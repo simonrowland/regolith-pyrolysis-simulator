@@ -14,6 +14,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import importlib.util
+import inspect
 import itertools
 import json
 import math
@@ -5086,6 +5087,9 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # condition locators excluded) then uncover rows whose values were fully
 # pinned: 48,603 -> 48,631 observations and 611 -> 616 extracts.
 # Unattested samples, pilot pins, and source-blind pins did not move.
+# Leading-decimal strings such as ".19" are measured leaves. Remeasured
+# on this corpus they sit in observations that were already uncovered, so
+# these ceilings did not move.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 48631
 _UNCOVERED_EXTRACTS_CEILING = 616
@@ -5282,6 +5286,20 @@ _MEASURED_PIN_CASES = {
         "source_text": "alpha 0.24 measured\n",
         "structured": True,
     },
+    # Literal citation. The sibling is the string ".91", the spelling in
+    # centolanzi-1966 figure legends. The artifact names the label only.
+    "leading_decimal_label": {
+        "values": {"quantity": "alpha", "alpha": ".91"},
+        "pins": [("quantity", "alpha")],
+        "source_text": "alpha\n",
+        "structured": False,
+    },
+    "leading_decimal_label_structured": {
+        "values": {"quantity": "alpha", "alpha": ".91"},
+        "pins": [("quantity", "alpha")],
+        "source_text": "alpha\n",
+        "structured": True,
+    },
     "partial_number": {
         "values": {"alpha": 0.91, "beta": 0.5},
         "pins": [("alpha", 0.91)],
@@ -5316,6 +5334,18 @@ _MEASURED_PIN_CASES = {
         "values": {"quantity": "alpha", "alpha": 0.91},
         "pins": [("alpha", 0.91)],
         "source_text": "alpha 0.91 measured\n",
+        "structured": True,
+    },
+    "leading_decimal_pinned": {
+        "values": {"quantity": "alpha", "alpha": ".91"},
+        "pins": [("alpha", ".91")],
+        "source_text": "legend .91\n",
+        "structured": False,
+    },
+    "leading_decimal_pinned_structured": {
+        "values": {"quantity": "alpha", "alpha": ".91"},
+        "pins": [("alpha", ".91")],
+        "source_text": "legend .91\n",
         "structured": True,
     },
     "split_two_numbers": {
@@ -5492,6 +5522,8 @@ _PASS_PIN_CLASSES = (
     "equal_siblings_split_structured",
     "equal_siblings_whole",
     "equal_siblings_whole_structured",
+    "leading_decimal_pinned",
+    "leading_decimal_pinned_structured",
 )
 _DEFECT_PIN_CLASSES = (
     "equipment_pin",
@@ -5518,6 +5550,8 @@ _DEFECT_PIN_CLASSES = (
     "series_element",
     "duplicate_alpha_pins",
     "duplicate_alpha_pins_structured",
+    "leading_decimal_label",
+    "leading_decimal_label_structured",
 )
 _DEFECT_KIND = {
     "equipment_pin": "uncovered_observation",
@@ -5544,6 +5578,8 @@ _DEFECT_KIND = {
     "series_element": "uncovered_observation",
     "duplicate_alpha_pins": "uncovered_observation",
     "duplicate_alpha_pins_structured": "uncovered_observation",
+    "leading_decimal_label": "uncovered_observation",
+    "leading_decimal_label_structured": "uncovered_observation",
 }
 _PROMOTION_ENTRIES = (
     "certify",
@@ -5694,15 +5730,116 @@ def test_draft_defects_stay_schema_valid_and_warn(pin_class: str, tmp_path: Path
 # Every leaf class a ``values`` payload can hold. The oracle below is the
 # invariant, written separately from the gate: a measured leaf is a finite
 # int, a finite float, or a string that contains a numeric token, at its
-# address under ``values``. A bool and a label are not leaves. A pin covers
-# an address only when that address is the pin or a descendant of it.
-# Repeating one address does not cover a sibling that stores the same number.
+# address under ``values``. A leading decimal is a numeric token. The
+# scanner below is not the gate regex, and the expected token is the
+# spelling a case constructs. A bool and a label are not leaves. A pin
+# covers an address only when that address is the pin or a descendant of
+# it. Repeating one address does not cover a sibling that stores the same
+# number.
+_ORACLE_TOKEN_SIGNS = frozenset("+-\u00b1\u2213")
+_ORACLE_BEFORE_BLOCK = frozenset(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.+\u00b1\u2213-"
+)
+_ORACLE_AFTER_BLOCK = frozenset(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_."
+)
+
+
+def _oracle_fold_signs(text: str) -> str:
+    """Fold the sign catalog onto ASCII. Distinct signs stay themselves."""
+    folded = text
+    for _name, sign, kind in _CERTIFICATION_SIGNS:
+        if kind == "minus" and sign != "-":
+            folded = folded.replace(sign, "-")
+        elif kind == "plus" and sign != "+":
+            folded = folded.replace(sign, "+")
+    return folded
+
+
+def _oracle_mantissa_end(text: str, index: int) -> int | None:
+    size = len(text)
+    if index >= size:
+        return None
+    if text[index] == ".":
+        cursor = index + 1
+        if cursor >= size or not text[cursor].isdigit():
+            return None
+        cursor += 1
+        while cursor < size and text[cursor].isdigit():
+            cursor += 1
+        return cursor
+    if not text[index].isdigit():
+        return None
+    cursor = index + 1
+    while cursor < size and text[cursor].isdigit():
+        cursor += 1
+    if (
+        cursor < size
+        and text[cursor] == "."
+        and cursor + 1 < size
+        and text[cursor + 1].isdigit()
+    ):
+        cursor += 2
+        while cursor < size and text[cursor].isdigit():
+            cursor += 1
+    return cursor
+
+
+def _oracle_exponent_end(text: str, index: int) -> int | None:
+    cursor = index + 1
+    size = len(text)
+    if cursor < size and text[cursor] in _ORACLE_TOKEN_SIGNS:
+        cursor += 1
+    if cursor >= size or not text[cursor].isdigit():
+        return None
+    cursor += 1
+    while cursor < size and text[cursor].isdigit():
+        cursor += 1
+    return cursor
+
+
+def _oracle_numeric_tokens(text: str) -> list[str]:
+    """Numeric tokens in ``text``. This scanner does not call the gate."""
+    folded = _oracle_fold_signs(text)
+    tokens: list[str] = []
+    index = 0
+    size = len(folded)
+    while index < size:
+        if index > 0 and folded[index - 1] in _ORACLE_BEFORE_BLOCK:
+            index += 1
+            continue
+        start = index
+        cursor = index
+        if folded[cursor] in _ORACLE_TOKEN_SIGNS:
+            cursor += 1
+        end = _oracle_mantissa_end(folded, cursor)
+        if end is None:
+            index = start + 1
+            continue
+        if end < size and folded[end] in "eE":
+            exponent = _oracle_exponent_end(folded, end)
+            if exponent is None:
+                index = start + 1
+                continue
+            end = exponent
+        if end < size and folded[end] in _ORACLE_AFTER_BLOCK:
+            index = start + 1
+            continue
+        if end == start:
+            index = start + 1
+            continue
+        tokens.append(folded[start:end])
+        index = end
+    return tokens
+
+
 _EVIDENCE_LEAF_CATALOG = (
     ("alpha", 0.91),
     ("count", 3),
     ("flag", True),
     ("quantity", "alpha"),
     ("printed", "0.24 mol"),
+    ("legend", ".19"),
     ("series", [0.2, 0.5]),
 )
 _ORACLE_TEMPERATURE_KEYS = ("T_K", "T", "temperature_K", "temp_K")
@@ -5721,7 +5858,7 @@ def _oracle_measured_addresses(
             return []
         return [prefix]
     if isinstance(value, str):
-        if value.strip() and vle._NUMERIC_TOKEN_RE.search(value):
+        if value.strip() and _oracle_numeric_tokens(value):
             return [prefix]
         return []
     if isinstance(value, dict):
@@ -6098,6 +6235,12 @@ def test_measured_number_coverage_enumerates_every_leaf_class(tmp_path: Path):
         (
             "printed",
             {"left": "0.24 mol", "right": "0.24 mol"},
+            ("left", "right"),
+            False,
+        ),
+        (
+            "leading-decimal",
+            {"left": ".24", "right": ".24"},
             ("left", "right"),
             False,
         ),
@@ -6780,6 +6923,22 @@ _TOKEN_CASES = (
     ("string_minus", "0.24", "alpha -0.24 measured\n", False),
     ("string_exponent", "0.24", "alpha 0.24e-5 measured\n", False),
     ("string_one_against_bare", "1.0", "ratio 1 only\n", False),
+    # Literal citation. ".24" is not "-.24", "10.24", or ".24e-5".
+    ("leading_decimal_exact", ".24", "alpha .24 measured\n", True),
+    ("leading_decimal_opposite_sign", ".24", "alpha -.24 measured\n", False),
+    ("leading_decimal_unicode_minus", ".24", "alpha \u2212.24 measured\n", False),
+    ("leading_decimal_unicode_same", "-.24", "delta \u2212.24 measured\n", True),
+    ("leading_decimal_longer", ".24", "alpha 10.24 measured\n", False),
+    ("leading_decimal_exponent_exact", ".24e-5", "alpha .24e-5 measured\n", True),
+    ("leading_decimal_exponent_truncated", ".24", "alpha .24e-5 measured\n", False),
+    # Literal neighbour. format(this, ".16g") is "0.24", a different float.
+    ("rounded_neighbour", 0.24000000000000002, "alpha 0.24 measured\n", False),
+    (
+        "rounded_neighbour_exact",
+        0.24000000000000002,
+        "alpha 0.24000000000000002 measured\n",
+        True,
+    ),
 )
 
 
@@ -6821,8 +6980,9 @@ def test_complete_numeric_token_is_required_at_every_promoter(
 ):
     """Invariant: sign and exponent belong to the certified token.
 
-    ``0.24`` is not ``-0.24`` or ``0.24e-5``. ``1.0`` is not ``1``. Every
-    promoter calls ``certify_extract_source_fidelity``. Drafts stay
+    ``0.24`` is not ``-0.24`` or ``0.24e-5``. ``1.0`` is not ``1``.
+    ``.24`` is not ``-.24``. ``0.24000000000000002`` is not ``0.24``.
+    Every promoter calls ``certify_extract_source_fidelity``. Drafts stay
     schema-valid and carry a typed ``source_blind_pin`` warning.
     """
     doc = _literal_source_document(tmp_path, pin, source_text)
@@ -6846,6 +7006,179 @@ def test_complete_numeric_token_is_required_at_every_promoter(
         draft, label="draft", artifact_root=tmp_path
     )
     assert any(warning.kind == "source_blind_pin" for warning in warnings)
+
+
+# Mantissa classes the certification token claims to recognize. A leading
+# decimal is one of them. The expected token is the spelling built here.
+_NUMERIC_MANTISSAS = ("0", "24", "0.24", "1.0", "10.24", ".24", ".5", ".91")
+_NUMERIC_SIGNS = ("", "-", "+")
+_NUMERIC_EXPONENTS = ("", "e-5", "E+2")
+
+
+def _opposite_numeric_spelling(spelling: str) -> str:
+    """The other sign of ``spelling``. Independent of the gate."""
+    if spelling.startswith("-"):
+        return spelling[1:]
+    if spelling.startswith("+"):
+        return "-" + spelling[1:]
+    return "-" + spelling
+
+
+def _spelling_preserves_float(spelling: str, leaf: float) -> bool:
+    """True when ``spelling`` is this float. Not the gate's spelling helper."""
+    if "." not in spelling and "e" not in spelling.lower():
+        return False
+    try:
+        parsed = float(spelling)
+    except ValueError:
+        return False
+    return parsed == leaf and math.copysign(1.0, parsed) == math.copysign(1.0, leaf)
+
+
+def test_measured_leaf_oracle_does_not_call_the_gate_scanner():
+    """The coverage oracle has its own scanner, so a shared regex cannot hide a hole."""
+    for function in (_oracle_measured_addresses, _oracle_numeric_tokens):
+        source = inspect.getsource(function)
+        assert "vle." not in source
+        assert "_NUMERIC_TOKEN_RE" not in source
+        assert "_citation_token_matches" not in source
+
+
+def test_every_numeric_spelling_certifies_only_its_exact_token(tmp_path: Path):
+    """Invariant: a stored number certifies only as that complete token.
+
+    The matrix is every mantissa class (integer, fraction, leading decimal),
+    every sign (none, minus, plus), and every exponent class (none, negative,
+    positive). The expected token is the constructed spelling. A label pin
+    does not cover a sibling leading decimal. ``.24`` is not ``-.24`` or
+    ``.241``.
+    """
+    failures: list[str] = []
+    for mantissa in _NUMERIC_MANTISSAS:
+        for sign in _NUMERIC_SIGNS:
+            for exponent in _NUMERIC_EXPONENTS:
+                spelling = f"{sign}{mantissa}{exponent}"
+                context = f"alpha {spelling} measured"
+                expected = [spelling]
+                oracle = _oracle_numeric_tokens(context)
+                gate = [match.group(0) for match in vle._citation_token_matches(context)]
+                if oracle != expected or gate != expected:
+                    failures.append(
+                        f"token {spelling!r} oracle={oracle} gate={gate}"
+                    )
+                    continue
+                values = {"quantity": "alpha", "alpha": spelling}
+                if _oracle_measured_addresses(values) != [("alpha",)]:
+                    failures.append(f"oracle address {spelling!r}")
+                if list(vle._measured_leaf_addresses(values)) != [("alpha",)]:
+                    failures.append(f"gate address {spelling!r}")
+                exact = _literal_source_document(tmp_path, spelling, context + "\n")
+                exact_errors = vle.certify_extract_source_fidelity(
+                    exact, label="spell", artifact_root=tmp_path
+                )
+                if exact_errors:
+                    failures.append(f"exact {spelling!r}: {exact_errors}")
+                longer = _literal_source_document(
+                    tmp_path, spelling, f"alpha {spelling}1 measured\n"
+                )
+                longer_errors = vle.certify_extract_source_fidelity(
+                    longer, label="spell", artifact_root=tmp_path
+                )
+                if "source_blind_pin" not in "\n".join(longer_errors):
+                    failures.append(f"longer {spelling!r}: {longer_errors}")
+                opposite = _opposite_numeric_spelling(spelling)
+                opposed = _literal_source_document(
+                    tmp_path, spelling, f"alpha {opposite} measured\n"
+                )
+                opposed_errors = vle.certify_extract_source_fidelity(
+                    opposed, label="spell", artifact_root=tmp_path
+                )
+                if "source_blind_pin" not in "\n".join(opposed_errors):
+                    failures.append(f"sign {spelling!r} vs {opposite!r}: {opposed_errors}")
+                if not mantissa.startswith("."):
+                    continue
+                for structured in (False, True):
+                    hidden = _values_pin_document(
+                        tmp_path,
+                        values=values,
+                        pins=[("quantity", "alpha")],
+                        source_text="alpha\n",
+                        structured=structured,
+                    )
+                    hidden_errors = vle.certify_extract_source_fidelity(
+                        hidden, label="spell", artifact_root=tmp_path
+                    )
+                    joined = "\n".join(hidden_errors)
+                    if "uncovered_observation" not in joined or "source_blind_pin" in joined:
+                        failures.append(
+                            f"label {spelling!r} structured={structured}: {hidden_errors}"
+                        )
+    assert failures == []
+
+
+def test_float_spellings_certify_only_the_stored_number(tmp_path: Path):
+    """Invariant: rounding does not substitute for the stored float.
+
+    ``format(0.24000000000000002, ".16g")`` is ``0.24``. That spelling is a
+    different number and must not certify. A spelling is accepted only when
+    parsing it returns the stored float, including the sign of zero. The
+    predicate is float equality, not ``_numeric_spellings``.
+    """
+    leaves = [
+        0.0,
+        -0.0,
+        math.nextafter(0.0, math.inf),
+        math.nextafter(0.0, -math.inf),
+    ]
+    for base in (
+        0.24,
+        0.5,
+        1.0,
+        1.5,
+        10.0,
+        0.1,
+        2.5,
+        -0.24,
+        0.91,
+        3.0,
+        100.0,
+        1e-4,
+        1e-20,
+        math.pi,
+    ):
+        leaves.append(float(base))
+        direction = math.inf if base > 0.0 else -math.inf
+        leaves.append(math.nextafter(float(base), direction))
+    seen: list[float] = []
+    failures: list[str] = []
+    for leaf in leaves:
+        if any(candidate.hex() == leaf.hex() for candidate in seen):
+            continue
+        seen.append(leaf)
+        candidates = (str(leaf), format(leaf, ".16g"))
+        preserved = {
+            spelling
+            for spelling in candidates
+            if _spelling_preserves_float(spelling, leaf)
+        }
+        gate = vle._numeric_spellings(leaf)
+        if gate != preserved:
+            failures.append(f"spellings {leaf.hex()} gate={gate} preserved={preserved}")
+            continue
+        for spelling in candidates:
+            doc = _literal_source_document(
+                tmp_path, leaf, f"alpha {spelling} measured\n"
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label="round", artifact_root=tmp_path
+            )
+            if spelling in preserved:
+                if errors:
+                    failures.append(f"exact {leaf.hex()} {spelling!r}: {errors}")
+                continue
+            if "source_blind_pin" not in "\n".join(errors):
+                failures.append(f"rounded {leaf.hex()} {spelling!r}: {errors}")
+    assert failures == []
 
 
 # The sign class, written here and not read from the gate. ``kind`` is the

@@ -29,7 +29,11 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   (paper, OCR, or quotes — not the extract and not program source) and
   requires each resolved extract number as a complete token: sign and
   exponent belong to the token, so 0.24 is not -0.24 or 0.24e-5, and
-  1.0 is not 1. A sample value within ``rel_tol`` of a different stored
+  1.0 is not 1. A leading decimal is a number, so .24 is not a label
+  and is not the token -0.24, 10.24, or 0.24. A float spelling is kept
+  only when it parses back to the stored number, so
+  ``format(0.24000000000000002, ".16g")`` is 0.24 and does not certify
+  it. A sample value within ``rel_tol`` of a different stored
   number does not certify that stored number; the opened source must
   contain the resolved leaf. Unicode numeric signs are folded onto that
   grammar before the match, so a Unicode minus is a minus and −0.24 is
@@ -235,14 +239,17 @@ _TOKEN_LOOKBEHIND_CLASS = "A-Za-z0-9_." + "+" + _DISTINCT_NUMERIC_SIGNS + "-"
 # Sign and exponent are part of one token. The lookbehind also rejects a
 # preceding sign so the match cannot start on the digits of -0.24. The
 # optional exponent group consumes 0.24e-5 whole, so a shorter spelling is
-# not a second match. This is the citation token used by t-1333, kept here
-# so certification does not invent a second numeric grammar. Callers scan
-# text only through ``_citation_token_matches``, which folds Unicode signs
-# first.
+# not a second match. The mantissa is digits, a fraction, or a leading
+# decimal: ".24" is a number. Without that alternative the string ".91"
+# is not a measured leaf, and the non-numeric substring path treats ".24"
+# as text inside "-.24". Callers scan text only through
+# ``_citation_token_matches``, which folds Unicode signs first. A second
+# scanner would let one path drop a sign or a leading decimal that
+# another path keeps.
 _NUMERIC_TOKEN_RE = re.compile(
     f"(?<![{_TOKEN_LOOKBEHIND_CLASS}])"
     f"[{_TOKEN_SIGN_CLASS}]?"
-    r"\d+(?:\.\d+)?"
+    r"(?:\d+(?:\.\d+)?|\.\d+)"
     f"(?:[eE][{_TOKEN_SIGN_CLASS}]?"
     r"\d+)?"
     r"(?![A-Za-z0-9_.])"
@@ -1949,17 +1956,33 @@ def _scalar_leaves(value: Any) -> list[Any]:
 def _numeric_spellings(leaf: int | float) -> set[str]:
     """Spellings whose complete token may certify this number.
 
-    ``format(1.0, ".16g")`` is ``1``. That spelling is dropped: a float keeps
-    a decimal point or an exponent, so 1.0 does not certify against a lone 1.
+    Only a spelling that preserves the stored number is kept. Rounding
+    ``0.24000000000000002`` to ``0.24`` is not that number. ``str(leaf)``
+    is the shortest round trip. ``format(leaf, ".16g")`` is kept only when
+    it parses back to the same float, so an exact alternate of ``1e-20``
+    can remain and a rounded neighbour cannot. ``-0.0`` and ``0.0`` compare
+    equal, so the sign is checked separately. A float spelling still needs
+    a decimal point or an exponent: ``format(1.0, ".16g")`` is ``1`` and
+    does not certify 1.0.
     """
     if isinstance(leaf, int):
         return {str(leaf)}
-    spellings = {str(leaf), format(leaf, ".16g")}
-    return {
-        spelling
-        for spelling in spellings
-        if "." in spelling or "e" in spelling.lower()
-    }
+    if not math.isfinite(leaf):
+        return set()
+    exact: set[str] = set()
+    for spelling in (str(leaf), format(leaf, ".16g")):
+        if "." not in spelling and "e" not in spelling.lower():
+            continue
+        try:
+            parsed = float(spelling)
+        except ValueError:
+            continue
+        if parsed != leaf:
+            continue
+        if math.copysign(1.0, parsed) != math.copysign(1.0, leaf):
+            continue
+        exact.add(spelling)
+    return exact
 
 
 def _spelling_is_complete_token(spelling: str, text: str) -> bool:
@@ -1973,8 +1996,10 @@ def _string_leaf_in_text(leaf: str, text: str) -> bool:
 
     A non-numeric leaf stays a substring. A leaf that contains a number
     matches only where each of those numbers is the same complete token,
-    so the string ``0.24`` is not ``-0.24`` or ``0.24e-5``. Unicode signs
-    are folded before either string is searched, so ``−0.24`` is ``-0.24``.
+    so the string ``0.24`` is not ``-0.24`` or ``0.24e-5``. A leading
+    decimal is a number, so ``.24`` is not ``-.24`` or ``10.24``. Unicode
+    signs are folded before either string is searched, so ``−0.24`` is
+    ``-0.24``.
     """
     leaf = _fold_numeric_signs(leaf)
     text = _fold_numeric_signs(text)
@@ -2006,8 +2031,11 @@ def _leaf_in_text(leaf: Any, text: str) -> bool:
 
     Numeric leaves match a complete token only. Sign and exponent belong to
     the token, so 0.24 does not match -0.24, 0.24e-5, or 10.24, and 1.0 does
-    not match 1. A Unicode minus is a minus, so −0.24 does not match 0.24
-    and does match -0.24. This is a cited-text grep, not a unit conversion.
+    not match 1. A leading decimal is a token, so .24 does not match -.24.
+    A float matches only a spelling that parses back to that stored number,
+    so 0.24000000000000002 does not match 0.24. A Unicode minus is a minus,
+    so −0.24 does not match 0.24 and does match -0.24. This is a cited-text
+    grep, not a unit conversion.
     """
     if isinstance(leaf, bool):
         token = "true" if leaf else "false"
@@ -2133,7 +2161,9 @@ def fidelity_source_warnings(
     Invariant: a scored measured leaf is certified only when its observation
     id is one non-empty string naming exactly one scored row, and the opened
     source contains that resolved extract leaf as a complete token of the
-    same sign. The sample's own spelling is not a substitute: a ``rel_tol``
+    same sign and the same digits. A leading decimal is a numeric token.
+    A spelling that rounds the stored float to a different number is not
+    that token. The sample's own spelling is not a substitute: a ``rel_tol``
     match of a different number does not certify the stored leaf. A scored
     row with no usable observation id is a typed refusal, never omitted.
     A Unicode minus is a minus. Duplicate observation ids are a typed
@@ -2383,7 +2413,9 @@ def certify_extract_source_fidelity(
     Invariant: an empty list is the only pass. A scored measured leaf is
     certified only when its observation id is one non-empty string naming
     exactly one scored row, and the opened source contains that resolved
-    extract leaf as a complete token of the same sign. The sample's own
+    extract leaf as a complete token of the same sign and the same digits.
+    A leading decimal is a numeric token. A spelling that rounds the stored
+    float to a different number is not that token. The sample's own
     spelling is not a substitute: a ``rel_tol`` match of a different number
     does not certify the stored leaf. A scored row with no usable
     observation id refuses; the row is not omitted. Every measured leaf of
