@@ -39,8 +39,6 @@ def test_edited_locators_bind_to_their_physical_pdf_pages() -> None:
     assert "Table II" in page6 and "418 ± 8.4" in page6
 
     page5 = source_page_text(document["source_id"], 5)
-    normalized_page5 = " ".join(page5.split())
-    assert (
-        "Ionization of the species in the vapor phase was achieved by applying an electron "
-        "energy of 70 eV and an emission current of 0.2 mA."
-    ) in normalized_page5
+    assert "electron energy of 70 eV" in page5
+    assert "emission current of 0.2 mA" in page5
+    assert "0.2 mA" not in page6
