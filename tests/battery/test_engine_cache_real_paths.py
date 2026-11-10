@@ -684,6 +684,94 @@ def test_internal_analytical_residue_cache_round_trips_named_observation_request
     }
 
 
+def test_internal_analytical_high_temperature_mode_is_keyed_and_cache_equivalent(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        internal_analytical_residue_vapor_pressure,
+    )
+    from tests.battery.cache_test_support import open_available_engine
+
+    cache_path = tmp_path / "internal-analytical-high-temperature.sqlite"
+    composition_mol = {
+        "SiO2": 0.44,
+        "Al2O3": 0.05,
+        "FeO": 0.08,
+        "MgO": 0.36,
+        "CaO": 0.07,
+    }
+    request = {
+        "temperature_C": 1726.85,
+        "pressure_bar": 0.0,
+        "composition_kg": None,
+        "composition_mol": composition_mol,
+        "fO2_log": -10.0,
+        "po2_request": Po2Request(PO2_COMMANDED, 1e-10),
+        "include_diagnostic_shadows": False,
+    }
+
+    def evaluate(mode: str, *, cache: bool) -> Any:
+        handle = open_available_engine(
+            Engine.INTERNAL_ANALYTICAL,
+            nodeid="internal analytical high-temperature cache invariant",
+        )
+        try:
+            core = handle.backend._core
+            core._high_t_melt_activity = mode
+            if cache:
+                monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(cache_path))
+            else:
+                monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+            return internal_analytical_residue_vapor_pressure(core=core, **request)
+        finally:
+            close_battery_engine_handle(handle)
+
+    openimcc_backend = open_available_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        nodeid="internal analytical high-temperature key invariant",
+    )
+    try:
+        openimcc_backend.backend._core._high_t_melt_activity = "openimcc"
+        openimcc_settings = engine_cache.engine_cache_backend_settings(
+            openimcc_backend.backend
+        )
+        openimcc_key = engine_cache.engine_cache_key(
+            "internal-analytical",
+            engine_cache.ENGINE_CHEMISTRY_VERSION["internal-analytical"],
+            {"request": request, "engine_settings": openimcc_settings},
+        )
+        openimcc_backend.backend._core._high_t_melt_activity = "constant_gamma"
+        constant_gamma_settings = engine_cache.engine_cache_backend_settings(
+            openimcc_backend.backend
+        )
+        constant_gamma_key = engine_cache.engine_cache_key(
+            "internal-analytical",
+            engine_cache.ENGINE_CHEMISTRY_VERSION["internal-analytical"],
+            {"request": request, "engine_settings": constant_gamma_settings},
+        )
+    finally:
+        close_battery_engine_handle(openimcc_backend)
+
+    assert openimcc_key != constant_gamma_key
+    engine_cache.engine_cache_counters(reset=True)
+    openimcc_off = evaluate("openimcc", cache=False)
+    openimcc_cold = evaluate("openimcc", cache=True)
+    openimcc_warm = evaluate("openimcc", cache=True)
+    constant_gamma_off = evaluate("constant_gamma", cache=False)
+    constant_gamma_cold = evaluate("constant_gamma", cache=True)
+    constant_gamma_warm = evaluate("constant_gamma", cache=True)
+
+    assert openimcc_cold == openimcc_off
+    assert openimcc_warm == openimcc_off
+    assert constant_gamma_cold == constant_gamma_off
+    assert constant_gamma_warm == constant_gamma_off
+    assert openimcc_off.vapor_pressures_Pa != constant_gamma_off.vapor_pressures_Pa
+
+
 def test_hashimoto_internal_residue_path_reads_diagnostics_from_cache(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
