@@ -431,17 +431,19 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     assert counts["alias_groups_needing_resolution"] == 84 + 2  # landing 84 + stack delta 2
 
     status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
-    # SOURCE_STATUS.yaml changed only on stack 4, so this pin stays green
-    # 91061cdad plus the stack-owned status delta.
-    assert status["counts"]["sources"] == 2311 + 16  # green 2311 + stack delta 16
+    # Status rows are landing f3d5d78d5 (2318 sources, in_progress 256).
+    # Landing is green 91061cdad (2311 / in_progress 249) plus seven
+    # in_progress sources. Stack 4's header had counted only green plus its
+    # delta and left those seven rows uncounted.
+    assert status["counts"]["sources"] == 2318 + 16  # landing 2318 + stack delta 16
     assert status["counts"]["by_stage"] == {
-        "located": 209 + 0,  # green 209 + stack delta 0
-        "inbox": 1261 - 12,  # green 1261 + stack delta -12
-        "in_progress": 249 + 2,  # green 249 + stack delta 2
-        "ingested_partial": 145 + 10,  # green 145 + stack delta 10
-        "ingested_complete": 130 + 6,  # green 130 + stack delta 6
-        "wired": 0 + 0,  # green 0 + stack delta 0
-        "unknown": 317 + 10,  # green 317 + stack delta 10
+        "located": 209 + 0,  # landing 209 + stack delta 0
+        "inbox": 1261 - 12,  # landing 1261 + stack delta -12
+        "in_progress": 256 + 2,  # landing 256 + stack delta 2
+        "ingested_partial": 145 + 10,  # landing 145 + stack delta 10
+        "ingested_complete": 130 + 6,  # landing 130 + stack delta 6
+        "wired": 0 + 0,  # neither side has a wired row
+        "unknown": 317 + 10,  # landing 317 + stack delta 10
     }
 
 
