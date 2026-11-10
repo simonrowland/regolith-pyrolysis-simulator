@@ -610,14 +610,20 @@ def _validate_objectives(
             raise ProfileValidationError(f"{source}: {where}.rationale must be a string")
     if isinstance(profile, dict):
         profile["objectives"] = normalized_objectives
-    # The returned profile keeps the authored campaign so its digest does not
-    # absorb a fidelity overlay. The weight check uses the executed campaign.
-    check_profile: Mapping[str, Any] = profile
-    if scoring_campaign is not None:
-        check_profile = profile_with_executed_campaign(profile, scoring_campaign)
+    # Structure of every declared row, including products a campaign will
+    # withhold. The remaining-weight refusal is an evaluation: it uses the
+    # campaign the selected fidelity executes. A load that has not selected
+    # a fidelity is not that evaluation. Refusing here on the authored
+    # campaign rejects a file whose executed campaign claims the product.
     try:
         objective_importance_evidence(profile)
         declared_objective_definitions(profile)
+    except ObjectiveProfileError as exc:
+        raise ProfileValidationError(f"{source}: {exc}") from exc
+    if scoring_campaign is None:
+        return
+    check_profile = profile_with_executed_campaign(profile, scoring_campaign)
+    try:
         objective_definitions(check_profile)
     except ObjectiveProfileError as exc:
         raise ProfileValidationError(f"{source}: {exc}") from exc
