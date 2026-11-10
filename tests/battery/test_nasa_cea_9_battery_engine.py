@@ -16,7 +16,10 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
 )
-from simulator.battery.identity import Identity
+from simulator.battery.identity import (
+    Identity,
+    ideal_gas_entropy_pressure_shift_J_per_mol_K,
+)
 from simulator.battery.records import State, Value
 from simulator.battery.score import (
     ScoreContext,
@@ -33,6 +36,7 @@ def _o2_observation(
     *,
     temperature_K: Decimal = Decimal("1000"),
     value: Decimal = Decimal("1"),
+    standard_pressure_Pa: State[Decimal] | None = None,
 ):
     experiment = F.tabulation_experiment(T_K=temperature_K)
     identity = replace(
@@ -40,6 +44,11 @@ def _o2_observation(
         quantity=quantity,
         reaction=State.not_applicable("not a formation quantity"),
         formation_elements=State.not_applicable("not a formation quantity"),
+        standard_pressure_Pa=(
+            standard_pressure_Pa
+            if standard_pressure_Pa is not None
+            else State.of(Decimal("100000"))
+        ),
     )
     observation = F.observation(
         f"synthetic-nasa-cea::{quantity.value}",
@@ -62,7 +71,9 @@ def _o2_observation(
 
 
 def test_nasa_cea_9_scores_supported_synthetic_heat_capacity() -> None:
-    context, observation = _o2_observation(Quantity.CP)
+    context, observation = _o2_observation(
+        Quantity.CP, temperature_K=Decimal("298.15")
+    )
     assert isinstance(observation.identity, Identity)
     assert observation.identity.per is not None
     assert observation.identity.per.value is PerBasis.MOL_SPECIES
@@ -73,6 +84,7 @@ def test_nasa_cea_9_scores_supported_synthetic_heat_capacity() -> None:
         experiment=context.experiments[observation.experiment_id],
     )
     assert prediction.value is not None
+    assert abs(prediction.value - Decimal("29.3782")) < Decimal("0.001")
     assert prediction.unit == QUANTITY_UNITS[Quantity.CP]
     assert prediction.authority is Authority.BRIDGE
 
@@ -105,6 +117,55 @@ def test_nasa_cea_9_scores_supported_synthetic_heat_capacity() -> None:
         row["engine"] == Engine.NASA_CEA_9.value
         for row in summary["records"]
     )
+
+
+def test_nasa_cea_9_gas_entropy_uses_printed_pressure_shift() -> None:
+    predictions = {}
+    for pressure in (Decimal("100000"), Decimal("101325")):
+        context, observation = _o2_observation(
+            Quantity.S,
+            temperature_K=Decimal("298.15"),
+            standard_pressure_Pa=State.of(pressure),
+        )
+        predictions[pressure] = predict_with_engine(
+            Engine.NASA_CEA_9,
+            observation,
+            experiment=context.experiments[observation.experiment_id],
+        )
+
+    at_reference = predictions[Decimal("100000")]
+    at_printed = predictions[Decimal("101325")]
+    assert at_reference.value is not None
+    assert at_printed.value is not None
+    expected_shift = ideal_gas_entropy_pressure_shift_J_per_mol_K(
+        Decimal("100000"), Decimal("101325")
+    )
+    assert abs(at_printed.value - at_reference.value - expected_shift) < Decimal(
+        "1e-24"
+    )
+
+
+def test_nasa_cea_9_gas_entropy_refuses_missing_or_nonpositive_pressure() -> None:
+    for pressure in (
+        State.unknown("source does not report pressure"),
+        State.of(Decimal("0")),
+    ):
+        context, observation = _o2_observation(
+            Quantity.S,
+            temperature_K=Decimal("298.15"),
+            standard_pressure_Pa=pressure,
+        )
+        prediction = predict_with_engine(
+            Engine.NASA_CEA_9,
+            observation,
+            experiment=context.experiments[observation.experiment_id],
+        )
+
+        assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+        assert prediction.refusal_detail["reason"].startswith(
+            "nasa-cea-gas-entropy-pressure-"
+        )
 
 
 def test_nasa_cea_9_refuses_unsupported_quantity_with_typed_reason() -> None:

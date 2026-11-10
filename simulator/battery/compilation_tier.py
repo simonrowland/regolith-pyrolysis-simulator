@@ -1185,6 +1185,27 @@ def _nasa_cea_9_attempt(
                 origin=origin,
                 extra={"formula": identity.species.formula},
             )
+        gas_entropy_pressure: Decimal | None = None
+        if quantity is Quantity.S and phase_token(identity.species) is Phase.G:
+            pressure_state = identity.standard_pressure_Pa
+            if pressure_state is None or not pressure_state.is_value:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "nasa-cea-gas-entropy-pressure-missing",
+                    quantity=quantity,
+                    origin=origin,
+                )
+            try:
+                gas_entropy_pressure = as_decimal(pressure_state.value)
+            except (TypeError, ValueError):
+                gas_entropy_pressure = Decimal("NaN")
+            if not gas_entropy_pressure.is_finite() or gas_entropy_pressure <= 0:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "nasa-cea-gas-entropy-pressure-not-positive",
+                    quantity=quantity,
+                    origin=origin,
+                )
         try:
             polynomial = _nasa_cea_9_polynomial(str(record["record_id"]))
             state, outside = _nasa_cea_9_state(polynomial, temperature_K)
@@ -1192,6 +1213,13 @@ def _nasa_cea_9_attempt(
                 value = as_decimal(str(state.cp_J_per_mol_K))
             elif quantity is Quantity.S:
                 value = as_decimal(str(state.s_J_per_mol_K))
+                if gas_entropy_pressure is not None:
+                    # The NASA gas polynomial gives S(T, p0), p0 = 100000 Pa.
+                    # S(T,p) = S(T,p0) - R ln(p/p0): zero shift at p0 and
+                    # about +95.7 J/mol/K at 1 Pa. Use the identity owner.
+                    value += ideal_gas_entropy_pressure_shift_J_per_mol_K(
+                        Decimal("100000"), gas_entropy_pressure
+                    )
             else:
                 anchor_state, anchor_outside = _nasa_cea_9_state(
                     polynomial, reference_temperature
