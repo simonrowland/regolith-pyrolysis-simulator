@@ -317,12 +317,19 @@ The `filters` object has these keys:
 | `refused_count` | Total refused rows in the input, counted before feedstock, engine, rail, species, unit, temperature, or run-envelope filters. All refusals are excluded from ranking; this is not a filter-specific count. Refusals have no unit and remain counted with `--unit`. |
 | `rank_policy` | Text describing the within-unit ranking and unit-block order. |
 
-Markdown output also lists refusal totals by engine and rail. For active engine or rail
-filters, matching buckets show the count matching those dimensions where the row's values
-are known. When a rail or species filter is active, the Markdown summary reports refusals
-missing the rail and/or species value needed to evaluate those filters. The engine/rail
-breakdown does not provide a species-specific match count. Refusals with known values that
-do not match a filter remain in the input-wide `refused_count` but are not unattributed.
+Markdown output lists input-wide refusal totals by engine and rail, using `unknown` for a
+blank rail. These buckets are printed regardless of active filters; they include known
+matches and non-matches and do not show counts matching the selected filters. For example,
+with five refusals and `--engine openimcc --rail vapour --species Fe`, the summary can show
+`magemin/unknown=1; openimcc/unknown=1; openimcc/vapour=2; other/activity=1`. The
+`openimcc/vapour=2` bucket includes refusals that do not match the selected species, and
+`other/activity=1` matches neither the selected engine nor rail.
+
+When `--rail` or `--species` is active, a separate Markdown line reports refusals missing
+the rail value needed by `--rail` and/or the species value needed by `--species`. It is a
+missing-value attribution summary, not a filter-match count. Refusals with known values
+that do not match a filter remain in the input-wide `refused_count` but are not
+unattributed.
 
 When `run_envelope` is present, it contains `feedstock_composition_class`,
 `feedstock_class_source`, `backend`, `engines_by_role`, `temperature_K` (`min`, `max`, and
