@@ -55,18 +55,32 @@ def test_sossi_start_inventory_contains_table1_host_and_starting_trace() -> None
 
 
 def test_sossi_geometry_is_declared_from_bead_mass_without_residue_inputs() -> None:
-    areas = _sossi_geometry_areas(25.0e-6)
+    source = yaml.safe_load(SOURCE.read_text())
+    area_record = next(
+        observation["equipment"]["sample_surface_area"]
+        for observation in source["species"]["K"]["observations"]
+        if "sample_surface_area" in observation.get("equipment", {})
+    )
+    printed_area_m2 = float(area_record["value"])
+    areas = _sossi_geometry_areas(25.0e-6, printed_area_m2=printed_area_m2)
 
     assert tuple(areas) == _SOSSI_GEOMETRIES
     assert all(value > 0.0 for value in areas.values())
+    assert printed_area_m2 == pytest.approx(2.0e-5)
     assert areas["pt_loop_bead_sphere_constant"] == areas[
         "pt_loop_bead_sphere_shrinking"
     ]
-    radius_m = (3.0 * 25.0e-6 / (4.0 * math.pi * 2700.0)) ** (1.0 / 3.0)
     assert areas["pt_loop_bead_sphere_constant"] == pytest.approx(
-        4.0 * math.pi * radius_m**2
+        printed_area_m2
     )
     assert areas["pt_loop_bead_disk_equivalent_volume"] != areas[
+        "pt_loop_bead_sphere_constant"
+    ]
+
+    mutated_area_m2 = printed_area_m2 * 2.0
+    mutated = _sossi_geometry_areas(25.0e-6, printed_area_m2=mutated_area_m2)
+    assert mutated["pt_loop_bead_sphere_constant"] == pytest.approx(mutated_area_m2)
+    assert mutated["pt_loop_bead_sphere_constant"] != areas[
         "pt_loop_bead_sphere_constant"
     ]
 
@@ -77,7 +91,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
 
     import simulator.battery.residue as residue
     from simulator.melt_backend import openimcc_bridge
-    from simulator.chemistry.melt_activity import melt_oxide_activity
+    import simulator.chemistry.melt_activity as melt_activity
 
     monkeypatch.setattr(
         openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
@@ -104,18 +118,29 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     temperature_K = residue._hashimoto_point_value(
         experiment["thermal_schedule"]["setpoints_and_holds"][0]["temperature_K"]
     )
-    expected_mno_activity = melt_oxide_activity(
+    expected_fallback_activity = melt_activity.melt_oxide_activity(
         "MnO", initial_inventory, temperature_K=temperature_K
     )
-    assert expected_mno_activity is not None
+    assert expected_fallback_activity is not None
     evaluated_compositions: list[dict[str, float]] = []
+    openimcc_mno_activities: list[float] = []
     gas_activity_inputs: list[dict[str, float]] = []
+    extension_calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
     original_melt_evaluate = openimcc_bridge.evaluate
     original_gas_evaluate = openimcc.evaluate_gas
+    original_melt_activity = melt_activity.melt_oxide_activity
 
     def capture_melt_evaluate(**kwargs):
         evaluated_compositions.append(dict(kwargs["composition_mol"]))
-        return original_melt_evaluate(**kwargs)
+        state = original_melt_evaluate(**kwargs)
+        openimcc_mno_activities.append(
+            float(state.parent_oxide_activities["MnO"])
+        )
+        return state
+
+    def capture_extension_call(*args, **kwargs):
+        extension_calls.append((args, kwargs))
+        return original_melt_activity(*args, **kwargs)
 
     def capture_gas_evaluate(activities, *args, **kwargs):
         gas_activity_inputs.append(dict(activities))
@@ -128,6 +153,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     )
     monkeypatch.setattr(openimcc_bridge, "evaluate", capture_melt_evaluate)
     monkeypatch.setattr(openimcc, "evaluate_gas", capture_gas_evaluate)
+    monkeypatch.setattr(melt_activity, "melt_oxide_activity", capture_extension_call)
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     prediction = residue._predict_sossi_residue_cohort(
         [experiment],
@@ -136,6 +162,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
         code_revision="pack-digest-pin-test",
         engine="openimcc",
+        sample_surface_area_m2=2.0e-5,
     )[0]
 
     gas_pack = openimcc.load_gas_datapack()
@@ -155,13 +182,19 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert all("MnO" not in composition for composition in evaluated_compositions)
     mno_inputs = [activities for activities in gas_activity_inputs if "MnO" in activities]
     assert mno_inputs
-    assert mno_inputs[0]["MnO"] == pytest.approx(
-        expected_mno_activity.thermodynamic_parent_activity()
+    assert openimcc_mno_activities
+    assert mno_inputs[0]["MnO"] == openimcc_mno_activities[0]
+    assert mno_inputs[0]["MnO"] != pytest.approx(
+        expected_fallback_activity.thermodynamic_parent_activity()
     )
-    mno_extension = prediction.provenance["melt_activity_extensions"]["MnO"]
-    assert mno_extension["authority_level"] == expected_mno_activity.evidence_tier
-    assert mno_extension["certified_band_K"] is None
-    assert mno_extension["activity_provenance"] == expected_mno_activity.provenance()
+    assert extension_calls == []
+    assert "MnO" not in prediction.provenance.get("melt_activity_extensions", {})
+    assert prediction.provenance["geometry_areas_m2"][
+        "pt_loop_bead_sphere_constant"
+    ] == pytest.approx(2.0e-5)
+    assert prediction.provenance["assumption_flags"][
+        "sample_surface_area_fallback_2700_kg_m3"
+    ] is False
 
 
 def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
