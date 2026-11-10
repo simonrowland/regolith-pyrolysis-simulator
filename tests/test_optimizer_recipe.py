@@ -1228,14 +1228,48 @@ def test_c2a_staged_po2_hold_accepts_hard_vacuum_total_and_refuses_nonphysical()
     assert validated.values[STAGE_SIO_PTOTAL] == pytest.approx(0.2)
     assert validated.values[STAGE_SIO_GAS_MODE] == "po2_hold"
 
-    hard_vacuum = RecipePatch(
+    # po2_hold with pO2 <= 0 is invalid input at execution. Schema must
+    # refuse it with the same phrase. Finite total pressure >= 0 stays
+    # admissible when pO2 is positive.
+    with pytest.raises(
+        RecipeValidationError,
+        match="must be positive for gas_cover_mode=po2_hold",
+    ):
+        RecipePatch(
+            {
+                STAGE_SIO_PO2: 0.0,
+                STAGE_SIO_PTOTAL: 0.0,
+                STAGE_SIO_GAS_MODE: "po2_hold",
+            }
+        ).validated(schema)
+
+    setpoints = copy.deepcopy(yaml.safe_load(SETPOINTS_PATH.read_text()))
+    manager = CampaignManager(setpoints)
+    _atmosphere, gas = manager._c2a_staged_stage_gas_control(
         {
-            STAGE_SIO_PO2: 0.0,
-            STAGE_SIO_PTOTAL: 0.0,
-            STAGE_SIO_GAS_MODE: "po2_hold",
+            "name": "sio_window",
+            "gas_cover_mode": "po2_hold",
+            "pO2_mbar": 0.1,
+            "p_total_mbar": 0.2,
         }
-    ).validated(schema)
-    assert hard_vacuum.values[STAGE_SIO_PTOTAL] == pytest.approx(0.0)
+    )
+    assert gas["atmosphere"] == "CONTROLLED_O2"
+    assert gas["pO2_mbar"] == pytest.approx(0.1)
+    assert gas["p_total_mbar"] == pytest.approx(0.2)
+    assert gas["requested_p_total_mbar"] == pytest.approx(0.2)
+    assert gas["pn2_band_action"] == ""
+    with pytest.raises(
+        ValueError,
+        match="must be positive for gas_cover_mode=po2_hold",
+    ):
+        manager._c2a_staged_stage_gas_control(
+            {
+                "name": "sio_window",
+                "gas_cover_mode": "po2_hold",
+                "pO2_mbar": 0.0,
+                "p_total_mbar": 0.0,
+            }
+        )
 
     with pytest.raises(RecipeValidationError, match="below lower bound"):
         RecipePatch({STAGE_SIO_PTOTAL: -1.0e-9}).validated(schema)

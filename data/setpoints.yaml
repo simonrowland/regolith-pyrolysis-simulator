@@ -220,6 +220,15 @@ campaigns:
     default_hold_T_C: 1750
     atmosphere: "recirculating_inert_sweep"
     carrier_gas: "pN2"
+    # [5, 15] mbar is the pN2-sweep operating envelope and the free-molecular
+    # Knudsen repair floor. It is engineering margin, not a physics gate
+    # (d-209). flow_regime viscous describes operation inside that envelope
+    # (Kn < 0.01 at the documented 0.12 m pipe, d-208). Shipped stages do
+    # not schedule 0.2 mbar. A recipe po2_hold total that is transitional
+    # is kept at the scheduled total and flagged as extrapolated beyond
+    # the viscous-validated band; it is not lifted and not clamped near
+    # 0.318 mbar. The 2026-08-26 0.2 mbar point is C4's own default after
+    # this campaign.
     p_total_mbar: [5, 15]
     pO2_mbar: null
     pO2_mbar_default: 0.0

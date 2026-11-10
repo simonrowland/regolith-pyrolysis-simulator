@@ -1470,6 +1470,72 @@ def test_provider_extrapolates_finite_continuum_without_fabricating_zero_flux():
 
 
 @pytest.mark.xdist_group("serial")
+def test_c2a_staged_provider_flags_transitional_total_and_keeps_continuum_flux():
+    """Scheduled 0.2 mbar on C2A_staged is extrapolated, not refused.
+
+    The notice carries regime, Kn, extrapolated authority, and the
+    certified 5-15 mbar band. Gas resistance stays on so the Na flux is
+    the continuum continuation, not the R_gas=0 branch.
+    """
+    provider = BuiltinEvaporationFluxProvider()
+    view = ProviderAccountView(
+        accounts={"process.cleaned_melt": {"SiO2": 10.0, "Na2O": 1.0}},
+        species_formula_registry={},
+    )
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.EVAPORATION_FLUX,
+            account_view=view,
+            temperature_C=1600.0,
+            pressure_bar=2.0e-7,
+            fO2_log=None,
+            control_inputs={
+                "campaign_name": "C2A_staged",
+                "vapour_batch_flux_pressures_Pa": {"Na": 100.0},
+                "overhead_partials_Pa": {},
+                "overhead_pressure_pa": 20.0,
+                "pipe_diameter_m": 0.12,
+                "gas_temperature_K": 1873.15,
+                "carrier_gas": "N2",
+                "molar_mass_kg_mol": {"Na": 0.022989769},
+                "stoich_by_species": {
+                    "Na": {
+                        "parent_oxide": "Na2O",
+                        "oxide_per_product_kg": 1.347,
+                        "O2_per_product_kg": 0.347,
+                    },
+                },
+                "available_oxide_kg": {"Na": 10.0},
+                "melt_surface_area_m2": 1.0,
+                "stir_factor": {"axial": 0.0, "radial": 1.0},
+                "alpha": {"Na": 1.0},
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    notice = result.diagnostic["continuum_extrapolation_notice"]
+    assert notice["status"] == "extrapolated"
+    assert notice["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert notice["regime"] == "transitional"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["ledger_yields_authorized"] is True
+    assert notice["evaporation_flux_status"] == "extrapolated"
+    assert notice["certified_band_mbar"] == pytest.approx([5.0, 15.0])
+    assert notice["knudsen_number"] == pytest.approx(0.016813952116450776)
+    assert "viscous-validated band" in notice["detail"]
+    series = result.diagnostic["evaporation_series_resistance"]["Na"]
+    assert series["r_gas"] > 0.0
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] == pytest.approx(
+        0.007424038156428245 * 3600.0
+    )
+    assert any(
+        "viscous_p_bulk_transport_out_of_domain" in warning
+        for warning in result.warnings
+    )
+
+
+@pytest.mark.xdist_group("serial")
 def test_transitional_extrapolation_reports_actual_and_commanded_pressure():
     result = _w3_result_with_controls(
         1.0,

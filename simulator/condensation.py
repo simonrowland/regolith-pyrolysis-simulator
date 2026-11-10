@@ -3947,7 +3947,12 @@ class CondensationModel:
         carrier_gas: str,
         pressure_margin_fraction: float = 0.01,
     ) -> dict[str, Any]:
-        """Repair a stranded C2A pressure setpoint or retain typed refusal."""
+        """Repair free-molecular C2A pressure, or flag a transitional one.
+
+        Free-molecular setpoints still lift to the pN2 band. Transitional
+        po2_hold totals stay at the scheduled value (d-209, d-208): the
+        band is engineering margin, not a clamp.
+        """
 
         band_min = float(pN2_min_mbar)
         band_max = float(pN2_max_mbar)
@@ -3965,6 +3970,31 @@ class CondensationModel:
             pipe_segments=self.pipe_segments,
             carrier_gas=carrier_gas,
         )
+        if current.get('regime') == KnudsenRegime.TRANSITIONAL.value:
+            pO2 = max(0.0, float(pO2_mbar))
+            requested = float(requested_p_total_mbar)
+            notice = {
+                'status': 'extrapolated',
+                'reason': 'c2a_transitional_continuum_extrapolation',
+                'requested_p_total_mbar': requested,
+                'applied_p_total_mbar': requested,
+                'requested_pN2_mbar': max(0.0, requested - pO2),
+                'pO2_mbar': pO2,
+                'regime': KnudsenRegime.TRANSITIONAL.value,
+                'knudsen_number': current.get('knudsen_number'),
+                'authority_level': 'extrapolated',
+                'authority_class': 'extrapolated',
+                'certified_band_mbar': [band_min, band_max],
+                'ledger_yields_authorized': True,
+                'physical_pN2_band_mbar': [band_min, band_max],
+                'detail': (
+                    'extrapolated beyond the viscous-validated band; '
+                    'scheduled total retained; not lifted to the pN2 '
+                    'sweep floor and not clamped at the Kn=0.01 boundary'
+                ),
+            }
+            self.last_knudsen_pressure_adjustment = dict(notice)
+            return notice
         if current.get('regime') != KnudsenRegime.FREE_MOLECULAR.value:
             prior = self.last_knudsen_pressure_adjustment
             if (

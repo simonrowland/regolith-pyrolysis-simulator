@@ -2718,10 +2718,15 @@ def _validate_pressure_default_pairs(
         po2_path,
         total_path,
     ) in schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items():
+        mode_path = po2_path[:-1] + ("gas_cover_mode",)
         if (
             po2_path not in schema._spec_by_path
             or total_path not in schema._spec_by_path
-            or (po2_path not in values and total_path not in values)
+            or (
+                po2_path not in values
+                and total_path not in values
+                and mode_path not in values
+            )
         ):
             continue
         if po2_path in values:
@@ -2736,7 +2741,6 @@ def _validate_pressure_default_pairs(
         else:
             total = float(_default_setpoint_value(C2A_STAGED_P_TOTAL_MBAR_DEFAULT_PATH))
             total_source = "C2A_staged YAML default"
-        mode_path = po2_path[:-1] + ("gas_cover_mode",)
         if mode_path in values:
             gas_cover_mode = str(values[mode_path])
             gas_cover_mode_source = "patched"
@@ -2777,6 +2781,16 @@ def _validate_pressure_pair(
             f"{_format_path(po2_path)}={po2:.12g} ({po2_source}) > "
             f"{_format_path(total_path)}={total:.12g} ({total_source}); "
             "oxygen partial pressure cannot exceed total pressure; "
+            f"{guidance}"
+        )
+    if gas_cover_mode == "po2_hold" and po2 <= 0.0:
+        mode_path = gas_cover_mode_path or po2_path[:-1] + ("gas_cover_mode",)
+        raise RecipeValidationError(
+            "recipe_pressure_po2_hold_requires_positive_po2: "
+            f"{_format_path(po2_path)}={po2:.12g} ({po2_source}) "
+            "must be positive for gas_cover_mode=po2_hold "
+            f"({_format_path(mode_path)}={gas_cover_mode}"
+            f"{f' ({gas_cover_mode_source})' if gas_cover_mode_source else ''}); "
             f"{guidance}"
         )
     if gas_cover_mode == "pn2_sweep" and total <= po2:

@@ -345,6 +345,104 @@ def test_c2a_knudsen_pressure_floor_recovers_stranded_setpoint():
     assert applied_kn < condensation_module.FREE_MOLECULAR_KNUDSEN_MIN
 
 
+def test_c2a_staged_transitional_po2_hold_keeps_scheduled_total_and_flags():
+    """d-209/d-208: a transitional po2_hold total is not repaired upward.
+
+    The 5-15 mbar band is engineering margin. The scheduled 0.2 mbar total
+    stays, with a visible extrapolation notice, and the continuum Na flux
+    at that Kn stays the continuation value.
+    """
+    from engines.builtin.evaporation_flux import (
+        _series_resistance_evaporation_flux_kg_m2_s,
+    )
+    from simulator.evaporation import viscous_p_bulk_out_of_domain_diagnostic
+
+    model = CondensationModel(CondensationTrain.create_default())
+    adjustment = model.adjust_c2a_pressure_setpoint(
+        requested_p_total_mbar=0.2,
+        pO2_mbar=0.1,
+        gas_temperature_C=1600.0,
+        pipe_diameter_m=0.12,
+        pN2_min_mbar=5.0,
+        pN2_max_mbar=15.0,
+        carrier_gas="N2",
+    )
+
+    assert adjustment["status"] == "extrapolated"
+    assert adjustment["regime"] == "transitional"
+    assert adjustment["requested_p_total_mbar"] == pytest.approx(0.2)
+    assert adjustment["applied_p_total_mbar"] == pytest.approx(0.2)
+    assert adjustment["authority_level"] == "extrapolated"
+    assert adjustment["ledger_yields_authorized"] is True
+    assert adjustment["certified_band_mbar"] == pytest.approx([5.0, 15.0])
+    assert adjustment["knudsen_number"] == pytest.approx(0.016813952116450776)
+    assert "viscous-validated band" in adjustment["detail"]
+    assert "applied_pN2_mbar" not in adjustment
+
+    in_band = model.adjust_c2a_pressure_setpoint(
+        requested_p_total_mbar=10.0,
+        pO2_mbar=0.0,
+        gas_temperature_C=1600.0,
+        pipe_diameter_m=0.12,
+        pN2_min_mbar=5.0,
+        pN2_max_mbar=15.0,
+        carrier_gas="N2",
+    )
+    assert in_band == {}
+
+    kn = float(adjustment["knudsen_number"])
+    diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=kn,
+        overhead_pressure_pa=20.0,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=1873.15,
+        carrier_gas="N2",
+        campaign_name="C2A_staged",
+        asking_site="tests.c2a_staged_po2_hold",
+    )
+    assert diagnostic is not None
+    assert diagnostic["status"] == "extrapolated"
+    assert diagnostic["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert diagnostic["evaporation_flux_status"] == "extrapolated"
+    assert diagnostic["ledger_yields_authorized"] is True
+    assert diagnostic["regime"] == "transitional"
+    assert diagnostic["authority_level"] == "extrapolated"
+    assert diagnostic["certified_band_mbar"] == pytest.approx([5.0, 15.0])
+    assert "viscous-validated band" in diagnostic["detail"]
+
+    c4 = viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=kn,
+        overhead_pressure_pa=20.0,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=1873.15,
+        carrier_gas="N2",
+        campaign_name="C4",
+        asking_site="tests.c4_still_refuses",
+    )
+    assert c4 is not None
+    assert c4["status"] == "refused"
+    assert c4["evaporation_flux_status"] == "not_evaluated"
+    assert c4["ledger_yields_authorized"] is False
+
+    continued = _series_resistance_evaporation_flux_kg_m2_s(
+        species="Na",
+        P_eq_pa=100.0,
+        P_bulk_pa=0.0,
+        T_surface_K=1873.15,
+        molar_mass_kg_mol=0.022989769,
+        alpha_i=1.0,
+        pipe_diameter_m=0.12,
+        overhead_pressure_pa=20.0,
+        carrier_gas="N2",
+        T_gas_K=1873.15,
+        gas_resistance_enabled=True,
+        extrapolate_continuum=True,
+    )
+    assert continued.flux_kg_s_m2 == pytest.approx(0.007424038156428245)
+    assert continued.knudsen_number == pytest.approx(kn)
+    assert continued.r_gas > 0.0
+
+
 def test_c2a_knudsen_pressure_floor_uses_continuous_transport_for_empty_band():
     model = CondensationModel(CondensationTrain.create_default())
 

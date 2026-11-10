@@ -3976,6 +3976,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             carrier_gas=carrier_gas,
         )
         if adjustment.get('status') != 'applied':
+            # Transitional predict-and-flag keeps the scheduled total.
+            # Record the notice; do not rewrite p_total.
+            if adjustment.get('status') == 'extrapolated':
+                staged_control = self.campaign_mgr.last_c2a_staged_gas_control
+                if isinstance(staged_control, dict):
+                    staged_control['knudsen_pressure_adjustment'] = dict(
+                        adjustment
+                    )
             return
 
         applied_pN2_mbar = float(adjustment['applied_pN2_mbar'])
@@ -8263,7 +8271,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             asking_site='core.native_fe_vapor_partition',
         )
         _flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
-        if continuum_validity_refuses(domain_diag):
+        # The authoritative evaporation provider carries the C2A continuum
+        # continuation. This bounded projection still suppresses on that
+        # reason so its capacity stays the diagnostic-limited zero.
+        suppress_bounded_flux = continuum_validity_refuses(domain_diag) or (
+            domain_diag is not None
+            and domain_diag.get('reason')
+            == 'viscous_p_bulk_transport_out_of_domain'
+            and domain_diag.get('status') == 'extrapolated'
+        )
+        if suppress_bounded_flux:
             _flux_kg_s_m2 = 0.0
         capacity_kg_hr = max(
             0.0,
@@ -8303,7 +8320,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'carrier_gas': domain_diag['carrier_gas'],
                 'framing': domain_diag['framing'],
             }
-            if continuum_validity_refuses(domain_diag):
+            if suppress_bounded_flux:
                 series_update['flux_kg_s_m2'] = 0.0
             series_diag.update(series_update)
         diagnostic = {

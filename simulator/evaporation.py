@@ -119,6 +119,17 @@ def evaporation_flux_refusal_from_configuration_error(
     )
 
 
+# d-209 removed the viscous-flow invariant. These campaigns keep a
+# transitional total and flag the continuum continuation instead of
+# refusing it. The 5-15 mbar band stays an engineering margin.
+_C2A_CONTINUUM_EXTRAPOLATION_CAMPAIGNS = frozenset({
+    "C2A",
+    "C2A_continuous",
+    "C2A_STAGED",
+    "C2A_staged",
+})
+
+
 def viscous_p_bulk_out_of_domain_diagnostic(
     *,
     knudsen_number: float,
@@ -146,7 +157,9 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     Transitional Kn at nonzero overhead is out-of-domain for viscous
     Poiseuille P_bulk. Applicability lives in
     ``simulator.transport_regime.assess_continuum_formula_validity``:
-    pyrolysis extraction fail-closes (status=refused); Stage 0 bakeout
+    pyrolysis extraction fail-closes (status=refused), except the C2A
+    family, which keeps the scheduled total and flags a continuum
+    continuation (status=extrapolated; d-209, d-208). Stage 0 bakeout
     computes and marks (status=out_of_domain). Missing campaign is
     UNKNOWN and still refuses so the pyrolysis guard cannot be dropped
     by omitting the stage. The 0.6.3 optimizer floor (~1 mbar, Kn≈0.004)
@@ -325,6 +338,44 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     }
     if assessment.note is not None:
         payload["silent_zero_notes"] = [dict(assessment.note)]
+    campaign = assessment.campaign_name
+    if (
+        refuses
+        and payload["reason"] == "viscous_p_bulk_transport_out_of_domain"
+        and campaign is not None
+        and str(campaign).strip() in _C2A_CONTINUUM_EXTRAPOLATION_CAMPAIGNS
+    ):
+        from simulator.campaigns import (
+            C2A_STAGED_PN2_SWEEP_MAX_MBAR,
+            C2A_STAGED_PN2_SWEEP_MIN_MBAR,
+        )
+
+        certified_band_mbar = [
+            float(C2A_STAGED_PN2_SWEEP_MIN_MBAR),
+            float(C2A_STAGED_PN2_SWEEP_MAX_MBAR),
+        ]
+        # The refuse-path note is a category-1 silent-zero marker. This
+        # branch predicts a flagged value, so it must not travel with it.
+        payload.pop("silent_zero_notes", None)
+        payload.update(
+            {
+                "status": "extrapolated",
+                "authority_class": "extrapolated",
+                "authority_level": "extrapolated",
+                "ledger_yields_authorized": True,
+                "doctrine_category": 2,
+                "evaporation_flux_status": "extrapolated",
+                "regime": "transitional",
+                "certified_band_mbar": certified_band_mbar,
+                "detail": (
+                    f"{payload['detail']}; extrapolated beyond the "
+                    "viscous-validated band; finite continuation of the "
+                    "same continuum fit; not certified transitional "
+                    "transport; "
+                    f"certified_band_mbar={certified_band_mbar}"
+                ),
+            }
+        )
     return payload
 
 
@@ -345,7 +396,9 @@ def refuse_viscous_p_bulk_out_of_domain(
     TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
     safety gate and NOT a coating gate. Hard-raises when the diagnostic helper
     reports a load-bearing transitional refusal or an invalid Kn input.
-    Bakeout out-of-domain marks do not raise. The authoritative provider
+    Bakeout out-of-domain marks do not raise. C2A-family transitional
+    extrapolation does not raise. Other load-bearing transitional
+    refusals and invalid Kn inputs do. The authoritative provider
     returns a refused result from the same payload; bounded C7/native-Fe
     consumers apply their own explicitly tagged diagnostic-limited policy.
     """

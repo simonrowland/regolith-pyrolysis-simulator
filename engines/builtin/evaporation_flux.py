@@ -1566,22 +1566,29 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 campaign_name=campaign_name,
                 asking_site="engines.builtin.evaporation_flux",
             )
-            if (
-                active_gas_transport_species
-                and continuum_validity_refuses(domain_refusal)
-            ):
+            if active_gas_transport_species and domain_refusal is not None:
                 if domain_refusal.get("reason") == "viscous_p_bulk_transport_out_of_domain":
-                    continuum_extrapolation = {
-                        **{key: value for key, value in domain_refusal.items()
-                           if key not in ("silent_zero_notes", "evaporation_flux_kg_hr")},
-                        "status": "extrapolated",
-                        "authority_level": "extrapolated",
-                        "authority_class": "extrapolated",
-                        "doctrine_category": 2,
-                        "ledger_yields_authorized": True,
-                        "evaporation_flux_status": "extrapolated",
-                        "detail": domain_refusal["detail"] + "; finite continuation of the same continuum fit; not certified transitional transport",
+                    kept = {
+                        key: value for key, value in domain_refusal.items()
+                        if key not in ("silent_zero_notes", "evaporation_flux_kg_hr")
                     }
+                    # C2A already returns the flagged continuation. Other
+                    # pyrolysis still arrives as a refusal; remap it so
+                    # extrapolate_continuum stays on and the flux does not
+                    # drop onto the R_gas=0 branch.
+                    if domain_refusal.get("status") == "extrapolated":
+                        continuum_extrapolation = kept
+                    elif continuum_validity_refuses(domain_refusal):
+                        continuum_extrapolation = {
+                            **kept,
+                            "status": "extrapolated",
+                            "authority_level": "extrapolated",
+                            "authority_class": "extrapolated",
+                            "doctrine_category": 2,
+                            "ledger_yields_authorized": True,
+                            "evaporation_flux_status": "extrapolated",
+                            "detail": domain_refusal["detail"] + "; finite continuation of the same continuum fit; not certified transitional transport",
+                        }
             if (
                 active_gas_transport_species
                 and continuum_validity_refuses(domain_refusal)
@@ -1913,6 +1920,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
         if (
             domain_refusal is not None
+            and continuum_extrapolation is None
+            and domain_refusal.get("status") != "extrapolated"
             and not continuum_validity_refuses(domain_refusal)
         ):
             from simulator.silent_zero import merge_notes_into_mapping
