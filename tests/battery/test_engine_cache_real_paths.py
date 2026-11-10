@@ -96,21 +96,24 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             Engine.ALPHAMELTS,
             alpha_backend,
             lambda backend: setattr(backend, "_redox_buffer", "NNO"),
-            lambda backend: {"QFM": 1.0, "NNO": 2.0}[backend._redox_buffer],
+            lambda backend: {"QFM": 0.25, "NNO": 0.75}[backend._redox_buffer],
         ),
         _SettingCase(
             "AlphaMELTS fO2 offset",
             Engine.ALPHAMELTS,
             alpha_backend,
             lambda backend: setattr(backend, "_fo2_offset", 0.5),
-            lambda backend: {0.0: 1.0, 0.5: 2.0}[backend._fo2_offset],
+            lambda backend: {0.0: 0.25, 0.5: 0.75}[backend._fo2_offset],
         ),
         _SettingCase(
             "AlphaMELTS Python API model code",
             Engine.ALPHAMELTS,
             alpha_python_api_backend,
             lambda backend: setattr(backend._pet_worker, "_bootstrap_args", (2,)),
-            lambda backend: float(backend._pet_worker._bootstrap_args[0]),
+            lambda backend: {
+                1: 0.25,
+                2: 0.75,
+            }[backend._pet_worker._bootstrap_args[0]],
         ),
         _SettingCase(
             "MAGEMin worker database",
@@ -121,7 +124,7 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 "_bootstrap_args",
                 ("magemin", "mp", {"fO2_buffer": "qfm"}),
             ),
-            lambda backend: {"ig": 1.0, "mp": 2.0}[
+            lambda backend: {"ig": 0.25, "mp": 0.75}[
                 backend._effective_database()
             ],
         ),
@@ -134,7 +137,7 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 "_bootstrap_args",
                 ("magemin", "ig", {"fO2_buffer": "nno"}),
             ),
-            lambda backend: {"qfm": 1.0, "nno": 2.0}[
+            lambda backend: {"qfm": 0.25, "nno": 0.75}[
                 backend._subprocess_pool.workers[0]._bootstrap_args[2][
                     "fO2_buffer"
                 ]
@@ -148,8 +151,8 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 backend._thermoengine_transport, "_model_name", "rhyolite-MELTS"
             ),
             lambda backend: {
-                "MELTS-v1.0": 1.0,
-                "rhyolite-MELTS": 2.0,
+                "MELTS-v1.0": 0.25,
+                "rhyolite-MELTS": 0.75,
             }[backend._thermoengine_transport._model_name],
         ),
         _SettingCase(
@@ -160,8 +163,8 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 "pack", "openimcc-v1.0.3-ext-v1"
             ),
             lambda backend: {
-                "openimcc-v1.0.2": 1.0,
-                "openimcc-v1.0.3-ext-v1": 2.0,
+                "openimcc-v1.0.2": 0.25,
+                "openimcc-v1.0.3-ext-v1": 0.75,
             }[backend._effective_pack_name],
         ),
     )
@@ -270,4 +273,77 @@ def test_openimcc_gas_cache_key_tracks_loaded_pack_filename(
         "hits": 0,
         "misses": 2,
         "stores": 2,
+        "store_error": 0,
+        "read_error": 0,
+    }
+
+
+def test_internal_analytical_residue_cache_projects_named_observation_request(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+    from simulator.battery.score import load_score_context, temperature_of
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    source_id = "abdeyazdan-2026-na-sn-si-phase-thermodynamics"
+    observation_id = (
+        source_id
+        + "::abdeyazdan_2026_t1_run04_NaSi11_glass_nao0p5"
+    )
+    context = load_score_context(Path(__file__).resolve().parents[2], sources=(source_id,))
+    observation = context.observations[observation_id]
+    temperature_K = temperature_of(observation.identity)
+    assert temperature_K is not None and observation.value.point is not None
+    temperature_C = float(temperature_K) - 273.15
+    nao_half_fraction = float(observation.value.point)
+    composition_mol = {
+        "NaO0.5": nao_half_fraction,
+        "SiO2": 1.0 - nao_half_fraction,
+    }
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    engine_cache.engine_cache_counters(reset=True)
+    calls: list[dict[str, Any]] = []
+
+    def fake_residue_pressure(**kwargs: Any) -> Any:
+        calls.append(kwargs)
+        return SimpleNamespace(
+            vapor_pressures_Pa={"Na(g)": 1.25},
+            diagnostics=SimpleNamespace(unconsumed="not part of residue scoring"),
+        )
+
+    monkeypatch.setattr(
+        battery, "_internal_analytical_vapor_pressure_adapter", fake_residue_pressure
+    )
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        internal_analytical_residue_vapor_pressure,
+    )
+
+    request = {
+        "core": object(),
+        "temperature_C": temperature_C,
+        "pressure_bar": 1.0,
+        "composition_kg": None,
+        "composition_mol": composition_mol,
+        "fO2_log": -8.0,
+        "po2_request": Po2Request(PO2_COMMANDED, 10.0**-8.0),
+        "include_diagnostic_shadows": False,
+    }
+    cold = internal_analytical_residue_vapor_pressure(**request)
+    warm = internal_analytical_residue_vapor_pressure(**request)
+
+    assert cold.vapor_pressures_Pa == {"Na(g)": 1.25}
+    assert warm.vapor_pressures_Pa == cold.vapor_pressures_Pa
+    assert len(calls) == 1
+    assert calls[0]["temperature_C"] == 800.0
+    assert calls[0]["composition_mol"] == composition_mol
+    assert engine_cache.engine_cache_counters(reset=True)["internal-analytical"] == {
+        "hits": 1,
+        "misses": 1,
+        "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
     }

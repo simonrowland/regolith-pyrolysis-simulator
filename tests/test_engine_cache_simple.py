@@ -108,6 +108,8 @@ def test_cache_uses_canonical_request_and_wal_sqlite(
         "hits": 1,
         "misses": 1,
         "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
     }
 
     with sqlite3.connect(database) as connection:
@@ -183,7 +185,9 @@ def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
         activity_coefficients={"FeO": 0.75},
     )
     expected.diagnostics = {"backend_status_reason": "fixture-code"}
-    handle = SimpleNamespace(name="thermoengine", engine_settings={})
+    handle = SimpleNamespace(
+        name="thermoengine", engine_settings={}, backend=SimpleNamespace()
+    )
     calls = 0
 
     def solve() -> EquilibriumResult:
@@ -206,6 +210,8 @@ def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
         "hits": 1,
         "misses": 1,
         "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
     }
 
 
@@ -222,7 +228,9 @@ def test_mapping_equilibrium_result_uses_compact_projection(
     database = tmp_path / "engine-cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
     _engine_cache_counters(reset=True)
-    handle = SimpleNamespace(name="thermoengine", engine_settings={})
+    handle = SimpleNamespace(
+        name="thermoengine", engine_settings={}, backend=SimpleNamespace()
+    )
     calls = 0
     result = {
         "status": "ok",
@@ -507,7 +515,8 @@ def test_readonly_mode_serves_hits_and_solves_misses_without_writing(
         "vaporock", {"temperature_K": 901.0}, lambda: {"pressure": 3.0}
     ) == {"pressure": 3.0}
     assert _engine_cache_counters(reset=True)["vaporock"] == {
-        "hits": 1, "misses": 1, "stores": 0
+        "hits": 1, "misses": 1, "stores": 0,
+        "store_error": 0, "read_error": 0,
     }
     with sqlite3.connect(database) as connection:
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
@@ -537,6 +546,8 @@ def test_non_authoritative_engine_result_is_cacheable(
         "hits": 1,
         "misses": 1,
         "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
     }
 
 
@@ -555,6 +566,8 @@ def test_engine_worker_returns_cache_counters_to_parent(
             "hits": 1,
             "misses": 1,
             "stores": 1,
+            "store_error": 0,
+            "read_error": 0,
         }
     finally:
         pool.close(cancel_pending=True, timeout_s=5.0)
@@ -578,6 +591,8 @@ def test_exceptions_and_typed_refusals_are_not_stored(
         "hits": 0,
         "misses": 3,
         "stores": 0,
+        "store_error": 0,
+        "read_error": 0,
     }
 
 
@@ -607,6 +622,68 @@ def test_corrupt_hot_json_is_a_miss_and_is_replaced(
         "hits": 1,
         "misses": 2,
         "stores": 2,
+        "store_error": 0,
+        "read_error": 0,
+    }
+
+
+def test_store_encoding_failure_returns_live_value_and_counts_error(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    _engine_cache_counters(reset=True)
+    hot = SimpleNamespace(status="ok")
+
+    result = _cached_engine_call()(
+        "openimcc",
+        {"temperature_K": 1700.0},
+        lambda: CacheValue(hot, {"unused": "cold"}),
+    )
+
+    assert result is hot
+    assert _engine_cache_counters(reset=True)["openimcc"] == {
+        "hits": 0,
+        "misses": 1,
+        "stores": 0,
+        "store_error": 1,
+        "read_error": 0,
+    }
+    with sqlite3.connect(database) as connection:
+        assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 0
+
+
+def test_malformed_hot_value_is_a_counted_miss_and_replaced(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    _engine_cache_counters(reset=True)
+    request = {"temperature_K": 1700.0}
+    call = _cached_engine_call()
+    assert call("openimcc", request, lambda: {"answer": 1}) == {"answer": 1}
+
+    connection = engine_cache._connect(database, root=database, readonly=False, cold=False)
+    assert connection is not None
+    digest = engine_cache_key("openimcc", 1, request)
+    connection.execute(
+        "UPDATE engine_outputs SET value=? WHERE key=?",
+        (sqlite3.Binary(b"not-zlib"), digest),
+    )
+    connection.commit()
+    _engine_cache_counters(reset=True)
+
+    assert call("openimcc", request, lambda: {"answer": 2}) == {"answer": 2}
+    assert _engine_cache_counters(reset=True)["openimcc"] == {
+        "hits": 0,
+        "misses": 1,
+        "stores": 1,
+        "store_error": 0,
+        "read_error": 1,
     }
 
 
