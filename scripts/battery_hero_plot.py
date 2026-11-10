@@ -27,8 +27,6 @@ from __future__ import annotations
 import argparse
 import base64
 import csv
-from contextlib import contextmanager
-import gzip
 import hashlib
 import html
 import json
@@ -47,7 +45,7 @@ from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, BinaryIO, Iterable, Iterator, Mapping, Sequence
+from typing import Any, Iterable, Iterator, Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -83,6 +81,18 @@ from simulator.diagnostic_helpers.species_rail import (  # noqa: E402
     parse_formula_elements,
 )
 from simulator.feedstock_composition import resolve_feedstock_composition  # noqa: E402
+from simulator.battery.leaderboard import (  # noqa: E402
+    _engine_name,
+    _hero_decimal,
+    _hero_metric_temperature,
+    _hero_row_flagged,
+    _is_d139_uncalibrated_kems_row,
+    _open_residual_jsonl,
+    _row_formula,
+    _row_identity,
+    _species_formula,
+    _state_value,
+)
 from simulator.battery.score import (  # noqa: E402
     _BATTERY_HERO_DECK_CHART_IDS,
     _BATTERY_HERO_DECK_SOURCE_RAILS,
@@ -349,56 +359,11 @@ def _bin_points_by_key(
     }
 
 
-def _state_value(value: object) -> object | None:
-    if isinstance(value, Mapping):
-        if value.get("tag") != "value":
-            return None
-        return value.get("value")
-    return value
-
-
-@contextmanager
-def _open_residual_jsonl(path: Path) -> Iterator[BinaryIO]:
-    """Open residuals directly, or stream the residual member from a battery archive."""
-
-    if path.name.endswith(".tgz"):
-        with tarfile.open(path, "r:gz") as archive:
-            try:
-                member = archive.getmember("data/battery/residuals.jsonl")
-            except KeyError as exc:
-                raise ValueError(f"{path}: missing data/battery/residuals.jsonl") from exc
-            source = archive.extractfile(member)
-            if source is None:
-                raise ValueError(f"{path}: cannot read data/battery/residuals.jsonl")
-            try:
-                yield source
-            finally:
-                source.close()
-    elif path.suffix == ".gz":
-        with gzip.open(path, "rb") as source:
-            yield source
-    else:
-        with path.open("rb") as source:
-            yield source
-
-
 def _identity_from_observation(
     observation: Mapping[str, Any],
 ) -> Mapping[str, Any]:
     identity = observation.get("identity")
     return identity if isinstance(identity, Mapping) else {}
-
-
-def _species_formula(identity: Mapping[str, Any]) -> str:
-    species_value = identity.get("species")
-    species = (
-        _state_value(species_value)
-        if isinstance(species_value, Mapping) and "tag" in species_value
-        else species_value
-    )
-    if isinstance(species, Mapping):
-        return str(species.get("formula") or "")
-    return ""
 
 
 def _composition_fields(identity: Mapping[str, Any]) -> tuple[str, str]:
@@ -426,59 +391,6 @@ def _composition_fields(identity: Mapping[str, Any]) -> tuple[str, str]:
 def _observable(identity: Mapping[str, Any]) -> str:
     value = _state_value(identity.get("quantity"))
     return str(value) if value is not None else "unknown"
-
-
-def _row_identity(row: Mapping[str, Any]) -> Mapping[str, Any]:
-    observation = row.get("candidate_observation")
-    if isinstance(observation, Mapping):
-        identity = observation.get("identity")
-        if isinstance(identity, Mapping):
-            return identity
-    return {}
-
-
-def _is_d139_uncalibrated_kems_row(row: Mapping[str, Any]) -> bool:
-    numeric = row.get("numeric")
-    if not isinstance(numeric, Mapping) or numeric.get("decision_band") is not None:
-        return False
-    if _state_value(_row_identity(row).get("quantity")) != "p_partial":
-        return False
-    candidate = row.get("candidate_observation")
-    candidate = candidate if isinstance(candidate, Mapping) else {}
-    notice_sources = (row.get("notices"), candidate.get("notices"))
-    return any(
-        isinstance(notice, Mapping)
-        and notice.get("kind") == NoticeKind.UNVERIFIED_APPARATUS.value
-        and isinstance(notice.get("reason"), str)
-        and notice["reason"].startswith("calibration_not_grounded:")
-        for source in notice_sources
-        if isinstance(source, Sequence) and not isinstance(source, (str, bytes))
-        for notice in source
-    )
-
-
-def _hero_row_flagged(
-    row: Mapping[str, Any], *, d139_uncalibrated_kems: bool
-) -> bool:
-    return d139_uncalibrated_kems or bool(_flagged_payload_strata(row))
-
-
-def _row_formula(row: Mapping[str, Any]) -> str:
-    formula = _species_formula(_row_identity(row))
-    if formula:
-        return formula
-    refusal = row.get("refusal")
-    detail = refusal.get("detail") if isinstance(refusal, Mapping) else None
-    if isinstance(detail, Mapping) and detail.get("formula"):
-        return str(detail["formula"])
-    request = row.get("candidate_request")
-    if isinstance(request, Mapping):
-        species = request.get("species")
-        if isinstance(species, Mapping) and species.get("formula"):
-            return str(species["formula"])
-        if request.get("formula"):
-            return str(request["formula"])
-    return ""
 
 
 def _row_observable(row: Mapping[str, Any]) -> str:
@@ -513,18 +425,6 @@ def _decimal_key(value: object) -> str | None:
     if not parsed.is_finite():
         return None
     return format(parsed.normalize(), "f")
-
-
-def _engine_name(row: Mapping[str, Any]) -> str | None:
-    request = row.get("candidate_request")
-    if isinstance(request, Mapping) and request.get("engine"):
-        return str(request["engine"])
-    observation = row.get("candidate_observation")
-    if isinstance(observation, Mapping):
-        engine = observation.get("engine")
-        if isinstance(engine, Mapping) and engine.get("name"):
-            return str(engine["name"])
-    return None
 
 
 def _version_text(raw: object) -> str | None:
@@ -643,25 +543,6 @@ def _exposure_policy_from_files(
         exposed_source_ids=source_ids,
         baseline_observation_ids=baseline_ids,
     )
-
-
-def _hero_decimal(raw: object) -> Decimal | None:
-    try:
-        value = Decimal(str(raw))
-    except (InvalidOperation, TypeError, ValueError, ArithmeticError):
-        return None
-    return value if value.is_finite() else None
-
-
-def _hero_metric_temperature(row: Mapping[str, object]) -> Decimal | None:
-    # Temperature grouping keys on the measured residual field, not the request:
-    # candidate_observation.identity.temperature_K.
-    candidate = row.get("candidate_observation")
-    candidate = candidate if isinstance(candidate, Mapping) else {}
-    identity = candidate.get("identity")
-    identity = identity if isinstance(identity, Mapping) else {}
-    temperature = _state_value(identity.get("temperature_K"))
-    return _hero_decimal(temperature)
 
 
 def _hero_source_disagreement_notices(
