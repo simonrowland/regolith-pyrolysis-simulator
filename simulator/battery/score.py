@@ -11981,6 +11981,36 @@ def _hashimoto_residue_prediction(
 _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 
 
+def _sossi_printed_sample_surface_area_m2(
+    source: Mapping[str, Any],
+) -> float | None:
+    """Read the source's shared wire-loop bead area without deriving it."""
+    species = source.get("species")
+    if not isinstance(species, Mapping):
+        return None
+    for species_record in species.values():
+        if not isinstance(species_record, Mapping):
+            continue
+        for observation in species_record.get("observations", ()):
+            if not isinstance(observation, Mapping):
+                continue
+            equipment = observation.get("equipment")
+            area = (
+                equipment.get("sample_surface_area")
+                if isinstance(equipment, Mapping)
+                else None
+            )
+            if not isinstance(area, Mapping) or area.get("units") != "m2":
+                continue
+            try:
+                value = float(area.get("value"))
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if math.isfinite(value) and value > 0.0:
+                return value
+    return None
+
+
 def _knudsen_residue_prediction(context, reference, engine, cache=None) -> EnginePrediction:
     """Translate the residue owner's extent result to the scoring contract."""
     from simulator.battery.residue import (
@@ -12092,6 +12122,7 @@ def _sossi_residue_prediction(
             source = load_yaml(
                 REPO_ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
             )
+            sample_surface_area_m2 = _sossi_printed_sample_surface_area_m2(source)
             source_experiments = {
                 str(item.get("experiment_id")): item
                 for item in source.get("experiments", ())
@@ -12117,6 +12148,7 @@ def _sossi_residue_prediction(
                 buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
                 code_revision=revision,
                 engine=engine.value,
+                sample_surface_area_m2=sample_surface_area_m2,
             )
             cache[cache_key] = {
                 row.experiment_id: row for row in rows

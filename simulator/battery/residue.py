@@ -3427,6 +3427,10 @@ _SOSSI_DENSITY_SOURCE = (
     "labelled 2700 kg/m3 fallback for the Sossi bead geometry sensitivity; "
     "density is not printed by Sossi"
 )
+_SOSSI_AREA_SOURCE = (
+    "Sossi 2019 source extract, species.K equipment.sample_surface_area: "
+    "approximately 2e-5 m2"
+)
 
 
 def _sossi_initial_inventory(
@@ -3466,7 +3470,26 @@ def _sossi_initial_inventory(
     )
 
 
-def _sossi_geometry_areas(sample_mass_kg: float) -> dict[str, float]:
+def _sossi_geometry_areas(
+    sample_mass_kg: float, *, printed_area_m2: float | None = None
+) -> dict[str, float]:
+    if printed_area_m2 is not None:
+        bead_area_m2 = float(printed_area_m2)
+        if not math.isfinite(bead_area_m2) or bead_area_m2 <= 0.0:
+            raise ResidueInventoryRefusal("sossi_sample_surface_area_invalid")
+        # Premise: the source reports the exposed bead area directly, so it
+        # replaces the sphere area reconstructed from mass and guessed density.
+        # For the existing equal-volume disk sensitivity, V=4πr³/3 and h=2r
+        # give A_disk=V/(2r)=A_sphere/6. The ratio is dimensionless, so both
+        # outputs stay in m²; 2e-5 m² yields a smaller ~3.3e-6 m² disk area.
+        disk_area = bead_area_m2 / 6.0
+        return {
+            "pt_loop_bead_sphere_constant": bead_area_m2,
+            "pt_loop_bead_sphere_shrinking": bead_area_m2,
+            "pt_loop_bead_disk_equivalent_volume": disk_area,
+        }
+
+    # Missing printed area keeps the previous density-based geometry estimate.
     density_kg_m3 = _HASHIMOTO_DENSITY_KG_M3
     volume_m3 = sample_mass_kg / density_kg_m3
     radius_m = (3.0 * volume_m3 / (4.0 * math.pi)) ** (1.0 / 3.0)
@@ -3514,6 +3537,7 @@ def _predict_sossi_residue_cohort(
     buffered_fO2_log_by_experiment: Mapping[str, float],
     code_revision: str,
     engine: str,
+    sample_surface_area_m2: float | None = None,
 ) -> tuple[_SossiResiduePrediction, ...]:
     """Predict Sossi Mn/Ti with the shared buffered inventory integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -3702,40 +3726,51 @@ def _predict_sossi_residue_cohort(
                             melt_oxide_activity,
                         )
 
-                        mno_activity = melt_oxide_activity(
-                            "MnO", composition, temperature_K=temperature_K
-                        )
-                        if mno_activity is None:
-                            raise ResidueInventoryRefusal(
-                                "melt_activity_unavailable",
-                                "OpenIMCC Mn gas channel needs a caller-supplied MnO activity",
+                        native_mno_activity = gas_parent_oxide_activities.get("MnO")
+                        if native_mno_activity is None:
+                            mno_activity = melt_oxide_activity(
+                                "MnO", composition, temperature_K=temperature_K
                             )
-                        mno_parent_activity = (
-                            mno_activity.thermodynamic_parent_activity()
-                        )
-                        if (
-                            not math.isfinite(mno_parent_activity)
-                            or mno_parent_activity < 0.0
-                        ):
-                            raise ResidueInventoryRefusal(
-                                "melt_activity_invalid",
-                                f"MnO activity extension returned {mno_parent_activity!r}",
+                            if mno_activity is None:
+                                raise ResidueInventoryRefusal(
+                                    "melt_activity_unavailable",
+                                    "OpenIMCC Mn gas channel needs a caller-supplied MnO activity",
+                                )
+                            native_mno_activity = (
+                                mno_activity.thermodynamic_parent_activity()
                             )
-                        gas_parent_oxide_activities["MnO"] = mno_parent_activity
-                        gas_parent_oxides += ("MnO",)
-                        melt_activity_extensions.setdefault(
-                            "MnO",
-                            {
-                                "reason": (
-                                    "MnO is outside the IMCC-SF04 melt-activity domain; "
-                                    "the simulator constant-gamma extension supplies the "
-                                    "activity required by the new Mn gas channel"
-                                ),
-                                "authority_level": mno_activity.evidence_tier,
-                                "certified_band_K": mno_activity.valid_range_K,
-                                "activity_provenance": mno_activity.provenance(),
-                            },
-                        )
+                            if (
+                                not math.isfinite(native_mno_activity)
+                                or native_mno_activity < 0.0
+                            ):
+                                raise ResidueInventoryRefusal(
+                                    "melt_activity_invalid",
+                                    f"MnO activity extension returned {native_mno_activity!r}",
+                                )
+                            gas_parent_oxide_activities["MnO"] = native_mno_activity
+                            gas_parent_oxides += ("MnO",)
+                            melt_activity_extensions.setdefault(
+                                "MnO",
+                                {
+                                    "reason": (
+                                        "MnO is outside the IMCC-SF04 melt-activity domain; "
+                                        "the simulator constant-gamma extension supplies the "
+                                        "activity required by the new Mn gas channel"
+                                    ),
+                                    "authority_level": mno_activity.evidence_tier,
+                                    "certified_band_K": mno_activity.valid_range_K,
+                                    "activity_provenance": mno_activity.provenance(),
+                                },
+                            )
+                        else:
+                            native_value = float(native_mno_activity)
+                            if not math.isfinite(native_value) or native_value < 0.0:
+                                raise ResidueInventoryRefusal(
+                                    "melt_activity_invalid",
+                                    f"OpenIMCC returned MnO activity {native_mno_activity!r}",
+                                )
+                            if "MnO" not in gas_parent_oxides:
+                                gas_parent_oxides += ("MnO",)
                     gas_result = evaluate_gas(
                         gas_parent_oxide_activities,
                         temperature_K,
@@ -3853,7 +3888,10 @@ def _predict_sossi_residue_cohort(
             else ()
         )
 
-        areas = _sossi_geometry_areas(sample_mass_kg)
+        area_fallback = sample_surface_area_m2 is None
+        areas = _sossi_geometry_areas(
+            sample_mass_kg, printed_area_m2=sample_surface_area_m2
+        )
         steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
         geometry_predictions: dict[str, dict[str, float]] = {}
         geometry_buffer_exchange: dict[str, float] = {}
@@ -3994,13 +4032,21 @@ def _predict_sossi_residue_cohort(
                     "geometry_policy_id": _SOSSI_PRIMARY_GEOMETRY,
                     "geometry_areas_m2": areas,
                     "area_m2_initial_by_geometry": areas,
+                    "sample_surface_area_m2": sample_surface_area_m2,
+                    "sample_surface_area_source": (
+                        _SOSSI_DENSITY_SOURCE if area_fallback else _SOSSI_AREA_SOURCE
+                    ),
                     "area_evolution_by_geometry": {
                         _SOSSI_GEOMETRIES[0]: "constant sphere area",
                         _SOSSI_GEOMETRIES[1]: "sphere area scales with remaining mass to 2/3",
                         _SOSSI_GEOMETRIES[2]: "constant equal-volume disk area",
                     },
-                    "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
-                    "density_source": _SOSSI_DENSITY_SOURCE,
+                    "density_kg_m3": (
+                        _HASHIMOTO_DENSITY_KG_M3 if area_fallback else None
+                    ),
+                    "density_source": (
+                        _SOSSI_DENSITY_SOURCE if area_fallback else "not used"
+                    ),
                     "alpha_arm": "alpha_runtime_catalog",
                     "alpha_by_channel": [
                         {
@@ -4035,7 +4081,8 @@ def _predict_sossi_residue_cohort(
                     ),
                     "assumption_flags": {
                         "pt_wire_loop_bead_geometry_assumed": True,
-                        "density_fallback_2700_kg_m3": True,
+                        "density_fallback_2700_kg_m3": area_fallback,
+                        "sample_surface_area_fallback_2700_kg_m3": area_fallback,
                         "bc_open_furnace_langmuir_limit_diagnostic": True,
                     },
                 },
