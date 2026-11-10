@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 """Tripwire: is the committed derived store stale w.r.t. migrate inputs?
 
+Invariant: no migrate-input change is silent. Every path is one input class
+(exact, code, battery_package, extract, compilation, named_source) or it is
+not an input. ``stale_input_commits`` is the only refusal: a commit after the
+last store-output commit that touches any class is refused unless that commit
+carries a store-neutral acknowledgement. Byte identity is the nightly
+``--check-store`` half, not a second commit-order rule.
+
 The derived store (works/, extracts-v2/, observations-v2/, migration-queue.yaml,
 and migration-report.md) is what consumers read, but nothing asserts it was regenerated after the
 extracts, compilations, or migration code last changed. This script is the
@@ -58,6 +65,14 @@ CODE_INPUTS = (
     "simulator/physical_constants.py",
     "simulator/reference_data/janaf.py",
     "simulator/state_types.py",
+)
+
+# Roots passed to ``git log`` by stale_input_commits. Every input_class path
+# lives under one of these. A class that is not walked cannot be refused.
+COMMIT_WALK_PATHS = (
+    "data/literature",
+    "simulator/battery",
+    *CODE_INPUTS,
 )
 
 
@@ -344,29 +359,55 @@ def _git(*args: str) -> str:
     ).stdout
 
 
-def _is_input(path: str) -> bool:
+def commit_walk_includes(path: str) -> bool:
+    """True when ``stale_input_commits`` asks git for this path."""
+    return any(
+        path == root or path.startswith(root + "/") for root in COMMIT_WALK_PATHS
+    )
+
+
+def input_class(path: str) -> str | None:
+    """Return the migrate-input class, or None when the path cannot change the store.
+
+    This is the only classifier. ``stale_input_commits`` refuses an
+    unacknowledged post-store commit that touches any class.
+    """
     name = path.rsplit("/", 1)[-1]
-    if path in INPUT_EXACT or path in CODE_INPUTS or path.startswith("simulator/battery/"):
-        return True
+    if path in INPUT_EXACT:
+        return "exact"
+    if path in CODE_INPUTS:
+        return "code"
+    if path.startswith("simulator/battery/"):
+        return "battery_package"
     if path.startswith("data/literature/extracts/"):
-        return (
+        if (
             path.endswith(".yaml")
             and path.count("/") == 3
             and not name.startswith("_")
             and not name.upper().startswith("SCHEMA")
-        )
+        ):
+            return "extract"
+        return None
     if path.startswith("data/literature/compilations/"):
-        return (
+        if (
             path.endswith((".yaml", ".yml", ".json"))
             and name != "README.md"
             and "__pycache__" not in path
-        )
+        ):
+            return "compilation"
+        return None
     # Named-source ledgers: top-level data/literature/*.yaml only.
-    return (
+    if (
         path.startswith("data/literature/")
         and path.endswith(".yaml")
         and path.count("/") == 2
-    )
+    ):
+        return "named_source"
+    return None
+
+
+def _is_input(path: str) -> bool:
+    return input_class(path) is not None
 
 
 def _tree_names(head: str, directory: str) -> set[str]:
@@ -407,7 +448,7 @@ def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
     ack_shas = _store_neutral_ack_commits()
     log = _git(
         "log", "--format=%H%x00%s", "--name-only", f"{last_store}..{head}", "--",
-        "data/literature", "simulator/battery", *CODE_INPUTS,
+        *COMMIT_WALK_PATHS,
     )
     commit: str | None = None
     subject = ""
