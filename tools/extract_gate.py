@@ -146,7 +146,7 @@ def _run_one(
         pre_policy_ids=pre_policy_ids,
     )
     if isinstance(doc, Mapping):
-        errors.extend(validator.check_all_fidelity_samples_match(doc, label=path.stem))
+        errors.extend(validator._check_fidelity_gate(doc, label=path.stem))
     yaml_issues = yaml_source_issues(raw)
     report = gate.evaluate_extract(
         path,

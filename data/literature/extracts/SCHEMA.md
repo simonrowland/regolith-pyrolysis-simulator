@@ -61,12 +61,16 @@ fidelity_samples:
     # Optional series pin: T_K: 1750.0  OR  index: 0
     field: alpha                         # optional key inside values
     value: 0.02
-    locator: { page: 12, figure: "3" }   # required on structured samples
+    reviewed_by: "reviewer-id"           # required source attestation
+    reviewed_on: "2026-08-01"             # required ISO date
+    locator: { page: 12, figure: "3" }   # required artifact locator
   # Path-based form (pilot DRAFT migrations; still accepted):
   # - path: species.Fe.observations[costa_jacobson_2015_fe_olivine_kems].values.alpha
   #   value: 0.02
   #   note: "DRAFT alpha-kinetics Costa Fe KEMS pin"
   #   locator: { record: costa_jacobson_2015_fe_olivine_kems }
+  #   reviewed_by: "reviewer-id"
+  #   reviewed_on: "2026-08-01"
 species: {}                              # map: canonical U0 / manifest id → species block
 ```
 
@@ -87,10 +91,12 @@ is absent.
 
 ### `fidelity_samples` (t-510 gate)
 
-Each sample is a **reviewer-verified** line item checked against the source /
-OCR artifact: the stored value still matches what the reviewer read at the
-locator. Samples are the extraction-drift fuse — a bad regeneration or silent
-rewrite of a pinned field turns the checked-in match test RED.
+Each sample is a **reviewer-attested** line item checked against the source /
+OCR artifact: the reviewer records who checked it, when, and where in the
+artifact. The extract gate requires a matching, attested sample for every
+scored observation. Matching pins also detect later extraction drift. The gate
+checks that an attestation is recorded; it does not independently open the OCR
+artifact or prove that the reviewer transcribed it correctly.
 
 #### Sample shapes
 
@@ -101,7 +107,9 @@ rewrite of a pinned field turns the checked-in match test RED.
 | `species` | yes | Canonical species id under `species:` |
 | `observable` and/or `observation_id` | yes (≥1) | Observation type and/or id |
 | `value` / `draft_value` | yes | Expected value (scalar or structure) |
-| `locator` / `source_locator` | yes (exactly 1) | Where in the source/OCR this was checked |
+| `reviewed_by` | yes | Person who checked the sample against the source/OCR artifact |
+| `reviewed_on` | yes | ISO `YYYY-MM-DD` date of that source check |
+| `locator` / `source_locator` | yes (exactly 1) | Where in the source/OCR artifact this was checked |
 | `T_K` / `T` or `index` | no | Pin a series point by temperature or list index |
 | `field` / `value_key` | no | Key inside `values` (or the series point) |
 | `rel_tol` | no | Finite numeric magnitude tolerance, `0 <= rel_tol < 1`; never changes type matching |
@@ -112,7 +120,9 @@ rewrite of a pinned field turns the checked-in match test RED.
 |-------|----------|---------|
 | `path` / `field_path` | yes | Dot path into the extract (supports `[observation_id]`) |
 | `value` / `draft_value` | yes | Expected / stored value |
-| `locator` / `source_locator` or `note` | yes | Where in the source this was checked; locator aliases are mutually exclusive and any supplied locator must be valid |
+| `reviewed_by` | yes | Person who checked the sample against the source/OCR artifact |
+| `reviewed_on` | yes | ISO `YYYY-MM-DD` date of that source check |
+| `locator` / `source_locator` | yes (exactly 1) | Where in the source/OCR artifact this was checked |
 
 A sample uses **exactly one** addressing mode. Path keys cannot be combined
 with structured selector keys as decoration; the resolver rejects such mixed
@@ -126,6 +136,14 @@ of `T_K`/`T`, one of `value`/`draft_value`, one of
 `locator`/`source_locator`, and either `index` or a temperature selector. When
 both `observation_id` and `observable` are supplied, the selected observation's
 type must equal `observable`; no null or contradictory alias may be decorative.
+
+The pre-policy allowlist only grandfathers sample presence in the general
+extract validator. `tools/extract_gate.py` still requires sample coverage for
+every scored observation and a per-sample reviewer, date, and source locator.
+Migration-generated samples have no reviewer attestation and therefore do not
+count until someone checks them against the cited artifact. Do not backfill
+attestation from the extract's own value. Until the existing pilot samples are
+re-audited, the gate reports them as unverified.
 
 A structured sample addresses one observation-shaped row, whether it lives in
 `observations[]` or in the sibling `context[]` container (d-032): the resolver

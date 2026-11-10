@@ -19,6 +19,8 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   ``_fidelity_pre_policy_allowlist.yaml``)
 * fidelity sample structure: path-based *or* structured line-item form
   (species, observable, T/index, value, locator)
+* the extract fidelity gate requires one matching, reviewer-attested sample
+  (reviewer, date, source locator) per scored observation
 * structured fidelity samples resolve rows in ``observations[]`` or the
   sibling ``context[]`` container (d-032); an id matching rows in both
   containers is an ambiguity error, not a silent pick
@@ -44,7 +46,13 @@ import math
 import re
 import subprocess
 import sys
-from collections.abc import MutableMapping, MutableSequence, MutableSet, Set as AbstractSet
+from collections.abc import (
+    MutableMapping,
+    MutableSequence,
+    MutableSet,
+    Set as AbstractSet,
+)
+from datetime import date
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -1129,6 +1137,162 @@ def check_all_fidelity_samples_match(
     return errors
 
 
+def _fidelity_sample_observation_key(
+    doc: Mapping[str, Any], sample: Mapping[str, Any]
+) -> tuple[str, str] | None:
+    """Return the scored observation addressed by a fidelity sample, if any."""
+    path_keys, structured_keys = _sample_addressing_keys(sample)
+    if path_keys:
+        if len(path_keys) != 1:
+            return None
+        path = sample.get(path_keys[0])
+        if not isinstance(path, str):
+            return None
+        parts = path.split(".")
+        if len(parts) < 4 or parts[0] != "species":
+            return None
+        species_match = _PATH_SEGMENT_RE.match(parts[1])
+        observation_match = _PATH_SEGMENT_RE.match(parts[2])
+        if (
+            not species_match
+            or species_match.group(2) is not None
+            or not observation_match
+            or observation_match.group(1) != "observations"
+            or observation_match.group(2) is None
+        ):
+            return None
+        species_id = species_match.group(1)
+        try:
+            observation = resolve_field_path(doc, ".".join(parts[:3]))
+        except KeyError:
+            return None
+        observation_id = (
+            observation.get("observation_id")
+            if isinstance(observation, Mapping)
+            else None
+        )
+        if isinstance(observation_id, str) and observation_id:
+            return species_id, observation_id
+        return None
+
+    if not structured_keys or not isinstance(sample.get("species"), str):
+        return None
+    species_id = sample["species"]
+    try:
+        observation = _find_observation(
+            doc,
+            species=species_id,
+            observation_id=(
+                str(sample["observation_id"]) if sample.get("observation_id") else None
+            ),
+            observable=str(sample["observable"]) if sample.get("observable") else None,
+        )
+    except KeyError:
+        return None
+    species_map = doc.get("species")
+    if not isinstance(species_map, Mapping):
+        return None
+    block = species_map.get(species_id)
+    observations = block.get("observations") if isinstance(block, Mapping) else None
+    if not isinstance(observations, list) or not any(
+        observation is row for row in observations
+    ):
+        return None
+    observation_id = observation.get("observation_id")
+    if isinstance(observation_id, str) and observation_id:
+        return species_id, observation_id
+    return None
+
+
+def _check_fidelity_gate(
+    doc: Mapping[str, Any],
+    *,
+    label: str = "<document>",
+) -> list[str]:
+    """Require matching, source-attested fidelity samples for every observation.
+
+    The reviewer fields are an explicit attestation; migrated pins do not gain
+    that status from their extract locator or from matching the stored value.
+    """
+    errors: list[str] = []
+    samples = doc.get("fidelity_samples")
+    if samples is None:
+        samples = []
+    elif not isinstance(samples, list):
+        return [f"{label}: fidelity_samples must be a list"]
+
+    required: set[tuple[str, str]] = set()
+    species_map = doc.get("species") or {}
+    if isinstance(species_map, Mapping):
+        for species_id, block in species_map.items():
+            observations = (
+                block.get("observations") if isinstance(block, Mapping) else None
+            )
+            if not isinstance(observations, list):
+                continue
+            for observation in observations:
+                if not isinstance(observation, Mapping):
+                    continue
+                observation_id = observation.get("observation_id")
+                if isinstance(observation_id, str) and observation_id:
+                    required.add((str(species_id), observation_id))
+
+    covered: set[tuple[str, str]] = set()
+    for index, sample in enumerate(samples):
+        sample_label = f"{label}:fidelity_samples[{index}]"
+        if not isinstance(sample, Mapping):
+            errors.append(f"{sample_label}: each sample must be a mapping")
+            continue
+
+        match_errors = check_fidelity_sample_matches(doc, sample, label=sample_label)
+        errors.extend(match_errors)
+
+        attested = True
+        reviewer = sample.get("reviewed_by")
+        if not isinstance(reviewer, str) or not reviewer.strip():
+            errors.append(
+                f"{sample_label}: reviewed_by is required for source attestation"
+            )
+            attested = False
+        reviewed_on = sample.get("reviewed_on")
+        if not isinstance(reviewed_on, str) or not _ISO_DATE_RE.fullmatch(
+            reviewed_on
+        ):
+            errors.append(
+                f"{sample_label}: reviewed_on must be an ISO YYYY-MM-DD date"
+            )
+            attested = False
+        else:
+            try:
+                date.fromisoformat(reviewed_on)
+            except ValueError:
+                errors.append(f"{sample_label}: reviewed_on is not a calendar date")
+                attested = False
+        locator_keys = [key for key in ("locator", "source_locator") if key in sample]
+        if len(locator_keys) != 1 or not _locator_ok(sample.get(locator_keys[0])):
+            errors.append(
+                f"{sample_label}: exactly one valid locator/source_locator is required "
+                "for source attestation"
+            )
+            attested = False
+
+        observation_key = _fidelity_sample_observation_key(doc, sample)
+        if (
+            attested
+            and not match_errors
+            and observation_key is not None
+            and observation_key in required
+        ):
+            covered.add(observation_key)
+
+    for species_id, observation_id in sorted(required - covered):
+        errors.append(
+            f"{label}: fidelity sample coverage missing for observation "
+            f"species.{species_id}.observations[{observation_id}]"
+        )
+    return errors
+
+
 def load_known_species_ids() -> set[str] | None:
     """Return known U0/manifest ids, or None if the manifest is unavailable."""
     if not U0_MANIFEST.is_file():
@@ -1528,7 +1692,7 @@ def _check_fidelity_sample_shape(
     elif structured:
         errors.append(
             f"{sp}: locator/source_locator required on structured fidelity samples "
-            f"(reviewer-verified against source/OCR artifact)"
+            f"(for source/OCR artifact review)"
         )
     elif not note:
         errors.append(
@@ -1563,7 +1727,7 @@ def _check_fidelity_samples(
         if samples is None:
             errors.append(
                 f"{label}: fidelity_samples required when observations are present "
-                f"(t-510 ENFORCED_FOR_NEW: ≥1 reviewer-verified located sample; "
+                f"(t-510 ENFORCED_FOR_NEW: ≥1 located sample; "
                 f"pre-policy pilot extracts may be allowlisted)"
             )
             return

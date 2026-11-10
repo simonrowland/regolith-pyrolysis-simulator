@@ -34,6 +34,8 @@ def _document() -> dict:
                 "value": 0.24,
                 "note": "fixture fidelity sample",
                 "locator": {"page": 2, "pdf_page_index": 1, "table": "1"},
+                "reviewed_by": "pytest fixture reviewer",
+                "reviewed_on": "2026-11-10",
             }
         ],
         "species": {
@@ -73,7 +75,7 @@ def _run_gate(
         expected_source_id=path.stem,
         pre_policy_ids=set(),
     )
-    errors.extend(validator.check_all_fidelity_samples_match(parsed, label=path.stem))
+    errors.extend(validator._check_fidelity_gate(parsed, label=path.stem))
     return evaluate_extract(
         path,
         parsed,
@@ -97,6 +99,55 @@ def test_isolated_migration_reports_kinds_and_refusals(tmp_path: Path, monkeypat
     monkeypatch.setattr(gate, "_migrate_one", lambda *_args: ["forced refusal"])
     report = _run_gate(tmp_path, _document())
     assert next(item for item in report.findings if item.check == "isolated-migration").severity == "HARD"
+
+
+def test_fidelity_gate_requires_sample_coverage_for_every_observation(tmp_path: Path):
+    doc = _document()
+    doc["species"]["Fe"]["observations"].append(
+        {
+            "observation_id": "fe_alpha_2",
+            "type": "alpha",
+            "locator": {"table": "1", "page": 2, "pdf_page_index": 1},
+            "units": "dimensionless",
+            "values": {"alpha": 0.31},
+        }
+    )
+
+    report = _run_gate(tmp_path, doc)
+
+    assert report.hard_failed
+    assert any(
+        "fidelity sample coverage missing" in finding.detail
+        for finding in report.findings
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("reviewed_by", None),
+        ("reviewed_on", None),
+        ("reviewed_on", "2026-02-30"),
+        ("locator", None),
+    ],
+)
+def test_fidelity_gate_requires_per_sample_reviewer_attestation(
+    tmp_path: Path, field: str, value: str | None
+):
+    doc = _document()
+    if field == "reviewed_by":
+        # A copied value can match the extract exactly and still lack source evidence.
+        doc["fidelity_samples"][0]["value"] = 0.9
+        doc["species"]["Fe"]["observations"][0]["values"]["alpha"] = 0.9
+    if value is None:
+        del doc["fidelity_samples"][0][field]
+    else:
+        doc["fidelity_samples"][0][field] = value
+
+    report = _run_gate(tmp_path, doc)
+
+    assert report.hard_failed
+    assert any(field in finding.detail for finding in report.findings)
 
 
 def test_kress_pdf_lineage_resolves_in_stub_index_gate(monkeypatch):
