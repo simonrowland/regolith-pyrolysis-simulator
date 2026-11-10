@@ -121,8 +121,11 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # Lunar full runs diverge between laptop and studio-3, so these are the
         # obtained Studio-3 digests. re-pinned 2026-11-08 at bb77e4654
         # (rpp-ctrl, s3 gate engine set; fixtures regenerated at fd54f096e).
-        "flux_maps_sha256": "6343cef5e128aa81773f7f5e6788a9c1bf00d28881eb35738d031516befcede4",
-        "ledger_sha256": "497f7212b7a9c840546b5f79b2b80c15326b53bd640bc191cc6709e29f60a914",
+        # b-1119 (oxide reference state; d-359/d-364/d-365/d-367): lunar flux and
+        # ledger digests from the pytest run on studio-3 with the gate engine config
+        # (regolith-grind toml c3372562), fixtures regenerated at 65a154dca.
+        "flux_maps_sha256": "790a6203fea56b21b5394bf100bf6cd7f1ed70e30f34dd773e72d4cfd214f576",
+        "ledger_sha256": "7e5660d7224e16b0121a482554f83d717d669fc71172235f429398d93bdc14fd",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
@@ -2093,7 +2096,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # Final b-1119 tree (d-354): the hours carry the evaluated-below-floor channel
         # state and provenance; they still equal the regenerated fixture above.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "56e52097f782d4c0d21dd9bcd40e7a116fec8d47ce6f123779f5e849f3e7da32"
+            "5c9e387ebd19b3e6df9aff2f801617ccc76d50b6783b109d9dc8d61b6db4af95"  # b-1119, studio-3 gate config
         )
 
 
