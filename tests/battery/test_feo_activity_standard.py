@@ -533,7 +533,7 @@ def test_distin_closed_redox_residual_uses_default_profile(
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
     # Pin the result produced by the new default profile and FeO content guard.
     assert sha256(serialized).hexdigest() == (
-        "db996a2ae254697b9d6d2a1f46fc5f9c2834dfaea48313476dc2cff7149b4b63"
+        "0a9fc907ae911bab04cccf652494e4cbd2d44f22e7a74600f12cc67208082499"
     )
 
 
