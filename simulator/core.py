@@ -6028,20 +6028,61 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 candidate_fO2_log = min(
                     candidate_fO2_log, self._melt_redox_fO2_upper_bound_log(),
                 )
-                applied_delta_ln = (
-                    candidate_fO2_log - base_fO2_log
-                ) * math.log(10.0)
-                reservoir.melt_intrinsic_fO2_log = (
-                    self._finite_oxygen_reservoir_fO2_log(
-                        candidate_fO2_log,
-                        context='redox_source_terms',
-                        source_terms_mol_o2_equiv=terms,
-                        net_o2_equiv_mol=net_o2_equiv_mol,
-                        melt_redox_capacity_mol_per_ln_fO2=C_m,
-                        delta_ln_fO2=applied_delta_ln,
-                        candidate_fO2_log=candidate_fO2_log,
+                if net_o2_equiv_mol < 0.0:
+                    pressure_bar = floor_vacuum_pressure_bar(
+                        float(self.melt.p_total_mbar) / 1000.0,
+                        floor_bar=self._vacuum_floor_bar(),
                     )
-                )
+                    ferric_fraction = self._fe3_over_sigma_fe_at_fO2(
+                        self._melt_oxide_wt_pct(),
+                        fO2_log=base_fO2_log,
+                        T_K=T_K,
+                        pressure_bar=pressure_bar,
+                    )
+                    active_fe_mol = (
+                        self._cleaned_melt_fe_atom_mol()
+                        * self._melt_redox_liquid_fraction_factor(
+                            T_K,
+                            gate_authority=gate_authority,
+                        )
+                    )
+                    # Premise: Kress Fe3+/ΣFe is the active liquid's ferric
+                    # fraction, and 4 Fe3+ reduce per mol O2-equivalent.
+                    # Therefore n_O2,max = n_Fe * liquid_fraction * x_Fe3 / 4
+                    # mol. The units reduce to mol O2, and x_Fe3=0 leaves no
+                    # reducing buffer. At this endpoint x_Fe3 would be <= 0,
+                    # outside Kress's finite-fO2 domain, so refuse the update.
+                    available_reducing_o2_mol = max(
+                        0.0,
+                        active_fe_mol * ferric_fraction / 4.0,
+                    )
+                    if -net_o2_equiv_mol >= available_reducing_o2_mol:
+                        skip_reason = 'redox_capacity_saturation_refusal'
+                        refusal_context = self._oxygen_reservoir_guard_context(
+                            context='redox_source_terms_saturation_refusal',
+                            source_terms_mol_o2_equiv=terms,
+                            net_o2_equiv_mol=net_o2_equiv_mol,
+                            melt_redox_capacity_mol_per_ln_fO2=C_m,
+                            delta_ln_fO2=applied_delta_ln,
+                            candidate_fO2_log=candidate_fO2_log,
+                        )
+                if not skip_reason:
+                    applied_delta_ln = (
+                        candidate_fO2_log - base_fO2_log
+                    ) * math.log(10.0)
+                    reservoir.melt_intrinsic_fO2_log = (
+                        self._finite_oxygen_reservoir_fO2_log(
+                            candidate_fO2_log,
+                            context='redox_source_terms',
+                            source_terms_mol_o2_equiv=terms,
+                            net_o2_equiv_mol=net_o2_equiv_mol,
+                            melt_redox_capacity_mol_per_ln_fO2=C_m,
+                            delta_ln_fO2=applied_delta_ln,
+                            candidate_fO2_log=candidate_fO2_log,
+                        )
+                    )
+                else:
+                    applied_delta_ln = 0.0
         if terms:
             if skip_reason:
                 self._accumulate_redox_source_terms_for_hour(

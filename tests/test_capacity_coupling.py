@@ -1994,6 +1994,8 @@ def test_reductive_source_beyond_ferric_capacity_is_refused_before_runaway(
         "_melt_redox_source_capacity_mol_per_ln_fO2",
         lambda **_kwargs: 0.0,
     )
+    sim.melt.hour += 1
+    sim._reset_redox_source_diagnostics_for_hour()
     reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
         source,
         exchange_direction="redox_source:c3_na_shuttle_reduction",
