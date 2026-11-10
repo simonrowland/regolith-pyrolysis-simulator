@@ -887,6 +887,22 @@ def test_clipped_flagged_points_keep_a_hollow_marker(tmp_path: Path, view: str) 
         plt.close(figure)
 
 
+def test_hero_plot_reuses_leaderboard_flag_normalization() -> None:
+    from simulator.battery import leaderboard
+
+    row = {
+        "candidate_observation": {
+            "notices": [{"kind": "unverified-apparatus"}]
+        },
+        "notices": [{"kind": "unverified-apparatus"}],
+    }
+
+    assert hero_plot._row_flags is leaderboard._row_flags
+    assert hero_plot._row_flags(row, d139_uncalibrated_kems=False) == [
+        "unverified_apparatus"
+    ]
+
+
 def test_hero_hollow_encoding_uses_only_scorer_flags(tmp_path: Path) -> None:
     residuals = tmp_path / "flag-sources.jsonl"
     ordinary = _record(
