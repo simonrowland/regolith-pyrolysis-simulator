@@ -323,14 +323,11 @@ def _extrapolated_record_at(route, species: str, temperature_K: float):
 def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
     """250 C and 40 C are below the Na and K Antoine bands.
 
-    The route still captures. The notice is the existing
-    ``_record_antoine_extrapolation`` record (reason
-    ``wall_saturation_pressure_out_of_validated_range``). At these two
-    walls ``require_antoine_source_certified_temperature`` does not raise,
-    so the ``#wall:`` key is not the record this route writes. Band
-    sampling adds unique extrapolation records before the same 523.15 K
-    and 313.15 K wall records, whose serial keys are now ``Na#67`` and
-    ``K#67``.
+    Na capture at the 250 C collector proceeds with the existing
+    ``wall_saturation_pressure_out_of_validated_range`` notice. The route
+    then evaluates Na at the 40 C K trap, where the low-temperature fit is
+    unavailable and produces a typed refusal. K's 40 C lookup extrapolates
+    successfully and uses the serial key ``K#67``.
     """
 
     model = CondensationModel(CondensationTrain.create_default())
@@ -338,7 +335,10 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
         overhead_pressure_mbar=2.0,
         species_partial_pressures_mbar={'Na': 1.0, 'K': 1.0},
         stage_area_m2_by_stage={
-            str(stage.stage_number): 1.0 for stage in model.train.stages
+            str(stage.stage_number): (
+                0.0 if stage.stage_number in (5, 6, 7) else 1.0
+            )
+            for stage in model.train.stages
         },
     )
     route = model.route(
@@ -348,8 +348,28 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
 
     assert route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY]['Na'] > 0.0
     assert route.condensed_by_stage_species[K_TRAP_STAGE_KEY]['K'] > 0.0
+    assert route.remaining_by_species['Na'] == pytest.approx(
+        0.03163570211702649
+    )
+    na_trap_refusal = route.antoine_extrapolations['Na#wall:313.15']
+    assert na_trap_refusal['status'] == 'refused'
+    assert na_trap_refusal['authority_level'] == 'unavailable'
+    assert na_trap_refusal['refusal_type'] == 'WallSaturationPressureRefusal'
+    assert tuple(na_trap_refusal['valid_range_K']) == (924.0, 1118.0)
+    assert 'no extrapolation available' in na_trap_refusal['reason']
+    assert 'Na' not in route.condensed_by_stage_species.get(
+        K_TRAP_STAGE_KEY, {})
+    na_refusal = route.condensation_refusals_by_species['Na']
+    assert na_refusal['status'] == 'refused'
+    assert any(
+        outcome.get('stage_number') == 4
+        and outcome.get('refusal_type') == 'WallSaturationPressureRefusal'
+        for outcome in na_refusal['stage_outcomes']
+    )
     assert 'Na' not in route.impurity_by_stage_species.get(
         NA_COLLECTOR_STAGE_KEY, {})
+    assert 'Na' not in route.impurity_by_stage_species.get(
+        K_TRAP_STAGE_KEY, {})
     assert 'K' not in route.impurity_by_stage_species.get(K_TRAP_STAGE_KEY, {})
     na_key, na_record = _extrapolated_record_at(route, 'Na', 523.15)
     k_key, k_record = _extrapolated_record_at(route, 'K', 313.15)

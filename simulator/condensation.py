@@ -7529,8 +7529,8 @@ def _stage_alpha_surface_key(stage: CondensationStage) -> str:
 def _cold_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
     """Own taps on the cold alkali stages only. Not applied to stage 1.
 
-    The Na collector rejects K. The K trap accepts only species designated
-    to that key. Mg and every other species stage 4 captures stay on stage 4.
+    The Na collector rejects K. The K trap evaluates K and Na carryover;
+    other species designated elsewhere stay on their collector stages.
     """
 
     key = getattr(stage, 'stage_key', '') or ''
@@ -7538,7 +7538,7 @@ def _cold_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool
     if key == NA_COLLECTOR_STAGE_KEY:
         return designated == K_TRAP_STAGE_KEY
     if key == K_TRAP_STAGE_KEY:
-        return designated != K_TRAP_STAGE_KEY
+        return designated != K_TRAP_STAGE_KEY and species != 'Na'
     return False
 
 
