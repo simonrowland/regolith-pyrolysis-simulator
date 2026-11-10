@@ -9,7 +9,8 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, Quantity, ValueKind
+from simulator.battery.enums import FO2Channel, Phase, Quantity, ValueKind
+from simulator.battery.waypoints import oxygen_condition
 from tests.battery.factories import migrate_one_extract
 
 
@@ -106,7 +107,7 @@ def _assert_render_grid(document):
         assert row["locator"]["row"] == str(run)
 
 
-def _assert_migrated_reductions_and_conditions(observations):
+def _assert_migrated_reductions_and_conditions(observations, experiments, benches):
     assert len(EXPECTED_PNA_PA) == len(EXPECTED_ACTIVITY) == 31
     for run, rendered in RENDER_GRID.items():
         suffix = f"{run:02d}"
@@ -133,11 +134,12 @@ def _assert_migrated_reductions_and_conditions(observations):
             identity = observation.identity
             assert identity.temperature_K.value == temperature_c + Decimal("273.15")
             assert identity.composition.value.components == expected_composition
+            assert identity.composition.value.proxy_flag is None
             assert identity.total_pressure_Pa.value == expected_pressure_pa
             if observation is input_row:
-                assert identity.fO2_Pa is None
+                assert identity.fO2_Pa.is_value
             else:
-                assert identity.fO2_Pa is not None and identity.fO2_Pa.is_unknown
+                assert identity.fO2_Pa.is_unknown
 
             conditions = observation.point_conditions
             assert conditions is not None
@@ -160,6 +162,35 @@ def _assert_migrated_reductions_and_conditions(observations):
             assert conditions["atmosphere"].locator.page == 2
             assert conditions["fO2_log"].state.is_unknown
             assert conditions["fO2_log"].locator.page == 1
+
+        exp_record = experiments[pressure_row.experiment_id]
+        assert exp_record.bench_id is not None
+        assert exp_record.bench_id.endswith("::bench::rego-1985-transpiration-apparatus")
+        assert exp_record.sample.initial_composition is not None
+        assert exp_record.sample.initial_composition.state.is_unknown
+        assert exp_record.sample.initial_composition.locator.page == 3
+        assert exp_record.sample.form.state.value == "Preformed solidified slag piece"
+        assert exp_record.sample.form.locator.page == 3
+        assert "negligible in all cases" in exp_record.sample.characterization.state.value
+        assert exp_record.sample.characterization.locator.page == 3
+        assert exp_record.fO2_control.channel.value is FO2Channel.BUFFER
+        assert exp_record.fO2_control.buffer.state.value == "C-CO"
+        assert exp_record.fO2_control.buffer.locator.page == 1
+        gas = exp_record.pressure_environment.sweep_gas.state.value
+        assert gas.species == "CO"
+        assert gas.partial_pressure_Pa.is_unknown
+        assert exp_record.pressure_environment.total_pressure_Pa.state.value.point == expected_pressure_pa
+        bench = benches[exp_record.bench_id]
+        assert bench.cell_material_and_liner.state.value == (
+            "Pre-impregnated high-purity graphite crucible ('Graphitite G', Carborundum Co.)"
+        )
+        assert bench.cell_material_and_liner.locator.page == 2
+        cco = oxygen_condition(exp_record, bench, pressure_row)
+        assert cco.selected is not None
+        assert cco.selected.route == "graphite_c_co_buffer"
+        assert cco.selected.authority.value == "derived"
+        assert cco.selected.value.point is not None
+        assert pressure_row.identity.fO2_Pa.is_unknown
 
         reference_state = activity_row.identity.reference_state
         assert reference_state is not None and reference_state.is_value
@@ -233,8 +264,23 @@ def test_isolated_migration_binds_rendered_rows_and_refuses_only_the_input_bundl
         and observation.identity.species.phase.is_value
         for observation in result.observations.values()
     )
+    assert Counter(
+        observation.uncertainty.kind.value
+        for observation in result.observations.values()
+    ) == Counter({"none": 93})
+    assert all(
+        observation.uncertainty.verbatim is None
+        for observation in result.observations.values()
+    )
+    print("uncertainty: kind=none:93; confidence=no printed statement:93")
 
-    _assert_migrated_reductions_and_conditions(result.observations)
+    _assert_migrated_reductions_and_conditions(
+        result.observations, result.experiments, result.benches
+    )
+    print(
+        "identity axes: numeric rows fO2_Pa=unknown:62; typed-refused bundles "
+        "fO2_Pa=derived:31; C-CO oxygen waypoint=derived:31"
+    )
     migrated_input_row_10 = result.observations[
         f"{SID}::rego_1985_table1_run_10_inputs"
     ]
@@ -267,4 +313,6 @@ def test_tenfold_run_18_activity_mutation_fails_the_migrated_pins():
     )
 
     with pytest.raises(AssertionError):
-        _assert_migrated_reductions_and_conditions(observations)
+        _assert_migrated_reductions_and_conditions(
+            observations, migrator.result.experiments, migrator.result.benches
+        )

@@ -10,6 +10,7 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import AmountBasis
 from simulator.battery.migrate import Migrator
 
 
@@ -140,6 +141,84 @@ def test_table3_series_are_render_pinned_and_migrate_without_hard_issues():
     })
     assert len(migrated) == 68
     assert all(row.identity.temperature_K.is_value for row in migrated)
+    experiment_ids = {row.experiment_id for row in migrated}
+    assert len(experiment_ids) == 1
+    experiment_id = next(iter(experiment_ids))
+    assert experiment_id.endswith(
+        "::experiment::shornikov_2019_rjpc_mo_cell_kems"
+    )
+    experiment = migrator.result.experiments[experiment_id]
+    initial = experiment.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.locator.published_page == 1024
+    assert initial.state.value.proxy_flag == "initial_charge_only"
+    assert (
+        experiment.locator.page,
+        experiment.locator.published_page,
+        experiment.locator.pdf_page_index,
+    ) == (4, 1027, 3)
+    cell = experiment.apparatus.cell_material_and_liner
+    assert cell.state.is_value
+    assert "molybdenum" in cell.state.value.casefold()
+    assert (
+        cell.locator.page,
+        cell.locator.published_page,
+        cell.locator.pdf_page_index,
+    ) == (4, 1027, 3)
+    bench = migrator.result.benches[experiment.bench_id]
+    assert (
+        bench.apparatus_family.locator.page,
+        bench.apparatus_family.locator.published_page,
+        bench.apparatus_family.locator.pdf_page_index,
+    ) == (4, 1027, 3)
+    assert "molybdenum" in bench.cell_material_and_liner.state.value.casefold()
+    assert (
+        bench.cell_material_and_liner.locator.page,
+        bench.cell_material_and_liner.locator.published_page,
+        bench.cell_material_and_liner.locator.pdf_page_index,
+    ) == (4, 1027, 3)
+    assert (
+        bench.cell_materials[0].locator.page,
+        bench.cell_materials[0].locator.published_page,
+        bench.cell_materials[0].locator.pdf_page_index,
+    ) == (4, 1027, 3)
+    assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
+    residual = experiment.pressure_environment.cell_internal_pressure_note
+    assert residual.state.is_value
+    assert "10^-10 atm" in residual.state.value
+    for row in migrated:
+        assert row.point_conditions is not None
+        assert row.point_conditions["temperature_K"].state.is_value
+        composition = row.point_conditions["composition"]
+        assert composition.state.is_value
+        assert composition.locator.published_page == 1024
+        assert composition.state.value.basis == "printed_formula_stoichiometry"
+        assert composition.state.value.components == (
+            ("CaO", Decimal("1")),
+            ("TiO2", Decimal("1")),
+        )
+        assert composition.state.value.amount_basis is AmountBasis.MOL_INVENTORY
+        assert composition.state.value.proxy_flag == "initial_charge_only"
+        measured = row.point_conditions["measurement_state_composition"]
+        assert measured.state.is_unknown
+        assert (
+            measured.locator.page,
+            measured.locator.published_page,
+            measured.locator.pdf_page_index,
+        ) == (4, 1027, 3)
+        for field in ("run_order_index", "depletion_evidence", "vaporization_mode"):
+            assert row.point_conditions[field].state.is_unknown
+            locator = row.point_conditions[field].locator
+            assert (locator.page, locator.published_page, locator.pdf_page_index) == (
+                4, 1027, 3
+            )
+        oxygen = row.point_conditions["fO2_Pa"]
+        assert oxygen.state.is_unknown
+        assert (
+            oxygen.locator.page,
+            oxygen.locator.published_page,
+            oxygen.locator.pdf_page_index,
+        ) == (4, 1027, 3)
     assert {
         int(row.identity.temperature_K.value) for row in migrated
     } == set(TABLE3_TEMPERATURES)
@@ -158,6 +237,8 @@ def test_table2_cross_references_match_the_existing_tms_points():
         and row["values"].get("quantity") == "existing_partial_pressure_series"
     }
     tms_observations = _observations(tms)
+    rjpc_observation_ids = set(_observations(document))
+    assert not rjpc_observation_ids.intersection(tms_observations)
     audit_rows = list(csv.DictReader(COMPARE_AUDIT.open(encoding="utf-8", newline="")))
     shared_rows = [
         row for row in audit_rows
