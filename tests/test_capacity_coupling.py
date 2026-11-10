@@ -1538,7 +1538,13 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
         liquid_fraction=1.0,
         diagnostics={},
     )
-    sim._last_vapor_pressure_diagnostic = {}
+    # Fe is the only claimed species. Its selected pressure is the Ellingham
+    # rail, and a missing activity or transport pO2 refuses that quantity, so
+    # the debit path fail-closes before the two constructors can be compared.
+    sim._last_vapor_pressure_diagnostic = {
+        "pO2_bar": 1.0e-9,
+        "activities": {"Fe": 0.2},
+    }
     partials = {"Fe": 100.0, "N2": 200.0}
     effective_pressure_source = _pre_rg_effective_pressure_source(
         sim.vapor_pressures,

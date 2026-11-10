@@ -82,7 +82,16 @@ _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
 # The runtime already publishes the kernel seam green uses; keep that
 # seam on the selected pressure. answer.pressure stays the catalog
 # reference. Which source is the long-term owner is b-1169.
-_KERNEL_SEAM_DEBIT_SPECIES = frozenset({'Na', 'K', 'Ca', 'Mg', 'Ti'})
+# Si is the same class. At the C4 in-domain point (1670 C, p_total
+# 10.2 mbar, pO2 0.2 mbar = 2e-4 bar) the catalog row's pO2 reference
+# is 1e-9 bar and the exponent is -1, so the activity-corrected catalog
+# pressure is the kernel pressure times (2e-4/1e-9)^-1 = 1/2e5.
+# Measured pair: catalog 4.149230182792238e-12 Pa, kernel
+# 8.298460365584479e-07 Pa. Green debits the kernel. The catalog debit
+# falls under the 1e-12 kg/hr report floor and Si vanishes. At C0 the
+# realized pO2 is that 1e-9 bar floor, so the ratio is 1 (1 ulp) and
+# the C0 totals do not move.
+_KERNEL_SEAM_DEBIT_SPECIES = frozenset({'Na', 'K', 'Ca', 'Mg', 'Ti', 'Si'})
 
 
 class EvaporationFluxRefusal(ProviderUnavailableError):
@@ -770,7 +779,7 @@ def _retain_kernel_seam_debit(
     equilibrium: Any,
     effective_pressure_source: EffectivePressureSource,
 ) -> Any:
-    """Keep Na, K, Ca, Mg, and Ti on the kernel pressure already published.
+    """Keep Na, K, Ca, Mg, Ti, and Si on the kernel pressure already published.
 
     The catalog activity correction for these species is not the debit.
     ``answer.pressure`` stays the catalog value. The selected runtime

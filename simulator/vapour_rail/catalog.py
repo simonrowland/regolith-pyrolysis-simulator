@@ -37,7 +37,12 @@ from simulator.vapour_rail.activity import (
     SourceReactionActivity,
     StandardStateIdentity,
 )
-from simulator.vapour_rail.batch import FluxActivationContext, PressureValue
+from simulator.vapour_rail.batch import (
+    FluxActivationContext,
+    FluxRefusal,
+    PressureRefusal,
+    PressureValue,
+)
 from simulator.vapour_rail.channels import (
     CHANNEL_O2,
     LEGACY_FO2_PLANE,
@@ -1757,13 +1762,14 @@ class VapourRailCatalog:
             P = min(root, 1) * P_pure     condensed metal (below the boil)
             P = root * p0                  gas-standard metal
 
-        with K_decomp = exp(dG_kJ * 1000 / (R * T)), R from
-        ``simulator.state.GAS_CONSTANT``, dG from
-        ``ellingham_delta_g_kj_per_mol_o2`` (NIST-JANAF), and P_pure from
-        the pure-component Antoine sidecar. FeO uses the realized transport
-        pO2 (``state.fO2_bar``). C0 argon headspace O2 is 0 mol, so that
+        The arithmetic is ``ellingham_metal_equilibrium_pressure_Pa`` (the
+        kernel rail). FeO uses the realized transport pO2
+        (``state.fO2_bar``). C0 argon headspace O2 is 0 mol, so that
         realized pO2 is the 1e-9 bar transport floor, the same floor the
         diagnostic uses. The 85x gap is this skipped term, not a second pO2.
+        A missing activity, pO2, or any other failure to evaluate that rail
+        is a typed refusal of the selected quantity. The dormant Antoine
+        stays on ``answer.pressure`` and is not flux-eligible.
 
         Worked point, T = 1673.15 K, a_FeO = 0.2, pO2 = 1e-9 bar:
         dG = -330.157642 kJ/mol O2, K = 4.930535300796167e-11,
@@ -1776,18 +1782,20 @@ class VapourRailCatalog:
         nor the diagnostic. ``answer.pressure`` stays that catalog reference.
         """
 
-        if state is None or batch is None:
+        if batch is None:
             return batch
-        temperature_K = getattr(state, "temperature_K", None)
+        temperature_K = getattr(state, "temperature_K", None) if state is not None else None
         try:
             temperature_K = float(temperature_K)
         except (TypeError, ValueError):
-            return batch
-        if not math.isfinite(temperature_K) or temperature_K <= 0.0:
-            return batch
-        activities = getattr(state, "source_reaction_activities", None) or {}
+            temperature_K = None
+        activities = (
+            getattr(state, "source_reaction_activities", None)
+            if state is not None
+            else None
+        ) or {}
         if not isinstance(activities, Mapping):
-            return batch
+            activities = {}
 
         from engines.antoine import (
             _AntoineCoefficientRefusal,
@@ -1797,18 +1805,31 @@ class VapourRailCatalog:
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_PURE_COMPONENT,
             FIT_TARGET_PSEUDO_VAPOROCK,
+            VaporPressureComputationError,
+            _EllinghamNumeratorOmission,
+            ellingham_metal_equilibrium_pressure_Pa,
             vapor_pressure_antoine_coefficients,
         )
-        from simulator.chemistry.ellingham_graph import (
-            ELLINGHAM_STANDARD_PRESSURE_PA,
-        )
         from simulator.chemistry.ellingham_thermo import (
-            ELLINGHAM_METAL_PHASE_GAS,
-            ellingham_delta_g_kj_per_mol_o2,
             ellingham_metal_phase_kind,
             ellingham_stoichiometry,
         )
-        from simulator.state import GAS_CONSTANT
+
+        def _refuse(answer: Any, detail: str) -> Any:
+            code = "missing_ellingham_input"
+            extra = dict(answer.extra)
+            extra["detail"] = detail
+            if isinstance(answer.pressure, PressureValue):
+                extra["dormant_catalog_pressure_pa"] = float(answer.pressure.pa)
+            return replace(
+                answer,
+                selected_runtime_pressure=PressureRefusal(
+                    code=code, detail=detail
+                ),
+                flux=FluxRefusal(code=code, detail=detail),
+                refusal_code=code,
+                extra=MappingProxyType(extra),
+            )
 
         channels = dict(batch.channels_by_species)
         changed = False
@@ -1841,78 +1862,91 @@ class VapourRailCatalog:
             if str(row.get("fit_target") or "").strip() != FIT_TARGET_PSEUDO_VAPOROCK:
                 continue
             try:
-                activity = float(activities[species_id])
-            except (KeyError, TypeError, ValueError):
-                continue
-            parent_oxide = str(row.get("parent_oxide") or "")
-            pO2_bar = (
-                getattr(state, "fO2_bar", None)
-                if parent_oxide == "FeO"
-                else getattr(state, "source_reaction_fO2_bar", None)
-            )
-            try:
-                pO2_bar = float(pO2_bar)
-            except (TypeError, ValueError):
-                continue
-            if (
-                not math.isfinite(activity)
-                or activity <= 0.0
-                or not math.isfinite(pO2_bar)
-                or pO2_bar <= 0.0
-            ):
-                continue
-            antoine, coefficient_block = vapor_pressure_antoine_coefficients(
-                row,
-                temperature_K=temperature_K,
-            )
-            if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
-                continue
-            if not isinstance(antoine, Mapping) or antoine.get("selection_refusal"):
-                continue
-            try:
-                antoine_a, antoine_b, antoine_c = _read_antoine_coefficients(antoine)
+                if (
+                    temperature_K is None
+                    or not math.isfinite(temperature_K)
+                    or temperature_K <= 0.0
+                ):
+                    raise ValueError(
+                        f"{species_id}: missing temperature for the "
+                        "Ellingham pressure"
+                    )
+                try:
+                    activity = float(activities[species_id])
+                except (KeyError, TypeError, ValueError) as exc:
+                    raise ValueError(
+                        f"{species_id}: missing oxide activity for the "
+                        "Ellingham pressure"
+                    ) from exc
+                parent_oxide = str(row.get("parent_oxide") or "")
+                raw_pO2 = (
+                    getattr(state, "fO2_bar", None)
+                    if parent_oxide == "FeO"
+                    else getattr(state, "source_reaction_fO2_bar", None)
+                )
+                try:
+                    pO2_bar = float(raw_pO2)
+                except (TypeError, ValueError) as exc:
+                    raise ValueError(
+                        f"{species_id}: missing pO2 for the Ellingham "
+                        "pressure"
+                    ) from exc
+                antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+                    row,
+                    temperature_K=temperature_K,
+                )
+                if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
+                    raise ValueError(
+                        f"{species_id}: missing pure-component pressure "
+                        "for the Ellingham rail"
+                    )
+                if (
+                    not isinstance(antoine, Mapping)
+                    or antoine.get("selection_refusal")
+                ):
+                    raise ValueError(
+                        f"{species_id}: missing pure-component pressure "
+                        "for the Ellingham rail"
+                    )
+                antoine_a, antoine_b, antoine_c = _read_antoine_coefficients(
+                    antoine
+                )
                 pure_pa = 10.0 ** _antoine_log10_pressure(
                     antoine_a, antoine_b, antoine_c, temperature_K
                 )
                 n_metal, n_oxide = ellingham_stoichiometry(species_id)
-                delta_g_kj = ellingham_delta_g_kj_per_mol_o2(
+                phase_kind = ellingham_metal_phase_kind(
                     species_id, temperature_K
                 )
-                equilibrium_k = math.exp(
-                    delta_g_kj * 1000.0 / (GAS_CONSTANT * temperature_K)
+                selected_pa, _factor, _root, _rail = (
+                    ellingham_metal_equilibrium_pressure_Pa(
+                        species=species_id,
+                        temperature_K=temperature_K,
+                        oxide_activity=activity,
+                        n_metal=n_metal,
+                        n_oxide=n_oxide,
+                        pO2_bar=pO2_bar,
+                        metal_phase_kind=phase_kind,
+                        pure_pressure_Pa=pure_pa,
+                    )
                 )
+            except _EllinghamNumeratorOmission:
+                channels[species_id] = _refuse(
+                    answer,
+                    f"{species_id}: Ellingham numerator is not a positive "
+                    "pressure",
+                )
+                changed = True
+                continue
             except (
                 KeyError,
                 ValueError,
                 OverflowError,
                 _AntoineCoefficientRefusal,
-            ):
-                continue
-            if (
-                n_metal <= 0.0
-                or not math.isfinite(pure_pa)
-                or pure_pa <= 0.0
-                or not math.isfinite(equilibrium_k)
-                or equilibrium_k <= 0.0
-            ):
-                continue
-            numerator = equilibrium_k * (activity ** n_oxide) / pO2_bar
-            if not math.isfinite(numerator) or numerator <= 0.0:
-                continue
-            try:
-                root = numerator ** (1.0 / n_metal)
-            except OverflowError:
-                continue
-            if not math.isfinite(root) or root <= 0.0:
-                continue
-            if (
-                ellingham_metal_phase_kind(species_id, temperature_K)
-                == ELLINGHAM_METAL_PHASE_GAS
-            ):
-                selected_pa = root * ELLINGHAM_STANDARD_PRESSURE_PA
-            else:
-                selected_pa = min(root, 1.0) * pure_pa
-            if not math.isfinite(selected_pa) or selected_pa <= 0.0:
+                VaporPressureComputationError,
+            ) as exc:
+                channels[species_id] = _refuse(answer, str(exc))
+                changed = True
                 continue
             channels[species_id] = replace(
                 answer,
@@ -1921,7 +1955,18 @@ class VapourRailCatalog:
             changed = True
         if not changed:
             return batch
-        return replace(batch, channels_by_species=channels)
+        refused_ids = {
+            species_id
+            for species_id, refused in channels.items()
+            if refused.refusal_code == "missing_ellingham_input"
+        }
+        return replace(
+            batch,
+            channels_by_species=channels,
+            flux_active_species_ids=frozenset(
+                set(batch.flux_active_species_ids) - refused_ids
+            ),
+        )
 
     def resolve_batch(
         self,

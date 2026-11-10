@@ -4402,24 +4402,62 @@ def test_fe_selected_runtime_pressure_is_ellingham_not_dormant_antoine() -> None
     assert answer.source_label == "catalog"
 
 
-def test_fe_selected_pressure_stays_catalog_without_activity() -> None:
+def test_fe_missing_ellingham_input_refuses_instead_of_dormant_antoine() -> None:
+    """Missing Fe activity or pO2 refuses that quantity.
+
+    The dormant pseudo Antoine at 1673.15 K is 4.871162269407267 Pa. It may
+    stay on answer.pressure as the catalog reference. It must not be selected
+    or flux-eligible. Fails while a missing input keeps that Antoine as the debit.
+    """
+
     catalog = compile_vapour_rail_catalog(
         _yaml("vapor_pressures.yaml"),
         u0_manifest=load_u0_manifest(),
     )
-    batch = catalog.resolve_batch(
-        {"process.cleaned_melt": {"FeO": 1.0}},
+
+    def _resolve(state: dict) -> VapourBatch:
+        return catalog.resolve_batch(
+            {"process.cleaned_melt": {"FeO": 1.0}},
+            state,
+            flux_activation_context=_rg_activation_context(),
+        )
+
+    missing_activity = _resolve(
         {
             "temperature_K": 1673.15,
             "process_phase": "hot_train",
             "stage": "evaporation",
             "fO2_bar": 1.0e-9,
-        },
-        flux_activation_context=_rg_activation_context(),
+        }
     )
-    answer = batch.channel("Fe")
-    assert answer.selected_runtime_pressure == answer.pressure
+    answer = missing_activity.channel("Fe")
+    assert isinstance(answer.pressure, PressureValue)
     assert answer.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
+    assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+    assert answer.selected_runtime_pressure.code == "missing_ellingham_input"
+    assert "activity" in answer.selected_runtime_pressure.detail
+    assert isinstance(answer.flux, FluxRefusal)
+    assert answer.flux.code == "missing_ellingham_input"
+    assert "Fe" not in missing_activity.flux_active_species_ids
+    pressures, _report = flux_pressures_from_batch(missing_activity)
+    assert "Fe" not in pressures
+
+    missing_pO2 = _resolve(
+        {
+            "temperature_K": 1673.15,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "source_reaction_activities": {"Fe": 0.2},
+        }
+    )
+    answer = missing_pO2.channel("Fe")
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
+    assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+    assert answer.selected_runtime_pressure.code == "missing_ellingham_input"
+    assert "pO2" in answer.selected_runtime_pressure.detail
+    assert isinstance(answer.flux, FluxRefusal)
+    assert "Fe" not in missing_pO2.flux_active_species_ids
 
 
 def _missing_contract_rule(
@@ -4532,15 +4570,20 @@ def _seam_debit_answer(
 
 
 def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
-    """Na, K, Ca, Mg, and Ti debit the kernel seam. Catalog pressure and Fe stay put.
+    """Na, K, Ca, Mg, Ti, and Si debit the kernel seam. Fe stays on Ellingham.
 
-    The Ca, Mg, and Ti pairs are the 1400 C C0 step: catalog continuation
-    versus the kernel seam green debits. Fails when a selected pressure
-    stays on the catalog activity correction.
+    Ca, Mg, and Ti are the 1400 C C0 step. Si is the C4 1670 C in-domain
+    point: pO2 is 0.2 mbar (2e-4 bar) against the catalog reference
+    1e-9 bar and exponent -1, so the activity-corrected catalog pressure
+    is the kernel pressure / 2e5 (4.149230182792238e-12 Pa versus
+    8.298460365584479e-07 Pa). Fails when Si's selected pressure stays
+    on that catalog correction.
     """
 
     batch = VapourBatch(
-        requested_species_ids=frozenset({"Na", "K", "Ca", "Mg", "Ti", "Fe"}),
+        requested_species_ids=frozenset(
+            {"Na", "K", "Ca", "Mg", "Ti", "Si", "Fe"}
+        ),
         channels_by_species={
             "Na": _seam_debit_answer(
                 "Na",
@@ -4572,6 +4615,12 @@ def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
                 catalog_pa=1.1566690667153255e-15,
                 source_label="catalog_activity_corrected",
             ),
+            "Si": _seam_debit_answer(
+                "Si",
+                selected_pa=4.149230182792238e-12,
+                catalog_pa=4.149230182792238e-12,
+                source_label="catalog_activity_corrected",
+            ),
             "Fe": _seam_debit_answer(
                 "Fe",
                 selected_pa=0.05731853761717197,
@@ -4579,7 +4628,9 @@ def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
                 source_label="catalog",
             ),
         },
-        flux_active_species_ids=frozenset({"Na", "K", "Ca", "Mg", "Ti", "Fe"}),
+        flux_active_species_ids=frozenset(
+            {"Na", "K", "Ca", "Mg", "Ti", "Si", "Fe"}
+        ),
     )
     equilibrium = SimpleNamespace(
         vapor_pressures_source={
@@ -4594,6 +4645,7 @@ def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
             "Ca": "builtin_authoritative:standard_reaction_term",
             "Mg": "builtin_authoritative:standard_reaction_term",
             "Ti": "builtin_authoritative:standard_reaction_term",
+            "Si": "builtin_authoritative:standard_reaction_term",
             "Fe": "builtin_authoritative:pure_component_derived_from_evaluation",
         }
     )
@@ -4605,6 +4657,7 @@ def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
             "Ca": 1.8984315256420538e-08,
             "Mg": 0.00034222649537030153,
             "Ti": 1.0732438025337687e-15,
+            "Si": 8.298460365584479e-07,
             "Fe": 0.05731853761717197,
         },
     )
@@ -4615,6 +4668,7 @@ def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
         "Ca": 1.8984315256420538e-08,
         "Mg": 0.00034222649537030153,
         "Ti": 1.0732438025337687e-15,
+        "Si": 8.298460365584479e-07,
     }
     expected_catalog = {
         "Na": 2.7071606671395836,
@@ -4622,6 +4676,7 @@ def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
         "Ca": 1.3897762374690034e-08,
         "Mg": 0.00034222949385749943,
         "Ti": 1.1566690667153255e-15,
+        "Si": 4.149230182792238e-12,
     }
     for species_id, kernel_pa in expected_kernel.items():
         answer = retained.channel(species_id)
