@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import difflib
 from pathlib import Path
 from typing import Mapping
 
@@ -65,7 +66,16 @@ def assert_residue_score_cache_equivalence(
     )
 
     assert off
-    assert cold == cold_parallel == warm == parallel_warm == off_parallel == off
+    _assert_runs_match_off(
+        off,
+        {
+            "off-parallel": off_parallel,
+            "cold": cold,
+            "cold-parallel": cold_parallel,
+            "warm": warm,
+            "parallel-warm": parallel_warm,
+        },
+    )
     assert cold_counts is not None
     assert cold_parallel_counts is not None
     assert warm_counts is not None
@@ -83,3 +93,30 @@ def assert_residue_score_cache_equivalence(
         assert engine_counts["calls_by_kind"] == {
             kind: 0 for kind in _OPENIMCC_CALL_KINDS
         }
+
+
+def _assert_runs_match_off(off: bytes, runs: Mapping[str, bytes]) -> None:
+    for run_name, rows in runs.items():
+        if rows == off:
+            continue
+        diff = difflib.unified_diff(
+            off.decode("utf-8").splitlines(),
+            rows.decode("utf-8").splitlines(),
+            fromfile="off",
+            tofile=run_name,
+            n=0,
+            lineterm="",
+        )
+        first_hunk: list[str] = []
+        found_hunk = False
+        for line in diff:
+            if line.startswith("@@"):
+                if found_hunk:
+                    break
+                found_hunk = True
+            if line.startswith(("--- ", "+++ ")) or found_hunk:
+                first_hunk.append(line)
+        raise AssertionError(
+            f"{run_name} differs from off; first differing canonical rows:\n"
+            + "\n".join(first_hunk)
+        )
