@@ -2489,13 +2489,28 @@ def _published_diagnostic_notice(surface: str) -> dict:
                 }
             },
         }
-        exported = FoulingTerminalSnapshot.from_trace(
-            SimpleNamespace(
-                wall_deposit_by_segment_species_kg={("hot_wall", "Fe"): 0.1},
-                wall_deposit_sticking_authority=authority,
+        def _export(payload_notice: dict, kg: float) -> FoulingTerminalSnapshot:
+            body = deepcopy(authority)
+            body["vapour_carrier_authority_by_species"]["Fe"]["extra"] = {
+                "diagnostic_admission_notice": payload_notice,
+            }
+            return FoulingTerminalSnapshot.from_trace(
+                SimpleNamespace(
+                    wall_deposit_by_segment_species_kg={("hot_wall", "Fe"): kg},
+                    wall_deposit_sticking_authority=body,
+                )
             )
+
+        # Two snapshots, distinct comparator gaps. A merge that keeps one
+        # payload per key drops the second provenance and its gaps.
+        other = deepcopy(notice)
+        other["comparators"] = dict(other["comparators"])
+        other["comparators"]["gap_dex_law_vs_rail"] = 2.25
+        other["comparators"]["gap_dex_law_vs_vaporock"] = 3.5
+        merged, _net = merge_run_snapshot(
+            _export(deepcopy(notice), 0.1),
+            _export(other, 0.1),
         )
-        merged, _net = merge_run_snapshot(None, exported)
         carrier = merged.wall_deposit_sticking_authority[
             "vapour_carrier_authority_by_species"
         ]["Fe"]
@@ -2503,6 +2518,26 @@ def _published_diagnostic_notice(surface: str) -> dict:
             _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
         )
         assert "extrapolation_notice" not in carrier["extra"]
+        plural = carrier["extra"]["diagnostic_admission_notices"]
+        assert len(plural) == 2
+        rail_gaps = sorted(
+            item["comparators"]["gap_dex_law_vs_rail"] for item in plural
+        )
+        vaporock_gaps = sorted(
+            item["comparators"]["gap_dex_law_vs_vaporock"] for item in plural
+        )
+        assert rail_gaps[0] == pytest.approx(
+            1.1127636390496998, rel=0, abs=1e-12
+        )
+        assert rail_gaps[1] == pytest.approx(2.25, rel=0, abs=1e-12)
+        assert vaporock_gaps[0] == pytest.approx(
+            1.4535567803078235, rel=0, abs=1e-12
+        )
+        assert vaporock_gaps[1] == pytest.approx(3.5, rel=0, abs=1e-12)
+        for item in plural:
+            assert item["law_provenance"] == _DIAGNOSTIC_LAW_PROVENANCE
+            assert item["closes_with"] == _DIAGNOSTIC_CLOSER
+            assert item["authority"] == _DIAGNOSTIC_AUTHORITY
         return carrier["extra"]["diagnostic_admission_notice"]
 
     if surface == "typed_pressure_shadow":
@@ -2587,29 +2622,63 @@ def test_public_surface_publishes_diagnostic_only_carrier_notice(surface: str) -
     _assert_published_diagnostic_notice(_published_diagnostic_notice(surface))
 
 
+@pytest.mark.parametrize(
+    "carrier",
+    ["Fe", "FeO_association_gas", "K"],
+)
 @pytest.mark.parametrize("malformed", [None, "bare-token", 1, True])
-def test_malformed_provenance_entry_refuses_fe_compile(malformed: object) -> None:
-    """Fe's diagnostic provenance plus a fitted citation plus a bad entry.
+def test_malformed_provenance_entry_refuses_compile(
+    carrier: str,
+    malformed: object,
+) -> None:
+    """A non-mapping provenance entry refuses the whole list.
 
-    The fitted citation and the existing backsolve would certify the row if
-    the bad entry were skipped, and the diagnostic claim would disappear.
-    The whole provenance is malformed. Compilation refuses.
+    Invariant: every compiled pressure model is refused when any provenance
+    entry is not a mapping. The branches are the direct Fe law (diagnostic
+    citation plus a fitted sibling), the live FeO association (Fe's base
+    evidence stays valid; the association list itself is poisoned), and an
+    activity-dependent model that admission does not read. Skipping the bad
+    entry would keep the citation and admit the row.
     """
 
-    payload = _fe_feo_payload()
-    model = payload["families"]["metals_fe_family"]["physical_properties"][
-        "species"
-    ]["Fe"]["pressure_models"][0]
-    assert model["provenance"][0]["status"] == "diagnostic_only"
-    assert model["provenance"][0]["law_provenance"] == _DIAGNOSTIC_LAW_PROVENANCE
-    model["provenance"] = [
-        *model["provenance"],
-        {"source_id": "fitted-citation", "observation_id": "fit-grid"},
-        malformed,
-    ]
+    if carrier == "K":
+        payload = _reaction_fixture()
+        model = payload["families"]["potassium_test_family"][
+            "physical_properties"
+        ]["species"]["K"]["pressure_models"][0]
+        model["provenance"] = [
+            {"source_id": "fit-grid-source", "observation_id": "fit-grid"},
+            malformed,
+        ]
+    else:
+        payload = _fe_feo_payload()
+        fe_model = payload["families"]["metals_fe_family"][
+            "physical_properties"
+        ]["species"]["Fe"]["pressure_models"][0]
+        assert fe_model["provenance"][0]["status"] == "diagnostic_only"
+        assert (
+            fe_model["provenance"][0]["law_provenance"]
+            == _DIAGNOSTIC_LAW_PROVENANCE
+        )
+        if carrier == "Fe":
+            model = fe_model
+            model["provenance"] = [
+                *model["provenance"],
+                {"source_id": "fitted-citation", "observation_id": "fit-grid"},
+                malformed,
+            ]
+        else:
+            model = payload["families"]["oxide_vapors_feo_association_family"][
+                "physical_properties"
+            ]["species"]["FeO_association_gas"]["pressure_models"][0]
+            model["provenance"] = [*model["provenance"], malformed]
+    index = len(model["provenance"]) - 1
     with pytest.raises(
         CatalogCompileError,
-        match="provenance\\[2\\] is not a mapping; malformed provenance is a compile refusal",
+        match=(
+            rf"{carrier}: provenance\[{index}\] is not a mapping; "
+            "malformed provenance is a compile refusal"
+        ),
     ):
         compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
 

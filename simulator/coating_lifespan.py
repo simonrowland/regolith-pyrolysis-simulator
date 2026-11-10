@@ -278,6 +278,53 @@ def merge_run_snapshot(
     )
 
 
+def _distinct_public_notices(
+    carriers: Sequence[Any],
+) -> dict[str, list[dict[str, Any]]]:
+    """Every distinct ``*_notice`` payload across carriers, in encounter order.
+
+    Invariant: merging snapshots of one species keeps every distinct notice.
+    The singular key holds one mapping. The plural key (that key plus ``s``)
+    holds every distinct payload, including payloads a previous merge already
+    stored there. Both are read.
+    """
+
+    collected: dict[str, list[dict[str, Any]]] = {}
+
+    def add(key: str, notice: object) -> None:
+        if not key.endswith("_notice"):
+            return
+        if not isinstance(notice, Mapping) or not notice:
+            return
+        plain = _plain_authority_mapping(notice)
+        bucket = collected.setdefault(key, [])
+        if plain not in bucket:
+            bucket.append(plain)
+
+    for carrier in carriers:
+        if not isinstance(carrier, Mapping):
+            continue
+        found = public_carrier_notices(carrier)
+        extra = carrier.get("extra")
+        extra_map = extra if isinstance(extra, Mapping) else {}
+        keys = list(found)
+        for raw_key in extra_map:
+            if not isinstance(raw_key, str) or not raw_key.endswith("_notices"):
+                continue
+            singular = raw_key[:-1]
+            if singular.endswith("_notice") and singular not in keys:
+                keys.append(singular)
+        for key in keys:
+            if key in found:
+                add(key, found[key])
+            plural = extra_map.get(f"{key}s")
+            if isinstance(plural, (str, bytes)) or not isinstance(plural, Sequence):
+                continue
+            for item in plural:
+                add(key, item)
+    return collected
+
+
 def _merged_wall_deposit_sticking_authority(
     carried_authority: Mapping[str, Any] | None,
     run_authority: Mapping[str, Any] | None,
@@ -369,36 +416,18 @@ def _merged_wall_deposit_sticking_authority(
                         > vapour_carrier_authority_severity(current_status)
                     ):
                         carriers_by_species[species_key] = record
-                    notices: list[dict[str, Any]] = []
-                    other_notices: dict[str, dict[str, Any]] = {}
-                    for carrier in (current, record):
-                        if not isinstance(carrier, Mapping):
-                            continue
-                        found = public_carrier_notices(carrier)
-                        extra = carrier.get("extra")
-                        candidates = []
-                        if "extrapolation_notice" in found:
-                            candidates.append(found["extrapolation_notice"])
-                        if isinstance(extra, Mapping):
-                            candidates.extend(
-                                extra.get("extrapolation_notices", ())
-                            )
-                        for notice in candidates:
-                            if isinstance(notice, Mapping) and notice not in notices:
-                                notices.append(_plain_authority_mapping(notice))
-                        for key, notice in found.items():
-                            if key == "extrapolation_notice":
-                                continue
-                            other_notices.setdefault(
-                                key, _plain_authority_mapping(notice)
-                            )
-                    if notices or other_notices:
-                        extra = carriers_by_species[species_key].setdefault("extra", {})
-                        if notices:
-                            extra.setdefault("extrapolation_notice", notices[0])
-                            extra["extrapolation_notices"] = notices
-                        for key, notice in other_notices.items():
-                            extra.setdefault(key, notice)
+                    # Singular keys stay one mapping for existing readers.
+                    # Every distinct payload is on the plural key, so two
+                    # diagnostic notices of one species both survive.
+                    collected = _distinct_public_notices((current, record))
+                    if collected:
+                        extra = carriers_by_species[species_key].setdefault(
+                            "extra", {}
+                        )
+                        if isinstance(extra, dict):
+                            for key, items in collected.items():
+                                extra.setdefault(key, items[0])
+                                extra[f"{key}s"] = items
         raw_lineage = authority.get(
             "vapour_carrier_lineage_by_deposited_species"
         )

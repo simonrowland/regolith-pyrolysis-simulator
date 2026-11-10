@@ -2233,6 +2233,12 @@ def compile_vapour_rail_catalog(
                     f"{species_id}: VR-3 compiler requires one selected pressure model"
                 )
             model = _mapping(pressure_models[0], f"{species_id}.pressure_models[0]")
+            # Invariant: a provenance entry that is not a mapping refuses the
+            # whole model. This is the chokepoint every species passes.
+            # Association admission does not read its own provenance as
+            # evidence, and an activity-dependent model may not read
+            # provenance at all. Neither path may skip a malformed entry.
+            _normalised_provenance(str(species_id), model)
             observable, valid_temperature_K = _model_surface(species_id, model)
             evaluator = None
             availability = _pressure_model_availability(model, str(species_id))
@@ -3768,8 +3774,13 @@ def _zero_activity_melt_executable_is_evidenced(
     identity law (exponent 0, reference 1 bar, no channel) on the captured
     curve. The notice is the base law's notice. Own-row provenance on the
     association does not evidence that call and cannot admit the composite.
+    A non-mapping entry in that provenance still refuses compilation; the
+    association branch must not return before that check.
     """
 
+    # Before any branch, including the association return below. That return
+    # does not use this list as evidence, so it must not be the first read.
+    _normalised_provenance(species_id, model)
     # The captured base is the object the closure evaluates. Association
     # admission is only that executed law; do not fall through to this row's
     # own provenance.
