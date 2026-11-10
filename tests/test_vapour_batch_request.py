@@ -1512,7 +1512,7 @@ def test_malformed_reported_activity_becomes_typed_refusal() -> None:
 def test_missing_alpha_refuses_flux_without_fabricating_zero() -> None:
     compiled = _stub_catalog_species("K")
     compiled["K"].vaporisation_coefficients = SimpleNamespace(
-        evaporation_alpha={}
+        evaporation_alpha={"status": "no_data"}
     )
 
     answer = refusal_closure(
@@ -1527,6 +1527,25 @@ def test_missing_alpha_refuses_flux_without_fabricating_zero() -> None:
     assert answer.pressure.pa > 0.0
     assert isinstance(answer.flux, FluxRefusal)
     assert answer.flux.code == "missing_evaporation_alpha"
+
+
+def test_catalog_no_data_alpha_keeps_pressure_contract_refusal() -> None:
+    payload = _minimal_family("K")
+    payload["families"]["k_test_family"]["vaporisation_coefficients"][
+        "evaporation_alpha"
+    ] = {"status": "no_data"}
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
+
+    answer = catalog.resolve_batch(
+        {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}},
+        _state_with_k_activity(temperature_K=1500.0),
+        flux_activation_context=_rg_activation_context(),
+    ).channel("K")
+
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert answer.pressure.code == "missing_channel_contract"
+    assert isinstance(answer.flux, FluxRefusal)
+    assert answer.flux.code == "missing_channel_contract"
 
 
 def test_rg_activity_declarations_mark_compound_bearing_sources() -> None:

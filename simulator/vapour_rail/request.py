@@ -1658,7 +1658,7 @@ def refusal_closure(
             else:
                 pressure = PressureValue(pa=float(pressure_pa))
 
-            if not alpha:
+            if not _alpha_contract_available(alpha):
                 flux = FluxRefusal(
                     code="missing_evaporation_alpha",
                     detail=(
