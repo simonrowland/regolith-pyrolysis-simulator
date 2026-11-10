@@ -8,7 +8,7 @@ import sys
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _SYNTHETIC_ROSTER = Path(__file__).with_name("fixtures") / "known_red_synthetic.toml"
-_PLUGIN_AVAILABLE = find_spec("_pytest_known_red") is not None
+_PLUGIN_AVAILABLE = find_spec("tests._plugins.known_red") is not None
 _SYNTHETIC_TESTS = """\
 def test_known_red_failure():
     assert False, "synthetic known red"
@@ -39,7 +39,7 @@ def _run(
         str(project_root / "pytest.ini"),
     ]
     if _PLUGIN_AVAILABLE:
-        command.extend(("-p", "_pytest_known_red"))
+        command.extend(("-p", "tests._plugins.known_red"))
     if roster is not None and _PLUGIN_AVAILABLE:
         command.extend(("--known-red-roster", str(roster)))
     if known_red_only and _PLUGIN_AVAILABLE:
@@ -127,7 +127,7 @@ def test_xdist_group_suffixes_match_only_roster_nodes_in_this_collection():
     )
 
     try:
-        from _pytest_known_red import _partition_roster_nodes
+        from tests._plugins.known_red import _partition_roster_nodes
     except ModuleNotFoundError:
         selected, stale = (), roster_nodes
     else:
