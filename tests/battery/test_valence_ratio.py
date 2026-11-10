@@ -806,7 +806,7 @@ def test_out_of_range_fraction_valence_values_are_kept_with_notice(
         assert residuals[0].numeric is not None
 
 
-def test_validator_rejects_out_of_range_fraction_valence_value(tmp_path: Path) -> None:
+def test_validator_keeps_printed_out_of_range_fraction_valence_value(tmp_path: Path) -> None:
     migrator, observation = _migrate_valence_fixture(
         tmp_path, "Cr2plus_over_total_Cr", "1.01"
     )
@@ -820,10 +820,10 @@ def test_validator_rejects_out_of_range_fraction_valence_value(tmp_path: Path) -
         benches=migrator.result.benches,
     )
 
-    assert any(
+    assert observation.value.point == Decimal("1.01")
+    assert not any(
         issue.path == f"observation[{observation.observation_id}].value"
         and issue.reason is RefusalReason.INVALID_SOURCE
-        and "[0, 1]" in issue.detail
         for issue in report.hard_issues
     )
 

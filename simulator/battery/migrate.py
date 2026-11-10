@@ -9264,7 +9264,7 @@ def parse_quantity_suffix(suffix: str | None) -> tuple[str | None, str | None, s
 
 
 _PERCENT_FRACTION_UNIT_RE = re.compile(
-    r"(?<![a-z])(?:%|pct|percent(?:age)?|per\s+cent)(?![a-z])",
+    r"%|(?<![a-z])(?:pct|percent(?:age)?|per\s+cent)(?![a-z])",
     re.IGNORECASE,
 )
 _MASS_LOSS_YIELD_FIELDS = (
@@ -9350,11 +9350,18 @@ def _rekey_ordinal_point_observation_id(
         return series_point_id(stem, temperature=temperature)
     return str(raw_obs_id)
 
-def _percent_named_fraction_field(key: str, units: str | None) -> bool:
+def _percent_named_fraction_field(
+    key: str, units: str | None, payload: Mapping[str, Any] | None = None
+) -> bool:
     lowered = str(key or "").strip().lower()
     if lowered.endswith(("_pct", "_percent", "_wt_pct")):
         return True
-    unit = re.sub(r"\s+", " ", str(units or "").split(";", 1)[0].strip().lower())
+    if key == "value" and payload is not None and "value_as_published" in payload:
+        value = _numeric_field(payload, "value")
+        published = _numeric_field(payload, "value_as_published")
+        if value is not None and published == value * Decimal("100"):
+            return False
+    unit = re.sub(r"\s+", " ", str(units or "").strip().lower())
     return bool(_PERCENT_FRACTION_UNIT_RE.search(unit))
 
 
@@ -9391,7 +9398,7 @@ def _named_fraction_bound_selection(
         assert value.bound_value is not None
         bound = value.bound_value
         trail = "identity"
-        if _percent_named_fraction_field(key, field_units):
+        if _percent_named_fraction_field(key, field_units, payload):
             bound /= Decimal("100")
             trail = "percent_to_fraction"
         return replace(
@@ -9441,7 +9448,7 @@ def _named_fraction_bound_selection(
     sign = Decimal("-1") if number_text.startswith("-") else Decimal("1")
     bound = sign * _sci_to_decimal(unsigned_number)
     percent = match.group("percent") is not None or _percent_named_fraction_field(
-        key, field_units
+        key, field_units, payload
     )
     trail = "identity"
     if percent:
@@ -14350,7 +14357,7 @@ def _selection_from_named_field(
             Quantity.O2_YIELD,
             Quantity.VALENCE_RATIO,
         } and (
-            _percent_named_fraction_field(key, units)
+            _percent_named_fraction_field(key, units, payload)
             or key == "water_released_wt_pct_as_printed"
         ):
             # Percent-valued yield fields use the scorer's dimensionless fraction basis.
@@ -14428,7 +14435,7 @@ def _selection_from_named_field(
             Quantity.YIELD_FRACTION,
             Quantity.O2_YIELD,
             Quantity.VALENCE_RATIO,
-        } and _percent_named_fraction_field(key, units):
+        } and _percent_named_fraction_field(key, units, payload):
             amount /= Decimal("100")
             trail = "percent_to_fraction"
         return _point_selection(amount, key, trail, payload, condition_ranges)
