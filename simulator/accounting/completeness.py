@@ -636,7 +636,13 @@ def product_class_availability(
                     _CONSERVATIVE_LEDGER_UPPER_BOUND_BASIS
                 )
             excluded.append(excluded_item)
-    status = "available" if not refusals else "partial"
+    status = (
+        "available"
+        if not refusals
+        else "partial"
+        if has_computed_part
+        else "unavailable"
+    )
     targets = (
         (target_species,)
         if isinstance(target_species, str)
@@ -772,7 +778,9 @@ def product_class_availability(
         else None
     )
     return {
-        "class_total_kg": float(total_kg),
+        "class_total_kg": (
+            None if status == "unavailable" else float(total_kg)
+        ),
         "status": status,
         "excluded": excluded,
         "estimated_contributions": estimated_contributions,
