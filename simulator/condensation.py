@@ -173,7 +173,6 @@ KNUDSEN_REFUSAL_REASON = 'knudsen_outside_viscous_flow'
 KNUDSEN_TRANSITION_REASON = 'knudsen_transitional_flow'
 INVALID_PIPE_DIAMETER_REASON = 'invalid_pipe_diameter'
 COLD_SPOT_MARGIN_C = 25.0
-DEFAULT_UPSTREAM_HOT_WALL_MIN_C = 1400.0
 LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 
 # Viscous-regime wall mass-transfer model (post-F3 follow-on, 2026-05-27).
@@ -2274,7 +2273,6 @@ class CondensationModel:
         self.pipe_segments = self._build_default_pipe_segments(
             float(wall_temperature_C))
         self.cold_spot_margin_C = COLD_SPOT_MARGIN_C
-        self.upstream_hot_wall_min_C = DEFAULT_UPSTREAM_HOT_WALL_MIN_C
         self.last_cold_spot_diagnostic: dict[str, Any] = {
             'has_cold_spot': False,
             'warnings': [],
@@ -2282,7 +2280,7 @@ class CondensationModel:
             'has_upstream_hot_wall_violation': False,
             'upstream_hot_wall_warnings': [],
             'upstream_hot_wall_findings': [],
-            'upstream_hot_wall_min_C': DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
+            'upstream_hot_wall_min_C': None,
         }
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.last_knudsen_pressure_adjustment: dict[str, Any] = {}
@@ -2740,10 +2738,6 @@ class CondensationModel:
         """
         if not setpoints:
             return
-        self.upstream_hot_wall_min_C = _stage0_hot_wall_min_C_from_setpoints(
-            setpoints,
-            default_C=self.upstream_hot_wall_min_C,
-        )
         block = (
             (setpoints.get('condensation_train', {}) or {})
             .get('condensation_temperatures_C', {}) or {}
@@ -3186,7 +3180,6 @@ class CondensationModel:
              if segment.name not in self.wall_temperature_input_refusals],
             evap_flux.species_kg_hr,
             margin_C=self.cold_spot_margin_C,
-            upstream_hot_wall_min_C=self.upstream_hot_wall_min_C,
             temps=self.condensation_temperatures_C,
             vapor_pressure_data=self.vapor_pressure_data,
             species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
@@ -7459,34 +7452,6 @@ def _finite_or_none(value: float) -> float | None:
     return value if math.isfinite(value) else None
 
 
-def _stage0_hot_wall_min_C_from_setpoints(
-    setpoints: Mapping[str, Any] | None,
-    *,
-    default_C: float = DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
-) -> float:
-    if not setpoints:
-        return float(default_C)
-    block = (
-        (setpoints.get('condensation_train', {}) or {})
-        .get('metals_train', {}) or {}
-    )
-    if not isinstance(block, Mapping):
-        return float(default_C)
-    stage0 = block.get('stage_0_hot_duct', {}) or {}
-    if not isinstance(stage0, Mapping):
-        return float(default_C)
-    band = stage0.get('temp_range_C')
-    if not isinstance(band, (list, tuple)) or not band:
-        return float(default_C)
-    try:
-        low = float(band[0])
-    except (TypeError, ValueError):
-        return float(default_C)
-    if not math.isfinite(low):
-        return float(default_C)
-    return low
-
-
 def _campaign_requires_viscous_flow(campaign_name: str | None) -> bool:
     if campaign_name is None:
         return True
@@ -7620,7 +7585,7 @@ def cold_spot_diagnostic(
     vapor_species_kg_hr: Mapping[str, float],
     *,
     margin_C: float = COLD_SPOT_MARGIN_C,
-    upstream_hot_wall_min_C: float | None = DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
+    upstream_hot_wall_min_C: float | None = None,
     temps: Mapping[str, float] | None = None,
     vapor_pressure_data: Mapping[str, Any] | None = None,
     species_partial_pressures_pa: Mapping[str, float] | None = None,
@@ -7628,19 +7593,20 @@ def cold_spot_diagnostic(
     """Flag pipe segments that would condense flowing vapor too early.
 
     Landing-temperature cold spots stay a fixed engineering-threshold
-    check. Upstream hot-wall fouling additionally uses local partial
-    pressure versus the existing wall Antoine P_sat when that pressure
-    is supplied; the uniform 1400 C floor remains as a coarse minimum.
+    check. Upstream hot-wall fouling is the per-species dew point:
+    local partial pressure above the wall saturation pressure. That
+    inversion is the CLAUDE.md §4 / docs/concepts.md table (Na bake-off
+    about 486 C, Fe bake-off about 1775 C, both at 1 mbar). A uniform
+    temperature is not a second gate. ``upstream_hot_wall_min_C`` is
+    accepted and ignored so a stage-0 schedule band cannot reintroduce
+    one (b-282). A refused wall P_sat adds no finding.
     """
 
+    # The historical uniform floor is not a violation threshold.
+    del upstream_hot_wall_min_C
     margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
     findings: list[dict[str, Any]] = []
     upstream_hot_wall_findings: list[dict[str, Any]] = []
-    hot_wall_threshold_C = (
-        None
-        if upstream_hot_wall_min_C is None
-        else float(upstream_hot_wall_min_C)
-    )
     for species, raw_kg_hr in vapor_species_kg_hr.items():
         kg_hr = _finite_nonnegative_value(
             raw_kg_hr,
@@ -7674,25 +7640,6 @@ def cold_spot_diagnostic(
             if downstream_number > target_stage_number:
                 continue
             wall_T_C = float(segment.wall_temperature_C)
-            if (
-                hot_wall_threshold_C is not None
-                and math.isfinite(hot_wall_threshold_C)
-                and wall_T_C < hot_wall_threshold_C
-            ):
-                upstream_hot_wall_findings.append({
-                    'segment': segment.name,
-                    'account': segment.wall_deposit_account,
-                    'species': str(species),
-                    'kg_hr': kg_hr,
-                    'wall_temperature_C': wall_T_C,
-                    'upstream_hot_wall_min_C': hot_wall_threshold_C,
-                    'target_stage_number': target_stage_number,
-                    'warning': (
-                        f'upstream hot-wall violation {segment.name}: '
-                        f'{wall_T_C:.1f} C below {hot_wall_threshold_C:.1f} C '
-                        f'before stage {target_stage_number}'
-                    ),
-                })
             if p_local_pa is not None:
                 # Premise: fouling requires p_i > P_sat(T_wall) (mandate
                 # hot-wall invariant). Algebra: supersaturation iff
@@ -7720,7 +7667,6 @@ def cold_spot_diagnostic(
                         'species': str(species),
                         'kg_hr': kg_hr,
                         'wall_temperature_C': wall_T_C,
-                        'upstream_hot_wall_min_C': hot_wall_threshold_C,
                         'target_stage_number': target_stage_number,
                         'warning': (
                             f'upstream hot-wall violation {segment.name}: '
@@ -7758,7 +7704,7 @@ def cold_spot_diagnostic(
         'warnings': warnings,
         'findings': findings,
         'has_upstream_hot_wall_violation': bool(upstream_hot_wall_findings),
-        'upstream_hot_wall_min_C': hot_wall_threshold_C,
+        'upstream_hot_wall_min_C': None,
         'upstream_hot_wall_warnings': upstream_hot_wall_warnings,
         'upstream_hot_wall_findings': upstream_hot_wall_findings,
     }

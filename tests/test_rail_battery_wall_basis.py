@@ -9,8 +9,9 @@ stream exceeds it ~88-fold.
 
 Successful-value controls named by the verifiers: adequately hot or
 diluted Fe stays clear; a wall below the SiO engineering landing T
-still sets has_cold_spot; the 1300 C uniform-minimum warning remains;
-SiO reactive P_sat ~= 0 deposition policy is untouched (M30 / D04).
+still sets has_cold_spot; a 1300 C millibar Fe wall remains a dew-point
+violation; SiO reactive P_sat ~= 0 deposition policy is untouched (M30 / D04).
+The uniform 1400 C floor is not a violation (b-282).
 """
 
 from __future__ import annotations
@@ -20,7 +21,6 @@ import pytest
 from simulator.condensation import (
     CELSIUS_TO_KELVIN_OFFSET,
     CONDENSATION_TEMPS_C,
-    DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
     CondensationModel,
     _try_antoine_psat_pa,
     _wall_deposition_driving_pressure_pa,
@@ -56,7 +56,6 @@ def _fe_sio_segments(wall_temperature_C: float) -> list[PipeSegment]:
 def test_millibar_fe_sio_at_1400_c_is_hot_wall_violation():
     """Verifier CONFIRM probe: 1400 C millibar Fe/SiO must not all-clear."""
 
-    assert DEFAULT_UPSTREAM_HOT_WALL_MIN_C == 1400.0
     assert CONDENSATION_TEMPS_C["Fe"] == 1250
     assert CONDENSATION_TEMPS_C["SiO"] == 1050
 
@@ -75,8 +74,16 @@ def test_millibar_fe_sio_at_1400_c_is_hot_wall_violation():
     )
 
     assert diagnostic["has_upstream_hot_wall_violation"] is True
-    assert any(
-        finding["species"] == "Fe"
+    assert diagnostic["upstream_hot_wall_min_C"] is None
+    fe_findings = [
+        finding
+        for finding in diagnostic["upstream_hot_wall_findings"]
+        if finding["species"] == "Fe"
+    ]
+    assert fe_findings
+    assert all("saturation" in finding["warning"] for finding in fe_findings)
+    assert all(
+        "below" not in finding["warning"]
         for finding in diagnostic["upstream_hot_wall_findings"]
     )
 
@@ -101,8 +108,31 @@ def test_dilute_or_hot_fe_at_valid_wall_stays_clear():
     assert hot["has_cold_spot"] is False
 
 
+def test_na_500_c_alkali_duty_is_not_a_hot_wall_violation():
+    """b-282: Na at 500 C on 1 mbar alkali duty is undersaturated.
+
+    CLAUDE.md §4 / docs/concepts.md: Na bake-off T_wall,min is 486 C.
+    P_sat(Na, 773.15 K) is about 162 Pa, so 100 Pa does not foul. The
+    uniform 1400 C floor is what flags this wall.
+    """
+
+    na_psat, refused = _try_antoine_psat_pa("Na", 500.0 + CELSIUS_TO_KELVIN_OFFSET)
+    assert refused is False
+    assert na_psat > MILLIBAR_BAKEOFF_PA
+
+    diagnostic = cold_spot_diagnostic(
+        [_upstream_segment("stage_4", 500.0)],
+        {"Na": 1.0},
+        upstream_hot_wall_min_C=1400.0,
+        species_partial_pressures_pa={"Na": MILLIBAR_BAKEOFF_PA},
+    )
+
+    assert diagnostic["has_upstream_hot_wall_violation"] is False
+    assert diagnostic["upstream_hot_wall_findings"] == []
+
+
 def test_species_change_and_low_wall_uniform_minimum():
-    """Na millibar at 1400 C is undersaturated; 1300 C still trips the floor."""
+    """Na millibar at 1400 C is undersaturated; 1300 C Fe still exceeds P_sat."""
 
     na_psat, refused = _try_antoine_psat_pa("Na", WALL_1400_K)
     assert refused is False
