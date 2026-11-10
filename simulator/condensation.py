@@ -3340,7 +3340,11 @@ class CondensationModel:
                             collection_species=monomer,
                         )
                     except DepositionInputRefusal as exc:
-                        if monomer is None or exc.value is not None:
+                        # A missing partial (value is None) refuses this
+                        # species only. That includes Al2 and Ca2, whose
+                        # monomer has no collection contract. A present
+                        # but illegal number still aborts the train.
+                        if exc.value is not None:
                             raise
                         efficiency_outcomes_by_species.setdefault(species, []).append({
                             'status': 'refused',

@@ -250,6 +250,41 @@ def test_missing_dimer_partial_pressure_refuses_that_quantity_only():
     assert _mass_closure_kg(route, species_kg) == pytest.approx(0.0, abs=0.0)
 
 
+@pytest.mark.parametrize("dimer", COLLECTED_DIMERS + REFUSED_DIMERS)
+def test_missing_partial_on_every_dimer_refuses_that_species_only(dimer):
+    """A missing partial is a typed refusal. It never aborts the train.
+
+    Wall segments are reachable (lab geometry is set), so each dimer
+    hits the wall handler and the stage handler. Al2 and Ca2 used to
+    re-raise that missing P_local_pa and abort Na with them. Every
+    dimer stays in the stream. Na, which has a partial, still captures.
+    """
+
+    species_kg = {dimer: 1.0, "Na": 1.0}
+    model = _model(partials={"Na": 0.1})
+    model.lab_geometry = object()
+    route = model.route(
+        EvaporationFlux(species_kg_hr=species_kg, total_kg_hr=2.0),
+        MeltState(temperature_C=1500.0),
+    )
+
+    assert route.remaining_by_species[dimer] == pytest.approx(1.0)
+    assert _deposited_kg(route, dimer) == 0.0
+    assert _deposited_kg(route, "Na") > 0.0
+    outcomes = route.condensation_refusals_by_species[dimer].get(
+        "stage_outcomes", ()
+    )
+    parameters = {item.get("parameter") for item in outcomes}
+    assert "flowing_pressure_pa" in parameters
+    assert "P_local_pa" in parameters
+    reason = route.condensation_refusals_by_species[dimer]["reason"]
+    if dimer in REFUSED_DIMERS:
+        assert reason == CONTRACT_REASON
+    else:
+        assert reason != CONTRACT_REASON
+    assert _mass_closure_kg(route, species_kg) == pytest.approx(0.0, abs=1.0e-12)
+
+
 def test_respeciated_monomer_partial_obeys_the_quadratic_and_both_limits():
     """d-378 amendment 1 closed form. K_p -> inf is p_elem; K_p -> 0 is 0."""
 
@@ -394,14 +429,21 @@ def test_landed_kp_does_not_raise_the_no_kp_bound():
     assert _mass_closure_kg(route, {"Na2": 1.0}) == pytest.approx(0.0, abs=1.0e-15)
 
 
-# Invariant. Every contracted metal element (Na, K, Mg and their dimers)
-# is admitted and drawn down by one element-equilibrium criterion, on
-# every capture channel. p_elem = p_M + 2 p_M2 is conserved. The gas
-# re-speciates at the wall, p_M is compared with P_sat,M, and the captured
-# fraction of that element inventory is (p_elem - p_elem,sat) / p_elem with
-# p_elem,sat = P_sat + 2 P_sat^2 / K_p. The linear fraction
-# (p_M - P_sat) / p_M is not the capture. Species outside a contracted
-# pair are not on this criterion. A missing K_p stays the flagged
+# Invariant. Every contracted metal-element capture, on the stage band
+# and on the wall, draws the conserved element inventory down by each
+# species' own Hertz-Knudsen drive and never below that surface's own
+# p_elem,sat. No path snaps an oversized step to the coldest strip's
+# floor, and no path caps the removal with min(rate, supply). A missing
+# partial for any metal dimer, including Al2 and Ca2, is a typed refusal
+# of that species and does not abort the train.
+#
+# p_elem = p_M + 2 p_M2 is conserved. The gas re-speciates at the wall,
+# p_M is compared with P_sat,M, and the equilibrium capture fraction is
+# (p_elem - p_elem,sat) / p_elem with p_elem,sat = P_sat + 2 P_sat^2 / K_p.
+# The linear fraction (p_M - P_sat) / p_M is not the capture. The amount
+# removed at finite area is the integral of J_M + 2 J_M2, not that
+# equilibrium fraction by itself. Species outside a contracted pair are
+# not on this criterion. A missing K_p stays the flagged
 # p_elem-versus-P_sat upper bound.
 
 WORKED_P_ELEM_PA = 6.0
@@ -556,28 +598,46 @@ def _parallel_element_rate(pressure, kp, psat, k_monomer, k_dimer):
 
 
 def _rk4_element_partial(p_elem, kp, psat, k_monomer, k_dimer, duration, steps=20000):
-    """Independent integral of the parallel Hertz-Knudsen element rate."""
+    """RK4 of J_M + 2 J_M2. Not the production integrator.
 
-    dt = duration / steps
-    pressure = p_elem
+    A step that would pass p_elem,sat is halved until it stays above
+    that floor. The floor is not substituted for the step.
+    """
+
+    pressure = float(p_elem)
     floor = psat + 2.0 * psat * psat / kp
-    for _ in range(steps):
-        k1 = _parallel_element_rate(pressure, kp, psat, k_monomer, k_dimer)
-        if k1 == 0.0 or pressure + dt * k1 <= floor:
-            return floor
-        k2 = _parallel_element_rate(
-            pressure + dt * k1 / 2.0, kp, psat, k_monomer, k_dimer,
-        )
-        k3 = _parallel_element_rate(
-            pressure + dt * k2 / 2.0, kp, psat, k_monomer, k_dimer,
-        )
-        k4 = _parallel_element_rate(
-            pressure + dt * k3, kp, psat, k_monomer, k_dimer,
-        )
-        updated = pressure + dt * (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0
-        if updated <= floor:
-            return floor
+    t = 0.0
+    base = float(duration) / steps
+    while t < duration - 1.0e-15 * max(1.0, duration):
+        step = min(base, duration - t)
+        updated = pressure
+        accepted = False
+        for _halve in range(40):
+            k1 = _parallel_element_rate(
+                pressure, kp, psat, k_monomer, k_dimer,
+            )
+            if k1 == 0.0 or not math.isfinite(k1):
+                return pressure
+            k2 = _parallel_element_rate(
+                pressure + 0.5 * step * k1, kp, psat, k_monomer, k_dimer,
+            )
+            k3 = _parallel_element_rate(
+                pressure + 0.5 * step * k2, kp, psat, k_monomer, k_dimer,
+            )
+            k4 = _parallel_element_rate(
+                pressure + step * k3, kp, psat, k_monomer, k_dimer,
+            )
+            updated = pressure + step * (
+                k1 + 2.0 * k2 + 2.0 * k3 + k4
+            ) / 6.0
+            if math.isfinite(updated) and updated > floor:
+                accepted = True
+                break
+            step *= 0.5
+        if not accepted or updated >= pressure:
+            return pressure
         pressure = updated
+        t += step
     return pressure
 
 
@@ -926,6 +986,129 @@ def test_stiff_parallel_flux_lands_on_half_not_the_linear_third():
         WORKED_P_ELEM_PA - WORKED_PSAT_PA
     ) * math.exp(-0.2 * 3.0)
     assert dissociated == pytest.approx(monomer_only, rel=1.0e-8)
+
+
+def test_heterogeneous_linear_strips_stop_on_their_own_floor():
+    """Closed form for a monomer-only strip. No shared step and no snap.
+
+    p(t) = P_sat + (p0 - P_sat) exp(-k t). Chain two strips over one
+    second each, then the same second with both strips together.
+    K_p is infinite, so the drive is linear in the element partial.
+
+    Inlet 200 Pa. Fast strip k = 1e12 /s, P_sat = 100 Pa. Slow strip
+    k = 1e-6 /s, P_sat = 1 Pa.
+
+        fast: exp(-1e12) underflows, p = 100 Pa
+        slow: p = 1 + (100 - 1) exp(-1e-6)
+              = 1 + 99 (1 - 1e-6 + 5e-13 - ...)
+              = 99.999901 Pa
+
+    The fast strip turns off at 100 Pa. The slow strip then barely
+    moves. The cold floor, 1 Pa, is not the result.
+    """
+
+    from simulator.condensation_routing import final_element_partial_pa
+
+    fast = final_element_partial_pa(
+        element_partial_initial_pa=200.0,
+        residence_s=1.0,
+        strips=((1.0e12, 0.0, 100.0, math.inf),),
+    )
+    assert fast == pytest.approx(100.0)
+    slow_closed_form = 1.0 + 99.0 * math.exp(-1.0e-6)
+    assert slow_closed_form == pytest.approx(99.999901, abs=1.0e-9)
+    slow = final_element_partial_pa(
+        element_partial_initial_pa=fast,
+        residence_s=1.0,
+        strips=((1.0e-6, 0.0, 1.0, math.inf),),
+    )
+    assert slow == pytest.approx(slow_closed_form, abs=1.0e-9)
+    both = final_element_partial_pa(
+        element_partial_initial_pa=200.0,
+        residence_s=1.0,
+        strips=(
+            (1.0e12, 0.0, 100.0, math.inf),
+            (1.0e-6, 0.0, 1.0, math.inf),
+        ),
+    )
+    assert both == pytest.approx(slow_closed_form, abs=1.0e-6)
+    assert both > 99.0
+
+
+@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
+@pytest.mark.parametrize("channel", CAPTURE_CHANNELS)
+@pytest.mark.parametrize("arrival", ("monomer", "dimer"))
+def test_large_area_stops_at_half_the_element_inventory(
+    monkeypatch, monomer, dimer, channel, arrival,
+):
+    """Large area, p_elem = 6 Pa, K_p = 1 Pa, P_sat = 1 Pa, stops at 1/2.
+
+    p_M = (K_p/4) (sqrt(1 + 8*6) - 1) = 1.5 Pa and p_M2 = 2.25 Pa
+    (1.5 + 2*2.25 = 6). At saturation p_M = p_M2 = 1, so p_elem,eq = 3
+    and the removable fraction is 1/2. The linear fraction
+    (1.5 - 1) / 1.5 = 1/3 is not the capture. min(rate, supply) would
+    remove the whole kilogram.
+    """
+
+    _p_monomer, eta_element, eta_linear = _worked_equilibrium()
+    assert eta_element == pytest.approx(0.5)
+    species = monomer if arrival == "monomer" else dimer
+    monomer_partial, dimer_partial = _arrival_partials(species, monomer, dimer)
+    monkeypatch.setattr(
+        "simulator.condensation.dimer_dissociation_kp_pa",
+        lambda *_args, **_kwargs: WORKED_KP_PA,
+    )
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        _psat_flux([]),
+    )
+    from tests.test_condensation_input_refusals import _configured_model
+
+    model = _configured_model()
+    if channel == "stage":
+        for key in model.stage_area_m2_by_stage:
+            model.stage_area_m2_by_stage[key] = 1.0e12
+        eta = model._condensation_efficiency(
+            stage=_alkali_stage(model),
+            species=species,
+            T_cond_C=250.0,
+            residence_s=5.0,
+            available_kg=1.0,
+            alpha_s_value=0.5,
+            inlet_partial_pressure_pa=(
+                dimer_partial if species == dimer else monomer_partial
+            ),
+            coexisting_monomer_partial_pa=(
+                monomer_partial if species == dimer else None
+            ),
+            saturation_species=monomer if species == dimer else None,
+        )
+        assert eta == pytest.approx(eta_element, abs=1.0e-9)
+        assert eta != pytest.approx(eta_linear)
+        assert eta != pytest.approx(1.0)
+        return
+
+    from simulator.wall_deposition import wall_deposit_candidate_for_surface_kg
+
+    partials = {}
+    if monomer_partial > 0.0:
+        partials[monomer] = monomer_partial
+    if dimer_partial > 0.0:
+        partials[dimer] = dimer_partial
+    model.wall_species_partial_pressures_pa = partials
+    deposited = wall_deposit_candidate_for_surface_kg(
+        model,
+        species=species,
+        rate_kg_hr=1.0,
+        T_cond_C=250.0,
+        melt_temperature_C=1500.0,
+        wall_temperature_C=250.0,
+        surface_area_m2=1.0e12,
+        collection_species=monomer if species == dimer else None,
+    )
+    assert deposited == pytest.approx(eta_element, abs=1.0e-9)
+    assert deposited != pytest.approx(eta_linear)
+    assert deposited != pytest.approx(1.0)
 
 
 def test_janaf_kp_at_313_K_is_in_band_and_replaces_the_cea_polynomial():

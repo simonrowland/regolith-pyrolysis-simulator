@@ -297,8 +297,9 @@ def _dissociation_kp_pa(monomer_rows, dimer_rows, temperature_k):
 
 def _potassium_balance_inputs():
     vapor = yaml.safe_load((DATA_DIR / 'vapor_pressures.yaml').read_text())
-    potassium = vapor['metals_k_family']['physical_properties']['species']['K']
-    dimer = vapor['oxide_vapors_k2_cluster_family']['physical_properties']['species']['K2']
+    families = vapor['families']
+    potassium = families['metals_k_family']['physical_properties']['species']['K']
+    dimer = families['oxide_vapors_k2_cluster_family']['physical_properties']['species']['K2']
     sticking = yaml.safe_load(
         (DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml').read_text()
     )
@@ -362,63 +363,139 @@ def _parallel_hk_rate_pa_s(element_partial_pa, strips):
     return rate
 
 
-def _lowest_strip_floor_pa(strips):
-    floor = math.inf
+def _next_floor_pa(partial, strips):
+    """Hottest p_elem,sat strictly below ``partial``."""
+
+    floor = None
+    slack = max(1.0e-15, abs(partial) * 1.0e-14)
     for k_monomer, k_dimer, saturation_pa, kp_pa in strips:
         if k_monomer <= 0.0 and k_dimer <= 0.0:
             continue
         saturated = _element_saturation_pa(saturation_pa, kp_pa)
-        if saturated < floor:
+        if not math.isfinite(saturated) or saturated >= partial - slack:
+            continue
+        if floor is None or saturated > floor:
             floor = saturated
     return floor
 
 
-def _integrate_parallel_hk_pa(element_partial_pa, residence_s, strips):
-    """RK4 of the parallel element balance over one stage residence.
+def _rk4_above_floor(pressure, dt, strips, floor):
+    """One classical RK4 step, or None if a stage crosses ``floor``.
 
-    The step count is 40 per initial time constant, at least 64 and at
-    most 4096. A step that would cross the lowest p_elem,sat snaps to
-    that floor: the condenser does not evaporate.
+    Below the floor the flux is clamped to zero, so a stage that
+    crosses it is not a sample of the ODE. The floor is not written
+    in place of that step.
+    """
+
+    k1 = _parallel_hk_rate_pa_s(pressure, strips)
+    if not math.isfinite(k1):
+        return None
+    y2 = pressure + 0.5 * dt * k1
+    if floor is not None and y2 < floor:
+        return None
+    k2 = _parallel_hk_rate_pa_s(y2, strips)
+    if not math.isfinite(k2):
+        return None
+    y3 = pressure + 0.5 * dt * k2
+    if floor is not None and y3 < floor:
+        return None
+    k3 = _parallel_hk_rate_pa_s(y3, strips)
+    if not math.isfinite(k3):
+        return None
+    y4 = pressure + dt * k3
+    if floor is not None and y4 < floor:
+        return None
+    k4 = _parallel_hk_rate_pa_s(y4, strips)
+    if not math.isfinite(k4):
+        return None
+    updated = pressure + dt * (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0
+    if not math.isfinite(updated):
+        return None
+    if floor is not None and updated < floor:
+        return None
+    return updated
+
+
+def _adaptive_rk4_partial(partial, duration, strips, local_tol):
+    """RK4 with step halving. Independent of the production exponential."""
+
+    pressure = float(partial)
+    t = 0.0
+    for _guard in range(200000):
+        remaining = duration - t
+        if remaining <= 1.0e-15 * max(1.0, duration):
+            return pressure
+        floor = _next_floor_pa(pressure, strips)
+        # On this strip's floor already. Land and let colder strips
+        # keep the residence. An oversized step never takes this branch:
+        # the partial has to arrive within local_tol on its own.
+        if floor is not None and 0.0 < pressure - floor <= local_tol:
+            pressure = floor
+            continue
+        rate = _parallel_hk_rate_pa_s(pressure, strips)
+        if rate >= -1.0e-18 * max(1.0, abs(pressure)) or not math.isfinite(rate):
+            return pressure
+        dt = remaining
+        if floor is not None:
+            room = pressure - floor
+            if room <= 0.0:
+                pressure = floor
+                continue
+            dt = min(dt, 0.2 * room / abs(rate))
+        accepted = None
+        accepted_dt = None
+        for _halve in range(60):
+            full = _rk4_above_floor(pressure, dt, strips, floor)
+            if full is None:
+                dt *= 0.5
+                continue
+            mid = _rk4_above_floor(pressure, 0.5 * dt, strips, floor)
+            if mid is None:
+                dt *= 0.5
+                continue
+            second = _rk4_above_floor(mid, 0.5 * dt, strips, floor)
+            if second is None:
+                dt *= 0.5
+                continue
+            if abs(second - full) <= local_tol:
+                accepted = second
+                accepted_dt = dt
+                break
+            dt *= 0.5
+        else:
+            raise AssertionError('parallel element step did not converge')
+        if accepted == pressure or accepted_dt is None:
+            return pressure
+        pressure = accepted
+        t += accepted_dt
+    raise AssertionError('parallel element integral did not finish')
+
+
+def _integrate_parallel_hk_pa(element_partial_pa, residence_s, strips):
+    """Converged integral of J_M + 2 J_M2. Not the production integrator.
+
+    Production integrates a local exponential. This is classical RK4.
+    A step that would cross the next strip's p_elem,sat is halved; the
+    floor is not written into an oversized step. Two successive local
+    tolerances must agree to 1e-12 of the inlet partial.
     """
 
     partial = float(element_partial_pa)
     duration = float(residence_s)
     if partial <= 0.0 or duration <= 0.0 or not strips:
         return partial
-    floor = _lowest_strip_floor_pa(strips)
-    if not math.isfinite(floor) or partial <= floor:
+    if _parallel_hk_rate_pa_s(partial, strips) == 0.0:
         return partial
-    rate0 = _parallel_hk_rate_pa_s(partial, strips)
-    if rate0 == 0.0:
-        return partial
-    tau = (partial - floor) / abs(rate0)
-    ratio = duration / tau if tau > 0.0 else math.inf
-    if not math.isfinite(ratio) or ratio * 40.0 >= 4096.0:
-        steps = 4096
-    else:
-        steps = max(64, math.ceil(40.0 * ratio))
-    dt = duration / steps
-    for _step in range(steps):
-        k1 = _parallel_hk_rate_pa_s(partial, strips)
-        if k1 == 0.0 or partial + dt * k1 <= floor:
-            return floor
-        midpoint = partial + 0.5 * dt * k1
-        if midpoint <= floor:
-            return floor
-        k2 = _parallel_hk_rate_pa_s(midpoint, strips)
-        midpoint = partial + 0.5 * dt * k2
-        if midpoint <= floor:
-            return floor
-        k3 = _parallel_hk_rate_pa_s(midpoint, strips)
-        end = partial + dt * k3
-        if end <= floor:
-            return floor
-        k4 = _parallel_hk_rate_pa_s(end, strips)
-        updated = partial + dt * (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0
-        if not math.isfinite(updated) or updated <= floor:
-            return floor
-        partial = updated
-    return partial
+    tolerance = 1.0e-12 * max(1.0, abs(partial))
+    local = tolerance
+    previous = _adaptive_rk4_partial(partial, duration, strips, local)
+    for _refine in range(6):
+        local *= 0.5
+        value = _adaptive_rk4_partial(partial, duration, strips, local)
+        if abs(value - previous) < tolerance:
+            return value
+        previous = value
+    raise AssertionError('parallel element integral did not converge')
 
 
 def _hk_per_pa(molar_mass_g_mol, gas_temperature_k):
@@ -561,10 +638,26 @@ def test_default_k_route_allocation_numeric_pin():
         MeltState(temperature_C=1650.0),
     )
     assert walls_undersaturated
-    assert route.condensed_by_stage_species == condensed
-    assert route.remaining_by_species == {'K': remaining}
     assert route.wall_deposit_by_species == {}
-    assert route.impurity_by_stage_species == impurity
+    assert set(route.condensed_by_stage_species) == set(condensed)
+    for stage_key, species_kg in condensed.items():
+        actual = route.condensed_by_stage_species[stage_key]
+        assert set(actual) == set(species_kg)
+        for species, kilograms in species_kg.items():
+            assert actual[species] == pytest.approx(
+                kilograms, rel=1.0e-8, abs=1.0e-12,
+            )
+    assert route.remaining_by_species['K'] == pytest.approx(
+        remaining, rel=1.0e-8, abs=1.0e-12,
+    )
+    assert set(route.impurity_by_stage_species) == set(impurity)
+    for stage_key, species_kg in impurity.items():
+        actual = route.impurity_by_stage_species[stage_key]
+        assert set(actual) == set(species_kg)
+        for species, kilograms in species_kg.items():
+            assert actual[species] == pytest.approx(
+                kilograms, rel=1.0e-8, abs=1.0e-12,
+            )
 
 
 def _visit_labels(train: CondensationTrain) -> list[int | str]:

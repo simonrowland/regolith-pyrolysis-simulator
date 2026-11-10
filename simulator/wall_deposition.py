@@ -185,6 +185,112 @@ def wall_deposit_candidates_by_segment_kg(
     return candidates
 
 
+def _element_wall_capture_kg_hr(
+    *,
+    species: str,
+    rate_kg_hr: float,
+    surface_area_m2: float,
+    alpha_s: float,
+    p_species_pa: float,
+    p_elem_pa: float,
+    p_compare_pa: float,
+    saturation_pa: float,
+    kp_pa: float | None,
+    monomer: str,
+    dimer: str,
+    flux_mol_m2_s: float,
+    gas_temperature_K: float,
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> float:
+    """kg/hr of this gas species removed by the element drawdown.
+
+    d-378 amendment 2. The series-resistance call is only the saturation
+    gate (p_M against P_sat,M). The mass is not that flux and it is not
+    min(supply, flux * area). Each species deposits by its own
+    Hertz-Knudsen drive, and the conserved element is integrated:
+
+        J_M = alpha (p_M - P_sat,M) / sqrt(2 pi m_M k T)
+        J_M2 = alpha (p_M2 - P_sat,M^2 / K_p) / sqrt(2 pi m_M2 k T)
+
+    with p_M2 = p_M^2 / K_p and p_M from re-speciation of p_elem.
+    N = n_dot * τ and q = p / N, so k τ = (p / n_dot) * A * alpha * J(1 Pa).
+    One second with that k τ is the same ODE as residence τ. A large area
+    reaches p_elem,sat and stops. Worked check: p_elem = 6 Pa, K_p = 1 Pa
+    gives p_M = 1.5 Pa and p_M2 = 2.25 Pa. At P_sat = 1 Pa, p_M = p_M2 = 1,
+    p_elem,sat = 3 Pa, and the removable fraction is 1/2.
+
+    No K_p: the flagged upper bound integrates p_elem toward P_sat with
+    the series-resistance conductance. It does not invent a dimer drive.
+    """
+
+    from simulator.condensation import (
+        AVOGADRO_MOL,
+        _hkl_impingement_flux_mol_m2_s,
+        _molecular_mass_kg_per_molecule,
+    )
+    from simulator.condensation_routing import final_element_partial_pa
+
+    if (
+        rate_kg_hr <= 0.0
+        or surface_area_m2 <= 0.0
+        or alpha_s <= 0.0
+        or p_species_pa <= 0.0
+        or p_elem_pa <= 0.0
+        or not math.isfinite(saturation_pa)
+        or saturation_pa <= 0.0
+    ):
+        return 0.0
+    molar_mass = (
+        _molecular_mass_kg_per_molecule(
+            species, vapor_pressure_data=vapor_pressure_data,
+        )
+        * AVOGADRO_MOL
+    )
+    n_dot = rate_kg_hr / molar_mass / SECONDS_PER_HOUR
+    if n_dot <= 0.0:
+        return 0.0
+    if kp_pa is None:
+        drive = p_compare_pa - saturation_pa
+        if drive <= 0.0 or flux_mol_m2_s <= 0.0:
+            return 0.0
+        # q τ uses the compared element partial, matching the stage's
+        # no-K_p linear solver, which integrates p_elem.
+        k_tau = (p_elem_pa / n_dot) * surface_area_m2 * (flux_mol_m2_s / drive)
+        final = final_element_partial_pa(
+            element_partial_initial_pa=p_elem_pa,
+            residence_s=1.0,
+            strips=((k_tau, 0.0, saturation_pa, math.inf),),
+        )
+    else:
+        scale = (p_species_pa / n_dot) * surface_area_m2 * alpha_s
+        hk_monomer = _hkl_impingement_flux_mol_m2_s(
+            monomer, 1.0, gas_temperature_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        hk_dimer = _hkl_impingement_flux_mol_m2_s(
+            dimer, 1.0, gas_temperature_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        final = final_element_partial_pa(
+            element_partial_initial_pa=p_elem_pa,
+            residence_s=1.0,
+            strips=((
+                scale * hk_monomer,
+                scale * hk_dimer,
+                saturation_pa,
+                float(kp_pa),
+            ),),
+        )
+    if not math.isfinite(final) or p_elem_pa <= 0.0:
+        return 0.0
+    eta = (p_elem_pa - final) / p_elem_pa
+    if eta <= 0.0:
+        return 0.0
+    if eta > 1.0:
+        eta = 1.0
+    return rate_kg_hr * eta
+
+
 def wall_deposit_candidate_for_surface_kg(
     model: Any,
     *,
@@ -290,6 +396,9 @@ def wall_deposit_candidate_for_surface_kg(
     P_local_pa = None
     P_compare_pa = None
     saturation_flag = None
+    element_capture: dict[str, Any] | None = None
+    gas_temperature_K = None
+    vapor_pressure_data = None
     if alpha_s != 0.0:
         vapor_pressure_data = getattr(model, "vapor_pressure_data", None)
         overhead_pressure_pa = float(model.overhead_pressure_mbar) * 100.0
@@ -359,7 +468,7 @@ def wall_deposit_candidate_for_surface_kg(
                         dimer_partial_pa = _deposition_finite_scalar(
                             "P_dimer_pa", pressure_source[dimer_name],
                         )
-                _p_elem, P_compare_pa, saturation_flag, _kp = (
+                p_elem, P_compare_pa, saturation_flag, kp_pa = (
                     element_arrival_comparison_pa(
                         species,
                         monomer_partial_pa=monomer_partial_pa,
@@ -368,6 +477,12 @@ def wall_deposit_candidate_for_surface_kg(
                         vapor_pressure_data=vapor_pressure_data,
                     )
                 )
+                element_capture = {
+                    "monomer": monomer_name,
+                    "dimer": dimer_name,
+                    "p_elem": p_elem,
+                    "kp": kp_pa,
+                }
 
     rate_diagnostic: dict[str, Any] = {"status": "computed"}
     if alpha_s == 0.0:
@@ -395,8 +510,8 @@ def wall_deposit_candidate_for_surface_kg(
                 model.gas_temperature_C,
                 "must be finite",
             )
-        T_gas_K = gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET
-        if T_gas_K <= 0.0:
+        gas_temperature_K = gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET
+        if gas_temperature_K <= 0.0:
             raise DepositionInputRefusal(
                 "T_gas_K",
                 model.gas_temperature_C,
@@ -422,7 +537,7 @@ def wall_deposit_candidate_for_surface_kg(
                 stir_factor=model.stir_factor,
                 radial_stir_factor=model.radial_stir_factor,
                 regime_factor=applied_regime_factor,
-                T_gas_K=T_gas_K,
+                T_gas_K=gas_temperature_K,
                 overhead_pressure_pa=overhead_pressure_pa,
                 carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
                 vapor_pressure_data=vapor_pressure_data,
@@ -522,10 +637,43 @@ def wall_deposit_candidate_for_surface_kg(
         surface_area_m2=surface_area_m2,
         formula_registry=getattr(model, "species_formula_registry", None),
     )
+    # The series-resistance flux is the saturation gate. For a contracted
+    # element the captured mass is the parallel Hertz-Knudsen drawdown of
+    # p_elem, stopped on this surface's own p_elem,sat. It is not
+    # min(supply, flux * area): a large area removes half of p_elem = 6 Pa
+    # when K_p = P_sat = 1 Pa, not the whole supply.
+    captured_kg_hr = min(rate_kg_hr, budget_kg_hr)
+    if (
+        element_capture is not None
+        and gas_temperature_K is not None
+        and P_local_pa is not None
+        and P_compare_pa is not None
+        and isinstance(wall_saturation_pressure_pa, (int, float))
+        and math.isfinite(float(wall_saturation_pressure_pa))
+        and float(P_compare_pa) > float(wall_saturation_pressure_pa)
+        and isinstance(flux, (int, float))
+        and math.isfinite(float(flux))
+    ):
+        captured_kg_hr = _element_wall_capture_kg_hr(
+            species=species,
+            rate_kg_hr=rate_kg_hr,
+            surface_area_m2=surface_area_m2,
+            alpha_s=alpha_s,
+            p_species_pa=float(P_local_pa),
+            p_elem_pa=float(element_capture["p_elem"]),
+            p_compare_pa=float(P_compare_pa),
+            saturation_pa=float(wall_saturation_pressure_pa),
+            kp_pa=element_capture["kp"],
+            monomer=str(element_capture["monomer"]),
+            dimer=str(element_capture["dimer"]),
+            flux_mol_m2_s=float(flux),
+            gas_temperature_K=float(gas_temperature_K),
+            vapor_pressure_data=vapor_pressure_data,
+        )
     carrier_gas = str(getattr(model, "carrier_gas", "N2") or "N2")
     knudsen_number = None if "zero_reason" in rate_diagnostic else _knudsen_number(
         overhead_pressure_pa,
-        T_gas_K,
+        gas_temperature_K,
         applied_pipe_diameter_m,
         carrier_gas=carrier_gas,
     )
@@ -537,7 +685,7 @@ def wall_deposit_candidate_for_surface_kg(
         None,
     )
     if isinstance(by_segment, dict):
-        reported_kg_h = min(rate_kg_hr, budget_kg_hr)
+        reported_kg_h = captured_kg_hr
         molar_mass_kg_mol = resolve_species_formula(
             species,
             getattr(model, "species_formula_registry", None),
@@ -583,7 +731,7 @@ def wall_deposit_candidate_for_surface_kg(
             },
             "authoritative_for_lifespan": False,
         }
-    return min(rate_kg_hr, budget_kg_hr)
+    return captured_kg_hr
 
 
 def _wall_rate_parameter_status(alpha_record: Mapping[str, Any]) -> str:

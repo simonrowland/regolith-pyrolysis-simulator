@@ -396,6 +396,322 @@ def _element_saturation_floor_pa(
     return floor
 
 
+def _strips_are_linear(
+    strips: tuple[tuple[float, float, float, float], ...],
+) -> bool:
+    """True when dp/dt = -sum k_i max(p - P_sat,i, 0).
+
+    Fully dissociated strips (K_p -> inf) have p_M = p_elem and no dimer
+    channel, so the drive is linear in the element partial. A finite K_p
+    makes p_M nonlinear in p_elem even if the dimer coefficient is zero.
+    """
+
+    if not strips:
+        return True
+    for _k_monomer, _k_dimer, _saturation, kp_pa in strips:
+        kp = float(kp_pa)
+        if not (math.isinf(kp) and kp > 0.0):
+            return False
+    return True
+
+
+def _final_linear_monomer_partial(
+    partial: float,
+    duration: float,
+    strips: tuple[tuple[float, float, float, float], ...],
+) -> float:
+    """Closed form of dp/dt = -sum k_i max(p - P_i, 0). No step, no snap.
+
+    While the active set (strips with P_i < p) is fixed,
+
+        C = sum k_i
+        p_eq = sum (k_i P_i) / C
+        p(t) = p_eq + (p0 - p_eq) exp(-C t).
+
+    A strip turns off when p reaches its own P_i. The condenser does not
+    evaporate, so a strip at or above p contributes nothing. March the
+    saturation levels from hot to cold. p_eq is a convex combination of
+    the active levels, so it is never above the hottest active level.
+    If p_eq is below that level, the hot strips hit it and turn off, and
+    the colder strips keep integrating for the time that remains. An
+    oversized coefficient therefore stops on the hot strip's own floor.
+    It does not jump to the coldest floor.
+
+    Float64 drops a 1e-6 coefficient next to 1e12, so the two-strip
+    p_eq collapses onto the hot level. The hot decay is then a few 1/C
+    (40/C), which is negligible beside a 1 s residence, and the cold
+    strip continues alone.
+
+    Worked chain. p0 = 200 Pa. Strip A: k = 1e12 /s, P_sat = 100 Pa.
+    Strip B: k = 1e-6 /s, P_sat = 1 Pa. One second:
+
+        fast strip reaches 100 Pa (exp(-1e12) underflows to 0)
+        slow strip: p = 1 + (100 - 1) exp(-1e-6)
+                  = 1 + 99 (1 - 1e-6 + 5e-13 - ...)
+                  = 99.999901 Pa
+
+    not 1 Pa.
+    """
+
+    rows = [
+        (float(k_monomer), float(saturation))
+        for k_monomer, _k_dimer, saturation, _kp in strips
+        if float(k_monomer) > 0.0
+    ]
+    pressure = float(partial)
+    remaining = float(duration)
+    if not rows or remaining <= 0.0:
+        return pressure
+    levels = sorted({saturation for _k, saturation in rows})
+
+    def _segment(
+        pressure_pa: float,
+        duration_s: float,
+    ) -> tuple[float, float, float] | None:
+        active = [
+            (coefficient, saturation)
+            for coefficient, saturation in rows
+            if saturation < pressure_pa
+        ]
+        total_k = sum(coefficient for coefficient, _saturation in active)
+        if total_k <= 0.0:
+            return None
+        equilibrium = (
+            sum(coefficient * saturation for coefficient, saturation in active)
+            / total_k
+        )
+        nxt = equilibrium + (pressure_pa - equilibrium) * math.exp(
+            -total_k * duration_s
+        )
+        return total_k, equilibrium, nxt
+
+    # The coldest level is the last active equilibrium, not a crossing.
+    for threshold in reversed(levels[1:]):
+        if remaining <= 0.0 or pressure <= threshold:
+            break
+        solved = _segment(pressure, remaining)
+        if solved is None:
+            break
+        total_k, equilibrium, nxt = solved
+        if equilibrium < threshold:
+            gap = threshold - equilibrium
+            numer = pressure - equilibrium
+            if gap <= 0.0 or numer <= gap:
+                hit_s = 0.0
+            else:
+                hit_s = math.log(numer / gap) / total_k
+            if hit_s >= remaining:
+                return nxt
+            pressure = threshold
+            remaining -= hit_s
+            continue
+        # p_eq is on this level at float64 precision. A stiff hot strip
+        # arrives in a few 1/C and turns off. A gentle strip approaches
+        # the level for the rest of the residence and does not pass it.
+        if total_k * remaining >= 40.0:
+            pressure = threshold
+            remaining -= 40.0 / total_k
+            continue
+        return threshold + (pressure - threshold) * math.exp(
+            -total_k * remaining
+        )
+    if remaining > 0.0:
+        solved = _segment(pressure, remaining)
+        if solved is not None:
+            pressure = solved[2]
+    return pressure
+
+
+def _next_strip_floor_pa(
+    partial: float,
+    strips: tuple[tuple[float, float, float, float], ...],
+) -> float | None:
+    """Hottest strip floor strictly below ``partial``, or None."""
+
+    floor = None
+    slack = max(1e-15, abs(partial) * 1e-14)
+    for k_monomer, k_dimer, saturation, kp_pa in strips:
+        if k_monomer <= 0.0 and k_dimer <= 0.0:
+            continue
+        saturated = saturated_element_partial_pa(saturation, kp_pa)
+        if not math.isfinite(saturated) or saturated >= partial - slack:
+            continue
+        if floor is None or saturated > floor:
+            floor = saturated
+    return floor
+
+
+def _local_drawdown_line(
+    partial: float,
+    strips: tuple[tuple[float, float, float, float], ...],
+    next_floor: float | None,
+) -> tuple[float, float, float | None]:
+    """(rate, λ, p_star) for dp/dt ≈ -λ (p - p_star) at ``partial``.
+
+    λ <= 0 means the finite difference did not see a restoring slope.
+    p_star is None in that case. The probe stays above the next floor
+    so the slope is not taken across a strip that has already turned off.
+    """
+
+    rate = _element_drawdown_rate_pa_s(partial, strips)
+    if rate >= 0.0 or not math.isfinite(rate):
+        return rate, 0.0, None
+    span = (partial - next_floor) if next_floor is not None else abs(partial) * 0.01
+    span = max(span, 1e-18)
+    probe = partial - span * 1.0e-4
+    if next_floor is not None and probe <= next_floor:
+        probe = partial - 0.5 * span
+    if probe >= partial:
+        return rate, 0.0, None
+    rate_probe = _element_drawdown_rate_pa_s(probe, strips)
+    slope = (rate - rate_probe) / (partial - probe)
+    lam = -slope
+    if not math.isfinite(lam) or lam <= 0.0:
+        return rate, 0.0, None
+    return rate, lam, partial + rate / lam
+
+
+def _exponential_partial(
+    partial: float,
+    duration_s: float,
+    lam: float,
+    p_star: float,
+) -> float:
+    """Unclamped local exponential p_star + (p - p_star) exp(-λ t).
+
+    The next strip floor is not substituted. A Newton step whose
+    equilibrium lies below that floor would otherwise become the
+    captured partial.
+    """
+
+    exponent = -lam * duration_s
+    if exponent <= -700.0:
+        return p_star
+    return p_star + (partial - p_star) * math.exp(exponent)
+
+
+def _adaptive_nonlinear_partial(
+    partial: float,
+    duration: float,
+    strips: tuple[tuple[float, float, float, float], ...],
+) -> float:
+    """Element partial for the nonlinear dimer drive.
+
+    The dimer term makes dp_elem/dt nonlinear, so there is no closed
+    form. Each accepted step is a local exponential dp/dt = -λ (p - p_star),
+    halved until a re-linearized half-step agrees to 1e-10 relative.
+
+    p_star below the next strip's p_elem,sat is a Newton overshoot of
+    the frozen line, not an arrival. The line reaches that floor in
+    finite time; the ODE only approaches it. The unclamped exponential
+    is legal only while it stays above the floor. A longer step is
+    halved. The floor is written only after an accepted step has
+    already landed within tolerance of it and many time constants
+    remain, so a stiff strip stops and a colder strip continues. A
+    residence of a few time constants stays above the floor. Nothing
+    snaps an oversized step onto the coldest floor.
+    """
+
+    t = 0.0
+    pressure = float(partial)
+    rows = strips
+    for _guard in range(200000):
+        remaining = duration - t
+        if remaining <= 1.0e-15 * max(1.0, duration):
+            return pressure
+        next_floor = _next_strip_floor_pa(pressure, rows)
+        rate, lam, p_star = _local_drawdown_line(pressure, rows, next_floor)
+        tolerance = 1.0e-10 * max(1.0, abs(pressure)) + 1.0e-12
+        if rate >= -1.0e-18 * max(1.0, abs(pressure)):
+            return pressure
+        if lam <= 0.0 or p_star is None:
+            dt = remaining
+            if next_floor is not None and rate < 0.0:
+                dt = min(dt, 0.2 * (pressure - next_floor) / abs(rate))
+            updated = pressure + rate * dt
+            if next_floor is not None and updated < next_floor:
+                # Euler crossed. Shorten; do not replace the step
+                # with the floor.
+                room = pressure - next_floor
+                dt = 0.5 * room / abs(rate) if room > 0.0 else 0.0
+                updated = pressure + rate * dt
+            if dt <= 0.0 or updated >= pressure:
+                return pressure
+            pressure = updated
+            t += dt
+            continue
+        dt_cap = remaining
+        if next_floor is not None and p_star < next_floor:
+            gap = next_floor - p_star
+            numer = pressure - p_star
+            if gap > 0.0 and numer > gap:
+                # Frozen line would cross here. Stay strictly above.
+                hit_s = math.log(numer / gap) / lam
+                dt_cap = min(dt_cap, hit_s * (1.0 - 1.0e-12))
+            else:
+                dt_cap = 0.0
+        if dt_cap <= 0.0:
+            return pressure
+        dt = dt_cap
+        accepted = None
+        for _halve in range(50):
+            full = _exponential_partial(pressure, dt, lam, p_star)
+            if not math.isfinite(full):
+                dt *= 0.5
+                continue
+            if next_floor is not None and full < next_floor - tolerance:
+                dt *= 0.5
+                continue
+            mid = _exponential_partial(pressure, 0.5 * dt, lam, p_star)
+            if not math.isfinite(mid) or (
+                next_floor is not None and mid < next_floor - tolerance
+            ):
+                dt *= 0.5
+                continue
+            _mid_rate, mid_lam, mid_star = _local_drawdown_line(
+                mid, rows, next_floor,
+            )
+            if mid_lam <= 0.0 or mid_star is None:
+                second = mid + _mid_rate * (0.5 * dt)
+            else:
+                second = _exponential_partial(mid, 0.5 * dt, mid_lam, mid_star)
+            if not math.isfinite(second):
+                dt *= 0.5
+                continue
+            if next_floor is not None and second < next_floor - tolerance:
+                dt *= 0.5
+                continue
+            if abs(second - full) <= tolerance:
+                accepted = second
+                break
+            dt *= 0.5
+        else:
+            room = (
+                pressure - next_floor
+                if next_floor is not None else abs(pressure)
+            )
+            dt = min(dt, 0.25 * room / abs(rate)) if room > 0.0 else 0.0
+            if dt <= 0.0:
+                return pressure
+            accepted = pressure + rate * dt
+            if next_floor is not None and accepted < next_floor:
+                return pressure
+        if accepted is None or accepted > pressure or accepted == pressure:
+            return pressure
+        # Already on this strip's floor, with a stiff remainder. Land
+        # so colder strips see the time that is left. The trajectory
+        # that got here was accepted; the floor is not a shortcut.
+        if (
+            next_floor is not None
+            and abs(accepted - next_floor) <= tolerance
+            and lam * max(0.0, remaining - dt) >= 40.0
+        ):
+            accepted = next_floor
+        pressure = accepted
+        t += dt
+    return pressure
+
+
 def final_element_partial_pa(
     *,
     element_partial_initial_pa: float,
@@ -407,10 +723,16 @@ def final_element_partial_pa(
     """Element partial after residence under the parallel fluxes.
 
     ``strips`` is (k_M, k_M2, P_sat_Pa, K_p_Pa). See
-    ``_element_drawdown_rate_pa_s``. RK4 follows the drawdown. A step
-    that would cross the lowest p_elem,sat snaps to that floor: the
-    condenser does not evaporate, and a stiff coefficient must land on
-    p_elem,sat (the worked check is 1/2, not the linear 1/3, and not 0).
+    ``_element_drawdown_rate_pa_s``. This is the only drawdown. Stage
+    efficiency and wall capture both call it. A fast strip stops on its
+    own p_elem,sat. A slow strip then barely moves. Nothing snaps an
+    oversized step to the coldest floor, and nothing caps the removal
+    with min(rate, supply).
+
+    Linear strips (K_p -> inf) use the closed form
+    p(t) = P_sat + (p0 - P_sat) exp(-k t) on each active set. The dimer
+    term is nonlinear and uses the adaptive exponential instead. The
+    element never falls below p_elem,sat = P_sat + 2 P_sat^2 / K_p.
     """
 
     partial = float(element_partial_initial_pa)
@@ -421,38 +743,21 @@ def final_element_partial_pa(
     floor = _element_saturation_floor_pa(rows)
     if not math.isfinite(floor) or partial <= floor:
         return partial
-    rate0 = _element_drawdown_rate_pa_s(partial, rows)
-    if rate0 == 0.0:
+    if _element_drawdown_rate_pa_s(partial, rows) == 0.0:
         return partial
-    span = partial - floor
-    tau = span / abs(rate0)
-    ratio = duration / tau if tau > 0.0 else math.inf
-    if not math.isfinite(ratio) or ratio * 40.0 >= 4096.0:
-        steps = 4096
+    if _strips_are_linear(rows):
+        updated = _final_linear_monomer_partial(partial, duration, rows)
     else:
-        steps = max(64, math.ceil(40.0 * ratio))
-    dt = duration / steps
-    for _ in range(steps):
-        k1 = _element_drawdown_rate_pa_s(partial, rows)
-        if k1 == 0.0 or partial + dt * k1 <= floor:
-            return floor
-        midpoint = partial + 0.5 * dt * k1
-        if midpoint <= floor:
-            return floor
-        k2 = _element_drawdown_rate_pa_s(midpoint, rows)
-        midpoint = partial + 0.5 * dt * k2
-        if midpoint <= floor:
-            return floor
-        k3 = _element_drawdown_rate_pa_s(midpoint, rows)
-        end = partial + dt * k3
-        if end <= floor:
-            return floor
-        k4 = _element_drawdown_rate_pa_s(end, rows)
-        updated = partial + dt * (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0
-        if not math.isfinite(updated) or updated <= floor:
-            return floor
-        partial = updated
-    return partial
+        updated = _adaptive_nonlinear_partial(partial, duration, rows)
+    if not math.isfinite(updated):
+        return partial
+    # An ulp under the equilibrium is the floor. A real overshoot is left
+    # in place so a heterogeneous step cannot be snapped back up to it.
+    if updated < floor and floor - updated <= 1e-9 * max(1.0, abs(floor)):
+        return floor
+    if updated > partial:
+        return partial
+    return updated
 
 
 # Monomer has no condenser contract. The vapor stays in the stream.
