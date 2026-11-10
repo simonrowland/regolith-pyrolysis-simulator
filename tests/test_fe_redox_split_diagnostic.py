@@ -207,6 +207,67 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("knudsen_number", "invalid"),
+    [
+        pytest.param(float("nan"), True, id="nan-refuses-before-commit"),
+        pytest.param(0.05, False, id="transitional-commits-with-extension"),
+    ],
+)
+def test_native_fe_transport_authority_gates_ledger_commit(
+    monkeypatch, knudsen_number, invalid
+):
+    from simulator import evaporation as evaporation_module
+    from simulator.transport_regime import TransportRegimeRefusal
+
+    sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.campaign_hour = 6.0
+    _seed_redox_liquidus_curve(sim)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.fO2_log = -10.0
+    sim.melt.melt_fO2_log = -10.0
+
+    assess_transport = evaporation_module.viscous_p_bulk_out_of_domain_diagnostic
+
+    def force_transport_domain(**kwargs):
+        if kwargs.get("asking_site") == "core.native_fe_vapor_partition":
+            return assess_transport(
+                **{
+                    **kwargs,
+                    "knudsen_number": knudsen_number,
+                    "overhead_pressure_pa": max(
+                        1.0, float(kwargs["overhead_pressure_pa"])
+                    ),
+                    "campaign_name": "C2A",
+                }
+            )
+        return assess_transport(**kwargs)
+
+    monkeypatch.setattr(
+        evaporation_module,
+        "viscous_p_bulk_out_of_domain_diagnostic",
+        force_transport_domain,
+    )
+    balances_before = sim.atom_ledger.mol_by_account()
+    transitions_before = tuple(sim.atom_ledger.transitions)
+
+    if invalid:
+        with pytest.raises(TransportRegimeRefusal) as exc_info:
+            sim._apply_native_fe_saturation_split()
+        assert exc_info.value.category == "invalid_knudsen_number"
+        assert sim.atom_ledger.mol_by_account() == balances_before
+        assert tuple(sim.atom_ledger.transitions) == transitions_before
+        return
+
+    result = sim._apply_native_fe_saturation_split()
+    partition = result["native_fe_partition"]
+    assert partition["ledger_yields_authorized"] is True
+    assert partition["authority_reason"] == "transport_domain_extension"
+    assert partition["native_fe_split_commit_status"] == "ok"
+    assert tuple(sim.atom_ledger.transitions) != transitions_before
+
+
 def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

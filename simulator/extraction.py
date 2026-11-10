@@ -4256,6 +4256,15 @@ class ExtractionMixin:
         r_transport, transport_diag = self._c7_transport_extent_mol(
             cfg, ca_per_extent=stoich['Ca'],
             extent_cap_mol=r_stoich_total * extent_fraction)
+        if transport_diag.get('ledger_yields_authorized') is False:
+            from simulator.transport_regime import TransportRegimeRefusal
+
+            raise TransportRegimeRefusal(
+                str(transport_diag.get('reason') or 'invalid_transport_input'),
+                str(transport_diag.get('detail') or ''),
+                process_regime='pyrolysis_extraction',
+                asking_site='extraction.c7_ca_transport',
+            )
         transport_refusal = str(
             transport_diag.get('c7_transport_refusal') or '')
         if transport_refusal:

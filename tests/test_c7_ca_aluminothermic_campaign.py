@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -141,9 +142,83 @@ def test_c7_enabled_run_commits_at_realized_pressure_and_closes_mass(
     )
     assert notices["transport_domain_extension"]["knudsen_number"] == diagnostic["c7_knudsen_number"]
     assert notices["transport_domain_extension"]["commanded_pressure_pa"] == 5.0
+    assert notices["transport_domain_extension"][
+        "ledger_yields_authorized"
+    ] is True
 
     assert diagnostic["c7_al_credit_input_kg"] == pytest.approx(20.0)
     assert diagnostic["c7_al_credit_unused_mol"] > 0.0
+
+
+def test_c7_invalid_knudsen_refuses_before_reduction_dispatch():
+    from simulator.account_ids import (
+        C7_AL_CREDIT_ACCOUNT,
+        METAL_FLOAT_LAYER_ACCOUNT,
+        METAL_PHASE_ACCOUNT,
+    )
+    from simulator.extraction import ExtractionMixin
+    from simulator.evaporation import viscous_p_bulk_out_of_domain_diagnostic
+    from simulator.transport_regime import (
+        TransportRegimeRefusal,
+    )
+
+    diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=float("nan"),
+        overhead_pressure_pa=5.0,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=1473.15,
+        campaign_name="C7_CA_ALUMINOTHERMIC",
+        asking_site="extraction.c7_ca_transport",
+    )
+    assert diagnostic is not None
+    balances = {
+        "process.cleaned_melt": {"CaO": 100.0},
+        "terminal.slag": {},
+        METAL_PHASE_ACCOUNT: {"Al": 100.0},
+        METAL_FLOAT_LAYER_ACCOUNT: {},
+        C7_AL_CREDIT_ACCOUNT: {},
+    }
+    transitions = []
+    dispatches = []
+    host = SimpleNamespace(
+        atom_ledger=SimpleNamespace(
+            mol_by_account=lambda account: dict(balances.get(account, {})),
+            transitions=transitions,
+        ),
+        melt=SimpleNamespace(
+            campaign_hour=0,
+            temperature_C=1200.0,
+            p_total_mbar=0.05,
+            pO2_mbar=0.0,
+        ),
+        _c7_aluminothermic_applied=False,
+        _c7_campaign_config=lambda: {
+            "enabled": True,
+            "aluminate_mode": "C3A",
+            "extent_fraction": 1.0,
+            "al_fraction": 1.0,
+        },
+        _c7_residual_ceramic_report=lambda: {},
+        _c7_stoich=lambda _mode: {
+            "CaO": 6.0,
+            "Al": 2.0,
+            "Ca": 3.0,
+            "aluminate_species": "Ca3Al2O6",
+        },
+        _c7_transport_extent_mol=lambda _cfg, **_kwargs: (1.0, diagnostic),
+        _c7_hold_temperature_C=lambda _cfg: 1200.0,
+        _dispatch_only=lambda *args, **kwargs: dispatches.append((args, kwargs)),
+    )
+    host._c7_bool = ExtractionMixin._c7_bool
+    host._c7_float = ExtractionMixin._c7_float
+    host._c7_clamp = ExtractionMixin._c7_clamp
+
+    with pytest.raises(TransportRegimeRefusal) as exc_info:
+        ExtractionMixin._step_c7_ca_aluminothermic(host)
+
+    assert exc_info.value.category == "invalid_knudsen_number"
+    assert dispatches == []
+    assert transitions == []
 
 
 def test_c7_set_it_to_11_reports_campaign_knob_saturations(tmp_path, monkeypatch):

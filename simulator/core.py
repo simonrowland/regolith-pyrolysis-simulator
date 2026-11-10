@@ -8635,6 +8635,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return {**split, **event}
         partition = self._native_fe_partition_diagnostic(native_fe_mol)
         partition['native_fe_source_account'] = native_fe_source_account
+        if partition.get('ledger_yields_authorized') is False:
+            from simulator.transport_regime import TransportRegimeRefusal
+
+            raise TransportRegimeRefusal(
+                str(partition.get('reason') or 'invalid_transport_input'),
+                str(partition.get('detail') or ''),
+                process_regime='pyrolysis_extraction',
+                asking_site='core.native_fe_vapor_partition',
+            )
 
         control_inputs = {
             'native_fe_mol': native_fe_mol,
