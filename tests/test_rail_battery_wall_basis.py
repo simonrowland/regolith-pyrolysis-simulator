@@ -1001,3 +1001,161 @@ def test_every_hot_wall_judgement_uses_the_arriving_partial(
             assert _flags_for_segment(
                 margin, "upstream_hot_wall_supersaturation", species, name
             ) == []
+
+
+# Invariant (b-282 / d-367): no arriving species flow is a silent 0.0.
+# The hot-wall chokepoint is cold_spot_diagnostic. When a surviving-flow
+# map is supplied, every species is one of:
+#   - a computed judgement (explicit positive flow, then P_sat comparison
+#     or a saturation refusal),
+#   - a typed refusal (segment missing, species key missing, or the value
+#     is not finite and non-negative),
+#   - not judged, only when the flow is an explicit finite zero.
+# A missing species key is the refusal. It is not the zero, so it cannot
+# skip a 1400 C / 100 Pa Fe wall.
+_ARRIVING_FLOW_CASES = (
+    "missing_species",
+    "missing_segment",
+    "explicit_zero",
+    "negative",
+    "nan",
+    "inf",
+    "non_numeric",
+    "none",
+    "positive",
+)
+_FLOW_REFUSAL_REASON = {
+    "missing_species": "missing",
+    "missing_segment": "missing",
+    "negative": "must be finite and non-negative",
+    "nan": "must be finite and non-negative",
+    "inf": "must be finite and non-negative",
+    "non_numeric": "must be finite and non-negative",
+    "none": "must be finite and non-negative",
+}
+
+
+def _surviving_species_flows(species: str, segment_name: str, flow_case: str):
+    """One input class of the surviving-flow map. None means the map is omitted."""
+
+    if flow_case == "missing_segment":
+        return {}
+    if flow_case == "missing_species":
+        # Reviewer counterexample: the segment is present and the species is not.
+        return {segment_name: {}}
+    value = {
+        "explicit_zero": 0.0,
+        "negative": -1.0,
+        "nan": float("nan"),
+        "inf": float("inf"),
+        "non_numeric": "nope",
+        "none": None,
+        "positive": 1.0,
+    }[flow_case]
+    return {segment_name: {species: value}}
+
+
+def _assert_arriving_flow_invariant(
+    diagnostic: dict,
+    species: str,
+    flow_case: str,
+):
+    where = f"{species} 1400 C 100 Pa {flow_case}"
+    matches = [
+        judgement
+        for judgement in diagnostic["upstream_hot_wall_judgements"]
+        if judgement["species"] == species
+    ]
+    if flow_case == "explicit_zero":
+        assert matches == [], where
+        assert diagnostic["upstream_hot_wall_refused"] is False, where
+        assert diagnostic["has_upstream_hot_wall_violation"] is False, where
+        assert diagnostic["upstream_hot_wall_findings"] == [], where
+        assert diagnostic["upstream_hot_wall_refusals"] == [], where
+        return
+
+    assert len(matches) == 1, where
+    judgement = matches[0]
+    if flow_case in _FLOW_REFUSAL_REASON:
+        assert judgement["status"] == "refused", where
+        assert judgement["refusal_type"] == "DepositionInputRefusal", where
+        assert judgement["parameter"] == "surviving_species_kg_hr", where
+        assert judgement["reason"] == _FLOW_REFUSAL_REASON[flow_case], where
+        assert judgement["partial_pressure_pa"] is None, where
+        assert diagnostic["has_upstream_hot_wall_violation"] is False, where
+        assert diagnostic["upstream_hot_wall_refused"] is True, where
+        assert diagnostic["upstream_hot_wall_findings"] == [], where
+        assert diagnostic["upstream_hot_wall_extrapolations"] == [], where
+        return
+
+    assert flow_case == "positive", where
+    _assert_diagnostic_invariant(diagnostic, species, 1400.0, "bakeoff_100pa")
+    assert judgement["kg_hr"] == pytest.approx(1.0), where
+    assert judgement["partial_pressure_pa"] == pytest.approx(MILLIBAR_BAKEOFF_PA), where
+    if species == "Fe":
+        # Hand Fe Antoine at 1673.15 K, not the production evaluator.
+        # log10(P/Pa) = 10.670336 - 17759.430841 / 1673.15.
+        assert judgement["saturation_pressure_pa"] == pytest.approx(
+            _LITERAL_WALL_PSAT_PA[("Fe", 1400.0)]
+        ), where
+        assert judgement["status"] == "violation", where
+
+
+def _assert_arriving_flow_gate(margin, species: str, flow_case: str):
+    where = f"{species} 1400 C 100 Pa {flow_case} {margin.status}"
+    payload = margin.status_payload or {}
+    assert margin.feasible is True, where
+    assert payload.get("coating_verdict") == "clear", where
+    if flow_case == "explicit_zero":
+        assert _gate_flags(margin, "upstream_hot_wall_refused", species) == [], where
+        assert _gate_flags(
+            margin, "upstream_hot_wall_supersaturation", species
+        ) == [], where
+        return
+    if flow_case in _FLOW_REFUSAL_REASON:
+        flags = _gate_flags(margin, "upstream_hot_wall_refused", species)
+        assert len(flags) == 1, where
+        assert flags[0]["finding"]["parameter"] == "surviving_species_kg_hr", where
+        assert flags[0]["finding"]["reason"] == _FLOW_REFUSAL_REASON[flow_case], where
+        assert _gate_flags(
+            margin, "upstream_hot_wall_supersaturation", species
+        ) == [], where
+        return
+    _assert_gate_invariant(margin, species, 1400.0, "bakeoff_100pa")
+
+
+@pytest.mark.parametrize("species", _HOT_WALL_SPECIES)
+@pytest.mark.parametrize("flow_case", _ARRIVING_FLOW_CASES)
+@pytest.mark.parametrize("channel", _HOT_WALL_CHANNELS)
+def test_arriving_species_flow_is_computed_or_refused(
+    species: str,
+    flow_case: str,
+    channel: str,
+):
+    """Every species, flow-input class, and coating channel.
+
+    Fe at 1 kg/hr, a 1400 C upstream wall, 100 Pa, and ``{segment: {}}``
+    is the missing-species class: a typed refusal, not a skipped judgement.
+    Explicit 0.0 is the only class that skips.
+    """
+
+    stage = designated_stage_number(species)
+    assert stage is not None
+    segment = _upstream_segment(f"stage_{stage}", 1400.0)
+    diagnostic = cold_spot_diagnostic(
+        [segment],
+        {species: 1.0},
+        species_partial_pressures_pa_by_segment={
+            segment.name: {species: MILLIBAR_BAKEOFF_PA},
+        },
+        surviving_species_kg_hr_by_segment=_surviving_species_flows(
+            species,
+            segment.name,
+            flow_case,
+        ),
+    )
+    _assert_arriving_flow_invariant(diagnostic, species, flow_case)
+    if channel == "payload":
+        return
+    margin = _coating_margin(channel, diagnostic)
+    _assert_arriving_flow_gate(margin, species, flow_case)

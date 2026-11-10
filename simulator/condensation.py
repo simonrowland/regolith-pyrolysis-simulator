@@ -7655,17 +7655,19 @@ def cold_spot_diagnostic(
     accepted and ignored so a stage-0 schedule band cannot reintroduce
     one (b-282).
 
-    Invariant: every hot-wall judgement is one segment's arriving
-    partial pressure compared with that species' P_sat(T_wall), or a
-    typed refusal of that quantity. A species with no surviving flow
-    at a segment is not judged there. A missing or invalid arriving
-    pressure, or a refused wall P_sat, is a typed refusal (d-367). It
-    is not a clear and it is not a supersaturation finding. A computed
-    P_sat outside the certified fit keeps that best estimate and
-    publishes the extrapolation on the judgement. The coating gate
-    reads those judgements. Reactive SiO deposition still uses its
-    P_sat ~= 0 backstop on the deposition path; that backstop does not
-    pass the hot-wall check.
+    Invariant: no arriving species flow is a silent 0.0. Every hot-wall
+    judgement is one segment's arriving partial pressure compared with
+    that species' P_sat(T_wall), or a typed refusal of that quantity.
+    When a surviving-flow map is supplied, a missing segment or a
+    missing species key is a typed refusal. Only an explicit finite
+    zero (the species was captured upstream) skips the judgement. A
+    missing or invalid arriving pressure, or a refused wall P_sat, is
+    a typed refusal (d-367). It is not a clear and it is not a
+    supersaturation finding. A computed P_sat outside the certified
+    fit keeps that best estimate and publishes the extrapolation on
+    the judgement. The coating gate reads those judgements. Reactive
+    SiO deposition still uses its P_sat ~= 0 backstop on the deposition
+    path; that backstop does not pass the hot-wall check.
     """
 
     # The historical uniform floor is not a violation threshold.
@@ -7722,15 +7724,21 @@ def cold_spot_diagnostic(
                 continue
             wall_T_C = float(segment.wall_temperature_C)
             # One lookup: this segment's arriving stream. There is no
-            # inlet-pressure fallback. A computed zero flow means the
-            # species was captured upstream and is not judged here.
+            # inlet-pressure fallback. An explicit finite zero means the
+            # species was captured upstream and is not judged here. A
+            # missing species key is not that zero (b-282 / d-367).
             arriving_kg_hr: float | None = kg_hr
             flow_refusal: dict[str, Any] | None = None
             if surviving_species_kg_hr_by_segment is not None:
                 segment_flows = surviving_species_kg_hr_by_segment.get(
                     segment.name
                 )
-                if segment_flows is None:
+                if (
+                    segment_flows is None
+                    or species_name not in segment_flows
+                ):
+                    # Absent segment and absent species are the same
+                    # missing input. Neither one is an explicit 0.0.
                     arriving_kg_hr = None
                     flow_refusal = {
                         'refusal_type': 'DepositionInputRefusal',
@@ -7738,7 +7746,7 @@ def cold_spot_diagnostic(
                         'reason': 'missing',
                     }
                 else:
-                    raw_flow = segment_flows.get(species_name, 0.0)
+                    raw_flow = segment_flows[species_name]
                     try:
                         arriving_kg_hr = float(raw_flow)
                     except (TypeError, ValueError):
