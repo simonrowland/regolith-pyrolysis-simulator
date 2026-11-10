@@ -15,6 +15,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     open_battery_engine,
 )
 from simulator.melt_backend.base import EquilibriumResult
+from tests.battery.cache_test_support import CACHE_TEST_ENGINES
 
 
 @dataclass(frozen=True)
@@ -418,15 +419,48 @@ def test_cache_settings_do_not_drop_names_only_because_they_contain_runtime_term
         assert first != second, name
 
 
-def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason() -> None:
+def test_alpha_and_thermoengine_runtime_paths_do_not_enter_settings() -> None:
+    from simulator import engine_cache
+
+    backend = SimpleNamespace(
+        _binary_path=Path("/engine/one"),
+        _engine_path=Path("/engine/one"),
+        _last_normalization_warnings=["prior-call diagnostic"],
+        _thermoengine_transport=SimpleNamespace(_melts_version="1.0.2"),
+    )
+    first = engine_cache.engine_cache_backend_settings(backend)
+    for path in (
+        ("_binary_path",),
+        ("_engine_path",),
+        ("_last_normalization_warnings",),
+        ("_thermoengine_transport", "_melts_version"),
+    ):
+        reason = engine_cache._setting_drop_reason(path)
+        assert reason
+        if path == ("_binary_path",):
+            backend._binary_path = Path("/engine/two")
+        elif path == ("_engine_path",):
+            backend._engine_path = Path("/engine/two")
+        elif path == ("_last_normalization_warnings",):
+            backend._last_normalization_warnings = ["changed diagnostic"]
+        else:
+            backend._thermoengine_transport._melts_version = "9.9.9"
+        assert engine_cache.engine_cache_backend_settings(backend) == first
+
+
+@pytest.mark.parametrize("engine", CACHE_TEST_ENGINES, ids=lambda value: value.value)
+def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason(
+    engine: Engine,
+) -> None:
     from collections.abc import Mapping
     from enum import Enum
     from types import ModuleType
 
     from simulator import engine_cache
-    from tests.battery.cache_test_support import CACHE_TEST_ENGINES, open_available_engine
+    from tests.battery.cache_test_support import open_available_engine
 
     runtime_reasons = engine_cache._RUNTIME_ONLY_SETTING_REASONS
+    opaque_paths: set[tuple[Any, ...]] = set()
 
     def simple(value: Any) -> bool:
         return value is None or isinstance(value, (bool, int, float, str, Enum))
@@ -434,6 +468,8 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason() -> 
     def leaves(value: Any, path: tuple[Any, ...] = (), seen: set[int] | None = None):
         if seen is None:
             seen = set()
+        if any(path[: len(opaque_path)] == opaque_path for opaque_path in opaque_paths):
+            return
         if simple(value):
             yield path, value
             return
@@ -511,52 +547,311 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason() -> 
             return value + 0.125
         return f"{value}-cache-setting-test"
 
-    for engine in CACHE_TEST_ENGINES:
-        handle = open_available_engine(engine, nodeid="cache settings invariant")
-        try:
-            settings, dropped = engine_cache._engine_cache_backend_settings_with_drops(
-                handle.backend
-            )
-            for path, reason in dropped.items():
-                assert path and engine_cache._setting_drop_reason(path) == reason, path
-                assert reason in runtime_reasons.values(), path
-            chem_version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine.value]
-            baseline_key = engine_cache.engine_cache_key(
-                engine.value, chem_version, settings
-            )
-            assert engine_cache.engine_cache_key(
-                engine.value, chem_version + 1, settings
-            ) != baseline_key
-            for path, original in tuple(leaves(handle.backend)):
-                changed = alternate(original)
-                if changed == original:
-                    continue
-                replace(handle.backend, path, changed)
-                try:
-                    changed_settings, changed_drops = (
-                        engine_cache._engine_cache_backend_settings_with_drops(
-                            handle.backend
+    handle = open_available_engine(engine, nodeid="cache settings invariant")
+    try:
+        settings, dropped, opaque = engine_cache._engine_cache_backend_settings_with_drops(
+            handle.backend
+        )
+        for path, reason in dropped.items():
+            assert path and engine_cache._setting_drop_reason(path) == reason, path
+            assert reason in runtime_reasons.values(), path
+        for path, type_name in opaque.items():
+            assert type_name, path
+            assert engine_cache._opaque_setting_reason(path), path
+        opaque_paths.update(opaque)
+
+        chem_version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine.value]
+        baseline_key = engine_cache.engine_cache_key(
+            engine.value, chem_version, settings
+        )
+        assert engine_cache.engine_cache_key(
+            engine.value, chem_version + 1, settings
+        ) != baseline_key
+        for path, original in tuple(leaves(handle.backend)):
+            changed = alternate(original)
+            if changed == original:
+                continue
+            replace(handle.backend, path, changed)
+            try:
+                changed_settings, changed_drops, changed_opaque = (
+                    engine_cache._engine_cache_backend_settings_with_drops(
+                        handle.backend
+                    )
+                )
+                changed_key = engine_cache.engine_cache_key(
+                    engine.value, chem_version, changed_settings
+                )
+                if changed_key == baseline_key:
+                    dropped_prefixes = [
+                        dropped_path
+                        for dropped_path in changed_drops
+                        if path[: len(dropped_path)] == dropped_path
+                    ]
+                    opaque_prefixes = [
+                        opaque_path
+                        for opaque_path in changed_opaque
+                        if path[: len(opaque_path)] == opaque_path
+                    ]
+                    assert dropped_prefixes or opaque_prefixes, (engine.value, path)
+                    for dropped_path in dropped_prefixes:
+                        assert (
+                            engine_cache._setting_drop_reason(dropped_path)
+                            == changed_drops[dropped_path]
+                        ), (engine.value, path, dropped_path)
+                    for opaque_path in opaque_prefixes:
+                        assert engine_cache._opaque_setting_reason(opaque_path), (
+                            engine.value,
+                            path,
+                            opaque_path,
                         )
-                    )
-                    changed_key = engine_cache.engine_cache_key(
-                        engine.value, chem_version, changed_settings
-                    )
-                    if changed_key == baseline_key:
-                        dropped_prefixes = [
-                            dropped_path
-                            for dropped_path in changed_drops
-                            if path[: len(dropped_path)] == dropped_path
-                        ]
-                        assert dropped_prefixes, (engine.value, path)
-                        for dropped_path in dropped_prefixes:
-                            assert (
-                                engine_cache._setting_drop_reason(dropped_path)
-                                == changed_drops[dropped_path]
-                            ), (engine.value, path, dropped_path)
-                finally:
-                    replace(handle.backend, path, original)
-        finally:
-            close_battery_engine_handle(handle)
+            finally:
+                replace(handle.backend, path, original)
+    finally:
+        close_battery_engine_handle(handle)
+
+
+@pytest.mark.parametrize("engine", CACHE_TEST_ENGINES, ids=lambda value: value.value)
+def test_each_real_backend_equilibrate_warm_pair_matches_cache_off(
+    engine: Engine,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        Po2Request,
+        close_battery_engine_handle,
+        equilibrate_cell,
+        load_binary_pots,
+    )
+    from tests.battery.cache_test_support import open_available_engine
+
+    handle = open_available_engine(engine, nodeid="real backend cache warm pair")
+    pots, _metadata = load_binary_pots()
+    pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
+    common = {
+        "temperature_K": 1700.0,
+        "po2": Po2Request(mode="engine_default", po2_bar=None),
+        "timeout_s": 90.0,
+        "isolated": False,
+    }
+
+    def stable(cell: Any) -> Any:
+        return cell.to_engine_cache_value().hot
+
+    try:
+        monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+        cache_off = equilibrate_cell(handle, pot, **common)
+        monkeypatch.setenv(
+            "REGOLITH_ENGINE_CACHE", str(tmp_path / f"{engine.value}.sqlite")
+        )
+        engine_cache.engine_cache_counters(reset=True)
+        cold = equilibrate_cell(handle, pot, **common)
+        warm = equilibrate_cell(handle, pot, **common)
+
+        assert stable(cache_off) == stable(cold) == stable(warm)
+        assert engine_cache.engine_cache_counters(reset=True)[engine.value] == {
+            "hits": 1,
+            "misses": 1,
+            "stores": 1,
+            "store_error": 0,
+            "read_error": 0,
+        }
+    finally:
+        close_battery_engine_handle(handle)
+
+
+def test_disabled_cache_does_not_walk_opaque_equilibrate_backend(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        _call_cached_backend_equilibrate,
+    )
+
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    monkeypatch.setattr(
+        engine_cache,
+        "engine_cache_backend_settings",
+        lambda _backend: pytest.fail("disabled cache walked backend settings"),
+    )
+    handle = EngineHandle(
+        name="openimcc",
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    result = EquilibriumResult(status="ok", liquid_fraction=0.75)
+
+    assert _call_cached_backend_equilibrate(
+        handle, {"temperature_C": 1000.0}, lambda: result
+    ) is result
+
+
+def test_disabled_cache_does_not_walk_opaque_internal_analytical_core(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        internal_analytical_residue_vapor_pressure,
+    )
+
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    monkeypatch.setattr(engine_cache, "record_engine_open", lambda *_args: None)
+    monkeypatch.setattr(
+        engine_cache,
+        "engine_cache_backend_settings",
+        lambda _backend: pytest.fail("disabled cache walked backend settings"),
+    )
+    expected = SimpleNamespace(vapor_pressures_Pa={"SiO(g)": 2.0})
+    monkeypatch.setattr(
+        battery,
+        "_internal_analytical_vapor_pressure_adapter",
+        lambda **_kwargs: expected,
+    )
+
+    result = internal_analytical_residue_vapor_pressure(
+        core=object(),
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        composition_kg=None,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=-8.0,
+        po2_request=Po2Request(PO2_COMMANDED, 1e-8),
+        include_diagnostic_shadows=False,
+    )
+
+    assert result is expected
+
+
+def test_openimcc_ferric_and_ferrous_requests_have_distinct_cache_entries(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _call_cached_backend_equilibrate,
+    )
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    engine_cache.engine_cache_counters(reset=True)
+    handle = SimpleNamespace(name="openimcc", backend=SimpleNamespace())
+    calls: list[dict[str, float]] = []
+
+    def solve(composition: dict[str, float]) -> EquilibriumResult:
+        calls.append(composition)
+        return EquilibriumResult(status="ok", liquid_fraction=0.5)
+
+    ferric = {"SiO2": 0.5, "Fe2O3": 0.1}
+    ferrous = {"SiO2": 0.5, "FeO": 0.2}
+    for composition in (ferric, ferrous):
+        _call_cached_backend_equilibrate(
+            handle,
+            {"composition_mol": composition, "temperature_C": 1500.0},
+            lambda composition=composition: solve(composition),
+        )
+
+    assert calls == [ferric, ferrous]
+    assert engine_cache.engine_cache_counters(reset=True)["openimcc"]["misses"] == 2
+
+
+def test_openimcc_unused_pressure_and_caller_timeout_do_not_replace_cached_cell(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _call_cached_backend_equilibrate,
+    )
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    engine_cache.engine_cache_counters(reset=True)
+    handle = SimpleNamespace(name="openimcc", backend=SimpleNamespace())
+    calls = 0
+
+    def solve() -> EquilibriumResult:
+        nonlocal calls
+        calls += 1
+        return EquilibriumResult(status="ok", liquid_fraction=0.625)
+
+    first = _call_cached_backend_equilibrate(
+        handle,
+        {
+            "temperature_C": 1500.0,
+            "pressure_bar": 1.0,
+            "call_timeout_s": 30.0,
+        },
+        solve,
+    )
+    second = _call_cached_backend_equilibrate(
+        handle,
+        {
+            "temperature_C": 1500.0,
+            "pressure_bar": 40.0,
+            "call_timeout_s": 0.01,
+        },
+        lambda: pytest.fail("pressure/timeout-only change should hit cached cell"),
+    )
+
+    assert first.liquid_fraction == second.liquid_fraction == 0.625
+    assert calls == 1
+    assert engine_cache.engine_cache_counters(reset=True)["openimcc"] == {
+        "hits": 1,
+        "misses": 1,
+        "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
+    }
+
+
+def test_isolated_backend_reconstruction_disables_nested_pools(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    import simulator.backends as backends
+    import simulator.melt_backend.vaporock as vaporock
+    from simulator.diagnostic_helpers.binary_pot_battery import _open_resolved_backend
+
+    configs: dict[str, dict[str, Any]] = {}
+
+    class FakeVapoRockBackend:
+        def initialize(self, config: dict[str, Any]) -> bool:
+            configs["vaporock"] = dict(config)
+            return True
+
+    monkeypatch.setattr(vaporock, "VapoRockBackend", FakeVapoRockBackend)
+
+    def try_backend(_backend_type: Any, config: dict[str, Any]) -> Any:
+        configs["magemin"] = dict(config)
+        return SimpleNamespace()
+
+    monkeypatch.setattr(backends, "_try_backend", try_backend)
+
+    def resolve_backend(name: str, _policy: Any, *, backend_config: dict[str, Any]):
+        configs[name] = dict(backend_config)
+        return SimpleNamespace()
+
+    monkeypatch.setattr(backends, "resolve_backend", resolve_backend)
+    for engine in ("vaporock", "magemin", "alphamelts", "thermoengine"):
+        _open_resolved_backend(engine, {})
+
+    assert set(configs) == {"vaporock", "magemin", "alphamelts", "thermoengine"}
+    assert all(
+        config["warm_worker"] is False
+        for config in configs.values()
+        if "warm_worker" in config
+    )
+    assert "warm_worker" not in configs["thermoengine"]
 
 
 def test_cache_settings_exclude_warm_pool_runtime_state() -> None:

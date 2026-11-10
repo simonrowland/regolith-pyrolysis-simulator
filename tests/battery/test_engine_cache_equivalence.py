@@ -39,7 +39,7 @@ class _FakeWorker:
         return {"status": "ok", "refusal_reason": None, "result": 17}
 
 
-def test_battery_engine_worker_request_is_cached_at_the_adapter_boundary(
+def test_isolated_cell_qualification_decoration_is_omitted_from_cache_key(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
@@ -53,6 +53,7 @@ def test_battery_engine_worker_request_is_cached_at_the_adapter_boundary(
     first = {
         "engine": "magemin",
         "pot_id": "first-pot",
+        "qualification": False,
         "composition_wt_pct": {"SiO2": 50.0, "FeO": 50.0},
         "temperature_K": 1700.0,
         "physical_pressure_bar": 1.0,
@@ -60,7 +61,12 @@ def test_battery_engine_worker_request_is_cached_at_the_adapter_boundary(
         "engine_settings": {},
         "arm": "headline",
     }
-    second = {**first, "pot_id": "second-pot", "arm": "qualification"}
+    second = {
+        **first,
+        "pot_id": "second-pot",
+        "qualification": True,
+        "arm": "qualification",
+    }
 
     first_result = worker.request(first, timeout_s=90.0)
     second_result = worker.request(second, timeout_s=90.0)

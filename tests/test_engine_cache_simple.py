@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
 import pickle
+import subprocess
+import sys
 import threading
 import zlib
 from dataclasses import dataclass
@@ -81,6 +84,70 @@ def test_disabled_cache_calls_solver_without_creating_store(
     assert calls == 2
     assert _engine_cache_counters(reset=True) == {}
     assert list(tmp_path.iterdir()) == []
+
+
+def test_concurrent_processes_can_write_the_same_cache_key(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    start = tmp_path / "start"
+    ready_files = [tmp_path / f"ready-{index}" for index in range(4)]
+    child_code = """
+import sys, time
+from pathlib import Path
+from simulator.engine_cache import cached_engine_call
+database, start, ready = map(Path, sys.argv[1:])
+ready.touch()
+deadline = time.monotonic() + 20
+while not start.exists():
+    if time.monotonic() >= deadline:
+        raise TimeoutError('cache writer barrier timed out')
+    time.sleep(.005)
+def solve():
+    time.sleep(.15)
+    return {'answer': 42}
+assert cached_engine_call('openimcc', {'request': 'same'}, solve) == {'answer': 42}
+"""
+    environment = dict(os.environ)
+    environment["REGOLITH_ENGINE_CACHE"] = str(database)
+    environment["PYTHONPATH"] = str(Path(__file__).resolve().parents[1])
+    processes: list[subprocess.Popen[str]] = []
+    try:
+        processes = [
+            subprocess.Popen(
+                [
+                    sys.executable,
+                    "-c",
+                    child_code,
+                    str(database),
+                    str(start),
+                    str(ready),
+                ],
+                env=environment,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            for ready in ready_files
+        ]
+        deadline = time.monotonic() + 20
+        while not all(ready.exists() for ready in ready_files):
+            if time.monotonic() >= deadline:
+                pytest.fail("cache writers did not reach the start barrier")
+            time.sleep(0.01)
+        start.touch()
+        for process in processes:
+            stdout, stderr = process.communicate(timeout=30)
+            assert process.returncode == 0, f"stdout={stdout}\nstderr={stderr}"
+    finally:
+        for process in processes:
+            if process.poll() is None:
+                process.kill()
+                process.communicate(timeout=5)
+
+    with sqlite3.connect(database) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 1
+        assert connection.execute("PRAGMA journal_mode").fetchone()[0].lower() == "wal"
 
 
 def test_cache_uses_canonical_request_and_wal_sqlite(
