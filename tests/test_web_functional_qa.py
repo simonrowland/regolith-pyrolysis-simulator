@@ -241,7 +241,7 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
     if feedstock == "lunar_mare_low_ti":
         oxygen_partition = sim._oxygen_terminal_partition_kg()
         assert oxygen_kg == 0.0
-        assert oxygen_partition["total"] > 0.0
+        assert oxygen_partition["total"] == 0.0
         assert {
             key: oxygen_partition[key]
             for key in ("stored", "vented", "captured", "total")
@@ -262,30 +262,29 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         assert oxygen_flag["pending_follow_ups"] == [
             "d-359 B", "d-359 C", "d-359 E",
         ]
+        assert runner["oxygen"]["status"] == "partial"
         reason = oxygen_flag["reason"]
         assert reason.startswith(
-            "0.0 kg O₂ is the direct O₂-ledger total; no stored, vented, or "
-            "captured molecular O₂ was recorded. The associated B/C/E "
-            "oxide-vapor predictions are incomplete and are not counted as "
-            "shipped O₂. "
+            "The shipped molecular-O₂ ledger total is 0.0 kg; B/C/E interim "
+            "estimates remain non-authoritative and pending their follow-ups. "
         )
-        assert "missing_evidence" in reason
-        assert "provider activity" in reason
-        assert "published gamma*x" in reason
-        assert "outside_declared_evaluator_domain" in reason
-        assert "domain [1519.0, 2273.15] K" in reason
-        assert "stage0_only" in reason
-        assert "phase-independent K" in reason
+        predictions = oxygen_flag["class_predictions"]
+        assert any(row["class"] == "B" for row in predictions)
+        class_c = next(
+            row for row in predictions
+            if row["class"] == "C" and row["species"] == "MnO_gas"
+        )
+        assert "outside_declared_evaluator_domain" in class_c["reason"]
+        assert "HKL alpha=1" in class_c["reason"]
+        assert "alpha domain [1000, 3000] K" in class_c["reason"]
+        class_e = [row for row in predictions if row["class"] == "E"]
+        assert any(row["species"] == "P4O6" for row in class_e)
+        assert all("phase-independent K" in row["reason"] for row in class_e)
         assert "Pending d-359 follow-ups: B, C, E." in reason
-        refusal_reasons = {
-            row["species"]: row["reason"]
-            for row in runner["oxygen"]["excluded"]
-        }
-        assert "missing_evidence" in refusal_reasons["SiO"]
-        assert "outside_declared_evaluator_domain" in refusal_reasons["MnO_gas"]
-        for species in ("P4O10", "P4O6", "PO", "PO2"):
-            assert "stage0_only predicate inactive" in refusal_reasons[species]
-            assert refusal_reasons[species] in reason
+        assert "missing_evidence" in reason
+        assert "outside_declared_evaluator_domain" in reason
+        assert "stage0_only predicate inactive" in reason
+        assert "phase-independent K" in reason
         combined_flag = runner["metals_plus_O2"]["availability_flag"]
         for field in (
             "status", "category", "kind", "authority", "authority_level",

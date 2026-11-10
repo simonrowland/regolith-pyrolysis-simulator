@@ -1603,11 +1603,16 @@ def test_mno_gas_313k_uses_flagged_out_of_domain_continuation(
     assert isinstance(answer.pressure, PressureValue)
     assert isinstance(answer.flux, FluxEligible)
     assert answer.extra["out_of_range"] is True
+    assert answer.extra["alpha_inventory_policy"] == (
+        "d359_interim_predict_and_flag"
+    )
     notice = answer.extra["d359_prediction"]
     assert notice["class"] == "C"
     assert notice["authority"] == "extrapolated"
     assert notice["certified_band_K"] == (1519.0, 2273.15)
     assert "outside_declared_evaluator_domain" in notice["reason"]
+    assert "HKL alpha=1" in notice["reason"]
+    assert "alpha domain [1000, 3000] K" in notice["reason"]
 
 
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)
