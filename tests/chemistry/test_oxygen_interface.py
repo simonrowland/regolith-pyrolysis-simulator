@@ -13,12 +13,12 @@ M_FE_KG_PER_MOL = parse_formula("Fe").molar_mass_kg_per_mol()
 M_O2_KG_PER_MOL = parse_formula("O2").molar_mass_kg_per_mol()
 TEMPERATURE_K = 1800.0
 AREA_M2 = 0.3
-K_BAR_3_2 = 1.0e-6
+K_BAR = 1.0e-6
 
 
-def _closed_form_pressure_bar(k_bar_3_2: float = K_BAR_3_2) -> float:
+def _closed_form_pressure_bar(k_bar: float = K_BAR) -> float:
     return (
-        k_bar_3_2 * math.sqrt(M_O2_KG_PER_MOL / M_FE_KG_PER_MOL) / 2.0
+        k_bar * math.sqrt(M_O2_KG_PER_MOL / M_FE_KG_PER_MOL) / 2.0
     ) ** (2.0 / 3.0)
 
 
@@ -27,7 +27,7 @@ def _solve(
     capacity: float = 0.0,
     reservoir_log10_fO2: float = -2.0,
     overhead_pO2_bar: float = 0.0,
-    k_bar_3_2: float = K_BAR_3_2,
+    k_bar: float = K_BAR,
 ):
     channel = oxygen_interface.InterfaceOxygenChannel(
         species="Fe",
@@ -41,7 +41,7 @@ def _solve(
 
     def pressure_model(log10_pO2_bar: float) -> dict[str, float]:
         pO2_bar = 10.0**log10_pO2_bar
-        p_fe_bar = k_bar_3_2 / math.sqrt(pO2_bar)
+        p_fe_bar = k_bar / math.sqrt(pO2_bar)
         return {"Fe": p_fe_bar * PA_PER_BAR}
 
     return oxygen_interface.solve_interface_oxygen(
@@ -90,7 +90,7 @@ def test_overhead_above_vacuum_root_is_a_labeled_floor_with_product_flux() -> No
 
 
 def test_both_positive_bracket_endpoints_return_lower_edge_flux() -> None:
-    solution = _solve(k_bar_3_2=1.0e-45)
+    solution = _solve(k_bar=1.0e-45)
 
     assert solution.surface_pO2_bar == 1.0e-30
     assert solution.label == "bracket_boundary=lower"
