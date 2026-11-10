@@ -108,7 +108,8 @@ REFUSAL_NO_COMPLETE_BUNDLE_SOURCE = "no_complete_bundle_source"
 # never fabricate PressureValue(0.0) + FluxEligible as a stand-in.
 REFUSAL_MISSING_OUTCOME_STATE = "missing_outcome_determining_state"
 # t-571 chemical-potential channel refusals (design §9).  Distinct from the
-# legacy formula/evaluator/alpha/route "channel contract" check below.
+# legacy formula/evaluator/route channel-contract check below. Alpha is a
+# flux input and is not part of that check.
 REFUSAL_CHEMICAL_POTENTIAL_CHANNEL = "refused_missing_channel_input"
 REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING = "refused_halide_reservoir_owner_missing"
 REFUSAL_SULFUR_RESERVOIR_OWNER_MISSING = "refused_sulfur_reservoir_owner_missing"
@@ -991,10 +992,16 @@ def _executable_contract_refusal(rule: RequestRule) -> str | None:
     """Provider-independent missing-contract check (step 2).
 
     Renamed from ``_channel_contract_refusal`` (t-571 design §2.1): this gate
-    checks formula / evaluator / alpha / route completeness.  It is **not** a
+    checks formula / evaluator / route completeness.  It is **not** a
     chemical-potential channel gate — those refusals live in
     :mod:`simulator.vapour_rail.channels` and
     :func:`chemical_potential_channel_refusal`.
+
+    Evaporation alpha is a flux input, not a pressure input. Every closure
+    path decides it only in ``_make_live`` via ``_alpha_contract_available``:
+    a missing or non-executable alpha refuses flux and keeps a pressure the
+    evaluator can compute (d-367). ``RequestRule.has_alpha`` records the
+    compile-time fact and must not refuse that pressure.
     """
 
     missing: list[str] = []
@@ -1002,8 +1009,6 @@ def _executable_contract_refusal(rule: RequestRule) -> str | None:
         missing.append("formula")
     if not rule.has_pressure_evaluator:
         missing.append("pressure_evaluator")
-    if not rule.has_alpha:
-        missing.append("alpha")
     if not rule.has_route:
         missing.append("route")
     # Source reaction is required only when the rule kind expects one.
@@ -1658,6 +1663,8 @@ def refusal_closure(
             else:
                 pressure = PressureValue(pa=float(pressure_pa))
 
+            # Sole alpha chokepoint. The pressure above is the evaluator
+            # result; a missing or non-executable alpha refuses flux only.
             if not _alpha_contract_available(alpha):
                 flux = FluxRefusal(
                     code="missing_evaporation_alpha",
@@ -1817,7 +1824,8 @@ def refusal_closure(
                 changed = True
                 continue
 
-            # 3) Channel contract (formula/evaluator/alpha/route)
+            # 3) Channel contract (formula/evaluator/route). Alpha is not a
+            #    pressure input; flux refusal for it happens in _make_live.
             contract_detail = _channel_contract_refusal(rule)
             if contract_detail is not None:
                 answers[species_id] = _make_refusal(

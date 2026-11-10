@@ -16,6 +16,7 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import FrozenInstanceError, replace
 from decimal import Decimal
+import json
 import math
 from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
@@ -25,6 +26,7 @@ import numpy as np
 import pytest
 import yaml
 
+from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
 from simulator.backend_names import (
     VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
     VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
@@ -53,6 +55,7 @@ from simulator.vapour_rail.batch import (
 )
 from simulator.vapour_rail.catalog import (
     OUT_OF_RANGE_STATUS,
+    CatalogCompileError,
     compile_vapour_rail_catalog,
 )
 from simulator.vapour_rail.request import (
@@ -66,6 +69,8 @@ from simulator.vapour_rail.request import (
     RequestRule,
     SelectedBundleIdentity,
     VapourResolveState,
+    _alpha_contract_available,
+    _executable_contract_refusal,
     _state_fingerprint,
     assert_request_coverage,
     allocate_selected_source,
@@ -1529,19 +1534,319 @@ def test_missing_alpha_refuses_flux_without_fabricating_zero() -> None:
     assert answer.flux.code == "missing_evaporation_alpha"
 
 
-def test_catalog_no_data_alpha_keeps_pressure_contract_refusal() -> None:
-    payload = _minimal_family("K")
+# Alpha decides flux only. A pressure the channel evaluator can compute is
+# retained for every alpha class; flux is eligible only when the shared
+# parser returns an executable alpha. ``has_alpha`` records that fact and
+# must not refuse the pressure. Catalog no_data rows are the compile-time
+# absence class (parse returns None); every other non-executable shape is
+# rejected at catalog compile or refused at the same flux chokepoint.
+_ALPHA_ADMISSION_CLASSES = (
+    # (alpha, pressure kind, flux kind, executable)
+    ({"status": "no_data"}, "value", "refusal", False),
+    (
+        {"status": "no_data", "policy": "refuse_nonzero_flux"},
+        "value",
+        "refusal",
+        False,
+    ),
+    (
+        {
+            "status": "no_data",
+            "policy": "refuse_nonzero_flux",
+            "compatibility_policy_field": "refuse_nonzero_flux",
+        },
+        "value",
+        "refusal",
+        False,
+    ),
+    ({}, "value", "refusal", False),
+    ({"status": "absent"}, "value", "refusal", False),
+    ({"status": "unmeasured"}, "value", "refusal", False),
+    ({"status": "analytical_upper_bound"}, "value", "refusal", False),
+    ({"status": "diagnostic_upper_bound"}, "upper", "refusal", False),
+    (None, "value", "refusal", False),
+    ("no_data", "value", "refusal", False),
+    (0.2, "value", "refusal", False),
+    ({"value": True}, "value", "refusal", False),
+    ({"value": 1.5}, "value", "refusal", False),
+    ({"value": -0.1}, "value", "refusal", False),
+    ({"value": float("nan")}, "value", "refusal", False),
+    ({"value": {"form": "policy"}}, "value", "refusal", False),
+    (
+        {"value": {"form": "arrhenius", "status": "CITED"}},
+        "value",
+        "refusal",
+        False,
+    ),
+    ({"value": 0.13}, "value", "eligible", True),
+    ({"value": 0.0}, "value", "eligible", True),
+    ({"value": 1}, "value", "eligible", True),
+    (
+        {"status": "analytical_upper_bound", "value": 0.2},
+        "value",
+        "eligible",
+        True,
+    ),
+    (
+        {"status": "diagnostic_upper_bound", "value": 0.2},
+        "upper",
+        "diagnostic",
+        True,
+    ),
+)
+_PRESSURE_KIND = {"value": PressureValue, "upper": PressureUpperBound}
+_FLUX_KIND = {
+    "refusal": FluxRefusal,
+    "eligible": FluxEligible,
+    "diagnostic": FluxDiagnosticUpperBound,
+}
+
+
+def _alpha_case_id(alpha: Any) -> str:
+    if isinstance(alpha, dict):
+        return json.dumps(alpha, sort_keys=True, default=str)
+    return repr(alpha)
+
+
+def _catalog_can_compile_alpha(alpha: Any) -> bool:
+    if not isinstance(alpha, dict):
+        return False
+    try:
+        parse_alpha_contract(alpha)
+    except AlphaSpecError:
+        return False
+    return True
+
+
+def _pressure_flux_signature(
+    answer: VapourAnswer,
+    *,
+    expected_pa: float,
+    pressure_kind: str,
+    flux_kind: str,
+) -> tuple[str, str, str | None]:
+    """Return the quantity split, and pin it to the evaluator pressure."""
+
+    pressure_type = _PRESSURE_KIND[pressure_kind]
+    flux_type = _FLUX_KIND[flux_kind]
+    assert answer.refusal_code is None
+    assert isinstance(answer.pressure, pressure_type)
+    assert not isinstance(answer.pressure, PressureRefusal)
+    assert answer.pressure.pa == expected_pa
+    assert answer.pressure.pa > 0.0
+    assert math.isfinite(answer.pressure.pa)
+    assert type(answer.selected_runtime_pressure) is type(answer.pressure)
+    assert answer.selected_runtime_pressure.pa == expected_pa
+    assert isinstance(answer.flux, flux_type)
+    if flux_kind == "refusal":
+        assert answer.flux.code == "missing_evaporation_alpha"
+        assert answer.is_flux_active is False
+    elif flux_kind == "eligible":
+        assert answer.is_flux_active is True
+    else:
+        assert answer.is_flux_active is False
+        assert not isinstance(answer.flux, FluxRefusal)
+    return (
+        type(answer.pressure).__name__,
+        type(answer.flux).__name__,
+        getattr(answer.flux, "code", None),
+    )
+
+
+def _closure_alpha_answer(alpha: Any, *, has_alpha: bool) -> VapourAnswer:
+    compiled = _stub_catalog_species("K")
+    compiled["K"].vaporisation_coefficients = SimpleNamespace(
+        evaporation_alpha=alpha
+    )
+    answer = refusal_closure(
+        requested=frozenset({"K"}),
+        rules=(replace(_selector_rule("K"), has_alpha=has_alpha),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        catalog_species=compiled,
+    ).answers["K"]
+    return answer
+
+
+def _compiled_k_catalog(alpha: Any, *, activity_branch: bool):
+    payload = _minimal_family("K", with_reaction=activity_branch)
     payload["families"]["k_test_family"]["vaporisation_coefficients"][
         "evaporation_alpha"
-    ] = {"status": "no_data"}
-    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
+    ] = alpha
+    return compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
 
-    answer = catalog.resolve_batch(
-        {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}},
-        _state_with_k_activity(temperature_K=1500.0),
-        flux_activation_context=_rg_activation_context(),
-    ).channel("K")
 
+@pytest.mark.parametrize(
+    ("alpha", "pressure_kind", "flux_kind", "executable"),
+    [
+        pytest.param(*case, id=_alpha_case_id(case[0]))
+        for case in _ALPHA_ADMISSION_CLASSES
+    ],
+)
+def test_alpha_admission_refuses_flux_only(
+    alpha: Any,
+    pressure_kind: str,
+    flux_kind: str,
+    executable: bool,
+) -> None:
+    """Every alpha class keeps a calculable pressure and splits flux alone.
+
+    Paths: closure with both ``has_alpha`` flags, and — when the contract
+    is a catalog mapping the compiler accepts — activity-dependent and
+    pure-component resolves under RG and unclaimed pre-RG. A pre-RG claim
+    of a flux refusal raises; it does not activate flux or mint a zero.
+    """
+
+    assert _alpha_contract_available(alpha) is executable
+    signatures = []
+    for has_alpha in (True, False):
+        answer = _closure_alpha_answer(alpha, has_alpha=has_alpha)
+        signatures.append(
+            _pressure_flux_signature(
+                answer,
+                expected_pa=10.0,
+                pressure_kind=pressure_kind,
+                flux_kind=flux_kind,
+            )
+        )
+    assert signatures[0] == signatures[1]
+
+    if not _catalog_can_compile_alpha(alpha):
+        for activity_branch in (True, False):
+            with pytest.raises(CatalogCompileError):
+                _compiled_k_catalog(alpha, activity_branch=activity_branch)
+        return
+
+    for activity_branch in (True, False):
+        catalog = _compiled_k_catalog(alpha, activity_branch=activity_branch)
+        rule = next(
+            item
+            for item in catalog.request_rules
+            if item.species_id == "K" and item.origin == "catalog"
+        )
+        assert rule.has_pressure_evaluator is True
+        assert rule.has_formula is True
+        assert rule.has_route is True
+        assert rule.has_alpha is executable
+        if activity_branch:
+            state = _state_with_k_activity(temperature_K=1500.0)
+            ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+            expected_pa = catalog.species["K"].evaluator.evaluate(
+                1500.0,
+                source_activity=0.25,
+                pO2_bar=1.0e-8,
+            ).pressure_pa
+        else:
+            state = VapourResolveState(temperature_K=1500.0)
+            ledger = {"process.cleaned_melt": {"K2O": 1.0}}
+            expected_pa = catalog.species["K"].evaluator.evaluate(
+                1500.0,
+                source_activity=1.0,
+            ).pressure_pa
+        for context in (
+            _rg_activation_context(),
+            _pre_rg_activation_context(),
+        ):
+            batch = catalog.resolve_batch(
+                ledger,
+                state,
+                flux_activation_context=context,
+            )
+            answer = batch.channel("K")
+            signature = _pressure_flux_signature(
+                answer,
+                expected_pa=expected_pa,
+                pressure_kind=pressure_kind,
+                flux_kind=flux_kind,
+            )
+            assert signature == signatures[0]
+            if context.epoch == FLUX_ACTIVATION_EPOCH_RG_MANIFEST and (
+                flux_kind == "eligible"
+            ):
+                assert "K" in batch.flux_active_species_ids
+            else:
+                assert "K" not in batch.flux_active_species_ids
+        if flux_kind == "refusal":
+            with pytest.raises(
+                VapourRequestConstructionError,
+                match="not flux-eligible",
+            ):
+                catalog.resolve_batch(
+                    ledger,
+                    state,
+                    flux_activation_context=_pre_rg_activation_context("K"),
+                )
+        elif flux_kind == "eligible":
+            claimed = catalog.resolve_batch(
+                ledger,
+                state,
+                flux_activation_context=_pre_rg_activation_context("K"),
+            )
+            assert "K" in claimed.flux_active_species_ids
+            assert isinstance(claimed.channel("K").pressure, PressureValue)
+            assert claimed.channel("K").pressure.pa == expected_pa
+        else:
+            claimed = catalog.resolve_batch(
+                ledger,
+                state,
+                flux_activation_context=_pre_rg_activation_context("K"),
+            )
+            assert "K" not in claimed.flux_active_species_ids
+            assert isinstance(
+                claimed.channel("K").pressure, PressureUpperBound
+            )
+            assert claimed.channel("K").pressure.pa == expected_pa
+
+
+def test_catalog_absent_alphas_are_in_the_admission_matrix() -> None:
+    covered = {
+        json.dumps(alpha, sort_keys=True)
+        for alpha, _pressure, _flux, executable in _ALPHA_ADMISSION_CLASSES
+        if isinstance(alpha, dict) and not executable
+    }
+    found: set[str] = set()
+    malformed: list[str] = []
+    for family in _yaml("vapor_pressures.yaml")["families"].values():
+        alpha = (family.get("vaporisation_coefficients") or {}).get(
+            "evaporation_alpha"
+        )
+        try:
+            parsed = parse_alpha_contract(alpha)
+        except AlphaSpecError as exc:
+            malformed.append(str(exc))
+            continue
+        if parsed is None:
+            found.add(json.dumps(alpha, sort_keys=True))
+    assert malformed == []
+    assert found
+    assert found <= covered
+
+
+@pytest.mark.parametrize(
+    "flag",
+    ("has_formula", "has_pressure_evaluator", "has_route"),
+)
+def test_missing_pressure_contract_still_refuses_without_citing_alpha(
+    flag: str,
+) -> None:
+    rule = replace(_selector_rule("K"), has_alpha=False, **{flag: False})
+    detail = _executable_contract_refusal(rule)
+    assert detail is not None
+    missing = detail.split("missing ", 1)[1]
+    tokens = [part.strip() for part in missing.split(",")]
+    token = {
+        "has_formula": "formula",
+        "has_pressure_evaluator": "pressure_evaluator",
+        "has_route": "route",
+    }[flag]
+    assert tokens == [token]
+    answer = refusal_closure(
+        requested=frozenset({"K"}),
+        rules=(rule,),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        catalog_species=_stub_catalog_species("K"),
+    ).answers["K"]
     assert isinstance(answer.pressure, PressureRefusal)
     assert answer.pressure.code == "missing_channel_contract"
     assert isinstance(answer.flux, FluxRefusal)
