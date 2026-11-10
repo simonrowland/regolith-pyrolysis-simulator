@@ -29,7 +29,8 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   (paper, OCR, or quotes — not the extract and not program source) and
   requires each resolved extract number as a complete token: sign and
   exponent belong to the token, so 0.24 is not -0.24 or 0.24e-5, and
-  1.0 is not 1. A leading decimal is a number, so .24 is not a label
+  1.0 is not 1. A sentence period does not extend that token, so 1
+  matches "the value is 1." A leading decimal is a number, so .24 is not a label
   and is not the token -0.24, 10.24, or 0.24. A float spelling is kept
   only when it parses back to the stored number, so
   ``format(0.24000000000000002, ".16g")`` is 0.24 and does not certify
@@ -252,15 +253,20 @@ _TOKEN_LOOKBEHIND_CLASS = "A-Za-z0-9_." + "+" + _DISTINCT_NUMERIC_SIGNS + "-"
 # ``_citation_token_matches``, which folds Unicode signs first and drops
 # any span ``_span_is_complete_printed_value`` rejects. The grammar is not
 # the boundary: a comma is not a hard edge here, and a yielded match is
-# still not a token of ``1,000``. A second scanner would let one path drop
-# a sign or a leading decimal that another path keeps.
+# still not a token of ``1,000``. A period is not a hard edge either.
+# ``(?:\.\d+)?`` consumes a decimal only when a digit follows the dot, so
+# a sentence period stays outside the match. The shared predicate then
+# accepts that period and rejects one a digit follows. Listing '.' in the
+# lookahead would drop ``1`` from ``the value is 1.`` before the predicate
+# could accept it. A second scanner would let one path drop a sign or a
+# leading decimal that another path keeps.
 _NUMERIC_TOKEN_RE = re.compile(
     f"(?<![{_TOKEN_LOOKBEHIND_CLASS}])"
     f"[{_TOKEN_SIGN_CLASS}]?"
     r"(?:\d+(?:\.\d+)?|\.\d+)"
     f"(?:[eE][{_TOKEN_SIGN_CLASS}]?"
     r"\d+)?"
-    r"(?![A-Za-z0-9_.])"
+    r"(?![A-Za-z0-9_])"
 )
 
 
@@ -356,7 +362,7 @@ def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
     token. The whole stored value, number plus any attached or spaced unit,
     occupies ``[start, end)``, and neither neighbour extends that span.
     ``1 K`` is not ``1 KPa``. ``1`` is not ``1,000``. ``1,000`` is not
-    ``1,000,000``. ``1`` is not ``-1`` or ``1µ``.
+    ``1,000,000``. ``1`` is not ``-1`` or ``1µ``. ``1`` is ``the value is 1.``
     """
     if not (0 <= start < end <= len(text)):
         return False
@@ -2335,7 +2341,9 @@ def fidelity_source_warnings(
     same sign and the same digits. The whole value, including a spaced or
     attached unit, must match, and neither neighbour may extend the span:
     an ASCII letter or digit, a Unicode letter, µ, or °, or a dot or comma
-    followed by a digit. ``1 K`` is not ``1 KPa`` and ``1`` is not ``1,000``.
+    followed by a digit. A sentence period does not extend the token, so
+    ``1`` matches ``the value is 1.``. ``1 K`` is not ``1 KPa`` and ``1``
+    is not ``1,000``.
     A leading decimal is a numeric token.
     A spelling that rounds the stored float to a different number is not
     that token. The sample's own spelling is not a substitute: a ``rel_tol``
@@ -2599,7 +2607,8 @@ def certify_extract_source_fidelity(
     extract leaf as a complete token of the same sign and the same digits.
     The whole value, including a spaced or attached unit, must match, and
     neither neighbour may extend the span. ``1 K`` is not ``1 KPa`` and
-    ``1`` is not ``1,000``. A leading decimal is a numeric token. A spelling
+    ``1`` is not ``1,000``. A sentence period does not extend the span, so
+    ``1`` matches ``the value is 1.``. A leading decimal is a numeric token. A spelling
     that rounds the stored float to a different number is not that token.
     The sample's own
     spelling is not a substitute: a ``rel_tol`` match of a different number

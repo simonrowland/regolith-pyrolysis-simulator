@@ -5111,6 +5111,9 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # so the source matcher does not run, and no extract is review_status
 # reviewed. ivtan-mno-coo-thermo and sf04-magma-companion-workbook were
 # already draft. Certification-state changes from this boundary: 0.
+# A sentence period is not an extending character. No sample has
+# reviewed_by, so the source matcher still does not run, and this does
+# not move the ceilings or any extract's certification state.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 48661
 _UNCOVERED_EXTRACTS_CEILING = 616
@@ -5761,9 +5764,27 @@ _ORACLE_TOKEN_SIGNS = frozenset("+-\u00b1\u2213")
 _ORACLE_BEFORE_BLOCK = frozenset(
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.+\u00b1\u2213-"
 )
+# A period is not in this set. It extends a token only when a digit
+# follows, which ``_oracle_after_blocks`` decides. Sentence punctuation
+# must not swallow the number.
 _ORACLE_AFTER_BLOCK = frozenset(
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_."
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_"
 )
+
+
+def _oracle_after_blocks(text: str, end: int) -> bool:
+    """True when the character after a candidate token extends it.
+
+    Independent of the gate. A period extends only when a digit follows,
+    so ``1`` remains a token of ``the value is 1.``.
+    """
+    if end >= len(text):
+        return False
+    ch = text[end]
+    if ch == ".":
+        nxt = text[end + 1] if end + 1 < len(text) else ""
+        return len(nxt) == 1 and nxt.isdigit()
+    return ch in _ORACLE_AFTER_BLOCK
 
 
 def _oracle_fold_signs(text: str) -> str:
@@ -5843,7 +5864,7 @@ def _oracle_numeric_tokens(text: str) -> list[str]:
                 index = start + 1
                 continue
             end = exponent
-        if end < size and folded[end] in _ORACLE_AFTER_BLOCK:
+        if _oracle_after_blocks(folded, end):
             index = start + 1
             continue
         if end == start:
@@ -6968,6 +6989,13 @@ _TOKEN_CASES = (
     ("grouped_string_tail", "1,000", "1,000,000\n", False),
     ("micro_tail", "1", "1µ\n", False),
     ("degree_tail", "1", "1°\n", False),
+    # Sentence punctuation. The period has no following digit, so it does
+    # not extend the token. Integer 1 and the string "1" both certify.
+    ("sentence_period_int", 1, "the value is 1.\n", True),
+    ("sentence_period_string", "1", "the value is 1.\n", True),
+    ("sentence_period_then_word", 1, "the value is 1. Next\n", True),
+    ("sentence_period_float", 0.24, "alpha 0.24.\n", True),
+    ("sentence_period_string_float", "0.24", "alpha 0.24.\n", True),
 )
 
 
@@ -7096,6 +7124,28 @@ def test_every_numeric_spelling_certifies_only_its_exact_token(tmp_path: Path):
                         f"token {spelling!r} oracle={oracle} gate={gate}"
                     )
                     continue
+                ended = f"alpha {spelling}."
+                if (
+                    _oracle_numeric_tokens(ended) != expected
+                    or [
+                        match.group(0)
+                        for match in vle._citation_token_matches(ended)
+                    ]
+                    != expected
+                ):
+                    failures.append(
+                        f"period token {spelling!r} "
+                        f"oracle={_oracle_numeric_tokens(ended)} "
+                        f"gate={[match.group(0) for match in vle._citation_token_matches(ended)]}"
+                    )
+                ended_doc = _literal_source_document(
+                    tmp_path, spelling, ended + "\n"
+                )
+                ended_errors = vle.certify_extract_source_fidelity(
+                    ended_doc, label="spell", artifact_root=tmp_path
+                )
+                if ended_errors:
+                    failures.append(f"period {spelling!r}: {ended_errors}")
                 values = {"quantity": "alpha", "alpha": spelling}
                 if _oracle_measured_addresses(values) != [("alpha",)]:
                     failures.append(f"oracle address {spelling!r}")
@@ -7284,6 +7334,23 @@ def _rule_extension_sources(leaf: str) -> list[str]:
     return sources
 
 
+def _rule_punctuation_sources(leaf: str) -> list[str]:
+    """Sentence punctuation around ``leaf``. The rule decides, not the gate.
+
+    A period or comma extends only when the next character is a digit.
+    Parentheses, a semicolon, a colon, and a question mark never extend.
+    ``the value is 1.`` carries ``1``. ``1.5`` and ``1,000`` do not.
+    """
+    return [
+        f"the value is {leaf}.",
+        f"the value is {leaf}. Next",
+        f"({leaf})",
+        f"{leaf}, next",
+        f"{leaf};",
+        f"{leaf}?",
+    ]
+
+
 @pytest.mark.parametrize("leaf", _digit_leaf_product(), ids=_digit_leaf_case_id)
 def test_digit_bearing_leaf_certifies_only_when_source_carries_it(
     leaf: str, tmp_path: Path
@@ -7296,7 +7363,10 @@ def test_digit_bearing_leaf_certifies_only_when_source_carries_it(
     not cover the measurement. ``0.91Pa`` and ``91.`` are in this product.
     Each positive also refuses a source that extends it: a digit, ``,000``,
     ``.5``, or a unit letter on the right, and a digit, ``1,``, or a sign
-    that changes the value on the left.
+    that changes the value on the left. Sentence punctuation does not
+    extend the leaf: ``the value is 1.`` carries ``1``, and the same
+    period, comma, parenthesis, semicolon, and question mark carry every
+    other leaf in the product.
     """
     carried = f"\n{leaf}\n"
     withheld = f"\n9{leaf}\n"
@@ -7343,6 +7413,16 @@ def test_digit_bearing_leaf_certifies_only_when_source_carries_it(
         assert (extended_errors == []) is expected, (leaf, extended, expected, extended_errors)
         if not expected:
             assert "source_blind_pin" in "\n".join(extended_errors)
+
+    for punctuated in _rule_punctuation_sources(leaf):
+        source = f"\n{punctuated}\n"
+        expected = _rule_source_carries_printed_value(leaf, source)
+        assert expected, (leaf, punctuated)
+        punctuated_doc = _literal_source_document(tmp_path, leaf, source)
+        punctuated_errors = vle.certify_extract_source_fidelity(
+            punctuated_doc, label="digit", artifact_root=tmp_path
+        )
+        assert punctuated_errors == [], (leaf, punctuated, punctuated_errors)
 
     hidden = _values_pin_document(
         tmp_path,
