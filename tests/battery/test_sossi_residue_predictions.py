@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -111,7 +112,11 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
 
     monkeypatch.setattr(residue, "integrate_residue_inventory", no_evaporation)
     source = yaml.safe_load(SOURCE.read_text())
-    experiment = source["experiments"][0]
+    experiment = next(
+        row
+        for row in source["experiments"]
+        if row["experiment_id"] == "sossi-2019-run-c17-12-15b"
+    )
     experiment_id = experiment["experiment_id"]
     printed_area_m2 = _printed_sossi_bead_area_m2()
     sample_surface_area_m2 = (
@@ -136,6 +141,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
     evaluated_compositions: list[dict[str, float]] = []
     openimcc_mno_activities: list[float] = []
     gas_activity_inputs: list[dict[str, float]] = []
+    gas_parent_oxide_names: list[tuple[str, ...]] = []
     extension_calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
     original_melt_evaluate = openimcc_bridge.evaluate
     original_gas_evaluate = openimcc.evaluate_gas
@@ -155,6 +161,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
 
     def capture_gas_evaluate(activities, *args, **kwargs):
         gas_activity_inputs.append(dict(activities))
+        gas_parent_oxide_names.append(tuple(kwargs["parent_oxides"]))
         return original_gas_evaluate(activities, *args, **kwargs)
 
     monkeypatch.setattr(
@@ -211,6 +218,55 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
     assert prediction.provenance["assumption_flags"][
         "sample_surface_area_fallback_2700_kg_m3"
     ] is (sample_surface_area_m2 is None)
+    assert prediction.provenance["transport_model"] == "series_resistance"
+    assert prediction.provenance["transport_source_locations"][
+        "sweep_gas_mixture_and_flow_rate_sccm"
+    ]["page"] == 55
+    assert prediction.provenance["transport_source_locations"]["tube_geometry"] == {
+        "page": 6,
+        "section": "2.1 Experimental Methods",
+    }
+
+    if sample_surface_area_m2 is not None:
+        def remove_native_mno_activity(**kwargs):
+            state = original_melt_evaluate(**kwargs)
+            activities = dict(state.parent_oxide_activities)
+            activities.pop("MnO", None)
+            parent_oxides = tuple(
+                oxide for oxide in state.parent_oxides if oxide != "MnO"
+            )
+            return replace(
+                state,
+                parent_oxide_activities=activities,
+                parent_oxides=parent_oxides,
+            )
+
+        with monkeypatch.context() as missing_activity_patch:
+            missing_activity_patch.setattr(
+                openimcc_bridge, "evaluate", remove_native_mno_activity
+            )
+            extension_calls.clear()
+            gas_activity_inputs.clear()
+            gas_parent_oxide_names.clear()
+            fallback_prediction = residue._predict_sossi_residue_cohort(
+                [experiment],
+                catalog,
+                starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+                buffered_fO2_log_by_experiment={experiment_id: -10.0},
+                code_revision="pack-digest-pin-test-missing-mno",
+                engine="openimcc",
+                sample_surface_area_m2=sample_surface_area_m2,
+            )[0]
+
+        assert extension_calls
+        assert gas_activity_inputs
+        assert gas_activity_inputs[0]["MnO"] == pytest.approx(
+            expected_fallback_activity.thermodynamic_parent_activity()
+        )
+        assert "MnO" in gas_parent_oxide_names[0]
+        assert fallback_prediction.provenance["melt_activity_extensions"]["MnO"][
+            "authority_level"
+        ] == expected_fallback_activity.evidence_tier
 
 
 def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
@@ -405,6 +461,25 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
                 provenance={
                     "integration": {"primary": {"status": "converged"}},
                     "code_revision": "fixture-revision",
+                    "transport_model": "series_resistance",
+                    "transport_conditions": {
+                        "total_pressure_pa": 101325.0,
+                        "carrier_gas_mixture": {"CO2": 200.0},
+                        "flow_rate_sccm": 200.0,
+                        "pipe_diameter_m": 0.042,
+                        "transport_length_m": 0.03,
+                    },
+                    "transport_source_locations": {
+                        "total_pressure_pa": {"page": 2, "section": "Abstract"},
+                        "sweep_gas_mixture_and_flow_rate_sccm": {
+                            "page": 55,
+                            "table": "2",
+                        },
+                        "tube_geometry": {
+                            "page": 6,
+                            "section": "2.1 Experimental Methods",
+                        },
+                    },
                     "melt_activity_extensions": {
                         "MnO": {
                             "reason": "MnO is outside the IMCC-SF04 melt-activity domain",
@@ -436,8 +511,21 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     assert set(openimcc_pack_identity_sources(openimcc_pack_identity())) <= set(
         prediction.coefficient_sources
     )
-    assert any(
-        notice.reason == "bc_open_furnace_langmuir_limit_diagnostic"
+    transport_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.reason == "sossi_open_furnace_series_resistance_transport"
+    )
+    assert "series-resistance gas film" in transport_notice.band
+    assert "P_total=101325 Pa (PDF p. 2)" in transport_notice.band
+    assert "Table 2, PDF p. 55" in transport_notice.band
+    assert "Methods §2.1, PDF p. 6" in transport_notice.band
+    assert prediction.refusal_detail["transport_model"] == "series_resistance"
+    assert prediction.refusal_detail["transport_source_locations"][
+        "sweep_gas_mixture_and_flow_rate_sccm"
+    ]["page"] == 55
+    assert all(
+        notice.reason != "bc_open_furnace_langmuir_limit_diagnostic"
         for notice in prediction.notices
     )
     assert any(
