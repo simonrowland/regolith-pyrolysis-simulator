@@ -98,7 +98,6 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
 
     import simulator.battery.residue as residue
     from simulator.melt_backend import openimcc_bridge
-    import simulator.chemistry.melt_activity as melt_activity
 
     monkeypatch.setattr(
         openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
@@ -127,31 +126,25 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
         ]
         for element in ("Mn", "Ti")
     }
-    initial_inventory, _, _ = residue._sossi_initial_inventory(
-        experiment, starting_trace
-    )
     temperature_K = residue._hashimoto_point_value(
         experiment["thermal_schedule"]["setpoints_and_holds"][0]["temperature_K"]
     )
-    expected_fallback_activity = melt_activity.melt_oxide_activity(
-        "MnO", initial_inventory, temperature_K=temperature_K
-    )
-    assert expected_fallback_activity is not None
     evaluated_compositions: list[dict[str, float]] = []
     gas_activity_inputs: list[dict[str, float]] = []
     gas_parent_oxide_names: list[tuple[str, ...]] = []
-    extension_calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
+    native_results: list[object] = []
     original_melt_evaluate = openimcc_bridge.evaluate
+    original_openimcc_evaluate = openimcc.evaluate
     original_gas_evaluate = openimcc.evaluate_gas
-    original_melt_activity = melt_activity.melt_oxide_activity
 
     def capture_melt_evaluate(**kwargs):
         evaluated_compositions.append(dict(kwargs["composition_mol"]))
         return original_melt_evaluate(**kwargs)
 
-    def capture_extension_call(*args, **kwargs):
-        extension_calls.append((args, kwargs))
-        return original_melt_activity(*args, **kwargs)
+    def capture_openimcc_evaluate(*args, **kwargs):
+        result = original_openimcc_evaluate(*args, **kwargs)
+        native_results.append(result)
+        return result
 
     def capture_gas_evaluate(activities, *args, **kwargs):
         gas_activity_inputs.append(dict(activities))
@@ -164,8 +157,8 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
         lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
     )
     monkeypatch.setattr(openimcc_bridge, "evaluate", capture_melt_evaluate)
+    monkeypatch.setattr(openimcc, "evaluate", capture_openimcc_evaluate)
     monkeypatch.setattr(openimcc, "evaluate_gas", capture_gas_evaluate)
-    monkeypatch.setattr(melt_activity, "melt_oxide_activity", capture_extension_call)
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     prediction = residue._predict_sossi_residue_cohort(
         [experiment],
@@ -191,17 +184,27 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
     assert "gas_pack_digest" not in prediction.provenance
     assert "liquid_pack_digest" not in prediction.provenance
     assert evaluated_compositions
-    assert all("MnO" not in composition for composition in evaluated_compositions)
+    assert all("MnO" in composition for composition in evaluated_compositions)
     mno_inputs = [activities for activities in gas_activity_inputs if "MnO" in activities]
     assert mno_inputs
-    assert extension_calls
+    assert native_results
     assert all("MnO" in parent_oxides for parent_oxides in gas_parent_oxide_names)
-    assert mno_inputs[0]["MnO"] == pytest.approx(
-        expected_fallback_activity.thermodynamic_parent_activity()
+    native_result = native_results[0]
+    assert "MnO" in native_result.parent_oxides
+    expected_mno_activity = native_result.parent_activity[
+        list(native_result.parent_oxides).index("MnO")
+    ]
+    assert all(
+        activities["MnO"] == pytest.approx(expected_mno_activity)
+        for activities in mno_inputs
     )
-    assert prediction.provenance["melt_activity_extensions"]["MnO"][
-        "authority_level"
-    ] == expected_fallback_activity.evidence_tier
+    assert "MnO" not in prediction.provenance.get("melt_activity_extensions", {})
+    assert temperature_K < 1700.0
+    extrapolation = prediction.provenance["openimcc_temperature_extrapolation"]
+    assert extrapolation["authority"] == "extrapolated"
+    assert extrapolation["certified_band_K"] == [1700.0, 3000.0]
+    assert extrapolation["allow_extrapolation"] is True
+    assert extrapolation["openimcc_reason"]
     expected_area_m2 = (
         _sossi_geometry_areas(25.0e-6)["pt_loop_bead_sphere_constant"]
         if sample_surface_area_m2 is None
