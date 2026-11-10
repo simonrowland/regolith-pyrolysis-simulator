@@ -110,12 +110,6 @@ def _is_d139_uncalibrated_kems_row(row: Mapping[str, Any]) -> bool:
     )
 
 
-def _hero_row_flagged(
-    row: Mapping[str, Any], *, d139_uncalibrated_kems: bool
-) -> bool:
-    return d139_uncalibrated_kems or bool(_flagged_payload_strata(row))
-
-
 def _row_formula(row: Mapping[str, Any]) -> str:
     formula = _species_formula(_row_identity(row))
     if formula:
@@ -144,6 +138,41 @@ def _engine_name(row: Mapping[str, Any]) -> str | None:
         if isinstance(engine, Mapping) and engine.get("name"):
             return str(engine["name"])
     return None
+
+
+def _row_engine(row: Mapping[str, Any]) -> str:
+    engine = _engine_from_payload(row)
+    if engine == "unknown":
+        return _engine_name(row) or "unknown"
+    return engine
+
+
+def _is_refused_row(row: Mapping[str, Any]) -> bool:
+    return str(row.get("status") or "").casefold() == "refused"
+
+
+def _with_refusal_attribution(
+    rows: Iterator[Mapping[str, Any]],
+    refused_by_engine_rail: dict[tuple[str, str], int],
+    unattributed_refusals: dict[tuple[str, str], int],
+    *,
+    rail_filter: str | None,
+    species_filter: str | None,
+) -> Iterator[Mapping[str, Any]]:
+    for payload in rows:
+        if not isinstance(payload, Mapping) or is_store_stamp_payload(payload):
+            continue
+        if _is_refused_row(payload):
+            engine = _row_engine(payload)
+            rail = str(payload.get("rail") or "").strip()
+            species = _row_formula(payload)
+            key = (engine, rail or "unknown")
+            refused_by_engine_rail[key] = refused_by_engine_rail.get(key, 0) + 1
+            if (rail_filter is not None and not rail) or (
+                species_filter is not None and not species
+            ):
+                unattributed_refusals[key] = unattributed_refusals.get(key, 0) + 1
+        yield payload
 
 
 def _hero_decimal(raw: object) -> Decimal | None:
@@ -678,7 +707,9 @@ def _metric_unit(numeric: Mapping[str, Any]) -> tuple[str, str]:
     return operation, raw_unit
 
 
-def _row_flags(row: Mapping[str, Any], flagged: bool) -> list[str]:
+def _row_flags(
+    row: Mapping[str, Any], *, d139_uncalibrated_kems: bool
+) -> list[str]:
     def canonical(value: object) -> str:
         return str(value).strip().casefold().replace("-", "_")
 
@@ -691,7 +722,7 @@ def _row_flags(row: Mapping[str, Any], flagged: bool) -> list[str]:
     }
     flags.update(canonical(flag) for flag in _flagged_payload_strata(row))
     flags.discard("")
-    if flagged and not flags:
+    if d139_uncalibrated_kems and not flags:
         flags.add("flagged")
     return sorted(flags)
 
@@ -773,11 +804,12 @@ def leaderboard(
         if not isinstance(payload, Mapping) or is_store_stamp_payload(payload):
             continue
         row = payload
+        if _is_refused_row(row):
+            refused_count += 1
+            continue
         row_rail = str(row.get("rail") or "")
         row_species = _row_formula(row)
-        row_engine = _engine_from_payload(row)
-        if row_engine == "unknown":
-            row_engine = _engine_name(row) or "unknown"
+        row_engine = _row_engine(row)
         if not row_rail or not row_species:
             continue
         if feedstock_id != "all" and not _matches_feedstock_species(
@@ -793,13 +825,7 @@ def leaderboard(
 
         numeric = _mapping(row.get("numeric"))
         operation, unit_label = _metric_unit(numeric)
-        status = str(row.get("status") or "").casefold()
-        refused = status == "refused"
-        if (
-            unit is not None
-            and unit_label.casefold() != unit.casefold()
-            and not refused
-        ):
+        if unit is not None and unit_label.casefold() != unit.casefold():
             continue
         temperature = _hero_metric_temperature(row)
         if envelope is not None:
@@ -809,8 +835,7 @@ def leaderboard(
                 continue
         if temperature_filter is not None:
             if temperature is None:
-                if not refused:
-                    continue
+                continue
             else:
                 if (
                     temperature_filter["min"] is not None
@@ -823,9 +848,6 @@ def leaderboard(
                 ):
                     continue
 
-        if refused:
-            refused_count += 1
-            continue
         residual = _number(numeric.get("value"))
         residual_decimal = _hero_decimal(numeric.get("value"))
         if residual is None or residual_decimal is None:
@@ -848,9 +870,8 @@ def leaderboard(
             source = observation_id.split("::", 1)[0]
         if not source:
             source = "unknown"
-        flagged = _hero_row_flagged(
-            row,
-            d139_uncalibrated_kems=_is_d139_uncalibrated_kems_row(row),
+        flags = _row_flags(
+            row, d139_uncalibrated_kems=_is_d139_uncalibrated_kems_row(row)
         )
         scored_rows.append(
             {
@@ -859,13 +880,13 @@ def leaderboard(
                 "engine": row_engine,
                 "unit": unit_label,
                 "residual": residual,
-                "flagged": flagged,
+                "flagged": bool(flags),
                 "observation_id": observation_id,
                 "source": str(source),
                 "T_K": None if temperature is None else float(temperature),
                 "observed": None if observed_decimal is None else float(observed_decimal),
                 "predicted": None if predicted_decimal is None else float(predicted_decimal),
-                "flags": _row_flags(row, flagged),
+                "flags": flags,
             }
         )
 
@@ -1024,7 +1045,12 @@ def _display(value: object) -> str:
     return str(value)
 
 
-def _markdown(result: Mapping[str, Any]) -> str:
+def _markdown(
+    result: Mapping[str, Any],
+    *,
+    refused_by_engine_rail: Mapping[tuple[str, str], int] | None = None,
+    unattributed_refusals: Mapping[tuple[str, str], int] | None = None,
+) -> str:
     filters = _mapping(result.get("filters"))
     rows = _sequence(result.get("rows"))
     total, limit, offset = result.get("total", 0), result.get("limit", 0), result.get("offset", 0)
@@ -1036,6 +1062,23 @@ def _markdown(result: Mapping[str, Any]) -> str:
         f"Feedstock: `{filters.get('feedstock')}`; engine: `{filters.get('engine') or 'all'}`; "
         f"level: `{filters.get('level')}`; order: `{filters.get('order')}`.",
     ]
+    if refused_by_engine_rail is not None:
+        refusal_counts = "; ".join(
+            f"{engine}/{rail}={count}"
+            for (engine, rail), count in sorted(refused_by_engine_rail.items())
+        )
+        lines.append(f"Refusals by engine/rail: {refusal_counts or 'none'}.")
+        if filters.get("rail") is not None or filters.get("species") is not None:
+            unattributed_counts = "; ".join(
+                f"{engine}/{rail}={count}"
+                for (engine, rail), count in sorted(
+                    (unattributed_refusals or {}).items()
+                )
+            )
+            lines.append(
+                "Unattributed to selected rail/species filters: "
+                f"{unattributed_counts or 'none'}."
+            )
     temperature = _mapping(filters.get("temperature_K"))
     if temperature:
         low, high = temperature.get("min"), temperature.get("max")
@@ -1218,8 +1261,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             if not isinstance(loaded_run, Mapping):
                 raise ValueError(f"{args.run}: run report must be an object")
             run = loaded_run
+        refused_by_engine_rail: dict[tuple[str, str], int] = defaultdict(int)
+        unattributed_refusals: dict[tuple[str, str], int] = defaultdict(int)
         result = leaderboard(
-            _iter_archive_rows(args.archive),
+            _with_refusal_attribution(
+                _iter_archive_rows(args.archive),
+                refused_by_engine_rail,
+                unattributed_refusals,
+                rail_filter=args.rail,
+                species_filter=args.species,
+            ),
             feedstock=args.feedstock,
             engine=args.engine,
             level=args.level,
@@ -1233,11 +1284,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             tmin_K=args.tmin_K,
             tmax_K=args.tmax_K,
         )
-        rendered = {
-            "md": _markdown,
-            "json": _json_text,
-            "csv": _csv_text,
-        }[args.format](result)
+        if args.format == "md":
+            rendered = _markdown(
+                result,
+                refused_by_engine_rail=refused_by_engine_rail,
+                unattributed_refusals=unattributed_refusals,
+            )
+        else:
+            rendered = {"json": _json_text, "csv": _csv_text}[args.format](result)
         if args.out is None:
             sys.stdout.write(rendered)
         else:
