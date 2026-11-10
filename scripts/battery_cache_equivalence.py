@@ -165,6 +165,24 @@ def main(argv: list[str] | None = None) -> int:
             )
             outputs[name] = rows
             counters[name] = counts
+            engine_rows = []
+            for engine in engines:
+                engine_counts = counts.get(engine.value)
+                if engine_counts is None:
+                    engine_rows.append(f"{engine.value}=missing")
+                    continue
+                calls_by_kind = engine_counts.get("calls_by_kind", {})
+                engine_rows.append(
+                    f"{engine.value}:hits={engine_counts.get('hits', 0)},"
+                    f"misses={engine_counts.get('misses', 0)},"
+                    f"stores={engine_counts.get('stores', 0)},"
+                    "calls_by_kind="
+                    f"{json.dumps(calls_by_kind, sort_keys=True, separators=(',', ':'))}"
+                )
+            print(
+                f"engine_cache_counters run={name} {' '.join(engine_rows)}",
+                flush=True,
+            )
 
     if not outputs["off"]:
         print("slice produced no canonical residual rows", file=sys.stderr)
@@ -220,6 +238,7 @@ def main(argv: list[str] | None = None) -> int:
         )
     ):
         expected = outputs["off"]
+        print("canonical residual rows differ from the off run", file=sys.stderr)
         for name in (
             "off-parallel",
             "cold",
@@ -242,6 +261,30 @@ def main(argv: list[str] | None = None) -> int:
                 )
         return 1
     if unexercised:
+        for engine in engines:
+            engine_id = engine.value
+            failed_conditions = []
+            if cold_calls_by_engine[engine_id] <= 0:
+                failed_conditions.append("cold_calls=0")
+            if any(
+                sum(counters[name][engine_id]["calls_by_kind"].values()) <= 0
+                for name in cold_names
+            ):
+                failed_conditions.append("a_cold_run_calls=0")
+            if warm_hits_by_engine[engine_id] <= 0:
+                failed_conditions.append("warm_hits=0")
+            if any(
+                counters[name][engine_id]["misses"]
+                or any(counters[name][engine_id]["calls_by_kind"].values())
+                for name in warm_names
+            ):
+                failed_conditions.append("warm_misses_or_calls>0")
+            if failed_conditions:
+                print(
+                    f"engine_cache_gate_failed engine={engine_id} "
+                    f"conditions={','.join(failed_conditions)}",
+                    file=sys.stderr,
+                )
         print(
             "slice did not exercise every requested engine through cold and warm "
             f"calls: {', '.join(unexercised)}",
@@ -255,7 +298,14 @@ def main(argv: list[str] | None = None) -> int:
         f"warm_hits={sum(row['hits'] for row in counters['warm'].values())} "
         f"parallel_workers={workers}"
     )
-    return 0 if warm_misses == 0 and warm_calls == 0 else 1
+    if warm_misses or warm_calls:
+        print(
+            "warm cache gate failed: "
+            f"warm_misses={warm_misses} warm_engine_calls={warm_calls}",
+            file=sys.stderr,
+        )
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
