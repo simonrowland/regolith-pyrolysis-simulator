@@ -3939,9 +3939,28 @@ class _MELTSBackendSupport(MeltBackend):
                 eq.vapor_pressures_source,
                 vapor_diagnostics,
             ) = self._builtin_vapor_projection_for_subprocess(eq)
+            # Evaporation reads vapor_pressure_zero_reason on the equilibrium
+            # diagnostic, not under subprocess_vapor_projection. Hoist only a
+            # notice the projection already typed (reason, authority, band).
+            vapor_fields: dict[str, object] = {
+                'subprocess_vapor_projection': vapor_diagnostics,
+            }
+            authority_notice = vapor_diagnostics.get(
+                'vapor_pressure_authority_notice'
+            )
+            zero_reason = vapor_diagnostics.get('vapor_pressure_zero_reason')
+            if (
+                isinstance(authority_notice, Mapping)
+                and isinstance(zero_reason, str)
+                and zero_reason
+            ):
+                vapor_fields['vapor_pressure_zero_reason'] = zero_reason
+                vapor_fields['vapor_pressure_authority_notice'] = dict(
+                    authority_notice
+                )
             eq.diagnostics = self._merge_diagnostics(
                 eq.diagnostics,
-                {'subprocess_vapor_projection': vapor_diagnostics},
+                vapor_fields,
             )
             return eq
 
@@ -5918,7 +5937,10 @@ class _MELTSBackendSupport(MeltBackend):
                 'missing solved liquid composition for positive liquid fraction',
             )
 
-        from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+        from engines.builtin.vapor_pressure import (
+            BUILTIN_VAPOR_BELOW_400K_ZERO_REASON,
+            BuiltinVaporPressureProvider,
+        )
         from simulator.chemistry.offgas_fo2 import (
             _oxygen_atom_partial_pressure_bar,
         )
@@ -5986,6 +6008,19 @@ class _MELTSBackendSupport(MeltBackend):
         pressures = dict(diagnostic.get('vapor_pressures_Pa') or {})
         sources = dict(diagnostic.get('vapor_pressures_source') or {})
         if not pressures:
+            # The builtin provider's own below-400 K short-circuit is a
+            # sourced empty map (reason + authority + band). Any other
+            # status=ok empty map is still an unsourced contract failure.
+            notice = diagnostic.get('vapor_pressure_authority_notice')
+            if (
+                diagnostic.get('vapor_pressure_zero_reason')
+                == BUILTIN_VAPOR_BELOW_400K_ZERO_REASON
+                and isinstance(notice, Mapping)
+                and notice.get('reason') == BUILTIN_VAPOR_BELOW_400K_ZERO_REASON
+                and notice.get('authority')
+                and isinstance(notice.get('band'), Mapping)
+            ):
+                return {}, {}, diagnostic
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
                 'provider returned status=ok with no vapor_pressures_Pa entries',

@@ -2475,6 +2475,130 @@ def test_builtin_subprocess_vapor_projection_refuses_silent_empty_or_unsourced(
     )
 
 
+# Captured on green 16c8dabfa, lunar_mare_low_ti C2A, alphamelts subprocess.
+# Stored hours 1-4 are 40/55/70/85 C. The 85 C call is a quadratic
+# convergence failure and does not project vapour. The next setpoint, 100 C,
+# returns this superliquidus-guess assemblage (melt fraction 0.999756) and
+# the builtin provider's below-400 K empty map. That empty map must be the
+# typed builtin outcome, not vapor_projection_empty.
+_HOUR4_ABORT_LIQUID_WT_PCT = {
+    'SiO2': 44.9571,
+    'TiO2': 1.51336,
+    'Al2O3': 13.6364,
+    'Fe2O3': 18.5245,
+    'Cr2O3': 0.353699,
+    'FeO': 2.10658e-11,
+    'MnO': 0.202128,
+    'MgO': 9.09428,
+    'CaO': 11.1132,
+    'Na2O': 0.40325,
+    'K2O': 0.101015,
+    'P2O5': 0.101015,
+}
+_HOUR4_ABORT_LIQUID_FRACTION = 0.9997563764893724
+_HOUR4_ABORT_TEMPERATURE_C = 100.0
+
+
+def _hour4_abort_equilibrium() -> EquilibriumResult:
+    return EquilibriumResult(
+        temperature_C=_HOUR4_ABORT_TEMPERATURE_C,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        requested_fO2_log=-9.0,
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 0.101866151},
+        liquid_fraction=_HOUR4_ABORT_LIQUID_FRACTION,
+        liquid_composition_wt_pct=dict(_HOUR4_ABORT_LIQUID_WT_PCT),
+        status='ok',
+    )
+
+
+def test_hour4_positive_liquid_below_400k_empty_vapor_map_is_typed():
+    """Kill mutation: raise_on_builtin_below_400k_empty_vapor_map."""
+    from engines.builtin.vapor_pressure import (
+        BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
+        BUILTIN_VAPOR_BELOW_400K_ZERO_REASON,
+    )
+
+    backend = AlphaMELTSBackend()
+    pressures, sources, diagnostic = (
+        backend._builtin_vapor_projection_for_subprocess(
+            _hour4_abort_equilibrium()
+        )
+    )
+
+    assert pressures == {}
+    assert sources == {}
+    # Evaporation accepts this token and no other empty-map reason.
+    assert BUILTIN_VAPOR_BELOW_400K_ZERO_REASON == (
+        'internal_analytical_below_400K'
+    )
+    assert diagnostic['vapor_pressure_zero_reason'] == (
+        'internal_analytical_below_400K'
+    )
+    notice = diagnostic['vapor_pressure_authority_notice']
+    assert notice['reason'] == 'internal_analytical_below_400K'
+    assert notice['authority'] == 'builtin-vapor-pressure'
+    assert notice['band']['temperature_K'] == [
+        0.0,
+        BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
+    ]
+    assert BUILTIN_VAPOR_BELOW_400K_LIMIT_K == 400.0
+
+
+def test_hour4_typed_vapor_outcome_is_visible_on_equilibrium_diagnostics(
+    monkeypatch,
+):
+    """Kill mutation: nest_below_400k_reason_where_evaporation_cannot_read_it."""
+    from engines.builtin.vapor_pressure import (
+        BUILTIN_VAPOR_BELOW_400K_ZERO_REASON,
+    )
+
+    backend = AlphaMELTSBackend()
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    backend._mode = 'subprocess'
+
+    def fake_run(*args, **kwargs):
+        if args and args[0] and str(args[0][-1]) == '--version':
+            return types.SimpleNamespace(
+                returncode=0, stdout='alphaMELTS fake\n', stderr=''
+            )
+        return types.SimpleNamespace(returncode=0, stdout='', stderr='')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
+    monkeypatch.setattr(
+        backend,
+        '_parse_single_point_stdout',
+        lambda *args, **kwargs: _hour4_abort_equilibrium(),
+    )
+
+    result = backend._equilibrate_subprocess(
+        _HOUR4_ABORT_TEMPERATURE_C,
+        dict(_HOUR4_ABORT_LIQUID_WT_PCT),
+        -9.0,
+        1.0,
+        total_input_kg=1.0,
+        run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+    )
+
+    assert result.status == 'ok'
+    assert result.vapor_pressures_Pa == {}
+    assert result.diagnostics['vapor_pressure_zero_reason'] == (
+        BUILTIN_VAPOR_BELOW_400K_ZERO_REASON
+    )
+    notice = result.diagnostics['vapor_pressure_authority_notice']
+    assert notice['reason'] == BUILTIN_VAPOR_BELOW_400K_ZERO_REASON
+    assert notice['authority'] == 'builtin-vapor-pressure'
+    assert 'temperature_K' in notice['band']
+    nested = result.diagnostics['subprocess_vapor_projection']
+    assert nested['vapor_pressure_zero_reason'] == (
+        BUILTIN_VAPOR_BELOW_400K_ZERO_REASON
+    )
+
+
 @pytest.mark.parametrize(
     'composition, provider_status, reason_fragment',
     [
