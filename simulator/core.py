@@ -8152,6 +8152,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'native Fe vapor partition received invalid Fe '
                 'pure_component_antoine coefficients'
             )
+        # d-383 pure-Fe saturation pressure. Premise: Fe(l) = Fe(g) with unit
+        # liquid activity, from NIST-JANAF 4th Fe-006 Fe(l) and Fe-008 Fe(g)
+        # (p° = 0.1 MPa). Algebra: log10(P/bar) = log Kf(g) - log Kf(l), and
+        # P/Pa = 10**(that) * 1e5. Unit check: 1 bar = 1e5 Pa. The sidecar
+        # stores the least-squares Antoine of that equilibrium over the
+        # certified liquid band 1809-3134 K (max |residual| 0.004690522701 dex
+        # versus 1/T interpolation of log Kf). Sanity: 7.97 Pa at 1873.15 K and
+        # 47.66 Pa at 2023.15 K are the linear-in-T audit readings; 1/T
+        # interpolation is 8.079 Pa and 48.112 Pa; P = 1 atm near 3134 K
+        # (JANAF fugacity = 1 bar at 3133.345 K). Outside the band, callers
+        # that already consult valid_range_K predict and flag. This partition
+        # evaluates the same coefficients.
         P_reference_Pa = _pow10_pressure_or_raise(
             _antoine_log10_pressure(A, B, C, T_K),
             species='Fe',

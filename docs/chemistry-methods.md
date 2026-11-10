@@ -88,11 +88,14 @@ CITED — traceable to a primary measurement on the basis the reference used.
 <!-- impl: §2.1 -> engines/builtin/vapor_pressure.py vapor_pressure_antoine_coefficients:2385 — Antoine row selection -->
 <!-- impl: §2.1 -> data/vapor_pressures.yaml families.metals_na_family.physical_properties.species.Na.pure_component_antoine:807 — pure Antoine data -->
 
-Iron is a documented exception. The WebBook carries no simple high-temperature elemental Antoine row
-for iron, so the iron pure-component pressure is a constant-enthalpy Clausius–Clapeyron form anchored at
-one atmosphere at its normal boiling point (3135 K). It is labelled UNCERTIFIED accordingly: defensible,
-but a derivation rather than a fitted primary.
-<!-- impl: §2.1 -> docs/chemistry-provenance.yaml Fe_pure_antoine:411 — Fe surrogate provenance -->
+Iron's pure-component saturation pressure is a least-squares Antoine fit to NIST-JANAF 4th edition
+Fe(l) and Fe(g) (tables Fe-006 and Fe-008, Chase 1998). The equilibrium is Fe(l) = Fe(g):
+log10(P/bar) = log Kf(Fe(g)) − log Kf(Fe(l)), and P/Pa = 10^(that) × 1e5. Over the certified liquid
+band 1809–3134 K the fit stays within 0.0047 dex of 1/T interpolation of those rows. Outside that band
+the existing valid-range path predicts and flags. The audit's linear-in-T readings are 7.97 Pa at
+1873.15 K and 47.66 Pa at 2023.15 K, and the pressure is 1 atm near 3134 K. The dormant VapoRock
+pseudo-Antoine remains inactive.
+<!-- impl: §2.1 -> docs/chemistry-provenance.yaml Fe_pure_antoine:411 — Fe JANAF liquid fit -->
 
 Iron still carries **pseudo-Antoine** provenance metadata whose coefficients were back-solved
 so that the activity-scaled Antoine product reproduces a VapoRock gas-speciation target on a fixed

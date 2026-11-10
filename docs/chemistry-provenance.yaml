@@ -409,28 +409,34 @@ values:
     status: active
 
   - id: Fe_pure_antoine
-    quantity: "Pure liquid iron vapor-pressure Clausius-Clapeyron approximation encoded as Antoine coefficients."
-    value: {A: 10.670336, B: 17759.430841, C: 0}
-    units: "log10(P_Pa) = A - B/T_K"
-    tier: UNCERTIFIED
+    quantity: "Pure liquid iron vapor-pressure Antoine coefficients fit to NIST-JANAF 4th Fe(l) and Fe(g)."
+    value: {A: 10.5800108010, B: 16600.8522745789, C: -157.2155777135}
+    units: "log10(P_Pa) = A - B/(T_K + C)"
+    tier: CITED
     basis: >-
-      Pure liquid Fe metal, Raoultian standard state; derived constant-DeltaH Clausius-Clapeyron form
-      anchored to the normal boiling point and DeltaH_vap near 340 kJ/mol, not a primary Antoine fit.
+      Pure liquid Fe metal, Raoultian standard state. Least-squares fit of log10(P/Pa) = A - B/(T+C)
+      to NIST-JANAF 4th Fe-006 Fe(l) and Fe-008 Fe(g): log10(P/bar) = log Kf(g) - log Kf(l),
+      P/Pa = 10**(log10(P/bar)) * 1e5. Certified liquid band 1809-3134 K. Node max |residual|
+      0.001805094984 dex on the 13 printed nodes from 1900 K through 3100 K; max |residual| versus
+      1/T interpolation of log Kf over 1809-3134 K is 0.004690522701 dex. d-383.
     range:
-      anchor_T_K: 3135.15
-      recipe_1773_2173K: engineering extrapolation of constant-DeltaH form
-      measured_vs_extrapolated: extrapolated
-    uncertainty: "Literature scatter in high-temperature Fe DeltaH_vap and boiling point; no single primary Antoine row recovered."
+      T_K: [1809, 3134]
+      fit_node_count: 13
+      max_abs_log10_residual_vs_source: 0.001805094984
+      max_abs_log10_residual_vs_invT_band: 0.004690522701
+      recipe_1773_2173K: interpolated
+      measured_vs_extrapolated: interpolated
+    uncertainty: "Maximum |residual| versus 1/T interpolation of JANAF log Kf on 1809-3134 K is 0.004690522701 dex."
     chosen:
-      ref: REF-012
-      locus: "NIST/CRC-style elemental boiling point and vaporization-enthalpy rows; local Clausius-Clapeyron derivation; no primary Antoine table/page recovered."
-      url: "https://webbook.nist.gov/chemistry/"
-      why: "Best documented basis for the current simple iron pure-component approximation, but not certification-grade."
+      ref: REF-020
+      locus: "NIST-JANAF/Chase 1998 Fe(l) Fe-006 and Fe(g) Fe-008; 13 shared nodes from 1900 through 3100 K."
+      url: "https://janaf.nist.gov/"
+      why: "The liquid iron saturation pressure is the JANAF vaporization equilibrium, not a constant-enthalpy line through the boiling point."
     alternatives:
-      - ref: "Hultgren or Desai high-temperature evaluations"
-        lacks: "more complex equations and variant anchors; not the simple runtime CC Antoine form"
+      - ref: "CRC/NIST boiling point and constant DeltaH_vap near 340 kJ/mol"
+        lacks: "that Clausius-Clapeyron anchor is 0.28 dex high at 1873.15 K and 0.21 dex high at 2023.15 K versus JANAF"
     code_sites:
-      - "data/vapor_pressures.yaml:208 (metals.Fe.pure_component_antoine)"
+      - "data/vapor_pressures.yaml (metals.Fe.pure_component_antoine)"
     status: active
 
   - id: pseudo_antoine_Na_backsolve

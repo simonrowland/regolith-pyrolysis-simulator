@@ -1515,19 +1515,32 @@ families:
                 remaining oxides renormalized to 100 wt%
               fit_objective: bounded minimax absolute log10 residual; |C| <= 1000 K
           pure_component_antoine:
-            source: REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron
-              anchored at 1 atm
+            source: REF-020 NIST-JANAF 4th Fe(l) Fe-006 and Fe(g) Fe-008, Chase 1998
             provenance_class: derived_from_evaluation
-            construction_support_range_K:
-            - 1809.0
-            - 3134.0
-            construction: Clausius-Clapeyron from CRC/NIST Tb + dH_vap; construction support band declared
-              for metadata honesty (audit 2026-07-20). Not a VapoRock fit. Runtime selects this pure-component
-              sidecar; the residual pseudo Antoine block is dormant/inactive and must not be retuned (t-373
-              tail).
-            A: 10.670336
-            B: 17759.430841
-            C: 0
+            derivation: >-
+              Premise: vaporization equilibrium Fe(l) = Fe(g) with unit liquid activity.
+              Algebra: log10(P/bar) = log10 Kf(Fe-008) - log10 Kf(Fe-006);
+              P/Pa = 10**(log10(P/bar)) * 1e5. Unit check: JANAF p° = 0.1 MPa = 1 bar
+              = 1e5 Pa, not 1 atm. Least-squares fit of log10(P/Pa) = A - B/(T+C) on the
+              13 shared printed nodes from 1900 K through 3100 K. Node max |residual|
+              0.001805094984 dex. Versus 1/T interpolation of log Kf over the certified
+              liquid band 1809-3134 K, max |residual| 0.004690522701 dex at 1809 K.
+              Sanity: the linear-in-T audit readings are 7.97 Pa at 1873.15 K and 47.66 Pa
+              at 2023.15 K; 1/T interpolation of the same rows is 8.079 Pa and 48.112 Pa;
+              this fit is 8.044 Pa and 48.218 Pa. JANAF marks fugacity = 1 bar at 3133.345 K;
+              this fit is within 0.08% of 1 atm at 3135.15 K. Fe-007 is the stable
+              crystal/liquid table and is not the liquid branch used here. Outside
+              1809-3134 K the existing valid_range_K path predicts and flags. The dormant
+              pseudo Antoine block must not be retuned (t-373 tail).
+            valid_range_K:
+            - 1809
+            - 3134
+            fit_node_count: 13
+            max_abs_log10_residual_vs_source: 0.001805094984
+            max_abs_log10_residual_vs_invT_band: 0.004690522701
+            A: 10.5800108010
+            B: 16600.8522745789
+            C: -157.2155777135
           boiling_point_C: 2862
           notes: 'Prior 0.023 dex basalt-grid residual did not re-confirm against the
 
