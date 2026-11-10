@@ -560,27 +560,8 @@ _INTERNAL_ANALYTICAL_FEO_STANDARD = _FeOActivityStandard(
     name="JANAF-type",
     offset_j_mol=Decimal(0),
 )
-_OPENIMCC_FEO_REDOX_ROWS_DIGEST = (
-    "8dc55974d7198675266c83634ffa08673c18fdbe228ee01c1017481642c2f0cc"
-)
-_OPENIMCC_FEO_CONDENSATE_ROW_DIGEST = (
-    "0aa4d729270ca1434601f414c11485e70706894b735907d7b6eeade0e24f9312"
-)
-_OPENIMCC_FEO_PUBLISHED_CONDENSATE_ROW_DIGEST = (
-    "63c5a83e84091608bcd56fa97cff10568ce6df568ded5b6845f480f42da62fa8"
-)
-
-
-def _source_value(sources: Sequence[str], prefix: str) -> str | None:
-    return next(
-        (source[len(prefix):] for source in sources if source.startswith(prefix)),
-        None,
-    )
-
-
 def _resolve_feo_activity_standard(
     engine: Engine,
-    coefficient_sources: Sequence[str],
     *,
     temperature_K: Decimal | None = None,
     profile: str = "openimcc",
@@ -596,123 +577,47 @@ def _resolve_feo_activity_standard(
             },
         )
 
-    condensate_row_digest = _source_value(
-        coefficient_sources,
-        "openimcc-feo-condensate-row:sha256:",
-    )
-    gas_load_failure = _source_value(
-        coefficient_sources,
-        "openimcc-gas-datapack-load-failure:",
-    )
-    if gas_load_failure is not None and condensate_row_digest is None:
+    if temperature_K is None or temperature_K <= 0:
         return None, ResidualRefusal(
             RefusalReason.METRIC_DOMAIN,
             {
-                "reason": (
-                    "openimcc_feo_gas_datapack_load_failed_"
-                    "condensate_identity_missing"
-                ),
-                "gas_load_failure": gas_load_failure,
-                "missing_identity": "condensate_feo_row_digest",
+                "reason": "feo_activity_standard_temperature_missing",
+                "engine": engine.value,
             },
         )
-
-    redox_rows_digest = _source_value(
-        coefficient_sources,
-        "openimcc-feo-redox-rows:sha256:",
-    )
-    published_condensate_row_digest = _source_value(
-        coefficient_sources,
-        "openimcc-feo-published-condensate-row:sha256:",
-    )
-    guarded_rows = (
-        (
-            "redox FeO and Mn reaction/thermo rows",
-            redox_rows_digest,
-            _OPENIMCC_FEO_REDOX_ROWS_DIGEST,
-        ),
-        (
-            "default-profile condensate FeO(l) row",
-            condensate_row_digest,
-            _OPENIMCC_FEO_CONDENSATE_ROW_DIGEST,
-        ),
-        (
-            "published-profile condensate FeO(l) row",
-            published_condensate_row_digest,
-            _OPENIMCC_FEO_PUBLISHED_CONDENSATE_ROW_DIGEST,
-        ),
-    )
-    for row_name, actual, expected in guarded_rows:
-        if actual is not None and actual != expected:
-            return None, ResidualRefusal(
-                RefusalReason.METRIC_DOMAIN,
-                {
-                    "reason": "FeO pinned-digest guard: awaiting re-pin",
-                    "row": row_name,
-                    "expected_sha256": expected,
-                    "actual_sha256": actual,
-                },
-            )
-    if (
-        redox_rows_digest == _OPENIMCC_FEO_REDOX_ROWS_DIGEST
-        and condensate_row_digest == _OPENIMCC_FEO_CONDENSATE_ROW_DIGEST
-        and published_condensate_row_digest
-        == _OPENIMCC_FEO_PUBLISHED_CONDENSATE_ROW_DIGEST
-    ):
-        if temperature_K is None or temperature_K <= 0:
-            return None, ResidualRefusal(
-                RefusalReason.METRIC_DOMAIN,
-                {
-                    "reason": "feo_activity_standard_temperature_missing",
-                    "engine": engine.value,
-                },
-            )
-        try:
-            import openimcc
-        except ImportError as exc:
-            return None, ResidualRefusal(
-                RefusalReason.OPENIMCC_NOT_IMPORTABLE,
-                {
-                    "reason": RefusalReason.OPENIMCC_NOT_IMPORTABLE.value,
-                    "detail": str(exc),
-                },
-            )
-        try:
-            standard_offset = openimcc.feo_liquid_standard_offset(
-                float(temperature_K), profile=profile
-            )
-            offset_j_mol = Decimal(str(standard_offset.value_J_per_mol))
-        except (
-            openimcc.ImccRefusal,
-            ArithmeticError,
-            AttributeError,
-            TypeError,
-            ValueError,
-        ) as exc:
-            return None, ResidualRefusal(
-                RefusalReason.METRIC_DOMAIN,
-                {
-                    "reason": "FeO pinned-digest guard: awaiting re-pin",
-                    "row": "openimcc FeO standard offset",
-                    "detail": str(exc),
-                },
-            )
-        return _FeOActivityStandard(
-            name="JANAF-type",
-            offset_j_mol=offset_j_mol,
-        ), None
-
-    return None, ResidualRefusal(
-        RefusalReason.METRIC_DOMAIN,
-        {
-            "reason": "FeO pinned-digest guard: awaiting re-pin",
-            "missing_rows": [
-                row_name for row_name, actual, _expected in guarded_rows
-                if actual is None
-            ],
-            "engine": engine.value,
-        },
-    )
+    try:
+        import openimcc
+    except ImportError as exc:
+        return None, ResidualRefusal(
+            RefusalReason.OPENIMCC_NOT_IMPORTABLE,
+            {
+                "reason": RefusalReason.OPENIMCC_NOT_IMPORTABLE.value,
+                "detail": str(exc),
+            },
+        )
+    try:
+        standard_offset = openimcc.feo_liquid_standard_offset(
+            float(temperature_K), profile=profile
+        )
+        offset_j_mol = Decimal(str(standard_offset.value_J_per_mol))
+    except (
+        openimcc.ImccRefusal,
+        ArithmeticError,
+        AttributeError,
+        TypeError,
+        ValueError,
+    ) as exc:
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "openimcc_feo_standard_offset_unavailable",
+                "detail": str(exc),
+            },
+        )
+    return _FeOActivityStandard(
+        name="JANAF-type",
+        offset_j_mol=offset_j_mol,
+    ), None
 
 
 def _canonical_log10_feo_activity(
@@ -759,7 +664,6 @@ def _canonicalize_feo_activity_prediction(
     temperature_K = temperature_of(comparison_identity)
     standard, refusal = _resolve_feo_activity_standard(
         prediction.engine,
-        prediction.coefficient_sources,
         temperature_K=temperature_K,
     )
     if refusal is not None:

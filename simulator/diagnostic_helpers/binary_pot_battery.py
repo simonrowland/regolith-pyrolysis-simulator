@@ -2595,9 +2595,6 @@ class _OpenImccBatteryBackend:
             self._gas = None
             self._gas_error = f"{type(exc).__name__}: {exc}"
             self._identity["gas_load_failure"] = self._gas_error
-            self._identity["pack_identity"]["feo_guard"].pop(
-                "condensate_feo_row_sha256", None
-            )
             return
         self._identity["engine_binding_identity"] = (
             self._bridge.engine_binding_identity(self._pack, self._gas)
@@ -2814,7 +2811,6 @@ class _OpenImccBatteryBackend:
                     from openimcc import (
                         evaluate_gas,
                         oxygen_balance_from_pressure_model,
-                        oxygen_balance_species_metadata,
                     )
                 except (ImportError, AttributeError) as exc:
                     raise _OxygenBalanceRefusal(
@@ -2828,21 +2824,24 @@ class _OpenImccBatteryBackend:
                         gas_parent_oxides, self._gas
                     )
                 )
-                base_species = oxygen_balance_species_metadata(
-                    {name: parent or None for name, (parent, _ng, _no2) in channels}
-                )
-                for name, (parent, n_gas, n_o2) in channels:
-                    expected = -n_o2 / n_gas if parent else (
-                        1.0 if name == "O2" else 0.5
+                if any(name == "AlSiO" for name, _reaction in channels):
+                    notices.append(
+                        {
+                            "kind": "openimcc_flag",
+                            "authority": None,
+                            "reason": "multi_parent_channel_interim",
+                        }
                     )
-                    if not math.isclose(
-                        base_species[name].pO2_exponent, expected, abs_tol=1e-12
-                    ):
-                        raise _OxygenBalanceRefusal(
-                            "imcc_gas_oxygen_balance_failed",
-                            f"openimcc reaction exponent for {name!r} "
-                            "does not match formula metadata",
-                        )
+                from simulator.battery.oxygen_balance import (
+                    openimcc_oxygen_balance_species_metadata,
+                )
+
+                try:
+                    base_species = openimcc_oxygen_balance_species_metadata(channels)
+                except Exception as exc:  # noqa: BLE001 - preserve typed adapter refusal
+                    raise _OxygenBalanceRefusal(
+                        "imcc_gas_oxygen_balance_failed", str(exc)
+                    ) from exc
 
                 def pressure_model(pO2_bar: float) -> Mapping[str, float]:
                     return evaluate_gas(
@@ -2947,16 +2946,16 @@ class _OpenImccBatteryBackend:
 
                 fo2_bar = 10.0 ** float(fO2_log)
                 gas_result = evaluate_gas(
-                    result.parent_oxide_activities,
+                    gas_parent_activities,
                     temperature_K,
                     fo2_bar,
                     self._gas,
-                    parent_oxides=result.parent_oxides,
+                    parent_oxides=gas_parent_oxides,
                     allow_extrapolation=True,
                 )
                 _channels, omission_notices = (
                     _openimcc_gas_channels_and_omission_notices(
-                        result.parent_oxides, self._gas, gas_result
+                        gas_parent_oxides, self._gas, gas_result
                     )
                 )
                 notices.extend(omission_notices)

@@ -19,9 +19,11 @@ from simulator.accounting.formulas import parse_formula
 from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
 from simulator.battery.oxygen_balance import (
     OxygenBalanceBracketBoundary,
+    _OPENIMCC_ALSIO_REACTION,
     _VacuumOxygenChannel,
     _net_evaporation_pressure_Pa,
     _solve_vacuum_oxygen_balance,
+    openimcc_oxygen_balance_species_metadata,
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -521,18 +523,23 @@ def _channel_terms(
                         "residue_stoichiometry_invalid",
                         "interim AlSiO channel requires formula AlSiO and primary parent Al2O3",
                     )
-                # Premise: OpenIMCC's AlSiO(g) is the two-parent channel
-                # 1/2 Al2O3 + SiO2 -> AlSiO(g) + 5/4 O2. Atom balance is
-                # Al 1=1; Si 1=1; O 3/2 + 2 = 1 + 5/2. Parent amounts are
-                # mol per mol product; the mass terms below are kg/mol.
-                # Sanity: parent mass equals product plus 5/4 mol O2, checked
-                # by the shared mass identity below.
+                # Parent debits come from the oxygen-balance owner; the shared
+                # mass identity below checks its atom balance.
+                parent_coefficients = dict(
+                    _OPENIMCC_ALSIO_REACTION.parent_oxide_moles_per_product
+                )
+                parent_moles_per_product = parent_coefficients[channel.parent_oxide]
+                al_sio_sio2_moles_per_product = parent_coefficients["SiO2"]
                 silica_atoms, silica_molar_mass = _formula_terms("SiO2")
-                parent_moles_per_product = 0.5
-                al_sio_sio2_moles_per_product = 1.0
-                parent_oxygen_demand = (
-                    parent_moles_per_product * parent_atoms.get("O", 0.0)
-                    + al_sio_sio2_moles_per_product * silica_atoms.get("O", 0.0)
+                parent_oxygen_demand = math.fsum(
+                    coefficient * oxygen_count
+                    for coefficient, oxygen_count in (
+                        (parent_moles_per_product, parent_atoms.get("O", 0.0)),
+                        (
+                            al_sio_sio2_moles_per_product,
+                            silica_atoms.get("O", 0.0),
+                        ),
+                    )
                 )
                 oxide_per_product_kg = (
                     parent_moles_per_product * parent_molar_mass
@@ -567,6 +574,16 @@ def _channel_terms(
                 parent_oxygen_demand = parent_moles_per_product * parent_atoms.get("O", 0.0)
                 oxide_per_product_kg = parent_moles_per_product * parent_molar_mass / molar_mass
             oxygen_difference = parent_oxygen_demand - atom_counts.get("O", 0.0)
+            if channel.species == "AlSiO" and not math.isclose(
+                oxygen_difference / 2.0,
+                _OPENIMCC_ALSIO_REACTION.oxygen_molecules_per_product,
+                rel_tol=1e-12,
+                abs_tol=1e-12,
+            ):
+                raise ResidueInventoryRefusal(
+                    "residue_stoichiometry_invalid",
+                    "interim AlSiO channel does not match its oxygen balance",
+                )
             _oxygen_atoms, oxygen_molar_mass = _formula_terms("O2")
             o2_per_product_kg = (
                 oxygen_difference * 0.5 * oxygen_molar_mass / molar_mass
@@ -1414,21 +1431,21 @@ def _make_residue_pressure_model(
     floor_inversion_diagnostics: dict[str, dict[str, object]] | None = None,
 ) -> Callable[[Mapping[str, float], float], Mapping[str, float]]:
     """Build the engine pressure closure shared by the residue cohorts."""
-    # AlSiO's 0.5 tuple coefficient is the Al2O3 debit, while its O2
-    # coefficient 1.25 is per one AlSiO product; SiO2 is the second parent.
-    # Its pO2 exponent is therefore -1.25 per product, not -1.25 / 0.5.
-    pressure_exponents = {
-        str(species): (
-            1.0
-            if str(species) == "O2"
-            else (
-                -float(reaction[2])
-                if str(species) == "AlSiO"
+    if engine == "openimcc":
+        species_metadata = openimcc_oxygen_balance_species_metadata(gas_channels)
+        pressure_exponents = {
+            species: metadata.pO2_exponent
+            for species, metadata in species_metadata.items()
+        }
+    else:
+        pressure_exponents = {
+            str(species): (
+                1.0
+                if str(species) == "O2"
                 else -float(reaction[2]) / float(reaction[1])
             )
-        )
-        for species, reaction in gas_channels
-    }
+            for species, reaction in gas_channels
+        }
     if engine == "openimcc":
         from openimcc import evaluate_gas
         from openimcc.kernel import ImccNonconvergenceError

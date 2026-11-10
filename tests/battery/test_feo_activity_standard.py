@@ -115,7 +115,7 @@ def test_internal_analytical_zero_offset_preserves_residual_bytes(
     assert callable(resolver)
     assert callable(converter)
 
-    standard, refusal = resolver(engine, prediction.coefficient_sources)
+    standard, refusal = resolver(engine)
     assert refusal is None
     assert standard is not None
     assert standard.name == "JANAF-type"
@@ -154,7 +154,6 @@ def test_openimcc_feo_standard_conversion_uses_the_profile_resolver() -> None:
 
     standard, refusal = resolver(
         Engine.OPENIMCC,
-        prediction.coefficient_sources,
         temperature_K=temperature_K,
     )
     assert refusal is None
@@ -197,7 +196,6 @@ def test_openimcc_feo_resolver_does_not_require_gas_binding_metadata(
 ) -> None:
     import openimcc
 
-    from simulator.battery.source_lineage import openimcc_pack_identity_sources
     from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
 
     def fail_gas_load():
@@ -210,7 +208,6 @@ def test_openimcc_feo_resolver_does_not_require_gas_binding_metadata(
 
     standard, refusal = score_module._resolve_feo_activity_standard(
         Engine.OPENIMCC,
-        openimcc_pack_identity_sources(handle.identity["pack_identity"]),
         temperature_K=Decimal("1700"),
     )
 
@@ -225,7 +222,6 @@ def test_openimcc_nondefault_profile_uses_its_profile_resolver() -> None:
     temperature_K = Decimal("1700")
     standard, refusal = score_module._resolve_feo_activity_standard(
         Engine.OPENIMCC,
-        _openimcc_sources(),
         temperature_K=temperature_K,
         profile="published",
     )
@@ -359,7 +355,7 @@ def test_compile_residual_applies_nonzero_standard_conversion_exactly_once(
     monkeypatch.setattr(
         score_module,
         "_resolve_feo_activity_standard",
-        lambda _engine, _sources, **_kwargs: (
+        lambda _engine, **_kwargs: (
             score_module._FeOActivityStandard(
                 name="hand-value test",
                 offset_j_mol=Decimal("9701.7"),

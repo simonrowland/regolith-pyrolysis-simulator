@@ -110,6 +110,104 @@ class _VacuumOxygenChannel:
 
 
 @dataclass(frozen=True)
+class _OpenImccOxygenBalanceSpecies:
+    molar_mass: float
+    oxygen_atoms: float
+    parent_oxygen_demand: float
+    pO2_exponent: float
+
+
+@dataclass(frozen=True)
+class _OpenImccGasReaction:
+    parent_oxide_moles_per_product: tuple[tuple[str, float], ...]
+    gas_moles_per_product: float
+    oxygen_molecules_per_product: float
+
+
+_OPENIMCC_ALSIO_REACTION = _OpenImccGasReaction(
+    parent_oxide_moles_per_product=(("Al2O3", 0.5), ("SiO2", 1.0)),
+    gas_moles_per_product=1.0,
+    oxygen_molecules_per_product=1.25,
+)
+
+
+def openimcc_oxygen_balance_species_metadata(
+    channels: Sequence[tuple[str, Sequence[object]]],
+) -> dict[str, _OpenImccOxygenBalanceSpecies]:
+    """Convert OpenIMCC gas-channel tuples to pressure and oxygen metadata."""
+
+    from openimcc import oxygen_balance_species_metadata as package_metadata
+
+    species_parents: dict[str, str | None] = {}
+    reactions: dict[str, tuple[str | None, float, float]] = {}
+    for species, reaction in channels:
+        if len(reaction) != 3:
+            raise ValueError(f"invalid OpenIMCC gas reaction for {species!r}")
+        parent, parent_moles, oxygen_molecules = reaction
+        name = str(species)
+        parent_formula = str(parent) if parent else None
+        species_parents[name] = parent_formula
+        reactions[name] = (
+            parent_formula,
+            float(parent_moles),
+            float(oxygen_molecules),
+        )
+
+    package_species = package_metadata(species_parents)
+    metadata: dict[str, _OpenImccOxygenBalanceSpecies] = {}
+    for species, source in package_species.items():
+        molar_mass = float(source.molar_mass)
+        oxygen_atoms = float(source.oxygen_atoms)
+        parent_oxygen_demand = float(source.parent_oxygen_demand)
+        pO2_exponent = float(source.pO2_exponent)
+        parent, parent_moles, oxygen_molecules = reactions[species]
+        if species == "AlSiO":
+            reaction = _OPENIMCC_ALSIO_REACTION
+            expected_primary_parent, expected_parent_moles = (
+                reaction.parent_oxide_moles_per_product[0]
+            )
+            if (
+                parent != expected_primary_parent
+                or not math.isclose(parent_moles, expected_parent_moles, abs_tol=1e-12)
+                or not math.isclose(
+                    oxygen_molecules,
+                    reaction.oxygen_molecules_per_product,
+                    abs_tol=1e-12,
+                )
+            ):
+                raise ValueError("OpenIMCC AlSiO channel differs from the accepted reaction")
+            # Premise: 1/2 Al2O3(l) + SiO2(l) -> AlSiO(g) + 5/4 O2(g).
+            # At fixed parent activities, K = (p_AlSiO/bar)*(pO2/bar)^1.25 /
+            # (a_Al2O3^0.5*a_SiO2), so p_AlSiO scales as pO2^-1.25 per mol gas.
+            # The pressure ratios are dimensionless; SiO2(l) -> SiO(g) +
+            # 1/2 O2(g) independently gives the single-parent exponent -1/2.
+            parent_oxygen_demand = (
+                oxygen_atoms
+                + 2.0
+                * reaction.oxygen_molecules_per_product
+                / reaction.gas_moles_per_product
+            )
+            pO2_exponent = (
+                -reaction.oxygen_molecules_per_product
+                / reaction.gas_moles_per_product
+            )
+        elif parent is not None:
+            expected_exponent = -oxygen_molecules / parent_moles
+            if not math.isclose(pO2_exponent, expected_exponent, abs_tol=1e-12):
+                raise ValueError(
+                    f"OpenIMCC reaction exponent for {species!r} "
+                    "does not match formula metadata"
+                )
+        metadata[species] = _OpenImccOxygenBalanceSpecies(
+            molar_mass=molar_mass,
+            oxygen_atoms=oxygen_atoms,
+            parent_oxygen_demand=parent_oxygen_demand,
+            pO2_exponent=pO2_exponent,
+        )
+    return metadata
+
+
+@dataclass(frozen=True)
 class _VacuumOxygenBalance:
     pO2_bar: float
     bracket_boundary: OxygenBalanceBracketBoundary | None
