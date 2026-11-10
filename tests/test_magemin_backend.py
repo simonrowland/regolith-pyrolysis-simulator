@@ -1633,8 +1633,9 @@ def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
 def test_magemin_hour156_mode_sum_is_renormalised_to_one(monkeypatch):
     """Hour 156 prints 1.00003 + 0.00008 with a ~1e-5 Mass residual.
 
-    Green refuses the 1.00003 token. The residual does not shrink the
-    1e-3 cap, so the row is renormalised and the residual is recorded.
+    Green refuses the 1.00003 token. Clamping it to 1 leaves a sum of
+    1.00008, inside the same abs 1e-4 the vector check uses, so the row
+    is renormalised. The residual is recorded and does not decide that.
     """
     monkeypatch.setattr(
         'simulator.melt_backend.magemin.subprocess.run',
@@ -1710,33 +1711,29 @@ def test_magemin_mode_deficit_outside_green_closure_stays_refusal():
         )
 
 
-def test_magemin_lone_mode_token_1_0002_is_renormalised_to_one():
+def test_magemin_lone_mode_token_1_0002_is_refused():
     """A lone liq token of 1.0002 is an excess of 2e-4.
 
-    The 2026-11-10 ruling supersedes the original "1.0002 still refused"
-    sentence: an excess up to 1e-3 is renormalised. Pairing this token
-    with 0.8 refuses on the vector sum and does not cover this row.
+    That is outside the abs 1e-4 per-token bound. A sum-only check, and
+    a 1e-3 renormalisation cap, both accept this row. The ticket refuses
+    it. The Mass residual does not widen the bound.
     """
-    metadata: dict = {}
-    parsed = MAGEMinBackend._parse_subprocess_stdout(
-        f'{_VERB0_MASS_RESIDUAL_1E5}'
-        'Phase: liq\nMode: 1.0002\n',
-        metadata=metadata,
-    )
+    from simulator.melt_backend.magemin import _MAGEMinEngineCallError
 
-    assert parsed == {'liq': {'mass_kg': 1.0}}
-    notice = metadata['mode_token_notices'][0]
-    assert notice['kind'] == 'mode_vector_renormalised'
-    assert notice['raw_tokens'] == [
-        {'phase': 'liq', 'raw_token': '1.0002'},
-    ]
-    assert notice['raw_sum'] == pytest.approx(1.0002)
-    assert notice['mass_residual'] == pytest.approx(1.2e-5)
+    with pytest.raises(
+        _MAGEMinEngineCallError, match='Mode token'
+    ) as raised:
+        MAGEMinBackend._parse_subprocess_stdout(
+            f'{_VERB0_MASS_RESIDUAL_1E5}'
+            'Phase: liq\nMode: 1.0002\n',
+        )
+    assert raised.value.exception_type == 'MAGEMinOutputError'
+    assert '1.0002' in str(raised.value)
 
 
 @pytest.mark.parametrize(
     'mode_line',
-    ['0.8 0.8', '0.8 1.0002', '0.5 0.5011'],
+    ['0.8 0.8', '0.5 0.5011', '0.50000 0.50011', '1.00003 0.00011'],
 )
 def test_magemin_subprocess_parser_rejects_nonunit_mode_vector(mode_line):
     from simulator.melt_backend.magemin import _MAGEMinEngineCallError
@@ -1754,7 +1751,7 @@ def test_magemin_mode_deficit_outside_bound_stays_typed_refusal():
     """A deficit of 1.2e-3 stays the typed mass-deficit refusal.
 
     0.50000 + 0.49880 = 0.99880. A residual above that deficit does not
-    widen the 1e-3 cap.
+    turn it into a renormalised success.
     """
     with pytest.raises(RuntimeError, match='Mode vector must sum to 1.0'):
         MAGEMinBackend._parse_subprocess_stdout(
@@ -1782,100 +1779,86 @@ def test_magemin_mode_sum_excess_of_1_2e_3_is_refused():
     assert raised.value.exception_type == 'MAGEMinOutputError'
 
 
-# Every closure class the mode parser can return. The oracle is the
-# b-978 rule: green 1e-4 rows stay raw, a printed excess up to 1e-3 is
-# renormalised, and every other finite vector is a typed refusal. The
-# Mass residual is an axis, not an input to that class.
+# Expected class is a literal, not a second copy of the parser. Bands:
+# raw = tokens in [0, 1] and the float sum within abs 1e-4 of 1;
+# renormalised = a token in (1, 1+1e-4] whose clamp leaves the sum inside
+# that same 1e-4 (lone 1.00003, hour 156); invalid_token = a token outside
+# [0, 1+1e-4], including 1.0002; mass_deficit / sum_excess = the other side
+# of 1e-4. A sum of 1.00011 with both tokens in [0, 1] is sum_excess.
+# Hour 156 is renormalised only because its 1.00003 token clamps.
+# The Mass residual is an axis and does not change the class.
 _MODE_CLOSURE_CASES = (
-    ('liq', '1'),
-    ('liq', '0'),
-    ('liq', '1.0000'),
-    ('liq', '1.00003'),
-    ('liq', '1.0001'),
-    ('liq', '1.0002'),
-    ('liq', '1.001'),
-    ('liq', '1.0010001'),
-    ('liq', '1.0011'),
-    ('liq', '1.2'),
-    ('liq', '-0.1'),
-    ('liq', 'nan'),
-    ('liq', 'inf'),
-    ('liq', 'bad'),
-    ('liq ol', '0.50000 0.50000'),
-    ('liq ol', '0.50000 0.49995'),
-    ('liq ol', '0.50000 0.49990'),
-    ('liq ol', '0.50000 0.49950'),
-    ('liq ol', '0.50000 0.49880'),
-    ('liq ol', '0.50000 0.50005'),
-    ('liq ol', '0.50000 0.50010'),
-    ('liq ol', '0.50000 0.50050'),
-    ('liq ol', '0.50000 0.50100'),
-    ('liq ol', '0.50000 0.50120'),
-    ('liq ol', '1.00003 0.00008'),
-    ('liq ol', '1.00003 0.00005'),
-    ('liq ol', '1.00003 0'),
-    ('liq ol', '0.8 0.8'),
-    ('liq ol', '0.8 1.0002'),
-    ('liq ol', '0.5 0.5011'),
-    ('liq ol', '0.0 1'),
-    ('liq ol', '0.0 1.00003'),
-    ('spl liq qfm', '0.00175 0.97265 0.02558'),
-    ('liq qfm', '0.50000 0.50000'),
-    ('liq qfm', '1.00003 0.00008'),
-    ('ol liq spl', '0.25000 0.50000 0.25000'),
-    ('ol liq spl', '0.25000 0.50020 0.25000'),
+    ('liq', '1', 'raw'),
+    ('liq', '0', 'mass_deficit'),
+    ('liq', '1.0000', 'raw'),
+    ('liq', '1.00003', 'renormalised'),
+    ('liq', '1.00003e0', 'renormalised'),
+    ('liq', '1.00009', 'renormalised'),
+    ('liq', '1.0001', 'renormalised'),
+    ('liq', '1.00010', 'renormalised'),
+    ('liq', '1.00011', 'invalid_token'),
+    ('liq', '1.0002', 'invalid_token'),
+    ('liq', '1.0002e0', 'invalid_token'),
+    ('liq', '1.001', 'invalid_token'),
+    ('liq', '1.0010001', 'invalid_token'),
+    ('liq', '1.0011', 'invalid_token'),
+    ('liq', '1.2', 'invalid_token'),
+    ('liq', '-0.1', 'invalid_token'),
+    ('liq', 'nan', 'invalid_token'),
+    ('liq', 'inf', 'invalid_token'),
+    ('liq', 'bad', 'invalid_token'),
+    ('liq ol', '0.50000 0.50000', 'raw'),
+    ('liq ol', '0.50000 0.49995', 'raw'),
+    ('liq ol', '0.50000 0.49990', 'raw'),
+    ('liq ol', '0.50000 0.49989', 'mass_deficit'),
+    ('liq ol', '0.50000 0.49950', 'mass_deficit'),
+    ('liq ol', '0.50000 0.49880', 'mass_deficit'),
+    ('liq ol', '0.50000 0.50005', 'raw'),
+    ('liq ol', '0.50000 0.50010', 'raw'),
+    ('liq ol', '0.50000 0.50011', 'sum_excess'),
+    ('liq ol', '0.50000 0.50050', 'sum_excess'),
+    ('liq ol', '0.50000 0.50100', 'sum_excess'),
+    ('liq ol', '0.50000 0.50120', 'sum_excess'),
+    ('liq ol', '1.00003 0.00008', 'renormalised'),
+    ('liq ol', '1.00003 0.00005', 'renormalised'),
+    ('liq ol', '1.00003 0', 'renormalised'),
+    ('liq ol', '1.00003 0.00010', 'renormalised'),
+    ('liq ol', '1.00003 0.00011', 'sum_excess'),
+    ('liq ol', '1.0001 0.0001', 'renormalised'),
+    ('liq ol', '1.00011 0.00008', 'invalid_token'),
+    ('liq ol', '0.8 0.8', 'sum_excess'),
+    ('liq ol', '0.8 1.0002', 'invalid_token'),
+    ('liq ol', '0.5 0.5011', 'sum_excess'),
+    ('liq ol', '0.0 1', 'raw'),
+    ('liq ol', '0.0 1.00003', 'renormalised'),
+    ('liq ol', '0.0 1.0002', 'invalid_token'),
+    ('spl liq qfm', '0.00175 0.97265 0.02558', 'raw'),
+    ('liq qfm', '0.50000 0.50000', 'raw'),
+    ('liq qfm', '1.00003 0.00008', 'renormalised'),
+    ('ol liq spl', '0.25000 0.50000 0.25000', 'raw'),
+    ('ol liq spl', '0.25000 0.50005 0.25000', 'raw'),
+    ('ol liq spl', '0.25000 0.50010 0.25000', 'raw'),
+    ('ol liq spl', '0.25000 0.50011 0.25000', 'sum_excess'),
+    ('ol liq spl', '0.25000 0.50020 0.25000', 'sum_excess'),
+    ('ol liq spl', '1.00003 0.00004 0.00004', 'renormalised'),
+    ('ol liq spl', '1.00003 0.00006 0.00006', 'sum_excess'),
+    ('ol liq spl qfm', '0.02491 0.96156 0.00213 0.01140', 'raw'),
+    ('ol liq spl qfm', '0.02491 0.96156 0.00213 0.01151', 'sum_excess'),
 )
 
 
-def _mode_closure_class(mode_tokens: list[str]) -> str:
-    """The b-978 closure rule, written once for the generative pin."""
-    import math
-    from decimal import Decimal, InvalidOperation
-
-    cap = Decimal('0.001')
-    decs = []
-    floats = []
-    for raw in mode_tokens:
-        try:
-            token = Decimal(raw)
-        except InvalidOperation:
-            return 'invalid_token'
-        if (
-            not token.is_finite()
-            or token < 0
-            or token > Decimal(1) + cap
-        ):
-            return 'invalid_token'
-        decs.append(token)
-        floats.append(float(raw))
-    float_sum = sum(floats)
-    if (
-        all(0.0 <= value <= 1.0 for value in floats)
-        and math.isclose(float_sum, 1.0, rel_tol=0.0, abs_tol=1.0e-4)
-    ):
-        return 'raw'
-    raw_sum = sum(decs, Decimal(0))
-    excess = raw_sum - Decimal(1)
-    if excess == 0:
-        return 'raw'
-    if excess > 0 and excess <= cap:
-        return 'renormalised'
-    if excess < 0:
-        return 'mass_deficit'
-    return 'sum_excess'
-
-
 @pytest.mark.parametrize('residual', [None, '+1.20000e-05', '+5.00000e-03'])
-@pytest.mark.parametrize('phases,modes', _MODE_CLOSURE_CASES)
+@pytest.mark.parametrize('phases,modes,kind', _MODE_CLOSURE_CASES)
 def test_magemin_mode_closure_is_one_class_for_every_vector(
-    phases, modes, residual,
+    phases, modes, kind, residual,
 ):
     """Every printed vector is raw, renormalised, or a typed refusal.
 
-    A positive non-buffer token is never stored as a silent 0. The Mass
-    residual does not change the class. Green rows keep the printed
-    floats. A renormalised vector's stored fractions sum to 1 and the
-    notice carries the raw tokens.
+    ``kind`` is the literal class for that row. A positive non-buffer
+    token is never stored as a silent 0. The Mass residual does not
+    change the class. Green rows keep the printed floats. A renormalised
+    vector's stored fractions sum to 1 and the notice carries the raw
+    tokens and the 1e-4 bound.
     """
     from decimal import Decimal
 
@@ -1887,7 +1870,6 @@ def test_magemin_mode_closure_is_one_class_for_every_vector(
     names = phases.split()
     mode_tokens = modes.split()
     assert len(names) == len(mode_tokens)
-    kind = _mode_closure_class(mode_tokens)
     lines = []
     if residual is not None:
         lines.append(f'Mass residual      : {residual}')
@@ -1930,6 +1912,7 @@ def test_magemin_mode_closure_is_one_class_for_every_vector(
     assert sum(metadata['mode_fractions'].values()) == 1.0
     notice = metadata['mode_token_notices'][0]
     assert notice['kind'] == 'mode_vector_renormalised'
+    assert notice['bound'] == 1.0e-4
     assert [item['raw_token'] for item in notice['raw_tokens']] == mode_tokens
     raw_sum = sum((Decimal(token) for token in mode_tokens), Decimal(0))
     assert notice['raw_sum'] == float(raw_sum)
@@ -1942,6 +1925,32 @@ def test_magemin_mode_closure_is_one_class_for_every_vector(
     if phases == 'liq ol' and modes == '1.00003 0.00008':
         assert metadata['mode_fractions']['liq'] == 0.9999200087990321
         assert metadata['mode_fractions']['ol'] == 0.00007999120096791046
+
+
+def test_magemin_duplicate_phase_names_close_before_they_are_summed():
+    """Two printed rows are closed as a vector, then summed by name.
+
+    0.50020 + 0.50020 = 1.00040, both tokens inside [0, 1]. That is a
+    sum excess. Adding the rows first would make one token 1.00040 and
+    refuse it as an invalid token instead.
+    """
+    from simulator.melt_backend.magemin import _MAGEMinEngineCallError
+
+    with pytest.raises(
+        _MAGEMinEngineCallError, match='Mode vector must sum to 1.0'
+    ) as raised:
+        MAGEMinBackend._parse_subprocess_stdout(
+            'Phase: ol ol\nMode: 0.50020 0.50020\n'
+        )
+    assert raised.value.exception_type == 'MAGEMinOutputError'
+
+    metadata: dict = {}
+    parsed = MAGEMinBackend._parse_subprocess_stdout(
+        'Phase: ol ol\nMode: 0.50000 0.50000\n',
+        metadata=metadata,
+    )
+    assert parsed == {'ol': {'mass_kg': 1.0}}
+    assert 'mode_token_notices' not in metadata
 
 
 def test_magemin_liquidus_flags_flat_renormalised_bracket(monkeypatch):

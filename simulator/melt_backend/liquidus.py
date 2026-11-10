@@ -921,11 +921,12 @@ def _annotate_renormalised_threshold(
 ) -> None:
     """Attach ΔT_bound when a renormalised sample is in a threshold pair.
 
-    The cap comment on ``_MODE_RENORMALISE_CAP`` derives
-    ΔT_bound = δ / s with s = |ΔF/ΔT| from the two bracketing samples.
-    Unit: δ is dimensionless and s is 1/K, so ΔT_bound is in K. A zero
-    slope makes the shift unbounded. The largest bound is kept. The
-    result itself is not changed.
+    ΔT_bound = δ / s with s = |ΔF/ΔT| from the two bracketing samples
+    and δ the sample's own raw-sum excess. The acceptance tolerance is
+    ``_MODE_TOKEN_ABS`` (abs 1e-4), not this slope. Unit: δ is
+    dimensionless and s is 1/K, so ΔT_bound is in K. A zero slope makes
+    the shift unbounded. The largest bound is kept. The result itself
+    is not changed.
     """
     if not notices:
         return

@@ -898,49 +898,49 @@ _MAGEMIN_MASS_RESIDUAL_RE = re.compile(
 # Green's closure at 16c8dabfa: math.isclose(sum, 1, abs_tol=1e-4) with
 # every token in [0, 1]. Those rows stay the raw floats.
 _MODE_GREEN_CLOSURE_ABS = 1.0e-4
-# d-367: "we can't refuse pedantically when it provides an unphysical 0
-# result" and "we want to flag bugs but let's fix it with a warning in
-# the meantime". Physics re-ruling b-978 (2026-11-10): a printed EXCESS
-# up to this cap is renormalised, with a mode_vector_renormalised notice.
-# Above the cap the typed invalid-output refusal stays. A deficit outside
-# the green closure stays the typed mass-deficit refusal. That is the
-# original acceptance's deficit path. The original "refuse 1.0002"
-# sentence was the 1e-4 per-token rule; this ruling supersedes it. A lone
-# token 1.0002 is an excess of 2e-4, inside the cap, so it is renormalised.
+# The per-token bound is that same absolute tolerance. Decimal('0.0001')
+# is 1e-4 with no binary rounding. A printed token in (1, 1+1e-4] is the
+# rounding the sum check already allowed, so it is clamped to 1. A token
+# above that, including a lone 1.0002 (excess 2e-4), is a typed refusal.
+# b-978's acceptance sentence ("1.0002 still refused") is this bound.
+# A 1e-3 acceptance cap would renormalise that token and every sum excess
+# through 1e-3. That cap is not established: 1e-3 is the finder's
+# solid_epsilon, a threshold on F, not a second closure tolerance.
 #
-# Why 1e-3. Premise. The finder decides on F (liquid fraction) at two
-# thresholds: solid θ_s = solid_epsilon = 1e-3 (F > θ_s), and liquid
-# θ_l = 1 - liquid_epsilon = 0.999 (F >= θ_l). Renormalising a mode
-# vector with sum S = 1 + δ, 0 < δ <= 1e-3, gives F' = F/S.
-# Algebra. F - F' = F·δ/(1+δ) < δ. A decision can flip only if F lies
-# within δ of a threshold:
-#   liquidus: θ_l <= F < θ_l·S
-#   solidus: the analogous window.
-# Example: the printed "1.00003 0.00008" gives
-# F' = 1.00003/1.00011 = 0.99992 >= 0.999, so it does not flip.
-# Map to temperature. A flip moves the bracket by ΔT <= δ / |dF/dT|
-# at the crossing. The finder's tolerance_C (2 K) is unaffected iff
-# |dF/dT| >= δ / tolerance_C = 1e-3 / 2 K = 5e-4 per K.
-# Units: dimensionless / K → K.
-# Sanity: a basalt melting interval of ~200 K averages dF/dT ~ 5e-3
-# per K, ten times that requirement, and the curve is steeper near the
-# liquidus. That average is not the bound. When a renormalised sample
-# takes part in a threshold decision, the finder computes the local
-# slope from the two bracketing samples, s = |ΔF/ΔT|, attaches
-# ΔT_bound = δ / s to this notice, and sets
-# renormalisation_may_shift_bracket when ΔT_bound > tolerance_C. The
-# result is kept (d-367). The flag makes the remaining uncertainty
-# visible.
-# Raw F > 1 is unphysical. The renormalised F' removes that impossible
-# value. ΔT_bound is the bracket uncertainty that remains.
+# Why 1e-4. Green already closes the vector at abs 1e-4. The hour-156
+# Mass residual is ~1e-5 and the liquid token 1.00003 is 3e-5 over 1, so
+# 1e-4 sits one decade above that print noise and is the tolerance the
+# vector check already documents.
 #
-# The Mass residual is recorded on the notice. It is not the closure
-# bound. Closure is a physical sanity bound on the phase-fraction vector.
-# The residual is the solver's BR_norm, a different number, and a ~1e-5
-# residual must not turn hour 156's 1.1e-4 excess into a refusal. The
-# notice keeps the raw tokens, the raw sum, and the residual so the
-# inconsistency in MAGEMin's printed modes stays visible.
-_MODE_RENORMALISE_CAP = Decimal('0.001')
+# Flagged renormalisation (d-367: do not refuse an in-tolerance rounding
+# excess into an unphysical miss; flag the best estimate). Hour 156 prints
+# "1.00003 0.00008", raw sum 1.00011. The token excess 3e-5 is inside
+# 1e-4. Clamping it to 1 leaves 1+0.00008, and 8e-5 is inside the same
+# sum tolerance, so the raw vector is divided by its raw sum
+# (F' = 1.00003/1.00011) and the notice keeps the raw tokens. A sum of
+# in-range tokens that itself exceeds 1e-4 (0.50000+0.50011 = 1.00011)
+# is not that case and stays refused. A clamped sum that is still outside
+# 1e-4 (1.00003+0.00011) stays refused. The largest raw excess this admits
+# is 2e-4: a token excess of 1e-4 plus a clamped-sum excess of 1e-4.
+#
+# Bracket flag, computed, not assumed. Premise. The finder decides on F
+# at θ_s = solid_epsilon = 1e-3 (F > θ_s) and θ_l = 0.999 (F >= θ_l).
+# Renormalising S = 1+δ gives F' = F/S. Algebra. F - F' = F·δ/(1+δ) < δ,
+# so a threshold can flip only when F lies within δ of it. Example: hour
+# 156 gives F' = 0.99992 >= 0.999, so the liquidus call does not flip.
+# Map to temperature. ΔT <= δ / |dF/dT|. Units: dimensionless / (1/K) = K.
+# The finder does not use a 1e-3/2 K = 5e-4 per K average. When a
+# renormalised sample is in a threshold pair it computes s = |ΔF/ΔT|
+# from the two bracketing samples, attaches ΔT_bound = δ/s, and sets
+# renormalisation_may_shift_bracket when ΔT_bound > tolerance_C (2 K).
+# The result is kept (d-367). Sanity: a ~200 K basalt interval averages
+# ~5e-3 per K, but the flag uses the local slope. Raw F > 1 is
+# unphysical; F' removes it. δ is that sample's raw excess.
+#
+# The Mass residual is recorded on the notice and is not the closure
+# bound. A ~1e-5 residual must not refuse hour 156 and must not widen
+# 1e-4. The notice keeps the raw tokens, the raw sum, and the residual.
+_MODE_TOKEN_ABS = Decimal('0.0001')
 
 
 def _close_printed_mode_vector(
@@ -957,14 +957,19 @@ def _close_printed_mode_vector(
     Invariant: every printed vector is exactly one of
     - raw floats, when it is inside green's 1e-4 closure and every token
       is in [0, 1], or the printed decimal sum is already 1;
-    - a renormalisation of a printed excess δ with 0 < δ <= 1e-3, stored
-      so the fractions sum to 1, with the raw tokens kept for the notice;
-    - a typed refusal: an invalid token, a mass deficit outside the green
-      closure, or an excess above 1e-3.
+    - a renormalisation, when every token is in [0, 1+1e-4], at least one
+      token exceeds 1, and the sum of those tokens clamped to 1 is still
+      inside abs 1e-4 of 1. Stored fractions are the raw tokens divided by
+      the raw sum. Hour 156 and a lone 1.00003 are this class. A lone
+      1.0002 is not;
+    - a typed refusal: a token outside [0, 1+1e-4], a mass deficit outside
+      the green closure, or a sum that is still outside 1e-4 after that
+      clamp.
 
     No branch stores a silent un-normalised success, and no branch turns a
     positive token into 0. The Mass residual is not an input: it cannot
-    move a vector between these classes.
+    move a vector between these classes. Duplicate phase names are summed
+    only after this decision.
     """
     raw_rows: list[tuple[str, Decimal, str, float]] = []
     for name, raw in zip(names, values):
@@ -978,7 +983,7 @@ def _close_printed_mode_vector(
         if (
             not token.is_finite()
             or token < 0
-            or token > Decimal(1) + _MODE_RENORMALISE_CAP
+            or token > Decimal(1) + _MODE_TOKEN_ABS
         ):
             _raise_magemin_output_invalid(
                 f'MAGEMin Mode token for {name!r} is invalid: {raw!r}'
@@ -1002,7 +1007,25 @@ def _close_printed_mode_vector(
     excess = raw_sum - Decimal(1)
     if green_closed or excess == 0:
         return 'raw', float_modes, raw_rows, raw_sum
-    if excess > 0 and excess <= _MODE_RENORMALISE_CAP:
+    # Clamp only token excesses inside the same 1e-4 the sum uses. The
+    # row is renormalised only when that clamp puts the sum back inside
+    # 1e-4. Otherwise the printed excess is out of tolerance.
+    clamped_sum = sum(
+        (
+            token if token <= Decimal(1) else Decimal(1)
+            for _name, token, _raw, _fraction in raw_rows
+        ),
+        Decimal(0),
+    )
+    clamped_excess = clamped_sum - Decimal(1)
+    token_was_clamped = any(
+        token > Decimal(1) for _name, token, _raw, _fraction in raw_rows
+    )
+    if (
+        token_was_clamped
+        and excess > 0
+        and Decimal(0) <= clamped_excess <= _MODE_TOKEN_ABS
+    ):
         scaled = [
             float(token / raw_sum)
             for _name, token, _raw, _fraction in raw_rows
@@ -1018,7 +1041,11 @@ def _close_printed_mode_vector(
         ]
         return 'renormalised', parsed_modes, raw_rows, raw_sum
     mode_total = float(raw_sum)
-    if excess < 0:
+    # Tokens green could have seen stay on green's float split: a sum
+    # below 1 is the mass-deficit refusal, and a sum above 1 is the
+    # invalid-output refusal. Clamping only removes mass, so a token
+    # above 1 that still misses the sum tolerance is an excess.
+    if not token_was_clamped and float_sum < 1.0:
         raise _MAGEMinModeVectorMassDeficit(
             mode_sum=mode_total,
             parsed_modes=float_modes,
@@ -1067,7 +1094,7 @@ def _parse_magemin_mass_residual(stdout: str) -> Optional[Decimal]:
 
     ``--Verb=0`` prints the line. The value is stored on a
     ``mode_vector_renormalised`` notice. It does not set the closure
-    bound: see ``_MODE_RENORMALISE_CAP``. A missing or negative token
+    bound: see ``_MODE_TOKEN_ABS``. A missing or negative token
     is not a residual norm, so the notice records none.
     """
     matches = _MAGEMIN_MASS_RESIDUAL_RE.findall(stdout)
@@ -3679,10 +3706,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         pseudo-phase (any name in ``_BUFFER_CHOICES``) is dropped — it is
         a control row, not a material phase.  Closure is decided only by
         ``_close_printed_mode_vector``: green's 1e-4 rows stay raw, a
-        printed excess up to 1e-3 is renormalised onto a
-        ``mode_vector_renormalised`` notice, and a deficit outside that
-        green closure or an excess above 1e-3 is a typed refusal.  See
-        ``_MODE_RENORMALISE_CAP``.
+        token excess inside that same 1e-4 whose clamped sum is still
+        inside 1e-4 is renormalised onto a ``mode_vector_renormalised``
+        notice, and every wider token or sum is a typed refusal.  See
+        ``_MODE_TOKEN_ABS``.
         Returns ``{phase: {'mass_kg': fraction}}`` on a unit-mass basis
         (the adapter only needs relative masses for ``liquid_fraction``
         and modal parity).
@@ -3740,14 +3767,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'kind': 'mode_vector_renormalised',
                     'raw_tokens': raw_tokens,
                     'raw_sum': float(raw_sum),
-                    'bound': float(_MODE_RENORMALISE_CAP),
+                    'bound': float(_MODE_TOKEN_ABS),
                     'mass_residual': (
                         None if mass_residual is None else float(mass_residual)
                     ),
                 },)
                 metadata['mode_token_diagnostics'] = (
                     'MAGEMin Mode vector was renormalised to 1 '
-                    f'within abs tolerance {float(_MODE_RENORMALISE_CAP):.6g} '
+                    f'within abs tolerance {float(_MODE_TOKEN_ABS):.6g} '
                     f'(raw sum {float(raw_sum):.9g}; {residual_note}; '
                     f'raw tokens: {token_text})',
                 )
