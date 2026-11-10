@@ -404,6 +404,7 @@ def _assert_selected_forward_pressure(sim, partition):
     assert partials["Fe"] * 100.0 == pytest.approx(partition["P_bulk_Pa"], rel=1e-8)
     notice = next(n for n in partition["notices"] if n.get("kind") == "transport_domain_extension")
     assert notice["overhead_pressure_pa"] == partition["overhead_pressure_pa"]
+    assert notice["commanded_pressure_pa"] == max(0.0, sim.melt.p_total_mbar * 100.0)
     assert notice["knudsen_number"] == partition["series_resistance"]["knudsen_number"]
     assert notice["authority"] == "extrapolated"
     assert partition["ledger_yields_authorized"] is True

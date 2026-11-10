@@ -140,6 +140,7 @@ def test_c7_enabled_run_commits_at_realized_pressure_and_closes_mass(
         diagnostic["c7_overhead_pressure_pa"] / 100.0
     )
     assert notices["transport_domain_extension"]["knudsen_number"] == diagnostic["c7_knudsen_number"]
+    assert notices["transport_domain_extension"]["commanded_pressure_pa"] == 5.0
 
     assert diagnostic["c7_al_credit_input_kg"] == pytest.approx(20.0)
     assert diagnostic["c7_al_credit_unused_mol"] > 0.0

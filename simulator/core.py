@@ -8390,6 +8390,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
             knudsen_number=float(series_flux.knudsen_number),
             overhead_pressure_pa=overhead_pressure_pa,
+            commanded_pressure_pa=commanded_overhead_pa,
             pipe_diameter_m=pipe_diameter_m,
             gas_temperature_K=gas_temperature_K,
             carrier_gas=str(carrier_gas),
