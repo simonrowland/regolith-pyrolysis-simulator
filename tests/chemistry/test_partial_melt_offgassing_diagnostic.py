@@ -1,10 +1,8 @@
 """Diagnostic-only partial-melt offgassing instrumentation."""
 
-from types import SimpleNamespace
-
 import pytest
 
-from simulator.chemistry.kernel import ChemistryIntent
+from simulator.chemistry.kernel import ChemistryIntent, IntentResult
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.runner import build_per_hour_summary
 from simulator.vapour_rail.batch import (
@@ -30,7 +28,8 @@ def _sim(vapor_pressure_data, feedstocks_data, setpoints_data):
 def _install_flux_dispatch(monkeypatch, sim, rates):
     def fake_dispatch_only(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
-            return SimpleNamespace(
+            return IntentResult(
+                intent=intent,
                 status='ok',
                 diagnostic={'evaporation_flux_kg_hr': dict(rates)},
             )
@@ -150,6 +149,7 @@ def test_projection_unavailable_omits_a_missing_molar_mass(
     assert 'Unobtainium' not in flux.species_kg_hr
     assert flux.species_kg_hr['Na'] == pytest.approx(0.01)
     diagnostic = sim._last_evaporation_flux_diagnostic
+    assert diagnostic['evaporation_flux_kg_hr'] == {'Na': 0.01}
     assert diagnostic['missing_molar_mass']['Unobtainium']['policy'] == (
         'fail_loud_missing_molar_mass'
     )

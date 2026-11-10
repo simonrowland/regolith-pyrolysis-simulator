@@ -1277,6 +1277,7 @@ class EvaporationMixin:
             )
         )
         closure_record = None
+        missing_molar_mass_refusal: dict[str, dict[str, str]] = {}
         pressure_held_bounds_record = None
         closure_rates_are_admitted = False
         native_fe_capacity_allocation = None
@@ -1525,7 +1526,6 @@ class EvaporationMixin:
                         break
                 if admitted_species and not projection_covers_admitted:
                     missing_inputs = []
-                    missing_molar_mass_refusal: dict[str, dict[str, str]] = {}
                     for species in sorted(admitted_species):
                         series = seed_series.get(species)
                         try:
@@ -1556,21 +1556,6 @@ class EvaporationMixin:
                     # P_bulk=0 estimate, labelled below.
                     for species in missing_molar_mass_refusal:
                         provider_rates.pop(species, None)
-                    base_diagnostic = seed_result.diagnostic
-                    if isinstance(base_diagnostic, dict):
-                        if missing_molar_mass_refusal:
-                            base_diagnostic['missing_molar_mass'] = (
-                                missing_molar_mass_refusal
-                            )
-                            kept_rates = dict(
-                                base_diagnostic.get('evaporation_flux_kg_hr')
-                                or {}
-                            )
-                            for species in missing_molar_mass_refusal:
-                                kept_rates.pop(species, None)
-                            base_diagnostic['evaporation_flux_kg_hr'] = (
-                                kept_rates
-                            )
                     kernel_result = seed_result
                     closure_record = {
                         'regime': 'projection_unavailable',
@@ -1823,6 +1808,15 @@ class EvaporationMixin:
                 control_inputs=control_inputs,
             )
         diagnostic = dict(kernel_result.diagnostic or {})
+        if missing_molar_mass_refusal:
+            # IntentResult freezes its diagnostic. Apply the species-local
+            # refusal to this final copy, using the already filtered stream;
+            # mutating only the provider DTO/dict cannot govern the output.
+            diagnostic['evaporation_flux_kg_hr'] = dict(closure_record['rates_kg_hr'])
+            diagnostic['missing_molar_mass'] = {
+                **dict(diagnostic.get('missing_molar_mass') or {}),
+                **missing_molar_mass_refusal,
+            }
         if closure_record is not None:
             diagnostic['same_hour_headspace_closure'] = closure_record
             if closure_record.get('regime') == 'pressure_held':
