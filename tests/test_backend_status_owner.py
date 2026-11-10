@@ -517,6 +517,15 @@ def test_a_degrading_status_survives_a_later_ok(degrading: str) -> None:
     assert select_backend_status(["ok", degrading, "ok"]) == degrading
 
 
+@pytest.mark.parametrize("status", ["missing", "not_run"])
+def test_runtime_only_non_certifying_status_survives_a_later_ok(status: str) -> None:
+    """The fidelity vocabulary says only ``ok`` certifies; every other
+    ``RuntimeStatus`` is a caveat. Its explicit ``missing`` and ``not_run``
+    degradations must therefore survive a later flattering ``ok``.
+    """
+    assert select_backend_status([status, "ok"]) == status
+
+
 def test_status_partition_covers_the_vocabulary_exactly() -> None:
     """A new vocabulary token must not be able to default to unranked.
 
