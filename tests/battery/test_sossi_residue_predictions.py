@@ -190,7 +190,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
     assert "gas_pack_digest" not in prediction.provenance
     assert "liquid_pack_digest" not in prediction.provenance
     assert evaluated_compositions
-    assert all("MnO" not in composition for composition in evaluated_compositions)
+    assert all("MnO" in composition for composition in evaluated_compositions)
     mno_inputs = [activities for activities in gas_activity_inputs if "MnO" in activities]
     assert mno_inputs
     assert openimcc_mno_activities

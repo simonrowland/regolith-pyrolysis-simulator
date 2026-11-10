@@ -158,6 +158,37 @@ def test_series_flux_continuum_limit_is_gas_transport_limited():
     assert result.flux_kg_s_m2 < result.langmuir_flux_kg_s_m2
 
 
+def test_series_flux_default_inputs_keep_pre_extension_golden_values():
+    result = series_flux(
+        "MnO_gas",
+        100.0,
+        1.0,
+        1800.0,
+        0.070937044,
+        0.5,
+        knudsen_number=0.001,
+        pipe_diameter_m=0.02,
+        overhead_pressure_pa=101325.0,
+        carrier_gas="CO2",
+        T_gas_K=1700.0,
+    )
+
+    assert result.as_dict() == {
+        "flux_kg_s_m2": 2.4273313735334508e-05,
+        "langmuir_flux_kg_s_m2": 0.042993070536011736,
+        "knudsen_effusion_flux_kg_s_m2": 0.08598614107202347,
+        "knudsen_number": 0.001,
+        "Kn": 0.001,
+        "r_interface": 2302.6966617114704,
+        "r_gas": 4076250.4452558802,
+        "r_melt": 0.0,
+        "gas_resistance_weight": 1.0,
+        "k_hk_kg_s_m2_pa": 0.0008685468795153886,
+        "alpha_intrinsic": 0.5,
+        "alpha_effective": 0.0002822933257930806,
+    }
+
+
 def test_grounded_alpha_and_p_eq_match_provider_wiring():
     T_K = 1700.0
     alpha_na, _ = grounded_alpha("Na", T_K)

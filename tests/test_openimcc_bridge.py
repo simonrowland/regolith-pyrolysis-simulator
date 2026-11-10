@@ -23,6 +23,7 @@ from simulator.melt_backend.openimcc_bridge import (
     _load_pack,
     _pack_digest,
     _cleaned_melt_projection,
+    _cleaned_melt_policy,
     evaluate as bridge_evaluate,
     evaluate_cleaned_melt,
     imported_openimcc_commit,
@@ -193,6 +194,18 @@ def test_cleaned_melt_treats_zero_inventory_as_absent() -> None:
 
     assert "MgO" not in source_wt_pct
     assert "MgO" not in cleaned_mol
+
+
+def test_mno_is_native_openimcc_parent_and_not_a_relaxed_projection() -> None:
+    assert "MnO" in OPENIMCC_PARENT_OXIDES
+
+    composition = {"SiO2": 9.0, "MnO": 1.0}
+    _source_wt_pct, cleaned = _cleaned_melt_projection(composition)
+    policy_composition, policy = _cleaned_melt_policy(composition)
+
+    assert cleaned["MnO"] == 1.0
+    assert policy_composition["MnO"] == 1.0
+    assert "openimcc_projection_crmn_relaxed" not in policy
 
 
 def test_cleaned_melt_passes_exact_parent_moles_to_openimcc(
