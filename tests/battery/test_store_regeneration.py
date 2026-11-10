@@ -67,6 +67,9 @@ def test_check_store_detects_byte_drift_in_a_small_tree(
     assert "migration-report.md" in capsys.readouterr().out
 
 
+@pytest.mark.nightly
+@pytest.mark.xdist_group("serial")
+@pytest.mark.cpu_budget(2600)
 def test_committed_store_is_byte_identical_to_regeneration() -> None:
     """CI must verify the real committed store against the committed inputs."""
     repo_root = Path(__file__).resolve().parents[2]
