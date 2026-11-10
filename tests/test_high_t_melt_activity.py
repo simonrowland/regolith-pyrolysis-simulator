@@ -529,10 +529,12 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "7e81a7b49be5273ac7a6208f0c7933e1a382a445af5de52d1109a70f7587d475"
-    # Combined physics and metadata digest re-derived against OpenIMCC 995dc14.
+    # Provenance includes OpenIMCC's module version and melt pack version/digest,
+    # but not its Git commit. Pin the exact Git-installed result from RPP
+    # (d-368/d-371).
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "0e86cd92ba7b10e4ef0340349e347aa7a716a4e2d5ba825e27fd36f17088485d"
+    ).hexdigest() == "e8a2b5d649500bb2c9f95a018c44885465755c9da04956be00a7ed30df51c9d3"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:

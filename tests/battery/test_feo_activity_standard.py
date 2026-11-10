@@ -303,9 +303,10 @@ def test_distin_closed_redox_residual_uses_default_profile(
         candidate.engine.coefficient_sources
     )
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
-    # Pin the result produced by the default profile and package identity.
+    # Pin the result produced by the default profile and exact Git-installed
+    # OpenIMCC 995dc14 package identity (d-368/d-371).
     assert sha256(serialized).hexdigest() == (
-        "da28e51e8b7c9432522f76e7a448d113d3df6c9f5de0232a69a50614a0278536"
+        "c474fe5a56f40db5a760b9d367d9a6c95a3b24f56dd87bc1134bd8d6eca35c18"
     )
 
 
