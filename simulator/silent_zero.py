@@ -31,6 +31,7 @@ class ZeroBecause(str, Enum):
 
     PROVEN_EMPTY_INVENTORY = "proven_empty_inventory"
     PROVEN_BELOW_THRESHOLD = "proven_below_threshold"
+    NOT_REPORTED_FEEDSTOCK_OXIDE = "not_reported_feedstock_oxide"
     MISSING_COEFFICIENT = "missing_coefficient"
     MISSING_THERMO = "missing_thermo"
     MISSING_ACTIVITY = "missing_activity"

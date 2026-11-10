@@ -49,6 +49,7 @@ from simulator.lab_geometry import (
 )
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.silent_zero import SilentZeroNote, ZeroBecause, make_note
 
 
 @dataclass
@@ -124,6 +125,7 @@ class VolatilesTrainSpec:
     """
     max_throughput_kg_hr: float = 0.0  # Max offgas rate the train can handle
     design_point_kg_hr: float = 0.0    # Expected peak for mare basalt
+    unreported_oxide_notices: tuple[SilentZeroNote, ...] = ()
 
 
 @dataclass
@@ -561,6 +563,22 @@ class EquipmentDesigner:
         """
         # Estimate volatile content from ledger-normalized feedstock composition
         comp = normalized_feedstock_component_masses_kg(feedstock, mass_kg)
+        source_composition = feedstock.get('composition_wt_pct', {}) or {}
+        unreported_oxide_notices = tuple(
+            make_note(
+                ZeroBecause.NOT_REPORTED_FEEDSTOCK_OXIDE,
+                site='equipment.size_volatiles_train',
+                species=oxide,
+                field=f'composition_wt_pct.{oxide}',
+                detail=(
+                    'Current sizing estimate is retained while the missing '
+                    'source value is flagged.'
+                ),
+            )
+            for oxide in ('Na2O', 'K2O')
+            if not isinstance(source_composition, Mapping)
+            or oxide not in source_composition
+        )
         volatile_mass_kg = (
             comp.get('Na2O', mass_kg * 0.4 / 100.0) +
             comp.get('K2O', mass_kg * 0.1 / 100.0) +
@@ -580,6 +598,7 @@ class EquipmentDesigner:
         return VolatilesTrainSpec(
             max_throughput_kg_hr=max(max_rate, 0.5),  # floor at 0.5 kg/hr
             design_point_kg_hr=design_rate,
+            unreported_oxide_notices=unreported_oxide_notices,
         )
 
     def size_buffer_tanks(self, mass_kg: float) -> BufferTankSpec:

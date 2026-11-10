@@ -1141,6 +1141,15 @@ def test_missing_openimcc_and_the_seam_block_release():
     assert admitted["committed"] is False
     assert admitted["provider_status"] == "refused"
     assert admitted["provider_reason"] == "missing_solid_area"
+    notices = [
+        note for note in sim._silent_zero_notes
+        if note.get("site") == "core.c0_bakeout_capacity"
+    ]
+    assert {note["species"] for note in notices} == {"Na2O", "K2O"}
+    assert all(
+        note["zero_because"] == "not_reported_feedstock_oxide"
+        for note in notices
+    )
     assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"] == pytest.approx(
         before
     )

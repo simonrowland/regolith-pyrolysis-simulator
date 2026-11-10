@@ -5025,6 +5025,47 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         return silent_zero_diagnostic(self)
 
+    def _record_unreported_alkali_oxide_notes(
+        self,
+        *,
+        site: str,
+        composition: Mapping[str, Any] | None = None,
+    ) -> None:
+        """Record when a C0 consumer treats unreported alkalis as zero."""
+        if isinstance(composition, Mapping):
+            not_reported = {
+                oxide for oxide in ("Na2O", "K2O")
+                if oxide not in composition
+            }
+        else:
+            not_reported = set(
+                getattr(
+                    getattr(self, "inventory", None),
+                    "not_reported_oxide_species",
+                    (),
+                )
+            )
+        if not_reported:
+            from simulator.silent_zero import (
+                ZeroBecause,
+                record_on_host,
+            )
+
+            for oxide in ("Na2O", "K2O"):
+                if oxide not in not_reported:
+                    continue
+                record_on_host(
+                    self,
+                    ZeroBecause.NOT_REPORTED_FEEDSTOCK_OXIDE,
+                    site=site,
+                    species=oxide,
+                    field=f"composition_wt_pct.{oxide}",
+                    detail=(
+                        "The source does not report this oxide; current "
+                        "numeric behavior is preserved."
+                    ),
+                )
+
     @staticmethod
     def _melt_redox_gate_authority_provenance(
         gate_authority: _MeltRedoxGateAuthority,
@@ -11386,6 +11427,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             stage0_temp_range_C=stage0_temp_range,
             carbon_reductant_required_kg=carbon_reductant_kg,
             stage0_mass_balance_delta_kg=stage0_mass_balance_delta_kg,
+            not_reported_oxide_species=tuple(
+                oxide for oxide in OXIDE_SPECIES if oxide not in comp
+            ),
         )
 
     @classmethod
@@ -12922,6 +12966,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 },
             )]
         comp = feedstock.get("composition_wt_pct") or {}
+        self._record_unreported_alkali_oxide_notes(
+            site="core.stage0_chloride_foulant_split",
+            composition=comp,
+        )
         na = float(comp.get("Na2O", 0.0) or 0.0)
         k = float(comp.get("K2O", 0.0) or 0.0)
         if na + k < 1e-12:
@@ -14145,6 +14193,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         self.species_formula_registry,
                     ).molar_mass_kg_per_mol()
             train = getattr(self, "_volatiles_train_spec", None)
+            self._record_unreported_alkali_oxide_notes(
+                site="core.c0_bakeout_capacity",
+            )
             throughput = getattr(train, "max_throughput_kg_hr", None)
             if not isinstance(throughput, (int, float)) or isinstance(throughput, bool):
                 throughput = 0.0
@@ -16417,6 +16468,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- Loop 4: Volatiles train throttle (C0/C0b only) ---
         if self.melt.campaign in (CampaignPhase.C0, CampaignPhase.C0B):
             vol_train = getattr(self, '_volatiles_train_spec', None)
+            if vol_train:
+                self._record_unreported_alkali_oxide_notes(
+                    site='core.c0_volatiles_train_ramp',
+                )
             if vol_train and vol_train.max_throughput_kg_hr > 0:
                 # Last hour's committed Na, K, S2, SO2, and H2O. A
                 # non-positive train still skips this ramp throttle;

@@ -438,6 +438,8 @@ class ProcessInventory:
     stage0_temp_range_C: Tuple[float, float] = (20.0, 950.0)
     carbon_reductant_required_kg: float = 0.0
     stage0_mass_balance_delta_kg: float = 0.0
+    # Absent declarations are not reported; explicit 0 wt% remains reported.
+    not_reported_oxide_species: Tuple[str, ...] = ()
 
     def copy(self) -> 'ProcessInventory':
         """Return a detached copy for records and snapshots."""
@@ -461,6 +463,9 @@ class ProcessInventory:
             stage0_temp_range_C=tuple(self.stage0_temp_range_C),
             carbon_reductant_required_kg=self.carbon_reductant_required_kg,
             stage0_mass_balance_delta_kg=self.stage0_mass_balance_delta_kg,
+            not_reported_oxide_species=tuple(
+                self.not_reported_oxide_species
+            ),
         )
 
     def residual_mass_kg(self) -> float:

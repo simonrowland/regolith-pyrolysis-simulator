@@ -30,6 +30,7 @@ def test_zero_because_closed_enum_values() -> None:
     values = {item.value for item in ZeroBecause}
     # Stable closed set for the class contract.
     assert "proven_empty_inventory" in values
+    assert "not_reported_feedstock_oxide" in values
     assert "missing_coefficient" in values
     assert "missing_thermo" in values
     assert "refused_upstream" in values

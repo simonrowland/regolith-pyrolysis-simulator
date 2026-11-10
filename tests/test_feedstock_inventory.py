@@ -44,6 +44,50 @@ def _sim_with_data(feedstocks):
     )
 
 
+def test_inventory_distinguishes_unreported_oxide_from_explicit_zero():
+    feedstocks = {
+        "unreported": {"composition_wt_pct": {"SiO2": 100.0}},
+        "explicit_zero": {
+            "composition_wt_pct": {"SiO2": 100.0, "K2O": 0.0}
+        },
+    }
+    sim = _sim(feedstocks)
+
+    sim.load_batch("unreported", mass_kg=1000.0)
+    assert "K2O" in sim.inventory.not_reported_oxide_species
+    assert "K2O" not in sim.inventory.raw_components_kg
+    assert "K2O" in sim.record.initial_inventory.not_reported_oxide_species
+
+    sim.load_batch("explicit_zero", mass_kg=1000.0)
+    assert "K2O" not in sim.inventory.not_reported_oxide_species
+    assert "K2O" not in sim.inventory.raw_components_kg
+
+
+def test_c0_ramp_preserves_train_rate_and_reports_unreported_alkalis():
+    sim = _sim({"silica": {"composition_wt_pct": {"SiO2": 100.0}}})
+    sim.load_batch("silica", mass_kg=1000.0)
+    sim.melt.campaign = CampaignPhase.C0
+    sim.campaign_mgr.get_temp_target = lambda *_args: (1200.0, 10.0)
+    sim._get_turbine_spec()
+    sim._silent_zero_notes = []
+
+    assert sim._volatiles_train_spec.design_point_kg_hr == pytest.approx(0.5)
+    assert sim._volatiles_train_spec.max_throughput_kg_hr == pytest.approx(1.0)
+
+    sim._update_temperature()
+
+    assert sim._last_actual_ramp == pytest.approx(10.0)
+    notices = [
+        note for note in sim._silent_zero_notes
+        if note.get("site") == "core.c0_volatiles_train_ramp"
+    ]
+    assert {note["species"] for note in notices} == {"Na2O", "K2O"}
+    assert all(
+        note["zero_because"] == "not_reported_feedstock_oxide"
+        for note in notices
+    )
+
+
 def _completion_contract(contract_id: str):
     data_dir = Path(__file__).parent.parent / "data"
     contracts = completion_contracts_from_setpoints(

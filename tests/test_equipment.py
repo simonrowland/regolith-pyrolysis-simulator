@@ -6,10 +6,25 @@ import pytest
 
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import parse_lab_geometry
+from simulator.silent_zero import ZeroBecause
 
 
 def _designer(**geometry):
     return EquipmentDesigner({"condenser_geometry": geometry})
+
+
+def test_unreported_alkali_notice_preserves_train_sizing_values():
+    spec = EquipmentDesigner().size_volatiles_train(
+        1000.0,
+        {"composition_wt_pct": {"SiO2": 99.0, "Na2O": 1.0}},
+    )
+
+    assert spec.design_point_kg_hr == pytest.approx(1.1)
+    assert spec.max_throughput_kg_hr == pytest.approx(2.2)
+    assert [note.species for note in spec.unreported_oxide_notices] == ["K2O"]
+    assert spec.unreported_oxide_notices[0].zero_because is (
+        ZeroBecause.NOT_REPORTED_FEEDSTOCK_OXIDE
+    )
 
 
 def test_batch_headspace_counts_freeboard_once_and_includes_pipe_volume():
