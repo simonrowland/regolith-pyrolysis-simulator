@@ -132,6 +132,8 @@ from simulator.lab_geometry import (
 from simulator.condensation_routing import (
     DESIGNATED_STAGE,
     K_TRAP_STAGE_KEY,
+    MISSING_COLLECTION_PRODUCT_CONTRACT_REASON,
+    MISSING_COLLECTION_PRODUCT_CONTRACT_SPECIES,
     NA_COLLECTOR_STAGE_KEY,
     accepted_species_for_stage_key,
     accepted_species_for_stage_number,
@@ -3871,6 +3873,47 @@ class CondensationModel:
                 ),
             })
             condensation_refusals_by_species[species] = existing
+
+        # Name the missing collection product without withdrawing the
+        # vapor or the wall-saturation diagnostic. A refused carrier
+        # status would withhold the evaporation debit.
+        for species in MISSING_COLLECTION_PRODUCT_CONTRACT_SPECIES:
+            inlet = max(
+                0.0, float(evap_flux.species_kg_hr.get(species, 0.0) or 0.0)
+            )
+            if inlet <= 0.0:
+                continue
+            retained = max(
+                0.0,
+                float(retained_in_source_by_species.get(species, 0.0) or 0.0),
+            )
+            remaining = max(
+                0.0, float(remaining_by_species.get(species, 0.0) or 0.0)
+            )
+            if retained > 1e-15 or abs(remaining - inlet) > 1e-9:
+                continue
+            refusal = dict(
+                condensation_refusals_by_species.get(species) or {}
+            )
+            refusal.update({
+                'status': 'refused',
+                'reason': MISSING_COLLECTION_PRODUCT_CONTRACT_REASON,
+                'severity': 'warning',
+                'output_status': 'refused',
+                'species': species,
+                'mass_disposition': (
+                    'uncollected_vapor_missing_collection_product_contract'
+                ),
+                'collection_product_kg_hr': None,
+                'input_mass_kg_hr': inlet,
+                'remaining_mass_kg_hr': remaining,
+            })
+            condensation_refusals_by_species[species] = refusal
+            authority = condensation_authority_by_species.get(species)
+            if isinstance(authority, dict):
+                authority['reason'] = MISSING_COLLECTION_PRODUCT_CONTRACT_REASON
+                authority['mass_disposition'] = refusal['mass_disposition']
+                authority['authoritative_for_condensation'] = False
 
         self.last_condensation_refusals_by_species = copy.deepcopy(
             condensation_refusals_by_species

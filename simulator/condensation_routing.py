@@ -113,6 +113,20 @@ DESIGNATED_STAGE: dict[str, str] = {
     'Mg': NA_COLLECTOR_STAGE_KEY,
 }
 
+# Melt-side formation only. These rows have no wall saturation curve,
+# stable collected phase, accommodation coefficient, or kinetics.
+# Designating M2 onto the M stage would credit two atoms as one product.
+MISSING_COLLECTION_PRODUCT_CONTRACT_SPECIES: frozenset[str] = frozenset({
+    'Al2',
+    'Ca2',
+    'K2',
+    'Mg2',
+    'Na2',
+})
+MISSING_COLLECTION_PRODUCT_CONTRACT_REASON = (
+    'missing_collection_product_contract'
+)
+
 CONDENSATION_COPRODUCT_STAGE: dict[str, str] = {
     'Si': 'stage_3_sio_zone',
 }
