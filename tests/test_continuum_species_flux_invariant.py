@@ -1,16 +1,22 @@
 """Generative pin for the continuum-flux invariant.
 
-INVARIANT: no authorized species flux is an artificial zero. Every species
-that shares a continuum-domain diagnostic is one of:
+INVARIANT: every species flux that shares a continuum-domain diagnostic is
+the diagnostic's decision, and the evaporation provider publishes that
+same decision. No campaign gets a second authorization.
 
-- the computed ordinary series flux (in-domain, or a Stage 0 mark),
-- the continuum continuation (authorized extrapolation: gas film kept on),
-- a typed refusal (status refused, ledger not authorized).
+- transitional Kn, any campaign that is not Stage 0 bakeout: flagged
+  continuum continuation (regime transitional, Kn, authority extrapolated,
+  certified 5-15 mbar band, ledger authorized) and a strictly positive
+  continuation flux
+- Stage 0 bakeout at transitional Kn: out-of-domain mark, ordinary series,
+  R_gas == 0
+- in-domain viscous Kn: ordinary series, no extrapolation notice
+- invalid Kn: typed refusal, resolved flux 0
 
-Positive evaporation driving pressure on an authorized extrapolation is the
-continuation and is strictly positive. The native-Fe capacity and the
-melt-Fe residual cap both read that choice from
-``resolve_species_flux_kg_s_m2``.
+The Na continuation at 20 Pa / 1873.15 K / P_eq 100 Pa is the independent
+number 0.007424038156428245 kg/s/m2. Other species must match
+``resolve_species_flux_kg_s_m2`` of the unmodified diagnostic, not a
+provider-only remap.
 """
 
 from __future__ import annotations
@@ -31,13 +37,12 @@ from simulator.chemistry.kernel.dto import IntentResult, ProviderAccountView
 from simulator.condensation import _LENNARD_JONES_PARAMS
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import (
-    _C2A_CONTINUUM_EXTRAPOLATION_CAMPAIGNS,
     pool_first_residual_kg_hr,
     resolve_species_flux_kg_s_m2,
     viscous_p_bulk_out_of_domain_diagnostic,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.state import CampaignPhase
+from simulator.state import MOLAR_MASS, CampaignPhase
 from simulator.transport_regime import (
     _ELECTROLYSIS_CAMPAIGNS,
     _IDLE_CAMPAIGNS,
@@ -66,9 +71,15 @@ _T_C = 1600.0
 _PIPE_M = 0.12
 _POOL_MOL = 1.0e-6
 _MELT_RAW_KG_HR = 1.0e6
+# Independent of _series: C2A Na continuation at the transitional point above.
+_NA_CONTINUATION_KG_S_M2 = 0.007424038156428245
+_CERTIFIED_BAND_MBAR = (5.0, 15.0)
 
 
 def _molar_mass_kg_mol(species: str) -> float:
+    # Na is the independent continuation pin (0.022989769 kg/mol).
+    if species == "Na":
+        return 0.022989769
     if species in _LENNARD_JONES_PARAMS and species not in _CARRIERS:
         return float(_LENNARD_JONES_PARAMS[species][2]) / 1000.0
     return float(_EVAPORATION_LJ_PROXY_MOLAR_MASSES[species]) / 1000.0
@@ -91,16 +102,54 @@ def _series(species: str, *, overhead_pa: float, extrapolate: bool, alpha: float
     )
 
 
-def _assert_resolved_flux(campaign_name: str | None, *, overhead_pa: float) -> None:
-    ordinary = _series("Fe", overhead_pa=overhead_pa, extrapolate=False)
-    diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
-        knudsen_number=float(ordinary.knudsen_number),
+def _is_stage0(campaign_name: str | None) -> bool:
+    return str(campaign_name or "") in _STAGE0_BAKEOUT_CAMPAIGNS
+
+
+def _provider_campaign(campaign_name: str | None) -> str | None:
+    if campaign_name is None:
+        return None
+    stripped = str(campaign_name).strip()
+    return stripped or None
+
+
+def _diagnostic(campaign_name: str | None, knudsen_number: float, overhead_pa: float):
+    return viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=knudsen_number,
         overhead_pressure_pa=overhead_pa,
         pipe_diameter_m=_PIPE_M,
         gas_temperature_K=_T_GAS_K,
         carrier_gas="N2",
         campaign_name=campaign_name,
         asking_site="tests.continuum_species_flux_invariant",
+    )
+
+
+def _assert_flagged_continuation(diagnostic: dict) -> None:
+    assert diagnostic["status"] == "extrapolated"
+    assert diagnostic["ledger_yields_authorized"] is True
+    assert diagnostic["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert diagnostic["regime"] == "transitional"
+    assert diagnostic["authority_level"] == "extrapolated"
+    assert diagnostic["authority_class"] == "extrapolated"
+    assert diagnostic["evaporation_flux_status"] == "extrapolated"
+    assert diagnostic["doctrine_category"] == 2
+    assert diagnostic["certified_band_mbar"] == pytest.approx(_CERTIFIED_BAND_MBAR)
+    assert "viscous-validated band" in diagnostic["detail"]
+    assert diagnostic["knudsen_number"] == pytest.approx(0.016813952116450776)
+
+
+def _assert_resolved_flux(
+    campaign_name: str | None,
+    *,
+    overhead_pa: float,
+    species: str,
+) -> None:
+    ordinary = _series(species, overhead_pa=overhead_pa, extrapolate=False)
+    diagnostic = _diagnostic(
+        campaign_name,
+        float(ordinary.knudsen_number),
+        overhead_pa,
     )
     continued = None
     continuation_flux = None
@@ -109,36 +158,39 @@ def _assert_resolved_flux(campaign_name: str | None, *, overhead_pa: float) -> N
         and diagnostic.get("status") == "extrapolated"
         and diagnostic.get("ledger_yields_authorized")
     ):
-        continued = _series("Fe", overhead_pa=overhead_pa, extrapolate=True)
+        continued = _series(species, overhead_pa=overhead_pa, extrapolate=True)
         continuation_flux = float(continued.flux_kg_s_m2)
     resolved = resolve_species_flux_kg_s_m2(
         diagnostic,
         ordinary_flux_kg_s_m2=float(ordinary.flux_kg_s_m2),
         continuation_flux_kg_s_m2=continuation_flux,
     )
-    name = "" if campaign_name is None else str(campaign_name)
-    if name in _C2A_CONTINUUM_EXTRAPOLATION_CAMPAIGNS and overhead_pa == _TRANSITIONAL_PA:
-        assert diagnostic is not None
-        assert diagnostic["status"] == "extrapolated"
-        assert diagnostic["ledger_yields_authorized"] is True
-        assert continued is not None
-        assert continued.r_gas > 0.0
-        assert resolved == pytest.approx(continued.flux_kg_s_m2)
-        assert resolved > 0.0
-        return
-    if diagnostic is None:
+    if overhead_pa == _VISCOUS_PA:
+        assert diagnostic is None
+        assert ordinary.r_gas > 0.0
         assert resolved == pytest.approx(ordinary.flux_kg_s_m2)
         assert resolved > 0.0
         return
-    if diagnostic.get("status") == "refused":
-        assert diagnostic["ledger_yields_authorized"] is False
-        assert resolved == pytest.approx(0.0)
+    if _is_stage0(campaign_name):
+        assert diagnostic is not None
+        assert diagnostic["status"] == "out_of_domain"
+        assert diagnostic["ledger_yields_authorized"] is True
+        assert diagnostic["reason"] == "continuum_formula_out_of_domain_marked"
+        assert diagnostic.get("regime") is None
+        assert ordinary.r_gas == pytest.approx(0.0)
+        assert resolved == pytest.approx(ordinary.flux_kg_s_m2)
+        assert resolved > 0.0
         return
-    assert diagnostic["status"] == "out_of_domain"
-    assert diagnostic["ledger_yields_authorized"] is True
+    assert diagnostic is not None
+    _assert_flagged_continuation(diagnostic)
+    assert continued is not None
     assert ordinary.r_gas == pytest.approx(0.0)
-    assert resolved == pytest.approx(ordinary.flux_kg_s_m2)
+    assert continued.r_gas > 0.0
+    assert resolved == pytest.approx(continued.flux_kg_s_m2)
     assert resolved > 0.0
+    assert resolved < ordinary.flux_kg_s_m2
+    if species == "Na":
+        assert resolved == pytest.approx(_NA_CONTINUATION_KG_S_M2)
 
 
 @pytest.fixture(scope="module")
@@ -188,17 +240,24 @@ def _independent_native_series(sim: PyrolysisSimulator, part: dict, *, extrapola
     )
 
 
+@pytest.mark.parametrize("species", TRANSPORT_SPECIES)
 @pytest.mark.parametrize("campaign_name", CAMPAIGN_NAMES + (None,))
-def test_chokepoint_enumerates_campaign_branches(campaign_name) -> None:
-    _assert_resolved_flux(campaign_name, overhead_pa=_TRANSITIONAL_PA)
+def test_chokepoint_enumerates_campaign_and_species(campaign_name, species: str) -> None:
+    _assert_resolved_flux(
+        campaign_name,
+        overhead_pa=_TRANSITIONAL_PA,
+        species=species,
+    )
 
 
-@pytest.mark.parametrize(
-    "campaign_name",
-    tuple(sorted(_C2A_CONTINUUM_EXTRAPOLATION_CAMPAIGNS)),
-)
-def test_in_band_c2a_chokepoint_is_not_an_extrapolation(campaign_name: str) -> None:
-    _assert_resolved_flux(campaign_name, overhead_pa=_VISCOUS_PA)
+@pytest.mark.parametrize("species", TRANSPORT_SPECIES)
+@pytest.mark.parametrize("campaign_name", CAMPAIGN_NAMES + (None,))
+def test_in_domain_chokepoint_is_not_an_extrapolation(campaign_name, species: str) -> None:
+    _assert_resolved_flux(
+        campaign_name,
+        overhead_pa=_VISCOUS_PA,
+        species=species,
+    )
 
 
 @pytest.mark.parametrize("phase", list(CampaignPhase), ids=lambda phase: phase.name)
@@ -226,29 +285,9 @@ def test_native_and_melt_fe_follow_the_invariant(
     capacity_kg_hr = float(part["native_fe_vapor_capacity_kg_hr"])
     assert part["P_eq_Pa"] > part["P_bulk_Pa"]
 
-    if phase.name in _C2A_CONTINUUM_EXTRAPOLATION_CAMPAIGNS:
-        continued = _independent_native_series(sim, part, extrapolate=True)
-        assert part["status"] == "extrapolated"
-        assert part["ledger_yields_authorized"] is True
-        assert part["evaporation_flux_status"] == "extrapolated"
-        assert continued.r_gas > 0.0
-        assert part["series_resistance"]["r_gas"] == pytest.approx(continued.r_gas)
-        assert part["series_resistance"]["flux_kg_s_m2"] == pytest.approx(
-            continued.flux_kg_s_m2
-        )
-        assert capacity_kg_hr == pytest.approx(
-            continued.flux_kg_s_m2 * area * 3600.0
-        )
-        assert capacity_kg_hr > 0.0
-        assert part["native_fe_vapor_mol"] == pytest.approx(_POOL_MOL)
-        assert residual_mol > 0.0
-        assert melt_kg_hr > 0.0
-        assert melt_kg_hr == pytest.approx(residual_mol * molar)
-        assert melt_kg_hr < _MELT_RAW_KG_HR
-        return
-
-    if part.get("status") == "out_of_domain":
+    if phase.name in _STAGE0_BAKEOUT_CAMPAIGNS:
         ordinary = _independent_native_series(sim, part, extrapolate=False)
+        assert part["status"] == "out_of_domain"
         assert part["ledger_yields_authorized"] is True
         assert ordinary.r_gas == pytest.approx(0.0)
         assert capacity_kg_hr == pytest.approx(ordinary.flux_kg_s_m2 * area * 3600.0)
@@ -257,12 +296,27 @@ def test_native_and_melt_fe_follow_the_invariant(
         assert melt_kg_hr > 0.0
         return
 
-    assert part["status"] == "refused"
-    assert part["ledger_yields_authorized"] is False
-    assert capacity_kg_hr == pytest.approx(0.0)
-    assert part["native_fe_vapor_mol"] == pytest.approx(0.0)
-    assert residual_mol == pytest.approx(0.0)
-    assert melt_kg_hr == pytest.approx(0.0)
+    continued = _independent_native_series(sim, part, extrapolate=True)
+    assert part["status"] == "extrapolated"
+    assert part["ledger_yields_authorized"] is True
+    assert part["evaporation_flux_status"] == "extrapolated"
+    assert part["regime"] == "transitional"
+    assert part["authority_level"] == "extrapolated"
+    assert part["certified_band_mbar"] == pytest.approx(_CERTIFIED_BAND_MBAR)
+    assert continued.r_gas > 0.0
+    assert part["series_resistance"]["r_gas"] == pytest.approx(continued.r_gas)
+    assert part["series_resistance"]["flux_kg_s_m2"] == pytest.approx(
+        continued.flux_kg_s_m2
+    )
+    assert capacity_kg_hr == pytest.approx(
+        continued.flux_kg_s_m2 * area * 3600.0
+    )
+    assert capacity_kg_hr > 0.0
+    assert part["native_fe_vapor_mol"] == pytest.approx(_POOL_MOL)
+    assert residual_mol > 0.0
+    assert melt_kg_hr > 0.0
+    assert melt_kg_hr == pytest.approx(residual_mol * molar)
+    assert melt_kg_hr < _MELT_RAW_KG_HR
 
 
 def test_c2a_staged_in_band_native_fe_is_unchanged(
@@ -287,18 +341,27 @@ def test_c2a_staged_in_band_native_fe_is_unchanged(
     assert part["series_resistance"]["r_gas"] > 0.0
 
 
-def test_c2a_staged_melt_fe_cap_uses_continuation_residual(
+@pytest.mark.parametrize(
+    "phase",
+    (CampaignPhase.C2A_STAGED, CampaignPhase.C4),
+    ids=lambda phase: phase.name,
+)
+def test_transitional_melt_fe_cap_uses_continuation_residual(
+    phase: CampaignPhase,
     transitional_sim: PyrolysisSimulator,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     sim = transitional_sim
-    sim.melt.campaign = CampaignPhase.C2A_STAGED
+    sim.melt.campaign = phase
     sim.melt.temperature_C = _T_C
     sim.overhead.headspace_temperature_K = _T_GAS_K
     sim.melt.p_total_mbar = _TRANSITIONAL_PA / 100.0
     sim._melt_headspace_composition_mbar = {}
     part = sim._native_fe_partition_diagnostic(_POOL_MOL)
+    assert part["status"] == "extrapolated"
+    assert part["ledger_yields_authorized"] is True
     residual_mol = float(part["ordinary_melt_fe_residual_capacity_mol_hr"])
+    assert residual_mol > 0.0
     sim._native_fe_vapor_residual_capacity_mol_this_hr = residual_mol
     stub = IntentResult(
         intent=ChemistryIntent.EVAPORATION_FLUX,
@@ -329,47 +392,30 @@ def test_c2a_staged_melt_fe_cap_uses_continuation_residual(
     assert allocation["melt_fe_raw_kg_hr"] == pytest.approx(_MELT_RAW_KG_HR)
 
 
-def test_refused_campaign_melt_fe_cap_stays_a_typed_zero(
-    transitional_sim: PyrolysisSimulator,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    sim = transitional_sim
-    sim.melt.campaign = CampaignPhase.C4
-    sim.melt.temperature_C = _T_C
-    sim.overhead.headspace_temperature_K = _T_GAS_K
-    sim.melt.p_total_mbar = _TRANSITIONAL_PA / 100.0
-    sim._melt_headspace_composition_mbar = {}
-    part = sim._native_fe_partition_diagnostic(_POOL_MOL)
-    assert part["ledger_yields_authorized"] is False
-    assert part["native_fe_vapor_capacity_kg_hr"] == pytest.approx(0.0)
-    sim._native_fe_vapor_residual_capacity_mol_this_hr = float(
-        part["ordinary_melt_fe_residual_capacity_mol_hr"]
+def test_invalid_kn_resolves_to_a_typed_zero() -> None:
+    diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=float("nan"),
+        overhead_pressure_pa=_TRANSITIONAL_PA,
+        pipe_diameter_m=_PIPE_M,
+        gas_temperature_K=_T_GAS_K,
+        carrier_gas="N2",
+        campaign_name="C4",
+        asking_site="tests.invalid_kn",
     )
-    stub = IntentResult(
-        intent=ChemistryIntent.EVAPORATION_FLUX,
-        status="ok",
-        diagnostic={"evaporation_flux_kg_hr": {"Fe": _MELT_RAW_KG_HR}},
+    assert diagnostic is not None
+    assert diagnostic["status"] == "refused"
+    assert diagnostic["ledger_yields_authorized"] is False
+    assert diagnostic["reason"] == "invalid_knudsen_number"
+    resolved = resolve_species_flux_kg_s_m2(
+        diagnostic,
+        ordinary_flux_kg_s_m2=1.0,
+        continuation_flux_kg_s_m2=1.0,
     )
-    monkeypatch.setattr(
-        sim,
-        "_dispatch_only",
-        lambda intent, *args, **kwargs: stub,
-    )
-    equilibrium = SimpleNamespace(
-        vapor_pressures_Pa={"Fe": 100.0},
-        vapor_pressures_source={},
-        activity_coefficients={},
-        diagnostics={},
-        liquid_fraction=1.0,
-    )
-    flux = sim._calculate_evaporation(equilibrium)
-    assert "Fe" not in flux.species_kg_hr
-    allocation = sim._last_evaporation_flux_diagnostic["native_fe_capacity_allocation"]
-    assert allocation["melt_fe_applied_kg_hr"] == pytest.approx(0.0)
-    assert allocation["melt_fe_residual_capacity_kg_hr"] == pytest.approx(0.0)
+    assert resolved == pytest.approx(0.0)
+    assert pool_first_residual_kg_hr(_MELT_RAW_KG_HR, 0.0, 0.055845) == pytest.approx(0.0)
 
 
-def test_c7_transitional_transport_stays_a_typed_refusal(
+def test_c7_transitional_transport_is_a_flagged_continuation(
     transitional_sim: PyrolysisSimulator,
 ) -> None:
     sim = transitional_sim
@@ -389,11 +435,22 @@ def test_c7_transitional_transport_stays_a_typed_refusal(
         radial_stir_factor=1.0,
     )
     extent, diagnostic = sim._c7_transport_extent_mol(cfg, ca_per_extent=3.0)
-    assert extent == pytest.approx(0.0)
-    assert diagnostic["c7_ca_flux_kg_s_m2"] == pytest.approx(0.0)
-    assert diagnostic["ledger_yields_authorized"] is False
-    assert diagnostic["authority_class"] == "diagnostic-limited"
+    assert diagnostic["ledger_yields_authorized"] is True
+    assert diagnostic["status"] == "extrapolated"
+    assert diagnostic["authority_class"] == "extrapolated"
+    assert diagnostic["authority_level"] == "extrapolated"
+    assert diagnostic["regime"] == "transitional"
+    assert diagnostic["certified_band_mbar"] == pytest.approx(_CERTIFIED_BAND_MBAR)
     assert diagnostic["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert diagnostic["evaporation_flux_status"] == "extrapolated"
+    assert diagnostic["c7_transport_refusal"] == ""
+    assert diagnostic["R_gas"] > 0.0
+    flux = float(diagnostic["c7_ca_flux_kg_s_m2"])
+    assert flux > 0.0
+    assert extent == pytest.approx(
+        flux * 0.2 * 3600.0 / (MOLAR_MASS["Ca"] / 1000.0) / 3.0
+    )
+    assert extent > 0.0
 
 
 def test_authorized_extrapolation_without_continuation_refuses() -> None:
@@ -405,11 +462,11 @@ def test_authorized_extrapolation_without_continuation_refuses() -> None:
         pipe_diameter_m=_PIPE_M,
         gas_temperature_K=_T_GAS_K,
         carrier_gas="N2",
-        campaign_name="C2A_staged",
+        campaign_name="C4",
         asking_site="tests.missing_continuation",
     )
     assert diagnostic is not None
-    assert diagnostic["status"] == "extrapolated"
+    _assert_flagged_continuation(diagnostic)
     with pytest.raises(EvaporationFluxRefusal) as excinfo:
         resolve_species_flux_kg_s_m2(
             diagnostic,
@@ -422,7 +479,7 @@ def test_authorized_extrapolation_without_continuation_refuses() -> None:
     assert excinfo.value.diagnostic["ledger_yields_authorized"] is False
 
 
-def _provider_result(species: str, campaign_name: str, overhead_pa: float):
+def _provider_result(species: str, campaign_name: str | None, overhead_pa: float):
     molar = _molar_mass_kg_mol(species)
     provider = BuiltinEvaporationFluxProvider()
     view = ProviderAccountView(
@@ -462,23 +519,12 @@ def _provider_result(species: str, campaign_name: str, overhead_pa: float):
 
 
 @pytest.mark.parametrize("species", TRANSPORT_SPECIES)
-@pytest.mark.parametrize(
-    ("campaign_name", "overhead_pa", "branch"),
-    (
-        ("C2A_staged", _TRANSITIONAL_PA, "extrapolated"),
-        ("C2A_STAGED", _TRANSITIONAL_PA, "extrapolated"),
-        ("C2A", _TRANSITIONAL_PA, "extrapolated"),
-        ("C2A_continuous", _TRANSITIONAL_PA, "extrapolated"),
-        ("C4", _TRANSITIONAL_PA, "provider_continuation"),
-        ("C0", _TRANSITIONAL_PA, "bakeout_mark"),
-        ("C2A_staged", _VISCOUS_PA, "in_domain"),
-    ),
-)
-def test_provider_species_flux_matches_the_invariant(
+@pytest.mark.parametrize("campaign_name", CAMPAIGN_NAMES + (None,))
+@pytest.mark.parametrize("overhead_pa", (_TRANSITIONAL_PA, _VISCOUS_PA))
+def test_provider_species_flux_matches_the_diagnostic(
     species: str,
-    campaign_name: str,
+    campaign_name: str | None,
     overhead_pa: float,
-    branch: str,
 ) -> None:
     result = _provider_result(species, campaign_name, overhead_pa)
     assert result.status == "ok", result.diagnostic
@@ -490,26 +536,36 @@ def test_provider_species_flux_matches_the_invariant(
         record = missing.get(species) or missing_alpha[species]
         assert record.get("status") == "unavailable" or record.get("policy")
         return
-    published = float(flux[species])
-    assert published > 0.0
-    series = result.diagnostic["evaporation_series_resistance"][species]
-    if branch in {"extrapolated", "provider_continuation"}:
-        notice = result.diagnostic["continuum_extrapolation_notice"]
-        assert notice["status"] == "extrapolated"
-        assert notice["ledger_yields_authorized"] is True
-        continued = _series(species, overhead_pa=overhead_pa, extrapolate=True)
-        assert continued.r_gas > 0.0
-        assert series["r_gas"] == pytest.approx(continued.r_gas)
-        assert published == pytest.approx(continued.flux_kg_s_m2 * 3600.0)
-        return
-    if branch == "bakeout_mark":
-        assert "continuum_extrapolation_notice" not in result.diagnostic
-        ordinary = _series(species, overhead_pa=overhead_pa, extrapolate=False)
-        assert ordinary.r_gas == pytest.approx(0.0)
-        assert series["r_gas"] == pytest.approx(0.0)
-        assert published == pytest.approx(ordinary.flux_kg_s_m2 * 3600.0)
-        return
-    assert "continuum_extrapolation_notice" not in result.diagnostic
+    published_kg_hr = float(flux[species])
+    assert published_kg_hr > 0.0
     ordinary = _series(species, overhead_pa=overhead_pa, extrapolate=False)
-    assert ordinary.r_gas > 0.0
-    assert published == pytest.approx(ordinary.flux_kg_s_m2 * 3600.0)
+    diagnostic = _diagnostic(
+        _provider_campaign(campaign_name),
+        float(ordinary.knudsen_number),
+        overhead_pa,
+    )
+    continuation_flux = None
+    if (
+        diagnostic is not None
+        and diagnostic.get("status") == "extrapolated"
+        and diagnostic.get("ledger_yields_authorized")
+    ):
+        continuation_flux = float(
+            _series(species, overhead_pa=overhead_pa, extrapolate=True).flux_kg_s_m2
+        )
+    expected_kg_s_m2 = resolve_species_flux_kg_s_m2(
+        diagnostic,
+        ordinary_flux_kg_s_m2=float(ordinary.flux_kg_s_m2),
+        continuation_flux_kg_s_m2=continuation_flux,
+    )
+    assert published_kg_hr == pytest.approx(expected_kg_s_m2 * 3600.0)
+    notice = result.diagnostic.get("continuum_extrapolation_notice")
+    if overhead_pa == _VISCOUS_PA or _is_stage0(_provider_campaign(campaign_name)):
+        assert notice is None
+        return
+    assert notice is not None
+    _assert_flagged_continuation(notice)
+    assert notice["campaign_name"] == diagnostic["campaign_name"]
+    assert notice["knudsen_number"] == pytest.approx(diagnostic["knudsen_number"])
+    if species == "Na":
+        assert published_kg_hr == pytest.approx(_NA_CONTINUATION_KG_S_M2 * 3600.0)

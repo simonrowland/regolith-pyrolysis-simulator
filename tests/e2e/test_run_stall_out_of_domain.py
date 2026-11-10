@@ -1,21 +1,14 @@
-"""Known defect (b): a run starts, then STALLS — the owner saw it sit on an
-OUT_OF_DOMAIN state that arrives over socket.io, not the HTTP access log.
+"""A run must keep moving. Transitional C4 is a flagged continuation, not a stall.
 
-Framing (controller correction, 2026-08-28): the terminal refusal this test
-reproduces — `viscous_p_bulk_transport_out_of_domain` at C4 — is CORRECT,
-DELIBERATE fail-closed behaviour: viscous Poiseuille P_bulk is invalid in the
-transitional Knudsen band, so pyrolysis extraction refuses rather than
-extrapolate (Stage 0 bakeout is the compute-and-mark regime; see
-simulator/evaporation.py viscous_p_bulk_out_of_domain_diagnostic). The test
-still FAILS on it because the happy-path journey genuinely does not complete —
-but the harness reports it as a lawful model-coverage refusal, never as a
-crash or hang. A *true* stall (no state change for STALL_THRESHOLD_MS with no
-terminal state and no unanswered decision) remains a defect. So this watchdog:
+d-209 removed the viscous-flow invariant and d-208 leaves Kn as a diagnostic.
+A default recipe that reaches C4 at 0.2 mbar runs with a continuum-continuation
+notice. It must not abort as ``viscous_p_bulk_transport_out_of_domain``. A true
+stall (no state change for STALL_THRESHOLD_MS with no terminal state and no
+unanswered decision) remains a defect. This watchdog:
 
   * starts a run at max speed; the server must answer within START_ACK_MS,
   * then requires continuous forward progress (no no-progress window longer
-    than STALL_THRESHOLD_MS) for WATCHDOG_WINDOW_MS — long enough to reach the
-    C4 campaign where the terminal out_of_domain refusal reproduces,
+    than STALL_THRESHOLD_MS) for WATCHDOG_WINDOW_MS,
   * treats 'refused'/'error' terminal states as findings, not passes,
   * captures the ENTIRE socket.io stream; if the run stalls, the verbatim
     tail of that stream (plus any event whose payload mentions
@@ -93,13 +86,6 @@ def _stall_report(evidence, last_hour: float) -> str:
     return "\n".join(parts)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "viscous_p_bulk_transport_out_of_domain is a known product gap pending "
-        "low-pressure transport support"
-    ),
-)
 @pytest.mark.cpu_budget(300)
 def test_run_does_not_stall(page, evidence):
     page.goto(f"{BASE_URL}/", wait_until="domcontentloaded", timeout=PAGE_LOAD_MS)
@@ -174,8 +160,8 @@ def test_run_does_not_stall(page, evidence):
         ]
         pytest.fail(
             f"run terminated as {verdict} at Hour: {last_hour}: {detail}\n"
-            "(a *_out_of_domain refusal here is the deliberate fail-closed "
-            "model-coverage gate — lawful, but the happy path does not complete)\n\n"
+            "(a viscous_p_bulk_transport_out_of_domain abort is a regression: "
+            "transitional C4 must keep running with a flagged continuation)\n\n"
             f"--- verbatim terminal payloads (truncated; full stream in the evidence JSON) ---\n"
             + json.dumps(refused_payloads, indent=2, default=str)
             + f"\n--- out_of_domain events: {len(domain_hits)} ---"
@@ -192,9 +178,9 @@ def test_run_does_not_stall(page, evidence):
 
 
 @pytest.mark.cpu_budget(300)
-def test_default_recipe_refusal_reason_is_viscous_p_bulk_transport_out_of_domain(
-    page, evidence
-):
+def test_default_recipe_does_not_abort_on_transitional_c4(page, evidence):
+    """Default C4 runs. A viscous P_bulk refusal is not the terminal reason."""
+
     page.goto(f"{BASE_URL}/", wait_until="domcontentloaded", timeout=PAGE_LOAD_MS)
     select_feedstock(page)
     set_max_speed(page)
@@ -209,16 +195,21 @@ def test_default_recipe_refusal_reason_is_viscous_p_bulk_transport_out_of_domain
     )
     assert started.get("status") == "started", started
 
+    terminal = None
     try:
         terminal = wait_for_socket_event(
             page,
             "simulation_status",
             timeout_ms=RUN_COMPLETE_MS,
-            statuses=["refused", "error"],
+            statuses=["refused", "error", "complete"],
         )
+    except PlaywrightTimeoutError:
+        terminal = None
     finally:
-        evidence.harvest_socket_log(phase="exact-refusal")
+        evidence.harvest_socket_log(phase="c4-continues")
         cancel_run_quietly(page, evidence)
 
-    assert terminal.get("status") == "refused", terminal
-    assert terminal.get("reason") == "viscous_p_bulk_transport_out_of_domain", terminal
+    if terminal is None:
+        return
+    assert terminal.get("reason") != "viscous_p_bulk_transport_out_of_domain", terminal
+    assert terminal.get("status") == "complete", terminal

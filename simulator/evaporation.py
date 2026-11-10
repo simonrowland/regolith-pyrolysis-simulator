@@ -119,17 +119,6 @@ def evaporation_flux_refusal_from_configuration_error(
     )
 
 
-# d-209 removed the viscous-flow invariant. These campaigns keep a
-# transitional total and flag the continuum continuation instead of
-# refusing it. The 5-15 mbar band stays an engineering margin.
-_C2A_CONTINUUM_EXTRAPOLATION_CAMPAIGNS = frozenset({
-    "C2A",
-    "C2A_continuous",
-    "C2A_STAGED",
-    "C2A_staged",
-})
-
-
 def viscous_p_bulk_out_of_domain_diagnostic(
     *,
     knudsen_number: float,
@@ -155,16 +144,14 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     an invalid input.
 
     Transitional Kn at nonzero overhead is out-of-domain for viscous
-    Poiseuille P_bulk. Applicability lives in
-    ``simulator.transport_regime.assess_continuum_formula_validity``:
-    pyrolysis extraction fail-closes (status=refused), except the C2A
-    family, which keeps the scheduled total and flags a continuum
-    continuation (status=extrapolated; d-209, d-208). Stage 0 bakeout
-    computes and marks (status=out_of_domain). Missing campaign is
-    UNKNOWN and still refuses so the pyrolysis guard cannot be dropped
-    by omitting the stage. The 0.6.3 optimizer floor (~1 mbar, Kn≈0.004)
-    never enters this domain; t-379 (0.7) lifts pyrolysis refusals with
-    transitional/molecular conductance.
+    Poiseuille P_bulk. ``assess_continuum_formula_validity`` still
+    classifies every load-bearing stage as a refusal and Stage 0 bakeout
+    as a mark. This function is the chokepoint that turns every such
+    refusal into one flagged continuum continuation (d-209, d-208): the
+    scheduled total runs, with regime, Kn, extrapolated authority, and
+    the viscous-validated 5-15 mbar engineering band. Stage 0 stays a
+    mark (ordinary HKL, R_gas=0). Invalid Kn stays a typed refusal.
+    Callers publish this payload; they do not authorize a second policy.
     """
     from simulator.transport_constants import (
         FREE_MOLECULAR_KNUDSEN_MIN,
@@ -338,12 +325,14 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     }
     if assessment.note is not None:
         payload["silent_zero_notes"] = [dict(assessment.note)]
-    campaign = assessment.campaign_name
+    # d-209 removed the viscous-flow invariant; d-208 leaves Kn as a
+    # diagnostic. Every transitional refusal, not a campaign allowlist,
+    # is the same flagged continuation. The 5-15 mbar constants are the
+    # viscous-validated engineering margin already published on C2A, not
+    # a per-campaign physics gate and not a pressure repair.
     if (
         refuses
         and payload["reason"] == "viscous_p_bulk_transport_out_of_domain"
-        and campaign is not None
-        and str(campaign).strip() in _C2A_CONTINUUM_EXTRAPOLATION_CAMPAIGNS
     ):
         from simulator.campaigns import (
             C2A_STAGED_PN2_SWEEP_MAX_MBAR,
@@ -461,17 +450,14 @@ def refuse_viscous_p_bulk_out_of_domain(
     asking_site: str = "evaporation.viscous_p_bulk",
     stage: str | None = None,
 ) -> None:
-    """Typed refusal when ledger yields leave the viscous P_bulk domain.
+    """Typed refusal when the continuum diagnostic is still a refusal.
 
     TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
-    safety gate and NOT a coating gate. Hard-raises when the diagnostic helper
-    reports a load-bearing transitional refusal or an invalid Kn input.
-    Bakeout out-of-domain marks do not raise. C2A-family transitional
-    extrapolation does not raise. Other load-bearing transitional
-    refusals and invalid Kn inputs do. The authoritative provider
-    returns a refused result from the same payload. Bounded consumers
-    take their flux from ``resolve_species_flux_kg_s_m2``: a refusal is
-    a typed zero, and an authorized extrapolation keeps the continuation.
+    safety gate and NOT a coating gate. Hard-raises only for invalid Kn.
+    Transitional Kn is a flagged extrapolation on every campaign and does
+    not raise. Stage 0 marks do not raise. Bounded consumers take their
+    flux from ``resolve_species_flux_kg_s_m2``: a refusal is a typed zero,
+    and an authorized extrapolation keeps the continuation.
     """
     from simulator.transport_regime import continuum_validity_refuses
 

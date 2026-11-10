@@ -3805,59 +3805,57 @@ class ExtractionMixin:
         pipe_diameter_m = float(
             getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
         )
-        if cf7_ca_shell_route_active and (
+        shell_route = cf7_ca_shell_route_active and (
             C7_MIN_TOTAL_PRESSURE_MBAR <= p_total_mbar <= C7_MAX_TOTAL_PRESSURE_MBAR
-        ):
+        )
+        series_kwargs = None
+        if shell_route:
+            series_kwargs = dict(
+                species='Ca',
+                P_eq_pa=p_sat_pa,
+                P_bulk_pa=p_bulk_pa,
+                T_surface_K=hold_temp_K,
+                molar_mass_kg_mol=MOLAR_MASS['Ca'] / 1000.0,
+                alpha_i=ca_alpha,
+                knudsen_number=None,
+                pipe_diameter_m=pipe_diameter_m,
+                overhead_pressure_pa=overhead_pressure_pa,
+                axial_stir_factor=requested_stir,
+                radial_stir_factor=self._c7_float(
+                    cfg.get('radial_stir_factor'), 1.0),
+                cold_skull_envelope={
+                    'frozen_skull_stir_ceiling': max(0.0, cold_skull_safe)
+                },
+                carrier_gas=carrier_gas,
+                T_gas_K=gas_temperature_K,
+                melt_resistance_enabled=bool(
+                    series_config.get('melt_resistance_enabled', False)
+                ),
+                gas_resistance_enabled=bool_feature_flag(
+                    series_config, 'gas_resistance_enabled', True
+                ),
+                melt_surface_renewal_base_kg_s_m2_pa=self._c7_float(
+                    series_config.get(
+                        'melt_surface_renewal_base_kg_s_m2_pa'
+                    ),
+                    0.0,
+                ),
+                melt_surface_renewal_source=str(
+                    series_config.get(
+                        'melt_surface_renewal_source',
+                        'disabled:missing-species-state-dependent-'
+                        'melt-transfer-inputs',
+                    )
+                ),
+            )
             try:
                 series_flux = _series_resistance_evaporation_flux_kg_m2_s(
-                    species='Ca',
-                    P_eq_pa=p_sat_pa,
-                    P_bulk_pa=p_bulk_pa,
-                    T_surface_K=hold_temp_K,
-                    molar_mass_kg_mol=MOLAR_MASS['Ca'] / 1000.0,
-                    alpha_i=ca_alpha,
-                    knudsen_number=None,
-                    pipe_diameter_m=pipe_diameter_m,
-                    overhead_pressure_pa=overhead_pressure_pa,
-                    axial_stir_factor=requested_stir,
-                    radial_stir_factor=self._c7_float(
-                        cfg.get('radial_stir_factor'), 1.0),
-                    cold_skull_envelope={
-                        'frozen_skull_stir_ceiling': max(0.0, cold_skull_safe)
-                    },
-                    carrier_gas=carrier_gas,
-                    T_gas_K=gas_temperature_K,
-                    melt_resistance_enabled=bool(
-                        series_config.get('melt_resistance_enabled', False)
-                    ),
-                    gas_resistance_enabled=bool_feature_flag(
-                        series_config, 'gas_resistance_enabled', True
-                    ),
-                    melt_surface_renewal_base_kg_s_m2_pa=self._c7_float(
-                        series_config.get(
-                            'melt_surface_renewal_base_kg_s_m2_pa'
-                        ),
-                        0.0,
-                    ),
-                    melt_surface_renewal_source=str(
-                        series_config.get(
-                            'melt_surface_renewal_source',
-                            'disabled:missing-species-state-dependent-'
-                            'melt-transfer-inputs',
-                        )
-                    ),
+                    **series_kwargs
                 )
             except EvaporationFluxConfigurationError as exc:
                 raise evaporation_flux_refusal_from_configuration_error(
                     exc
                 ) from exc
-            # Kn-domain validity for viscous P_bulk applies here too: the
-            # C7 0.01–0.1 mbar shell-route band sits above VISCOUS_KNUDSEN_MAX
-            # at typical hold T / D, so the same transport-model validity
-            # C7-specific diagnostic-limited policy suppresses
-            # ledger-authoritative extent. The authoritative EVAPORATION_FLUX
-            # provider refuses this state. Not a Kn safety/coating gate;
-            # t-379 (0.7) lifts the missing-model restriction.
         else:
             try:
                 series_flux = _series_resistance_evaporation_flux_kg_m2_s(
@@ -3885,13 +3883,31 @@ class ExtractionMixin:
             campaign_name='C7_CA_ALUMINOTHERMIC',
             asking_site='extraction.c7_ca_transport',
         )
-        # C7 stays a typed refusal at transitional Kn. The shared resolver
-        # is what suppresses the flux; an authorized extrapolation would
-        # require a continuation and must not become an artificial zero.
+        # Same chokepoint as evaporation: a transitional shell route publishes
+        # the flagged continuum continuation. The P_eq=0 branch is Kn=+inf
+        # and stays an ordinary zero. Not a Kn safety/coating gate.
+        series_for_ledger = series_flux
+        continuation_flux_kg_s_m2 = None
+        if (
+            series_kwargs is not None
+            and domain_diag is not None
+            and domain_diag.get('status') == 'extrapolated'
+            and domain_diag.get('ledger_yields_authorized')
+        ):
+            try:
+                series_for_ledger = _series_resistance_evaporation_flux_kg_m2_s(
+                    **series_kwargs,
+                    extrapolate_continuum=True,
+                )
+            except EvaporationFluxConfigurationError as exc:
+                raise evaporation_flux_refusal_from_configuration_error(
+                    exc
+                ) from exc
+            continuation_flux_kg_s_m2 = float(series_for_ledger.flux_kg_s_m2)
         flux_kg_s_m2 = resolve_species_flux_kg_s_m2(
             domain_diag,
             ordinary_flux_kg_s_m2=float(series_flux.flux_kg_s_m2),
-            continuation_flux_kg_s_m2=None,
+            continuation_flux_kg_s_m2=continuation_flux_kg_s_m2,
         )
         ca_transport_mol = (
             flux_kg_s_m2
@@ -3901,9 +3917,9 @@ class ExtractionMixin:
         )
         extent_mol = ca_transport_mol / max(ca_per_extent, 1e-30)
         resistances = {
-            'melt': series_flux.r_melt,
-            'interface': series_flux.r_interface,
-            'gas': series_flux.r_gas,
+            'melt': series_for_ledger.r_melt,
+            'interface': series_for_ledger.r_interface,
+            'gas': series_for_ledger.r_gas,
         }
         finite_resistances = {
             key: value
@@ -3929,7 +3945,7 @@ class ExtractionMixin:
                 'cold_skull_safe_stir_factor',
             ),
         ]
-        if getattr(series_flux, 'frozen_skull_stir_clamped', False):
+        if getattr(series_for_ledger, 'frozen_skull_stir_clamped', False):
             saturation.append(
                 self._c7_knob_diag(
                     'stir_factor',
@@ -3958,15 +3974,19 @@ class ExtractionMixin:
             'c7_ca_p_sat_pa': p_sat_pa,
             'c7_ca_p_bulk_pa': p_bulk_pa,
             'c7_ca_alpha_intrinsic': ca_alpha,
-            'c7_ca_alpha_effective': series_flux.alpha_effective,
+            'c7_ca_alpha_effective': series_for_ledger.alpha_effective,
             'c7_ca_route_surface_area_m2': area_m2,
             'c7_hold_time_s': hold_time_s,
             'c7_overhead_pressure_pa': overhead_pressure_pa,
-            'c7_knudsen_number': series_flux.knudsen_number,
-            'R_melt': series_flux.r_melt,
-            'R_interface': series_flux.r_interface,
-            'R_gas': series_flux.r_gas,
-            'R_total': series_flux.r_melt + series_flux.r_interface + series_flux.r_gas,
+            'c7_knudsen_number': series_for_ledger.knudsen_number,
+            'R_melt': series_for_ledger.r_melt,
+            'R_interface': series_for_ledger.r_interface,
+            'R_gas': series_for_ledger.r_gas,
+            'R_total': (
+                series_for_ledger.r_melt
+                + series_for_ledger.r_interface
+                + series_for_ledger.r_gas
+            ),
             'limiting_resistance': limiting,
             'stir_requested': requested_stir,
             'stir_applied': applied_stir,
@@ -4002,6 +4022,15 @@ class ExtractionMixin:
                     'carrier_gas': domain_diag['carrier_gas'],
                     'framing': domain_diag['framing'],
                     'knudsen_number': domain_diag['knudsen_number'],
+                    'status': domain_diag.get('status'),
+                    'regime': domain_diag.get('regime'),
+                    'authority_level': domain_diag.get('authority_level'),
+                    'certified_band_mbar': domain_diag.get(
+                        'certified_band_mbar'
+                    ),
+                    'evaporation_flux_status': domain_diag.get(
+                        'evaporation_flux_status'
+                    ),
                 }
             )
         return extent_mol, diagnostic

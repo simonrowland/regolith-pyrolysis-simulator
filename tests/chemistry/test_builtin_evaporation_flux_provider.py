@@ -1452,21 +1452,30 @@ def test_provider_extrapolates_finite_continuum_without_fabricating_zero_flux():
         "viscous_p_bulk_transport_out_of_domain" in w for w in result.warnings
     )
 
-    # Explicit hard-refuse helper uses the same typed refusal.
+    # The helper reports the same flagged extrapolation. It does not raise.
     from simulator.evaporation import (
-        EvaporationFluxRefusal,
         refuse_viscous_p_bulk_out_of_domain,
+        viscous_p_bulk_out_of_domain_diagnostic,
     )
-    import pytest
 
-    with pytest.raises(EvaporationFluxRefusal) as ei:
-        refuse_viscous_p_bulk_out_of_domain(
-            knudsen_number=notice["knudsen_number"],
-            overhead_pressure_pa=3.632,
-            pipe_diameter_m=0.12,
-            gas_temperature_K=2023.15,
-        )
-    assert ei.value.reason == "viscous_p_bulk_transport_out_of_domain"
+    flagged = viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=notice["knudsen_number"],
+        overhead_pressure_pa=3.632,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=2023.15,
+    )
+    assert flagged is not None
+    assert flagged["status"] == "extrapolated"
+    assert flagged["ledger_yields_authorized"] is True
+    assert flagged["regime"] == "transitional"
+    assert flagged["authority_level"] == "extrapolated"
+    assert flagged["certified_band_mbar"] == pytest.approx([5.0, 15.0])
+    refuse_viscous_p_bulk_out_of_domain(
+        knudsen_number=notice["knudsen_number"],
+        overhead_pressure_pa=3.632,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=2023.15,
+    )
 
 
 @pytest.mark.xdist_group("serial")

@@ -1,9 +1,10 @@
 """b-214: continuum-transport guard applicability (Stage 0 vs pyrolysis).
 
 Production path: ``_evaporation_flux_control_inputs`` threads campaign_name
-into the live EVAPORATION_FLUX provider, which consults
-``assess_continuum_formula_validity``. Direct provider tests without a
-campaign still refuse (missing stage is category 1).
+into the live EVAPORATION_FLUX provider. The assessor still refuses
+load-bearing transitional Kn. ``viscous_p_bulk_out_of_domain_diagnostic``
+turns every such refusal into one flagged continuation, including a
+missing campaign. Stage 0 stays a compute-and-mark.
 """
 
 from __future__ import annotations
@@ -16,7 +17,6 @@ from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.evaporation import (
-    EvaporationFluxRefusal,
     refuse_viscous_p_bulk_out_of_domain,
     viscous_p_bulk_out_of_domain_diagnostic,
 )
@@ -135,6 +135,8 @@ def test_pyrolysis_provider_extrapolates_with_original_domain_context():
     )
     assert notice["doctrine_category"] == 2
     assert notice["authority_level"] == "extrapolated"
+    assert notice["regime"] == "transitional"
+    assert notice["certified_band_mbar"] == pytest.approx([5.0, 15.0])
     assert not continuum_validity_refuses(notice)
 
 
@@ -200,7 +202,7 @@ def test_c0_production_controls_drive_provider_mark_not_refusal():
     )
 
 
-def test_viscous_p_bulk_helper_marks_bakeout_and_refuses_pyrolysis():
+def test_viscous_p_bulk_helper_marks_bakeout_and_flags_transitional():
     bakeout = viscous_p_bulk_out_of_domain_diagnostic(
         knudsen_number=0.1,
         overhead_pressure_pa=_TRANSITIONAL_PA,
@@ -222,16 +224,30 @@ def test_viscous_p_bulk_helper_marks_bakeout_and_refuses_pyrolysis():
         campaign_name="C0",
     )
 
-    with pytest.raises(EvaporationFluxRefusal) as exc_info:
-        refuse_viscous_p_bulk_out_of_domain(
-            knudsen_number=0.1,
-            overhead_pressure_pa=_TRANSITIONAL_PA,
-            pipe_diameter_m=_PIPE_M,
-            gas_temperature_K=_TRANSITIONAL_T_K,
-            campaign_name="C4",
-        )
-    assert exc_info.value.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert exc_info.value.diagnostic["campaign_name"] == "C4"
-    assert exc_info.value.diagnostic["process_regime"] == (
+    flagged = viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=0.1,
+        overhead_pressure_pa=_TRANSITIONAL_PA,
+        pipe_diameter_m=_PIPE_M,
+        gas_temperature_K=_TRANSITIONAL_T_K,
+        campaign_name="C4",
+        asking_site="tests.viscous_p_bulk",
+    )
+    assert flagged is not None
+    assert flagged["status"] == "extrapolated"
+    assert flagged["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert flagged["ledger_yields_authorized"] is True
+    assert flagged["regime"] == "transitional"
+    assert flagged["authority_level"] == "extrapolated"
+    assert flagged["certified_band_mbar"] == pytest.approx([5.0, 15.0])
+    assert flagged["campaign_name"] == "C4"
+    assert flagged["process_regime"] == (
         ProcessRegime.PYROLYSIS_EXTRACTION.value
+    )
+    assert not continuum_validity_refuses(flagged)
+    refuse_viscous_p_bulk_out_of_domain(
+        knudsen_number=0.1,
+        overhead_pressure_pa=_TRANSITIONAL_PA,
+        pipe_diameter_m=_PIPE_M,
+        gas_temperature_K=_TRANSITIONAL_T_K,
+        campaign_name="C4",
     )

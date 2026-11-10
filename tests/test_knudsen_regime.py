@@ -417,12 +417,17 @@ def test_c2a_staged_transitional_po2_hold_keeps_scheduled_total_and_flags():
         gas_temperature_K=1873.15,
         carrier_gas="N2",
         campaign_name="C4",
-        asking_site="tests.c4_still_refuses",
+        asking_site="tests.c4_flagged_continuation",
     )
     assert c4 is not None
-    assert c4["status"] == "refused"
-    assert c4["evaporation_flux_status"] == "not_evaluated"
-    assert c4["ledger_yields_authorized"] is False
+    assert c4["status"] == "extrapolated"
+    assert c4["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert c4["evaporation_flux_status"] == "extrapolated"
+    assert c4["ledger_yields_authorized"] is True
+    assert c4["regime"] == "transitional"
+    assert c4["authority_level"] == "extrapolated"
+    assert c4["certified_band_mbar"] == pytest.approx([5.0, 15.0])
+    assert c4["knudsen_number"] == pytest.approx(kn)
 
     continued = _series_resistance_evaporation_flux_kg_m2_s(
         species="Na",

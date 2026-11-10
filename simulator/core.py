@@ -8257,11 +8257,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         except EvaporationFluxConfigurationError as exc:
             raise evaporation_flux_refusal_from_configuration_error(exc) from exc
-        # Transitional Kn: refused diagnostics suppress this bounded
-        # projection (typed refusal, ledger not authorized). An authorized
-        # C2A extrapolation keeps the continuum continuation, the same
-        # gas-film formula the evaporation provider publishes. Stage 0
-        # bakeout marks and keeps the computed HKL capacity.
+        # Transitional Kn is the flagged continuum continuation from
+        # viscous_p_bulk_out_of_domain_diagnostic (d-209, d-208), the same
+        # gas-film formula the evaporation provider publishes. A refused
+        # diagnostic (invalid Kn) is a typed zero. Stage 0 bakeout marks
+        # and keeps the computed HKL capacity.
         from simulator.evaporation import resolve_species_flux_kg_s_m2
         from simulator.transport_regime import continuum_validity_refuses
 
