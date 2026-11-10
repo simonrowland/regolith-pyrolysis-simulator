@@ -1106,32 +1106,13 @@ def _imcc_activity_coefficient_reports(
 ) -> tuple[dict[str, float], dict[str, dict[str, Any]]]:
     """Build single-cation Gamma values and their reference-state labels."""
 
-    from simulator.chemistry.melt_activity import (
-        single_cation_activity_and_fraction,
-        single_cation_component_formula,
+    from simulator.melt_backend.openimcc_bridge import (
+        _single_cation_activity_coefficient_reports,
     )
 
-    values: dict[str, float] = {}
-    details: dict[str, dict[str, Any]] = {}
-    for oxide, parent_activity in parent_activities.items():
-        single_activity, fraction = single_cation_activity_and_fraction(
-            str(oxide), float(parent_activity), composition_mol
-        )
-        if fraction <= 0.0:
-            continue
-        component = single_cation_component_formula(str(oxide))
-        gamma = single_activity / fraction
-        values[component] = gamma
-        details[component] = {
-            "value": gamma,
-            "coefficient_basis": "single_cation",
-            "standard_state": {
-                "convention": "raoultian_pure_endmember",
-                "phase": "l",
-                "component_basis": component,
-            },
-        }
-    return values, details
+    return _single_cation_activity_coefficient_reports(
+        parent_activities, composition_mol
+    )
 
 
 def _plain_data(value: Any) -> Any:

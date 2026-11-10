@@ -898,6 +898,34 @@ def _pack_digest(pack: Any) -> str:
     return value
 
 
+def _single_cation_activity_coefficient_reports(
+    parent_activities: Mapping[str, float], composition_mol: Mapping[str, float]
+) -> tuple[dict[str, float], dict[str, dict[str, Any]]]:
+    """Build single-cation Gamma values and their reference-state labels."""
+
+    values: dict[str, float] = {}
+    details: dict[str, dict[str, Any]] = {}
+    for oxide, parent_activity in parent_activities.items():
+        single_activity, fraction = single_cation_activity_and_fraction(
+            str(oxide), float(parent_activity), composition_mol
+        )
+        if fraction <= 0.0:
+            continue
+        component = single_cation_component_formula(str(oxide))
+        gamma = single_activity / fraction
+        values[component] = gamma
+        details[component] = {
+            "value": gamma,
+            "coefficient_basis": "single_cation",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": component,
+            },
+        }
+    return values, details
+
+
 def openimcc_pack_identity() -> dict[str, Any]:
     """Return the package and raw-file identity for its default profile."""
 
@@ -1021,23 +1049,9 @@ def _evaluate_redox_melt(
     )
     activities = {name: float(redox.parent_activity[name]) for name in parent_oxides}
     composition_mol = _canonical_composition(composition_mol)
-    activity_coefficients: dict[str, dict[str, Any]] = {}
-    for oxide, parent_activity in activities.items():
-        single_activity, fraction = single_cation_activity_and_fraction(
-            oxide, parent_activity, composition_mol
-        )
-        if fraction <= 0.0:
-            continue
-        component = single_cation_component_formula(oxide)
-        activity_coefficients[component] = {
-            "value": single_activity / fraction,
-            "coefficient_basis": "single_cation",
-            "standard_state": {
-                "convention": "raoultian_pure_endmember",
-                "phase": "l",
-                "component_basis": component,
-            },
-        }
+    _activity_coefficient_values, activity_coefficients = (
+        _single_cation_activity_coefficient_reports(activities, composition_mol)
+    )
     return OpenImccBridgeResult(
         parent_oxide_activities=activities,
         parent_oxides=parent_oxides,
@@ -1158,23 +1172,11 @@ def evaluate(
             for name, value in composition.items()
             if float(value) > 0.0
         }
-    activity_coefficients: dict[str, dict[str, Any]] = {}
-    for oxide, parent_activity in activities.items():
-        single_activity, fraction = single_cation_activity_and_fraction(
-            oxide, parent_activity, composition_mol_for_fraction
+    _activity_coefficient_values, activity_coefficients = (
+        _single_cation_activity_coefficient_reports(
+            activities, composition_mol_for_fraction
         )
-        if fraction <= 0.0:
-            continue
-        component = single_cation_component_formula(oxide)
-        activity_coefficients[component] = {
-            "value": single_activity / fraction,
-            "coefficient_basis": "single_cation",
-            "standard_state": {
-                "convention": "raoultian_pure_endmember",
-                "phase": "l",
-                "component_basis": component,
-            },
-        }
+    )
     package_labels = result.labels
     labels = ImccAdapterLabels(
         identity=package_labels.identity,
