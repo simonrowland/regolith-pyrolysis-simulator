@@ -404,6 +404,12 @@ def _display_mass(value):
 
 
 def _story_total(story, *keys):
+    missing = {
+        key: story[key]["class_total_kg"]
+        for key in keys
+        if story[key]["class_total_kg"] is None
+    }
+    assert not missing, f"product story has unavailable class totals: {missing}"
     return sum(story[key]["class_total_kg"] for key in keys)
 
 
