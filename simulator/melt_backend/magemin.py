@@ -1444,12 +1444,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         name = str(configured).lower().strip()
         return name if name in self._BUFFER_CHOICES else 'qfm'
 
-    def _engine_cache_settings(self) -> dict[str, str]:
-        return {
-            'database': self._effective_database(),
-            'fO2_buffer': self._effective_fO2_buffer(),
-        }
-
     def get_vapor_species(self) -> List[str]:
         # MAGEMin does not compute vapor speciation.  Returning an empty
         # list signals the simulator's router not to ask this backend
