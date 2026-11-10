@@ -196,7 +196,7 @@ def headless_full_run_product_story(tmp_path_factory):
         (
             "lunar_mare_low_ti", 24, {},
             {}, {"Cl": 0.02, "Co": 0.04, "Ni": 0.21, "S": 0.72},
-            None, 363.32,
+            0.0, 363.32,
         ),
         (
             "mars_basalt", 12, {"C": 30.0},
@@ -237,13 +237,14 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
     assert runner["glass"]["species_kg"] == {}
     assert web_story["captured_volatiles"]["species_kg"] == {}
     assert runner["captured_volatiles"]["kg_by_species"] == {}
-    oxygen_kg = (
-        sim._oxygen_terminal_partition_kg()["total"]
-        if feedstock == "lunar_mare_low_ti"
-        else expected_oxygen_kg
-    )
+    oxygen_kg = expected_oxygen_kg
     if feedstock == "lunar_mare_low_ti":
-        assert oxygen_kg > 0.0
+        oxygen_partition = sim._oxygen_terminal_partition_kg()
+        assert oxygen_kg == 0.0
+        assert {
+            key: oxygen_partition[key]
+            for key in ("stored", "vented", "captured", "total")
+        } == {"stored": 0.0, "vented": 0.0, "captured": 0.0, "total": 0.0}
     assert web_story["oxygen"]["class_total_kg"] == pytest.approx(
         oxygen_kg, abs=0.01
     )
@@ -255,7 +256,12 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         assert oxygen_flag["authority"] == "extrapolated"
         assert oxygen_flag["band"] == "d-359 B/C/E follow-ups pending"
         reason = oxygen_flag["reason"]
-        assert "Interim best estimate" in reason
+        assert reason.startswith(
+            "0.0 kg O₂ is the direct O₂-ledger total; no stored, vented, or "
+            "captured molecular O₂ was recorded. The associated B/C/E "
+            "oxide-vapor predictions are incomplete and are not counted as "
+            "shipped O₂. "
+        )
         assert "missing_evidence" in reason
         assert "ideal_mixing_assumption" in reason
         assert "outside_declared_evaluator_domain" in reason

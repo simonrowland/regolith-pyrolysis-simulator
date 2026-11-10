@@ -285,19 +285,22 @@ def test_non_silica_availability_flag_renders_from_availability_field():
     assert "reason=provider pressure was below its reporting floor" in report
 
 
-def test_flagged_oxygen_estimate_renders_d367_notice_in_runner_report():
+def test_flagged_zero_oxygen_renders_d364_notice_in_runner_report():
     classification = _empty_classification()
     classification["metals_plus_O2"].update({
-        "class_total_kg": 1.25,
+        "class_total_kg": 0.0,
         "metals_total_kg": 0.0,
-        "O2_kg": 1.25,
+        "O2_kg": 0.0,
         "status": "partial",
         "availability_flag": {
             "status": "flagged prediction",
             "authority": "extrapolated",
             "band": "d-359 B/C/E follow-ups pending",
             "reason": (
-                "Interim best estimate from flagged vapor contributions. "
+                "0.0 kg O₂ is the direct O₂-ledger total; no stored, vented, "
+                "or captured molecular O₂ was recorded. The associated "
+                "B/C/E oxide-vapor predictions are incomplete and are not "
+                "counted as shipped O₂. "
                 "Class B: missing_evidence (no assemblage/potential "
                 "evidence; Henrian upper bound disabled); use provider "
                 "activity, published gamma*x, then ideal a=x with "
@@ -315,8 +318,10 @@ def test_flagged_oxygen_estimate_renders_d367_notice_in_runner_report():
 
     assert (
         "- Availability flag: status=flagged prediction; "
-        "authority=extrapolated; reason=Interim best estimate from flagged "
-        "vapor contributions. Class B: missing_evidence (no "
+        "authority=extrapolated; reason=0.0 kg O₂ is the direct O₂-ledger "
+        "total; no stored, vented, or captured molecular O₂ was recorded. "
+        "The associated B/C/E oxide-vapor predictions are incomplete and "
+        "are not counted as shipped O₂. Class B: missing_evidence (no "
         "assemblage/potential evidence; Henrian upper bound disabled); use "
         "provider activity, published gamma*x, then ideal a=x with "
         "ideal_mixing_assumption. Class C: "

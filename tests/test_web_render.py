@@ -495,11 +495,13 @@ def test_product_ledger_preserves_incomplete_story_status():
     assert rendered["text"]["product-ledger-state"] == "incomplete"
 
 
-def test_oxygen_out_renders_d367_flagged_estimate_notice():
+def test_oxygen_out_renders_d364_flagged_zero_notice():
     html = app_module.create_app().test_client().get("/").get_data(as_text=True)
     reason = (
-        "Interim best estimate from flagged vapor contributions. Class B: "
-        "missing_evidence (no assemblage/potential evidence; Henrian upper "
+        "0.0 kg O₂ is the direct O₂-ledger total; no stored, vented, or "
+        "captured molecular O₂ was recorded. The associated B/C/E oxide-vapor "
+        "predictions are incomplete and are not counted as shipped O₂. "
+        "Class B: missing_evidence (no assemblage/potential evidence; Henrian upper "
         "bound disabled); use provider activity, published gamma*x, then "
         "ideal a=x with ideal_mixing_assumption. Class C: "
         "outside_declared_evaluator_domain for MnO_gas at 313.15 K; "
@@ -514,8 +516,8 @@ def test_oxygen_out_renders_d367_flagged_estimate_notice():
         payload={
             "product_story": {
                 "oxygen": {
-                    "class_total_kg": 1.25,
-                    "O2_kg": 1.25,
+                    "class_total_kg": 0.0,
+                    "O2_kg": 0.0,
                     "status": "partial",
                     "availability_flag": {
                         "status": "flagged prediction",
