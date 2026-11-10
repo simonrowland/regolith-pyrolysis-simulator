@@ -1,9 +1,9 @@
 profile_id: mars-basalt-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: mars_basalt
-description: General Mars basalt; carbon/sulfate/halide cleanup then Fe/O2/alkali-compatible extraction.
+description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. General Mars basalt; carbon/sulfate/halide cleanup then Fe/O2/alkali-compatible extraction."
 north_star_rationale: Mars basalt needs Stage-0 carbon cleanup and halide/sulfate handling before O2, metals, and glass targets.
-objective_emphasis: Mars cleanup plus balanced O2/metals/glass.
+objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Mars cleanup plus balanced O2/metals/glass."
 objectives:
   - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.34, rationale: stored O2 for Mars baseline}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.24, rationale: Fe/metal proxy}

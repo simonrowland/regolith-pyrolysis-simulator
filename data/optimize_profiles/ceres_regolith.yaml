@@ -1,9 +1,9 @@
 profile_id: ceres-regolith-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: ceres_regolith
-description: Ceres regolith; water/NH3/salts cleanup before Mg/O2 extraction.
+description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Ceres regolith; water/NH3/salts cleanup before Mg/O2 extraction."
 north_star_rationale: Ceres value starts with volatile cleanup, but the optimizer vocabulary can only steer the post-cleanup silicate extraction products.
-objective_emphasis: Cleanup-heavy volatile body profile with Mg/O2 proxy.
+objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Cleanup-heavy volatile body profile with Mg/O2 proxy."
 objectives:
   - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.30, rationale: stored O2 product}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.26, rationale: Mg shuttle metal proxy}

@@ -6,9 +6,9 @@
 profile_id: lunar-mare-lms1-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: lunar_mare_lms1
-description: LMS-1 mare simulant; balance O2, Fe/Mg metal, silica glass, and short runs.
+description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. LMS-1 mare simulant; balance O2, Fe/Mg metal, silica glass, and short runs."
 north_star_rationale: LMS-1 is a source-captured low-Ti mare simulant, so reuse the mare-low-Ti objective shape while keeping simulant provenance separate from real regolith.
-objective_emphasis: Balanced O2/metals/glass profile for source-captured LMS-1.
+objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Balanced O2/metals/glass profile for source-captured LMS-1."
 objectives:
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.34, rationale: main stored oxidizer product}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.28, rationale: Fe/Mg ingot proxy}

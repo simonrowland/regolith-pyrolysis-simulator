@@ -6,9 +6,9 @@
 profile_id: lunar-eac-1a-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: lunar_eac_1a
-description: EAC-1A mare-like basaltic simulant; balance O2, Fe/Mg metal, silica glass, and short runs.
+description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. EAC-1A mare-like basaltic simulant; balance O2, Fe/Mg metal, silica glass, and short runs."
 north_star_rationale: EAC-1A is an Eifel basanite lunar simulant with mare-like Fe/Mg/Ca-rich oxides, so reuse the mare simulant objective shape while preserving its source-captured composition caveat.
-objective_emphasis: Balanced O2/metals/glass profile for source-captured EAC-1A.
+objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Balanced O2/metals/glass profile for source-captured EAC-1A."
 objectives:
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.34, rationale: main stored oxidizer product}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.28, rationale: Fe/Mg ingot proxy}

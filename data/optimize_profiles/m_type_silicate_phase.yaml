@@ -1,9 +1,9 @@
 profile_id: m-type-silicate-phase-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: m_type_silicate_phase
-description: Ultra-magnesian M-type silicate phase after metal removal.
+description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Ultra-magnesian M-type silicate phase after metal removal."
 north_star_rationale: After magnetic metal removal, the silicate phase should behave like S-type Mg shuttle stock.
-objective_emphasis: Mg/metal proxy with O2 and glass secondary.
+objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Mg/metal proxy with O2 and glass secondary."
 objectives:
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.40, rationale: Mg shuttle metal proxy}
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.24, rationale: O2 product}
