@@ -57,6 +57,7 @@ from typing import Any, Mapping, Optional
 from engines.magemin.domain import MAGEMinDomainGate
 from engines.magemin.parity import MAGEMinParityComparator, ParityReport
 from engines.magemin.result import MAGEMinShadowDiagnostics
+from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -71,6 +72,7 @@ from simulator.fe_redox import normalize_redox_state
 from simulator.melt_backend.base import (
     RealBackendAuthority,
     RealBackendFamily,
+    project_melt_to_oxide_wt_pct,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.scalar_boundary import is_finite
@@ -253,10 +255,27 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         control_audit = self._build_control_audit(request)
 
         composition_mol_by_account = self._composition_from_view(request)
-        composition_wt_pct = self._composition_wt_pct(
-            composition_mol_by_account.get(self.DECLARED_ACCOUNT, {}),
-            request.account_view.species_formula_registry,
-        )
+        try:
+            composition_wt_pct = self._composition_wt_pct(
+                composition_mol_by_account.get(self.DECLARED_ACCOUNT, {}),
+                request.account_view.species_formula_registry,
+            )
+        except UnknownSpeciesError as exc:
+            warning = f'MAGEMin composition refuses unresolvable species: {exc}'
+            return IntentResult(
+                intent=request.intent,
+                status='out_of_domain',
+                transition=None,
+                control_audit=control_audit,
+                diagnostic=MAGEMinShadowDiagnostics(
+                    mode='unavailable',
+                    engine_version=self._engine_version(),
+                    backend_status='out_of_domain',
+                    backend_status_reason='unresolvable_species_composition',
+                    backend_warnings=(warning,),
+                ).as_diagnostic(),
+                warnings=(warning,),
+            )
 
         # Run the domain gate even when the adapter is None so callers
         # see a meaningful rejection (rather than a silent
@@ -482,33 +501,14 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         species_formula_registry: Mapping[str, Any],
     ) -> dict:
         """Project mol -> wt% for the domain gate."""
-        if not species_mol:
-            return {}
-        from simulator.accounting.formulas import resolve_species_formula
-
-        kg_by_species: dict = {}
-        total_kg = 0.0
-        for species, mol in species_mol.items():
-            mol_val = float(mol)
-            if mol_val <= 0.0:
-                continue
-            try:
-                formula = resolve_species_formula(species, species_formula_registry)
-            except Exception:
-                continue
-            mass_kg = mol_val * formula.molar_mass_kg_per_mol()
-            if mass_kg <= 0.0:
-                continue
-            kg_by_species[str(species)] = (
-                kg_by_species.get(str(species), 0.0) + mass_kg
-            )
-            total_kg += mass_kg
-        if total_kg <= 0.0:
-            return {}
-        return {
-            species: kg / total_kg * 100.0
-            for species, kg in kg_by_species.items()
-        }
+        # Include every submitted species so the domain gate can reject
+        # non-oxides instead of silently projecting them out.
+        return project_melt_to_oxide_wt_pct(
+            composition_kg=None,
+            composition_mol=species_mol,
+            oxide_basis=tuple(species_mol),
+            species_formula_registry=species_formula_registry,
+        )
 
     def _ensure_backend(self) -> Optional[Any]:
         """Return the live adapter, lazily constructing it on first use.

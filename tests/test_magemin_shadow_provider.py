@@ -39,6 +39,8 @@ from engines.magemin import (
     ParityReport,
 )
 import engines.magemin.provider as provider_module
+from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.fe_redox import (
@@ -165,6 +167,50 @@ def test_domain_gate_flags_sio2_outside_range():
     valid, warnings = MAGEMinDomainGate.validate(composition)
     assert valid is False
     assert any('SiO2' in w and 'outside' in w for w in warnings)
+
+
+# Without a formula there is no mass fraction for the 1 wt% policy to use;
+# both trace-sized and large positive inventories therefore refuse.
+@pytest.mark.parametrize('unknown_mol', [1e-12, 1e6])
+def test_composition_projection_refuses_unresolvable_positive_mol(unknown_mol):
+    provider = MAGEMinShadowProvider.__new__(MAGEMinShadowProvider)
+
+    with pytest.raises(UnknownSpeciesError, match='BogusXYZ'):
+        provider._composition_wt_pct(
+            {'SiO2': 1.0, 'BogusXYZ': unknown_mol},
+            {},
+        )
+
+
+@pytest.mark.parametrize('unknown_mol', [1e-12, 1e6])
+def test_dispatch_returns_typed_refusal_for_unresolvable_species(unknown_mol):
+    class UnavailableBackend:
+        def is_available(self):
+            return False
+
+    composition_mol = {
+        species: wt_pct / resolve_species_formula(species).molar_mass_g_per_mol()
+        for species, wt_pct in _basalt_wt_pct().items()
+    }
+    composition_mol['BogusXYZ'] = unknown_mol
+    request = IntentRequest(
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': composition_mol},
+            species_formula_registry={},
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    result = MAGEMinShadowProvider(backend=UnavailableBackend()).dispatch(request)
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostic['backend_status_reason'] == (
+        'unresolvable_species_composition'
+    )
+    assert any('BogusXYZ' in warning for warning in result.warnings)
 
 
 # ----------------------------------------------------------------------

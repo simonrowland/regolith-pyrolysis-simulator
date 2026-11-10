@@ -76,7 +76,10 @@ from simulator.alphamelts_reference_pressure import (
     alphamelts_reference_pressure_diagnostics,
     annotate_alphamelts_reference_pressure,
 )
-from simulator.melt_backend.base import LiquidFractionInvalidError
+from simulator.melt_backend.base import (
+    LiquidFractionInvalidError,
+    project_melt_to_oxide_wt_pct,
+)
 from simulator.melt_backend.liquidus import (
     EquilibriumCrystallizationPathResult,
     LiquidusSampleError,
@@ -464,48 +467,15 @@ class AlphaMELTSProvider(ChemistryProvider):
         species_mol: Mapping[str, float],
         species_formula_registry: Mapping[str, Any],
     ) -> dict:
-        """Project mol -> wt% for the domain gate.
-
-        Lazy import on ``simulator.accounting.formulas`` to avoid the
-        package-init cycle (see ``engines/builtin/__init__.py`` for the
-        canonical description of the cycle). Mirrors the projection
-        :meth:`AlphaMELTSBackend._composition_kg_to_wt_pct` runs on the
-        adapter side.
-        """
-        if not species_mol:
-            return {}
-        from simulator.accounting.formulas import resolve_species_formula
-
-        kg_by_species: dict = {}
-        total_kg = 0.0
-        for species, mol in species_mol.items():
-            mol_val = float(mol)
-            if mol_val <= 0.0:
-                continue
-            try:
-                formula = resolve_species_formula(species, species_formula_registry)
-            except Exception as exc:
-                # Positive-mol species that cannot resolve must refuse
-                # the composition projection. Dropping the species and
-                # renormalizing invents a leaner melt (e.g. SiO2+Bogus
-                # becomes SiO2=100 wt%).
-                raise ValueError(
-                    f'AlphaMELTS composition refuses unresolvable species '
-                    f'{species!r} with positive mol; not renormalizing around a hole'
-                ) from exc
-            mass_kg = mol_val * formula.molar_mass_kg_per_mol()
-            if mass_kg <= 0.0:
-                continue
-            kg_by_species[str(species)] = (
-                kg_by_species.get(str(species), 0.0) + mass_kg
-            )
-            total_kg += mass_kg
-        if total_kg <= 0.0:
-            return {}
-        return {
-            species: kg / total_kg * 100.0
-            for species, kg in kg_by_species.items()
-        }
+        """Project the full input to wt% with the shared melt projector."""
+        # Keep every submitted species in the projection so the domain gate
+        # sees and rejects non-oxides instead of silently dropping them.
+        return project_melt_to_oxide_wt_pct(
+            composition_kg=None,
+            composition_mol=species_mol,
+            oxide_basis=tuple(species_mol),
+            species_formula_registry=species_formula_registry,
+        )
 
     def _backend_available(self) -> bool:
         if self._backend is None:
