@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.migrate import Migrator
+from tests.literature_extract_test_helpers import source_page_text
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/georges-1999-lpsc30-1744.yaml"
@@ -35,6 +36,28 @@ def test_printed_results_and_deferred_figures_are_retained() -> None:
     assert all(row["values"]["digitisation"] == "deferred to a figure pass" for row in context[1:])
     assert [s["marker_count"] for s in context[1]["values"]["series"]] == [7, 5, 0]
     assert [s["marker_count"] for s in context[2]["values"]["series"]] == [5, 10]
+
+
+def test_page_one_abstract_identifier_is_not_a_printed_folio() -> None:
+    data = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    locators = [
+        data["experiments"][0]["locator"],
+        data["experiments"][0]["sample"]["printed_composition"]["locator"],
+        data["experiments"][1]["locator"],
+        data["experiments"][1]["sample"]["printed_composition"]["locator"],
+        data["experiments"][2]["sample"]["printed_composition"]["locator"],
+        data["species"]["K2O"]["context"][0]["locator"],
+        data["species"]["K2O"]["context"][1]["locator"],
+    ]
+    assert len(locators) == 7
+    for locator in locators:
+        assert (locator["page"], locator["pdf_page_index"]) == (1, 0)
+        assert "published_page" not in locator
+
+    page1 = source_page_text(data["source_id"], 1)
+    assert "Lunar and Planetary Science XXX" in page1
+    assert "1744.pdf" in page1
+    assert "6.0 ± 0.5 wt%" in page1
 
 
 def test_isolated_migration_has_no_hard_issues_or_unsupported_points() -> None:
