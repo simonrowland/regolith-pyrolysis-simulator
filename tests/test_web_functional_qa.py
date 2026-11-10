@@ -263,7 +263,8 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
             "shipped O₂. "
         )
         assert "missing_evidence" in reason
-        assert "ideal_mixing_assumption" in reason
+        assert "provider activity" in reason
+        assert "published gamma*x" in reason
         assert "outside_declared_evaluator_domain" in reason
         assert "1519-2273 K" in reason
         assert "stage0_only" in reason
@@ -653,7 +654,7 @@ def test_headless_full_run_ledgers_and_product_story_web(
     # 3.93e-9 kg (1.18e-9 relative): float-level, measured on studio-3 at
     # 340d3c9c5 with the nightly tier; the band-integration bisect bounds the
     # solver's per-call differences at <=1.1e-7 kg.
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3152815851036044, rel=1e-9)
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3152824854034093, rel=1e-9)
     assert cr_ingot_kg == 0.0
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
