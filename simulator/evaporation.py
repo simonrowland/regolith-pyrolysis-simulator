@@ -835,7 +835,9 @@ class EvaporationMixin:
         for these partials. This method does not sum them again.
         """
 
-        from simulator.config_flags import bool_feature_flag
+        from engines.builtin.evaporation_flux import (
+            resolve_gas_resistance_enabled,
+        )
         from simulator.condensation import _knudsen_number
         from simulator.langmuir_surface_oxygen import LangmuirTransport
         from simulator.transport_regime import continuum_validity_refuses
@@ -847,10 +849,11 @@ class EvaporationMixin:
         series_config = dict(
             kernel_config.get("evaporation_series_resistance", {}) or {}
         )
-        gas_resistance_enabled = bool_feature_flag(
-            series_config,
-            "gas_resistance_enabled",
-            bool_feature_flag(kernel_config, "gas_resistance_enabled", True),
+        # Same resolver the flux publisher calls. The parent map is the
+        # kernel here; the publisher sees that top-level flag copied onto
+        # its controls by ``_evaporation_flux_control_inputs``.
+        gas_resistance_enabled = resolve_gas_resistance_enabled(
+            series_config, kernel_config
         )
         overhead_model = getattr(self, "overhead_model", None)
         try:
@@ -960,8 +963,19 @@ class EvaporationMixin:
     ) -> Any:
         """Close the flux map on one partial vector. The only writer call."""
 
+        from engines.builtin.evaporation_flux import (
+            alpha_policy_controls,
+            publisher_alpha_policy,
+        )
         from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
 
+        kernel_config = dict(
+            (getattr(self, "setpoints", {}) or {}).get("chemistry_kernel", {})
+            or {}
+        )
+        allow_fallback, fallback_species = publisher_alpha_policy(
+            alpha_policy_controls(kernel_config)
+        )
         if overhead_pressure_Pa is None:
             partials, overhead_pressure_Pa = EvaporationMixin._langmuir_film(
                 self, overhead_partials_Pa
@@ -986,6 +1000,8 @@ class EvaporationMixin:
                 temperature_K,
                 overhead_pressure_Pa,
             ),
+            allow_unmeasured_alpha_fallback=allow_fallback,
+            unmeasured_alpha_fallback_species_allowlist=fallback_species,
         )
 
     def _reclose_langmuir_pressures(
@@ -4387,6 +4403,15 @@ class EvaporationMixin:
             'evaporation_series_resistance': dict(
                 kernel_config.get('evaporation_series_resistance', {}) or {}
             ),
+            # The publisher's film default is this key, then True. Copy the
+            # top-level kernel flag so a nested-absent False is free-molecular
+            # in the publisher as well as in the closure. Null stays null;
+            # ``resolve_gas_resistance_enabled`` treats it as absent.
+            **(
+                {'gas_resistance_enabled': kernel_config['gas_resistance_enabled']}
+                if 'gas_resistance_enabled' in kernel_config
+                else {}
+            ),
             'alpha': _measured_alpha_control_view(
                 _load_evaporation_alpha_by_species(self.vapor_pressures)
             ),
@@ -4395,9 +4420,6 @@ class EvaporationMixin:
             ),
             'hkl_upper_bound_transport_species': (
                 _load_hkl_upper_bound_transport_species(self.vapor_pressures)
-            ),
-            'allow_unmeasured_alpha_fallback': kernel_config.get(
-                'allow_unmeasured_alpha_fallback', False
             ),
             'campaign_name': str(
                 getattr(
@@ -4420,10 +4442,9 @@ class EvaporationMixin:
                 controls['vapour_batch_flux_shadow_outcome'] = (
                     vapour_batch_flux_overlay['shadow_outcome']
                 )
-        if 'unmeasured_alpha_fallback_species' in kernel_config:
-            controls['unmeasured_alpha_fallback_species'] = tuple(
-                kernel_config['unmeasured_alpha_fallback_species'] or ()
-            )
+        from engines.builtin.evaporation_flux import alpha_policy_controls
+
+        controls.update(alpha_policy_controls(kernel_config))
         return controls, molar_masses_kg_mol
 
     def _project_evaporation_overhead_source_mol_hr(

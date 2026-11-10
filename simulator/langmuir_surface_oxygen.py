@@ -39,11 +39,17 @@ transport-headspace channel, or no melt-surface law), the single
 surface-pO2 law below, or a typed refusal. The published surface is
 the root of ``sum (nO_i - dO_i) J_i = 0`` where ``J_i`` is that
 species' publisher net flux at those partials, and the reported
-residual is that root's residual. Nothing writes ``0.0`` in place of
-a published pressure. Nothing drops a participating carrier's reaction
-oxygen demand because a cap zeroed the local slope. A condensed-metal
-rail never publishes above ``P_sat``, including when the solve itself
-drives a subunit activity across 1.
+residual is that root's residual. The alpha in ``J_i`` and the
+gas-film flag are the publisher's, from ``publisher_effective_alpha``
+and ``resolve_gas_resistance_enabled``: a measured row, a ``*``
+wildcard, or a permitted unmeasured fallback (broad-proxy rows are
+stripped, then alpha = 1 when the fallback allows that species). A
+carrier that policy refuses is not in the residual. Nothing writes
+``0.0`` in place of a published pressure. Nothing drops a
+participating carrier's reaction oxygen demand because a cap zeroed
+the local slope. A condensed-metal rail never publishes above
+``P_sat``, including when the solve itself drives a subunit activity
+across 1.
 
 Algebra. Reaction stoichiometry and pressure sensitivity are separate.
 The reaction exponent ``n`` is the mass-action slope off any activity
@@ -313,6 +319,8 @@ def apply_langmuir_surface_oxygen(
     overhead_partials_Pa: Mapping[str, float] | None = None,
     transport: LangmuirTransport | None = None,
     conductance_mol_s_m2_Pa: Mapping[str, float] | None = None,
+    allow_unmeasured_alpha_fallback: bool = False,
+    unmeasured_alpha_fallback_species_allowlist: set[str] | None = None,
 ) -> LangmuirSurfaceOxygen:
     """Return flux pressures at the d-376 amendment 1 surface pO2.
 
@@ -409,6 +417,10 @@ def apply_langmuir_surface_oxygen(
         conductance_mol_s_m2_Pa=conductance_mol_s_m2_Pa,
         capacity_negligible=capacity_negligible,
         eval_pO2_below_physical_floor=below_floor,
+        allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
+        unmeasured_alpha_fallback_species_allowlist=(
+            unmeasured_alpha_fallback_species_allowlist
+        ),
     )
 
 
@@ -720,27 +732,45 @@ def _flux_alpha(
     species: str,
     alpha_by_species: Mapping[str, Any],
     temperature_K: float,
+    *,
+    allow_unmeasured_alpha_fallback: bool = False,
+    unmeasured_alpha_fallback_species_allowlist: set[str] | None = None,
 ) -> tuple[float | None, str]:
-    if species not in alpha_by_species:
-        return None, ""
-    from engines.builtin.evaporation_flux import _evaluate_alpha_control
+    """Publisher alpha for the residual, or None when that publisher will not emit.
+
+    ``publisher_effective_alpha`` is the kernel's order: species row,
+    ``*`` wildcard, else the permitted fallback of 1. A broad-proxy row
+    has already been stripped, so the fallback is what publishes Al2.
+    A zero alpha emits no flux and stays out of the sum without a
+    refusal. An unmeasured species the fallback does not permit is
+    omitted; the publisher refuses it when a parent mass is present.
+    """
+
+    from engines.builtin.evaporation_flux import publisher_effective_alpha
 
     try:
-        value, evaluation = _evaluate_alpha_control(
+        decision = publisher_effective_alpha(
             species,
             temperature_K,
-            alpha_by_species[species],
+            alpha_by_species,
+            allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
+            unmeasured_alpha_fallback_species_allowlist=(
+                unmeasured_alpha_fallback_species_allowlist
+            ),
         )
     except (TypeError, ValueError):
         return None, ""
-    alpha = _finite_or_none(value)
-    if alpha is None or alpha < 0.0:
+    if decision.alpha == 0.0:
+        return 0.0, ""
+    if not decision.policy_emits():
         return None, ""
     status = ""
-    if isinstance(evaluation, Mapping):
-        status = str(evaluation.get("authority_status") or "")
+    if isinstance(decision.evaluation, Mapping):
+        status = str(decision.evaluation.get("authority_status") or "")
+    if decision.unmeasured and decision.fallback_permitted:
+        status = status or "unmeasured_alpha_fallback"
     source = status or "catalog evaporation_alpha"
-    return alpha, f"evaporation_flux_alpha:{source}"
+    return float(decision.alpha), f"evaporation_flux_alpha:{source}"
 
 
 def _parent_oxygen_demand(oxygen_atoms: float, exponent: float) -> float:
@@ -1074,6 +1104,8 @@ def _solve_or_refuse(
     conductance_mol_s_m2_Pa: Mapping[str, float] | None = None,
     capacity_negligible: bool = False,
     eval_pO2_below_physical_floor: bool = False,
+    allow_unmeasured_alpha_fallback: bool = False,
+    unmeasured_alpha_fallback_species_allowlist: set[str] | None = None,
 ) -> LangmuirSurfaceOxygen:
     registry = _formula_registry(rows)
     from simulator.evaporation import (
@@ -1115,7 +1147,13 @@ def _solve_or_refuse(
                 )
             continue
         alpha, alpha_source = _flux_alpha(
-            carrier.species, alphas, temperature_K
+            carrier.species,
+            alphas,
+            temperature_K,
+            allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
+            unmeasured_alpha_fallback_species_allowlist=(
+                unmeasured_alpha_fallback_species_allowlist
+            ),
         )
         if alpha is None:
             if carrier.inverted:

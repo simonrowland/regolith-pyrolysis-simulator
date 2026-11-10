@@ -48,6 +48,14 @@ so a commanded pressure below the overhead partial sum publishes a
 vacuum film under a root that used the O2 gas film. A step that did
 not close a root keeps the vapor-map backpressure. An explicit
 override is filmed once and handed to both.
+
+Publisher policy. The alpha and the gas-film flag in that residual
+are the publisher's own decision (``publisher_effective_alpha`` and
+``resolve_gas_resistance_enabled``). A measured row, a ``*`` wildcard,
+and a permitted unmeasured fallback are in the residual at that alpha.
+A carrier the policy refuses is not emitted and keeps its published
+pressure. Nested, top-level, null, and quoted film flags select the
+same law in the closure and in the flux kernel.
 """
 
 from __future__ import annotations
@@ -241,6 +249,7 @@ def _host(
     temperature_C: float = _T_C,
     p_total_mbar: float = 0.0,
     headspace_partials_mbar: dict[str, float] | None = None,
+    chemistry_kernel: dict | None = None,
 ):
     equilibrium = EquilibriumResult(
         temperature_C=temperature_C,
@@ -258,7 +267,11 @@ def _host(
             stir_state=SimpleNamespace(axial=0.0, radial=0.0),
             campaign=SimpleNamespace(name="C2A"),
         ),
-        setpoints={},
+        setpoints=(
+            {}
+            if chemistry_kernel is None
+            else {"chemistry_kernel": dict(chemistry_kernel)}
+        ),
         vapor_pressures=legacy,
         vapour_rail_catalog=compiled,
         overhead=SimpleNamespace(headspace_temperature_K=0.0),
@@ -1074,6 +1087,7 @@ def _series_molar_flux(
     alpha: float,
     temperature_K: float,
     overhead_pa: float,
+    gas_resistance_enabled: bool = True,
 ) -> float:
     """Publisher series flux in mol m^-2 s^-1. Not the surface solver."""
 
@@ -1094,7 +1108,7 @@ def _series_molar_flux(
         radial_stir_factor=0.0,
         carrier_gas="N2",
         T_gas_K=temperature_K,
-        gas_resistance_enabled=True,
+        gas_resistance_enabled=gas_resistance_enabled,
         extrapolate_continuum=False,
         melt_resistance_enabled=False,
     )
@@ -2186,3 +2200,505 @@ def test_publisher_film_matches_the_surface_root_on_every_path(
             pressure_ca_pa=float(kernel_map["Ca"]),
         )
         assert stale > 1.0e-3
+
+
+# Placements of the one film flag. ``absent`` omits the key. None is a
+# present null. Nested wins; null is absent and falls through; a quoted
+# false and a numeric 0 stay off. Top-level false with no nested key is
+# the reviewer's split: the closure was free-molecular and the publisher
+# stayed on the film.
+_GAS_FLAG_PLACEMENTS = (
+    ("absent", "absent", True),
+    ("absent", False, False),
+    ("absent", True, True),
+    ("absent", None, True),
+    ("absent", "false", False),
+    ("absent", 0, False),
+    (False, "absent", False),
+    (True, "absent", True),
+    (False, True, False),
+    (True, False, True),
+    (None, False, False),
+    (None, "absent", True),
+    (None, None, True),
+)
+_ALPHA_POLICIES = (
+    "off",
+    "on",
+    "allow-Al2",
+    "allow-string",
+    "allow-other",
+    "allow-null",
+    "wildcard",
+)
+_ZR_PA = 1.0
+_WILDCARD_ALPHA = 0.4
+
+
+def _flag_id(value: object) -> str:
+    if value == "absent":
+        return "absent"
+    if value is None:
+        return "null"
+    return repr(value)
+
+
+def _gas_kernel(nested: object, top: object) -> dict:
+    kernel: dict = {}
+    if top != "absent":
+        kernel["gas_resistance_enabled"] = top
+    if nested != "absent":
+        kernel["evaporation_series_resistance"] = {
+            "gas_resistance_enabled": nested,
+        }
+    return kernel
+
+
+def _alpha_kernel(policy: str) -> dict:
+    if policy in ("off", "wildcard"):
+        return {}
+    if policy == "on":
+        return {"allow_unmeasured_alpha_fallback": True}
+    if policy == "allow-Al2":
+        return {
+            "allow_unmeasured_alpha_fallback": True,
+            "unmeasured_alpha_fallback_species": ["Al2"],
+        }
+    if policy == "allow-string":
+        return {
+            "allow_unmeasured_alpha_fallback": True,
+            "unmeasured_alpha_fallback_species": "Al2",
+        }
+    if policy == "allow-other":
+        return {
+            "allow_unmeasured_alpha_fallback": True,
+            "unmeasured_alpha_fallback_species": ["NoSuchSpecies"],
+        }
+    if policy == "allow-null":
+        # Present null is stored as an empty tuple: nobody is permitted.
+        return {
+            "allow_unmeasured_alpha_fallback": True,
+            "unmeasured_alpha_fallback_species": None,
+        }
+    raise AssertionError(policy)
+
+
+@functools.lru_cache(maxsize=1)
+def _cao_al_answer():
+    payload = yaml.safe_load(_DATA.read_text())
+    provider = BuiltinVaporPressureProvider(payload)
+    return provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={
+                    "process.cleaned_melt": {"CaO": 1.0, "Al2O3": 1.0},
+                },
+                species_formula_registry={},
+            ),
+            temperature_C=_T_C,
+            pressure_bar=0.01,
+            control_inputs={
+                "pO2_bar": DEFAULT_VACUUM_FLOOR_BAR,
+                "intrinsic_fO2_log": -9.0,
+                "vacuum_floor_bar": DEFAULT_VACUUM_FLOOR_BAR,
+            },
+        )
+    )
+
+
+def _legacy_species_row(legacy, species: str):
+    for group_name in ("metals", "oxide_vapors"):
+        group = legacy.get(group_name) or {}
+        row = group.get(species)
+        if isinstance(row, dict):
+            return row
+    return None
+
+
+def _law_exponent_and_pref(compiled, legacy, species: str, provenance, source_bar):
+    """Catalog exponent and the pO2 that published this pressure.
+
+    Metal rails use the Ellingham stoichiometry. Intrinsic-melt oxide
+    rows use the source-reaction fO2, not the row's 1 bar reference.
+    """
+
+    if species == "Zr":
+        return -0.5, 1.0e-9
+    rail = str((provenance or {}).get("pressure_rail") or "")
+    if rail in ("gas_fugacity", "condensed_raoult_psat"):
+        from simulator.chemistry.ellingham_thermo import ellingham_stoichiometry
+
+        n_metal, _oxide = ellingham_stoichiometry(species)
+        recorded = float(provenance["pO2_bar"])
+        return -1.0 / float(n_metal), recorded
+    species_map = getattr(compiled, "species", {}) or {}
+    compiled_species = species_map.get(species)
+    evaluator = getattr(compiled_species, "evaluator", None)
+    exponent = getattr(evaluator, "pO2_exponent", None) if evaluator else None
+    channel = (
+        getattr(evaluator, "oxygen_fugacity_channel", None) if evaluator else None
+    )
+    if exponent is None:
+        row = _legacy_species_row(legacy, species)
+        if isinstance(row, dict) and row.get("pO2_exponent") is not None:
+            exponent = row.get("pO2_exponent")
+    if exponent is None and provenance.get("pO2_exponent") is not None:
+        exponent = provenance.get("pO2_exponent")
+    if channel == "intrinsic_melt":
+        pref = float(source_bar)
+    else:
+        recorded = provenance.get("pO2_bar")
+        pref = float(recorded) if recorded else float(source_bar)
+    if exponent is None:
+        return None, pref
+    return float(exponent), pref
+
+
+def _species_molar_kg(legacy, species: str) -> float:
+    if species == "Zr":
+        return parse_formula("Zr").molar_mass_kg_per_mol()
+    row = _legacy_species_row(legacy, species) or {}
+    formula = row.get("formula") or species
+    return parse_formula(str(formula)).molar_mass_kg_per_mol()
+
+
+def _catalog_overlay(legacy, metal_rows: Mapping[str, dict]):
+    """Shallow catalog copy plus extra metal rows.
+
+    The compiled legacy view holds mapping proxies, so ``copy.deepcopy``
+    cannot clone it. Existing rows stay shared and are not mutated.
+    """
+
+    copied = dict(legacy)
+    metals = dict(legacy.get("metals") or {})
+    metals.update(metal_rows)
+    copied["metals"] = metals
+    copied["oxide_vapors"] = dict(legacy.get("oxide_vapors") or {})
+    return copied
+
+
+def _with_proxy_zr(legacy):
+    """Synthetic broad-proxy carrier, same admission class as Al2.
+
+    ``_legacy_evaporation_shadow_pressure_map`` keeps a species only when
+    the full alpha loader has a row. A proxy tag passes that gate and is
+    then stripped by the measured view, so both consumers see an
+    unmeasured carrier. A species with no ``evaporation_alpha`` key never
+    reaches the flux map; it is not a second alpha path.
+    """
+
+    return _catalog_overlay(
+        legacy,
+        {
+            "Zr": {
+                "formula": "Zr",
+                "evaporation_alpha": {
+                    "value": 0.2,
+                    "tag": "broad_proxy_not_intrinsic",
+                },
+            }
+        },
+    )
+
+
+def _with_wildcard(legacy):
+    return _catalog_overlay(
+        legacy,
+        {
+            "*": {
+                "formula": "Ca",
+                "evaporation_alpha": {"value": _WILDCARD_ALPHA},
+            }
+        },
+    )
+
+
+def _dispatch_parented_flux_provider(host, captured, molar_kg) -> None:
+    """Real flux provider, with a parent mass above the dust floor.
+
+    The dust floor (``available_parent_kg <= 1e-12``) is the publisher's
+    inventory gate, not an alpha. Every species here has a parent, so
+    the alpha policy and the refusal are the same decision.
+    """
+
+    from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+
+    provider = BuiltinEvaporationFluxProvider()
+
+    def _dispatch_only(intent, *args, **kwargs):
+        del args
+        controls = dict(kwargs["control_inputs"])
+        captured["intent"] = intent
+        captured["controls"] = controls
+        enriched = dict(controls)
+        pressures = dict(enriched.get(CONTROL_FLUX_PRESSURES_KEY) or {})
+        stoich = dict(enriched.get("stoich_by_species") or {})
+        masses = dict(enriched.get("molar_mass_kg_mol") or {})
+        available = dict(enriched.get("available_oxide_kg") or {})
+        for species in pressures:
+            stoich.setdefault(
+                species,
+                {"oxide_per_product_kg": 1.0, "parent_oxide": "CaO"},
+            )
+            masses.setdefault(species, molar_kg(species))
+            available.setdefault(species, 1.0)
+        enriched["stoich_by_species"] = stoich
+        enriched["molar_mass_kg_mol"] = masses
+        enriched["available_oxide_kg"] = available
+        captured["provider"] = provider.dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                account_view=ProviderAccountView(
+                    accounts={},
+                    species_formula_registry={},
+                ),
+                temperature_C=float(host.melt.temperature_C),
+                pressure_bar=float(host.melt.p_total_mbar) / 1000.0,
+                control_inputs=enriched,
+            )
+        )
+        return SimpleNamespace(
+            status="ok",
+            diagnostic={"evaporation_flux_kg_hr": {}},
+        )
+
+    host._dispatch_only = _dispatch_only
+
+
+@pytest.mark.parametrize(
+    ("nested", "top", "enabled"),
+    _GAS_FLAG_PLACEMENTS,
+    ids=[
+        f"nested-{_flag_id(nested)}-top-{_flag_id(top)}"
+        for nested, top, _enabled in _GAS_FLAG_PLACEMENTS
+    ],
+)
+def test_closure_and_publisher_share_every_film_flag(
+    nested, top, enabled: bool
+) -> None:
+    """One film flag for the closure and the publisher, at every placement.
+
+    Invariant: ``resolve_gas_resistance_enabled`` is the film decision.
+    Nested key, else the top-level kernel key, else on. Null is absent.
+    A top-level false with no nested override is free-molecular (5.3423 Pa
+    at this publication), and the publisher's Ca flux is that law, not
+    the 10 mbar film.
+    """
+
+    from engines.builtin.evaporation_flux import resolve_gas_resistance_enabled
+
+    compiled, legacy = _catalog()
+    answer = _cao_answer(-9.0)
+    diagnostic = answer.diagnostic
+    published, published_ca, p_ref_bar = _published_ca(diagnostic)
+    _surface, ideal_pa, _flux = _congruent_cao_surface(published_ca, p_ref_bar)
+    overhead_pa = 10.0 * 100.0
+    _root_bar, film_pa = _series_cao_root(
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=0.0,
+        bulk_ca_pa=0.0,
+        overhead_pa=overhead_pa,
+        temperature_K=_T_K,
+        legacy=legacy,
+    )
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=0.0,
+        p_total_mbar=10.0,
+        chemistry_kernel=_gas_kernel(nested, top),
+    )
+    captured: dict = {}
+    _dispatch_real_flux_provider(host, captured)
+    EvaporationMixin._calculate_evaporation(host, equilibrium)
+    notice = host._last_langmuir_surface_oxygen
+    controls = captured["controls"]
+    kernel_map = controls[CONTROL_FLUX_PRESSURES_KEY]
+    resolved_flag = resolve_gas_resistance_enabled(
+        controls.get("evaporation_series_resistance"),
+        controls,
+    )
+    assert resolved_flag is enabled
+    expected_pa = film_pa if enabled else ideal_pa
+    other_pa = ideal_pa if enabled else film_pa
+    assert kernel_map["Ca"] == pytest.approx(expected_pa, rel=1.0e-6)
+    assert kernel_map["Ca"] != pytest.approx(other_pa, rel=1.0e-3)
+    assert float(notice["relative_residual"]) < 1.0e-4
+    provider = captured["provider"]
+    assert provider is not None and str(provider.status) == "ok"
+    provider_flux = dict(
+        (provider.diagnostic or {}).get("evaporation_flux_kg_hr") or {}
+    )
+    alpha_ca = _catalog_alpha(legacy, "Ca", _T_K)
+    molar = _series_molar_flux(
+        species="Ca",
+        pressure_pa=float(kernel_map["Ca"]),
+        bulk_pa=0.0,
+        molar_mass=_M_CA,
+        alpha=alpha_ca,
+        temperature_K=_T_K,
+        overhead_pa=float(controls["overhead_pressure_pa"]),
+        gas_resistance_enabled=enabled,
+    )
+    expected_kg_hr = molar * _M_CA * 3600.0
+    assert provider_flux["Ca"] == pytest.approx(expected_kg_hr, rel=1.0e-6)
+    other = _series_molar_flux(
+        species="Ca",
+        pressure_pa=float(kernel_map["Ca"]),
+        bulk_pa=0.0,
+        molar_mass=_M_CA,
+        alpha=alpha_ca,
+        temperature_K=_T_K,
+        overhead_pa=float(controls["overhead_pressure_pa"]),
+        gas_resistance_enabled=not enabled,
+    )
+    assert provider_flux["Ca"] != pytest.approx(
+        other * _M_CA * 3600.0, rel=1.0e-3
+    )
+
+
+@pytest.mark.parametrize("policy", _ALPHA_POLICIES)
+def test_every_species_uses_the_publisher_alpha_policy(policy: str) -> None:
+    """The residual contains each carrier the publisher's alpha policy emits.
+
+    Species classes in one CaO/Al2O3 map, plus synthetic Zr:
+    measured rows (Ca, Al, CaO_gas, Ca2), broad-proxy rows the measured
+    view strips (Al2, Al2O, AlO, and the other Al oxides), and Zr, a
+    proxy-tagged row that is not Al2. Policies: fallback off, fallback
+    on, a list allowlist, a string allowlist, an allowlist that names
+    nobody here, a present-null allowlist (nobody), and a ``*`` wildcard.
+    A parent mass is present, so a refused species is a typed
+    missing-alpha and not a flux. An emitted carrier is rescaled with
+    the policy alpha, and the publisher's kilogram flux is that same
+    pressure and alpha.
+    """
+
+    from engines.builtin.evaporation_flux import (
+        alpha_policy_controls,
+        publisher_alpha_policy,
+        publisher_effective_alpha,
+    )
+    from simulator.evaporation import (
+        _load_evaporation_alpha_by_species,
+        _measured_alpha_control_view,
+    )
+
+    compiled, legacy = _catalog()
+    kernel = _alpha_kernel(policy)
+    legacy = _with_proxy_zr(legacy)
+    if policy == "wildcard":
+        legacy = _with_wildcard(legacy)
+    answer = _cao_al_answer()
+    diagnostic = dict(answer.diagnostic)
+    published = dict(diagnostic["vapor_pressures_Pa"])
+    published["Zr"] = _ZR_PA
+    provenance = dict(diagnostic.get("vapor_pressure_numerator_provenance") or {})
+    provenance["Zr"] = {
+        "oxygen_fugacity_channel": "intrinsic_melt",
+        "pO2_bar": 1.0e-9,
+        "pO2_exponent": -0.5,
+    }
+    diagnostic["vapor_pressures_Pa"] = published
+    diagnostic["vapor_pressure_numerator_provenance"] = provenance
+    source_bar = float(diagnostic["source_reaction_fO2_bar"])
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=0.0,
+        chemistry_kernel=kernel,
+    )
+    captured: dict = {}
+    _dispatch_parented_flux_provider(
+        host,
+        captured,
+        lambda species: _species_molar_kg(legacy, species),
+    )
+    EvaporationMixin._calculate_evaporation(host, equilibrium)
+    notice = host._last_langmuir_surface_oxygen
+    assert notice["applied"] is True
+    assert notice["surface_pO2_bar"] is not None
+    assert float(notice["relative_residual"]) < 1.0e-4
+    surface = float(notice["surface_pO2_bar"])
+    controls = captured["controls"]
+    closed = dict(controls[CONTROL_FLUX_PRESSURES_KEY])
+    allow, allowlist = publisher_alpha_policy(alpha_policy_controls(kernel))
+    # The controls the publisher actually read are that same policy.
+    published_allow, published_allowlist = publisher_alpha_policy(controls)
+    assert published_allow is allow
+    assert published_allowlist == allowlist
+    alpha_map = _measured_alpha_control_view(
+        _load_evaporation_alpha_by_species(dict(legacy))
+    )
+    provider = captured["provider"]
+    assert provider is not None and str(provider.status) == "ok", provider
+    diagnostic_out = provider.diagnostic or {}
+    flux = dict(diagnostic_out.get("evaporation_flux_kg_hr") or {})
+    alpha_used = dict(diagnostic_out.get("alpha_used_by_species") or {})
+    missing = dict(diagnostic_out.get("missing_alpha") or {})
+    fallback_rows = set(diagnostic_out.get("unmeasured_alpha_fallback_species") or [])
+    emitted_proxy = False
+    for species, published_pa in published.items():
+        decision = publisher_effective_alpha(
+            species,
+            _T_K,
+            alpha_map,
+            allow_unmeasured_alpha_fallback=allow,
+            unmeasured_alpha_fallback_species_allowlist=allowlist,
+        )
+        exponent, pref = _law_exponent_and_pref(
+            compiled, legacy, species, provenance.get(species) or {}, source_bar
+        )
+        assert exponent is not None, species
+        if decision.policy_emits():
+            assert species not in missing
+            assert alpha_used[species] == pytest.approx(decision.alpha)
+            if decision.unmeasured:
+                assert species in fallback_rows
+                emitted_proxy = True
+            else:
+                assert species not in fallback_rows
+            mass = _species_molar_kg(legacy, species)
+            molar = _series_molar_flux(
+                species=species,
+                pressure_pa=float(closed[species]),
+                bulk_pa=0.0,
+                molar_mass=mass,
+                alpha=decision.alpha,
+                temperature_K=_T_K,
+                overhead_pa=float(controls["overhead_pressure_pa"]),
+                gas_resistance_enabled=True,
+            )
+            expected_kg_hr = molar * mass * 3600.0
+            assert flux.get(species, 0.0) == pytest.approx(
+                expected_kg_hr, rel=1.0e-5, abs=1.0e-12
+            )
+            if exponent != 0.0:
+                expected_pa = published_pa * (surface / pref) ** exponent
+                assert closed[species] == pytest.approx(
+                    expected_pa, rel=1.0e-4, abs=1.0e-12
+                )
+                assert closed[species] != pytest.approx(published_pa, rel=1.0e-3)
+        else:
+            assert species in missing, species
+            assert species not in flux
+            assert species not in alpha_used
+            assert closed[species] == pytest.approx(published_pa)
+            assert species not in fallback_rows
+    if policy == "on":
+        assert emitted_proxy
+    if policy == "wildcard":
+        assert alpha_used["Al2"] == pytest.approx(_WILDCARD_ALPHA)
+        assert alpha_used["Zr"] == pytest.approx(_WILDCARD_ALPHA)
+        assert "Al2" not in fallback_rows
+        assert "Zr" not in missing
+    if policy == "allow-string":
+        assert "Al2" in alpha_used
+        assert alpha_used["Al2"] == pytest.approx(1.0)
+        assert "Zr" in missing
+        assert "Al2O" in missing

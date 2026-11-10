@@ -269,6 +269,153 @@ def _unmeasured_alpha_fallback_permitted(
     )
 
 
+@dataclass(frozen=True)
+class PublisherAlphaDecision:
+    """Alpha the flux publisher evaluates for one species.
+
+    ``policy_emits`` is the carrier the surface residual must include:
+    a positive measured coefficient (a species row or a ``*`` wildcard),
+    or a permitted unmeasured fallback. A non-positive alpha emits no
+    flux. An unmeasured species the fallback does not permit is a
+    refusal when a parent mass is present, not a second alpha.
+    """
+
+    alpha: float
+    evaluation: Mapping[str, Any]
+    unmeasured: bool
+    fallback_permitted: bool
+
+    def policy_emits(self) -> bool:
+        return (
+            math.isfinite(self.alpha)
+            and self.alpha > 0.0
+            and (not self.unmeasured or self.fallback_permitted)
+        )
+
+
+def fallback_species_allowlist(raw: Any) -> set[str] | None:
+    """None permits every species. A string is one species, not characters."""
+
+    if raw is None:
+        return None
+    if isinstance(raw, (str, bytes)):
+        return {str(raw)}
+    return {str(species) for species in raw}
+
+
+def publisher_alpha_policy(
+    config: Mapping[str, Any] | None,
+) -> tuple[bool, set[str] | None]:
+    """Fallback flag and allowlist the flux publisher reads from one map.
+
+    Call this on the controls map ``alpha_policy_controls`` built, not
+    the raw kernel. An absent allowlist key means every species. That
+    builder stores a present null as an empty tuple, which this parser
+    reads as nobody. A string is one species name, not its characters.
+    """
+
+    mapping = config if isinstance(config, Mapping) else {}
+    return (
+        bool(mapping.get("allow_unmeasured_alpha_fallback", False)),
+        fallback_species_allowlist(
+            mapping.get("unmeasured_alpha_fallback_species")
+        ),
+    )
+
+
+def alpha_policy_controls(kernel_config: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Alpha-policy keys the flux controls and the closure both consume.
+
+    A string allowlist stays a string. ``tuple("Al2")`` would split it
+    into characters and the publisher would permit the wrong set. A
+    present null is stored as an empty tuple, which the parser reads as
+    nobody; that is the controls builder's existing null.
+    """
+
+    mapping = kernel_config if isinstance(kernel_config, Mapping) else {}
+    controls: dict[str, Any] = {
+        "allow_unmeasured_alpha_fallback": mapping.get(
+            "allow_unmeasured_alpha_fallback", False
+        ),
+    }
+    if "unmeasured_alpha_fallback_species" in mapping:
+        raw = mapping.get("unmeasured_alpha_fallback_species")
+        if isinstance(raw, (str, bytes)):
+            controls["unmeasured_alpha_fallback_species"] = str(raw)
+        else:
+            controls["unmeasured_alpha_fallback_species"] = tuple(raw or ())
+    return controls
+
+
+def publisher_effective_alpha(
+    species: str,
+    temperature_K: float,
+    alpha_by_species: Mapping[str, Any],
+    *,
+    allow_unmeasured_alpha_fallback: bool,
+    unmeasured_alpha_fallback_species_allowlist: set[str] | None,
+) -> PublisherAlphaDecision:
+    """Alpha the publisher will evaluate, including a permitted fallback.
+
+    Order is the kernel's: the species row, else a ``*`` wildcard row,
+    else ``_DEFAULT_EVAPORATION_ALPHA`` (1). A species missing from the
+    map is unmeasured only when ``*`` is missing too. Broad-proxy rows
+    are already stripped from ``alpha_by_species``, so a permitted
+    fallback is alpha = 1 for those carriers. The surface closure calls
+    this same function; it does not keep a second alpha table.
+    """
+
+    unmeasured = _alpha_is_unmeasured(species, alpha_by_species)
+    permitted = _unmeasured_alpha_fallback_permitted(
+        species,
+        allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
+        unmeasured_alpha_fallback_species_allowlist=(
+            unmeasured_alpha_fallback_species_allowlist
+        ),
+    )
+    spec = alpha_by_species.get(
+        species,
+        alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
+    )
+    value, evaluation = _evaluate_alpha_control(
+        species, temperature_K, spec
+    )
+    return PublisherAlphaDecision(
+        alpha=float(value),
+        evaluation=evaluation if isinstance(evaluation, Mapping) else {},
+        unmeasured=unmeasured,
+        fallback_permitted=permitted,
+    )
+
+
+def resolve_gas_resistance_enabled(
+    series_config: Mapping[str, Any] | None,
+    parent_config: Mapping[str, Any] | None,
+) -> bool:
+    """Film flag shared by the surface closure and the flux publisher.
+
+    The nested ``evaporation_series_resistance`` key wins. Otherwise the
+    parent map supplies it: ``chemistry_kernel`` in the closure, and the
+    flux controls in the publisher. Otherwise the conservative default
+    is on. Present null is absent, and a quoted false stays false. A
+    top-level ``gas_resistance_enabled: false`` with no nested override
+    is free-molecular on both sides. At 10 mbar that is the 5.3423 Pa Ca
+    root, not the film root at 5.7893 Pa.
+    """
+
+    series = series_config if isinstance(series_config, Mapping) else {}
+    parent = parent_config if isinstance(parent_config, Mapping) else {}
+    # ``bool_feature_flag`` rejects a default other than True for this
+    # key, so a parent result of False cannot be that default argument.
+    # Present null is absent and falls through to the parent, then to on.
+    if (
+        "gas_resistance_enabled" in series
+        and series.get("gas_resistance_enabled") is not None
+    ):
+        return bool_feature_flag(series, "gas_resistance_enabled", True)
+    return bool_feature_flag(parent, "gas_resistance_enabled", True)
+
+
 def _missing_alpha_record(
     *,
     P_eq_Pa: float,
@@ -1385,10 +1532,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 controls.get("melt_resistance_enabled", False),
             )
         )
-        gas_resistance_enabled = bool_feature_flag(
-            series_config,
-            "gas_resistance_enabled",
-            bool_feature_flag(controls, "gas_resistance_enabled", True),
+        gas_resistance_enabled = resolve_gas_resistance_enabled(
+            series_config, controls
         )
         hkl_upper_bound_transport_species = frozenset(
             str(species)
@@ -1405,22 +1550,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         alpha_envelope_by_species = _coerce_alpha_envelope_by_species(
             controls.get("alpha_envelope")
         )
-        allow_unmeasured_alpha_fallback = bool(
-            controls.get("allow_unmeasured_alpha_fallback", False)
-        )
-        fallback_species_raw = controls.get(
-            "unmeasured_alpha_fallback_species"
-        )
-        if fallback_species_raw is None:
-            unmeasured_alpha_fallback_species_allowlist = None
-        elif isinstance(fallback_species_raw, (str, bytes)):
-            unmeasured_alpha_fallback_species_allowlist = {
-                str(fallback_species_raw)
-            }
-        else:
-            unmeasured_alpha_fallback_species_allowlist = {
-                str(species) for species in fallback_species_raw
-            }
+        (
+            allow_unmeasured_alpha_fallback,
+            unmeasured_alpha_fallback_species_allowlist,
+        ) = publisher_alpha_policy(controls)
         missing_alpha: dict[str, dict[str, float | str]] = {}
         active_gas_transport_species: list[str] = []
         if (
@@ -1437,18 +1570,19 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     continue
                 # α=1 is the Hertz-Knudsen ceiling used only as a marked
                 # screening bound; record the same missing_alpha payload.
-                alpha_is_unmeasured = _alpha_is_unmeasured(
-                    species, alpha_by_species
-                )
-                alpha_spec = alpha_by_species.get(
-                    species,
-                    alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
-                )
-                alpha, _alpha_evaluation = _evaluate_alpha_control(
+                decision = publisher_effective_alpha(
                     species,
                     T_K,
-                    alpha_spec,
+                    alpha_by_species,
+                    allow_unmeasured_alpha_fallback=(
+                        allow_unmeasured_alpha_fallback
+                    ),
+                    unmeasured_alpha_fallback_species_allowlist=(
+                        unmeasured_alpha_fallback_species_allowlist
+                    ),
                 )
+                alpha = decision.alpha
+                alpha_is_unmeasured = decision.unmeasured
                 if alpha <= 0.0:
                     continue
                 P_bulk_Pa = float(overhead_partials.get(species, 0.0))
@@ -1486,15 +1620,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     continue
                 if (
                     alpha_is_unmeasured
-                    and not _unmeasured_alpha_fallback_permitted(
-                        species,
-                        allow_unmeasured_alpha_fallback=(
-                            allow_unmeasured_alpha_fallback
-                        ),
-                        unmeasured_alpha_fallback_species_allowlist=(
-                            unmeasured_alpha_fallback_species_allowlist
-                        ),
-                    )
+                    and not decision.fallback_permitted
                     and available_parent_kg > 1.0e-12
                 ):
                     missing_alpha[species] = _missing_alpha_record(
@@ -1672,11 +1798,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
             if delta_p_Pa <= 0:
                 continue
-            alpha_is_unmeasured = _alpha_is_unmeasured(
-                species, alpha_by_species
-            )
-            alpha_fallback_permitted = _unmeasured_alpha_fallback_permitted(
+            decision = publisher_effective_alpha(
                 species,
+                T_K,
+                alpha_by_species,
                 allow_unmeasured_alpha_fallback=(
                     allow_unmeasured_alpha_fallback
                 ),
@@ -1684,15 +1809,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     unmeasured_alpha_fallback_species_allowlist
                 ),
             )
-            alpha_spec = alpha_by_species.get(
-                species,
-                alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
-            )
-            alpha, alpha_evaluation = _evaluate_alpha_control(
-                species,
-                T_K,
-                alpha_spec,
-            )
+            alpha_is_unmeasured = decision.unmeasured
+            alpha_fallback_permitted = decision.fallback_permitted
+            alpha = decision.alpha
+            alpha_evaluation = dict(decision.evaluation)
             if alpha_evaluation:
                 alpha_evaluations_by_species[species] = alpha_evaluation
             alpha_authority_status = alpha_evaluation.get(
