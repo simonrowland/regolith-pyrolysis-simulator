@@ -12548,7 +12548,38 @@ _ANCILLARY_SERIES_KEYS = (
     "delta_IW",
 )
 
-_PARTIAL_PRESSURE_FIELDS = ("partial_pressure_pa", "p_Ga_Pa", "p_In_Pa", "p_O2_calc_Pa")
+# Table S-I prints p at 1273 K as ``mantissa·10±exp`` (middle dot U+00B7,
+# no caret). A caret, a times sign, or a ± on the mantissa is a different token.
+_MIDDOT_DECADE_RE = re.compile(
+    r"(?P<mantissa>[0-9]+(?:\.[0-9]+)?)\u00b710(?P<exponent>[+-][0-9]+)\Z"
+)
+_MIDDOT_DECADE_PARTIAL_FIELDS = ("p_Na_at_1273_K_Pa", "p_K_at_1273_K_Pa")
+_PARTIAL_PRESSURE_FIELDS = (
+    "partial_pressure_pa",
+    "p_Ga_Pa",
+    "p_In_Pa",
+    "p_O2_calc_Pa",
+    *_MIDDOT_DECADE_PARTIAL_FIELDS,
+)
+
+
+def _printed_middot_decade(value: object) -> Decimal | None:
+    """Read one printed ``mantissa·10±exp`` token as a decimal.
+
+    Premise: the cell is the whole token, already in the field's unit.
+    Algebra: value = mantissa × 10^exponent. Unit check: the caller names
+    the unit; this function does not convert. Sanity: ``1.70·10-2`` is
+    ``1.70e-2``. A caret (``10^-2``) or a parenthetical ± does not match.
+    """
+
+    if not isinstance(value, str):
+        return None
+    match = _MIDDOT_DECADE_RE.fullmatch(value.strip())
+    if match is None:
+        return None
+    return Decimal(match.group("mantissa")) * (
+        Decimal(10) ** int(match.group("exponent"))
+    )
 
 # Quantity keys are the closed observables. A plain string key is an
 # unsupported token whose printed column this migrator still records, so the
@@ -14097,7 +14128,14 @@ def _selection_from_named_field(
             for key in _PARTIAL_PRESSURE_FIELDS:
                 if key not in payload:
                     continue
-                val, trail = convert_pressure_to_pa(payload.get(key), "Pa")
+                raw_pressure = payload.get(key)
+                if key in _MIDDOT_DECADE_PARTIAL_FIELDS:
+                    # The printed glyph is not a Decimal literal. Only these
+                    # two Pa columns use it; the activity column is not read.
+                    parsed = _printed_middot_decade(raw_pressure)
+                    if parsed is not None:
+                        raw_pressure = parsed
+                val, trail = convert_pressure_to_pa(raw_pressure, "Pa")
                 if val is not None:
                     return _point_selection(
                         val, key, trail or "identity:Pa", payload, condition_ranges
