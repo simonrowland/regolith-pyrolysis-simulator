@@ -237,38 +237,40 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
     assert runner["glass"]["species_kg"] == {}
     assert web_story["captured_volatiles"]["species_kg"] == {}
     assert runner["captured_volatiles"]["kg_by_species"] == {}
-    oxygen_kg = expected_oxygen_kg
     if feedstock == "lunar_mare_low_ti":
         oxygen_partition = sim._oxygen_terminal_partition_kg()
-        assert oxygen_kg == 0.0
+        assert expected_oxygen_kg == 0.0
         assert oxygen_partition["total"] == 0.0
         assert {
             key: oxygen_partition[key]
             for key in ("stored", "vented", "captured", "total")
         } == {"stored": 0.0, "vented": 0.0, "captured": 0.0, "total": 0.0}
-    assert web_story["oxygen"]["class_total_kg"] == pytest.approx(
-        oxygen_kg, abs=0.01
-    )
-    assert runner["oxygen"]["O2_kg"] == pytest.approx(oxygen_kg)
-    if feedstock == "lunar_mare_low_ti":
+        assert web_story["oxygen"]["class_total_kg"] is None
+        assert runner["oxygen"]["class_total_kg"] is None
+        assert runner["oxygen"]["O2_kg"] is None
         oxygen_flag = runner["oxygen"].get("availability_flag")
         assert oxygen_flag is not None
-        assert oxygen_flag["status"] == "flagged prediction"
-        assert oxygen_flag["category"] == 3
-        assert oxygen_flag["kind"] == "predict_and_flag"
-        assert oxygen_flag["authority"] == "extrapolated"
-        assert oxygen_flag["authority_level"] == "extrapolated"
-        assert oxygen_flag["band"] == "d-359 B/C/E follow-ups pending"
-        assert oxygen_flag["pending_follow_ups"] == [
+        assert oxygen_flag["status"] == "unavailable"
+        assert oxygen_flag["reason"].startswith(
+            "No computed product is available; refused contributions: "
+        )
+        prediction_flag = runner["oxygen"]["prediction_flag"]
+        assert prediction_flag["status"] == "flagged prediction"
+        assert prediction_flag["category"] == 3
+        assert prediction_flag["kind"] == "predict_and_flag"
+        assert prediction_flag["authority"] == "extrapolated"
+        assert prediction_flag["authority_level"] == "extrapolated"
+        assert prediction_flag["band"] == "d-359 B/C/E follow-ups pending"
+        assert prediction_flag["pending_follow_ups"] == [
             "d-359 B", "d-359 C", "d-359 E",
         ]
-        assert runner["oxygen"]["status"] == "partial"
-        reason = oxygen_flag["reason"]
+        assert runner["oxygen"]["status"] == "unavailable"
+        reason = prediction_flag["reason"]
         assert reason.startswith(
-            "The shipped molecular-O₂ ledger total is 0 kg; B/C/E interim "
-            "estimates remain non-authoritative and pending their follow-ups. "
+            oxygen_flag["reason"]
+            + "; B/C/E interim estimates remain non-authoritative"
         )
-        predictions = oxygen_flag["class_predictions"]
+        predictions = prediction_flag["class_predictions"]
         assert any(row["class"] == "B" for row in predictions)
         sio = next(
             row for row in predictions
@@ -291,12 +293,20 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         assert "stage0_only predicate inactive" in reason
         assert "phase-independent K" in reason
         combined_flag = runner["metals_plus_O2"]["availability_flag"]
+        combined_prediction = runner["metals_plus_O2"]["prediction_flag"]
         for field in (
-            "status", "category", "kind", "authority", "authority_level",
-            "band", "pending_follow_ups",
+            "category", "kind", "authority", "authority_level", "band",
+            "pending_follow_ups",
         ):
-            assert combined_flag[field] == oxygen_flag[field]
+            assert combined_prediction[field] == prediction_flag[field]
+        assert combined_flag["status"] == "unavailable"
         assert web_story["oxygen"]["availability_flag"] == oxygen_flag
+        assert web_story["oxygen"]["prediction_flag"] == prediction_flag
+    else:
+        assert web_story["oxygen"]["class_total_kg"] == pytest.approx(
+            expected_oxygen_kg, abs=0.01
+        )
+        assert runner["oxygen"]["O2_kg"] == pytest.approx(expected_oxygen_kg)
     assert web_story["refractory_ceramic"]["class_total_kg"] == pytest.approx(
         rump_kg, abs=0.01
     )
@@ -410,27 +420,35 @@ def _render_product_story(*, html, payload):
 
 
 def _display_mass(value):
+    if value is None:
+        return "unavailable"
     return f"{value:.3f}".rstrip("0").rstrip(".")
 
 
 def _story_total(story, *keys):
-    missing = {
-        key: story[key]["class_total_kg"]
-        for key in keys
-        if story[key]["class_total_kg"] is None
-    }
-    assert not missing, f"product story has unavailable class totals: {missing}"
-    return sum(story[key]["class_total_kg"] for key in keys)
+    total = 0.0
+    for key in keys:
+        bucket = story[key]
+        if bucket["class_total_kg"] is None:
+            assert bucket["status"] == "unavailable", key
+            flag = bucket.get("availability_flag") or bucket.get("flag")
+            assert flag["status"] == "unavailable", key
+            assert flag["reason"].startswith(
+                "No computed product is available"
+            ), key
+        else:
+            total += bucket["class_total_kg"]
+    return total
 
 
-def test_advisory_product_story_renders_partial_metadata() -> None:
+def test_advisory_product_story_renders_unavailable_and_prediction_metadata() -> None:
     payload = {
         "product_story_status": "ok",
         "product_story": {
             "metal_ingots": {
                 "species_kg": {"Fe": 1.0},
                 "class_total_kg": 1.0,
-                "status": "partial",
+                    "status": "unavailable",
                 "excluded": [{
                     "species": "Si",
                     "account": "process.cleaned_melt",
@@ -444,6 +462,31 @@ def test_advisory_product_story_renders_partial_metadata() -> None:
                     "authority": "status_bearing",
                     "reason": "estimated carrier row",
                 }],
+                "availability_flag": {
+                    "status": "unavailable",
+                    "authority": "unavailable",
+                    "reason": (
+                        "No computed product is available; refused "
+                        "contributions: missing LJ row"
+                    ),
+                },
+                "flag": {
+                    "status": "unavailable",
+                    "authority": "unavailable",
+                    "reason": (
+                        "No computed product is available; refused "
+                        "contributions: missing LJ row"
+                    ),
+                },
+                "prediction_flag": {
+                    "status": "flagged prediction",
+                    "category": 3,
+                    "kind": "predict_and_flag",
+                    "authority": "extrapolated",
+                    "authority_level": "extrapolated",
+                    "band": "d-359 B/C/E follow-ups pending",
+                    "reason": "B/C/E interim estimates pending d-359 follow-ups.",
+                },
             },
         },
         "products": {},
@@ -457,7 +500,9 @@ def test_advisory_product_story_renders_partial_metadata() -> None:
     )
 
     text = rendered["text"]["product-ledger-content"]
-    assert "status: partial" in text
+    assert "status unavailable" in text
+    assert "flagged prediction" in text
+    assert "B/C/E interim estimates pending d-359 follow-ups." in text
     assert "species Si" in text
     assert "account process.cleaned_melt" in text
     assert "reason missing LJ row" in text
@@ -812,7 +857,14 @@ def test_headless_full_run_ledgers_and_product_story_web(
         "unclassified",
     ):
         bucket = story[key]
-        assert bucket["class_total_kg"] == round(bucket["class_total_kg"], 2)
+        if bucket["class_total_kg"] is None:
+            assert bucket["status"] == "unavailable"
+            flag = bucket.get("availability_flag") or bucket.get("flag")
+            assert flag["status"] == "unavailable"
+        else:
+            assert bucket["class_total_kg"] == round(
+                bucket["class_total_kg"], 2
+            )
         assert all(
             mass == round(mass, 2)
             for mass in bucket.get("species_kg", {}).values()

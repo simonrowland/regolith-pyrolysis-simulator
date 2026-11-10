@@ -614,10 +614,17 @@ def test_pinned_lunar_unavailable_notice_has_no_zero_kg_total(
         assert all(item["reason"] in reason for item in bucket["excluded"])
         prediction = bucket["prediction_flag"]
         assert prediction["status"] == "flagged prediction"
+        assert prediction["reason"].startswith(
+            reason + "; B/C/E interim estimates remain non-authoritative"
+        )
         assert "0 kg" not in prediction["reason"]
         assert "0.0 kg" not in prediction["reason"]
         assert "unavailable" in markdown
-        assert reason in markdown
+
+    assert products["metals_plus_O2"]["availability_flag"]["reason"] in markdown
+    assert (
+        products["metals_plus_O2"]["prediction_flag"]["reason"] in markdown
+    )
 
 
 def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:

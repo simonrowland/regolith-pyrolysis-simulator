@@ -418,7 +418,7 @@ def test_glass_aggregate_keeps_computed_zero_when_capture_is_unqualified():
     assert glass['excluded'] == silica['excluded']
 
 
-def test_refused_zero_flux_keeps_numeric_total_across_product_classes():
+def test_refused_zero_flux_without_computed_parts_is_unavailable():
     refusal = {
         'species_id': 'SiO',
         'parent_oxide': 'SiO2',
@@ -451,11 +451,13 @@ def test_refused_zero_flux_keeps_numeric_total_across_product_classes():
         'captured_volatiles',
     ):
         bucket = result[bucket_name]
-        assert bucket['class_total_kg'] == 0.0, bucket_name
-        assert bucket['status'] == 'partial'
-        flag = bucket.get('flag') or bucket.get('availability_flag')
-        assert flag is not None
-        assert flag['status'] == 'partial'
+        assert bucket['class_total_kg'] is None, bucket_name
+        assert bucket['status'] == 'unavailable', bucket_name
+        flag = bucket.get('availability_flag') or bucket.get('flag')
+        assert flag['status'] == 'unavailable', bucket_name
+        assert flag['reason'].startswith(
+            'No computed product is available; refused contributions:'
+        ), bucket_name
         assert 'missing_evidence' in flag['reason']
         assert any(
             item['species'] == 'SiO' for item in bucket['excluded']

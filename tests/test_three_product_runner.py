@@ -332,7 +332,6 @@ def test_default_classification_values_preserve_controlled_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    # Re-pinned from production after d-367 retained numeric partial classes
-    # and marked refusal-only, no-number classes unavailable; R9 also routes
-    # the molecular-O2 notice through its ledger total.
-    assert digest == "6b773058ae32e6cfe7670d8858f51df494462406c3e140ba5ede452207847325"
+    # Re-pinned from production after d-367 retained numeric classes and
+    # classified refusal-only, no-number classes as unavailable.
+    assert digest == "d88b1f7391ee43d87badccfec08e2f427943799f9aa1da85ef38cbf0e153abc8"
