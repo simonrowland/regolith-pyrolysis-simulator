@@ -25,6 +25,7 @@ import numpy as np
 import pytest
 import yaml
 
+from simulator.chemistry.melt_activity import single_cation_mole_fractions
 from simulator.backend_names import (
     VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
     VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
@@ -1725,6 +1726,45 @@ def test_missing_activity_uses_d359_ladder_before_henrian_upper_bound() -> None:
     assert serialize_vapour_answer(bounded)["activity_bound"] == "bound-not-point"
     assert bounded.verdict_status == "status_bearing_non_authoritative"
     assert bounded.certification_ceiling == "never"
+
+
+def test_missing_gamma_row_uses_flagged_ideal_mixing_activity() -> None:
+    payload = _minimal_family("Fe", parent_oxide="FeO")
+    reaction = payload["families"]["fe_test_family"][
+        "physical_properties"
+    ]["species"]["Fe"]["source_reactions"][0]
+    reaction["reactants"] = [{"formula": "FeO", "stoichiometry": 1.0}]
+    reaction["products"] = [
+        {"formula": "Fe", "stoichiometry": 1.0},
+        {"formula": "O2", "stoichiometry": 0.5},
+    ]
+    reaction["activity_input"]["component_id"] = "FeO"
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("Fe"))
+    ledger = {"process.cleaned_melt": {"FeO": 1.0, "SiO2": 3.0}}
+    state = VapourResolveState(
+        temperature_K=1500.0,
+        source_reaction_fO2_bar=1.0e-8,
+    )
+
+    answer = catalog.resolve_batch(
+        ledger,
+        state,
+        flux_activation_context=_pre_rg_activation_context(),
+    ).channel("Fe")
+
+    expected_x = single_cation_mole_fractions(
+        {"FeO": 1.0, "SiO2": 3.0}
+    )["FeO"]
+    assert isinstance(answer.pressure, PressureValue)
+    assert isinstance(answer.flux, FluxEligible)
+    assert answer.source_reaction_activity is not None
+    assert answer.source_reaction_activity.value == pytest.approx(expected_x)
+    prediction = answer.extra["d359_prediction"]
+    assert prediction["class"] == "B"
+    assert prediction["rung"] == "ideal a=x"
+    assert prediction["authority_level"] == "extrapolated"
+    assert "ideal_mixing_assumption" in prediction["reason"]
+    assert "estimate, not a bound" in prediction["reason"]
 
 
 def test_out_of_domain_gamma_status_stays_numeric_and_flux_driving() -> None:

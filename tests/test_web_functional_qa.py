@@ -241,6 +241,7 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
     if feedstock == "lunar_mare_low_ti":
         oxygen_partition = sim._oxygen_terminal_partition_kg()
         assert oxygen_kg == 0.0
+        assert oxygen_partition["total"] > 0.0
         assert {
             key: oxygen_partition[key]
             for key in ("stored", "vented", "captured", "total")
