@@ -109,12 +109,17 @@ _RUNTIME_ONLY_SETTING_NAMES = frozenset({
     "_worker_startup_timeout_s", "_pool_size", "_cache", "_cache_path",
     "_subprocess_pool", "_pet_worker", "_warm_pool", "_process", "process", "pid",
     "returncode", "stderr", "stdout", "_gas_error", "_pack", "_gas",
-    "_bridge", "_package",
+    "_package",
     "call_timeout_s", "startup_timeout_s", "warm_call_timeout_s",
     "worker_startup_timeout_s", "warm_pool_size", "_warm_pool_size",
     "_warm_worker_enabled", "warm_worker",
     "pool_size", "worker_count", "workers", "slots",
 })
+
+_RUNTIME_IDENTITY_SETTING_PARTS = (
+    "identity", "version", "digest", "sha256", "commit", "hostname",
+    "readypayload", "path",
+)
 
 
 @dataclass(frozen=True)
@@ -142,6 +147,14 @@ def _simple_cache_setting(value: Any) -> bool:
     return value is None or isinstance(value, (bool, int, float, str))
 
 
+def _runtime_only_setting_name(name: Any) -> bool:
+    text = str(name)
+    if text in _RUNTIME_ONLY_SETTING_NAMES:
+        return True
+    normalized = "".join(character.lower() for character in text if character.isalnum())
+    return any(part in normalized for part in _RUNTIME_IDENTITY_SETTING_PARTS)
+
+
 def _worker_settings(worker: Any) -> dict[str, Any]:
     args = getattr(worker, "_bootstrap_args", None)
     if (
@@ -161,7 +174,7 @@ def _settings_value(value: Any, seen: set[int]) -> Any:
         return {
             str(key): item
             for key, child in value.items()
-            if str(key) not in _RUNTIME_ONLY_SETTING_NAMES
+            if not _runtime_only_setting_name(key)
             if (item := _settings_value(child, seen)) is not _OMIT
         }
     if isinstance(value, tuple):
@@ -184,6 +197,10 @@ def _settings_value(value: Any, seen: set[int]) -> Any:
         attributes = vars(value)
     except TypeError:
         return _OMIT
+    try:
+        effective_pack_name = getattr(value, "_effective_pack_name")
+    except AttributeError:
+        effective_pack_name = _OMIT
     output: dict[str, Any] = {}
     for name, child in attributes.items():
         if name == "_subprocess_pool":
@@ -195,11 +212,17 @@ def _settings_value(value: Any, seen: set[int]) -> Any:
         if name == "_pet_worker":
             output[name] = _worker_settings(child)
             continue
-        if name in _RUNTIME_ONLY_SETTING_NAMES:
+        if name == "_pack_name" and effective_pack_name is not _OMIT:
+            continue
+        if _runtime_only_setting_name(name):
             continue
         item = _settings_value(child, seen)
         if item is not _OMIT:
             output[name] = item
+    if effective_pack_name is not _OMIT:
+        item = _settings_value(effective_pack_name, seen)
+        if item is not _OMIT:
+            output["_effective_pack_name"] = item
     return output
 
 
@@ -377,6 +400,7 @@ def engine_cache_runtime_identities(*, reset: bool = False) -> dict[str, str]:
 
 
 _NAMESPACE_TAG = "__engine_cache_simple_namespace__"
+_TUPLE_TAG = "__engine_cache_tuple__"
 
 
 def _encode_hot(value: Any) -> Any:
@@ -388,7 +412,9 @@ def _encode_hot(value: Any) -> Any:
         }
     if isinstance(value, Mapping):
         return {str(key): _encode_hot(item) for key, item in value.items()}
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, tuple):
+        return {_TUPLE_TAG: [_encode_hot(item) for item in value]}
+    if isinstance(value, list):
         return [_encode_hot(item) for item in value]
     return value
 
@@ -400,6 +426,9 @@ def _decode_hot(value: Any) -> Any:
             return SimpleNamespace(
                 **{key: _decode_hot(item) for key, item in fields.items()}
             )
+        items = value.get(_TUPLE_TAG)
+        if isinstance(items, list) and len(value) == 1:
+            return tuple(_decode_hot(item) for item in items)
         return {key: _decode_hot(item) for key, item in value.items()}
     if isinstance(value, list):
         return [_decode_hot(item) for item in value]
