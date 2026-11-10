@@ -375,6 +375,12 @@ def _fake_evaluate(
                 "thread_env": {name: os.environ.get(name) for name in THREAD_ENV_VARS},
                 "backend_status": "ok",
                 "backend_authoritative": True,
+                "backend_name": "alphamelts",
+                "engine_version": "petthermotools 1.2.3",
+                "diagnostics": {
+                    "backend_name": "alphamelts",
+                    "engine_version": "petthermotools 1.2.3",
+                },
                 "snapshots": [{"mass_balance_error_pct": 0.0}],
             },
             product_summary={
