@@ -2281,6 +2281,8 @@ class CondensationModel:
             'upstream_hot_wall_warnings': [],
             'upstream_hot_wall_findings': [],
             'upstream_hot_wall_min_C': None,
+            'upstream_hot_wall_refused': False,
+            'upstream_hot_wall_refusals': [],
         }
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.last_knudsen_pressure_adjustment: dict[str, Any] = {}
@@ -7599,7 +7601,13 @@ def cold_spot_diagnostic(
     about 486 C, Fe bake-off about 1775 C, both at 1 mbar). A uniform
     temperature is not a second gate. ``upstream_hot_wall_min_C`` is
     accepted and ignored so a stage-0 schedule band cannot reintroduce
-    one (b-282). A refused wall P_sat adds no finding.
+    one (b-282).
+
+    A missing or invalid local pressure, or a refused wall P_sat, is a
+    typed refusal of this quantity (d-367). It is not a clear and it is
+    not a supersaturation finding. Reactive SiO deposition still uses
+    its P_sat ~= 0 backstop on the deposition path; that backstop does
+    not pass the hot-wall check.
     """
 
     # The historical uniform floor is not a violation threshold.
@@ -7607,6 +7615,29 @@ def cold_spot_diagnostic(
     margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
     findings: list[dict[str, Any]] = []
     upstream_hot_wall_findings: list[dict[str, Any]] = []
+    upstream_hot_wall_refusals: list[dict[str, Any]] = []
+
+    def _hot_wall_refusal(
+        segment: PipeSegment,
+        species: str,
+        kg_hr: float,
+        wall_T_C: float,
+        target_stage_number: int,
+        **fields: Any,
+    ) -> dict[str, Any]:
+        return {
+            'status': 'refused',
+            'output_status': 'refused',
+            'quantity': 'upstream_hot_wall',
+            'segment': segment.name,
+            'account': segment.wall_deposit_account,
+            'species': str(species),
+            'kg_hr': kg_hr,
+            'wall_temperature_C': wall_T_C,
+            'target_stage_number': target_stage_number,
+            **fields,
+        }
+
     for species, raw_kg_hr in vapor_species_kg_hr.items():
         kg_hr = _finite_nonnegative_value(
             raw_kg_hr,
@@ -7623,16 +7654,33 @@ def cold_spot_diagnostic(
             vapor_pressure_data=vapor_pressure_data,
         )
         threshold_C = condensation_T_C - margin_C
+        # Missing and non-positive pressures are not a completed clear.
+        # A physical undersaturated comparison needs a finite p_i > 0.
         p_local_pa = None
-        if species_partial_pressures_pa is not None:
-            raw_partial = species_partial_pressures_pa.get(species)
-            if raw_partial is not None:
-                try:
-                    candidate_pa = float(raw_partial)
-                except (TypeError, ValueError):
-                    candidate_pa = math.nan
-                if math.isfinite(candidate_pa) and candidate_pa > 0.0:
-                    p_local_pa = candidate_pa
+        pressure_refusal_fields: dict[str, Any] | None = None
+        if (
+            species_partial_pressures_pa is None
+            or species not in species_partial_pressures_pa
+        ):
+            pressure_refusal_fields = {
+                'refusal_type': 'DepositionInputRefusal',
+                'parameter': 'species_partial_pressure_pa',
+                'reason': 'missing',
+            }
+        else:
+            raw_partial = species_partial_pressures_pa[species]
+            try:
+                candidate_pa = float(raw_partial)
+            except (TypeError, ValueError):
+                candidate_pa = math.nan
+            if math.isfinite(candidate_pa) and candidate_pa > 0.0:
+                p_local_pa = candidate_pa
+            else:
+                pressure_refusal_fields = {
+                    'refusal_type': 'DepositionInputRefusal',
+                    'parameter': 'species_partial_pressure_pa',
+                    'reason': 'must be finite and positive',
+                }
         for segment in pipe_segments:
             downstream_number = _segment_stage_number(segment.downstream_stage)
             if downstream_number is None:
@@ -7640,27 +7688,67 @@ def cold_spot_diagnostic(
             if downstream_number > target_stage_number:
                 continue
             wall_T_C = float(segment.wall_temperature_C)
-            if p_local_pa is not None:
+            if pressure_refusal_fields is not None:
+                upstream_hot_wall_refusals.append(_hot_wall_refusal(
+                    segment,
+                    str(species),
+                    kg_hr,
+                    wall_T_C,
+                    target_stage_number,
+                    **pressure_refusal_fields,
+                ))
+            else:
                 # Premise: fouling requires p_i > P_sat(T_wall) (mandate
                 # hot-wall invariant). Algebra: supersaturation iff
                 # p_local_Pa - P_sat_Pa > 0. Units: both pressures are Pa.
                 # Sanity: Fe P_sat(1673.15 K) ≈ 1.14 Pa, so a 100 Pa
                 # (1 mbar) Fe stream is ~88-fold supersaturated; Na
                 # P_sat at the same wall is ~0.93 MPa, so 100 Pa Na is
-                # undersaturated. SiO wall Antoine is not a P_sat
-                # curve; a refused P_sat does not invent a flag here
-                # (reactive P_sat ~= 0 is M30 deposition policy).
-                P_sat_pa, saturation_refused = _try_antoine_psat_pa(
-                    str(species),
-                    wall_T_C + CELSIUS_TO_KELVIN_OFFSET,
-                    vapor_pressure_data=vapor_pressure_data,
+                # undersaturated. A refused P_sat is not P_sat = 0: the
+                # reactive deposition backstop must not invent a violation.
+                wall_T_K = wall_T_C + CELSIUS_TO_KELVIN_OFFSET
+                # Keep an active route telemetry context. A private dict
+                # is only for reading the refusal when no context is set.
+                saturation_notes, saturation_warnings = _resolve_antoine_telemetry(
+                    None,
+                    None,
                 )
-                if (
+                if saturation_notes is None:
+                    saturation_notes = {}
+                species_name = str(species)
+                P_sat_pa, saturation_refused = _try_antoine_psat_pa(
+                    species_name,
+                    wall_T_K,
+                    vapor_pressure_data=vapor_pressure_data,
+                    antoine_extrapolations=saturation_notes,
+                    antoine_extrapolation_warnings=saturation_warnings,
+                )
+                saturation_known = (
                     not saturation_refused
                     and P_sat_pa is not None
                     and math.isfinite(P_sat_pa)
-                    and p_local_pa > P_sat_pa
-                ):
+                )
+                if not saturation_known:
+                    note = saturation_notes.get(
+                        f'{species_name}#wall:{wall_T_K}',
+                        {},
+                    )
+                    upstream_hot_wall_refusals.append(_hot_wall_refusal(
+                        segment,
+                        species_name,
+                        kg_hr,
+                        wall_T_C,
+                        target_stage_number,
+                        refusal_type=str(
+                            note.get('refusal_type')
+                            or 'WallSaturationPressureRefusal'
+                        ),
+                        reason=str(
+                            note.get('reason')
+                            or 'saturation_pressure_unavailable'
+                        ),
+                    ))
+                elif p_local_pa > P_sat_pa:
                     upstream_hot_wall_findings.append({
                         'segment': segment.name,
                         'account': segment.wall_deposit_account,
@@ -7707,6 +7795,8 @@ def cold_spot_diagnostic(
         'upstream_hot_wall_min_C': None,
         'upstream_hot_wall_warnings': upstream_hot_wall_warnings,
         'upstream_hot_wall_findings': upstream_hot_wall_findings,
+        'upstream_hot_wall_refused': bool(upstream_hot_wall_refusals),
+        'upstream_hot_wall_refusals': upstream_hot_wall_refusals,
     }
 
 

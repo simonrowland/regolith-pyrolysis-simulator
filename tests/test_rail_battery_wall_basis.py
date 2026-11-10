@@ -11,7 +11,9 @@ Successful-value controls named by the verifiers: adequately hot or
 diluted Fe stays clear; a wall below the SiO engineering landing T
 still sets has_cold_spot; a 1300 C millibar Fe wall remains a dew-point
 violation; SiO reactive P_sat ~= 0 deposition policy is untouched (M30 / D04).
-The uniform 1400 C floor is not a violation (b-282).
+The uniform 1400 C floor is not a violation (b-282). A refused wall
+P_sat, or a missing local pressure, is a typed refusal of the hot-wall
+quantity, not a clear (d-367).
 """
 
 from __future__ import annotations
@@ -103,8 +105,10 @@ def test_dilute_or_hot_fe_at_valid_wall_stays_clear():
     )
 
     assert dilute["has_upstream_hot_wall_violation"] is False
+    assert dilute["upstream_hot_wall_refused"] is False
     assert dilute["has_cold_spot"] is False
     assert hot["has_upstream_hot_wall_violation"] is False
+    assert hot["upstream_hot_wall_refused"] is False
     assert hot["has_cold_spot"] is False
 
 
@@ -128,7 +132,9 @@ def test_na_500_c_alkali_duty_is_not_a_hot_wall_violation():
     )
 
     assert diagnostic["has_upstream_hot_wall_violation"] is False
+    assert diagnostic["upstream_hot_wall_refused"] is False
     assert diagnostic["upstream_hot_wall_findings"] == []
+    assert diagnostic["upstream_hot_wall_refusals"] == []
 
 
 def test_species_change_and_low_wall_uniform_minimum():
@@ -198,6 +204,93 @@ def test_sio_reactive_wall_saturation_backstop_unchanged():
         species_partial_pressures_pa={"SiO": MILLIBAR_BAKEOFF_PA},
     )
     assert sio_only["has_upstream_hot_wall_violation"] is False
+    assert sio_only["upstream_hot_wall_refused"] is True
+    assert sio_only["upstream_hot_wall_refusals"][0]["refusal_type"] == (
+        "WallSaturationPressureRefusal"
+    )
+
+
+def test_sio_at_1300_c_refuses_unchecked_bakeoff_instead_of_clearing():
+    """SiO at 1300 C and 100 Pa is neither a cold spot nor a silent clear.
+
+    1300 C is above the 1050 C landing setpoint. Wall P_sat refuses, so
+    the millibar bake-off requirement is a typed refusal of that quantity.
+    It is not a supersaturation finding: refused P_sat is not P_sat = 0.
+    """
+
+    diagnostic = cold_spot_diagnostic(
+        [_upstream_segment("stage_3", 1300.0)],
+        {"SiO": 1.0},
+        species_partial_pressures_pa={"SiO": MILLIBAR_BAKEOFF_PA},
+    )
+
+    assert diagnostic["has_cold_spot"] is False
+    assert diagnostic["has_upstream_hot_wall_violation"] is False
+    assert diagnostic["upstream_hot_wall_findings"] == []
+    assert diagnostic["upstream_hot_wall_refused"] is True
+    refusal = diagnostic["upstream_hot_wall_refusals"][0]
+    assert refusal["status"] == "refused"
+    assert refusal["output_status"] == "refused"
+    assert refusal["quantity"] == "upstream_hot_wall"
+    assert refusal["species"] == "SiO"
+    assert refusal["refusal_type"] == "WallSaturationPressureRefusal"
+    assert refusal["wall_temperature_C"] == 1300.0
+    assert "wall_saturation_pressure_refused" in refusal["reason"]
+
+
+def test_omitted_partial_pressure_refuses_fe_hot_wall_quantity():
+    """d-367: omitted pressure on a 1300 C Fe wall is not an all-clear.
+
+    The wall is above Fe's 1250 C landing setpoint, so the cold-spot
+    check is quiet. The dew-point check has no local pressure to compare.
+    """
+
+    diagnostic = cold_spot_diagnostic(
+        [_upstream_segment("stage_1", 1300.0)],
+        {"Fe": 1.0},
+    )
+
+    assert diagnostic["has_cold_spot"] is False
+    assert diagnostic["has_upstream_hot_wall_violation"] is False
+    assert diagnostic["upstream_hot_wall_findings"] == []
+    assert diagnostic["upstream_hot_wall_refused"] is True
+    refusal = diagnostic["upstream_hot_wall_refusals"][0]
+    assert refusal["status"] == "refused"
+    assert refusal["output_status"] == "refused"
+    assert refusal["quantity"] == "upstream_hot_wall"
+    assert refusal["species"] == "Fe"
+    assert refusal["refusal_type"] == "DepositionInputRefusal"
+    assert refusal["parameter"] == "species_partial_pressure_pa"
+    assert refusal["reason"] == "missing"
+    assert refusal["wall_temperature_C"] == 1300.0
+
+
+@pytest.mark.parametrize(
+    ("partials", "reason"),
+    [
+        ({"Fe": float("nan")}, "must be finite and positive"),
+        ({"Fe": 0.0}, "must be finite and positive"),
+        ({"Fe": -5.0}, "must be finite and positive"),
+        ({"Fe": "nope"}, "must be finite and positive"),
+        ({"Na": MILLIBAR_BAKEOFF_PA}, "missing"),
+    ],
+)
+def test_invalid_partial_pressure_refuses_fe_hot_wall_quantity(partials, reason):
+    """A present-but-unusable Fe pressure is the same typed refusal."""
+
+    diagnostic = cold_spot_diagnostic(
+        [_upstream_segment("stage_1", 1300.0)],
+        {"Fe": 1.0},
+        species_partial_pressures_pa=partials,
+    )
+
+    assert diagnostic["has_upstream_hot_wall_violation"] is False
+    assert diagnostic["upstream_hot_wall_refused"] is True
+    refusal = diagnostic["upstream_hot_wall_refusals"][0]
+    assert refusal["refusal_type"] == "DepositionInputRefusal"
+    assert refusal["parameter"] == "species_partial_pressure_pa"
+    assert refusal["reason"] == reason
+    assert refusal["species"] == "Fe"
 
 
 def test_route_millibar_fe_at_1400_c_uses_wall_partial_pressure():
