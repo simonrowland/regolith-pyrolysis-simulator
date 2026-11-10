@@ -56,12 +56,7 @@ from simulator.state import (
     CampaignPhase,
     DecisionType,
 )
-from simulator.vapour_rail.batch import (
-    FluxRefusal,
-    PressureRefusal,
-    PressureValue,
-)
-from simulator.vapour_rail.request import REFUSAL_MISSING_CHANNEL_CONTRACT
+from simulator.vapour_rail.batch import PressureValue
 from tests.chemistry.conftest import _build_sim
 
 
@@ -1077,19 +1072,27 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
         "series-resistance reference returned no flux -- the test "
         "fixture is not exercising the path it claims to cover"
     )
-    # b-114: a numeric broad proxy is not an intrinsic alpha. Preserve the
-    # channel refusal directly rather than inferring it from flux diagnostics.
+    # CrO2's broad proxy is not a measured alpha. The shipped policy keeps
+    # it flux-active at the flagged alpha=1 upper bound. The reference helper
+    # still evaluates the proxy coefficient, so that species is outside the
+    # strict numerical compare.
     cro2 = batch.channel("CrO2")
-    assert cro2.refusal_code == REFUSAL_MISSING_CHANNEL_CONTRACT
-    assert isinstance(cro2.pressure, PressureRefusal)
-    assert isinstance(cro2.selected_runtime_pressure, PressureRefusal)
-    assert isinstance(cro2.flux, FluxRefusal)
-    assert "missing alpha" in (cro2.extra.get("detail") or "")
-    assert "CrO2" not in batch.flux_active_species_ids
-    assert "CrO2" not in kernel_flux
+    assert cro2.refusal_code is None
+    assert isinstance(cro2.pressure, PressureValue)
+    assert isinstance(cro2.selected_runtime_pressure, PressureValue)
+    assert cro2.is_flux_active
+    assert "CrO2" in batch.flux_active_species_ids
+    assert "CrO2" in (
+        getattr(sim, "_unmeasured_alpha_fallback_species_engaged", ()) or ()
+    )
+    cro2_kernel = float(kernel_flux.get("CrO2", 0.0))
+    assert math.isfinite(cro2_kernel) and cro2_kernel >= 0.0
+    fallback_engaged = set(
+        getattr(sim, "_unmeasured_alpha_fallback_species_engaged", ()) or ()
+    )
     assert refused_reference_species == set()
     for species, legacy_value in reference_flux.items():
-        if species in refused_reference_species:
+        if species in refused_reference_species or species in fallback_engaged:
             continue
         kernel_value = kernel_flux.get(species, 0.0)
         tol = max(
@@ -1101,7 +1104,9 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
             f"kg/hr kernel={kernel_value:.6g} kg/hr (tol={tol:.3g})"
         )
 
-    extra_runtime_species = set(kernel_flux) - set(reference_flux)
+    extra_runtime_species = (
+        set(kernel_flux) - set(reference_flux) - fallback_engaged
+    )
     assert extra_runtime_species == set(), (
         f"runtime species lack selected-runtime reference values: "
         f"{extra_runtime_species}"
@@ -1207,14 +1212,19 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         )
         refusals = sim._last_vapour_batch_report["refusals_by_species"]
         refused_reference_species = set(reference_flux) & set(refusals)
+        fallback_engaged = set(
+            getattr(sim, "_unmeasured_alpha_fallback_species_engaged", ()) or ()
+        )
         # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114
         # in 1a6ad25, made batch eligibility authoritative.
         # C0 retains phosphorus and uses the ordinary evaporation stage, so
         # stage0-only carriers can be refused before C0B begins. The C0B-only
         # reason check below applies only when that cleanup campaign is sampled;
         # the legacy math helper has no stage predicate, so typed refusals stay
-        # outside wiring parity in every campaign. CrO2 keeps a typed
-        # missing-alpha refusal; the C0B predicate can take precedence.
+        # outside wiring parity in every campaign. CrO2 stays flux-active on
+        # the flagged alpha=1 fallback; the reference helper still uses the
+        # proxy coefficient, so that species is outside the numerical compare.
+        # The C0B predicate can still refuse it once that campaign is sampled.
         for species in refused_reference_species:
             refusal = refusals[species]
             assert refusal["refusal_code"] == "inapplicable_by_declared_predicate"
@@ -1226,8 +1236,6 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         refused_reference_species_seen.update(refused_reference_species)
         if "CrO2" in refusals:
             cro2_refusal = refusals["CrO2"]
-            if cro2_refusal["refusal_code"] == REFUSAL_MISSING_CHANNEL_CONTRACT:
-                proxy_accounted_species_seen.add("CrO2")
             if (
                 sampled_campaign is CampaignPhase.C0B
                 and cro2_refusal["refusal_code"]
@@ -1237,9 +1245,13 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
                 assert "c0b_p_cleanup admits only P2O5-sourced carrier rules" in (
                     cro2_refusal["extra"]["detail"]
                 )
+        if "CrO2" in fallback_engaged:
+            proxy_accounted_species_seen.add("CrO2")
+            cro2_kernel = float(kernel_flux.get("CrO2", 0.0))
+            assert math.isfinite(cro2_kernel) and cro2_kernel >= 0.0
 
         for species in set(reference_flux) | set(kernel_flux):
-            if species in refused_reference_species:
+            if species in refused_reference_species or species in fallback_engaged:
                 continue
             legacy_value = float(reference_flux.get(species, 0.0))
             kernel_value = float(kernel_flux.get(species, 0.0))
@@ -1269,10 +1281,8 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
     assert steps > 0, f"smoke run for {feedstock_key} executed zero steps"
     if feedstock_key in {"lunar_mare_low_ti", "s_type_asteroid_silicate"}:
         assert "CrO2" in c0b_refused_reference_species_seen
-        # Outside C0B, CrO2 is refused for its missing intrinsic alpha.
-        assert "CrO2" in (
-            refused_reference_species_seen | proxy_accounted_species_seen
-        )
+        # Outside C0B, CrO2 stays on the flagged alpha=1 fallback.
+        assert "CrO2" in proxy_accounted_species_seen
     assert worst_delta_kg_hr <= 1.0, (
         f"worst observed parity delta {worst_delta_kg_hr:.6g} kg/hr is "
         f"suspiciously large for a refactor-only change"

@@ -146,7 +146,7 @@ def _total_chromium_mol(sim: PyrolysisSimulator) -> float:
     )
 
 
-def test_lunar_mare_c2a_refuses_cro2_without_intrinsic_alpha():
+def test_lunar_mare_c2a_keeps_cro2_flux_active_with_flagged_alpha_fallback():
     setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
     backend = InternalAnalyticalBackend()
@@ -168,11 +168,8 @@ def test_lunar_mare_c2a_refuses_cro2_without_intrinsic_alpha():
         snapshot = sim.step()
         closures.append(abs(snapshot.mass_balance_error_pct))
 
-    assert "CrO2" in sim._last_vapour_batch_report["refusals_by_species"]
-    assert "CrO2" not in sim._last_vapour_batch_report["flux_active_species_ids"]
-    assert not any(
-        transition.reason == "evaporate_CrO2"
-        for transition in sim.atom_ledger.transitions
-    )
-    assert _total_chromium_mol(sim) == pytest.approx(initial_cr_mol, abs=1e-9)
+    assert "CrO2" not in sim._last_vapour_batch_report["refusals_by_species"]
+    assert "CrO2" in sim._last_vapour_batch_report["flux_active_species_ids"]
+    assert "CrO2" in sim._unmeasured_alpha_fallback_species_engaged
+    assert _total_chromium_mol(sim) <= initial_cr_mol + 1e-9
     assert max(closures) <= 5e-12

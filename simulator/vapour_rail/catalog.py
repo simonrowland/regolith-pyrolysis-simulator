@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from collections import OrderedDict
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 import hashlib
 import json
@@ -37,7 +37,7 @@ from simulator.vapour_rail.activity import (
     SourceReactionActivity,
     StandardStateIdentity,
 )
-from simulator.vapour_rail.batch import FluxActivationContext
+from simulator.vapour_rail.batch import FluxActivationContext, PressureValue
 from simulator.vapour_rail.channels import (
     CHANNEL_O2,
     LEGACY_FO2_PLANE,
@@ -1740,6 +1740,189 @@ class VapourRailCatalog:
             caller_species_filter=caller_species_filter,
         )
 
+    def _apply_pseudo_psat_ellingham_selected_pressure(
+        self,
+        batch: Any,
+        state: Any,
+    ) -> Any:
+        """Replace a dormant pseudo-psat selection with the Ellingham pressure.
+
+        Fe's catalog row is ``fit_target: pseudo_psat_backsolved_from_vaporock``
+        with activity and pO2 exponents of 0 and no oxygen channel, so
+        ``CompiledPressureEvaluator.evaluate`` returns the dormant pseudo
+        Antoine and ignores melt activity and pO2. That fit is not the
+        runtime metal pressure. The kernel publishes
+
+            root = (K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M)
+            P = min(root, 1) * P_pure     condensed metal (below the boil)
+            P = root * p0                  gas-standard metal
+
+        with K_decomp = exp(dG_kJ * 1000 / (R * T)), R from
+        ``simulator.state.GAS_CONSTANT``, dG from
+        ``ellingham_delta_g_kj_per_mol_o2`` (NIST-JANAF), and P_pure from
+        the pure-component Antoine sidecar. FeO uses the realized transport
+        pO2 (``state.fO2_bar``). C0 argon headspace O2 is 0 mol, so that
+        realized pO2 is the 1e-9 bar transport floor, the same floor the
+        diagnostic uses. The 85x gap is this skipped term, not a second pO2.
+
+        Worked point, T = 1673.15 K, a_FeO = 0.2, pO2 = 1e-9 bar:
+        dG = -330.157642 kJ/mol O2, K = 4.930535300796167e-11,
+        pure sidecar A = 10.670336, B = 17759.430841, C = 0,
+        P_pure = 1.1375418658242942 Pa, n_M = n_ox = 2,
+        root = 0.0444096174304448,
+        P_Fe = 0.05051779907237128 Pa.
+        The dormant pseudo Antoine (A = 9.408547, B = 23312.312336,
+        C = 1000) is 4.871162269407267 Pa and matches neither this value
+        nor the diagnostic. ``answer.pressure`` stays that catalog reference.
+        """
+
+        if state is None or batch is None:
+            return batch
+        temperature_K = getattr(state, "temperature_K", None)
+        try:
+            temperature_K = float(temperature_K)
+        except (TypeError, ValueError):
+            return batch
+        if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+            return batch
+        activities = getattr(state, "source_reaction_activities", None) or {}
+        if not isinstance(activities, Mapping):
+            return batch
+
+        from engines.antoine import (
+            _AntoineCoefficientRefusal,
+            _antoine_log10_pressure,
+            _read_antoine_coefficients,
+        )
+        from engines.builtin.vapor_pressure import (
+            COEFF_BLOCK_PURE_COMPONENT,
+            FIT_TARGET_PSEUDO_VAPOROCK,
+            vapor_pressure_antoine_coefficients,
+        )
+        from simulator.chemistry.ellingham_graph import (
+            ELLINGHAM_STANDARD_PRESSURE_PA,
+        )
+        from simulator.chemistry.ellingham_thermo import (
+            ELLINGHAM_METAL_PHASE_GAS,
+            ellingham_delta_g_kj_per_mol_o2,
+            ellingham_metal_phase_kind,
+            ellingham_stoichiometry,
+        )
+        from simulator.state import GAS_CONSTANT
+
+        channels = dict(batch.channels_by_species)
+        changed = False
+        for species_id, answer in channels.items():
+            if answer.source_label != "catalog":
+                continue
+            if not isinstance(answer.pressure, PressureValue):
+                continue
+            if not isinstance(answer.selected_runtime_pressure, PressureValue):
+                continue
+            compiled = self._species.get(species_id)
+            evaluator = None if compiled is None else compiled.evaluator
+            if evaluator is None:
+                continue
+            if float(evaluator.activity_exponent or 0.0) != 0.0:
+                continue
+            if float(evaluator.pO2_exponent or 0.0) != 0.0:
+                continue
+            if evaluator.oxygen_fugacity_channel is not None:
+                continue
+            row = None
+            for group_name in ("metals", "oxide_vapors"):
+                group = self._legacy_projection.get(group_name) or {}
+                candidate = group.get(species_id)
+                if isinstance(candidate, Mapping):
+                    row = candidate
+                    break
+            if row is None:
+                continue
+            if str(row.get("fit_target") or "").strip() != FIT_TARGET_PSEUDO_VAPOROCK:
+                continue
+            try:
+                activity = float(activities[species_id])
+            except (KeyError, TypeError, ValueError):
+                continue
+            parent_oxide = str(row.get("parent_oxide") or "")
+            pO2_bar = (
+                getattr(state, "fO2_bar", None)
+                if parent_oxide == "FeO"
+                else getattr(state, "source_reaction_fO2_bar", None)
+            )
+            try:
+                pO2_bar = float(pO2_bar)
+            except (TypeError, ValueError):
+                continue
+            if (
+                not math.isfinite(activity)
+                or activity <= 0.0
+                or not math.isfinite(pO2_bar)
+                or pO2_bar <= 0.0
+            ):
+                continue
+            antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+                row,
+                temperature_K=temperature_K,
+            )
+            if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
+                continue
+            if not isinstance(antoine, Mapping) or antoine.get("selection_refusal"):
+                continue
+            try:
+                antoine_a, antoine_b, antoine_c = _read_antoine_coefficients(antoine)
+                pure_pa = 10.0 ** _antoine_log10_pressure(
+                    antoine_a, antoine_b, antoine_c, temperature_K
+                )
+                n_metal, n_oxide = ellingham_stoichiometry(species_id)
+                delta_g_kj = ellingham_delta_g_kj_per_mol_o2(
+                    species_id, temperature_K
+                )
+                equilibrium_k = math.exp(
+                    delta_g_kj * 1000.0 / (GAS_CONSTANT * temperature_K)
+                )
+            except (
+                KeyError,
+                ValueError,
+                OverflowError,
+                _AntoineCoefficientRefusal,
+            ):
+                continue
+            if (
+                n_metal <= 0.0
+                or not math.isfinite(pure_pa)
+                or pure_pa <= 0.0
+                or not math.isfinite(equilibrium_k)
+                or equilibrium_k <= 0.0
+            ):
+                continue
+            numerator = equilibrium_k * (activity ** n_oxide) / pO2_bar
+            if not math.isfinite(numerator) or numerator <= 0.0:
+                continue
+            try:
+                root = numerator ** (1.0 / n_metal)
+            except OverflowError:
+                continue
+            if not math.isfinite(root) or root <= 0.0:
+                continue
+            if (
+                ellingham_metal_phase_kind(species_id, temperature_K)
+                == ELLINGHAM_METAL_PHASE_GAS
+            ):
+                selected_pa = root * ELLINGHAM_STANDARD_PRESSURE_PA
+            else:
+                selected_pa = min(root, 1.0) * pure_pa
+            if not math.isfinite(selected_pa) or selected_pa <= 0.0:
+                continue
+            channels[species_id] = replace(
+                answer,
+                selected_runtime_pressure=PressureValue(pa=float(selected_pa)),
+            )
+            changed = True
+        if not changed:
+            return batch
+        return replace(batch, channels_by_species=channels)
+
     def resolve_batch(
         self,
         ledger_snapshot: Mapping[str, Any] | Any,
@@ -1858,7 +2041,7 @@ class VapourRailCatalog:
                 stage=getattr(state, "stage", None),
             )
 
-        return resolve_vapour_batch(
+        batch = resolve_vapour_batch(
             rules=self._request_rules,
             ledger_snapshot=ledger_snapshot,
             state=resolve_state,
@@ -1867,6 +2050,10 @@ class VapourRailCatalog:
             catalog_species=self._species,
             caller_species_filter=caller_species_filter,
             flux_activation_context=flux_activation_context,
+        )
+        return self._apply_pseudo_psat_ellingham_selected_pressure(
+            batch,
+            resolve_state,
         )
 
 

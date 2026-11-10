@@ -4362,3 +4362,157 @@ def test_legacy_view_production_warm_hit_budget() -> None:
     assert proj_loop < 0.005, (
         f"projected re-entry loop too slow: {proj_loop*1000:.2f} ms"
     )
+
+
+def test_fe_selected_runtime_pressure_is_ellingham_not_dormant_antoine() -> None:
+    """Fe's selected pressure is K*a/sqrt(pO2) on the pure sidecar.
+
+    Independent literals, not derived from the helper under test.
+    T = 1673.15 K, a_FeO = 0.2, pO2 = 1e-9 bar, R = simulator.state
+    GAS_CONSTANT, dG from ellingham_delta_g_kj_per_mol_o2, pure Antoine
+    A=10.670336 B=17759.430841 C=0. Condensed rail:
+    P_Fe = 0.05051779907237128 Pa. The dormant pseudo Antoine stays on
+    answer.pressure at 4.871162269407267 Pa.
+    """
+
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"),
+        u0_manifest=load_u0_manifest(),
+    )
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"FeO": 1.0}},
+        {
+            "temperature_K": 1673.15,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "fO2_bar": 1.0e-9,
+            "source_reaction_activities": {"Fe": 0.2},
+        },
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel("Fe")
+    assert isinstance(answer.selected_runtime_pressure, PressureValue)
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.selected_runtime_pressure.pa == pytest.approx(
+        0.05051779907237128, rel=1e-12
+    )
+    assert answer.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
+    assert answer.source_label == "catalog"
+
+
+def test_fe_selected_pressure_stays_catalog_without_activity() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"),
+        u0_manifest=load_u0_manifest(),
+    )
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"FeO": 1.0}},
+        {
+            "temperature_K": 1673.15,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "fO2_bar": 1.0e-9,
+        },
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel("Fe")
+    assert answer.selected_runtime_pressure == answer.pressure
+    assert answer.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
+
+
+def _missing_contract_rule(
+    species_id: str,
+    *,
+    has_alpha: bool,
+    has_formula: bool,
+) -> RequestRule:
+    return RequestRule(
+        species_id=species_id,
+        source_account="process.cleaned_melt",
+        parent_species_ids=frozenset({"P"}),
+        required_source_atoms=frozenset({"P"}),
+        solve_group_id=f"bundle-{species_id}",
+        applicability_predicate="applicable",
+        request_rule_kind="source_inventory_present",
+        origin="catalog",
+        formula_id=species_id,
+        validation_status="pending_validation",
+        has_pressure_evaluator=True,
+        has_alpha=has_alpha,
+        has_route=True,
+        has_formula=has_formula,
+    )
+
+
+def test_missing_alpha_plus_another_field_demotes_instead_of_aborting() -> None:
+    """A broad-proxy carrier missing alpha and formula must not abort the batch."""
+
+    batch = resolve_vapour_batch(
+        rules=(
+            _missing_contract_rule("K", has_alpha=True, has_formula=True),
+            _missing_contract_rule("CrO2", has_alpha=False, has_formula=False),
+        ),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1800.0),
+        catalog_species={
+            **_stub_catalog_species("K"),
+            **_stub_catalog_species("CrO2"),
+        },
+        flux_activation_context=_pre_rg_activation_context("K", "CrO2"),
+    )
+    assert "K" in batch.flux_active_species_ids
+    cro2 = batch.channel("CrO2")
+    assert cro2.refusal_code == "missing_channel_contract"
+    detail = cro2.extra.get("detail") or ""
+    assert "alpha" in detail
+    assert "formula" in detail
+    assert "CrO2" not in batch.flux_active_species_ids
+
+
+def test_missing_formula_without_alpha_still_aborts_the_batch() -> None:
+    with pytest.raises(VapourRequestConstructionError, match="not flux-eligible"):
+        resolve_vapour_batch(
+            rules=(
+                _missing_contract_rule("CrO2", has_alpha=True, has_formula=False),
+            ),
+            ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+            state=VapourResolveState(temperature_K=1800.0),
+            catalog_species=_stub_catalog_species("CrO2"),
+            flux_activation_context=_pre_rg_activation_context("CrO2"),
+        )
+
+
+def test_sole_missing_alpha_stays_flux_active_when_fallback_admits() -> None:
+    context = FluxActivationContext(
+        epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+        effective_pressure_species_ids=frozenset({"CrO2"}),
+        allow_unmeasured_alpha_fallback=True,
+        unmeasured_alpha_fallback_species=frozenset({"CrO2"}),
+    )
+    batch = resolve_vapour_batch(
+        rules=(_missing_contract_rule("CrO2", has_alpha=False, has_formula=True),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1800.0),
+        catalog_species=_stub_catalog_species("CrO2"),
+        flux_activation_context=context,
+    )
+    answer = batch.channel("CrO2")
+    assert isinstance(answer.pressure, PressureValue)
+    assert isinstance(answer.selected_runtime_pressure, PressureValue)
+    assert answer.is_flux_active
+    assert "CrO2" in batch.flux_active_species_ids
+
+
+def test_sole_missing_alpha_stays_refused_when_fallback_is_off() -> None:
+    batch = resolve_vapour_batch(
+        rules=(_missing_contract_rule("CrO2", has_alpha=False, has_formula=True),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1800.0),
+        catalog_species=_stub_catalog_species("CrO2"),
+        flux_activation_context=_pre_rg_activation_context("CrO2"),
+    )
+    answer = batch.channel("CrO2")
+    assert answer.refusal_code == "missing_channel_contract"
+    assert "alpha" in (answer.extra.get("detail") or "")
+    assert not answer.is_flux_active
+    assert "CrO2" not in batch.flux_active_species_ids

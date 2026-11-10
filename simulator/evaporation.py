@@ -948,6 +948,13 @@ class EvaporationMixin:
                 }
         self._last_vapour_batch = vapour_batch
         self._last_vapour_batch_report = batch_report
+        # d-367: a below-threshold empty seam is a typed zero, not a silent one.
+        # The reason used to ride the flux consumer's source argument. Stamp it
+        # here, where the typed source still exists, before the overlay is stored.
+        zero_reason = effective_pressure_source.physical_zero_reason
+        if zero_reason is not None:
+            flux_overlay_report = dict(flux_overlay_report)
+            flux_overlay_report['effective_pressure_zero_reason'] = zero_reason
         self._last_vapour_batch_flux_overlay = flux_overlay_report
         imcc_shadow = None
         batch_shadow = getattr(vapour_batch, "melt_activity_shadow", None)
@@ -1069,6 +1076,11 @@ class EvaporationMixin:
                 # zero, while the batch proves catalog coverage. Resolution
                 # errors were refused above; a refused or missing channel still
                 # reaches fail-closed handling below.
+                self._last_evaporation_flux_diagnostic = {
+                    'reason': effective_pressure_source.physical_zero_reason,
+                    'evaporation_flux_kg_hr': {},
+                    'vapour_batch_flux_overlay': flux_overlay_report,
+                }
                 return flux
             vapor_pressure_diagnostic = dict(
                 getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
@@ -3673,6 +3685,25 @@ class EvaporationMixin:
             }
             campaign = getattr(self.melt, 'campaign', None)
             campaign_name = str(getattr(campaign, 'name', '') or '')
+            kernel_config = dict(
+                getattr(self, 'setpoints', {}).get('chemistry_kernel', {}) or {}
+            )
+            allow_unmeasured_alpha_fallback = bool(
+                kernel_config.get('allow_unmeasured_alpha_fallback', False)
+            )
+            if 'unmeasured_alpha_fallback_species' in kernel_config:
+                # Key present, including an empty list: only those species.
+                # Key absent: None, which admits every species, matching the
+                # flux provider.
+                unmeasured_alpha_fallback_species = frozenset(
+                    str(species_id)
+                    for species_id in (
+                        kernel_config.get('unmeasured_alpha_fallback_species')
+                        or ()
+                    )
+                )
+            else:
+                unmeasured_alpha_fallback_species = None
             # Keep the global request phase on the legacy hot-train contract.
             # C0 does not select stage0_p_carriers: phosphorus stays condensed
             # through C0. C0B still selects c0b_p_cleanup. Flipping the whole
@@ -3766,6 +3797,12 @@ class EvaporationMixin:
                 flux_activation_context=FluxActivationContext(
                     epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
                     effective_pressure_species_ids=effective_pressure_species_ids,
+                    allow_unmeasured_alpha_fallback=(
+                        allow_unmeasured_alpha_fallback
+                    ),
+                    unmeasured_alpha_fallback_species=(
+                        unmeasured_alpha_fallback_species
+                    ),
                 ),
             )
         except Exception as exc:  # noqa: BLE001 — typed failure, not live fallback

@@ -497,7 +497,7 @@ def test_headless_full_run_ledgers_and_product_story_web(
     assert artifact["terminal"]["final_state"] == runner["final_state"]
     assert (
         sim.setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
-        is False
+        is True
     )
     assert completion["products"] == {
         species: round(value, 2)

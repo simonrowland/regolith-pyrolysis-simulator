@@ -1187,6 +1187,7 @@ FLUX_CONSUMER_RELPATHS: tuple[str, ...] = (
     "simulator/evaporation.py",
     "simulator/vapour_rail/instrumentation.py",
     "simulator/vapour_rail/request.py",
+    "scripts/vapour_head_pressure_table.py",
 )
 
 # Kernel path: any legacy-key read is a fail.

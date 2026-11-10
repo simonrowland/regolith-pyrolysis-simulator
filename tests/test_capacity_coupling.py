@@ -1028,8 +1028,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     snapshot = sim.step()
     # d-252's 1 mbar Ar cover and 200 C/h ramp move this first step from
     # 1600 C to 1400 C. The old hard-vacuum step was 1.39e6% over transport
-    # capacity; b-114 selected runtime pressures raise this step's saturation
-    # to 3.6895%.
+    # capacity. This step's saturation is 2.4814%.
     # Physics seq 1003 classifies Ti below the 1e-12 kg/hr negligibility
     # threshold here, so it is absent from snapshot flux/status and is a
     # legitimate no-flux carrier for this pin.
@@ -1037,15 +1036,23 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # b-114 moves this first-step aggregate through the selected batch values.
-    # Fe now contributes 0.0749965086426351 kg/hr; the other species together
-    # contribute 0.06364158399850756 kg/hr, close to the former total.
+    # Fe's selected pressure is the Ellingham value at the in-step diagnostic
+    # (0.05731853761717197 Pa, a_FeO and the 1e-9 bar transport floor). Its
+    # flux is 0.0008827256411335937 kg/hr. The other species contribute
+    # 0.06364158399791156 kg/hr.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.13863809264114266, rel=1e-12, abs=1e-12
+        0.06452430963904515, rel=1e-12, abs=1e-12
     )
     assert snapshot.evap_flux.species_kg_hr["Fe"] == pytest.approx(
-        0.0749965086426351, rel=1e-12, abs=1e-12
+        0.0008827256411335937, rel=1e-12, abs=1e-12
     )
+    fe_answer = sim._last_vapour_batch.channel("Fe")
+    # Review diagnostic at this hour, measured before the selection fix.
+    assert fe_answer.selected_runtime_pressure.pa == pytest.approx(
+        0.05731853761717197, rel=1e-12
+    )
+    # Dormant pseudo Antoine stays the catalog reference and is not debited.
+    assert fe_answer.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
     )
@@ -1068,6 +1075,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         assert refusal["extra"].get("detail") == (
             "channel contract incomplete: missing alpha"
         )
+    assert "CrO2" not in alpha_refusals
+    assert "CrO2" in sim._last_vapour_batch.flux_active_species_ids
+    assert "CrO2" in sim._unmeasured_alpha_fallback_species_engaged
 
     assert tuple(
         pins[key]
@@ -1079,13 +1089,13 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # b-114 selected runtime values raise Fe evaporation in this C0 step.
+        # Fe follows the in-step Ellingham pressure, not the dormant Antoine.
         (
             1,
             1400.0,
-            0.13863809264114266,
-            3.689528113675295,
-            998.6328042986327,
+            0.06452430963904515,
+            2.481413156248235,
+            998.7069180816347,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -1185,15 +1195,20 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
         for species, rate in snapshot.evap_flux.species_kg_hr.items()
         if float(rate) > 0.0
     }
-    # Selected runtime pressures move the constrained release slightly below
-    # capacity: 0.0002646937535894336 - 0.00026469375065717025 =
-    # 2.93226337335e-12 kg/hr. Pin the resulting value and bound that residual.
+    # The snapshot total is short of pipe capacity by the demand carriers
+    # that do not survive into the reported flux. This step's tail is
+    # 3.02e-12 kg/hr across eight carriers (Ca 2.335e-12, Na2O_gas
+    # 4.39e-13, TiO 2.02e-13, and five smaller). The bound is one
+    # 1e-12 kg/hr quantum per omitted carrier, so a missing major
+    # carrier still fails.
+    assert 0.0 <= capacity_kg_hr - released_kg_hr <= (
+        8.0 * _NONTRIVIAL_FLUX_KG_HR
+    )
     assert released_kg_hr == pytest.approx(
-        0.00026469375065717025,
+        0.00025384203742374385,
         rel=1e-12,
         abs=1e-15,
     )
-    assert 0.0 <= capacity_kg_hr - released_kg_hr <= 3.0e-12
     assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
 
     def _committed_vapor_kg(species: str) -> float:
@@ -1235,7 +1250,7 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
     assert sim._subsolidus_pending_release is None
     assert snapshot.mass_balance_error_pct <= 5.0e-12
     assert snapshot.overhead.transport_saturation_pct == pytest.approx(
-        99.99999938874974,
+        99.99999936973133,
         rel=1e-12,
         abs=1e-12,
     )
