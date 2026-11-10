@@ -419,7 +419,7 @@ def _evaporation_quantity_authority_contributions(
             existing_authority = estimated_by_species_account[key]["authority"]
             if existing_authority == "extrapolated" or authority != "extrapolated":
                 return
-        estimated_by_species_account[key] = {
+        estimate = {
             "species": species_id,
             "account": account,
             "authority": authority,
@@ -432,6 +432,10 @@ def _evaporation_quantity_authority_contributions(
                 or "carrier evidence is status-bearing"
             ),
         }
+        prediction = extra.get("d359_prediction")
+        if isinstance(prediction, Mapping):
+            estimate["d359_prediction"] = dict(prediction)
+        estimated_by_species_account[key] = estimate
 
     diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
     missing = diagnostic.get("missing_transport_parameters", {})
@@ -474,7 +478,9 @@ def _evaporation_quantity_authority_contributions(
                     record, expected_species_id=str(species)
                 )
                 if status == VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING:
-                    if has_positive_flux(flux, species):
+                    if has_positive_flux(flux, species) or isinstance(
+                        extra.get("d359_prediction"), Mapping
+                    ):
                         record_estimate(species, record)
                     continue
                 if status == VAPOUR_CARRIER_AUTHORITY_MISSING:
@@ -629,11 +635,7 @@ def product_class_availability(
                     _CONSERVATIVE_LEDGER_UPPER_BOUND_BASIS
                 )
             excluded.append(excluded_item)
-    status = (
-        "available" if not refusals
-        else "partial" if has_computed_part
-        else "unavailable"
-    )
+    status = "available" if not refusals else "partial"
     targets = (
         (target_species,)
         if isinstance(target_species, str)
@@ -652,30 +654,49 @@ def product_class_availability(
         else:
             continue
         d359_refusals[label].append(reason)
+    contains_o2_target = "O2" in targets
     pending_classes = [
         label for label in ("B", "C", "E") if d359_refusals[label]
     ]
-    contains_o2_target = "O2" in targets
-    flagged_oxygen_output = contains_o2_target and bool(pending_classes)
-    if flagged_oxygen_output:
-        # A refused O-bearing vapor channel must not erase the independently
-        # computed molecular-O2 ledger total. Keep that value visible and
-        # attach its unresolved B/C/E evidence to the product row.
+    d359_class_predictions: list[dict[str, Any]] = []
+    seen_predictions: set[tuple[str, str, str]] = set()
+    for estimate in estimated_contributions:
+        prediction = estimate.get("d359_prediction")
+        if not isinstance(prediction, Mapping):
+            continue
+        rows = prediction.get("class_predictions")
+        if not isinstance(rows, (list, tuple)):
+            rows = (prediction,)
+        for row in rows:
+            if (
+                not isinstance(row, Mapping)
+                or row.get("class") not in {"B", "C", "E"}
+            ):
+                continue
+            species = str(
+                row.get("species") or estimate.get("species") or "unknown"
+            )
+            reason = str(row.get("reason") or prediction.get("reason") or "")
+            key = (str(row["class"]), species, reason)
+            if key in seen_predictions:
+                continue
+            seen_predictions.add(key)
+            d359_class_predictions.append(dict(row))
+            pending_classes.append(str(row["class"]))
+    pending_classes = list(dict.fromkeys(pending_classes))
+    if pending_classes and status == "available":
         status = "partial"
     prediction_flag = None
-    if flagged_oxygen_output:
+    if pending_classes:
         reason_parts = [
             (
-                "0.0 kg O₂ is the direct O₂-ledger total; no stored, vented, "
-                "or captured molecular O₂ was recorded. The associated "
-                "B/C/E oxide-vapor predictions are incomplete and are "
-                "not counted as shipped O₂."
-            )
-            if total_kg == 0.0
-            else (
-                "The direct O₂-ledger total is retained; associated B/C/E "
-                "oxide-vapor predictions are incomplete and are not "
-                "counted as shipped O₂."
+                f"The shipped molecular-O₂ ledger total is {float(total_kg):.1f} kg; "
+                "B/C/E interim estimates remain non-authoritative and pending "
+                "their follow-ups."
+                if contains_o2_target
+                else f"This product-class total is {float(total_kg):.1f} kg; "
+                "B/C/E interim estimates remain non-authoritative and pending "
+                "their follow-ups."
             )
         ]
         if d359_refusals["B"]:
@@ -700,25 +721,39 @@ def product_class_availability(
             reason_parts.append(
                 "Class C out-of-domain refusal: "
                 + "; ".join(d359_refusals["C"])
-                + ". The current refusal remains against the certified "
-                "evaluator band."
+                + ". The evaluator continues outside its certified band "
+                "with extrapolated authority."
             )
         if d359_refusals["E"]:
             reason_parts.append(
                 "Class E P species refusals: "
                 + "; ".join(d359_refusals["E"])
-                + ". The stage0_only gate leaves the P carriers uncomputed "
-                "while P2O5 is present; phase-independent K remains pending."
+                + ". P2O5 is present; phase-independent K is the pending "
+                "hot-train estimate."
             )
+        reason_parts.extend(
+            str(row.get("reason") or "") for row in d359_class_predictions
+        )
         reason_parts.append("Pending d-359 follow-ups: B, C, E.")
+        authority_level = (
+            "extrapolated"
+            if any(
+                row.get("authority_level") == "extrapolated"
+                for row in d359_class_predictions
+            )
+            else "status_bearing"
+            if d359_class_predictions
+            else "unavailable"
+        )
         prediction_flag = {
             "status": "flagged prediction",
             "category": 3,
             "kind": "predict_and_flag",
-            "authority": "extrapolated",
-            "authority_level": "extrapolated",
+            "authority": authority_level,
+            "authority_level": authority_level,
             "band": "d-359 B/C/E follow-ups pending",
             "pending_follow_ups": ["d-359 B", "d-359 C", "d-359 E"],
+            "class_predictions": d359_class_predictions,
             "reason": " ".join(reason_parts),
         }
     omission_flag = (
@@ -736,11 +771,7 @@ def product_class_availability(
         else None
     )
     return {
-        "class_total_kg": (
-            float(total_kg)
-            if has_computed_part or flagged_oxygen_output or not refusals
-            else None
-        ),
+        "class_total_kg": float(total_kg),
         "status": status,
         "excluded": excluded,
         "estimated_contributions": estimated_contributions,

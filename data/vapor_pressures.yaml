@@ -11054,7 +11054,7 @@ families:
       compatibility_fields:
         flux_dormant: false
         consumer_status: active
-        hot_train_applicability: stage0_only
+        hot_train_applicability: applicable
     vaporisation_coefficients:
       evaporation_alpha:
         value: 1.0
@@ -11081,11 +11081,11 @@ families:
     code_metadata:
       formula_id: PO
       source_account: process.cleaned_melt
-      request_rule: stage0_only
+      request_rule: source_inventory_present
       solve_group_id: phosphorus_carriers_family
       compatibility_projection: oxide_vapors
       canonical_aliases: []
-      hot_train_applicability: stage0_only
+      hot_train_applicability: applicable
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_PO2_family:
@@ -11254,7 +11254,7 @@ families:
       compatibility_fields:
         flux_dormant: false
         consumer_status: active
-        hot_train_applicability: stage0_only
+        hot_train_applicability: applicable
     vaporisation_coefficients:
       evaporation_alpha:
         value: 1.0
@@ -11281,11 +11281,11 @@ families:
     code_metadata:
       formula_id: PO2
       source_account: process.cleaned_melt
-      request_rule: stage0_only
+      request_rule: source_inventory_present
       solve_group_id: phosphorus_carriers_family
       compatibility_projection: oxide_vapors
       canonical_aliases: []
-      hot_train_applicability: stage0_only
+      hot_train_applicability: applicable
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P4O6_family:
@@ -11450,7 +11450,7 @@ families:
       compatibility_fields:
         flux_dormant: false
         consumer_status: active
-        hot_train_applicability: stage0_only
+        hot_train_applicability: applicable
     vaporisation_coefficients:
       evaporation_alpha:
         value: 1.0
@@ -11477,11 +11477,11 @@ families:
     code_metadata:
       formula_id: P4O6
       source_account: process.cleaned_melt
-      request_rule: stage0_only
+      request_rule: source_inventory_present
       solve_group_id: phosphorus_carriers_family
       compatibility_projection: oxide_vapors
       canonical_aliases: []
-      hot_train_applicability: stage0_only
+      hot_train_applicability: applicable
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P4O10_family:
@@ -11695,7 +11695,7 @@ families:
       compatibility_fields:
         flux_dormant: false
         consumer_status: active
-        hot_train_applicability: stage0_only
+        hot_train_applicability: applicable
     vaporisation_coefficients:
       evaporation_alpha:
         value: 1.0
@@ -11722,11 +11722,11 @@ families:
     code_metadata:
       formula_id: P4O10
       source_account: process.cleaned_melt
-      request_rule: stage0_only
+      request_rule: source_inventory_present
       solve_group_id: phosphorus_carriers_family
       compatibility_projection: oxide_vapors
       canonical_aliases: []
-      hot_train_applicability: stage0_only
+      hot_train_applicability: applicable
       yaml_quote_species_id: false
       chemical_family: phosphorus_carrier
   phosphorus_P2_family:
@@ -14911,7 +14911,6 @@ families:
       canonical_aliases:
       - MnO
       hot_train_applicability: applicable
-      out_of_domain_disposition: typed_refusal
   oxide_vapors_coo_family:
     physical_properties:
       species:

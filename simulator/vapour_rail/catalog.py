@@ -1385,7 +1385,14 @@ class CompiledPressureEvaluator:
             # Shomate cover [1000, 3000] K; T below that floor raises
             # ShomateDomainError from the polynomial module rather than a
             # typed catalog continuation.
-            return float(self.reference_model.log10_pressure(temperature_K))
+            try:
+                return float(self.reference_model.log10_pressure(temperature_K))
+            except (NasaCeaDomainError, ShomateDomainError):
+                # A composite can be outside its certified band while one of
+                # its constituent thermo polynomials is outside that
+                # polynomial's own domain. Continue from the evaluator edge;
+                # the caller retains the OOR status and must flag the result.
+                return self._reciprocal_T_tangent_log10(temperature_K)
 
         mode = self._physical_oor_continuation_mode()
         if mode == "direct":

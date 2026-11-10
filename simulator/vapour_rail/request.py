@@ -156,8 +156,9 @@ _PRE_RG_SPECIES_LOCAL_REFUSAL_CODES = frozenset({
 })
 
 _D354_UNPROVENANCED_ACTIVITY_SPECIES = frozenset(
-    {"Fe", "CaO_gas", "MgO_gas"}
+    {"Fe", "CaO_gas", "MgO_gas", "SiO"}
 )
+_D359_P_CARRIERS = frozenset({"PO", "PO2", "P4O6", "P4O10"})
 
 DEFAULT_SOURCE_ACCOUNT = "process.cleaned_melt"
 DEFAULT_SOLVE_GROUP_PREFIX = "u0_v:"
@@ -1472,6 +1473,7 @@ def refusal_closure(
         activity_conversion_notice: Mapping[str, Any] | None = None
         reference_state_predict_and_flag_notice: dict[str, Any] | None = None
         unprovenanced_reference_activity = False
+        activity_d359_original_reason: str | None = None
         _unit_activity_note: dict[str, Any] | None = None
         if (
             compiled is not None
@@ -1879,25 +1881,6 @@ def refusal_closure(
                 evidence_ref = state.source_reaction_activity_evidence_refs.get(
                     rule.species_id
                 )
-                if reported_activity is not None:
-                    provider_id = state.source_reaction_activity_provider
-                    if (
-                        (not isinstance(provider_id, str) or not provider_id.strip())
-                        and not unprovenanced_reference_activity
-                    ):
-                        return _make_refusal(
-                            rule,
-                            REFUSAL_MISSING_CHANNEL_CONTRACT,
-                            "reported activity lacks its provider identity",
-                        )
-                    if not isinstance(
-                        reported_standard_state, StandardStateIdentity
-                    ) and not unprovenanced_reference_activity:
-                        return _make_refusal(
-                            rule,
-                            REFUSAL_MISSING_CHANNEL_CONTRACT,
-                            "reported activity lacks its standard-state identity",
-                        )
                 reported_mole_fraction = reported_provenance.get(
                     "melt_oxide_X_single_cation"
                 )
@@ -1905,13 +1888,47 @@ def refusal_closure(
                     coeff = melt_oxide_activity_coefficient(
                         declaration.component_id
                     )
-                    if coeff is not None:
-                        source_fractions = single_cation_mole_fractions(
-                            _account_mols(ledger_snapshot, rule.source_account)
+                    source_fractions = single_cation_mole_fractions(
+                        _account_mols(ledger_snapshot, rule.source_account)
+                    )
+                    reported_mole_fraction = source_fractions.get(
+                        coeff.parent_oxide
+                        if coeff is not None
+                        else rule.parent_oxide or declaration.component_id
+                    )
+                resolver_reported_activity = reported_activity
+                resolver_reported_provider = (
+                    state.source_reaction_activity_provider
+                )
+                resolver_reported_standard_state = reported_standard_state
+                if unprovenanced_reference_activity:
+                    activity_d359_original_reason = (
+                        f"missing_evidence: numeric activity "
+                        f"{float(reported_activity):g} is present but its "
+                        "evidence link is missing"
+                    )
+                elif reported_activity is not None:
+                    provider_id = state.source_reaction_activity_provider
+                    provider_missing = (
+                        not isinstance(provider_id, str)
+                        or not provider_id.strip()
+                    )
+                    standard_state_missing = not isinstance(
+                        reported_standard_state, StandardStateIdentity
+                    )
+                    if provider_missing or standard_state_missing:
+                        missing = (
+                            "provider identity"
+                            if provider_missing
+                            else "standard-state identity"
                         )
-                        reported_mole_fraction = source_fractions.get(
-                            coeff.parent_oxide
+                        activity_d359_original_reason = (
+                            f"missing_evidence: reported activity lacks its "
+                            f"{missing}"
                         )
+                        resolver_reported_activity = None
+                        resolver_reported_provider = None
+                        resolver_reported_standard_state = None
                 if unprovenanced_reference_activity:
                     source_reaction_activity = SourceReactionActivity(
                         component_id=declaration.component_id,
@@ -1956,12 +1973,12 @@ def refusal_closure(
                             solve_group_id=rule.solve_group_id,
                             state_fingerprint=state_identity,
                             mole_fraction=reported_mole_fraction,
-                            reported_activity=reported_activity,
-                            reported_activity_provider=(
-                                state.source_reaction_activity_provider
-                            ),
+                            reported_activity=resolver_reported_activity,
+                            reported_activity_provider=resolver_reported_provider,
                             reported_activity_evidence_ref=evidence_ref,
-                            reported_activity_standard_state=reported_standard_state,
+                            reported_activity_standard_state=(
+                                resolver_reported_standard_state
+                            ),
                             reported_activity_provenance=reported_provenance,
                         )
                     )
@@ -2374,10 +2391,31 @@ def refusal_closure(
                 if isinstance(alpha, Mapping)
                 else ""
             )
+            alpha_band = alpha.get("T_band_K") if isinstance(alpha, Mapping) else None
+            d359_mno_interim_alpha = False
+            if (
+                rule.species_id == "MnO_gas"
+                and bool(evaluation_extra.get("out_of_range"))
+                and state is not None
+                and isinstance(alpha_band, Sequence)
+                and not isinstance(alpha_band, (str, bytes))
+                and len(alpha_band) == 2
+            ):
+                try:
+                    alpha_low, alpha_high = map(float, alpha_band)
+                    current_temperature = float(state.temperature_K)
+                except (TypeError, ValueError, OverflowError):
+                    pass
+                else:
+                    d359_mno_interim_alpha = (
+                        current_temperature < alpha_low
+                        or current_temperature > alpha_high
+                    )
             # Default OOD seam: out-of-domain pressure stays PressureValue +
             # FluxEligible (status/acquisition/certification strip authority).
-            # A diagnostic alpha upper bound remains visible but non-debiting
-            # both inside and outside the evaluator domain.
+            # The d-359 MnO edge estimate also uses its explicit HKL alpha=1
+            # ceiling as a provisional flux point when T lies outside the
+            # declared alpha band; the estimate remains category-3 flagged.
             # INCOMING activity semantics (b-121/b-122): only a genuine Henrian
             # activity bound (UPPER or LOWER) remains non-debiting; OOD gamma
             # is status-bearing and flux-driving.
@@ -2391,6 +2429,7 @@ def refusal_closure(
             )
             alpha_is_diagnostic_bound = (
                 alpha_authority_status == "diagnostic_upper_bound"
+                and not d359_mno_interim_alpha
             )
             if activity_is_bound or alpha_is_diagnostic_bound:
                 if activity_is_bound:
@@ -2465,8 +2504,11 @@ def refusal_closure(
         elif alpha_authority_status == "diagnostic_upper_bound":
             extra_payload["alpha_authority_status"] = alpha_authority_status
             extra_payload["alpha_inventory_policy"] = (
-                "diagnostic_only_no_inventory_debit"
+                "d359_interim_predict_and_flag"
+                if d359_mno_interim_alpha
+                else "diagnostic_only_no_inventory_debit"
             )
+        d359_class_predictions: list[dict[str, Any]] = []
         if source_reaction_activity is not None:
             source_label = "catalog_activity_corrected"
             extra_payload.update(
@@ -2500,6 +2542,141 @@ def refusal_closure(
                     source_reaction_activity.report_label
                     or "status-bearing-not-point"
                 )
+            if (
+                evaluator_activity_exponent != 0.0
+                and source_reaction_activity.verdict
+                is ActivityVerdictKind.STATUS_BEARING_VALUE
+            ):
+                if source_reaction_activity.provider == "published_gamma":
+                    rung = "published gamma*x"
+                    authority_level = "status_bearing"
+                    estimate_detail = (
+                        "published gamma*x bridge estimate; a=1 is not an "
+                        "upper bound when gamma>1"
+                    )
+                elif source_reaction_activity.provider == "ideal_mixing":
+                    rung = "ideal a=x"
+                    authority_level = "extrapolated"
+                    estimate_detail = (
+                        "ideal_mixing_assumption; ideal a=x is an estimate, "
+                        "not a bound"
+                    )
+                else:
+                    rung = "provider activity"
+                    authority_level = "status_bearing"
+                    estimate_detail = (
+                        "provider-reported activity is retained with its "
+                        "missing or limited evidence"
+                    )
+                if rule.species_id == "SiO":
+                    original_reason = (
+                        "missing_evidence: provider SiO activity is present "
+                        "but its evidence link is missing "
+                        f"(value={source_reaction_activity.value:.3g})"
+                    )
+                else:
+                    original_reason = activity_d359_original_reason or (
+                        "missing_evidence: no matched MAGEMin/ThermoEngine "
+                        "activity evidence; the Henrian a=1 value is not an "
+                        "upper bound when gamma>1"
+                    )
+                d359_class_predictions.append({
+                    "class": "B",
+                    "species": rule.species_id,
+                    "rung": rung,
+                    "authority": authority_level,
+                    "authority_level": authority_level,
+                    "original_refusal_reason": original_reason,
+                    "reason": (
+                        f"{original_reason}; {rule.species_id}: {estimate_detail}; "
+                        "pending d-359 B follow-up"
+                    ),
+                })
+        if (
+            rule.species_id == "MnO_gas"
+            and bool(evaluation_extra.get("out_of_range"))
+            and compiled is not None
+            and state is not None
+        ):
+            certified_band = tuple(
+                float(value) for value in compiled.valid_temperature_K
+            )
+            original_reason = (
+                f"outside_declared_evaluator_domain: temperature "
+                f"{float(state.temperature_K):g} K is outside declared "
+                f"evaluator domain [{certified_band[0]:g}, "
+                f"{certified_band[1]:g}] K"
+            )
+            alpha_reason = ""
+            if d359_mno_interim_alpha:
+                alpha_reason = (
+                    "; diagnostic HKL alpha=1 is used as an interim flux "
+                    "estimate outside alpha domain [1000, 3000] K, with "
+                    "extrapolated authority"
+                )
+            d359_class_predictions.append({
+                "class": "C",
+                "species": rule.species_id,
+                "authority": "extrapolated",
+                "authority_level": "extrapolated",
+                "certified_band_K": certified_band,
+                "original_refusal_reason": original_reason,
+                "reason": (
+                    f"{rule.species_id}: {original_reason}; conservative "
+                    "out-of-domain continuation is used under d-359"
+                    f"{alpha_reason}; "
+                    "pending d-359 C follow-up"
+                ),
+            })
+        if (
+            rule.species_id in _D359_P_CARRIERS
+            and state is not None
+            and state.process_phase != "stage0"
+            and state.stage != "stage0"
+            and float(
+                _account_mols(ledger_snapshot, rule.source_account).get(
+                    "P2O5", 0.0
+                )
+            ) > 0.0
+        ):
+            original_reason = (
+                "inapplicable_by_declared_predicate: stage0_only predicate "
+                "inactive outside stage0 "
+                f"(process_phase={state.process_phase!r}, stage={state.stage!r})"
+            )
+            d359_class_predictions.append({
+                "class": "E",
+                "species": rule.species_id,
+                "authority": "status_bearing",
+                "authority_level": "status_bearing",
+                "original_refusal_reason": original_reason,
+                "reason": (
+                    f"{rule.species_id}: {original_reason}; P2O5 inventory is "
+                    "present, so the hot-train carrier uses phase-independent "
+                    "K under d-359; pending d-359 E follow-up"
+                ),
+            })
+        if d359_class_predictions:
+            primary_prediction = d359_class_predictions[-1]
+            extra_payload["d359_prediction"] = {
+                **primary_prediction,
+                "status": "flagged prediction",
+                "category": 3,
+                "kind": "predict_and_flag",
+                "band": (
+                    "d-359 B/C/E follow-ups pending"
+                    if "certified_band_K" not in primary_prediction
+                    else primary_prediction["certified_band_K"]
+                ),
+                "pending_follow_ups": [
+                    "d-359 B", "d-359 C", "d-359 E",
+                ],
+                "class_predictions": d359_class_predictions,
+                "reason": " ".join(
+                    [row["reason"] for row in d359_class_predictions]
+                    + ["Pending d-359 follow-ups: B, C, E."]
+                ),
+            }
         extra_payload.update(evaluation_extra)
         return VapourAnswer(
             species_id=rule.species_id,

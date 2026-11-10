@@ -1281,6 +1281,74 @@ class CondensedPhaseActivityProvider:
                 },
             )
 
+        if mole_fraction is not None and not declaration.allow_henrian_upper_bound:
+            try:
+                fraction = float(mole_fraction)
+            except (TypeError, ValueError, OverflowError):
+                fraction = math.nan
+            if not math.isfinite(fraction) or fraction < 0.0:
+                return _refusal(
+                    declaration.component_id,
+                    ActivityRefusalCode.NON_FINITE_POTENTIAL,
+                    "mole_fraction must be finite and non-negative",
+                    standard_state=declaration.standard_state,
+                    state_fingerprint=state_fingerprint,
+                    solve_group_id=solve_group_id,
+                )
+            coefficient = melt_oxide_activity_coefficient(
+                declaration.component_id
+            )
+            if coefficient is not None:
+                activity = float(coefficient.gamma) * fraction
+                rung = "published gamma*x"
+                provider = "published_gamma"
+                reason = (
+                    "missing_evidence: no matched activity evidence; using "
+                    "published gamma*x"
+                )
+                detail = (
+                    f"published gamma {coefficient.gamma:g} for "
+                    f"{declaration.component_id} times mole fraction "
+                    f"{fraction:g}; interim estimate pending d-359 B"
+                )
+                gamma_derivation = f"a = {coefficient.gamma} * {fraction}"
+            else:
+                activity = fraction
+                rung = "ideal a=x"
+                provider = "ideal_mixing"
+                reason = (
+                    "missing_evidence: no matched activity evidence or "
+                    "published gamma row; ideal_mixing_assumption"
+                )
+                detail = (
+                    "ideal-mixing a=x is an estimate, not a bound; "
+                    "pending d-359 B"
+                )
+                gamma_derivation = f"a = x = {fraction}"
+            return SourceReactionActivity(
+                component_id=declaration.component_id,
+                value=activity,
+                verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+                bound_direction=None,
+                reason=reason,
+                standard_state=declaration.standard_state,
+                phase_assemblage_ref=None,
+                chemical_potential_ref=None,
+                state_fingerprint=state_fingerprint,
+                solve_group_id=solve_group_id,
+                provider=provider,
+                authority=False,
+                report_label=STATUS_BEARING_NOT_POINT,
+                detail=f"{rung}: {detail}",
+                derivation={
+                    "premise": "d-359 interim activity authority ladder",
+                    "algebra": gamma_derivation,
+                    "units": "gamma, mole fraction, and activity are dimensionless",
+                    "limiting_case": "ideal mixing gives a=x",
+                },
+                evidence_tier="uncertified_predict_and_flag",
+            )
+
         if magemin is None and thermoengine is None:
             if declaration.allow_henrian_upper_bound:
                 return henrian_unknown_gamma_upper_bound(
