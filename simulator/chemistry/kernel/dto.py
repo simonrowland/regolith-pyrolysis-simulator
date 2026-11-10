@@ -20,7 +20,10 @@ from types import MappingProxyType
 from typing import Any, Literal, Optional, Protocol, get_args
 
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
-from simulator.fidelity_vocabulary import NON_CERTIFYING_RUNTIME_STATUSES
+from simulator.fidelity_vocabulary import (
+    NON_CERTIFYING_RUNTIME_STATUSES,
+    translate_legacy_token,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -537,15 +540,18 @@ def select_backend_status(statuses) -> str | None:
     Returns the most severe member of :data:`BACKEND_STATUS_PRECEDENCE` present,
     else the last degrading status, else the last status seen, else ``None``
     for an empty input. Runtime-only caveats come from the fidelity vocabulary;
-    unknown tokens are treated as ``unavailable`` so they cannot certify.
+    unknown tokens are rejected by that vocabulary so they cannot certify.
     Callers that need "the latest" rather than "the most severe" want a
     different function — this one deliberately does not preserve ordering
     information beyond the fallback.
     """
     values = tuple(str(status) for status in statuses if status is not None)
-    known_statuses = INTENT_RESULT_STATUSES | NON_CERTIFYING_RUNTIME_STATUSES
-    if any(status not in known_statuses for status in values):
-        values += ("unavailable",)
+    runtime_degrading = {
+        status
+        for status in values
+        if translate_legacy_token("backend/status alias", status).runtime_status
+        in NON_CERTIFYING_RUNTIME_STATUSES
+    }
     for status in BACKEND_STATUS_PRECEDENCE:
         if status in values:
             return status
@@ -558,7 +564,7 @@ def select_backend_status(statuses) -> str | None:
         value
         for value in values
         if value in DEGRADING_INTENT_RESULT_STATUSES
-        or value in NON_CERTIFYING_RUNTIME_STATUSES
+        or value in runtime_degrading
     ]
     if degrading:
         return degrading[-1]

@@ -15,6 +15,7 @@ import pathlib
 
 import pytest
 
+from simulator.fidelity_vocabulary import UnknownFidelityVocabularyTokenError
 from simulator.optimize.backend_status import (
     latest_backend_status_from_sequence,
 )
@@ -527,7 +528,8 @@ def test_runtime_only_non_certifying_status_survives_a_later_ok(status: str) -> 
 
 
 def test_unknown_status_fails_closed_before_a_later_ok() -> None:
-    assert select_backend_status(["future_status", "ok"]) == "unavailable"
+    with pytest.raises(UnknownFidelityVocabularyTokenError):
+        select_backend_status(["future_status", "ok"])
 
 
 def test_status_partition_covers_the_vocabulary_exactly() -> None:
