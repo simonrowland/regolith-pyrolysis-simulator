@@ -65,13 +65,10 @@ REORDERED_ROWS = {
     "S2",
     "S_total",
     "TeO2",
-    # d-359 class E now provides compiled hot-train pressures for these two
-    # carriers, so they leave the reordered/refused rows:
-    # PO and P4O6.
+    # d-359 class E now provides compiled hot-train pressures for these four
+    # oxide carriers, so they leave the reordered/refused rows.
     "P2",
     "P4",
-    "P4O10",
-    "PO2",
 }
 
 

@@ -277,9 +277,12 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         assert "phase-independent K" in reason
         assert "Pending d-359 follow-ups: B, C, E." in reason
         estimates_by_class = {
-            row["d359_class"]
-            for row in runner["oxygen"]["estimated_contributions"]
-            if row.get("d359_class")
+            row["class"]
+            for estimate in runner["oxygen"]["estimated_contributions"]
+            for row in estimate.get("d359_prediction", {}).get(
+                "class_predictions", ()
+            )
+            if row.get("class")
         }
         assert {"B", "C", "E"} <= estimates_by_class
         assert runner["metals_plus_O2"]["availability_flag"] == oxygen_flag
