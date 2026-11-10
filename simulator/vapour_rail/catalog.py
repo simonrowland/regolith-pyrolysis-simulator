@@ -2156,6 +2156,7 @@ def compile_vapour_rail_catalog(
                     model=model,
                     evaluator=evaluator,
                     source_account=compiled_code.source_account,
+                    validation_anchor_refs=anchor_refs,
                 )
             )
             compiled[str(species_id)] = CompiledSpecies(
@@ -2591,6 +2592,7 @@ def _compile_source_reaction_activity(
     model: Mapping[str, Any],
     evaluator: CompiledPressureEvaluator | None,
     source_account: str,
+    validation_anchor_refs: tuple[str, ...],
 ) -> tuple[str | None, ActivityInputDeclaration | None]:
     """Compile the activity-input declaration stored on one compiled species.
 
@@ -2655,6 +2657,56 @@ def _compile_source_reaction_activity(
                 f"{species_id}: activity-independent melt answer must be an "
                 "explicit effective-pressure reference fit, never pure P_sat"
             )
+        # Gas-association rows use this token to describe their referenced
+        # effective base; that base's own fit row carries the evidence check.
+        if model.get("composition_mode") != "gas_association_from_effective_base":
+            backsolve = row.get("backsolve")
+            backsolve = backsolve if isinstance(backsolve, Mapping) else {}
+            backsolve_provenance = backsolve.get("provenance")
+            has_backsolve_provenance = bool(
+                isinstance(backsolve_provenance, Mapping)
+                and isinstance(backsolve_provenance.get("generated_by"), str)
+                and bool(backsolve_provenance["generated_by"].strip())
+                and isinstance(backsolve_provenance.get("fit_objective"), str)
+                and bool(backsolve_provenance["fit_objective"].strip())
+            )
+            model_provenance = model.get("provenance")
+            has_model_provenance = bool(
+                isinstance(model_provenance, Sequence)
+                and not isinstance(model_provenance, (str, bytes))
+                and any(
+                    isinstance(item, Mapping)
+                    and isinstance(item.get("source_id"), str)
+                    and bool(item["source_id"].strip())
+                    and (
+                        isinstance(item.get("observation_id"), str)
+                        and bool(item["observation_id"].strip())
+                        or bool(item.get("observation_ids"))
+                    )
+                    for item in model_provenance
+                )
+            )
+            try:
+                fit_residual_dex = _finite_real(
+                    backsolve.get("residual_dex"),
+                    f"{species_id}.backsolve.residual_dex",
+                )
+            except CatalogCompileError:
+                fit_residual_dex = None
+            if (
+                not has_model_provenance
+                or not has_backsolve_provenance
+                or fit_residual_dex is None
+                or fit_residual_dex < 0.0
+                or not validation_anchor_refs
+            ):
+                raise CatalogCompileError(
+                    f"{species_id}: effective-pressure reference fit requires "
+                    "model provenance with source_id and observation_id(s), "
+                    "backsolve.provenance.generated_by, "
+                    "backsolve.provenance.fit_objective, a finite non-negative "
+                    "backsolve.residual_dex, and validation.anchor_refs"
+                )
 
     if evaluator is not None and (
         activity_semantics == "pure_condensed_phase"

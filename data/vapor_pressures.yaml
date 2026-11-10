@@ -1540,7 +1540,8 @@ families:
             '
           validation:
             status: pending_validation
-            anchor_refs: []
+            anchor_refs:
+            - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
           source_reactions: []
           pressure_models:
           - fit_target: pseudo_psat_backsolved_from_vaporock
@@ -1552,7 +1553,9 @@ families:
               - 1400
               - 1900
             provenance:
-            - source: schema_v1_in_place_migration
+            - source_id: current-rail-against-2026-08-03-vaporock-crosscheck-cells
+              observation_id: Fe
+              status: diagnostic_only
             evaluator_family: antoine
             coefficients:
               A: 9.408547

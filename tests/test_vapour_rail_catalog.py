@@ -930,6 +930,32 @@ def _reaction_fixture() -> dict:
     }
 
 
+def _effective_pressure_fit_fixture() -> dict:
+    payload = _reaction_fixture()
+    row = payload["families"]["potassium_test_family"][
+        "physical_properties"
+    ]["species"]["K"]
+    row["source_reactions"] = []
+    row["pressure_models"][0] = {
+        "evaluator_family": "antoine",
+        "fit_target": "pseudo_psat_backsolved_from_vaporock",
+        "pressure_kind": "equilibrium_partial_pressure",
+        "activity_semantics": "effective_pressure_reference_fit",
+        "activity_exponent": 0.0,
+        "species_basis": "monomer",
+        "valid_domain": {"temperature_K": [1000.0, 1200.0]},
+        "provenance": [
+            {
+                "source_id": "fit-grid-source",
+                "observation_id": "fit-grid",
+                "status": "diagnostic_only",
+            }
+        ],
+        "coefficients": {"A": 10.0, "B": 10000.0, "C": 0.0},
+    }
+    return payload
+
+
 @pytest.mark.parametrize(
     "availability",
     [
@@ -961,6 +987,62 @@ def test_pressure_model_availability_omitted_or_explicitly_unavailable() -> None
     model["availability"] = "unavailable_pending_acquisition"
     unavailable = compile_vapour_rail_catalog(payload)
     assert unavailable.species["K"].evaluator is None
+
+
+@pytest.mark.parametrize(
+    "missing",
+    [
+        "model_provenance",
+        "migration_provenance",
+        "fit_provenance",
+        "fit_residual",
+        "anchor_refs",
+    ],
+)
+def test_effective_pressure_reference_fit_requires_fit_evidence(missing: str) -> None:
+    payload = _effective_pressure_fit_fixture()
+    row = payload["families"]["potassium_test_family"][
+        "physical_properties"
+    ]["species"]["K"]
+    row["backsolve"] = {
+        "residual_dex": 0.12,
+        "provenance": {"generated_by": "fit.py", "fit_objective": "minimax"},
+    }
+    row["validation"]["anchor_refs"] = ["validation:fit-grid"]
+    if missing == "model_provenance":
+        row["pressure_models"][0].pop("provenance")
+    elif missing == "migration_provenance":
+        row["pressure_models"][0]["provenance"] = [
+            {"source": "schema_v1_in_place_migration"}
+        ]
+    elif missing == "fit_provenance":
+        row["backsolve"].pop("provenance")
+    elif missing == "fit_residual":
+        row["backsolve"].pop("residual_dex")
+    else:
+        row["validation"]["anchor_refs"] = []
+
+    with pytest.raises(
+        CatalogCompileError,
+        match="effective-pressure reference fit requires",
+    ):
+        compile_vapour_rail_catalog(payload)
+
+
+def test_effective_pressure_reference_fit_compiles_with_fit_evidence() -> None:
+    payload = _effective_pressure_fit_fixture()
+    row = payload["families"]["potassium_test_family"][
+        "physical_properties"
+    ]["species"]["K"]
+    row["backsolve"] = {
+        "residual_dex": 0.12,
+        "provenance": {"generated_by": "fit.py", "fit_objective": "minimax"},
+    }
+    row["validation"]["anchor_refs"] = ["validation:fit-grid"]
+
+    compiled = compile_vapour_rail_catalog(payload)
+
+    assert compiled.species["K"].evaluator is not None
 
 
 def test_policy_identity_cannot_compile_as_executable_alpha() -> None:
