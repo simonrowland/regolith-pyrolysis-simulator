@@ -29,7 +29,6 @@ from simulator.battery.score import (  # noqa: E402
     is_store_stamp_payload,
     load_score_context,
 )
-from simulator.engine_cache import EngineCache  # noqa: E402
 
 
 def _without_cache_counters(value: Any) -> Any:
@@ -85,23 +84,29 @@ def _run_slice(
     workers: int,
     cache_path: Path | None,
 ) -> tuple[list[str], dict[str, dict[str, Any]]]:
-    cache = None if cache_path is None else EngineCache(cache_path)
-    _row_count, metadata = _score_store_to_jsonl(
-        context,
-        output_path,
-        root=root,
-        engines=engines,
-        rail=None if rail is None else canonicalize_rail(rail),
-        work_id=work,
-        limit=limit,
-        workers=workers,
-        engine_cache=cache,
-    )
+    previous_cache_path = os.environ.get("REGOLITH_ENGINE_CACHE")
+    if cache_path is None:
+        os.environ.pop("REGOLITH_ENGINE_CACHE", None)
+    else:
+        os.environ["REGOLITH_ENGINE_CACHE"] = str(cache_path)
+    try:
+        _row_count, metadata = _score_store_to_jsonl(
+            context,
+            output_path,
+            root=root,
+            engines=engines,
+            rail=None if rail is None else canonicalize_rail(rail),
+            work_id=work,
+            limit=limit,
+            workers=workers,
+        )
+    finally:
+        if previous_cache_path is None:
+            os.environ.pop("REGOLITH_ENGINE_CACHE", None)
+        else:
+            os.environ["REGOLITH_ENGINE_CACHE"] = previous_cache_path
     residuals_path = output_path.with_name(output_path.name + ".partial")
-    counters = metadata.engine_cache_counters
-    if counters is None:
-        counters = {} if cache is None else cache.counters
-    return _canonical_rows(residuals_path), dict(counters)
+    return _canonical_rows(residuals_path), dict(metadata.engine_cache_counters or {})
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -173,13 +178,10 @@ def main(argv: list[str] | None = None) -> int:
                 if engine_counts is None:
                     engine_rows.append(f"{engine.value}=missing")
                     continue
-                calls_by_kind = engine_counts.get("calls_by_kind", {})
                 engine_rows.append(
                     f"{engine.value}:hits={engine_counts.get('hits', 0)},"
                     f"misses={engine_counts.get('misses', 0)},"
-                    f"stores={engine_counts.get('stores', 0)},"
-                    "calls_by_kind="
-                    f"{json.dumps(calls_by_kind, sort_keys=True, separators=(',', ':'))}"
+                    f"stores={engine_counts.get('stores', 0)}"
                 )
             print(
                 f"engine_cache_counters run={name} {' '.join(engine_rows)}",
@@ -196,38 +198,34 @@ def main(argv: list[str] | None = None) -> int:
         for name in warm_names
         for row in counters[name].values()
     )
-    warm_calls = sum(
-        sum(row["calls_by_kind"].values())
-        for name in warm_names
-        for row in counters[name].values()
-    )
-    cold_calls_by_engine = {
+    cold_misses_by_engine = {
         engine.value: sum(
-            sum(counters[name][engine.value]["calls_by_kind"].values())
+            counters[name].get(engine.value, {}).get("misses", 0)
+            for name in cold_names
+        )
+        for engine in engines
+    }
+    cold_stores_by_engine = {
+        engine.value: sum(
+            counters[name].get(engine.value, {}).get("stores", 0)
             for name in cold_names
         )
         for engine in engines
     }
     warm_hits_by_engine = {
         engine.value: min(
-            counters[name][engine.value]["hits"] for name in warm_names
+            counters[name].get(engine.value, {}).get("hits", 0)
+            for name in warm_names
         )
         for engine in engines
     }
     unexercised = [
         engine.value
         for engine in engines
-        if cold_calls_by_engine[engine.value] <= 0
-        or any(
-            sum(counters[name][engine.value]["calls_by_kind"].values()) <= 0
-            for name in cold_names
-        )
+        if cold_misses_by_engine[engine.value] <= 0
+        or cold_stores_by_engine[engine.value] <= 0
         or warm_hits_by_engine[engine.value] <= 0
-        or any(
-            counters[name][engine.value]["misses"]
-            or any(counters[name][engine.value]["calls_by_kind"].values())
-            for name in warm_names
-        )
+        or any(counters[name].get(engine.value, {}).get("misses", 0) for name in warm_names)
     ]
     if any(
         outputs[name] != outputs["off"]
@@ -266,21 +264,14 @@ def main(argv: list[str] | None = None) -> int:
         for engine in engines:
             engine_id = engine.value
             failed_conditions = []
-            if cold_calls_by_engine[engine_id] <= 0:
-                failed_conditions.append("cold_calls=0")
-            if any(
-                sum(counters[name][engine_id]["calls_by_kind"].values()) <= 0
-                for name in cold_names
-            ):
-                failed_conditions.append("a_cold_run_calls=0")
+            if cold_misses_by_engine[engine_id] <= 0:
+                failed_conditions.append("cold_misses=0")
+            if cold_stores_by_engine[engine_id] <= 0:
+                failed_conditions.append("cold_stores=0")
             if warm_hits_by_engine[engine_id] <= 0:
                 failed_conditions.append("warm_hits=0")
-            if any(
-                counters[name][engine_id]["misses"]
-                or any(counters[name][engine_id]["calls_by_kind"].values())
-                for name in warm_names
-            ):
-                failed_conditions.append("warm_misses_or_calls>0")
+            if any(counters[name].get(engine_id, {}).get("misses", 0) for name in warm_names):
+                failed_conditions.append("warm_misses>0")
             if failed_conditions:
                 print(
                     f"engine_cache_gate_failed engine={engine_id} "
@@ -296,14 +287,14 @@ def main(argv: list[str] | None = None) -> int:
     print(
         f"equivalent rows={len(outputs['off'])} engines={len(engines)} "
         f"cold_misses={sum(row['misses'] for name in cold_names for row in counters[name].values())} "
-        f"warm_misses={warm_misses} warm_calls={warm_calls} "
+        f"warm_misses={warm_misses} "
         f"warm_hits={sum(row['hits'] for row in counters['warm'].values())} "
         f"parallel_workers={workers}"
     )
-    if warm_misses or warm_calls:
+    if warm_misses:
         print(
             "warm cache gate failed: "
-            f"warm_misses={warm_misses} warm_engine_calls={warm_calls}",
+            f"warm_misses={warm_misses}",
             file=sys.stderr,
         )
         return 1

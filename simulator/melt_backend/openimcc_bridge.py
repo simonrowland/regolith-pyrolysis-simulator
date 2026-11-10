@@ -7,7 +7,7 @@ absent.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import metadata
@@ -311,15 +311,6 @@ class OpenImccBridgeResult:
             },
             "parent_oxide_x_star_ratios": dict(self.parent_oxide_x_star_ratios),
         }
-
-    def to_cache_payload(self) -> dict[str, Any]:
-        """Serialize the exact bridge result for the battery engine cache."""
-        return self.to_transport()
-
-    @classmethod
-    def from_cache_payload(cls, payload: Mapping[str, Any]) -> OpenImccBridgeResult:
-        """Restore a bridge result from :meth:`to_cache_payload`."""
-        return cls.from_transport(payload)
 
     @classmethod
     def from_transport(cls, payload: Mapping[str, Any]) -> OpenImccBridgeResult:
@@ -935,7 +926,7 @@ def engine_binding_identity(melt_pack: Any, gas_pack: Any) -> dict[str, str]:
     return result
 
 
-def evaluate(
+def _evaluate_uncached(
     composition_mol: Mapping[str, float] | None = None,
     temperature_K: float | None = None,
     *,
@@ -1065,6 +1056,108 @@ def evaluate(
     )
 
 
+def evaluate(
+    composition_mol: Mapping[str, float] | None = None,
+    temperature_K: float | None = None,
+    *,
+    composition_kg: Mapping[str, float] | None = None,
+    pack: str | None = None,
+    allow_extrapolation: bool = False,
+    allow_out_of_envelope: bool = False,
+) -> OpenImccBridgeResult:
+    from simulator.engine_cache import cached_engine_call
+
+    request = {
+        "call": "evaluate",
+        "composition_mol": composition_mol,
+        "composition_kg": composition_kg,
+        "temperature_K": temperature_K,
+        "pack": pack,
+        "allow_extrapolation": allow_extrapolation,
+        "allow_out_of_envelope": allow_out_of_envelope,
+    }
+    payload = cached_engine_call(
+        "openimcc",
+        request,
+        lambda: _evaluate_uncached(
+            composition_mol=composition_mol,
+            temperature_K=temperature_K,
+            composition_kg=composition_kg,
+            pack=pack,
+            allow_extrapolation=allow_extrapolation,
+            allow_out_of_envelope=allow_out_of_envelope,
+        ).to_transport(),
+    )
+    return OpenImccBridgeResult.from_transport(payload)
+
+
+def evaluate_gas(
+    parent_oxide_activities: Mapping[str, float],
+    temperature_K: float,
+    pressure_bar: float,
+    gas_pack: Any,
+    *,
+    parent_oxides: Sequence[str] | None = None,
+    allow_extrapolation: bool = False,
+    gas_pack_selection: str = "default",
+) -> dict[str, float]:
+    from openimcc import evaluate_gas as openimcc_evaluate_gas
+    from simulator.engine_cache import cached_engine_call
+
+    request = {
+        "call": "evaluate_gas",
+        "parent_oxide_activities": dict(parent_oxide_activities),
+        "temperature_K": temperature_K,
+        "pressure_bar": pressure_bar,
+        "gas_pack_selection": gas_pack_selection,
+        "parent_oxides": None if parent_oxides is None else tuple(parent_oxides),
+        "allow_extrapolation": allow_extrapolation,
+    }
+    return cached_engine_call(
+        "openimcc",
+        request,
+        lambda: dict(openimcc_evaluate_gas(
+            parent_oxide_activities,
+            temperature_K,
+            pressure_bar,
+            gas_pack,
+            parent_oxides=parent_oxides,
+            allow_extrapolation=allow_extrapolation,
+        )),
+    )
+
+
+def evaluate_redox(
+    inventory: Mapping[str, float],
+    temperature_K: float,
+    mode: str,
+    *,
+    lambda_imposed: float | None = None,
+    entry: str = "openimcc.evaluate_redox",
+) -> Any:
+    import openimcc
+    from simulator.engine_cache import cached_engine_call
+
+    request = {
+        "call": entry,
+        "inventory": dict(inventory),
+        "temperature_K": temperature_K,
+        "mode": mode,
+        "lambda_imposed": lambda_imposed,
+    }
+
+    def solve() -> Any:
+        if entry == "openimcc.redox.evaluate_redox":
+            import openimcc.redox as openimcc_redox
+
+            return openimcc_redox.evaluate_redox(inventory, temperature_K, mode)
+        return openimcc.evaluate_redox(
+            inventory, temperature_K, mode, lambda_imposed=lambda_imposed
+        )
+
+    return cached_engine_call("openimcc", request, solve)
+
+
 evaluate_openimcc = evaluate
 
 
@@ -1189,5 +1282,7 @@ __all__ = [
     "FE2O3_TO_FEO_TOTAL_WT_FACTOR",
     "evaluate",
     "evaluate_cleaned_melt",
+    "evaluate_gas",
     "evaluate_openimcc",
+    "evaluate_redox",
 ]

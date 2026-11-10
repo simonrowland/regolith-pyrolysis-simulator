@@ -1303,7 +1303,6 @@ def _make_residue_pressure_model(
     engine_flags: set[str],
     missing_channels_reason: str,
     caller: str,
-    engine_cache: Any | None = None,
     floor_inversion_diagnostics: dict[str, dict[str, object]] | None = None,
 ) -> Callable[[Mapping[str, float], float], Mapping[str, float]]:
     """Build the engine pressure closure shared by the residue cohorts."""
@@ -1316,7 +1315,6 @@ def _make_residue_pressure_model(
         for species, reaction in gas_channels
     }
     if engine == "openimcc":
-        from openimcc import evaluate_gas
         from openimcc.kernel import ImccNonconvergenceError
 
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -1341,27 +1339,31 @@ def _make_residue_pressure_model(
                 }
                 try:
                     timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
-                    from simulator.melt_backend.openimcc_cache import (
-                        cached_openimcc_evaluate,
+                    from simulator.engine_cache import cached_engine_call
+                    from simulator.melt_backend.openimcc_bridge import (
+                        OpenImccBridgeResult,
                     )
 
-                    state = cached_openimcc_evaluate(
-                        engine_cache,
-                        composition_mol=current_composition,
-                        temperature_K=temperature_K,
-                        timeout_s=timeout_s,
-                        pack=None,
-                        allow_extrapolation=True,
-                        allow_out_of_envelope=True,
-                        solve_fn=lambda: _evaluate_openimcc_isolated(
-                            openimcc_bridge.evaluate,
+                    state_payload = cached_engine_call(
+                        "openimcc",
+                        {
+                            "call": "evaluate",
+                            "composition_mol": current_composition,
+                            "temperature_K": temperature_K,
+                            "pack": None,
+                            "allow_extrapolation": True,
+                            "allow_out_of_envelope": True,
+                        },
+                        lambda: _evaluate_openimcc_isolated(
+                            openimcc_bridge._evaluate_uncached,
                             timeout_s=timeout_s,
                             composition_mol=current_composition,
                             temperature_K=temperature_K,
                             allow_extrapolation=True,
                             allow_out_of_envelope=True,
-                        ),
+                        ).to_transport(),
                     )
+                    state = OpenImccBridgeResult.from_transport(state_payload)
                 except ImccNonconvergenceError as exc:
                     raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
                 except TimeoutError as exc:
@@ -1381,26 +1383,14 @@ def _make_residue_pressure_model(
                         "openimcc_version": state.openimcc_version,
                     }
                 )
-                from simulator.melt_backend.openimcc_cache import (
-                    cached_openimcc_evaluate_gas,
-                )
-
-                base_pressure_bar = cached_openimcc_evaluate_gas(
-                    engine_cache,
-                    parent_oxide_activities=state.parent_oxide_activities,
-                    temperature_K=temperature_K,
-                    pressure_bar=1.0,
-                    gas_pack=gas_pack,
+                base_pressure_bar = openimcc_bridge.evaluate_gas(
+                    state.parent_oxide_activities,
+                    temperature_K,
+                    1.0,
+                    gas_pack,
                     parent_oxides=state.parent_oxides,
                     allow_extrapolation=True,
-                    solve_fn=lambda: evaluate_gas(
-                        state.parent_oxide_activities,
-                        temperature_K,
-                        1.0,
-                        gas_pack,
-                        parent_oxides=state.parent_oxides,
-                        allow_extrapolation=True,
-                    ),
+                    gas_pack_selection="default",
                 )
                 pressure_state_cache[key] = base_pressure_bar
             pO2_bar = 10.0**float(log10_pO2_bar)
@@ -1422,7 +1412,7 @@ def _make_residue_pressure_model(
             _InternalAnalyticalInputRefusal,
             _OxygenBalanceRefusal,
             _gas_formula_for_oxygen_balance,
-            cached_internal_analytical_residue_vapor_pressure,
+            internal_analytical_residue_vapor_pressure,
             _new_internal_analytical_core,
         )
         from simulator.chemistry.offgas_fo2 import OffgasFO2Unavailable, _oxygen_atom_partial_pressure_bar
@@ -1450,8 +1440,7 @@ def _make_residue_pressure_model(
             inventory: Mapping[str, float], log10_pO2_bar: float
         ) -> Mapping[str, float]:
             try:
-                response = cached_internal_analytical_residue_vapor_pressure(
-                    engine_cache,
+                response = internal_analytical_residue_vapor_pressure(
                     core=analytical_core,
                     temperature_C=temperature_K - 273.15,
                     pressure_bar=total_pressure_Pa / 100_000.0,
@@ -1883,8 +1872,7 @@ def _mass_loss_corner_bounds(
                     "inventory_capped_channels": sorted(inventory_caps)}
 
 def predict_knudsen_residue_composition(
-    engine: str, reference, experiment, observations, bench=None, *,
-    engine_cache: Any | None = None,
+    engine: str, reference, experiment, observations, bench=None,
 ) -> dict[str, object]:
     """Predict a residue at its own printed loss, never at its measured composition."""
     from dataclasses import replace
@@ -2035,7 +2023,6 @@ def predict_knudsen_residue_composition(
                     engine_metadata=metadata, engine_flags=flags,
                     missing_channels_reason="residue_pressure_channels_missing",
                     caller="Knudsen residue prediction",
-                    engine_cache=engine_cache,
                 )
             return pressure_callbacks[temperature_K](inventory, logp)
 
@@ -2075,7 +2062,6 @@ def predict_mass_loss_fraction(
     temperature_K: float | None,
     source_document: Mapping[str, Any] | None = None,
     observation: object | None = None,
-    engine_cache: Any | None = None,
 ) -> ResidueMassLossPrediction:
     """Predict one bulk mass-loss point through the existing residue integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -2280,7 +2266,6 @@ def predict_mass_loss_fraction(
             total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,
             engine_flags=flags, missing_channels_reason="residue_pressure_channels_missing",
             caller="Mass-loss residue prediction",
-            engine_cache=engine_cache,
         )
         def measure(incoming, active_channels, area, duration):
             bounds, corners = _mass_loss_corner_bounds(
@@ -2726,7 +2711,6 @@ def _predict_hashimoto_residue_cohort(
     preform_dimensions_mm: Mapping[str, float],
     code_revision: str,
     engine: str = "openimcc",
-    engine_cache: Any | None = None,
     _allow_partial_cohort_for_test: bool = False,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
     """Produce both alpha arms and geometry bands, without reading residues."""
@@ -2994,7 +2978,6 @@ def _predict_hashimoto_residue_cohort(
             engine_flags=set(),
             missing_channels_reason="hashimoto_internal_analytical_channels_missing",
             caller="Hashimoto residue cohort",
-            engine_cache=engine_cache,
             floor_inversion_diagnostics=(
                 engine_floor_inversion_diagnostics
                 if engine == "internal-analytical"
@@ -3392,7 +3375,6 @@ def _predict_sossi_residue_cohort(
     buffered_fO2_log_by_experiment: Mapping[str, float],
     code_revision: str,
     engine: str,
-    engine_cache: Any | None = None,
 ) -> tuple[_SossiResiduePrediction, ...]:
     """Predict Sossi Mn/Ti with the shared buffered inventory integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -3418,7 +3400,7 @@ def _predict_sossi_residue_cohort(
     if engine == "openimcc":
         try:
             import openimcc
-            from openimcc import evaluate_gas, load_gas_datapack
+            from openimcc import load_gas_datapack
             from openimcc.kernel import ImccNonconvergenceError
             from simulator.melt_backend import openimcc_bridge
         except ImportError as exc:
@@ -3557,27 +3539,31 @@ def _predict_sossi_residue_cohort(
                         )
                         melt_activity_input_policy.update(activity_input_policy)
                         timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
-                        from simulator.melt_backend.openimcc_cache import (
-                            cached_openimcc_evaluate,
+                        from simulator.engine_cache import cached_engine_call
+                        from simulator.melt_backend.openimcc_bridge import (
+                            OpenImccBridgeResult,
                         )
 
-                        state = cached_openimcc_evaluate(
-                            engine_cache,
-                            composition_mol=activity_composition,
-                            temperature_K=temperature_K,
-                            timeout_s=timeout_s,
-                            pack=None,
-                            allow_extrapolation=True,
-                            allow_out_of_envelope=True,
-                            solve_fn=lambda: _evaluate_openimcc_isolated(
-                                openimcc_bridge.evaluate,
+                        state_payload = cached_engine_call(
+                            "openimcc",
+                            {
+                                "call": "evaluate",
+                                "composition_mol": activity_composition,
+                                "temperature_K": temperature_K,
+                                "pack": None,
+                                "allow_extrapolation": True,
+                                "allow_out_of_envelope": True,
+                            },
+                            lambda: _evaluate_openimcc_isolated(
+                                openimcc_bridge._evaluate_uncached,
                                 timeout_s=timeout_s,
                                 composition_mol=activity_composition,
                                 temperature_K=temperature_K,
                                 allow_extrapolation=True,
                                 allow_out_of_envelope=True,
-                            ),
+                            ).to_transport(),
                         )
+                        state = OpenImccBridgeResult.from_transport(state_payload)
                     except ImccNonconvergenceError as exc:
                         raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
                     except TimeoutError as exc:
@@ -3629,26 +3615,14 @@ def _predict_sossi_residue_cohort(
                                 "activity_provenance": mno_activity.provenance(),
                             },
                         )
-                    from simulator.melt_backend.openimcc_cache import (
-                        cached_openimcc_evaluate_gas,
-                    )
-
-                    gas_result = cached_openimcc_evaluate_gas(
-                        engine_cache,
-                        parent_oxide_activities=gas_parent_oxide_activities,
-                        temperature_K=temperature_K,
-                        pressure_bar=1.0,
-                        gas_pack=gas_pack,
+                    gas_result = openimcc_bridge.evaluate_gas(
+                        gas_parent_oxide_activities,
+                        temperature_K,
+                        1.0,
+                        gas_pack,
                         parent_oxides=gas_parent_oxides,
                         allow_extrapolation=True,
-                        solve_fn=lambda: evaluate_gas(
-                            gas_parent_oxide_activities,
-                            temperature_K,
-                            1.0,
-                            gas_pack,
-                            parent_oxides=gas_parent_oxides,
-                            allow_extrapolation=True,
-                        ),
+                        gas_pack_selection="default",
                     )
                     melt_pack_identity.update(
                         {
@@ -3672,7 +3646,7 @@ def _predict_sossi_residue_cohort(
             from simulator.diagnostic_helpers.binary_pot_battery import (
                 PO2_COMMANDED,
                 Po2Request,
-                cached_internal_analytical_residue_vapor_pressure,
+                internal_analytical_residue_vapor_pressure,
                 _new_internal_analytical_core,
             )
 
@@ -3681,8 +3655,7 @@ def _predict_sossi_residue_cohort(
             def pressure_model(
                 composition: Mapping[str, float], log10_pO2_bar: float
             ) -> Mapping[str, float]:
-                response = cached_internal_analytical_residue_vapor_pressure(
-                    engine_cache,
+                response = internal_analytical_residue_vapor_pressure(
                     core=analytical_core,
                     temperature_C=temperature_K - 273.15,
                     pressure_bar=total_pressure_Pa / 100_000.0,

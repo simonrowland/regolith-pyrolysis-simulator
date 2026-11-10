@@ -6843,7 +6843,6 @@ def _predict_distin_closed_feo_activity(
     identity: Identity,
     channel: str,
     sources: tuple[str, ...],
-    engine_cache: object | None = None,
 ) -> EnginePrediction:
     def refused(reason: RefusalReason, detail: Mapping[str, object]) -> EnginePrediction:
         return EnginePrediction(
@@ -6903,7 +6902,7 @@ def _predict_distin_closed_feo_activity(
     inventory["Fe"] = inventory.get("Fe", 0.0) + 1.0
     try:
         import openimcc
-        import openimcc.redox as openimcc_redox
+        from simulator.melt_backend.openimcc_bridge import evaluate_redox
     except ImportError as exc:
         return refused(
             RefusalReason.OPENIMCC_NOT_IMPORTABLE,
@@ -6913,18 +6912,12 @@ def _predict_distin_closed_feo_activity(
             },
         )
     try:
-        from simulator.melt_backend.openimcc_cache import cached_openimcc_redox
-
         temperature = float(temperature_K)
-        result = cached_openimcc_redox(
-            engine_cache,
-            inventory=inventory,
-            temperature_K=temperature,
-            mode="closed",
-            lambda_imposed=None,
-            solve_fn=lambda: openimcc_redox.evaluate_redox(
-                inventory, temperature, "closed"
-            ),
+        result = evaluate_redox(
+            inventory,
+            temperature,
+            "closed",
+            entry="openimcc.redox.evaluate_redox",
         )
     except openimcc.ImccRefusal as exc:
         return refused(
@@ -7009,7 +7002,6 @@ def _predict_fe_redox(
     *,
     handles: Mapping[str, object] | None = None,
     isolated: bool | None = None,
-    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Predict Fe3+/Fe2+ from Kress91, OpenIMCC, or a MELTS ferric split.
 
@@ -7154,22 +7146,16 @@ def _predict_fe_redox(
                 },
             )
         try:
-            from simulator.melt_backend.openimcc_cache import cached_openimcc_redox
+            from simulator.melt_backend.openimcc_bridge import evaluate_redox
 
             temperature = float(material.temperature)
             lambda_imposed = float(fo2_log) * math.log(10.0)
-            result = cached_openimcc_redox(
-                engine_cache,
-                inventory=inventory,
-                temperature_K=temperature,
-                mode="imposed",
+            result = evaluate_redox(
+                inventory,
+                temperature,
+                "imposed",
                 lambda_imposed=lambda_imposed,
-                solve_fn=lambda: openimcc.evaluate_redox(
-                    inventory,
-                    temperature,
-                    "imposed",
-                    lambda_imposed=lambda_imposed,
-                ),
+                entry="openimcc.evaluate_redox",
             )
         except openimcc.ImccRefusal as exc:
             return refused(
@@ -7386,7 +7372,6 @@ def _predict_fe_redox(
         qualification=False,
         isolated=isolated,
         physical_pressure_bar=pressure_bar,
-        engine_cache=engine_cache,
     )
     name = str(getattr(handle, "name", engine.value))
     call_evidence = (
@@ -7879,7 +7864,6 @@ def _borrow_internal_analytical_effusion(
     bench: Bench | None,
     handles: Mapping[str, object] | None,
     isolated: bool | None,
-    engine_cache: object | None,
     notices: list[Notice],
 ) -> "Po2Request | EnginePrediction":
     """Command the internal-analytical closure for an engine that cannot solve it.
@@ -7901,7 +7885,6 @@ def _borrow_internal_analytical_effusion(
         isolated=isolated,
         experiment=experiment,
         bench=bench,
-        engine_cache=engine_cache,
     )
     bar = _solved_effusion_po2_bar(prediction)
     if bar is None or not math.isfinite(bar) or bar <= 0.0:
@@ -8607,7 +8590,11 @@ def _equilibrate_phase_assemblage(
                     f"{solute_fugacity_parameter}"
                 )
             kwargs[solute_fugacity_parameter] = solute_fugacity_bar
-        return backend.equilibrate(**kwargs)
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            _call_cached_backend_equilibrate,
+        )
+
+        return _call_cached_backend_equilibrate(handle, kwargs, lambda: backend.equilibrate(**kwargs))
     finally:
         if owns_handle:
             from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -9086,7 +9073,6 @@ def _predict_mass_loss_with_residue(
     sources: tuple[str, ...],
     experiment: Experiment | None,
     observation: Observation,
-    engine_cache: object | None = None,
 ) -> EnginePrediction:
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
@@ -9137,7 +9123,6 @@ def _predict_mass_loss_with_residue(
             temperature_K=None if temperature is None else float(temperature),
             source_document=source_document,
             observation=observation,
-            engine_cache=engine_cache,
         )
     except ResidueInventoryRefusal as exc:
         reason = exc.reason
@@ -9251,7 +9236,6 @@ def _engine_prediction_or_unparseable_component(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
-    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Return one prediction. One unparseable component refuses that row."""
 
@@ -9266,7 +9250,6 @@ def _engine_prediction_or_unparseable_component(
             experiment=experiment,
             bench=bench,
             fo2_mode=fo2_mode,
-            engine_cache=engine_cache,
         )
     except UnparseableCompositionComponent as exc:
         identity = (
@@ -9298,7 +9281,6 @@ def predict_with_engine(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
-    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine and close any handle opened for this call."""
 
@@ -9318,7 +9300,6 @@ def predict_with_engine(
             experiment=experiment,
             bench=bench,
             fo2_mode=fo2_mode,
-            engine_cache=engine_cache,
         )
 
     provided_handles = handles or {}
@@ -9332,7 +9313,6 @@ def predict_with_engine(
             experiment=experiment,
             bench=bench,
             fo2_mode=fo2_mode,
-            engine_cache=engine_cache,
         )
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -9357,7 +9337,6 @@ def _score_predict_with_engine(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode | None = None,
-    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Route scorer calls while preserving custom predictor keyword contracts."""
 
@@ -9368,8 +9347,6 @@ def _score_predict_with_engine(
             kwargs["bench"] = bench
         if fo2_mode is not None:
             kwargs["fo2_mode"] = fo2_mode
-        if engine_cache is not None:
-            kwargs["engine_cache"] = engine_cache
         if engine is Engine.INTERNAL_ANALYTICAL:
             # Scoring owns a shared handle cache, but every IA row still uses
             # the CPU-budgeted child. Direct predictor callers keep their own
@@ -9387,7 +9364,6 @@ def _predict_with_engine(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
-    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
@@ -9449,7 +9425,6 @@ def _predict_with_engine(
             sources,
             experiment,
             observation,
-            engine_cache=engine_cache,
         )
     if engine is Engine.MAGEMIN and quantity in _VAPOUR_EQUILIBRIUM:
         return EnginePrediction(
@@ -9477,7 +9452,6 @@ def _predict_with_engine(
             channel,
             handles=handles,
             isolated=isolated,
-            engine_cache=engine_cache,
         )
     phase_basis = (
         identity.subtype.value
@@ -9885,7 +9859,6 @@ def _predict_with_engine(
             identity,
             channel,
             sources,
-            engine_cache=engine_cache,
         )
 
     wt: dict[str, float] | None = None
@@ -10497,7 +10470,6 @@ def _predict_with_engine(
             bench=bench,
             handles=handle_map,
             isolated=isolated,
-            engine_cache=engine_cache,
             notices=extra_notices,
         )
         if isinstance(borrowed, EnginePrediction):
@@ -10619,7 +10591,6 @@ def _predict_with_engine(
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
-                engine_cache=engine_cache,
             )
 
         def solve_oxygen_balance_at_current_pressure():
@@ -10721,7 +10692,6 @@ def _predict_with_engine(
                     arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                     physical_pressure_bar=pressure_bar,
                     native_activity_formula=native_activity_formula,
-                    engine_cache=engine_cache,
                 )
             except Exception as exc:
                 return engine_call_failure(exc)
@@ -10737,7 +10707,6 @@ def _predict_with_engine(
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
-                engine_cache=engine_cache,
             )
         except Exception as exc:
             return engine_call_failure(exc)
@@ -11027,7 +10996,6 @@ def _predict_with_engine(
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
-                engine_cache=engine_cache,
             )
         except Exception as exc:
             return engine_call_failure(exc)
@@ -11726,7 +11694,6 @@ def _hashimoto_residue_prediction(
     reference: Observation,
     engine: Engine,
     cache: dict[tuple[str, Engine], Mapping[str, object]],
-    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
@@ -11788,7 +11755,6 @@ def _hashimoto_residue_prediction(
                 preform_dimensions_mm=geometry,
                 code_revision=revision,
                 engine=engine.value,
-                engine_cache=engine_cache,
             )
             cache[cache_key] = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
@@ -11994,7 +11960,7 @@ _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 
 
 def _knudsen_residue_prediction(
-    context, reference, engine, cache=None, engine_cache=None
+    context, reference, engine, cache=None
 ) -> EnginePrediction:
     """Translate the residue owner's extent result to the scoring contract."""
     from simulator.battery.residue import (
@@ -12011,7 +11977,6 @@ def _knudsen_residue_prediction(
             result = predict_knudsen_residue_composition(
                 engine.value, reference, experiment, context.observations.values(),
                 _bench_for_score(experiment, context.benches) if experiment is not None else None,
-                engine_cache=engine_cache,
             )
             if cache is not None:
                 cache[cache_key] = result
@@ -12043,7 +12008,6 @@ def _sossi_residue_prediction(
     reference: Observation,
     engine: Engine,
     cache: dict[tuple[str, Engine], Mapping[str, object]],
-    engine_cache: object | None = None,
 ) -> EnginePrediction:
     """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
     channel = ENGINE_CHANNELS[engine]
@@ -12133,7 +12097,6 @@ def _sossi_residue_prediction(
                 buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
                 code_revision=revision,
                 engine=engine.value,
-                engine_cache=engine_cache,
             )
             cache[cache_key] = {
                 row.experiment_id: row for row in rows
@@ -12391,7 +12354,6 @@ def compile_residual(
     ratchet_missing: bool = False,
     point_observations: Sequence[Observation] | None = None,
     fo2_mode: Fo2Mode | None = None,
-    engine_cache: object | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     precomputed_prediction = prediction is not None
@@ -12875,7 +12837,7 @@ def compile_residual(
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
     ):
         prediction = _knudsen_residue_prediction(
-            context, reference, engine, engine_cache=engine_cache
+            context, reference, engine
         )
     if prediction is None:
         builtin_predictor = (
@@ -12975,8 +12937,6 @@ def compile_residual(
                 predictor_kwargs["bench"] = recorded
         if builtin_predictor and fo2_mode is not None:
             predictor_kwargs["fo2_mode"] = fo2_mode
-        if builtin_predictor and engine_cache is not None:
-            predictor_kwargs["engine_cache"] = engine_cache
         prediction = predictor(
             engine,
             _melt_prediction_reference(implied_alpha_reference or reference),
@@ -14127,7 +14087,6 @@ def _score_store_with_decisions(
     measured_only: bool = False,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
-    engine_cache: object | None = None,
     _prepared: _PreparedScoreRun | None = None,
     _engine_set: Sequence[Engine] | None = None,
     _refs: Sequence[Observation] | None = None,
@@ -14269,7 +14228,6 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
-                                engine_cache=engine_cache,
                             )
                         if (
                             predict is None
@@ -14283,7 +14241,6 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
-                                engine_cache=engine_cache,
                             )
                         if (
                             predict is None
@@ -14294,7 +14251,6 @@ def _score_store_with_decisions(
                         ):
                             prediction = _knudsen_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
-                                engine_cache=engine_cache,
                             )
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(
                             engine, point
@@ -14324,7 +14280,6 @@ def _score_store_with_decisions(
                                 if intrinsic_redox_activity
                                 else None
                             ),
-                            engine_cache=engine_cache,
                         )
                         if _stream is None:
                             assert residuals is not None
@@ -14366,7 +14321,6 @@ def _score_store_with_decisions(
                                     point.experiment_id, ()
                                 ),
                                 fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
-                                engine_cache=engine_cache,
                             )
                             if _stream is None:
                                 assert residuals is not None
@@ -14436,30 +14390,8 @@ _SCORE_WORKER_SETUP: (
     tuple[
         _PreparedScoreRun,
         Callable[..., EnginePrediction] | None,
-        object | None,
     ]
 ) | None = None
-
-
-def _engine_cache_counter_delta(
-    before: Mapping[str, Mapping[str, object]],
-    after: Mapping[str, Mapping[str, object]],
-) -> dict[str, dict[str, object]]:
-    delta: dict[str, dict[str, object]] = {}
-    for engine, after_counts in after.items():
-        before_counts = before.get(engine, {})
-        engine_delta: dict[str, object] = {}
-        for name, value in after_counts.items():
-            if name == "calls_by_kind" and isinstance(value, Mapping):
-                previous = before_counts.get(name, {})
-                engine_delta[name] = {
-                    call: int(count) - int(previous.get(call, 0))
-                    for call, count in value.items()
-                }
-            elif isinstance(value, int):
-                engine_delta[name] = value - int(before_counts.get(name, 0))
-        delta[engine] = engine_delta
-    return delta
 
 
 def _sum_engine_cache_counters(
@@ -14471,12 +14403,7 @@ def _sum_engine_cache_counters(
     for engine, engine_counts in counts.items():
         accumulated = total.setdefault(engine, {})
         for name, value in engine_counts.items():
-            if name == "calls_by_kind" and isinstance(value, Mapping):
-                calls = accumulated.setdefault(name, {})
-                assert isinstance(calls, dict)
-                for call, count in value.items():
-                    calls[str(call)] = int(calls.get(str(call), 0)) + int(count)
-            elif isinstance(value, int):
+            if isinstance(value, int):
                 accumulated[name] = int(accumulated.get(name, 0)) + value
     return total
 
@@ -14484,16 +14411,9 @@ def _sum_engine_cache_counters(
 def _initialize_score_worker(
     prepared: _PreparedScoreRun,
     predict: Callable[..., EnginePrediction] | None,
-    engine_cache_path: str | None,
 ) -> None:
     global _SCORE_WORKER_SETUP
-    engine_cache = None
-    if engine_cache_path is not None:
-        from simulator.engine_cache import EngineCache
-
-        engine_cache = EngineCache(engine_cache_path)
-        engine_cache._defer_runtime_notices = True
-    _SCORE_WORKER_SETUP = (prepared, predict, engine_cache)
+    _SCORE_WORKER_SETUP = (prepared, predict)
 
 
 def _score_shard_start_marker_path(
@@ -14525,9 +14445,8 @@ def _score_group_shard(
     str,
     int,
     Mapping[str, Mapping[str, object]] | None,
-    Mapping[str, tuple[dict[str, object], dict[str, object]]] | None,
 ]:
-    prepared, predict, engine_cache = _SCORE_WORKER_SETUP or (None, None, None)
+    prepared, predict = _SCORE_WORKER_SETUP or (None, None)
     if prepared is None:
         raise RuntimeError("battery score worker was not initialized")
     shard_index, engine, refs, path_text, root_text = task
@@ -14541,9 +14460,9 @@ def _score_group_shard(
         sort_on_finalize=False,
     )
     try:
-        counters_before = (
-            engine_cache.counters if engine_cache is not None else None
-        )
+        from simulator.engine_cache import engine_cache_counters
+
+        engine_cache_counters(reset=True)
         _score_store_with_decisions(
             prepared.context,
             predict=predict,
@@ -14551,20 +14470,9 @@ def _score_group_shard(
             _engine_set=(engine,),
             _refs=refs,
             _stream=stream,
-            engine_cache=engine_cache,
         )
-        counters_after = (
-            engine_cache.counters if engine_cache is not None else None
-        )
-        counter_delta = (
-            _engine_cache_counter_delta(counters_before, counters_after)
-            if counters_before is not None and counters_after is not None
-            else None
-        )
-        runtime_changes = (
-            engine_cache.runtime_changes if engine_cache is not None else None
-        )
-        return str(stream.partial_path), stream.count, counter_delta, runtime_changes
+        counters = engine_cache_counters(reset=True)
+        return str(stream.partial_path), stream.count, counters
     finally:
         stream.close()
         _clear_score_shard_start_marker(task)
@@ -14589,7 +14497,6 @@ def _score_store_to_jsonl(
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
     workers: int = 1,
-    engine_cache: object | None = None,
 ) -> tuple[int, _ResidualReportMetadata]:
     """Score directly to a sorted ``.partial`` JSONL without retaining rows."""
 
@@ -14598,9 +14505,12 @@ def _score_store_to_jsonl(
     if workers > 1 and handles:
         raise ValueError("spawned score workers open their own engine handles")
     stream = _ResidualJsonlStream(path, root=root)
-    engine_cache_counters = None
+    from simulator.engine_cache import engine_cache_counters
+
+    cache_counters: dict[str, dict[str, object]] | None = None
     try:
         if workers == 1:
+            engine_cache_counters(reset=True)
             _score_store_with_decisions(
                 context,
                 engines=engines,
@@ -14611,11 +14521,9 @@ def _score_store_to_jsonl(
                 measured_only=measured_only,
                 predict=predict,
                 handles=handles,
-                engine_cache=engine_cache,
                 _stream=stream,
             )
-            if engine_cache is not None:
-                engine_cache_counters = engine_cache.counters
+            cache_counters = engine_cache_counters(reset=True)
         else:
             prepared = _prepare_score_run(
                 context,
@@ -14633,14 +14541,14 @@ def _score_store_to_jsonl(
                 if chunk
             ]
             if not populated_chunks or not prepared.engine_set:
+                engine_cache_counters(reset=True)
                 _score_store_with_decisions(
                     context,
                     _prepared=prepared,
                     _refs=(),
                     _stream=stream,
                 )
-                if engine_cache is not None:
-                    engine_cache_counters = engine_cache.counters
+                cache_counters = engine_cache_counters(reset=True)
             else:
                 root_text = None if root is None else str(root)
                 with tempfile.TemporaryDirectory(
@@ -14663,9 +14571,6 @@ def _score_store_to_jsonl(
                         initargs=(
                             prepared,
                             predict,
-                            None
-                            if engine_cache is None
-                            else str(engine_cache.db_path),
                         ),
                         mp_context=mp.get_context("spawn"),
                         timeout_seconds=DEFAULT_PROCESS_TASK_TIMEOUT_SECONDS,
@@ -14675,24 +14580,12 @@ def _score_store_to_jsonl(
                     with stream.partial_path.open("rb") as output:
                         header = output.readline()
                     shard_count = 0
-                    for (
-                        shard_path_text,
-                        row_count,
-                        counters,
-                        runtime_changes,
-                    ) in shard_results:
+                    for shard_path_text, row_count, counters in shard_results:
                         shard_count += row_count
                         if counters is not None:
-                            engine_cache_counters = _sum_engine_cache_counters(
-                                engine_cache_counters, counters
+                            cache_counters = _sum_engine_cache_counters(
+                                cache_counters, counters
                             )
-                        if engine_cache is not None and runtime_changes is not None:
-                            for engine_id, (stored, current) in runtime_changes.items():
-                                engine_cache._notice_runtime_change(
-                                    engine_id,
-                                    stored,
-                                    current,
-                                )
                         order_path = Path(f"{shard_path_text}.order")
                         with (
                             Path(shard_path_text).open("rb") as shard,
@@ -14745,7 +14638,7 @@ def _score_store_to_jsonl(
             headline_band_values=dict(stream.headline_band_values),
             tier_band_values=dict(stream.tier_band_values),
             aggregate=stream.report_aggregate,
-            engine_cache_counters=engine_cache_counters,
+            engine_cache_counters=cache_counters,
         )
     finally:
         stream.close()
@@ -14761,7 +14654,6 @@ def score_store(
     include_diagnostics: bool = True,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
-    engine_cache: object | None = None,
 ) -> tuple[tuple[Residual, ...], dict[str, Observation]]:
     """Score the store and keep the historical residual/candidate return shape."""
 
@@ -14774,7 +14666,6 @@ def score_store(
         include_diagnostics=include_diagnostics,
         predict=predict,
         handles=handles,
-        engine_cache=engine_cache,
     )
     return residuals, candidates
 
