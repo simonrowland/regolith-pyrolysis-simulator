@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from types import SimpleNamespace
 
 import pytest
 
@@ -312,7 +313,7 @@ def test_depletion_retains_continuous_small_flow_limit(
     assert rates["Na"] / raw_rate == pytest.approx(1.0, rel=1e-10)
 
 
-@pytest.mark.parametrize("available_o2_kg", [0.0, 1.0e-6])
+@pytest.mark.parametrize("available_o2_kg", [0.0, 1.0e-12])
 def test_subthreshold_oxygen_consuming_flow_obeys_reactant_budget(
     vapor_pressure_data, feedstocks_data, setpoints_data, available_o2_kg
 ):
@@ -331,3 +332,80 @@ def test_subthreshold_oxygen_consuming_flow_obeys_reactant_budget(
         # positive supported tail or consume more reactant than available.
         assert 0.0 < rates["CrO2"] <= raw_rate
         assert rates["CrO2"] * abs(stoich["O2_per_product_kg"]) <= available_o2_kg
+
+
+@pytest.mark.parametrize("available_parent_kg", [0.0, 1.0e-12])
+def test_tiny_positive_parent_stock_keeps_depletion_tail(
+    vapor_pressure_data, feedstocks_data, setpoints_data, available_parent_kg
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    stoich = sim._evaporation_stoich("Na", _species_data(sim, "Na"))
+    parent = stoich["parent_oxide"]
+    raw_rate = 1.0e-14
+    rates = sim._analytic_evaporation_depletion_rates(
+        {"Na": raw_rate},
+        dt_hr=1.0,
+        phase_scalar=1.0,
+        cleaned_melt_kg={parent: available_parent_kg},
+        available_o2_kg=0.0,
+    )
+
+    if available_parent_kg == 0.0:
+        assert "Na" not in rates
+    else:
+        assert 0.0 < rates["Na"] <= raw_rate
+
+
+def test_native_fe_route_keeps_tiny_positive_vapor_and_drops_zero(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    route_rates = []
+
+    def route(flux, _melt):
+        rate = flux.species_kg_hr["Fe"]
+        route_rates.append(rate)
+        return SimpleNamespace(remaining_by_species={"Fe": rate})
+
+    monkeypatch.setattr(
+        sim, "_configure_condensation_operating_conditions", lambda *_: None
+    )
+    monkeypatch.setattr(sim.condensation_model, "route", route)
+    monkeypatch.setattr(
+        sim, "_dispatch_condensation_route", lambda *_args, **_kwargs: 0.0
+    )
+    monkeypatch.setattr(
+        sim, "_condensed_products_kg", lambda *_args, **_kwargs: {}
+    )
+    monkeypatch.setattr(
+        sim,
+        "_project_condensed_stage_collection",
+        lambda *_args, **_kwargs: None,
+    )
+    monkeypatch.setattr(sim, "_sync_oxygen_kg_counters", lambda: None)
+
+    assert sim._route_native_fe_vapor_to_condensation(
+        0.0, source_account="process.metal_phase"
+    ) == {}
+    assert route_rates == []
+
+    tiny_mol = 1.0e-13
+    result = sim._route_native_fe_vapor_to_condensation(
+        tiny_mol, source_account="process.metal_phase"
+    )
+    assert len(route_rates) == 1
+    assert route_rates[0] > 0.0
+    assert result["native_fe_vapor_mol"] == tiny_mol

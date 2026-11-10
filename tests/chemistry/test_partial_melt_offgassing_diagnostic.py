@@ -162,6 +162,42 @@ def test_projection_unavailable_omits_a_missing_molar_mass(
     assert 'molar_mass' in missing['Unobtainium']
 
 
+@pytest.mark.parametrize(
+    ("rate", "expected_present"),
+    [
+        pytest.param(0.0, False, id="zero-rate-is-removed"),
+        pytest.param(1.0e-13, True, id="tiny-positive-rate-survives"),
+    ],
+)
+def test_nonadmitted_provider_flux_keeps_positive_finite_tail(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    rate,
+    expected_present,
+):
+    sim = _sim(vapor_pressure_data, feedstocks_data, setpoints_data)
+    _install_flux_dispatch(monkeypatch, sim, {"Na": rate})
+    _install_eligible_vapour_batch(sim)
+    equilibrium = EquilibriumResult(
+        temperature_C=1150.0,
+        pressure_bar=1e-8,
+        liquid_fraction=0.2,
+        vapor_pressures_Pa={"Na": 1.0},
+        diagnostics={"solidus_T_C": 1000.0, "liquidus_T_C": 1300.0},
+    )
+
+    flux = sim._calculate_evaporation(equilibrium)
+
+    assert ("Na" in flux.species_kg_hr) is expected_present
+    if expected_present:
+        assert flux.species_kg_hr["Na"] == rate
+    assert sim._last_evaporation_flux_diagnostic.get(
+        "evaporation_flux_rates_are_admitted"
+    ) is not True
+
+
 def test_partial_melt_offgassing_diagnostic_uses_phase_engine_liquid_comp(
     monkeypatch,
     vapor_pressure_data,

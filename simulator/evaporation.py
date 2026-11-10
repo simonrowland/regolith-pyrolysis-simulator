@@ -2068,9 +2068,8 @@ class EvaporationMixin:
                 gated_rate_kg_hr = capped['Fe']
                 if allocation is not None:
                     diagnostic['native_fe_capacity_allocation'] = allocation
-            if gated_rate_kg_hr > 1e-12 or (
-                closure_rates_are_admitted and gated_rate_kg_hr > 0.0
-            ):
+            # A positive finite flux remains physical at any mass scale.
+            if math.isfinite(gated_rate_kg_hr) and gated_rate_kg_hr > 0.0:
                 flux.species_kg_hr[species] = gated_rate_kg_hr
                 alpha_authority_status = alpha_authority_statuses.get(species)
                 if alpha_authority_status is not None:
@@ -4742,7 +4741,12 @@ class EvaporationMixin:
             available_parent_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
             total_parent_draw_kg_hr = sum(
                 entry['parent_draw_kg_hr'] for entry in entries)
-            if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= 0.0:
+            # Positive parent stock sustains the expm1 depletion tail.
+            if (
+                not math.isfinite(available_parent_kg)
+                or available_parent_kg <= 0.0
+                or total_parent_draw_kg_hr <= 0.0
+            ):
                 continue
             k_hr = total_parent_draw_kg_hr / available_parent_kg
             depletion_fraction = -math.expm1(-k_hr * dt_hr)
@@ -4775,7 +4779,8 @@ class EvaporationMixin:
         if total_o2_draw_kg_hr <= 0.0:
             return effective_rates
 
-        if available_o2_kg <= 1e-12:
+        # Positive O2 stock sustains its stoichiometric tail over this finite step.
+        if not math.isfinite(available_o2_kg) or available_o2_kg <= 0.0:
             for species, _draw in o2_draws:
                 effective_rates.pop(species, None)
             return effective_rates
@@ -5138,7 +5143,8 @@ class EvaporationMixin:
         source_account: str = 'process.cleaned_melt',
     ) -> dict[str, float]:
         native_fe_vapor_mol = max(0.0, float(native_fe_vapor_mol or 0.0))
-        if native_fe_vapor_mol <= 1.0e-12:
+        # Positive finite Fe vapor is routeable at any scale.
+        if not math.isfinite(native_fe_vapor_mol) or native_fe_vapor_mol <= 0.0:
             return {}
         fe_formula = resolve_species_formula('Fe', self.species_formula_registry)
         fe_molar_mass = fe_formula.molar_mass_kg_per_mol()
