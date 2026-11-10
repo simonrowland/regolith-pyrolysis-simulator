@@ -18,6 +18,16 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
 
 
+def _printed_sossi_bead_area_m2() -> float:
+    source = yaml.safe_load(SOURCE.read_text())
+    area_record = next(
+        observation["equipment"]["sample_surface_area"]
+        for observation in source["species"]["K"]["observations"]
+        if "sample_surface_area" in observation.get("equipment", {})
+    )
+    return float(area_record["value"])
+
+
 def test_sossi_start_inventory_contains_table1_host_and_starting_trace() -> None:
     source = yaml.safe_load(SOURCE.read_text())
     experiment = source["experiments"][0]
@@ -55,13 +65,7 @@ def test_sossi_start_inventory_contains_table1_host_and_starting_trace() -> None
 
 
 def test_sossi_geometry_is_declared_from_bead_mass_without_residue_inputs() -> None:
-    source = yaml.safe_load(SOURCE.read_text())
-    area_record = next(
-        observation["equipment"]["sample_surface_area"]
-        for observation in source["species"]["K"]["observations"]
-        if "sample_surface_area" in observation.get("equipment", {})
-    )
-    printed_area_m2 = float(area_record["value"])
+    printed_area_m2 = _printed_sossi_bead_area_m2()
     areas = _sossi_geometry_areas(25.0e-6, printed_area_m2=printed_area_m2)
 
     assert tuple(areas) == _SOSSI_GEOMETRIES
@@ -85,7 +89,10 @@ def test_sossi_geometry_is_declared_from_bead_mass_without_residue_inputs() -> N
     ]
 
 
-def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -> None:
+@pytest.mark.parametrize("area_scale", [1.0, None])
+def test_sossi_prediction_provenance_pins_engine_binding_identity(
+    monkeypatch, area_scale
+) -> None:
     pytest.importorskip("openimcc")
     import openimcc
 
@@ -106,6 +113,10 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     source = yaml.safe_load(SOURCE.read_text())
     experiment = source["experiments"][0]
     experiment_id = experiment["experiment_id"]
+    printed_area_m2 = _printed_sossi_bead_area_m2()
+    sample_surface_area_m2 = (
+        None if area_scale is None else printed_area_m2 * area_scale
+    )
     starting_trace = {
         element: source["species"][element]["observations"][0]["values"][
             "starting_measured_ppm"
@@ -162,7 +173,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
         code_revision="pack-digest-pin-test",
         engine="openimcc",
-        sample_surface_area_m2=2.0e-5,
+        sample_surface_area_m2=sample_surface_area_m2,
     )[0]
 
     gas_pack = openimcc.load_gas_datapack()
@@ -189,12 +200,17 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     )
     assert extension_calls == []
     assert "MnO" not in prediction.provenance.get("melt_activity_extensions", {})
+    expected_area_m2 = (
+        _sossi_geometry_areas(25.0e-6)["pt_loop_bead_sphere_constant"]
+        if sample_surface_area_m2 is None
+        else sample_surface_area_m2
+    )
     assert prediction.provenance["geometry_areas_m2"][
         "pt_loop_bead_sphere_constant"
-    ] == pytest.approx(2.0e-5)
+    ] == pytest.approx(expected_area_m2)
     assert prediction.provenance["assumption_flags"][
         "sample_surface_area_fallback_2700_kg_m3"
-    ] is False
+    ] is (sample_surface_area_m2 is None)
 
 
 def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
