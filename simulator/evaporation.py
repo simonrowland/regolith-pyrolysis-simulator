@@ -68,7 +68,6 @@ from simulator.vapour_rail.instrumentation import (
 PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID = (
     'equilibrium_backend_effective_pressure_pre_rg'
 )
-PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C = 1050.0
 # Stage-0 phosphorus vapour carriers. C0 must not claim them (they stay
 # condensed). C0B claims only this set. Activity-evidence annotations use
 # the same membership. Not STRUCTURALLY_ZERO_P_CARRIERS: that name is the
@@ -716,17 +715,11 @@ def _pre_rg_effective_pressure_source(
         getattr(equilibrium, 'vapor_pressures_Pa', {}),
         read_context=EFFECTIVE_PRESSURE_SOURCE_CONTEXT,
     )
-    temperature_C = float(getattr(equilibrium, 'temperature_C', math.inf))
-    physical_zero_reason = None
-    if (
-        not effective_pressures
-        and temperature_C < PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C
-    ):
-        physical_zero_reason = 'pre_rg_backend_below_effective_pressure_threshold'
+    # An empty backend map is missing pressure evidence at every temperature;
+    # only inventory and typed batch outcomes can establish a physical zero.
     return EffectivePressureSource(
         PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
         effective_pressures,
-        physical_zero_reason=physical_zero_reason,
     )
 
 
