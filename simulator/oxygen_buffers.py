@@ -154,6 +154,43 @@ def oneill_iw_log10_fO2_bar(temperature_K: float) -> float:
     return mu_o2 / (_ONEILL_IW_R * temperature * _ONEILL_IW_LN10)
 
 
+ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K = (
+    (833.0, 1042.0),
+    (1042.0, 1184.0),
+    (1184.0, 1644.0),
+)
+ONEILL_POWNCEBY_1993_IW_UNCERTAINTY_J_MOL = 150.0
+
+
+def oneill_pownceby_1993_iw_log10_fO2_bar(temperature_K: float) -> float:
+    """Return O'Neill & Pownceby (1993) Fe–\"FeO\" log10(fO2/bar).
+
+    The three recommended µO2 equations are printed in the abstract, in
+    J/mol O2 with T in K and a 1 bar reference. The uncertainty is ±150 J/mol.
+    """
+    temperature = _require_finite_positive(temperature_K, "temperature_K")
+    if temperature < 1042.0:
+        mu_o2 = (
+            -605568.0
+            + 1366.420 * temperature
+            - 182.7955 * temperature * math.log(temperature)
+            + 0.10359 * temperature**2
+        )
+    elif temperature < 1184.0:
+        mu_o2 = (
+            -519113.0
+            + 59.129 * temperature
+            + 8.9276 * temperature * math.log(temperature)
+        )
+    else:
+        mu_o2 = (
+            -550915.0
+            + 269.106 * temperature
+            - 16.9484 * temperature * math.log(temperature)
+        )
+    return mu_o2 / (_ONEILL_IW_R * temperature * _ONEILL_IW_LN10)
+
+
 def _require_finite_positive(value: float, label: str) -> float:
     if not is_declared_real_scalar(value, allow_numeric_str=True):
         raise TypeError(f"{label} must be numeric")

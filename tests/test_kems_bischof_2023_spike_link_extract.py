@@ -181,7 +181,8 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
                 control = row.point_conditions["fO2_control"]
                 assert control.state.is_value
                 assert control.state.value == (
-                    f"IW buffer-relative; printed ΔIW={delta_iw}"
+                    f"IW buffer-relative; printed ΔIW={delta_iw}; "
+                    "O’Neill and Pownceby, 1993"
                 )
                 # Supplement Table S1, p. 2, prints the row's ΔIW beside T;
                 # e.g. "1586.4 ... ΔIW 1.66".
@@ -189,7 +190,13 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
                 assert control.locator.table == "S1"
                 decision = printed_oxygen_decision(
                     PrintedOxygenFacts(),
-                    raw_item={"delta_IW": str(delta_iw)},
+                    raw_item={
+                        "delta_IW": str(delta_iw),
+                        "oxygen_buffer_as_published": (
+                            f"IW buffer-relative; printed ΔIW={delta_iw}; "
+                            "O’Neill and Pownceby, 1993"
+                        ),
+                    },
                     point_conditions=None,
                     scope="row",
                     run_temperature_K=temperature,
@@ -197,6 +204,12 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
                     source_id=sid,
                 )
                 assert decision is not None and decision.state.is_value
+                if temperature == Decimal("1586.4"):
+                    assert decision.notice_reason is not None
+                    assert "oneill_pownceby_1993_iw_fe_feo" in decision.notice_reason
+                    assert decision.state.value == Decimal(
+                        "0.0001130368308746852372423477753"
+                    )
                 assert row.identity.fO2_Pa == decision.state
                 conversion_notice = next(
                     notice

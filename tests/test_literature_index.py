@@ -617,7 +617,7 @@ def test_source_status_wired_zero_today_and_positive_control(tmp_path, monkeypat
     _write_yaml(root / "data/literature/extracts" / f"{sid}.yaml", _extract_v1(sid))
     _write_yaml(root / "data/literature/extracts-v2" / f"{sid}.yaml", _v21(sid, [_usable_obs()]))
     rows, status = _status_rows(root)
-    assert status["counts"]["by_stage"]["wired"] == 0
+    assert "wired" not in status["counts"]["by_stage"]
     assert rows[sid]["stage"] != "wired"
 
     _write_yaml(root / "data/literature/battery_residuals.yaml", {

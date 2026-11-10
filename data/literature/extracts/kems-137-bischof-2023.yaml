@@ -24,10 +24,10 @@ review_status: draft
 fidelity_samples:
 - path: species.Ga.observations[bischof_2023_ga_psat_s1_1low_polytherm].values.points[0].p_Pa
   value: 4.04e-05
-  locator: {page: 2, table: S1, row: 1, note: 'Rendered Supplement Table S1, Ga partial pressure'}
+  locator: {page: 2, pdf_page_index: 1, table: S1, row: 1, note: 'Rendered Supplement Table S1, Ga partial pressure'}
 - path: species.In.observations[bischof_2023_in_psat_s1_1low_polytherm].values.points[5].p_Pa
   value: 0.000123
-  locator: {page: 2, table: S1, row: 6, note: 'Rendered Supplement Table S1, In partial pressure'}
+  locator: {page: 2, pdf_page_index: 1, table: S1, row: 6, note: 'Rendered Supplement Table S1, In partial pressure'}
 - species: Ga
   observable: activity_coefficient
   observation_id: bischof_2023_gao15_gamma_preferred_1700k
@@ -53,7 +53,7 @@ fidelity_samples:
   value: 0.0632
   locator:
     table: S1
-    pdf_page_index: 2
+    pdf_page_index: 1
     note: supplement Table S1 first row γ(GaO1.5)=6.32E-02 at 1586.4 K
 - species: Ga
   observable: activity_coefficient
@@ -1659,7 +1659,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.66"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.66; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 1}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -1675,7 +1675,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.62"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.62; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 2}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -1691,7 +1691,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.61"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.61; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 3}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -1707,7 +1707,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 4}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -1723,7 +1723,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 5}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -1739,7 +1739,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 6}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -1755,7 +1755,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 7}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -1771,7 +1771,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 8}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -1787,7 +1787,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 9}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -1803,7 +1803,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 10}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -1819,7 +1819,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 11}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -3603,7 +3603,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.66"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.66; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 1}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -3619,7 +3619,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.62"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.62; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 2}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -3635,7 +3635,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.61"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.61; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 3}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -3651,7 +3651,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 4}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -3667,7 +3667,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 5}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -3683,7 +3683,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 6}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -3699,7 +3699,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 7}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -3715,7 +3715,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 8}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -3731,7 +3731,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 9}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -3747,7 +3747,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 10}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -3763,7 +3763,7 @@ species:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
               locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
             fO2_control:
-              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53"}
+              state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 11}
             composition:
               state: {tag: unknown, reason: mixed wt% base plus ppm spikes has no exact mixed-basis bulk composition token}
@@ -4028,6 +4028,17 @@ corrections:
   page: 2
   table: S1
   quote: *s1_quote
+- observation_id: bischof_2023_ga_psat_s1_1low_polytherm
+  field: oxygen_buffer_as_published
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
+  old: absent
+  new: O’Neill and Pownceby, 1993
+  page: 19
+  line_range: '518-521'
+  quote: Both 1_low and 2_low runs exhibit a gradual reduction relative to IW (O’Neill and
+    Pownceby, 1993) as temperature increases from 1587 K; ΔIW+1.66 and ΔIW+2.10, respectively,
+    before converging at the highest temperatures (~1700 K) to a constant value of ΔIW+1.54 in
+    both runs.
 - observation_id: bischof_2023_ga2o3_henrian_log10_gamma_model
   field: printed_quote
   source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf

@@ -8,142 +8,21 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2954
+  sources: 2978
   by_stage:
-    located: 206
-    inbox: 1878
-    in_progress: 173
-    ingested_partial: 185
-    ingested_complete: 151
-    wired: 0
     unknown: 361
+    in_progress: 173
+    inbox: 1902
+    ingested_complete: 151
+    located: 206
+    ingested_partial: 185
 anti_loss:
   corpus_uncommitted:
     count: 0
     ids: []
   corpus_unpushed:
-    count: 120
-    ids:
-    - 67d9991672be628c7d87b4aaa3fc5ad4b9158d23
-    - e3ffaf4ad72121b6789efd0ef256f66464ac7650
-    - 2e5c4bcdf7b91bfd0c1bb897b48c054e4ebf50bc
-    - eaab5db2eac8ea0082a3e646e109920fb98e2f37
-    - 75e3b98190a442a2afc77502a9d21cae21701992
-    - d80a72ce6b71467ab979a2b450a622a14116e4a5
-    - 9fab7bc5edc14849ae601a0e6f546aaec1553960
-    - 8874a0416966327981e980469e6df38dfd9855c1
-    - 7340f8b59bd3ac37a879f87aeb43cb98623e8ec4
-    - 18d95b0629984575a892ad2b8e93d0b06dc6c47b
-    - 172b2d95fd677e01acf6f0711115f0354e3ecbd6
-    - efa2e8ed97a1765b7b571a2a11f3f9150be24ddb
-    - 3094b3b5cb71519d19019f5699185e34ef961d1e
-    - 40906ea7d660e3dfb73b79e73fe04b832b9f25fb
-    - 6ef4016a05bd9a6249dbbd421ccb4a66273b816c
-    - c19b68eb83ab307e3bd4a96c8c28d3e02b75a75c
-    - 6d39fca1e3c8404dab6a52ab52d14271d633eaf4
-    - 6e811463c9676983f9a2384d41a9dba052341062
-    - 76685aabfaa454c76fac8c32e7251bf049a0e64f
-    - 768634511698d7095f555079704f740ee9880227
-    - e1764bd044bdd2b8f6300471c14cd9a3a388fe10
-    - 25b858d1cf5954025f7e0defa1d46f39b558407f
-    - 8bb800e4967aa70615669bfac1d15ec1b9949a9d
-    - 8996e5bbda1739d606bc58e4d2fd2ed43d0cad86
-    - 1fdbea82a0bffa420858476e58a0e767fe6b6541
-    - 5684a904e2defe68a13785234cbcce3a99d3aa8f
-    - 9429a7ec5f618b3b27fdc63d0a2e650e83cf7c26
-    - 678cbd62720fd81a8de9b6d1cd5b873c0939ad27
-    - 8d3b74d0db8aaf0881883dcd8c5e1540e71be639
-    - a46cd46014e0395eaedafa09bd92e2dd63fe987a
-    - 95f13f9105bd02ab7b5823617427ee971b7c58cc
-    - 3ac1b7f74c46e06f87fb21020ceee7677e396381
-    - 274ca46404cadb4a5ebab69d8bca5313f27100d5
-    - 481932644101c026a13ee6fc8d4e91556b79e2ce
-    - 97ecd0a842afcafd65261822c7c79f82da7fe8db
-    - 22dbc0ce698cb25bfb974a78de28c325d7212b06
-    - e690471b3fae8b18413acc9635910d590028b134
-    - fd844a78d3a7457abcbbef20fc802cc2a00d5f46
-    - 277070b6ab8de446fe00336e4a7c7725af2c57cf
-    - 0723327baa7810fce404978e97e29e8a155106cd
-    - 4575956bd5a8e6e9a4e96b9fd0e473ade4c20fb0
-    - ffe016c4463d9e04f96b4a0fdabf65ec99c9ff02
-    - 827da5d0cc53a6f92c2df408183f5e5c84b2c521
-    - 16ffa0575183763dc6938f2754eb69279904b840
-    - 3916580fa448120e08327469c4e8e087e3b73f46
-    - 5702eabd7a123796689385c27602f3ea4868a39c
-    - 7703951239c23a6e25deca4fae02e322649d8493
-    - a6871422ff04f6033afef12c4593f2df76704e17
-    - eea61e3b944d26890fad418980aa54c7e448b38f
-    - 1c397a28c6801e7ecfc08373fe83709916ad6d13
-    - 220a151cacf518547158a199ed9b87e92913e0d7
-    - 0feb02e738010c801b098a6bf191a3f65ec1a53f
-    - 8935c18298cc693945d95bf99f3f896beb867c50
-    - ea3e4608a09ecef4d28a1ba0a070b0644b56e56b
-    - 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
-    - 5c7fa95bb1ade6a5d542cc1fa5f085825d71ceb2
-    - d4e8782b5c8686466a26591d7d43ca7b0ce92663
-    - 44587b627d1998ec54a7666565c6e48a12762439
-    - e8167c65e74399c6ec69498c21f1080dcb84f15b
-    - 8d1bcd2103dad613a3983cf47ba788adf1acd4e9
-    - 5425a7c94e1ee5484a7fe65c63b43c9aa8c6cf85
-    - e4211cab6c9ac9cfbb3913e9cf2800eb273a3263
-    - bd326a582a8531599146e4f721316dce7855c017
-    - 9be13c6816d4d54f6819300d2ff8d273028bebc4
-    - 5ea12a678cfc659472df333184a538fbe8c6b624
-    - 154ea2bfb902b43ad46852ce2d6ac4bea49116d3
-    - d2cfb582f0a2173d99c23c79d7257b56ed252063
-    - ddbff0c82797e332131d26b8b1d9ccc5f4fcef48
-    - 60b8ab5a601e49701fd9f334bfdde60b4dcfec6a
-    - 4a2d7c7e27e7c43d6999d67af1dd41b4a0b785d4
-    - 4219264cd64b6da7054bac1a6ad1153b0aabddd6
-    - ba3961f8ecc6fca64f3e6f4a5635139f395b76f4
-    - 2f29708617838644842aa580d8f43dbfb0c4a2c6
-    - 408dd55f0b0e2e75d2ae3879c2d96249e1b259c4
-    - 4fb1206ea6c7f143481409fa67ae12550b74a686
-    - dfff6049e4952a3c50aebb07aaec472976674ae2
-    - 22d4cdff9aa9084db6179b1252056bcc3890d841
-    - e32d06d37f8d056e2afbfeaf7e88ed687da0c4d1
-    - 4ceed768180f01f7445017a408ae19aa574ddf18
-    - 7348bd0cbc16aff1b9d58145e9f476e605df45d6
-    - c3166f51764e2bc49e6a80bea2c1c4ff597bc16a
-    - f165d8412737abe4e7912a354764832eb5b4675a
-    - a265f5efa0df0ad25871216f22acbf97e17d3f94
-    - 032a3877b43f81f6e56884d4294586d33ccfc3e0
-    - d82d2691d8206e65f30cb10dbb7d1f32afb361ea
-    - 2d8a9fb2703c55c4c72b7b75e284b289172e1874
-    - 648b741d0d5b6d5938f835fa78baaaf581126384
-    - 79f01030387cb5a69a1a68303629da5a42e72a23
-    - e81526feb40557807361472bb53c4a72d7521256
-    - 40fc90aff8bcbe596c17929cfb9c9531a5032adc
-    - 7c57ad965927e286405fc92e3c24f9e1c9ff786e
-    - bab89baaf12867738e044634108c28b9685345bb
-    - 44e8e584256aa476c2de9bd66d615760432454e1
-    - c13ecd8cc968b176e3d410f3c00a0caf12d873da
-    - 82d1c6eb0819fc29981077a646e49c5ca4e97d9a
-    - af19832d1e8532f0d7705122d97735a36134c102
-    - cf96c28985f5f52a5d4dadf03b278bb761b2a68f
-    - 155938536d8f0fafa64f18c8b0ffeb60952761fa
-    - 05ad42fc3844afafc874802f9fe9600c4f2741aa
-    - b1b576a198cc5011ef99d9f9168ff21010d9f813
-    - 195d28c0e683be9355c88777ef9da26ec52a05bb
-    - 97aec1a0cb7e1bc06d1590aac6b2d87c0061b298
-    - 397b7f796003345dd917cd3bfbf9a39f553be7d7
-    - 6ec36f8713e0dc0f344ea4793d657ec48d1a0277
-    - a7f98e8fa082bd0b17897a5287de2a8e5823b83a
-    - a10a2144c9623a019a5c1b497a44d8b1e0417416
-    - 499a0fd386c3dd006f98398a85ae897c53586288
-    - 749fa886982f2ceac6032ce84072d017118c7809
-    - e26442e2373ac885bf13317a0e9612828c648304
-    - f721efdf8bf4ccf746ee8b34d3977a5441f8745c
-    - ea4ee8cdce7fb783b6308160914b12799ee3b52f
-    - b31e0cb25878be5dd437da3d51ab7c6c227ac381
-    - 734f4e8025bff4081a392198c77e87eb11902737
-    - c7913367ae65f134e916bfe3be534a75407a3b43
-    - b08397bcd614108c972fd575087effd614212fd4
-    - 1b88f30053ae515f680028c8b7aa9327eb9456d3
-    - 3dc62e4cc3833212bb217af34b6b902d26afc4f7
-    - 236f0ec8a296edc4e28262dffdfcf341a9d9b423
-    - e3fd1afee3f48eaf3bae5f1c86277084fe30c12f
-    - 47f287c968f5ff395ee02d576f791832fe76c84f
+    count: 0
+    ids: []
   extract_mirror_parity:
     simulator_only:
       count: 404
@@ -4348,6 +4227,16 @@ sources:
     decided_by: inbox
     artefacts:
     - raw/balabanova-lopatin-2022-rcct-sro-al2o3-kems-abstract/balabanova-lopatin-2022-rcct-sro-al2o3-kems-abstract.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: balabanova-lopatin-tyurnina-2024-bao-al2o3-sio2-vaporization
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/balabanova-lopatin-tyurnina-2024-bao-al2o3-sio2-vaporization/balabanova-lopatin-tyurnina-2024-bao-al2o3-sio2-vaporization.pdf
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
@@ -9920,6 +9809,17 @@ sources:
     artefacts:
     - raw/elvrum-2017-ferric-iron-nio-activity
     reason: source folder exists in the corpus, but no document
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: emelyanova-shugurov-panin-lopatin-2016-gaseous-lead-phosphates
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/emelyanova-shugurov-panin-lopatin-2016-gaseous-lead-phosphates/SOURCE.md
+    - raw/emelyanova-shugurov-panin-lopatin-2016-gaseous-lead-phosphates/emelyanova-shugurov-panin-lopatin-2016-gaseous-lead-phosphates.pdf
+    reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -15539,6 +15439,17 @@ sources:
     - raw/ivanova-2023-first-solid-material-review/supplementary/ivanova-supp-126755.png
     - raw/ivanova-2023-first-solid-material-review/supplementary/ivanova-supp-126756.png
     - raw/ivanova-2023-first-solid-material-review/supplementary/ivanova-supp-126757.png
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: ivtan-878-cro3-g
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/ivtan-878-cro3-g/SOURCE.md
+    - raw/ivtan-878-cro3-g/ivtan-878-cro3-g.html
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
@@ -22978,6 +22889,17 @@ sources:
   usable_rows: 72
   total_rows: 140
   inbox_exclusion_reason: null
+- source_id: kennedy-1948-ferric-ferrous-silicate-melts
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/kennedy-1948-ferric-ferrous-silicate-melts/SOURCE.md
+    - raw/kennedy-1948-ferric-ferrous-silicate-melts/kennedy-1948-ferric-ferrous-silicate-melts.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: kennel-petschek-1966-limit-stably-trapped
   stage: inbox
   evidence:
@@ -24154,6 +24076,17 @@ sources:
     reason: v2.1 store present; 214/214 rows battery-usable
   usable_rows: 214
   total_rows: 214
+  inbox_exclusion_reason: null
+- source_id: kunkel-milke-binnewies-2015-gaseous-ternary-oxides-te-pb
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/kunkel-milke-binnewies-2015-gaseous-ternary-oxides-te-pb/SOURCE.md
+    - raw/kunkel-milke-binnewies-2015-gaseous-ternary-oxides-te-pb/kunkel-milke-binnewies-2015-gaseous-ternary-oxides-te-pb.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
   stage: unknown
@@ -25728,6 +25661,27 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: lopatin-2003-gaseous-oxyacid-salts-systematization-review
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/lopatin-2003-gaseous-oxyacid-salts-systematization-review/SOURCE.md
+    - raw/lopatin-2003-gaseous-oxyacid-salts-systematization-review/lopatin-2003-gaseous-oxyacid-salts-systematization-review.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: lopatin-2007-gaseous-oxyacid-salts-thermo-review
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/lopatin-2007-gaseous-oxyacid-salts-thermo-review/lopatin-2007-gaseous-oxyacid-salts-thermo-review.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: lopatin-2013-gaseous-oxyacid-salt-thermochemistry
   stage: inbox
   evidence:
@@ -25786,6 +25740,27 @@ sources:
     artefacts:
     - raw/lopatin-shugurov-panin-2019-gaseous-cerium-phosphate-kems/SOURCE.md
     - raw/lopatin-shugurov-panin-2019-gaseous-cerium-phosphate-kems/lopatin-shugurov-panin-2019-gaseous-cerium-phosphate-kems.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: lopatin-shugurov-panin-prikhodko-2016-zinc-phosphate-gas-thermochemistry
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/lopatin-shugurov-panin-prikhodko-2016-zinc-phosphate-gas-thermochemistry/SOURCE.md
+    - raw/lopatin-shugurov-panin-prikhodko-2016-zinc-phosphate-gas-thermochemistry/lopatin-shugurov-panin-prikhodko-2016-zinc-phosphate-gas-thermochemistry.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: lopatin-shugurov-stolyarova-tyurnina-2006-sro-sio2-thermodynamics
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/lopatin-shugurov-stolyarova-tyurnina-2006-sro-sio2-thermodynamics/lopatin-shugurov-stolyarova-tyurnina-2006-sro-sio2-thermodynamics.pdf
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
@@ -33292,6 +33267,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: rcct-2024-lopatin-cs-sas-vaporization-abstract
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/rcct-2024-lopatin-cs-sas-vaporization-abstract/rcct-2024-lopatin-cs-sas-vaporization-abstract.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: recio-2026-po-ps-photoelectron
   stage: inbox
   evidence:
@@ -38079,6 +38064,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: shilov-vorozhtcov-stolyarova-2025-sro-al2o3-sio2-kems
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/shilov-vorozhtcov-stolyarova-2025-sro-al2o3-sio2-kems/shilov-vorozhtcov-stolyarova-2025-sro-al2o3-sio2-kems.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: shim-banya-1981-feo-mgo-sio2
   stage: inbox
   evidence:
@@ -39300,6 +39295,17 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: shugurov-2005-3d-oxyacid-salts-dissertation-abstract
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/shugurov-2005-3d-oxyacid-salts-dissertation-abstract/SOURCE.md
+    - raw/shugurov-2005-3d-oxyacid-salts-dissertation-abstract/shugurov-2005-3d-oxyacid-salts-dissertation-abstract.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: shugurov-2024-gaseous-cerates-si
   stage: ingested_complete
   evidence:
@@ -39329,6 +39335,49 @@ sources:
     reason: v2.1 store present; 50/50 rows battery-usable
   usable_rows: 50
   total_rows: 50
+  inbox_exclusion_reason: null
+- source_id: shugurov-lopatin-2011-gaseous-vanadium-phosphates-kems
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/shugurov-lopatin-2011-gaseous-vanadium-phosphates-kems/SOURCE.md
+    - raw/shugurov-lopatin-2011-gaseous-vanadium-phosphates-kems/shugurov-lopatin-2011-gaseous-vanadium-phosphates-kems.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: shugurov-lopatin-2019-high-temperature-inorganic-associates
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/shugurov-lopatin-2019-high-temperature-inorganic-associates/SOURCE.md
+    - raw/shugurov-lopatin-2019-high-temperature-inorganic-associates/shugurov-lopatin-2019-high-temperature-inorganic-associates.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: shugurov-panin-lopatin-emelyanova-2016-gaseous-lead-tellurates
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/shugurov-panin-lopatin-emelyanova-2016-gaseous-lead-tellurates/SOURCE.md
+    - raw/shugurov-panin-lopatin-emelyanova-2016-gaseous-lead-tellurates/shugurov-panin-lopatin-emelyanova-2016-gaseous-lead-tellurates.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: shugurov-timoshkin-lopatin-2004-manganese-phosphates-mnpo3-mnpo2
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/shugurov-timoshkin-lopatin-2004-manganese-phosphates-mnpo3-mnpo2/shugurov-timoshkin-lopatin-2004-manganese-phosphates-mnpo3-mnpo2.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: shukla-2012-alkaline-earth-oxide-thermodynamic-database-thesis
   stage: inbox
@@ -40356,6 +40405,46 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: stolyarova-lopatin-shugurov-tyurnina-2006-gaseous-strontium-silicates
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/stolyarova-lopatin-shugurov-tyurnina-2006-gaseous-strontium-silicates/stolyarova-lopatin-shugurov-tyurnina-2006-gaseous-strontium-silicates.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: stolyarova-lopatin-tyurnina-2006-sro-sio2-vaporization
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/stolyarova-lopatin-tyurnina-2006-sro-sio2-vaporization/stolyarova-lopatin-tyurnina-2006-sro-sio2-vaporization.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: stolyarova-shilov-lopatin-shugurov-2014-bi2o3-sio2-kems
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/stolyarova-shilov-lopatin-shugurov-2014-bi2o3-sio2-kems/stolyarova-shilov-lopatin-shugurov-2014-bi2o3-sio2-kems.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: stolyarova-vorozhtcov-lopatin-2021-cs2o-b2o3-kems
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/stolyarova-vorozhtcov-lopatin-2021-cs2o-b2o3-kems/stolyarova-vorozhtcov-lopatin-2021-cs2o-b2o3-kems.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
   stage: ingested_complete
   evidence:
@@ -40698,6 +40787,17 @@ sources:
     reason: v2.1 store present; 4/4 rows battery-usable
   usable_rows: 4
   total_rows: 4
+  inbox_exclusion_reason: null
+- source_id: sugimoto-1978-melt-activity
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/sugimoto-1978-melt-activity/SOURCE.md
+    - raw/sugimoto-1978-melt-activity/sugimoto-1978-melt-activity.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: suito-1991-al-o-equilibrium-cao-al2o3
   stage: inbox
@@ -41854,6 +41954,17 @@ sources:
       quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
   total_rows: 13
+  inbox_exclusion_reason: null
+- source_id: takeda-1993-melt-activity
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/takeda-1993-melt-activity/SOURCE.md
+    - raw/takeda-1993-melt-activity/takeda-1993-melt-activity.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: takeda-nakazawa-yazawa-1980-ca-ferrite-slag-fulltext
   stage: inbox
@@ -43767,6 +43878,18 @@ sources:
     decided_by: inbox
     artefacts:
     - raw/wakita-schmitt-rey-1970-apollo11-elemental-abundances/wakita-schmitt-rey-1970-apollo11-elemental-abundances.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: waldmann-1959-thermophoresis
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/waldmann-1959-thermophoresis/SOURCE.md
+    - raw/waldmann-1959-thermophoresis/ZNA-1959-14a-0589.header.tei.xml
+    - raw/waldmann-1959-thermophoresis/waldmann-1959-thermophoresis.pdf
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
@@ -45950,6 +46073,17 @@ sources:
     - raw/yoo-2020-lower-hybrid-drift-waves-during-guide-fiel/SOURCE.md
     - raw/yoo-2020-lower-hybrid-drift-waves-during-guide-fiel/grl61471-sup-0001-2020GL087192-SI.pdf
     - raw/yoo-2020-lower-hybrid-drift-waves-during-guide-fiel/yoo-2020-lower-hybrid-drift-waves-during-guide-fiel.pdf
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: yoshikawa-2004-melt-activity
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/yoshikawa-2004-melt-activity/SOURCE.md
+    - raw/yoshikawa-2004-melt-activity/yoshikawa-2004-melt-activity.pdf
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
