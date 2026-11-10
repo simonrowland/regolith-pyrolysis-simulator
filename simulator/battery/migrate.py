@@ -9362,6 +9362,8 @@ def _percent_named_fraction_field(
         if value is not None and published == value * Decimal("100"):
             return False
     unit = re.sub(r"\s+", " ", str(units or "").strip().lower())
+    if re.search(r"%\s+of\s+total\b", unit):
+        return False
     return bool(_PERCENT_FRACTION_UNIT_RE.search(unit))
 
 
