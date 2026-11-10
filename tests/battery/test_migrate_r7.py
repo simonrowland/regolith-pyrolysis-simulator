@@ -32,7 +32,8 @@ from simulator.battery.migrate import (
     wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import State
-from simulator.battery.score import rail_for_quantity
+from simulator.battery.compilation_tier import _iter_compilation_series_cells
+from simulator.battery.score import point_magnitude, rail_for_quantity
 from simulator.battery.validity import underdetermined_apparatus
 from tests.battery.test_migrate import (
     _copy_compilation_record,
@@ -774,6 +775,28 @@ def test_g1_compilation_columns_grid_and_multi_phase(tmp_path):
             formulas = {obs.identity.species.formula for obs in table1}
             assert "Al2O3" in formulas and "SiO2" in formulas
             continue
+        if record == "high-temperature-p253":
+            formed = _delta_fg_observations(result, family, record)
+            assert formed
+            assert all(
+                obs.value.kind is not ValueKind.UNAVAILABLE for obs in formed
+            )
+            assert any(
+                magnitude == Decimal("-591.8")
+                for obs in formed
+                for _temperature, magnitude in _landed_formation_points(obs)
+            )
+            assert all(
+                "awaiting the per-source compilation generator"
+                not in (obs.value.unavailable_reason or "")
+                for obs in formed
+            )
+            assert any(
+                obs.value.kind is ValueKind.SERIES
+                and "temperature grid" in (obs.identity.temperature_K.reason or "")
+                for obs in formed
+            )
+            continue
         obs = result.observations[f"{family}:{record}"]
         assert obs.value.kind is ValueKind.UNAVAILABLE
         reason = obs.value.unavailable_reason
@@ -786,9 +809,6 @@ def test_g1_compilation_columns_grid_and_multi_phase(tmp_path):
             assert obs.identity.quantity.is_unknown
         else:
             assert "temperature grid" in obs.identity.temperature_K.reason
-        if record == "high-temperature-p253":
-            assert quantity_token(obs.identity) is Quantity.DELTA_FG
-            assert "awaiting the per-source compilation generator" in reason
 
 
 @pytest.mark.parametrize(
@@ -813,16 +833,29 @@ def test_h1_compilation_units_preserve_every_printed_shape(
     record["units_as_published"] = units
     path.write_text(json.dumps(record), encoding="utf-8")
     result = migrate(root, write=False)
-    obs = result.observations[
-        "robie-hemingway-1995-usgs-b2131:high-temperature-p253"
+    formed = _delta_fg_observations(
+        result, "robie-hemingway-1995-usgs-b2131", "high-temperature-p253"
+    )
+    assert formed
+    points = [
+        point
+        for obs in formed
+        for point in _landed_formation_points(obs)
     ]
-    reason = obs.value.unavailable_reason or ""
-    if expected is None:
-        assert "unit as printed not stated" in reason
-        return
-    assert expected in reason
-    assert "unit as printed not stated" not in reason
-    assert ("not mapped to column formation_gibbs" in reason) is not mapped
+    # The formation column's printed figure, not a J-to-kJ rescaling.
+    assert (Decimal("298.15"), Decimal("-591.8")) in points
+    for obs in formed:
+        reason = obs.value.unavailable_reason or ""
+        assert "unit as printed not stated" not in reason
+        assert "not mapped to column formation_gibbs" not in reason
+    if mapped:
+        assert units["formation_gibbs"] == "kJ/mol"
+    elif isinstance(units, str) and expected:
+        # The multi-column line is still the record's printed units. It is
+        # not parsed as this column's unit, and it is not dropped.
+        assert expected in json.dumps(
+            json.loads(path.read_text())["units_as_published"]
+        )
 
 
 def test_h1_b2131_printed_unit_line_is_not_denied(tmp_path):
@@ -833,13 +866,128 @@ def test_h1_b2131_printed_unit_line_is_not_denied(tmp_path):
         "high-temperature-p253.json",
     )
     result = migrate(root, write=False)
-    obs = result.observations[
-        "robie-hemingway-1995-usgs-b2131:high-temperature-p253"
+    formed = _delta_fg_observations(
+        result, "robie-hemingway-1995-usgs-b2131", "high-temperature-p253"
+    )
+    assert formed
+    points = [
+        point
+        for obs in formed
+        for point in _landed_formation_points(obs)
     ]
-    reason = obs.value.unavailable_reason or ""
-    assert "J•mol-1·K-1" in reason
-    assert "unit as printed not stated" not in reason
-    assert "not mapped to column formation_gibbs" in reason
+    assert (Decimal("298.15"), Decimal("-591.8")) in points
+    for obs in formed:
+        reason = obs.value.unavailable_reason or ""
+        assert "unit as printed not stated" not in reason
+        assert "not mapped to column formation_gibbs" not in reason
+
+
+def _copy_named_compilation(root: Path, source_id: str, record_id: str) -> Path:
+    source = next(
+        (REPO_ROOT / "data/literature/compilations" / source_id).rglob(
+            record_id + ".json"
+        )
+    )
+    dest = root / source.relative_to(REPO_ROOT)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_bytes(source.read_bytes())
+    return dest
+
+
+def _delta_fg_observations(result, source_id: str, record_id: str):
+    prefix = f"{source_id}:{record_id}"
+    return [
+        obs
+        for oid, obs in result.observations.items()
+        if (oid == prefix or oid.startswith(prefix + ":"))
+        and quantity_token(obs.identity) is Quantity.DELTA_FG
+    ]
+
+
+def _landed_formation_points(obs):
+    """(printed T, magnitude) cells that clear the metric_domain point gate."""
+
+    landed = []
+    for cell in _iter_compilation_series_cells(obs):
+        magnitude = point_magnitude(cell.value)
+        temperature = cell.identity.temperature_K
+        if (
+            magnitude is None
+            or not isinstance(temperature, State)
+            or not temperature.is_value
+        ):
+            continue
+        landed.append((temperature.value, magnitude))
+    return landed
+
+
+def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
+    """Printed B2131 ΔfG cells clear metric_domain; unparsed cells stay refused.
+
+    Census groups 4 and 8 (reference-p005-02, reference-p005-01) and the
+    high-temperature-p078 mechanical proof. Group 14 (reference-p012-01)
+    has no parsed number and keeps refusing. The STD. STATE / formula-weight
+    line under a 298.15 K value is the printed uncertainty, not a second ΔfG.
+    """
+
+    source = "robie-hemingway-1995-usgs-b2131"
+    root = _write_min_tree(tmp_path)
+    for record in (
+        "reference-p005-01",
+        "reference-p005-02",
+        "reference-p011-01",
+        "reference-p012-01",
+        "high-temperature-p078",
+    ):
+        _copy_named_compilation(root, source, record)
+    result = migrate(root, write=False)
+
+    silver_ion = _delta_fg_observations(result, source, "reference-p005-02")
+    assert len(silver_ion) == 1
+    assert _landed_formation_points(silver_ion[0]) == [
+        (Decimal("298.15"), Decimal("77.1"))
+    ]
+    assert point_magnitude(silver_ion[0].value) == Decimal("77.1")
+    assert silver_ion[0].identity.species.phase.is_unknown
+
+    silver = _delta_fg_observations(result, source, "reference-p005-01")
+    assert len(silver) == 1
+    assert _landed_formation_points(silver[0]) == [
+        (Decimal("298.15"), Decimal("0.0"))
+    ]
+    phase = silver[0].identity.species.phase
+    assert phase.is_unknown
+    assert "REFERENCE STATE" in (phase.reason or "")
+    assert phase.value is not Phase.CR
+
+    calcium = _delta_fg_observations(result, source, "high-temperature-p078")
+    series = [_landed_formation_points(obs) for obs in calcium]
+    assert sorted(tuple(points) for points in series) == [
+        ((Decimal("300"), Decimal("0.0")), (Decimal("700"), Decimal("0.0"))),
+        ((Decimal("1100"), Decimal("0.0")),),
+        (
+            (Decimal("1115"), Decimal("0.0")),
+            (Decimal("1700"), Decimal("0.0")),
+        ),
+    ]
+    for points in series:
+        temperatures = {temperature for temperature, _magnitude in points}
+        assert Decimal("298.15") not in temperatures
+        assert not (
+            any(temperature <= Decimal("716") for temperature in temperatures)
+            and any(temperature > Decimal("716") for temperature in temperatures)
+        )
+
+    cubanite = _delta_fg_observations(result, source, "reference-p012-01")
+    assert len(cubanite) == 1
+    assert cubanite[0].value.kind is ValueKind.UNAVAILABLE
+    assert "no parsed numeric value" in (cubanite[0].value.unavailable_reason or "")
+    assert _landed_formation_points(cubanite[0]) == []
+
+    acanthite = _delta_fg_observations(result, source, "reference-p011-01")
+    assert len(acanthite) == 1
+    assert acanthite[0].value.kind is ValueKind.UNAVAILABLE
+    assert _landed_formation_points(acanthite[0]) == []
 
 
 @pytest.mark.parametrize(
