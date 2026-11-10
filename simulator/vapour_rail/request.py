@@ -528,8 +528,18 @@ def _formula_elements(formula: str | None) -> frozenset[str]:
 
 
 def _alpha_contract_available(alpha: Any) -> bool:
-    """True only when the shared parser proves an executable alpha value."""
+    """True only when an intrinsic executable alpha value is available.
 
+    A numerically populated broad proxy is still policy/no-data for inventory
+    flux admission: its value is not an intrinsic coefficient for this carrier.
+    """
+
+    if (
+        isinstance(alpha, Mapping)
+        and str(alpha.get("tag") or "").strip().lower()
+        == "broad_proxy_not_intrinsic"
+    ):
+        return False
     try:
         return parse_alpha_contract(alpha) is not None
     except AlphaSpecError:
@@ -2608,12 +2618,11 @@ def resolve_vapour_batch(
         if answer.is_flux_active
     )
     # Answerability is not activation authority. Pre-RG keeps the species set
-    # supplied by the typed effective-pressure seam, but only after refusal
+    # supplied by the typed effective-pressure source, but only after refusal
     # closure proves every *remaining debit claim* is catalog-eligible.
-    # Typed non-debiting answers (genuine PressureUpperBound /
-    # FluxDiagnosticUpperBound, ZeroByPhysics) demote the seam claim rather
-    # than hard-fail the batch.
-    # True refusals among claimed species still hard-fail construction.
+    # Typed non-debiting answers and a sole missing-alpha refusal demote that
+    # species from the debit set while preserving its channel outcome.
+    # Other true refusals among claimed species still hard-fail construction.
     # RG-1 may activate the full manifest/catalog union after its
     # activity-corrected value path lands.
     if flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_PRE_RG:
@@ -2622,8 +2631,18 @@ def resolve_vapour_batch(
             species_id
             for species_id in claimed
             if species_id in answers
-            and not answers[species_id].is_refused
-            and not answers[species_id].is_flux_active
+            and (
+                (
+                    not answers[species_id].is_refused
+                    and not answers[species_id].is_flux_active
+                )
+                or (
+                    answers[species_id].refusal_code
+                    == REFUSAL_MISSING_CHANNEL_CONTRACT
+                    and answers[species_id].extra.get("detail")
+                    == "channel contract incomplete: missing alpha"
+                )
+            )
         )
         required_debit_claims = claimed - demoted_non_debiting
         missing_effective = required_debit_claims - union_eligible

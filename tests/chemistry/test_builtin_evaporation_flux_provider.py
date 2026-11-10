@@ -10,10 +10,10 @@ Covers:
   payload.
 * Account filter: kernel filter scopes the provider's view to
   ``process.cleaned_melt`` only (defence in depth).
-* Shadow parity: across a multi-step simulation run on lunar + Mars +
+* Caller wiring: across a multi-step simulation run on lunar + Mars +
   asteroid feedstocks, the kernel dispatch agrees with the standalone
-  series-resistance reference species by species within 1e-9 kg/hr
-  (relative + absolute floor).
+  series-resistance reference fed from selected batch pressures, species by
+  species within 1e-9 kg/hr (relative + absolute floor).
 * Diagnostic only: ``transition`` is always ``None`` -- EVAPORATION_FLUX
   owns no ledger mutation (that belongs to EVAPORATION_TRANSITION, not
   yet migrated).
@@ -56,6 +56,12 @@ from simulator.state import (
     CampaignPhase,
     DecisionType,
 )
+from simulator.vapour_rail.batch import (
+    FluxRefusal,
+    PressureRefusal,
+    PressureValue,
+)
+from simulator.vapour_rail.request import REFUSAL_MISSING_CHANNEL_CONTRACT
 from tests.chemistry.conftest import _build_sim
 
 
@@ -165,6 +171,19 @@ def _series_resistance_reference_flux(
         if rate_kg_hr > 1e-12:
             flux[species] = rate_kg_hr
     return flux
+
+
+def _selected_runtime_pressures(batch) -> dict[str, float]:
+    """Reference the same typed runtime values consumed by the flux caller."""
+
+    return {
+        species_id: float(answer.selected_runtime_pressure.pa)
+        for species_id in batch.flux_active_species_ids
+        if isinstance(
+            (answer := batch.channels_by_species[species_id]).selected_runtime_pressure,
+            PressureValue,
+        )
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -366,10 +385,10 @@ def test_k_at_1650c_drives_flux_with_extrapolation_status(
 
     assert flux.species_kg_hr.get("K", 0.0) > 0.0
     answer = sim._last_vapour_batch.channel("K")
-    continuation_pa = answer.pressure.pa
+    selected_pa = answer.selected_runtime_pressure.pa
     seam_pa = effective_source.pressure_pa("K")
     assert seam_pa is not None and seam_pa > 0.0
-    assert seam_pa != pytest.approx(continuation_pa, rel=1.0e-6)
+    assert seam_pa != pytest.approx(selected_pa, rel=1.0e-6)
     assert answer.extra.get("out_of_range") is True
     assert answer.verdict_status == "status_bearing_non_authoritative"
     assert answer.certification_ceiling == "never"
@@ -384,17 +403,16 @@ def test_k_at_1650c_drives_flux_with_extrapolation_status(
     )
     overlay = sim._last_vapour_batch_flux_overlay
     assert overlay["selected_runtime_pa_by_species"]["K"] == pytest.approx(
-        seam_pa, rel=0.0, abs=0.0
+        selected_pa, rel=0.0, abs=0.0
     )
     assert (
         overlay["selected_pressure_source_by_species"]["K"]
-        == effective_source.source_id
+        == "vapour_batch_selected_runtime_pressure"
     )
     assert "K" in overlay["extrapolated_flux_species"]
-    assert "K" not in overlay["catalog_continuation_flux_species"]
     expected_flux = _series_resistance_reference_flux(
         sim,
-        {"K": seam_pa},
+        {"K": selected_pa},
     )
     assert flux.species_kg_hr["K"] == pytest.approx(expected_flux["K"])
     degraded = sim._degraded_path_engagement_summary()
@@ -1045,8 +1063,13 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
         "would be vacuous"
     )
 
-    reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     kernel_flux = dict(sim._calculate_evaporation(equilibrium).species_kg_hr)
+    batch = sim._last_vapour_batch
+    assert batch is not None
+    reference_flux = _series_resistance_reference_flux(
+        sim,
+        _selected_runtime_pressures(batch),
+    )
     refusals = sim._last_vapour_batch_report["refusals_by_species"]
     refused_reference_species = set(reference_flux) & set(refusals)
 
@@ -1054,32 +1077,19 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
         "series-resistance reference returned no flux -- the test "
         "fixture is not exercising the path it claims to cover"
     )
-    # b-314: MC-4A's numeric CrO2-family alpha rows are tier-2
-    # ``broad_proxy_not_intrinsic`` proxies, not measurements. The restored
-    # gate no longer lets them satisfy the measured-alpha requirement: with
-    # this fixture's explicit ``allow_unmeasured_alpha_fallback`` opt-in they
-    # take the marked alpha=1.0 prototype path (recorded in
-    # ``unmeasured_alpha_fallback_species``) instead of fluxing as measured —
-    # a declared deviation from the reference helper's tagged-proxy value, so
-    # they leave wiring parity. Parity continues for every measured species.
-    flux_diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
-    sc67_accounted = set(
-        flux_diagnostic.get("unmeasured_alpha_fallback_species", ())
-    ) | set(flux_diagnostic.get("missing_alpha") or ())
-    non_parity_species = set(reference_flux) & sc67_accounted
-    assert "CrO2" in non_parity_species, (
-        "the broad_proxy_not_intrinsic CrO2 row must not flux as measured; "
-        f"fallback="
-        f"{flux_diagnostic.get('unmeasured_alpha_fallback_species')} "
-        f"missing_alpha={flux_diagnostic.get('missing_alpha')}"
-    )
+    # b-114: a numeric broad proxy is not an intrinsic alpha. Preserve the
+    # channel refusal directly rather than inferring it from flux diagnostics.
+    cro2 = batch.channel("CrO2")
+    assert cro2.refusal_code == REFUSAL_MISSING_CHANNEL_CONTRACT
+    assert isinstance(cro2.pressure, PressureRefusal)
+    assert isinstance(cro2.selected_runtime_pressure, PressureRefusal)
+    assert isinstance(cro2.flux, FluxRefusal)
+    assert "missing alpha" in (cro2.extra.get("detail") or "")
+    assert "CrO2" not in batch.flux_active_species_ids
+    assert "CrO2" not in kernel_flux
     assert refused_reference_species == set()
     for species, legacy_value in reference_flux.items():
         if species in refused_reference_species:
-            continue
-        if species in non_parity_species:
-            # Accounted by the restored SC-67 surface (marked fallback or
-            # missing_alpha refusal), not by measured-alpha wiring.
             continue
         kernel_value = kernel_flux.get(species, 0.0)
         tol = max(
@@ -1091,12 +1101,11 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
             f"kg/hr kernel={kernel_value:.6g} kg/hr (tol={tol:.3g})"
         )
 
-    # An explicit prototype alpha can lift a proxy-only reference below its
-    # reporting floor into a positive runtime channel (AlO on this trajectory).
     extra_runtime_species = set(kernel_flux) - set(reference_flux)
-    assert extra_runtime_species <= set(
-        flux_diagnostic.get("unmeasured_alpha_fallback_species", ())
-    ), f"runtime species lack measured reference or explicit alpha fallback: {extra_runtime_species}"
+    assert extra_runtime_species == set(), (
+        f"runtime species lack selected-runtime reference values: "
+        f"{extra_runtime_species}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1187,9 +1196,14 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         if not vapor_pressures_Pa:
             continue
 
-        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
         kernel_flux = dict(
             sim._calculate_evaporation(equilibrium).species_kg_hr
+        )
+        batch = sim._last_vapour_batch
+        assert batch is not None
+        reference_flux = _series_resistance_reference_flux(
+            sim,
+            _selected_runtime_pressures(batch),
         )
         refusals = sim._last_vapour_batch_report["refusals_by_species"]
         refused_reference_species = set(reference_flux) & set(refusals)
@@ -1199,9 +1213,8 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         # stage0-only carriers can be refused before C0B begins. The C0B-only
         # reason check below applies only when that cleanup campaign is sampled;
         # the legacy math helper has no stage predicate, so typed refusals stay
-        # outside wiring parity in every campaign. MC-4A makes CrO2 executable,
-        # so at C0B it follows that typed predicate refusal rather than missing
-        # a channel contract.
+        # outside wiring parity in every campaign. CrO2 keeps a typed
+        # missing-alpha refusal; the C0B predicate can take precedence.
         for species in refused_reference_species:
             refusal = refusals[species]
             assert refusal["refusal_code"] == "inapplicable_by_declared_predicate"
@@ -1211,31 +1224,22 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
                     refusal["extra"]["detail"]
                 )
         refused_reference_species_seen.update(refused_reference_species)
-
-        # b-314: tier-2 ``broad_proxy_not_intrinsic`` rows no longer satisfy
-        # the measured-alpha requirement. With the fallback explicitly
-        # enabled for this fixture they take the marked alpha=1.0 prototype
-        # path (recorded in ``unmeasured_alpha_fallback_species``) — a
-        # declared deviation from the reference helper's tagged-proxy value,
-        # so they leave wiring parity rather than parrot it.
-        flux_diagnostic = (
-            getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
-        )
-        fallback_reference_species = set(reference_flux) & set(
-            flux_diagnostic.get("unmeasured_alpha_fallback_species", ())
-        )
-        missing_alpha_reference_species = set(reference_flux) & set(
-            flux_diagnostic.get("missing_alpha") or ()
-        )
-        non_parity_species = (
-            fallback_reference_species | missing_alpha_reference_species
-        )
-        proxy_accounted_species_seen.update(non_parity_species)
+        if "CrO2" in refusals:
+            cro2_refusal = refusals["CrO2"]
+            if cro2_refusal["refusal_code"] == REFUSAL_MISSING_CHANNEL_CONTRACT:
+                proxy_accounted_species_seen.add("CrO2")
+            if (
+                sampled_campaign is CampaignPhase.C0B
+                and cro2_refusal["refusal_code"]
+                == "inapplicable_by_declared_predicate"
+            ):
+                c0b_refused_reference_species_seen.add("CrO2")
+                assert "c0b_p_cleanup admits only P2O5-sourced carrier rules" in (
+                    cro2_refusal["extra"]["detail"]
+                )
 
         for species in set(reference_flux) | set(kernel_flux):
             if species in refused_reference_species:
-                continue
-            if species in non_parity_species:
                 continue
             legacy_value = float(reference_flux.get(species, 0.0))
             kernel_value = float(kernel_flux.get(species, 0.0))
@@ -1265,10 +1269,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
     assert steps > 0, f"smoke run for {feedstock_key} executed zero steps"
     if feedstock_key in {"lunar_mare_low_ti", "s_type_asteroid_silicate"}:
         assert "CrO2" in c0b_refused_reference_species_seen
-        # b-314: whenever CrO2 carries a flux pressure outside the C0b
-        # predicate refusal, it must be visibly accounted by the restored
-        # SC-67 surface (missing_alpha or the marked prototype fallback) —
-        # never evaporating on a bare proxy as if it were measured.
+        # Outside C0B, CrO2 is refused for its missing intrinsic alpha.
         assert "CrO2" in (
             refused_reference_species_seen | proxy_accounted_species_seen
         )

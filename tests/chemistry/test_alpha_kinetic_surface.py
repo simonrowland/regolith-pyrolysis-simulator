@@ -17,6 +17,7 @@ from simulator.evaporation import (
     _load_evaporation_alpha_by_species,
 )
 from simulator.vapour_rail.batch import (
+    FLUX_ACTIVATION_EPOCH_PRE_RG,
     FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
     FluxActivationContext,
     FluxRefusal,
@@ -25,7 +26,6 @@ from simulator.vapour_rail.batch import (
 from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
 from simulator.vapour_rail.instrumentation import (
     CONTROL_FLUX_PRESSURES_KEY,
-    EffectivePressureSource,
     flux_pressures_from_batch,
     serialize_vapour_answer,
 )
@@ -260,7 +260,13 @@ def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
 def test_cro2_composite_refuses_missing_activity_evidence() -> None:
     """An executable alpha does not replace the required melt activity."""
 
-    catalog = compile_vapour_rail_catalog(_vapor_pressure_data())
+    payload = _vapor_pressure_data()
+    alpha = payload["families"]["oxide_vapors_cro2_family"][
+        "vaporisation_coefficients"
+    ]["evaporation_alpha"]
+    alpha.pop("tag")
+    alpha["source"] = "synthetic intrinsic alpha for activity refusal test"
+    catalog = compile_vapour_rail_catalog(payload)
     batch = catalog.resolve_batch(
         {"process.cleaned_melt": {"Cr2O3": 1.0}},
         state={
@@ -282,11 +288,40 @@ def test_cro2_composite_refuses_missing_activity_evidence() -> None:
     assert "assemblage/potential evidence" in answer.pressure.detail
     assert "CrO2" not in batch.flux_active_species_ids
     assert serialize_vapour_answer(answer)["is_refused"] is True
-    flux_pressures, _ = flux_pressures_from_batch(
-        batch,
-        effective_pressure_source=EffectivePressureSource("test", {}),
-    )
+    flux_pressures, _ = flux_pressures_from_batch(batch)
     assert "CrO2" not in flux_pressures
+
+
+@pytest.mark.parametrize(
+    "epoch",
+    [FLUX_ACTIVATION_EPOCH_PRE_RG, FLUX_ACTIVATION_EPOCH_RG_MANIFEST],
+)
+def test_cro2_broad_proxy_alpha_is_a_typed_missing_alpha_refusal(epoch) -> None:
+    catalog = compile_vapour_rail_catalog(_vapor_pressure_data())
+    flux_activation_context = FluxActivationContext(
+        epoch=epoch,
+        effective_pressure_species_ids=(
+            {"CrO2"} if epoch == FLUX_ACTIVATION_EPOCH_PRE_RG else frozenset()
+        ),
+    )
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"Cr2O3": 1.0}},
+        state={
+            "temperature_K": 1800.0,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "fO2_bar": 1.0e-6,
+        },
+        flux_activation_context=flux_activation_context,
+    )
+
+    answer = batch.channel("CrO2")
+    assert answer.refusal_code == "missing_channel_contract"
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+    assert "alpha" in answer.pressure.detail
+    assert "CrO2" not in batch.flux_active_species_ids
 
 
 def test_sio_catalog_only_fixture_refuses_missing_evidence() -> None:
@@ -323,10 +358,7 @@ def test_sio_catalog_only_fixture_refuses_missing_evidence() -> None:
     assert "assemblage/potential evidence" in answer.pressure.detail
     assert "SiO" not in batch.flux_active_species_ids
     assert serialize_vapour_answer(answer)["is_refused"] is True
-    flux_pressures, _ = flux_pressures_from_batch(
-        batch,
-        effective_pressure_source=EffectivePressureSource("test", {}),
-    )
+    flux_pressures, _ = flux_pressures_from_batch(batch)
     assert "SiO" not in flux_pressures
 
 

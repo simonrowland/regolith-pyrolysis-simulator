@@ -77,7 +77,6 @@ from simulator.vapour_rail.request import (
     resolve_vapour_batch,
 )
 from simulator.vapour_rail.instrumentation import (
-    EffectivePressureSource,
     flux_pressures_from_batch,
     serialize_melt_activity_shadow,
     serialize_vapour_answer,
@@ -1326,37 +1325,18 @@ def test_out_of_domain_k_at_1650c_is_flux_eligible_but_non_authoritative() -> No
     assert answer.verdict_status == "status_bearing_non_authoritative"
     assert answer.certification_ceiling == "never"
 
-    seam_pa = float(answer.pressure.pa) / 10.0
-    flux_pressures, overlay = flux_pressures_from_batch(
-        batch,
-        effective_pressure_source=EffectivePressureSource(
-            "populated_pre_rg_seam",
-            {"K": seam_pa},
-        ),
-    )
-    assert overlay["missing_effective_pressure_species"] == []
-    assert flux_pressures["K"] == pytest.approx(seam_pa, rel=0.0, abs=0.0)
+    selected_pa = float(answer.selected_runtime_pressure.pa)
+    flux_pressures, overlay = flux_pressures_from_batch(batch)
+    assert flux_pressures["K"] == pytest.approx(selected_pa, rel=0.0, abs=0.0)
     assert (
         overlay["selected_pressure_source_by_species"]["K"]
-        == "populated_pre_rg_seam"
+        == "vapour_batch_selected_runtime_pressure"
     )
-    assert overlay["catalog_continuation_flux_species"] == []
     assert overlay["extrapolated_flux_species"] == ["K"]
 
-    fallback_flux_pressures, fallback_overlay = flux_pressures_from_batch(
-        batch,
-        effective_pressure_source=EffectivePressureSource(
-            "empty_pre_rg_seam",
-            {},
-        ),
+    assert overlay["selected_runtime_pa_by_species"]["K"] == pytest.approx(
+        selected_pa
     )
-    assert fallback_overlay["missing_effective_pressure_species"] == ["K"]
-    assert fallback_flux_pressures["K"] == pytest.approx(answer.pressure.pa)
-    assert (
-        fallback_overlay["selected_pressure_source_by_species"]["K"]
-        == "vapour_batch_catalog_continuation"
-    )
-    assert fallback_overlay["catalog_continuation_flux_species"] == ["K"]
 
     pre_rg = catalog.resolve_batch(
         ledger,

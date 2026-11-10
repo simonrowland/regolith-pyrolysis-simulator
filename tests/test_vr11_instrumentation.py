@@ -43,7 +43,6 @@ from simulator.vapour_rail.instrumentation import (
     CompatibilityPressureMapReadTripwire,
     CONTROL_FLUX_PRESSURES_KEY,
     EFFECTIVE_PRESSURE_SOURCE_CONTEXT,
-    EffectivePressureSource,
     FLUX_CONSUMER_RELPATHS,
     SETPOINTS_T_COND_AUDIT,
     SHADOW_MISMATCH,
@@ -725,24 +724,10 @@ def _flux_with_live_shadow(
     batch: VapourBatch | None,
     live: dict[str, float],
     *,
-    effective: dict[str, float] | None = None,
     resolution_error: dict[str, Any] | None = None,
 ) -> tuple[dict[str, float], dict[str, Any]]:
-    source_values = (
-        {
-            species_id: live[species_id]
-            for species_id in batch.flux_active_species_ids
-            if species_id in live
-        }
-        if effective is None and batch is not None
-        else dict(effective or {})
-    )
     flux, report = flux_pressures_from_batch(
         batch,
-        effective_pressure_source=EffectivePressureSource(
-            "test_effective_pressure_source",
-            source_values,
-        ),
         resolution_error=resolution_error,
     )
     report.update(
@@ -757,41 +742,51 @@ def _flux_with_live_shadow(
 
 
 def test_flux_pressures_from_batch_channel_unions() -> None:
-    """Batch gates channels while the typed source supplies effective Pa."""
+    """Batch channel selection and selected runtime Pa reach the flux path."""
 
     live = {"Na": 12.5, "SiO": 3.0, "Fe": 0.0}
-    selected = {"Na": 9.0, "SiO": 2.0, "Fe": 0.0}
+    selected_runtime = {"Na": 999.0, "SiO": 999.0, "Fe": 999.0}
     batch = _toy_batch(
         {"Na", "SiO", "Fe", "K"},
         pressures={"Na": 1.0, "SiO": 1.0, "Fe": 1.0, "K": 0.5},
-        selected_runtime_pressures={"Na": 999.0, "SiO": 999.0, "Fe": 999.0},
+        selected_runtime_pressures=selected_runtime,
         flux_active=set(live),
     )
-    flux, report = _flux_with_live_shadow(batch, live, effective=selected)
-    assert flux == selected
+    flux, report = _flux_with_live_shadow(
+        batch,
+        live,
+    )
+    assert flux == selected_runtime
     # Batch-only answerable channel is dormant in the pre-RG epoch.
     assert "K" not in flux
     assert report["batch_pa_by_species"]["K"] == 0.5
     assert report["batch_flux_active_not_in_live"] == []
-    assert report["selection_source"] == "test_effective_pressure_source"
+    assert report["selection_source"] == "vapour_batch_selected_runtime_pressure"
     assert report["batch_pa_by_species"]["Na"] == 1.0
-    assert report["selected_runtime_pa_by_species"]["Na"] == 9.0
+    assert report["selected_runtime_pa_by_species"]["Na"] == 999.0
     assert report["shadow_equal"] is False
     assert report["shadow_outcome"] == SHADOW_MISMATCH
     assert report["catalog_pa_shadow_equal"] is False
 
 
-def test_in_domain_effective_pressure_set_mismatch_fails_closed() -> None:
-    batch = _toy_batch({"Na"}, pressures={"Na": 1.0})
+def test_invalid_selected_runtime_pressure_fails_closed() -> None:
+    answer = replace(
+        _toy_answer("Na"),
+        selected_runtime_pressure=PressureRefusal(
+            code="test_missing_runtime_pressure",
+            detail="selected runtime pressure is unavailable",
+        ),
+    )
+    batch = VapourBatch(
+        requested_species_ids=frozenset({"Na"}),
+        channels_by_species={"Na": answer},
+        flux_active_species_ids=frozenset({"Na"}),
+    )
 
-    flux, report = _flux_with_live_shadow(batch, {"Na": 12.5}, effective={})
+    flux, report = _flux_with_live_shadow(batch, {"Na": 12.5})
 
     assert flux == {}
-    assert report["selection_source"] == (
-        "typed_failure_effective_pressure_species_set_mismatch"
-    )
-    assert report["missing_effective_pressure_species"] == ["Na"]
-    assert report["catalog_continuation_flux_species"] == []
+    assert report["batch_channel_states"]["Na"] == "refusal"
 
 
 def test_flux_pressures_proved_when_legacy_and_batch_agree() -> None:
@@ -1025,6 +1020,12 @@ def test_source_guard_no_flux_consumer_iterates_compatibility_maps() -> None:
         relpath: (ROOT / relpath).read_text(encoding="utf-8")
         for relpath in FLUX_CONSUMER_RELPATHS
     }
+    assert {
+        "engines/builtin/evaporation_flux.py",
+        "simulator/evaporation.py",
+        "simulator/vapour_rail/instrumentation.py",
+        "simulator/vapour_rail/request.py",
+    } <= set(FLUX_CONSUMER_RELPATHS)
     assert_no_flux_consumer_iterates_compatibility_maps(sources)
     kernel = sources["engines/builtin/evaporation_flux.py"]
     assert "vapour_batch_flux_pressures_Pa" in kernel
@@ -1040,6 +1041,17 @@ def test_source_guard_flags_live_map_argument_on_batch_flux_consumer() -> None:
     bad = (
         "def flux_pressures_from_batch_and_live(batch, live_pressures_Pa):\n"
         "    return {sid: live_pressures_Pa[sid] for sid in batch}\n"
+    )
+    with pytest.raises(AssertionError, match="compatibility pressure argument"):
+        assert_no_flux_consumer_iterates_compatibility_maps(
+            {"simulator/vapour_rail/instrumentation.py": bad}
+        )
+
+
+def test_source_guard_flags_effective_pressure_source_argument() -> None:
+    bad = (
+        "def flux_pressures_from_batch(batch, *, effective_pressure_source):\n"
+        "    return effective_pressure_source.pressure_pa('Na')\n"
     )
     with pytest.raises(AssertionError, match="compatibility pressure argument"):
         assert_no_flux_consumer_iterates_compatibility_maps(
@@ -1142,7 +1154,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
     assert {context for context, _operation in backend_shadow.reads} == {
         "shadow_comparison"
     }
-    assert captured_controls[CONTROL_FLUX_PRESSURES_KEY] == {"Na": 999.0}
+    assert captured_controls[CONTROL_FLUX_PRESSURES_KEY] == {"Na": 1.0}
     assert (
         captured["flux_activation_context"].effective_pressure_species_ids
         == frozenset({"Na"})
@@ -1266,7 +1278,7 @@ def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
         },
     )
     assert controls[CONTROL_FLUX_PRESSURES_KEY] == {"Na": 5.0}
-    # Reporting keeps live; the typed seam supplied the already batch-gated key.
+    # Reporting keeps the live projection; the batch supplied the debit key.
     assert controls["vapor_pressures_Pa"] == {"Na": 5.0}
     assert controls["vapour_batch_flux_shadow_equal"] is True
     assert controls["vapour_batch_flux_shadow_outcome"] == SHADOW_PROVED

@@ -1294,9 +1294,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else vapor_pressures
         )
         # VR-6/VR-11: compile request rules with the U0 manifest. Evaporation
-        # consumes VapourBatch for channel/refusal/set authority; the typed
-        # pre-RG seam supplies equilibrium-backend effective pressure values
-        # until t-499's activity-corrected catalog evaluator lands.
+        # consumes VapourBatch answers for channel/refusal/set authority and
+        # selected runtime pressure values; the typed pre-RG source supplies
+        # activation membership until the RG-1 set cutover is authorized.
         self.vapour_rail_catalog = (
             compile_vapour_rail_catalog(self.vapor_pressure_catalog_data)
             if self.vapor_pressure_catalog_data.get("schema_version") == 2

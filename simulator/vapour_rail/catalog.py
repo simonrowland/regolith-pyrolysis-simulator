@@ -1766,7 +1766,7 @@ class VapourRailCatalog:
             if "selected_runtime_pressures_Pa" in state:
                 raise ValueError(
                     "selected_runtime_pressures_Pa is not catalog resolve state; "
-                    "pre-RG values cross only the typed flux seam"
+                    "selected runtime values are produced by batch evaluation"
                 )
             resolve_state = VapourResolveState(
                 temperature_K=state.get("temperature_K"),

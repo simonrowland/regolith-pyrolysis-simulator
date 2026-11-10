@@ -718,8 +718,8 @@ def test_flux_activity_operands_retain_every_pressure_carrier(temperature_K):
     assert operands != equilibrium.activity_coefficients
 
 
-def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
-    """RG-1 gateway: catalog P_eff class without a flux-value cutover.
+def test_catalog_probe_and_flux_use_selected_runtime_pressure():
+    """The selected runtime pressure in each answer reaches the flux map.
 
     Each species' band is derived from its verifier-probed effective-vs-pure
     separation so every pure-component reversion is independently red.
@@ -929,25 +929,23 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             pytest.approx(expected_pa, rel=0.0, abs=0.0)
         )
 
-    # Golden-neutral cutover guard: batch channels own eligibility, but the
-    # numeric operand still comes from the typed equilibrium-backend seam.
-    flux_pressures, flux_report = flux_pressures_from_batch(
-        batch,
-        effective_pressure_source=effective_source,
-    )
+    # Flux consumes the selected runtime value already carried by each answer.
+    flux_pressures, flux_report = flux_pressures_from_batch(batch)
     assert flux_report["selection_source"] == (
-        "equilibrium_backend_effective_pressure_pre_rg"
+        "vapour_batch_selected_runtime_pressure"
     )
     for species_id in verifier_probe_pa:
         assert flux_pressures[species_id] == pytest.approx(
-            effective_source.pressure_pa(species_id), rel=0.0, abs=0.0
+            batch.channel(species_id).selected_runtime_pressure.pa,
+            rel=0.0,
+            abs=0.0,
         )
         assert flux_report["selected_pressure_source_by_species"][species_id] == (
-            effective_source.source_id
+            "vapour_batch_selected_runtime_pressure"
         )
     # b-145: TiO/TiO2_gas status-bearing OOR flux-eligible. b-136 posture
     # rework keeps them live via Hertz-Knudsen ideal α=1.0 upper bound after
-    # Zhang cascade proxy withdrawal (refuse would zero Ti flux and negate
+    # Zhang cascade proxy withdrawal (refusal would zero Ti flux and negate
     # the observable effect of the b-145 pressure fix).
     for species_id in ("TiO", "TiO2_gas"):
         answer = batch.channel(species_id)
@@ -958,18 +956,18 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         assert answer.extra.get("acquisition_flag")
         assert answer.verdict_status == "status_bearing_non_authoritative"
         assert answer.certification_ceiling == "never"
-        seam_pa = effective_source.pressure_pa(species_id)
-        assert seam_pa is not None and math.isfinite(seam_pa) and seam_pa > 0.0
         assert flux_pressures[species_id] == pytest.approx(
-            seam_pa, rel=0.0, abs=0.0
+            answer.selected_runtime_pressure.pa, rel=0.0, abs=0.0
         )
         assert species_id in flux_report["extrapolated_flux_species"]
         assert flux_report["selected_pressure_source_by_species"][species_id] == (
-            effective_source.source_id
+            "vapour_batch_selected_runtime_pressure"
         )
     assert batch.channel("K").extra.get("out_of_range") is True
-    assert flux_pressures["K"] != pytest.approx(
-        batch.channel("K").pressure.pa, rel=1.0e-6
+    assert flux_pressures["K"] == pytest.approx(
+        batch.channel("K").selected_runtime_pressure.pa,
+        rel=0.0,
+        abs=0.0,
     )
     assert "K" in flux_report["extrapolated_flux_species"]
 
@@ -1030,7 +1028,8 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     snapshot = sim.step()
     # d-252's 1 mbar Ar cover and 200 C/h ramp move this first step from
     # 1600 C to 1400 C. The old hard-vacuum step was 1.39e6% over transport
-    # capacity; the new Ar-film diffusion-limited value is 2.47%.
+    # capacity; b-114 selected runtime pressures raise this step's saturation
+    # to 3.6895%.
     # Physics seq 1003 classifies Ti below the 1e-12 kg/hr negligibility
     # threshold here, so it is absent from snapshot flux/status and is a
     # legitimate no-flux carrier for this pin.
@@ -1038,9 +1037,14 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # Re-pinned 2026-10-25 under d-252 from the studio-2 setup.
+    # b-114 moves this first-step aggregate through the selected batch values.
+    # Fe now contributes 0.0749965086426351 kg/hr; the other species together
+    # contribute 0.06364158399850756 kg/hr, close to the former total.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.06423670196107581, rel=1e-12, abs=1e-12
+        0.13863809264114266, rel=1e-12, abs=1e-12
+    )
+    assert snapshot.evap_flux.species_kg_hr["Fe"] == pytest.approx(
+        0.0749965086426351, rel=1e-12, abs=1e-12
     )
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
@@ -1057,6 +1061,13 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     assert snapshot.overhead.initial_throat_area_m2 == pytest.approx(
         sim._equipment.pipe.initial_throat_area_m2
     )
+    alpha_refusals = sim._last_vapour_batch_report["refusals_by_species"]
+    for species in ("AlO", "CrO"):
+        refusal = alpha_refusals[species]
+        assert refusal["refusal_code"] == "missing_channel_contract"
+        assert refusal["extra"].get("detail") == (
+            "channel contract incomplete: missing alpha"
+        )
 
     assert tuple(
         pins[key]
@@ -1068,15 +1079,13 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # Re-pinned 2026-10-25 under d-252: the 1 mbar Ar cover and 200 C/h
-        # ramp move the first step from 1600 C to 1400 C. The old hard-vacuum
-        # step was 1.39e6% over transport capacity; the new value is 2.47%.
+        # b-114 selected runtime values raise Fe evaporation in this C0 step.
         (
             1,
             1400.0,
-            0.06423670196107581,
-            2.4701307994323103,
-            998.7072055554551,
+            0.13863809264114266,
+            3.689528113675295,
+            998.6328042986327,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -1098,11 +1107,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "condense_Na",
         "evaporate_K",
         "condense_K",
-        "evaporate_AlO",
         "evaporate_Ca",
         "evaporate_CaO_gas",
         "evaporate_Cr",
-        "evaporate_CrO",
         "evaporate_K2",
         "evaporate_K2O_gas",
         "evaporate_MgO_gas",
@@ -1151,8 +1158,8 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
     snapshot = sim.step()
 
     # Default-off skips the optional shadow. This step still hits the
-    # mandatory C0 pipe cap: one estimate is over capacity, and the
-    # admitted release matches that estimate within the flux floor.
+    # mandatory C0 pipe cap: one estimate is over capacity, and the admitted
+    # release is pinned at its measured 2.932e-12 kg/hr residual below capacity.
     binding = [
         call
         for call in transport_calls
@@ -1178,7 +1185,15 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
         for species, rate in snapshot.evap_flux.species_kg_hr.items()
         if float(rate) > 0.0
     }
-    assert abs(released_kg_hr - capacity_kg_hr) <= _NONTRIVIAL_FLUX_KG_HR
+    # Selected runtime pressures move the constrained release slightly below
+    # capacity: 0.0002646937535894336 - 0.00026469375065717025 =
+    # 2.93226337335e-12 kg/hr. Pin the resulting value and bound that residual.
+    assert released_kg_hr == pytest.approx(
+        0.00026469375065717025,
+        rel=1e-12,
+        abs=1e-15,
+    )
+    assert 0.0 <= capacity_kg_hr - released_kg_hr <= 3.0e-12
     assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
 
     def _committed_vapor_kg(species: str) -> float:
@@ -1220,9 +1235,9 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
     assert sim._subsolidus_pending_release is None
     assert snapshot.mass_balance_error_pct <= 5.0e-12
     assert snapshot.overhead.transport_saturation_pct == pytest.approx(
-        100.0,
-        rel=0.0,
-        abs=100.0 * _NONTRIVIAL_FLUX_KG_HR / capacity_kg_hr,
+        99.99999938874974,
+        rel=1e-12,
+        abs=1e-12,
     )
     assert snapshot.hour == 1
 
@@ -1349,6 +1364,7 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
     assert na_collector["Mg"] > 0.0
     assert k_trap["K"] > 0.0
     offgas = sim.atom_ledger.project_account_kg("terminal.offgas")
+    refusals = sim._last_vapour_batch_report["refusals_by_species"]
     for species in (
         "Al2O",
         "AlO",
@@ -1359,7 +1375,14 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
         "TiO",
         "TiO2_gas",
     ):
-        assert offgas.get(species, 0.0) > 0.0, species
+        if offgas.get(species, 0.0) > 0.0:
+            continue
+        refusal = refusals.get(species)
+        assert refusal is not None, species
+        assert refusal["refusal_code"] == "missing_channel_contract", species
+        assert refusal["extra"].get("detail") == (
+            "channel contract incomplete: missing alpha"
+        ), species
 
 
 def test_unscaled_c0_commits_reversible_si_condensation():
@@ -1477,10 +1500,7 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
         temperature_K=sim.melt.temperature_C + 273.15,
         effective_pressure_source=effective_pressure_source,
     )
-    batch_pressures, batch_overlay = flux_pressures_from_batch(
-        vapour_batch,
-        effective_pressure_source=effective_pressure_source,
-    )
+    batch_pressures, batch_overlay = flux_pressures_from_batch(vapour_batch)
     batch_overlay.update(
         compare_live_shadow_to_batch_flux(
             batch=vapour_batch,

@@ -153,8 +153,8 @@ CERTIFICATION_CEILING_NEVER = "never"
 class VapourAnswer:
     """One exact-key channel answer for a requested gas species.
 
-    ``selected_runtime_pressure`` remains catalog-side serialized metadata;
-    pre-RG flux values come from the separately typed effective-pressure seam.
+    ``selected_runtime_pressure`` is the selected value consumed by the flux
+    path after this answer's pressure and flux outcomes authorize a debit.
     """
 
     species_id: str

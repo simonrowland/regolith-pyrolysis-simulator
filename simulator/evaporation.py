@@ -698,17 +698,18 @@ def _pre_rg_effective_pressure_source(
     vapor_pressure_data: dict,
     equilibrium: Any,
 ) -> EffectivePressureSource:
-    """Return the sole typed pre-RG handoff for flux-driving pressure values.
+    """Return the typed pre-RG source for flux activation membership.
 
     The catalog can now evaluate activity-corrected ``P_eff`` for melt species,
-    but VR-13/RG-1 has not authorized a flux-value cutover. The verifier's
-    1873.15 K baseline exposed the former pure/reference-vs-effective gap:
+    and VapourBatch answers carry the pressure consumed by the flux path. This
+    source retains the pre-RG active species set and legacy shadow evidence.
+    The verifier's 1873.15 K baseline exposed the former pure/reference-vs-effective gap:
     Ca 8.35e5/4.6e-9 Pa, Mg 6.87e5/7.3e-3 Pa, K 4.51e6/0.469 Pa, and
     Al 110.2/1.4e-8 Pa. This factory therefore remains the sole pre-RG handoff
-    and continues to return equilibrium-backend effective pressures.
+    for deriving the active set from equilibrium-backend effective pressures.
 
-    TODO(VR-13 / RG-1): switch this one factory only after owner authorization
-    and the remaining DESIGN-REV5 §7.4 cutover preconditions are green.
+    TODO(VR-13 / RG-1): remove this compatibility projection after the
+    remaining DESIGN-REV5 §7.4 cutover preconditions are green.
     """
 
     effective_pressures = _legacy_evaporation_shadow_pressure_map(
@@ -808,7 +809,6 @@ class EvaporationMixin:
         )
         vapor_pressures, flux_overlay_report = flux_pressures_from_batch(
             vapour_batch,
-            effective_pressure_source=effective_pressure_source,
             resolution_error=resolve_error or None,
         )
         flux_overlay_report.update(
@@ -924,8 +924,8 @@ class EvaporationMixin:
             self._last_imcc_activity_shadow = {}
             return flux
 
-        # VR-11: batch owns channel refusal, eligibility, and active membership.
-        # Pre-RG effective values cross only the named typed seam below.
+        # VR-11: batch owns channel refusal, eligibility, active membership,
+        # and selected runtime values. The pre-RG source sets active membership.
         (
             vapor_pressures,
             flux_overlay_report,
@@ -1065,10 +1065,10 @@ class EvaporationMixin:
                 effective_pressure_source.physical_zero_reason is not None
                 and flux_overlay_report.get('batch_pa_by_species')
             ):
-                # The typed pre-RG seam proves its own below-threshold zero,
-                # while the batch proves catalog pressure coverage. A refused
-                # or missing catalog channel still reaches fail-closed handling
-                # below (kernel_ok_empty split remains intact).
+                # The typed pre-RG source proves this below-threshold physical
+                # zero, while the batch proves catalog coverage. Resolution
+                # errors were refused above; a refused or missing channel still
+                # reaches fail-closed handling below.
                 return flux
             vapor_pressure_diagnostic = dict(
                 getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
@@ -3832,7 +3832,7 @@ class EvaporationMixin:
         carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
         carrier_gas = carrier_resolver() if callable(carrier_resolver) else 'N2'
         controls: dict[str, Any] = {
-            # Batch-gated flux map; pre-RG values came through the typed seam.
+            # Batch-gated flux map from each answer's selected runtime value.
             CONTROL_FLUX_PRESSURES_KEY: vapor_pressures,
             # Reporting / shadow projection only — kernel must NOT read this
             # for flux (source guard). Distinct from the batch flux map so a

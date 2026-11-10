@@ -8,8 +8,8 @@ Acceptance (DECOMPOSITION VR-12 / DESIGN-REV5 §7.2 U5 / §1.1):
   FAIL (``ok=False``). Open acquisition debt is enumerated explicitly and is
   never soft-passed as coverage-ok.
 - At ``1e-9 mol/species`` inventory significance, legacy and catalog paths match
-  request activation (inventory parents → request gases), live pressures/ranges
-  **via the typed pre-RG seam**, source provenance, activity verdicts,
+  request activation (inventory parents → request gases), selected batch
+  pressures/ranges, source provenance, activity verdicts,
   condensation routing, ledger proposals, mass closure, and O2 outlet
   separation across lunar + Mars + asteroid + one carbonaceous feedstock.
 - Mismatches block activation; they are never hidden by golden edits.
@@ -18,10 +18,8 @@ Acceptance (DECOMPOSITION VR-12 / DESIGN-REV5 §7.2 U5 / §1.1):
 
 Post-decomposition reality (0de9c6d / t-499 / RG-1 precondition):
 
-- Flux **values** come from the equilibrium-backend effective-pressure seam
-  until activity-corrected catalog ``P_eff`` lands. The parity gate therefore
-  compares batch **eligibility / refusal / set** authority plus seam values —
-  **not** catalog-evaluated pure-component ``P_sat`` numbers.
+- Flux **values** come from each batch answer's selected runtime pressure. The
+  pre-RG source retains activation-set and independent shadow authority.
 - CI doctrine: no bare laptop golden pins. This suite is structural / mol-native / shadow-proved; it does
   not commit engine-routed numeric fixtures.
 """
@@ -75,11 +73,16 @@ from simulator.vapour_rail.instrumentation import (
     CONTROL_FLUX_PRESSURES_KEY,
     FLUX_CONSUMER_RELPATHS,
     SHADOW_PROVED,
+    SHADOW_REFUSED_VS_LIVE,
     assert_no_flux_consumer_iterates_compatibility_maps,
     compare_live_shadow_to_batch_flux,
     flux_pressures_from_batch,
 )
-from simulator.vapour_rail.request import _INVENTORY_EPSILON, build_request
+from simulator.vapour_rail.request import (
+    REFUSAL_MISSING_CHANNEL_CONTRACT,
+    _INVENTORY_EPSILON,
+    build_request,
+)
 from simulator.vapour_rail.u0_manifest import FEEDSTOCK_DELTA_IDS, load_u0_manifest
 
 
@@ -565,11 +568,8 @@ def _parity_surface(sim: PyrolysisSimulator) -> dict[str, Any]:
     assert batch is not None
     assert isinstance(batch, VapourBatch)
 
-    flux_pressures, flux_report = flux_pressures_from_batch(
-        batch, effective_pressure_source=effective
-    )
-    # Independent legacy shadow projection = alpha-gated finite seam map
-    # (same source the production shadow uses — not catalog P_sat).
+    flux_pressures, flux_report = flux_pressures_from_batch(batch)
+    # Independent legacy shadow projection = alpha-gated finite seam map.
     live_seam = {
         sid: float(effective.pressure_pa(sid) or 0.0)
         for sid in effective.species_ids
@@ -1067,12 +1067,12 @@ def test_pending_validation_rows_select_evaluator_not_retention(
     FEEDSTOCK_MATRIX,
     ids=[body for _, body in FEEDSTOCK_MATRIX],
 )
-def test_cross_feedstock_request_activation_and_seam_parity(
+def test_cross_feedstock_request_activation_and_selected_runtime(
     feedstock_id: str,
     body_class: str,
     parent_to_gas_ids: dict[str, frozenset[str]],
 ) -> None:
-    """Legacy seam vs catalog batch: activation, eligibility, seam Pa match.
+    """Cross-feedstock request activation and selected pressure contract.
 
     Compares at >=1e-9 mol inventory significance. Catalog ``P_sat`` is
     deliberately **not** required to equal seam ``P_eff`` (t-499 / RG-1).
@@ -1098,7 +1098,7 @@ def test_cross_feedstock_request_activation_and_seam_parity(
     )
     assert rebuilt == surface["requested_species_ids"]
 
-    # Pre-RG flux-active set ⊆ effective seam species ∩ eligible answers.
+    # Pre-RG flux-active set ⊆ effective-source species ∩ eligible answers.
     assert surface["flux_active_species_ids"] <= surface["effective_species_ids"]
     # Hot matrix must exercise a non-empty flux set (empty-vs-empty is vacuous).
     assert surface["flux_active_species_ids"], (
@@ -1110,13 +1110,20 @@ def test_cross_feedstock_request_activation_and_seam_parity(
         assert isinstance(answer.pressure, PressureValue)
         assert isinstance(answer.flux, FluxEligible)
 
-    # Shadow proof: seam live == batch-gated seam values.
+    # Refusals make the independent live shadow disagree by design. Every
+    # claimed live species removed from flux must carry the missing-alpha
+    # refusal; it cannot be restored from the compatibility map.
     shadow = surface["shadow"]
-    assert shadow["shadow_equal"] is True, (
-        f"{feedstock_id}: seam/batch shadow mismatch blocks activation: "
-        f"{shadow}"
-    )
-    assert shadow["shadow_outcome"] == SHADOW_PROVED
+    refused_live_species = shadow["batch_refused_live_species"]
+    assert refused_live_species
+    assert shadow["shadow_equal"] is False
+    assert shadow["shadow_outcome"] == SHADOW_REFUSED_VS_LIVE
+    for sid in refused_live_species:
+        answer = batch.channel(sid)
+        assert answer.refusal_code == REFUSAL_MISSING_CHANNEL_CONTRACT
+        assert answer.extra.get("detail") == (
+            "channel contract incomplete: missing alpha"
+        )
     assert surface["effective_source_id"] == (
         "equilibrium_backend_effective_pressure_pre_rg"
     )
@@ -1127,15 +1134,23 @@ def test_cross_feedstock_request_activation_and_seam_parity(
     assert "catalog_pa_shadow_equal" in shadow
     # Do not assert True — that would re-introduce the forbidden metric.
 
-    # Per-species seam Pa equality within shadow tolerances.
+    # Debit values are each answer's selected runtime pressure, independent of
+    # the compatibility map retained for activation and shadow reporting.
     for sid, pa in surface["flux_pressures_Pa"].items():
-        live = surface["live_seam_Pa"][sid]
-        assert math.isclose(pa, live, rel_tol=1.0e-9, abs_tol=1.0e-12), (
-            f"{feedstock_id}/{sid}: batch seam Pa {pa} != live seam {live}"
+        answer = batch.channel(sid)
+        assert isinstance(answer.selected_runtime_pressure, PressureValue)
+        assert math.isclose(
+            pa,
+            answer.selected_runtime_pressure.pa,
+            rel_tol=0.0,
+            abs_tol=0.0,
+        ), (
+            f"{feedstock_id}/{sid}: debit Pa {pa} != selected batch Pa "
+            f"{answer.selected_runtime_pressure.pa}"
         )
         assert surface["flux_report"][
             "selected_pressure_source_by_species"
-        ][sid] == surface["effective_source_id"]
+        ][sid] == "vapour_batch_selected_runtime_pressure"
 
     # Provenance / verdict ceilings on every requested channel (SC-50 consumers).
     for sid, ch in surface["channel_surface"].items():
