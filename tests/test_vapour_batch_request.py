@@ -780,6 +780,59 @@ def test_d359_p_carrier_uses_phase_independent_k_in_c2_hot_train() -> None:
     assert "phase-independent K" in answer.extra["d359_prediction"]["reason"]
 
 
+def test_d359_p_carriers_use_real_ladder_and_are_flux_active() -> None:
+    species_ids = ("PO", "PO2", "P4O6", "P4O10")
+    payload = _yaml("vapor_pressures.yaml")
+    catalog = compile_vapour_rail_catalog(
+        payload, u0_manifest=load_u0_manifest()
+    )
+    state = VapourResolveState(
+        temperature_K=1800.0,
+        process_phase="hot_train",
+        stage="evaporation",
+        fO2_bar=1.0e-8,
+        source_reaction_fO2_bar=1.0e-8,
+    )
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"P2O5": 1.0}},
+        state,
+        caller_species_filter=species_ids,
+        flux_activation_context=_pre_rg_activation_context(*species_ids),
+    )
+    rows_by_species = {
+        species_id: species
+        for family in payload["families"].values()
+        for species_id, species in family["physical_properties"]["species"].items()
+        if species_id in species_ids
+    }
+
+    assert batch.flux_active_species_ids == frozenset(species_ids)
+    for species_id in species_ids:
+        answer = batch.channel(species_id)
+        assert isinstance(answer.pressure, PressureValue)
+        assert math.isfinite(answer.pressure.pa) and answer.pressure.pa > 0.0
+        assert isinstance(answer.flux, FluxEligible)
+        assert answer.is_flux_active
+        activity = answer.source_reaction_activity
+        assert activity is not None
+        assert activity.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+        assert activity.provider in {"published_gamma", "ideal_mixing"}
+        prediction = answer.extra["d359_prediction"]
+        assert prediction["category"] == 3
+        assert prediction["kind"] == "predict_and_flag"
+        assert prediction["pending_follow_ups"] == [
+            "d-359 B", "d-359 C", "d-359 E",
+        ]
+        assert any(
+            row["class"] == "E"
+            and row["species"] == species_id
+            and row["authority_level"] == "status_bearing"
+            and "phase-independent K" in row["reason"]
+            for row in prediction["class_predictions"]
+        )
+        assert "stoich_O2_per_vapor" in rows_by_species[species_id]
+
+
 @pytest.mark.parametrize("phase,stage", [(None, None), ("", None), (None, ""), ("", "")])
 def test_missing_cleanup_context_is_refused_not_dormant(phase, stage):
     from simulator.vapour_rail.instrumentation import _channel_flux_gate_state

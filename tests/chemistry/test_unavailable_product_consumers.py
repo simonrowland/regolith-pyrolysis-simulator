@@ -126,7 +126,10 @@ def test_oxygen_partitions_inherit_partial_product_flag(two_hour_run, monkeypatc
             "d-359 B", "d-359 C", "d-359 E",
         ]
         assert "The shipped molecular-O₂ ledger total is 1.0 kg" in notice["reason"]
-        assert "Class E P species refusals" in notice["reason"]
+        assert (
+            "P2O5 inventory is present, so the hot-train carrier uses "
+            "phase-independent K under d-359"
+        ) in notice["reason"]
 
 
 def test_study_summary_retains_partial_transport_refusal_reason(two_hour_run):
