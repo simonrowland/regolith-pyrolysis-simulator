@@ -116,6 +116,14 @@ _MASS_OBJECTIVE_METRICS = frozenset(
 # ``metals_plus_o2_kg``, so it is scored only when the campaign claims ``O2``
 # and a metal key (``Fe``, ``Mg``, or ``Ti``). Otherwise it is withheld
 # with the same notice. It is never a silent 0.0.
+# This changes the objective vector an evaluation returns. EvalSpec keys are
+# VERSION-scoped (evalspec.py: behaviour-changing code edits require a
+# VERSION bump). corpus_version is the data-corpus lever only and stays at
+# the green tag: a corpus bump would expire the real-backend engine cache
+# for a non-chemistry change. Do not add a key dimension or a version
+# integer. VERSION is train-owned. The landing offer asks the train to bump
+# VERSION, or to carry b-080 in the next release, so pre-fix objective
+# vectors miss. ``_scoring_objective_rows`` does not change the cache key.
 # C0 claims volatiles and native_Fe only. native_Fe is nanophase magnetic
 # separation, not the pyrolysis metal product, so it authorizes no named
 # metal metric and no energy-per-product intensity here.
@@ -1773,6 +1781,11 @@ def _scoring_objective_rows(profile: Mapping[str, Any]) -> Any:
     executed campaign does not claim is dropped here. Composition rows are
     judged by their own target product. There is no flag that puts one back,
     and description text is not read.
+
+    Pre-fix objective vectors miss only after a VERSION bump. evalspec.py
+    scopes EvalSpec keys by the repo VERSION file: behaviour-changing code
+    edits require a VERSION bump. corpus_version stays at the green tag.
+    This function does not add a cache-key dimension.
     """
 
     raw_objectives = profile.get("objectives")

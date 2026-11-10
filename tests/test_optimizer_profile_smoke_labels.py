@@ -770,9 +770,21 @@ def test_scoring_strategies_use_the_claim_chokepoint() -> None:
 
     schema = RecipeSchema()
     strategies = (OptunaTPEStrategy, OptunaNSGA2Strategy, StagedStrategy)
-    for metric in (*FINAL_PRODUCT_METRICS, _COMPOSITION_METRIC):
+    # Every product class the chokepoint withholds, including intensities
+    # and a ledger species. Strategy metrics are objective_definitions.
+    for metric in (
+        *FINAL_PRODUCT_METRICS,
+        *sorted(_ENERGY_PER_PRODUCT_METRICS),
+        _COMPOSITION_METRIC,
+        "Mg_kg",
+    ):
+        row = (
+            _intensity_row(metric)
+            if metric in _ENERGY_PER_PRODUCT_METRICS
+            else _product_row(metric)
+        )
         profile = _profile(
-            _product_row(metric),
+            row,
             campaign="C0",
             prose="description-edited",
         )

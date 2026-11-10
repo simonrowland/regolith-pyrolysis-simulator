@@ -1,16 +1,9 @@
 # Deliberate analytical-model corpus release tag.
-# Bump only when the operator decides cached rows are no longer reusable.
+# Bump only when the operator decides cached-real rows are no longer reusable.
 # 2026-07-31 VR-3 compatibility-only bump: retire optimizer keys containing
 # code/data/provider fingerprints. This changes identity shape, not physics.
 # Prior corpus rows are intentionally non-interoperable so old and new key
 # shapes cannot collide after fingerprints become provenance-only.
-# 2026-11-10 b-080 withhold unclaimed-product objectives.
-# Optimizer evaluations now withhold objectives whose product the executed
-# campaign does not claim, including energy-per-product intensities whose
-# denominator product is unclaimed. Pre-fix optimizer rows must miss.
-# The previous tag stays interoperable so reduced-real physics rows can
-# still be rekeyed. This is not a physics-corpus change.
-corpus_version: "analytical-corpus-2026-11-10-b080-unclaimed-product-objectives"
+corpus_version: "analytical-corpus-2026-07-31-vapour-rail-key-v2"
 interoperable_versions:
-  - "analytical-corpus-2026-11-10-b080-unclaimed-product-objectives"
   - "analytical-corpus-2026-07-31-vapour-rail-key-v2"
