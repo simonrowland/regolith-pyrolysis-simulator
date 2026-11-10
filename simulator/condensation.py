@@ -2280,6 +2280,8 @@ class CondensationModel:
             'has_upstream_hot_wall_violation': False,
             'upstream_hot_wall_warnings': [],
             'upstream_hot_wall_findings': [],
+            'upstream_hot_wall_judgements': [],
+            'upstream_hot_wall_extrapolations': [],
             'upstream_hot_wall_min_C': None,
             'upstream_hot_wall_refused': False,
             'upstream_hot_wall_refusals': [],
@@ -7582,6 +7584,31 @@ def _segment_stage_number(stage_name: str) -> int | None:
     return int(suffix) if suffix.isdecimal() else None
 
 
+def _saturation_extrapolation_records(
+    notes: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    """Copy out-of-domain saturation qualifications, excluding refusals.
+
+    A refused fit is a typed refusal, not a best estimate. An extrapolated
+    fit is a best estimate and must keep this qualification (d-367).
+    """
+
+    records: list[dict[str, Any]] = []
+    for key, record in notes.items():
+        if not isinstance(record, Mapping):
+            continue
+        status = record.get('status')
+        authority = record.get('authority_level')
+        if status == 'refused' or authority == 'unavailable':
+            continue
+        if authority != 'extrapolated' and status != 'extrapolated':
+            continue
+        published = dict(record)
+        published['telemetry_key'] = str(key)
+        records.append(published)
+    return records
+
+
 def cold_spot_diagnostic(
     pipe_segments: list[PipeSegment],
     vapor_species_kg_hr: Mapping[str, float],
@@ -7605,9 +7632,12 @@ def cold_spot_diagnostic(
 
     A missing or invalid local pressure, or a refused wall P_sat, is a
     typed refusal of this quantity (d-367). It is not a clear and it is
-    not a supersaturation finding. Reactive SiO deposition still uses
-    its P_sat ~= 0 backstop on the deposition path; that backstop does
-    not pass the hot-wall check.
+    not a supersaturation finding. A computed P_sat outside the certified
+    fit keeps that best estimate and publishes the extrapolation on the
+    judgement. Every checked species is one judgement: a typed refusal or
+    a computed comparison. The coating gate reads those judgements.
+    Reactive SiO deposition still uses its P_sat ~= 0 backstop on the
+    deposition path; that backstop does not pass the hot-wall check.
     """
 
     # The historical uniform floor is not a violation threshold.
@@ -7615,6 +7645,7 @@ def cold_spot_diagnostic(
     margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
     findings: list[dict[str, Any]] = []
     upstream_hot_wall_findings: list[dict[str, Any]] = []
+    upstream_hot_wall_judgements: list[dict[str, Any]] = []
     upstream_hot_wall_refusals: list[dict[str, Any]] = []
 
     def _hot_wall_refusal(
@@ -7689,51 +7720,71 @@ def cold_spot_diagnostic(
                 continue
             wall_T_C = float(segment.wall_temperature_C)
             if pressure_refusal_fields is not None:
-                upstream_hot_wall_refusals.append(_hot_wall_refusal(
+                refusal = _hot_wall_refusal(
                     segment,
                     str(species),
                     kg_hr,
                     wall_T_C,
                     target_stage_number,
                     **pressure_refusal_fields,
-                ))
+                )
+                upstream_hot_wall_refusals.append(refusal)
+                upstream_hot_wall_judgements.append({
+                    **refusal,
+                    'partial_pressure_pa': None,
+                    'saturation_pressure_pa': None,
+                    'extrapolations': [],
+                })
             else:
                 # Premise: fouling requires p_i > P_sat(T_wall) (mandate
                 # hot-wall invariant). Algebra: supersaturation iff
                 # p_local_Pa - P_sat_Pa > 0. Units: both pressures are Pa.
                 # Sanity: Fe P_sat(1673.15 K) ≈ 1.14 Pa, so a 100 Pa
                 # (1 mbar) Fe stream is ~88-fold supersaturated; Na
-                # P_sat at the same wall is ~0.93 MPa, so 100 Pa Na is
-                # undersaturated. A refused P_sat is not P_sat = 0: the
-                # reactive deposition backstop must not invent a violation.
+                # P_sat(773.15 K) ≈ 162 Pa, so 100 Pa Na is undersaturated
+                # even though 773.15 K is outside the 924–1118 K fit.
+                # A refused P_sat is not P_sat = 0: the reactive deposition
+                # backstop must not invent a violation. Out-of-domain P_sat
+                # is kept and qualified; it is not an unqualified clear.
                 wall_T_K = wall_T_C + CELSIUS_TO_KELVIN_OFFSET
-                # Keep an active route telemetry context. A private dict
-                # is only for reading the refusal when no context is set.
-                saturation_notes, saturation_warnings = _resolve_antoine_telemetry(
+                # Read this evaluation from a private dict, then copy it
+                # into any active route telemetry context. The private dict
+                # is what this diagnostic publishes. Leaving the records
+                # only in a context-or-discard dict dropped the qualification
+                # whenever no context was set (b-282).
+                context_notes, context_warnings = _resolve_antoine_telemetry(
                     None,
                     None,
                 )
-                if saturation_notes is None:
-                    saturation_notes = {}
+                call_notes: dict[str, dict[str, Any]] = {}
+                call_warnings: list[str] = []
                 species_name = str(species)
                 P_sat_pa, saturation_refused = _try_antoine_psat_pa(
                     species_name,
                     wall_T_K,
                     vapor_pressure_data=vapor_pressure_data,
-                    antoine_extrapolations=saturation_notes,
-                    antoine_extrapolation_warnings=saturation_warnings,
+                    antoine_extrapolations=call_notes,
+                    antoine_extrapolation_warnings=call_warnings,
                 )
+                if context_notes is not None:
+                    for note_key, note_record in call_notes.items():
+                        context_notes.setdefault(note_key, note_record)
+                if context_warnings is not None:
+                    for warning in call_warnings:
+                        if warning not in context_warnings:
+                            context_warnings.append(warning)
+                extrapolations = _saturation_extrapolation_records(call_notes)
                 saturation_known = (
                     not saturation_refused
                     and P_sat_pa is not None
                     and math.isfinite(P_sat_pa)
                 )
                 if not saturation_known:
-                    note = saturation_notes.get(
+                    note = call_notes.get(
                         f'{species_name}#wall:{wall_T_K}',
                         {},
                     )
-                    upstream_hot_wall_refusals.append(_hot_wall_refusal(
+                    refusal = _hot_wall_refusal(
                         segment,
                         species_name,
                         kg_hr,
@@ -7747,22 +7798,49 @@ def cold_spot_diagnostic(
                             note.get('reason')
                             or 'saturation_pressure_unavailable'
                         ),
-                    ))
-                elif p_local_pa > P_sat_pa:
-                    upstream_hot_wall_findings.append({
+                    )
+                    upstream_hot_wall_refusals.append(refusal)
+                    upstream_hot_wall_judgements.append({
+                        **refusal,
+                        'partial_pressure_pa': p_local_pa,
+                        'saturation_pressure_pa': None,
+                        'extrapolations': [],
+                    })
+                else:
+                    violated = p_local_pa > P_sat_pa
+                    judgement = {
                         'segment': segment.name,
                         'account': segment.wall_deposit_account,
-                        'species': str(species),
+                        'species': species_name,
                         'kg_hr': kg_hr,
                         'wall_temperature_C': wall_T_C,
                         'target_stage_number': target_stage_number,
-                        'warning': (
-                            f'upstream hot-wall violation {segment.name}: '
-                            f'{species} local pressure exceeds wall '
-                            f'saturation at {wall_T_C:.1f} C before stage '
-                            f'{target_stage_number}'
-                        ),
-                    })
+                        'status': 'violation' if violated else 'clear',
+                        'partial_pressure_pa': p_local_pa,
+                        'saturation_pressure_pa': P_sat_pa,
+                        'extrapolations': extrapolations,
+                    }
+                    upstream_hot_wall_judgements.append(judgement)
+                    if violated:
+                        finding = {
+                            'segment': segment.name,
+                            'account': segment.wall_deposit_account,
+                            'species': species_name,
+                            'kg_hr': kg_hr,
+                            'wall_temperature_C': wall_T_C,
+                            'target_stage_number': target_stage_number,
+                            'warning': (
+                                f'upstream hot-wall violation {segment.name}: '
+                                f'{species} local pressure exceeds wall '
+                                f'saturation at {wall_T_C:.1f} C before stage '
+                                f'{target_stage_number}'
+                            ),
+                        }
+                        if extrapolations:
+                            finding['partial_pressure_pa'] = p_local_pa
+                            finding['saturation_pressure_pa'] = P_sat_pa
+                            finding['extrapolations'] = extrapolations
+                        upstream_hot_wall_findings.append(finding)
             if wall_T_C >= threshold_C:
                 continue
             findings.append({
@@ -7786,6 +7864,20 @@ def cold_spot_diagnostic(
         str(finding['warning'])
         for finding in upstream_hot_wall_findings
     ]
+    upstream_hot_wall_extrapolations = [
+        {
+            'segment': judgement['segment'],
+            'account': judgement['account'],
+            'species': judgement['species'],
+            'wall_temperature_C': judgement['wall_temperature_C'],
+            'partial_pressure_pa': judgement['partial_pressure_pa'],
+            'saturation_pressure_pa': judgement['saturation_pressure_pa'],
+            'supersaturated': judgement['status'] == 'violation',
+            'records': judgement['extrapolations'],
+        }
+        for judgement in upstream_hot_wall_judgements
+        if judgement['extrapolations']
+    ]
     return {
         'has_cold_spot': bool(findings),
         'margin_C': margin_C,
@@ -7795,6 +7887,8 @@ def cold_spot_diagnostic(
         'upstream_hot_wall_min_C': None,
         'upstream_hot_wall_warnings': upstream_hot_wall_warnings,
         'upstream_hot_wall_findings': upstream_hot_wall_findings,
+        'upstream_hot_wall_judgements': upstream_hot_wall_judgements,
+        'upstream_hot_wall_extrapolations': upstream_hot_wall_extrapolations,
         'upstream_hot_wall_refused': bool(upstream_hot_wall_refusals),
         'upstream_hot_wall_refusals': upstream_hot_wall_refusals,
     }

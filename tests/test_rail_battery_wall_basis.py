@@ -18,6 +18,9 @@ quantity, not a clear (d-367).
 
 from __future__ import annotations
 
+import math
+from types import SimpleNamespace
+
 import pytest
 
 from simulator.condensation import (
@@ -28,6 +31,8 @@ from simulator.condensation import (
     _wall_deposition_driving_pressure_pa,
     cold_spot_diagnostic,
 )
+from simulator.condensation_routing import DESIGNATED_STAGE, designated_stage_number
+from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState, PipeSegment
 
 
@@ -135,6 +140,21 @@ def test_na_500_c_alkali_duty_is_not_a_hot_wall_violation():
     assert diagnostic["upstream_hot_wall_refused"] is False
     assert diagnostic["upstream_hot_wall_findings"] == []
     assert diagnostic["upstream_hot_wall_refusals"] == []
+    # 773.15 K is below the Na pure-component fit certified for 924–1118 K.
+    # The undersaturated comparison is the best estimate; the fit is not
+    # an unqualified clear (d-367).
+    qualifications = diagnostic["upstream_hot_wall_extrapolations"]
+    assert len(qualifications) == 1
+    assert qualifications[0]["species"] == "Na"
+    assert qualifications[0]["saturation_pressure_pa"] == pytest.approx(na_psat)
+    assert qualifications[0]["partial_pressure_pa"] == pytest.approx(
+        MILLIBAR_BAKEOFF_PA
+    )
+    assert qualifications[0]["supersaturated"] is False
+    records = qualifications[0]["records"]
+    assert records
+    assert all(record["authority_level"] == "extrapolated" for record in records)
+    assert records[0]["valid_range_K"] == pytest.approx((924.0, 1118.0))
 
 
 def test_species_change_and_low_wall_uniform_minimum():
@@ -327,3 +347,334 @@ def test_route_millibar_fe_at_1400_c_uses_wall_partial_pressure():
     assert millibar["has_upstream_hot_wall_violation"] is True
     assert dilute["has_upstream_hot_wall_violation"] is False
     assert hot["has_upstream_hot_wall_violation"] is False
+
+
+# Invariant (b-282 / d-367): every upstream hot-wall species judgement is a
+# typed refusal or a computed saturation comparison, and that same record
+# reaches every coating-gate consumer. An out-of-domain Antoine evaluation
+# keeps its best estimate and carries the extrapolation qualification. A
+# refusal is never dropped on the way to the gate, and it does not become
+# a deposit veto.
+# Product aliases SiO2 and Cr2O3 have a designated stage but no landing
+# setpoint. cold_spot_diagnostic raises before the hot-wall chokepoint;
+# they are not a second judgement path.
+_HOT_WALL_SPECIES = tuple(
+    species
+    for species in DESIGNATED_STAGE
+    if species in CONDENSATION_TEMPS_C
+)
+_HOT_WALL_WALLS_C = (20.0, 500.0, 800.0, 1000.0, 1400.0, 1775.0)
+_HOT_WALL_PRESSURE_CASES = ("missing", "nan", "bakeoff_100pa", "extreme_1e12")
+_HOT_WALL_CHANNELS = (
+    "payload",
+    "runtime",
+    "merged_report",
+    "report_diagnostics",
+    "fraction_report",
+)
+
+
+def _hot_wall_partial_pressures(species: str, pressure_case: str):
+    if pressure_case == "missing":
+        return None
+    if pressure_case == "nan":
+        return {species: float("nan")}
+    if pressure_case == "bakeoff_100pa":
+        return {species: MILLIBAR_BAKEOFF_PA}
+    if pressure_case == "extreme_1e12":
+        return {species: 1.0e12}
+    raise AssertionError(pressure_case)
+
+
+def _hot_wall_diagnostic(species: str, wall_C: float, pressure_case: str):
+    stage = designated_stage_number(species)
+    assert stage is not None
+    return cold_spot_diagnostic(
+        [_upstream_segment(f"stage_{stage}", wall_C)],
+        {species: 1.0},
+        species_partial_pressures_pa=_hot_wall_partial_pressures(
+            species, pressure_case
+        ),
+    )
+
+
+def _saturation_oracle(species: str, wall_C: float):
+    notes: dict[str, dict] = {}
+    pressure_pa, refused = _try_antoine_psat_pa(
+        species,
+        wall_C + CELSIUS_TO_KELVIN_OFFSET,
+        antoine_extrapolations=notes,
+        antoine_extrapolation_warnings=[],
+    )
+    known = (
+        not refused
+        and pressure_pa is not None
+        and math.isfinite(pressure_pa)
+    )
+    extrapolated = [
+        record
+        for record in notes.values()
+        if isinstance(record, dict)
+        and record.get("status") != "refused"
+        and record.get("authority_level") != "unavailable"
+        and (
+            record.get("authority_level") == "extrapolated"
+            or record.get("status") == "extrapolated"
+        )
+    ]
+    return pressure_pa, known, extrapolated
+
+
+def _qualification_identity(record: dict) -> tuple:
+    raw_range = record.get("valid_range_K")
+    if isinstance(raw_range, (list, tuple)) and len(raw_range) == 2:
+        try:
+            norm_range = (
+                round(float(raw_range[0]), 6),
+                round(float(raw_range[1]), 6),
+            )
+        except (TypeError, ValueError):
+            norm_range = (raw_range[0], raw_range[1])
+    else:
+        norm_range = raw_range
+    return (
+        record.get("authority_level"),
+        record.get("status"),
+        norm_range,
+        str(record.get("reason")),
+    )
+
+
+def _assert_published_extrapolation(published: list, oracle: list, where: str):
+    assert [
+        _qualification_identity(record) for record in published
+    ] == [
+        _qualification_identity(record) for record in oracle
+    ], where
+
+
+def _judgement_for(diagnostic: dict, species: str) -> dict:
+    matches = [
+        judgement
+        for judgement in diagnostic["upstream_hot_wall_judgements"]
+        if judgement["species"] == species
+    ]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def _assert_diagnostic_invariant(
+    diagnostic: dict,
+    species: str,
+    wall_C: float,
+    pressure_case: str,
+):
+    """One judgement per checked species, qualified exactly as the fit was."""
+
+    where = f"{species} {wall_C} C {pressure_case}"
+    judgement = _judgement_for(diagnostic, species)
+    assert judgement["wall_temperature_C"] == wall_C
+    pressure_refused = pressure_case in {"missing", "nan"}
+    if pressure_refused:
+        assert diagnostic["has_upstream_hot_wall_violation"] is False, where
+        assert diagnostic["upstream_hot_wall_refused"] is True, where
+        assert judgement["status"] == "refused", where
+        assert judgement["refusal_type"] == "DepositionInputRefusal", where
+        assert judgement["extrapolations"] == [], where
+        assert diagnostic["upstream_hot_wall_extrapolations"] == [], where
+        return
+
+    partial_pa = _hot_wall_partial_pressures(species, pressure_case)[species]
+    saturation_pa, known, extrapolated = _saturation_oracle(species, wall_C)
+    if not known:
+        assert diagnostic["has_upstream_hot_wall_violation"] is False, where
+        assert diagnostic["upstream_hot_wall_refused"] is True, where
+        assert judgement["status"] == "refused", where
+        assert judgement["refusal_type"], where
+        assert judgement["saturation_pressure_pa"] is None, where
+        assert diagnostic["upstream_hot_wall_findings"] == [], where
+        return
+
+    assert diagnostic["upstream_hot_wall_refused"] is False, where
+    assert judgement["status"] == (
+        "violation" if partial_pa > saturation_pa else "clear"
+    ), where
+    assert judgement["saturation_pressure_pa"] == pytest.approx(saturation_pa), where
+    assert judgement["partial_pressure_pa"] == pytest.approx(partial_pa), where
+    assert diagnostic["has_upstream_hot_wall_violation"] is (
+        judgement["status"] == "violation"
+    ), where
+    _assert_published_extrapolation(
+        judgement["extrapolations"],
+        extrapolated,
+        where,
+    )
+    publications = [
+        item
+        for item in diagnostic["upstream_hot_wall_extrapolations"]
+        if item["species"] == species
+    ]
+    if extrapolated:
+        assert len(publications) == 1, where
+        assert publications[0]["supersaturated"] is (
+            judgement["status"] == "violation"
+        ), where
+        assert publications[0]["saturation_pressure_pa"] == pytest.approx(
+            saturation_pa
+        ), where
+        _assert_published_extrapolation(
+            publications[0]["records"],
+            extrapolated,
+            where,
+        )
+    else:
+        assert publications == [], where
+        assert judgement["extrapolations"] == [], where
+
+
+def _clear_campaign_report(*, fraction: bool, diagnostics: dict | None):
+    report = {
+        "campaigns_to_resinter_total": math.inf,
+        "resinter_threshold_kg": None,
+        "wall_deposit_kg_per_campaign": 0.0,
+        "unqualified_deposition_rate_kg_per_campaign": 0.0,
+        "authoritative_for_resinter": True,
+        "output_status": "authoritative",
+        "status_reason": "",
+        "sticking_alpha_authority": {
+            "authoritative_for_deposit_mass": True,
+        },
+    }
+    if fraction:
+        report["feedstock_charge_mass_kg"] = 1.0
+        report["coating_constraint_mode"] = "upstream_deposit_fraction"
+        report["coating_constraint_authoritative"] = True
+    if diagnostics is not None:
+        report["coating_diagnostics"] = diagnostics
+    return report
+
+
+def _coating_margin(channel: str, diagnostic: dict):
+    constraints = PhysicsConstraintSet(active_gates=("coating",))
+    if channel == "runtime":
+        trace = SimpleNamespace(
+            snapshots=(),
+            wall_deposit_by_segment_species_delta=(),
+            condensation_model=SimpleNamespace(
+                cold_spot_history=[diagnostic],
+            ),
+        )
+        return constraints.coating(trace)
+    if channel == "merged_report":
+        trace = SimpleNamespace(
+            wall_fouling_report=_clear_campaign_report(
+                fraction=False,
+                diagnostics=None,
+            ),
+            condensation_model=SimpleNamespace(
+                last_cold_spot_diagnostic=diagnostic,
+            ),
+        )
+        return constraints.coating(trace)
+    if channel == "report_diagnostics":
+        return constraints.coating_from_fouling_report(
+            _clear_campaign_report(fraction=False, diagnostics=diagnostic)
+        )
+    if channel == "fraction_report":
+        return constraints.coating_from_fouling_report(
+            _clear_campaign_report(fraction=True, diagnostics=diagnostic)
+        )
+    raise AssertionError(channel)
+
+
+def _gate_flags(margin, reason: str, species: str) -> list:
+    flags = (margin.status_payload or {}).get("coating_warning_flags") or []
+    matched = []
+    for flag in flags:
+        if flag.get("reason") != reason:
+            continue
+        finding = flag.get("finding") or {}
+        owner = flag.get("species") or finding.get("species")
+        if owner == species:
+            matched.append(flag)
+    return matched
+
+
+def _assert_gate_invariant(
+    margin,
+    species: str,
+    wall_C: float,
+    pressure_case: str,
+):
+    where = f"{species} {wall_C} C {pressure_case} {margin.status}"
+    payload = margin.status_payload or {}
+    assert margin.feasible is True, where
+    assert payload.get("coating_verdict") == "clear", where
+    assert payload.get("coating_violation_reasons") in (None, []), where
+    pressure_refused = pressure_case in {"missing", "nan"}
+    if pressure_refused:
+        flags = _gate_flags(margin, "upstream_hot_wall_refused", species)
+        assert len(flags) == 1, where
+        assert flags[0]["finding"]["refusal_type"] == "DepositionInputRefusal"
+        assert _gate_flags(margin, "upstream_hot_wall_extrapolated", species) == []
+        assert _gate_flags(
+            margin, "upstream_hot_wall_supersaturation", species
+        ) == []
+        return
+
+    partial_pa = _hot_wall_partial_pressures(species, pressure_case)[species]
+    saturation_pa, known, extrapolated = _saturation_oracle(species, wall_C)
+    if not known:
+        flags = _gate_flags(margin, "upstream_hot_wall_refused", species)
+        assert len(flags) == 1, where
+        assert flags[0]["finding"]["refusal_type"]
+        assert _gate_flags(
+            margin, "upstream_hot_wall_supersaturation", species
+        ) == []
+        return
+
+    violation_flags = _gate_flags(
+        margin, "upstream_hot_wall_supersaturation", species
+    )
+    if partial_pa > saturation_pa:
+        assert len(violation_flags) == 1, where
+    else:
+        assert violation_flags == [], where
+    extrapolation_flags = _gate_flags(
+        margin, "upstream_hot_wall_extrapolated", species
+    )
+    if extrapolated:
+        assert len(extrapolation_flags) == 1, where
+        assert extrapolation_flags[0]["saturation_pressure_pa"] == pytest.approx(
+            saturation_pa
+        ), where
+        assert extrapolation_flags[0]["partial_pressure_pa"] == pytest.approx(
+            partial_pa
+        ), where
+        _assert_published_extrapolation(
+            extrapolation_flags[0]["extrapolations"],
+            extrapolated,
+            where,
+        )
+    else:
+        assert extrapolation_flags == [], where
+    if not extrapolated and partial_pa <= saturation_pa:
+        assert _gate_flags(margin, "upstream_hot_wall_refused", species) == []
+
+
+@pytest.mark.parametrize("species", _HOT_WALL_SPECIES)
+@pytest.mark.parametrize("wall_C", _HOT_WALL_WALLS_C)
+@pytest.mark.parametrize("pressure_case", _HOT_WALL_PRESSURE_CASES)
+@pytest.mark.parametrize("channel", _HOT_WALL_CHANNELS)
+def test_hot_wall_judgement_is_qualified_on_every_consumer(
+    species: str,
+    wall_C: float,
+    pressure_case: str,
+    channel: str,
+):
+    diagnostic = _hot_wall_diagnostic(species, wall_C, pressure_case)
+    _assert_diagnostic_invariant(diagnostic, species, wall_C, pressure_case)
+    if channel == "payload":
+        return
+    margin = _coating_margin(channel, diagnostic)
+    _assert_gate_invariant(margin, species, wall_C, pressure_case)
