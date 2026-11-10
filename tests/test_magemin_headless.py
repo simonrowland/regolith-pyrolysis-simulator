@@ -1,7 +1,17 @@
 """MAGEMin launch isolation and captured numeric output contracts."""
 
+import importlib
+import multiprocessing
+import os
+import subprocess
+import tempfile
+import time
+from contextlib import contextmanager
 from pathlib import Path
 
+import pytest
+
+import simulator.melt_backend.magemin as magemin
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.magemin import MAGEMinBackend
 
@@ -24,3 +34,180 @@ def test_captured_phase_assemblage_numeric_pin():
         'crst': '0x1.43fe5c91d14e4p-5',
         'sph': '0x1.0941c8216c615p-5',
     }
+
+
+@pytest.mark.parametrize('launch', ['version', 'equilibrium', 'pure_phase'])
+def test_every_launch_uses_headless_env_and_slot(monkeypatch, tmp_path, launch):
+    import simulator.engine_local_config as local_config
+
+    monkeypatch.setenv('DISPLAY', ':99')
+    monkeypatch.setenv('MPLBACKEND', 'MacOSX')
+    monkeypatch.setenv('OMPI_MCA_btl', 'tcp')
+    monkeypatch.setenv('KEEP_MAGEMIN_TEST_VALUE', 'inherited')
+    monkeypatch.setattr(local_config, 'cache_version_for', lambda _: None)
+    held = []
+    seen = []
+
+    @contextmanager
+    def slot(_timeout):
+        held.append(True)
+        try:
+            yield
+        finally:
+            held.pop()
+
+    def run(args, **kwargs):
+        assert held == [True]
+        env = kwargs['env']
+        assert env['OMPI_MCA_btl'] == 'self'
+        assert env['OMPI_MCA_pml'] == 'ob1'
+        loopback = 'lo0' if magemin.sys.platform == 'darwin' else 'lo'
+        assert env['PMIX_MCA_ptl_base_if_include'] == loopback
+        assert env['PRTE_MCA_prte_if_include'] == loopback
+        assert env['HWLOC_COMPONENTS'] == '-opencl'
+        assert env['MPLBACKEND'] == 'Agg'
+        assert env['KEEP_MAGEMIN_TEST_VALUE'] == 'inherited'
+        assert 'DISPLAY' not in env
+        assert os.environ['DISPLAY'] == ':99'
+        assert os.environ['OMPI_MCA_btl'] == 'tcp'
+        seen.append(args)
+        output = Path(kwargs['cwd']) / 'output'
+        output.mkdir()
+        (output / '_matlab_output.txt').write_text('captured matlab')
+        return subprocess.CompletedProcess(
+            args, 0, stdout='Phase : liq\nMode : 1.000\n', stderr=''
+        )
+
+    monkeypatch.setattr(magemin, '_magemin_subprocess_slot', slot)
+    monkeypatch.setattr(magemin.subprocess, 'run', run)
+    backend = MAGEMinBackend()
+    backend._binary_path = tmp_path / 'MAGEMin'
+    backend._config = {'timeout_s': 5}
+    if launch == 'version':
+        with pytest.warns(UserWarning, match='legacy MAGEMin'):
+            backend.get_engine_version()
+    elif launch == 'equilibrium':
+        backend._call_magemin_subprocess(
+            bulk_projection=backend._build_db_bulk_projection(
+                {'SiO2': 60.0, 'MgO': 40.0}
+            ),
+            temperature_C=1200.0,
+            pressure_kbar=0.001,
+            fO2_log=-8.0,
+        )
+    else:
+        backend._run_pure_phase_probe(
+            bulk_wt_ig={'SiO2': 60.0, 'MgO': 40.0},
+            temperature_C=1200.0,
+            pressure_kbar=0.001,
+        )
+    assert len(seen) == 1
+    assert held == []
+
+
+@pytest.mark.parametrize('value, expected', [(None, 2), ('1', 1), ('4', 4),
+                                             ('0', 2), ('bad', 2)])
+def test_host_limit_default_and_override(monkeypatch, value, expected):
+    monkeypatch.delenv('REGOLITH_MAGEMIN_SLOTS', raising=False)
+    monkeypatch.delenv('REGOLITH_MAGEMIN_MAX_CONCURRENCY', raising=False)
+    if value is not None:
+        monkeypatch.setenv('REGOLITH_MAGEMIN_MAX_CONCURRENCY', value)
+    assert magemin._magemin_subprocess_slot_count() == expected
+
+
+def _parallel_slot_caller(scratch, locks, start, release, full, state, mutex):
+    os.environ['TMPDIR'] = scratch
+    tempfile.tempdir = None
+    module = importlib.reload(magemin)
+    # Reload under a different TMPDIR: production paths must still agree.
+    assert module._MAGEMIN_SUBPROCESS_LOCK_DIR == Path(
+        '/tmp/regolith-pyrolysis-simulator'
+    )
+    module._MAGEMIN_SUBPROCESS_LOCK_DIR = Path(locks)
+    module._MAGEMIN_SUBPROCESS_LOCK = Path(locks) / 'magemin.lock'
+    start.wait(timeout=30)
+    with module._magemin_subprocess_slot(30):
+        with mutex:
+            state[0] += 1
+            state[1] = max(state[1], state[0])
+            state[2] += 1
+            if state[0] == 2:
+                full.set()
+        try:
+            assert release.wait(timeout=30)
+        finally:
+            with mutex:
+                state[0] -= 1
+
+
+def test_four_processes_share_two_slots_with_distinct_tmpdirs(monkeypatch, tmp_path):
+    monkeypatch.delenv('REGOLITH_MAGEMIN_SLOTS', raising=False)
+    monkeypatch.delenv('REGOLITH_MAGEMIN_MAX_CONCURRENCY', raising=False)
+    ctx = multiprocessing.get_context('spawn')
+    start = ctx.Barrier(5, timeout=30)
+    release, full = ctx.Event(), ctx.Event()
+    state, mutex = ctx.Array('i', [0, 0, 0]), ctx.Lock()
+    workers = []
+    for index in range(4):
+        scratch = tmp_path / str(index)
+        scratch.mkdir()
+        workers.append(ctx.Process(target=_parallel_slot_caller, args=(
+            str(scratch), str(tmp_path / 'locks'), start, release, full,
+            state, mutex,
+        )))
+    try:
+        for worker in workers:
+            worker.start()
+        start.wait()
+        assert full.wait(timeout=30)
+        time.sleep(0.1)
+        with mutex:
+            assert list(state) == [2, 2, 2]
+        release.set()
+        for worker in workers:
+            worker.join(timeout=30)
+            assert worker.exitcode == 0
+        assert list(state) == [0, 2, 4]
+    finally:
+        release.set()
+        for worker in workers:
+            if worker.pid is not None:
+                worker.join(timeout=5)
+                if worker.is_alive():
+                    worker.kill()
+                    worker.join(timeout=5)
+
+
+def test_live_phase_and_melt_output_identical_with_headless_env():
+    from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
+
+    backend = MAGEMinBackend()
+    binary = backend._resolve_binary_path()
+    if binary is None:
+        pytest.skip('No compiled MAGEMin binary found')
+    args = [str(binary), '--Verb=0', '--db=ig', '--Temp=1200',
+            '--Pres=0.001', '--sys_in=wt',
+            '--Bulk=49,14,11,9,10,0.8,2.5,1.5,0,0.2,0',
+            '--buffer=qfm', '--buffer_n=0']
+    outputs = []
+    for env in (os.environ.copy(), magemin._magemin_subprocess_env()):
+        with magemin._magemin_subprocess_slot(30):
+            with tempfile.TemporaryDirectory() as cwd:
+                completed = _run_alphamelts_subprocess(
+                    args, cwd=cwd, timeout=30, env=env,
+                )
+        assert completed.returncode == 0, completed.stderr
+        # Runtime timing fields vary; Phase/Mode are the native assemblage bytes.
+        phase_bytes = b'\n'.join(
+            line for line in completed.stdout.encode().splitlines()
+            if line.strip().startswith((b'Phase :', b'Mode '))
+        )
+        assert phase_bytes
+        result = EquilibriumResult(liquid_fraction=0.0)
+        backend._populate_result(result, {'phases':
+            backend._parse_subprocess_stdout(completed.stdout)})
+        assert 'liq' in result.phases_present
+        assert result.liquid_fraction > 0
+        outputs.append((phase_bytes, result.phase_masses_kg,
+                        result.liquid_fraction.hex()))
+    assert outputs[0] == outputs[1]

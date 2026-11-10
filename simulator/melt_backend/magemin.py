@@ -103,6 +103,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 import warnings
@@ -175,7 +176,8 @@ _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS = 48
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_VALUE_CHARS = 64
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS = 128
 _MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
-    tempfile.gettempdir(),
+    # TMPDIR differs between dispatches and xdist workers; slots must not.
+    '/tmp',
     'regolith-pyrolysis-simulator',
 )
 _MAGEMIN_SUBPROCESS_LOCK = _MAGEMIN_SUBPROCESS_LOCK_DIR / (
@@ -184,26 +186,37 @@ _MAGEMIN_SUBPROCESS_LOCK = _MAGEMIN_SUBPROCESS_LOCK_DIR / (
 
 
 def _magemin_subprocess_slot_count() -> int:
-    """Bounded machine-wide MAGEMin binary concurrency (K slots).
-
-    Each MAGEMin CLI call runs in a private TemporaryDirectory — there is
-    no shared mutable state between invocations, so the old exclusive lock
-    (K=1) was a CPU-contention bound, not a correctness requirement (t-385
-    lock audit, 2026-07-22). K>1 lets independent heavy tests overlap
-    instead of paying each other's wall-clock. Determinism under bounded K
-    is verified by the split_path concurrent A/B against sequential pins
-    (rel=1e-12). Override with REGOLITH_MAGEMIN_SLOTS; K=1 restores strict
-    serialization.
-    """
-    raw = os.environ.get('REGOLITH_MAGEMIN_SLOTS', '')
+    """Host-wide launch limit; retain the existing SLOTS override as an alias."""
+    raw = os.environ.get(
+        'REGOLITH_MAGEMIN_MAX_CONCURRENCY',
+        os.environ.get('REGOLITH_MAGEMIN_SLOTS', ''),
+    )
     try:
         value = int(raw)
     except (TypeError, ValueError):
         value = 0
     if value >= 1:
         return value
-    cores = os.cpu_count() or 4
-    return max(1, min(3, cores // 6))
+    return 2
+
+
+def _magemin_subprocess_env() -> Dict[str, str]:
+    """Single-rank CLI policy: no TCP BTL or GPU/GUI topology discovery."""
+    env = os.environ.copy()
+    loopback = 'lo0' if sys.platform == 'darwin' else 'lo'
+    env.update({
+        # Open MPI 5: self suffices for one rank; ob1 owns BTL selection.
+        'OMPI_MCA_btl': 'self',
+        'OMPI_MCA_pml': 'ob1',
+        # Runtime control traffic is separate from the MPI data BTL.
+        'PMIX_MCA_ptl_base_if_include': loopback,
+        'PRTE_MCA_prte_if_include': loopback,
+        # The installed hwloc 2.13 build offers opencl, but no other GPU plugin.
+        'HWLOC_COMPONENTS': '-opencl',
+        'MPLBACKEND': 'Agg',
+    })
+    env.pop('DISPLAY', None)
+    return env
 
 
 @contextmanager
@@ -2154,7 +2167,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             return 'unavailable'
         resolved_binary_path = binary_path.resolve()
         try:
-            with tempfile.TemporaryDirectory() as tmpdir:
+            with _magemin_subprocess_slot(5), tempfile.TemporaryDirectory() as tmpdir:
                 result = subprocess.run(
                     [
                         str(resolved_binary_path),
@@ -2166,6 +2179,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     capture_output=True,
                     text=True,
                     timeout=5,
+                    env=_magemin_subprocess_env(),
                 )
             lines = (result.stdout or result.stderr).strip().splitlines()
             if result.returncode == 0 and lines:
@@ -3122,6 +3136,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         text=True,
                         timeout=remaining_timeout_s,
                         check=False,
+                        env=_magemin_subprocess_env(),
                     )
                 except subprocess.TimeoutExpired as exc:
                     raise _MAGEMinEngineCallError(
@@ -3715,6 +3730,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         text=True,
                         timeout=timeout_s,
                         check=False,
+                        env=_magemin_subprocess_env(),
                     )
                     matlab_path = (
                         Path(tmpdir) / 'output' / '_matlab_output.txt'
