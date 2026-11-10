@@ -115,11 +115,17 @@ def test_oxygen_partitions_inherit_partial_product_flag(two_hour_run, monkeypatc
         assert products[bucket]["flag"] == expected_refusal["flag"]
         notice = products[bucket]["availability_flag"]
         assert notice["status"] == "flagged prediction"
+        assert notice["category"] == 3
+        assert notice["kind"] == "predict_and_flag"
         assert notice["authority"] == "extrapolated"
-        assert notice["band"] == "d-359 B/E follow-ups pending"
-        assert "Interim best estimate" in notice["reason"]
+        assert notice["band"] == "d-359 B/C/E follow-ups pending"
+        assert notice["pending_follow_ups"] == [
+            "d-359 B", "d-359 C", "d-359 E",
+        ]
+        assert "The direct O₂-ledger total is retained" in notice["reason"]
         assert "Class B activity ladder" in notice["reason"]
-        assert "Class E:" in notice["reason"]
+        assert "Class C out-of-domain refusal" in notice["reason"]
+        assert "Class E P species refusals" in notice["reason"]
 
 
 def test_study_summary_retains_partial_transport_refusal_reason(two_hour_run):
