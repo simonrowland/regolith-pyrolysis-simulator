@@ -60,6 +60,7 @@ class LangmuirKnudsenDiagnostics:
     series: SeriesEvaporationFlux
     langmuir_flux_kg_s_m2: float
     knudsen_effusion_flux_kg_s_m2: float
+    transport_assumption_flags: tuple[str, ...] = ()
 
     @property
     def flux_kg_s_m2(self) -> float:
@@ -235,12 +236,16 @@ def series_flux(
     alpha: float,
     *,
     knudsen_number: float | None = None,
-    pipe_diameter_m: float = 0.12,
+    pipe_diameter_m: float | None = 0.12,
     overhead_pressure_pa: float = 0.0,
     axial_stir_factor: float = 0.0,
     radial_stir_factor: float = 1.0,
     carrier_gas: str = "N2",
     T_gas_K: float | None = None,
+    total_pressure_pa: float | None = None,
+    carrier_gas_mixture: Mapping[str, float] | None = None,
+    flow_rate_sccm: float | None = None,
+    transport_length_m: float | None = None,
     melt_resistance_enabled: bool = False,
     gas_resistance_enabled: bool = True,
 ) -> LangmuirKnudsenDiagnostics:
@@ -254,7 +259,129 @@ def series_flux(
     Limiting cases: free-molecular vacuum makes ``r_gas`` vanish, reducing to
     :func:`langmuir_flux` while the ungrounded melt term is disabled;
     ``Kn < 0.01`` enables the continuum gas film.
+
+    Flow mapping. Premise: standard cubic centimetres per minute gives molar
+    flow at 273.15 K and 101325 Pa; at furnace conditions the ideal-gas law
+    gives ``Q_hot = Q_sccm * 1e-6/60 * (T_gas/273.15) * (101325/P_total)``
+    in m^3/s. The tube area is ``A=pi*d^2/4`` in m^2, so ``u=Q_hot/A`` is
+    m/s. The dimensionless Peclet proxy ``Pe=u*L/D_AB`` maps to the existing
+    radial-stir factor consumed by the series law; the law retains its own
+    ``Sh=3.66*sqrt(max(1, radial_factor))`` clamp. Because both ``Q_hot`` and
+    Chapman-Enskog ``D_AB`` scale as ``1/P_total`` at fixed temperature, Pe
+    is pressure-invariant. The unit check is ``(m/s)*m/(m^2/s)=1``; 200 sccm
+    through the printed 42 mm tube at 1773 K gives a Pe of order one, which
+    stays near the existing laminar Sherwood baseline.
+
+    The source mixture is represented by its dominant CO or CO2 component.
+    CO uses the law's existing N2 transport proxy and is flagged; a missing
+    mixture uses N2 with a flag. Missing flow keeps radial factor 1.0, and
+    missing tube diameter or length uses the existing 0.12 m characteristic
+    default with a flag. The equilibrium gas-pressure species stays separate
+    from total furnace pressure: ``total_pressure_pa`` changes transport,
+    while ``p_bulk_pa`` remains the evaporant's bulk partial pressure.
     """
+    transport_active = any(
+        value is not None
+        for value in (
+            total_pressure_pa,
+            carrier_gas_mixture,
+            flow_rate_sccm,
+            transport_length_m,
+        )
+    ) or pipe_diameter_m is None
+    flags: list[str] = []
+    resolved_diameter_m = 0.12 if pipe_diameter_m is None else float(pipe_diameter_m)
+    resolved_length_m = 0.12 if transport_length_m is None else float(transport_length_m)
+    if transport_active and (pipe_diameter_m is None or transport_length_m is None):
+        flags.append("pipe_geometry_unprinted_default_0.12_m")
+
+    resolved_carrier_gas = str(carrier_gas or "N2")
+    if carrier_gas_mixture is not None:
+        fractions: dict[str, float] = {}
+        for name, raw_fraction in carrier_gas_mixture.items():
+            gas = str(name).strip().upper()
+            fraction = float(raw_fraction)
+            if gas not in {"CO", "CO2"} or not math.isfinite(fraction) or fraction < 0.0:
+                raise ValueError(
+                    "carrier_gas_mixture requires non-negative CO/CO2 fractions"
+                )
+            fractions[gas] = fraction
+        total_fraction = math.fsum(fractions.values())
+        if total_fraction <= 0.0:
+            raise ValueError(
+                "carrier_gas_mixture must have a positive total fraction"
+            )
+        fractions = {gas: value / total_fraction for gas, value in fractions.items()}
+        co_fraction = fractions.get("CO", 0.0)
+        co2_fraction = fractions.get("CO2", 0.0)
+        if co_fraction > 0.0 and co2_fraction > 0.0:
+            flags.append("carrier_gas_dominant_component_diffusivity_approximation")
+        if co_fraction > co2_fraction:
+            resolved_carrier_gas = "N2"
+            flags.append("carrier_gas_dominant_CO_approximated_as_N2")
+        else:
+            resolved_carrier_gas = "CO2"
+    elif transport_active:
+        flags.append("sweep_gas_unprinted_default_N2")
+
+    resolved_overhead_pressure_pa = (
+        float(overhead_pressure_pa)
+        if total_pressure_pa is None
+        else float(total_pressure_pa)
+    )
+    if total_pressure_pa is not None and (
+        not math.isfinite(resolved_overhead_pressure_pa)
+        or resolved_overhead_pressure_pa <= 0.0
+    ):
+        raise ValueError("total_pressure_pa must be finite and positive")
+
+    resolved_radial_stir_factor = float(radial_stir_factor)
+    if transport_active and flow_rate_sccm is None:
+        flags.append("gas_flow_unprinted_default_radial_stir_factor_1")
+        resolved_radial_stir_factor = 1.0
+    elif flow_rate_sccm is not None:
+        flow = float(flow_rate_sccm)
+        if not math.isfinite(flow) or flow < 0.0:
+            raise ValueError("flow_rate_sccm must be finite and non-negative")
+        # Resolve D_AB with the existing law, then apply the computed Peclet
+        # proxy through its existing radial-stir input. This keeps the
+        # resistance expression and Chapman-Enskog parameters single-owned.
+        baseline = _series_resistance_evaporation_flux_kg_m2_s(
+            species=species,
+            P_eq_pa=p_eq_pa,
+            P_bulk_pa=p_bulk_pa,
+            T_surface_K=T_surface_K,
+            molar_mass_kg_mol=molar_mass_kg_mol,
+            alpha_i=alpha,
+            knudsen_number=knudsen_number,
+            pipe_diameter_m=resolved_diameter_m,
+            overhead_pressure_pa=resolved_overhead_pressure_pa,
+            axial_stir_factor=axial_stir_factor,
+            radial_stir_factor=1.0,
+            carrier_gas=resolved_carrier_gas,
+            T_gas_K=T_gas_K,
+            melt_resistance_enabled=melt_resistance_enabled,
+            gas_resistance_enabled=gas_resistance_enabled,
+        )
+        if flow == 0.0 or baseline.d_ab_m2_s <= 0.0:
+            resolved_radial_stir_factor = 0.0
+        else:
+            effective_T_gas_K = (
+                T_surface_K if T_gas_K is None else float(T_gas_K)
+            )
+            # Standard-volume conversion and ideal-gas temperature/pressure
+            # correction give hot m^3/s; divide by circular m^2 tube area to
+            # get velocity, then form the dimensionless Peclet proxy.
+            q_standard_m3_s = flow * 1.0e-6 / 60.0
+            q_hot_m3_s = q_standard_m3_s * (
+                effective_T_gas_K / 273.15
+            ) * (101_325.0 / resolved_overhead_pressure_pa)
+            tube_area_m2 = math.pi * resolved_diameter_m**2 / 4.0
+            velocity_m_s = q_hot_m3_s / tube_area_m2
+            resolved_radial_stir_factor = (
+                velocity_m_s * resolved_length_m / baseline.d_ab_m2_s
+            )
+
     series = _series_resistance_evaporation_flux_kg_m2_s(
         species=species,
         P_eq_pa=p_eq_pa,
@@ -263,11 +390,11 @@ def series_flux(
         molar_mass_kg_mol=molar_mass_kg_mol,
         alpha_i=alpha,
         knudsen_number=knudsen_number,
-        pipe_diameter_m=pipe_diameter_m,
-        overhead_pressure_pa=overhead_pressure_pa,
+        pipe_diameter_m=resolved_diameter_m,
+        overhead_pressure_pa=resolved_overhead_pressure_pa,
         axial_stir_factor=axial_stir_factor,
-        radial_stir_factor=radial_stir_factor,
-        carrier_gas=carrier_gas,
+        radial_stir_factor=resolved_radial_stir_factor,
+        carrier_gas=resolved_carrier_gas,
         T_gas_K=T_gas_K,
         melt_resistance_enabled=melt_resistance_enabled,
         gas_resistance_enabled=gas_resistance_enabled,
@@ -292,6 +419,7 @@ def series_flux(
         series=series,
         langmuir_flux_kg_s_m2=langmuir,
         knudsen_effusion_flux_kg_s_m2=knudsen,
+        transport_assumption_flags=tuple(sorted(set(flags))),
     )
 
 

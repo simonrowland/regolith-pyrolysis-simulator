@@ -6,6 +6,7 @@ import atexit
 import json
 import math
 import multiprocessing
+import re
 import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
@@ -684,8 +685,9 @@ def _finite_step_fluxes(
     pressures_Pa: Mapping[str, float],
     background_pressure_Pa: float = 0.0,
     include_below_threshold: bool = False,
+    transport_conditions: Mapping[str, Any] | None = None,
 ) -> dict[str, float]:
-    """Run the authoritative HKL provider at the solved channel pressures."""
+    """Run the authoritative flux law at the solved channel pressures."""
     parent_channels = [
         term
         for term in terms
@@ -693,6 +695,39 @@ def _finite_step_fluxes(
     ]
     if not parent_channels:
         return {}
+    if transport_conditions is not None:
+        from simulator.chemistry.langmuir_knudsen import series_flux
+
+        rates_kg_s: dict[str, float] = {}
+        for term in parent_channels:
+            result = series_flux(
+                species=term.source.species,
+                p_eq_pa=float(pressures_Pa.get(term.source.species, 0.0)),
+                p_bulk_pa=0.0,
+                T_surface_K=temperature_K,
+                molar_mass_kg_mol=term.molar_mass_kg_mol,
+                alpha=float(term.source.alpha),
+                pipe_diameter_m=transport_conditions.get("pipe_diameter_m"),
+                overhead_pressure_pa=background_pressure_Pa,
+                carrier_gas=str(transport_conditions.get("carrier_gas") or "N2"),
+                T_gas_K=float(transport_conditions.get("T_gas_K", temperature_K)),
+                total_pressure_pa=transport_conditions.get("total_pressure_pa"),
+                carrier_gas_mixture=transport_conditions.get(
+                    "carrier_gas_mixture"
+                ),
+                flow_rate_sccm=transport_conditions.get("flow_rate_sccm"),
+                transport_length_m=transport_conditions.get("transport_length_m"),
+                melt_resistance_enabled=False,
+                gas_resistance_enabled=True,
+            )
+            # Premise: the series law returns surface mass flux J in
+            # kg/(s*m^2), while the inventory integrator consumes whole-sample
+            # mass rate. Algebra: m_dot = J*A; the units reduce to kg/s. A
+            # positive area preserves the flux sign, and zero driving flux
+            # remains zero after the conversion.
+            rates_kg_s[term.source.species] = result.flux_kg_s_m2 * area_m2
+        return rates_kg_s
+
     provider = BuiltinEvaporationFluxProvider()
     request = IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
@@ -815,6 +850,7 @@ def integrate_residue_inventory(
     area_evolution_m2: Sequence[float] | None = None,
     buffered_fO2_log: float | None = None,
     background_pressure_Pa: float = 0.0,
+    transport_conditions: Mapping[str, Any] | None = None,
 ) -> ResidueInventoryResult:
     """Integrate free evaporation with an engine-specific pressure callback.
 
@@ -828,6 +864,12 @@ def integrate_residue_inventory(
     HKL driver (zero for existing vacuum callers). The provider receives
     net driving pressures and the declared area, so its
     returned kg h^-1 is converted at the boundary back to mol s^-1.
+
+    An optional ``transport_conditions`` mapping selects the existing
+    three-resistance series law and carries source ``total_pressure_pa``,
+    ``carrier_gas_mixture``, ``flow_rate_sccm``, ``pipe_diameter_m``, and
+    ``transport_length_m`` inputs. Omitting it retains the existing builtin
+    HKL provider path bit-for-bit.
 
     For a parent with inventory ``N`` mol and requested parent draw ``r`` mol
     s^-1, analytic depletion debits ``N * (1 - exp(-r*dt/N))`` mol during the
@@ -965,6 +1007,7 @@ def integrate_residue_inventory(
             area_m2=area_m2,
             pressures_Pa=pressures,
             background_pressure_Pa=background_pressure_Pa,
+            transport_conditions=transport_conditions,
         )
         requested_product_mol_s = {
             species: rate_kg_s / term_by_species[species].molar_mass_kg_mol
@@ -3503,6 +3546,90 @@ def _sossi_geometry_areas(
     }
 
 
+def _sossi_transport_conditions(
+    experiment: Mapping[str, Any], total_pressure_pa: float
+) -> dict[str, Any]:
+    """Translate the Sossi table and shared bench dimensions to series inputs.
+
+    Premise: Table 2 reports CO and CO2 component flows in the same sccm
+    unit, so those values are proportional to mole flow at the standard
+    reference state. Their inferred total is ``Q = Q_CO + Q_CO2``; equal
+    units preserve sccm (for example, 1.8 + 200 = 201.8 sccm). The separate
+    component values are normalized into mixture fractions. A printed dash
+    means that component is not metered; two dashes leave mixture and flow
+    unknown. The source values are non-negative and the example total is
+    positive, as required by the flow conversion.
+    The furnace prints a 42 mm tube ID and a 3 cm hotspot. SI conversion is
+    ``42 mm * 1e-3 m/mm = 0.042 m`` and ``3 cm * 1e-2 m/cm = 0.03 m``;
+    both values are characteristic dimensions in metres. The 70 cm tube
+    length is not used because the transport proxy uses the local hotspot
+    length. Checks: conversions are below one metre and preserve positive
+    geometry; the source values round-trip to 42 mm and 3 cm.
+    """
+    pressure = experiment.get("pressure_environment")
+    if not isinstance(pressure, Mapping):
+        pressure = {}
+    mixture: dict[str, float] | None = None
+    mixture_record = pressure.get("sweep_gas_mixture")
+    if isinstance(mixture_record, Mapping):
+        mixture_state = mixture_record.get("state")
+        raw_components = (
+            mixture_state.get("value")
+            if isinstance(mixture_state, Mapping)
+            and mixture_state.get("tag") == "value"
+            else None
+        )
+        if isinstance(raw_components, Mapping):
+            parsed_components: dict[str, float] = {}
+            for gas in ("CO", "CO2"):
+                raw_value = raw_components.get(gas)
+                if raw_value == "-":
+                    parsed_components[gas] = 0.0
+                else:
+                    try:
+                        value = float(raw_value)
+                    except (TypeError, ValueError, OverflowError):
+                        parsed_components = {}
+                        break
+                    if not math.isfinite(value) or value < 0.0:
+                        parsed_components = {}
+                        break
+                    parsed_components[gas] = value
+            if parsed_components and math.fsum(parsed_components.values()) > 0.0:
+                mixture = parsed_components
+
+    flow_rate_sccm: float | None = None
+    flow_record = pressure.get("flow_rate_sccm")
+    if isinstance(flow_record, Mapping):
+        flow_state = flow_record.get("state")
+        if isinstance(flow_state, Mapping) and flow_state.get("tag") == "value":
+            try:
+                flow_rate_sccm = _hashimoto_point_value(flow_record)
+            except (ResidueInventoryRefusal, TypeError, ValueError, OverflowError):
+                flow_rate_sccm = None
+
+    diameter_m: float | None = None
+    hotspot_length_m: float | None = None
+    dimensions = experiment.get("_bench_furnace_tube_dimensions")
+    if isinstance(dimensions, str):
+        match = re.search(
+            r"(?P<diameter>\d+(?:\.\d+)?)-mm internal diameter;.*?"
+            r"(?P<hotspot>\d+(?:\.\d+)?)-cm hotspot",
+            dimensions,
+        )
+        if match is not None:
+            diameter_m = float(match.group("diameter")) * 1.0e-3
+            hotspot_length_m = float(match.group("hotspot")) * 1.0e-2
+
+    return {
+        "total_pressure_pa": float(total_pressure_pa),
+        "carrier_gas_mixture": mixture,
+        "flow_rate_sccm": flow_rate_sccm,
+        "pipe_diameter_m": diameter_m,
+        "transport_length_m": hotspot_length_m,
+    }
+
+
 def _sossi_project_element_ppm(
     inventory_mol: Mapping[str, float],
     buffer_oxygen_exchange_mol: float,
@@ -3606,6 +3733,9 @@ def _predict_sossi_residue_cohort(
         sample = experiment.get("sample") or {}
         total_pressure_Pa = _hashimoto_point_value(
             experiment.get("pressure_environment", {}).get("total_pressure_Pa", {})
+        )
+        transport_conditions = _sossi_transport_conditions(
+            experiment, total_pressure_Pa
         )
         inventory, sample_mass_kg, initial_melt_mass_kg = _sossi_initial_inventory(
             experiment, starting_trace_ppm_by_experiment.get(experiment_id, {})
@@ -3875,6 +4005,23 @@ def _predict_sossi_residue_cohort(
             amount * _formula_terms(oxide)[1]
             for oxide, amount in inventory.items()
         )
+        from simulator.chemistry.langmuir_knudsen import series_flux
+
+        flag_channel = channels[0]
+        transport_probe = series_flux(
+            species=flag_channel.species,
+            p_eq_pa=float(initial_pressures.get(flag_channel.species, 0.0)),
+            p_bulk_pa=0.0,
+            T_surface_K=temperature_K,
+            molar_mass_kg_mol=_formula_terms(flag_channel.formula)[1],
+            alpha=float(flag_channel.alpha),
+            total_pressure_pa=transport_conditions["total_pressure_pa"],
+            carrier_gas_mixture=transport_conditions["carrier_gas_mixture"],
+            flow_rate_sccm=transport_conditions["flow_rate_sccm"],
+            pipe_diameter_m=transport_conditions["pipe_diameter_m"],
+            transport_length_m=transport_conditions["transport_length_m"],
+        )
+        transport_assumption_flags = transport_probe.transport_assumption_flags
         liquid_rows_used = (
             _hashimoto_liquid_row_provenance(
                 gas_pack,
@@ -3929,6 +4076,7 @@ def _predict_sossi_residue_cohort(
                             duration_s=dt,
                             area_evolution_m2=(area,),
                             buffered_fO2_log=buffered_logp,
+                            transport_conditions=transport_conditions,
                         )
                     except ResidueEngineNonconvergence as exc:
                         run_refusal = exc
@@ -4011,6 +4159,23 @@ def _predict_sossi_residue_cohort(
                     "code_revision": code_revision,
                     "sample_mass_kg": sample_mass_kg,
                     "total_pressure_Pa": total_pressure_Pa,
+                    "transport_model": "series_resistance",
+                    "transport_conditions": transport_conditions,
+                    "transport_assumption_flags": transport_assumption_flags,
+                    "transport_source_locations": {
+                        "total_pressure_pa": {
+                            "page": 2,
+                            "section": "Abstract",
+                        },
+                        "sweep_gas_mixture_and_flow_rate_sccm": {
+                            "page": 54,
+                            "table": "2",
+                        },
+                        "tube_geometry": {
+                            "page": 4,
+                            "section": "2.1 Experimental Methods",
+                        },
+                    },
                     "buffered_fO2_log": buffered_logp,
                     "buffered_boundary": "printed log10 fO2; reservoir oxygen exchange included",
                     "buffer_oxygen_exchange_mol_by_geometry": geometry_buffer_exchange,

@@ -151,6 +151,14 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '-'}}
+      units: sccm
+      locator: *id001
+    flow_rate_sccm:
+      state: {tag: unknown, reason: both Table 2 CO/CO2 flow cells are printed as dashes}
+      units: sccm
+      locator: *id001
     regime:
       regime_class:
         tag: value
@@ -274,6 +282,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '200'}}
+      units: sccm
+      locator: *id002
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id002
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -397,6 +414,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '1.8', CO2: '200'}}
+      units: sccm
+      locator: *id003
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '201.8'}}
+      units: sccm
+      locator: *id003
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -520,6 +546,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '24', CO2: '175'}}
+      units: sccm
+      locator: *id004
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '199'}}
+      units: sccm
+      locator: *id004
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -643,6 +678,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '200'}}
+      units: sccm
+      locator: *id005
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id005
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -766,6 +810,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '200'}}
+      units: sccm
+      locator: *id006
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id006
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -889,6 +942,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '1.9', CO2: '200'}}
+      units: sccm
+      locator: *id007
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '201.9'}}
+      units: sccm
+      locator: *id007
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -1012,6 +1074,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '25', CO2: '180'}}
+      units: sccm
+      locator: *id008
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '205'}}
+      units: sccm
+      locator: *id008
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -1135,6 +1206,14 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '-'}}
+      units: sccm
+      locator: *id009
+    flow_rate_sccm:
+      state: {tag: unknown, reason: both Table 2 CO/CO2 flow cells are printed as dashes}
+      units: sccm
+      locator: *id009
     regime:
       regime_class:
         tag: value
@@ -1258,6 +1337,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '200'}}
+      units: sccm
+      locator: *id010
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id010
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -1381,6 +1469,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '12', CO2: '188'}}
+      units: sccm
+      locator: *id011
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id011
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -1504,6 +1601,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '180'}}
+      units: sccm
+      locator: *id012
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '180'}}
+      units: sccm
+      locator: *id012
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -1627,6 +1733,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '5', CO2: '180'}}
+      units: sccm
+      locator: *id013
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '185'}}
+      units: sccm
+      locator: *id013
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -1750,6 +1865,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '66', CO2: '133'}}
+      units: sccm
+      locator: *id014
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '199'}}
+      units: sccm
+      locator: *id014
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -1873,6 +1997,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '130', CO2: '65'}}
+      units: sccm
+      locator: *id015
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '195'}}
+      units: sccm
+      locator: *id015
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -1996,6 +2129,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '130', CO2: '65'}}
+      units: sccm
+      locator: *id016
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '195'}}
+      units: sccm
+      locator: *id016
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -2119,6 +2261,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '167', CO2: '33'}}
+      units: sccm
+      locator: *id017
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id017
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -2242,6 +2393,14 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '-'}}
+      units: sccm
+      locator: *id018
+    flow_rate_sccm:
+      state: {tag: unknown, reason: both Table 2 CO/CO2 flow cells are printed as dashes}
+      units: sccm
+      locator: *id018
     regime:
       regime_class:
         tag: value
@@ -2365,6 +2524,14 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '-'}}
+      units: sccm
+      locator: *id019
+    flow_rate_sccm:
+      state: {tag: unknown, reason: both Table 2 CO/CO2 flow cells are printed as dashes}
+      units: sccm
+      locator: *id019
     regime:
       regime_class:
         tag: value
@@ -2488,6 +2655,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '200'}}
+      units: sccm
+      locator: *id020
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id020
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -2611,6 +2787,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '0', CO2: '27'}}
+      units: sccm
+      locator: *id021
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '27'}}
+      units: sccm
+      locator: *id021
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -2734,6 +2919,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '5', CO2: '180'}}
+      units: sccm
+      locator: *id022
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '185'}}
+      units: sccm
+      locator: *id022
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -2857,6 +3051,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '5.5', CO2: '195'}}
+      units: sccm
+      locator: *id023
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200.5'}}
+      units: sccm
+      locator: *id023
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -2980,6 +3183,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '13', CO2: '27'}}
+      units: sccm
+      locator: *id024
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '40'}}
+      units: sccm
+      locator: *id024
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -3103,6 +3315,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '167', CO2: '33'}}
+      units: sccm
+      locator: *id025
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id025
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -3226,6 +3447,14 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '-'}}
+      units: sccm
+      locator: *id026
+    flow_rate_sccm:
+      state: {tag: unknown, reason: both Table 2 CO/CO2 flow cells are printed as dashes}
+      units: sccm
+      locator: *id026
     regime:
       regime_class:
         tag: value
@@ -3349,6 +3578,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '13', CO2: '27'}}
+      units: sccm
+      locator: *id027
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '40'}}
+      units: sccm
+      locator: *id027
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -3472,6 +3710,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '167', CO2: '33'}}
+      units: sccm
+      locator: *id028
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id028
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -3595,6 +3842,14 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '-'}}
+      units: sccm
+      locator: *id029
+    flow_rate_sccm:
+      state: {tag: unknown, reason: both Table 2 CO/CO2 flow cells are printed as dashes}
+      units: sccm
+      locator: *id029
     regime:
       regime_class:
         tag: value
@@ -3718,6 +3973,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '13', CO2: '27'}}
+      units: sccm
+      locator: *id030
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '40'}}
+      units: sccm
+      locator: *id030
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -3841,6 +4105,14 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '-'}}
+      units: sccm
+      locator: *id031
+    flow_rate_sccm:
+      state: {tag: unknown, reason: both Table 2 CO/CO2 flow cells are printed as dashes}
+      units: sccm
+      locator: *id031
     regime:
       regime_class:
         tag: value
@@ -3964,6 +4236,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '200'}}
+      units: sccm
+      locator: *id032
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id032
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -4087,6 +4368,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '16', CO2: '184'}}
+      units: sccm
+      locator: *id033
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id033
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -4210,6 +4500,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '120', CO2: '80'}}
+      units: sccm
+      locator: *id034
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id034
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -4333,6 +4632,14 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '-'}}
+      units: sccm
+      locator: *id035
+    flow_rate_sccm:
+      state: {tag: unknown, reason: both Table 2 CO/CO2 flow cells are printed as dashes}
+      units: sccm
+      locator: *id035
     regime:
       regime_class:
         tag: value
@@ -4456,6 +4763,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '200'}}
+      units: sccm
+      locator: *id036
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id036
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -4579,6 +4895,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '16', CO2: '184'}}
+      units: sccm
+      locator: *id037
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id037
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -4702,6 +5027,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '120', CO2: '80'}}
+      units: sccm
+      locator: *id038
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id038
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -4825,6 +5159,14 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '-'}}
+      units: sccm
+      locator: *id039
+    flow_rate_sccm:
+      state: {tag: unknown, reason: both Table 2 CO/CO2 flow cells are printed as dashes}
+      units: sccm
+      locator: *id039
     regime:
       regime_class:
         tag: value
@@ -4948,6 +5290,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '-', CO2: '200'}}
+      units: sccm
+      locator: *id040
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id040
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -5071,6 +5422,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '25', CO2: '175'}}
+      units: sccm
+      locator: *id041
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id041
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -5194,6 +5554,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '42', CO2: '158'}}
+      units: sccm
+      locator: *id042
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id042
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value
@@ -5317,6 +5686,15 @@ experiments:
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
+    sweep_gas_mixture:
+      state: {tag: value, value: {CO: '188', CO2: '12'}}
+      units: sccm
+      locator: *id043
+    flow_rate_sccm:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      units: sccm
+      locator: *id043
+      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
     regime:
       regime_class:
         tag: value

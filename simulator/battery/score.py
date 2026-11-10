@@ -12133,7 +12133,40 @@ def _sossi_residue_prediction(
                 raise ResidueInventoryRefusal(
                     "sossi_experiment_missing_from_extract", ",".join(sorted(missing_runs))
                 )
-            experiments = [source_experiments[key] for key in sorted(experiments_by_run)]
+            bench_dimensions: dict[str, str] = {}
+            for bench in source.get("benches", ()):
+                if not isinstance(bench, Mapping):
+                    continue
+                bench_id = str(bench.get("id") or "")
+                for fact in bench.get("other_facts", ()):
+                    if not isinstance(fact, Mapping) or fact.get("name") != "furnace_tube_dimensions":
+                        continue
+                    value_record = fact.get("value")
+                    value_state = (
+                        value_record.get("state")
+                        if isinstance(value_record, Mapping)
+                        else None
+                    )
+                    value = (
+                        value_state.get("value")
+                        if isinstance(value_state, Mapping)
+                        and value_state.get("tag") == "value"
+                        else None
+                    )
+                    categorical = (
+                        value.get("categorical")
+                        if isinstance(value, Mapping)
+                        else None
+                    )
+                    if bench_id and isinstance(categorical, str):
+                        bench_dimensions[bench_id] = categorical
+            experiments = []
+            for key in sorted(experiments_by_run):
+                experiment = dict(source_experiments[key])
+                experiment["_bench_furnace_tube_dimensions"] = bench_dimensions.get(
+                    str(experiment.get("bench_id") or "")
+                )
+                experiments.append(experiment)
             revision = subprocess.run(
                 ["git", "rev-parse", "HEAD"],
                 cwd=REPO_ROOT,

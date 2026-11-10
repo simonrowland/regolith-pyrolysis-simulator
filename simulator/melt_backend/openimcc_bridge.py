@@ -182,9 +182,10 @@ OPENIMCC_PARENT_OXIDES = (
     "CaO",
     "Al2O3",
     "TiO2",
+    "MnO",
 )
-_OPENIMCC_CRMN_RELAXED_OXIDES = ("Cr2O3", "MnO")
-_OPENIMCC_CRMN_RELAXED_RULING = "owner 2026-09-27"
+_OPENIMCC_CR_RELAXED_OXIDES = ("Cr2O3",)
+_OPENIMCC_CR_RELAXED_RULING = "owner 2026-09-27"
 _REDOX_BACKED_MELT_OXIDES = ("SrO", "Li2O", "ZnO", "Yb2O3", "Cr2O3")
 
 # Fe2O3 contributes two FeO-equivalent moles. Keep this mass ratio for the
@@ -698,7 +699,7 @@ def _cleaned_melt_policy(
     relaxed_dropped = {
         name: value
         for name, value in dropped.items()
-        if name in _OPENIMCC_CRMN_RELAXED_OXIDES
+        if name in _OPENIMCC_CR_RELAXED_OXIDES
     }
     relaxed_notice: dict[str, Any] | None = None
     threshold_classification = classification
@@ -706,17 +707,17 @@ def _cleaned_melt_policy(
         threshold_dropped = {
             name: value
             for name, value in dropped.items()
-            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES
+            if name not in _OPENIMCC_CR_RELAXED_OXIDES
         }
         threshold_dropped_mol_per_kg = {
             name: value
             for name, value in dropped_mol_per_kg.items()
-            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES
+            if name not in _OPENIMCC_CR_RELAXED_OXIDES
         }
         threshold_unavailable_reasons = {
             name: value
             for name, value in unavailable_reasons.items()
-            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES
+            if name not in _OPENIMCC_CR_RELAXED_OXIDES
         }
         threshold_classification = classify_projected_bulk(
             threshold_dropped,
@@ -741,11 +742,11 @@ def _cleaned_melt_policy(
         )
         relaxed_notice = {
             "code": "openimcc_projection_crmn_relaxed",
-            "ruling": _OPENIMCC_CRMN_RELAXED_RULING,
+            "ruling": _OPENIMCC_CR_RELAXED_RULING,
             "owner_ruling_date": "2026-09-27",
             "wt_pct": dict(relaxed_dropped),
             "message": (
-                "Cr2O3 and MnO remain projected from the openimcc input, "
+                "Cr2O3 remains projected from the openimcc input, "
                 "but do not count toward the shared 1.0 wt% gate"
             ),
         }
