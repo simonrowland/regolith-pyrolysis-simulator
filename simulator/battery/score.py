@@ -12306,6 +12306,28 @@ def _sossi_residue_prediction(
                 band=str(band),
             ),
         ]
+        temperature_extrapolation = provenance.get(
+            "openimcc_temperature_extrapolation"
+        )
+        if isinstance(temperature_extrapolation, Mapping):
+            certified_band = temperature_extrapolation["certified_band_K"]
+            notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(
+                        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                    ),
+                    reason="openimcc_temperature_extrapolated",
+                    origin="sossi-residue-r5",
+                    band=(
+                        f"[{float(certified_band[0]):g}, "
+                        f"{float(certified_band[1]):g}] K; "
+                        f"OpenIMCC reason: "
+                        f"{temperature_extrapolation['openimcc_reason']}"
+                    ),
+                    authority=Authority.EXTRAPOLATED,
+                )
+            )
         activity_extensions = provenance.get("melt_activity_extensions")
         mno_activity_extension = (
             activity_extensions.get("MnO")

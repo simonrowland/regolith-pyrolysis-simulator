@@ -3739,7 +3739,6 @@ def _predict_sossi_residue_cohort(
     ]
     alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
     engine_binding_identity: dict[str, str] | None = None
-    openimcc_melt_parent_oxides: frozenset[str] = frozenset()
     if engine == "openimcc":
         try:
             import openimcc
@@ -3754,9 +3753,6 @@ def _predict_sossi_residue_cohort(
         )
         engine_binding_identity = openimcc_bridge.engine_binding_identity(
             melt_pack, gas_pack
-        )
-        openimcc_melt_parent_oxides = frozenset(
-            str(oxide) for oxide in melt_pack.kernel_datapack.parent_oxides
         )
         raw_gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
             tuple(_SOSSI_TRACE_PARENTS.values()), gas_pack
@@ -3865,6 +3861,7 @@ def _predict_sossi_residue_cohort(
         melt_pack_identity: dict[str, str] = {}
         melt_activity_input_policy: dict[str, Any] = {}
         melt_activity_extensions: dict[str, dict[str, Any]] = {}
+        openimcc_temperature_extrapolation: dict[str, Any] = {}
         if engine == "openimcc":
             from simulator.diagnostic_helpers.binary_pot_battery import (
                 _ENGINE_OUTER_TIMEOUT_S,
@@ -3889,17 +3886,6 @@ def _predict_sossi_residue_cohort(
                         activity_composition, activity_input_policy = (
                             openimcc_bridge._cleaned_melt_policy(composition)
                         )
-                        if "MnO" not in openimcc_melt_parent_oxides:
-                            # The loaded melt pack owns its input domain. Omit
-                            # only unsupported MnO so the existing flagged
-                            # activity extension below can supply its gas
-                            # channel; keep other out-of-domain inputs visible
-                            # to OpenIMCC's typed refusal.
-                            activity_composition.pop("MnO", None)
-                            activity_input_policy = dict(activity_input_policy)
-                            activity_input_policy[
-                                "omitted_out_of_domain_melt_activities"
-                            ] = ("MnO",)
                         melt_activity_input_policy.update(activity_input_policy)
                         state = _evaluate_openimcc_isolated(
                             openimcc_bridge.evaluate,
@@ -3921,13 +3907,33 @@ def _predict_sossi_residue_cohort(
                         state.parent_oxide_activities
                     )
                     gas_parent_oxides = tuple(state.parent_oxides)
-                    if mno_channel_active:
-                        from simulator.chemistry.melt_activity import (
-                            melt_oxide_activity,
+                    temperature_domain = (
+                        openimcc_bridge._UNAVAILABLE_TEMPERATURE_DOMAIN_K
+                    )
+                    if temperature_K < temperature_domain[0]:
+                        openimcc_temperature_extrapolation.update(
+                            {
+                                "authority": "extrapolated",
+                                "certified_band_K": list(temperature_domain),
+                                "allow_extrapolation": True,
+                                "result_extrapolated": bool(state.extrapolated),
+                                "openimcc_reason": "; ".join(
+                                    str(reason)
+                                    for reason in (
+                                        *getattr(state, "notices", ()),
+                                        *getattr(state, "flags", ()),
+                                    )
+                                    if str(reason)
+                                )
+                                or "temperature is below the OpenIMCC datapack domain",
+                            }
                         )
+                    if mno_channel_active:
+                        if "MnO" not in gas_parent_oxides:
+                            from simulator.chemistry.melt_activity import (
+                                melt_oxide_activity,
+                            )
 
-                        native_mno_activity = gas_parent_oxide_activities.get("MnO")
-                        if native_mno_activity is None:
                             mno_activity = melt_oxide_activity(
                                 "MnO", composition, temperature_K=temperature_K
                             )
@@ -3953,9 +3959,9 @@ def _predict_sossi_residue_cohort(
                                 "MnO",
                                 {
                                     "reason": (
-                                        "MnO is outside the IMCC-SF04 melt-activity domain; "
-                                        "the simulator constant-gamma extension supplies the "
-                                        "activity required by the new Mn gas channel"
+                                        "OpenIMCC evaluate() returned no MnO result axis; "
+                                        "the flagged d-373 constant-gamma extension supplies "
+                                        "the activity required by the Mn gas channel"
                                     ),
                                     "authority_level": mno_activity.evidence_tier,
                                     "certified_band_K": mno_activity.valid_range_K,
@@ -3963,14 +3969,20 @@ def _predict_sossi_residue_cohort(
                                 },
                             )
                         else:
-                            native_value = float(native_mno_activity)
+                            try:
+                                native_value = float(
+                                    gas_parent_oxide_activities["MnO"]
+                                )
+                            except (KeyError, TypeError, ValueError, OverflowError) as exc:
+                                raise ResidueInventoryRefusal(
+                                    "melt_activity_invalid",
+                                    "OpenIMCC result has an MnO axis without an activity value",
+                                ) from exc
                             if not math.isfinite(native_value) or native_value < 0.0:
                                 raise ResidueInventoryRefusal(
                                     "melt_activity_invalid",
-                                    f"OpenIMCC returned MnO activity {native_mno_activity!r}",
+                                    f"OpenIMCC returned MnO activity {native_value!r}",
                                 )
-                            if "MnO" not in gas_parent_oxides:
-                                gas_parent_oxides += ("MnO",)
                     gas_result = evaluate_gas(
                         gas_parent_oxide_activities,
                         temperature_K,
@@ -4320,6 +4332,15 @@ def _predict_sossi_residue_cohort(
                     **(
                         {"melt_activity_extensions": dict(melt_activity_extensions)}
                         if melt_activity_extensions
+                        else {}
+                    ),
+                    **(
+                        {
+                            "openimcc_temperature_extrapolation": dict(
+                                openimcc_temperature_extrapolation
+                            )
+                        }
+                        if openimcc_temperature_extrapolation
                         else {}
                     ),
                     "assumption_flags": {
