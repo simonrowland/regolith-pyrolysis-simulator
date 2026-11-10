@@ -2,17 +2,20 @@
 
 The vapor-pressure provider keeps the mass-action metal pressure at the
 commanded melt fO2, including the b-491 floor inversion. Free evaporation
-into vacuum is a different boundary. When a published carrier was evaluated
-below the certified mass-action band, this module replaces the flux
-pressure map and names the warning. In-band maps are returned unchanged.
+into vacuum is a different boundary. This module replaces the flux
+pressure map with one surface pO2 and names the warning. Provider
+equilibrium pressures stay on the mass-action law.
 
 Premise. Free (Langmuir) evaporation does not impose a headspace pO2. The
 surface oxygen potential is the value at which the oxygen atoms leaving in
 the vapor fluxes equal the oxygen atoms removed from the parent oxides.
 The persisted melt fO2 is the mass-action state of the melt, not that
-surface boundary. Below the certified band, ``p_M = K*a/sqrt(pO2)``
-inflates metal pressures, so the flux map is re-evaluated at the solved
-surface pO2.
+surface boundary. That includes an ordinary in-band value such as 1e-9 bar.
+Below the certified band, ``p_M = K*a/sqrt(pO2)`` is an uncertified
+extrapolation; in band it is the certified melt state. Neither is the
+free-surface boundary, so both flux maps are re-evaluated at the solved
+surface pO2. A failed root drops only below-band carriers. An in-band
+failure keeps the published pressures and names the warning.
 
 Algebra. A carrier published at ``P_pub`` (Pa) and reference ``p_ref``
 (bar), with pressure scaling as ``pO2^n``, is ``P(p) = P_pub*(p/p_ref)^n``
@@ -104,6 +107,22 @@ class _Carrier:
     inverted: bool
 
 
+def _needs_surface_balance(carrier: _Carrier) -> bool:
+    """True when this carrier's pressure was published at a melt fO2.
+
+    The exponent and the reference pO2 are what the mass-action law used.
+    The certified-band floor is not the gate: 1e-9 bar is still a melt
+    state, and the free-surface root is a different number.
+    """
+
+    return (
+        carrier.exponent is not None
+        and carrier.exponent < 0.0
+        and carrier.p_ref_bar is not None
+        and carrier.pressure_Pa > 0.0
+    )
+
+
 def apply_langmuir_surface_oxygen(
     pressures_Pa: Mapping[str, float],
     *,
@@ -114,13 +133,14 @@ def apply_langmuir_surface_oxygen(
     legacy_catalog: Mapping[str, Any] | None = None,
     compiled_catalog: Any | None = None,
 ) -> LangmuirSurfaceOxygen:
-    """Return flux pressures at one surface pO2 when mass action left the band.
+    """Return flux pressures at one self-consistent surface pO2.
 
     The caller owns ``pressures_Pa``. This function does not mutate it.
     A successful root copies the map and rescales every included
-    oxygen-coupled carrier. A failed root, or a lower-bracket pin that is
-    not a root, drops only the inverted carriers and keeps the rest at the
-    published pressures. Neither path writes a silent 0.
+    oxygen-coupled carrier, in band and below it. A failed root, or a
+    lower-bracket pin that is not a root, drops only the below-band
+    carriers and keeps in-band pressures with a warning. Neither path
+    writes a silent 0.
     """
 
     provenance_by_species = provenance_by_species or {}
@@ -143,7 +163,7 @@ def apply_langmuir_surface_oxygen(
         if carrier.p_ref_bar is not None
     }
     inverted = [carrier for carrier in carriers if carrier.inverted]
-    if not inverted:
+    if not any(_needs_surface_balance(carrier) for carrier in carriers):
         return LangmuirSurfaceOxygen(
             pressures_Pa=pressures_Pa,
             applied=False,

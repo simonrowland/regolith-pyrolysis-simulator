@@ -786,6 +786,14 @@ class EvaporationMixin:
         flux at another partial-pressure vector (the finite cold-train
         shadow) must pass this map so a flagged transitional species is
         priced with its flag instead of dropped from the solved set.
+
+        The returned map is that shared input after one free-surface oxygen
+        balance. Finite cold-train capacity
+        (``_compute_capacity_coupling_shadow_impl``) and live evaporation
+        both price this map. Adjusting only the live path leaves the
+        capacity solve on the persisted melt fO2. ``equilibrium`` vapor
+        pressures stay the mass-action law; the shadow comparison above
+        the balance still checks that provider seam.
         """
         vapor_pressure_diagnostic = dict(
             getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
@@ -819,6 +827,33 @@ class EvaporationMixin:
                 resolution_error=resolve_error or None,
             )
         )
+        # Shadow equality is the unadjusted provider seam. The surface
+        # balance below is the flux boundary both consumers must share.
+        if hasattr(self, "_last_langmuir_surface_oxygen"):
+            del self._last_langmuir_surface_oxygen
+        from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
+
+        langmuir_surface = apply_langmuir_surface_oxygen(
+            vapor_pressures,
+            temperature_K=temperature_K,
+            provenance_by_species=(
+                vapor_pressure_diagnostic.get(
+                    "vapor_pressure_numerator_provenance"
+                )
+                or {}
+            ),
+            source_reaction_fO2_bar=vapor_pressure_diagnostic.get(
+                "source_reaction_fO2_bar"
+            ),
+            transport_pO2_bar=vapor_pressure_diagnostic.get("pO2_bar"),
+            legacy_catalog=getattr(self, "vapor_pressures", None),
+            compiled_catalog=getattr(self, "vapour_rail_catalog", None),
+        )
+        if langmuir_surface.applied:
+            vapor_pressures = dict(langmuir_surface.pressures_Pa)
+            self._last_langmuir_surface_oxygen = (
+                langmuir_surface.as_diagnostic()
+            )
         return (
             vapor_pressures,
             flux_overlay_report,
@@ -1220,36 +1255,16 @@ class EvaporationMixin:
         # Uses the previous hour's upstream melt-headspace/duct partials as
         # backpressure. ``overhead.composition`` is the physically distinct
         # post-condensation report, so near-total capture must not erase P_bulk
-        # above the melt. Gas pO2 has already been applied once upstream in
-        # the equilibrium vapor pressures consumed here. Below the certified
-        # mass-action band that upstream pO2 is not the free-surface boundary:
-        # replace it on this flux map only. equilibrium.vapor_pressures_Pa
-        # stays the melt-supported law.
-        from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
-
-        langmuir_surface = apply_langmuir_surface_oxygen(
-            vapor_pressures,
-            temperature_K=T_K,
-            provenance_by_species=(
-                vapor_pressure_diagnostic.get(
-                    "vapor_pressure_numerator_provenance"
-                )
-                or {}
-            ),
-            source_reaction_fO2_bar=vapor_pressure_diagnostic.get(
-                "source_reaction_fO2_bar"
-            ),
-            transport_pO2_bar=vapor_pressure_diagnostic.get("pO2_bar"),
-            legacy_catalog=getattr(self, "vapor_pressures", None),
-            compiled_catalog=getattr(self, "vapour_rail_catalog", None),
-        )
-        if langmuir_surface.applied:
-            vapor_pressures = dict(langmuir_surface.pressures_Pa)
-            self._last_langmuir_surface_oxygen = langmuir_surface.as_diagnostic()
-            if langmuir_surface.warning:
-                equilibrium_warnings = getattr(equilibrium, "warnings", None)
-                if isinstance(equilibrium_warnings, list):
-                    equilibrium_warnings.append(langmuir_surface.warning)
+        # above the melt. The flux map was already closed at one surface pO2
+        # in ``_resolve_evaporation_batch_flux_state``. Do not solve again
+        # here: a second pass would scale the adjusted pressures as if they
+        # were still the persisted melt-fO2 publication. equilibrium
+        # vapor pressures stay the melt-supported law.
+        langmuir_notice = getattr(self, "_last_langmuir_surface_oxygen", None)
+        if isinstance(langmuir_notice, dict) and langmuir_notice.get("warning"):
+            equilibrium_warnings = getattr(equilibrium, "warnings", None)
+            if isinstance(equilibrium_warnings, list):
+                equilibrium_warnings.append(str(langmuir_notice["warning"]))
         overhead_partials_Pa = (
             {
                 str(species): max(0.0, float(value))
