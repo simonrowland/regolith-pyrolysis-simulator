@@ -171,7 +171,7 @@ def _run_measured_headline(
     context=None,
     *,
     workers: int = 1,
-    engine_cache=None,
+    engine_cache_path: Path | None = None,
 ) -> int:
     started_wall = time.perf_counter()
     started_cpu = time.process_time()
@@ -224,7 +224,6 @@ def _run_measured_headline(
             measured_only=True,
             handles=score_handles,
             workers=workers,
-            engine_cache=engine_cache,
         )
         residuals = _ResidualJsonlRows(
             residuals_partial,
@@ -254,7 +253,7 @@ def _run_measured_headline(
             "load_average": load_average,
             "records": records,
             "engine_cache": _engine_cache_summary(
-                engine_cache, local_counters=metadata.engine_cache_counters
+                engine_cache_path, local_counters=metadata.engine_cache_counters
             ),
         }
         summary_path = battery / "score-summary.json"
@@ -434,77 +433,51 @@ def _run_studio(
 
 
 def _engine_cache_summary(
-    engine_cache,
+    cache_path: Path | None,
     studio_cache_summary: Mapping[str, object] | None = None,
     local_counters: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
-    if engine_cache is None:
-        engines = (
-            "openimcc",
-            "internal-analytical",
-            "vaporock",
-            "magemin",
-            "alphamelts",
-            "thermoengine",
-        )
-        names = ("hits", "misses", "stores", "transient_skips")
-        return {
-            "enabled": False,
-            "by_engine": {
-                engine: {
-                    **{name: 0 for name in names},
-                    "calls_by_kind": {
-                        call: 0
-                        for call in (
-                            "equilibrate_cell",
-                            "evaluate",
-                            "evaluate_redox",
-                        )
-                    },
-                }
-                for engine in engines
-            },
-        }
-    summary: dict[str, object] = {
-        "enabled": True,
-        "path": str(engine_cache.db_path),
-        "by_engine": (
-            engine_cache.counters if local_counters is None else local_counters
-        ),
+    engines = tuple(engine.value for engine in SCORE_ENGINE_SET)
+    by_engine: dict[str, dict[str, int]] = {
+        engine: {name: 0 for name in ("hits", "misses", "stores")}
+        for engine in engines
     }
+    sources = [local_counters or {}]
     if studio_cache_summary is not None:
-        by_engine = summary["by_engine"]
         studio_by_engine = studio_cache_summary.get("by_engine", {})
-        if isinstance(by_engine, dict) and isinstance(studio_by_engine, Mapping):
-            for engine, studio_counts in studio_by_engine.items():
-                if not isinstance(studio_counts, Mapping):
-                    continue
-                local_counts = by_engine.setdefault(str(engine), {})
-                if not isinstance(local_counts, dict):
-                    continue
-                for name, value in studio_counts.items():
-                    if name == "calls_by_kind" and isinstance(value, Mapping):
-                        local_calls = local_counts.setdefault(name, {})
-                        if isinstance(local_calls, dict):
-                            for call_kind, count in value.items():
-                                local_calls[str(call_kind)] = (
-                                    local_calls.get(str(call_kind), 0) + int(count)
-                                )
-                    elif isinstance(value, int):
-                        local_counts[str(name)] = local_counts.get(str(name), 0) + value
+        if isinstance(studio_by_engine, Mapping):
+            sources.append(studio_by_engine)
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        for engine, counts in source.items():
+            if not isinstance(counts, Mapping):
+                continue
+            target = by_engine.setdefault(str(engine), {"hits": 0, "misses": 0, "stores": 0})
+            for name in target:
+                value = counts.get(name, 0)
+                if isinstance(value, int):
+                    target[name] += value
+    summary: dict[str, object] = {
+        "enabled": cache_path is not None or studio_cache_summary is not None,
+        "by_engine": by_engine,
+    }
+    if cache_path is not None:
+        summary["path"] = str(cache_path)
+    if studio_cache_summary is not None:
         summary["studio_path"] = studio_cache_summary.get("path")
     return summary
 
 
 def _attach_engine_cache_summary(
     path: Path,
-    engine_cache,
+    cache_path: Path | None,
     studio_cache_summary: Mapping[str, object] | None = None,
     local_counters: Mapping[str, object] | None = None,
 ) -> None:
     payload = json.loads(path.read_text(encoding="utf-8"))
     payload["engine_cache"] = _engine_cache_summary(
-        engine_cache, studio_cache_summary, local_counters
+        cache_path, studio_cache_summary, local_counters
     )
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -563,11 +536,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.workers < 1:
         parser.error("--workers must be at least 1")
 
-    engine_cache = None
     if args.engine_cache is not None:
-        from simulator.engine_cache import EngineCache
-
-        engine_cache = EngineCache(args.engine_cache)
+        os.environ["REGOLITH_ENGINE_CACHE"] = str(args.engine_cache.expanduser())
+    cache_path_value = os.environ.get("REGOLITH_ENGINE_CACHE")
+    engine_cache_path = (
+        None if not cache_path_value else Path(cache_path_value).expanduser()
+    )
 
     if args.update_band_ratchet:
         context = load_score_context(args.root)
@@ -583,7 +557,7 @@ def main(argv: list[str] | None = None) -> int:
             args.root,
             engines,
             workers=args.workers,
-            engine_cache=engine_cache,
+            engine_cache_path=engine_cache_path,
         )
 
     if args.write_pins:
@@ -653,7 +627,7 @@ def main(argv: list[str] | None = None) -> int:
             origins=context.origins,
             store_stamp=recorded,
         )
-        _attach_engine_cache_summary(summary_partial_path, engine_cache)
+        _attach_engine_cache_summary(summary_partial_path, engine_cache_path)
         os.replace(summary_partial_path, summary_path)
         os.replace(report_partial_path, report_path)
         print(
@@ -685,7 +659,7 @@ def main(argv: list[str] | None = None) -> int:
             studio_comparisons_path,
             studio_cache_summary,
         ) = _run_studio(
-            melts, extra, engine_cache_path=args.engine_cache
+            melts, extra, engine_cache_path=engine_cache_path
         )
         engines = tuple(laptop)
 
@@ -699,7 +673,6 @@ def main(argv: list[str] | None = None) -> int:
         work_id=args.work,
         limit=args.limit,
         workers=args.workers,
-        engine_cache=engine_cache,
     )
     partial_path = residuals_path.with_name(residuals_path.name + ".partial")
     payloads = _ResidualJsonlRows(
@@ -792,7 +765,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         _attach_engine_cache_summary(
             summary_partial_path,
-            engine_cache,
+            engine_cache_path,
             studio_cache_summary,
             metadata.engine_cache_counters,
         )

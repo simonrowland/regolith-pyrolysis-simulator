@@ -29,7 +29,6 @@ from simulator.battery.records import (
 )
 from simulator.battery.identity import Identity
 from simulator.battery.score import ScoreContext, _score_store_to_jsonl
-from simulator.engine_cache import EngineCache
 from tests.battery.test_engine_cache_equivalence import _canonical_residual_rows
 from tests.battery import factories as F
 
@@ -131,7 +130,11 @@ def test_scored_knudsen_residue_uses_the_cache_off_cold_and_warm(
         battery, "_internal_analytical_vapor_pressure_adapter", evaluate_pressure
     )
 
-    def score(label: str, cache: EngineCache | None) -> tuple[bytes, object]:
+    def score(label: str, cache_path: Path | None) -> tuple[bytes, object]:
+        if cache_path is None:
+            monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+        else:
+            monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(cache_path))
         path = tmp_path / f"{label}.jsonl"
         _row_count, metadata = _score_store_to_jsonl(
             context,
@@ -141,7 +144,6 @@ def test_scored_knudsen_residue_uses_the_cache_off_cold_and_warm(
             rail=Rail.RESIDUE_COMPOSITION,
             limit=1,
             include_diagnostics=False,
-            engine_cache=cache,
         )
         return (
             _canonical_residual_rows(path.with_name(path.name + ".partial")),
@@ -150,19 +152,17 @@ def test_scored_knudsen_residue_uses_the_cache_off_cold_and_warm(
 
     off, _off_counts = score("off", None)
     cache_path = tmp_path / "knudsen-residue.sqlite"
-    cold, cold_counts = score("cold", EngineCache(cache_path))
+    cold, cold_counts = score("cold", cache_path)
     calls_after_cold = calls
-    warm, warm_counts = score("warm", EngineCache(cache_path))
+    warm, warm_counts = score("warm", cache_path)
 
     assert off
     assert cold == warm == off
     assert calls_after_cold > 0
     assert calls == calls_after_cold
     assert cold_counts is not None
-    assert cold_counts[Engine.INTERNAL_ANALYTICAL.value]["calls_by_kind"][
-        "residue_vapor_pressure"
-    ] > 0
+    assert cold_counts[Engine.INTERNAL_ANALYTICAL.value]["misses"] > 0
+    assert cold_counts[Engine.INTERNAL_ANALYTICAL.value]["stores"] > 0
     assert warm_counts is not None
-    assert not any(
-        warm_counts[Engine.INTERNAL_ANALYTICAL.value]["calls_by_kind"].values()
-    )
+    assert warm_counts[Engine.INTERNAL_ANALYTICAL.value]["hits"] > 0
+    assert warm_counts[Engine.INTERNAL_ANALYTICAL.value]["misses"] == 0

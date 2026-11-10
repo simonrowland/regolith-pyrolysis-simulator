@@ -23,7 +23,6 @@ def _install_fake_slice(
     )
     monkeypatch.setenv("TMPDIR", str(tmp_path))
     monkeypatch.setattr(gate, "load_score_context", lambda _root: object())
-    monkeypatch.setattr(gate, "EngineCache", lambda _path: object())
 
     def run_slice(_context: object, output_path: Path, **_kwargs: Any):
         run_name = output_path.stem
@@ -33,7 +32,6 @@ def _install_fake_slice(
                     "hits": 0,
                     "misses": 1,
                     "stores": 1,
-                    "calls_by_kind": {"equilibrate_cell": 1},
                 }
             }
         elif run_name in {"warm", "parallel-warm"}:
@@ -42,7 +40,6 @@ def _install_fake_slice(
                     "hits": 1,
                     "misses": 0,
                     "stores": 0,
-                    "calls_by_kind": {},
                 }
             }
         else:
@@ -77,7 +74,7 @@ def test_counter_table_is_printed_on_success_and_failure(
     engine_id = SCORE_ENGINE_SET[0].value
     assert any(
         "engine_cache_counters run=parallel-warm" in line
-        and f"{engine_id}:hits=1,misses=0,stores=0,calls_by_kind={{}}" in line
+        and f"{engine_id}:hits=1,misses=0,stores=0" in line
         for line in success_lines
     )
 
@@ -143,10 +140,8 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
                             "hits": 1,
                             "misses": 0,
                             "stores": 0,
-                            "calls_by_kind": {},
                         }
                     },
-                    None,
                 )
             )
         assert len(results) == 2 * len(SCORE_ENGINE_SET)
@@ -157,7 +152,6 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
         context,
         tmp_path / "parallel-warm.jsonl",
         workers=2,
-        engine_cache=SimpleNamespace(db_path=tmp_path / "engine-cache.sqlite"),
     )
 
     assert metadata.engine_cache_counters is not None
@@ -169,4 +163,3 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
         assert counters["hits"] == 2
         assert counters["misses"] == 0
         assert counters["stores"] == 0
-        assert counters["calls_by_kind"] == {}

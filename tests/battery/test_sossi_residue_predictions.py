@@ -165,11 +165,12 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
 
 
 def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
-    pytest.importorskip("openimcc")
+    openimcc = pytest.importorskip("openimcc")
 
     import simulator.battery.residue as residue
     from simulator.diagnostic_helpers import binary_pot_battery as battery
-    from simulator.melt_backend import openimcc_cache
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
 
     source = yaml.safe_load(SOURCE.read_text())
     experiment = source["experiments"][0]
@@ -197,12 +198,17 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
         pack_version="fixture-version",
         pack_digest="fixture-digest",
         openimcc_version="fixture-openimcc",
+        flags=(),
+        extrapolated=False,
     )
     gas_calls: list[dict[str, object]] = []
 
-    def evaluate_gas(_cache, **kwargs):
+    def evaluate_gas(*_args, **kwargs):
         gas_calls.append(kwargs)
         return {species: 1.0e-6 for species in selected}
+
+    def isolated(_evaluate, **_kwargs):
+        return SimpleNamespace(to_transport=lambda: {"fixture": True})
 
     def no_evaporation(inventory, *_args, **_kwargs):
         return SimpleNamespace(
@@ -212,8 +218,13 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
     monkeypatch.setattr(
         battery, "_openimcc_gas_channels_and_omission_notices", ti_channels
     )
-    monkeypatch.setattr(openimcc_cache, "cached_openimcc_evaluate", lambda *_a, **_k: state)
-    monkeypatch.setattr(openimcc_cache, "cached_openimcc_evaluate_gas", evaluate_gas)
+    monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", isolated)
+    monkeypatch.setattr(openimcc, "evaluate_gas", evaluate_gas)
+    monkeypatch.setattr(
+        OpenImccBridgeResult,
+        "from_transport",
+        classmethod(lambda _cls, _payload: state),
+    )
     monkeypatch.setattr(residue, "integrate_residue_inventory", no_evaporation)
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
 
@@ -224,7 +235,6 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
         code_revision="sossi-ti-only-cache-test",
         engine="openimcc",
-        engine_cache=object(),
     )[0]
 
     assert gas_calls

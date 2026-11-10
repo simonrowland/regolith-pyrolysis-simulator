@@ -16,7 +16,6 @@ def test_default_slice_uses_all_engines_and_all_rails(
     spec_path.write_text("{}", encoding="utf-8")
     monkeypatch.setenv("TMPDIR", str(tmp_path))
     monkeypatch.setattr(gate, "load_score_context", lambda _root: object())
-    monkeypatch.setattr(gate, "EngineCache", lambda _path: object())
     calls: list[dict[str, Any]] = []
 
     def run_slice(
@@ -31,11 +30,7 @@ def test_default_slice_uses_all_engines_and_all_rails(
             engine.value: {
                 "misses": 0 if warm else 1,
                 "hits": 1 if warm else 0,
-                "calls_by_kind": {
-                    "equilibrate_cell": 0 if warm else 1,
-                    "evaluate": 0,
-                    "evaluate_redox": 0,
-                },
+                "stores": 0 if warm else 1,
             }
             for engine in SCORE_ENGINE_SET
         }
@@ -59,17 +54,8 @@ def test_run_slice_returns_summed_worker_cache_counters(
             "hits": 7,
             "misses": 0,
             "stores": 0,
-            "transient_skips": 0,
-            "calls_by_kind": {
-                "equilibrate_cell": 0,
-                "evaluate": 0,
-                "evaluate_redox": 0,
-                "evaluate_gas": 0,
-                "residue_vapor_pressure": 0,
-            },
         }
     }
-    monkeypatch.setattr(gate, "EngineCache", lambda _path: SimpleNamespace(counters={}))
     monkeypatch.setattr(
         gate,
         "_score_store_to_jsonl",
