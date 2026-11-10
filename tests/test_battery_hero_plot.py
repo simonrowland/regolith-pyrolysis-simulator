@@ -1653,8 +1653,7 @@ def test_fingerprint_panels_leave_sparse_cells_blank(
 
     monkeypatch.setattr(plotter, "_draw_hero_sweet_spot", capture_limits)
     files = render_hero_charts(data, tmp_path / "sweet-spot-render")
-    assert len(rendered_limits) == 2
-    assert rendered_limits[0] == rendered_limits[1]
+    assert rendered_limits == [((0.0, 1.0), temperature_limits)]
     svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
     assert "fingerprint fill uses median |dex| traffic-light bands" in svg
     assert "n&lt;3 cells are blank" in svg
@@ -1678,12 +1677,12 @@ def test_fingerprint_plot_leaves_sparse_cells_blank() -> None:
         "temperature_lower_K": "1900",
         "temperature_upper_K": "2000",
         "n": 1,
-        "color_eligible": True,
+        "color_eligible": False,
         "median_abs_dex": "0.25",
     }
     fig, axis = plt.subplots()
     try:
-        assert _draw_hero_sweet_spot(
+        assert not _draw_hero_sweet_spot(
             axis,
             "openimcc",
             [cell],
@@ -1691,6 +1690,7 @@ def test_fingerprint_plot_leaves_sparse_cells_blank() -> None:
             temperature_limits=(1900, 2000),
         )
         assert not axis.patches
+        assert not axis.axison
     finally:
         plt.close(fig)
 
@@ -1704,6 +1704,7 @@ def test_fingerprint_traffic_light_cells_have_no_count_text() -> None:
             "temperature_lower_K": "1000",
             "temperature_upper_K": "1100",
             "n": 3,
+            "color_eligible": True,
             "median_abs_dex": value,
         }
         for index, value in enumerate(("0.5", "0.8", "1.1"))

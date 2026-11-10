@@ -12,6 +12,8 @@ from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import (
     ElectrolysisModel,
+    FERRIC_TO_FERROUS_REFERENCE_STATUS,
+    FERRIC_TO_FERROUS_REFERENCE_V,
     MREElectrolysisInvalidInput,
     MREElectrolysisRefusal,
     MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
@@ -20,6 +22,7 @@ from simulator.electrolysis import (
     MRE_RAW_MARGIN_REFUSAL,
     mre_selectivity_weight,
 )
+import simulator.mre_ladder as mre_ladder
 from simulator.run_executor import RunExecutor
 from simulator.runner import DATA_DIR
 from simulator.session import SimSessionConfig
@@ -340,6 +343,70 @@ def test_step_hour_valid_feo_still_reduces():
     assert result["energy_kWh"] == pytest.approx(0.3)
 
 
+def test_step_hour_missing_raw_reference_records_notice_without_changing_amount(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    def _raw_reference_unavailable(*_args, **_kwargs):
+        raise LookupError("test raw reference unavailable")
+
+    monkeypatch.setattr(
+        mre_ladder,
+        "ellingham_segment_for_temperature",
+        _raw_reference_unavailable,
+    )
+    result = _legacy_model().step_hour(
+        MeltState(composition_kg={"FeO": 1.0}),
+        voltage_V=3.0,
+        current_A=100.0,
+        T_C=1600.0,
+    )
+
+    assert result["mre_decomposition_voltage_authority_by_oxide"]["FeO"] == (
+        "ellingham_fallback"
+    )
+    assert result["oxides_reduced_mol"]["FeO"] > 0.0
+    # Binary64 output captured from the fallback path at a6308d063.
+    assert result["oxides_reduced_mol"]["FeO"].hex() == (
+        "0x1.14ec234378d20p+0"
+    )
+    assert result["oxides_reduced_kg"]["FeO"].hex() == (
+        "0x1.3e52cbc0c5859p-4"
+    )
+    notice = next(
+        notice
+        for notice in result.get("notices", ())
+        if notice.get("kind") == "mre_raw_margin_unassessed"
+    )
+    assert notice["oxide"] == "FeO"
+    assert notice["temperature_C"] == pytest.approx(1600.0)
+    assert notice["applied_voltage_V"] == pytest.approx(3.0)
+    assert notice["fallback_requirement_V"] == pytest.approx(
+        _legacy_model().nernst_voltage("FeO", 1600.0, 1.0)
+    )
+    assert notice["reason"] == "raw_graph_voltage_missing"
+    assert notice["authority"] == "fallback_heuristic"
+
+
+def test_step_hour_raw_reference_has_no_unassessed_notice():
+    reference = mre_ladder.mre_decomposition_voltage_reference(
+        "FeO", temperature_K=1600.0 + 273.15
+    )
+    assert reference is not None
+    assert reference.raw_graph_voltage_V is not None
+
+    result = _legacy_model().step_hour(
+        MeltState(composition_kg={"FeO": 1.0}),
+        voltage_V=3.0,
+        current_A=100.0,
+        T_C=1600.0,
+    )
+
+    assert not any(
+        notice.get("kind") == "mre_raw_margin_unassessed"
+        for notice in result.get("notices", ())
+    )
+
+
 def test_step_hour_counts_ferric_oxide_with_ferric_to_ferrous_stoichiometry():
     result = _legacy_model().step_hour(
         MeltState(composition_kg={"FeO": 1.0, "Fe2O3": 1.0}),
@@ -358,6 +425,18 @@ def test_step_hour_counts_ferric_oxide_with_ferric_to_ferrous_stoichiometry():
     assert result["O2_produced_mol"] - 0.5 * result[
         "oxides_reduced_mol"].get("FeO", 0.0
     ) == pytest.approx(0.5 * ferric_reduced_mol)
+    notice = next(
+        notice
+        for notice in result.get("notices", ())
+        if notice.get("kind") == "mre_raw_margin_unassessed"
+        and notice.get("oxide") == "Fe2O3"
+    )
+    assert notice["fallback_requirement_V"] > 0.0
+    assert notice["reason"] == FERRIC_TO_FERROUS_REFERENCE_STATUS
+    assert notice["authority"] == "fallback_heuristic"
+    assert notice["heuristic_reference_V"] == pytest.approx(
+        FERRIC_TO_FERROUS_REFERENCE_V
+    )
 
 
 def test_step_hour_zero_current_and_voltage_remain_idle():

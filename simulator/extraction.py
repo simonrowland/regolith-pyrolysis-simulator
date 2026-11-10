@@ -1947,8 +1947,8 @@ class ExtractionMixin:
             if self._mre_effective_voltage_margin_V_by_oxide
             else None
         )
-        if c5_ellingham_ladder_diagnostic:
-            notices = diagnostic.get('notices')
+        notices = diagnostic.get('notices')
+        if c5_ellingham_ladder_diagnostic or notices:
             if notices:
                 c5_ellingham_ladder_diagnostic['notices'] = list(notices)
             diagnostic['mre_ellingham_ladder_diagnostic'] = (

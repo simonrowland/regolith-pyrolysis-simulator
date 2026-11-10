@@ -74,13 +74,23 @@
     }
     const entries = Object.entries(species);
     if (!entries.length) return `<p class="sec-p10-empty">No per-species sources emitted.</p>`;
+    const activitySources = isRecord(report.activity_sources)
+      ? report.activity_sources
+      : {};
     const rows = entries.map(([name, source]) => {
       const color = speciesColor(name);
       const speciesLabel = esc(prettySpecies(name));
       const token = typeof source === "string"
-        ? `<span class="sec-p10-token">${esc(String(source))}</span>`
+        ? `<span class="sec-p10-token">${esc(source)}</span>`
         : `<span class="sec-p10-malformed">Malformed ${source === null ? "null" : Array.isArray(source) ? "array" : typeof source} source token</span>`;
-      return `<tr><th scope="row"><span class="sec-p10-species-dot" style="--sec-p10-species-color: ${esc(color)}" aria-hidden="true"></span><span title="${esc(name)}">${speciesLabel}</span></th><td>${token}</td></tr>`;
+      let activityDetail = "";
+      if (hasOwn(activitySources, name)) {
+        const activity = activitySources[name];
+        activityDetail = isRecord(activity)
+          ? `<small class="sec-p10-activity-source">Activity ${esc(String(activity.rung ?? ""))} · ${esc(String(activity.source ?? ""))} · x=${esc(String(activity.x ?? ""))} · ${esc(String(activity.reason ?? ""))}${activity.warning ? ` · ${esc(String(activity.warning))}` : ""}</small>`
+          : `<small class="sec-p10-malformed">Malformed activity source detail</small>`;
+      }
+      return `<tr><th scope="row"><span class="sec-p10-species-dot" style="--sec-p10-species-color: ${esc(color)}" aria-hidden="true"></span><span title="${esc(name)}">${speciesLabel}</span></th><td>${token}${activityDetail}</td></tr>`;
     }).join("");
     return `<div class="table-wrap sec-p10-table-wrap"><table class="sec-p10-species-table"><caption>Per-species source tokens</caption><thead><tr><th scope="col">Species</th><th scope="col">Source token · verbatim</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
@@ -105,7 +115,7 @@
       envelopeCard(report, "authoritative_for_requested_vapor_pressure", "Authoritative for requested vapor pressure", { expected: "boolean-or-null" })
     ].join("");
 
-    return `<section id="sec-p10-vapor-source" class="sec-p10-vapor-source" aria-labelledby="sec-p10-vapor-source-title"><h2 id="sec-p10-vapor-source-title"><span class="sect">P10</span>Vapor-pressure source report</h2><p class="sub">Producer-emitted final-equilibrium source tokens and vapor-pressure backend envelope. Source tokens remain verbatim.</p><div class="sec-p10-envelope" role="list" aria-label="Vapor-pressure source report envelope">${envelope}</div><div class="sec-p10-summary-grid">${summaryBlock(report, "summary", "Source summary", "No source-summary entries emitted.")}${summaryBlock(report, "vapor_pressure_backend_status_summary", "Backend-status summary", "No backend-status summary entries emitted.")}</div><div class="sec-p10-species-block"><h3>Species sources</h3>${speciesBlock(report)}</div><div class="pending sec-p10-pending sec-p10-structured-pending" role="note"><strong>Per-species authority detail · pending producer</strong><p>Per-species backend status, authority, reference, diagnostic/certification, fallback, extrapolation, and uncertainty are not emitted as structured fields. Final-equilibrium envelope values are not copied into species rows.</p></div></section>`;
+    return `<section id="sec-p10-vapor-source" class="sec-p10-vapor-source" aria-labelledby="sec-p10-vapor-source-title"><h2 id="sec-p10-vapor-source-title"><span class="sect">P10</span>Vapor-pressure source report</h2><p class="sub">Producer-emitted final-equilibrium source tokens and vapor-pressure backend envelope. Source tokens remain verbatim.</p><div class="sec-p10-envelope" role="list" aria-label="Vapor-pressure source report envelope">${envelope}</div><div class="sec-p10-summary-grid">${summaryBlock(report, "summary", "Source summary", "No source-summary entries emitted.")}${summaryBlock(report, "vapor_pressure_backend_status_summary", "Backend-status summary", "No backend-status summary entries emitted.")}</div><div class="sec-p10-species-block"><h3>Species sources</h3>${speciesBlock(report)}</div><div class="pending sec-p10-pending sec-p10-structured-pending" role="note"><strong>Other per-species detail · pending producer</strong><p>Per-species backend status, authority, reference, diagnostic/certification, extrapolation, and uncertainty are not emitted as structured fields. Final-equilibrium envelope values are not copied into species rows.</p></div></section>`;
   }
 
   (root.ReportPanels = root.ReportPanels || []).push({

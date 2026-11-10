@@ -9,7 +9,10 @@ from simulator.config import load_config_bundle
 from simulator.feedstock_composition import resolve_feedstock_composition
 from simulator.chemistry.ellingham_graph import effective_equilibrium_pressure_Pa
 from simulator.chemistry.melt_activity import MELT_OXIDE_CATIONS_PER_FORMULA, melt_oxide_activity
-from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+from simulator.melt_backend.alphamelts import (
+    AlphaMELTSBackend,
+    VaporPressureActivityRefusal,
+)
 
 
 FEEDSTOCKS = (
@@ -141,7 +144,14 @@ def test_pure_sidecar_is_not_a_melt_source_input(monkeypatch, vapor_pressure_dat
         )
 
 
-def test_melt_source_fallback_refuses_missing_oxygen_input():
+def test_melt_source_fallback_returns_typed_refusal_for_missing_oxygen_input():
     backend = AlphaMELTSBackend()
-    with pytest.raises(RuntimeError, match="without pO2_bar"):
-        backend._activities_times_antoine(1800.0 - 273.15, {"SiO2": 0.4}, {})
+    refusal = backend._activities_times_antoine(
+        1800.0 - 273.15,
+        {"SiO2": 0.4},
+        {},
+    )
+
+    assert isinstance(refusal, VaporPressureActivityRefusal)
+    assert refusal.missing_precursor_species
+    assert refusal.reason == "missing_input"

@@ -10377,8 +10377,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         Behaviour:
           - Below 400 K this method returns before kernel dispatch and preserves
-            whatever backend vapor-pressure surface it received. It does not
-            establish that either the backend or kernel surface is empty; that
+            the backend vapor-pressure surface and matching activity-source
+            notices. It does not establish that either surface is empty; that
             is a separate provider contract.
           - When the kernel returns a populated ``vapor_pressures_Pa``
             it replaces the equilibrium-result dict in place. For
@@ -10402,6 +10402,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             explicitly forbidden by the goal spec.
         """
 
+        backend_diagnostics = dict(
+            getattr(self, '_last_backend_diagnostics', {}) or {}
+        )
+        backend_activity_sources = backend_diagnostics.pop(
+            'activity_source_by_species', {}
+        )
+        self._last_backend_diagnostics = backend_diagnostics
+        backend_vp = dict(getattr(result, 'vapor_pressures_Pa', {}) or {})
+
+        def restore_retained_backend_activity_sources() -> None:
+            if not isinstance(backend_activity_sources, Mapping):
+                return
+            retained_activity_sources = {
+                str(species): dict(activity_source)
+                for species, activity_source in backend_activity_sources.items()
+                if (
+                    str(species) in backend_vp
+                    and isinstance(activity_source, Mapping)
+                )
+            }
+            if retained_activity_sources:
+                self._last_backend_diagnostics[
+                    'activity_source_by_species'
+                ] = retained_activity_sources
+
         T_C = float(self.melt.temperature_C)
         co2_diagnostic = getattr(self, '_headspace_co2_dissociation_diagnostic', {})
         if co2_diagnostic:
@@ -10410,6 +10435,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if warning not in result.warnings:
                     result.warnings.append(warning)
         if T_C + 273.15 < 400:
+            restore_retained_backend_activity_sources()
             self._last_high_t_melt_activity = {}
             self._last_high_t_melt_activity_temperature_K = None
             self._last_vapor_pressures_source = dict(
@@ -10419,7 +10445,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._last_vapor_pressure_diagnostic = {'co2_dissociation': dict(co2_diagnostic)}
             return
 
-        backend_vp = dict(getattr(result, 'vapor_pressures_Pa', {}) or {})
         backend_sources = dict(
             getattr(result, 'vapor_pressures_source', {}) or {}
         )
@@ -10727,6 +10752,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 diagnostic['vapor_pressures_source'] = dict(
                     getattr(result, 'vapor_pressures_source', {}) or {}
                 )
+                restore_retained_backend_activity_sources()
         high_t_activity = diagnostic.get('high_t_melt_activity') or {}
         parent_activities = high_t_activity.get('selected_parent_activities')
         kernel_activities = parent_activities or diagnostic.get('activities') or {}
