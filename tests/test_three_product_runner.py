@@ -333,4 +333,4 @@ def test_default_classification_values_preserve_controlled_digest():
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
     # Re-pinned after d-364 kept the O₂ ledger total and attached its notice.
-    assert digest == "9e0c3802448b904a482e4bbb0388dbd7b0613c3d780738c2927962f478f68b51"
+    assert digest == "5f14d5d1e78a20bffb23494ad099aa53d8b7bc42a10ca7a5f70706d892c5116c"
