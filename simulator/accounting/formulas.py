@@ -420,6 +420,8 @@ def resolve_species_formula(
             return coerce_species_formula(species, registry[species])
         except AccountingError as exc:
             raise UnknownSpeciesError(f"invalid formula for species {species!r}") from exc
+        except (TypeError, ValueError) as exc:
+            raise UnknownSpeciesError(f"invalid formula for species {species!r}") from exc
 
     try:
         return parse_formula(species, species=species)

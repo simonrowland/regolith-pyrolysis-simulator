@@ -213,6 +213,36 @@ def test_dispatch_returns_typed_refusal_for_unresolvable_species(unknown_mol):
     assert any('BogusXYZ' in warning for warning in result.warnings)
 
 
+def test_dispatch_returns_typed_refusal_for_malformed_registry_formula():
+    class UnavailableBackend:
+        def is_available(self):
+            return False
+
+    composition_mol = {
+        species: wt_pct / resolve_species_formula(species).molar_mass_g_per_mol()
+        for species, wt_pct in _basalt_wt_pct().items()
+    }
+    composition_mol['BogusXYZ'] = 1.0
+    request = IntentRequest(
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': composition_mol},
+            species_formula_registry={'BogusXYZ': {'atoms': {'Si': 'bad'}}},
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    result = MAGEMinShadowProvider(backend=UnavailableBackend()).dispatch(request)
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostic['backend_status_reason'] == (
+        'unresolvable_species_composition'
+    )
+    assert any('BogusXYZ' in warning for warning in result.warnings)
+
+
 # ----------------------------------------------------------------------
 # Parity comparator
 # ----------------------------------------------------------------------
