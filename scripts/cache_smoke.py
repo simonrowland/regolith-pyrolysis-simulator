@@ -24,11 +24,11 @@ from simulator.battery.score import (  # noqa: E402
     _score_store_to_jsonl,
     load_score_context,
 )
+import simulator.battery.score as battery_score  # noqa: E402
 from simulator.battery.enums import Engine, Rail  # noqa: E402
 from simulator.battery.migrate import (  # noqa: E402
     iter_observation_store_paths,
     iter_work_store_paths,
-    dump_yaml,
     load_aliases,
     load_yaml,
     path_matches_source_tokens,
@@ -46,60 +46,47 @@ class SmokeSlice:
     observation_match: str | None = None
 
 
-# Real numeric rows selected from the controller's whole-store census. Keep
-# these source/rail pairs in the smoke so each engine must make a cache call.
+# Non-refused rows from the green whole-store census. Match each observation
+# exactly so a row that refuses before its adapter cannot satisfy the cache gate.
 SMOKE_SLICES = (
-    SmokeSlice(Engine.OPENIMCC, "guo-2021-mgo-activity-cmas-slag", Rail.MELT_ACTIVITY),
-    SmokeSlice(
-        Engine.OPENIMCC,
-        "shornikov-2002-aluminosilicate-solid-phases",
-        Rail.SIO_EVOLUTION,
-    ),
-    SmokeSlice(Engine.OPENIMCC, "sossi-2020-magma-ocean-redox", Rail.REDOX),
-    SmokeSlice(Engine.ALPHAMELTS, "sossi-2020-magma-ocean-redox", Rail.REDOX),
     SmokeSlice(
         Engine.ALPHAMELTS,
-        "shornikov-2002-aluminosilicate-solid-phases",
+        "nazarov-2015-dhofar-silicides",
         Rail.SIO_EVOLUTION,
-    ),
-    SmokeSlice(
-        Engine.ALPHAMELTS,
-        "aithala-2026-magmatic-iron-redox-to-2100c",
-        Rail.REDOX,
+        "nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio2::T=1833:h=677f0952267b",
     ),
     SmokeSlice(
         Engine.INTERNAL_ANALYTICAL,
-        "hemingway-haas-robinson-1982-usgs-b1544",
-        Rail.THERMOCHEMISTRY,
-        "usgs-b1544-lime:delta_fG:from_the_elements:T=1000",
+        "kems-053-stolyarova-1991",
+        Rail.SIO_EVOLUTION,
+        "kems-053-stolyarova-1991::stolyarova_1991_sio2_gas_partial_pressure_1933k_ion_comparison::T=1933.00:h=2ce25ff1442e",
     ),
     SmokeSlice(
         Engine.MAGEMIN,
-        "hemingway-haas-robinson-1982-usgs-b1544",
-        Rail.THERMOCHEMISTRY,
-        "usgs-b1544-andalusite:S:shared:T=1000",
+        "stolyarova-1996-cao-alumina-silica-kems",
+        Rail.MELT_ACTIVITY,
+        "stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_table3_sio2_activity_column_5_1933k::T=1933.00:h=9d04049614eb",
     ),
     SmokeSlice(
         Engine.THERMOENGINE,
-        "hemingway-haas-robinson-1982-usgs-b1544",
-        Rail.THERMOCHEMISTRY,
-        "usgs-b1544-andalusite:S:shared:T=1000",
+        "nazarov-2015-dhofar-silicides",
+        Rail.SIO_EVOLUTION,
+        "nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio::T=1833:h=d2752f80345e",
     ),
     SmokeSlice(
         Engine.VAPOROCK,
-        "kelley-king-1961-usbm-b592",
-        Rail.THERMOCHEMISTRY,
-        "table-006-0018:S:entropy_recommended",
+        "kems-053-stolyarova-1991",
+        Rail.SIO_EVOLUTION,
+        "kems-053-stolyarova-1991::stolyarova_1991_sio_partial_pressure_1933k_complete_evaporation::T=1933.00:h=fb536d3ae94b",
+    ),
+    SmokeSlice(
+        Engine.OPENIMCC,
+        "kems-053-stolyarova-1991",
+        Rail.SIO_EVOLUTION,
+        "kems-053-stolyarova-1991::stolyarova_1991_sio2_gas_partial_pressure_1933k_ion_comparison::T=1933.00:h=2ce25ff1442e",
     ),
 )
-DEFAULT_SLICES = (
-    SMOKE_SLICES[0],
-    SMOKE_SLICES[3],
-    SMOKE_SLICES[6],
-    SMOKE_SLICES[7],
-    SMOKE_SLICES[8],
-    SMOKE_SLICES[9],
-)
+DEFAULT_SLICES = SMOKE_SLICES
 ENGINE_ORDER = (
     Engine.OPENIMCC,
     Engine.ALPHAMELTS,
@@ -115,7 +102,6 @@ def _link_smoke_sources(
     root: Path,
     subset_root: Path,
     sources: tuple[str, ...],
-    slices: tuple[SmokeSlice, ...],
 ) -> None:
     literature = root / "data" / "literature"
     subset_literature = subset_root / "data" / "literature"
@@ -133,51 +119,10 @@ def _link_smoke_sources(
         for source in paths:
             if not path_matches_source_tokens(source, store, tokens):
                 continue
-            source_cases = [
-                case
-                for case in slices
-                if path_matches_source_tokens(
-                    source, store, source_filter_tokens((case.source,))
-                )
-            ]
-            filters: list[str] = []
-            eligible = False
-            relative = source.relative_to(store).as_posix()
-            for case in source_cases:
-                if case.observation_match is None:
-                    eligible = True
-                    continue
-                fragment = case.observation_match.removeprefix(case.source + ":").split(":", 1)[0]
-                matching_paths = [
-                    candidate
-                    for candidate in paths
-                    if path_matches_source_tokens(
-                        candidate, store, source_filter_tokens((case.source,))
-                    )
-                    and fragment in candidate.relative_to(store).as_posix()
-                ]
-                if not matching_paths or source in matching_paths:
-                    filters.append(case.observation_match)
-                    eligible = True
-            if not eligible:
-                continue
             document = load_yaml(source)
             if not isinstance(document, Mapping):
                 continue
             observations = document.get("observations") or []
-            if filters:
-                observations = [
-                    observation
-                    for observation in observations
-                    if isinstance(observation, Mapping)
-                    and any(
-                        term in str(observation.get("observation_id") or "")
-                        for term in filters
-                    )
-                ]
-                if not observations:
-                    continue
-                document = {**document, "observations": observations}
             for observation in observations:
                 if not isinstance(observation, Mapping):
                     continue
@@ -186,10 +131,7 @@ def _link_smoke_sources(
                     experiment_ids.add(str(experiment_id))
             destination = subset_literature / store_name / source.relative_to(store)
             destination.parent.mkdir(parents=True, exist_ok=True)
-            if filters:
-                dump_yaml(document, destination)
-            else:
-                destination.symlink_to(source.resolve())
+            destination.symlink_to(source.resolve())
 
     works = literature / "works"
     subset_works = subset_literature / "works"
@@ -306,32 +248,63 @@ def _run(
     counters: dict[str, dict[str, int]] = {}
     rows: list[str] = []
     output_dir.mkdir(parents=True, exist_ok=True)
-    for index, case in enumerate(slices):
-        case_context = context
-        if case.observation_match is not None:
-            selected = {
-                observation_id: observation
-                for observation_id, observation in context.observations.items()
-                if case.observation_match in observation_id
-            }
-            if not selected:
+    groups: dict[tuple[str, Rail, str | None], list[SmokeSlice]] = {}
+    for case in slices:
+        groups.setdefault(
+            (case.source, case.rail, case.observation_match), []
+        ).append(case)
+    for index, group in enumerate(groups.values()):
+        case = group[0]
+        engines = tuple(item.engine for item in group)
+        engine_label = "-".join(engine.value for engine in engines)
+        output = output_dir / f"{index:02d}-{engine_label}.jsonl"
+        original_prepare = battery_score._prepare_score_run
+        if case.observation_match is None:
+            exact_ids = None
+        else:
+            exact_ids = {case.observation_match}
+
+        def prepare_exact_refs(*args: Any, **kwargs: Any) -> Any:
+            prepared = original_prepare(*args, **kwargs)
+            if exact_ids is None:
+                return prepared
+            refs = tuple(
+                observation
+                for observation in prepared.refs
+                if observation.observation_id in exact_ids
+            )
+            if not refs:
+                engine_names = ", ".join(engine.value for engine in engines)
                 raise RuntimeError(
-                    f"{case.engine.value}: no observation matched "
+                    f"{engine_names}: no prepared observation matched "
                     f"{case.observation_match!r}"
                 )
-            case_context = replace(context, observations=selected)
-        output = output_dir / f"{index:02d}-{case.engine.value}.jsonl"
-        _count, metadata = _score_store_to_jsonl(
-            case_context,
-            output,
-            root=root,
-            engines=(case.engine,),
-            rail=case.rail,
-            work_id=case.source,
-            limit=limit,
-            include_diagnostics=True,
-            workers=workers,
-        )
+            ref_ids = {observation.observation_id for observation in refs}
+            return replace(
+                prepared,
+                refs=refs,
+                series_point_counts={
+                    observation_id: count
+                    for observation_id, count in prepared.series_point_counts.items()
+                    if observation_id in ref_ids
+                },
+            )
+
+        battery_score._prepare_score_run = prepare_exact_refs
+        try:
+            _count, metadata = _score_store_to_jsonl(
+                context,
+                output,
+                root=root,
+                engines=engines,
+                rail=case.rail,
+                work_id=case.source,
+                limit=None if exact_ids is not None else limit,
+                include_diagnostics=True,
+                workers=workers,
+            )
+        finally:
+            battery_score._prepare_score_run = original_prepare
         rows.extend(_canonical_rows(output.with_name(output.name + ".partial")))
         for engine, values in (metadata.engine_cache_counters or {}).items():
             target = counters.setdefault(engine, {})
@@ -374,7 +347,7 @@ def main(argv: list[str] | None = None) -> int:
     with tempfile.TemporaryDirectory(prefix="cache-smoke-", dir=tmp_parent) as name:
         scratch = Path(name)
         subset_root = scratch / "subset-store"
-        _link_smoke_sources(root, subset_root, work_ids, slices)
+        _link_smoke_sources(root, subset_root, work_ids)
         context = load_score_context(subset_root, sources=work_ids)
         if not context.observations:
             raise RuntimeError("selected smoke sources loaded no observations")

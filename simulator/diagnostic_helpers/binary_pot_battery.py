@@ -47,7 +47,11 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
-from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
+from simulator.melt_backend.base import (
+    ANTOINE_FALLBACK_SOURCE_PREFIX,
+    REDOX_MODE_NOT_AN_INPUT,
+    vapor_pressure_source_code,
+)
 from simulator.melt_regime import (
     legacy_raw_liquid_fraction_is_zero,
     liquid_fraction_invalidity,
@@ -157,7 +161,6 @@ _FLOOR_INVERSION_REASON = "melt_dissociation_pO2_floor_inverted_through_mass_act
 FINDING_CLASS_FALLBACK_VS_SPECIATION = "fallback_vs_speciation"
 AUTHORITY_FALLBACK = "fallback"
 AUTHORITY_SPECIATION = "speciation"
-_ANTOINE_FALLBACK_PREFIX = "antoine_fallback_from_vaporock"
 
 _MAJOR_SUM_TOKENS = frozenset(
     {"major_sum", "sum_below_95_wt_pct", "major oxide sum"}
@@ -311,18 +314,23 @@ def _call_cached_backend_equilibrate(
         request_kwargs["po2_request"] = po2_request.as_payload()
     from types import SimpleNamespace
 
-    from simulator.engine_cache import cached_engine_call
+    from simulator.engine_cache import _is_refusal, cached_engine_call
     from simulator.melt_backend.base import (
         EquilibriumResult,
+        equilibrium_cache_from_value,
         equilibrium_cache_value,
     )
 
     def solve_cache_value() -> Any:
         result = solve()
+        if _is_refusal(result):
+            return result
         if isinstance(result, EquilibriumResult):
             return result.to_engine_cache_value()
         if isinstance(result, SimpleNamespace):
             return equilibrium_cache_value(vars(result))
+        if isinstance(result, Mapping):
+            return equilibrium_cache_value(result)
         return result
 
     payload = cached_engine_call(
@@ -333,6 +341,8 @@ def _call_cached_backend_equilibrate(
         },
         solve_cache_value,
     )
+    if isinstance(payload, list):
+        payload = equilibrium_cache_from_value(payload)
     if isinstance(payload, Mapping):
         if handle.name == "internal-analytical":
             return SimpleNamespace(**payload)
@@ -457,6 +467,15 @@ def _handle_model_id(handle: EngineHandle) -> str | None:
     return None if model_id is None else str(model_id)
 
 
+def _activity_reference_phase(text: str | None) -> str | None:
+    blob = str(text or "").lower()
+    if "(s)" in blob or "solid" in blob:
+        return "solid"
+    if "(l)" in blob or "liquid" in blob:
+        return "liquid"
+    return None
+
+
 @dataclass
 class EquilibrateCell:
     pot_id: str
@@ -497,6 +516,19 @@ class EquilibrateCell:
     liquid_composition_wt_pct: dict[str, float] = field(default_factory=dict)
     fe_redox_split: dict[str, float] = field(default_factory=dict)
     backend_failure_disposition: str | None = None
+
+    def to_cache_payload(self) -> str:
+        """Serialize the cell without losing its Python value types."""
+        return _to_equilibrate_cell_cache_payload(self)
+
+    @classmethod
+    def from_cache_payload(cls, payload: str) -> "EquilibrateCell":
+        value = _from_equilibrate_cell_cache_payload(payload)
+        if type(value) is not cls:
+            raise TypeError(
+                f"cache payload contains {type(value).__name__}, expected {cls.__name__}"
+            )
+        return value
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -663,6 +695,300 @@ class EquilibrateCell:
                 else str(payload.get("backend_failure_disposition"))
             ),
         )
+
+    def to_engine_cache_value(self) -> Any:
+        """Return consumed engine fields in HOT and remaining cell fields in COLD."""
+        from simulator.engine_cache import CacheValue
+        from simulator.melt_backend.base import equilibrium_cache_value
+
+        projection = equilibrium_cache_value(
+            {
+                "status": self.status,
+                "liquid_fraction": self.liquid_fraction,
+                "phase_assemblage_available": True,
+                "activity_coefficients": self.melt_activities,
+                "reported_activity_coefficients": self.melt_activity_coefficients,
+                "activity_coefficient_details": self.melt_activity_coefficient_details,
+                "vapor_pressures_Pa": self.gas_partial_pressures_Pa,
+                "vapor_pressures_source": self.vapor_pressures_source,
+                "liquid_composition_wt_pct": self.liquid_composition_wt_pct,
+                "fe_redox_split": self.fe_redox_split,
+            }
+        )
+        compact_notices = []
+        for notice in self.notices:
+            if not isinstance(notice, Mapping):
+                continue
+            kind = notice.get("kind")
+            if isinstance(kind, Enum):
+                kind = kind.value
+            authority = notice.get("authority")
+            certified_band = notice.get("certified_band")
+            if kind is None and authority is None and certified_band is None:
+                continue
+            if certified_band == self.certified_band and certified_band is not None:
+                certified_band = True
+            compact_notices.append(
+                [
+                    None if kind is None else str(kind),
+                    None if authority is None else str(authority),
+                    certified_band,
+                ]
+            )
+        flags = [
+            self.engine_status,
+            _activity_reference_phase(self.engine_reason),
+            vapor_pressure_source_code(self.vapor_pressure_backend_status),
+            vapor_pressure_source_code(self.vapor_pressure_backend_status_reason),
+            self.authoritative_for_requested_vapor_pressure,
+            self.authority,
+            self.certified_band,
+            compact_notices,
+            self.model_id,
+            list(self.invalid_gas_partial_pressure_components),
+            self.backend_failure_disposition,
+        ]
+        payload = self.as_payload()
+        cold_fields = {
+            "pot_id",
+            "engine",
+            "temperature_K",
+            "po2",
+            "refusal_reason",
+            "engine_reason",
+            "engine_annotation",
+            "wall_s",
+            "cpu_s",
+            "hostname",
+            "vapor_pressures_source",
+            "vapor_pressure_backend_status",
+            "vapor_pressure_backend_status_reason",
+            "arm",
+            "notices",
+            "exit_signal",
+            "exit_code",
+            "melt_activities",
+            "melt_activity_coefficients",
+            "melt_activity_coefficient_details",
+            "gas_partial_pressures_Pa",
+            "activities_standard_state",
+        }
+        cold = {name: payload[name] for name in cold_fields if name in payload}
+        return CacheValue([*projection.hot, flags], cold)
+
+    @classmethod
+    def from_engine_cache_value(cls, payload: Any) -> "EquilibrateCell":
+        """Restore the scorer-visible fields from the compact HOT cache value."""
+        from simulator.melt_backend.base import equilibrium_cache_from_value
+
+        if not isinstance(payload, list) or len(payload) != 12:
+            raise ValueError("invalid compact EquilibrateCell cache value")
+        base = equilibrium_cache_from_value(payload[:11])
+        flags = payload[11]
+        if not isinstance(flags, list) or len(flags) != 11:
+            raise ValueError("invalid compact EquilibrateCell flags")
+        (
+            engine_status,
+            activity_phase,
+            vapor_status,
+            vapor_status_reason,
+            authoritative,
+            authority,
+            certified_band,
+            raw_notices,
+            model_id,
+            invalid_components,
+            failure_disposition,
+        ) = flags
+        if not isinstance(raw_notices, list) or not isinstance(invalid_components, list):
+            raise ValueError("invalid compact EquilibrateCell notices or components")
+        notices = []
+        for row in raw_notices:
+            if (
+                not isinstance(row, list)
+                or len(row) != 3
+                or any(value is not None and not isinstance(value, str) for value in row[:2])
+            ):
+                raise ValueError("invalid compact EquilibrateCell notice")
+            notice: dict[str, Any] = {}
+            if row[0] is not None:
+                notice["kind"] = row[0]
+            if row[1] is not None:
+                notice["authority"] = row[1]
+            if row[2] is True:
+                notice["certified_band"] = certified_band
+            elif row[2] is not None:
+                notice["certified_band"] = row[2]
+            notices.append(notice)
+        values = {
+            "status": base.get("status") or "ok",
+            "engine_status": engine_status,
+            "engine_reason": activity_phase,
+            "melt_activities": base.get("activity_coefficients") or {},
+            "melt_activity_coefficients": base.get("reported_activity_coefficients") or {},
+            "melt_activity_coefficient_details": base.get("activity_coefficient_details") or {},
+            "gas_partial_pressures_Pa": base.get("vapor_pressures_Pa") or {},
+            "liquid_fraction": base.get("liquid_fraction"),
+            "vapor_pressures_source": base.get("vapor_pressures_source") or {},
+            "vapor_pressure_backend_status": vapor_status,
+            "vapor_pressure_backend_status_reason": vapor_status_reason,
+            "authoritative_for_requested_vapor_pressure": authoritative,
+            "notices": notices,
+            "authority": authority,
+            "certified_band": certified_band,
+            "model_id": model_id,
+            "invalid_gas_partial_pressure_components": invalid_components,
+            "liquid_composition_wt_pct": base.get("liquid_composition_wt_pct") or {},
+            "fe_redox_split": base.get("fe_redox_split") or {},
+            "backend_failure_disposition": failure_disposition,
+        }
+        return cls.from_payload(values)
+
+
+def _cache_payload_sort_key(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _encode_cell_cache_value(value: Any) -> list[Any]:
+    if value is None:
+        return ["none"]
+    if isinstance(value, bool):
+        return ["bool", value]
+    if isinstance(value, Enum):
+        value_type = type(value)
+        return ["enum", value_type.__module__, value_type.__qualname__, value.name]
+    if isinstance(value, Decimal):
+        return ["decimal", str(value)]
+    if isinstance(value, float):
+        return ["float64", struct.pack(">d", value).hex()]
+    if isinstance(value, int):
+        return ["int", str(value)]
+    if isinstance(value, str):
+        return ["str", value]
+    if isinstance(value, tuple):
+        return ["tuple", [_encode_cell_cache_value(item) for item in value]]
+    if isinstance(value, list):
+        return ["list", [_encode_cell_cache_value(item) for item in value]]
+    if isinstance(value, Mapping):
+        items = [
+            [_encode_cell_cache_value(key), _encode_cell_cache_value(item)]
+            for key, item in value.items()
+        ]
+        items.sort(key=lambda pair: _cache_payload_sort_key(pair[0]))
+        return ["dict", items]
+    if is_dataclass(value) and not isinstance(value, type):
+        value_type = type(value)
+        if value_type not in {Po2Request, EquilibrateCell}:
+            raise TypeError(f"unsupported cell cache payload type: {value_type.__name__}")
+        return [
+            "dataclass",
+            value_type.__module__,
+            value_type.__qualname__,
+            [
+                [item.name, _encode_cell_cache_value(getattr(value, item.name))]
+                for item in fields(value)
+            ],
+        ]
+    raise TypeError(
+        f"unsupported cell cache payload value type: {type(value).__module__}."
+        f"{type(value).__qualname__}"
+    )
+
+
+def _decode_cell_cache_value(value: Any) -> Any:
+    if not isinstance(value, list) or not value or not isinstance(value[0], str):
+        raise ValueError("invalid tagged cell cache payload value")
+    tag, *items = value
+    if tag == "none" and not items:
+        return None
+    if tag == "bool" and len(items) == 1 and type(items[0]) is bool:
+        return items[0]
+    if tag == "enum" and len(items) == 3 and all(
+        isinstance(item, str) for item in items
+    ):
+        if items[:2] != [NoticeKind.__module__, NoticeKind.__qualname__]:
+            raise ValueError("unsupported enum in cell cache payload")
+        try:
+            return NoticeKind.__members__[items[2]]
+        except KeyError as exc:
+            raise ValueError(f"unknown NoticeKind member {items[2]!r}") from exc
+    if tag == "decimal" and len(items) == 1 and isinstance(items[0], str):
+        return Decimal(items[0])
+    if tag == "float64" and len(items) == 1 and isinstance(items[0], str):
+        try:
+            raw = bytes.fromhex(items[0])
+        except ValueError as exc:
+            raise ValueError("invalid float64 cell cache payload") from exc
+        if len(raw) != 8:
+            raise ValueError("invalid float64 cell cache payload length")
+        return struct.unpack(">d", raw)[0]
+    if tag == "int" and len(items) == 1 and isinstance(items[0], str):
+        return int(items[0])
+    if tag == "str" and len(items) == 1 and isinstance(items[0], str):
+        return items[0]
+    if tag in {"tuple", "list"} and len(items) == 1 and isinstance(items[0], list):
+        decoded = [_decode_cell_cache_value(item) for item in items[0]]
+        return tuple(decoded) if tag == "tuple" else decoded
+    if tag == "dict" and len(items) == 1 and isinstance(items[0], list):
+        result: dict[Any, Any] = {}
+        for pair in items[0]:
+            if not isinstance(pair, list) or len(pair) != 2:
+                raise ValueError("invalid dict entry in cell cache payload")
+            key = _decode_cell_cache_value(pair[0])
+            if key in result:
+                raise ValueError("duplicate dict key in cell cache payload")
+            result[key] = _decode_cell_cache_value(pair[1])
+        return result
+    if tag == "dataclass" and len(items) == 3:
+        module_name, qualname, raw_fields = items
+        if module_name != __name__ or not isinstance(raw_fields, list):
+            raise ValueError("unsupported dataclass in cell cache payload")
+        if qualname == "Po2Request":
+            value_type = Po2Request
+        elif qualname == "EquilibrateCell":
+            value_type = EquilibrateCell
+        else:
+            raise ValueError(f"unsupported cell cache payload type: {qualname}")
+        decoded_fields: dict[str, Any] = {}
+        for pair in raw_fields:
+            if (
+                not isinstance(pair, list)
+                or len(pair) != 2
+                or not isinstance(pair[0], str)
+                or pair[0] in decoded_fields
+            ):
+                raise ValueError("invalid dataclass field in cell cache payload")
+            decoded_fields[pair[0]] = _decode_cell_cache_value(pair[1])
+        known_fields = {item.name for item in fields(value_type)}
+        if decoded_fields.keys() - known_fields:
+            raise ValueError(f"unknown field in {qualname} cache payload")
+        return value_type(**decoded_fields)
+    raise ValueError(f"invalid {tag!r} tagged cell cache payload value")
+
+
+def _to_equilibrate_cell_cache_payload(cell: EquilibrateCell) -> str:
+    if type(cell) is not EquilibrateCell:
+        raise TypeError("cache payloads support EquilibrateCell values only")
+    return json.dumps(
+        {"value": _encode_cell_cache_value(cell)},
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+
+
+def _from_equilibrate_cell_cache_payload(payload: str) -> EquilibrateCell:
+    try:
+        decoded = json.loads(payload)
+    except (TypeError, json.JSONDecodeError) as exc:
+        raise ValueError("invalid EquilibrateCell cache JSON") from exc
+    if not isinstance(decoded, dict) or set(decoded) != {"value"}:
+        raise ValueError("unsupported EquilibrateCell cache payload")
+    result = _decode_cell_cache_value(decoded["value"])
+    if type(result) is not EquilibrateCell:
+        raise ValueError("EquilibrateCell cache payload did not contain a cell")
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -891,7 +1217,8 @@ def _reported_value_has_floor_provenance(
     if not blob:
         return False
     return (
-        _FLOOR_INVERSION_REASON in blob
+        source_label == "floor"
+        or _FLOOR_INVERSION_REASON in blob
         or REFUSAL_VALUE_IS_FLOOR in blob
     )
 
@@ -1389,10 +1716,11 @@ def vapor_authority_kind(
     if quantity != QUANTITY_PRESSURE:
         return None
     source = _source_label_for_species(payload, species)
+    source_code = vapor_pressure_source_code(source)
     status = str(payload.get("vapor_pressure_backend_status") or "")
-    if status == "fallback" or source.startswith(_ANTOINE_FALLBACK_PREFIX):
+    if status == "fallback" or source_code == "fallback":
         return AUTHORITY_FALLBACK
-    if source == "vaporock" or source.startswith("vaporock"):
+    if source_code == "speciation":
         return AUTHORITY_SPECIATION
     # Standalone VapoRock keeps live speciation off vapor_pressures_Pa.
     if str(payload.get("engine") or "") == "vaporock":
@@ -4168,7 +4496,7 @@ class _IsolatedCellWorker:
         if payload.get("simulate_crash") is not None:
             request["simulate_crash"] = payload["simulate_crash"]
 
-        def solve() -> dict[str, Any]:
+        def solve() -> Any:
             with self._lock:
                 try:
                     result = self._worker.call(payload, timeout_s=timeout_s)
@@ -4201,11 +4529,15 @@ class _IsolatedCellWorker:
                     raise _IsolatedCellWorkerFailure(
                         detail="isolated worker response was not an object"
                     )
-                return result
+                if result.get("status") == "refusal":
+                    return result
+                return EquilibrateCell.from_payload(result).to_engine_cache_value()
 
         from simulator.engine_cache import cached_engine_call
 
         result = cached_engine_call(self.engine, request, solve)
+        if isinstance(result, list):
+            result = EquilibrateCell.from_engine_cache_value(result).as_payload()
         if not isinstance(result, dict):
             raise _IsolatedCellWorkerFailure(
                 detail="isolated worker response was not an object"
@@ -5846,7 +6178,7 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
                 "and are excluded from residuals. "
                 f"`{FINDING_CLASS_FALLBACK_VS_SPECIATION}` marks a pair where "
                 "one engine reported an Antoine fallback authority "
-                f"(`{_ANTOINE_FALLBACK_PREFIX}` / "
+            f"(`{ANTOINE_FALLBACK_SOURCE_PREFIX}` / "
                 "`vapor_pressure_backend_status=fallback`) and the other a "
                 "speciation result. The Pa number itself is indistinguishable "
                 "from a speciation value; the harness now copies the engine "
