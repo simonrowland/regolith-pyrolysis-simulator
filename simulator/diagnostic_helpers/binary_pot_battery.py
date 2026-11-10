@@ -307,8 +307,15 @@ def _call_cached_backend_equilibrate(
 ) -> Any:
     if not cache:
         return solve()
+    from simulator.engine_cache import _configured_engine_cache_path
+
+    if _configured_engine_cache_path() is None:
+        return solve()
     request_kwargs = dict(kwargs)
     request_kwargs.pop("call_timeout_s", None)
+    if handle.name == "openimcc":
+        # OpenIMCC's battery adapter discards pressure before calling the bridge.
+        request_kwargs.pop("pressure_bar", None)
     if handle.name == "alphamelts":
         request_kwargs["engine_environment"] = {
             "ALPHAMELTS_CALC_MODE": os.environ.get("ALPHAMELTS_CALC_MODE")
@@ -3003,6 +3010,8 @@ class _OpenImccBatteryBackend:
         self._package = openimcc_bridge._require_openimcc()
         self._pack_name = str(pack_name or openimcc_bridge.DEFAULT_BACKEND_PACK_NAME)
         self._pack = openimcc_bridge._load_pack(self._pack_name)
+        # The gas loader selects its packaged default; keep that selector in the key.
+        self._gas_pack_name = "default"
         self.model_id = str(getattr(self._pack, "model_id", "openimcc"))
         self._gas: Any = None
         self._gas_error: str | None = None
@@ -3835,24 +3844,13 @@ def internal_analytical_residue_vapor_pressure(
 ) -> Any:
     """Run one direct internal-analytical residue pressure request."""
     from simulator.engine_cache import (
+        _configured_engine_cache_path,
         cached_engine_call,
         engine_cache_backend_settings,
         record_engine_open,
     )
 
     record_engine_open("internal-analytical", core)
-
-    request = {
-        "call": "residue_vapor_pressure",
-        "temperature_C": temperature_C,
-        "pressure_bar": pressure_bar,
-        "composition_kg": composition_kg,
-        "composition_mol": composition_mol,
-        "fO2_log": fO2_log,
-        "po2_request": po2_request.as_payload(),
-        "include_diagnostic_shadows": include_diagnostic_shadows,
-        "engine_settings": engine_cache_backend_settings(core),
-    }
 
     def solve_pressure_cache_value() -> Any:
         return _internal_analytical_vapor_pressure_adapter(
@@ -3865,6 +3863,27 @@ def internal_analytical_residue_vapor_pressure(
             po2_request=po2_request,
             include_diagnostic_shadows=include_diagnostic_shadows,
         )
+
+    if _configured_engine_cache_path() is None:
+        return solve_pressure_cache_value()
+
+    request = {
+        "call": "residue_vapor_pressure",
+        "temperature_C": temperature_C,
+        "pressure_bar": pressure_bar,
+        "composition_kg": composition_kg,
+        "composition_mol": composition_mol,
+        "fO2_log": fO2_log,
+        "po2_request": po2_request.as_payload(),
+        "include_diagnostic_shadows": include_diagnostic_shadows,
+        "high_t_melt_activity_previous": getattr(
+            core, "_last_high_t_melt_activity", {}
+        ),
+        "high_t_melt_activity_previous_temperature_K": getattr(
+            core, "_last_high_t_melt_activity_temperature_K", None
+        ),
+        "engine_settings": engine_cache_backend_settings(core),
+    }
 
     payload = cached_engine_call(
         "internal-analytical",
