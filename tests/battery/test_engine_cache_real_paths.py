@@ -405,6 +405,7 @@ def test_cache_settings_do_not_drop_names_only_because_they_contain_runtime_term
         chemistry_identity_mode="openimcc",
         custom_version_selection="v1",
         input_digest_formula="sha256",
+        input_sha256_algorithm="sha256",
         commit_atom_count=4,
         hostname_is_a_component="H",
         ready_payload_composition="SiO2",
@@ -454,15 +455,15 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason() -> 
                 attributes = vars(value)
             except TypeError:
                 attributes = {}
-                for cls in type(value).__mro__:
-                    slots = getattr(cls, "__slots__", ())
-                    if isinstance(slots, str):
-                        slots = (slots,)
-                    for name in slots:
-                        if name not in {"__dict__", "__weakref__"} and hasattr(
-                            value, name
-                        ):
-                            attributes[name] = getattr(value, name)
+            for cls in type(value).__mro__:
+                slots = getattr(cls, "__slots__", ())
+                if isinstance(slots, str):
+                    slots = (slots,)
+                for name in slots:
+                    if name not in {"__dict__", "__weakref__"} and hasattr(
+                        value, name
+                    ):
+                        attributes.setdefault(name, getattr(value, name))
             for name, child in attributes.items():
                 yield from leaves(child, (*path, name), seen)
 
@@ -523,6 +524,9 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason() -> 
             baseline_key = engine_cache.engine_cache_key(
                 engine.value, chem_version, settings
             )
+            assert engine_cache.engine_cache_key(
+                engine.value, chem_version + 1, settings
+            ) != baseline_key
             for path, original in tuple(leaves(handle.backend)):
                 changed = alternate(original)
                 if changed == original:
@@ -907,6 +911,19 @@ def test_internal_analytical_high_temperature_mode_is_keyed_and_cache_equivalent
             engine_cache.ENGINE_CHEMISTRY_VERSION["internal-analytical"],
             {**key_request, "engine_settings": openimcc_settings},
         )
+        different_composition_request = {
+            **key_request,
+            "composition_mol": {
+                **composition_mol,
+                "SiO2": 0.439,
+                "FeO": 0.081,
+            },
+        }
+        different_composition_key = engine_cache.engine_cache_key(
+            "internal-analytical",
+            engine_cache.ENGINE_CHEMISTRY_VERSION["internal-analytical"],
+            {**different_composition_request, "engine_settings": openimcc_settings},
+        )
         openimcc_backend.backend._core._high_t_melt_activity = "constant_gamma"
         constant_gamma_settings = engine_cache.engine_cache_backend_settings(
             openimcc_backend.backend._core
@@ -920,6 +937,7 @@ def test_internal_analytical_high_temperature_mode_is_keyed_and_cache_equivalent
         close_battery_engine_handle(openimcc_backend)
 
     assert openimcc_key != constant_gamma_key
+    assert openimcc_key != different_composition_key
     engine_cache.engine_cache_counters(reset=True)
     openimcc_off = evaluate("openimcc", cache=False)
     openimcc_cold = evaluate("openimcc", cache=True)
