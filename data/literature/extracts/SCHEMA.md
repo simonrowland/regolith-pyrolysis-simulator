@@ -103,10 +103,16 @@ when schema validation is skipped), fidelity-policy graduation, MinerU emit,
 the extract gate, and the literature index all call
 `certify_extract_source_fidelity` and refuse while any count is non-zero.
 
-Coverage means a sample whose value matches the extract and whose path or
-structured selector names the observation id and pins the measured `values`
-payload. An equipment pin does not cover that payload. A bare integer bracket
-such as `observations[0]` is a list position, not an id, so it does not cover.
+Coverage means the matching samples together contain every measured number
+in that observation's `values`, and each of those samples names the
+observation id. A measured number is a finite int or float (not a boolean),
+or a string that contains a numeric token. A descriptive label such as
+`quantity: alpha` does not cover a sibling number, and a pin of one number
+does not cover a second; two samples may pin different numbers of the same
+observation. A `values` payload with no measured number is covered by a pin
+of that payload, because no number is left unchecked. An equipment pin does
+not contribute. A bare integer bracket such as `observations[0]` is a list
+position, not an id, so it does not contribute.
 Matching pins still detect later extraction drift; a mismatch does not cover
 and blocks certification. Certification opens the locator's text artifact
 (`source_path`, `quotes_path`, or a `record` that is a repository-relative

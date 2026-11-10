@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 import shutil
 import subprocess
@@ -853,10 +854,12 @@ def test_mixed_series_transition_compositions_are_checked_per_point(
         ],
     }
     doc["species"] = {"FeO": {"observations": [row]}}
+    # The whole values payload: one temperature does not cover the other
+    # measured numbers in the points.
     doc["fidelity_samples"][0]["path"] = (
-        "species.FeO.observations[mixed_transition_series].values.points[0].T_K"
+        "species.FeO.observations[mixed_transition_series].values"
     )
-    doc["fidelity_samples"][0]["value"] = 1800
+    doc["fidelity_samples"][0]["value"] = copy.deepcopy(row["values"])
 
     report = _run_gate(tmp_path, doc)
 
@@ -888,10 +891,12 @@ def test_inherited_transition_composition_applies_to_unmarked_points(
         ],
     }
     doc["species"] = {"FeO": {"observations": [row]}}
+    # The whole values payload: one temperature does not cover the composition
+    # numbers or the other point.
     doc["fidelity_samples"][0]["path"] = (
-        "species.FeO.observations[inherited_transition_series].values.points[0].T_K"
+        "species.FeO.observations[inherited_transition_series].values"
     )
-    doc["fidelity_samples"][0]["value"] = 1800
+    doc["fidelity_samples"][0]["value"] = copy.deepcopy(row["values"])
 
     report = _run_gate(tmp_path, doc)
 
@@ -1139,33 +1144,37 @@ def test_cli_audits_extract_with_explicit_tree(tmp_path: Path, capsys):
             },
         }
     )
-    # Pin a number that the reference note actually prints. The quantity
-    # string lives in the validator; that file is not a source artifact.
+    # Pin the whole values payload. A single T_K does not cover the
+    # composition numbers. The opened note is written for this call and
+    # removed before the function returns; the validator source is not it.
     observation["values"]["T_K"] = 1966
+    pinned = copy.deepcopy(observation["values"])
+    artifact_rel = "docs/references/cli-audit-equilibrium-fixture.txt"
+    artifact = REPO_ROOT / artifact_rel
     doc["fidelity_samples"][0].update(
         {
-            "path": "species.Fe.observations[fe_alpha_1].values.T_K",
-            "value": 1966,
+            "path": "species.Fe.observations[fe_alpha_1].values",
+            "value": pinned,
+            "locator": {"source_path": artifact_rel, "page": 1, "table": "1"},
         }
     )
-    doc["fidelity_samples"][0]["locator"] = {
-        "source_path": "docs/references/pdfs/99-kems-langmuir/kems-001-homma-1966.md",
-        "page": 1,
-        "table": "1",
-    }
-    path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    artifact.write_text(" ".join(_cited_tokens(pinned)) + "\n", encoding="utf-8")
+    try:
+        path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
 
-    status = extract_gate.main(
-        [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
-    )
+        status = extract_gate.main(
+            [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
+        )
 
-    output = capsys.readouterr().out
-    assert status == 0, output
-    assert f"TREE {REPO_ROOT} HEAD " in output
-    assert "MIGRATION observations by ValueKind:" in output
-    assert "HARD schema/fidelity:" not in output
-    assert "HARD isolated-migration:" not in output
-    assert "unsupported quantity" not in output
+        output = capsys.readouterr().out
+        assert status == 0, output
+        assert f"TREE {REPO_ROOT} HEAD " in output
+        assert "MIGRATION observations by ValueKind:" in output
+        assert "HARD schema/fidelity:" not in output
+        assert "HARD isolated-migration:" not in output
+        assert "unsupported quantity" not in output
+    finally:
+        artifact.unlink(missing_ok=True)
 
     doc = _document()
     doc["extraction"]["date"] = "2026-10-18"

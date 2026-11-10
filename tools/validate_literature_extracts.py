@@ -29,7 +29,12 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   requires each pinned number as a complete token: sign and exponent
   belong to the token, so 0.24 is not -0.24 or 0.24e-5, and 1.0 is not 1.
   A recorded locator that is not opened is source-blind. An equipment
-  pin does not cover a measured payload.
+  pin does not cover a measured payload. Coverage of an observation holds
+  only when the matching samples together contain every measured number
+  in that observation's ``values``. A measured number is a finite int or
+  float (not a boolean), or a string that contains a numeric token. A
+  descriptive label such as ``quantity: alpha`` does not cover a sibling
+  number, and a pin of one number does not cover a second.
 * structured fidelity samples resolve rows in ``observations[]`` or the
   sibling ``context[]`` container (d-032); an id matching rows in both
   containers is an ambiguity error, not a silent pick
@@ -1309,15 +1314,16 @@ def _finish_detail(reasons: list[str], extra: int) -> str:
     return text
 
 
-def _scored_observation_keys(doc: Mapping[str, Any]) -> set[tuple[str, str]]:
+def _scored_observation_values(doc: Mapping[str, Any]) -> dict[tuple[str, str], Any]:
     """Scored rows are ``species.*.observations[]`` with a non-empty id.
 
     Context rows are unscored (d-032) and are not part of this coverage set.
+    The mapped value is that observation's ``values`` payload.
     """
-    required: set[tuple[str, str]] = set()
+    found: dict[tuple[str, str], Any] = {}
     species_map = doc.get("species") or {}
     if not isinstance(species_map, Mapping):
-        return required
+        return found
     for species_id, block in species_map.items():
         observations = block.get("observations") if isinstance(block, Mapping) else None
         if not isinstance(observations, list):
@@ -1327,8 +1333,8 @@ def _scored_observation_keys(doc: Mapping[str, Any]) -> set[tuple[str, str]]:
                 continue
             observation_id = observation.get("observation_id")
             if isinstance(observation_id, str) and observation_id:
-                required.add((str(species_id), observation_id))
-    return required
+                found[(str(species_id), observation_id)] = observation.get("values")
+    return found
 
 
 def _path_selector_names_observation_id(sample: Mapping[str, Any]) -> bool:
@@ -1376,12 +1382,12 @@ def _sample_attestation_defects(sample: Mapping[str, Any]) -> list[str]:
     return defects
 
 
-def _sample_pins_measured_payload(sample: Mapping[str, Any]) -> bool:
-    """True when the pin addresses ``observation.values``, not equipment.
+def _sample_addresses_values(sample: Mapping[str, Any]) -> bool:
+    """True when the pin's address is under ``observation.values``.
 
-    The fourth path segment is the payload container
+    This is not coverage. The fourth path segment is the payload container
     (``species.<id>.observations[<id>].values...``). An equipment path may be
-    a legal sample and still must not clear coverage. Structured samples
+    a legal sample and still must not contribute evidence. Structured samples
     resolve through ``values`` only.
     """
     path_keys, structured_keys = _sample_addressing_keys(sample)
@@ -1397,6 +1403,55 @@ def _sample_pins_measured_payload(sample: Mapping[str, Any]) -> bool:
         leaf = _PATH_SEGMENT_RE.match(parts[3])
         return bool(leaf and leaf.group(1) == "values")
     return bool(structured_keys)
+
+
+def _measured_evidence_leaves(value: Any) -> list[Any]:
+    """Finite numbers, and strings that contain a numeric token.
+
+    A bool is not a number. A descriptive label such as ``alpha`` has no
+    numeric token and is not measured evidence. A printed measurement such
+    as ``0.24 mol`` is one leaf: the whole string, not the token inside it.
+    """
+    if isinstance(value, bool):
+        return []
+    if isinstance(value, int):
+        return [value]
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            return []
+        return [value]
+    if isinstance(value, str):
+        if value.strip() and _NUMERIC_TOKEN_RE.search(value):
+            return [value]
+        return []
+    if isinstance(value, Mapping):
+        leaves: list[Any] = []
+        for child in value.values():
+            leaves.extend(_measured_evidence_leaves(child))
+        return leaves
+    if isinstance(value, (list, tuple)):
+        leaves = []
+        for child in value:
+            leaves.extend(_measured_evidence_leaves(child))
+        return leaves
+    return []
+
+
+def _measured_leaf_key(leaf: Any) -> tuple[Any, Any]:
+    """Type-tagged identity. ``1`` and ``1.0`` are different evidence."""
+    return (type(leaf), leaf)
+
+
+def _measured_leaves_cover(present: Sequence[Any], required: Sequence[Any]) -> bool:
+    """True when every required leaf occurs in ``present`` at least as often."""
+    pool = [_measured_leaf_key(leaf) for leaf in present]
+    for leaf in required:
+        key = _measured_leaf_key(leaf)
+        try:
+            pool.remove(key)
+        except ValueError:
+            return False
+    return True
 
 
 def _parse_line_range(raw: Any) -> tuple[int, int] | None:
@@ -1720,18 +1775,23 @@ def fidelity_source_warnings(
 ) -> list[FidelityWarning]:
     """Count source-fidelity holes. Empty means the certification invariant holds.
 
-    Invariant: every scored observation's measured ``values`` payload is covered
-    by a matching sample that names its observation id, is not an auto-migrated
-    pilot pin, carries reviewer, ISO date, and one locator, and that locator's
-    source artifact was opened and contains each pinned number as a complete
-    token (sign and exponent included). The artifact is a paper, OCR, quotes,
-    or reference transcription. The extract document and program source are
-    not artifacts. Equipment pins do not cover. A pilot or unattested sample
-    can still cover ``uncovered_observation``; those holes are their own
-    counts. A numeric observation index does not cover. Drift stays a match
-    error. ``source_blind_pin`` counts attestation-complete samples whose
-    locator was not opened or whose pinned value is absent from the opened
-    text. These warnings do not reject a draft corpus.
+    Invariant: every measured number in a scored observation's ``values`` is
+    inside some matching sample that names that observation id. A measured
+    number is a finite int or float (not a boolean), or a string that contains
+    a numeric token. A descriptive label does not contain a sibling number.
+    Several samples may each pin part of the payload. Equipment pins and a
+    numeric observation index do not contribute. A payload with no measured
+    number is covered by any matching values pin, because no number is left
+    unchecked. A pilot or unattested sample can still supply numbers toward
+    ``uncovered_observation``; attestation is its own count. Certification
+    refuses while any of these counts is non-zero: a pilot pin or an
+    unattested sample anywhere in the file, or an attestation-complete pin
+    whose locator was not opened. An opened locator must be a paper, OCR,
+    quotes, or reference transcription and must contain each pinned number
+    as a complete token (sign and exponent included). The extract document
+    and program source are not artifacts. Drift stays a match error.
+    ``source_blind_pin`` is that unopened or absent-value count. These
+    warnings do not reject a draft corpus.
     """
     samples = doc.get("fidelity_samples")
     if samples is None:
@@ -1739,8 +1799,12 @@ def fidelity_source_warnings(
     elif not isinstance(samples, list):
         samples = []
 
-    required = _scored_observation_keys(doc)
-    covered: set[tuple[str, str]] = set()
+    value_map = _scored_observation_values(doc)
+    required = set(value_map)
+    # Numbers each observation still needs. A values pin contributes only the
+    # measured leaves it actually holds. This is the only coverage write.
+    contributed: dict[tuple[str, str], list[Any]] = {key: [] for key in required}
+    addressed: set[tuple[str, str]] = set()
     unattested = 0
     unattested_reasons: list[str] = []
     unattested_extra = [0]
@@ -1797,9 +1861,28 @@ def fidelity_source_warnings(
             and observation_key is not None
             and observation_key in required
             and _path_selector_names_observation_id(sample)
-            and _sample_pins_measured_payload(sample)
+            and _sample_addresses_values(sample)
         ):
-            covered.add(observation_key)
+            addressed.add(observation_key)
+            try:
+                pinned = _sample_expected_value(sample)
+            except KeyError:
+                pinned = None
+            if pinned is not None:
+                contributed[observation_key].extend(_measured_evidence_leaves(pinned))
+
+    # Invariant: an observation is covered only when every measured number in
+    # its values is inside the union of those pins. A label, a boolean, or a
+    # pin of one number does not cover a number it does not contain.
+    covered: set[tuple[str, str]] = set()
+    for key, payload in value_map.items():
+        needed = _measured_evidence_leaves(payload)
+        if not needed:
+            if key in addressed:
+                covered.add(key)
+            continue
+        if _measured_leaves_cover(contributed[key], needed):
+            covered.add(key)
 
     uncovered_reasons: list[str] = []
     uncovered_extra = [0]
@@ -1874,13 +1957,14 @@ def certify_extract_source_fidelity(
 ) -> list[str]:
     """Refuse source certification while any fidelity hole remains.
 
-    Invariant: an empty list is the only pass. Every scored observation's
-    measured payload must be covered by a matching, non-pilot, attested sample
-    whose source artifact was opened and contains each pinned number as a
-    complete token. The extract itself and program source do not qualify.
-    Equipment pins, unopened locators, and copied values that are absent from
-    the artifact refuse. ``warnings`` is accepted for existing callers and is
-    not the decision: a supplied empty list cannot hide a hole.
+    Invariant: an empty list is the only pass. Every measured number in a
+    scored observation's ``values`` must sit inside a matching, non-pilot,
+    attested sample whose source artifact was opened and contains each pinned
+    number as a complete token. A descriptive label does not stand in for a
+    number it does not contain. The extract itself and program source do not
+    qualify. Equipment pins, unopened locators, and copied values that are
+    absent from the artifact refuse. ``warnings`` is accepted for existing
+    callers and is not the decision: a supplied empty list cannot hide a hole.
     """
     _ = warnings
     warnings = fidelity_source_warnings(

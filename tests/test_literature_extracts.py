@@ -14,6 +14,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import importlib.util
+import itertools
 import json
 import math
 import os
@@ -5072,25 +5073,37 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 
 # Measured on this corpus. Six ``observations[<integer>]`` pins are positions
 # and do not cover; counting them would report 46,335 observations in 524
-# extracts. Equipment pins also do not cover a measured payload: two
-# observations an equipment field alone used to clear are now uncovered
-# (46,341 -> 46,343), inside extracts that were already uncovered, so the
-# extract count stays 525. Each ceiling may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 46343
-_UNCOVERED_EXTRACTS_CEILING = 525
+# extracts. Equipment pins also do not cover a measured payload
+# (46,341 -> 46,343 observations, still 525 extracts). A values pin covers an
+# observation only when the pins together contain every measured number.
+# Descriptive labels, printed numeric strings, and partial numeric pins that
+# used to clear coverage are now uncovered: 46,343 -> 48,603 observations and
+# 525 -> 611 extracts. Unattested samples, pilot pins, and source-blind pins
+# did not move. Each ceiling may only fall.
+_UNCOVERED_OBSERVATIONS_CEILING = 48603
+_UNCOVERED_EXTRACTS_CEILING = 611
 _UNATTESTED_SAMPLES_CEILING = 3128
 _PILOT_PIN_EXTRACTS_CEILING = 57
+# The warning count, not the number of extracts that have at least one.
+# A second pilot pin inside an already-affected extract must still fail.
+_PILOT_PINS_CEILING = 57
 # Attestation-complete pins whose locator is not opened. Zero on this corpus:
 # no sample carries reviewed_by. The ceiling may only fall.
 _SOURCE_BLIND_PINS_CEILING = 0
 
 
 def test_fidelity_source_warning_ratchet():
-    """Source-fidelity holes are an upper bound, not a green bill of health."""
+    """Source-fidelity holes are an upper bound, not a green bill of health.
+
+    ``auto_migrated_pilot_pin`` is the number of pilot samples. Counting
+    affected extracts alone would miss another pilot pin in an extract that
+    already has one.
+    """
     uncovered_obs = 0
     uncovered_extracts = 0
     unattested_samples = 0
     pilot_extracts = 0
+    pilot_pins = 0
     source_blind_pins = 0
     for path in vle.discover_extracts():
         doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
@@ -5106,13 +5119,27 @@ def test_fidelity_source_warning_ratchet():
             uncovered_obs += uncovered
         unattested_samples += by_kind.get("unattested_sample", 0)
         source_blind_pins += by_kind.get("source_blind_pin", 0)
-        if by_kind.get("auto_migrated_pilot_pin", 0):
+        pilot = by_kind.get("auto_migrated_pilot_pin", 0)
+        pilot_pins += pilot
+        if pilot:
             pilot_extracts += 1
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
     assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
     assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, unattested_samples
+    assert pilot_pins <= _PILOT_PINS_CEILING, pilot_pins
     assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
     assert source_blind_pins <= _SOURCE_BLIND_PINS_CEILING, source_blind_pins
+
+
+def test_auto_migrated_pilot_pin_counts_each_sample():
+    """Two pilot notes in one extract are two violations, not one extract."""
+    doc = _minimal_extract()
+    note = "auto fidelity sample from first observation payload (pilot migration)"
+    doc["fidelity_samples"][0]["note"] = note
+    doc["fidelity_samples"].append(copy.deepcopy(doc["fidelity_samples"][0]))
+    warnings = vle.fidelity_source_warnings(doc, label="two-pilots")
+    pilot = next(warning for warning in warnings if warning.kind == "auto_migrated_pilot_pin")
+    assert pilot.count == 2
 
 
 def _opened_payload_document(root: Path, *, structured: bool) -> dict:
@@ -5147,8 +5174,120 @@ def _opened_payload_document(root: Path, *, structured: bool) -> dict:
     return doc
 
 
+def _source_locator(root: Path, text: str) -> dict:
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text(text, encoding="utf-8")
+    return {"source_path": "text/paper.txt", "page": 2}
+
+
+def _values_pin_document(
+    root: Path,
+    *,
+    values: object,
+    pins: list[tuple[str | None, object]],
+    source_text: str,
+    structured: bool,
+) -> dict:
+    """Attested pins of ``values``. ``None`` as the field pins the whole payload."""
+    locator = _source_locator(root, source_text)
+    doc = _minimal_extract()
+    doc["review_status"] = "reviewed"
+    doc["species"]["Fe"]["observations"][0]["values"] = copy.deepcopy(values)
+    samples = []
+    for field, value in pins:
+        if structured:
+            sample: dict = {
+                "species": "Fe",
+                "observable": "alpha",
+                "observation_id": "fe_alpha_1",
+                "value": copy.deepcopy(value),
+                "reviewed_by": "independent reviewer",
+                "reviewed_on": "2026-11-10",
+                "locator": dict(locator),
+            }
+            if field is not None:
+                sample["field"] = field
+        else:
+            path = "species.Fe.observations[fe_alpha_1].values"
+            if field is not None:
+                path = f"{path}.{field}"
+            sample = {
+                "path": path,
+                "value": copy.deepcopy(value),
+                "reviewed_by": "independent reviewer",
+                "reviewed_on": "2026-11-10",
+                "locator": dict(locator),
+            }
+        samples.append(sample)
+    doc["fidelity_samples"] = samples
+    return doc
+
+
+# Literal payloads. The source text is not derived from the unchecked number.
+_MEASURED_PIN_CASES = {
+    "descriptive_quantity": {
+        "values": {"quantity": "alpha", "alpha": 0.91},
+        "pins": [("quantity", "alpha")],
+        "source_text": "alpha 0.24 measured\n",
+        "structured": False,
+    },
+    "descriptive_quantity_structured": {
+        "values": {"quantity": "alpha", "alpha": 0.91},
+        "pins": [("quantity", "alpha")],
+        "source_text": "alpha 0.24 measured\n",
+        "structured": True,
+    },
+    "partial_number": {
+        "values": {"alpha": 0.91, "beta": 0.5},
+        "pins": [("alpha", 0.91)],
+        "source_text": "alpha 0.91 measured\n",
+        "structured": False,
+    },
+    "partial_number_structured": {
+        "values": {"alpha": 0.91, "beta": 0.5},
+        "pins": [("alpha", 0.91)],
+        "source_text": "alpha 0.91 measured\n",
+        "structured": True,
+    },
+    "printed_string_beside_number": {
+        "values": {"alpha": 0.91, "printed": "0.24 mol"},
+        "pins": [("printed", "0.24 mol")],
+        "source_text": "0.24 mol\n",
+        "structured": False,
+    },
+    "series_element": {
+        "values": {"series": [0.2, 0.5]},
+        "pins": [("series[0]", 0.2)],
+        "source_text": "0.2\n",
+        "structured": False,
+    },
+    "numeric_beside_label": {
+        "values": {"quantity": "alpha", "alpha": 0.91},
+        "pins": [("alpha", 0.91)],
+        "source_text": "alpha 0.91 measured\n",
+        "structured": False,
+    },
+    "numeric_beside_label_structured": {
+        "values": {"quantity": "alpha", "alpha": 0.91},
+        "pins": [("alpha", 0.91)],
+        "source_text": "alpha 0.91 measured\n",
+        "structured": True,
+    },
+    "split_two_numbers": {
+        "values": {"alpha": 0.91, "beta": 0.5},
+        "pins": [("alpha", 0.91), ("beta", 0.5)],
+        "source_text": "0.91\n0.5\n",
+        "structured": False,
+    },
+}
+
+
 def _defect_document(pin_class: str, root: Path) -> dict:
-    """One input class. Only ``opened_payload`` and ``structured_payload`` pass."""
+    """One input class. Pass classes are ``_PASS_PIN_CLASSES``."""
+    if pin_class in _MEASURED_PIN_CASES:
+        spec = _MEASURED_PIN_CASES[pin_class]
+        return _values_pin_document(root, **spec)
     if pin_class == "structured_context":
         # Structured selectors also read context rows. That pin must not cover
         # the scored observation, even when the artifact contains the text.
@@ -5261,7 +5400,13 @@ def _defect_document(pin_class: str, root: Path) -> dict:
     raise AssertionError(pin_class)
 
 
-_PASS_PIN_CLASSES = ("opened_payload", "structured_payload")
+_PASS_PIN_CLASSES = (
+    "opened_payload",
+    "structured_payload",
+    "numeric_beside_label",
+    "numeric_beside_label_structured",
+    "split_two_numbers",
+)
 _DEFECT_PIN_CLASSES = (
     "equipment_pin",
     "metadata_id",
@@ -5279,6 +5424,12 @@ _DEFECT_PIN_CLASSES = (
     "copied_value",
     "context_pin",
     "structured_context",
+    "descriptive_quantity",
+    "descriptive_quantity_structured",
+    "partial_number",
+    "partial_number_structured",
+    "printed_string_beside_number",
+    "series_element",
 )
 _DEFECT_KIND = {
     "equipment_pin": "uncovered_observation",
@@ -5297,6 +5448,12 @@ _DEFECT_KIND = {
     "copied_value": "source_blind_pin",
     "context_pin": "uncovered_observation",
     "structured_context": "uncovered_observation",
+    "descriptive_quantity": "uncovered_observation",
+    "descriptive_quantity_structured": "uncovered_observation",
+    "partial_number": "uncovered_observation",
+    "partial_number_structured": "uncovered_observation",
+    "printed_string_beside_number": "uncovered_observation",
+    "series_element": "uncovered_observation",
 }
 _PROMOTION_ENTRIES = (
     "certify",
@@ -5442,6 +5599,200 @@ def test_draft_defects_stay_schema_valid_and_warn(pin_class: str, tmp_path: Path
         doc, label="draft", artifact_root=tmp_path
     )
     assert any(warning.kind == _DEFECT_KIND[pin_class] for warning in warnings)
+
+
+# Every leaf class a ``values`` payload can hold. The oracle below is the
+# invariant, written separately from the gate: a measured leaf is a finite
+# int, a finite float, or a string that contains a numeric token. A bool
+# and a label are not. Coverage is the multiset union of the pins.
+_EVIDENCE_LEAF_CATALOG = (
+    ("alpha", 0.91),
+    ("count", 3),
+    ("flag", True),
+    ("quantity", "alpha"),
+    ("printed", "0.24 mol"),
+    ("series", [0.2, 0.5]),
+)
+
+
+def _oracle_measured_leaves(value: object) -> list[tuple[type, object]]:
+    """Independent leaf rule for the generative coverage test."""
+    if isinstance(value, bool):
+        return []
+    if isinstance(value, int):
+        return [(int, value)]
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            return []
+        return [(float, value)]
+    if isinstance(value, str):
+        if value.strip() and vle._NUMERIC_TOKEN_RE.search(value):
+            return [(str, value)]
+        return []
+    if isinstance(value, dict):
+        found: list[tuple[type, object]] = []
+        for child in value.values():
+            found.extend(_oracle_measured_leaves(child))
+        return found
+    if isinstance(value, (list, tuple)):
+        found = []
+        for child in value:
+            found.extend(_oracle_measured_leaves(child))
+        return found
+    return []
+
+
+def _oracle_leaves_cover(
+    present: list[tuple[type, object]],
+    required: list[tuple[type, object]],
+) -> bool:
+    pool = list(present)
+    for leaf in required:
+        try:
+            pool.remove(leaf)
+        except ValueError:
+            return False
+    return True
+
+
+def _source_text_for(value: object) -> list[str]:
+    """Lines that contain each pinned scalar as the gate's token grammar reads it."""
+    if isinstance(value, bool):
+        return ["true" if value else "false"]
+    if isinstance(value, (int, float)):
+        return [str(value)]
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        lines: list[str] = []
+        for child in value.values():
+            lines.extend(_source_text_for(child))
+        return lines
+    if isinstance(value, (list, tuple)):
+        lines = []
+        for child in value:
+            lines.extend(_source_text_for(child))
+        return lines
+    return []
+
+
+def test_measured_number_coverage_enumerates_every_leaf_class(tmp_path: Path):
+    """Invariant: every measured number in ``values`` is inside some matching pin.
+
+    The matrix is every non-empty subset of the leaf catalog, each single
+    field and the whole payload, in both addressing modes. A split pair of
+    pins must cover when each measured field is pinned and must refuse when
+    one measured field is left out. A list element does not cover its sibling.
+    """
+    names = [name for name, _value in _EVIDENCE_LEAF_CATALOG]
+    catalog = dict(_EVIDENCE_LEAF_CATALOG)
+    failures: list[str] = []
+
+    def check(case: str, values: object, pins: list[tuple[str | None, object]], *, structured: bool) -> None:
+        required = _oracle_measured_leaves(values)
+        present: list[tuple[type, object]] = []
+        for _field, pinned in pins:
+            present.extend(_oracle_measured_leaves(pinned))
+        # No measured number: any values pin covers, because nothing is unchecked.
+        expect_cover = _oracle_leaves_cover(present, required) if required else True
+        source = "\n".join(
+            line for _field, pinned in pins for line in _source_text_for(pinned)
+        ) + "\n"
+        doc = _values_pin_document(
+            tmp_path,
+            values=values,
+            pins=pins,
+            source_text=source,
+            structured=structured,
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label="leaf", artifact_root=tmp_path
+        )
+        if expect_cover:
+            if errors:
+                failures.append(f"{case} structured={structured} expected cover: {errors}")
+            return
+        joined = "\n".join(errors)
+        if "uncovered_observation" not in joined:
+            failures.append(f"{case} structured={structured} expected uncovered: {errors}")
+
+    for size in range(1, len(names) + 1):
+        for chosen in itertools.combinations(names, size):
+            values = {name: catalog[name] for name in chosen}
+            for name in chosen:
+                for structured in (False, True):
+                    check(
+                        f"field {chosen} pin {name}",
+                        values,
+                        [(name, catalog[name])],
+                        structured=structured,
+                    )
+            for structured in (False, True):
+                check(
+                    f"whole {chosen}",
+                    values,
+                    [(None, values)],
+                    structured=structured,
+                )
+            measured_fields = [
+                name
+                for name in chosen
+                if _oracle_measured_leaves(catalog[name])
+            ]
+            if len(measured_fields) >= 2:
+                check(
+                    f"split {chosen}",
+                    values,
+                    [(name, catalog[name]) for name in measured_fields],
+                    structured=False,
+                )
+                omitted = measured_fields[:-1]
+                check(
+                    f"split-omit {chosen} without {measured_fields[-1]}",
+                    values,
+                    [(name, catalog[name]) for name in omitted],
+                    structured=False,
+                )
+
+    # One element of a series, and one index of a list payload.
+    check(
+        "series element",
+        {"series": [0.2, 0.5]},
+        [("series[0]", 0.2)],
+        structured=False,
+    )
+    list_doc = _values_pin_document(
+        tmp_path,
+        values=[0.2, 0.5],
+        pins=[(None, [0.2, 0.5])],
+        source_text="0.2\n0.5\n",
+        structured=True,
+    )
+    whole_list = vle.certify_extract_source_fidelity(
+        list_doc, label="leaf", artifact_root=tmp_path
+    )
+    if whole_list:
+        failures.append(f"whole list expected cover: {whole_list}")
+    list_doc["fidelity_samples"] = [
+        {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+            "index": 0,
+            "value": 0.2,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": {"source_path": "text/paper.txt", "page": 2},
+        }
+    ]
+    (tmp_path / "text" / "paper.txt").write_text("0.2\n", encoding="utf-8")
+    indexed = vle.certify_extract_source_fidelity(
+        list_doc, label="leaf", artifact_root=tmp_path
+    )
+    if "uncovered_observation" not in "\n".join(indexed):
+        failures.append(f"list index expected uncovered: {indexed}")
+
+    assert failures == []
 
 
 # Literal source text, written independently of the pin. A helper that copies
