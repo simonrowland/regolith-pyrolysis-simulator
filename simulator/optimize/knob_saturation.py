@@ -20,6 +20,7 @@ from simulator.optimize.recipe import (
     RecipePatch,
     RecipeSchema,
     _default_setpoint_value,
+    knob_search_low,
 )
 
 
@@ -52,7 +53,7 @@ def compute_knob_saturation(
                 value,
                 path=path,
                 kind=spec.kind,
-                low=spec.low,
+                low=knob_search_low(spec),
                 high=spec.high,
                 units=spec.units,
                 active_metrics=active_metrics,
@@ -104,7 +105,7 @@ def _default_bound_rows(
                 value,
                 path=spec.path,
                 kind=spec.kind,
-                low=spec.low,
+                low=knob_search_low(spec),
                 high=spec.high,
                 units=spec.units,
                 active_metrics=active_metrics,

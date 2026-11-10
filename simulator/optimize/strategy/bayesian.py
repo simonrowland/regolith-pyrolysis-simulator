@@ -24,6 +24,7 @@ from simulator.optimize.recipe import (
     RecipeSchema,
     RecipeValidationError,
     _default_setpoint_value,
+    knob_search_low,
 )
 from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
 
@@ -498,9 +499,10 @@ def _sync_conditioned_trial_params(
 
 def _numeric_bounds(spec: KnobSpec) -> tuple[float, float]:
     name = ".".join(spec.path)
-    if spec.low is None or spec.high is None:
+    low_bound = knob_search_low(spec)
+    if low_bound is None or spec.high is None:
         raise ValueError(f"{name} numeric knob lacks bounds")
-    low = float(spec.low)
+    low = float(low_bound)
     high = float(spec.high)
     if not math.isfinite(low) or not math.isfinite(high) or low > high:
         raise ValueError(f"{name} numeric knob has invalid bounds")

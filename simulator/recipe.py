@@ -394,12 +394,26 @@ CANONICAL_TO_RUNTIME_PATH: Mapping[KeyPath, tuple[KeyPath, str]] = MappingProxyT
 )
 
 
+# C2A total-pressure setpoints bands are the optimizer search envelope.
+# d-209 removed the viscous-flow invariant; d-208 reports Kn. Schema
+# admission for these knobs is physical (finite and >= 0), not that band.
+_C2A_TOTAL_PRESSURE_SETPOINT_SOURCES = frozenset(
+    {
+        "setpoints:campaigns.C2A_continuous.p_total_mbar",
+        "setpoints:campaigns.C2A_staged.p_total_mbar",
+    }
+)
+
+
 @dataclass(frozen=True)
 class KnobSpec:
     path: KeyPath
     kind: Literal["float", "int", "categorical"]
     low: float | None = None
     high: float | None = None
+    # Optimizer sampling interval when it is wider or narrower than admission.
+    # None means the search interval is ``low``.
+    search_low: float | None = None
     choices: tuple[str, ...] | None = None
     units: str = ""
     bounds_source: str = ""
@@ -408,6 +422,13 @@ class KnobSpec:
     scale: Literal["linear", "log", "log10", "ordinal", "zero-inflated"] = "linear"
     guard: GuardSpec | None = None
     _bound_types: tuple[type, type] | None = field(default=None, repr=False)
+
+
+def knob_search_low(spec: KnobSpec) -> float | None:
+    """Lower edge the optimizer samples. Admission uses ``spec.low``."""
+    if spec.search_low is not None:
+        return spec.search_low
+    return spec.low
 
 
 def _knob(
@@ -2063,8 +2084,20 @@ def _setpoint_sourced_allowlist(
         if spec._bound_types is not None:
             low = spec._bound_types[0](low)
             high = spec._bound_types[1](high)
+        search_low = spec.search_low
+        if spec.bounds_source in _C2A_TOTAL_PRESSURE_SETPOINT_SOURCES:
+            # Keep the setpoints band as the search envelope. Admission is
+            # physical: finite and >= 0, including a hard-vacuum crown total.
+            search_low = low
+            low = 0.0
         resolved.append(
-            replace(spec, low=low, high=high, bounds_source=bounds_source)
+            replace(
+                spec,
+                low=low,
+                high=high,
+                search_low=search_low,
+                bounds_source=bounds_source,
+            )
         )
     return tuple(resolved)
 
@@ -2114,6 +2147,8 @@ def _bounds_identity_entry(spec: KnobSpec) -> dict[str, Any]:
         entry["low"] = _bounds_identity_float(spec.low)
     if spec.high is not None:
         entry["high"] = _bounds_identity_float(spec.high)
+    if spec.search_low is not None:
+        entry["search_low"] = _bounds_identity_float(spec.search_low)
     if spec.choices is not None:
         entry["choices"] = [str(choice) for choice in spec.choices]
     step = getattr(spec, "step", None)

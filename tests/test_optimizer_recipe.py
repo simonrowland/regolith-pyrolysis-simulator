@@ -11,6 +11,7 @@ import yaml
 import pytest
 
 import simulator.optimize.doe as doe_module
+from simulator.optimize.doe import _map_unit_value
 import simulator.optimize.study as study_module
 from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
@@ -41,6 +42,7 @@ from simulator.optimize.recipe import (
     RecipePinWarning,
     RecipeSchema,
     RecipeValidationError,
+    _C2A_TOTAL_PRESSURE_SETPOINT_SOURCES,
     STAGE0_CARBON_REDUCTANT_KG_PATH,
     STAGE0_REDOX_OXIDANT_KG_PATH,
     allowlist_version,
@@ -130,19 +132,20 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
     assert schema.bounds_digest == (
-        "e02d77339d524d397ba5850d386a62427f70dcad9a7efc270bc93fc61bd1ab0c"
+        "c29ba45d7ef926efc56d20c9c2d24e0933a13c9598ba68ad4b7e3640c518fc5b"
     )
     assert schema.bounds_digest != (
-        "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
+        "e02d77339d524d397ba5850d386a62427f70dcad9a7efc270bc93fc61bd1ab0c"
     )
     # Moves with bounds_digest above -- that is the POINT of this test's name
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
-    # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
+    # tracks the schema. Recomputed for b-245: C2A p_total admission is >= 0
+    # while the search interval stays the setpoints band (d-209, d-208).
     assert empty.recipe_id(schema) == (
-        "17f2abb0d76c5234e709641b2f5a6b666b031dd7f94b287832f4daad9d2e1786"
+        "96d7d63163969506ffbe74cdd86ee45014fee045b45943e5b38cf146fef615bb"
     )
     assert empty.recipe_id(schema) != (
-        "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
+        "17f2abb0d76c5234e709641b2f5a6b666b031dd7f94b287832f4daad9d2e1786"
     )
     identity = study_module._search_space_identity(
         schema, profile_pinned_paths=(), cli_pinned_paths=()
@@ -152,7 +155,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "d40d619c3228beccd37ca6b683c5213a7894edcbe07ffc105a2ef58ff2c6ec55"
+        "a2b65b82ef326815651384b413d504cab547d640d147d4048501f76937064684"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -1176,7 +1179,8 @@ def test_c2a_staged_stage_gas_knobs_validate_and_render() -> None:
     mode_spec = schema.spec_for(STAGE_SIO_GAS_MODE)
     assert po2_spec.low == pytest.approx(0.0)
     assert po2_spec.high == pytest.approx(15.0)
-    assert total_spec.low == pytest.approx(5.0)
+    assert total_spec.low == pytest.approx(0.0)
+    assert total_spec.search_low == pytest.approx(5.0)
     assert total_spec.high == pytest.approx(15.0)
     assert mode_spec.choices == ("pn2_sweep", "po2_hold")
 
@@ -1199,6 +1203,47 @@ def test_c2a_staged_stage_gas_knobs_validate_and_render() -> None:
     assert sio_stage["gas_cover_mode"] == "po2_hold"
 
 
+def test_c2a_staged_po2_hold_accepts_hard_vacuum_total_and_refuses_nonphysical() -> None:
+    """d-209: the 5 mbar RecipeSchema floor is not a physics boundary.
+
+    C2A_staged po2_hold may schedule a hard-vacuum crown total, including the
+    0.2 mbar endpoint. Admission is finite and >= 0. The optimizer search
+    interval stays the setpoints band.
+    """
+    schema = RecipeSchema()
+    total_spec = schema.spec_for(STAGE_SIO_PTOTAL)
+    assert total_spec.low == pytest.approx(0.0)
+    assert total_spec.search_low == pytest.approx(5.0)
+    # Log-uniform search still opens at the setpoints floor, not at vacuum.
+    assert _map_unit_value(total_spec, 0.0) == pytest.approx(5.0)
+    assert _map_unit_value(total_spec, 1.0) == pytest.approx(15.0)
+
+    validated = RecipePatch(
+        {
+            STAGE_SIO_PO2: 0.1,
+            STAGE_SIO_PTOTAL: 0.2,
+            STAGE_SIO_GAS_MODE: "po2_hold",
+        }
+    ).validated(schema)
+    assert validated.values[STAGE_SIO_PTOTAL] == pytest.approx(0.2)
+    assert validated.values[STAGE_SIO_GAS_MODE] == "po2_hold"
+
+    hard_vacuum = RecipePatch(
+        {
+            STAGE_SIO_PO2: 0.0,
+            STAGE_SIO_PTOTAL: 0.0,
+            STAGE_SIO_GAS_MODE: "po2_hold",
+        }
+    ).validated(schema)
+    assert hard_vacuum.values[STAGE_SIO_PTOTAL] == pytest.approx(0.0)
+
+    with pytest.raises(RecipeValidationError, match="below lower bound"):
+        RecipePatch({STAGE_SIO_PTOTAL: -1.0e-9}).validated(schema)
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(RecipeValidationError, match="NaN or infinite"):
+            RecipePatch({STAGE_SIO_PTOTAL: bad}).validated(schema)
+
+
 def test_c2a_staged_stage_gas_knobs_fail_loudly() -> None:
     schema = RecipeSchema()
 
@@ -1207,11 +1252,8 @@ def test_c2a_staged_stage_gas_knobs_fail_loudly() -> None:
         match=r"campaigns\.C2A_staged\.stages\.sio_window\.gas_cover_mode",
     ):
         RecipePatch({STAGE_SIO_GAS_MODE: "argon_blanket"}).validated(schema)
-    with pytest.raises(
-        RecipeValidationError,
-        match=r"campaigns\.C2A_staged\.stages\.sio_window\.p_total_mbar",
-    ):
-        RecipePatch({STAGE_SIO_PTOTAL: 4.9}).validated(schema)
+    # 4.9 mbar is under the 5 mbar search band and inside physical admission.
+    RecipePatch({STAGE_SIO_PTOTAL: 4.9}).validated(schema)
     with pytest.raises(
         RecipeValidationError,
         match=r"campaigns\.C2A_staged\.stages\.sio_window\.pN2_mbar",
@@ -1744,9 +1786,11 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # difference between two moving numbers, written down as a constant, goes
     # stale every time either moves. It is now evaluated, not pinned. Recomputed
     # 2026-09-29 for C2 loader-scalar pressure coupling.
+    # Recomputed for b-245: C2A p_total admission is finite and >= 0 (d-209,
+    # d-208). The patched pO2 value is unchanged; the id tracks bounds_digest.
     assert (
         first.recipe_id()
-                == "a22450a415301779be6d918590944b3e5c7050b72970a03602d457d9b9e6f4bc"
+                == "d4c2ece09f99b3f8e642018b3086ebf1f9681709dde55b59e6e8837a47bc014b"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
@@ -2130,7 +2174,14 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
             assert len(yaml_value) == 2
             assert spec.low is not None
             assert spec.high is not None
-            assert (spec.low, spec.high) == tuple(yaml_value)
+            if spec.bounds_source in _C2A_TOTAL_PRESSURE_SETPOINT_SOURCES:
+                # Admission is physical. The YAML band remains the search edge.
+                assert spec.low == 0.0
+                assert spec.search_low == yaml_value[0]
+                assert spec.high == yaml_value[1]
+            else:
+                assert spec.search_low is None
+                assert (spec.low, spec.high) == tuple(yaml_value)
             range_sourced += 1
         elif spec.bounds_source.startswith(
             "engineering_envelope converted from setpoints.yaml range "
@@ -2187,16 +2238,16 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         "campaigns.C0b_p_cleanup.duration_hr": (0.5, 2.5),
         "campaigns.C2A_continuous.temp_range_C": (1050, 1843),
         "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C": (10, 20),
-        "campaigns.C2A_continuous.p_total_mbar": (5, 15),
-        "campaigns.C2A_continuous.p_total_mbar_default": (5, 15),
+        "campaigns.C2A_continuous.p_total_mbar": (0.0, 15),
+        "campaigns.C2A_continuous.p_total_mbar_default": (0.0, 15),
         "campaigns.C2A_staged.temp_range_C": (1250, 1750),
         "campaigns.C2A_staged.default_hold_T_C": (1250, 1750),
-        "campaigns.C2A_staged.p_total_mbar": (5, 15),
-        "campaigns.C2A_staged.p_total_mbar_default": (5, 15),
-        "campaigns.C2A_staged.stages.alkali_early_fe.p_total_mbar": (5.0, 15.0),
-        "campaigns.C2A_staged.stages.sio_window.p_total_mbar": (5.0, 15.0),
-        "campaigns.C2A_staged.stages.fe_hot_hold.p_total_mbar": (5.0, 15.0),
-        "campaigns.C2A_staged.stages.cool_for_na_shuttle.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2A_staged.p_total_mbar": (0.0, 15),
+        "campaigns.C2A_staged.p_total_mbar_default": (0.0, 15),
+        "campaigns.C2A_staged.stages.alkali_early_fe.p_total_mbar": (0.0, 15.0),
+        "campaigns.C2A_staged.stages.sio_window.p_total_mbar": (0.0, 15.0),
+        "campaigns.C2A_staged.stages.fe_hot_hold.p_total_mbar": (0.0, 15.0),
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.p_total_mbar": (0.0, 15.0),
         "campaigns.C2B.temp_range_C": (1320, 1480),
         "campaigns.C2B.pO2_mbar": (0.8, 2.3),
         "campaigns.C2B.pO2_mbar_default": (0.8, 2.3),

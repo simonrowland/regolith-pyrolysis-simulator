@@ -27,15 +27,19 @@ from simulator.optimize.objective import (
     objective_scores,
     pareto_front,
 )
-from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.recipe import (
     C2A_STAGED_DEFAULT_ORDER,
     C2A_STAGED_ORDER_CHOICES,
     C2A_STAGED_ORDER_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    KeyPath,
+    KnobSpec,
+    RecipePatch,
+    RecipeSchema,
+    c2a_staged_stage_order,
     c5_sampler_context,
     conditional_context_metadata,
-    c2a_staged_stage_order,
+    knob_search_low,
 )
 from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
 
@@ -1809,11 +1813,13 @@ def _joint_refine_anchor_value(parent: RecipePatch, spec: KnobSpec) -> Any:
     if spec.path in parent.values:
         return parent.values[spec.path]
     if spec.kind == "float":
-        low = 0.0 if spec.low is None else float(spec.low)
+        search_low = knob_search_low(spec)
+        low = 0.0 if search_low is None else float(search_low)
         high = low if spec.high is None else float(spec.high)
         return (low + high) / 2.0 if high > low else low
     if spec.kind == "int":
-        return 0 if spec.low is None else int(spec.low)
+        search_low = knob_search_low(spec)
+        return 0 if search_low is None else int(search_low)
     raise ValueError(
         f"{'.'.join(spec.path)} has unsupported numeric refine kind {spec.kind!r}"
     )

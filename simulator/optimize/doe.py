@@ -27,6 +27,7 @@ from simulator.optimize.recipe import (
     RecipeSchema,
     c5_sampler_context,
     _default_setpoint_value,
+    knob_search_low,
 )
 from simulator.optimize.canonical import canonical_json_dumps
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -1012,7 +1013,7 @@ def _condition_pressure_pair_values(
                 # A refinement parent can predate the regulator-band contract.
                 # Project its local pO2 interval down to the nearest globally
                 # legal value instead of aborting the whole staged study.
-                po2_low = max(float(po2_spec.low), feasible_high)
+                po2_low = max(float(knob_search_low(po2_spec)), feasible_high)
         _raise_if_infeasible(
             po2_path,
             po2_low,
@@ -1232,9 +1233,10 @@ def _anchored_numeric_interval(
 
 
 def _numeric_bounds(spec: Any) -> tuple[float, float]:
-    if spec.low is None or spec.high is None:
+    low_bound = knob_search_low(spec)
+    if low_bound is None or spec.high is None:
         raise ValueError(f"{'.'.join(spec.path)} numeric knob lacks bounds")
-    low = float(spec.low)
+    low = float(low_bound)
     high = float(spec.high)
     if not math.isfinite(low) or not math.isfinite(high) or low >= high:
         raise ValueError(f"{'.'.join(spec.path)} has invalid numeric bounds")
