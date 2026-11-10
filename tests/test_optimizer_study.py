@@ -1824,7 +1824,10 @@ def test_strategy_ask_paths_emit_pressure_feasible_candidates(
 
 
 def _stale_melt_target_profile() -> dict[str, Any]:
-    return {
+    # C2A does not claim this residual melt. C2B's CMAS_glass does. The stale
+    # refusal under test is the purity gate, which runs only if the objective
+    # is still eligible. Copy run so the shared PROFILE stays C2A.
+    profile = {
         **PROFILE,
         "profile_id": "stale-melt-target-profile",
         "constraints": {"gates": ["delivered_stream_purity"]},
@@ -1853,6 +1856,8 @@ def _stale_melt_target_profile() -> dict[str, Any]:
             }
         ],
     }
+    profile["run"] = {**PROFILE["run"], "campaign": "C2B"}
+    return profile
 
 
 def _stored_rows(out_dir: Path) -> list[ScoredResult]:

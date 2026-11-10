@@ -95,12 +95,15 @@ from simulator.fidelity_vocabulary import (
 from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveVector,
+    _merged_run_for_fidelity,
     composition_target_eval_metadata,
     composition_target_infeasible_reason,
     composition_target_specs,
     composition_targets_require_coating,
     composition_targets_require_stage0_exit,
     composition_targets_require_terminal_rump,
+    executed_campaign_id,
+    profile_with_executed_campaign,
     unclaimed_product_withheld_objective_note,
     compute_objectives,
     product_summary,
@@ -2923,6 +2926,7 @@ def _build_eval_inputs_impl(
         expected_feedstock=feedstock_id,
         source="<profile>",
         schema=schema,
+        scoring_fidelity=fidelity,
     )
     run_options = _thermal_scheduled_run_options(
         _run_options(profile, fidelity),
@@ -3454,14 +3458,7 @@ def _c4_default_hold_temp_C(setpoints: Mapping[str, Any]) -> float:
 
 
 def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]:
-    fidelity_options = profile.get("fidelities", {})
-    selected = {}
-    if isinstance(fidelity_options, Mapping):
-        raw_selected = fidelity_options.get(fidelity, {})
-        if isinstance(raw_selected, Mapping):
-            selected = dict(raw_selected)
-    merged = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
-    merged.update(selected)
+    merged = _merged_run_for_fidelity(profile, fidelity)
     # Fold the legacy `stub` alias onto canonical `internal-analytical` at this
     # run-config acceptance boundary so downstream consumers see one token.
     backend_name = canonical_backend_name(
@@ -3487,7 +3484,7 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
     lab_overlay_scope = _lab_overlay_scope_options(merged)
     mass_kg = _positive_eval_mass_kg(merged.get("mass_kg", 1000.0))
     return MappingProxyType({
-        "campaign": merged.get("campaign", "C0"),
+        "campaign": executed_campaign_id(profile, fidelity=fidelity),
         "hours": int(merged.get("hours", 24)),
         "mass_kg": mass_kg,
         "additives_kg": dict(merged.get("additives_kg", {}) or {}),
@@ -4154,6 +4151,10 @@ def _objective_profile_for_spec(
     profile: Mapping[str, Any],
     spec: EvalSpec,
 ) -> Mapping[str, Any]:
+    # Score against EvalSpec.campaign. Fidelity options override profile.run,
+    # and that override is what _run_options stored on the spec. The digested
+    # profile is the caller's object; this copy is scoring-only.
+    profile = profile_with_executed_campaign(profile, str(spec.campaign))
     run = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
     changed = False
     try:

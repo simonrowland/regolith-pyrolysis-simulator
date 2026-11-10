@@ -980,8 +980,8 @@ def _composition_profile() -> dict:
     profile["profile_id"] = "composition-target-profile-test"
     # C0 claims no ceramic product, so a composition-only vector would be
     # withheld and validation would stop before these target checks. C2B
-    # claims CMAS glass and Fe, which authorize a composition target, and it
-    # does not pick up the copied C2A thermal-window seed.
+    # claims CMAS_glass, which authorizes this residual melt pool. Fe does
+    # not. C2B does not pick up the copied C2A thermal-window seed.
     profile["run"]["campaign"] = "C2B"
     profile["objectives"] = [
         {
@@ -1048,3 +1048,36 @@ def _composition_profile() -> dict:
         }
     ]
     return profile
+
+
+def test_validate_profile_weight_check_uses_the_fidelity_campaign() -> None:
+    """Authored C2B keeps the melt target. A C0 fidelity overlay withholds it.
+
+    The returned profile keeps the authored campaign, so the digest does not
+    absorb the overlay. EvalSpec.campaign records it separately.
+    """
+
+    authored = _composition_profile()
+    ok = validate_profile(authored, expected_feedstock="lunar_mare_low_ti")
+    assert ok["run"]["campaign"] == "C2B"
+
+    overlaid = _composition_profile()
+    fidelities = {
+        name: {**dict(options), "campaign": "C0"}
+        for name, options in overlaid["fidelities"].items()
+    }
+    fidelities["internal-analytical"] = {
+        **dict(fidelities.get("internal-analytical", {})),
+        "campaign": "C0",
+    }
+    overlaid["fidelities"] = fidelities
+    with pytest.raises(ProfileValidationError, match="no remaining objective weight"):
+        validate_profile(
+            overlaid,
+            expected_feedstock="lunar_mare_low_ti",
+            scoring_fidelity="internal-analytical",
+        )
+    # Without the fidelity argument the authored campaign still validates,
+    # and the returned run campaign is the authored one.
+    kept = validate_profile(overlaid, expected_feedstock="lunar_mare_low_ti")
+    assert kept["run"]["campaign"] == "C2B"

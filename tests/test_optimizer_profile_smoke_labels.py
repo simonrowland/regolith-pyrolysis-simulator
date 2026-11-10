@@ -1,13 +1,17 @@
 """Campaign product-claim gate for optimizer scoring.
 
-INVARIANT: no product objective is scored unless the evaluated campaign's
-setpoints ``products`` claim that product. Otherwise it is absent from
-objective definitions, ``compute_objectives``, strategy metrics, and the study
-scalar. It is named in a notice with its weight, the reason
-``campaign_does_not_claim_product``, and the withheld weight fraction. It is
-never entered as 0.0. Retained weights are not renormalized. Description text
-is not an eligibility input. An absent, blank, or unknown campaign claims
-nothing. Operational metrics (energy, duration, and dynamic species ``*_kg``
+INVARIANT: no product objective is scored unless the executed campaign's
+setpoints ``products`` claim THAT objective's product. The executed campaign
+is the fidelity overlay on ``profile.run`` (EvalSpec.campaign). Otherwise the
+objective is absent from objective definitions, ``compute_objectives``,
+strategy metrics, and the study scalar. It is named in a notice with its
+weight, the reason ``campaign_does_not_claim_product``, and the withheld
+weight fraction. It is never entered as 0.0. Retained weights are not
+renormalized. Description text is not an eligibility input. An absent, blank,
+or unknown campaign claims nothing; a missing run campaign is the ``C0``
+default and still claims no scored product. A composition target is eligible
+only for its own pool product. ``captured_products`` requires every extracted
+species. Operational metrics (energy, duration, and dynamic species ``*_kg``
 such as ``Fe_kg``) are not product objectives and stay.
 """
 
@@ -25,18 +29,23 @@ import yaml
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.optimize.objective import (
     COMPOSITION_TARGET_METRIC_PREFIX,
+    COMPOSITION_VECTOR_SPECIES,
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     SSO2_OWNER_RECIPE_ID,
-    _COMPOSITION_AUTHORIZING_CLAIM_KEYS,
+    SUPPORTED_COMPOSITION_POOLS,
+    _EXTRACT_SPECIES_CLAIM_KEYS,
     _MASS_OBJECTIVE_METRICS,
     _METAL_PRODUCT_CLAIM_KEYS,
     _OBJECTIVE_PRODUCT_CLAIM_KEYS,
+    _POOL_PRODUCT_CLAIM_KEYS,
     _SETPOINT_CAMPAIGN_ALIASES,
     campaign_claims_product_objective,
     campaign_product_claim_keys,
     compute_objectives,
+    executed_campaign_id,
     objective_definitions,
     objective_importance_evidence,
+    profile_scored_at_fidelity,
     unclaimed_product_withheld_objective_note,
     unclaimed_product_withheld_weight_fraction,
     unrenormalized_study_scalar_weights,
@@ -69,16 +78,24 @@ _LITERAL_CLAIM_KEYS = {
     "oxygen_vented_kg": frozenset({"O2"}),
     SSO2_OWNER_RECIPE_ID: frozenset({"SiO2_glass"}),
 }
-_LITERAL_COMPOSITION_KEYS = frozenset({
-    "SiO2_glass",
-    "CMAS_glass",
-    "industrial_mixed_glass",
-    "refractory_ceramic_rump",
-    "Fe",
-    "Mg",
-    "Ti",
-    "O2",
-})
+# Literal pool and extract tables. Production must match these. The membership
+# oracle below uses these sets, not the production helper.
+_LITERAL_POOL_KEYS = {
+    "captured_stage_3_silica": frozenset({"SiO2_glass"}),
+    "terminal_rump_earned": frozenset({"refractory_ceramic_rump"}),
+    "residual_rump_at_stop": frozenset({"CMAS_glass", "industrial_mixed_glass"}),
+    "cleaned_melt_at_stage0_exit": frozenset({"CMAS_glass", "industrial_mixed_glass"}),
+}
+_LITERAL_EXTRACT_KEYS = {
+    "Na": frozenset({"Na"}),
+    "K": frozenset({"K"}),
+    "Fe": frozenset({"Fe"}),
+    "Mg": frozenset({"Mg"}),
+    "O2": frozenset({"O2"}),
+    "Si": frozenset({"SiO2_glass"}),
+    "Al": frozenset(),
+    "Ca": frozenset(),
+}
 _LITERAL_ALIASES = {
     "C2A": "C2A_continuous",
     "C2A_staged": "C2A_staged",
@@ -139,9 +156,13 @@ def test_c0_profiles_with_product_objectives_are_labeled_smoke() -> None:
 def test_claim_table_matches_the_literal_product_map() -> None:
     assert dict(_OBJECTIVE_PRODUCT_CLAIM_KEYS) == _LITERAL_CLAIM_KEYS
     assert _METAL_PRODUCT_CLAIM_KEYS == _METAL_KEYS
-    assert _COMPOSITION_AUTHORIZING_CLAIM_KEYS == _LITERAL_COMPOSITION_KEYS
+    assert dict(_POOL_PRODUCT_CLAIM_KEYS) == _LITERAL_POOL_KEYS
+    assert dict(_EXTRACT_SPECIES_CLAIM_KEYS) == _LITERAL_EXTRACT_KEYS
+    assert set(SUPPORTED_COMPOSITION_POOLS) == set(_LITERAL_POOL_KEYS) | {"captured_products"}
+    assert COMPOSITION_VECTOR_SPECIES == frozenset(_LITERAL_EXTRACT_KEYS)
     assert dict(_SETPOINT_CAMPAIGN_ALIASES) == _LITERAL_ALIASES
     assert "metals_plus_o2_kg" not in _OBJECTIVE_PRODUCT_CLAIM_KEYS
+    assert "captured_products" not in _POOL_PRODUCT_CLAIM_KEYS
 
 
 def _setpoints_product_keys() -> dict[str, frozenset[str]]:
@@ -180,9 +201,57 @@ def _oracle_claims(campaign_id: str | None) -> frozenset[str]:
     return oracle.get(key, frozenset())
 
 
-def _oracle_claims_metric(metric: str, claim_keys: frozenset[str], *, composition: bool) -> bool:
-    if composition or metric.startswith(COMPOSITION_TARGET_METRIC_PREFIX):
-        return bool(claim_keys & _LITERAL_COMPOSITION_KEYS)
+def _oracle_pool_claimed(
+    pool: str,
+    species_vector: Mapping[str, str] | None,
+    claim_keys: frozenset[str],
+) -> bool:
+    if pool == "captured_products":
+        if not species_vector:
+            return False
+        extracts = [species for species, role in species_vector.items() if role == "extract"]
+        if not extracts:
+            return False
+        for species in extracts:
+            required = _LITERAL_EXTRACT_KEYS.get(species)
+            if not required or not (claim_keys & required):
+                return False
+        return True
+    required = _LITERAL_POOL_KEYS.get(pool)
+    if not required:
+        return False
+    return bool(claim_keys & required)
+
+
+def _oracle_composition_claimed(target: object, claim_keys: frozenset[str]) -> bool:
+    if not isinstance(target, Mapping):
+        return False
+    pool = target.get("pool")
+    if not isinstance(pool, str) or not pool.strip():
+        return False
+    pools = [pool.strip()]
+    window = target.get("composition_window")
+    if isinstance(window, Mapping):
+        window_pool = window.get("pool")
+        if isinstance(window_pool, str) and window_pool.strip():
+            name = window_pool.strip()
+            if name not in pools:
+                pools.append(name)
+    vector = target.get("species_vector")
+    species_vector = vector if isinstance(vector, Mapping) else None
+    return all(
+        _oracle_pool_claimed(name, species_vector, claim_keys) for name in pools
+    )
+
+
+def _oracle_claims_metric(
+    metric: str,
+    claim_keys: frozenset[str],
+    *,
+    target: Mapping[str, object] | None = None,
+) -> bool:
+    if metric.startswith(COMPOSITION_TARGET_METRIC_PREFIX):
+        return _oracle_composition_claimed(target, claim_keys)
     if metric == "metals_plus_o2_kg":
         return "O2" in claim_keys and bool(claim_keys & _METAL_KEYS)
     required = _LITERAL_CLAIM_KEYS.get(metric)
@@ -202,6 +271,8 @@ def _objective_row(metric: str, *, weight: float, units: str) -> dict:
 
 
 def _composition_row(*, weight: float = 0.50) -> dict:
+    """Composition row with no readable target. That is not a product claim."""
+
     return {
         "type": "composition_target",
         "id": "glass",
@@ -211,6 +282,36 @@ def _composition_row(*, weight: float = 0.50) -> dict:
         "weight": weight,
         "rationale": "stage-3 glass composition",
         "target": {},
+    }
+
+
+def _composition_target_row(
+    pool: str,
+    *,
+    species_vector: dict[str, str],
+    window_pool: str | None = None,
+    weight: float = 0.50,
+    target_id: str = "target",
+) -> dict:
+    return {
+        "type": "composition_target",
+        "id": target_id,
+        "metric": f"{COMPOSITION_TARGET_METRIC_PREFIX}{target_id}",
+        "sense": "maximize",
+        "units": "score_0_1",
+        "weight": weight,
+        "rationale": f"test {pool}",
+        "target": {
+            "pool": pool,
+            "species_vector": dict(species_vector),
+            "composition_window": {
+                "pool": window_pool or pool,
+                "basis": "oxide_wt_pct",
+                "mode": "hard_window",
+                "oxides": {"SiO2": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+            },
+            "score_weights": {"extraction": 0.0, "composition": 1.0},
+        },
     }
 
 
@@ -393,7 +494,7 @@ def _campaign_ids() -> tuple[str | None, ...]:
 def _metric_cases() -> list[tuple[str | None, str, str]]:
     cases: list[tuple[str | None, str, str]] = []
     for campaign in _campaign_ids():
-        for metric in (*FINAL_PRODUCT_METRICS, _COMPOSITION_METRIC):
+        for metric in FINAL_PRODUCT_METRICS:
             for prose in ("both-edited", "both-smoke", "description-edited"):
                 cases.append((campaign, metric, prose))
     return cases
@@ -416,13 +517,8 @@ def test_product_objective_membership_follows_campaign_claims(
     """Every campaign, every product metric, with the description already edited."""
 
     claim_keys = _oracle_claims(campaign)
-    composition = metric == _COMPOSITION_METRIC
-    claimed = _oracle_claims_metric(metric, claim_keys, composition=composition)
-    assert campaign_claims_product_objective(
-        metric,
-        claim_keys,
-        composition=composition,
-    ) is claimed
+    claimed = _oracle_claims_metric(metric, claim_keys)
+    assert campaign_claims_product_objective(metric, claim_keys) is claimed
     profile = _profile(_product_row(metric), campaign=campaign, prose=prose)
     scored = {definition.metric for definition in objective_definitions(profile)}
     if claimed:
@@ -432,16 +528,24 @@ def test_product_objective_membership_follows_campaign_claims(
     _assert_withheld(profile, {metric}, label=f"{campaign}:{metric}:{prose}")
 
 
+_TERMINAL_METRIC = f"{COMPOSITION_TARGET_METRIC_PREFIX}ceramic"
+
+
 @pytest.mark.parametrize("prose", _PROSE_VARIANTS)
-@pytest.mark.parametrize("metric", (*FINAL_PRODUCT_METRICS, _COMPOSITION_METRIC, "Fe_kg"))
+@pytest.mark.parametrize("metric", (*FINAL_PRODUCT_METRICS, _TERMINAL_METRIC, "Fe_kg"))
 def test_c0_prose_does_not_change_claim_membership(metric: str, prose: str) -> None:
     """Copy lunar_highland's C0 run and edit either prose field: still withheld."""
 
-    row = (
-        _objective_row(metric, weight=0.50, units="kg")
-        if metric == "Fe_kg"
-        else _product_row(metric)
-    )
+    if metric == "Fe_kg":
+        row = _objective_row(metric, weight=0.50, units="kg")
+    elif metric == _TERMINAL_METRIC:
+        row = _composition_target_row(
+            "terminal_rump_earned",
+            species_vector={"Ca": "retain"},
+            target_id="ceramic",
+        )
+    else:
+        row = _product_row(metric)
     profile = _profile(row, campaign="C0", prose=prose)
     scored = {definition.metric for definition in objective_definitions(profile)}
     if metric == "Fe_kg":
@@ -474,8 +578,13 @@ def _declared_retained(profile: dict) -> list[tuple[str, float]]:
     retained = []
     for objective in profile["objectives"]:
         metric = str(objective["metric"])
-        composition = objective.get("type") == "composition_target"
-        if _oracle_claims_metric(metric, claim_keys, composition=composition):
+        target = objective.get("target")
+        claimed = _oracle_claims_metric(
+            metric,
+            claim_keys,
+            target=target if isinstance(target, Mapping) else None,
+        )
+        if claimed:
             retained.append((metric, float(objective["weight"])))
         elif metric not in PRODUCT_OBJECTIVES and not metric.startswith(
             COMPOSITION_TARGET_METRIC_PREFIX
@@ -604,3 +713,357 @@ def test_scoring_strategies_use_the_claim_chokepoint() -> None:
             got = tuple(strategy.objective_metrics)
         assert got == expected
         assert "pure_silica_glass_kg" in got
+
+    # One representative profile per class. The parametrized tests cover every
+    # campaign, pool, and species; strategy init is not repeated for each.
+    fidelity_glass = _profile(
+        _product_row("pure_silica_glass_kg"),
+        campaign="C2A_continuous",
+        prose="both-edited",
+    )
+    fidelity_glass["fidelities"] = {"fast": {"campaign": "C0"}}
+    fidelity_stamped = profile_scored_at_fidelity(fidelity_glass, "fast")
+    assert fidelity_glass["run"]["campaign"] == "C2A_continuous"
+    expected = tuple(
+        definition.metric for definition in objective_definitions(fidelity_stamped)
+    )
+    assert "pure_silica_glass_kg" not in expected
+    ceramic = _profile(
+        _composition_target_row(
+            "terminal_rump_earned",
+            species_vector={"Ca": "retain"},
+            target_id="ceramic",
+        ),
+        campaign="C4",
+        prose="both-edited",
+    )
+    ceramic_expected = tuple(definition.metric for definition in objective_definitions(ceramic))
+    assert f"{COMPOSITION_TARGET_METRIC_PREFIX}ceramic" not in ceramic_expected
+    melt = _profile(
+        _composition_target_row(
+            "residual_rump_at_stop",
+            species_vector={"Ca": "retain"},
+            target_id="melt",
+        ),
+        campaign="C2B",
+        prose="both-edited",
+    )
+    melt_expected = tuple(definition.metric for definition in objective_definitions(melt))
+    assert f"{COMPOSITION_TARGET_METRIC_PREFIX}melt" in melt_expected
+    for label, profile, want in (
+        ("fidelity-c0", fidelity_stamped, expected),
+        ("c4-ceramic", ceramic, ceramic_expected),
+        ("c2b-melt", melt, melt_expected),
+    ):
+        for strategy_cls in strategies:
+            strategy = strategy_cls(schema, seed=0, objective_profile=profile)
+            if strategy_cls is StagedStrategy:
+                got = tuple(definition.metric for definition in strategy._definitions)
+            else:
+                got = tuple(strategy.objective_metrics)
+            assert got == want, f"{strategy_cls.__name__} {label}"
+
+
+def _assert_membership(profile: dict, metric: str, *, claimed: bool, label: str) -> None:
+    scored = {definition.metric for definition in objective_definitions(profile)}
+    if claimed:
+        assert metric in scored, label
+        assert unclaimed_product_withheld_objective_note(profile) is None, label
+        return
+    _assert_withheld(profile, {metric}, label=label)
+
+
+def _pool_cases() -> list[tuple[str | None, str]]:
+    pools = (*sorted(SUPPORTED_COMPOSITION_POOLS), "not-a-pool")
+    return [(campaign, pool) for campaign in _campaign_ids() for pool in pools]
+
+
+def _window_cases() -> list[tuple[str | None, str, str]]:
+    pools = (*sorted(SUPPORTED_COMPOSITION_POOLS), "not-a-pool")
+    cases = []
+    for campaign in _campaign_ids():
+        for pool in pools:
+            for window_pool in pools:
+                if window_pool != pool:
+                    cases.append((campaign, pool, window_pool))
+    return cases
+
+
+def _extract_cases() -> list[tuple[str | None, str, str]]:
+    return [
+        (campaign, species, role)
+        for campaign in _campaign_ids()
+        for species in sorted(COMPOSITION_VECTOR_SPECIES)
+        for role in ("extract", "retain")
+    ]
+
+
+def _multi_extract_cases() -> list[tuple[str | None, tuple[str, ...]]]:
+    vectors = (("Fe", "Mg"), ("Fe", "Al"), ("Si", "O2"))
+    return [(campaign, species) for campaign in _campaign_ids() for species in vectors]
+
+
+def _fidelity_cases() -> list[tuple[str | None, str | None, str]]:
+    return [
+        (run_campaign, fidelity_campaign, kind)
+        for run_campaign in _campaign_ids()
+        for fidelity_campaign in _campaign_ids()
+        for kind in ("glass", "ceramic")
+    ]
+
+
+@pytest.mark.parametrize(
+    ("campaign", "pool"),
+    _pool_cases(),
+    ids=[f"{campaign or 'absent'}-{pool}" for campaign, pool in _pool_cases()],
+)
+def test_composition_target_follows_its_own_product(campaign: str | None, pool: str) -> None:
+    """Every campaign and every pool. A foreign product claim does not authorize it."""
+
+    row = _composition_target_row(
+        pool,
+        species_vector={"Ca": "retain"},
+        target_id="pool",
+    )
+    named_keys = _oracle_claims(campaign)
+    named_claimed = _oracle_composition_claimed(row["target"], named_keys)
+    assert campaign_claims_product_objective(
+        row["metric"],
+        named_keys,
+        composition=True,
+        target=row["target"],
+    ) is named_claimed
+    profile = _profile(row, campaign=campaign, prose="description-edited")
+    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    _assert_membership(
+        profile,
+        row["metric"],
+        claimed=_oracle_composition_claimed(row["target"], executed_keys),
+        label=f"{campaign}:{pool}",
+    )
+
+
+@pytest.mark.parametrize(
+    ("campaign", "pool", "window_pool"),
+    _window_cases(),
+    ids=[
+        f"{campaign or 'absent'}-{pool}-window-{window_pool}"
+        for campaign, pool, window_pool in _window_cases()
+    ],
+)
+def test_both_composition_pools_must_be_claimed(
+    campaign: str | None,
+    pool: str,
+    window_pool: str,
+) -> None:
+    """A window pool that differs from the target pool needs its own product."""
+
+    row = _composition_target_row(
+        pool,
+        species_vector={"Ca": "retain"},
+        window_pool=window_pool,
+        target_id="split",
+    )
+    claim_keys = _oracle_claims(campaign)
+    claimed = _oracle_composition_claimed(row["target"], claim_keys)
+    assert campaign_claims_product_objective(
+        row["metric"],
+        claim_keys,
+        composition=True,
+        target=row["target"],
+    ) is claimed
+    profile = _profile(row, campaign=campaign, prose="description-edited")
+    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    _assert_membership(
+        profile,
+        row["metric"],
+        claimed=_oracle_composition_claimed(row["target"], executed_keys),
+        label=f"{campaign}:{pool}:{window_pool}",
+    )
+
+
+@pytest.mark.parametrize(
+    ("campaign", "species", "role"),
+    _extract_cases(),
+    ids=[
+        f"{campaign or 'absent'}-{species}-{role}"
+        for campaign, species, role in _extract_cases()
+    ],
+)
+def test_captured_products_follow_extracted_species(
+    campaign: str | None,
+    species: str,
+    role: str,
+) -> None:
+    """Every campaign and every composition species. Retain is not an extract."""
+
+    row = _composition_target_row(
+        "captured_products",
+        species_vector={species: role},
+        target_id="extract",
+    )
+    claim_keys = _oracle_claims(campaign)
+    claimed = _oracle_composition_claimed(row["target"], claim_keys)
+    assert campaign_claims_product_objective(
+        row["metric"],
+        claim_keys,
+        composition=True,
+        target=row["target"],
+    ) is claimed
+    profile = _profile(row, campaign=campaign, prose="description-edited")
+    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    _assert_membership(
+        profile,
+        row["metric"],
+        claimed=_oracle_composition_claimed(row["target"], executed_keys),
+        label=f"{campaign}:{species}:{role}",
+    )
+
+
+@pytest.mark.parametrize(
+    ("campaign", "species"),
+    _multi_extract_cases(),
+    ids=[
+        f"{campaign or 'absent'}-{'-'.join(species)}"
+        for campaign, species in _multi_extract_cases()
+    ],
+)
+def test_captured_products_require_every_extracted_species(
+    campaign: str | None,
+    species: tuple[str, ...],
+) -> None:
+    row = _composition_target_row(
+        "captured_products",
+        species_vector={name: "extract" for name in species},
+        target_id="multi",
+    )
+    claim_keys = _oracle_claims(campaign)
+    claimed = _oracle_composition_claimed(row["target"], claim_keys)
+    assert campaign_claims_product_objective(
+        row["metric"],
+        claim_keys,
+        composition=True,
+        target=row["target"],
+    ) is claimed
+    profile = _profile(row, campaign=campaign, prose="description-edited")
+    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    _assert_membership(
+        profile,
+        row["metric"],
+        claimed=_oracle_composition_claimed(row["target"], executed_keys),
+        label=f"{campaign}:{species}",
+    )
+
+
+def test_empty_composition_target_is_withheld_for_every_campaign() -> None:
+    """No readable product: a recognized claim key does not authorize the row."""
+
+    for campaign in _campaign_ids():
+        profile = _profile(_composition_row(), campaign=campaign, prose="both-edited")
+        assert campaign_claims_product_objective(
+            _COMPOSITION_METRIC,
+            _oracle_claims(campaign),
+            composition=True,
+        ) is False
+        _assert_withheld(profile, {_COMPOSITION_METRIC}, label=str(campaign))
+
+
+def test_notice_keeps_a_claimed_composition_target_beside_an_unclaimed_one() -> None:
+    """C2A's silica claim does not withhold a silica pool, and does not keep ceramic."""
+
+    silica = _composition_target_row(
+        "captured_stage_3_silica",
+        species_vector={"Si": "retain"},
+        target_id="silica",
+        weight=0.20,
+    )
+    ceramic = _composition_target_row(
+        "terminal_rump_earned",
+        species_vector={"Ca": "retain"},
+        target_id="ceramic",
+        weight=0.30,
+    )
+    profile = _profile(silica, ceramic, campaign="C2A_continuous", prose="both-edited")
+    scored = [definition.metric for definition in objective_definitions(profile)]
+    assert silica["metric"] in scored
+    assert ceramic["metric"] not in scored
+    note = unclaimed_product_withheld_objective_note(profile)
+    assert note is not None
+    assert ceramic["metric"] in note
+    assert silica["metric"] not in note
+    evidence = objective_importance_evidence(profile)
+    total = math.fsum(row.weight for row in evidence)
+    fraction = unclaimed_product_withheld_weight_fraction(profile)
+    assert fraction == pytest.approx(0.30 / total)
+    weights = unrenormalized_study_scalar_weights(profile)
+    assert math.isclose(math.fsum(weights), total - 0.30, rel_tol=0.0, abs_tol=1e-12)
+
+
+@pytest.mark.parametrize(
+    ("run_campaign", "fidelity_campaign", "kind"),
+    _fidelity_cases(),
+    ids=[
+        f"{run or 'absent'}-fid-{fid or 'absent'}-{kind}"
+        for run, fid, kind in _fidelity_cases()
+    ],
+)
+def test_fidelity_overlay_is_the_executed_campaign(
+    run_campaign: str | None,
+    fidelity_campaign: str | None,
+    kind: str,
+) -> None:
+    """Every authored campaign crossed with every fidelity campaign."""
+
+    if kind == "glass":
+        row = _product_row("pure_silica_glass_kg")
+        metric = "pure_silica_glass_kg"
+        target = None
+    else:
+        row = _composition_target_row(
+            "terminal_rump_earned",
+            species_vector={"Ca": "retain"},
+            target_id="ceramic",
+        )
+        metric = row["metric"]
+        target = row["target"]
+    profile = _profile(row, campaign=run_campaign, prose="description-edited")
+    if fidelity_campaign is None:
+        profile["fidelities"] = {"fast": {"backend_name": "internal-analytical"}}
+    else:
+        profile["fidelities"] = {"fast": {"campaign": fidelity_campaign}}
+    authored_campaign = profile["run"].get("campaign")
+    stamped = profile_scored_at_fidelity(profile, "fast")
+    assert profile["run"].get("campaign") == authored_campaign
+    executed = executed_campaign_id(profile, fidelity="fast")
+    assert stamped["run"]["campaign"] == executed
+    from simulator.optimize.evaluate import _objective_profile_for_spec
+
+    via_spec = _objective_profile_for_spec(
+        profile,
+        SimpleNamespace(
+            campaign=executed,
+            hours=1,
+            runtime_campaign_overrides={},
+            lab_schedule={},
+        ),
+    )
+    assert via_spec["run"]["campaign"] == executed
+    assert profile["run"].get("campaign") == authored_campaign
+    claim_keys = _oracle_claims(executed)
+    claimed = _oracle_claims_metric(metric, claim_keys, target=target)
+    assert campaign_claims_product_objective(
+        metric,
+        claim_keys,
+        composition=target is not None,
+        target=target,
+    ) is claimed
+    _assert_membership(stamped, metric, claimed=claimed, label=f"{run_campaign}:{fidelity_campaign}:{kind}")
+
+
+def test_shipped_fidelity_blocks_do_not_override_campaign() -> None:
+    for name, raw in _shipped_profiles():
+        authored = [definition.metric for definition in objective_definitions(raw)]
+        for fidelity in raw.get("fidelities") or {}:
+            stamped = profile_scored_at_fidelity(raw, fidelity)
+            assert stamped["run"]["campaign"] == raw["run"]["campaign"], name
+            assert [definition.metric for definition in objective_definitions(stamped)] == authored

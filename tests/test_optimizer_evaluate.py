@@ -1753,6 +1753,28 @@ def _kernel_curve(
     }
 
 
+@pytest.fixture(autouse=True)
+def _claim_ceramic_rump_for_scorer_mechanics(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Terminal ceramic-rump rows have no shipped product claim.
+
+    These tests exercise the scorer. Eligibility is pinned in
+    test_optimizer_profile_smoke_labels, which does not use this patch.
+    A test that replaces campaign_product_claim_keys still wins: its
+    monkeypatch runs after this fixture.
+    """
+
+    real = objective_module.campaign_product_claim_keys
+
+    def _with_ceramic(campaign_id: object) -> frozenset[str]:
+        return frozenset(real(campaign_id)) | frozenset({"refractory_ceramic_rump"})
+
+    monkeypatch.setattr(
+        objective_module,
+        "campaign_product_claim_keys",
+        _with_ceramic,
+    )
+
+
 def _composition_eval_profile(
     pool: str,
     *,
@@ -1799,9 +1821,17 @@ def _composition_eval_profile(
             }
         ],
     }
-    # A composition-only vector needs a campaign that claims a ceramic or metal
-    # product. C0 does not. Copy run so the shared PROFILE stays C0.
-    profile["run"] = {**PROFILE["run"], "campaign": "C2A_continuous"}
+    # A composition-only vector needs a campaign that claims this pool's product.
+    # Melt pools are the glass body (C2B's CMAS_glass). Silica and captured
+    # products use C2A. Terminal ceramic rump has no shipped claim; the
+    # module autouse adds that key so these tests can reach the scorer.
+    # Copy run so the shared PROFILE stays C0.
+    campaign = (
+        "C2B"
+        if pool in {"residual_rump_at_stop", "cleaned_melt_at_stage0_exit"}
+        else "C2A_continuous"
+    )
+    profile["run"] = {**PROFILE["run"], "campaign": campaign}
     return profile
 
 

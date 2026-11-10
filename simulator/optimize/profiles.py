@@ -29,10 +29,12 @@ from simulator.optimize.objective import (
     ObjectiveProfileError,
     canonical_objective_metric,
     declared_objective_definitions,
+    executed_campaign_id,
     normalize_composition_target_objective,
     objective_definitions,
     objective_importance_evidence,
     objective_type,
+    profile_with_executed_campaign,
 )
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.product_pools import forbidden_gates_for_pool, product_pool_class
@@ -304,6 +306,7 @@ def validate_profile(
     expected_feedstock: str | None = None,
     source: str | Path = "<profile>",
     schema: RecipeSchema | None = None,
+    scoring_fidelity: str | None = None,
 ) -> Mapping[str, Any]:
     if not isinstance(raw, Mapping):
         raise ProfileValidationError(f"{source}: profile must be a mapping")
@@ -331,7 +334,15 @@ def validate_profile(
             f"{source}: feedstock {profile['feedstock']!r} does not match {expected_feedstock!r}"
         )
 
-    _validate_objectives(profile, source=source)
+    scoring_campaign = None
+    if scoring_fidelity is not None:
+        canonical_fidelity = canonical_backend_name(scoring_fidelity)
+        if canonical_fidelity is not None:
+            scoring_campaign = executed_campaign_id(
+                profile,
+                fidelity=str(canonical_fidelity),
+            )
+    _validate_objectives(profile, source=source, scoring_campaign=scoring_campaign)
     _validate_constraints(profile["constraints"], source=source)
     _validate_pool_scoped_constraints(profile, source=source)
     _validate_study_constraints(profile.get("study_constraints"), source=source)
@@ -547,7 +558,12 @@ def _profile_paths(data_dir: Path) -> tuple[Path, ...]:
     return tuple(sorted(profile_dir.glob("*.yaml")))
 
 
-def _validate_objectives(profile: Mapping[str, Any], *, source: str | Path) -> None:
+def _validate_objectives(
+    profile: Mapping[str, Any],
+    *,
+    source: str | Path,
+    scoring_campaign: str | None = None,
+) -> None:
     raw_objectives = profile["objectives"]
     if not isinstance(raw_objectives, list) or not raw_objectives:
         raise ProfileValidationError(f"{source}: objectives must be a non-empty list")
@@ -594,10 +610,15 @@ def _validate_objectives(profile: Mapping[str, Any], *, source: str | Path) -> N
             raise ProfileValidationError(f"{source}: {where}.rationale must be a string")
     if isinstance(profile, dict):
         profile["objectives"] = normalized_objectives
+    # The returned profile keeps the authored campaign so its digest does not
+    # absorb a fidelity overlay. The weight check uses the executed campaign.
+    check_profile: Mapping[str, Any] = profile
+    if scoring_campaign is not None:
+        check_profile = profile_with_executed_campaign(profile, scoring_campaign)
     try:
         objective_importance_evidence(profile)
         declared_objective_definitions(profile)
-        objective_definitions(profile)
+        objective_definitions(check_profile)
     except ObjectiveProfileError as exc:
         raise ProfileValidationError(f"{source}: {exc}") from exc
 
