@@ -65,6 +65,7 @@ from simulator.battery.enums import (
     ResidualStatus,
     SourceRelation,
     UncertaintyKind,
+    ValenceValueForm,
     ValueKind,
 )
 from simulator.battery.identity import (
@@ -1208,6 +1209,46 @@ def _validate_observation(
         _check_identity(
             f"{path}.identity", identity, issues, source_id=observation.source_id
         )
+        quantity = quantity_token(identity)
+        fraction_quantity = quantity in {
+            Quantity.MASS_LOSS_FRACTION,
+            Quantity.MASS_LOSS_FRACTION_VS_T,
+            Quantity.YIELD_FRACTION,
+            Quantity.O2_YIELD,
+        }
+        if quantity is Quantity.VALENCE_RATIO:
+            basis = identity.valence_basis
+            fraction_quantity = (
+                basis is not None
+                and basis.is_value
+                and basis.value.value_form is ValenceValueForm.FRACTION
+            )
+        if fraction_quantity:
+            fraction_values: tuple[Decimal, ...]
+            if observation.value.kind is ValueKind.POINT:
+                fraction_values = (observation.value.point,)
+            elif observation.value.kind is ValueKind.SERIES:
+                fraction_values = tuple(
+                    value for _coordinate, value in observation.value.series
+                )
+            elif observation.value.kind is ValueKind.BOUND:
+                fraction_values = (observation.value.bound_value,)
+            elif observation.value.kind is ValueKind.INTERVAL:
+                fraction_values = (
+                    observation.value.interval_low,
+                    observation.value.interval_high,
+                )
+            else:
+                fraction_values = ()
+            for value in fraction_values:
+                if value < 0 or value > 1:
+                    issues.append(
+                        _issue(
+                            f"{path}.value",
+                            RefusalReason.INVALID_SOURCE,
+                            f"fraction value {value} is outside [0, 1]",
+                        )
+                    )
         if experiment is not None:
             pc = observation.point_conditions or {}
             _reconcile_identity_axis(

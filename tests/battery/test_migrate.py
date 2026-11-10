@@ -9610,6 +9610,40 @@ def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = 
     return extract
 
 
+def test_prose_percent_fraction_conversion_and_validation_range(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="S6+/ΣS as printed in percent",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "mass_loss_fraction": "74.5",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.745")
+
+    observations = dict(result.observations)
+    observations[observation.observation_id] = replace(
+        observation,
+        value=Value(ValueKind.POINT, point=Decimal("1.01")),
+    )
+    report = validate_corpus(result.works, result.experiments, observations)
+    range_issues = [
+        issue
+        for issue in report.hard_issues
+        if issue.path == f"observation[{observation.observation_id}].value"
+        and issue.reason is RefusalReason.INVALID_SOURCE
+    ]
+    assert len(range_issues) == 1
+    assert "[0, 1]" in range_issues[0].detail
+
+
 def test_partial_molar_enthalpy_value_field_migrates_as_numeric_point(
     tmp_path: Path,
 ) -> None:

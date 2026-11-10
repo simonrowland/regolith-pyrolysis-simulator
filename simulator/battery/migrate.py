@@ -9263,8 +9263,9 @@ def parse_quantity_suffix(suffix: str | None) -> tuple[str | None, str | None, s
     return formula, derivation, reference
 
 
-_PERCENT_FRACTION_UNITS = frozenset(
-    {"percent", "pct", "wt_percent", "wt%", "wt_pct", "%"}
+_PERCENT_FRACTION_UNIT_RE = re.compile(
+    r"(?<![a-z])(?:%|pct|percent(?:age)?|per\s+cent)(?![a-z])",
+    re.IGNORECASE,
 )
 _MASS_LOSS_YIELD_FIELDS = (
     "mass_loss_wt_pct",
@@ -9353,8 +9354,8 @@ def _percent_named_fraction_field(key: str, units: str | None) -> bool:
     lowered = str(key or "").strip().lower()
     if lowered.endswith(("_pct", "_percent", "_wt_pct")):
         return True
-    unit = str(units or "").strip().lower().replace(" ", "")
-    return unit in _PERCENT_FRACTION_UNITS
+    unit = re.sub(r"\s+", " ", str(units or "").split(";", 1)[0].strip().lower())
+    return bool(_PERCENT_FRACTION_UNIT_RE.search(unit))
 
 
 _NAMED_FRACTION_BOUND_PREFIX_RE = re.compile(
