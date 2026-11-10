@@ -1584,13 +1584,23 @@ def _renormalised_mode_notice(result):
     return notice
 
 
+_VERB0_MASS_RESIDUAL_1E5 = 'Mass residual      : +1.20000e-05\n'
+
+
 def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
     monkeypatch,
 ):
+    """A lone liq token of 1.00003 is renormalised. Green refuses it."""
     monkeypatch.setattr(
         'simulator.melt_backend.magemin.subprocess.run',
         lambda args, **_kwargs: subprocess.CompletedProcess(
-            args, 0, stdout='Phase: liq\nMode: 1.00003\n', stderr='',
+            args,
+            0,
+            stdout=(
+                f'{_VERB0_MASS_RESIDUAL_1E5}'
+                'Phase: liq\nMode: 1.00003\n'
+            ),
+            stderr='',
         ),
     )
     backend = MAGEMinBackend()
@@ -1613,7 +1623,7 @@ def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
         {'phase': 'liq', 'raw_token': '1.00003'},
     ]
     assert notice['raw_sum'] == pytest.approx(1.00003)
-    assert notice['mass_residual'] is None
+    assert notice['mass_residual'] == pytest.approx(1.2e-5)
     assert any(
         'renormalised to 1' in warning and '1.00003' in warning
         for warning in result.warnings
@@ -1621,13 +1631,20 @@ def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
 
 
 def test_magemin_hour156_mode_sum_is_renormalised_to_one(monkeypatch):
-    """Hour 156 prints 1.00003 + 0.00008. That sum is inside the cap."""
+    """Hour 156 prints 1.00003 + 0.00008 with a ~1e-5 Mass residual.
+
+    Green refuses the 1.00003 token. The residual does not shrink the
+    1e-3 cap, so the row is renormalised and the residual is recorded.
+    """
     monkeypatch.setattr(
         'simulator.melt_backend.magemin.subprocess.run',
         lambda args, **_kwargs: subprocess.CompletedProcess(
             args,
             0,
-            stdout='Phase: liq ol\nMode: 1.00003 0.00008\n',
+            stdout=(
+                f'{_VERB0_MASS_RESIDUAL_1E5}'
+                'Phase: liq ol\nMode: 1.00003 0.00008\n'
+            ),
             stderr='',
         ),
     )
@@ -1645,18 +1662,20 @@ def test_magemin_hour156_mode_sum_is_renormalised_to_one(monkeypatch):
 
     assert result.status == 'ok'
     assert sum(result.phase_masses_kg.values()) == 1.0
+    assert result.phase_masses_kg['ol'] > 0.0
     notice = _renormalised_mode_notice(result)
     assert notice['raw_tokens'] == [
         {'phase': 'liq', 'raw_token': '1.00003'},
         {'phase': 'ol', 'raw_token': '0.00008'},
     ]
     assert notice['raw_sum'] == pytest.approx(1.00011)
-    assert notice['mass_residual'] is None
+    assert notice['mass_residual'] == pytest.approx(1.2e-5)
 
 
 def test_magemin_mode_100003_00005_sums_to_one_and_native_mode_agrees():
     metadata: dict = {}
     parsed = MAGEMinBackend._parse_subprocess_stdout(
+        f'{_VERB0_MASS_RESIDUAL_1E5}'
         'Phase: liq ol\nMode: 1.00003 0.00005\n',
         metadata=metadata,
     )
@@ -1667,11 +1686,18 @@ def test_magemin_mode_100003_00005_sums_to_one_and_native_mode_agrees():
     notice = metadata['mode_token_notices'][0]
     assert notice['kind'] == 'mode_vector_renormalised'
     assert notice['raw_sum'] == pytest.approx(1.00008)
+    assert notice['mass_residual'] == pytest.approx(1.2e-5)
 
 
 def test_magemin_mode_deficit_inside_bound_is_renormalised():
+    """A deficit between 1e-4 and 1e-3 follows the same cap.
+
+    0.50000 + 0.49950 = 0.99950. The ~1e-5 residual does not shrink
+    the cap, so the vector is renormalised.
+    """
     metadata: dict = {}
     parsed = MAGEMinBackend._parse_subprocess_stdout(
+        f'{_VERB0_MASS_RESIDUAL_1E5}'
         'Phase: liq ol\nMode: 0.50000 0.49950\n',
         metadata=metadata,
     )
@@ -1680,7 +1706,7 @@ def test_magemin_mode_deficit_inside_bound_is_renormalised():
     notice = metadata['mode_token_notices'][0]
     assert notice['kind'] == 'mode_vector_renormalised'
     assert notice['raw_sum'] == pytest.approx(0.99950)
-    assert notice['mass_residual'] is None
+    assert notice['mass_residual'] == pytest.approx(1.2e-5)
 
 
 @pytest.mark.parametrize(
@@ -1700,59 +1726,63 @@ def test_magemin_subprocess_parser_rejects_nonunit_mode_vector(mode_line):
 
 
 def test_magemin_mode_deficit_outside_bound_stays_typed_refusal():
-    with pytest.raises(RuntimeError, match='Mode vector must sum to 1.0'):
-        MAGEMinBackend._parse_subprocess_stdout(
-            'Phase: liq ol\nMode: 0.50000 0.49800\n'
-        )
+    """A deficit of 1.2e-3 stays the typed mass-deficit refusal.
 
-
-def test_magemin_reported_mass_residual_tightens_the_mode_bound():
-    from simulator.melt_backend.magemin import _MAGEMinEngineCallError
-
-    # Two tokens, each inside 1 + 1e-5. Their sum excess is 2e-5, which
-    # is outside max(2 * 5e-6, 1e-6) and inside the no-residual cap.
-    stdout = (
-        'Mass residual      : +1.00000e-06\n'
-        'Phase: liq ol\n'
-        'Mode: 0.50000 0.50002\n'
-    )
-    with pytest.raises(
-        _MAGEMinEngineCallError, match='Mode vector must sum to 1.0'
-    ) as raised:
-        MAGEMinBackend._parse_subprocess_stdout(stdout)
-    assert raised.value.exception_type == 'MAGEMinOutputError'
-
-
-def test_magemin_reported_mass_residual_widens_the_mode_bound():
-    metadata: dict = {}
-    parsed = MAGEMinBackend._parse_subprocess_stdout(
-        'Mass residual      : +5.00000e-04\n'
-        'Phase: liq ol\n'
-        'Mode: 1.00003 0.00008\n',
-        metadata=metadata,
-    )
-
-    assert parsed['liq']['mass_kg'] + parsed['ol']['mass_kg'] == 1.0
-    notice = metadata['mode_token_notices'][0]
-    assert notice['kind'] == 'mode_vector_renormalised'
-    assert notice['mass_residual'] == pytest.approx(5.0e-4)
-    assert notice['raw_sum'] == pytest.approx(1.00011)
-
-
-def test_magemin_verb0_lunar_1350_closure_stays_a_typed_deficit():
-    """Live --Verb=0 residual holds this sum to the print bound, not 1e-4.
-
-    Three tokens, residual 8.99565e-6, printed sum 0.99998. The bound is
-    max(1.5e-5, 8.99565e-6). The 2e-5 deficit is outside it. At the flat
-    1e-4 check this stdout was accepted.
+    0.50000 + 0.49880 = 0.99880. A residual above that deficit does not
+    widen the 1e-3 cap.
     """
     with pytest.raises(RuntimeError, match='Mode vector must sum to 1.0'):
         MAGEMinBackend._parse_subprocess_stdout(
-            ' Status             :            0\n'
-            ' Mass residual      : +8.99565e-06\n'
-            ' Phase :      spl      liq      qfm\n'
-            ' Mode  :  0.00175  0.97265  0.02558\n'
+            'Mass residual      : +5.00000e-03\n'
+            'Phase: liq ol\n'
+            'Mode: 0.50000 0.49880\n'
         )
+
+
+def test_magemin_mode_sum_excess_of_1_2e_3_is_refused():
+    """A sum excess of 1.2e-3 is refused. A larger residual does not widen the cap.
+
+    0.50000 + 0.50120 = 1.00120.
+    """
+    from simulator.melt_backend.magemin import _MAGEMinEngineCallError
+
+    with pytest.raises(
+        _MAGEMinEngineCallError, match='Mode vector must sum to 1.0'
+    ) as raised:
+        MAGEMinBackend._parse_subprocess_stdout(
+            'Mass residual      : +5.00000e-03\n'
+            'Phase: liq ol\n'
+            'Mode: 0.50000 0.50120\n'
+        )
+    assert raised.value.exception_type == 'MAGEMinOutputError'
+
+
+def test_magemin_verb0_lunar_1350_closure_stays_raw():
+    """Lunar 1350 C prints 0.00175 + 0.97265 + 0.02558 = 0.99998.
+
+    That deficit is inside green's 1e-4 closure and every token is in
+    [0, 1], so the row stays the raw floats green stored. The Mass
+    residual is on the line and does not move those values.
+    """
+    metadata: dict = {}
+    parsed = MAGEMinBackend._parse_subprocess_stdout(
+        ' Status             :            0\n'
+        ' Mass residual      : +8.99565e-06\n'
+        ' Phase :      spl      liq      qfm\n'
+        ' Mode  :  0.00175  0.97265  0.02558\n',
+        metadata=metadata,
+    )
+
+    assert 'mode_token_notices' not in metadata
+    assert parsed == {
+        'spl': {'mass_kg': float('0.00175')},
+        'liq': {'mass_kg': float('0.97265')},
+    }
+    assert metadata['mode_fractions'] == {
+        'spl': float('0.00175'),
+        'liq': float('0.97265'),
+        'qfm': float('0.02558'),
+    }
 
 
 def test_magemin_duplicate_liquid_modes_are_summed_from_captured_output():
@@ -1764,14 +1794,18 @@ def test_magemin_duplicate_liquid_modes_are_summed_from_captured_output():
         / 'magemin'
         / 'lfdrop-diag-1-1700-phase-mode.stdout'
     ).read_text()
-    parsed = MAGEMinBackend._parse_subprocess_stdout(stdout)
+    metadata: dict = {}
+    parsed = MAGEMinBackend._parse_subprocess_stdout(stdout, metadata=metadata)
     result = EquilibriumResult(liquid_fraction=0.0)
     MAGEMinBackend()._populate_result(result, {'phases': parsed})
 
-    # The captured Mode vector prints 0.71766 liquid and 0.99999 total mass.
-    # Renormalising that printed sum to 1 leaves the liquid/total ratio.
+    # The captured Mode vector prints 0.71766 liquid and 0.99999 total
+    # mass. That closure is inside 1e-4, so the row stays the raw floats
+    # and the production resolver divides liquid by the printed total.
+    assert 'mode_token_notices' not in metadata
+    assert parsed['liq']['mass_kg'] == 0.71766
     assert sum(entry['mass_kg'] for entry in parsed.values()) == pytest.approx(
-        1.0
+        0.99999
     )
     assert result.liquid_fraction == pytest.approx(0.7176672, abs=1e-7)
 

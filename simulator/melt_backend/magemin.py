@@ -895,18 +895,39 @@ _MAGEMIN_MASS_RESIDUAL_RE = re.compile(
     r'([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)',
     re.MULTILINE,
 )
-# Half of the last digit MAGEMin prints on a mode token (5 decimal places).
-_MODE_PRINT_HALF_ULP = Decimal('0.000005')
-# Stated cap when that solve prints no mass residual. See the bound comment.
-_MODE_RESIDUAL_CAP = Decimal('0.001')
+# Green's closure at 16c8dabfa: math.isclose(sum, 1, abs_tol=1e-4) with
+# every token in [0, 1]. Those rows stay the raw floats.
+_MODE_GREEN_CLOSURE_ABS = 1.0e-4
+# d-367: "we can't refuse pedantically when it provides an unphysical 0
+# result" and "we want to flag bugs but let's fix it with a warning in
+# the meantime". Physics re-ruling b-978: a row green refuses is
+# renormalised, with a mode_vector_renormalised notice, while its printed
+# sum misses 1 by at most this cap. Above the cap the typed refusal stays.
+#
+# Why 1e-3. Dividing a phase fraction by a sum that misses 1 by at most
+# 1e-3 changes that fraction by at most 0.1% relative (1/0.999 - 1 is
+# about 1.001e-3). The liquidus finder tolerates 2 K. A 0.1% melt-fraction
+# shift sits far inside that bracket, so the renormalised row cannot move
+# a gate decision. Hour 156 prints 1.00003 + 0.00008 = 1.00011. That
+# 1.1e-4 excess is inside this cap, and the melt is fully liquid at that
+# bracket either way.
+#
+# The Mass residual is recorded on the notice. It is not the closure
+# bound. Closure is a physical sanity bound on the phase-fraction vector.
+# The residual is the solver's BR_norm, a different number, and a ~1e-5
+# residual must not turn hour 156's 1.1e-4 excess into a refusal. The
+# notice keeps the raw tokens, the raw sum, and the residual so the
+# inconsistency in MAGEMin's printed modes stays visible.
+_MODE_RENORMALISE_CAP = Decimal('0.001')
 
 
 def _parse_magemin_mass_residual(stdout: str) -> Optional[Decimal]:
     """Last ``Mass residual`` magnitude, or None when that line is absent.
 
-    The adapter's ``--Verb=0`` block includes the line. A missing or
-    negative token is not a residual norm, so the closure bound uses the
-    stated 1e-3 cap instead.
+    ``--Verb=0`` prints the line. The value is stored on a
+    ``mode_vector_renormalised`` notice. It does not set the closure
+    bound: see ``_MODE_RENORMALISE_CAP``. A missing or negative token
+    is not a residual norm, so the notice records none.
     """
     matches = _MAGEMIN_MASS_RESIDUAL_RE.findall(stdout)
     if not matches:
@@ -918,44 +939,6 @@ def _parse_magemin_mass_residual(stdout: str) -> Optional[Decimal]:
     if not value.is_finite() or value < 0:
         return None
     return value
-
-
-def _magemin_mode_closure_bound(
-    n_tokens: int,
-    mass_residual: Optional[Decimal],
-) -> Decimal:
-    """One absolute closure bound for a token excess and for ``|sum - 1|``.
-
-    Premise. MAGEMin prints each mode token to 5 decimal places. Half of
-    that last digit is 5e-6 of system mass. N printed tokens can accumulate
-    at most N * 5e-6 if every token rounds the same way.
-
-    Algebra. Let t_i be the printed token (mass fraction) and T = sum t_i.
-        print_bound = N * 5e-6
-        reported   = the solve's Mass residual, when stdout has one
-        cap        = 1e-3 when it does not
-        bound      = max(print_bound, reported or cap)
-    A token in (1, 1 + bound] and a sum with |T - 1| <= bound are the same
-    event. Inside the bound, store t_i / T. Outside it, keep the typed refusal.
-
-    Units. Tokens, T, the residual, and the bound are mass fractions of the
-    system (dimensionless kilograms per kilogram).
-
-    Limiting case. Ten phases and no residual: print_bound = 5e-5, so the
-    cap 1e-3 governs. The melt fraction then moves by at most 0.1% relative,
-    inside the liquidus finder's 2 K tolerance, and cannot flip a gate.
-    Hour 156 prints 1.00003 + 0.00008 = 1.00011. That excess, 1.1e-4, is
-    inside 1e-3 and is renormalised. A reported residual of 1e-6 on two
-    tokens sets bound = max(1e-5, 1e-6) = 1e-5, and 1.00011 stays refused.
-    Live --Verb=0 does print the line, so that cap is not the production
-    bound. Lunar 1350 C prints three tokens summing to 0.99998 with
-    residual 9.0e-6: bound = max(1.5e-5, 9.0e-6) = 1.5e-5, and the 2e-5
-    deficit stays a typed refusal.
-    """
-    print_bound = Decimal(n_tokens) * _MODE_PRINT_HALF_ULP
-    if mass_residual is None:
-        return max(print_bound, _MODE_RESIDUAL_CAP)
-    return max(print_bound, mass_residual)
 
 
 @dataclass(frozen=True)
@@ -3529,10 +3512,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         Mode values are mass fractions of the system.  The buffer
         pseudo-phase (any name in ``_BUFFER_CHOICES``) is dropped — it is
-        a control row, not a material phase.  A closure error inside
-        :func:`_magemin_mode_closure_bound` is renormalised so the stored
-        fractions sum to 1, and the raw tokens are kept on a
-        ``mode_vector_renormalised`` notice.  A larger error is refused.
+        a control row, not a material phase.  A row inside green's 1e-4
+        closure, with every token in [0, 1], is stored raw.  A larger
+        closure error up to 1e-3 is renormalised so the stored fractions
+        sum to 1, and the raw tokens, raw sum, and Mass residual are kept
+        on a ``mode_vector_renormalised`` notice.  Above 1e-3 the row is
+        refused.  See ``_MODE_RENORMALISE_CAP``.
         Returns ``{phase: {'mass_kg': fraction}}`` on a unit-mass basis
         (the adapter only needs relative masses for ``liquid_fraction``
         and modal parity).
@@ -3555,14 +3540,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if not names or len(names) != len(values):
             return {}
 
-        # One bound for a token above 1 and for |sum - 1|. Derivation is
-        # on ``_magemin_mode_closure_bound``. The printed decimal sum, not
-        # the float sum, decides closure: five-decimal tokens that already
-        # add to 1 can still miss 1 by a unit in the last place as floats.
+        # One closure rule. See ``_MODE_RENORMALISE_CAP``.
+        #   A token excess past 1e-3 is an invalid token.
+        #   |sum - 1| <= 1e-4 and every token in [0, 1]: raw floats, the
+        #   same ones green stored (math.isclose on the float sum).
+        #   Otherwise, printed |sum - 1| <= 1e-3: renormalise the whole
+        #   vector.
+        #   Above 1e-3: the typed refusal. A deficit stays the mass-deficit
+        #   refusal; an excess stays invalid output.
+        # The Mass residual is parsed so a renormalised row can record it.
+        # It does not enter either comparison.
         mass_residual = _parse_magemin_mass_residual(stdout)
-        bound = _magemin_mode_closure_bound(len(values), mass_residual)
-        token_limit = Decimal(1) + bound
-        raw_parsed_modes: list[tuple[str, Decimal, str]] = []
+        raw_rows: list[tuple[str, Decimal, str, float]] = []
         for name, raw in zip(names, values):
             try:
                 token = Decimal(raw)
@@ -3571,49 +3560,59 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'MAGEMin Mode token for {name!r} is not numeric: {raw!r}',
                     exc,
                 )
-            if not token.is_finite() or token < 0 or token > token_limit:
+            if (
+                not token.is_finite()
+                or token < 0
+                or token > Decimal(1) + _MODE_RENORMALISE_CAP
+            ):
                 _raise_magemin_output_invalid(
                     f'MAGEMin Mode token for {name!r} is invalid: {raw!r}'
                 )
-            raw_parsed_modes.append((name, token, raw))
+            # float(raw), not float(Decimal), so a raw row matches green.
+            raw_rows.append((name, token, raw, float(raw)))
+        float_modes = [
+            (name, fraction) for name, _token, _raw, fraction in raw_rows
+        ]
+        float_sum = sum(fraction for _name, fraction in float_modes)
+        green_closed = (
+            all(0.0 <= fraction <= 1.0 for _name, fraction in float_modes)
+            and math.isclose(
+                float_sum, 1.0, rel_tol=0.0, abs_tol=_MODE_GREEN_CLOSURE_ABS,
+            )
+        )
         raw_sum = sum(
-            (token for _name, token, _raw in raw_parsed_modes),
+            (token for _name, token, _raw, _fraction in raw_rows),
             Decimal(0),
         )
-        closure = abs(raw_sum - Decimal(1))
-        if closure > bound:
-            mode_total = float(raw_sum)
-            if raw_sum < 1:
-                raise _MAGEMinModeVectorMassDeficit(
-                    mode_sum=mode_total,
-                    parsed_modes=[
-                        (name, float(token))
-                        for name, token, _raw in raw_parsed_modes
-                    ],
-                )
-            _raise_magemin_output_invalid(
-                'MAGEMin Mode vector must sum to 1.0; '
-                f'got {mode_total:.9g}'
-            )
-
-        renormalise = raw_sum != Decimal(1)
-        if renormalise:
+        if green_closed:
+            parsed_modes = float_modes
+            renormalise = False
+        elif abs(raw_sum - Decimal(1)) <= _MODE_RENORMALISE_CAP:
             scaled = [
                 float(token / raw_sum)
-                for _name, token, _raw in raw_parsed_modes
+                for _name, token, _raw, _fraction in raw_rows
             ]
             # The last token absorbs the rounding so the stored floats sum
             # to 1. x + (1 - x) is 1 for a finite x.
             scaled[-1] = 1.0 - sum(scaled[:-1])
             parsed_modes = [
                 (name, value)
-                for (name, _token, _raw), value in zip(raw_parsed_modes, scaled)
+                for (name, _token, _raw, _fraction), value in zip(
+                    raw_rows, scaled
+                )
             ]
+            renormalise = True
         else:
-            parsed_modes = [
-                (name, float(token))
-                for name, token, _raw in raw_parsed_modes
-            ]
+            mode_total = float(raw_sum)
+            if raw_sum < 1:
+                raise _MAGEMinModeVectorMassDeficit(
+                    mode_sum=mode_total,
+                    parsed_modes=float_modes,
+                )
+            _raise_magemin_output_invalid(
+                'MAGEMin Mode vector must sum to 1.0; '
+                f'got {mode_total:.9g}'
+            )
         if metadata is not None:
             metadata['phase_names'] = tuple(names)
             metadata['solver_status'] = _parse_magemin_solver_status(stdout)
@@ -3624,25 +3623,33 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             if renormalise:
                 raw_tokens = [
                     {'phase': name, 'raw_token': raw}
-                    for name, _token, raw in raw_parsed_modes
+                    for name, _token, raw, _fraction in raw_rows
                 ]
                 token_text = ', '.join(
-                    f'{name}={raw!r}' for name, _token, raw in raw_parsed_modes
+                    f'{name}={raw!r}'
+                    for name, _token, raw, _fraction in raw_rows
                 )
+                if mass_residual is None:
+                    residual_note = 'Mass residual not printed'
+                else:
+                    residual_note = (
+                        f'Mass residual {float(mass_residual):.6g}'
+                    )
                 metadata['mode_token_notices'] = ({
                     'type': 'typed_notice',
                     'kind': 'mode_vector_renormalised',
                     'raw_tokens': raw_tokens,
                     'raw_sum': float(raw_sum),
-                    'bound': float(bound),
+                    'bound': float(_MODE_RENORMALISE_CAP),
                     'mass_residual': (
                         None if mass_residual is None else float(mass_residual)
                     ),
                 },)
                 metadata['mode_token_diagnostics'] = (
                     'MAGEMin Mode vector was renormalised to 1 '
-                    f'within abs tolerance {float(bound):.6g} '
-                    f'(raw sum {float(raw_sum):.9g}; raw tokens: {token_text})',
+                    f'within abs tolerance {float(_MODE_RENORMALISE_CAP):.6g} '
+                    f'(raw sum {float(raw_sum):.9g}; {residual_note}; '
+                    f'raw tokens: {token_text})',
                 )
 
         phases: Dict[str, Dict[str, float]] = {}
