@@ -8,6 +8,7 @@ import re
 import sqlite3
 import subprocess
 import sys
+import time
 import ast
 from pathlib import Path
 from collections.abc import Mapping
@@ -277,35 +278,72 @@ def test_concurrent_process_writes_preserve_same_and_different_keys(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / "engine-cache.sqlite3"
-    writes = [
-        ("same", {"value": 1}),
-        ("same", {"value": 1}),
+    writes = [("same", {"value": 1}) for _ in range(4)] + [
+        ("left", {"value": 2}),
         ("left", {"value": 2}),
         ("right", {"value": 3}),
+        ("right", {"value": 3}),
     ]
-    processes = [
-        subprocess.Popen(
-            [
-                sys.executable,
-                "-c",
-                "import json, sys; "
-                "from simulator.engine_cache import EngineCache; "
-                "EngineCache(sys.argv[1]).put(sys.argv[2], json.loads(sys.argv[3]), {'runtime': 'test'})",
-                str(db_path),
-                key("magemin", {"request": name}),
-                json.dumps(payload),
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            env=os.environ.copy(),
-        )
-        for name, payload in writes
-    ]
+    ready_dir = tmp_path / "ready"
+    ready_dir.mkdir()
+    start_path = tmp_path / "start"
+    child_code = (
+        "import json, pathlib, sys, time\n"
+        "from simulator.engine_cache import EngineCache\n"
+        "db_path, cache_key, payload, ready_path, start_path = sys.argv[1:]\n"
+        "pathlib.Path(ready_path).touch()\n"
+        "start = pathlib.Path(start_path)\n"
+        "while not start.exists():\n"
+        "    time.sleep(0.001)\n"
+        "EngineCache(db_path).put(cache_key, json.loads(payload), "
+        "{'runtime': 'test'})"
+    )
+    processes = []
+    try:
+        for index, (name, payload) in enumerate(writes):
+            processes.append(
+                subprocess.Popen(
+                    [
+                        sys.executable,
+                        "-c",
+                        child_code,
+                        str(db_path),
+                        key("magemin", {"request": name}),
+                        json.dumps(payload),
+                        str(ready_dir / f"{index}.ready"),
+                        str(start_path),
+                    ],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    env=os.environ.copy(),
+                )
+            )
 
-    for process in processes:
-        stdout, stderr = process.communicate(timeout=60)
-        assert process.returncode == 0, f"stdout={stdout}\nstderr={stderr}"
+        ready_paths = [ready_dir / f"{index}.ready" for index in range(len(writes))]
+        ready_deadline = time.monotonic() + 60
+        while not all(path.exists() for path in ready_paths):
+            if any(process.poll() is not None for process in processes):
+                break
+            if time.monotonic() >= ready_deadline:
+                pytest.fail("cache initializer children did not reach the start barrier")
+            time.sleep(0.01)
+        start_path.touch()
+
+        for process in processes:
+            stdout, stderr = process.communicate(timeout=60)
+            assert process.returncode == 0, f"stdout={stdout}\nstderr={stderr}"
+    finally:
+        for process in processes:
+            if process.poll() is None:
+                process.terminate()
+        for process in processes:
+            if process.poll() is None:
+                try:
+                    process.communicate(timeout=5)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.communicate(timeout=5)
 
     connection = sqlite3.connect(db_path)
     try:
