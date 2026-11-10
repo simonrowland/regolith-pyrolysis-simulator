@@ -430,10 +430,12 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     computed_mass_by_class = {
         'metals_plus_O2': {
             **({'metals_total_kg': metals_total_kg} if has_metal_product else {}),
-            'O2_kg': o2_kg,
+            **({'O2_kg': o2_kg} if has_oxygen_product else {}),
         },
         'ingots_metals': dict(metals_kg) if has_metal_product else {},
-        'oxygen': {'O2_kg': o2_kg},
+        'oxygen': (
+            {'O2_kg': o2_kg} if has_oxygen_product else {}
+        ),
         'pure_silica_glass': (
             {'qualified_capture_kg': silica_product_kg}
             if has_silica_capture else {}
@@ -690,9 +692,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 for key in species_maps:
                     bucket[key] = {}
         if availability['flag'] is not None:
-            # Available flags are sub-floor omissions; refusals retain the
-            # legacy field consumed by existing refusal-reason readers.
-            if (
+            if availability['status'] == 'unavailable':
+                bucket['flag'] = availability['flag']
+                bucket['availability_flag'] = availability['flag']
+            elif (
                 availability['status'] == 'available'
                 or isinstance(bucket.get('flag'), Mapping)
             ):
@@ -701,7 +704,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 bucket['flag'] = availability['flag']
         prediction_flag = availability.get('prediction_flag')
         if isinstance(prediction_flag, Mapping):
-            bucket['availability_flag'] = prediction_flag
+            if availability['status'] == 'unavailable':
+                bucket['prediction_flag'] = prediction_flag
+            else:
+                bucket['availability_flag'] = prediction_flag
     if result['oxygen']['class_total_kg'] is None:
         for name, key in (
             ('oxygen', 'partition_kg'),
@@ -1406,14 +1412,21 @@ def build_product_story(
             )
         availability_flag = source.get('availability_flag')
         flag = source.get('flag')
-        if not isinstance(availability_flag, Mapping) and not isinstance(flag, Mapping):
+        prediction_flag = source.get('prediction_flag')
+        if (
+            not isinstance(availability_flag, Mapping)
+            and not isinstance(flag, Mapping)
+            and not isinstance(prediction_flag, Mapping)
+        ):
             continue
         if isinstance(flag, Mapping):
             story[name]['flag'] = dict(flag)
         if isinstance(availability_flag, Mapping):
             story[name]['availability_flag'] = dict(availability_flag)
+        if isinstance(prediction_flag, Mapping):
+            story[name]['prediction_flag'] = dict(prediction_flag)
         story[name]['status'] = source.get('status') or (
-            availability_flag or flag
+            availability_flag or flag or prediction_flag
         ).get('status')
         story[name]['excluded'] = list(source.get('excluded', ()))
         if story[name]['status'] == 'unavailable':

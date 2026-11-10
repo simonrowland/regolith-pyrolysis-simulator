@@ -613,7 +613,6 @@ def product_class_availability(
         if has_computed_part
         else {}
     )
-    molecular_o2_total_kg = available_parts_kg.get("O2_kg")
     total_kg = sum(parts.values())
     excluded: list[dict[str, Any]] = []
     if refusals:
@@ -648,6 +647,10 @@ def product_class_availability(
         if isinstance(target_species, str)
         else tuple(target_species)
     )
+    contains_o2_target = "O2" in targets
+    molecular_o2_total_kg = (
+        parts.get("O2_kg") if contains_o2_target else None
+    )
     d359_refusals: dict[str, list[str]] = {"B": [], "C": [], "E": []}
     for item in excluded:
         species = item["species"]
@@ -661,7 +664,6 @@ def product_class_availability(
         else:
             continue
         d359_refusals[label].append(reason)
-    contains_o2_target = "O2" in targets
     pending_classes = [
         label for label in ("B", "C", "E") if d359_refusals[label]
     ]
@@ -693,10 +695,19 @@ def product_class_availability(
     pending_classes = list(dict.fromkeys(pending_classes))
     if pending_classes and status == "available":
         status = "partial"
+    excluded_reason = "; ".join(item["reason"] for item in excluded)
+    availability_reason = (
+        f"No computed product is available; refused contributions: "
+        f"{excluded_reason}"
+        if status == "unavailable"
+        else excluded_reason
+    )
     prediction_flag = None
     if pending_classes:
         total_notice = (
-            f"The shipped molecular-O₂ ledger total is "
+            f"{availability_reason}; "
+            if status == "unavailable"
+            else f"The shipped molecular-O₂ ledger total is "
             f"{float(molecular_o2_total_kg):.3g} kg; "
             if contains_o2_target and molecular_o2_total_kg is not None
             else f"This product-class total is {float(total_kg):.1f} kg; "
@@ -784,7 +795,7 @@ def product_class_availability(
         "status": status,
         "excluded": excluded,
         "estimated_contributions": estimated_contributions,
-        "reason": "; ".join(item["reason"] for item in excluded),
+        "reason": availability_reason,
         "prediction_flag": prediction_flag,
         "flag": (
             omission_flag if status == "available" else {
@@ -795,7 +806,7 @@ def product_class_availability(
                 },
                 "status": status,
                 "authority": "unavailable",
-                "reason": "; ".join(item["reason"] for item in excluded),
+                "reason": availability_reason,
                 "excluded": excluded,
                 **({"total_basis": "lower_bound"} if status == "partial" else {}),
             }

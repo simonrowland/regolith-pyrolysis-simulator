@@ -91,6 +91,7 @@ def _append_availability_flag(
     bucket: Mapping[str, Any],
     *,
     fallback_to_legacy_flag: bool,
+    label: str = 'Availability flag',
 ) -> None:
     flag = bucket.get('availability_flag')
     if not isinstance(flag, Mapping) and fallback_to_legacy_flag:
@@ -112,8 +113,20 @@ def _append_availability_flag(
         fields.append(f"band={flag.get('band')}")
     if 'reason' in flag:
         fields.append(f"reason={flag.get('reason')}")
-    lines.append('- Availability flag: ' + '; '.join(fields))
+    lines.append(f'- {label}: ' + '; '.join(fields))
     lines.append('')
+
+
+def _append_prediction_flag(lines: list[str], bucket: Mapping[str, Any]) -> None:
+    prediction_flag = bucket.get('prediction_flag')
+    if not isinstance(prediction_flag, Mapping):
+        return
+    _append_availability_flag(
+        lines,
+        {'availability_flag': prediction_flag},
+        fallback_to_legacy_flag=False,
+        label='Prediction flag',
+    )
 
 
 def format_three_product_markdown(
@@ -221,6 +234,7 @@ def format_three_product_markdown(
                 bucket,
                 fallback_to_legacy_flag=True,
             )
+            _append_prediction_flag(lines, bucket)
         lines.append("")
 
         if bucket_key == 'metals_plus_O2':
@@ -242,6 +256,7 @@ def format_three_product_markdown(
                 bucket,
                 fallback_to_legacy_flag=True,
             )
+            _append_prediction_flag(lines, bucket)
             lines.append(
                 "- Source-side O₂ potential subtotal "
                 f"(emitted; not recovered/captured): {_format_kg(o2_kg)} kg"
@@ -278,6 +293,7 @@ def format_three_product_markdown(
                 bucket,
                 fallback_to_legacy_flag=False,
             )
+            _append_prediction_flag(lines, bucket)
             lines.append(
                 f"- Stage 3 capture: "
                 f"{_format_kg(bucket.get('stage_3_capture_kg', 0.0))} kg"
