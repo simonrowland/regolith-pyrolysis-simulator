@@ -12,6 +12,7 @@ import pytest
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import NoticeKind
+from simulator.config import load_config_bundle
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "battery_hero_priorities.py"
@@ -57,7 +58,7 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
 ) -> None:
     hero_report = {
         "run_metadata": {
-            "feedstock_id": "mare-basalt-test",
+            "feedstock_id": "lunar_mare_low_ti",
             "backend": "internal-analytical",
             "activity_sources": {
                 "melt_activity": ["openimcc"],
@@ -231,6 +232,9 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
     assert completed.returncode == 0, completed.stderr
     report = json.loads(out.with_suffix(".json").read_text())
     envelope = report["hero_envelope"]
+    assert envelope["feedstock_composition_class"] == load_config_bundle().feedstocks[
+        "lunar_mare_low_ti"
+    ]["label"]
     assert envelope["engines_by_role"]["phase_equilibrium"] == [
         "internal-analytical"
     ]

@@ -27,6 +27,7 @@ from scripts.battery_hero_plot import (
 )
 from simulator.accounting import UnknownSpeciesError, resolve_species_formula
 from simulator.battery.identity import PA_PER_BAR_DEC
+from simulator.config import load_config_bundle
 from simulator.battery.score import (
     _engine_from_payload,
     _median_rms_from_float64,
@@ -301,12 +302,24 @@ def _build_envelope(report: Mapping[str, Any]) -> dict[str, Any]:
         if feedstock_class:
             break
     if feedstock_class is None:
-        if metadata.get("feedstock_id"):
-            feedstock_class = str(metadata["feedstock_id"])
-            feedstock_class_source = "run_metadata.feedstock_id"
-        elif report.get("feedstock_id"):
-            feedstock_class = str(report["feedstock_id"])
-            feedstock_class_source = "report.feedstock_id"
+        feedstock_id = metadata.get("feedstock_id") or report.get("feedstock_id")
+        if feedstock_id:
+            feedstock_id = str(feedstock_id)
+            feedstock_id_source = (
+                "run_metadata.feedstock_id"
+                if metadata.get("feedstock_id")
+                else "report.feedstock_id"
+            )
+            catalog_entry = _mapping(
+                load_config_bundle(ROOT / "data").feedstocks.get(feedstock_id)
+            )
+            label = catalog_entry.get("label")
+            if isinstance(label, str) and label.strip():
+                feedstock_class = label.strip()
+                feedstock_class_source = f"data/feedstocks.yaml[{feedstock_id}].label"
+            else:
+                feedstock_class = feedstock_id
+                feedstock_class_source = feedstock_id_source
         else:
             feedstock_class = "unknown"
             feedstock_class_source = "unreported"
@@ -605,8 +618,9 @@ def _markdown(envelope: Mapping[str, Any], rows: Sequence[Mapping[str, Any]]) ->
         f"with ±{_display(temperature.get('margin_K'))} K margin; pO₂: {pO2_text}.",
         f"Engines by report role: {engines}.",
         "Rows are sorted by RMS descending. Flagged and refused counts are excluded from n and all metrics.",
+        "Moles integrate reported vapor mass rates; melt-activity rows use non-oxygen formula-unit equivalents.",
         "",
-        "| # | Rail | Species | Engine | n | RMS (unit) | Median | Bias | Hero evaporated mol | Flagged | Refused | Worst observation ids |",
+        "| # | Rail | Species | Engine | n | RMS (unit) | Median | Bias | Hero evaporated mol/equiv. | Flagged | Refused | Worst observation ids |",
         "|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for row in rows:
