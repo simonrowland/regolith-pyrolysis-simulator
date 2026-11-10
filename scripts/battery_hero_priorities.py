@@ -506,7 +506,7 @@ def _score_rows(
                 payload,
                 d139_uncalibrated_kems=_is_d139_uncalibrated_kems_row(payload),
             )
-            if not (refused or flagged or residual is not None):
+            if not (refused or residual is not None):
                 continue
 
             operation = str(numeric.get("operation") or "")
@@ -522,17 +522,21 @@ def _score_rows(
                     "unit": unit,
                     "operation": operation,
                     "values": [],
+                    "unflagged_values": [],
                     "worst": [],
-                    "flagged_count": 0,
+                    "flagged_n": 0,
                     "refused_count": 0,
                 },
             )
-            group["flagged_count"] += int(flagged)
             group["refused_count"] += int(refused)
-            if refused or flagged or residual is None:
+            if refused or residual is None:
                 continue
             observation_id = _observation_id(payload)
             group["values"].append(residual)
+            if flagged:
+                group["flagged_n"] += 1
+            else:
+                group["unflagged_values"].append(residual)
             if observation_id:
                 group["worst"].append((abs(residual), observation_id))
 
@@ -545,7 +549,6 @@ def _score_rows(
             if other_key[:3] == key[:3] and other_key != key
         ]
         if len(siblings) == 1:
-            siblings[0]["flagged_count"] += group["flagged_count"]
             siblings[0]["refused_count"] += group["refused_count"]
             del groups[key]
 
@@ -555,6 +558,10 @@ def _score_rows(
         values = group["values"]
         statistics = _median_rms_from_float64(values)
         median, rms = statistics if statistics is not None else (None, None)
+        unflagged_statistics = _median_rms_from_float64(group["unflagged_values"])
+        _unflagged_median, rms_unflagged_only = (
+            unflagged_statistics if unflagged_statistics is not None else (None, None)
+        )
         worst_ids: list[str] = []
         seen_ids: set[str] = set()
         for _magnitude, observation_id in sorted(
@@ -577,10 +584,13 @@ def _score_rows(
                 "unit": unit,
                 "n": len(values),
                 "rms": None if rms is None else float(rms),
+                "rms_unflagged_only": (
+                    None if rms_unflagged_only is None else float(rms_unflagged_only)
+                ),
                 "median": None if median is None else float(median),
                 "bias": bias,
                 "hero_evaporated_mol": _number(evaporated_moles.get(group["species"])),
-                "flagged_count": group["flagged_count"],
+                "flagged_n": group["flagged_n"],
                 "refused_count": group["refused_count"],
                 "worst_observation_ids": worst_ids,
             }
@@ -628,21 +638,23 @@ def _markdown(envelope: Mapping[str, Any], rows: Sequence[Mapping[str, Any]]) ->
         f"Temperature: {_display(temperature.get('min'))}–{_display(temperature.get('max'))} K "
         f"with ±{_display(temperature.get('margin_K'))} K margin; pO₂: {pO2_text}.",
         f"Engines by report role: {engines}.",
-        "Rows are sorted by RMS descending. Flagged and refused counts are excluded from n and all metrics.",
+        "Rows are sorted by RMS descending. Numeric flagged predictions are included in n and RMS; refused rows are counted and excluded.",
         "Moles integrate reported vapor mass rates; melt-activity rows use non-oxygen formula-unit equivalents.",
         "",
-        "| # | Rail | Species | Engine | n | RMS (unit / operation) | Median | Bias | Hero evaporated mol/equiv. | Flagged | Refused | Worst observation ids |",
-        "|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
+        "| # | Rail | Species | Engine | n | Flagged n | RMS (unit / operation) | RMS (unflagged only) | Median | Bias | Hero evaporated mol/equiv. | Refused | Worst observation ids |",
+        "|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for row in rows:
         rms = _display(row.get("rms"))
+        rms_unflagged = _display(row.get("rms_unflagged_only"))
         unit = str(row.get("unit") or "unknown").replace("|", "\\|")
         worst = ", ".join(str(value).replace("|", "\\|") for value in row["worst_observation_ids"])
         lines.append(
             f"| {row['rank']} | {row['rail']} | {row['species']} | {row['engine']} | "
-            f"{row['n']} | {rms} {unit} | {_display(row['median'])} | "
+            f"{row['n']} | {row['flagged_n']} | {rms} {unit} | {rms_unflagged} {unit} | "
+            f"{_display(row['median'])} | "
             f"{_display(row['bias'])} | {_display(row['hero_evaporated_mol'])} | "
-            f"{row['flagged_count']} | {row['refused_count']} | {worst} |"
+            f"{row['refused_count']} | {worst} |"
         )
     lines.append("")
     return "\n".join(lines)
