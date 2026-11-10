@@ -472,23 +472,28 @@ def test_partial_metal_objective_evidence_keeps_exclusions_and_lower_bound() -> 
     assert evidence["total_basis"] == "lower_bound"
 
 
-def test_flagged_oxygen_estimate_objective_keeps_numeric_value(monkeypatch) -> None:
+def test_flagged_zero_oxygen_objective_keeps_numeric_value(monkeypatch) -> None:
     availability_flag = {
         "status": "flagged prediction",
         "category": 3,
         "kind": "predict_and_flag",
         "authority": "extrapolated",
         "band": "d-359 B/C/E follow-ups pending",
-        "reason": "Interim best estimate; d-359 B/C/E follow-ups pending.",
+        "reason": (
+            "0.0 kg O₂ is the direct O₂-ledger total; no stored, vented, "
+            "or captured molecular O₂ was recorded. The associated B/C/E "
+            "oxide-vapor predictions are incomplete and are not counted as "
+            "shipped O₂."
+        ),
     }
     monkeypatch.setattr(
         objective_module,
         "classify_products",
         lambda sim, *, early_tap_mode=False: {
             "metals_plus_O2": {
-                "O2_kg": 1.25,
-                "class_total_kg": 1.25,
-                "metals_total_kg": 1.0,
+                "O2_kg": 0.0,
+                "class_total_kg": 0.0,
+                "metals_total_kg": 0.0,
                 "status": "partial",
                 "availability_flag": availability_flag,
                 "excluded": [],
@@ -506,8 +511,8 @@ def test_flagged_oxygen_estimate_objective_keeps_numeric_value(monkeypatch) -> N
         SimpleNamespace(product_ledger=lambda: {}),
     )
 
-    assert objectives.values[0].value == pytest.approx(1.25)
-    assert objectives.as_mapping()["O2_kg"] == pytest.approx(1.25)
+    assert objectives.values[0].value == pytest.approx(0.0)
+    assert objectives.as_mapping()["O2_kg"] == pytest.approx(0.0)
     assert objectives.evidence["O2_kg"]["value_status"] == "partial"
     assert objectives.evidence["O2_kg"]["availability_flag"] == availability_flag
     assert objectives.evidence["O2_kg"]["excluded"] == []
