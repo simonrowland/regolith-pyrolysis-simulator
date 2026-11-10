@@ -112,7 +112,6 @@ def test_cache_uses_canonical_request_and_wal_sqlite(
         "store_error": 0,
         "read_error": 0,
     }
-
     with sqlite3.connect(database) as connection:
         assert connection.execute("PRAGMA journal_mode").fetchone()[0].lower() == "wal"
         tables = connection.execute(
@@ -287,6 +286,39 @@ def test_openimcc_chemistry_version_change_with_same_pack_name_is_a_miss(
     assert calls == 2
 
 
+def test_alphamelts_calc_mode_is_part_of_the_adapter_request_key(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _call_cached_backend_equilibrate,
+    )
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "MELTS")
+    engine_cache.engine_cache_counters(reset=True)
+    handle = SimpleNamespace(name="alphamelts", backend=SimpleNamespace())
+    calls = 0
+
+    def solve() -> EquilibriumResult:
+        nonlocal calls
+        calls += 1
+        return EquilibriumResult(status="ok", liquid_fraction=0.5)
+
+    first = _call_cached_backend_equilibrate(
+        handle, {"temperature_C": 1000.0}, solve
+    )
+    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "pMELTS")
+    second = _call_cached_backend_equilibrate(
+        handle, {"temperature_C": 1000.0}, solve
+    )
+
+    assert first.liquid_fraction == second.liquid_fraction == 0.5
+    assert calls == 2
+
+
 def test_every_chemistry_version_has_changelog_and_runtime_identity() -> None:
     import re
 
@@ -305,9 +337,13 @@ def test_every_chemistry_version_has_changelog_and_runtime_identity() -> None:
         engine_cache.ENGINE_CHEMISTRY_VERSION
     )
     assert all(
-        set(engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT[engine])
-        == {"identity", "date"}
+        {"identity", "date"}
+        <= set(engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT[engine])
         for engine in engine_cache.ENGINE_CHEMISTRY_VERSION
+    )
+    assert all(
+        "stat" in engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT[engine]
+        for engine in ("alphamelts", "magemin")
     )
 
 
@@ -320,7 +356,8 @@ def test_stale_runtime_warns_once_without_changing_hits_or_results(
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
     _engine_cache_counters(reset=True)
     engine_cache.runtime_identity.cache_clear()
-    monkeypatch.setattr(engine_cache, "_compute_runtime_identity", lambda _engine: "new")
+    engine_cache.engine_cache_runtime_identities(reset=True)
+    monkeypatch.setattr(engine_cache, "_compute_runtime_identity", lambda _engine: "old")
     monkeypatch.setitem(
         engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT,
         "openimcc",
@@ -333,10 +370,18 @@ def test_stale_runtime_warns_once_without_changing_hits_or_results(
         calls += 1
         return {"answer": 42}
 
+    engine_cache.record_engine_open("openimcc")
+    first = engine_cache.cached_engine_call(
+        "openimcc", {"call": "evaluate", "pack": "default"}, solve
+    )
+    _engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.runtime_identity.cache_clear()
+    engine_cache.engine_cache_runtime_identities(reset=True)
+    monkeypatch.setattr(engine_cache, "_compute_runtime_identity", lambda _engine: "new")
+
     with caplog.at_level("WARNING", logger=engine_cache.__name__):
-        first = engine_cache.cached_engine_call(
-            "openimcc", {"call": "evaluate", "pack": "default"}, solve
-        )
+        engine_cache.record_engine_open("openimcc")
         second = engine_cache.cached_engine_call(
             "openimcc", {"call": "evaluate", "pack": "default"}, solve
         )
@@ -351,11 +396,20 @@ def test_stale_runtime_warns_once_without_changing_hits_or_results(
     assert len(warnings) == 1
     assert _engine_cache_counters(reset=True)["openimcc"] == {
         "hits": 1,
-        "misses": 1,
-        "stores": 1,
+        "misses": 0,
+        "stores": 0,
         "store_error": 0,
         "read_error": 0,
     }
+    with sqlite3.connect(database.with_name(database.name + ".cold")) as connection:
+        cold_value = pickle.loads(
+            zlib.decompress(
+                connection.execute(
+                    "SELECT value FROM engine_outputs_cold"
+                ).fetchone()[0]
+            )
+        )
+    assert cold_value["_engine_runtime_identity"] == "old"
 
 
 def test_runtime_identity_is_computed_once_per_engine(
@@ -375,6 +429,39 @@ def test_runtime_identity_is_computed_once_per_engine(
         for _ in range(5):
             assert engine_cache.runtime_identity(engine_id) == f"identity:{engine_id}"
     assert calls == Counter(dict.fromkeys(engine_cache.ENGINE_CHEMISTRY_VERSION, 1))
+
+
+def test_native_identity_hashes_only_after_recorded_binary_stat_changes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    binary = tmp_path / "engine"
+    binary.write_bytes(b"initial binary")
+    stat = binary.stat()
+    engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT["alphamelts"] = {
+        "identity": "sha256:recorded",
+        "date": "2026-11-08",
+        "stat": {"size": stat.st_size, "mtime_ns": stat.st_mtime_ns},
+    }
+    engine_cache._RUNTIME_BACKENDS["alphamelts"] = SimpleNamespace(
+        _binary_path=binary
+    )
+    hashes: list[Path] = []
+
+    def digest(path: Path) -> str:
+        hashes.append(path)
+        return "changed"
+
+    monkeypatch.setattr(engine_cache, "_file_sha256", digest)
+
+    assert engine_cache._native_binary_identity("alphamelts") == "sha256:recorded"
+    assert hashes == []
+
+    binary.write_bytes(b"changed binary")
+    assert engine_cache._native_binary_identity("alphamelts") == "sha256:changed"
+    assert hashes == [binary]
 
 
 def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
@@ -825,6 +912,7 @@ def test_corrupt_hot_json_is_a_miss_and_is_replaced(
     assert call("alphamelts", request, solve) == "result"
     with sqlite3.connect(database) as connection:
         connection.execute("UPDATE engine_outputs SET value = ?", (b"not a pickle",))
+    engine_cache._MEMORY_CACHE.clear()
     assert call("alphamelts", request, solve) == "result"
     assert call("alphamelts", request, solve) == "result"
     assert calls == 2
@@ -841,12 +929,10 @@ def test_store_encoding_failure_returns_live_value_and_counts_error(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from types import SimpleNamespace
-
     database = tmp_path / "engine-cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
     _engine_cache_counters(reset=True)
-    hot = SimpleNamespace(status="ok")
+    hot = object()
 
     result = _cached_engine_call()(
         "openimcc",
@@ -886,6 +972,7 @@ def test_malformed_hot_value_is_a_counted_miss_and_replaced(
     )
     connection.commit()
     _engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
 
     assert call("openimcc", request, lambda: {"answer": 2}) == {"answer": 2}
     assert _engine_cache_counters(reset=True)["openimcc"] == {
