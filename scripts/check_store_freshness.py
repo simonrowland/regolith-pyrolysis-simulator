@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Tripwire: is the committed derived store stale w.r.t. migrate inputs?
 
-The derived store (works/, extracts-v2/, observations-v2/, migration-report.md)
-is what consumers read, but nothing asserts it was regenerated after the
+The derived store (works/, extracts-v2/, observations-v2/, migration-queue.yaml,
+and migration-report.md) is what consumers read, but nothing asserts it was regenerated after the
 extracts, compilations, or migration code last changed. This script is the
 cheap half of that assertion: it finds the newest commit that touched store
 outputs and fails if any later commit touched migrate inputs.
 
 It cannot prove byte equality — that needs a full regen + diff (minutes,
-nightly-tier). It proves two cheaper facts: nobody changed an input and walked
+nightly-tier; ``scripts/battery_migrate.py --check-store`` and its CI test do
+that comparison. It proves two cheaper facts: nobody changed an input and walked
 away without touching the store, and no extract silently lacks a store trace.
 
 Exit 0: store is at least as new as every migrate input, and every extract
@@ -33,6 +34,7 @@ STORE_OUTPUTS = (
     "data/literature/works",
     "data/literature/extracts-v2",
     "data/literature/observations-v2",
+    "data/battery/migration-queue.yaml",
     "data/battery/migration-report.md",
 )
 
