@@ -930,6 +930,14 @@ def openimcc_pack_identity() -> dict[str, Any]:
     """Return the package and raw-file identity for its default profile."""
 
     package = _require_openimcc()
+    package_version = str(getattr(package, "__version__", "") or "")
+    if package_version in {"", "0+unknown"}:
+        try:
+            package_version = metadata.version("openimcc")
+        except metadata.PackageNotFoundError:
+            pass
+    if not package_version:
+        package_version = "0+unknown"
     data = resources.files("openimcc").joinpath("data")
     melt_path = data.joinpath("packs", "imcc-sf04-d066-v4.json")
     redox_path = data.joinpath("packs", "openimcc-redox-v5.json")
@@ -970,14 +978,48 @@ def openimcc_pack_identity() -> dict[str, Any]:
         ),
         key=lambda row: row["complex"],
     )
+    referenced_thermo_species = sorted(
+        {
+            str(term["species"])
+            for row in feo_redox_rows
+            for term in row.get("standard_gibbs_terms", ())
+        }
+    )
+    thermo_species = redox_payload.get("thermo_species")
+    if not isinstance(thermo_species, Mapping) or any(
+        name not in thermo_species for name in referenced_thermo_species
+    ):
+        raise OpenImccBindingDigestUnavailableError()
+    feo_redox_content = {
+        "rows": feo_redox_rows,
+        "thermo_species": {
+            name: thermo_species[name] for name in referenced_thermo_species
+        },
+    }
     with Path(condensate_path).open(newline="", encoding="utf-8") as stream:
         condensate_rows = [
             row
             for row in csv.DictReader(stream)
             if row.get("species_name") == "FeO(l)"
         ]
-    if len(feo_redox_rows) != len(feo_row_names) or len(condensate_rows) != 1:
+    published_condensate_path = data.joinpath(
+        "packs", "sf04-published", "condensate.csv"
+    )
+    with Path(published_condensate_path).open(
+        newline="", encoding="utf-8"
+    ) as stream:
+        published_condensate_rows = [
+            row
+            for row in csv.DictReader(stream)
+            if row.get("species_name") == "FeO(l)"
+        ]
+    if (
+        len(feo_redox_rows) != len(feo_row_names)
+        or len(condensate_rows) != 1
+        or len(published_condensate_rows) != 1
+    ):
         raise OpenImccBindingDigestUnavailableError()
+
     def canonical_digest(value: Any) -> str:
         canonical_json = json.dumps(
             value, sort_keys=True, separators=(",", ":"), ensure_ascii=False
@@ -985,12 +1027,15 @@ def openimcc_pack_identity() -> dict[str, Any]:
         return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
 
     return {
-        "package_version": str(getattr(package, "__version__", "0+unknown")),
+        "package_version": package_version,
         "commit": imported_openimcc_commit() or "unverified",
         "packs": packs,
         "feo_guard": {
-            "redox_rows_sha256": canonical_digest(feo_redox_rows),
+            "redox_rows_sha256": canonical_digest(feo_redox_content),
             "condensate_feo_row_sha256": canonical_digest(condensate_rows[0]),
+            "published_condensate_feo_row_sha256": canonical_digest(
+                published_condensate_rows[0]
+            ),
         },
     }
 

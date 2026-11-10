@@ -17,6 +17,7 @@ OPENIMCC_PROVENANCE_PREFIXES: tuple[str, ...] = (
     "openimcc-pack-file:",
     "openimcc-feo-redox-rows:",
     "openimcc-feo-condensate-row:",
+    "openimcc-feo-published-condensate-row:",
 )
 
 _OPENIMCC_ENGINE_IDENTITY_FIELDS: tuple[tuple[str, str], ...] = (
@@ -82,11 +83,19 @@ def openimcc_pack_identity_sources(
     if isinstance(guard, Mapping):
         redox_digest = guard.get("redox_rows_sha256")
         condensate_digest = guard.get("condensate_feo_row_sha256")
+        published_condensate_digest = guard.get(
+            "published_condensate_feo_row_sha256"
+        )
         if isinstance(redox_digest, str):
             sources.append(f"openimcc-feo-redox-rows:sha256:{redox_digest}")
         if isinstance(condensate_digest, str):
             sources.append(
                 f"openimcc-feo-condensate-row:sha256:{condensate_digest}"
+            )
+        if isinstance(published_condensate_digest, str):
+            sources.append(
+                "openimcc-feo-published-condensate-row:sha256:"
+                f"{published_condensate_digest}"
             )
     return tuple(sources)
 

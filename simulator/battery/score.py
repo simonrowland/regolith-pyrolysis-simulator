@@ -561,11 +561,16 @@ _INTERNAL_ANALYTICAL_FEO_STANDARD = _FeOActivityStandard(
     offset_j_mol=Decimal(0),
 )
 _OPENIMCC_FEO_REDOX_ROWS_DIGEST = (
-    "d2d99f2cfd4417633bbdeecb33dd7ebaf92f5a375c456480237c906d449d1e9f"
+    "8dc55974d7198675266c83634ffa08673c18fdbe228ee01c1017481642c2f0cc"
 )
 _OPENIMCC_FEO_CONDENSATE_ROW_DIGEST = (
     "0aa4d729270ca1434601f414c11485e70706894b735907d7b6eeade0e24f9312"
 )
+_OPENIMCC_FEO_PUBLISHED_CONDENSATE_ROW_DIGEST = (
+    "63c5a83e84091608bcd56fa97cff10568ce6df568ded5b6845f480f42da62fa8"
+)
+
+
 def _source_value(sources: Sequence[str], prefix: str) -> str | None:
     return next(
         (source[len(prefix):] for source in sources if source.startswith(prefix)),
@@ -578,6 +583,7 @@ def _resolve_feo_activity_standard(
     coefficient_sources: Sequence[str],
     *,
     temperature_K: Decimal | None = None,
+    profile: str = "openimcc",
 ) -> tuple[_FeOActivityStandard | None, ResidualRefusal | None]:
     if engine is Engine.INTERNAL_ANALYTICAL:
         return _INTERNAL_ANALYTICAL_FEO_STANDARD, None
@@ -615,12 +621,25 @@ def _resolve_feo_activity_standard(
         coefficient_sources,
         "openimcc-feo-redox-rows:sha256:",
     )
+    published_condensate_row_digest = _source_value(
+        coefficient_sources,
+        "openimcc-feo-published-condensate-row:sha256:",
+    )
     guarded_rows = (
-        ("redox FeO and Mn rows", redox_rows_digest, _OPENIMCC_FEO_REDOX_ROWS_DIGEST),
         (
-            "condensate FeO(l) row",
+            "redox FeO and Mn reaction/thermo rows",
+            redox_rows_digest,
+            _OPENIMCC_FEO_REDOX_ROWS_DIGEST,
+        ),
+        (
+            "default-profile condensate FeO(l) row",
             condensate_row_digest,
             _OPENIMCC_FEO_CONDENSATE_ROW_DIGEST,
+        ),
+        (
+            "published-profile condensate FeO(l) row",
+            published_condensate_row_digest,
+            _OPENIMCC_FEO_PUBLISHED_CONDENSATE_ROW_DIGEST,
         ),
     )
     for row_name, actual, expected in guarded_rows:
@@ -637,6 +656,8 @@ def _resolve_feo_activity_standard(
     if (
         redox_rows_digest == _OPENIMCC_FEO_REDOX_ROWS_DIGEST
         and condensate_row_digest == _OPENIMCC_FEO_CONDENSATE_ROW_DIGEST
+        and published_condensate_row_digest
+        == _OPENIMCC_FEO_PUBLISHED_CONDENSATE_ROW_DIGEST
     ):
         if temperature_K is None or temperature_K <= 0:
             return None, ResidualRefusal(
@@ -658,7 +679,7 @@ def _resolve_feo_activity_standard(
             )
         try:
             standard_offset = openimcc.feo_liquid_standard_offset(
-                float(temperature_K), profile="openimcc"
+                float(temperature_K), profile=profile
             )
             offset_j_mol = Decimal(str(standard_offset.value_J_per_mol))
         except (
@@ -11860,6 +11881,13 @@ def _hashimoto_residue_prediction(
         if primary is None or production is None:
             raise ValueError("hashimoto_prediction_row_missing")
         primary_provenance = dict(primary.provenance)
+        pack_identity_sources: tuple[str, ...] = ()
+        if engine is Engine.OPENIMCC:
+            from simulator.melt_backend.openimcc_bridge import openimcc_pack_identity
+
+            pack_identity_sources = openimcc_pack_identity_sources(
+                openimcc_pack_identity()
+            )
         sources = (
             *sources,
             *openimcc_pack_coefficient_sources(
@@ -11868,6 +11896,7 @@ def _hashimoto_residue_prediction(
             *openimcc_engine_identity_sources(
                 primary_provenance.get("engine_binding_identity")
             ),
+            *pack_identity_sources,
         )
         consumed_provenance = {
             "observation_id": reference.observation_id,
@@ -12211,6 +12240,13 @@ def _sossi_residue_prediction(
                 "residue_metric_domain", f"no positive Sossi {formula} prediction"
             )
         provenance = dict(prediction.provenance)
+        pack_identity_sources: tuple[str, ...] = ()
+        if engine is Engine.OPENIMCC:
+            from simulator.melt_backend.openimcc_bridge import openimcc_pack_identity
+
+            pack_identity_sources = openimcc_pack_identity_sources(
+                openimcc_pack_identity()
+            )
         sources = (
             *sources,
             *openimcc_pack_coefficient_sources(
@@ -12219,6 +12255,7 @@ def _sossi_residue_prediction(
             *openimcc_engine_identity_sources(
                 provenance.get("engine_binding_identity")
             ),
+            *pack_identity_sources,
         )
         provenance["consumed_row"] = {
             "observation_id": reference.observation_id,
