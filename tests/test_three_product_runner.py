@@ -332,5 +332,5 @@ def test_default_classification_values_preserve_controlled_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    # Verified at both 98da5be and the r4 tip with no changed leaf values.
-    assert digest == "578dff9e48e2ff6306356e2eb235f5e734dec8e4242f1612ff3336b5e9666eb6"
+    # Re-pinned after d-364 kept the O₂ ledger total and attached its notice.
+    assert digest == "9e0c3802448b904a482e4bbb0388dbd7b0613c3d780738c2927962f478f68b51"
