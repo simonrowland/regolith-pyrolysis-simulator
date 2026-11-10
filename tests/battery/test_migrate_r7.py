@@ -774,6 +774,56 @@ def test_g1_compilation_columns_grid_and_multi_phase(tmp_path):
             formulas = {obs.identity.species.formula for obs in table1}
             assert "Al2O3" in formulas and "SiO2" in formulas
             continue
+        if record == "high-temperature-p253":
+            parent = f"{family}:{record}"
+            assert parent not in result.observations
+            gibbs = [
+                item
+                for item in result.observations.values()
+                if item.observation_id.startswith(parent + ":")
+                and quantity_token(item.identity) is Quantity.DELTA_FG
+            ]
+            assert len(gibbs) == 2
+            assert {item.identity.species.phase.value for item in gibbs} == {
+                Phase.CR,
+                Phase.L,
+            }
+            crystal = next(
+                item for item in gibbs if item.identity.species.phase.value is Phase.CR
+            )
+            liquid = next(
+                item for item in gibbs if item.identity.species.phase.value is Phase.L
+            )
+            crystal_t = {point[0] for point in crystal.value.series}
+            liquid_t = {point[0] for point in liquid.value.series}
+            assert crystal_t.isdisjoint(liquid_t)
+            assert max(crystal_t) <= Decimal("987")
+            assert min(liquid_t) >= Decimal("987")
+            document = json.loads(
+                (
+                    REPO_ROOT
+                    / "data/literature/compilations"
+                    / family
+                    / "records"
+                    / f"{record}.json"
+                ).read_text(encoding="utf-8")
+            )
+            printed = next(
+                Decimal(row["cells"]["formation_gibbs"]["raw"])
+                for row in document["rows"]
+                if row["cells"]["temperature"]["raw"] == "298.15"
+            )
+            assert any(
+                temperature == Decimal("298.15") and value == printed
+                for item in gibbs
+                for temperature, value in item.value.series
+            )
+            assert all(item.value.kind is ValueKind.SERIES for item in gibbs)
+            assert all(
+                "temperature grid" in (item.identity.temperature_K.reason or "")
+                for item in gibbs
+            )
+            continue
         obs = result.observations[f"{family}:{record}"]
         assert obs.value.kind is ValueKind.UNAVAILABLE
         reason = obs.value.unavailable_reason
@@ -786,23 +836,35 @@ def test_g1_compilation_columns_grid_and_multi_phase(tmp_path):
             assert obs.identity.quantity.is_unknown
         else:
             assert "temperature grid" in obs.identity.temperature_K.reason
-        if record == "high-temperature-p253":
-            assert quantity_token(obs.identity) is Quantity.DELTA_FG
-            assert "awaiting the per-source compilation generator" in reason
+
+
+def _p253_gibbs_at_298(result):
+    parent = "robie-hemingway-1995-usgs-b2131:high-temperature-p253"
+    assert parent not in result.observations
+    found = []
+    for obs in result.observations.values():
+        if not obs.observation_id.startswith(parent + ":"):
+            continue
+        if quantity_token(obs.identity) is not Quantity.DELTA_FG:
+            continue
+        assert obs.value.kind is ValueKind.SERIES
+        assert "J•mol-1·K-1" not in (obs.value.unavailable_reason or "")
+        for temperature, value in obs.value.series:
+            if temperature == Decimal("298.15"):
+                found.append(value)
+    return found
 
 
 @pytest.mark.parametrize(
-    "units, expected, mapped",
+    "units",
     [
-        ({"formation_gibbs": "kJ/mol"}, "kJ/mol", True),
-        (["K ... kJ/mol", "second printed line"], "K ... kJ/mol", False),
-        ("K ... kJ/mol", "K ... kJ/mol", False),
-        ([], None, False),
+        {"formation_gibbs": "kJ/mol"},
+        ["K ... kJ/mol", "second printed line"],
+        "K ... kJ/mol",
+        [],
     ],
 )
-def test_h1_compilation_units_preserve_every_printed_shape(
-    tmp_path, units, expected, mapped
-):
+def test_h1_compilation_units_preserve_every_printed_shape(tmp_path, units):
     root = _write_min_tree(tmp_path)
     path = _copy_compilation_record(
         root,
@@ -810,36 +872,40 @@ def test_h1_compilation_units_preserve_every_printed_shape(
         "high-temperature-p253.json",
     )
     record = json.loads(path.read_text())
+    printed = next(
+        Decimal(row["cells"]["formation_gibbs"]["raw"])
+        for row in record["rows"]
+        if row["cells"]["temperature"]["raw"] == "298.15"
+    )
     record["units_as_published"] = units
     path.write_text(json.dumps(record), encoding="utf-8")
     result = migrate(root, write=False)
-    obs = result.observations[
-        "robie-hemingway-1995-usgs-b2131:high-temperature-p253"
-    ]
-    reason = obs.value.unavailable_reason or ""
-    if expected is None:
-        assert "unit as printed not stated" in reason
-        return
-    assert expected in reason
-    assert "unit as printed not stated" not in reason
-    assert ("not mapped to column formation_gibbs" in reason) is not mapped
+    # The captured unit string is not the unit source. Every printed shape
+    # imports the same numeric formation energy.
+    assert _p253_gibbs_at_298(result) == [printed]
+    captured = json.dumps(units)
+    for obs in result.observations.values():
+        if "high-temperature-p253" not in obs.observation_id:
+            continue
+        assert captured not in (obs.value.unavailable_reason or "")
 
 
 def test_h1_b2131_printed_unit_line_is_not_denied(tmp_path):
     root = _write_min_tree(tmp_path)
-    _copy_compilation_record(
+    path = _copy_compilation_record(
         root,
         "robie-hemingway-1995-usgs-b2131",
         "high-temperature-p253.json",
     )
+    record = json.loads(path.read_text(encoding="utf-8"))
+    printed = next(
+        Decimal(row["cells"]["formation_gibbs"]["raw"])
+        for row in record["rows"]
+        if row["cells"]["temperature"]["raw"] == "298.15"
+    )
     result = migrate(root, write=False)
-    obs = result.observations[
-        "robie-hemingway-1995-usgs-b2131:high-temperature-p253"
-    ]
-    reason = obs.value.unavailable_reason or ""
-    assert "J•mol-1·K-1" in reason
-    assert "unit as printed not stated" not in reason
-    assert "not mapped to column formation_gibbs" in reason
+    assert "J•mol-1·K-1" in json.dumps(record["units_as_published"], ensure_ascii=False)
+    assert _p253_gibbs_at_298(result) == [printed]
 
 
 @pytest.mark.parametrize(

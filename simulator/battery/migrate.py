@@ -18849,6 +18849,19 @@ def _is_usgs_b1452_record(path: Path, doc: Mapping[str, Any]) -> bool:
     return index + 1 < len(parts) and parts[index + 1] == _B1452_SOURCE_ID
 
 
+def _is_usgs_b2131_record(path: Path, doc: Mapping[str, Any]) -> bool:
+    if not doc.get("record_id"):
+        return False
+    if str(doc.get("source_id") or "") == _B2131_SOURCE_ID:
+        return True
+    parts = path.parts
+    try:
+        index = parts.index("compilations")
+    except ValueError:
+        return False
+    return index + 1 < len(parts) and parts[index + 1] == _B2131_SOURCE_ID
+
+
 def _is_usgs_b1259_record(path: Path, doc: Mapping[str, Any]) -> bool:
     if not doc.get("record_id"):
         return False
@@ -19027,7 +19040,7 @@ def _b592_gas_basis(
 
 
 def _b2131_formation_basis(formula: str) -> dict[str, State]:
-    """log10 Kf per mole of an Ellingham oxide product, referenced to 1 bar."""
+    """ΔfG and log10 Kf per mole of an Ellingham oxide product, at 1 bar."""
 
     from simulator.battery.compilation_tier import formula_is_ellingham_oxide_product
 
@@ -19070,7 +19083,10 @@ def compilation_source_basis(
         return _b677_formation_basis(formula)
     if source_id == _B592_SOURCE_ID and quantity in _B592_GAS_QUANTITIES:
         return _b592_gas_basis(formula, phase, quantity, temperatures)
-    if source_id == _B2131_SOURCE_ID and quantity is Quantity.LOG10_KF:
+    if source_id == _B2131_SOURCE_ID and quantity in (
+        Quantity.LOG10_KF,
+        Quantity.DELTA_FG,
+    ):
         return _b2131_formation_basis(formula)
     return {}
 
@@ -27091,6 +27107,12 @@ class Migrator:
         if _is_usgs_b1259_record(path, doc):
             self._lift_b1259_from_generator(work, source_id, rel, count, doc)
             return
+        if _is_usgs_b2131_record(path, doc):
+            from simulator.battery.generators.usgs_b2131 import owns_record
+
+            if owns_record(doc):
+                self._lift_b2131_from_generator(work, source_id, rel, count, doc)
+                return
         count.rows_in += 1
         record_id = str(doc.get("record_id") or path.stem)
         formula = str(
@@ -27591,6 +27613,90 @@ class Migrator:
         doc: Mapping[str, Any],
     ) -> None:
         from simulator.battery.generators.usgs_b1259 import generate_record
+
+        generated = generate_record(doc)
+        count.rows_in += 1
+        for observation in generated.observations:
+            work = self._register_compilation_record_asset(
+                self.result.works.get(work.work_id, work),
+                observation.locator.source_path
+                if observation.locator is not None
+                else rel,
+            )
+            read_from = choose_read_from(work, observation.locator)
+            updates: dict[str, Any] = {}
+            if read_from != observation.read_from:
+                updates["read_from"] = read_from
+            if observation.derivation is not None and observation.derivation.inputs != (
+                read_from,
+            ):
+                # Generator staging records the JSON path. The store requires
+                # derivation.inputs to resolve as a Work asset or observation id.
+                updates["derivation"] = replace(
+                    observation.derivation, inputs=(read_from,)
+                )
+            if updates:
+                observation = replace(observation, **updates)
+            self._ensure_experiment(
+                work_id=work.work_id,
+                experiment_id=observation.experiment_id,
+                locator=observation.locator,
+                method=State.of(MethodToken.TABULATION),
+                equipment=None,
+                observation_id=observation.observation_id,
+                source=rel,
+            )
+            if observation.identity.species.phase.is_unknown:
+                self.result.add_queue(
+                    work.work_id,
+                    observation.locator,
+                    ["phase"],
+                    observation.identity.species.phase.reason or "missing phase",
+                    source=rel,
+                    observation_id=observation.observation_id,
+                )
+            if observation.value.kind is ValueKind.UNAVAILABLE:
+                q_label = (
+                    observation.identity.quantity.value
+                    if observation.identity.quantity.is_value
+                    else "unknown"
+                )
+                why = observation.value.unavailable_reason or (
+                    f"{q_label} value is unavailable"
+                )
+                if str(q_label) not in why:
+                    why = f"{q_label}: {why}"
+                self.result.add_queue(
+                    work.work_id,
+                    observation.locator,
+                    ["value"],
+                    why,
+                    source=rel,
+                    observation_id=observation.observation_id,
+                )
+            unmatched = unmatched_read_from_reason(
+                observation.locator, observation.read_from
+            )
+            if unmatched:
+                self.result.add_queue(
+                    work.work_id,
+                    observation.locator,
+                    ["read_from"],
+                    unmatched,
+                    source=rel,
+                    observation_id=observation.observation_id,
+                )
+            self._add_observation(observation, rel)
+
+    def _lift_b2131_from_generator(
+        self,
+        work: Work,
+        source_id: str,
+        rel: str,
+        count: SourceCount,
+        doc: Mapping[str, Any],
+    ) -> None:
+        from simulator.battery.generators.usgs_b2131 import generate_record
 
         generated = generate_record(doc)
         count.rows_in += 1
