@@ -792,7 +792,6 @@ def _is_quantity_not_predicted(quantity: Quantity | None) -> bool:
     return quantity is Quantity.LOG10_K_REACTION
 
 
-@lru_cache(maxsize=None)
 def _engine_lacks_quantity_capability(
     engine: Engine,
     quantity: Quantity,
