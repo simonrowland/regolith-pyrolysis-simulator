@@ -320,16 +320,23 @@ The `filters` object has these keys:
 Markdown output lists input-wide refusal totals by engine and rail, using `unknown` for a
 blank rail. These buckets are printed regardless of active filters; they include known
 matches and non-matches and do not show counts matching the selected filters. For example,
-with five refusals and `--engine openimcc --rail vapour --species Fe`, the summary can show
-`magemin/unknown=1; openimcc/unknown=1; openimcc/vapour=2; other/activity=1`. The
-`openimcc/vapour=2` bucket includes refusals that do not match the selected species, and
-`other/activity=1` matches neither the selected engine nor rail.
+with five refusals and `--engine openimcc --rail vapour --species Fe`, the CLI prints:
+
+```text
+Refusals by engine/rail: magemin/unknown=1; openimcc/unknown=1; openimcc/vapour=2; other/activity=1.
+Unattributed to selected rail/species filters: magemin/unknown=1; openimcc/unknown=1; openimcc/vapour=1.
+```
+
+The `openimcc/vapour=2` bucket is the selected Fe refusal plus a refusal with a blank
+species; that blank-species refusal also appears as `openimcc/vapour=1` on the unattributed
+line. `other/activity=1` matches neither the selected engine nor rail.
 
 When `--rail` or `--species` is active, a separate Markdown line reports refusals missing
-the rail value needed by `--rail` and/or the species value needed by `--species`. It is a
-missing-value attribution summary, not a filter-match count. Refusals with known values
-that do not match a filter remain in the input-wide `refused_count` but are not
-unattributed.
+the rail value needed by `--rail` and/or the species value needed by `--species`. A refusal
+appears on that line if an active `--rail` filter meets a blank rail or an active
+`--species` filter meets a blank species, regardless of its other fields. Known non-matches
+alone do not put a refusal on the unattributed line. This is a missing-value attribution
+summary, not a filter-match count.
 
 When `run_envelope` is present, it contains `feedstock_composition_class`,
 `feedstock_class_source`, `backend`, `engines_by_role`, `temperature_K` (`min`, `max`, and
