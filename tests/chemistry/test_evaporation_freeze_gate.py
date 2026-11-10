@@ -1986,6 +1986,72 @@ def _lunar_composition_projected_diagnostic(sim):
     return diagnostic, notice
 
 
+@pytest.mark.parametrize('held', [False, True])
+def test_over_limit_projection_uses_hold_or_kress_floor(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    held,
+):
+    from simulator.melt_backend.magemin import (
+        MAGEMinBackend,
+        _magemin_bulk_projection_details,
+    )
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    if held:
+        sim._remember_freeze_gate_provider_curve({
+            'source': 'gate_liquid_fraction',
+            'solidus_T_C': 1200.0,
+            'liquidus_T_C': 1500.0,
+            'path': ((1200.0, 0.0), (1500.0, 1.0)),
+        })
+    projection = MAGEMinBackend()._build_db_bulk_projection({
+        'SiO2': 85.0,
+        'Al2O3': 10.0,
+        'CaO': 3.0,
+        'MnO': 2.0,
+    })
+    diagnostic = {
+        'backend_status': 'out_of_domain',
+        'backend_status_reason': 'composition_projected',
+        'input_composition_projection': _magemin_bulk_projection_details(
+            projection
+        ),
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1100.0,
+    }
+
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *args, **kwargs: SimpleNamespace(
+            status='out_of_domain',
+            warnings=(),
+            diagnostic=diagnostic,
+        ),
+    )
+    curve = sim._melt_redox_liquidus_gate_curve()
+
+    notice = curve['composition_projected_notice']
+    assert notice['composition_projection_classification'][
+        'projection_verdict'
+    ] == 'over_threshold'
+    if held:
+        assert curve['path'] == ((1200.0, 0.0), (1500.0, 1.0))
+        assert curve['gate_provider_refusal']['qualification'] == (
+            'held_last_good_curve'
+        )
+    else:
+        assert curve['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+
+
 def test_lunar_composition_projected_does_not_arm_floor_fallback(
     monkeypatch,
     vapor_pressure_data,
