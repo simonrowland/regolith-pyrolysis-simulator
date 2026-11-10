@@ -1626,6 +1626,32 @@ def test_magemin_subprocess_parser_rejects_nonunit_mode_vector(mode_line):
     assert raised.value.exception_type == 'MAGEMinOutputError'
 
 
+def test_magemin_subprocess_parser_rejects_raw_sum_hidden_by_token_clamp():
+    """Refuse a vector whose raw sum is outside the sum budget.
+
+    Each token is inside the per-token budget. Their printed sum is not.
+    Clamping the excess token to 1.0 before the sum check would hide that.
+    """
+    from simulator.melt_backend.magemin import _MAGEMinEngineCallError
+
+    raw_liq = 1.00003
+    raw_ol = 0.00008
+    sum_tolerance = 1.0e-4
+    raw_sum = raw_liq + raw_ol
+    clamped_sum = 1.0 + raw_ol
+    assert raw_sum - 1.0 > sum_tolerance
+    assert clamped_sum - 1.0 <= sum_tolerance
+
+    with pytest.raises(
+        _MAGEMinEngineCallError, match='Mode vector must sum to 1.0'
+    ) as raised:
+        MAGEMinBackend._parse_subprocess_stdout(
+            'Phase: liq ol\nMode: 1.00003 0.00008\n'
+        )
+    assert raised.value.exception_type == 'MAGEMinOutputError'
+    assert f'{raw_sum:.9g}' in raised.value.engine_message
+
+
 def test_magemin_duplicate_liquid_modes_are_summed_from_captured_output():
     from simulator.melt_backend.base import EquilibriumResult
 

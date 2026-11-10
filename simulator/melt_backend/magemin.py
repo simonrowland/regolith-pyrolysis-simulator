@@ -3486,11 +3486,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         # MAGEMin prints modes to five decimals (up to 5e-6 rounding each);
         # the existing abs 1e-4 sum budget covers accumulated print error.
         # Reuse it on each fraction so token validation cannot preempt the sum.
+        # Sum the printed tokens before clamping an in-budget excess to 1.0.
+        # Clamping first hides an out-of-budget vector: 1.00003 + 0.00008
+        # is 1.00011 (excess 1.1e-4), but 1.0 + 0.00008 is 1.00008 (excess
+        # 8e-5) and would pass this same abs 1e-4 check.
         mode_tolerance = 1.0e-4
-        parsed_modes: list[tuple[str, float]] = []
+        raw_parsed_modes: list[tuple[str, float, str]] = []
         raw_mode_fractions: Dict[str, float] = {}
-        mode_token_diagnostics: list[str] = []
-        mode_token_notices: list[Dict[str, Any]] = []
         for name, raw in zip(names, values):
             try:
                 fraction = float(raw)
@@ -3507,6 +3509,32 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'MAGEMin Mode token for {name!r} is invalid: {raw!r}'
                 )
             raw_mode_fractions[name] = fraction
+            raw_parsed_modes.append((name, fraction, raw))
+        if metadata is not None:
+            metadata['phase_names'] = tuple(names)
+            metadata['solver_status'] = _parse_magemin_solver_status(stdout)
+            metadata['mode_fractions'] = raw_mode_fractions
+        mode_total = sum(fraction for _, fraction, _raw in raw_parsed_modes)
+        if not math.isclose(
+            mode_total, 1.0, rel_tol=0.0, abs_tol=mode_tolerance
+        ):
+            if mode_total < 1.0:
+                raise _MAGEMinModeVectorMassDeficit(
+                    mode_sum=mode_total,
+                    parsed_modes=[
+                        (name, fraction)
+                        for name, fraction, _raw in raw_parsed_modes
+                    ],
+                )
+            _raise_magemin_output_invalid(
+                'MAGEMin Mode vector must sum to 1.0; '
+                f'got {mode_total:.9g}'
+            )
+
+        parsed_modes: list[tuple[str, float]] = []
+        mode_token_diagnostics: list[str] = []
+        mode_token_notices: list[Dict[str, Any]] = []
+        for name, fraction, raw in raw_parsed_modes:
             if fraction > 1.0:
                 mode_token_notices.append({
                     'type': 'typed_notice',
@@ -3523,28 +3551,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
                 fraction = 1.0
             parsed_modes.append((name, fraction))
-        if metadata is not None:
-            metadata['phase_names'] = tuple(names)
-            metadata['solver_status'] = _parse_magemin_solver_status(stdout)
-            metadata['mode_fractions'] = raw_mode_fractions
-            if mode_token_diagnostics:
-                metadata['mode_token_diagnostics'] = tuple(
-                    mode_token_diagnostics
-                )
-                metadata['mode_token_notices'] = tuple(mode_token_notices)
-        mode_total = sum(fraction for _, fraction in parsed_modes)
-        if not math.isclose(
-            mode_total, 1.0, rel_tol=0.0, abs_tol=mode_tolerance
-        ):
-            if mode_total < 1.0:
-                raise _MAGEMinModeVectorMassDeficit(
-                    mode_sum=mode_total,
-                    parsed_modes=parsed_modes,
-                )
-            _raise_magemin_output_invalid(
-                'MAGEMin Mode vector must sum to 1.0; '
-                f'got {mode_total:.9g}'
-            )
+        if metadata is not None and mode_token_diagnostics:
+            metadata['mode_token_diagnostics'] = tuple(mode_token_diagnostics)
+            metadata['mode_token_notices'] = tuple(mode_token_notices)
 
         phases: Dict[str, Dict[str, float]] = {}
         for name, fraction in parsed_modes:
