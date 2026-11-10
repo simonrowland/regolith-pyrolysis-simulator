@@ -184,7 +184,7 @@ _MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
 _MAGEMIN_SUBPROCESS_LOCK = _MAGEMIN_SUBPROCESS_LOCK_DIR / (
     f'magemin-subprocess-{os.getuid()}.lock'
 )
-_MAGEMIN_ENGINE_VERSION_CACHE: Dict[str, str] = {}
+_MAGEMIN_ENGINE_VERSION_CACHE: Dict[Tuple[str, int, int, int], str] = {}
 _MAGEMIN_ENGINE_VERSION_CACHE_LOCK = threading.Lock()
 
 
@@ -2187,9 +2187,23 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if binary_path is None:
             return 'unavailable'
         resolved_binary_path = binary_path.resolve()
-        version_key = str(resolved_binary_path)
+        try:
+            binary_stat = resolved_binary_path.stat()
+        except OSError:
+            version_key = None
+        else:
+            version_key = (
+                str(resolved_binary_path),
+                binary_stat.st_ino,
+                binary_stat.st_size,
+                binary_stat.st_mtime_ns,
+            )
         with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
-            legacy = _MAGEMIN_ENGINE_VERSION_CACHE.get(version_key)
+            legacy = (
+                _MAGEMIN_ENGINE_VERSION_CACHE.get(version_key)
+                if version_key is not None
+                else None
+            )
             if legacy is None:
                 try:
                     with (
@@ -2212,7 +2226,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     lines = (result.stdout or result.stderr).strip().splitlines()
                     if result.returncode == 0 and lines:
                         legacy = lines[0].strip()
-                        _MAGEMIN_ENGINE_VERSION_CACHE[version_key] = legacy
+                        if version_key is not None:
+                            _MAGEMIN_ENGINE_VERSION_CACHE[version_key] = legacy
                     else:
                         legacy = f'MAGEMin subprocess ({resolved_binary_path})'
                 except (

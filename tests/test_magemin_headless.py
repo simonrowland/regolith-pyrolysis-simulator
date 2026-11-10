@@ -1,5 +1,6 @@
 """MAGEMin launch isolation and captured numeric output contracts."""
 
+import hashlib
 import importlib
 import multiprocessing
 import os
@@ -129,6 +130,7 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
     monkeypatch.setattr(magemin, '_magemin_subprocess_slot', slot)
     monkeypatch.setattr(magemin.subprocess, 'run', run)
     binary = tmp_path / 'MAGEMin'
+    binary.write_bytes(b'fake MAGEMin executable')
     first = MAGEMinBackend()
     first._binary_path = binary
     second = MAGEMinBackend()
@@ -153,6 +155,68 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
         f'MAGEMin subprocess ({busy._binary_path.resolve()})'
     )
     assert len(run_calls) == 1
+
+
+def test_version_probe_repeats_when_binary_changes_at_same_path(
+    monkeypatch, tmp_path,
+):
+    import simulator.engine_local_config as local_config
+
+    monkeypatch.setattr(local_config, 'cache_version_for', lambda _: None)
+    monkeypatch.setattr(local_config, 'warn_legacy_once', lambda *_args: None)
+    binary = tmp_path / 'MAGEMin'
+    first_bytes = b'1.9.6'
+    binary.write_bytes(first_bytes)
+    initial_stat = binary.stat()
+    run_calls = []
+
+    def run(args, **kwargs):
+        run_calls.append(args)
+        runtime_bytes = Path(args[0]).read_bytes()
+        version = runtime_bytes.decode('ascii')
+        digest = hashlib.sha256(runtime_bytes).hexdigest()
+        return subprocess.CompletedProcess(
+            args,
+            0,
+            stdout=f'MAGEMin {version} (runtime sha256={digest})\n',
+            stderr='',
+        )
+
+    monkeypatch.setattr(magemin.subprocess, 'run', run)
+    first = MAGEMinBackend()
+    first._binary_path = binary
+    second = MAGEMinBackend()
+    second._binary_path = binary
+
+    first_version = first.get_engine_version()
+    assert second.get_engine_version() == first_version
+    assert len(run_calls) == 1
+    assert (
+        f'runtime sha256={hashlib.sha256(first_bytes).hexdigest()}'
+        in first_version
+    )
+
+    replacement_bytes = b'2.0.0'
+    binary.write_bytes(replacement_bytes)
+    # Keep the path, inode, and size fixed so the changed mtime proves re-probing.
+    replacement_mtime = max(time.time(), initial_stat.st_mtime + 1)
+    os.utime(binary, (replacement_mtime, replacement_mtime))
+    replacement_stat = binary.stat()
+    assert replacement_bytes != first_bytes
+    assert replacement_stat.st_ino == initial_stat.st_ino
+    assert replacement_stat.st_size == initial_stat.st_size
+    assert replacement_stat.st_mtime_ns != initial_stat.st_mtime_ns
+
+    third = MAGEMinBackend()
+    third._binary_path = binary
+    replacement_version = third.get_engine_version()
+
+    assert replacement_version != first_version
+    assert (
+        f'runtime sha256={hashlib.sha256(replacement_bytes).hexdigest()}'
+        in replacement_version
+    )
+    assert len(run_calls) == 2
 
 
 @pytest.mark.parametrize('value, expected', [(None, 2), ('1', 1), ('4', 4),
