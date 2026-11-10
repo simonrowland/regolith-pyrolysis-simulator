@@ -2105,6 +2105,54 @@ def test_commanded_po2_grid_remains_direct_gas_evaluation(
     )
 
 
+def test_openimcc_reactive_cell_accepts_aluminosilicate_interim_gas() -> None:
+    _require_openimcc()
+    from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
+
+    result = _OpenImccBatteryBackend("openimcc").equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_mol={"SiO2": 0.5, "Al2O3": 0.5},
+        po2_request=Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+            cell_material="W",
+        ),
+    )
+
+    assert result.status == "ok"
+    assert result.vapor_pressures_Pa["WO3"] > 0.0
+    assert any(
+        notice.get("reason") == "multi_parent_channel_interim"
+        for notice in result.imcc_notices
+    )
+
+
+def test_explicit_po2_passes_only_positive_inventory_gas_parents(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _require_openimcc()
+    import openimcc
+    from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
+
+    original_evaluate_gas = openimcc.evaluate_gas
+    parent_vectors: list[tuple[str, ...]] = []
+
+    def record_parents(*args: object, **kwargs: object):
+        parent_vectors.append(tuple(kwargs["parent_oxides"]))
+        return original_evaluate_gas(*args, **kwargs)
+
+    monkeypatch.setattr(openimcc, "evaluate_gas", record_parents)
+    result = _OpenImccBatteryBackend("openimcc").equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_mol={"SiO2": 0.5, "K2O": 0.0, "TiO2": 0.0},
+        fO2_log=-10.0,
+        po2_request=Po2Request(mode="commanded", po2_bar=1.0e-10),
+    )
+
+    assert result.status == "ok"
+    assert parent_vectors == [("SiO2",)]
+
+
 def test_openimcc_battery_reports_single_cation_gamma() -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
 
@@ -2886,6 +2934,12 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
     packaged = _OpenImccBatteryBackend("openimcc")
     monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(VAPOROCK_ROOT))
     mutated = _OpenImccBatteryBackend("openimcc")
+    if "engine_binding_identity" not in mutated._identity:
+        pytest.skip(
+            "tests/test_openimcc_battery_engine.py::"
+            "test_openimcc_gas_table_mutation_to_vaporock_changes_prediction: "
+            "external VapoRock checkout does not publish engine binding metadata"
+        )
     temperature_K = float(row["T_K"])
     evaluate_gas = openimcc.evaluate_gas
     gas_results = []

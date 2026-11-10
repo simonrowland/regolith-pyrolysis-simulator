@@ -813,8 +813,8 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
 
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
     # d-137 splits the old 350 C Stage 4 into a 250 C Na/Mg collector and a
-    # 40 C K trap. d-368 accepts the 995dc14 default-pack K activity; its owner
-    # card is pending. The next row transfers this production row to reagent,
+    # 40 C K trap. d-371 accepts d-368's 995dc14 default-pack K activity. The
+    # next row transfers this production row to reagent,
     # so live product returns to zero while cumulative condensate and recycled
     # mass retain the capture.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(

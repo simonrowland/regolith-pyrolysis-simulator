@@ -106,6 +106,47 @@ def _species_metadata(
     )
 
 
+def test_openimcc_channel_metadata_uses_two_parent_alsio_reaction() -> None:
+    import openimcc
+
+    from simulator.battery.oxygen_balance import (
+        openimcc_oxygen_balance_species_metadata,
+    )
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _openimcc_gas_channels_and_omission_notices,
+    )
+
+    gas_pack = openimcc.load_gas_datapack()
+    channels, _omissions = _openimcc_gas_channels_and_omission_notices(
+        ("SiO2", "Al2O3"), gas_pack
+    )
+    metadata = openimcc_oxygen_balance_species_metadata(channels)
+
+    # Independent d-368 reaction: 1/2 Al2O3(l) + SiO2(l) -> AlSiO(g) + 5/4 O2(g).
+    # The K expression gives P_AlSiO ∝ pO2^(-n_O2/n_AlSiO) at fixed parent
+    # activities. Formula parsing yields 3.5 mol O atoms in the parents and
+    # 1 mol in AlSiO, hence 1.25 mol O2 per mol gas and exponent -1.25.
+    parent_oxygen_atoms = math.fsum(
+        coefficient * float(parse_formula(parent).elements.get("O", 0.0))
+        for parent, coefficient in (("Al2O3", 0.5), ("SiO2", 1.0))
+    )
+    al_sio_oxygen_atoms = float(parse_formula("AlSiO").elements["O"])
+    al_sio_oxygen_molecules = (parent_oxygen_atoms - al_sio_oxygen_atoms) / 2.0
+    al_sio_exponent = -al_sio_oxygen_molecules / 1.0
+    assert parent_oxygen_atoms == pytest.approx(3.5)
+    assert al_sio_exponent == pytest.approx(-1.25)
+    assert metadata["AlSiO"].parent_oxygen_demand == pytest.approx(3.5)
+    assert metadata["AlSiO"].pO2_exponent == pytest.approx(al_sio_exponent)
+
+    # Check the same K exponent convention against SiO2(l) -> SiO(g) + 1/2 O2(g).
+    sio_parent_oxygen_atoms = float(parse_formula("SiO2").elements["O"])
+    sio_oxygen_atoms = float(parse_formula("SiO").elements["O"])
+    sio_oxygen_molecules = (sio_parent_oxygen_atoms - sio_oxygen_atoms) / 2.0
+    sio_exponent = -sio_oxygen_molecules / 1.0
+    assert sio_exponent == pytest.approx(-0.5)
+    assert metadata["SiO"].pO2_exponent == pytest.approx(sio_exponent)
+
+
 def _alpha_source_for_catalog_row(
     species: str, row: dict[str, object]
 ) -> str:
