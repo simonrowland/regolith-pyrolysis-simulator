@@ -9294,6 +9294,120 @@ def test_bencze_2016_reference_temperature_is_bound(tmp_path: Path) -> None:
     )
 
 
+def test_bencze_2016_table_s1_1273k_partial_pressure_is_the_printed_glyph(
+    tmp_path: Path,
+) -> None:
+    """Table S-I prints p(Na) as ``1.70·10-2`` Pa at the parent's 1273 K.
+
+    The sibling activity ``7.57·10-9`` is not this quantity. A caret power
+    and a printed ± on the mantissa stay unavailable. A and B are not gridded.
+    """
+
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/bencze-yazhenskikh-2016.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    na_rows = source["species"]["Na"]["observations"]
+    table_s1 = next(
+        row for row in na_rows if row["observation_id"] == "bencze_2016_table_s1_na_all_subsamples"
+    )
+    printed = table_s1["values"]["rows"][0]
+    assert printed["p_Na_at_1273_K_Pa"] == "1.70·10-2"
+    assert printed["a_Na2O_at_1273_K"] == "7.57·10-9"
+    assert printed["A"] == 45.439
+    assert printed["B"] == -63030
+
+    selected = select_declared_source(Quantity.P_PARTIAL, "Pa", printed)
+    assert selected.field_name == "p_Na_at_1273_K_Pa"
+    assert selected.value.kind is ValueKind.POINT
+    assert selected.amount == Decimal("1.70e-2")
+    assert selected.unit_trail == "identity:Pa"
+    # The printed cell, not exp(A + B/1273). That fit is about 0.01701 Pa.
+    fit_pa = Decimal(str(math.exp(45.439 + (-63030) / 1273)))
+    assert abs(selected.amount - fit_pa) > Decimal("1e-6")
+
+    activity_only = {
+        key: value for key, value in printed.items() if key != "p_Na_at_1273_K_Pa"
+    }
+    refused_activity = select_declared_source(Quantity.P_PARTIAL, "Pa", activity_only)
+    assert refused_activity.value.kind is ValueKind.UNAVAILABLE
+    assert "no mapped p_partial" in (refused_activity.reason or "")
+    assert refused_activity.amount != Decimal("7.57e-9")
+    activity_quantity = select_declared_source(Quantity.ACTIVITY, None, printed)
+    assert activity_quantity.value.kind is ValueKind.UNAVAILABLE
+    assert activity_quantity.amount != Decimal("7.57e-9")
+
+    caret = dict(printed)
+    caret["p_Na_at_1273_K_Pa"] = "1.70·10^-2"
+    caret_selection = select_declared_source(Quantity.P_PARTIAL, "Pa", caret)
+    assert caret_selection.value.kind is ValueKind.UNAVAILABLE
+
+    table_s2 = next(
+        row for row in na_rows if row["observation_id"] == "bencze_2016_table_s2_na_selected_means"
+    )
+    mean_row = table_s2["values"]["rows"][0]
+    assert mean_row["p_Na_at_1273_K_Pa"] == "(5.45±0.61)·10-2"
+    mean_selection = select_declared_source(Quantity.P_PARTIAL, "Pa", mean_row)
+    assert mean_selection.value.kind is ValueKind.UNAVAILABLE
+    assert "not numeric" in (mean_selection.reason or "")
+    assert "(5.45±0.61)·10-2" in (mean_selection.reason or "")
+    assert mean_selection.amount != Decimal("5.45e-2")
+
+    potassium = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/extracts/bencze-yazhenskikh-2016-table-s1-k.yaml"
+        ).read_text(encoding="utf-8")
+    )["rows"][0]
+    assert potassium["p_K_at_1273_K_Pa"] == "5.52·10-4"
+    assert potassium["a_K2O_at_1273_K"] == "1.13·10-14"
+    potassium_selection = select_declared_source(Quantity.P_PARTIAL, "Pa", potassium)
+    assert potassium_selection.field_name == "p_K_at_1273_K_Pa"
+    assert potassium_selection.amount == Decimal("5.52e-4")
+    assert potassium_selection.amount != Decimal("1.13e-14")
+
+    result = _migrate_real_extract(tmp_path, "bencze-yazhenskikh-2016.yaml")
+    assert len(result.observations) == 70
+    example = result.observations[
+        "bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples"
+        "::rows:row=1:h=db6e6e110926"
+    ]
+    assert example.value.kind is ValueKind.POINT
+    assert example.value.point == Decimal("1.70e-2")
+    assert example.identity.quantity.value is Quantity.P_PARTIAL
+    assert example.identity.temperature_K.value == Decimal("1273")
+    assert example.identity.species.formula == "Na"
+    assert example.value.point != Decimal("7.57e-9")
+
+    points = [
+        observation
+        for observation in result.observations.values()
+        if observation.value.kind is ValueKind.POINT
+    ]
+    unavailable = [
+        observation
+        for observation in result.observations.values()
+        if observation.value.kind is ValueKind.UNAVAILABLE
+    ]
+    assert len(points) == 61
+    assert {observation.value.point for observation in points} >= {Decimal("1.70e-2")}
+    assert Decimal("7.57e-9") not in {observation.value.point for observation in points}
+    assert len(unavailable) == 9
+    mean = result.observations[
+        "bencze-yazhenskikh-2016::bencze_2016_table_s2_na_selected_means"
+        "::rows:row=s1-1:h=1d0d1e2bbace"
+    ]
+    assert mean.value.kind is ValueKind.UNAVAILABLE
+    assert "(5.45±0.61)·10-2" in (mean.value.unavailable_reason or "")
+    potassium_shell = result.observations[
+        "bencze-yazhenskikh-2016::bencze_2016_table_s1_k_all_subsamples"
+    ]
+    assert potassium_shell.value.kind is ValueKind.UNAVAILABLE
+    assert "table_transcription" in (potassium_shell.value.unavailable_reason or "")
+    assert "no mapped p_partial" in (potassium_shell.value.unavailable_reason or "")
+
+
 @pytest.mark.parametrize(
     "extra, expected",
     [
