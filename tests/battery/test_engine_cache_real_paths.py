@@ -429,6 +429,9 @@ def test_alpha_and_thermoengine_runtime_paths_do_not_enter_settings() -> None:
         _thermoengine_transport=SimpleNamespace(_melts_version="1.0.2"),
     )
     first = engine_cache.engine_cache_backend_settings(backend)
+    assert engine_cache._setting_drop_reason(("_binary_path",)) == (
+        engine_cache._setting_drop_reason(("_engine_path",))
+    )
     for path in (
         ("_binary_path",),
         ("_engine_path",),
@@ -505,7 +508,11 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason(
                 yield from leaves(child, (*path, name), seen)
             for cls in type(value).__mro__:
                 for name, descriptor in vars(cls).items():
-                    if not isinstance(descriptor, property) or name in attributes:
+                    if (
+                        not cls.__module__.startswith("simulator.")
+                        or not isinstance(descriptor, property)
+                        or name in attributes
+                    ):
                         continue
                     try:
                         child = getattr(value, name)
@@ -529,6 +536,25 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason(
             else:
                 raise AssertionError((path, current))
         return current
+
+    def set_property(value: Any, path: tuple[Any, ...], replacement: Any) -> Callable[[], None]:
+        parent = value
+        for part in path[:-1]:
+            if isinstance(parent, Mapping):
+                parent = parent[str(part)]
+            elif isinstance(parent, (list, tuple)):
+                parent = parent[part]
+            else:
+                parent = getattr(parent, str(part))
+        name = str(path[-1])
+        owner = next(
+            cls
+            for cls in type(parent).__mro__
+            if isinstance(vars(cls).get(name), property)
+        )
+        descriptor = vars(owner)[name]
+        setattr(owner, name, property(lambda _instance: replacement))
+        return lambda: setattr(owner, name, descriptor)
 
     def replace(value: Any, path: tuple[Any, ...], replacement: Any) -> Any:
         if not path:
@@ -644,6 +670,45 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason(
                         )
             finally:
                 replace(handle.backend, path, original)
+        for path, original in property_values.items():
+            changed = alternate(original)
+            if changed == original:
+                continue
+            restore_property = set_property(handle.backend, path, changed)
+            try:
+                changed_settings, changed_drops, changed_opaque = (
+                    engine_cache._engine_cache_backend_settings_with_drops(
+                        handle.backend
+                    )
+                )
+                changed_key = engine_cache.engine_cache_key(
+                    engine.value, chem_version, changed_settings
+                )
+                if changed_key == baseline_key:
+                    dropped_prefixes = [
+                        dropped_path
+                        for dropped_path in changed_drops
+                        if path[: len(dropped_path)] == dropped_path
+                    ]
+                    opaque_prefixes = [
+                        opaque_path
+                        for opaque_path in changed_opaque
+                        if path[: len(opaque_path)] == opaque_path
+                    ]
+                    assert dropped_prefixes or opaque_prefixes, (engine.value, path)
+                    for dropped_path in dropped_prefixes:
+                        assert (
+                            engine_cache._setting_drop_reason(dropped_path)
+                            == changed_drops[dropped_path]
+                        ), (engine.value, path, dropped_path)
+                    for opaque_path in opaque_prefixes:
+                        assert engine_cache._opaque_setting_reason(opaque_path), (
+                            engine.value,
+                            path,
+                            opaque_path,
+                        )
+            finally:
+                restore_property()
     finally:
         close_battery_engine_handle(handle)
 
