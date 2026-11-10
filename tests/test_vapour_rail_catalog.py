@@ -666,6 +666,119 @@ def test_require_git_history_rejects_ambiguous_ack_prefix_in_tmp_repo(
         require_git_history(repo, ack.stem)
 
 
+# Pseudo-block Antoine law evaluate() runs for the Fe zero-activity admission.
+# engines.antoine._antoine_log10_pressure: log10(P/Pa) = A - B / (T + C)
+# A=9.408547, B=23312.312336, C=1000, T=1750, T+C=2750.
+# log10(P) = 9.408547 - 23312.312336/2750 = 0.9313425141818197
+# P = 10 ** 0.9313425141818197 = 8.537731922030234 Pa
+# This is an activity-independent effective pressure over basalt, not pure-Fe P_sat.
+# At 1800 K the same law is 10 ** (9.408547 - 23312.312336/2800) = 12.098211309846041 Pa.
+_FE_PSEUDO_LAW_1750_PA = 8.537731922030234
+_FE_PSEUDO_LAW_1800_PA = 12.098211309846041
+_FE_DISAGREEMENT_ANCHOR = (
+    "validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml"
+)
+_DIAGNOSTIC_AUTHORITY = "diagnostic/extrapolated"
+_DIAGNOSTIC_LAW_PROVENANCE = "backsolved from VapoRock, no coefficients fitted"
+_DIAGNOSTIC_EVALUATOR_FORM = "log10(P) = A - B / (T + C)"
+_DIAGNOSTIC_CLOSER = "t-1723"
+# Synthetic diagnostic Antoine in the generative grid. Same form.
+# A=10, B=10000, C=0, T=1100. log10(P) = 10 - 10000/1100 = 0.9090909090909083
+# P = 8.111308307896856 Pa. Comparators are 1 Pa and 0.1 Pa.
+_SYNTHETIC_DIAGNOSTIC_1100_PA = 8.111308307896856
+
+
+@functools.lru_cache(maxsize=1)
+def _fe_crosscheck_row() -> dict:
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "validation-data"
+        / "pin-evidence"
+        / "vaporock_engine_crosscheck_2026-08-08.yaml"
+    )
+    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return payload["pin_rows"]["Fe"]
+
+
+def _assert_diagnostic_disclosure(
+    notice: dict | None,
+    *,
+    executed_species_id: str,
+    anchor: str,
+    temperature_K: float,
+    rail_pressure_Pa: float,
+    vaporock_pressure_Pa: float,
+    law_pressure_Pa: float,
+) -> None:
+    assert notice is not None
+    assert notice["authority"] == _DIAGNOSTIC_AUTHORITY
+    assert notice["law_provenance"] == _DIAGNOSTIC_LAW_PROVENANCE
+    assert notice["provenance_status"] == "diagnostic_only"
+    assert notice["evaluator_form"] == _DIAGNOSTIC_EVALUATOR_FORM
+    assert notice["closes_with"] == _DIAGNOSTIC_CLOSER
+    assert notice["executed_species_id"] == executed_species_id
+    assert notice["anchor"] == anchor
+    assert notice["anchor_role"] == "disagreement_not_source"
+    assert notice["temperature_K"] == temperature_K
+    assert notice["law_pressure_Pa"] == pytest.approx(
+        law_pressure_Pa, rel=1e-12, abs=0.0
+    )
+    comparators = notice["comparators"]
+    assert comparators["rail_pressure_Pa"] == rail_pressure_Pa
+    assert comparators["vaporock_pressure_Pa"] == vaporock_pressure_Pa
+    assert comparators["gap_dex_law_vs_rail"] == pytest.approx(
+        math.log10(law_pressure_Pa / rail_pressure_Pa), rel=0, abs=1e-12
+    )
+    assert comparators["gap_dex_law_vs_vaporock"] == pytest.approx(
+        math.log10(law_pressure_Pa / vaporock_pressure_Pa), rel=0, abs=1e-12
+    )
+
+
+def _assert_fe_pseudo_law_disclosure(notice: dict | None) -> None:
+    """Flag carries the anchor gap. Comparators are the crosscheck row.
+
+    Recomputed from that file, not from the catalog coefficients:
+    rail 0.6585350200427053 Pa, gap 1.1127636390496998 dex;
+    VapoRock 0.3004593572618527 Pa, gap 1.4535567803078235 dex.
+    The file residual of rail against VapoRock is 0.3407931412581238 dex.
+    """
+
+    row = _fe_crosscheck_row()
+    rail = float(row["rail_pressure_Pa"])
+    vaporock = float(row["vaporock_pressure_Pa"])
+    assert float(row["temperature_K"]) == 1750.0
+    assert float(row["signed_delta_dex"]) == pytest.approx(
+        math.log10(rail / vaporock), rel=0, abs=1e-12
+    )
+    assert math.log10(_FE_PSEUDO_LAW_1750_PA / rail) == pytest.approx(
+        1.1127636390496998, rel=0, abs=1e-12
+    )
+    assert math.log10(_FE_PSEUDO_LAW_1750_PA / vaporock) == pytest.approx(
+        1.4535567803078235, rel=0, abs=1e-12
+    )
+    _assert_diagnostic_disclosure(
+        notice,
+        executed_species_id="Fe",
+        anchor=_FE_DISAGREEMENT_ANCHOR,
+        temperature_K=1750.0,
+        rail_pressure_Pa=rail,
+        vaporock_pressure_Pa=vaporock,
+        law_pressure_Pa=_FE_PSEUDO_LAW_1750_PA,
+    )
+
+
+def _assert_admission_notice_for_record(evaluator, evaluation, record) -> None:
+    evaluation_notice = getattr(evaluation, "diagnostic_admission_notice", None)
+    evaluator_notice = getattr(evaluator, "diagnostic_admission_notice", None)
+    if len(record) == 7 and record[6][0] == "diagnostic_admission":
+        assert record[0] == "Fe"
+        _assert_fe_pseudo_law_disclosure(evaluation_notice)
+        _assert_fe_pseudo_law_disclosure(evaluator_notice)
+        return
+    assert evaluation_notice is None
+    assert evaluator_notice is None
+
+
 def test_t622_frozen_fe_law_compiles_without_rewriting_the_fixture() -> None:
     fixture_bytes = T622_LANDING_CATALOG_FIXTURE.read_bytes()
     assert (
@@ -694,9 +807,31 @@ def test_t622_frozen_fe_law_compiles_without_rewriting_the_fixture() -> None:
         historic_evaluator = historic.species[species_id].evaluator
         live_evaluator = live.species[species_id].evaluator
         assert historic_evaluator is not None and live_evaluator is not None
-        assert historic_evaluator.evaluate(1800.0, **kwargs).pressure_pa == (
-            live_evaluator.evaluate(1800.0, **kwargs).pressure_pa
-        )
+        historic_evaluation = historic_evaluator.evaluate(1800.0, **kwargs)
+        live_evaluation = live_evaluator.evaluate(1800.0, **kwargs)
+        assert historic_evaluation.pressure_pa == live_evaluation.pressure_pa
+        if species_id == "Fe":
+            assert historic_evaluation.pressure_pa == pytest.approx(
+                _FE_PSEUDO_LAW_1800_PA, rel=1e-12, abs=0.0
+            )
+            for pinned_evaluator in (historic_evaluator, live_evaluator):
+                pinned = pinned_evaluator.evaluate(1750.0)
+                assert pinned.pressure_pa == pytest.approx(
+                    _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
+                )
+                _assert_fe_pseudo_law_disclosure(
+                    getattr(pinned, "diagnostic_admission_notice", None)
+                )
+                _assert_fe_pseudo_law_disclosure(
+                    getattr(pinned_evaluator, "diagnostic_admission_notice", None)
+                )
+        else:
+            _assert_fe_pseudo_law_disclosure(
+                getattr(historic_evaluation, "diagnostic_admission_notice", None)
+            )
+            _assert_fe_pseudo_law_disclosure(
+                getattr(live_evaluation, "diagnostic_admission_notice", None)
+            )
     assert historic.species["Fe"].validation_anchor_refs == ()
     assert historic.species["FeO_association_gas"].validation_anchor_refs == ()
 
@@ -1012,7 +1147,6 @@ def _effective_pressure_fit_fixture() -> dict:
             {
                 "source_id": "fit-grid-source",
                 "observation_id": "fit-grid",
-                "status": "diagnostic_only",
             }
         ],
         "coefficients": {"A": 10.0, "B": 10000.0, "C": 0.0},
@@ -1149,7 +1283,14 @@ _ZERO_ACTIVITY_MODES = (
     "gas_association_from_effective_base",
     "not_a_composition_mode",
 )
-_ZERO_ACTIVITY_EVIDENCE = ("none", "migration_only", "full")
+_ZERO_ACTIVITY_EVIDENCE = (
+    "none",
+    "migration_only",
+    "full",
+    "diagnostic_unfitted",
+    "diagnostic_token",
+    "diagnostic_sibling",
+)
 _ZERO_ACTIVITY_BASE_LINKS = ("absent", "matching", "mismatched")
 _COMPILABLE_ZERO_ACTIVITY_FAMILIES = frozenset(
     {"antoine", "tabulated_equilibrium", "standard_reaction_term"}
@@ -1164,7 +1305,34 @@ def _set_fit_evidence(row: dict, model: dict, kind: str) -> None:
         return
     if kind == "migration_only":
         model["provenance"] = [{"source": "schema_v1_in_place_migration"}]
+        model.pop("anchor_disagreement", None)
     elif kind == "full":
+        model["provenance"] = [
+            {
+                "source_id": "fit-grid-source",
+                "observation_id": "fit-grid",
+            }
+        ]
+        model.pop("anchor_disagreement", None)
+    elif kind == "diagnostic_unfitted":
+        model["provenance"] = [
+            {
+                "source_id": "pseudo_psat_backsolved_from_vaporock",
+                "observation_id": "fit-grid",
+                "status": "diagnostic_only",
+                "law_provenance": _DIAGNOSTIC_LAW_PROVENANCE,
+            }
+        ]
+        model["anchor_disagreement"] = {
+            "role": "disagreement_not_source",
+            "anchor": "validation:disagreement-not-source",
+            "temperature_K": 1100.0,
+            "rail_pressure_Pa": 1.0,
+            "vaporock_pressure_Pa": 0.1,
+        }
+    elif kind == "diagnostic_token":
+        # Status plus a real observation id, residual, and anchors. That is
+        # not the unfitted statement and must not certify.
         model["provenance"] = [
             {
                 "source_id": "fit-grid-source",
@@ -1172,6 +1340,28 @@ def _set_fit_evidence(row: dict, model: dict, kind: str) -> None:
                 "status": "diagnostic_only",
             }
         ]
+        model.pop("anchor_disagreement", None)
+    elif kind == "diagnostic_sibling":
+        # A fitted citation beside diagnostic_only must not launder it.
+        model["provenance"] = [
+            {
+                "source_id": "pseudo_psat_backsolved_from_vaporock",
+                "observation_id": "fit-grid",
+                "status": "diagnostic_only",
+                "law_provenance": _DIAGNOSTIC_LAW_PROVENANCE,
+            },
+            {
+                "source_id": "fit-grid-source",
+                "observation_id": "fit-grid",
+            },
+        ]
+        model["anchor_disagreement"] = {
+            "role": "disagreement_not_source",
+            "anchor": "validation:disagreement-not-source",
+            "temperature_K": 1100.0,
+            "rail_pressure_Pa": 1.0,
+            "vaporock_pressure_Pa": 0.1,
+        }
     else:
         raise AssertionError(kind)
     row["backsolve"] = {
@@ -1265,15 +1455,19 @@ def _assert_zero_activity_admission(
         child_id=child_id,
     )
     compilable = family in _COMPILABLE_ZERO_ACTIVITY_FAMILIES
+    admitted_unflagged = compilable and evidence == "full"
+    admitted_flagged = (
+        compilable and evidence == "diagnostic_unfitted" and family == "antoine"
+    )
     try:
         compiled = compile_vapour_rail_catalog(payload)
     except CatalogCompileError as exc:
-        if compilable and evidence == "full":
+        if admitted_unflagged or admitted_flagged:
             pytest.fail(f"evidenced {family} law was refused: {exc}")
         if compilable:
             assert "effective-pressure reference fit requires" in str(exc)
         return
-    assert compilable and evidence == "full", (
+    assert admitted_unflagged or admitted_flagged, (
         f"{family} mode={mode!r} evidence={evidence} base={base_link} "
         f"child={child_id} compiled without evidence on the executable law"
     )
@@ -1282,8 +1476,41 @@ def _assert_zero_activity_admission(
     assert evaluator.activity_exponent == 0.0
     assert evaluator.reference_model.physical_composite_ood is False
     assert getattr(evaluator.reference_model, "_association_base", None) is None
-    pressure = evaluator.evaluate(1100.0, pO2_bar=1.0).pressure_pa
-    assert pressure > 0.0
+    evaluation = evaluator.evaluate(1100.0, pO2_bar=1.0)
+    pressure = evaluation.pressure_pa
+    notice = getattr(evaluation, "diagnostic_admission_notice", None)
+    if admitted_unflagged:
+        assert notice is None
+        assert getattr(evaluator, "diagnostic_admission_notice", None) is None
+        if family == "antoine":
+            # log10(P/Pa) = 10 - 10000/1100 = 0.9090909090909083
+            assert pressure == pytest.approx(
+                _SYNTHETIC_DIAGNOSTIC_1100_PA, rel=1e-12, abs=0.0
+            )
+        else:
+            assert pressure > 0.0
+        return
+    assert pressure == pytest.approx(
+        _SYNTHETIC_DIAGNOSTIC_1100_PA, rel=1e-12, abs=0.0
+    )
+    _assert_diagnostic_disclosure(
+        notice,
+        executed_species_id=child_id,
+        anchor="validation:disagreement-not-source",
+        temperature_K=1100.0,
+        rail_pressure_Pa=1.0,
+        vaporock_pressure_Pa=0.1,
+        law_pressure_Pa=_SYNTHETIC_DIAGNOSTIC_1100_PA,
+    )
+    _assert_diagnostic_disclosure(
+        getattr(evaluator, "diagnostic_admission_notice", None),
+        executed_species_id=child_id,
+        anchor="validation:disagreement-not-source",
+        temperature_K=1100.0,
+        rail_pressure_Pa=1.0,
+        vaporock_pressure_Pa=0.1,
+        law_pressure_Pa=_SYNTHETIC_DIAGNOSTIC_1100_PA,
+    )
 
 
 @pytest.mark.parametrize("family", _ZERO_ACTIVITY_FAMILIES)
@@ -1505,19 +1732,13 @@ def _live_bound_effective_fit_contexts() -> tuple[dict[str, object], ...]:
     return tuple(found)
 
 
-# Fe effective-pressure fit at 1800 K. Cited from data/vapor_pressures.yaml
-# metals_fe_family Fe: A=9.408547, B=23312.312336, C=1000.0,
-# source_id current-rail-against-2026-08-03-vaporock-crosscheck-cells,
-# observation_id Fe, anchor
-# validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml.
+# Hand literals for the pseudo-block law evaluate() runs. The crosscheck file
+# is disagreement evidence at 1750 K, not the source of these coefficients.
 # pO2_exponent is omitted, so the stored multiplier is 0 and pO2 does not
-# scale P.
-# log10(P/Pa) = 9.408547 - 23312.312336 / (1800 + 1000)
-#             = 1.0827211657142861
-# P/Pa        = 10 ** 1.0827211657142861
-#             = 12.098211309846041
+# scale P. Derivations are next to _FE_PSEUDO_LAW_1750_PA.
 _CITED_EFFECTIVE_FIT_PRESSURE_PA = {
-    ("Fe", 1800.0): 12.098211309846041,
+    ("Fe", 1750.0): _FE_PSEUDO_LAW_1750_PA,
+    ("Fe", 1800.0): _FE_PSEUDO_LAW_1800_PA,
 }
 
 
@@ -1573,9 +1794,25 @@ def test_copied_effective_fit_law_is_evidence_only_for_its_species(
         expected_pa = _cited_effective_fit_pressure_pa(
             str(context["species_id"]), temperature_K
         )
-        assert evaluator.evaluate(temperature_K).pressure_pa == pytest.approx(
+        evaluation = evaluator.evaluate(temperature_K)
+        assert evaluation.pressure_pa == pytest.approx(
             expected_pa, rel=1e-12, abs=0.0
         )
+        record = next(item for item in fits if item[0] == context["species_id"])
+        _assert_admission_notice_for_record(evaluator, evaluation, record)
+        if (
+            context["species_id"] == "Fe"
+            and float(context["low"]) <= 1750.0 <= float(context["high"])
+        ):
+            pinned = evaluator.evaluate(1750.0)
+            assert pinned.pressure_pa == pytest.approx(
+                _cited_effective_fit_pressure_pa("Fe", 1750.0),
+                rel=1e-12,
+                abs=0.0,
+            )
+            _assert_fe_pseudo_law_disclosure(
+                getattr(pinned, "diagnostic_admission_notice", None)
+            )
 
 
 _FIT_CONTEXT_FIELDS = (
@@ -1701,9 +1938,12 @@ def test_historic_reuse_binds_every_oxygen_executable_law(
             live_exponent, _live_reference, _live_channel = live
             assert live_exponent == 0.0
             expected_pa = _cited_effective_fit_pressure_pa(species_id, temperature_K)
-            assert evaluator.evaluate(temperature_K).pressure_pa == pytest.approx(
+            evaluation = evaluator.evaluate(temperature_K)
+            assert evaluation.pressure_pa == pytest.approx(
                 expected_pa, rel=1e-12, abs=0.0
             )
+            record = next(item for item in fits if item[0] == species_id)
+            _assert_admission_notice_for_record(evaluator, evaluation, record)
             assert evaluator.evaluate(
                 temperature_K, pO2_bar=1.0
             ).pressure_pa == pytest.approx(expected_pa, rel=1e-12, abs=0.0)
@@ -1746,8 +1986,18 @@ def test_unevidenced_fit_follows_the_request_not_a_warm_cache() -> None:
     )
     evaluator = admitted.species["Fe"].evaluator
     assert evaluator is not None
-    assert evaluator.evaluate(1800.0).pressure_pa == pytest.approx(
+    evaluation = evaluator.evaluate(1800.0)
+    assert evaluation.pressure_pa == pytest.approx(
         _cited_effective_fit_pressure_pa("Fe", 1800.0), rel=1e-12, abs=0.0
+    )
+    record = next(item for item in fits if item[0] == "Fe")
+    _assert_admission_notice_for_record(evaluator, evaluation, record)
+    pinned = evaluator.evaluate(1750.0)
+    assert pinned.pressure_pa == pytest.approx(
+        _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
+    )
+    _assert_fe_pseudo_law_disclosure(
+        getattr(pinned, "diagnostic_admission_notice", None)
     )
     with pytest.raises(
         CatalogCompileError,
@@ -1788,18 +2038,67 @@ def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:
             ]["species"]["Fe"]["pressure_models"][0]
             assert _oracle_stored_oxygen_law(base_model) == (0.0, 1.0, None)
             assert _oracle_stored_oxygen_law(embedded) == (0.0, 1.0, None)
-            assert _oracle_provenance_cites_observations(base_model["provenance"][0])
+            assert base_model["provenance"][0]["status"] == "diagnostic_only"
+            assert (
+                base_model["provenance"][0]["law_provenance"]
+                == _DIAGNOSTIC_LAW_PROVENANCE
+            )
+            assert (
+                base_model["provenance"][0]["source_id"]
+                == "pseudo_psat_backsolved_from_vaporock"
+            )
+            for pO2_bar, expected_pa in _CITED_FEO_ASSOCIATION_PRESSURE_PA.items():
+                evaluation = evaluator.evaluate(1800.0, pO2_bar=pO2_bar)
+                assert evaluation.pressure_pa == pytest.approx(
+                    expected_pa, rel=1e-12, abs=0.0
+                )
+                _assert_fe_pseudo_law_disclosure(
+                    getattr(evaluation, "diagnostic_admission_notice", None)
+                )
+            _assert_fe_pseudo_law_disclosure(
+                getattr(evaluator, "diagnostic_admission_notice", None)
+            )
             continue
         row = payload["families"][compiled.family_id]["physical_properties"][
             "species"
         ][species_id]
         model = row["pressure_models"][0]
-        assert model["provenance"][0]["source_id"]
-        assert row["backsolve"]["residual_dex"] >= 0.0
-        assert row["backsolve"]["provenance"]["generated_by"]
-        assert row["validation"]["anchor_refs"]
-    assert "Fe" in checked
-    assert "FeO_association_gas" in checked
+        notice = getattr(evaluator, "diagnostic_admission_notice", None)
+        if notice is None:
+            assert model["provenance"][0].get("status") != "diagnostic_only"
+            assert model["provenance"][0]["source_id"]
+            assert row["backsolve"]["residual_dex"] >= 0.0
+            assert row["backsolve"]["provenance"]["generated_by"]
+            assert row["validation"]["anchor_refs"]
+            continue
+        assert species_id == "Fe"
+        assert (
+            model["provenance"][0]["source_id"]
+            == "pseudo_psat_backsolved_from_vaporock"
+        )
+        assert model["provenance"][0]["source_id"] != model["anchor_disagreement"]["anchor"]
+        assert model["anchor_disagreement"]["anchor"] == _FE_DISAGREEMENT_ANCHOR
+        assert model["anchor_disagreement"]["role"] == "disagreement_not_source"
+        assert row["validation"]["anchor_refs"] == [_FE_DISAGREEMENT_ANCHOR]
+        assert model["provenance"][0]["status"] == "diagnostic_only"
+        assert model["provenance"][0]["law_provenance"] == _DIAGNOSTIC_LAW_PROVENANCE
+        for temperature_K, expected_pa in (
+            (1750.0, _FE_PSEUDO_LAW_1750_PA),
+            (1800.0, _FE_PSEUDO_LAW_1800_PA),
+        ):
+            evaluation = evaluator.evaluate(temperature_K)
+            assert evaluation.pressure_pa == pytest.approx(
+                expected_pa, rel=1e-12, abs=0.0
+            )
+            _assert_fe_pseudo_law_disclosure(
+                getattr(evaluation, "diagnostic_admission_notice", None)
+            )
+        _assert_fe_pseudo_law_disclosure(notice)
+    assert {"Fe", "FeO_association_gas"} <= set(checked)
+    assert (
+        getattr(catalog.species["Fe"].evaluator, "diagnostic_admission_notice", None)
+        is not None
+    )
 
 
 # Oxygen multiplier the association closure evaluates. log10_pressure() takes
@@ -1850,7 +2149,7 @@ _CITATION_CASES = (
 
 
 def _citation_provenance(fields: dict) -> dict:
-    item = {"source_id": "fit-grid-source", "status": "diagnostic_only"}
+    item = {"source_id": "fit-grid-source"}
     item.update(fields)
     return item
 
@@ -2023,7 +2322,12 @@ def _assert_cited_executed_law(case: dict) -> None:
         evaluator = compiled.species["K"].evaluator
         assert evaluator is not None
         assert evaluator.activity_exponent == 0.0
-        assert evaluator.evaluate(1100.0).pressure_pa > 0.0
+        evaluation = evaluator.evaluate(1100.0)
+        assert evaluation.pressure_pa == pytest.approx(
+            _SYNTHETIC_DIAGNOSTIC_1100_PA, rel=1e-12, abs=0.0
+        )
+        assert getattr(evaluation, "diagnostic_admission_notice", None) is None
+        assert getattr(evaluator, "diagnostic_admission_notice", None) is None
         return
 
     payload = _fe_feo_payload()
@@ -2086,10 +2390,26 @@ def _assert_cited_executed_law(case: dict) -> None:
     evaluator = compiled.species["FeO_association_gas"].evaluator
     assert evaluator is not None
     assert evaluator.activity_exponent == 0.0
-    for pO2_bar, expected_pa in _CITED_FEO_ASSOCIATION_PRESSURE_PA.items():
-        assert evaluator.evaluate(1800.0, pO2_bar=pO2_bar).pressure_pa == (
-            pytest.approx(expected_pa, rel=1e-12, abs=0.0)
+    if case["kind"] == "association-citation":
+        assert getattr(evaluator, "diagnostic_admission_notice", None) is None
+        fe_evaluator = compiled.species["Fe"].evaluator
+        assert fe_evaluator is not None
+        assert getattr(fe_evaluator, "diagnostic_admission_notice", None) is None
+    else:
+        _assert_fe_pseudo_law_disclosure(
+            getattr(evaluator, "diagnostic_admission_notice", None)
         )
+    for pO2_bar, expected_pa in _CITED_FEO_ASSOCIATION_PRESSURE_PA.items():
+        evaluation = evaluator.evaluate(1800.0, pO2_bar=pO2_bar)
+        assert evaluation.pressure_pa == pytest.approx(
+            expected_pa, rel=1e-12, abs=0.0
+        )
+        if case["kind"] == "association-citation":
+            assert getattr(evaluation, "diagnostic_admission_notice", None) is None
+        else:
+            _assert_fe_pseudo_law_disclosure(
+                getattr(evaluation, "diagnostic_admission_notice", None)
+            )
 
 
 @pytest.mark.parametrize(

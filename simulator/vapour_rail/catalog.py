@@ -1180,6 +1180,15 @@ class CompiledPressureEvaluator:
                 was_clamped=False,
             ),
         )
+        # Same non-field slot. A diagnostic admission discloses the unfitted
+        # law and the anchor it disagrees with. It does not change pressure.
+        diagnostic_notice = getattr(self, "diagnostic_admission_notice", None)
+        if diagnostic_notice is not None:
+            object.__setattr__(
+                evaluation,
+                "diagnostic_admission_notice",
+                _copy_diagnostic_notice(diagnostic_notice),
+            )
         return evaluation
 
     def evaluate_typed_shadow(
@@ -2676,6 +2685,260 @@ def _provenance_cites_observations(item: Mapping[str, Any]) -> bool:
     return True
 
 
+# engines.antoine._antoine_log10_pressure. Quoted on the diagnostic notice.
+_ANTOINE_EVALUATOR_FORM = "log10(P) = A - B / (T + C)"
+_DIAGNOSTIC_ONLY_STATUS = "diagnostic_only"
+_DIAGNOSTIC_LAW_PROVENANCE = "backsolved from VapoRock, no coefficients fitted"
+_DIAGNOSTIC_AUTHORITY = "diagnostic/extrapolated"
+_DIAGNOSTIC_CLOSER = "t-1723"
+_DIAGNOSTIC_BOUND_MARKER = "diagnostic_admission"
+_DIAGNOSTIC_REASON = (
+    "effective_pressure_reference_fit would legalize a cleaned-melt activity "
+    "exponent of 0 without a certified executed fit; the executed Antoine law "
+    "is diagnostic_only, backsolved from VapoRock, and no coefficients were fitted"
+)
+
+
+def _provenance_items(model: Mapping[str, Any]) -> tuple[Mapping[str, Any], ...] | None:
+    raw = model.get("provenance")
+    if isinstance(raw, (str, bytes)) or not isinstance(raw, Sequence):
+        return None
+    items: list[Mapping[str, Any]] = []
+    for item in raw:
+        if not isinstance(item, Mapping):
+            return None
+        items.append(item)
+    return tuple(items)
+
+
+def _claims_diagnostic_only(model: Mapping[str, Any]) -> bool:
+    """True when a provenance item says the law is diagnostic_only.
+
+    That status is not a certified fit. A sibling citation cannot launder it.
+    """
+
+    items = _provenance_items(model)
+    if not items:
+        return False
+    return any(
+        isinstance(item.get("status"), str)
+        and item["status"].strip() == _DIAGNOSTIC_ONLY_STATUS
+        for item in items
+    )
+
+
+def _diagnostic_unfitted_item(model: Mapping[str, Any]) -> Mapping[str, Any] | None:
+    """The law's own provenance, when it is the unfitted diagnostic citation.
+
+    Exactly one provenance item, status diagnostic_only, and the backsolved
+    statement. The disagreement anchor is not this citation.
+    """
+
+    items = _provenance_items(model)
+    if items is None or len(items) != 1:
+        return None
+    item = items[0]
+    status = item.get("status")
+    text = item.get("law_provenance")
+    if not isinstance(status, str) or status.strip() != _DIAGNOSTIC_ONLY_STATUS:
+        return None
+    if not isinstance(text, str) or text.strip() != _DIAGNOSTIC_LAW_PROVENANCE:
+        return None
+    return item
+
+
+def _disagreement_inputs(
+    model: Mapping[str, Any],
+) -> tuple[str, float, float, float] | None:
+    """Anchor comparators carried on the compile payload.
+
+    ``(anchor, temperature_K, rail_pressure_Pa, vaporock_pressure_Pa)``.
+    This does not open the anchor file. The role must say the anchor is not
+    the law's source.
+    """
+
+    raw = model.get("anchor_disagreement")
+    if not isinstance(raw, Mapping):
+        return None
+    if raw.get("role") != "disagreement_not_source":
+        return None
+    anchor = raw.get("anchor")
+    if not isinstance(anchor, str) or not anchor.strip():
+        return None
+    try:
+        temperature = _finite_positive(
+            raw.get("temperature_K"),
+            "anchor_disagreement.temperature_K",
+        )
+        rail = _finite_positive(
+            raw.get("rail_pressure_Pa"),
+            "anchor_disagreement.rail_pressure_Pa",
+        )
+        vaporock = _finite_positive(
+            raw.get("vaporock_pressure_Pa"),
+            "anchor_disagreement.vaporock_pressure_Pa",
+        )
+    except CatalogCompileError:
+        return None
+    return (anchor.strip(), temperature, rail, vaporock)
+
+
+def _notice_from_law_and_disagreement(
+    *,
+    executed_species_id: str,
+    coefficients: Mapping[str, Any] | tuple[float, float, float],
+    disagreement: tuple[str, float, float, float],
+) -> dict[str, Any] | None:
+    """Disclosure for one diagnostic Antoine law. Pressure is not modified.
+
+    Premise: ``log10(P/Pa) = A - B / (T + C)`` via
+    ``_antoine_log10_pressure``. ``gap_dex = log10(P_law / P_comparator)``.
+    The rail comparator and the VapoRock comparator are the anchor row, which
+    this law disagrees with. They are not the coefficients' source.
+    """
+
+    if isinstance(coefficients, tuple):
+        if len(coefficients) != 3:
+            return None
+        A, B, C = coefficients
+    else:
+        try:
+            A = float(coefficients["A"])
+            B = float(coefficients["B"])
+            C = float(coefficients["C"])
+        except (KeyError, TypeError, ValueError):
+            return None
+    if isinstance(A, bool) or isinstance(B, bool) or isinstance(C, bool):
+        return None
+    try:
+        A, B, C = float(A), float(B), float(C)
+    except (TypeError, ValueError):
+        return None
+    anchor, temperature, rail, vaporock = disagreement
+    if not all(math.isfinite(value) for value in (A, B, C, temperature, rail, vaporock)):
+        return None
+    if temperature + C <= 0.0:
+        return None
+    log10_pressure = _antoine_log10_pressure(A, B, C, temperature)
+    if not math.isfinite(log10_pressure):
+        return None
+    law_pressure = 10.0 ** log10_pressure
+    if not math.isfinite(law_pressure) or law_pressure <= 0.0:
+        return None
+    return {
+        "authority": _DIAGNOSTIC_AUTHORITY,
+        "reason": _DIAGNOSTIC_REASON,
+        "law_provenance": _DIAGNOSTIC_LAW_PROVENANCE,
+        "provenance_status": _DIAGNOSTIC_ONLY_STATUS,
+        "evaluator_form": _ANTOINE_EVALUATOR_FORM,
+        "closes_with": _DIAGNOSTIC_CLOSER,
+        "executed_species_id": executed_species_id,
+        "anchor": anchor,
+        "anchor_role": "disagreement_not_source",
+        "temperature_K": temperature,
+        "law_pressure_Pa": law_pressure,
+        "comparators": {
+            "rail_pressure_Pa": rail,
+            "gap_dex_law_vs_rail": math.log10(law_pressure / rail),
+            "vaporock_pressure_Pa": vaporock,
+            "gap_dex_law_vs_vaporock": math.log10(law_pressure / vaporock),
+        },
+    }
+
+
+def _copy_diagnostic_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
+    comparators = notice["comparators"]
+    return {
+        "authority": notice["authority"],
+        "reason": notice["reason"],
+        "law_provenance": notice["law_provenance"],
+        "provenance_status": notice["provenance_status"],
+        "evaluator_form": notice["evaluator_form"],
+        "closes_with": notice["closes_with"],
+        "executed_species_id": notice["executed_species_id"],
+        "anchor": notice["anchor"],
+        "anchor_role": notice["anchor_role"],
+        "temperature_K": notice["temperature_K"],
+        "law_pressure_Pa": notice["law_pressure_Pa"],
+        "comparators": {
+            "rail_pressure_Pa": comparators["rail_pressure_Pa"],
+            "gap_dex_law_vs_rail": comparators["gap_dex_law_vs_rail"],
+            "vaporock_pressure_Pa": comparators["vaporock_pressure_Pa"],
+            "gap_dex_law_vs_vaporock": comparators["gap_dex_law_vs_vaporock"],
+        },
+    }
+
+
+def _diagnostic_notice_from_model_coefficients(
+    *,
+    executed_species_id: str,
+    model: Mapping[str, Any],
+    coefficients: Mapping[str, Any] | tuple[float, float, float],
+) -> dict[str, Any] | None:
+    item = _diagnostic_unfitted_item(model)
+    disagreement = _disagreement_inputs(model)
+    if item is None or disagreement is None:
+        return None
+    source_id = item.get("source_id")
+    if isinstance(source_id, str) and source_id.strip() == disagreement[0]:
+        return None
+    return _notice_from_law_and_disagreement(
+        executed_species_id=executed_species_id,
+        coefficients=coefficients,
+        disagreement=disagreement,
+    )
+
+
+def _is_diagnostic_bound_record(record: tuple[object, ...]) -> bool:
+    if len(record) != 7 or not isinstance(record[6], tuple):
+        return False
+    marker = record[6]
+    if len(marker) != 5 or marker[0] != _DIAGNOSTIC_BOUND_MARKER:
+        return False
+    anchor, temperature, rail, vaporock = marker[1:]
+    return (
+        isinstance(anchor, str)
+        and bool(anchor)
+        and isinstance(temperature, (int, float))
+        and not isinstance(temperature, bool)
+        and isinstance(rail, (int, float))
+        and not isinstance(rail, bool)
+        and isinstance(vaporock, (int, float))
+        and not isinstance(vaporock, bool)
+    )
+
+
+def _bound_record_identity(record: tuple[object, ...]) -> tuple[object, ...]:
+    if _is_diagnostic_bound_record(record):
+        return record[:6]
+    return record
+
+
+def _notice_from_bound_record(record: tuple[object, ...]) -> dict[str, Any] | None:
+    if not _is_diagnostic_bound_record(record):
+        return None
+    identity = record[:6]
+    law = identity[5]
+    if not isinstance(law, tuple) or not law or not isinstance(law[0], tuple):
+        return None
+    coefficients = law[0]
+    if len(coefficients) != 3:
+        return None
+    marker = record[6]
+    assert isinstance(marker, tuple)
+    disagreement = (
+        str(marker[1]),
+        float(marker[2]),
+        float(marker[3]),
+        float(marker[4]),
+    )
+    return _notice_from_law_and_disagreement(
+        executed_species_id=str(identity[0]),
+        coefficients=(float(coefficients[0]), float(coefficients[1]), float(coefficients[2])),
+        disagreement=disagreement,
+    )
+
+
 def _has_effective_pressure_reference_fit_evidence(
     *,
     species_id: str,
@@ -2683,6 +2946,10 @@ def _has_effective_pressure_reference_fit_evidence(
     model: Mapping[str, Any],
     validation_anchor_refs: tuple[str, ...],
 ) -> bool:
+    # diagnostic_only is a flagged admission, not a certified fit. A residual
+    # and an anchor the law disagrees with do not certify these coefficients.
+    if _claims_diagnostic_only(model):
+        return False
     backsolve = row.get("backsolve")
     backsolve = backsolve if isinstance(backsolve, Mapping) else {}
     backsolve_provenance = backsolve.get("provenance")
@@ -2884,14 +3151,40 @@ def _bound_effective_fit_context(
     )
 
 
+def _diagnostic_identity_law(species_id: str, model: Mapping[str, Any]) -> bool:
+    """True when evaluate() would run this Antoine curve with no oxygen scale.
+
+    The identity multiplier is exponent 0, reference 1 bar, and no channel.
+    A non-zero exponent is a different pressure and is not this admission.
+    """
+
+    if model.get("evaluator_family") != "antoine":
+        return False
+    if model.get("activity_semantics") != "effective_pressure_reference_fit":
+        return False
+    if model.get("activity_exponent", 0.0) not in (0, 0.0, None, ""):
+        return False
+    try:
+        observable, _bounds = _model_surface(species_id, model)
+        oxygen = _stored_oxygen_executable_law(species_id, model)
+    except CatalogCompileError:
+        return False
+    return (
+        observable is PressureObservable.EQUILIBRIUM_PARTIAL_PRESSURE
+        and oxygen == (0.0, 1.0, None)
+    )
+
+
 def _evidenced_antoine_contexts(
     catalog: Mapping[str, Any],
 ) -> tuple[tuple[object, ...], ...]:
     """Evidenced Antoine fits carried by this catalog mapping.
 
-    The records are the species, melt basis, coefficients, temperature
-    domain, and stored oxygen multiplier. A row qualifies only when it
-    already has provenance, residual, and anchors. This does not read a file.
+    A certified fit is a 6-tuple: species, melt basis, coefficients,
+    temperature domain, and stored oxygen multiplier. A diagnostic_only
+    identity law is that tuple plus the disagreement marker. The marker
+    records the anchor the law disagrees with. It is not the law's source.
+    This does not read a file.
     """
 
     contexts: list[tuple[object, ...]] = []
@@ -2935,13 +3228,37 @@ def _evidenced_antoine_contexts(
                 )
             except CatalogCompileError:
                 continue
+            coefficients = (
+                model.get("coefficients")
+                if isinstance(model.get("coefficients"), Mapping)
+                else {}
+            )
+            diagnostic_marker: tuple[object, ...] | None = None
             if not _has_effective_pressure_reference_fit_evidence(
                 species_id=str(species_id),
                 row=row,
                 model=model,
                 validation_anchor_refs=anchor_refs,
             ):
-                continue
+                # A diagnostic_only claim does not fall through to a certified
+                # match. Incomplete diagnostic evidence is omitted here and
+                # refused at the admission chokepoint.
+                if not _diagnostic_identity_law(str(species_id), model):
+                    continue
+                notice = _diagnostic_notice_from_model_coefficients(
+                    executed_species_id=str(species_id),
+                    model=model,
+                    coefficients=coefficients,
+                )
+                if notice is None:
+                    continue
+                diagnostic_marker = (
+                    _DIAGNOSTIC_BOUND_MARKER,
+                    notice["anchor"],
+                    float(notice["temperature_K"]),
+                    float(notice["comparators"]["rail_pressure_Pa"]),
+                    float(notice["comparators"]["vaporock_pressure_Pa"]),
+                )
             context = _bound_effective_fit_context(
                 species_id=str(species_id),
                 formula=row.get("formula"),
@@ -2950,14 +3267,15 @@ def _evidenced_antoine_contexts(
                 species_basis=model.get("species_basis"),
                 model=model,
                 evaluator_family=str(model.get("evaluator_family") or ""),
-                coefficients=model.get("coefficients")
-                if isinstance(model.get("coefficients"), Mapping)
-                else {},
+                coefficients=coefficients,
                 observable=observable,
                 valid_temperature_K=bounds,
             )
-            if context is not None:
-                contexts.append(context)
+            if context is None:
+                continue
+            if diagnostic_marker is not None:
+                context = context + (diagnostic_marker,)
+            contexts.append(context)
     return tuple(sorted(contexts))
 
 
@@ -3012,6 +3330,49 @@ def _normalize_bound_effective_fits(
     return ordered
 
 
+def _matching_bound_record(
+    *,
+    species_id: str,
+    formula: object,
+    parent_oxide: object,
+    source_account: str,
+    species_basis: object,
+    model: Mapping[str, Any],
+    evaluator_family: str,
+    coefficients: Mapping[str, Any],
+    observable: PressureObservable,
+    valid_temperature_K: tuple[float, float],
+    bound_effective_fits: frozenset[tuple[object, ...]],
+) -> tuple[object, ...] | None:
+    """Return the evidence record whose law identity matches, marker included.
+
+    Certified records are the 6-tuple identity. Diagnostic records append the
+    disagreement marker. Matching compares the identity only, so a historic
+    row that does not itself say diagnostic_only still finds the marker.
+    """
+
+    if not bound_effective_fits:
+        return None
+    context = _bound_effective_fit_context(
+        species_id=species_id,
+        formula=formula,
+        parent_oxide=parent_oxide,
+        source_account=source_account,
+        species_basis=species_basis,
+        model=model,
+        evaluator_family=evaluator_family,
+        coefficients=coefficients,
+        observable=observable,
+        valid_temperature_K=valid_temperature_K,
+    )
+    if context is None:
+        return None
+    for record in bound_effective_fits:
+        if _bound_record_identity(record) == context:
+            return record
+    return None
+
+
 def _matches_bound_effective_fit(
     *,
     species_id: str,
@@ -3026,21 +3387,22 @@ def _matches_bound_effective_fit(
     valid_temperature_K: tuple[float, float],
     bound_effective_fits: frozenset[tuple[object, ...]],
 ) -> bool:
-    if not bound_effective_fits:
-        return False
-    context = _bound_effective_fit_context(
-        species_id=species_id,
-        formula=formula,
-        parent_oxide=parent_oxide,
-        source_account=source_account,
-        species_basis=species_basis,
-        model=model,
-        evaluator_family=evaluator_family,
-        coefficients=coefficients,
-        observable=observable,
-        valid_temperature_K=valid_temperature_K,
+    return (
+        _matching_bound_record(
+            species_id=species_id,
+            formula=formula,
+            parent_oxide=parent_oxide,
+            source_account=source_account,
+            species_basis=species_basis,
+            model=model,
+            evaluator_family=evaluator_family,
+            coefficients=coefficients,
+            observable=observable,
+            valid_temperature_K=valid_temperature_K,
+            bound_effective_fits=bound_effective_fits,
+        )
+        is not None
     )
-    return context is not None and context in bound_effective_fits
 
 
 def _effective_pressure_reference_fit_is_evidenced(
@@ -3052,6 +3414,22 @@ def _effective_pressure_reference_fit_is_evidenced(
     source_account: str,
     bound_effective_fits: frozenset[tuple[object, ...]],
 ) -> bool:
+    # diagnostic_only is never a certified citation. A sibling observation id
+    # does not launder it, and a bound 6-tuple must not either.
+    if _claims_diagnostic_only(model):
+        coefficients = model.get("coefficients")
+        if not isinstance(coefficients, Mapping):
+            return False
+        if not _diagnostic_identity_law(species_id, model):
+            return False
+        return (
+            _diagnostic_notice_from_model_coefficients(
+                executed_species_id=species_id,
+                model=model,
+                coefficients=coefficients,
+            )
+            is not None
+        )
     if _has_effective_pressure_reference_fit_evidence(
         species_id=species_id,
         row=row,
@@ -3190,6 +3568,104 @@ def _verified_gas_association_base_has_fit_evidence(
     )
 
 
+def _direct_diagnostic_notice(
+    *,
+    species_id: str,
+    model: Mapping[str, Any],
+    evaluator: CompiledPressureEvaluator,
+) -> dict[str, Any] | None:
+    """Notice for the Antoine curve this evaluator runs, or None to refuse.
+
+    ``diagnostic_only`` does not fall through to a certified citation or a
+    bound record. The notice is present only when that status, the unfitted
+    statement, and the disagreement anchor are complete, and ``evaluate()``
+    runs the identity Antoine law.
+    """
+
+    if not _diagnostic_identity_law(species_id, model):
+        return None
+    if (
+        evaluator.evaluator_family != "antoine"
+        or evaluator.activity_exponent != 0.0
+        or evaluator.pO2_exponent != 0.0
+        or evaluator.pO2_reference_bar != 1.0
+        or evaluator.oxygen_fugacity_channel is not None
+        or evaluator.pressure_observable
+        is not PressureObservable.EQUILIBRIUM_PARTIAL_PRESSURE
+    ):
+        return None
+    coefficients = evaluator.reference_model.coefficients
+    if not isinstance(coefficients, Mapping):
+        return None
+    return _diagnostic_notice_from_model_coefficients(
+        executed_species_id=species_id,
+        model=model,
+        coefficients=coefficients,
+    )
+
+
+def _association_executed_law_notice(
+    *,
+    model: Mapping[str, Any],
+    evaluator: CompiledPressureEvaluator,
+    species_rows_by_id: Mapping[str, Mapping[str, Any]],
+    species_source_account_by_id: Mapping[str, str],
+    bound_effective_fits: frozenset[tuple[object, ...]],
+) -> tuple[bool, Mapping[str, Any] | None]:
+    """Notice for the base curve the association closure evaluates.
+
+    The caller has already verified that closure. A diagnostic base must
+    carry its notice. A historic base takes the notice from the bound
+    record. A certified base has no notice. A diagnostic base whose notice
+    cannot be built is refused rather than certified.
+    """
+
+    captured = _captured_association_base(evaluator)
+    if captured is None:
+        return False, None
+    base_species_id = model.get("base_vapor_formula")
+    if not isinstance(base_species_id, str) or not base_species_id.strip():
+        return False, None
+    base_species_id = base_species_id.strip()
+    base_row = species_rows_by_id.get(base_species_id)
+    if not isinstance(base_row, Mapping):
+        return False, None
+    base_models = base_row.get("pressure_models")
+    if not isinstance(base_models, list) or len(base_models) != 1:
+        return False, None
+    if not isinstance(base_models[0], Mapping):
+        return False, None
+    base_model = base_models[0]
+    if _claims_diagnostic_only(base_model):
+        notice = _diagnostic_notice_from_model_coefficients(
+            executed_species_id=base_species_id,
+            model=base_model,
+            coefficients=captured.coefficients,
+        )
+        return notice is not None, notice
+    try:
+        observable, bounds = _model_surface(base_species_id, base_model)
+    except CatalogCompileError:
+        return True, None
+    record = _matching_bound_record(
+        species_id=base_species_id,
+        formula=base_row.get("formula"),
+        parent_oxide=base_row.get("parent_oxide"),
+        source_account=species_source_account_by_id.get(base_species_id, ""),
+        species_basis=base_model.get("species_basis"),
+        model=base_model,
+        evaluator_family=captured.evaluator_family,
+        coefficients=captured.coefficients,
+        observable=observable,
+        valid_temperature_K=bounds,
+        bound_effective_fits=bound_effective_fits,
+    )
+    if record is None or not _is_diagnostic_bound_record(record):
+        return True, None
+    notice = _notice_from_bound_record(record)
+    return notice is not None, notice
+
+
 def _zero_activity_melt_executable_is_evidenced(
     *,
     species_id: str,
@@ -3201,52 +3677,75 @@ def _zero_activity_melt_executable_is_evidenced(
     species_rows_by_id: Mapping[str, Mapping[str, Any]],
     species_source_account_by_id: Mapping[str, str],
     bound_effective_fits: frozenset[tuple[object, ...]],
-) -> bool:
+) -> tuple[bool, Mapping[str, Any] | None]:
     """Admit cleaned-melt activity exponent 0 only for a cited executed law.
 
-    Invariant: every cleaned-melt species with activity exponent 0 is refused
-    unless the pressure ``evaluate()`` computes is a completely cited
-    evidenced law. A citation is a nonblank ``observation_id`` or a nonempty
-    sequence of nonblank ``observation_ids``. ``null``, blanks, and booleans
-    are not citations. The executed pressure is the reference curve times the
-    oxygen multiplier the evaluator actually applies.
+    Invariant: every cleaned-melt species with activity exponent 0 is refused,
+    or admitted only when the pressure ``evaluate()`` computes is a cited
+    executed law. A law whose provenance is ``diagnostic_only`` and
+    "backsolved from VapoRock, no coefficients fitted" is admitted
+    value-identical at authority diagnostic/extrapolated, with a notice. The
+    disagreement anchor is evidence the law disagrees with, not the citation.
+    A bare ``diagnostic_only`` token does not certify and does not admit.
+    A sibling fitted citation cannot launder that status.
 
-    A direct evaluator applies the oxygen law stored on that same model, so
-    this row's provenance, residual, and anchors evidence that law. Historic
-    reuse admits only this species' own Antoine law, including that oxygen
-    multiplier, when it matches ``bound_effective_fits``.
+    A certified citation is a nonblank ``observation_id`` or a nonempty
+    sequence of nonblank ``observation_ids``, plus residual and anchors.
+    ``null``, blanks, and booleans are not citations. The executed pressure
+    is the reference curve times the oxygen multiplier the evaluator applies.
+
+    A direct evaluator applies the oxygen law stored on that same model.
+    Historic reuse admits only this species' own Antoine law, including that
+    oxygen multiplier, when it matches ``bound_effective_fits``. The notice
+    comes from the diagnostic marker on that record.
 
     A gas-association composite calls ``base_reference.log10_pressure()``.
     That call applies no base oxygen multiplier, so it executes only the
     identity law (exponent 0, reference 1 bar, no channel) on the captured
-    curve. Own-row provenance on the association does not evidence that call
-    and cannot admit the composite. Copying another species' coefficients,
-    or keeping them while changing the oxygen law, is not that call.
+    curve. The notice is the base law's notice. Own-row provenance on the
+    association does not evidence that call and cannot admit the composite.
     """
 
     # The captured base is the object the closure evaluates. Association
     # admission is only that executed law; do not fall through to this row's
     # own provenance.
     if _captured_association_base(evaluator) is not None:
-        return _verified_gas_association_base_has_fit_evidence(
+        if not _verified_gas_association_base_has_fit_evidence(
             species_id=species_id,
             model=model,
             evaluator=evaluator,
             species_rows_by_id=species_rows_by_id,
             species_source_account_by_id=species_source_account_by_id,
             bound_effective_fits=bound_effective_fits,
+        ):
+            return False, None
+        return _association_executed_law_notice(
+            model=model,
+            evaluator=evaluator,
+            species_rows_by_id=species_rows_by_id,
+            species_source_account_by_id=species_source_account_by_id,
+            bound_effective_fits=bound_effective_fits,
         )
+    # A row that claims diagnostic_only cannot be certified by a sibling
+    # citation or by falling through to a bound record.
+    if _claims_diagnostic_only(model):
+        notice = _direct_diagnostic_notice(
+            species_id=species_id,
+            model=model,
+            evaluator=evaluator,
+        )
+        return notice is not None, notice
     if _has_effective_pressure_reference_fit_evidence(
         species_id=species_id,
         row=row,
         model=model,
         validation_anchor_refs=validation_anchor_refs,
     ):
-        return True
+        return True, None
     reference = evaluator.reference_model
     if reference.physical_composite_ood or reference.thermo_log10_pressure is not None:
-        return False
-    return _matches_bound_effective_fit(
+        return False, None
+    record = _matching_bound_record(
         species_id=species_id,
         formula=row.get("formula"),
         parent_oxide=row.get("parent_oxide"),
@@ -3259,6 +3758,12 @@ def _zero_activity_melt_executable_is_evidenced(
         valid_temperature_K=evaluator.valid_temperature_K,
         bound_effective_fits=bound_effective_fits,
     )
+    if record is None:
+        return False, None
+    if _is_diagnostic_bound_record(record):
+        notice = _notice_from_bound_record(record)
+        return notice is not None, notice
+    return True, None
 
 
 def _compile_source_reaction_activity(
@@ -3336,7 +3841,7 @@ def _compile_source_reaction_activity(
                 f"{species_id}: activity-independent melt answer must be an "
                 "explicit effective-pressure reference fit, never pure P_sat"
             )
-        if not _zero_activity_melt_executable_is_evidenced(
+        admitted, diagnostic_notice = _zero_activity_melt_executable_is_evidenced(
             species_id=species_id,
             row=row,
             model=model,
@@ -3346,7 +3851,8 @@ def _compile_source_reaction_activity(
             species_rows_by_id=species_rows_by_id,
             species_source_account_by_id=species_source_account_by_id,
             bound_effective_fits=bound_effective_fits,
-        ):
+        )
+        if not admitted:
             raise CatalogCompileError(
                 f"{species_id}: effective-pressure reference fit requires "
                 "model provenance with source_id and a nonblank "
@@ -3362,6 +3868,13 @@ def _compile_source_reaction_activity(
                 "account, species basis, and oxygen multiplier "
                 "(pO2_exponent, pO2_reference_bar, oxygen_fugacity_channel) "
                 "as a record in bound_effective_fits"
+            )
+        if diagnostic_notice is not None:
+            # Non-field attribute. t-622 hashes dataclass fields only.
+            object.__setattr__(
+                evaluator,
+                "diagnostic_admission_notice",
+                diagnostic_notice,
             )
 
     if evaluator is not None and (
