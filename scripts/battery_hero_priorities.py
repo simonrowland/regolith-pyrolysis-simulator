@@ -468,7 +468,7 @@ def _score_rows(
 ) -> list[dict[str, Any]]:
     aliases = _formula_aliases(report)
     roles = _engine_roles(report, _report_rows(report))
-    groups: dict[tuple[str, str, str], dict[str, Any]] = {}
+    groups: dict[tuple[str, str, str, str, str], dict[str, Any]] = {}
     with _open_residual_jsonl(archive) as source:
         saw_stamp = False
         for line_number, line in enumerate(source, start=1):
@@ -509,27 +509,26 @@ def _score_rows(
             if not (refused or flagged or residual is not None):
                 continue
 
+            operation = str(numeric.get("operation") or "")
+            raw_unit = str(numeric.get("unit") or "unknown")
+            unit = "dex" if operation == "dex" else raw_unit
+            key = (rail, species, engine, unit, operation)
             group = groups.setdefault(
-                (rail, species, engine),
+                key,
                 {
                     "rail": rail,
                     "species": species,
                     "engine": engine,
+                    "unit": unit,
+                    "operation": operation,
                     "values": [],
                     "worst": [],
                     "flagged_count": 0,
                     "refused_count": 0,
-                    "units": set(),
-                    "operations": set(),
                 },
             )
             group["flagged_count"] += int(flagged)
             group["refused_count"] += int(refused)
-            operation = str(numeric.get("operation") or "")
-            raw_unit = str(numeric.get("unit") or "unknown")
-            if operation or raw_unit != "unknown":
-                group["operations"].add(operation)
-                group["units"].add("dex" if operation == "dex" else raw_unit)
             if refused or flagged or residual is None:
                 continue
             observation_id = _observation_id(payload)
@@ -537,14 +536,22 @@ def _score_rows(
             if observation_id:
                 group["worst"].append((abs(residual), observation_id))
 
+    for key, group in list(groups.items()):
+        if key[3:] != ("unknown", "") or group["values"]:
+            continue
+        siblings = [
+            other
+            for other_key, other in groups.items()
+            if other_key[:3] == key[:3] and other_key != key
+        ]
+        if len(siblings) == 1:
+            siblings[0]["flagged_count"] += group["flagged_count"]
+            siblings[0]["refused_count"] += group["refused_count"]
+            del groups[key]
+
     result: list[dict[str, Any]] = []
     evaporated_moles = _mapping(envelope.get("evaporated_mol_by_species"))
     for group in groups.values():
-        if len(group["units"]) > 1 or len(group["operations"]) > 1:
-            raise ValueError(
-                "mixed numeric units or operations for "
-                f"{group['rail']}/{group['species']}/{group['engine']}"
-            )
         values = group["values"]
         statistics = _median_rms_from_float64(values)
         median, rms = statistics if statistics is not None else (None, None)
@@ -559,12 +566,15 @@ def _score_rows(
             if len(worst_ids) == 3:
                 break
         bias = math.fsum(values) / len(values) if values else None
+        unit = group["unit"]
+        if group["operation"] and group["operation"] != "dex":
+            unit = f"{unit} ({group['operation']})"
         result.append(
             {
                 "rail": group["rail"],
                 "species": group["species"],
                 "engine": group["engine"],
-                "unit": next(iter(group["units"]), "unknown"),
+                "unit": unit,
                 "n": len(values),
                 "rms": None if rms is None else float(rms),
                 "median": None if median is None else float(median),
@@ -582,6 +592,7 @@ def _score_rows(
             row["rail"],
             row["species"],
             row["engine"],
+            row["unit"],
         )
     )
     for rank, row in enumerate(result, start=1):
@@ -620,7 +631,7 @@ def _markdown(envelope: Mapping[str, Any], rows: Sequence[Mapping[str, Any]]) ->
         "Rows are sorted by RMS descending. Flagged and refused counts are excluded from n and all metrics.",
         "Moles integrate reported vapor mass rates; melt-activity rows use non-oxygen formula-unit equivalents.",
         "",
-        "| # | Rail | Species | Engine | n | RMS (unit) | Median | Bias | Hero evaporated mol/equiv. | Flagged | Refused | Worst observation ids |",
+        "| # | Rail | Species | Engine | n | RMS (unit / operation) | Median | Bias | Hero evaporated mol/equiv. | Flagged | Refused | Worst observation ids |",
         "|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for row in rows:
