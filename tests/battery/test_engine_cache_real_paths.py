@@ -395,9 +395,23 @@ def test_cache_settings_exclude_warm_pool_runtime_state() -> None:
         _warm_pool=SimpleNamespace(call_count=0),
         _warm_worker_enabled=True,
         _warm_pool_size=1,
+        _startup_failure_disposition=None,
+        _last_pressure_authority_warning=None,
+        _last_empty_speciation_cause=None,
+        _last_empty_speciation_stats=None,
+        _last_empty_speciation_reason=None,
+        _last_empty_speciation_error=None,
+        _last_silent_zero_notes=[],
     )
     first = engine_cache_backend_settings(backend)
     backend._warm_pool.call_count = 1
+    backend._startup_failure_disposition = "worker_died"
+    backend._last_pressure_authority_warning = "diagnostic changed"
+    backend._last_empty_speciation_cause = "nonfinite_pressure"
+    backend._last_empty_speciation_stats = {"calls": 1}
+    backend._last_empty_speciation_reason = "diagnostic changed"
+    backend._last_empty_speciation_error = {"detail": "diagnostic changed"}
+    backend._last_silent_zero_notes = [{"code": "diagnostic_changed"}]
     second = engine_cache_backend_settings(backend)
 
     assert first == second
