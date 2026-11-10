@@ -19,10 +19,23 @@ The pins go through the evaporation resolver, which exists at green.
 On green the resolver is the identity map, so the sub-floor pin and
 the overhead pin fail with green's published pressure on the actual
 side. The buffered pin fails when that pressure is moved off green.
+The candidate-only helpers are bound only when this mixin already
+has them, so the same fixture reaches that identity resolver.
+
+Invariant, enforced only inside the resolver's surface adjustment:
+every species is the published pressure (closure closed, or not a
+melt-surface carrier), the one shared surface-pO2 law, or a typed
+refusal. A condensed-metal cap does not zero that carrier's oxygen
+demand, and its pressure leaves P_sat once the surface rises past the
+cap. Transport-headspace pressures are not rewritten. The closure
+opens only for the physical floor or a reservoir source capacity at
+or under the noop floor. ``equilibrium.liquid_fraction`` is not that
+test.
 """
 
 from __future__ import annotations
 
+import functools
 import math
 from pathlib import Path
 from types import SimpleNamespace
@@ -70,6 +83,7 @@ _BUFFERED_KG = {"CaO": 0.50, "FeO": 0.40, "SiO2": 0.10}
 _BUFFERED_CAPACITY_MOL_PER_LN = 1.0
 
 
+@functools.lru_cache(maxsize=1)
 def _catalog():
     payload = yaml.safe_load(_DATA.read_text())
     compiled = compile_vapour_rail_catalog(payload)
@@ -183,26 +197,42 @@ def _passthrough_batch(equilibrium, *, temperature_K, effective_pressure_source)
     )
 
 
+def _bind_mixin_if_present(host, name: str) -> None:
+    """Bind a mixin method only when this revision already defines it.
+
+    Green (16c8dabfa) has the evaporation resolver and not the two
+    Langmuir helpers. An unconditional bind raises AttributeError before
+    any pressure assertion, so a transplant of this file cannot show the
+    identity-map failure.
+    """
+
+    method = getattr(EvaporationMixin, name, None)
+    if callable(method):
+        setattr(host, name, method.__get__(host, EvaporationMixin))
+
+
 def _host(
     compiled,
     legacy,
     diagnostic,
     pressures,
     *,
-    redox_capacity_mol_per_ln_fO2: float,
+    redox_capacity_mol_per_ln_fO2: float | None,
     headspace_o2_mbar: float | None = None,
+    liquid_fraction: float = 1.0,
+    temperature_C: float = _T_C,
 ):
     equilibrium = EquilibriumResult(
-        temperature_C=_T_C,
+        temperature_C=temperature_C,
         pressure_bar=0.01,
-        liquid_fraction=1.0,
+        liquid_fraction=liquid_fraction,
         status="ok",
         vapor_pressures_Pa=dict(pressures),
         warnings=[],
     )
     host = SimpleNamespace(
         melt=SimpleNamespace(
-            temperature_C=_T_C,
+            temperature_C=temperature_C,
             melt_surface_area_m2=1.0,
             p_total_mbar=10.0,
             stir_state=SimpleNamespace(axial=0.0, radial=0.0),
@@ -222,25 +252,24 @@ def _host(
         ),
         _resolve_evaporation_vapour_batch=_passthrough_batch,
     )
-    def _capacity(*, fO2_log, T_K):
+    def _source_capacity(*, fO2_log, T_K, **_ignored):
         del fO2_log, T_K
+        if redox_capacity_mol_per_ln_fO2 is None:
+            return None
         return float(redox_capacity_mol_per_ln_fO2)
 
-    host._melt_redox_capacity_mol_per_ln_fO2 = _capacity
+    # Reservoir operand, the same one as ``no_melt_redox_capacity``.
+    # Stubbing ``_melt_redox_capacity_mol_per_ln_fO2`` would leave the
+    # gate on a missing measurement.
+    host._melt_redox_source_capacity_mol_per_ln_fO2 = _source_capacity
     host._resolve_evaporation_batch_flux_state = (
         EvaporationMixin._resolve_evaporation_batch_flux_state.__get__(host)
     )
     host._evaporation_bulk_partial_pressure_pa = (
         EvaporationMixin._evaporation_bulk_partial_pressure_pa.__get__(host)
     )
-    host._langmuir_overhead_pO2_bar = (
-        EvaporationMixin._langmuir_overhead_pO2_bar.__get__(host)
-    )
-    host._langmuir_melt_redox_capacity_mol_per_ln_fO2 = (
-        EvaporationMixin._langmuir_melt_redox_capacity_mol_per_ln_fO2.__get__(
-            host
-        )
-    )
+    _bind_mixin_if_present(host, "_langmuir_overhead_pO2_bar")
+    _bind_mixin_if_present(host, "_langmuir_melt_redox_capacity_mol_per_ln_fO2")
     host._evaporation_overhead_total_pressure_Pa = (
         EvaporationMixin._evaporation_overhead_total_pressure_Pa.__get__(host)
     )
@@ -254,10 +283,10 @@ def _host(
     return host, equilibrium
 
 
-def _resolve(host, equilibrium):
+def _resolve(host, equilibrium, temperature_K: float = _T_K):
     pressures, *_rest = host._resolve_evaporation_batch_flux_state(
         equilibrium,
-        temperature_K=_T_K,
+        temperature_K=temperature_K,
     )
     return pressures
 
@@ -497,3 +526,447 @@ def test_overhead_po2_above_congruent_bounds_surface() -> None:
     assert equilibrium.vapor_pressures_Pa["Ca"] == published_ca
     _assert_kernel_prices(host, equilibrium, resolved["Ca"])
     assert any(_SURFACE_REASON in item for item in equilibrium.warnings)
+
+
+# Generative grid. 1900 C sits inside the Fe (1873-2373 K) and Ca
+# (1200-2500 K) alpha bands, so the coefficients below are the catalog
+# scalars rather than an extrapolation. Pressures are Pa. p_ref is bar.
+_GEN_T_C = 1900.0
+_GEN_T_K = _GEN_T_C + 273.15
+_GEN_P_CA = 1.0e6
+_GEN_P_FE = 1.0e4
+_GEN_FE_RAW = 100.0
+_GEN_P_SIO = 50.0
+_GEN_P_SI = 25.0
+_GEN_P_TIO2 = 10.0
+_GEN_N_METAL = -0.5
+_GEN_ALPHA_CA = 1.0
+_GEN_ALPHA_FE = 0.02
+_GEN_IN_BAND_PO2_BAR = 1.0e-9
+_GEN_FLOOR_PO2_BAR = 1.0e-30
+_GEN_TRANSPORT_PO2_BAR = 1.0e-8
+_M_FE = parse_formula("Fe").molar_mass_kg_per_mol()
+_GEN_EXTRAS = ("Fe", "SiO", "Si", "TiO2_gas")
+# Published pressures that are not melt-surface carriers. SiO is the
+# named transport channel. Si is transport_headspace and not that name.
+# TiO2_gas has reaction exponent 0.
+_GEN_UNCHANGED = ("SiO", "Si", "TiO2_gas")
+
+
+def _gen_extra_subsets() -> list[tuple[str, ...]]:
+    subsets: list[tuple[str, ...]] = []
+    width = len(_GEN_EXTRAS)
+    for mask in range(1 << width):
+        subsets.append(tuple(
+            name for bit, name in enumerate(_GEN_EXTRAS) if mask & (1 << bit)
+        ))
+    return subsets
+
+
+def _closure_opens(
+    reservoir_cm: float | None,
+    *,
+    at_floor: bool,
+    has_melt_surface_carrier: bool,
+) -> bool:
+    """d-376 amendment 1, at the resolver gate.
+
+    No melt-surface carrier means there is nothing to close: transport
+    and neutral species stay published even at the physical floor.
+    A missing reservoir capacity is not ``C_m ~ 0``.
+    """
+
+    if not has_melt_surface_carrier:
+        return False
+    if at_floor:
+        return True
+    if reservoir_cm is None:
+        return False
+    return float(reservoir_cm) <= float(OXYGEN_RESERVOIR_NOOP_MOL)
+
+
+def _gen_published(
+    extras: tuple[str, ...],
+    *,
+    at_floor: bool,
+    include_ca: bool,
+) -> tuple[dict[str, float], dict, float]:
+    p_ref = _GEN_FLOOR_PO2_BAR if at_floor else _GEN_IN_BAND_PO2_BAR
+    pressures: dict[str, float] = {}
+    provenance: dict[str, dict] = {}
+    if include_ca:
+        pressures["Ca"] = _GEN_P_CA
+        provenance["Ca"] = {
+            "pressure_rail": "gas_fugacity",
+            "pO2_bar": p_ref,
+            "activity_factor": 0.2,
+            "raw_metal_activity_root": 0.2,
+        }
+    if "Fe" in extras:
+        pressures["Fe"] = _GEN_P_FE
+        provenance["Fe"] = {
+            "pressure_rail": "condensed_raoult_psat",
+            "pO2_bar": p_ref,
+            "activity_factor": 1.0,
+            "raw_metal_activity_root": _GEN_FE_RAW,
+        }
+    if "SiO" in extras:
+        pressures["SiO"] = _GEN_P_SIO
+        provenance["SiO"] = {
+            "oxygen_fugacity_channel": "transport_headspace",
+            "pO2_bar": _GEN_TRANSPORT_PO2_BAR,
+            "pO2_exponent": -0.5,
+        }
+    if "Si" in extras:
+        pressures["Si"] = _GEN_P_SI
+        provenance["Si"] = {
+            "pressure_rail": "liquid_oxide_standard_reaction",
+            "oxygen_fugacity_channel": "transport_headspace",
+            "pO2_bar": _GEN_TRANSPORT_PO2_BAR,
+            "pO2_exponent": -1.0,
+        }
+    if "TiO2_gas" in extras:
+        pressures["TiO2_gas"] = _GEN_P_TIO2
+        provenance["TiO2_gas"] = {
+            "oxygen_fugacity_channel": "intrinsic_melt",
+            "pO2_bar": _GEN_TRANSPORT_PO2_BAR,
+            "pO2_exponent": 0.0,
+        }
+    diagnostic = {
+        "source_reaction_fO2_bar": p_ref,
+        "pO2_bar": _GEN_TRANSPORT_PO2_BAR,
+        "vapor_pressure_numerator_provenance": provenance,
+    }
+    return pressures, diagnostic, p_ref
+
+
+def _gen_law_pressure(
+    published_pa: float,
+    p_ref_bar: float,
+    surface_pO2_bar: float,
+    *,
+    raw_activity: float | None = None,
+) -> float:
+    """Mass-action pressure, with the condensed-metal cap released above p_uncap.
+
+    Off the cap, ``P = P_pub * (p / p_ref)^n``. On a condensed rail the
+    published pressure is P_sat and the uncapped continuation is
+    ``P = P_sat * raw * (p / p_ref)^n``, which is ``P_sat * 10^log_raw``
+    once ``log_raw = log10(raw) + n*log10(p/p_ref)`` drops below 0.
+    ``n = -1/2`` for Fe and Ca. Sanity: raw=100 gives
+    ``p_uncap / p_ref = 1e4``.
+    """
+
+    log_ratio = _GEN_N_METAL * math.log10(surface_pO2_bar / p_ref_bar)
+    if raw_activity is None:
+        return 10.0 ** (math.log10(published_pa) + log_ratio)
+    log_raw = math.log10(raw_activity) + log_ratio
+    if log_raw >= 0.0:
+        return published_pa
+    return 10.0 ** (math.log10(published_pa) + log_raw)
+
+
+def _gen_oxygen_parts(
+    surface_pO2_bar: float,
+    p_ref_bar: float,
+    *,
+    include_ca: bool,
+    include_fe: bool,
+    fe_demand: bool,
+) -> tuple[float, float]:
+    """Proportional oxygen-atom and parent-demand terms.
+
+    The Hertz-Knudsen ``1/sqrt(2*pi*R*T)`` cancels. Metal gas has
+    ``nO = 0`` and reaction ``n = -1/2``, so ``dO = nO - 2*n = 1`` and
+    the signed weight is ``-1``. O2 has ``nO = 2``, ``dO = 0``. Forcing
+    ``fe_demand`` false is the capped-rail bug: the local slope is 0,
+    and using that slope as stoichiometry drops Fe's parent oxygen.
+    """
+
+    oxygen = 2.0 * (surface_pO2_bar * PA_PER_BAR) / math.sqrt(_M_O2)
+    parent = 0.0
+    if include_ca:
+        pressure = _gen_law_pressure(
+            _GEN_P_CA, p_ref_bar, surface_pO2_bar
+        )
+        parent += _GEN_ALPHA_CA * pressure / math.sqrt(_M_CA)
+    if include_fe and fe_demand:
+        pressure = _gen_law_pressure(
+            _GEN_P_FE,
+            p_ref_bar,
+            surface_pO2_bar,
+            raw_activity=_GEN_FE_RAW,
+        )
+        parent += _GEN_ALPHA_FE * pressure / math.sqrt(_M_FE)
+    return oxygen, parent
+
+
+def _gen_relative_residual(
+    surface_pO2_bar: float,
+    p_ref_bar: float,
+    *,
+    include_ca: bool,
+    include_fe: bool,
+    fe_demand: bool,
+) -> float:
+    oxygen, parent = _gen_oxygen_parts(
+        surface_pO2_bar,
+        p_ref_bar,
+        include_ca=include_ca,
+        include_fe=include_fe,
+        fe_demand=fe_demand,
+    )
+    return abs(oxygen - parent) / max(oxygen, parent, 1.0e-300)
+
+
+def _gen_surface_pO2_bar(
+    p_ref_bar: float,
+    *,
+    include_ca: bool,
+    include_fe: bool,
+) -> float:
+    """Independent root. Does not call the production balance."""
+
+    from scipy.optimize import brentq
+
+    def residual(log_p: float) -> float:
+        oxygen, parent = _gen_oxygen_parts(
+            10.0 ** log_p,
+            p_ref_bar,
+            include_ca=include_ca,
+            include_fe=include_fe,
+            fe_demand=True,
+        )
+        return oxygen - parent
+
+    low = residual(-30.0)
+    high = residual(0.0)
+    assert low < 0.0 < high
+    root = brentq(residual, -30.0, 0.0, xtol=1.0e-12, rtol=1.0e-12, maxiter=200)
+    return 10.0 ** root
+
+
+def _assert_langmuir_invariant(
+    *,
+    extras: tuple[str, ...],
+    reservoir_cm: float | None,
+    at_floor: bool,
+    liquid_fraction: float,
+    include_ca: bool,
+) -> None:
+    published, diagnostic, p_ref = _gen_published(
+        extras,
+        at_floor=at_floor,
+        include_ca=include_ca,
+    )
+    include_fe = "Fe" in extras
+    opens = _closure_opens(
+        reservoir_cm,
+        at_floor=at_floor,
+        has_melt_surface_carrier=include_ca or include_fe,
+    )
+    compiled, legacy = _catalog()
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=reservoir_cm,
+        liquid_fraction=liquid_fraction,
+        temperature_C=_GEN_T_C,
+    )
+    resolved = _resolve(host, equilibrium, temperature_K=_GEN_T_K)
+    assert set(resolved) == set(published)
+    for species, pressure in resolved.items():
+        assert pressure > 0.0
+        assert math.isfinite(pressure)
+    for species in _GEN_UNCHANGED:
+        if species in published:
+            assert resolved[species] == published[species]
+
+    if not opens:
+        assert resolved == published
+        assert not hasattr(host, "_last_langmuir_surface_oxygen")
+        return
+
+    surface = _gen_surface_pO2_bar(
+        p_ref,
+        include_ca=include_ca,
+        include_fe=include_fe,
+    )
+    notice = host._last_langmuir_surface_oxygen
+    assert notice["applied"] is True
+    assert notice["refused_species"] == {}
+    assert notice["capacity_negligible"] is (
+        reservoir_cm is not None
+        and float(reservoir_cm) <= float(OXYGEN_RESERVOIR_NOOP_MOL)
+    )
+    assert notice["eval_pO2_below_physical_floor"] is at_floor
+    assert notice["surface_pO2_bar"] == pytest.approx(surface, rel=1.0e-6)
+    assert notice["relative_residual"] < 1.0e-4
+    assert _gen_relative_residual(
+        notice["surface_pO2_bar"],
+        p_ref,
+        include_ca=include_ca,
+        include_fe=include_fe,
+        fe_demand=True,
+    ) < 1.0e-4
+    if include_ca:
+        expected_ca = _gen_law_pressure(_GEN_P_CA, p_ref, surface)
+        assert resolved["Ca"] == pytest.approx(expected_ca, rel=1.0e-6)
+        assert resolved["Ca"] != pytest.approx(published["Ca"], rel=1.0e-3)
+    if include_fe:
+        # raw=100, n=-1/2: the cap releases at p_ref * 1e4, below this root.
+        p_uncap = p_ref * (_GEN_FE_RAW ** (-1.0 / _GEN_N_METAL))
+        assert surface > p_uncap
+        expected_fe = _gen_law_pressure(
+            _GEN_P_FE,
+            p_ref,
+            surface,
+            raw_activity=_GEN_FE_RAW,
+        )
+        assert expected_fe < published["Fe"]
+        assert resolved["Fe"] == pytest.approx(expected_fe, rel=1.0e-6)
+        assert resolved["Fe"] < published["Fe"]
+        assert _gen_relative_residual(
+            notice["surface_pO2_bar"],
+            p_ref,
+            include_ca=include_ca,
+            include_fe=True,
+            fe_demand=False,
+        ) > 1.0e-3
+
+
+def test_generative_alphas_match_catalog_scalars() -> None:
+    """The mixture algebra uses the in-band Fe and Ca catalog coefficients."""
+
+    from engines.builtin.evaporation_flux import _evaluate_alpha_control
+    from simulator.evaporation import (
+        _load_evaporation_alpha_by_species,
+        _measured_alpha_control_view,
+    )
+
+    _compiled, legacy = _catalog()
+    alphas = _measured_alpha_control_view(
+        _load_evaporation_alpha_by_species(dict(legacy))
+    )
+    calcium, _ca_eval = _evaluate_alpha_control("Ca", _GEN_T_K, alphas["Ca"])
+    iron, _fe_eval = _evaluate_alpha_control("Fe", _GEN_T_K, alphas["Fe"])
+    assert float(calcium) == _GEN_ALPHA_CA
+    assert float(iron) == _GEN_ALPHA_FE
+    assert _GEN_T_K == pytest.approx(2173.15)
+
+
+@pytest.mark.parametrize(
+    "reservoir_cm",
+    [None, 0.0, 1.0e-15, 1.0e-14, 1.0],
+    ids=["missing", "zero", "noop", "above-noop", "buffered"],
+)
+@pytest.mark.parametrize("at_floor", [False, True], ids=["in-band", "floor"])
+@pytest.mark.parametrize("liquid_fraction", [0.0, 0.25, 1.0])
+def test_surface_gate_follows_reservoir_capacity_not_liquid_fraction(
+    reservoir_cm: float | None,
+    at_floor: bool,
+    liquid_fraction: float,
+) -> None:
+    """Closure follows the reservoir noop test, not equilibrium.liquid_fraction.
+
+    The map always contains a capped Fe rail and both transport channels.
+    A gate that multiplies source capacity by the equilibrium liquid
+    fraction opens at liquid_fraction 0 even when the reservoir capacity
+    is 1. The floor arm must not rewrite Si, SiO, or TiO2_gas.
+    """
+
+    _assert_langmuir_invariant(
+        extras=_GEN_EXTRAS,
+        reservoir_cm=reservoir_cm,
+        at_floor=at_floor,
+        liquid_fraction=liquid_fraction,
+        include_ca=True,
+    )
+
+
+@pytest.mark.parametrize(
+    "extras",
+    _gen_extra_subsets(),
+    ids=lambda extras: "+".join(extras) or "none",
+)
+@pytest.mark.parametrize(
+    "include_ca",
+    [True, False],
+    ids=["with-ca", "no-ca"],
+)
+@pytest.mark.parametrize(
+    ("mode", "reservoir_cm", "at_floor"),
+    [
+        ("closed", 1.0, False),
+        ("open-capacity", 0.0, False),
+        ("open-floor", 1.0, True),
+    ],
+    ids=["closed", "open-capacity", "open-floor"],
+)
+@pytest.mark.parametrize("liquid_fraction", [0.0, 1.0])
+def test_every_species_is_published_surface_law_or_refusal(
+    extras: tuple[str, ...],
+    include_ca: bool,
+    mode: str,
+    reservoir_cm: float,
+    at_floor: bool,
+    liquid_fraction: float,
+) -> None:
+    """Every carrier class is published, the shared surface law, or a refusal.
+
+    Subsets cover capped Fe, transport SiO, transport Si (not the SiO
+    name), and neutral TiO2_gas, with and without the uncapped Ca rail.
+    ``mode`` is the closed buffer, the empty-buffer opening, and the
+    physical-floor opening. Green returns the published map on all of
+    these, so an open case fails on the identity pressure.
+    """
+
+    del mode
+    _assert_langmuir_invariant(
+        extras=extras,
+        reservoir_cm=reservoir_cm,
+        at_floor=at_floor,
+        liquid_fraction=liquid_fraction,
+        include_ca=include_ca,
+    )
+
+
+def test_unsolvable_surface_refuses_inverted_carriers_without_silent_zero() -> None:
+    """A failed root omits below-band carriers and names the reason.
+
+    Transport and neutral pressures stay published. Nothing in the map
+    is replaced with 0.
+    """
+
+    published, diagnostic, _p_ref = _gen_published(
+        _GEN_EXTRAS,
+        at_floor=True,
+        include_ca=True,
+    )
+    compiled, legacy = _catalog()
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=1.0,
+        liquid_fraction=0.0,
+        temperature_C=_GEN_T_C,
+    )
+    resolved = _resolve(host, equilibrium, temperature_K=float("nan"))
+    notice = host._last_langmuir_surface_oxygen
+    assert notice["applied"] is True
+    assert notice["surface_pO2_bar"] is None
+    assert notice["eval_pO2_below_physical_floor"] is True
+    for species in ("Ca", "Fe"):
+        assert species not in resolved
+        reason = notice["refused_species"][species]
+        assert reason
+        assert "0.0" not in reason
+    for species in _GEN_UNCHANGED:
+        assert resolved[species] == published[species]
+        assert resolved[species] > 0.0
+    for pressure in resolved.values():
+        assert pressure > 0.0

@@ -788,21 +788,23 @@ class EvaporationMixin:
         *,
         temperature_K: float,
         eval_pO2_bar: float | None,
-        liquid_fraction: Any,
     ) -> float | None:
-        """d-072 effective redox capacity for the surface-pO2 gate.
+        """Reservoir source capacity for the surface-pO2 gate.
 
-        ``C_m_full`` is ``_melt_redox_capacity_mol_per_ln_fO2``:
-        ``(n_Fe / 4) * d(x_Fe3)/d(ln fO2)``, mol per ln fO2. The
-        reservoir's source term is ``C_m_full * liquid_fraction``
-        (``_melt_redox_source_capacity_mol_per_ln_fO2``). The fraction
-        is the one this evaporation step already holds, so the gate
-        does not open a second liquidus query. A missing fraction is
-        left unscaled: treating it as zero would call a buffered melt
-        unbuffered. Pure CaO has ``n_Fe = 0``, so this returns 0.
+        The no-buffer test is ``_melt_redox_source_capacity_mol_per_ln_fO2
+        <= OXYGEN_RESERVOIR_NOOP_MOL`` (``no_melt_redox_capacity``). That
+        source capacity is ``C_m_full`` times the reservoir liquid-fraction
+        factor, not ``equilibrium.liquid_fraction``. A missing method or a
+        non-finite result is not a buffer measurement. The liquid-fraction
+        factor's ``unavailable`` status returns 0 as a sentinel; that
+        sentinel is not ``C_m ~ 0`` unless ``C_m_full`` itself is already
+        at the noop floor (no Fe). Pure CaO has ``n_Fe = 0``, so the full
+        term is 0 and this returns 0.
         """
 
-        method = getattr(self, "_melt_redox_capacity_mol_per_ln_fO2", None)
+        method = getattr(
+            self, "_melt_redox_source_capacity_mol_per_ln_fO2", None
+        )
         if (
             not callable(method)
             or eval_pO2_bar is None
@@ -819,14 +821,28 @@ class EvaporationMixin:
             return None
         if not math.isfinite(capacity):
             return None
-        if liquid_fraction is None:
-            return capacity
-        try:
-            fraction = float(liquid_fraction)
-        except (TypeError, ValueError):
-            return capacity
-        if math.isfinite(fraction) and 0.0 <= fraction <= 1.0:
-            return capacity * fraction
+        diagnostic = getattr(
+            self, "_last_melt_redox_liquid_fraction_diagnostic", None
+        )
+        if (
+            isinstance(diagnostic, Mapping)
+            and diagnostic.get("status") == "unavailable"
+        ):
+            full_method = getattr(
+                self, "_melt_redox_capacity_mol_per_ln_fO2", None
+            )
+            if not callable(full_method):
+                return None
+            try:
+                full = float(full_method(
+                    fO2_log=math.log10(float(eval_pO2_bar)),
+                    T_K=float(temperature_K),
+                ))
+            except (TypeError, ValueError, OverflowError):
+                return None
+            if not math.isfinite(full) or full > 0.0:
+                return None
+            return full
         return capacity
 
     def _resolve_evaporation_batch_flux_state(
@@ -853,10 +869,13 @@ class EvaporationMixin:
 
         The returned map is that shared input after the d-376 amendment 1
         surface closure. The congruent balance runs only when the
-        evaluated pO2 is at the physical floor or the d-072 redox
-        capacity is negligible, and an overhead O2 partial then floors
-        the surface while O2 is net-leaving. Everywhere else the map
-        stays the reservoir / mass-action publication. Finite cold-train
+        evaluated pO2 is at the physical floor or the reservoir
+        no-buffer test is true (source capacity <= the noop floor, not
+        ``equilibrium.liquid_fraction`` times ``C_m_full``). Transport-
+        headspace pressures, including SiO, stay published. An overhead
+        O2 partial then floors the surface while O2 is net-leaving.
+        Everywhere else the map stays the reservoir / mass-action
+        publication. Finite cold-train
         capacity (``_compute_capacity_coupling_shadow_impl``) and live
         evaporation both price this map. ``equilibrium`` vapor pressures
         stay the mass-action law; the shadow comparison above the
@@ -910,6 +929,13 @@ class EvaporationMixin:
         else:
             if not math.isfinite(eval_pO2_bar) or eval_pO2_bar <= 0.0:
                 eval_pO2_bar = None
+        # Namespace fakes bind this resolver without the mixin helpers.
+        # A missing reader is not a measurement: capacity stays unknown
+        # (not ``C_m ~ 0``) and there is no overhead bound.
+        capacity_reader = getattr(
+            self, "_langmuir_melt_redox_capacity_mol_per_ln_fO2", None
+        )
+        overhead_reader = getattr(self, "_langmuir_overhead_pO2_bar", None)
         langmuir_surface = apply_langmuir_surface_oxygen(
             vapor_pressures,
             temperature_K=temperature_K,
@@ -924,15 +950,16 @@ class EvaporationMixin:
             legacy_catalog=getattr(self, "vapor_pressures", None),
             compiled_catalog=getattr(self, "vapour_rail_catalog", None),
             melt_redox_capacity_mol_per_ln_fO2=(
-                self._langmuir_melt_redox_capacity_mol_per_ln_fO2(
+                capacity_reader(
                     temperature_K=temperature_K,
                     eval_pO2_bar=eval_pO2_bar,
-                    liquid_fraction=getattr(
-                        equilibrium, "liquid_fraction", None
-                    ),
                 )
+                if callable(capacity_reader)
+                else None
             ),
-            overhead_pO2_bar=self._langmuir_overhead_pO2_bar(),
+            overhead_pO2_bar=(
+                overhead_reader() if callable(overhead_reader) else None
+            ),
         )
         if langmuir_surface.applied:
             vapor_pressures = dict(langmuir_surface.pressures_Pa)
