@@ -38,6 +38,43 @@ class _FakeActivityEngine:
         )
 
 
+def test_published_mole_fraction_drives_engine_boundary_verdict():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        row
+        for row in fixture["points"]
+        if isinstance(row.get("published_mole_fraction"), dict)
+    )
+    point = {
+        **point,
+        "composition_wt_pct": {"SiO2": 90.0, "Na2O": 10.0},
+    }
+    from simulator.accounting.formulas import project_oxide_composition
+
+    expected_wt_pct = project_oxide_composition(
+        {
+            oxide: amount
+            for oxide, amount in point["published_mole_fraction"].items()
+        },
+        source_basis="moles",
+    )
+    expected_wt_pct = {
+        oxide: 100.0 * amount for oxide, amount in expected_wt_pct.items()
+    }
+    received = {}
+
+    class _CaptureEngine(_FakeActivityEngine):
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            received["composition_wt_pct"] = composition_wt_pct
+            return super().evaluate(composition_wt_pct, temperature_K, fO2_bar)
+
+    benchmark.run_points(
+        {**fixture, "points": [point]}, [_CaptureEngine()]
+    )
+
+    assert received["composition_wt_pct"] == pytest.approx(expected_wt_pct)
+
+
 def test_harness_runs_end_to_end_on_tiny_fixture(tmp_path, monkeypatch):
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     fixture["points"] = fixture["points"][:1]
