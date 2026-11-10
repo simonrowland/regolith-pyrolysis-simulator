@@ -110,6 +110,7 @@ assert cached_engine_call('openimcc', {'request': 'same'}, solve) == {'answer': 
 """
     environment = dict(os.environ)
     environment["REGOLITH_ENGINE_CACHE"] = str(database)
+    environment.pop("REGOLITH_ENGINE_CACHE_MODE", None)
     environment["PYTHONPATH"] = str(Path(__file__).resolve().parents[1])
     processes: list[subprocess.Popen[str]] = []
     try:

@@ -537,7 +537,9 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason(
                 raise AssertionError((path, current))
         return current
 
-    def set_property(value: Any, path: tuple[Any, ...], replacement: Any) -> Callable[[], None]:
+    def set_property(
+        value: Any, path: tuple[Any, ...], replacement: Any
+    ) -> Callable[[], None]:
         parent = value
         for part in path[:-1]:
             if isinstance(parent, Mapping):
