@@ -101,22 +101,10 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # from the runner JSON because its public envelope does not include raw flux maps.
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
-        # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
-        # b-858: atomic-Si evaporation through the sourced Si Lennard-Jones row
-        # (trace Si flux; largest product move 6.3e-7 relative). Same values on
-        # studio-2 and studio-3 (gate config).
-        # d-137 condenser (t-1217 law, Stage-1 plate, Stage-4 Na / 4b K split) +
-        # t-1579 hot-face schedule: regenerated on studio-3, two passes identical.
-        # d-137 fix rounds (single product-accounting owner, band-integrated
-        # Stage-3 capture, typed saturation refusal): flux unchanged; the
-        # ledger digest moves with the additive unrecovered_metal_phase /
-        # source-account fields. Regenerated on studio-3 at b0b70903d.
-        # d137p: both digests are the studio-3 actuals (pins2 log, tree
-        # 9666fc129 plus the de32c69ca runner regen). The runner regen script
-        # does not update these pins. Lunar full runs diverge between the
-        # laptop and studio-3, so these digests are not a laptop re-run.
-        "flux_maps_sha256": "87508c1755a8c9521e7396ca37168f20c55088b6464763cea51514ce6443767d",
-        "ledger_sha256": "d40bc5f8c7d221c2ba7216a43448cb2139e7d3039b59d9bd5f0f42b9aa39a5db",
+        # d-371: refreshed from the exact OpenIMCC 995dc14 lunar golden
+        # regenerated on studio-2.
+        "flux_maps_sha256": "037a497bae7e2af0e6a5e16881c531a58c212e5c0fa1c814c5cb5733f1f0699d",
+        "ledger_sha256": "a0750ffd8b55adbdb48e1869d911ce24108985938cf44c366bd328beedacca10",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
