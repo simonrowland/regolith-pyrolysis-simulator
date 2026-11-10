@@ -428,7 +428,11 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
     monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", fake_native_split)
     monkeypatch.setattr(sim, "_get_equilibrium", fake_equilibrium)
     monkeypatch.setattr(sim, "_calculate_evaporation", fake_evaporation)
-    monkeypatch.setattr(sim, "_apply_analytic_evaporation_depletion", lambda flux: flux)
+    monkeypatch.setattr(
+        sim,
+        "_apply_analytic_evaporation_depletion",
+        lambda flux, *, dt_hr=1.0: flux,
+    )
     monkeypatch.setattr(sim, "_configure_condensation_operating_conditions", lambda flux: None)
     monkeypatch.setattr(sim, "_apply_lab_surface_temperatures", lambda *, sample_time_h: None)
     monkeypatch.setattr(sim, "_route_to_condensation", fake_route)
@@ -3204,9 +3208,9 @@ def test_native_fe_vacuum_command_keeps_finite_outlet_closure() -> None:
     # Kn is 0.01083361438108784 (transitional). That rate is an unclosed
     # upper bound. The same-hour closure solves 0.24956473231274315 kg/hr
     # at P_bulk=23.204792348202464 Pa (Kn 0.015265451743701922). Continuum
-    # validity refuses that transitional state, so the ledger does not
-    # vaporize the pool. The 0.5 mol cap is the same refusal at
-    # 0.0279225 kg/hr and 7.761813978128352 Pa.
+    # 3e418c7 keeps the converged closure selected and marks its transitional
+    # transport as an extrapolated domain extension, so the ledger can route
+    # that stream. The 0.5 mol cap is 0.0279225 kg/hr at 7.761813978128352 Pa.
     sim = _make_sim()
     sim.melt.temperature_C = 1700.0
     sim.melt.p_total_mbar = 0.0
@@ -3225,6 +3229,12 @@ def test_native_fe_vacuum_command_keeps_finite_outlet_closure() -> None:
             if notice["kind"] == "unclosed_vacuum_hkl_upper_bound"
         )
 
+    def domain_extension(diagnostic):
+        return next(
+            notice for notice in diagnostic["notices"]
+            if notice["kind"] == "transport_domain_extension"
+        )
+
     small_closure = vacuum_small["same_hour_headspace_closure"]
     pool_closure = vacuum_pool["same_hour_headspace_closure"]
     small_bound = bound(vacuum_small)
@@ -3232,8 +3242,17 @@ def test_native_fe_vacuum_command_keeps_finite_outlet_closure() -> None:
 
     assert small_closure["status"] == "roots_found_by_sampling"
     assert small_closure["converged"] is True
-    assert vacuum_small["native_fe_vapor_mol"] == pytest.approx(0.0)
-    assert vacuum_small["native_fe_tap_mol"] == pytest.approx(0.5)
+    assert vacuum_small["native_fe_vapor_mol"] > 0.0
+    assert (
+        vacuum_small["native_fe_vapor_mol"]
+        + vacuum_small["native_fe_tap_mol"]
+        == pytest.approx(0.5)
+    )
+    assert vacuum_small["ledger_yields_authorized"] is True
+    assert domain_extension(vacuum_small)["authority"] == "extrapolated"
+    assert vacuum_small["native_fe_vapor_capacity_kg_hr"] == pytest.approx(
+        small_closure["rates_kg_hr"]["Fe"]
+    )
     assert vacuum_small["P_bulk_Pa"] == pytest.approx(7.761813978128352)
     assert vacuum_small["reason"] == "viscous_p_bulk_transport_out_of_domain"
     assert small_bound["authority"] == "unclosed_upper_bound"
@@ -3248,7 +3267,17 @@ def test_native_fe_vacuum_command_keeps_finite_outlet_closure() -> None:
         0.24956473231274315
     )
     assert vacuum_pool["P_bulk_Pa"] == pytest.approx(23.204792348202464)
-    assert vacuum_pool["native_fe_vapor_mol"] == pytest.approx(0.0)
+    assert vacuum_pool["native_fe_vapor_mol"] > 0.0
+    assert (
+        vacuum_pool["native_fe_vapor_mol"]
+        + vacuum_pool["native_fe_tap_mol"]
+        == pytest.approx(100.0)
+    )
+    assert vacuum_pool["ledger_yields_authorized"] is True
+    assert domain_extension(vacuum_pool)["authority"] == "extrapolated"
+    assert vacuum_pool["native_fe_vapor_capacity_kg_hr"] == pytest.approx(
+        pool_closure["rates_kg_hr"]["Fe"]
+    )
     assert vacuum_pool["knudsen_number"] == pytest.approx(0.015265451743701922)
     assert pool_bound["upper_bound_kg_hr"] == pytest.approx(
         0.49551383845456703
@@ -3466,7 +3495,7 @@ def test_c7_transport_closes_against_same_hour_headspace() -> None:
 
 
 def test_c7_same_hour_pressure_and_native_fe_transitional_validity() -> None:
-    """The self-pumped C7 pressure is projected; native Fe keeps its floor."""
+    """C7 and native Fe retain closed streams with a transport-domain flag."""
     sim = _make_sim()
     sim.melt.temperature_C = 1750.0
     sim.melt.p_total_mbar = 0.03632  # 3.632 Pa
@@ -3499,20 +3528,22 @@ def test_c7_same_hour_pressure_and_native_fe_transitional_validity() -> None:
     assert c7_diag.get("reason") != "viscous_p_bulk_transport_out_of_domain"
 
     native = sim._native_fe_partition_diagnostic(1.0)
-    assert native["native_fe_vapor_mol"] == pytest.approx(0.0)
-    assert native["native_fe_tap_mol"] == pytest.approx(1.0)
-    assert native["ledger_yields_authorized"] is False
-    assert native["authority_class"] == "diagnostic-limited"
+    assert native["native_fe_vapor_mol"] > 0.0
+    assert (
+        native["native_fe_vapor_mol"] + native["native_fe_tap_mol"]
+        == pytest.approx(1.0)
+    )
+    assert native["ledger_yields_authorized"] is True
+    assert native["authority_class"] == "status_bearing"
+    assert native["authority_reason"] == "transport_domain_extension"
     assert native["reason"] == "viscous_p_bulk_transport_out_of_domain"
     assert native["p_bulk_transport_domain"] == "out_of_domain_transitional"
     assert "transport_model_validity_domain" in native["framing"]
     series = native["series_resistance"]
-    assert series["authority_class"] == "diagnostic-limited"
-    assert series["authority_reason"] == (
-        "viscous_p_bulk_transport_out_of_domain"
-    )
+    assert series["authority_class"] == "status_bearing"
+    assert series["authority_reason"] == "transport_domain_extension"
     assert series["p_bulk_transport_domain"] == "out_of_domain_transitional"
-    assert series["ledger_yields_authorized"] is False
+    assert series["ledger_yields_authorized"] is True
     assert "transport_model_validity_domain" in series["framing"]
 
     # --- viscous floor: P=100 Pa, Kn≈0.0036 — normal behavior ---
