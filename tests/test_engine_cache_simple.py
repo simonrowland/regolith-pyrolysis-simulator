@@ -186,7 +186,8 @@ def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
 
     assert isinstance(cold, EquilibriumResult)
     assert isinstance(warm, EquilibriumResult)
-    assert warm.phase_compositions == expected.phase_compositions
+    assert cold.phase_compositions == {}
+    assert warm.phase_compositions == {}
     assert warm.activity_coefficients == expected.activity_coefficients
     assert warm.diagnostics == expected.diagnostics
     assert calls == 1
@@ -241,10 +242,12 @@ def test_equilibrium_hot_value_contains_only_battery_consumed_fields() -> None:
     }
     assert "phase_masses_kg" in value.cold
     assert "temperature_C" in value.cold
+    assert value.hot["diagnostics"] == {"backend_status_reason": "fixture-code"}
+    assert value.cold["diagnostics"] == {"unused": "large"}
     restored = EquilibriumResult.from_engine_cache_value(value.hot)
     assert restored.activity_coefficients == result.activity_coefficients
     assert restored.vapor_pressures_Pa == result.vapor_pressures_Pa
-    assert restored.diagnostics == result.diagnostics
+    assert restored.diagnostics == {"backend_status_reason": "fixture-code"}
     assert restored.phase_masses_kg == {}
 
 
@@ -293,6 +296,33 @@ def test_readonly_mode_serves_hits_and_solves_misses_without_writing(
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
 
 
+def test_non_authoritative_engine_result_is_cacheable(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    _engine_cache_counters(reset=True)
+    calls = 0
+
+    def solve() -> dict[str, object]:
+        nonlocal calls
+        calls += 1
+        return {"status": "non_authoritative", "pressure_Pa": 42.0}
+
+    first = engine_cache.cached_engine_call("vaporock", {"T_K": 1700.0}, solve)
+    second = engine_cache.cached_engine_call(
+        "vaporock", {"T_K": 1700.0}, solve
+    )
+
+    assert first == second == {"status": "non_authoritative", "pressure_Pa": 42.0}
+    assert calls == 1
+    assert _engine_cache_counters(reset=True)["vaporock"] == {
+        "hits": 1,
+        "misses": 1,
+        "stores": 1,
+    }
+
+
 def test_engine_worker_returns_cache_counters_to_parent(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -334,7 +364,7 @@ def test_exceptions_and_typed_refusals_are_not_stored(
     }
 
 
-def test_corrupt_pickle_is_a_miss_and_is_replaced(
+def test_corrupt_hot_json_is_a_miss_and_is_replaced(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

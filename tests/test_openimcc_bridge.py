@@ -1367,7 +1367,10 @@ def test_redox_result_keeps_its_type_across_cache_round_trip(
 ) -> None:
     openimcc = pytest.importorskip("openimcc")
     from simulator import engine_cache
-    from simulator.melt_backend.openimcc_bridge import evaluate_redox
+    from simulator.melt_backend.openimcc_bridge import (
+        OpenImccRedoxResult,
+        evaluate_redox,
+    )
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "redox-cache.sqlite"))
     engine_cache.engine_cache_counters(reset=True)
@@ -1385,9 +1388,20 @@ def test_redox_result_keeps_its_type_across_cache_round_trip(
     cold = evaluate_redox(request, 1700.0, "closed")
     warm = evaluate_redox(request, 1700.0, "closed")
 
-    assert type(cold) is type(expected)
-    assert type(warm) is type(expected)
-    assert warm == expected
+    assert isinstance(cold, OpenImccRedoxResult)
+    assert isinstance(warm, OpenImccRedoxResult)
+    assert warm == cold
+    assert warm.temperature_K == expected.temperature_K
+    assert warm.mode == expected.mode
+    assert warm.lambda_ln_f_o2 == expected.lambda_ln_f_o2
+    assert dict(warm.parent_activity) == {"FeO": expected.parent_activity["FeO"]}
+    assert warm.ferric_fe_mol == expected.ferric_fe_mol
+    assert warm.ferrous_fe_mol == expected.ferrous_fe_mol
+    assert warm.metal_buffered is expected.metal_buffered
+    assert warm.flags == expected.flags
+    assert warm.extrapolated_redox_rows == expected.extrapolated_redox_rows
+    assert warm.active_row_band_intersection_K == expected.active_row_band_intersection_K
+    assert warm.redox_pack_digest == expected.redox_pack_digest
     assert calls == 1
     assert engine_cache.engine_cache_counters(reset=True)["openimcc"] == {
         "hits": 1,

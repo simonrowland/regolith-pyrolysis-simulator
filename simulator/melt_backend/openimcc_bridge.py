@@ -8,7 +8,7 @@ absent.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from functools import lru_cache
 from importlib import metadata
 from importlib import resources
@@ -261,6 +261,16 @@ class OpenImccBindingDigestUnavailableError(RuntimeError):
         super().__init__(self.backend_status_reason)
 
 
+def _plain_cache_data(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {key: _plain_cache_data(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return tuple(_plain_cache_data(item) for item in value)
+    if isinstance(value, list):
+        return [_plain_cache_data(item) for item in value]
+    return value
+
+
 @dataclass(frozen=True)
 class OpenImccBridgeResult:
     """Parent activities and provenance returned by one openimcc evaluation."""
@@ -361,6 +371,82 @@ class OpenImccBridgeResult:
                     for key, value in (self.activity_coefficients or {}).items()
                 }
             ),
+        )
+
+
+@dataclass(frozen=True)
+class OpenImccRedoxResult:
+    """The redox fields consumed by battery scoring and its provenance rows."""
+
+    temperature_K: float
+    mode: str
+    lambda_ln_f_o2: float
+    parent_activity: Mapping[str, float]
+    ferric_fe_mol: float
+    ferrous_fe_mol: float
+    metal_buffered: bool
+    flags: tuple[str, ...]
+    extrapolated_redox_rows: tuple[str, ...]
+    active_row_band_intersection_K: tuple[float, float]
+    redox_pack_digest: str
+
+    def lean(self) -> dict[str, Any]:
+        return {
+            "temperature_K": self.temperature_K,
+            "mode": self.mode,
+            "lambda_ln_f_o2": self.lambda_ln_f_o2,
+            "parent_activity": dict(self.parent_activity),
+            "ferric_fe_mol": self.ferric_fe_mol,
+            "ferrous_fe_mol": self.ferrous_fe_mol,
+            "metal_buffered": self.metal_buffered,
+            "flags": self.flags,
+            "extrapolated_redox_rows": self.extrapolated_redox_rows,
+            "active_row_band_intersection_K": self.active_row_band_intersection_K,
+            "redox_pack_digest": self.redox_pack_digest,
+        }
+
+    @classmethod
+    def from_lean(cls, payload: Mapping[str, Any]) -> OpenImccRedoxResult:
+        return cls(
+            temperature_K=float(payload["temperature_K"]),
+            mode=str(payload["mode"]),
+            lambda_ln_f_o2=float(payload["lambda_ln_f_o2"]),
+            parent_activity=MappingProxyType(
+                {str(name): float(value) for name, value in payload["parent_activity"].items()}
+            ),
+            ferric_fe_mol=float(payload["ferric_fe_mol"]),
+            ferrous_fe_mol=float(payload["ferrous_fe_mol"]),
+            metal_buffered=bool(payload["metal_buffered"]),
+            flags=tuple(str(value) for value in payload["flags"]),
+            extrapolated_redox_rows=tuple(
+                str(value) for value in payload["extrapolated_redox_rows"]
+            ),
+            active_row_band_intersection_K=tuple(
+                float(value) for value in payload["active_row_band_intersection_K"]
+            ),
+            redox_pack_digest=str(payload["redox_pack_digest"]),
+        )
+
+    @classmethod
+    def from_engine_result(cls, result: Any) -> OpenImccRedoxResult:
+        return cls(
+            temperature_K=float(result.temperature_K),
+            mode=str(result.mode),
+            lambda_ln_f_o2=float(result.lambda_ln_f_o2),
+            parent_activity={
+                "FeO": float(result.parent_activity["FeO"])
+            },
+            ferric_fe_mol=float(result.ferric_fe_mol),
+            ferrous_fe_mol=float(result.ferrous_fe_mol),
+            metal_buffered=bool(result.metal_buffered),
+            flags=tuple(str(value) for value in result.flags),
+            extrapolated_redox_rows=tuple(
+                str(value) for value in result.extrapolated_redox_rows
+            ),
+            active_row_band_intersection_K=tuple(
+                float(value) for value in result.active_row_band_intersection_K
+            ),
+            redox_pack_digest=str(result.redox_pack_digest),
         )
 
 
@@ -1136,7 +1222,7 @@ def evaluate_redox(
     entry: str = "openimcc.evaluate_redox",
 ) -> Any:
     import openimcc
-    from simulator.engine_cache import cached_engine_call
+    from simulator.engine_cache import CacheValue, cached_engine_call
 
     request = {
         "call": entry,
@@ -1146,16 +1232,26 @@ def evaluate_redox(
         "lambda_imposed": lambda_imposed,
     }
 
-    def solve() -> Any:
+    def solve() -> CacheValue:
         if entry == "openimcc.redox.evaluate_redox":
             import openimcc.redox as openimcc_redox
 
-            return openimcc_redox.evaluate_redox(inventory, temperature_K, mode)
-        return openimcc.evaluate_redox(
-            inventory, temperature_K, mode, lambda_imposed=lambda_imposed
-        )
+            result = openimcc_redox.evaluate_redox(inventory, temperature_K, mode)
+        else:
+            result = openimcc.evaluate_redox(
+                inventory, temperature_K, mode, lambda_imposed=lambda_imposed
+            )
+        lean = OpenImccRedoxResult.from_engine_result(result)
+        consumed = set(lean.lean())
+        cold = {
+            item.name: _plain_cache_data(getattr(result, item.name))
+            for item in fields(result)
+            if item.name not in consumed
+        }
+        return CacheValue(lean.lean(), cold)
 
-    return cached_engine_call("openimcc", request, solve)
+    payload = cached_engine_call("openimcc", request, solve)
+    return OpenImccRedoxResult.from_lean(payload)
 
 
 evaluate_openimcc = evaluate
