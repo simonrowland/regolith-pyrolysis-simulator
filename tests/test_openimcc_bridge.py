@@ -1407,4 +1407,6 @@ def test_redox_result_keeps_its_type_across_cache_round_trip(
         "hits": 1,
         "misses": 1,
         "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
     }

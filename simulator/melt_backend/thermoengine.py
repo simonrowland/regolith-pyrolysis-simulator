@@ -99,6 +99,15 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
     def transport(self) -> Optional[ThermoEngineTransport]:
         return self._thermoengine_transport
 
+    def _engine_cache_settings(self) -> dict[str, str]:
+        transport = self._thermoengine_transport
+        model_name = (
+            transport._model_name
+            if transport is not None
+            else resolve_grid_engine_model(self._model, 'thermoengine')
+        )
+        return {'model': str(model_name)}
+
     def initialize(self, config: dict) -> bool:
         config = self._thermoengine_config(config)
         requested_mode = str(config.get('mode') or 'thermoengine').strip().lower()

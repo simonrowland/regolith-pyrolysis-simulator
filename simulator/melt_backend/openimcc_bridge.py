@@ -1196,6 +1196,7 @@ def evaluate_gas(
         "temperature_K": temperature_K,
         "pressure_bar": pressure_bar,
         "gas_pack_selection": gas_pack_selection,
+        "gas_pack_identity": _gas_pack_cache_identity(gas_pack),
         "parent_oxides": None if parent_oxides is None else tuple(parent_oxides),
         "allow_extrapolation": allow_extrapolation,
     }
@@ -1211,6 +1212,21 @@ def evaluate_gas(
             allow_extrapolation=allow_extrapolation,
         )),
     )
+
+
+def _gas_pack_cache_identity(gas_pack: Any) -> dict[str, str]:
+    version = getattr(gas_pack, "version", None)
+    if version is not None and str(version).strip():
+        return {"version": str(version)}
+    filenames = {
+        key: Path(path).name
+        for key, path in (
+            ("gas_file", getattr(gas_pack, "gas_path", None)),
+            ("oxide_file", getattr(gas_pack, "oxide_path", None)),
+        )
+        if path is not None
+    }
+    return filenames
 
 
 def evaluate_redox(

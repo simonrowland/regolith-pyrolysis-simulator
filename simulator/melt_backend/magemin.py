@@ -1423,12 +1423,32 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     def is_available(self) -> bool:
         return self._available
 
-    def _effective_database(self) -> str:
-        """Return the database used by both parent projection and worker calls."""
+    def _effective_worker_configuration(
+        self,
+    ) -> tuple[str, Mapping[str, Any]]:
+        """Return the database and configuration used by the active bridge."""
         pool = self._subprocess_pool
         if self._bridge == 'subprocess' and pool is not None and pool.workers:
-            return str(pool.workers[0]._bootstrap_args[1])
-        return self._database
+            bootstrap_args = pool.workers[0]._bootstrap_args
+            return str(bootstrap_args[1]), bootstrap_args[2]
+        return self._database, self._config
+
+    def _effective_database(self) -> str:
+        """Return the database used by both parent projection and worker calls."""
+        return self._effective_worker_configuration()[0]
+
+    def _effective_fO2_buffer(self) -> str:
+        configured = self._effective_worker_configuration()[1].get('fO2_buffer')
+        if configured is None:
+            return 'qfm'
+        name = str(configured).lower().strip()
+        return name if name in self._BUFFER_CHOICES else 'qfm'
+
+    def _engine_cache_settings(self) -> dict[str, str]:
+        return {
+            'database': self._effective_database(),
+            'fO2_buffer': self._effective_fO2_buffer(),
+        }
 
     def get_vapor_species(self) -> List[str]:
         # MAGEMin does not compute vapor speciation.  Returning an empty

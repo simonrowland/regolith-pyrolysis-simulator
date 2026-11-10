@@ -37,6 +37,7 @@ _CONNECTION_PID: int | None = None
 _CONNECTION_ROOT: Path | None = None
 _CONNECTION_READONLY = False
 _COUNTERS: dict[str, dict[str, int]] = {}
+_COUNTER_NAMES = ("hits", "misses", "stores", "store_error", "read_error")
 
 
 @dataclass(frozen=True)
@@ -155,14 +156,19 @@ def engine_cache_counters(*, reset: bool = False) -> dict[str, dict[str, int]]:
         return snapshot
 
 
+def _counter_bucket(engine: str) -> dict[str, int]:
+    return _COUNTERS.setdefault(engine, dict.fromkeys(_COUNTER_NAMES, 0))
+
+
 def _record_engine_cache_counters(
     counters: Mapping[str, Mapping[str, int]],
 ) -> None:
     with _LOCK:
         for engine, values in counters.items():
-            target = _COUNTERS.setdefault(engine, {"hits": 0, "misses": 0, "stores": 0})
-            for name in target:
-                target[name] += int(values.get(name, 0))
+            target = _counter_bucket(engine)
+            for name, value in values.items():
+                target.setdefault(name, 0)
+                target[name] += int(value)
 
 
 def _hot_and_cold(result: Any) -> tuple[Any, Any]:
@@ -210,7 +216,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     cache_key = engine_cache_key(engine_id, chem_version, request)
     connection = _connect(path, root=path, readonly=readonly, cold=False)
     with _LOCK:
-        counts = _COUNTERS.setdefault(engine_id, {"hits": 0, "misses": 0, "stores": 0})
+        counts = _counter_bucket(engine_id)
         row = None if connection is None else connection.execute(
             f"SELECT value FROM {_TABLE} WHERE key=?", (cache_key,)
         ).fetchone()
@@ -224,6 +230,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                     hot_json = zlib.decompress(stored_value)
                 result = json.loads(hot_json)
             except (TypeError, UnicodeDecodeError, json.JSONDecodeError, zlib.error):
+                counts["read_error"] += 1
                 row = None
             else:
                 counts["hits"] += 1
@@ -246,36 +253,60 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             level=9,
         )
         cold_value = zlib.compress(pickle.dumps(cold, protocol=5), level=6)
-    except (TypeError, ValueError) as exc:
-        raise ValueError("engine cache result must have canonical JSON HOT fields") from exc
+    except Exception:
+        with _LOCK:
+            _counter_bucket(engine_id)["store_error"] += 1
+        return hot
     source_box = _source_box()
     cold_path = path.with_name(path.name + ".cold")
-    with _LOCK:
-        connection.execute("BEGIN IMMEDIATE")
-        row_seq = _next_row_sequence(connection, source_box)
-        connection.execute(
-            f"INSERT OR REPLACE INTO {_TABLE} "
-            "(key, value, engine, chem_version, source_box, row_seq) VALUES (?, ?, ?, ?, ?, ?)",
-            (
-                cache_key,
-                sqlite3.Binary(hot_value),
-                engine_id,
-                str(chem_version),
-                source_box,
-                row_seq,
-            ),
-        )
-        connection.commit()
-        cold_connection = _connect(
-            cold_path, root=path, readonly=False, cold=True
-        )
-        assert cold_connection is not None
-        cold_connection.execute(
-            f"INSERT OR REPLACE INTO {_COLD_TABLE} (key, value) VALUES (?, ?)",
-            (cache_key, sqlite3.Binary(cold_value)),
-        )
-        cold_connection.commit()
-        _COUNTERS[engine_id]["stores"] += 1
+    cold_connection: sqlite3.Connection | None = None
+    try:
+        with _LOCK:
+            cold_connection = _connect(
+                cold_path, root=path, readonly=False, cold=True
+            )
+            assert cold_connection is not None
+            cold_connection.execute("BEGIN IMMEDIATE")
+            cold_connection.execute(
+                f"INSERT OR REPLACE INTO {_COLD_TABLE} (key, value) VALUES (?, ?)",
+                (cache_key, sqlite3.Binary(cold_value)),
+            )
+            cold_connection.commit()
+            connection.execute("BEGIN IMMEDIATE")
+            row_seq = _next_row_sequence(connection, source_box)
+            connection.execute(
+                f"INSERT OR REPLACE INTO {_TABLE} "
+                "(key, value, engine, chem_version, source_box, row_seq) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    cache_key,
+                    sqlite3.Binary(hot_value),
+                    engine_id,
+                    str(chem_version),
+                    source_box,
+                    row_seq,
+                ),
+            )
+            connection.commit()
+            _counter_bucket(engine_id)["stores"] += 1
+    except Exception:
+        with _LOCK:
+            for failed_connection in (connection, cold_connection):
+                if failed_connection is None:
+                    continue
+                try:
+                    failed_connection.rollback()
+                except sqlite3.Error:
+                    pass
+            if cold_connection is not None:
+                try:
+                    cold_connection.execute(
+                        f"DELETE FROM {_COLD_TABLE} WHERE key=?", (cache_key,)
+                    )
+                    cold_connection.commit()
+                except sqlite3.Error:
+                    pass
+            _counter_bucket(engine_id)["store_error"] += 1
     return hot
 
 

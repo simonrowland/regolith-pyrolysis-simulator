@@ -181,7 +181,9 @@ def main(argv: list[str] | None = None) -> int:
                 engine_rows.append(
                     f"{engine.value}:hits={engine_counts.get('hits', 0)},"
                     f"misses={engine_counts.get('misses', 0)},"
-                    f"stores={engine_counts.get('stores', 0)}"
+                    f"stores={engine_counts.get('stores', 0)},"
+                    f"store_error={engine_counts.get('store_error', 0)},"
+                    f"read_error={engine_counts.get('read_error', 0)}"
                 )
             print(
                 f"engine_cache_counters run={name} {' '.join(engine_rows)}",
@@ -281,6 +283,17 @@ def main(argv: list[str] | None = None) -> int:
         print(
             "slice did not exercise every requested engine through cold and warm "
             f"calls: {', '.join(unexercised)}",
+            file=sys.stderr,
+        )
+        return 1
+    store_errors = sum(
+        values.get("store_error", 0)
+        for name in ("cold", "cold-parallel", "warm", "parallel-warm")
+        for values in counters[name].values()
+    )
+    if store_errors:
+        print(
+            f"engine_cache_gate_failed store_error>0 count={store_errors}",
             file=sys.stderr,
         )
         return 1

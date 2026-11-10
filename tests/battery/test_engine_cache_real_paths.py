@@ -227,6 +227,8 @@ def test_scorer_cache_key_tracks_effective_adapter_setting(
             "hits": 1,
             "misses": 2,
             "stores": 2,
+            "store_error": 0,
+            "read_error": 0,
         }
     finally:
         close_battery_engine_handle(handle)
@@ -338,7 +340,7 @@ def test_internal_analytical_residue_cache_projects_named_observation_request(
     assert cold.vapor_pressures_Pa == {"Na(g)": 1.25}
     assert warm.vapor_pressures_Pa == cold.vapor_pressures_Pa
     assert len(calls) == 1
-    assert calls[0]["temperature_C"] == 800.0
+    assert calls[0]["temperature_C"] == temperature_C
     assert calls[0]["composition_mol"] == composition_mol
     assert engine_cache.engine_cache_counters(reset=True)["internal-analytical"] == {
         "hits": 1,

@@ -333,11 +333,16 @@ def _call_cached_backend_equilibrate(
             return equilibrium_cache_value(result)
         return result
 
+    effective_settings = getattr(handle.backend, "_engine_cache_settings", None)
+    adapter_settings = (
+        dict(effective_settings()) if callable(effective_settings) else {}
+    )
+
     payload = cached_engine_call(
         handle.name,
         {
             "kwargs": request_kwargs,
-            "engine_settings": dict(getattr(handle, "engine_settings", {}) or {}),
+            "engine_settings": adapter_settings,
         },
         solve_cache_value,
     )
@@ -3023,6 +3028,9 @@ class _OpenImccBatteryBackend:
         """Return the pack identity captured with the loaded datapack."""
         return str(self._identity["pack"])
 
+    def _engine_cache_settings(self) -> dict[str, str]:
+        return {"pack": self._effective_pack_name}
+
     def _load_gas(self) -> None:
         try:
             from openimcc import load_gas_datapack
@@ -3824,6 +3832,8 @@ def internal_analytical_residue_vapor_pressure(
     include_diagnostic_shadows: bool,
 ) -> Any:
     """Run one direct internal-analytical residue pressure request."""
+    from types import SimpleNamespace
+
     from simulator.engine_cache import cached_engine_call
 
     request = {
@@ -3837,10 +3847,8 @@ def internal_analytical_residue_vapor_pressure(
         "include_diagnostic_shadows": include_diagnostic_shadows,
     }
 
-    return cached_engine_call(
-        "internal-analytical",
-        request,
-        lambda: _internal_analytical_vapor_pressure_adapter(
+    def solve_pressure_cache_value() -> dict[str, Any]:
+        response = _internal_analytical_vapor_pressure_adapter(
             core=core,
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
@@ -3849,8 +3857,15 @@ def internal_analytical_residue_vapor_pressure(
             fO2_log=fO2_log,
             po2_request=po2_request,
             include_diagnostic_shadows=include_diagnostic_shadows,
-        ),
+        )
+        return {"vapor_pressures_Pa": dict(response.vapor_pressures_Pa or {})}
+
+    payload = cached_engine_call(
+        "internal-analytical",
+        request,
+        solve_pressure_cache_value,
     )
+    return SimpleNamespace(vapor_pressures_Pa=payload["vapor_pressures_Pa"])
 
 
 class _InternalAnalyticalBatteryBackend:

@@ -1538,6 +1538,25 @@ class _MELTSBackendSupport(MeltBackend):
             )
         return self._python_api_model
 
+    def _engine_cache_settings(self) -> dict[str, object]:
+        settings: dict[str, object] = {
+            'redox_buffer': self._redox_buffer,
+            'fo2_offset': (
+                float(self._fo2_offset or 0.0)
+                if self._redox_buffer is not None
+                else self._fo2_offset
+            ),
+        }
+        if self._mode == 'python_api':
+            if self._pet_worker is not None:
+                model_code = self._pet_worker._bootstrap_args[0]
+            else:
+                model_code = self._melts_model_code()
+            settings['python_api_model_code'] = int(model_code)
+        else:
+            settings['model'] = self._model
+        return settings
+
     def _find_project_binary(self, engine_root: Path) -> Optional[Path]:
         if not engine_root.exists():
             return None
