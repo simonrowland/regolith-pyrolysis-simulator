@@ -37,6 +37,7 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
     melt_regime,
 )
+from simulator.physical_constants import PA_PER_BAR
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -765,6 +766,69 @@ class EvaporationMixin:
             self, '_melt_headspace_composition_mbar', {}) or {}
         return float(melt_headspace_partials_mbar.get(species, 0.0)) * 100.0
 
+    def _langmuir_overhead_pO2_bar(self) -> float | None:
+        """Upstream headspace O2 partial, in bar.
+
+        The evaporation backpressure reader returns Pa. Dividing by
+        ``PA_PER_BAR`` (1e5 Pa/bar) is the same partial the overhead
+        lower bound compares with the congruent surface. No O2 in the
+        headspace is not a bound.
+        """
+
+        try:
+            partial_pa = float(self._evaporation_bulk_partial_pressure_pa("O2"))
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(partial_pa) or partial_pa <= 0.0:
+            return None
+        return partial_pa / PA_PER_BAR
+
+    def _langmuir_melt_redox_capacity_mol_per_ln_fO2(
+        self,
+        *,
+        temperature_K: float,
+        eval_pO2_bar: float | None,
+        liquid_fraction: Any,
+    ) -> float | None:
+        """d-072 effective redox capacity for the surface-pO2 gate.
+
+        ``C_m_full`` is ``_melt_redox_capacity_mol_per_ln_fO2``:
+        ``(n_Fe / 4) * d(x_Fe3)/d(ln fO2)``, mol per ln fO2. The
+        reservoir's source term is ``C_m_full * liquid_fraction``
+        (``_melt_redox_source_capacity_mol_per_ln_fO2``). The fraction
+        is the one this evaporation step already holds, so the gate
+        does not open a second liquidus query. A missing fraction is
+        left unscaled: treating it as zero would call a buffered melt
+        unbuffered. Pure CaO has ``n_Fe = 0``, so this returns 0.
+        """
+
+        method = getattr(self, "_melt_redox_capacity_mol_per_ln_fO2", None)
+        if (
+            not callable(method)
+            or eval_pO2_bar is None
+            or not math.isfinite(eval_pO2_bar)
+            or eval_pO2_bar <= 0.0
+        ):
+            return None
+        try:
+            capacity = float(method(
+                fO2_log=math.log10(float(eval_pO2_bar)),
+                T_K=float(temperature_K),
+            ))
+        except (TypeError, ValueError, OverflowError):
+            return None
+        if not math.isfinite(capacity):
+            return None
+        if liquid_fraction is None:
+            return capacity
+        try:
+            fraction = float(liquid_fraction)
+        except (TypeError, ValueError):
+            return capacity
+        if math.isfinite(fraction) and 0.0 <= fraction <= 1.0:
+            return capacity * fraction
+        return capacity
+
     def _resolve_evaporation_batch_flux_state(
         self,
         equilibrium: Any,
@@ -787,13 +851,16 @@ class EvaporationMixin:
         shadow) must pass this map so a flagged transitional species is
         priced with its flag instead of dropped from the solved set.
 
-        The returned map is that shared input after one free-surface oxygen
-        balance. Finite cold-train capacity
-        (``_compute_capacity_coupling_shadow_impl``) and live evaporation
-        both price this map. Adjusting only the live path leaves the
-        capacity solve on the persisted melt fO2. ``equilibrium`` vapor
-        pressures stay the mass-action law; the shadow comparison above
-        the balance still checks that provider seam.
+        The returned map is that shared input after the d-376 amendment 1
+        surface closure. The congruent balance runs only when the
+        evaluated pO2 is at the physical floor or the d-072 redox
+        capacity is negligible, and an overhead O2 partial then floors
+        the surface while O2 is net-leaving. Everywhere else the map
+        stays the reservoir / mass-action publication. Finite cold-train
+        capacity (``_compute_capacity_coupling_shadow_impl``) and live
+        evaporation both price this map. ``equilibrium`` vapor pressures
+        stay the mass-action law; the shadow comparison above the
+        closure still checks that provider seam.
         """
         vapor_pressure_diagnostic = dict(
             getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
@@ -833,6 +900,16 @@ class EvaporationMixin:
             del self._last_langmuir_surface_oxygen
         from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
 
+        source_reaction_fO2_bar = vapor_pressure_diagnostic.get(
+            "source_reaction_fO2_bar"
+        )
+        try:
+            eval_pO2_bar = float(source_reaction_fO2_bar)
+        except (TypeError, ValueError):
+            eval_pO2_bar = None
+        else:
+            if not math.isfinite(eval_pO2_bar) or eval_pO2_bar <= 0.0:
+                eval_pO2_bar = None
         langmuir_surface = apply_langmuir_surface_oxygen(
             vapor_pressures,
             temperature_K=temperature_K,
@@ -842,12 +919,20 @@ class EvaporationMixin:
                 )
                 or {}
             ),
-            source_reaction_fO2_bar=vapor_pressure_diagnostic.get(
-                "source_reaction_fO2_bar"
-            ),
+            source_reaction_fO2_bar=source_reaction_fO2_bar,
             transport_pO2_bar=vapor_pressure_diagnostic.get("pO2_bar"),
             legacy_catalog=getattr(self, "vapor_pressures", None),
             compiled_catalog=getattr(self, "vapour_rail_catalog", None),
+            melt_redox_capacity_mol_per_ln_fO2=(
+                self._langmuir_melt_redox_capacity_mol_per_ln_fO2(
+                    temperature_K=temperature_K,
+                    eval_pO2_bar=eval_pO2_bar,
+                    liquid_fraction=getattr(
+                        equilibrium, "liquid_fraction", None
+                    ),
+                )
+            ),
+            overhead_pO2_bar=self._langmuir_overhead_pO2_bar(),
         )
         if langmuir_surface.applied:
             vapor_pressures = dict(langmuir_surface.pressures_Pa)

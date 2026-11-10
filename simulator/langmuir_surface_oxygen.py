@@ -1,21 +1,28 @@
 """Self-consistent surface pO2 for free Langmuir evaporation.
 
 The vapor-pressure provider keeps the mass-action metal pressure at the
-commanded melt fO2, including the b-491 floor inversion. Free evaporation
-into vacuum is a different boundary. This module replaces the flux
-pressure map with one surface pO2 and names the warning. Provider
-equilibrium pressures stay on the mass-action law.
+commanded melt fO2, including the b-491 floor inversion. Provider
+equilibrium pressures stay on that law. This module replaces the flux
+map only for the closure in d-376 amendment 1, and names the warning.
 
-Premise. Free (Langmuir) evaporation does not impose a headspace pO2. The
-surface oxygen potential is the value at which the oxygen atoms leaving in
-the vapor fluxes equal the oxygen atoms removed from the parent oxides.
-The persisted melt fO2 is the mass-action state of the melt, not that
-surface boundary. That includes an ordinary in-band value such as 1e-9 bar.
-Below the certified band, ``p_M = K*a/sqrt(pO2)`` is an uncertified
-extrapolation; in band it is the certified melt state. Neither is the
-free-surface boundary, so both flux maps are re-evaluated at the solved
-surface pO2. A failed root drops only below-band carriers. An in-band
-failure keeps the published pressures and names the warning.
+d-376 amendment 1. Under the d-072 reservoir a melt with redox capacity
+controls its interface pO2. Evaporative oxygen changes that inventory
+through the booked fluxes; it does not reset the surface pO2 on the
+evaporation step. The congruent closure (effusion-weighted
+``J_O2 = 1/2 J_M``) is the surface boundary only when the evaluated
+pO2 is at or below the physical floor, or the melt's effective redox
+capacity is negligible (``C_m ~ 0``). The physical floor is
+``MELT_DISSOCIATION_PO2_MIN_BAR`` (1e-30 bar), the clamp that published
+the unphysical 2.6e13 Pa Ca pressure. Every other in-band evaporation
+keeps the reservoir / mass-action pressures.
+
+Overhead. While that closure has O2 net-leaving, the surface pO2 is
+not set below the overhead pO2. The vacuum root is raised to the
+overhead partial, and the metal pressures follow the same power law
+there.
+
+A failed root drops only below-band carriers. An in-band failure keeps
+the published pressures and names the warning.
 
 Algebra. A carrier published at ``P_pub`` (Pa) and reference ``p_ref``
 (bar), with pressure scaling as ``pO2^n``, is ``P(p) = P_pub*(p/p_ref)^n``
@@ -83,6 +90,9 @@ class LangmuirSurfaceOxygen:
     warning: str | None
     refused_species: Mapping[str, str]
     persisted_pO2_bar_by_species: Mapping[str, float]
+    capacity_negligible: bool = False
+    eval_pO2_below_physical_floor: bool = False
+    overhead_bounded: bool = False
 
     def as_diagnostic(self) -> dict[str, Any]:
         return {
@@ -95,6 +105,11 @@ class LangmuirSurfaceOxygen:
             "persisted_pO2_bar_by_species": dict(
                 self.persisted_pO2_bar_by_species
             ),
+            "capacity_negligible": self.capacity_negligible,
+            "eval_pO2_below_physical_floor": (
+                self.eval_pO2_below_physical_floor
+            ),
+            "overhead_bounded": self.overhead_bounded,
         }
 
 
@@ -108,11 +123,9 @@ class _Carrier:
 
 
 def _needs_surface_balance(carrier: _Carrier) -> bool:
-    """True when this carrier's pressure was published at a melt fO2.
+    """True when this carrier's pressure can move with surface pO2.
 
-    The exponent and the reference pO2 are what the mass-action law used.
-    The certified-band floor is not the gate: 1e-9 bar is still a melt
-    state, and the free-surface root is a different number.
+    Opening the solve is a separate gate (physical floor or ``C_m ~ 0``).
     """
 
     return (
@@ -121,6 +134,69 @@ def _needs_surface_balance(carrier: _Carrier) -> bool:
         and carrier.p_ref_bar is not None
         and carrier.pressure_Pa > 0.0
     )
+
+
+def _eval_pO2_bar(
+    source_reaction_fO2_bar: float | None,
+    carriers: list[_Carrier],
+) -> float | None:
+    """pO2 that published the oxygen-coupled pressures.
+
+    The provider's source-reaction fO2 is that evaluation. If it is
+    missing, the lowest metal-rail reference is the stand-in: that is
+    the pO2 the mass-action law actually used.
+    """
+
+    source = _positive(source_reaction_fO2_bar)
+    if source is not None:
+        return source
+    refs = [
+        carrier.p_ref_bar
+        for carrier in carriers
+        if _needs_surface_balance(carrier) and carrier.p_ref_bar is not None
+    ]
+    if not refs:
+        return None
+    return min(refs)
+
+
+def _capacity_is_negligible(capacity_mol_per_ln_fO2: float | None) -> bool:
+    """True when d-072 has no effective redox buffer (``C_m ~ 0``).
+
+    d-376 amendment 1. The capacity is the d-072 term
+    ``C_m = (n_Fe / 4) * d(x_Fe3)/d(ln fO2) * liquid_fraction``
+    (mol per ln fO2), from ``_melt_redox_capacity_mol_per_ln_fO2``
+    scaled by the liquid fraction the evaporation step already holds.
+    The reservoir integrates ``Δln fO2 = n_O2 / C_m``. At
+    ``C_m <= OXYGEN_RESERVOIR_NOOP_MOL`` (1e-15 mol per ln fO2) that
+    quotient is not a buffer: the same test is ``no_melt_redox_capacity``
+    and the oxygen is not taken up by Fe2+/Fe3+. Pure CaO has
+    ``n_Fe = 0``, so ``C_m = 0`` and this test is true. A missing
+    capacity is not treated as zero: the caller did not show that the
+    buffer is gone.
+    """
+
+    if capacity_mol_per_ln_fO2 is None:
+        return False
+    try:
+        capacity = float(capacity_mol_per_ln_fO2)
+    except (TypeError, ValueError):
+        return False
+    if not math.isfinite(capacity):
+        return False
+    from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL
+
+    return capacity <= float(OXYGEN_RESERVOIR_NOOP_MOL)
+
+
+def _eval_pO2_is_physical_floor(eval_pO2_bar: float | None) -> bool:
+    """True at the b-148 dissociation floor (the 2.6e13 Pa Ca case)."""
+
+    if eval_pO2_bar is None:
+        return False
+    from engines.builtin.vapor_pressure import _pO2_is_melt_dissociation_floor
+
+    return bool(_pO2_is_melt_dissociation_floor(eval_pO2_bar))
 
 
 def apply_langmuir_surface_oxygen(
@@ -132,15 +208,18 @@ def apply_langmuir_surface_oxygen(
     transport_pO2_bar: float | None = None,
     legacy_catalog: Mapping[str, Any] | None = None,
     compiled_catalog: Any | None = None,
+    melt_redox_capacity_mol_per_ln_fO2: float | None = None,
+    overhead_pO2_bar: float | None = None,
 ) -> LangmuirSurfaceOxygen:
-    """Return flux pressures at one self-consistent surface pO2.
+    """Return flux pressures at the d-376 amendment 1 surface pO2.
 
     The caller owns ``pressures_Pa``. This function does not mutate it.
-    A successful root copies the map and rescales every included
-    oxygen-coupled carrier, in band and below it. A failed root, or a
-    lower-bracket pin that is not a root, drops only the below-band
-    carriers and keeps in-band pressures with a warning. Neither path
-    writes a silent 0.
+    The congruent root runs only when ``eval pO2`` is at the physical
+    floor or ``C_m`` is negligible. Otherwise the map is the reservoir /
+    mass-action publication. A successful root copies the map and
+    rescales every included oxygen-coupled carrier, then raises the
+    surface to the overhead pO2 while O2 is net-leaving. A failed root
+    drops only the below-band carriers. Neither path writes a silent 0.
     """
 
     provenance_by_species = provenance_by_species or {}
@@ -174,6 +253,25 @@ def apply_langmuir_surface_oxygen(
             persisted_pO2_bar_by_species=persisted,
         )
 
+    eval_pO2_bar = _eval_pO2_bar(source_reaction_fO2_bar, carriers)
+    below_floor = _eval_pO2_is_physical_floor(eval_pO2_bar)
+    capacity_negligible = _capacity_is_negligible(
+        melt_redox_capacity_mol_per_ln_fO2
+    )
+    # d-376 amendment 1: congruent closure only for the physical floor
+    # or a melt with no effective buffer. A buffered in-band melt keeps
+    # the mass-action map.
+    if not below_floor and not capacity_negligible:
+        return LangmuirSurfaceOxygen(
+            pressures_Pa=pressures_Pa,
+            applied=False,
+            surface_pO2_bar=None,
+            relative_residual=None,
+            warning=None,
+            refused_species={},
+            persisted_pO2_bar_by_species=persisted,
+        )
+
     try:
         temperature = float(temperature_K)
     except (TypeError, ValueError):
@@ -184,6 +282,8 @@ def apply_langmuir_surface_oxygen(
             inverted,
             persisted,
             detail="temperature_K is not finite and positive",
+            capacity_negligible=capacity_negligible,
+            eval_pO2_below_physical_floor=below_floor,
         )
 
     return _solve_or_refuse(
@@ -194,6 +294,9 @@ def apply_langmuir_surface_oxygen(
         temperature_K=temperature,
         rows=legacy,
         legacy_catalog=legacy_catalog,
+        overhead_pO2_bar=overhead_pO2_bar,
+        capacity_negligible=capacity_negligible,
+        eval_pO2_below_physical_floor=below_floor,
     )
 
 
@@ -462,6 +565,35 @@ def _scaled_pressure_Pa(
     return 10.0 ** log_p
 
 
+def _surface_with_overhead_floor(
+    vacuum_pO2_bar: float,
+    o2_flux_mol_m2_s: float,
+    overhead_pO2_bar: float | None,
+) -> tuple[float, bool]:
+    """Raise a net-leaving O2 root up to the overhead partial.
+
+    d-376 amendment 1. The vacuum root is the pO2 where the O2 flux
+    balances the parent oxygen demand against zero overhead. Net O2
+    leaving the surface into an overhead requires
+    ``p_surface >= p_overhead``: a root below that partial would be
+    O2 flowing toward the surface. The bound is that floor. Metal
+    pressures then follow ``P = P_pub * (p / p_ref)^n`` at the floored
+    p. The reported residual stays the vacuum root's residual; the
+    overhead is a bound, not a second root. ``o2_flux`` is mol m^-2 s^-1
+    and both pressures are bar.
+    """
+
+    overhead = _positive(overhead_pO2_bar)
+    if (
+        overhead is None
+        or overhead <= vacuum_pO2_bar
+        or not math.isfinite(o2_flux_mol_m2_s)
+        or o2_flux_mol_m2_s <= 0.0
+    ):
+        return vacuum_pO2_bar, False
+    return overhead, True
+
+
 def _solve_or_refuse(
     pressures_Pa: Mapping[str, float],
     *,
@@ -471,6 +603,9 @@ def _solve_or_refuse(
     temperature_K: float,
     rows: Mapping[str, Any],
     legacy_catalog: Mapping[str, Any] | None,
+    overhead_pO2_bar: float | None = None,
+    capacity_negligible: bool = False,
+    eval_pO2_below_physical_floor: bool = False,
 ) -> LangmuirSurfaceOxygen:
     registry = _formula_registry(rows)
     from simulator.evaporation import (
@@ -546,6 +681,8 @@ def _solve_or_refuse(
             persisted,
             detail="no oxygen-coupled carrier could enter the balance",
             extra_refused=refused,
+            capacity_negligible=capacity_negligible,
+            eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         )
 
     o2_formula = parse_formula("O2")
@@ -599,6 +736,8 @@ def _solve_or_refuse(
             persisted,
             detail=str(exc),
             extra_refused=refused,
+            capacity_negligible=capacity_negligible,
+            eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         )
 
     residual = float(balance.relative_residual)
@@ -618,33 +757,66 @@ def _solve_or_refuse(
                 f"bracket={balance.bracket_boundary})"
             ),
             extra_refused=refused,
+            capacity_negligible=capacity_negligible,
+            eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         )
 
+    surface_pO2_bar, overhead_bounded = _surface_with_overhead_floor(
+        float(balance.pO2_bar),
+        float(balance.channel_fluxes_mol_m2_s.get("O2", 0.0) or 0.0),
+        overhead_pO2_bar,
+    )
     adjusted = dict(pressures_Pa)
     for species in refused:
         adjusted.pop(species, None)
-    for carrier in coupled:
-        if carrier.species in refused or carrier.exponent is None:
-            continue
-        solved = balance.pressures_Pa.get(carrier.species)
-        if solved is None:
-            continue
-        adjusted[carrier.species] = float(solved)
+    try:
+        for carrier in coupled:
+            if carrier.species in refused or carrier.exponent is None:
+                continue
+            if carrier.p_ref_bar is None:
+                continue
+            if overhead_bounded:
+                adjusted[carrier.species] = _scaled_pressure_Pa(
+                    carrier.pressure_Pa,
+                    carrier.exponent,
+                    carrier.p_ref_bar,
+                    surface_pO2_bar,
+                )
+                continue
+            solved = balance.pressures_Pa.get(carrier.species)
+            if solved is None:
+                continue
+            adjusted[carrier.species] = float(solved)
+    except ValueError as exc:
+        return _refuse_inverted(
+            pressures_Pa,
+            inverted,
+            persisted,
+            detail=str(exc),
+            extra_refused=refused,
+            capacity_negligible=capacity_negligible,
+            eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
+        )
     warning = (
         f"{LANGMUIR_SURFACE_PO2_REASON}: "
-        f"surface_pO2_bar={balance.pO2_bar:.6e} "
+        f"surface_pO2_bar={surface_pO2_bar:.6e} "
         f"relative_residual={residual:.3e}"
     )
+    if overhead_bounded:
+        warning += f" overhead_pO2_bar={surface_pO2_bar:.6e}"
     if refused:
         warning += " refused=" + ",".join(sorted(refused))
     return LangmuirSurfaceOxygen(
         pressures_Pa=adjusted,
         applied=True,
-        surface_pO2_bar=float(balance.pO2_bar),
+        surface_pO2_bar=surface_pO2_bar,
         relative_residual=residual,
         warning=warning,
         refused_species=dict(refused),
         persisted_pO2_bar_by_species=dict(persisted),
+        capacity_negligible=capacity_negligible,
+        eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
+        overhead_bounded=overhead_bounded,
     )
 
 
@@ -655,6 +827,8 @@ def _refuse_inverted(
     *,
     detail: str,
     extra_refused: Mapping[str, str] | None = None,
+    capacity_negligible: bool = False,
+    eval_pO2_below_physical_floor: bool = False,
 ) -> LangmuirSurfaceOxygen:
     refused = {
         carrier.species: (
@@ -682,4 +856,6 @@ def _refuse_inverted(
         warning=warning,
         refused_species=refused,
         persisted_pO2_bar_by_species=dict(persisted),
+        capacity_negligible=capacity_negligible,
+        eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
     )
