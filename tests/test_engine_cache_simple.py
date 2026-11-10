@@ -198,7 +198,7 @@ def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
     }
 
 
-def test_equilibrium_hot_value_contains_only_battery_consumed_fields() -> None:
+def test_equilibrium_hot_value_contains_only_scoring_inputs() -> None:
     result = EquilibriumResult(
         temperature_C=1000.0,
         pressure_bar=1.0,
@@ -229,25 +229,27 @@ def test_equilibrium_hot_value_contains_only_battery_consumed_fields() -> None:
         "vapor_pressures_Pa",
         "vapor_pressures_source",
         "activity_coefficients",
-        "warnings",
         "status",
-        "diagnostics",
         "reported_activity_coefficients",
         "activity_coefficient_details",
         "vaporock_full_speciation_Pa",
-        "imcc_notices",
-        "imcc_model_id",
         "liquid_composition_wt_pct",
         "fe_redox_split",
     }
     assert "phase_masses_kg" in value.cold
     assert "temperature_C" in value.cold
-    assert value.hot["diagnostics"] == {"backend_status_reason": "fixture-code"}
-    assert value.cold["diagnostics"] == {"unused": "large"}
+    assert "diagnostics" in value.cold
+    assert value.cold["diagnostics"] == {
+        "backend_status_reason": "fixture-code",
+        "unused": "large",
+    }
+    assert "warnings" in value.cold
+    assert "imcc_notices" in value.cold
+    assert "imcc_model_id" in value.cold
     restored = EquilibriumResult.from_engine_cache_value(value.hot)
     assert restored.activity_coefficients == result.activity_coefficients
     assert restored.vapor_pressures_Pa == result.vapor_pressures_Pa
-    assert restored.diagnostics == {"backend_status_reason": "fixture-code"}
+    assert restored.diagnostics == {}
     assert restored.phase_masses_kg == {}
 
 
