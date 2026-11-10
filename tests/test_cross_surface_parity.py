@@ -172,20 +172,20 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     for account in OPTIONAL_PRODUCT_ACCOUNTS:
         assert len({account in surface.ledger for surface in surfaces}) == 1
     assert "Fe" in batch.ledger["process.condensation_train"]
-    # d-320 approved the Cr move from offgas into Stage 2. The Stage-2
-    # midpoint is still undersaturated (P_sat(Cr) = 0.28857 Pa at 1200 C;
-    # this drive's p_Cr stays at or below 0.19365 Pa), but band-integrated
-    # capture (85fedcb8e) condenses Cr on the colder strips. The midpoint
-    # exclusion written at bf8560703 described the pre-band model. Batch,
-    # CLI, and web carry the same captured Cr; the ledger comparison below
-    # checks the rest of the routing. Some Cr remains in terminal offgas.
-    cr_mol = {
-        surface.name: surface.ledger["process.condensation_train"]["Cr"]
+    # This upper-bound/null-feed trajectory is physically undersaturated for
+    # atomic Cr: local p_Cr <= 0.02854 Pa, sampled P_sat >= 0.03914 Pa.
+    # Oxide capture still occurs. _ledger_from_simulator checks Cr atom
+    # conservation on every surface; compare the oxide channel explicitly
+    # here and every species/account in the full ledger comparison below.
+    for surface in surfaces:
+        assert "Cr" not in surface.ledger["process.condensation_train"]
+    cr_oxide_mol = {
+        surface.name: surface.ledger["terminal.chromium_condensed_oxide_stored"]["Cr2O3"]
         for surface in surfaces
     }
-    assert set(cr_mol) == {"batch", "cli", "web"}
-    assert min(cr_mol.values()) > 0.0
-    assert max(cr_mol.values()) - min(cr_mol.values()) <= LEDGER_TOLERANCE_MOL
+    assert set(cr_oxide_mol) == {"batch", "cli", "web"}
+    assert min(cr_oxide_mol.values()) > 0.0
+    assert max(cr_oxide_mol.values()) - min(cr_oxide_mol.values()) <= LEDGER_TOLERANCE_MOL
     # SiO wall saturation is outside its source-certified range on this drive,
     # so the typed pass-through remains terminal offgas rather than fabricating
     # a condensed Si product. All three surfaces must preserve that routing.
@@ -460,6 +460,8 @@ def _install_stepwise_web(monkeypatch) -> StepwiseWebDriver:
 
 
 def _ledger_from_simulator(sim) -> dict[str, dict[str, float]]:
+    drift = sim.atom_ledger.element_atom_drift_report()
+    assert abs(drift["whole_run_boundary_residual_mol_atoms"]["Cr"]) <= LEDGER_TOLERANCE_MOL
     balances = sim.atom_ledger.mol_by_account()
     return {
         account: {
