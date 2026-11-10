@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import subprocess
 import sys
 import tarfile
@@ -58,6 +59,10 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
         "run_metadata": {
             "feedstock_id": "mare-basalt-test",
             "backend": "internal-analytical",
+            "activity_sources": {
+                "melt_activity": ["openimcc"],
+                "vapour": ["openimcc"],
+            },
             "engines_used": {
                 "active": {
                     "fe_redox_respeciation": "redox-provider",
@@ -112,7 +117,7 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
             observation_id="fe-flagged",
             engine="internal-analytical",
             species="Fe",
-            temperature_K=420,
+            temperature_K=550,
             fO2_Pa=1.5,
             residual=100.0,
             flagged=True,
@@ -203,6 +208,8 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
     hero_path = tmp_path / "hero-run.json"
     hero_path.write_text(json.dumps(hero_report))
     out = tmp_path / "priorities.md"
+    environment = os.environ.copy()
+    environment.pop("PYTHONPATH", None)
 
     completed = subprocess.run(
         [
@@ -218,6 +225,7 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
         capture_output=True,
         text=True,
         check=False,
+        env=environment,
     )
 
     assert completed.returncode == 0, completed.stderr
@@ -238,6 +246,7 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
     ]
     iron, iron_oxide, silica = groups
     assert iron["n"] == 2
+    assert iron["unit"] == "dex"
     assert iron["rms"] == pytest.approx(math.sqrt(12.5))
     assert iron["median"] == pytest.approx(3.5)
     assert iron["bias"] == pytest.approx(3.5)
@@ -253,5 +262,7 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
     assert silica["rms"] == pytest.approx(math.sqrt(1.25))
     assert silica["median"] == pytest.approx(-0.5)
     assert silica["bias"] == pytest.approx(-0.5)
-    assert "Fe" in out.read_text()
-    assert out.read_text().index("Fe") < out.read_text().index("SiO")
+    markdown = out.read_text()
+    assert "| 1 | vapour | Fe | internal-analytical |" in markdown
+    assert "| 2 | melt_activity | FeO | openimcc |" in markdown
+    assert "| 3 | vapour | SiO | openimcc |" in markdown
