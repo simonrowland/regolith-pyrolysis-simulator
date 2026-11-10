@@ -961,9 +961,11 @@ def test_evaporation_healthy_empty_batch_at_900c_keeps_cheap_zero() -> None:
 # species is a computed debit or a selected outcome that authorizes zero
 # (dormant epoch, upper bound, zero-by-physics). Refusal, incomplete,
 # missing, and invalid selected pressures are typed refusals of that empty
-# flux. A numeric catalog pressure does not authorize the zero. The sub-1050 C
-# physical-zero shortcut and the below-400 K kinetic floor both go through
-# that one rule.
+# flux above the kinetic floor. A numeric catalog pressure does not
+# authorize the zero. The below-400 K kinetic floor is a legitimate empty
+# flux even when a channel is refused, because the kernel did not evaluate.
+# The sub-1050 C physical zero still requires every selected outcome to
+# authorize zero.
 # Kernel-seam carriers, the non-seam tripwire carriers, and the sibling that
 # rides the 900 C Fe batch. Kept literal here because those sets are defined
 # later in this module; the coverage test pins the equality.
@@ -1180,8 +1182,9 @@ def test_empty_flux_refuses_every_nonauthorizing_selected_outcome(
 ) -> None:
     """A dormant catalog Pa or an empty backend map cannot hide a bad selection.
 
-    Fails while the sub-1050 C shortcut or the below-400 K floor returns an
-    empty flux for this shape.
+    Above the kinetic floor, this fails while the sub-1050 C shortcut returns
+    an empty flux for this shape. On the below-400 K floor the kernel did not
+    evaluate, so the empty flux is authorized.
     """
 
     outcome, reason, overlay = _run_empty_backend(
@@ -1194,6 +1197,10 @@ def test_empty_flux_refuses_every_nonauthorizing_selected_outcome(
     if shape == "refusal_beside_authorizing_peer":
         assert states.get(_AUTHORIZING_PEER) == "dormant_by_epoch"
         assert _AUTHORIZING_PEER in (overlay.get("batch_pa_by_species") or {})
+    if kinetic_floor:
+        assert outcome == "returned", (species_id, shape, temperature_C, reason)
+        assert reason == "internal_analytical_below_400K"
+        return
     assert outcome == "refused", (species_id, shape, temperature_C, reason)
     assert reason == "vapour_batch_no_debiting_pressure_outcome"
     assert reason != "pre_rg_backend_below_effective_pressure_threshold"
@@ -1456,7 +1463,10 @@ def test_authorizer_blocks_every_nonauthorizing_state(
     catalog_pressure_present: bool,
     physical_zero_reason: str | None,
 ) -> None:
-    """The zero gate reads selected outcomes, not catalog Pa or temperature."""
+    """Above the kinetic floor the zero gate reads selected outcomes.
+
+    The below-400 K floor authorizes before those outcomes are read.
+    """
 
     result = _authorize_empty_species_flux(
         {"Fe": state, "Na": "dormant_by_epoch"},
@@ -1464,15 +1474,16 @@ def test_authorizer_blocks_every_nonauthorizing_state(
         physical_zero_reason=physical_zero_reason,
         catalog_pressure_present=catalog_pressure_present,
     )
+    if kinetic_floor:
+        assert result == ("kinetic_floor", "internal_analytical_below_400K")
+        return
     authorizes = state in _EMPTY_FLUX_AUTHORIZING_STATES
     if not authorizes:
         assert result is None
         return
     assert result is not None
     kind, reason = result
-    if kinetic_floor:
-        assert (kind, reason) == ("kinetic_floor", "internal_analytical_below_400K")
-    elif physical_zero_reason and catalog_pressure_present:
+    if physical_zero_reason and catalog_pressure_present:
         assert (kind, reason) == ("physical_zero", physical_zero_reason)
     else:
         # A dormant peer keeps an all-zero-by-physics map from taking that token.

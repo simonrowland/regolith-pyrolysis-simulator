@@ -4116,7 +4116,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             # root=(K*a_oxide**n_ox/fO2_bar)**(1/n_M). FeO keeps the transport
             # denominator selected above; the arithmetic is
             # ellingham_metal_equilibrium_pressure_Pa. A non-positive numerator
-            # omits this species. It is not a provider abort and it is not a
+            # omits this species. So does a ValueError from this call (missing
+            # pure-component pressure when the Antoine sidecar underflows, or
+            # any other per-species input the rail will not invent). One
+            # carrier is omitted. It is not a provider abort and it is not a
             # dormant pseudo-Antoine.
             try:
                 (
@@ -4134,7 +4137,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     metal_phase_kind=metal_phase_kind,
                     pure_pressure_Pa=P_reference_Pa,
                 )
-            except _EllinghamNumeratorOmission:
+            except (_EllinghamNumeratorOmission, ValueError):
                 continue
             if _publishes_vapor_pressure(
                 P_eq_Pa,

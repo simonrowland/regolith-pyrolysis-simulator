@@ -9905,12 +9905,12 @@ entries:
   since: '2026-08-05'
 - element: H
   carrier: H2O
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: end-to-end Stage-0 source debit and terminal.offgas credit proof for the catalog carrier
   filed: fix-vapour-rail
   since: '2026-08-28'
-  note: C1-C4 are structurally executable through the catalog H2O row; current conformance source accounts commit no H2O carrier, so C5 remains open.
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: H
   carrier: H2O2
   contract: C1-C5
@@ -14502,224 +14502,200 @@ entries:
   since: '2026-08-04'
 - element: C
   carrier: C2H5OH
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: catalog carries t425-grounded Antoine coefficients for this carrier
-    (prior thermo_missing label was stale); C1-C4 structural, C5 Stage-0 committed-credit proof pending.'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: C
   carrier: C2H6
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
   since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: C
   carrier: CH3COOH
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: catalog carries t425-grounded Antoine coefficients for this carrier
-    (prior thermo_missing label was stale); C1-C4 structural, C5 Stage-0 committed-credit proof pending.'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: C
   carrier: COS
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
   since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: C
   carrier: CS2
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
   since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: C
   carrier: HCHO
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: catalog carries t425-grounded Antoine coefficients for this carrier
-    (prior thermo_missing label was stale); C1-C4 structural, C5 Stage-0 committed-credit proof pending.'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: C
   carrier: HCN
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: C
   carrier: HNCO
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
   since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: Ca
   carrier: CaCl2
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: Cl
   carrier: CaCl2
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: Cl
   carrier: Cl2
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: Cl
   carrier: HCl
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: H
   carrier: C2H5OH
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: catalog carries t425-grounded Antoine coefficients for this carrier
-    (prior thermo_missing label was stale); C1-C4 structural, C5 Stage-0 committed-credit proof pending.'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: H
   carrier: C2H6
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
   since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: H
   carrier: CH3COOH
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: catalog carries t425-grounded Antoine coefficients for this carrier
-    (prior thermo_missing label was stale); C1-C4 structural, C5 Stage-0 committed-credit proof pending.'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: H
   carrier: H2S
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: H
   carrier: HCHO
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: executable gas pressure thermochemistry or correlation for catalog carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: catalog carries t425-grounded Antoine coefficients for this carrier
-    (prior thermo_missing label was stale); C1-C4 structural, C5 Stage-0 committed-credit proof pending.'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: H
   carrier: HCN
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: H
   carrier: HCl
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: H
   carrier: HNCO
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: batch-merge-cx
   since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: N
   carrier: HCN
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   disposition: NEEDS-BASE
   missing: 'NEEDS-TRIAGE-MANUAL: multi-primary carrier needs coupled reservoir / activity policy; primary=[''C'', ''N'']; no exact condensed formula'
   filed: mc4b-wave1
   since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: N
   carrier: HNCO
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   disposition: NEEDS-BASE
   missing: 'NEEDS-TRIAGE-MANUAL: multi-primary carrier needs coupled reservoir / activity policy; primary=[''C'', ''N'']; no exact condensed formula'
   filed: mc4b-wave1
   since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: catalog carries t425-grounded Antoine coefficients for this carrier
-    (prior thermo_missing label was stale); C1-C4 structural, C5 Stage-0 committed-credit proof pending.'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: S
   carrier: COS
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   disposition: NEEDS-BASE
   missing: 'NEEDS-TRIAGE-MANUAL: multi-primary carrier needs coupled reservoir / activity policy; primary=[''C'', ''S'']; no exact condensed formula'
   filed: mc4b-wave1
   since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: S
   carrier: CS2
-  contract: C5
+  contract: C1-C5
   reason: acquisition-pending
   disposition: NEEDS-BASE
   missing: 'NEEDS-TRIAGE-MANUAL: multi-primary carrier needs coupled reservoir / activity policy; primary=[''C'', ''S'']; no exact condensed formula'
   filed: mc4b-wave1
   since: '2026-08-05'
-  note: '2026-08-05 MC-4 integration: C1-C4 structural contracts satisfied by the wave-1 composition;
-    C5 remains -- Stage-0 committed-credit proof pending (wave-1B standard).'
+  note: 'b-114: broad-proxy alpha is not an intrinsic coefficient, so the C1 alpha contract is open.'
 - element: P
   carrier: P2O5_gas
   contract: C1-C5
@@ -14727,3 +14703,82 @@ entries:
   missing: catalog row plus executable P(T,pO2,activity) evaluator for thermo-present carrier; needs_triage
   filed: tddharness-seed
   since: '2026-08-04'
+- element: C
+  carrier: CH4
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: broad-proxy evaporation alpha is not an intrinsic coefficient and the carrier is outside the shipped alpha=1 fallback allowlist
+  filed: b-114
+  since: '2026-11-10'
+
+- element: C
+  carrier: CO
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: broad-proxy evaporation alpha is not an intrinsic coefficient and the carrier is outside the shipped alpha=1 fallback allowlist
+  filed: b-114
+  since: '2026-11-10'
+
+- element: C
+  carrier: CO2
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: broad-proxy evaporation alpha is not an intrinsic coefficient and the carrier is outside the shipped alpha=1 fallback allowlist
+  filed: b-114
+  since: '2026-11-10'
+
+- element: Cl
+  carrier: KCl
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: broad-proxy evaporation alpha is not an intrinsic coefficient and the carrier is outside the shipped alpha=1 fallback allowlist
+  filed: b-114
+  since: '2026-11-10'
+
+- element: Cl
+  carrier: NaCl
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: broad-proxy evaporation alpha is not an intrinsic coefficient and the carrier is outside the shipped alpha=1 fallback allowlist
+  filed: b-114
+  since: '2026-11-10'
+
+- element: H
+  carrier: CH4
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: broad-proxy evaporation alpha is not an intrinsic coefficient and the carrier is outside the shipped alpha=1 fallback allowlist
+  filed: b-114
+  since: '2026-11-10'
+
+- element: H
+  carrier: NH3
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: broad-proxy evaporation alpha is not an intrinsic coefficient and the carrier is outside the shipped alpha=1 fallback allowlist
+  filed: b-114
+  since: '2026-11-10'
+
+- element: K
+  carrier: KCl
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: broad-proxy evaporation alpha is not an intrinsic coefficient and the carrier is outside the shipped alpha=1 fallback allowlist
+  filed: b-114
+  since: '2026-11-10'
+
+- element: N
+  carrier: NH3
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: broad-proxy evaporation alpha is not an intrinsic coefficient and the carrier is outside the shipped alpha=1 fallback allowlist
+  filed: b-114
+  since: '2026-11-10'
+
+- element: Na
+  carrier: NaCl
+  contract: C1-C5
+  reason: acquisition-pending
+  missing: broad-proxy evaporation alpha is not an intrinsic coefficient and the carrier is outside the shipped alpha=1 fallback allowlist
+  filed: b-114
+  since: '2026-11-10'

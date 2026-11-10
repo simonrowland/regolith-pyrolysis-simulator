@@ -861,25 +861,27 @@ def _authorize_empty_species_flux(
 ) -> tuple[str, str] | None:
     """Return ``(kind, reason)`` or None when the empty flux must be refused.
 
-    Invariant: no requested species is a silent 0.0. When any species is
-    present, every selected outcome must be dormant-by-epoch, an upper
-    bound, or zero-by-physics. Refusal, incomplete, missing, and invalid
-    selected pressures block every empty-flux return, including the
-    sub-1050 C physical zero and the below-400 K kinetic floor. A numeric
-    catalog pressure does not authorize the zero. No species present does
-    not block; one of the typed proofs below is still required.
+    Invariant: no requested species is a silent 0.0. The below-400 K kinetic
+    floor is a legitimate empty flux. The kernel did not evaluate on that
+    tick, so a catalog refusal there is not a debit and must not abort the
+    run. Above that floor, every selected outcome must be dormant-by-epoch,
+    an upper bound, or zero-by-physics before an empty flux returns.
+    Refusal, incomplete, missing, and invalid selected pressures still block
+    the sub-1050 C physical zero and the hot typed-non-debit return. A
+    numeric catalog pressure does not authorize the zero. No species present
+    does not block; one of the typed proofs below is still required.
 
     This is the only authorization for an empty species flux. Callers must
     not return that flux on a second predicate.
     """
 
+    if kinetic_floor:
+        return ('kinetic_floor', _EMPTY_FLUX_KINETIC_FLOOR)
     if channel_states and any(
         state not in _EMPTY_FLUX_AUTHORIZING_STATES
         for state in channel_states.values()
     ):
         return None
-    if kinetic_floor:
-        return ('kinetic_floor', _EMPTY_FLUX_KINETIC_FLOOR)
     if physical_zero_reason and catalog_pressure_present:
         return ('physical_zero', str(physical_zero_reason))
     if channel_states and all(
@@ -1185,10 +1187,10 @@ class EvaporationMixin:
             return flux
 
         if not vapor_pressures:
-            # One chokepoint. The kinetic floor, the sub-1050 C physical
-            # zero, and the typed non-debit return all use its token.
-            # Catalog batch_pa_by_species is coverage evidence only after
-            # every selected outcome authorizes the zero.
+            # One chokepoint. The kinetic floor authorizes before channel
+            # states are read: a cold tick has no kernel debit. Above that
+            # floor, catalog batch_pa_by_species is coverage evidence only
+            # after every selected outcome authorizes the zero.
             channel_states = dict(
                 flux_overlay_report.get('batch_channel_states', {}) or {}
             )
