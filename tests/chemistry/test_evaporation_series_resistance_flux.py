@@ -1362,6 +1362,29 @@ def test_scalar_closure_counts_source_and_projection_evaluations():
     )
 
 
+def test_scalar_closure_finds_root_before_admission_cutoff():
+    # A finite outlet gives P=sqrt(n), while the source gives n=1/(1+g).
+    # Thus n+sqrt(n)=1 has n=0.38196601125, well above the 0.1 cutoff.
+    # A coarse logarithmic scan jumps from positive residual to a discarded
+    # tail. That admission zero is not a proof that the positive root is absent.
+    def rate(g, _pressure):
+        value = 1.0 / (1.0 + g)
+        return {"Na": value if value > 0.1 else 0.0}
+
+    result = _solve_same_hour_headspace_closure(
+        {"Na": 1.0}, rate,
+        lambda rates: {"Na": math.sqrt(rates["Na"]) / 100.0},
+        {"Na": 1.0},
+    )
+
+    assert result.converged, result.as_diagnostic()
+    assert result.rates_kg_hr["Na"] == pytest.approx(0.3819660112501051)
+    assert result.partial_pressures_mbar["Na"] * 100.0 == pytest.approx(
+        math.sqrt(result.rates_kg_hr["Na"])
+    )
+    assert result.iterations <= 200
+
+
 def test_native_fe_closure_uses_pressure_held_zero_boundary(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
