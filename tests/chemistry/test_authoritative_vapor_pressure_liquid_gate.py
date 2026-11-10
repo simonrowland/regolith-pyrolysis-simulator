@@ -13,6 +13,7 @@ from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
     FluxEligible,
     FluxActivationContext,
+    FluxRefusal,
     PressureValue,
     VapourAnswer,
     VapourBatch,
@@ -369,7 +370,7 @@ def test_subthreshold_empty_vapor_pressures_remain_physical_zero():
     assert flux.total_kg_hr == 0.0
 
 
-def test_pre_rg_subthreshold_effective_source_zero_requires_answered_batch():
+def test_pre_rg_subthreshold_empty_source_does_not_hide_flux_refusal():
     sim = types.SimpleNamespace(
         melt=types.SimpleNamespace(temperature_C=500.0),
         setpoints={},
@@ -387,13 +388,14 @@ def test_pre_rg_subthreshold_effective_source_zero_requires_answered_batch():
                 species_id='K',
                 pressure=pressure,
                 selected_runtime_pressure=pressure,
-                flux=FluxEligible(alpha_ref='test:K'),
+                flux=FluxRefusal(code='test_refusal', detail='refused'),
                 source_label='test',
                 formula_id='K',
                 source_account='process.cleaned_melt',
                 solve_group_id='test:K',
                 state_fingerprint='test',
                 validation_status='validated',
+                refusal_code='test_refusal',
             )
         },
         flux_active_species_ids=frozenset(),
@@ -413,13 +415,14 @@ def test_pre_rg_subthreshold_effective_source_zero_requires_answered_batch():
         status='ok',
     )
 
-    flux = PyrolysisSimulator._calculate_evaporation(sim, result)
-
-    assert flux.species_kg_hr == {}
-    assert flux.total_kg_hr == 0.0
+    with pytest.raises(
+        EvaporationFluxRefusal,
+        match='vapour_batch_no_debiting_pressure_outcome',
+    ):
+        PyrolysisSimulator._calculate_evaporation(sim, result)
     assert sim._last_vapour_batch_flux_overlay[
         'effective_pressure_zero_reason'
-    ] == 'pre_rg_backend_below_effective_pressure_threshold'
+    ] is None
 
 
 @pytest.mark.parametrize('simulation_hour', [None, 37])
