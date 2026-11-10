@@ -683,7 +683,7 @@ def test_core_carrier_normalizer_preserves_legacy_edge_behavior(
     assert str(exc_info.value) == error_message
 
 
-def test_assess_continuum_validity_refuses_nan_but_keeps_true_vacuum_in_domain():
+def test_assess_continuum_validity_refuses_invalid_kn_but_keeps_true_vacuum():
     """b-275: the assessor must VALIDATE its input, not just partition the valid domain.
 
     Historical defect: ``_knudsen_is_transitional`` answers ``False`` for any
@@ -708,6 +708,13 @@ def test_assess_continuum_validity_refuses_nan_but_keeps_true_vacuum_in_domain()
     assert nan_case.action is tr.ContinuumValidityAction.REFUSE
     assert nan_case.in_domain is False
     assert "invalid_knudsen_number" in nan_case.detail
+
+    zero_case = tr.assess_continuum_formula_validity(
+        0.0, campaign_name="C4", asking_site="tests.b275.zero"
+    )
+    assert zero_case.action is tr.ContinuumValidityAction.REFUSE
+    assert zero_case.in_domain is False
+    assert "invalid_knudsen_number" in zero_case.detail
 
     negative_case = tr.assess_continuum_formula_validity(
         -1.0, campaign_name="C4", asking_site="tests.b275.negative"

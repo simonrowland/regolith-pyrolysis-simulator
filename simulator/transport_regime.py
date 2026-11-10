@@ -258,7 +258,7 @@ class ContinuumFormulaValidity:
 
 def _knudsen_is_transitional(knudsen_number: float) -> bool:
     kn = float(knudsen_number)
-    if not math.isfinite(kn):
+    if math.isnan(kn) or math.isinf(kn):
         return False
     return VISCOUS_KNUDSEN_MAX <= kn < FREE_MOLECULAR_KNUDSEN_MIN
 
@@ -301,14 +301,13 @@ def assess_continuum_formula_validity(
     # NaN is MISSING INPUT and must refuse. POSITIVE INFINITY IS NOT: Kn = lambda/L
     # -> +inf is the mean free path dwarfing the pipe, i.e. true vacuum and the
     # free-molecular limit -- a DETERMINED physical state and the mandate's own
-    # baseline regime. `not math.isfinite(kn)` cannot tell them apart, which is
-    # why this asks the two questions separately, matching `classify_knudsen_regime`
-    # below (the one idiom in this file that already had it right).
+    # baseline regime. The assessor rejects NaN and lets +inf reach its valid
+    # free-molecular branch; checks that require bounded Kn values reject
+    # infinity explicitly.
     #
-    # Kn == 0 is left in-domain here to match classify_knudsen_regime's `< 0.0`.
-    # Note the file is NOT unanimous: the evaporation-side guard refuses `<= 0.0`.
-    # That disagreement is real and is deliberately not resolved by this change.
-    if math.isnan(kn) or kn < 0.0:
+    # Kn is a ratio of positive lengths and must itself be positive. Positive
+    # infinity remains valid: it represents the true-vacuum free-molecular limit.
+    if math.isnan(kn) or kn <= 0.0:
         return ContinuumFormulaValidity(
             action=ContinuumValidityAction.REFUSE,
             process_regime=regime,
@@ -320,7 +319,7 @@ def assess_continuum_formula_validity(
             load_bearing=load_bearing,
             note=None,
             detail=(
-                "invalid_knudsen_number: Kn must not be NaN or negative; "
+                "invalid_knudsen_number: Kn must be positive and not NaN; "
                 f"received {kn!r}"
             ),
         )
@@ -523,6 +522,8 @@ def _require_free_molecular_knudsen(
             "invalid_knudsen_number",
             "Kn must not be NaN or negative; +inf is the free-molecular limit",
         )
+    if math.isinf(knudsen_number):
+        return knudsen_number
     if knudsen_number < FREE_MOLECULAR_KNUDSEN_MIN:
         _refuse(
             category,
@@ -537,7 +538,11 @@ def _require_transitional_knudsen(
     allow_near_viscous_cross_check: bool = False,
 ) -> float:
     knudsen_number = float(knudsen_number)
-    if not math.isfinite(knudsen_number) or knudsen_number <= 0.0:
+    if (
+        math.isnan(knudsen_number)
+        or math.isinf(knudsen_number)
+        or knudsen_number <= 0.0
+    ):
         _refuse("invalid_knudsen_number", "Kn must be finite and > 0")
     lower_ok = knudsen_number >= VISCOUS_KNUDSEN_MAX
     near_viscous_ok = (
