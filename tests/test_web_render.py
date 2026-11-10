@@ -495,21 +495,18 @@ def test_product_ledger_preserves_incomplete_story_status():
     assert rendered["text"]["product-ledger-state"] == "incomplete"
 
 
-def test_oxygen_out_renders_d364_flagged_zero_notice():
+def test_oxygen_out_renders_d367_flagged_estimate_notice():
     html = app_module.create_app().test_client().get("/").get_data(as_text=True)
     reason = (
-        "Flagged structural 0.0 kg: stored, vented, and captured O2 ledger "
-        "entries are all 0.0 kg. Class B activity ladder: refusals cite "
+        "Interim best estimate from flagged vapor contributions. Class B: "
         "missing_evidence (no assemblage/potential evidence; Henrian upper "
-        "bound disabled); do not treat a=1 as an upper bound when gamma>1; "
-        "use provider activity, then published gamma*x, then ideal-mixing "
-        "a=x as an extrapolated estimate; SiO activity 0.436 lacks its "
-        "evidence link. Class C: MnO_gas is outside its certified "
-        "1519-2273 K evaluator band; conservative continuation is not "
-        "admitted, so use flagged extrapolation. Class E: the stage0_only "
-        "predicate is inactive outside Stage 0 for P4O10/P4O6/PO/PO2 while "
-        "P2O5 is present; use phase-independent K or flag out-of-domain. "
-        "Pending d-359 follow-ups: B, C, E."
+        "bound disabled); use provider activity, published gamma*x, then "
+        "ideal a=x with ideal_mixing_assumption. Class C: "
+        "outside_declared_evaluator_domain for MnO_gas at 313.15 K; "
+        "continuation is outside the certified 1519-2273 K band. Class E: "
+        "stage0_only predicate inactive outside Stage 0; P4O10/P4O6/PO/PO2 "
+        "computed from phase-independent K while P2O5 is present. Pending "
+        "d-359 follow-ups: B, C, E."
     )
     rendered = _render_advisory_dom(
         html=html,
@@ -517,8 +514,8 @@ def test_oxygen_out_renders_d364_flagged_zero_notice():
         payload={
             "product_story": {
                 "oxygen": {
-                    "class_total_kg": 0.0,
-                    "O2_kg": 0.0,
+                    "class_total_kg": 1.25,
+                    "O2_kg": 1.25,
                     "status": "partial",
                     "availability_flag": {
                         "status": "flagged prediction",

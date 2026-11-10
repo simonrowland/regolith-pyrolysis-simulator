@@ -749,6 +749,34 @@ def test_stage0_p_markers_activate_only_p2o5_sourced_rules() -> None:
         assert non_p_batch.channel("NaCl").extra["applicability_evidence"]["flux_dormant"] is True
 
 
+def test_d359_p_carrier_uses_phase_independent_k_in_c2_hot_train() -> None:
+    rule = replace(
+        _selector_rule("P4O6"),
+        parent_species_ids=frozenset({"P2O5"}),
+        required_source_atoms=frozenset({"P", "O"}),
+        applicability_predicate="stage0_only",
+    )
+    state = VapourResolveState(
+        temperature_K=1800.0,
+        process_phase="hot_train",
+        stage="evaporation",
+    )
+    closure = refusal_closure(
+        requested=frozenset({"P4O6"}),
+        rules=(rule,),
+        ledger_snapshot={"process.cleaned_melt": {"P2O5": 1.0}},
+        state=state,
+        catalog_species=_selector_catalog_species("P4O6"),
+    )
+    answer = closure.answers["P4O6"]
+
+    assert isinstance(answer.pressure, PressureValue)
+    assert isinstance(answer.flux, FluxEligible)
+    assert answer.extra["applicability_evidence"]["active"] is True
+    assert answer.extra["d359_prediction"]["class"] == "E"
+    assert "phase-independent K" in answer.extra["d359_prediction"]["reason"]
+
+
 @pytest.mark.parametrize("phase,stage", [(None, None), ("", None), (None, ""), ("", "")])
 def test_missing_cleanup_context_is_refused_not_dormant(phase, stage):
     from simulator.vapour_rail.instrumentation import _channel_flux_gate_state

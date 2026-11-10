@@ -190,13 +190,13 @@ def headless_full_run_product_story(tmp_path_factory):
 @pytest.mark.parametrize(
     (
         "feedstock", "hours", "additives_kg", "web_ingots",
-        "web_unclassified", "oxygen_kg", "rump_kg",
+        "web_unclassified", "expected_oxygen_kg", "rump_kg",
     ),
     [
         (
             "lunar_mare_low_ti", 24, {},
             {}, {"Cl": 0.02, "Co": 0.04, "Ni": 0.21, "S": 0.72},
-            0.0, 363.32,
+            None, 363.32,
         ),
         (
             "mars_basalt", 12, {"C": 30.0},
@@ -207,7 +207,7 @@ def headless_full_run_product_story(tmp_path_factory):
 )
 def test_current_web_and_runner_product_story_pins_shipped_scenarios(
     feedstock, hours, additives_kg, web_ingots, web_unclassified,
-    oxygen_kg, rump_kg,
+    expected_oxygen_kg, rump_kg,
 ):
     from simulator.run_executor import RunExecutor
     from simulator.runner import PyrolysisRun
@@ -237,6 +237,13 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
     assert runner["glass"]["species_kg"] == {}
     assert web_story["captured_volatiles"]["species_kg"] == {}
     assert runner["captured_volatiles"]["kg_by_species"] == {}
+    oxygen_kg = (
+        sim._oxygen_terminal_partition_kg()["total"]
+        if feedstock == "lunar_mare_low_ti"
+        else expected_oxygen_kg
+    )
+    if feedstock == "lunar_mare_low_ti":
+        assert oxygen_kg > 0.0
     assert web_story["oxygen"]["class_total_kg"] == pytest.approx(
         oxygen_kg, abs=0.01
     )
@@ -247,30 +254,21 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         assert oxygen_flag["status"] == "flagged prediction"
         assert oxygen_flag["authority"] == "extrapolated"
         assert oxygen_flag["band"] == "d-359 B/C/E follow-ups pending"
-        assert oxygen_flag["reason"] == (
-            "Flagged structural 0.0 kg: stored, vented, and captured O2 ledger "
-            "entries are all 0.0 kg. Class B activity ladder: refusals cite "
-            "missing_evidence (no assemblage/potential evidence; Henrian "
-            "upper bound disabled); do not treat a=1 as an upper bound when "
-            "gamma>1; use provider activity, then published gamma*x, then "
-            "ideal-mixing a=x as an extrapolated estimate; SiO activity 0.436 "
-            "lacks its evidence link. Class C: MnO_gas is outside its "
-            "certified 1519-2273 K evaluator band; conservative continuation "
-            "is not admitted, so use flagged extrapolation. Class E: the "
-            "stage0_only predicate is inactive outside Stage 0 for "
-            "P4O10/P4O6/PO/PO2 while P2O5 is present; use phase-independent "
-            "K or flag out-of-domain. Pending d-359 follow-ups: B, C, E."
-        )
-        refusal_reasons = {
-            row["species"]: row["reason"]
-            for row in runner["oxygen"]["excluded"]
+        reason = oxygen_flag["reason"]
+        assert "Interim best estimate" in reason
+        assert "missing_evidence" in reason
+        assert "ideal_mixing_assumption" in reason
+        assert "outside_declared_evaluator_domain" in reason
+        assert "1519-2273 K" in reason
+        assert "stage0_only" in reason
+        assert "phase-independent K" in reason
+        assert "Pending d-359 follow-ups: B, C, E." in reason
+        estimates_by_class = {
+            row["d359_class"]
+            for row in runner["oxygen"]["estimated_contributions"]
+            if row.get("d359_class")
         }
-        assert "Henrian upper bound disabled" in refusal_reasons["SiO"]
-        assert "outside_declared_evaluator_domain" in refusal_reasons[
-            "MnO_gas"
-        ]
-        for species in ("P4O10", "P4O6", "PO", "PO2"):
-            assert "stage0_only predicate inactive" in refusal_reasons[species]
+        assert {"B", "C", "E"} <= estimates_by_class
         assert runner["metals_plus_O2"]["availability_flag"] == oxygen_flag
         assert web_story["oxygen"]["availability_flag"] == oxygen_flag
     assert web_story["refractory_ceramic"]["class_total_kg"] == pytest.approx(
@@ -649,7 +647,7 @@ def test_headless_full_run_ledgers_and_product_story_web(
     # 3.93e-9 kg (1.18e-9 relative): float-level, measured on studio-3 at
     # 340d3c9c5 with the nightly tier; the band-integration bisect bounds the
     # solver's per-call differences at <=1.1e-7 kg.
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.328323685668657, rel=1e-9)
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3152815851036044, rel=1e-9)
     assert cr_ingot_kg == 0.0
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)

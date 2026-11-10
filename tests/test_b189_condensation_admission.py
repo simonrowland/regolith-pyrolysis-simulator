@@ -551,9 +551,19 @@ def test_legacy_antoine_rows_still_consult_applicability(payload) -> None:
 def test_stage0_only_refusal_is_phase_dependent(payload) -> None:
     catalog = compiled_catalog_for(payload, emit_u0_request_rules=False)
     for species_id in P_CARRIERS:
-        assert _condensation_admission_refusal(
-            species_id, vapor_pressure_data=payload
-        ) == REFUSAL_INAPPLICABLE_PREDICATE
+        if species_id in {"PO", "PO2", "P4O6", "P4O10"}:
+            assert _condensation_admission_refusal(
+                species_id, vapor_pressure_data=payload
+            ) is None
+            assert catalog.evaluator_for_hot_train(
+                species_id,
+                process_phase="hot_train",
+                stage="evaporation",
+            ) is catalog.species[species_id].evaluator
+        else:
+            assert _condensation_admission_refusal(
+                species_id, vapor_pressure_data=payload
+            ) == REFUSAL_INAPPLICABLE_PREDICATE
 
         assert catalog.evaluator_for_hot_train(
             species_id,

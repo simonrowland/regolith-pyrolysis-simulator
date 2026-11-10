@@ -1595,6 +1595,21 @@ def test_c2_out_of_domain_value_is_typed_diagnostic_flux(
             assert answer.pressure.pa > 0.0
 
 
+def test_mno_gas_313k_uses_flagged_out_of_domain_continuation(
+    conformance_sim,
+) -> None:
+    _batch, answer = _resolve_one("MnO_gas", 313.15, conformance_sim)
+
+    assert isinstance(answer.pressure, PressureValue)
+    assert isinstance(answer.flux, FluxEligible)
+    assert answer.extra["out_of_range"] is True
+    notice = answer.extra["d359_prediction"]
+    assert notice["class"] == "C"
+    assert notice["authority"] == "extrapolated"
+    assert notice["certified_band_K"] == (1519.0, 2273.15)
+    assert "outside_declared_evaluator_domain" in notice["reason"]
+
+
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)
 def test_c3_po2_exponent_is_stoichiometric_and_numerically_active(
     species_id: str,
