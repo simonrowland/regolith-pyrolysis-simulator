@@ -548,6 +548,26 @@ def test_c4_acquired_high_rate_arms_without_ending() -> None:
     ) is False
 
 
+def test_c4_missing_current_species_flux_is_not_depletion() -> None:
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(snapshots=[
+        _c4_snapshot(temperature_C=1580.0, mg_rate=0.021)
+        for _ in range(5)
+    ])
+
+    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C4, 5, temperature_C=1580.0),
+            _flux(),
+            CondensationTrain(),
+            record,
+        )
+
+    assert refusal.value.reason == "campaign_depletion_signal_invalid"
+    assert refusal.value.diagnostic["signal"] == "C4.Mg_kg_hr"
+    assert refusal.value.diagnostic["value"] is None
+
+
 def test_c4_max_hold_without_signal_is_a_typed_refusal() -> None:
     manager = CampaignManager(_setpoints())
     record = BatchRecord(snapshots=[

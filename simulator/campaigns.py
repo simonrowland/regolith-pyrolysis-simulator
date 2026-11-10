@@ -2978,7 +2978,7 @@ class CampaignManager:
             species = str(soft.get('species', ''))
             if not species:
                 raise ValueError('C4.soft_endpoint.species is required')
-            rate = evap_flux.species_kg_hr.get(species, 0.0)
+            rate = evap_flux.species_kg_hr.get(species)
             window_low_C, window_high_C = self._c4_temperature_window()
             requested_window_C = [window_low_C, window_high_C]
             acquisition_limit_hr, acquisition_limit_source = (
@@ -3075,6 +3075,21 @@ class CampaignManager:
                 <= float(melt.temperature_C)
                 <= window_high_C
             )
+            if current_in_window and rate is None:
+                signal = f'C4.{species}_kg_hr'
+                raise CampaignC4EndpointRefusal({
+                    'reason_refused': (
+                        CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON
+                    ),
+                    'signal': signal,
+                    'unit': 'kg/hr',
+                    'value': None,
+                    'detail': (
+                        f'{signal} is missing from current evaporation flux'
+                    ),
+                    'campaign_hour': completed_campaign_hour,
+                    'temperature_C': float(melt.temperature_C),
+                })
             prior_in_window = [
                 snapshot
                 for snapshot in c4_snapshots
