@@ -839,6 +839,58 @@ def _retain_kernel_seam_debit(
     return replace(batch, channels_by_species=channels)
 
 
+# Selected outcomes that authorize an empty species flux. Anything else
+# (refusal, incomplete, missing, invalid, still-eligible) is not a physical
+# zero. A numeric catalog pressure is not in this set.
+_EMPTY_FLUX_AUTHORIZING_STATES = frozenset({
+    'zero_by_physics',
+    'upper_bound',
+    'dormant_by_epoch',
+})
+_EMPTY_FLUX_KINETIC_FLOOR = 'internal_analytical_below_400K'
+_EMPTY_FLUX_ZERO_BY_PHYSICS = 'zero_by_physics'
+_EMPTY_FLUX_TYPED_NON_DEBIT = 'vapour_batch_all_channels_non_debiting'
+
+
+def _authorize_empty_species_flux(
+    channel_states: Mapping[str, str],
+    *,
+    kinetic_floor: bool,
+    physical_zero_reason: str | None,
+    catalog_pressure_present: bool,
+) -> tuple[str, str] | None:
+    """Return ``(kind, reason)`` or None when the empty flux must be refused.
+
+    Invariant: no requested species is a silent 0.0. When any species is
+    present, every selected outcome must be dormant-by-epoch, an upper
+    bound, or zero-by-physics. Refusal, incomplete, missing, and invalid
+    selected pressures block every empty-flux return, including the
+    sub-1050 C physical zero and the below-400 K kinetic floor. A numeric
+    catalog pressure does not authorize the zero. No species present does
+    not block; one of the typed proofs below is still required.
+
+    This is the only authorization for an empty species flux. Callers must
+    not return that flux on a second predicate.
+    """
+
+    if channel_states and any(
+        state not in _EMPTY_FLUX_AUTHORIZING_STATES
+        for state in channel_states.values()
+    ):
+        return None
+    if kinetic_floor:
+        return ('kinetic_floor', _EMPTY_FLUX_KINETIC_FLOOR)
+    if physical_zero_reason and catalog_pressure_present:
+        return ('physical_zero', str(physical_zero_reason))
+    if channel_states and all(
+        state == 'zero_by_physics' for state in channel_states.values()
+    ):
+        return ('zero_by_physics', _EMPTY_FLUX_ZERO_BY_PHYSICS)
+    if channel_states:
+        return ('typed_non_debit', _EMPTY_FLUX_TYPED_NON_DEBIT)
+    return None
+
+
 class EvaporationMixin:
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
@@ -1133,41 +1185,50 @@ class EvaporationMixin:
             return flux
 
         if not vapor_pressures:
-            if (
-                0.0 < T_K < 400.0
-                and getattr(equilibrium, 'status', None) == 'ok'
-                and (getattr(equilibrium, 'diagnostics', {}) or {}).get(
-                    'vapor_pressure_zero_reason'
-                ) == 'internal_analytical_below_400K'
-            ):
+            # One chokepoint. The kinetic floor, the sub-1050 C physical
+            # zero, and the typed non-debit return all use its token.
+            # Catalog batch_pa_by_species is coverage evidence only after
+            # every selected outcome authorizes the zero.
+            channel_states = dict(
+                flux_overlay_report.get('batch_channel_states', {}) or {}
+            )
+            equilibrium_diagnostic = dict(
+                getattr(equilibrium, 'diagnostics', {}) or {}
+            )
+            authorization = _authorize_empty_species_flux(
+                channel_states,
+                kinetic_floor=(
+                    0.0 < T_K < 400.0
+                    and getattr(equilibrium, 'status', None) == 'ok'
+                    and equilibrium_diagnostic.get('vapor_pressure_zero_reason')
+                    == _EMPTY_FLUX_KINETIC_FLOOR
+                ),
+                physical_zero_reason=(
+                    effective_pressure_source.physical_zero_reason
+                ),
+                catalog_pressure_present=bool(
+                    flux_overlay_report.get('batch_pa_by_species')
+                ),
+            )
+            if authorization is not None and authorization[0] == 'kinetic_floor':
                 # The guarded producer explicitly skipped pressure evaluation
                 # under its existing kinetic floor; absent Pa alone is no proof.
                 self._last_evaporation_flux_diagnostic = {
-                    'reason': 'internal_analytical_below_400K',
+                    'reason': authorization[1],
                     'evaporation_flux_kg_hr': {},
                     'vapour_batch_flux_overlay': flux_overlay_report,
                     'vapour_batch': batch_report,
                 }
                 return flux
-            if (
-                effective_pressure_source.physical_zero_reason is not None
-                and flux_overlay_report.get('batch_pa_by_species')
-            ):
-                # The typed pre-RG source proves this below-threshold physical
-                # zero, while the batch proves catalog coverage. Resolution
-                # errors were refused above; a refused or missing channel still
-                # reaches fail-closed handling below.
+            if authorization is not None and authorization[0] == 'physical_zero':
                 self._last_evaporation_flux_diagnostic = {
-                    'reason': effective_pressure_source.physical_zero_reason,
+                    'reason': authorization[1],
                     'evaporation_flux_kg_hr': {},
                     'vapour_batch_flux_overlay': flux_overlay_report,
                 }
                 return flux
             vapor_pressure_diagnostic = dict(
                 getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
-            )
-            equilibrium_diagnostic = dict(
-                getattr(equilibrium, 'diagnostics', {}) or {}
             )
             zero_reason = (
                 vapor_pressure_diagnostic.get('vapor_pressure_zero_reason')
@@ -1196,29 +1257,12 @@ class EvaporationMixin:
                     pass
             if regime_diagnostic:
                 self._last_evaporation_flux_diagnostic = regime_diagnostic
-            channel_states = dict(
-                flux_overlay_report.get('batch_channel_states', {}) or {}
-            )
-            if channel_states and all(
-                state == 'zero_by_physics' for state in channel_states.values()
-            ):
+            if authorization is not None and authorization[0] == 'zero_by_physics':
                 return flux
             # When every channel is a typed non-debit outcome (genuine bound,
             # zero, dormant) and none is refused / eligible / missing-seam,
             # empty flux is authorized, not an empty-provider false zero.
-            _typed_non_debit = frozenset(
-                {
-                    'zero_by_physics',
-                    'upper_bound',
-                    'dormant_by_epoch',
-                }
-            )
-            if (
-                channel_states
-                and all(
-                    state in _typed_non_debit for state in channel_states.values()
-                )
-            ):
+            if authorization is not None and authorization[0] == 'typed_non_debit':
                 self._last_evaporation_flux_diagnostic = {
                     **regime_diagnostic,
                     'reason': 'vapour_batch_all_channels_non_debiting',
