@@ -147,6 +147,7 @@ from simulator.battery.identity import (
 )
 from simulator.battery.stable_ids import (
     cao_raw_pca_id,
+    phase_window_suffix,
     series_point_id,
     series_row_extra,
     temperature_token,
@@ -13424,6 +13425,230 @@ def _delta_fg_unavailable_reason(
     return None
 
 
+# Printed "298.15 to 716 K" / "716 to melting point 1115 K" phase windows.
+# "fictive boiling point" is left unmatched; those rows stay out of the
+# neighbouring window instead of being spanned across it.
+_B2131_PHASE_WINDOW_RE = re.compile(
+    r"(?P<phrase>.+?)\s+(?P<lo>\d+(?:\.\d+)?)\s+to\s+"
+    r"(?:(?:melting|boiling)\s+point\s+)?"
+    r"(?P<hi>\d+(?:\.\d+)?)\s*K",
+    re.IGNORECASE,
+)
+
+
+@dataclass(frozen=True)
+class _B2131FormationWindow:
+    """One printed phase window of formation-Gibbs points, in row order."""
+
+    phase_text: str
+    lower_K: Decimal | None
+    upper_K: Decimal | None
+    points: tuple[tuple[Decimal, Decimal], ...]
+    unit_trail: str
+
+
+def _b2131_phase_sentence(doc: Mapping[str, Any]) -> str:
+    raw = doc.get("phase_as_published")
+    if isinstance(raw, list):
+        parts = [str(part).strip() for part in raw if str(part).strip()]
+        return " ".join(parts)
+    if isinstance(raw, str):
+        return " ".join(raw.split())
+    return ""
+
+
+def _b2131_parsed_phase_windows(
+    text: str,
+) -> list[tuple[str, Decimal, Decimal]]:
+    found: list[tuple[str, Decimal, Decimal]] = []
+    for match in _B2131_PHASE_WINDOW_RE.finditer(text):
+        phrase = match.group("phrase").strip().lstrip(".;,").strip()
+        lower = Decimal(match.group("lo"))
+        upper = Decimal(match.group("hi"))
+        if upper < lower:
+            lower, upper = upper, lower
+        found.append((phrase, lower, upper))
+    return found
+
+
+def _b2131_row_cells(row: Mapping[str, Any]) -> Mapping[str, Any]:
+    cells = row.get("cells")
+    if isinstance(cells, Mapping):
+        return cells
+    return row
+
+
+def _b2131_row_temperature(
+    doc: Mapping[str, Any], row: Mapping[str, Any]
+) -> Decimal | None:
+    cells = _b2131_row_cells(row)
+    for key in ("temperature", "T_K", "T", "temperature_K"):
+        if key in cells:
+            amount = _cell_numeric_amount(cells.get(key))
+            if amount is not None:
+                return amount
+        if key in row and key not in cells:
+            amount = _cell_numeric_amount(row.get(key))
+            if amount is not None:
+                return amount
+    if doc.get("table_kind") == "reference_state_298K":
+        grid = doc.get("temperature_grid")
+        if isinstance(grid, list):
+            for item in grid:
+                if isinstance(item, Mapping):
+                    amount = _as_dec_or_none(item.get("value"))
+                    if amount is not None:
+                        return amount
+    return None
+
+
+def _b2131_formation_kJ(
+    doc: Mapping[str, Any], row: Mapping[str, Any]
+) -> tuple[Decimal, str] | None:
+    """Parsed formation_gibbs as kJ/mol. A null cell stays out.
+
+    The 298.15 K table and the high-temperature formation columns print
+    kJ·mol⁻¹ over the cell. A units blob that does not convert is that
+    multi-column header, not a reason to divide the printed figure.
+    """
+
+    cell = _b2131_row_cells(row).get("formation_gibbs")
+    amount = _cell_numeric_amount(cell)
+    if amount is None:
+        return None
+    unit = _source_unit_for_cell(cell, _printed_unit_for_field(doc, "formation_gibbs"))
+    converted = _convert_compilation_amount(amount, Quantity.DELTA_FG, unit)
+    if converted is not None:
+        return converted
+    return amount, "identity:kJ_per_mol"
+
+
+def _b2131_reference_value_rows(
+    doc: Mapping[str, Any],
+) -> list[Mapping[str, Any]]:
+    """The 298.15 K value line. The next line is the printed uncertainty.
+
+    Two numeric formation_gibbs rows are the value and the uncertainty
+    printed under it (formula reprint or STD. STATE). One numeric row is
+    the value only when that row also prints the formula weight; a lone
+    number on the formula line is the uncertainty under an unparsed value.
+    """
+
+    numeric: list[Mapping[str, Any]] = []
+    for row in _compilation_rows(doc):
+        if _b2131_formation_kJ(doc, row) is not None:
+            numeric.append(row)
+    if len(numeric) >= 2:
+        return [numeric[0]]
+    if len(numeric) == 1:
+        weight = _cell_numeric_amount(_b2131_row_cells(numeric[0]).get("weight"))
+        if weight is not None:
+            return [numeric[0]]
+    return []
+
+
+def _b2131_formation_gibbs_windows(
+    doc: Mapping[str, Any],
+) -> tuple[_B2131FormationWindow, ...]:
+    """Importable ΔfG windows for USGS B2131. Empty means keep the refusal."""
+
+    if str(doc.get("source_id") or "") != _B2131_SOURCE_ID:
+        return ()
+    if not _census_formation_gibbs(doc):
+        return ()
+    phase_sentence = _b2131_phase_sentence(doc)
+    parsed = _b2131_parsed_phase_windows(phase_sentence)
+    if parsed and doc.get("table_kind") != "reference_state_298K":
+        buckets: list[dict[str, Any]] = [
+            {
+                "phase": phrase,
+                "lo": lower,
+                "hi": upper,
+                "points": [],
+                "seen": set(),
+                "trail": None,
+            }
+            for phrase, lower, upper in parsed
+        ]
+        orphans: dict[str, Any] = {
+            "phase": phase_sentence,
+            "lo": None,
+            "hi": None,
+            "points": [],
+            "seen": set(),
+            "trail": None,
+        }
+        index = 0
+        for row in _compilation_rows(doc):
+            temperature = _b2131_row_temperature(doc, row)
+            if temperature is None:
+                continue
+            while index < len(buckets) and temperature > buckets[index]["hi"]:
+                index += 1
+            if (
+                index < len(buckets)
+                and buckets[index]["lo"] <= temperature <= buckets[index]["hi"]
+            ):
+                if (
+                    temperature in buckets[index]["seen"]
+                    and index + 1 < len(buckets)
+                    and buckets[index + 1]["lo"]
+                    <= temperature
+                    <= buckets[index + 1]["hi"]
+                ):
+                    index += 1
+                bucket = buckets[index]
+            else:
+                bucket = orphans
+            bucket["seen"].add(temperature)
+            converted = _b2131_formation_kJ(doc, row)
+            if converted is None:
+                continue
+            amount, trail = converted
+            bucket["points"].append((temperature, amount))
+            if bucket["trail"] is None:
+                bucket["trail"] = trail
+        chosen = [bucket for bucket in [*buckets, orphans] if bucket["points"]]
+    else:
+        if doc.get("table_kind") == "reference_state_298K":
+            point_rows = _b2131_reference_value_rows(doc)
+        else:
+            # One printed phase, or a sentence with no temperature window.
+            point_rows = _compilation_rows(doc)
+        points = []
+        trail = None
+        for row in point_rows:
+            temperature = _b2131_row_temperature(doc, row)
+            converted = _b2131_formation_kJ(doc, row)
+            if temperature is None or converted is None:
+                continue
+            amount, one_trail = converted
+            points.append((temperature, amount))
+            if trail is None:
+                trail = one_trail
+        if not points:
+            return ()
+        chosen = [
+            {
+                "phase": phase_sentence,
+                "lo": None,
+                "hi": None,
+                "points": points,
+                "trail": trail,
+            }
+        ]
+    return tuple(
+        _B2131FormationWindow(
+            phase_text=str(bucket["phase"] or ""),
+            lower_K=bucket["lo"],
+            upper_K=bucket["hi"],
+            points=tuple(bucket["points"]),
+            unit_trail=str(bucket["trail"] or "identity:kJ_per_mol"),
+        )
+        for bucket in chosen
+    )
+
+
 def _unused_ancillary(payload: Mapping[str, Any], used: str | None) -> tuple[str, ...]:
     return tuple(k for k in _ANCILLARY_SERIES_KEYS if k in payload and k != used)
 
@@ -26647,6 +26872,14 @@ class Migrator:
         t = _compilation_temperature_state(doc)
         p_std = None
         column_series = compilation_column_series_from_record(doc)
+        if source_id == _B2131_SOURCE_ID:
+            # Phase windows own formation Gibbs. A converted column series
+            # would put every printed phase in one series.
+            column_series = tuple(
+                series
+                for series in column_series
+                if series.quantity is not Quantity.DELTA_FG
+            )
         # For mapped thermodynamic quantities, a non-"as_published" trail means
         # the converter recognized a molar/gfw denominator.
         molar_series_per = {
@@ -26799,6 +27032,62 @@ class Migrator:
                 source=rel,
                 observation_id=f"{source_id}:{record_id}",
             )
+        formation_windows = (
+            _b2131_formation_gibbs_windows(doc)
+            if source_id == _B2131_SOURCE_ID
+            else ()
+        )
+        if formation_windows:
+            sole_window = len(formation_windows) == 1
+            for window in formation_windows:
+                window_phase, _window_unmapped = map_phase(window.phase_text or None)
+                unbound_single_point = (
+                    len(window.points) == 1 and window.lower_K is None
+                )
+                window_value = _emit_series_or_point(
+                    Quantity.DELTA_FG,
+                    record_id,
+                    window.points,
+                    point_temperature=(
+                        window.points[0][0] if unbound_single_point else None
+                    ),
+                ).value
+                if unbound_single_point:
+                    window_temperature: State[Decimal] = State.of(window.points[0][0])
+                else:
+                    window_temperature = _compilation_temperature_state(doc)
+                if sole_window:
+                    window_id = f"{source_id}:{record_id}"
+                else:
+                    window_id = (
+                        f"{source_id}:{record_id}:"
+                        + phase_window_suffix(
+                            Quantity.DELTA_FG.value,
+                            lower_K=window.lower_K,
+                            upper_K=window.upper_K,
+                        )
+                    )
+                self._generic_obs(
+                    work=work,
+                    source_id=source_id,
+                    source_key=rel,
+                    observation_id=window_id,
+                    locator=locator,
+                    quantity=State.of(Quantity.DELTA_FG),
+                    species=make_species(formula, window_phase),
+                    value=window_value,
+                    evidence=evidence,
+                    temperature_K=window_temperature,
+                    standard_pressure_Pa=p_std,
+                    method=State.of(MethodToken.TABULATION),
+                    derivation=_compilation_conversion_derivation(
+                        window.unit_trail,
+                        None,
+                        locator,
+                        choose_read_from(work, locator),
+                    ),
+                )
+            return
         if series_items:
             sel = select_declared_source(
                 quantity,
