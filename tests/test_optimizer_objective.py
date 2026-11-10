@@ -472,29 +472,26 @@ def test_partial_metal_objective_evidence_keeps_exclusions_and_lower_bound() -> 
     assert evidence["total_basis"] == "lower_bound"
 
 
-def test_unavailable_oxygen_product_objective_preserves_typed_null(monkeypatch) -> None:
-    excluded = [{
-        "species": "Fe",
-        "account": "process.cleaned_melt",
-        "reason": "Fe activity unavailable",
-    }]
+def test_flagged_oxygen_estimate_objective_keeps_numeric_value(monkeypatch) -> None:
     availability_flag = {
-        "status": "unavailable",
-        "authority": "unavailable",
-        "reason": excluded[0]["reason"],
-        "excluded": excluded,
+        "status": "flagged prediction",
+        "category": 3,
+        "kind": "predict_and_flag",
+        "authority": "extrapolated",
+        "band": "d-359 B/C/E follow-ups pending",
+        "reason": "Interim best estimate; d-359 B/C/E follow-ups pending.",
     }
     monkeypatch.setattr(
         objective_module,
         "classify_products",
         lambda sim, *, early_tap_mode=False: {
             "metals_plus_O2": {
-                "O2_kg": None,
-                "class_total_kg": None,
+                "O2_kg": 1.25,
+                "class_total_kg": 1.25,
                 "metals_total_kg": 1.0,
-                "status": "unavailable",
+                "status": "partial",
                 "availability_flag": availability_flag,
-                "excluded": excluded,
+                "excluded": [],
             }
         },
     )
@@ -509,11 +506,11 @@ def test_unavailable_oxygen_product_objective_preserves_typed_null(monkeypatch) 
         SimpleNamespace(product_ledger=lambda: {}),
     )
 
-    assert objectives.values[0].value is None
-    assert objectives.as_mapping()["O2_kg"] is None
-    assert objectives.evidence["O2_kg"]["value_status"] == "unavailable"
+    assert objectives.values[0].value == pytest.approx(1.25)
+    assert objectives.as_mapping()["O2_kg"] == pytest.approx(1.25)
+    assert objectives.evidence["O2_kg"]["value_status"] == "partial"
     assert objectives.evidence["O2_kg"]["availability_flag"] == availability_flag
-    assert objectives.evidence["O2_kg"]["excluded"] == excluded
+    assert objectives.evidence["O2_kg"]["excluded"] == []
 
 
 def test_missing_stage_3_capture_refuses_silica_objective_with_reason() -> None:
