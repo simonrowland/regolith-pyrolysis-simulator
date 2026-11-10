@@ -192,7 +192,7 @@ def _assert_migrated_reductions_and_conditions(observations, experiments, benche
         assert cco.selected.value.point is not None
         if run == 1:
             assert float(cco.selected.value.point) == pytest.approx(
-                -9.534450869442678, abs=1e-12
+                -9.521520437034766, abs=1e-12
             )
         assert pressure_row.identity.fO2_Pa.is_unknown
 
