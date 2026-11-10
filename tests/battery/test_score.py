@@ -10343,6 +10343,74 @@ def test_static_lineage_resolver_reuses_store_resolution_per_run(
     )
 
 
+def test_static_lineage_memo_matches_the_prediction_source_relation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.kems_experiment()
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"),
+        quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        species=Species("Na", Phase.L),
+        subtype=State.of("langmuir_alpha"),
+        per=State.of(PerBasis.DIMENSIONLESS),
+        reference_state=State.not_applicable(
+            "alpha row does not carry activity standard state"
+        ),
+        reservoir=State.of(Species("Na", Phase.G)),
+        sweep_gas=State.of(
+            SweepIdentity(
+                species="N2",
+                flow_sccm=State.of(Decimal("1")),
+                partial_pressure_Pa=State.of(Decimal("1")),
+            )
+        ),
+        exposure=State.of(
+            Exposure(
+                area_m2=State.of(Decimal("1")),
+                duration_s=State.of(Decimal("1")),
+            )
+        ),
+    )
+    reference = F.observation(
+        "static-lineage-source-mismatch",
+        experiment.experiment_id,
+        identity,
+        Decimal("1e-6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="janaf-4th",
+    )
+    context = _context(F.work(), experiment, reference)
+
+    def refusal_with_other_sources(engine, observation, **_kwargs):
+        return EnginePrediction(
+            engine=engine,
+            channel=engine.value,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=("not-the-engine-default",),
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "quantity_not_predicted",
+                "quantity": Quantity.EVAPORATION_COEFFICIENT_ALPHA.value,
+            },
+            identity=observation.identity,
+        )
+
+    monkeypatch.setattr(
+        score_mod, "_score_predict_with_engine", refusal_with_other_sources
+    )
+    compiled_rows = _assert_score_store_matches_compile_jsonl(
+        context,
+        reference,
+        engines=(Engine.VAPOROCK,),
+    )
+
+    assert (
+        compiled_rows[Engine.VAPOROCK][0].source_relation
+        is SourceRelation.UNKNOWN
+    )
+
+
 def _printed_unresolved_observation(
     observation_id: str,
     experiment_id: str,
