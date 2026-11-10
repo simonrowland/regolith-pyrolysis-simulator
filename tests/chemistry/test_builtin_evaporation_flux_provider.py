@@ -336,10 +336,14 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
     # t-383: Na standard_reaction_term refuses pre-RG eligibility without
     # NaO0.5 activity evidence. This counter test only needs a flux-eligible
     # seam claim so the mocked EVAPORATION_FLUX path can record alpha fallbacks.
+    # Fe is that claim. Without oxide activity and pO2 the Ellingham rail
+    # refuses it, and the caller raises before dispatch. The values keep the
+    # claim debiting; this test does not pin the Fe pressure.
     equilibrium = SimpleNamespace(
         vapor_pressures_Pa={"Fe": 1.0},
         vapor_pressures_source={},
-        activity_coefficients={},
+        activity_coefficients={"Fe": 0.2},
+        pO2_bar=1e-9,
         diagnostics={},
         liquid_fraction=1.0,
     )
@@ -383,7 +387,13 @@ def test_k_at_1650c_drives_flux_with_extrapolation_status(
     selected_pa = answer.selected_runtime_pressure.pa
     seam_pa = effective_source.pressure_pa("K")
     assert seam_pa is not None and seam_pa > 0.0
-    assert seam_pa != pytest.approx(selected_pa, rel=1.0e-6)
+    # Lunar mare, 1650 C, gas resistance off. The debit is the kernel seam.
+    # Literals are the equilibrium seam and the catalog continuation:
+    # seam 0.9925267435196796 Pa, continuation 1.0320260760706617 Pa.
+    assert selected_pa == pytest.approx(seam_pa, rel=0.0, abs=0.0)
+    assert selected_pa == pytest.approx(0.9925267435196796, rel=0.0, abs=0.0)
+    assert answer.pressure.pa == pytest.approx(1.0320260760706617, rel=0.0, abs=0.0)
+    assert answer.pressure.pa != pytest.approx(selected_pa, rel=1.0e-6)
     assert answer.extra.get("out_of_range") is True
     assert answer.verdict_status == "status_bearing_non_authoritative"
     assert answer.certification_ceiling == "never"
@@ -1597,10 +1607,14 @@ def test_evaporation_caller_keeps_missing_alpha_unavailable_without_aborting(
         return original_dispatch(intent, *args, **kwargs)
 
     monkeypatch.setattr(sim, "_dispatch_only", dispatch)
+    # Fe is only the debiting seam that lets this caller reach the mock.
+    # Activity and pO2 are the Ellingham inputs; without them Fe is refused
+    # and the caller raises before the missing-alpha diagnostic is stored.
     equilibrium = SimpleNamespace(
         vapor_pressures_Pa={"Fe": 1.0},
         vapor_pressures_source={},
-        activity_coefficients={},
+        activity_coefficients={"Fe": 0.2},
+        pO2_bar=1e-9,
         diagnostics={},
         liquid_fraction=1.0,
     )
@@ -1804,10 +1818,14 @@ def test_missing_transport_channel_is_unavailable_downstream(
 
     monkeypatch.setattr(sim, "_dispatch_only", dispatch)
     monkeypatch.setattr(sim, "_freeze_gate_enabled", lambda: False)
+    # Fe is only the debiting seam that lets this caller reach the mock.
+    # Activity and pO2 are the Ellingham inputs; without them Fe is refused
+    # and the caller raises before the transport refusal is recorded.
     equilibrium = SimpleNamespace(
         vapor_pressures_Pa={"Fe": 1.0},
         vapor_pressures_source={},
-        activity_coefficients={},
+        activity_coefficients={"Fe": 0.2},
+        pO2_bar=1e-9,
         diagnostics={},
         liquid_fraction=1.0,
     )

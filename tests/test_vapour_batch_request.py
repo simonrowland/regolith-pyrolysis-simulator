@@ -4439,6 +4439,7 @@ def test_fe_missing_ellingham_input_refuses_instead_of_dormant_antoine() -> None
     assert isinstance(answer.flux, FluxRefusal)
     assert answer.flux.code == "missing_ellingham_input"
     assert "Fe" not in missing_activity.flux_active_species_ids
+    _assert_ellingham_refusal_bookkeeping(missing_activity)
     pressures, _report = flux_pressures_from_batch(missing_activity)
     assert "Fe" not in pressures
 
@@ -4458,6 +4459,226 @@ def test_fe_missing_ellingham_input_refuses_instead_of_dormant_antoine() -> None
     assert "pO2" in answer.selected_runtime_pressure.detail
     assert isinstance(answer.flux, FluxRefusal)
     assert "Fe" not in missing_pO2.flux_active_species_ids
+    _assert_ellingham_refusal_bookkeeping(missing_pO2)
+
+
+def _assert_ellingham_refusal_bookkeeping(batch: VapourBatch) -> None:
+    """Post-resolution Fe refusal updates every derived batch field.
+
+    flux-active membership, solve bundles, and the metadata counts are one
+    bookkeeping record. A refusal that updates only the channel leaves Fe
+    counted as active.
+    """
+
+    assert "Fe" not in batch.flux_active_species_ids
+    assert all(
+        "Fe" not in members for members in batch.solve_bundle_ids.values()
+    )
+    assert batch.metadata["n_flux_active"] == len(batch.flux_active_species_ids)
+    assert batch.metadata["n_solve_bundles"] == len(batch.solve_bundle_ids)
+    assert batch.metadata["n_refused"] == sum(
+        1 for answer in batch.channels_by_species.values() if answer.is_refused
+    )
+    assert batch.channel("Fe").is_refused
+
+
+_FE_ELLINGHAM_OMISSIONS = (
+    ("missing_activity", {"fO2_bar": 1.0e-9}),
+    ("missing_activity_key", {
+        "fO2_bar": 1.0e-9,
+        "source_reaction_activities": {},
+    }),
+    ("activity_none", {
+        "fO2_bar": 1.0e-9,
+        "source_reaction_activities": {"Fe": None},
+    }),
+    ("missing_pO2", {"source_reaction_activities": {"Fe": 0.2}}),
+    ("pO2_none", {
+        "fO2_bar": None,
+        "source_reaction_activities": {"Fe": 0.2},
+    }),
+)
+
+
+@pytest.mark.parametrize(
+    "omission_id,state_overrides",
+    _FE_ELLINGHAM_OMISSIONS,
+    ids=[item[0] for item in _FE_ELLINGHAM_OMISSIONS],
+)
+def test_fe_ellingham_omission_reconciles_batch_bookkeeping(
+    omission_id: str,
+    state_overrides: dict,
+) -> None:
+    """Every missing Ellingham input refuses Fe and fixes derived fields."""
+
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"),
+        u0_manifest=load_u0_manifest(),
+    )
+    state = {
+        "temperature_K": 1673.15,
+        "process_phase": "hot_train",
+        "stage": "evaporation",
+    }
+    state.update(state_overrides)
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"FeO": 1.0}},
+        state,
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel("Fe")
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
+    assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+    assert answer.selected_runtime_pressure.code == "missing_ellingham_input"
+    assert isinstance(answer.flux, FluxRefusal)
+    assert answer.flux.code == "missing_ellingham_input"
+    _assert_ellingham_refusal_bookkeeping(batch)
+    pressures, _report = flux_pressures_from_batch(batch)
+    assert "Fe" not in pressures
+    assert omission_id
+
+
+# C4 Si pair. The catalog activity correction at pO2 = 2e-4 bar against the
+# 1e-9 bar reference is the kernel pressure / 2e5. Debiting that catalog
+# number drops Si under the report floor.
+_C4_SI_CATALOG_PA = 4.149230182792238e-12
+_C4_SI_KERNEL_PA = 8.298460365584479e-07
+_KERNEL_SEAM_SPECIES = ("Na", "K", "Ca", "Mg", "Ti", "Si")
+_KERNEL_PROVENANCE_BRANCHES = (
+    "label_present",
+    "label_missing",
+    "label_empty",
+    "label_blank",
+    "label_non_string",
+    "pressure_absent",
+    "pressure_zero_unlabeled",
+)
+
+
+@pytest.mark.parametrize("species_id", _KERNEL_SEAM_SPECIES)
+@pytest.mark.parametrize("branch", _KERNEL_PROVENANCE_BRANCHES)
+def test_kernel_seam_finite_pressure_is_not_a_provenance_cutover(
+    species_id: str,
+    branch: str,
+) -> None:
+    """Finite kernel pressure is the debit for every seam species.
+
+    Missing, empty, blank, or non-string provenance must not select the
+    catalog number. No kernel pressure leaves the incoming selection in
+    place and does not invent a zero. One species' branch does not rewrite
+    the others, Al, or Fe.
+    """
+
+    channels = {}
+    pressures: dict[str, float] = {}
+    sources: dict[str, object] = {}
+    for sid in _KERNEL_SEAM_SPECIES:
+        channels[sid] = _seam_debit_answer(
+            sid,
+            selected_pa=_C4_SI_CATALOG_PA,
+            catalog_pa=_C4_SI_CATALOG_PA,
+            source_label="catalog_activity_corrected",
+        )
+        subject = sid == species_id
+        if subject and branch == "pressure_absent":
+            continue
+        if subject and branch == "pressure_zero_unlabeled":
+            pressures[sid] = 0.0
+            continue
+        pressures[sid] = _C4_SI_KERNEL_PA
+        if subject and branch == "label_present":
+            sources[sid] = "builtin_authoritative:standard_reaction_term"
+        elif subject and branch in {"label_missing", "pressure_absent"}:
+            continue
+        elif subject and branch == "label_empty":
+            sources[sid] = ""
+        elif subject and branch == "label_blank":
+            sources[sid] = "   "
+        elif subject and branch == "label_non_string":
+            sources[sid] = 12
+        else:
+            sources[sid] = f"builtin_authoritative:standard_reaction_term:{sid}"
+    channels["Al"] = _seam_debit_answer(
+        "Al",
+        selected_pa=1.5,
+        catalog_pa=1.5,
+        source_label="catalog",
+    )
+    channels["Fe"] = _seam_debit_answer(
+        "Fe",
+        selected_pa=0.05731853761717197,
+        catalog_pa=4.871162269407267,
+        source_label="catalog",
+    )
+    pressures["Al"] = 9.0
+    pressures["Fe"] = 0.05731853761717197
+    batch = VapourBatch(
+        requested_species_ids=frozenset(channels),
+        channels_by_species=channels,
+        flux_active_species_ids=frozenset(channels),
+    )
+    equilibrium = SimpleNamespace(vapor_pressures_source=sources)
+    retained = _retain_kernel_seam_debit(
+        batch,
+        equilibrium,
+        EffectivePressureSource("kernel-seam-invariant", pressures),
+    )
+    debit, _report = flux_pressures_from_batch(retained)
+
+    for sid in _KERNEL_SEAM_SPECIES:
+        answer = retained.channel(sid)
+        assert answer.pressure.pa == pytest.approx(
+            _C4_SI_CATALOG_PA, rel=0.0, abs=0.0
+        )
+        subject = sid == species_id
+        if subject and branch == "pressure_absent":
+            assert answer.selected_runtime_pressure.pa == pytest.approx(
+                _C4_SI_CATALOG_PA, rel=0.0, abs=0.0
+            )
+            assert answer.extra.get("kernel_seam_provenance_missing") is not True
+            assert debit[sid] == pytest.approx(_C4_SI_CATALOG_PA, rel=0.0, abs=0.0)
+            assert debit[sid] != 0.0
+            continue
+        expected = (
+            0.0
+            if subject and branch == "pressure_zero_unlabeled"
+            else _C4_SI_KERNEL_PA
+        )
+        assert answer.selected_runtime_pressure.pa == pytest.approx(
+            expected, rel=0.0, abs=0.0
+        )
+        assert debit[sid] == pytest.approx(expected, rel=0.0, abs=0.0)
+        if subject and branch == "label_present":
+            assert answer.source_label == (
+                "builtin_authoritative:standard_reaction_term"
+            )
+            assert answer.extra.get("kernel_seam_provenance_missing") is not True
+        elif subject and branch in {
+            "label_missing",
+            "label_empty",
+            "label_blank",
+            "label_non_string",
+            "pressure_zero_unlabeled",
+        }:
+            assert answer.source_label == "catalog_activity_corrected"
+            assert answer.extra.get("kernel_seam_provenance_missing") is True
+        else:
+            assert answer.source_label == (
+                f"builtin_authoritative:standard_reaction_term:{sid}"
+            )
+            assert answer.extra.get("kernel_seam_provenance_missing") is not True
+
+    aluminum = retained.channel("Al")
+    assert aluminum.selected_runtime_pressure.pa == pytest.approx(1.5)
+    assert aluminum.source_label == "catalog"
+    assert debit["Al"] == pytest.approx(1.5)
+    iron = retained.channel("Fe")
+    assert iron.selected_runtime_pressure.pa == pytest.approx(
+        0.05731853761717197, rel=0.0, abs=0.0
+    )
+    assert iron.source_label == "catalog"
+    assert iron.pressure.pa == pytest.approx(4.871162269407267, rel=0.0, abs=0.0)
 
 
 def _missing_contract_rule(

@@ -8,6 +8,7 @@ from collections import defaultdict
 from collections.abc import Mapping
 from dataclasses import replace
 from numbers import Real
+from types import MappingProxyType
 from typing import Any, NamedTuple
 
 from simulator.alpha_kinetics import parse_alpha_contract
@@ -90,7 +91,8 @@ _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
 # 8.298460365584479e-07 Pa. Green debits the kernel. The catalog debit
 # falls under the 1e-12 kg/hr report floor and Si vanishes. At C0 the
 # realized pO2 is that 1e-9 bar floor, so the ratio is 1 (1 ulp) and
-# the C0 totals do not move.
+# the C0 totals do not move. A missing source label is not that cutover:
+# the finite kernel number stays the debit.
 _KERNEL_SEAM_DEBIT_SPECIES = frozenset({'Na', 'K', 'Ca', 'Mg', 'Ti', 'Si'})
 
 
@@ -774,6 +776,18 @@ def _load_evaporation_alpha_envelope_by_species(
     return envelope_by_species
 
 
+def _kernel_seam_provenance_label(
+    kernel_sources: Mapping[Any, Any],
+    species_id: str,
+) -> str:
+    """Return the published source string, or empty when provenance is absent."""
+
+    raw = kernel_sources.get(species_id)
+    if not isinstance(raw, str):
+        return ""
+    return raw.strip()
+
+
 def _retain_kernel_seam_debit(
     batch: Any,
     equilibrium: Any,
@@ -781,10 +795,12 @@ def _retain_kernel_seam_debit(
 ) -> Any:
     """Keep Na, K, Ca, Mg, Ti, and Si on the kernel pressure already published.
 
-    The catalog activity correction for these species is not the debit.
-    ``answer.pressure`` stays the catalog value. The selected runtime
-    pressure and its source label stay on the kernel seam when that seam
-    published a finite pressure and a source label.
+    Invariant: for every flux-active species in this set, a finite kernel
+    pressure is the selected debit. ``answer.pressure`` stays the catalog
+    value. A missing, blank, or non-string source label is missing
+    provenance. It does not select the catalog number and it does not
+    invent a zero. Genuine absence of a kernel pressure leaves the incoming
+    selection unchanged.
     """
 
     if batch is None:
@@ -801,17 +817,22 @@ def _retain_kernel_seam_debit(
         if not isinstance(answer.selected_runtime_pressure, PressureValue):
             continue
         kernel_pa = effective_pressure_source.pressure_pa(species_id)
-        kernel_label = kernel_sources.get(species_id)
-        if kernel_pa is None or not kernel_label:
+        if kernel_pa is None:
             continue
         kernel_pa = float(kernel_pa)
         if not math.isfinite(kernel_pa) or kernel_pa < 0.0:
             continue
-        channels[species_id] = replace(
-            answer,
-            selected_runtime_pressure=PressureValue(pa=kernel_pa),
-            source_label=str(kernel_label),
-        )
+        label = _kernel_seam_provenance_label(kernel_sources, species_id)
+        updates: dict[str, Any] = {
+            "selected_runtime_pressure": PressureValue(pa=kernel_pa),
+        }
+        if label:
+            updates["source_label"] = label
+        else:
+            extra = dict(answer.extra)
+            extra["kernel_seam_provenance_missing"] = True
+            updates["extra"] = MappingProxyType(extra)
+        channels[species_id] = replace(answer, **updates)
         changed = True
     if not changed:
         return batch

@@ -1833,6 +1833,7 @@ class VapourRailCatalog:
 
         channels = dict(batch.channels_by_species)
         changed = False
+        refused_ids: set[str] = set()
         for species_id, answer in channels.items():
             if answer.source_label != "catalog":
                 continue
@@ -1936,6 +1937,7 @@ class VapourRailCatalog:
                     f"{species_id}: Ellingham numerator is not a positive "
                     "pressure",
                 )
+                refused_ids.add(species_id)
                 changed = True
                 continue
             except (
@@ -1946,6 +1948,7 @@ class VapourRailCatalog:
                 VaporPressureComputationError,
             ) as exc:
                 channels[species_id] = _refuse(answer, str(exc))
+                refused_ids.add(species_id)
                 changed = True
                 continue
             channels[species_id] = replace(
@@ -1955,17 +1958,29 @@ class VapourRailCatalog:
             changed = True
         if not changed:
             return batch
-        refused_ids = {
-            species_id
-            for species_id, refused in channels.items()
-            if refused.refusal_code == "missing_ellingham_input"
-        }
+        if not refused_ids:
+            return replace(batch, channels_by_species=channels)
+        # Refusal is post-resolution. Counts and bundles were derived from
+        # the pre-refusal channels, so a Fe-only batch would still report
+        # Fe as active and keep it in its solve bundle.
+        flux_active = frozenset(batch.flux_active_species_ids) - refused_ids
+        solve_bundles: dict[str, frozenset[str]] = {}
+        for bundle_id, members in batch.solve_bundle_ids.items():
+            remaining = frozenset(members) - refused_ids
+            if remaining:
+                solve_bundles[bundle_id] = remaining
+        metadata = dict(batch.metadata)
+        metadata["n_refused"] = sum(
+            1 for answer in channels.values() if answer.is_refused
+        )
+        metadata["n_flux_active"] = len(flux_active)
+        metadata["n_solve_bundles"] = len(solve_bundles)
         return replace(
             batch,
             channels_by_species=channels,
-            flux_active_species_ids=frozenset(
-                set(batch.flux_active_species_ids) - refused_ids
-            ),
+            flux_active_species_ids=flux_active,
+            solve_bundle_ids=solve_bundles,
+            metadata=metadata,
         )
 
     def resolve_batch(

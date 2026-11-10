@@ -1113,21 +1113,30 @@ def test_cross_feedstock_request_activation_and_selected_runtime(
     # Shadow proof: every debit matches the live seam. A dropped or moved
     # Si fails here. The two ruled moves are pinned on their own and are
     # not an open mismatch allowance.
+    #
+    # One permitted missing-alpha refusal makes the comparator return
+    # SHADOW_REFUSED_VS_LIVE before it compares any other species. That
+    # outcome is recorded, then the remaining species are still compared.
     shadow = surface["shadow"]
-    refused_live_species = shadow["batch_refused_live_species"]
+    refused_live_species = set(shadow["batch_refused_live_species"])
     fallback_carriers = frozenset({
         "Al2", "Al2O", "Al2O2", "Al2O3_gas", "AlO", "AlO2", "CrO", "CrO2",
     })
     assert fallback_carriers.isdisjoint(refused_live_species)
-    if refused_live_species:
+    permitted_refusals: set[str] = set()
+    for sid in sorted(refused_live_species):
+        answer = batch.channel(sid)
+        assert answer.refusal_code == REFUSAL_MISSING_CHANNEL_CONTRACT, (
+            f"{feedstock_id}/{sid}: live species refused as "
+            f"{answer.refusal_code}, not the missing-alpha contract"
+        )
+        assert answer.extra.get("detail") == (
+            "channel contract incomplete: missing alpha"
+        )
+        permitted_refusals.add(sid)
+    if permitted_refusals:
         assert shadow["shadow_equal"] is False
         assert shadow["shadow_outcome"] == SHADOW_REFUSED_VS_LIVE
-        for sid in refused_live_species:
-            answer = batch.channel(sid)
-            assert answer.refusal_code == REFUSAL_MISSING_CHANNEL_CONTRACT
-            assert answer.extra.get("detail") == (
-                "channel contract incomplete: missing alpha"
-            )
     else:
         assert shadow["shadow_equal"] is True, (
             f"{feedstock_id}: seam/batch shadow mismatch blocks activation: "
@@ -1136,50 +1145,57 @@ def test_cross_feedstock_request_activation_and_selected_runtime(
         assert shadow["shadow_outcome"] == SHADOW_PROVED
         assert not shadow.get("mismatched_species")
         assert not shadow.get("missing_in_batch_path")
-        for sid, pa in surface["flux_pressures_Pa"].items():
-            live = surface["live_seam_Pa"][sid]
-            assert math.isclose(pa, live, rel_tol=1.0e-9, abs_tol=1.0e-12), (
-                f"{feedstock_id}/{sid}: batch seam Pa {pa} != live seam {live}"
-            )
-        # Si is computable on this hot surface. Absence or a catalog-only
-        # debit is a d-367 blank, not an allowed mismatch.
-        assert "Si" in surface["flux_pressures_Pa"]
+    comparable = {
+        sid: pa
+        for sid, pa in surface["flux_pressures_Pa"].items()
+        if sid not in permitted_refusals
+    }
+    for sid, pa in comparable.items():
+        live = surface["live_seam_Pa"][sid]
+        assert math.isclose(pa, live, rel_tol=1.0e-9, abs_tol=1.0e-12), (
+            f"{feedstock_id}/{sid}: batch seam Pa {pa} != live seam {live}"
+        )
+    # Si is computable on this hot surface. Absence or a catalog-only
+    # debit is a d-367 blank, not an allowed mismatch.
+    assert "Si" in comparable
+    assert "Si" not in permitted_refusals
+    assert math.isclose(
+        comparable["Si"],
+        surface["live_seam_Pa"]["Si"],
+        rel_tol=1.0e-9,
+        abs_tol=1.0e-12,
+    )
+    # Fe's selected pressure is the Ellingham rail and matches the live
+    # seam. The dormant pseudo-Antoine stays on answer.pressure.
+    fe = batch.channel("Fe")
+    assert isinstance(fe.pressure, PressureValue)
+    assert isinstance(fe.selected_runtime_pressure, PressureValue)
+    assert "Fe" in comparable
+    assert math.isclose(
+        comparable["Fe"],
+        surface["live_seam_Pa"]["Fe"],
+        rel_tol=1.0e-9,
+        abs_tol=1.0e-12,
+    )
+    assert not math.isclose(
+        fe.pressure.pa,
+        fe.selected_runtime_pressure.pa,
+        rel_tol=1.0e-6,
+        abs_tol=1.0e-9,
+    )
+    # The eight broad-proxy carriers stay flux-active on the flagged
+    # alpha=1 allowlist. Their debit still matches the live seam.
+    for sid in sorted(fallback_carriers & batch.requested_species_ids):
+        assert sid in surface["flux_active_species_ids"], (
+            f"{feedstock_id}/{sid}: flagged alpha=1 carrier left the flux set"
+        )
+        assert sid in comparable
         assert math.isclose(
-            surface["flux_pressures_Pa"]["Si"],
-            surface["live_seam_Pa"]["Si"],
+            comparable[sid],
+            surface["live_seam_Pa"][sid],
             rel_tol=1.0e-9,
             abs_tol=1.0e-12,
         )
-        # Fe's selected pressure is the Ellingham rail and matches the live
-        # seam. The dormant pseudo-Antoine stays on answer.pressure.
-        fe = batch.channel("Fe")
-        assert isinstance(fe.pressure, PressureValue)
-        assert isinstance(fe.selected_runtime_pressure, PressureValue)
-        assert "Fe" in surface["flux_pressures_Pa"]
-        assert math.isclose(
-            surface["flux_pressures_Pa"]["Fe"],
-            surface["live_seam_Pa"]["Fe"],
-            rel_tol=1.0e-9,
-            abs_tol=1.0e-12,
-        )
-        assert not math.isclose(
-            fe.pressure.pa,
-            fe.selected_runtime_pressure.pa,
-            rel_tol=1.0e-6,
-            abs_tol=1.0e-9,
-        )
-        # The eight broad-proxy carriers stay flux-active on the flagged
-        # alpha=1 allowlist. Their debit still matches the live seam.
-        for sid in sorted(fallback_carriers & batch.requested_species_ids):
-            assert sid in surface["flux_active_species_ids"], (
-                f"{feedstock_id}/{sid}: flagged alpha=1 carrier left the flux set"
-            )
-            assert math.isclose(
-                surface["flux_pressures_Pa"][sid],
-                surface["live_seam_Pa"][sid],
-                rel_tol=1.0e-9,
-                abs_tol=1.0e-12,
-            )
     assert surface["effective_source_id"] == (
         "equilibrium_backend_effective_pressure_pre_rg"
     )
