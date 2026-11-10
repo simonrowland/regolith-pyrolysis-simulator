@@ -14289,10 +14289,12 @@ def test_pankratz_1987_crystal_columns_reach_separate_series(tmp_path: Path) -> 
         ("nasa-glenn", "NG-1475"),
         ("burcat", "BU-2430"),
     ):
+        record_prefix = f"{source_id}:{record_id}"
         observations = [
             observation
             for observation in result.observations.values()
-            if observation.observation_id.startswith(f"{source_id}:{record_id}:")
+            if observation.observation_id == record_prefix
+            or observation.observation_id.startswith(f"{record_prefix}:")
         ]
         assert observations
         assert all(
