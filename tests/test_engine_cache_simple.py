@@ -197,6 +197,57 @@ def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
     }
 
 
+def test_equilibrium_hot_value_contains_only_battery_consumed_fields() -> None:
+    result = EquilibriumResult(
+        temperature_C=1000.0,
+        pressure_bar=1.0,
+        phases_present=["melt"],
+        phase_masses_kg={"melt": 1.0},
+        liquid_fraction=0.25,
+        phase_assemblage_available=True,
+        vapor_pressures_Pa={"H2O": 1200.0},
+        vapor_pressures_source={"H2O": "thermoengine"},
+        activity_coefficients={"FeO": 0.75},
+        warnings=["AlphaMELTS model notice"],
+        status="ok",
+        diagnostics={"backend_status_reason": "fixture-code", "unused": "large"},
+    )
+    result.reported_activity_coefficients = {"FeO": 0.9}
+    result.activity_coefficient_details = {"FeO": {"basis": "fixture"}}
+    result.vaporock_full_speciation_Pa = {"CO": 42.0}
+    result.imcc_notices = [{"kind": "fixture_flag"}]
+    result.imcc_model_id = "fixture-model"
+    result.liquid_composition_wt_pct = {"FeO": 10.0}
+    result.fe_redox_split = {"FeO": 0.2}
+
+    value = result.to_engine_cache_value()
+
+    assert set(value.hot) == {
+        "liquid_fraction",
+        "phase_assemblage_available",
+        "vapor_pressures_Pa",
+        "vapor_pressures_source",
+        "activity_coefficients",
+        "warnings",
+        "status",
+        "diagnostics",
+        "reported_activity_coefficients",
+        "activity_coefficient_details",
+        "vaporock_full_speciation_Pa",
+        "imcc_notices",
+        "imcc_model_id",
+        "liquid_composition_wt_pct",
+        "fe_redox_split",
+    }
+    assert "phase_masses_kg" in value.cold
+    assert "temperature_C" in value.cold
+    restored = EquilibriumResult.from_engine_cache_value(value.hot)
+    assert restored.activity_coefficients == result.activity_coefficients
+    assert restored.vapor_pressures_Pa == result.vapor_pressures_Pa
+    assert restored.diagnostics == result.diagnostics
+    assert restored.phase_masses_kg == {}
+
+
 def test_bulk_loader_is_idempotent_and_chemistry_version_can_be_dropped(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
