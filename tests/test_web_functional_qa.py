@@ -276,15 +276,15 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         assert "stage0_only" in reason
         assert "phase-independent K" in reason
         assert "Pending d-359 follow-ups: B, C, E." in reason
-        estimates_by_class = {
-            row["class"]
-            for estimate in runner["oxygen"]["estimated_contributions"]
-            for row in estimate.get("d359_prediction", {}).get(
-                "class_predictions", ()
-            )
-            if row.get("class")
+        refusal_reasons = {
+            row["species"]: row["reason"]
+            for row in runner["oxygen"]["excluded"]
         }
-        assert {"B", "C", "E"} <= estimates_by_class
+        assert "missing_evidence" in refusal_reasons["SiO"]
+        assert "outside_declared_evaluator_domain" in refusal_reasons["MnO_gas"]
+        for species in ("P4O10", "P4O6", "PO", "PO2"):
+            assert "stage0_only predicate inactive" in refusal_reasons[species]
+            assert refusal_reasons[species] in reason
         assert runner["metals_plus_O2"]["availability_flag"] == oxygen_flag
         assert web_story["oxygen"]["availability_flag"] == oxygen_flag
     assert web_story["refractory_ceramic"]["class_total_kg"] == pytest.approx(
