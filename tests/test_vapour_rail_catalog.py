@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 import csv
+import functools
 import hashlib
 import importlib.util
 import math
@@ -1302,37 +1303,202 @@ def test_association_token_does_not_evidence_any_live_species(
     )
 
 
-def test_identical_antoine_law_is_evidenced_and_a_different_law_is_not() -> None:
-    payload = _zero_activity_melt_payload(
-        family="antoine",
-        mode="gas_association_from_effective_base",
-        evidence="none",
-        base_link="matching",
-    )
-    row = payload["families"]["K_family"]["physical_properties"]["species"]["K"]
+def _unevidenced_law_copy(
+    species_id: str,
+    context: dict[str, object],
+    **overrides: object,
+) -> dict:
+    """Cleaned-melt Antoine with no fit evidence, copying one live fit context.
+
+    ``overrides`` changes a single identity field. The coefficients are the
+    live law unless A, B, or C is overridden.
+    """
+
+    payload = _effective_pressure_fit_fixture()
+    row = _rename_family_species(payload, species_id)
+    row["formula"] = overrides.get("formula", context["formula"])
+    row["parent_oxide"] = overrides.get("parent_oxide", context["parent_oxide"])
+    row.pop("backsolve", None)
+    row["validation"]["anchor_refs"] = []
     model = row["pressure_models"][0]
-    model["coefficients"] = dict(_EVIDENCED_BASE_COEFFICIENTS)
-    model["valid_domain"] = {"temperature_K": [1400.0, 1900.0]}
-    compiled = compile_vapour_rail_catalog(payload)
-    evaluator = compiled.species["K"].evaluator
-    assert evaluator is not None
-    assert evaluator.evaluate(1800.0).pressure_pa > 0.0
-    assert compiled.species["K"].validation_anchor_refs == ()
+    model.pop("provenance", None)
+    model["evaluator_family"] = "antoine"
+    model["activity_semantics"] = "effective_pressure_reference_fit"
+    model["activity_exponent"] = 0.0
+    model["pressure_kind"] = "equilibrium_partial_pressure"
+    model["species_basis"] = overrides.get("species_basis", context["species_basis"])
+    model["coefficients"] = {
+        "A": overrides.get("A", context["A"]),
+        "B": overrides.get("B", context["B"]),
+        "C": overrides.get("C", context["C"]),
+    }
+    model["valid_domain"] = {
+        "temperature_K": [
+            overrides.get("low", context["low"]),
+            overrides.get("high", context["high"]),
+        ]
+    }
+    family = payload["families"][f"{species_id}_family"]
+    family["code_metadata"]["source_account"] = overrides.get(
+        "source_account", context["source_account"]
+    )
+    return payload
 
-    model["valid_domain"] = {"temperature_K": [1000.0, 1200.0]}
-    with pytest.raises(
-        CatalogCompileError,
-        match="effective-pressure reference fit requires",
-    ):
-        compile_vapour_rail_catalog(payload)
 
-    model["valid_domain"] = {"temperature_K": [1400.0, 1900.0]}
-    model["coefficients"]["B"] += 1.0
-    with pytest.raises(
-        CatalogCompileError,
-        match="effective-pressure reference fit requires",
-    ):
-        compile_vapour_rail_catalog(payload)
+@functools.lru_cache(maxsize=1)
+def _live_bound_effective_fit_contexts() -> tuple[dict[str, object], ...]:
+    """Antoine effective fits whose own row carries the evidence fields.
+
+    This scan is the test oracle. It does not call the compiler's historic
+    matcher, so a matcher that ignores species cannot satisfy the test by
+    construction.
+    """
+
+    payload = _yaml("vapor_pressures.yaml")
+    found: list[dict[str, object]] = []
+    for family in payload["families"].values():
+        account = family["code_metadata"]["source_account"]
+        for species_id, row in family["physical_properties"]["species"].items():
+            models = row.get("pressure_models") or []
+            if len(models) != 1 or not isinstance(models[0], dict):
+                continue
+            model = models[0]
+            if model.get("evaluator_family") != "antoine":
+                continue
+            if model.get("activity_semantics") != "effective_pressure_reference_fit":
+                continue
+            if model.get("activity_exponent", 0.0) not in (0, 0.0, None, ""):
+                continue
+            if model.get("pressure_kind") != "equilibrium_partial_pressure":
+                continue
+            provenance = model.get("provenance") or []
+            has_model_provenance = any(
+                isinstance(item, dict)
+                and str(item.get("source_id") or "").strip()
+                and (
+                    str(item.get("observation_id") or "").strip()
+                    or item.get("observation_ids")
+                )
+                for item in provenance
+            )
+            backsolve = row.get("backsolve") if isinstance(row.get("backsolve"), dict) else {}
+            back_provenance = (
+                backsolve.get("provenance")
+                if isinstance(backsolve.get("provenance"), dict)
+                else {}
+            )
+            try:
+                residual = float(backsolve.get("residual_dex"))
+            except (TypeError, ValueError):
+                residual = float("nan")
+            anchors = (row.get("validation") or {}).get("anchor_refs") or []
+            if not (
+                has_model_provenance
+                and str(back_provenance.get("generated_by") or "").strip()
+                and str(back_provenance.get("fit_objective") or "").strip()
+                and math.isfinite(residual)
+                and residual >= 0.0
+                and anchors
+            ):
+                continue
+            coefficients = model["coefficients"]
+            low, high = model["valid_domain"]["temperature_K"]
+            found.append(
+                {
+                    "species_id": str(species_id),
+                    "formula": row["formula"],
+                    "parent_oxide": row["parent_oxide"],
+                    "source_account": account,
+                    "species_basis": model["species_basis"],
+                    "A": float(coefficients["A"]),
+                    "B": float(coefficients["B"]),
+                    "C": float(coefficients["C"]),
+                    "low": float(low),
+                    "high": float(high),
+                }
+            )
+    return tuple(found)
+
+
+def _shifted_fit_context_value(field: str, context: dict[str, object]) -> object:
+    current = context[field]
+    if field in {"formula", "parent_oxide", "species_basis"}:
+        return f"{current}_other"
+    if field in {"A", "B", "C", "low", "high"}:
+        return float(current) + 1.0
+    raise AssertionError(field)
+
+
+@pytest.mark.parametrize("species_id", _live_vapour_species_ids())
+def test_copied_effective_fit_law_is_evidence_only_for_its_species(
+    species_id: str,
+) -> None:
+    """Invariant: Fe's coefficients do not evidence any other cleaned-melt species.
+
+    Every live species is given the evidenced fit's formula, parent oxide,
+    species basis, and Antoine law, and no provenance, residual, or anchors.
+    Admission is allowed only for the species the live evidence names.
+    """
+
+    contexts = _live_bound_effective_fit_contexts()
+    assert contexts
+    assert any(item["species_id"] == "Fe" for item in contexts)
+    for context in contexts:
+        payload = _unevidenced_law_copy(species_id, context)
+        if species_id != context["species_id"]:
+            with pytest.raises(
+                CatalogCompileError,
+                match="effective-pressure reference fit requires",
+            ):
+                compile_vapour_rail_catalog(payload)
+            continue
+        compiled = compile_vapour_rail_catalog(payload)
+        assert compiled.species[species_id].validation_anchor_refs == ()
+        evaluator = compiled.species[species_id].evaluator
+        assert evaluator is not None
+        assert evaluator.activity_exponent == 0.0
+        temperature_K = 1800.0
+        if not (float(context["low"]) <= temperature_K <= float(context["high"])):
+            temperature_K = 0.5 * (float(context["low"]) + float(context["high"]))
+        # log10(P/Pa) = A - B / (T + C). Same expression the Antoine evaluator uses.
+        expected_pa = 10 ** (
+            float(context["A"])
+            - float(context["B"]) / (temperature_K + float(context["C"]))
+        )
+        assert evaluator.evaluate(temperature_K).pressure_pa == pytest.approx(
+            expected_pa, rel=1e-12, abs=0.0
+        )
+
+
+_FIT_CONTEXT_FIELDS = (
+    "formula",
+    "parent_oxide",
+    "species_basis",
+    "A",
+    "B",
+    "C",
+    "low",
+    "high",
+)
+
+
+@pytest.mark.parametrize("field", _FIT_CONTEXT_FIELDS)
+def test_historic_reuse_rejects_each_changed_fit_context_field(field: str) -> None:
+    """One changed identity field drops historic reuse of the evidenced law."""
+
+    contexts = _live_bound_effective_fit_contexts()
+    assert contexts
+    for context in contexts:
+        payload = _unevidenced_law_copy(
+            str(context["species_id"]),
+            context,
+            **{field: _shifted_fit_context_value(field, context)},
+        )
+        with pytest.raises(
+            CatalogCompileError,
+            match="effective-pressure reference fit requires",
+        ):
+            compile_vapour_rail_catalog(payload)
 
 
 def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:

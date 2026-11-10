@@ -4025,6 +4025,23 @@ def test_compile_cache_uses_explicit_content_identity() -> None:
     assert "NaCl" not in cat_a.species
 
     payload_b = _minimal_family("NaCl", parent_oxide="Na2O", with_reaction=False)
+    # with_reaction=False is a cleaned-melt Antoine at activity exponent 0.
+    # The cache test needs that row to compile, so it carries fit evidence.
+    nacl = payload_b["families"]["nacl_test_family"]["physical_properties"][
+        "species"
+    ]["NaCl"]
+    nacl["pressure_models"][0]["provenance"] = [
+        {
+            "source_id": "fit-grid-source",
+            "observation_id": "fit-grid",
+            "status": "diagnostic_only",
+        }
+    ]
+    nacl["backsolve"] = {
+        "residual_dex": 0.12,
+        "provenance": {"generated_by": "fit.py", "fit_objective": "minimax"},
+    }
+    nacl["validation"]["anchor_refs"] = ["anchor:test"]
     key_b = _compile_input_identity(
         payload_b, emit_u0_request_rules=False, u0_manifest=None
     )

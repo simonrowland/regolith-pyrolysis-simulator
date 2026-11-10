@@ -2078,6 +2078,7 @@ def compile_vapour_rail_catalog(
         raise CatalogCompileError("vapour catalog must declare at least one family")
 
     species_rows_by_id: dict[str, Mapping[str, Any]] = {}
+    species_source_account_by_id: dict[str, str] = {}
     for source_family_id, source_family_value in families.items():
         source_family = _mapping(source_family_value, f"families.{source_family_id}")
         source_physical = _mapping(
@@ -2088,10 +2089,18 @@ def compile_vapour_rail_catalog(
             source_physical.get("species"),
             f"{source_family_id}.physical_properties.species",
         )
+        source_code = source_family.get("code_metadata")
+        source_account = ""
+        if isinstance(source_code, Mapping) and isinstance(
+            source_code.get("source_account"), str
+        ):
+            source_account = source_code["source_account"].strip()
         for source_species_id, source_row in source_rows.items():
-            species_rows_by_id[str(source_species_id)] = _mapping(
+            source_species_key = str(source_species_id)
+            species_rows_by_id[source_species_key] = _mapping(
                 source_row, f"{source_family_id}.{source_species_id}"
             )
+            species_source_account_by_id[source_species_key] = source_account
 
     compiled: dict[str, CompiledSpecies] = {}
     legacy: dict[str, Any] = {}
@@ -2174,6 +2183,7 @@ def compile_vapour_rail_catalog(
                     source_account=compiled_code.source_account,
                     validation_anchor_refs=anchor_refs,
                     species_rows_by_id=species_rows_by_id,
+                    species_source_account_by_id=species_source_account_by_id,
                 )
             )
             if evaluator is not None and hasattr(
@@ -2657,9 +2667,9 @@ def _has_effective_pressure_reference_fit_evidence(
     )
 
 
-_LIVE_ANTOINE_LAW_CACHE: tuple[tuple[int, int], frozenset[tuple[object, ...]]] | None = (
-    None
-)
+_LIVE_ANTOINE_CONTEXT_CACHE: (
+    tuple[tuple[int, int], frozenset[tuple[object, ...]]] | None
+) = None
 
 
 def _antoine_executable_law(
@@ -2687,25 +2697,84 @@ def _antoine_executable_law(
     return (law, float(low), float(high))
 
 
-def _live_evidenced_antoine_laws() -> frozenset[tuple[object, ...]]:
-    """Antoine laws whose checked-in catalog row carries fit evidence.
+def _context_text(value: object) -> str | None:
+    if not isinstance(value, str):
+        return None
+    text = value.strip()
+    return text or None
 
-    Historic snapshots keep the same coefficients and domain after provenance
-    was added to the live row. The lookup reads that row; it does not copy
-    anchors onto the snapshot.
+
+def _bound_effective_fit_context(
+    *,
+    species_id: str,
+    formula: object,
+    parent_oxide: object,
+    source_account: str,
+    species_basis: object,
+    evaluator_family: str,
+    coefficients: Mapping[str, Any],
+    observable: PressureObservable,
+    valid_temperature_K: tuple[float, float],
+) -> tuple[object, ...] | None:
+    """Species, melt basis, and the Antoine law ``evaluate()`` computes.
+
+    A, B, C, and the temperature bounds are the law. Formula, parent oxide,
+    source account, and species basis are the fit context those coefficients
+    were solved for. A different species with the same coefficients is a
+    different context.
     """
 
-    global _LIVE_ANTOINE_LAW_CACHE
+    formula_text = _context_text(formula)
+    parent_oxide_text = _context_text(parent_oxide)
+    account_text = _context_text(source_account)
+    basis_text = _context_text(species_basis)
+    if (
+        formula_text is None
+        or parent_oxide_text is None
+        or account_text is None
+        or basis_text is None
+    ):
+        return None
+    law = _antoine_executable_law(
+        evaluator_family=evaluator_family,
+        coefficients=coefficients,
+        observable=observable,
+        valid_temperature_K=valid_temperature_K,
+    )
+    if law is None:
+        return None
+    return (
+        species_id,
+        formula_text,
+        parent_oxide_text,
+        account_text,
+        basis_text,
+        law,
+    )
+
+
+def _live_evidenced_antoine_contexts() -> frozenset[tuple[object, ...]]:
+    """Effective Antoine fits whose checked-in row binds evidence to that species.
+
+    Historic snapshots keep the same species, melt basis, and coefficients
+    after provenance was added to the live row. The lookup reads that row.
+    It does not lend the fit to any other species or parent oxide.
+    """
+
+    global _LIVE_ANTOINE_CONTEXT_CACHE
     path = Path(__file__).resolve().parents[2] / "data" / "vapor_pressures.yaml"
     try:
         stat = path.stat()
     except OSError:
         return frozenset()
     signature = (stat.st_mtime_ns, stat.st_size)
-    if _LIVE_ANTOINE_LAW_CACHE is not None and _LIVE_ANTOINE_LAW_CACHE[0] == signature:
-        return _LIVE_ANTOINE_LAW_CACHE[1]
+    if (
+        _LIVE_ANTOINE_CONTEXT_CACHE is not None
+        and _LIVE_ANTOINE_CONTEXT_CACHE[0] == signature
+    ):
+        return _LIVE_ANTOINE_CONTEXT_CACHE[1]
     payload = yaml.safe_load(path.read_text(encoding="utf-8"))
-    laws: set[tuple[object, ...]] = set()
+    contexts: set[tuple[object, ...]] = set()
     families = payload.get("families") if isinstance(payload, Mapping) else None
     if isinstance(families, Mapping):
         for family in families.values():
@@ -2717,6 +2786,10 @@ def _live_evidenced_antoine_laws() -> frozenset[tuple[object, ...]]:
             species_rows = physical.get("species")
             if not isinstance(species_rows, Mapping):
                 continue
+            code = family.get("code_metadata")
+            source_account = ""
+            if isinstance(code, Mapping) and isinstance(code.get("source_account"), str):
+                source_account = code["source_account"]
             for species_id, row in species_rows.items():
                 if not isinstance(row, Mapping):
                     continue
@@ -2748,7 +2821,12 @@ def _live_evidenced_antoine_laws() -> frozenset[tuple[object, ...]]:
                     validation_anchor_refs=anchor_refs,
                 ):
                     continue
-                law = _antoine_executable_law(
+                context = _bound_effective_fit_context(
+                    species_id=str(species_id),
+                    formula=row.get("formula"),
+                    parent_oxide=row.get("parent_oxide"),
+                    source_account=source_account,
+                    species_basis=model.get("species_basis"),
                     evaluator_family=str(model.get("evaluator_family") or ""),
                     coefficients=model.get("coefficients")
                     if isinstance(model.get("coefficients"), Mapping)
@@ -2756,26 +2834,37 @@ def _live_evidenced_antoine_laws() -> frozenset[tuple[object, ...]]:
                     observable=observable,
                     valid_temperature_K=bounds,
                 )
-                if law is not None:
-                    laws.add(law)
-    found = frozenset(laws)
-    _LIVE_ANTOINE_LAW_CACHE = (signature, found)
+                if context is not None:
+                    contexts.add(context)
+    found = frozenset(contexts)
+    _LIVE_ANTOINE_CONTEXT_CACHE = (signature, found)
     return found
 
 
-def _compiled_antoine_matches_live_evidenced_law(
-    evaluator: CompiledPressureEvaluator,
+def _matches_live_bound_effective_fit(
+    *,
+    species_id: str,
+    formula: object,
+    parent_oxide: object,
+    source_account: str,
+    species_basis: object,
+    evaluator_family: str,
+    coefficients: Mapping[str, Any],
+    observable: PressureObservable,
+    valid_temperature_K: tuple[float, float],
 ) -> bool:
-    reference = evaluator.reference_model
-    if reference.physical_composite_ood or reference.thermo_log10_pressure is not None:
-        return False
-    law = _antoine_executable_law(
-        evaluator_family=evaluator.evaluator_family,
-        coefficients=reference.coefficients,
-        observable=evaluator.pressure_observable,
-        valid_temperature_K=evaluator.valid_temperature_K,
+    context = _bound_effective_fit_context(
+        species_id=species_id,
+        formula=formula,
+        parent_oxide=parent_oxide,
+        source_account=source_account,
+        species_basis=species_basis,
+        evaluator_family=evaluator_family,
+        coefficients=coefficients,
+        observable=observable,
+        valid_temperature_K=valid_temperature_K,
     )
-    return law is not None and law in _live_evidenced_antoine_laws()
+    return context is not None and context in _live_evidenced_antoine_contexts()
 
 
 def _effective_pressure_reference_fit_is_evidenced(
@@ -2784,6 +2873,7 @@ def _effective_pressure_reference_fit_is_evidenced(
     row: Mapping[str, Any],
     model: Mapping[str, Any],
     validation_anchor_refs: tuple[str, ...],
+    source_account: str,
 ) -> bool:
     if _has_effective_pressure_reference_fit_evidence(
         species_id=species_id,
@@ -2802,13 +2892,17 @@ def _effective_pressure_reference_fit_is_evidenced(
         reference = _compile_reference_model(species_id, model)
     except CatalogCompileError:
         return False
-    law = _antoine_executable_law(
+    return _matches_live_bound_effective_fit(
+        species_id=species_id,
+        formula=row.get("formula"),
+        parent_oxide=row.get("parent_oxide"),
+        source_account=source_account,
+        species_basis=model.get("species_basis"),
         evaluator_family=reference.evaluator_family,
         coefficients=reference.coefficients,
         observable=observable,
         valid_temperature_K=bounds,
     )
-    return law is not None and law in _live_evidenced_antoine_laws()
 
 
 def _captured_association_base(
@@ -2834,6 +2928,7 @@ def _verified_gas_association_base_has_fit_evidence(
     model: Mapping[str, Any],
     evaluator: CompiledPressureEvaluator,
     species_rows_by_id: Mapping[str, Mapping[str, Any]],
+    species_source_account_by_id: Mapping[str, str],
 ) -> bool:
     """True when evaluate() runs an evidenced base, not merely names one."""
 
@@ -2882,6 +2977,7 @@ def _verified_gas_association_base_has_fit_evidence(
         row=base_row,
         model=base_model,
         validation_anchor_refs=base_anchor_refs,
+        source_account=species_source_account_by_id.get(base_species_id, ""),
     ):
         return False
 
@@ -2903,17 +2999,22 @@ def _zero_activity_melt_executable_is_evidenced(
     model: Mapping[str, Any],
     evaluator: CompiledPressureEvaluator,
     validation_anchor_refs: tuple[str, ...],
+    source_account: str,
     species_rows_by_id: Mapping[str, Mapping[str, Any]],
+    species_source_account_by_id: Mapping[str, str],
 ) -> bool:
-    """Admit cleaned-melt activity exponent 0 only for an evidenced law.
+    """Admit cleaned-melt activity exponent 0 only for a bound evidenced fit.
 
-    Invariant: the pressure ``evaluate()`` computes is an evidenced effective
-    fit. That is this row's own provenance, residual, and anchors; a compiled
-    gas-association composite whose captured base is such a fit; or this
-    evaluator's own Antoine law (A, B, C, and temperature domain) matching a
-    live catalog row that has the evidence. ``composition_mode``,
-    ``base_vapor_formula``, and an embedded coefficient copy that the
-    executable evaluator does not call are not evidence.
+    Invariant: every cleaned-melt species with activity exponent 0 is refused
+    unless the pressure ``evaluate()`` computes is evidenced for that same
+    species and melt basis. Evidence is this row's own provenance, residual,
+    and anchors; a gas-association composite whose captured base is such a
+    fit for the named base species; or this species' own Antoine law (formula,
+    parent oxide, source account, species basis, coefficients, and temperature
+    domain) matching a live catalog row that carries the evidence. Copying
+    another species' A, B, and C is not evidence. ``composition_mode`` and an
+    embedded coefficient block the executable evaluator does not call are not
+    evidence.
     """
 
     if _verified_gas_association_base_has_fit_evidence(
@@ -2921,6 +3022,7 @@ def _zero_activity_melt_executable_is_evidenced(
         model=model,
         evaluator=evaluator,
         species_rows_by_id=species_rows_by_id,
+        species_source_account_by_id=species_source_account_by_id,
     ):
         return True
     if _has_effective_pressure_reference_fit_evidence(
@@ -2930,10 +3032,20 @@ def _zero_activity_melt_executable_is_evidenced(
         validation_anchor_refs=validation_anchor_refs,
     ):
         return True
-    # The executable Antoine coefficients, not a YAML token. A historic
-    # snapshot of an evidenced law has the same A/B/C and domain with the
-    # later provenance left on the live catalog.
-    return _compiled_antoine_matches_live_evidenced_law(evaluator)
+    reference = evaluator.reference_model
+    if reference.physical_composite_ood or reference.thermo_log10_pressure is not None:
+        return False
+    return _matches_live_bound_effective_fit(
+        species_id=species_id,
+        formula=row.get("formula"),
+        parent_oxide=row.get("parent_oxide"),
+        source_account=source_account,
+        species_basis=evaluator.species_basis,
+        evaluator_family=evaluator.evaluator_family,
+        coefficients=reference.coefficients,
+        observable=evaluator.pressure_observable,
+        valid_temperature_K=evaluator.valid_temperature_K,
+    )
 
 
 def _compile_source_reaction_activity(
@@ -2945,6 +3057,7 @@ def _compile_source_reaction_activity(
     source_account: str,
     validation_anchor_refs: tuple[str, ...],
     species_rows_by_id: Mapping[str, Mapping[str, Any]],
+    species_source_account_by_id: Mapping[str, str],
 ) -> tuple[str | None, ActivityInputDeclaration | None]:
     """Compile the activity-input declaration stored on one compiled species.
 
@@ -3015,7 +3128,9 @@ def _compile_source_reaction_activity(
             model=model,
             evaluator=evaluator,
             validation_anchor_refs=validation_anchor_refs,
+            source_account=source_account,
             species_rows_by_id=species_rows_by_id,
+            species_source_account_by_id=species_source_account_by_id,
         ):
             raise CatalogCompileError(
                 f"{species_id}: effective-pressure reference fit requires "
@@ -3024,8 +3139,9 @@ def _compile_source_reaction_activity(
                 "backsolve.provenance.fit_objective, a finite non-negative "
                 "backsolve.residual_dex, validation.anchor_refs, a "
                 "gas-association composite whose captured base matches an "
-                "evidence-backed fit, or an Antoine law identical to a live "
-                "evidenced fit"
+                "evidence-backed fit, or this species' Antoine law bound to "
+                "the same formula, parent oxide, source account, and species "
+                "basis as a live evidenced fit"
             )
 
     if evaluator is not None and (
