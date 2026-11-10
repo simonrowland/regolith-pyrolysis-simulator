@@ -850,6 +850,7 @@ _EMPTY_FLUX_AUTHORIZING_STATES = frozenset({
 _EMPTY_FLUX_KINETIC_FLOOR = 'internal_analytical_below_400K'
 _EMPTY_FLUX_ZERO_BY_PHYSICS = 'zero_by_physics'
 _EMPTY_FLUX_TYPED_NON_DEBIT = 'vapour_batch_all_channels_non_debiting'
+_EMPTY_FLUX_PARTIAL = 'partial_authorized'
 
 
 def _authorize_empty_species_flux(
@@ -864,12 +865,18 @@ def _authorize_empty_species_flux(
     Invariant: no requested species is a silent 0.0. The below-400 K kinetic
     floor is a legitimate empty flux. The kernel did not evaluate on that
     tick, so a catalog refusal there is not a debit and must not abort the
-    run. Above that floor, every selected outcome must be dormant-by-epoch,
-    an upper bound, or zero-by-physics before an empty flux returns.
-    Refusal, incomplete, missing, and invalid selected pressures still block
-    the sub-1050 C physical zero and the hot typed-non-debit return. A
-    numeric catalog pressure does not authorize the zero. No species present
-    does not block; one of the typed proofs below is still required.
+    run. A refused, incomplete, missing, or invalid channel refuses only
+    that channel. Peers that are dormant, an upper bound, or zero-by-physics
+    still authorize their own zero, and the sub-1050 C physical zero still
+    applies when any channel can answer. The batch is refused only when
+    every selected channel is unable to answer. A numeric dormant catalog
+    pressure on an all-refusal request is not that answer, so it does not
+    take the physical zero. No species present does not block; one of the
+    typed proofs below is still required.
+
+    ``partial_authorized`` means at least one channel authorizes a zero and
+    at least one does not. The caller must let a later kernel or freeze-gate
+    refusal surface before accepting the empty flux.
 
     This is the only authorization for an empty species flux. Callers must
     not return that flux on a second predicate.
@@ -877,10 +884,14 @@ def _authorize_empty_species_flux(
 
     if kinetic_floor:
         return ('kinetic_floor', _EMPTY_FLUX_KINETIC_FLOOR)
-    if channel_states and any(
-        state not in _EMPTY_FLUX_AUTHORIZING_STATES
+    blocking = [
+        state
         for state in channel_states.values()
-    ):
+        if state not in _EMPTY_FLUX_AUTHORIZING_STATES
+    ]
+    # Every selected channel is a non-answer. Do not cover that with the
+    # sub-1050 C seam proof or a dormant catalog pressure.
+    if blocking and len(blocking) == len(channel_states):
         return None
     if physical_zero_reason and catalog_pressure_present:
         return ('physical_zero', str(physical_zero_reason))
@@ -888,8 +899,10 @@ def _authorize_empty_species_flux(
         state == 'zero_by_physics' for state in channel_states.values()
     ):
         return ('zero_by_physics', _EMPTY_FLUX_ZERO_BY_PHYSICS)
-    if channel_states:
+    if channel_states and not blocking:
         return ('typed_non_debit', _EMPTY_FLUX_TYPED_NON_DEBIT)
+    if channel_states:
+        return (_EMPTY_FLUX_PARTIAL, _EMPTY_FLUX_TYPED_NON_DEBIT)
     return None
 
 
@@ -1188,9 +1201,11 @@ class EvaporationMixin:
 
         if not vapor_pressures:
             # One chokepoint. The kinetic floor authorizes before channel
-            # states are read: a cold tick has no kernel debit. Above that
-            # floor, catalog batch_pa_by_species is coverage evidence only
-            # after every selected outcome authorizes the zero.
+            # states are read: a cold tick has no kernel debit. A refused
+            # channel does not veto a peer that can debit or authorize a
+            # zero. The batch is refused only when no channel can answer.
+            # partial_authorized still reaches the kernel so a freeze-gate
+            # or missing-data refusal is raised instead of this token.
             channel_states = dict(
                 flux_overlay_report.get('batch_channel_states', {}) or {}
             )
@@ -1261,17 +1276,28 @@ class EvaporationMixin:
                 self._last_evaporation_flux_diagnostic = regime_diagnostic
             if authorization is not None and authorization[0] == 'zero_by_physics':
                 return flux
-            # When every channel is a typed non-debit outcome (genuine bound,
-            # zero, dormant) and none is refused / eligible / missing-seam,
-            # empty flux is authorized, not an empty-provider false zero.
-            if authorization is not None and authorization[0] == 'typed_non_debit':
+            # Every channel is a typed non-debit, or a refusal sits beside one
+            # and this host has no kernel to ask. Empty flux is authorized.
+            # A partial authorization on a host that can dispatch falls
+            # through, so a kernel missing-data refusal or the freeze gate's
+            # own typed refusal is raised instead of the batch token.
+            partial_reaches_kernel = (
+                authorization is not None
+                and authorization[0] == _EMPTY_FLUX_PARTIAL
+                and T_K >= 400.0
+                and callable(getattr(self, '_dispatch_only', None))
+            )
+            if authorization is not None and authorization[0] in (
+                'typed_non_debit',
+                _EMPTY_FLUX_PARTIAL,
+            ) and not partial_reaches_kernel:
                 self._last_evaporation_flux_diagnostic = {
                     **regime_diagnostic,
                     'reason': 'vapour_batch_all_channels_non_debiting',
                     'detail': (
-                        'every requested vapour channel is a typed non-debit '
-                        'outcome (upper_bound / zero / dormant); '
-                        'empty flux is authorized'
+                        'requested vapour channels are typed non-debit '
+                        'outcomes (upper_bound / zero / dormant); a refused '
+                        'channel refuses only itself'
                     ),
                     'batch_channel_states': channel_states,
                     'evaporation_flux_kg_hr': {},
@@ -1279,25 +1305,26 @@ class EvaporationMixin:
                     'vapour_batch': batch_report,
                 }
                 return flux
-            reason = 'vapour_batch_no_debiting_pressure_outcome'
-            diagnostic = {
-                **regime_diagnostic,
-                'reason': reason,
-                'detail': (
-                    'non-empty vapour request has no batch-authorized debiting '
-                    'effective pressure; empty provider output is not '
-                    'physical-zero proof'
-                ),
-                'provider_zero_reason': zero_reason,
-                'evaporation_flux_kg_hr': {},
-                'vapour_batch_flux_overlay': flux_overlay_report,
-                'vapour_batch': batch_report,
-            }
-            self._last_evaporation_flux_diagnostic = diagnostic
-            raise EvaporationFluxRefusal(
-                reason,
-                diagnostic,
-            )
+            if not partial_reaches_kernel:
+                reason = 'vapour_batch_no_debiting_pressure_outcome'
+                diagnostic = {
+                    **regime_diagnostic,
+                    'reason': reason,
+                    'detail': (
+                        'non-empty vapour request has no batch-authorized debiting '
+                        'effective pressure; empty provider output is not '
+                        'physical-zero proof'
+                    ),
+                    'provider_zero_reason': zero_reason,
+                    'evaporation_flux_kg_hr': {},
+                    'vapour_batch_flux_overlay': flux_overlay_report,
+                    'vapour_batch': batch_report,
+                }
+                self._last_evaporation_flux_diagnostic = diagnostic
+                raise EvaporationFluxRefusal(
+                    reason,
+                    diagnostic,
+                )
         if T_K < 400:  # Catalog pressure exists; thermal physical zero.
             return flux
         # b-149 instance 4: partial channel refusals. When some channels debit
