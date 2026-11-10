@@ -332,6 +332,7 @@ def test_default_classification_values_preserve_controlled_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    # Re-pinned after d-367 routed the interim B/C/E estimates through the
-    # vapour rail while preserving numeric class totals.
-    assert digest == "c58ff8ebb8dcfbb9da4d662c2487f0284610553dd9b8fc3613091e47efd3222f"
+    # Re-pinned from production after d-367 retained numeric partial classes
+    # and marked refusal-only, no-number classes unavailable; R9 also routes
+    # the molecular-O2 notice through its ledger total.
+    assert digest == "6b773058ae32e6cfe7670d8858f51df494462406c3e140ba5ede452207847325"

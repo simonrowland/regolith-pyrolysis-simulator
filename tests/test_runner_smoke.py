@@ -244,7 +244,7 @@ def test_completed_run_wires_product_classification_and_markdown() -> None:
     session = run._start_session()
 
     payload = run._run_session(session)
-    expected = classify_products(session.simulator)
+    expected = _json_safe(classify_products(session.simulator))
     report = payload["product_classification"]
 
     assert report["classification"] == expected
@@ -822,12 +822,11 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     # 40 C K trap. The c679673f5/85fedcb8e band-integrated capture path gives
     # this production row total; the next row transfers it to reagent, so live
     # product returns to zero while cumulative condensate and recycled mass
-    # retain the capture. Matched Studio-2 runs move row-7 Na+K product from
-    # green 0.0004975311735864233 kg to candidate 0.0004975123352703119 kg
-    # (-1.88383156111e-8 kg, -0.003785%) as the converted Ca/Mg vapor terms
-    # change the coupled melt composition.
+    # retain the capture. d-365 accepts the d-359 CaO/MgO activity correction
+    # from 8e9a42378, which changes the coupled melt composition and this
+    # production value.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0004975123352703119, rel=1e-12, abs=1e-15
+        0.0004966753199465325, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
