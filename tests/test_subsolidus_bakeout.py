@@ -857,6 +857,56 @@ def test_competing_branches_share_one_host_inventory():
     assert accepted["a_branch"] + accepted["b_branch"] == pytest.approx(1.0, rel=1e-9)
 
 
+def test_shared_host_prefers_higher_equilibrium_driving_force():
+    """reaction_id does not outrank a higher p_eq - p_bulk on one host.
+
+    a_weak sorts first by id and has the smaller equilibrium driving
+    force. The host mole goes to z_strong.
+    """
+    result = _dispatch_bakeout(
+        temperature_C=900.0 - 273.15,
+        vapour_batch_flux_pressures_Pa={"S2": 1.0, "SO2": 1000.0},
+        solid_host_area_m2=10.0,
+        max_throughput_kg_hr=1.0e9,
+        dt_hr=1.0,
+        alpha={"S2": 0.25, "SO2": 0.25},
+        molar_mass_kg_mol={"S2": _molar("S2"), "SO2": _molar("SO2")},
+        reactions=[
+            _troilite_reaction(
+                reaction_id="a_weak",
+                host_remaining_mol=1.0,
+                extent_bound_mol_rxn=10.0,
+            ),
+            _troilite_reaction(
+                reaction_id="z_strong",
+                driving_gas_species_id="SO2",
+                host_remaining_mol=1.0,
+                extent_bound_mol_rxn=10.0,
+                stoichiometry=[
+                    {
+                        "species_id": "FeS_troilite",
+                        "phase": "troilite",
+                        "nu_mol_per_mol_rxn": -1.0,
+                    },
+                    {
+                        "species_id": "Fe",
+                        "phase": "metal",
+                        "nu_mol_per_mol_rxn": 1.0,
+                    },
+                    {
+                        "species_id": "SO2",
+                        "phase": "gas",
+                        "nu_mol_per_mol_rxn": 1.0,
+                    },
+                ],
+            ),
+        ],
+    )
+    accepted = result.diagnostic["accepted_extent_mol_by_reaction"]
+    assert accepted["z_strong"] == pytest.approx(1.0, rel=1e-9)
+    assert accepted["a_weak"] == pytest.approx(0.0, abs=1e-9)
+
+
 def test_refused_reaction_does_not_enter_released_demand():
     result = _dispatch_bakeout(
         temperature_C=626.85,

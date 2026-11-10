@@ -362,6 +362,100 @@ def _parse_dg_points(dg_row: Mapping[str, Any]) -> list[tuple[float, float]]:
     return parsed
 
 
+def _reactant_coefficient(reaction: str, species: str) -> float:
+    left, arrow, _right = reaction.partition("->")
+    if not arrow or not left.strip():
+        raise ValueError(f"dG row reaction must contain one '->': {reaction!r}")
+    for term in left.split("+"):
+        tokens = term.strip().split()
+        if not tokens or tokens[-1] != species:
+            continue
+        if len(tokens) == 1:
+            return 1.0
+        if len(tokens) != 2:
+            raise ValueError(
+                f"invalid reactant term {term.strip()!r} in reaction {reaction!r}"
+            )
+        try:
+            coefficient = Fraction(tokens[0])
+        except (ValueError, ZeroDivisionError) as exc:
+            raise ValueError(
+                f"invalid coefficient in dG row reaction {reaction!r}"
+            ) from exc
+        if coefficient <= 0:
+            raise ValueError(
+                f"reactant coefficient must be positive: {reaction!r}"
+            )
+        return float(coefficient)
+    raise ValueError(f"reaction {reaction!r} has no reactant {species!r}")
+
+
+def _interpolated_dg_kJ(
+    dg_points: Sequence[tuple[float, float]],
+    temperature_K: float,
+) -> tuple[float, str]:
+    """Linear dG(T). Outside the tabulated span, extend the end segment."""
+    _validate_dg_points(dg_points)
+    if not math.isfinite(temperature_K):
+        raise ValueError("temperature_K must be finite")
+    ordered = sorted(dg_points, key=lambda row: row[0])
+    low_K = ordered[0][0]
+    high_K = ordered[-1][0]
+    if temperature_K < low_K:
+        (t0, g0), (t1, g1) = ordered[0], ordered[1]
+        confidence = "out_of_domain"
+    elif temperature_K > high_K:
+        (t0, g0), (t1, g1) = ordered[-2], ordered[-1]
+        confidence = "out_of_domain"
+    else:
+        confidence = "in_domain"
+        (t0, g0), (t1, g1) = ordered[0], ordered[1]
+        for (lo_t, lo_g), (hi_t, hi_g) in zip(ordered, ordered[1:]):
+            if lo_t <= temperature_K <= hi_t:
+                t0, g0, t1, g1 = lo_t, lo_g, hi_t, hi_g
+                break
+    if math.isclose(t1, t0):
+        raise ValueError("degenerate dG temperature spacing")
+    # dG(T) = g0 + (g1-g0) * (T-t0) / (t1-t0). Endpoints stay on the
+    # tabulated value; one kelvin outside either end is out_of_domain.
+    dg = g0 + (g1 - g0) * (temperature_K - t0) / (t1 - t0)
+    return dg, confidence
+
+
+def foulant_dg_kJ_per_mol_carbon(
+    dg_row: Mapping[str, Any],
+    temperature_K: float,
+    *,
+    species: str,
+    carbon_per_mol_feed: float,
+) -> tuple[float, str, bool]:
+    """Tabulated thermal dG divided by the carbon the cleanup consumes.
+
+    The oxide reactions are the thermal decomposition plus
+    ``C + 1/2 O2 -> CO``. That CO term is the same for every sulfate
+    whose table releases 1/2 O2 per mol C, so it does not change the
+    greedy order. ``n_C`` is the feed coefficient in the tabulated
+    reaction times ``carbon_per_mol_feed``. ``oxygen_couple`` is true
+    when ``2 * nu_O2 == n_C``.
+    """
+    if not isinstance(dg_row, Mapping):
+        raise ValueError("dG row must be a mapping")
+    c_per_feed = float(carbon_per_mol_feed)
+    if not math.isfinite(c_per_feed) or c_per_feed <= 0.0:
+        raise ValueError("carbon_per_mol_feed must be finite and positive")
+    reaction = dg_row.get("reaction")
+    if not isinstance(reaction, str):
+        raise ValueError("dG row reaction must be a string")
+    feed_coeff = _reactant_coefficient(reaction, species)
+    n_carbon = feed_coeff * c_per_feed
+    dg_reaction, confidence = _interpolated_dg_kJ(
+        _parse_dg_points(dg_row), temperature_K
+    )
+    nu_o2 = _product_o2_stoich(reaction)
+    oxygen_couple = math.isclose(2.0 * nu_o2, n_carbon, rel_tol=0.0, abs_tol=1e-9)
+    return dg_reaction / n_carbon, confidence, oxygen_couple
+
+
 def _product_o2_stoich(reaction: object) -> float:
     if not isinstance(reaction, str) or not reaction.strip():
         raise ValueError("dG row reaction must be a non-empty string")

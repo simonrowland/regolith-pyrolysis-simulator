@@ -1043,6 +1043,9 @@ def _solid_host_bakeout_result(
             "host_species": host_species,
             "host_nu_abs": abs(host_term[2]),
             "unconstrained": max(0.0, unconstrained),
+            # p_eq - p_bulk is the Hertz-Knudsen driving force. A larger
+            # value is the more favoured equilibrium on a shared host.
+            "driving_pa": max(0.0, p_eq - p_bulk),
             "extent_bound": bound,
             "terms": terms,
         })
@@ -1061,7 +1064,9 @@ def _solid_host_bakeout_result(
             unavailable_reactions=unavailable,
         )
 
-    priced.sort(key=lambda row: row["reaction_id"])
+    # Reaction id is only the tie-break. Equilibrium driving force
+    # decides which channel debits a shared host first.
+    priced.sort(key=lambda row: (-row["driving_pa"], row["reaction_id"]))
 
     def _gas_kg_h(row: Mapping[str, Any], extent: float) -> float:
         total = 0.0

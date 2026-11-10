@@ -584,3 +584,119 @@ def test_bare_so3_sulfate_path_unchanged(mars_caso4_feedstock):
     assert ledger_offgas.get("SO2", 0.0) >= expected_so2 - 1e-9
     assert ledger_offgas.get("CO", 0.0) >= expected_co - 1e-9
     assert "SO3" not in sim.inventory.salt_phase_kg
+
+
+def _scarce_sulfate_feed(registry, order: tuple[str, ...]):
+    """1 mol CaSO4, 2 mol FeSO4, and 1 mol C. ``order`` is dict insertion."""
+    molar = {
+        species: resolve_species_formula(species, registry).molar_mass_kg_per_mol()
+        for species in ("CaSO4", "FeSO4", "C", "Fe2O3", "SO2", "CO")
+    }
+    feeds = {"CaSO4": molar["CaSO4"], "FeSO4": 2.0 * molar["FeSO4"]}
+    return molar, {species: feeds[species] for species in order}
+
+
+def test_scarce_carbon_allocates_to_lower_dg_per_mol_c_not_dict_order():
+    """1 mol C cannot reduce both 1 CaSO4 and 2 FeSO4.
+
+    At 1050 C the foulant tables give FeSO4 -35 kJ/mol C and CaSO4
+    +85.75 kJ/mol C, both extrapolated. FeSO4 takes the mole of C:
+    2 FeSO4 + C -> Fe2O3 + 2 SO2 + CO. CaSO4 stays a host and reserves
+    nothing. Insertion order must not change that.
+    """
+    sim = _sim({"feed": {"label": "b-1056 rank"}})
+    registry = sim.species_formula_registry
+    for order in (("CaSO4", "FeSO4"), ("FeSO4", "CaSO4")):
+        molar, cation_feed = _scarce_sulfate_feed(registry, order)
+        sim.inventory.cation_sulfate_feed_kg = dict(cation_feed)
+        sim.inventory.gas_volatiles_kg = {}
+        sim.inventory.stage0_products_kg = {}
+        sim.inventory.melt_oxide_kg = {}
+        sim.inventory.sulfide_matte_kg = {}
+        sim.inventory.stage0_temp_range_C = (20.0, 1050.0)
+        sim._stage0_bakeout_reserved_carbon_kg = 0.0
+        specs: list[dict] = []
+        remaining = sim._apply_stage0_cation_sulfate_carbon_reactions(
+            {"stage0_carbon_cleanup": {"cation_sulfate_product": "oxide"}},
+            1.0,
+            specs,
+        )
+        assert remaining == pytest.approx(0.0, abs=1e-12)
+        assert sim.inventory.melt_oxide_kg.get("Fe2O3", 0.0) == pytest.approx(
+            molar["Fe2O3"], rel=0, abs=1e-12
+        )
+        assert sim.inventory.gas_volatiles_kg.get("SO2", 0.0) == pytest.approx(
+            2.0 * molar["SO2"], rel=0, abs=1e-12
+        )
+        assert sim.inventory.gas_volatiles_kg.get("CO", 0.0) == pytest.approx(
+            molar["CO"], rel=0, abs=1e-12
+        )
+        assert sim.inventory.cation_sulfate_feed_kg.get("CaSO4", 0.0) == (
+            pytest.approx(molar["CaSO4"], rel=0, abs=1e-12)
+        )
+        assert "FeSO4" not in sim.inventory.cation_sulfate_feed_kg
+        assert sim._stage0_bakeout_reserved_carbon_kg == pytest.approx(0.0, abs=1e-12)
+        notice = sim._stage0_carbon_allocation_notices[0]
+        assert notice["order"] == ["FeSO4", "CaSO4"]
+        assert notice["rationed"] is True
+        by_species = {claim["species"]: claim for claim in notice["claims"]}
+        assert by_species["FeSO4"]["dG_kJ_per_mol_C"] == pytest.approx(-35.0)
+        assert by_species["CaSO4"]["dG_kJ_per_mol_C"] == pytest.approx(85.75)
+        assert by_species["FeSO4"]["confidence"] == "out_of_domain"
+        assert by_species["CaSO4"]["confidence"] == "out_of_domain"
+        assert by_species["FeSO4"]["oxygen_couple"] is True
+        assert by_species["CaSO4"]["oxygen_couple"] is True
+
+
+def test_load_batch_scarce_sulfate_carbon_follows_dg_not_set_order():
+    """The set-built cation feed used by load_batch follows the same rank."""
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    probe = PyrolysisSimulator(
+        backend, {"campaigns": {}}, {"feed": {}}, {"metals": {}, "oxide_vapors": {}}
+    )
+    registry = probe.species_formula_registry
+    molar = {
+        species: resolve_species_formula(species, registry).molar_mass_kg_per_mol()
+        for species in ("CaSO4", "FeSO4", "C", "Fe2O3", "SO2", "SiO2")
+    }
+    caso4_kg = molar["CaSO4"]
+    feso4_kg = 2.0 * molar["FeSO4"]
+    sio2_kg = 10.0
+    mass_kg = caso4_kg + feso4_kg + sio2_kg
+    carbon_kg = molar["C"]
+    feedstock = {
+        "label": "b-1056 scarce carbon",
+        "stage0_profile": "mars_carbon_cleanup",
+        "stage0_temp_range_C": [20.0, 1050.0],
+        "stage0_carbon_cleanup": {
+            "carbon_reductant_kg_per_tonne": carbon_kg * 1000.0 / mass_kg,
+            "reactions": ["sulfate_so3_to_so2_co"],
+        },
+        "composition_wt_pct": {
+            "SiO2": 100.0 * sio2_kg / mass_kg,
+            "CaSO4": 100.0 * caso4_kg / mass_kg,
+            "FeSO4": 100.0 * feso4_kg / mass_kg,
+        },
+    }
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {"feed": feedstock},
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("feed", mass_kg=mass_kg, additives_kg={"C": carbon_kg})
+    assert sim.inventory.melt_oxide_kg.get("Fe2O3", 0.0) == pytest.approx(
+        molar["Fe2O3"], rel=0, abs=1e-9
+    )
+    assert sim.inventory.gas_volatiles_kg.get("SO2", 0.0) == pytest.approx(
+        2.0 * molar["SO2"], rel=0, abs=1e-9
+    )
+    assert sim.inventory.cation_sulfate_feed_kg.get("CaSO4", 0.0) == pytest.approx(
+        caso4_kg, rel=0, abs=1e-9
+    )
+    assert "FeSO4" not in sim.inventory.cation_sulfate_feed_kg
+    assert sim._stage0_bakeout_reserved_carbon_kg == pytest.approx(0.0, abs=1e-9)
+    assert sim._stage0_carbon_allocation_notices[0]["order"] == ["FeSO4", "CaSO4"]
+    snapshot = sim._make_snapshot()
+    assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
