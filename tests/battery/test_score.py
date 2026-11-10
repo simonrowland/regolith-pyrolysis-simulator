@@ -12669,6 +12669,47 @@ def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
             {"reason": "quantity_not_predicted", "quantity": Quantity.P_SAT.value},
         ),
     )
+    phase_static_id = "fixture-derived-01"
+    phase_static_row = fixture_residuals[phase_static_id]
+    fixture_residuals[phase_static_id] = replace(
+        phase_static_row,
+        rail=Rail.MELT_ACTIVITY,
+        status=ResidualStatus.REFUSED,
+        numeric=None,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        candidate_request=CandidateRequest(
+            context.observations[phase_static_id].experiment_id,
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            engine,
+            engine.value,
+        ),
+        refusal=ResidualRefusal(
+            RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+            {"reason": "engine_does_not_report_phase_composition"},
+        ),
+    )
+    called_id = "fixture-derived-02"
+    called_row = fixture_residuals[called_id]
+    fixture_residuals[called_id] = replace(
+        called_row,
+        rail=Rail.MELT_ACTIVITY,
+        status=ResidualStatus.REFUSED,
+        numeric=None,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="equilibrate_cell:fixture",
+        ),
+        candidate_request=CandidateRequest(
+            context.observations[called_id].experiment_id,
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            engine,
+            engine.value,
+        ),
+        refusal=ResidualRefusal(
+            RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+            {"reason": "engine_does_not_report_phase_composition"},
+        ),
+    )
     dynamic_id = "fixture-derived-00"
     dynamic_row = fixture_residuals[dynamic_id]
     fixture_residuals[dynamic_id] = replace(
@@ -12720,16 +12761,24 @@ def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
     expected_static = [
         {
             "engine": engine.value,
+            "rail": Rail.MELT_ACTIVITY.value,
+            "reason": "engine_does_not_report_phase_composition/engine_does_not_report_phase_composition",
+            "count": 1,
+        },
+        {
+            "engine": engine.value,
             "rail": Rail.VAPOUR.value,
             "reason": "unsupported/quantity_not_predicted",
             "count": 1,
         }
     ]
-    assert compact_written == default_written - 1
+    assert compact_written == default_written - 2
     assert compact_metadata.static_refusals == expected_static
     assert score_mod.load_residuals_stamp(compact_partial)["static_refusals"] == expected_static
     assert all(row["reference"] != static_id for row in compact_rows)
+    assert all(row["reference"] != phase_static_id for row in compact_rows)
     assert any(row["reference"] == dynamic_id for row in compact_rows)
+    assert any(row["reference"] == called_id for row in compact_rows)
 
     def numeric_lines(path: Path) -> list[bytes]:
         return [
