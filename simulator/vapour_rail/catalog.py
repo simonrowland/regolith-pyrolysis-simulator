@@ -1821,6 +1821,7 @@ class VapourRailCatalog:
                     state.get("melt_activity_engine_inputs") or {}
                 ),
                 liquid_feo_domain=state.get("liquid_feo_domain"),
+                phase_equilibrium_handoff=state.get("phase_equilibrium_handoff"),
                 extras={
                     key: value
                     for key, value in state.items()
@@ -1848,6 +1849,7 @@ class VapourRailCatalog:
                         "imcc_activity_shadow_enabled",
                         "melt_activity_engine_inputs",
                         "liquid_feo_domain",
+                        "phase_equilibrium_handoff",
                     }
                 },
             )
@@ -1856,6 +1858,9 @@ class VapourRailCatalog:
                 temperature_K=getattr(state, "temperature_K", None),
                 process_phase=getattr(state, "process_phase", None),
                 stage=getattr(state, "stage", None),
+                phase_equilibrium_handoff=getattr(
+                    state, "phase_equilibrium_handoff", None
+                ),
             )
 
         return resolve_vapour_batch(

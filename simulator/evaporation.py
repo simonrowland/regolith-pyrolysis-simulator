@@ -3513,6 +3513,28 @@ class EvaporationMixin:
             operands = getattr(equilibrium, 'activity_coefficients', {}) or {}
         return dict(operands)
 
+    def _evaporation_phase_equilibrium_handoff(self, equilibrium: Any) -> Any:
+        """Pass the snapshot refresh already built. Build it only if missing."""
+
+        stored = getattr(self, "_phase_equilibrium_handoff", None)
+        if stored is not None:
+            return stored
+        from simulator.vapour_rail.request import (
+            phase_equilibrium_handoff_from_hour,
+        )
+
+        provider_id_fn = getattr(
+            self, "_phase_equilibrium_backend_provider_id", None
+        )
+        provider_id = provider_id_fn() if callable(provider_id_fn) else None
+        return phase_equilibrium_handoff_from_hour(
+            equilibrium,
+            provider_id=provider_id,
+            attached_magemin_shadow=getattr(
+                self, "_attached_magemin_shadow_diagnostic", None
+            ),
+        )
+
     def _resolve_evaporation_vapour_batch(
         self,
         equilibrium: Any,
@@ -3763,6 +3785,9 @@ class EvaporationMixin:
                     self, "_melt_activity_engine_inputs", {}
                 ),
                 liquid_feo_domain=liquid_feo_domain,
+                phase_equilibrium_handoff=self._evaporation_phase_equilibrium_handoff(
+                    equilibrium
+                ),
                 flux_activation_context=FluxActivationContext(
                     epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
                     effective_pressure_species_ids=effective_pressure_species_ids,

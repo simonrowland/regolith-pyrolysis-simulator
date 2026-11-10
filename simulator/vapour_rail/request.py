@@ -262,6 +262,317 @@ class SelectedBundleIdentity:
     state_fingerprint: str
 
 
+PHASE_EQUILIBRIUM_HANDOFF_SCHEMA = "phase_equilibrium_handoff.v1"
+_PHASE_EQUILIBRIUM_HANDOFF_SOURCES = frozenset({
+    "equilibrium_result",
+    "magemin_shadow_diagnostic",
+    "absent",
+})
+
+
+def _finite_handoff_float(raw: Any) -> float | None:
+    if isinstance(raw, bool) or raw is None:
+        return None
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(value):
+        return None
+    return value
+
+
+def _handoff_wt_pct(raw: Any) -> dict[str, float]:
+    if not isinstance(raw, Mapping):
+        return {}
+    copied: dict[str, float] = {}
+    for key, value in raw.items():
+        number = _finite_handoff_float(value)
+        if number is None:
+            continue
+        copied[str(key)] = number
+    return copied
+
+
+def _handoff_phase_compositions(raw: Any) -> dict[str, dict[str, float]]:
+    if not isinstance(raw, Mapping):
+        return {}
+    copied: dict[str, dict[str, float]] = {}
+    for phase, composition in raw.items():
+        phase_wt = _handoff_wt_pct(composition)
+        if phase_wt:
+            copied[str(phase)] = phase_wt
+    return copied
+
+
+def _handoff_phases(raw: Any) -> tuple[str, ...]:
+    if raw is None or isinstance(raw, (str, bytes)):
+        return ()
+    try:
+        return tuple(str(phase) for phase in raw)
+    except TypeError:
+        return ()
+
+
+def _hour_attr(source: Any, name: str) -> Any:
+    if source is None:
+        return None
+    if isinstance(source, Mapping):
+        return source.get(name)
+    return getattr(source, name, None)
+
+
+def _hour_temperature_K(source: Any) -> float | None:
+    celsius = _finite_handoff_float(_hour_attr(source, "temperature_C"))
+    if celsius is not None:
+        # Same offset the vapour-pressure hour uses (T_C + 273.15).
+        return celsius + 273.15
+    return _finite_handoff_float(_hour_attr(source, "temperature_K"))
+
+
+def _attached_magemin_shadow_on_hour(source: Any) -> Any:
+    for name in ("magemin_shadow_diagnostics", "magemin_diagnostics"):
+        value = _hour_attr(source, name)
+        if value:
+            return value
+    diagnostics = _hour_attr(source, "diagnostics")
+    if isinstance(diagnostics, Mapping):
+        for key in ("magemin_shadow_diagnostics", "magemin_diagnostics"):
+            value = diagnostics.get(key)
+            if value:
+                return value
+    return None
+
+
+@dataclass(frozen=True)
+class PhaseEquilibriumHandoff:
+    """Frozen copy of a phase equilibrium the hour already computed.
+
+    Schema token ``phase_equilibrium_handoff.v1``. No chemical potentials
+    and no engine handle. Not part of vapour-request identity.
+    """
+
+    provider_id: str | None = None
+    status: str | None = None
+    source: str = "absent"
+    temperature_K: float | None = None
+    pressure_bar: float | None = None
+    liquid_fraction: float | None = None
+    phase_assemblage_available: bool = False
+    phases_present: tuple[str, ...] = ()
+    liquid_composition_wt_pct: Mapping[str, float] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+    phase_compositions: Mapping[str, Mapping[str, float]] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+    schema: str = PHASE_EQUILIBRIUM_HANDOFF_SCHEMA
+
+    def __post_init__(self) -> None:
+        if self.schema != PHASE_EQUILIBRIUM_HANDOFF_SCHEMA:
+            raise ValueError(
+                "phase_equilibrium_handoff schema "
+                f"{self.schema!r} is not {PHASE_EQUILIBRIUM_HANDOFF_SCHEMA!r}"
+            )
+        if self.source not in _PHASE_EQUILIBRIUM_HANDOFF_SOURCES:
+            raise ValueError(
+                f"unknown phase_equilibrium_handoff source {self.source!r}"
+            )
+        if not isinstance(self.phase_assemblage_available, bool):
+            raise TypeError("phase_assemblage_available must be bool")
+        object.__setattr__(
+            self,
+            "provider_id",
+            None if self.provider_id is None else str(self.provider_id),
+        )
+        object.__setattr__(
+            self,
+            "status",
+            None if self.status is None else str(self.status),
+        )
+        object.__setattr__(self, "source", str(self.source))
+        object.__setattr__(
+            self, "temperature_K", _finite_handoff_float(self.temperature_K)
+        )
+        object.__setattr__(
+            self, "pressure_bar", _finite_handoff_float(self.pressure_bar)
+        )
+        object.__setattr__(
+            self,
+            "liquid_fraction",
+            _finite_handoff_float(self.liquid_fraction),
+        )
+        object.__setattr__(
+            self, "phases_present", _handoff_phases(self.phases_present)
+        )
+        object.__setattr__(
+            self,
+            "liquid_composition_wt_pct",
+            MappingProxyType(_handoff_wt_pct(self.liquid_composition_wt_pct)),
+        )
+        object.__setattr__(
+            self,
+            "phase_compositions",
+            MappingProxyType(
+                {
+                    phase: MappingProxyType(dict(composition))
+                    for phase, composition in _handoff_phase_compositions(
+                        self.phase_compositions
+                    ).items()
+                }
+            ),
+        )
+
+    def as_mapping(self) -> dict[str, Any]:
+        return {
+            "schema": self.schema,
+            "provider_id": self.provider_id,
+            "status": self.status,
+            "source": self.source,
+            "temperature_K": self.temperature_K,
+            "pressure_bar": self.pressure_bar,
+            "liquid_fraction": self.liquid_fraction,
+            "phase_assemblage_available": self.phase_assemblage_available,
+            "phases_present": list(self.phases_present),
+            "liquid_composition_wt_pct": dict(self.liquid_composition_wt_pct),
+            "phase_compositions": {
+                phase: dict(composition)
+                for phase, composition in self.phase_compositions.items()
+            },
+        }
+
+
+def phase_equilibrium_handoff_from_hour(
+    equilibrium: Any,
+    *,
+    provider_id: str | None = None,
+    attached_magemin_shadow: Any = None,
+) -> PhaseEquilibriumHandoff:
+    """Copy this hour's phase equilibrium. Does not solve or call an engine.
+
+    ``equilibrium_result`` wins when that result already has an assemblage
+    and a non-empty liquid wt% map. Otherwise an already-attached MAGEMin
+    shadow diagnostic is copied. Anything else is ``absent`` and does not
+    carry a partial phase list.
+    """
+
+    temperature_K = _hour_temperature_K(equilibrium)
+    pressure_bar = _finite_handoff_float(_hour_attr(equilibrium, "pressure_bar"))
+    status_raw = _hour_attr(equilibrium, "status")
+    status = None if status_raw is None else str(status_raw)
+    liquid_fraction = _finite_handoff_float(
+        _hour_attr(equilibrium, "liquid_fraction")
+    )
+    assemblage_flag = _hour_attr(equilibrium, "phase_assemblage_available")
+    # Missing flag is not EquilibriumResult's default True. A partial fake
+    # that never solved an assemblage stays off the equilibrium_result path.
+    assemblage_available = (
+        assemblage_flag if isinstance(assemblage_flag, bool) else False
+    )
+    liquid = _handoff_wt_pct(_hour_attr(equilibrium, "liquid_composition_wt_pct"))
+    if assemblage_available and liquid:
+        return PhaseEquilibriumHandoff(
+            provider_id=provider_id,
+            status=status,
+            source="equilibrium_result",
+            temperature_K=temperature_K,
+            pressure_bar=pressure_bar,
+            liquid_fraction=liquid_fraction,
+            phase_assemblage_available=True,
+            phases_present=_handoff_phases(
+                _hour_attr(equilibrium, "phases_present")
+            ),
+            liquid_composition_wt_pct=liquid,
+            phase_compositions=_handoff_phase_compositions(
+                _hour_attr(equilibrium, "phase_compositions")
+            ),
+        )
+    shadow = _attached_magemin_shadow_on_hour(equilibrium)
+    if not shadow:
+        shadow = attached_magemin_shadow
+    if shadow:
+        shadow_liquid = _handoff_wt_pct(
+            _hour_attr(shadow, "liquid_composition_wt_pct")
+        )
+        shadow_phases = _handoff_phases(_hour_attr(shadow, "phases_present"))
+        shadow_status = _hour_attr(shadow, "backend_status")
+        if shadow_status is None:
+            shadow_status = _hour_attr(shadow, "status")
+        shadow_provider = _hour_attr(shadow, "provider_id") or "magemin-shadow"
+        return PhaseEquilibriumHandoff(
+            provider_id=None if shadow_provider is None else str(shadow_provider),
+            status=None if shadow_status is None else str(shadow_status),
+            source="magemin_shadow_diagnostic",
+            temperature_K=temperature_K,
+            pressure_bar=pressure_bar,
+            liquid_fraction=_finite_handoff_float(
+                _hour_attr(shadow, "liquid_fraction")
+            ),
+            phase_assemblage_available=bool(shadow_phases or shadow_liquid),
+            phases_present=shadow_phases,
+            liquid_composition_wt_pct=shadow_liquid,
+            phase_compositions=_handoff_phase_compositions(
+                _hour_attr(shadow, "phase_compositions")
+            ),
+        )
+    return PhaseEquilibriumHandoff(
+        source="absent",
+        status=status,
+        temperature_K=temperature_K,
+        pressure_bar=pressure_bar,
+        liquid_fraction=liquid_fraction,
+        phase_assemblage_available=False,
+    )
+
+
+def phase_equilibrium_provider_label(
+    handoff: PhaseEquilibriumHandoff | None,
+) -> str:
+    """Report id beside the d-370 activity provider. Absent stays ``absent``."""
+
+    if handoff is None or handoff.source == "absent":
+        return "absent"
+    if handoff.provider_id:
+        return str(handoff.provider_id)
+    return str(handoff.source)
+
+
+def _coerce_phase_equilibrium_handoff(
+    raw: Any,
+) -> PhaseEquilibriumHandoff | None:
+    if raw is None or isinstance(raw, PhaseEquilibriumHandoff):
+        return raw
+    if isinstance(raw, Mapping):
+        flag = raw.get("phase_assemblage_available", False)
+        if not isinstance(flag, bool):
+            raise TypeError("phase_assemblage_available must be bool")
+        return PhaseEquilibriumHandoff(
+            provider_id=raw.get("provider_id"),
+            status=raw.get("status"),
+            source=str(raw.get("source", "absent")),
+            temperature_K=raw.get("temperature_K"),
+            pressure_bar=raw.get("pressure_bar"),
+            liquid_fraction=raw.get("liquid_fraction"),
+            phase_assemblage_available=flag,
+            phases_present=_handoff_phases(raw.get("phases_present")),
+            liquid_composition_wt_pct=dict(
+                raw.get("liquid_composition_wt_pct") or {}
+            ),
+            phase_compositions={
+                str(phase): dict(composition)
+                for phase, composition in dict(
+                    raw.get("phase_compositions") or {}
+                ).items()
+                if isinstance(composition, Mapping)
+            },
+            schema=str(raw.get("schema", PHASE_EQUILIBRIUM_HANDOFF_SCHEMA)),
+        )
+    raise TypeError(
+        "phase_equilibrium_handoff must be PhaseEquilibriumHandoff, "
+        f"mapping, or None; got {type(raw).__name__}"
+    )
+
+
 @dataclass(frozen=True)
 class VapourResolveState:
     """Minimal process state for refusal closure / domain checks."""
@@ -312,6 +623,10 @@ class VapourResolveState:
     # Liquid-state fact for the FeO shadow. Not vapour request identity:
     # omitted from as_mapping so it cannot enter _state_fingerprint.
     liquid_feo_domain: Any = None
+    # Hour phase-equilibrium snapshot. Not vapour request identity:
+    # _state_fingerprint does not read it. as_mapping projects it only
+    # when one is set, so the default mapping stays unchanged.
+    phase_equilibrium_handoff: PhaseEquilibriumHandoff | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.melt_activity_shadow_enabled, bool):
@@ -361,9 +676,14 @@ class VapourResolveState:
             MappingProxyType(dict(self.melt_activity_engine_inputs)),
         )
         object.__setattr__(self, "extras", MappingProxyType(dict(self.extras)))
+        object.__setattr__(
+            self,
+            "phase_equilibrium_handoff",
+            _coerce_phase_equilibrium_handoff(self.phase_equilibrium_handoff),
+        )
 
     def as_mapping(self) -> dict[str, Any]:
-        return {
+        mapping = {
             "temperature_K": self.temperature_K,
             "process_phase": self.process_phase,
             "stage": self.stage,
@@ -406,6 +726,10 @@ class VapourResolveState:
             "melt_activity_engine_inputs": dict(self.melt_activity_engine_inputs),
             **dict(self.extras),
         }
+        handoff = self.phase_equilibrium_handoff
+        if handoff is not None:
+            mapping["phase_equilibrium_handoff"] = handoff.as_mapping()
+        return mapping
 
 
 def _account_mols(

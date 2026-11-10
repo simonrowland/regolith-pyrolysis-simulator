@@ -1441,6 +1441,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_high_t_melt_activity_temperature_K: float | None = None
         self._last_high_t_melt_activity: Dict[str, Any] = {}
+        self._phase_equilibrium_handoff: Any = None
+        self._phase_equilibrium_provider: str | None = None
+        self._attached_magemin_shadow_diagnostic: Dict[str, Any] | None = None
         self._high_t_melt_activity_fallback_steps: list[Dict[str, Any]] = []
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_target_inventory_diagnostic: Dict[str, Any] = {}
@@ -1818,6 +1821,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_imcc_activity_shadow = {}
         self._last_high_t_melt_activity_temperature_K = None
         self._last_high_t_melt_activity = {}
+        self._phase_equilibrium_handoff = None
+        self._phase_equilibrium_provider = None
+        self._attached_magemin_shadow_diagnostic = None
         self._high_t_melt_activity_fallback_steps = []
         self._last_target_inventory_diagnostic = {}
         self._target_inventory_by_hour = []
@@ -2373,6 +2379,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         provider_candidates_by_species: dict | None = None,
         flux_activation_context: FluxActivationContext | None = None,
         liquid_feo_domain: Any = None,
+        phase_equilibrium_handoff: Any = None,
     ):
         """Exact-key vapour batch via VR-6 request builder + refusal closure.
 
@@ -2439,6 +2446,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 melt_activity_engine_inputs or {}
             ),
             "liquid_feo_domain": liquid_feo_domain,
+            "phase_equilibrium_handoff": phase_equilibrium_handoff,
         }
         return self.vapour_rail_catalog.resolve_batch(
             ledger_snapshot,
@@ -9911,6 +9919,65 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'consuming account-scoped metal/gas inputs; got {unsupported}'
             )
 
+    def _phase_equilibrium_backend_provider_id(self) -> str | None:
+        backend = getattr(self, "backend", None)
+        if backend is None:
+            return None
+        raw = getattr(backend, "backend_name", None)
+        if raw is None:
+            raw = getattr(backend, "name", None)
+        if raw is None:
+            return None
+        return canonical_backend_name(str(raw))
+
+    def _magemin_shadow_trace_mark(self) -> int | None:
+        planner = getattr(getattr(self, "_chem_kernel", None), "planner", None)
+        trace = getattr(planner, "shadow_trace", None)
+        if not trace:
+            return None
+        return id(trace[-1])
+
+    def _copy_this_dispatch_magemin_shadow(self, mark_id: int | None) -> None:
+        """Copy a MAGEMin shadow diagnostic produced by this dispatch only.
+
+        The vapour path does not call MAGEMin. A mark that the trace cap
+        has already dropped is ignored so a previous hour cannot be reused.
+        """
+
+        planner = getattr(getattr(self, "_chem_kernel", None), "planner", None)
+        trace = getattr(planner, "shadow_trace", None)
+        if not trace:
+            return
+        records = list(trace)
+        if mark_id is None:
+            fresh = records
+        else:
+            start: int | None = None
+            for index, record in enumerate(records):
+                if id(record) == mark_id:
+                    start = index + 1
+                    break
+            if start is None:
+                return
+            fresh = records[start:]
+        for record in reversed(fresh):
+            if not isinstance(record, Mapping):
+                continue
+            if record.get("event") != "shadow_dispatch":
+                continue
+            if record.get("intent") != "silicate_equilibrium":
+                continue
+            if str(record.get("provider_id")) != "magemin-shadow":
+                continue
+            shadow_result = record.get("result")
+            if isinstance(shadow_result, Mapping):
+                diagnostic = shadow_result.get("diagnostic")
+            else:
+                diagnostic = getattr(shadow_result, "diagnostic", None)
+            if isinstance(diagnostic, Mapping) and diagnostic:
+                self._attached_magemin_shadow_diagnostic = dict(diagnostic)
+                return
+
     def _get_equilibrium(self, *, run_post_equilibrium_sulfsat: bool = True):
         """
         Query backend with the mol inventory from the atom ledger.
@@ -9928,6 +9995,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         A forecast can disable the post-equilibrium SulfSat hook because its
         candidate temperatures are not realized run steps.
         """
+        self._attached_magemin_shadow_diagnostic = None
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'replay_enabled', False):
             return store.replay_equilibrium(self)
@@ -10051,6 +10119,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 from engines.alphamelts.result import LiquidusDiagnostics
 
+                shadow_mark = self._magemin_shadow_trace_mark()
                 kernel_result = self._dispatch_only(
                     ChemistryIntent.SILICATE_EQUILIBRIUM,
                     control_inputs={
@@ -10072,6 +10141,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     request_controls,
                 )
                 setattr(result, 'alphamelts_diagnostics', diagnostic)
+                self._copy_this_dispatch_magemin_shadow(shadow_mark)
                 diagnostic_silicate_equilibrium = True
             else:
                 is_alphamelts_backend = self._is_alphamelts_backend(
@@ -10354,6 +10424,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             explicitly forbidden by the goal spec.
         """
 
+        from simulator.vapour_rail.request import (
+            phase_equilibrium_handoff_from_hour,
+            phase_equilibrium_provider_label,
+        )
+
+        provider_id_fn = getattr(
+            self, "_phase_equilibrium_backend_provider_id", None
+        )
+        handoff = phase_equilibrium_handoff_from_hour(
+            result,
+            provider_id=provider_id_fn() if callable(provider_id_fn) else None,
+            attached_magemin_shadow=getattr(
+                self, "_attached_magemin_shadow_diagnostic", None
+            ),
+        )
+        self._phase_equilibrium_handoff = handoff
+        provider_label = phase_equilibrium_provider_label(handoff)
+        self._phase_equilibrium_provider = provider_label
+        result_diagnostics = dict(getattr(result, "diagnostics", {}) or {})
+        result_diagnostics["phase_equilibrium_provider"] = provider_label
+        result.diagnostics = result_diagnostics
+
+        def _store_vapor_pressure_diagnostic(payload: Mapping[str, Any]) -> None:
+            stored = dict(payload)
+            stored["phase_equilibrium_provider"] = provider_label
+            self._last_vapor_pressure_diagnostic = stored
+
         backend_diagnostics = dict(
             getattr(self, '_last_backend_diagnostics', {}) or {}
         )
@@ -10394,7 +10491,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(result, 'vapor_pressures_source', {}) or {}
             )
             if co2_diagnostic:
-                self._last_vapor_pressure_diagnostic = {'co2_dissociation': dict(co2_diagnostic)}
+                _store_vapor_pressure_diagnostic(
+                    {'co2_dissociation': dict(co2_diagnostic)}
+                )
             return
 
         backend_sources = dict(
@@ -10442,7 +10541,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._last_vapor_pressures_source = {}
                 if getattr(self, '_headspace_co2_dissociation_diagnostic', None):
                     diagnostic['co2_dissociation'] = dict(self._headspace_co2_dissociation_diagnostic)
-                self._last_vapor_pressure_diagnostic = diagnostic
+                _store_vapor_pressure_diagnostic(diagnostic)
                 self._last_high_t_melt_activity = {}
                 self._last_high_t_melt_activity_temperature_K = None
                 return
@@ -10723,7 +10822,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         co2_diagnostic = getattr(self, '_headspace_co2_dissociation_diagnostic', {})
         if co2_diagnostic:
             diagnostic['co2_dissociation'] = dict(co2_diagnostic)
-        self._last_vapor_pressure_diagnostic = diagnostic
+        _store_vapor_pressure_diagnostic(diagnostic)
         note_high_t_fallback = getattr(
             self, '_note_high_t_melt_activity_fallback', None
         )

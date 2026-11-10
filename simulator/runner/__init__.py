@@ -2955,6 +2955,9 @@ def build_per_hour_summary(
     )
     if high_t_melt_activity:
         summary["high_t_melt_activity"] = _json_safe(high_t_melt_activity)
+    phase_equilibrium_provider = getattr(sim, "_phase_equilibrium_provider", None)
+    if phase_equilibrium_provider is not None:
+        summary["phase_equilibrium_provider"] = phase_equilibrium_provider
     capture_ledger_snapshot(sim, snapshot)
     return _json_safe(summary)
 
@@ -4865,6 +4868,13 @@ def build_sio_yield_report(
         if high_t_melt_activity:
             diagnostics["high_t_melt_activity"] = _json_safe(
                 high_t_melt_activity
+            )
+        phase_equilibrium_provider = getattr(
+            sim, "_phase_equilibrium_provider", None
+        )
+        if phase_equilibrium_provider is not None:
+            diagnostics["phase_equilibrium_provider"] = (
+                phase_equilibrium_provider
             )
         if include_lab_oxygen_diagnostics:
             queries = AccountingQueries(sim)

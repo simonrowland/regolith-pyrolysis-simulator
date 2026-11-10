@@ -4382,3 +4382,327 @@ def test_legacy_view_production_warm_hit_budget() -> None:
     assert proj_loop < 0.005, (
         f"projected re-entry loop too slow: {proj_loop*1000:.2f} ms"
     )
+
+
+def _phase_handoff_fixture() -> "PhaseEquilibriumHandoff":
+    from simulator.vapour_rail.request import PhaseEquilibriumHandoff
+
+    return PhaseEquilibriumHandoff(
+        provider_id="alphamelts",
+        status="ok",
+        source="equilibrium_result",
+        temperature_K=1473.15,
+        pressure_bar=1.0,
+        liquid_fraction=0.4,
+        phase_assemblage_available=True,
+        phases_present=("liquid", "olivine"),
+        liquid_composition_wt_pct={"MgO": 5.0, "SiO2": 45.0},
+        phase_compositions={"olivine": {"MgO": 40.0, "SiO2": 40.0}},
+    )
+
+
+def test_phase_equilibrium_handoff_is_outside_state_fingerprint() -> None:
+    """The snapshot is carried, and it is not vapour-request identity."""
+
+    handoff = _phase_handoff_fixture()
+    plain = VapourResolveState(
+        temperature_K=1600.0,
+        process_phase="hot_train",
+        stage="evaporation",
+        source_reaction_activities={"Mg": 0.2},
+        source_reaction_activity_provider="internal-analytical",
+    )
+    carried = VapourResolveState(
+        temperature_K=1600.0,
+        process_phase="hot_train",
+        stage="evaporation",
+        source_reaction_activities={"Mg": 0.2},
+        source_reaction_activity_provider="internal-analytical",
+        phase_equilibrium_handoff=handoff,
+    )
+    other = replace(
+        handoff,
+        liquid_composition_wt_pct={"MgO": 1.0, "SiO2": 45.0},
+    )
+    different = replace(carried, phase_equilibrium_handoff=other)
+
+    assert _state_fingerprint(plain) == _state_fingerprint(carried)
+    assert _state_fingerprint(carried) == _state_fingerprint(different)
+    assert "phase_equilibrium_handoff" not in plain.as_mapping()
+    projected = carried.as_mapping()
+    assert projected["phase_equilibrium_handoff"]["schema"] == (
+        "phase_equilibrium_handoff.v1"
+    )
+    assert projected["phase_equilibrium_handoff"]["source"] == "equilibrium_result"
+    assert "liquid_feo_domain" not in projected
+    round_trip = VapourResolveState(**projected)
+    assert round_trip.phase_equilibrium_handoff == handoff
+    assert _state_fingerprint(round_trip) == _state_fingerprint(plain)
+
+
+def test_resolve_batch_mapping_keeps_handoff_out_of_extras(monkeypatch) -> None:
+    from simulator.vapour_rail.catalog import VapourRailCatalog
+
+    captured: dict[str, Any] = {}
+
+    def _capture(**kwargs):
+        captured["state"] = kwargs["state"]
+        return SimpleNamespace()
+
+    monkeypatch.setattr(
+        "simulator.vapour_rail.request.resolve_vapour_batch",
+        _capture,
+    )
+    handoff = _phase_handoff_fixture()
+    catalog = SimpleNamespace(_request_rules=(), _species={})
+    activation = FluxActivationContext(
+        epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+        effective_pressure_species_ids=frozenset(),
+    )
+    VapourRailCatalog.resolve_batch(
+        catalog,
+        {},
+        {
+            "temperature_K": 1600.0,
+            "process_phase": "hot_train",
+            "phase_equilibrium_handoff": handoff,
+            "not_a_named_field": "keep",
+        },
+        flux_activation_context=activation,
+    )
+
+    state = captured["state"]
+    assert state.phase_equilibrium_handoff is handoff
+    assert "phase_equilibrium_handoff" not in state.extras
+    assert state.extras["not_a_named_field"] == "keep"
+
+    class _AttributeState:
+        temperature_K = 1600.0
+        process_phase = "hot_train"
+        stage = "evaporation"
+        phase_equilibrium_handoff = handoff
+
+    VapourRailCatalog.resolve_batch(
+        catalog,
+        {},
+        _AttributeState(),
+        flux_activation_context=activation,
+    )
+    assert captured["state"].phase_equilibrium_handoff is handoff
+    assert "phase_equilibrium_handoff" not in captured["state"].extras
+
+
+def test_hour_equilibrium_is_copied_without_calling_equilibrate(
+    monkeypatch,
+) -> None:
+    """A fake hour result is copied onto the batch state. equilibrate stays at 0."""
+
+    from engines.magemin.provider import MAGEMinShadowProvider
+    from simulator.core import PyrolysisSimulator
+    from simulator.evaporation import EvaporationMixin
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.magemin import MAGEMinBackend
+    from simulator.vapour_rail.request import (
+        phase_equilibrium_handoff_from_hour,
+        phase_equilibrium_provider_label,
+    )
+
+    calls: list[str] = []
+
+    def _boom(*_args, **_kwargs):
+        calls.append("equilibrate")
+        raise AssertionError("phase-equilibrium handoff must not equilibrate")
+
+    monkeypatch.setattr(AlphaMELTSBackend, "equilibrate", _boom)
+    monkeypatch.setattr(MAGEMinBackend, "equilibrate", _boom)
+    monkeypatch.setattr(MAGEMinShadowProvider, "dispatch", _boom)
+
+    equilibrium = EquilibriumResult(
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        phases_present=["liquid", "olivine"],
+        liquid_fraction=0.4,
+        phase_assemblage_available=True,
+        liquid_composition_wt_pct={"MgO": 5.0, "SiO2": 50.0},
+        phase_compositions={"olivine": {"MgO": 40.0, "SiO2": 40.0}},
+        status="ok",
+        diagnostics={"backend_marker": "preserved"},
+        vapor_pressures_Pa={},
+        vapor_pressures_source={},
+    )
+    sim = SimpleNamespace(
+        backend=SimpleNamespace(backend_name="alphamelts"),
+        _attached_magemin_shadow_diagnostic=None,
+        _last_backend_diagnostics={},
+        melt=SimpleNamespace(
+            temperature_C=1200.0,
+            ambient_pressure_mbar=0.0,
+            campaign=None,
+            body="",
+            oxygen_reservoir=SimpleNamespace(melt_intrinsic_fO2_log=-9.0),
+        ),
+        liquid_feo_domain_at=lambda _temperature_K: None,
+        _vapor_pressure_dispatch_pO2_bar=lambda: 1.0e-12,
+        _oxygen_numerical_floor_bar=lambda: 1.0e-12,
+        _kernel_vapor_pressure_source=(
+            PyrolysisSimulator._kernel_vapor_pressure_source
+        ),
+        _vapor_pressure_values_agree=(
+            PyrolysisSimulator._vapor_pressure_values_agree
+        ),
+        _dispatch_only=lambda *_args, **_kwargs: SimpleNamespace(
+            status="ok",
+            warnings=(),
+            diagnostic={
+                "vapor_pressures_Pa": {"K": 1.0},
+                "vapor_pressures_source": {"K": "builtin"},
+            },
+        ),
+    )
+    sim._phase_equilibrium_backend_provider_id = (
+        lambda: PyrolysisSimulator._phase_equilibrium_backend_provider_id(sim)
+    )
+
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, equilibrium)
+
+    handoff = sim._phase_equilibrium_handoff
+    assert handoff.source == "equilibrium_result"
+    assert handoff.provider_id == "alphamelts"
+    assert handoff.schema == "phase_equilibrium_handoff.v1"
+    assert handoff.phases_present == ("liquid", "olivine")
+    assert dict(handoff.liquid_composition_wt_pct) == {"MgO": 5.0, "SiO2": 50.0}
+    assert dict(handoff.phase_compositions["olivine"]) == {
+        "MgO": 40.0,
+        "SiO2": 40.0,
+    }
+    assert handoff.temperature_K == pytest.approx(1200.0 + 273.15)
+    assert handoff.pressure_bar == pytest.approx(1.0)
+    assert handoff.liquid_fraction == pytest.approx(0.4)
+    assert sim._phase_equilibrium_provider == "alphamelts"
+    assert equilibrium.diagnostics["backend_marker"] == "preserved"
+    assert equilibrium.diagnostics["phase_equilibrium_provider"] == "alphamelts"
+    assert (
+        sim._last_vapor_pressure_diagnostic["phase_equilibrium_provider"]
+        == "alphamelts"
+    )
+    high_t_payload = sim._last_vapor_pressure_diagnostic.get("high_t_melt_activity")
+    if isinstance(high_t_payload, dict):
+        assert "phase_equilibrium_provider" not in high_t_payload
+    assert (
+        EvaporationMixin._evaporation_phase_equilibrium_handoff(sim, equilibrium)
+        is handoff
+    )
+
+    captured: dict[str, Any] = {}
+
+    def _resolve_batch(_ledger, state, **_kwargs):
+        captured["state"] = state
+        return SimpleNamespace()
+
+    sim.vapour_rail_catalog = SimpleNamespace(resolve_batch=_resolve_batch)
+    sim.atom_ledger = SimpleNamespace(mol_by_account=lambda: {})
+    sim._imcc_activity_shadow_enabled = False
+    PyrolysisSimulator.build_vapour_batch(
+        sim,
+        temperature_K=1473.15,
+        phase_equilibrium_handoff=handoff,
+        flux_activation_context=FluxActivationContext(
+            epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+            effective_pressure_species_ids=frozenset(),
+        ),
+    )
+    assert captured["state"]["phase_equilibrium_handoff"] is handoff
+
+    bare = SimpleNamespace(temperature_C=1000.0, pressure_bar=0.01, status="ok")
+    absent = phase_equilibrium_handoff_from_hour(
+        bare, provider_id="internal-analytical"
+    )
+    assert absent.source == "absent"
+    assert absent.provider_id is None
+    assert absent.phases_present == ()
+    assert dict(absent.liquid_composition_wt_pct) == {}
+    assert phase_equilibrium_provider_label(absent) == "absent"
+
+    shadow = {
+        "provider_id": "magemin-shadow",
+        "backend_status": "ok",
+        "phases_present": ["liquid", "spinel"],
+        "liquid_composition_wt_pct": {"MgO": 1.5, "Al2O3": 8.0},
+        "liquid_fraction": 0.2,
+    }
+    no_assemblage = EquilibriumResult(
+        temperature_C=1200.0,
+        pressure_bar=2.0,
+        phase_assemblage_available=False,
+        liquid_fraction=None,
+        status="ok",
+    )
+    shadowed = phase_equilibrium_handoff_from_hour(
+        no_assemblage,
+        provider_id="internal-analytical",
+        attached_magemin_shadow=shadow,
+    )
+    assert shadowed.source == "magemin_shadow_diagnostic"
+    assert shadowed.provider_id == "magemin-shadow"
+    assert dict(shadowed.liquid_composition_wt_pct) == {
+        "MgO": 1.5,
+        "Al2O3": 8.0,
+    }
+    assert shadowed.phases_present == ("liquid", "spinel")
+    assert shadowed.phase_assemblage_available is True
+    assert shadowed.temperature_K == pytest.approx(1200.0 + 273.15)
+    assert phase_equilibrium_provider_label(shadowed) == "magemin-shadow"
+
+    preferred = phase_equilibrium_handoff_from_hour(
+        equilibrium,
+        provider_id="alphamelts",
+        attached_magemin_shadow=shadow,
+    )
+    assert preferred.source == "equilibrium_result"
+    assert preferred.provider_id == "alphamelts"
+    assert calls == []
+
+
+def test_magemin_shadow_copy_reads_only_this_dispatch() -> None:
+    from simulator.core import PyrolysisSimulator
+
+    previous = {
+        "event": "shadow_dispatch",
+        "intent": "silicate_equilibrium",
+        "provider_id": "magemin-shadow",
+        "result": SimpleNamespace(
+            diagnostic={
+                "phases_present": ["old"],
+                "liquid_composition_wt_pct": {"MgO": 99.0},
+                "backend_status": "ok",
+            }
+        ),
+    }
+    current = {
+        "event": "shadow_dispatch",
+        "intent": "silicate_equilibrium",
+        "provider_id": "magemin-shadow",
+        "result": SimpleNamespace(
+            diagnostic={
+                "phases_present": ["liquid"],
+                "liquid_composition_wt_pct": {"SiO2": 40.0},
+                "backend_status": "ok",
+            }
+        ),
+    }
+    planner = SimpleNamespace(shadow_trace=(previous, current))
+
+    def _host() -> SimpleNamespace:
+        return SimpleNamespace(
+            _chem_kernel=SimpleNamespace(planner=planner),
+            _attached_magemin_shadow_diagnostic=None,
+        )
+
+    fresh = _host()
+    PyrolysisSimulator._copy_this_dispatch_magemin_shadow(fresh, id(previous))
+    assert fresh._attached_magemin_shadow_diagnostic["phases_present"] == ["liquid"]
+
+    dropped_mark = _host()
+    PyrolysisSimulator._copy_this_dispatch_magemin_shadow(dropped_mark, id(object()))
+    assert dropped_mark._attached_magemin_shadow_diagnostic is None
