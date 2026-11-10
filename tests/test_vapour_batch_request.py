@@ -4531,15 +4531,16 @@ def _seam_debit_answer(
     )
 
 
-def test_na_k_selected_pressure_stays_on_kernel_seam() -> None:
-    """Na and K debit the kernel seam. Catalog pressure and Fe stay put.
+def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
+    """Na, K, Ca, Mg, and Ti debit the kernel seam. Catalog pressure and Fe stay put.
 
-    Fails when the selected pressure is the catalog activity correction
-    (green and the CrO2-only branch both leave it there).
+    The Ca, Mg, and Ti pairs are the 1400 C C0 step: catalog continuation
+    versus the kernel seam green debits. Fails when a selected pressure
+    stays on the catalog activity correction.
     """
 
     batch = VapourBatch(
-        requested_species_ids=frozenset({"Na", "K", "Fe"}),
+        requested_species_ids=frozenset({"Na", "K", "Ca", "Mg", "Ti", "Fe"}),
         channels_by_species={
             "Na": _seam_debit_answer(
                 "Na",
@@ -4553,6 +4554,24 @@ def test_na_k_selected_pressure_stays_on_kernel_seam() -> None:
                 catalog_pa=0.12738062946763712,
                 source_label="catalog_activity_corrected",
             ),
+            "Ca": _seam_debit_answer(
+                "Ca",
+                selected_pa=1.3897762374690034e-08,
+                catalog_pa=1.3897762374690034e-08,
+                source_label="catalog_activity_corrected",
+            ),
+            "Mg": _seam_debit_answer(
+                "Mg",
+                selected_pa=0.00034222949385749943,
+                catalog_pa=0.00034222949385749943,
+                source_label="catalog_activity_corrected",
+            ),
+            "Ti": _seam_debit_answer(
+                "Ti",
+                selected_pa=1.1566690667153255e-15,
+                catalog_pa=1.1566690667153255e-15,
+                source_label="catalog_activity_corrected",
+            ),
             "Fe": _seam_debit_answer(
                 "Fe",
                 selected_pa=0.05731853761717197,
@@ -4560,7 +4579,7 @@ def test_na_k_selected_pressure_stays_on_kernel_seam() -> None:
                 source_label="catalog",
             ),
         },
-        flux_active_species_ids=frozenset({"Na", "K", "Fe"}),
+        flux_active_species_ids=frozenset({"Na", "K", "Ca", "Mg", "Ti", "Fe"}),
     )
     equilibrium = SimpleNamespace(
         vapor_pressures_source={
@@ -4572,6 +4591,9 @@ def test_na_k_selected_pressure_stays_on_kernel_seam() -> None:
                 "builtin_authoritative:standard_reaction_term:"
                 "extrapolated_beyond_valid_range_K:out_of_gamma_domain"
             ),
+            "Ca": "builtin_authoritative:standard_reaction_term",
+            "Mg": "builtin_authoritative:standard_reaction_term",
+            "Ti": "builtin_authoritative:standard_reaction_term",
             "Fe": "builtin_authoritative:pure_component_derived_from_evaluation",
         }
     )
@@ -4580,32 +4602,46 @@ def test_na_k_selected_pressure_stays_on_kernel_seam() -> None:
         {
             "Na": 2.694467309265198,
             "K": 0.12704107980939044,
+            "Ca": 1.8984315256420538e-08,
+            "Mg": 0.00034222649537030153,
+            "Ti": 1.0732438025337687e-15,
             "Fe": 0.05731853761717197,
         },
     )
     retained = _retain_kernel_seam_debit(batch, equilibrium, source)
-    na = retained.channel("Na")
-    k = retained.channel("K")
+    expected_kernel = {
+        "Na": 2.694467309265198,
+        "K": 0.12704107980939044,
+        "Ca": 1.8984315256420538e-08,
+        "Mg": 0.00034222649537030153,
+        "Ti": 1.0732438025337687e-15,
+    }
+    expected_catalog = {
+        "Na": 2.7071606671395836,
+        "K": 0.12738062946763712,
+        "Ca": 1.3897762374690034e-08,
+        "Mg": 0.00034222949385749943,
+        "Ti": 1.1566690667153255e-15,
+    }
+    for species_id, kernel_pa in expected_kernel.items():
+        answer = retained.channel(species_id)
+        assert answer.selected_runtime_pressure.pa == pytest.approx(
+            kernel_pa, rel=0.0, abs=0.0
+        )
+        assert answer.pressure.pa == pytest.approx(
+            expected_catalog[species_id], rel=0.0, abs=0.0
+        )
+        assert answer.source_label == equilibrium.vapor_pressures_source[species_id]
     fe = retained.channel("Fe")
-    assert na.selected_runtime_pressure.pa == pytest.approx(
-        2.694467309265198, rel=1e-12
-    )
-    assert k.selected_runtime_pressure.pa == pytest.approx(
-        0.12704107980939044, rel=1e-12
-    )
-    assert na.pressure.pa == pytest.approx(2.7071606671395836, rel=1e-12)
-    assert k.pressure.pa == pytest.approx(0.12738062946763712, rel=1e-12)
-    assert na.source_label == equilibrium.vapor_pressures_source["Na"]
-    assert k.source_label == equilibrium.vapor_pressures_source["K"]
     assert fe.selected_runtime_pressure.pa == pytest.approx(
-        0.05731853761717197, rel=1e-12
+        0.05731853761717197, rel=0.0, abs=0.0
     )
-    assert fe.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
+    assert fe.pressure.pa == pytest.approx(4.871162269407267, rel=0.0, abs=0.0)
     assert fe.source_label == "catalog"
     pressures, _report = flux_pressures_from_batch(retained)
-    assert pressures["Na"] == pytest.approx(2.694467309265198, rel=1e-12)
-    assert pressures["K"] == pytest.approx(0.12704107980939044, rel=1e-12)
-    assert pressures["Fe"] == pytest.approx(0.05731853761717197, rel=1e-12)
+    for species_id, kernel_pa in expected_kernel.items():
+        assert pressures[species_id] == pytest.approx(kernel_pa, rel=0.0, abs=0.0)
+    assert pressures["Fe"] == pytest.approx(0.05731853761717197, rel=0.0, abs=0.0)
 
 
 def test_shipped_fallback_key_admits_alo_and_refuses_unlisted() -> None:

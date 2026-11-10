@@ -78,10 +78,11 @@ PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C = 1050.0
 _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
     'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10',
 })
-# Catalog activity correction for these two alkalis is not the debit.
-# The runtime already publishes the kernel seam; keep that seam on the
-# selected pressure. answer.pressure stays the catalog reference.
-_KERNEL_SEAM_DEBIT_SPECIES = frozenset({'Na', 'K'})
+# Catalog activity correction for these species is not the debit.
+# The runtime already publishes the kernel seam green uses; keep that
+# seam on the selected pressure. answer.pressure stays the catalog
+# reference. Which source is the long-term owner is b-1169.
+_KERNEL_SEAM_DEBIT_SPECIES = frozenset({'Na', 'K', 'Ca', 'Mg', 'Ti'})
 
 
 class EvaporationFluxRefusal(ProviderUnavailableError):
@@ -769,9 +770,9 @@ def _retain_kernel_seam_debit(
     equilibrium: Any,
     effective_pressure_source: EffectivePressureSource,
 ) -> Any:
-    """Keep Na and K on the kernel pressure the runtime already published.
+    """Keep Na, K, Ca, Mg, and Ti on the kernel pressure already published.
 
-    The catalog activity correction for these two alkalis is not the debit.
+    The catalog activity correction for these species is not the debit.
     ``answer.pressure`` stays the catalog value. The selected runtime
     pressure and its source label stay on the kernel seam when that seam
     published a finite pressure and a source label.

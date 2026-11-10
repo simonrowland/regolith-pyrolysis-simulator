@@ -1113,8 +1113,8 @@ def test_cross_feedstock_request_activation_and_selected_runtime(
 
     # A claimed live species removed from flux must carry the missing-alpha
     # refusal. The shipped allowlist keeps the eight stripped broad-proxy
-    # carriers flux-active, so that removed set can be empty. Na, K, Fe, and
-    # those carriers are not a remaining pressure mismatch.
+    # carriers flux-active, so that removed set can be empty. Na, K, Ca, Mg,
+    # Ti, Fe, and those carriers are not a remaining pressure mismatch.
     shadow = surface["shadow"]
     refused_live_species = shadow["batch_refused_live_species"]
     fallback_carriers = frozenset({
@@ -1136,7 +1136,9 @@ def test_cross_feedstock_request_activation_and_selected_runtime(
             str(item["species"])
             for item in (shadow.get("mismatched_species") or [])
         }
-        assert mismatched.isdisjoint(fallback_carriers | {"Na", "K", "Fe"})
+        assert mismatched.isdisjoint(
+            fallback_carriers | {"Na", "K", "Ca", "Mg", "Ti", "Fe"}
+        )
     assert surface["effective_source_id"] == (
         "equilibrium_backend_effective_pressure_pre_rg"
     )
