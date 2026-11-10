@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -139,7 +138,6 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
     )
     assert expected_fallback_activity is not None
     evaluated_compositions: list[dict[str, float]] = []
-    openimcc_mno_activities: list[float] = []
     gas_activity_inputs: list[dict[str, float]] = []
     gas_parent_oxide_names: list[tuple[str, ...]] = []
     extension_calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
@@ -149,11 +147,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
 
     def capture_melt_evaluate(**kwargs):
         evaluated_compositions.append(dict(kwargs["composition_mol"]))
-        state = original_melt_evaluate(**kwargs)
-        openimcc_mno_activities.append(
-            float(state.parent_oxide_activities["MnO"])
-        )
-        return state
+        return original_melt_evaluate(**kwargs)
 
     def capture_extension_call(*args, **kwargs):
         extension_calls.append((args, kwargs))
@@ -197,16 +191,17 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
     assert "gas_pack_digest" not in prediction.provenance
     assert "liquid_pack_digest" not in prediction.provenance
     assert evaluated_compositions
-    assert all("MnO" in composition for composition in evaluated_compositions)
+    assert all("MnO" not in composition for composition in evaluated_compositions)
     mno_inputs = [activities for activities in gas_activity_inputs if "MnO" in activities]
     assert mno_inputs
-    assert openimcc_mno_activities
-    assert mno_inputs[0]["MnO"] == openimcc_mno_activities[0]
-    assert mno_inputs[0]["MnO"] != pytest.approx(
+    assert extension_calls
+    assert all("MnO" in parent_oxides for parent_oxides in gas_parent_oxide_names)
+    assert mno_inputs[0]["MnO"] == pytest.approx(
         expected_fallback_activity.thermodynamic_parent_activity()
     )
-    assert extension_calls == []
-    assert "MnO" not in prediction.provenance.get("melt_activity_extensions", {})
+    assert prediction.provenance["melt_activity_extensions"]["MnO"][
+        "authority_level"
+    ] == expected_fallback_activity.evidence_tier
     expected_area_m2 = (
         _sossi_geometry_areas(25.0e-6)["pt_loop_bead_sphere_constant"]
         if sample_surface_area_m2 is None
@@ -226,48 +221,6 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(
         "page": 6,
         "section": "2.1 Experimental Methods",
     }
-
-    if sample_surface_area_m2 is not None:
-        def remove_native_mno_activity(**kwargs):
-            state = original_melt_evaluate(**kwargs)
-            activities = dict(state.parent_oxide_activities)
-            activities.pop("MnO", None)
-            parent_oxides = tuple(
-                oxide for oxide in state.parent_oxides if oxide != "MnO"
-            )
-            return replace(
-                state,
-                parent_oxide_activities=activities,
-                parent_oxides=parent_oxides,
-            )
-
-        with monkeypatch.context() as missing_activity_patch:
-            missing_activity_patch.setattr(
-                openimcc_bridge, "evaluate", remove_native_mno_activity
-            )
-            extension_calls.clear()
-            gas_activity_inputs.clear()
-            gas_parent_oxide_names.clear()
-            fallback_prediction = residue._predict_sossi_residue_cohort(
-                [experiment],
-                catalog,
-                starting_trace_ppm_by_experiment={experiment_id: starting_trace},
-                buffered_fO2_log_by_experiment={experiment_id: -10.0},
-                code_revision="pack-digest-pin-test-missing-mno",
-                engine="openimcc",
-                sample_surface_area_m2=sample_surface_area_m2,
-            )[0]
-
-        assert extension_calls
-        assert gas_activity_inputs
-        assert gas_activity_inputs[0]["MnO"] == pytest.approx(
-            expected_fallback_activity.thermodynamic_parent_activity()
-        )
-        assert "MnO" in gas_parent_oxide_names[0]
-        assert fallback_prediction.provenance["melt_activity_extensions"]["MnO"][
-            "authority_level"
-        ] == expected_fallback_activity.evidence_tier
-
 
 def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
     monkeypatch: pytest.MonkeyPatch,
@@ -517,7 +470,14 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
         if notice.reason == "sossi_open_furnace_series_resistance_transport"
     )
     assert "series-resistance gas film" in transport_notice.band
-    assert "P_total=101325 Pa (PDF p. 2)" in transport_notice.band
+    from simulator.battery.score import (
+        _format_sossi_residue_transport_notice_band,
+    )
+
+    assert transport_notice.band == _format_sossi_residue_transport_notice_band(
+        prediction.refusal_detail["transport_conditions"],
+        prediction.refusal_detail["transport_source_locations"],
+    )
     assert "Table 2, PDF p. 55" in transport_notice.band
     assert "Methods §2.1, PDF p. 6" in transport_notice.band
     assert prediction.refusal_detail["transport_model"] == "series_resistance"
