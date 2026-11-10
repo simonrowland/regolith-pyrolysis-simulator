@@ -414,7 +414,7 @@ function advisoryEstimatedTransportText(value) {
 
 function advisoryIsProductMetadata(key) {
     return [
-        'status', 'flag', 'availability_flag', 'excluded', 'reason',
+        'status', 'flag', 'availability_flag', 'prediction_flag', 'excluded', 'reason',
         'source_accounts_by_species',
     ]
         .includes(key);
