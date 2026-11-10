@@ -750,3 +750,36 @@ def test_c7_set_it_to_11_knobs_saturate_without_extra_product(formula_registry):
         "campaigns.C7.ca_shuttle.reserve_ca_product_fraction",
     }
     assert all(row["saturated"] for row in saturation)
+
+
+def test_c7_reaction_equilibrium_pressure_is_the_thermo_zero():
+    provider = BuiltinCaAluminothermicStepProvider()
+    audit = provider._thermo_margin_audit(1200.0, 5.0)
+    p_eq = audit["ca_reaction_equilibrium_pressure_pa"]
+    assert p_eq == pytest.approx(31.998881797435118)
+    assert provider._computed_thermo_margin_kj_per_mol_o2(1200.0, p_eq) == pytest.approx(0.0, abs=1e-10)
+    assert provider._computed_thermo_margin_kj_per_mol_o2(1200.0, p_eq / 2) > 0.0
+    assert provider._computed_thermo_margin_kj_per_mol_o2(1200.0, p_eq * 2) < 0.0
+
+
+@pytest.mark.parametrize("p_ca_pa, favorable", [(20.0, True), (40.0, False)])
+def test_c7_realized_partial_controls_thermo_and_flags_envelope(
+    formula_registry, p_ca_pa, favorable
+):
+    result = BuiltinCaAluminothermicStepProvider().dispatch(_request(
+        formula_registry, _c7_reduction_accounts(), _controls(
+            commanded_p_total_mbar=0.05,
+            p_total_mbar=0.5,
+            ca_product_pressure_pa=p_ca_pa,
+        ),
+    ))
+    assert result.diagnostic["ca_product_pressure_pa"] == p_ca_pa
+    if favorable:
+        assert result.transition is not None
+        notice, = result.diagnostic["notices"]
+        assert notice["kind"] == "envelope_exceeded"
+        assert notice["realized_pressure_mbar"] == 0.5
+        assert notice["commanded_pressure_mbar"] == 0.05
+    else:
+        assert result.transition is None
+        assert result.diagnostic["reason_refused"] == "c7_vacuum_shifted_thermo_margin_unfavorable"

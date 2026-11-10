@@ -297,6 +297,9 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
                 self._ca_product_pressure_pa(controls),
             )
         )
+        envelope_notice = self._pressure_envelope_notice(controls)
+        if envelope_notice is not None:
+            diagnostic["notices"] = [envelope_notice]
         return IntentResult(
             intent=ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
             status="ok",
@@ -366,7 +369,7 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
         if (
             p_total_mbar < C7_MIN_TOTAL_PRESSURE_MBAR
             or p_total_mbar > C7_MAX_TOTAL_PRESSURE_MBAR
-        ):
+        ) and "ca_product_pressure_pa" not in controls:
             return self._refused(
                 "c7_total_pressure_outside_vacuum_envelope",
                 control_audit=control_audit,
@@ -437,15 +440,27 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
 
     @staticmethod
     def _ca_product_pressure_pa(controls: Mapping[str, Any]) -> float:
-        """Overhead Ca product pressure (Pa) for the vapor-term gate.
+        """Use the solved Ca partial; standalone requests bound it by total."""
 
-        C7 writes Ca to ``process.overhead_gas``. The conservative product
-        pressure is the commanded total overhead pressure (Ca cannot exceed
-        p_total). 1 mbar = 100 Pa.
-        """
-
+        if "ca_product_pressure_pa" in controls:
+            return _finite_float(controls["ca_product_pressure_pa"], float("nan"))
         p_total_mbar = _finite_float(controls.get("p_total_mbar"), float("nan"))
         return p_total_mbar * 100.0
+
+    @staticmethod
+    def _pressure_envelope_notice(controls: Mapping[str, Any]) -> dict | None:
+        realized_mbar = _finite_float(controls.get("p_total_mbar"), float("nan"))
+        if C7_MIN_TOTAL_PRESSURE_MBAR <= realized_mbar <= C7_MAX_TOTAL_PRESSURE_MBAR:
+            return None
+        return {
+            "type": "typed_notice",
+            "kind": "envelope_exceeded",
+            "reason": "c7_pressure_control_failure",
+            "authority": "extrapolated",
+            "commanded_pressure_mbar": controls.get("commanded_p_total_mbar"),
+            "realized_pressure_mbar": realized_mbar,
+            "envelope_mbar": [C7_MIN_TOTAL_PRESSURE_MBAR, C7_MAX_TOTAL_PRESSURE_MBAR],
+        }
 
     @classmethod
     def _thermo_margin_audit(
@@ -550,12 +565,23 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
             r_kJ = ellingham_graph.GAS_CONSTANT_J_PER_MOL_K / 1000.0
             vapor_term = n_M * r_kJ * T_K * math.log(p_ca_pa / p_ref_pa)
         margin = condensed_margin - vapor_term
+        # The reaction supplies Ca(g): dG_rxn = -condensed_margin
+        # + n_M R T ln(p_Ca/p_ref). Setting dG_rxn=0 gives
+        # P_eq = p_ref exp(condensed_margin/(n_M R T)). The exponent is
+        # (kJ/mol O2)/[(mol Ca/mol O2)(kJ/mol Ca/K)K], dimensionless;
+        # P_eq is Pa. At 1200 C this is 31.999 Pa, below pure-Ca
+        # P_sat=17057 Pa. As p_Ca -> 0, dG_rxn -> -infinity.
+        p_equilibrium_pa = p_ref_pa * math.exp(
+            condensed_margin / (n_M * ellingham_graph.GAS_CONSTANT_J_PER_MOL_K
+                                / 1000.0 * T_K)
+        )
         return {
             "computed_thermo_margin_kj_per_mol_o2": margin,
             "condensed_ellingham_margin_kj_per_mol_o2": condensed_margin,
             "ca_vapor_term_kj_per_mol_o2": vapor_term,
             "ca_product_pressure_pa": float(p_ca_pa),
             "ca_vapor_reference_pressure_pa": float(p_ref_pa),
+            "ca_reaction_equilibrium_pressure_pa": p_equilibrium_pa,
             "ca_metal_phase_kind": phase,
             "ca_antoine_out_of_certified_range": bool(antoine_out_of_range),
         }

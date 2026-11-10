@@ -120,6 +120,31 @@ def evaporation_flux_refusal_from_configuration_error(
     )
 
 
+def _predict_transport_domain_extension(diagnostic: dict | None) -> dict | None:
+    """Native Fe/C7 retain a closed prediction outside continuum validity.
+
+    Refuse certification of the transport model, not the physical stream.
+    Missing or invalid inputs retain their refusal; only transitional Kn is
+    an extension. The authoritative ordinary-flux provider keeps its policy.
+    """
+    if diagnostic is None or diagnostic.get('p_bulk_transport_domain') != 'out_of_domain_transitional':
+        return diagnostic
+    return {
+        **diagnostic,
+        'type': 'typed_notice',
+        'kind': 'transport_domain_extension',
+        'status': 'out_of_domain',
+        'authority': 'extrapolated',
+        'authority_class': 'status_bearing',
+        'authority_reason': 'transport_domain_extension',
+        'ledger_yields_authorized': True,
+        'detail': (
+            diagnostic['detail'] + '; selected closed stream is a flagged '
+            'transport-domain prediction, not a certified continuum result'
+        ),
+    }
+
+
 def viscous_p_bulk_out_of_domain_diagnostic(
     *,
     knudsen_number: float,

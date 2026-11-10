@@ -2304,9 +2304,14 @@ def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):
     assert success["status"] == "partial"
     assert set(success) == TOP_LEVEL_KEYS
     assert success["c7_product_report"]
-    # An in-envelope commit leaves the refusal empty. extraction.py sets
-    # _last_c7_refusal_diagnostic to {} and fills it only on a refusal.
+    # A favorable reaction retains its closed stream and flags pressure
+    # control failure when the realized state exceeds the commanded envelope.
     assert success["c7_refusal_diagnostic"] == {}
+    diagnostic = success["c7_product_report"]["diagnostic"]
+    assert diagnostic["same_hour_headspace_closure"]["converged"]
+    assert diagnostic["transport_ca_mol"] == pytest.approx(diagnostic["ca_overhead_mol"])
+    assert diagnostic["computed_thermo_margin_kj_per_mol_o2"] > 0.0
+    assert any(n["kind"] == "envelope_exceeded" for n in diagnostic["notices"])
     assert set(failure) == TOP_LEVEL_KEYS
     assert failure["status"] == "failed"
     assert failure["c7_product_report"] == {}

@@ -3578,6 +3578,7 @@ class ExtractionMixin:
         cfg: dict,
         *,
         ca_per_extent: float,
+        extent_cap_mol: float | None = None,
     ) -> tuple[float, dict]:
         from engines.builtin.ca_aluminothermic_step import (
             BuiltinCaAluminothermicStepProvider,
@@ -3590,6 +3591,7 @@ class ExtractionMixin:
             _series_resistance_evaporation_flux_kg_m2_s,
         )
         from simulator.evaporation import (
+            _predict_transport_domain_extension,
             evaporation_flux_refusal_from_configuration_error,
             viscous_p_bulk_out_of_domain_diagnostic,
         )
@@ -3790,6 +3792,26 @@ class ExtractionMixin:
         self._last_c7_ca_silent_zero_notes = {
             'silent_zero_notes': [dict(n) for n in _c7_sz_notes],
         }
+        thermo_audit = BuiltinCaAluminothermicStepProvider._thermo_margin_audit(
+            hold_temp_C, p_sat_pa
+        )
+        if thermo_audit.get('thermo_fail_closed_category') in {'missing_input', 'proven_zero'}:
+            return 0.0, {
+                **thermo_audit,
+                'r_transport': 0.0,
+                'transport_ca_mol': 0.0,
+                'c7_transport_refusal': thermo_audit['reason_refused'],
+            }
+        p_eq_pa = float(thermo_audit['ca_reaction_equilibrium_pressure_pa'])
+        # The finite inventory/recipe cap belongs inside the rate solve.
+        # extent [mol] * Ca/extent / hold [h] * M [kg/mol] gives kg/h;
+        # a zero-duration hold supplies no stream.
+        rate_cap_kg_hr = (
+            max(0.0, extent_cap_mol) * ca_per_extent / hold_time_h
+            * MOLAR_MASS['Ca'] / 1000.0
+            if extent_cap_mol is not None and hold_time_h > 0.0
+            else (0.0 if hold_time_h <= 0.0 else math.inf)
+        )
         p_bulk_pa = 0.0
         overhead_pressure_pa = max(0.0, p_total_mbar * 100.0)
         series_config = dict(
@@ -3818,7 +3840,6 @@ class ExtractionMixin:
                 _pressure_held_closed_line_total_pressure_Pa,
                 _solve_same_hour_headspace_closure,
             )
-            from simulator.transport_regime import continuum_validity_refuses
 
             melt_resistance = bool(
                 series_config.get('melt_resistance_enabled', False)
@@ -3843,7 +3864,7 @@ class ExtractionMixin:
                 try:
                     return _series_resistance_evaporation_flux_kg_m2_s(
                         species='Ca',
-                        P_eq_pa=p_sat_pa,
+                        P_eq_pa=p_eq_pa,
                         P_bulk_pa=bulk_Pa,
                         T_surface_K=hold_temp_K,
                         molar_mass_kg_mol=MOLAR_MASS['Ca'] / 1000.0,
@@ -3884,25 +3905,13 @@ class ExtractionMixin:
                     area_m2=area_m2,
                 )
                 candidate_mol_hr = (
-                    p_sat_pa / (molar_resistance + float(g))
+                    p_eq_pa / (molar_resistance + float(g))
                     if math.isfinite(molar_resistance)
                     else 0.0
                 )
-                projected_bulk_Pa = candidate_mol_hr * float(g)
-                candidate = series_flux_at(projected_bulk_Pa, total_pressure_Pa)
-                domain = viscous_p_bulk_out_of_domain_diagnostic(
-                    knudsen_number=float(candidate.knudsen_number),
-                    overhead_pressure_pa=total_pressure_Pa,
-                    pipe_diameter_m=pipe_diameter_m,
-                    gas_temperature_K=gas_temperature_K,
-                    carrier_gas=str(carrier_gas),
-                    campaign_name='C7_CA_ALUMINOTHERMIC',
-                    asking_site='extraction.c7_ca_transport',
-                )
-                if continuum_validity_refuses(domain):
-                    return {'Ca': 0.0}
                 return {
-                    'Ca': max(0.0, candidate_mol_hr) * molar_mass_kg_mol
+                    'Ca': min(rate_cap_kg_hr,
+                              max(0.0, candidate_mol_hr) * molar_mass_kg_mol)
                 }
 
             def ca_partials_at_rates(rates_kg_hr):
@@ -3943,20 +3952,20 @@ class ExtractionMixin:
             if pressure_held_total_Pa is not None:
                 closed_line_boundary = {
                     'closed_line_equilibrium_pressures_Pa': {
-                        'Ca': p_sat_pa,
+                        'Ca': p_eq_pa,
                     },
                     'closed_line_total_pressure_Pa': pressure_held_total_Pa,
                 }
             closure = _solve_same_hour_headspace_closure(
                 {
-                    'Ca': max(0.0, float(seed.flux_kg_s_m2))
-                    * area_m2 * 3600.0
+                    'Ca': min(rate_cap_kg_hr, max(0.0, float(seed.flux_kg_s_m2))
+                              * area_m2 * 3600.0)
                 },
                 ca_rate_at_projection_g,
                 ca_partials_at_rates,
                 {'Ca': MOLAR_MASS['Ca'] / 1000.0},
                 pressure_floor_Pa=p_total_mbar * 100.0,
-                transformed_equilibrium_pressures_Pa={'Ca': p_sat_pa},
+                transformed_equilibrium_pressures_Pa={'Ca': p_eq_pa},
                 downstream_pressure_Pa=max(
                     0.0,
                     self._headspace_downstream_pressure_bar(None) * 1.0e5,
@@ -3988,13 +3997,6 @@ class ExtractionMixin:
             C7_MIN_TOTAL_PRESSURE_MBAR <= p_total_mbar <= C7_MAX_TOTAL_PRESSURE_MBAR
         ):
             series_flux = series_flux_at(p_bulk_pa, overhead_pressure_pa)
-            # Kn-domain validity for viscous P_bulk applies here too: the
-            # C7 0.01–0.1 mbar shell-route band sits above VISCOUS_KNUDSEN_MAX
-            # at typical hold T / D, so the same transport-model validity
-            # C7-specific diagnostic-limited policy suppresses
-            # ledger-authoritative extent. The authoritative EVAPORATION_FLUX
-            # provider refuses this state. Not a Kn safety/coating gate;
-            # t-379 (0.7) lifts the missing-model restriction.
         else:
             try:
                 series_flux = _series_resistance_evaporation_flux_kg_m2_s(
@@ -4010,7 +4012,6 @@ class ExtractionMixin:
                     exc
                 ) from exc
         hold_time_s = hold_time_h * 3600.0
-        from simulator.transport_regime import continuum_validity_refuses
 
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
             knudsen_number=float(series_flux.knudsen_number),
@@ -4021,11 +4022,9 @@ class ExtractionMixin:
             campaign_name='C7_CA_ALUMINOTHERMIC',
             asking_site='extraction.c7_ca_transport',
         )
+        domain_diag = _predict_transport_domain_extension(domain_diag)
         flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
-        if continuum_validity_refuses(domain_diag):
-            # C7-specific diagnostic-limited suppression; not provider parity.
-            flux_kg_s_m2 = 0.0
-        elif closure is not None and not closure.converged and area_m2 > 0.0:
+        if closure is not None and area_m2 > 0.0:
             flux_kg_s_m2 = max(
                 0.0,
                 float(closure.rates_kg_hr.get('Ca', 0.0))
@@ -4076,9 +4075,7 @@ class ExtractionMixin:
                     'series_resistance_frozen_skull_stir_ceiling',
                 )
             )
-        if continuum_validity_refuses(domain_diag):
-            transport_refusal = 'viscous_p_bulk_transport_out_of_domain'
-        elif (
+        if (
             cf7_ca_shell_route_active
             and C7_MIN_TOTAL_PRESSURE_MBAR
             <= p_total_mbar
@@ -4094,6 +4091,7 @@ class ExtractionMixin:
             'transport_ca_mol': ca_transport_mol,
             'c7_ca_flux_kg_s_m2': flux_kg_s_m2,
             'c7_ca_p_sat_pa': p_sat_pa,
+            'c7_ca_p_eq_pa': p_eq_pa,
             'c7_ca_p_bulk_pa': p_bulk_pa,
             'c7_ca_alpha_intrinsic': ca_alpha,
             'c7_ca_alpha_effective': series_flux.alpha_effective,
@@ -4134,14 +4132,14 @@ class ExtractionMixin:
                     'iterations': closure.iterations,
                     'authority': 'extrapolated',
                 }]
-        if active_ca_transport and p_bulk_pa >= p_sat_pa:
+        if active_ca_transport and p_bulk_pa >= p_eq_pa:
             diagnostic['species_physical_zeros'] = {
                 'Ca': {
                     'type': 'typed_notice',
                     'kind': 'evaporation_condensation_direction_physical_zero',
                     'species': 'Ca',
                     'reason': 'condensation_direction',
-                    'P_eq_Pa': p_sat_pa,
+                    'P_eq_Pa': p_eq_pa,
                     'P_bulk_Pa': p_bulk_pa,
                 }
             }
@@ -4150,7 +4148,8 @@ class ExtractionMixin:
             # caller's transport_diag splice.
             diagnostic['silent_zero_notes'] = [dict(n) for n in _c7_sz_notes]
         if domain_diag is not None:
-            # Shared validity vocabulary on the C7 diagnostic-limited path.
+            diagnostic.setdefault('notices', []).append(domain_diag)
+            # Keep the predicted closed stream and flag transport uncertainty.
             diagnostic.update(
                 {
                     'authority_class': domain_diag['authority_class'],
@@ -4175,6 +4174,18 @@ class ExtractionMixin:
                     'knudsen_number': domain_diag['knudsen_number'],
                 }
             )
+        realized_controls = {
+            'p_total_mbar': overhead_pressure_pa / 100.0,
+            'commanded_p_total_mbar': p_total_mbar,
+        }
+        envelope_notice = BuiltinCaAluminothermicStepProvider._pressure_envelope_notice(
+            realized_controls
+        )
+        if envelope_notice is not None:
+            diagnostic.setdefault('notices', []).append(envelope_notice)
+        diagnostic.update(BuiltinCaAluminothermicStepProvider._thermo_margin_audit(
+            hold_temp_C, p_bulk_pa
+        ))
         return extent_mol, diagnostic
 
     def _step_c7_ca_aluminothermic(self) -> None:
@@ -4242,7 +4253,8 @@ class ExtractionMixin:
             total_al_budget / stoich['Al'],
         )
         r_transport, transport_diag = self._c7_transport_extent_mol(
-            cfg, ca_per_extent=stoich['Ca'])
+            cfg, ca_per_extent=stoich['Ca'],
+            extent_cap_mol=r_stoich_total * extent_fraction)
         transport_refusal = str(
             transport_diag.get('c7_transport_refusal') or '')
         if transport_refusal:
@@ -4255,7 +4267,7 @@ class ExtractionMixin:
                 'c7_overhead_pressure_pa': float(
                     transport_diag.get('c7_overhead_pressure_pa', 0.0) or 0.0),
             }
-        objective_extent = min(r_stoich_total, r_transport)
+        objective_extent = min(r_stoich_total * extent_fraction, r_transport)
         objective = str(cfg.get('objective') or 'ree_enrichment')
         p_total_raw = cfg.get('p_total_mbar')
         if p_total_raw is None:
@@ -4270,11 +4282,17 @@ class ExtractionMixin:
             'reductant_species': 'Al',
             'objective': objective,
             'aluminate_mode': mode,
-            'extent_fraction': extent_fraction,
+            # Recipe fraction is already applied inside the capped closure.
+            'extent_fraction': 1.0,
             'allow_partial_extent': self._c7_bool(
                 cfg.get('allow_partial_extent'), True),
             'hold_temp_C': self._c7_hold_temperature_C(cfg),
-            'p_total_mbar': self._c7_float(p_total_raw, self.melt.p_total_mbar),
+            'commanded_p_total_mbar': self._c7_float(p_total_raw, self.melt.p_total_mbar),
+            'p_total_mbar': transport_diag.get(
+                'c7_overhead_pressure_pa',
+                self._c7_float(p_total_raw, self.melt.p_total_mbar) * 100.0
+            ) / 100.0,
+            'ca_product_pressure_pa': transport_diag.get('c7_ca_p_bulk_pa'),
             'pO2_mbar': self._c7_float(pO2_raw, self.melt.pO2_mbar),
             'active_ca_condensation_route': self._c7_bool(
                 cfg.get('active_ca_condensation_route'), True),

@@ -59,14 +59,11 @@ def test_c7_enabled_routes_after_c6_with_explicit_proceed_decision():
 def test_c7_enabled_run_commits_at_realized_pressure_and_closes_mass(
     tmp_path, monkeypatch
 ):
-    # The commanded C7 envelope is 0.05 mbar (5 Pa). The same-hour closure
-    # of this recipe solves Ca at 147.5986003169424 Pa (Kn
-    # 0.0017918100837050204, viscous). Resistance, Kn, and the closure use
-    # that one realized pressure. The command is not a second evaluation,
-    # so the transitional-Kn refusal that used to be computed at 5 Pa does
-    # not fire. The step commits the Al-limited extent. The favorable-margin
-    # unit contract remains in
-    # tests/chemistry/test_builtin_ca_aluminothermic_step_provider.py.
+    # The reaction supplies Ca with P_eq=31.999 Pa at 1200 C, rather
+    # than pure-Ca P_sat=17057 Pa. The recipe/Al cap supplies 3.5156 kg/h,
+    # whose forward pressure is 21.212 Pa. That favorable reaction state
+    # exceeds the commanded 5 Pa envelope and uses flagged transitional
+    # transport; it must not be silently zeroed or certified in-envelope.
     monkeypatch.setenv("MPLCONFIGDIR", str(tmp_path / "mpl"))
     run = PyrolysisRun(
         feedstock_id="targeted_super_kreep_ore",
@@ -117,22 +114,32 @@ def test_c7_enabled_run_commits_at_realized_pressure_and_closes_mass(
         1.465184975535996
     )
 
-    # No transport refusal: the realized total is the closure partial, and
-    # Kn there is inside the viscous domain. The document refusal stays
-    # empty; the command (5 Pa) is not the pressure of record.
     assert document["c7_refusal_diagnostic"] == {}
     diagnostic = report["diagnostic"]
+    closure = diagnostic["same_hour_headspace_closure"]
+    assert closure["converged"] is True
     assert diagnostic["c7_transport_refusal"] == ""
-    assert diagnostic["c7_overhead_pressure_pa"] == pytest.approx(
-        147.5986003169424
-    )
+    assert diagnostic["c7_ca_p_eq_pa"] == pytest.approx(31.998881797435118)
+    assert diagnostic["c7_overhead_pressure_pa"] == pytest.approx(21.212173418835263)
     assert diagnostic["c7_ca_p_bulk_pa"] == pytest.approx(
         diagnostic["c7_overhead_pressure_pa"]
     )
-    assert diagnostic["c7_knudsen_number"] == pytest.approx(
-        0.0017918100837050204
+    assert 0.01 < diagnostic["c7_knudsen_number"] < 10.0
+    assert diagnostic["transport_ca_mol"] == pytest.approx(diagnostic["ca_overhead_mol"])
+    assert closure["rates_kg_hr"]["Ca"] == pytest.approx(products["Ca_metal"]["kg"])
+    assert diagnostic["computed_thermo_margin_kj_per_mol_o2"] > 0.0
+    reductions = [d for d in diagnostic["raw_diagnostics"] if d["operation"] == "reduction"]
+    assert reductions
+    for reduction in reductions:
+        assert reduction["ca_product_pressure_pa"] == diagnostic["c7_ca_p_bulk_pa"]
+        assert reduction["computed_thermo_margin_kj_per_mol_o2"] == diagnostic["computed_thermo_margin_kj_per_mol_o2"]
+        assert reduction["notices"][0]["kind"] == "envelope_exceeded"
+    notices = {notice["kind"]: notice for notice in diagnostic["notices"]}
+    assert notices["envelope_exceeded"]["commanded_pressure_mbar"] == 0.05
+    assert notices["envelope_exceeded"]["realized_pressure_mbar"] == pytest.approx(
+        diagnostic["c7_overhead_pressure_pa"] / 100.0
     )
-    assert diagnostic["c7_knudsen_number"] < 0.01
+    assert notices["transport_domain_extension"]["knudsen_number"] == diagnostic["c7_knudsen_number"]
 
     assert diagnostic["c7_al_credit_input_kg"] == pytest.approx(20.0)
     assert diagnostic["c7_al_credit_unused_mol"] > 0.0
