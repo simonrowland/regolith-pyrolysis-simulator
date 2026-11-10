@@ -28,6 +28,7 @@ from simulator.optimize.objective import (
     LEGACY_ENERGY_KWH_METRIC,
     ObjectiveProfileError,
     canonical_objective_metric,
+    declared_objective_definitions,
     normalize_composition_target_objective,
     objective_definitions,
     objective_importance_evidence,
@@ -595,7 +596,7 @@ def _validate_objectives(profile: Mapping[str, Any], *, source: str | Path) -> N
         profile["objectives"] = normalized_objectives
     try:
         objective_importance_evidence(profile)
-        objective_definitions(profile, include_unclaimed_c0_products=True)
+        declared_objective_definitions(profile)
         objective_definitions(profile)
     except ObjectiveProfileError as exc:
         raise ProfileValidationError(f"{source}: {exc}") from exc

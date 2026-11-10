@@ -96,16 +96,13 @@ _MASS_OBJECTIVE_METRICS = frozenset(
         "oxygen_vented_kg",
     }
 )
-# data/setpoints.yaml campaigns.C0: silicate melt + Stage 0 inert slag,
-# no final ceramic claim. These metrics are that claim.
+# data/setpoints.yaml campaigns.C0 claims volatiles and native Fe only.
+# INVARIANT: a C0 smoke profile never scores a final product. The withheld
+# set is the whole mass-product registry plus the Stage-3 silica certification
+# score. Composition-target rows are the same claim and are withheld with them.
+# A withheld metric is absent from every scoring path. It is never a 0.0.
 _C0_UNCLAIMED_PRODUCT_METRICS = frozenset(
-    {
-        "pure_silica_glass_kg",
-        "industrial_mixed_glass_kg",
-        "refractory_ceramic_rump_kg",
-        "metals_plus_o2_kg",
-        "metals_total_kg",
-    }
+    _MASS_OBJECTIVE_METRICS | {SSO2_OWNER_RECIPE_ID}
 )
 _C0_SMOKE_LABEL_PREFIX = "C0 SMOKE ONLY:"
 _C0_WITHHOLD_REASON = "campaign_does_not_claim_product"
@@ -1359,6 +1356,24 @@ def is_c0_smoke_profile(profile: Mapping[str, Any]) -> bool:
     )
 
 
+def _metric_is_unclaimed_final_product(metric: str) -> bool:
+    """True when this metric is a product C0 does not claim."""
+
+    canonical = canonical_objective_metric(metric)
+    return (
+        canonical in _C0_UNCLAIMED_PRODUCT_METRICS
+        or canonical.startswith(COMPOSITION_TARGET_METRIC_PREFIX)
+    )
+
+
+def _row_is_unclaimed_final_product(raw: object) -> bool:
+    if not isinstance(raw, Mapping):
+        return False
+    if objective_type(raw) == COMPOSITION_TARGET_TYPE:
+        return True
+    return _metric_is_unclaimed_final_product(str(raw.get("metric", "")))
+
+
 def _format_declared_number(value: float) -> str:
     return format(value, ".12g")
 
@@ -1387,7 +1402,7 @@ def c0_smoke_withheld_weight_fraction(profile: Mapping[str, Any]) -> float | Non
     if evidence is None:
         return None
     withheld_rows = [
-        row for row in evidence if row.metric in _C0_UNCLAIMED_PRODUCT_METRICS
+        row for row in evidence if _metric_is_unclaimed_final_product(row.metric)
     ]
     if not withheld_rows:
         return None
@@ -1403,7 +1418,7 @@ def c0_smoke_withheld_objective_note(profile: Mapping[str, Any]) -> str | None:
     if evidence is None:
         return None
     withheld_rows = [
-        row for row in evidence if row.metric in _C0_UNCLAIMED_PRODUCT_METRICS
+        row for row in evidence if _metric_is_unclaimed_final_product(row.metric)
     ]
     fraction = c0_smoke_withheld_weight_fraction(profile)
     if not withheld_rows or fraction is None:
@@ -1422,36 +1437,27 @@ def c0_smoke_withheld_objective_note(profile: Mapping[str, Any]) -> str | None:
     )
 
 
-def _scoring_objective_rows(
-    profile: Mapping[str, Any],
-    *,
-    include_unclaimed_c0_products: bool,
-) -> Any:
+def _scoring_objective_rows(profile: Mapping[str, Any]) -> Any:
+    """Rows that enter the scored vector.
+
+    One chokepoint: objective definitions, ``compute_objectives``, strategy
+    metrics, and the study scalar all read this list. C0 smoke profiles drop
+    every final-product row. There is no flag that puts one back.
+    """
+
     raw_objectives = profile.get("objectives")
-    if include_unclaimed_c0_products or not is_c0_smoke_profile(profile):
+    if not is_c0_smoke_profile(profile):
         return raw_objectives
     if not isinstance(raw_objectives, (list, tuple)):
         return raw_objectives
     return [
-        raw
-        for raw in raw_objectives
-        if not (
-            isinstance(raw, Mapping)
-            and canonical_objective_metric(str(raw.get("metric", "")))
-            in _C0_UNCLAIMED_PRODUCT_METRICS
-        )
+        raw for raw in raw_objectives if not _row_is_unclaimed_final_product(raw)
     ]
 
 
-def objective_definitions(
-    profile: Mapping[str, Any],
-    *,
-    include_unclaimed_c0_products: bool = False,
+def _objective_definitions_from_rows(
+    raw_objectives: Any,
 ) -> tuple[ObjectiveDefinition, ...]:
-    raw_objectives = _scoring_objective_rows(
-        profile,
-        include_unclaimed_c0_products=include_unclaimed_c0_products,
-    )
     if not isinstance(raw_objectives, (list, tuple)) or not raw_objectives:
         raise ObjectiveProfileError("profile.objectives must be a non-empty list")
 
@@ -1476,6 +1482,34 @@ def objective_definitions(
             )
         )
     return tuple(definitions)
+
+
+def declared_objective_definitions(
+    profile: Mapping[str, Any],
+) -> tuple[ObjectiveDefinition, ...]:
+    """Every declared row, including products the campaign does not claim.
+
+    Profile validation uses this so a malformed withheld row is still refused.
+    Scoring uses ``objective_definitions``.
+    """
+
+    return _objective_definitions_from_rows(profile.get("objectives"))
+
+
+def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefinition, ...]:
+    raw_objectives = profile.get("objectives")
+    scoring_rows = _scoring_objective_rows(profile)
+    if (
+        isinstance(raw_objectives, (list, tuple))
+        and raw_objectives
+        and isinstance(scoring_rows, (list, tuple))
+        and not scoring_rows
+    ):
+        raise ObjectiveProfileError(
+            "study scalar has no remaining objective weight after withholding "
+            "products the campaign does not claim"
+        )
+    return _objective_definitions_from_rows(scoring_rows)
 
 
 def _expected_objective_units(metric: str) -> str | None:
@@ -1584,10 +1618,7 @@ def compute_objectives(
 
     active_cost_parameters = cost_parameters_from_mapping(cost_parameters)
     definitions = objective_definitions(profile)
-    raw_objectives = _scoring_objective_rows(
-        profile,
-        include_unclaimed_c0_products=False,
-    )
+    raw_objectives = _scoring_objective_rows(profile)
     if not isinstance(raw_objectives, (list, tuple)):
         raise ObjectiveProfileError("profile.objectives must be a non-empty list")
     sim = getattr(run_execution, "simulator", run_execution)

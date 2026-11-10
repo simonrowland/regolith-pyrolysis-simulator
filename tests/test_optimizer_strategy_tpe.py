@@ -777,20 +777,26 @@ def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> No
 
     strategy.tell(list(zip(candidates, results, strict=True)))
     trials = _trials_by_candidate(strategy)
-    # C0 smoke profiles do not score glass or metal. The cap still moves
+    # C0 smoke profiles do not score final products. The cap still moves
     # product_summary metals; see test_lunar_highland_60_hour_horizon_changes_extracted_metals.
-    assert "metals_total_kg" not in strategy.objective_metrics
-    assert "pure_silica_glass_kg" not in strategy.objective_metrics
-    assert "industrial_mixed_glass_kg" not in strategy.objective_metrics
-    oxygen_index = strategy.objective_metrics.index("oxygen_kg")
+    for withheld in (
+        "metals_total_kg",
+        "pure_silica_glass_kg",
+        "industrial_mixed_glass_kg",
+        "oxygen_kg",
+        "sso2_pn2_fe_drain_silica",
+    ):
+        assert withheld not in strategy.objective_metrics
+    duration_index = strategy.objective_metrics.index("duration_h")
     for candidate, result in zip(candidates, results, strict=True):
         trial = trials[candidate.id]
         assert trial.state.name == "COMPLETE"
         assert trial.values is not None
-        value = trial.values[oxygen_index]
+        value = trial.values[duration_index]
         assert math.isfinite(value)
         assert value not in (_BAD_MAXIMIZE_VALUE, _BAD_MINIMIZE_VALUE)
         assert "metals_total_kg" not in result.objectives.as_mapping()
+        assert "oxygen_kg" not in result.objectives.as_mapping()
         assert set(result.failing_gates) <= set(
             trial.user_attrs[_CONSTRAINT_NAMES_ATTR]
         )
@@ -822,8 +828,12 @@ def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> No
         assert "metals_total_kg" not in mapping
         assert "pure_silica_glass_kg" not in mapping
         assert "industrial_mixed_glass_kg" not in mapping
-    short_oxygen = [mapping["oxygen_kg"] for mapping in short_mappings]
-    assert short_oxygen[0] == short_oxygen[1]
+        assert "oxygen_kg" not in mapping
+        assert "sso2_pn2_fe_drain_silica" not in mapping
+    short_energy = [
+        mapping["energy_electrical_plus_evaporation_kWh"] for mapping in short_mappings
+    ]
+    assert short_energy[0] == short_energy[1]
     assert all(
         result.objectives.as_mapping()["duration_h"] == result.eval_spec.hours
         for result in short_results
