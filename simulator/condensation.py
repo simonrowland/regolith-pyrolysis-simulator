@@ -7661,13 +7661,17 @@ def cold_spot_diagnostic(
     When a surviving-flow map is supplied, a missing segment or a
     missing species key is a typed refusal. Only an explicit finite
     zero (the species was captured upstream) skips the judgement. A
-    missing or invalid arriving pressure, or a refused wall P_sat, is
-    a typed refusal (d-367). It is not a clear and it is not a
-    supersaturation finding. A computed P_sat outside the certified
-    fit keeps that best estimate and publishes the extrapolation on
-    the judgement. The coating gate reads those judgements. Reactive
-    SiO deposition still uses its P_sat ~= 0 backstop on the deposition
-    path; that backstop does not pass the hot-wall check.
+    positive flow at or below the 1e-15 kg/hr mass floor is still
+    arriving: that floor is not the zero. With no surviving-flow map
+    the inlet rate is the arriving flow, and the same predicate
+    decides it. A missing or invalid arriving pressure, or a refused
+    wall P_sat, is a typed refusal (d-367). It is not a clear and it
+    is not a supersaturation finding. A computed P_sat outside the
+    certified fit keeps that best estimate and publishes the
+    extrapolation on the judgement. The coating gate reads those
+    judgements. Reactive SiO deposition still uses its P_sat ~= 0
+    backstop on the deposition path; that backstop does not pass the
+    hot-wall check.
     """
 
     # The historical uniform floor is not a violation threshold.
@@ -7699,22 +7703,52 @@ def cold_spot_diagnostic(
             **fields,
         }
 
+    def _flow_is_explicit_zero(flow_kg_hr: float) -> bool:
+        """Only an exact 0.0 kg/hr skips a hot-wall judgement.
+
+        Premise: upstream capture is stored as a finite 0.0, not as a
+        mass-accounting floor. Algebra: the species arrives iff
+        flow_kg_hr > 0. Units: kg/hr. Sanity: Fe at 1e-16 kg/hr with
+        an arriving partial of 100 Pa at 1400 C has P_sat(1673.15 K)
+        ≈ 1.14 Pa, so the wall is supersaturated and must be a
+        violation. The 1e-15 kg/hr deposit-dust floor is not this
+        predicate. Both the inlet rate (when no surviving-flow map is
+        supplied) and the surviving rate go through this function.
+        """
+
+        return flow_kg_hr == 0.0
+
     for species, raw_kg_hr in vapor_species_kg_hr.items():
         kg_hr = _finite_nonnegative_value(
             raw_kg_hr,
             label=f'vapor flow for {species}',
         )
-        if kg_hr <= 1e-15:
+        # No surviving-flow map: the inlet rate is the arriving flow.
+        # Explicit zero is absent. A positive inlet, however small,
+        # stays in the chokepoint below. A supplied map can still name
+        # a positive arriving flow when the inlet itself is zero.
+        if (
+            surviving_species_kg_hr_by_segment is None
+            and _flow_is_explicit_zero(kg_hr)
+        ):
             continue
         target_stage_number = designated_stage_number(species)
         if target_stage_number is None:
             continue
-        condensation_T_C = _species_condensation_temperature_C(
-            species,
-            temps=temps,
-            vapor_pressure_data=vapor_pressure_data,
-        )
-        threshold_C = condensation_T_C - margin_C
+        # Cold spots keep the engineering dust floor. It is not a
+        # hot-wall skip: a positive flow at or below 1e-15 kg/hr is
+        # still judged below.
+        cold_spot_limit: tuple[float, float] | None = None
+        if kg_hr > 1e-15:
+            condensation_T_C = _species_condensation_temperature_C(
+                species,
+                temps=temps,
+                vapor_pressure_data=vapor_pressure_data,
+            )
+            cold_spot_limit = (
+                condensation_T_C,
+                condensation_T_C - margin_C,
+            )
         species_name = str(species)
         for segment in pipe_segments:
             downstream_number = _segment_stage_number(segment.downstream_stage)
@@ -7765,7 +7799,7 @@ def cold_spot_diagnostic(
                 flow_refusal is not None
                 or (
                     arriving_kg_hr is not None
-                    and arriving_kg_hr > 1e-15
+                    and not _flow_is_explicit_zero(arriving_kg_hr)
                 )
             )
             if species_reaches_segment:
@@ -7932,6 +7966,9 @@ def cold_spot_diagnostic(
                                 finding['saturation_pressure_pa'] = P_sat_pa
                                 finding['extrapolations'] = extrapolations
                             upstream_hot_wall_findings.append(finding)
+            if cold_spot_limit is None:
+                continue
+            condensation_T_C, threshold_C = cold_spot_limit
             if wall_T_C >= threshold_C:
                 continue
             findings.append({

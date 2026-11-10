@@ -1004,15 +1004,26 @@ def test_every_hot_wall_judgement_uses_the_arriving_partial(
 
 
 # Invariant (b-282 / d-367): no arriving species flow is a silent 0.0.
-# The hot-wall chokepoint is cold_spot_diagnostic. When a surviving-flow
-# map is supplied, every species is one of:
-#   - a computed judgement (explicit positive flow, then P_sat comparison
+# The hot-wall chokepoint is cold_spot_diagnostic. Every species on every
+# flow source (surviving-flow map, or the inlet rate when that map is
+# omitted) is one of:
+#   - a computed judgement (any finite flow > 0, then P_sat comparison
 #     or a saturation refusal),
 #   - a typed refusal (segment missing, species key missing, or the value
 #     is not finite and non-negative),
 #   - not judged, only when the flow is an explicit finite zero.
-# A missing species key is the refusal. It is not the zero, so it cannot
-# skip a 1400 C / 100 Pa Fe wall.
+# A missing species key is the refusal. It is not the zero. A positive
+# flow at or below 1e-15 kg/hr is not the zero either: Fe at 1e-16 kg/hr,
+# 100 Pa, and 1400 C is still a violation.
+_POSITIVE_ARRIVING_KG_HR = {
+    "positive": 1.0,
+    # Reviewer counterexample, below the old mass floor.
+    "sub_floor_positive": 1e-16,
+    # The old `> 1e-15` comparison skipped this value too.
+    "floor_positive": 1e-15,
+    # Smallest positive float64. Any hidden floor fails this class.
+    "min_positive": math.nextafter(0.0, math.inf),
+}
 _ARRIVING_FLOW_CASES = (
     "missing_species",
     "missing_segment",
@@ -1022,7 +1033,23 @@ _ARRIVING_FLOW_CASES = (
     "inf",
     "non_numeric",
     "none",
-    "positive",
+    *_POSITIVE_ARRIVING_KG_HR,
+)
+# Inlet-only has no map, so it cannot express a missing key or a
+# non-numeric value. Those raise at the inlet parser, or they are map
+# refusals. Explicit zero and every positive magnitude still apply:
+# with no map the inlet rate is the arriving flow.
+_INLET_ONLY_FLOW_CASES = (
+    "explicit_zero",
+    *_POSITIVE_ARRIVING_KG_HR,
+)
+_FLOW_SOURCE_CASES = (
+    # Inlet is 1 kg/hr, so a dust surviving flow is not hidden by it.
+    tuple(("surviving_map", case) for case in _ARRIVING_FLOW_CASES)
+    # Inlet is the explicit zero. The map still decides: a positive
+    # surviving flow is judged, and a missing key is refused.
+    + tuple(("inlet_zero_map", case) for case in _ARRIVING_FLOW_CASES)
+    + tuple(("inlet_only", case) for case in _INLET_ONLY_FLOW_CASES)
 )
 _FLOW_REFUSAL_REASON = {
     "missing_species": "missing",
@@ -1041,7 +1068,7 @@ def _surviving_species_flows(species: str, segment_name: str, flow_case: str):
     if flow_case == "missing_segment":
         return {}
     if flow_case == "missing_species":
-        # Reviewer counterexample: the segment is present and the species is not.
+        # The segment is present and the species is not. That is a refusal.
         return {segment_name: {}}
     value = {
         "explicit_zero": 0.0,
@@ -1050,17 +1077,44 @@ def _surviving_species_flows(species: str, segment_name: str, flow_case: str):
         "inf": float("inf"),
         "non_numeric": "nope",
         "none": None,
-        "positive": 1.0,
+        **_POSITIVE_ARRIVING_KG_HR,
     }[flow_case]
     return {segment_name: {species: value}}
+
+
+def _arriving_flow_inputs(
+    species: str,
+    segment_name: str,
+    flow_source: str,
+    flow_case: str,
+):
+    """Inlet rate and optional surviving-flow map for one chokepoint branch.
+
+    ``surviving_map`` keeps a 1 kg/hr inlet so a dust surviving flow is
+    not hidden by the inlet magnitude. ``inlet_zero_map`` is the other
+    inlet extreme: an explicit zero inlet must not hide the map.
+    ``inlet_only`` omits the map, and the inlet rate is the arriving flow.
+    """
+
+    if flow_source == "inlet_only":
+        if flow_case == "explicit_zero":
+            return 0.0, None
+        return _POSITIVE_ARRIVING_KG_HR[flow_case], None
+    surviving = _surviving_species_flows(species, segment_name, flow_case)
+    if flow_source == "surviving_map":
+        return 1.0, surviving
+    if flow_source == "inlet_zero_map":
+        return 0.0, surviving
+    raise AssertionError(flow_source)
 
 
 def _assert_arriving_flow_invariant(
     diagnostic: dict,
     species: str,
+    flow_source: str,
     flow_case: str,
 ):
-    where = f"{species} 1400 C 100 Pa {flow_case}"
+    where = f"{species} 1400 C 100 Pa {flow_source} {flow_case}"
     matches = [
         judgement
         for judgement in diagnostic["upstream_hot_wall_judgements"]
@@ -1088,9 +1142,10 @@ def _assert_arriving_flow_invariant(
         assert diagnostic["upstream_hot_wall_extrapolations"] == [], where
         return
 
-    assert flow_case == "positive", where
+    assert flow_case in _POSITIVE_ARRIVING_KG_HR, where
+    expected_kg_hr = _POSITIVE_ARRIVING_KG_HR[flow_case]
     _assert_diagnostic_invariant(diagnostic, species, 1400.0, "bakeoff_100pa")
-    assert judgement["kg_hr"] == pytest.approx(1.0), where
+    assert judgement["kg_hr"] == pytest.approx(expected_kg_hr), where
     assert judgement["partial_pressure_pa"] == pytest.approx(MILLIBAR_BAKEOFF_PA), where
     if species == "Fe":
         # Hand Fe Antoine at 1673.15 K, not the production evaluator.
@@ -1101,8 +1156,13 @@ def _assert_arriving_flow_invariant(
         assert judgement["status"] == "violation", where
 
 
-def _assert_arriving_flow_gate(margin, species: str, flow_case: str):
-    where = f"{species} 1400 C 100 Pa {flow_case} {margin.status}"
+def _assert_arriving_flow_gate(
+    margin,
+    species: str,
+    flow_source: str,
+    flow_case: str,
+):
+    where = f"{species} 1400 C 100 Pa {flow_source} {flow_case} {margin.status}"
     payload = margin.status_payload or {}
     assert margin.feasible is True, where
     assert payload.get("coating_verdict") == "clear", where
@@ -1125,37 +1185,47 @@ def _assert_arriving_flow_gate(margin, species: str, flow_case: str):
 
 
 @pytest.mark.parametrize("species", _HOT_WALL_SPECIES)
-@pytest.mark.parametrize("flow_case", _ARRIVING_FLOW_CASES)
+@pytest.mark.parametrize("flow_source,flow_case", _FLOW_SOURCE_CASES)
 @pytest.mark.parametrize("channel", _HOT_WALL_CHANNELS)
 def test_arriving_species_flow_is_computed_or_refused(
     species: str,
+    flow_source: str,
     flow_case: str,
     channel: str,
 ):
-    """Every species, flow-input class, and coating channel.
+    """Every species, flow source, flow class, and coating channel.
 
-    Fe at 1 kg/hr, a 1400 C upstream wall, 100 Pa, and ``{segment: {}}``
-    is the missing-species class: a typed refusal, not a skipped judgement.
-    Explicit 0.0 is the only class that skips.
+    Fe at inlet 1 kg/hr, surviving 1e-16 kg/hr, a 1400 C wall, and 100 Pa
+    is the sub-floor class: a violation, not a skipped judgement.
+    Explicit 0.0 is the only class that skips. Inlet-only repeats that
+    rule when no map is supplied. Inlet-zero-map repeats it when the
+    inlet is 0.0 and the surviving flow is still positive.
     """
 
     stage = designated_stage_number(species)
     assert stage is not None
     segment = _upstream_segment(f"stage_{stage}", 1400.0)
+    inlet_kg_hr, surviving = _arriving_flow_inputs(
+        species,
+        segment.name,
+        flow_source,
+        flow_case,
+    )
     diagnostic = cold_spot_diagnostic(
         [segment],
-        {species: 1.0},
+        {species: inlet_kg_hr},
         species_partial_pressures_pa_by_segment={
             segment.name: {species: MILLIBAR_BAKEOFF_PA},
         },
-        surviving_species_kg_hr_by_segment=_surviving_species_flows(
-            species,
-            segment.name,
-            flow_case,
-        ),
+        surviving_species_kg_hr_by_segment=surviving,
     )
-    _assert_arriving_flow_invariant(diagnostic, species, flow_case)
+    _assert_arriving_flow_invariant(
+        diagnostic,
+        species,
+        flow_source,
+        flow_case,
+    )
     if channel == "payload":
         return
     margin = _coating_margin(channel, diagnostic)
-    _assert_arriving_flow_gate(margin, species, flow_case)
+    _assert_arriving_flow_gate(margin, species, flow_source, flow_case)
