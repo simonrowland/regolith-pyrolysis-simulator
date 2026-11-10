@@ -76,7 +76,11 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
                 "hour": 1,
                 "T_C": 100.0,
                 "pO2_bar": 1e-5,
-                "vapor_species_kg_hr": {"Fe": 0.055845, "SiO": 0.0600843},
+                "vapor_species_kg_hr": {
+                    "CaO": 0.056077,
+                    "Fe": 0.055845,
+                    "SiO": 0.0600843,
+                },
                 "condensation_train_kg_cumulative": {"Fe": 0.01},
                 "high_t_melt_activity": {
                     "provider": "openimcc",
@@ -87,7 +91,11 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
                 "hour": 2,
                 "T_C": 200.0,
                 "pO2_bar": 2e-5,
-                "vapor_species_kg_hr": {"Fe": 0.055845, "SiO": 0.0600843},
+                "vapor_species_kg_hr": {
+                    "CaO": 0.056077,
+                    "Fe": 0.055845,
+                    "SiO": 0.0600843,
+                },
                 "condensation_train_kg_cumulative": {"Fe": 0.02},
                 "high_t_melt_activity": {
                     "provider": "openimcc",
@@ -96,8 +104,38 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
             },
         ],
     }
+    calcium_enthalpy = _residual(
+        observation_id="cao-enthalpy",
+        engine="internal-analytical",
+        species="CaO",
+        temperature_K=430,
+        fO2_Pa=1.5,
+        residual=10.0,
+        rail="thermochemistry",
+    )
+    calcium_enthalpy["numeric"] = {
+        "operation": "absolute",
+        "unit": "kJ_per_declared_mol_basis",
+        "value": 10.0,
+    }
+    calcium_ratio = _residual(
+        observation_id="cao-ratio",
+        engine="internal-analytical",
+        species="CaO",
+        temperature_K=430,
+        fO2_Pa=1.5,
+        residual=0.5,
+        rail="thermochemistry",
+    )
+    calcium_ratio["numeric"] = {
+        "operation": "ratio",
+        "unit": "dimensionless",
+        "value": 0.5,
+    }
     rows = [
         {"kind": "battery_store_stamp", "revision": "synthetic"},
+        calcium_enthalpy,
+        calcium_ratio,
         _residual(
             observation_id="fe-three",
             engine="internal-analytical",
@@ -243,12 +281,31 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
     assert "FeO" in envelope["species_by_rail"]["melt_activity"]
     assert "SiO" in envelope["species_by_rail"]["vapour"]
     groups = report["rows"]
-    assert [(row["rail"], row["species"], row["engine"]) for row in groups] == [
-        ("vapour", "Fe", "internal-analytical"),
-        ("melt_activity", "FeO", "openimcc"),
-        ("vapour", "SiO", "openimcc"),
+    assert [
+        (row["rail"], row["species"], row["engine"], row["unit"])
+        for row in groups
+    ] == [
+        (
+            "thermochemistry",
+            "CaO",
+            "internal-analytical",
+            "kJ_per_declared_mol_basis (absolute)",
+        ),
+        ("vapour", "Fe", "internal-analytical", "dex"),
+        ("melt_activity", "FeO", "openimcc", "dex"),
+        ("vapour", "SiO", "openimcc", "dex"),
+        (
+            "thermochemistry",
+            "CaO",
+            "internal-analytical",
+            "dimensionless (ratio)",
+        ),
     ]
-    iron, iron_oxide, silica = groups
+    calcium_enthalpy_group, iron, iron_oxide, silica, calcium_ratio_group = groups
+    assert calcium_enthalpy_group["n"] == 1
+    assert calcium_enthalpy_group["rms"] == pytest.approx(10.0)
+    assert calcium_ratio_group["n"] == 1
+    assert calcium_ratio_group["rms"] == pytest.approx(0.5)
     assert iron["n"] == 2
     assert iron["unit"] == "dex"
     assert iron["rms"] == pytest.approx(math.sqrt(12.5))
@@ -267,6 +324,7 @@ def test_cli_filters_hero_envelope_and_excludes_flagged_and_refused_rows(
     assert silica["median"] == pytest.approx(-0.5)
     assert silica["bias"] == pytest.approx(-0.5)
     markdown = out.read_text()
-    assert "| 1 | vapour | Fe | internal-analytical |" in markdown
-    assert "| 2 | melt_activity | FeO | openimcc |" in markdown
-    assert "| 3 | vapour | SiO | openimcc |" in markdown
+    assert "| 1 | thermochemistry | CaO | internal-analytical |" in markdown
+    assert "| 2 | vapour | Fe | internal-analytical |" in markdown
+    assert "| 3 | melt_activity | FeO | openimcc |" in markdown
+    assert "| 4 | vapour | SiO | openimcc |" in markdown
