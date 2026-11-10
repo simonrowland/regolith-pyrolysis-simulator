@@ -59,6 +59,60 @@ def _document() -> dict:
     }
 
 
+def _cited_tokens(value: object) -> list[str]:
+    """Spell a pinned scalar the way certification searches the opened text."""
+    if isinstance(value, bool):
+        return ["true" if value else "false"]
+    if isinstance(value, int):
+        return [str(value)]
+    if isinstance(value, float):
+        return [format(value, ".16g")]
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        tokens: list[str] = []
+        for child in value.values():
+            tokens.extend(_cited_tokens(child))
+        return tokens
+    if isinstance(value, (list, tuple)):
+        tokens = []
+        for child in value:
+            tokens.extend(_cited_tokens(child))
+        return tokens
+    return []
+
+
+def _open_attested_samples(root: Path, doc: dict) -> None:
+    """Point attestation-complete page locators at a text file under ``root``.
+
+    The gate certifies every extract. A page number is not an open. Tests that
+    are about another check keep reviewer and date, so the cited file has to
+    contain the pinned value or the gate refuses before that check runs.
+    Samples that already name a file, or that lack a reviewer, are left alone.
+    """
+    tokens: list[str] = []
+    for sample in doc.get("fidelity_samples") or []:
+        if not isinstance(sample, dict):
+            continue
+        reviewer = sample.get("reviewed_by")
+        if not isinstance(reviewer, str) or not reviewer.strip():
+            continue
+        locator = sample.get("locator")
+        if not isinstance(locator, dict):
+            continue
+        if any(
+            isinstance(locator.get(key), str) and str(locator.get(key)).strip()
+            for key in ("source_path", "quotes_path", "record")
+        ):
+            continue
+        value = sample["value"] if "value" in sample else sample.get("draft_value")
+        tokens.extend(_cited_tokens(value))
+        locator["source_path"] = "paper.txt"
+        locator["line_range"] = "1-1"
+    if tokens:
+        (root / "paper.txt").write_text(" ".join(tokens) + "\n", encoding="utf-8")
+
+
 def _run_gate(
     tmp_path: Path,
     doc: dict,
@@ -66,6 +120,7 @@ def _run_gate(
     raw: str | None = None,
     corpus: Path | None = None,
 ):
+    _open_attested_samples(tmp_path, doc)
     path = tmp_path / "fixture-source.yaml"
     raw = raw if raw is not None else yaml.safe_dump(doc, sort_keys=False)
     path.write_text(raw, encoding="utf-8")
@@ -75,8 +130,13 @@ def _run_gate(
         path=path,
         expected_source_id=path.stem,
         pre_policy_ids=set(),
+        artifact_root=tmp_path,
     )
-    errors.extend(validator._check_fidelity_gate(parsed, label=path.stem))
+    errors.extend(
+        validator.certify_extract_source_fidelity(
+            parsed, label=path.stem, artifact_root=tmp_path
+        )
+    )
     return evaluate_extract(
         path,
         parsed,
@@ -1079,6 +1139,13 @@ def test_cli_audits_extract_with_explicit_tree(tmp_path: Path, capsys):
             "value": "equilibrium_phase_composition",
         }
     )
+    # Certification opens this repository-relative text file. The pinned
+    # quantity token is the observation type named in that source.
+    doc["fidelity_samples"][0]["locator"] = {
+        "source_path": "tools/validate_literature_extracts.py",
+        "page": 2,
+        "table": "1",
+    }
     path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
 
     status = extract_gate.main(
@@ -1117,11 +1184,14 @@ def test_cli_audits_changed_extracts(tmp_path: Path, monkeypatch, capsys):
     repo = tmp_path / "repo"
     extracts = repo / "data/literature/extracts"
     extracts.mkdir(parents=True)
+    doc = _document()
+    _open_attested_samples(repo, doc)
     (extracts / "fixture-source.yaml").write_text(
-        yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8"
+        yaml.safe_dump(doc, sort_keys=False), encoding="utf-8"
     )
     (extracts / "_policy.yaml").write_text("ignored: true\n", encoding="utf-8")
     monkeypatch.setattr(extract_gate, "REPO_ROOT", REPO_ROOT)
+    monkeypatch.setattr(validator, "ROOT", repo)
     monkeypatch.setattr(
         extract_gate,
         "_tree_head",
@@ -1161,10 +1231,13 @@ def test_cli_audits_extract_by_source_id(tmp_path: Path, monkeypatch, capsys):
     repo = tmp_path / "repo"
     extracts = repo / "data/literature/extracts"
     extracts.mkdir(parents=True)
+    doc = _document()
+    _open_attested_samples(repo, doc)
     (extracts / "fixture-source.yaml").write_text(
-        yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8"
+        yaml.safe_dump(doc, sort_keys=False), encoding="utf-8"
     )
     monkeypatch.setattr(extract_gate, "REPO_ROOT", REPO_ROOT)
+    monkeypatch.setattr(validator, "ROOT", repo)
     monkeypatch.setattr(extract_gate, "_tree_head", lambda _path: (repo, "test-head"))
     monkeypatch.setattr(
         extract_gate,

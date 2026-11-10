@@ -2487,14 +2487,33 @@ def test_numeric_index_path_does_not_cover_a_scored_observation():
     assert any("uncovered_observation" in line for line in refusals)
 
 
-def test_attested_identity_sample_certifies():
-    """Reviewer, ISO date, locator, and an observation id are enough to certify."""
+def test_attested_page_locator_without_an_opened_artifact_does_not_certify():
+    """Reviewer, date, and a page locator do not open the source.
+
+    The payload pin still covers drift. Certification refuses because the
+    locator was never opened. A draft stays schema-valid and warns;
+    ``review_status: reviewed`` does not.
+    """
     doc = _minimal_extract()
     sample = doc["fidelity_samples"][0]
     sample["reviewed_by"] = "independent reviewer"
     sample["reviewed_on"] = "2026-11-10"
-    assert vle.fidelity_source_warnings(doc, label="attested") == []
-    assert vle.certify_extract_source_fidelity(doc, label="attested") == []
+    warnings = vle.fidelity_source_warnings(doc, label="attested")
+    by_kind = {warning.kind: warning.count for warning in warnings}
+    assert by_kind.get("source_blind_pin") == 1
+    assert "uncovered_observation" not in by_kind
+    assert "unattested_sample" not in by_kind
+    refusals = vle.certify_extract_source_fidelity(doc, label="attested")
+    assert any("source_blind_pin" in line for line in refusals)
+    draft_errors = vle.validate_extract_document(
+        doc, expected_source_id="fixture-source"
+    )
+    assert draft_errors == [], draft_errors
+    doc["review_status"] = "reviewed"
+    reviewed_errors = vle.validate_extract_document(
+        doc, expected_source_id="fixture-source"
+    )
+    assert any("source_blind_pin" in line for line in reviewed_errors)
 
 
 def test_corpus_fidelity_gate_rejects_observation_id_as_evidence():
@@ -5051,13 +5070,19 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     assert match_errors == [], "\n".join(match_errors)
 
 
-# Measured on this corpus when numeric observation indexes are not identities.
-# 6 ``observations[<integer>]`` pins are positions: counting them would report
-# 46,335 observations in 524 extracts. The ceiling may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 46341
+# Measured on this corpus. Six ``observations[<integer>]`` pins are positions
+# and do not cover; counting them would report 46,335 observations in 524
+# extracts. Equipment pins also do not cover a measured payload: two
+# observations an equipment field alone used to clear are now uncovered
+# (46,341 -> 46,343), inside extracts that were already uncovered, so the
+# extract count stays 525. Each ceiling may only fall.
+_UNCOVERED_OBSERVATIONS_CEILING = 46343
 _UNCOVERED_EXTRACTS_CEILING = 525
 _UNATTESTED_SAMPLES_CEILING = 3128
 _PILOT_PIN_EXTRACTS_CEILING = 57
+# Attestation-complete pins whose locator is not opened. Zero on this corpus:
+# no sample carries reviewed_by. The ceiling may only fall.
+_SOURCE_BLIND_PINS_CEILING = 0
 
 
 def test_fidelity_source_warning_ratchet():
@@ -5066,6 +5091,7 @@ def test_fidelity_source_warning_ratchet():
     uncovered_extracts = 0
     unattested_samples = 0
     pilot_extracts = 0
+    source_blind_pins = 0
     for path in vle.discover_extracts():
         doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         if not isinstance(doc, dict):
@@ -5079,12 +5105,332 @@ def test_fidelity_source_warning_ratchet():
             uncovered_extracts += 1
             uncovered_obs += uncovered
         unattested_samples += by_kind.get("unattested_sample", 0)
+        source_blind_pins += by_kind.get("source_blind_pin", 0)
         if by_kind.get("auto_migrated_pilot_pin", 0):
             pilot_extracts += 1
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
     assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
     assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, unattested_samples
     assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
+    assert source_blind_pins <= _SOURCE_BLIND_PINS_CEILING, source_blind_pins
+
+
+def _opened_payload_document(root: Path, *, structured: bool) -> dict:
+    """One scored observation whose pin is in an opened text artifact."""
+    artifact = root / "paper.txt"
+    artifact.write_text(
+        "line 1\nline 2\nline 3\nline 4\nalpha 0.24 measured\n",
+        encoding="utf-8",
+    )
+    doc = _minimal_extract()
+    doc["review_status"] = "reviewed"
+    locator = {"source_path": "paper.txt", "line_range": "5-5", "page": 2}
+    if structured:
+        doc["fidelity_samples"] = [
+            {
+                "species": "Fe",
+                "observable": "alpha",
+                "observation_id": "fe_alpha_1",
+                "field": "alpha",
+                "value": 0.24,
+                "reviewed_by": "independent reviewer",
+                "reviewed_on": "2026-11-10",
+                "locator": locator,
+            }
+        ]
+    else:
+        sample = doc["fidelity_samples"][0]
+        sample["reviewed_by"] = "independent reviewer"
+        sample["reviewed_on"] = "2026-11-10"
+        sample["locator"] = locator
+    return doc
+
+
+def _defect_document(pin_class: str, root: Path) -> dict:
+    """One input class. Only ``opened_payload`` and ``structured_payload`` pass."""
+    if pin_class == "structured_context":
+        # Structured selectors also read context rows. That pin must not cover
+        # the scored observation, even when the artifact contains the text.
+        doc = _opened_payload_document(root, structured=True)
+        doc["species"]["Fe"]["context"] = [
+            {
+                "observation_id": "fe_bench_note",
+                "type": "apparatus",
+                "locator": {"page": 3, "section": "experimental"},
+                "units": "as printed",
+                "values": {"furnace": "muffle"},
+            }
+        ]
+        sample = doc["fidelity_samples"][0]
+        sample["observation_id"] = "fe_bench_note"
+        sample["observable"] = "apparatus"
+        sample["field"] = "furnace"
+        sample["value"] = "muffle"
+        sample["locator"] = {"source_path": "paper.txt", "page": 3}
+        (root / "paper.txt").write_text("muffle\n", encoding="utf-8")
+        return doc
+    doc = _opened_payload_document(root, structured=pin_class == "structured_payload")
+    sample = doc["fidelity_samples"][0]
+    if pin_class in ("opened_payload", "structured_payload"):
+        return doc
+    if pin_class == "equipment_pin":
+        doc["species"]["Fe"]["observations"][0]["equipment"] = {
+            "sample_mass_g": {"value": 0.24, "locator": {"page": 1}}
+        }
+        sample["path"] = (
+            "species.Fe.observations[fe_alpha_1].equipment.sample_mass_g.value"
+        )
+        sample["value"] = 0.24
+        return doc
+    if pin_class == "metadata_id":
+        sample["path"] = "species.Fe.observations[fe_alpha_1].observation_id"
+        sample["value"] = "fe_alpha_1"
+        (root / "paper.txt").write_text("fe_alpha_1\n", encoding="utf-8")
+        sample["locator"] = {"source_path": "paper.txt", "page": 2}
+        return doc
+    if pin_class == "numeric_index":
+        sample["path"] = "species.Fe.observations[0].values.alpha"
+        return doc
+    if pin_class == "second_observation":
+        extra = copy.deepcopy(doc["species"]["Fe"]["observations"][0])
+        extra["observation_id"] = "fe_alpha_2"
+        extra["values"] = {"alpha": 0.31}
+        doc["species"]["Fe"]["observations"].append(extra)
+        return doc
+    if pin_class == "pilot_note":
+        sample["note"] = (
+            "auto fidelity sample from first observation payload (pilot migration)"
+        )
+        return doc
+    if pin_class == "missing_reviewer":
+        del sample["reviewed_by"]
+        return doc
+    if pin_class == "missing_date":
+        del sample["reviewed_on"]
+        return doc
+    if pin_class == "missing_locator":
+        del sample["locator"]
+        sample["note"] = "locatable only by note"
+        return doc
+    if pin_class == "prose_locator":
+        sample["locator"] = {"page": 2, "table": "1"}
+        return doc
+    if pin_class == "artifact_missing":
+        sample["locator"] = {"source_path": "missing.txt", "page": 2}
+        return doc
+    if pin_class == "value_absent":
+        (root / "paper.txt").write_text("line 1\nno numeric payload here\n", encoding="utf-8")
+        sample["locator"] = {"source_path": "paper.txt", "page": 2}
+        return doc
+    if pin_class == "pdf_artifact":
+        (root / "paper.txt").write_bytes(b"%PDF-1.4\nnot text\n")
+        return doc
+    if pin_class == "path_escape":
+        sample["locator"] = {"source_path": "../paper.txt", "page": 2}
+        return doc
+    if pin_class == "copied_value":
+        sample["value"] = 0.91
+        doc["species"]["Fe"]["observations"][0]["values"]["alpha"] = 0.91
+        return doc
+    if pin_class == "context_pin":
+        doc["species"]["Fe"]["context"] = [
+            {
+                "observation_id": "fe_bench_note",
+                "type": "apparatus",
+                "locator": {"page": 3, "section": "experimental"},
+                "units": "as printed",
+                "values": {"furnace": "muffle"},
+            }
+        ]
+        sample["path"] = "species.Fe.context[fe_bench_note].values.furnace"
+        sample["value"] = "muffle"
+        (root / "paper.txt").write_text("muffle\n", encoding="utf-8")
+        sample["locator"] = {"source_path": "paper.txt", "page": 3}
+        return doc
+    raise AssertionError(pin_class)
+
+
+_PASS_PIN_CLASSES = ("opened_payload", "structured_payload")
+_DEFECT_PIN_CLASSES = (
+    "equipment_pin",
+    "metadata_id",
+    "numeric_index",
+    "second_observation",
+    "pilot_note",
+    "missing_reviewer",
+    "missing_date",
+    "missing_locator",
+    "prose_locator",
+    "artifact_missing",
+    "value_absent",
+    "pdf_artifact",
+    "path_escape",
+    "copied_value",
+    "context_pin",
+    "structured_context",
+)
+_DEFECT_KIND = {
+    "equipment_pin": "uncovered_observation",
+    "metadata_id": "uncovered_observation",
+    "numeric_index": "uncovered_observation",
+    "second_observation": "uncovered_observation",
+    "pilot_note": "auto_migrated_pilot_pin",
+    "missing_reviewer": "unattested_sample",
+    "missing_date": "unattested_sample",
+    "missing_locator": "unattested_sample",
+    "prose_locator": "source_blind_pin",
+    "artifact_missing": "source_blind_pin",
+    "value_absent": "source_blind_pin",
+    "pdf_artifact": "source_blind_pin",
+    "path_escape": "source_blind_pin",
+    "copied_value": "source_blind_pin",
+    "context_pin": "uncovered_observation",
+    "structured_context": "uncovered_observation",
+}
+_PROMOTION_ENTRIES = (
+    "certify",
+    "validate",
+    "load_require_valid",
+    "load_skip_valid",
+    "graduation",
+    "index",
+)
+
+
+def _promotion_errors(entry: str, doc: dict, root: Path, monkeypatch) -> list[str]:
+    """Every promoter. Empty means the extract was accepted as reviewed."""
+    reviewed = copy.deepcopy(doc)
+    reviewed["review_status"] = "reviewed"
+    if entry == "certify":
+        return vle.certify_extract_source_fidelity(
+            reviewed, label="pin", artifact_root=root
+        )
+    if entry == "validate":
+        return vle.validate_extract_document(
+            reviewed,
+            expected_source_id=reviewed["source_id"],
+            artifact_root=root,
+        )
+    if entry in ("load_require_valid", "load_skip_valid"):
+        folder = root / entry
+        folder.mkdir()
+        (folder / "fixture-source.yaml").write_text(
+            yaml.safe_dump(reviewed), encoding="utf-8"
+        )
+        try:
+            loaded = em.load_extracts(
+                folder,
+                require_valid=entry == "load_require_valid",
+                artifact_root=root,
+            )
+        except SystemExit as exc:
+            return [str(exc)]
+        if any(item.get("review_status") == "reviewed" for item in loaded):
+            return []
+        return ["reviewed status was not propagated"]
+    if entry == "graduation":
+        extracts = root / "policy-extracts"
+        extracts.mkdir()
+        (extracts / "fixture-source.yaml").write_text(
+            yaml.safe_dump(reviewed), encoding="utf-8"
+        )
+        policy = {
+            "schema_version": "literature_extract_fidelity_policy.v1",
+            "policy": "ENFORCED_FOR_NEW",
+            "closed_set_source_ids": ["fixture-source"],
+            "active_pre_policy_source_ids": [],
+            "graduated_pre_policy_source_ids": ["fixture-source"],
+        }
+        ledger = {
+            "schema_version": "literature_extract_fidelity_graduation_ledger.v1",
+            "graduated_pre_policy_source_ids": ["fixture-source"],
+        }
+        policy_path = root / "policy.yaml"
+        ledger_path = root / "ledger.yaml"
+        policy_path.write_text(yaml.safe_dump(policy), encoding="utf-8")
+        ledger_path.write_text(yaml.safe_dump(ledger), encoding="utf-8")
+        monkeypatch.setattr(vle, "EXTRACTS_DIR", extracts)
+        _policy, errors = vle.load_fidelity_policy(
+            policy_path,
+            graduated_ledger_path=ledger_path,
+            artifact_root=root,
+        )
+        return [error for error in errors if "source certification refused" in error]
+    if entry == "index":
+        literature = root / "data" / "literature" / "extracts"
+        literature.mkdir(parents=True)
+        (literature / "fixture-source.yaml").write_text(
+            yaml.safe_dump(reviewed), encoding="utf-8"
+        )
+        spec = importlib.util.spec_from_file_location(
+            "literature_index_fidelity",
+            REPO_ROOT / "data" / "literature" / "build_index.py",
+        )
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        try:
+            loaded = module.load_extracts(root)
+        except ValueError as exc:
+            return [str(exc)]
+        status = loaded["fixture-source"]["files"][0]["review_status"]
+        if status == "reviewed":
+            return []
+        return [f"index recorded {status}"]
+    raise AssertionError(entry)
+
+
+@pytest.mark.parametrize("pin_class", _PASS_PIN_CLASSES)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_source_certification_accepts_only_an_opened_payload_pin(
+    pin_class: str, entry: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """Both addressing modes pass every promoter when the artifact contains the value."""
+    doc = _defect_document(pin_class, tmp_path)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    assert errors == [], (pin_class, entry, errors)
+
+
+@pytest.mark.parametrize("pin_class", _DEFECT_PIN_CLASSES)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_source_certification_refuses_every_unopened_or_uncovered_pin(
+    pin_class: str, entry: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """No promoter accepts a reviewed extract that misses the payload or the source."""
+    doc = _defect_document(pin_class, tmp_path)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    assert errors, (pin_class, entry)
+    if entry == "certify":
+        assert _DEFECT_KIND[pin_class] in "\n".join(errors)
+        # A caller-supplied empty warning list is not a waiver.
+        waived = vle.certify_extract_source_fidelity(
+            doc,
+            label="pin",
+            warnings=[],
+            artifact_root=tmp_path,
+        )
+        assert waived
+        assert _DEFECT_KIND[pin_class] in "\n".join(waived)
+
+
+@pytest.mark.parametrize(
+    "pin_class",
+    [name for name in _DEFECT_PIN_CLASSES if name != "metadata_id"],
+)
+def test_draft_defects_stay_schema_valid_and_warn(pin_class: str, tmp_path: Path):
+    """The committed corpus may stay schema-valid. The hole is a typed warning."""
+    doc = _defect_document(pin_class, tmp_path)
+    doc["review_status"] = "draft"
+    errors = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert errors == [], (pin_class, errors)
+    warnings = vle.fidelity_source_warnings(
+        doc, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == _DEFECT_KIND[pin_class] for warning in warnings)
 
 
 def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(tmp_path):

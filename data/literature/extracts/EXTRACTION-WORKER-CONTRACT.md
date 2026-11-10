@@ -76,13 +76,16 @@ paths.
 
 ### How many
 
-Every scored observation needs a sample that names its observation id and
+Every scored observation needs a sample that names its observation id, pins
+its measured `values` payload (an equipment field does not cover), and
 matches the stored value. One sample per file is not coverage. Until the
-corpus is re-audited, missing coverage, missing reviewer/date/locator, and
-auto-migrated pilot notes are typed counted warnings
-(`uncovered_observation`, `unattested_sample`, `auto_migrated_pilot_pin`).
-They do not reject the corpus. Setting `review_status: reviewed` refuses
-while any warning remains. Do not stamp reviewers or copy pins to clear them.
+corpus is re-audited, missing coverage, missing reviewer/date/locator,
+auto-migrated pilot notes, and attestation-complete pins whose locator was
+not opened are typed counted warnings (`uncovered_observation`,
+`unattested_sample`, `auto_migrated_pilot_pin`, `source_blind_pin`). They do
+not reject a draft. Setting `review_status: reviewed` refuses while any
+warning remains, and certification opens the text artifact at the locator.
+Do not stamp reviewers or copy pins to clear them.
 
 ### Tranche review obligation
 

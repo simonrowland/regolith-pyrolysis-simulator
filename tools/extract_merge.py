@@ -46,6 +46,7 @@ if str(TOOLS_DIR) not in sys.path:
 
 from validate_literature_extracts import (  # noqa: E402
     EXTRACTS_DIR,
+    certify_extract_source_fidelity,
     discover_extracts,
     fidelity_warning_summary,
     load_extract_yaml,
@@ -150,11 +151,18 @@ def load_extracts(
     directory: Path | None = None,
     *,
     require_valid: bool = True,
+    artifact_root: Path | None = None,
 ) -> list[dict[str, Any]]:
-    """Load all extract documents. Optionally refuse invalid files."""
+    """Load all extract documents. Optionally refuse invalid files.
+
+    ``review_status: reviewed`` is a promotion. It is refused unless
+    ``certify_extract_source_fidelity`` passes, including when schema
+    validation is skipped.
+    """
     files = discover_extracts(directory)
     docs: list[dict[str, Any]] = []
     errors: list[str] = []
+    certification_errors: list[str] = []
     fidelity_warnings: list[Any] = []
     # Honor ENFORCED_FOR_NEW fidelity allowlist (same policy as validate_all).
     pre_policy: set[str] | None = None
@@ -170,15 +178,29 @@ def load_extracts(
                 path,
                 pre_policy_ids=pre_policy,
                 fidelity_warnings=fidelity_warnings,
+                artifact_root=artifact_root,
             )
             if errs:
                 errors.extend(errs)
                 continue
         doc = _load_yaml(path)
+        if isinstance(doc, Mapping) and doc.get("review_status") == "reviewed":
+            refusals = certify_extract_source_fidelity(
+                doc,
+                label=path.stem,
+                artifact_root=artifact_root,
+            )
+            if refusals:
+                certification_errors.extend(refusals)
+                continue
         if isinstance(doc, Mapping):
             docs.append(dict(doc))
     if require_valid and errors:
         raise SystemExit("extract validation failed:\n" + "\n".join(errors))
+    if certification_errors:
+        raise SystemExit(
+            "source certification refused:\n" + "\n".join(certification_errors)
+        )
     if fidelity_warnings:
         print(
             "WARN: source fidelity is not certified: "

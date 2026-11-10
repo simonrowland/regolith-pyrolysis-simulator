@@ -92,22 +92,28 @@ is absent.
 ### `fidelity_samples` (t-510 gate)
 
 Each sample is a line item that can be checked against the source / OCR
-artifact. Reviewer, date, and artifact locator are the attestation contract
-for **certification**. They are not schema errors: the stored corpus is not
-rejected while those fields are missing. `validate_extract_document` counts
-three warnings — `uncovered_observation`, `unattested_sample`, and
-`auto_migrated_pilot_pin` — and every fidelity consumer prints the counts.
-Certifying or promoting the extract (the extract gate, fidelity-policy
-graduation of an on-disk extract, or emitting `review_status: reviewed`)
-refuses while any count is non-zero. A stored `review_status: reviewed` is
-not rewritten and is not by itself a schema failure.
+artifact. Reviewer, date, and artifact locator are necessary for
+**certification** and are not enough by themselves. They are not schema
+errors on a draft: the stored corpus is not rejected while those fields are
+missing. `validate_extract_document` counts four warnings —
+`uncovered_observation`, `unattested_sample`, `auto_migrated_pilot_pin`, and
+`source_blind_pin` — and every fidelity consumer prints the counts.
+`review_status: reviewed` is a promotion. Validation, extract load (including
+when schema validation is skipped), fidelity-policy graduation, MinerU emit,
+the extract gate, and the literature index all call
+`certify_extract_source_fidelity` and refuse while any count is non-zero.
 
 Coverage means a sample whose value matches the extract and whose path or
-structured selector names the observation id. A bare integer bracket such as
-`observations[0]` is a list position, not an id, so it does not cover.
+structured selector names the observation id and pins the measured `values`
+payload. An equipment pin does not cover that payload. A bare integer bracket
+such as `observations[0]` is a list position, not an id, so it does not cover.
 Matching pins still detect later extraction drift; a mismatch does not cover
-and blocks certification. The check records attestation. It does not open the
-OCR artifact. Do not backfill reviewer fields from the extract's own value.
+and blocks certification. Certification opens the locator's text artifact
+(`source_path`, `quotes_path`, or a `record` that is a repository-relative
+file) and requires every pinned scalar leaf to appear in the cited
+`line_range` when one is set, otherwise in the opened text. A page or table
+number alone is not an open. A PDF is not opened as text. Do not backfill
+reviewer fields from the extract's own value.
 
 #### Sample shapes
 

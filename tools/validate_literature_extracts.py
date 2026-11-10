@@ -21,8 +21,12 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   (species, observable, T/index, value, locator)
 * source fidelity is a typed, counted warning at this chokepoint
   (``uncovered_observation`` / ``unattested_sample`` /
-  ``auto_migrated_pilot_pin``). The corpus is not rejected for those
-  warnings. Certifying or promoting the extract refuses while any remain
+  ``auto_migrated_pilot_pin`` / ``source_blind_pin``). A draft corpus is
+  not rejected for those warnings. Promoting the extract
+  (``review_status: reviewed``, graduation, load, emit, or the index)
+  refuses while any remain. Certification opens the locator artifact and
+  finds the pinned value there; a recorded locator that is not opened is
+  source-blind. An equipment pin does not cover a measured payload.
 * structured fidelity samples resolve rows in ``observations[]`` or the
   sibling ``context[]`` container (d-032); an id matching rows in both
   containers is an ambiguity error, not a silent pick
@@ -465,6 +469,7 @@ def load_fidelity_policy(
     *,
     graduated_ledger_path: Path | None = None,
     prior_graduated_source_ids: set[str] | None = None,
+    artifact_root: Path | None = None,
 ) -> tuple[dict[str, Any], list[str]]:
     """Load the fidelity policy file.
 
@@ -613,7 +618,7 @@ def load_fidelity_policy(
         out["graduated_pre_policy_source_ids"] = list(graduated)
     # Promotion: graduating an id certifies that extract. A missing file is not
     # certified here (synthetic policy tests graduate ids that have no extract).
-    # Already-stored review_status is not re-decided by schema validation.
+    # The same chokepoint refuses a stored review_status of reviewed.
     if not errors:
         for source_id in sorted(graduated_set):
             extract_path = EXTRACTS_DIR / f"{source_id}.yaml"
@@ -632,7 +637,11 @@ def load_fidelity_policy(
                 )
                 continue
             errors.extend(
-                certify_extract_source_fidelity(extract_doc, label=source_id)
+                certify_extract_source_fidelity(
+                    extract_doc,
+                    label=source_id,
+                    artifact_root=artifact_root,
+                )
             )
     return out, errors
 
@@ -1239,7 +1248,9 @@ _FIDELITY_WARNING_KINDS = (
     "uncovered_observation",
     "unattested_sample",
     "auto_migrated_pilot_pin",
+    "source_blind_pin",
 )
+_ARTIFACT_PATH_KEYS = ("source_path", "quotes_path")
 _FIDELITY_DETAIL_CAP = 3
 # Same bracket rule as resolve_field_path: a bare integer is a list position.
 _INTEGER_SELECTOR_RE = re.compile(r"-?\d+")
@@ -1342,21 +1353,252 @@ def _sample_attestation_defects(sample: Mapping[str, Any]) -> list[str]:
     return defects
 
 
+def _sample_pins_measured_payload(sample: Mapping[str, Any]) -> bool:
+    """True when the pin addresses ``observation.values``, not equipment.
+
+    The fourth path segment is the payload container
+    (``species.<id>.observations[<id>].values...``). An equipment path may be
+    a legal sample and still must not clear coverage. Structured samples
+    resolve through ``values`` only.
+    """
+    path_keys, structured_keys = _sample_addressing_keys(sample)
+    if path_keys:
+        if len(path_keys) != 1:
+            return False
+        path = sample.get(path_keys[0])
+        if not isinstance(path, str):
+            return False
+        parts = path.split(".")
+        if len(parts) < 4:
+            return False
+        leaf = _PATH_SEGMENT_RE.match(parts[3])
+        return bool(leaf and leaf.group(1) == "values")
+    return bool(structured_keys)
+
+
+def _parse_line_range(raw: Any) -> tuple[int, int] | None:
+    """1-based inclusive span. A bare line number is that one line."""
+    if isinstance(raw, bool) or raw is None:
+        return None
+    if isinstance(raw, int):
+        return (raw, raw) if raw >= 1 else None
+    if isinstance(raw, str):
+        text = raw.strip()
+        if re.fullmatch(r"\d+", text):
+            number = int(text)
+            return (number, number) if number >= 1 else None
+        match = re.fullmatch(r"(\d+)\s*-\s*(\d+)", text)
+        if not match:
+            return None
+        start, end = int(match.group(1)), int(match.group(2))
+        if start >= 1 and end >= start:
+            return start, end
+        return None
+    if (
+        isinstance(raw, (list, tuple))
+        and len(raw) == 2
+        and all(isinstance(item, int) and not isinstance(item, bool) for item in raw)
+    ):
+        start, end = int(raw[0]), int(raw[1])
+        if start >= 1 and end >= start:
+            return start, end
+    return None
+
+
+def _resolve_artifact(root: Path, raw: str) -> Path | None:
+    """Repository-relative file inside ``root``, or None when it cannot be opened."""
+    text = raw.strip()
+    if not text or "://" in text or _ABS_PATH_RE.match(text):
+        return None
+    candidate = Path(text)
+    if candidate.is_absolute():
+        return None
+    root_resolved = root.resolve()
+    resolved = (root_resolved / candidate).resolve()
+    if not resolved.is_relative_to(root_resolved) or not resolved.is_file():
+        return None
+    return resolved
+
+
+def _artifact_candidates(locator: Mapping[str, Any], root: Path) -> list[Path]:
+    explicit = [
+        raw.strip()
+        for key in _ARTIFACT_PATH_KEYS
+        if isinstance((raw := locator.get(key)), str) and raw.strip()
+    ]
+    if explicit:
+        return [
+            path
+            for raw in explicit
+            if (path := _resolve_artifact(root, raw)) is not None
+        ]
+    record = locator.get("record")
+    if not isinstance(record, str) or not record.strip():
+        return []
+    text = record.strip()
+    direct = _resolve_artifact(root, text)
+    if direct is not None:
+        return [direct]
+    token = text.split()[0]
+    if token != text:
+        fallback = _resolve_artifact(root, token)
+        if fallback is not None:
+            return [fallback]
+    return []
+
+
+def _read_artifact_text(path: Path) -> tuple[str | None, str | None]:
+    if path.suffix.lower() == ".pdf":
+        return None, f"{path.name} is a PDF; certification opens a text or OCR artifact"
+    try:
+        blob = path.read_bytes()
+    except OSError as exc:
+        return None, f"could not read {path.name}: {exc}"
+    if blob.startswith(b"%PDF"):
+        return None, f"{path.name} is a PDF; certification opens a text or OCR artifact"
+    try:
+        return blob.decode("utf-8"), None
+    except UnicodeError:
+        return None, f"{path.name} is not UTF-8 text"
+
+
+def _cited_text(
+    full: str, locator: Mapping[str, Any]
+) -> tuple[str | None, str | None]:
+    if "line_range" not in locator or locator.get("line_range") is None:
+        return full, None
+    span = _parse_line_range(locator.get("line_range"))
+    if span is None:
+        return None, "line_range is not a line number or start-end span"
+    start, end = span
+    lines = full.splitlines()
+    if end > len(lines):
+        return None, (
+            f"line_range {start}-{end} is outside the artifact ({len(lines)} lines)"
+        )
+    return "\n".join(lines[start - 1 : end]), None
+
+
+def _scalar_leaves(value: Any) -> list[Any]:
+    if isinstance(value, str):
+        return [value] if value.strip() else []
+    if isinstance(value, bool) or isinstance(value, (int, float)):
+        return [value]
+    if isinstance(value, Mapping):
+        leaves: list[Any] = []
+        for child in value.values():
+            leaves.extend(_scalar_leaves(child))
+        return leaves
+    if isinstance(value, (list, tuple)):
+        leaves = []
+        for child in value:
+            leaves.extend(_scalar_leaves(child))
+        return leaves
+    return []
+
+
+def _leaf_in_text(leaf: Any, text: str) -> bool:
+    """True when the opened artifact contains this pinned scalar.
+
+    Numeric leaves use a general-format token with digit boundaries, so 0.24
+    does not match 10.24. This is a cited-text grep, not a unit conversion.
+    """
+    if isinstance(leaf, bool):
+        token = "true" if leaf else "false"
+        return (
+            re.search(rf"(?i)(?<![A-Za-z0-9_]){token}(?![A-Za-z0-9_])", text)
+            is not None
+        )
+    if isinstance(leaf, int):
+        return re.search(rf"(?<![\d.]){leaf}(?![\d.])", text) is not None
+    if isinstance(leaf, float):
+        if not math.isfinite(leaf):
+            return False
+        forms = {format(leaf, ".16g"), str(leaf)}
+        if leaf.is_integer() and abs(leaf) < 10**15:
+            forms.add(str(int(leaf)))
+        return any(
+            re.search(rf"(?<![\d.]){re.escape(form)}(?![\d.])", text) is not None
+            for form in forms
+        )
+    if isinstance(leaf, str):
+        return leaf in text
+    return False
+
+
+def _locator_source_blind_reason(
+    sample: Mapping[str, Any],
+    *,
+    artifact_root: Path,
+) -> str | None:
+    """None only when the locator was opened and the pinned leaves are in it."""
+    keys = [key for key in ("locator", "source_locator") if key in sample]
+    if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
+        return "locator was not opened: attestation locator is missing"
+    locator = sample[keys[0]]
+    explicit = [
+        raw.strip()
+        for key in _ARTIFACT_PATH_KEYS
+        if isinstance((raw := locator.get(key)), str) and raw.strip()
+    ]
+    candidates = _artifact_candidates(locator, artifact_root)
+    if explicit and not candidates:
+        joined = ", ".join(explicit)
+        return (
+            "locator was not opened: "
+            f"{joined} is not a text artifact inside the repository root"
+        )
+    if not candidates:
+        return (
+            "locator was not opened: no source_path, quotes_path, or file record "
+            "points at a text artifact"
+        )
+    try:
+        expected = _sample_expected_value(sample)
+    except KeyError as exc:
+        return f"locator was not opened: {exc}"
+    leaves = _scalar_leaves(expected)
+    if not leaves:
+        return "locator was not opened: pinned value has no scalar leaf to find"
+    reasons: list[str] = []
+    for path in candidates:
+        text, read_error = _read_artifact_text(path)
+        if text is None:
+            reasons.append(read_error or f"{path.name} was not opened")
+            continue
+        cited, span_error = _cited_text(text, locator)
+        if cited is None:
+            reasons.append(span_error or "cited span was not opened")
+            continue
+        missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
+        if not missing:
+            return None
+        rendered = ", ".join(repr(leaf) for leaf in missing[:3])
+        reasons.append(
+            f"opened {path.name} but the pinned value is not in the cited text "
+            f"({rendered})"
+        )
+    return "locator source-blind: " + "; ".join(reasons)
+
+
 def fidelity_source_warnings(
     doc: Mapping[str, Any],
     *,
     label: str = "<document>",
+    artifact_root: Path | None = None,
 ) -> list[FidelityWarning]:
     """Count source-fidelity holes. Empty means the certification invariant holds.
 
-    The three kinds split one invariant: every scored observation is covered by
-    a value-matching sample that names its observation id, is not an
-    auto-migrated pilot pin, and carries a reviewer, an ISO date, and one
-    artifact locator. A pilot sample that names an id still covers for
-    ``uncovered_observation``; the pilot and attestation holes are their own
-    counts. A numeric observation index does not cover. Drift (sample value
-    != extract) does not cover, and stays a match error rather than a fourth
-    kind. These warnings do not reject the corpus.
+    Invariant: every scored observation's measured ``values`` payload is covered
+    by a matching sample that names its observation id, is not an auto-migrated
+    pilot pin, carries reviewer, ISO date, and one locator, and that locator's
+    text artifact was opened and contains the pinned value. Equipment pins do
+    not cover. A pilot or unattested sample can still cover
+    ``uncovered_observation``; those holes are their own counts. A numeric
+    observation index does not cover. Drift stays a match error.
+    ``source_blind_pin`` counts attestation-complete samples whose locator was
+    not opened or whose pinned value is absent from the opened text. These
+    warnings do not reject a draft corpus.
     """
     samples = doc.get("fidelity_samples")
     if samples is None:
@@ -1372,6 +1614,10 @@ def fidelity_source_warnings(
     pilot = 0
     pilot_reasons: list[str] = []
     pilot_extra = [0]
+    source_blind = 0
+    source_blind_reasons: list[str] = []
+    source_blind_extra = [0]
+    root = artifact_root if artifact_root is not None else ROOT
 
     for index, sample in enumerate(samples):
         sample_label = f"{label}:fidelity_samples[{index}]"
@@ -1400,6 +1646,17 @@ def fidelity_source_warnings(
                     unattested_extra,
                     f"{sample_label}: {defect}",
                 )
+        else:
+            # Attestation-complete pins are the ones that would otherwise certify
+            # without opening the source. Unattested pins stay on that count.
+            blind = _locator_source_blind_reason(sample, artifact_root=root)
+            if blind:
+                source_blind += 1
+                _note_reason(
+                    source_blind_reasons,
+                    source_blind_extra,
+                    f"{sample_label}: {blind}",
+                )
         match_errors = check_fidelity_sample_matches(doc, sample, label=sample_label)
         observation_key = _fidelity_sample_observation_key(doc, sample)
         if (
@@ -1407,6 +1664,7 @@ def fidelity_source_warnings(
             and observation_key is not None
             and observation_key in required
             and _path_selector_names_observation_id(sample)
+            and _sample_pins_measured_payload(sample)
         ):
             covered.add(observation_key)
 
@@ -1449,6 +1707,15 @@ def fidelity_source_warnings(
                 _finish_detail(pilot_reasons, pilot_extra[0]),
             )
         )
+    if source_blind:
+        warnings.append(
+            FidelityWarning(
+                "source_blind_pin",
+                source_blind,
+                label,
+                _finish_detail(source_blind_reasons, source_blind_extra[0]),
+            )
+        )
     return warnings
 
 
@@ -1458,7 +1725,7 @@ def fidelity_warning_summary(warnings: Sequence[FidelityWarning]) -> str:
     for kind in _FIDELITY_WARNING_KINDS:
         rows = [warning for warning in warnings if warning.kind == kind]
         total = sum(warning.count for warning in rows)
-        if kind == "unattested_sample":
+        if kind in ("unattested_sample", "source_blind_pin"):
             parts.append(f"{kind}={total}")
         else:
             parts.append(f"{kind}={total} ({len(rows)} extracts)")
@@ -1470,15 +1737,21 @@ def certify_extract_source_fidelity(
     *,
     label: str = "<document>",
     warnings: Sequence[FidelityWarning] | None = None,
+    artifact_root: Path | None = None,
 ) -> list[str]:
-    """Refuse to mark this extract source-reviewed while any hole remains.
+    """Refuse source certification while any fidelity hole remains.
 
-    An empty list is the only pass. Drift mismatches refuse as well: a pin
-    that no longer matches the extract is not source evidence. Callers that
-    only validate schema must not treat this list as a corpus error.
+    Invariant: an empty list is the only pass. Every scored observation's
+    measured payload must be covered by a matching, non-pilot, attested sample
+    whose locator artifact was opened and contains the pinned value. Equipment
+    pins, unopened locators, and copied values that are absent from the
+    artifact refuse. ``warnings`` is accepted for existing callers and is not
+    the decision: a supplied empty list cannot hide a hole.
     """
-    if warnings is None:
-        warnings = fidelity_source_warnings(doc, label=label)
+    _ = warnings
+    warnings = fidelity_source_warnings(
+        doc, label=label, artifact_root=artifact_root
+    )
     refusals: list[str] = []
     for warning in warnings:
         if warning.count <= 0:
@@ -2052,14 +2325,16 @@ def validate_extract_document(
     fidelity_warnings: list[FidelityWarning] | None = None,
     pre_policy_ids: set[str] | None = None,
     check_fidelity_match: bool = False,
+    artifact_root: Path | None = None,
 ) -> list[str]:
     """Return a list of error strings (empty ⇒ schema-valid).
 
     Warnings (unknown species ids, and rendered source-fidelity warnings) are
-    appended to ``collect_warnings`` when provided; they do not fail validation
-    (SCHEMA.md: draft may carry unknown ids; fidelity holes do not reject the
-    corpus). Typed ``FidelityWarning`` rows are appended to ``fidelity_warnings``
-    when that list is provided. The holes are always computed here.
+    appended to ``collect_warnings`` when provided. Fidelity holes do not reject
+    a draft. ``review_status: reviewed`` is a promotion: those holes become
+    errors from ``certify_extract_source_fidelity``. Typed ``FidelityWarning``
+    rows are appended to ``fidelity_warnings`` when that list is provided. The
+    holes are always computed here.
 
     ``pre_policy_ids``: source_ids exempt from the fidelity_samples presence
     requirement (ENFORCED_FOR_NEW grandfathering). When None, the on-disk
@@ -2185,13 +2460,24 @@ def validate_extract_document(
         check_match=check_fidelity_match,
     )
 
-    # Chokepoint: count source-fidelity holes on every extract. They are
-    # warnings, not schema errors. Certification entry points refuse them.
-    source_warnings = fidelity_source_warnings(doc, label=label)
+    # Chokepoint: count source-fidelity holes on every extract. Drafts warn.
+    # review_status reviewed is promotion and refuses the same holes.
+    source_warnings = fidelity_source_warnings(
+        doc, label=label, artifact_root=artifact_root
+    )
     if fidelity_warnings is not None:
         fidelity_warnings.extend(source_warnings)
     if collect_warnings is not None:
         collect_warnings.extend(item.render() for item in source_warnings)
+    if review == "reviewed":
+        errors.extend(
+            certify_extract_source_fidelity(
+                doc,
+                label=label,
+                warnings=source_warnings,
+                artifact_root=artifact_root,
+            )
+        )
 
     return errors
 
@@ -2204,6 +2490,7 @@ def validate_extract_file(
     fidelity_warnings: list[FidelityWarning] | None = None,
     pre_policy_ids: set[str] | None = None,
     check_fidelity_match: bool = False,
+    artifact_root: Path | None = None,
 ) -> list[str]:
     try:
         doc = load_extract_yaml(path)
@@ -2284,6 +2571,7 @@ def validate_extract_file(
         fidelity_warnings=fidelity_warnings,
         pre_policy_ids=pre_policy_ids,
         check_fidelity_match=check_fidelity_match,
+        artifact_root=artifact_root,
     )
 
 
