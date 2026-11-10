@@ -12795,6 +12795,50 @@ def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
     assert summary["static_refusals"] == expected_static
 
 
+def test_static_quantity_refusal_skips_compile_with_identical_residual(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.tabulation_experiment()
+    identity = replace(F.o2_identity(), quantity=Quantity.H_MINUS_H298)
+    reference = F.observation(
+        "fixture-static-thermo-refusal",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+    )
+    context = _context(F.work(), experiment, reference)
+    expected, _ = compile_residual(
+        reference,
+        Engine.ALPHAMELTS,
+        context=context,
+        comparison_ids={reference.observation_id},
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "comparison_candidates",
+        lambda _context: (reference,),
+    )
+    monkeypatch.setattr(score_mod, "diagnostic_references", lambda _context: ())
+    monkeypatch.setattr(
+        score_mod, "_refusal_diagnostic_references", lambda _context: ()
+    )
+
+    def unexpected_compile(*_args, **_kwargs):
+        raise AssertionError("static quantity refusal reached compile_residual")
+
+    monkeypatch.setattr(score_mod, "compile_residual", unexpected_compile)
+    residuals, candidates = score_store(
+        context,
+        engines=(Engine.ALPHAMELTS,),
+        include_diagnostics=False,
+    )
+
+    assert candidates == {}
+    assert len(residuals) == 1
+    assert dumps_residual_line(residuals[0]) == dumps_residual_line(expected)
+
+
 def test_streamed_unrailed_measured_tier_matches_legacy_zero_grid(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
