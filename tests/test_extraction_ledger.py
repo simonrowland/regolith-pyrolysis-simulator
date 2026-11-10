@@ -31,6 +31,7 @@ from simulator.condensation_routing import (
 from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import (
     DECOMP_VOLTAGES,
+    ELECTRONS_PER_OXIDE,
     FERRIC_TO_FERROUS_REFERENCE_V,
     ElectrolysisModel,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
@@ -268,6 +269,66 @@ def _enable_c5_mre(sim, *, target_species: str, max_voltage_V: float) -> None:
     sim.melt.mre_target_species = target_species
     sim.melt.mre_max_voltage_V = max_voltage_V
     sim.campaign_mgr.c5_enabled = True
+
+
+def test_unknown_cleaned_melt_oxide_does_not_add_fabricated_mre_charge(
+    monkeypatch,
+):
+    from simulator.accounting.formulas import resolve_species_formula
+
+    oxide = "P2O5"
+    assert oxide not in ELECTRONS_PER_OXIDE
+    monkeypatch.setitem(
+        MOLAR_MASS,
+        "P",
+        resolve_species_formula("P").molar_mass_g_mol,
+    )
+
+    sim = _sim(
+        {
+            "phosphate": {
+                "label": "Phosphate",
+                "composition_wt_pct": {oxide: 100.0},
+            }
+        }
+    )
+    sim.load_batch("phosphate", mass_kg=1.0)
+    sim.melt.campaign = CampaignPhase.MRE_BASELINE
+    sim.melt.temperature_C = 1600.0
+    sim._mre_voltage_sequence = [{
+        "voltage": 2.0,
+        "species": [oxide],
+        "min_hold_hours": 99,
+    }]
+    sim._mre_voltage_step_idx = 0
+    sim._mre_hold_hours = 0
+
+    _install_fixed_mre_provider(
+        sim,
+        oxide_species=oxide,
+        oxide_mol=1.0,
+        metal_species="P",
+        metal_mol=2.0,
+        O2_mol=2.5,
+        oxide_kg=MOLAR_MASS[oxide] / 1000.0,
+        metal_kg=0.0,
+        O2_kg=0.0,
+        energy_kWh=0.0,
+    )
+
+    control = sim._select_plant_mre_interval_control()
+    assert control is not None
+    outcome = sim._execute_mre_interval(control, execution_origin="plant")
+
+    assert outcome["committed_electron_charge_C"] == pytest.approx(0.0)
+    assert outcome["effective_current_A"] == pytest.approx(0.0)
+    assert outcome["diagnostic"]["notices"] == [{
+        "kind": "mre_effective_current_partial",
+        "quantity": "effective_current_A",
+        "status": "partial_estimate",
+        "reason": "oxide_electron_count_unavailable",
+        "oxides": [oxide],
+    }]
 
 
 def test_c5_fallback_voltage_commit_is_flagged_without_changing_amount():
