@@ -2,8 +2,11 @@ import math
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 from simulator.condensation import (
+    DATA_DIR,
+    HKL_BAND_SAMPLES,
     CondensationModel,
     STAGE_PURITY_NO_CAPTURED_MASS,
     STAGE_PURITY_VERDICT_INDETERMINATE,
@@ -12,6 +15,7 @@ from simulator.condensation import (
     stage_visit_key,
 )
 from simulator.condensation_routing import (
+    COLLECTOR_STAGE_KEY_BY_NUMBER,
     DESIGNATED_STAGE,
     K_TRAP_STAGE_KEY,
     NA_COLLECTOR_STAGE_KEY,
@@ -21,6 +25,12 @@ from simulator.condensation_routing import (
     product_stage_number,
     stage_list_index_for_destination,
     target_species_for_stage_number,
+)
+from simulator.physical_constants import (
+    AVOGADRO,
+    BOLTZMANN,
+    CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT,
 )
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 
@@ -239,13 +249,297 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
     assert route.remaining_by_species["K"] == pytest.approx(1.0 - total_deposited)
 
 
-def test_default_k_route_allocation_numeric_pin():
-    """Pin the production band-integrated route, not a calibration target.
+def _printed_formation_gibbs(table_id):
+    table = yaml.safe_load(
+        (
+            DATA_DIR / 'literature' / 'compilations' / 'janaf' / 'tables'
+            / f'{table_id}.yaml'
+        ).read_text()
+    )
+    rows = []
+    for row in table['table']['values']:
+        gibbs = row['formation_gibbs_energy']['value']
+        rows.append((
+            float(row['temperature']['value']),
+            None if gibbs is None else float(gibbs),
+        ))
+    return sorted(rows)
 
-    The c679673f5/85fedcb8e capture changes integrate each collector's
-    temperature band and saturation thresholds; the old midpoint pin had
-    more K reaching stage 6 and less captured at stage 5.
+
+def _gibbs_at(rows, temperature):
+    """Linear ΔfG between the adjacent printed rows. No extrapolation."""
+
+    for index, (row_temperature, gibbs) in enumerate(rows):
+        if row_temperature == temperature:
+            return gibbs
+        if row_temperature > temperature:
+            left_temperature, left_gibbs = rows[index - 1]
+            weight = (temperature - left_temperature) / (
+                row_temperature - left_temperature
+            )
+            return left_gibbs + (gibbs - left_gibbs) * weight
+    raise AssertionError(temperature)
+
+
+def _dissociation_kp_pa(monomer_rows, dimer_rows, temperature_k):
+    """K_p = P° exp(ΔG_assoc / (R T)) from the printed formation rows.
+
+    ΔG_assoc = ΔfG°(M2) - 2 ΔfG°(M), kJ/mol. P° = 1e5 Pa. At 313.15 K
+    the K2 rows are 300 K and 400 K; that arithmetic is written out in
+    test_janaf_kp_at_313_K_is_in_band_and_replaces_the_cea_polynomial.
     """
+
+    delta_g = _gibbs_at(dimer_rows, temperature_k) - 2.0 * _gibbs_at(
+        monomer_rows, temperature_k,
+    )
+    return 1.0e5 * math.exp(delta_g * 1000.0 / (GAS_CONSTANT * temperature_k))
+
+
+def _potassium_balance_inputs():
+    vapor = yaml.safe_load((DATA_DIR / 'vapor_pressures.yaml').read_text())
+    potassium = vapor['metals_k_family']['physical_properties']['species']['K']
+    dimer = vapor['oxide_vapors_k2_cluster_family']['physical_properties']['species']['K2']
+    sticking = yaml.safe_load(
+        (DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml').read_text()
+    )
+    antoine = potassium['pure_component_antoine']
+    return {
+        'A': float(antoine['A']),
+        'B': float(antoine['B']),
+        'C': float(antoine['C']),
+        'molar_mass_k': float(potassium['molar_mass_g_mol']),
+        'molar_mass_k2': float(dimer['molar_mass_g_mol']),
+        'alpha': float(sticking['species']['K']['value']),
+        'k_rows': _printed_formation_gibbs('K-005'),
+        'k2_rows': _printed_formation_gibbs('K-011'),
+    }
+
+
+def _antoine_pa(temperature_k, inputs):
+    """log10(P/Pa) = A - B / (T + C), including the flagged flank."""
+
+    return 10.0 ** (
+        inputs['A'] - inputs['B'] / (temperature_k + inputs['C'])
+    )
+
+
+def _respeciated_monomer_pa(element_partial_pa, kp_pa):
+    """Conjugate root of p_M + 2 p_M^2 / K_p = p_elem."""
+
+    if not math.isfinite(element_partial_pa) or element_partial_pa <= 0.0:
+        return 0.0
+    if math.isinf(kp_pa) and kp_pa > 0.0:
+        return element_partial_pa
+    if not math.isfinite(kp_pa) or kp_pa <= 0.0:
+        return 0.0
+    ratio = element_partial_pa / kp_pa
+    if ratio > 1.0e16:
+        return math.sqrt(kp_pa * element_partial_pa / 2.0)
+    return (2.0 * element_partial_pa) / (math.sqrt(1.0 + 8.0 * ratio) + 1.0)
+
+
+def _element_saturation_pa(saturation_pa, kp_pa):
+    """p_elem where both J_M and J_M2 are zero: P_sat + 2 P_sat^2 / K_p."""
+
+    return saturation_pa + 2.0 * saturation_pa * saturation_pa / kp_pa
+
+
+def _parallel_hk_rate_pa_s(element_partial_pa, strips):
+    """dp_elem/dt = -(J_M + 2 J_M2) summed over the wall strips."""
+
+    rate = 0.0
+    for k_monomer, k_dimer, saturation_pa, kp_pa in strips:
+        monomer_pa = _respeciated_monomer_pa(element_partial_pa, kp_pa)
+        drive = monomer_pa - saturation_pa
+        if drive <= 0.0:
+            continue
+        if k_monomer > 0.0:
+            rate -= k_monomer * drive
+        if k_dimer > 0.0 and math.isfinite(kp_pa) and kp_pa > 0.0:
+            dimer_drive = drive * (monomer_pa + saturation_pa) / kp_pa
+            if dimer_drive > 0.0:
+                rate -= 2.0 * k_dimer * dimer_drive
+    return rate
+
+
+def _lowest_strip_floor_pa(strips):
+    floor = math.inf
+    for k_monomer, k_dimer, saturation_pa, kp_pa in strips:
+        if k_monomer <= 0.0 and k_dimer <= 0.0:
+            continue
+        saturated = _element_saturation_pa(saturation_pa, kp_pa)
+        if saturated < floor:
+            floor = saturated
+    return floor
+
+
+def _integrate_parallel_hk_pa(element_partial_pa, residence_s, strips):
+    """RK4 of the parallel element balance over one stage residence.
+
+    The step count is 40 per initial time constant, at least 64 and at
+    most 4096. A step that would cross the lowest p_elem,sat snaps to
+    that floor: the condenser does not evaporate.
+    """
+
+    partial = float(element_partial_pa)
+    duration = float(residence_s)
+    if partial <= 0.0 or duration <= 0.0 or not strips:
+        return partial
+    floor = _lowest_strip_floor_pa(strips)
+    if not math.isfinite(floor) or partial <= floor:
+        return partial
+    rate0 = _parallel_hk_rate_pa_s(partial, strips)
+    if rate0 == 0.0:
+        return partial
+    tau = (partial - floor) / abs(rate0)
+    ratio = duration / tau if tau > 0.0 else math.inf
+    if not math.isfinite(ratio) or ratio * 40.0 >= 4096.0:
+        steps = 4096
+    else:
+        steps = max(64, math.ceil(40.0 * ratio))
+    dt = duration / steps
+    for _step in range(steps):
+        k1 = _parallel_hk_rate_pa_s(partial, strips)
+        if k1 == 0.0 or partial + dt * k1 <= floor:
+            return floor
+        midpoint = partial + 0.5 * dt * k1
+        if midpoint <= floor:
+            return floor
+        k2 = _parallel_hk_rate_pa_s(midpoint, strips)
+        midpoint = partial + 0.5 * dt * k2
+        if midpoint <= floor:
+            return floor
+        k3 = _parallel_hk_rate_pa_s(midpoint, strips)
+        end = partial + dt * k3
+        if end <= floor:
+            return floor
+        k4 = _parallel_hk_rate_pa_s(end, strips)
+        updated = partial + dt * (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0
+        if not math.isfinite(updated) or updated <= floor:
+            return floor
+        partial = updated
+    return partial
+
+
+def _hk_per_pa(molar_mass_g_mol, gas_temperature_k):
+    """Hertz-Knudsen mol/(m2 s Pa) at the gas temperature."""
+
+    molecule_kg = (molar_mass_g_mol / 1000.0) / AVOGADRO
+    denominator = math.sqrt(
+        2.0 * math.pi * molecule_kg * BOLTZMANN * gas_temperature_k
+    )
+    return 1.0 / denominator / AVOGADRO
+
+
+def _configured_stage_area_m2(model, stage):
+    areas = model.stage_area_m2_by_stage
+    number = str(int(stage.stage_number))
+    key = getattr(stage, 'stage_key', '') or ''
+    for candidate in (key, f'stage_{number}', number):
+        if candidate and candidate in areas:
+            return float(areas[candidate])
+    raise AssertionError(f'no configured area for stage {number}')
+
+
+def _potassium_stage_blocked(stage):
+    """Cr harvest blocks K. The Na collector blocks K. The trap accepts it."""
+
+    key = getattr(stage, 'stage_key', '') or ''
+    if 'CrO2' in stage.target_species:
+        return True
+    return key == NA_COLLECTOR_STAGE_KEY
+
+
+def _allocation_stage_key(stage):
+    explicit = getattr(stage, 'stage_key', '') or ''
+    if explicit:
+        return explicit
+    return COLLECTOR_STAGE_KEY_BY_NUMBER[int(stage.stage_number)]
+
+
+def _potassium_pipe_walls_undersaturated(model, inlet_partial_pa, inputs):
+    """A pure-K partial at the default pipe temperature is below P_sat(K)."""
+
+    for segment in model.pipe_segments:
+        temperature_k = float(segment.wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        kp_pa = _dissociation_kp_pa(inputs['k_rows'], inputs['k2_rows'], temperature_k)
+        monomer_pa = _respeciated_monomer_pa(inlet_partial_pa, kp_pa)
+        if monomer_pa > _antoine_pa(temperature_k, inputs):
+            return False
+    return True
+
+
+def _independent_potassium_capture_kg(model, *, inlet_partial_pa, supply_kg_hr):
+    """Stage kilograms from this test's J_M + 2 J_M2 integral.
+
+    The feed is pure K, so the carrier mole fraction is zero. Dalton's
+    law then keeps p_K at the inlet partial after upstream capture: the
+    mass falls and the partial does not. q = p_K / N_K uses the arriving
+    monomer's molar mass. T_gas is the model's gas temperature, which
+    this pin leaves at the pipe default. P_sat and K_p use each wall
+    sample. K2's accommodation coefficient is the monomer alpha.
+    """
+
+    inputs = _potassium_balance_inputs()
+    gas_temperature_k = float(model.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+    hk_monomer = _hk_per_pa(inputs['molar_mass_k'], gas_temperature_k)
+    hk_dimer = _hk_per_pa(inputs['molar_mass_k2'], gas_temperature_k)
+    supply = float(supply_kg_hr)
+    condensed = {}
+    impurity = {}
+    for stage in sorted(model.train.stages, key=stage_visit_key):
+        residence_s = float(model.residence_time_s.get(stage.stage_number, 1.0))
+        if _potassium_stage_blocked(stage) or residence_s <= 0.0 or supply <= 1.0e-15:
+            continue
+        lo_c, hi_c = (float(stage.temp_range_C[0]), float(stage.temp_range_C[1]))
+        width_c = hi_c - lo_c
+        sample_count = 1 if width_c == 0.0 else HKL_BAND_SAMPLES
+        inventory_mol = (
+            supply / (inputs['molar_mass_k'] / 1000.0) / 3600.0 * residence_s
+        )
+        area_scale = (
+            inlet_partial_pa / inventory_mol
+            * _configured_stage_area_m2(model, stage)
+            / sample_count
+        )
+        k_monomer = area_scale * inputs['alpha'] * hk_monomer
+        k_dimer = area_scale * inputs['alpha'] * hk_dimer
+        strips = []
+        for sample in range(sample_count):
+            sample_c = (
+                lo_c if width_c == 0.0
+                else lo_c + width_c * (sample + 0.5) / HKL_BAND_SAMPLES
+            )
+            sample_k = sample_c + CELSIUS_TO_KELVIN_OFFSET
+            kp_pa = _dissociation_kp_pa(inputs['k_rows'], inputs['k2_rows'], sample_k)
+            saturation_pa = _antoine_pa(sample_k, inputs)
+            if _respeciated_monomer_pa(inlet_partial_pa, kp_pa) > saturation_pa:
+                strips.append((k_monomer, k_dimer, saturation_pa, kp_pa))
+        if not strips:
+            continue
+        final_pa = _integrate_parallel_hk_pa(inlet_partial_pa, residence_s, strips)
+        eta = (inlet_partial_pa - final_pa) / inlet_partial_pa
+        deposit = supply * eta
+        # A stage deposit at or below this threshold is not removed.
+        if deposit > 1.0e-15:
+            stage_key = _allocation_stage_key(stage)
+            condensed[stage_key] = {'K': deposit}
+            if stage_key != K_TRAP_STAGE_KEY:
+                impurity[stage_key] = {'K': deposit}
+            supply -= deposit
+    return condensed, impurity, supply, _potassium_pipe_walls_undersaturated(
+        model, inlet_partial_pa, inputs,
+    )
+
+
+def test_default_k_route_allocation_numeric_pin():
+    """Pure-K capture follows the parallel Hertz-Knudsen element balance.
+
+    The expected kilograms are this test's integral of J_M + 2 J_M2.
+    K_p comes from the printed JANAF rows. P_sat comes from the potassium
+    Antoine equation. route() is the system under test, not the oracle.
+    """
+
     model = CondensationModel(CondensationTrain.create_default())
     assert tuple(stage_purity_report(model.train)) == (
         'stage_0', 'stage_1_fe_condenser', 'stage_2_cr_oxide_harvest',
@@ -257,21 +551,20 @@ def test_default_k_route_allocation_numeric_pin():
         species_partial_pressures_mbar={'K': 1.0},
         stage_area_m2_by_stage={str(s.stage_number): 1.0 for s in model.train.stages},
     )
+    condensed, impurity, remaining, walls_undersaturated = (
+        _independent_potassium_capture_kg(
+            model, inlet_partial_pa=100.0, supply_kg_hr=1.0,
+        )
+    )
     route = model.route(
         EvaporationFlux(species_kg_hr={'K': 1.0}, total_kg_hr=1.0),
         MeltState(temperature_C=1650.0),
     )
-    assert route.condensed_by_stage_species == {
-        K_TRAP_STAGE_KEY: {'K': 0.9999661577804508},
-        'stage_5_vortex_dust_filter': {'K': 3.344749012837271e-05},
-        'stage_6_turbine_compressor': {'K': 3.947289899573387e-07},
-    }
-    assert route.remaining_by_species == {'K': 4.3083272981466337e-13}
+    assert walls_undersaturated
+    assert route.condensed_by_stage_species == condensed
+    assert route.remaining_by_species == {'K': remaining}
     assert route.wall_deposit_by_species == {}
-    assert route.impurity_by_stage_species == {
-        'stage_5_vortex_dust_filter': {'K': 3.344749012837271e-05},
-        'stage_6_turbine_compressor': {'K': 3.947289899573387e-07},
-    }
+    assert route.impurity_by_stage_species == impurity
 
 
 def _visit_labels(train: CondensationTrain) -> list[int | str]:

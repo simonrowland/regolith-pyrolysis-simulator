@@ -931,11 +931,24 @@ def test_stiff_parallel_flux_lands_on_half_not_the_linear_third():
 def test_janaf_kp_at_313_K_is_in_band_and_replaces_the_cea_polynomial():
     """Primary table. 313.15 K is inside the printed JANAF grid.
 
-    Adjacent rows are 300 K and 350 K, except K2(g), which has no 350 K
-    row and is interpolated between 300 K and 400 K. Fail-before on the
-    CEA path: dimer_dissociation_kp_pa('K2', 313.15) returned
-    1.325277167193154 Pa. That figure is the in-band 300-1000 K NASA-9
-    polynomial, not a high-T extrapolation, and it is the wrong source.
+    K2(g), table K-011, has no 350 K row. The printed formation Gibbs
+    energies are 87.579 kJ/mol at 300 K and 76.804 kJ/mol at 400 K:
+
+        weight = (313.15 - 300) / (400 - 300) = 0.1315
+        G_K2 = 87.579 + (76.804 - 87.579) * 0.1315 = 86.1620875 kJ/mol
+
+    K(g), table K-005, does have a 350 K row, so its neighbours stay
+    300 K and 350 K. The printed values are 60.299 and 55.652 kJ/mol:
+
+        weight = (313.15 - 300) / (350 - 300) = 0.263
+        G_K = 60.299 + (55.652 - 60.299) * 0.263 = 59.076839 kJ/mol
+        ΔG_assoc = 86.1620875 - 2 * 59.076839 = -31.9915905 kJ/mol
+        K_p = 1e5 Pa * exp(1000 * ΔG_assoc / (R * 313.15 K))
+
+    Fail-before on the CEA path: dimer_dissociation_kp_pa('K2', 313.15)
+    returned 1.325277167193154 Pa. That figure is the in-band 300-1000 K
+    NASA-9 polynomial, not a high-T extrapolation, and it is the wrong
+    source.
     """
 
     import yaml
@@ -997,17 +1010,38 @@ def test_janaf_kp_at_313_K_is_in_band_and_replaces_the_cea_polynomial():
         )
         return 1.0e5 * math.exp(delta_g * 1000.0 / (GAS_CONSTANT * temperature))
 
-    # Independent evaluation of the printed rows. K2 at 313.15 K is 0.461 Pa,
-    # not the CEA 1.325277 Pa.
-    assert dimer_dissociation_kp_pa("K2", 313.15) == pytest.approx(
-        independent_kp("K-005", "K-011", 313.15), rel=1.0e-12,
+    k2_rows = formation_gibbs("K-011")
+    k_rows = formation_gibbs("K-005")
+    assert 350.0 not in {temperature for temperature, _gibbs in k2_rows}
+    k2_below = max(temperature for temperature, _gibbs in k2_rows if temperature <= 313.15)
+    k2_above = min(temperature for temperature, _gibbs in k2_rows if temperature >= 313.15)
+    k_below = max(temperature for temperature, _gibbs in k_rows if temperature <= 313.15)
+    k_above = min(temperature for temperature, _gibbs in k_rows if temperature >= 313.15)
+    assert (k2_below, k2_above) == (300.0, 400.0)
+    assert (k_below, k_above) == (300.0, 350.0)
+    g_k2_300 = gibbs_at(k2_rows, 300.0)
+    g_k2_400 = gibbs_at(k2_rows, 400.0)
+    g_k_300 = gibbs_at(k_rows, 300.0)
+    g_k_350 = gibbs_at(k_rows, 350.0)
+    assert (g_k2_300, g_k2_400) == (87.579, 76.804)
+    assert (g_k_300, g_k_350) == (60.299, 55.652)
+    trap_k = 313.15
+    g_k2 = g_k2_300 + (g_k2_400 - g_k2_300) * (trap_k - 300.0) / (400.0 - 300.0)
+    g_k = g_k_300 + (g_k_350 - g_k_300) * (trap_k - 300.0) / (350.0 - 300.0)
+    assert g_k2 == 86.1620875
+    assert g_k == 59.076839
+    delta_g_assoc = g_k2 - 2.0 * g_k
+    assert delta_g_assoc == -31.9915905
+    kp_from_printed_rows = 1.0e5 * math.exp(
+        delta_g_assoc * 1000.0 / (GAS_CONSTANT * trap_k)
     )
-    assert dimer_dissociation_kp_pa("K2", 313.15) == pytest.approx(
-        0.4610863442751231, rel=1.0e-12,
+    assert dimer_dissociation_kp_pa("K2", trap_k) == pytest.approx(
+        kp_from_printed_rows, rel=1.0e-12,
     )
-    assert dimer_dissociation_kp_pa("K2", 313.15) != pytest.approx(
-        1.325277167193154, rel=1.0e-4,
+    assert dimer_dissociation_kp_pa("K2", trap_k) == pytest.approx(
+        independent_kp("K-005", "K-011", trap_k), rel=1.0e-12,
     )
+    assert kp_from_printed_rows != pytest.approx(1.325277167193154, rel=1.0e-4)
     assert dimer_dissociation_kp_pa("K2", 298.15) == pytest.approx(
         independent_kp("K-005", "K-011", 298.15), rel=1.0e-12,
     )
