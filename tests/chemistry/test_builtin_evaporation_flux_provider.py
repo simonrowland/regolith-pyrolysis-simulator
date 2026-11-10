@@ -1868,13 +1868,7 @@ def test_missing_transport_channel_is_unavailable_downstream(
 
     monkeypatch.setattr(sim, "_dispatch_only", dispatch)
     monkeypatch.setattr(sim, "_freeze_gate_enabled", lambda: False)
-    equilibrium = SimpleNamespace(
-        vapor_pressures_Pa={"Fe": 1.0},
-        vapor_pressures_source={},
-        activity_coefficients={},
-        diagnostics={},
-        liquid_fraction=1.0,
-    )
+    equilibrium = sim._get_equilibrium()
     flux = sim._calculate_evaporation(equilibrium)
     assert "Si" not in flux.species_kg_hr
     assert flux.species_kg_hr["Na"] > 0.0
@@ -1907,7 +1901,7 @@ def test_missing_transport_channel_is_unavailable_downstream(
 
     monkeypatch.setattr(single_sim, "_dispatch_only", dispatch_single)
     monkeypatch.setattr(single_sim, "_freeze_gate_enabled", lambda: False)
-    single_flux = single_sim._calculate_evaporation(equilibrium)
+    single_flux = single_sim._calculate_evaporation(single_sim._get_equilibrium())
     assert single_flux.species_kg_hr == {}
     assert single_flux.carrier_authority_by_species["Si"]["is_refused"] is True
 
