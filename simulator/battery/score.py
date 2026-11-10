@@ -205,6 +205,7 @@ SCORE_ENGINE_SET: tuple[Engine, ...] = (
     Engine.MAGEMIN,
     Engine.OPENIMCC,
     Engine.INTERNAL_ANALYTICAL,
+    Engine.NASA_CEA_9,
 )
 MELTS_ENGINES: frozenset[Engine] = frozenset(
     {Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.MAGEMIN}
@@ -442,6 +443,7 @@ ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.MAGEMIN: "magemin",
     Engine.OPENIMCC: "openimcc",
     Engine.INTERNAL_ANALYTICAL: "internal-analytical",
+    Engine.NASA_CEA_9: "nasa_cea_9",
 }
 ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.VAPOROCK: ("vaporock",),
@@ -450,6 +452,7 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.MAGEMIN: ("magemin",),
     Engine.OPENIMCC: (),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
+    Engine.NASA_CEA_9: ("nasa-glenn",),
 }
 
 
@@ -471,6 +474,7 @@ def _attempt_coefficient_sources(
 # IMCC consumes the SF04 magma companion workbook.
 COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "vaporock": ("janaf-4th",),
+    "nasa-glenn": ("nasa-glenn",),
     "antoine_sidecar": ("nist-webbook",),
     # JANAF-4th is the refit for the oxide segments that cite Chase.
     # Zr, Rb, Cs, and P cite NASA CEA thermo.inp. nasa-glenn is that
@@ -9435,6 +9439,20 @@ def _predict_with_engine(
     _require_score_engine(engine)
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    if engine is Engine.NASA_CEA_9 and quantity is not None:
+        from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+        if quantity not in _engine_thermo_quantities(engine) | {Quantity.P_SAT}:
+            return EnginePrediction(
+                engine=engine,
+                channel=ENGINE_CHANNELS[engine],
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail=_quantity_not_predicted_detail(quantity),
+                identity=identity,
+            )
     if _is_quantity_not_predicted(quantity):
         return EnginePrediction(
             engine=engine,
@@ -9840,6 +9858,7 @@ def _predict_with_engine(
         quantity in FORMATION_QUANTITIES
         or quantity in PURE_STANDARD_THERMO
         or quantity in FUSION_QUANTITIES
+        or (engine is Engine.NASA_CEA_9 and quantity is Quantity.P_SAT)
     ):
         from simulator.battery.compilation_tier import predict_thermo_attempt
 
