@@ -44,6 +44,8 @@ def _without_cache_counters(value: Any) -> Any:
                 "wall_s",
                 "cpu_s",
                 "elapsed_s",
+                "process_cpu_seconds",
+                "process_cpu_seconds_by_geometry",
             }
         }
     if isinstance(value, list):

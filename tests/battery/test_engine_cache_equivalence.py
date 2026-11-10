@@ -37,6 +37,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 import simulator.diagnostic_helpers.binary_pot_battery as battery
 from simulator.engine_cache import EngineCache, cached_solve
 from simulator.melt_backend.base import EquilibriumResult
+from scripts.battery_cache_equivalence import _without_cache_counters
 from tests.battery import factories as F
 from tests.battery.cache_test_support import (
     CACHE_TEST_ENGINES,
@@ -50,24 +51,6 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def _canonical_residual_rows(path: Path) -> bytes:
-    def without_counters_and_timing(value: object) -> object:
-        if isinstance(value, dict):
-            return {
-                key: without_counters_and_timing(item)
-                for key, item in value.items()
-                if key
-                not in {
-                    "engine_cache",
-                    "cache_counters",
-                    "wall_s",
-                    "cpu_s",
-                    "elapsed_s",
-                }
-            }
-        if isinstance(value, list):
-            return [without_counters_and_timing(item) for item in value]
-        return value
-
     rows = []
     with path.open(encoding="utf-8") as stream:
         for line in stream:
@@ -78,7 +61,7 @@ def _canonical_residual_rows(path: Path) -> bytes:
                 continue
             rows.append(
                 json.dumps(
-                    without_counters_and_timing(payload),
+                    _without_cache_counters(payload),
                     sort_keys=True,
                     ensure_ascii=False,
                     separators=(",", ":"),
