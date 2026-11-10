@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import pickle
+import threading
 import zlib
 from dataclasses import dataclass
 from pathlib import Path
@@ -250,6 +251,86 @@ def test_mapping_equilibrium_result_uses_compact_projection(
     assert cold.diagnostics == warm.diagnostics == {}
     assert cold.phase_compositions == warm.phase_compositions == {}
     assert calls == 1
+
+
+def test_isolated_cell_cache_stores_only_compact_hot_fields(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import _IsolatedCellWorker
+
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    _engine_cache_counters(reset=True)
+    result = {
+        "pot_id": "worker-pot",
+        "engine": "thermoengine",
+        "temperature_K": 1800.0,
+        "po2": {"mode": "engine_default", "po2_bar": None},
+        "status": "ok",
+        "refusal_reason": None,
+        "engine_status": "ok",
+        "engine_reason": "liquid reference from a verbose engine diagnostic",
+        "melt_activities": {"SiO2": 0.5},
+        "gas_partial_pressures_Pa": {"SiO": 1.25},
+        "liquid_fraction": 1.0,
+        "wall_s": 99.0,
+        "cpu_s": 22.0,
+        "hostname": "worker-host",
+        "vapor_pressures_source": {"SiO": "antoine_fallback_from_vaporock:detail"},
+        "notices": [{"kind": "fallback", "reason": "long diagnostic prose"}],
+        "authority": "extrapolated",
+        "certified_band": {"temperature_K": [1500.0, 1900.0]},
+        "melt_activity_coefficients": {"SiO2": 0.75},
+        "melt_activity_coefficient_details": {
+            "SiO2": {
+                "coefficient_basis": "single_cation",
+                "standard_state": {"convention": "raoultian", "phase": "l"},
+                "unused_detail": "long per-phase detail",
+            }
+        },
+        "activities_standard_state": {"convention": "raoultian", "phase": "l"},
+        "liquid_composition_wt_pct": {"SiO2": 51.0},
+        "fe_redox_split": {"Fe3Fet": 0.1},
+    }
+
+    class Worker:
+        calls = 0
+
+        def call(self, _payload, *, timeout_s):
+            self.calls += 1
+            assert timeout_s == 12.0
+            return dict(result)
+
+    isolated = object.__new__(_IsolatedCellWorker)
+    isolated.engine = "thermoengine"
+    isolated.engine_settings = {}
+    isolated._lock = threading.Lock()
+    isolated._worker = Worker()
+    request = {
+        "pot_id": "caller-pot",
+        "temperature_K": 1800.0,
+        "po2": {"mode": "engine_default", "po2_bar": None},
+        "arm": "headline",
+        "composition_wt_pct": {"SiO2": 50.0},
+    }
+
+    cold = isolated.request(request, timeout_s=12.0)
+    warm = isolated.request(request, timeout_s=12.0)
+
+    with sqlite3.connect(database) as connection:
+        hot_value = connection.execute("SELECT value FROM engine_outputs").fetchone()[0]
+    hot_json = zlib.decompress(hot_value)
+    assert isinstance(json.loads(hot_json), list)
+    assert len(hot_value) <= 400
+    assert "verbose engine diagnostic" not in hot_json.decode("ascii")
+    assert cold["pot_id"] == warm["pot_id"] == "caller-pot"
+    assert cold["melt_activities"] == warm["melt_activities"] == {"SiO2": 0.5}
+    assert cold["gas_partial_pressures_Pa"] == warm["gas_partial_pressures_Pa"] == {
+        "SiO": 1.25
+    }
+    assert cold["engine_reason"] == warm["engine_reason"] == "liquid"
+    assert isolated._worker.calls == 1
 
 
 def test_equilibrium_hot_value_contains_only_scoring_inputs() -> None:
