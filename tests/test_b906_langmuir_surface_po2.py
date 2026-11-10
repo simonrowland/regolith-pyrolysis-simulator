@@ -40,12 +40,21 @@ reservoir source capacity at or under the noop floor.
 host uses ``p_total_mbar = 0`` (production vacuum default) so the
 5.3423 Pa anchor stays the ideal root. A positive total pressure is
 its own case: the series film is inside the same residual.
+
+Publisher film. When a root closed, the flux kernel receives that
+root's partial vector and transport pressure. It does not rebuild
+partials from the vapor-map keys: that rebuild drops synthetic O2,
+so a commanded pressure below the overhead partial sum publishes a
+vacuum film under a root that used the O2 gas film. A step that did
+not close a root keeps the vapor-map backpressure. An explicit
+override is filmed once and handed to both.
 """
 
 from __future__ import annotations
 
 import functools
 import math
+from collections.abc import Mapping
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -1272,6 +1281,49 @@ def test_viscous_total_pressure_uses_publisher_film() -> None:
         1.0e-300,
     )
     assert abs(ideal_signed) / ideal_scale > 1.0e-3
+    # d-376 round 5. Diffusive k_O2/k_Ca at 10 mbar, not the effusion
+    # weight, is the +8.4% Ca-pressure move. p_total = 0 is the other ratio.
+    k_ca_film = _series_molar_flux(
+        species="Ca",
+        pressure_pa=1.0,
+        bulk_pa=0.0,
+        molar_mass=_M_CA,
+        alpha=alpha_ca,
+        temperature_K=_T_K,
+        overhead_pa=overhead_pa,
+    )
+    k_o2_film = _series_molar_flux(
+        species="O2",
+        pressure_pa=1.0,
+        bulk_pa=0.0,
+        molar_mass=_M_O2,
+        alpha=1.0,
+        temperature_K=_T_K,
+        overhead_pa=overhead_pa,
+    )
+    k_ca_free = _series_molar_flux(
+        species="Ca",
+        pressure_pa=1.0,
+        bulk_pa=0.0,
+        molar_mass=_M_CA,
+        alpha=alpha_ca,
+        temperature_K=_T_K,
+        overhead_pa=0.0,
+    )
+    k_o2_free = _series_molar_flux(
+        species="O2",
+        pressure_pa=1.0,
+        bulk_pa=0.0,
+        molar_mass=_M_O2,
+        alpha=1.0,
+        temperature_K=_T_K,
+        overhead_pa=0.0,
+    )
+    assert k_o2_film / k_ca_film == pytest.approx(1.42427779844656, rel=1.0e-6)
+    assert k_o2_free / k_ca_free == pytest.approx(
+        math.sqrt(_M_CA / _M_O2), rel=1.0e-12
+    )
+    assert root_pa / ideal_pa - 1.0 == pytest.approx(0.08368, rel=1.0e-3)
 
 
 def test_live_override_and_reclose_use_that_partial_vector() -> None:
@@ -1858,3 +1910,279 @@ def test_net_flux_invariant_over_species_partials_and_conductance(
         assert again.pressures_Pa[spec["species"]] <= spec["p_sat"] * (
             1.0 + 1.0e-9
         )
+
+
+# Partial classes the ordinary publisher must not reassemble on its own.
+# ``o2`` is the reviewer's case: 100 Pa of headspace O2, absent from the
+# vapor map. ``both`` adds a Ca bulk. ``metal`` has no synthetic channel.
+_FILM_PARTIAL_CASES = {
+    "none": {},
+    "o2": {"O2": 100.0},
+    "metal": {"Ca": 50.0},
+    "both": {"O2": 100.0, "Ca": 50.0},
+}
+# ``below`` is commanded pressure 0, under a 100 Pa overhead sum.
+# ``above`` is 50 mbar = 5000 Pa, over that sum, so only the partial
+# vector can still diverge.
+_FILM_COMMANDS_MBAR = {
+    "below": 0.0,
+    "above": 50.0,
+}
+_FILM_GATES = ("open", "floor", "buffered")
+_FILM_ENTRIES = ("persisted", "override", "reclose")
+
+
+def _film_answer(gate: str):
+    log = -40.0 if gate == "floor" else -9.0
+    return _cao_answer(log)
+
+
+def _film_capacity(gate: str) -> float:
+    if gate == "open":
+        return 0.0
+    return _BUFFERED_CAPACITY_MOL_PER_LN
+
+
+def _positive_partials(partials: Mapping) -> dict[str, float]:
+    cleaned: dict[str, float] = {}
+    for species, value in partials.items():
+        number = float(value)
+        if math.isfinite(number) and number > 0.0:
+            cleaned[str(species)] = number
+    return cleaned
+
+
+def _dispatch_real_flux_provider(host, captured: dict):
+    """Run the production flux provider on the controls the live path built.
+
+    Stoich and molar mass are filled only so the provider can emit Ca.
+    Partials and ``overhead_pressure_pa`` are the live path's values.
+    The return to ``_calculate_evaporation`` is an empty success so the
+    rest of that method does not need a full simulator. The assertions
+    read ``captured``, including the provider result.
+    """
+
+    from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+
+    provider = BuiltinEvaporationFluxProvider()
+
+    def _dispatch_only(intent, *args, **kwargs):
+        del args
+        controls = dict(kwargs["control_inputs"])
+        captured["intent"] = intent
+        captured["controls"] = controls
+        enriched = dict(controls)
+        stoich = dict(enriched.get("stoich_by_species") or {})
+        stoich.setdefault(
+            "Ca",
+            {"oxide_per_product_kg": 1.4, "parent_oxide": "CaO"},
+        )
+        enriched["stoich_by_species"] = stoich
+        masses = dict(enriched.get("molar_mass_kg_mol") or {})
+        masses.setdefault("Ca", _M_CA)
+        enriched["molar_mass_kg_mol"] = masses
+        try:
+            captured["provider"] = provider.dispatch(
+                IntentRequest(
+                    intent=ChemistryIntent.EVAPORATION_FLUX,
+                    account_view=ProviderAccountView(
+                        accounts={},
+                        species_formula_registry={},
+                    ),
+                    temperature_C=float(host.melt.temperature_C),
+                    pressure_bar=float(host.melt.p_total_mbar) / 1000.0,
+                    control_inputs=enriched,
+                )
+            )
+            captured["provider_error"] = None
+        except Exception as exc:  # noqa: BLE001 — the assertion reports it
+            captured["provider"] = None
+            captured["provider_error"] = exc
+        return SimpleNamespace(
+            status="ok",
+            diagnostic={"evaporation_flux_kg_hr": {}},
+        )
+
+    host._dispatch_only = _dispatch_only
+
+
+@pytest.mark.parametrize("partial_name", list(_FILM_PARTIAL_CASES))
+@pytest.mark.parametrize("command_name", list(_FILM_COMMANDS_MBAR))
+@pytest.mark.parametrize("gate", _FILM_GATES)
+@pytest.mark.parametrize("entry", _FILM_ENTRIES)
+def test_publisher_film_matches_the_surface_root_on_every_path(
+    partial_name: str,
+    command_name: str,
+    gate: str,
+    entry: str,
+) -> None:
+    """One film for the root and the flux publisher, on every path.
+
+    Invariant: when this step closed a surface root, the kernel's
+    partial vector and transport pressure are that root's film. The
+    publisher does not rebuild them from the vapor-map keys. Synthetic
+    O2 stays in the film, including when the commanded melt pressure is
+    below the overhead partial sum (100 Pa O2, commanded 0). The real
+    flux provider's Ca flux is the series law at that pressure, and the
+    oxygen residual of that film closes.
+
+    A step that did not close a root keeps the vapor-map backpressure,
+    so a buffered in-band melt does not pick up an unused O2 film.
+    An explicit override, including a reclose of that same vector, is
+    filmed once and shared even when the root stays shut.
+
+    Paths: persisted headspace, explicit override, and reclose.
+    Partials: none, O2, Ca, both. Command: below and above the partial
+    sum. Gates: no buffer, physical floor, buffered in-band.
+    """
+
+    partials_pa = dict(_FILM_PARTIAL_CASES[partial_name])
+    p_total_mbar = _FILM_COMMANDS_MBAR[command_name]
+    explicit = entry != "persisted"
+    answer = _film_answer(gate)
+    diagnostic = answer.diagnostic
+    published, published_ca, p_ref_bar = _published_ca(diagnostic)
+    compiled, legacy = _catalog()
+    headspace_mbar = (
+        {}
+        if explicit
+        else {species: value / 100.0 for species, value in partials_pa.items()}
+    )
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=_film_capacity(gate),
+        p_total_mbar=p_total_mbar,
+        headspace_partials_mbar=headspace_mbar,
+    )
+    if explicit:
+        source = _positive_partials(partials_pa)
+    else:
+        source = EvaporationMixin._langmuir_headspace_partials_Pa(
+            host, published
+        )
+    root_pressure = EvaporationMixin._evaporation_overhead_total_pressure_Pa(
+        host, source
+    )
+    green = {
+        species: host._evaporation_bulk_partial_pressure_pa(species)
+        for species in published
+    }
+    for species in published:
+        green.setdefault(species, 0.0)
+    green_pressure = EvaporationMixin._evaporation_overhead_total_pressure_Pa(
+        host, green
+    )
+    captured: dict = {}
+    _dispatch_real_flux_provider(host, captured)
+    override = partials_pa if explicit else None
+    EvaporationMixin._calculate_evaporation(
+        host,
+        equilibrium,
+        overhead_partials_override_Pa=override,
+    )
+    notice = getattr(host, "_last_langmuir_surface_oxygen", None)
+    root_closed = (
+        isinstance(notice, dict) and notice.get("surface_pO2_bar") is not None
+    )
+    if gate == "buffered":
+        assert not root_closed
+    elif partial_name != "both":
+        assert root_closed, notice
+    if root_closed or explicit:
+        expected_positive = source
+        expected_pressure = root_pressure
+    else:
+        expected_positive = _positive_partials(green)
+        expected_pressure = green_pressure
+    controls = captured["controls"]
+    kernel_partials = controls["overhead_partials_Pa"]
+    kernel_pressure = float(controls["overhead_pressure_pa"])
+    kernel_map = controls[CONTROL_FLUX_PRESSURES_KEY]
+    for species, value in expected_positive.items():
+        assert species in kernel_partials, (
+            f"publisher film dropped {species}; "
+            f"partials={kernel_partials} pressure={kernel_pressure} "
+            f"expected {expected_positive} at {expected_pressure}"
+        )
+        assert kernel_partials[species] == pytest.approx(value)
+    assert kernel_pressure == pytest.approx(expected_pressure)
+    if root_closed:
+        assert notice is not None
+        assert float(notice["relative_residual"]) < 1.0e-4
+        # Ca+O2 only. Ca2 and CaO(g) sit outside this check, so a closed
+        # root can miss 1e-4 here (the metal-bulk cells land near 3e-4)
+        # while a vacuum film under an O2 root misses by order 1.
+        # ``both`` puts the Ca bulk above the O2-bounded Ca pressure, so
+        # the Ca drive is zero and this ratio is not the root.
+        if partial_name != "both":
+            residual = _series_cao_residual(
+                float(notice["surface_pO2_bar"]),
+                published_ca,
+                p_ref_bar,
+                bulk_o2_pa=float(kernel_partials.get("O2", 0.0)),
+                bulk_ca_pa=float(kernel_partials.get("Ca", 0.0)),
+                overhead_pa=kernel_pressure,
+                temperature_K=_T_K,
+                legacy=legacy,
+                pressure_ca_pa=float(kernel_map["Ca"]),
+            )
+            assert residual < 1.0e-3
+    if entry == "reclose":
+        reclosed = EvaporationMixin._reclose_langmuir_pressures(
+            host, partials_pa
+        )
+        assert reclosed is not None
+        assert reclosed.pressures_Pa["Ca"] == pytest.approx(
+            float(kernel_map["Ca"]), rel=1.0e-12, abs=0.0
+        )
+        if root_closed:
+            assert reclosed.surface_pO2_bar is not None
+            assert reclosed.relative_residual < 1.0e-4
+    assert captured["provider_error"] is None
+    provider = captured["provider"]
+    assert provider is not None
+    assert str(provider.status) == "ok", provider.diagnostic
+    provider_flux = dict(
+        (provider.diagnostic or {}).get("evaporation_flux_kg_hr") or {}
+    )
+    alpha_ca = _catalog_alpha(legacy, "Ca", _T_K)
+    molar_flux = _series_molar_flux(
+        species="Ca",
+        pressure_pa=float(kernel_map["Ca"]),
+        bulk_pa=float(kernel_partials.get("Ca", 0.0)),
+        molar_mass=_M_CA,
+        alpha=alpha_ca,
+        temperature_K=_T_K,
+        overhead_pa=kernel_pressure,
+    )
+    expected_kg_hr = molar_flux * _M_CA * 3600.0 * float(
+        host.melt.melt_surface_area_m2
+    )
+    assert provider_flux.get("Ca", 0.0) == pytest.approx(
+        expected_kg_hr, rel=1.0e-6, abs=1.0e-12
+    )
+    if (
+        partial_name == "o2"
+        and command_name == "below"
+        and gate == "open"
+        and entry == "persisted"
+    ):
+        assert kernel_pressure == pytest.approx(100.0)
+        assert kernel_partials["O2"] == pytest.approx(100.0)
+        assert provider_flux["Ca"] > 0.0
+        # The vacuum film the old publisher built does not close.
+        stale = _series_cao_residual(
+            float(notice["surface_pO2_bar"]),
+            published_ca,
+            p_ref_bar,
+            bulk_o2_pa=0.0,
+            bulk_ca_pa=0.0,
+            overhead_pa=0.0,
+            temperature_K=_T_K,
+            legacy=legacy,
+            pressure_ca_pa=float(kernel_map["Ca"]),
+        )
+        assert stale > 1.0e-3

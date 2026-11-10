@@ -71,6 +71,18 @@ and gas resistance the publisher flux is
 ``R_interface = 1/(alpha*k_HK)``. ``R_gas`` is 0 in free molecular
 flow, so ``k_i`` collapses to ``alpha/sqrt(2*pi*M*R*T)`` and a zero
 bulk recovers the vacuum balance. Unequal ``k_i`` does not cancel.
+
+d-376 round 5. With a 10 mbar total pressure the fluxes pass through
+the gas-film series resistance, the mandate's
+``J = dP / (1/(alpha*k_HK) + R_gas(Kn) + R_melt)``. There the congruent
+condition ``J_O2 = 1/2 J_Ca`` is set by the diffusive conductances, not
+the effusion ``1/sqrt(M)`` weights. A different O/Ca conductance ratio
+moves the surface pO2 down and Ca up; +8.4% is that, and ``p_total = 0``
+recovering the free-molecular value is the right limit. The ratio used
+is the publisher's 1 Pa probe at 2200 C, pipe 0.12 m, N2, alpha = 1,
+``R_melt = 0``, and zero bulks: ``k_O2/k_Ca = 1.424`` at 1000 Pa, against
+the free-molecular ``sqrt(M_Ca/M_O2) = 1.119``. That is the move from
+5.3423 Pa to 5.7893 Pa.
 The signed weight ``(nO - dO)`` equals ``2*n`` from the reaction, not
 from the local slope. Off the cap the slope in ``log10(p)`` has the
 sign of ``n^2`` and does not fold; on the cap the metal term is flat

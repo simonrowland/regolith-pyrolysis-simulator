@@ -794,12 +794,46 @@ class EvaporationMixin:
                 partials[species] = value
         return partials
 
+    def _langmuir_film(
+        self,
+        partials_Pa: Mapping[str, float] | None,
+    ) -> tuple[dict[str, float], float]:
+        """The one partial vector and transport pressure for an evaluation.
+
+        Positive finite partials only. A non-positive entry is not a
+        bulk and does not enter the sum. The transport pressure is the
+        flux provider's ``max(partial sum, commanded melt pressure)``
+        when that reader exists, and the partial sum when it does not.
+        The surface root and the flux kernel both consume this pair.
+        Neither sums a second vector.
+        """
+
+        cleaned: dict[str, float] = {}
+        for species, value in dict(partials_Pa or {}).items():
+            try:
+                number = float(value)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(number) and number > 0.0:
+                cleaned[str(species)] = number
+        reader = getattr(self, "_evaporation_overhead_total_pressure_Pa", None)
+        if callable(reader):
+            pressure = float(reader(cleaned))
+        else:
+            pressure = sum(cleaned.values())
+        return cleaned, pressure
+
     def _langmuir_transport(
         self,
         partials_Pa: Mapping[str, float],
         temperature_K: float,
+        overhead_pressure_Pa: float,
     ) -> Any:
-        """Series-resistance knobs matching the evaporation flux provider."""
+        """Series-resistance knobs for one already-filmed pressure.
+
+        ``overhead_pressure_Pa`` is the value ``_langmuir_film`` returned
+        for these partials. This method does not sum them again.
+        """
 
         from simulator.config_flags import bool_feature_flag
         from simulator.condensation import _knudsen_number
@@ -844,13 +878,12 @@ class EvaporationMixin:
             radial = clamp_stir_factor(float(radial_source or 0.0))
         except (TypeError, ValueError):
             radial = 1.0
-        total_reader = getattr(self, "_evaporation_overhead_total_pressure_Pa", None)
-        if callable(total_reader):
-            overhead_pressure_Pa = float(total_reader(partials_Pa))
-        else:
-            overhead_pressure_Pa = sum(
-                max(0.0, float(value)) for value in partials_Pa.values()
-            )
+        try:
+            overhead_pressure_Pa = float(overhead_pressure_Pa)
+        except (TypeError, ValueError):
+            overhead_pressure_Pa = math.nan
+        if not math.isfinite(overhead_pressure_Pa) or overhead_pressure_Pa < 0.0:
+            overhead_pressure_Pa = 0.0
         carrier_resolver = getattr(self, "_resolve_condensation_carrier_gas", None)
         carrier_gas = carrier_resolver() if callable(carrier_resolver) else "N2"
         campaign = getattr(
@@ -923,12 +956,18 @@ class EvaporationMixin:
         source_reaction_fO2_bar: float | None,
         transport_pO2_bar: float | None,
         melt_redox_capacity_mol_per_ln_fO2: float | None,
+        overhead_pressure_Pa: float | None = None,
     ) -> Any:
         """Close the flux map on one partial vector. The only writer call."""
 
         from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
 
-        partials = dict(overhead_partials_Pa or {})
+        if overhead_pressure_Pa is None:
+            partials, overhead_pressure_Pa = EvaporationMixin._langmuir_film(
+                self, overhead_partials_Pa
+            )
+        else:
+            partials = dict(overhead_partials_Pa or {})
         return apply_langmuir_surface_oxygen(
             publication_Pa,
             temperature_K=temperature_K,
@@ -942,7 +981,10 @@ class EvaporationMixin:
             ),
             overhead_partials_Pa=partials,
             transport=EvaporationMixin._langmuir_transport(
-                self, partials, temperature_K
+                self,
+                partials,
+                temperature_K,
+                overhead_pressure_Pa,
             ),
         )
 
@@ -1179,6 +1221,11 @@ class EvaporationMixin:
             or {}
         )
         transport_pO2_bar = vapor_pressure_diagnostic.get("pO2_bar")
+        # One film. The publisher reads these two fields. It does not
+        # rebuild the vector from the vapor-map keys.
+        partials, film_pressure = EvaporationMixin._langmuir_film(
+            self, partials
+        )
         # Pre-close publication. Capacity iterations re-enter from this
         # map; closing the already-adjusted map would apply the power
         # law twice. Only this resolver stores the diagnostic.
@@ -1189,6 +1236,9 @@ class EvaporationMixin:
             "source_reaction_fO2_bar": source_reaction_fO2_bar,
             "transport_pO2_bar": transport_pO2_bar,
             "melt_redox_capacity_mol_per_ln_fO2": capacity,
+            "film_partials_Pa": partials,
+            "film_pressure_Pa": film_pressure,
+            "root_closed": False,
         }
         langmuir_surface = (
             EvaporationMixin._closed_langmuir_pressures_for_partials(
@@ -1200,13 +1250,19 @@ class EvaporationMixin:
                 source_reaction_fO2_bar=source_reaction_fO2_bar,
                 transport_pO2_bar=transport_pO2_bar,
                 melt_redox_capacity_mol_per_ln_fO2=capacity,
+                overhead_pressure_Pa=film_pressure,
             )
+        )
+        self._langmuir_flux_closure_context["root_closed"] = bool(
+            langmuir_surface.applied
+            and langmuir_surface.surface_pO2_bar is not None
         )
         if langmuir_surface.applied:
             vapor_pressures = dict(langmuir_surface.pressures_Pa)
-            self._last_langmuir_surface_oxygen = (
-                langmuir_surface.as_diagnostic()
-            )
+            diagnostic = langmuir_surface.as_diagnostic()
+            diagnostic["overhead_partials_Pa"] = dict(partials)
+            diagnostic["overhead_pressure_Pa"] = film_pressure
+            self._last_langmuir_surface_oxygen = diagnostic
         return (
             vapor_pressures,
             flux_overlay_report,
@@ -1215,6 +1271,62 @@ class EvaporationMixin:
             vapor_pressure_diagnostic,
             effective_pressure_source,
         )
+
+    def _evaporation_publisher_film(
+        self,
+        vapor_pressures: Mapping[str, float],
+        overhead_partials_override_Pa: Mapping[str, float] | None,
+    ) -> tuple[dict[str, float], float]:
+        """Partial vector and transport pressure the flux kernel emits.
+
+        Invariant: when this step closed a surface root, the kernel
+        receives that root's film (``_langmuir_film`` stored it). The
+        publisher does not rebuild the vector from the vapor-map keys.
+        Rebuilding drops synthetic O2, so a commanded pressure below the
+        overhead partial sum publishes a vacuum film under a root that
+        used the O2 gas film.
+
+        An explicit override is that evaluation's vector; the resolver
+        already filmed it. A step that did not close a root and has no
+        explicit vector keeps the vapor-map backpressure, zeros included.
+        d-376 amendment 1 leaves that buffered in-band flux on green:
+        the root did not run, and adopting its unused O2 film would
+        change the gas resistance of pressures the gate kept.
+        """
+
+        context = getattr(self, "_langmuir_flux_closure_context", None)
+        root_closed = (
+            isinstance(context, Mapping) and bool(context.get("root_closed"))
+        )
+        if root_closed or overhead_partials_override_Pa is not None:
+            if (
+                not isinstance(context, Mapping)
+                or "film_partials_Pa" not in context
+                or "film_pressure_Pa" not in context
+            ):
+                raise EvaporationFluxRefusal(
+                    "langmuir_film_missing",
+                    {
+                        "reason": "langmuir_film_missing",
+                        "detail": (
+                            "evaporation flux requires the film stored by "
+                            "the surface evaluation"
+                        ),
+                        "evaporation_flux_kg_hr": {},
+                    },
+                )
+            partials = dict(context["film_partials_Pa"])
+            for species in vapor_pressures:
+                partials.setdefault(species, 0.0)
+            return partials, float(context["film_pressure_Pa"])
+        partials = {
+            species: self._evaporation_bulk_partial_pressure_pa(species)
+            for species in vapor_pressures
+        }
+        for species in vapor_pressures:
+            partials.setdefault(species, 0.0)
+        _cleaned, pressure = EvaporationMixin._langmuir_film(self, partials)
+        return partials, pressure
 
     def _calculate_evaporation(
         self,
@@ -1609,12 +1721,14 @@ class EvaporationMixin:
         # Uses the previous hour's upstream melt-headspace/duct partials as
         # backpressure. ``overhead.composition`` is the physically distinct
         # post-condensation report, so near-total capture must not erase P_bulk
-        # above the melt. The flux map was already closed on THESE partials
-        # in ``_resolve_evaporation_batch_flux_state`` (the override when
-        # the capacity shadow supplies one). Do not solve again here: a
-        # second pass would scale the adjusted pressures as if they were
-        # still the persisted melt-fO2 publication. A different partial
-        # vector re-enters from the stored publication via
+        # above the melt. The flux map was already closed on the film stored
+        # by ``_resolve_evaporation_batch_flux_state`` (the override when the
+        # capacity shadow supplies one). The kernel receives that film from
+        # ``_evaporation_publisher_film``. Do not rebuild it from the vapor
+        # map: that drops synthetic O2. Do not solve again here: a second
+        # pass would scale the adjusted pressures as if they were still the
+        # persisted melt-fO2 publication. A different partial vector
+        # re-enters from the stored publication via
         # ``_reclose_langmuir_pressures``. equilibrium vapor pressures
         # stay the melt-supported law.
         langmuir_notice = getattr(self, "_last_langmuir_surface_oxygen", None)
@@ -1622,19 +1736,13 @@ class EvaporationMixin:
             equilibrium_warnings = getattr(equilibrium, "warnings", None)
             if isinstance(equilibrium_warnings, list):
                 equilibrium_warnings.append(str(langmuir_notice["warning"]))
-        overhead_partials_Pa = (
-            {
-                str(species): max(0.0, float(value))
-                for species, value in overhead_partials_override_Pa.items()
-            }
-            if overhead_partials_override_Pa is not None
-            else {
-                species: self._evaporation_bulk_partial_pressure_pa(species)
-                for species in vapor_pressures
-            }
+        overhead_partials_Pa, overhead_pressure_Pa = (
+            EvaporationMixin._evaporation_publisher_film(
+                self,
+                vapor_pressures,
+                overhead_partials_override_Pa,
+            )
         )
-        for species in vapor_pressures:
-            overhead_partials_Pa.setdefault(species, 0.0)
 
         # F-B1: EVAPORATION_FLUX is read-only -- no commit_batch follows.
         # The dispatch-only helper centralises melt-derived T/P plumbing
@@ -1645,12 +1753,7 @@ class EvaporationMixin:
                 self,
                 equilibrium,
                 overhead_partials_Pa=overhead_partials_Pa,
-                overhead_pressure_pa=(
-                    EvaporationMixin._evaporation_overhead_total_pressure_Pa(
-                        self,
-                        overhead_partials_Pa,
-                    )
-                ),
+                overhead_pressure_pa=overhead_pressure_Pa,
                 vapour_batch_flux_pressures_Pa=vapor_pressures,
                 vapour_batch_report=batch_report,
                 vapour_batch_flux_overlay=flux_overlay_report,
