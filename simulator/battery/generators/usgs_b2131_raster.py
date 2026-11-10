@@ -1,4 +1,4 @@
-"""Reviewed MinerU rasters for USGS Bulletin 2131 high-temperature pages.
+"""Reviewed MinerU rasters for USGS Bulletin 2131.
 
 Formula rows differ from formula_as_published only by letter case or by a
 published digit 0 or 1 that this page's MinerU text shows as O or l.
@@ -166,6 +166,21 @@ FORMULA_RASTER: dict[str, tuple[str, str, str, int, int]] = {
     'high-temperature-p378': ('NaA1Sio4', 'NaAlSiO4', '$NaAlSiO_{4}$: Glass-liquid 298.15 to glass transition 1000 K.', 384, 378),
     'high-temperature-p380': ('NaAlSi2o 6', 'NaAlSi2O6', '$NaAlSi_{2}O_{6}$: Cubic crystals 298.15 to 1000 K.', 386, 380),
     'high-temperature-p394': ('Mg3Si205(0H)4', 'Mg3Si2O5(OH)4', '$Mg_{3}Si_{2}O5(OH)_{4}$: Monoclinic crystals 298.15 to 900 K.', 400, 394),
+    'high-temperature-p280': ('NH4N03', 'NH4NO3', '$NH_{4}NO_{3}$ : Ammonia-niter undergoes phase changes at 305.3, 357.4, 398.4 K. It melts at 442.8 K.', 286, 280),
+    'reference-p028-05': ('CuS04', 'CuSO4', 'CHALCOCYANITE</td><td>159.610</td><td>109.5</td><td>40.88</td><td>-771.4</td><td>-662.3</td><td>116.03</td><td>106</td><td>4</td><td>106</td></tr><tr><td> $CuSO_4$', 34, 28),
+    'reference-p028-11': ('H2S04', 'H2SO4', 'SULFURIC ACID (LIQUID)</td><td>98.080</td><td>156.9</td><td>53.57</td><td>-814.0</td><td>-690.0</td><td>120.88</td><td>419</td><td>419</td><td></td></tr><tr><td> $H_2SO_4$', 34, 28),
+    'reference-p028-12': ('K2S04', 'K2SO4', 'ARCANITE</td><td>174.260</td><td>175.6</td><td>65.50</td><td>-1437.7</td><td>-1319.6</td><td>231.18</td><td>67</td><td>67</td><td>387</td></tr><tr><td> $K_2SO_4$', 34, 28),
+    'reference-p028-16': ('MgS04', 'MgSO4', 'MAGNESIUM SULFATE</td><td>120.369</td><td>91.4</td><td></td><td>-1284.9</td><td>-1170.5</td><td>205.07</td><td>67</td><td>247</td><td>67</td></tr><tr><td> $MgSO_4$', 34, 28),
+    'reference-p029-04': ('Na2S04', 'Na2SO4', 'THENARDITE</td><td>142.043</td><td>149.6</td><td>53.33</td><td>-1387.8</td><td>-1269.8</td><td>222.46</td><td>88</td><td>88</td><td>81</td></tr><tr><td> $Na_2SO_4$', 35, 29),
+    'reference-p029-09': ('PbS04', 'PbSO4', 'ANGLESITE</td><td>303.264</td><td>148.5</td><td>47.95</td><td>-920.0</td><td>-813.1</td><td>142.44</td><td>85</td><td>85</td><td>88</td></tr><tr><td> $PbSO_4$', 35, 29),
+    'reference-p029-11': ('ZnS04', 'ZnSO4', 'ZINKOSITE</td><td>161.454</td><td>110.5</td><td>41.57</td><td>-980.1</td><td>-868.7</td><td>152.20</td><td>87</td><td>87</td><td>87</td></tr><tr><td> $ZnSO_4$', 35, 29),
+    'reference-p030-01': ('AlP04', 'AlPO4', 'BERLINITE</td><td>121.953</td><td>90.8</td><td>46.58</td><td>-1733.8</td><td>-1617.9</td><td>283.44</td><td>419</td><td>419</td><td>181</td></tr><tr><td> $AlPO_4$', 36, 30),
+    'reference-p030-07': ('PbMo04', 'PbMoO4', 'WULFENITE</td><td>367.138</td><td>166.1</td><td>53.86</td><td>-1051.9</td><td>-951.2</td><td>166.65</td><td>320</td><td>419</td><td></td></tr><tr><td> $PbMoO_4$', 36, 30),
+    'reference-p030-09': ('FeW04', 'FeWO4', 'FERBERITE</td><td>303.695</td><td>131.8</td><td>40.38</td><td>-1154.8</td><td>-1054.0</td><td>184.64</td><td>430</td><td>419</td><td></td></tr><tr><td> $FeWO_4$', 36, 30),
+    'reference-p030-10': ('MnW04', 'MnWO4', 'HUEBNERITE</td><td>302.786</td><td>132.5</td><td>41.89</td><td>-1337.6</td><td>-1235.4</td><td>216.44</td><td>304</td><td>7</td><td></td></tr><tr><td> $MnWO_4$', 36, 30),
+    'reference-p030-11': ('PbW04', 'PbWO4', 'STOLZITE</td><td>455.048</td><td>168.2</td><td>54.10</td><td>-1127.2</td><td>-1026.0</td><td>179.74</td><td>428</td><td>89</td><td></td></tr><tr><td> $PbWO_4$', 36, 30),
+    'reference-p030-12': ('ZnW04', 'ZnWO4', 'SANMARTINITE</td><td>313.238</td><td>119.3</td><td>39.79</td><td>-1232.6</td><td>-1123.7</td><td>196.86</td><td>260</td><td>266</td><td>260</td></tr><tr><td> $ZnWO_4$', 36, 30),
+    'reference-p037-15': ('NaAlSi04', 'NaAlSiO4', 'GLASS</td><td>142.054</td><td>134.5</td><td>56.86</td><td>-2089.0</td><td>-1977.4</td><td>346.4</td><td>346</td><td>346</td><td>346</td></tr><tr><td> $NaAlSiO_4$', 43, 37),
 }
 
 # record_id -> MinerU phase sentence

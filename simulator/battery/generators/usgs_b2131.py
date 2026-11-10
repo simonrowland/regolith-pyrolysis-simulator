@@ -111,6 +111,16 @@ _REFERENCE_RELATION = (
     "The next numeric line in a column is the printed uncertainty, not a "
     "second temperature."
 )
+# MinerU shows SrCO3 and KAlSi3O8. Same-length case / 0→O / 1→l cannot
+# insert the C, and it cannot turn the 9 into 8. Emitting the OCR token
+# would store a different stoichiometry, and the generic path would do the
+# same for log Kf, so these two records produce no observations.
+_OFF_NUMERIC_PATH = frozenset(
+    {
+        "high-temperature-p274",
+        "high-temperature-p367",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -369,8 +379,18 @@ def _ht_rows(
 def _generate_ht(doc: Mapping[str, Any]) -> RecordGeneration:
     record_id = str(doc["record_id"])
     source_path = f"{_PREFIX}/records/{record_id}.json"
+    if record_id in _OFF_NUMERIC_PATH:
+        return RecordGeneration(
+            observations=(),
+            report={"record_id": record_id, "skipped": "raster alignment cannot reach the printed formula"},
+        )
     published = _published_formula(doc)
     formula, quote = formula_for_record(doc)
+    if not formula:
+        return RecordGeneration(
+            observations=(),
+            report={"record_id": record_id, "skipped": "blank formula"},
+        )
     sentence = PHASE_SENTENCE.get(record_id) or str(doc.get("phase_as_published") or "")
     windows = phase_windows(sentence)
     parsed_rows = _ht_rows(doc)
@@ -430,7 +450,7 @@ def _generate_ht(doc: Mapping[str, Any]) -> RecordGeneration:
             _one_observation(
                 doc=doc,
                 source_path=source_path,
-                formula=formula or record_id,
+                formula=formula,
                 quantity=quantity,
                 value=Value(ValueKind.SERIES, series=series),
                 phase=phase,
@@ -484,8 +504,18 @@ def _generate_reference(doc: Mapping[str, Any]) -> RecordGeneration:
     temperature = _grid_temperature(doc)
     if temperature is None:
         return RecordGeneration(observations=(), report={"record_id": record_id, "skipped": "no single grid temperature"})
+    if record_id in _OFF_NUMERIC_PATH:
+        return RecordGeneration(
+            observations=(),
+            report={"record_id": record_id, "skipped": "raster alignment cannot reach the printed formula"},
+        )
     published = _published_formula(doc)
     formula, quote = formula_for_record(doc)
+    if not formula:
+        return RecordGeneration(
+            observations=(),
+            report={"record_id": record_id, "skipped": "blank formula"},
+        )
     phase_raw = doc.get("phase_as_published")
     if isinstance(phase_raw, list):
         phase_raw = " ".join(str(part) for part in phase_raw)
@@ -521,7 +551,7 @@ def _generate_reference(doc: Mapping[str, Any]) -> RecordGeneration:
         observation = _one_observation(
             doc=doc,
             source_path=source_path,
-            formula=formula or record_id,
+            formula=formula,
             quantity=quantity,
             value=value,
             phase=phase,
@@ -548,6 +578,9 @@ def owns_record(doc: Mapping[str, Any]) -> bool:
     """
 
     if str(doc.get("source_id") or "") != SOURCE_ID or not doc.get("record_id"):
+        return False
+    # An empty heading is not a formula. The record id must not replace it.
+    if not _published_formula(doc).strip():
         return False
     kind = str(doc.get("table_kind") or "")
     if kind == "high_temperature":

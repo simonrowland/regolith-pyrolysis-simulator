@@ -31,6 +31,11 @@ def _load(relative: str) -> dict:
     return document
 
 
+def _compilation_path(record_id: str) -> str:
+    folder = "summary" if record_id.startswith("reference-") else "records"
+    return f"{folder}/{record_id}.json"
+
+
 def _series_temperatures(observation) -> list[Decimal]:
     assert observation.value.kind is ValueKind.SERIES
     return [temperature for temperature, _value in observation.value.series]
@@ -42,6 +47,21 @@ def test_committed_raster_rows_are_allowed_edits() -> None:
         "high-temperature-p285": ("caso4", "CaSO4"),
         "high-temperature-p353": ("MgSio3", "MgSiO3"),
         "high-temperature-p320": ("CaMgSio4", "CaMgSiO4"),
+        "high-temperature-p280": ("NH4N03", "NH4NO3"),
+        "reference-p028-05": ("CuS04", "CuSO4"),
+        "reference-p028-11": ("H2S04", "H2SO4"),
+        "reference-p028-12": ("K2S04", "K2SO4"),
+        "reference-p028-16": ("MgS04", "MgSO4"),
+        "reference-p029-04": ("Na2S04", "Na2SO4"),
+        "reference-p029-09": ("PbS04", "PbSO4"),
+        "reference-p029-11": ("ZnS04", "ZnSO4"),
+        "reference-p030-01": ("AlP04", "AlPO4"),
+        "reference-p030-07": ("PbMo04", "PbMoO4"),
+        "reference-p030-09": ("FeW04", "FeWO4"),
+        "reference-p030-10": ("MnW04", "MnWO4"),
+        "reference-p030-11": ("PbW04", "PbWO4"),
+        "reference-p030-12": ("ZnW04", "ZnWO4"),
+        "reference-p037-15": ("NaAlSi04", "NaAlSiO4"),
     }
     for record_id, (published, corrected) in named.items():
         assert FORMULA_RASTER[record_id][:2] == (published, corrected)
@@ -49,7 +69,7 @@ def test_committed_raster_rows_are_allowed_edits() -> None:
     for record_id, (published, corrected, quote, _pdf, _printed) in FORMULA_RASTER.items():
         assert aligned_raster_formula(published, corrected) == corrected
         assert quote
-        document = _load(f"records/{record_id}.json")
+        document = _load(_compilation_path(record_id))
         formula, evidence = formula_for_record(document)
         assert formula == corrected
         assert evidence == quote
@@ -162,7 +182,7 @@ def test_reference_state_second_line_is_the_printed_uncertainty() -> None:
     )
     assert enthalpy.value.point == Decimal("-1387.8")
     assert enthalpy.uncertainty.value == Decimal("0.4")
-    assert enthalpy.identity.species.formula == "Na2S04"
+    assert enthalpy.identity.species.formula == "Na2SO4"
 
 
 def test_lime_formation_basis_is_not_copied_onto_heat_capacity() -> None:
@@ -226,6 +246,25 @@ def test_records_without_a_parsed_thermochemical_cell_stay_generic() -> None:
     ) is False
     assert owns_record(_load("records/high-temperature-p078.json")) is True
     assert owns_record(_load("summary/reference-p005-02.json")) is True
+    # Magnetite and bromine have a blank published formula. The page formula
+    # is not invented from the phase sentence, and the record id is not stored.
+    assert owns_record(_load("records/high-temperature-p193.json")) is False
+    assert generate_record(_load("records/high-temperature-p193.json")).observations == ()
+    assert owns_record(_load("summary/reference-p005-13.json")) is False
+    assert generate_record(_load("summary/reference-p005-13.json")).observations == ()
+    # Sr003 cannot align to SrCO3, and KAlSi309 cannot align to KAlSi3O8.
+    for record_id, published in (
+        ("high-temperature-p274", "Sr003"),
+        ("high-temperature-p367", "KAlSi309"),
+    ):
+        document = _load(_compilation_path(record_id))
+        assert document["formula_as_published"] == published
+        assert formula_for_record(document) == (published, None)
+        assert owns_record(document) is True
+        assert generate_record(document).observations == ()
+    ammonia = generate_record(_load("records/high-temperature-p280.json"))
+    assert ammonia.observations
+    assert {obs.identity.species.formula for obs in ammonia.observations} == {"NH4NO3"}
 
 
 def test_paths_are_the_compilation_record() -> None:
