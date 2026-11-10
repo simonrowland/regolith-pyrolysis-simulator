@@ -12,6 +12,7 @@ import math
 import os
 import sqlite3
 import threading
+import time
 from collections.abc import Callable, Mapping
 from contextlib import contextmanager
 from functools import lru_cache
@@ -416,7 +417,25 @@ class EngineCache:
 
     def _initialize(self) -> None:
         with self._connect() as connection:
-            connection.execute("PRAGMA journal_mode=WAL")
+            journal_mode = connection.execute("PRAGMA journal_mode").fetchone()[0]
+            if str(journal_mode).lower() != "wal":
+                deadline = time.monotonic() + _BUSY_TIMEOUT_MS / 1000
+                while True:
+                    try:
+                        connection.execute("PRAGMA journal_mode=WAL")
+                        break
+                    except sqlite3.OperationalError as exc:
+                        if not any(
+                            message in str(exc).lower()
+                            for message in ("locked", "busy")
+                        ):
+                            raise
+                        # SQLite may skip the busy handler on this lock upgrade
+                        # to avoid deadlock.
+                        remaining = deadline - time.monotonic()
+                        if remaining <= 0:
+                            raise
+                        time.sleep(min(0.01, remaining))
             connection.execute(
                 f"""
                 CREATE TABLE IF NOT EXISTS {_TABLE_NAME} (
