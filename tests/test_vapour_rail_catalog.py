@@ -32,6 +32,7 @@ from simulator.vapour_rail.catalog import (
     RUNTIME_THERMO_EVALUATOR_FAMILIES,
     CatalogCompileError,
     OUT_OF_RANGE_STATUS,
+    bound_effective_fit_evidence,
     compile_vapour_rail_catalog,
     validate_species_catalog,
 )
@@ -671,8 +672,17 @@ def test_t622_frozen_fe_law_compiles_without_rewriting_the_fixture() -> None:
         hashlib.sha256(fixture_bytes).hexdigest()
         == PINNED_CATALOG_FIXTURE_SHA256[T622_LANDING_CATALOG_FIXTURE.name]
     )
+    historic_payload = yaml.safe_load(fixture_bytes)
+    with pytest.raises(
+        CatalogCompileError,
+        match="effective-pressure reference fit requires",
+    ):
+        compile_vapour_rail_catalog(historic_payload, emit_u0_request_rules=False)
+    fits = bound_effective_fit_evidence(_yaml("vapor_pressures.yaml"))
     historic = compile_vapour_rail_catalog(
-        yaml.safe_load(fixture_bytes), emit_u0_request_rules=False
+        historic_payload,
+        emit_u0_request_rules=False,
+        bound_effective_fits=fits,
     )
     live = compile_vapour_rail_catalog(
         _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
@@ -698,7 +708,11 @@ def test_t622_frozen_fe_law_compiles_without_rewriting_the_fixture() -> None:
         CatalogCompileError,
         match="effective-pressure reference fit requires",
     ):
-        compile_vapour_rail_catalog(drifted, emit_u0_request_rules=False)
+        compile_vapour_rail_catalog(
+            drifted,
+            emit_u0_request_rules=False,
+            bound_effective_fits=fits,
+        )
     assert hashlib.sha256(T622_LANDING_CATALOG_FIXTURE.read_bytes()).hexdigest() == (
         PINNED_CATALOG_FIXTURE_SHA256[T622_LANDING_CATALOG_FIXTURE.name]
     )
@@ -1465,6 +1479,30 @@ def _live_bound_effective_fit_contexts() -> tuple[dict[str, object], ...]:
     return tuple(found)
 
 
+# Fe effective-pressure fit at 1800 K. Cited from data/vapor_pressures.yaml
+# metals_fe_family Fe: A=9.408547, B=23312.312336, C=1000.0,
+# source_id current-rail-against-2026-08-03-vaporock-crosscheck-cells,
+# observation_id Fe, anchor
+# validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml.
+# pO2_exponent is omitted, so the stored multiplier is 0 and pO2 does not
+# scale P.
+# log10(P/Pa) = 9.408547 - 23312.312336 / (1800 + 1000)
+#             = 1.0827211657142861
+# P/Pa        = 10 ** 1.0827211657142861
+#             = 12.098211309846041
+_CITED_EFFECTIVE_FIT_PRESSURE_PA = {
+    ("Fe", 1800.0): 12.098211309846041,
+}
+
+
+def _cited_effective_fit_pressure_pa(species_id: str, temperature_K: float) -> float:
+    pressure = _CITED_EFFECTIVE_FIT_PRESSURE_PA.get((species_id, temperature_K))
+    assert pressure is not None, (
+        f"no cited pressure pin for {species_id} at {temperature_K} K"
+    )
+    return pressure
+
+
 def _shifted_fit_context_value(field: str, context: dict[str, object]) -> object:
     current = context[field]
     if field in {"formula", "parent_oxide", "species_basis"}:
@@ -1488,6 +1526,7 @@ def test_copied_effective_fit_law_is_evidence_only_for_its_species(
     contexts = _live_bound_effective_fit_contexts()
     assert contexts
     assert any(item["species_id"] == "Fe" for item in contexts)
+    fits = bound_effective_fit_evidence(_yaml("vapor_pressures.yaml"))
     for context in contexts:
         payload = _unevidenced_law_copy(species_id, context)
         if species_id != context["species_id"]:
@@ -1495,9 +1534,9 @@ def test_copied_effective_fit_law_is_evidence_only_for_its_species(
                 CatalogCompileError,
                 match="effective-pressure reference fit requires",
             ):
-                compile_vapour_rail_catalog(payload)
+                compile_vapour_rail_catalog(payload, bound_effective_fits=fits)
             continue
-        compiled = compile_vapour_rail_catalog(payload)
+        compiled = compile_vapour_rail_catalog(payload, bound_effective_fits=fits)
         assert compiled.species[species_id].validation_anchor_refs == ()
         evaluator = compiled.species[species_id].evaluator
         assert evaluator is not None
@@ -1505,10 +1544,8 @@ def test_copied_effective_fit_law_is_evidence_only_for_its_species(
         temperature_K = 1800.0
         if not (float(context["low"]) <= temperature_K <= float(context["high"])):
             temperature_K = 0.5 * (float(context["low"]) + float(context["high"]))
-        # log10(P/Pa) = A - B / (T + C). Same expression the Antoine evaluator uses.
-        expected_pa = 10 ** (
-            float(context["A"])
-            - float(context["B"]) / (temperature_K + float(context["C"]))
+        expected_pa = _cited_effective_fit_pressure_pa(
+            str(context["species_id"]), temperature_K
         )
         assert evaluator.evaluate(temperature_K).pressure_pa == pytest.approx(
             expected_pa, rel=1e-12, abs=0.0
@@ -1533,6 +1570,7 @@ def test_historic_reuse_rejects_each_changed_fit_context_field(field: str) -> No
 
     contexts = _live_bound_effective_fit_contexts()
     assert contexts
+    fits = bound_effective_fit_evidence(_yaml("vapor_pressures.yaml"))
     for context in contexts:
         payload = _unevidenced_law_copy(
             str(context["species_id"]),
@@ -1543,7 +1581,7 @@ def test_historic_reuse_rejects_each_changed_fit_context_field(field: str) -> No
             CatalogCompileError,
             match="effective-pressure reference fit requires",
         ):
-            compile_vapour_rail_catalog(payload)
+            compile_vapour_rail_catalog(payload, bound_effective_fits=fits)
 
 
 # Omitted (None) is a distinct declaration from an explicit zero or 1.
@@ -1590,6 +1628,7 @@ def test_historic_reuse_binds_every_oxygen_executable_law(
         item["species_id"] == "Fe" and item["oxygen_law"] == (0.0, 1.0, None)
         for item in contexts
     )
+    fits = bound_effective_fit_evidence(_yaml("vapor_pressures.yaml"))
     for context in contexts:
         species_id = str(context["species_id"])
         payload = _unevidenced_law_copy(species_id, context)
@@ -1611,7 +1650,9 @@ def test_historic_reuse_binds_every_oxygen_executable_law(
         )
         if expected is not None and expected == live:
             assert not reviewer_bypass
-            compiled = compile_vapour_rail_catalog(payload)
+            compiled = compile_vapour_rail_catalog(
+                payload, bound_effective_fits=fits
+            )
             evaluator = compiled.species[species_id].evaluator
             assert evaluator is not None
             assert evaluator.activity_exponent == 0.0
@@ -1629,33 +1670,23 @@ def test_historic_reuse_binds_every_oxygen_executable_law(
                 temperature_K = 0.5 * (
                     float(context["low"]) + float(context["high"])
                 )
-            # log10(P/Pa) = A - B/(T+C) + exponent*log10(pO2/p_ref).
-            # Exponent 0 leaves P equal to the Antoine curve at every pO2.
-            base_pa = 10 ** (
-                float(context["A"])
-                - float(context["B"]) / (temperature_K + float(context["C"]))
-            )
-            live_exponent, live_reference, _live_channel = live
-
-            def scaled(pO2_bar: float) -> float:
-                if live_exponent == 0.0:
-                    return base_pa
-                return base_pa * (pO2_bar / float(live_reference)) ** float(
-                    live_exponent
-                )
-
+            # The cited Fe law stores exponent 0, so every pO2 returns the
+            # same pressure. A non-zero cited exponent needs its own literals.
+            live_exponent, _live_reference, _live_channel = live
+            assert live_exponent == 0.0
+            expected_pa = _cited_effective_fit_pressure_pa(species_id, temperature_K)
             assert evaluator.evaluate(temperature_K).pressure_pa == pytest.approx(
-                scaled(1.0)
+                expected_pa, rel=1e-12, abs=0.0
             )
             assert evaluator.evaluate(
                 temperature_K, pO2_bar=1.0
-            ).pressure_pa == pytest.approx(scaled(1.0))
+            ).pressure_pa == pytest.approx(expected_pa, rel=1e-12, abs=0.0)
             assert evaluator.evaluate(
                 temperature_K, pO2_bar=1.0e-9
-            ).pressure_pa == pytest.approx(scaled(1.0e-9))
+            ).pressure_pa == pytest.approx(expected_pa, rel=1e-12, abs=0.0)
             continue
         with pytest.raises(CatalogCompileError) as exc_info:
-            compile_vapour_rail_catalog(payload)
+            compile_vapour_rail_catalog(payload, bound_effective_fits=fits)
         if expected is None:
             continue
         assert "effective-pressure reference fit requires" in str(exc_info.value)
@@ -1663,6 +1694,40 @@ def test_historic_reuse_binds_every_oxygen_executable_law(
             # (pO2/p_ref)**1 at 1e-9 bar is 1e-9. Admission must stop first.
             assert expected == (1.0, 1.0, "transport_headspace")
             assert live != expected
+
+
+def test_unevidenced_fit_follows_the_request_not_a_warm_cache() -> None:
+    """A cached admission must not survive removal of the request's evidence.
+
+    The unevidenced Fe law is refused when the compile request carries no
+    bound fits. Supplying the live catalog's fits admits it. Compiling that
+    same payload again without the fits misses the cache and refuses.
+    """
+
+    contexts = _live_bound_effective_fit_contexts()
+    fe = next(item for item in contexts if item["species_id"] == "Fe")
+    payload = _unevidenced_law_copy("Fe", fe)
+    with pytest.raises(
+        CatalogCompileError,
+        match="effective-pressure reference fit requires",
+    ):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+    fits = bound_effective_fit_evidence(_yaml("vapor_pressures.yaml"))
+    admitted = compile_vapour_rail_catalog(
+        payload,
+        emit_u0_request_rules=False,
+        bound_effective_fits=fits,
+    )
+    evaluator = admitted.species["Fe"].evaluator
+    assert evaluator is not None
+    assert evaluator.evaluate(1800.0).pressure_pa == pytest.approx(
+        _cited_effective_fit_pressure_pa("Fe", 1800.0), rel=1e-12, abs=0.0
+    )
+    with pytest.raises(
+        CatalogCompileError,
+        match="effective-pressure reference fit requires",
+    ):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
 
 
 def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:

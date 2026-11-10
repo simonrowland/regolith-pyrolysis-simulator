@@ -381,7 +381,11 @@ def _require_poly_covers_domain(
 #     - effective u0_manifest content ONLY when emit_u0_request_rules is true
 #       (resolved via load_u0_manifest() when the caller passed None — the
 #       default-manifest surface that rule emission actually reads)
+#     - bound_effective_fits when the caller passed that sequence (evidenced
+#       laws this request may reuse). Never a digest of a catalog file the
+#       request did not carry.
 #   When emission is disabled, manifest is excluded (not an output determinant).
+#   When bound_effective_fits is omitted, it is excluded.
 # Why content digest rather than object-id / strong-ref pins alone:
 #   - Object id is incidental, not an identity contract (Codex P3-2 / NV-1 class:
 #     recycled id(u0_manifest) or id(payload) can silently hit a stale entry).
@@ -525,12 +529,15 @@ def _compile_input_identity(
     *,
     emit_u0_request_rules: bool,
     u0_manifest: Mapping[str, Any] | None,
+    bound_effective_fits: tuple[tuple[object, ...], ...] | None = None,
 ) -> str:
     """Explicit identity of one compile-input vector (content digest).
 
     Digests the *effective* input: payload + emit flag + manifest content
     actually used by rule emission (default fixture when emit and
-    ``u0_manifest is None``). Manifest is omitted when emission is disabled.
+    ``u0_manifest is None``) + ``bound_effective_fits`` when the caller
+    supplied that sequence. Manifest is omitted when emission is disabled.
+    The fit sequence is omitted when the caller did not pass it.
     Always walks current content (oracle for mutation / equal-content tests).
     """
 
@@ -541,6 +548,7 @@ def _compile_input_identity(
         payload,
         emit_u0_request_rules=emit_u0_request_rules,
         effective_u0_manifest=effective_manifest,
+        bound_effective_fits=bound_effective_fits,
     )
     content_key = _content_digest(input_vector)
     fingerprint = _compile_input_fingerprint(input_vector)
@@ -559,6 +567,7 @@ def _compile_input_vector(
     *,
     emit_u0_request_rules: bool,
     effective_u0_manifest: Mapping[str, Any] | None,
+    bound_effective_fits: tuple[tuple[object, ...], ...] | None = None,
 ) -> dict[str, Any]:
     """Minimal vector that determines compiled catalog output."""
 
@@ -566,6 +575,8 @@ def _compile_input_vector(
         "payload": payload,
         "emit_u0_request_rules": bool(emit_u0_request_rules),
     }
+    if bound_effective_fits:
+        vector["bound_effective_fits"] = bound_effective_fits
     # Extract-backed thermo changes compiled pressure output even when the owner
     # catalog payload is unchanged. Include selected observation ids plus the
     # containing extract digest: premise output=f(payload, selected rows), and a
@@ -1896,6 +1907,7 @@ def _compile_owner_fingerprint(
     *,
     emit_u0_request_rules: bool,
     effective_u0_manifest: Mapping[str, Any] | None,
+    bound_effective_fits: tuple[tuple[object, ...], ...] | None = None,
 ) -> bytes | None:
     vector: dict[str, Any] = {
         "payload": payload,
@@ -1903,6 +1915,8 @@ def _compile_owner_fingerprint(
     }
     if emit_u0_request_rules:
         vector["u0_manifest"] = effective_u0_manifest
+    if bound_effective_fits:
+        vector["bound_effective_fits"] = bound_effective_fits
     return _compile_input_fingerprint(vector)
 
 
@@ -1952,6 +1966,7 @@ def compiled_catalog_for(
     emit_u0_request_rules: bool = False,
     u0_manifest: Mapping[str, Any] | None = None,
     content_key: str | None = None,
+    bound_effective_fits: Sequence[tuple[object, ...]] | None = None,
 ) -> "VapourRailCatalog":
     """Return a cached compile of ``payload`` (hot capability-probe entrypoint).
 
@@ -1972,6 +1987,7 @@ def compiled_catalog_for(
         u0_manifest=u0_manifest,
         emit_u0_request_rules=emit_u0_request_rules,
         content_key=content_key,
+        bound_effective_fits=bound_effective_fits,
     )
 
 
@@ -1981,6 +1997,7 @@ def compile_vapour_rail_catalog(
     u0_manifest: Mapping[str, Any] | None = None,
     emit_u0_request_rules: bool = True,
     content_key: str | None = None,
+    bound_effective_fits: Sequence[tuple[object, ...]] | None = None,
 ) -> VapourRailCatalog:
     """Validate and compile one schema-v2 YAML payload.
 
@@ -1988,21 +2005,28 @@ def compile_vapour_rail_catalog(
     one request rule per executable U0 ``V`` row and eligible ``C`` edge so a
     physically eligible manifest species cannot be unrequested by construction.
 
+    ``bound_effective_fits`` is the only way a row without its own provenance
+    can reuse an evidenced Antoine law. Pass the tuple from
+    :func:`bound_effective_fit_evidence`. Compile does not open a catalog
+    file. Omitting the argument refuses that reuse on both cold and warm
+    lookups, because the fit sequence is part of the cache identity.
+
     Results are memoized by an explicit content-digest identity of the full
     *effective* compile-input vector (payload + emit flag + effective
-    u0_manifest content when emission is on) — not by object ``id()``. Same
-    content reuses the catalog; in-place mutation changes the verified snapshot
-    and canonical digest, forcing recompile (or raise), so a mutated input
-    cannot silently serve a stale entry. Pass ``content_key`` from the owner
-    boundary to seed the verified snapshot hint and skip canonical re-digesting
-    on repeated lookups. The U0 manifest YAML load is separately memoized in
-    ``load_u0_manifest``.
+    u0_manifest content when emission is on + bound fits when passed) — not
+    by object ``id()``. Same content reuses the catalog; in-place mutation
+    changes the verified snapshot and canonical digest, forcing recompile
+    (or raise), so a mutated input cannot silently serve a stale entry. Pass
+    ``content_key`` from the owner boundary to seed the verified snapshot
+    hint and skip canonical re-digesting on repeated lookups. The U0 manifest
+    YAML load is separately memoized in ``load_u0_manifest``.
     """
 
     if not isinstance(payload, Mapping):
         raise CatalogCompileError("vapour catalog root must be a mapping")
     if u0_manifest is not None and not isinstance(u0_manifest, Mapping):
         raise CatalogCompileError("u0_manifest must be a mapping when provided")
+    fit_records = _normalize_bound_effective_fits(bound_effective_fits)
 
     # Resolve effective manifest before keying so default-on emission digests
     # the fixture content rule emission will read (not a bare None token).
@@ -2013,6 +2037,7 @@ def compile_vapour_rail_catalog(
         payload,
         emit_u0_request_rules=emit_u0_request_rules,
         effective_u0_manifest=effective_manifest,
+        bound_effective_fits=fit_records,
     )
     locator = (id(payload), bool(emit_u0_request_rules))
     fast_hint = _COMPILE_FAST_HINTS.get(locator)
@@ -2039,6 +2064,7 @@ def compile_vapour_rail_catalog(
         payload,
         emit_u0_request_rules=emit_u0_request_rules,
         effective_u0_manifest=effective_manifest,
+        bound_effective_fits=fit_records,
     )
     # Digest refuses non-finite floats generically. Defer that refusal so
     # schema/field validation can name the bad field first; after a successful
@@ -2105,6 +2131,9 @@ def compile_vapour_rail_catalog(
     compiled: dict[str, CompiledSpecies] = {}
     legacy: dict[str, Any] = {}
     condensation_reference: dict[str, Any] = {}
+    # Membership set for this request only. It is the same sequence digested
+    # into the cache key, so a warm hit cannot outlive a change to it.
+    bound_fit_set = frozenset(fit_records) if fit_records else frozenset()
     for family_id, family_value in families.items():
         family = _mapping(family_value, f"families.{family_id}")
         if set(family) != set(FOUR_STRATA):
@@ -2184,6 +2213,7 @@ def compile_vapour_rail_catalog(
                     validation_anchor_refs=anchor_refs,
                     species_rows_by_id=species_rows_by_id,
                     species_source_account_by_id=species_source_account_by_id,
+                    bound_effective_fits=bound_fit_set,
                 )
             )
             if evaluator is not None and hasattr(
@@ -2650,11 +2680,6 @@ def _has_effective_pressure_reference_fit_evidence(
     )
 
 
-_LIVE_ANTOINE_CONTEXT_CACHE: (
-    tuple[tuple[int, int], frozenset[tuple[object, ...]]] | None
-) = None
-
-
 _OXYGEN_FUGACITY_CHANNELS = frozenset(
     {"intrinsic_melt", "transport_headspace"}
 )
@@ -2818,97 +2843,135 @@ def _bound_effective_fit_context(
     )
 
 
-def _live_evidenced_antoine_contexts() -> frozenset[tuple[object, ...]]:
-    """Effective Antoine fits whose checked-in row binds evidence to that species.
+def _evidenced_antoine_contexts(
+    catalog: Mapping[str, Any],
+) -> tuple[tuple[object, ...], ...]:
+    """Evidenced Antoine fits carried by this catalog mapping.
 
-    Historic snapshots keep the same species, melt basis, coefficients, and
-    oxygen multiplier after provenance was added to the live row. The lookup
-    reads that row. It does not lend the fit to any other species, parent
-    oxide, or oxygen law.
+    The records are the species, melt basis, coefficients, temperature
+    domain, and stored oxygen multiplier. A row qualifies only when it
+    already has provenance, residual, and anchors. This does not read a file.
     """
 
-    global _LIVE_ANTOINE_CONTEXT_CACHE
-    path = Path(__file__).resolve().parents[2] / "data" / "vapor_pressures.yaml"
-    try:
-        stat = path.stat()
-    except OSError:
-        return frozenset()
-    signature = (stat.st_mtime_ns, stat.st_size)
-    if (
-        _LIVE_ANTOINE_CONTEXT_CACHE is not None
-        and _LIVE_ANTOINE_CONTEXT_CACHE[0] == signature
-    ):
-        return _LIVE_ANTOINE_CONTEXT_CACHE[1]
-    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
-    contexts: set[tuple[object, ...]] = set()
-    families = payload.get("families") if isinstance(payload, Mapping) else None
-    if isinstance(families, Mapping):
-        for family in families.values():
-            if not isinstance(family, Mapping):
+    contexts: list[tuple[object, ...]] = []
+    families = catalog.get("families")
+    if not isinstance(families, Mapping):
+        return ()
+    for family in families.values():
+        if not isinstance(family, Mapping):
+            continue
+        physical = family.get("physical_properties")
+        if not isinstance(physical, Mapping):
+            continue
+        species_rows = physical.get("species")
+        if not isinstance(species_rows, Mapping):
+            continue
+        code = family.get("code_metadata")
+        source_account = ""
+        if isinstance(code, Mapping) and isinstance(code.get("source_account"), str):
+            source_account = code["source_account"]
+        for species_id, row in species_rows.items():
+            if not isinstance(row, Mapping):
                 continue
-            physical = family.get("physical_properties")
-            if not isinstance(physical, Mapping):
+            models = row.get("pressure_models")
+            if not isinstance(models, list) or len(models) != 1:
                 continue
-            species_rows = physical.get("species")
-            if not isinstance(species_rows, Mapping):
+            if not isinstance(models[0], Mapping):
                 continue
-            code = family.get("code_metadata")
-            source_account = ""
-            if isinstance(code, Mapping) and isinstance(code.get("source_account"), str):
-                source_account = code["source_account"]
-            for species_id, row in species_rows.items():
-                if not isinstance(row, Mapping):
-                    continue
-                models = row.get("pressure_models")
-                if not isinstance(models, list) or len(models) != 1:
-                    continue
-                if not isinstance(models[0], Mapping):
-                    continue
-                model = models[0]
-                if model.get("activity_semantics") != "effective_pressure_reference_fit":
-                    continue
-                exponent = model.get("activity_exponent", 0.0)
-                if exponent not in (0, 0.0, None, ""):
-                    continue
-                validation = row.get("validation")
-                if not isinstance(validation, Mapping):
-                    continue
-                try:
-                    observable, bounds = _model_surface(str(species_id), model)
-                    anchor_refs = _anchor_refs_from_validation(
-                        validation, str(species_id)
-                    )
-                except CatalogCompileError:
-                    continue
-                if not _has_effective_pressure_reference_fit_evidence(
-                    species_id=str(species_id),
-                    row=row,
-                    model=model,
-                    validation_anchor_refs=anchor_refs,
-                ):
-                    continue
-                context = _bound_effective_fit_context(
-                    species_id=str(species_id),
-                    formula=row.get("formula"),
-                    parent_oxide=row.get("parent_oxide"),
-                    source_account=source_account,
-                    species_basis=model.get("species_basis"),
-                    model=model,
-                    evaluator_family=str(model.get("evaluator_family") or ""),
-                    coefficients=model.get("coefficients")
-                    if isinstance(model.get("coefficients"), Mapping)
-                    else {},
-                    observable=observable,
-                    valid_temperature_K=bounds,
+            model = models[0]
+            if model.get("activity_semantics") != "effective_pressure_reference_fit":
+                continue
+            exponent = model.get("activity_exponent", 0.0)
+            if exponent not in (0, 0.0, None, ""):
+                continue
+            validation = row.get("validation")
+            if not isinstance(validation, Mapping):
+                continue
+            try:
+                observable, bounds = _model_surface(str(species_id), model)
+                anchor_refs = _anchor_refs_from_validation(
+                    validation, str(species_id)
                 )
-                if context is not None:
-                    contexts.add(context)
-    found = frozenset(contexts)
-    _LIVE_ANTOINE_CONTEXT_CACHE = (signature, found)
-    return found
+            except CatalogCompileError:
+                continue
+            if not _has_effective_pressure_reference_fit_evidence(
+                species_id=str(species_id),
+                row=row,
+                model=model,
+                validation_anchor_refs=anchor_refs,
+            ):
+                continue
+            context = _bound_effective_fit_context(
+                species_id=str(species_id),
+                formula=row.get("formula"),
+                parent_oxide=row.get("parent_oxide"),
+                source_account=source_account,
+                species_basis=model.get("species_basis"),
+                model=model,
+                evaluator_family=str(model.get("evaluator_family") or ""),
+                coefficients=model.get("coefficients")
+                if isinstance(model.get("coefficients"), Mapping)
+                else {},
+                observable=observable,
+                valid_temperature_K=bounds,
+            )
+            if context is not None:
+                contexts.append(context)
+    return tuple(sorted(contexts))
 
 
-def _matches_live_bound_effective_fit(
+def bound_effective_fit_evidence(
+    catalog: Mapping[str, Any],
+) -> tuple[tuple[object, ...], ...]:
+    """Evidence records to pass as ``bound_effective_fits``.
+
+    Resolve this once from the catalog payload the caller trusts. Compile
+    does not open ``data/vapor_pressures.yaml``.
+    """
+
+    if not isinstance(catalog, Mapping):
+        raise CatalogCompileError(
+            "bound_effective_fit_evidence catalog must be a mapping"
+        )
+    return _evidenced_antoine_contexts(catalog)
+
+
+def _normalize_bound_effective_fits(
+    fits: Sequence[tuple[object, ...]] | None,
+) -> tuple[tuple[object, ...], ...] | None:
+    """Stable request identity for ``bound_effective_fits``.
+
+    ``None`` and an empty sequence are the same request: no external fit
+    may be reused, and the cache key omits the field. A non-empty sequence
+    must already be the tuples :func:`bound_effective_fit_evidence` returns.
+    """
+
+    if fits is None:
+        return None
+    if isinstance(fits, (str, bytes)) or not isinstance(fits, Sequence):
+        raise CatalogCompileError(
+            "bound_effective_fits must be a sequence of fit evidence records"
+        )
+    records: list[tuple[object, ...]] = []
+    for item in fits:
+        if not isinstance(item, tuple):
+            raise CatalogCompileError(
+                "bound_effective_fits records must be tuples from "
+                "bound_effective_fit_evidence"
+            )
+        records.append(item)
+    if not records:
+        return None
+    try:
+        ordered = tuple(sorted(records))
+    except TypeError as exc:
+        raise CatalogCompileError(
+            "bound_effective_fits records cannot be ordered"
+        ) from exc
+    return ordered
+
+
+def _matches_bound_effective_fit(
     *,
     species_id: str,
     formula: object,
@@ -2920,7 +2983,10 @@ def _matches_live_bound_effective_fit(
     coefficients: Mapping[str, Any],
     observable: PressureObservable,
     valid_temperature_K: tuple[float, float],
+    bound_effective_fits: frozenset[tuple[object, ...]],
 ) -> bool:
+    if not bound_effective_fits:
+        return False
     context = _bound_effective_fit_context(
         species_id=species_id,
         formula=formula,
@@ -2933,7 +2999,7 @@ def _matches_live_bound_effective_fit(
         observable=observable,
         valid_temperature_K=valid_temperature_K,
     )
-    return context is not None and context in _live_evidenced_antoine_contexts()
+    return context is not None and context in bound_effective_fits
 
 
 def _effective_pressure_reference_fit_is_evidenced(
@@ -2943,6 +3009,7 @@ def _effective_pressure_reference_fit_is_evidenced(
     model: Mapping[str, Any],
     validation_anchor_refs: tuple[str, ...],
     source_account: str,
+    bound_effective_fits: frozenset[tuple[object, ...]],
 ) -> bool:
     if _has_effective_pressure_reference_fit_evidence(
         species_id=species_id,
@@ -2961,7 +3028,7 @@ def _effective_pressure_reference_fit_is_evidenced(
         reference = _compile_reference_model(species_id, model)
     except CatalogCompileError:
         return False
-    return _matches_live_bound_effective_fit(
+    return _matches_bound_effective_fit(
         species_id=species_id,
         formula=row.get("formula"),
         parent_oxide=row.get("parent_oxide"),
@@ -2972,6 +3039,7 @@ def _effective_pressure_reference_fit_is_evidenced(
         coefficients=reference.coefficients,
         observable=observable,
         valid_temperature_K=bounds,
+        bound_effective_fits=bound_effective_fits,
     )
 
 
@@ -2999,6 +3067,7 @@ def _verified_gas_association_base_has_fit_evidence(
     evaluator: CompiledPressureEvaluator,
     species_rows_by_id: Mapping[str, Mapping[str, Any]],
     species_source_account_by_id: Mapping[str, str],
+    bound_effective_fits: frozenset[tuple[object, ...]],
 ) -> bool:
     """True when evaluate() runs an evidenced base, not merely names one."""
 
@@ -3048,6 +3117,7 @@ def _verified_gas_association_base_has_fit_evidence(
         model=base_model,
         validation_anchor_refs=base_anchor_refs,
         source_account=species_source_account_by_id.get(base_species_id, ""),
+        bound_effective_fits=bound_effective_fits,
     ):
         return False
 
@@ -3072,6 +3142,7 @@ def _zero_activity_melt_executable_is_evidenced(
     source_account: str,
     species_rows_by_id: Mapping[str, Mapping[str, Any]],
     species_source_account_by_id: Mapping[str, str],
+    bound_effective_fits: frozenset[tuple[object, ...]],
 ) -> bool:
     """Admit cleaned-melt activity exponent 0 only for a bound evidenced fit.
 
@@ -3083,12 +3154,12 @@ def _zero_activity_melt_executable_is_evidenced(
     residual, and anchors; a gas-association composite whose captured base is
     such a fit for the named base species; or this species' own Antoine law
     (formula, parent oxide, source account, species basis, coefficients,
-    temperature domain, and the stored oxygen multiplier) matching a live
-    catalog row that carries the evidence. Copying another species' A, B, and
-    C is not evidence. Keeping those coefficients while changing
-    ``pO2_exponent``, ``pO2_reference_bar``, or the oxygen channel is not
-    evidence either. ``composition_mode`` and an embedded coefficient block
-    the executable evaluator does not call are not evidence.
+    temperature domain, and the stored oxygen multiplier) matching a record
+    in ``bound_effective_fits``. Copying another species' A, B, and C is not
+    evidence. Keeping those coefficients while changing ``pO2_exponent``,
+    ``pO2_reference_bar``, or the oxygen channel is not evidence either.
+    ``composition_mode`` and an embedded coefficient block the executable
+    evaluator does not call are not evidence.
     """
 
     if _verified_gas_association_base_has_fit_evidence(
@@ -3097,6 +3168,7 @@ def _zero_activity_melt_executable_is_evidenced(
         evaluator=evaluator,
         species_rows_by_id=species_rows_by_id,
         species_source_account_by_id=species_source_account_by_id,
+        bound_effective_fits=bound_effective_fits,
     ):
         return True
     if _has_effective_pressure_reference_fit_evidence(
@@ -3109,7 +3181,7 @@ def _zero_activity_melt_executable_is_evidenced(
     reference = evaluator.reference_model
     if reference.physical_composite_ood or reference.thermo_log10_pressure is not None:
         return False
-    return _matches_live_bound_effective_fit(
+    return _matches_bound_effective_fit(
         species_id=species_id,
         formula=row.get("formula"),
         parent_oxide=row.get("parent_oxide"),
@@ -3120,6 +3192,7 @@ def _zero_activity_melt_executable_is_evidenced(
         coefficients=reference.coefficients,
         observable=evaluator.pressure_observable,
         valid_temperature_K=evaluator.valid_temperature_K,
+        bound_effective_fits=bound_effective_fits,
     )
 
 
@@ -3133,6 +3206,7 @@ def _compile_source_reaction_activity(
     validation_anchor_refs: tuple[str, ...],
     species_rows_by_id: Mapping[str, Mapping[str, Any]],
     species_source_account_by_id: Mapping[str, str],
+    bound_effective_fits: frozenset[tuple[object, ...]],
 ) -> tuple[str | None, ActivityInputDeclaration | None]:
     """Compile the activity-input declaration stored on one compiled species.
 
@@ -3206,6 +3280,7 @@ def _compile_source_reaction_activity(
             source_account=source_account,
             species_rows_by_id=species_rows_by_id,
             species_source_account_by_id=species_source_account_by_id,
+            bound_effective_fits=bound_effective_fits,
         ):
             raise CatalogCompileError(
                 f"{species_id}: effective-pressure reference fit requires "
@@ -3217,8 +3292,8 @@ def _compile_source_reaction_activity(
                 "evidence-backed fit, or this species' Antoine law bound to "
                 "the same formula, parent oxide, source account, species "
                 "basis, and oxygen multiplier (pO2_exponent, "
-                "pO2_reference_bar, oxygen_fugacity_channel) as a live "
-                "evidenced fit"
+                "pO2_reference_bar, oxygen_fugacity_channel) as a record "
+                "in bound_effective_fits"
             )
 
     if evaluator is not None and (
