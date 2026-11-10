@@ -99,7 +99,7 @@ PROFILE = {
     ],
     "constraints": {"gates": ["delivered_stream_purity"]},
     "run": {
-        "campaign": "C0",
+        "campaign": "C2A_continuous",
         "hours": 1,
         "mass_kg": 1000.0,
         "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -142,6 +142,8 @@ def _run_reference(**kwargs: Any) -> RunReference:
 def _write_cli_physics_smoke_profile(tmp_path: Path) -> Path:
     profile = copy.deepcopy(PROFILE)
     profile["profile_id"] = "cli-physics-smoke"
+    # This smoke run is a real C0 campaign. C2A would change the furnace path.
+    profile["run"]["campaign"] = "C0"
     # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
     profile["run"]["allow_unmeasured_alpha_fallback"] = True
     profile["constraints"] = {
@@ -2910,8 +2912,8 @@ def test_default_profile_leaderboard_uses_scoped_energy_metric_and_legacy_alias(
         expected_feedstock=FEEDSTOCK,
     )
     definitions = study.objective_definitions(profile)
+    # C0 claims volatiles and native_Fe, not O2, so oxygen_kg is withheld.
     assert [definition.metric for definition in definitions] == [
-        "oxygen_kg",
         ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
         "duration_h",
     ]
@@ -3632,7 +3634,19 @@ def test_study_hands_knob_saturation_to_next_bayesian_ask(
         assert knob.path in result.records[2].patch.values
 
 
-def test_best_tap_winner_recipe_replays_tap_claim_through_eval_path(tmp_path) -> None:
+def test_best_tap_winner_recipe_replays_tap_claim_through_eval_path(
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # C0b's duration bound is what this tap replay pins. C0b does not claim a
+    # ceramic product, so claim the glass the composition target is scoring.
+    from simulator.optimize import objective as objective_module
+
+    monkeypatch.setattr(
+        objective_module,
+        "campaign_product_claim_keys",
+        lambda _campaign_id: frozenset({"CMAS_glass", "Fe"}),
+    )
     profile = _closed_loop_best_tap_profile()
     executor = _ClosedLoopTapExecutor()
 

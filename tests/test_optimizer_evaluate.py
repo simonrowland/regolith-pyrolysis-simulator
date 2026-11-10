@@ -156,6 +156,14 @@ PROFILE = {
 }
 
 
+def _product_claiming_profile() -> dict:
+    """C2A claims SiO2 glass and O2, so those rows stay on the score."""
+
+    profile = copy.deepcopy(PROFILE)
+    profile["run"] = {**profile["run"], "campaign": "C2A_continuous"}
+    return profile
+
+
 @dataclass
 class FakeExecutor:
     execution: object | None = None
@@ -1791,6 +1799,9 @@ def _composition_eval_profile(
             }
         ],
     }
+    # A composition-only vector needs a campaign that claims a ceramic or metal
+    # product. C0 does not. Copy run so the shared PROFILE stays C0.
+    profile["run"] = {**PROFILE["run"], "campaign": "C2A_continuous"}
     return profile
 
 
@@ -2474,11 +2485,12 @@ def test_failed_runtime_backend_prefixed_message_is_engine_bug() -> None:
 
 
 def test_completed_infeasible_run_retains_derived_objectives() -> None:
+    profile = _product_claiming_profile()
     feasible = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(_execution()),
     )
 
@@ -2500,14 +2512,14 @@ def test_completed_infeasible_run_retains_derived_objectives() -> None:
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(mixed_stream_execution),
     )
     same_run_without_purity_gate = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(mixed_stream_execution),
         constraints=PhysicsConstraintSet(active_gates=("knudsen_viscous",)),
     )
@@ -2590,11 +2602,12 @@ def _switched_silica_snapshots(
 
 
 def test_silica_objective_separates_route_from_authority_and_refuses_unavailable() -> None:
+    profile = _product_claiming_profile()
     unqualified = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(_execution()),
     )
     assert unqualified.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(0.0)
@@ -2609,7 +2622,7 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(qualified_execution),
     )
     assert qualified.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
@@ -2626,7 +2639,7 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(flagged_execution),
     )
     assert flagged.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
@@ -2649,7 +2662,7 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(refused_execution),
     )
     assert refused.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
@@ -2708,7 +2721,7 @@ def test_pO2_enforcement_rows_surface_in_optimizer_result_artifact() -> None:
 
 
 def test_objective_definitions_keep_profile_order_as_ordinal() -> None:
-    definitions = objective_definitions(PROFILE)
+    definitions = objective_definitions(_product_claiming_profile())
 
     assert [(definition.metric, definition.sense, definition.ordinal) for definition in definitions] == [
         ("pure_silica_glass_kg", "maximize", 0),
@@ -4771,7 +4784,7 @@ def test_out_of_domain_earned_rump_with_wall_deposit_is_excluded_by_coating_gate
         "completeness_min": {"Si": 1.0e-12},
     }
     target["score_weights"] = {"extraction": 0.5, "composition": 0.5}
-    profile["run"] = {**PROFILE["run"], "backend_name": "alphamelts"}
+    profile["run"] = {**profile["run"], "backend_name": "alphamelts"}
     profile["fidelities"] = {"high": {"backend_name": "alphamelts", "hours": 1}}
     execution = _execution(
         trace=trace,

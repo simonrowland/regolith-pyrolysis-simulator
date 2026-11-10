@@ -317,6 +317,12 @@ def test_product_class_mass_evidence_serializes_metric_and_source_path(
         "classify_products",
         lambda sim, *, early_tap_mode=False: product_classes,
     )
+    # No shipped campaign claims both of these classes together.
+    monkeypatch.setattr(
+        objective_module,
+        "campaign_product_claim_keys",
+        lambda _campaign_id: frozenset({"CMAS_glass", "refractory_ceramic_rump"}),
+    )
     profile = {
         "objectives": [
             {
@@ -2681,6 +2687,7 @@ def _sso2_objective_profile(*, stream_purity_min: float = 0.95) -> dict:
             "gates": ["delivered_stream_purity"],
             "stream_purity_min": stream_purity_min,
         },
+        "run": {"campaign": "C2A_continuous", "hours": 1, "mass_kg": 1000.0},
     }
 
 
@@ -3987,7 +3994,7 @@ def _composition_score_profile(
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
-        "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "internal-analytical"},
+        "run": {"campaign": "C2A_continuous", "hours": 1, "mass_kg": 1000.0, "backend_name": "internal-analytical"},
         "fidelities": {"internal-analytical": {"backend_name": "internal-analytical", "hours": 1}},
         "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
     }

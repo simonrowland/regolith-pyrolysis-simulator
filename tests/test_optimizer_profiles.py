@@ -978,6 +978,11 @@ def _composition_profile() -> dict:
         if gate not in {"delivered_stream_purity", "knudsen_viscous"}
     ]
     profile["profile_id"] = "composition-target-profile-test"
+    # C0 claims no ceramic product, so a composition-only vector would be
+    # withheld and validation would stop before these target checks. C2B
+    # claims CMAS glass and Fe, which authorize a composition target, and it
+    # does not pick up the copied C2A thermal-window seed.
+    profile["run"]["campaign"] = "C2B"
     profile["objectives"] = [
         {
             "type": "composition_target",

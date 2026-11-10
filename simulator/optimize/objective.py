@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import replace
+from functools import lru_cache
 import fnmatch
 import hashlib
 import math
@@ -20,7 +21,7 @@ from simulator.cost_parameters import (
     CostParameters,
     cost_parameters_from_mapping,
 )
-from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.config import DEFAULT_DATA_DIR, _load_setpoints_file, load_config_bundle
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.physics import (
@@ -96,16 +97,53 @@ _MASS_OBJECTIVE_METRICS = frozenset(
         "oxygen_vented_kg",
     }
 )
-# data/setpoints.yaml campaigns.C0 claims volatiles and native Fe only.
-# INVARIANT: a C0 smoke profile never scores a final product. The withheld
-# set is the whole mass-product registry plus the Stage-3 silica certification
-# score. Composition-target rows are the same claim and are withheld with them.
-# A withheld metric is absent from every scoring path. It is never a 0.0.
-_C0_UNCLAIMED_PRODUCT_METRICS = frozenset(
+# INVARIANT: a product objective is scored only when the evaluated campaign's
+# setpoints ``products`` claim it. Otherwise it is withheld from every scoring
+# path (objective definitions, compute_objectives, strategy metrics, and the
+# study scalar). It is never entered as 0.0. Retained weights stay declared.
+# The notice names each withheld objective, its weight, the reason
+# campaign_does_not_claim_product, and the withheld weight fraction.
+# Eligibility is those product-claim keys, never description text.
+# C0 claims volatiles and native_Fe only. native_Fe is nanophase magnetic
+# separation, not the pyrolysis metal product, so it authorizes no metric here.
+_FINAL_PRODUCT_OBJECTIVE_METRICS = frozenset(
     _MASS_OBJECTIVE_METRICS | {SSO2_OWNER_RECIPE_ID}
 )
-_C0_SMOKE_LABEL_PREFIX = "C0 SMOKE ONLY:"
 _C0_WITHHOLD_REASON = "campaign_does_not_claim_product"
+# Same keys as profiles._SETPOINT_CAMPAIGN_ALIASES. Duplicated because that
+# module imports this one.
+_SETPOINT_CAMPAIGN_ALIASES = MappingProxyType({
+    "C2A": "C2A_continuous",
+    "C2A_staged": "C2A_staged",
+    "C3_K": "C3",
+    "C3_NA": "C3",
+})
+_METAL_PRODUCT_CLAIM_KEYS = frozenset({"Fe", "Mg", "Ti"})
+_OBJECTIVE_PRODUCT_CLAIM_KEYS = MappingProxyType({
+    "pure_silica_glass_kg": frozenset({"SiO2_glass"}),
+    "industrial_mixed_glass_kg": frozenset({
+        "CMAS_glass",
+        "industrial_mixed_glass",
+    }),
+    "refractory_ceramic_rump_kg": frozenset({"refractory_ceramic_rump"}),
+    "metals_total_kg": _METAL_PRODUCT_CLAIM_KEYS,
+    "O2_kg": frozenset({"O2"}),
+    "o2_kg": frozenset({"O2"}),
+    "oxygen_kg": frozenset({"O2"}),
+    "oxygen_stored_kg": frozenset({"O2"}),
+    "oxygen_vented_kg": frozenset({"O2"}),
+    SSO2_OWNER_RECIPE_ID: frozenset({"SiO2_glass"}),
+})
+# Composition-target rows are the same final-product claim. Shuttle volatiles
+# and native_Fe do not authorize them.
+_COMPOSITION_AUTHORIZING_CLAIM_KEYS = frozenset({
+    "SiO2_glass",
+    "CMAS_glass",
+    "industrial_mixed_glass",
+    "refractory_ceramic_rump",
+    *_METAL_PRODUCT_CLAIM_KEYS,
+    "O2",
+})
 PRODUCT_CLASS_MASS_METRIC_PATHS = MappingProxyType(
     {
         "industrial_mixed_glass_kg": (
@@ -1337,60 +1375,130 @@ def _require_objective_keys(
         )
 
 
-def is_c0_smoke_profile(profile: Mapping[str, Any]) -> bool:
-    """True when a C0 run is explicitly labeled as a screening smoke profile."""
+def evaluated_campaign_id(profile: Mapping[str, Any]) -> str | None:
+    """Campaign the profile evaluates, or None when it names none."""
 
     run = profile.get("run")
-    campaign = ""
-    if isinstance(run, Mapping):
-        campaign = str(run.get("campaign") or "")
-    if campaign != "C0":
-        return False
-    description = profile.get("description")
-    emphasis = profile.get("objective_emphasis")
-    return (
-        isinstance(description, str)
-        and description.startswith(_C0_SMOKE_LABEL_PREFIX)
-        and isinstance(emphasis, str)
-        and emphasis.startswith(_C0_SMOKE_LABEL_PREFIX)
-    )
+    if not isinstance(run, Mapping):
+        return None
+    campaign = run.get("campaign")
+    if not isinstance(campaign, str) or not campaign.strip():
+        return None
+    return campaign.strip()
 
 
-def _metric_is_unclaimed_final_product(metric: str) -> bool:
-    """True when this metric is a product C0 does not claim."""
+@lru_cache(maxsize=1)
+def _campaign_product_claims_by_id() -> Mapping[str, frozenset[str]]:
+    loaded = _load_setpoints_file(DEFAULT_DATA_DIR / "setpoints.yaml")
+    campaigns = loaded.get("campaigns")
+    claims: dict[str, frozenset[str]] = {}
+    if isinstance(campaigns, Mapping):
+        for name, cfg in campaigns.items():
+            products = cfg.get("products") if isinstance(cfg, Mapping) else None
+            if isinstance(products, Mapping):
+                claims[str(name)] = frozenset(str(key) for key in products)
+            else:
+                claims[str(name)] = frozenset()
+    return MappingProxyType(claims)
 
+
+def campaign_product_claim_keys(campaign_id: str | None) -> frozenset[str]:
+    """Product keys declared on ``campaigns.<id>.products`` in setpoints.
+
+    An absent, blank, or unknown campaign claims nothing. Description text is
+    not consulted.
+    """
+
+    if not isinstance(campaign_id, str) or not campaign_id.strip():
+        return frozenset()
+    key = _SETPOINT_CAMPAIGN_ALIASES.get(campaign_id.strip(), campaign_id.strip())
+    return _campaign_product_claims_by_id().get(key, frozenset())
+
+
+def _profile_product_claim_keys(profile: Mapping[str, Any]) -> frozenset[str]:
+    return campaign_product_claim_keys(evaluated_campaign_id(profile))
+
+
+def _metric_requires_product_claim(metric: str) -> bool:
     canonical = canonical_objective_metric(metric)
     return (
-        canonical in _C0_UNCLAIMED_PRODUCT_METRICS
+        canonical in _FINAL_PRODUCT_OBJECTIVE_METRICS
         or canonical.startswith(COMPOSITION_TARGET_METRIC_PREFIX)
     )
 
 
-def _row_is_unclaimed_final_product(raw: object) -> bool:
+def campaign_claims_product_objective(
+    metric: str,
+    claim_keys: frozenset[str],
+    *,
+    composition: bool = False,
+) -> bool:
+    """True when ``claim_keys`` authorize this product objective.
+
+    ``metals_plus_o2_kg`` is the combined class, so it needs both a metal
+    claim and ``O2``. One of the two is not that product.
+    """
+
+    if composition or canonical_objective_metric(metric).startswith(
+        COMPOSITION_TARGET_METRIC_PREFIX
+    ):
+        return bool(claim_keys & _COMPOSITION_AUTHORIZING_CLAIM_KEYS)
+    canonical = canonical_objective_metric(metric)
+    if canonical == "metals_plus_o2_kg":
+        return "O2" in claim_keys and bool(claim_keys & _METAL_PRODUCT_CLAIM_KEYS)
+    required = _OBJECTIVE_PRODUCT_CLAIM_KEYS.get(canonical)
+    if required is None:
+        return not _metric_requires_product_claim(canonical)
+    return bool(claim_keys & required)
+
+
+def _metric_is_withheld_product(metric: str, claim_keys: frozenset[str]) -> bool:
+    if not _metric_requires_product_claim(metric):
+        return False
+    return not campaign_claims_product_objective(metric, claim_keys)
+
+
+def _row_is_withheld_product(raw: object, claim_keys: frozenset[str]) -> bool:
     if not isinstance(raw, Mapping):
         return False
     if objective_type(raw) == COMPOSITION_TARGET_TYPE:
-        return True
-    return _metric_is_unclaimed_final_product(str(raw.get("metric", "")))
+        return not campaign_claims_product_objective(
+            str(raw.get("metric", "")),
+            claim_keys,
+            composition=True,
+        )
+    return _metric_is_withheld_product(str(raw.get("metric", "")), claim_keys)
 
 
 def _format_declared_number(value: float) -> str:
     return format(value, ".12g")
 
 
-def _c0_smoke_objective_evidence(
+def _declared_objective_evidence(
     profile: Mapping[str, Any],
 ) -> tuple[ObjectiveImportanceEvidence, ...] | None:
-    """Declared objective rows when this profile is a C0 smoke screen."""
-
-    if not is_c0_smoke_profile(profile):
-        return None
-    if not isinstance(profile.get("objectives"), (list, tuple)):
+    raw_objectives = profile.get("objectives")
+    if not isinstance(raw_objectives, (list, tuple)) or not raw_objectives:
         return None
     return objective_importance_evidence(profile)
 
 
-def c0_smoke_withheld_weight_fraction(profile: Mapping[str, Any]) -> float | None:
+def _withheld_evidence_rows(
+    profile: Mapping[str, Any],
+) -> tuple[tuple[ObjectiveImportanceEvidence, ...], tuple[ObjectiveImportanceEvidence, ...]] | None:
+    evidence = _declared_objective_evidence(profile)
+    if evidence is None:
+        return None
+    claim_keys = _profile_product_claim_keys(profile)
+    withheld = tuple(
+        row for row in evidence if _metric_is_withheld_product(row.metric, claim_keys)
+    )
+    return evidence, withheld
+
+
+def unclaimed_product_withheld_weight_fraction(
+    profile: Mapping[str, Any],
+) -> float | None:
     """Share of declared objective weight withheld from the study scalar.
 
     withheld_weight_fraction = sum(withheld weights) / sum(all declared weights).
@@ -1398,12 +1506,10 @@ def c0_smoke_withheld_weight_fraction(profile: Mapping[str, Any]) -> float | Non
     (1 - this fraction).
     """
 
-    evidence = _c0_smoke_objective_evidence(profile)
-    if evidence is None:
+    rows = _withheld_evidence_rows(profile)
+    if rows is None:
         return None
-    withheld_rows = [
-        row for row in evidence if _metric_is_unclaimed_final_product(row.metric)
-    ]
+    evidence, withheld_rows = rows
     if not withheld_rows:
         return None
     total = math.fsum(row.weight for row in evidence)
@@ -1411,16 +1517,16 @@ def c0_smoke_withheld_weight_fraction(profile: Mapping[str, Any]) -> float | Non
     return withheld / total
 
 
-def c0_smoke_withheld_objective_note(profile: Mapping[str, Any]) -> str | None:
+def unclaimed_product_withheld_objective_note(
+    profile: Mapping[str, Any],
+) -> str | None:
     """Visible notice: each withheld objective, its weight, and the reason."""
 
-    evidence = _c0_smoke_objective_evidence(profile)
-    if evidence is None:
+    rows = _withheld_evidence_rows(profile)
+    if rows is None:
         return None
-    withheld_rows = [
-        row for row in evidence if _metric_is_unclaimed_final_product(row.metric)
-    ]
-    fraction = c0_smoke_withheld_weight_fraction(profile)
+    _evidence, withheld_rows = rows
+    fraction = unclaimed_product_withheld_weight_fraction(profile)
     if not withheld_rows or fraction is None:
         return None
     parts = [
@@ -1441,17 +1547,19 @@ def _scoring_objective_rows(profile: Mapping[str, Any]) -> Any:
     """Rows that enter the scored vector.
 
     One chokepoint: objective definitions, ``compute_objectives``, strategy
-    metrics, and the study scalar all read this list. C0 smoke profiles drop
-    every final-product row. There is no flag that puts one back.
+    metrics, and the study scalar all read this list. A product objective the
+    evaluated campaign does not claim is dropped here. There is no flag that
+    puts one back, and description text is not read.
     """
 
     raw_objectives = profile.get("objectives")
-    if not is_c0_smoke_profile(profile):
-        return raw_objectives
     if not isinstance(raw_objectives, (list, tuple)):
         return raw_objectives
+    claim_keys = _profile_product_claim_keys(profile)
     return [
-        raw for raw in raw_objectives if not _row_is_unclaimed_final_product(raw)
+        raw
+        for raw in raw_objectives
+        if not _row_is_withheld_product(raw, claim_keys)
     ]
 
 
