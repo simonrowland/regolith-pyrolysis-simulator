@@ -23,6 +23,7 @@ from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.battery.enums import Engine, ProprietaryEngineRefusal
 from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -369,6 +370,80 @@ def test_raw_profile_mapping_unknown_key_raises_before_run() -> None:
             profile=bad_profile,
             executor=executor,
         )
+
+    assert executor.calls == 0
+
+
+def _proprietary_optimizer_profile() -> dict:
+    profile = copy.deepcopy(PROFILE)
+    profile["run"]["backend_name"] = Engine.PROPRIETARY_REMOTE.value
+    profile["fidelities"]["fast"]["backend_name"] = (
+        Engine.PROPRIETARY_REMOTE.value
+    )
+    return profile
+
+
+def test_proprietary_engine_is_refused_by_direct_evaluate_before_executor() -> None:
+    executor = FakeExecutor(
+        execution=_execution(backend_status="ok", backend_authoritative=True)
+    )
+
+    with pytest.raises(ProprietaryEngineRefusal):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=_proprietary_optimizer_profile(),
+            executor=executor,
+        )
+
+    assert executor.calls == 0
+
+
+def test_verify_imported_study_reaches_proprietary_evaluate_guard(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    from simulator.optimize import import_bundle as import_bundle_module
+
+    candidate = {
+        "cache_key": "cache-a",
+        "candidate_id": "candidate-a",
+        "patch_json": "{}",
+    }
+    monkeypatch.setattr(
+        import_bundle_module,
+        "verify_import_hashes",
+        lambda root: {"verdict": "confirmed"},
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_enforce_import_safety_caps",
+        lambda root: {"leaderboard": [], "rows_by_cache_key": {}},
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_selected_verification_candidates",
+        lambda root, *, top_n, leaderboard: [candidate],
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_load_profile",
+        lambda path: _proprietary_optimizer_profile(),
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_imported_claim",
+        lambda candidate, imported_row: {"identity": {"cost_parameters": None}},
+    )
+    monkeypatch.setattr(import_bundle_module, "_load_json_object", lambda path: {})
+    executor = FakeExecutor(
+        execution=_execution(backend_status="ok", backend_authoritative=True)
+    )
+    monkeypatch.setattr(evaluate_module, "RunExecutor", lambda: executor)
+
+    with pytest.raises(ProprietaryEngineRefusal):
+        import_bundle_module.verify_imported_study(tmp_path)
 
     assert executor.calls == 0
 
