@@ -20,11 +20,11 @@
     "terminal.oxygen_mre_anode_stored",
   ]);
   // Campaign → stage glow is a designed-route cue only (not emitted activity).
-  // C3_K/C3_NA are alkali-shuttle reagents; product destinations are Fe/Cr
-  // condenser stages and Ti metal-phase — not Stage 4 (see PRODUCT_DESTINATIONS).
+  // C3 Fe exits through the drain tap; C3_NA Cr still routes to Stage 2 and Ti
+  // stays in the metal phase (see PRODUCT_DESTINATIONS).
   const STAGES = Object.freeze([
     { key: "stage_0", label: "Hot Duct (IR)", campaigns: ["C0", "C0B"] },
-    { key: "stage_1_fe_condenser", label: "Fe Condenser", campaigns: ["C2B", "C3_K", "C3_NA"], productSpecies: ["Fe"] },
+    { key: "stage_1_fe_condenser", label: "Fe Condenser", campaigns: ["C2B"], productSpecies: ["Fe"] },
     { key: "stage_2_cr_oxide_harvest", label: "Cr Oxide Harvester", campaigns: ["C3_NA"], productSpecies: ["Cr", "CrO2"] },
     { key: "stage_3_sio_zone", label: "SiO Zone", campaigns: ["C2A", "C2A_STAGED"], productSpecies: ["SiO", "SiO2"] },
     { key: "stage_4_alkali_mg_cyclone", label: "Alkali/Mg Cyclone", campaigns: ["C4"], productSpecies: ["Na", "Mg"] },
@@ -33,9 +33,10 @@
     { key: "stage_6", label: "Turbine-Compressor", campaigns: [] },
     { key: "stage_7", label: "Turbine Outlet Monitor", campaigns: [] },
   ]);
-  // Extra non-condenser destinations for multi-product campaigns (honest cue text).
+  // Extra non-condenser destinations (honest cue text).
   const CAMPAIGN_NON_CONDENSER_NOTES = Object.freeze({
-    C3_NA: "Ti metal-phase (non-condenser)",
+    C3_K: "Fe drain tap (non-condenser)",
+    C3_NA: "Fe drain tap + Ti metal-phase (non-condenser)",
   });
 
   const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
@@ -230,7 +231,7 @@
           ? ` · reason: ${silicaUnavailableReason}`
           : ""}`
         : "Terminal product-destination classification pending — not emitted";
-      return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label} · terminal product-destination classification; includes stage-routed tap metal; not condenser inventory${activeText}`)}">` +
+      return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label} · terminal product-destination classification; not condenser inventory${activeText}`)}">` +
         `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
         `<h4>${esc(label)}</h4>${routeNote}<div class="sec-p15-inline-pending">${esc(pendingMessage)}</div>` +
         `</article>`;
@@ -292,7 +293,7 @@
     const purityMetric = isIndeterminate || stage.purity_fraction === null
       ? `<div class="sec-p15-metric"><span>Emitted purity fraction</span><strong>no material</strong></div>`
       : metric("Emitted purity fraction", stage.purity_fraction, "", { min: 0, max: 1 });
-    return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label} · terminal product-destination classification; includes stage-routed tap metal; not condenser inventory${activeText}`)}">` +
+    return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label} · terminal product-destination classification; not condenser inventory${activeText}`)}">` +
       `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
       `<h4>${esc(label)}</h4>${routeNote}` +
       `<span class="sec-p15-verdict${verdictClass}">${esc(verdict)}</span>${emptyStage}${flaggedCapture}${flaggedProduct}${warning}` +
@@ -342,7 +343,7 @@
     });
     return `<div class="sec-p15-train-head"><div><span class="sec-p15-kicker">Metal condensation train</span>` +
       `<strong>Terminal product-destination classification</strong></div><span>${esc("Per-hour per-stage inventory pending producer emit")}</span></div>` +
-      `<div class="sec-p15-stage-line" role="group" aria-label="Terminal product-destination classification; includes stage-routed tap metal; not condenser inventory">${items.join("")}</div>`;
+      `<div class="sec-p15-stage-line" role="group" aria-label="Terminal product-destination classification; not condenser inventory">${items.join("")}</div>`;
   }
 
   function storedO2Accounts(ledger) {
@@ -687,7 +688,7 @@
       `<h2><span class="sect">15</span>${esc("Equipment process schematic")}</h2>` +
       `<p class="sub">${esc("Scrub-driven artifact view · route-specific inventories · terminal product-destination classification, not condenser inventory")}</p>` +
       `<div class="sec-p15-legend"><span>${esc("Solid colour = classified designated species mass, not vessel fill")}</span>` +
-      `<span>${esc("Dashed = pending / not emitted")}</span><span>${esc("Glow = designed campaign-route cue, not emitted activity")}</span><span>${esc("Stage masses include stage-routed tap metal; not physical condenser inventory")}</span></div>` +
+      `<span>${esc("Dashed = pending / not emitted")}</span><span>${esc("Glow = designed campaign-route cue, not emitted activity")}</span><span>${esc("Stage product classifications are separate from drain-tap products; per-hour stage inventory is pending")}</span></div>` +
       `<div class="sec-p15-sr-only" id="${STATUS_ID}" role="status" aria-live="polite" aria-atomic="true">${esc(timestepStatus(artifact, 0))}</div>` +
       `<div class="sec-p15-equipment-state" id="${STATE_ID}">${equipmentState(artifact, 0)}</div>` +
       `</section>`;

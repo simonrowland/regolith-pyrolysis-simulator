@@ -241,9 +241,9 @@ def test_stage_routed_metal_credit_without_projection_fails_closed():
         train_kg_by_stage=[{}, {}],
     )
 
-    assert product_stage_number('C3', 'Fe') == 1
+    assert product_stage_number('MRE', 'Fe') == 1
     target._record_stage_routed_metal_credits(
-        'C3', _stage_routed_fe_credit(0.05)
+        'MRE', _stage_routed_fe_credit(0.05)
     )
 
     assert target._stage_collection_kg_by_source == {}
@@ -261,10 +261,10 @@ def test_second_stage_routed_credit_is_not_capped_by_first_projection():
         },
     )
     target._record_stage_routed_metal_credits(
-        'C3', _stage_routed_fe_credit(0.05)
+        'MRE', _stage_routed_fe_credit(0.05)
     )
     target._record_stage_routed_metal_credits(
-        'C3', _stage_routed_fe_credit(0.05)
+        'MRE', _stage_routed_fe_credit(0.05)
     )
 
     assert target._audit_metal_projection_drift() == {
@@ -279,7 +279,7 @@ def test_second_stage_routed_credit_is_not_capped_by_first_projection():
         ('_shuttle_inject_Na', 'shuttle_Na_inventory_kg'),
     ],
 )
-def test_c3_projection_uses_current_transition_credit_not_aggregate_metal(
+def test_c3_shuttle_fe_routes_current_transition_to_drain_tap(
     monkeypatch,
     injector_name,
     inventory_attr,
@@ -290,11 +290,17 @@ def test_c3_projection_uses_current_transition_credit_not_aggregate_metal(
     sim.atom_ledger._balances['process.metal_phase'] = {
         'Fe': unrouted_kg / (MOLAR_MASS['Fe'] / 1000.0),
     }
+    sim.atom_ledger._balances['terminal.drain_tap_material'] = {}
     setattr(sim, inventory_attr, 1.0)
-    transition = _stage_routed_fe_credit(routed_kg)
+    transition = LedgerTransition.move(
+        name='test_c3_shuttle_drain_tap_credit',
+        debit_account='process.cleaned_melt',
+        credit_account='terminal.drain_tap_material',
+        species_kg={'Fe': routed_kg},
+    )
 
     def _commit_routed_credit(*args, **kwargs):
-        sim.atom_ledger._balances['process.metal_phase']['Fe'] += (
+        sim.atom_ledger._balances['terminal.drain_tap_material']['Fe'] = (
             routed_kg / (MOLAR_MASS['Fe'] / 1000.0)
         )
         return transition
@@ -329,13 +335,10 @@ def test_c3_projection_uses_current_transition_credit_not_aggregate_metal(
 
     getattr(sim, injector_name)()
 
-    assert sim._stage_collection_backing_kg('Fe') == pytest.approx(
-        unrouted_kg + routed_kg
-    )
-    assert sim._condensed_species_projected_kg('Fe') == pytest.approx(routed_kg)
-    assert sim._stage_collection_kg_by_source[
-        ('process.metal_phase', 1, 'Fe')
-    ] == pytest.approx(routed_kg)
+    assert sim._stage_collection_backing_kg('Fe') == pytest.approx(unrouted_kg)
+    assert sim._condensed_species_projected_kg('Fe') == 0.0
+    assert sim._stage_collection_kg_by_source == {}
+    assert sim.inventory.metal_alloy_kg['Fe'] == pytest.approx(routed_kg)
     assert sim._audit_metal_projection_drift() == {}
 
 
@@ -346,10 +349,10 @@ def test_stage_routed_bottom_pool_credit_with_destination_metadata_fails_closed(
         train_kg_by_stage=[{}, {}],
     )
     target._record_stage_routed_metal_credits(
-        'C3', _stage_routed_fe_credit(0.05)
+        'MRE', _stage_routed_fe_credit(0.05)
     )
 
-    assert product_stage_number('C3', 'Fe') == 1
+    assert product_stage_number('MRE', 'Fe') == 1
     assert target._audit_metal_projection_drift() == {
         'Fe': pytest.approx(0.05),
     }
@@ -364,7 +367,7 @@ def test_stage_routed_metal_projection_only_mutation_fails_closed_after_rescope(
         },
     )
 
-    assert product_stage_number('C3', 'Fe') == 1
+    assert product_stage_number('MRE', 'Fe') == 1
     assert projection_only._audit_metal_projection_drift() == {
         'Fe': pytest.approx(-0.05),
     }

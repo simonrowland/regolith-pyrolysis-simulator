@@ -2888,24 +2888,12 @@ class ExtractionMixin:
         # Partial withdrawals attribute K to its live origins pro rata.
         self.atom_ledger.mark_amalgamated_pool('process.cleaned_melt', ('K',))
         self._record_stage_routed_metal_credits('C3', transition)
+        self._project_drain_tap_from_atom_ledger()
         self._apply_transition_redox_source_terms(
             transition,
             label='redox_source:c3_k_shuttle_reduction',
             target_oxides=('FeO',),
             exchange_direction='redox_source:c3_k_shuttle_reduction',
-        )
-
-        # Fe produced goes to its canonical product destination.
-        fe_delta_kg = sum(
-            max(0.0, float(credit.species_kg.get('Fe', 0.0)))
-            for credit in transition.credits
-            if credit.account in METAL_PHASE_ACCOUNTS
-        )
-        self._project_extraction_product(
-            'C3',
-            'Fe',
-            delta_kg=fe_delta_kg,
-            source_account='process.metal_phase',
         )
 
         # Deduct K from shuttle inventory
@@ -3007,6 +2995,7 @@ class ExtractionMixin:
             },
         )
         self._record_stage_routed_metal_credits('C3', transition)
+        self._project_drain_tap_from_atom_ledger()
         self._apply_transition_redox_source_terms(
             transition,
             label='redox_source:c3_na_shuttle_reduction',
@@ -3014,10 +3003,8 @@ class ExtractionMixin:
             exchange_direction='redox_source:c3_na_shuttle_reduction',
         )
 
-        # Reduced metals use the canonical recipe product registry.  Cr routes
-        # to the dedicated Cr stage; Ti stays as a metal-phase product unless a
-        # future accepted physical condenser is added.
-        for metal in ('Fe', 'Cr', 'Ti'):
+        # Cr routes to the dedicated Cr stage; Ti stays in the metal phase.
+        for metal in ('Cr', 'Ti'):
             delta_kg = sum(
                 max(0.0, float(credit.species_kg.get(metal, 0.0)))
                 for credit in transition.credits

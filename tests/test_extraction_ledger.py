@@ -24,8 +24,10 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.config import load_config_bundle
+from simulator.condensation import stage_purity_report
 from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
+    STAGE_KEY_BY_NUMBER,
     stage_list_index_for_destination,
 )
 from simulator.core import PyrolysisSimulator
@@ -44,6 +46,7 @@ from simulator.state import (
     CampaignPhase,
     MeltState,
 )
+from simulator.three_product_report import classify_products
 from web.events import (
     _browser_socket_payload,
     _completion_payload,
@@ -1075,6 +1078,16 @@ def test_k_shuttle_draws_from_process_reagent_inventory():
         "alkali_dosing", {}
     )["K_kg"] = 9.0
     sim.load_batch("oxide", mass_kg=1000.0, additives_kg={})
+    sim.atom_ledger.load_external_mol(
+        "process.condensation_train",
+        {
+            "Fe": 0.028 * 1000.0 / MOLAR_MASS["Fe"],
+            "SiO2": 0.002 * 1000.0 / MOLAR_MASS["SiO2"],
+        },
+        material_origin="feedstock",
+    )
+    sim._project_condensed_species(1, "Fe")
+    sim._project_condensed_species(1, "SiO2")
     sim._init_shuttle_inventory(CampaignPhase.C3_K)
 
     assert sim.atom_ledger.kg_by_account("reservoir.reagent.K").get(
@@ -1101,10 +1114,52 @@ def test_k_shuttle_draws_from_process_reagent_inventory():
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt")[
         "K2O"
     ] > 0.0
-    assert sim.atom_ledger.kg_by_account("process.metal_phase")[
+    stage_one = stage_purity_report(sim.train)[STAGE_KEY_BY_NUMBER[1]]
+    assert stage_one["designated_species_kg"]["Fe"] == pytest.approx(0.028)
+    assert stage_one["impurity_species_kg"]["SiO2"] == pytest.approx(0.002)
+    # 0.028 kg captured Fe / (0.028 kg Fe + 0.002 kg SiO2) = 0.9333.
+    assert stage_one["designated_kg"] == pytest.approx(0.028)
+    assert stage_one["total_kg"] == pytest.approx(0.030)
+    assert stage_one["purity_fraction"] == pytest.approx(0.9333333333333333)
+    assert stage_one["verdict"] == "MIXED"
+    assert sim.atom_ledger.kg_by_account("process.metal_phase").get(
+        "Fe", 0.0
+    ) == pytest.approx(0.0)
+    tap_fe_kg = sim.atom_ledger.kg_by_account("terminal.drain_tap_material")[
         "Fe"
-    ] == pytest.approx(sim.train.stages[1].collected_kg["Fe"])
-    _assert_product_matches_account(sim, "process.metal_phase", "Fe")
+    ]
+    assert tap_fe_kg == pytest.approx(2.1424844558459064)
+    assert sim.inventory.drain_tap_kg["Fe"] == pytest.approx(
+        tap_fe_kg
+    )
+    assert sim.product_ledger()["Fe"] == pytest.approx(2.1704844558459064)
+    product_classes = classify_products(sim)
+    assert product_classes["ingots_metals"]["species_kg"]["Fe"] == pytest.approx(
+        2.1704844558459064
+    )
+    assert product_classes["ingots_metals"]["class_total_kg"] == pytest.approx(
+        2.1704844558459064
+    )
+    assert any(
+        source["account"] == "terminal.drain_tap_material"
+        and source["kg"] == pytest.approx(2.1424844558459064)
+        for source in product_classes["ingots_metals"][
+            "source_accounts_by_species"
+        ]["Fe"]
+    )
+    assert product_classes["process_inventory_spent_reductant"][
+        "kg_by_species"
+    ].get("Fe", 0.0) == 0.0
+    assert product_classes["process_inventory_spent_reductant"][
+        "class_total_kg"
+    ] == 0.0
+    assert product_classes["refractory_ceramic_rump"][
+        "rump_kg_by_species"
+    ].get("Fe", 0.0) == 0.0
+    assert product_classes["unclassified"]["kg_by_species"].get(
+        "Fe", 0.0
+    ) == 0.0
+    assert product_classes["unclassified"]["total_kg"] == pytest.approx(0.002)
 
 
 def test_na_shuttle_metals_are_reported_from_process_metal_phase():

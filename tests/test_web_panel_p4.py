@@ -100,33 +100,39 @@ def _complete_stage(**overrides) -> dict:
     return stage
 
 
-def test_stage_mass_is_product_destination_classification_not_condenser_inventory() -> None:
+def test_stage_one_report_keeps_shuttle_tap_fe_out_of_stage_purity() -> None:
     stage = _complete_stage(
-        label="Fe Condenser", designated_species_kg={"Fe": 85.22329294683593},
-        coproduct_species_kg={}, designated_kg=85.22329294683593,
-        impurity_species_kg={"Al": 0.00176855144165}, impurity_kg=0.00176855144165,
-        total_kg=85.22506149827758, purity_fraction=0.9999792473594084,
+        label="Fe Condenser",
+        designated_species_kg={"Fe": 0.02739867051993343},
+        coproduct_species_kg={}, designated_kg=0.02739867051993343,
+        impurity_species_kg={"Al": 0.00176855144165},
+        impurity_kg=0.00176855144165,
+        total_kg=0.02916722196158343,
+        purity_fraction=0.9393651049805365,
+        verdict="MIXED",
     )
     artifact = {
         "terminal": {
             "stage_purity": {"stage_1_fe_condenser": stage},
-            "final_state": {"process.metal_phase_bottom_pool": {"Fe": 1525.994711609524}},
+            "final_state": {
+                "terminal.drain_tap_material": {"Fe": 1525.994711609524},
+            },
         },
         "timesteps": [{"summary": {"condensation_train_kg": {"Fe": 0.02739867051993343}}}],
     }
     html = _render_panel(artifact)
     visible = " ".join(unescape(re.sub(r"<[^>]+>", " ", html)).split())
     assert "Terminal product-destination classification" in visible
-    assert "Stage masses include stage-routed tap metal; not physical condenser inventory" in visible
+    assert "C3 shuttle Fe is reported under the drain tap, separate from Stage 1" in visible
     assert "Product destination · Stage 1" in visible
     assert "Fe Condenser" in visible
-    assert "Total classified product mass 85.23 kg" in visible
-    assert "Product-destination totals kg basis Designated + coproduct 85.22 kg" in visible
+    assert "85.23 kg" not in visible
+    assert float(_headline_value(html, "Purity fraction")) == pytest.approx(
+        0.9393651049805365, abs=5e-5
+    )
     for misleading in ("Condensation-train stage purity", "Total stage mass", "Collected-stage totals"):
         assert misleading not in visible
-    assert "0.0274 kg" not in visible
-    assert "1526" not in visible
-    assert _headline_value(html, "Purity fraction") == "1"
+    assert "stage-routed tap metal" not in visible
 
 
 def _render_stage(stage: dict[str, object], **kwargs: object) -> str:
@@ -544,8 +550,8 @@ def test_subtitle_binds_backend_emission_and_no_recompute_claims() -> None:
 
     subtitle = _between(html, '<p class="sub">', "</p>")
     assert subtitle == (
-        "Backend-emitted product-destination mass, grade, activity, and verdict. "
-        "Stage masses include stage-routed tap metal; not physical condenser inventory. "
+        "Backend-emitted stage mass, grade, activity, and verdict. "
+        "C3 shuttle Fe is reported under the drain tap, separate from Stage 1. "
         "Purity and totals are not recomputed in the viewer."
     )
 

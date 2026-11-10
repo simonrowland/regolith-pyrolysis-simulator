@@ -52,6 +52,7 @@ def test_stage_list_index_resolves_stage_keys_for_all_collector_bands():
         ("MRE", "Mn", 2),
         ("MRE", "Mg", 4),
         ("C3", "Cr", 2),
+        ("C3", "Fe", None),
         ("C3", "Ti", None),
         ("C6", "Al", None),
         ("C6", "Si", None),

@@ -11,13 +11,15 @@ re-derivation of the metallothermic physics. The same solubility-limit /
 kinetic / accessibility constants flow through verbatim:
 
 * C3 K-shuttle: ``2 K + FeO -> K2O + Fe`` (K2O saturated at 10 wt% melt,
-  K injected up to 1/3 of inventory per hour).
+  K injected up to 1/3 of inventory per hour); Fe exits through the terminal
+  drain tap.
 * C3 Na-shuttle: stage-aware targets.  The Cr stage preserves the legacy
   ``6 Na + Cr2O3 -> 3 Na2O + 2 Cr`` first, then
   ``4 Na + TiO2 -> 2 Na2O + Ti`` with 0.75 accessibility factor
   (highest-priority experimental question -- legacy comment
   ``[THERMO-10]``).  Cool Fe-cleanup may instead request
-  ``2 Na + FeO -> Na2O + Fe``. Na2O saturated at 10 wt%.
+  ``2 Na + FeO -> Na2O + Fe``; this Fe exits through the terminal drain tap.
+  Na2O saturated at 10 wt%.
 * C6 Mg thermite primary: ``3 Mg + Al2O3 -> 3 MgO + 2 Al``. Mg consumed
   per Arrhenius-style rate factor ``0.20 * exp(-0.05 * wt%MgO)`` (clamped
   to ``[0.01, 0.25]``).
@@ -50,12 +52,13 @@ chemical reaction is a single atom-balanced :class:`LedgerTransition`.
 The provider:
 
 - reads ``process.cleaned_melt`` (the oxide source / coproduct sink),
-  ``process.metal_phase`` (cathode-metal credit + Al back-reduction
+  ``process.metal_phase`` (remaining metal credits + Al back-reduction
   debit), and ``process.reagent_inventory`` (alkali / Mg reagent debit)
   via the filtered :class:`ProviderAccountView`.  Reagent inventory is
   a normal process account (debiting is permitted); only terminal
   accounts have the special "credit-only via canonical commit path"
-  rule.  Net C6 Al is credited to ``terminal.drain_tap_material``;
+  rule. C3 shuttle Fe and net C6 Al are credited to
+  ``terminal.drain_tap_material``;
   alkali-shuttle bakeout vapor still goes through the
   EVAPORATION_TRANSITION / CONDENSATION_ROUTE intents.
 - reads T from ``request.temperature_C`` (currently informational only
@@ -109,10 +112,10 @@ atom-balance validation at dispatch time AND again at commit time.
 Account declaration: ``process.cleaned_melt`` (debit oxides being
 reduced + credit K2O / MgO / regenerated Al2O3 coproducts),
 ``process.spent_reductant_residue`` (credit melt-resident Na2O from the
-spent Na shuttle), ``process.metal_phase`` (credit Fe/Cr/Ti/Al/Si metals
+spent Na shuttle), ``process.metal_phase`` (credit Cr/Ti/C6 Al/Si metals
 + debit Al on back-reduction), ``process.reagent_inventory`` (debit
-K/Na/Mg consumed), and ``terminal.drain_tap_material`` (credit net C6
-Al product).
+K/Na/Mg consumed), and ``terminal.drain_tap_material`` (credit C3 shuttle
+Fe and net C6 Al products).
 Every account named in the legacy ``_record_atom_transition`` calls
 inside ``_shuttle_inject_K``, ``_shuttle_inject_Na``, and
 ``_step_thermite`` lands in this set.  The hardened kernel account-
@@ -164,7 +167,10 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
-from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.account_ids import (
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    TERMINAL_DRAIN_TAP_ACCOUNT,
+)
 from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
@@ -175,7 +181,7 @@ from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 REACTION_FAMILY_C3_K = "c3_k_shuttle"
 REACTION_FAMILY_C3_NA = "c3_na_shuttle"
 REACTION_FAMILY_C6_MG = "c6_mg_thermite"
-C6_AL_PRODUCT_ACCOUNT = "terminal.drain_tap_material"
+C6_AL_PRODUCT_ACCOUNT = TERMINAL_DRAIN_TAP_ACCOUNT
 VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_C3_K,
     REACTION_FAMILY_C3_NA,
@@ -240,7 +246,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         "process.metal_phase",
         "process.reagent_inventory",
         SPENT_REDUCTANT_RESIDUE_ACCOUNT,
-        C6_AL_PRODUCT_ACCOUNT,
+        TERMINAL_DRAIN_TAP_ACCOUNT,
     })
 
     # Legacy constants reproduced verbatim from simulator/extraction.py
@@ -539,14 +545,14 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
 
         # Reaction 2 K + FeO -> K2O + Fe.  Per mol:
         # debits: 2 mol K (reagent_inventory) + 1 mol FeO (cleaned_melt).
-        # credits: 1 mol K2O (cleaned_melt) + 1 mol Fe (metal_phase).
+        # credits: 1 mol K2O (cleaned_melt) + 1 mol Fe (drain tap).
         debits: dict[str, dict[str, float]] = {
             "process.reagent_inventory": {"K": mol_K_used},
             "process.cleaned_melt": {"FeO": mol_FeO_reduced},
         }
         credits: dict[str, dict[str, float]] = {
             "process.cleaned_melt": {"K2O": mol_FeO_reduced},
-            "process.metal_phase": {"Fe": mol_FeO_reduced},
+            TERMINAL_DRAIN_TAP_ACCOUNT: {"Fe": mol_FeO_reduced},
         }
 
         # Diagnostic dict in kg-native form for legacy parity.  Convert
@@ -930,7 +936,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             "process.metal_phase": {},
         }
         if total_Fe_produced_mol > 0.0:
-            credits["process.metal_phase"]["Fe"] = total_Fe_produced_mol
+            credits[TERMINAL_DRAIN_TAP_ACCOUNT] = {
+                "Fe": total_Fe_produced_mol
+            }
         if total_Cr_produced_mol > 0.0:
             credits["process.metal_phase"]["Cr"] = total_Cr_produced_mol
         if total_Ti_produced_mol > 0.0:

@@ -1302,7 +1302,7 @@ def test_unmapped_campaign_is_explicit_and_does_not_glow_a_stage() -> None:
 
 
 def test_c3_campaigns_cue_product_destinations_not_alkali_cyclone() -> None:
-    # C3_K → Fe stage 1 only; C3_NA → Fe stage 1 + Cr stage 2 + Ti metal-phase.
+    # C3 Fe uses the drain tap; C3_NA also routes Cr to stage 2 and retains Ti.
     # Mutation: put C3_K/C3_NA back on stage_4 campaigns list.
     c3k = _run_panel({
         "timesteps": [{"hour": 10, "summary": {"campaign": "C3_K"}, "ledger": {}}],
@@ -1313,16 +1313,16 @@ def test_c3_campaigns_cue_product_destinations_not_alkali_cyclone() -> None:
         "terminal": {"stage_purity": _stage_purity()},
     })["html"]
 
-    assert "sec-p15-stage--active" in _stage_card(c3k, "stage_1_fe_condenser")
+    assert "sec-p15-stage--active" not in _stage_card(c3k, "stage_1_fe_condenser")
     assert "sec-p15-stage--active" not in _stage_card(c3k, "stage_4_alkali_mg_cyclone")
-    assert "Designed campaign-route cue: Fe Condenser" in _selected_timestep(c3k)
+    assert "Designed campaign-route cue: Fe drain tap (non-condenser)" in _selected_timestep(c3k)
     assert "Alkali/Mg Cyclone" not in _selected_timestep(c3k)
 
-    assert "sec-p15-stage--active" in _stage_card(c3na, "stage_1_fe_condenser")
+    assert "sec-p15-stage--active" not in _stage_card(c3na, "stage_1_fe_condenser")
     assert "sec-p15-stage--active" in _stage_card(c3na, "stage_2_cr_oxide_harvest")
     assert "sec-p15-stage--active" not in _stage_card(c3na, "stage_4_alkali_mg_cyclone")
     selected_na = _selected_timestep(c3na)
-    assert "Fe Condenser" in selected_na
+    assert "Fe drain tap + Ti metal-phase (non-condenser)" in selected_na
     assert "Cr Oxide Harvester" in selected_na
     assert "Ti metal-phase (non-condenser)" in selected_na
     assert "Alkali/Mg Cyclone" not in selected_na
@@ -1413,13 +1413,8 @@ def test_empty_stage_without_verdict_does_not_invent_backend_classification() ->
     assert "PENDING" in stage
 
 
-def test_p15_stage_purity_mass_is_classification_not_condenser_inventory() -> None:
-    """stage_purity kilograms include tap metal; they are not vessel fill.
-
-    Target-sample counterexample: stage_1 designated Fe 85.22 kg, bottom-pool
-    Fe 1526 mol, aggregate train Fe 0.027 kg. Mutation: labeling that 85 kg
-    as condenser contents / condensate inventory would fail.
-    """
+def test_p15_stage_purity_excludes_shuttle_fe_routed_to_drain_tap() -> None:
+    """Stage 1 shows train capture while shuttle Fe uses the drain tap."""
     artifact = {
         "header": {"charge_mass_kg": 1000.0},
         "timesteps": [
@@ -1428,9 +1423,10 @@ def test_p15_stage_purity_mass_is_classification_not_condenser_inventory() -> No
                 "summary": {
                     "campaign": "C2B",
                     "condensation_train_kg": {"Fe": 0.02739867051993343},
+                    "drain_tap_kg": {"Fe": 85.22329294683593},
                     "metal_phase_stratification": {
                         "pool_mol_after": {
-                            "bottom_pool": {"Fe": 1525.994711609524},
+                            "bottom_pool": {},
                         }
                     },
                 },
@@ -1441,18 +1437,18 @@ def test_p15_stage_purity_mass_is_classification_not_condenser_inventory() -> No
             "stage_purity": {
                 "stage_1_fe_condenser": {
                     "label": "Fe Condenser",
-                    "designated_species_kg": {"Fe": 85.22329294683593},
+                    "designated_species_kg": {"Fe": 0.02739867051993343},
                     "coproduct_species_kg": {},
                     "impurity_species_kg": {},
-                    "designated_kg": 85.22329294683593,
+                    "designated_kg": 0.02739867051993343,
                     "impurity_kg": 0.0,
-                    "total_kg": 85.22329294683593,
+                    "total_kg": 0.02739867051993343,
                     "purity_fraction": 1.0,
                     "verdict": "PURE",
                 }
             },
             "final_state": {
-                "process.metal_phase_bottom_pool": {"Fe": 1525.994711609524},
+                "terminal.drain_tap_material": {"Fe": 1525.994711609524},
             },
         },
     }
@@ -1461,7 +1457,8 @@ def test_p15_stage_purity_mass_is_classification_not_condenser_inventory() -> No
     stage = _stage_card(html, "stage_1_fe_condenser")
     train = _readout(html, "condensation-train-projection")
 
-    assert "85.22 kg" in stage
+    assert "85.22 kg" not in stage
+    assert "PURE" in stage
     assert "Designated + coproduct mass" in stage
     assert "terminal product-destination classification" in stage.lower()
     assert "not condenser inventory" in stage.lower()
@@ -1469,7 +1466,7 @@ def test_p15_stage_purity_mass_is_classification_not_condenser_inventory() -> No
     assert "No condensate emitted" not in html
     assert "not vessel fill" in html.lower()
     assert "not condenser inventory" in html.lower()
-    assert "stage-routed tap metal" in html.lower()
+    assert "stage-routed tap metal" not in html.lower()
     assert "Per-hour per-stage inventory pending producer emit" in html
     assert "0.0274 kg" in train
     assert "85.22 kg" not in train

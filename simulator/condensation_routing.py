@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from simulator.account_ids import TERMINAL_DRAIN_TAP_ACCOUNT
+
 
 STAGE_KEY_BY_NUMBER: dict[int, str] = {
     1: 'stage_1_fe_condenser',
@@ -127,10 +129,11 @@ METAL_PHASE_DESTINATIONS: dict[str, str] = {
 # Recipe-extracted products are not automatically condenser targets. A stage
 # key here means the product is physically routed to that train stage; a
 # metal_phase_* value means the atom ledger's metal-phase account is the honest
-# destination and no condenser-stage projection should be minted.
+# destination; terminal.drain_tap_material means the product exits through the
+# drain tap. Neither destination mints a condenser-stage projection.
 PRODUCT_DESTINATIONS: dict[str, dict[str, str]] = {
     'C3': {
-        'Fe': 'stage_1_fe_condenser',
+        'Fe': TERMINAL_DRAIN_TAP_ACCOUNT,
         'Cr': 'stage_2_cr_oxide_harvest',
         'CrO2': 'stage_2_cr_oxide_harvest',
         'Ti': 'metal_phase_ti',

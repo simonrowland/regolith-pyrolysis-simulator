@@ -1303,7 +1303,10 @@ def test_staged_na_fe_hold_recomputes_stranded_temperature_by_fe_yield_sweep(
 
     sim.melt.temperature_C = target
     sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
-    assert sim._ledger_account_species_kg("process.metal_phase", "Fe") > 0.0
+    assert sim._ledger_account_species_kg("process.metal_phase", "Fe") == 0.0
+    assert sim._ledger_account_species_kg(
+        "terminal.drain_tap_material", "Fe"
+    ) > 0.0
     assert sim._shuttle_refusal_history == []
 
 

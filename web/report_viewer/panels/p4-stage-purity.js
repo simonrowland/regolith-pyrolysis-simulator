@@ -186,7 +186,7 @@
 
     return `<section id="sec-p4-stage-purity" class="sec-p4-stage-purity" aria-labelledby="sec-p4-stage-purity-title">` +
       `<h2 id="sec-p4-stage-purity-title"><span class="sect">P4</span>Terminal product-destination classification</h2>` +
-      `<p class="sub">Backend-emitted product-destination mass, grade, activity, and verdict. Stage masses include stage-routed tap metal; not physical condenser inventory. Purity and totals are not recomputed in the viewer.</p>` +
+      `<p class="sub">Backend-emitted stage mass, grade, activity, and verdict. C3 shuttle Fe is reported under the drain tap, separate from Stage 1. Purity and totals are not recomputed in the viewer.</p>` +
       `${body}</section>`;
   }
 
