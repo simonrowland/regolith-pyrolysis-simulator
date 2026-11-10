@@ -43,6 +43,7 @@ from simulator.evaporation_classes import (
 from simulator.vapour_rail.instrumentation import CONTROL_FLUX_PRESSURES_KEY
 
 VAPOR_PRESSURES_PATH = Path("data/vapor_pressures.yaml")
+SETPOINTS_PATH = Path("data/setpoints.yaml")
 
 # Rows carrying ``tag: broad_proxy_not_intrinsic`` inside the loader's
 # (metals, oxide_vapors) groups on the current data. This set is the class
@@ -278,10 +279,10 @@ def test_sc67_refusal_fires_for_cro2_with_real_loader_map():
     assert "per-species evaporation refusal" in result.warnings[0]
 
 
-def test_fallback_path_marks_proxy_species_when_explicitly_enabled():
-    """With ``allow_unmeasured_alpha_fallback`` explicitly set, a stripped
-    proxy species takes the marked alpha=1.0 prototype fallback — recorded
-    in ``unmeasured_alpha_fallback_species``, never silently measured."""
+def test_project_policy_marks_cro2_proxy_with_upper_bound_fallback():
+    """The shipped allowlist drives CrO2 through the marked alpha=1.0 upper
+    bound; the proxy stays stripped and the provider emits its warning."""
+    kernel_policy = yaml.safe_load(SETPOINTS_PATH.read_text())["chemistry_kernel"]
     alpha_by_species = _measured_alpha_control_view(
         _load_evaporation_alpha_by_species(_raw_data())
     )
@@ -310,7 +311,12 @@ def test_fallback_path_marks_proxy_species_when_explicitly_enabled():
             "melt_surface_area_m2": 1.0,
             "stir_factor": 1.0,
             "alpha": alpha_by_species,
-            "allow_unmeasured_alpha_fallback": True,
+            "allow_unmeasured_alpha_fallback": kernel_policy[
+                "allow_unmeasured_alpha_fallback"
+            ],
+            "unmeasured_alpha_fallback_species": kernel_policy[
+                "unmeasured_alpha_fallback_species"
+            ],
         },
     )
 
@@ -321,3 +327,8 @@ def test_fallback_path_marks_proxy_species_when_explicitly_enabled():
     assert result.diagnostic["evaporation_flux_kg_hr"]["CrO2"] > 0.0
     assert result.diagnostic["unmeasured_alpha_fallback_species"] == ["CrO2"]
     assert result.diagnostic["alpha_used_by_species"]["CrO2"] == 1.0
+    assert any(
+        "WARNING: alpha=1.0 prototype fallback used for unmeasured evaporation species: CrO2"
+        in warning
+        for warning in result.warnings
+    )
