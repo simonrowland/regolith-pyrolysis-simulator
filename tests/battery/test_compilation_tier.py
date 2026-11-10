@@ -4131,6 +4131,121 @@ def test_vaporock_b1259_calcium_above_boiling_entropy_scores() -> None:
     assert attempt.value is not None
 
 
+def test_vaporock_b1259_sio_ideal_gas_span_enthalpy_scores_iron_still_refuses() -> None:
+    """B1259 SiO prints an ideal-gas span and a zero H−H298 cell at 298.15 K.
+
+    Census proof: 5.610 kcal at 1000 K is stored 23.47224 kJ, and that
+    minus printed O-012 is −0.00076 kJ. The 1100 K and 1200 K nodes are
+    +0.0011 kJ and +0.0001 kJ at 0.0001 kJ. Iron at 1000 K is α crystal,
+    5.840 kcal on the crystal zero, and stays refused. The one-element
+    predicate stays false for SiO. The record stays scoring_eligible false.
+    """
+
+    pytest.importorskip("vaporock.equil")
+
+    import json
+
+    from simulator.battery.generators.usgs_b1259 import (
+        CAL_TH_TO_J,
+        RECORDS_DIR,
+        reference_enthalpy_zero_is_ideal_gas,
+        reference_enthalpy_zero_is_ideal_gas_span,
+    )
+    from simulator.battery.migrate import load_yaml, observation_from_plain
+
+    assert reference_enthalpy_zero_is_ideal_gas("SiO") is False
+    assert reference_enthalpy_zero_is_ideal_gas("Fe") is False
+    assert reference_enthalpy_zero_is_ideal_gas("O2") is True
+    assert reference_enthalpy_zero_is_ideal_gas_span(
+        "b1259-ht-0111-silicon-monoxide"
+    ) is True
+    assert reference_enthalpy_zero_is_ideal_gas_span(
+        "b1259-ht-0020-iron-reference-state"
+    ) is False
+    assert reference_enthalpy_zero_is_ideal_gas_span(
+        "b1259-ht-0025-potassium-reference-state"
+    ) is False
+    assert reference_enthalpy_zero_is_ideal_gas_span(
+        "b1259-ht-0034-oxygen-reference-state"
+    ) is False
+
+    record = json.loads(
+        (RECORDS_DIR / "b1259-ht-0111-silicon-monoxide.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert record["phase"] == "Ideal gas 298.15° to 2000°K."
+    assert record["compilation_role"]["scoring_eligible"] is False
+
+    root = Path(__file__).resolve().parents[2]
+    document = load_yaml(
+        root
+        / "data/literature/observations-v2"
+        / "compilations-robie-waldbaum-1968-usgs-b1259"
+        / "b1259-ht-0111-silicon-monoxide.yaml"
+    )
+    enthalpies = [
+        observation_from_plain(row)
+        for row in document["observations"]
+        if row["identity"]["quantity"]["value"] == Quantity.H_MINUS_H298.value
+    ]
+    assert len(enthalpies) == 18
+    by_temperature = {
+        observation.identity.temperature_K.value: observation
+        for observation in enthalpies
+    }
+    sio = by_temperature[Decimal("1000")]
+    assert sio.value.point == Decimal("5.610") * CAL_TH_TO_J
+    assert sio.value.point == Decimal("23.47224")
+    assert "as_published='5.610'" in (sio.locator.note or "")
+    assert sio.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+    printed_1000 = _printed_janaf_node(
+        "O-012", Decimal("1000"), "enthalpy_increment"
+    )
+    assert printed_1000 == Decimal("23.473")
+    assert sio.value.point - printed_1000 == Decimal("-0.00076")
+
+    for temperature, census_delta in (
+        (Decimal("1100"), Decimal("0.0011")),
+        (Decimal("1200"), Decimal("0.0001")),
+    ):
+        stored = by_temperature[temperature].value.point
+        printed = _printed_janaf_node(
+            "O-012", temperature, "enthalpy_increment"
+        )
+        assert (stored - printed).quantize(Decimal("0.0001")) == census_delta
+
+    for observation in enthalpies:
+        temperature = observation.identity.temperature_K.value
+        printed = _printed_janaf_node(
+            "O-012", temperature, "enthalpy_increment"
+        )
+        attempt = predict_thermo_attempt(Engine.VAPOROCK, observation)
+        assert attempt.refusal_reason is None
+        assert attempt.value is not None
+        assert abs(attempt.value - printed) <= Decimal("1")
+        assert abs(observation.value.point - printed) <= Decimal("1")
+        assert "O-012" in attempt.call_evidence
+        assert attempt.authority is Authority.BRIDGE
+        assert observation.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+
+    iron = _b1259_point(
+        "b1259-ht-0020-iron-reference-state.yaml",
+        "robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:"
+        "H_minus_H298:shared:T=1000:col=H_minus_H298:name=iron-(reference-state):"
+        "v=33d14bdc09:poly=alpha",
+    )
+    assert iron.identity.species.phase.value is Phase.CR
+    assert iron.identity.species.polymorph.value is Polymorph.ALPHA
+    assert iron.value.point == Decimal("5.840") * CAL_TH_TO_J
+    assert iron.value.point == Decimal("24.43456")
+    assert "as_published='5.840'" in (iron.locator.note or "")
+    iron_attempt = predict_thermo_attempt(Engine.VAPOROCK, iron)
+    assert iron_attempt.value is None
+    assert iron_attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert iron_attempt.refusal_detail["reason"] == "engine-thermo-does-not-emit"
+
+
 def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
     """Inside a coefficient row, each quantity keeps its own basis axis.
 
