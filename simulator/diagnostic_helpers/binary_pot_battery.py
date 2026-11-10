@@ -309,13 +309,35 @@ def _call_cached_backend_equilibrate(
     po2_request = request_kwargs.get("po2_request")
     if isinstance(po2_request, Po2Request):
         request_kwargs["po2_request"] = po2_request.as_payload()
-    from simulator.engine_cache import cached_engine_call
+    from types import SimpleNamespace
 
-    return cached_engine_call(
-        handle.name,
-        {"kwargs": request_kwargs, "engine_settings": dict(getattr(handle, "engine_settings", {}) or {})},
-        solve,
+    from simulator.engine_cache import cached_engine_call
+    from simulator.melt_backend.base import (
+        EquilibriumResult,
+        equilibrium_cache_value,
     )
+
+    def solve_cache_value() -> Any:
+        result = solve()
+        if isinstance(result, EquilibriumResult):
+            return result.to_engine_cache_value()
+        if isinstance(result, SimpleNamespace):
+            return equilibrium_cache_value(vars(result))
+        return result
+
+    payload = cached_engine_call(
+        handle.name,
+        {
+            "kwargs": request_kwargs,
+            "engine_settings": dict(getattr(handle, "engine_settings", {}) or {}),
+        },
+        solve_cache_value,
+    )
+    if isinstance(payload, Mapping):
+        if handle.name == "internal-analytical":
+            return SimpleNamespace(**payload)
+        return EquilibriumResult.from_engine_cache_value(payload)
+    return payload
 
 
 def close_battery_engine_handle(handle: object) -> None:

@@ -36,6 +36,85 @@ DEFAULT_BACKEND_CAPABILITIES = {
 
 REDOX_MODE_NOT_AN_INPUT = 'not_an_input'
 
+_EQUILIBRIUM_CACHE_HOT_FIELDS = frozenset({
+    'liquid_fraction',
+    'phase_assemblage_available',
+    'vapor_pressures_Pa',
+    'vapor_pressures_source',
+    'activity_coefficients',
+    'warnings',
+    'status',
+    'reported_activity_coefficients',
+    'activity_coefficient_details',
+    'vaporock_full_speciation_Pa',
+    'imcc_notices',
+    'imcc_model_id',
+    'liquid_composition_wt_pct',
+    'fe_redox_split',
+})
+_EQUILIBRIUM_CACHE_DIAGNOSTIC_FIELDS = frozenset({
+    'backend_status_reason',
+    'empty_speciation_cause',
+    'backend_failure_reason_code',
+    'backend_failure_category',
+    'backend_failure_disposition',
+    'subprocess_failure',
+    'input_composition_projection',
+    'engine_reason',
+    'vapor_pressure_backend_status',
+    'vapor_pressure_backend_status_reason',
+    'authoritative_for_requested_vapor_pressure',
+    'vapor_pressure_diagnostic',
+    'commissioning_notice',
+    'authority',
+    'certified_band',
+    'imcc_notices',
+    'fo2_gas_only',
+})
+
+
+def _equilibrium_cache_json(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _equilibrium_cache_json(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_equilibrium_cache_json(item) for item in value]
+    if isinstance(value, Enum):
+        return value.value
+    return value
+
+
+def equilibrium_cache_value(values: Mapping[str, Any]) -> Any:
+    """Split the scorer-consumed equilibrium projection from COLD fields."""
+    from simulator.engine_cache import CacheValue
+
+    hot: dict[str, Any] = {}
+    cold: dict[str, Any] = {}
+    diagnostics = values.get('diagnostics')
+    if isinstance(diagnostics, Mapping):
+        diagnostic_hot = {
+            name: value
+            for name, value in diagnostics.items()
+            if name in _EQUILIBRIUM_CACHE_DIAGNOSTIC_FIELDS
+        }
+        diagnostic_cold = {
+            name: value
+            for name, value in diagnostics.items()
+            if name not in _EQUILIBRIUM_CACHE_DIAGNOSTIC_FIELDS
+        }
+        if diagnostic_hot:
+            hot['diagnostics'] = _equilibrium_cache_json(diagnostic_hot)
+        if diagnostic_cold:
+            cold['diagnostics'] = diagnostic_cold
+
+    for name, value in values.items():
+        if name == 'diagnostics':
+            continue
+        if name in _EQUILIBRIUM_CACHE_HOT_FIELDS:
+            hot[name] = _equilibrium_cache_json(value)
+        else:
+            cold[name] = value
+    return CacheValue(hot, cold)
+
 # More than one oxidation state in silicate melts over the fO2 range these
 # engines are asked to run. The melt-backend contract owns this eligibility
 # rule so scorers and backend calls use the same component test.
@@ -804,6 +883,22 @@ class EquilibriumResult:
     # Other backends leave these fields unset.
     requested_fO2_log: Optional[float] = None
     printed_fO2_echo_log: Optional[float] = None
+
+    def to_engine_cache_value(self) -> Any:
+        """Split scorer-consumed fields into HOT and the remaining fields into COLD."""
+        return equilibrium_cache_value(vars(self))
+
+    @classmethod
+    def from_engine_cache_value(cls, payload: Mapping[str, Any]) -> EquilibriumResult:
+        """Rebuild the battery-visible equilibrium fields from the HOT JSON."""
+        from dataclasses import fields
+
+        field_names = {item.name for item in fields(cls)}
+        result = cls(**{name: value for name, value in payload.items() if name in field_names})
+        for name, value in payload.items():
+            if name not in field_names:
+                setattr(result, name, value)
+        return result
 
     def __post_init__(self) -> None:
         if self.status != 'ok':
