@@ -14447,6 +14447,7 @@ def _score_group_shard(
     str,
     int,
     Mapping[str, Mapping[str, object]] | None,
+    Mapping[str, str] | None,
 ]:
     prepared, predict = _SCORE_WORKER_SETUP or (None, None)
     if prepared is None:
@@ -14462,7 +14463,10 @@ def _score_group_shard(
         sort_on_finalize=False,
     )
     try:
-        from simulator.engine_cache import engine_cache_counters
+        from simulator.engine_cache import (
+            engine_cache_counters,
+            engine_cache_runtime_identities,
+        )
 
         engine_cache_counters(reset=True)
         _score_store_with_decisions(
@@ -14474,7 +14478,8 @@ def _score_group_shard(
             _stream=stream,
         )
         counters = engine_cache_counters(reset=True)
-        return str(stream.partial_path), stream.count, counters
+        runtime_identities = engine_cache_runtime_identities()
+        return str(stream.partial_path), stream.count, counters, runtime_identities
     finally:
         stream.close()
         _clear_score_shard_start_marker(task)
@@ -14507,9 +14512,13 @@ def _score_store_to_jsonl(
     if workers > 1 and handles:
         raise ValueError("spawned score workers open their own engine handles")
     stream = _ResidualJsonlStream(path, root=root)
-    from simulator.engine_cache import engine_cache_counters
+    from simulator.engine_cache import (
+        engine_cache_counters,
+        engine_cache_runtime_identities,
+    )
 
     cache_counters: dict[str, dict[str, object]] | None = None
+    cache_runtime_identities: dict[str, str] | None = None
     try:
         if workers == 1:
             engine_cache_counters(reset=True)
@@ -14526,6 +14535,7 @@ def _score_store_to_jsonl(
                 _stream=stream,
             )
             cache_counters = engine_cache_counters(reset=True)
+            cache_runtime_identities = engine_cache_runtime_identities()
         else:
             prepared = _prepare_score_run(
                 context,
@@ -14551,6 +14561,7 @@ def _score_store_to_jsonl(
                     _stream=stream,
                 )
                 cache_counters = engine_cache_counters(reset=True)
+                cache_runtime_identities = engine_cache_runtime_identities()
             else:
                 root_text = None if root is None else str(root)
                 with tempfile.TemporaryDirectory(
@@ -14582,12 +14593,15 @@ def _score_store_to_jsonl(
                     with stream.partial_path.open("rb") as output:
                         header = output.readline()
                     shard_count = 0
-                    for shard_path_text, row_count, counters in shard_results:
+                    cache_runtime_identities = {}
+                    for shard_path_text, row_count, counters, identities in shard_results:
                         shard_count += row_count
                         if counters is not None:
                             cache_counters = _sum_engine_cache_counters(
                                 cache_counters, counters
                             )
+                        if identities is not None:
+                            cache_runtime_identities.update(identities)
                         order_path = Path(f"{shard_path_text}.order")
                         with (
                             Path(shard_path_text).open("rb") as shard,
@@ -14641,6 +14655,7 @@ def _score_store_to_jsonl(
             tier_band_values=dict(stream.tier_band_values),
             aggregate=stream.report_aggregate,
             engine_cache_counters=cache_counters,
+            engine_cache_runtime_identities=cache_runtime_identities,
         )
     finally:
         stream.close()
@@ -14902,6 +14917,7 @@ class _ResidualReportMetadata:
     tier_band_values: Mapping[tuple[str, str, str, str, str, str], set[str]]
     aggregate: _ScorePayloadAccumulator | None = None
     engine_cache_counters: Mapping[str, Mapping[str, object]] | None = None
+    engine_cache_runtime_identities: Mapping[str, str] | None = None
 
 
 class _ResidualJsonlRows:

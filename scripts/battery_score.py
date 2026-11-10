@@ -253,7 +253,9 @@ def _run_measured_headline(
             "load_average": load_average,
             "records": records,
             "engine_cache": _engine_cache_summary(
-                engine_cache_path, local_counters=metadata.engine_cache_counters
+                engine_cache_path,
+                local_counters=metadata.engine_cache_counters,
+                local_runtime_identities=metadata.engine_cache_runtime_identities,
             ),
         }
         summary_path = battery / "score-summary.json"
@@ -436,6 +438,7 @@ def _engine_cache_summary(
     cache_path: Path | None,
     studio_cache_summary: Mapping[str, object] | None = None,
     local_counters: Mapping[str, object] | None = None,
+    local_runtime_identities: Mapping[str, str] | None = None,
 ) -> dict[str, object]:
     engines = tuple(engine.value for engine in SCORE_ENGINE_SET)
     by_engine: dict[str, dict[str, int]] = {
@@ -458,9 +461,17 @@ def _engine_cache_summary(
                 value = counts.get(name, 0)
                 if isinstance(value, int):
                     target[name] += value
+    runtime_identities = dict(local_runtime_identities or {})
+    if studio_cache_summary is not None:
+        studio_identities = studio_cache_summary.get("runtime_identities", {})
+        if isinstance(studio_identities, Mapping):
+            runtime_identities.update(
+                {str(engine): str(identity) for engine, identity in studio_identities.items()}
+            )
     summary: dict[str, object] = {
         "enabled": cache_path is not None or studio_cache_summary is not None,
         "by_engine": by_engine,
+        "runtime_identities": runtime_identities,
     }
     if cache_path is not None:
         summary["path"] = str(cache_path)
@@ -474,10 +485,14 @@ def _attach_engine_cache_summary(
     cache_path: Path | None,
     studio_cache_summary: Mapping[str, object] | None = None,
     local_counters: Mapping[str, object] | None = None,
+    local_runtime_identities: Mapping[str, str] | None = None,
 ) -> None:
     payload = json.loads(path.read_text(encoding="utf-8"))
     payload["engine_cache"] = _engine_cache_summary(
-        cache_path, studio_cache_summary, local_counters
+        cache_path,
+        studio_cache_summary,
+        local_counters,
+        local_runtime_identities,
     )
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -768,6 +783,7 @@ def main(argv: list[str] | None = None) -> int:
             engine_cache_path,
             studio_cache_summary,
             metadata.engine_cache_counters,
+            metadata.engine_cache_runtime_identities,
         )
         report_partial_path.write_text(report, encoding="utf-8")
         os.replace(summary_partial_path, summary_path)

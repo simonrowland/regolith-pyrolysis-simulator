@@ -309,12 +309,20 @@ def _call_cached_backend_equilibrate(
         return solve()
     request_kwargs = dict(kwargs)
     request_kwargs.pop("call_timeout_s", None)
+    if handle.name == "alphamelts":
+        request_kwargs["engine_environment"] = {
+            "ALPHAMELTS_CALC_MODE": os.environ.get("ALPHAMELTS_CALC_MODE")
+        }
     po2_request = request_kwargs.get("po2_request")
     if isinstance(po2_request, Po2Request):
         request_kwargs["po2_request"] = po2_request.as_payload()
     from types import SimpleNamespace
 
-    from simulator.engine_cache import _is_refusal, cached_engine_call
+    from simulator.engine_cache import (
+        _is_refusal,
+        cached_engine_call,
+        engine_cache_backend_settings,
+    )
     from simulator.melt_backend.base import (
         EquilibriumResult,
         equilibrium_cache_from_value,
@@ -333,10 +341,7 @@ def _call_cached_backend_equilibrate(
             return equilibrium_cache_value(result)
         return result
 
-    effective_settings = getattr(handle.backend, "_engine_cache_settings", None)
-    adapter_settings = (
-        dict(effective_settings()) if callable(effective_settings) else {}
-    )
+    adapter_settings = engine_cache_backend_settings(handle.backend)
 
     payload = cached_engine_call(
         handle.name,
@@ -3028,9 +3033,6 @@ class _OpenImccBatteryBackend:
         """Return the pack identity captured with the loaded datapack."""
         return str(self._identity["pack"])
 
-    def _engine_cache_settings(self) -> dict[str, str]:
-        return {"pack": self._effective_pack_name}
-
     def _load_gas(self) -> None:
         try:
             from openimcc import load_gas_datapack
@@ -3832,9 +3834,9 @@ def internal_analytical_residue_vapor_pressure(
     include_diagnostic_shadows: bool,
 ) -> Any:
     """Run one direct internal-analytical residue pressure request."""
-    from types import SimpleNamespace
+    from simulator.engine_cache import cached_engine_call, record_engine_open
 
-    from simulator.engine_cache import cached_engine_call
+    record_engine_open("internal-analytical", core)
 
     request = {
         "call": "residue_vapor_pressure",
@@ -3847,8 +3849,8 @@ def internal_analytical_residue_vapor_pressure(
         "include_diagnostic_shadows": include_diagnostic_shadows,
     }
 
-    def solve_pressure_cache_value() -> dict[str, Any]:
-        response = _internal_analytical_vapor_pressure_adapter(
+    def solve_pressure_cache_value() -> Any:
+        return _internal_analytical_vapor_pressure_adapter(
             core=core,
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
@@ -3858,14 +3860,13 @@ def internal_analytical_residue_vapor_pressure(
             po2_request=po2_request,
             include_diagnostic_shadows=include_diagnostic_shadows,
         )
-        return {"vapor_pressures_Pa": dict(response.vapor_pressures_Pa or {})}
 
     payload = cached_engine_call(
         "internal-analytical",
         request,
         solve_pressure_cache_value,
     )
-    return SimpleNamespace(vapor_pressures_Pa=payload["vapor_pressures_Pa"])
+    return payload
 
 
 class _InternalAnalyticalBatteryBackend:
@@ -4869,6 +4870,9 @@ def _open_battery_engine_with_settings(
     identity_block = _engine_identities_from_toml().get(name, {})
     try:
         backend = _open_resolved_backend(name, engine_settings)
+        from simulator.engine_cache import record_engine_open
+
+        record_engine_open(name, backend)
         if name in IMCC_ENGINE_NAMES and hasattr(backend, "_identity"):
             identity_block = {**identity_block, **dict(backend._identity)}
     except BackendUnavailableError as exc:
