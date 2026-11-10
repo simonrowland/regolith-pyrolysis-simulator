@@ -85,10 +85,10 @@ from simulator.battery.leaderboard import (  # noqa: E402
     _engine_name,
     _hero_decimal,
     _hero_metric_temperature,
-    _hero_row_flagged,
     _is_d139_uncalibrated_kems_row,
     _open_residual_jsonl,
     _row_formula,
+    _row_flags,
     _row_identity,
     _species_formula,
     _state_value,
@@ -1145,8 +1145,10 @@ def read_scores(
                 if not experiment:
                     experiment = row.get("reference") or row.get("key") or f"line:{line_number}"
 
-                flagged = _hero_row_flagged(
-                    row, d139_uncalibrated_kems=d139_uncalibrated_kems
+                flagged = bool(
+                    _row_flags(
+                        row, d139_uncalibrated_kems=d139_uncalibrated_kems
+                    )
                 )
                 source_relation = str(row.get("source_relation") or "unknown")
                 if rail in selected:
@@ -3402,8 +3404,11 @@ def _collection_row_database(
                     _row_formula(row),
                     residual,
                     int(
-                        _hero_row_flagged(
-                            row, d139_uncalibrated_kems=d139_uncalibrated_kems
+                        bool(
+                            _row_flags(
+                                row,
+                                d139_uncalibrated_kems=d139_uncalibrated_kems,
+                            )
                         )
                     ),
                 )

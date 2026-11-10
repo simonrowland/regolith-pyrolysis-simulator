@@ -294,7 +294,7 @@ JSON output is a stable, versioned interface. The top-level object has exactly t
 
 | Key | Meaning |
 |---|---|
-| `schema` | Schema identifier, `battery-leaderboard.v1`. Bump the version if keys or meanings change. |
+| `schema` | Schema identifier, `battery-leaderboard.v1`. The refusal-count meaning below is part of v1; bump the version if keys or meanings change. |
 | `filters` | Applied filters and the ranking policy. |
 | `total` | Number of ranked rows/groups before `offset` and `limit`. Refusals are excluded. |
 | `limit` | Maximum number of returned rows. |
@@ -314,8 +314,15 @@ The `filters` object has these keys:
 | `unit` | Selected unit block, or `null` when unit blocks are ranked separately. |
 | `temperature_K` | `{min, max, source}` temperature bounds, or `null` if none are declared. |
 | `run_envelope` | Report-derived hero context, or `null` without `--run`; its keys are listed below. |
-| `refused_count` | Number of matching refused rows excluded from ranking; refusals have no unit and remain counted with `--unit`. |
+| `refused_count` | Total refused rows in the input, counted before feedstock, engine, rail, species, unit, temperature, or run-envelope filters. All refusals are excluded from ranking; this is not a filter-specific count. Refusals have no unit and remain counted with `--unit`. |
 | `rank_policy` | Text describing the within-unit ranking and unit-block order. |
+
+Markdown output also lists refusal totals by engine and rail. For active engine or rail
+filters, matching buckets show the count matching those dimensions where the row's values
+are known. When a rail or species filter is active, the Markdown summary reports refusals
+missing the rail and/or species value needed to evaluate those filters. The engine/rail
+breakdown does not provide a species-specific match count. Refusals with known values that
+do not match a filter remain in the input-wide `refused_count` but are not unattributed.
 
 When `run_envelope` is present, it contains `feedstock_composition_class`,
 `feedstock_class_source`, `backend`, `engines_by_role`, `temperature_K` (`min`, `max`, and
