@@ -2039,7 +2039,7 @@ def _point_condition_from_plain(
     key: str | None = None,
     closure_context: object = None,
 ) -> Located[Any]:
-    """Located lab axes, printed condition text, or a printed composition map."""
+    """Located lab axes, pressure evidence, or printed composition maps."""
 
     if isinstance(payload, Located):
         return payload
@@ -2111,7 +2111,8 @@ def _point_condition_from_plain(
     if isinstance(payload, Mapping) and "state" not in payload:
         if "kind" in payload:
             if _is_value_kind_wrapper(payload):
-                return _located_from_plain(payload, _value_or_point_from_plain)
+                located = _located_from_plain(payload, _value_or_point_from_plain)
+                return _pressure_condition_provenance(payload, key, located)
             return Located(
                 State.unknown(
                     "malformed printed value wrapper: invalid kind "
@@ -2135,7 +2136,8 @@ def _point_condition_from_plain(
                 _locator_from_plain(payload.get("locator")),
             )
     if not isinstance(payload, Mapping) or "state" not in payload:
-        return _located_from_plain(payload, as_decimal)
+        located = _located_from_plain(payload, as_decimal)
+        return _pressure_condition_provenance(payload, key, located)
     state_payload = payload.get("state")
     value = (
         state_payload.get("value") if isinstance(state_payload, Mapping) else None
@@ -2180,7 +2182,29 @@ def _point_condition_from_plain(
                 else _as_printed_map(raw)
             ),
         )
-    return _located_from_plain(payload, as_decimal)
+    located = _located_from_plain(payload, as_decimal)
+    return _pressure_condition_provenance(payload, key, located)
+
+
+def _pressure_condition_provenance(
+    payload: object, key: str | None, located: Located[Any]
+) -> Located[Any]:
+    """Retain nonprinted pressure evidence on the located condition itself."""
+
+    if (
+        key != "total_pressure_Pa"
+        or not located.state.is_value
+        or located.inference is not None
+        or not _located_pressure_is_unprinted(located)
+    ):
+        return located
+    note = located.locator.note if located.locator is not None else None
+    return replace(
+        located,
+        inference=_inferred_derivation_from_plain(
+            {"inference": note or "total pressure has no printed locator"}
+        ),
+    )
 
 
 def _condition_value_from_plain(payload: object) -> object:
@@ -11457,6 +11481,65 @@ def _pressure_hit_is_chamber_condition(
     return False
 
 
+def _pressure_extract_value_is_unprinted(
+    obs: Mapping[str, Any],
+    values: Mapping[str, Any],
+    name: str,
+    raw: object,
+) -> bool:
+    """Check pressure payload and its sibling provenance before identity use."""
+
+    if isinstance(raw, Mapping):
+        if raw.get("inferred") is True:
+            return True
+        raw_inference = raw.get("inference")
+        if isinstance(raw_inference, Mapping):
+            try:
+                derivation = _derivation_from_plain(
+                    raw_inference, allow_mapping_inputs=True
+                )
+            except (KeyError, TypeError, ValueError):
+                derivation = None
+            if _pressure_inference_is_unprinted(derivation):
+                return True
+        if _pressure_locator_is_unprinted(raw.get("locator")):
+            return True
+    for payload in (obs, values):
+        provenance = payload.get("provenance")
+        if not isinstance(provenance, Mapping):
+            continue
+        for scope in ("identity", "point_conditions"):
+            fields = provenance.get(scope)
+            evidence = fields.get(name) if isinstance(fields, Mapping) else None
+            if not isinstance(evidence, Mapping):
+                continue
+            inference = evidence.get("inference")
+            if isinstance(inference, Mapping):
+                try:
+                    derivation = _derivation_from_plain(
+                        inference, allow_mapping_inputs=True
+                    )
+                except (KeyError, TypeError, ValueError):
+                    derivation = None
+                if _pressure_inference_is_unprinted(derivation):
+                    return True
+            if _pressure_locator_is_unprinted(evidence.get("locator")):
+                return True
+    return False
+
+
+def _pressure_locator_is_unprinted(locator: object) -> bool:
+    if locator is None:
+        return True
+    note = (
+        locator.get("note", "")
+        if isinstance(locator, Mapping)
+        else getattr(locator, "note", "")
+    )
+    note = str(note or "").casefold()
+    return any(marker in note for marker in ("not printed", "inferred", "assumed"))
+
+
 def _extract_text(payload: object) -> str:
     """Flatten source prose for guarded premise detection only."""
 
@@ -11745,6 +11828,12 @@ def _pressure_total_from_extract(
     source_text: str,
 ) -> tuple[State[Decimal] | None, str | None]:
     raw = _pressure_payload_value(obs, values, "total_pressure_Pa")
+    if raw not in (None, "") and _pressure_extract_value_is_unprinted(
+        obs, values, "total_pressure_Pa", raw
+    ):
+        return State.unknown(
+            "source total_pressure_Pa is inferred, not printed"
+        ), None
     if (
         raw is not None
         and not _pressure_value_is_model_calculation(
@@ -12036,16 +12125,35 @@ def _partial_pressure_point_condition(
 def _source_point_condition_total_pressure_pa(
     values: Mapping[str, Any],
     obs: Mapping[str, Any],
-) -> Decimal | None:
-    """Read a numeric total pressure from a row or exploded point condition."""
+) -> Located[Any] | None:
+    """Read total pressure with its source locator and inference intact."""
 
     for raw in (obs.get("point_conditions"), values.get("point_conditions")):
         if not isinstance(raw, Mapping) or "total_pressure_Pa" not in raw:
             continue
-        amount = _point_condition_decimal(raw.get("total_pressure_Pa"))
-        if amount is not None and amount > 0:
-            return amount
+        located = _point_condition_from_plain(
+            raw["total_pressure_Pa"], key="total_pressure_Pa"
+        )
+        amount = _as_dec_or_none(located.state.value)
+        if located.state.is_value and amount is not None and amount > 0:
+            return located
     return None
+
+
+def _printed_source_point_condition_pressure(
+    located: Located[Any] | None,
+) -> Decimal | None:
+    """Return a condition pressure only when its source prints the set point."""
+
+    if (
+        located is None
+        or not located.state.is_value
+        or located.locator is None
+        or _located_pressure_is_unprinted(located)
+    ):
+        return None
+    amount = _as_dec_or_none(located.state.value)
+    return amount if amount is not None and amount > 0 else None
 
 
 def _keeps_phase_composition_unknown_total(observation: Observation) -> bool:
@@ -12062,17 +12170,25 @@ def _keeps_phase_composition_unknown_total(observation: Observation) -> bool:
 def _without_unprinted_total_pressure(
     point_conditions: Mapping[str, Located[Any]] | None,
 ) -> Mapping[str, Located[Any]] | None:
-    """Point conditions carry total pressure only when it is a printed value.
+    """Keep printed pressure and inferred pressure with explicit provenance.
 
-    An unprinted total is not a set point. As an unknown it stops same-point
-    matching; filling it with the in-cell partial sum would be circular. The
-    identity axis is left as the migrator already filled it.
+    An unlocated numeric value with no derivation is unclassified and is
+    dropped. Inferred pressure stays in point conditions with its derivation,
+    while identity pressure remains unknown. The value is never promoted from
+    a partial-pressure sum.
     """
 
     if not point_conditions or "total_pressure_Pa" not in point_conditions:
         return point_conditions
     located = point_conditions["total_pressure_Pa"]
-    if isinstance(located, Located) and located.state.is_value:
+    if (
+        isinstance(located, Located)
+        and located.state.is_value
+        and (
+            located.locator is not None
+            or _pressure_inference_is_unprinted(located.inference)
+        )
+    ):
         return point_conditions
     kept = {
         key: value
@@ -12112,16 +12228,27 @@ def _printed_experiment_pressure(
         return None
     if raw.point is None or raw.approximate:
         return None
-    inference = located.inference
-    if inference is not None and (
+    if _located_pressure_is_unprinted(located):
+        return None
+    return raw.point
+
+
+def _pressure_inference_is_unprinted(inference: Derivation | None) -> bool:
+    """Whether source provenance says a pressure is inferred or assumed."""
+
+    return inference is not None and (
         inference.relation in {"extract_inference", "extract_limit", "default", "assumed"}
         or any(
             marker in inference.inputs
             for marker in ("inferred=true", "default=true", "assumed=true")
         )
-    ):
-        return None
-    return raw.point
+    )
+
+
+def _located_pressure_is_unprinted(located: Located[Any]) -> bool:
+    if _pressure_inference_is_unprinted(located.inference):
+        return True
+    return _pressure_locator_is_unprinted(located.locator)
 
 
 def _identity_provenance_for_value_derivation(
@@ -19071,6 +19198,7 @@ class Migrator:
         quantity: Quantity | None = None,
         species_formula: str | None = None,
         source_values: Mapping[str, Any] | None = None,
+        source_provenance: Mapping[str, Any] | None = None,
         point_values: Mapping[str, Any] | None = None,
     ) -> tuple[dict[str, Any], tuple[str, ...]]:
         """Lift printed experiment conditions into an observation identity.
@@ -19257,6 +19385,8 @@ class Migrator:
                     for key in ("total_pressure_Pa", "method_class")
                     if source_values.get(key) is not None
                 }
+                if source_provenance is not None:
+                    row_pressure_values["provenance"] = source_provenance
                 row_pressure, row_pressure_provenance = _pressure_total_from_extract(
                     {},
                     row_pressure_values,
@@ -21513,8 +21643,11 @@ class Migrator:
                 basis = str(values.get("basis") or "").strip()
                 if basis in PHASE_BASIS_TOKENS:
                     ident_kwargs["subtype"] = State.of(basis)
-                    printed_total = _source_point_condition_total_pressure_pa(
+                    source_total = _source_point_condition_total_pressure_pa(
                         values, obs
+                    )
+                    printed_total = _printed_source_point_condition_pressure(
+                        source_total
                     )
                     existing_total = ident_kwargs.get("total_pressure_Pa")
                     if printed_total is not None and (
@@ -21525,6 +21658,21 @@ class Migrator:
                         )
                     ):
                         ident_kwargs["total_pressure_Pa"] = State.of(printed_total)
+                    elif (
+                        source_total is not None
+                        and source_total.state.is_value
+                        and printed_total is None
+                        and (
+                            existing_total is None
+                            or (
+                                isinstance(existing_total, State)
+                                and existing_total.is_unknown
+                            )
+                        )
+                    ):
+                        ident_kwargs["total_pressure_Pa"] = State.unknown(
+                            "source total_pressure_Pa is inferred, not printed"
+                        )
             if (
                 q_token is Quantity.DISTRIBUTION_RATIO
                 and counter_phase_role_token is not None
@@ -21645,7 +21793,9 @@ class Migrator:
                 values.get("pressure_basis_Pa") or values.get("target_pressure_Pa")
             )
             if p_amt is None:
-                p_amt = _source_point_condition_total_pressure_pa(values, obs)
+                p_amt = _printed_source_point_condition_pressure(
+                    _source_point_condition_total_pressure_pa(values, obs)
+                )
             if p_amt is not None:
                 ident_kwargs["total_pressure_Pa"] = State.of(p_amt)
             else:
@@ -22428,6 +22578,11 @@ class Migrator:
             quantity=q_token,
             species_formula=species.formula,
             source_values=values if isinstance(values, Mapping) else None,
+            source_provenance=(
+                obs.get("provenance")
+                if isinstance(obs.get("provenance"), Mapping)
+                else None
+            ),
         )
         identity_for_profile = (
             Identity(
@@ -24122,7 +24277,9 @@ class Migrator:
             q_token is Quantity.TRANSITION_TEMPERATURE
             and isinstance(raw_item, Mapping)
         ):
-            point_pressure = _source_point_condition_total_pressure_pa(raw_item, {})
+            point_pressure = _printed_source_point_condition_pressure(
+                _source_point_condition_total_pressure_pa(raw_item, {})
+            )
             if point_pressure is not None:
                 ident_kwargs["total_pressure_Pa"] = State.of(point_pressure)
         if coord is not None:
