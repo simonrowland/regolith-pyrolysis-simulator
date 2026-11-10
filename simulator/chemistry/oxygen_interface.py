@@ -15,6 +15,25 @@ The solved balance is ``S_melt + S_evap - S_gas = 0``. The separate
 monotone residual is its negative so positive values at both bracket ends
 identify a root below the lower pressure edge.
 
+Writing ``ξ = ln(pO2 / bar)``, the governing root is
+``F(ξ_s) = (C_m / τ)(ξ_m - ξ_s) + S_evap(p_s) - S_gas(p_s, p_h) = 0``,
+where the signed gas source is
+``S_gas = A (p_s - p_h) / ((R_int + R_gas) M_O2) + A J_O / 2``.
+The pressure difference is in Pa, so division by ``(m/s)(kg/mol)`` gives
+``mol/(m² s)`` and multiplication by area gives ``mol/s``. For zero melt
+capacity in the product-only case, ``p_s <= p_h`` gives ``S_evap > 0`` and
+``S_gas <= 0``, hence ``F > 0``. Since ``F`` decreases with ``p_s``, the
+closed root lies above ``p_h`` and the outward film carries exactly
+``S_evap``. The overhead bound is therefore a property of the signed-flux
+root; clamping at ``p_h`` leaves the positive evaporation residual open.
+With finite capacity and a reservoir below ``p_h``, the root can lie below
+the overhead: signed ``J_O2 < 0`` means overhead oxygen enters a melt that is
+a net oxygen sink. For ``C_m > 1e6``, the pin sets ``ξ_s = ξ_m`` at every
+overhead pressure. A finite melt source as ``C_m -> infinity`` requires
+``ξ_s -> ξ_m``, so the limiting source is
+``S_gas(ξ_m, p_h) - S_evap(ξ_m)`` with the signed film term, and the pinned
+residual is zero.
+
 Analytic fixture: for one ``FeO -> Fe + 1/2 O2`` channel with
 ``p_Fe = K / sqrt(p / bar)``, unit alphas, vacuum overhead, and no gas
 resistance, Hertz-Knudsen molar flux is proportional to ``p / sqrt(M)``.
@@ -47,10 +66,7 @@ _MELT_CAPACITY_NOOP_MOL_PER_LN = 1.0e-15
 _BUFFERED_CAPACITY_MOL_PER_LN = 1.0e6
 _M_O2_KG_PER_MOL = 2.0 * ATOMIC_WEIGHTS_G_PER_MOL["O"] / 1000.0
 
-InterfaceOxygenLabel = Literal[
-    "overhead_oxygen_floor",
-    "bracket_boundary=lower",
-]
+InterfaceOxygenLabel = Literal["bracket_boundary=lower"]
 InterfaceOxygenFailureReason = Literal[
     "non_monotone",
     "not_strictly_monotone",
@@ -350,19 +366,10 @@ def solve_interface_oxygen(
         )
 
     overhead_pa = overhead_bar * PA_PER_BAR
-    label: InterfaceOxygenLabel | None = None
-    if overhead_bar > 0.0:
-        vacuum_root, _ = solve_at_overhead(0.0)
-        if 10.0**vacuum_root <= overhead_bar:
-            logp = math.log10(overhead_bar)
-            label = "overhead_oxygen_floor"
-        else:
-            logp, label = solve_at_overhead(overhead_pa)
-    else:
-        logp, label = solve_at_overhead(overhead_pa)
+    logp, label = solve_at_overhead(overhead_pa)
 
     accepted = evaluate(logp, overhead_pa)
-    if effective_capacity > _BUFFERED_CAPACITY_MOL_PER_LN and logp == reservoir_log:
+    if effective_capacity > _BUFFERED_CAPACITY_MOL_PER_LN:
         # As C_m -> ∞ and ξ_s -> ξ_m, (C_m/τ)(ξ_m - ξ_s) -> S_gas - S_evap.
         accepted["melt_source"] = accepted["gas_source"] - accepted["evaporative_source"]
         accepted["residual"] = 0.0
