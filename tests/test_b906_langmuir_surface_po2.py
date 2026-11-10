@@ -59,6 +59,15 @@ and a permitted unmeasured fallback are in the residual at that alpha.
 A carrier the policy refuses is not emitted and keeps its published
 pressure. Nested, top-level, null, and quoted film flags select the
 same law in the closure and in the flux kernel.
+
+Persisted headspace. The partial vector the film sums is every
+positive finite entry of the persisted composition. The vapor map is
+not an allowlist, and O2 is not a species added after that
+intersection. A non-vapor carrier sets the realized total
+``max(sum, commanded)`` that Kn and diffusivity use. An explicit
+override is that evaluation's vector and is not filled from the
+persisted map. A step that did not close a root keeps vapor-map
+backpressure; the stored film still holds the complete vector.
 """
 
 from __future__ import annotations
@@ -3089,3 +3098,396 @@ def test_overhead_o2_bound_holds_on_every_transport_branch(case: tuple) -> None:
         _assert_direct_bound(film_on, hkl_name, partial_name, gate)
     else:
         _assert_host_bound(entry, film_on)
+
+
+# d-376 round 6. The vapor map is not an allowlist. Every positive
+# persisted partial is in the film, including a gas that is not a
+# vapor species and not O2. Kn and Chapman-Enskog diffusivity use
+# that one realized total: max(sum of the vector, commanded pressure).
+def _persisted_partial_classes() -> tuple[tuple[str, tuple[tuple[str, float], ...]], ...]:
+    from simulator.transport_constants import CARRIER_GAS_PROPERTIES
+
+    rows = [
+        (species, ((species, 10.0),))
+        for species in sorted(CARRIER_GAS_PROPERTIES)
+    ]
+    # Neither a transport-catalog carrier nor a pure-CaO vapor species.
+    rows.append(("CO", (("CO", 10.0),)))
+    # In the vapor map. The old allowlist kept it only when the caller
+    # passed that key.
+    rows.append(("Ca", (("Ca", 10.0),)))
+    # Reviewer's underestimate: 10 mbar N2 plus 1 mbar O2. Keeping only
+    # O2 publishes 100 Pa instead of 1100 Pa.
+    rows.append(("N2+O2", (("N2", 10.0), ("O2", 1.0))))
+    return tuple(rows)
+
+
+_PERSISTED_PARTIAL_CLASSES = _persisted_partial_classes()
+_PERSISTED_ENTRIES = (
+    "reader",
+    "film",
+    "live-open",
+    "live-open-nofilm",
+    "live-floor",
+    "live-buffered",
+    "live-above",
+    "override-keeps",
+    "override-omits",
+    "reclose",
+)
+_JUNK_PARTIALS_MBAR = {
+    "junk0": 0.0,
+    "junkneg": -2.0,
+    "junknan": float("nan"),
+}
+
+
+def _persisted_case_id(case: tuple) -> str:
+    name, _pairs, entry = case
+    return f"{entry}-{name}"
+
+
+def _persisted_cases() -> list[tuple]:
+    return [
+        (name, pairs, entry)
+        for name, pairs in _PERSISTED_PARTIAL_CLASSES
+        for entry in _PERSISTED_ENTRIES
+    ]
+
+
+def _expected_persisted_pa(pairs: tuple[tuple[str, float], ...]) -> dict[str, float]:
+    # Persisted composition is mbar. The bulk reader converts with * 100.
+    return {species: mbar * 100.0 for species, mbar in pairs}
+
+
+def _composition_with_junk(pairs: tuple[tuple[str, float], ...]) -> dict[str, float]:
+    composition = {species: mbar for species, mbar in pairs}
+    composition.update(_JUNK_PARTIALS_MBAR)
+    return composition
+
+
+def _realized_transport_pa(partials_pa: Mapping[str, float], commanded_mbar: float) -> float:
+    return max(
+        sum(value for value in partials_pa.values() if value > 0.0),
+        max(0.0, commanded_mbar) * 100.0,
+    )
+
+
+def _assert_reader_keeps_every_persisted_gas(
+    host,
+    published: Mapping[str, float],
+    expected_pa: Mapping[str, float],
+) -> None:
+    """The vapor map cannot narrow the persisted vector.
+
+    Decoys are the three allowlists the old reader used: nothing, Ca
+    alone, and the pure-CaO publication. O2 used to be appended after
+    that intersection, which still dropped N2.
+    """
+
+    decoys = ({}, {"Ca": 1.0}, dict(published))
+    for decoy in decoys:
+        got = EvaporationMixin._langmuir_headspace_partials_Pa(host, decoy)
+        assert set(got) == set(expected_pa), (decoy, got, expected_pa)
+        for species, pa in expected_pa.items():
+            assert got[species] == pytest.approx(pa)
+        for junk in _JUNK_PARTIALS_MBAR:
+            assert junk not in got
+
+
+def _assert_film_sums_the_vector(host, expected_pa: Mapping[str, float]) -> None:
+    for commanded_mbar in (0.0, _FILM_COMMANDS_MBAR["above"]):
+        host.melt.p_total_mbar = commanded_mbar
+        cleaned, pressure = EvaporationMixin._langmuir_film(host, expected_pa)
+        realized = _realized_transport_pa(expected_pa, commanded_mbar)
+        assert pressure == pytest.approx(realized)
+        for species, pa in expected_pa.items():
+            assert cleaned[species] == pytest.approx(pa)
+        for junk in _JUNK_PARTIALS_MBAR:
+            assert junk not in cleaned
+
+
+def _assert_transport_state(
+    controls: Mapping,
+    provider,
+    expected_pa: Mapping[str, float],
+    *,
+    realized_pa: float,
+    film_on: bool,
+) -> None:
+    from simulator.condensation import _chapman_enskog_d_ab_m2_s, _knudsen_number
+    from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
+
+    assert float(controls["overhead_pressure_pa"]) == pytest.approx(realized_pa)
+    kernel_partials = controls["overhead_partials_Pa"]
+    for species, pa in expected_pa.items():
+        assert kernel_partials[species] == pytest.approx(pa), kernel_partials
+    series = (provider.diagnostic or {}).get("evaporation_series_resistance") or {}
+    # A species whose equilibrium pressure sits under its bulk has no
+    # drive, and the provider records no series row for it. Kn is a
+    # property of the total, so any row that was computed is the check.
+    if not series:
+        assert realized_pa <= 0.0 or float(expected_pa.get("Ca", 0.0)) > 0.0
+        return
+    probe = "Ca" if "Ca" in series else next(iter(series))
+    probed = series[probe]
+    got_kn = float(probed["knudsen_number"])
+    if realized_pa <= 0.0:
+        # Commanded total 0 and no partials. Kn is the vacuum limit.
+        assert math.isinf(got_kn)
+    else:
+        expected_kn = _knudsen_number(
+            realized_pa,
+            float(controls["gas_temperature_K"]),
+            float(controls["pipe_diameter_m"]),
+            carrier_gas=str(controls["carrier_gas"]),
+        )
+        assert got_kn == pytest.approx(expected_kn, rel=1.0e-9, abs=0.0)
+        assert math.isfinite(got_kn)
+    if film_on and realized_pa > 0.0:
+        assert float(probed["knudsen_number"]) < VISCOUS_KNUDSEN_MAX
+        assert float(probed["d_ab_m2_s"]) > 0.0
+        assert float(probed["r_gas"]) > 0.0
+        if probe == "Ca":
+            # Ca has no Lennard-Jones proxy, so this call is the
+            # publisher's diffusivity at the realized total.
+            expected_d = _chapman_enskog_d_ab_m2_s(
+                "Ca",
+                float(controls["gas_temperature_K"]),
+                realized_pa,
+                carrier=str(controls["carrier_gas"]),
+            )
+            assert probed["d_ab_m2_s"] == pytest.approx(expected_d, rel=1.0e-9)
+    else:
+        assert float(probed["r_gas"]) == pytest.approx(0.0)
+
+
+def _two_species_root_is_the_balance(
+    expected_pa: Mapping[str, float],
+    *,
+    gate: str,
+) -> bool:
+    """Ca+O2 is the whole oxygen balance only while Ca's bulk is zero.
+
+    A 1000 Pa Ca bulk chokes that carrier. CaO(g) and Ca2 then carry
+    the oxygen, so the two-species root is not the solver's root.
+    The floor publication has the same problem once a film makes the
+    carriers' conductances differ. Open gate, no Ca bulk: the
+    two-species root is the independent anchor.
+    """
+
+    return gate == "open" and float(expected_pa.get("Ca", 0.0)) <= 0.0
+
+
+def _assert_closed_surface(
+    notice: Mapping,
+    kernel_map: Mapping,
+    expected_pa: Mapping[str, float],
+    *,
+    published_ca: float,
+    p_ref_bar: float,
+    legacy,
+    film_on: bool,
+    realized_pa: float,
+    gate: str,
+) -> None:
+    bulk_o2 = float(expected_pa.get("O2", 0.0))
+    bulk_ca = float(expected_pa.get("Ca", 0.0))
+    assert float(notice["relative_residual"]) < 1.0e-4
+    if bulk_o2 > 0.0:
+        assert notice["overhead_bounded"] is True
+        assert notice["surface_pO2_bar"] * PA_PER_BAR >= bulk_o2 * (1.0 - 1.0e-9)
+    else:
+        assert notice["overhead_bounded"] is False
+    if film_on and not _two_species_root_is_the_balance(expected_pa, gate=gate):
+        return
+    if film_on:
+        root_bar, root_pa = _series_cao_root(
+            published_ca,
+            p_ref_bar,
+            bulk_o2_pa=bulk_o2,
+            bulk_ca_pa=bulk_ca,
+            overhead_pa=realized_pa,
+            temperature_K=_T_K,
+            legacy=legacy,
+        )
+    else:
+        root_bar, root_pa = _bound_cao_root(
+            published_ca,
+            p_ref_bar,
+            partials={"O2": bulk_o2, "Ca": bulk_ca},
+            film_on=False,
+            hkl=frozenset(),
+            legacy=legacy,
+            realized_pa=realized_pa,
+        )
+    assert notice["surface_pO2_bar"] == pytest.approx(root_bar, rel=1.0e-5)
+    assert kernel_map["Ca"] == pytest.approx(root_pa, rel=1.0e-5)
+
+
+def _assert_persisted_headspace(pairs: tuple[tuple[str, float], ...], entry: str) -> None:
+    expected_pa = _expected_persisted_pa(pairs)
+    composition = _composition_with_junk(pairs)
+    if entry == "live-floor":
+        gate = "floor"
+    elif entry == "live-buffered":
+        gate = "buffered"
+    else:
+        gate = "open"
+    film_on = entry != "live-open-nofilm"
+    commanded_mbar = _FILM_COMMANDS_MBAR["above"] if entry == "live-above" else 0.0
+    explicit = entry in {"override-keeps", "override-omits"}
+    answer = _bound_answer("floor" if gate == "floor" else "open")
+    diagnostic = answer.diagnostic
+    published, published_ca, p_ref_bar = _published_ca(diagnostic)
+    compiled, legacy = _catalog()
+    if entry == "override-keeps":
+        headspace: dict[str, float] = {}
+    elif entry == "reclose":
+        headspace = {}
+    else:
+        headspace = composition
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=_film_capacity(gate),
+        p_total_mbar=commanded_mbar,
+        headspace_partials_mbar=headspace,
+        chemistry_kernel={"gas_resistance_enabled": film_on},
+    )
+    if entry == "reader":
+        _assert_reader_keeps_every_persisted_gas(host, published, expected_pa)
+        return
+    if entry == "film":
+        _assert_film_sums_the_vector(host, expected_pa)
+        return
+
+    if entry == "reclose":
+        vacuum = _resolve(host, equilibrium)
+        _surface, ideal_pa, _flux = _congruent_cao_surface(published_ca, p_ref_bar)
+        assert vacuum["Ca"] == pytest.approx(ideal_pa, rel=1.0e-4)
+        reclosed = EvaporationMixin._reclose_langmuir_pressures(host, expected_pa)
+        assert reclosed is not None
+        assert reclosed.relative_residual < 1.0e-4
+        realized = _realized_transport_pa(expected_pa, 0.0)
+        if expected_pa.get("O2", 0.0) > 0.0:
+            assert reclosed.overhead_bounded is True
+            assert reclosed.surface_pO2_bar * PA_PER_BAR >= float(
+                expected_pa["O2"]
+            ) * (1.0 - 1.0e-9)
+        else:
+            assert reclosed.overhead_bounded is False
+        if _two_species_root_is_the_balance(expected_pa, gate="open"):
+            root_bar, root_pa = _series_cao_root(
+                published_ca,
+                p_ref_bar,
+                bulk_o2_pa=float(expected_pa.get("O2", 0.0)),
+                bulk_ca_pa=0.0,
+                overhead_pa=realized,
+                temperature_K=_T_K,
+                legacy=legacy,
+            )
+            assert reclosed.surface_pO2_bar == pytest.approx(root_bar, rel=1.0e-5)
+            assert reclosed.pressures_Pa["Ca"] == pytest.approx(root_pa, rel=1.0e-5)
+        else:
+            # Ca bulk chokes that carrier. The root is not the vacuum one.
+            assert reclosed.surface_pO2_bar != pytest.approx(
+                _surface, rel=1.0e-3
+            )
+        return
+
+    captured: dict = {}
+    _dispatch_real_flux_provider(host, captured)
+    override = None
+    if entry == "override-keeps":
+        override = dict(expected_pa)
+    elif entry == "override-omits":
+        override = {}
+    EvaporationMixin._calculate_evaporation(
+        host,
+        equilibrium,
+        overhead_partials_override_Pa=override,
+    )
+    context = host._langmuir_flux_closure_context
+    notice = getattr(host, "_last_langmuir_surface_oxygen", None)
+    root_closed = isinstance(notice, dict) and notice.get("surface_pO2_bar") is not None
+    if gate == "buffered" and not explicit:
+        assert not root_closed
+        for species, pa in expected_pa.items():
+            assert context["film_partials_Pa"][species] == pytest.approx(pa)
+        assert context["film_pressure_Pa"] == pytest.approx(
+            _realized_transport_pa(expected_pa, commanded_mbar)
+        )
+        kernel_partials = captured["controls"]["overhead_partials_Pa"]
+        # Amendment 1 carve-out: the publisher does not adopt the unused
+        # film. A vapor-map species stays; a non-vapor carrier does not.
+        for species, pa in expected_pa.items():
+            if species in published:
+                assert kernel_partials[species] == pytest.approx(pa)
+            else:
+                assert species not in kernel_partials
+        return
+
+    publisher_pa = {} if entry == "override-omits" else expected_pa
+    realized = _realized_transport_pa(publisher_pa, commanded_mbar)
+    assert root_closed, notice
+    for species, pa in publisher_pa.items():
+        assert context["film_partials_Pa"][species] == pytest.approx(pa)
+    for species in expected_pa:
+        if entry == "override-omits":
+            assert species not in context["film_partials_Pa"]
+    assert context["film_pressure_Pa"] == pytest.approx(realized)
+    assert captured["provider_error"] is None
+    provider = captured["provider"]
+    assert provider is not None and str(provider.status) == "ok", provider
+    _assert_transport_state(
+        captured["controls"],
+        provider,
+        publisher_pa,
+        realized_pa=realized,
+        film_on=film_on,
+    )
+    _assert_closed_surface(
+        notice,
+        captured["controls"][CONTROL_FLUX_PRESSURES_KEY],
+        publisher_pa,
+        published_ca=published_ca,
+        p_ref_bar=p_ref_bar,
+        legacy=legacy,
+        film_on=film_on,
+        realized_pa=realized,
+        gate=gate,
+    )
+    assert float(captured["controls"]["commanded_pressure_pa"]) == pytest.approx(
+        commanded_mbar * 100.0
+    )
+
+
+@pytest.mark.parametrize(
+    "case",
+    _persisted_cases(),
+    ids=_persisted_case_id,
+)
+def test_persisted_headspace_vector_sets_transport_on_every_path(case: tuple) -> None:
+    """No persisted gas is dropped before the film sums the total.
+
+    Invariant: the persisted composition is one partial vector. Every
+    positive finite entry is in the film whenever that film is built
+    from the persisted headspace, whether or not the gas is in the
+    vapor map. The realized total is ``max(sum of that vector,
+    commanded melt pressure)``, and Kn and diffusivity use it. An
+    explicit vector is not filled from the persisted map. A step that
+    did not close a root keeps vapor-map backpressure; its stored film
+    still holds the complete vector.
+
+    Classes: every transport-catalog carrier, CO (in neither catalog),
+    Ca (in the vapor map), and N2 plus O2. Paths: the reader against
+    three vapor-map decoys, the film sum, live open / floor / buffered
+    / commanded-above, film off, an override that keeps the gas, an
+    override that omits a persisted gas, and reclose.
+    """
+
+    _name, pairs, entry = case
+    _assert_persisted_headspace(pairs, entry)

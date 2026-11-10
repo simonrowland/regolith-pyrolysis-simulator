@@ -770,28 +770,49 @@ class EvaporationMixin:
         self,
         species_ids: Mapping[str, Any] | Any,
     ) -> dict[str, float]:
-        """Species backpressures (Pa) for one surface closure.
+        """Every positive headspace partial the film may sum, in Pa.
 
-        Includes O2 even when the vapor map has no O2 row: the balance's
-        synthetic O2 channel uses that partial. A missing reader is an
-        empty headspace, not a zero substituted for a measurement the
-        caller withheld.
+        The persisted composition is the vector. ``species_ids`` (the
+        vapor map) is not an allowlist: a carrier absent from it, such
+        as N2, still sets the realized total. Those keys are extra
+        reader queries, so a reader that does not store partials on the
+        composition map still answers for them. O2 is queried too, so a
+        reader that stores the overhead bound outside that map still
+        supplies it. A missing reader is an empty headspace, not a zero
+        substituted for a measurement the caller withheld.
+
+        d-376 round 6. Kn and diffusivity use one pressure,
+        ``max(sum of this vector, commanded melt pressure)``.
+        Intersecting with the vapor map and then adding O2 left a
+        commanded total of 0 on vacuum transport under 1000 Pa of
+        persisted N2.
         """
 
         reader = getattr(self, "_evaporation_bulk_partial_pressure_pa", None)
         if not callable(reader):
             return {}
-        names = [str(species) for species in species_ids]
-        if "O2" not in names:
+        composition = getattr(self, "_melt_headspace_composition_mbar", None) or {}
+        names: list[Any] = []
+        if isinstance(composition, Mapping):
+            names.extend(composition)
+        # Extra queries, not a filter. Dropping any name that is absent
+        # from this list was the vacuum-transport hole.
+        names.extend(species_ids)
+        if not any(str(species) == "O2" for species in names):
             names.append("O2")
         partials: dict[str, float] = {}
+        seen: set[str] = set()
         for species in names:
+            label = str(species)
+            if label in seen:
+                continue
+            seen.add(label)
             try:
                 value = float(reader(species))
             except (TypeError, ValueError):
                 continue
             if math.isfinite(value) and value > 0.0:
-                partials[species] = value
+                partials[label] = value
         return partials
 
     def _langmuir_film(
@@ -801,11 +822,14 @@ class EvaporationMixin:
         """The one partial vector and transport pressure for an evaluation.
 
         Positive finite partials only. A non-positive entry is not a
-        bulk and does not enter the sum. The transport pressure is the
+        bulk and does not enter the sum. This method does not intersect
+        the vector with the vapor map: every positive key, including a
+        non-vapor carrier, is in the sum. The transport pressure is the
         flux provider's ``max(partial sum, commanded melt pressure)``
         when that reader exists, and the partial sum when it does not.
-        The surface root and the flux kernel both consume this pair.
-        Neither sums a second vector.
+        That one pressure is what Kn and diffusivity use. The surface
+        root and the flux kernel both consume this pair. Neither sums
+        a second vector.
         """
 
         cleaned: dict[str, float] = {}
@@ -1215,6 +1239,8 @@ class EvaporationMixin:
             # Call the mixin directly. A namespace host binds the
             # resolver without copying every helper onto itself; the
             # helper then uses whatever bulk reader that host has.
+            # ``vapor_pressures`` is not a filter: the helper returns
+            # every positive persisted partial, and the film sums it.
             partials = EvaporationMixin._langmuir_headspace_partials_Pa(
                 self, vapor_pressures
             )
@@ -1306,8 +1332,11 @@ class EvaporationMixin:
         already filmed it. A step that did not close a root and has no
         explicit vector keeps the vapor-map backpressure, zeros included.
         d-376 amendment 1 leaves that buffered in-band flux on green:
-        the root did not run, and adopting its unused O2 film would
-        change the gas resistance of pressures the gate kept.
+        the root did not run, and adopting its unused film would change
+        the gas resistance of pressures the gate kept. The stored film
+        still holds the complete persisted vector, non-vapor carriers
+        included; this branch does not rebuild that vector from the
+        vapor-map keys.
         """
 
         context = getattr(self, "_langmuir_flux_closure_context", None)
