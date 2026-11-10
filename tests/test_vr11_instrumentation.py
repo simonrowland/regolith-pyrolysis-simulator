@@ -25,11 +25,14 @@ from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
     PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
+    _D380_DEBIT_EXCEPTIONS,
+    _D380_ELLINGHAM_RAIL,
+    _D380_FLAGGED_ALPHA_FALLBACK,
     _EMPTY_FLUX_AUTHORIZING_STATES,
-    _KERNEL_SEAM_DEBIT_SPECIES,
     _authorize_empty_species_flux,
     _evaporation_legacy_shadow_pressure_map,
     _pre_rg_effective_pressure_source,
+    _uses_kernel_seam_debit,
 )
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
@@ -957,18 +960,19 @@ def test_evaporation_healthy_empty_batch_at_900c_keeps_cheap_zero() -> None:
     assert flux.species_kg_hr == {}
 
 
-# Invariant: an empty species flux is never a silent 0.0. Every requested
-# species is a computed debit or a selected outcome that authorizes zero
-# (dormant epoch, upper bound, zero-by-physics). Refusal, incomplete,
-# missing, and invalid selected pressures are typed refusals of that empty
-# flux above the kinetic floor. A numeric catalog pressure does not
-# authorize the zero. The below-400 K kinetic floor is a legitimate empty
-# flux even when a channel is refused, because the kernel did not evaluate.
-# The sub-1050 C physical zero still requires every selected outcome to
+# Invariant: an empty species flux is never a silent 0.0, and a typed
+# refusal is never covered by the sub-1050 C physical zero. Every
+# requested species is a computed debit or a selected outcome that
+# authorizes zero (dormant epoch, upper bound, zero-by-physics).
+# Refusal, incomplete, missing, and invalid selected pressures are typed
+# refusals of that channel. A numeric catalog pressure on a dormant or
+# upper-bound peer does not authorize the cold zero while a refusal sits
+# beside it. The below-400 K kinetic floor is a legitimate empty flux
+# even when a channel is refused, because the kernel did not evaluate.
+# The sub-1050 C physical zero requires every selected outcome to
 # authorize zero.
-# Kernel-seam carriers, the non-seam tripwire carriers, and the sibling that
-# rides the 900 C Fe batch. Kept literal here because those sets are defined
-# later in this module; the coverage test pins the equality.
+# Carriers named by d-380, the old six-species seam, the grok catalog
+# movers (Al, SiO, TiO, TiO2_gas), and the sibling on the 900 C Fe batch.
 _EMPTY_FLUX_SPECIES = (
     "Al",
     "Al2",
@@ -988,6 +992,8 @@ _EMPTY_FLUX_SPECIES = (
     "Si",
     "SiO",
     "Ti",
+    "TiO",
+    "TiO2_gas",
 )
 _EMPTY_FLUX_BLOCKING_SHAPES = (
     "selected_refusal_dormant_catalog",
@@ -996,7 +1002,12 @@ _EMPTY_FLUX_BLOCKING_SHAPES = (
     "invalid_selected_active",
     "both_pressures_refused",
     "refusal_beside_authorizing_peer",
+    "refusal_beside_upper_bound_peer",
 )
+_BESIDE_AUTHORIZING_PEER_STATE = {
+    "refusal_beside_authorizing_peer": "dormant_by_epoch",
+    "refusal_beside_upper_bound_peer": "upper_bound",
+}
 _EMPTY_FLUX_AUTHORIZING_SHAPES = (
     "dormant_eligible",
     "upper_bound",
@@ -1009,6 +1020,7 @@ _EMPTY_FLUX_STATE_BY_SHAPE = {
     "invalid_selected_active": "invalid_selected_runtime_pressure",
     "both_pressures_refused": "refusal",
     "refusal_beside_authorizing_peer": "refusal",
+    "refusal_beside_upper_bound_peer": "refusal",
     "dormant_eligible": "dormant_by_epoch",
     "upper_bound": "upper_bound",
     "inactive_zero_by_physics": "dormant_by_epoch",
@@ -1088,6 +1100,16 @@ def _empty_flux_batch(species_id: str, shape: str) -> VapourBatch:
             pressure=value,
             selected=selected_value,
             flux=FluxEligible(alpha_ref="alpha:peer"),
+        )
+    elif shape == "refusal_beside_upper_bound_peer":
+        channels[species_id] = _channel_answer(
+            species_id, pressure=refusal, selected=refusal, flux=flux_refusal
+        )
+        channels[_AUTHORIZING_PEER] = _channel_answer(
+            _AUTHORIZING_PEER,
+            pressure=value,
+            selected=PressureUpperBound(pa=3.0, evidence_ref="test:peer-bound"),
+            flux=FluxDiagnosticUpperBound(alpha_ref="alpha:peer"),
         )
     elif shape == "dormant_eligible":
         channels[species_id] = _channel_answer(
@@ -1183,10 +1205,10 @@ def test_empty_flux_refuses_every_nonauthorizing_selected_outcome(
     """A dormant catalog Pa cannot hide a selection that nobody can answer.
 
     Above the kinetic floor, an all-refusal or incomplete request still
-    refuses. A refusal beside an authorizing peer does not: the peer's zero
-    stands, and below 1050 C that zero is the seam's physical zero. On the
-    below-400 K floor the kernel did not evaluate, so the empty flux is
-    authorized for every shape.
+    refuses. A refusal beside a dormant or upper-bound peer does not abort
+    the batch and does not become the sub-1050 C physical zero: the peer's
+    catalog pressure is not that proof. On the below-400 K floor the kernel
+    did not evaluate, so the empty flux is authorized for every shape.
     """
 
     outcome, reason, overlay = _run_empty_backend(
@@ -1196,19 +1218,19 @@ def test_empty_flux_refuses_every_nonauthorizing_selected_outcome(
     )
     states = overlay.get("batch_channel_states") or {}
     assert states.get(species_id) == _EMPTY_FLUX_STATE_BY_SHAPE[shape]
-    if shape == "refusal_beside_authorizing_peer":
-        assert states.get(_AUTHORIZING_PEER) == "dormant_by_epoch"
+    if shape in _BESIDE_AUTHORIZING_PEER_STATE:
+        assert states.get(_AUTHORIZING_PEER) == (
+            _BESIDE_AUTHORIZING_PEER_STATE[shape]
+        )
         assert _AUTHORIZING_PEER in (overlay.get("batch_pa_by_species") or {})
     if kinetic_floor:
         assert outcome == "returned", (species_id, shape, temperature_C, reason)
         assert reason == "internal_analytical_below_400K"
         return
-    if shape == "refusal_beside_authorizing_peer":
+    if shape in _BESIDE_AUTHORIZING_PEER_STATE:
         assert outcome == "returned", (species_id, shape, temperature_C, reason)
-        if temperature_C >= 1050.0:
-            assert reason == "vapour_batch_all_channels_non_debiting"
-        else:
-            assert reason == "pre_rg_backend_below_effective_pressure_threshold"
+        assert reason == "vapour_batch_all_channels_non_debiting"
+        assert reason != "pre_rg_backend_below_effective_pressure_threshold"
         return
     assert outcome == "refused", (species_id, shape, temperature_C, reason)
     assert reason == "vapour_batch_no_debiting_pressure_outcome"
@@ -1422,27 +1444,12 @@ def test_source_guard_flags_effective_pressure_source_argument() -> None:
         )
 
 
-# Invariant: the flux debit is the batch selected pressure after the single
-# kernel-seam chokepoint. That chokepoint copies a finite effective-pressure
-# value onto Na, K, Ca, Mg, Ti, and Si. Every other carrier keeps the batch
-# value. The flux context never reads the compatibility map. Catalog
-# ``answer.pressure`` stays the catalog number on both classes.
-_PINNED_KERNEL_SEAM_SPECIES = frozenset({"Na", "K", "Ca", "Mg", "Ti", "Si"})
+# Invariant: the flux debit is the kernel seam after the single chokepoint,
+# except Fe's Ellingham selection. The eight flagged alpha=1 carriers debit
+# the seam too. The flux context never reads the compatibility map. Catalog
+# ``answer.pressure`` stays the catalog number.
 _TRIPWIRE_CATALOG_PA = 1.0
 _TRIPWIRE_KERNEL_PA = 999.0
-_TRIPWIRE_NON_SEAM_SPECIES = (
-    "Al",
-    "Fe",
-    "SiO",
-    "Al2",
-    "Al2O",
-    "Al2O2",
-    "Al2O3_gas",
-    "AlO",
-    "AlO2",
-    "CrO",
-    "CrO2",
-)
 
 
 # Every channel state flux_pressures_from_batch can publish. A new state
@@ -1460,27 +1467,30 @@ _EMPTY_FLUX_PUBLISHED_STATES = (
 
 
 @pytest.mark.parametrize("state", _EMPTY_FLUX_PUBLISHED_STATES)
+@pytest.mark.parametrize("peer_state", ["dormant_by_epoch", "upper_bound"])
 @pytest.mark.parametrize("kinetic_floor", [False, True])
 @pytest.mark.parametrize("catalog_pressure_present", [False, True])
 @pytest.mark.parametrize(
     "physical_zero_reason",
     [None, "pre_rg_backend_below_effective_pressure_threshold"],
 )
-def test_authorizer_refusal_does_not_veto_dormant_peer(
+def test_authorizer_refusal_beside_nonanswer_is_not_a_cold_physical_zero(
     state: str,
+    peer_state: str,
     kinetic_floor: bool,
     catalog_pressure_present: bool,
     physical_zero_reason: str | None,
 ) -> None:
-    """Above the kinetic floor a refusal does not veto a dormant peer.
+    """A refusal beside a dormant or upper-bound peer is not the cold zero.
 
     The below-400 K floor authorizes before those outcomes are read. A
-    non-answer vetoes the batch only when every channel is a non-answer;
-    this map always includes a dormant Na peer.
+    non-answer vetoes the batch only when every channel is a non-answer.
+    Catalog pressure does not select the sub-1050 C physical zero while
+    any channel is a refusal, incomplete, missing, or invalid outcome.
     """
 
     result = _authorize_empty_species_flux(
-        {"Fe": state, "Na": "dormant_by_epoch"},
+        {"Fe": state, "Na": peer_state},
         kinetic_floor=kinetic_floor,
         physical_zero_reason=physical_zero_reason,
         catalog_pressure_present=catalog_pressure_present,
@@ -1491,16 +1501,17 @@ def test_authorizer_refusal_does_not_veto_dormant_peer(
     authorizes = state in _EMPTY_FLUX_AUTHORIZING_STATES
     assert result is not None
     kind, reason = result
-    if physical_zero_reason and catalog_pressure_present:
-        assert (kind, reason) == ("physical_zero", physical_zero_reason)
-        return
     if not authorizes:
         assert (kind, reason) == (
             "partial_authorized",
             "vapour_batch_all_channels_non_debiting",
         )
+        assert reason != "pre_rg_backend_below_effective_pressure_threshold"
         return
-    # A dormant peer keeps an all-zero-by-physics map from taking that token.
+    if physical_zero_reason and catalog_pressure_present:
+        assert (kind, reason) == ("physical_zero", physical_zero_reason)
+        return
+    # An authorizing peer keeps an all-zero-by-physics map from that token.
     assert (kind, reason) == (
         "typed_non_debit",
         "vapour_batch_all_channels_non_debiting",
@@ -1551,43 +1562,53 @@ def test_empty_flux_returns_call_the_authorizer_once() -> None:
 
 
 def test_empty_flux_species_cover_b114_carriers() -> None:
-    assert set(_EMPTY_FLUX_SPECIES) == (
-        set(_PINNED_KERNEL_SEAM_SPECIES)
-        | set(_TRIPWIRE_NON_SEAM_SPECIES)
-        | {"FeO_association_gas"}
-    )
+    named = set(_D380_DEBIT_EXCEPTIONS)
+    assert named <= set(_EMPTY_FLUX_SPECIES)
+    assert {
+        "Al", "SiO", "TiO", "TiO2_gas", "Na", "K", "Ca", "Mg", "Ti", "Si", "Fe",
+    } <= set(_EMPTY_FLUX_SPECIES)
+    assert {
+        species_id
+        for species_id, kind in _D380_DEBIT_EXCEPTIONS.items()
+        if kind == _D380_ELLINGHAM_RAIL
+    } == {"Fe"}
+    assert {
+        species_id
+        for species_id, kind in _D380_DEBIT_EXCEPTIONS.items()
+        if kind == _D380_FLAGGED_ALPHA_FALLBACK
+    } == {
+        "Al2", "Al2O", "Al2O2", "Al2O3_gas", "AlO", "AlO2", "CrO", "CrO2",
+    }
+    shipped = yaml.safe_load(
+        (ROOT / "data" / "setpoints.yaml").read_text(encoding="utf-8")
+    )["chemistry_kernel"]["unmeasured_alpha_fallback_species"]
+    assert set(shipped) == {
+        species_id
+        for species_id, kind in _D380_DEBIT_EXCEPTIONS.items()
+        if kind == _D380_FLAGGED_ALPHA_FALLBACK
+    }
 
 
-def _tripwire_species_cases() -> list:
-    cases = [
-        pytest.param(species_id, True, id=f"seam-{species_id}")
-        for species_id in sorted(_PINNED_KERNEL_SEAM_SPECIES)
-    ]
-    cases.extend(
-        pytest.param(species_id, False, id=f"nonseam-{species_id}")
-        for species_id in _TRIPWIRE_NON_SEAM_SPECIES
-    )
-    return cases
-
-
-@pytest.mark.parametrize(
-    ("species_id", "on_seam"),
-    _tripwire_species_cases(),
-)
+@pytest.mark.parametrize("species_id", _EMPTY_FLUX_SPECIES)
 def test_runtime_tripwire_records_zero_flux_context_compatibility_reads(
     species_id: str,
-    on_seam: bool,
 ) -> None:
-    """Kernel-seam species debit 999 Pa. Every other carrier stays at catalog 1 Pa.
+    """Every carrier except Fe debits the kernel seam (999 Pa).
 
-    The compatibility map is the effective-pressure source. Reading it under
+    Fe keeps the Ellingham selection, here the catalog 1 Pa stand-in. The
+    compatibility map is the effective-pressure source. Reading it under
     the flux context is still forbidden. The seam copy happens in the named
     effective-pressure context, then the flux consumer reads the batch.
     """
 
-    assert _KERNEL_SEAM_DEBIT_SPECIES == _PINNED_KERNEL_SEAM_SPECIES
-    assert _PINNED_KERNEL_SEAM_SPECIES.isdisjoint(_TRIPWIRE_NON_SEAM_SPECIES)
-    assert (species_id in _KERNEL_SEAM_DEBIT_SPECIES) is on_seam
+    on_seam = _uses_kernel_seam_debit(species_id)
+    assert on_seam is (species_id != "Fe")
+    if species_id in _D380_DEBIT_EXCEPTIONS:
+        if _D380_DEBIT_EXCEPTIONS[species_id] == _D380_FLAGGED_ALPHA_FALLBACK:
+            assert on_seam is True
+        else:
+            assert _D380_DEBIT_EXCEPTIONS[species_id] == _D380_ELLINGHAM_RAIL
+            assert on_seam is False
     expected_pa = _TRIPWIRE_KERNEL_PA if on_seam else _TRIPWIRE_CATALOG_PA
     compatibility = CompatibilityPressureMapReadTripwire(
         {species_id: _TRIPWIRE_KERNEL_PA}

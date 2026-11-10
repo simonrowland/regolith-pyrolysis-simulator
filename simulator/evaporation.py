@@ -79,21 +79,53 @@ PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C = 1050.0
 _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
     'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10',
 })
-# Catalog activity correction for these species is not the debit.
-# The runtime already publishes the kernel seam green uses; keep that
-# seam on the selected pressure. answer.pressure stays the catalog
-# reference. Which source is the long-term owner is b-1169.
-# Si is the same class. At the C4 in-domain point (1670 C, p_total
-# 10.2 mbar, pO2 0.2 mbar = 2e-4 bar) the catalog row's pO2 reference
-# is 1e-9 bar and the exponent is -1, so the activity-corrected catalog
-# pressure is the kernel pressure times (2e-4/1e-9)^-1 = 1/2e5.
-# Measured pair: catalog 4.149230182792238e-12 Pa, kernel
-# 8.298460365584479e-07 Pa. Green debits the kernel. The catalog debit
-# falls under the 1e-12 kg/hr report floor and Si vanishes. At C0 the
-# realized pO2 is that 1e-9 bar floor, so the ratio is 1 (1 ulp) and
-# the C0 totals do not move. A missing source label is not that cutover:
-# the finite kernel number stays the debit.
-_KERNEL_SEAM_DEBIT_SPECIES = frozenset({'Na', 'K', 'Ca', 'Mg', 'Ti', 'Si'})
+# d-380 (2026-11-10): the kernel seam is the debit for every carrier.
+# answer.pressure stays the catalog reference (b-1169). A finite kernel
+# pressure is copied onto the selected debit. A missing seam value is
+# not a zero and does not replace a typed refusal.
+#
+# Si shows why the catalog continuation is not the debit. At the C4
+# in-domain point (1670 C, p_total 10.2 mbar, pO2 0.2 mbar = 2e-4 bar)
+# the catalog row's pO2 reference is 1e-9 bar and the exponent is -1, so
+# the activity-corrected catalog pressure is the kernel pressure times
+# (2e-4/1e-9)^-1 = 1/2e5. Measured pair: catalog
+# 4.149230182792238e-12 Pa, kernel 8.298460365584479e-07 Pa. The catalog
+# debit falls under the 1e-12 kg/hr report floor and Si vanishes. Green
+# debits the kernel. At C0 the realized pO2 is that 1e-9 bar floor, so
+# the ratio is 1 (1 ulp). A missing source label is not that cutover.
+#
+# Named exceptions, and no others:
+# - Fe: the Ellingham rail already written on selected_runtime_pressure.
+#   Copying the seam would replace that ruling.
+# - Al2, Al2O, Al2O2, Al2O3_gas, AlO, AlO2, CrO, CrO2: the flagged
+#   alpha=1 fallback changes admission only. Their debit stays the seam.
+_D380_ELLINGHAM_RAIL = 'ellingham_rail'
+_D380_FLAGGED_ALPHA_FALLBACK = 'flagged_alpha_fallback_admission'
+_D380_DEBIT_EXCEPTIONS: Mapping[str, str] = MappingProxyType({
+    'Fe': _D380_ELLINGHAM_RAIL,
+    'Al2': _D380_FLAGGED_ALPHA_FALLBACK,
+    'Al2O': _D380_FLAGGED_ALPHA_FALLBACK,
+    'Al2O2': _D380_FLAGGED_ALPHA_FALLBACK,
+    'Al2O3_gas': _D380_FLAGGED_ALPHA_FALLBACK,
+    'AlO': _D380_FLAGGED_ALPHA_FALLBACK,
+    'AlO2': _D380_FLAGGED_ALPHA_FALLBACK,
+    'CrO': _D380_FLAGGED_ALPHA_FALLBACK,
+    'CrO2': _D380_FLAGGED_ALPHA_FALLBACK,
+})
+
+
+def _uses_kernel_seam_debit(species_id: str) -> bool:
+    """Return whether this carrier debits the kernel seam.
+
+    d-380: the seam is the default. False only for the Fe Ellingham row.
+    The eight flagged alpha=1 carriers are named in
+    ``_D380_DEBIT_EXCEPTIONS`` and still return True.
+    """
+
+    return (
+        _D380_DEBIT_EXCEPTIONS.get(str(species_id))
+        != _D380_ELLINGHAM_RAIL
+    )
 
 
 class EvaporationFluxRefusal(ProviderUnavailableError):
@@ -793,14 +825,16 @@ def _retain_kernel_seam_debit(
     equilibrium: Any,
     effective_pressure_source: EffectivePressureSource,
 ) -> Any:
-    """Keep Na, K, Ca, Mg, Ti, and Si on the kernel pressure already published.
+    """Copy the kernel seam onto every flux-active debit except Fe.
 
-    Invariant: for every flux-active species in this set, a finite kernel
-    pressure is the selected debit. ``answer.pressure`` stays the catalog
-    value. A missing, blank, or non-string source label is missing
-    provenance. It does not select the catalog number and it does not
-    invent a zero. Genuine absence of a kernel pressure leaves the incoming
-    selection unchanged.
+    Invariant: every flux-active carrier debits a finite kernel pressure
+    when the seam has one. ``answer.pressure`` stays the catalog value.
+    Fe keeps the Ellingham selection already on the answer (d-380). The
+    eight flagged alpha=1 carriers are not a second pressure source.
+    A missing, blank, or non-string source label is missing provenance.
+    It does not select the catalog number and it does not invent a zero.
+    Genuine absence of a kernel pressure, or a selected refusal, leaves
+    the incoming selection unchanged.
     """
 
     if batch is None:
@@ -810,8 +844,9 @@ def _retain_kernel_seam_debit(
         kernel_sources = {}
     channels = dict(batch.channels_by_species)
     changed = False
-    for species_id in _KERNEL_SEAM_DEBIT_SPECIES:
-        answer = channels.get(species_id)
+    for species_id, answer in channels.items():
+        if not _uses_kernel_seam_debit(species_id):
+            continue
         if answer is None or not answer.is_flux_active:
             continue
         if not isinstance(answer.selected_runtime_pressure, PressureValue):
@@ -862,17 +897,21 @@ def _authorize_empty_species_flux(
 ) -> tuple[str, str] | None:
     """Return ``(kind, reason)`` or None when the empty flux must be refused.
 
-    Invariant: no requested species is a silent 0.0. The below-400 K kinetic
-    floor is a legitimate empty flux. The kernel did not evaluate on that
-    tick, so a catalog refusal there is not a debit and must not abort the
-    run. A refused, incomplete, missing, or invalid channel refuses only
-    that channel. Peers that are dormant, an upper bound, or zero-by-physics
-    still authorize their own zero, and the sub-1050 C physical zero still
-    applies when any channel can answer. The batch is refused only when
-    every selected channel is unable to answer. A numeric dormant catalog
-    pressure on an all-refusal request is not that answer, so it does not
-    take the physical zero. No species present does not block; one of the
-    typed proofs below is still required.
+    Invariant: no requested species is a silent 0.0, and a typed refusal
+    is never covered by the sub-1050 C physical zero. Every channel is a
+    computed debit, a typed non-debit, or a typed refusal of that channel
+    alone. The below-400 K kinetic floor is a legitimate empty flux. The
+    kernel did not evaluate on that tick, so a catalog refusal there is
+    not a debit and must not abort the run. A refused, incomplete,
+    missing, or invalid channel refuses only that channel. Peers that are
+    dormant, an upper bound, or zero-by-physics still authorize their own
+    zero. The sub-1050 C physical zero applies only when no channel is a
+    non-answer. A refusal beside a dormant or upper-bound channel does
+    not take that zero merely because the peer has a catalog pressure.
+    Fe missing Ellingham inputs stays a refusal of Fe; the other carriers
+    continue. The batch is refused only when every selected channel is
+    unable to answer. No species present does not block; one of the typed
+    proofs below is still required.
 
     ``partial_authorized`` means at least one channel authorizes a zero and
     at least one does not. The caller must let a later kernel or freeze-gate
@@ -893,6 +932,10 @@ def _authorize_empty_species_flux(
     # sub-1050 C seam proof or a dormant catalog pressure.
     if blocking and len(blocking) == len(channel_states):
         return None
+    # A refusal beside a dormant or upper-bound peer is that channel's
+    # typed refusal. The peer's catalog pressure is not the cold zero.
+    if blocking:
+        return (_EMPTY_FLUX_PARTIAL, _EMPTY_FLUX_TYPED_NON_DEBIT)
     if physical_zero_reason and catalog_pressure_present:
         return ('physical_zero', str(physical_zero_reason))
     if channel_states and all(

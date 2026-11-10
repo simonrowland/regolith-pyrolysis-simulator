@@ -929,16 +929,18 @@ def test_catalog_probe_and_flux_use_selected_runtime_pressure():
             pytest.approx(expected_pa, rel=0.0, abs=0.0)
         )
 
-    # Flux consumes the selected runtime value already carried by each answer.
+    # Flux debits the kernel seam, computed here from the effective-pressure
+    # source. That source is independent of the selected pressure the debit
+    # chokepoint writes onto the answer.
     flux_pressures, flux_report = flux_pressures_from_batch(batch)
     assert flux_report["selection_source"] == (
         "vapour_batch_selected_runtime_pressure"
     )
     for species_id in verifier_probe_pa:
+        seam_pa = effective_source.pressure_pa(species_id)
+        assert seam_pa is not None and seam_pa > 0.0
         assert flux_pressures[species_id] == pytest.approx(
-            batch.channel(species_id).selected_runtime_pressure.pa,
-            rel=0.0,
-            abs=0.0,
+            float(seam_pa), rel=0.0, abs=0.0
         )
         assert flux_report["selected_pressure_source_by_species"][species_id] == (
             "vapour_batch_selected_runtime_pressure"
@@ -956,19 +958,19 @@ def test_catalog_probe_and_flux_use_selected_runtime_pressure():
         assert answer.extra.get("acquisition_flag")
         assert answer.verdict_status == "status_bearing_non_authoritative"
         assert answer.certification_ceiling == "never"
+        seam_pa = effective_source.pressure_pa(species_id)
+        assert seam_pa is not None and seam_pa > 0.0
         assert flux_pressures[species_id] == pytest.approx(
-            answer.selected_runtime_pressure.pa, rel=0.0, abs=0.0
+            float(seam_pa), rel=0.0, abs=0.0
         )
         assert species_id in flux_report["extrapolated_flux_species"]
         assert flux_report["selected_pressure_source_by_species"][species_id] == (
             "vapour_batch_selected_runtime_pressure"
         )
     assert batch.channel("K").extra.get("out_of_range") is True
-    assert flux_pressures["K"] == pytest.approx(
-        batch.channel("K").selected_runtime_pressure.pa,
-        rel=0.0,
-        abs=0.0,
-    )
+    k_seam_pa = effective_source.pressure_pa("K")
+    assert k_seam_pa is not None and k_seam_pa > 0.0
+    assert flux_pressures["K"] == pytest.approx(float(k_seam_pa), rel=0.0, abs=0.0)
     assert "K" in flux_report["extrapolated_flux_species"]
 
     assert effective_source.source_id == (
@@ -1038,8 +1040,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     pins = capacity_pin_values(snapshot)
     # Fe's selected pressure is the Ellingham value at the in-step diagnostic
     # (0.05731853761717197 Pa, a_FeO and the 1e-9 bar transport floor). Its
-    # flux is 0.0008827256411335937 kg/hr. Na, K, Ca, Mg, and Ti debit the
-    # kernel seam, so this total matches green's kernel debit.
+    # flux is 0.0008827256411335937 kg/hr. Every other carrier debits the
+    # kernel seam (d-380), so this total matches green's kernel debit plus
+    # the ruled eight-carrier fallback.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
         0.06423670196107581, rel=1e-12, abs=1e-12
     )
@@ -1126,7 +1129,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         )
     ) == pytest.approx(
         # Fe follows the in-step Ellingham pressure, not the dormant Antoine.
-        # Na, K, Ca, Mg, and Ti follow the kernel seam, matching green.
+        # Every other carrier follows the kernel seam, matching green.
         (
             1,
             1400.0,

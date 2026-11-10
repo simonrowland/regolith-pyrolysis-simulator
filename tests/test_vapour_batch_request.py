@@ -4541,10 +4541,17 @@ def test_fe_ellingham_omission_reconciles_batch_bookkeeping(
 
 # C4 Si pair. The catalog activity correction at pO2 = 2e-4 bar against the
 # 1e-9 bar reference is the kernel pressure / 2e5. Debiting that catalog
-# number drops Si under the report floor.
+# number drops Si under the report floor. The same cutover is the default
+# for every carrier except Fe's Ellingham row (d-380).
 _C4_SI_CATALOG_PA = 4.149230182792238e-12
 _C4_SI_KERNEL_PA = 8.298460365584479e-07
-_KERNEL_SEAM_SPECIES = ("Na", "K", "Ca", "Mg", "Ti", "Si")
+_KERNEL_SEAM_SPECIES = (
+    "Na", "K", "Ca", "Mg", "Ti", "Si",
+    "Al", "SiO", "TiO", "TiO2_gas",
+    "Al2", "Al2O", "Al2O2", "Al2O3_gas", "AlO", "AlO2", "CrO", "CrO2",
+)
+_FE_ELLINGHAM_PA = 0.05731853761717197
+_FE_DIVERGENT_KERNEL_PA = 1.25
 _KERNEL_PROVENANCE_BRANCHES = (
     "label_present",
     "label_missing",
@@ -4562,12 +4569,13 @@ def test_kernel_seam_finite_pressure_is_not_a_provenance_cutover(
     species_id: str,
     branch: str,
 ) -> None:
-    """Finite kernel pressure is the debit for every seam species.
+    """Finite kernel pressure is the debit for every carrier except Fe.
 
     Missing, empty, blank, or non-string provenance must not select the
     catalog number. No kernel pressure leaves the incoming selection in
     place and does not invent a zero. One species' branch does not rewrite
-    the others, Al, or Fe.
+    the others. Fe keeps the Ellingham selection even when the seam value
+    differs. The eight flagged alpha=1 carriers debit the seam.
     """
 
     channels = {}
@@ -4599,20 +4607,13 @@ def test_kernel_seam_finite_pressure_is_not_a_provenance_cutover(
             sources[sid] = 12
         else:
             sources[sid] = f"builtin_authoritative:standard_reaction_term:{sid}"
-    channels["Al"] = _seam_debit_answer(
-        "Al",
-        selected_pa=1.5,
-        catalog_pa=1.5,
-        source_label="catalog",
-    )
     channels["Fe"] = _seam_debit_answer(
         "Fe",
-        selected_pa=0.05731853761717197,
+        selected_pa=_FE_ELLINGHAM_PA,
         catalog_pa=4.871162269407267,
         source_label="catalog",
     )
-    pressures["Al"] = 9.0
-    pressures["Fe"] = 0.05731853761717197
+    pressures["Fe"] = _FE_DIVERGENT_KERNEL_PA
     batch = VapourBatch(
         requested_species_ids=frozenset(channels),
         channels_by_species=channels,
@@ -4669,16 +4670,14 @@ def test_kernel_seam_finite_pressure_is_not_a_provenance_cutover(
             )
             assert answer.extra.get("kernel_seam_provenance_missing") is not True
 
-    aluminum = retained.channel("Al")
-    assert aluminum.selected_runtime_pressure.pa == pytest.approx(1.5)
-    assert aluminum.source_label == "catalog"
-    assert debit["Al"] == pytest.approx(1.5)
     iron = retained.channel("Fe")
     assert iron.selected_runtime_pressure.pa == pytest.approx(
-        0.05731853761717197, rel=0.0, abs=0.0
+        _FE_ELLINGHAM_PA, rel=0.0, abs=0.0
     )
     assert iron.source_label == "catalog"
     assert iron.pressure.pa == pytest.approx(4.871162269407267, rel=0.0, abs=0.0)
+    assert debit["Fe"] == pytest.approx(_FE_ELLINGHAM_PA, rel=0.0, abs=0.0)
+    assert debit["Fe"] != pytest.approx(_FE_DIVERGENT_KERNEL_PA)
 
 
 def _missing_contract_rule(
@@ -4791,19 +4790,29 @@ def _seam_debit_answer(
 
 
 def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
-    """Na, K, Ca, Mg, Ti, and Si debit the kernel seam. Fe stays on Ellingham.
+    """Every carrier except Fe debits the kernel seam. Fe stays on Ellingham.
 
     Ca, Mg, and Ti are the 1400 C C0 step. Si is the C4 1670 C in-domain
     point: pO2 is 0.2 mbar (2e-4 bar) against the catalog reference
     1e-9 bar and exponent -1, so the activity-corrected catalog pressure
     is the kernel pressure / 2e5 (4.149230182792238e-12 Pa versus
-    8.298460365584479e-07 Pa). Fails when Si's selected pressure stays
-    on that catalog correction.
+    8.298460365584479e-07 Pa). Al, SiO, TiO, TiO2_gas, and CrO2 are the
+    carriers a six-species whitelist left on the catalog continuation.
+    Fails when any of those selected pressures stay on that continuation.
     """
 
+    # Synthetic catalog/kernel pairs. Distinct on purpose so a whitelist
+    # that leaves these carriers on the catalog continuation fails.
+    catalog_movers = {
+        "Al": (1.4e-8, 9.0e-8),
+        "SiO": (3.0e-4, 1.1e-3),
+        "TiO": (2.0e-6, 4.0e-5),
+        "TiO2_gas": (5.0e-7, 7.0e-6),
+        "CrO2": (8.0e-5, 2.0e-4),
+    }
     batch = VapourBatch(
         requested_species_ids=frozenset(
-            {"Na", "K", "Ca", "Mg", "Ti", "Si", "Fe"}
+            {"Na", "K", "Ca", "Mg", "Ti", "Si", "Fe", *catalog_movers}
         ),
         channels_by_species={
             "Na": _seam_debit_answer(
@@ -4848,9 +4857,18 @@ def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
                 catalog_pa=4.871162269407267,
                 source_label="catalog",
             ),
+            **{
+                species_id: _seam_debit_answer(
+                    species_id,
+                    selected_pa=catalog_pa,
+                    catalog_pa=catalog_pa,
+                    source_label="catalog_activity_corrected",
+                )
+                for species_id, (catalog_pa, _kernel_pa) in catalog_movers.items()
+            },
         },
         flux_active_species_ids=frozenset(
-            {"Na", "K", "Ca", "Mg", "Ti", "Si", "Fe"}
+            {"Na", "K", "Ca", "Mg", "Ti", "Si", "Fe", *catalog_movers}
         ),
     )
     equilibrium = SimpleNamespace(
@@ -4868,6 +4886,12 @@ def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
             "Ti": "builtin_authoritative:standard_reaction_term",
             "Si": "builtin_authoritative:standard_reaction_term",
             "Fe": "builtin_authoritative:pure_component_derived_from_evaluation",
+            **{
+                species_id: (
+                    f"builtin_authoritative:standard_reaction_term:{species_id}"
+                )
+                for species_id in catalog_movers
+            },
         }
     )
     source = EffectivePressureSource(
@@ -4880,6 +4904,10 @@ def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
             "Ti": 1.0732438025337687e-15,
             "Si": 8.298460365584479e-07,
             "Fe": 0.05731853761717197,
+            **{
+                species_id: kernel_pa
+                for species_id, (_catalog_pa, kernel_pa) in catalog_movers.items()
+            },
         },
     )
     retained = _retain_kernel_seam_debit(batch, equilibrium, source)
@@ -4890,6 +4918,10 @@ def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
         "Mg": 0.00034222649537030153,
         "Ti": 1.0732438025337687e-15,
         "Si": 8.298460365584479e-07,
+        **{
+            species_id: kernel_pa
+            for species_id, (_catalog_pa, kernel_pa) in catalog_movers.items()
+        },
     }
     expected_catalog = {
         "Na": 2.7071606671395836,
@@ -4898,6 +4930,10 @@ def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
         "Mg": 0.00034222949385749943,
         "Ti": 1.1566690667153255e-15,
         "Si": 4.149230182792238e-12,
+        **{
+            species_id: catalog_pa
+            for species_id, (catalog_pa, _kernel_pa) in catalog_movers.items()
+        },
     }
     for species_id, kernel_pa in expected_kernel.items():
         answer = retained.channel(species_id)
