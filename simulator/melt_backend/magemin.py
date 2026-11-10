@@ -226,17 +226,29 @@ def _magemin_subprocess_env() -> Dict[str, str]:
 def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
     """Acquire one of K machine-wide MAGEMin launch slots (see above)."""
     deadline = time.monotonic() + max(0.001, float(timeout_s))
-    _MAGEMIN_SUBPROCESS_LOCK_DIR.mkdir(parents=True, exist_ok=True)
-    slots = _magemin_subprocess_slot_count()
     lock_files = []
     acquired_index = -1
     try:
-        for index in range(slots):
-            path = (
-                _MAGEMIN_SUBPROCESS_LOCK if index == 0
-                else _MAGEMIN_SUBPROCESS_LOCK.with_suffix(f'.slot{index}')
-            )
-            lock_files.append(path.open('a+b'))
+        try:
+            _MAGEMIN_SUBPROCESS_LOCK_DIR.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            raise _MAGEMinEngineLifecycleError(
+                'MAGEMinSubprocessSlotUnavailable',
+                f'MAGEMin subprocess slot is unavailable: {exc}',
+            ) from exc
+        slots = _magemin_subprocess_slot_count()
+        try:
+            for index in range(slots):
+                path = (
+                    _MAGEMIN_SUBPROCESS_LOCK if index == 0
+                    else _MAGEMIN_SUBPROCESS_LOCK.with_suffix(f'.slot{index}')
+                )
+                lock_files.append(path.open('a+b'))
+        except OSError as exc:
+            raise _MAGEMinEngineLifecycleError(
+                'MAGEMinSubprocessSlotUnavailable',
+                f'MAGEMin subprocess slot is unavailable: {exc}',
+            ) from exc
         while True:
             for index, lock_file in enumerate(lock_files):
                 try:
@@ -247,13 +259,19 @@ def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
                     break
                 except BlockingIOError:
                     continue
+                except OSError as exc:
+                    raise _MAGEMinEngineLifecycleError(
+                        'MAGEMinSubprocessSlotUnavailable',
+                        f'MAGEMin subprocess slot is unavailable: {exc}',
+                    ) from exc
             if acquired_index >= 0:
                 break
             remaining = deadline - time.monotonic()
             if remaining <= 0.0:
                 raise _MAGEMinEngineLifecycleError(
                     'MAGEMinSubprocessSlotTimeout',
-                    f'MAGEMin subprocess slot timed out after {timeout_s:g}s',
+                    f'MAGEMin subprocess slot timed out after '
+                    f'{timeout_s:g}s',
                 )
             time.sleep(min(0.01, remaining))
         yield

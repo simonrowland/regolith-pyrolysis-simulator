@@ -1213,6 +1213,46 @@ def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
     assert 'slot timed out' in result.diagnostics['backend_failure_message']
 
 
+def test_magemin_subprocess_slot_permission_error_returns_not_converged(
+    monkeypatch, tmp_path,
+):
+    from simulator.melt_backend import magemin as magemin_module
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._config = {'timeout_s': 1.0}
+    lock_dir = tmp_path / 'read-only'
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', lock_dir
+    )
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK', lock_dir / 'magemin.lock'
+    )
+    original_mkdir = Path.mkdir
+
+    def deny_lock_dir(path, *args, **kwargs):
+        if path == lock_dir:
+            raise PermissionError('read-only filesystem')
+        return original_mkdir(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, 'mkdir', deny_lock_dir)
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'MAGEMinSubprocessSlotUnavailable'
+    )
+    assert 'read-only filesystem' in result.diagnostics['backend_failure_message']
+
+
 @pytest.mark.parametrize(
     'pooled',
     (True, False),
