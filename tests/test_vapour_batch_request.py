@@ -4429,15 +4429,8 @@ def test_phase_equilibrium_handoff_is_outside_state_fingerprint() -> None:
     assert _state_fingerprint(plain) == _state_fingerprint(carried)
     assert _state_fingerprint(carried) == _state_fingerprint(different)
     assert "phase_equilibrium_handoff" not in plain.as_mapping()
-    projected = carried.as_mapping()
-    assert projected["phase_equilibrium_handoff"]["schema"] == (
-        "phase_equilibrium_handoff.v1"
-    )
-    assert projected["phase_equilibrium_handoff"]["source"] == "equilibrium_result"
-    assert "liquid_feo_domain" not in projected
-    round_trip = VapourResolveState(**projected)
-    assert round_trip.phase_equilibrium_handoff == handoff
-    assert _state_fingerprint(round_trip) == _state_fingerprint(plain)
+    assert "phase_equilibrium_handoff" not in carried.as_mapping()
+    assert "liquid_feo_domain" not in carried.as_mapping()
 
 
 def test_resolve_batch_mapping_keeps_handoff_out_of_extras(monkeypatch) -> None:

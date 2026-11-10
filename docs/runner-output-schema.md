@@ -1021,6 +1021,8 @@ incident, stuck, re-evaporated, and net continuous flux and has
     `sim._last_high_t_melt_activity`; it describes that hour's provider,
     authority, and notices. It is separate from the run-level
     `high_t_melt_activity_fallback_notice`.
+  * `phase_equilibrium_provider` -- reports the current hour's
+    phase-equilibrium provider label; `absent` means no result was copied.
   * `mass_balance_error_category` -- added inline by `build_per_hour_summary`
     when `HourSnapshot.mass_balance_error_category` is a non-empty string; the
     categorical mass-balance-error label for that hour.
