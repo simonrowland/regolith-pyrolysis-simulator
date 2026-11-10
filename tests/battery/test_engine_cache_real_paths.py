@@ -461,6 +461,7 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason(
 
     runtime_reasons = engine_cache._RUNTIME_ONLY_SETTING_REASONS
     opaque_paths: set[tuple[Any, ...]] = set()
+    property_values: dict[tuple[Any, ...], Any] = {}
 
     def simple(value: Any) -> bool:
         return value is None or isinstance(value, (bool, int, float, str, Enum))
@@ -502,6 +503,32 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason(
                         attributes.setdefault(name, getattr(value, name))
             for name, child in attributes.items():
                 yield from leaves(child, (*path, name), seen)
+            for cls in type(value).__mro__:
+                for name, descriptor in vars(cls).items():
+                    if not isinstance(descriptor, property) or name in attributes:
+                        continue
+                    try:
+                        child = getattr(value, name)
+                    except AttributeError:
+                        continue
+                    except Exception:
+                        continue
+                    child_path = (*path, name)
+                    if simple(child):
+                        property_values[child_path] = child
+                    else:
+                        yield from leaves(child, child_path, seen)
+
+    def setting_at(settings: Any, path: tuple[Any, ...]) -> Any:
+        current = settings
+        for part in path:
+            if isinstance(current, Mapping):
+                current = current[str(part)]
+            elif isinstance(current, list):
+                current = current[part]
+            else:
+                raise AssertionError((path, current))
+        return current
 
     def replace(value: Any, path: tuple[Any, ...], replacement: Any) -> Any:
         if not path:
@@ -559,6 +586,17 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason(
             assert type_name, path
             assert engine_cache._opaque_setting_reason(path), path
         opaque_paths.update(opaque)
+        for path, value in property_values.items():
+            reason = engine_cache._setting_drop_reason(path)
+            if reason is not None:
+                assert any(
+                    path[: len(dropped_path)] == dropped_path
+                    for dropped_path in dropped
+                ), path
+                assert reason in runtime_reasons.values(), path
+            else:
+                expected = value.value if isinstance(value, Enum) else value
+                assert setting_at(settings, path) == expected, path
 
         chem_version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine.value]
         baseline_key = engine_cache.engine_cache_key(
