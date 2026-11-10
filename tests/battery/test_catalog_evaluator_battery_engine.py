@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import Decimal
 
 from simulator.battery.enums import (
@@ -9,10 +10,12 @@ from simulator.battery.enums import (
     MetricOperation,
     NoticeKind,
     Phase,
+    Polymorph,
     Quantity,
     RefusalReason,
     ResidualStatus,
 )
+from simulator.battery.records import Species, State
 from simulator.battery.migrate import REPO_ROOT, load_yaml
 from simulator.battery.score import (
     SCORE_ENGINE_SET,
@@ -29,6 +32,20 @@ def _catalog_pressure(formula: str, temperature_K: Decimal):
     payload = load_yaml(REPO_ROOT / "data" / "vapor_pressures.yaml")
     catalog = compiled_catalog_for(payload, emit_u0_request_rules=False)
     return catalog.evaluator_for(formula).evaluate(float(temperature_K))
+
+
+def _h2o_identity(temperature_K: Decimal):
+    # Ice Ih is form I. A crystal reservoir with no polymorph is identity_unknown
+    # against itself, so the residual never becomes numeric.
+    identity = F.psat_identity(
+        "H2O", T_K=temperature_K, reservoir_phase=Phase.CR
+    )
+    return replace(
+        identity,
+        reservoir=State.of(
+            Species("H2O", Phase.CR, polymorph=State.of(Polymorph.I))
+        ),
+    )
 
 
 def _context(experiment, observation) -> ScoreContext:
@@ -51,9 +68,7 @@ def test_catalog_evaluator_scores_supported_pressure_in_pa_and_dex() -> None:
         work_id="catalog-pressure-work",
         T_K=temperature_K,
     )
-    identity = F.psat_identity(
-        "H2O", T_K=temperature_K, reservoir_phase=Phase.CR
-    )
+    identity = _h2o_identity(temperature_K)
     observation = F.observation(
         "catalog-pressure-reference",
         experiment.experiment_id,
@@ -80,7 +95,7 @@ def test_catalog_evaluator_scores_supported_pressure_in_pa_and_dex() -> None:
     assert prediction.unit == "Pa"
     assert residual.numeric is not None
     assert residual.numeric.operation is MetricOperation.DEX
-    assert residual.numeric.unit == "dex"
+    assert residual.numeric.unit == "dimensionless"
     assert residual.numeric.value == Decimal("-1")
 
 
@@ -95,7 +110,7 @@ def test_catalog_evaluator_predicts_and_flags_temperature_extrapolation() -> Non
     observation = F.observation(
         "catalog-extrapolation-reference",
         experiment.experiment_id,
-        F.psat_identity("H2O", T_K=temperature_K, reservoir_phase=Phase.CR),
+        _h2o_identity(temperature_K),
         Decimal(str(evaluation.pressure_pa)),
         evidence=F.EvidenceClass.MEASURED_DIRECT,
         source_id="catalog-extrapolation-source",
