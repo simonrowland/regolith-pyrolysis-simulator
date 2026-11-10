@@ -6,13 +6,19 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.10.0`
+**Schema version:** `1.11.0`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
 
-Schema 1.10.0 adds the required per-hour `same_hour_headspace_diagnostics`
+Schema 1.10.0 adds the unconditional `activity_sources` sibling map to the
+vapor-pressure source report. Per-species source entries remain their original
+scalar source strings. The activity map records the rung, citation or `ideal`,
+single-cation mole fraction, and reason for each pressure that used the
+melt-activity ladder. An optional `warning` is included when the shared
+resolver reports a temperature-domain warning for its published coefficient.
+Schema 1.11.0 adds the required per-hour `same_hour_headspace_diagnostics`
 object. It carries the source closure regime and rates, pressure-held U/L
-bracket authority, physical-zero and sweep notices, and closure iteration
-counts by consumer.
+bracket authority, physical-zero and sweep notices, closure iteration counts
+by consumer, and carrier-feed consumption.
 
 Schema 1.9.0 adds the unconditional top-level
 `vapour_rail_instrumentation` and `condensation_refusals_by_species` fields,
@@ -54,9 +60,9 @@ engine identity used for a computed C0 exit forecast (`internal-analytical`,
 `alphamelts`, `thermoengine`, or `cached-real`). Older run records without this
 nested field remain valid, and absence carries no meaning. This additive
 run-metadata field does not change the exact top-level runner envelope or the
-artifact envelope, so that metadata addition left `RUNNER_SCHEMA_VERSION` at
-`1.9.0` and
-`ARTIFACT_SCHEMA_VERSION` remains `0.2.0`.
+artifact envelope in schema 1.9.0, so at that version
+`RUNNER_SCHEMA_VERSION` remained `1.9.0` and `ARTIFACT_SCHEMA_VERSION`
+remained `0.2.0`.
 
 Run the CLI as:
 
@@ -114,7 +120,7 @@ the in-process trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.10.0",
+  "schema_version": "1.11.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
@@ -302,7 +308,7 @@ omit it.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.10.0",
+  "schema_version": "1.11.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
@@ -539,10 +545,22 @@ and the aggregate liner load:
 "vapor_pressure_source_report": {
   "species": {
     "Na": "builtin_authoritative",
-    "K": "builtin_authoritative"
+    "Mg": "builtin_authoritative:standard_reaction_term"
+  },
+  "activity_sources": {
+    "Mg": {
+      "rung": "published_gamma",
+      "source": "Sossi & Fegley 2018 Table 2 pp.409-410, DOI 10.2138/rmg.2018.84.11",
+      "x": 0.25,
+      "reason": "alphaMELTS supplied no oxide-component activity"
+    }
   },
   "summary": {
-    "builtin_authoritative": {"count": 2, "percentage": 100.0}
+    "builtin_authoritative": {"count": 1, "percentage": 50.0},
+    "builtin_authoritative:standard_reaction_term": {
+      "count": 1,
+      "percentage": 50.0
+    }
   },
   "total_species": 2,
   "vapor_pressure_backend_status": "fallback",
@@ -566,9 +584,13 @@ and the aggregate liner load:
   is diagnostic-only.
 * Percentages are species-count percentages for the latest vapor
   pressure surface used by the evaporation path.
-* All eight keys are unconditional in schema 1.4.0. When no backend facet
-  status exists, the status and reason/source strings are empty, the facet
-  summary is `{}`, and `authoritative_for_requested_vapor_pressure` is `null`.
+* The original eight report-level keys are unconditional from schema 1.4.0;
+  `activity_sources` is also unconditional from schema 1.10.0. Per-species
+  entries remain scalar source tokens. An `activity_sources` entry is present
+  only when the AlphaMELTS activity ladder supplied an activity for a backend
+  pressure retained after kernel refresh. When no backend facet status exists,
+  the status and reason/source strings are empty, the facet summary is `{}`,
+  and `authoritative_for_requested_vapor_pressure` is `null`.
 * When VapoRock shadow data exists, `simulator.runner` copies it from
   `_last_vapor_pressure_diagnostic["vaporock_full_speciation_Pa"]` into
   the runner diagnostics under the same key. It is not an authoritative
@@ -763,19 +785,6 @@ mole, energy, pressure, or partition arithmetic.
     "Kn": 0.00035,                           // Knudsen number, or null
     "regime": "viscous",                    // named Knudsen regime, or ""
     "transport_formula_id": "not_applicable_until_p0",
-    "same_hour_headspace_diagnostics": {
-      "regime": "pressure_held",
-      "closure": {"converged": true, "rates_kg_hr": {"Na": 0.02}},
-      "pressure_held_sweep_bounds": {
-        "selected_bound": "upper",
-        "upper_rates_kg_hr": {"Na": 0.02},
-        "lower_rates_kg_hr": {"Na": 0.01},
-        "notices": [{"kind": "sweep_flow_unspecified", "authority": "upper_bound"}]
-      },
-      "species_physical_zeros": {},
-      "notices": [],
-      "iterations_by_consumer": {"ordinary_evaporation": 1}
-    },
     "redox_source_breakdown": {             // optional; present when melt redox source terms fired
       "terms_mol_o2_equiv_by_label": {
         "redox_source:c3_na_shuttle_reduction": -0.5

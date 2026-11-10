@@ -285,6 +285,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             ELECTRONS_PER_OXIDE,
             _faraday_reduced_extent,
             _mre_raw_margin_assessment,
+            _mre_raw_margin_unassessed_notice,
             FERRIC_TO_FERROUS_ELECTRONS,
             FERRIC_TO_FERROUS_FEO_PER_FE2O3,
             FERRIC_TO_FERROUS_O2_PER_FE2O3,
@@ -789,6 +790,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         billable_current_A = 0.0
         any_capped = False
         oxide_produced_mol_total: dict[str, float] = {}
+        unassessed_notices: list[dict[str, object]] = []
 
         for oxide, _E, dV, _a, mode, voltage_reference in reducible:
             fraction = weights[oxide] / total_weight
@@ -855,6 +857,20 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             diagnostic["oxides_reduced_kg"][oxide] = kg_oxide_reduced
             diagnostic["oxides_reduced_mol"][oxide] = moles_reduced
             diagnostic["oxide_charge_electrons"][oxide] = n_e
+            unassessed_notice = _mre_raw_margin_unassessed_notice(
+                oxide=oxide,
+                temperature_C=T_C,
+                applied_voltage_V=voltage_V,
+                fallback_requirement_V=_E,
+                reference=voltage_reference,
+                heuristic_reference_V=(
+                    FERRIC_TO_FERROUS_REFERENCE_V
+                    if mode == "ferric_to_ferrous"
+                    else None
+                ),
+            )
+            if unassessed_notice is not None:
+                unassessed_notices.append(unassessed_notice)
             oxide_mol_total[oxide] = (
                 oxide_mol_total.get(oxide, 0.0) + moles_reduced
             )
@@ -979,6 +995,10 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 energy_kWh=0.0,
             )
         diagnostic["energy_kWh"] = energy_kWh
+        if unassessed_notices:
+            notices = list(diagnostic.get("notices", ()) or ())
+            notices.extend(unassessed_notices)
+            diagnostic["notices"] = notices
 
         # Assemble the proposal in mol-native form.
         if not oxide_mol_total:

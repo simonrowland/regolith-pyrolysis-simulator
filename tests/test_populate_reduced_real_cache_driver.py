@@ -1074,6 +1074,15 @@ def test_main_preflight_rejects_uncovered_feedstock_before_case_run(
 
 def test_run_case_records_all_builtin_authoritative_source_report(tmp_path, monkeypatch):
     session = _FakeSession(source="builtin_authoritative")
+    activity_source = {
+        "rung": "published_gamma",
+        "source": "Sossi & Fegley 2018 Table 2",
+        "x": 0.25,
+        "reason": "alphaMELTS supplied no oxide-component activity",
+    }
+    session.simulator._last_backend_diagnostics = {
+        "activity_source_by_species": {"Na": activity_source}
+    }
     monkeypatch.setattr(driver, "_start_session", lambda **kwargs: session)
     monkeypatch.setattr(driver, "_apply_pending_decision", lambda session: False)
 
@@ -1093,6 +1102,8 @@ def test_run_case_records_all_builtin_authoritative_source_report(tmp_path, monk
 
     source_report = result["rows"][0]["vapor_pressure_source_report"]
     assert source_report["summary"]["builtin_authoritative"]["count"] == 1
+    assert source_report["species"] == {"Na": "builtin_authoritative"}
+    assert source_report["activity_sources"] == {"Na": activity_source}
 
 
 def test_run_case_rejects_builtin_fallback_source_report(tmp_path, monkeypatch):

@@ -42,7 +42,7 @@ PER_HOUR_KEYS = {
     "Kn",
     "regime",
     "transport_formula_id",
-    # Runner schema 1.10.0. Additive per-hour closure diagnostic.
+    # Runner schema 1.11.0. Additive per-hour closure diagnostic.
     "same_hour_headspace_diagnostics",
     # Hourly energy split (electrical tracker + known evaporation enthalpy).
     "energy_electrical_plus_evaporation_kWh",

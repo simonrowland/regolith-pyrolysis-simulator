@@ -125,6 +125,7 @@ def test_l5_thermoengine_vapor_sources_survive_c2a_tick(
     }
     report = _vapor_pressure_source_report(sim)
     assert report["species"] == sources
+    assert report["activity_sources"] == {}
     if fallback_species:
         assert report["summary"]["builtin_authoritative"]["count"] == len(
             fallback_species
