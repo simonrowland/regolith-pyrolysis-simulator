@@ -1,5 +1,6 @@
 """Source-grounded regression witnesses for migration round 7."""
 
+import hashlib
 import json
 import re
 from collections.abc import Mapping
@@ -29,6 +30,7 @@ from simulator.battery.migrate import (
     map_quantity,
     migrate,
     select_declared_source,
+    to_plain,
     wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import State
@@ -988,6 +990,40 @@ def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
     assert len(acanthite) == 1
     assert acanthite[0].value.kind is ValueKind.UNAVAILABLE
     assert _landed_formation_points(acanthite[0]) == []
+
+
+def _b2131_formation_observation_serialization(tmp_path):
+    source_id = "robie-hemingway-1995-usgs-b2131"
+    root = _write_min_tree(tmp_path / "tree")
+    source_dir = REPO_ROOT / "data/literature/compilations" / source_id
+    for source_path in sorted(source_dir.rglob("*")):
+        if not source_path.is_file():
+            continue
+        destination = root / source_path.relative_to(REPO_ROOT)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(source_path.read_bytes())
+
+    result = migrate(root, write=False)
+    observations = sorted(
+        (
+            to_plain(obs)
+            for obs in result.observations.values()
+            if obs.source_id == source_id
+            and quantity_token(obs.identity) is Quantity.DELTA_FG
+        ),
+        key=lambda obs: obs["observation_id"],
+    )
+    payload = json.dumps(
+        observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    return len(observations), hashlib.sha256(payload).hexdigest()
+
+
+def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
+    assert _b2131_formation_observation_serialization(tmp_path) == (
+        928,
+        "345ae25f398e31f96f8b6bf2855cd7f580911cba925160ce418278fbd3e739b1",
+    )
 
 
 @pytest.mark.parametrize(
