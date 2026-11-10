@@ -10,7 +10,7 @@ from simulator.campaigns import CampaignManager
 from simulator.extraction import ExtractionMixin
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun
-from simulator.state import BatchRecord, CampaignPhase, DecisionType
+from simulator.state import MOLAR_MASS, BatchRecord, CampaignPhase, DecisionType
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -129,10 +129,32 @@ def test_c7_enabled_run_flags_transitional_transport_and_closes_mass(
     assert diagnostic["regime"] == "transitional"
     assert diagnostic["reason"] == "viscous_p_bulk_transport_out_of_domain"
     assert diagnostic["certified_band_mbar"] == pytest.approx([5.0, 15.0])
-    assert diagnostic["r_transport"] == pytest.approx(27152.589213216823)
-    assert diagnostic["c7_ca_flux_kg_s_m2"] == pytest.approx(
-        4.5342561270304325
+    # d-209 amendment 1. Published transport is the Ca that left
+    # (product + wall + vented), not the uncapped kinetic capacity.
+    # Green booked 81458 mol against 3.5 kg of Ca metal.
+    produced_mol = float(diagnostic["ca_overhead_mol"])
+    captured_mol = float(diagnostic["captured_ca_mol"])
+    wall_mol = float(diagnostic["wall_deposit_ca_mol"])
+    shuttle_mol = float(diagnostic["shuttle_drawn_ca_mol"])
+    vented_mol = max(0.0, produced_mol - captured_mol - wall_mol)
+    product_mol = max(0.0, captured_mol - shuttle_mol)
+    assert diagnostic["transport_ca_mol"] == pytest.approx(
+        product_mol + wall_mol + vented_mol
     )
+    cao_drawn_mol = float(diagnostic["cao_removed_kg"]) / (
+        MOLAR_MASS["CaO"] / 1000.0
+    )
+    assert diagnostic["transport_ca_mol"] <= cao_drawn_mol
+    assert diagnostic["transport_ca_mol"] == pytest.approx(87.71833158417171)
+    assert diagnostic["transport_ca_mol"] > 0.0
+    # Green published the kinetic capacity, r_transport 27152.589213216823.
+    assert diagnostic["r_transport"] == pytest.approx(29.23944386139057)
+    assert diagnostic["r_transport"] < 27152.589213216823
+    # Bare D∝1/p continuation at this hold was 4.5342561270304325.
+    assert diagnostic["c7_ca_flux_kg_s_m2"] == pytest.approx(
+        4.216010635106305
+    )
+    assert diagnostic["c7_ca_flux_kg_s_m2"] < 4.5342561270304325
     assert diagnostic["c7_overhead_pressure_pa"] == pytest.approx(5.0)
     assert diagnostic["c7_al_credit_input_kg"] == pytest.approx(20.0)
     assert diagnostic["c7_al_credit_unused_mol"] > 0.0

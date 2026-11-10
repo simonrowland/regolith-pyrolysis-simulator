@@ -14,7 +14,8 @@ same decision. No campaign gets a second authorization.
 - invalid Kn: typed refusal, resolved flux 0
 
 The Na continuation at 20 Pa / 1873.15 K / P_eq 100 Pa is the independent
-number 0.007424038156428245 kg/s/m2. Other species must match
+number 0.0071981127765166995 kg/s/m2 (Bosanquet bridge, d-209 amendment 1).
+Other species must match
 ``resolve_species_flux_kg_s_m2`` of the unmodified diagnostic, not a
 provider-only remap.
 """
@@ -72,19 +73,21 @@ _PIPE_M = 0.12
 _POOL_MOL = 1.0e-6
 _MELT_RAW_KG_HR = 1.0e6
 # Independent of _series: C2A Na continuation at the transitional point above.
-_NA_CONTINUATION_KG_S_M2 = 0.007424038156428245
+# Bare D∝1/p value was 0.007424038156428245 kg/s/m2 (d-209 amendment 1).
+_NA_BARE_CONTINUATION_KG_S_M2 = 0.007424038156428245
+_NA_CONTINUATION_KG_S_M2 = 0.0071981127765166995
 _CERTIFIED_BAND_MBAR = (5.0, 15.0)
 # Frozen native-Fe pool-first split at the transitional fixture above
 # (pool 1e-6 mol, area 0.2 m^2, Fe alpha 0.02). Not recomputed from the
 # series-resistance calculator or from the diagnostic's own operands.
 # Green refused this point, so capacity, vapor, residual and the residual-
 # limited melt rate were 0 and the tap kept the whole pool.
-_FE_CONTINUATION_CAPACITY_KG_HR = 0.15496798052986593
-_FE_CONTINUATION_CAPACITY_MOL_HR = 2.774966076280167
+_FE_CONTINUATION_CAPACITY_KG_HR = 0.15438505756897217
+_FE_CONTINUATION_CAPACITY_MOL_HR = 2.76452784616299
 _FE_CONTINUATION_VAPOR_MOL = 1.0e-6
 _FE_CONTINUATION_TAP_MOL = 0.0
-_FE_CONTINUATION_RESIDUAL_MOL_HR = 2.774965076280167
-_FE_CONTINUATION_MELT_KG_HR = 0.15496792468486592
+_FE_CONTINUATION_RESIDUAL_MOL_HR = 2.76452684616299
+_FE_CONTINUATION_MELT_KG_HR = 0.15438500172397218
 
 
 def _molar_mass_kg_mol(species: str) -> float:
@@ -202,6 +205,7 @@ def _assert_resolved_flux(
     assert resolved < ordinary.flux_kg_s_m2
     if species == "Na":
         assert resolved == pytest.approx(_NA_CONTINUATION_KG_S_M2)
+        assert resolved < _NA_BARE_CONTINUATION_KG_S_M2
 
 
 @pytest.fixture(scope="module")
@@ -316,6 +320,7 @@ def test_native_and_melt_fe_follow_the_invariant(
     assert part["certified_band_mbar"] == pytest.approx(_CERTIFIED_BAND_MBAR)
     assert part["series_resistance"]["r_gas"] > 0.0
     assert capacity_kg_hr == pytest.approx(_FE_CONTINUATION_CAPACITY_KG_HR)
+    assert capacity_kg_hr < _C2A_FE_BARE_CONTINUATION_KG_HR
     assert part["native_fe_vapor_capacity_mol_hr"] == pytest.approx(
         _FE_CONTINUATION_CAPACITY_MOL_HR
     )
@@ -465,9 +470,87 @@ def test_c7_transitional_transport_is_a_flagged_continuation(
     # Frozen continuation at 0.03632 mbar, 1750 C, 0.2 m^2, 1 h, ca_per_extent=3.
     # Not recomputed from the diagnostic flux.
     assert float(diagnostic["c7_ca_flux_kg_s_m2"]) == pytest.approx(
-        132.2801891709535
+        119.10328513802571
     )
-    assert extent == pytest.approx(792136.4689113438)
+    assert extent == pytest.approx(713228.9144449866)
+    assert float(diagnostic["c7_ca_flux_kg_s_m2"]) < _C7_CA_BARE_CONTINUATION_KG_S_M2
+
+
+# Bare D∝1/p continuation at the direct C7 probe (3.632 Pa, 2023.15 K,
+# pure-Ca Antoine P_eq, α=1). d-209 amendment 1: the Bosanquet bridge
+# must come in under this value. Equal to it is the defect.
+_C7_CA_BARE_CONTINUATION_KG_S_M2 = 132.2801891709535
+# C2A native-Fe continuation before the bridge, kg/h at 0.2 m².
+_C2A_FE_BARE_CONTINUATION_KG_HR = 0.15496798052986593
+
+
+def _kn_case(species, molar, alpha, p_eq, temperature_K, overhead_pa, *, extrapolate):
+    return _series_resistance_evaporation_flux_kg_m2_s(
+        species=species,
+        P_eq_pa=p_eq,
+        P_bulk_pa=0.0,
+        T_surface_K=temperature_K,
+        molar_mass_kg_mol=molar,
+        alpha_i=alpha,
+        pipe_diameter_m=_PIPE_M,
+        overhead_pressure_pa=overhead_pa,
+        carrier_gas="N2",
+        T_gas_K=temperature_K,
+        gas_resistance_enabled=True,
+        extrapolate_continuum=extrapolate,
+    )
+
+
+def test_hertz_knudsen_ceiling_holds_across_kn_for_c7_ca_and_c2a_fe() -> None:
+    """d-209 amendment 1. J ≤ α k_HK (P_eq − P_bulk) at every Kn.
+
+    C7 Ca uses the direct-probe pure-Ca Antoine pressure at 1750 °C.
+    C2A Fe uses α=0.02 and P_eq=100 Pa. The sweep crosses viscous,
+    transitional, and free-molecular Kn. At 1000 Pa the bridged call
+    matches the unbridged continuum film. At 0.01 Pa the open
+    line-of-sight branch is pure HK.
+    """
+
+    # log10(P/Pa) = 7.78473 - 3121.368/(T-594.591), T=2023.15 K.
+    c7_ca_p_eq_pa = 10.0 ** (7.78473 - 3121.368 / (2023.15 - 594.591))
+    species_cases = (
+        ("Ca", 0.040078, 1.0, c7_ca_p_eq_pa, 2023.15),
+        ("Fe", 0.055845, 0.02, 100.0, 1873.15),
+    )
+    pressures_pa = (1.0e5, 1000.0, 100.0, 20.0, 5.0, 3.632, 0.01)
+    seen_kn = []
+    for species, molar, alpha, p_eq, temperature_K in species_cases:
+        for overhead_pa in pressures_pa:
+            bridged = _kn_case(
+                species, molar, alpha, p_eq, temperature_K, overhead_pa,
+                extrapolate=True,
+            )
+            ceiling = alpha * float(bridged.k_hk_kg_s_m2_pa) * p_eq
+            assert bridged.flux_kg_s_m2 <= ceiling * (1.0 + 1.0e-12)
+            kn = float(bridged.knudsen_number)
+            seen_kn.append(kn)
+            if overhead_pa == 1000.0:
+                plain = _kn_case(
+                    species, molar, alpha, p_eq, temperature_K, overhead_pa,
+                    extrapolate=False,
+                )
+                assert kn < 0.01
+                assert bridged.flux_kg_s_m2 == pytest.approx(plain.flux_kg_s_m2)
+                assert plain.flux_kg_s_m2 < ceiling
+            if overhead_pa == 0.01:
+                assert kn >= 10.0
+                assert bridged.r_gas == pytest.approx(0.0)
+                assert bridged.flux_kg_s_m2 == pytest.approx(ceiling)
+    assert min(seen_kn) < 0.01
+    assert any(0.01 <= kn < 10.0 for kn in seen_kn)
+    assert max(seen_kn) >= 10.0
+
+    ca_probe = _kn_case(
+        "Ca", 0.040078, 1.0, c7_ca_p_eq_pa, 2023.15, 3.632,
+        extrapolate=True,
+    )
+    assert ca_probe.flux_kg_s_m2 < _C7_CA_BARE_CONTINUATION_KG_S_M2
+    assert ca_probe.r_gas > 0.0
 
 
 def test_authorized_extrapolation_without_continuation_refuses() -> None:

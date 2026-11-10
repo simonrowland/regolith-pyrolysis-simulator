@@ -1421,8 +1421,8 @@ def test_provider_refuses_universal_melt_renewal_model():
 @pytest.mark.xdist_group("serial")
 def test_provider_extrapolates_finite_continuum_without_fabricating_zero_flux():
     # Kn≈0.1 at T=2023 K, D=0.12 m, P≈3.63 Pa — transitional. Viscous
-    # Poiseuille P_bulk is out of domain: continue its finite source model
-    # with authority demoted, including the existing continuum gas resistance.
+    # Poiseuille P_bulk is out of domain: continue the series law with the
+    # Bosanquet gas bridge (d-209 amendment 1), authority demoted.
     result = _w3_result_with_controls(
         1.0,
         overhead_pressure_pa=3.632,
@@ -1536,6 +1536,9 @@ def test_c2a_staged_provider_flags_transitional_total_and_keeps_continuum_flux()
     series = result.diagnostic["evaporation_series_resistance"]["Na"]
     assert series["r_gas"] > 0.0
     assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] == pytest.approx(
+        0.0071981127765166995 * 3600.0
+    )
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] < (
         0.007424038156428245 * 3600.0
     )
     assert any(

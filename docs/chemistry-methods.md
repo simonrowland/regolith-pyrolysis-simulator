@@ -341,7 +341,7 @@ interface resistance, and the continuum boundary-layer gas-diffusion resistance:
 J = (P_eff − P_bulk) / ( r_interface + r_gas + r_melt )
 
   r_interface = 1 / (α × k_HKL)             free-molecular impingement
-  r_gas       = 1 / k_g                     continuum duct film only (Kn < 0.01)
+  r_gas       = 1 / k_g                     Kn < 0.01: D_mol; transitional: Bosanquet D_eff
   r_melt      = 0                           HKL upper-bound (see below)
 
   k_HKL = √( M / (2π R T) )                 free-molecular impingement rate [s/m]
@@ -357,18 +357,13 @@ the former universal scalar `1e-4·√axial_stir` conductance is **refused**
 artifacts emit `authority_class: "upper-bound"` with
 `authority_reason: "missing-species-state-dependent-melt-transfer-inputs"`.
 
-**Gas film.** Continuum `r_gas = 1/k_g` applies for `Kn < VISCOUS_KNUDSEN_MAX` (0.01); in transitional Kn the
-same continuum expression is continued and flagged `extrapolated`. There is no
-Fuchs–Sutugin weight and no fitted transitional film coefficient. At free-molecular / vacuum
-conditions the local film is off (`r_gas = 0`) and the flux approaches pure HKL on `Δp`. The diffusion
-coefficient `D_AB` is per-species Chapman–Enskog; Sherwood carries the **radial** induction-stirring
-enhancement `Sh_eff = 3.66 × √max(1, radial_stir_factor)` (default radial 1.0 → laminar `Sh = 3.66`).
+**Gas film.** Continuum `r_gas = 1/k_g` with Chapman–Enskog `D_mol` applies for `Kn < VISCOUS_KNUDSEN_MAX` (0.01). In transitional Kn the film uses the Bosanquet bridge `1/D_eff = 1/D_mol + 1/D_Kn` (`D_Kn = L/3 · <v>`, `L` the pipe diameter) and is flagged `extrapolated` (d-209 amendment 1). A bare `D ∝ 1/p` continuation is not used. The interface term stays in the denominator, so `J ≤ α k_HK ΔP` at every Kn. There is no Fuchs–Sutugin weight. At free-molecular / open line-of-sight conditions the local film is off (`r_gas = 0`) and `J → α k_HK ΔP`. Sherwood carries the **radial** induction-stirring enhancement `Sh_eff = 3.66 × √max(1, radial_stir_factor)` (default radial 1.0 → laminar `Sh = 3.66`).
 <!-- impl: §4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:654 — continuum R_g branch (Fuchs weight removed; 63df9bd) -->
 <!-- impl: §4 -> simulator/condensation.py _stirring_enhanced_sherwood:1460 — radial Sherwood -->
 
 **Transport-model validity domain (not a Kn safety/coating gate).** Beyond `VISCOUS_KNUDSEN_MAX`,
-evolved `P_bulk` still comes from the viscous Poiseuille model, so the flux is computed as a finite
-continuation and flagged `extrapolated`; ledger yields are still produced. The optimizer's ~1 mbar
+evolved `P_bulk` still comes from the viscous Poiseuille model, so the flux is the flagged Bosanquet
+series-law continuation (d-209 amendment 1) and ledger yields are still produced. The optimizer's ~1 mbar
 floor (Kn≈0.004) stays inside the viscous domain. Coming soon: transitional and molecular
 conductance. Coating remains the continuous rate→lifespan model. See
 [`docs/model-limitations.md`](model-limitations.md).

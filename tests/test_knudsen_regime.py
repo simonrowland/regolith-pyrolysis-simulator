@@ -443,7 +443,8 @@ def test_c2a_staged_transitional_po2_hold_keeps_scheduled_total_and_flags():
         gas_resistance_enabled=True,
         extrapolate_continuum=True,
     )
-    assert continued.flux_kg_s_m2 == pytest.approx(0.007424038156428245)
+    assert continued.flux_kg_s_m2 == pytest.approx(0.0071981127765166995)
+    assert continued.flux_kg_s_m2 < 0.007424038156428245
     assert continued.knudsen_number == pytest.approx(kn)
     assert continued.r_gas > 0.0
 

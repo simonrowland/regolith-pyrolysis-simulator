@@ -3884,8 +3884,9 @@ class ExtractionMixin:
             asking_site='extraction.c7_ca_transport',
         )
         # Same chokepoint as evaporation: a transitional shell route publishes
-        # the flagged continuum continuation. The P_eq=0 branch is Kn=+inf
-        # and stays an ordinary zero. Not a Kn safety/coating gate.
+        # the flagged series-law continuation (Bosanquet gas bridge,
+        # d-209 amendment 1). The P_eq=0 branch is Kn=+inf and stays an
+        # ordinary zero. Not a Kn safety/coating gate.
         series_for_ledger = series_flux
         continuation_flux_kg_s_m2 = None
         if (
@@ -4265,6 +4266,28 @@ class ExtractionMixin:
                 ],
             },
         )
+        # d-209 amendment 1. transport_ca_mol used to be the kinetic film
+        # capacity J*A*t/M_Ca. That integral is in mol and is integrated
+        # once; it is not a unit error and not a double time step. At the
+        # C7 hold it is ~1e5 mol (a few tonnes) because pure-Ca P_sat at
+        # the hold makes ΔP enormous, while the committed reduction is
+        # min(CaO budget, Al budget, recipe fraction, that capacity) and
+        # only ~3.5 kg of Ca leaves. The published extent was the uncapped
+        # capacity, so it booked ~1000× more transport than product and
+        # was not limited by the melt inventory.
+        # Book the Ca that actually left: product + wall + vented.
+        # Capture already consumed the kinetic capacity as an upper bound
+        # on the condenser split; this rewrite does not feed that split.
+        produced_mol = float(aggregate.get('ca_overhead_mol', 0.0) or 0.0)
+        captured_mol = float(aggregate.get('captured_ca_mol', 0.0) or 0.0)
+        wall_mol = float(aggregate.get('wall_deposit_ca_mol', 0.0) or 0.0)
+        shuttle_mol = float(aggregate.get('shuttle_drawn_ca_mol', 0.0) or 0.0)
+        vented_mol = max(0.0, produced_mol - captured_mol - wall_mol)
+        product_mol = max(0.0, captured_mol - shuttle_mol)
+        closed_transport_mol = product_mol + wall_mol + vented_mol
+        aggregate['transport_ca_mol'] = closed_transport_mol
+        aggregate['r_transport'] = closed_transport_mol / max(
+            float(stoich['Ca']), 1e-30)
         self._last_c7_diagnostic = aggregate
         self._c7_product_report = self._build_c7_product_report(
             before, after, aggregate)

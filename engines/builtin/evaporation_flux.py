@@ -657,13 +657,33 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             and VISCOUS_KNUDSEN_MAX <= knudsen < FREE_MOLECULAR_KNUDSEN_MIN
         ):
             gas_weight = 1.0
-        # Premise: an open free-molecular vacuum has no stagnant carrier-gas
-        # film. Therefore R_g=0 locally. Continuum branch: k_g=M*Sh*D/(L*R*T)
-        # [s/m], R_g=1/k_g [m/s], only for Kn < VISCOUS_KNUDSEN_MAX (0.01).
-        # The provider and its Pareto replay may continue this same finite
-        # continuum expression into transitional Kn, carrying extrapolated
-        # authority. This is not a transitional conductance fit. Keep the
-        # existing free-molecular HKL branch and unflagged diagnostic sweeps.
+        # d-209 amendment 1. Series law, interface always present:
+        #   J = ΔP / (1/(α k_HK) + R_gas(Kn) + R_melt)
+        # so J ≤ α k_HK ΔP at every Kn. HK is a hard ceiling.
+        #
+        # Viscous film (Kn < 0.01): R_gas = 1/k_g with
+        #   k_g = M Sh D_mol / (L R T)
+        # and D_mol the Chapman-Enskog binary diffusivity. That branch is
+        # the certified continuum film and is not bridged.
+        #
+        # Transitional film (flagged extrapolation): Bosanquet bridge.
+        # Molecule-molecule and molecule-wall collisions are independent,
+        # so their rates add. Diffusivity scales with the mean free path
+        # and the two paths are resistances in series:
+        #   1/D_eff = 1/D_mol + 1/D_Kn
+        # D_Kn = (1/3) L <v>, <v> = sqrt(8 R T / (π M)). The length L is
+        # the pipe diameter: the same L as Kn = λ/L and as the film
+        # length in k_g. A bare D_mol ∝ 1/p continuation is the defect;
+        # it lets the film conductance blow up while Kn is still
+        # transitional.
+        #
+        # Kn → 0: λ << L, so D_mol << D_Kn and D_eff → D_mol. k_g
+        # returns the current continuum film. The viscous branch uses
+        # that limit directly.
+        # Kn → ∞, open line-of-sight surface: no stagnant film and no
+        # capillary wall on the flight path, so R_gas → 0
+        # (Kn >= FREE_MOLECULAR_KNUDSEN_MIN). With R_melt = 0,
+        # J → α k_HK ΔP.
 
     r_gas = 0.0
     k_mt_kg_s_m2_pa = 0.0
@@ -697,9 +717,22 @@ def _series_resistance_evaporation_flux_kg_m2_s(
                 "missing Chapman-Enskog transport parameters for "
                 f"species={species!r} carrier_gas={carrier_gas!r}"
             )
+        # d_ab_m2_s stays the Chapman-Enskog D_mol. The transitional
+        # bridge uses D_eff in k_g only (d-209 amendment 1).
+        d_film_m2_s = d_ab_m2_s
+        if extrapolate_continuum and knudsen >= VISCOUS_KNUDSEN_MAX:
+            gas_temperature_K = max(effective_T_gas_K, 1.0)
+            mean_speed_m_s = math.sqrt(
+                8.0
+                * GAS_CONSTANT_J_MOL_K
+                * gas_temperature_K
+                / (math.pi * M_kg_mol)
+            )
+            d_kn_m2_s = diameter_m * mean_speed_m_s / 3.0
+            d_film_m2_s = 1.0 / (1.0 / d_ab_m2_s + 1.0 / d_kn_m2_s)
         k_mt_mol_s_m2_pa = (
             sherwood_eff
-            * d_ab_m2_s
+            * d_film_m2_s
             / (diameter_m * GAS_CONSTANT_J_MOL_K * max(effective_T_gas_K, 1.0))
         )
         k_mt_kg_s_m2_pa = k_mt_mol_s_m2_pa * M_kg_mol
@@ -1927,7 +1960,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         if continuum_extrapolation is not None:
             diagnostic["continuum_extrapolation_notice"] = continuum_extrapolation
             warning_messages.append(
-                "viscous_p_bulk_transport_out_of_domain: EXTRAPOLATED finite continuum flux; "
+                "viscous_p_bulk_transport_out_of_domain: EXTRAPOLATED series-law "
+                "flux with the Bosanquet gas bridge (d-209 amendment 1); "
                 "source domain and evaluated Kn remain attached"
             )
         if (

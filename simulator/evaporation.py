@@ -358,9 +358,10 @@ def viscous_p_bulk_out_of_domain_diagnostic(
                 "certified_band_mbar": certified_band_mbar,
                 "detail": (
                     f"{payload['detail']}; extrapolated beyond the "
-                    "viscous-validated band; finite continuation of the "
-                    "same continuum fit; not certified transitional "
-                    "transport; "
+                    "viscous-validated band; series-law continuation "
+                    "with the Bosanquet gas bridge (d-209 amendment 1); "
+                    "not a bare diffusivity proportional to 1/p; not "
+                    "certified transitional transport; "
                     f"certified_band_mbar={certified_band_mbar}"
                 ),
             }
@@ -956,7 +957,7 @@ class EvaporationMixin:
         where:
             alpha_i     = intrinsic Hertz-Knudsen evaporation coefficient
             k_HK_i      = sqrt(M_i / (2*pi*R*T))
-            R_gas_i     = continuum-only gas-side Sherwood resistance
+            R_gas_i     = Sherwood film; Bosanquet D_eff in transitional Kn
             R_melt_i    = 0 until species/state melt-transfer inputs exist
             A_surface   = melt surface area (m²)
             P_eq_i      = effective equilibrium pressure from VAPOR_PRESSURE (Pa)
