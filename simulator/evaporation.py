@@ -880,6 +880,8 @@ class EvaporationMixin:
         T_K = self.melt.temperature_C + 273.15
         flux = EvaporationFlux()
         self._last_partial_melt_offgassing_diagnostic = {}
+        if hasattr(self, "_last_langmuir_surface_oxygen"):
+            del self._last_langmuir_surface_oxygen
 
         # Hostile uncertified melt model must refuse even below the 400 K
         # kinetic floor so cold early hours cannot mask the config as ok.
@@ -1219,7 +1221,35 @@ class EvaporationMixin:
         # backpressure. ``overhead.composition`` is the physically distinct
         # post-condensation report, so near-total capture must not erase P_bulk
         # above the melt. Gas pO2 has already been applied once upstream in
-        # the equilibrium vapor pressures consumed here.
+        # the equilibrium vapor pressures consumed here. Below the certified
+        # mass-action band that upstream pO2 is not the free-surface boundary:
+        # replace it on this flux map only. equilibrium.vapor_pressures_Pa
+        # stays the melt-supported law.
+        from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
+
+        langmuir_surface = apply_langmuir_surface_oxygen(
+            vapor_pressures,
+            temperature_K=T_K,
+            provenance_by_species=(
+                vapor_pressure_diagnostic.get(
+                    "vapor_pressure_numerator_provenance"
+                )
+                or {}
+            ),
+            source_reaction_fO2_bar=vapor_pressure_diagnostic.get(
+                "source_reaction_fO2_bar"
+            ),
+            transport_pO2_bar=vapor_pressure_diagnostic.get("pO2_bar"),
+            legacy_catalog=getattr(self, "vapor_pressures", None),
+            compiled_catalog=getattr(self, "vapour_rail_catalog", None),
+        )
+        if langmuir_surface.applied:
+            vapor_pressures = dict(langmuir_surface.pressures_Pa)
+            self._last_langmuir_surface_oxygen = langmuir_surface.as_diagnostic()
+            if langmuir_surface.warning:
+                equilibrium_warnings = getattr(equilibrium, "warnings", None)
+                if isinstance(equilibrium_warnings, list):
+                    equilibrium_warnings.append(langmuir_surface.warning)
         overhead_partials_Pa = (
             {
                 str(species): max(0.0, float(value))
@@ -1278,6 +1308,9 @@ class EvaporationMixin:
             from simulator.silent_zero import merge_notes_into_mapping
 
             merge_notes_into_mapping(diagnostic, _partial_sz_notes)
+        langmuir_notice = getattr(self, "_last_langmuir_surface_oxygen", None)
+        if isinstance(langmuir_notice, dict):
+            diagnostic["langmuir_surface_oxygen"] = langmuir_notice
         self._last_evaporation_flux_diagnostic = diagnostic
         missing_transport = diagnostic.get('missing_transport_parameters', {})
         if isinstance(missing_transport, Mapping):
