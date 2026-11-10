@@ -1,9 +1,13 @@
 # Reference PDFs
 
 PDFs are not kept in this repository. The source documents live in the private
-corpus repository (`regolith-corpus`, `raw/<source_id>/`), which is also the source of
-record for extracts; `tests/test_corpus_extract_mirror.py` keeps the two in step. The
-sidecar `.md` notes below stay here.
+corpus repository (`regolith-corpus`, `raw/<source_id>/`). Owner ruling d-385:
+`data/literature/extracts` is the only extract database; the corpus keeps the
+raw PDFs, OCR text, tables, sidecars, and the ledger.
+`tests/test_corpus_extract_source_on_file.py` requires `raw/<source_id>` for
+every extract `source_id` when `REGOLITH_REQUIRE_CORPUS=1` (corpus root:
+`REGOLITH_CORPUS_ROOT`, otherwise `~/Repos/regolith-corpus`). The sidecar
+`.md` notes below stay here.
 
 `data/literature/extracts/SCHEMA.md` is authoritative: **`source_id` is the
 extract filename stem**. One extract file is one literature source.

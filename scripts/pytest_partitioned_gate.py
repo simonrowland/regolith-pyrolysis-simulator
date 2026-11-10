@@ -5,6 +5,13 @@ Bulk tests inherit pyproject's ``-n auto`` xdist addopts. Tests marked
 ``serial`` are run in a second ``-n0`` pass so coscheduling-sensitive families
 stay covered without making the whole suite serial. Nightly tests remain in the
 separate full-tier gate.
+
+``REGOLITH_REQUIRE_CORPUS=1`` opts the d-385 source-on-file check
+(``tests/test_corpus_extract_source_on_file.py``) into a gate that has a
+corpus checkout. An absent checkout then fails closed. Unset, that test skips
+with ``corpus_checkout_not_required_by_this_gate``. ``REGOLITH_CORPUS_ROOT``
+selects the checkout (default ``~/Repos/regolith-corpus``). s3/rpp PR gates
+leave ``REGOLITH_REQUIRE_CORPUS`` unset.
 """
 
 from __future__ import annotations

@@ -25,6 +25,12 @@
 #   NIGHTLY_WT      — pinned worktree path (default: /tmp/rps-nightly-gate)
 #   CI_WALL_CAP_S   — wall cap passed through (default: 16200)
 #   JOB_NAME        — studio-ci job name (default: nightly-YYYYMMDD-HHMMSS)
+#   REGOLITH_REQUIRE_CORPUS — set to 1 for the d-385 source-on-file check
+#                     (tests/test_corpus_extract_source_on_file.py). An absent
+#                     checkout fails closed. Unset skips with
+#                     corpus_checkout_not_required_by_this_gate.
+#   REGOLITH_CORPUS_ROOT — corpus checkout for that check
+#                     (default: ~/Repos/regolith-corpus).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
