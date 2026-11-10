@@ -198,6 +198,13 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             ],
         ),
         _SettingCase(
+            "MAGEMin bridge selection",
+            Engine.MAGEMIN,
+            magemin_backend,
+            lambda backend: setattr(backend, "_bridge", "julia"),
+            lambda backend: {"subprocess": 0.25, "julia": 0.75}[backend._bridge],
+        ),
+        _SettingCase(
             "ThermoEngine transport model",
             Engine.THERMOENGINE,
             thermoengine_backend,
@@ -289,6 +296,10 @@ def _replace_setting(root: Any, path: tuple[Any, ...], value: Any) -> None:
         replacement = list(parent)
         replacement[final] = value
         _replace_setting(root, path[:-1], tuple(replacement))
+    elif final == "_effective_pack_name" and isinstance(
+        getattr(parent, "_identity", None), dict
+    ):
+        parent._identity["pack"] = value
     else:
         setattr(parent, final, value)
 
@@ -416,6 +427,99 @@ def test_cache_settings_exclude_warm_pool_runtime_state() -> None:
 
     assert first == second
     assert first["_config"] == {"temperature_units": "C"}
+
+
+@pytest.mark.parametrize(
+    "engine",
+    tuple(dict.fromkeys(case.engine for case in _setting_cases())),
+    ids=lambda engine: engine.value,
+)
+def test_opened_backend_settings_exclude_runtime_identity_strings(
+    engine: Engine,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import json
+    import re
+    import socket
+
+    from simulator import engine_cache
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    case = {case.engine: case for case in _setting_cases()}[engine]
+    backend = case.backend_factory()
+    digest = "a" * 64
+    identity = (
+        f"runtime sha256:{digest} commit:{digest} path=/Users/engine/runtime "
+        f"host={socket.gethostname()}"
+    )
+    backend.engine_version = identity
+    backend.runtime_identity = {
+        "sha256": digest,
+        "commit": digest,
+        "absolute_path": "/Users/engine/runtime",
+        "hostname": socket.gethostname(),
+    }
+    backend.runtime_worker = SimpleNamespace(
+        ready_payload={"engine_version": identity, "identity": identity}
+    )
+    if engine is Engine.THERMOENGINE:
+        backend._thermoengine_transport.engine_version = identity
+        backend._thermoengine_transport._worker = SimpleNamespace(
+            ready_payload={"engine_version": identity, "identity": identity}
+        )
+
+    monkeypatch.setattr(
+        battery, "_open_resolved_backend", lambda _name, _settings=None: backend
+    )
+    handle = open_battery_engine(engine.value)
+    try:
+        settings = engine_cache.engine_cache_backend_settings(handle.backend)
+        serialized = json.dumps(settings, sort_keys=True)
+    finally:
+        close_battery_engine_handle(handle)
+
+    assert "sha256" not in serialized.lower()
+    assert "commit" not in serialized.lower()
+    assert "/Users/" not in serialized
+    assert socket.gethostname() not in serialized
+    assert re.search(
+        r"(?<![0-9A-Fa-f])[0-9A-Fa-f]{64}(?![0-9A-Fa-f])", serialized
+    ) is None
+
+
+def test_magemin_bridge_selection_is_a_cache_setting() -> None:
+    from simulator.engine_cache import engine_cache_backend_settings, engine_cache_key
+
+    case = next(case for case in _setting_cases() if case.label == "MAGEMin bridge selection")
+    backend = case.backend_factory()
+    first = engine_cache_backend_settings(backend)
+    backend._bridge = "julia"
+    second = engine_cache_backend_settings(backend)
+
+    assert first["_bridge"] == "subprocess"
+    assert second["_bridge"] == "julia"
+    assert first != second
+    assert engine_cache_key("magemin", 1, first) != engine_cache_key("magemin", 1, second)
+
+
+def test_openimcc_cache_settings_use_effective_loaded_pack() -> None:
+    from simulator.engine_cache import engine_cache_backend_settings, engine_cache_key
+    from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
+
+    backend = object.__new__(_OpenImccBatteryBackend)
+    backend._pack_name = "default"
+    backend._identity = {"pack": "published-core"}
+
+    first = engine_cache_backend_settings(backend)
+    backend._identity["pack"] = "published-ext"
+    second = engine_cache_backend_settings(backend)
+
+    assert first["_effective_pack_name"] == "published-core"
+    assert second["_effective_pack_name"] == "published-ext"
+    assert "_pack_name" not in first
+    assert first != second
+    assert engine_cache_key("openimcc", 1, first) != engine_cache_key("openimcc", 1, second)
 
 
 def test_openimcc_gas_cache_key_tracks_pack_selection_only(
