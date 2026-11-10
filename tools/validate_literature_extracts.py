@@ -1146,7 +1146,7 @@ def _fidelity_sample_observation_key(
         if len(path_keys) != 1:
             return None
         path = sample.get(path_keys[0])
-        if not isinstance(path, str):
+        if not isinstance(path, str) or not _path_is_observation_evidence(path):
             return None
         parts = path.split(".")
         if len(parts) < 4 or parts[0] != "species":
@@ -1248,6 +1248,14 @@ def _check_fidelity_gate(
         errors.extend(match_errors)
 
         attested = True
+        if sample.get("note") == (
+            "auto fidelity sample from first observation payload (pilot migration)"
+        ):
+            errors.append(
+                f"{sample_label}: auto-migrated pilot sample cannot be source-attested; "
+                "replace it with a source-reviewed sample"
+            )
+            attested = False
         reviewer = sample.get("reviewed_by")
         if not isinstance(reviewer, str) or not reviewer.strip():
             errors.append(

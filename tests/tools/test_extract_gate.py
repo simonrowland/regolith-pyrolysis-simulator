@@ -6,6 +6,7 @@ import subprocess
 import sys
 from contextlib import nullcontext
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -148,6 +149,23 @@ def test_fidelity_gate_requires_per_sample_reviewer_attestation(
 
     assert report.hard_failed
     assert any(field in finding.detail for finding in report.findings)
+
+
+def test_fidelity_gate_rejects_auto_migrated_sample_even_with_reviewer_fields(
+    tmp_path: Path,
+):
+    doc = _document()
+    doc["fidelity_samples"][0]["note"] = (
+        "auto fidelity sample from first observation payload (pilot migration)"
+    )
+
+    report = _run_gate(tmp_path, doc)
+
+    assert report.hard_failed
+    assert any(
+        "auto-migrated pilot sample cannot be source-attested" in finding.detail
+        for finding in report.findings
+    )
 
 
 def test_kress_pdf_lineage_resolves_in_stub_index_gate(monkeypatch):
@@ -1285,6 +1303,35 @@ def test_internal_gate_attribute_error_is_not_a_tree_import_error(
             [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
         )
     assert "HARD tree-import:" not in capsys.readouterr().out
+
+
+def test_tree_without_attestation_helper_uses_legacy_fidelity_check(
+    tmp_path: Path, monkeypatch, capsys
+):
+    path = tmp_path / "fixture-source.yaml"
+    path.write_text(yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8")
+    checked: list[str] = []
+    old_validator = SimpleNamespace(
+        pre_policy_source_ids=lambda: set(),
+        validate_extract_document=lambda *_args, **_kwargs: [],
+        check_all_fidelity_samples_match=lambda _doc, *, label: checked.append(label)
+        or [],
+    )
+    monkeypatch.setattr(
+        extract_gate,
+        "_tree_modules",
+        lambda _tree: nullcontext(
+            (gate, old_validator, yaml_cache, yaml_cache.yaml_mapping_source_issues)
+        ),
+    )
+
+    status = extract_gate.main(
+        [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
+    )
+
+    output = capsys.readouterr().out
+    assert status == 0, output
+    assert checked == ["fixture-source"]
 
 
 def test_tree_import_refuses_missing_migrator_without_fallback(tmp_path: Path, capsys):

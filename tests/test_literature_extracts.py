@@ -2406,6 +2406,35 @@ def test_structured_fidelity_sample_accepted():
     assert match_errs == []
 
 
+def test_corpus_fidelity_gate_rejects_copied_unattested_values():
+    """A pin copied into the extract cannot attest itself through the corpus gate."""
+    doc = _minimal_extract()
+    doc["fidelity_samples"][0]["value"] = 0.9
+    doc["species"]["Fe"]["observations"][0]["values"]["alpha"] = 0.9
+
+    errors = vle._check_fidelity_gate(doc, label="copied-pin")
+
+    assert any("reviewed_by is required" in error for error in errors), errors
+
+
+def test_corpus_fidelity_gate_rejects_observation_id_as_evidence():
+    """Pinning observation metadata does not cover its numeric evidence."""
+    doc = _minimal_extract()
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].observation_id",
+            "value": "fe_alpha_1",
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": {"page": 2, "table": "1"},
+        }
+    ]
+
+    errors = vle._check_fidelity_gate(doc, label="metadata-pin")
+
+    assert any("fidelity sample coverage missing" in error for error in errors), errors
+
+
 def test_structured_sample_requires_locator():
     doc = _minimal_extract()
     doc["fidelity_samples"] = [
@@ -4930,15 +4959,21 @@ def _extract_paths_with_samples() -> list[Path]:
     ids=lambda p: p.stem,
 )
 def test_fidelity_sample_matches_extract(extract_path: Path):
-    """Every fidelity sample still matches extract content (extraction-drift fuse).
+    """Corpus pins match stored values but stay blocked pending source review.
 
-    Null-hypothesis: a silent rewrite of a pinned field (bad regeneration,
-    migrator regression) leaves samples stale while the file stays
-    schema-valid — this test must go RED.
+    The match assertion preserves the extraction-drift fuse. The corpus gate
+    must also reject these historical, unattested pins until a reviewer checks
+    their cited source artifacts.
     """
     doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
-    errs = vle.check_all_fidelity_samples_match(doc, label=extract_path.stem)
-    assert errs == [], "\n".join(errs)
+    match_errors = vle.check_all_fidelity_samples_match(
+        doc, label=extract_path.stem
+    )
+    assert match_errors == [], "\n".join(match_errors)
+    gate_errors = vle._check_fidelity_gate(
+        doc, label=extract_path.stem
+    )
+    assert any("reviewed_by is required" in error for error in gate_errors), gate_errors
 
 
 def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(tmp_path):

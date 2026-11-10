@@ -146,7 +146,15 @@ def _run_one(
         pre_policy_ids=pre_policy_ids,
     )
     if isinstance(doc, Mapping):
-        errors.extend(validator._check_fidelity_gate(doc, label=path.stem))
+        fidelity_gate = getattr(validator, "_check_fidelity_gate", None)
+        if callable(fidelity_gate):
+            errors.extend(fidelity_gate(doc, label=path.stem))
+        else:
+            # Older --tree validators predate source attestation and coverage;
+            # retain their existing drift check instead of crashing the audit.
+            match_check = getattr(validator, "check_all_fidelity_samples_match", None)
+            if callable(match_check):
+                errors.extend(match_check(doc, label=path.stem))
     yaml_issues = yaml_source_issues(raw)
     report = gate.evaluate_extract(
         path,
