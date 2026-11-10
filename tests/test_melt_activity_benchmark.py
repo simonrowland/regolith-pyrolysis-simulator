@@ -183,6 +183,35 @@ def test_pure_solid_activity_rows_score_after_battery_conversion(oxide):
     assert rows[0]["residual_dex"] == pytest.approx(0.0, abs=1e-12)
 
 
+def test_saved_pure_solid_activity_rows_record_each_conversion():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    solid_points = {
+        point["id"]: point
+        for point in fixture["points"]
+        if point["observable"] == "activity"
+        and benchmark.measured_activity_basis(point) == "pure_solid"
+    }
+    results_path = benchmark.DEFAULT_OUTPUT_DIR / "benchmark-results.csv"
+    with results_path.open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+
+    solid_rows = [row for row in rows if row["point_id"] in solid_points]
+    assert solid_rows
+    assert len(solid_rows) == len(solid_points) * len(benchmark.DEFAULT_ENGINES)
+    for point_id, point in solid_points.items():
+        converted_measured, conversion_record = (
+            benchmark._liquid_standard_measured_activity(point)
+        )
+        assert conversion_record.startswith("solid_to_liquid_reference_conversion:")
+        point_rows = [row for row in solid_rows if row["point_id"] == point_id]
+        assert all(
+            float(row["measured"]) == converted_measured for row in point_rows
+        )
+        assert all(conversion_record in row["reason"] for row in point_rows), (
+            f"saved rows for {point_id} omit {conversion_record}"
+        )
+
+
 def test_regeneration_without_live_check_refuses_to_drop_anchor_csv(
     tmp_path, monkeypatch
 ):
