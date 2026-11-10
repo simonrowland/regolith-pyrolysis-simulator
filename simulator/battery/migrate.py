@@ -434,8 +434,6 @@ PHASE_MAP: dict[str, Phase] = {
     "silicate_melt_ferrobasalt_FCMAS": Phase.L,
     "silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1": Phase.L,
     "cao-al2o3-sio2 liquid oxide melt": Phase.L,
-    # Printed phase abbreviations used by Kelley and Pankratz tables.
-    "c": Phase.CR,
     "(g)": Phase.G,
     "(c)": Phase.CR,
 }
@@ -26524,6 +26522,11 @@ class Migrator:
             )
             if suffix_phase is not None:
                 phase = suffix_phase
+        elif (
+            source_id == "pankratz-1987-usbm-b689"
+            and printed_phase == "c"
+        ):
+            phase, _unmapped = map_phase("(c)")
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
         if not locator.source_path:

@@ -7577,7 +7577,6 @@ def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
         ("supercooled_l", Phase.SUPERCOOLED_L),
         ("g", Phase.G),
         ("cr", Phase.CR),
-        ("c", Phase.CR),
         ("l", Phase.L),
     ):
         assert PHASE_MAP[spelling] is token
@@ -7587,6 +7586,7 @@ def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
     assert mapped.is_unknown and why is not None
 
     for spelling in (
+        "c",
         "quenched_silicate_glass",
         "quenched silicate glass; recalculated",
     ):
@@ -14262,6 +14262,8 @@ def test_pankratz_1987_crystal_columns_reach_separate_series(tmp_path: Path) -> 
     _copy_compilation_record(
         root, "pankratz-1987-usbm-b689", "page-0005.json"
     )
+    _copy_compilation_record(root, "nasa-glenn", "NG-1475.json")
+    _copy_compilation_record(root, "burcat", "BU-2430.json")
     result = migrate(root, write=False)
     rows = [
         observation
@@ -14282,6 +14284,21 @@ def test_pankratz_1987_crystal_columns_reach_separate_series(tmp_path: Path) -> 
         assert observation.identity.species.phase.value is Phase.CR
         assert observation.value.kind is ValueKind.SERIES
         assert len(observation.value.series or ()) == 14
+
+    for source_id, record_id in (
+        ("nasa-glenn", "NG-1475"),
+        ("burcat", "BU-2430"),
+    ):
+        observations = [
+            observation
+            for observation in result.observations.values()
+            if observation.observation_id.startswith(f"{source_id}:{record_id}:")
+        ]
+        assert observations
+        assert all(
+            observation.identity.species.phase.is_unknown
+            for observation in observations
+        )
 
 
 def test_g5_compilation_conversion_trail_mutation_proof(
