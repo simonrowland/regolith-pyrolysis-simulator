@@ -16990,6 +16990,15 @@ _BUFFER_OFFSET_TEXT_RE = re.compile(
     r"\s*([+−-])\s*((?:\d+(?:\.\d*)?|\.\d+))\s*$",
     re.IGNORECASE,
 )
+# A printed log whose unit is the buffer name is the offset, not an absolute
+# pressure. log10(bar) and log10(atm) stay absolute frames.
+_LOG_BUFFER_UNITS_RE = re.compile(
+    r"^\s*log(?:10)?\s*\(\s*"
+    r"(IW|FMQ|QFM|NNO|CO[-–]CO2|M[-–]H|MH|MW|Mo[-–]MoO2)"
+    r"\s*\)\s*$",
+    re.IGNORECASE,
+)
+_RELATIVE_LOG_FIELD_NAMES = frozenset({"logfo2", "log10fo2", "fo2log"})
 _MAVROGENES_SOURCE_ID = "mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas"
 _KEMS_137_SOURCE_ID = "kems-137-bischof-2023"
 
@@ -17013,6 +17022,17 @@ def _canonical_buffer_name(text: str) -> str:
     if "mw" in lowered:
         return "MW"
     return text.strip()
+
+
+def _buffer_named_by_log_units(units: object) -> str | None:
+    """Buffer named by a log unit such as ``log10(IW)``, or None."""
+
+    if not isinstance(units, str):
+        return None
+    match = _LOG_BUFFER_UNITS_RE.match(units)
+    if match is None:
+        return None
+    return _canonical_buffer_name(match.group(1))
 
 
 def _relative_buffer_for_field(name: str) -> str | None:
@@ -17083,6 +17103,12 @@ def _printed_relative_oxygen(
     for mapping in mappings:
         for key, raw in mapping.items():
             buffer = _relative_buffer_for_field(str(key))
+            if buffer is None:
+                normalized = re.sub(r"[^a-z0-9]", "", str(key).casefold())
+                if normalized in _RELATIVE_LOG_FIELD_NAMES and isinstance(raw, Mapping):
+                    buffer = _buffer_named_by_log_units(
+                        str(raw.get("units") or raw.get("unit") or "")
+                    )
             if buffer is None:
                 continue
             located = _relative_offset_value(raw)
@@ -17989,7 +18015,16 @@ def _walk_printed_oxygen(
                     reference_pressure_pa = conventional_reference_pa
                 else:
                     reference_pressure_pa = units_reference_pa
-                if (
+                buffer_units = _buffer_named_by_log_units(units)
+                # Buffer-scale units are an offset. A non-point on that scale
+                # is still present oxygen and must not inherit a parent point.
+                if buffer_units is not None:
+                    if (
+                        not isinstance(condition_value, Decimal)
+                        or not condition_value.is_finite()
+                    ):
+                        rejected_logs.append(True)
+                elif (
                     located_condition is None
                     or not isinstance(condition_value, Decimal)
                     or not condition_value.is_finite()
@@ -18040,6 +18075,10 @@ def _walk_printed_oxygen(
                     rejected_logs.append(True)
                     continue
                 units = str(node.get("units") or node.get("unit") or "").strip().lower()
+                if _buffer_named_by_log_units(units) is not None:
+                    # Offset on a named buffer. Not an absolute log, and not
+                    # a bounded refusal: the relative converter reads the node.
+                    continue
                 reference_pressure_pa = _OXYGEN_LOG_REFERENCE_PA.get(units)
                 if reference_pressure_pa is None:
                     rejected_logs.append(True)
