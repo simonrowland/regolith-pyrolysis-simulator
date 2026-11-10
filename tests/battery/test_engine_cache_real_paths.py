@@ -387,6 +387,23 @@ def test_cache_settings_include_unanticipated_simple_configuration_attributes() 
     assert first != second
 
 
+def test_cache_settings_exclude_warm_pool_runtime_state() -> None:
+    from simulator.engine_cache import engine_cache_backend_settings
+
+    backend = SimpleNamespace(
+        _config={"temperature_units": "C", "warm_worker": True},
+        _warm_pool=SimpleNamespace(call_count=0),
+        _warm_worker_enabled=True,
+        _warm_pool_size=1,
+    )
+    first = engine_cache_backend_settings(backend)
+    backend._warm_pool.call_count = 1
+    second = engine_cache_backend_settings(backend)
+
+    assert first == second
+    assert first["_config"] == {"temperature_units": "C"}
+
+
 def test_openimcc_gas_cache_key_tracks_pack_selection_only(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -440,6 +457,7 @@ def test_openimcc_gas_cache_key_tracks_pack_selection_only(
 
 
 def test_runtime_identity_is_captured_once_when_each_engine_opens(
+    tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from collections import Counter
@@ -447,7 +465,9 @@ def test_runtime_identity_is_captured_once_when_each_engine_opens(
     from simulator import engine_cache
     import simulator.diagnostic_helpers.binary_pot_battery as battery
 
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
     engine_cache.runtime_identity.cache_clear()
+    engine_cache.engine_cache_runtime_identities(reset=True)
     calls: Counter[str] = Counter()
 
     def compute(engine: str) -> str:
@@ -562,7 +582,7 @@ def test_hashimoto_internal_residue_path_reads_diagnostics_from_cache(
         nonlocal calls
         calls += 1
         return SimpleNamespace(
-            vapor_pressures_Pa={"Na(g)": 5.0},
+            vapor_pressures_Pa={"Na": 5.0},
             diagnostics={
                 "vapor_pressure_diagnostic": {
                     "pO2_floor_inversion_notices_by_species": {
@@ -592,7 +612,10 @@ def test_hashimoto_internal_residue_path_reads_diagnostics_from_cache(
 
     first = pressure({"Na2O": 1.0}, -8.0)
     second = pressure({"Na2O": 1.0}, -8.0)
+    pressure._on_accepted_evaluation(-8.0)
 
     assert first == second == {"Na": 5.0}
-    assert floor_diagnostics["Na"] == {"reason": "recorded floor inversion"}
+    assert floor_diagnostics["Na"]["detail"] == {
+        "reason": "recorded floor inversion"
+    }
     assert calls == 1
