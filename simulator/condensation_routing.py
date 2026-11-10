@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 
 STAGE_KEY_BY_NUMBER: dict[int, str] = {
     1: 'stage_1_fe_condenser',
@@ -126,6 +128,10 @@ METAL_DIMER_SPECIES: frozenset[str] = frozenset({
     'Na2',
 })
 DIMER_ALPHA_FROM_MONOMER_PROXY = 'dimer_alpha_from_monomer_proxy'
+# d-378 amendment 1. No dissociation constant: compare the element
+# partial with P_sat,M and say so. This is an upper bound on capture,
+# not a measured equilibrium partial.
+DIMER_SATURATION_UPPER_BOUND_NO_KP = 'dimer_saturation_upper_bound_no_Kp'
 
 
 def dimer_collection_monomer(species: str) -> str | None:
@@ -166,6 +172,80 @@ def monomer_condensate_credit_kg(
     dimer_molar_mass = float(dimer_formula.molar_mass_g_per_mol())
     monomer_molar_mass = float(monomer_formula.molar_mass_g_per_mol())
     return float(dimer_kg) * atom_count * monomer_molar_mass / dimer_molar_mass
+
+
+def element_partial_pa(
+    monomer_partial_pa: float,
+    dimer_partial_pa: float,
+) -> float:
+    """Conserved element partial p_elem = p_M + 2 p_M2, in pascals.
+
+    A missing monomer partial is zero coexistence, not a refusal of the
+    dimer. Negative or non-finite inputs are not a partial pressure.
+    """
+
+    monomer_partial = float(monomer_partial_pa)
+    dimer_partial = float(dimer_partial_pa)
+    if not math.isfinite(monomer_partial) or monomer_partial < 0.0:
+        monomer_partial = 0.0
+    if not math.isfinite(dimer_partial) or dimer_partial < 0.0:
+        dimer_partial = 0.0
+    return monomer_partial + 2.0 * dimer_partial
+
+
+def respeciated_monomer_partial_pa(
+    element_partial_pa_value: float,
+    kp_pa: float,
+) -> float:
+    """Equilibrium monomer partial at the wall for one element total.
+
+    d-378 amendment 1, option (b). The condensed phase is M, so the wall
+    condenses iff p_M(T_wall) > P_sat,M(T_wall).
+
+    Premise. The gas re-speciates at the wall through M2 <=> 2 M:
+
+        K_p(T) = p_M^2 / p_M2
+
+    with the element partial conserved:
+
+        p_elem = p_M + 2 p_M2.
+
+    Quadratic. Substitute p_M2 = p_M^2 / K_p:
+
+        p_M + 2 p_M^2 / K_p = p_elem
+        2 p_M^2 + K_p p_M - K_p p_elem = 0.
+
+    Closed form. The non-negative root is
+
+        p_M = (K_p / 4) * (sqrt(1 + 8 p_elem / K_p) - 1).
+
+    Evaluation uses the conjugate identity, which does not cancel when
+    K_p is large:
+
+        p_M = 2 p_elem / (sqrt(1 + 8 p_elem / K_p) + 1).
+
+    When 8 p_elem / K_p exceeds 1e16 the square root overflows, and the
+    K_p -> 0 asymptotic is used instead: p_M = sqrt(K_p * p_elem / 2).
+
+    Units. p_elem, p_M, p_M2, and K_p are pascals. K_p = P° exp(ΔG_assoc/RT)
+    with P° = 1e5 Pa, so p_elem / K_p is dimensionless.
+
+    Limits. K_p -> inf (fully dissociated) gives p_M = p_elem.
+    K_p -> 0 (fully associated) gives p_M -> 0.
+    """
+
+    p_elem = float(element_partial_pa_value)
+    if not math.isfinite(p_elem) or p_elem <= 0.0:
+        return 0.0
+    kp = float(kp_pa)
+    if math.isinf(kp) and kp > 0.0:
+        return p_elem
+    if not math.isfinite(kp) or kp <= 0.0:
+        return 0.0
+    ratio = p_elem / kp
+    if ratio > 1.0e16:
+        return math.sqrt(kp * p_elem / 2.0)
+    return (2.0 * p_elem) / (math.sqrt(1.0 + 8.0 * ratio) + 1.0)
 
 
 # Monomer has no condenser contract. The vapor stays in the stream.

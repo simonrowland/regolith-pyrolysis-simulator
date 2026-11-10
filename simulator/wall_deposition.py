@@ -288,6 +288,8 @@ def wall_deposit_candidate_for_surface_kg(
     segment_name = str(getattr(segment, "name", "")) if segment is not None else ""
     overhead_pressure_pa = None
     P_local_pa = None
+    P_compare_pa = None
+    saturation_flag = None
     if alpha_s != 0.0:
         vapor_pressure_data = getattr(model, "vapor_pressure_data", None)
         overhead_pressure_pa = float(model.overhead_pressure_mbar) * 100.0
@@ -330,6 +332,31 @@ def wall_deposit_candidate_for_surface_kg(
         P_local_pa = _deposition_finite_scalar("P_local_pa", pressure_source[species])
         if P_local_pa is not None and P_local_pa < 0.0:
             raise DepositionInputRefusal("P_local_pa", P_local_pa, "must be non-negative")
+        # d-378 amendment 1. The flowing partial stays on the dimer.
+        # The saturation comparison uses the re-speciated monomer partial
+        # at this wall temperature. A missing monomer key is zero
+        # coexistence, not a missing-pressure refusal.
+        P_compare_pa = P_local_pa
+        saturation_flag = None
+        if (
+            collection_species is not None
+            and collection_species != species
+            and P_local_pa is not None
+        ):
+            from simulator.condensation import dimer_wall_comparison_pressure_pa
+
+            monomer_partial_pa = 0.0
+            if collection_species in pressure_source:
+                monomer_partial_pa = _deposition_finite_scalar(
+                    "P_monomer_pa", pressure_source[collection_species],
+                )
+            P_compare_pa, saturation_flag = dimer_wall_comparison_pressure_pa(
+                gas_species=species,
+                dimer_partial_pa=P_local_pa,
+                monomer_partial_pa=monomer_partial_pa,
+                temperature_K=T_wall_K,
+                vapor_pressure_data=vapor_pressure_data,
+            )
 
     rate_diagnostic: dict[str, Any] = {"status": "computed"}
     if alpha_s == 0.0:
@@ -379,7 +406,7 @@ def wall_deposit_candidate_for_surface_kg(
         )
         try:
             flux = _series_resistance_deposition_flux_mol_m2_s(
-                species, P_local_pa, T_wall_K, alpha_s,
+                species, P_compare_pa, T_wall_K, alpha_s,
                 pipe_diameter_m=applied_pipe_diameter_m,
                 stir_factor=model.stir_factor,
                 radial_stir_factor=model.radial_stir_factor,
@@ -459,6 +486,10 @@ def wall_deposit_candidate_for_surface_kg(
             "terminal_refusal": False, "species": species,
             "wall_temperature_K": T_wall_K,
         }
+    if saturation_flag is not None and P_local_pa is not None and P_local_pa > 0.0:
+        bounds = getattr(model, "_dimer_saturation_upper_bound_by_species", None)
+        if isinstance(bounds, dict):
+            bounds[species] = saturation_flag
     pressure_notice = rate_diagnostic.get("wall_saturation_pressure_notice")
     if pressure_notice is not None:
         _record_wall_pressure_notice(model, "wall_saturation_pressure_extrapolations_by_species",
@@ -469,8 +500,8 @@ def wall_deposit_candidate_for_surface_kg(
         "wall_saturation_pressure_pa"
     )
     rate_diagnostic["supersaturated"] = (
-        P_local_pa > wall_saturation_pressure_pa
-        if wall_saturation_pressure_pa is not None and P_local_pa is not None
+        P_compare_pa > wall_saturation_pressure_pa
+        if wall_saturation_pressure_pa is not None and P_compare_pa is not None
         else None
     )
 

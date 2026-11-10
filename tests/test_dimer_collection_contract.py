@@ -9,18 +9,28 @@ their mass stays in the flowing stream.
 
 from __future__ import annotations
 
+import math
+
 import pytest
 
 from simulator.accounting.formulas import resolve_species_formula
-from simulator.condensation import CondensationModel, _CONFIG_BUNDLE
+from simulator.condensation import (
+    CondensationModel,
+    _CONFIG_BUNDLE,
+    _try_antoine_psat_pa,
+    dimer_dissociation_kp_pa,
+)
 from simulator.condensation_routing import (
     DESIGNATED_STAGE,
     DIMER_ALPHA_FROM_MONOMER_PROXY,
+    DIMER_SATURATION_UPPER_BOUND_NO_KP,
     K_TRAP_STAGE_KEY,
     METAL_DIMER_SPECIES,
     MISSING_COLLECTION_PRODUCT_CONTRACT_SPECIES,
     NA_COLLECTOR_STAGE_KEY,
     dimer_collection_monomer,
+    element_partial_pa,
+    respeciated_monomer_partial_pa,
 )
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 
@@ -152,7 +162,9 @@ def test_monomer_present_with_its_dimer_keeps_both_masses():
     # dimer mass. The monomer's own capture at this partial is larger.
     assert deposited_na > captured_dimer
     assert _moles("Na", deposited_na) > 2.0 * _moles("Na2", captured_dimer)
-    assert _mass_closure_kg(route, inlet) == pytest.approx(0.0, abs=0.0)
+    # The shared stage bucket sums the monomer deposit and the dimer credit
+    # to the inlet within one ulp.
+    assert _mass_closure_kg(route, inlet) == pytest.approx(0.0, abs=1.0e-15)
     for species in inlet:
         assert route.condensation_authority_by_species[species][
             "mass_closure_error_kg_hr"
@@ -236,3 +248,147 @@ def test_missing_dimer_partial_pressure_refuses_that_quantity_only():
         assert refusal["collection_product_kg_hr"] is None
 
     assert _mass_closure_kg(route, species_kg) == pytest.approx(0.0, abs=0.0)
+
+
+def test_respeciated_monomer_partial_obeys_the_quadratic_and_both_limits():
+    """d-378 amendment 1 closed form. K_p -> inf is p_elem; K_p -> 0 is 0."""
+
+    p_elem = 20.0
+    kp = 11268.6
+    partial = respeciated_monomer_partial_pa(p_elem, kp)
+    assert partial + 2.0 * partial * partial / kp == pytest.approx(p_elem)
+    direct = (kp / 4.0) * (math.sqrt(1.0 + 8.0 * p_elem / kp) - 1.0)
+    assert partial == pytest.approx(direct)
+
+    assert respeciated_monomer_partial_pa(p_elem, math.inf) == pytest.approx(p_elem)
+    assert respeciated_monomer_partial_pa(p_elem, 1.0e20) == pytest.approx(
+        p_elem, rel=1.0e-9
+    )
+    assert respeciated_monomer_partial_pa(p_elem, 0.0) == 0.0
+    tiny = 1.0e-20
+    assert respeciated_monomer_partial_pa(p_elem, tiny) == pytest.approx(
+        math.sqrt(tiny * p_elem / 2.0), rel=1.0e-6
+    )
+    assert element_partial_pa(3.0, 4.0) == pytest.approx(11.0)
+
+
+def test_stable_dimer_below_monomer_saturation_passes_through(monkeypatch):
+    """p_M2 > P_sat,M but the re-speciated p_M is below it, so nothing captures.
+
+    Downstream cold bands are moved to 1500 C so the only cold surface is
+    the isothermal Na collector. The monkeypatched K_p is the stable-dimer
+    side of amendment 1: real Na2 thermo is dissociated and cannot stage
+    p_M < P_sat < p_M2.
+    """
+
+    psat_pa, refused = _try_antoine_psat_pa(
+        "Na",
+        250.0 + 273.15,
+        vapor_pressure_data=_CONFIG_BUNDLE.vapor_pressures,
+    )
+    assert refused is False
+    assert psat_pa is not None and psat_pa > 0.0
+    dimer_partial_pa = 10.0
+    assert dimer_partial_pa > psat_pa
+    kp_pa = 1.0e-25
+    p_monomer = respeciated_monomer_partial_pa(
+        element_partial_pa(0.0, dimer_partial_pa), kp_pa,
+    )
+    assert 0.0 < p_monomer < psat_pa
+
+    monkeypatch.setattr(
+        "simulator.condensation.dimer_dissociation_kp_pa",
+        lambda *_args, **_kwargs: kp_pa,
+    )
+    model = _model(partials={"Na2": dimer_partial_pa / 100.0})
+    for stage in model.train.stages:
+        if stage.stage_number >= 5:
+            stage.temp_range_C = (1500.0, 1500.0)
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"Na2": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+    assert route.remaining_by_species["Na2"] == pytest.approx(1.0, abs=1.0e-12)
+    assert _deposited_kg(route, "Na") == pytest.approx(0.0, abs=0.0)
+    assert _mass_closure_kg(route, {"Na2": 1.0}) == pytest.approx(0.0, abs=0.0)
+    assert DIMER_SATURATION_UPPER_BOUND_NO_KP not in (
+        route.sticking_alpha_provenance_notice
+    )
+
+
+def test_missing_kp_flags_the_element_partial_upper_bound(monkeypatch):
+    """No K_p: compare p_elem with P_sat,M and flag it. Not a silent zero.
+
+    At 480 C, p_M2 is below P_sat,Na and p_elem is above it, so the old
+    p_M2 comparison would not foul this wall. The flagged bound does.
+    """
+
+    wall_T_K = 480.0 + 273.15
+    psat_pa, refused = _try_antoine_psat_pa(
+        "Na",
+        wall_T_K,
+        vapor_pressure_data=_CONFIG_BUNDLE.vapor_pressures,
+    )
+    assert refused is False and psat_pa is not None
+    dimer_partial_pa = 50.0
+    p_elem = element_partial_pa(0.0, dimer_partial_pa)
+    assert dimer_partial_pa < psat_pa < p_elem
+    # The landed exchange is available. The patch below is the missing-K_p seam.
+    assert dimer_dissociation_kp_pa(
+        "Na2", wall_T_K, _CONFIG_BUNDLE.vapor_pressures,
+    ) is not None
+
+    monkeypatch.setattr(
+        "simulator.condensation.dimer_dissociation_kp_pa",
+        lambda *_args, **_kwargs: None,
+    )
+    model = _model(partials={"Na2": dimer_partial_pa / 100.0})
+    temperatures = {segment.name: 1500.0 for segment in model.pipe_segments}
+    temperatures["stage_3_to_stage_4"] = 480.0
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+        species_partial_pressures_mbar={"Na2": dimer_partial_pa / 100.0},
+        pipe_segment_temperatures_C=temperatures,
+    )
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"Na2": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+    assert route.wall_deposit_by_species.get("Na", 0.0) > 0.0
+    assert route.wall_deposit_fraction_by_species["Na2"] > 0.0
+    notice = route.sticking_alpha_provenance_notice
+    assert notice[DIMER_SATURATION_UPPER_BOUND_NO_KP]["Na2"] == (
+        DIMER_SATURATION_UPPER_BOUND_NO_KP
+    )
+    assert _mass_closure_kg(route, {"Na2": 1.0}) == pytest.approx(0.0, abs=0.0)
+
+
+def test_landed_kp_does_not_raise_the_no_kp_bound():
+    """A real Na2 K_p at 480 C supersaturates without the upper-bound flag."""
+
+    model = _model(partials={"Na2": 0.5})
+    temperatures = {segment.name: 1500.0 for segment in model.pipe_segments}
+    temperatures["stage_3_to_stage_4"] = 480.0
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+        species_partial_pressures_mbar={"Na2": 0.5},
+        pipe_segment_temperatures_C=temperatures,
+    )
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"Na2": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+    assert route.wall_deposit_by_species.get("Na", 0.0) > 0.0
+    assert DIMER_SATURATION_UPPER_BOUND_NO_KP not in (
+        route.sticking_alpha_provenance_notice
+    )
+    assert _moles("Na", _deposited_kg(route, "Na")) == pytest.approx(
+        2.0 * _moles("Na2", 1.0 - route.remaining_by_species["Na2"])
+    )
+    assert _mass_closure_kg(route, {"Na2": 1.0}) == pytest.approx(0.0, abs=1.0e-15)

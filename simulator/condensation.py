@@ -132,6 +132,7 @@ from simulator.lab_geometry import (
 from simulator.condensation_routing import (
     DESIGNATED_STAGE,
     DIMER_ALPHA_FROM_MONOMER_PROXY,
+    DIMER_SATURATION_UPPER_BOUND_NO_KP,
     K_TRAP_STAGE_KEY,
     METAL_DIMER_SPECIES,
     MISSING_COLLECTION_PRODUCT_CONTRACT_REASON,
@@ -142,8 +143,10 @@ from simulator.condensation_routing import (
     coproduct_species_for_stage_number,
     designated_stage_number,
     dimer_collection_monomer,
+    element_partial_pa,
     is_designated_for_stage,
     monomer_condensate_credit_kg,
+    respeciated_monomer_partial_pa,
     species_accepted_on_stage,
     stage_key_for_stage,
 )
@@ -3095,6 +3098,8 @@ class CondensationModel:
         antoine_extrapolation_warnings: list[str] = []
         wall_sticking_alpha_by_species: dict[str, float] = {}
         wall_sticking_alpha_provenance_by_species: dict[str, Any] = {}
+        # Filled when a dimer sample has no K_p and uses p_elem vs P_sat.
+        self._dimer_saturation_upper_bound_by_species = {}
         transport_parameter_notice_by_species: dict[str, Any] = {}
         condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
         from simulator.vapour_rail.instrumentation import (
@@ -3363,6 +3368,9 @@ class CondensationModel:
                         residence_s=self.residence_time_s.get(stage.stage_number, 1.0),
                         available_kg=supply,
                         inlet_partial_pressure_pa=partials.get(species),
+                        coexisting_monomer_partial_pa=(
+                            partials.get(monomer, 0.0) if monomer is not None else None
+                        ),
                         alpha_s_value=_required_record_alpha_s(
                             alpha_record, species=physics, site='stage_deposition',
                         ),
@@ -3622,6 +3630,29 @@ class CondensationModel:
                     )
                     removed_kg += deposit
                     credited_kg += credit
+                # d-378: the kernel splits this gas species' condensed kg.
+                # The fraction is the dimer's own wall/stage split. Rebuilding
+                # the monomer's fraction from monomer-plus-dimer mass would
+                # move the monomer's wall/collector split. The segment map
+                # passed below is dimer-keyed so the monomer projection in
+                # wall_deposit_by_species is not read back as a gas species.
+                if wall_hkl_kg > 1e-15:
+                    wall_deposit_fraction_by_species[species] = (
+                        wall_hkl_kg / (wall_hkl_kg + hkl_condensed_total_kg)
+                    )
+                    dimer_segment_kg = {
+                        segment_name: {species: float(deposit)}
+                        for segment_name, deposit in wall_hkl_by_segment.items()
+                        if float(deposit) > 0.0
+                    }
+                    wall_deposit_account_fractions_by_species[species] = (
+                        _wall_segment_account_fractions(
+                            dimer_segment_kg,
+                            species,
+                            wall_hkl_kg,
+                            self.pipe_segments,
+                        )
+                    )
                 dimer_removed_kg[species] = removed_kg
                 monomer_credit_kg[monomer] = (
                     monomer_credit_kg.get(monomer, 0.0) + credited_kg
@@ -3645,12 +3676,6 @@ class CondensationModel:
             wall_deposit_by_species[credited_monomer] = (
                 wall_deposit_by_species.get(credited_monomer, 0.0) + added_kg
             )
-        # The kernel reads wall_deposit_fraction_by_species by gas species
-        # and applies it to that species' own condensed kg. Rebuilding the
-        # monomer fraction from monomer-plus-dimer mass would move the
-        # monomer's own wall split. The dimer's fraction stays 0: the wall
-        # path would otherwise credit an M2 condensate, and d-378 has no
-        # distinct dimer condensate. Dimer mass is the monomer product.
 
         from simulator.diagnostics import (
             _status_bearing_alpha_record,
@@ -3671,6 +3696,20 @@ class CondensationModel:
             sticking_notice[DIMER_ALPHA_FROM_MONOMER_PROXY] = dict(
                 sorted(dimer_alpha_proxy_by_species.items())
             )
+        saturation_bounds = getattr(
+            self, '_dimer_saturation_upper_bound_by_species', None,
+        )
+        if isinstance(saturation_bounds, dict) and saturation_bounds:
+            # d-378 amendment 1: without K_p the criterion is p_elem vs
+            # P_sat,M, an upper bound, not a silent zero and not p_M2.
+            sticking_notice = dict(sticking_notice)
+            sticking_notice['severity'] = 'warning'
+            sticking_notice['authoritative_for_deposit_mass'] = False
+            sticking_notice['deposit_output_status'] = 'status_bearing'
+            sticking_notice[DIMER_SATURATION_UPPER_BOUND_NO_KP] = {
+                species_name: DIMER_SATURATION_UPPER_BOUND_NO_KP
+                for species_name in sorted(saturation_bounds)
+            }
         current_alpha_provenance = sticking_notice.get(
             'alpha_s_provenance_by_species',
             {},
@@ -4439,12 +4478,16 @@ class CondensationModel:
         antoine_extrapolation_warnings: list[str] | None = None,
         efficiency_outcomes: list[dict[str, Any]] | None = None,
         saturation_species: str | None = None,
+        coexisting_monomer_partial_pa: float | None = None,
     ) -> float:
         """Equilibrium-capped kinetic capture integrated over the stage band.
 
         ``saturation_species`` selects the wall saturation curve when it is
         not the gas molecule. d-378 uses the monomer curve for a metal dimer.
-        Molar mass and the flowing partial stay on ``species``.
+        Molar mass stays on ``species``. d-378 amendment 1 compares the
+        re-speciated monomer partial, not the dimer partial, with that curve.
+        ``coexisting_monomer_partial_pa`` is the monomer's share of the
+        element total; a missing monomer is zero coexistence.
         """
         def _mint_zero(reason: str, **detail: Any) -> float:
             if efficiency_outcomes is not None:
@@ -4534,6 +4577,10 @@ class CondensationModel:
         active_temperature_samples = 0
         positive_driving_samples = 0
         strip_conductance_and_saturation: list[tuple[float, float]] = []
+        # One entry per sample that reached the saturation comparison.
+        # Isothermal collector bands share one re-speciated partial.
+        comparison_pressures: list[float] = []
+        dimer_monomer = dimer_collection_monomer(species)
         for sample in range(sample_count):
             sample_T_C = (
                 lo_C if width_C == 0.0
@@ -4560,6 +4607,22 @@ class CondensationModel:
             if sample_alpha_s == 0.0:
                 continue
 
+            # d-378 amendment 1: re-speciate once at this wall temperature
+            # and hand that partial to both the flux and the drawdown.
+            # Doing it again inside the driving-pressure helper would
+            # apply the equilibrium twice. Molar mass stays on the dimer.
+            p_sample = p_in
+            saturation_flag = None
+            if dimer_monomer is not None:
+                p_sample, saturation_flag = dimer_wall_comparison_pressure_pa(
+                    gas_species=species,
+                    dimer_partial_pa=p_in,
+                    monomer_partial_pa=float(coexisting_monomer_partial_pa or 0.0),
+                    temperature_K=sample_T_K,
+                    vapor_pressure_data=self.vapor_pressure_data,
+                )
+            comparison_pressures.append(p_sample)
+
             diagnostic: dict[str, Any] = {}
             pressure_options = dict(
                 vapor_pressure_data=self.vapor_pressure_data,
@@ -4575,7 +4638,7 @@ class CondensationModel:
             )
             try:
                 flux = _series_resistance_deposition_flux_mol_m2_s(
-                    species, p_in, sample_T_K, sample_alpha_s,
+                    species, p_sample, sample_T_K, sample_alpha_s,
                     pipe_diameter_m=gas_side_length_m,
                     stir_factor=self.stir_factor,
                     radial_stir_factor=self.radial_stir_factor,
@@ -4608,7 +4671,13 @@ class CondensationModel:
                 raise WallSaturationPressureRefusal(
                     species, sample_T_K, 'saturation_pressure_unavailable',
                 )
-            sample_driving_pressure = max(0.0, p_in - float(saturation_pressure))
+            if saturation_flag is not None and p_in > 0.0:
+                bounds = getattr(
+                    self, '_dimer_saturation_upper_bound_by_species', None,
+                )
+                if isinstance(bounds, dict):
+                    bounds[species] = saturation_flag
+            sample_driving_pressure = max(0.0, p_sample - float(saturation_pressure))
             band_flux_sum += flux
             if sample_driving_pressure > 0.0:
                 positive_driving_samples += 1
@@ -4654,6 +4723,14 @@ class CondensationModel:
         # p_in=100 Pa, the first-set equilibrium is 45 Pa, but the 90 Pa
         # strip stops there while the cold strip remains active and captures
         # below 45 Pa.
+        if comparison_pressures:
+            # Designated Na and K bands are isothermal, so every sample
+            # shares one p_M and the shared-pressure solution is exact.
+            # A wide band's samples do not: the drawdown then uses the
+            # partial at the middle sample, the only temperature one
+            # shared pressure can carry. Each strip was admitted from
+            # its own p_M(T) > P_sat(T).
+            p_in = comparison_pressures[len(comparison_pressures) // 2]
         inventory_mol = available_kg / molar_mass / 3600.0 * residence_s
         pressure_scale_pa_per_mol = p_in / inventory_mol
 
@@ -6762,6 +6839,174 @@ def _wall_antoine_temperature_relation(
     return None
 
 
+def _association_exchange_amounts(
+    exchange: Mapping[str, Any],
+) -> tuple[dict[str, float], dict[str, float]] | None:
+    """Stoichiometry of a gas-exchange reaction, or None if it is unreadable."""
+
+    def amounts(side: Any) -> dict[str, float] | None:
+        if not isinstance(side, list):
+            return None
+        totals: dict[str, float] = {}
+        for item in side:
+            if not isinstance(item, Mapping):
+                return None
+            formula = item.get('formula')
+            if not isinstance(formula, str) or not formula:
+                return None
+            try:
+                stoich = float(item.get('stoichiometry'))
+            except (TypeError, ValueError):
+                return None
+            if not math.isfinite(stoich) or stoich <= 0.0:
+                return None
+            totals[formula] = totals.get(formula, 0.0) + stoich
+        return totals
+
+    reactants = amounts(exchange.get('reactants'))
+    products = amounts(exchange.get('products'))
+    if reactants is None or products is None:
+        return None
+    return reactants, products
+
+
+def dimer_dissociation_kp_pa(
+    dimer: str,
+    temperature_K: float,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> float | None:
+    """K_p = p_M^2 / p_M2 in pascals for M2 <=> 2 M, or None if unavailable.
+
+    The catalog stores the association 2 M -> M2. Its CEA polynomials give
+
+        ΔG_assoc / (R T) = g_M2 - 2 g_M
+        K_assoc = exp(-ΔG_assoc / (R T)) = (p_M2 / P°) / (p_M / P°)^2
+        K_p = p_M^2 / p_M2 = P° exp(ΔG_assoc / (R T))
+
+    with P° = 1e5 Pa. A missing exchange, a reaction that is not that
+    association, thermo outside its CEA domain, or a non-finite Gibbs
+    term returns None so the caller can use the flagged element-partial
+    upper bound. A catalog compile error is a broken row and propagates.
+    """
+
+    monomer = dimer_collection_monomer(dimer)
+    if monomer is None:
+        return None
+    try:
+        temperature = float(temperature_K)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        return None
+    row = _species_vapor_data(dimer, vapor_pressure_data=vapor_pressure_data)
+    model = row.get('reference_pressure_model')
+    if not isinstance(model, Mapping):
+        return None
+    exchange = model.get('gas_exchange_reaction')
+    if not isinstance(exchange, Mapping):
+        return None
+    parsed = _association_exchange_amounts(exchange)
+    if parsed is None:
+        return None
+    reactants, products = parsed
+    # Association as landed: 2 M -> M2. The reverse would flip ΔG.
+    if (
+        set(reactants) != {monomer}
+        or abs(reactants[monomer] - 2.0) > 1.0e-9
+        or set(products) != {dimer}
+        or abs(products[dimer] - 1.0) > 1.0e-9
+    ):
+        return None
+    thermo = model.get('species_thermo')
+    if not isinstance(thermo, Mapping):
+        return None
+
+    from simulator.vapour_rail.catalog import (
+        _THERMO_REFERENCE_PRESSURE_PA,
+        _polynomial_from_thermo_record,
+        _resolve_thermo_record,
+    )
+    from simulator.vapour_rail.nasa_cea import NasaCeaDomainError
+
+    gibbs: dict[str, float] = {}
+    reference_pressures: list[float] = []
+    for formula in (monomer, dimer):
+        record = thermo.get(formula)
+        if not isinstance(record, Mapping):
+            return None
+        resolved = _resolve_thermo_record(
+            record, field=f'{dimer}.species_thermo.{formula}',
+        )
+        family = str(
+            resolved.get('evaluator_family')
+            or resolved.get('evaluator')
+            or model.get('evaluator_family')
+            or ''
+        )
+        polynomial = _polynomial_from_thermo_record(
+            name=f'{dimer}.{formula}',
+            family=family,
+            record=resolved,
+            default_standard_state='gas',
+        )
+        try:
+            state = polynomial.evaluate(temperature)
+        except NasaCeaDomainError:
+            return None
+        g_over_rt = getattr(state, 'g_over_RT', None)
+        try:
+            g_value = float(g_over_rt)
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(g_value):
+            return None
+        gibbs[formula] = g_value
+        try:
+            reference_pa = float(
+                resolved.get('reference_pressure_Pa', _THERMO_REFERENCE_PRESSURE_PA)
+            )
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(reference_pa) or reference_pa <= 0.0:
+            return None
+        reference_pressures.append(reference_pa)
+    reference_pa = reference_pressures[0]
+    if abs(reference_pressures[1] - reference_pa) > 1.0e-6 * reference_pa:
+        return None
+    # log K_p = ln(P°) + g_M2 - 2 g_M. Clamp before exp overflows.
+    log_kp = math.log(reference_pa) + gibbs[dimer] - 2.0 * gibbs[monomer]
+    if log_kp >= 700.0:
+        return math.inf
+    if log_kp <= -700.0:
+        return 0.0
+    return math.exp(log_kp)
+
+
+def dimer_wall_comparison_pressure_pa(
+    *,
+    gas_species: str,
+    dimer_partial_pa: float,
+    monomer_partial_pa: float,
+    temperature_K: float,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> tuple[float, str | None]:
+    """Partial to compare with P_sat,M, and the no-K_p flag if used.
+
+    Returns ``(p_M, None)`` when K_p is available, else
+    ``(p_elem, dimer_saturation_upper_bound_no_Kp)``. The flag is the
+    criterion that was selected. The caller records it only once the
+    wall curve itself is available.
+    """
+
+    p_elem = element_partial_pa(monomer_partial_pa, dimer_partial_pa)
+    kp_pa = dimer_dissociation_kp_pa(
+        gas_species, temperature_K, vapor_pressure_data,
+    )
+    if kp_pa is None:
+        return p_elem, DIMER_SATURATION_UPPER_BOUND_NO_KP
+    return respeciated_monomer_partial_pa(p_elem, kp_pa), None
+
+
 def _wall_deposition_driving_pressure_pa(
     species: str,
     P_local_pa: float,
@@ -6775,7 +7020,11 @@ def _wall_deposition_driving_pressure_pa(
     diagnostic_out: MutableMapping[str, Any] | None = None,
     saturation_species: str | None = None,
 ) -> float:
-    # d-378: a dimer deposit is driven by the monomer's wall curve.
+    # The caller supplies the gas-side pressure compared with this
+    # curve. d-378 amendment 1: for a metal dimer that pressure is the
+    # re-speciated monomer partial p_M(T_wall), not p_M2. Re-speciating
+    # again here would apply the equilibrium twice. ``saturation_species``
+    # selects the monomer wall curve.
     if saturation_species is not None:
         species = saturation_species
     try:

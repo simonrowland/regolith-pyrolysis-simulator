@@ -727,10 +727,30 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         alkali_state_by_account = self._copy_alkali_state(
             controls.get("wall_alkali_binding_diagnostic_state_by_account")
         )
+        # d-378: M2(g) has no distinct condensate. A contracted dimer
+        # deposits n mol of the monomer on the monomer's wall account.
+        # The vapor debit stays mol of M2. Homonuclear n = 2 and
+        # M_M2 = 2 M_M, so the credited mass equals the vapor mass and
+        # the Na/K alkali diagnostic sees monomer moles.
+        from simulator.accounting.formulas import resolve_species_formula
+        from simulator.condensation_routing import dimer_collection_monomer
+
+        deposit_species = species
+        moles_per_arrival = 1.0
+        monomer = dimer_collection_monomer(species)
+        if monomer is not None:
+            atom_count = float(
+                resolve_species_formula(species).elements.get(monomer, 0.0)
+            )
+            if atom_count <= 0.0:
+                raise ValueError(f'{species} has no {monomer} atoms to credit')
+            deposit_species = monomer
+            moles_per_arrival = atom_count
 
         for account, arrival_mol in wall_deposit_mol_by_account.items():
             if arrival_mol <= 0.0:
                 continue
+            deposit_mol = arrival_mol * moles_per_arrival
             account_state = dict(account_view.get(account, {}) or {})
             products: dict[str, float] = {}
             debits: dict[str, float] = {}
@@ -739,21 +759,21 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 "source": str(WALL_REACTIVITY_MATRIX_PATH),
             }
 
-            if species == "SiO":
+            if deposit_species == "SiO":
                 reaction = self._matrix_reaction("SiO_disproportionation")
                 for product, ratio in dict(reaction["product_credits"]).items():
-                    products[str(product)] = arrival_mol * float(ratio)
+                    products[str(product)] = deposit_mol * float(ratio)
                 diagnostic.update({
                     "mechanism": reaction.get("mechanism"),
                     "status": reaction.get("status"),
                 })
-            elif species == "Mg":
+            elif deposit_species == "Mg":
                 reaction = self._matrix_reaction("Mg_silica_reduction")
                 available_sio2_mol = max(
                     0.0, float(account_state.get("SiO2", 0.0))
                 )
-                reactive_mg_mol = min(arrival_mol, 2.0 * available_sio2_mol)
-                residual_mg_mol = max(0.0, arrival_mol - reactive_mg_mol)
+                reactive_mg_mol = min(deposit_mol, 2.0 * available_sio2_mol)
+                residual_mg_mol = max(0.0, deposit_mol - reactive_mg_mol)
                 if reactive_mg_mol > 0.0:
                     debits["SiO2"] = 0.5 * reactive_mg_mol
                     products["MgO"] = reactive_mg_mol
@@ -771,11 +791,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                         "MgO_vs_Mg2Si_competition",
                     ),
                 })
-            elif species == "Fe":
+            elif deposit_species == "Fe":
                 reaction = self._matrix_reaction("Fe_silicide")
                 available_si_mol = max(0.0, float(account_state.get("Si", 0.0)))
-                silicide_mol = min(arrival_mol, available_si_mol)
-                residual_fe_mol = max(0.0, arrival_mol - silicide_mol)
+                silicide_mol = min(deposit_mol, available_si_mol)
+                residual_fe_mol = max(0.0, deposit_mol - silicide_mol)
                 if silicide_mol > 0.0:
                     debits["Si"] = silicide_mol
                     products["FeSi"] = silicide_mol
@@ -791,20 +811,20 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                         reaction.get("deferred_products") or ()
                     ),
                 })
-            elif species in {"Na", "K"}:
-                products[species] = arrival_mol
+            elif deposit_species in {"Na", "K"}:
+                products[deposit_species] = deposit_mol
                 diagnostic, alkali_state_by_account[account] = (
                     self._alkali_diagnostic_update(
-                        species,
+                        deposit_species,
                         account,
-                        arrival_mol,
+                        deposit_mol,
                         account_state,
                         alkali_state_by_account.get(account),
                         self._wall_temperature_K(controls, account),
                     )
                 )
             else:
-                products[species] = arrival_mol
+                products[deposit_species] = deposit_mol
                 diagnostic.update({
                     "mechanism": "physisorbing_non_reactive_c4b",
                     "status": "NON_REACTIVE_C4B",
