@@ -108,8 +108,8 @@ _RUNTIME_ONLY_SETTING_REASONS = {
     "_last_pressure_authority_warning": "This is a diagnostic from a prior call.",
     "_last_vapor_pressure_diagnostic": "This contains the previous call's vapor output and diagnostics.",
     "_last_vapor_pressures_source": "This contains source labels from the previous vapor-pressure call.",
-    "_last_high_t_melt_activity_temperature_K": "This records the previous call's high-temperature activity state.",
-    "_last_high_t_melt_activity": "This records the previous call's high-temperature activity output.",
+    "_last_high_t_melt_activity_temperature_K": "The direct residue request projects this continuation temperature separately; equilibrate clears it before solving.",
+    "_last_high_t_melt_activity": "The direct residue request projects this continuation certificate separately; equilibrate clears it before solving.",
     "_high_t_melt_activity_fallback_steps": "These record the previous call's high-temperature fallback diagnostics.",
     "_chem_kernel": "This per-call kernel is derived from keyed setpoints and request inputs.",
     "atom_ledger": "The direct residue adapter rebuilds this ledger from composition already present in the request.",
@@ -118,7 +118,8 @@ _RUNTIME_ONLY_SETTING_REASONS = {
     "_last_empty_speciation_reason": "This is a diagnostic from a prior call.",
     "_last_empty_speciation_error": "This is a diagnostic from a prior call.",
     "_last_silent_zero_notes": "These are diagnostics from a prior call.",
-    "_binary_path": "The selected native runtime is diagnostic; chemistry changes use the explicit chemistry version.",
+    "_binary_path": "The launched native runtime path is diagnostic; chemistry changes use the explicit chemistry version.",
+    "_engine_path": "The launched native runtime path is diagnostic; chemistry changes use the explicit chemistry version.",
     "binary_path": "The selected native runtime is diagnostic; chemistry changes use the explicit chemistry version.",
     "_engine_root": "The native runtime location is diagnostic; chemistry changes use the explicit chemistry version.",
     "engine_root": "The native runtime location is diagnostic; chemistry changes use the explicit chemistry version.",
@@ -126,6 +127,7 @@ _RUNTIME_ONLY_SETTING_REASONS = {
     "working_directory": "The process working directory is operational, not a prediction input.",
     "workdir": "The process working directory is operational, not a prediction input.",
     "_engine_version": "Runtime version text is diagnostic; chemistry changes use the explicit chemistry version.",
+    "_thermoengine_transport._melts_version": "Runtime version text is diagnostic; chemistry changes use the explicit chemistry version.",
     "engine_version": "Runtime version text is diagnostic; chemistry changes use the explicit chemistry version.",
     "runtime_identity": "Runtime identity is diagnostic; chemistry changes use the explicit chemistry version.",
     "ready_payload": "The worker handshake reports runtime readiness and is not an engine input.",
@@ -151,6 +153,7 @@ _RUNTIME_ONLY_SETTING_REASONS = {
     "_warm_pool_size": "Worker count changes scheduling, not prediction inputs.",
     "_warm_worker_enabled": "Warm worker use changes scheduling, not prediction inputs.",
     "warm_worker": "Warm worker use changes scheduling, not prediction inputs.",
+    "uses_warm_pool": "Whether a runtime pool is active changes scheduling, not prediction inputs.",
     "pool_size": "Worker count changes scheduling, not prediction inputs.",
     "worker_count": "Worker count changes scheduling, not prediction inputs.",
     "slots": "Worker count changes scheduling, not prediction inputs.",
@@ -180,6 +183,7 @@ _RUNTIME_ONLY_SETTING_REASONS = {
     "_bootstrap_args[0]": "The executable location is runtime metadata; chemistry changes use the explicit chemistry version.",
     "diagnostic_log_path": "Worker log destinations do not change engine inputs.",
     "_diagnostic_log_path": "Worker log destinations do not change engine inputs.",
+    "_last_normalization_warnings": "These are diagnostics from a prior call.",
     "diagnostic_signal": "Diagnostic signal selection affects reporting, not engine inputs.",
     "watchdog_grace_s": "Worker watchdog timing changes process management, not prediction inputs.",
     "_watchdog_grace_s": "Worker watchdog timing changes process management, not prediction inputs.",
@@ -214,6 +218,21 @@ _RUNTIME_ONLY_SETTING_REASONS = {
     "melt.oxygen_reservoir.melt_intrinsic_fO2_log": "The direct residue request keys fO2 and assigns this oxygen state.",
     "melt.oxygen_reservoir.headspace_ledger_pO2_bar": "The direct residue request keys pO2 and assigns this oxygen state.",
     "melt.oxygen_reservoir.headspace_transport_pO2_bar": "The direct residue request keys pO2 and assigns this oxygen state.",
+}
+
+_OPAQUE_SETTING_REASONS = {
+    ("_gas", "gas_df", "_mgr"): (
+        "OpenIMCC gas table contents are covered by the chemistry version and the "
+        "selected gas-pack name."
+    ),
+    ("backend",): (
+        "InternalAnalyticalBackend is a stateless empty marker; prediction settings "
+        "remain visible on the enclosing core."
+    ),
+    ("_core", "backend"): (
+        "InternalAnalyticalBackend is a stateless empty marker; prediction settings "
+        "remain visible on the enclosing core."
+    ),
 }
 
 
@@ -265,19 +284,45 @@ def _setting_type_name(value: Any) -> str:
     return f"{value_type.__module__}.{value_type.__qualname__}"
 
 
+def _opaque_setting_reason(path: tuple[Any, ...]) -> str | None:
+    """Return the explicit reason an engine setting at this path is opaque."""
+    return _OPAQUE_SETTING_REASONS.get(path)
+
+
 def _object_settings(value: Any) -> dict[str, Any] | None:
     try:
         attributes = dict(vars(value))
     except TypeError:
         attributes = {}
+    except Exception:
+        return None
     for cls in type(value).__mro__:
         slots = getattr(cls, "__slots__", ())
         if isinstance(slots, str):
             slots = (slots,)
         for name in slots:
-            if name not in {"__dict__", "__weakref__"} and hasattr(value, name):
+            if name in {"__dict__", "__weakref__"}:
+                continue
+            try:
                 attributes[name] = getattr(value, name)
-    if attributes or type(value) is object:
+            except AttributeError:
+                continue
+            except Exception:
+                return None
+        for name, descriptor in vars(cls).items():
+            if (
+                cls.__module__.startswith("simulator.")
+                and isinstance(descriptor, property)
+                and descriptor.fget is not None
+                and name not in attributes
+            ):
+                try:
+                    attributes[name] = getattr(value, name)
+                except AttributeError:
+                    continue
+                except Exception:
+                    return None
+    if attributes:
         return attributes
     return None
 
@@ -286,10 +331,11 @@ def _settings_value(
     value: Any,
     seen: dict[int, tuple[Any, ...]],
     dropped: dict[tuple[Any, ...], str],
+    opaque: dict[tuple[Any, ...], str],
     path: tuple[Any, ...] = (),
 ) -> Any:
     if isinstance(value, Enum):
-        return _settings_value(value.value, seen, dropped, path)
+        return _settings_value(value.value, seen, dropped, opaque, path)
     if _simple_cache_setting(value):
         return value
     if isinstance(value, Path):
@@ -299,10 +345,10 @@ def _settings_value(
     if type(value).__module__.split(".", 1)[0] == "numpy":
         tolist = getattr(value, "tolist", None)
         if callable(tolist):
-            return _settings_value(tolist(), seen, dropped, path)
+            return _settings_value(tolist(), seen, dropped, opaque, path)
         item = getattr(value, "item", None)
         if callable(item):
-            return _settings_value(item(), seen, dropped, path)
+            return _settings_value(item(), seen, dropped, opaque, path)
     if isinstance(value, ModuleType):
         # A module is executable implementation code; chemistry changes to it
         # are represented by the engine's opt-in chemistry version in the key.
@@ -318,6 +364,10 @@ def _settings_value(
         return {"$ref": list(seen[marker])}
     seen[marker] = path
 
+    if _opaque_setting_reason(path) is not None:
+        opaque[path] = _setting_type_name(value)
+        return {"$opaque": _setting_type_name(value)}
+
     if isinstance(value, Mapping):
         output: dict[str, Any] = {}
         for key, child in value.items():
@@ -327,26 +377,24 @@ def _settings_value(
             if reason is not None:
                 dropped[child_path] = reason
                 continue
-            output[name] = _settings_value(child, seen, dropped, child_path)
+            output[name] = _settings_value(child, seen, dropped, opaque, child_path)
         return output
     if isinstance(value, (tuple, list)):
         return [
-            _settings_value(child, seen, dropped, (*path, index))
+            _settings_value(child, seen, dropped, opaque, (*path, index))
             for index, child in enumerate(value)
         ]
     if isinstance(value, (set, frozenset)):
         ordered = sorted(value, key=repr)
         return [
-            _settings_value(child, seen, dropped, (*path, index))
+            _settings_value(child, seen, dropped, opaque, (*path, index))
             for index, child in enumerate(ordered)
         ]
 
     attributes = _object_settings(value)
     if attributes is None:
-        raise TypeError(
-            f"cannot inspect engine backend setting at {path!r}: "
-            f"{_setting_type_name(value)}"
-        )
+        opaque[path] = _setting_type_name(value)
+        return {"$opaque": _setting_type_name(value)}
     output = {}
     try:
         effective_pack_name = getattr(value, "_effective_pack_name")
@@ -372,13 +420,15 @@ def _settings_value(
         if reason is not None:
             dropped[child_path] = reason
             continue
-        output[name] = _settings_value(child, seen, dropped, child_path)
+        output[name] = _settings_value(child, seen, dropped, opaque, child_path)
     if effective_pack_name is not _MISSING:
         output["_effective_pack_name"] = _settings_value(
-            effective_pack_name, seen, dropped, (*path, "_effective_pack_name")
+            effective_pack_name,
+            seen,
+            dropped,
+            opaque,
+            (*path, "_effective_pack_name"),
         )
-    if not attributes and not output:
-        return {"$type": _setting_type_name(value)}
     return output
 
 
@@ -387,16 +437,26 @@ _MISSING = object()
 
 def _engine_cache_backend_settings_with_drops(
     backend: Any,
-) -> tuple[dict[str, Any], dict[tuple[Any, ...], str]]:
+) -> tuple[
+    dict[str, Any],
+    dict[tuple[Any, ...], str],
+    dict[tuple[Any, ...], str],
+]:
     dropped: dict[tuple[Any, ...], str] = {}
-    settings = _settings_value(backend, {}, dropped)
-    return (settings if isinstance(settings, dict) else {}), dropped
+    opaque: dict[tuple[Any, ...], str] = {}
+    settings = _settings_value(backend, {}, dropped, opaque)
+    return (settings if isinstance(settings, dict) else {}), dropped, opaque
 
 
 def engine_cache_backend_settings(backend: Any) -> dict[str, Any]:
     """Collect backend inputs recursively, omitting only named runtime fields."""
-    settings, _dropped = _engine_cache_backend_settings_with_drops(backend)
+    settings, _dropped, _opaque = _engine_cache_backend_settings_with_drops(backend)
     return settings
+
+
+def _configured_engine_cache_path() -> str | None:
+    """Return the configured cache path, or None when caching is disabled."""
+    return os.environ.get("REGOLITH_ENGINE_CACHE") or None
 
 
 def _file_sha256(path: Path) -> str:
@@ -759,7 +819,7 @@ def _next_row_sequence(connection: sqlite3.Connection, source_box: str) -> int:
 
 
 def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
-    path_value = os.environ.get("REGOLITH_ENGINE_CACHE")
+    path_value = _configured_engine_cache_path()
     if not path_value:
         return _hot_and_cold(solve())[0]
     mode = os.environ.get("REGOLITH_ENGINE_CACHE_MODE", "").lower()
