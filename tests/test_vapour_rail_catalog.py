@@ -2146,7 +2146,7 @@ def test_diagnostic_admission_reaches_every_public_carrier() -> None:
             # equilibrium.py and the metal rail keep only pressure_pa from
             # prefer_compiled_reference_pressure_model. That publisher does
             # not copy this notice. Fail until it calls
-            # merge_diagnostic_admission_notice.
+            # apply_public_carrier_notices.
             assert not row.get("prefer_compiled_reference_pressure_model"), (
                 species_id
             )
@@ -2231,6 +2231,387 @@ def test_diagnostic_admission_reaches_every_public_carrier() -> None:
     metal_fe = provenance_by_species.get("Fe")
     if metal_fe is not None:
         assert "diagnostic_admission_notice" not in metal_fe
+
+
+def _diagnostic_only_carrier_notice() -> dict:
+    """A carrier notice with no sibling extrapolation_notice.
+
+    Comparators are the Fe pseudo-law anchor gaps. The literal pressure is
+    the hand evaluation at 1750 K, not a catalog read.
+    """
+
+    return {
+        "authority": _DIAGNOSTIC_AUTHORITY,
+        "reason": (
+            "effective_pressure_reference_fit would legalize a cleaned-melt "
+            "activity exponent of 0 without a certified executed fit"
+        ),
+        "law_provenance": _DIAGNOSTIC_LAW_PROVENANCE,
+        "provenance_status": "diagnostic_only",
+        "evaluator_form": _DIAGNOSTIC_EVALUATOR_FORM,
+        "closes_with": _DIAGNOSTIC_CLOSER,
+        "executed_species_id": "Fe",
+        "anchor": _FE_DISAGREEMENT_ANCHOR,
+        "anchor_role": "disagreement_not_source",
+        "temperature_K": 1750.0,
+        "law_pressure_Pa": _FE_PSEUDO_LAW_1750_PA,
+        "comparators": {
+            "rail_pressure_Pa": 0.6585350200427053,
+            "gap_dex_law_vs_rail": 1.1127636390496998,
+            "vaporock_pressure_Pa": 0.3004593572618527,
+            "gap_dex_law_vs_vaporock": 1.4535567803078235,
+        },
+    }
+
+
+def _assert_published_diagnostic_notice(notice: dict) -> None:
+    assert notice["authority"] == _DIAGNOSTIC_AUTHORITY
+    assert notice["law_provenance"] == _DIAGNOSTIC_LAW_PROVENANCE
+    assert notice["provenance_status"] == "diagnostic_only"
+    assert notice["evaluator_form"] == _DIAGNOSTIC_EVALUATOR_FORM
+    assert notice["closes_with"] == _DIAGNOSTIC_CLOSER
+    assert notice["executed_species_id"] == "Fe"
+    comparators = notice["comparators"]
+    assert "gap_dex_law_vs_rail" in comparators
+    assert "gap_dex_law_vs_vaporock" in comparators
+    assert comparators["gap_dex_law_vs_rail"] == pytest.approx(
+        1.1127636390496998, rel=0, abs=1e-12
+    )
+    assert comparators["gap_dex_law_vs_vaporock"] == pytest.approx(
+        1.4535567803078235, rel=0, abs=1e-12
+    )
+
+
+def _published_diagnostic_notice(surface: str) -> dict:
+    """Feed one carrier whose extra holds only the diagnostic notice.
+
+    Each arm is a public surface that publishes a vapour pressure or a
+    quantity derived from it. The carrier has no extrapolation_notice.
+    """
+
+    notice = _diagnostic_only_carrier_notice()
+    extra = {"diagnostic_admission_notice": deepcopy(notice)}
+    assert list(extra) == ["diagnostic_admission_notice"]
+
+    if surface == "batch_request_answer":
+        from simulator.vapour_rail.batch import (
+            FluxEligible,
+            PressureValue,
+            VapourAnswer,
+        )
+        from simulator.vapour_rail.instrumentation import (
+            apply_public_carrier_notices,
+            serialize_vapour_answer,
+        )
+
+        evaluation = SimpleNamespace(diagnostic_admission_notice=deepcopy(notice))
+        published_extra: dict = {}
+        apply_public_carrier_notices(published_extra, evaluation)
+        answer = VapourAnswer(
+            species_id="Fe",
+            pressure=PressureValue(pa=_FE_PSEUDO_LAW_1750_PA),
+            selected_runtime_pressure=PressureValue(pa=_FE_PSEUDO_LAW_1750_PA),
+            flux=FluxEligible(alpha_ref="diagnostic-only"),
+            source_label="diagnostic-only",
+            formula_id="antoine",
+            source_account="process.cleaned_melt",
+            solve_group_id="fe",
+            state_fingerprint="fe",
+            validation_status="pending_validation",
+            extra=published_extra,
+        )
+        public = serialize_vapour_answer(answer)
+        assert public["pressure"]["pa"] == pytest.approx(
+            _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
+        )
+        assert "extrapolation_notice" not in public["extra"]
+        return public["extra"]["diagnostic_admission_notice"]
+
+    if surface == "oxide_provenance":
+        from simulator.vapour_rail.instrumentation import (
+            apply_public_carrier_notices,
+        )
+
+        provenance = {"P_eq_Pa": _FE_PSEUDO_LAW_1750_PA}
+        evaluation = SimpleNamespace(diagnostic_admission_notice=deepcopy(notice))
+        apply_public_carrier_notices(provenance, evaluation)
+        assert provenance["P_eq_Pa"] == pytest.approx(
+            _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
+        )
+        assert "extrapolation_notice" not in provenance
+        return provenance["diagnostic_admission_notice"]
+
+    if surface == "diagnostics_summary":
+        from simulator.diagnostics import pressure_coating_pareto_diagnostic
+
+        sim = SimpleNamespace(
+            condensation_model=SimpleNamespace(
+                last_sticking_alpha_provenance_notice={
+                    "vapour_carrier_authority_by_species": {
+                        "Fe": {"extra": deepcopy(extra)},
+                    }
+                }
+            )
+        )
+        diagnostic = pressure_coating_pareto_diagnostic(
+            sim, target_species=("Fe",)
+        )
+        assert diagnostic["status"] == "unavailable"
+        entry = diagnostic["by_species"]["Fe"]
+        assert "vapour_pressure_extrapolation_notice" not in entry
+        return entry["diagnostic_admission_notice"]
+
+    if surface == "pareto_table":
+        from simulator.diagnostics import pressure_coating_pareto_diagnostic
+
+        knudsen = {
+            "gas_temperature_C": 1000.0,
+            "carrier_gas": "N2",
+            "overhead_pressure_mbar": 10.0,
+            "pipe_diameter_m": 0.12,
+            "knudsen_number": 0.001,
+            "regime": "free_molecular",
+            "segments": [
+                {
+                    "name": "main",
+                    "characteristic_length_m": 0.12,
+                    "knudsen_number": 0.001,
+                    "regime": "viscous",
+                },
+                {
+                    "name": "narrow",
+                    "characteristic_length_m": 0.01,
+                    "knudsen_number": 0.12,
+                    "regime": "free_molecular",
+                },
+            ],
+        }
+        sim = SimpleNamespace(
+            condensation_model=SimpleNamespace(
+                last_knudsen_regime_diagnostic=knudsen,
+                gas_temperature_C=1000.0,
+                carrier_gas="N2",
+                last_sticking_alpha_provenance_notice={
+                    "vapour_carrier_authority_by_species": {
+                        "Fe": {"extra": deepcopy(extra)},
+                    }
+                },
+            ),
+            _last_evaporation_flux_diagnostic={
+                "evaporation_series_resistance": {
+                    "Fe": {
+                        "P_eq_Pa": _FE_PSEUDO_LAW_1750_PA,
+                        "P_bulk_Pa": 0.0,
+                        "alpha_intrinsic": 0.02,
+                        "transport_length_m": 0.12,
+                    }
+                }
+            },
+        )
+        diagnostic = pressure_coating_pareto_diagnostic(
+            sim,
+            per_hour=[{"wall_deposit_delta_kg": {"wall": {"Fe": 1.0}}}],
+            target_species=("Fe",),
+        )
+        entry = diagnostic["by_species"]["Fe"]
+        assert entry["P_eq_Pa"] == pytest.approx(
+            _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
+        )
+        assert "vapour_pressure_extrapolation_notice" not in entry
+        return entry["diagnostic_admission_notice"]
+
+    if surface == "runner_summary":
+        from simulator.core import CampaignPhase
+        from simulator.runner import build_per_hour_summary
+        from simulator.state import HourSnapshot
+
+        snapshot = HourSnapshot(campaign=CampaignPhase.C2A)
+        sim = SimpleNamespace(
+            campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+            product_ledger=lambda: {},
+            record=SimpleNamespace(snapshots=[snapshot]),
+            _last_vapour_batch_report={
+                "n_requested": 1,
+                "n_flux_active": 1,
+                "n_refused": 0,
+                "solve_bundle_ids": {},
+                "metadata": {},
+                "channels_by_species": {
+                    "Fe": {
+                        "pressure": {
+                            "kind": "value",
+                            "pa": _FE_PSEUDO_LAW_1750_PA,
+                        },
+                        "extra": deepcopy(extra),
+                    }
+                },
+            },
+        )
+        summary = build_per_hour_summary(
+            sim, snapshot, include_fe_redox_split=False
+        )
+        metadata = summary["vapour_batch_summary"]["metadata"]
+        assert "extrapolation_notices_by_species" not in metadata
+        return metadata["carrier_notices_by_species"]["Fe"][
+            "diagnostic_admission_notice"
+        ]
+
+    if surface == "coating_merge":
+        from simulator.coating_lifespan import (
+            FoulingTerminalSnapshot,
+            merge_run_snapshot,
+        )
+
+        authority = {
+            "vapour_carrier_authority_by_species": {
+                "Fe": {
+                    "species_id": "Fe",
+                    "pressure": {"kind": "value", "pa": _FE_PSEUDO_LAW_1750_PA},
+                    "flux": {"kind": "eligible"},
+                    "verdict_status": "status_bearing_non_authoritative",
+                    "certification_ceiling": "never",
+                    "validation_status": "modeled-PENDING",
+                    "is_union_flux_eligible": True,
+                    "is_flux_active": True,
+                    "extra": deepcopy(extra),
+                }
+            },
+            "alpha_s_provenance_by_species": {
+                "Fe": {
+                    "hot_wall": {
+                        "segment": "hot_wall",
+                        "species": "Fe",
+                        "alpha_s": 0.02,
+                        "citation_status": "CITED",
+                        "status": "sourced",
+                        "output_status": "sourced_with_surface_proxy",
+                    }
+                }
+            },
+        }
+        exported = FoulingTerminalSnapshot.from_trace(
+            SimpleNamespace(
+                wall_deposit_by_segment_species_kg={("hot_wall", "Fe"): 0.1},
+                wall_deposit_sticking_authority=authority,
+            )
+        )
+        merged, _net = merge_run_snapshot(None, exported)
+        carrier = merged.wall_deposit_sticking_authority[
+            "vapour_carrier_authority_by_species"
+        ]["Fe"]
+        assert carrier["pressure"]["pa"] == pytest.approx(
+            _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
+        )
+        assert "extrapolation_notice" not in carrier["extra"]
+        return carrier["extra"]["diagnostic_admission_notice"]
+
+    if surface == "typed_pressure_shadow":
+        import math
+
+        from simulator.vapour_rail.activity import (
+            ActivityVerdictKind,
+            SourceReactionActivity,
+            StandardStateIdentity,
+        )
+        from tests.test_vapour_batch_request import _minimal_family, _u0_stub
+
+        # In-band oxygen (1e-8 bar, certified band 1e-30..100) so the oxygen
+        # receipt contributes no extrapolation_notice. The only carrier notice
+        # is the diagnostic admission set on the evaluator.
+        payload = _minimal_family("K", validation_status="pending_validation")
+        catalog = compile_vapour_rail_catalog(
+            payload, u0_manifest=_u0_stub("K")
+        )
+        evaluator = catalog.species["K"].evaluator
+        assert evaluator is not None
+        object.__setattr__(
+            evaluator, "diagnostic_admission_notice", deepcopy(notice)
+        )
+        standard = StandardStateIdentity(
+            convention="raoultian_pure_endmember",
+            phase="liquid",
+            reference_pressure_bar=1.0,
+            component_basis="raoultian_pure_endmember",
+        )
+        activity = SourceReactionActivity(
+            component_id="KO0.5",
+            value=0.25,
+            ln_value=math.log(0.25),
+            verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+            bound_direction=None,
+            reason="diagnostic-only-carrier",
+            standard_state=standard,
+            phase_assemblage_ref="test:liquid_melt",
+            chemical_potential_ref="test:mu",
+            state_fingerprint="state:test",
+            solve_group_id=None,
+            provider="test",
+            authority=False,
+            target_standard_state=standard,
+        )
+        result = evaluator.evaluate_typed_shadow(
+            1500.0,
+            activity=activity,
+            pO2_bar=1.0e-8,
+            expected_component_id="KO0.5",
+            expected_standard_state=standard,
+            expected_state_fingerprint="state:test",
+        )
+        assert math.isfinite(result["ln_pressure_Pa"])
+        assert "extrapolation_notice" not in result
+        return result["diagnostic_admission_notice"]
+
+    raise AssertionError(f"unknown public surface {surface}")
+
+
+@pytest.mark.parametrize(
+    "surface",
+    [
+        "batch_request_answer",
+        "oxide_provenance",
+        "diagnostics_summary",
+        "pareto_table",
+        "runner_summary",
+        "coating_merge",
+        "typed_pressure_shadow",
+    ],
+)
+def test_public_surface_publishes_diagnostic_only_carrier_notice(surface: str) -> None:
+    """Invariant: every public pressure surface carries every carrier notice.
+
+    The carrier extra holds only diagnostic_admission_notice. A surface that
+    selects extrapolation_notice by name drops the provenance, the comparator
+    gaps, and the t-1723 closer.
+    """
+
+    _assert_published_diagnostic_notice(_published_diagnostic_notice(surface))
+
+
+@pytest.mark.parametrize("malformed", [None, "bare-token", 1, True])
+def test_malformed_provenance_entry_refuses_fe_compile(malformed: object) -> None:
+    """Fe's diagnostic provenance plus a fitted citation plus a bad entry.
+
+    The fitted citation and the existing backsolve would certify the row if
+    the bad entry were skipped, and the diagnostic claim would disappear.
+    The whole provenance is malformed. Compilation refuses.
+    """
+
+    payload = _fe_feo_payload()
+    model = payload["families"]["metals_fe_family"]["physical_properties"][
+        "species"
+    ]["Fe"]["pressure_models"][0]
+    assert model["provenance"][0]["status"] == "diagnostic_only"
+    assert model["provenance"][0]["law_provenance"] == _DIAGNOSTIC_LAW_PROVENANCE
+    model["provenance"] = [
+        *model["provenance"],
+        {"source_id": "fitted-citation", "observation_id": "fit-grid"},
+        malformed,
+    ]
+    with pytest.raises(
+        CatalogCompileError,
+        match="provenance\\[2\\] is not a mapping; malformed provenance is a compile refusal",
+    ):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
 
 
 # Oxygen multiplier the association closure evaluates. log10_pressure() takes

@@ -415,6 +415,63 @@ def _activity_payload(activity: Any) -> dict[str, Any] | None:
     }
 
 
+def _is_public_notice_key(key: object) -> bool:
+    return isinstance(key, str) and key.endswith("_notice")
+
+
+def _copy_public_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
+    return copy.deepcopy(dict(notice))
+
+
+def public_carrier_notices(carrier: Any) -> dict[str, dict[str, Any]]:
+    """Every ``*_notice`` on a carrier that publishes a vapour pressure.
+
+    Invariant: a public surface that publishes a vapour pressure, or a
+    quantity derived from it, publishes every notice on that carrier with
+    the authority already inside the notice. The scan is the ``_notice``
+    suffix. Callers do not select ``extrapolation_notice`` by name. A
+    future ``*_notice`` key is included by the same scan.
+
+    A mapping contributes its own notice values and, when it has an
+    ``extra`` mapping, that extra too (a channel or authority record).
+    An object contributes notice attributes stored on the instance
+    (evaluation slots that are not dataclass fields). Empty values and
+    non-mappings are omitted. Each notice is a copy.
+    """
+
+    notices: dict[str, dict[str, Any]] = {}
+
+    def take(mapping: Mapping[Any, Any]) -> None:
+        for key, value in mapping.items():
+            if not _is_public_notice_key(key):
+                continue
+            if isinstance(value, Mapping) and value:
+                notices[str(key)] = _copy_public_notice(value)
+
+    if isinstance(carrier, Mapping):
+        take(carrier)
+        extra = carrier.get("extra")
+        if isinstance(extra, Mapping):
+            take(extra)
+        return notices
+    attributes = getattr(carrier, "__dict__", None)
+    if isinstance(attributes, Mapping):
+        take(attributes)
+    return notices
+
+
+def apply_public_carrier_notices(target: dict[str, Any], carrier: Any) -> None:
+    """Copy every carrier notice onto ``target`` without replacing a key.
+
+    A provenance alias already stored on ``target`` (the floor inversion
+    notice published as ``extrapolation_notice``) is left in place. Every
+    other notice on ``carrier`` is added.
+    """
+
+    for key, notice in public_carrier_notices(carrier).items():
+        target.setdefault(key, notice)
+
+
 def serialize_vapour_answer(answer: VapourAnswer) -> dict[str, Any]:
     """JSON-safe channel answer for runner/artifact/UI."""
 

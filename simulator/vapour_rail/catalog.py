@@ -1161,15 +1161,28 @@ class CompiledPressureEvaluator:
                 )
             ),
         )
-        o2_notice = (
-            (o2_potential.observation_or_setpoint_receipt or {}).get("extrapolation_notice")
-            if o2_potential is not None else None
-        )
         # Non-field attribute so t-622 dataclass canonicalization is unchanged.
+        # Every *_notice on the oxygen receipt is copied. The named
+        # extrapolation field stays, including None, so an in-band evaluation
+        # keeps that attribute. A floor notice fills it only when the receipt
+        # did not carry one.
+        from simulator.vapour_rail.instrumentation import public_carrier_notices
+
+        receipt = (
+            o2_potential.observation_or_setpoint_receipt
+            if o2_potential is not None
+            else None
+        )
+        receipt_notices = (
+            public_carrier_notices(receipt)
+            if isinstance(receipt, Mapping)
+            else {}
+        )
         object.__setattr__(
             evaluation,
             "extrapolation_notice",
-            o2_notice or _pO2_floor_inversion_notice(
+            receipt_notices.get("extrapolation_notice")
+            or _pO2_floor_inversion_notice(
                 species_id=self.species_id,
                 pressure_pa=pressure_pa,
                 pO2_exponent=self.pO2_exponent,
@@ -1180,6 +1193,10 @@ class CompiledPressureEvaluator:
                 was_clamped=False,
             ),
         )
+        for notice_key, notice in receipt_notices.items():
+            if notice_key == "extrapolation_notice":
+                continue
+            object.__setattr__(evaluation, notice_key, notice)
         # Same non-field slot. A diagnostic admission discloses the unfitted
         # law and the anchor it disagrees with. It does not change pressure.
         diagnostic_notice = getattr(self, "diagnostic_admission_notice", None)
@@ -1338,9 +1355,17 @@ class CompiledPressureEvaluator:
             "activity_verdict": activity.verdict.value,
             "flux_disposition": "instrumented_not_selected",
         }
+        from simulator.vapour_rail.instrumentation import public_carrier_notices
+
         if self.pO2_exponent and math.isfinite(ln_pressure):
             pressure_pa = math.exp(float(ln_pressure))
-            notice = (o2_potential.observation_or_setpoint_receipt or {}).get(
+            receipt = o2_potential.observation_or_setpoint_receipt
+            receipt_notices = (
+                public_carrier_notices(receipt)
+                if isinstance(receipt, Mapping)
+                else {}
+            )
+            notice = receipt_notices.get(
                 "extrapolation_notice"
             ) or _pO2_floor_inversion_notice(
                 species_id=self.species_id,
@@ -1351,6 +1376,14 @@ class CompiledPressureEvaluator:
             )
             if notice is not None:
                 payload["extrapolation_notice"] = dict(notice)
+            for notice_key, item in receipt_notices.items():
+                if notice_key == "extrapolation_notice":
+                    continue
+                payload.setdefault(notice_key, item)
+        # The evaluator is the carrier for a diagnostic admission. This
+        # shadow publishes ln_pressure, so that notice rides with it.
+        for notice_key, item in public_carrier_notices(self).items():
+            payload.setdefault(notice_key, item)
         return MappingProxyType(payload)
 
     def _out_of_domain_log10_continuation(self, temperature_K: float) -> float:
@@ -2699,25 +2732,42 @@ _DIAGNOSTIC_REASON = (
 )
 
 
-def _provenance_items(model: Mapping[str, Any]) -> tuple[Mapping[str, Any], ...] | None:
+def _normalised_provenance(
+    species_id: str, model: Mapping[str, Any]
+) -> tuple[Mapping[str, Any], ...] | None:
+    """The provenance list admission and certification both read.
+
+    Absent provenance, or a value that is not a sequence of entries, is
+    ``None``. A sequence is well-formed only when every entry is a mapping.
+    Any other entry refuses compilation. Callers do not skip that entry and
+    do not treat the list as "no diagnostic claim".
+    """
+
     raw = model.get("provenance")
     if isinstance(raw, (str, bytes)) or not isinstance(raw, Sequence):
         return None
     items: list[Mapping[str, Any]] = []
-    for item in raw:
+    for index, item in enumerate(raw):
         if not isinstance(item, Mapping):
-            return None
+            raise CatalogCompileError(
+                f"{species_id}: provenance[{index}] is not a mapping; "
+                "malformed provenance is a compile refusal"
+            )
         items.append(item)
     return tuple(items)
 
 
-def _claims_diagnostic_only(model: Mapping[str, Any]) -> bool:
-    """True when a provenance item says the law is diagnostic_only.
+def _provenance_claims_diagnostic_only(
+    items: tuple[Mapping[str, Any], ...] | None,
+) -> bool:
+    """True when a normalised provenance item says the law is diagnostic_only.
 
     That status is not a certified fit. A sibling citation cannot launder it.
+    ``items`` is the list :func:`_normalised_provenance` returned. A missing
+    list is not a diagnostic claim. A malformed list never reaches here: the
+    normaliser already refused it.
     """
 
-    items = _provenance_items(model)
     if not items:
         return False
     return any(
@@ -2727,14 +2777,25 @@ def _claims_diagnostic_only(model: Mapping[str, Any]) -> bool:
     )
 
 
-def _diagnostic_unfitted_item(model: Mapping[str, Any]) -> Mapping[str, Any] | None:
+def _claims_diagnostic_only(species_id: str, model: Mapping[str, Any]) -> bool:
+    """Diagnostic claim from the shared normalised provenance list."""
+
+    return _provenance_claims_diagnostic_only(
+        _normalised_provenance(species_id, model)
+    )
+
+
+def _diagnostic_unfitted_item(
+    species_id: str, model: Mapping[str, Any]
+) -> Mapping[str, Any] | None:
     """The law's own provenance, when it is the unfitted diagnostic citation.
 
     Exactly one provenance item, status diagnostic_only, and the backsolved
-    statement. The disagreement anchor is not this citation.
+    statement. The disagreement anchor is not this citation. The item list
+    is the same normalised provenance certification reads.
     """
 
-    items = _provenance_items(model)
+    items = _normalised_provenance(species_id, model)
     if items is None or len(items) != 1:
         return None
     item = items[0]
@@ -2869,33 +2930,13 @@ def _copy_diagnostic_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def merge_diagnostic_admission_notice(
-    target: dict[str, Any],
-    evaluation: object,
-) -> None:
-    """Copy a diagnostic admission onto one public pressure mapping.
-
-    Invariant: a public carrier that publishes an evaluation's pressure
-    also publishes ``diagnostic_admission_notice`` when that evaluation
-    carries one. The notice is the authority, the law's provenance, the
-    disagreement anchor, both comparator gaps, and the closer. Carriers
-    call this function. They do not select those fields themselves.
-    A missing or non-mapping notice adds no key.
-    """
-
-    notice = getattr(evaluation, "diagnostic_admission_notice", None)
-    if not isinstance(notice, Mapping):
-        return
-    target["diagnostic_admission_notice"] = _copy_diagnostic_notice(notice)
-
-
 def _diagnostic_notice_from_model_coefficients(
     *,
     executed_species_id: str,
     model: Mapping[str, Any],
     coefficients: Mapping[str, Any] | tuple[float, float, float],
 ) -> dict[str, Any] | None:
-    item = _diagnostic_unfitted_item(model)
+    item = _diagnostic_unfitted_item(executed_species_id, model)
     disagreement = _disagreement_inputs(model)
     if item is None or disagreement is None:
         return None
@@ -2966,9 +3007,13 @@ def _has_effective_pressure_reference_fit_evidence(
     model: Mapping[str, Any],
     validation_anchor_refs: tuple[str, ...],
 ) -> bool:
+    # Same list as the diagnostic claim. A non-mapping entry raises here,
+    # before a sibling citation can be accepted and before a malformed list
+    # can be read as "no diagnostic claim".
+    provenance_items = _normalised_provenance(species_id, model)
     # diagnostic_only is a flagged admission, not a certified fit. A residual
     # and an anchor the law disagrees with do not certify these coefficients.
-    if _claims_diagnostic_only(model):
+    if _provenance_claims_diagnostic_only(provenance_items):
         return False
     backsolve = row.get("backsolve")
     backsolve = backsolve if isinstance(backsolve, Mapping) else {}
@@ -2980,16 +3025,13 @@ def _has_effective_pressure_reference_fit_evidence(
         and isinstance(backsolve_provenance.get("fit_objective"), str)
         and bool(backsolve_provenance["fit_objective"].strip())
     )
-    model_provenance = model.get("provenance")
     has_model_provenance = bool(
-        isinstance(model_provenance, Sequence)
-        and not isinstance(model_provenance, (str, bytes))
+        provenance_items
         and any(
-            isinstance(item, Mapping)
-            and isinstance(item.get("source_id"), str)
+            isinstance(item.get("source_id"), str)
             and bool(item["source_id"].strip())
             and _provenance_cites_observations(item)
-            for item in model_provenance
+            for item in provenance_items
         )
     )
     try:
@@ -3436,7 +3478,7 @@ def _effective_pressure_reference_fit_is_evidenced(
 ) -> bool:
     # diagnostic_only is never a certified citation. A sibling observation id
     # does not launder it, and a bound 6-tuple must not either.
-    if _claims_diagnostic_only(model):
+    if _claims_diagnostic_only(species_id, model):
         coefficients = model.get("coefficients")
         if not isinstance(coefficients, Mapping):
             return False
@@ -3656,7 +3698,7 @@ def _association_executed_law_notice(
     if not isinstance(base_models[0], Mapping):
         return False, None
     base_model = base_models[0]
-    if _claims_diagnostic_only(base_model):
+    if _claims_diagnostic_only(base_species_id, base_model):
         notice = _diagnostic_notice_from_model_coefficients(
             executed_species_id=base_species_id,
             model=base_model,
@@ -3707,7 +3749,9 @@ def _zero_activity_melt_executable_is_evidenced(
     value-identical at authority diagnostic/extrapolated, with a notice. The
     disagreement anchor is evidence the law disagrees with, not the citation.
     A bare ``diagnostic_only`` token does not certify and does not admit.
-    A sibling fitted citation cannot launder that status.
+    A sibling fitted citation cannot launder that status. A provenance
+    entry that is not a mapping refuses compilation; it is not skipped
+    and it is not read as the absence of a diagnostic claim.
 
     A certified citation is a nonblank ``observation_id`` or a nonempty
     sequence of nonblank ``observation_ids``, plus residual and anchors.
@@ -3748,7 +3792,7 @@ def _zero_activity_melt_executable_is_evidenced(
         )
     # A row that claims diagnostic_only cannot be certified by a sibling
     # citation or by falling through to a bound record.
-    if _claims_diagnostic_only(model):
+    if _claims_diagnostic_only(species_id, model):
         notice = _direct_diagnostic_notice(
             species_id=species_id,
             model=model,

@@ -107,6 +107,7 @@ from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
 )
+from simulator.vapour_rail.instrumentation import public_carrier_notices
 from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.liner_life import build_liner_life_run_diagnostic
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
@@ -2917,14 +2918,43 @@ def build_per_hour_summary(
                 "metadata": batch_report.get("metadata"),
             }
         )
-        pressure_notices = {
-            species: dict(channel["extra"]["extrapolation_notice"])
-            for species, channel in batch_report.get("channels_by_species", {}).items()
-            if channel.get("extra", {}).get("extrapolation_notice")
+        pressure_notices: dict[str, dict[str, Any]] = {}
+        channels = batch_report.get("channels_by_species", {})
+        if isinstance(channels, Mapping):
+            for species, channel in channels.items():
+                if not isinstance(channel, Mapping):
+                    continue
+                found = public_carrier_notices(channel)
+                if found:
+                    pressure_notices[str(species)] = found
+        # Existing consumers read the extrapolation notice body under this
+        # key. Every other notice is published beside it. A carrier whose
+        # only notice is a diagnostic admission still appears.
+        extrapolation_notices = {
+            species: dict(notices["extrapolation_notice"])
+            for species, notices in pressure_notices.items()
+            if "extrapolation_notice" in notices
+        }
+        other_notices = {
+            species: {
+                key: dict(notice)
+                for key, notice in notices.items()
+                if key != "extrapolation_notice"
+            }
+            for species, notices in pressure_notices.items()
+        }
+        other_notices = {
+            species: notices
+            for species, notices in other_notices.items()
+            if notices
         }
         metadata = dict(summary["vapour_batch_summary"].get("metadata") or {})
-        if pressure_notices:
-            metadata["extrapolation_notices_by_species"] = _json_safe(pressure_notices)
+        if extrapolation_notices:
+            metadata["extrapolation_notices_by_species"] = _json_safe(
+                extrapolation_notices
+            )
+        if other_notices:
+            metadata["carrier_notices_by_species"] = _json_safe(other_notices)
         wall_authority = wall_deposit_sticking_authority_status(
             summary["wall_deposit_cumulative_kg"], wall_notice,
         )

@@ -35,6 +35,7 @@ from simulator.wall_deposit_availability import (
 )
 from simulator.vapour_rail.instrumentation import (
     merge_vapour_carrier_lineage,
+    public_carrier_notices,
     vapour_carrier_authority_severity,
     vapour_carrier_authority_status,
 )
@@ -369,19 +370,35 @@ def _merged_wall_deposit_sticking_authority(
                     ):
                         carriers_by_species[species_key] = record
                     notices: list[dict[str, Any]] = []
+                    other_notices: dict[str, dict[str, Any]] = {}
                     for carrier in (current, record):
-                        extra = carrier.get("extra") if isinstance(carrier, Mapping) else None
-                        if not isinstance(extra, Mapping):
+                        if not isinstance(carrier, Mapping):
                             continue
-                        candidates = [extra.get("extrapolation_notice")]
-                        candidates.extend(extra.get("extrapolation_notices", ()))
+                        found = public_carrier_notices(carrier)
+                        extra = carrier.get("extra")
+                        candidates = []
+                        if "extrapolation_notice" in found:
+                            candidates.append(found["extrapolation_notice"])
+                        if isinstance(extra, Mapping):
+                            candidates.extend(
+                                extra.get("extrapolation_notices", ())
+                            )
                         for notice in candidates:
                             if isinstance(notice, Mapping) and notice not in notices:
                                 notices.append(_plain_authority_mapping(notice))
-                    if notices:
+                        for key, notice in found.items():
+                            if key == "extrapolation_notice":
+                                continue
+                            other_notices.setdefault(
+                                key, _plain_authority_mapping(notice)
+                            )
+                    if notices or other_notices:
                         extra = carriers_by_species[species_key].setdefault("extra", {})
-                        extra.setdefault("extrapolation_notice", notices[0])
-                        extra["extrapolation_notices"] = notices
+                        if notices:
+                            extra.setdefault("extrapolation_notice", notices[0])
+                            extra["extrapolation_notices"] = notices
+                        for key, notice in other_notices.items():
+                            extra.setdefault(key, notice)
         raw_lineage = authority.get(
             "vapour_carrier_lineage_by_deposited_species"
         )

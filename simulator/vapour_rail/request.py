@@ -1502,27 +1502,20 @@ def refusal_closure(
                 )
                 source_notice = provenance.get("extrapolation_notice")
                 if source_notice is None:
-                    # Floor inversion uses the same public extra field as
-                    # temperature-range extrapolation (diagnostics.py /
-                    # runner Pareto copy extra.extrapolation_notice).
+                    # Floor inversion is published on the existing
+                    # extrapolation_notice field. Do not replace a
+                    # temperature-range notice already on that key.
                     source_notice = provenance.get("floor_inversion_notice")
                 if source_notice is not None:
-                    # Keep the melt source's band/reason attached to its public
-                    # pressure answer, through the existing extensible carrier.
                     evaluation_extra["extrapolation_notice"] = dict(source_notice)
-                eval_notice = getattr(evaluation, "extrapolation_notice", None)
-                if (
-                    eval_notice is not None
-                    and "extrapolation_notice" not in evaluation_extra
-                ):
-                    evaluation_extra["extrapolation_notice"] = dict(eval_notice)
-                # Function-local: catalog imports request while emitting rules.
-                # Both modules are loaded before a live answer is built.
-                from simulator.vapour_rail.catalog import (
-                    merge_diagnostic_admission_notice,
+                # Every *_notice on the evaluation. A diagnostic admission
+                # that is the only notice is included. The alias above is
+                # left in place.
+                from simulator.vapour_rail.instrumentation import (
+                    apply_public_carrier_notices,
                 )
 
-                merge_diagnostic_admission_notice(evaluation_extra, evaluation)
+                apply_public_carrier_notices(evaluation_extra, evaluation)
                 if _unit_activity_note is not None:
                     from simulator.silent_zero import merge_notes_into_mapping
 
