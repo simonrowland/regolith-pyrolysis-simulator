@@ -72,6 +72,7 @@ from simulator.vapour_rail.catalog import (
 from simulator.vapour_rail.instrumentation import (
     CONTROL_FLUX_PRESSURES_KEY,
     FLUX_CONSUMER_RELPATHS,
+    SHADOW_MISMATCH,
     SHADOW_PROVED,
     SHADOW_REFUSED_VS_LIVE,
     assert_no_flux_consumer_iterates_compatibility_maps,
@@ -1110,20 +1111,32 @@ def test_cross_feedstock_request_activation_and_selected_runtime(
         assert isinstance(answer.pressure, PressureValue)
         assert isinstance(answer.flux, FluxEligible)
 
-    # Refusals make the independent live shadow disagree by design. Every
-    # claimed live species removed from flux must carry the missing-alpha
-    # refusal; it cannot be restored from the compatibility map.
+    # A claimed live species removed from flux must carry the missing-alpha
+    # refusal. The shipped allowlist keeps the eight stripped broad-proxy
+    # carriers flux-active, so that removed set can be empty. Na, K, Fe, and
+    # those carriers are not a remaining pressure mismatch.
     shadow = surface["shadow"]
     refused_live_species = shadow["batch_refused_live_species"]
-    assert refused_live_species
-    assert shadow["shadow_equal"] is False
-    assert shadow["shadow_outcome"] == SHADOW_REFUSED_VS_LIVE
-    for sid in refused_live_species:
-        answer = batch.channel(sid)
-        assert answer.refusal_code == REFUSAL_MISSING_CHANNEL_CONTRACT
-        assert answer.extra.get("detail") == (
-            "channel contract incomplete: missing alpha"
-        )
+    fallback_carriers = frozenset({
+        "Al2", "Al2O", "Al2O2", "Al2O3_gas", "AlO", "AlO2", "CrO", "CrO2",
+    })
+    assert fallback_carriers.isdisjoint(refused_live_species)
+    if refused_live_species:
+        assert shadow["shadow_equal"] is False
+        assert shadow["shadow_outcome"] == SHADOW_REFUSED_VS_LIVE
+        for sid in refused_live_species:
+            answer = batch.channel(sid)
+            assert answer.refusal_code == REFUSAL_MISSING_CHANNEL_CONTRACT
+            assert answer.extra.get("detail") == (
+                "channel contract incomplete: missing alpha"
+            )
+    else:
+        assert shadow["shadow_outcome"] in {SHADOW_PROVED, SHADOW_MISMATCH}
+        mismatched = {
+            str(item["species"])
+            for item in (shadow.get("mismatched_species") or [])
+        }
+        assert mismatched.isdisjoint(fallback_carriers | {"Na", "K", "Fe"})
     assert surface["effective_source_id"] == (
         "equilibrium_backend_effective_pressure_pre_rg"
     )

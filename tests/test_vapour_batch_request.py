@@ -76,7 +76,9 @@ from simulator.vapour_rail.request import (
     refusal_closure,
     resolve_vapour_batch,
 )
+from simulator.evaporation import _retain_kernel_seam_debit
 from simulator.vapour_rail.instrumentation import (
+    EffectivePressureSource,
     flux_pressures_from_batch,
     serialize_melt_activity_shadow,
     serialize_vapour_answer,
@@ -4501,6 +4503,145 @@ def test_sole_missing_alpha_stays_flux_active_when_fallback_admits() -> None:
     assert isinstance(answer.selected_runtime_pressure, PressureValue)
     assert answer.is_flux_active
     assert "CrO2" in batch.flux_active_species_ids
+
+
+def _seam_debit_answer(
+    species_id: str,
+    *,
+    selected_pa: float,
+    catalog_pa: float,
+    source_label: str,
+    active: bool = True,
+) -> VapourAnswer:
+    return VapourAnswer(
+        species_id=species_id,
+        pressure=PressureValue(pa=catalog_pa),
+        selected_runtime_pressure=PressureValue(pa=selected_pa),
+        flux=(
+            FluxEligible(alpha_ref="test")
+            if active
+            else FluxRefusal(code="missing_channel_contract", detail="missing alpha")
+        ),
+        source_label=source_label,
+        formula_id=species_id,
+        source_account="process.cleaned_melt",
+        solve_group_id="g",
+        state_fingerprint="fp",
+        validation_status="pending_validation",
+    )
+
+
+def test_na_k_selected_pressure_stays_on_kernel_seam() -> None:
+    """Na and K debit the kernel seam. Catalog pressure and Fe stay put.
+
+    Fails when the selected pressure is the catalog activity correction
+    (green and the CrO2-only branch both leave it there).
+    """
+
+    batch = VapourBatch(
+        requested_species_ids=frozenset({"Na", "K", "Fe"}),
+        channels_by_species={
+            "Na": _seam_debit_answer(
+                "Na",
+                selected_pa=2.7071606671395836,
+                catalog_pa=2.7071606671395836,
+                source_label="catalog_activity_corrected",
+            ),
+            "K": _seam_debit_answer(
+                "K",
+                selected_pa=0.12738062946763712,
+                catalog_pa=0.12738062946763712,
+                source_label="catalog_activity_corrected",
+            ),
+            "Fe": _seam_debit_answer(
+                "Fe",
+                selected_pa=0.05731853761717197,
+                catalog_pa=4.871162269407267,
+                source_label="catalog",
+            ),
+        },
+        flux_active_species_ids=frozenset({"Na", "K", "Fe"}),
+    )
+    equilibrium = SimpleNamespace(
+        vapor_pressures_source={
+            "Na": (
+                "builtin_authoritative:standard_reaction_term:"
+                "extrapolated_beyond_valid_range_K:out_of_gamma_domain"
+            ),
+            "K": (
+                "builtin_authoritative:standard_reaction_term:"
+                "extrapolated_beyond_valid_range_K:out_of_gamma_domain"
+            ),
+            "Fe": "builtin_authoritative:pure_component_derived_from_evaluation",
+        }
+    )
+    source = EffectivePressureSource(
+        "equilibrium_backend_effective_pressure_pre_rg",
+        {
+            "Na": 2.694467309265198,
+            "K": 0.12704107980939044,
+            "Fe": 0.05731853761717197,
+        },
+    )
+    retained = _retain_kernel_seam_debit(batch, equilibrium, source)
+    na = retained.channel("Na")
+    k = retained.channel("K")
+    fe = retained.channel("Fe")
+    assert na.selected_runtime_pressure.pa == pytest.approx(
+        2.694467309265198, rel=1e-12
+    )
+    assert k.selected_runtime_pressure.pa == pytest.approx(
+        0.12704107980939044, rel=1e-12
+    )
+    assert na.pressure.pa == pytest.approx(2.7071606671395836, rel=1e-12)
+    assert k.pressure.pa == pytest.approx(0.12738062946763712, rel=1e-12)
+    assert na.source_label == equilibrium.vapor_pressures_source["Na"]
+    assert k.source_label == equilibrium.vapor_pressures_source["K"]
+    assert fe.selected_runtime_pressure.pa == pytest.approx(
+        0.05731853761717197, rel=1e-12
+    )
+    assert fe.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
+    assert fe.source_label == "catalog"
+    pressures, _report = flux_pressures_from_batch(retained)
+    assert pressures["Na"] == pytest.approx(2.694467309265198, rel=1e-12)
+    assert pressures["K"] == pytest.approx(0.12704107980939044, rel=1e-12)
+    assert pressures["Fe"] == pytest.approx(0.05731853761717197, rel=1e-12)
+
+
+def test_shipped_fallback_key_admits_alo_and_refuses_unlisted() -> None:
+    """The rail reads the shipped allowlist. AlO is on it; Ghost is not."""
+
+    kernel = yaml.safe_load(
+        Path("data/setpoints.yaml").read_text()
+    )["chemistry_kernel"]
+    allowlist = frozenset(kernel["unmeasured_alpha_fallback_species"])
+    context = FluxActivationContext(
+        epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+        effective_pressure_species_ids=frozenset({"AlO", "Ghost"}),
+        allow_unmeasured_alpha_fallback=bool(
+            kernel["allow_unmeasured_alpha_fallback"]
+        ),
+        unmeasured_alpha_fallback_species=allowlist,
+    )
+    batch = resolve_vapour_batch(
+        rules=(
+            _missing_contract_rule("AlO", has_alpha=False, has_formula=True),
+            _missing_contract_rule("Ghost", has_alpha=False, has_formula=True),
+        ),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1800.0),
+        catalog_species={
+            **_stub_catalog_species("AlO"),
+            **_stub_catalog_species("Ghost"),
+        },
+        flux_activation_context=context,
+    )
+    assert batch.channel("AlO").is_flux_active
+    assert "AlO" in batch.flux_active_species_ids
+    ghost = batch.channel("Ghost")
+    assert ghost.refusal_code == "missing_channel_contract"
+    assert "alpha" in (ghost.extra.get("detail") or "")
+    assert "Ghost" not in batch.flux_active_species_ids
 
 
 def test_sole_missing_alpha_stays_refused_when_fallback_is_off() -> None:

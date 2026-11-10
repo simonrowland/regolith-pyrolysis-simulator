@@ -1038,10 +1038,10 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     pins = capacity_pin_values(snapshot)
     # Fe's selected pressure is the Ellingham value at the in-step diagnostic
     # (0.05731853761717197 Pa, a_FeO and the 1e-9 bar transport floor). Its
-    # flux is 0.0008827256411335937 kg/hr. The other species contribute
-    # 0.06364158399791156 kg/hr.
+    # flux is 0.0008827256411335937 kg/hr. Na and K are the kernel seam.
+    # The other species contribute 0.06335397623171825 kg/hr.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.06452430963904515, rel=1e-12, abs=1e-12
+        0.06423670187285184, rel=1e-12, abs=1e-12
     )
     assert snapshot.evap_flux.species_kg_hr["Fe"] == pytest.approx(
         0.0008827256411335937, rel=1e-12, abs=1e-12
@@ -1068,16 +1068,31 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     assert snapshot.overhead.initial_throat_area_m2 == pytest.approx(
         sim._equipment.pipe.initial_throat_area_m2
     )
+    fallback_species = {
+        "Al2", "Al2O", "Al2O2", "Al2O3_gas", "AlO", "AlO2", "CrO", "CrO2",
+    }
     alpha_refusals = sim._last_vapour_batch_report["refusals_by_species"]
-    for species in ("AlO", "CrO"):
-        refusal = alpha_refusals[species]
-        assert refusal["refusal_code"] == "missing_channel_contract"
-        assert refusal["extra"].get("detail") == (
-            "channel contract incomplete: missing alpha"
-        )
-    assert "CrO2" not in alpha_refusals
-    assert "CrO2" in sim._last_vapour_batch.flux_active_species_ids
-    assert "CrO2" in sim._unmeasured_alpha_fallback_species_engaged
+    assert fallback_species.isdisjoint(alpha_refusals)
+    assert fallback_species <= sim._last_vapour_batch.flux_active_species_ids
+    assert set(sim._unmeasured_alpha_fallback_species_engaged) == fallback_species
+    # Na and K debit the kernel seam. The catalog activity correction stays
+    # on answer.pressure (b-1169) and is not the flux value.
+    na_answer = sim._last_vapour_batch.channel("Na")
+    k_answer = sim._last_vapour_batch.channel("K")
+    assert na_answer.selected_runtime_pressure.pa == pytest.approx(
+        2.694467309265198, rel=1e-12
+    )
+    assert na_answer.pressure.pa == pytest.approx(2.7071606671395836, rel=1e-12)
+    assert k_answer.selected_runtime_pressure.pa == pytest.approx(
+        0.12704107980939044, rel=1e-12
+    )
+    assert k_answer.pressure.pa == pytest.approx(0.12738062946763712, rel=1e-12)
+    assert na_answer.source_label.startswith(
+        "builtin_authoritative:standard_reaction_term"
+    )
+    assert k_answer.source_label.startswith(
+        "builtin_authoritative:standard_reaction_term"
+    )
 
     assert tuple(
         pins[key]
@@ -1090,19 +1105,22 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         )
     ) == pytest.approx(
         # Fe follows the in-step Ellingham pressure, not the dormant Antoine.
+        # Na and K follow the kernel seam. Ca and Mg stay on the catalog
+        # continuation, which is why this total is 8.8224e-11 kg/hr under
+        # the green kernel-seam debit.
         (
             1,
             1400.0,
-            0.06452430963904515,
-            2.481413156248235,
-            998.7069180816347,
+            0.06423670187285184,
+            2.4701307984614065,
+            998.7072055555434,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
     )
     # The split adds Na/Mg collector and K-trap captures after their matching
     # evaporations. Generic C0 Ca has no designated collector in that split;
-    # this trace sends its tiny residual (5.908276614890879e-10 kg) to terminal
+    # this trace sends its tiny residual (4.325245516032059e-10 kg) to terminal
     # offgas instead of the former mixed-stage condense_Ca transition.
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions
@@ -1117,9 +1135,11 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "condense_Na",
         "evaporate_K",
         "condense_K",
+        "evaporate_AlO",
         "evaporate_Ca",
         "evaporate_CaO_gas",
         "evaporate_Cr",
+        "evaporate_CrO",
         "evaporate_K2",
         "evaporate_K2O_gas",
         "evaporate_MgO_gas",
@@ -1205,7 +1225,7 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
         8.0 * _NONTRIVIAL_FLUX_KG_HR
     )
     assert released_kg_hr == pytest.approx(
-        0.00025384203742374385,
+        0.0002538457749981869,
         rel=1e-12,
         abs=1e-15,
     )
@@ -1250,7 +1270,7 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
     assert sim._subsolidus_pending_release is None
     assert snapshot.mass_balance_error_pct <= 5.0e-12
     assert snapshot.overhead.transport_saturation_pct == pytest.approx(
-        99.99999936973133,
+        99.99999935908018,
         rel=1e-12,
         abs=1e-12,
     )
@@ -1381,10 +1401,7 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
     offgas = sim.atom_ledger.project_account_kg("terminal.offgas")
     refusals = sim._last_vapour_batch_report["refusals_by_species"]
     for species in (
-        "Al2O",
-        "AlO",
         "CaO_gas",
-        "CrO",
         "MgO_gas",
         "SiO2_gas",
         "TiO",

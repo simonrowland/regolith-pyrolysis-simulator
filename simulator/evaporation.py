@@ -6,6 +6,7 @@ import copy
 import math
 from collections import defaultdict
 from collections.abc import Mapping
+from dataclasses import replace
 from numbers import Real
 from typing import Any, NamedTuple
 
@@ -49,6 +50,7 @@ from simulator.state import (
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
     FluxActivationContext,
+    PressureValue,
 )
 from simulator.vapour_rail.activity import StandardStateIdentity
 from simulator.vapour_rail.instrumentation import (
@@ -76,6 +78,10 @@ PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C = 1050.0
 _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
     'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10',
 })
+# Catalog activity correction for these two alkalis is not the debit.
+# The runtime already publishes the kernel seam; keep that seam on the
+# selected pressure. answer.pressure stays the catalog reference.
+_KERNEL_SEAM_DEBIT_SPECIES = frozenset({'Na', 'K'})
 
 
 class EvaporationFluxRefusal(ProviderUnavailableError):
@@ -756,6 +762,50 @@ def _load_evaporation_alpha_envelope_by_species(
                 float(envelope[1]),
             )
     return envelope_by_species
+
+
+def _retain_kernel_seam_debit(
+    batch: Any,
+    equilibrium: Any,
+    effective_pressure_source: EffectivePressureSource,
+) -> Any:
+    """Keep Na and K on the kernel pressure the runtime already published.
+
+    The catalog activity correction for these two alkalis is not the debit.
+    ``answer.pressure`` stays the catalog value. The selected runtime
+    pressure and its source label stay on the kernel seam when that seam
+    published a finite pressure and a source label.
+    """
+
+    if batch is None:
+        return batch
+    kernel_sources = getattr(equilibrium, 'vapor_pressures_source', None) or {}
+    if not isinstance(kernel_sources, Mapping):
+        kernel_sources = {}
+    channels = dict(batch.channels_by_species)
+    changed = False
+    for species_id in _KERNEL_SEAM_DEBIT_SPECIES:
+        answer = channels.get(species_id)
+        if answer is None or not answer.is_flux_active:
+            continue
+        if not isinstance(answer.selected_runtime_pressure, PressureValue):
+            continue
+        kernel_pa = effective_pressure_source.pressure_pa(species_id)
+        kernel_label = kernel_sources.get(species_id)
+        if kernel_pa is None or not kernel_label:
+            continue
+        kernel_pa = float(kernel_pa)
+        if not math.isfinite(kernel_pa) or kernel_pa < 0.0:
+            continue
+        channels[species_id] = replace(
+            answer,
+            selected_runtime_pressure=PressureValue(pa=kernel_pa),
+            source_label=str(kernel_label),
+        )
+        changed = True
+    if not changed:
+        return batch
+    return replace(batch, channels_by_species=channels)
 
 
 class EvaporationMixin:
@@ -3818,6 +3868,10 @@ class EvaporationMixin:
                 'reason': 'vapour_batch_unavailable',
                 'detail': 'build_vapour_batch returned None without a typed error',
             }
+        if batch is not None:
+            batch = _retain_kernel_seam_debit(
+                batch, equilibrium, effective_pressure_source,
+            )
         return batch
 
     def _evaporation_flux_control_inputs(
