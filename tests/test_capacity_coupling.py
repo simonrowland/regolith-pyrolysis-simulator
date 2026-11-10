@@ -31,7 +31,12 @@ from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
     NA_COLLECTOR_STAGE_KEY,
 )
-from simulator.core import PyrolysisSimulator
+from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL, PyrolysisSimulator
+from simulator.fe_redox import (
+    calphad_ferrous_feo_activity_diagnostic,
+    feo_iw_log10_fO2_bar,
+    floor_vacuum_pressure_bar,
+)
 from simulator.evaporation import (
     EvaporationFluxRefusal,
     _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS,
@@ -1938,6 +1943,148 @@ def test_binding_cold_train_does_not_turn_redox_no_capacity_into_fo2_move(
     assert reservoir.redox_source_terms_applied is False
     assert reservoir.redox_source_skip_reason == "no_melt_redox_capacity"
     assert len(sim.atom_ledger.transitions) == before_transitions
+
+
+def test_reductive_source_beyond_ferric_capacity_reaches_fe_metal_saturation(
+    monkeypatch,
+):
+    sim = _build_sim(
+        "s_type_asteroid_silicate",
+        _load_yaml("vapor_pressures.yaml"),
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("setpoints.yaml"),
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 0.2
+    base_fO2_log = -8.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = base_fO2_log
+    sim.melt.oxygen_reservoir.reference_T_K = 1873.15
+    sim._sync_oxygen_reservoir_mirror()
+    monkeypatch.setattr(
+        sim,
+        "_resolved_melt_redox_gate_authority",
+        lambda _gate_authority: None,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_liquid_fraction_factor",
+        lambda *_args, **_kwargs: 1.0,
+    )
+
+    pressure_bar = floor_vacuum_pressure_bar(
+        sim.melt.p_total_mbar / 1000.0,
+        floor_bar=sim._vacuum_floor_bar(),
+    )
+    ferric_fraction = sim._fe3_over_sigma_fe_at_fO2(
+        sim._melt_oxide_wt_pct(),
+        fO2_log=base_fO2_log,
+        T_K=1873.15,
+        pressure_bar=pressure_bar,
+    )
+    active_fe_mol = (
+        sim._cleaned_melt_fe_atom_mol()
+        * sim._melt_redox_liquid_fraction_factor(1873.15, gate_authority=None)
+    )
+    ferric_buffer_o2_mol = active_fe_mol * ferric_fraction / 4.0
+    source_demand_o2_mol = ferric_buffer_o2_mol + 1.0
+    source = {"redox_source:c3_na_shuttle_reduction": -source_demand_o2_mol}
+    # Candidate log10(fO2) = base + n_O2/(C_m ln(10)); solving for C_m
+    # gives |n_O2| / ((base - target) ln(10)). Units are mol/(mol per ln),
+    # so the tangent is dimensionless, and this finite source yields -2.7e13.
+    capacity_for_runaway = source_demand_o2_mol / (
+        (base_fO2_log - -2.7e13) * math.log(10.0)
+    )
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_source_capacity_mol_per_ln_fO2",
+        lambda **_kwargs: capacity_for_runaway,
+    )
+    capacity = sim._melt_redox_source_capacity_mol_per_ln_fO2(
+        fO2_log=base_fO2_log,
+        T_K=1873.15,
+        gate_authority=None,
+    )
+    assert capacity > OXYGEN_RESERVOIR_NOOP_MOL
+
+    reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        source,
+        exchange_direction="redox_source:c3_na_shuttle_reduction",
+        temperature_K=1873.15,
+        gate_authority=None,
+    )
+
+    pressure_bar = floor_vacuum_pressure_bar(
+        sim._melt_headspace_total_pressure_bar(),
+        floor_bar=sim._vacuum_floor_bar(),
+    )
+    comp = sim._melt_oxide_wt_pct()
+
+    def saturation_residual(fO2_log):
+        activity = calphad_ferrous_feo_activity_diagnostic(
+            comp_wt=comp,
+            fO2_log=fO2_log,
+            T_K=1873.15,
+            pressure_bar=pressure_bar,
+        )
+        a_feo = float(activity["a_FeO_authoritative"])
+        return fO2_log - feo_iw_log10_fO2_bar(1873.15, a_feo=a_feo)
+
+    # Independently solve ℓ = IW + 2 log10(a_FeO(ℓ)) from the CALPHAD
+    # activity resolver instead of using the simulator's native-Fe target.
+    low_fO2_log, high_fO2_log = -80.0, 0.0
+    assert saturation_residual(low_fO2_log) < 0.0
+    assert saturation_residual(high_fO2_log) > 0.0
+    for _ in range(80):
+        mid_fO2_log = (low_fO2_log + high_fO2_log) / 2.0
+        if saturation_residual(mid_fO2_log) > 0.0:
+            high_fO2_log = mid_fO2_log
+        else:
+            low_fO2_log = mid_fO2_log
+    fe_saturation_fO2_log = (low_fO2_log + high_fO2_log) / 2.0
+    assert fe_saturation_fO2_log < base_fO2_log
+
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        fe_saturation_fO2_log,
+        abs=1e-6,
+    )
+    assert sim.melt.melt_fO2_log == pytest.approx(fe_saturation_fO2_log, abs=1e-6)
+    assert reservoir.redox_source_terms_applied is False
+    assert reservoir.redox_source_skip_reason == (
+        "redox_reduced_to_fe_metal_saturation"
+    )
+    assert reservoir.redox_source_skipped_terms_mol_o2_equiv == pytest.approx(
+        source
+    )
+    assert reservoir.redox_source_refusal_context["flag"] == (
+        "redox_reduced_to_fe_metal_saturation"
+    )
+    assert reservoir.redox_source_refusal_context[
+        "unspent_reducing_equivalents_mol_o2_equiv"
+    ] == pytest.approx(1.0)
+
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_source_capacity_mol_per_ln_fO2",
+        lambda **_kwargs: 0.0,
+    )
+    sim.melt.hour += 1
+    sim._reset_redox_source_diagnostics_for_hour()
+    reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        source,
+        exchange_direction="redox_source:c3_na_shuttle_reduction",
+        temperature_K=1873.15,
+        gate_authority=None,
+    )
+
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        fe_saturation_fO2_log,
+        abs=1e-6,
+    )
+    assert sim.melt.melt_fO2_log == pytest.approx(
+        fe_saturation_fO2_log,
+        abs=1e-6,
+    )
+    assert reservoir.redox_source_skip_reason == "no_melt_redox_capacity"
 
 
 @pytest.mark.parametrize("finite_headspace_enabled", [False, True])
