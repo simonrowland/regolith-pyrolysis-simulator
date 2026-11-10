@@ -2406,6 +2406,53 @@ def test_structured_fidelity_sample_accepted():
     assert match_errs == []
 
 
+def test_fresh_unattested_extract_warns_and_refuses_certification():
+    """A new unattested extract warns at the chokepoint and cannot be certified.
+
+    Schema validation still accepts the document. Certification refuses while
+    an observation is uncovered, a sample lacks reviewer/date/locator, or a
+    sample is an auto-migrated pilot pin. This fails at green, which has
+    neither the typed warnings nor a certification refusal.
+    """
+    doc = _minimal_extract()
+    doc["fidelity_samples"][0]["note"] = (
+        "auto fidelity sample from first observation payload (pilot migration)"
+    )
+    extra = copy.deepcopy(doc["species"]["Fe"]["observations"][0])
+    extra["observation_id"] = "fe_alpha_2"
+    extra["values"] = {"alpha": 0.31}
+    doc["species"]["Fe"]["observations"].append(extra)
+
+    collected: list = []
+    errors = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        fidelity_warnings=collected,
+    )
+    assert errors == [], errors
+    warnings = collected
+    assert warnings == vle.fidelity_source_warnings(doc)
+    by_kind = {warning.kind: warning for warning in warnings}
+    assert set(by_kind) == {
+        "uncovered_observation",
+        "unattested_sample",
+        "auto_migrated_pilot_pin",
+    }
+    assert by_kind["uncovered_observation"].count == 1
+    assert by_kind["unattested_sample"].count == 1
+    assert by_kind["auto_migrated_pilot_pin"].count == 1
+    rendered = " ".join(warning.render() for warning in warnings)
+    assert "uncovered_observation count=1" in rendered
+    assert "reviewed_by is required for source attestation" in rendered
+    assert "auto-migrated pilot sample cannot be source-attested" in rendered
+    refusals = vle.certify_extract_source_fidelity(doc, warnings=warnings)
+    assert refusals
+    assert all("source certification refused" in line for line in refusals)
+    assert any("uncovered_observation" in line for line in refusals)
+    assert any("unattested_sample" in line for line in refusals)
+    assert any("auto_migrated_pilot_pin" in line for line in refusals)
+
+
 def test_corpus_fidelity_gate_rejects_copied_unattested_values():
     """A pin copied into the extract cannot attest itself through the corpus gate."""
     doc = _minimal_extract()
@@ -2415,6 +2462,39 @@ def test_corpus_fidelity_gate_rejects_copied_unattested_values():
     errors = vle._check_fidelity_gate(doc, label="copied-pin")
 
     assert any("reviewed_by is required" in error for error in errors), errors
+
+
+def test_numeric_index_path_does_not_cover_a_scored_observation():
+    """``observations[0]`` is a position. Reordering would retarget the pin."""
+    doc = _minimal_extract()
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[0].values.alpha",
+            "value": 0.24,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": {"page": 2, "table": "1"},
+        }
+    ]
+    errors = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert errors == [], errors
+    warnings = vle.fidelity_source_warnings(doc, label="index-pin")
+    by_kind = {warning.kind: warning.count for warning in warnings}
+    assert by_kind.get("uncovered_observation") == 1
+    assert "unattested_sample" not in by_kind
+    assert "auto_migrated_pilot_pin" not in by_kind
+    refusals = vle.certify_extract_source_fidelity(doc, label="index-pin")
+    assert any("uncovered_observation" in line for line in refusals)
+
+
+def test_attested_identity_sample_certifies():
+    """Reviewer, ISO date, locator, and an observation id are enough to certify."""
+    doc = _minimal_extract()
+    sample = doc["fidelity_samples"][0]
+    sample["reviewed_by"] = "independent reviewer"
+    sample["reviewed_on"] = "2026-11-10"
+    assert vle.fidelity_source_warnings(doc, label="attested") == []
+    assert vle.certify_extract_source_fidelity(doc, label="attested") == []
 
 
 def test_corpus_fidelity_gate_rejects_observation_id_as_evidence():
@@ -4959,21 +5039,52 @@ def _extract_paths_with_samples() -> list[Path]:
     ids=lambda p: p.stem,
 )
 def test_fidelity_sample_matches_extract(extract_path: Path):
-    """Corpus pins match stored values but stay blocked pending source review.
+    """Corpus pins still match the stored extract (drift fuse).
 
-    The match assertion preserves the extraction-drift fuse. The corpus gate
-    must also reject these historical, unattested pins until a reviewer checks
-    their cited source artifacts.
+    Source-fidelity holes are not a per-file failure. The shrink-only counts
+    live in ``test_fidelity_source_warning_ratchet``.
     """
     doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
     match_errors = vle.check_all_fidelity_samples_match(
         doc, label=extract_path.stem
     )
     assert match_errors == [], "\n".join(match_errors)
-    gate_errors = vle._check_fidelity_gate(
-        doc, label=extract_path.stem
-    )
-    assert any("reviewed_by is required" in error for error in gate_errors), gate_errors
+
+
+# Measured on this corpus when numeric observation indexes are not identities.
+# 6 ``observations[<integer>]`` pins are positions: counting them would report
+# 46,335 observations in 524 extracts. The ceiling may only fall.
+_UNCOVERED_OBSERVATIONS_CEILING = 46341
+_UNCOVERED_EXTRACTS_CEILING = 525
+_UNATTESTED_SAMPLES_CEILING = 3128
+_PILOT_PIN_EXTRACTS_CEILING = 57
+
+
+def test_fidelity_source_warning_ratchet():
+    """Source-fidelity holes are an upper bound, not a green bill of health."""
+    uncovered_obs = 0
+    uncovered_extracts = 0
+    unattested_samples = 0
+    pilot_extracts = 0
+    for path in vle.discover_extracts():
+        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+        if not isinstance(doc, dict):
+            continue
+        if doc.get("schema_version") != vle.SCHEMA_VERSION:
+            continue
+        warnings = vle.fidelity_source_warnings(doc, label=path.stem)
+        by_kind = {warning.kind: warning.count for warning in warnings}
+        uncovered = by_kind.get("uncovered_observation", 0)
+        if uncovered:
+            uncovered_extracts += 1
+            uncovered_obs += uncovered
+        unattested_samples += by_kind.get("unattested_sample", 0)
+        if by_kind.get("auto_migrated_pilot_pin", 0):
+            pilot_extracts += 1
+    assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
+    assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
+    assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, unattested_samples
+    assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
 
 
 def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(tmp_path):

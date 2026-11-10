@@ -47,6 +47,7 @@ if str(TOOLS_DIR) not in sys.path:
 from validate_literature_extracts import (  # noqa: E402
     EXTRACTS_DIR,
     discover_extracts,
+    fidelity_warning_summary,
     load_extract_yaml,
     load_fidelity_policy,
     pre_policy_source_ids,
@@ -154,6 +155,7 @@ def load_extracts(
     files = discover_extracts(directory)
     docs: list[dict[str, Any]] = []
     errors: list[str] = []
+    fidelity_warnings: list[Any] = []
     # Honor ENFORCED_FOR_NEW fidelity allowlist (same policy as validate_all).
     pre_policy: set[str] | None = None
     if require_valid:
@@ -164,7 +166,11 @@ def load_extracts(
         pre_policy = pre_policy_source_ids(policy)
     for path in files:
         if require_valid:
-            errs = validate_extract_file(path, pre_policy_ids=pre_policy)
+            errs = validate_extract_file(
+                path,
+                pre_policy_ids=pre_policy,
+                fidelity_warnings=fidelity_warnings,
+            )
             if errs:
                 errors.extend(errs)
                 continue
@@ -173,6 +179,12 @@ def load_extracts(
             docs.append(dict(doc))
     if require_valid and errors:
         raise SystemExit("extract validation failed:\n" + "\n".join(errors))
+    if fidelity_warnings:
+        print(
+            "WARN: source fidelity is not certified: "
+            + fidelity_warning_summary(fidelity_warnings),
+            file=sys.stderr,
+        )
     return docs
 
 

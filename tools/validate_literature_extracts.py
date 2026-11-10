@@ -19,8 +19,10 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   ``_fidelity_pre_policy_allowlist.yaml``)
 * fidelity sample structure: path-based *or* structured line-item form
   (species, observable, T/index, value, locator)
-* the extract fidelity gate requires one matching, reviewer-attested sample
-  (reviewer, date, source locator) per scored observation
+* source fidelity is a typed, counted warning at this chokepoint
+  (``uncovered_observation`` / ``unattested_sample`` /
+  ``auto_migrated_pilot_pin``). The corpus is not rejected for those
+  warnings. Certifying or promoting the extract refuses while any remain
 * structured fidelity samples resolve rows in ``observations[]`` or the
   sibling ``context[]`` container (d-032); an id matching rows in both
   containers is an ambiguity error, not a silent pick
@@ -41,6 +43,7 @@ from __future__ import annotations
 
 import argparse
 from copy import deepcopy
+from dataclasses import dataclass
 from functools import lru_cache
 import math
 import re
@@ -608,6 +611,29 @@ def load_fidelity_policy(
     out = dict(doc)
     if "graduated_pre_policy_source_ids" not in out:
         out["graduated_pre_policy_source_ids"] = list(graduated)
+    # Promotion: graduating an id certifies that extract. A missing file is not
+    # certified here (synthetic policy tests graduate ids that have no extract).
+    # Already-stored review_status is not re-decided by schema validation.
+    if not errors:
+        for source_id in sorted(graduated_set):
+            extract_path = EXTRACTS_DIR / f"{source_id}.yaml"
+            if not extract_path.is_file():
+                continue
+            try:
+                extract_doc = load_extract_yaml(extract_path)
+            except Exception as exc:  # noqa: BLE001 — surface as a promotion refusal
+                errors.append(
+                    f"{p}: cannot certify graduated extract {source_id}: {exc}"
+                )
+                continue
+            if not isinstance(extract_doc, Mapping):
+                errors.append(
+                    f"{p}: graduated extract {source_id} is not a mapping"
+                )
+                continue
+            errors.extend(
+                certify_extract_source_fidelity(extract_doc, label=source_id)
+            )
     return out, errors
 
 
@@ -1204,101 +1230,280 @@ def _fidelity_sample_observation_key(
     return None
 
 
+# Auto-migrated pilot pins copied the first stored payload. They are not a
+# source check. Do not rewrite them; the re-audit is a separate campaign.
+_PILOT_MIGRATION_NOTE = (
+    "auto fidelity sample from first observation payload (pilot migration)"
+)
+_FIDELITY_WARNING_KINDS = (
+    "uncovered_observation",
+    "unattested_sample",
+    "auto_migrated_pilot_pin",
+)
+_FIDELITY_DETAIL_CAP = 3
+# Same bracket rule as resolve_field_path: a bare integer is a list position.
+_INTEGER_SELECTOR_RE = re.compile(r"-?\d+")
+
+
+@dataclass(frozen=True)
+class FidelityWarning:
+    """One counted source-fidelity hole. ``count`` is observations or samples."""
+
+    kind: str
+    count: int
+    label: str
+    detail: str = ""
+
+    def render(self) -> str:
+        text = f"{self.label}: fidelity warning {self.kind} count={self.count}"
+        if self.detail:
+            text = f"{text}: {self.detail}"
+        return text
+
+
+def _note_reason(reasons: list[str], extra: list[int], text: str) -> None:
+    if len(reasons) < _FIDELITY_DETAIL_CAP:
+        reasons.append(text)
+    else:
+        extra[0] += 1
+
+
+def _finish_detail(reasons: list[str], extra: int) -> str:
+    text = "; ".join(reasons)
+    if extra:
+        text = f"{text}; and {extra} more"
+    return text
+
+
+def _scored_observation_keys(doc: Mapping[str, Any]) -> set[tuple[str, str]]:
+    """Scored rows are ``species.*.observations[]`` with a non-empty id.
+
+    Context rows are unscored (d-032) and are not part of this coverage set.
+    """
+    required: set[tuple[str, str]] = set()
+    species_map = doc.get("species") or {}
+    if not isinstance(species_map, Mapping):
+        return required
+    for species_id, block in species_map.items():
+        observations = block.get("observations") if isinstance(block, Mapping) else None
+        if not isinstance(observations, list):
+            continue
+        for observation in observations:
+            if not isinstance(observation, Mapping):
+                continue
+            observation_id = observation.get("observation_id")
+            if isinstance(observation_id, str) and observation_id:
+                required.add((str(species_id), observation_id))
+    return required
+
+
+def _path_selector_names_observation_id(sample: Mapping[str, Any]) -> bool:
+    """False when the observation bracket is a list position, not an id.
+
+    ``resolve_field_path`` prefers a bare integer bracket as a list index.
+    ``observations[0]`` follows whichever row currently sits there, so the pin
+    does not identify an observation. Structured samples have no path bracket;
+    ``_fidelity_sample_observation_key`` decides those.
+    """
+    path_keys, _structured = _sample_addressing_keys(sample)
+    if len(path_keys) != 1:
+        return True
+    path = sample.get(path_keys[0])
+    if not isinstance(path, str):
+        return False
+    parts = path.split(".")
+    if len(parts) < 3:
+        return False
+    match = _PATH_SEGMENT_RE.match(parts[2])
+    if not match or match.group(1) != "observations" or match.group(2) is None:
+        return False
+    return _INTEGER_SELECTOR_RE.fullmatch(match.group(2)) is None
+
+
+def _sample_attestation_defects(sample: Mapping[str, Any]) -> list[str]:
+    """Missing reviewer, ISO date, or exactly one artifact locator."""
+    defects: list[str] = []
+    reviewer = sample.get("reviewed_by")
+    if not isinstance(reviewer, str) or not reviewer.strip():
+        defects.append("reviewed_by is required for source attestation")
+    reviewed_on = sample.get("reviewed_on")
+    if not isinstance(reviewed_on, str) or not _ISO_DATE_RE.fullmatch(reviewed_on):
+        defects.append("reviewed_on must be an ISO YYYY-MM-DD date")
+    else:
+        try:
+            date.fromisoformat(reviewed_on)
+        except ValueError:
+            defects.append("reviewed_on is not a calendar date")
+    locator_keys = [key for key in ("locator", "source_locator") if key in sample]
+    if len(locator_keys) != 1 or not _locator_ok(sample.get(locator_keys[0])):
+        defects.append(
+            "exactly one valid locator/source_locator is required for source attestation"
+        )
+    return defects
+
+
+def fidelity_source_warnings(
+    doc: Mapping[str, Any],
+    *,
+    label: str = "<document>",
+) -> list[FidelityWarning]:
+    """Count source-fidelity holes. Empty means the certification invariant holds.
+
+    The three kinds split one invariant: every scored observation is covered by
+    a value-matching sample that names its observation id, is not an
+    auto-migrated pilot pin, and carries a reviewer, an ISO date, and one
+    artifact locator. A pilot sample that names an id still covers for
+    ``uncovered_observation``; the pilot and attestation holes are their own
+    counts. A numeric observation index does not cover. Drift (sample value
+    != extract) does not cover, and stays a match error rather than a fourth
+    kind. These warnings do not reject the corpus.
+    """
+    samples = doc.get("fidelity_samples")
+    if samples is None:
+        samples = []
+    elif not isinstance(samples, list):
+        samples = []
+
+    required = _scored_observation_keys(doc)
+    covered: set[tuple[str, str]] = set()
+    unattested = 0
+    unattested_reasons: list[str] = []
+    unattested_extra = [0]
+    pilot = 0
+    pilot_reasons: list[str] = []
+    pilot_extra = [0]
+
+    for index, sample in enumerate(samples):
+        sample_label = f"{label}:fidelity_samples[{index}]"
+        if not isinstance(sample, Mapping):
+            unattested += 1
+            _note_reason(
+                unattested_reasons,
+                unattested_extra,
+                f"{sample_label}: each sample must be a mapping",
+            )
+            continue
+        if sample.get("note") == _PILOT_MIGRATION_NOTE:
+            pilot += 1
+            _note_reason(
+                pilot_reasons,
+                pilot_extra,
+                f"{sample_label}: auto-migrated pilot sample cannot be "
+                "source-attested; replace it with a source-reviewed sample",
+            )
+        defects = _sample_attestation_defects(sample)
+        if defects:
+            unattested += 1
+            for defect in defects:
+                _note_reason(
+                    unattested_reasons,
+                    unattested_extra,
+                    f"{sample_label}: {defect}",
+                )
+        match_errors = check_fidelity_sample_matches(doc, sample, label=sample_label)
+        observation_key = _fidelity_sample_observation_key(doc, sample)
+        if (
+            not match_errors
+            and observation_key is not None
+            and observation_key in required
+            and _path_selector_names_observation_id(sample)
+        ):
+            covered.add(observation_key)
+
+    uncovered_reasons: list[str] = []
+    uncovered_extra = [0]
+    for species_id, observation_id in sorted(required - covered):
+        _note_reason(
+            uncovered_reasons,
+            uncovered_extra,
+            f"{label}: fidelity sample coverage missing for observation "
+            f"species.{species_id}.observations[{observation_id}]",
+        )
+    uncovered = len(required - covered)
+
+    warnings: list[FidelityWarning] = []
+    if uncovered:
+        warnings.append(
+            FidelityWarning(
+                "uncovered_observation",
+                uncovered,
+                label,
+                _finish_detail(uncovered_reasons, uncovered_extra[0]),
+            )
+        )
+    if unattested:
+        warnings.append(
+            FidelityWarning(
+                "unattested_sample",
+                unattested,
+                label,
+                _finish_detail(unattested_reasons, unattested_extra[0]),
+            )
+        )
+    if pilot:
+        warnings.append(
+            FidelityWarning(
+                "auto_migrated_pilot_pin",
+                pilot,
+                label,
+                _finish_detail(pilot_reasons, pilot_extra[0]),
+            )
+        )
+    return warnings
+
+
+def fidelity_warning_summary(warnings: Sequence[FidelityWarning]) -> str:
+    """One visible total line. Extract counts are how many warnings of that kind."""
+    parts: list[str] = []
+    for kind in _FIDELITY_WARNING_KINDS:
+        rows = [warning for warning in warnings if warning.kind == kind]
+        total = sum(warning.count for warning in rows)
+        if kind == "unattested_sample":
+            parts.append(f"{kind}={total}")
+        else:
+            parts.append(f"{kind}={total} ({len(rows)} extracts)")
+    return " ".join(parts)
+
+
+def certify_extract_source_fidelity(
+    doc: Mapping[str, Any],
+    *,
+    label: str = "<document>",
+    warnings: Sequence[FidelityWarning] | None = None,
+) -> list[str]:
+    """Refuse to mark this extract source-reviewed while any hole remains.
+
+    An empty list is the only pass. Drift mismatches refuse as well: a pin
+    that no longer matches the extract is not source evidence. Callers that
+    only validate schema must not treat this list as a corpus error.
+    """
+    if warnings is None:
+        warnings = fidelity_source_warnings(doc, label=label)
+    refusals: list[str] = []
+    for warning in warnings:
+        if warning.count <= 0:
+            continue
+        detail = warning.detail or warning.kind
+        refusals.append(
+            f"{warning.label}: source certification refused: "
+            f"{warning.kind} count={warning.count}: {detail}"
+        )
+    refusals.extend(check_all_fidelity_samples_match(doc, label=label))
+    return refusals
+
+
 def _check_fidelity_gate(
     doc: Mapping[str, Any],
     *,
     label: str = "<document>",
 ) -> list[str]:
-    """Require matching, source-attested fidelity samples for every observation.
+    """Certification refusals for this extract.
 
-    The reviewer fields are an explicit attestation; migrated pins do not gain
-    that status from their extract locator or from matching the stored value.
+    Schema validation does not emit these. A caller that certifies or promotes
+    the extract treats a non-empty list as a hard refusal. Older trees that
+    only have this helper keep that refusal behaviour.
     """
-    errors: list[str] = []
-    samples = doc.get("fidelity_samples")
-    if samples is None:
-        samples = []
-    elif not isinstance(samples, list):
-        return [f"{label}: fidelity_samples must be a list"]
-
-    required: set[tuple[str, str]] = set()
-    species_map = doc.get("species") or {}
-    if isinstance(species_map, Mapping):
-        for species_id, block in species_map.items():
-            observations = (
-                block.get("observations") if isinstance(block, Mapping) else None
-            )
-            if not isinstance(observations, list):
-                continue
-            for observation in observations:
-                if not isinstance(observation, Mapping):
-                    continue
-                observation_id = observation.get("observation_id")
-                if isinstance(observation_id, str) and observation_id:
-                    required.add((str(species_id), observation_id))
-
-    covered: set[tuple[str, str]] = set()
-    for index, sample in enumerate(samples):
-        sample_label = f"{label}:fidelity_samples[{index}]"
-        if not isinstance(sample, Mapping):
-            errors.append(f"{sample_label}: each sample must be a mapping")
-            continue
-
-        match_errors = check_fidelity_sample_matches(doc, sample, label=sample_label)
-        errors.extend(match_errors)
-
-        attested = True
-        if sample.get("note") == (
-            "auto fidelity sample from first observation payload (pilot migration)"
-        ):
-            errors.append(
-                f"{sample_label}: auto-migrated pilot sample cannot be source-attested; "
-                "replace it with a source-reviewed sample"
-            )
-            attested = False
-        reviewer = sample.get("reviewed_by")
-        if not isinstance(reviewer, str) or not reviewer.strip():
-            errors.append(
-                f"{sample_label}: reviewed_by is required for source attestation"
-            )
-            attested = False
-        reviewed_on = sample.get("reviewed_on")
-        if not isinstance(reviewed_on, str) or not _ISO_DATE_RE.fullmatch(
-            reviewed_on
-        ):
-            errors.append(
-                f"{sample_label}: reviewed_on must be an ISO YYYY-MM-DD date"
-            )
-            attested = False
-        else:
-            try:
-                date.fromisoformat(reviewed_on)
-            except ValueError:
-                errors.append(f"{sample_label}: reviewed_on is not a calendar date")
-                attested = False
-        locator_keys = [key for key in ("locator", "source_locator") if key in sample]
-        if len(locator_keys) != 1 or not _locator_ok(sample.get(locator_keys[0])):
-            errors.append(
-                f"{sample_label}: exactly one valid locator/source_locator is required "
-                "for source attestation"
-            )
-            attested = False
-
-        observation_key = _fidelity_sample_observation_key(doc, sample)
-        if (
-            attested
-            and not match_errors
-            and observation_key is not None
-            and observation_key in required
-        ):
-            covered.add(observation_key)
-
-    for species_id, observation_id in sorted(required - covered):
-        errors.append(
-            f"{label}: fidelity sample coverage missing for observation "
-            f"species.{species_id}.observations[{observation_id}]"
-        )
-    return errors
+    return certify_extract_source_fidelity(doc, label=label)
 
 
 def load_known_species_ids() -> set[str] | None:
@@ -1844,13 +2049,17 @@ def validate_extract_document(
     expected_source_id: str | None = None,
     known_species_ids: set[str] | None = None,
     collect_warnings: list[str] | None = None,
+    fidelity_warnings: list[FidelityWarning] | None = None,
     pre_policy_ids: set[str] | None = None,
     check_fidelity_match: bool = False,
 ) -> list[str]:
-    """Return a list of error strings (empty ⇒ valid).
+    """Return a list of error strings (empty ⇒ schema-valid).
 
-    Warnings (unknown species ids) are appended to ``collect_warnings`` when
-    provided; they do not fail validation (SCHEMA.md: draft may carry unknown ids).
+    Warnings (unknown species ids, and rendered source-fidelity warnings) are
+    appended to ``collect_warnings`` when provided; they do not fail validation
+    (SCHEMA.md: draft may carry unknown ids; fidelity holes do not reject the
+    corpus). Typed ``FidelityWarning`` rows are appended to ``fidelity_warnings``
+    when that list is provided. The holes are always computed here.
 
     ``pre_policy_ids``: source_ids exempt from the fidelity_samples presence
     requirement (ENFORCED_FOR_NEW grandfathering). When None, the on-disk
@@ -1976,6 +2185,14 @@ def validate_extract_document(
         check_match=check_fidelity_match,
     )
 
+    # Chokepoint: count source-fidelity holes on every extract. They are
+    # warnings, not schema errors. Certification entry points refuse them.
+    source_warnings = fidelity_source_warnings(doc, label=label)
+    if fidelity_warnings is not None:
+        fidelity_warnings.extend(source_warnings)
+    if collect_warnings is not None:
+        collect_warnings.extend(item.render() for item in source_warnings)
+
     return errors
 
 
@@ -1984,6 +2201,7 @@ def validate_extract_file(
     *,
     known_species_ids: set[str] | None = None,
     collect_warnings: list[str] | None = None,
+    fidelity_warnings: list[FidelityWarning] | None = None,
     pre_policy_ids: set[str] | None = None,
     check_fidelity_match: bool = False,
 ) -> list[str]:
@@ -2063,6 +2281,7 @@ def validate_extract_file(
         expected_source_id=path.stem,
         known_species_ids=known_species_ids,
         collect_warnings=collect_warnings,
+        fidelity_warnings=fidelity_warnings,
         pre_policy_ids=pre_policy_ids,
         check_fidelity_match=check_fidelity_match,
     )
@@ -2120,6 +2339,7 @@ def validate_all(
     check_fidelity_policy: bool = True,
     check_fidelity_match: bool = False,
     collect_warnings: list[str] | None = None,
+    fidelity_warnings: list[FidelityWarning] | None = None,
 ) -> list[str]:
     errors: list[str] = []
     if check_priority:
@@ -2139,6 +2359,7 @@ def validate_all(
                 path,
                 known_species_ids=known,
                 collect_warnings=collect_warnings,
+                fidelity_warnings=fidelity_warnings,
                 pre_policy_ids=pre_policy if check_fidelity_policy else None,
                 check_fidelity_match=check_fidelity_match,
             )
@@ -2178,23 +2399,31 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     paths = [p.resolve() for p in args.paths] if args.paths else None
     warnings: list[str] = []
+    fidelity: list[FidelityWarning] = []
     errors = validate_all(
         paths,
         check_priority=not args.skip_priority,
         check_fidelity_policy=not args.skip_fidelity_policy,
         check_fidelity_match=args.check_fidelity_match,
         collect_warnings=warnings if args.show_warnings else None,
+        fidelity_warnings=fidelity,
     )
     if args.show_warnings and warnings:
         for w in warnings:
             print(f"WARN: {w}", file=sys.stderr)
+    summary = fidelity_warning_summary(fidelity)
+    if any(item.count for item in fidelity):
+        print(
+            f"WARN: source fidelity is not certified: {summary}",
+            file=sys.stderr,
+        )
     if errors:
         for e in errors:
             print(e, file=sys.stderr)
         print(f"FAIL: {len(errors)} error(s)", file=sys.stderr)
         return 1
     n = len(paths) if paths is not None else len(discover_extracts())
-    print(f"OK: {n} extract file(s) valid")
+    print(f"OK: {n} extract file(s) schema-valid; fidelity warnings: {summary}")
     return 0
 
 

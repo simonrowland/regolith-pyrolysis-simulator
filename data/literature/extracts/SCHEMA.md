@@ -91,12 +91,23 @@ is absent.
 
 ### `fidelity_samples` (t-510 gate)
 
-Each sample is a **reviewer-attested** line item checked against the source /
-OCR artifact: the reviewer records who checked it, when, and where in the
-artifact. The extract gate requires a matching, attested sample for every
-scored observation. Matching pins also detect later extraction drift. The gate
-checks that an attestation is recorded; it does not independently open the OCR
-artifact or prove that the reviewer transcribed it correctly.
+Each sample is a line item that can be checked against the source / OCR
+artifact. Reviewer, date, and artifact locator are the attestation contract
+for **certification**. They are not schema errors: the stored corpus is not
+rejected while those fields are missing. `validate_extract_document` counts
+three warnings — `uncovered_observation`, `unattested_sample`, and
+`auto_migrated_pilot_pin` — and every fidelity consumer prints the counts.
+Certifying or promoting the extract (the extract gate, fidelity-policy
+graduation of an on-disk extract, or emitting `review_status: reviewed`)
+refuses while any count is non-zero. A stored `review_status: reviewed` is
+not rewritten and is not by itself a schema failure.
+
+Coverage means a sample whose value matches the extract and whose path or
+structured selector names the observation id. A bare integer bracket such as
+`observations[0]` is a list position, not an id, so it does not cover.
+Matching pins still detect later extraction drift; a mismatch does not cover
+and blocks certification. The check records attestation. It does not open the
+OCR artifact. Do not backfill reviewer fields from the extract's own value.
 
 #### Sample shapes
 
@@ -107,8 +118,8 @@ artifact or prove that the reviewer transcribed it correctly.
 | `species` | yes | Canonical species id under `species:` |
 | `observable` and/or `observation_id` | yes (≥1) | Observation type and/or id |
 | `value` / `draft_value` | yes | Expected value (scalar or structure) |
-| `reviewed_by` | yes | Person who checked the sample against the source/OCR artifact |
-| `reviewed_on` | yes | ISO `YYYY-MM-DD` date of that source check |
+| `reviewed_by` | to certify | Person who checked the sample against the source/OCR artifact |
+| `reviewed_on` | to certify | ISO `YYYY-MM-DD` date of that source check |
 | `locator` / `source_locator` | yes (exactly 1) | Where in the source/OCR artifact this was checked |
 | `T_K` / `T` or `index` | no | Pin a series point by temperature or list index |
 | `field` / `value_key` | no | Key inside `values` (or the series point) |
@@ -120,8 +131,8 @@ artifact or prove that the reviewer transcribed it correctly.
 |-------|----------|---------|
 | `path` / `field_path` | yes | Dot path into the extract (supports `[observation_id]`) |
 | `value` / `draft_value` | yes | Expected / stored value |
-| `reviewed_by` | yes | Person who checked the sample against the source/OCR artifact |
-| `reviewed_on` | yes | ISO `YYYY-MM-DD` date of that source check |
+| `reviewed_by` | to certify | Person who checked the sample against the source/OCR artifact |
+| `reviewed_on` | to certify | ISO `YYYY-MM-DD` date of that source check |
 | `locator` / `source_locator` | yes (exactly 1) | Where in the source/OCR artifact this was checked |
 
 A sample uses **exactly one** addressing mode. Path keys cannot be combined
@@ -138,12 +149,11 @@ both `observation_id` and `observable` are supplied, the selected observation's
 type must equal `observable`; no null or contradictory alias may be decorative.
 
 The pre-policy allowlist only grandfathers sample presence in the general
-extract validator. `tools/extract_gate.py` still requires sample coverage for
-every scored observation and a per-sample reviewer, date, and source locator.
-Migration-generated samples have no reviewer attestation and therefore do not
-count until someone checks them against the cited artifact. Do not backfill
-attestation from the extract's own value. Until the existing pilot samples are
-re-audited, the gate reports them as unverified.
+extract validator. Source fidelity is a counted warning, not a corpus reject.
+`tools/extract_gate.py` prints those warnings and refuses certification while
+any remain. Migration-generated samples have no reviewer attestation. Do not
+backfill attestation from the extract's own value. Until the existing pilot
+samples are re-audited, the validator reports `auto_migrated_pilot_pin`.
 
 A structured sample addresses one observation-shaped row, whether it lives in
 `observations[]` or in the sibling `context[]` container (d-032): the resolver

@@ -146,15 +146,27 @@ def _run_one(
         pre_policy_ids=pre_policy_ids,
     )
     if isinstance(doc, Mapping):
-        fidelity_gate = getattr(validator, "_check_fidelity_gate", None)
-        if callable(fidelity_gate):
-            errors.extend(fidelity_gate(doc, label=path.stem))
+        # Certification decision. Warnings are printed even when the schema
+        # check passed. Trees without the typed helpers keep the older refusal
+        # or, failing that, the drift check.
+        warn_fn = getattr(validator, "fidelity_source_warnings", None)
+        certify_fn = getattr(validator, "certify_extract_source_fidelity", None)
+        if callable(warn_fn) and callable(certify_fn):
+            source_warnings = list(warn_fn(doc, label=path.stem))
+            for warning in source_warnings:
+                rendered = warning.render() if hasattr(warning, "render") else str(warning)
+                print(f"WARN {rendered}")
+            errors.extend(
+                certify_fn(doc, label=path.stem, warnings=source_warnings)
+            )
         else:
-            # Older --tree validators predate source attestation and coverage;
-            # retain their existing drift check instead of crashing the audit.
-            match_check = getattr(validator, "check_all_fidelity_samples_match", None)
-            if callable(match_check):
-                errors.extend(match_check(doc, label=path.stem))
+            fidelity_gate = getattr(validator, "_check_fidelity_gate", None)
+            if callable(fidelity_gate):
+                errors.extend(fidelity_gate(doc, label=path.stem))
+            else:
+                match_check = getattr(validator, "check_all_fidelity_samples_match", None)
+                if callable(match_check):
+                    errors.extend(match_check(doc, label=path.stem))
     yaml_issues = yaml_source_issues(raw)
     report = gate.evaluate_extract(
         path,

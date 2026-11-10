@@ -65,7 +65,8 @@ Minimum content:
 | `observable` and/or `observation_id` | Locates the observation |
 | `value` | Exact stored value (scalar or structure) the reviewer read |
 | `locator` | Page/table/figure/paragraph (or OCR artifact pointer) — **required** |
-| `T_K` / `index` | When pinning a series point |
+| `reviewed_by` / `reviewed_on` | Required to certify the extract. Missing values are a counted `unattested_sample` warning, not a schema failure |
+| `T_K` / `index` | When pinning a series point. A bare integer observation index does not cover that observation |
 | `field` | When pinning one key inside `values` |
 
 Path-based samples (`path` + `value` + locator/note) remain valid for
@@ -75,9 +76,13 @@ paths.
 
 ### How many
 
-At least **one** sample per extract with observations. Prefer **N ≥ 1 per
-major observation family** present (e.g. one α pin + one P_sat pin when both
-exist). More samples catch more drift classes; one is the hard floor.
+Every scored observation needs a sample that names its observation id and
+matches the stored value. One sample per file is not coverage. Until the
+corpus is re-audited, missing coverage, missing reviewer/date/locator, and
+auto-migrated pilot notes are typed counted warnings
+(`uncovered_observation`, `unattested_sample`, `auto_migrated_pilot_pin`).
+They do not reject the corpus. Setting `review_status: reviewed` refuses
+while any warning remains. Do not stamp reviewers or copy pins to clear them.
 
 ### Tranche review obligation
 
