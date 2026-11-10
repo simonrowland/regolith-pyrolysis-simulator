@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import nullcontext
 import importlib.util
 import os
 import sys
@@ -138,6 +139,8 @@ def test_engine_verify_fails_install_when_a_fresh_import_fails(
 ) -> None:
     import importlib.util
     from types import SimpleNamespace
+    from simulator.melt_backend import alphamelts as alphamelts_backend
+    from simulator.melt_backend import magemin as magemin_backend
 
     installer_path = LOCK_PATH.parents[1] / "install-engines.py"
     spec = importlib.util.spec_from_file_location("install_engines_verify_test", installer_path)
@@ -150,6 +153,7 @@ def test_engine_verify_fails_install_when_a_fresh_import_fails(
     magemin.parent.mkdir(parents=True)
     magemin.write_bytes(b"fake binary")
     import_environments: list[dict[str, str]] = []
+    magemin_verifications: list[list[str]] = []
 
     def fail_import(command, **kwargs):
         if "-c" in command:
@@ -157,13 +161,28 @@ def test_engine_verify_fails_install_when_a_fresh_import_fails(
             return SimpleNamespace(returncode=1, stdout="", stderr="import failed")
         return SimpleNamespace(returncode=0, stdout="MAGEMin", stderr="")
 
+    def verify_magemin(command, **_kwargs):
+        magemin_verifications.append(command)
+        return SimpleNamespace(returncode=0, stdout="MAGEMin", stderr="")
+
     monkeypatch.setattr(installer.subprocess, "run", fail_import)
+    monkeypatch.setattr(
+        alphamelts_backend,
+        "_run_alphamelts_subprocess",
+        verify_magemin,
+    )
+    monkeypatch.setattr(
+        magemin_backend,
+        "_magemin_subprocess_slot",
+        lambda _timeout: nullcontext(),
+    )
     monkeypatch.setattr(installer, "checkout_matches_pin", lambda _pin, _path: True)
 
     with pytest.raises(SystemExit, match="Engine verification failed"):
         installer.verify(Path("/fake/python"), lock, root)
 
     assert len(import_environments) == 5
+    assert magemin_verifications == [[str(magemin), "--version"]]
     assert all(
         environment["DYLD_FALLBACK_LIBRARY_PATH"].startswith(
             str(Path.home() / "lib")
