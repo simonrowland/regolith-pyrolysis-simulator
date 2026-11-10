@@ -1410,3 +1410,49 @@ def test_redox_result_keeps_its_type_across_cache_round_trip(
         "store_error": 0,
         "read_error": 0,
     }
+
+
+def test_openimcc_canonical_predictions_match_chemistry_version_pin(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import hashlib
+
+    openimcc = pytest.importorskip("openimcc")
+    from simulator import engine_cache
+    from simulator.canonical import canonical_json_dumps
+    from simulator.melt_backend.openimcc_bridge import (
+        evaluate_gas,
+        evaluate_redox,
+    )
+
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    melt = bridge_evaluate(
+        composition_mol={"SiO2": 0.7, "FeO": 0.2, "Na2O": 0.1},
+        temperature_K=2200.0,
+        pack="default",
+    )
+    redox = evaluate_redox({"Fe": 1.0, "O": 1.0}, 1700.0, "closed")
+    gas = evaluate_gas(
+        melt.parent_oxide_activities,
+        2200.0,
+        1.0e-6,
+        openimcc.load_gas_datapack(),
+        gas_pack_selection="default",
+    )
+    predictions = {
+        "evaluate": {
+            "parent_oxide_activities": dict(melt.parent_oxide_activities),
+            "parent_oxide_x_star_ratios": dict(melt.parent_oxide_x_star_ratios),
+            "acid_sink_ratio": melt.acid_sink_ratio,
+        },
+        "redox": redox.lean(),
+        "gas": dict(gas),
+    }
+    digest = hashlib.sha256(
+        canonical_json_dumps(predictions).encode("ascii")
+    ).hexdigest()
+
+    assert digest == engine_cache.OPENIMCC_CANONICAL_OUTPUT_SHA256, (
+        "OpenIMCC predictions changed: bump ENGINE_CHEMISTRY_VERSION[openimcc] "
+        "and re-pin"
+    )
