@@ -1030,6 +1030,67 @@ def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
             }
 
 
+def test_single_cation_gamma_conversion_is_shared_and_bit_identical(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _openimcc_or_skip()
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _imcc_activity_coefficient_reports,
+    )
+
+    helper = getattr(
+        openimcc_bridge, "_single_cation_activity_coefficient_reports", None
+    )
+    assert callable(helper)
+    calls = []
+
+    def record_call(parent_activities, composition_mol):
+        calls.append((parent_activities, composition_mol))
+        return helper(parent_activities, composition_mol)
+
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_single_cation_activity_coefficient_reports",
+        record_call,
+    )
+    composition = {"SiO2": 1.0, "MgO": 1.0}
+    evaluated = openimcc_bridge.evaluate(
+        composition_mol=composition,
+        temperature_K=1800.0,
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    redox = openimcc_bridge._evaluate_redox_melt(composition, 1800.0)
+    reported_values, reported_details = _imcc_activity_coefficient_reports(
+        redox.parent_oxide_activities, composition
+    )
+
+    assert len(calls) == 3
+    assert {
+        component: row["value"].hex()
+        for component, row in evaluated.activity_coefficients.items()
+    } == {
+        "SiO2": "0x1.3a33d01762066p-1",
+        "MgO": "0x1.902b58c60fe36p-5",
+    }
+    expected_redox = {
+        "SiO2": "0x1.3a33d01762068p-1",
+        "MgO": "0x1.902b58c60fe36p-5",
+    }
+    assert {
+        component: row["value"].hex()
+        for component, row in redox.activity_coefficients.items()
+    } == expected_redox
+    assert {component: value.hex() for component, value in reported_values.items()} == (
+        expected_redox
+    )
+    assert {
+        component: detail["value"].hex()
+        for component, detail in reported_details.items()
+    } == expected_redox
+
+
 def test_single_cation_gamma_ideal_pure_oxide_limit() -> None:
     _openimcc_or_skip()
     result = bridge_evaluate(

@@ -9695,6 +9695,13 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         first, second = references[0], references[-1]
         first_prediction = score._hashimoto_residue_prediction(context, first, engine, cache)
         second_prediction = score._hashimoto_residue_prediction(context, second, engine, cache)
+        if engine is Engine.OPENIMCC:
+            from simulator.battery.source_lineage import openimcc_pack_identity_sources
+            from simulator.melt_backend.openimcc_bridge import openimcc_pack_identity
+
+            assert set(openimcc_pack_identity_sources(openimcc_pack_identity())) <= set(
+                first_prediction.coefficient_sources
+            )
         assert first_prediction.execution.state is ExecutionState.PRODUCED, first_prediction.refusal_detail
         assert second_prediction.execution.state is ExecutionState.PRODUCED
         assert first_prediction.value != second_prediction.value

@@ -381,6 +381,12 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     assert prediction.execution.state.value == "produced"
     assert prediction.value == 900.0
     assert prediction.identity == manganese.identity
+    from simulator.battery.source_lineage import openimcc_pack_identity_sources
+    from simulator.melt_backend.openimcc_bridge import openimcc_pack_identity
+
+    assert set(openimcc_pack_identity_sources(openimcc_pack_identity())) <= set(
+        prediction.coefficient_sources
+    )
     assert any(
         notice.reason == "bc_open_furnace_langmuir_limit_diagnostic"
         for notice in prediction.notices

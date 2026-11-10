@@ -904,3 +904,65 @@ def test_hashimoto_nonconvergence_is_partial_per_run_and_cohort_continues(
     )
     assert len(per_run_results) == 2
     assert per_run_results[1][3] is None
+
+
+def test_hashimoto_al_sio_interim_channel_debits_both_parents_and_closes_atoms() -> None:
+    from simulator.battery.residue import ResidueChannel, integrate_residue_inventory
+
+    initial = {"Al2O3": 0.2, "SiO2": 0.4}
+    result = integrate_residue_inventory(
+        initial,
+        (ResidueChannel("AlSiO", "AlSiO", "Al2O3", 1.0, "interim SiO alpha"),),
+        lambda _inventory, _logp: {"AlSiO": 10.0},
+        temperature_K=1800.0,
+        duration_s=10.0,
+        area_evolution_m2=(1.0,),
+        buffered_fO2_log=-10.0,
+    )
+
+    product_mol = result.evaporated_mol["AlSiO"]
+    assert product_mol > 0.0
+    assert result.residue_mol["Al2O3"] == pytest.approx(
+        initial["Al2O3"] - 0.5 * product_mol, rel=1.0e-12
+    )
+    assert result.residue_mol["SiO2"] == pytest.approx(
+        initial["SiO2"] - product_mol, rel=1.0e-12
+    )
+    for element in ("Al", "Si", "O"):
+        assert result.atom_closure_mol[element] == pytest.approx(0.0, abs=1.0e-12)
+
+
+def test_hashimoto_al_sio_omitting_alumina_debit_fails_atom_closure() -> None:
+    from simulator.battery.residue import (
+        ResidueChannel,
+        ResidueInventoryRefusal,
+        _atom_totals,
+        _residue_atom_closure,
+        integrate_residue_inventory,
+    )
+
+    initial = {"Al2O3": 0.2, "SiO2": 0.4}
+    result = integrate_residue_inventory(
+        initial,
+        (ResidueChannel("AlSiO", "AlSiO", "Al2O3", 1.0, "interim SiO alpha"),),
+        lambda _inventory, _logp: {"AlSiO": 10.0},
+        temperature_K=1800.0,
+        duration_s=10.0,
+        area_evolution_m2=(1.0,),
+        buffered_fO2_log=-10.0,
+    )
+    product_mol = result.evaporated_mol["AlSiO"]
+    mutated_residue = dict(result.residue_mol)
+    mutated_residue["Al2O3"] += 0.5 * product_mol
+    initial_atoms = _atom_totals(initial, {})
+    mutated_final_atoms = _atom_totals(mutated_residue, result.evaporated_mol)
+
+    with pytest.raises(ResidueInventoryRefusal) as exc_info:
+        _residue_atom_closure(
+            initial_atoms,
+            mutated_final_atoms,
+            result.buffer_oxygen_exchange_mol,
+        )
+
+    assert exc_info.value.reason == "residue_atom_balance_failed"
+    assert "Al atom residual" in exc_info.value.detail
