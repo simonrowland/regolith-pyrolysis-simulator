@@ -7,6 +7,7 @@ import threading
 import zlib
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -165,6 +166,215 @@ def test_raw_key_hot_json_cold_compression_and_exact_round_trip(
             "SELECT value FROM engine_outputs_cold WHERE key=?", (digest,)
         ).fetchone()[0]
     assert pickle.loads(zlib.decompress(cold_value)) == cold
+
+
+def test_sqlite_hit_populates_bounded_memory_cache_and_next_hit_skips_sqlite(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    _engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+    request = {"temperature_K": 1700.0, "call": "evaluate"}
+
+    assert engine_cache.cached_engine_call(
+        "openimcc", request, lambda: {"answer": 7}
+    ) == {"answer": 7}
+    engine_cache._MEMORY_CACHE.clear()
+    assert engine_cache.cached_engine_call(
+        "openimcc", request, lambda: pytest.fail("expected SQLite hit")
+    ) == {"answer": 7}
+
+    def sqlite_is_not_touched(*_args: Any, **_kwargs: Any) -> Any:
+        pytest.fail("memory-cache hit reached SQLite")
+
+    monkeypatch.setattr(engine_cache, "_connect", sqlite_is_not_touched)
+    assert engine_cache.cached_engine_call(
+        "openimcc", request, lambda: pytest.fail("expected memory hit")
+    ) == {"answer": 7}
+    assert len(engine_cache._MEMORY_CACHE) == 1
+    assert len(engine_cache._MEMORY_CACHE) <= engine_cache._MEMORY_CACHE_MAXSIZE
+
+
+def test_memory_hit_does_not_compute_runtime_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    engine_cache._MEMORY_CACHE.clear()
+    request = {"call": "evaluate_redox", "pack": "default"}
+    assert engine_cache.cached_engine_call("openimcc", request, lambda: {"ok": 1}) == {
+        "ok": 1
+    }
+    monkeypatch.setattr(
+        engine_cache,
+        "runtime_identity",
+        lambda _engine: pytest.fail("hit path computed runtime identity"),
+    )
+    assert engine_cache.cached_engine_call(
+        "openimcc", request, lambda: pytest.fail("expected cached result")
+    ) == {"ok": 1}
+
+
+def test_recursive_simple_namespace_hot_value_round_trips_without_projection(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    _engine_cache_counters(reset=True)
+    expected = SimpleNamespace(
+        vapor_pressures_Pa={"Na(g)": 0.0},
+        diagnostics=SimpleNamespace(
+            vapor_pressure_diagnostic={
+                "below_reporting_threshold_omissions": {
+                    "Na": {"computed_pressure_Pa": 0.25, "reporting_threshold_Pa": 1.0}
+                }
+            }
+        ),
+    )
+
+    cold = engine_cache.cached_engine_call(
+        "internal-analytical", {"call": "residue"}, lambda: expected
+    )
+    warm = engine_cache.cached_engine_call(
+        "internal-analytical",
+        {"call": "residue"},
+        lambda: pytest.fail("expected recursive namespace cache hit"),
+    )
+
+    assert cold == expected
+    assert warm == expected
+    assert isinstance(warm, SimpleNamespace)
+    assert isinstance(warm.diagnostics, SimpleNamespace)
+    assert _engine_cache_counters(reset=True)["internal-analytical"] == {
+        "hits": 1,
+        "misses": 1,
+        "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
+    }
+
+
+def test_openimcc_chemistry_version_change_with_same_pack_name_is_a_miss(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    _engine_cache_counters(reset=True)
+    monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, "openimcc", 1)
+    request = {
+        "call": "evaluate_gas",
+        "pack": "default",
+    }
+    calls = 0
+
+    def solve() -> dict[str, str]:
+        nonlocal calls
+        calls += 1
+        return {"chemistry_version": str(engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"])}
+
+    first = engine_cache.cached_engine_call("openimcc", request, solve)
+    monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, "openimcc", 2)
+    second = engine_cache.cached_engine_call("openimcc", request, solve)
+
+    assert first == {"chemistry_version": "1"}
+    assert second == {"chemistry_version": "2"}
+    assert calls == 2
+
+
+def test_every_chemistry_version_has_changelog_and_runtime_identity() -> None:
+    import re
+
+    source = Path(engine_cache.__file__).read_text(encoding="utf-8")
+    changelog = {
+        (engine, int(version))
+        for engine, version in re.findall(
+            r"^\s*#\s*(\S+) v(\d+):", source, re.MULTILINE
+        )
+    }
+    assert all(
+        (engine, version) in changelog
+        for engine, version in engine_cache.ENGINE_CHEMISTRY_VERSION.items()
+    )
+    assert set(engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT) == set(
+        engine_cache.ENGINE_CHEMISTRY_VERSION
+    )
+    assert all(
+        set(engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT[engine])
+        == {"identity", "date"}
+        for engine in engine_cache.ENGINE_CHEMISTRY_VERSION
+    )
+
+
+def test_stale_runtime_warns_once_without_changing_hits_or_results(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    _engine_cache_counters(reset=True)
+    engine_cache.runtime_identity.cache_clear()
+    monkeypatch.setattr(engine_cache, "_compute_runtime_identity", lambda _engine: "new")
+    monkeypatch.setitem(
+        engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT,
+        "openimcc",
+        {"identity": "old", "date": "2026-11-08"},
+    )
+    calls = 0
+
+    def solve() -> dict[str, int]:
+        nonlocal calls
+        calls += 1
+        return {"answer": 42}
+
+    with caplog.at_level("WARNING", logger=engine_cache.__name__):
+        first = engine_cache.cached_engine_call(
+            "openimcc", {"call": "evaluate", "pack": "default"}, solve
+        )
+        second = engine_cache.cached_engine_call(
+            "openimcc", {"call": "evaluate", "pack": "default"}, solve
+        )
+
+    warnings = [
+        record.getMessage()
+        for record in caplog.records
+        if "engine cache:" in record.getMessage()
+    ]
+    assert first == second == {"answer": 42}
+    assert calls == 1
+    assert len(warnings) == 1
+    assert _engine_cache_counters(reset=True)["openimcc"] == {
+        "hits": 1,
+        "misses": 1,
+        "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
+    }
+
+
+def test_runtime_identity_is_computed_once_per_engine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from collections import Counter
+
+    engine_cache.runtime_identity.cache_clear()
+    calls: Counter[str] = Counter()
+
+    def compute(engine_id: str) -> str:
+        calls[engine_id] += 1
+        return f"identity:{engine_id}"
+
+    monkeypatch.setattr(engine_cache, "_compute_runtime_identity", compute)
+    for engine_id in engine_cache.ENGINE_CHEMISTRY_VERSION:
+        for _ in range(5):
+            assert engine_cache.runtime_identity(engine_id) == f"identity:{engine_id}"
+    assert calls == Counter(dict.fromkeys(engine_cache.ENGINE_CHEMISTRY_VERSION, 1))
 
 
 def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
