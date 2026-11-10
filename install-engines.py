@@ -396,9 +396,22 @@ def verify(python: Path, lock: EngineLock, root: Path) -> None:
     if checkout_matches_pin(
         magemin_pin, engine_install_path(lock, root, "magemin")
     ) and magemin.exists():
-        proc = subprocess.run(
-            [str(magemin), "--version"], capture_output=True, text=True
+        from simulator.melt_backend.alphamelts import (
+            _run_alphamelts_subprocess,
         )
+        from simulator.melt_backend.magemin import (
+            _magemin_subprocess_env,
+            _magemin_subprocess_slot,
+        )
+
+        with _magemin_subprocess_slot(30):
+            proc = _run_alphamelts_subprocess(
+                [str(magemin), "--version"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                env=_magemin_subprocess_env(),
+            )
         out = (proc.stdout or proc.stderr).strip().splitlines()
         _record(f"MAGEMin: runs ({out[0] if out else 'no version output'})")
     else:

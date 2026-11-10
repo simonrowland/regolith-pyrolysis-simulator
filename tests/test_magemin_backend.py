@@ -53,6 +53,8 @@ from simulator.melt_backend.magemin import (
     MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
     MAGEMIN_WARM_CALL_TIMEOUT_S,
     MAGEMinBackend,
+    _magemin_subprocess_env,
+    _magemin_subprocess_slot,
 )
 
 # Thread-rendezvous guards throughout this module: these bound a HANG, they do
@@ -3358,17 +3360,22 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
         f"--buffer_n={buffer_n:.6f}",
         "--out_matlab=1",
     ]
-    with tempfile.TemporaryDirectory() as tmpdir:
-        completed = subprocess.run(
-            direct_args,
-            cwd=tmpdir,
-            capture_output=True,
-            text=True,
-            timeout=20.0,
-            check=False,
-        )
-        assert completed.returncode == 0, completed.stderr
-        matlab_text = (Path(tmpdir) / "output" / "_matlab_output.txt").read_text()
+    from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
+
+    with _magemin_subprocess_slot(20.0):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            completed = _run_alphamelts_subprocess(
+                direct_args,
+                cwd=tmpdir,
+                capture_output=True,
+                text=True,
+                timeout=20.0,
+                env=_magemin_subprocess_env(),
+            )
+            assert completed.returncode == 0, completed.stderr
+            matlab_text = (
+                Path(tmpdir) / "output" / "_matlab_output.txt"
+            ).read_text()
 
     direct_fields = backend._parse_subprocess_native_activities(matlab_text)
     for formula, field in (("MgO", "aMgO"), ("SiO2", "aSiO2")):
@@ -3549,24 +3556,29 @@ def _run_magemin_gam_o(binary: Path, *, buffer_n: float) -> float:
     """
     # Basalt analog (matches the live-smoke test) with O set nonzero.
     bulk = "49,14,11,9,10.899810,0.8,2.5,1.5,1.0,0.2,0"
-    completed = subprocess.run(  # noqa: S603 - args are test-built constants
-        [
-            str(binary),
-            "--Verb=2",
-            "--db=ig",
-            "--Temp=1200.0",
-            "--Pres=2.0",
-            "--sys_in=wt",
-            f"--Bulk={bulk}",
-            "--buffer=qfm",
-            f"--buffer_n={buffer_n:.6f}",
-        ],
-        cwd=str(binary.parent),
-        capture_output=True,
-        text=True,
-        timeout=120,
-        check=True,
-    )
+    from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
+
+    with _magemin_subprocess_slot(120):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            completed = _run_alphamelts_subprocess(
+                [
+                    str(binary),
+                    "--Verb=2",
+                    "--db=ig",
+                    "--Temp=1200.0",
+                    "--Pres=2.0",
+                    "--sys_in=wt",
+                    f"--Bulk={bulk}",
+                    "--buffer=qfm",
+                    f"--buffer_n={buffer_n:.6f}",
+                ],
+                cwd=tmpdir,
+                capture_output=True,
+                text=True,
+                timeout=120,
+                env=_magemin_subprocess_env(),
+            )
+    assert completed.returncode == 0, completed.stderr
     match = re.search(r"GAM = \[([^\]]+)\]", completed.stdout)
     assert match, f"no GAM vector in MAGEMin stdout:\n{completed.stdout}"
     gam = [float(x) for x in match.group(1).split(",")]
@@ -3604,24 +3616,31 @@ def _run_magemin_adapter_buffer_probe(
         temperature_C=temperature_C,
         fO2_log=fO2_log,
     )
-    completed = subprocess.run(  # noqa: S603 - args are test-built constants
-        [
-            str(binary),
-            "--Verb=2",
-            f"--db={backend._database}",
-            f"--Temp={temperature_C:.6f}",
-            f"--Pres={pressure_kbar:.6f}",
-            "--sys_in=wt",
-            "--Bulk=" + ",".join(f"{value:.6f}" for value in bulk),
-            f"--buffer={buffer_name}",
-            f"--buffer_n={buffer_n:.6f}",
-        ],
-        cwd=str(binary.parent),
-        capture_output=True,
-        text=True,
-        timeout=120,
-        check=True,
-    )
+    from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
+
+    with _magemin_subprocess_slot(120):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            completed = _run_alphamelts_subprocess(
+                [
+                    str(binary),
+                    "--Verb=2",
+                    f"--db={backend._database}",
+                    f"--Temp={temperature_C:.6f}",
+                    f"--Pres={pressure_kbar:.6f}",
+                    "--sys_in=wt",
+                    "--Bulk=" + ",".join(
+                        f"{value:.6f}" for value in bulk
+                    ),
+                    f"--buffer={buffer_name}",
+                    f"--buffer_n={buffer_n:.6f}",
+                ],
+                cwd=tmpdir,
+                capture_output=True,
+                text=True,
+                timeout=120,
+                env=_magemin_subprocess_env(),
+            )
+    assert completed.returncode == 0, completed.stderr
     gam_match = re.search(r"GAM = \[([^\]]+)\]", completed.stdout)
     assert gam_match, f"no GAM vector in MAGEMin stdout:\n{completed.stdout}"
     gam = [float(x) for x in gam_match.group(1).split(",")]
