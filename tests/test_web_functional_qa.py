@@ -270,6 +270,11 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         )
         predictions = oxygen_flag["class_predictions"]
         assert any(row["class"] == "B" for row in predictions)
+        sio = next(
+            row for row in predictions
+            if row["class"] == "B" and row["species"] == "SiO"
+        )
+        assert "activity is present but its evidence link is missing" in sio["reason"]
         class_c = next(
             row for row in predictions
             if row["class"] == "C" and row["species"] == "MnO_gas"
