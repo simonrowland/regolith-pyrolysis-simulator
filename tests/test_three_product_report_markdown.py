@@ -285,7 +285,7 @@ def test_non_silica_availability_flag_renders_from_availability_field():
     assert "reason=provider pressure was below its reporting floor" in report
 
 
-def test_flagged_zero_oxygen_renders_d364_notice_in_runner_report():
+def test_flagged_zero_oxygen_renders_d367_notice_in_runner_report():
     classification = _empty_classification()
     classification["metals_plus_O2"].update({
         "class_total_kg": 0.0,
@@ -300,22 +300,16 @@ def test_flagged_zero_oxygen_renders_d364_notice_in_runner_report():
             "authority_level": "extrapolated",
             "band": "d-359 B/C/E follow-ups pending",
             "reason": (
-                "0.0 kg O₂ is the direct O₂-ledger total; no stored, vented, "
-                "or captured molecular O₂ was recorded. The associated "
-                "B/C/E oxide-vapor predictions are incomplete and are not "
-                "counted as shipped O₂. "
-                "Class B activity ladder refusals: SiO: missing_evidence "
-                "(no assemblage/potential evidence; Henrian upper bound "
-                "disabled); do not treat a=1 as a bound when gamma>1; use "
-                "provider activity, then published gamma*x, then "
-                "ideal-mixing a=x marked ideal_mixing_assumption. Class C "
-                "out-of-domain refusal: MnO_gas: "
-                "outside_declared_evaluator_domain at 313.15 K; certified "
-                "band [1519.0, 2273.15] K; flagged continuation remains pending. "
-                "Class E P species refusals: P4O10/P4O6/PO/PO2: stage0_only "
-                "predicate inactive outside Stage 0 while P2O5 is present; "
-                "phase-independent K remains pending. Pending d-359 "
-                "follow-ups: B, C, E."
+                "The shipped molecular-O₂ ledger total is 0.0 kg; B/C/E "
+                "interim estimates remain non-authoritative and pending their "
+                "follow-ups. Class B activity ladder: SiO uses provider "
+                "activity 0.436 with its evidence link missing; the ladder "
+                "continues through published gamma*x and ideal a=x with "
+                "ideal_mixing_assumption. Class C: MnO_gas uses a conservative "
+                "continuation outside its certified [1519, 2273.15] K band, "
+                "with extrapolated authority. Class E: P4O10/P4O6/PO/PO2 use "
+                "phase-independent K because P2O5 inventory is present. "
+                "Pending d-359 follow-ups: B, C, E."
             ),
         },
     })
@@ -326,19 +320,15 @@ def test_flagged_zero_oxygen_renders_d364_notice_in_runner_report():
         "- Availability flag: status=flagged prediction; "
         "category=3; kind=predict_and_flag; authority=extrapolated; "
         "authority_level=extrapolated; band=d-359 B/C/E follow-ups pending; "
-        "reason=0.0 kg O₂ is the direct O₂-ledger "
-        "total; no stored, vented, or captured molecular O₂ was recorded. "
-        "The associated B/C/E oxide-vapor predictions are incomplete and "
-        "are not counted as shipped O₂. Class B activity ladder refusals: "
-        "SiO: missing_evidence (no assemblage/potential evidence; Henrian "
-        "upper bound disabled); do not treat a=1 as a bound when gamma>1; "
-        "use provider activity, then published gamma*x, then ideal-mixing "
-        "a=x marked ideal_mixing_assumption. Class C out-of-domain refusal: "
-        "MnO_gas: outside_declared_evaluator_domain at 313.15 K; certified "
-        "band [1519.0, 2273.15] K; flagged continuation remains pending. "
-        "Class E P species refusals: P4O10/P4O6/PO/PO2: stage0_only predicate "
-        "inactive outside Stage 0 while P2O5 is present; phase-independent "
-        "K remains pending. Pending d-359 follow-ups: B, C, E."
+        "reason=The shipped molecular-O₂ ledger total is 0.0 kg; B/C/E "
+        "interim estimates remain non-authoritative and pending their "
+        "follow-ups. Class B activity ladder: SiO uses provider activity "
+        "0.436 with its evidence link missing; the ladder continues through "
+        "published gamma*x and ideal a=x with ideal_mixing_assumption. "
+        "Class C: MnO_gas uses a conservative continuation outside its "
+        "certified [1519, 2273.15] K band, with extrapolated authority. "
+        "Class E: P4O10/P4O6/PO/PO2 use phase-independent K because P2O5 "
+        "inventory is present. Pending d-359 follow-ups: B, C, E."
     ) in report
 
 
