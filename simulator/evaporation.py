@@ -17,6 +17,7 @@ from simulator.chemistry.kernel import (
     ChemistryIntent,
     ProviderUnavailableError,
 )
+from simulator.composition_projection import PROJECTED_BULK_CLASSIFICATION_KEY
 from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
@@ -1975,6 +1976,18 @@ class EvaporationMixin:
                 'per-component mass fraction'
             )
             return None
+        classification = notice.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+        if (
+            isinstance(classification, Mapping)
+            and classification.get('projection_verdict') == 'over_threshold'
+        ):
+            reasons.append(
+                f'{source} composition_projected classifier veto: '
+                f"{classification['dropped_total_wt_pct']:g} wt% exceeds "
+                f"{classification['threshold_wt_pct']:g} wt%"
+            )
+            self._stash_invalid_projected_liquidus_notice(notice)
+            return None
         projected_source = f'{source}:composition_projected'
         curve = None
         inconsistent = False
@@ -2085,6 +2098,11 @@ class EvaporationMixin:
                 if isinstance(row, Mapping)
             ],
         }
+        classification = notice.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+        if isinstance(classification, Mapping):
+            self._invalid_projected_liquidus_notice[
+                PROJECTED_BULK_CLASSIFICATION_KEY
+            ] = dict(classification)
 
     def _invalid_projection_bounds_notice(
         self,
@@ -2108,6 +2126,11 @@ class EvaporationMixin:
             'bounds_source': bounds_source,
             'projected_bounds': 'invalid',
         }
+        classification = notice.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+        if isinstance(classification, Mapping):
+            annotated[PROJECTED_BULK_CLASSIFICATION_KEY] = dict(
+                classification
+            )
         if bounds_source != _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE:
             return annotated
         # Frozen at and below 1200 C. That limb is the below-1200 C
@@ -3040,6 +3063,33 @@ class EvaporationMixin:
             )
             if projected is not None:
                 return self._remember_freeze_gate_provider_curve(projected)
+            invalid_notice = getattr(
+                self, '_invalid_projected_liquidus_notice', None,
+            )
+            classification = (
+                invalid_notice.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+                if isinstance(invalid_notice, Mapping)
+                else None
+            )
+            if (
+                isinstance(classification, Mapping)
+                and classification.get('projection_verdict')
+                == 'over_threshold'
+            ):
+                held = self._hold_freeze_gate_provider_curve({
+                    'provider': self._liquid_fraction_provider,
+                    'status': status,
+                    'outcome': status_outcome,
+                    'provider_diagnostic': diagnostic,
+                })
+                if held is not None:
+                    held['composition_projected_notice'] = (
+                        self._invalid_projection_bounds_notice(
+                            invalid_notice,
+                            bounds_source=str(held.get('source') or ''),
+                        )
+                    )
+                    return held
             if _diagnostic_names_composition_projected(diagnostic):
                 if not any(
                     'composition_projected' in reason for reason in reasons

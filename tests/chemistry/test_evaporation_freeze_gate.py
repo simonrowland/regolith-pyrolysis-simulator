@@ -701,7 +701,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((1018.75, 0.0), (1320.3125, 1.0)),
             ),
         ],
-        # Executable capture: 12 hours, six hour-local curve reads per hour.
+        # The >1 wt% projection is rejected once; its Kress floor is reused.
         'ci_carbonaceous_chondrite_C2B_12h': [
             (
                 'C2B',
@@ -710,7 +710,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 1200.000001,
                 ((1200.0, 0.0), (1200.000001, 1.0)),
             ),
-        ] * 72,
+        ],
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
@@ -727,12 +727,12 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             return record
         curve = record['curve']
         if current_scenario[0] == 'ci_carbonaceous_chondrite_C2B_12h':
-            notice = curve['gate_provider_refusal']
-            assert notice['authority'] == 'extrapolated (lower-rung)'
-            assert notice['outcome'] == 'numerical_failure'
-            assert notice['provider_diagnostic']['backend_diagnostics'][
-                'projected_liquidus_status'
-            ] in {'unavailable', 'not_converged'}
+            notice = curve['composition_projected_notice']
+            classification = notice['composition_projection_classification']
+            assert classification['projection_verdict'] == 'over_threshold'
+            assert sim._freeze_gate_provider_outcome is (
+                GateCurveProviderOutcome.STABLE_REFUSAL
+            )
         row = (
             sim.melt.campaign.name,
             curve['source'],
@@ -774,7 +774,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             assert result['status'] == 'ok'
             artifact = build_run_artifact(result, run_id='ci-first-call-floor')
             assert len(artifact['timesteps']) == scenario['hours']
-            assert rebuild_counts.get(name, 0) == 0
+            assert rebuild_counts.get(name, 0) == 1
             assert equilibrium_count[0] > equilibrations_before
 
     assert observed == expected
@@ -1984,6 +1984,72 @@ def _lunar_composition_projected_diagnostic(sim):
     notice = composition_projected_liquidus_notice(diagnostic)
     assert notice is not None
     return diagnostic, notice
+
+
+@pytest.mark.parametrize('held', [False, True])
+def test_over_limit_projection_uses_hold_or_kress_floor(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    held,
+):
+    from simulator.melt_backend.magemin import (
+        MAGEMinBackend,
+        _magemin_bulk_projection_details,
+    )
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    if held:
+        sim._remember_freeze_gate_provider_curve({
+            'source': 'gate_liquid_fraction',
+            'solidus_T_C': 1200.0,
+            'liquidus_T_C': 1500.0,
+            'path': ((1200.0, 0.0), (1500.0, 1.0)),
+        })
+    projection = MAGEMinBackend()._build_db_bulk_projection({
+        'SiO2': 85.0,
+        'Al2O3': 10.0,
+        'CaO': 3.0,
+        'MnO': 2.0,
+    })
+    diagnostic = {
+        'backend_status': 'out_of_domain',
+        'backend_status_reason': 'composition_projected',
+        'input_composition_projection': _magemin_bulk_projection_details(
+            projection
+        ),
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1100.0,
+    }
+
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *args, **kwargs: SimpleNamespace(
+            status='out_of_domain',
+            warnings=(),
+            diagnostic=diagnostic,
+        ),
+    )
+    curve = sim._melt_redox_liquidus_gate_curve()
+
+    notice = curve['composition_projected_notice']
+    assert notice['composition_projection_classification'][
+        'projection_verdict'
+    ] == 'over_threshold'
+    if held:
+        assert curve['path'] == ((1200.0, 0.0), (1500.0, 1.0))
+        assert curve['gate_provider_refusal']['qualification'] == (
+            'held_last_good_curve'
+        )
+    else:
+        assert curve['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
 
 
 def test_lunar_composition_projected_does_not_arm_floor_fallback(
