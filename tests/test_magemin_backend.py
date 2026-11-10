@@ -1563,7 +1563,7 @@ def test_magemin_object_negative_convergence_discards_phase_rows(monkeypatch):
 
 @pytest.mark.parametrize(
     'mode_line',
-    ['0.8 bad', '0.8 nan', '0.8 -0.2', '0.8 1.2'],
+    ['0.8 bad', '0.8 nan', '0.8 -0.2', '0.8 1.0002', '0.8 1.2'],
 )
 def test_magemin_subprocess_parser_rejects_any_invalid_mode_token(mode_line):
     from simulator.melt_backend.magemin import _MAGEMinEngineCallError
@@ -1575,14 +1575,53 @@ def test_magemin_subprocess_parser_rejects_any_invalid_mode_token(mode_line):
     assert raised.value.exception_type == 'MAGEMinOutputError'
 
 
-def test_magemin_subprocess_parser_rejects_nonunit_mode_vector():
+def test_magemin_subprocess_parser_clamps_rounding_excess_with_warning(
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        'simulator.melt_backend.magemin.subprocess.run',
+        lambda args, **_kwargs: subprocess.CompletedProcess(
+            args, 0, stdout='Phase: liq\nMode: 1.00003\n', stderr='',
+        ),
+    )
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        pressure_bar=1.0,
+        fO2_log=-8.0,
+    )
+
+    assert result.status == 'ok'
+    assert result.phase_masses_kg['liq'] == pytest.approx(1.0)
+    assert result.diagnostics['magemin_mode_token_notices'] == [{
+        'type': 'typed_notice',
+        'kind': 'magemin_mode_token_clamped',
+        'phase': 'liq',
+        'raw_token': '1.00003',
+        'clamped_fraction': 1.0,
+        'abs_tolerance': 1.0e-4,
+    }]
+    assert any(
+        'clamped to 1.0' in warning
+        and "raw token: '1.00003'" in warning
+        for warning in result.warnings
+    )
+
+
+@pytest.mark.parametrize('mode_line', ['0.8 0.8', '0.5 0.50011'])
+def test_magemin_subprocess_parser_rejects_nonunit_mode_vector(mode_line):
     from simulator.melt_backend.magemin import _MAGEMinEngineCallError
 
     with pytest.raises(
         _MAGEMinEngineCallError, match='Mode vector must sum to 1.0'
     ) as raised:
         MAGEMinBackend._parse_subprocess_stdout(
-            'Phase: liq ol\nMode: 0.8 0.8\n'
+            f'Phase: liq ol\nMode: {mode_line}\n'
         )
     assert raised.value.exception_type == 'MAGEMinOutputError'
 
@@ -2884,7 +2923,7 @@ def test_magemin_equilibrate_parser_local_defect_propagates(
     backend._bridge = 'subprocess'
     backend._binary_path = Path('/fake/MAGEMin')
 
-    def broken_parser(_stdout):
+    def broken_parser(_stdout, **_kwargs):
         raise local_error('local MAGEMin parser defect')
 
     monkeypatch.setattr(backend, '_parse_subprocess_stdout', broken_parser)
@@ -2911,7 +2950,7 @@ def test_magemin_subprocess_parser_value_error_propagates(monkeypatch):
         ),
     )
 
-    def broken_parser(_stdout):
+    def broken_parser(_stdout, **_kwargs):
         raise ValueError('local MAGEMin parser defect')
 
     monkeypatch.setattr(backend, '_parse_subprocess_stdout', broken_parser)
