@@ -238,6 +238,8 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
     assert web_story["captured_volatiles"]["species_kg"] == {}
     assert runner["captured_volatiles"]["kg_by_species"] == {}
     if feedstock == "lunar_mare_low_ti":
+        # d-367: the terminal zero partition is not a computed shipped-O₂
+        # class total when every product contribution was refused.
         oxygen_partition = sim._oxygen_terminal_partition_kg()
         assert expected_oxygen_kg == 0.0
         assert oxygen_partition["total"] == 0.0
@@ -908,7 +910,12 @@ def test_headless_full_run_ledgers_and_product_story_web(
         "off_spec_condensate",
     ):
         rendered_mass = _display_mass(story[key]["class_total_kg"])
-        assert f"class total kg: {rendered_mass} kg" in text
+        rendered_total = (
+            f"class total kg: {rendered_mass}"
+            if story[key]["class_total_kg"] is None
+            else f"class total kg: {rendered_mass} kg"
+        )
+        assert rendered_total in text
     assert f"feedstock label: {sim.record.feedstock_label} kg" not in text
 
     empty_story_payload = dict(completion)

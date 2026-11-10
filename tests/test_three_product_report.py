@@ -451,6 +451,8 @@ def test_refused_zero_flux_without_computed_parts_is_unavailable():
         'captured_volatiles',
     ):
         bucket = result[bucket_name]
+        # d-367: these classes have no computed parts, so their earlier
+        # empty-sum zeroes are not numeric product totals.
         assert bucket['class_total_kg'] is None, bucket_name
         assert bucket['status'] == 'unavailable', bucket_name
         flag = bucket.get('availability_flag') or bucket.get('flag')
