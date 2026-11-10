@@ -158,6 +158,22 @@ def _engine_models():
     openimcc_channels, _ = _openimcc_gas_channels_and_omission_notices(
         openimcc_state.parent_oxides, gas_pack
     )
+    openimcc_reference_pressures = evaluate_gas(
+        openimcc_state.parent_oxide_activities,
+        temperature_K,
+        1.0,
+        gas_pack,
+        parent_oxides=openimcc_state.parent_oxides,
+        allow_extrapolation=True,
+    )
+    openimcc_lower_pressures = evaluate_gas(
+        openimcc_state.parent_oxide_activities,
+        temperature_K,
+        0.1,
+        gas_pack,
+        parent_oxides=openimcc_state.parent_oxides,
+        allow_extrapolation=True,
+    )
     openimcc_channel_rows: list[_VacuumOxygenChannel] = []
     for species, (parent, _gas_molecules, _oxygen_molecules) in openimcc_channels:
         if species in {"O", "O2"}:
@@ -181,6 +197,16 @@ def _engine_models():
         channel = _species_metadata(
             species, parent or None, alpha=_OXYGEN_GAS_ALPHA
         )
+        if species in {"Si2O2", "AlSiO"}:
+            # These channels borrow SiO's alpha, but their pO2 law comes from
+            # OpenIMCC's own gas resolver rather than the SiO catalog row.
+            reference_pressure = float(openimcc_reference_pressures[species])
+            lower_pressure = float(openimcc_lower_pressures[species])
+            channel = replace(
+                channel,
+                pO2_exponent=math.log10(lower_pressure / reference_pressure)
+                / math.log10(0.1),
+            )
         openimcc_channel_rows.append(
             replace(
                 channel,
