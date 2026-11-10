@@ -5117,14 +5117,15 @@ def test_fidelity_source_warning_ratchet():
 
 def _opened_payload_document(root: Path, *, structured: bool) -> dict:
     """One scored observation whose pin is in an opened text artifact."""
-    artifact = root / "paper.txt"
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
     artifact.write_text(
         "line 1\nline 2\nline 3\nline 4\nalpha 0.24 measured\n",
         encoding="utf-8",
     )
     doc = _minimal_extract()
     doc["review_status"] = "reviewed"
-    locator = {"source_path": "paper.txt", "line_range": "5-5", "page": 2}
+    locator = {"source_path": "text/paper.txt", "line_range": "5-5", "page": 2}
     if structured:
         doc["fidelity_samples"] = [
             {
@@ -5166,8 +5167,10 @@ def _defect_document(pin_class: str, root: Path) -> dict:
         sample["observable"] = "apparatus"
         sample["field"] = "furnace"
         sample["value"] = "muffle"
-        sample["locator"] = {"source_path": "paper.txt", "page": 3}
-        (root / "paper.txt").write_text("muffle\n", encoding="utf-8")
+        sample["locator"] = {"source_path": "text/paper.txt", "page": 3}
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("muffle\n", encoding="utf-8")
         return doc
     doc = _opened_payload_document(root, structured=pin_class == "structured_payload")
     sample = doc["fidelity_samples"][0]
@@ -5185,8 +5188,10 @@ def _defect_document(pin_class: str, root: Path) -> dict:
     if pin_class == "metadata_id":
         sample["path"] = "species.Fe.observations[fe_alpha_1].observation_id"
         sample["value"] = "fe_alpha_1"
-        (root / "paper.txt").write_text("fe_alpha_1\n", encoding="utf-8")
-        sample["locator"] = {"source_path": "paper.txt", "page": 2}
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("fe_alpha_1\n", encoding="utf-8")
+        sample["locator"] = {"source_path": "text/paper.txt", "page": 2}
         return doc
     if pin_class == "numeric_index":
         sample["path"] = "species.Fe.observations[0].values.alpha"
@@ -5219,11 +5224,15 @@ def _defect_document(pin_class: str, root: Path) -> dict:
         sample["locator"] = {"source_path": "missing.txt", "page": 2}
         return doc
     if pin_class == "value_absent":
-        (root / "paper.txt").write_text("line 1\nno numeric payload here\n", encoding="utf-8")
-        sample["locator"] = {"source_path": "paper.txt", "page": 2}
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("line 1\nno numeric payload here\n", encoding="utf-8")
+        sample["locator"] = {"source_path": "text/paper.txt", "page": 2}
         return doc
     if pin_class == "pdf_artifact":
-        (root / "paper.txt").write_bytes(b"%PDF-1.4\nnot text\n")
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_bytes(b"%PDF-1.4\nnot text\n")
         return doc
     if pin_class == "path_escape":
         sample["locator"] = {"source_path": "../paper.txt", "page": 2}
@@ -5244,8 +5253,10 @@ def _defect_document(pin_class: str, root: Path) -> dict:
         ]
         sample["path"] = "species.Fe.context[fe_bench_note].values.furnace"
         sample["value"] = "muffle"
-        (root / "paper.txt").write_text("muffle\n", encoding="utf-8")
-        sample["locator"] = {"source_path": "paper.txt", "page": 3}
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("muffle\n", encoding="utf-8")
+        sample["locator"] = {"source_path": "text/paper.txt", "page": 3}
         return doc
     raise AssertionError(pin_class)
 
@@ -5358,7 +5369,7 @@ def _promotion_errors(entry: str, doc: dict, root: Path, monkeypatch) -> list[st
         return [error for error in errors if "source certification refused" in error]
     if entry == "index":
         literature = root / "data" / "literature" / "extracts"
-        literature.mkdir(parents=True)
+        literature.mkdir(parents=True, exist_ok=True)
         (literature / "fixture-source.yaml").write_text(
             yaml.safe_dump(reviewed), encoding="utf-8"
         )
@@ -5431,6 +5442,256 @@ def test_draft_defects_stay_schema_valid_and_warn(pin_class: str, tmp_path: Path
         doc, label="draft", artifact_root=tmp_path
     )
     assert any(warning.kind == _DEFECT_KIND[pin_class] for warning in warnings)
+
+
+# Literal source text, written independently of the pin. A helper that copies
+# the pin into the artifact cannot show these refusals.
+_TOKEN_CASES = (
+    ("exact_float", 0.24, "alpha 0.24 measured\n", True),
+    ("parens", 0.24, "alpha (0.24)\n", True),
+    ("comma", 0.24, "alpha 0.24, next\n", True),
+    ("leading_minus", 0.24, "alpha -0.24 measured\n", False),
+    ("leading_plus", 0.24, "alpha +0.24 measured\n", False),
+    ("exponent_neg", 0.24, "alpha 0.24e-5 measured\n", False),
+    ("exponent_pos", 0.24, "alpha 0.24E+2 measured\n", False),
+    ("exponent_bare", 0.24, "alpha 0.24e5 measured\n", False),
+    ("longer_prefix", 0.24, "alpha 10.24 measured\n", False),
+    ("longer_suffix", 0.24, "alpha 0.241 measured\n", False),
+    ("glued_ident", 0.24, "alpha x0.24 measured\n", False),
+    ("float_one_against_bare", 1.0, "ratio 1 only\n", False),
+    ("float_one_exact", 1.0, "ratio 1.0 only\n", True),
+    ("float_one_exponent", 1.0, "ratio 1.0e0 only\n", False),
+    ("int_exact", 1, "count 1 sample\n", True),
+    ("int_leading_minus", 1, "count -1 sample\n", False),
+    ("int_exponent", 1, "count 1e-5 sample\n", False),
+    ("int_decimal", 1, "count 1.0 sample\n", False),
+    ("int_longer_prefix", 1, "count 21 sample\n", False),
+    ("int_longer_suffix", 1, "count 10 sample\n", False),
+    ("neg_float_exact", -0.24, "delta -0.24 measured\n", True),
+    ("neg_float_unsigned", -0.24, "delta 0.24 measured\n", False),
+    ("string_exact", "0.24", "alpha 0.24 measured\n", True),
+    ("string_minus", "0.24", "alpha -0.24 measured\n", False),
+    ("string_exponent", "0.24", "alpha 0.24e-5 measured\n", False),
+    ("string_one_against_bare", "1.0", "ratio 1 only\n", False),
+)
+
+
+def _literal_source_document(root: Path, pin: object, source_text: str) -> dict:
+    """One attested pin. ``source_text`` is a literal, not derived from ``pin``."""
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text(source_text, encoding="utf-8")
+    doc = _minimal_extract()
+    doc["review_status"] = "reviewed"
+    doc["species"]["Fe"]["observations"][0]["values"] = {"alpha": pin}
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values.alpha",
+            "value": pin,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": {"source_path": "text/paper.txt", "page": 2},
+        }
+    ]
+    return doc
+
+
+@pytest.mark.parametrize(
+    ("case_name", "pin", "source_text", "accepts"),
+    _TOKEN_CASES,
+    ids=[row[0] for row in _TOKEN_CASES],
+)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_complete_numeric_token_is_required_at_every_promoter(
+    case_name: str,
+    pin: object,
+    source_text: str,
+    accepts: bool,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: sign and exponent belong to the certified token.
+
+    ``0.24`` is not ``-0.24`` or ``0.24e-5``. ``1.0`` is not ``1``. Every
+    promoter calls ``certify_extract_source_fidelity``. Drafts stay
+    schema-valid and carry a typed ``source_blind_pin`` warning.
+    """
+    doc = _literal_source_document(tmp_path, pin, source_text)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    if accepts:
+        assert errors == [], (case_name, entry, errors)
+        return
+    assert errors, (case_name, entry)
+    if entry != "certify":
+        return
+    assert "source_blind_pin" in "\n".join(errors)
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (case_name, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == "source_blind_pin" for warning in warnings)
+
+
+def _artifact_role_document(root: Path, role: str) -> tuple[dict, bool]:
+    """Pin 0.91 against one artifact role. The source text is a literal."""
+    doc = _literal_source_document(root, 0.91, "alpha 0.91 measured\n")
+    sample = doc["fidelity_samples"][0]
+    literal = "alpha 0.91 measured\n"
+
+    def place(relative: str, text: str | None = None, *, binary: bytes | None = None) -> None:
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if binary is not None:
+            path.write_bytes(binary)
+        else:
+            path.write_text(text if text is not None else literal, encoding="utf-8")
+        sample["locator"] = {"source_path": relative, "page": 1}
+
+    if role == "source_text":
+        return doc, True
+    if role == "raw_text":
+        place("raw/paper.txt")
+        return doc, True
+    if role == "corpus_text":
+        place("corpus/paper.txt")
+        return doc, True
+    if role == "supporting_text":
+        place("supporting/note.txt")
+        return doc, True
+    if role == "ocr_text":
+        place("text/fixture-source/mineru/page.md")
+        return doc, True
+    if role == "reference_note":
+        place("docs/references/note.md")
+        return doc, True
+    if role == "quotes_table":
+        place("tables/t1.csv", "alpha,0.91\n")
+        sample["locator"] = {"quotes_path": "tables/t1.csv", "page": 1}
+        return doc, True
+    if role == "extract_self":
+        sample["locator"] = {"source_path": "fixture-source.yaml", "page": 1}
+        (root / "fixture-source.yaml").write_text(
+            yaml.safe_dump(doc), encoding="utf-8"
+        )
+        return doc, False
+    if role == "extract_copy_yaml":
+        place("text/self.yaml", yaml.safe_dump(doc))
+        return doc, False
+    if role == "extract_copy_txt":
+        dumped = yaml.safe_dump(doc)
+        place("text/self.txt", dumped)
+        return doc, False
+    if role == "validator_source":
+        place("tools/validate_literature_extracts.py", "alpha = 0.91\n")
+        return doc, False
+    if role == "gate_source":
+        place("tools/extract_gate.py", "VALUE = 0.91\n")
+        return doc, False
+    if role == "test_module":
+        place("tests/tools/test_extract_gate.py", "ALPHA = 0.91\n")
+        return doc, False
+    if role == "schema_doc":
+        place("data/literature/extracts/SCHEMA.md", "The example alpha is 0.91.\n")
+        return doc, False
+    if role == "implementation_under_source_root":
+        place("docs/references/reader.py", "alpha = 0.91\n")
+        return doc, False
+    if role == "pipeline_yaml":
+        place("docs/references/doi_verification.yaml", "alpha: 0.91\n")
+        return doc, False
+    if role == "companion_table":
+        place(
+            "tables/t1.yaml",
+            yaml.safe_dump(
+                {"schema_version": "literature_extract_table.v1", "alpha": 0.91}
+            ),
+        )
+        return doc, False
+    if role == "path_escapes_into_code":
+        place("tools/validate_literature_extracts.py", "alpha = 0.91\n")
+        sample["locator"] = {
+            "source_path": "text/../tools/validate_literature_extracts.py",
+            "page": 1,
+        }
+        return doc, False
+    raise AssertionError(role)
+
+
+_ARTIFACT_ROLES = (
+    "source_text",
+    "raw_text",
+    "corpus_text",
+    "supporting_text",
+    "ocr_text",
+    "reference_note",
+    "quotes_table",
+    "extract_self",
+    "extract_copy_yaml",
+    "extract_copy_txt",
+    "validator_source",
+    "gate_source",
+    "test_module",
+    "schema_doc",
+    "implementation_under_source_root",
+    "pipeline_yaml",
+    "companion_table",
+    "path_escapes_into_code",
+)
+_ARTIFACT_ROLE_PASS = {
+    "source_text",
+    "raw_text",
+    "corpus_text",
+    "supporting_text",
+    "ocr_text",
+    "reference_note",
+    "quotes_table",
+}
+
+
+@pytest.mark.parametrize("role", _ARTIFACT_ROLES)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_source_artifact_provenance_is_required_at_every_promoter(
+    role: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: the opened file is source evidence, not the extract or the gate.
+
+    Self-reference, a renamed extract, validator source, and a path that
+    normalizes into program source all refuse. Drafts warn ``source_blind_pin``
+    instead of failing schema validation.
+    """
+    doc, accepts = _artifact_role_document(tmp_path, role)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    if accepts:
+        assert errors == [], (role, entry, errors)
+        return
+    assert errors, (role, entry)
+    if entry != "certify":
+        return
+    assert "source_blind_pin" in "\n".join(errors)
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (role, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == "source_blind_pin" for warning in warnings)
+    assert accepts == (role in _ARTIFACT_ROLE_PASS)
 
 
 def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(tmp_path):

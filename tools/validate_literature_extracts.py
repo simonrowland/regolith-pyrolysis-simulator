@@ -24,9 +24,12 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   ``auto_migrated_pilot_pin`` / ``source_blind_pin``). A draft corpus is
   not rejected for those warnings. Promoting the extract
   (``review_status: reviewed``, graduation, load, emit, or the index)
-  refuses while any remain. Certification opens the locator artifact and
-  finds the pinned value there; a recorded locator that is not opened is
-  source-blind. An equipment pin does not cover a measured payload.
+  refuses while any remain. Certification opens a source artifact
+  (paper, OCR, or quotes — not the extract and not program source) and
+  requires each pinned number as a complete token: sign and exponent
+  belong to the token, so 0.24 is not -0.24 or 0.24e-5, and 1.0 is not 1.
+  A recorded locator that is not opened is source-blind. An equipment
+  pin does not cover a measured payload.
 * structured fidelity samples resolve rows in ``observations[]`` or the
   sibling ``context[]`` container (d-032); an id matching rows in both
   containers is an ambiguity error, not a silent pick
@@ -172,6 +175,26 @@ LOCATOR_KEYS = frozenset(
 
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ABS_PATH_RE = re.compile(r"^(/|[A-Za-z]:\\|\\\\)")
+# Sign and exponent are part of one token. The lookbehind also rejects a
+# preceding sign so the match cannot start on the digits of -0.24. The
+# optional exponent group consumes 0.24e-5 whole, so a shorter spelling is
+# not a second match. This is the citation token used by t-1333, kept here
+# so certification does not invent a second numeric grammar.
+_NUMERIC_TOKEN_RE = re.compile(
+    r"(?<![A-Za-z0-9_.+-])[-+]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(?![A-Za-z0-9_.])"
+)
+# Repository-relative roots that hold a paper, OCR, quotes, or a reference
+# transcription. The extract tree and the gate implementation are absent
+# on purpose: a pin must not certify against its own YAML or this file.
+_SOURCE_ARTIFACT_PREFIXES = (
+    "raw/",
+    "corpus/",
+    "text/",
+    "tables/",
+    "supporting/",
+    "docs/references/",
+)
+_PROGRAM_SOURCE_SUFFIXES = frozenset({".py", ".pyi"})
 # path segments: bare key or key[index_or_id]
 _PATH_SEGMENT_RE = re.compile(r"^([^.\[]+)(?:\[([^\]]*)\])?$")
 
@@ -1420,6 +1443,53 @@ def _resolve_artifact(root: Path, raw: str) -> Path | None:
     return resolved
 
 
+def _source_artifact_refusal(root: Path, path: Path) -> str | None:
+    """None only when ``path`` is source evidence, not the gate or an extract.
+
+    Invariant: every certification path opens the artifact here. A file under
+    the extract tree, the validator, or a program-source suffix is not a
+    paper, OCR transcript, or quotes file, even when it contains the pin.
+    """
+    try:
+        relative = path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        return f"{path.name} is outside the repository root"
+    if not any(relative.startswith(prefix) for prefix in _SOURCE_ARTIFACT_PREFIXES):
+        return (
+            f"{relative} is not a source artifact "
+            "(paper, OCR, quotes, or reference transcription)"
+        )
+    if path.suffix.lower() in _PROGRAM_SOURCE_SUFFIXES:
+        return f"{relative} is implementation source, not a source artifact"
+    # Quotes live under tables/. Other YAML is pipeline metadata or an extract
+    # copy parked on a source root.
+    if path.suffix.lower() in {".yaml", ".yml"} and not relative.startswith("tables/"):
+        return f"{relative} is not a source-artifact transcription"
+    return None
+
+
+def _text_is_extract_document(text: str) -> bool:
+    """True when the opened bytes are an extract or companion table.
+
+    A copy renamed into ``text/`` still parses as the extract and would
+    otherwise supply its own pins as source evidence.
+    """
+    head = text[:8192]
+    if (
+        SCHEMA_VERSION not in head
+        and TABLE_SCHEMA_VERSION not in head
+    ):
+        return False
+    try:
+        loaded = yaml.safe_load(text)
+    except yaml.YAMLError:
+        return False
+    return isinstance(loaded, Mapping) and loaded.get("schema_version") in {
+        SCHEMA_VERSION,
+        TABLE_SCHEMA_VERSION,
+    }
+
+
 def _artifact_candidates(locator: Mapping[str, Any], root: Path) -> list[Path]:
     explicit = [
         raw.strip()
@@ -1497,11 +1567,65 @@ def _scalar_leaves(value: Any) -> list[Any]:
     return []
 
 
+def _numeric_spellings(leaf: int | float) -> set[str]:
+    """Spellings whose complete token may certify this number.
+
+    ``format(1.0, ".16g")`` is ``1``. That spelling is dropped: a float keeps
+    a decimal point or an exponent, so 1.0 does not certify against a lone 1.
+    """
+    if isinstance(leaf, int):
+        return {str(leaf)}
+    spellings = {str(leaf), format(leaf, ".16g")}
+    return {
+        spelling
+        for spelling in spellings
+        if "." in spelling or "e" in spelling.lower()
+    }
+
+
+def _spelling_is_complete_token(spelling: str, text: str) -> bool:
+    """True when ``spelling`` is one whole numeric token in ``text``."""
+    return any(
+        match.group(0) == spelling for match in _NUMERIC_TOKEN_RE.finditer(text)
+    )
+
+
+def _string_leaf_in_text(leaf: str, text: str) -> bool:
+    """Substring match that does not slice a numeric token.
+
+    A non-numeric leaf stays a substring. A leaf that contains a number
+    matches only where each of those numbers is the same complete token,
+    so the string ``0.24`` is not ``-0.24`` or ``0.24e-5``.
+    """
+    leaf_tokens = list(_NUMERIC_TOKEN_RE.finditer(leaf))
+    placed: dict[tuple[int, int], str] = {}
+    if leaf_tokens:
+        placed = {
+            (match.start(), match.end()): match.group(0)
+            for match in _NUMERIC_TOKEN_RE.finditer(text)
+        }
+    start = 0
+    while True:
+        index = text.find(leaf, start)
+        if index < 0:
+            return False
+        if not leaf_tokens:
+            return True
+        if all(
+            placed.get((index + token.start(), index + token.end()))
+            == token.group(0)
+            for token in leaf_tokens
+        ):
+            return True
+        start = index + 1
+
+
 def _leaf_in_text(leaf: Any, text: str) -> bool:
     """True when the opened artifact contains this pinned scalar.
 
-    Numeric leaves use a general-format token with digit boundaries, so 0.24
-    does not match 10.24. This is a cited-text grep, not a unit conversion.
+    Numeric leaves match a complete token only. Sign and exponent belong to
+    the token, so 0.24 does not match -0.24, 0.24e-5, or 10.24, and 1.0 does
+    not match 1. This is a cited-text grep, not a unit conversion.
     """
     if isinstance(leaf, bool):
         token = "true" if leaf else "false"
@@ -1510,19 +1634,16 @@ def _leaf_in_text(leaf: Any, text: str) -> bool:
             is not None
         )
     if isinstance(leaf, int):
-        return re.search(rf"(?<![\d.]){leaf}(?![\d.])", text) is not None
+        return _spelling_is_complete_token(str(leaf), text)
     if isinstance(leaf, float):
         if not math.isfinite(leaf):
             return False
-        forms = {format(leaf, ".16g"), str(leaf)}
-        if leaf.is_integer() and abs(leaf) < 10**15:
-            forms.add(str(int(leaf)))
         return any(
-            re.search(rf"(?<![\d.]){re.escape(form)}(?![\d.])", text) is not None
-            for form in forms
+            _spelling_is_complete_token(spelling, text)
+            for spelling in _numeric_spellings(leaf)
         )
     if isinstance(leaf, str):
-        return leaf in text
+        return _string_leaf_in_text(leaf, text)
     return False
 
 
@@ -1562,9 +1683,19 @@ def _locator_source_blind_reason(
         return "locator was not opened: pinned value has no scalar leaf to find"
     reasons: list[str] = []
     for path in candidates:
+        provenance = _source_artifact_refusal(artifact_root, path)
+        if provenance:
+            reasons.append(f"locator was not opened: {provenance}")
+            continue
         text, read_error = _read_artifact_text(path)
         if text is None:
             reasons.append(read_error or f"{path.name} was not opened")
+            continue
+        if _text_is_extract_document(text):
+            reasons.append(
+                "locator was not opened: "
+                f"{path.name} is an extract document, not an independent source"
+            )
             continue
         cited, span_error = _cited_text(text, locator)
         if cited is None:
@@ -1592,13 +1723,15 @@ def fidelity_source_warnings(
     Invariant: every scored observation's measured ``values`` payload is covered
     by a matching sample that names its observation id, is not an auto-migrated
     pilot pin, carries reviewer, ISO date, and one locator, and that locator's
-    text artifact was opened and contains the pinned value. Equipment pins do
-    not cover. A pilot or unattested sample can still cover
-    ``uncovered_observation``; those holes are their own counts. A numeric
-    observation index does not cover. Drift stays a match error.
-    ``source_blind_pin`` counts attestation-complete samples whose locator was
-    not opened or whose pinned value is absent from the opened text. These
-    warnings do not reject a draft corpus.
+    source artifact was opened and contains each pinned number as a complete
+    token (sign and exponent included). The artifact is a paper, OCR, quotes,
+    or reference transcription. The extract document and program source are
+    not artifacts. Equipment pins do not cover. A pilot or unattested sample
+    can still cover ``uncovered_observation``; those holes are their own
+    counts. A numeric observation index does not cover. Drift stays a match
+    error. ``source_blind_pin`` counts attestation-complete samples whose
+    locator was not opened or whose pinned value is absent from the opened
+    text. These warnings do not reject a draft corpus.
     """
     samples = doc.get("fidelity_samples")
     if samples is None:
@@ -1743,10 +1876,11 @@ def certify_extract_source_fidelity(
 
     Invariant: an empty list is the only pass. Every scored observation's
     measured payload must be covered by a matching, non-pilot, attested sample
-    whose locator artifact was opened and contains the pinned value. Equipment
-    pins, unopened locators, and copied values that are absent from the
-    artifact refuse. ``warnings`` is accepted for existing callers and is not
-    the decision: a supplied empty list cannot hide a hole.
+    whose source artifact was opened and contains each pinned number as a
+    complete token. The extract itself and program source do not qualify.
+    Equipment pins, unopened locators, and copied values that are absent from
+    the artifact refuse. ``warnings`` is accepted for existing callers and is
+    not the decision: a supplied empty list cannot hide a hole.
     """
     _ = warnings
     warnings = fidelity_source_warnings(

@@ -60,13 +60,17 @@ def _document() -> dict:
 
 
 def _cited_tokens(value: object) -> list[str]:
-    """Spell a pinned scalar the way certification searches the opened text."""
+    """Spell a pinned scalar the way certification searches the opened text.
+
+    Floats keep a decimal or exponent. ``format(1.0, ".16g")`` is ``1``, and
+    that token must not stand in for 1.0.
+    """
     if isinstance(value, bool):
         return ["true" if value else "false"]
     if isinstance(value, int):
         return [str(value)]
     if isinstance(value, float):
-        return [format(value, ".16g")]
+        return [str(value)]
     if isinstance(value, str):
         return [value]
     if isinstance(value, dict):
@@ -107,10 +111,12 @@ def _open_attested_samples(root: Path, doc: dict) -> None:
             continue
         value = sample["value"] if "value" in sample else sample.get("draft_value")
         tokens.extend(_cited_tokens(value))
-        locator["source_path"] = "paper.txt"
+        locator["source_path"] = "text/paper.txt"
         locator["line_range"] = "1-1"
     if tokens:
-        (root / "paper.txt").write_text(" ".join(tokens) + "\n", encoding="utf-8")
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text(" ".join(tokens) + "\n", encoding="utf-8")
 
 
 def _run_gate(
@@ -1133,17 +1139,18 @@ def test_cli_audits_extract_with_explicit_tree(tmp_path: Path, capsys):
             },
         }
     )
+    # Pin a number that the reference note actually prints. The quantity
+    # string lives in the validator; that file is not a source artifact.
+    observation["values"]["T_K"] = 1966
     doc["fidelity_samples"][0].update(
         {
-            "path": "species.Fe.observations[fe_alpha_1].values.quantity",
-            "value": "equilibrium_phase_composition",
+            "path": "species.Fe.observations[fe_alpha_1].values.T_K",
+            "value": 1966,
         }
     )
-    # Certification opens this repository-relative text file. The pinned
-    # quantity token is the observation type named in that source.
     doc["fidelity_samples"][0]["locator"] = {
-        "source_path": "tools/validate_literature_extracts.py",
-        "page": 2,
+        "source_path": "docs/references/pdfs/99-kems-langmuir/kems-001-homma-1966.md",
+        "page": 1,
         "table": "1",
     }
     path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")

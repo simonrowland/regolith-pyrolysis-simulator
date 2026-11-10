@@ -110,10 +110,15 @@ such as `observations[0]` is a list position, not an id, so it does not cover.
 Matching pins still detect later extraction drift; a mismatch does not cover
 and blocks certification. Certification opens the locator's text artifact
 (`source_path`, `quotes_path`, or a `record` that is a repository-relative
-file) and requires every pinned scalar leaf to appear in the cited
-`line_range` when one is set, otherwise in the opened text. A page or table
-number alone is not an open. A PDF is not opened as text. Do not backfill
-reviewer fields from the extract's own value.
+file under a source-evidence root: `raw/`, `corpus/`, `text/`, `tables/`,
+`supporting/`, or `docs/references/`). The extract document and program
+source are not source artifacts, including a copy parked on a source root.
+A numeric pin matches only a complete token: the sign and the exponent
+belong to the token, so `0.24` is not `-0.24` or `0.24e-5`, and `1.0` is
+not `1`. The token must appear in the cited `line_range` when one is set,
+otherwise in the opened text. A page or table number alone is not an open.
+A PDF is not opened as text. Do not backfill reviewer fields from the
+extract's own value.
 
 #### Sample shapes
 

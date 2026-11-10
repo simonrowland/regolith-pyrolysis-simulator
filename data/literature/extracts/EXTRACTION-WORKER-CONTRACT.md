@@ -84,7 +84,9 @@ auto-migrated pilot notes, and attestation-complete pins whose locator was
 not opened are typed counted warnings (`uncovered_observation`,
 `unattested_sample`, `auto_migrated_pilot_pin`, `source_blind_pin`). They do
 not reject a draft. Setting `review_status: reviewed` refuses while any
-warning remains, and certification opens the text artifact at the locator.
+warning remains. Certification opens a source artifact at the locator
+(paper, OCR, or quotes — not this extract and not program source) and
+requires each pinned number as a complete token, sign and exponent included.
 Do not stamp reviewers or copy pins to clear them.
 
 ### Tranche review obligation
