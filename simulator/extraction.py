@@ -2200,6 +2200,7 @@ class ExtractionMixin:
 
         # Calculate effective current from actual Faradaic reduction.   [Step 8]
         total_charge_C = 0.0
+        unassessed_charge_oxides = set()
         charge_electrons = result.get('oxide_charge_electrons', {}) or {}
         if transition is not None:
             for lot in transition.debits:
@@ -2210,10 +2211,32 @@ class ExtractionMixin:
                 ).items():
                     n_e = charge_electrons.get(
                         oxide,
-                        ELECTRONS_PER_OXIDE.get(oxide, 2),
+                        ELECTRONS_PER_OXIDE.get(oxide),
                     )
+                    if n_e is None:
+                        unassessed_charge_oxides.add(oxide)
+                        continue
                     total_charge_C += moles_ox * n_e * FARADAY
         self._mre_effective_current_A = total_charge_C / (dt_hr * 3600.0)
+        if unassessed_charge_oxides:
+            notices = list(result.get('notices', ()) or ())
+            notice = {
+                'kind': 'mre_effective_current_partial',
+                'quantity': 'effective_current_A',
+                'status': 'partial_estimate',
+                'reason': 'oxide_electron_count_unavailable',
+                'oxides': sorted(unassessed_charge_oxides),
+            }
+            notices.append(notice)
+            result['notices'] = notices
+            mre_diagnostic = dict(
+                result.get('mre_ellingham_ladder_diagnostic') or {}
+            )
+            mre_notices = list(mre_diagnostic.get('notices', ()) or ())
+            mre_notices.append(notice)
+            mre_diagnostic['notices'] = mre_notices
+            result['mre_ellingham_ladder_diagnostic'] = mre_diagnostic
+            self._mre_ellingham_ladder_diagnostic = mre_diagnostic
         if is_plant and not c5_rung_advanced:
             if (
                 self.melt.campaign == CampaignPhase.C5

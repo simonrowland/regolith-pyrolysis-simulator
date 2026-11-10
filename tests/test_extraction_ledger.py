@@ -329,6 +329,10 @@ def test_unknown_cleaned_melt_oxide_does_not_add_fabricated_mre_charge(
         "reason": "oxide_electron_count_unavailable",
         "oxides": [oxide],
     }]
+    assert (
+        sim._mre_ellingham_ladder_diagnostic["notices"]
+        == outcome["diagnostic"]["notices"]
+    )
 
 
 def test_c5_fallback_voltage_commit_is_flagged_without_changing_amount():

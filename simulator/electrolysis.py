@@ -1121,7 +1121,7 @@ class ElectrolysisModel:
             n = (
                 FERRIC_TO_FERROUS_ELECTRONS
                 if mode == "ferric_to_ferrous"
-                else ELECTRONS_PER_OXIDE.get(oxide, 2)
+                else ELECTRONS_PER_OXIDE[oxide]
             )
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)  # g/mol
             t_s = 3600.0  # 1 hour in seconds
@@ -1317,7 +1317,7 @@ class ElectrolysisModel:
             if kg < 1e-6:
                 continue
 
-            n = ELECTRONS_PER_OXIDE.get(oxide, 2)
+            n = ELECTRONS_PER_OXIDE[oxide]
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)  # g/mol
             moles = kg * 1000.0 / M_oxide_gmol  # kg→g then ÷ g/mol
 
