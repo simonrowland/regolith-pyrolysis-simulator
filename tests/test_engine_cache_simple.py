@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sqlite3
 import pickle
 import zlib
@@ -146,7 +147,10 @@ def test_raw_key_hot_json_cold_compression_and_exact_round_trip(
             "FROM engine_outputs"
         ).fetchone()
     assert row[0] == digest
-    assert row[1] == '{"activity":0.12345678901234566,"status":"ok"}'
+    assert json.loads(zlib.decompress(row[1])) == {
+        "activity": 0.12345678901234566,
+        "status": "ok",
+    }
     assert row[2:4] == ("openimcc", "1")
     with sqlite3.connect(cold_database) as connection:
         cold_value = connection.execute(
@@ -189,13 +193,63 @@ def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
     assert cold.phase_compositions == {}
     assert warm.phase_compositions == {}
     assert warm.activity_coefficients == expected.activity_coefficients
-    assert warm.diagnostics == expected.diagnostics
+    assert cold.diagnostics == {}
+    assert warm.diagnostics == {}
     assert calls == 1
     assert _engine_cache_counters(reset=True)["thermoengine"] == {
         "hits": 1,
         "misses": 1,
         "stores": 1,
     }
+
+
+def test_mapping_equilibrium_result_uses_compact_projection(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _call_cached_backend_equilibrate,
+    )
+
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    _engine_cache_counters(reset=True)
+    handle = SimpleNamespace(name="thermoengine", engine_settings={})
+    calls = 0
+    result = {
+        "status": "ok",
+        "liquid_fraction": 0.25,
+        "phase_assemblage_available": True,
+        "activity_coefficients": {"FeO": 0.75},
+        "vapor_pressures_Pa": {"CO": 42.0},
+        "vapor_pressures_source": {"CO": "thermoengine"},
+        "phase_compositions": {"melt": {"FeO": 0.5}},
+        "diagnostics": {"backend_status_reason": "unused diagnostic prose"},
+    }
+
+    def solve() -> dict[str, object]:
+        nonlocal calls
+        calls += 1
+        return result
+
+    cold = _call_cached_backend_equilibrate(
+        handle, {"temperature_C": 1000.0}, solve
+    )
+    warm = _call_cached_backend_equilibrate(
+        handle, {"temperature_C": 1000.0}, solve
+    )
+
+    with sqlite3.connect(database) as connection:
+        stored = connection.execute(
+            "SELECT value FROM engine_outputs"
+        ).fetchone()[0]
+    assert isinstance(json.loads(zlib.decompress(stored)), list)
+    assert cold.activity_coefficients == warm.activity_coefficients == {"FeO": 0.75}
+    assert cold.diagnostics == warm.diagnostics == {}
+    assert cold.phase_compositions == warm.phase_compositions == {}
+    assert calls == 1
 
 
 def test_equilibrium_hot_value_contains_only_scoring_inputs() -> None:
@@ -214,7 +268,18 @@ def test_equilibrium_hot_value_contains_only_scoring_inputs() -> None:
         diagnostics={"backend_status_reason": "fixture-code", "unused": "large"},
     )
     result.reported_activity_coefficients = {"FeO": 0.9}
-    result.activity_coefficient_details = {"FeO": {"basis": "fixture"}}
+    result.activity_coefficient_details = {
+        "FeO": {
+            "value": 0.9,
+            "coefficient_basis": "single_cation",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": "FeO",
+            },
+            "unused_detail": "large",
+        }
+    }
     result.vaporock_full_speciation_Pa = {"CO": 42.0}
     result.imcc_notices = [{"kind": "fixture_flag"}]
     result.imcc_model_id = "fixture-model"
@@ -223,19 +288,7 @@ def test_equilibrium_hot_value_contains_only_scoring_inputs() -> None:
 
     value = result.to_engine_cache_value()
 
-    assert set(value.hot) == {
-        "liquid_fraction",
-        "phase_assemblage_available",
-        "vapor_pressures_Pa",
-        "vapor_pressures_source",
-        "activity_coefficients",
-        "status",
-        "reported_activity_coefficients",
-        "activity_coefficient_details",
-        "vaporock_full_speciation_Pa",
-        "liquid_composition_wt_pct",
-        "fe_redox_split",
-    }
+    assert isinstance(value.hot, list)
     assert "phase_masses_kg" in value.cold
     assert "temperature_C" in value.cold
     assert "diagnostics" in value.cold
@@ -249,8 +302,84 @@ def test_equilibrium_hot_value_contains_only_scoring_inputs() -> None:
     restored = EquilibriumResult.from_engine_cache_value(value.hot)
     assert restored.activity_coefficients == result.activity_coefficients
     assert restored.vapor_pressures_Pa == result.vapor_pressures_Pa
+    assert restored.vapor_pressures_source == {}
+    assert restored.status == "ok"
+    assert restored.phase_assemblage_available is True
+    assert restored.reported_activity_coefficients == {"FeO": 0.9}
+    assert restored.activity_coefficient_details == {
+        "FeO": {
+            "coefficient_basis": "single_cation",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": "FeO",
+            },
+        }
+    }
+    assert restored.vaporock_full_speciation_Pa == {"CO": 42.0}
+    assert restored.liquid_composition_wt_pct == {"FeO": 10.0}
+    assert restored.fe_redox_split == {"FeO": 0.2}
     assert restored.diagnostics == {}
     assert restored.phase_masses_kg == {}
+
+
+def test_openimcc_hot_json_compresses_to_400_bytes() -> None:
+    result = EquilibriumResult(
+        liquid_fraction=1.0,
+        activity_coefficients={
+            "SiO2": 0.007355492127623946,
+            "MgO": 0.0,
+            "FeO": 0.0,
+            "CaO": 0.025718780542185595,
+            "Al2O3": 0.0,
+            "TiO2": 0.0,
+            "Na2O": 0.0,
+            "K2O": 0.0,
+        },
+        vapor_pressures_Pa={
+            "SiO": 0.05272248338791592,
+            "SiO2": 5.687460979368064e-05,
+            "O": 0.0022838425816733105,
+            "Si": 2.4665766051704816e-09,
+            "CaO": 4.2523914297704835e-06,
+            "Ca": 0.0019192690260704188,
+            "O2": 0.000337681211470004,
+            "Si2": 2.783098537113361e-20,
+            "Si3": 7.889378813945906e-30,
+            "WO": 5.383975292508744e-06,
+            "WO2": 0.0003703733875241695,
+            "WO3": 0.0019867368862648144,
+            "W2O6": 0.024686751898453776,
+            "W3O8": 0.0004717790627170212,
+            "W3O9": 0.0002566385044588118,
+            "W4O12": 2.079863897110883e-07,
+        },
+        vapor_pressures_source={
+            "SiO": "openimcc-gas-table:sha256:d6998a34dd62e344e6756f1ddc76d276454cf749be0da99b20436f0588ddb87d",
+            "WO": "cell_shared_janaf:O-027:a7b478fbb89b4bf1fbd560c7c8a1400aa8f67b406db3e6dd5d380f037254b722",
+        },
+    )
+    result.reported_activity_coefficients = {
+        "SiO2": 0.01838873031905986,
+        "CaO": 0.04286463423697599,
+    }
+    result.activity_coefficient_details = {
+        name: {
+            "value": value,
+            "coefficient_basis": "single_cation",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": name,
+            },
+        }
+        for name, value in result.reported_activity_coefficients.items()
+    }
+
+    hot = result.to_engine_cache_value().hot
+    raw = json.dumps(hot, separators=(",", ":"), ensure_ascii=True).encode("ascii")
+
+    assert len(zlib.compress(raw, level=6)) <= 400
 
 
 def test_bulk_loader_is_idempotent_and_chemistry_version_can_be_dropped(
