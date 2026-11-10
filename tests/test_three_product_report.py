@@ -418,6 +418,50 @@ def test_glass_aggregate_keeps_computed_zero_when_capture_is_unqualified():
     assert glass['excluded'] == silica['excluded']
 
 
+def test_refused_zero_flux_keeps_numeric_total_across_product_classes():
+    refusal = {
+        'species_id': 'SiO',
+        'parent_oxide': 'SiO2',
+        'account': 'process.cleaned_melt',
+        'reason': 'missing_evidence: activity input is absent',
+        'refusal_code': 'missing_evidence',
+        'is_refused': True,
+        'pressure': {'kind': 'refusal', 'code': 'missing_evidence'},
+        'flux': {'kind': 'refusal', 'code': 'missing_evidence'},
+    }
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[None, None, None, SimpleNamespace(
+            collected_kg={},
+        )]),
+        record=SimpleNamespace(snapshots=[SimpleNamespace(
+            evap_flux=SimpleNamespace(
+                species_kg_hr={},
+                carrier_authority_by_species={'SiO': refusal},
+            ),
+        )]),
+        _last_evaporation_flux_diagnostic={},
+    )
+
+    result = classify_products(sim, early_tap_mode=True)
+
+    for bucket_name in (
+        'metals_plus_O2', 'ingots_metals', 'oxygen', 'pure_silica_glass',
+        'glass', 'industrial_mixed_glass', 'refractory_ceramic_rump',
+        'captured_volatiles',
+    ):
+        bucket = result[bucket_name]
+        assert bucket['class_total_kg'] == 0.0, bucket_name
+        assert bucket['status'] == 'partial'
+        flag = bucket.get('flag') or bucket.get('availability_flag')
+        assert flag is not None
+        assert flag['status'] == 'partial'
+        assert 'missing_evidence' in flag['reason']
+        assert any(
+            item['species'] == 'SiO' for item in bucket['excluded']
+        )
+
+
 @pytest.mark.parametrize(
     ('events', 'verdict', 'outcome'),
     [
