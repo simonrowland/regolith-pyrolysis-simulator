@@ -21,12 +21,11 @@ from simulator.battery.score import (
     SCORE_ENGINE_SET,
     ScoreContext,
     _catalog_score_rows,
-    _catalog_source_terms,
     compile_residual,
     headline_rows,
     predict_with_engine,
 )
-from simulator.vapour_rail.catalog import compiled_catalog_for
+from simulator.vapour_rail.catalog import compiled_catalog_for, source_reaction_terms
 from tests.battery import factories as F
 
 
@@ -78,7 +77,7 @@ def test_catalog_reaction_terms_match_reviewed_row_goldens() -> None:
             or row.species.evaluator is None
         ):
             continue
-        terms = _catalog_source_terms(reaction)
+        terms = source_reaction_terms(reaction)
         if terms is None:
             continue
         encoded = ", ".join(

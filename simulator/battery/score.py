@@ -9700,26 +9700,6 @@ def _catalog_observation_terms(reaction: object) -> dict[str, Fraction] | None:
     return {key: value for key, value in signed.items() if value != 0} or None
 
 
-def _catalog_source_terms(reaction: Mapping[str, Any]) -> dict[str, Fraction] | None:
-    signed: dict[str, Fraction] = {}
-    for sign, side in ((-1, "reactants"), (1, "products")):
-        members = reaction.get(side)
-        if members is None:
-            members = []
-        if not isinstance(members, list):
-            return None
-        for member in members:
-            if not isinstance(member, Mapping):
-                return None
-            formula = member.get("formula")
-            stoich = _catalog_positive_fraction(member.get("stoichiometry"))
-            if not formula or stoich is None:
-                return None
-            key = _catalog_bare_formula(str(formula))
-            signed[key] = signed.get(key, Fraction(0)) + (sign * stoich)
-    return {key: value for key, value in signed.items() if value != 0} or None
-
-
 def _catalog_reaction_reason(
     row: _CatalogScoreRow,
     identity: Identity,
@@ -9733,7 +9713,9 @@ def _catalog_reaction_reason(
     if row.source_reaction is None:
         return "catalog_source_reaction_undeclared"
     observed = _catalog_observation_terms(state.value)
-    catalog = _catalog_source_terms(row.source_reaction)
+    from simulator.vapour_rail.catalog import source_reaction_terms
+
+    catalog = source_reaction_terms(row.source_reaction)
     if observed is None or catalog is None:
         return "catalog_reaction_unreadable"
     if observed != catalog:
