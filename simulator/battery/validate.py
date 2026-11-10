@@ -41,11 +41,23 @@ from __future__ import annotations
 
 import json
 import re
+import types
 from contextlib import contextmanager, nullcontext
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import MISSING, dataclass, fields, is_dataclass
 from decimal import Decimal, InvalidOperation
 from enum import Enum
-from typing import Any, Iterable, Iterator, Mapping, Sequence
+from functools import lru_cache
+from typing import (
+    Any,
+    Iterable,
+    Iterator,
+    Mapping,
+    Sequence,
+    Union,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 
 from simulator.battery.enums import (
     AdmissionStatus,
@@ -97,6 +109,7 @@ from simulator.battery.records import (
     phase_token,
     union_notices,
 )
+from simulator.battery import records as battery_records
 from simulator.battery.oxygen_balance import (
     has_own_engine_solved_oxygen_balance,
 )
@@ -212,7 +225,12 @@ def _check_located(
     *,
     empirical: bool,
 ) -> None:
-    if empirical and located.state.is_value and located.locator is None:
+    if (
+        empirical
+        and isinstance(located.state, State)
+        and located.state.is_value
+        and located.locator is None
+    ):
         issues.append(
             _issue(
                 path,
@@ -223,7 +241,12 @@ def _check_located(
 
 
 def _located_decimal_value(located: Located[Any] | None) -> Any:
-    if located is None or not located.state.is_value or located.state.value is None:
+    if (
+        not isinstance(located, Located)
+        or not isinstance(located.state, State)
+        or not located.state.is_value
+        or located.state.value is None
+    ):
         return None
     if isinstance(located.state.value, Value):
         if located.state.value.kind is ValueKind.POINT:
@@ -300,6 +323,108 @@ def _reconcile_identity_axis(
         )
 
 
+def _union_args(annotation: object) -> tuple[object, ...]:
+    origin = get_origin(annotation)
+    if origin in (Union, types.UnionType):
+        return get_args(annotation)
+    return ()
+
+
+def _located_payload_annotations(annotation: object) -> tuple[object, ...]:
+    if get_origin(annotation) is Located:
+        args = get_args(annotation)
+        return args[:1]
+    return tuple(
+        payload
+        for option in _union_args(annotation)
+        for payload in _located_payload_annotations(option)
+    )
+
+
+def _dataclass_types(annotation: object) -> tuple[type, ...]:
+    if isinstance(annotation, type) and is_dataclass(annotation):
+        return (annotation,)
+    return tuple(
+        cls
+        for option in _union_args(annotation)
+        for cls in _dataclass_types(option)
+    )
+
+
+def _matches_annotation(value: object, annotation: object) -> bool:
+    if annotation is Any or annotation is object:
+        return True
+    options = _union_args(annotation)
+    if options:
+        return any(_matches_annotation(value, option) for option in options)
+    if annotation is type(None):
+        return value is None
+    if isinstance(annotation, type):
+        return isinstance(value, annotation)
+    origin = get_origin(annotation)
+    return origin is None or isinstance(value, origin)
+
+
+def _expected_shape(annotation: object) -> str:
+    options = _union_args(annotation)
+    if options:
+        return " or ".join(_expected_shape(option) for option in options)
+    if isinstance(annotation, type) and is_dataclass(annotation):
+        required = tuple(
+            item.name
+            for item in fields(annotation)
+            if item.default is MISSING and item.default_factory is MISSING
+        )
+        if required:
+            return f"mapping with {'/'.join(required)}"
+        return f"{annotation.__name__} record"
+    return getattr(annotation, "__name__", str(annotation))
+
+
+def _container_args(obj: object, annotation: object | None) -> tuple[object, ...]:
+    for option in (annotation, *_union_args(annotation)):
+        origin = get_origin(option)
+        if isinstance(origin, type) and isinstance(obj, origin):
+            return get_args(option)
+    return ()
+
+
+def _located_payload_shape_issue(
+    path: str, located: Located[Any], expected: object
+) -> ValidationIssue | None:
+    if not isinstance(located.state, State):
+        return _issue(
+            path,
+            RefusalReason.CONDITIONAL_FIELD,
+            f"expected a State wrapper, got {type(located.state).__name__}",
+        )
+    if not located.state.is_value:
+        return None
+    payload_types = _located_payload_annotations(expected)
+    if not any(_dataclass_types(payload) for payload in payload_types):
+        return None
+    value = located.state.value
+    if any(_matches_annotation(value, payload) for payload in payload_types):
+        return None
+    expected_shape = " or ".join(
+        _expected_shape(payload) for payload in payload_types
+    )
+    return _issue(
+        path,
+        RefusalReason.CONDITIONAL_FIELD,
+        f"expected {expected_shape}, got {type(value).__name__}",
+    )
+
+
+@lru_cache(maxsize=None)
+def _record_type_hints(record_type: type) -> dict[str, object]:
+    return get_type_hints(
+        record_type,
+        globalns=vars(battery_records),
+        localns=vars(battery_records),
+    )
+
+
 def _walk_located(
     obj: object,
     path: str,
@@ -307,6 +432,7 @@ def _walk_located(
     seen: set[int] | None = None,
     *,
     empirical: bool,
+    expected: object | None = None,
 ) -> None:
     if obj is None:
         return
@@ -316,23 +442,73 @@ def _walk_located(
     if marker in seen:
         return
     seen.add(marker)
+    if (
+        not isinstance(obj, Located)
+        and _located_payload_annotations(expected)
+    ):
+        issues.append(
+            _issue(
+                path,
+                RefusalReason.CONDITIONAL_FIELD,
+                f"expected a Located State wrapper, got {type(obj).__name__}",
+            )
+        )
+        return
     if isinstance(obj, Located):
+        shape_issue = _located_payload_shape_issue(path, obj, expected)
+        if shape_issue is not None:
+            issues.append(shape_issue)
         _check_located(path, obj, issues, empirical=empirical)
         if obj.inference is not None:
-            _walk_located(obj.inference, f"{path}.inference", issues, seen, empirical=empirical)
+            _walk_located(
+                obj.inference,
+                f"{path}.inference",
+                issues,
+                seen,
+                empirical=empirical,
+            )
         return
     if isinstance(obj, Mapping):
+        args = _container_args(obj, expected)
+        value_type = args[1] if len(args) > 1 else None
         for key, value in obj.items():
-            _walk_located(value, f"{path}.{key}", issues, seen, empirical=empirical)
+            _walk_located(
+                value,
+                f"{path}.{key}",
+                issues,
+                seen,
+                empirical=empirical,
+                expected=value_type,
+            )
         return
     if isinstance(obj, (tuple, list)):
+        args = _container_args(obj, expected)
+        item_types = (
+            args[:-1]
+            if len(args) > 1 and args[-1] is not Ellipsis
+            else args[:1]
+        )
         for i, value in enumerate(obj):
-            _walk_located(value, f"{path}[{i}]", issues, seen, empirical=empirical)
+            item_type = item_types[min(i, len(item_types) - 1)] if item_types else None
+            _walk_located(
+                value,
+                f"{path}[{i}]",
+                issues,
+                seen,
+                empirical=empirical,
+                expected=item_type,
+            )
         return
     if is_dataclass(obj) and not isinstance(obj, type):
+        hints = _record_type_hints(type(obj))
         for field in fields(obj):
             _walk_located(
-                getattr(obj, field.name), f"{path}.{field.name}", issues, seen, empirical=empirical
+                getattr(obj, field.name),
+                f"{path}.{field.name}",
+                issues,
+                seen,
+                empirical=empirical,
+                expected=hints.get(field.name),
             )
 
 
@@ -1030,9 +1206,19 @@ def validate_experiment(
                     ),
                 )
             )
-    sweep = experiment.pressure_environment.sweep_gas.state
-    if sweep.is_value:
-        issues.extend(validate_sweep_gas(sweep.value, f"{path}.pressure_environment.sweep_gas"))
+    sweep_located = experiment.pressure_environment.sweep_gas
+    if (
+        isinstance(sweep_located, Located)
+        and isinstance(sweep_located.state, State)
+        and sweep_located.state.is_value
+        and isinstance(sweep_located.state.value, SweepGas)
+    ):
+        issues.extend(
+            validate_sweep_gas(
+                sweep_located.state.value,
+                f"{path}.pressure_environment.sweep_gas",
+            )
+        )
     if experiment.fO2_control is not None:
         channel = experiment.fO2_control.channel
         if channel.is_value and channel.value is FO2Channel.BUFFER:

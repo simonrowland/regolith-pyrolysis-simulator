@@ -115,8 +115,48 @@ def test_malformed_located_payload_is_typed_refusal(bad) -> None:
     experiment = replace(experiment, pressure_environment=replace(
         experiment.pressure_environment, sweep_gas=factories.located(bad)))
     issues = validate_experiment(experiment, {"work-1": factories.work()}, {})
-    assert any(i.reason is RefusalReason.CONDITIONAL_FIELD
-               and i.path.endswith(".sweep_gas") for i in issues)
+    issue = next(i for i in issues if i.path.endswith(".sweep_gas"))
+    assert issue.reason is RefusalReason.CONDITIONAL_FIELD
+    assert issue.detail == (
+        "expected mapping with species/flow_sccm/partial_pressure_Pa, "
+        f"got {type(bad).__name__}"
+    )
+
+
+def test_malformed_located_composition_is_typed_refusal() -> None:
+    experiment = factories.kems_experiment()
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=factories.located("bad composition"),
+        ),
+    )
+
+    issues = validate_experiment(experiment, {"work-1": factories.work()}, {})
+
+    issue = next(i for i in issues if i.path.endswith(".sample.initial_composition"))
+    assert issue.reason is RefusalReason.CONDITIONAL_FIELD
+    assert issue.detail == (
+        "expected mapping with basis/components/amount_basis, got str"
+    )
+
+
+def test_malformed_sweep_gas_extract_migrates_to_typed_refusal(tmp_path) -> None:
+    result = Migrator(
+        root=_write_min_tree(tmp_path, _extract_with_gas("CO-Ar"))
+    ).run()
+
+    assert result.validation is not None
+    issue = next(
+        issue
+        for issue in result.validation.hard_issues
+        if issue.path.endswith(".sweep_gas")
+    )
+    assert issue.reason is RefusalReason.CONDITIONAL_FIELD
+    assert issue.detail == (
+        "expected mapping with species/flow_sccm/partial_pressure_Pa, got str"
+    )
 
 
 @pytest.mark.parametrize("field", ["flow_sccm", "partial_pressure_Pa"])
