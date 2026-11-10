@@ -253,8 +253,14 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         oxygen_flag = runner["oxygen"].get("availability_flag")
         assert oxygen_flag is not None
         assert oxygen_flag["status"] == "flagged prediction"
+        assert oxygen_flag["category"] == 3
+        assert oxygen_flag["kind"] == "predict_and_flag"
         assert oxygen_flag["authority"] == "extrapolated"
+        assert oxygen_flag["authority_level"] == "extrapolated"
         assert oxygen_flag["band"] == "d-359 B/C/E follow-ups pending"
+        assert oxygen_flag["pending_follow_ups"] == [
+            "d-359 B", "d-359 C", "d-359 E",
+        ]
         reason = oxygen_flag["reason"]
         assert reason.startswith(
             "0.0 kg O₂ is the direct O₂-ledger total; no stored, vented, or "
@@ -266,7 +272,7 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         assert "provider activity" in reason
         assert "published gamma*x" in reason
         assert "outside_declared_evaluator_domain" in reason
-        assert "1519-2273 K" in reason
+        assert "domain [1519, 2273.15] K" in reason
         assert "stage0_only" in reason
         assert "phase-independent K" in reason
         assert "Pending d-359 follow-ups: B, C, E." in reason
@@ -617,19 +623,11 @@ def test_headless_full_run_ledgers_and_product_story_web(
     # Offgas species masses and their Cr equivalents come from the same live
     # terminal.offgas projection used by the headless full-run path.
     _PINNED_CRO_OFFGAS_KG = 0.0
-    # c679673f5 integrates Stage 2 capture over its temperature band (33 equal
-    # center samples). This captures Cr-bearing vapour the midpoint calculation
-    # sent to terminal.offgas: Cr-equivalent offgas falls from 0.182436796288
-    # to 0.180051898903 kg, while accepted Stage 2 Cr rises from 0.000066897364
-    # to 0.002451792057 kg. The remaining 2.69e-9 kg Cr moves into the rump:
-    # 3.932472e-9 kg extra Cr2O3 times its formula-derived Cr mass fraction.
-    # Thus 2.384897384 g lost from offgas = 2.384894693 g gained in Stage 2
-    # plus 0.000002691 g gained in the rump; the full ledger still totals
-    # 2.459768802 kg Cr against the 2.46 kg feed. CrO offgas remains 0.
-    # 85fedcb8e's per-strip solver moves a further 1.4458e-7 kg from offgas
-    # into Stage 2 capture; the later segment-update refactor leaves the pin
-    # unchanged.
-    _PINNED_CR_OFFGAS_EQ_KG = 0.18005189890349527
+    # d-365 (with d-144) corrects the CaO/MgO activity at 1750 C by x4.4866.
+    # On this lunar runner path, the accepted Mg capture and terminal residual
+    # rise by 103% and 187%, respectively; the resulting Cr-equivalent offgas
+    # pin is remeasured from this run while the Cr ledger still closes.
+    _PINNED_CR_OFFGAS_EQ_KG = 0.18936532126908368
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _cr_mass_fraction("Cr2O3")
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")

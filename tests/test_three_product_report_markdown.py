@@ -294,7 +294,10 @@ def test_flagged_zero_oxygen_renders_d364_notice_in_runner_report():
         "status": "partial",
         "availability_flag": {
             "status": "flagged prediction",
+            "category": 3,
+            "kind": "predict_and_flag",
             "authority": "extrapolated",
+            "authority_level": "extrapolated",
             "band": "d-359 B/C/E follow-ups pending",
             "reason": (
                 "0.0 kg O₂ is the direct O₂-ledger total; no stored, vented, "
@@ -306,7 +309,7 @@ def test_flagged_zero_oxygen_renders_d364_notice_in_runner_report():
                 "activity, published gamma*x, then ideal a=x with "
                 "ideal_mixing_assumption. Class C: "
                 "outside_declared_evaluator_domain for MnO_gas at 313.15 K; "
-                "continuation is outside the certified 1519-2273 K band. "
+                "continuation is outside the certified [1519, 2273.15] K band. "
                 "Class E: stage0_only predicate inactive outside Stage 0; "
                 "P4O10/P4O6/PO/PO2 computed from phase-independent K while "
                 "P2O5 is present. Pending d-359 follow-ups: B, C, E."
@@ -318,7 +321,9 @@ def test_flagged_zero_oxygen_renders_d364_notice_in_runner_report():
 
     assert (
         "- Availability flag: status=flagged prediction; "
-        "authority=extrapolated; reason=0.0 kg O₂ is the direct O₂-ledger "
+        "category=3; kind=predict_and_flag; authority=extrapolated; "
+        "authority_level=extrapolated; band=d-359 B/C/E follow-ups pending; "
+        "reason=0.0 kg O₂ is the direct O₂-ledger "
         "total; no stored, vented, or captured molecular O₂ was recorded. "
         "The associated B/C/E oxide-vapor predictions are incomplete and "
         "are not counted as shipped O₂. Class B: missing_evidence (no "
@@ -326,7 +331,8 @@ def test_flagged_zero_oxygen_renders_d364_notice_in_runner_report():
         "provider activity, published gamma*x, then ideal a=x with "
         "ideal_mixing_assumption. Class C: "
         "outside_declared_evaluator_domain for MnO_gas at 313.15 K; "
-        "continuation is outside the certified 1519-2273 K band. Class E: "
+        "continuation is outside the certified [1519, 2273.15] K band. "
+        "Class E: "
         "stage0_only predicate inactive outside Stage 0; P4O10/P4O6/PO/PO2 "
         "computed from phase-independent K while P2O5 is present. Pending "
         "d-359 follow-ups: B, C, E."

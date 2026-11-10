@@ -65,7 +65,13 @@ REORDERED_ROWS = {
     "S2",
     "S_total",
     "TeO2",
-    *P_CARRIERS,
+    # d-359 class E now provides compiled hot-train pressures for these two
+    # carriers, so they leave the reordered/refused rows:
+    # PO and P4O6.
+    "P2",
+    "P4",
+    "P4O10",
+    "PO2",
 }
 
 
@@ -554,7 +560,7 @@ def test_stage0_only_refusal_is_phase_dependent(payload) -> None:
         if species_id in {"PO", "PO2", "P4O6", "P4O10"}:
             assert _condensation_admission_refusal(
                 species_id, vapor_pressure_data=payload
-            ) is None
+            ) != REFUSAL_INAPPLICABLE_PREDICATE
             assert catalog.evaluator_for_hot_train(
                 species_id,
                 process_phase="hot_train",

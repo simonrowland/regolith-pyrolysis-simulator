@@ -754,7 +754,7 @@ def test_d359_p_carrier_uses_phase_independent_k_in_c2_hot_train() -> None:
         _selector_rule("P4O6"),
         parent_species_ids=frozenset({"P2O5"}),
         required_source_atoms=frozenset({"P", "O"}),
-        applicability_predicate="stage0_only",
+        applicability_predicate="applicable",
     )
     state = VapourResolveState(
         temperature_K=1800.0,
@@ -772,8 +772,10 @@ def test_d359_p_carrier_uses_phase_independent_k_in_c2_hot_train() -> None:
 
     assert isinstance(answer.pressure, PressureValue)
     assert isinstance(answer.flux, FluxEligible)
-    assert answer.extra["applicability_evidence"]["active"] is True
     assert answer.extra["d359_prediction"]["class"] == "E"
+    assert "stage0_only predicate inactive" in (
+        answer.extra["d359_prediction"]["original_refusal_reason"]
+    )
     assert "phase-independent K" in answer.extra["d359_prediction"]["reason"]
 
 
@@ -1334,21 +1336,21 @@ def test_t609_real_rows_stay_status_bearing_through_request_layer(
 
 
 @pytest.mark.parametrize(
-    ("species_id", "parent_oxide", "temperature_K", "expected_refusal"),
+    ("species_id", "parent_oxide", "temperature_K", "ood_policy"),
     (
-        ("MnO_gas", "MnO", 1500.0, True),
-        ("MnO_gas", "MnO", 1800.0, False),
-        ("MnO_gas", "MnO", 2400.0, True),
-        ("CoO_gas", "CoO", 1300.0, True),
-        ("CoO_gas", "CoO", 1800.0, False),
-        ("CoO_gas", "CoO", 2100.0, True),
+        ("MnO_gas", "MnO", 1500.0, "continuation"),
+        ("MnO_gas", "MnO", 1800.0, "in_domain"),
+        ("MnO_gas", "MnO", 2400.0, "continuation"),
+        ("CoO_gas", "CoO", 1300.0, "refusal"),
+        ("CoO_gas", "CoO", 1800.0, "in_domain"),
+        ("CoO_gas", "CoO", 2100.0, "refusal"),
     ),
 )
 def test_t622_real_rows_share_diagnostic_only_typed_ood_policy(
     species_id: str,
     parent_oxide: str,
     temperature_K: float,
-    expected_refusal: bool,
+    ood_policy: str,
 ) -> None:
     catalog = compile_vapour_rail_catalog(
         _yaml("vapor_pressures.yaml"), u0_manifest=load_u0_manifest()
@@ -1382,7 +1384,25 @@ def test_t622_real_rows_share_diagnostic_only_typed_ood_policy(
     assert answer.verdict_status == "status_bearing_non_authoritative"
     assert answer.certification_ceiling == "never"
     assert not answer.is_flux_active
-    if expected_refusal:
+    if ood_policy == "continuation":
+        assert species_id == "MnO_gas"
+        assert isinstance(answer.pressure, PressureUpperBound)
+        assert isinstance(answer.flux, FluxDiagnosticUpperBound)
+        prediction = answer.extra["d359_prediction"]
+        class_c = next(
+            row for row in prediction["class_predictions"]
+            if row["class"] == "C"
+        )
+        assert class_c["class"] == "C"
+        assert class_c["authority_level"] == "extrapolated"
+        assert tuple(class_c["certified_band_K"]) == pytest.approx(
+            catalog.species[species_id].valid_temperature_K
+        )
+        assert answer.extra["alpha_inventory_policy"] == (
+            "diagnostic_only_no_inventory_debit"
+        )
+        assert answer.extra["alpha_authority_status"] == "diagnostic_upper_bound"
+    elif ood_policy == "refusal":
         assert isinstance(answer.pressure, PressureRefusal)
         assert answer.pressure.code == REFUSAL_OUTSIDE_DECLARED_DOMAIN
         assert isinstance(answer.flux, FluxRefusal)
@@ -1640,19 +1660,13 @@ def test_out_of_domain_k_at_1650c_is_flux_eligible_but_non_authoritative() -> No
     assert in_domain.is_flux_active
 
 
-def test_missing_activity_is_refusal_or_declared_henrian_upper_bound() -> None:
-    """Henrian a=1 bound remains non-debiting (HEAD rail); b-122 direction.
-
-    Activity verdict is UPPER_BOUND (gamma<=1 property). Pressure is typed as
-    PressureUpperBound + FluxDiagnosticUpperBound so inventory does not debit.
-    OOD gamma status-bearing (b-121) is covered separately and stays
-    flux-driving on the oodfix seam.
-    """
+def test_missing_activity_uses_d359_ladder_before_henrian_upper_bound() -> None:
+    """Published gamma*x is status-bearing; a declared Henrian bound is not debit."""
     payload = _minimal_family("K")
     catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
     ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
 
-    refused = catalog.resolve_batch(
+    fallback = catalog.resolve_batch(
         ledger,
         VapourResolveState(
             temperature_K=1500.0,
@@ -1660,12 +1674,20 @@ def test_missing_activity_is_refusal_or_declared_henrian_upper_bound() -> None:
         ),
         flux_activation_context=_rg_activation_context(),
     ).channel("K")
-    assert isinstance(refused.pressure, PressureRefusal)
-    assert refused.source_reaction_activity is not None
+    assert isinstance(fallback.pressure, PressureValue)
+    assert isinstance(fallback.flux, FluxEligible)
+    assert fallback.is_flux_active
+    assert fallback.verdict_status == "status_bearing_non_authoritative"
+    assert fallback.source_reaction_activity is not None
     assert (
-        refused.source_reaction_activity.verdict
-        is ActivityVerdictKind.REFUSAL
+        fallback.source_reaction_activity.verdict
+        is ActivityVerdictKind.STATUS_BEARING_VALUE
     )
+    prediction = fallback.extra["d359_prediction"]
+    assert prediction["class"] == "B"
+    assert prediction["rung"] == "published gamma*x"
+    assert prediction["authority_level"] == "status_bearing"
+    assert prediction["reason"].startswith("missing_evidence")
 
     bounded_payload = deepcopy(payload)
     reaction = bounded_payload["families"]["k_test_family"][
@@ -1815,7 +1837,7 @@ def test_resolve_batch_preserves_reported_standard_state_mismatch() -> None:
         "missing_temperature",
     ),
 )
-def test_pre_rg_contract_and_run_state_refusals_fail_closed(
+def test_pre_rg_activity_gaps_use_d359_ladder_and_other_refusals_fail_closed(
     failure: str,
 ) -> None:
     catalog = compile_vapour_rail_catalog(
@@ -1851,6 +1873,19 @@ def test_pre_rg_contract_and_run_state_refusals_fail_closed(
         assert isinstance(answer.pressure, PressureRefusal)
         assert answer.pressure.code == REFUSAL_MISSING_EVALUATOR_INTRINSIC_FO2
         assert "intrinsic_melt oxygen fugacity" in answer.pressure.detail
+    elif failure in {"missing_provider", "missing_standard_state"}:
+        answer = catalog.resolve_batch(
+            ledger,
+            state,
+            flux_activation_context=_pre_rg_activation_context("K"),
+        ).channel("K")
+        assert isinstance(answer.pressure, PressureValue)
+        assert isinstance(answer.flux, FluxEligible)
+        assert answer.verdict_status == "status_bearing_non_authoritative"
+        prediction = answer.extra["d359_prediction"]
+        assert prediction["class"] == "B"
+        assert prediction["rung"] == "published gamma*x"
+        assert prediction["authority_level"] == "status_bearing"
     else:
         activation_context = (
             _pre_rg_activation_context()
