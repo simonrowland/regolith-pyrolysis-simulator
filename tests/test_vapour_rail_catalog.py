@@ -1359,6 +1359,35 @@ def _unevidenced_law_copy(
     return payload
 
 
+def _oracle_provenance_cites_observations(item: dict) -> bool:
+    """True when a provenance item cites real observation ids.
+
+    Independent of the compiler. A singular ``observation_id`` is one
+    citation. ``observation_ids`` counts only as a nonempty sequence of
+    nonblank strings. ``null``, ``""``, ``true``, and a bare string are not
+    citations. A present field that is malformed voids the item, so a valid
+    sibling cannot launder it.
+    """
+
+    has_singular = "observation_id" in item
+    has_plural = "observation_ids" in item
+    if not has_singular and not has_plural:
+        return False
+    if has_singular:
+        raw = item.get("observation_id")
+        if not isinstance(raw, str) or not raw.strip():
+            return False
+    if has_plural:
+        raw_ids = item.get("observation_ids")
+        if isinstance(raw_ids, (str, bytes)) or not isinstance(raw_ids, (list, tuple)):
+            return False
+        if len(raw_ids) == 0:
+            return False
+        if any(not isinstance(obs, str) or not obs.strip() for obs in raw_ids):
+            return False
+    return True
+
+
 def _oracle_stored_oxygen_law(
     model: dict,
 ) -> tuple[float, float, str | None] | None:
@@ -1433,10 +1462,7 @@ def _live_bound_effective_fit_contexts() -> tuple[dict[str, object], ...]:
             has_model_provenance = any(
                 isinstance(item, dict)
                 and str(item.get("source_id") or "").strip()
-                and (
-                    str(item.get("observation_id") or "").strip()
-                    or item.get("observation_ids")
-                )
+                and _oracle_provenance_cites_observations(item)
                 for item in provenance
             )
             backsolve = row.get("backsolve") if isinstance(row.get("backsolve"), dict) else {}
@@ -1748,14 +1774,21 @@ def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:
         )
         if executes_association:
             assert species_id == "FeO_association_gas"
-            embedded = payload["families"][compiled.family_id][
+            association_model = payload["families"][compiled.family_id][
                 "physical_properties"
-            ]["species"][species_id]["pressure_models"][0][
-                "base_reference_pressure_model"
-            ]["coefficients"]
-            assert embedded["A"] == pytest.approx(9.408547)
-            assert embedded["B"] == pytest.approx(23312.312336)
-            assert embedded["C"] == pytest.approx(1000.0)
+            ]["species"][species_id]["pressure_models"][0]
+            embedded = association_model["base_reference_pressure_model"]
+            assert embedded["coefficients"]["A"] == pytest.approx(9.408547)
+            assert embedded["coefficients"]["B"] == pytest.approx(23312.312336)
+            assert embedded["coefficients"]["C"] == pytest.approx(1000.0)
+            # The closure calls log10_pressure() and does not apply a base
+            # oxygen multiplier. Live admission is the identity multiplier only.
+            base_model = payload["families"]["metals_fe_family"][
+                "physical_properties"
+            ]["species"]["Fe"]["pressure_models"][0]
+            assert _oracle_stored_oxygen_law(base_model) == (0.0, 1.0, None)
+            assert _oracle_stored_oxygen_law(embedded) == (0.0, 1.0, None)
+            assert _oracle_provenance_cites_observations(base_model["provenance"][0])
             continue
         row = payload["families"][compiled.family_id]["physical_properties"][
             "species"
@@ -1767,6 +1800,305 @@ def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:
         assert row["validation"]["anchor_refs"]
     assert "Fe" in checked
     assert "FeO_association_gas" in checked
+
+
+# Oxygen multiplier the association closure evaluates. log10_pressure() takes
+# temperature only: omitted exponent is 0, omitted reference is 1 bar, and
+# exponent 0 stores no channel. This is not read from the compiler.
+_ASSOCIATION_EXECUTED_BASE_OXYGEN = (0.0, 1.0, None)
+# FeO_association_gas at 1800 K when that identity law is the base.
+# data/vapor_pressures.yaml: Fe(g) + 0.5 O2(g) -> FeO(g), so the outer
+# exponent is +0.5. Off the 1 bar reference the closure already baked in:
+#   P(pO2) = P(1 bar) * (pO2 / 1 bar) ** 0.5
+#   P(1e-9 bar) = 2629.115392552568 * 10 ** (-4.5) = 0.08313992871873806
+#   P(0.01 bar) = 2629.115392552568 * 10 ** (-1) = 262.91153925525686
+# P(1 bar) is the landed CEA composition of the cited Fe curve
+# (12.098211309846041 Pa). These expectations are not recomputed from A, B, C.
+_CITED_FEO_ASSOCIATION_PRESSURE_PA = {
+    1.0: 2629.115392552568,
+    1.0e-9: 0.08313992871873806,
+    0.01: 262.91153925525686,
+}
+_CITATION_CASES = (
+    ("singular", {"observation_id": "fit-grid"}, True),
+    ("singular-blank", {"observation_id": ""}, False),
+    ("singular-whitespace", {"observation_id": "   "}, False),
+    ("singular-null", {"observation_id": None}, False),
+    ("singular-bool", {"observation_id": True}, False),
+    ("plural", {"observation_ids": ["fit-grid"]}, True),
+    ("plural-two", {"observation_ids": ["fit-grid", "other"]}, True),
+    ("plural-null", {"observation_ids": [None]}, False),
+    ("plural-blank", {"observation_ids": [""]}, False),
+    ("plural-whitespace", {"observation_ids": ["   "]}, False),
+    ("plural-bool", {"observation_ids": True}, False),
+    ("plural-string", {"observation_ids": "fit-grid"}, False),
+    ("plural-empty", {"observation_ids": []}, False),
+    ("plural-mixed-blank", {"observation_ids": ["fit-grid", ""]}, False),
+    ("plural-mixed-null", {"observation_ids": [None, "fit-grid"]}, False),
+    (
+        "both-valid",
+        {"observation_id": "fit-grid", "observation_ids": ["other"]},
+        True,
+    ),
+    (
+        "singular-hides-bad-plural",
+        {"observation_id": "fit-grid", "observation_ids": [None]},
+        False,
+    ),
+    ("absent", {}, False),
+)
+
+
+def _citation_provenance(fields: dict) -> dict:
+    item = {"source_id": "fit-grid-source", "status": "diagnostic_only"}
+    item.update(fields)
+    return item
+
+
+def _zero_activity_law_cases() -> list[dict]:
+    """Every citation shape and every stored oxygen law the gate must judge.
+
+    The oracle below is the invariant. It does not call the compiler, so a
+    gate that ignores oxygen or treats any truthy observation_ids as a
+    citation cannot satisfy the grid by construction.
+    """
+
+    cases: list[dict] = []
+    for label, fields, admitted in _CITATION_CASES:
+        cases.append(
+            {
+                "id": f"direct-citation-{label}",
+                "kind": "direct-citation",
+                "fields": fields,
+                "admitted": admitted,
+                "evidence_message": not admitted,
+            }
+        )
+        cases.append(
+            {
+                "id": f"association-citation-{label}",
+                "kind": "association-citation",
+                "fields": fields,
+                "admitted": admitted,
+                "evidence_message": not admitted,
+            }
+        )
+    for exponent in _OXYGEN_EXPONENTS:
+        for reference in _OXYGEN_REFERENCES:
+            for channel in _OXYGEN_CHANNELS:
+                for target in ("base", "captured"):
+                    cases.append(
+                        {
+                            "id": (
+                                f"association-{target}"
+                                f"-e={exponent!r}-r={reference!r}-c={channel!r}"
+                            ),
+                            "kind": "association-oxygen",
+                            "target": target,
+                            "exponent": exponent,
+                            "reference": reference,
+                            "channel": channel,
+                            "own_evidence": False,
+                        }
+                    )
+    # Own-row provenance on the association must not bypass the base law.
+    for exponent, reference, channel, own_evidence in (
+        (None, None, None, True),
+        (1, 1, "transport_headspace", True),
+    ):
+        cases.append(
+            {
+                "id": (
+                    f"association-own-evidence"
+                    f"-e={exponent!r}-r={reference!r}-c={channel!r}"
+                ),
+                "kind": "association-oxygen",
+                "target": "base",
+                "exponent": exponent,
+                "reference": reference,
+                "channel": channel,
+                "own_evidence": own_evidence,
+            }
+        )
+    return cases
+
+
+def _apply_oracle_oxygen(
+    model: dict,
+    *,
+    exponent: object,
+    reference: object,
+    channel: object,
+) -> None:
+    if exponent is None:
+        model.pop("pO2_exponent", None)
+    else:
+        model["pO2_exponent"] = exponent
+    if reference is None:
+        model.pop("pO2_reference_bar", None)
+    else:
+        model["pO2_reference_bar"] = reference
+    if channel is None:
+        model.pop("oxygen_fugacity_channel", None)
+    else:
+        model["oxygen_fugacity_channel"] = channel
+
+
+@functools.lru_cache(maxsize=1)
+def _fe_feo_payload_cached() -> tuple:
+    payload = _yaml("vapor_pressures.yaml")
+    return (
+        payload["schema_version"],
+        payload["families"]["metals_fe_family"],
+        payload["families"]["oxide_vapors_feo_association_family"],
+    )
+
+
+def _fe_feo_payload() -> dict:
+    schema_version, fe_family, feo_family = _fe_feo_payload_cached()
+    return {
+        "schema_version": schema_version,
+        "families": {
+            "metals_fe_family": deepcopy(fe_family),
+            "oxide_vapors_feo_association_family": deepcopy(feo_family),
+        },
+    }
+
+
+def _association_case_expects_admission(case: dict, payload: dict) -> bool:
+    fe_model = payload["families"]["metals_fe_family"]["physical_properties"][
+        "species"
+    ]["Fe"]["pressure_models"][0]
+    captured = payload["families"]["oxide_vapors_feo_association_family"][
+        "physical_properties"
+    ]["species"]["FeO_association_gas"]["pressure_models"][0][
+        "base_reference_pressure_model"
+    ]
+    if case["kind"] == "association-citation":
+        return _oracle_provenance_cites_observations(fe_model["provenance"][0])
+    base_law = _oracle_stored_oxygen_law(fe_model)
+    captured_law = _oracle_stored_oxygen_law(captured)
+    return (
+        base_law == _ASSOCIATION_EXECUTED_BASE_OXYGEN
+        and captured_law == _ASSOCIATION_EXECUTED_BASE_OXYGEN
+    )
+
+
+def _assert_cited_executed_law(case: dict) -> None:
+    """Invariant: activity exponent 0 is admitted only for a cited executed law.
+
+    A cleaned-melt evaluator with activity exponent 0 compiles only when the
+    pressure ``evaluate()`` computes is a complete evidenced law. Citations
+    are a nonempty sequence of nonblank observation ids. A gas association
+    executes its captured base by calling ``log10_pressure()``, which applies
+    no oxygen multiplier, so the evidenced base and the captured reference
+    must both be that identity law. Own-row provenance on the association
+    does not replace the base law.
+    """
+
+    if case["kind"] == "direct-citation":
+        payload = _effective_pressure_fit_fixture()
+        row = payload["families"]["potassium_test_family"]["physical_properties"][
+            "species"
+        ]["K"]
+        row["backsolve"] = {
+            "residual_dex": 0.12,
+            "provenance": {"generated_by": "fit.py", "fit_objective": "minimax"},
+        }
+        row["validation"]["anchor_refs"] = ["validation:fit-grid"]
+        row["pressure_models"][0]["provenance"] = [
+            _citation_provenance(case["fields"])
+        ]
+        admitted = _oracle_provenance_cites_observations(
+            row["pressure_models"][0]["provenance"][0]
+        )
+        assert admitted is case["admitted"]
+        try:
+            compiled = compile_vapour_rail_catalog(payload)
+        except CatalogCompileError as exc:
+            assert not admitted, f"refused a cited law: {exc}"
+            assert "effective-pressure reference fit requires" in str(exc)
+            return
+        assert admitted, "direct zero-activity melt compiled without a citation"
+        evaluator = compiled.species["K"].evaluator
+        assert evaluator is not None
+        assert evaluator.activity_exponent == 0.0
+        assert evaluator.evaluate(1100.0).pressure_pa > 0.0
+        return
+
+    payload = _fe_feo_payload()
+    fe_row = payload["families"]["metals_fe_family"]["physical_properties"][
+        "species"
+    ]["Fe"]
+    fe_model = fe_row["pressure_models"][0]
+    association_row = payload["families"]["oxide_vapors_feo_association_family"][
+        "physical_properties"
+    ]["species"]["FeO_association_gas"]
+    association_model = association_row["pressure_models"][0]
+    captured = association_model["base_reference_pressure_model"]
+    if case["kind"] == "association-citation":
+        fe_model["provenance"] = [_citation_provenance(case["fields"])]
+    else:
+        _apply_oracle_oxygen(
+            fe_model if case["target"] == "base" else captured,
+            exponent=case["exponent"],
+            reference=case["reference"],
+            channel=case["channel"],
+        )
+        if case["own_evidence"]:
+            association_row["backsolve"] = {
+                "residual_dex": 0.12,
+                "provenance": {
+                    "generated_by": "fit.py",
+                    "fit_objective": "minimax",
+                },
+            }
+            association_row["validation"]["anchor_refs"] = ["validation:fit-grid"]
+    admitted = _association_case_expects_admission(case, payload)
+    if case["kind"] == "association-oxygen":
+        base_law = _oracle_stored_oxygen_law(fe_model)
+        captured_law = _oracle_stored_oxygen_law(captured)
+        evidence_message = base_law is not None and captured_law is not None
+    else:
+        evidence_message = True
+    reviewer_base_bypass = (
+        case["kind"] == "association-oxygen"
+        and case["target"] == "base"
+        and case["exponent"] == 1
+        and case["reference"] == 1
+        and case["channel"] == "transport_headspace"
+    )
+    try:
+        compiled = compile_vapour_rail_catalog(
+            payload, emit_u0_request_rules=False
+        )
+    except CatalogCompileError as exc:
+        assert not admitted, f"refused the executed identity law: {exc}"
+        if evidence_message and not admitted:
+            assert "effective-pressure reference fit requires" in str(exc)
+        if reviewer_base_bypass:
+            assert "effective-pressure reference fit requires" in str(exc)
+        return
+    assert admitted, (
+        f"{case['id']} compiled a zero-activity law evaluate() does not cite "
+        "and execute"
+    )
+    evaluator = compiled.species["FeO_association_gas"].evaluator
+    assert evaluator is not None
+    assert evaluator.activity_exponent == 0.0
+    for pO2_bar, expected_pa in _CITED_FEO_ASSOCIATION_PRESSURE_PA.items():
+        assert evaluator.evaluate(1800.0, pO2_bar=pO2_bar).pressure_pa == (
+            pytest.approx(expected_pa, rel=1e-12, abs=0.0)
+        )
+
+
+@pytest.mark.parametrize(
+    "case",
+    _zero_activity_law_cases(),
+    ids=lambda case: case["id"],
+)
+def test_zero_activity_melt_admits_only_a_cited_executed_law(case: dict) -> None:
+    _assert_cited_executed_law(case)
 
 
 def test_policy_identity_cannot_compile_as_executable_alpha() -> None:

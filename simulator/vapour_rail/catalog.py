@@ -2631,6 +2631,51 @@ def _compile_evaluator(
     )
 
 
+def _nonblank_observation_id_sequence(value: object) -> tuple[str, ...] | None:
+    """Nonempty sequence of nonblank strings, or None when that is not the shape.
+
+    A string is not a sequence of ids. ``null``, blanks, and booleans are not
+    ids.
+    """
+
+    if isinstance(value, (str, bytes)) or not isinstance(value, Sequence):
+        return None
+    if len(value) == 0:
+        return None
+    ids: list[str] = []
+    for item in value:
+        if not isinstance(item, str):
+            return None
+        text = item.strip()
+        if not text:
+            return None
+        ids.append(text)
+    return tuple(ids)
+
+
+def _provenance_cites_observations(item: Mapping[str, Any]) -> bool:
+    """True when one provenance item cites real observation ids.
+
+    A singular ``observation_id`` is one citation. ``observation_ids`` counts
+    only as a nonempty sequence of nonblank strings. If either field is
+    present and malformed, the item cites nothing: a valid sibling does not
+    launder ``[null]``, ``[""]``, or ``true``.
+    """
+
+    has_singular = "observation_id" in item
+    has_plural = "observation_ids" in item
+    if not has_singular and not has_plural:
+        return False
+    if has_singular:
+        raw = item.get("observation_id")
+        if not isinstance(raw, str) or not raw.strip():
+            return False
+    if has_plural:
+        if _nonblank_observation_id_sequence(item.get("observation_ids")) is None:
+            return False
+    return True
+
+
 def _has_effective_pressure_reference_fit_evidence(
     *,
     species_id: str,
@@ -2656,11 +2701,7 @@ def _has_effective_pressure_reference_fit_evidence(
             isinstance(item, Mapping)
             and isinstance(item.get("source_id"), str)
             and bool(item["source_id"].strip())
-            and (
-                isinstance(item.get("observation_id"), str)
-                and bool(item["observation_id"].strip())
-                or bool(item.get("observation_ids"))
-            )
+            and _provenance_cites_observations(item)
             for item in model_provenance
         )
     )
@@ -3121,14 +3162,31 @@ def _verified_gas_association_base_has_fit_evidence(
     ):
         return False
 
+    base_reference_raw = model.get("base_reference_pressure_model")
+    if not isinstance(base_reference_raw, Mapping):
+        return False
     try:
         evidenced_base = _compile_reference_model(base_species_id, base_model)
+        # The closure calls captured.log10_pressure(T) and does not multiply
+        # by (pO2 / p_ref) ** exponent. That call is the identity multiplier:
+        # exponent 0, reference 1 bar, no channel. A stored oxygen law on the
+        # evidenced base or on the captured reference is a different pressure
+        # unless it is exactly that identity. Refuse it. Do not fold the base
+        # exponent into the exchange term: the closure has no pO2 argument.
+        executed_oxygen = (0.0, 1.0, None)
+        captured_oxygen = _stored_oxygen_executable_law(
+            f"{species_id}.base_reference_pressure_model",
+            base_reference_raw,
+        )
+        base_oxygen = _stored_oxygen_executable_law(base_species_id, base_model)
     except CatalogCompileError:
         return False
     return bool(
         captured.evaluator_family == evidenced_base.evaluator_family
         and captured.coefficients == evidenced_base.coefficients
         and captured.points == evidenced_base.points
+        and captured_oxygen == executed_oxygen
+        and base_oxygen == executed_oxygen
     )
 
 
@@ -3144,33 +3202,40 @@ def _zero_activity_melt_executable_is_evidenced(
     species_source_account_by_id: Mapping[str, str],
     bound_effective_fits: frozenset[tuple[object, ...]],
 ) -> bool:
-    """Admit cleaned-melt activity exponent 0 only for a bound evidenced fit.
+    """Admit cleaned-melt activity exponent 0 only for a cited executed law.
 
     Invariant: every cleaned-melt species with activity exponent 0 is refused
-    unless the pressure ``evaluate()`` computes is evidenced for that same
-    species and melt basis. That pressure is the Antoine curve times the
-    oxygen multiplier ``(pO2 / p_ref) ** exponent`` on the named channel.
-    Exponent 0 applies no multiplier. Evidence is this row's own provenance,
-    residual, and anchors; a gas-association composite whose captured base is
-    such a fit for the named base species; or this species' own Antoine law
-    (formula, parent oxide, source account, species basis, coefficients,
-    temperature domain, and the stored oxygen multiplier) matching a record
-    in ``bound_effective_fits``. Copying another species' A, B, and C is not
-    evidence. Keeping those coefficients while changing ``pO2_exponent``,
-    ``pO2_reference_bar``, or the oxygen channel is not evidence either.
-    ``composition_mode`` and an embedded coefficient block the executable
-    evaluator does not call are not evidence.
+    unless the pressure ``evaluate()`` computes is a completely cited
+    evidenced law. A citation is a nonblank ``observation_id`` or a nonempty
+    sequence of nonblank ``observation_ids``. ``null``, blanks, and booleans
+    are not citations. The executed pressure is the reference curve times the
+    oxygen multiplier the evaluator actually applies.
+
+    A direct evaluator applies the oxygen law stored on that same model, so
+    this row's provenance, residual, and anchors evidence that law. Historic
+    reuse admits only this species' own Antoine law, including that oxygen
+    multiplier, when it matches ``bound_effective_fits``.
+
+    A gas-association composite calls ``base_reference.log10_pressure()``.
+    That call applies no base oxygen multiplier, so it executes only the
+    identity law (exponent 0, reference 1 bar, no channel) on the captured
+    curve. Own-row provenance on the association does not evidence that call
+    and cannot admit the composite. Copying another species' coefficients,
+    or keeping them while changing the oxygen law, is not that call.
     """
 
-    if _verified_gas_association_base_has_fit_evidence(
-        species_id=species_id,
-        model=model,
-        evaluator=evaluator,
-        species_rows_by_id=species_rows_by_id,
-        species_source_account_by_id=species_source_account_by_id,
-        bound_effective_fits=bound_effective_fits,
-    ):
-        return True
+    # The captured base is the object the closure evaluates. Association
+    # admission is only that executed law; do not fall through to this row's
+    # own provenance.
+    if _captured_association_base(evaluator) is not None:
+        return _verified_gas_association_base_has_fit_evidence(
+            species_id=species_id,
+            model=model,
+            evaluator=evaluator,
+            species_rows_by_id=species_rows_by_id,
+            species_source_account_by_id=species_source_account_by_id,
+            bound_effective_fits=bound_effective_fits,
+        )
     if _has_effective_pressure_reference_fit_evidence(
         species_id=species_id,
         row=row,
@@ -3284,16 +3349,19 @@ def _compile_source_reaction_activity(
         ):
             raise CatalogCompileError(
                 f"{species_id}: effective-pressure reference fit requires "
-                "model provenance with source_id and observation_id(s), "
-                "backsolve.provenance.generated_by, "
+                "model provenance with source_id and a nonblank "
+                "observation_id or a nonempty sequence of nonblank "
+                "observation_ids, backsolve.provenance.generated_by, "
                 "backsolve.provenance.fit_objective, a finite non-negative "
                 "backsolve.residual_dex, validation.anchor_refs, a "
-                "gas-association composite whose captured base matches an "
-                "evidence-backed fit, or this species' Antoine law bound to "
-                "the same formula, parent oxide, source account, species "
-                "basis, and oxygen multiplier (pO2_exponent, "
-                "pO2_reference_bar, oxygen_fugacity_channel) as a record "
-                "in bound_effective_fits"
+                "gas-association composite whose captured base curve matches "
+                "an evidence-backed fit and whose base oxygen law is the "
+                "identity multiplier the closure executes (pO2_exponent 0, "
+                "pO2_reference_bar 1, no oxygen channel), or this species' "
+                "Antoine law bound to the same formula, parent oxide, source "
+                "account, species basis, and oxygen multiplier "
+                "(pO2_exponent, pO2_reference_bar, oxygen_fugacity_channel) "
+                "as a record in bound_effective_fits"
             )
 
     if evaluator is not None and (
@@ -3892,6 +3960,10 @@ def _compile_thermo_reference_model(
                 log10_K = -delta_g_over_RT / math.log(10.0)
                 # Base Antoine is the van't Hoff 1/(T+C) continuation of the
                 # fitted liquid-reservoir reaction dH; evaluate at actual T.
+                # This call does not apply the base oxygen multiplier.
+                # Zero-activity association admission therefore requires that
+                # multiplier to be the identity (exponent 0, reference 1 bar,
+                # no channel) on both the evidenced base and this reference.
                 log10_base_pa = float(base_reference.log10_pressure(temperature_K))
                 log10_base_ratio = log10_base_pa - math.log10(Pstd)
                 log10_pO2_over_Pstd = math.log10(
