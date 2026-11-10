@@ -2743,7 +2743,12 @@ def test_sio_activity_notice_reason_matches_selected_rung(
         assert prediction["original_refusal_reason"] == (
             answer.source_reaction_activity.reason
         )
-    assert rung in prediction["reason"]
+    reason_fragment = {
+        "provider activity": "provider-reported activity is retained",
+        "published gamma*x": "published gamma*x bridge estimate",
+        "ideal a=x": "ideal_mixing_assumption",
+    }[rung]
+    assert reason_fragment in prediction["reason"]
 
 
 @pytest.mark.parametrize("temperature_K", (1300.0, 1800.0))
