@@ -515,23 +515,16 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
             unity.pO2_bar, rel=1.0e-9
         )
 
-    # openimcc 4fe8eaf refit the CaO(l) continuation used by this Hashimoto
-    # probe; at 30c51c8 the alpha=1 and 0.25 results are 0.8286161505495706 Pa
-    # and 0.3003449996328013 Pa, respectively.
-    # The two engines still use their own melt channel pressures for both arms.
-    assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.160995d98f6e4p-17"
+    # 995dc14 adds Si2O2 and AlSiO to the OpenIMCC gas profile. Both bridge
+    # through the SiO alpha row; their pressure laws remain those from
+    # OpenIMCC's gas resolver. The two engines use their own pressure models.
+    assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.35134320e1451p-17"
     assert (
         solved["openimcc"][1.0].pO2_bar * PA_PER_BAR
-    ).hex() == "0x1.a8406047187bap-1"
-    assert solved["openimcc"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.3003449996328013, rel=2.0e-5
-    )
-    assert solved["internal-analytical"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
-        1.025329, rel=2.0e-5
-    )
-    assert solved["internal-analytical"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.374487, rel=2.0e-5
-    )
+    ).hex() == "0x1.d79c844e0bbc0p-1"
+    assert solved["openimcc"][0.25].pO2_bar.hex() == "0x1.c1d82afdabaebp-19"
+    assert solved["internal-analytical"][1.0].pO2_bar.hex() == "0x1.41bde8a262d97p-17"
+    assert solved["internal-analytical"][0.25].pO2_bar.hex() == "0x1.d4f2d817b610ap-19"
 
     # Replacing either engine's root by the other's does not close that engine's
     # channel balance, which catches the old IA adapter's borrowed-root pattern.
