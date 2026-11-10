@@ -9656,6 +9656,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._sulfur_saturation_steps = steps
         steps.append(step)
 
+    def stage0_carbon_allocation_run_notice(self) -> Dict[str, Any] | None:
+        """Out-of-domain or refused stage-0 sulfate carbon ranking.
+
+        In-domain rankings stay off the report. An extrapolated ranking
+        is a flagged best estimate and must be visible. A scarce budget
+        with no reaction-specific dG is a typed refusal of that quantity.
+        """
+        notices = getattr(self, '_stage0_carbon_allocation_notices', None)
+        if not isinstance(notices, list) or not notices:
+            return None
+        notice = notices[0]
+        if not isinstance(notice, dict):
+            return None
+        payload = copy.deepcopy(notice)
+        claims = payload.get('claims') or []
+        out_of_domain = [
+            str(claim['species'])
+            for claim in claims
+            if isinstance(claim, dict)
+            and claim.get('confidence') == 'out_of_domain'
+        ]
+        payload['out_of_domain'] = bool(out_of_domain)
+        payload['out_of_domain_species'] = list(
+            payload.get('out_of_domain_species') or out_of_domain
+        )
+        if payload.get('reason') == (
+            'stage0_cation_sulfate_carbon_ranking_refused'
+        ):
+            return payload
+        if not payload['out_of_domain']:
+            return None
+        return payload
+
     def sulfur_saturation_run_notice(self) -> Dict[str, Any] | None:
         """Run-level SulfSat notice, or None when every step was in range."""
 
@@ -10998,6 +11031,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return [species for species, _feed_kg in active]
 
         from engines.builtin.foulant_disposition import (
+            FoulantCarbonRankingRefusal,
             foulant_dg_kJ_per_mol_carbon,
         )
 
@@ -11027,6 +11061,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else STAGE0_CATION_SULFATE_OXIDE_STOICH
         )
         claims: list[dict] = []
+        refused: list[dict] = []
         carbon_mol_demand = 0.0
         for species, feed_kg in active:
             stoich = stoich_table.get(species)
@@ -11054,6 +11089,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f'cation sulfate {species!r} has no foulant dG row '
                     'for carbon ranking'
                 )
+            reaction = str(dg_row.get('reaction') or '')
+            # Sulfide cleanup is not the oxide-decomposition table. Dividing
+            # that thermal dG by the sulfide carbon demand is not a ranking
+            # input, even when the oxygen couple happens to be false.
+            if to_sulfide:
+                refused.append({
+                    'species': species,
+                    'basis': dg_key,
+                    'reaction': reaction,
+                    'detail': (
+                        'sulfide cleanup has no reaction-specific dG; '
+                        'the oxide decomposition table is a different reaction'
+                    ),
+                })
+                continue
             try:
                 dg_per_mol_c, confidence, oxygen_couple = (
                     foulant_dg_kJ_per_mol_carbon(
@@ -11063,6 +11113,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         carbon_per_mol_feed=c_per_mol,
                     )
                 )
+            except FoulantCarbonRankingRefusal as exc:
+                refused.append({
+                    'species': species,
+                    'basis': dg_key,
+                    'reaction': exc.reaction,
+                    'detail': exc.detail,
+                })
+                continue
             except (KeyError, ValueError) as exc:
                 raise AccountingError(
                     f'cation sulfate {species!r} has no usable foulant '
@@ -11076,10 +11134,36 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'oxygen_couple': oxygen_couple,
                 'carbon_mol_demand': feed_mol * c_per_mol,
             })
+        rationed = carbon_mol_demand > float(carbon_mol_remaining) + 1e-9
+        if refused:
+            if rationed:
+                self._stage0_carbon_allocation_notices = [{
+                    'reason': 'stage0_cation_sulfate_carbon_ranking_refused',
+                    'temperature_K': temperature_K,
+                    'refused': refused,
+                    'carbon_mol_demand': carbon_mol_demand,
+                    'carbon_mol_supplied': float(carbon_mol_remaining),
+                    'rationed': True,
+                }]
+                details = '; '.join(
+                    f"{item['species']}: {item['detail']}" for item in refused
+                )
+                raise AccountingError(
+                    'stage-0 cation-sulfate carbon ranking refused: '
+                    f'{details}'
+                )
+            # Carbon covers every stoichiometric claim, so the missing
+            # ranking input cannot change an extent. Do not sort on it.
+            return sorted(species for species, _feed_kg in active)
         claims.sort(key=lambda claim: (
             float(claim['dG_kJ_per_mol_C']),
             str(claim['species']),
         ))
+        out_of_domain_species = [
+            str(claim['species'])
+            for claim in claims
+            if claim['confidence'] == 'out_of_domain'
+        ]
         self._stage0_carbon_allocation_notices = [{
             'reason': 'stage0_cation_sulfate_carbon_ranked_by_dg',
             'temperature_K': temperature_K,
@@ -11087,7 +11171,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'claims': claims,
             'carbon_mol_demand': carbon_mol_demand,
             'carbon_mol_supplied': float(carbon_mol_remaining),
-            'rationed': carbon_mol_demand > float(carbon_mol_remaining) + 1e-9,
+            'rationed': rationed,
+            'out_of_domain': bool(out_of_domain_species),
+            'out_of_domain_species': out_of_domain_species,
         }]
         return [str(claim['species']) for claim in claims]
 

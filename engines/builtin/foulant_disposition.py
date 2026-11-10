@@ -422,6 +422,19 @@ def _interpolated_dg_kJ(
     return dg, confidence
 
 
+class FoulantCarbonRankingRefusal(ValueError):
+    """The tabulated thermal dG is not this cleanup's dG per mol carbon."""
+
+    def __init__(self, species: str, reaction: str, detail: str) -> None:
+        self.species = species
+        self.reaction = reaction
+        self.detail = detail
+        super().__init__(
+            f"cation sulfate {species!r} has no reaction-specific dG per mol C "
+            f"({detail}; table reaction {reaction!r})"
+        )
+
+
 def foulant_dg_kJ_per_mol_carbon(
     dg_row: Mapping[str, Any],
     temperature_K: float,
@@ -429,14 +442,15 @@ def foulant_dg_kJ_per_mol_carbon(
     species: str,
     carbon_per_mol_feed: float,
 ) -> tuple[float, str, bool]:
-    """Tabulated thermal dG divided by the carbon the cleanup consumes.
+    """Oxide-decomposition dG per mol C, only when the oxygen couple holds.
 
-    The oxide reactions are the thermal decomposition plus
-    ``C + 1/2 O2 -> CO``. That CO term is the same for every sulfate
-    whose table releases 1/2 O2 per mol C, so it does not change the
-    greedy order. ``n_C`` is the feed coefficient in the tabulated
-    reaction times ``carbon_per_mol_feed``. ``oxygen_couple`` is true
-    when ``2 * nu_O2 == n_C``.
+    The carbothermal cleanup is the tabulated decomposition plus
+    ``C + 1/2 O2 -> CO``. ``n_C`` is the feed coefficient in the table
+    times ``carbon_per_mol_feed``. That CO term is common, and drops out
+    of the greedy order, only when the table releases 1/2 O2 per mol C
+    (``2 * nu_O2 == n_C``). MgSO4 -> MgO + SO3, and an oxide table
+    divided by a sulfide carbon demand, are different reactions. Those
+    quotients are not ranking inputs.
     """
     if not isinstance(dg_row, Mapping):
         raise ValueError("dG row must be a mapping")
@@ -448,12 +462,19 @@ def foulant_dg_kJ_per_mol_carbon(
         raise ValueError("dG row reaction must be a string")
     feed_coeff = _reactant_coefficient(reaction, species)
     n_carbon = feed_coeff * c_per_feed
+    nu_o2 = _product_o2_stoich(reaction)
+    oxygen_couple = math.isclose(2.0 * nu_o2, n_carbon, rel_tol=0.0, abs_tol=1e-9)
+    if not oxygen_couple:
+        raise FoulantCarbonRankingRefusal(
+            species,
+            reaction,
+            "oxygen couple does not match carbon demand; "
+            "the shared C + 1/2 O2 -> CO term does not cancel",
+        )
     dg_reaction, confidence = _interpolated_dg_kJ(
         _parse_dg_points(dg_row), temperature_K
     )
-    nu_o2 = _product_o2_stoich(reaction)
-    oxygen_couple = math.isclose(2.0 * nu_o2, n_carbon, rel_tol=0.0, abs_tol=1e-9)
-    return dg_reaction / n_carbon, confidence, oxygen_couple
+    return dg_reaction / n_carbon, confidence, True
 
 
 def _product_o2_stoich(reaction: object) -> float:

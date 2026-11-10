@@ -11,8 +11,13 @@ from pathlib import Path
 
 import pytest
 
-from engines.builtin.foulant_disposition import chi_decomp, load_foulant_registry
-from simulator.accounting import resolve_species_formula
+from engines.builtin.foulant_disposition import (
+    FoulantCarbonRankingRefusal,
+    chi_decomp,
+    foulant_dg_kJ_per_mol_carbon,
+    load_foulant_registry,
+)
+from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 
@@ -646,6 +651,11 @@ def test_scarce_carbon_allocates_to_lower_dg_per_mol_c_not_dict_order():
         assert by_species["CaSO4"]["confidence"] == "out_of_domain"
         assert by_species["FeSO4"]["oxygen_couple"] is True
         assert by_species["CaSO4"]["oxygen_couple"] is True
+        assert notice["out_of_domain"] is True
+        reported = sim.stage0_carbon_allocation_run_notice()
+        assert reported["out_of_domain_species"] == ["FeSO4", "CaSO4"]
+        assert reported["claims"][0]["basis"] == "FeSO4_thermal_decomp"
+        assert reported["claims"][1]["basis"] == "CaSO4_thermal_decomp"
 
 
 def test_load_batch_scarce_sulfate_carbon_follows_dg_not_set_order():
@@ -698,5 +708,174 @@ def test_load_batch_scarce_sulfate_carbon_follows_dg_not_set_order():
     assert "FeSO4" not in sim.inventory.cation_sulfate_feed_kg
     assert sim._stage0_bakeout_reserved_carbon_kg == pytest.approx(0.0, abs=1e-9)
     assert sim._stage0_carbon_allocation_notices[0]["order"] == ["FeSO4", "CaSO4"]
+    reported = sim.stage0_carbon_allocation_run_notice()
+    assert reported["out_of_domain"] is True
+    assert reported["out_of_domain_species"] == ["FeSO4", "CaSO4"]
+    assert [claim["basis"] for claim in reported["claims"]] == [
+        "FeSO4_thermal_decomp",
+        "CaSO4_thermal_decomp",
+    ]
+    from simulator.runner import (
+        _attach_stage0_carbon_allocation_notice,
+        _product_classification_report,
+    )
+
+    metadata: dict = {}
+    _attach_stage0_carbon_allocation_notice(metadata, sim)
+    assert metadata["stage0_carbon_allocation_notice"]["out_of_domain"] is True
+    classification = _product_classification_report(
+        sim, feedstock_id="feed", campaign="C0"
+    )
+    assert classification["stage0_carbon_allocation_notice"]["out_of_domain_species"] == [
+        "FeSO4",
+        "CaSO4",
+    ]
+    assert "flagged best estimate" in classification["markdown"]
+    assert "FeSO4_thermal_decomp" in classification["markdown"] or (
+        "FeSO4" in classification["markdown"]
+    )
     snapshot = sim._make_snapshot()
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
+
+
+def test_mgso4_thermal_table_is_not_a_carbon_ranking_input():
+    registry = load_foulant_registry(FOULANT_THERMO)
+    with pytest.raises(FoulantCarbonRankingRefusal, match="MgSO4"):
+        foulant_dg_kJ_per_mol_carbon(
+            registry.foulant_dG["MgSO4_thermal_decomp"],
+            1323.15,
+            species="MgSO4",
+            carbon_per_mol_feed=1.0,
+        )
+    with pytest.raises(FoulantCarbonRankingRefusal, match="CaSO4"):
+        foulant_dg_kJ_per_mol_carbon(
+            registry.foulant_dG["CaSO4_thermal_decomp"],
+            1323.15,
+            species="CaSO4",
+            carbon_per_mol_feed=4.0,
+        )
+
+
+def _cation_masses(registry, species: str, moles: float) -> float:
+    return moles * resolve_species_formula(
+        species, registry
+    ).molar_mass_kg_per_mol()
+
+
+def test_scarce_mgsO4_refuses_thermal_dg_ranking_and_does_not_allocate():
+    """MgSO4 -> MgO + SO3 is not MgSO4 + C -> MgO + SO2 + CO.
+
+    1 mol C, 1 mol MgSO4, 2 mol FeSO4 used to give the carbon to FeSO4
+    because the SO3 table's thermal dG ranked below FeSO4. That quotient
+    is not the cleanup reaction. The scarce budget is refused.
+    """
+    sim = _sim({"feed": {"label": "b-1056 mgsO4"}})
+    registry = sim.species_formula_registry
+    feeds = {
+        "MgSO4": _cation_masses(registry, "MgSO4", 1.0),
+        "FeSO4": _cation_masses(registry, "FeSO4", 2.0),
+    }
+    sim.inventory.cation_sulfate_feed_kg = dict(feeds)
+    sim.inventory.stage0_temp_range_C = (20.0, 1050.0)
+    sim.inventory.melt_oxide_kg = {}
+    sim.inventory.gas_volatiles_kg = {}
+    with pytest.raises(AccountingError, match="MgSO4"):
+        sim._apply_stage0_cation_sulfate_carbon_reactions(
+            {"stage0_carbon_cleanup": {"cation_sulfate_product": "oxide"}},
+            1.0,
+            [],
+        )
+    assert sim.inventory.cation_sulfate_feed_kg == feeds
+    assert sim.inventory.melt_oxide_kg == {}
+    assert sim.inventory.gas_volatiles_kg == {}
+    notice = sim.stage0_carbon_allocation_run_notice()
+    assert notice["reason"] == "stage0_cation_sulfate_carbon_ranking_refused"
+    assert notice["refused"][0]["species"] == "MgSO4"
+    assert notice["refused"][0]["basis"] == "MgSO4_thermal_decomp"
+
+
+def test_abundant_mgsO4_still_serves_every_stoichiometric_claim():
+    """A covered carbon budget does not need the missing MgSO4 rank."""
+    sim = _sim({"feed": {"label": "b-1056 mgsO4 covered"}})
+    registry = sim.species_formula_registry
+    sim.inventory.cation_sulfate_feed_kg = {
+        "MgSO4": _cation_masses(registry, "MgSO4", 1.0),
+        "FeSO4": _cation_masses(registry, "FeSO4", 1.0),
+    }
+    sim.inventory.stage0_temp_range_C = (20.0, 1050.0)
+    sim.inventory.melt_oxide_kg = {}
+    sim.inventory.gas_volatiles_kg = {}
+    sim._stage0_bakeout_reserved_carbon_kg = 0.0
+    remaining = sim._apply_stage0_cation_sulfate_carbon_reactions(
+        {"stage0_carbon_cleanup": {"cation_sulfate_product": "oxide"}},
+        2.0,
+        [],
+    )
+    assert remaining == pytest.approx(0.5, abs=1e-12)
+    assert sim.inventory.melt_oxide_kg.get("Fe2O3", 0.0) == pytest.approx(
+        _cation_masses(registry, "Fe2O3", 0.5), abs=1e-12
+    )
+    assert sim.inventory.cation_sulfate_feed_kg.get("MgSO4", 0.0) == pytest.approx(
+        _cation_masses(registry, "MgSO4", 1.0), abs=1e-12
+    )
+    assert "FeSO4" not in sim.inventory.cation_sulfate_feed_kg
+    assert sim._stage0_bakeout_reserved_carbon_kg == pytest.approx(
+        _cation_masses(registry, "C", 1.0), abs=1e-12
+    )
+    assert sim.stage0_carbon_allocation_run_notice() is None
+
+
+def test_scarce_sulfide_refuses_oxide_table_ranking():
+    """Sulfide carbon demand is not the oxide decomposition dG."""
+    sim = _sim({"feed": {"label": "b-1056 sulfide"}})
+    registry = sim.species_formula_registry
+    feeds = {
+        "CaSO4": _cation_masses(registry, "CaSO4", 1.0),
+        "FeSO4": _cation_masses(registry, "FeSO4", 1.0),
+    }
+    sim.inventory.cation_sulfate_feed_kg = dict(feeds)
+    sim.inventory.stage0_temp_range_C = (20.0, 1050.0)
+    sim.inventory.sulfide_matte_kg = {}
+    sim.inventory.gas_volatiles_kg = {}
+    with pytest.raises(AccountingError, match="sulfide cleanup"):
+        sim._apply_stage0_cation_sulfate_carbon_reactions(
+            {"stage0_carbon_cleanup": {"cation_sulfate_product": "sulfide"}},
+            4.0,
+            [],
+        )
+    assert sim.inventory.cation_sulfate_feed_kg == feeds
+    assert sim.inventory.sulfide_matte_kg == {}
+    assert sim.inventory.gas_volatiles_kg == {}
+    notice = sim.stage0_carbon_allocation_run_notice()
+    assert notice["reason"] == "stage0_cation_sulfate_carbon_ranking_refused"
+    assert {item["species"] for item in notice["refused"]} == {"CaSO4", "FeSO4"}
+
+
+def test_abundant_sulfide_still_converts_each_host():
+    sim = _sim({"feed": {"label": "b-1056 sulfide covered"}})
+    registry = sim.species_formula_registry
+    sim.inventory.cation_sulfate_feed_kg = {
+        "CaSO4": _cation_masses(registry, "CaSO4", 1.0),
+        "FeSO4": _cation_masses(registry, "FeSO4", 1.0),
+    }
+    sim.inventory.stage0_temp_range_C = (20.0, 1050.0)
+    sim.inventory.sulfide_matte_kg = {}
+    sim.inventory.gas_volatiles_kg = {}
+    sim._stage0_bakeout_reserved_carbon_kg = 0.0
+    remaining = sim._apply_stage0_cation_sulfate_carbon_reactions(
+        {"stage0_carbon_cleanup": {"cation_sulfate_product": "sulfide"}},
+        8.0,
+        [],
+    )
+    assert remaining == pytest.approx(0.0, abs=1e-12)
+    assert sim.inventory.sulfide_matte_kg.get("FeS", 0.0) == pytest.approx(
+        _cation_masses(registry, "FeS", 1.0), abs=1e-12
+    )
+    assert "CaS" not in sim.inventory.sulfide_matte_kg
+    assert sim.inventory.cation_sulfate_feed_kg.get("CaSO4", 0.0) == pytest.approx(
+        _cation_masses(registry, "CaSO4", 1.0), abs=1e-12
+    )
+    assert sim._stage0_bakeout_reserved_carbon_kg == pytest.approx(
+        _cation_masses(registry, "C", 4.0), abs=1e-12
+    )
+    assert sim.stage0_carbon_allocation_run_notice() is None

@@ -6271,6 +6271,15 @@ def _cache_trace_payload(
         payload["high_t_melt_activity_fallback_notice"] = _compact_jsonable(
             high_t_activity_notice
         )
+    carbon_reader = getattr(
+        simulator, "stage0_carbon_allocation_run_notice", None
+    )
+    if callable(carbon_reader):
+        carbon_notice = carbon_reader()
+        if isinstance(carbon_notice, MappingABC) and carbon_notice:
+            payload["stage0_carbon_allocation_notice"] = _compact_jsonable(
+                dict(carbon_notice)
+            )
     alpha_authority_status_by_species = getattr(
         simulator,
         "_alpha_authority_status_by_species_engaged",
