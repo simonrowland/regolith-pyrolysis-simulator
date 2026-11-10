@@ -112,7 +112,7 @@ def _hero_report() -> dict[str, object]:
     }
 
 
-def test_rows_rank_page_and_filter_by_engine_feedstock_and_default_campaign() -> None:
+def test_rows_rank_page_and_filter_by_engine_and_feedstock() -> None:
     rows = [
         _residual("fe-two", predicted=100.0),
         _residual("fe-minus-one", predicted=0.1),
@@ -123,8 +123,9 @@ def test_rows_rank_page_and_filter_by_engine_feedstock_and_default_campaign() ->
     ]
 
     worst = leaderboard_module.leaderboard(rows, level="row", order="worst", limit=20)
-    assert worst["total"] == 4
+    assert worst["total"] == 5
     assert [row["observation_id"] for row in worst["rows"]] == [
+        "fe-hot",
         "fe-other-engine",
         "fe-two",
         "fe-minus-one",
@@ -144,11 +145,10 @@ def test_rows_rank_page_and_filter_by_engine_feedstock_and_default_campaign() ->
         "unit",
         "flags",
     }
-    assert worst["filters"]["temperature_K"]["source"] == (
-        "data/setpoints.yaml campaigns.C0.temp_range_C, converted to K"
-    )
+    assert worst["filters"]["temperature_K"] is None
+    assert "Temperature: not filtered." in leaderboard_module._markdown(worst)
     assert worst["rows"][0]["observed"] == pytest.approx(1.0)
-    assert worst["rows"][0]["predicted"] == pytest.approx(1000.0)
+    assert worst["rows"][0]["predicted"] == pytest.approx(1e6)
 
     best = leaderboard_module.leaderboard(rows, level="row", order="best", limit=20)
     assert [row["observation_id"] for row in best["rows"]] == [
@@ -156,6 +156,7 @@ def test_rows_rank_page_and_filter_by_engine_feedstock_and_default_campaign() ->
         "fe-minus-one",
         "fe-two",
         "fe-other-engine",
+        "fe-hot",
     ]
     assert best["rows"][0]["flags"] == [NoticeKind.OUT_OF_CERTIFIED_BAND.value]
 
@@ -165,8 +166,11 @@ def test_rows_rank_page_and_filter_by_engine_feedstock_and_default_campaign() ->
     second = leaderboard_module.leaderboard(
         rows, level="row", order="worst", limit=2, offset=2
     )
-    assert [*first["rows"], *second["rows"]] == worst["rows"]
-    assert second["total"] == 4
+    third = leaderboard_module.leaderboard(
+        rows, level="row", order="worst", limit=2, offset=4
+    )
+    assert [*first["rows"], *second["rows"], *third["rows"]] == worst["rows"]
+    assert second["total"] == 5
     assert second["offset"] == 2
 
     openimcc = leaderboard_module.leaderboard(rows, engine="openimcc", level="row")
@@ -174,8 +178,56 @@ def test_rows_rank_page_and_filter_by_engine_feedstock_and_default_campaign() ->
     all_feedstocks = leaderboard_module.leaderboard(
         rows, feedstock="all", level="row", limit=20
     )
-    assert all_feedstocks["total"] == 5
+    assert all_feedstocks["total"] == 6
     assert "au" in [row["observation_id"] for row in all_feedstocks["rows"]]
+
+
+def test_explicit_temperature_bounds_and_flag_spelling(tmp_path: Path) -> None:
+    hot = _residual("fe-hot", temperature_K=1300.0)
+    duplicate_flags = _residual("fe-flags")
+    duplicate_flags["notices"] = [{"kind": "unverified-apparatus"}]
+    duplicate_flags["candidate_observation"]["notices"] = [
+        {"kind": "unverified_apparatus"},
+        {"kind": "unverified-apparatus"},
+    ]
+    rows = [hot, duplicate_flags]
+
+    bounded = leaderboard_module.leaderboard(
+        rows, level="row", tmin_K=1200.0, tmax_K=1400.0
+    )
+    assert [row["observation_id"] for row in bounded["rows"]] == ["fe-hot"]
+    assert bounded["filters"]["temperature_K"] == {
+        "min": 1200.0,
+        "max": 1400.0,
+        "source": "explicit CLI bounds",
+    }
+
+    unbounded = leaderboard_module.leaderboard(rows, level="row", feedstock="all")
+    flagged_row = next(
+        row for row in unbounded["rows"] if row["observation_id"] == "fe-flags"
+    )
+    assert flagged_row["flags"] == ["unverified_apparatus"]
+
+    archive = tmp_path / "bounds.tgz"
+    _write_archive(archive, rows)
+    output = tmp_path / "bounded.json"
+    assert leaderboard_module.main(
+        [
+            "--archive",
+            str(archive),
+            "--feedstock",
+            "all",
+            "--tmin-K",
+            "1200",
+            "--tmax-K",
+            "1400",
+            "--format",
+            "json",
+            "--out",
+            str(output),
+        ]
+    ) == 0
+    assert json.loads(output.read_text(encoding="utf-8"))["total"] == 1
 
 
 def test_groups_keep_units_separate_include_flags_and_exclude_refusals() -> None:

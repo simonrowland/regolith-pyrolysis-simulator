@@ -628,21 +628,19 @@ def _matches_feedstock_species(species: str, oxide_names: set[str], elements: se
     return cations <= elements
 
 
-def _default_temperature_filter(config: Any) -> dict[str, Any] | None:
-    # The runner defaults to C0; use its declared campaign band rather than another range.
-    campaigns = _mapping(_mapping(config.setpoints).get("campaigns"))
-    default_campaign = _mapping(campaigns.get("C0"))
-    raw_range = _sequence(default_campaign.get("temp_range_C"))
-    if len(raw_range) != 2:
+def _explicit_temperature_filter(
+    tmin_K: float | None, tmax_K: float | None
+) -> dict[str, Any] | None:
+    if tmin_K is None and tmax_K is None:
         return None
-    low, high = _number(raw_range[0]), _number(raw_range[1])
-    if low is None or high is None:
-        return None
-    return {
-        "min": low + 273.15,
-        "max": high + 273.15,
-        "source": "data/setpoints.yaml campaigns.C0.temp_range_C, converted to K",
-    }
+    low, high = _number(tmin_K), _number(tmax_K)
+    if tmin_K is not None and low is None:
+        raise ValueError("tmin_K must be a finite number")
+    if tmax_K is not None and high is None:
+        raise ValueError("tmax_K must be a finite number")
+    if low is not None and high is not None and low > high:
+        raise ValueError("tmin_K must be less than or equal to tmax_K")
+    return {"min": low, "max": high, "source": "explicit CLI bounds"}
 
 
 def _run_temperature_filter(envelope: Mapping[str, Any]) -> dict[str, Any] | None:
@@ -681,14 +679,18 @@ def _metric_unit(numeric: Mapping[str, Any]) -> tuple[str, str]:
 
 
 def _row_flags(row: Mapping[str, Any], flagged: bool) -> list[str]:
+    def canonical(value: object) -> str:
+        return str(value).strip().casefold().replace("-", "_")
+
     candidate = _mapping(row.get("candidate_observation"))
     flags = {
-        str(notice.get("kind"))
+        canonical(notice.get("kind"))
         for source in (row.get("notices"), candidate.get("notices"))
         for notice in _sequence(source)
         if isinstance(notice, Mapping) and notice.get("kind")
     }
-    flags.update(_flagged_payload_strata(row))
+    flags.update(canonical(flag) for flag in _flagged_payload_strata(row))
+    flags.discard("")
     if flagged and not flags:
         flags.add("flagged")
     return sorted(flags)
@@ -715,6 +717,8 @@ def leaderboard(
     species: str | None = None,
     unit: str | None = None,
     run: Mapping[str, Any] | None = None,
+    tmin_K: float | None = None,
+    tmax_K: float | None = None,
 ) -> dict[str, Any]:
     """Rank priced residuals by prediction or by rail/species/engine/unit group."""
 
@@ -739,10 +743,27 @@ def leaderboard(
     aliases = _formula_aliases(run) if run is not None else {}
     roles = _engine_roles(run, _report_rows(run)) if run is not None else {}
     temperature_filter = (
-        _run_temperature_filter(envelope)
-        if envelope is not None
-        else _default_temperature_filter(config)
+        _run_temperature_filter(envelope) if envelope is not None else None
     )
+    explicit_temperature_filter = _explicit_temperature_filter(tmin_K, tmax_K)
+    if explicit_temperature_filter is not None:
+        if temperature_filter is None:
+            temperature_filter = explicit_temperature_filter
+        else:
+            run_min, run_max = temperature_filter["min"], temperature_filter["max"]
+            explicit_min = explicit_temperature_filter["min"]
+            explicit_max = explicit_temperature_filter["max"]
+            temperature_filter = {
+                "min": max(run_min, explicit_min)
+                if explicit_min is not None
+                else run_min,
+                "max": min(run_max, explicit_max)
+                if explicit_max is not None
+                else run_max,
+                "source": f"{temperature_filter['source']}; explicit CLI bounds",
+            }
+            if temperature_filter["min"] > temperature_filter["max"]:
+                raise ValueError("explicit temperature bounds do not overlap the run")
     engine_values = _engine_filter_values(engine)
     engine_json = None if engine_values is None else sorted(engine_values)
 
@@ -786,15 +807,21 @@ def leaderboard(
                 row, row_rail, row_species, row_engine, envelope, roles, aliases
             ):
                 continue
-        elif temperature_filter is not None and temperature is not None:
-            if not (
-                temperature_filter["min"]
-                <= float(temperature)
-                <= temperature_filter["max"]
-            ):
-                continue
-        elif temperature_filter is not None and not refused:
-            continue
+        if temperature_filter is not None:
+            if temperature is None:
+                if not refused:
+                    continue
+            else:
+                if (
+                    temperature_filter["min"] is not None
+                    and float(temperature) < temperature_filter["min"]
+                ):
+                    continue
+                if (
+                    temperature_filter["max"] is not None
+                    and float(temperature) > temperature_filter["max"]
+                ):
+                    continue
 
         if refused:
             refused_count += 1
@@ -1011,10 +1038,16 @@ def _markdown(result: Mapping[str, Any]) -> str:
     ]
     temperature = _mapping(filters.get("temperature_K"))
     if temperature:
-        lines.append(
-            f"Temperature filter: {_display(temperature.get('min'))}–"
-            f"{_display(temperature.get('max'))} K ({temperature.get('source')})."
-        )
+        low, high = temperature.get("min"), temperature.get("max")
+        if low is not None and high is not None:
+            bounds = f"{_display(low)}–{_display(high)} K"
+        elif low is not None:
+            bounds = f"≥{_display(low)} K"
+        else:
+            bounds = f"≤{_display(high)} K"
+        lines.append(f"Temperature filter: {bounds} ({temperature.get('source')}).")
+    else:
+        lines.append("Temperature: not filtered.")
     envelope = _mapping(filters.get("run_envelope"))
     if envelope:
         pO2 = _mapping(envelope.get("pO2_bar"))
@@ -1169,6 +1202,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--rail")
     parser.add_argument("--species")
     parser.add_argument("--unit", help="rank only this unit")
+    parser.add_argument("--tmin-K", type=float, help="minimum temperature in kelvin")
+    parser.add_argument("--tmax-K", type=float, help="maximum temperature in kelvin")
     parser.add_argument("--format", choices=("md", "json", "csv"), default="md")
     parser.add_argument("--out", type=Path, help="write output to this path; markdown also writes a sibling JSON")
     return parser
@@ -1195,6 +1230,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             species=args.species,
             unit=args.unit,
             run=run,
+            tmin_K=args.tmin_K,
+            tmax_K=args.tmax_K,
         )
         rendered = {
             "md": _markdown,

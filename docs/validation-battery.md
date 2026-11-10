@@ -237,11 +237,12 @@ carry their notice kinds. Refused rows never rank and are counted in the output 
 
 By default, the leaderboard selects species that can be formed from the nonzero oxide components
 in the `lunar_mare_low_ti` feedstock. The `all` feedstock setting skips that species filter. Without
-a run report, the temperature filter comes from the runner's default C0 campaign band in
-`data/setpoints.yaml`, converted from °C to K (currently 20–950 °C). With `--run`, the report's
-traversed temperature range and pO₂ range are used; temperature includes the report's ±100 K margin,
-and the evaporated-moles column comes from the run report. The report also limits species and
-engines by rail using its recorded activity providers and backends.
+a run report, temperature is not filtered unless you provide `--tmin-K`, `--tmax-K`, or both. The
+output header says `Temperature: not filtered.` when no temperature bounds apply. With `--run`, the
+report's traversed temperature range and pO₂ range are used; temperature includes the report's
+±100 K margin, and the evaporated-moles column comes from the run report. Explicit temperature
+bounds further restrict that run range. The report also limits species and engines by rail using its
+recorded activity providers and backends.
 
 Rows are ranked by absolute residual: `worst` puts the largest first and `best` the smallest first.
 Groups are ranked by RMS in the selected order. Rankings are independent within each unit block;
