@@ -2005,15 +2005,14 @@ freeze_gate:
 chemistry_kernel:
   # Fixed run input: analytical explicitly selects the qualified Kress91 floor.
   liquid_fraction_provider: magemin
-  # Cr, CrO2, and Mn currently lack measured evaporation_alpha values. CrO2(g)
-  # is a computable carrier sampled by default recipes; keep its flux available
-  # with the α=1.0 upper-bound fallback, which the provider marks in diagnostics
-  # and warns about. Restrict the fallback to CrO2 so missing Cr and Mn alphas
-  # remain typed refusals, and keep broad proxy rows out of the measured-alpha map.
+  # Cr has a measured tier-1 alpha and Mn has an owner-ratified proxy; neither
+  # is stripped from the measured-alpha map. Broad-proxy carriers stay
+  # computable under the flagged α=1.0 upper-bound fallback, while species
+  # without an alpha row remain typed refusals.
   # V1e-followon (task #36) is the post-0.5.0 work to either measure α or refine
   # the placeholder policy.
   allow_unmeasured_alpha_fallback: true
-  unmeasured_alpha_fallback_species: [CrO2]
+  unmeasured_alpha_fallback_species: [Al2, Al2O, Al2O2, Al2O3_gas, AlO, AlO2, CrO, CrO2]
   evaporation_series_resistance:
     # J=M_i*k_L,i*Delta-C and Delta-p=H_i*Delta-C imply
     # k_m,i=M_i*k_L,i/H_i [s/m], R_m,i=H_i/(M_i*k_L,i) [m/s]. Runtime has

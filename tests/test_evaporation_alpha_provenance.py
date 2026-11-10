@@ -597,9 +597,9 @@ def test_ca_ti_alpha_ceiling_survives_grounded_report_consumer(species):
     )
 
 
-def test_default_setpoints_allow_flagged_cro2_alpha_fallback_only():
+def test_default_setpoints_allow_flagged_cro2_alpha_fallback():
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text()) or {}
     kernel_policy = setpoints["chemistry_kernel"]
 
     assert kernel_policy["allow_unmeasured_alpha_fallback"] is True
-    assert kernel_policy["unmeasured_alpha_fallback_species"] == ["CrO2"]
+    assert "CrO2" in kernel_policy["unmeasured_alpha_fallback_species"]

@@ -279,10 +279,18 @@ def test_sc67_refusal_fires_for_cro2_with_real_loader_map():
     assert "per-species evaporation refusal" in result.warnings[0]
 
 
-def test_project_policy_marks_cro2_proxy_with_upper_bound_fallback():
-    """The shipped allowlist drives CrO2 through the marked alpha=1.0 upper
-    bound; the proxy stays stripped and the provider emits its warning."""
+@pytest.mark.parametrize(
+    "species, molar_mass",
+    (("CrO2", 0.084), ("CrO", 0.0679951)),
+)
+def test_project_policy_marks_broad_proxy_with_upper_bound_fallback(
+    species, molar_mass
+):
+    """Shipped setpoints use flagged alpha=1.0 for stripped broad proxies."""
     kernel_policy = yaml.safe_load(SETPOINTS_PATH.read_text())["chemistry_kernel"]
+    assert kernel_policy["unmeasured_alpha_fallback_species"] == sorted(
+        BROAD_PROXY_SPECIES
+    )
     alpha_by_species = _measured_alpha_control_view(
         _load_evaporation_alpha_by_species(_raw_data())
     )
@@ -297,17 +305,22 @@ def test_project_policy_marks_cro2_proxy_with_upper_bound_fallback():
         fO2_log=None,
         control_inputs={
             "overhead_pressure_pa": 0.0,
-            CONTROL_FLUX_PRESSURES_KEY: {"CrO2": 100.0},
+            CONTROL_FLUX_PRESSURES_KEY: {species: 100.0, "Ghost": 100.0},
             "overhead_partials_Pa": {},
-            "molar_mass_kg_mol": {"CrO2": 0.084},
+            "molar_mass_kg_mol": {species: molar_mass, "Ghost": 0.030},
             "stoich_by_species": {
-                "CrO2": {
+                species: {
+                    "parent_oxide": "Cr2O3",
+                    "oxide_per_product_kg": 1.0,
+                    "O2_per_product_kg": 0.0,
+                },
+                "Ghost": {
                     "parent_oxide": "Cr2O3",
                     "oxide_per_product_kg": 1.0,
                     "O2_per_product_kg": 0.0,
                 },
             },
-            "available_oxide_kg": {"CrO2": 10.0},
+            "available_oxide_kg": {species: 10.0, "Ghost": 10.0},
             "melt_surface_area_m2": 1.0,
             "stir_factor": 1.0,
             "alpha": alpha_by_species,
@@ -323,12 +336,18 @@ def test_project_policy_marks_cro2_proxy_with_upper_bound_fallback():
     result = BuiltinEvaporationFluxProvider().dispatch(request)
 
     assert result.status == "ok"
-    assert "missing_alpha" not in result.diagnostic
-    assert result.diagnostic["evaporation_flux_kg_hr"]["CrO2"] > 0.0
-    assert result.diagnostic["unmeasured_alpha_fallback_species"] == ["CrO2"]
-    assert result.diagnostic["alpha_used_by_species"]["CrO2"] == 1.0
+    assert result.diagnostic["evaporation_flux_kg_hr"][species] > 0.0
+    assert "Ghost" not in result.diagnostic["evaporation_flux_kg_hr"]
+    assert set(result.diagnostic["missing_alpha"]) == {"Ghost"}
+    ghost_refusal = result.diagnostic["species_refusals"]["Ghost"]
+    assert ghost_refusal["policy"] == "fail_loud_missing_alpha"
+    assert ghost_refusal["reason"] == "missing_evaporation_alpha"
+    assert ghost_refusal["status"] == "refused"
+    assert result.diagnostic["unmeasured_alpha_fallback_species"] == [species]
+    assert result.diagnostic["alpha_used_by_species"][species] == 1.0
     assert any(
-        "WARNING: alpha=1.0 prototype fallback used for unmeasured evaporation species: CrO2"
+        "WARNING: alpha=1.0 prototype fallback used for unmeasured evaporation species: "
+        + species
         in warning
         for warning in result.warnings
     )
