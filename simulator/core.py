@@ -7523,10 +7523,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 None,
             )
             if residual_fe_mol is not None and 'Fe' in rates:
-                rates['Fe'] = min(
+                from simulator.evaporation import pool_first_residual_kg_hr
+
+                rates['Fe'] = pool_first_residual_kg_hr(
                     rates['Fe'],
-                    max(0.0, float(residual_fe_mol))
-                    * molar_masses.get('Fe', 0.0),
+                    float(residual_fe_mol),
+                    float(molar_masses.get('Fe', 0.0) or 0.0),
                 )
             rates = self._analytic_evaporation_depletion_rates(
                 rates,
@@ -8231,32 +8233,36 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pipe_diameter_m = float(
             getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
         )
+        series_kwargs = dict(
+            species='Fe',
+            P_eq_pa=P_reference_Pa,
+            P_bulk_pa=P_bulk_Pa,
+            T_surface_K=T_K,
+            molar_mass_kg_mol=molar_mass_kg_mol,
+            alpha_i=alpha,
+            pipe_diameter_m=pipe_diameter_m,
+            overhead_pressure_pa=overhead_pressure_pa,
+            axial_stir_factor=clamp_stir_factor(self.melt.stir_state.axial),
+            radial_stir_factor=clamp_stir_factor(self.melt.stir_state.radial),
+            carrier_gas=carrier_gas,
+            T_gas_K=gas_temperature_K,
+            melt_resistance_enabled=melt_resistance_enabled,
+            gas_resistance_enabled=gas_resistance_enabled,
+            melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
+            melt_surface_renewal_source=melt_surface_renewal_source,
+        )
         try:
             series_flux = _series_resistance_evaporation_flux_kg_m2_s(
-                species='Fe',
-                P_eq_pa=P_reference_Pa,
-                P_bulk_pa=P_bulk_Pa,
-                T_surface_K=T_K,
-                molar_mass_kg_mol=molar_mass_kg_mol,
-                alpha_i=alpha,
-                pipe_diameter_m=pipe_diameter_m,
-                overhead_pressure_pa=overhead_pressure_pa,
-                axial_stir_factor=clamp_stir_factor(self.melt.stir_state.axial),
-                radial_stir_factor=clamp_stir_factor(self.melt.stir_state.radial),
-                carrier_gas=carrier_gas,
-                T_gas_K=gas_temperature_K,
-                melt_resistance_enabled=melt_resistance_enabled,
-                gas_resistance_enabled=gas_resistance_enabled,
-                melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
-                melt_surface_renewal_source=melt_surface_renewal_source,
+                **series_kwargs
             )
         except EvaporationFluxConfigurationError as exc:
             raise evaporation_flux_refusal_from_configuration_error(exc) from exc
-        # Transitional Kn domain: this bounded native-Fe projection suppresses
-        # capacity under its diagnostic-limited policy when continuum transport
-        # is load-bearing (pyrolysis). Stage 0 bakeout marks and keeps the
-        # computed HKL capacity. The authoritative EVAPORATION_FLUX provider
-        # refuses the pyrolysis case; t-379 lifts this suppression.
+        # Transitional Kn: refused diagnostics suppress this bounded
+        # projection (typed refusal, ledger not authorized). An authorized
+        # C2A extrapolation keeps the continuum continuation, the same
+        # gas-film formula the evaporation provider publishes. Stage 0
+        # bakeout marks and keeps the computed HKL capacity.
+        from simulator.evaporation import resolve_species_flux_kg_s_m2
         from simulator.transport_regime import continuum_validity_refuses
 
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
@@ -8270,18 +8276,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ) or None,
             asking_site='core.native_fe_vapor_partition',
         )
-        _flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
-        # The authoritative evaporation provider carries the C2A continuum
-        # continuation. This bounded projection still suppresses on that
-        # reason so its capacity stays the diagnostic-limited zero.
-        suppress_bounded_flux = continuum_validity_refuses(domain_diag) or (
+        series_for_ledger = series_flux
+        continuation_flux_kg_s_m2 = None
+        if (
             domain_diag is not None
-            and domain_diag.get('reason')
-            == 'viscous_p_bulk_transport_out_of_domain'
             and domain_diag.get('status') == 'extrapolated'
+            and domain_diag.get('ledger_yields_authorized')
+        ):
+            try:
+                series_for_ledger = _series_resistance_evaporation_flux_kg_m2_s(
+                    **series_kwargs,
+                    extrapolate_continuum=True,
+                )
+            except EvaporationFluxConfigurationError as exc:
+                raise evaporation_flux_refusal_from_configuration_error(
+                    exc
+                ) from exc
+            continuation_flux_kg_s_m2 = float(
+                series_for_ledger.flux_kg_s_m2
+            )
+        _flux_kg_s_m2 = resolve_species_flux_kg_s_m2(
+            domain_diag,
+            ordinary_flux_kg_s_m2=float(series_flux.flux_kg_s_m2),
+            continuation_flux_kg_s_m2=continuation_flux_kg_s_m2,
         )
-        if suppress_bounded_flux:
-            _flux_kg_s_m2 = 0.0
         capacity_kg_hr = max(
             0.0,
             _flux_kg_s_m2
@@ -8292,11 +8310,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         vapor_mol = min(native_fe_available_mol, capacity_mol_hr)
         tap_mol = native_fe_available_mol - vapor_mol
         pool = native_fe_available_mol
-        series_diag = series_flux.as_diagnostic()
+        series_diag = series_for_ledger.as_diagnostic()
         if domain_diag is not None:
             # Relabel series diagnostic with the typed continuum-validity
-            # vocabulary. Pyrolysis refusals still suppress flux; bakeout
-            # marks keep the computed HKL number.
+            # vocabulary. Pyrolysis refusals still suppress flux; an
+            # authorized extrapolation keeps the continuation number.
             series_diag = dict(series_diag)
             series_update = {
                 'authority_class': domain_diag['authority_class'],
@@ -8320,7 +8338,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'carrier_gas': domain_diag['carrier_gas'],
                 'framing': domain_diag['framing'],
             }
-            if suppress_bounded_flux:
+            if continuum_validity_refuses(domain_diag):
                 series_update['flux_kg_s_m2'] = 0.0
             series_diag.update(series_update)
         diagnostic = {
@@ -8377,6 +8395,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'process_regime': domain_diag.get('process_regime'),
                     'campaign_name': domain_diag.get('campaign_name'),
                     'asking_site': domain_diag.get('asking_site'),
+                    'status': domain_diag.get('status'),
+                    'evaporation_flux_status': domain_diag.get(
+                        'evaporation_flux_status'
+                    ),
+                    'regime': domain_diag.get('regime'),
+                    'certified_band_mbar': domain_diag.get(
+                        'certified_band_mbar'
+                    ),
+                    'authority_level': domain_diag.get('authority_level'),
                 }
             )
         return diagnostic

@@ -3873,6 +3873,7 @@ class ExtractionMixin:
                     exc
                 ) from exc
         hold_time_s = hold_time_h * 3600.0
+        from simulator.evaporation import resolve_species_flux_kg_s_m2
         from simulator.transport_regime import continuum_validity_refuses
 
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
@@ -3884,10 +3885,14 @@ class ExtractionMixin:
             campaign_name='C7_CA_ALUMINOTHERMIC',
             asking_site='extraction.c7_ca_transport',
         )
-        flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
-        if continuum_validity_refuses(domain_diag):
-            # C7-specific diagnostic-limited suppression; not provider parity.
-            flux_kg_s_m2 = 0.0
+        # C7 stays a typed refusal at transitional Kn. The shared resolver
+        # is what suppresses the flux; an authorized extrapolation would
+        # require a continuation and must not become an artificial zero.
+        flux_kg_s_m2 = resolve_species_flux_kg_s_m2(
+            domain_diag,
+            ordinary_flux_kg_s_m2=float(series_flux.flux_kg_s_m2),
+            continuation_flux_kg_s_m2=None,
+        )
         ca_transport_mol = (
             flux_kg_s_m2
             * area_m2

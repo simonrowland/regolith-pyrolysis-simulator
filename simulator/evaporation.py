@@ -379,6 +379,76 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     return payload
 
 
+def resolve_species_flux_kg_s_m2(
+    domain_diag: Mapping[str, Any] | None,
+    *,
+    ordinary_flux_kg_s_m2: float,
+    continuation_flux_kg_s_m2: float | None,
+) -> float:
+    """Ledger flux for one species under the continuum-domain diagnostic.
+
+    INVARIANT: no authorized species flux is an artificial zero. An
+    extrapolated diagnostic with ``ledger_yields_authorized`` is the
+    continuum continuation the caller computed (gas film kept on). It is
+    never replaced by 0.0. A refused diagnostic is a typed refusal and
+    returns 0.0; its ledger flag is already false. Every other diagnostic,
+    including in-domain and Stage 0 marks, keeps the ordinary series flux.
+    Missing the continuation on an authorized extrapolation refuses rather
+    than publishing a zero.
+    """
+
+    from simulator.transport_regime import continuum_validity_refuses
+
+    ordinary = float(ordinary_flux_kg_s_m2)
+    if domain_diag is not None and continuum_validity_refuses(domain_diag):
+        return 0.0
+    authorized_extrapolation = (
+        domain_diag is not None
+        and str(domain_diag.get("status") or "") == "extrapolated"
+        and bool(domain_diag.get("ledger_yields_authorized"))
+    )
+    if not authorized_extrapolation:
+        return ordinary
+    if continuation_flux_kg_s_m2 is None:
+        raise EvaporationFluxRefusal(
+            "authorized_extrapolation_missing_continuum_flux",
+            {
+                "reason": "authorized_extrapolation_missing_continuum_flux",
+                "status": "refused",
+                "ledger_yields_authorized": False,
+                "authority_class": "diagnostic-limited",
+                "detail": (
+                    "an authorized continuum extrapolation requires the "
+                    "computed continuation; refusing an artificial zero"
+                ),
+                "campaign_name": domain_diag.get("campaign_name"),
+                "asking_site": domain_diag.get("asking_site"),
+                "knudsen_number": domain_diag.get("knudsen_number"),
+            },
+        )
+    return float(continuation_flux_kg_s_m2)
+
+
+def pool_first_residual_kg_hr(
+    raw_kg_hr: float,
+    residual_capacity_mol: float,
+    molar_mass_kg_mol: float,
+) -> float:
+    """Cap melt-derived Fe at the native pool's leftover vapor capacity.
+
+    ``residual_capacity_mol`` is native capacity minus committed native
+    vapor, in mol/h. Times molar mass it is the kg/h cap. A zero residual
+    yields zero melt-derived Fe. That residual has to come from
+    ``resolve_species_flux_kg_s_m2`` so an authorized extrapolation cannot
+    show up here as a fabricated zero capacity.
+    """
+
+    residual_kg_hr = max(0.0, float(residual_capacity_mol)) * max(
+        0.0, float(molar_mass_kg_mol)
+    )
+    return min(float(raw_kg_hr), residual_kg_hr)
+
+
 def refuse_viscous_p_bulk_out_of_domain(
     *,
     knudsen_number: float,
@@ -399,8 +469,9 @@ def refuse_viscous_p_bulk_out_of_domain(
     Bakeout out-of-domain marks do not raise. C2A-family transitional
     extrapolation does not raise. Other load-bearing transitional
     refusals and invalid Kn inputs do. The authoritative provider
-    returns a refused result from the same payload; bounded C7/native-Fe
-    consumers apply their own explicitly tagged diagnostic-limited policy.
+    returns a refused result from the same payload. Bounded consumers
+    take their flux from ``resolve_species_flux_kg_s_m2``: a refusal is
+    a typed zero, and an authorized extrapolation keeps the continuation.
     """
     from simulator.transport_regime import continuum_validity_refuses
 
@@ -1490,8 +1561,14 @@ class EvaporationMixin:
                     # melt activity is an operand here. Limiting cases: zero
                     # residual gives zero melt-derived Fe; residual >= raw
                     # rate/M_Fe leaves the raw melt-derived rate unchanged.
+                    # The residual itself is the continuum continuation when
+                    # the native partition authorized an extrapolation.
                     original_gated_rate = gated_rate_kg_hr
-                    gated_rate_kg_hr = min(gated_rate_kg_hr, residual_capacity_kg_hr)
+                    gated_rate_kg_hr = pool_first_residual_kg_hr(
+                        original_gated_rate,
+                        float(residual_capacity_mol),
+                        fe_molar_mass,
+                    )
                     diagnostic['native_fe_capacity_allocation'] = {
                         'rule': 'pool_first_residual',
                         'native_pool_activity_argument': (

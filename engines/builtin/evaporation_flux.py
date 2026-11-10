@@ -1528,6 +1528,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
         )
         from simulator.evaporation import (
+            resolve_species_flux_kg_s_m2,
             viscous_p_bulk_out_of_domain_diagnostic,
         )
         from simulator.transport_regime import continuum_validity_refuses
@@ -1791,7 +1792,26 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 }
                 continue
             computable_transport_species.add(species)
-            J_kg_s_m2 = series_flux.flux_kg_s_m2
+            # Authorized extrapolation publishes the continuation this call
+            # already evaluated (extrapolate_continuum). A refused diagnostic
+            # is a typed zero. HKL-only species are not on viscous P_bulk.
+            if uses_gas_resistance:
+                published_domain = (
+                    continuum_extrapolation
+                    if continuum_extrapolation is not None
+                    else domain_refusal
+                )
+                J_kg_s_m2 = resolve_species_flux_kg_s_m2(
+                    published_domain,
+                    ordinary_flux_kg_s_m2=float(series_flux.flux_kg_s_m2),
+                    continuation_flux_kg_s_m2=(
+                        float(series_flux.flux_kg_s_m2)
+                        if continuum_extrapolation is not None
+                        else None
+                    ),
+                )
+            else:
+                J_kg_s_m2 = float(series_flux.flux_kg_s_m2)
 
             series_diagnostic = series_flux.as_diagnostic()
             if continuum_extrapolation is not None and uses_gas_resistance:
