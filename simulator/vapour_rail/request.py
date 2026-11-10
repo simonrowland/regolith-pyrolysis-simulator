@@ -1516,6 +1516,13 @@ def refusal_closure(
                     and "extrapolation_notice" not in evaluation_extra
                 ):
                     evaluation_extra["extrapolation_notice"] = dict(eval_notice)
+                # Function-local: catalog imports request while emitting rules.
+                # Both modules are loaded before a live answer is built.
+                from simulator.vapour_rail.catalog import (
+                    merge_diagnostic_admission_notice,
+                )
+
+                merge_diagnostic_admission_notice(evaluation_extra, evaluation)
                 if _unit_activity_note is not None:
                     from simulator.silent_zero import merge_notes_into_mapping
 

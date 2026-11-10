@@ -4185,7 +4185,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
-        from simulator.vapour_rail.catalog import CatalogCompileError
+        from simulator.vapour_rail.catalog import (
+            CatalogCompileError,
+            merge_diagnostic_admission_notice,
+        )
 
         for name, data in oxide_vapors_data.items():
             if self._vapour_rail_catalog is not None:
@@ -4624,6 +4627,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if oxygen_notice is not None:
                     vapor_pressure_provenance[name].setdefault(
                         "extrapolation_notice", dict(oxygen_notice)
+                    )
+                if compiled_evaluator is not None:
+                    merge_diagnostic_admission_notice(
+                        vapor_pressure_provenance[name], evaluation
                     )
                 if source_activity_floor_notice is not None:
                     vapor_pressure_provenance[name][

@@ -4030,11 +4030,12 @@ def test_compile_cache_uses_explicit_content_identity() -> None:
     nacl = payload_b["families"]["nacl_test_family"]["physical_properties"][
         "species"
     ]["NaCl"]
+    # Ordinary fitted citation. diagnostic_only is not this fixture: that
+    # status admits only with law_provenance and an anchor disagreement.
     nacl["pressure_models"][0]["provenance"] = [
         {
             "source_id": "fit-grid-source",
             "observation_id": "fit-grid",
-            "status": "diagnostic_only",
         }
     ]
     nacl["backsolve"] = {

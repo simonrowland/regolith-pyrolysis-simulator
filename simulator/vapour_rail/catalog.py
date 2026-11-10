@@ -2869,6 +2869,26 @@ def _copy_diagnostic_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def merge_diagnostic_admission_notice(
+    target: dict[str, Any],
+    evaluation: object,
+) -> None:
+    """Copy a diagnostic admission onto one public pressure mapping.
+
+    Invariant: a public carrier that publishes an evaluation's pressure
+    also publishes ``diagnostic_admission_notice`` when that evaluation
+    carries one. The notice is the authority, the law's provenance, the
+    disagreement anchor, both comparator gaps, and the closer. Carriers
+    call this function. They do not select those fields themselves.
+    A missing or non-mapping notice adds no key.
+    """
+
+    notice = getattr(evaluation, "diagnostic_admission_notice", None)
+    if not isinstance(notice, Mapping):
+        return
+    target["diagnostic_admission_notice"] = _copy_diagnostic_notice(notice)
+
+
 def _diagnostic_notice_from_model_coefficients(
     *,
     executed_species_id: str,

@@ -2101,6 +2101,138 @@ def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:
     )
 
 
+def test_diagnostic_admission_reaches_every_public_carrier() -> None:
+    """Invariant: a diagnostic admission is on every public pressure carrier.
+
+    Every live species whose evaluator carries diagnostic_admission_notice
+    is resolved as a batch answer. Every such species the oxide provider
+    publishes keeps the same notice on its provenance. The notice carries
+    authority, provenance, the disagreement anchor, both gaps, and t-1723.
+    The metal compiled-reference rail publishes pressure_pa only; a
+    diagnostic species must not sit on that rail.
+    """
+
+    from simulator.vapour_rail.batch import (
+        FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
+        FluxActivationContext,
+        PressureUpperBound,
+        PressureValue,
+    )
+    from simulator.vapour_rail.instrumentation import serialize_vapour_answer
+
+    payload = _yaml("vapor_pressures.yaml")
+    provider = BuiltinVaporPressureProvider(payload)
+    catalog = provider._vapour_rail_catalog
+    assert catalog is not None
+    noticed: list[str] = []
+    oxide_noticed: list[str] = []
+    parents: dict[str, float] = {}
+    for species_id, compiled in sorted(catalog.species.items()):
+        evaluator = compiled.evaluator
+        if evaluator is None:
+            continue
+        if getattr(evaluator, "diagnostic_admission_notice", None) is None:
+            continue
+        noticed.append(species_id)
+        row = payload["families"][compiled.family_id]["physical_properties"][
+            "species"
+        ][species_id]
+        parent = row.get("parent_oxide")
+        if isinstance(parent, str) and parent.strip():
+            parents[parent.strip()] = 1.0
+        if compiled.code_metadata.compatibility_projection == "oxide_vapors":
+            oxide_noticed.append(species_id)
+        elif compiled.code_metadata.compatibility_projection == "metals":
+            # equilibrium.py and the metal rail keep only pressure_pa from
+            # prefer_compiled_reference_pressure_model. That publisher does
+            # not copy this notice. Fail until it calls
+            # merge_diagnostic_admission_notice.
+            assert not row.get("prefer_compiled_reference_pressure_model"), (
+                species_id
+            )
+    assert "Fe" in noticed
+    assert "FeO_association_gas" in oxide_noticed
+    assert parents
+
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": dict(parents)},
+        state={
+            "temperature_K": 1750.0,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "fO2_bar": 1.0e-9,
+            "source_reaction_fO2_bar": 1.0e-9,
+        },
+        flux_activation_context=FluxActivationContext(
+            epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST
+        ),
+    )
+    for species_id in noticed:
+        compiled = catalog.species[species_id]
+        evaluator = compiled.evaluator
+        assert evaluator is not None
+        kwargs: dict[str, float] = {}
+        if evaluator.pO2_exponent or evaluator.oxygen_fugacity_channel:
+            kwargs["pO2_bar"] = 1.0e-9
+        evaluation = evaluator.evaluate(1750.0, **kwargs)
+        evaluation_notice = getattr(evaluation, "diagnostic_admission_notice", None)
+        answer = batch.channel(species_id)
+        assert answer.refusal_code is None, (species_id, answer.extra)
+        assert isinstance(answer.pressure, (PressureValue, PressureUpperBound))
+        assert answer.pressure.pa > 0.0
+        if species_id == "Fe":
+            # Hand literal for log10(P/Pa) = A - B/(T+C) at 1750 K.
+            # A=9.408547, B=23312.312336, C=1000, T+C=2750.
+            # log10(P) = 9.408547 - 23312.312336/2750
+            # P = 8.537731922030234 Pa. Not recomputed from the catalog.
+            assert isinstance(answer.pressure, PressureValue)
+            assert answer.pressure.pa == pytest.approx(
+                _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
+            )
+        public = serialize_vapour_answer(answer)
+        public_notice = public["extra"]["diagnostic_admission_notice"]
+        assert public_notice == evaluation_notice
+        assert public_notice["authority"] == _DIAGNOSTIC_AUTHORITY
+        assert public_notice["law_provenance"] == _DIAGNOSTIC_LAW_PROVENANCE
+        assert public_notice["closes_with"] == _DIAGNOSTIC_CLOSER
+        assert public_notice["evaluator_form"] == _DIAGNOSTIC_EVALUATOR_FORM
+        assert "gap_dex_law_vs_rail" in public_notice["comparators"]
+        assert "gap_dex_law_vs_vaporock" in public_notice["comparators"]
+        if public_notice["executed_species_id"] == "Fe":
+            _assert_fe_pseudo_law_disclosure(public_notice)
+
+    provider_result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": dict(parents)},
+                species_formula_registry={},
+            ),
+            temperature_C=1600.0,
+            pressure_bar=1e-6,
+            control_inputs={"pO2_bar": 1.0e-9},
+        )
+    )
+    assert provider_result.status == "ok"
+    provenance_by_species = provider_result.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]
+    for species_id in oxide_noticed:
+        evaluator = catalog.species[species_id].evaluator
+        assert evaluator is not None
+        expected = getattr(evaluator, "diagnostic_admission_notice", None)
+        provenance = provenance_by_species[species_id]
+        assert provenance["diagnostic_admission_notice"] == expected
+        if expected["executed_species_id"] == "Fe":
+            _assert_fe_pseudo_law_disclosure(
+                provenance["diagnostic_admission_notice"]
+            )
+    # The metal Fe pressure is the pure-component rail, not this law.
+    metal_fe = provenance_by_species.get("Fe")
+    if metal_fe is not None:
+        assert "diagnostic_admission_notice" not in metal_fe
+
+
 # Oxygen multiplier the association closure evaluates. log10_pressure() takes
 # temperature only: omitted exponent is 0, omitted reference is 1 bar, and
 # exponent 0 stores no channel. This is not read from the compiler.
