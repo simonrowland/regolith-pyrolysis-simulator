@@ -66,6 +66,7 @@ from simulator.accounting.formulas import (
 from simulator.chemistry.melt_activity import (
     melt_oxide_activity,
     melt_oxide_activity_coefficient,
+    oxide_activity_account_mol_from_wt_pct,
 )
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
@@ -6252,7 +6253,7 @@ class _MELTSBackendSupport(MeltBackend):
             )
 
         account_mol = (
-            self._oxide_activity_account_mol_from_wt_pct(comp_wt)
+            oxide_activity_account_mol_from_wt_pct(comp_wt)
             if use_melt_activity_ladder
             else None
         )
@@ -6498,7 +6499,7 @@ class _MELTSBackendSupport(MeltBackend):
 
         T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
         if use_melt_activity_ladder and account_mol is None:
-            account_mol = self._oxide_activity_account_mol_from_wt_pct(
+            account_mol = oxide_activity_account_mol_from_wt_pct(
                 comp_wt
             )
         pressures: Dict[str, float] = {}
@@ -6616,7 +6617,7 @@ class _MELTSBackendSupport(MeltBackend):
         activity ladder when the solved liquid composition contains its oxide.
         """
         if use_melt_activity_ladder and account_mol is None:
-            account_mol = self._oxide_activity_account_mol_from_wt_pct(
+            account_mol = oxide_activity_account_mol_from_wt_pct(
                 comp_wt
             )
         missing: list[str] = []
@@ -6649,34 +6650,6 @@ class _MELTSBackendSupport(MeltBackend):
             if raw is None or not self._is_number(raw):
                 missing.append(str(vapor_species))
         return sorted(missing)
-
-    @staticmethod
-    def _oxide_activity_account_mol_from_wt_pct(
-        comp_wt: Mapping[str, object],
-    ) -> dict[str, float]:
-        """Convert solved oxide weight percentages to relative mole amounts."""
-        account_mol: dict[str, float] = {}
-        for raw_name, raw_wt_pct in (comp_wt or {}).items():
-            oxide = canonical_melt_oxide_activity_name(str(raw_name))
-            if oxide not in MELTS_OXIDE_BASIS:
-                continue
-            try:
-                wt_pct = float(raw_wt_pct)
-            except (TypeError, ValueError):
-                continue
-            if not math.isfinite(wt_pct) or wt_pct <= 0.0:
-                continue
-            molar_mass = resolve_species_formula(
-                oxide
-            ).molar_mass_kg_per_mol()
-            # Premise: all reported wt% share one mass basis, and n_i is
-            # proportional to wt_i/M_i. Unit check: wt/M is mol per shared
-            # mass unit; the common scale cancels in mole fractions. In a
-            # pure-oxide limit the fraction is 1 and the owner returns a->1.
-            account_mol[oxide] = account_mol.get(oxide, 0.0) + (
-                wt_pct / molar_mass
-            )
-        return account_mol
 
     @staticmethod
     def _parent_oxide_for_vapor_species(species: str) -> str | None:

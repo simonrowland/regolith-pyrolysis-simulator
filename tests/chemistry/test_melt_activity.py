@@ -12,6 +12,7 @@ from simulator.chemistry.melt_activity import (
     P2O5_ACTIVITY_COEFFICIENT,
     melt_oxide_activity,
     melt_oxide_gamma_domain_authority,
+    oxide_activity_account_mol_from_wt_pct,
     na_reductant_activity_shift_kj_per_mol_o2,
     single_cation_mole_fractions,
     table_gamma_effective,
@@ -163,8 +164,9 @@ def test_blend_start_seam_is_still_the_shipped_0_99_cutoff() -> None:
     assert near_unity * (1.0 - 1.0e-9) == pytest.approx(1.0, abs=2.0e-9)
 
 
-# Observed 2026-11-10 from AlphaMELTSBackend._oxide_activity_account_mol_from_wt_pct
-# then melt_oxide_activity(..., temperature_K=1673.0). These literals are the
+# Observed 2026-11-10 from the oxide wt% account conversion, then
+# melt_oxide_activity(..., temperature_K=1673.0), before that conversion
+# moved to oxide_activity_account_mol_from_wt_pct. These literals are the
 # pin; the test does not recompute wt/M.
 _PINNED_ACTIVITY_WT_PCT = {
     "SiO2": 45.0,
@@ -202,14 +204,8 @@ _PINNED_ACTIVITY = {
 }
 
 
-def _oxide_activity_account_mol(comp_wt):
-    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
-
-    return AlphaMELTSBackend._oxide_activity_account_mol_from_wt_pct(comp_wt)
-
-
 def test_oxide_activity_account_pin_matches_today() -> None:
-    account_mol = _oxide_activity_account_mol(_PINNED_ACTIVITY_WT_PCT)
+    account_mol = oxide_activity_account_mol_from_wt_pct(_PINNED_ACTIVITY_WT_PCT)
     assert account_mol == _PINNED_ACTIVITY_ACCOUNT_MOL
     assert "FeO_total" not in account_mol
     assert "Mg2SiO4" not in account_mol
@@ -224,8 +220,8 @@ def test_oxide_activity_account_pin_matches_today() -> None:
         assert activity is not None
         assert activity.activity == expected
 
-    heavy = _oxide_activity_account_mol({"MgO": 37.0})
-    light = _oxide_activity_account_mol({"MgO": 3.7})
+    heavy = oxide_activity_account_mol_from_wt_pct({"MgO": 37.0})
+    light = oxide_activity_account_mol_from_wt_pct({"MgO": 3.7})
     assert heavy["MgO"] / light["MgO"] == pytest.approx(10.0)
     for moles in (heavy, light):
         pure = melt_oxide_activity("MgO", moles, temperature_K=1673.0)

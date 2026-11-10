@@ -1,8 +1,9 @@
 """Single-cation melt-oxide activity coefficients.
 
-This module is intentionally dependency-light so builtin vapor pressure,
-metallothermic gating, and tests share the same activity-coefficient table
-without importing engine code.
+This module owns the activity-coefficient table and the oxide weight-percent
+account that feeds it. The table stays free of engine binaries. The account
+conversion imports the MELTS oxide-basis canonicalizer only when called, so
+importing this module does not pull engine commissioning into vapour pressure.
 """
 
 from __future__ import annotations
@@ -13,6 +14,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any
+
+from simulator.accounting.formulas import resolve_species_formula
 
 
 ALPHAMELTS_CROSS_CHECK_STATUS = "inconclusive_no_activities"
@@ -549,6 +552,38 @@ def table_gamma_effective(
     if not math.isfinite(effective_gamma) or effective_gamma <= 0.0:
         raise ValueError("table-gamma effective gamma must be finite and positive")
     return effective_gamma
+
+
+def oxide_activity_account_mol_from_wt_pct(
+    comp_wt: Mapping[str, object],
+) -> dict[str, float]:
+    """Convert solved oxide weight percentages to relative mole amounts."""
+
+    from engines.alphamelts.domain import (
+        MELTS_OXIDE_BASIS,
+        canonical_melt_oxide_activity_name,
+    )
+
+    account_mol: dict[str, float] = {}
+    for raw_name, raw_wt_pct in (comp_wt or {}).items():
+        oxide = canonical_melt_oxide_activity_name(str(raw_name))
+        if oxide not in MELTS_OXIDE_BASIS:
+            continue
+        try:
+            wt_pct = float(raw_wt_pct)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(wt_pct) or wt_pct <= 0.0:
+            continue
+        molar_mass = resolve_species_formula(oxide).molar_mass_kg_per_mol()
+        # Premise: all reported wt% share one mass basis, and n_i is
+        # proportional to wt_i/M_i. Unit check: wt/M is mol per shared
+        # mass unit; the common scale cancels in mole fractions. In a
+        # pure-oxide limit the fraction is 1 and the owner returns a->1.
+        account_mol[oxide] = account_mol.get(oxide, 0.0) + (
+            wt_pct / molar_mass
+        )
+    return account_mol
 
 
 def melt_oxide_activity(
