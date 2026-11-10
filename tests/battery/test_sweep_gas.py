@@ -322,6 +322,15 @@ def test_model_row_total_pressure_is_not_a_partial_pressure_identity() -> None:
     assert provenance is None
 
 
+def test_locatorless_printed_pressure_wrapper_migrates_to_identity() -> None:
+    row = {"total_pressure_Pa": {"value": "0.001", "units": "kbar"}}
+    total, provenance = _pressure_total_from_extract(
+        row, row, gas_formula=None, source_text=""
+    )
+    assert total == State.of(Decimal("100000.000"))
+    assert provenance == "identity.total_pressure_Pa=source row total; kbar_to_Pa"
+
+
 def test_ueda_about_chamber_pressure_does_not_inherit_to_knudsen_points(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-095-ueda-1986.yaml")
     pressures = [

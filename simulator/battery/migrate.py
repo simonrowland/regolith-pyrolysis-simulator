@@ -11530,13 +11530,14 @@ def _pressure_extract_value_is_unprinted(
 
 def _pressure_locator_is_unprinted(locator: object) -> bool:
     if locator is None:
-        return True
+        return False
     note = (
         locator.get("note", "")
         if isinstance(locator, Mapping)
         else getattr(locator, "note", "")
     )
     note = str(note or "").casefold()
+    note = re.sub(r"\bnot\s+(?:an?\s+)?inferred\b", "", note)
     return any(marker in note for marker in ("not printed", "inferred", "assumed"))
 
 
