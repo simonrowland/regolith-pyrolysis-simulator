@@ -12647,6 +12647,105 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
     assert any(row.get("status") == ResidualStatus.REFUSED.value for row in rows)
 
 
+def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery.records import CandidateRequest, ResidualRefusal
+
+    context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
+    static_id = "fixture-measured-refusal"
+    static_row = fixture_residuals[static_id]
+    fixture_residuals[static_id] = replace(
+        static_row,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        candidate_request=CandidateRequest(
+            context.observations[static_id].experiment_id,
+            Quantity.P_SAT,
+            engine,
+            engine.value,
+        ),
+        refusal=ResidualRefusal(
+            RefusalReason.UNSUPPORTED,
+            {"reason": "quantity_not_predicted", "quantity": Quantity.P_SAT.value},
+        ),
+    )
+    dynamic_id = "fixture-derived-00"
+    dynamic_row = fixture_residuals[dynamic_id]
+    fixture_residuals[dynamic_id] = replace(
+        dynamic_row,
+        status=ResidualStatus.REFUSED,
+        numeric=None,
+        candidate_request=CandidateRequest(
+            context.observations[dynamic_id].experiment_id,
+            Quantity.DELTA_FG,
+            engine,
+            engine.value,
+        ),
+        refusal=ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {"reason": "input_missing"},
+        ),
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "compile_residual",
+        lambda reference, _engine, **_kwargs: (
+            fixture_residuals[reference.observation_id],
+            fixture_candidates.get(
+                fixture_residuals[reference.observation_id].candidate or ""
+            ),
+        ),
+    )
+
+    default_path = tmp_path / "default.jsonl"
+    default_written, _default_metadata = score_mod._score_store_to_jsonl(
+        context, default_path, root=score_mod.REPO_ROOT, engines=(engine,)
+    )
+    default_partial = default_path.with_name(default_path.name + ".partial")
+    default_rows = score_mod.load_residuals_jsonl(default_partial)
+    assert default_written == len(fixture_residuals)
+    assert score_mod.load_residuals_stamp(default_partial).get("static_refusals") is None
+    assert any(row["reference"] == static_id for row in default_rows)
+
+    compact_path = tmp_path / "compact.jsonl"
+    compact_written, compact_metadata = score_mod._score_store_to_jsonl(
+        context,
+        compact_path,
+        root=score_mod.REPO_ROOT,
+        engines=(engine,),
+        compact_static_refusals=True,
+    )
+    compact_partial = compact_path.with_name(compact_path.name + ".partial")
+    compact_rows = score_mod.load_residuals_jsonl(compact_partial)
+    expected_static = [
+        {
+            "engine": engine.value,
+            "rail": Rail.VAPOUR.value,
+            "reason": "unsupported/quantity_not_predicted",
+            "count": 1,
+        }
+    ]
+    assert compact_written == default_written - 1
+    assert compact_metadata.static_refusals == expected_static
+    assert score_mod.load_residuals_stamp(compact_partial)["static_refusals"] == expected_static
+    assert all(row["reference"] != static_id for row in compact_rows)
+    assert any(row["reference"] == dynamic_id for row in compact_rows)
+
+    def numeric_lines(path: Path) -> list[bytes]:
+        return [
+            line
+            for line in path.read_bytes().splitlines()
+            if b'"numeric":{' in line
+        ]
+
+    assert numeric_lines(default_partial) == numeric_lines(compact_partial)
+    summary = compact_metadata.aggregate.summary_payload(
+        score_mod.load_residuals_stamp(compact_partial)
+    )
+    assert summary["schema_version"] == "v1.1"
+    assert summary["static_refusals"] == expected_static
+
+
 def test_streamed_unrailed_measured_tier_matches_legacy_zero_grid(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
