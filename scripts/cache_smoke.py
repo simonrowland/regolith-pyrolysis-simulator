@@ -378,6 +378,8 @@ def main(argv: list[str] | None = None) -> int:
                 f"{engine.value}=hits:{engine_counts.get(engine.value, {}).get('hits', 0)}"
                 f"/misses:{engine_counts.get(engine.value, {}).get('misses', 0)}"
                 f"/stores:{engine_counts.get(engine.value, {}).get('stores', 0)}"
+                f"/store_error:{engine_counts.get(engine.value, {}).get('store_error', 0)}"
+                f"/read_error:{engine_counts.get(engine.value, {}).get('read_error', 0)}"
                 for engine in ENGINE_ORDER
             )
             print(
@@ -401,10 +403,16 @@ def main(argv: list[str] | None = None) -> int:
         parallel_warm = counts["warm-workers-2"].get(engine.value, {})
         if cold.get("misses", 0) <= 0 or cold.get("stores", 0) <= 0:
             failures.append(f"{engine.value}:cold")
+        if cold.get("store_error", 0) > 0:
+            failures.append(f"{engine.value}:cold-store-error")
         if warm.get("hits", 0) <= 0 or warm.get("misses", 0) != 0:
             failures.append(f"{engine.value}:warm")
+        if warm.get("store_error", 0) > 0:
+            failures.append(f"{engine.value}:warm-store-error")
         if parallel_warm.get("hits", 0) <= 0 or parallel_warm.get("misses", 0) != 0:
             failures.append(f"{engine.value}:warm-workers-2")
+        if parallel_warm.get("store_error", 0) > 0:
+            failures.append(f"{engine.value}:warm-workers-2-store-error")
     if failures:
         print("cache smoke incomplete: " + ", ".join(failures), file=sys.stderr)
     return 0 if identical and not failures else 1

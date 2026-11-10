@@ -32,6 +32,8 @@ def _install_fake_slice(
                     "hits": 0,
                     "misses": 1,
                     "stores": 1,
+                    "store_error": 0,
+                    "read_error": 0,
                 }
             }
         elif run_name in {"warm", "parallel-warm"}:
@@ -40,6 +42,8 @@ def _install_fake_slice(
                     "hits": 1,
                     "misses": 0,
                     "stores": 0,
+                    "store_error": 0,
+                    "read_error": 0,
                 }
             }
         else:
@@ -165,6 +169,8 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
                             "hits": 1,
                             "misses": 0,
                             "stores": 0,
+                            "store_error": 0,
+                            "read_error": 0,
                         }
                     },
                 )
@@ -188,3 +194,5 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
         assert counters["hits"] == 2
         assert counters["misses"] == 0
         assert counters["stores"] == 0
+        assert counters["store_error"] == 0
+        assert counters["read_error"] == 0

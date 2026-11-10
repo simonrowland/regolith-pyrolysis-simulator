@@ -73,4 +73,6 @@ def test_battery_engine_worker_request_is_cached_at_the_adapter_boundary(
         "hits": 1,
         "misses": 1,
         "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
     }

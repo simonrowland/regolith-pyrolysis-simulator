@@ -623,7 +623,7 @@ def test_corrupt_hot_json_is_a_miss_and_is_replaced(
         "misses": 2,
         "stores": 2,
         "store_error": 0,
-        "read_error": 0,
+        "read_error": 1,
     }
 
 
