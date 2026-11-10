@@ -4153,10 +4153,9 @@ class _MELTSBackendSupport(MeltBackend):
                 # (system mass, absolute fO2) still fail closed when the
                 # omitted value leaves them absent. A non-numeric token still
                 # raises: that row is not this typed omission.
-                if not math.isfinite(value):
-                    non_finite_columns.append(name)
-                    return None
-                return value
+                return self._omit_nonfinite_engine_number(
+                    value, name, non_finite_columns
+                )
 
             fO2_index = next(
                 (
@@ -4221,6 +4220,19 @@ class _MELTSBackendSupport(MeltBackend):
             return payload
         return {}
 
+    @staticmethod
+    def _omit_nonfinite_engine_number(
+        value: float,
+        label: str,
+        omitted: list[str],
+    ) -> Optional[float]:
+        """Omit nan/inf. Record ``label`` once. Never substitute 0."""
+        if math.isfinite(value):
+            return value
+        if label not in omitted:
+            omitted.append(label)
+        return None
+
     def _parse_phase_main_output(self, output: str) -> dict[str, object]:
         lines = [line.strip() for line in output.splitlines() if line.strip()]
         header_index = next(
@@ -4247,6 +4259,13 @@ class _MELTSBackendSupport(MeltBackend):
 
         accumulated: dict[str, dict[str, object]] = {}
         phase_instances: list[dict[str, object]] = []
+        omitted_phase_columns: list[str] = []
+        thermo_fields = (
+            ('enthalpy', 'enthalpy_J'),
+            ('entropy', 'entropy_J_K'),
+            ('volume', 'volume_m3'),
+            ('heat_capacity_Cp', 'heat_capacity_J_K'),
+        )
         for line in lines[header_index + 1:]:
             tokens = line.split()
             if len(tokens) < 7 + len(oxides):
@@ -4256,9 +4275,8 @@ class _MELTSBackendSupport(MeltBackend):
             instance_id = tokens[0]
             phase = re.sub(r'\d+$', '', instance_id)
             try:
-                mass_g, enthalpy, entropy, volume, heat_capacity = (
-                    float(value) for value in tokens[1:6]
-                )
+                mass_g = float(tokens[1])
+                raw_thermo = [float(value) for value in tokens[2:6]]
                 composition_values = [
                     float(value) for value in tokens[-len(oxides):]
                 ]
@@ -4266,6 +4284,19 @@ class _MELTSBackendSupport(MeltBackend):
                 raise ValueError(
                     f'Phase_main_tbl.txt has non-numeric table value: {line!r}'
                 ) from exc
+            # Mass is the phase amount, same as system mass: a non-finite
+            # token is not an optional thermo cell.
+            if not math.isfinite(mass_g):
+                raise ValueError(
+                    f'Phase_main_tbl.txt non-finite mass: {line!r}'
+                )
+            thermo_values: dict[str, Optional[float]] = {}
+            for (key, published), raw_value in zip(thermo_fields, raw_thermo):
+                thermo_values[key] = self._omit_nonfinite_engine_number(
+                    raw_value,
+                    f'{phase}.{published}',
+                    omitted_phase_columns,
+                )
             property_tokens = tokens[6:-len(oxides)]
             if not property_tokens:
                 raise ValueError(
@@ -4274,19 +4305,27 @@ class _MELTSBackendSupport(MeltBackend):
             # AlphaMELTS prints liquid viscosity or a solid formula in this
             # slot, despite older table descriptions calling it density.
             # The table's mass (g) / volume (cm3) is the phase density.
+            volume = thermo_values['volume']
             density_kg_m3 = (
                 mass_g / volume * 1000.0
-                if mass_g > 0.0 and volume > 0.0 else None
+                if (
+                    mass_g > 0.0
+                    and volume is not None
+                    and volume > 0.0
+                )
+                else None
             )
             phase_instances.append({
                 'instance_id': instance_id,
                 'phase': phase,
                 'solver_basis_mass_kg': mass_g / 1000.0,
                 'formula_or_endmember_token': ' '.join(property_tokens),
-                'enthalpy_J': enthalpy,
-                'entropy_J_K': entropy,
-                'volume_m3': volume * 1.0e-6,
-                'heat_capacity_J_K': heat_capacity,
+                'enthalpy_J': thermo_values['enthalpy'],
+                'entropy_J_K': thermo_values['entropy'],
+                'volume_m3': (
+                    None if volume is None else volume * 1.0e-6
+                ),
+                'heat_capacity_J_K': thermo_values['heat_capacity_Cp'],
                 'density_kg_m3': density_kg_m3,
                 'reference_mass_kg': mass_g / 1000.0,
                 'reference_basis': 'alphamelts_solver_phase_amount',
@@ -4297,23 +4336,23 @@ class _MELTSBackendSupport(MeltBackend):
                 phase,
                 {
                     'mass_g': 0.0,
-                    'enthalpy': 0.0,
-                    'entropy': 0.0,
-                    'volume': 0.0,
-                    'heat_capacity_Cp': 0.0,
+                    'enthalpy': None,
+                    'entropy': None,
+                    'volume': None,
+                    'heat_capacity_Cp': None,
                     'density_mass_sum': 0.0,
                     'density_mass_g': 0.0,
                     'composition_mass_sums': {oxide: 0.0 for oxide in oxides},
                 },
             )
             entry['mass_g'] = float(entry['mass_g']) + mass_g
-            for key, value in (
-                ('enthalpy', enthalpy),
-                ('entropy', entropy),
-                ('volume', volume),
-                ('heat_capacity_Cp', heat_capacity),
-            ):
-                entry[key] = float(entry[key]) + value
+            for key, value in thermo_values.items():
+                if value is None:
+                    continue
+                current = entry[key]
+                entry[key] = (
+                    value if current is None else float(current) + value
+                )
             if density_kg_m3 is not None and mass_g > 0.0:
                 entry['density_mass_sum'] = (
                     float(entry['density_mass_sum']) + density_kg_m3 * mass_g
@@ -4332,10 +4371,10 @@ class _MELTSBackendSupport(MeltBackend):
                 continue
             density_mass_g = float(entry['density_mass_g'])
             phase_thermo[phase] = {
-                'enthalpy': float(entry['enthalpy']),
-                'entropy': float(entry['entropy']),
-                'volume': float(entry['volume']),
-                'heat_capacity_Cp': float(entry['heat_capacity_Cp']),
+                'enthalpy': entry['enthalpy'],
+                'entropy': entry['entropy'],
+                'volume': entry['volume'],
+                'heat_capacity_Cp': entry['heat_capacity_Cp'],
                 'reference_mass_kg': mass_g / 1000.0,
                 'density_kg_m3': (
                     float(entry['density_mass_sum']) / density_mass_g
@@ -4352,6 +4391,7 @@ class _MELTSBackendSupport(MeltBackend):
             'phase_thermo': phase_thermo,
             'phase_compositions': phase_compositions,
             'phase_instances': phase_instances,
+            'non_finite_phase_columns': tuple(omitted_phase_columns),
         }
 
     @staticmethod
@@ -4850,22 +4890,38 @@ class _MELTSBackendSupport(MeltBackend):
             str(name)
             for name in (system_values.get('non_finite_system_columns') or ())
         )
+        phase_non_finite_columns = tuple(
+            str(name)
+            for name in (phase_values.get('non_finite_phase_columns') or ())
+        )
+        # One notice for both tables. System column names stay first so the
+        # system-row contract is unchanged when the phase table is finite.
+        notice_columns = list(non_finite_columns)
+        for name in phase_non_finite_columns:
+            if name not in notice_columns:
+                notice_columns.append(name)
         non_finite_notice: dict[str, object] | None = None
-        if non_finite_columns:
-            # The engine returned an assemblage and a system row, and some
-            # thermo cells are nan. Keep the finite cells. Do not abort the
-            # run and do not publish nan as an enthalpy or entropy.
+        if notice_columns:
+            # The engine returned an assemblage, and some thermo cells are
+            # nan. Keep the finite cells. Do not abort the run and do not
+            # publish nan, or a silent 0, as an enthalpy or entropy.
             non_finite_notice = {
                 'kind': 'alphamelts_system_property_notice',
                 'reason': 'non_finite_system_property',
                 'authority': 'alphamelts',
-                'band': {'columns': list(non_finite_columns)},
+                'band': {'columns': notice_columns},
                 'temperature_C': executed_temperature_C,
             }
-            result_warnings.append(
-                'AlphaMELTS system table omitted non-finite columns: '
-                + ', '.join(non_finite_columns)
-            )
+            if non_finite_columns:
+                result_warnings.append(
+                    'AlphaMELTS system table omitted non-finite columns: '
+                    + ', '.join(non_finite_columns)
+                )
+            if phase_non_finite_columns:
+                result_warnings.append(
+                    'AlphaMELTS phase table omitted non-finite columns: '
+                    + ', '.join(phase_non_finite_columns)
+                )
         result_diagnostics = self._merge_diagnostics(
             success_diagnostics,
             {

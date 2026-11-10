@@ -2674,6 +2674,84 @@ def test_nonfinite_system_fo2_still_refuses():
         )
 
 
+def _assert_no_nonfinite(value: object, path: str = 'result') -> None:
+    if isinstance(value, float):
+        assert math.isfinite(value), path
+        return
+    if isinstance(value, dict):
+        for key, item in value.items():
+            _assert_no_nonfinite(item, f'{path}.{key}')
+        return
+    if isinstance(value, (list, tuple)):
+        for index, item in enumerate(value):
+            _assert_no_nonfinite(item, f'{path}[{index}]')
+        return
+    if hasattr(value, '__dict__'):
+        for key, item in vars(value).items():
+            _assert_no_nonfinite(item, f'{path}.{key}')
+
+
+def test_nonfinite_phase_enthalpy_is_omitted_and_flagged():
+    """Kill mutation: publish_nan_phase_enthalpy."""
+    backend = AlphaMELTSBackend()
+    # Same 160 C system row as the system-enthalpy fixture. Liquid H and S
+    # are nan. One clinopyroxene instance is nan and one is finite, so the
+    # phase sum must keep the finite enthalpy and must not become 0.
+    output = (
+        "<> Stable liquid solid assemblage achieved.\n"
+        "Initial alphaMELTS calculation at: P 1.000000 (bars), "
+        "T 160.000000 (C)\n"
+        "liquid: SiO2\n"
+        "101.858164 g 44.9571\n"
+        "clinopyroxene1: 0.032809 g\n"
+        "Melt fraction = 0.999678\n"
+    )
+    phase = (
+        "index 1 Pressure 1.00 Temperature 160.00 SiO2\n"
+        "liquid1 101.858164 nan nan 33.852089 145.956791 15.942 44.9571\n"
+        "clinopyroxene1 0.016000 nan 0.010000 0.005000 0.004000 CaSiO3 50.0\n"
+        "clinopyroxene2 0.016809 -40.0 0.020000 0.005000 0.004000 CaSiO3 50.0\n"
+    )
+    composition = (
+        "index Pressure Temperature mass SiO2\n"
+        "1 1.00 160.00 101.890973 44.9571\n"
+    )
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=160.0,
+        total_input_kg=0.101890973,
+        system_output=_NONFINITE_SYSTEM_ROW,
+        table_outputs={
+            'System_main_tbl.txt': _NONFINITE_SYSTEM_ROW,
+            'Phase_main_tbl.txt': phase,
+            'Solid_comp_tbl.txt': composition,
+            'Bulk_comp_tbl.txt': composition,
+            'Liquid_comp_tbl.txt': composition,
+        },
+    )
+
+    assert result.status == 'ok'
+    liquid = result.phase_thermo['liquid']
+    clinopyroxene = result.phase_thermo['clinopyroxene']
+    assert liquid['enthalpy_J'] is None
+    assert liquid['entropy_J_K'] is None
+    assert liquid['volume_m3'] == pytest.approx(33.852089e-6)
+    assert liquid['heat_capacity_J_K'] == pytest.approx(145.956791)
+    assert clinopyroxene['enthalpy_J'] == pytest.approx(-40.0)
+    assert clinopyroxene['entropy_J_K'] == pytest.approx(0.03)
+    notice = result.diagnostics['alphamelts_system_property_notice']
+    assert notice['reason'] == 'non_finite_system_property'
+    assert notice['authority'] == 'alphamelts'
+    columns = notice['band']['columns']
+    assert columns[:2] == ['H', 'S']
+    assert 'liquid.enthalpy_J' in columns
+    assert 'liquid.entropy_J_K' in columns
+    assert 'clinopyroxene.enthalpy_J' in columns
+    assert 'clinopyroxene.entropy_J_K' not in columns
+    _assert_no_nonfinite(result)
+
+
 @pytest.mark.parametrize(
     'composition, provider_status, reason_fragment',
     [
