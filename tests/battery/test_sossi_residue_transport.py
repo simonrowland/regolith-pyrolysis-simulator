@@ -66,6 +66,8 @@ def test_sossi_series_conditions_read_primary_table_and_shared_geometry():
 
 
 def test_sossi_unprinted_flow_remains_unknown_for_series_defaults():
+    from simulator.chemistry.langmuir_knudsen import series_flux
+
     experiment = _source_experiment("2m-15-07-16c")
 
     conditions = _sossi_transport_conditions(experiment, 101325.0)
@@ -75,6 +77,87 @@ def test_sossi_unprinted_flow_remains_unknown_for_series_defaults():
     assert conditions["flow_rate_sccm"] is None
     assert conditions["pipe_diameter_m"] == pytest.approx(0.042)
     assert conditions["transport_length_m"] == pytest.approx(0.03)
+    result = series_flux(
+        species="Mn",
+        p_eq_pa=10.0,
+        p_bulk_pa=0.0,
+        T_surface_K=1673.15,
+        molar_mass_kg_mol=0.05494,
+        alpha=1.0,
+        **{
+            key: conditions[key]
+            for key in (
+                "total_pressure_pa",
+                "carrier_gas_mixture",
+                "flow_rate_sccm",
+                "pipe_diameter_m",
+                "transport_length_m",
+            )
+        },
+    )
+    assert "gas_flow_unprinted_default_radial_stir_factor_1" in (
+        result.transport_assumption_flags
+    )
+    assert "sweep_gas_unprinted_default_N2" in result.transport_assumption_flags
+
+
+def test_sossi_open_furnace_sends_printed_pressure_to_series_law(monkeypatch):
+    from types import SimpleNamespace
+
+    from simulator.battery.residue import (
+        ResidueChannel,
+        _ChannelTerms,
+        _finite_step_fluxes,
+    )
+
+    calls = []
+
+    def capture_series_flux(**kwargs):
+        calls.append(kwargs)
+        return SimpleNamespace(flux_kg_s_m2=4.0)
+
+    monkeypatch.setattr(
+        "simulator.chemistry.langmuir_knudsen.series_flux", capture_series_flux
+    )
+    experiment = _source_experiment("2m-15-07-16g")
+    conditions = _sossi_transport_conditions(experiment, 101325.0)
+    term = _ChannelTerms(
+        source=ResidueChannel("Mn", "Mn", "MnO", 0.85, "test"),
+        molar_mass_kg_mol=0.05494,
+        atom_counts={"Mn": 1.0},
+        parent_moles_per_product=1.0,
+        parent_oxygen_demand=0.0,
+        al_sio_sio2_moles_per_product=0.0,
+        oxide_per_product_kg=0.0,
+        o2_per_product_kg=0.0,
+    )
+
+    rates = _finite_step_fluxes(
+        [term],
+        {"MnO": 1.0},
+        temperature_K=1673.15,
+        area_m2=2.0e-5,
+        pressures_Pa={"Mn": 100.0},
+        transport_conditions=conditions,
+    )
+
+    assert rates["Mn"] == pytest.approx(8.0e-5)
+    assert len(calls) == 1
+    assert calls[0]["total_pressure_pa"] == 101325.0
+    assert calls[0]["carrier_gas_mixture"] == {"CO": 1.8, "CO2": 200.0}
+    assert calls[0]["flow_rate_sccm"] == 201.8
+    assert calls[0]["gas_resistance_enabled"] is True
+
+    mutated_conditions = {**conditions, "total_pressure_pa": 202650.0}
+    _finite_step_fluxes(
+        [term],
+        {"MnO": 1.0},
+        temperature_K=1673.15,
+        area_m2=2.0e-5,
+        pressures_Pa={"Mn": 100.0},
+        transport_conditions=mutated_conditions,
+    )
+    assert calls[-1]["total_pressure_pa"] == 202650.0
 
 
 def test_sossi_single_dash_keeps_component_unknown_and_flags_carrier_approximation():
