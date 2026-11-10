@@ -997,6 +997,7 @@ def test_pressure_model_availability_omitted_or_explicitly_unavailable() -> None
         "fit_provenance",
         "fit_residual",
         "anchor_refs",
+        "composition_mode",
     ],
 )
 def test_effective_pressure_reference_fit_requires_fit_evidence(missing: str) -> None:
@@ -1019,8 +1020,15 @@ def test_effective_pressure_reference_fit_requires_fit_evidence(missing: str) ->
         row["backsolve"].pop("provenance")
     elif missing == "fit_residual":
         row["backsolve"].pop("residual_dex")
-    else:
+    elif missing == "anchor_refs":
         row["validation"]["anchor_refs"] = []
+    else:
+        row["pressure_models"][0].pop("provenance")
+        row.pop("backsolve")
+        row["validation"]["anchor_refs"] = []
+        row["pressure_models"][0][
+            "composition_mode"
+        ] = "gas_association_from_effective_base"
 
     with pytest.raises(
         CatalogCompileError,
@@ -1043,6 +1051,23 @@ def test_effective_pressure_reference_fit_compiles_with_fit_evidence() -> None:
     compiled = compile_vapour_rail_catalog(payload)
 
     assert compiled.species["K"].evaluator is not None
+
+
+def test_gas_association_base_must_match_evidenced_effective_fit() -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    compiled = compile_vapour_rail_catalog(payload)
+    assert compiled.species["FeO_association_gas"].evaluator is not None
+
+    model = payload["families"]["oxide_vapors_feo_association_family"][
+        "physical_properties"
+    ]["species"]["FeO_association_gas"]["pressure_models"][0]
+    model["base_reference_pressure_model"]["coefficients"]["A"] += 0.1
+
+    with pytest.raises(
+        CatalogCompileError,
+        match="effective-pressure reference fit requires",
+    ):
+        compile_vapour_rail_catalog(payload)
 
 
 def test_policy_identity_cannot_compile_as_executable_alpha() -> None:
