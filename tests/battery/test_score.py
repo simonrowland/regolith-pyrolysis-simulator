@@ -19,6 +19,7 @@ from collections import Counter
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from typing import Mapping
 
 import pytest
 import yaml
