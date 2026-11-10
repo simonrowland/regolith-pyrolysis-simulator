@@ -900,17 +900,39 @@ _MAGEMIN_MASS_RESIDUAL_RE = re.compile(
 _MODE_GREEN_CLOSURE_ABS = 1.0e-4
 # d-367: "we can't refuse pedantically when it provides an unphysical 0
 # result" and "we want to flag bugs but let's fix it with a warning in
-# the meantime". Physics re-ruling b-978: a row green refuses is
-# renormalised, with a mode_vector_renormalised notice, while its printed
-# sum misses 1 by at most this cap. Above the cap the typed refusal stays.
+# the meantime". Physics re-ruling b-978 (2026-11-10): a printed EXCESS
+# up to this cap is renormalised, with a mode_vector_renormalised notice.
+# Above the cap the typed invalid-output refusal stays. A deficit outside
+# the green closure stays the typed mass-deficit refusal. That is the
+# original acceptance's deficit path. The original "refuse 1.0002"
+# sentence was the 1e-4 per-token rule; this ruling supersedes it. A lone
+# token 1.0002 is an excess of 2e-4, inside the cap, so it is renormalised.
 #
-# Why 1e-3. Dividing a phase fraction by a sum that misses 1 by at most
-# 1e-3 changes that fraction by at most 0.1% relative (1/0.999 - 1 is
-# about 1.001e-3). The liquidus finder tolerates 2 K. A 0.1% melt-fraction
-# shift sits far inside that bracket, so the renormalised row cannot move
-# a gate decision. Hour 156 prints 1.00003 + 0.00008 = 1.00011. That
-# 1.1e-4 excess is inside this cap, and the melt is fully liquid at that
-# bracket either way.
+# Why 1e-3. Premise. The finder decides on F (liquid fraction) at two
+# thresholds: solid θ_s = solid_epsilon = 1e-3 (F > θ_s), and liquid
+# θ_l = 1 - liquid_epsilon = 0.999 (F >= θ_l). Renormalising a mode
+# vector with sum S = 1 + δ, 0 < δ <= 1e-3, gives F' = F/S.
+# Algebra. F - F' = F·δ/(1+δ) < δ. A decision can flip only if F lies
+# within δ of a threshold:
+#   liquidus: θ_l <= F < θ_l·S
+#   solidus: the analogous window.
+# Example: the printed "1.00003 0.00008" gives
+# F' = 1.00003/1.00011 = 0.99992 >= 0.999, so it does not flip.
+# Map to temperature. A flip moves the bracket by ΔT <= δ / |dF/dT|
+# at the crossing. The finder's tolerance_C (2 K) is unaffected iff
+# |dF/dT| >= δ / tolerance_C = 1e-3 / 2 K = 5e-4 per K.
+# Units: dimensionless / K → K.
+# Sanity: a basalt melting interval of ~200 K averages dF/dT ~ 5e-3
+# per K, ten times that requirement, and the curve is steeper near the
+# liquidus. That average is not the bound. When a renormalised sample
+# takes part in a threshold decision, the finder computes the local
+# slope from the two bracketing samples, s = |ΔF/ΔT|, attaches
+# ΔT_bound = δ / s to this notice, and sets
+# renormalisation_may_shift_bracket when ΔT_bound > tolerance_C. The
+# result is kept (d-367). The flag makes the remaining uncertainty
+# visible.
+# Raw F > 1 is unphysical. The renormalised F' removes that impossible
+# value. ΔT_bound is the bracket uncertainty that remains.
 #
 # The Mass residual is recorded on the notice. It is not the closure
 # bound. Closure is a physical sanity bound on the phase-fraction vector.
@@ -919,6 +941,125 @@ _MODE_GREEN_CLOSURE_ABS = 1.0e-4
 # notice keeps the raw tokens, the raw sum, and the residual so the
 # inconsistency in MAGEMin's printed modes stays visible.
 _MODE_RENORMALISE_CAP = Decimal('0.001')
+
+
+def _close_printed_mode_vector(
+    names: Sequence[str],
+    values: Sequence[str],
+) -> tuple[
+    str,
+    list[tuple[str, float]],
+    list[tuple[str, Decimal, str, float]],
+    Decimal,
+]:
+    """Classify one printed MAGEMin mode vector. The only closure decision.
+
+    Invariant: every printed vector is exactly one of
+    - raw floats, when it is inside green's 1e-4 closure and every token
+      is in [0, 1], or the printed decimal sum is already 1;
+    - a renormalisation of a printed excess δ with 0 < δ <= 1e-3, stored
+      so the fractions sum to 1, with the raw tokens kept for the notice;
+    - a typed refusal: an invalid token, a mass deficit outside the green
+      closure, or an excess above 1e-3.
+
+    No branch stores a silent un-normalised success, and no branch turns a
+    positive token into 0. The Mass residual is not an input: it cannot
+    move a vector between these classes.
+    """
+    raw_rows: list[tuple[str, Decimal, str, float]] = []
+    for name, raw in zip(names, values):
+        try:
+            token = Decimal(raw)
+        except InvalidOperation as exc:
+            _raise_magemin_output_invalid(
+                f'MAGEMin Mode token for {name!r} is not numeric: {raw!r}',
+                exc,
+            )
+        if (
+            not token.is_finite()
+            or token < 0
+            or token > Decimal(1) + _MODE_RENORMALISE_CAP
+        ):
+            _raise_magemin_output_invalid(
+                f'MAGEMin Mode token for {name!r} is invalid: {raw!r}'
+            )
+        # float(raw), not float(Decimal), so a raw row matches green.
+        raw_rows.append((name, token, raw, float(raw)))
+    float_modes = [
+        (name, fraction) for name, _token, _raw, fraction in raw_rows
+    ]
+    float_sum = sum(fraction for _name, fraction in float_modes)
+    green_closed = (
+        all(0.0 <= fraction <= 1.0 for _name, fraction in float_modes)
+        and math.isclose(
+            float_sum, 1.0, rel_tol=0.0, abs_tol=_MODE_GREEN_CLOSURE_ABS,
+        )
+    )
+    raw_sum = sum(
+        (token for _name, token, _raw, _fraction in raw_rows),
+        Decimal(0),
+    )
+    excess = raw_sum - Decimal(1)
+    if green_closed or excess == 0:
+        return 'raw', float_modes, raw_rows, raw_sum
+    if excess > 0 and excess <= _MODE_RENORMALISE_CAP:
+        scaled = [
+            float(token / raw_sum)
+            for _name, token, _raw, _fraction in raw_rows
+        ]
+        # The last token absorbs the rounding so the stored floats sum
+        # to 1. x + (1 - x) is 1 for a finite x.
+        scaled[-1] = 1.0 - sum(scaled[:-1])
+        parsed_modes = [
+            (name, value)
+            for (name, _token, _raw, _fraction), value in zip(
+                raw_rows, scaled,
+            )
+        ]
+        return 'renormalised', parsed_modes, raw_rows, raw_sum
+    mode_total = float(raw_sum)
+    if excess < 0:
+        raise _MAGEMinModeVectorMassDeficit(
+            mode_sum=mode_total,
+            parsed_modes=float_modes,
+        )
+    _raise_magemin_output_invalid(
+        'MAGEMin Mode vector must sum to 1.0; '
+        f'got {mode_total:.9g}'
+    )
+
+
+def _record_mode_bracket_notices(
+    diagnostics: dict,
+    warnings_out: list,
+    notices: list[dict],
+    tolerance_C: float,
+) -> None:
+    """Copy finder-annotated mode notices onto the liquidus result.
+
+    The finder writes ``delta_T_bound`` and, when that bound exceeds
+    ``tolerance_C``, ``renormalisation_may_shift_bracket`` onto the same
+    dict the sample returned. This only surfaces that decision.
+    """
+    if not notices:
+        return
+    diagnostics['magemin_mode_token_notices'] = [
+        dict(notice) for notice in notices
+    ]
+    for notice in notices:
+        if notice.get('renormalisation_may_shift_bracket') is not True:
+            continue
+        bound = notice.get('delta_T_bound')
+        if isinstance(bound, (int, float)) and math.isfinite(float(bound)):
+            bound_text = f'{float(bound):.6g} K'
+        else:
+            bound_text = 'unbounded'
+        warnings_out.append(
+            'MAGEMin mode renormalisation may shift a bracket '
+            f'(delta_T_bound {bound_text}; '
+            f'tolerance_C {float(tolerance_C):g} K; '
+            f'raw sum {notice.get("raw_sum")})'
+        )
 
 
 def _parse_magemin_mass_residual(stdout: str) -> Optional[Decimal]:
@@ -1968,6 +2109,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         sample_warnings: list[str] = []
+        renormalised_notices: list[dict] = []
 
         # MAGEMin uses a finite hang guard; sample count, not wall time,
         # bounds the search work. A per-call engine timeout remains separate.
@@ -2057,7 +2199,24 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     continue
                 if warning not in sample_warnings:
                     sample_warnings.append(warning)
-            return float(result.liquid_fraction)
+            fraction = float(result.liquid_fraction)
+            # The finder annotates this same dict when the sample takes
+            # part in a threshold decision. One notice per mode vector.
+            mode_notices = ()
+            if isinstance(result.diagnostics, Mapping):
+                raw_notices = result.diagnostics.get(
+                    'magemin_mode_token_notices',
+                )
+                if isinstance(raw_notices, (list, tuple)):
+                    mode_notices = raw_notices
+            for notice in mode_notices:
+                if (
+                    isinstance(notice, dict)
+                    and notice.get('kind') == 'mode_vector_renormalised'
+                ):
+                    renormalised_notices.append(notice)
+                    return fraction, notice
+            return fraction
 
         result = find_liquidus_solidus_by_fraction(
             sample_fraction,
@@ -2069,6 +2228,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         warnings_out = [*result.warnings, *sample_warnings[:6]]
         diagnostics = dict(result.diagnostics or {})
+        _record_mode_bracket_notices(
+            diagnostics,
+            warnings_out,
+            renormalised_notices,
+            tolerance_C,
+        )
         # An ig-order drop is a refusal of the requested bulk (status stays
         # out_of_domain — not ok). The freeze gate is allowed to predict on
         # the projected bulk, so the search for that different bulk is
@@ -3512,12 +3677,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         Mode values are mass fractions of the system.  The buffer
         pseudo-phase (any name in ``_BUFFER_CHOICES``) is dropped — it is
-        a control row, not a material phase.  A row inside green's 1e-4
-        closure, with every token in [0, 1], is stored raw.  A larger
-        closure error up to 1e-3 is renormalised so the stored fractions
-        sum to 1, and the raw tokens, raw sum, and Mass residual are kept
-        on a ``mode_vector_renormalised`` notice.  Above 1e-3 the row is
-        refused.  See ``_MODE_RENORMALISE_CAP``.
+        a control row, not a material phase.  Closure is decided only by
+        ``_close_printed_mode_vector``: green's 1e-4 rows stay raw, a
+        printed excess up to 1e-3 is renormalised onto a
+        ``mode_vector_renormalised`` notice, and a deficit outside that
+        green closure or an excess above 1e-3 is a typed refusal.  See
+        ``_MODE_RENORMALISE_CAP``.
         Returns ``{phase: {'mass_kg': fraction}}`` on a unit-mass basis
         (the adapter only needs relative masses for ``liquid_fraction``
         and modal parity).
@@ -3540,79 +3705,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if not names or len(names) != len(values):
             return {}
 
-        # One closure rule. See ``_MODE_RENORMALISE_CAP``.
-        #   A token excess past 1e-3 is an invalid token.
-        #   |sum - 1| <= 1e-4 and every token in [0, 1]: raw floats, the
-        #   same ones green stored (math.isclose on the float sum).
-        #   Otherwise, printed |sum - 1| <= 1e-3: renormalise the whole
-        #   vector.
-        #   Above 1e-3: the typed refusal. A deficit stays the mass-deficit
-        #   refusal; an excess stays invalid output.
+        # Closure has one decision, in ``_close_printed_mode_vector``.
         # The Mass residual is parsed so a renormalised row can record it.
-        # It does not enter either comparison.
+        # It is not passed into that decision.
         mass_residual = _parse_magemin_mass_residual(stdout)
-        raw_rows: list[tuple[str, Decimal, str, float]] = []
-        for name, raw in zip(names, values):
-            try:
-                token = Decimal(raw)
-            except InvalidOperation as exc:
-                _raise_magemin_output_invalid(
-                    f'MAGEMin Mode token for {name!r} is not numeric: {raw!r}',
-                    exc,
-                )
-            if (
-                not token.is_finite()
-                or token < 0
-                or token > Decimal(1) + _MODE_RENORMALISE_CAP
-            ):
-                _raise_magemin_output_invalid(
-                    f'MAGEMin Mode token for {name!r} is invalid: {raw!r}'
-                )
-            # float(raw), not float(Decimal), so a raw row matches green.
-            raw_rows.append((name, token, raw, float(raw)))
-        float_modes = [
-            (name, fraction) for name, _token, _raw, fraction in raw_rows
-        ]
-        float_sum = sum(fraction for _name, fraction in float_modes)
-        green_closed = (
-            all(0.0 <= fraction <= 1.0 for _name, fraction in float_modes)
-            and math.isclose(
-                float_sum, 1.0, rel_tol=0.0, abs_tol=_MODE_GREEN_CLOSURE_ABS,
-            )
+        kind, parsed_modes, raw_rows, raw_sum = _close_printed_mode_vector(
+            names, values,
         )
-        raw_sum = sum(
-            (token for _name, token, _raw, _fraction in raw_rows),
-            Decimal(0),
-        )
-        if green_closed:
-            parsed_modes = float_modes
-            renormalise = False
-        elif abs(raw_sum - Decimal(1)) <= _MODE_RENORMALISE_CAP:
-            scaled = [
-                float(token / raw_sum)
-                for _name, token, _raw, _fraction in raw_rows
-            ]
-            # The last token absorbs the rounding so the stored floats sum
-            # to 1. x + (1 - x) is 1 for a finite x.
-            scaled[-1] = 1.0 - sum(scaled[:-1])
-            parsed_modes = [
-                (name, value)
-                for (name, _token, _raw, _fraction), value in zip(
-                    raw_rows, scaled
-                )
-            ]
-            renormalise = True
-        else:
-            mode_total = float(raw_sum)
-            if raw_sum < 1:
-                raise _MAGEMinModeVectorMassDeficit(
-                    mode_sum=mode_total,
-                    parsed_modes=float_modes,
-                )
-            _raise_magemin_output_invalid(
-                'MAGEMin Mode vector must sum to 1.0; '
-                f'got {mode_total:.9g}'
-            )
+        renormalise = kind == 'renormalised'
         if metadata is not None:
             metadata['phase_names'] = tuple(names)
             metadata['solver_status'] = _parse_magemin_solver_status(stdout)
