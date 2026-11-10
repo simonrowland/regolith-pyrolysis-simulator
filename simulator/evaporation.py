@@ -37,6 +37,7 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
     melt_regime,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -68,6 +69,11 @@ from simulator.vapour_rail.instrumentation import (
 PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID = (
     'equilibrium_backend_effective_pressure_pre_rg'
 )
+# Same bound as EquilibriumMixin._internal_analytical_equilibrium: T_K < 400
+# returns before the vapor-pressure loop. Empty Pa from that skip is not a
+# measured pressure of zero.
+_INTERNAL_ANALYTICAL_EVAPORATION_FLOOR_K = 400.0
+_INTERNAL_ANALYTICAL_BELOW_FLOOR_REASON = 'internal_analytical_below_400K'
 # Stage-0 phosphorus vapour carriers. C0 must not claim them (they stay
 # condensed). C0B claims only this set. Activity-evidence annotations use
 # the same membership. Not STRUCTURALLY_ZERO_P_CARRIERS: that name is the
@@ -693,6 +699,39 @@ def _evaporation_legacy_shadow_pressure_map(
     )
 
 
+def _sub_400k_skip_overlay_reason(equilibrium: Any) -> str | None:
+    """Name the sub-400 K skip on an empty overlay, with T and the floor.
+
+    The skip records ``internal_analytical_below_400K`` and returns no
+    pressures. That token does not carry the hour temperature. The overlay
+    reason does, so a cold empty hour is not a blank (d-367).
+    """
+
+    diagnostics = getattr(equilibrium, 'diagnostics', None) or {}
+    if not isinstance(diagnostics, Mapping):
+        return None
+    if (
+        diagnostics.get('vapor_pressure_zero_reason')
+        != _INTERNAL_ANALYTICAL_BELOW_FLOOR_REASON
+    ):
+        return None
+    if getattr(equilibrium, 'status', None) != 'ok':
+        return None
+    try:
+        temperature_K = (
+            float(equilibrium.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        )
+    except (AttributeError, TypeError, ValueError):
+        return None
+    floor_K = _INTERNAL_ANALYTICAL_EVAPORATION_FLOOR_K
+    if not math.isfinite(temperature_K) or not 0.0 < temperature_K < floor_K:
+        return None
+    return (
+        'below_evaporation_temperature_floor:'
+        f'T_K={temperature_K:.2f}:floor_K={floor_K:.0f}'
+    )
+
+
 def _pre_rg_effective_pressure_source(
     vapor_pressure_data: dict,
     equilibrium: Any,
@@ -715,11 +754,16 @@ def _pre_rg_effective_pressure_source(
         getattr(equilibrium, 'vapor_pressures_Pa', {}),
         read_context=EFFECTIVE_PRESSURE_SOURCE_CONTEXT,
     )
-    # An empty backend map is missing pressure evidence at every temperature;
-    # only inventory and typed batch outcomes can establish a physical zero.
+    # An empty backend map is missing pressure evidence at every temperature.
+    # The sub-400 K skip is the one empty case with a typed cause; record
+    # that cause. It does not prove the pressure was measured as zero.
+    physical_zero_reason = None
+    if not effective_pressures:
+        physical_zero_reason = _sub_400k_skip_overlay_reason(equilibrium)
     return EffectivePressureSource(
         PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
         effective_pressures,
+        physical_zero_reason=physical_zero_reason,
     )
 
 
@@ -1039,16 +1083,16 @@ class EvaporationMixin:
 
         if not vapor_pressures:
             if (
-                0.0 < T_K < 400.0
+                0.0 < T_K < _INTERNAL_ANALYTICAL_EVAPORATION_FLOOR_K
                 and getattr(equilibrium, 'status', None) == 'ok'
                 and (getattr(equilibrium, 'diagnostics', {}) or {}).get(
                     'vapor_pressure_zero_reason'
-                ) == 'internal_analytical_below_400K'
+                ) == _INTERNAL_ANALYTICAL_BELOW_FLOOR_REASON
             ):
                 # The guarded producer explicitly skipped pressure evaluation
                 # under its existing kinetic floor; absent Pa alone is no proof.
                 self._last_evaporation_flux_diagnostic = {
-                    'reason': 'internal_analytical_below_400K',
+                    'reason': _INTERNAL_ANALYTICAL_BELOW_FLOOR_REASON,
                     'evaporation_flux_kg_hr': {},
                     'vapour_batch_flux_overlay': flux_overlay_report,
                     'vapour_batch': batch_report,
@@ -1152,7 +1196,8 @@ class EvaporationMixin:
                 reason,
                 diagnostic,
             )
-        if T_K < 400:  # Catalog pressure exists; thermal physical zero.
+        if T_K < _INTERNAL_ANALYTICAL_EVAPORATION_FLOOR_K:
+            # Catalog pressure exists; thermal physical zero below the floor.
             return flux
         # b-149 instance 4: partial channel refusals. When some channels debit
         # and others are typed refusals, refused species drop out of

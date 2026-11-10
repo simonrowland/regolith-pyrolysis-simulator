@@ -302,6 +302,11 @@ def test_active_liquid_empty_vapor_pressures_fail_loud(temperature_C):
     assert exc_info.value.reason == 'vapour_batch_no_debiting_pressure_outcome'
     assert refused_batch.requested_species_ids == frozenset({'K'})
     assert refused_batch.channel('K').is_refused
+    # 0 C is below 400 K, but kernel_ok_empty is not the sub-400 K skip.
+    if temperature_C + 273.15 < 400.0:
+        assert sim._last_vapour_batch_flux_overlay[
+            'effective_pressure_zero_reason'
+        ] is None
 
 
 def test_kernel_ok_empty_with_proven_empty_request_is_physical_zero():
@@ -350,6 +355,41 @@ def test_no_volatile_species_allows_active_liquid_zero_evaporation():
 
     assert flux.species_kg_hr == {}
     assert flux.total_kg_hr == 0.0
+
+
+def test_cold_hour_overlay_names_sub_400k_evaporation_floor():
+    """Empty cold-hour overlay cites the sub-400 K skip, not a blank or a proved zero.
+
+    Mars C2A hour 1 is 40 C (313.15 K). The internal-analytical skip
+    returns no vapor pressures below 400 K. Flux stays empty; the overlay
+    reason carries that temperature and the floor.
+    """
+    temperature_C = 40.0
+    sim = _with_empty_vapour_batch(
+        types.SimpleNamespace(melt=types.SimpleNamespace(temperature_C=temperature_C))
+    )
+    result = EquilibriumResult(
+        temperature_C=temperature_C,
+        pressure_bar=1.5e-3,
+        liquid_fraction=None,
+        phase_assemblage_available=False,
+        vapor_pressures_Pa={},
+        status='ok',
+        diagnostics={
+            'vapor_pressure_zero_reason': 'internal_analytical_below_400K',
+        },
+    )
+
+    flux = PyrolysisSimulator._calculate_evaporation(sim, result)
+
+    assert flux.species_kg_hr == {}
+    assert flux.total_kg_hr == 0.0
+    assert sim._last_vapour_batch_flux_overlay[
+        'effective_pressure_zero_reason'
+    ] == (
+        'below_evaporation_temperature_floor:T_K=313.15:floor_K=400'
+    )
+    assert sim._last_vapour_batch_flux_overlay['n_flux_pressures'] == 0
 
 
 def test_subthreshold_empty_vapor_pressures_remain_physical_zero():
