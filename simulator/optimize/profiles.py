@@ -595,6 +595,7 @@ def _validate_objectives(profile: Mapping[str, Any], *, source: str | Path) -> N
         profile["objectives"] = normalized_objectives
     try:
         objective_importance_evidence(profile)
+        objective_definitions(profile, include_unclaimed_c0_products=True)
         objective_definitions(profile)
     except ObjectiveProfileError as exc:
         raise ProfileValidationError(f"{source}: {exc}") from exc

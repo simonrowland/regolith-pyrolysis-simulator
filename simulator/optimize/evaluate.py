@@ -101,6 +101,7 @@ from simulator.optimize.objective import (
     composition_targets_require_coating,
     composition_targets_require_stage0_exit,
     composition_targets_require_terminal_rump,
+    c0_smoke_withheld_objective_note,
     compute_objectives,
     product_summary,
 )
@@ -1272,6 +1273,7 @@ def evaluate(
             cost_parameters=spec.cost_parameters,
             coating_margin=feasibility.margins.get("coating"),
         ),
+        notes=_notes_with_c0_smoke_withhold((), objective_profile),
     )
 
 
@@ -4440,6 +4442,17 @@ def _with_composition_target_extraction_thresholds(
     )
 
 
+def _notes_with_c0_smoke_withhold(
+    notes: tuple[str, ...] | Sequence[str],
+    profile: Mapping[str, Any],
+) -> tuple[str, ...]:
+    note = c0_smoke_withheld_objective_note(profile)
+    existing = tuple(str(item) for item in notes)
+    if note is None or note in existing:
+        return existing
+    return existing + (note,)
+
+
 def _infeasible_result(
     candidate_id: str | None,
     spec: EvalSpec,
@@ -4457,6 +4470,8 @@ def _infeasible_result(
         run_execution,
         feasibility.margins,
     )
+    if objectives is not None:
+        notes = _notes_with_c0_smoke_withhold(notes, profile)
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -5109,7 +5124,7 @@ def _out_of_domain_result(
                 cost_parameters=spec.cost_parameters,
                 coating_margin=feasibility.margins.get("coating"),
             ),
-            notes=assessment.notes,
+            notes=_notes_with_c0_smoke_withhold(assessment.notes, profile),
         )
 
     if composition_targets_require_terminal_rump(profile):

@@ -76,10 +76,10 @@ from simulator.optimize.objective import (
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
     objective_definitions,
-    objective_importance_evidence,
     objective_scores,
     objective_value_for_metric,
     pareto_front,
+    unrenormalized_study_scalar_weights,
 )
 from simulator.optimize.pool import (
     DEFAULT_EVAL_TIMEOUT_SECONDS,
@@ -612,12 +612,8 @@ def run(
         cli_pinned_paths=_cli_pinned_paths(pinned_paths),
     )
     definitions = objective_definitions(resolved_profile)
-    importance_by_metric = {
-        row.metric: row.weight for row in objective_importance_evidence(resolved_profile)
-    }
-    objective_weights = tuple(
-        importance_by_metric[definition.metric] for definition in definitions
-    )
+    # d-377: drop products the campaign does not claim. Weights stay declared.
+    objective_weights = unrenormalized_study_scalar_weights(resolved_profile)
     two_phase = _resolve_two_phase_config(resolved_profile, two_phase_certify)
     _validate_inputs(config, resolved_profile)
     try:

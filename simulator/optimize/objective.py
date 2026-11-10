@@ -96,6 +96,19 @@ _MASS_OBJECTIVE_METRICS = frozenset(
         "oxygen_vented_kg",
     }
 )
+# data/setpoints.yaml campaigns.C0: silicate melt + Stage 0 inert slag,
+# no final ceramic claim. These metrics are that claim.
+_C0_UNCLAIMED_PRODUCT_METRICS = frozenset(
+    {
+        "pure_silica_glass_kg",
+        "industrial_mixed_glass_kg",
+        "refractory_ceramic_rump_kg",
+        "metals_plus_o2_kg",
+        "metals_total_kg",
+    }
+)
+_C0_SMOKE_LABEL_PREFIX = "C0 SMOKE ONLY:"
+_C0_WITHHOLD_REASON = "campaign_does_not_claim_product"
 PRODUCT_CLASS_MASS_METRIC_PATHS = MappingProxyType(
     {
         "industrial_mixed_glass_kg": (
@@ -1327,8 +1340,118 @@ def _require_objective_keys(
         )
 
 
-def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefinition, ...]:
+def is_c0_smoke_profile(profile: Mapping[str, Any]) -> bool:
+    """True when a C0 run is explicitly labeled as a screening smoke profile."""
+
+    run = profile.get("run")
+    campaign = ""
+    if isinstance(run, Mapping):
+        campaign = str(run.get("campaign") or "")
+    if campaign != "C0":
+        return False
+    description = profile.get("description")
+    emphasis = profile.get("objective_emphasis")
+    return (
+        isinstance(description, str)
+        and description.startswith(_C0_SMOKE_LABEL_PREFIX)
+        and isinstance(emphasis, str)
+        and emphasis.startswith(_C0_SMOKE_LABEL_PREFIX)
+    )
+
+
+def _format_declared_number(value: float) -> str:
+    return format(value, ".12g")
+
+
+def _c0_smoke_objective_evidence(
+    profile: Mapping[str, Any],
+) -> tuple[ObjectiveImportanceEvidence, ...] | None:
+    """Declared objective rows when this profile is a C0 smoke screen."""
+
+    if not is_c0_smoke_profile(profile):
+        return None
+    if not isinstance(profile.get("objectives"), (list, tuple)):
+        return None
+    return objective_importance_evidence(profile)
+
+
+def c0_smoke_withheld_weight_fraction(profile: Mapping[str, Any]) -> float | None:
+    """Share of declared objective weight withheld from the study scalar.
+
+    withheld_weight_fraction = sum(withheld weights) / sum(all declared weights).
+    Retained weights stay at their declared values: they are not divided by
+    (1 - this fraction).
+    """
+
+    evidence = _c0_smoke_objective_evidence(profile)
+    if evidence is None:
+        return None
+    withheld_rows = [
+        row for row in evidence if row.metric in _C0_UNCLAIMED_PRODUCT_METRICS
+    ]
+    if not withheld_rows:
+        return None
+    total = math.fsum(row.weight for row in evidence)
+    withheld = math.fsum(row.weight for row in withheld_rows)
+    return withheld / total
+
+
+def c0_smoke_withheld_objective_note(profile: Mapping[str, Any]) -> str | None:
+    """Visible notice: each withheld objective, its weight, and the reason."""
+
+    evidence = _c0_smoke_objective_evidence(profile)
+    if evidence is None:
+        return None
+    withheld_rows = [
+        row for row in evidence if row.metric in _C0_UNCLAIMED_PRODUCT_METRICS
+    ]
+    fraction = c0_smoke_withheld_weight_fraction(profile)
+    if not withheld_rows or fraction is None:
+        return None
+    parts = [
+        (
+            f"{row.metric} weight={_format_declared_number(row.weight)} "
+            f"reason={_C0_WITHHOLD_REASON}"
+        )
+        for row in withheld_rows
+    ]
+    return (
+        f"{_C0_WITHHOLD_REASON}: "
+        + "; ".join(parts)
+        + f"; withheld_weight_fraction={_format_declared_number(fraction)}"
+    )
+
+
+def _scoring_objective_rows(
+    profile: Mapping[str, Any],
+    *,
+    include_unclaimed_c0_products: bool,
+) -> Any:
     raw_objectives = profile.get("objectives")
+    if include_unclaimed_c0_products or not is_c0_smoke_profile(profile):
+        return raw_objectives
+    if not isinstance(raw_objectives, (list, tuple)):
+        return raw_objectives
+    return [
+        raw
+        for raw in raw_objectives
+        if not (
+            isinstance(raw, Mapping)
+            and canonical_objective_metric(str(raw.get("metric", "")))
+            in _C0_UNCLAIMED_PRODUCT_METRICS
+        )
+    ]
+
+
+def objective_definitions(
+    profile: Mapping[str, Any],
+    *,
+    include_unclaimed_c0_products: bool = False,
+) -> tuple[ObjectiveDefinition, ...]:
+    raw_objectives = _scoring_objective_rows(
+        profile,
+        include_unclaimed_c0_products=include_unclaimed_c0_products,
+    )
     if not isinstance(raw_objectives, (list, tuple)) or not raw_objectives:
         raise ObjectiveProfileError("profile.objectives must be a non-empty list")
 
@@ -1424,6 +1547,33 @@ def objective_importance_evidence(
     return tuple(rows)
 
 
+def unrenormalized_study_scalar_weights(
+    profile: Mapping[str, Any],
+) -> tuple[float, ...]:
+    """Declared weights of the objectives that enter the study scalar.
+
+    Products the evaluated campaign does not claim are absent from
+    ``objective_definitions``. Their weight is not redistributed, and they
+    are not entered as a zero score.
+    """
+
+    definitions = objective_definitions(profile)
+    importance_by_metric = {
+        row.metric: row.weight for row in objective_importance_evidence(profile)
+    }
+    weights = tuple(
+        importance_by_metric[definition.metric] for definition in definitions
+    )
+    # A zero weight sum would publish a zero study score. Declared weights are
+    # positive, and withholding unclaimed products must leave at least one.
+    if not weights or math.fsum(weights) == 0.0:
+        raise ObjectiveProfileError(
+            "study scalar has no remaining objective weight after withholding "
+            "products the campaign does not claim"
+        )
+    return weights
+
+
 def compute_objectives(
     profile: Mapping[str, Any],
     run_execution: Any,
@@ -1434,7 +1584,10 @@ def compute_objectives(
 
     active_cost_parameters = cost_parameters_from_mapping(cost_parameters)
     definitions = objective_definitions(profile)
-    raw_objectives = profile.get("objectives")
+    raw_objectives = _scoring_objective_rows(
+        profile,
+        include_unclaimed_c0_products=False,
+    )
     if not isinstance(raw_objectives, (list, tuple)):
         raise ObjectiveProfileError("profile.objectives must be a non-empty list")
     sim = getattr(run_execution, "simulator", run_execution)
