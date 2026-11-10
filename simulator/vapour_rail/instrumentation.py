@@ -1116,12 +1116,15 @@ def _demote_self_agreement_proof(
     self_agreement_species: Collection[str],
     compared_species: Collection[str],
 ) -> dict[str, Any]:
-    """A shared activity is not evidence, and it must not hide a mismatch.
+    """Shared-origin agreement is not proof. This is the only demotion gate.
 
-    ``shadow_equal`` stays true only when every compared species agrees
-    independently. Species that agree by recomputing ``a_reported`` are
-    listed and cannot prove the set. A numeric mismatch stays in
-    ``mismatched_species`` even when another species is self-agreement.
+    Invariant: ``shadow_outcome`` is ``proved`` only when every participating
+    species agrees numerically and none of them recomputes ``a_reported``.
+    Catalog pressure equality is not an input. Pre-RG live and seam operands
+    can both come from backend pressures, so a catalog mismatch does not make
+    that pair independent (d-367, d-019). A numeric mismatch stays
+    ``mismatch`` and is never dropped. Callers pass every shared-activity
+    species; filtering on catalog equality belongs nowhere else.
     """
 
     participating = {str(species) for species in compared_species}
@@ -1267,8 +1270,8 @@ def compare_live_shadow_to_batch_flux(
     )
 
     if batch is not None and not resolution_error:
-        # Per species. One self-agreement must not blank the comparison, and
-        # a numeric match on a shared reported activity is not proof.
+        # Per species. One shared reported activity demotes the whole proof,
+        # including when the catalog pressure disagrees with the live pressure.
         self_agreement_ids = _reported_activity_species(
             batch, catalog_pa_by_species
         )
@@ -1299,23 +1302,11 @@ def compare_live_shadow_to_batch_flux(
         )
         if catalog_self:
             comparison["catalog_pa_self_agreement_species"] = catalog_self
-        shared_proof: list[str] = []
-        for species_id in self_agreement_ids:
-            if species_id not in catalog_pa_by_species or species_id not in live:
-                continue
-            if not _pressures_equal(
-                live[species_id], catalog_pa_by_species[species_id]
-            ):
-                continue
-            batch_pa = batch_flux_pressures_Pa.get(species_id)
-            if batch_pa is None or not _pressures_equal(
-                float(batch_pa), catalog_pa_by_species[species_id]
-            ):
-                continue
-            shared_proof.append(species_id)
+        # Every shared-activity species. Catalog inequality must not restore
+        # a proof: the live/seam pair can still share a backend origin.
         comparison = _demote_self_agreement_proof(
             comparison,
-            self_agreement_species=shared_proof,
+            self_agreement_species=self_agreement_ids,
             compared_species=set(live) & {str(key) for key in batch_flux_pressures_Pa},
         )
     return comparison

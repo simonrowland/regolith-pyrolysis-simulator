@@ -873,10 +873,11 @@ def _shadow_assignment(
     ids=["-".join(roles) for roles in product(_SHADOW_ROLES, repeat=len(_SHADOW_PANEL))],
 )
 def test_shadow_proof_classifies_every_species(roles: tuple[str, ...]) -> None:
-    """No species is proved by a shared activity, and no mismatch is dropped.
+    """Proved only when every species agrees and none shares reported activity.
 
-    Roles cover independent agreement, self-agreement, a seam mismatch, and
-    a catalog mismatch on every panel species.
+    ``catalog_mismatch`` still carries ``a_source = a_reported``. Live and
+    seam can both be backend pressures, so a different catalog value does not
+    make that pair independent evidence. A seam mismatch stays ``mismatch``.
     """
 
     batch, live, batch_flux = _shadow_assignment(roles)
@@ -893,19 +894,22 @@ def test_shadow_proof_classifies_every_species(roles: tuple[str, ...]) -> None:
     self_agreement = {
         sid for sid, role in by_role.items() if role == "self_agreement"
     }
+    # Both roles recompute a reported activity. Catalog inequality is not
+    # a separate proof of the live/seam pair.
+    shared_origin = self_agreement | catalog_mismatch
     assert {row["species"] for row in report["mismatched_species"]} == seam_mismatch
     assert {
         row["species"]
         for row in (report.get("catalog_pa_mismatched_species") or [])
     } == catalog_mismatch
-    assert set(report.get("self_agreement_species") or []) == self_agreement
+    assert set(report.get("self_agreement_species") or []) == shared_origin
     assert set(
         report.get("catalog_pa_self_agreement_species") or []
     ) == self_agreement
-    assert report["shadow_equal"] is not (bool(seam_mismatch) or bool(self_agreement))
+    assert report["shadow_equal"] is not (bool(seam_mismatch) or bool(shared_origin))
     if seam_mismatch:
         assert report["shadow_outcome"] == SHADOW_MISMATCH
-    elif self_agreement:
+    elif shared_origin:
         assert report["shadow_outcome"] == SHADOW_SELF_AGREEMENT
     else:
         assert report["shadow_outcome"] == SHADOW_PROVED

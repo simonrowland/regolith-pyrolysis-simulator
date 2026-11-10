@@ -2048,6 +2048,28 @@ def test_unread_compound_state_does_not_default_the_spinel_gate(
         species_id,
         compound_state=None,
     )
+    # Named outcomes are literals. They do not call ``evaluator.evaluate``,
+    # so a wrong coefficient or activity exponent cannot move both sides.
+    # Na: domain midpoint T=(1405+1600)/2=1502.5 K, a=0.25, pO2=1e-8 bar.
+    # log10(P/Pa)=11.342243-12140.316409/(T-163.701)+log10(a)-0.25*log10(pO2)
+    # (Lamoreaux & Hildenbrand liquid-NaO0.5 Antoine, d-367, d-019).
+    if species_id == "Na":
+        assert temperature_K == 1502.5
+        assert isinstance(answer.pressure, PressureValue)
+        assert answer.pressure.pa == 4700.217634211815
+        assert isinstance(answer.flux, FluxRefusal)
+        assert answer.flux.code == REFUSAL_COMPOUND_BEARING_STATE_UNKNOWN
+        assert answer.extra["compound_bearing_state"] == "unknown"
+        return
+    # Fe has no source_reactions activity term. RG must refuse the pressure
+    # rather than keep the pure-component sidecar.
+    if species_id == "Fe":
+        assert isinstance(answer.pressure, PressureRefusal)
+        assert answer.pressure.code == "missing_channel_contract"
+        assert "source_reactions" in answer.pressure.detail
+        assert isinstance(answer.flux, FluxRefusal)
+        assert answer.flux.code == "missing_channel_contract"
+        return
     activity = answer.source_reaction_activity
     if activity is not None and activity.refusal_code is not None:
         assert activity.refusal_code is not (
@@ -2057,25 +2079,19 @@ def test_unread_compound_state_does_not_default_the_spinel_gate(
     compound_bearing = bool(
         declaration is not None and declaration.compound_bearing
     )
-    if not isinstance(answer.pressure, (PressureValue, PressureUpperBound)):
-        if species_id == "Na":
-            raise AssertionError(
-                f"Na pressure was refused ({answer.pressure!r}) instead of pinned"
-            )
+    if isinstance(answer.pressure, PressureRefusal):
+        assert answer.pressure.code == "inapplicable_by_declared_predicate", (
+            f"{species_id} pressure refusal {answer.pressure.code!r} "
+            "is not an explicit unread-compound outcome"
+        )
+        assert isinstance(answer.flux, FluxRefusal)
+        assert answer.flux.code == "inapplicable_by_declared_predicate"
         return
+    assert isinstance(answer.pressure, (PressureValue, PressureUpperBound)), (
+        species_id
+    )
     assert answer.pressure.pa > 0.0
     assert math.isfinite(answer.pressure.pa)
-    if species.evaluator is not None and (
-        declaration is None or declaration.activity_model == (
-            "provider_reported_thermodynamic_activity"
-        )
-    ):
-        expected = species.evaluator.evaluate(
-            temperature_K,
-            source_activity=0.25 if declaration is not None else 1.0,
-            pO2_bar=1.0e-8,
-        ).pressure_pa
-        assert answer.pressure.pa == pytest.approx(expected)
     if compound_bearing:
         assert isinstance(answer.flux, FluxRefusal)
         alpha_executable = _alpha_contract_available(
@@ -2086,8 +2102,6 @@ def test_unread_compound_state_does_not_default_the_spinel_gate(
             assert answer.extra["compound_bearing_state"] == "unknown"
         else:
             assert answer.flux.code == "missing_evaporation_alpha"
-        if species_id == "Na":
-            assert isinstance(answer.pressure, PressureValue)
     else:
         flux_code = getattr(answer.flux, "code", None)
         assert flux_code != REFUSAL_COMPOUND_BEARING_STATE_UNKNOWN
