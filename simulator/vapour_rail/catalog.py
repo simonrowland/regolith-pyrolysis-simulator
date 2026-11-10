@@ -2176,6 +2176,12 @@ def compile_vapour_rail_catalog(
                     species_rows_by_id=species_rows_by_id,
                 )
             )
+            if evaluator is not None and hasattr(
+                evaluator.reference_model, "_association_base"
+            ):
+                # Admission compared this captured base. It is not part of
+                # the published evaluator.
+                object.__delattr__(evaluator.reference_model, "_association_base")
             compiled[str(species_id)] = CompiledSpecies(
                 species_id=str(species_id),
                 family_id=str(family_id),
@@ -2651,12 +2657,202 @@ def _has_effective_pressure_reference_fit_evidence(
     )
 
 
+_LIVE_ANTOINE_LAW_CACHE: tuple[tuple[int, int], frozenset[tuple[object, ...]]] | None = (
+    None
+)
+
+
+def _antoine_executable_law(
+    *,
+    evaluator_family: str,
+    coefficients: Mapping[str, Any],
+    observable: PressureObservable,
+    valid_temperature_K: tuple[float, float],
+) -> tuple[object, ...] | None:
+    """Identity of the Antoine pressure ``evaluate()`` actually computes."""
+
+    if evaluator_family != "antoine":
+        return None
+    if observable is not PressureObservable.EQUILIBRIUM_PARTIAL_PRESSURE:
+        return None
+    try:
+        law = tuple(float(coefficients[name]) for name in ("A", "B", "C"))
+    except (KeyError, TypeError, ValueError):
+        return None
+    if any(isinstance(coefficients[name], bool) for name in ("A", "B", "C")):
+        return None
+    if not all(math.isfinite(item) for item in law):
+        return None
+    low, high = valid_temperature_K
+    return (law, float(low), float(high))
+
+
+def _live_evidenced_antoine_laws() -> frozenset[tuple[object, ...]]:
+    """Antoine laws whose checked-in catalog row carries fit evidence.
+
+    Historic snapshots keep the same coefficients and domain after provenance
+    was added to the live row. The lookup reads that row; it does not copy
+    anchors onto the snapshot.
+    """
+
+    global _LIVE_ANTOINE_LAW_CACHE
+    path = Path(__file__).resolve().parents[2] / "data" / "vapor_pressures.yaml"
+    try:
+        stat = path.stat()
+    except OSError:
+        return frozenset()
+    signature = (stat.st_mtime_ns, stat.st_size)
+    if _LIVE_ANTOINE_LAW_CACHE is not None and _LIVE_ANTOINE_LAW_CACHE[0] == signature:
+        return _LIVE_ANTOINE_LAW_CACHE[1]
+    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    laws: set[tuple[object, ...]] = set()
+    families = payload.get("families") if isinstance(payload, Mapping) else None
+    if isinstance(families, Mapping):
+        for family in families.values():
+            if not isinstance(family, Mapping):
+                continue
+            physical = family.get("physical_properties")
+            if not isinstance(physical, Mapping):
+                continue
+            species_rows = physical.get("species")
+            if not isinstance(species_rows, Mapping):
+                continue
+            for species_id, row in species_rows.items():
+                if not isinstance(row, Mapping):
+                    continue
+                models = row.get("pressure_models")
+                if not isinstance(models, list) or len(models) != 1:
+                    continue
+                if not isinstance(models[0], Mapping):
+                    continue
+                model = models[0]
+                if model.get("activity_semantics") != "effective_pressure_reference_fit":
+                    continue
+                exponent = model.get("activity_exponent", 0.0)
+                if exponent not in (0, 0.0, None, ""):
+                    continue
+                validation = row.get("validation")
+                if not isinstance(validation, Mapping):
+                    continue
+                try:
+                    observable, bounds = _model_surface(str(species_id), model)
+                    anchor_refs = _anchor_refs_from_validation(
+                        validation, str(species_id)
+                    )
+                except CatalogCompileError:
+                    continue
+                if not _has_effective_pressure_reference_fit_evidence(
+                    species_id=str(species_id),
+                    row=row,
+                    model=model,
+                    validation_anchor_refs=anchor_refs,
+                ):
+                    continue
+                law = _antoine_executable_law(
+                    evaluator_family=str(model.get("evaluator_family") or ""),
+                    coefficients=model.get("coefficients")
+                    if isinstance(model.get("coefficients"), Mapping)
+                    else {},
+                    observable=observable,
+                    valid_temperature_K=bounds,
+                )
+                if law is not None:
+                    laws.add(law)
+    found = frozenset(laws)
+    _LIVE_ANTOINE_LAW_CACHE = (signature, found)
+    return found
+
+
+def _compiled_antoine_matches_live_evidenced_law(
+    evaluator: CompiledPressureEvaluator,
+) -> bool:
+    reference = evaluator.reference_model
+    if reference.physical_composite_ood or reference.thermo_log10_pressure is not None:
+        return False
+    law = _antoine_executable_law(
+        evaluator_family=evaluator.evaluator_family,
+        coefficients=reference.coefficients,
+        observable=evaluator.pressure_observable,
+        valid_temperature_K=evaluator.valid_temperature_K,
+    )
+    return law is not None and law in _live_evidenced_antoine_laws()
+
+
+def _effective_pressure_reference_fit_is_evidenced(
+    *,
+    species_id: str,
+    row: Mapping[str, Any],
+    model: Mapping[str, Any],
+    validation_anchor_refs: tuple[str, ...],
+) -> bool:
+    if _has_effective_pressure_reference_fit_evidence(
+        species_id=species_id,
+        row=row,
+        model=model,
+        validation_anchor_refs=validation_anchor_refs,
+    ):
+        return True
+    if model.get("activity_semantics") != "effective_pressure_reference_fit":
+        return False
+    exponent = model.get("activity_exponent", 0.0)
+    if exponent not in (0, 0.0, None, ""):
+        return False
+    try:
+        observable, bounds = _model_surface(species_id, model)
+        reference = _compile_reference_model(species_id, model)
+    except CatalogCompileError:
+        return False
+    law = _antoine_executable_law(
+        evaluator_family=reference.evaluator_family,
+        coefficients=reference.coefficients,
+        observable=observable,
+        valid_temperature_K=bounds,
+    )
+    return law is not None and law in _live_evidenced_antoine_laws()
+
+
+def _captured_association_base(
+    evaluator: CompiledPressureEvaluator,
+) -> _ReferencePressureModel | None:
+    """Return the base reference the compiled composite actually calls.
+
+    ``_compile_thermo_reference_model`` sets this only on the gas-exchange
+    composite whose closure evaluates that object. Antoine, tabulated, and
+    standard-reaction compilation never set it, so a YAML copy of an
+    evidenced base is not this object.
+    """
+
+    captured = getattr(evaluator.reference_model, "_association_base", None)
+    if isinstance(captured, _ReferencePressureModel):
+        return captured
+    return None
+
+
 def _verified_gas_association_base_has_fit_evidence(
     *,
     species_id: str,
     model: Mapping[str, Any],
+    evaluator: CompiledPressureEvaluator,
     species_rows_by_id: Mapping[str, Mapping[str, Any]],
 ) -> bool:
+    """True when evaluate() runs an evidenced base, not merely names one."""
+
+    captured = _captured_association_base(evaluator)
+    if captured is None:
+        return False
+    if evaluator.activity_exponent != 0.0:
+        return False
+    if evaluator.evaluator_family not in RUNTIME_THERMO_EVALUATOR_FAMILIES:
+        return False
+    reference = evaluator.reference_model
+    if (
+        not reference.physical_composite_ood
+        or reference.thermo_log10_pressure is None
+        or reference.coefficients
+        or reference.points
+    ):
+        return False
+
     base_species_id = model.get("base_vapor_formula")
     if not isinstance(base_species_id, str) or not base_species_id.strip():
         return False
@@ -2681,7 +2877,7 @@ def _verified_gas_association_base_has_fit_evidence(
         base_row.get("validation"), f"{base_species_id}.validation"
     )
     base_anchor_refs = _anchor_refs_from_validation(base_validation, base_species_id)
-    if not _has_effective_pressure_reference_fit_evidence(
+    if not _effective_pressure_reference_fit_is_evidenced(
         species_id=base_species_id,
         row=base_row,
         model=base_model,
@@ -2689,22 +2885,55 @@ def _verified_gas_association_base_has_fit_evidence(
     ):
         return False
 
-    raw_embedded_base = model.get("base_reference_pressure_model")
-    if not isinstance(raw_embedded_base, Mapping):
-        return False
     try:
-        embedded_base = _compile_reference_model(
-            species_id,
-            _mapping(raw_embedded_base, f"{species_id}.base_reference_pressure_model"),
-        )
         evidenced_base = _compile_reference_model(base_species_id, base_model)
     except CatalogCompileError:
         return False
     return bool(
-        embedded_base.evaluator_family == evidenced_base.evaluator_family
-        and embedded_base.coefficients == evidenced_base.coefficients
-        and embedded_base.points == evidenced_base.points
+        captured.evaluator_family == evidenced_base.evaluator_family
+        and captured.coefficients == evidenced_base.coefficients
+        and captured.points == evidenced_base.points
     )
+
+
+def _zero_activity_melt_executable_is_evidenced(
+    *,
+    species_id: str,
+    row: Mapping[str, Any],
+    model: Mapping[str, Any],
+    evaluator: CompiledPressureEvaluator,
+    validation_anchor_refs: tuple[str, ...],
+    species_rows_by_id: Mapping[str, Mapping[str, Any]],
+) -> bool:
+    """Admit cleaned-melt activity exponent 0 only for an evidenced law.
+
+    Invariant: the pressure ``evaluate()`` computes is an evidenced effective
+    fit. That is this row's own provenance, residual, and anchors; a compiled
+    gas-association composite whose captured base is such a fit; or this
+    evaluator's own Antoine law (A, B, C, and temperature domain) matching a
+    live catalog row that has the evidence. ``composition_mode``,
+    ``base_vapor_formula``, and an embedded coefficient copy that the
+    executable evaluator does not call are not evidence.
+    """
+
+    if _verified_gas_association_base_has_fit_evidence(
+        species_id=species_id,
+        model=model,
+        evaluator=evaluator,
+        species_rows_by_id=species_rows_by_id,
+    ):
+        return True
+    if _has_effective_pressure_reference_fit_evidence(
+        species_id=species_id,
+        row=row,
+        model=model,
+        validation_anchor_refs=validation_anchor_refs,
+    ):
+        return True
+    # The executable Antoine coefficients, not a YAML token. A historic
+    # snapshot of an evidenced law has the same A/B/C and domain with the
+    # later provenance left on the live catalog.
+    return _compiled_antoine_matches_live_evidenced_law(evaluator)
 
 
 def _compile_source_reaction_activity(
@@ -2780,28 +3009,23 @@ def _compile_source_reaction_activity(
                 f"{species_id}: activity-independent melt answer must be an "
                 "explicit effective-pressure reference fit, never pure P_sat"
             )
-        has_fit_evidence = (
-            _verified_gas_association_base_has_fit_evidence(
-                species_id=species_id,
-                model=model,
-                species_rows_by_id=species_rows_by_id,
-            )
-            if model.get("composition_mode") == "gas_association_from_effective_base"
-            else _has_effective_pressure_reference_fit_evidence(
-                species_id=species_id,
-                row=row,
-                model=model,
-                validation_anchor_refs=validation_anchor_refs,
-            )
-        )
-        if not has_fit_evidence:
+        if not _zero_activity_melt_executable_is_evidenced(
+            species_id=species_id,
+            row=row,
+            model=model,
+            evaluator=evaluator,
+            validation_anchor_refs=validation_anchor_refs,
+            species_rows_by_id=species_rows_by_id,
+        ):
             raise CatalogCompileError(
                 f"{species_id}: effective-pressure reference fit requires "
                 "model provenance with source_id and observation_id(s), "
                 "backsolve.provenance.generated_by, "
                 "backsolve.provenance.fit_objective, a finite non-negative "
-                "backsolve.residual_dex, validation.anchor_refs, or a "
-                "gas-association base matching an evidence-backed fit"
+                "backsolve.residual_dex, validation.anchor_refs, a "
+                "gas-association composite whose captured base matches an "
+                "evidence-backed fit, or an Antoine law identical to a live "
+                "evidenced fit"
             )
 
     if evaluator is not None and (
@@ -3418,16 +3642,18 @@ def _compile_thermo_reference_model(
                     )
                 return log10_pressure_pa
 
-            return (
-                _ReferencePressureModel(
-                    evaluator_family=evaluator_family,
-                    coefficients=MappingProxyType({}),
-                    points=(),
-                    thermo_log10_pressure=_log10_from_composite,
-                    physical_composite_ood=True,
-                ),
-                derived_pO2_exponent,
+            compiled_reference = _ReferencePressureModel(
+                evaluator_family=evaluator_family,
+                coefficients=MappingProxyType({}),
+                points=(),
+                thermo_log10_pressure=_log10_from_composite,
+                physical_composite_ood=True,
             )
+            # The closure above calls this object. Admission of a
+            # zero-activity association reads it back; a YAML token cannot
+            # stand in for it.
+            object.__setattr__(compiled_reference, "_association_base", base_reference)
+            return compiled_reference, derived_pO2_exponent
 
         # Stoichiometric (ν, poly, formula) terms: products +, reactants −.
         terms_builders: list[tuple[float, Any, str]] = []

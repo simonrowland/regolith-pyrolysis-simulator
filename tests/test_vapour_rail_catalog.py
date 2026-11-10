@@ -28,6 +28,7 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from simulator.volatile_properties import _catalog as _volatile_runtime_catalog
 from simulator.vapour_rail.catalog import (
+    RUNTIME_THERMO_EVALUATOR_FAMILIES,
     CatalogCompileError,
     OUT_OF_RANGE_STATUS,
     compile_vapour_rail_catalog,
@@ -114,6 +115,15 @@ CARRIER_ONLY = {
 
 def _yaml(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text())
+
+
+def _live_vapour_species_ids() -> tuple[str, ...]:
+    payload = yaml.safe_load((DATA_DIR / "vapor_pressures.yaml").read_text())
+    return tuple(
+        str(species_id)
+        for family in payload["families"].values()
+        for species_id in family["physical_properties"]["species"]
+    )
 
 
 def _load_t609_proof():
@@ -654,6 +664,45 @@ def test_require_git_history_rejects_ambiguous_ack_prefix_in_tmp_repo(
         require_git_history(repo, ack.stem)
 
 
+def test_t622_frozen_fe_law_compiles_without_rewriting_the_fixture() -> None:
+    fixture_bytes = T622_LANDING_CATALOG_FIXTURE.read_bytes()
+    assert (
+        hashlib.sha256(fixture_bytes).hexdigest()
+        == PINNED_CATALOG_FIXTURE_SHA256[T622_LANDING_CATALOG_FIXTURE.name]
+    )
+    historic = compile_vapour_rail_catalog(
+        yaml.safe_load(fixture_bytes), emit_u0_request_rules=False
+    )
+    live = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
+    )
+    for species_id, kwargs in (
+        ("Fe", {}),
+        ("FeO_association_gas", {"pO2_bar": 1.0}),
+    ):
+        historic_evaluator = historic.species[species_id].evaluator
+        live_evaluator = live.species[species_id].evaluator
+        assert historic_evaluator is not None and live_evaluator is not None
+        assert historic_evaluator.evaluate(1800.0, **kwargs).pressure_pa == (
+            live_evaluator.evaluate(1800.0, **kwargs).pressure_pa
+        )
+    assert historic.species["Fe"].validation_anchor_refs == ()
+    assert historic.species["FeO_association_gas"].validation_anchor_refs == ()
+
+    drifted = yaml.safe_load(fixture_bytes)
+    drifted["families"]["metals_fe_family"]["physical_properties"]["species"]["Fe"][
+        "pressure_models"
+    ][0]["coefficients"]["B"] += 1.0
+    with pytest.raises(
+        CatalogCompileError,
+        match="effective-pressure reference fit requires",
+    ):
+        compile_vapour_rail_catalog(drifted, emit_u0_request_rules=False)
+    assert hashlib.sha256(T622_LANDING_CATALOG_FIXTURE.read_bytes()).hexdigest() == (
+        PINNED_CATALOG_FIXTURE_SHA256[T622_LANDING_CATALOG_FIXTURE.name]
+    )
+
+
 def test_t622_oxidative_window_envelope_evidence_is_reproducible(
     tmp_path: Path,
 ) -> None:
@@ -1068,6 +1117,261 @@ def test_gas_association_base_must_match_evidenced_effective_fit() -> None:
         match="effective-pressure reference fit requires",
     ):
         compile_vapour_rail_catalog(payload)
+
+
+_EVIDENCED_BASE_COEFFICIENTS = {"A": 9.408547, "B": 23312.312336, "C": 1000.0}
+_ZERO_ACTIVITY_FAMILIES = (
+    "antoine",
+    "tabulated_equilibrium",
+    "standard_reaction_term",
+    "nasa_cea_7",
+    "nasa_cea_9",
+    "shomate",
+)
+_ZERO_ACTIVITY_MODES = (
+    None,
+    "source_reaction_activity",
+    "gas_association_from_effective_base",
+    "not_a_composition_mode",
+)
+_ZERO_ACTIVITY_EVIDENCE = ("none", "migration_only", "full")
+_ZERO_ACTIVITY_BASE_LINKS = ("absent", "matching", "mismatched")
+_COMPILABLE_ZERO_ACTIVITY_FAMILIES = frozenset(
+    {"antoine", "tabulated_equilibrium", "standard_reaction_term"}
+)
+
+
+def _set_fit_evidence(row: dict, model: dict, kind: str) -> None:
+    if kind == "none":
+        model.pop("provenance", None)
+        row.pop("backsolve", None)
+        row["validation"]["anchor_refs"] = []
+        return
+    if kind == "migration_only":
+        model["provenance"] = [{"source": "schema_v1_in_place_migration"}]
+    elif kind == "full":
+        model["provenance"] = [
+            {
+                "source_id": "fit-grid-source",
+                "observation_id": "fit-grid",
+                "status": "diagnostic_only",
+            }
+        ]
+    else:
+        raise AssertionError(kind)
+    row["backsolve"] = {
+        "residual_dex": 0.12,
+        "provenance": {"generated_by": "fit.py", "fit_objective": "minimax"},
+    }
+    row["validation"]["anchor_refs"] = ["validation:fit-grid"]
+
+
+def _rename_family_species(payload: dict, species_id: str) -> dict:
+    family = payload["families"].pop("potassium_test_family")
+    family["code_metadata"]["formula_id"] = species_id
+    family["code_metadata"]["solve_group_id"] = f"{species_id}_family"
+    row = family["physical_properties"]["species"].pop("K")
+    row["formula"] = species_id
+    family["physical_properties"]["species"][species_id] = row
+    payload["families"][f"{species_id}_family"] = family
+    return row
+
+
+def _zero_activity_melt_payload(
+    *,
+    family: str,
+    mode: str | None,
+    evidence: str,
+    base_link: str,
+    child_id: str = "K",
+) -> dict:
+    """One cleaned-melt activity exponent of zero, plus an evidenced Antoine base.
+
+    The child coefficients stay unrelated to the base. ``base_link`` only
+    changes the unused or embedded base block.
+    """
+
+    payload = _effective_pressure_fit_fixture()
+    base_row = _rename_family_species(payload, "FeBase")
+    base_model = base_row["pressure_models"][0]
+    base_model["coefficients"] = dict(_EVIDENCED_BASE_COEFFICIENTS)
+    base_model["activity_exponent"] = 0.0
+    _set_fit_evidence(base_row, base_model, "full")
+
+    if family == "standard_reaction_term":
+        child_payload = _reaction_fixture()
+    else:
+        child_payload = _effective_pressure_fit_fixture()
+    child_row = _rename_family_species(child_payload, child_id)
+    child_model = child_row["pressure_models"][0]
+    child_model["activity_exponent"] = 0.0
+    child_model["activity_semantics"] = "effective_pressure_reference_fit"
+    child_model["pressure_kind"] = "equilibrium_partial_pressure"
+    if family == "tabulated_equilibrium":
+        child_model["evaluator_family"] = "tabulated_equilibrium"
+        child_model.pop("coefficients", None)
+        child_model["points"] = [
+            {"temperature_K": 1000.0, "pressure_Pa": 1.0},
+            {"temperature_K": 1200.0, "pressure_Pa": 10.0},
+        ]
+    elif family != "standard_reaction_term":
+        child_model["evaluator_family"] = family
+        if family == "antoine":
+            child_model["coefficients"] = {"A": 10.0, "B": 10000.0, "C": 0.0}
+    _set_fit_evidence(child_row, child_model, evidence)
+    if mode is not None:
+        child_model["composition_mode"] = mode
+    if base_link != "absent":
+        coefficients = dict(_EVIDENCED_BASE_COEFFICIENTS)
+        if base_link == "mismatched":
+            coefficients["A"] += 1.0
+        child_model["base_vapor_formula"] = "FeBase"
+        child_model["base_reference_pressure_model"] = {
+            "evaluator_family": "antoine",
+            "coefficients": coefficients,
+        }
+    payload["families"].update(child_payload["families"])
+    return payload
+
+
+def _assert_zero_activity_admission(
+    *,
+    family: str,
+    mode: str | None,
+    evidence: str,
+    base_link: str,
+    child_id: str = "K",
+) -> None:
+    payload = _zero_activity_melt_payload(
+        family=family,
+        mode=mode,
+        evidence=evidence,
+        base_link=base_link,
+        child_id=child_id,
+    )
+    compilable = family in _COMPILABLE_ZERO_ACTIVITY_FAMILIES
+    try:
+        compiled = compile_vapour_rail_catalog(payload)
+    except CatalogCompileError as exc:
+        if compilable and evidence == "full":
+            pytest.fail(f"evidenced {family} law was refused: {exc}")
+        if compilable:
+            assert "effective-pressure reference fit requires" in str(exc)
+        return
+    assert compilable and evidence == "full", (
+        f"{family} mode={mode!r} evidence={evidence} base={base_link} "
+        f"child={child_id} compiled without evidence on the executable law"
+    )
+    evaluator = compiled.species[child_id].evaluator
+    assert evaluator is not None
+    assert evaluator.activity_exponent == 0.0
+    assert evaluator.reference_model.physical_composite_ood is False
+    assert getattr(evaluator.reference_model, "_association_base", None) is None
+    pressure = evaluator.evaluate(1100.0, pO2_bar=1.0).pressure_pa
+    assert pressure > 0.0
+
+
+@pytest.mark.parametrize("family", _ZERO_ACTIVITY_FAMILIES)
+@pytest.mark.parametrize("mode", _ZERO_ACTIVITY_MODES)
+@pytest.mark.parametrize("evidence", _ZERO_ACTIVITY_EVIDENCE)
+@pytest.mark.parametrize("base_link", _ZERO_ACTIVITY_BASE_LINKS)
+def test_zero_activity_melt_admits_only_an_evidenced_executable_law(
+    family: str,
+    mode: str | None,
+    evidence: str,
+    base_link: str,
+) -> None:
+    _assert_zero_activity_admission(
+        family=family,
+        mode=mode,
+        evidence=evidence,
+        base_link=base_link,
+    )
+
+
+@pytest.mark.parametrize("species_id", _live_vapour_species_ids())
+def test_association_token_does_not_evidence_any_live_species(
+    species_id: str,
+) -> None:
+    _assert_zero_activity_admission(
+        family="antoine",
+        mode="gas_association_from_effective_base",
+        evidence="none",
+        base_link="matching",
+        child_id=species_id,
+    )
+
+
+def test_identical_antoine_law_is_evidenced_and_a_different_law_is_not() -> None:
+    payload = _zero_activity_melt_payload(
+        family="antoine",
+        mode="gas_association_from_effective_base",
+        evidence="none",
+        base_link="matching",
+    )
+    row = payload["families"]["K_family"]["physical_properties"]["species"]["K"]
+    model = row["pressure_models"][0]
+    model["coefficients"] = dict(_EVIDENCED_BASE_COEFFICIENTS)
+    model["valid_domain"] = {"temperature_K": [1400.0, 1900.0]}
+    compiled = compile_vapour_rail_catalog(payload)
+    evaluator = compiled.species["K"].evaluator
+    assert evaluator is not None
+    assert evaluator.evaluate(1800.0).pressure_pa > 0.0
+    assert compiled.species["K"].validation_anchor_refs == ()
+
+    model["valid_domain"] = {"temperature_K": [1000.0, 1200.0]}
+    with pytest.raises(
+        CatalogCompileError,
+        match="effective-pressure reference fit requires",
+    ):
+        compile_vapour_rail_catalog(payload)
+
+    model["valid_domain"] = {"temperature_K": [1400.0, 1900.0]}
+    model["coefficients"]["B"] += 1.0
+    with pytest.raises(
+        CatalogCompileError,
+        match="effective-pressure reference fit requires",
+    ):
+        compile_vapour_rail_catalog(payload)
+
+
+def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+    checked: list[str] = []
+    for species_id, compiled in catalog.species.items():
+        evaluator = compiled.evaluator
+        if evaluator is None or evaluator.activity_exponent != 0.0:
+            continue
+        if compiled.code_metadata.source_account != "process.cleaned_melt":
+            continue
+        checked.append(species_id)
+        executes_association = (
+            evaluator.evaluator_family in RUNTIME_THERMO_EVALUATOR_FAMILIES
+            and evaluator.reference_model.physical_composite_ood is True
+            and not evaluator.reference_model.coefficients
+        )
+        if executes_association:
+            assert species_id == "FeO_association_gas"
+            embedded = payload["families"][compiled.family_id][
+                "physical_properties"
+            ]["species"][species_id]["pressure_models"][0][
+                "base_reference_pressure_model"
+            ]["coefficients"]
+            assert embedded["A"] == pytest.approx(9.408547)
+            assert embedded["B"] == pytest.approx(23312.312336)
+            assert embedded["C"] == pytest.approx(1000.0)
+            continue
+        row = payload["families"][compiled.family_id]["physical_properties"][
+            "species"
+        ][species_id]
+        model = row["pressure_models"][0]
+        assert model["provenance"][0]["source_id"]
+        assert row["backsolve"]["residual_dex"] >= 0.0
+        assert row["backsolve"]["provenance"]["generated_by"]
+        assert row["validation"]["anchor_refs"]
+    assert "Fe" in checked
+    assert "FeO_association_gas" in checked
 
 
 def test_policy_identity_cannot_compile_as_executable_alpha() -> None:
