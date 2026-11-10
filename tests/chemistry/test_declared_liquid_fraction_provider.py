@@ -41,7 +41,7 @@ from simulator.optimize.evalspec import EvalSpec, canonical_evalspec_json
 from simulator.optimize.evaluate import _build_eval_inputs
 import simulator.optimize.evaluate as evaluate_module
 from simulator.config import load_config_bundle
-from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.recipe import RecipePatch, RecipeSchema
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
 from tests.test_optimizer_evalspec import _mre_cap_profile
