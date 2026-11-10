@@ -4313,32 +4313,14 @@ def _evaluate_ordering(
 
     melt_recipe, recipe_source, recipe_error = _melt_recipe_mol(obs)
     runtime["melt_recipe_source"] = recipe_source
+    # No feedstock proxy. A silicate-melt ordering that names no composition
+    # refuses, the same as _melt_recipe_mol on the psat path. lunar_mare_low_ti
+    # is not a stand-in for a solar-abundance FCMAS claim.
     if melt_recipe is None:
-        # Silicate-melt orderings are claims about a class of melts. Use the
-        # production lunar-mare proxy when the extract names a silicate melt
-        # but omits a numeric recipe, and record the composition that was
-        # actually checked.
-        system_class = observation_system_class(obs)
-        if system_class == "silicate_melt":
-            feedstocks = load_cached_safe_yaml(FEEDSTOCKS_PATH.read_text(encoding="utf-8")) or {}
-            feedstock = feedstocks.get("lunar_mare_low_ti") or {}
-            raw_wt = feedstock.get("composition_wt_pct")
-            if isinstance(raw_wt, Mapping) and raw_wt:
-                melt_recipe = {
-                    str(oxide): float(wt) / float(MOLAR_MASS[str(oxide)])
-                    for oxide, wt in raw_wt.items()
-                    if float(wt) > 0.0 and str(oxide) in MOLAR_MASS
-                }
-                recipe_source = (
-                    "data/feedstocks.yaml::lunar_mare_low_ti "
-                    "(silicate-melt ordering evaluation composition)"
-                )
-                runtime["melt_recipe_source"] = recipe_source
-        if melt_recipe is None:
-            return _emit(
-                verdict="not_evaluable",
-                reason=recipe_error or "missing_condition:melt_composition",
-            )
+        return _emit(
+            verdict="not_evaluable",
+            reason=recipe_error or "missing_condition:melt_composition",
+        )
 
     diagnostic_pO2 = float(pO2) if pO2 is not None else DEFAULT_PO2_BAR
     vp = vp_data or load_vapor_pressure_data()
