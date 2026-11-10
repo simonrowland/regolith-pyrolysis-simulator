@@ -49,10 +49,16 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   (``T_range_K``, ``T_K``, ``T_C``, ``temperature_C``, ``temp_C``,
   ``point_conditions``). A locator inside a condition is provenance, not
   a leaf. A measured leaf is a finite int or float (not a boolean), or a
-  string that contains a numeric token. Repeating a pin of one address
-  does not cover a sibling, even when the numbers are equal, and a
-  ``values`` pin does not cover a sibling condition. A descriptive label
-  such as ``quantity: alpha`` does not cover a sibling number.
+  string that contains any digit [0-9]. A quantity name, a unit on its
+  own, or another label with no digit is not a leaf and may be attested
+  as text. A string the numeric parser cannot read, such as ``0.91Pa``
+  or ``0.0614K``, is still a leaf: it is uncovered unless the opened
+  source carries that printed value. Zero recognised leaves in a block
+  that still contains a digit is a refusal, not coverage. Repeating a
+  pin of one address does not cover a sibling, even when the numbers
+  are equal, and a ``values`` pin does not cover a sibling condition.
+  A descriptive label such as ``quantity: pressure`` does not cover a
+  sibling measurement.
 * structured fidelity samples resolve rows in ``observations[]`` or the
   sibling ``context[]`` container (d-032); an id matching rows in both
   containers is an ambiguity error, not a silent pick
@@ -268,10 +274,72 @@ def _fold_numeric_signs(text: str) -> str:
 def _citation_token_matches(text: str) -> list[re.Match[str]]:
     """Numeric tokens after Unicode signs are folded.
 
-    Leaf detection, spelling equality, and string alignment all read this
-    list. A sign cannot be dropped on one of those paths and kept on another.
+    Spelling equality and string alignment read this list. A sign cannot
+    be dropped on one of those paths and kept on another. This grammar is
+    not the coverage membership test: a string that contains a digit is a
+    measured leaf even when this list is empty.
     """
     return list(_NUMERIC_TOKEN_RE.finditer(_fold_numeric_signs(text)))
+
+
+_ASCII_DIGITS = "0123456789"
+# A printed value ends where a longer number or identifier would continue.
+# The same class the token grammar uses as a lookaround, plus nothing else.
+_PRINTED_VALUE_BOUNDARY = frozenset(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-._"
+    + _DISTINCT_NUMERIC_SIGNS
+)
+
+
+def _string_has_ascii_digit(text: str) -> bool:
+    """True when ``text`` contains a digit [0-9].
+
+    This is the coverage membership test for a string leaf. It does not
+    ask whether the numeric grammar can read the string.
+    """
+    return any(ch in _ASCII_DIGITS for ch in text)
+
+
+def _parser_reads_every_digit(text: str) -> bool:
+    """True when every ASCII digit of ``text`` sits inside a citation token.
+
+    The numeric grammar still compares values it can read. A digit that
+    sits outside every token, as in ``0.91Pa`` or ``91.``, is not read.
+    """
+    folded = _fold_numeric_signs(text)
+    if not _string_has_ascii_digit(folded):
+        return False
+    covered = [False] * len(folded)
+    for match in _citation_token_matches(folded):
+        for index in range(match.start(), match.end()):
+            covered[index] = True
+    return all(
+        covered[index] or folded[index] not in _ASCII_DIGITS
+        for index in range(len(folded))
+    )
+
+
+def _printed_value_carried(leaf: str, text: str) -> bool:
+    """True when sign-folded ``leaf`` occurs in sign-folded ``text`` whole.
+
+    The character on either side must not continue a number or an
+    identifier. ``0.91Pa`` is not ``10.91Pa`` or ``0.91Pascal``, and
+    ``91.`` is not ``91.0``.
+    """
+    if not leaf:
+        return False
+    start = 0
+    limit = len(text)
+    while True:
+        index = text.find(leaf, start)
+        if index < 0:
+            return False
+        before_ok = index == 0 or text[index - 1] not in _PRINTED_VALUE_BOUNDARY
+        after = index + len(leaf)
+        after_ok = after == limit or text[after] not in _PRINTED_VALUE_BOUNDARY
+        if before_ok and after_ok:
+            return True
+        start = index + 1
 
 
 # Repository-relative roots that hold a paper, OCR, quotes, or a reference
@@ -1521,6 +1589,37 @@ def _scored_measured_leaves(observation: Mapping[str, Any]) -> list[tuple[Any, .
     return leaves
 
 
+def _observation_has_digit_bearing_string(observation: Mapping[str, Any]) -> bool:
+    """True when scored evidence contains a string with a digit [0-9].
+
+    The walk is the same evidence the measured-leaf walker uses. A locator
+    inside a condition is provenance. This is the backstop for a recognizer
+    that returns no leaves: the coverage decision refuses that block.
+    """
+
+    def contains(value: Any, skip_keys: frozenset[str]) -> bool:
+        if isinstance(value, str):
+            return _string_has_ascii_digit(value)
+        if isinstance(value, Mapping):
+            return any(
+                contains(child, skip_keys)
+                for key, child in value.items()
+                if key not in skip_keys
+            )
+        if isinstance(value, (list, tuple)):
+            return any(contains(child, skip_keys) for child in value)
+        return False
+
+    if "values" in observation and contains(observation.get("values"), frozenset()):
+        return True
+    for key in _SCORED_NUMERIC_CONDITIONS:
+        if key not in observation or observation.get(key) is None:
+            continue
+        if contains(observation.get(key), _CONDITION_PROVENANCE_KEYS):
+            return True
+    return False
+
+
 def _path_selector_names_observation_id(sample: Mapping[str, Any]) -> bool:
     """False when the observation bracket is a list position, not an id.
 
@@ -1605,11 +1704,12 @@ def _measured_leaf_addresses(
     """Addresses of measured leaves under ``value``.
 
     A measured leaf is a finite int or float (not a boolean), or a string
-    that contains a numeric token. The address is the path of mapping keys
-    and list indexes from ``value``. A container is not a leaf. A label with
-    no numeric token is not a leaf. ``()`` is a measured scalar payload.
-    ``skip_keys`` drops a provenance mapping (a condition ``locator``) and
-    does not apply when walking ``values``.
+    that contains any digit [0-9]. The address is the path of mapping keys
+    and list indexes from ``value``. A container is not a leaf. A label
+    with no digit is not a leaf. ``()`` is a measured scalar payload.
+    Membership does not consult the numeric grammar: ``0.91Pa`` is a leaf
+    because it contains digits. ``skip_keys`` drops a provenance mapping
+    (a condition ``locator``) and does not apply when walking ``values``.
     """
     if isinstance(value, bool):
         return []
@@ -1618,7 +1718,7 @@ def _measured_leaf_addresses(
     if isinstance(value, float):
         return [prefix] if math.isfinite(value) else []
     if isinstance(value, str):
-        if value.strip() and _citation_token_matches(value):
+        if _string_has_ascii_digit(value):
             return [prefix]
         return []
     if isinstance(value, Mapping):
@@ -1994,15 +2094,19 @@ def _spelling_is_complete_token(spelling: str, text: str) -> bool:
 def _string_leaf_in_text(leaf: str, text: str) -> bool:
     """Substring match that does not slice a numeric token.
 
-    A non-numeric leaf stays a substring. A leaf that contains a number
-    matches only where each of those numbers is the same complete token,
-    so the string ``0.24`` is not ``-0.24`` or ``0.24e-5``. A leading
-    decimal is a number, so ``.24`` is not ``-.24`` or ``10.24``. Unicode
-    signs are folded before either string is searched, so ``−0.24`` is
-    ``-0.24``.
+    A label with no digit stays a substring. A digit-bearing leaf the
+    numeric parser cannot read is not that shortcut: it is carried only
+    when the printed value occurs whole, so ``0.91Pa`` is not ``10.91Pa``.
+    A leaf the parser does read matches only where each of those numbers
+    is the same complete token, so ``0.24`` is not ``-0.24`` or ``0.24e-5``.
+    A leading decimal is a number, so ``.24`` is not ``-.24`` or ``10.24``.
+    Unicode signs are folded before either string is searched, so ``−0.24``
+    is ``-0.24``.
     """
     leaf = _fold_numeric_signs(leaf)
     text = _fold_numeric_signs(text)
+    if _string_has_ascii_digit(leaf) and not _parser_reads_every_digit(leaf):
+        return _printed_value_carried(leaf, text)
     leaf_tokens = _citation_token_matches(leaf)
     placed: dict[tuple[int, int], str] = {}
     if leaf_tokens:
@@ -2178,11 +2282,15 @@ def fidelity_source_warnings(
     of one address does not cover a sibling, even when the numbers are
     equal, and a ``values`` pin does not cover a sibling condition. A
     measured leaf is a finite int or float (not a boolean), or a string
-    that contains a numeric token. A descriptive label is not a leaf and
-    does not cover a sibling number. Several samples may each pin part of
-    the evidence. Equipment pins and a numeric observation index do not
-    contribute. Evidence with no measured leaf is covered by any matching
-    evidence pin, because no number is left unchecked. A pilot or
+    that contains any digit [0-9]. A descriptive label with no digit is
+    not a leaf and does not cover a sibling measurement. A string the
+    numeric parser cannot read is uncovered unless the opened source
+    carries that printed value; it is never skipped. Several samples may
+    each pin part of the evidence. Equipment pins and a numeric
+    observation index do not contribute. Evidence with no measured leaf
+    is covered by any matching evidence pin only when that evidence also
+    contains no digit. Zero recognised leaves in a digit-bearing block
+    is a refusal. A pilot pin or an
     unattested sample can still supply addresses toward
     ``uncovered_observation``; attestation is its own count. Certification
     refuses while any of these counts is non-zero: a pilot pin or an
@@ -2286,15 +2394,19 @@ def fidelity_source_warnings(
                 if leaf[: len(pin_address)] == pin_address:
                     covered_addresses[observation_key].add(leaf)
 
-    # Invariant: an observation is covered only when every measured leaf
-    # of its evidence has a pin of that address or an ancestor. A repeated
-    # pin of one address does not cover an equal sibling, and a values pin
-    # does not cover a scored condition.
+    # Invariant: an observation is covered only when every digit-bearing
+    # leaf of its evidence has a pin of that address or an ancestor. A
+    # repeated pin of one address does not cover an equal sibling, and a
+    # values pin does not cover a scored condition. Zero recognised
+    # measured leaves in a block that still contains a digit is a refusal,
+    # not a pass.
     covered: set[tuple[str, str]] = set()
     for key in observation_map:
         needed = needed_addresses[key]
         if not needed:
-            if key in addressed:
+            if key in addressed and not _observation_has_digit_bearing_string(
+                observation_map[key]
+            ):
                 covered.add(key)
             continue
         if set(needed) <= covered_addresses[key]:
@@ -2422,7 +2534,11 @@ def certify_extract_source_fidelity(
     a scored observation's evidence (``values`` and each scored numeric
     condition) must be covered by a matching, non-pilot, attested sample
     whose address is that leaf or an ancestor, and whose source artifact
-    was opened and contains each resolved number as a complete token. A
+    was opened and contains each resolved number. A measured string is
+    every leaf that contains a digit [0-9]. A label with no digit is not
+    a leaf. A digit-bearing string the numeric parser cannot read is
+    uncovered unless the opened source carries that printed value, and
+    zero recognised leaves in a digit-bearing block refuses. A
     Unicode minus is a minus. An observation id that names more than one
     scored row refuses; the rows are not one coverage entry.
     Repeating a pin of one address does not cover a sibling, even when the

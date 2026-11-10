@@ -5090,8 +5090,24 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # Leading-decimal strings such as ".19" are measured leaves. Remeasured
 # on this corpus they sit in observations that were already uncovered, so
 # these ceilings did not move.
+# Every string that contains a digit [0-9] is a measured leaf, including
+# printed measurements the numeric grammar does not read. Remeasured on
+# this corpus: 48,631 -> 48,661 observations. The 30 newly uncovered
+# observations are in 13 extracts that were already uncovered, so the
+# extract ceiling did not move and no extract changed certify pass/fail.
+# None of those extracts were review_status reviewed. The ids are
+# barin-1995, filiberto-lpsc2011-2064-volatiles,
+# hertl-1967-solid-sio-disproportionation-vaporization,
+# kems-012-sossi-2019, kems-137-bischof-2023, metsoc-2024-6224,
+# nazarov-2015-dhofar-silicides,
+# richet-bottinga-1986-silicate-thermochemistry,
+# schumm-1981-alkali-aluminosilicate-thermochemical-tables,
+# sossi-2020-cu-zn-isotope-evap-formalism,
+# sugawara-akaogi-2004-liquid-calorimetry,
+# woermann-1969-mg-fe-ti-oxides, and
+# wright-okamura-1977-makaopuhi-cooling.
 # Each ceiling may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 48631
+_UNCOVERED_OBSERVATIONS_CEILING = 48661
 _UNCOVERED_EXTRACTS_CEILING = 616
 _UNATTESTED_SAMPLES_CEILING = 3128
 _PILOT_PIN_EXTRACTS_CEILING = 57
@@ -5729,8 +5745,8 @@ def test_draft_defects_stay_schema_valid_and_warn(pin_class: str, tmp_path: Path
 
 # Every leaf class a ``values`` payload can hold. The oracle below is the
 # invariant, written separately from the gate: a measured leaf is a finite
-# int, a finite float, or a string that contains a numeric token, at its
-# address under ``values``. A leading decimal is a numeric token. The
+# int, a finite float, or a string that contains any digit [0-9], at its
+# address under ``values``. A label with no digit is not a leaf. The
 # scanner below is not the gate regex, and the expected token is the
 # spelling a case constructs. A bool and a label are not leaves. A pin
 # covers an address only when that address is the pin or a descendant of
@@ -5858,7 +5874,7 @@ def _oracle_measured_addresses(
             return []
         return [prefix]
     if isinstance(value, str):
-        if value.strip() and _oracle_numeric_tokens(value):
+        if any(ch in "0123456789" for ch in value):
             return [prefix]
         return []
     if isinstance(value, dict):
@@ -7114,6 +7130,113 @@ def test_every_numeric_spelling_certifies_only_its_exact_token(tmp_path: Path):
                             f"label {spelling!r} structured={structured}: {hidden_errors}"
                         )
     assert failures == []
+
+
+# Product of printed measurements. Expected certification is the rule below,
+# not the gate's scanner: a digit-bearing leaf certifies only when the source
+# carries that printed value. A bordering letter, digit, sign, dot, or
+# underscore means the source carries a different value.
+_DIGIT_LEAF_SIGNS = ("", "-", "+")
+_DIGIT_LEAF_MANTISSAS = ("1", "0.91", ".91", "91.", "1e3", "1.2E-3", "1,000")
+_DIGIT_LEAF_JOINS = ("", " ", "\u00a0")
+_DIGIT_LEAF_UNITS = ("", "Pa", "K", "%", "wt%")
+_RULE_VALUE_BOUNDARY = frozenset(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-._\u00b1\u2213"
+)
+
+
+def _digit_leaf_product() -> list[str]:
+    leaves: list[str] = []
+    for sign in _DIGIT_LEAF_SIGNS:
+        for mantissa in _DIGIT_LEAF_MANTISSAS:
+            for join in _DIGIT_LEAF_JOINS:
+                for unit in _DIGIT_LEAF_UNITS:
+                    leaves.append(f"{sign}{mantissa}{join}{unit}")
+    return leaves
+
+
+def _digit_leaf_case_id(leaf: str) -> str:
+    return (
+        leaf.replace(" ", "SP")
+        .replace("\u00a0", "NBSP")
+        .replace("%", "PCT")
+        .replace(",", "COMMA")
+    )
+
+
+def _rule_source_carries_printed_value(leaf: str, source: str) -> bool:
+    """Independent of the gate.
+
+    A digit-bearing leaf is carried only when ``leaf`` itself occurs in
+    ``source`` and neither side of that occurrence continues a number or
+    an identifier. This is the certification rule for every generated
+    spelling, including spellings a numeric grammar does not read.
+    """
+    if not any(ch in "0123456789" for ch in leaf):
+        return False
+    start = 0
+    limit = len(source)
+    while True:
+        index = source.find(leaf, start)
+        if index < 0:
+            return False
+        before_ok = index == 0 or source[index - 1] not in _RULE_VALUE_BOUNDARY
+        after = index + len(leaf)
+        after_ok = after == limit or source[after] not in _RULE_VALUE_BOUNDARY
+        if before_ok and after_ok:
+            return True
+        start = index + 1
+
+
+@pytest.mark.parametrize("leaf", _digit_leaf_product(), ids=_digit_leaf_case_id)
+def test_digit_bearing_leaf_certifies_only_when_source_carries_it(
+    leaf: str, tmp_path: Path
+):
+    """Invariant: a digit in a measured string requires source coverage.
+
+    The leaf certifies only when the source carries that printed value.
+    The expected boolean is ``_rule_source_carries_printed_value``, which
+    does not call the gate. A quantity pin against the word pressure does
+    not cover the measurement. ``0.91Pa`` and ``91.`` are in this product.
+    """
+    carried = f"\n{leaf}\n"
+    withheld = f"\n9{leaf}\n"
+    assert _rule_source_carries_printed_value(leaf, carried)
+    assert not _rule_source_carries_printed_value(leaf, withheld)
+    recognized = vle._measured_leaf_addresses(
+        {"quantity": "pressure", "measured": leaf}
+    )
+    assert ("measured",) in recognized
+    assert ("quantity",) not in recognized
+
+    pinned = _literal_source_document(tmp_path, leaf, carried)
+    pinned_errors = vle.certify_extract_source_fidelity(
+        pinned, label="digit", artifact_root=tmp_path
+    )
+    carried_ok = _rule_source_carries_printed_value(leaf, carried)
+    assert (pinned_errors == []) is carried_ok, (leaf, carried_ok, pinned_errors)
+
+    missed = _literal_source_document(tmp_path, leaf, withheld)
+    missed_errors = vle.certify_extract_source_fidelity(
+        missed, label="digit", artifact_root=tmp_path
+    )
+    withheld_ok = _rule_source_carries_printed_value(leaf, withheld)
+    assert (missed_errors == []) is withheld_ok, (leaf, withheld_ok, missed_errors)
+    assert "source_blind_pin" in "\n".join(missed_errors)
+
+    hidden = _values_pin_document(
+        tmp_path,
+        values={"quantity": "pressure", "measured": leaf},
+        pins=[("quantity", "pressure")],
+        source_text="pressure\n",
+        structured=False,
+    )
+    hidden_errors = vle.certify_extract_source_fidelity(
+        hidden, label="digit", artifact_root=tmp_path
+    )
+    joined = "\n".join(hidden_errors)
+    assert "uncovered_observation" in joined
+    assert "source_blind_pin" not in joined
 
 
 def test_float_spellings_certify_only_the_stored_number(tmp_path: Path):

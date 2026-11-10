@@ -79,8 +79,11 @@ paths.
 Every scored observation needs samples that name its observation id and pin
 every measured leaf address under `values` (a repeated pin of one address
 does not cover a sibling with the same number; an equipment field does not
-cover), and each pin matches the stored value. One sample per file is not
-coverage. Until the corpus is re-audited, missing coverage, missing
+cover), and each pin matches the stored value. A measured string leaf is
+any value that contains a digit [0-9], including a printed measurement the
+numeric grammar does not read (`0.91Pa`, `0.0614K`). A label with no digit
+does not cover that measurement. One sample per file is not coverage.
+Until the corpus is re-audited, missing coverage, missing
 reviewer/date/locator,
 auto-migrated pilot notes, and attestation-complete pins whose locator was
 not opened are typed counted warnings (`uncovered_observation`,
@@ -89,6 +92,8 @@ not reject a draft. Setting `review_status: reviewed` refuses while any
 warning remains. Certification opens a source artifact at the locator
 (paper, OCR, or quotes — not this extract and not program source) and
 requires each pinned number as a complete token, sign and exponent included.
+A digit-bearing string the parser cannot read is uncovered unless that
+printed value occurs whole in the opened source.
 Do not stamp reviewers or copy pins to clear them.
 
 ### Tranche review obligation

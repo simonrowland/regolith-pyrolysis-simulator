@@ -104,19 +104,23 @@ the extract gate, and the literature index all call
 `certify_extract_source_fidelity` and refuse while any count is non-zero.
 
 Coverage is by leaf address. A measured leaf is a finite int or float
-(not a boolean), or a string that contains a numeric token. The evidence
-tree is the observation's `values` plus each scored numeric condition the
-temperature payload copies beside it: `T_range_K`, `T_K`, `T_C`,
-`temperature_C`, `temp_C`, and `point_conditions`. A `locator` inside a
-condition is provenance, not a leaf. A matching sample covers a leaf only
-when the sample names the observation id and the sample's address is that
-leaf or an ancestor of it. Repeating a pin of one address does not cover
-a sibling address, even when the stored numbers are equal, and a `values`
-pin does not cover a sibling condition. A descriptive label such as
-`quantity: alpha` is not a measured leaf and does not cover a sibling
-number. Two samples may pin different addresses of the same observation.
-Evidence with no measured leaf is covered by a pin of that evidence,
-because no number is left unchecked. An equipment pin does not contribute.
+(not a boolean), or a string that contains any digit [0-9]. A quantity
+name, a unit on its own, or another label with no digit is not a leaf.
+The evidence tree is the observation's `values` plus each scored numeric
+condition the temperature payload copies beside it: `T_range_K`, `T_K`,
+`T_C`, `temperature_C`, `temp_C`, and `point_conditions`. A `locator`
+inside a condition is provenance, not a leaf. A matching sample covers a
+leaf only when the sample names the observation id and the sample's
+address is that leaf or an ancestor of it. Repeating a pin of one address
+does not cover a sibling address, even when the stored numbers are equal,
+and a `values` pin does not cover a sibling condition. A descriptive label
+such as `quantity: pressure` is not a measured leaf and does not cover a
+sibling measurement, including a printed value such as `0.91Pa` that the
+numeric grammar does not read. Two samples may pin different addresses of
+the same observation. Evidence with no measured leaf is covered by a pin
+of that evidence only when the evidence also contains no digit. Zero
+recognised leaves in a block that still contains a digit is not coverage.
+An equipment pin does not contribute.
 A bare integer bracket such as `observations[0]` is a list position, not
 an id, so it does not contribute. Structured samples address `values`
 only; a condition is pinned by a path.
