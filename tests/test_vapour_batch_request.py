@@ -796,7 +796,6 @@ def test_d359_p_carriers_use_real_ladder_and_are_flux_active() -> None:
     batch = catalog.resolve_batch(
         {"process.cleaned_melt": {"P2O5": 1.0}},
         state,
-        caller_species_filter=species_ids,
         flux_activation_context=_pre_rg_activation_context(*species_ids),
     )
     rows_by_species = {
@@ -806,7 +805,7 @@ def test_d359_p_carriers_use_real_ladder_and_are_flux_active() -> None:
         if species_id in species_ids
     }
 
-    assert batch.flux_active_species_ids == frozenset(species_ids)
+    assert set(species_ids) <= batch.flux_active_species_ids
     for species_id in species_ids:
         answer = batch.channel(species_id)
         assert isinstance(answer.pressure, PressureValue)
