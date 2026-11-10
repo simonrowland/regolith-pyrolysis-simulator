@@ -98,10 +98,18 @@ def _append_availability_flag(
     if not isinstance(flag, Mapping):
         return
     fields = [f"status={flag.get('status')}"]
+    if 'category' in flag:
+        fields.append(f"category={flag.get('category')}")
+    if 'kind' in flag:
+        fields.append(f"kind={flag.get('kind')}")
     if 'state' in flag:
         fields.append(f"state={flag.get('state')}")
     if 'authority' in flag:
         fields.append(f"authority={flag.get('authority')}")
+    if 'authority_level' in flag:
+        fields.append(f"authority_level={flag.get('authority_level')}")
+    if 'band' in flag:
+        fields.append(f"band={flag.get('band')}")
     if 'reason' in flag:
         fields.append(f"reason={flag.get('reason')}")
     lines.append('- Availability flag: ' + '; '.join(fields))

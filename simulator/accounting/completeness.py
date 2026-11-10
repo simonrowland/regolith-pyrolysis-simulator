@@ -634,6 +634,93 @@ def product_class_availability(
         else "partial" if has_computed_part
         else "unavailable"
     )
+    targets = (
+        (target_species,)
+        if isinstance(target_species, str)
+        else tuple(target_species)
+    )
+    d359_refusals: dict[str, list[str]] = {"B": [], "C": [], "E": []}
+    for item in excluded:
+        species = item["species"]
+        reason = item["reason"]
+        if "stage0_only" in reason:
+            label = "E"
+        elif "outside_declared_evaluator_domain" in reason:
+            label = "C"
+        elif "missing_evidence" in reason:
+            label = "B"
+        else:
+            continue
+        d359_refusals[label].append(reason)
+    pending_classes = [
+        label for label in ("B", "C", "E") if d359_refusals[label]
+    ]
+    contains_o2_target = "O2" in targets
+    flagged_oxygen_output = contains_o2_target and bool(pending_classes)
+    if flagged_oxygen_output:
+        # A refused O-bearing vapor channel must not erase the independently
+        # computed molecular-O2 ledger total. Keep that value visible and
+        # attach its unresolved B/C/E evidence to the product row.
+        status = "partial"
+    prediction_flag = None
+    if flagged_oxygen_output:
+        reason_parts = [
+            (
+                "0.0 kg O₂ is the direct O₂-ledger total; no stored, vented, "
+                "or captured molecular O₂ was recorded. The associated "
+                "B/C/E oxide-vapor predictions are incomplete and are "
+                "not counted as shipped O₂."
+            )
+            if total_kg == 0.0
+            else (
+                "The direct O₂-ledger total is retained; associated B/C/E "
+                "oxide-vapor predictions are incomplete and are not "
+                "counted as shipped O₂."
+            )
+        ]
+        if d359_refusals["B"]:
+            reason_parts.append(
+                "Class B activity ladder refusals: "
+                + "; ".join(d359_refusals["B"])
+                + ". d-359's pending rungs are provider activity, then "
+                "published gamma*x, then ideal-mixing a=x with "
+                "ideal_mixing_assumption; a=1 is not an upper bound when "
+                "gamma>1."
+                + (
+                    " The d-359 SiO ruling records activity 0.436 without "
+                    "its evidence link."
+                    if any(
+                        reason.startswith("SiO:")
+                        for reason in d359_refusals["B"]
+                    )
+                    else ""
+                )
+            )
+        if d359_refusals["C"]:
+            reason_parts.append(
+                "Class C out-of-domain refusal: "
+                + "; ".join(d359_refusals["C"])
+                + ". The current refusal remains against the certified "
+                "evaluator band."
+            )
+        if d359_refusals["E"]:
+            reason_parts.append(
+                "Class E P species refusals: "
+                + "; ".join(d359_refusals["E"])
+                + ". The stage0_only gate leaves the P carriers uncomputed "
+                "while P2O5 is present; phase-independent K remains pending."
+            )
+        reason_parts.append("Pending d-359 follow-ups: B, C, E.")
+        prediction_flag = {
+            "status": "flagged prediction",
+            "category": 3,
+            "kind": "predict_and_flag",
+            "authority": "extrapolated",
+            "authority_level": "extrapolated",
+            "band": "d-359 B/C/E follow-ups pending",
+            "pending_follow_ups": ["d-359 B", "d-359 C", "d-359 E"],
+            "reason": " ".join(reason_parts),
+        }
     omission_flag = (
         {
             "status": "available",
@@ -650,12 +737,15 @@ def product_class_availability(
     )
     return {
         "class_total_kg": (
-            total_kg if has_computed_part or not refusals else None
+            float(total_kg)
+            if has_computed_part or flagged_oxygen_output or not refusals
+            else None
         ),
         "status": status,
         "excluded": excluded,
         "estimated_contributions": estimated_contributions,
         "reason": "; ".join(item["reason"] for item in excluded),
+        "prediction_flag": prediction_flag,
         "flag": (
             omission_flag if status == "available" else {
                 **{

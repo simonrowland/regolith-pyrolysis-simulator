@@ -699,6 +699,9 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 bucket['availability_flag'] = availability['flag']
             else:
                 bucket['flag'] = availability['flag']
+        prediction_flag = availability.get('prediction_flag')
+        if isinstance(prediction_flag, Mapping):
+            bucket['availability_flag'] = prediction_flag
     if result['oxygen']['class_total_kg'] is None:
         for name, key in (
             ('oxygen', 'partition_kg'),
