@@ -477,6 +477,13 @@ def run_mre_reproduction(
             "mass_balance_error_pct": outcome["mass_balance_error_pct"],
             "control_source_locator": copy.deepcopy(interval.source_locator),
         }
+        ladder_diagnostic = (outcome.get("diagnostic") or {}).get(
+            "mre_ellingham_ladder_diagnostic"
+        )
+        if ladder_diagnostic:
+            interval_row["mre_ellingham_ladder_diagnostic"] = copy.deepcopy(
+                ladder_diagnostic
+            )
         intervals.append(interval_row)
 
     cumulative_metals_mol = _sum_species_rows(

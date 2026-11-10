@@ -18898,6 +18898,7 @@ _B2131_SOURCE_ID = "robie-hemingway-1995-usgs-b2131"
 _B677_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S, Quantity.H_MINUS_H298})
 _B592_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S})
 _H_MINUS_H298_ANCHOR = "H(T)-H(298.15 K)"
+_CLOSED_COMPILATION_NAME_FORMULAS = {"oxygen": "O2"}
 
 # Pankratz, L. B., 1984, Thermodynamic properties of elements and oxides,
 # USBM Bulletin 677. Mineru text/pankratz-1984-usbm-b677/mineru/chunk-p001-p040/
@@ -27004,6 +27005,34 @@ class Migrator:
                 continue
             self._migrate_compilation_file(path)
 
+    @staticmethod
+    def _normalize_compilation_formula(
+        record: Mapping[str, Any], printed_formula: str
+    ) -> str:
+        formula_token = record.get("formula_token")
+        formula_ocr_suspect = record.get("ocr_suspect") is True or (
+            isinstance(formula_token, Mapping)
+            and formula_token.get("ocr_suspect") is True
+        )
+        if not formula_ocr_suspect:
+            return printed_formula
+
+        name = str(record.get("name_as_published") or "").strip().casefold()
+        closed_formula = _CLOSED_COMPILATION_NAME_FORMULAS.get(name)
+        if closed_formula is None:
+            return printed_formula
+
+        from simulator.reference_data.janaf import formula_normalised
+
+        candidate = printed_formula.strip()
+        if candidate.startswith("$") and candidate.endswith("$"):
+            candidate = candidate[1:-1].strip()
+        candidate = re.sub(r"\\(?:mathrm|text)\{([^{}]*)\}", r"\1", candidate)
+        candidate = formula_normalised(candidate).replace("0", "O").replace("l", "1")
+        if candidate != closed_formula or parse_species_formula(closed_formula) is None:
+            return printed_formula
+        return closed_formula
+
     def _migrate_compilation_file(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
         count = self._count(rel)
@@ -27067,6 +27096,7 @@ class Migrator:
         formula = str(
             doc.get("formula") or doc.get("formula_as_published") or record_id
         )
+        formula = self._normalize_compilation_formula(doc, formula)
         phase, _unmapped = map_phase(compilation_phase_text(doc))
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)

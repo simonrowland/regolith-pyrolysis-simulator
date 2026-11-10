@@ -134,6 +134,49 @@ MRE_FIXED_REDUCIBLE_OXIDES = tuple(
 )
 
 
+def _mre_raw_margin_unassessed_notice(
+    *,
+    oxide: str,
+    temperature_C: float,
+    applied_voltage_V: float,
+    fallback_requirement_V: float,
+    reference: MREDecompositionVoltageReference | None,
+    heuristic_reference_V: float | None = None,
+) -> dict[str, object] | None:
+    if (
+        heuristic_reference_V is None
+        and reference is not None
+        and reference.raw_graph_voltage_V is not None
+    ):
+        return None
+
+    if heuristic_reference_V is not None:
+        reason = FERRIC_TO_FERROUS_REFERENCE_STATUS
+        reference_status = FERRIC_TO_FERROUS_REFERENCE_STATUS
+    else:
+        reason = (
+            'decomposition_voltage_reference_missing'
+            if reference is None
+            else 'raw_graph_voltage_missing'
+        )
+        reference_status = None if reference is None else reference.status
+
+    notice: dict[str, object] = {
+        'kind': 'mre_raw_margin_unassessed',
+        'oxide': oxide,
+        'temperature_C': temperature_C,
+        'applied_voltage_V': applied_voltage_V,
+        'fallback_requirement_V': fallback_requirement_V,
+        'reason': reason,
+        'authority': 'fallback_heuristic',
+    }
+    if reference_status is not None:
+        notice['reference_status'] = reference_status
+    if heuristic_reference_V is not None:
+        notice['heuristic_reference_V'] = heuristic_reference_V
+    return notice
+
+
 def _mre_raw_margin_assessment(
     *,
     voltage_V: float,
@@ -910,6 +953,7 @@ class ElectrolysisModel:
 
         # Find all reducible species at this voltage
         reducible = []
+        unassessed_notices: list[dict[str, object]] = []
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if oxide not in melt_state.composition_kg:
                 continue
@@ -1114,6 +1158,20 @@ class ElectrolysisModel:
                 result['oxides_reduced_kg'][oxide] = kg_oxide_reduced
                 result['oxides_reduced_mol'][oxide] = moles_reduced
                 result['oxide_charge_electrons'][oxide] = n
+                unassessed_notice = _mre_raw_margin_unassessed_notice(
+                    oxide=oxide,
+                    temperature_C=T_C,
+                    applied_voltage_V=voltage_V,
+                    fallback_requirement_V=E,
+                    reference=reference,
+                    heuristic_reference_V=(
+                        FERRIC_TO_FERROUS_REFERENCE_V
+                        if mode == 'ferric_to_ferrous'
+                        else None
+                    ),
+                )
+                if unassessed_notice is not None:
+                    unassessed_notices.append(unassessed_notice)
 
                 if mode == "ferric_to_ferrous":
                     feo_mol = moles_reduced * FERRIC_TO_FERROUS_FEO_PER_FE2O3
@@ -1168,6 +1226,8 @@ class ElectrolysisModel:
         # Preserve exact commanded energy when no cap bound.
         energy_current_A = billable_current_A if any_capped else current_A
         result['energy_kWh'] = voltage_V * energy_current_A * 1.0 / 1000.0
+        if unassessed_notices:
+            result.setdefault('notices', []).extend(unassessed_notices)
 
         return result
 
