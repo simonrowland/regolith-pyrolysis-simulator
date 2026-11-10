@@ -748,6 +748,45 @@ def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
     return {"reason": "quantity_not_predicted", "quantity": quantity.value}
 
 
+_STATIC_REFUSAL_DETAILS = frozenset(
+    {
+        "quantity_not_predicted",
+        "engine-thermo-does-not-emit",
+        "engine_does_not_report_phase_composition",
+        "engine_does_not_report_fe_redox",
+        "engine_does_not_report_melt_activity",
+        "engine_missing_observable",
+        "pure-phase-is-crystal-only",
+        "pure-phase-symbol-unmapped",
+        "outside_supported_species",
+        "not_a_vapour_quantity",
+        "non_alkali_kinetic",
+        "vaporock-species-not-in-janaf-table",
+    }
+)
+
+
+def _static_refusal_summary_key(
+    residual: Residual,
+) -> tuple[str, str, str] | None:
+    request = residual.candidate_request
+    refusal = residual.refusal
+    if (
+        residual.status is not ResidualStatus.REFUSED
+        or request is None
+        or refusal is None
+        or residual.execution.call_evidence is not None
+        or refusal.detail.get("reason") not in _STATIC_REFUSAL_DETAILS
+    ):
+        return None
+    rail = residual.rail or rail_for_quantity(request.quantity)
+    return (
+        request.engine.value,
+        "unassigned" if rail is None else rail.value,
+        f"{refusal.reason.value}/{refusal.detail['reason']}",
+    )
+
+
 def _is_quantity_not_predicted(quantity: Quantity | None) -> bool:
     return quantity is Quantity.LOG10_K_REACTION
 
@@ -14322,10 +14361,15 @@ def _score_store_to_jsonl(
     measured_only: bool = False,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
+    compact_static_refusals: bool = False,
 ) -> tuple[int, _ResidualReportMetadata]:
     """Score directly to a sorted ``.partial`` JSONL without retaining rows."""
 
-    stream = _ResidualJsonlStream(path, root=root)
+    stream = _ResidualJsonlStream(
+        path,
+        root=root,
+        compact_static_refusals=compact_static_refusals,
+    )
     try:
         _score_store_with_decisions(
             context,
@@ -14344,6 +14388,7 @@ def _score_store_to_jsonl(
             headline_band_values=dict(stream.headline_band_values),
             tier_band_values=dict(stream.tier_band_values),
             aggregate=stream.report_aggregate,
+            static_refusals=stream.static_refusals,
         )
     finally:
         stream.close()
@@ -14441,6 +14486,12 @@ def dumps_store_stamp(stamp: Mapping[str, object]) -> str:
         "queue": int(stamp["queue"]),
         "hard_issues": int(stamp["hard_issues"]),
     }
+    if stamp.get("static_refusals"):
+        payload["static_refusals"] = [
+            dict(row)
+            for row in stamp["static_refusals"]
+            if isinstance(row, Mapping)
+        ]
     return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
 
 
@@ -14604,6 +14655,7 @@ class _ResidualReportMetadata:
     headline_band_values: Mapping[tuple[str, str, str], set[str]]
     tier_band_values: Mapping[tuple[str, str, str, str, str, str], set[str]]
     aggregate: _ScorePayloadAccumulator | None = None
+    static_refusals: Sequence[Mapping[str, object]] = ()
 
 
 class _ResidualJsonlRows:
@@ -18164,13 +18216,17 @@ def headline_summary_payload(
     records: Sequence[Mapping[str, object]],
     *,
     store_stamp: Mapping[str, object] | None = None,
+    static_refusals: Sequence[Mapping[str, object]] = (),
 ) -> dict[str, object]:
-    return {
+    payload: dict[str, object] = {
         "kind": HEADLINE_SUMMARY_KIND,
-        "schema_version": "v1",
+        "schema_version": "v1.1" if static_refusals else "v1",
         "store": None if store_stamp is None else dict(store_stamp),
         "records": [dict(record) for record in records],
     }
+    if static_refusals:
+        payload["static_refusals"] = [dict(row) for row in static_refusals]
+    return payload
 
 
 def write_headline_summary_json(
@@ -19303,14 +19359,17 @@ class _ResidualJsonlStream:
         path: Path,
         *,
         root: Path | None = None,
+        compact_static_refusals: bool = False,
     ) -> None:
         self.partial_path = path.with_name(path.name + ".partial")
+        self.root = root or REPO_ROOT
+        self.compact_static_refusals = compact_static_refusals
+        self.static_refusal_counts: Counter[tuple[str, str, str]] = Counter()
+        self.store_stamp = derive_store_stamp(self.root)
         path.parent.mkdir(parents=True, exist_ok=True)
         self.file = self.partial_path.open("wb")
         self.file.write(
-            (dumps_store_stamp(derive_store_stamp(root or REPO_ROOT)) + "\n").encode(
-                "utf-8"
-            )
+            (dumps_store_stamp(self.store_stamp) + "\n").encode("utf-8")
         )
         self.file.flush()
         self._temporary = tempfile.TemporaryDirectory(prefix="battery-score-index-")
@@ -19337,11 +19396,30 @@ class _ResidualJsonlStream:
         self.count = 0
         self._last_flush = time.monotonic()
 
+    @property
+    def static_refusals(self) -> list[dict[str, object]]:
+        return [
+            {
+                "engine": engine,
+                "rail": rail,
+                "reason": reason,
+                "count": count,
+            }
+            for (engine, rail, reason), count in sorted(
+                self.static_refusal_counts.items()
+            )
+        ]
+
     def append(
         self,
         residual: Residual,
         candidate: Observation | None,
     ) -> None:
+        if self.compact_static_refusals:
+            static_key = _static_refusal_summary_key(residual)
+            if static_key is not None:
+                self.static_refusal_counts[static_key] += 1
+                return
         offset = self.file.tell()
         line = dumps_residual_line(residual, candidate).encode("utf-8")
         self.file.write(line + b"\n")
@@ -19396,6 +19474,7 @@ class _ResidualJsonlStream:
         report_aggregate = _ScorePayloadAccumulator(
             context,
             engines,
+            static_refusals=self.static_refusals,
             typed_family_band_values=self.band_values,
             typed_headline_band_values=self.headline_band_values,
             typed_tier_band_values=self.tier_band_values,
@@ -19408,7 +19487,12 @@ class _ResidualJsonlStream:
             ) as output:
                 temporary_path = Path(output.name)
                 with self.partial_path.open("rb") as source:
-                    output.write(source.readline())
+                    stamp = dict(self.store_stamp)
+                    if self.static_refusals:
+                        stamp["static_refusals"] = self.static_refusals
+                    output.write(
+                        (dumps_store_stamp(stamp) + "\n").encode("utf-8")
+                    )
                     rows = self._database.execute(
                         "SELECT offset, band_value, numeric_value "
                         "FROM residual_order "
@@ -19797,6 +19881,7 @@ class _ScorePayloadAccumulator:
         context: ScoreContext,
         engines: Sequence[Engine],
         *,
+        static_refusals: Sequence[Mapping[str, object]] = (),
         typed_family_band_values: Mapping[
             tuple[str, str, str, str], set[str]
         ] | None = None,
@@ -19812,6 +19897,7 @@ class _ScorePayloadAccumulator:
         self.context = context
         self.engines = tuple(engines)
         self.engine_names = {engine.value for engine in engines}
+        self.static_refusals = tuple(dict(row) for row in static_refusals)
         self._row_metadata_cache: dict[
             str,
             tuple[
@@ -20403,7 +20489,9 @@ class _ScorePayloadAccumulator:
 
     def summary_payload(self, store_stamp: Mapping[str, object] | None) -> dict[str, object]:
         return headline_summary_payload(
-            self.headline_records(), store_stamp=store_stamp
+            self.headline_records(),
+            store_stamp=store_stamp,
+            static_refusals=self.static_refusals,
         )
 
 
