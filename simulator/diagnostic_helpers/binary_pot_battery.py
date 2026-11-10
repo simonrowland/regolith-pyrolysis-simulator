@@ -3834,7 +3834,11 @@ def internal_analytical_residue_vapor_pressure(
     include_diagnostic_shadows: bool,
 ) -> Any:
     """Run one direct internal-analytical residue pressure request."""
-    from simulator.engine_cache import cached_engine_call, record_engine_open
+    from simulator.engine_cache import (
+        cached_engine_call,
+        engine_cache_backend_settings,
+        record_engine_open,
+    )
 
     record_engine_open("internal-analytical", core)
 
@@ -3847,6 +3851,7 @@ def internal_analytical_residue_vapor_pressure(
         "fO2_log": fO2_log,
         "po2_request": po2_request.as_payload(),
         "include_diagnostic_shadows": include_diagnostic_shadows,
+        "engine_settings": engine_cache_backend_settings(core),
     }
 
     def solve_pressure_cache_value() -> Any:

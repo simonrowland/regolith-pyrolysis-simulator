@@ -44,7 +44,7 @@ from simulator.optimize.evaluate import (
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
-from simulator.optimize.recipe import RecipePatch
+from simulator.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore, ResultStoreWriteRejected
 from simulator.optimize.worker_runtime import (
     clear_worker_runtime,

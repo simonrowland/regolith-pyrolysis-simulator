@@ -16,6 +16,7 @@ import subprocess
 import sys
 import warnings
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
