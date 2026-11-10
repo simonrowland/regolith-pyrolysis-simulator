@@ -5051,6 +5051,11 @@ def authoritative_condensation_temperature(
     Stage temperature windows validate placement; they do not synthesize a
     crossing.  This read-only accessor mirrors the instance override order
     used by ``CondensationModel`` without mutating module state.
+
+    Al 1180 °C and Ti 1500 °C live in ``CONDENSATION_TEMPS_C`` as capture
+    thresholds only. ``_species_condensation_temperature_C`` returns that
+    dict before the vapour-pressure catalogue, so those two must not be
+    labelled ``data.vapor_pressures.condensation_T_C_at_1mbar``.
     """
 
     train = (setpoints or {}).get("condensation_train", {}) or {}
@@ -5066,6 +5071,14 @@ def authoritative_condensation_temperature(
             if isinstance(sources, Mapping)
             else "setpoints.condensation_temperatures_C",
             "authority": "condensation_temperature_override",
+        }
+    # Capture-threshold rows are not p_sat crossings. The number stays the
+    # in-source threshold; only the report source changes.
+    if species in ("Al", "Ti") and species in CONDENSATION_TEMPS_C:
+        return {
+            "temperature_C": float(CONDENSATION_TEMPS_C[species]),
+            "source": "simulator.condensation.CONDENSATION_TEMPS_C.capture_threshold",
+            "authority": "capture_threshold_fallback",
         }
     temperature_C = _species_condensation_temperature_C(
         species,

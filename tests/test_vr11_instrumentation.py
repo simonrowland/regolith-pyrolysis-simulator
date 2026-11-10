@@ -12,6 +12,7 @@ Acceptance (DECOMPOSITION VR-11 / DESIGN-REV5 U4):
 from __future__ import annotations
 
 from dataclasses import replace
+import json
 import math
 from pathlib import Path
 from types import MethodType, SimpleNamespace
@@ -1395,6 +1396,52 @@ def test_setpoints_t_cond_audit_covers_operator_overrides() -> None:
         "al_ti_policy"
     ]
     assert SETPOINTS_T_COND_AUDIT["schema"] == "setpoints_t_cond_audit.v1"
+
+
+def test_runner_goldens_pin_the_al_ti_audit_and_capture_threshold_label() -> None:
+    """Runner fixtures must emit the live audit, not the old Al/Ti override list.
+
+    The lunar C0 golden also records an Al thermal crossing. Its temperature
+    stays 1180 °C. The source is the in-source capture threshold, not an
+    operator condenser override and not a vapour-pressure catalogue row.
+    """
+
+    expected_audit = {
+        "schema": SETPOINTS_T_COND_AUDIT["schema"],
+        "operator_override_species": list(
+            SETPOINTS_T_COND_AUDIT["operator_override_species"]
+        ),
+        "al_ti_policy": SETPOINTS_T_COND_AUDIT["al_ti_policy"],
+        "reaction_fixed_windows": SETPOINTS_T_COND_AUDIT["reaction_fixed_windows"],
+    }
+    names = (
+        "ci_carbonaceous_chondrite_C2B_12h.json",
+        "lunar_mare_low_ti_C0_24h.json",
+        "mars_basalt_C2A_12h.json",
+    )
+    lunar = None
+    for name in names:
+        payload = json.loads(
+            (ROOT / "tests" / "fixtures" / "runner" / name).read_text(
+                encoding="utf-8"
+            )
+        )
+        audit = payload["vapour_rail_instrumentation"]["setpoints_t_cond_audit"]
+        assert audit == expected_audit
+        assert "Al" not in audit["operator_override_species"]
+        assert "Ti" not in audit["operator_override_species"]
+        if name.startswith("lunar_"):
+            lunar = payload
+    assert lunar is not None
+    al = lunar["thermal_train_report"]["condensation_crossings"]["Al"]
+    assert al["temperature_K"] == pytest.approx(1180.0 + 273.15)
+    assert al["stage_window_K"] is None
+    assert al["source"] == (
+        "simulator.condensation.CONDENSATION_TEMPS_C.capture_threshold"
+    )
+    assert al["authority"] == "capture_threshold_fallback"
+    assert "vapor_pressure" not in al["source"]
+    assert "operator-routing override" not in al["source"]
 
 
 def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
