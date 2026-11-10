@@ -140,6 +140,11 @@ HEAVY_ROSTER = frozenset({
     # justification at the mark). It stays nightly in the serial chain.
     ("tests/test_web_functional_qa.py",
      "test_headless_full_run_ledgers_and_product_story_web"),
+    # Owner-ratified b-549 follow-up (2026-11-10): byte-identical battery
+    # store regeneration measured 1931.1 CPU seconds and 2142.1 wall seconds.
+    # Keep the provenance pin nightly with a 2600 s CPU budget.
+    ("tests/battery/test_store_regeneration.py",
+     "test_committed_store_is_byte_identical_to_regeneration"),
 })
 
 # b-586: these campaign-length yield nodes must stay out of the PR tier. They
