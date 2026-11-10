@@ -400,8 +400,6 @@ def _stub_execution() -> SimpleNamespace:
 
 
 def _assert_withheld(profile: dict, withheld_metrics: set[str], *, label: str) -> None:
-    from simulator.optimize.evaluate import _notes_with_unclaimed_product_withhold
-
     evidence = objective_importance_evidence(profile)
     withheld_rows = [row for row in evidence if row.metric in withheld_metrics]
     retained_rows = [row for row in evidence if row.metric not in withheld_metrics]
@@ -437,7 +435,6 @@ def _assert_withheld(profile: dict, withheld_metrics: set[str], *, label: str) -
             "reason=campaign_does_not_claim_product"
         ) in note, label
     assert f"withheld_weight_fraction={format(fraction, '.12g')}" in note, label
-    assert _notes_with_unclaimed_product_withhold((), profile) == (note,)
     weights = unrenormalized_study_scalar_weights(profile)
     assert weights == tuple(row.weight for row in retained_rows)
     assert math.isclose(

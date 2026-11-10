@@ -1140,23 +1140,25 @@ def evaluate(
             cache_key_value=key,
         ) from exc
     if not feasibility.feasible:
-        objectives = None
+        # ``profile`` stays the authored profile for the run reference.
+        # The vector and its withhold notice come from ``objective_profile``,
+        # which is stamped with EvalSpec.campaign. They travel as one score
+        # so a fidelity overlay cannot make the notice name a different campaign.
+        campaign_score = None
         try:
             pumping_diagnostic = _pumping_diagnostic_for_gate(
                 run_execution,
                 feedstock_id=spec.feedstock_id,
             )
-            computed_objectives = _compute_objective_vector(
+            campaign_score = _compute_objective_vector(
                 run_execution,
                 objective_profile,
                 pumping_diagnostic,
                 spec,
             )
-            if all(value.value is not None for value in computed_objectives.values):
-                objectives = computed_objectives
         except (OverflowError, ObjectiveComputationError):
             # Keep the failed gate result; an unavailable vector remains unscored.
-            pass
+            campaign_score = None
         return _infeasible_result(
             candidate_id,
             spec,
@@ -1164,7 +1166,7 @@ def evaluate(
             feasibility,
             run_execution,
             profile,
-            objectives=objectives,
+            campaign_score=campaign_score,
         )
     pumping_diagnostic = _pumping_diagnostic_for_gate(
         run_execution,
@@ -1218,12 +1220,13 @@ def evaluate(
             )
 
     try:
-        objectives = _compute_objective_vector(
+        campaign_score = _compute_objective_vector(
             run_execution,
             objective_profile,
             pumping_diagnostic,
             spec,
         )
+        objectives = campaign_score.objectives
         trace_payload = _composition_target_trace_payload(
             objective_profile,
             objectives,
@@ -1276,7 +1279,7 @@ def evaluate(
             cost_parameters=spec.cost_parameters,
             coating_margin=feasibility.margins.get("coating"),
         ),
-        notes=_notes_with_unclaimed_product_withhold((), objective_profile),
+        notes=_notes_for_executed_campaign_score((), campaign_score),
     )
 
 
@@ -4443,12 +4446,43 @@ def _with_composition_target_extraction_thresholds(
     )
 
 
-def _notes_with_unclaimed_product_withhold(
+@dataclass(frozen=True)
+class _ExecutedCampaignScore:
+    """Objective vector and the withhold notice of one scoring profile.
+
+    INVARIANT: the notice is ``unclaimed_product_withheld_objective_note`` of
+    the same profile passed to ``compute_objectives``. That profile is the
+    evaluated campaign (EvalSpec.campaign), not the authored profile. Every
+    path that publishes a vector publishes this pair. A fidelity overlay
+    cannot attach a notice for a different campaign.
+    """
+
+    objectives: ObjectiveVector
+    withhold_note: str | None
+
+
+def _score_executed_campaign(
+    run_execution: Any,
+    scoring_profile: Mapping[str, Any],
+    spec: EvalSpec,
+) -> _ExecutedCampaignScore:
+    objectives = compute_objectives(
+        scoring_profile,
+        run_execution,
+        cost_parameters=spec.cost_parameters,
+    )
+    return _ExecutedCampaignScore(
+        objectives=_objectives_with_thermal_window_metadata(objectives, spec),
+        withhold_note=unclaimed_product_withheld_objective_note(scoring_profile),
+    )
+
+
+def _notes_for_executed_campaign_score(
     notes: tuple[str, ...] | Sequence[str],
-    profile: Mapping[str, Any],
+    score: _ExecutedCampaignScore,
 ) -> tuple[str, ...]:
-    note = unclaimed_product_withheld_objective_note(profile)
     existing = tuple(str(item) for item in notes)
+    note = score.withhold_note
     if note is None or note in existing:
         return existing
     return existing + (note,)
@@ -4464,15 +4498,21 @@ def _infeasible_result(
     *,
     notes: tuple[str, ...] = (),
     trace_payload: Mapping[str, Any] | None = None,
-    objectives: ObjectiveVector | None = None,
+    campaign_score: _ExecutedCampaignScore | None = None,
 ) -> ScoredResult:
     trace_payload = _trace_payload_with_interpolation_feasibility(
         trace_payload,
         run_execution,
         feasibility.margins,
     )
-    if objectives is not None:
-        notes = _notes_with_unclaimed_product_withhold(notes, profile)
+    objectives = None
+    # A retained vector keeps the notice produced with it. ``profile`` is the
+    # run-reference profile and is not a second campaign for this notice.
+    if campaign_score is not None and all(
+        value.value is not None for value in campaign_score.objectives.values
+    ):
+        objectives = campaign_score.objectives
+        notes = _notes_for_executed_campaign_score(notes, campaign_score)
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -4492,16 +4532,15 @@ def _compute_objective_vector(
     objective_profile: Mapping[str, Any],
     pumping_diagnostic: Mapping[str, Any],
     spec: EvalSpec,
-) -> ObjectiveVector:
-    objectives = compute_objectives(
-        objective_profile,
+) -> _ExecutedCampaignScore:
+    return _score_executed_campaign(
         _CertifiedPumpingDiagnosticRunExecution(
             run_execution,
             pumping_diagnostic,
         ),
-        cost_parameters=spec.cost_parameters,
+        objective_profile,
+        spec,
     )
-    return _objectives_with_thermal_window_metadata(objectives, spec)
 
 
 def _target_infeasible_result(
@@ -5070,10 +5109,12 @@ def _out_of_domain_result(
             assessment.trace_payload,
         )
         try:
-            objectives = compute_objectives(
-                profile,
+            # ``profile`` here is the scoring profile the caller stamped with
+            # EvalSpec.campaign. The vector and the notice share it.
+            campaign_score = _score_executed_campaign(
                 scoring_execution,
-                cost_parameters=spec.cost_parameters,
+                profile,
+                spec,
             )
         except OverflowError as exc:
             raise EngineBugAbort(
@@ -5091,7 +5132,7 @@ def _out_of_domain_result(
                 eval_spec=spec,
                 cache_key_value=key,
             ) from exc
-        objectives = _objectives_with_thermal_window_metadata(objectives, spec)
+        objectives = campaign_score.objectives
         trace_payload = _composition_target_trace_payload(
             profile,
             objectives,
@@ -5125,7 +5166,7 @@ def _out_of_domain_result(
                 cost_parameters=spec.cost_parameters,
                 coating_margin=feasibility.margins.get("coating"),
             ),
-            notes=_notes_with_unclaimed_product_withhold(assessment.notes, profile),
+            notes=_notes_for_executed_campaign_score(assessment.notes, campaign_score),
         )
 
     if composition_targets_require_terminal_rump(profile):
