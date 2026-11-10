@@ -639,11 +639,13 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
         assert _hx_tree(balance["dominant_O_carriers"]) == expected["O"]
         assert _hx_tree(balance["dominant_metal_carriers"]) == expected["metal"]
         assert float(solved["pO2_bar"]).hex() == expected["pO2"]
-        # The overall field only marks a global extrapolation. Per-species gas
-        # extrapolation remains represented by domain_flags and notices below.
-        assert diagnostics["authority"] is None
         assert diagnostics["openimcc_provenance"] == gas_provenance
         assert gas["domain_flags"] == expected["domain_flags"]
+        # Overall authority is raised when any gas species is extrapolated;
+        # the detailed flags remain available per species below.
+        assert diagnostics["authority"] == (
+            "extrapolated" if any(gas["domain_flags"].values()) else None
+        )
         assert gas["provenance_class"] == expected["provenance_class"]
         expected_gas_notices = {
             ("openimcc_gas_flag", "extrapolated", species, reason)
