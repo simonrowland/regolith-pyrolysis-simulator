@@ -78,6 +78,8 @@ from simulator.vapour_rail.request import (
 )
 from simulator.vapour_rail.instrumentation import (
     EffectivePressureSource,
+    SHADOW_ABSENT_COMPARISON,
+    compare_live_shadow_to_batch_flux,
     flux_pressures_from_batch,
     serialize_melt_activity_shadow,
     serialize_vapour_answer,
@@ -1108,6 +1110,7 @@ def test_t622_real_rows_share_diagnostic_only_typed_ood_policy(
         source_reaction_activity_standard_states={
             species_id: declaration.standard_state
         },
+        extras={"compound_bearing_state": False},
     )
     batch = catalog.resolve_batch(
         {"process.cleaned_melt": {parent_oxide: 1.0}},
@@ -1504,6 +1507,128 @@ def test_malformed_reported_activity_becomes_typed_refusal() -> None:
     assert isinstance(answer.pressure, PressureRefusal)
     assert answer.source_reaction_activity is not None
     assert answer.source_reaction_activity.verdict is ActivityVerdictKind.REFUSAL
+
+
+def test_missing_alpha_refuses_flux_without_fabricating_zero() -> None:
+    compiled = _stub_catalog_species("K")
+    compiled["K"].vaporisation_coefficients = SimpleNamespace(
+        evaporation_alpha={}
+    )
+
+    answer = refusal_closure(
+        requested=frozenset({"K"}),
+        rules=(_selector_rule("K"),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        catalog_species=compiled,
+    ).answers["K"]
+
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.pressure.pa > 0.0
+    assert isinstance(answer.flux, FluxRefusal)
+    assert answer.flux.code == "missing_evaporation_alpha"
+
+
+def test_rg_activity_declarations_mark_compound_bearing_sources() -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    compound_bearing_components = {
+        "NaO0.5",
+        "KO0.5",
+        "MgO",
+        "CaO",
+        "AlO1.5",
+        "SiO2",
+        "TiO2",
+        "CrO1.5",
+        "MnO",
+    }
+    declarations = []
+    for family in payload["families"].values():
+        species_by_id = family.get("physical_properties", {}).get("species", {})
+        for species_id, species in species_by_id.items():
+            for reaction in species.get("source_reactions", ()):
+                activity_input = reaction.get("activity_input") or {}
+                if activity_input.get("component_id") in compound_bearing_components:
+                    declarations.append((species_id, activity_input))
+
+    assert {
+        activity_input["component_id"]
+        for _, activity_input in declarations
+    } == compound_bearing_components
+    assert declarations
+    assert all(
+        activity_input.get("compound_bearing") is True
+        for _, activity_input in declarations
+    )
+
+
+def test_unknown_compound_state_refuses_rg_activity_but_keeps_pre_rg_seam() -> None:
+    payload = _minimal_family("K")
+    payload["families"]["k_test_family"]["physical_properties"]["species"][
+        "K"
+    ]["source_reactions"][0]["activity_input"]["compound_bearing"] = True
+    catalog = compile_vapour_rail_catalog(
+        payload, u0_manifest=_u0_stub("K")
+    )
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+    state = _state_with_k_activity(temperature_K=1500.0)
+
+    pre_rg = catalog.resolve_batch(
+        ledger,
+        state,
+        flux_activation_context=_pre_rg_activation_context("K"),
+    ).channel("K")
+    assert isinstance(pre_rg.pressure, PressureValue)
+    assert isinstance(pre_rg.flux, FluxEligible)
+
+    rg = catalog.resolve_batch(
+        ledger,
+        state,
+        flux_activation_context=_rg_activation_context(),
+    ).channel("K")
+    assert isinstance(rg.pressure, PressureRefusal)
+    assert rg.source_reaction_activity is not None
+    assert rg.source_reaction_activity.verdict is ActivityVerdictKind.REFUSAL
+    assert "compound-bearing" in (rg.source_reaction_activity.detail or "")
+
+
+def test_backend_reported_activity_does_not_prove_catalog_pressure_parity() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"), u0_manifest=_u0_stub("K")
+    )
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+    batch = catalog.resolve_batch(
+        ledger,
+        _state_with_k_activity(temperature_K=1500.0),
+        flux_activation_context=_pre_rg_activation_context("K"),
+    )
+    pressure_pa = batch.channel("K").pressure.pa
+
+    report = compare_live_shadow_to_batch_flux(
+        batch=batch,
+        live_pressures_Pa={"K": pressure_pa},
+        batch_flux_pressures_Pa={"K": pressure_pa},
+    )
+
+    assert report["catalog_pa_shadow_equal"] is False
+    assert report["catalog_pa_shadow_outcome"] == SHADOW_ABSENT_COMPARISON
+
+
+def test_fe_pure_component_sidecar_is_refused_for_rg_flux() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), u0_manifest=load_u0_manifest()
+    )
+
+    answer = catalog.resolve_batch(
+        {"process.cleaned_melt": {"FeO": 1.0}},
+        VapourResolveState(temperature_K=1600.0),
+        flux_activation_context=_rg_activation_context(),
+    ).channel("Fe")
+
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert answer.is_refused
+    assert "source_reactions" in answer.pressure.detail
+    assert "pure-component" in answer.pressure.detail
 
 
 def test_resolve_batch_preserves_reported_standard_state_mismatch() -> None:

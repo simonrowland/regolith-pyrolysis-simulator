@@ -1198,17 +1198,33 @@ def compare_live_shadow_to_batch_flux(
     )
 
     if batch is not None and not resolution_error:
-        catalog_vs_live = compare_legacy_vs_batch_flux_paths(
-            legacy_pressures_Pa=live,
-            batch_flux_pressures_Pa=catalog_pa_by_species,
-            legacy_flux_active_species_ids=tuple(live),
-            batch_flux_active_species_ids=tuple(batch.flux_active_species_ids),
-            batch_present=True,
+        shared_reported_activity = any(
+            species_id in catalog_pa_by_species
+            and answer.source_reaction_activity is not None
+            and answer.source_reaction_activity.derivation.get("algebra")
+            == "a_source = a_reported"
+            for species_id, answer in batch.channels_by_species.items()
         )
-        comparison["catalog_pa_shadow_equal"] = catalog_vs_live["shadow_equal"]
-        comparison["catalog_pa_shadow_outcome"] = catalog_vs_live[
-            "shadow_outcome"
-        ]
+        if shared_reported_activity:
+            # The catalog pressure reuses the backend-reported activity that
+            # produced the legacy pressure. Numeric agreement proves the
+            # plumbing matches; it is not an independent physics comparison.
+            comparison["catalog_pa_shadow_equal"] = False
+            comparison["catalog_pa_shadow_outcome"] = SHADOW_ABSENT_COMPARISON
+        else:
+            catalog_vs_live = compare_legacy_vs_batch_flux_paths(
+                legacy_pressures_Pa=live,
+                batch_flux_pressures_Pa=catalog_pa_by_species,
+                legacy_flux_active_species_ids=tuple(live),
+                batch_flux_active_species_ids=tuple(batch.flux_active_species_ids),
+                batch_present=True,
+            )
+            comparison["catalog_pa_shadow_equal"] = catalog_vs_live[
+                "shadow_equal"
+            ]
+            comparison["catalog_pa_shadow_outcome"] = catalog_vs_live[
+                "shadow_outcome"
+            ]
     return comparison
 
 

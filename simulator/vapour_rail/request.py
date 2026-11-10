@@ -1189,6 +1189,7 @@ def refusal_closure(
     | None = None,
     catalog_species: Mapping[str, Any] | None = None,
     activity_provider: CondensedPhaseActivityProvider | None = None,
+    flux_activation_context: FluxActivationContext | None = None,
 ) -> RefusalClosureResult:
     """Monotone refusal closure to a fixed point (DESIGN-REV5 §4.2 step 2).
 
@@ -1212,6 +1213,18 @@ def refusal_closure(
     candidates_map = dict(provider_candidates_by_species or {})
     catalog_species = catalog_species or {}
     activity_provider = activity_provider or CondensedPhaseActivityProvider()
+    rg_manifest_activation = (
+        flux_activation_context is not None
+        and flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_RG_MANIFEST
+    )
+    supplied_compound_state = (
+        state.extras.get("compound_bearing_state") if state is not None else None
+    )
+    compound_bearing_state = (
+        supplied_compound_state
+        if rg_manifest_activation and isinstance(supplied_compound_state, bool)
+        else rg_manifest_activation
+    )
     state_identity_error: str | None = None
     try:
         state_identity = _state_fingerprint(state)
@@ -1290,6 +1303,22 @@ def refusal_closure(
         source_reaction_activity_shadow: SourceReactionActivity | None = None
         typed_activity_evaluation: Mapping[str, Any] | None = None
         declaration: ActivityInputDeclaration | None = None
+        if (
+            rule.species_id == "Fe"
+            and rule.source_reaction_id is None
+            and rg_manifest_activation
+        ):
+            # The Fe row has no source_reactions[].activity_input and its live
+            # catalog path selects a pure-component sidecar. The low-confidence
+            # melt fit is structurally activity-dependent, so that sidecar
+            # cannot supply an RG-1 melt pressure without a declared activity.
+            return _make_refusal(
+                rule,
+                REFUSAL_MISSING_CHANNEL_CONTRACT,
+                "Fe melt pressure has no source_reactions[].activity_input; "
+                "the pure-component sidecar cannot stand in for the missing "
+                "melt activity term",
+            )
         # b-149 instance 7: source_activity defaulted to 1.0 before the
         # activity-dependent branch (REAL under b-119). Pure-component
         # (exponent==0) legitimately uses a=1; activity-dependent paths
@@ -1381,6 +1410,7 @@ def refusal_closure(
                         reported_activity_evidence_ref=evidence_ref,
                         reported_activity_standard_state=reported_standard_state,
                         reported_activity_provenance=reported_provenance,
+                        compound_bearing_state=compound_bearing_state,
                     )
                 )
                 if source_reaction_activity.verdict is ActivityVerdictKind.REFUSAL:
@@ -1585,11 +1615,7 @@ def refusal_closure(
                 if compiled is not None
                 else {}
             )
-            alpha_ref = (
-                f"alpha:{rule.species_id}"
-                if alpha
-                else f"alpha_missing:{rule.species_id}"
-            )
+            alpha_ref = f"alpha:{rule.species_id}"
             alpha_authority_status = (
                 str(alpha.get("status") or "")
                 if isinstance(alpha, Mapping)
@@ -1629,12 +1655,23 @@ def refusal_closure(
                 pressure = PressureUpperBound(
                     pa=float(pressure_pa), evidence_ref=bound_evidence
                 )
+            else:
+                pressure = PressureValue(pa=float(pressure_pa))
+
+            if not alpha:
+                flux = FluxRefusal(
+                    code="missing_evaporation_alpha",
+                    detail=(
+                        "positive pressure is available, but evaporation alpha "
+                        f"is missing for {rule.species_id}; flux is refused"
+                    ),
+                )
+            elif activity_is_bound or alpha_is_diagnostic_bound:
                 flux = FluxDiagnosticUpperBound(
                     alpha_ref=alpha_ref,
                     reaction_id=rule.source_reaction_id,
                 )
             else:
-                pressure = PressureValue(pa=float(pressure_pa))
                 flux = FluxEligible(
                     alpha_ref=alpha_ref,
                     reaction_id=rule.source_reaction_id,
@@ -2591,6 +2628,7 @@ def resolve_vapour_batch(
         provider_candidates_by_species=provider_candidates_by_species,
         catalog_species=catalog_species,
         activity_provider=activity_provider,
+        flux_activation_context=flux_activation_context,
     )
     answers = dict(closure.answers)
 
