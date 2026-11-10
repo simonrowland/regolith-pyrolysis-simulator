@@ -76,10 +76,11 @@ from simulator.optimize.objective import (
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
     objective_definitions,
-    objective_importance_evidence,
     objective_scores,
     objective_value_for_metric,
     pareto_front,
+    profile_scored_at_fidelity,
+    unrenormalized_study_scalar_weights,
 )
 from simulator.optimize.pool import (
     DEFAULT_EVAL_TIMEOUT_SECONDS,
@@ -593,6 +594,7 @@ def run(
             config.profile,
             expected_feedstock=config.feedstock,
             schema=base_schema,
+            scoring_fidelity=fidelity,
         )
     except ProfileValidationError as exc:
         if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
@@ -611,13 +613,11 @@ def run(
         profile_pinned_paths=_profile_pinned_paths(resolved_profile),
         cli_pinned_paths=_cli_pinned_paths(pinned_paths),
     )
-    definitions = objective_definitions(resolved_profile)
-    importance_by_metric = {
-        row.metric: row.weight for row in objective_importance_evidence(resolved_profile)
-    }
-    objective_weights = tuple(
-        importance_by_metric[definition.metric] for definition in definitions
-    )
+    # d-377: score the campaign this fidelity executes. The digested profile
+    # passed to evaluate stays the authored one.
+    scoring_profile = profile_scored_at_fidelity(resolved_profile, fidelity)
+    definitions = objective_definitions(scoring_profile)
+    objective_weights = unrenormalized_study_scalar_weights(scoring_profile)
     two_phase = _resolve_two_phase_config(resolved_profile, two_phase_certify)
     _validate_inputs(config, resolved_profile)
     try:
@@ -656,7 +656,7 @@ def run(
     if requested_topologies is None:
         active_strategy = resolve_strategy(
             config.strategy,
-            profile=resolved_profile,
+            profile=scoring_profile,
             seed=config.seed,
             schema=active_schema,
             parallel=config.parallel,
@@ -670,7 +670,7 @@ def run(
             or isinstance(config.strategy, StagedStrategy)
         ):
             raise ValueError("topologies are only supported for staged strategy")
-        single_topology_profile = _profile_without_staged_topologies(resolved_profile)
+        single_topology_profile = _profile_without_staged_topologies(scoring_profile)
         staged_strategies = tuple(
             StagedStrategy(
                 active_schema,
@@ -1197,11 +1197,13 @@ def run_certify(
         seed=0,
         per_eval_timeout_seconds=resolve_eval_timeout_seconds(per_eval_timeout_seconds),
     )
+    scoring_fidelity = str(canonical_backend_name(fidelity))
     try:
         resolved_profile = resolve_profile(
             config.profile,
             expected_feedstock=config.feedstock,
             schema=base_schema,
+            scoring_fidelity=scoring_fidelity,
         )
     except ProfileValidationError as exc:
         if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
@@ -1217,7 +1219,8 @@ def run_certify(
         profile_pinned_paths=_profile_pinned_paths(resolved_profile),
         cli_pinned_paths=_cli_pinned_paths(pinned_paths),
     )
-    definitions = objective_definitions(resolved_profile)
+    scoring_profile = profile_scored_at_fidelity(resolved_profile, scoring_fidelity)
+    definitions = objective_definitions(scoring_profile)
     _validate_inputs(config, resolved_profile)
     try:
         active_constraints = _constraints_for_profile(resolved_profile)
@@ -1763,10 +1766,12 @@ def _load_study_journal(
     feedstock = str(manifest.get("feedstock_id") or profile_payload.get("feedstock") or "")
     if not feedstock:
         raise StudyReplayError("study manifest missing feedstock_id")
+    scoring_fidelity = str(canonical_backend_name(str(manifest.get("fidelity"))))
     resolved_profile = resolve_profile(
         profile_payload,
         expected_feedstock=feedstock,
         schema=base_schema,
+        scoring_fidelity=scoring_fidelity,
     )
     manifest_identity = _mapping_or_empty(manifest.get("search_space_identity"))
     active_schema = _schema_with_pinned_paths(
@@ -1806,7 +1811,7 @@ def _load_study_journal(
         profile=resolved_profile,
         feedstock=feedstock,
         strategy=strategy_key,
-        fidelity=str(canonical_backend_name(str(manifest.get("fidelity")))),
+        fidelity=scoring_fidelity,
         parallel=int(manifest_scalars["parallel"]),
         budget=int(manifest_scalars["budget"]),
         out_dir=root,
@@ -1830,10 +1835,11 @@ def _load_study_journal(
         search_space_identity=search_space_identity,
         requested_topologies=requested_topologies,
     )
+    scoring_profile = profile_scored_at_fidelity(resolved_profile, scoring_fidelity)
     if requested_topologies is None:
         active_strategy = resolve_strategy(
             strategy_key,
-            profile=resolved_profile,
+            profile=scoring_profile,
             seed=config.seed,
             schema=active_schema,
             parallel=config.parallel,
@@ -1842,7 +1848,7 @@ def _load_study_journal(
         )
         staged_strategies: tuple[StagedStrategy, ...] = ()
     else:
-        single_topology_profile = _profile_without_staged_topologies(resolved_profile)
+        single_topology_profile = _profile_without_staged_topologies(scoring_profile)
         staged_strategies = tuple(
             StagedStrategy(
                 active_schema,
@@ -1857,7 +1863,7 @@ def _load_study_journal(
 
     warnings_seen.extend(_strategy_manifest_warnings(manifest, active_strategy))
     events = _load_replay_events(events_path)
-    definitions = objective_definitions(resolved_profile)
+    definitions = objective_definitions(scoring_profile)
     records: list[StudyRecord] = []
     pending_candidates: list[Candidate] = []
     topology_cursor = 0
@@ -2897,6 +2903,7 @@ def resolve_profile(
     *,
     expected_feedstock: str | None = None,
     schema: RecipeSchema | None = None,
+    scoring_fidelity: str | None = None,
 ) -> Mapping[str, Any]:
     if isinstance(profile, str):
         try:
@@ -2910,6 +2917,7 @@ def resolve_profile(
             expected_feedstock=expected_feedstock,
             source=f"<profile:{profile}>",
             schema=schema,
+            scoring_fidelity=scoring_fidelity,
         )
         _requested_staged_topologies(validated, None)
         return validated
@@ -2920,6 +2928,7 @@ def resolve_profile(
         expected_feedstock=expected_feedstock,
         source=getattr(profile, "source", "<profile>"),
         schema=schema,
+        scoring_fidelity=scoring_fidelity,
     )
     _requested_staged_topologies(validated, None)
     return validated

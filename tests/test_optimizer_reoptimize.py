@@ -59,7 +59,7 @@ PROFILE = {
     ],
     "constraints": {"gates": ["delivered_stream_purity"]},
     "run": {
-        "campaign": "C0",
+        "campaign": "C2A_continuous",
         "hours": 1,
         "mass_kg": 1000.0,
         "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,

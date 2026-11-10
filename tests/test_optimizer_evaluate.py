@@ -7,6 +7,7 @@ import math
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 from engines.alphamelts import AlphaMELTSProvider
 from engines.alphamelts.parser import diagnostics_to_equilibrium
@@ -30,7 +31,7 @@ from simulator.chemistry.kernel import (
     ProviderRegistry,
 )
 from simulator.condensation import KnudsenRegimeRefusal
-from simulator.config import load_config_bundle
+from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.core import PoisonedHourError, PoisonedHourState
 from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.recipe_errors import MalformedRecipeError
@@ -154,6 +155,14 @@ PROFILE = {
         }
     ],
 }
+
+
+def _product_claiming_profile() -> dict:
+    """C2A claims SiO2 glass and O2, so those rows stay on the score."""
+
+    profile = copy.deepcopy(PROFILE)
+    profile["run"] = {**profile["run"], "campaign": "C2A_continuous"}
+    return profile
 
 
 @dataclass
@@ -1745,6 +1754,28 @@ def _kernel_curve(
     }
 
 
+@pytest.fixture(autouse=True)
+def _claim_ceramic_rump_for_scorer_mechanics(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Terminal ceramic-rump rows have no shipped product claim.
+
+    These tests exercise the scorer. Eligibility is pinned in
+    test_optimizer_profile_smoke_labels, which does not use this patch.
+    A test that replaces campaign_product_claim_keys still wins: its
+    monkeypatch runs after this fixture.
+    """
+
+    real = objective_module.campaign_product_claim_keys
+
+    def _with_ceramic(campaign_id: object) -> frozenset[str]:
+        return frozenset(real(campaign_id)) | frozenset({"refractory_ceramic_rump"})
+
+    monkeypatch.setattr(
+        objective_module,
+        "campaign_product_claim_keys",
+        _with_ceramic,
+    )
+
+
 def _composition_eval_profile(
     pool: str,
     *,
@@ -1791,6 +1822,17 @@ def _composition_eval_profile(
             }
         ],
     }
+    # A composition-only vector needs a campaign that claims this pool's product.
+    # Melt pools are the glass body (C2B's CMAS_glass). Silica and captured
+    # products use C2A. Terminal ceramic rump has no shipped claim; the
+    # module autouse adds that key so these tests can reach the scorer.
+    # Copy run so the shared PROFILE stays C0.
+    campaign = (
+        "C2B"
+        if pool in {"residual_rump_at_stop", "cleaned_melt_at_stage0_exit"}
+        else "C2A_continuous"
+    )
+    profile["run"] = {**PROFILE["run"], "campaign": campaign}
     return profile
 
 
@@ -2474,11 +2516,12 @@ def test_failed_runtime_backend_prefixed_message_is_engine_bug() -> None:
 
 
 def test_completed_infeasible_run_retains_derived_objectives() -> None:
+    profile = _product_claiming_profile()
     feasible = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(_execution()),
     )
 
@@ -2500,14 +2543,14 @@ def test_completed_infeasible_run_retains_derived_objectives() -> None:
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(mixed_stream_execution),
     )
     same_run_without_purity_gate = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(mixed_stream_execution),
         constraints=PhysicsConstraintSet(active_gates=("knudsen_viscous",)),
     )
@@ -2523,6 +2566,172 @@ def test_completed_infeasible_run_retains_derived_objectives() -> None:
     )
     assert infeasible.failing_gates == ("delivered_stream_purity",)
     assert infeasible.feasibility_margins["delivered_stream_purity"].margin < 0.0
+
+
+# INVARIANT: a scored result's unclaimed-product notice is the notice of the
+# campaign that produced that result's objective vector (EvalSpec.campaign).
+# It is never the authored profile's notice when a fidelity overlay changes
+# the campaign. Every path that publishes a vector goes through one scorer,
+# which builds the vector and the notice from the same profile.
+_SCORED_RESULT_BRANCHES = (
+    "feasible",
+    "infeasible",
+    "out_of_domain_scored",
+)
+# Claim-distinct setpoint campaigns this stub run admits. Claims below are
+# read from setpoints ``products``, not from the production claim helper.
+_OVERLAY_CAMPAIGNS = ("C0", "C2A_continuous", "C2B")
+_GLASS_CLAIM_KEY = "SiO2_glass"
+_OXYGEN_CLAIM_KEY = "O2"
+_DECLARED_OBJECTIVE_ROWS = (
+    ("pure_silica_glass_kg", 0.4, _GLASS_CLAIM_KEY),
+    ("oxygen_kg", 0.3, _OXYGEN_CLAIM_KEY),
+    (ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC, 0.15, None),
+    ("duration_h", 0.15, None),
+)
+
+
+def _setpoint_product_keys(campaign: str) -> frozenset[str]:
+    loaded = yaml.safe_load((DEFAULT_DATA_DIR / "setpoints.yaml").read_text())
+    products = loaded["campaigns"][campaign].get("products") or {}
+    return frozenset(str(key) for key in products)
+
+
+def _literal_scored_metrics_and_note(
+    evaluated: str,
+) -> tuple[tuple[str, ...], str | None]:
+    """Vector membership and notice text from the declared rows and the YAML.
+
+    withheld_weight_fraction = sum(withheld weights) / sum(all declared weights).
+    Retained weights stay at the declared values. Operational rows have no
+    product key and are always scored.
+    """
+
+    claim_keys = _setpoint_product_keys(evaluated)
+    scored: list[str] = []
+    withheld: list[tuple[str, float]] = []
+    for metric, weight, product_key in _DECLARED_OBJECTIVE_ROWS:
+        if product_key is None or product_key in claim_keys:
+            scored.append(metric)
+            continue
+        withheld.append((metric, weight))
+    if not withheld:
+        return tuple(scored), None
+    total = math.fsum(weight for _metric, weight, _key in _DECLARED_OBJECTIVE_ROWS)
+    withheld_weight = math.fsum(weight for _metric, weight in withheld)
+    fraction = withheld_weight / total
+    parts = [
+        (
+            f"{metric} weight={format(weight, '.12g')} "
+            "reason=campaign_does_not_claim_product"
+        )
+        for metric, weight in withheld
+    ]
+    note = (
+        "campaign_does_not_claim_product: "
+        + "; ".join(parts)
+        + f"; withheld_weight_fraction={format(fraction, '.12g')}"
+    )
+    return tuple(scored), note
+
+
+def _fidelity_overlay_profile(authored: str, evaluated: str) -> dict:
+    profile = copy.deepcopy(PROFILE)
+    profile["run"] = {**profile["run"], "campaign": authored}
+    profile["fidelities"] = {
+        "fast": {
+            "backend_name": "internal-analytical",
+            "hours": 1,
+            "campaign": evaluated,
+        }
+    }
+    return profile
+
+
+def _scored_branch_execution(branch: str) -> SimpleNamespace:
+    if branch == "feasible":
+        return _execution()
+    if branch == "infeasible":
+        return _execution(trace=_trace(mixed_stream=True))
+    if branch == "out_of_domain_scored":
+        return _execution(
+            backend_status="out_of_domain",
+            backend_diagnostics=_crash_diagnostics(),
+            freeze_curve=_kernel_curve(),
+        )
+    raise AssertionError(branch)
+
+
+@pytest.mark.parametrize("branch", _SCORED_RESULT_BRANCHES)
+@pytest.mark.parametrize("authored", _OVERLAY_CAMPAIGNS)
+@pytest.mark.parametrize("evaluated", _OVERLAY_CAMPAIGNS)
+def test_scored_withhold_notice_follows_evaluated_campaign(
+    branch: str,
+    authored: str,
+    evaluated: str,
+) -> None:
+    """Every scored evaluate path, every authored/fidelity campaign pair.
+
+    The three branches are the only evaluate results that publish an
+    objective vector: the feasible return, the completed physics-gate
+    failure, and the earned out-of-domain score.
+    """
+
+    profile = _fidelity_overlay_profile(authored, evaluated)
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(_scored_branch_execution(branch)),
+    )
+
+    assert profile["run"]["campaign"] == authored
+    assert result.eval_spec is not None
+    assert result.eval_spec.campaign == evaluated
+    assert result.objectives is not None
+    if branch == "infeasible":
+        assert result.feasible is False
+        assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+        assert result.failing_gates == ("delivered_stream_purity",)
+    else:
+        assert result.feasible is True
+        assert result.failure_category is None
+
+    expected_metrics, expected_note = _literal_scored_metrics_and_note(evaluated)
+    assert tuple(result.objectives.as_mapping()) == expected_metrics
+    withhold_notes = [
+        note
+        for note in result.notes
+        if note.startswith("campaign_does_not_claim_product:")
+    ]
+    if expected_note is None:
+        assert withhold_notes == []
+    else:
+        assert withhold_notes == [expected_note]
+    for metric, _weight, product_key in _DECLARED_OBJECTIVE_ROWS:
+        if product_key is None or product_key in _setpoint_product_keys(evaluated):
+            continue
+        assert metric not in result.objectives.as_mapping()
+
+
+def test_withhold_notice_is_built_only_inside_the_scoring_chokepoint() -> None:
+    """A new scoring call cannot attach a notice from a different profile.
+
+    ``compute_objectives`` and the withhold-note helper are called together
+    in ``_score_executed_campaign`` and nowhere else in the evaluator.
+    """
+
+    source = inspect.getsource(evaluate_module)
+    assert source.count("compute_objectives(") == 1
+    assert source.count("unclaimed_product_withheld_objective_note(") == 1
+    assert "_notes_with_unclaimed_product_withhold" not in source
+    score_source = inspect.getsource(evaluate_module._score_executed_campaign)
+    assert "compute_objectives(" in score_source
+    assert "unclaimed_product_withheld_objective_note(" in score_source
+    # The feasible return, the infeasible publisher, and the earned
+    # out-of-domain return. The definition itself is the fourth hit.
+    assert source.count("_notes_for_executed_campaign_score(") == 4
 
 
 def _authoritative_sio_carrier() -> dict[str, object]:
@@ -2590,11 +2799,12 @@ def _switched_silica_snapshots(
 
 
 def test_silica_objective_separates_route_from_authority_and_refuses_unavailable() -> None:
+    profile = _product_claiming_profile()
     unqualified = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(_execution()),
     )
     assert unqualified.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(0.0)
@@ -2609,7 +2819,7 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(qualified_execution),
     )
     assert qualified.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
@@ -2626,7 +2836,7 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(flagged_execution),
     )
     assert flagged.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
@@ -2649,7 +2859,7 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=FakeExecutor(refused_execution),
     )
     assert refused.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
@@ -2708,7 +2918,7 @@ def test_pO2_enforcement_rows_surface_in_optimizer_result_artifact() -> None:
 
 
 def test_objective_definitions_keep_profile_order_as_ordinal() -> None:
-    definitions = objective_definitions(PROFILE)
+    definitions = objective_definitions(_product_claiming_profile())
 
     assert [(definition.metric, definition.sense, definition.ordinal) for definition in definitions] == [
         ("pure_silica_glass_kg", "maximize", 0),
@@ -4771,7 +4981,7 @@ def test_out_of_domain_earned_rump_with_wall_deposit_is_excluded_by_coating_gate
         "completeness_min": {"Si": 1.0e-12},
     }
     target["score_weights"] = {"extraction": 0.5, "composition": 0.5}
-    profile["run"] = {**PROFILE["run"], "backend_name": "alphamelts"}
+    profile["run"] = {**profile["run"], "backend_name": "alphamelts"}
     profile["fidelities"] = {"high": {"backend_name": "alphamelts", "hours": 1}}
     execution = _execution(
         trace=trace,

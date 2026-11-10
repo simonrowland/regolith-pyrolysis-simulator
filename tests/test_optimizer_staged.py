@@ -76,7 +76,7 @@ PROFILE = {
         },
     ],
     "constraints": {"gates": ["delivered_stream_purity"]},
-    "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "internal-analytical"},
+    "run": {"campaign": "C2A_continuous", "hours": 1, "mass_kg": 1000.0, "backend_name": "internal-analytical"},
     "fidelities": {"internal-analytical": {"backend_name": "internal-analytical", "hours": 1}},
     "seed_recipes": [
         {

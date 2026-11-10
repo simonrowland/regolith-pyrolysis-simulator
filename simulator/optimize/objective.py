@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import replace
+from functools import lru_cache
 import fnmatch
 import hashlib
 import math
@@ -20,7 +21,7 @@ from simulator.cost_parameters import (
     CostParameters,
     cost_parameters_from_mapping,
 )
-from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.config import DEFAULT_DATA_DIR, _load_setpoints_file, load_config_bundle
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.physics import (
@@ -96,6 +97,94 @@ _MASS_OBJECTIVE_METRICS = frozenset(
         "oxygen_vented_kg",
     }
 )
+# INVARIANT: a product objective is scored only when the executed campaign's
+# setpoints ``products`` claim THAT objective's product. The executed campaign
+# is the fidelity overlay on ``profile.run`` (the same value EvalSpec.campaign
+# stores). Otherwise the objective is withheld from every scoring path
+# (objective definitions, compute_objectives, strategy metrics, and the study
+# scalar). It is never entered as 0.0. Retained weights stay declared.
+# The notice names each withheld objective, its weight, the reason
+# campaign_does_not_claim_product, and the withheld weight fraction.
+# Eligibility is those product-claim keys, never description text.
+# A composition target is eligible only for its own pool's product. For
+# captured_products, every extracted species must be claimed.
+# A dynamic ``{species}_kg`` row is the product-ledger species ``species``.
+# It is claimed only when that same key is in ``products``. ``native_Fe``
+# does not claim ``Fe``. The silica extract map does not claim ``Si_kg``.
+# An energy-per-product intensity is not a ledger species. Its denominator
+# is ``metals_plus_O2.class_total_kg``, the same product as
+# ``metals_plus_o2_kg``, so it is scored only when the campaign claims ``O2``
+# and a metal key (``Fe``, ``Mg``, or ``Ti``). Otherwise it is withheld
+# with the same notice. It is never a silent 0.0.
+# This changes the objective vector an evaluation returns. EvalSpec keys are
+# VERSION-scoped (evalspec.py: behaviour-changing code edits require a
+# VERSION bump). corpus_version is the data-corpus lever only and stays at
+# the green tag: a corpus bump would expire the real-backend engine cache
+# for a non-chemistry change. Do not add a key dimension or a version
+# integer. VERSION is train-owned. The landing offer asks the train to bump
+# VERSION, or to carry b-080 in the next release, so pre-fix objective
+# vectors miss. ``_scoring_objective_rows`` does not change the cache key.
+# C0 claims volatiles and native_Fe only. native_Fe is nanophase magnetic
+# separation, not the pyrolysis metal product, so it authorizes no named
+# metal metric and no energy-per-product intensity here.
+# File load is not an evaluation. The remaining-weight refusal runs only
+# once a fidelity has selected the executed campaign.
+_FINAL_PRODUCT_OBJECTIVE_METRICS = frozenset(
+    _MASS_OBJECTIVE_METRICS | {SSO2_OWNER_RECIPE_ID}
+)
+_C0_WITHHOLD_REASON = "campaign_does_not_claim_product"
+# Same keys as profiles._SETPOINT_CAMPAIGN_ALIASES. Duplicated because that
+# module imports this one.
+_SETPOINT_CAMPAIGN_ALIASES = MappingProxyType({
+    "C2A": "C2A_continuous",
+    "C2A_staged": "C2A_staged",
+    "C3_K": "C3",
+    "C3_NA": "C3",
+})
+_METAL_PRODUCT_CLAIM_KEYS = frozenset({"Fe", "Mg", "Ti"})
+_OBJECTIVE_PRODUCT_CLAIM_KEYS = MappingProxyType({
+    "pure_silica_glass_kg": frozenset({"SiO2_glass"}),
+    "industrial_mixed_glass_kg": frozenset({
+        "CMAS_glass",
+        "industrial_mixed_glass",
+    }),
+    "refractory_ceramic_rump_kg": frozenset({"refractory_ceramic_rump"}),
+    "metals_total_kg": _METAL_PRODUCT_CLAIM_KEYS,
+    "O2_kg": frozenset({"O2"}),
+    "o2_kg": frozenset({"O2"}),
+    "oxygen_kg": frozenset({"O2"}),
+    "oxygen_stored_kg": frozenset({"O2"}),
+    "oxygen_vented_kg": frozenset({"O2"}),
+    SSO2_OWNER_RECIPE_ID: frozenset({"SiO2_glass"}),
+})
+# Composition eligibility is the target's own product, not any claim key.
+# Melt pools are one glass body: either glass key authorizes that pool.
+# Terminal slag is the ceramic rump only. Stage-3 silica is SiO2_glass.
+# captured_products is not here: every extracted species must be claimed.
+_POOL_PRODUCT_CLAIM_KEYS = MappingProxyType({
+    "captured_stage_3_silica": frozenset({"SiO2_glass"}),
+    "terminal_rump_earned": frozenset({"refractory_ceramic_rump"}),
+    "residual_rump_at_stop": frozenset({
+        "CMAS_glass",
+        "industrial_mixed_glass",
+    }),
+    "cleaned_melt_at_stage0_exit": frozenset({
+        "CMAS_glass",
+        "industrial_mixed_glass",
+    }),
+})
+# Si metal is not a setpoints product. C2A's silica claim is the Si product.
+# Al and Ca have no setpoints product key, so extracting either is withheld.
+_EXTRACT_SPECIES_CLAIM_KEYS = MappingProxyType({
+    "Na": frozenset({"Na"}),
+    "K": frozenset({"K"}),
+    "Fe": frozenset({"Fe"}),
+    "Mg": frozenset({"Mg"}),
+    "O2": frozenset({"O2"}),
+    "Si": frozenset({"SiO2_glass"}),
+    "Al": frozenset(),
+    "Ca": frozenset(),
+})
 PRODUCT_CLASS_MASS_METRIC_PATHS = MappingProxyType(
     {
         "industrial_mixed_glass_kg": (
@@ -1327,8 +1416,392 @@ def _require_objective_keys(
         )
 
 
-def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefinition, ...]:
+def _merged_run_for_fidelity(
+    profile: Mapping[str, Any],
+    fidelity: str | None,
+) -> dict[str, Any]:
+    """``profile.run`` with one fidelity block laid over it.
+
+    This is the merge ``_run_options`` uses. ``fidelity is None`` does not
+    consult ``fidelities``. The fidelity name is used as the dict key: callers
+    that canonicalize backend aliases must do so before this lookup.
+    """
+
+    merged = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
+    if fidelity is None:
+        return merged
+    fidelity_options = profile.get("fidelities", {})
+    if isinstance(fidelity_options, Mapping):
+        raw_selected = fidelity_options.get(fidelity, {})
+        if isinstance(raw_selected, Mapping):
+            merged.update(dict(raw_selected))
+    return merged
+
+
+def _campaign_id_token(campaign: object) -> str:
+    """Campaign id as EvalSpec stores it. A blank string stays blank."""
+
+    if isinstance(campaign, str):
+        return campaign
+    return str(campaign)
+
+
+def executed_campaign_id(
+    profile: Mapping[str, Any],
+    *,
+    fidelity: str | None = None,
+) -> str:
+    """Campaign the run executes.
+
+    Fidelity options override ``profile.run``. A missing campaign is ``C0``,
+    matching ``_run_options``. A blank string is not rewritten to ``C0``;
+    claim lookup already treats a blank id as no claim.
+    """
+
+    merged = _merged_run_for_fidelity(profile, fidelity)
+    return _campaign_id_token(merged.get("campaign", "C0"))
+
+
+def profile_with_executed_campaign(
+    profile: Mapping[str, Any],
+    campaign_id: str,
+) -> Mapping[str, Any]:
+    """Return ``profile`` with ``run.campaign`` set to ``campaign_id``.
+
+    The same object is returned when that campaign is already set, so a digest
+    of the authored profile is left alone. Otherwise this is a shallow copy
+    with a new ``run`` dict. The authored profile is not mutated.
+    """
+
+    run = profile.get("run")
+    if isinstance(run, Mapping) and run.get("campaign") == campaign_id:
+        return profile
+    merged = dict(profile)
+    new_run = dict(run) if isinstance(run, Mapping) else {}
+    new_run["campaign"] = campaign_id
+    merged["run"] = new_run
+    return merged
+
+
+def profile_scored_at_fidelity(
+    profile: Mapping[str, Any],
+    fidelity: str | None,
+) -> Mapping[str, Any]:
+    """Scoring copy whose run campaign is the one ``fidelity`` executes."""
+
+    return profile_with_executed_campaign(
+        profile,
+        executed_campaign_id(profile, fidelity=fidelity),
+    )
+
+
+@lru_cache(maxsize=1)
+def _campaign_product_claims_by_id() -> Mapping[str, frozenset[str]]:
+    loaded = _load_setpoints_file(DEFAULT_DATA_DIR / "setpoints.yaml")
+    campaigns = loaded.get("campaigns")
+    claims: dict[str, frozenset[str]] = {}
+    if isinstance(campaigns, Mapping):
+        for name, cfg in campaigns.items():
+            products = cfg.get("products") if isinstance(cfg, Mapping) else None
+            if isinstance(products, Mapping):
+                claims[str(name)] = frozenset(str(key) for key in products)
+            else:
+                claims[str(name)] = frozenset()
+    return MappingProxyType(claims)
+
+
+def campaign_product_claim_keys(campaign_id: str | None) -> frozenset[str]:
+    """Product keys declared on ``campaigns.<id>.products`` in setpoints.
+
+    An absent, blank, or unknown campaign claims nothing. Description text is
+    not consulted.
+    """
+
+    if not isinstance(campaign_id, str) or not campaign_id.strip():
+        return frozenset()
+    key = _SETPOINT_CAMPAIGN_ALIASES.get(campaign_id.strip(), campaign_id.strip())
+    return _campaign_product_claims_by_id().get(key, frozenset())
+
+
+def _profile_product_claim_keys(profile: Mapping[str, Any]) -> frozenset[str]:
+    # No fidelity argument: the caller stamps the executed campaign onto
+    # ``profile.run`` first. A direct call uses the authored run, or C0 when
+    # that run names no campaign.
+    return campaign_product_claim_keys(executed_campaign_id(profile))
+
+
+def _ledger_species_objective(metric: str) -> str | None:
+    """Species of a product-ledger ``{species}_kg`` objective, if this is one.
+
+    ``_metric_value`` reads ``product_ledger[species]`` for every remaining
+    ``*_kg`` metric. Named class masses are not ledger species. An
+    energy-per-product intensity ends in ``_kg`` and is not a ledger species.
+    Its claim is the denominator product, decided in
+    ``campaign_claims_product_objective``. The species string is the
+    product-claim key. No alias is applied here.
+    """
+
+    canonical = canonical_objective_metric(metric)
+    if _energy_per_product_metric(canonical) is not None:
+        return None
+    if not canonical.endswith("_kg"):
+        return None
+    if canonical in _MASS_OBJECTIVE_METRICS:
+        return None
+    species = canonical[:-3]
+    if not species:
+        return None
+    return species
+
+
+def _metric_requires_product_claim(metric: str) -> bool:
+    canonical = canonical_objective_metric(metric)
+    # Energy-per-product intensities require the denominator product's claim.
+    # Leaving them out here would score them on every campaign.
+    return (
+        canonical in _FINAL_PRODUCT_OBJECTIVE_METRICS
+        or canonical.startswith(COMPOSITION_TARGET_METRIC_PREFIX)
+        or _ledger_species_objective(canonical) is not None
+        or _energy_per_product_metric(canonical) is not None
+    )
+
+
+def _pool_names_for_target(target: Mapping[str, Any]) -> tuple[str, ...] | None:
+    pool = target.get("pool")
+    if not isinstance(pool, str) or not pool.strip():
+        return None
+    pools = [pool.strip()]
+    window = target.get("composition_window")
+    if isinstance(window, Mapping):
+        window_pool = window.get("pool")
+        if isinstance(window_pool, str) and window_pool.strip():
+            name = window_pool.strip()
+            if name not in pools:
+                pools.append(name)
+    return tuple(pools)
+
+
+def _captured_products_claimed(
+    target: Mapping[str, Any],
+    claim_keys: frozenset[str],
+) -> bool:
+    vector = target.get("species_vector")
+    if not isinstance(vector, Mapping):
+        return False
+    extracts = [
+        str(species)
+        for species, role in vector.items()
+        if role == "extract"
+    ]
+    if not extracts:
+        return False
+    for species in extracts:
+        required = _EXTRACT_SPECIES_CLAIM_KEYS.get(species)
+        # Missing, unknown, or empty (Al, Ca): that species has no product key.
+        if not required or not (claim_keys & required):
+            return False
+    return True
+
+
+def _pool_product_claimed(
+    pool: str,
+    target: Mapping[str, Any],
+    claim_keys: frozenset[str],
+) -> bool:
+    if pool == "captured_products":
+        return _captured_products_claimed(target, claim_keys)
+    required = _POOL_PRODUCT_CLAIM_KEYS.get(pool)
+    if not required:
+        return False
+    # Alternate keys of one product: either claim authorizes the pool.
+    return bool(claim_keys & required)
+
+
+def _composition_target_claimed(
+    target: object,
+    claim_keys: frozenset[str],
+) -> bool:
+    if not isinstance(target, Mapping):
+        return False
+    pools = _pool_names_for_target(target)
+    if pools is None:
+        return False
+    return all(
+        _pool_product_claimed(pool, target, claim_keys) for pool in pools
+    )
+
+
+def campaign_claims_product_objective(
+    metric: str,
+    claim_keys: frozenset[str],
+    *,
+    composition: bool = False,
+    target: Mapping[str, Any] | None = None,
+) -> bool:
+    """True when ``claim_keys`` authorize this product objective.
+
+    ``metals_plus_o2_kg`` is the combined class, so it needs both a metal
+    claim and ``O2``. One of the two is not that product. An
+    energy-per-product intensity uses that same class as its denominator
+    (``metals_plus_O2.class_total_kg``) and inherits the same requirement.
+    A composition target with no readable target is not claimed: any product
+    key does not authorize every composition objective. A ledger species row
+    is claimed only by that species key.
+    """
+
+    canonical = canonical_objective_metric(metric)
+    if composition or canonical.startswith(COMPOSITION_TARGET_METRIC_PREFIX):
+        if target is None:
+            return False
+        return _composition_target_claimed(target, claim_keys)
+    if (
+        canonical == "metals_plus_o2_kg"
+        or _energy_per_product_metric(canonical) is not None
+    ):
+        return "O2" in claim_keys and bool(claim_keys & _METAL_PRODUCT_CLAIM_KEYS)
+    required = _OBJECTIVE_PRODUCT_CLAIM_KEYS.get(canonical)
+    if required is not None:
+        return bool(claim_keys & required)
+    species = _ledger_species_objective(canonical)
+    if species is not None:
+        return species in claim_keys
+    return not _metric_requires_product_claim(canonical)
+
+
+def _metric_is_withheld_product(metric: str, claim_keys: frozenset[str]) -> bool:
+    if not _metric_requires_product_claim(metric):
+        return False
+    return not campaign_claims_product_objective(metric, claim_keys)
+
+
+def _row_is_withheld_product(raw: object, claim_keys: frozenset[str]) -> bool:
+    if not isinstance(raw, Mapping):
+        return False
+    metric = str(raw.get("metric", ""))
+    canonical = canonical_objective_metric(metric)
+    if objective_type(raw) == COMPOSITION_TARGET_TYPE or canonical.startswith(
+        COMPOSITION_TARGET_METRIC_PREFIX
+    ):
+        target = raw.get("target")
+        return not campaign_claims_product_objective(
+            metric,
+            claim_keys,
+            composition=True,
+            target=target if isinstance(target, Mapping) else None,
+        )
+    return _metric_is_withheld_product(metric, claim_keys)
+
+
+def _format_declared_number(value: float) -> str:
+    return format(value, ".12g")
+
+
+def _declared_objective_evidence(
+    profile: Mapping[str, Any],
+) -> tuple[ObjectiveImportanceEvidence, ...] | None:
     raw_objectives = profile.get("objectives")
+    if not isinstance(raw_objectives, (list, tuple)) or not raw_objectives:
+        return None
+    return objective_importance_evidence(profile)
+
+
+def _withheld_evidence_rows(
+    profile: Mapping[str, Any],
+) -> tuple[tuple[ObjectiveImportanceEvidence, ...], tuple[ObjectiveImportanceEvidence, ...]] | None:
+    evidence = _declared_objective_evidence(profile)
+    if evidence is None:
+        return None
+    raw_objectives = profile.get("objectives")
+    if not isinstance(raw_objectives, (list, tuple)):
+        return None
+    claim_keys = _profile_product_claim_keys(profile)
+    # Zip with the raw row. A metric-only check would withhold every
+    # composition objective once a missing target is not a claim, including
+    # one whose own product the campaign does claim.
+    withheld = tuple(
+        row
+        for row, raw in zip(evidence, raw_objectives, strict=True)
+        if _row_is_withheld_product(raw, claim_keys)
+    )
+    return evidence, withheld
+
+
+def unclaimed_product_withheld_weight_fraction(
+    profile: Mapping[str, Any],
+) -> float | None:
+    """Share of declared objective weight withheld from the study scalar.
+
+    withheld_weight_fraction = sum(withheld weights) / sum(all declared weights).
+    Retained weights stay at their declared values: they are not divided by
+    (1 - this fraction).
+    """
+
+    rows = _withheld_evidence_rows(profile)
+    if rows is None:
+        return None
+    evidence, withheld_rows = rows
+    if not withheld_rows:
+        return None
+    total = math.fsum(row.weight for row in evidence)
+    withheld = math.fsum(row.weight for row in withheld_rows)
+    return withheld / total
+
+
+def unclaimed_product_withheld_objective_note(
+    profile: Mapping[str, Any],
+) -> str | None:
+    """Visible notice: each withheld objective, its weight, and the reason."""
+
+    rows = _withheld_evidence_rows(profile)
+    if rows is None:
+        return None
+    _evidence, withheld_rows = rows
+    fraction = unclaimed_product_withheld_weight_fraction(profile)
+    if not withheld_rows or fraction is None:
+        return None
+    parts = [
+        (
+            f"{row.metric} weight={_format_declared_number(row.weight)} "
+            f"reason={_C0_WITHHOLD_REASON}"
+        )
+        for row in withheld_rows
+    ]
+    return (
+        f"{_C0_WITHHOLD_REASON}: "
+        + "; ".join(parts)
+        + f"; withheld_weight_fraction={_format_declared_number(fraction)}"
+    )
+
+
+def _scoring_objective_rows(profile: Mapping[str, Any]) -> Any:
+    """Rows that enter the scored vector.
+
+    One chokepoint: objective definitions, ``compute_objectives``, strategy
+    metrics, and the study scalar all read this list. A product objective the
+    executed campaign does not claim is dropped here. Composition rows are
+    judged by their own target product. There is no flag that puts one back,
+    and description text is not read.
+
+    Pre-fix objective vectors miss only after a VERSION bump. evalspec.py
+    scopes EvalSpec keys by the repo VERSION file: behaviour-changing code
+    edits require a VERSION bump. corpus_version stays at the green tag.
+    This function does not add a cache-key dimension.
+    """
+
+    raw_objectives = profile.get("objectives")
+    if not isinstance(raw_objectives, (list, tuple)):
+        return raw_objectives
+    claim_keys = _profile_product_claim_keys(profile)
+    return [
+        raw
+        for raw in raw_objectives
+        if not _row_is_withheld_product(raw, claim_keys)
+    ]
+
+
+def _objective_definitions_from_rows(
+    raw_objectives: Any,
+) -> tuple[ObjectiveDefinition, ...]:
     if not isinstance(raw_objectives, (list, tuple)) or not raw_objectives:
         raise ObjectiveProfileError("profile.objectives must be a non-empty list")
 
@@ -1353,6 +1826,38 @@ def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefiniti
             )
         )
     return tuple(definitions)
+
+
+def declared_objective_definitions(
+    profile: Mapping[str, Any],
+) -> tuple[ObjectiveDefinition, ...]:
+    """Every declared row, including products the campaign does not claim.
+
+    Profile validation uses this so a malformed withheld row is still refused.
+    Scoring uses ``objective_definitions``.
+    """
+
+    return _objective_definitions_from_rows(profile.get("objectives"))
+
+
+def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefinition, ...]:
+    raw_objectives = profile.get("objectives")
+    # Unit checks cover withheld rows too. A species row the campaign does
+    # not claim is still a malformed objective when its units are wrong.
+    if isinstance(raw_objectives, (list, tuple)) and raw_objectives:
+        declared_objective_definitions(profile)
+    scoring_rows = _scoring_objective_rows(profile)
+    if (
+        isinstance(raw_objectives, (list, tuple))
+        and raw_objectives
+        and isinstance(scoring_rows, (list, tuple))
+        and not scoring_rows
+    ):
+        raise ObjectiveProfileError(
+            "study scalar has no remaining objective weight after withholding "
+            "products the campaign does not claim"
+        )
+    return _objective_definitions_from_rows(scoring_rows)
 
 
 def _expected_objective_units(metric: str) -> str | None:
@@ -1424,6 +1929,33 @@ def objective_importance_evidence(
     return tuple(rows)
 
 
+def unrenormalized_study_scalar_weights(
+    profile: Mapping[str, Any],
+) -> tuple[float, ...]:
+    """Declared weights of the objectives that enter the study scalar.
+
+    Products the evaluated campaign does not claim are absent from
+    ``objective_definitions``. Their weight is not redistributed, and they
+    are not entered as a zero score.
+    """
+
+    definitions = objective_definitions(profile)
+    importance_by_metric = {
+        row.metric: row.weight for row in objective_importance_evidence(profile)
+    }
+    weights = tuple(
+        importance_by_metric[definition.metric] for definition in definitions
+    )
+    # A zero weight sum would publish a zero study score. Declared weights are
+    # positive, and withholding unclaimed products must leave at least one.
+    if not weights or math.fsum(weights) == 0.0:
+        raise ObjectiveProfileError(
+            "study scalar has no remaining objective weight after withholding "
+            "products the campaign does not claim"
+        )
+    return weights
+
+
 def compute_objectives(
     profile: Mapping[str, Any],
     run_execution: Any,
@@ -1434,7 +1966,7 @@ def compute_objectives(
 
     active_cost_parameters = cost_parameters_from_mapping(cost_parameters)
     definitions = objective_definitions(profile)
-    raw_objectives = profile.get("objectives")
+    raw_objectives = _scoring_objective_rows(profile)
     if not isinstance(raw_objectives, (list, tuple)):
         raise ObjectiveProfileError("profile.objectives must be a non-empty list")
     sim = getattr(run_execution, "simulator", run_execution)

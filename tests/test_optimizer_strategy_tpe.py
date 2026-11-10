@@ -777,22 +777,30 @@ def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> No
 
     strategy.tell(list(zip(candidates, results, strict=True)))
     trials = _trials_by_candidate(strategy)
-    metals_index = strategy.objective_metrics.index("metals_total_kg")
-    stored_metals = []
+    # C0 smoke profiles do not score final products. The cap still moves
+    # product_summary metals; see test_lunar_highland_60_hour_horizon_changes_extracted_metals.
+    for withheld in (
+        "metals_total_kg",
+        "pure_silica_glass_kg",
+        "industrial_mixed_glass_kg",
+        "oxygen_kg",
+        "sso2_pn2_fe_drain_silica",
+    ):
+        assert withheld not in strategy.objective_metrics
+    duration_index = strategy.objective_metrics.index("duration_h")
     for candidate, result in zip(candidates, results, strict=True):
         trial = trials[candidate.id]
         assert trial.state.name == "COMPLETE"
         assert trial.values is not None
-        value = trial.values[metals_index]
+        value = trial.values[duration_index]
         assert math.isfinite(value)
         assert value not in (_BAD_MAXIMIZE_VALUE, _BAD_MINIMIZE_VALUE)
+        assert "metals_total_kg" not in result.objectives.as_mapping()
+        assert "oxygen_kg" not in result.objectives.as_mapping()
         assert set(result.failing_gates) <= set(
             trial.user_attrs[_CONSTRAINT_NAMES_ATTR]
         )
         assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR]
-        stored_metals.append(value)
-    # Identical deterministic patches have zero repeat spread at one cache key.
-    assert stored_metals[0] != stored_metals[1]
 
     short_profile = _lunar_profile_for_hours(
         1,
@@ -815,16 +823,17 @@ def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> No
         == "available"
         for result in short_results
     )
-    short_metals = [
-        result.objectives.as_mapping()["metals_total_kg"]
-        for result in short_results
+    short_mappings = [result.objectives.as_mapping() for result in short_results]
+    for mapping in short_mappings:
+        assert "metals_total_kg" not in mapping
+        assert "pure_silica_glass_kg" not in mapping
+        assert "industrial_mixed_glass_kg" not in mapping
+        assert "oxygen_kg" not in mapping
+        assert "sso2_pn2_fe_drain_silica" not in mapping
+    short_energy = [
+        mapping["energy_electrical_plus_evaporation_kWh"] for mapping in short_mappings
     ]
-    short_oxygen = [
-        result.objectives.as_mapping()["oxygen_kg"]
-        for result in short_results
-    ]
-    assert short_metals[0] == short_metals[1]
-    assert short_oxygen[0] == short_oxygen[1]
+    assert short_energy[0] == short_energy[1]
     assert all(
         result.objectives.as_mapping()["duration_h"] == result.eval_spec.hours
         for result in short_results

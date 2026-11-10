@@ -317,6 +317,12 @@ def test_product_class_mass_evidence_serializes_metric_and_source_path(
         "classify_products",
         lambda sim, *, early_tap_mode=False: product_classes,
     )
+    # No shipped campaign claims both of these classes together.
+    monkeypatch.setattr(
+        objective_module,
+        "campaign_product_claim_keys",
+        lambda _campaign_id: frozenset({"CMAS_glass", "refractory_ceramic_rump"}),
+    )
     profile = {
         "objectives": [
             {
@@ -2681,6 +2687,7 @@ def _sso2_objective_profile(*, stream_purity_min: float = 0.95) -> dict:
             "gates": ["delivered_stream_purity"],
             "stream_purity_min": stream_purity_min,
         },
+        "run": {"campaign": "C2A_continuous", "hours": 1, "mass_kg": 1000.0},
     }
 
 
@@ -3940,6 +3947,28 @@ def _set_profile_hours(profile: dict, hours: int) -> None:
     profile["fidelities"]["internal-analytical"]["hours"] = hours
 
 
+@pytest.fixture(autouse=True)
+def _claim_ceramic_rump_for_scorer_mechanics(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Terminal ceramic-rump rows have no shipped product claim.
+
+    These tests exercise the scorer. Eligibility is pinned in
+    test_optimizer_profile_smoke_labels, which does not use this patch.
+    A test that replaces campaign_product_claim_keys still wins: its
+    monkeypatch runs after this fixture.
+    """
+
+    real = objective_module.campaign_product_claim_keys
+
+    def _with_ceramic(campaign_id: object) -> frozenset[str]:
+        return frozenset(real(campaign_id)) | frozenset({"refractory_ceramic_rump"})
+
+    monkeypatch.setattr(
+        objective_module,
+        "campaign_product_claim_keys",
+        _with_ceramic,
+    )
+
+
 def _composition_score_profile(
     pool: str,
     *,
@@ -3987,7 +4016,16 @@ def _composition_score_profile(
             }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
-        "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "internal-analytical"},
+        "run": {
+            "campaign": (
+                "C2B"
+                if pool in {"residual_rump_at_stop", "cleaned_melt_at_stage0_exit"}
+                else "C2A_continuous"
+            ),
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "internal-analytical",
+        },
         "fidelities": {"internal-analytical": {"backend_name": "internal-analytical", "hours": 1}},
         "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
     }

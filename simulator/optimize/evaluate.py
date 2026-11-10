@@ -95,12 +95,16 @@ from simulator.fidelity_vocabulary import (
 from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveVector,
+    _merged_run_for_fidelity,
     composition_target_eval_metadata,
     composition_target_infeasible_reason,
     composition_target_specs,
     composition_targets_require_coating,
     composition_targets_require_stage0_exit,
     composition_targets_require_terminal_rump,
+    executed_campaign_id,
+    profile_with_executed_campaign,
+    unclaimed_product_withheld_objective_note,
     compute_objectives,
     product_summary,
 )
@@ -1136,23 +1140,25 @@ def evaluate(
             cache_key_value=key,
         ) from exc
     if not feasibility.feasible:
-        objectives = None
+        # ``profile`` stays the authored profile for the run reference.
+        # The vector and its withhold notice come from ``objective_profile``,
+        # which is stamped with EvalSpec.campaign. They travel as one score
+        # so a fidelity overlay cannot make the notice name a different campaign.
+        campaign_score = None
         try:
             pumping_diagnostic = _pumping_diagnostic_for_gate(
                 run_execution,
                 feedstock_id=spec.feedstock_id,
             )
-            computed_objectives = _compute_objective_vector(
+            campaign_score = _compute_objective_vector(
                 run_execution,
                 objective_profile,
                 pumping_diagnostic,
                 spec,
             )
-            if all(value.value is not None for value in computed_objectives.values):
-                objectives = computed_objectives
         except (OverflowError, ObjectiveComputationError):
             # Keep the failed gate result; an unavailable vector remains unscored.
-            pass
+            campaign_score = None
         return _infeasible_result(
             candidate_id,
             spec,
@@ -1160,7 +1166,7 @@ def evaluate(
             feasibility,
             run_execution,
             profile,
-            objectives=objectives,
+            campaign_score=campaign_score,
         )
     pumping_diagnostic = _pumping_diagnostic_for_gate(
         run_execution,
@@ -1214,12 +1220,13 @@ def evaluate(
             )
 
     try:
-        objectives = _compute_objective_vector(
+        campaign_score = _compute_objective_vector(
             run_execution,
             objective_profile,
             pumping_diagnostic,
             spec,
         )
+        objectives = campaign_score.objectives
         trace_payload = _composition_target_trace_payload(
             objective_profile,
             objectives,
@@ -1272,6 +1279,7 @@ def evaluate(
             cost_parameters=spec.cost_parameters,
             coating_margin=feasibility.margins.get("coating"),
         ),
+        notes=_notes_for_executed_campaign_score((), campaign_score),
     )
 
 
@@ -2921,6 +2929,7 @@ def _build_eval_inputs_impl(
         expected_feedstock=feedstock_id,
         source="<profile>",
         schema=schema,
+        scoring_fidelity=fidelity,
     )
     run_options = _thermal_scheduled_run_options(
         _run_options(profile, fidelity),
@@ -3452,14 +3461,7 @@ def _c4_default_hold_temp_C(setpoints: Mapping[str, Any]) -> float:
 
 
 def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]:
-    fidelity_options = profile.get("fidelities", {})
-    selected = {}
-    if isinstance(fidelity_options, Mapping):
-        raw_selected = fidelity_options.get(fidelity, {})
-        if isinstance(raw_selected, Mapping):
-            selected = dict(raw_selected)
-    merged = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
-    merged.update(selected)
+    merged = _merged_run_for_fidelity(profile, fidelity)
     # Fold the legacy `stub` alias onto canonical `internal-analytical` at this
     # run-config acceptance boundary so downstream consumers see one token.
     backend_name = canonical_backend_name(
@@ -3485,7 +3487,7 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
     lab_overlay_scope = _lab_overlay_scope_options(merged)
     mass_kg = _positive_eval_mass_kg(merged.get("mass_kg", 1000.0))
     return MappingProxyType({
-        "campaign": merged.get("campaign", "C0"),
+        "campaign": executed_campaign_id(profile, fidelity=fidelity),
         "hours": int(merged.get("hours", 24)),
         "mass_kg": mass_kg,
         "additives_kg": dict(merged.get("additives_kg", {}) or {}),
@@ -4152,6 +4154,10 @@ def _objective_profile_for_spec(
     profile: Mapping[str, Any],
     spec: EvalSpec,
 ) -> Mapping[str, Any]:
+    # Score against EvalSpec.campaign. Fidelity options override profile.run,
+    # and that override is what _run_options stored on the spec. The digested
+    # profile is the caller's object; this copy is scoring-only.
+    profile = profile_with_executed_campaign(profile, str(spec.campaign))
     run = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
     changed = False
     try:
@@ -4440,6 +4446,48 @@ def _with_composition_target_extraction_thresholds(
     )
 
 
+@dataclass(frozen=True)
+class _ExecutedCampaignScore:
+    """Objective vector and the withhold notice of one scoring profile.
+
+    INVARIANT: the notice is ``unclaimed_product_withheld_objective_note`` of
+    the same profile passed to ``compute_objectives``. That profile is the
+    evaluated campaign (EvalSpec.campaign), not the authored profile. Every
+    path that publishes a vector publishes this pair. A fidelity overlay
+    cannot attach a notice for a different campaign.
+    """
+
+    objectives: ObjectiveVector
+    withhold_note: str | None
+
+
+def _score_executed_campaign(
+    run_execution: Any,
+    scoring_profile: Mapping[str, Any],
+    spec: EvalSpec,
+) -> _ExecutedCampaignScore:
+    objectives = compute_objectives(
+        scoring_profile,
+        run_execution,
+        cost_parameters=spec.cost_parameters,
+    )
+    return _ExecutedCampaignScore(
+        objectives=_objectives_with_thermal_window_metadata(objectives, spec),
+        withhold_note=unclaimed_product_withheld_objective_note(scoring_profile),
+    )
+
+
+def _notes_for_executed_campaign_score(
+    notes: tuple[str, ...] | Sequence[str],
+    score: _ExecutedCampaignScore,
+) -> tuple[str, ...]:
+    existing = tuple(str(item) for item in notes)
+    note = score.withhold_note
+    if note is None or note in existing:
+        return existing
+    return existing + (note,)
+
+
 def _infeasible_result(
     candidate_id: str | None,
     spec: EvalSpec,
@@ -4450,13 +4498,21 @@ def _infeasible_result(
     *,
     notes: tuple[str, ...] = (),
     trace_payload: Mapping[str, Any] | None = None,
-    objectives: ObjectiveVector | None = None,
+    campaign_score: _ExecutedCampaignScore | None = None,
 ) -> ScoredResult:
     trace_payload = _trace_payload_with_interpolation_feasibility(
         trace_payload,
         run_execution,
         feasibility.margins,
     )
+    objectives = None
+    # A retained vector keeps the notice produced with it. ``profile`` is the
+    # run-reference profile and is not a second campaign for this notice.
+    if campaign_score is not None and all(
+        value.value is not None for value in campaign_score.objectives.values
+    ):
+        objectives = campaign_score.objectives
+        notes = _notes_for_executed_campaign_score(notes, campaign_score)
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -4476,16 +4532,15 @@ def _compute_objective_vector(
     objective_profile: Mapping[str, Any],
     pumping_diagnostic: Mapping[str, Any],
     spec: EvalSpec,
-) -> ObjectiveVector:
-    objectives = compute_objectives(
-        objective_profile,
+) -> _ExecutedCampaignScore:
+    return _score_executed_campaign(
         _CertifiedPumpingDiagnosticRunExecution(
             run_execution,
             pumping_diagnostic,
         ),
-        cost_parameters=spec.cost_parameters,
+        objective_profile,
+        spec,
     )
-    return _objectives_with_thermal_window_metadata(objectives, spec)
 
 
 def _target_infeasible_result(
@@ -5054,10 +5109,12 @@ def _out_of_domain_result(
             assessment.trace_payload,
         )
         try:
-            objectives = compute_objectives(
-                profile,
+            # ``profile`` here is the scoring profile the caller stamped with
+            # EvalSpec.campaign. The vector and the notice share it.
+            campaign_score = _score_executed_campaign(
                 scoring_execution,
-                cost_parameters=spec.cost_parameters,
+                profile,
+                spec,
             )
         except OverflowError as exc:
             raise EngineBugAbort(
@@ -5075,7 +5132,7 @@ def _out_of_domain_result(
                 eval_spec=spec,
                 cache_key_value=key,
             ) from exc
-        objectives = _objectives_with_thermal_window_metadata(objectives, spec)
+        objectives = campaign_score.objectives
         trace_payload = _composition_target_trace_payload(
             profile,
             objectives,
@@ -5109,7 +5166,7 @@ def _out_of_domain_result(
                 cost_parameters=spec.cost_parameters,
                 coating_margin=feasibility.margins.get("coating"),
             ),
-            notes=assessment.notes,
+            notes=_notes_for_executed_campaign_score(assessment.notes, campaign_score),
         )
 
     if composition_targets_require_terminal_rump(profile):
