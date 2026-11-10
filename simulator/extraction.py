@@ -1738,6 +1738,8 @@ class ExtractionMixin:
     ) -> dict[str, Any]:
         """Execute and commit one typed plant or literature MRE interval."""
 
+        from simulator.accounting.exceptions import AccountingError
+        from simulator.accounting.formulas import resolve_species_formula
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.electrolysis import (
             ELECTRONS_PER_OXIDE,
@@ -2201,6 +2203,7 @@ class ExtractionMixin:
         # Calculate effective current from actual Faradaic reduction.   [Step 8]
         total_charge_C = 0.0
         unassessed_charge_oxides = set()
+        formula_estimated_charge_oxides = set()
         charge_electrons = result.get('oxide_charge_electrons', {}) or {}
         if transition is not None:
             for lot in transition.debits:
@@ -2209,31 +2212,52 @@ class ExtractionMixin:
                 for oxide, moles_ox in lot.species_moles_for(
                     self.species_formula_registry
                 ).items():
-                    n_e = charge_electrons.get(
-                        oxide,
-                        ELECTRONS_PER_OXIDE.get(oxide),
-                    )
+                    n_e = charge_electrons.get(oxide)
                     if n_e is None:
-                        unassessed_charge_oxides.add(oxide)
-                        continue
+                        n_e = ELECTRONS_PER_OXIDE.get(oxide)
+                    if n_e is None:
+                        try:
+                            formula = resolve_species_formula(
+                                oxide, self.species_formula_registry
+                            )
+                        except AccountingError:
+                            unassessed_charge_oxides.add(oxide)
+                            continue
+                        oxygen_atoms_per_formula = formula.elements.get('O', 0.0)
+                        # Charge balance is O^2- -> 1/2 O2 + 2e-. Thus
+                        # M_aO_b transfers 2b mol e- per mol oxide. The
+                        # product below is mol oxide × mol e-/mol oxide ×
+                        # C/mol e- = C; at b=0 the stoichiometric electron
+                        # contribution is zero.
+                        n_e = 2.0 * oxygen_atoms_per_formula
+                        formula_estimated_charge_oxides.add(oxide)
                     total_charge_C += moles_ox * n_e * FARADAY
         self._mre_effective_current_A = total_charge_C / (dt_hr * 3600.0)
+        charge_notices = []
+        if formula_estimated_charge_oxides:
+            charge_notices.append({
+                'kind': 'mre_electron_count_from_formula_stoichiometry',
+                'quantity': 'effective_current_A',
+                'status': 'estimated',
+                'oxides': sorted(formula_estimated_charge_oxides),
+            })
         if unassessed_charge_oxides:
-            notices = list(result.get('notices', ()) or ())
-            notice = {
+            charge_notices.append({
                 'kind': 'mre_effective_current_partial',
                 'quantity': 'effective_current_A',
                 'status': 'partial_estimate',
                 'reason': 'oxide_electron_count_unavailable',
                 'oxides': sorted(unassessed_charge_oxides),
-            }
-            notices.append(notice)
+            })
+        if charge_notices:
+            notices = list(result.get('notices', ()) or ())
+            notices.extend(charge_notices)
             result['notices'] = notices
             mre_diagnostic = dict(
                 result.get('mre_ellingham_ladder_diagnostic') or {}
             )
             mre_notices = list(mre_diagnostic.get('notices', ()) or ())
-            mre_notices.append(notice)
+            mre_notices.extend(charge_notices)
             mre_diagnostic['notices'] = mre_notices
             result['mre_ellingham_ladder_diagnostic'] = mre_diagnostic
             self._mre_ellingham_ladder_diagnostic = mre_diagnostic
