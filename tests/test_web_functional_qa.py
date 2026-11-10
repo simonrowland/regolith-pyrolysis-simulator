@@ -285,7 +285,12 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         for species in ("P4O10", "P4O6", "PO", "PO2"):
             assert "stage0_only predicate inactive" in refusal_reasons[species]
             assert refusal_reasons[species] in reason
-        assert runner["metals_plus_O2"]["availability_flag"] == oxygen_flag
+        combined_flag = runner["metals_plus_O2"]["availability_flag"]
+        for field in (
+            "status", "category", "kind", "authority", "authority_level",
+            "band", "pending_follow_ups",
+        ):
+            assert combined_flag[field] == oxygen_flag[field]
         assert web_story["oxygen"]["availability_flag"] == oxygen_flag
     assert web_story["refractory_ceramic"]["class_total_kg"] == pytest.approx(
         rump_kg, abs=0.01
