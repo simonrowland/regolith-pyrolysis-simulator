@@ -86,6 +86,7 @@ from simulator.battery.migrate import (
     load_migrated_context,
     QUANTITY_SOURCE_FIELDS,
     map_phase,
+    _kelley_king_formula_phase_suffix,
     map_quantity,
     select_declared_source,
     parse_quantity_suffix,
@@ -7585,6 +7586,7 @@ def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
     assert mapped.is_unknown and why is not None
 
     for spelling in (
+        "c",
         "quenched_silicate_glass",
         "quenched silicate glass; recalculated",
     ):
@@ -14167,6 +14169,55 @@ def test_g5_compilation_column_series_maps_pankratz_and_kelley() -> None:
     assert k_by_key["entropy_recommended"].value.point == as_decimal("111.21072")
 
 
+@pytest.mark.parametrize(
+    ("formula", "printed_phase", "expected_formula", "expected_phase"),
+    (
+        ("AlCl3(c)", "(c)", "AlCl3", Phase.CR),
+        ("Ni(g)", "(g)", "Ni", Phase.G),
+        ("Na(l)", "(l)", "Na", Phase.L),
+        ("H2O(aq)", "(aq)", "H2O(aq)", None),
+        ("AlCl3(c)", "(l)", "AlCl3(c)", None),
+    ),
+)
+def test_kelley_king_phase_suffix_is_separated_using_closed_map(
+    formula: str,
+    printed_phase: str,
+    expected_formula: str,
+    expected_phase: Phase | None,
+) -> None:
+    normalized, phase = _kelley_king_formula_phase_suffix(formula, printed_phase)
+    assert normalized == expected_formula
+    if expected_phase is None:
+        assert phase is None
+    else:
+        assert phase is not None and phase.is_value and phase.value is expected_phase
+
+
+def test_kelley_king_phase_suffix_reaches_migrated_species(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(
+        root, "kelley-king-1961-usbm-b592", "table-006-0007.json"
+    )
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if "table-006-0007" in observation.observation_id
+    ]
+    assert rows
+    assert {quantity_token(row.identity) for row in rows} == {
+        None,
+        Quantity.CP,
+        Quantity.S,
+    }
+    assert all(row.identity.species.formula == "AlCl3" for row in rows)
+    assert all(
+        row.identity.species.phase.is_value
+        and row.identity.species.phase.value is Phase.CR
+        for row in rows
+    )
+
+
 def test_pankratz_source_units_convert_and_missing_units_refuse() -> None:
     page = json.loads(
         (
@@ -14204,6 +14255,52 @@ def test_pankratz_source_units_convert_and_missing_units_refuse() -> None:
     assert selection.value.unavailable_reason == (
         "missing printed unit for cp; refusing ungrounded numeric value"
     )
+
+
+def test_pankratz_1987_crystal_columns_reach_separate_series(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(
+        root, "pankratz-1987-usbm-b689", "page-0005.json"
+    )
+    _copy_compilation_record(root, "nasa-glenn", "NG-1475.json")
+    _copy_compilation_record(root, "burcat", "BU-2430.json")
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "pankratz-1987-usbm-b689:page-0005"
+        )
+    ]
+    by_quantity = {
+        quantity_token(observation.identity): observation
+        for observation in rows
+        if quantity_token(observation.identity)
+        in {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    }
+    assert set(by_quantity) == {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    for observation in by_quantity.values():
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.CR
+        assert observation.value.kind is ValueKind.SERIES
+        assert len(observation.value.series or ()) == 14
+
+    for source_id, record_id in (
+        ("nasa-glenn", "NG-1475"),
+        ("burcat", "BU-2430"),
+    ):
+        record_prefix = f"{source_id}:{record_id}"
+        observations = [
+            observation
+            for observation in result.observations.values()
+            if observation.observation_id == record_prefix
+            or observation.observation_id.startswith(f"{record_prefix}:")
+        ]
+        assert observations
+        assert all(
+            observation.identity.species.phase.is_unknown
+            for observation in observations
+        )
 
 
 def test_g5_compilation_conversion_trail_mutation_proof(

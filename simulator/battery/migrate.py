@@ -434,7 +434,6 @@ PHASE_MAP: dict[str, Phase] = {
     "silicate_melt_ferrobasalt_FCMAS": Phase.L,
     "silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1": Phase.L,
     "cao-al2o3-sio2 liquid oxide melt": Phase.L,
-    # Published parenthetical spellings (Kelley / Pankratz tables).
     "(g)": Phase.G,
     "(c)": Phase.CR,
 }
@@ -8738,6 +8737,37 @@ def compilation_phase_text(doc: Mapping[str, Any]) -> object:
         if phases:
             return "multi-phase table: " + "; ".join(phases)
     return None
+
+
+def _kelley_king_formula_phase_suffix(
+    formula: str, printed_phase: object
+) -> tuple[str, State[Phase] | None]:
+    """Move a closed trailing Kelley & King phase suffix out of its formula."""
+
+    match = re.search(r"\(([^()]*)\)$", formula)
+    if match is None:
+        return formula, None
+    suffix_token = match.group(1).casefold()
+    if suffix_token not in {"c", "cr", "g", "l"}:
+        return formula, None
+    phase, _reason = map_phase(match.group(0))
+    if not phase.is_value:
+        phase, _reason = map_phase(suffix_token)
+    if not phase.is_value:
+        return formula, None
+
+    explicit, _reason = map_phase(printed_phase)
+    printed = (
+        str(printed_phase).strip().casefold()
+        if printed_phase not in (None, "")
+        else ""
+    )
+    if printed and printed not in {
+        match.group(0).casefold(),
+        match.group(1).casefold(),
+    } and (not explicit.is_value or explicit.value is not phase.value):
+        return formula, None
+    return formula[: match.start()], phase
 
 
 _TRANSITION_PHASES = {
@@ -26542,7 +26572,19 @@ class Migrator:
         formula = str(
             doc.get("formula") or doc.get("formula_as_published") or record_id
         )
-        phase, _unmapped = map_phase(compilation_phase_text(doc))
+        printed_phase = compilation_phase_text(doc)
+        phase, _unmapped = map_phase(printed_phase)
+        if source_id == "kelley-king-1961-usbm-b592":
+            formula, suffix_phase = _kelley_king_formula_phase_suffix(
+                formula, printed_phase
+            )
+            if suffix_phase is not None:
+                phase = suffix_phase
+        elif (
+            source_id == "pankratz-1987-usbm-b689"
+            and printed_phase == "c"
+        ):
+            phase, _unmapped = map_phase("(c)")
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
         if not locator.source_path:
