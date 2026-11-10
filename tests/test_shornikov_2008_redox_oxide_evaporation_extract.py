@@ -13,14 +13,16 @@ from tests.helpers.pdf_text import pdftotext_page_text
 ROOT = Path(__file__).resolve().parents[1]
 SID = "shornikov-2008-redox-oxide-evaporation"
 EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
-STATEMENT_PINS = {
+STATEMENT_PINS: dict[str, tuple[str, ...]] = {
     "shornikov_2008_prose_sio2_minimum": (
-        "log p° ( O ) = –5.75 corresponds to the minimum of total vapor pressure "
-        "over SiO2 (Fig. 2a, curve V)"
+        "log p° ( O ) = –5.75",
+        "minimum of total vapor pressure over SiO2",
+        "Fig. 2a, curve V",
     ),
     "shornikov_2008_prose_alumina_minimum": (
-        "minimum of total vapor pressure over Al2O3 at log p° ( O ) = –8.0 "
-        "(Fig. 2b, curve IV)"
+        "minimum of total vapor pressure",
+        "over Al2O3 at log p° ( O ) = –8.0",
+        "Fig. 2b, curve IV",
     ),
 }
 
@@ -30,9 +32,14 @@ def _compact(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", dehyphenated.casefold())
 
 
-@pytest.mark.parametrize(("observation_id", "source_phrase"), STATEMENT_PINS.items())
+def _contains_all_pins(text: str, pins: tuple[str, ...]) -> bool:
+    normalized = _compact(text.replace("Äl2é3", "Al2O3"))
+    return all(_compact(pin) in normalized for pin in pins)
+
+
+@pytest.mark.parametrize(("observation_id", "source_pins"), STATEMENT_PINS.items())
 def test_minimum_statement_matches_its_cited_source_page(
-    observation_id: str, source_phrase: str
+    observation_id: str, source_pins: tuple[str, ...]
 ) -> None:
     corpus = regolith_corpus_root()
     pdf = corpus / f"raw/{SID}/{SID}.pdf"
@@ -43,16 +50,20 @@ def test_minimum_statement_matches_its_cited_source_page(
     observations = {
         observation["observation_id"]: observation
         for species in document["species"].values()
-        for observation in species.get("observations", [])
+        for collection in ("observations", "context")
+        for observation in species.get(collection, [])
     }
     observation = observations[observation_id]
     locator = observation["locator"]
+    statement = observation["values"]["statement"]
+    assert _contains_all_pins(statement, source_pins)
+
+    source_text = pdftotext_page_text(pdf, locator["page"])
+    assert _contains_all_pins(source_text, source_pins)
+
     assert locator["page"] == 3
     assert locator["pdf_page_index"] == 2
     assert locator["published_page"] == 726
 
-    statement = observation["values"]["statement"]
-    assert _compact(source_phrase) in _compact(statement)
-    source_text = pdftotext_page_text(pdf, locator["page"])
-    source_text = source_text.replace("Äl2é3", "Al2O3")
-    assert _compact(source_phrase) in _compact(source_text)
+    next_page_text = pdftotext_page_text(pdf, locator["page"] + 1)
+    assert not _contains_all_pins(next_page_text, source_pins)
