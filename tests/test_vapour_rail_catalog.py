@@ -1345,13 +1345,57 @@ def _unevidenced_law_copy(
     return payload
 
 
+def _oracle_stored_oxygen_law(
+    model: dict,
+) -> tuple[float, float, str | None] | None:
+    """Oxygen multiplier the evaluator stores. Independent of the compiler.
+
+    Omitted exponent is 0 and stores no channel. A non-zero exponent needs a
+    legal channel. None means the declaration cannot compile. This is not a
+    call into the historic matcher, so a matcher that drops the multiplier
+    cannot satisfy the grid by construction.
+    """
+
+    raw_exponent = model.get("pO2_exponent", None)
+    if raw_exponent is None or raw_exponent == "":
+        exponent = 0.0
+    elif isinstance(raw_exponent, bool) or not isinstance(
+        raw_exponent, (int, float)
+    ):
+        return None
+    else:
+        exponent = float(raw_exponent)
+        if not math.isfinite(exponent):
+            return None
+    if "pO2_reference_bar" not in model:
+        reference = 1.0
+    else:
+        raw_reference = model.get("pO2_reference_bar")
+        if isinstance(raw_reference, bool) or not isinstance(
+            raw_reference, (int, float)
+        ):
+            return None
+        reference = float(raw_reference)
+        if not math.isfinite(reference) or reference <= 0.0:
+            return None
+    if exponent == 0.0:
+        return (0.0, reference, None)
+    raw_channel = model.get("oxygen_fugacity_channel")
+    if not isinstance(raw_channel, str) or not raw_channel.strip():
+        return None
+    channel = raw_channel.strip()
+    if channel not in {"intrinsic_melt", "transport_headspace"}:
+        return None
+    return (exponent, reference, channel)
+
+
 @functools.lru_cache(maxsize=1)
 def _live_bound_effective_fit_contexts() -> tuple[dict[str, object], ...]:
     """Antoine effective fits whose own row carries the evidence fields.
 
     This scan is the test oracle. It does not call the compiler's historic
-    matcher, so a matcher that ignores species cannot satisfy the test by
-    construction.
+    matcher, so a matcher that ignores species or the oxygen multiplier
+    cannot satisfy the test by construction.
     """
 
     payload = _yaml("vapor_pressures.yaml")
@@ -1415,6 +1459,7 @@ def _live_bound_effective_fit_contexts() -> tuple[dict[str, object], ...]:
                     "C": float(coefficients["C"]),
                     "low": float(low),
                     "high": float(high),
+                    "oxygen_law": _oracle_stored_oxygen_law(model),
                 }
             )
     return tuple(found)
@@ -1499,6 +1544,125 @@ def test_historic_reuse_rejects_each_changed_fit_context_field(field: str) -> No
             match="effective-pressure reference fit requires",
         ):
             compile_vapour_rail_catalog(payload)
+
+
+# Omitted (None) is a distinct declaration from an explicit zero or 1.
+# Exponents cover zero, signed zero, the reviewer value 1, and both signs
+# of a fractional multiplier. References cover the default, the explicit
+# 1 bar the reviewer adds, and 1e-9 bar, which would cancel that exponent
+# at the reviewer's single pressure point. Channels cover both legal planes
+# and one illegal name.
+_OXYGEN_EXPONENTS = (None, 0, float("-0.0"), 1, -1, 0.5, -0.5)
+_OXYGEN_REFERENCES = (None, 1, 1.0e-9)
+_OXYGEN_CHANNELS = (
+    None,
+    "transport_headspace",
+    "intrinsic_melt",
+    "not_a_channel",
+)
+
+
+@pytest.mark.parametrize("exponent", _OXYGEN_EXPONENTS)
+@pytest.mark.parametrize("reference", _OXYGEN_REFERENCES)
+@pytest.mark.parametrize("channel", _OXYGEN_CHANNELS)
+def test_historic_reuse_binds_every_oxygen_executable_law(
+    exponent: object,
+    reference: object,
+    channel: object,
+) -> None:
+    """Invariant: historic reuse is the pressure evaluate() computes.
+
+    A cleaned-melt activity exponent of 0 is admitted only when the Antoine
+    curve and the stored oxygen multiplier are the evidenced law for that
+    same species. The multiplier is pO2_exponent, pO2_reference_bar, and
+    oxygen_fugacity_channel. Coefficients alone are not that law.
+
+    The reviewer bypass is one cell: Fe's identity and coefficients, no
+    evidence fields, plus pO2_exponent 1, pO2_reference_bar 1, and
+    oxygen_fugacity_channel transport_headspace. evaluate() would then
+    multiply the evidenced curve by pO2/p_ref. At pO2 = 1e-9 bar that
+    factor is 1e-9. The cell must be refused.
+    """
+
+    contexts = _live_bound_effective_fit_contexts()
+    assert contexts
+    assert any(
+        item["species_id"] == "Fe" and item["oxygen_law"] == (0.0, 1.0, None)
+        for item in contexts
+    )
+    for context in contexts:
+        species_id = str(context["species_id"])
+        payload = _unevidenced_law_copy(species_id, context)
+        model = payload["families"][f"{species_id}_family"][
+            "physical_properties"
+        ]["species"][species_id]["pressure_models"][0]
+        if exponent is not None:
+            model["pO2_exponent"] = exponent
+        if reference is not None:
+            model["pO2_reference_bar"] = reference
+        if channel is not None:
+            model["oxygen_fugacity_channel"] = channel
+        expected = _oracle_stored_oxygen_law(model)
+        live = context["oxygen_law"]
+        reviewer_bypass = (
+            exponent == 1
+            and reference == 1
+            and channel == "transport_headspace"
+        )
+        if expected is not None and expected == live:
+            assert not reviewer_bypass
+            compiled = compile_vapour_rail_catalog(payload)
+            evaluator = compiled.species[species_id].evaluator
+            assert evaluator is not None
+            assert evaluator.activity_exponent == 0.0
+            assert (
+                float(evaluator.pO2_exponent),
+                float(evaluator.pO2_reference_bar),
+                evaluator.oxygen_fugacity_channel,
+            ) == live
+            temperature_K = 1800.0
+            if not (
+                float(context["low"])
+                <= temperature_K
+                <= float(context["high"])
+            ):
+                temperature_K = 0.5 * (
+                    float(context["low"]) + float(context["high"])
+                )
+            # log10(P/Pa) = A - B/(T+C) + exponent*log10(pO2/p_ref).
+            # Exponent 0 leaves P equal to the Antoine curve at every pO2.
+            base_pa = 10 ** (
+                float(context["A"])
+                - float(context["B"]) / (temperature_K + float(context["C"]))
+            )
+            live_exponent, live_reference, _live_channel = live
+
+            def scaled(pO2_bar: float) -> float:
+                if live_exponent == 0.0:
+                    return base_pa
+                return base_pa * (pO2_bar / float(live_reference)) ** float(
+                    live_exponent
+                )
+
+            assert evaluator.evaluate(temperature_K).pressure_pa == pytest.approx(
+                scaled(1.0)
+            )
+            assert evaluator.evaluate(
+                temperature_K, pO2_bar=1.0
+            ).pressure_pa == pytest.approx(scaled(1.0))
+            assert evaluator.evaluate(
+                temperature_K, pO2_bar=1.0e-9
+            ).pressure_pa == pytest.approx(scaled(1.0e-9))
+            continue
+        with pytest.raises(CatalogCompileError) as exc_info:
+            compile_vapour_rail_catalog(payload)
+        if expected is None:
+            continue
+        assert "effective-pressure reference fit requires" in str(exc_info.value)
+        if reviewer_bypass:
+            # (pO2/p_ref)**1 at 1e-9 bar is 1e-9. Admission must stop first.
+            assert expected == (1.0, 1.0, "transport_headspace")
+            assert live != expected
 
 
 def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:

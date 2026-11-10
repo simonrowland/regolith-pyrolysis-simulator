@@ -2481,17 +2481,11 @@ def _compile_evaluator(
         activity_exponent = _finite_real(
             _activity_raw, f"{species_id}.activity_exponent"
         )
-    # Track whether pO2_exponent was explicitly declared (vs omitted default 0).
-    _pO2_raw = model.get("pO2_exponent", None)
-    pO2_exponent_declared = _pO2_raw is not None and _pO2_raw != ""
-    if pO2_exponent_declared:
-        pO2_exponent = _finite_real(_pO2_raw, f"{species_id}.pO2_exponent")
-    else:
-        pO2_exponent = 0.0
-    pO2_reference = _finite_positive(
-        model.get("pO2_reference_bar", 1.0),
-        f"{species_id}.pO2_reference_bar",
+    # Same parser historic reuse compares. Omitted exponent is 0.
+    pO2_exponent, pO2_exponent_declared = _declared_pO2_exponent(
+        species_id, model
     )
+    pO2_reference = _declared_pO2_reference_bar(species_id, model)
     if evaluator_family in RUNTIME_THERMO_EVALUATOR_FAMILIES:
         reference_model, derived_pO2_exponent = _compile_thermo_reference_model(
             species_id=species_id,
@@ -2549,20 +2543,9 @@ def _compile_evaluator(
             f"{species_id}: evaluator family {evaluator_family!r} belongs to a later chunk"
         )
 
-    oxygen_fugacity_channel = None
-    if pO2_exponent != 0.0:
-        oxygen_fugacity_channel = _required_string(
-            model.get("oxygen_fugacity_channel"),
-            f"{species_id}.oxygen_fugacity_channel",
-        )
-        if oxygen_fugacity_channel not in {
-            "intrinsic_melt",
-            "transport_headspace",
-        }:
-            raise CatalogCompileError(
-                f"{species_id}.oxygen_fugacity_channel must be "
-                "'intrinsic_melt' or 'transport_headspace'"
-            )
+    oxygen_fugacity_channel = _oxygen_channel_for_exponent(
+        species_id, model, pO2_exponent
+    )
 
     # t-571 Phase 1: emit the O2 channel term from the scalar exponent.
     # e_O2 = -nu_O2 / nu_g  ⇒  with nu_g = 1, nu_O2 = -e_O2.
@@ -2672,14 +2655,89 @@ _LIVE_ANTOINE_CONTEXT_CACHE: (
 ) = None
 
 
+_OXYGEN_FUGACITY_CHANNELS = frozenset(
+    {"intrinsic_melt", "transport_headspace"}
+)
+
+
+def _declared_pO2_exponent(
+    species_id: str, model: Mapping[str, Any]
+) -> tuple[float, bool]:
+    """Return ``(exponent, was_declared)``. Omitted exponent is 0."""
+
+    raw = model.get("pO2_exponent", None)
+    declared = raw is not None and raw != ""
+    if not declared:
+        return 0.0, False
+    return _finite_real(raw, f"{species_id}.pO2_exponent"), True
+
+
+def _declared_pO2_reference_bar(
+    species_id: str, model: Mapping[str, Any]
+) -> float:
+    """Return the stored reference. Omitted reference is 1 bar."""
+
+    return _finite_positive(
+        model.get("pO2_reference_bar", 1.0),
+        f"{species_id}.pO2_reference_bar",
+    )
+
+
+def _oxygen_channel_for_exponent(
+    species_id: str, model: Mapping[str, Any], exponent: float
+) -> str | None:
+    """Channel stored for ``exponent``. Exponent 0 stores no channel."""
+
+    if exponent == 0.0:
+        return None
+    channel = _required_string(
+        model.get("oxygen_fugacity_channel"),
+        f"{species_id}.oxygen_fugacity_channel",
+    )
+    if channel not in _OXYGEN_FUGACITY_CHANNELS:
+        raise CatalogCompileError(
+            f"{species_id}.oxygen_fugacity_channel must be "
+            "'intrinsic_melt' or 'transport_headspace'"
+        )
+    return channel
+
+
+def _stored_oxygen_executable_law(
+    species_id: str, model: Mapping[str, Any]
+) -> tuple[float, float, str | None]:
+    """Oxygen multiplier an Antoine evaluator stores and ``evaluate()`` applies.
+
+    The tuple is ``(exponent, reference_bar, channel)``. Exponent 0 stores no
+    channel and does not scale pressure. A non-zero exponent adds
+    ``exponent * log10(pO2 / reference)`` to ``log10(P)``. Exponent 1 with
+    reference 1 bar multiplies P by 1e-9 when pO2 is 1e-9 bar. Thermo families
+    may replace the exponent from stoichiometry after this declaration is
+    read; Antoine does not.
+    """
+
+    exponent, _declared = _declared_pO2_exponent(species_id, model)
+    reference = _declared_pO2_reference_bar(species_id, model)
+    channel = _oxygen_channel_for_exponent(species_id, model, exponent)
+    return (exponent, reference, channel)
+
+
 def _antoine_executable_law(
     *,
+    species_id: str,
+    model: Mapping[str, Any],
     evaluator_family: str,
     coefficients: Mapping[str, Any],
     observable: PressureObservable,
     valid_temperature_K: tuple[float, float],
 ) -> tuple[object, ...] | None:
-    """Identity of the Antoine pressure ``evaluate()`` actually computes."""
+    """Identity of the pressure ``evaluate()`` computes for an Antoine law.
+
+    Coefficients and temperature bounds are the reference curve. The oxygen
+    tuple is the multiplier applied on top of that curve. A historic match
+    that keeps A, B, and C while changing the multiplier is a different
+    pressure, not reuse of the evidenced fit. An oxygen declaration that
+    cannot compile is not a reusable law.
+    """
 
     if evaluator_family != "antoine":
         return None
@@ -2693,8 +2751,12 @@ def _antoine_executable_law(
         return None
     if not all(math.isfinite(item) for item in law):
         return None
+    try:
+        oxygen_law = _stored_oxygen_executable_law(species_id, model)
+    except CatalogCompileError:
+        return None
     low, high = valid_temperature_K
-    return (law, float(low), float(high))
+    return (law, float(low), float(high), oxygen_law)
 
 
 def _context_text(value: object) -> str | None:
@@ -2711,17 +2773,18 @@ def _bound_effective_fit_context(
     parent_oxide: object,
     source_account: str,
     species_basis: object,
+    model: Mapping[str, Any],
     evaluator_family: str,
     coefficients: Mapping[str, Any],
     observable: PressureObservable,
     valid_temperature_K: tuple[float, float],
 ) -> tuple[object, ...] | None:
-    """Species, melt basis, and the Antoine law ``evaluate()`` computes.
+    """Species, melt basis, and the full law ``evaluate()`` computes.
 
-    A, B, C, and the temperature bounds are the law. Formula, parent oxide,
-    source account, and species basis are the fit context those coefficients
-    were solved for. A different species with the same coefficients is a
-    different context.
+    A, B, C, the temperature bounds, and the oxygen multiplier are the law.
+    Formula, parent oxide, source account, and species basis are the fit
+    context those coefficients were solved for. A different species, or the
+    same coefficients with a different oxygen multiplier, is a different law.
     """
 
     formula_text = _context_text(formula)
@@ -2736,6 +2799,8 @@ def _bound_effective_fit_context(
     ):
         return None
     law = _antoine_executable_law(
+        species_id=species_id,
+        model=model,
         evaluator_family=evaluator_family,
         coefficients=coefficients,
         observable=observable,
@@ -2756,9 +2821,10 @@ def _bound_effective_fit_context(
 def _live_evidenced_antoine_contexts() -> frozenset[tuple[object, ...]]:
     """Effective Antoine fits whose checked-in row binds evidence to that species.
 
-    Historic snapshots keep the same species, melt basis, and coefficients
-    after provenance was added to the live row. The lookup reads that row.
-    It does not lend the fit to any other species or parent oxide.
+    Historic snapshots keep the same species, melt basis, coefficients, and
+    oxygen multiplier after provenance was added to the live row. The lookup
+    reads that row. It does not lend the fit to any other species, parent
+    oxide, or oxygen law.
     """
 
     global _LIVE_ANTOINE_CONTEXT_CACHE
@@ -2827,6 +2893,7 @@ def _live_evidenced_antoine_contexts() -> frozenset[tuple[object, ...]]:
                     parent_oxide=row.get("parent_oxide"),
                     source_account=source_account,
                     species_basis=model.get("species_basis"),
+                    model=model,
                     evaluator_family=str(model.get("evaluator_family") or ""),
                     coefficients=model.get("coefficients")
                     if isinstance(model.get("coefficients"), Mapping)
@@ -2848,6 +2915,7 @@ def _matches_live_bound_effective_fit(
     parent_oxide: object,
     source_account: str,
     species_basis: object,
+    model: Mapping[str, Any],
     evaluator_family: str,
     coefficients: Mapping[str, Any],
     observable: PressureObservable,
@@ -2859,6 +2927,7 @@ def _matches_live_bound_effective_fit(
         parent_oxide=parent_oxide,
         source_account=source_account,
         species_basis=species_basis,
+        model=model,
         evaluator_family=evaluator_family,
         coefficients=coefficients,
         observable=observable,
@@ -2898,6 +2967,7 @@ def _effective_pressure_reference_fit_is_evidenced(
         parent_oxide=row.get("parent_oxide"),
         source_account=source_account,
         species_basis=model.get("species_basis"),
+        model=model,
         evaluator_family=reference.evaluator_family,
         coefficients=reference.coefficients,
         observable=observable,
@@ -3007,14 +3077,18 @@ def _zero_activity_melt_executable_is_evidenced(
 
     Invariant: every cleaned-melt species with activity exponent 0 is refused
     unless the pressure ``evaluate()`` computes is evidenced for that same
-    species and melt basis. Evidence is this row's own provenance, residual,
-    and anchors; a gas-association composite whose captured base is such a
-    fit for the named base species; or this species' own Antoine law (formula,
-    parent oxide, source account, species basis, coefficients, and temperature
-    domain) matching a live catalog row that carries the evidence. Copying
-    another species' A, B, and C is not evidence. ``composition_mode`` and an
-    embedded coefficient block the executable evaluator does not call are not
-    evidence.
+    species and melt basis. That pressure is the Antoine curve times the
+    oxygen multiplier ``(pO2 / p_ref) ** exponent`` on the named channel.
+    Exponent 0 applies no multiplier. Evidence is this row's own provenance,
+    residual, and anchors; a gas-association composite whose captured base is
+    such a fit for the named base species; or this species' own Antoine law
+    (formula, parent oxide, source account, species basis, coefficients,
+    temperature domain, and the stored oxygen multiplier) matching a live
+    catalog row that carries the evidence. Copying another species' A, B, and
+    C is not evidence. Keeping those coefficients while changing
+    ``pO2_exponent``, ``pO2_reference_bar``, or the oxygen channel is not
+    evidence either. ``composition_mode`` and an embedded coefficient block
+    the executable evaluator does not call are not evidence.
     """
 
     if _verified_gas_association_base_has_fit_evidence(
@@ -3041,6 +3115,7 @@ def _zero_activity_melt_executable_is_evidenced(
         parent_oxide=row.get("parent_oxide"),
         source_account=source_account,
         species_basis=evaluator.species_basis,
+        model=model,
         evaluator_family=evaluator.evaluator_family,
         coefficients=reference.coefficients,
         observable=evaluator.pressure_observable,
@@ -3140,8 +3215,10 @@ def _compile_source_reaction_activity(
                 "backsolve.residual_dex, validation.anchor_refs, a "
                 "gas-association composite whose captured base matches an "
                 "evidence-backed fit, or this species' Antoine law bound to "
-                "the same formula, parent oxide, source account, and species "
-                "basis as a live evidenced fit"
+                "the same formula, parent oxide, source account, species "
+                "basis, and oxygen multiplier (pO2_exponent, "
+                "pO2_reference_bar, oxygen_fugacity_channel) as a live "
+                "evidenced fit"
             )
 
     if evaluator is not None and (
