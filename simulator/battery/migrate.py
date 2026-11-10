@@ -26944,13 +26944,20 @@ class Migrator:
             sole_window = len(formation_windows) == 1
             for window in formation_windows:
                 window_phase, _window_unmapped = map_phase(window.phase_text or None)
-                if len(window.points) == 1 and window.lower_K is None:
-                    window_value = Value.point_of(window.points[0][1])
+                unbound_single_point = (
+                    len(window.points) == 1 and window.lower_K is None
+                )
+                window_value = _emit_series_or_point(
+                    Quantity.DELTA_FG,
+                    record_id,
+                    window.points,
+                    point_temperature=(
+                        window.points[0][0] if unbound_single_point else None
+                    ),
+                ).value
+                if unbound_single_point:
                     window_temperature: State[Decimal] = State.of(window.points[0][0])
                 else:
-                    window_value = Value(
-                        ValueKind.SERIES, series=tuple(window.points)
-                    )
                     window_temperature = _compilation_temperature_state(doc)
                 if sole_window:
                     window_id = f"{source_id}:{record_id}"
