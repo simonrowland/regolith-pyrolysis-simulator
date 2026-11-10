@@ -13,10 +13,12 @@ default and still claims no scored product. A composition target is eligible
 only for its own pool product. ``captured_products`` requires every extracted
 species. A dynamic ``{species}_kg`` row is that ledger species. It is
 claimed only when ``species`` itself is a products key: ``native_Fe`` does
-not claim ``Fe_kg``, and ``SiO2_glass`` does not claim ``Si_kg``. Energy,
-duration, and energy-per-product intensities stay. File load is not an
-evaluation: the remaining-weight refusal waits until the selected fidelity's
-campaign is known.
+not claim ``Fe_kg``, and ``SiO2_glass`` does not claim ``Si_kg``. An
+energy-per-product intensity is not a ledger species. Its denominator is
+``metals_plus_O2.class_total_kg``, so it is claimed only when the campaign
+claims ``O2`` and a metal key (``Fe``, ``Mg``, or ``Ti``). Energy and
+duration stay. File load is not an evaluation: the remaining-weight refusal
+waits until the selected fidelity's campaign is known.
 """
 
 from __future__ import annotations
@@ -116,8 +118,11 @@ _LITERAL_ALIASES = {
     "C3_K": "C3",
     "C3_NA": "C3",
 }
-# Intensities. They end in ``_kg`` and are not ledger species. The production
-# reader recognizes exactly this set.
+# Intensities. They end in ``_kg`` and are not ledger species. Each one
+# divides by metals_plus_O2.class_total_kg, so the claim is the same combined
+# product as metals_plus_o2_kg: O2 and one of Fe, Mg, Ti. The production
+# reader recognizes exactly this set. Component names and kWh are literals:
+# the expected intensity is component_kWh / _INTENSITY_DENOMINATOR_KG.
 _ENERGY_PER_PRODUCT_METRICS = frozenset({
     "energy_electrical_plus_evaporation_per_product_kWh_per_kg",
     "electrical_energy_per_product_kWh_per_kg",
@@ -125,6 +130,16 @@ _ENERGY_PER_PRODUCT_METRICS = frozenset({
     "latent_energy_per_product_kWh_per_kg",
     "dissociation_energy_per_product_kWh_per_kg",
 })
+_LITERAL_INTENSITY_COMPONENT = {
+    "energy_electrical_plus_evaporation_per_product_kWh_per_kg": (
+        "electrical_plus_evaporation"
+    ),
+    "electrical_energy_per_product_kWh_per_kg": "electrical",
+    "evaporation_thermal_energy_per_product_kWh_per_kg": "evaporation_thermal",
+    "latent_energy_per_product_kWh_per_kg": "latent",
+    "dissociation_energy_per_product_kWh_per_kg": "dissociation",
+}
+_INTENSITY_DENOMINATOR_KG = 4.0
 # Ledger mass the species tests hand to the product ledger. Not zero: a
 # retained Mg_kg would add weight * this value to the study scalar.
 _LEDGER_KG = 12.5
@@ -136,6 +151,15 @@ _RETAINED_ENERGY_WEIGHT = 0.10
 _RETAINED_DURATION_WEIGHT = 0.06
 _STUB_ENERGY_KWH = 10.0
 _STUB_DURATION_H = 4.0
+# electrical_plus_evaporation is the retained energy objective's 10 kWh.
+# The other components are the intensity numerators only.
+_LITERAL_COMPONENT_KWH = {
+    "electrical_plus_evaporation": _STUB_ENERGY_KWH,
+    "electrical": 6.0,
+    "evaporation_thermal": 4.0,
+    "latent": 5.0,
+    "dissociation": 7.0,
+}
 # Furnace penalty 0 leaves the cost factor at 1. Minimized energy and duration
 # are negated, so the study scalar is 0.10 * -10 + 0.06 * -4.
 _SYNTHETIC_SCALAR = math.fsum((
@@ -305,7 +329,8 @@ def _oracle_claims_metric(
 ) -> bool:
     if metric.startswith(COMPOSITION_TARGET_METRIC_PREFIX):
         return _oracle_composition_claimed(target, claim_keys)
-    if metric == "metals_plus_o2_kg":
+    if metric == "metals_plus_o2_kg" or metric in _ENERGY_PER_PRODUCT_METRICS:
+        # The intensity denominator is metals_plus_O2.class_total_kg.
         return "O2" in claim_keys and bool(claim_keys & _METAL_KEYS)
     required = _LITERAL_CLAIM_KEYS.get(metric)
     if required is not None:
@@ -519,10 +544,14 @@ def _assert_study_scalar(
     metrics: dict[str, float],
     weights: tuple[float, ...],
     scalar: float,
+    execution: SimpleNamespace | None = None,
 ) -> None:
     """Production study scalar from literal metrics, weights, and the stub."""
 
-    mapping = compute_objectives(profile, _stub_execution()).as_mapping()
+    mapping = compute_objectives(
+        profile,
+        execution if execution is not None else _stub_execution(),
+    ).as_mapping()
     assert {key: mapping[key] for key in metrics} == metrics
     definitions = objective_definitions(profile)
     assert tuple(definition.metric for definition in definitions) == tuple(metrics)
@@ -1262,6 +1291,35 @@ def _energy_per_product_cases() -> list[tuple[str | None, str]]:
     ]
 
 
+def _intensity_row(metric: str, *, weight: float = _SPECIES_WEIGHT) -> dict:
+    """kWh/kg is minimized. ``_objective_row`` would mark it maximize."""
+
+    row = _objective_row(metric, weight=weight, units="kWh/kg")
+    row["sense"] = "minimize"
+    return row
+
+
+def _intensity_execution() -> SimpleNamespace:
+    """Fe ledger mass is the metals_plus_O2 denominator. The O2 partition is 0.
+
+    ``classify_products`` on a ledger without an atom ledger counts ``Fe`` as
+    recovered metal. The record exists and has no oxygen totals, so the class
+    total is exactly ``_INTENSITY_DENOMINATOR_KG``. Component kWh sit on the
+    cumulative breakdown. The electrical-plus-evaporation objective still
+    reads the cumulative 10 kWh attribute, and pumping has no diagnostic so
+    its penalty is 0.
+    """
+
+    execution = _stub_execution({"Fe": _INTENSITY_DENOMINATOR_KG})
+    execution.simulator.energy_cumulative_breakdown_kWh = dict(_LITERAL_COMPONENT_KWH)
+    return execution
+
+
+def _intensity_value(metric: str) -> float:
+    component = _LITERAL_INTENSITY_COMPONENT[metric]
+    return _LITERAL_COMPONENT_KWH[component] / _INTENSITY_DENOMINATOR_KG
+
+
 @pytest.mark.parametrize(
     ("campaign", "metric"),
     _energy_per_product_cases(),
@@ -1270,24 +1328,72 @@ def _energy_per_product_cases() -> list[tuple[str | None, str]]:
         for campaign, metric in _energy_per_product_cases()
     ],
 )
-def test_energy_per_product_intensity_is_not_a_product_claim(
+def test_energy_per_product_intensity_follows_denominator_claim(
     campaign: str | None,
     metric: str,
 ) -> None:
-    """``kWh_per_kg`` rows stay on every campaign, including an empty claim set."""
+    """Every campaign and every kWh/kg intensity.
 
+    The denominator product is metals plus O2. A campaign that does not claim
+    both withholds the intensity: it is absent from the vector, named in the
+    notice, and does not enter the study scalar as 0.0. A campaign that
+    claims both scores component_kWh / 4.0 kg. The 0.50 weight stays declared.
+    Sense is minimize, so that term is negated. -1.24 is the retained energy
+    and duration contribution and is not renormalized.
+    """
+
+    assert set(_LITERAL_INTENSITY_COMPONENT) == _ENERGY_PER_PRODUCT_METRICS
     assert _oracle_ledger_species(metric) is None
-    assert campaign_claims_product_objective(metric, frozenset()) is True
-    assert campaign_claims_product_objective(metric, _oracle_claims(campaign)) is True
+    assert _energy_per_product_metric(metric) is not None
+    direct_keys = _oracle_claims(campaign)
+    claimed = _oracle_claims_metric(metric, direct_keys)
+    assert campaign_claims_product_objective(metric, direct_keys) is claimed
+    assert campaign_claims_product_objective(metric, frozenset()) is False
     profile = _profile(
-        _objective_row(metric, weight=0.50, units="kWh/kg"),
+        _intensity_row(metric),
         campaign=campaign,
         prose="description-edited",
     )
-    scored = {definition.metric for definition in objective_definitions(profile)}
-    assert metric in scored
-    note = unclaimed_product_withheld_objective_note(profile)
-    assert note is None or metric not in note
+    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    assert _oracle_claims_metric(metric, executed_keys) is claimed
+    if not claimed:
+        _assert_withheld(
+            profile,
+            {metric},
+            label=f"{campaign}:{metric}",
+        )
+        _assert_study_scalar(
+            profile,
+            metrics={
+                ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: _STUB_ENERGY_KWH,
+                "duration_h": _STUB_DURATION_H,
+            },
+            weights=(_RETAINED_ENERGY_WEIGHT, _RETAINED_DURATION_WEIGHT),
+            scalar=_SYNTHETIC_SCALAR,
+        )
+        mapping = compute_objectives(profile, _intensity_execution()).as_mapping()
+        assert metric not in mapping
+        assert 0.0 not in mapping.values()
+        return
+    value = _intensity_value(metric)
+    assert value != 0.0
+    execution = _intensity_execution()
+    _assert_study_scalar(
+        profile,
+        metrics={
+            metric: value,
+            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: _STUB_ENERGY_KWH,
+            "duration_h": _STUB_DURATION_H,
+        },
+        weights=(
+            _SPECIES_WEIGHT,
+            _RETAINED_ENERGY_WEIGHT,
+            _RETAINED_DURATION_WEIGHT,
+        ),
+        scalar=math.fsum((_SPECIES_WEIGHT * -value, _SYNTHETIC_SCALAR)),
+        execution=execution,
+    )
+    assert unclaimed_product_withheld_objective_note(profile) is None
 
 
 def _fidelity_load_cases() -> list[tuple[str, str]]:

@@ -111,9 +111,14 @@ _MASS_OBJECTIVE_METRICS = frozenset(
 # A dynamic ``{species}_kg`` row is the product-ledger species ``species``.
 # It is claimed only when that same key is in ``products``. ``native_Fe``
 # does not claim ``Fe``. The silica extract map does not claim ``Si_kg``.
+# An energy-per-product intensity is not a ledger species. Its denominator
+# is ``metals_plus_O2.class_total_kg``, the same product as
+# ``metals_plus_o2_kg``, so it is scored only when the campaign claims ``O2``
+# and a metal key (``Fe``, ``Mg``, or ``Ti``). Otherwise it is withheld
+# with the same notice. It is never a silent 0.0.
 # C0 claims volatiles and native_Fe only. native_Fe is nanophase magnetic
 # separation, not the pyrolysis metal product, so it authorizes no named
-# metal metric here.
+# metal metric and no energy-per-product intensity here.
 # File load is not an evaluation. The remaining-weight refusal runs only
 # once a fidelity has selected the executed campaign.
 _FINAL_PRODUCT_OBJECTIVE_METRICS = frozenset(
@@ -1522,8 +1527,10 @@ def _ledger_species_objective(metric: str) -> str | None:
 
     ``_metric_value`` reads ``product_ledger[species]`` for every remaining
     ``*_kg`` metric. Named class masses are not ledger species. An
-    energy-per-product intensity ends in ``_kg`` and is not a product row.
-    The species string is the product-claim key. No alias is applied here.
+    energy-per-product intensity ends in ``_kg`` and is not a ledger species.
+    Its claim is the denominator product, decided in
+    ``campaign_claims_product_objective``. The species string is the
+    product-claim key. No alias is applied here.
     """
 
     canonical = canonical_objective_metric(metric)
@@ -1541,10 +1548,13 @@ def _ledger_species_objective(metric: str) -> str | None:
 
 def _metric_requires_product_claim(metric: str) -> bool:
     canonical = canonical_objective_metric(metric)
+    # Energy-per-product intensities require the denominator product's claim.
+    # Leaving them out here would score them on every campaign.
     return (
         canonical in _FINAL_PRODUCT_OBJECTIVE_METRICS
         or canonical.startswith(COMPOSITION_TARGET_METRIC_PREFIX)
         or _ledger_species_objective(canonical) is not None
+        or _energy_per_product_metric(canonical) is not None
     )
 
 
@@ -1623,10 +1633,12 @@ def campaign_claims_product_objective(
     """True when ``claim_keys`` authorize this product objective.
 
     ``metals_plus_o2_kg`` is the combined class, so it needs both a metal
-    claim and ``O2``. One of the two is not that product. A composition
-    target with no readable target is not claimed: any product key does not
-    authorize every composition objective. A ledger species row is claimed
-    only by that species key.
+    claim and ``O2``. One of the two is not that product. An
+    energy-per-product intensity uses that same class as its denominator
+    (``metals_plus_O2.class_total_kg``) and inherits the same requirement.
+    A composition target with no readable target is not claimed: any product
+    key does not authorize every composition objective. A ledger species row
+    is claimed only by that species key.
     """
 
     canonical = canonical_objective_metric(metric)
@@ -1634,7 +1646,10 @@ def campaign_claims_product_objective(
         if target is None:
             return False
         return _composition_target_claimed(target, claim_keys)
-    if canonical == "metals_plus_o2_kg":
+    if (
+        canonical == "metals_plus_o2_kg"
+        or _energy_per_product_metric(canonical) is not None
+    ):
         return "O2" in claim_keys and bool(claim_keys & _METAL_PRODUCT_CLAIM_KEYS)
     required = _OBJECTIVE_PRODUCT_CLAIM_KEYS.get(canonical)
     if required is not None:

@@ -4,7 +4,10 @@ from dataclasses import replace
 import json
 import sqlite3
 
-from simulator.corpus_version import current_corpus_version
+from simulator.corpus_version import (
+    current_corpus_version,
+    interoperable_corpus_versions,
+)
 from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_json
 from simulator.optimize.result_scope import selector_where
 from simulator.optimize.results_store import ResultStore
@@ -89,7 +92,7 @@ def test_recipe_run_inputs_and_corpus_version_remain_identity() -> None:
     assert cache_key(prior_corpus) != cache_key(base)
     assert cache_key(base) != OLD_FINGERPRINT_KEY_SHAPE
     assert current_corpus_version() == (
-        "analytical-corpus-2026-07-31-vapour-rail-key-v2"
+        "analytical-corpus-2026-11-10-b080-unclaimed-product-objectives"
     )
 
 
@@ -169,3 +172,72 @@ def test_result_selector_and_index_exclude_code_and_data_fingerprints(tmp_path) 
         "result_scope",
         "corpus_version",
     ]
+
+
+# Pre-fix optimizer rows were stamped with this tag. It stays interoperable
+# for reduced-real rekey. It is no longer the evaluation-cache current.
+_PRE_B080_CORPUS_VERSION = "analytical-corpus-2026-07-31-vapour-rail-key-v2"
+
+
+def test_b080_corpus_bump_misses_pre_fix_objective_vectors(tmp_path) -> None:
+    """A stored objective vector from before the hand-bumped tag is a miss.
+
+    The key is engine plus this version plus the request. No new dimension
+    and no read-path membership check: the previous tag is not current, so
+    lookup and fetch both refuse the old row.
+    """
+
+    previous = _PRE_B080_CORPUS_VERSION
+    current = current_corpus_version()
+    allowed = interoperable_corpus_versions()
+    assert current != previous
+    assert current in allowed
+    assert previous in allowed
+
+    base = _spec()
+    prior = replace(
+        base,
+        data_digests={**base.data_digests, "corpus_version": previous},
+    )
+    assert json.loads(canonical_evalspec_json(base))["corpus_version"] == current
+    assert json.loads(canonical_evalspec_json(prior))["corpus_version"] == previous
+    assert cache_key(prior) != cache_key(base)
+
+    store = ResultStore(tmp_path / "results.sqlite")
+    prior_key = cache_key(prior)
+    with sqlite3.connect(store.path) as conn:
+        conn.execute(
+            """
+            INSERT INTO results (
+                cache_key, feedstock_id, recipe_id, profile_id, fidelity,
+                code_version, corpus_version, data_digests, feasible,
+                objectives, feasibility_margins, failing_gates,
+                result_blob, run_reference, eval_spec, notes, created_at
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, 1,
+                ?, ?, ?, ?, ?, ?, ?, ?
+            )
+            """,
+            (
+                prior_key,
+                prior.feedstock_id,
+                prior.recipe_id,
+                prior.profile_id,
+                prior.fidelity,
+                prior.code_version,
+                previous,
+                "{}",
+                '{"pure_silica_glass_kg": 1.0}',
+                "{}",
+                "[]",
+                "{}",
+                "{}",
+                "{}",
+                "[]",
+                "2026-07-31T00:00:00Z",
+            ),
+        )
+
+    assert store.fetch(prior_key) is None
+    assert store.lookup(prior) is None
+    assert store.lookup(base) is None
