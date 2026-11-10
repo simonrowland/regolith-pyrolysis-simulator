@@ -136,6 +136,45 @@ def _run_reference(**kwargs: Any) -> RunReference:
     if authoritative is True and kwargs.get("backend_name") is None:
         kwargs["backend_name"] = "alphamelts"
         kwargs.setdefault("evidence_class", "melts")
+    evidence_class = kwargs.get("evidence_class")
+    backend_name = kwargs.get("backend_name")
+    status = kwargs.get("backend_status")
+    trace = kwargs.get("trace")
+    if status is None and isinstance(trace, Mapping):
+        status = trace.get("backend_status")
+    if (
+        authoritative is True
+        and status in (None, "ok")
+        and evidence_class in {"melts", "magemin"}
+        and isinstance(backend_name, str)
+        and backend_name
+        and isinstance(trace, dict)
+        and trace.get("backend_name") in (None, backend_name)
+    ):
+        diagnostics = trace.get("diagnostics")
+        if not isinstance(diagnostics, dict):
+            diagnostics = {}
+        diagnostics.setdefault("backend_name", backend_name)
+        diagnostics.setdefault("engine_version", "petthermotools 1.2.3")
+        trace["diagnostics"] = diagnostics
+        trace.setdefault("backend_name", backend_name)
+        trace.setdefault("engine_version", "petthermotools 1.2.3")
+    elif (
+        authoritative is True
+        and status in (None, "ok")
+        and evidence_class in {"melts", "magemin"}
+        and isinstance(backend_name, str)
+        and backend_name
+        and trace is None
+    ):
+        kwargs["trace"] = {
+            "backend_name": backend_name,
+            "engine_version": "petthermotools 1.2.3",
+            "diagnostics": {
+                "backend_name": backend_name,
+                "engine_version": "petthermotools 1.2.3",
+            },
+        }
     return RunReference(product_summary=product_summary, **kwargs)
 
 

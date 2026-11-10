@@ -186,6 +186,28 @@ def _spec(
     return spec
 
 
+def _stamped_melts_trace(trace: Any) -> Any:
+    """Stamp only the helper's own default trace.
+
+    Callers that pass a trace are checking strip or disagreement behaviour.
+    Adding a stamp there changes the light trace those tests pin.
+    """
+    if trace is not None:
+        return trace
+    return {
+        "backend_status": "ok",
+        "backend_authoritative": True,
+        "backend_name": "alphamelts",
+        "engine_version": "petthermotools 1.2.3",
+        "diagnostics": {
+            "backend_name": "alphamelts",
+            "engine_version": "petthermotools 1.2.3",
+        },
+        "snapshots": [{"mass_balance_error_pct": 0.0}],
+        "heavy": "trace",
+    }
+
+
 def _scored(
     patch: RecipePatch,
     feedstock: str = FEEDSTOCK,
@@ -217,14 +239,7 @@ def _scored(
         feasibility_margins={"delivered_stream_purity": margin or _margin()},
         run_reference=RunReference(
             status="ok",
-            trace={
-                "backend_status": "ok",
-                "backend_authoritative": True,
-                "snapshots": [{"mass_balance_error_pct": 0.0}],
-                "heavy": "trace",
-            }
-            if trace is None
-            else trace,
+            trace=_stamped_melts_trace(trace),
             product_summary={
                 "oxygen_kg": oxygen_value,
                 "mass_closure": _closed_mass_closure(),
@@ -472,7 +487,16 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
                 status=fresh.run_reference.status,
                 error_message=fresh.run_reference.error_message,
                 reason=fresh.run_reference.reason,
-                trace={"backend_status": "ok", "backend_authoritative": True},
+                trace={
+                    "backend_status": "ok",
+                    "backend_authoritative": True,
+                    "backend_name": "alphamelts",
+                    "engine_version": "petthermotools 1.2.3",
+                    "diagnostics": {
+                        "backend_name": "alphamelts",
+                        "engine_version": "petthermotools 1.2.3",
+                    },
+                },
                 product_summary=fresh.run_reference.product_summary,
                 backend_name="alphamelts",
                 backend_status="ok",

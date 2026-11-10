@@ -98,6 +98,7 @@ def test_optimizer_trace_preserves_high_t_melt_activity_notice() -> None:
     payload = evaluate_module._cache_trace_payload(execution, None)
 
     assert payload["high_t_melt_activity_fallback_notice"] == notice
+    assert "engine_version" not in payload
 
 
 PO2_DEFAULT = ("campaigns", "C0b_p_cleanup", "pO2_mbar_default")
@@ -1265,6 +1266,10 @@ def test_zero_overhead_flow_knudsen_snapshot_is_not_applicable_pass(
         trace=trace,
         backend_status="ok",
         backend_authoritative=True,
+        backend_diagnostics={
+            "backend_name": "alphamelts",
+            "engine_version": "petthermotools 1.2.3",
+        },
     )
     execution.session._config = SimpleNamespace(backend_name="alphamelts")
 
@@ -5466,6 +5471,85 @@ def test_cached_real_fidelity_inherits_run_level_cache_config(tmp_path) -> None:
     assert result.eval_spec.backend_name == "cached-real"
     assert executor.config.backend_name == "cached-real"
     assert executor.config.reduced_real_cache == cache_config
+
+
+def test_cache_trace_payload_binds_adapter_engine_stamp() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={
+                "backend_name": "alphamelts",
+                "engine_version": "petthermotools 1.2.3",
+            }
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="alphamelts")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert payload["backend_name"] == "alphamelts"
+    assert payload["engine_version"] == "petthermotools 1.2.3"
+    assert payload["diagnostics"]["backend_name"] == "alphamelts"
+    assert payload["diagnostics"]["engine_version"] == "petthermotools 1.2.3"
+
+
+def test_cache_trace_payload_does_not_bind_a_foreign_engine_version() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={
+                "backend_name": "magemin",
+                "engine_version": "MAGEMin 1.7.0",
+            }
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="alphamelts")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert payload["backend_name"] == "alphamelts"
+    assert "engine_version" not in payload
+    assert payload["diagnostics"]["backend_name"] == "magemin"
+    assert payload["diagnostics"]["engine_version"] == "MAGEMin 1.7.0"
+
+
+def test_cache_trace_payload_keeps_a_sentinel_adapter_version_unbound() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={
+                "backend_name": "alphamelts",
+                "engine_version": "unavailable",
+            },
+            backend=SimpleNamespace(
+                backend_name="alphamelts",
+                get_engine_version=lambda: "petthermotools 9.9.9",
+            ),
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="alphamelts")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert "engine_version" not in payload
+    assert "diagnostics" not in payload
+
+
+def test_cache_trace_payload_falls_back_to_live_backend_when_unstamped() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={"backend_status": "ok"},
+            backend=SimpleNamespace(
+                backend_name="unknown",
+                name="magemin",
+                get_engine_version=lambda: "MAGEMin 1.7.0",
+            ),
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="magemin")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert payload["backend_name"] == "magemin"
+    assert payload["engine_version"] == "MAGEMin 1.7.0"
+    assert payload["diagnostics"]["backend_name"] == "magemin"
 
 
 def test_run_reference_derives_real_engine_canonical_class() -> None:

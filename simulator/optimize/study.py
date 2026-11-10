@@ -67,6 +67,10 @@ from simulator.optimize.evalspec import (
     current_code_version,
 )
 from simulator.optimize.honesty import alpha_ceiling_species, optimizer_tier_label
+from simulator.optimize.result_trust import (
+    attach_producer_engine_stamp,
+    real_producer_stamp_pair,
+)
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     ObjectiveComputationError,
@@ -4329,6 +4333,7 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
                 for species in ceiling_species
             }
         _project_interpolation_ranked_drain_summary(trace, payload)
+        _project_producer_engine_stamp(trace, payload)
     return MappingProxyType(payload) if payload else None
 
 
@@ -4613,7 +4618,19 @@ def _light_backend_status_trace_for_reference(
             if key in reference.trace:
                 payload[key] = _jsonable_value(reference.trace[key])
         _project_interpolation_ranked_drain_summary(reference.trace, payload)
+        _project_producer_engine_stamp(reference.trace, payload)
     return MappingProxyType(payload)
+
+
+def _project_producer_engine_stamp(trace: Any, payload: dict[str, Any]) -> None:
+    """Keep the adapter stamp when the heavy trace is reduced for the store.
+
+    The two light-trace allowlists stay separate. They already differ, and
+    folding them is a behaviour-preserving move that needs its own pin.
+    """
+    stamp = real_producer_stamp_pair(trace)
+    if stamp is not None:
+        attach_producer_engine_stamp(payload, stamp)
 
 
 def _objective_evidence_trace_summary(objectives: ObjectiveVector | None) -> Mapping[str, Any]:
