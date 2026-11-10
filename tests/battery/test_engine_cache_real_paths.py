@@ -398,6 +398,148 @@ def test_cache_settings_include_unanticipated_simple_configuration_attributes() 
     assert first != second
 
 
+def test_cache_settings_do_not_drop_names_only_because_they_contain_runtime_terms() -> None:
+    from simulator.engine_cache import engine_cache_backend_settings
+
+    backend = SimpleNamespace(
+        chemistry_identity_mode="openimcc",
+        custom_version_selection="v1",
+        input_digest_formula="sha256",
+        commit_atom_count=4,
+        hostname_is_a_component="H",
+        ready_payload_composition="SiO2",
+        chemistry_path="phase-a",
+    )
+    for name, value in vars(backend).items():
+        first = engine_cache_backend_settings(backend)
+        setattr(backend, name, f"changed-{value}")
+        second = engine_cache_backend_settings(backend)
+        assert first != second, name
+
+
+def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason() -> None:
+    from collections.abc import Mapping
+    from enum import Enum
+    from types import ModuleType
+
+    from simulator import engine_cache
+    from tests.battery.cache_test_support import CACHE_TEST_ENGINES, open_available_engine
+
+    runtime_reasons = engine_cache._RUNTIME_ONLY_SETTING_REASONS
+
+    def simple(value: Any) -> bool:
+        return value is None or isinstance(value, (bool, int, float, str, Enum))
+
+    def leaves(value: Any, path: tuple[Any, ...] = (), seen: set[int] | None = None):
+        if seen is None:
+            seen = set()
+        if simple(value):
+            yield path, value
+            return
+        if isinstance(value, (Path, ModuleType)) or callable(value):
+            return
+        marker = id(value)
+        if marker in seen:
+            return
+        seen.add(marker)
+        if isinstance(value, Mapping):
+            for name, child in value.items():
+                yield from leaves(child, (*path, name), seen)
+        elif isinstance(value, (list, tuple, set, frozenset)):
+            for index, child in enumerate(value):
+                yield from leaves(child, (*path, index), seen)
+        else:
+            try:
+                attributes = vars(value)
+            except TypeError:
+                return
+            for name, child in attributes.items():
+                yield from leaves(child, (*path, name), seen)
+
+    def replace(value: Any, path: tuple[Any, ...], replacement: Any) -> Any:
+        if not path:
+            return replacement
+        part, *tail = path
+        if isinstance(value, Mapping):
+            updated = dict(value)
+            updated[part] = replace(value[part], tuple(tail), replacement)
+            if isinstance(value, dict):
+                value[part] = updated[part]
+                return value
+            return updated
+        if isinstance(value, list):
+            value[part] = replace(value[part], tuple(tail), replacement)
+            return value
+        if isinstance(value, tuple):
+            updated = list(value)
+            updated[part] = replace(value[part], tuple(tail), replacement)
+            return tuple(updated)
+        child = getattr(value, part)
+        updated_child = replace(child, tuple(tail), replacement)
+        try:
+            setattr(value, part, updated_child)
+        except (AttributeError, TypeError):
+            object.__setattr__(value, part, updated_child)
+        return value
+
+    def alternate(value: Any) -> Any:
+        if isinstance(value, Enum):
+            alternatives = [member for member in type(value) if member != value]
+            return alternatives[0] if alternatives else f"{value.value}-changed"
+        if value is None:
+            return "cache-setting-test"
+        if isinstance(value, bool):
+            return not value
+        if isinstance(value, int):
+            return value + 1
+        if isinstance(value, float):
+            return value + 0.125
+        return f"{value}-cache-setting-test"
+
+    for engine in CACHE_TEST_ENGINES:
+        handle = open_available_engine(engine, nodeid="cache settings invariant")
+        try:
+            settings, dropped = engine_cache._engine_cache_backend_settings_with_drops(
+                handle.backend
+            )
+            for path, reason in dropped.items():
+                assert path and runtime_reasons.get(str(path[-1])) == reason, path
+            chem_version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine.value]
+            baseline_key = engine_cache.engine_cache_key(
+                engine.value, chem_version, settings
+            )
+            for path, original in tuple(leaves(handle.backend)):
+                changed = alternate(original)
+                if changed == original:
+                    continue
+                replace(handle.backend, path, changed)
+                try:
+                    changed_settings, changed_drops = (
+                        engine_cache._engine_cache_backend_settings_with_drops(
+                            handle.backend
+                        )
+                    )
+                    changed_key = engine_cache.engine_cache_key(
+                        engine.value, chem_version, changed_settings
+                    )
+                    if changed_key == baseline_key:
+                        dropped_prefixes = [
+                            dropped_path
+                            for dropped_path in changed_drops
+                            if path[: len(dropped_path)] == dropped_path
+                        ]
+                        assert dropped_prefixes, (engine.value, path)
+                        for dropped_path in dropped_prefixes:
+                            assert (
+                                runtime_reasons.get(str(dropped_path[-1]))
+                                == changed_drops[dropped_path]
+                            ), (engine.value, path, dropped_path)
+                finally:
+                    replace(handle.backend, path, original)
+        finally:
+            close_battery_engine_handle(handle)
+
+
 def test_cache_settings_exclude_warm_pool_runtime_state() -> None:
     from simulator.engine_cache import engine_cache_backend_settings
 
