@@ -15,7 +15,10 @@ from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any
 
-from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+from engines.builtin.evaporation_flux import (
+    BuiltinEvaporationFluxProvider,
+    EvaporationFluxConfigurationError,
+)
 from simulator.accounting.formulas import parse_formula
 from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
 from simulator.battery.oxygen_balance import (
@@ -676,6 +679,45 @@ def _residue_atom_closure(initial_totals, final_totals, buffer_oxygen_exchange_m
     return closure
 
 
+def _series_flux_with_missing_ce_fallback(
+    **kwargs: Any,
+) -> Any:
+    """Use the existing Langmuir boundary only for a species missing CE data.
+
+    Premise: without sourced Chapman-Enskog parameters, that species' gas-film
+    resistance cannot be computed. The series owner already defines the
+    explicit no-gas-film limit, so set ``R_gas=0`` for this species only and
+    keep every supported species on the ordinary series path. With melt
+    resistance disabled, the algebra is ``J = delta_p / (R_interface + 0 +
+    0) = alpha*k_HK*delta_p``; every resistance is m² Pa s/kg and J is
+    kg/(m² s). This is a low-authority Langmuir limit, not a claim that the
+    flowing furnace itself is free molecular. The returned flag preserves the
+    missing-parameter reason and its limited authority. Sanity check: the
+    fallback result equals the production ``langmuir_flux`` resolver.
+    """
+    from simulator.chemistry.langmuir_knudsen import series_flux
+
+    try:
+        return series_flux(**kwargs)
+    except EvaporationFluxConfigurationError as exc:
+        if not str(exc).startswith(
+            "missing Chapman-Enskog transport parameters for "
+        ):
+            raise
+        fallback_kwargs = {**kwargs, "gas_resistance_enabled": False}
+        fallback_flag = (
+            "low_authority_langmuir_limit_missing_chapman_enskog_parameters:"
+            f"{exc}"
+        )
+        result = series_flux(**fallback_kwargs)
+        return replace(
+            result,
+            transport_assumption_flags=tuple(
+                sorted(set((*result.transport_assumption_flags, fallback_flag)))
+            ),
+        )
+
+
 def _finite_step_fluxes(
     terms: Sequence[_ChannelTerms],
     inventory_mol: Mapping[str, float],
@@ -696,11 +738,9 @@ def _finite_step_fluxes(
     if not parent_channels:
         return {}
     if transport_conditions is not None:
-        from simulator.chemistry.langmuir_knudsen import series_flux
-
         rates_kg_s: dict[str, float] = {}
         for term in parent_channels:
-            result = series_flux(
+            result = _series_flux_with_missing_ce_fallback(
                 species=term.source.species,
                 p_eq_pa=float(pressures_Pa.get(term.source.species, 0.0)),
                 p_bulk_pa=0.0,
@@ -4035,26 +4075,28 @@ def _predict_sossi_residue_cohort(
             amount * _formula_terms(oxide)[1]
             for oxide, amount in inventory.items()
         )
-        from simulator.chemistry.langmuir_knudsen import series_flux
-
-        flag_channel = channels[0]
-        transport_probe = series_flux(
-            species=flag_channel.species,
-            p_eq_pa=float(initial_pressures.get(flag_channel.species, 0.0)),
-            p_bulk_pa=0.0,
-            T_surface_K=temperature_K,
-            molar_mass_kg_mol=_formula_terms(flag_channel.formula)[1],
-            alpha=float(flag_channel.alpha),
-            total_pressure_pa=transport_conditions["total_pressure_pa"],
-            carrier_gas_mixture=transport_conditions["carrier_gas_mixture"],
-            flow_rate_sccm=transport_conditions["flow_rate_sccm"],
-            pipe_diameter_m=transport_conditions["pipe_diameter_m"],
-            transport_length_m=transport_conditions["transport_length_m"],
-        )
+        transport_probe_flags: list[str] = []
+        for flag_channel in channels:
+            transport_probe = _series_flux_with_missing_ce_fallback(
+                species=flag_channel.species,
+                p_eq_pa=float(initial_pressures.get(flag_channel.species, 0.0)),
+                p_bulk_pa=0.0,
+                T_surface_K=temperature_K,
+                molar_mass_kg_mol=_formula_terms(flag_channel.formula)[1],
+                alpha=float(flag_channel.alpha),
+                total_pressure_pa=transport_conditions["total_pressure_pa"],
+                carrier_gas_mixture=transport_conditions["carrier_gas_mixture"],
+                flow_rate_sccm=transport_conditions["flow_rate_sccm"],
+                pipe_diameter_m=transport_conditions["pipe_diameter_m"],
+                transport_length_m=transport_conditions["transport_length_m"],
+            )
+            transport_probe_flags.extend(
+                transport_probe.transport_assumption_flags
+            )
         transport_assumption_flags = tuple(
             dict.fromkeys(
                 (
-                    *transport_probe.transport_assumption_flags,
+                    *transport_probe_flags,
                     *transport_conditions["transport_assumption_flags"],
                 )
             )

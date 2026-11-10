@@ -253,7 +253,12 @@ def test_missing_tio2_transport_uses_flagged_langmuir_limit_only_for_tio2():
         },
     }
 
-    result, fallback_flag = residue._series_flux_with_missing_ce_fallback(**kwargs)
+    result = residue._series_flux_with_missing_ce_fallback(**kwargs)
+    fallback_flag = next(
+        flag
+        for flag in result.transport_assumption_flags
+        if "low_authority_langmuir_limit" in flag
+    )
 
     expected = langmuir_flux(
         "TiO2",
@@ -264,7 +269,6 @@ def test_missing_tio2_transport_uses_flagged_langmuir_limit_only_for_tio2():
         molar_mass_kg_mol=_formula_terms("TiO2")[1],
     )
     assert result.flux_kg_s_m2 == pytest.approx(expected)
-    assert fallback_flag is not None
     assert "TiO2" in fallback_flag
     assert "N2" in fallback_flag
     assert "missing_chapman_enskog_parameters" in fallback_flag
