@@ -842,6 +842,7 @@ def test_isolated_backend_reconstruction_disables_nested_pools(
         return SimpleNamespace()
 
     monkeypatch.setattr(backends, "resolve_backend", resolve_backend)
+    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "MELTS")
     for engine in ("vaporock", "magemin", "alphamelts", "thermoengine"):
         _open_resolved_backend(engine, {})
 
@@ -966,16 +967,22 @@ def test_openimcc_cache_settings_use_effective_loaded_pack() -> None:
 
     backend = object.__new__(_OpenImccBatteryBackend)
     backend._pack_name = "default"
+    backend._gas_pack_name = "default"
     backend._identity = {"pack": "published-core"}
 
     first = engine_cache_backend_settings(backend)
     backend._identity["pack"] = "published-ext"
     second = engine_cache_backend_settings(backend)
+    backend._gas_pack_name = "published-gas-ext"
+    third = engine_cache_backend_settings(backend)
 
     assert first["_effective_pack_name"] == "published-core"
     assert second["_effective_pack_name"] == "published-ext"
+    assert first["_gas_pack_name"] == "default"
+    assert third["_gas_pack_name"] == "published-gas-ext"
     assert "_pack_name" not in first
     assert first != second
+    assert second != third
     assert engine_cache_key("openimcc", 1, first) != engine_cache_key("openimcc", 1, second)
 
 
@@ -1141,6 +1148,69 @@ def test_internal_analytical_residue_cache_round_trips_named_observation_request
     }
 
 
+def test_internal_analytical_residue_keys_previous_high_t_activity_state(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        internal_analytical_residue_vapor_pressure,
+    )
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setattr(engine_cache, "record_engine_open", lambda *_args: None)
+    engine_cache.engine_cache_counters(reset=True)
+    core = SimpleNamespace(
+        _high_t_melt_activity="openimcc",
+        _last_high_t_melt_activity={},
+        _last_high_t_melt_activity_temperature_K=None,
+    )
+    calls = 0
+
+    def solve(**_kwargs: Any) -> Any:
+        nonlocal calls
+        calls += 1
+        return SimpleNamespace(vapor_pressures_Pa={"SiO(g)": 1.0})
+
+    monkeypatch.setattr(battery, "_internal_analytical_vapor_pressure_adapter", solve)
+    request = {
+        "temperature_C": 1726.85,
+        "pressure_bar": 0.0,
+        "composition_kg": None,
+        "composition_mol": {"SiO2": 0.44, "FeO": 0.08, "MgO": 0.36, "CaO": 0.12},
+        "fO2_log": -10.0,
+        "po2_request": Po2Request(PO2_COMMANDED, 1e-10),
+        "include_diagnostic_shadows": False,
+    }
+
+    first = internal_analytical_residue_vapor_pressure(core=core, **request)
+    core._last_high_t_melt_activity = {
+        "temperature_K": 1950.0,
+        "certified_effective_gamma_by_parent": {
+            "SiO2": {
+                "gamma_last": 1.25,
+                "temperature_K": 1950.0,
+                "composition_single_cation": {"SiO2": 1.0},
+            }
+        },
+    }
+    core._last_high_t_melt_activity_temperature_K = 1950.0
+    second = internal_analytical_residue_vapor_pressure(core=core, **request)
+
+    assert first.vapor_pressures_Pa == second.vapor_pressures_Pa == {"SiO(g)": 1.0}
+    assert calls == 2
+    assert engine_cache.engine_cache_counters(reset=True)["internal-analytical"] == {
+        "hits": 0,
+        "misses": 2,
+        "stores": 2,
+        "store_error": 0,
+        "read_error": 0,
+    }
+
+
 def test_internal_analytical_high_temperature_mode_is_keyed_and_cache_equivalent(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1174,6 +1244,8 @@ def test_internal_analytical_high_temperature_mode_is_keyed_and_cache_equivalent
         "call": "residue_vapor_pressure",
         **request,
         "po2_request": request["po2_request"].as_payload(),
+        "high_t_melt_activity_previous": {},
+        "high_t_melt_activity_previous_temperature_K": None,
     }
 
     def evaluate(mode: str, *, cache: bool) -> Any:
@@ -1246,6 +1318,13 @@ def test_internal_analytical_high_temperature_mode_is_keyed_and_cache_equivalent
     assert constant_gamma_cold == constant_gamma_off
     assert constant_gamma_warm == constant_gamma_off
     assert openimcc_off.vapor_pressures_Pa != constant_gamma_off.vapor_pressures_Pa
+    assert engine_cache.engine_cache_counters(reset=True)["internal-analytical"] == {
+        "hits": 2,
+        "misses": 2,
+        "stores": 2,
+        "store_error": 0,
+        "read_error": 0,
+    }
 
 
 def test_hashimoto_internal_residue_path_reads_diagnostics_from_cache(
