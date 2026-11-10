@@ -22,7 +22,15 @@ drive ``max(0, P_eq - P_bulk)`` and, where that publisher enables it,
 the species-specific gas-film resistance. A vacuum root that is then
 clamped to the overhead partial is not a root of that balance. While
 O2 is net-leaving, the solved surface is not below the overhead pO2,
-because the O2 drive is zero at and below that partial.
+because the O2 drive is zero at and below that partial. The O2
+partial is that backpressure on every transport branch.
+``species_drive_bulk_Pa`` is the only bulk decision, shared with the
+flux publisher. A disabled film and an HKL upper bound set
+``R_gas = 0`` (ideal Hertz-Knudsen); they do not zero the O2 partial.
+Free-molecular ``k_O2/k_Ca = sqrt(M_Ca/M_O2) = 1.119``. The 10 mbar
+film ratio is 1.424. ``p_total = 0`` with no O2 partial recovers the
+vacuum root. The exit check compares the solved surface with the
+caller's partial, not with a bulk a branch already discarded.
 
 A failed root drops only below-band carriers. An in-band failure keeps
 the published pressures and names the warning.
@@ -33,8 +41,12 @@ partial vector) enters it with the partials of that evaluation. The
 closure runs only when the evaluated pO2 is at the physical floor or
 the reservoir source capacity is at or below
 ``OXYGEN_RESERVOIR_NOOP_MOL`` (d-072 ``no_melt_redox_capacity``).
-``equilibrium.liquid_fraction`` is not that test. Every species is
-then one of three outcomes: the published pressure (closure closed,
+``equilibrium.liquid_fraction`` is not that test. While O2 is
+net-leaving, the solved surface is not below the caller's overhead
+O2 partial. That partial is the O2 drive bulk for every film flag
+and every HKL membership; the exit of this solve checks the caller's
+partial, not a bulk a branch zeroed. Every species is then one of
+three outcomes: the published pressure (closure closed,
 transport-headspace channel, or no melt-surface law), the single
 surface-pO2 law below, or a typed refusal. The published surface is
 the root of ``sum (nO_i - dO_i) J_i = 0`` where ``J_i`` is that
@@ -881,13 +893,17 @@ def publisher_net_law(
 
     ``k`` is mol s^-1 m^-2 Pa^-1 and ``bulk`` is Pa. With no transport
     context the law is ideal Hertz-Knudsen of the supplied backpressure
-    (``R_gas = 0``). With a transport context the law is the evaporation
-    publisher's: an HKL upper-bound carrier, or gas resistance disabled,
-    drops the backpressure and the film; every other carrier uses
+    (``R_gas = 0``). With a transport context the conductance is the
+    evaporation publisher's and the bulk is ``species_drive_bulk_Pa``:
+    overhead O2 on every branch, and every other species only when the
+    film is on and the carrier is not an HKL upper bound. A disabled
+    film or an HKL upper bound is ideal Hertz-Knudsen (``R_gas = 0``),
+    not a zero O2 bulk. Every other carrier uses
     ``_series_resistance_evaporation_flux_kg_m2_s``. The 1 Pa probe is
     valid because that flux is linear in ``P_eq - P_bulk`` (``R_gas``
     does not depend on the driving pressure). Sanity: free-molecular
-    flow returns the ideal conductance and the species bulk.
+    flow with no O2 partial returns the ideal conductance and a zero
+    bulk, which is the vacuum root.
     """
 
     if (
@@ -928,23 +944,37 @@ def _publisher_net_law_with_transport(
     bulk: float,
     transport: LangmuirTransport,
 ) -> tuple[float, float]:
+    from engines.builtin.evaporation_flux import (
+        EvaporationFluxConfigurationError,
+        _series_resistance_evaporation_flux_kg_m2_s,
+        species_drive_bulk_Pa,
+    )
+
     ideal = _ideal_molar_conductance(
         alpha, molar_mass_kg_per_mol, transport.temperature_K
     )
     hkl_bound = species in transport.hkl_upper_bound_species
-    if not transport.gas_resistance_enabled or hkl_bound:
-        # Publisher: P_bulk is forced to 0 and R_gas is off.
-        return ideal, 0.0
-    from engines.builtin.evaporation_flux import (
-        EvaporationFluxConfigurationError,
-        _series_resistance_evaporation_flux_kg_m2_s,
+    # d-376 amendment 1. Disabled film and an HKL upper bound are ideal
+    # Hertz-Knudsen, ``R_gas = 0``. Overhead O2 stays the backpressure,
+    # so the O2 drive is zero at and below that partial and the root
+    # cannot sit under it while O2 leaves. Other species keep the
+    # free-evaporation bound (bulk 0 here). Free-molecular
+    # ``k_O2/k_Ca = sqrt(M_Ca/M_O2) = 1.119``; the 10 mbar film ratio
+    # is 1.424. No O2 partial recovers the vacuum root either way.
+    drive_bulk = species_drive_bulk_Pa(
+        species,
+        bulk,
+        gas_resistance_enabled=transport.gas_resistance_enabled,
+        hkl_upper_bound=hkl_bound,
     )
+    if not transport.gas_resistance_enabled or hkl_bound:
+        return ideal, drive_bulk
 
     try:
         probed = _series_resistance_evaporation_flux_kg_m2_s(
             species=species,
-            P_eq_pa=bulk + 1.0,
-            P_bulk_pa=bulk,
+            P_eq_pa=drive_bulk + 1.0,
+            P_bulk_pa=drive_bulk,
             T_surface_K=transport.temperature_K,
             molar_mass_kg_mol=molar_mass_kg_per_mol,
             alpha_i=alpha,
@@ -966,12 +996,12 @@ def _publisher_net_law_with_transport(
     if not math.isfinite(flux_kg_s_m2) or flux_kg_s_m2 < 0.0:
         raise ValueError(f"publisher net flux invalid for {species}")
     if flux_kg_s_m2 == 0.0:
-        return 0.0, bulk
+        return 0.0, drive_bulk
     # J_mol = flux_kg / M. The probe drive is 1 Pa, so k = J_mol / 1 Pa.
     conductance = flux_kg_s_m2 / molar_mass_kg_per_mol
     if not math.isfinite(conductance) or conductance < 0.0:
         raise ValueError(f"publisher conductance invalid for {species}")
-    return conductance, bulk
+    return conductance, drive_bulk
 
 
 def _solve_net_surface_balance(
@@ -1280,12 +1310,15 @@ def _solve_or_refuse(
         )
 
     surface_pO2_bar = float(balance.pO2_bar)
-    o2_bulk_Pa = law.get("O2", (0.0, 0.0))[1]
+    # The caller's overhead partial, not the bulk a transport branch
+    # stored in the law. A disabled film used to zero that bulk and
+    # this check then missed a vacuum root under the real overhead.
+    physical_o2_Pa = partials.get("O2", 0.0)
     o2_flux = float(balance.channel_fluxes_mol_m2_s.get("O2", 0.0) or 0.0)
     # O2 drive is zero at and below the overhead partial. A positive O2
     # flux therefore means the solved surface is above that partial.
-    overhead_bounded = o2_bulk_Pa > 0.0 and o2_flux > 0.0
-    if overhead_bounded and surface_pO2_bar * PA_PER_BAR < o2_bulk_Pa:
+    overhead_bounded = physical_o2_Pa > 0.0 and o2_flux > 0.0
+    if overhead_bounded and surface_pO2_bar * PA_PER_BAR < physical_o2_Pa:
         return _refuse_inverted(
             pressures_Pa,
             inverted,
@@ -1314,7 +1347,7 @@ def _solve_or_refuse(
         f"relative_residual={residual:.3e}"
     )
     if overhead_bounded:
-        warning += f" overhead_pO2_bar={o2_bulk_Pa / PA_PER_BAR:.6e}"
+        warning += f" overhead_pO2_bar={physical_o2_Pa / PA_PER_BAR:.6e}"
     if refused:
         warning += " refused=" + ",".join(sorted(refused))
     return LangmuirSurfaceOxygen(

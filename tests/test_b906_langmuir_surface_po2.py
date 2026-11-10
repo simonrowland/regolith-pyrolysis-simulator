@@ -30,7 +30,10 @@ melt-surface carrier), the one shared surface-pO2 law, or a typed
 refusal. The published surface is the root of
 ``sum (nO - dO) J = 0`` with ``J = k * max(0, P - P_bulk)`` using the
 publisher conductance (ideal Hertz-Knudsen when the film is off).
-The reported residual is that root's residual. A condensed-metal cap
+Overhead O2 is that ``P_bulk`` on every branch: a disabled film and an
+HKL upper bound set ``R_gas = 0`` and do not discard the partial.
+While O2 is net-leaving the surface is not below it. The reported
+residual is that root's residual. A condensed-metal cap
 never publishes above P_sat, including when the solve lowers pO2 and
 a subunit activity crosses 1, and the cap does not zero that
 carrier's oxygen demand. Transport-headspace pressures are not
@@ -2702,3 +2705,387 @@ def test_every_species_uses_the_publisher_alpha_policy(policy: str) -> None:
         assert alpha_used["Al2"] == pytest.approx(1.0)
         assert "Zr" in missing
         assert "Al2O" in missing
+
+
+# d-376 amendment 1, stated as the spec. Not imported from the solver.
+# Overhead O2 is the drive bulk on every transport branch. Every other
+# species keeps a bulk only while the film is on and the carrier is not
+# an HKL upper bound. A disabled film is ideal Hertz-Knudsen, R_gas = 0.
+def _spec_drive_bulk(
+    species: str,
+    physical_pa: float,
+    *,
+    film_on: bool,
+    hkl: frozenset[str],
+) -> float:
+    if not math.isfinite(physical_pa) or physical_pa <= 0.0:
+        return 0.0
+    if species == "O2":
+        return physical_pa
+    if film_on and species not in hkl:
+        return physical_pa
+    return 0.0
+
+
+def _branch_film_on(species: str, *, film_on: bool, hkl: frozenset[str]) -> bool:
+    return film_on and species not in hkl
+
+
+_BOUND_HKL = {
+    "none": frozenset(),
+    "O2": frozenset({"O2"}),
+    "Ca": frozenset({"Ca"}),
+    "both": frozenset({"O2", "Ca"}),
+}
+_BOUND_PARTIALS = {
+    "none": {},
+    "o2": {"O2": 100.0},
+    "o2+ca": {"O2": 100.0, "Ca": 0.05},
+}
+_BOUND_GATES = ("open", "floor", "buffered")
+
+
+def _bound_cases() -> list[tuple]:
+    rows = []
+    for film_on in (False, True):
+        for hkl_name in _BOUND_HKL:
+            for partial_name in _BOUND_PARTIALS:
+                for gate in _BOUND_GATES:
+                    rows.append(("direct", film_on, hkl_name, partial_name, gate))
+    for film_on in (False, True):
+        for entry in ("live", "reclose"):
+            rows.append((entry, film_on, "none", "o2", "open"))
+    return rows
+
+
+def _bound_case_id(case: tuple) -> str:
+    entry, film_on, hkl_name, partial_name, gate = case
+    film = "film" if film_on else "nofilm"
+    return f"{entry}-{film}-hkl-{hkl_name}-{partial_name}-{gate}"
+
+
+@functools.lru_cache(maxsize=2)
+def _bound_answer(gate: str):
+    return _cao_answer(-40.0 if gate == "floor" else -9.0)
+
+
+def _bound_capacity(gate: str) -> float:
+    if gate == "open":
+        return 0.0
+    return _BUFFERED_CAPACITY_MOL_PER_LN
+
+
+def _bound_transport(film_on: bool, hkl: frozenset[str], partials: dict[str, float]):
+    from simulator.langmuir_surface_oxygen import LangmuirTransport
+
+    # Commanded total 0. The realized total is the partial sum, the same
+    # pressure Kn would see. Film off does not switch that state to vacuum.
+    realized_pa = sum(value for value in partials.values() if value > 0.0)
+    return LangmuirTransport(
+        temperature_K=_T_K,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=_T_K,
+        carrier_gas="N2",
+        axial_stir_factor=0.0,
+        radial_stir_factor=0.0,
+        overhead_pressure_Pa=realized_pa,
+        gas_resistance_enabled=film_on,
+        hkl_upper_bound_species=frozenset(hkl),
+        extrapolate_continuum=False,
+    )
+
+
+def _bound_cao_root(
+    published_ca: float,
+    p_ref_bar: float,
+    *,
+    partials: dict[str, float],
+    film_on: bool,
+    hkl: frozenset[str],
+    legacy,
+    realized_pa: float,
+) -> tuple[float, float]:
+    """Independent Ca+O2 root on the spec drive, not the surface solver."""
+
+    from scipy.optimize import brentq
+
+    alpha_ca = _catalog_alpha(legacy, "Ca", _T_K)
+    bulk_ca = _spec_drive_bulk(
+        "Ca", partials.get("Ca", 0.0), film_on=film_on, hkl=hkl
+    )
+    bulk_o2 = _spec_drive_bulk(
+        "O2", partials.get("O2", 0.0), film_on=film_on, hkl=hkl
+    )
+    ca_film = _branch_film_on("Ca", film_on=film_on, hkl=hkl)
+    o2_film = _branch_film_on("O2", film_on=film_on, hkl=hkl)
+
+    def signed(log_p: float) -> float:
+        surface = 10.0 ** log_p
+        pressure_ca = published_ca * (surface / p_ref_bar) ** (-0.5)
+        j_ca = _series_molar_flux(
+            species="Ca",
+            pressure_pa=pressure_ca,
+            bulk_pa=bulk_ca,
+            molar_mass=_M_CA,
+            alpha=alpha_ca,
+            temperature_K=_T_K,
+            overhead_pa=realized_pa,
+            gas_resistance_enabled=ca_film,
+        )
+        j_o2 = _series_molar_flux(
+            species="O2",
+            pressure_pa=surface * PA_PER_BAR,
+            bulk_pa=bulk_o2,
+            molar_mass=_M_O2,
+            alpha=1.0,
+            temperature_K=_T_K,
+            overhead_pa=realized_pa,
+            gas_resistance_enabled=o2_film,
+        )
+        return 2.0 * j_o2 - j_ca
+
+    low = signed(-30.0)
+    high = signed(0.0)
+    assert low < 0.0 < high
+    log_root = brentq(signed, -30.0, 0.0, xtol=1.0e-12, rtol=1.0e-12, maxiter=200)
+    surface = 10.0 ** log_root
+    pressure = published_ca * (surface / p_ref_bar) ** (-0.5)
+    return surface, pressure
+
+
+def _assert_law_bulks(transport, partials: dict[str, float], hkl: frozenset[str], film_on: bool) -> None:
+    from simulator.langmuir_surface_oxygen import publisher_net_law
+
+    probes = {"O2": partials.get("O2", 100.0), "Ca": partials.get("Ca", 50.0)}
+    masses = {"O2": _M_O2, "Ca": _M_CA}
+    for species, physical in probes.items():
+        _k, bulk = publisher_net_law(
+            species=species,
+            alpha=1.0,
+            molar_mass_kg_per_mol=masses[species],
+            bulk_pressure_Pa=physical,
+            temperature_K=_T_K,
+            transport=transport,
+        )
+        assert bulk == pytest.approx(
+            _spec_drive_bulk(species, physical, film_on=film_on, hkl=hkl)
+        )
+
+
+def _assert_direct_bound(film_on: bool, hkl_name: str, partial_name: str, gate: str) -> None:
+    from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
+
+    hkl = _BOUND_HKL[hkl_name]
+    partials = dict(_BOUND_PARTIALS[partial_name])
+    answer = _bound_answer(gate)
+    diagnostic = answer.diagnostic
+    published, published_ca, p_ref_bar = _published_ca(diagnostic)
+    compiled, legacy = _catalog()
+    transport = _bound_transport(film_on, hkl, partials)
+    _assert_law_bulks(transport, partials, hkl, film_on)
+    result = apply_langmuir_surface_oxygen(
+        published,
+        temperature_K=_T_K,
+        provenance_by_species=diagnostic.get(
+            "vapor_pressure_numerator_provenance"
+        )
+        or {},
+        source_reaction_fO2_bar=diagnostic.get("source_reaction_fO2_bar"),
+        transport_pO2_bar=diagnostic.get("pO2_bar"),
+        legacy_catalog=legacy,
+        compiled_catalog=compiled,
+        melt_redox_capacity_mol_per_ln_fO2=_bound_capacity(gate),
+        overhead_partials_Pa=partials,
+        transport=transport,
+    )
+    opens = gate != "buffered"
+    if not opens:
+        assert result.applied is False
+        assert result.surface_pO2_bar is None
+        assert dict(result.pressures_Pa) == published
+        return
+    assert result.applied is True
+    assert result.surface_pO2_bar is not None
+    assert result.refused_species == {}
+    assert result.relative_residual < 1.0e-4
+    surface = float(result.surface_pO2_bar)
+    physical_o2 = partials.get("O2", 0.0)
+    if physical_o2 > 0.0:
+        # The disabled-film hole published the vacuum root, 2.38675e-5 bar,
+        # under 100 Pa (1e-3 bar) of overhead O2.
+        assert surface * PA_PER_BAR >= physical_o2 * (1.0 - 1.0e-9)
+        assert surface != pytest.approx(2.386748965e-5, rel=1.0e-3)
+        assert result.overhead_bounded is True
+    else:
+        assert result.overhead_bounded is False
+    if hkl_name == "none":
+        realized = float(transport.overhead_pressure_Pa)
+        root_bar, root_pa = _bound_cao_root(
+            published_ca,
+            p_ref_bar,
+            partials=partials,
+            film_on=film_on,
+            hkl=hkl,
+            legacy=legacy,
+            realized_pa=realized,
+        )
+        assert surface == pytest.approx(root_bar, rel=1.0e-5)
+        assert result.pressures_Pa["Ca"] == pytest.approx(root_pa, rel=1.0e-5)
+
+
+def _provider_drive_bulks(*, film_on: bool) -> dict[str, float]:
+    """Real flux provider. O2 partial must survive a disabled film; Ca does not."""
+
+    from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+
+    provider = BuiltinEvaporationFluxProvider()
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.EVAPORATION_FLUX,
+            account_view=ProviderAccountView(
+                accounts={},
+                species_formula_registry={},
+            ),
+            temperature_C=_T_C,
+            pressure_bar=0.0,
+            control_inputs={
+                "vapour_batch_flux_pressures_Pa": {"O2": 250.0, "Ca": 80.0},
+                "overhead_partials_Pa": {"O2": 100.0, "Ca": 50.0},
+                "overhead_pressure_pa": 150.0,
+                "commanded_pressure_pa": 0.0,
+                "molar_mass_kg_mol": {"O2": _M_O2, "Ca": _M_CA},
+                "stoich_by_species": {
+                    "O2": {
+                        "parent_oxide": "CaO",
+                        "oxide_per_product_kg": 1.0,
+                    },
+                    "Ca": {
+                        "parent_oxide": "CaO",
+                        "oxide_per_product_kg": 1.4,
+                    },
+                },
+                "available_oxide_kg": {"O2": 1.0, "Ca": 1.0},
+                "melt_surface_area_m2": 1.0,
+                "alpha": 1.0,
+                "pipe_diameter_m": 0.12,
+                "gas_temperature_K": _T_K,
+                "carrier_gas": "N2",
+                "gas_resistance_enabled": film_on,
+                "evaporation_series_resistance": {
+                    "gas_resistance_enabled": film_on,
+                },
+            },
+        )
+    )
+    assert str(result.status) == "ok", result.diagnostic
+    series = (result.diagnostic or {}).get("evaporation_series_resistance") or {}
+    return {
+        species: float(series[species]["P_bulk_Pa"])
+        for species in ("O2", "Ca")
+    }
+
+
+def _assert_host_bound(entry: str, film_on: bool) -> None:
+    from simulator.condensation import _knudsen_number
+
+    partials = {"O2": 100.0}
+    hkl: frozenset[str] = frozenset()
+    compiled, legacy = _catalog()
+    answer = _bound_answer("open")
+    diagnostic = answer.diagnostic
+    published, published_ca, p_ref_bar = _published_ca(diagnostic)
+    kernel = {"gas_resistance_enabled": film_on}
+    # Persisted headspace for the live path. Reclose starts from an empty
+    # headspace and then enters with the O2 vector, the capacity iteration.
+    headspace = {"O2": 1.0} if entry == "live" else {}
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=0.0,
+        p_total_mbar=0.0,
+        headspace_partials_mbar=headspace,
+        chemistry_kernel=kernel,
+    )
+    root_bar, root_pa = _bound_cao_root(
+        published_ca,
+        p_ref_bar,
+        partials=partials,
+        film_on=film_on,
+        hkl=hkl,
+        legacy=legacy,
+        realized_pa=100.0,
+    )
+    if entry == "reclose":
+        vacuum = _resolve(host, equilibrium)
+        _surface, ideal_pa, _flux = _congruent_cao_surface(published_ca, p_ref_bar)
+        assert vacuum["Ca"] == pytest.approx(ideal_pa, rel=1.0e-4)
+        reclosed = EvaporationMixin._reclose_langmuir_pressures(host, partials)
+        assert reclosed is not None
+        assert reclosed.surface_pO2_bar is not None
+        assert reclosed.surface_pO2_bar * PA_PER_BAR >= 100.0 * (1.0 - 1.0e-9)
+        assert reclosed.surface_pO2_bar != pytest.approx(2.386748965e-5, rel=1.0e-3)
+        assert reclosed.pressures_Pa["Ca"] == pytest.approx(root_pa, rel=1.0e-5)
+        assert reclosed.surface_pO2_bar == pytest.approx(root_bar, rel=1.0e-5)
+        assert reclosed.overhead_bounded is True
+        assert reclosed.relative_residual < 1.0e-4
+        return
+
+    captured: dict = {}
+    _dispatch_real_flux_provider(host, captured)
+    EvaporationMixin._calculate_evaporation(host, equilibrium)
+    notice = host._last_langmuir_surface_oxygen
+    assert notice["surface_pO2_bar"] * PA_PER_BAR >= 100.0 * (1.0 - 1.0e-9)
+    assert notice["surface_pO2_bar"] != pytest.approx(2.386748965e-5, rel=1.0e-3)
+    assert notice["overhead_bounded"] is True
+    assert float(notice["relative_residual"]) < 1.0e-4
+    controls = captured["controls"]
+    # C7: commanded total is 0 and 100 Pa of O2 is present. The realized
+    # total is that partial. Kn is this one pressure, including when the
+    # film flag is off and R_gas stays 0. It is not a second vacuum total.
+    assert float(controls["commanded_pressure_pa"]) == pytest.approx(0.0)
+    assert float(controls["overhead_pressure_pa"]) == pytest.approx(100.0)
+    assert controls["overhead_partials_Pa"]["O2"] == pytest.approx(100.0)
+    kernel_map = controls[CONTROL_FLUX_PRESSURES_KEY]
+    assert kernel_map["Ca"] == pytest.approx(root_pa, rel=1.0e-5)
+    provider = captured["provider"]
+    assert provider is not None and str(provider.status) == "ok", provider
+    series = (provider.diagnostic or {}).get("evaporation_series_resistance") or {}
+    ca_diag = series["Ca"]
+    assert ca_diag["P_bulk_Pa"] == pytest.approx(0.0)
+    expected_kn = _knudsen_number(
+        100.0,
+        float(controls["gas_temperature_K"]),
+        float(controls["pipe_diameter_m"]),
+        carrier_gas=str(controls["carrier_gas"]),
+    )
+    assert ca_diag["knudsen_number"] == pytest.approx(expected_kn, rel=1.0e-9)
+    if film_on:
+        assert float(ca_diag["r_gas"]) > 0.0
+    else:
+        assert float(ca_diag["r_gas"]) == pytest.approx(0.0)
+    bulks = _provider_drive_bulks(film_on=film_on)
+    assert bulks["O2"] == pytest.approx(100.0)
+    assert bulks["Ca"] == pytest.approx(50.0 if film_on else 0.0)
+
+
+@pytest.mark.parametrize("case", _bound_cases(), ids=_bound_case_id)
+def test_overhead_o2_bound_holds_on_every_transport_branch(case: tuple) -> None:
+    """While O2 is net-leaving, surface pO2 is not below the overhead partial.
+
+    Invariant, one drive rule for the closure and the flux publisher.
+    Branches: film on and off, HKL membership of O2 and of Ca, partials
+    none / O2 / O2+Ca, and the open, floor, and buffered gates. Entries:
+    ``apply_langmuir_surface_oxygen`` with that transport, the live
+    evaporation path, and the capacity-iteration reclose. A disabled
+    film with 100 Pa overhead O2 is the vacuum root 2.38675e-5 bar
+    before the rule and a surface just above 1e-3 bar after it.
+    Buffered in-band publication stays on the mass-action map.
+    """
+
+    entry, film_on, hkl_name, partial_name, gate = case
+    if entry == "direct":
+        _assert_direct_bound(film_on, hkl_name, partial_name, gate)
+    else:
+        _assert_host_bound(entry, film_on)

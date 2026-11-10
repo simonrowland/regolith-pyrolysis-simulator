@@ -416,6 +416,40 @@ def resolve_gas_resistance_enabled(
     return bool_feature_flag(parent, "gas_resistance_enabled", True)
 
 
+def species_drive_bulk_Pa(
+    species: str,
+    physical_partial_Pa: float,
+    *,
+    gas_resistance_enabled: bool,
+    hkl_upper_bound: bool,
+) -> float:
+    """Pa backpressure in ``J = k * max(0, P_eq - P_bulk)``.
+
+    The only decision shared by the flux publisher and the surface
+    closure. d-376 amendment 1: overhead O2 is the lower bound on
+    surface pO2 while O2 is net-leaving. A disabled gas film and an
+    HKL upper-bound carrier turn ``R_gas`` off; they do not discard
+    that partial. The O2 drive is zero at and below it, so the
+    congruent root sits above it. Every other species keeps the
+    free-evaporation bound: the physical partial is the drive only
+    when the film is on and the carrier is not an HKL upper bound.
+    Zeroing O2 with those flags published the vacuum surface
+    (2.38675e-5 bar) under 100 Pa of overhead O2.
+    """
+
+    try:
+        partial = float(physical_partial_Pa)
+    except (TypeError, ValueError):
+        return 0.0
+    if not math.isfinite(partial) or partial <= 0.0:
+        return 0.0
+    if species == "O2":
+        return partial
+    if gas_resistance_enabled and not hkl_upper_bound:
+        return partial
+    return 0.0
+
+
 def _missing_alpha_record(
     *,
     P_eq_Pa: float,
@@ -1585,7 +1619,14 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 alpha_is_unmeasured = decision.unmeasured
                 if alpha <= 0.0:
                     continue
-                P_bulk_Pa = float(overhead_partials.get(species, 0.0))
+                P_bulk_Pa = species_drive_bulk_Pa(
+                    species,
+                    float(overhead_partials.get(species, 0.0)),
+                    gas_resistance_enabled=gas_resistance_enabled,
+                    hkl_upper_bound=(
+                        species in hkl_upper_bound_transport_species
+                    ),
+                )
                 if P_eq_Pa <= P_bulk_Pa:
                     continue
                 delta_p_Pa = P_eq_Pa - P_bulk_Pa
@@ -1787,13 +1828,17 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 gas_resistance_enabled
                 and species not in hkl_upper_bound_transport_species
             )
-            # The reconstructed HKL upper bound is a free-evaporation boundary:
-            # when gas resistance is disabled, viscous Poiseuille P_bulk is not
-            # part of the executed model and must not suppress its pressure drive.
-            P_bulk_Pa = (
-                float(overhead_partials.get(species, 0.0))
-                if uses_gas_resistance
-                else 0.0
+            # R_gas is off when the film is disabled or the carrier is an
+            # HKL upper bound. That is not a zero bulk for overhead O2:
+            # species_drive_bulk_Pa keeps the O2 partial on every branch
+            # (d-376 amendment 1). Other species stay on the
+            # free-evaporation bound, so a viscous partial does not
+            # suppress their drive.
+            P_bulk_Pa = species_drive_bulk_Pa(
+                species,
+                float(overhead_partials.get(species, 0.0)),
+                gas_resistance_enabled=gas_resistance_enabled,
+                hkl_upper_bound=species in hkl_upper_bound_transport_species,
             )
             delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
             if delta_p_Pa <= 0:
