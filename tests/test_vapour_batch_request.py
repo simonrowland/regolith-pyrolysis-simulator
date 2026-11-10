@@ -2581,36 +2581,117 @@ def test_ca_mg_activity_without_reference_provenance_predicts_and_flags(
         sorted((100.0 * raw_activity, 100.0 * crystalline_activity))
     )
 
-    unavailable_state = replace(
+
+
+@pytest.mark.parametrize(
+    ("species_id", "parent_oxide"),
+    (("CaO_gas", "CaO"), ("MgO_gas", "MgO")),
+)
+def test_d359_missing_ca_mg_activity_uses_real_catalog_ladder(
+    species_id: str,
+    parent_oxide: str,
+) -> None:
+    """The shipped vapor rows use the activity ladder when no provider value exists."""
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), u0_manifest=load_u0_manifest()
+    )
+    declaration = catalog.species[species_id].source_reaction_activity
+    assert declaration is not None
+    answer = catalog.resolve_batch(
+        {"process.cleaned_melt": {parent_oxide: 1.0, "Al2O3": 1.0}},
+        VapourResolveState(
+            temperature_K=2000.0,
+            process_phase="hot_train",
+            stage="evaporation",
+            fO2_bar=1.0e-9,
+            source_reaction_fO2_bar=1.0e-9,
+        ),
+        flux_activation_context=_pre_rg_activation_context(species_id),
+    ).channel(species_id)
+
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.pressure.pa > 0.0
+    assert isinstance(answer.flux, FluxEligible)
+    activity = answer.source_reaction_activity
+    assert activity is not None
+    assert activity.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert activity.value > 0.0
+    assert activity.provider in {"published_gamma", "ideal_mixing"}
+    prediction = answer.extra["d359_prediction"]
+    assert prediction["class"] == "B"
+    assert prediction["rung"] == (
+        "published gamma*x"
+        if activity.provider == "published_gamma"
+        else "ideal a=x"
+    )
+    assert "pending d-359 B follow-up" in prediction["reason"]
+
+
+@pytest.mark.parametrize(
+    ("rung", "reported_activity"),
+    (
+        ("provider activity", 0.436),
+        ("published gamma*x", None),
+        ("ideal a=x", None),
+    ),
+)
+def test_sio_activity_notice_reason_matches_selected_rung(
+    rung: str,
+    reported_activity: float | None,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.vapour_rail.activity as activity_module
+
+    if rung == "ideal a=x":
+        monkeypatch.setattr(
+            activity_module,
+            "melt_oxide_activity_coefficient",
+            lambda _component_id: None,
+        )
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), u0_manifest=load_u0_manifest()
+    )
+    declaration = catalog.species["SiO"].source_reaction_activity
+    assert declaration is not None
+    activities = {} if reported_activity is None else {"SiO": reported_activity}
+    state = VapourResolveState(
+        temperature_K=2000.0,
+        process_phase="hot_train",
+        stage="evaporation",
+        fO2_bar=1.0e-9,
+        source_reaction_fO2_bar=1.0e-9,
+        source_reaction_activities=activities,
+        source_reaction_activity_provider=(
+            "r8_test_provider" if reported_activity is not None else None
+        ),
+        source_reaction_activity_standard_states=(
+            {"SiO": declaration.standard_state}
+            if reported_activity is not None
+            else {}
+        ),
+    )
+    answer = catalog.resolve_batch(
+        {"process.cleaned_melt": {"SiO2": 1.0, "Al2O3": 1.0}},
         state,
-        source_reaction_activities={},
-        source_reaction_activity_provider=None,
-        source_reaction_activity_evidence_refs={},
-    )
-    peer_rule = _selector_rule("peer")
-    peer_species = _selector_catalog_species("peer")
-    unavailable_batch = resolve_vapour_batch(
-        rules=(rule, peer_rule),
-        ledger_snapshot={
-            "process.cleaned_melt": {parent_oxide: 1.0, "P": 1.0}
-        },
-        state=unavailable_state,
-        catalog_species={
-            species_id: SimpleNamespace(
-                species_id=species_id,
-                evaluator=Evaluator(),
-                vaporisation_coefficients=SimpleNamespace(
-                    evaporation_alpha={"value": 1.0}
-                ),
-            ),
-            **peer_species,
-        },
-        flux_activation_context=_pre_rg_activation_context(species_id, "peer"),
-    )
-    unavailable_channel = unavailable_batch.channel(species_id)
-    assert unavailable_channel.is_refused
-    assert unavailable_channel.refusal_code == ActivityRefusalCode.MISSING_EVIDENCE.value
-    assert isinstance(unavailable_batch.channel("peer").flux, FluxEligible)
+        flux_activation_context=_pre_rg_activation_context("SiO"),
+    ).channel("SiO")
+
+    assert isinstance(answer.pressure, PressureValue)
+    prediction = answer.extra["d359_prediction"]
+    assert prediction["rung"] == rung
+    assert answer.source_reaction_activity is not None
+    if rung == "provider activity":
+        assert "provider SiO activity is present" in prediction[
+            "original_refusal_reason"
+        ]
+    else:
+        assert "provider SiO activity is present" not in prediction[
+            "original_refusal_reason"
+        ]
+        assert prediction["original_refusal_reason"] == (
+            answer.source_reaction_activity.reason
+        )
+    assert rung in prediction["reason"]
 
 
 @pytest.mark.parametrize("temperature_K", (1300.0, 1800.0))
