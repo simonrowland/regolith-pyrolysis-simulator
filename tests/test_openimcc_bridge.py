@@ -1005,12 +1005,12 @@ def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
     }
     expected = {
         1473.15: {
-            "KO0.5": 1.6697561241999281e-6,
-            "NaO0.5": 0.00013466805822228952,
+            "KO0.5": 2.1891401806319048e-6,
+            "NaO0.5": 0.00017560125503048718,
         },
         1673.15: {
-            "KO0.5": 9.441799509227296e-6,
-            "NaO0.5": 0.0004922752489405557,
+            "KO0.5": 1.133192718678085e-5,
+            "NaO0.5": 0.0005829856233241274,
         },
     }
     for temperature_K, anchors in expected.items():
@@ -1351,6 +1351,41 @@ def test_imported_openimcc_commit_matches_recorded_pin_when_importable() -> None
         f"{pinned}; remedy: install --no-deps "
         f"{openimcc_bridge.OPENIMCC_RECORDED_PIN!r}"
     )
+
+
+def test_default_pack_identity_uses_the_openimcc_profile_files() -> None:
+    _openimcc_or_skip()
+    import hashlib
+    from importlib import resources
+
+    import openimcc
+    from openimcc.profiles import load_profile
+    from simulator.melt_backend import openimcc_bridge
+
+    profile = load_profile("openimcc")
+    identity_loader = getattr(openimcc_bridge, "openimcc_pack_identity", None)
+    assert callable(identity_loader)
+    identity = identity_loader()
+    melt_path = resources.files("openimcc").joinpath(
+        "data", "packs", "imcc-sf04-d066-v4.json"
+    )
+    pack_paths = {
+        "melt": melt_path,
+        "redox": profile.redox_pack_path,
+        "gas": profile.gas_datapack.gas_path,
+        "condensate": profile.gas_datapack.oxide_path,
+    }
+
+    assert _load_pack("default").binding_digest == profile.melt_pack.binding_digest
+    assert identity["package_version"] == openimcc.__version__
+    assert identity["commit"] == imported_openimcc_commit()
+    assert identity["packs"] == {
+        name: {
+            "file_name": Path(path).name,
+            "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest(),
+        }
+        for name, path in pack_paths.items()
+    }
 
 
 def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:

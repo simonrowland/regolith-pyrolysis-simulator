@@ -1962,7 +1962,7 @@ def test_above_cap_openimcc_route_feeds_flux_with_provenance() -> None:
 
     assert high_t["provider"] == "openimcc"
     assert high_t["temperature_domain_status"] == "in_domain"
-    assert high_t["openimcc_pack_version"] == "1.0.3-d066-v1"
+    assert high_t["openimcc_pack_version"] == "1.0.6-d066-v4"
     assert high_t["openimcc_pack_digest"]
     assert set(high_t["activities_by_oxide"]) == {
         "Na2O",

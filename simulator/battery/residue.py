@@ -31,6 +31,7 @@ _SECONDS_PER_HOUR = 3_600.0
 _OXYGEN_CHANNELS = frozenset({"O", "O2"})
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
 _HASHIMOTO_PRIMARY_GEOMETRY = "sphere_shrinking"
+_OPENIMCC_PROFILE_ONLY_RESIDUE_GASES = frozenset({"Si2O2", "AlSiO"})
 _HASHIMOTO_GEOMETRIES = (
     "sphere_constant",
     "sphere_shrinking",
@@ -2755,6 +2756,12 @@ def _predict_hashimoto_residue_cohort(
     gas_channels, channel_omissions = _openimcc_gas_channels_and_omission_notices(
         tuple(initial_composition_mol), gas_pack
     )
+    if engine != "openimcc":
+        gas_channels = [
+            channel
+            for channel in gas_channels
+            if channel[0] not in _OPENIMCC_PROFILE_ONLY_RESIDUE_GASES
+        ]
     if channel_omissions:
         raise ResidueInventoryRefusal(
             "hashimoto_openimcc_channel_missing", str(channel_omissions)

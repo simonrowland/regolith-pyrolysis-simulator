@@ -12,6 +12,11 @@ OPENIMCC_PROVENANCE_PREFIXES: tuple[str, ...] = (
     "openimcc-melt-binding:",
     "openimcc-condensate-table:",
     "openimcc-gas-table:",
+    "openimcc-package-version:",
+    "openimcc-commit:",
+    "openimcc-pack-file:",
+    "openimcc-feo-redox-rows:",
+    "openimcc-feo-condensate-row:",
 )
 
 _OPENIMCC_ENGINE_IDENTITY_FIELDS: tuple[tuple[str, str], ...] = (
@@ -48,6 +53,42 @@ def openimcc_pack_coefficient_sources(pack_version: object) -> tuple[str, ...]:
     if not isinstance(pack_version, str) or not pack_version:
         return ()
     return (f"openimcc-v{pack_version}",)
+
+
+def openimcc_pack_identity_sources(
+    identity: Mapping[str, object] | None,
+) -> tuple[str, ...]:
+    """Format the selected package's package and raw default-pack identities."""
+
+    if not isinstance(identity, Mapping):
+        return ()
+    sources: list[str] = []
+    if isinstance(identity.get("package_version"), str):
+        sources.append(f"openimcc-package-version:{identity['package_version']}")
+    if isinstance(identity.get("commit"), str):
+        sources.append(f"openimcc-commit:{identity['commit']}")
+    packs = identity.get("packs")
+    if isinstance(packs, Mapping):
+        for name in ("melt", "redox", "gas", "condensate"):
+            pack = packs.get(name)
+            if not isinstance(pack, Mapping):
+                continue
+            filename, digest = pack.get("file_name"), pack.get("sha256")
+            if isinstance(filename, str) and isinstance(digest, str):
+                sources.append(
+                    f"openimcc-pack-file:{name}:{filename}:sha256:{digest}"
+                )
+    guard = identity.get("feo_guard")
+    if isinstance(guard, Mapping):
+        redox_digest = guard.get("redox_rows_sha256")
+        condensate_digest = guard.get("condensate_feo_row_sha256")
+        if isinstance(redox_digest, str):
+            sources.append(f"openimcc-feo-redox-rows:sha256:{redox_digest}")
+        if isinstance(condensate_digest, str):
+            sources.append(
+                f"openimcc-feo-condensate-row:sha256:{condensate_digest}"
+            )
+    return tuple(sources)
 
 
 def coefficient_lineage_sources(sources: Sequence[str]) -> tuple[str, ...]:

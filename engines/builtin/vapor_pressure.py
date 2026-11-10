@@ -659,8 +659,9 @@ _PROJECTED_COMPOSITION_WARNING_TIERS = (
 # The Zhang anchor passes composition_kg in oxide wt% (the eight supported
 # oxides from the bridge test); the bridge converts that mass basis to moles.
 # Activity and mole fraction are both dimensionless, so their ratio Gamma is
-# dimensionless too. This reproduces the wording-file sanity values: D066 is
-# 1.67e-6 / 9.44e-6 and published-core is 3.5e-9 / 2.4e-8 at 1473 / 1673 K.
+# dimensionless too. This reproduces the wording-file sanity values: D066 v4
+# is 2.189e-6 / 1.133e-5 and published-core is 3.5e-9 / 2.4e-8 at
+# 1473 / 1673 K.
 # The content digest keys each evaluation so packs sharing a model id cannot
 # reuse one another's numbers.
 _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
@@ -677,13 +678,13 @@ _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
             1673.15: True,
         },
     },
-    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75": {
+    "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0": {
         "pack_alias": "default",
         "model_id": "IMCC-SF04-D066",
-        "pack_version": "1.0.3-d066-v1",
+        "pack_version": "1.0.6-d066-v4",
         "gamma_ko0_5_by_temperature_K": {
-            1473.15: "1.67e-6",
-            1673.15: "9.44e-6",
+            1473.15: "2.1891401806319048e-06",
+            1673.15: "1.133192718678085e-05",
         },
         "kcaal_si2o7_active_by_temperature_K": {
             1473.15: False,

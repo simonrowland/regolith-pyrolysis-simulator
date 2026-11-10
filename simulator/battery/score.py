@@ -172,6 +172,7 @@ from simulator.battery.composition import composition_wt_pct
 from simulator.battery.source_lineage import (
     coefficient_lineage_sources,
     openimcc_engine_identity_sources,
+    openimcc_pack_identity_sources,
     openimcc_pack_coefficient_sources,
 )
 from simulator.battery.validate import (
@@ -485,6 +486,7 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
+    "openimcc-v1.0.6-d066-v4": ("sf04-magma-companion-workbook",),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
@@ -558,22 +560,12 @@ _INTERNAL_ANALYTICAL_FEO_STANDARD = _FeOActivityStandard(
     name="JANAF-type",
     offset_j_mol=Decimal(0),
 )
-_OPENIMCC_DEFAULT_PACK_VERSION = "1.0.3-d066-v1"
-_OPENIMCC_DEFAULT_PACK_DIGEST = (
-    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
+_OPENIMCC_FEO_REDOX_ROWS_DIGEST = (
+    "d2d99f2cfd4417633bbdeecb33dd7ebaf92f5a375c456480237c906d449d1e9f"
 )
-_OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST = (
-    "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
+_OPENIMCC_FEO_CONDENSATE_ROW_DIGEST = (
+    "0aa4d729270ca1434601f414c11485e70706894b735907d7b6eeade0e24f9312"
 )
-_OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
-    "28ac36dfef019b8f0fe3e11a86030c65dbfdae6733d10532d2bdb942cf3dc67b"
-)
-_OPENIMCC_DEFAULT_FEO_STANDARD = _FeOActivityStandard(
-    name="JANAF-type",
-    offset_j_mol=Decimal(0),
-)
-
-
 def _source_value(sources: Sequence[str], prefix: str) -> str | None:
     return next(
         (source[len(prefix):] for source in sources if source.startswith(prefix)),
@@ -584,6 +576,8 @@ def _source_value(sources: Sequence[str], prefix: str) -> str | None:
 def _resolve_feo_activity_standard(
     engine: Engine,
     coefficient_sources: Sequence[str],
+    *,
+    temperature_K: Decimal | None = None,
 ) -> tuple[_FeOActivityStandard | None, ResidualRefusal | None]:
     if engine is Engine.INTERNAL_ANALYTICAL:
         return _INTERNAL_ANALYTICAL_FEO_STANDARD, None
@@ -596,29 +590,15 @@ def _resolve_feo_activity_standard(
             },
         )
 
-    condensate_digest = _source_value(
+    condensate_row_digest = _source_value(
         coefficient_sources,
-        "openimcc-condensate-table:sha256:",
+        "openimcc-feo-condensate-row:sha256:",
     )
-    if condensate_digest is not None and condensate_digest != (
-        _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
-    ):
-        return None, ResidualRefusal(
-            RefusalReason.METRIC_DOMAIN,
-            {
-                "reason": "openimcc_feo_condensate_table_digest_mismatch",
-                "expected_condensate_table_digest": (
-                    _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
-                ),
-                "actual_condensate_table_digest": condensate_digest,
-            },
-        )
-
     gas_load_failure = _source_value(
         coefficient_sources,
         "openimcc-gas-datapack-load-failure:",
     )
-    if gas_load_failure is not None and condensate_digest is None:
+    if gas_load_failure is not None and condensate_row_digest is None:
         return None, ResidualRefusal(
             RefusalReason.METRIC_DOMAIN,
             {
@@ -627,49 +607,89 @@ def _resolve_feo_activity_standard(
                     "condensate_identity_missing"
                 ),
                 "gas_load_failure": gas_load_failure,
-                "missing_identity": "condensate_table_digest",
+                "missing_identity": "condensate_feo_row_digest",
             },
         )
 
-    redox_pack_digest = _source_value(
+    redox_rows_digest = _source_value(
         coefficient_sources,
-        "openimcc-redox-pack:sha256:",
+        "openimcc-feo-redox-rows:sha256:",
     )
-    if redox_pack_digest is not None:
-        if redox_pack_digest != _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST:
+    guarded_rows = (
+        ("redox FeO and Mn rows", redox_rows_digest, _OPENIMCC_FEO_REDOX_ROWS_DIGEST),
+        (
+            "condensate FeO(l) row",
+            condensate_row_digest,
+            _OPENIMCC_FEO_CONDENSATE_ROW_DIGEST,
+        ),
+    )
+    for row_name, actual, expected in guarded_rows:
+        if actual is not None and actual != expected:
             return None, ResidualRefusal(
                 RefusalReason.METRIC_DOMAIN,
                 {
-                    "reason": "openimcc_feo_redox_pack_digest_mismatch",
-                    "expected_redox_pack_digest": (
-                        _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
-                    ),
-                    "actual_redox_pack_digest": redox_pack_digest,
+                    "reason": "FeO pinned-digest guard: awaiting re-pin",
+                    "row": row_name,
+                    "expected_sha256": expected,
+                    "actual_sha256": actual,
                 },
             )
-        return _OPENIMCC_DEFAULT_FEO_STANDARD, None
-
-    pack_version = _source_value(
-        coefficient_sources,
-        "openimcc-pack-version:",
-    )
-    pack_digest = _source_value(
-        coefficient_sources,
-        "openimcc-pack-digest:",
-    )
     if (
-        condensate_digest == _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
-        and pack_version == _OPENIMCC_DEFAULT_PACK_VERSION
-        and pack_digest == _OPENIMCC_DEFAULT_PACK_DIGEST
+        redox_rows_digest == _OPENIMCC_FEO_REDOX_ROWS_DIGEST
+        and condensate_row_digest == _OPENIMCC_FEO_CONDENSATE_ROW_DIGEST
     ):
-        return _OPENIMCC_DEFAULT_FEO_STANDARD, None
+        if temperature_K is None or temperature_K <= 0:
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "feo_activity_standard_temperature_missing",
+                    "engine": engine.value,
+                },
+            )
+        try:
+            import openimcc
+        except ImportError as exc:
+            return None, ResidualRefusal(
+                RefusalReason.OPENIMCC_NOT_IMPORTABLE,
+                {
+                    "reason": RefusalReason.OPENIMCC_NOT_IMPORTABLE.value,
+                    "detail": str(exc),
+                },
+            )
+        try:
+            standard_offset = openimcc.feo_liquid_standard_offset(
+                float(temperature_K), profile="openimcc"
+            )
+            offset_j_mol = Decimal(str(standard_offset.value_J_per_mol))
+        except (
+            openimcc.ImccRefusal,
+            ArithmeticError,
+            AttributeError,
+            TypeError,
+            ValueError,
+        ) as exc:
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "FeO pinned-digest guard: awaiting re-pin",
+                    "row": "openimcc FeO standard offset",
+                    "detail": str(exc),
+                },
+            )
+        return _FeOActivityStandard(
+            name="JANAF-type",
+            offset_j_mol=offset_j_mol,
+        ), None
 
     return None, ResidualRefusal(
         RefusalReason.METRIC_DOMAIN,
         {
-            "reason": "feo_activity_standard_not_declared",
+            "reason": "FeO pinned-digest guard: awaiting re-pin",
+            "missing_rows": [
+                row_name for row_name, actual, _expected in guarded_rows
+                if actual is None
+            ],
             "engine": engine.value,
-            "profile": pack_version or "unknown",
         },
     )
 
@@ -715,9 +735,11 @@ def _canonicalize_feo_activity_prediction(
     ):
         return prediction, None
 
+    temperature_K = temperature_of(comparison_identity)
     standard, refusal = _resolve_feo_activity_standard(
         prediction.engine,
         prediction.coefficient_sources,
+        temperature_K=temperature_K,
     )
     if refusal is not None:
         return None, refusal
@@ -725,7 +747,6 @@ def _canonicalize_feo_activity_prediction(
     if standard.offset_j_mol == 0:
         return prediction, None
 
-    temperature_K = temperature_of(comparison_identity)
     if temperature_K is None or temperature_K <= 0:
         return None, ResidualRefusal(
             RefusalReason.METRIC_DOMAIN,
@@ -7042,12 +7063,11 @@ def _predict_distin_closed_feo_activity(
         identity,
         fO2_Pa=State.of(log10_fo2_to_pa(Decimal(str(fo2_log)))),
     )
-    # The pinned openimcc/data/packs/openimcc-redox-v1.json:294-318 row names
-    # JANAF Fe-019 and embeds its FeO(l) coefficients; its redox-pack digest
-    # therefore guards the standard used by this closed-redox result.
-    coefficient_sources = [
-        f"openimcc-redox-pack:sha256:{result.redox_pack_digest}"
-    ]
+    from simulator.melt_backend.openimcc_bridge import openimcc_pack_identity
+
+    coefficient_sources = list(
+        openimcc_pack_identity_sources(openimcc_pack_identity())
+    )
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -7211,6 +7231,7 @@ def _predict_fe_redox(
             )
         try:
             import openimcc
+            from simulator.melt_backend.openimcc_bridge import openimcc_pack_identity
         except ImportError as exc:
             return refused(
                 RefusalReason.OPENIMCC_NOT_IMPORTABLE,
@@ -7257,8 +7278,8 @@ def _predict_fe_redox(
             unit="dimensionless",
             authority=authority,
             notices=notices,
-            coefficient_sources=(
-                f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
+            coefficient_sources=openimcc_pack_identity_sources(
+                openimcc_pack_identity()
             ),
             lineage_complete=False,
             certified_band={"temperature_K": band},
@@ -10416,6 +10437,9 @@ def _predict_with_engine(
                         ),
                         *openimcc_engine_identity_sources(
                             identity_block.get("engine_binding_identity")
+                        ),
+                        *openimcc_pack_identity_sources(
+                            identity_block.get("pack_identity")
                         ),
                         *(
                             (

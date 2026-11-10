@@ -12,6 +12,8 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import metadata
 from importlib import resources
+import csv
+import hashlib
 import json
 import math
 import numbers
@@ -66,7 +68,7 @@ OPENIMCC_INSTALL_HINT = (
 )
 OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
-    "@66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"
+    "@995dc14507dfeefb6849bfedbf19107d015bc040"
 )
 
 
@@ -184,6 +186,7 @@ OPENIMCC_PARENT_OXIDES = (
 )
 _OPENIMCC_CRMN_RELAXED_OXIDES = ("Cr2O3", "MnO")
 _OPENIMCC_CRMN_RELAXED_RULING = "owner 2026-09-27"
+_REDOX_BACKED_MELT_OXIDES = ("SrO", "Li2O", "ZnO", "Yb2O3", "Cr2O3")
 
 # Fe2O3 contributes two FeO-equivalent moles. Keep this mass ratio for the
 # policy diagnostic only; the actual projection folds moles directly.
@@ -893,6 +896,164 @@ def _pack_digest(pack: Any) -> str:
     if not isinstance(value, str) or not value:
         raise OpenImccBindingDigestUnavailableError()
     return value
+
+
+def openimcc_pack_identity() -> dict[str, Any]:
+    """Return the package and raw-file identity for its default profile."""
+
+    package = _require_openimcc()
+    data = resources.files("openimcc").joinpath("data")
+    melt_path = data.joinpath("packs", "imcc-sf04-d066-v4.json")
+    redox_path = data.joinpath("packs", "openimcc-redox-v5.json")
+    gas_path = data.joinpath("gas", "gas-shomate-default-v1.csv")
+    condensate_path = data.joinpath("gas", "condensate-default-v1.csv")
+    paths = {
+        "melt": melt_path,
+        "redox": redox_path,
+        "gas": gas_path,
+        "condensate": condensate_path,
+    }
+    packs = {
+        name: {
+            "file_name": Path(path).name,
+            "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest(),
+        }
+        for name, path in paths.items()
+    }
+
+    redox_payload = json.loads(Path(redox_path).read_text())
+    feo_row_names = {
+        "FeO(l)",
+        "FeO1.5(l)",
+        "MnO(l)",
+        "MnSiO3(l)",
+        "Mn2SiO4(l)",
+        "MnAl2O4(l)",
+    }
+    feo_redox_rows = [
+        row
+        for row in redox_payload["rows"]
+        if row.get("complex") in feo_row_names
+    ]
+    feo_redox_rows = sorted(
+        (
+            {key: value for key, value in row.items() if key != "row"}
+            for row in feo_redox_rows
+        ),
+        key=lambda row: row["complex"],
+    )
+    with Path(condensate_path).open(newline="", encoding="utf-8") as stream:
+        condensate_rows = [
+            row
+            for row in csv.DictReader(stream)
+            if row.get("species_name") == "FeO(l)"
+        ]
+    if len(feo_redox_rows) != len(feo_row_names) or len(condensate_rows) != 1:
+        raise OpenImccBindingDigestUnavailableError()
+    def canonical_digest(value: Any) -> str:
+        canonical_json = json.dumps(
+            value, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        )
+        return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
+
+    return {
+        "package_version": str(getattr(package, "__version__", "0+unknown")),
+        "commit": imported_openimcc_commit() or "unverified",
+        "packs": packs,
+        "feo_guard": {
+            "redox_rows_sha256": canonical_digest(feo_redox_rows),
+            "condensate_feo_row_sha256": canonical_digest(condensate_rows[0]),
+        },
+    }
+
+
+def _evaluate_redox_melt(
+    composition_mol: Mapping[str, float],
+    temperature_K: float,
+    *,
+    fO2_log: float | None = None,
+) -> OpenImccBridgeResult:
+    """Adapt the profile redox solver to the bridge's parent-activity result."""
+
+    package = _require_openimcc()
+    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
+
+    inventory: dict[str, float] = {}
+    for oxide, raw_amount in composition_mol.items():
+        amount = float(raw_amount)
+        for element, count in atoms_parse_formula_else_janaf(str(oxide)):
+            inventory[element] = inventory.get(element, 0.0) + float(count) * amount
+    try:
+        redox = package.evaluate_redox(
+            inventory,
+            float(temperature_K),
+            "closed",
+            profile="openimcc",
+        )
+    except package.ImccRefusal as exc:
+        if "requires an imposed oxygen fugacity" not in str(exc) or fO2_log is None:
+            if "requires an imposed oxygen fugacity" in str(exc):
+                raise OpenImccCompositionPolicyRefusal(
+                    "openimcc_redox_requires_imposed_fO2", str(exc)
+                ) from exc
+            raise
+        redox = package.evaluate_redox(
+            inventory,
+            float(temperature_K),
+            "imposed",
+            lambda_imposed=float(fO2_log) * math.log(10.0),
+            profile="openimcc",
+        )
+
+    loaded_pack = _load_pack(DEFAULT_BACKEND_PACK_NAME)
+    parent_oxides = tuple(str(name) for name in redox.parent_activity)
+    flags = tuple(str(flag) for flag in redox.flags)
+    labels = ImccAdapterLabels(
+        identity={
+            "model_id": str(loaded_pack.model_id),
+            "datapack_version": str(loaded_pack.version),
+        },
+        coverage={name: "redox-profile" for name in parent_oxides},
+        trust="internal-analytical",
+        envelope_status="extrapolated" if redox.extrapolated_redox_rows else "inside",
+        flags=flags,
+        notices=tuple(str(notice) for notice in redox.notices),
+    )
+    activities = {name: float(redox.parent_activity[name]) for name in parent_oxides}
+    composition_mol = _canonical_composition(composition_mol)
+    activity_coefficients: dict[str, dict[str, Any]] = {}
+    for oxide, parent_activity in activities.items():
+        single_activity, fraction = single_cation_activity_and_fraction(
+            oxide, parent_activity, composition_mol
+        )
+        if fraction <= 0.0:
+            continue
+        component = single_cation_component_formula(oxide)
+        activity_coefficients[component] = {
+            "value": single_activity / fraction,
+            "coefficient_basis": "single_cation",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": component,
+            },
+        }
+    return OpenImccBridgeResult(
+        parent_oxide_activities=activities,
+        parent_oxides=parent_oxides,
+        flags=labels.flags,
+        notices=labels.notices,
+        acid_sink_ratio=None,
+        pack_model_id=str(loaded_pack.model_id),
+        pack_version=str(loaded_pack.version),
+        pack_digest=_pack_digest(loaded_pack),
+        openimcc_version=str(getattr(package, "__version__", "0+unknown")),
+        envelope_status=labels.envelope_status,
+        extrapolated=bool(redox.extrapolated_redox_rows),
+        labels=labels,
+        coverage=dict(labels.coverage),
+        activity_coefficients=activity_coefficients,
+    )
 
 
 def engine_binding_identity(melt_pack: Any, gas_pack: Any) -> dict[str, str]:

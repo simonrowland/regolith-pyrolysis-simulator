@@ -29,37 +29,25 @@ import simulator.battery.score as score_module
 from tests.battery import factories as F
 
 
-_JANAF_FE019_CONDENSATE_DIGEST = (
-    "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
+_OPENIMCC_FEO_REDOX_ROWS_DIGEST = (
+    "d2d99f2cfd4417633bbdeecb33dd7ebaf92f5a375c456480237c906d449d1e9f"
 )
-_OPENIMCC_DEFAULT_VERSION = "1.0.3-d066-v1"
-_OPENIMCC_DEFAULT_PACK_DIGEST = (
-    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
-)
-_OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
-    "28ac36dfef019b8f0fe3e11a86030c65dbfdae6733d10532d2bdb942cf3dc67b"
+_OPENIMCC_FEO_CONDENSATE_ROW_DIGEST = (
+    "0aa4d729270ca1434601f414c11485e70706894b735907d7b6eeade0e24f9312"
 )
 _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
     Engine.INTERNAL_ANALYTICAL: (
         "eb6b8cce0b5487f44c7f6a0705d92a3f4ffc4a0248af489784610026544f624d"
     ),
-    Engine.OPENIMCC: (
-        "803a03d510720e9d63f7644f9e91546eee250b35d286fadaea69c48bfcd74a24"
-    ),
 }
-_DISTIN_GREEN_RESIDUAL_SHA256 = (
-    "39e7f3aed9b19d1ea1b6e8c1559cb7736d6acfccb8cf65e3f34f6f68b9cf4bc0"
-)
-
-
 def _openimcc_sources(
-    *, pack_version: str, pack_digest: str, condensate_digest: str
+    *,
+    redox_rows_digest: str = _OPENIMCC_FEO_REDOX_ROWS_DIGEST,
+    condensate_row_digest: str = _OPENIMCC_FEO_CONDENSATE_ROW_DIGEST,
 ) -> tuple[str, ...]:
     return (
-        f"openimcc-pack-version:{pack_version}",
-        f"openimcc-pack-digest:{pack_digest}",
-        f"openimcc-condensate-table:sha256:{condensate_digest}",
-        f"openimcc-melt-binding:sha256:{pack_digest}",
+        f"openimcc-feo-redox-rows:sha256:{redox_rows_digest}",
+        f"openimcc-feo-condensate-row:sha256:{condensate_row_digest}",
     )
 
 
@@ -123,18 +111,9 @@ def _case(
             ("nasa-cea-thermo",),
             _RESIDUAL_SHA256_BEFORE_STANDARD_STEP[Engine.INTERNAL_ANALYTICAL],
         ),
-        (
-            Engine.OPENIMCC,
-            _openimcc_sources(
-                pack_version=_OPENIMCC_DEFAULT_VERSION,
-                pack_digest=_OPENIMCC_DEFAULT_PACK_DIGEST,
-                condensate_digest=_JANAF_FE019_CONDENSATE_DIGEST,
-            ),
-            _RESIDUAL_SHA256_BEFORE_STANDARD_STEP[Engine.OPENIMCC],
-        ),
     ),
 )
-def test_declared_zero_offset_feo_standards_preserve_residual_bytes(
+def test_internal_analytical_zero_offset_preserves_residual_bytes(
     engine: Engine,
     sources: tuple[str, ...],
     expected_digest: str,
@@ -169,13 +148,50 @@ def test_declared_zero_offset_feo_standards_preserve_residual_bytes(
     assert sha256(before_bytes).hexdigest() == expected_digest
 
 
-def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
-    actual_digest = "a" * 64
-    sources = _openimcc_sources(
-        pack_version=_OPENIMCC_DEFAULT_VERSION,
-        pack_digest=_OPENIMCC_DEFAULT_PACK_DIGEST,
-        condensate_digest=actual_digest,
+def test_openimcc_feo_standard_conversion_uses_the_profile_resolver() -> None:
+    import openimcc
+
+    temperature_K = Decimal("1700")
+    sources = _openimcc_sources()
+    context, _experiment, reference, prediction = _case(
+        Engine.OPENIMCC, sources, temperature_K=temperature_K
     )
+    resolver = getattr(score_module, "_resolve_feo_activity_standard", None)
+    converter = getattr(score_module, "_canonicalize_feo_activity_prediction", None)
+    assert callable(resolver)
+    assert callable(converter)
+
+    standard, refusal = resolver(
+        Engine.OPENIMCC,
+        prediction.coefficient_sources,
+        temperature_K=temperature_K,
+    )
+    assert refusal is None
+    assert standard is not None
+    expected_offset = openimcc.feo_liquid_standard_offset(
+        float(temperature_K), profile="openimcc"
+    )
+    assert standard.name == "JANAF-type"
+    assert standard.offset_j_mol == Decimal(
+        str(expected_offset.value_J_per_mol)
+    )
+
+    canonical, refusal = converter(prediction)
+    assert refusal is None
+    assert canonical is not None
+    assert canonical.value != prediction.value
+    residual, _candidate = compile_residual(
+        reference, Engine.OPENIMCC, context=context, prediction=prediction
+    )
+    assert residual.numeric is not None
+    assert float(residual.numeric.value) == pytest.approx(
+        float(canonical.value.log10() - reference.value.point.log10()), abs=1e-15
+    )
+
+
+def test_openimcc_feo_row_refuses_changed_condensate_feo_content() -> None:
+    actual_digest = "a" * 64
+    sources = _openimcc_sources(condensate_row_digest=actual_digest)
     context, _experiment, reference, prediction = _case(Engine.OPENIMCC, sources)
 
     residual, _candidate = compile_residual(
@@ -186,17 +202,18 @@ def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
     assert residual.refusal.detail == {
-        "reason": "openimcc_feo_condensate_table_digest_mismatch",
-        "expected_condensate_table_digest": _JANAF_FE019_CONDENSATE_DIGEST,
-        "actual_condensate_table_digest": actual_digest,
+        "reason": "FeO pinned-digest guard: awaiting re-pin",
+        "row": "condensate FeO(l) row",
+        "expected_sha256": _OPENIMCC_FEO_CONDENSATE_ROW_DIGEST,
+        "actual_sha256": actual_digest,
     }
 
 
-def test_openimcc_closed_redox_feo_row_refuses_changed_redox_pack_digest() -> None:
+def test_openimcc_closed_redox_feo_row_refuses_changed_guarded_rows() -> None:
     actual_digest = "c" * 64
     context, _experiment, reference, prediction = _case(
         Engine.OPENIMCC,
-        (f"openimcc-redox-pack:sha256:{actual_digest}",),
+        _openimcc_sources(redox_rows_digest=actual_digest),
     )
 
     residual, _candidate = compile_residual(
@@ -207,9 +224,10 @@ def test_openimcc_closed_redox_feo_row_refuses_changed_redox_pack_digest() -> No
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
     assert residual.refusal.detail == {
-        "reason": "openimcc_feo_redox_pack_digest_mismatch",
-        "expected_redox_pack_digest": _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST,
-        "actual_redox_pack_digest": actual_digest,
+        "reason": "FeO pinned-digest guard: awaiting re-pin",
+        "row": "redox FeO and Mn rows",
+        "expected_sha256": _OPENIMCC_FEO_REDOX_ROWS_DIGEST,
+        "actual_sha256": actual_digest,
     }
 
 
@@ -249,8 +267,31 @@ def test_openimcc_feo_row_refuses_when_gas_load_loses_condensate_identity(
     assert residual.refusal.detail == {
         "reason": "openimcc_feo_gas_datapack_load_failed_condensate_identity_missing",
         "gas_load_failure": "RuntimeError: test gas datapack failure",
-        "missing_identity": "condensate_table_digest",
+        "missing_identity": "condensate_feo_row_digest",
     }
+
+
+def test_openimcc_feo_guard_accepts_the_default_pack_rows_by_content_digest() -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    identity_loader = getattr(openimcc_bridge, "openimcc_pack_identity", None)
+    assert callable(identity_loader)
+    feo_guard = identity_loader()["feo_guard"]
+    sources = (
+        "openimcc-feo-redox-rows:sha256:"
+        f"{feo_guard['redox_rows_sha256']}",
+        "openimcc-feo-condensate-row:sha256:"
+        f"{feo_guard['condensate_feo_row_sha256']}",
+    )
+
+    standard, refusal = score_module._resolve_feo_activity_standard(
+        Engine.OPENIMCC, sources, temperature_K=Decimal("1700")
+    )
+
+    assert refusal is None
+    assert standard is not None
+    assert standard.name == "JANAF-type"
+    assert standard.offset_j_mol != Decimal(0)
 
 
 @pytest.fixture(scope="module")
@@ -266,7 +307,7 @@ def distin_migration():
     return migrator.result
 
 
-def test_distin_closed_redox_residual_line_matches_green_bytes(
+def test_distin_closed_redox_residual_uses_default_profile(
     distin_migration,
 ) -> None:
     observation = next(
@@ -302,7 +343,7 @@ def test_distin_closed_redox_residual_line_matches_green_bytes(
     ) == (
         "dex",
         "dimensionless",
-        Decimal("-0.013180332034779389").as_tuple(),
+        Decimal("0.08341796180656715").as_tuple(),
         None,
         None,
         None,
@@ -312,19 +353,22 @@ def test_distin_closed_redox_residual_line_matches_green_bytes(
             "fo2_tier": 3,
             "physics_rung": None,
             "route": "openimcc_closed_fe_metal_saturation",
-            "value_Pa": "0.01295993251002745564044143855",
+            "value_Pa": "0.02022084627693526699090953590",
         }
     }
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
-    # The digest moved only for the added candidate observation provenance field.
-    assert sha256(serialized).hexdigest() == _DISTIN_GREEN_RESIDUAL_SHA256
+    # Pin the result produced by the new default profile and FeO content guard.
+    assert sha256(serialized).hexdigest() == (
+        "db996a2ae254697b9d6d2a1f46fc5f9c2834dfaea48313476dc2cff7149b4b63"
+    )
 
 
-def test_nondefault_openimcc_profile_refuses_an_undeclared_feo_standard() -> None:
-    sources = _openimcc_sources(
-        pack_version="1.0.3-d066-ext-v1",
-        pack_digest="b" * 64,
-        condensate_digest=_JANAF_FE019_CONDENSATE_DIGEST,
+def test_feo_guard_ignores_unrelated_openimcc_pack_content() -> None:
+    sources = (
+        *_openimcc_sources(),
+        "openimcc-package-version:1.0.6-d066-v4",
+        "openimcc-commit:995dc14507dfeefb6849bfedbf19107d015bc040",
+        "openimcc-pack-file:redox:openimcc-redox-v5.json:sha256:" + "b" * 64,
     )
     context, _experiment, reference, prediction = _case(Engine.OPENIMCC, sources)
 
@@ -332,14 +376,8 @@ def test_nondefault_openimcc_profile_refuses_an_undeclared_feo_standard() -> Non
         reference, Engine.OPENIMCC, context=context, prediction=prediction
     )
 
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
-    assert residual.refusal.detail == {
-        "reason": "feo_activity_standard_not_declared",
-        "engine": Engine.OPENIMCC.value,
-        "profile": "1.0.3-d066-ext-v1",
-    }
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.refusal is None
 
 
 def test_nonzero_feo_standard_conversion_matches_hand_value() -> None:
@@ -368,7 +406,7 @@ def test_compile_residual_applies_nonzero_standard_conversion_exactly_once(
     monkeypatch.setattr(
         score_module,
         "_resolve_feo_activity_standard",
-        lambda _engine, _sources: (
+        lambda _engine, _sources, **_kwargs: (
             score_module._FeOActivityStandard(
                 name="hand-value test",
                 offset_j_mol=Decimal("9701.7"),

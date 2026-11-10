@@ -551,7 +551,7 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     backend = handle.backend
     assert backend is not None
     assert handle.identity["pack_digest"] == (
-        "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
+        "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0"
     )
     assert handle.identity["model_id"] == backend.model_id
     cell = equilibrate_cell(
@@ -568,6 +568,90 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert cell.vapor_pressures_source["K"] == f"openimcc-gas-table:sha256:{gas_digest}"
     assert cell.model_id == backend.model_id
     assert handle.identity["pack"] == backend._pack_name
+
+
+def test_openimcc_battery_uses_redox_for_strontium_melt_without_fo2() -> None:
+    _require_openimcc()
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    result = backend.equilibrate(
+        2000.0 - 273.15,
+        composition_mol={"SiO2": 0.5, "SrO": 0.5},
+    )
+
+    assert result.status == "ok"
+    assert result.activity_coefficients["SrO"] > 0.0
+    assert any(
+        row["kind"] == "openimcc_flag"
+        and row["reason"] == "RED: no_modelled_redox_couple"
+        for row in result.imcc_notices
+    )
+
+
+def test_openimcc_battery_preserves_unmodelled_redox_state_mark() -> None:
+    _require_openimcc()
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    result = backend.equilibrate(
+        1700.0 - 273.15,
+        composition_mol={"SiO2": 0.5, "ZnO": 0.5},
+    )
+
+    assert result.activity_coefficients["ZnO"] > 0.0
+    assert any(
+        row["kind"] == "openimcc_flag"
+        and row["reason"] == "RED: Zn(0) unmodelled; ELEVATED"
+        for row in result.imcc_notices
+    )
+
+
+def test_openimcc_battery_requires_fo2_for_cr_redox_in_sr_melt() -> None:
+    _require_openimcc()
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+    from simulator.melt_backend.openimcc_bridge import (
+        OpenImccCompositionPolicyRefusal,
+    )
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    composition = {"SiO2": 0.8, "Cr2O3": 0.2}
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
+        backend.equilibrate(2000.0 - 273.15, composition_mol=composition)
+    assert exc_info.value.code == "openimcc_redox_requires_imposed_fO2"
+
+    result = backend.equilibrate(
+        2000.0 - 273.15,
+        composition_mol=composition,
+        fO2_log=-10.0,
+    )
+    assert result.status == "ok"
+    assert result.activity_coefficients["Cr2O3"] > 0.0
+
+
+def test_openimcc_battery_keeps_trace_component_notice() -> None:
+    _require_openimcc()
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    result = backend.equilibrate(
+        2000.0 - 273.15,
+        composition_mol={"SiO2": 0.994, "SrO": 0.006},
+    )
+
+    assert any(
+        row["kind"] == "openimcc_notice"
+        and "trace_components_outside_melt_model" in row["reason"]
+        for row in result.imcc_notices
+    )
 
 
 def test_openimcc_battery_reports_runtime_backend_pack(monkeypatch) -> None:
@@ -640,7 +724,7 @@ def test_openimcc_battery_solves_plante_oxygen_balance_anchor() -> None:
         if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
     )
     ratio = notice["pO2_bar"] * 1.0e5 / cell.gas_partial_pressures_Pa["K"]
-    assert ratio == pytest.approx(0.22444037883428292, abs=1e-8)
+    assert ratio == pytest.approx(0.22446221548960008, abs=1e-8)
     assert notice["relative_residual"] < 1.0e-8
     assert notice["bracket_log10_bar"] == [-30.0, 0.0]
     assert notice["cell_material"] is None
@@ -2143,11 +2227,24 @@ assert {
     if candidate.engine is not None
 } == {(True, "independent")}
 assert any(
-    "openimcc-pack-digest:02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
+    "openimcc-pack-digest:0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0"
     in candidate.engine.coefficient_sources
     for _, candidate in engine_rows
     if candidate.engine is not None
 )
+for source in (
+    "openimcc-package-version:0.1.0.dev0",
+    "openimcc-commit:995dc14507dfeefb6849bfedbf19107d015bc040",
+    "openimcc-pack-file:melt:imcc-sf04-d066-v4.json:sha256:5ad550f626a49ebd683211b6f5fd6d0269eb3f2eec93d714bf7ccb2475e82d29",
+    "openimcc-pack-file:redox:openimcc-redox-v5.json:sha256:94279c8627a13ae7af3416f20d1e38867b79842d0054990c7b47108d23b4a968",
+    "openimcc-pack-file:gas:gas-shomate-default-v1.csv:sha256:7f6f03cfae5f818df95a4a03e4bf2b43b9b1da08795eff8f1550e18620ccef36",
+    "openimcc-pack-file:condensate:condensate-default-v1.csv:sha256:1913f0c5d48b24f61576f75d4ae845f4ddf7943d40d517f62ce8dc1e9af5018b",
+):
+    assert any(
+        source in candidate.engine.coefficient_sources
+        for _, candidate in engine_rows
+        if candidate.engine is not None
+    )
 summary = next(
     row for row in headline_rows(residuals, context=context, engines=engines)
     if row["rail"] == "vapour" and row["engine"] == Engine.OPENIMCC.value
@@ -2160,8 +2257,8 @@ assert all(
     if candidate.observation_id.startswith("engine:openimcc:")
 )
 assert summary["n_inside_band"] == 56
-assert abs(float(summary["median_dex"]) - (-0.193144973432544415)) < 0.00000001
-assert abs(float(summary["rms_dex"]) - 0.2097386994979764836) < 0.00000001
+assert abs(float(summary["median_dex"]) - (-0.190683188292830975)) < 0.00000001
+assert abs(float(summary["rms_dex"]) - 0.2063429411922417977) < 0.00000001
 print(json.dumps({"headline": summary, "lineage": "independent"}))
 '''
     env = {
@@ -2185,10 +2282,10 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
     assert result["headline"]["n_score_eligible"] == 160
     assert result["headline"]["n_inside_band"] == 56
     assert float(result["headline"]["median_dex"]) == pytest.approx(
-        -0.193144973432544415, abs=1e-8
+        -0.190683188292830975, abs=1e-8
     )
     assert float(result["headline"]["rms_dex"]) == pytest.approx(
-        0.2097386994979764836, abs=1e-8
+        0.2063429411922417977, abs=1e-8
     )
     assert result["lineage"] == "independent"
 
@@ -2748,10 +2845,10 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
         0.14612803567823803, abs=1e-12
     )
     assert float(openimcc["median_dex"]) == pytest.approx(
-        -0.193144973432544415, abs=1e-8
+        -0.190683188292830975, abs=1e-8
     )
     assert float(openimcc["rms_dex"]) == pytest.approx(
-        0.209738699497976484, abs=1e-8
+        0.206342941192241798, abs=1e-8
     )
 
     solved_openimcc_notice = next(

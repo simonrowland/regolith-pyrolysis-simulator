@@ -327,7 +327,7 @@ wheels = [
 [[package]]
 name = "openimcc"
 version = "0.1.0.dev0"
-source = { git = "https://github.com/simonrowland/openimcc?rev=66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84#66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84" }
+source = { git = "https://github.com/simonrowland/openimcc?rev=995dc14507dfeefb6849bfedbf19107d015bc040#995dc14507dfeefb6849bfedbf19107d015bc040" }
 dependencies = [
     { name = "numpy" },
     { name = "scipy" },
@@ -726,7 +726,7 @@ requires-dist = [
     { name = "flask", specifier = ">=3.0" },
     { name = "flask-socketio", specifier = ">=5.3" },
     { name = "numpy", specifier = ">=1.26,<2" },
-    { name = "openimcc", git = "https://github.com/simonrowland/openimcc?rev=66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84" },
+    { name = "openimcc", git = "https://github.com/simonrowland/openimcc?rev=995dc14507dfeefb6849bfedbf19107d015bc040" },
     { name = "optuna", specifier = "==4.8.0" },
     { name = "pandas" },
     { name = "playwright", marker = "extra == 'e2e'", specifier = ">=1.61,<2" },

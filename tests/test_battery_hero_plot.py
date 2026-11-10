@@ -1976,14 +1976,14 @@ def test_hero_flagged_points_are_hollow_and_comparisons_use_shared_rows(
     files = render_hero_charts(
         data,
         tmp_path / "hero",
-        openimcc_score_commit="66ec4a3",
+        openimcc_score_commit="995dc14",
     )
     svg = files["hero:redox:svg"].read_text(encoding="utf-8").casefold()
     assert "vaporock" in svg and "n_shared=2" in svg
     assert "thermoengine" in svg and "n_shared=1" in svg
     assert "cross-engine signed dex scorecard" in svg
     assert "population sd (ddof=0)" in svg
-    assert "openimcc score commit: 66ec4a3" in svg
+    assert "openimcc score commit: 995dc14" in svg
     assert "benchmark" not in svg
 
 
@@ -2580,11 +2580,11 @@ def test_history_record_keeps_sd_views_and_openimcc_score_commit() -> None:
         comparisons={},
         diagnostics={},
         hero_metrics={("redox", "openimcc"): residuals[0]},
-        openimcc_score_commit="66ec4a3",
+        openimcc_score_commit="995dc14",
     )
 
     metric = record["metrics"][0]
-    assert record["openimcc_score_commit"] == "66ec4a3"
+    assert record["openimcc_score_commit"] == "995dc14"
     assert metric["sd_dex"] == "1"
     assert metric["views"]["temperature_ge_1700"]["n"] == 1
 
@@ -3257,7 +3257,7 @@ def test_stamp_derives_default_pack_from_scored_openimcc_version(
             "openimcc-pack-digest:sha256:green-archive-pack-digest",
         ],
         "lineage_complete": True,
-        "version": "66ec4a3",
+        "version": "995dc14",
     }
     with residuals.open("a", encoding="utf-8") as target:
         target.write(json.dumps(row) + "\n")
@@ -3266,12 +3266,12 @@ def test_stamp_derives_default_pack_from_scored_openimcc_version(
     stamp = stamp_text(
         data,
         simulator_commit="sim-test",
-        openimcc_commit="66ec4a3",
+        openimcc_commit="995dc14",
         render_date="2026-11-06",
     )
 
     assert "default pack at scored pin: imcc-sf04-d066-v5" in stamp
-    assert "SCORE 66ec4a3" in stamp
+    assert "SCORE 995dc14" in stamp
 
 
 def test_hero_summary_exposes_split_metrics_for_every_residual_engine(

@@ -2592,6 +2592,7 @@ class _OpenImccBatteryBackend:
             "openimcc_commit": (
                 openimcc_bridge.imported_openimcc_commit() or "unverified"
             ),
+            "pack_identity": openimcc_bridge.openimcc_pack_identity(),
         }
         domains = self._pack.kernel_datapack.domains
         self._certified_temperature_domain = (
@@ -2613,6 +2614,9 @@ class _OpenImccBatteryBackend:
             self._gas = None
             self._gas_error = f"{type(exc).__name__}: {exc}"
             self._identity["gas_load_failure"] = self._gas_error
+            self._identity["pack_identity"]["feo_guard"].pop(
+                "condensate_feo_row_sha256", None
+            )
             return
         self._identity["engine_binding_identity"] = (
             self._bridge.engine_binding_identity(self._pack, self._gas)
@@ -2666,7 +2670,42 @@ class _OpenImccBatteryBackend:
                 bridge_kwargs["composition_kg"] = composition_kg
         else:
             bridge_kwargs["composition_mol"] = composition_mol
-        result = self._bridge.evaluate(**bridge_kwargs)
+        if composition_mol:
+            redox_composition_mol = bridge_kwargs["composition_mol"]
+        elif composition_kg is not None:
+            if "composition_mol" in bridge_kwargs:
+                redox_composition_mol = bridge_kwargs["composition_mol"]
+            else:
+                redox_composition_mol = composition_kg_and_mol(
+                    {
+                        str(name): float(amount) * 100.0
+                        for name, amount in composition_kg.items()
+                    }
+                )[1]
+        else:
+            redox_composition_mol = {}
+        try:
+            result = self._bridge.evaluate(**bridge_kwargs)
+        except self._package.ImccComponentOutsideDomainError:
+            if not set(self._bridge._REDOX_BACKED_MELT_OXIDES).intersection(
+                redox_composition_mol
+            ):
+                raise
+            result = self._bridge._evaluate_redox_melt(
+                redox_composition_mol,
+                temperature_K,
+                fO2_log=fO2_log,
+            )
+        gas_parent_oxides = tuple(
+            oxide
+            for oxide in result.parent_oxides
+            if redox_composition_mol.get(oxide, 0.0) > 0.0
+            and oxide in result.parent_oxide_activities
+        )
+        gas_parent_activities = {
+            oxide: result.parent_oxide_activities[oxide]
+            for oxide in gas_parent_oxides
+        }
         self.model_id = result.pack_model_id
         self._identity["model_id"] = self.model_id
         self._identity["name"] = self.model_id
@@ -2776,10 +2815,10 @@ class _OpenImccBatteryBackend:
                 )
 
                 po2_bar, gas_result, balance = evaluate_gas_oxygen_balance(
-                    result.parent_oxide_activities,
+                    gas_parent_activities,
                     temperature_K,
                     self._gas,
-                    parent_oxides=result.parent_oxides,
+                    parent_oxides=gas_parent_oxides,
                 )
                 cell_fraction = 0.0
                 cell_info = {
@@ -2805,7 +2844,7 @@ class _OpenImccBatteryBackend:
 
                 channels, _omission_notices = (
                     _openimcc_gas_channels_and_omission_notices(
-                        result.parent_oxides, self._gas
+                        gas_parent_oxides, self._gas
                     )
                 )
                 base_species = oxygen_balance_species_metadata(
@@ -2826,11 +2865,11 @@ class _OpenImccBatteryBackend:
 
                 def pressure_model(pO2_bar: float) -> Mapping[str, float]:
                     return evaluate_gas(
-                        result.parent_oxide_activities,
+                        gas_parent_activities,
                         temperature_K,
                         pO2_bar,
                         self._gas,
-                        parent_oxides=result.parent_oxides,
+                        parent_oxides=gas_parent_oxides,
                         allow_extrapolation=True,
                     )
 
@@ -2846,11 +2885,11 @@ class _OpenImccBatteryBackend:
                     )
                 )
                 gas_result = evaluate_gas(
-                    result.parent_oxide_activities,
+                    gas_parent_activities,
                     temperature_K,
                     po2_bar,
                     self._gas,
-                    parent_oxides=result.parent_oxides,
+                    parent_oxides=gas_parent_oxides,
                     allow_extrapolation=True,
                 )
                 gas_pressures = dict(gas_result)
@@ -2859,7 +2898,7 @@ class _OpenImccBatteryBackend:
                 )
             _channels, omission_notices = (
                 _openimcc_gas_channels_and_omission_notices(
-                    result.parent_oxides, self._gas, gas_result
+                    gas_parent_oxides, self._gas, gas_result
                 )
             )
             notices.extend(omission_notices)
