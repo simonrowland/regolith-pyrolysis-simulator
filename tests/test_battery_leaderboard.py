@@ -130,6 +130,20 @@ def test_rows_rank_page_and_filter_by_engine_feedstock_and_default_campaign() ->
         "fe-minus-one",
         "fe-openimcc",
     ]
+    assert set(worst["rows"][0]) == {
+        "rank",
+        "observation_id",
+        "source",
+        "rail",
+        "species",
+        "engine",
+        "T_K",
+        "observed",
+        "predicted",
+        "residual",
+        "unit",
+        "flags",
+    }
     assert worst["filters"]["temperature_K"]["source"] == (
         "data/setpoints.yaml campaigns.C0.temp_range_C, converted to K"
     )
@@ -200,10 +214,10 @@ def test_groups_keep_units_separate_include_flags_and_exclude_refusals() -> None
     assert iron["n"] == 3
     assert iron["flagged_n"] == 1
     assert iron["rms"] == pytest.approx(
-        _median_rms_from_float64([0.3, -0.4, 1.0])[1]
+        float(_median_rms_from_float64([0.3, -0.4, 1.0])[1])
     )
     assert iron["rms_unflagged_only"] == pytest.approx(
-        _median_rms_from_float64([0.3, -0.4])[1]
+        float(_median_rms_from_float64([0.3, -0.4])[1])
     )
     assert result["filters"]["refused_count"] == 1
     calcium = [row for row in result["rows"] if row["species"] == "CaO"]
@@ -212,6 +226,21 @@ def test_groups_keep_units_separate_include_flags_and_exclude_refusals() -> None
         "kJ_per_declared_mol_basis (absolute)",
     }
     assert len(calcium) == 2
+    only_ratio = leaderboard_module.leaderboard(
+        rows,
+        rail="thermochemistry",
+        species="CaO",
+        level="row",
+        unit="dimensionless (relative)",
+    )
+    assert [row["observation_id"] for row in only_ratio["rows"]] == ["cao-ratio"]
+    dex_page = leaderboard_module.leaderboard(rows, level="row", unit="dex")
+    assert dex_page["filters"]["refused_count"] == 1
+    calcium_predictions = leaderboard_module.leaderboard(
+        rows, rail="thermochemistry", species="CaO", level="row", limit=10
+    )
+    measured = {row["observation_id"]: row["observed"] for row in calcium_predictions["rows"]}
+    assert measured == {"cao-ratio": pytest.approx(10.0), "cao-enthalpy": pytest.approx(10.0)}
 
 
 def test_archive_run_report_and_versioned_json_markdown_and_csv(tmp_path: Path) -> None:
@@ -292,9 +321,28 @@ def test_archive_run_report_and_versioned_json_markdown_and_csv(tmp_path: Path) 
         "species",
         "unit",
         "temperature_K",
+        "run_envelope",
         "refused_count",
         "rank_policy",
     }
+    assert set(payload["filters"]["run_envelope"]) == {
+        "feedstock_composition_class",
+        "feedstock_class_source",
+        "backend",
+        "engines_by_role",
+        "temperature_K",
+        "pO2_bar",
+        "species_by_rail",
+        "evaporated_mol_by_species",
+        "evaporated_mol_method",
+    }
+    assert payload["filters"]["run_envelope"]["pO2_bar"] == {
+        "min": 1e-5,
+        "max": 2e-5,
+    }
+    assert payload["filters"]["run_envelope"]["engines_by_role"]["vapour"] == [
+        "openimcc"
+    ]
     assert payload["total"] == 1
     assert payload["filters"]["refused_count"] == 1
     assert set(payload["rows"][0]) == {
@@ -350,19 +398,20 @@ def test_archive_run_report_and_versioned_json_markdown_and_csv(tmp_path: Path) 
             str(csv_path),
         ]
     ) == 0
-    with csv_path.open(newline="", encoding="utf-8") as stream:
-        assert next(csv.reader(stream)) == [
-            "rank",
-            "observation_id",
-            "source",
-            "rail",
-            "species",
-            "engine",
-            "T_K",
-            "observed",
-            "predicted",
-            "residual",
-            "unit",
-            "flags",
-        ]
+    csv_lines = csv_path.read_text(encoding="utf-8").splitlines()
+    assert csv_lines[0] == "# total=1; limit=10; offset=0; refused_count=1"
+    assert next(csv.reader(csv_lines[1:])) == [
+        "rank",
+        "observation_id",
+        "source",
+        "rail",
+        "species",
+        "engine",
+        "T_K",
+        "observed",
+        "predicted",
+        "residual",
+        "unit",
+        "flags",
+    ]
 

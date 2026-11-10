@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Rank battery residuals that fall inside a runner report's hero envelope."""
+"""Rank empirical battery predictions by residual or grouped RMS."""
 
 from __future__ import annotations
 
 import argparse
+import csv
 import gzip
+import io
 import json
 import math
 import re
@@ -20,13 +22,14 @@ from typing import Any, BinaryIO, Iterator
 ROOT = Path(__file__).resolve().parents[2]
 
 from simulator.accounting import UnknownSpeciesError, resolve_species_formula
-from simulator.battery.enums import NoticeKind
+from simulator.battery.enums import MetricOperation, NoticeKind
 from simulator.battery.identity import PA_PER_BAR_DEC
 from simulator.config import load_config_bundle
 from simulator.battery.score import (
     _engine_from_payload,
     _flagged_payload_strata,
     _median_rms_from_float64,
+    _reference_from_metric,
     is_store_stamp_payload,
 )
 
@@ -586,16 +589,8 @@ def _observation_id(row: Mapping[str, Any]) -> str:
     return str(request.get("observation_id") or request.get("experiment_id") or "")
 
 
-def _score_rows(
-    archive: Path,
-    envelope: Mapping[str, Any],
-    report: Mapping[str, Any],
-) -> list[dict[str, Any]]:
-    aliases = _formula_aliases(report)
-    roles = _engine_roles(report, _report_rows(report))
-    groups: dict[tuple[str, str, str, str, str], dict[str, Any]] = {}
+def _iter_archive_rows(archive: Path) -> Iterator[Mapping[str, Any]]:
     with _open_residual_jsonl(archive) as source:
-        saw_stamp = False
         for line_number, line in enumerate(source, start=1):
             if not line.strip():
                 continue
@@ -603,136 +598,395 @@ def _score_rows(
                 payload = json.loads(line)
             except json.JSONDecodeError as exc:
                 raise ValueError(f"{archive}:{line_number}: invalid JSON") from exc
-            if not isinstance(payload, Mapping):
-                continue
-            if not saw_stamp:
-                if not is_store_stamp_payload(payload):
-                    raise ValueError(f"{archive}: line 1 is not a battery_store_stamp")
-                saw_stamp = True
-                continue
-            if is_store_stamp_payload(payload):
-                continue
+            if isinstance(payload, Mapping) and not is_store_stamp_payload(payload):
+                yield payload
 
-            rail = str(payload.get("rail") or "")
-            species = _row_formula(payload)
-            engine = _engine_from_payload(payload)
-            if engine == "unknown":
-                engine = _engine_name(payload) or "unknown"
-            if not rail or not species or not engine:
-                continue
-            if not _row_inside_envelope(payload, rail, species, engine, envelope, roles, aliases):
-                continue
 
-            numeric = _mapping(payload.get("numeric"))
-            residual = _number(numeric.get("value"))
-            status = str(payload.get("status") or "").casefold()
-            refused = status == "refused"
-            flagged = _hero_row_flagged(
-                payload,
-                d139_uncalibrated_kems=_is_d139_uncalibrated_kems_row(payload),
+def _feedstock_oxide_elements(feedstock: Mapping[str, Any]) -> tuple[set[str], set[str]]:
+    composition = _mapping(feedstock.get("composition_wt_pct"))
+    oxide_names: set[str] = set()
+    elements: set[str] = set()
+    for raw_name, raw_amount in composition.items():
+        if (_number(raw_amount) or 0.0) <= 0.0:
+            continue
+        name = str(raw_name)
+        _canonical, _signature, formula_elements, _mass = _formula_info(name, {})
+        cations = set(formula_elements) - {"O"}
+        if "O" in formula_elements and cations:
+            oxide_names.add(name.casefold())
+            elements.update(cations)
+    return oxide_names, elements
+
+
+def _matches_feedstock_species(species: str, oxide_names: set[str], elements: set[str]) -> bool:
+    if species.casefold() in oxide_names:
+        return True
+    _canonical, _signature, formula_elements, _mass = _formula_info(species, {})
+    cations = set(formula_elements) - {"O"}
+    if not cations:
+        return "O" in formula_elements and bool(elements)
+    return cations <= elements
+
+
+def _default_temperature_filter(config: Any) -> dict[str, Any] | None:
+    # The runner defaults to C0; use its declared campaign band rather than another range.
+    campaigns = _mapping(_mapping(config.setpoints).get("campaigns"))
+    default_campaign = _mapping(campaigns.get("C0"))
+    raw_range = _sequence(default_campaign.get("temp_range_C"))
+    if len(raw_range) != 2:
+        return None
+    low, high = _number(raw_range[0]), _number(raw_range[1])
+    if low is None or high is None:
+        return None
+    return {
+        "min": low + 273.15,
+        "max": high + 273.15,
+        "source": "data/setpoints.yaml campaigns.C0.temp_range_C, converted to K",
+    }
+
+
+def _run_temperature_filter(envelope: Mapping[str, Any]) -> dict[str, Any] | None:
+    bounds = _mapping(envelope.get("temperature_K"))
+    low, high = _number(bounds.get("min")), _number(bounds.get("max"))
+    margin = _number(bounds.get("margin_K")) or 0.0
+    if low is None or high is None:
+        return None
+    return {
+        "min": low - margin,
+        "max": high + margin,
+        "source": f"run report per_hour_summary.T_C with ±{_display(margin)} K margin",
+    }
+
+
+def _decimal_point(raw: object) -> Decimal | None:
+    value = _state_value(raw) if isinstance(raw, Mapping) and "tag" in raw else raw
+    if isinstance(value, Mapping):
+        if value.get("kind") == "point":
+            value = value.get("point")
+        elif "point" in value:
+            value = value.get("point")
+        elif "value" in value:
+            value = value.get("value")
+    return _hero_decimal(value)
+
+
+def _metric_unit(numeric: Mapping[str, Any]) -> tuple[str, str]:
+    operation = str(numeric.get("operation") or "")
+    raw_unit = str(numeric.get("unit") or "unknown")
+    if operation == MetricOperation.DEX.value:
+        return operation, "dex"
+    if operation:
+        return operation, f"{raw_unit} ({operation})"
+    return operation, raw_unit
+
+
+def _row_flags(row: Mapping[str, Any], flagged: bool) -> list[str]:
+    candidate = _mapping(row.get("candidate_observation"))
+    flags = {
+        str(notice.get("kind"))
+        for source in (row.get("notices"), candidate.get("notices"))
+        for notice in _sequence(source)
+        if isinstance(notice, Mapping) and notice.get("kind")
+    }
+    flags.update(_flagged_payload_strata(row))
+    if flagged and not flags:
+        flags.add("flagged")
+    return sorted(flags)
+
+
+def _engine_filter_values(engine: str | Sequence[str] | None) -> set[str] | None:
+    if engine is None:
+        return None
+    values = (engine,) if isinstance(engine, str) else engine
+    normalized = {str(value).strip().casefold() for value in values if str(value).strip()}
+    return normalized
+
+
+def leaderboard(
+    rows: Sequence[Mapping[str, Any]] | Iterator[Mapping[str, Any]],
+    *,
+    feedstock: str = "lunar_mare_low_ti",
+    engine: str | Sequence[str] | None = None,
+    level: str = "row",
+    order: str = "worst",
+    limit: int = 10,
+    offset: int = 0,
+    rail: str | None = None,
+    species: str | None = None,
+    unit: str | None = None,
+    run: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Rank priced residuals by prediction or by rail/species/engine/unit group."""
+
+    if level not in {"row", "group"}:
+        raise ValueError("level must be 'row' or 'group'")
+    if order not in {"worst", "best"}:
+        raise ValueError("order must be 'worst' or 'best'")
+    if limit < 0 or offset < 0:
+        raise ValueError("limit and offset must be non-negative")
+
+    config = load_config_bundle(ROOT / "data")
+    feedstock_id = str(feedstock).strip()
+    selected_feedstock: Mapping[str, Any] = {}
+    if feedstock_id != "all":
+        raw_feedstock = config.feedstocks.get(feedstock_id)
+        if not isinstance(raw_feedstock, Mapping):
+            raise ValueError(f"unknown feedstock id: {feedstock_id}")
+        selected_feedstock = raw_feedstock
+    oxide_names, oxide_elements = _feedstock_oxide_elements(selected_feedstock)
+
+    envelope = _build_envelope(run) if run is not None else None
+    aliases = _formula_aliases(run) if run is not None else {}
+    roles = _engine_roles(run, _report_rows(run)) if run is not None else {}
+    temperature_filter = (
+        _run_temperature_filter(envelope)
+        if envelope is not None
+        else _default_temperature_filter(config)
+    )
+    engine_values = _engine_filter_values(engine)
+    engine_json = None if engine_values is None else sorted(engine_values)
+
+    scored_rows: list[dict[str, Any]] = []
+    refused_count = 0
+    for payload in rows:
+        if not isinstance(payload, Mapping) or is_store_stamp_payload(payload):
+            continue
+        row = payload
+        row_rail = str(row.get("rail") or "")
+        row_species = _row_formula(row)
+        row_engine = _engine_from_payload(row)
+        if row_engine == "unknown":
+            row_engine = _engine_name(row) or "unknown"
+        if not row_rail or not row_species:
+            continue
+        if feedstock_id != "all" and not _matches_feedstock_species(
+            row_species, oxide_names, oxide_elements
+        ):
+            continue
+        if engine_values is not None and row_engine.casefold() not in engine_values:
+            continue
+        if rail is not None and row_rail.casefold() != rail.casefold():
+            continue
+        if species is not None and row_species.casefold() != species.casefold():
+            continue
+
+        numeric = _mapping(row.get("numeric"))
+        operation, unit_label = _metric_unit(numeric)
+        status = str(row.get("status") or "").casefold()
+        refused = status == "refused"
+        if (
+            unit is not None
+            and unit_label.casefold() != unit.casefold()
+            and not refused
+        ):
+            continue
+        temperature = _hero_metric_temperature(row)
+        if envelope is not None:
+            if not _row_inside_envelope(
+                row, row_rail, row_species, row_engine, envelope, roles, aliases
+            ):
+                continue
+        elif temperature_filter is not None and temperature is not None:
+            if not (
+                temperature_filter["min"]
+                <= float(temperature)
+                <= temperature_filter["max"]
+            ):
+                continue
+        elif temperature_filter is not None and not refused:
+            continue
+
+        if refused:
+            refused_count += 1
+            continue
+        residual = _number(numeric.get("value"))
+        residual_decimal = _hero_decimal(numeric.get("value"))
+        if residual is None or residual_decimal is None:
+            continue
+
+        candidate = _mapping(row.get("candidate_observation"))
+        predicted_decimal = _decimal_point(candidate.get("value"))
+        try:
+            operation_enum = MetricOperation(operation)
+        except ValueError:
+            operation_enum = None
+        observed_decimal = (
+            _reference_from_metric(operation_enum, predicted_decimal, residual_decimal)
+            if operation_enum is not None and predicted_decimal is not None
+            else None
+        )
+        observation_id = _observation_id(row)
+        source = candidate.get("source_id") or row.get("source_id")
+        if not source and "::" in observation_id:
+            source = observation_id.split("::", 1)[0]
+        if not source:
+            source = "unknown"
+        flagged = _hero_row_flagged(
+            row,
+            d139_uncalibrated_kems=_is_d139_uncalibrated_kems_row(row),
+        )
+        scored_rows.append(
+            {
+                "rail": row_rail,
+                "species": row_species,
+                "engine": row_engine,
+                "unit": unit_label,
+                "residual": residual,
+                "flagged": flagged,
+                "observation_id": observation_id,
+                "source": str(source),
+                "T_K": None if temperature is None else float(temperature),
+                "observed": None if observed_decimal is None else float(observed_decimal),
+                "predicted": None if predicted_decimal is None else float(predicted_decimal),
+                "flags": _row_flags(row, flagged),
+            }
+        )
+
+    if level == "row":
+        units = sorted(
+            {row["unit"] for row in scored_rows},
+            key=lambda value: (value != "dex", str(value).casefold()),
+        )
+        ranked: list[dict[str, Any]] = []
+        for unit_block in units:
+            block = [row for row in scored_rows if row["unit"] == unit_block]
+            block.sort(
+                key=lambda row: (
+                    abs(row["residual"]) if order == "best" else -abs(row["residual"]),
+                    row["observation_id"],
+                    row["source"],
+                )
             )
-            if not (refused or residual is not None):
-                continue
-
-            operation = str(numeric.get("operation") or "")
-            raw_unit = str(numeric.get("unit") or "unknown")
-            unit = "dex" if operation == "dex" else raw_unit
-            key = (rail, species, engine, unit, operation)
+            for rank, row in enumerate(block, start=1):
+                ranked.append(
+                    {
+                        "rank": rank,
+                        **{
+                            key: row[key]
+                            for key in (
+                                "observation_id",
+                                "source",
+                                "rail",
+                                "species",
+                                "engine",
+                                "T_K",
+                                "observed",
+                                "predicted",
+                                "residual",
+                                "unit",
+                                "flags",
+                            )
+                        },
+                    }
+                )
+    else:
+        groups: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+        for row in scored_rows:
+            key = (row["rail"], row["species"], row["engine"], row["unit"])
             group = groups.setdefault(
                 key,
                 {
-                    "rail": rail,
-                    "species": species,
-                    "engine": engine,
-                    "unit": unit,
-                    "operation": operation,
+                    "rail": row["rail"],
+                    "species": row["species"],
+                    "engine": row["engine"],
+                    "unit": row["unit"],
                     "values": [],
                     "unflagged_values": [],
                     "worst": [],
                     "flagged_n": 0,
-                    "refused_count": 0,
                 },
             )
-            group["refused_count"] += int(refused)
-            if refused or residual is None:
-                continue
-            observation_id = _observation_id(payload)
-            group["values"].append(residual)
-            if flagged:
+            group["values"].append(row["residual"])
+            if row["flagged"]:
                 group["flagged_n"] += 1
             else:
-                group["unflagged_values"].append(residual)
-            if observation_id:
-                group["worst"].append((abs(residual), observation_id))
+                group["unflagged_values"].append(row["residual"])
+            if row["observation_id"]:
+                group["worst"].append((abs(row["residual"]), row["observation_id"]))
 
-    for key, group in list(groups.items()):
-        if key[3:] != ("unknown", "") or group["values"]:
-            continue
-        siblings = [
-            other
-            for other_key, other in groups.items()
-            if other_key[:3] == key[:3] and other_key != key
-        ]
-        if len(siblings) == 1:
-            siblings[0]["refused_count"] += group["refused_count"]
-            del groups[key]
-
-    result: list[dict[str, Any]] = []
-    evaporated_moles = _mapping(envelope.get("evaporated_mol_by_species"))
-    for group in groups.values():
-        values = group["values"]
-        statistics = _median_rms_from_float64(values)
-        median, rms = statistics if statistics is not None else (None, None)
-        unflagged_statistics = _median_rms_from_float64(group["unflagged_values"])
-        _unflagged_median, rms_unflagged_only = (
-            unflagged_statistics if unflagged_statistics is not None else (None, None)
-        )
-        worst_ids: list[str] = []
-        seen_ids: set[str] = set()
-        for _magnitude, observation_id in sorted(
-            group["worst"], key=lambda item: (-item[0], item[1])
-        ):
-            if observation_id not in seen_ids:
+        evaporated = _mapping(_mapping(envelope).get("evaporated_mol_by_species"))
+        groups_by_unit: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for group in groups.values():
+            stats = _median_rms_from_float64(group["values"])
+            median, rms = stats if stats is not None else (None, None)
+            unflagged_stats = _median_rms_from_float64(group["unflagged_values"])
+            _unflagged_median, unflagged_rms = (
+                unflagged_stats if unflagged_stats is not None else (None, None)
+            )
+            worst_ids: list[str] = []
+            seen_ids: set[str] = set()
+            for _magnitude, observation_id in sorted(
+                group["worst"], key=lambda item: (-item[0], item[1])
+            ):
+                if observation_id in seen_ids:
+                    continue
                 seen_ids.add(observation_id)
                 worst_ids.append(observation_id)
-            if len(worst_ids) == 3:
-                break
-        bias = math.fsum(values) / len(values) if values else None
-        unit = group["unit"]
-        if group["operation"] and group["operation"] != "dex":
-            unit = f"{unit} ({group['operation']})"
-        result.append(
-            {
+                if len(worst_ids) == 3:
+                    break
+            values = group["values"]
+            output = {
                 "rail": group["rail"],
                 "species": group["species"],
                 "engine": group["engine"],
-                "unit": unit,
+                "unit": group["unit"],
                 "n": len(values),
+                "flagged_n": group["flagged_n"],
                 "rms": None if rms is None else float(rms),
                 "rms_unflagged_only": (
-                    None if rms_unflagged_only is None else float(rms_unflagged_only)
+                    None if unflagged_rms is None else float(unflagged_rms)
                 ),
                 "median": None if median is None else float(median),
-                "bias": bias,
-                "hero_evaporated_mol": _number(evaporated_moles.get(group["species"])),
-                "flagged_n": group["flagged_n"],
-                "refused_count": group["refused_count"],
+                "bias": math.fsum(values) / len(values) if values else None,
+                "hero_evaporated_mol": _number(evaporated.get(group["species"])),
                 "worst_observation_ids": worst_ids,
             }
+            groups_by_unit[group["unit"]].append(output)
+
+        units = sorted(
+            groups_by_unit,
+            key=lambda value: (value != "dex", str(value).casefold()),
         )
-    result.sort(
-        key=lambda row: (
-            row["rms"] is None,
-            -(row["rms"] or 0.0),
-            row["rail"],
-            row["species"],
-            row["engine"],
-            row["unit"],
-        )
-    )
-    for rank, row in enumerate(result, start=1):
-        row["rank"] = rank
-    return result
+        ranked = []
+        for unit_block in units:
+            block = groups_by_unit[unit_block]
+            block.sort(
+                key=lambda row: (
+                    row["rms"] is None,
+                    (row["rms"] or 0.0) if order == "best" else -(row["rms"] or 0.0),
+                    row["rail"],
+                    row["species"],
+                    row["engine"],
+                )
+            )
+            for rank, row in enumerate(block, start=1):
+                ranked.append({"rank": rank, **row})
+
+    filters = {
+        "feedstock": feedstock_id,
+        "engine": engine_json,
+        "level": level,
+        "order": order,
+        "rail": rail,
+        "species": species,
+        "unit": unit,
+        "temperature_K": temperature_filter,
+        "run_envelope": envelope,
+        "refused_count": refused_count,
+        "rank_policy": (
+            "within the selected unit"
+            if unit is not None
+            else "within unit blocks; dex first, then remaining units alphabetically"
+        ),
+    }
+    return {
+        "schema": "battery-leaderboard.v1",
+        "filters": filters,
+        "total": len(ranked),
+        "limit": limit,
+        "offset": offset,
+        "rows": ranked[offset : offset + limit],
+    }
 
 
 def _display(value: object) -> str:
@@ -743,73 +997,224 @@ def _display(value: object) -> str:
     return str(value)
 
 
-def _markdown(envelope: Mapping[str, Any], rows: Sequence[Mapping[str, Any]]) -> str:
-    temperature = _mapping(envelope.get("temperature_K"))
-    pO2 = _mapping(envelope.get("pO2_bar"))
-    pO2_text = (
-        "unreported"
-        if pO2.get("min") is None or pO2.get("max") is None
-        else f"{_display(pO2.get('min'))}–{_display(pO2.get('max'))} bar"
-    )
-    engines = ", ".join(
-        f"{role}: {', '.join(values) or 'none'}"
-        for role, values in _mapping(envelope.get("engines_by_role")).items()
-    )
+def _markdown(result: Mapping[str, Any]) -> str:
+    filters = _mapping(result.get("filters"))
+    rows = _sequence(result.get("rows"))
+    total, limit, offset = result.get("total", 0), result.get("limit", 0), result.get("offset", 0)
     lines = [
-        "# Hero recipe empirical battery priorities",
+        "# Empirical battery leaderboard",
         "",
-        f"Feedstock composition class: `{envelope.get('feedstock_composition_class')}` "
-        f"(from `{envelope.get('feedstock_class_source')}`).",
-        f"Temperature: {_display(temperature.get('min'))}–{_display(temperature.get('max'))} K "
-        f"with ±{_display(temperature.get('margin_K'))} K margin; pO₂: {pO2_text}.",
-        f"Engines by report role: {engines}.",
-        "Rows are sorted by RMS descending. Numeric flagged predictions are included in n and RMS; refused rows are counted and excluded.",
-        "Moles integrate reported vapor mass rates; melt-activity rows use non-oxygen formula-unit equivalents.",
-        "",
-        "| # | Rail | Species | Engine | n | Flagged n | RMS (unit / operation) | RMS (unflagged only) | Median | Bias | Hero evaporated mol/equiv. | Refused | Worst observation ids |",
-        "|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        f"Total ranked rows: {total}; page: offset {offset}, limit {limit}.",
+        f"Refused rows excluded: {filters.get('refused_count', 0)}.",
+        f"Feedstock: `{filters.get('feedstock')}`; engine: `{filters.get('engine') or 'all'}`; "
+        f"level: `{filters.get('level')}`; order: `{filters.get('order')}`.",
     ]
-    for row in rows:
-        rms = _display(row.get("rms"))
-        rms_unflagged = _display(row.get("rms_unflagged_only"))
-        unit = str(row.get("unit") or "unknown").replace("|", "\\|")
-        worst = ", ".join(str(value).replace("|", "\\|") for value in row["worst_observation_ids"])
+    temperature = _mapping(filters.get("temperature_K"))
+    if temperature:
         lines.append(
-            f"| {row['rank']} | {row['rail']} | {row['species']} | {row['engine']} | "
-            f"{row['n']} | {row['flagged_n']} | {rms} {unit} | {rms_unflagged} {unit} | "
-            f"{_display(row['median'])} | "
-            f"{_display(row['bias'])} | {_display(row['hero_evaporated_mol'])} | "
-            f"{row['refused_count']} | {worst} |"
+            f"Temperature filter: {_display(temperature.get('min'))}–"
+            f"{_display(temperature.get('max'))} K ({temperature.get('source')})."
         )
-    lines.append("")
-    return "\n".join(lines)
+    envelope = _mapping(filters.get("run_envelope"))
+    if envelope:
+        pO2 = _mapping(envelope.get("pO2_bar"))
+        pO2_text = (
+            "unreported"
+            if pO2.get("min") is None or pO2.get("max") is None
+            else f"{_display(pO2.get('min'))}–{_display(pO2.get('max'))} bar"
+        )
+        engines = "; ".join(
+            f"{role}: {', '.join(str(value) for value in values) or 'none'}"
+            for role, values in _mapping(envelope.get("engines_by_role")).items()
+        )
+        species = "; ".join(
+            f"{rail}: {', '.join(str(value) for value in values)}"
+            for rail, values in _mapping(envelope.get("species_by_rail")).items()
+        )
+        lines.extend(
+            [
+                f"Run feedstock class: `{envelope.get('feedstock_composition_class')}` "
+                f"(from `{envelope.get('feedstock_class_source')}`).",
+                f"Run pO₂ range: {pO2_text}.",
+                f"Run engines by role: {engines or 'unreported'}.",
+                f"Run species by rail: {species or 'unreported'}.",
+            ]
+        )
+    lines.extend(
+        [
+            f"Ranking policy: {filters.get('rank_policy')}; each row includes its unit.",
+            "Flagged numeric predictions remain ranked and carry their flags; refusals never enter a rank.",
+            "",
+        ]
+    )
+    if not rows:
+        lines.append("No ranked rows on this page.")
+        return "\n".join(lines) + "\n"
+
+    if filters.get("level") == "row":
+        columns = [
+            "rank",
+            "observation_id",
+            "source",
+            "rail",
+            "species",
+            "engine",
+            "T_K",
+            "observed",
+            "predicted",
+            "residual",
+            "unit",
+            "flags",
+        ]
+    else:
+        columns = [
+            "rank",
+            "rail",
+            "species",
+            "engine",
+            "unit",
+            "n",
+            "flagged_n",
+            "rms",
+            "rms_unflagged_only",
+            "median",
+            "bias",
+            "hero_evaporated_mol",
+            "worst_observation_ids",
+        ]
+    header = "| " + " | ".join(columns) + " |"
+    divider = "| " + " | ".join("---:" if column in {"rank", "n", "flagged_n"} else "---" for column in columns) + " |"
+    previous_unit: str | None = None
+    for row in rows:
+        unit_name = str(_mapping(row).get("unit") or "unknown")
+        if unit_name != previous_unit:
+            lines.extend([f"### Unit: `{unit_name}`", "", header, divider])
+            previous_unit = unit_name
+        cells: list[str] = []
+        for column in columns:
+            value = _mapping(row).get(column)
+            if column == "flags":
+                value = ", ".join(str(flag) for flag in value or [])
+            elif column == "worst_observation_ids":
+                value = ", ".join(str(item) for item in value or [])
+            cells.append(_display(value).replace("|", "\\|"))
+        lines.append("| " + " | ".join(cells) + " |")
+    return "\n".join(lines) + "\n"
+
+
+def _csv_text(result: Mapping[str, Any]) -> str:
+    columns = (
+        [
+            "rank",
+            "observation_id",
+            "source",
+            "rail",
+            "species",
+            "engine",
+            "T_K",
+            "observed",
+            "predicted",
+            "residual",
+            "unit",
+            "flags",
+        ]
+        if _mapping(result.get("filters")).get("level") == "row"
+        else [
+            "rank",
+            "rail",
+            "species",
+            "engine",
+            "unit",
+            "n",
+            "flagged_n",
+            "rms",
+            "rms_unflagged_only",
+            "median",
+            "bias",
+            "hero_evaporated_mol",
+            "worst_observation_ids",
+        ]
+    )
+    stream = io.StringIO(newline="")
+    writer = csv.DictWriter(stream, fieldnames=columns)
+    writer.writeheader()
+    for row in _sequence(result.get("rows")):
+        values = dict(_mapping(row))
+        for column in ("flags", "worst_observation_ids"):
+            if column in values:
+                values[column] = json.dumps(values[column], ensure_ascii=False)
+        writer.writerow({column: values.get(column) for column in columns})
+    filters = _mapping(result.get("filters"))
+    summary = (
+        f"# total={result.get('total', 0)}; limit={result.get('limit', 0)}; "
+        f"offset={result.get('offset', 0)}; refused_count={filters.get('refused_count', 0)}\n"
+    )
+    return summary + stream.getvalue()
+
+
+def _json_text(result: Mapping[str, Any]) -> str:
+    return json.dumps(result, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--archive", required=True, type=Path, help="battery .tgz archive or residuals JSONL")
-    parser.add_argument("--hero-run", required=True, type=Path, help="runner hero-run JSON report")
-    parser.add_argument("--out", required=True, type=Path, help="Markdown output path; sibling .json is written too")
+    parser.add_argument("--run", type=Path, help="optional runner report for its T/pO2/species envelope")
+    parser.add_argument("--feedstock", default="lunar_mare_low_ti", help="feedstock id or 'all'")
+    parser.add_argument("--engine", action="append", help="engine filter; repeat for multiple engines")
+    parser.add_argument("--level", choices=("row", "group"), default="row")
+    parser.add_argument("--order", choices=("worst", "best"), default="worst")
+    parser.add_argument("--limit", type=int, default=10)
+    parser.add_argument("--offset", type=int, default=0)
+    parser.add_argument("--rail")
+    parser.add_argument("--species")
+    parser.add_argument("--unit", help="rank only this unit")
+    parser.add_argument("--format", choices=("md", "json", "csv"), default="md")
+    parser.add_argument("--out", type=Path, help="write output to this path; markdown also writes a sibling JSON")
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        report = json.loads(args.hero_run.read_text(encoding="utf-8"))
-        if not isinstance(report, Mapping):
-            raise ValueError(f"{args.hero_run}: hero report must be an object")
-        envelope = _build_envelope(report)
-        rows = _score_rows(args.archive, envelope, report)
-        payload = {"hero_envelope": envelope, "rows": rows}
-        args.out.parent.mkdir(parents=True, exist_ok=True)
-        args.out.write_text(_markdown(envelope, rows), encoding="utf-8")
-        args.out.with_suffix(".json").write_text(
-            json.dumps(payload, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
+        run: Mapping[str, Any] | None = None
+        if args.run is not None:
+            loaded_run = json.loads(args.run.read_text(encoding="utf-8"))
+            if not isinstance(loaded_run, Mapping):
+                raise ValueError(f"{args.run}: run report must be an object")
+            run = loaded_run
+        result = leaderboard(
+            _iter_archive_rows(args.archive),
+            feedstock=args.feedstock,
+            engine=args.engine,
+            level=args.level,
+            order=args.order,
+            limit=args.limit,
+            offset=args.offset,
+            rail=args.rail,
+            species=args.species,
+            unit=args.unit,
+            run=run,
         )
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        print(f"battery hero priorities: {exc}", file=sys.stderr)
+        rendered = {
+            "md": _markdown,
+            "json": _json_text,
+            "csv": _csv_text,
+        }[args.format](result)
+        if args.out is None:
+            sys.stdout.write(rendered)
+        else:
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(rendered, encoding="utf-8")
+            if args.format == "md":
+                json_path = (
+                    args.out.with_name(f"{args.out.stem}-data.json")
+                    if args.out.suffix.casefold() == ".json"
+                    else args.out.with_suffix(".json")
+                )
+                json_path.write_text(_json_text(result), encoding="utf-8")
+    except (OSError, ValueError, tarfile.TarError) as exc:
+        print(f"battery leaderboard: {exc}", file=sys.stderr)
         return 2
     return 0
 

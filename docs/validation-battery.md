@@ -23,7 +23,7 @@ observation store, schema v2.1    works, experiments, observations
 data/battery/residuals.jsonl      one residual per observation point and engine
         |  scripts/battery_hero_plot.py
         v
-score report, headline summary, hero charts
+score report, headline summary, hero charts and the battery leaderboard
 ```
 
 | Path | Holds |
@@ -227,6 +227,135 @@ The run also writes `battery-hero.html`, with every chart and table and an explo
 RMS over a chosen temperature and SiO₂ range is exact. Each chart's numbers are in `tables/*.csv`,
 and `methods.md` records the scorer revision, the OpenIMCC pin and these conventions. A new
 history path starts empty; `--append-history --landing-sha <sha>` adds the current run to it.
+
+## Leaderboard
+
+`simulator.battery.leaderboard` ranks individual numeric predictions or groups of predictions from
+the scorer's residual ledger. It reads `.tgz` score archives and residual JSONL directly; it never
+runs the scorer or creates a second store. Flagged numeric predictions remain in the ranking and
+carry their notice kinds. Refused rows never rank and are counted in the output header.
+
+By default, the leaderboard selects species that can be formed from the nonzero oxide components
+in the `lunar_mare_low_ti` feedstock. The `all` feedstock setting skips that species filter. Without
+a run report, the temperature filter comes from the runner's default C0 campaign band in
+`data/setpoints.yaml`, converted from °C to K (currently 20–950 °C). With `--run`, the report's
+traversed temperature range and pO₂ range are used; temperature includes the report's ±100 K margin,
+and the evaporated-moles column comes from the run report. The report also limits species and
+engines by rail using its recorded activity providers and backends.
+
+Rows are ranked by absolute residual: `worst` puts the largest first and `best` the smallest first.
+Groups are ranked by RMS in the selected order. Rankings are independent within each unit block;
+`dex` comes first by default, followed by other units alphabetically. Each markdown block names its
+unit. Use `--unit` when paging a specific unit.
+
+```bash
+# Worst 10 lunar predictions, then the next 10
+python -m simulator.battery.leaderboard --archive scores.tgz \
+  --feedstock lunar_mare_low_ti --level row --order worst --limit 10 --format md
+python -m simulator.battery.leaderboard --archive scores.tgz \
+  --feedstock lunar_mare_low_ti --level row --order worst --limit 10 --offset 10 --format md
+
+# Best 10 OpenIMCC predictions
+python -m simulator.battery.leaderboard --archive scores.tgz \
+  --feedstock lunar_mare_low_ti --engine openimcc --level row --order best --limit 10
+
+# Worst groups across all feedstocks
+python -m simulator.battery.leaderboard --archive scores.tgz \
+  --feedstock all --level group --order worst --limit 10
+
+# Hero-recipe priorities from the run report; markdown output also writes sibling JSON
+python -m simulator.battery.leaderboard --archive scores.tgz --run hero-run.json \
+  --feedstock lunar_mare_low_ti --level group --limit 10 --out out/hero-priorities.md
+```
+
+Use `--format md`, `json`, or `csv`; `--out` writes the selected format to a file. Markdown file
+output also writes the same page as sibling JSON. `--limit` defaults to 10 and `--offset` defaults
+to 0. The output's `total` counts all ranked rows or groups before paging. Filters include
+`--engine` (repeat it to select multiple engines), `--rail`, `--species`, and `--unit`. CSV begins
+with a metadata comment containing `total`, `limit`, `offset`, and `refused_count` before its header.
+
+OpenIMCC can call the CLI on a score archive, or import the library function when it already has
+residual rows in memory:
+
+```python
+from pathlib import Path
+
+from simulator.battery.leaderboard import leaderboard
+from simulator.battery.score import load_residuals_jsonl
+
+rows = load_residuals_jsonl(Path("data/battery/residuals.jsonl"))
+page = leaderboard(rows, engine="openimcc", level="row", order="best", limit=10)
+```
+
+### JSON schema: `battery-leaderboard.v1`
+
+JSON output is a stable, versioned interface. The top-level object has exactly these keys:
+
+| Key | Meaning |
+|---|---|
+| `schema` | Schema identifier, `battery-leaderboard.v1`. Bump the version if keys or meanings change. |
+| `filters` | Applied filters and the ranking policy. |
+| `total` | Number of ranked rows/groups before `offset` and `limit`. Refusals are excluded. |
+| `limit` | Maximum number of returned rows. |
+| `offset` | Number of ranked rows skipped before returning this page. |
+| `rows` | Page of row-level predictions or group summaries. |
+
+The `filters` object has these keys:
+
+| Key | Meaning |
+|---|---|
+| `feedstock` | Feedstock id, or `all`. |
+| `engine` | Selected engine ids as a list, or `null` for all engines. |
+| `level` | `row` or `group`. |
+| `order` | `worst` or `best`. |
+| `rail` | Selected rail, or `null`. |
+| `species` | Selected formula, or `null`. |
+| `unit` | Selected unit block, or `null` when unit blocks are ranked separately. |
+| `temperature_K` | `{min, max, source}` temperature bounds, or `null` if none are declared. |
+| `run_envelope` | Report-derived hero context, or `null` without `--run`; its keys are listed below. |
+| `refused_count` | Number of matching refused rows excluded from ranking; refusals have no unit and remain counted with `--unit`. |
+| `rank_policy` | Text describing the within-unit ranking and unit-block order. |
+
+When `run_envelope` is present, it contains `feedstock_composition_class`,
+`feedstock_class_source`, `backend`, `engines_by_role`, `temperature_K` (`min`, `max`, and
+`margin_K`), `pO2_bar` (`min` and `max`), `species_by_rail`, `evaporated_mol_by_species`, and
+`evaporated_mol_method`. `engines_by_role` maps each role to the providers named by the report;
+`species_by_rail` maps rail names to formulas; and `evaporated_mol_by_species` maps formulas to
+estimated moles. `feedstock_class_source` identifies the report field or catalog entry used for
+the class. Markdown output also prints the feedstock class, pO₂ range, engine roles, and species by
+rail from this metadata.
+
+Each `rows` item has keys depending on `filters.level`.
+
+| Row-level key | Meaning |
+|---|---|
+| `rank` | Rank within its unit block, starting at 1. |
+| `observation_id` | Reference observation id used by the scorer. |
+| `source` | Source id for the reference observation. |
+| `rail` | Battery rail. |
+| `species` | Chemical formula. |
+| `engine` | Candidate engine id. |
+| `T_K` | Observation temperature in K, or `null` if unavailable. |
+| `observed` | Reconstructed reference value, or `null` if not recoverable from the residual. |
+| `predicted` | Candidate prediction value, or `null` if unavailable. |
+| `residual` | Signed scored residual. |
+| `unit` | Residual unit; `dex` for dex metrics and `<unit> (<operation>)` otherwise. |
+| `flags` | Notice kinds attached to the numeric prediction. |
+
+| Group-level key | Meaning |
+|---|---|
+| `rank` | Rank within its unit block, starting at 1. |
+| `rail`, `species`, `engine`, `unit` | Group identity; groups never combine different units or operations. |
+| `n` | Number of numeric predictions, including flagged predictions. |
+| `flagged_n` | Number of flagged predictions included in `n` and RMS. |
+| `rms` | RMS of all `n` signed residuals in the group's unit. |
+| `rms_unflagged_only` | RMS over unflagged predictions, or `null` if none exist. |
+| `median` | Median signed residual. |
+| `bias` | Mean signed residual. |
+| `hero_evaporated_mol` | Moles of the species evaporated by `--run`, or `null` without a run report. |
+| `worst_observation_ids` | Up to three unique observation ids ordered by absolute residual, largest first. |
+
+Changing the schema keys requires a version bump and a corresponding key-pinning test.
 
 ## Adding a source
 

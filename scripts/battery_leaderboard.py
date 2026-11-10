@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""Deprecated alias for ``python -m simulator.battery.leaderboard``."""
-
-from __future__ import annotations
+"""Compatibility entry point for the battery leaderboard module."""
 
 import sys
 from pathlib import Path
@@ -10,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from simulator.battery.leaderboard import main
+from simulator.battery.leaderboard import main  # noqa: E402
 
 
 if __name__ == "__main__":
