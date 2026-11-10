@@ -161,3 +161,74 @@ def test_blend_start_seam_is_still_the_shipped_0_99_cutoff() -> None:
     assert table_gamma_effective(gamma, 0.99, blend_start=0.99) == pytest.approx(31.1)
     near_unity = table_gamma_effective(gamma, 1.0 - 1.0e-9)
     assert near_unity * (1.0 - 1.0e-9) == pytest.approx(1.0, abs=2.0e-9)
+
+
+# Observed 2026-11-10 from AlphaMELTSBackend._oxide_activity_account_mol_from_wt_pct
+# then melt_oxide_activity(..., temperature_K=1673.0). These literals are the
+# pin; the test does not recompute wt/M.
+_PINNED_ACTIVITY_WT_PCT = {
+    "SiO2": 45.0,
+    "MgO": 10.0,
+    "mgo": 2.0,
+    "Al2O3": 12.0,
+    "CaO": 8.0,
+    "Na2O": 1.5,
+    "FeO_total": 5.0,
+    "FeO": 3.0,
+    "Mg2SiO4": 20.0,
+    "H2O": 1.0,
+    "TiO2": 0.0,
+    "K2O": float("nan"),
+    "Cr2O3": -1.0,
+    "P2O5": 0.4,
+}
+_PINNED_ACTIVITY_ACCOUNT_MOL = {
+    "Al2O3": 117.69312414308985,
+    "CaO": 142.66098400413716,
+    "FeO": 111.35237458938813,
+    "MgO": 297.7371973005161,
+    "Na2O": 24.201925938409865,
+    "P2O5": 2.8180420408141553,
+    "SiO2": 748.9639332257045,
+}
+_PINNED_ACTIVITY = {
+    "Al2O3": 0.047665199197619613,
+    "CaO": 0.0010765914215800734,
+    "FeO": 0.07002674446015647,
+    "MgO": 0.1872395331355007,
+    "Na2O": 3.0439980995145703e-05,
+    "P2O5": 3.5443933835763387e-09,
+    "SiO2": 0.4710048272905744,
+}
+
+
+def _oxide_activity_account_mol(comp_wt):
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    return AlphaMELTSBackend._oxide_activity_account_mol_from_wt_pct(comp_wt)
+
+
+def test_oxide_activity_account_pin_matches_today() -> None:
+    account_mol = _oxide_activity_account_mol(_PINNED_ACTIVITY_WT_PCT)
+    assert account_mol == _PINNED_ACTIVITY_ACCOUNT_MOL
+    assert "FeO_total" not in account_mol
+    assert "Mg2SiO4" not in account_mol
+    assert "H2O" not in account_mol
+    assert "TiO2" not in account_mol
+    assert "K2O" not in account_mol
+    assert "Cr2O3" not in account_mol
+    for oxide, expected in _PINNED_ACTIVITY.items():
+        activity = melt_oxide_activity(
+            oxide, account_mol, temperature_K=1673.0
+        )
+        assert activity is not None
+        assert activity.activity == expected
+
+    heavy = _oxide_activity_account_mol({"MgO": 37.0})
+    light = _oxide_activity_account_mol({"MgO": 3.7})
+    assert heavy["MgO"] / light["MgO"] == pytest.approx(10.0)
+    for moles in (heavy, light):
+        pure = melt_oxide_activity("MgO", moles, temperature_K=1673.0)
+        assert pure is not None
+        assert pure.activity == 1.0
+        assert pure.x_single_cation == 1.0
