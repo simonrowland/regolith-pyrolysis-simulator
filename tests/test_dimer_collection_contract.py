@@ -392,3 +392,683 @@ def test_landed_kp_does_not_raise_the_no_kp_bound():
         2.0 * _moles("Na2", 1.0 - route.remaining_by_species["Na2"])
     )
     assert _mass_closure_kg(route, {"Na2": 1.0}) == pytest.approx(0.0, abs=1.0e-15)
+
+
+# Invariant. Every contracted metal element (Na, K, Mg and their dimers)
+# is admitted and drawn down by one element-equilibrium criterion, on
+# every capture channel. p_elem = p_M + 2 p_M2 is conserved. The gas
+# re-speciates at the wall, p_M is compared with P_sat,M, and the captured
+# fraction of that element inventory is (p_elem - p_elem,sat) / p_elem with
+# p_elem,sat = P_sat + 2 P_sat^2 / K_p. The linear fraction
+# (p_M - P_sat) / p_M is not the capture. Species outside a contracted
+# pair are not on this criterion. A missing K_p stays the flagged
+# p_elem-versus-P_sat upper bound.
+
+WORKED_P_ELEM_PA = 6.0
+WORKED_KP_PA = 1.0
+WORKED_PSAT_PA = 1.0
+CONTRACTED_PAIRS = (("K", "K2"), ("Mg", "Mg2"), ("Na", "Na2"))
+CAPTURE_CHANNELS = ("stage", "wall")
+
+
+def _worked_equilibrium():
+    """Independent arithmetic for the controller's worked check.
+
+    p_M = (K_p/4) (sqrt(1 + 8 p_elem/K_p) - 1) = 1.5 Pa.
+    p_elem,sat = P_sat + 2 P_sat^2/K_p = 3 Pa.
+    eta = 1/2. The linear monomer fraction (1.5-1)/1.5 is 1/3.
+    """
+
+    p_monomer = (WORKED_KP_PA / 4.0) * (
+        math.sqrt(1.0 + 8.0 * WORKED_P_ELEM_PA / WORKED_KP_PA) - 1.0
+    )
+    p_elem_sat = (
+        WORKED_PSAT_PA + 2.0 * WORKED_PSAT_PA * WORKED_PSAT_PA / WORKED_KP_PA
+    )
+    eta = (WORKED_P_ELEM_PA - p_elem_sat) / WORKED_P_ELEM_PA
+    linear = (p_monomer - WORKED_PSAT_PA) / p_monomer
+    assert p_monomer == pytest.approx(1.5)
+    assert p_elem_sat == pytest.approx(3.0)
+    assert eta == pytest.approx(0.5)
+    assert linear == pytest.approx(1.0 / 3.0)
+    return p_monomer, eta, linear
+
+
+def _alkali_stage(model):
+    for stage in model.train.stages:
+        if int(stage.stage_number) == 4 and int(stage.sub_order) == 0:
+            return stage
+    raise AssertionError("Na collector stage is missing")
+
+
+def _psat_flux(calls):
+    def flux(_species, pressure, _temperature_K, _alpha, **kwargs):
+        calls.append(float(pressure))
+        diagnostic = kwargs.get("diagnostic_out")
+        if isinstance(diagnostic, dict):
+            diagnostic["wall_saturation_pressure_pa"] = WORKED_PSAT_PA
+            diagnostic["wall_saturation_pressure_refused"] = False
+        return 1.0e9 * max(0.0, float(pressure) - WORKED_PSAT_PA)
+
+    return flux
+
+
+def _arrival_partials(species, monomer, dimer):
+    """Pure carrier of one element total. p_elem = 6 Pa either way."""
+
+    if species == dimer:
+        return 0.0, WORKED_P_ELEM_PA / 2.0
+    return WORKED_P_ELEM_PA, 0.0
+
+
+@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
+@pytest.mark.parametrize("channel", CAPTURE_CHANNELS)
+@pytest.mark.parametrize("arrival", ("monomer", "dimer"))
+def test_every_contracted_arrival_uses_the_element_capture_fraction(
+    monkeypatch, monomer, dimer, channel, arrival,
+):
+    """Limiting capture is 1/2 of the element, not 1/3 of p_M.
+
+    Grid: each contracted pair, each arrival (monomer and dimer), each
+    channel (stage efficiency and wall candidate). Inlet p_elem = 6 Pa,
+    K_p = 1 Pa, P_sat = 1 Pa.
+    """
+
+    _p_monomer, _eta_element, eta_linear = _worked_equilibrium()
+    species = monomer if arrival == "monomer" else dimer
+    monomer_partial, dimer_partial = _arrival_partials(species, monomer, dimer)
+    monkeypatch.setattr(
+        "simulator.condensation.dimer_dissociation_kp_pa",
+        lambda *_args, **_kwargs: WORKED_KP_PA,
+    )
+    calls = []
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        _psat_flux(calls),
+    )
+    from tests.test_condensation_input_refusals import _configured_model
+
+    model = _configured_model()
+    if channel == "stage":
+        eta = model._condensation_efficiency(
+            stage=_alkali_stage(model),
+            species=species,
+            T_cond_C=250.0,
+            residence_s=5.0,
+            available_kg=1.0,
+            alpha_s_value=0.5,
+            inlet_partial_pressure_pa=(
+                dimer_partial if species == dimer else monomer_partial
+            ),
+            coexisting_monomer_partial_pa=(
+                monomer_partial if species == dimer else None
+            ),
+            saturation_species=monomer if species == dimer else None,
+        )
+        assert calls, species
+        assert calls[0] == pytest.approx(_p_monomer)
+        k_monomer, k_dimer = _stage_hk_coefficients(
+            model, _alkali_stage(model), species, monomer, dimer,
+            dimer_partial if species == dimer else monomer_partial,
+            1.0, 5.0, 0.5,
+        )
+        final = _rk4_element_partial(
+            WORKED_P_ELEM_PA, WORKED_KP_PA, WORKED_PSAT_PA,
+            k_monomer, k_dimer, 5.0,
+        )
+        expected = (WORKED_P_ELEM_PA - final) / WORKED_P_ELEM_PA
+        assert eta == pytest.approx(expected, rel=1.0e-6, abs=1.0e-9)
+        assert eta != pytest.approx(eta_linear)
+        return
+
+    from simulator.wall_deposition import wall_deposit_candidate_for_surface_kg
+
+    partials = {}
+    if monomer_partial > 0.0:
+        partials[monomer] = monomer_partial
+    if dimer_partial > 0.0:
+        partials[dimer] = dimer_partial
+    model.wall_species_partial_pressures_pa = partials
+    deposited = wall_deposit_candidate_for_surface_kg(
+        model,
+        species=species,
+        rate_kg_hr=1.0,
+        T_cond_C=250.0,
+        melt_temperature_C=1500.0,
+        wall_temperature_C=250.0,
+        surface_area_m2=1.0,
+        collection_species=monomer if species == dimer else None,
+    )
+    assert calls, species
+    assert calls[0] == pytest.approx(_p_monomer)
+    assert deposited > 0.0
+
+
+def _parallel_element_rate(pressure, kp, psat, k_monomer, k_dimer):
+    """Independent J_M + 2 J_M2. Not the production integrator."""
+
+    monomer = (2.0 * pressure) / (math.sqrt(1.0 + 8.0 * pressure / kp) + 1.0)
+    drive = monomer - psat
+    if drive <= 0.0:
+        return 0.0
+    dimer_drive = drive * (monomer + psat) / kp
+    return -(k_monomer * drive + 2.0 * k_dimer * dimer_drive)
+
+
+def _rk4_element_partial(p_elem, kp, psat, k_monomer, k_dimer, duration, steps=20000):
+    """Independent integral of the parallel Hertz-Knudsen element rate."""
+
+    dt = duration / steps
+    pressure = p_elem
+    floor = psat + 2.0 * psat * psat / kp
+    for _ in range(steps):
+        k1 = _parallel_element_rate(pressure, kp, psat, k_monomer, k_dimer)
+        if k1 == 0.0 or pressure + dt * k1 <= floor:
+            return floor
+        k2 = _parallel_element_rate(
+            pressure + dt * k1 / 2.0, kp, psat, k_monomer, k_dimer,
+        )
+        k3 = _parallel_element_rate(
+            pressure + dt * k2 / 2.0, kp, psat, k_monomer, k_dimer,
+        )
+        k4 = _parallel_element_rate(
+            pressure + dt * k3, kp, psat, k_monomer, k_dimer,
+        )
+        updated = pressure + dt * (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0
+        if updated <= floor:
+            return floor
+        pressure = updated
+    return pressure
+
+
+def _stage_hk_coefficients(
+    model, stage, species, monomer, dimer, flowing, available_kg, residence_s, alpha,
+):
+    """q * (A/n) * alpha * J(1 Pa) for the monomer and the dimer."""
+
+    from simulator.condensation import (
+        AVOGADRO_MOL,
+        CELSIUS_TO_KELVIN_OFFSET,
+        HKL_BAND_SAMPLES,
+        _hkl_impingement_flux_mol_m2_s,
+        _molecular_mass_kg_per_molecule,
+    )
+
+    molar_mass = _molecular_mass_kg_per_molecule(
+        species, vapor_pressure_data=model.vapor_pressure_data,
+    ) * AVOGADRO_MOL
+    inventory_mol = available_kg / molar_mass / 3600.0 * residence_s
+    width = stage.temp_range_C[1] - stage.temp_range_C[0]
+    sample_count = 1 if width == 0.0 else HKL_BAND_SAMPLES
+    area = model._stage_area_m2_for_stage(stage)
+    scale = (flowing / inventory_mol) * area / sample_count * alpha
+    temperature_K = model.gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET
+    return (
+        scale * _hkl_impingement_flux_mol_m2_s(
+            monomer, 1.0, temperature_K,
+            vapor_pressure_data=model.vapor_pressure_data,
+        ),
+        scale * _hkl_impingement_flux_mol_m2_s(
+            dimer, 1.0, temperature_K,
+            vapor_pressure_data=model.vapor_pressure_data,
+        ),
+    )
+
+
+@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
+@pytest.mark.parametrize("arrival", ("monomer", "dimer"))
+def test_stage_drawdown_follows_the_element_inventory_ode(
+    monkeypatch, monomer, dimer, arrival,
+):
+    """Finite residence follows J_M + 2 J_M2, not a jump to p_elem,sat.
+
+    The series-resistance monkeypatch still supplies P_sat. It does not
+    set the rate: a monomer-only drive fails this integral.
+    """
+
+    from tests.test_condensation_input_refusals import _configured_model
+
+    species = monomer if arrival == "monomer" else dimer
+    monomer_partial, dimer_partial = _arrival_partials(species, monomer, dimer)
+    flowing = dimer_partial if species == dimer else monomer_partial
+    residence_s = 2.0
+    available_kg = 1.0
+
+    def flux(_species, pressure, _temperature_K, _alpha, **kwargs):
+        diagnostic = kwargs.get("diagnostic_out")
+        if isinstance(diagnostic, dict):
+            diagnostic["wall_saturation_pressure_pa"] = WORKED_PSAT_PA
+            diagnostic["wall_saturation_pressure_refused"] = False
+        return max(0.0, float(pressure) - WORKED_PSAT_PA)
+
+    monkeypatch.setattr(
+        "simulator.condensation.dimer_dissociation_kp_pa",
+        lambda *_args, **_kwargs: WORKED_KP_PA,
+    )
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        flux,
+    )
+    model = _configured_model()
+    stage = _alkali_stage(model)
+    assert stage.temp_range_C[0] == stage.temp_range_C[1]
+    eta = model._condensation_efficiency(
+        stage=stage,
+        species=species,
+        T_cond_C=250.0,
+        residence_s=residence_s,
+        available_kg=available_kg,
+        alpha_s_value=0.5,
+        inlet_partial_pressure_pa=flowing,
+        coexisting_monomer_partial_pa=(
+            monomer_partial if species == dimer else None
+        ),
+        saturation_species=monomer if species == dimer else None,
+    )
+    k_monomer, k_dimer = _stage_hk_coefficients(
+        model, stage, species, monomer, dimer, flowing,
+        available_kg, residence_s, 0.5,
+    )
+    p_final = _rk4_element_partial(
+        WORKED_P_ELEM_PA, WORKED_KP_PA, WORKED_PSAT_PA,
+        k_monomer, k_dimer, residence_s,
+    )
+    expected = (WORKED_P_ELEM_PA - p_final) / WORKED_P_ELEM_PA
+    assert eta == pytest.approx(expected, rel=1.0e-6, abs=1.0e-9)
+    assert eta != pytest.approx((1.5 - 1.0) / 1.5)
+
+
+@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
+@pytest.mark.parametrize("channel", CAPTURE_CHANNELS)
+@pytest.mark.parametrize("arrival", ("monomer", "dimer"))
+def test_strong_association_blocks_both_arrivals_of_one_element(
+    monkeypatch, monomer, dimer, channel, arrival,
+):
+    """Inlet p_M above P_sat does not capture when equilibrium p_M is below it.
+
+    p_M = 2 Pa, p_M2 = 10 Pa, p_elem = 22 Pa, K_p = 1e-8 Pa, P_sat = 1 Pa.
+    The monomer's own partial is supersaturated. The shared element
+    equilibrium is not, so the monomer and the dimer both pass through.
+    """
+
+    kp_pa = 1.0e-8
+    psat_pa = 1.0
+    monomer_partial = 2.0
+    dimer_partial = 10.0
+    p_elem = monomer_partial + 2.0 * dimer_partial
+    # Conjugate root, same closed form as the chokepoint. The K_p -> 0
+    # square-root asymptotic is a few ulp away at 1e-8 Pa.
+    p_monomer = (2.0 * p_elem) / (
+        math.sqrt(1.0 + 8.0 * p_elem / kp_pa) + 1.0
+    )
+    assert monomer_partial > psat_pa > p_monomer
+    species = monomer if arrival == "monomer" else dimer
+    monkeypatch.setattr(
+        "simulator.condensation.dimer_dissociation_kp_pa",
+        lambda *_args, **_kwargs: kp_pa,
+    )
+    calls = []
+
+    def flux(_species, pressure, _temperature_K, _alpha, **kwargs):
+        calls.append(float(pressure))
+        diagnostic = kwargs.get("diagnostic_out")
+        if isinstance(diagnostic, dict):
+            diagnostic["wall_saturation_pressure_pa"] = psat_pa
+            diagnostic["wall_saturation_pressure_refused"] = False
+        return 1.0e9 * max(0.0, float(pressure) - psat_pa)
+
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        flux,
+    )
+    from tests.test_condensation_input_refusals import _configured_model
+
+    model = _configured_model()
+    if channel == "stage":
+        eta = model._condensation_efficiency(
+            stage=_alkali_stage(model),
+            species=species,
+            T_cond_C=250.0,
+            residence_s=5.0,
+            available_kg=1.0,
+            alpha_s_value=0.5,
+            inlet_partial_pressure_pa=(
+                dimer_partial if species == dimer else monomer_partial
+            ),
+            coexisting_monomer_partial_pa=(
+                monomer_partial if species == dimer else None
+            ),
+            coexisting_dimer_partial_pa=(
+                dimer_partial if species == monomer else None
+            ),
+            saturation_species=monomer if species == dimer else None,
+        )
+        assert calls and calls[0] == pytest.approx(p_monomer, rel=1.0e-6)
+        assert eta == 0.0
+        return
+
+    from simulator.wall_deposition import wall_deposit_candidate_for_surface_kg
+
+    model.wall_species_partial_pressures_pa = {
+        monomer: monomer_partial,
+        dimer: dimer_partial,
+    }
+    deposited = wall_deposit_candidate_for_surface_kg(
+        model,
+        species=species,
+        rate_kg_hr=1.0,
+        T_cond_C=250.0,
+        melt_temperature_C=1500.0,
+        wall_temperature_C=250.0,
+        surface_area_m2=1.0,
+        collection_species=monomer if species == dimer else None,
+    )
+    assert calls and calls[0] == pytest.approx(p_monomer, rel=1.0e-6)
+    assert deposited == 0.0
+
+
+@pytest.mark.parametrize("channel", CAPTURE_CHANNELS)
+@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
+@pytest.mark.parametrize("arrival", ("monomer", "dimer"))
+def test_both_channels_take_the_comparison_from_one_chokepoint(
+    monkeypatch, channel, monomer, dimer, arrival,
+):
+    """A second re-speciation formula cannot satisfy this sentinel pressure."""
+
+    from simulator.condensation import element_arrival_comparison_pa
+
+    sentinel = 4.25
+
+    def marked(*args, **kwargs):
+        p_elem, _compare, flag, kp = element_arrival_comparison_pa(*args, **kwargs)
+        return p_elem, sentinel, flag, kp
+
+    monkeypatch.setattr(
+        "simulator.condensation.element_arrival_comparison_pa",
+        marked,
+    )
+    species = monomer if arrival == "monomer" else dimer
+    calls = []
+
+    def flux(_species, pressure, _temperature_K, _alpha, **kwargs):
+        calls.append(float(pressure))
+        diagnostic = kwargs.get("diagnostic_out")
+        if isinstance(diagnostic, dict):
+            diagnostic["wall_saturation_pressure_pa"] = 1.0
+            diagnostic["wall_saturation_pressure_refused"] = False
+        return 0.0
+
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        flux,
+    )
+    from tests.test_condensation_input_refusals import _configured_model
+
+    model = _configured_model()
+    if channel == "stage":
+        model._condensation_efficiency(
+            stage=_alkali_stage(model),
+            species=species,
+            T_cond_C=250.0,
+            residence_s=5.0,
+            available_kg=1.0,
+            alpha_s_value=0.5,
+            inlet_partial_pressure_pa=3.0,
+            coexisting_monomer_partial_pa=0.0 if species == dimer else None,
+            coexisting_dimer_partial_pa=0.0 if species == monomer else None,
+            saturation_species=monomer if species == dimer else None,
+        )
+    else:
+        from simulator.wall_deposition import wall_deposit_candidate_for_surface_kg
+
+        model.wall_species_partial_pressures_pa = {species: 3.0}
+        wall_deposit_candidate_for_surface_kg(
+            model,
+            species=species,
+            rate_kg_hr=1.0,
+            T_cond_C=250.0,
+            melt_temperature_C=1500.0,
+            wall_temperature_C=250.0,
+            surface_area_m2=1.0,
+            collection_species=monomer if species == dimer else None,
+        )
+    assert calls == [sentinel]
+
+
+def test_element_capture_fraction_matches_the_worked_check_and_both_limits():
+    """p_elem,sat and the capture fraction, independent of the stage solver."""
+
+    from simulator.condensation_routing import (
+        element_equilibrium_comparison_pa,
+        element_limiting_capture_fraction,
+        saturated_element_partial_pa,
+    )
+
+    p_elem, p_monomer, flag = element_equilibrium_comparison_pa(
+        monomer_partial_pa=0.0,
+        dimer_partial_pa=WORKED_P_ELEM_PA / 2.0,
+        kp_pa=WORKED_KP_PA,
+    )
+    assert flag is None
+    assert p_elem == pytest.approx(WORKED_P_ELEM_PA)
+    assert p_monomer == pytest.approx(1.5)
+    assert saturated_element_partial_pa(WORKED_PSAT_PA, WORKED_KP_PA) == pytest.approx(3.0)
+    assert element_limiting_capture_fraction(
+        WORKED_P_ELEM_PA, WORKED_PSAT_PA, WORKED_KP_PA,
+    ) == pytest.approx(0.5)
+    assert element_limiting_capture_fraction(
+        WORKED_P_ELEM_PA, WORKED_PSAT_PA, WORKED_KP_PA,
+    ) != pytest.approx(1.0 / 3.0)
+
+    assert saturated_element_partial_pa(WORKED_PSAT_PA, math.inf) == pytest.approx(
+        WORKED_PSAT_PA
+    )
+    assert element_limiting_capture_fraction(
+        WORKED_P_ELEM_PA, WORKED_PSAT_PA, math.inf,
+    ) == pytest.approx((WORKED_P_ELEM_PA - WORKED_PSAT_PA) / WORKED_P_ELEM_PA)
+    assert math.isinf(saturated_element_partial_pa(WORKED_PSAT_PA, 0.0))
+    assert element_limiting_capture_fraction(
+        WORKED_P_ELEM_PA, WORKED_PSAT_PA, 0.0,
+    ) == 0.0
+
+    _p_elem, compared, upper_flag = element_equilibrium_comparison_pa(
+        monomer_partial_pa=1.0,
+        dimer_partial_pa=2.0,
+        kp_pa=None,
+    )
+    assert compared == pytest.approx(5.0)
+    assert upper_flag == DIMER_SATURATION_UPPER_BOUND_NO_KP
+    assert saturated_element_partial_pa(WORKED_PSAT_PA, None) == pytest.approx(
+        WORKED_PSAT_PA
+    )
+
+
+def test_stiff_parallel_flux_lands_on_half_not_the_linear_third():
+    """Huge coefficients reach p_elem,sat. The capture is 1/2, not 1/3."""
+
+    from simulator.condensation_routing import final_element_partial_pa
+
+    huge = 1.0e12
+    final = final_element_partial_pa(
+        element_partial_initial_pa=WORKED_P_ELEM_PA,
+        residence_s=5.0,
+        strips=((huge, huge, WORKED_PSAT_PA, WORKED_KP_PA),),
+    )
+    eta = (WORKED_P_ELEM_PA - final) / WORKED_P_ELEM_PA
+    assert final == pytest.approx(3.0)
+    assert eta == pytest.approx(0.5)
+    assert eta != pytest.approx(1.0 / 3.0)
+
+    # Moderate coefficients stay on the trajectory, short of the floor.
+    k_monomer = 0.05
+    k_dimer = 0.05
+    duration = 2.0
+    partial = final_element_partial_pa(
+        element_partial_initial_pa=WORKED_P_ELEM_PA,
+        residence_s=duration,
+        strips=((k_monomer, k_dimer, WORKED_PSAT_PA, WORKED_KP_PA),),
+    )
+    expected = _rk4_element_partial(
+        WORKED_P_ELEM_PA, WORKED_KP_PA, WORKED_PSAT_PA,
+        k_monomer, k_dimer, duration,
+    )
+    eta_partial = (WORKED_P_ELEM_PA - partial) / WORKED_P_ELEM_PA
+    assert 0.0 < eta_partial < 0.5
+    assert partial == pytest.approx(expected, rel=1.0e-6)
+
+    # K_p -> inf drops the dimer channel even when its coefficient is huge.
+    dissociated = final_element_partial_pa(
+        element_partial_initial_pa=WORKED_P_ELEM_PA,
+        residence_s=3.0,
+        strips=((0.2, huge, WORKED_PSAT_PA, math.inf),),
+    )
+    monomer_only = WORKED_PSAT_PA + (
+        WORKED_P_ELEM_PA - WORKED_PSAT_PA
+    ) * math.exp(-0.2 * 3.0)
+    assert dissociated == pytest.approx(monomer_only, rel=1.0e-8)
+
+
+def test_janaf_kp_at_313_K_is_in_band_and_replaces_the_cea_polynomial():
+    """Primary table. 313.15 K is inside the printed JANAF grid.
+
+    Adjacent rows are 300 K and 350 K, except K2(g), which has no 350 K
+    row and is interpolated between 300 K and 400 K. Fail-before on the
+    CEA path: dimer_dissociation_kp_pa('K2', 313.15) returned
+    1.325277167193154 Pa. That figure is the in-band 300-1000 K NASA-9
+    polynomial, not a high-T extrapolation, and it is the wrong source.
+    """
+
+    import yaml
+
+    from simulator.condensation import DATA_DIR
+
+    document = yaml.safe_load(
+        (DATA_DIR / "literature" / "dimer_dissociation_kp.yaml").read_text()
+    )
+    assert document["extrapolation"] == "none"
+    assert document["standard_pressure_Pa"] == 100000.0
+    assert document["band"]["potassium_trap_K"] == 313.15
+    assert document["band"]["in_printed_table"] is True
+    assert document["source"]["valid_from_K"] == 298.15
+
+    def formation_gibbs(table_id):
+        table = yaml.safe_load(
+            (
+                DATA_DIR / "literature" / "compilations" / "janaf" / "tables"
+                / f"{table_id}.yaml"
+            ).read_text()
+        )
+        rows = []
+        for row in table["table"]["values"]:
+            gibbs = row["formation_gibbs_energy"]["value"]
+            rows.append((
+                float(row["temperature"]["value"]),
+                None if gibbs is None else float(gibbs),
+            ))
+        return sorted(rows)
+
+    def gibbs_at(rows, temperature):
+        for index, (row_temperature, gibbs) in enumerate(rows):
+            if row_temperature == temperature:
+                return gibbs
+            if row_temperature > temperature:
+                left_temperature, left_gibbs = rows[index - 1]
+                weight = (temperature - left_temperature) / (
+                    row_temperature - left_temperature
+                )
+                return left_gibbs + (gibbs - left_gibbs) * weight
+        raise AssertionError(temperature)
+
+    for table_id in ("K-005", "K-011", "Na-005", "Na-011", "Mg-005", "Mg-027"):
+        rows = formation_gibbs(table_id)
+        temperatures = [temperature for temperature, _gibbs in rows]
+        assert min(temperatures) <= 298.15 <= 313.15 <= max(temperatures)
+        below = max(temperature for temperature in temperatures if temperature <= 313.15)
+        above = min(temperature for temperature in temperatures if temperature >= 313.15)
+        assert below < 313.15 < above
+        assert gibbs_at(rows, below) is not None
+        assert gibbs_at(rows, above) is not None
+
+    from simulator.physical_constants import GAS_CONSTANT
+
+    def independent_kp(monomer_table, dimer_table, temperature):
+        delta_g = gibbs_at(formation_gibbs(dimer_table), temperature) - 2.0 * gibbs_at(
+            formation_gibbs(monomer_table), temperature,
+        )
+        return 1.0e5 * math.exp(delta_g * 1000.0 / (GAS_CONSTANT * temperature))
+
+    # Independent evaluation of the printed rows. K2 at 313.15 K is 0.461 Pa,
+    # not the CEA 1.325277 Pa.
+    assert dimer_dissociation_kp_pa("K2", 313.15) == pytest.approx(
+        independent_kp("K-005", "K-011", 313.15), rel=1.0e-12,
+    )
+    assert dimer_dissociation_kp_pa("K2", 313.15) == pytest.approx(
+        0.4610863442751231, rel=1.0e-12,
+    )
+    assert dimer_dissociation_kp_pa("K2", 313.15) != pytest.approx(
+        1.325277167193154, rel=1.0e-4,
+    )
+    assert dimer_dissociation_kp_pa("K2", 298.15) == pytest.approx(
+        independent_kp("K-005", "K-011", 298.15), rel=1.0e-12,
+    )
+    assert dimer_dissociation_kp_pa("Na2", 313.15) == pytest.approx(
+        independent_kp("Na-005", "Na-011", 313.15), rel=1.0e-12,
+    )
+    assert dimer_dissociation_kp_pa("Mg2", 313.15) == pytest.approx(
+        independent_kp("Mg-005", "Mg-027", 313.15), rel=1.0e-12,
+    )
+    assert dimer_dissociation_kp_pa("K2", 7000.0) is None
+    assert dimer_dissociation_kp_pa("Al2", 313.15) is None
+
+
+def test_monomer_only_potassium_flags_the_dimer_alpha_proxy():
+    """A pure K feed still uses alpha_K for the re-speciated K2 channel."""
+
+    route = _route({"K": 1.0}, partials={"K": 1.0})
+    notice = route.sticking_alpha_provenance_notice
+    assert notice[DIMER_ALPHA_FROM_MONOMER_PROXY]["K2"] == "K"
+    assert notice["authoritative_for_deposit_mass"] is False
+
+
+@pytest.mark.parametrize(
+    "species",
+    ("Al", "Al2", "Ca", "Ca2", "Fe", "SiO", "Cr", "CrO2", "Mn"),
+)
+def test_species_outside_a_contracted_pair_are_not_element_arrivals(species):
+    from simulator.condensation_routing import element_collection_pair
+
+    assert element_collection_pair(species) is None
+    assert species not in {
+        name for pair in CONTRACTED_PAIRS for name in pair
+    }
+
+
+def test_route_hands_both_partials_to_monomer_and_dimer_arrivals(monkeypatch):
+    """The stage call, not only a direct efficiency call, carries the partner."""
+
+    seen = {}
+
+    def capture(self, **kwargs):
+        stage = kwargs["stage"]
+        if int(stage.stage_number) == 4 and int(stage.sub_order) == 0:
+            seen[kwargs["species"]] = kwargs
+        return 0.0
+
+    monkeypatch.setattr(
+        "simulator.condensation.CondensationModel._condensation_efficiency",
+        capture,
+    )
+    model = _model(partials={"Na": 0.02, "Na2": 0.03})
+    model.pipe_segments = []
+    model.route(
+        EvaporationFlux(species_kg_hr={"Na": 1.0, "Na2": 1.0}, total_kg_hr=2.0),
+        MeltState(temperature_C=1500.0),
+    )
+    assert seen["Na"]["coexisting_dimer_partial_pa"] == pytest.approx(
+        seen["Na2"]["inlet_partial_pressure_pa"]
+    )
+    assert seen["Na2"]["coexisting_monomer_partial_pa"] == pytest.approx(
+        seen["Na"]["inlet_partial_pressure_pa"]
+    )
+    assert seen["Na"]["coexisting_dimer_partial_pa"] > 0.0
+    assert seen["Na2"]["coexisting_monomer_partial_pa"] > 0.0

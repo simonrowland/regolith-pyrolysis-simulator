@@ -1,0 +1,47 @@
+schema_version: 1
+quantity: K_p = p_M^2 / p_M2
+reaction: M2(g) <=> 2 M(g)
+# K_p / Pa = standard_pressure_Pa * exp(1000 * ΔG_assoc / (R T))
+# ΔG_assoc = ΔfG°(M2) - 2 ΔfG°(M), kJ/mol, linear in T between adjacent
+# printed JANAF rows. No extrapolation past the first or last finite row.
+standard_pressure_Pa: 100000.0
+interpolation: linear_formation_gibbs_in_temperature
+extrapolation: none
+source:
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998)
+  doi: 10.18434/T42S31
+  database: NIST Standard Reference Database 13
+  standard_state: p° = 0.1 MPa
+  valid_from_K: 298.15
+  tables_root: data/literature/compilations/janaf/tables
+band:
+  potassium_trap_K: 313.15
+  in_printed_table: true
+  note: >
+    313.15 K is inside every contracted JANAF gas table. Those tables
+    list finite formation Gibbs energies from 0 K through 6000 K, and
+    298.15 K is a printed row, so neither temperature is an extrapolation.
+    Adjacent printed rows at 313.15 K are 300 K and 350 K, except K2(g)
+    (K-011), which has no 350 K row and is interpolated between 300 K
+    and 400 K.
+    The value this replaces, 1.325277 Pa for K/K2 at 313.15 K, is the
+    NASA-CEA NASA-9 polynomial on its low-temperature segment (300-1000 K).
+    313.15 K is inside that segment, so 1.325 Pa was not an extrapolation
+    of the 1000-6000 K fit. d-378 amendment 2 still requires the JANAF
+    primary table. The two sources disagree by about 2.9× at 313.15 K.
+pairs:
+  K2:
+    monomer: K
+    dimer: K2
+    monomer_table: K-005
+    dimer_table: K-011
+  Na2:
+    monomer: Na
+    dimer: Na2
+    monomer_table: Na-005
+    dimer_table: Na-011
+  Mg2:
+    monomer: Mg
+    dimer: Mg2
+    monomer_table: Mg-005
+    dimer_table: Mg-027

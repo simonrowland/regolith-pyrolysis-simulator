@@ -248,6 +248,213 @@ def respeciated_monomer_partial_pa(
     return (2.0 * p_elem) / (math.sqrt(1.0 + 8.0 * ratio) + 1.0)
 
 
+def element_collection_pair(species: str) -> tuple[str, str] | None:
+    """(monomer, dimer) when this arrival shares one collection contract.
+
+    Both the monomer and the dimer of Na, K, and Mg are the same
+    element. Al2 and Ca2 stay out: their monomers have no condenser
+    contract. Other vapors are not an M2 <=> 2 M pair.
+    """
+
+    collected_dimer = dimer_collection_monomer(species)
+    if collected_dimer is not None:
+        return collected_dimer, species
+    dimer = f'{species}2'
+    if dimer_collection_monomer(dimer) == species:
+        return species, dimer
+    return None
+
+
+def saturated_element_partial_pa(
+    saturation_pa: float,
+    kp_pa: float | None,
+) -> float:
+    """Element partial at which the wall is no longer supersaturated.
+
+    Derivation. Condensation of M stops when the re-speciated monomer
+    partial equals P_sat,M. Substitute p_M = P_sat into the element
+    balance p_elem = p_M + 2 p_M^2 / K_p:
+
+        p_elem,sat = P_sat + 2 P_sat^2 / K_p.
+
+    The capture fraction of the conserved element inventory is
+    (p_elem - p_elem,sat) / p_elem when that is positive. It is not
+    (p_M - P_sat) / p_M. Worked check: p_elem = 6 Pa, K_p = 1 Pa,
+    P_sat = 1 Pa gives p_M = 1.5 Pa and p_elem,sat = 3 Pa, so the
+    fraction is 1/2, not the linear 1/3.
+
+    Limits. K_p -> inf (no dimer) gives p_elem,sat = P_sat, the
+    monomer-only rule. K_p -> 0 (all dimer, p_M -> 0) gives
+    p_elem,sat -> inf, so a finite element partial does not condense.
+    No K_p: the flagged upper bound compares p_elem with P_sat, so
+    p_elem,sat = P_sat.
+    """
+
+    saturation = float(saturation_pa)
+    if not math.isfinite(saturation) or saturation <= 0.0:
+        return 0.0
+    if kp_pa is None:
+        return saturation
+    kp = float(kp_pa)
+    if math.isinf(kp) and kp > 0.0:
+        return saturation
+    if not math.isfinite(kp) or kp <= 0.0:
+        return math.inf
+    return saturation + 2.0 * saturation * saturation / kp
+
+
+def element_equilibrium_comparison_pa(
+    *,
+    monomer_partial_pa: float,
+    dimer_partial_pa: float,
+    kp_pa: float | None,
+) -> tuple[float, float, str | None]:
+    """(p_elem, pressure compared with P_sat,M, no-K_p flag).
+
+    One criterion for a monomer arrival and a dimer arrival of the
+    same element. K_p known: the compared pressure is the re-speciated
+    p_M. K_p missing: the compared pressure is p_elem and the flag is
+    dimer_saturation_upper_bound_no_Kp.
+    """
+
+    p_elem = element_partial_pa(monomer_partial_pa, dimer_partial_pa)
+    if kp_pa is None:
+        return p_elem, p_elem, DIMER_SATURATION_UPPER_BOUND_NO_KP
+    return p_elem, respeciated_monomer_partial_pa(p_elem, kp_pa), None
+
+
+def element_limiting_capture_fraction(
+    element_partial_pa_value: float,
+    saturation_pa: float,
+    kp_pa: float | None,
+) -> float:
+    """(p_elem - p_elem,sat) / p_elem when positive, else 0."""
+
+    p_elem = float(element_partial_pa_value)
+    if not math.isfinite(p_elem) or p_elem <= 0.0:
+        return 0.0
+    saturated = saturated_element_partial_pa(saturation_pa, kp_pa)
+    if math.isinf(saturated):
+        return 0.0
+    return max(0.0, (p_elem - saturated) / p_elem)
+
+
+def _element_drawdown_rate_pa_s(
+    element_partial: float,
+    strips: tuple[tuple[float, float, float, float], ...],
+) -> float:
+    """dp_elem/dt from the parallel monomer and dimer Hertz-Knudsen fluxes.
+
+    d-378 amendment 2. The condensed phase is M. Each gas species
+    deposits against its own equilibrium pressure over that condensate:
+
+        J_M = k_M * max(p_M - P_sat,M, 0)
+        J_M2 = k_M2 * max(p_M2 - P_sat,M^2 / K_p, 0)
+        dp_elem/dt = -(J_M + 2 J_M2)
+
+    k_M and k_M2 already include the accommodation coefficient, the
+    ideal-gas scale q = RT/V, and the strip area. Amendment 1
+    re-speciates the gas as p_elem falls, so p_M2 = p_M^2 / K_p and
+    the dimer overpressure is
+
+        (p_M - P_sat) (p_M + P_sat) / K_p.
+
+    Both channels are zero together at
+    p_elem,sat = P_sat + 2 P_sat^2 / K_p. The rate is not linear in
+    (p_M - P_sat): the dimer channel grows with (p_M + P_sat) / K_p.
+    K_p -> inf drops that channel and leaves
+    k_M * max(p_elem - P_sat, 0), the monomer exponential.
+    """
+
+    rate = 0.0
+    for k_monomer, k_dimer, saturation, kp_pa in strips:
+        monomer_partial = respeciated_monomer_partial_pa(element_partial, kp_pa)
+        monomer_drive = monomer_partial - saturation
+        if monomer_drive <= 0.0:
+            continue
+        if k_monomer > 0.0:
+            rate -= k_monomer * monomer_drive
+        if k_dimer > 0.0 and math.isfinite(kp_pa) and kp_pa > 0.0:
+            dimer_drive = monomer_drive * (monomer_partial + saturation) / kp_pa
+            if dimer_drive > 0.0:
+                rate -= 2.0 * k_dimer * dimer_drive
+    return rate
+
+
+def _element_saturation_floor_pa(
+    strips: tuple[tuple[float, float, float, float], ...],
+) -> float:
+    """Lowest p_elem,sat of the strips that can still deposit."""
+
+    floor = math.inf
+    for k_monomer, k_dimer, saturation, kp_pa in strips:
+        if k_monomer <= 0.0 and k_dimer <= 0.0:
+            continue
+        saturated = saturated_element_partial_pa(saturation, kp_pa)
+        if saturated < floor:
+            floor = saturated
+    return floor
+
+
+def final_element_partial_pa(
+    *,
+    element_partial_initial_pa: float,
+    residence_s: float,
+    strips: tuple[tuple[float, float, float, float], ...] | list[
+        tuple[float, float, float, float]
+    ],
+) -> float:
+    """Element partial after residence under the parallel fluxes.
+
+    ``strips`` is (k_M, k_M2, P_sat_Pa, K_p_Pa). See
+    ``_element_drawdown_rate_pa_s``. RK4 follows the drawdown. A step
+    that would cross the lowest p_elem,sat snaps to that floor: the
+    condenser does not evaporate, and a stiff coefficient must land on
+    p_elem,sat (the worked check is 1/2, not the linear 1/3, and not 0).
+    """
+
+    partial = float(element_partial_initial_pa)
+    duration = float(residence_s)
+    rows = tuple(strips)
+    if not math.isfinite(partial) or partial <= 0.0 or duration <= 0.0 or not rows:
+        return max(0.0, partial) if math.isfinite(partial) else 0.0
+    floor = _element_saturation_floor_pa(rows)
+    if not math.isfinite(floor) or partial <= floor:
+        return partial
+    rate0 = _element_drawdown_rate_pa_s(partial, rows)
+    if rate0 == 0.0:
+        return partial
+    span = partial - floor
+    tau = span / abs(rate0)
+    ratio = duration / tau if tau > 0.0 else math.inf
+    if not math.isfinite(ratio) or ratio * 40.0 >= 4096.0:
+        steps = 4096
+    else:
+        steps = max(64, math.ceil(40.0 * ratio))
+    dt = duration / steps
+    for _ in range(steps):
+        k1 = _element_drawdown_rate_pa_s(partial, rows)
+        if k1 == 0.0 or partial + dt * k1 <= floor:
+            return floor
+        midpoint = partial + 0.5 * dt * k1
+        if midpoint <= floor:
+            return floor
+        k2 = _element_drawdown_rate_pa_s(midpoint, rows)
+        midpoint = partial + 0.5 * dt * k2
+        if midpoint <= floor:
+            return floor
+        k3 = _element_drawdown_rate_pa_s(midpoint, rows)
+        end = partial + dt * k3
+        if end <= floor:
+            return floor
+        k4 = _element_drawdown_rate_pa_s(end, rows)
+        updated = partial + dt * (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0
+        if not math.isfinite(updated) or updated <= floor:
+            return floor
+        partial = updated
+    return partial
+
+
 # Monomer has no condenser contract. The vapor stays in the stream.
 MISSING_COLLECTION_PRODUCT_CONTRACT_SPECIES: frozenset[str] = frozenset(
     species

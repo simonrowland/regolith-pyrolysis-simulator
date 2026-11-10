@@ -332,31 +332,42 @@ def wall_deposit_candidate_for_surface_kg(
         P_local_pa = _deposition_finite_scalar("P_local_pa", pressure_source[species])
         if P_local_pa is not None and P_local_pa < 0.0:
             raise DepositionInputRefusal("P_local_pa", P_local_pa, "must be non-negative")
-        # d-378 amendment 1. The flowing partial stays on the dimer.
-        # The saturation comparison uses the re-speciated monomer partial
-        # at this wall temperature. A missing monomer key is zero
-        # coexistence, not a missing-pressure refusal.
+        # One element criterion for a monomer arrival and a dimer arrival.
+        # The flowing partial stays on the gas molecule. The saturation
+        # comparison uses the chokepoint's re-speciated p_M. A missing
+        # partner key is zero coexistence, not a missing-pressure refusal.
         P_compare_pa = P_local_pa
         saturation_flag = None
-        if (
-            collection_species is not None
-            and collection_species != species
-            and P_local_pa is not None
-        ):
-            from simulator.condensation import dimer_wall_comparison_pressure_pa
+        if P_local_pa is not None:
+            from simulator.condensation import element_arrival_comparison_pa
+            from simulator.condensation_routing import element_collection_pair
 
-            monomer_partial_pa = 0.0
-            if collection_species in pressure_source:
-                monomer_partial_pa = _deposition_finite_scalar(
-                    "P_monomer_pa", pressure_source[collection_species],
+            element_pair = element_collection_pair(species)
+            if element_pair is not None:
+                monomer_name, dimer_name = element_pair
+                if species == dimer_name:
+                    dimer_partial_pa = P_local_pa
+                    monomer_partial_pa = 0.0
+                    if monomer_name in pressure_source:
+                        monomer_partial_pa = _deposition_finite_scalar(
+                            "P_monomer_pa", pressure_source[monomer_name],
+                        )
+                else:
+                    monomer_partial_pa = P_local_pa
+                    dimer_partial_pa = 0.0
+                    if dimer_name in pressure_source:
+                        dimer_partial_pa = _deposition_finite_scalar(
+                            "P_dimer_pa", pressure_source[dimer_name],
+                        )
+                _p_elem, P_compare_pa, saturation_flag, _kp = (
+                    element_arrival_comparison_pa(
+                        species,
+                        monomer_partial_pa=monomer_partial_pa,
+                        dimer_partial_pa=dimer_partial_pa,
+                        temperature_K=T_wall_K,
+                        vapor_pressure_data=vapor_pressure_data,
+                    )
                 )
-            P_compare_pa, saturation_flag = dimer_wall_comparison_pressure_pa(
-                gas_species=species,
-                dimer_partial_pa=P_local_pa,
-                monomer_partial_pa=monomer_partial_pa,
-                temperature_K=T_wall_K,
-                vapor_pressure_data=vapor_pressure_data,
-            )
 
     rate_diagnostic: dict[str, Any] = {"status": "computed"}
     if alpha_s == 0.0:
