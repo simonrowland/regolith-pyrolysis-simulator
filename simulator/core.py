@@ -5981,6 +5981,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         applied_delta_ln = 0.0
         skip_reason = ''
         refusal_context: Dict[str, Any] = {}
+        redox_saturation_applied = False
         if C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
             # No resolvable differential uptake: Δln(fO2) = n_O2eq/C_m
             # (mol / (mol per ln) is dimensionless) cannot be integrated at
@@ -6057,16 +6058,99 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         active_fe_mol * ferric_fraction / 4.0,
                     )
                     if -net_o2_equiv_mol >= available_reducing_o2_mol:
-                        skip_reason = 'redox_capacity_saturation_refusal'
-                        refusal_context = self._oxygen_reservoir_guard_context(
-                            context='redox_source_terms_saturation_refusal',
-                            source_terms_mol_o2_equiv=terms,
-                            net_o2_equiv_mol=net_o2_equiv_mol,
-                            melt_redox_capacity_mol_per_ln_fO2=C_m,
-                            delta_ln_fO2=applied_delta_ln,
-                            candidate_fO2_log=candidate_fO2_log,
+                        # Both amounts are mol O2-equivalent, so their
+                        # difference is the reducing demand left after all
+                        # ferric iron reaches Fe2+. This excess is reported
+                        # but is not booked as native Fe in this ledger path.
+                        unspent_reducing_equivalents_mol_o2_equiv = max(
+                            0.0,
+                            -net_o2_equiv_mol - available_reducing_o2_mol,
                         )
-                if not skip_reason:
+                        saturation_probe_fO2_log = base_fO2_log
+                        try:
+                            # The existing target solver searches upward from
+                            # the native-Fe side. Step down by its same 0.25
+                            # log-unit interval until this melt has native Fe,
+                            # then solve back to its own FeO-activity boundary.
+                            for _ in range(64):
+                                if (
+                                    self._native_fe_frac_for_trial_fO2(
+                                        saturation_probe_fO2_log
+                                    ) > 1.0e-12
+                                ):
+                                    break
+                                saturation_probe_fO2_log -= 0.25
+                            else:
+                                raise AccountingError(
+                                    'could not bracket native-Fe saturation '
+                                    'on the reduced side'
+                                )
+                            saturation_fO2_log = (
+                                self._native_fe_saturation_target_fO2_log(
+                                    saturation_probe_fO2_log
+                                )
+                            )
+                            if (
+                                not math.isfinite(saturation_fO2_log)
+                                or self._native_fe_frac_for_trial_fO2(
+                                    saturation_fO2_log
+                                ) > 1.0e-12
+                            ):
+                                raise AccountingError(
+                                    'native-Fe saturation target did not '
+                                    'resolve to a finite buffer'
+                                )
+                        except (AccountingError, ValueError) as exc:
+                            skip_reason = 'redox_capacity_saturation_refusal'
+                            refusal_context = (
+                                self._oxygen_reservoir_guard_context(
+                                    context=(
+                                        'redox_source_terms_saturation_refusal'
+                                    ),
+                                    source_terms_mol_o2_equiv=terms,
+                                    net_o2_equiv_mol=net_o2_equiv_mol,
+                                    melt_redox_capacity_mol_per_ln_fO2=C_m,
+                                    delta_ln_fO2=applied_delta_ln,
+                                    candidate_fO2_log=candidate_fO2_log,
+                                )
+                            )
+                            refusal_context.update({
+                                'reason': 'fe_metal_saturation_unavailable',
+                                'detail': str(exc),
+                            })
+                        else:
+                            skip_reason = (
+                                'redox_reduced_to_fe_metal_saturation'
+                            )
+                            redox_saturation_applied = True
+                            candidate_fO2_log = saturation_fO2_log
+                            applied_delta_ln = (
+                                candidate_fO2_log - base_fO2_log
+                            ) * math.log(10.0)
+                            refusal_context = (
+                                self._oxygen_reservoir_guard_context(
+                                    context=(
+                                        'redox_source_terms_fe_metal_saturation'
+                                    ),
+                                    source_terms_mol_o2_equiv=terms,
+                                    net_o2_equiv_mol=net_o2_equiv_mol,
+                                    melt_redox_capacity_mol_per_ln_fO2=C_m,
+                                    delta_ln_fO2=applied_delta_ln,
+                                    candidate_fO2_log=candidate_fO2_log,
+                                )
+                            )
+                            refusal_context.update({
+                                'flag': (
+                                    'redox_reduced_to_fe_metal_saturation'
+                                ),
+                                'fe_metal_saturation_fO2_log': (
+                                    saturation_fO2_log
+                                ),
+                                'unspent_reducing_equivalents_mol_o2_equiv': (
+                                    unspent_reducing_equivalents_mol_o2_equiv
+                                ),
+                            })
+                if not skip_reason or redox_saturation_applied:
                     applied_delta_ln = (
                         candidate_fO2_log - base_fO2_log
                     ) * math.log(10.0)
