@@ -12,7 +12,11 @@ import pytest
 
 from simulator import engine_cache
 from simulator.engine_cache import CacheValue, drop_chemistry_version, engine_cache_key, load_cache_rows
-from simulator.melt_backend.base import EquilibriumResult
+from simulator.melt_backend.base import (
+    EquilibriumResult,
+    equilibrium_cache_from_value,
+    equilibrium_cache_value,
+)
 from simulator.engine_pool import EngineWorkerPool, WarmEngineWorker
 
 
@@ -603,3 +607,31 @@ def test_corrupt_hot_json_is_a_miss_and_is_replaced(
         "misses": 2,
         "stores": 2,
     }
+
+
+def test_equilibrium_cache_maps_use_compact_canonical_json_objects() -> None:
+    result = equilibrium_cache_value(
+        {
+            "status": "ok",
+            "activity_coefficients": {"FeO": 0.91},
+            "reported_activity_coefficients": {"FeO": 0.89},
+            "vapor_pressures_Pa": {"SiO": 12.5},
+            "vapor_pressures_source": {"SiO": "vaporock"},
+            "liquid_composition_wt_pct": {"FeO": 25.0},
+            "fe_redox_split": {"Fe2O3_wt_pct": 3.0},
+        }
+    )
+
+    assert isinstance(result.hot[3], dict)
+    assert isinstance(result.hot[4], dict)
+    assert isinstance(result.hot[6], dict)
+    assert isinstance(result.hot[7], dict)
+    assert isinstance(result.hot[9], dict)
+    assert isinstance(result.hot[10], dict)
+    restored = equilibrium_cache_from_value(result.hot)
+    assert restored["activity_coefficients"] == {"FeO": 0.91}
+    assert restored["reported_activity_coefficients"] == {"FeO": 0.89}
+    assert restored["vapor_pressures_Pa"] == {"SiO": 12.5}
+    assert restored["vapor_pressures_source"] == {"SiO": "speciation"}
+    assert restored["liquid_composition_wt_pct"] == {"FeO": 25.0}
+    assert restored["fe_redox_split"] == {"Fe2O3_wt_pct": 3.0}
