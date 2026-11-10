@@ -1367,15 +1367,131 @@ def test_serialize_vapour_batch_distinguishes_epoch_dormancy() -> None:
 
 
 def test_setpoints_t_cond_audit_covers_operator_overrides() -> None:
+    """Al and Ti are not condenser overrides.
+
+    Al leaves as metal on the C6 Mg-thermite path and Ti is non-volatile.
+    A condensation temperature for either would read as a stage assignment
+    the train does not have. Ca stays: C7 routes it to stage 4.
+    """
+
     setpoints = yaml.safe_load(
         (ROOT / "data" / "setpoints.yaml").read_text(encoding="utf-8")
     )
-    temps = setpoints["condensation_train"]["condensation_temperatures_C"]
+    train = setpoints["condensation_train"]
+    temps = train["condensation_temperatures_C"]
+    sources = train["condensation_temperature_sources"]
+    estimated = train["condensation_temperature_estimated"]
+    assert "Al" not in temps and "Ti" not in temps
+    assert "Al" not in sources and "Ti" not in sources
+    assert "Al" not in estimated and "Ti" not in estimated
+    assert "Al" not in AUDITED_OPERATOR_T_COND_SPECIES
+    assert "Ti" not in AUDITED_OPERATOR_T_COND_SPECIES
     assert set(temps) == AUDITED_OPERATOR_T_COND_SPECIES
-    assert "Al" in temps and "Ti" in temps
-    # No extra Al/Ti/trace product overrides beyond the audited set.
-    assert set(temps) <= AUDITED_OPERATOR_T_COND_SPECIES
+    assert "Ca" in temps
+    listed = SETPOINTS_T_COND_AUDIT["operator_override_species"]
+    assert listed == sorted(AUDITED_OPERATOR_T_COND_SPECIES)
+    assert "Al" not in listed and "Ti" not in listed
+    assert "not operator condenser overrides" in SETPOINTS_T_COND_AUDIT[
+        "al_ti_policy"
+    ]
     assert SETPOINTS_T_COND_AUDIT["schema"] == "setpoints_t_cond_audit.v1"
+
+
+def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
+    """Incidental Al/Ti/AlO/TiO vapour is accounted, not dropped.
+
+    These species have no designated condenser stage. Injected flux must
+    still appear in a real ledger account (overhead, wall, terminal
+    offgas, or a colder stage the existing capture law already visits)
+    and the per-element balance must close.
+    """
+
+    from simulator.condensation_routing import (
+        DESIGNATED_STAGE,
+        METAL_PHASE_DESTINATIONS,
+    )
+    from simulator.config import load_config_bundle
+    from simulator.core import PyrolysisSimulator
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+    from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS, EvaporationFlux
+
+    species_ids = ("Al", "Ti", "AlO", "TiO")
+    injected_kg = 0.05
+    for species in species_ids:
+        assert DESIGNATED_STAGE.get(species) is None
+    assert METAL_PHASE_DESTINATIONS["Al"] == "metal_phase_al"
+    assert METAL_PHASE_DESTINATIONS["Ti"] == "metal_phase_ti"
+
+    def carrier(species: str) -> dict[str, Any]:
+        return {
+            "species_id": species,
+            "pressure": {"kind": "value", "pa": 10.0},
+            "flux": {"kind": "eligible"},
+            "verdict_status": "authoritative",
+            "certification_ceiling": "validated_point",
+            "validation_status": "validated",
+            "is_union_flux_eligible": True,
+            "is_flux_active": True,
+        }
+
+    bundle = load_config_bundle()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        bundle.setpoints,
+        bundle.feedstocks,
+        bundle.vapor_pressures,
+        materials=bundle.materials,
+    )
+    sim.load_batch("lunar_mare_low_ti", mass_kg=100.0)
+    sim.melt.temperature_C = 1600.0
+    before = sim.atom_ledger.element_atom_drift_report()[
+        "whole_run_boundary_residual_mol_atoms"
+    ]
+    flux = EvaporationFlux(
+        species_kg_hr={species: injected_kg for species in species_ids},
+        total_kg_hr=injected_kg * len(species_ids),
+        carrier_authority_by_species={
+            species: carrier(species) for species in species_ids
+        },
+    )
+    flux.update_totals()
+    sim._configure_condensation_operating_conditions(flux)
+    route = sim.condensation_model.route(flux, sim.melt)
+    for species in species_ids:
+        sim._route_evaporated_species_to_condensation(
+            route,
+            species,
+            injected_kg,
+            apply_evaporative_redox_source_terms=False,
+        )
+
+    sinks = {
+        "process.overhead_gas",
+        "process.condensation_train",
+        "process.condensation_retained_holdup",
+        "process.wall_deposit",
+        "terminal.offgas",
+        *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+    }
+    by_account = sim.atom_ledger.account_species_kg()
+    for species in species_ids:
+        held = sum(
+            float(species_kg.get(species, 0.0))
+            for account, species_kg in by_account.items()
+            if account in sinks
+        )
+        assert held == pytest.approx(injected_kg), (species, held)
+        assert held > 0.0
+    after = sim.atom_ledger.element_atom_drift_report()[
+        "whole_run_boundary_residual_mol_atoms"
+    ]
+    for element in ("Al", "Ti", "O"):
+        assert after.get(element, 0.0) - before.get(element, 0.0) == pytest.approx(
+            0.0, abs=1e-9
+        )
+    sim.atom_ledger.assert_balanced()
 
 
 def test_vapour_rail_instrumentation_diagnostic_shape() -> None:

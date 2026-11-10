@@ -2007,11 +2007,16 @@ def _require_knudsen_pipe_diameter(value: Any, field: str) -> float:
 #
 # Sources (historical cheap-win audit CW3, 2026-05-27 — these had been
 # uncited bare numbers, misleading anyone retuning the routing surface):
-#   - Fe / SiO / Mg / Na / K / Ca / Mn / Cr / Al / Ti default values
-#     are the routing setpoints curated in ``data/setpoints.yaml §
+#   - Fe / SiO / Mg / Na / K / Ca / Mn / Cr default values are the
+#     routing setpoints curated in ``data/setpoints.yaml §
 #     condensation_temperature_sources`` (operator-tuned for the
 #     pressure-vessel-internal pipe-geometry against published P_sat
 #     vs T curves).
+#   - Al 1180 °C and Ti 1500 °C stay here as capture-threshold
+#     fallbacks only. They are not operator condenser overrides and
+#     not designated stages: Al leaves as C6 metal and Ti is
+#     non-volatile. Removing them from this dict would change the
+#     temperature the existing stage/wall law uses if vapour appears.
 #   - SiO 1050 °C is the engineering midpoint of the documented
 #     900-1200 °C Stage 3 SiO zone, not a literature-derived T_cond.
 #     A 2026-05-28 corpus scan (Cardiff 2007 / Matchett 2006 /
@@ -2046,8 +2051,8 @@ CONDENSATION_TEMPS_C = {
     'Ca':  780,
     'Mn':  1000,
     'Cr':  1280,
-    'Al':  1180,   # negligible at process T, but included for completeness
-    'Ti':  1500,   # negligible at process T
+    'Al':  1180,   # capture-threshold fallback; not a designated stage
+    'Ti':  1500,   # capture-threshold fallback; not a designated stage
 }
 
 _CONFIG_BUNDLE = load_config_bundle(DATA_DIR)
@@ -2771,10 +2776,10 @@ class CondensationModel:
         # pressure, i.e. the vapour-pressure catalogue, which setpoints cannot
         # write. The blast radius is the coating diagnostic, not the b-189 seam.
         #
-        # MEASURED GOLDEN-NEUTRAL: data/setpoints.yaml ships 11 entries under
-        # condensation_train.condensation_temperatures_C and all 11 are known
+        # MEASURED GOLDEN-NEUTRAL: data/setpoints.yaml ships 9 entries under
+        # condensation_train.condensation_temperatures_C and all 9 are known
         # species with parseable values, so nothing in the shipped config
-        # trips either branch.
+        # trips either branch. Al and Ti are absent on purpose.
         known_species = set(self.condensation_temperatures_C)
         for species, value in block.items():
             name = str(species)
