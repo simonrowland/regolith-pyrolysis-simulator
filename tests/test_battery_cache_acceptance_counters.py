@@ -75,6 +75,7 @@ def test_counter_table_is_printed_on_success_and_failure(
     assert any(
         "engine_cache_counters run=parallel-warm" in line
         and f"{engine_id}:hits=1,misses=0,stores=0" in line
+        and "store_error=0" in line
         for line in success_lines
     )
 
@@ -88,6 +89,30 @@ def test_counter_table_is_printed_on_success_and_failure(
     ]
     assert len(failure_lines) == 6
     assert "canonical residual rows differ from the off run" in failure.err
+
+
+def test_store_error_fails_whole_store_cache_gate(
+    tmp_path: Path,
+    monkeypatch: Any,
+    capsys: Any,
+) -> None:
+    spec_path = _install_fake_slice(
+        monkeypatch, tmp_path, mismatch={"enabled": False}
+    )
+    run_slice = gate._run_slice
+
+    def with_store_error(context: object, output_path: Path, **kwargs: Any):
+        rows, counts = run_slice(context, output_path, **kwargs)
+        if output_path.stem == "cold":
+            engine_id = SCORE_ENGINE_SET[0].value
+            counts[engine_id]["store_error"] = 1
+        return rows, counts
+
+    monkeypatch.setattr(gate, "_run_slice", with_store_error)
+
+    assert gate.main([str(spec_path)]) == 1
+    failure = capsys.readouterr()
+    assert "store_error>0" in failure.err
 
 
 def test_parallel_warm_worker_counters_are_summed_per_engine(
