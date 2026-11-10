@@ -326,31 +326,43 @@ def test_evaporation_partial_channel_refusal_is_typed_per_species(
     assert k_refusal["status"] == "refused"
     assert k_refusal["refusal_code"] == "test_refusal"
 
+    notes = sim._last_evaporation_flux_diagnostic.get("silent_zero_notes") or []
+    assert any(
+        note.get("zero_because") == ZeroBecause.REFUSED_UPSTREAM.value
+        and note.get("site") == "evaporation.partial_channel_refusal"
+        and note.get("species") == "K"
+        for note in notes
+    )
+    host_notes = sim._silent_zero_notes or []
+    assert any(
+        note.get("zero_because") == ZeroBecause.REFUSED_UPSTREAM.value
+        and note.get("species") == "K"
+        for note in host_notes
+    )
+    public_notes = silent_zero_diagnostic(sim)
+    assert any(note.get("species") == "K" for note in public_notes["notes"])
+
 
 def test_pre_rg_eligible_dormant_channel_refuses_only_that_species(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Positive-inventory catalog eligibility cannot become a silent zero."""
+    """Below-threshold source zero cannot hide missing legacy coverage."""
     from simulator.evaporation import EvaporationMixin
     from simulator.vapour_rail.batch import FluxEligible, PressureValue, VapourBatch
 
-    na_answer = _flux_answer(
-        "Na", PressureValue(pa=1.5), FluxEligible(alpha_ref="alpha:Na")
-    )
     batch = VapourBatch(
-        requested_species_ids=frozenset({"Na", "K"}),
+        requested_species_ids=frozenset({"K"}),
         channels_by_species={
-            "Na": na_answer,
             "K": _flux_answer(
                 "K", PressureValue(pa=5.0), FluxEligible(alpha_ref="alpha:K")
             )
         },
-        flux_active_species_ids=frozenset({"Na"}),
+        flux_active_species_ids=frozenset(),
     )
     sim = SimpleNamespace(
-        melt=SimpleNamespace(temperature_C=1600.0),
+        melt=SimpleNamespace(temperature_C=1000.0),
         setpoints={},
-        vapor_pressures={"metals": {"Na": {"evaporation_alpha": {"value": 0.13}}}},
+        vapor_pressures={"metals": {}},
         _last_vapor_pressure_diagnostic={},
         _last_vapour_batch_resolve_error={},
         _resolve_evaporation_vapour_batch=lambda *_a, **_kw: batch,
@@ -371,8 +383,8 @@ def test_pre_rg_eligible_dormant_channel_refuses_only_that_species(
     equilibrium = SimpleNamespace(
         liquid_fraction=1.0,
         diagnostics={},
-        temperature_C=1600.0,
-        vapor_pressures_Pa={"Na": 1.5, "K": 5.0},
+        temperature_C=1000.0,
+        vapor_pressures_Pa={"K": 5.0},
     )
     monkeypatch.setattr(
         EvaporationMixin,
@@ -382,13 +394,21 @@ def test_pre_rg_eligible_dormant_channel_refuses_only_that_species(
 
     flux = EvaporationMixin._calculate_evaporation(sim, equilibrium)
 
-    assert flux.species_kg_hr == {"Na": 0.25}
+    assert flux.species_kg_hr == {}
+    assert sim._last_vapour_batch_flux_overlay[
+        "effective_pressure_zero_reason"
+    ] is None
     k_authority = flux.carrier_authority_by_species["K"]
     assert k_authority["is_refused"] is True
     assert k_authority["flux"]["code"] == "pre_rg_effective_pressure_missing"
     assert sim._last_evaporation_flux_diagnostic["species_refusals"]["K"][
         "status"
     ] == "refused"
+    assert any(
+        note.get("site") == "evaporation.pre_rg_effective_pressure_refusal"
+        and note.get("species") == "K"
+        for note in silent_zero_diagnostic(sim)["notes"]
+    )
 
 
 # ---------------------------------------------------------------------------

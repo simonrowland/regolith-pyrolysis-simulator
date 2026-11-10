@@ -711,10 +711,11 @@ def _pre_rg_effective_pressure_source(
     and the remaining DESIGN-REV5 §7.4 cutover preconditions are green.
     """
 
+    backend_pressures = getattr(equilibrium, 'vapor_pressures_Pa', {})
     try:
         effective_pressures = _legacy_evaporation_shadow_pressure_map(
             vapor_pressure_data,
-            getattr(equilibrium, 'vapor_pressures_Pa', {}),
+            backend_pressures,
             read_context=EFFECTIVE_PRESSURE_SOURCE_CONTEXT,
         )
     except (TypeError, ValueError) as exc:
@@ -729,9 +730,17 @@ def _pre_rg_effective_pressure_source(
             },
         ) from exc
     temperature_C = float(getattr(equilibrium, 'temperature_C', math.inf))
+    # The alpha projection can be empty while the backend supplied positive
+    # pressure for a catalog-eligible species lacking a legacy alpha row.
+    with compatibility_pressure_read_context(EFFECTIVE_PRESSURE_SOURCE_CONTEXT):
+        has_nonzero_backend_pressure = any(
+            float(value) != 0.0
+            for value in dict(backend_pressures or {}).values()
+        )
     physical_zero_reason = None
     if (
         not effective_pressures
+        and not has_nonzero_backend_pressure
         and temperature_C < PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C
     ):
         physical_zero_reason = 'pre_rg_backend_below_effective_pressure_threshold'
@@ -1075,6 +1084,48 @@ class EvaporationMixin:
                     'detail': detail,
                 }
 
+        species_refusal_notes: list[dict[str, Any]] = []
+        if species_refusals:
+            from simulator.silent_zero import (
+                CATEGORY_REFUSE,
+                ZeroBecause,
+                merge_notes_into_mapping,
+                record_on_host,
+            )
+
+            for species_id, refusal in sorted(species_refusals.items()):
+                refusal_code = str(refusal.get('refusal_code') or 'unknown')
+                is_missing_legacy_pressure = (
+                    refusal_code == 'pre_rg_effective_pressure_missing'
+                )
+                state = channel_states.get(species_id, 'refusal')
+                detail = str(
+                    refusal.get('detail')
+                    or (
+                        f'channel state={state}; refusal={refusal_code}; '
+                        'species omitted from flux and retained in source inventory'
+                    )
+                )
+                species_refusal_notes.append(
+                    record_on_host(
+                        self,
+                        ZeroBecause.REFUSED_UPSTREAM,
+                        site=(
+                            'evaporation.pre_rg_effective_pressure_refusal'
+                            if is_missing_legacy_pressure
+                            else 'evaporation.partial_channel_refusal'
+                        ),
+                        species=species_id,
+                        field=(
+                            'effective_pressure_source'
+                            if is_missing_legacy_pressure
+                            else 'batch_channel_state'
+                        ),
+                        detail=detail,
+                        doctrine_category=CATEGORY_REFUSE,
+                    )
+                )
+
         liquid_state_admits_inventory_zero = liquid_fraction is None
         if (
             isinstance(liquid_fraction, Real)
@@ -1223,7 +1274,7 @@ class EvaporationMixin:
                     state in _typed_non_debit for state in channel_states.values()
                 )
             ):
-                self._last_evaporation_flux_diagnostic = {
+                diagnostic = {
                     **regime_diagnostic,
                     'reason': 'vapour_batch_all_channels_non_debiting',
                     'detail': (
@@ -1237,6 +1288,9 @@ class EvaporationMixin:
                     'vapour_batch_flux_overlay': flux_overlay_report,
                     'vapour_batch': batch_report,
                 }
+                if species_refusal_notes:
+                    merge_notes_into_mapping(diagnostic, species_refusal_notes)
+                self._last_evaporation_flux_diagnostic = diagnostic
                 return flux
             reason = 'vapour_batch_no_debiting_pressure_outcome'
             diagnostic = {
@@ -1253,6 +1307,8 @@ class EvaporationMixin:
                 'vapour_batch_flux_overlay': flux_overlay_report,
                 'vapour_batch': batch_report,
             }
+            if species_refusal_notes:
+                merge_notes_into_mapping(diagnostic, species_refusal_notes)
             self._last_evaporation_flux_diagnostic = diagnostic
             raise EvaporationFluxRefusal(
                 reason,
@@ -1333,6 +1389,8 @@ class EvaporationMixin:
             )
             kernel_species_refusals.update(species_refusals)
             diagnostic['species_refusals'] = kernel_species_refusals
+        if species_refusal_notes:
+            merge_notes_into_mapping(diagnostic, species_refusal_notes)
         self._last_evaporation_flux_diagnostic = diagnostic
         missing_transport = diagnostic.get('missing_transport_parameters', {})
         if isinstance(missing_transport, Mapping):
