@@ -26,6 +26,7 @@ import tempfile
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
+from functools import lru_cache
 from fractions import Fraction
 from pathlib import Path
 from typing import Callable, Iterable, Mapping, Sequence
@@ -2040,6 +2041,70 @@ def _b1259_element_reference_phase_refusal(
     )
 
 
+_B677_H298_TEMPERATURES = (Decimal("298"), Decimal("298.15"))
+
+
+@lru_cache(maxsize=None)
+def _b677_printed_ideal_gas_h298(source_path: str, formula: str, table_id: str) -> bool:
+    """True when this B677 record prints the ideal-gas enthalpy zero.
+
+    Chapter 1 says a table headed as an ideal gas uses that gas as H298,
+    and those tables print H°−H°298 = 0 at 298 K
+    (pankratz-1984-usbm-b677-p001-p040.md:285-287). The combined K(c,l,g)
+    heading does not say ideal; its 298 K zero is the crystal.
+    ``table_id`` has to be the one JANAF gas table for ``formula``.
+    """
+
+    from simulator.battery.generators.janaf import _janaf_gas_table_ids
+
+    if _janaf_gas_table_ids().get(formula, ()) != (table_id,):
+        return False
+    norm = source_path.replace("\\", "/")
+    if "pankratz-1984-usbm-b677/records/" not in norm or not norm.endswith(".json"):
+        return False
+    from simulator.battery.migrate import (
+        REPO_ROOT,
+        compilation_column_series_from_record,
+    )
+
+    path = Path(norm)
+    if not path.is_file():
+        path = REPO_ROOT / norm.lstrip("/")
+    if not path.is_file():
+        return False
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(loaded, Mapping):
+        return False
+    token = loaded.get("formula_token")
+    if isinstance(token, Mapping) and token.get("value") not in (None, ""):
+        published = str(token["value"])
+    else:
+        published = str(loaded.get("formula_as_published") or "")
+    if published != formula:
+        return False
+    heading = str(loaded.get("name_as_published") or "")
+    if not heading:
+        heading = str(loaded.get("name_heading_raw") or "")
+    if "ideal" not in heading.casefold():
+        return False
+    series = next(
+        (
+            item
+            for item in compilation_column_series_from_record(loaded)
+            if item.quantity is Quantity.H_MINUS_H298
+        ),
+        None,
+    )
+    if series is None or not series.value.series:
+        return False
+    zeros = [
+        value
+        for temperature, value in series.value.series
+        if as_decimal(temperature) in _B677_H298_TEMPERATURES
+    ]
+    return len(zeros) == 1 and zeros[0] == 0
+
+
 def _tabulated_gas_basis_matches(
     observation: Observation, formula: str, table_id: str
 ) -> bool:
@@ -2048,11 +2113,13 @@ def _tabulated_gas_basis_matches(
     A JANAF row matches only its own table id. Mg-001 above the boiling
     point is the gas on the condensed 298.15 K zero; Mg-005 is the ideal-gas
     zero. A non-JANAF row matches only when its source-specific reference
-    owner establishes that the 298.15 K reference is this ideal gas. B677's
-    standalone K(g) table is such a match; its combined K(c,l,g) table is not.
-    A reference-state table that is crystal at 298.15 K does not, including
-    temperatures where the stable phase has become gas. H−H298 is the only
-    quantity that calls this. Cp and S do not.
+    owner establishes that the 298.15 K reference is this ideal gas. A B677
+    row matches when its record heading prints an ideal gas, its 298 K
+    H−H298 cell is 0, and ``formula`` is that one JANAF gas table. The
+    combined K(c,l,g) table does not. A reference-state table that is
+    crystal at 298.15 K does not, including temperatures where the stable
+    phase has become gas. H−H298 is the only quantity that calls this.
+    Cp and S do not.
     """
 
     if _is_janaf_compilation_observation(observation, None):
@@ -2072,30 +2139,16 @@ def _tabulated_gas_basis_matches(
     if source_id == b1452_source:
         return b1452_ideal_gas(formula)
     if source_id == "pankratz-1984-usbm-b677":
-        # B677 defines H°T−H°298° = ∫298^T Cp°dT, with 298.15 K as the
-        # integration baseline, and says the standard state is "the state of
-        # pure elements and pure compounds in their stable states at 1 atm of
-        # pressure"; H°298° "refers to the pure elements or compounds stable
-        # or assumed to be stable at 298.15 K" (source p001-p040.md:223,255,259).
-        # Its separate table-0096 is headed K(g), "Potassium (ideal
-        # monatomic gas)", and prints H°−H°298 = 0 at 298 K
-        # (source p041-p080.md:873-876), so that row has the K-005 gas zero.
-        # The combined K(c,l,g) table-0095 retains the condensed 298 K zero.
-        # The generic migrator leaves table_index as locator note metadata;
-        # confirm table-0096 from both the parent id and its source record path.
+        # B677 defines H°T−H°298 as the integral of Cp° from 298.15 K, and
+        # says that for a table headed ideal gas, H298 is that gas rather
+        # than the stable condensed phase (p001-p040.md:223,259,285-287).
         locator = observation.locator
         source_path = (
             ""
             if locator is None or locator.source_path is None
-            else str(locator.source_path).replace("\\", "/")
+            else str(locator.source_path)
         )
-        parent_id = parent_observation_id(observation.observation_id)
-        return (
-            formula == "K"
-            and table_id == "K-005"
-            and parent_id.startswith(f"{source_id}:table-0096:")
-            and source_path.endswith("/records/table-0096.json")
-        )
+        return _b677_printed_ideal_gas_h298(source_path, formula, table_id)
     return False
 
 

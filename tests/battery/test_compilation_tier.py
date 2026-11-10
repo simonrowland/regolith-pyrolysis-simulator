@@ -3867,6 +3867,144 @@ def test_vaporock_b1259_oxygen_298_entropy_scores_against_o029() -> None:
     assert heat_attempt.authority is Authority.BRIDGE
 
 
+def _stored_b677_observation(observation_id: str, tmp_path: Path):
+    """One stored B677 series, sliced out of the observations file."""
+
+    from simulator.battery.migrate import REPO_ROOT, load_yaml, observation_from_plain
+
+    source = (
+        REPO_ROOT
+        / "data/literature/observations-v2/compilations-pankratz-1984-usbm-b677.yaml"
+    )
+    text = source.read_text(encoding="utf-8")
+    marker = f"- observation_id: {observation_id}\n"
+    start = text.index(marker)
+    end = text.find("\n- observation_id:", start + len(marker))
+    block = text[start:] if end < 0 else text[start:end]
+    fragment = tmp_path / "stored-b677.yaml"
+    fragment.write_text(block, encoding="utf-8")
+    payload = load_yaml(fragment)
+    assert isinstance(payload, list) and len(payload) == 1
+    return observation_from_plain(payload[0])
+
+
+def _b677_record(filename: str) -> dict:
+    import json
+
+    from simulator.battery.migrate import REPO_ROOT
+
+    path = (
+        REPO_ROOT
+        / "data/literature/compilations/pankratz-1984-usbm-b677/records"
+        / filename
+    )
+    document = json.loads(path.read_text(encoding="utf-8"))
+    assert isinstance(document, dict)
+    return document
+
+
+def _b677_printed_cell(document: dict, temperature: str, column: int) -> str:
+    for row in document["source_table_rows_raw"]:
+        if isinstance(row, list) and row and str(row[0]) == temperature:
+            return str(row[column])
+    raise AssertionError(temperature)
+
+
+def _series_cell_at(observation, temperature: Decimal):
+    found = [
+        cell
+        for cell in _iter_compilation_series_cells(observation)
+        if isinstance(cell.identity.temperature_K, State)
+        and cell.identity.temperature_K.is_value
+        and cell.identity.temperature_K.value == temperature
+    ]
+    assert len(found) == 1, [cell.observation_id for cell in found]
+    return found[0]
+
+
+def test_b677_ideal_gas_enthalpy_scores_and_combined_phase_stays_refused(
+    tmp_path: Path,
+) -> None:
+    """Printed ideal-gas H−H298 scores. The combined-phase table does not.
+
+    Bulletin 677 table-0010 prints Al(g), Aluminum (ideal monatomic gas),
+    H°−H°298 = 0 at 298 K and 3.516 kcal at 1000 K. The store holds
+    14.710944 kJ, within 0.01 kJ of Al-005. table-0095 prints Potassium,
+    K(c,1,g), with no ideal heading; its 1000 K cell is 5.657 kcal and
+    the 1044 K rows jump 5.976 → 25.014 kcal. That row stays refused.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    from simulator.battery.compilation_tier import _tabulated_gas_basis_matches
+    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
+    from simulator.battery.migrate import compilation_column_series_from_record
+
+    aluminum_record = _b677_record("table-0010.json")
+    assert aluminum_record["name_as_published"] == "Aluminum (ideal monatomic gas)"
+    assert aluminum_record["formula_heading_raw"] == "Al(g)"
+    assert _b677_printed_cell(aluminum_record, "298", 3) == "0"
+    assert _b677_printed_cell(aluminum_record, "1000", 3) == "3.516"
+    aluminum = _stored_b677_observation(
+        "pankratz-1984-usbm-b677:table-0010:H_minus_H298", tmp_path
+    )
+    assert aluminum.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+    assert aluminum.identity.species.formula == "Al"
+    assert aluminum.identity.species.phase.value is Phase.G
+    aluminum_cell = _series_cell_at(aluminum, Decimal("1000"))
+    assert (
+        aluminum_cell.observation_id
+        == "pankratz-1984-usbm-b677:table-0010:H_minus_H298#t1000v14.710944"
+    )
+    assert aluminum_cell.value.point == Decimal("14.710944")
+    reader = next(
+        item
+        for item in compilation_column_series_from_record(aluminum_record)
+        if item.quantity is Quantity.H_MINUS_H298
+    )
+    assert reader.value.series is not None
+    assert (
+        next(value for temperature, value in reader.value.series if temperature == Decimal("1000"))
+        == aluminum_cell.value.point
+    )
+    gas_table = janaf_tabulated_gas_thermo("Al", Decimal("1000"))
+    assert gas_table.table_id == "Al-005"
+    assert abs(aluminum_cell.value.point - gas_table.enthalpy_increment) < Decimal("0.01")
+
+    attempt = predict_thermo_attempt(Engine.VAPOROCK, aluminum_cell)
+    assert attempt.refusal_reason is None
+    assert attempt.value is not None
+    assert abs(attempt.value - aluminum_cell.value.point) < Decimal("0.01")
+    assert "Al-005" in attempt.call_evidence
+    assert _tabulated_gas_basis_matches(aluminum_cell, "Al", "Al-005") is True
+
+    potassium_record = _b677_record("table-0095.json")
+    assert potassium_record["name_as_published"] == "Potassium"
+    assert "ideal" not in potassium_record["name_as_published"].casefold()
+    assert potassium_record["phase_as_published"] == "(c,1,g)"
+    assert _b677_printed_cell(potassium_record, "298", 3) == "0"
+    assert _b677_printed_cell(potassium_record, "1000", 3) == "5.657"
+    jump = [
+        str(row[3])
+        for row in potassium_record["source_table_rows_raw"]
+        if isinstance(row, list) and row and str(row[0]) == "1044"
+    ]
+    assert jump == ["5.976", "25.014"]
+    potassium = _stored_b677_observation(
+        "pankratz-1984-usbm-b677:table-0095:H_minus_H298", tmp_path
+    )
+    assert potassium.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+    potassium_cell = _series_cell_at(potassium, Decimal("1000"))
+    assert potassium_cell.value.point == Decimal("23.668888")
+    refused = predict_thermo_attempt(Engine.VAPOROCK, potassium_cell)
+    assert refused.value is None
+    assert refused.refusal_reason is RefusalReason.UNSUPPORTED
+    assert refused.refusal_detail["reason"] == "engine-thermo-does-not-emit"
+    assert _tabulated_gas_basis_matches(potassium_cell, "K", "K-005") is False
+
+
 def _b1259_point(filename: str, observation_id: str):
     from pathlib import Path
 
