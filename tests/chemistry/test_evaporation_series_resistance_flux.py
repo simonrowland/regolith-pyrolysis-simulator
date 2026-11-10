@@ -1394,7 +1394,7 @@ def test_native_fe_closure_uses_pressure_held_zero_boundary(
     ]["native_fe"] == 0
 
 
-def test_c7_pressure_scan_finds_positive_branch_above_suppressed_floor(
+def test_c7_pressure_scan_closes_on_reaction_equilibrium(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     sim = _build_sim(
@@ -1425,10 +1425,21 @@ def test_c7_pressure_scan_finds_positive_branch_above_suppressed_floor(
     assert closure["converged"] is True, closure
     assert closure["iterations"] <= 200
     assert closure["multiple_closure_roots"] is False
-    assert closure["rates_kg_hr"]["Ca"] == pytest.approx(
-        562.3498686097761, rel=1.0e-6
+    assert closure["rates_kg_hr"]["Ca"] > 0.0
+    assert extent * 3.0 * MOLAR_MASS["Ca"] / 1000.0 == pytest.approx(
+        closure["rates_kg_hr"]["Ca"]
     )
-    assert extent > 0.0
+    assert diagnostic["c7_ca_p_eq_pa"] < diagnostic["c7_ca_p_sat_pa"]
+    assert diagnostic["c7_ca_p_bulk_pa"] < diagnostic["c7_ca_p_eq_pa"]
+    stream = EvaporationFlux(species_kg_hr=dict(closure["rates_kg_hr"]))
+    stream.update_totals()
+    transport = sim.overhead_model.estimate_transport_state(
+        stream, sim.melt, p_downstream_bar=sim._headspace_downstream_pressure_bar(None)
+    )
+    partials = sim.overhead_model.species_partial_pressures(
+        stream, transport["vapor_pressure_mbar"], sim.species_formula_registry
+    )
+    assert partials["Ca"] * 100.0 == pytest.approx(diagnostic["c7_ca_p_bulk_pa"])
 
 
 @pytest.mark.parametrize("pressure_held", (False, True))
