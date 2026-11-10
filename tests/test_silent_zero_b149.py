@@ -12,7 +12,7 @@ import pytest
 from simulator.condensation import _coerce_alpha_s
 from simulator.campaigns import CampaignManager, CampaignSetpointMissingRefusal
 from simulator.config import load_config_bundle
-from simulator.state import CampaignPhase
+from simulator.state import CampaignPhase, MOLAR_MASS
 from simulator.silent_zero import (
     CATEGORY_PROVEN_ZERO,
     CATEGORY_REFUSE,
@@ -337,7 +337,8 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
     monkeypatch.setattr(
         EvaporationMixin,
         "_evaporation_flux_control_inputs",
-        lambda self, eq, **kw: ({}, {}),
+        # This seam tests missing series rows, not missing molar mass.
+        lambda self, eq, **kw: ({}, {"Na": MOLAR_MASS["Na"] / 1000.0}),
     )
 
     flux = EvaporationMixin._calculate_evaporation(sim, equilibrium)
