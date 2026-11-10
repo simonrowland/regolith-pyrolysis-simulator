@@ -861,6 +861,18 @@ def test_c6_current_at_target_tick_can_satisfy_composition_endpoint() -> None:
     ) is True
 
 
+def test_c6_composition_endpoint_refuses_unknown_species() -> None:
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C6"]["composition_endpoint"]["species"] = [
+        "TypoSpecies"
+    ]
+    manager = CampaignManager(setpoints)
+    melt = _melt(CampaignPhase.C6, 0, temperature_C=1400.0)
+
+    with pytest.raises(ValueError, match="unknown species.*TypoSpecies"):
+        manager.check_endpoint(melt, _flux(), CondensationTrain(), BatchRecord())
+
+
 def test_c6_max_hold_counts_only_provider_dispatch_ticks() -> None:
     manager = CampaignManager(_setpoints())
     melt = _melt(CampaignPhase.C6, 80, temperature_C=1400.0)

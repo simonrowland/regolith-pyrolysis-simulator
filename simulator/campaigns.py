@@ -3285,6 +3285,12 @@ class CampaignManager:
             if not isinstance(species, list) or not species:
                 raise ValueError(
                     'C6.composition_endpoint.species must be a list')
+            for species_name in species:
+                if _species_molar_mass_kg_per_mol(str(species_name)) is None:
+                    raise ValueError(
+                        'C6.composition_endpoint.species contains unknown '
+                        f'species {species_name!r}'
+                    )
             threshold_wt_pct = self._endpoint_float(
                 campaign, composition_endpoint, 'threshold_wt_pct')
             max_hold_hr = self._configured_max_hold_hr(campaign)
