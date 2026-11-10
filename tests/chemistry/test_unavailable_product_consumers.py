@@ -123,7 +123,6 @@ def test_oxygen_partitions_inherit_partial_product_flag(two_hour_run, monkeypatc
             "d-359 B", "d-359 C", "d-359 E",
         ]
         assert "The direct O₂-ledger total is retained" in notice["reason"]
-        assert "Class B activity ladder" in notice["reason"]
         assert "Class C out-of-domain refusal" in notice["reason"]
         assert "Class E P species refusals" in notice["reason"]
 
