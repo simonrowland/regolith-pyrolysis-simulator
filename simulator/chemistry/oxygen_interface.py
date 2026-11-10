@@ -220,6 +220,7 @@ def solve_interface_oxygen(
             )
         active_channels.append(channel)
 
+    # Same algebra as langmuir_knudsen.hertz_knudsen_k_kg_s_m2_pa.
     oxygen_r_interface = 1.0 / (
         oxygen_alpha_value
         * math.sqrt(_M_O2_KG_PER_MOL / (2.0 * math.pi * GAS_CONSTANT * temperature))
@@ -335,7 +336,7 @@ def solve_interface_oxygen(
                 rtol=1.0e-12,
                 maxiter=200,
             )
-        except RuntimeError as exc:
+        except (RuntimeError, ValueError) as exc:
             raise InterfaceOxygenSolveError(
                 "brent_failure",
                 "Brent failed inside a sign-changing interface oxygen bracket",
@@ -361,6 +362,10 @@ def solve_interface_oxygen(
         logp, label = solve_at_overhead(overhead_pa)
 
     accepted = evaluate(logp, overhead_pa)
+    if effective_capacity > _BUFFERED_CAPACITY_MOL_PER_LN and logp == reservoir_log:
+        # As C_m -> ∞ and ξ_s -> ξ_m, (C_m/τ)(ξ_m - ξ_s) -> S_gas - S_evap.
+        accepted["melt_source"] = accepted["gas_source"] - accepted["evaporative_source"]
+        accepted["residual"] = 0.0
     return InterfaceOxygenSolution(
         surface_pO2_bar=10.0**logp,
         surface_log10_pO2_bar=logp,

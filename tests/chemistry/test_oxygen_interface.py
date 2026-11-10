@@ -6,7 +6,7 @@ import pytest
 
 import simulator.chemistry.oxygen_interface as oxygen_interface
 from simulator.accounting.formulas import parse_formula
-from simulator.physical_constants import PA_PER_BAR
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 
 
 M_FE_KG_PER_MOL = parse_formula("Fe").molar_mass_kg_per_mol()
@@ -20,6 +20,16 @@ def _closed_form_pressure_bar(k_bar: float = K_BAR) -> float:
     return (
         k_bar * math.sqrt(M_O2_KG_PER_MOL / M_FE_KG_PER_MOL) / 2.0
     ) ** (2.0 / 3.0)
+
+
+def _expected_fe_flux(
+    solution, *, k_bar: float = K_BAR, alpha: float = 1.0
+) -> float:
+    p_fe_bar = k_bar / math.sqrt(solution.surface_pO2_bar)
+    p_fe_pa = p_fe_bar * PA_PER_BAR
+    return alpha * p_fe_pa / math.sqrt(
+        2.0 * math.pi * M_FE_KG_PER_MOL * GAS_CONSTANT * TEMPERATURE_K
+    )
 
 
 def _solve(
@@ -63,7 +73,9 @@ def test_zero_capacity_vacuum_matches_closed_form_langmuir_root() -> None:
 
     assert solution.surface_pO2_bar == pytest.approx(_closed_form_pressure_bar(), rel=1e-10)
     assert solution.capacity_label == "none:no_melt_redox_capacity"
-    assert solution.product_fluxes_mol_m2_s["Fe"] > 0.0
+    assert solution.product_fluxes_mol_m2_s["Fe"] == pytest.approx(
+        _expected_fe_flux(solution), rel=1e-10
+    )
 
 
 def test_large_melt_capacity_pins_surface_to_reservoir() -> None:
@@ -79,6 +91,19 @@ def test_large_melt_capacity_pins_surface_to_reservoir() -> None:
     )
 
 
+def test_buffered_pin_preserves_closing_melt_source_at_capacity_boundary() -> None:
+    brent_solution = _solve(capacity=1.0e6)
+    pin_solution = _solve(capacity=1.0e6 + 1.0)
+
+    assert brent_solution.melt_source_mol_s == pytest.approx(5.467009, rel=1e-4)
+    assert pin_solution.melt_source_mol_s == pytest.approx(5.467009, rel=1e-4)
+    assert pin_solution.melt_source_mol_s == pytest.approx(
+        pin_solution.gas_source_mol_s - pin_solution.evaporative_source_mol_s,
+        rel=1e-12,
+    )
+    assert pin_solution.residual_mol_s == pytest.approx(0.0, abs=1e-12)
+
+
 def test_overhead_above_vacuum_root_is_a_labeled_floor_with_product_flux() -> None:
     overhead_pO2_bar = 10.0 * _closed_form_pressure_bar()
 
@@ -86,7 +111,11 @@ def test_overhead_above_vacuum_root_is_a_labeled_floor_with_product_flux() -> No
 
     assert solution.surface_pO2_bar == pytest.approx(overhead_pO2_bar, rel=1e-12)
     assert solution.label == "overhead_oxygen_floor"
-    assert solution.product_fluxes_mol_m2_s["Fe"] > 0.0
+    expected_flux = _expected_fe_flux(solution)
+    assert expected_flux == pytest.approx(6.03278918e-2, rel=1e-8)
+    assert solution.product_fluxes_mol_m2_s["Fe"] == pytest.approx(
+        expected_flux, rel=1e-10
+    )
 
 
 def test_both_positive_bracket_endpoints_return_lower_edge_flux() -> None:
@@ -94,12 +123,17 @@ def test_both_positive_bracket_endpoints_return_lower_edge_flux() -> None:
 
     assert solution.surface_pO2_bar == 1.0e-30
     assert solution.label == "bracket_boundary=lower"
-    assert solution.product_fluxes_mol_m2_s["Fe"] > 0.0
+    assert solution.product_fluxes_mol_m2_s["Fe"] == pytest.approx(
+        _expected_fe_flux(solution, k_bar=1.0e-45), rel=1e-10
+    )
 
 
-def test_brent_failure_is_typed_and_does_not_fall_back_to_midpoint(monkeypatch) -> None:
+@pytest.mark.parametrize("failure", [RuntimeError, ValueError])
+def test_brent_failure_is_typed_and_does_not_fall_back_to_midpoint(
+    monkeypatch, failure
+) -> None:
     def fail_brentq(*args, **kwargs):
-        raise RuntimeError("forced Brent failure")
+        raise failure("forced Brent failure")
 
     monkeypatch.setattr(oxygen_interface, "brentq", fail_brentq)
 
