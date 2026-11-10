@@ -3699,6 +3699,7 @@ def _predict_sossi_residue_cohort(
     ]
     alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
     engine_binding_identity: dict[str, str] | None = None
+    openimcc_melt_parent_oxides: frozenset[str] = frozenset()
     if engine == "openimcc":
         try:
             import openimcc
@@ -3708,11 +3709,14 @@ def _predict_sossi_residue_cohort(
         except ImportError as exc:
             raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
         gas_pack = load_gas_datapack()
+        melt_pack = openimcc_bridge._load_pack(
+            openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+        )
         engine_binding_identity = openimcc_bridge.engine_binding_identity(
-            openimcc_bridge._load_pack(
-                openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
-            ),
-            gas_pack,
+            melt_pack, gas_pack
+        )
+        openimcc_melt_parent_oxides = frozenset(
+            str(oxide) for oxide in melt_pack.kernel_datapack.parent_oxides
         )
         raw_gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
             tuple(_SOSSI_TRACE_PARENTS.values()), gas_pack
@@ -3845,6 +3849,17 @@ def _predict_sossi_residue_cohort(
                         activity_composition, activity_input_policy = (
                             openimcc_bridge._cleaned_melt_policy(composition)
                         )
+                        if "MnO" not in openimcc_melt_parent_oxides:
+                            # The loaded melt pack owns its input domain. Omit
+                            # only unsupported MnO so the existing flagged
+                            # activity extension below can supply its gas
+                            # channel; keep other out-of-domain inputs visible
+                            # to OpenIMCC's typed refusal.
+                            activity_composition.pop("MnO", None)
+                            activity_input_policy = dict(activity_input_policy)
+                            activity_input_policy[
+                                "omitted_out_of_domain_melt_activities"
+                            ] = ("MnO",)
                         melt_activity_input_policy.update(activity_input_policy)
                         state = _evaluate_openimcc_isolated(
                             openimcc_bridge.evaluate,

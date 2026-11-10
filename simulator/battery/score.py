@@ -12053,6 +12053,52 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
         )
 
 
+def _format_sossi_residue_transport_notice_band(
+    transport_conditions: Mapping[str, object],
+    source_locations: Mapping[str, object],
+) -> str:
+    """Render the source values and defaults used by the Sossi transport model."""
+    pressure_location = source_locations.get("total_pressure_pa")
+    table2_location = source_locations.get(
+        "sweep_gas_mixture_and_flow_rate_sccm"
+    )
+    geometry_location = source_locations.get("tube_geometry")
+    pressure_location = (
+        pressure_location if isinstance(pressure_location, Mapping) else {}
+    )
+    table2_location = table2_location if isinstance(table2_location, Mapping) else {}
+    geometry_location = (
+        geometry_location if isinstance(geometry_location, Mapping) else {}
+    )
+    carrier_gas_input = transport_conditions.get("carrier_gas_mixture")
+    if carrier_gas_input is None:
+        carrier_gas_input = "unprinted; N2 default"
+    else:
+        carrier_gas_input = f"{carrier_gas_input} sccm"
+    flow_input = transport_conditions.get("flow_rate_sccm")
+    if flow_input is None:
+        flow_input = "unprinted; radial-factor default 1.0"
+    else:
+        flow_input = f"{flow_input} sccm"
+    pipe_diameter_input = transport_conditions.get("pipe_diameter_m")
+    if pipe_diameter_input is None:
+        pipe_diameter_input = "default"
+    transport_length_input = transport_conditions.get("transport_length_m")
+    if transport_length_input is None:
+        transport_length_input = "default"
+    return (
+        "series-resistance gas film; "
+        f"P_total={transport_conditions.get('total_pressure_pa', 'unprinted')} Pa "
+        f"(Abstract, PDF p. {pressure_location.get('page', 'unknown')}); "
+        f"CO/CO2 component flows={carrier_gas_input}; "
+        f"total flow={flow_input} "
+        f"(Table 2, PDF p. {table2_location.get('page', 'unknown')}); "
+        f"tube ID={pipe_diameter_input} m, "
+        f"hotspot={transport_length_input} m "
+        f"(Methods §2.1, PDF p. {geometry_location.get('page', 'unknown')})"
+    )
+
+
 def _sossi_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -12241,46 +12287,8 @@ def _sossi_residue_prediction(
         transport_locations = provenance.get("transport_source_locations")
         if not isinstance(transport_locations, Mapping):
             transport_locations = {}
-        pressure_location = transport_locations.get("total_pressure_pa")
-        table2_location = transport_locations.get(
-            "sweep_gas_mixture_and_flow_rate_sccm"
-        )
-        geometry_location = transport_locations.get("tube_geometry")
-        pressure_location = (
-            pressure_location if isinstance(pressure_location, Mapping) else {}
-        )
-        table2_location = (
-            table2_location if isinstance(table2_location, Mapping) else {}
-        )
-        geometry_location = (
-            geometry_location if isinstance(geometry_location, Mapping) else {}
-        )
-        carrier_gas_input = transport_conditions.get("carrier_gas_mixture")
-        if carrier_gas_input is None:
-            carrier_gas_input = "unprinted; N2 default"
-        else:
-            carrier_gas_input = f"{carrier_gas_input} sccm"
-        flow_input = transport_conditions.get("flow_rate_sccm")
-        if flow_input is None:
-            flow_input = "unprinted; radial-factor default 1.0"
-        else:
-            flow_input = f"{flow_input} sccm"
-        pipe_diameter_input = transport_conditions.get("pipe_diameter_m")
-        if pipe_diameter_input is None:
-            pipe_diameter_input = "default"
-        transport_length_input = transport_conditions.get("transport_length_m")
-        if transport_length_input is None:
-            transport_length_input = "default"
-        transport_notice_band = (
-            "series-resistance gas film; "
-            f"P_total={transport_conditions.get('total_pressure_pa', 'unprinted')} Pa "
-            f"(Abstract, PDF p. {pressure_location.get('page', 'unknown')}); "
-            f"CO/CO2 component flows={carrier_gas_input}; "
-            f"total flow={flow_input} "
-            f"(Table 2, PDF p. {table2_location.get('page', 'unknown')}); "
-            f"tube ID={pipe_diameter_input} m, "
-            f"hotspot={transport_length_input} m "
-            f"(Methods §2.1, PDF p. {geometry_location.get('page', 'unknown')})"
+        transport_notice_band = _format_sossi_residue_transport_notice_band(
+            transport_conditions, transport_locations
         )
         notices = [
             Notice(
