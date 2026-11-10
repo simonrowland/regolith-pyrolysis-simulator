@@ -791,6 +791,55 @@ def _is_quantity_not_predicted(quantity: Quantity | None) -> bool:
     return quantity is Quantity.LOG10_K_REACTION
 
 
+@lru_cache(maxsize=None)
+def _engine_lacks_quantity_capability(
+    engine: Engine,
+    quantity: Quantity,
+    phase_basis: str | None,
+) -> bool:
+    """Whether the declared predictor capability can never emit this row."""
+
+    if _is_quantity_not_predicted(quantity):
+        return True
+    if (
+        quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
+        or (engine is Engine.MAGEMIN and quantity in _VAPOUR_EQUILIBRIUM)
+        or quantity is Quantity.FE3_FE2_RATIO
+        or quantity in PRINTED_CAPACITY_QUANTITIES
+        or quantity is Quantity.DISTRIBUTION_RATIO
+        or (
+            quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and phase_basis in PHASE_BASIS_TOKENS
+        )
+        or quantity in _ENGINE_CELL_PREDICTED_QUANTITIES
+    ):
+        return False
+    if quantity in FUSION_QUANTITIES:
+        return False
+    from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+    return quantity not in _engine_thermo_quantities(engine)
+
+
+def _engine_quantity_not_predicted_detail(
+    engine: Engine,
+    identity: Identity | None,
+) -> dict[str, str] | None:
+    if not isinstance(identity, Identity):
+        return None
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return None
+    phase_basis = (
+        identity.subtype.value
+        if identity.subtype is not None and identity.subtype.is_value
+        else None
+    )
+    if not _engine_lacks_quantity_capability(engine, quantity, phase_basis):
+        return None
+    return _quantity_not_predicted_detail(quantity)
+
+
 @dataclass(frozen=True)
 class ScoreContext:
     works: Mapping[str, Work]
@@ -9474,7 +9523,8 @@ def _predict_with_engine(
     _require_score_engine(engine)
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-    if _is_quantity_not_predicted(quantity):
+    static_refusal_detail = _engine_quantity_not_predicted_detail(engine, identity)
+    if static_refusal_detail is not None:
         return EnginePrediction(
             engine=engine,
             channel=ENGINE_CHANNELS[engine],
@@ -9482,7 +9532,7 @@ def _predict_with_engine(
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
             lineage_complete=False,
             refusal_reason=RefusalReason.UNSUPPORTED,
-            refusal_detail=_quantity_not_predicted_detail(quantity),
+            refusal_detail=static_refusal_detail,
             identity=identity,
         )
     sample_phase_detail = (
@@ -9575,23 +9625,6 @@ def _predict_with_engine(
         return _predict_phase_row(
             engine, observation, identity, channel, sources, handles=handles
         )
-    if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
-
-        if (
-            quantity not in _engine_thermo_quantities(engine)
-            and quantity not in FUSION_QUANTITIES
-        ):
-            return EnginePrediction(
-                engine=engine,
-                channel=channel,
-                execution=Execution(state=ExecutionState.UNSUPPORTED),
-                coefficient_sources=sources,
-                lineage_complete=False,
-                refusal_reason=RefusalReason.UNSUPPORTED,
-                refusal_detail=_quantity_not_predicted_detail(quantity),
-                identity=identity,
-            )
     formula = identity.species.formula
     if (
         quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
@@ -12440,6 +12473,282 @@ def _is_selected_condition_observation(
     return derivation is not None and reference.observation_id in derivation.inputs
 
 
+def _validation_notices_for_residual(
+    context: ScoreContext,
+    source_reference: Observation,
+    lineage_observation_id: str | None,
+    quantity: Quantity | None,
+) -> tuple[Notice, ...]:
+    validation_notices: list[Notice] = []
+    for observation_id in dict.fromkeys(
+        (source_reference.observation_id, lineage_observation_id)
+    ):
+        if observation_id is None:
+            continue
+        issues = context.hard_issues_by_observation.get(observation_id, ())
+        if not issues:
+            continue
+        issue_codes = set()
+        for issue in issues:
+            location = observation_issue_location(issue.path)
+            field = "" if location is None else location[1]
+            issue_codes.add(
+                issue.reason.value if not field else f"{issue.reason.value}:{field}"
+            )
+        validation_notices.append(
+            Notice(
+                kind=NoticeKind.VALIDATION_HARD_ISSUE_LABEL,
+                affected_quantities=() if quantity is None else (quantity,),
+                reason="hard_validation_issue:" + ",".join(sorted(issue_codes)),
+                origin=observation_id,
+            )
+        )
+    return tuple(validation_notices)
+
+
+def _refused_residual(
+    reference: Observation,
+    engine: Engine,
+    quantity: Quantity | None,
+    rail: Rail | None,
+    key: str,
+    reason: RefusalReason,
+    detail: Mapping[str, object],
+    execution: Execution,
+    notices: tuple[Notice, ...],
+    *,
+    check_refs: tuple[str, ...],
+    extra_notices: tuple[Notice, ...] = (),
+    candidate: Observation | None = None,
+    source_relation: SourceRelation = SourceRelation.UNKNOWN,
+    exclusions: tuple[str, ...] = (),
+    fo2_mode: Fo2Mode | None = None,
+) -> tuple[Residual, Observation | None]:
+    all_notices = union_notices(notices, extra_notices)
+    result_mode = fo2_mode or _fo2_mode_from_notices(all_notices)
+    excl = exclusions or ("status_match_or_mismatch",)
+    if (
+        not _reference_has_measured_evidence(reference)
+        and "reference_measured_evidence" not in excl
+    ):
+        excl = (*excl, "reference_measured_evidence")
+    return (
+        Residual(
+            key=_key_for_fo2_mode(key, result_mode),
+            reference=reference.observation_id,
+            execution=execution,
+            rail=rail,
+            status=ResidualStatus.REFUSED,
+            source_relation=source_relation,
+            score_eligible=False,
+            exclusions=excl,
+            notices=all_notices,
+            candidate=None if candidate is None else candidate.observation_id,
+            candidate_request=None
+            if candidate is not None
+            else CandidateRequest(
+                reference.experiment_id,
+                quantity or Quantity.P_SAT,
+                engine,
+                ENGINE_CHANNELS[engine],
+            ),
+            numeric=None,
+            refusal=ResidualRefusal(reason, dict(detail), check_refs=check_refs),
+            quench_state=_residual_quench_state(reference),
+            fo2_mode=result_mode,
+        ),
+        candidate,
+    )
+
+
+def _early_static_quantity_refusal(
+    source_reference: Observation,
+    engine: Engine,
+    *,
+    context: ScoreContext,
+    lineage_observation_id: str | None = None,
+    table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
+    point_observations: Sequence[Observation] | None = None,
+    engine_lineage_complete: bool | None = None,
+    fo2_mode: Fo2Mode | None = None,
+) -> tuple[Residual, Observation | None] | None:
+    """Build safe capability refusals before compiler and predictor setup."""
+
+    if fo2_mode is not None:
+        return None
+    static_detail = _engine_quantity_not_predicted_detail(
+        engine, source_reference.identity
+    )
+    if static_detail is None or not isinstance(source_reference.identity, Identity):
+        return None
+    quantity = quantity_token(source_reference.identity)
+    if quantity is None or quantity in _VAPOUR_EQUILIBRIUM:
+        return None
+    # These rows may receive a prediction outside the generic engine path.
+    if quantity in {
+        Quantity.ACTIVITY,
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    }:
+        return None
+    if not _is_quantity_not_predicted(quantity):
+        origin = context.origins.get(source_reference.observation_id)
+        if engine_lineage_complete is None:
+            engine_lineage_complete = lineage_complete_for(
+                ENGINE_COEFFICIENT_SOURCES[engine],
+                works=context.works,
+                observations=context.observations,
+                experiments=context.experiments,
+            )
+        if engine_lineage_complete or is_internal_consistency(origin):
+            return None
+    reference = fusion_comparison_reference(source_reference, engine=engine)
+    identity = reference.identity
+    if not isinstance(identity, Identity):
+        return None
+    converted_quantity = quantity_token(identity)
+    if converted_quantity is None or converted_quantity is not quantity:
+        return None
+
+    formula = identity.species.formula if identity.species is not None else ""
+    rail = rail_for_quantity(quantity, species_formula=formula)
+    if rail is None:
+        return None
+    experiment = context.experiments.get(reference.experiment_id)
+    if (
+        experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.STATIC_EQUILIBRIUM
+        and rail is not Rail.VAPOUR
+    ):
+        return None
+    if engine in SINGLE_LIQUID_ENGINES and _is_bulk_not_liquid_composition(
+        reference
+    ):
+        return None
+    if point_magnitude(reference.value) is None:
+        return None
+    if (
+        quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
+        and parse_species_formula(formula, species=identity.species) is None
+    ):
+        return None
+
+    if experiment is not None:
+        gates = run_validity_gates(
+            experiment,
+            reference,
+            tables=_gate_tables(reference, context.observations, table_index),
+            point_observations=point_observations,
+        )
+    else:
+        from simulator.battery.validity import GateCheck
+
+        gates = GateOutcome(
+            passed=False,
+            reason=RefusalReason.REFERENTIAL_INTEGRITY,
+            checks=(GateCheck("experiment", False, {"reason": "missing experiment"}),),
+            primary_check="experiment",
+        )
+    bench = (
+        None
+        if experiment is None
+        else _bench_for_score(experiment, context.benches)
+    )
+    flagged_notices = _flagged_stratum_notices(
+        reference, experiment, gates, bench
+    )
+    apparatus_flagged = any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        for notice in flagged_notices
+    )
+    if not gates.passed and not apparatus_flagged:
+        return None
+
+    evidence_class = source_reference.evidence.class_
+    non_measured_comparison = (
+        not evidence_class.is_value
+        or evidence_class.value not in MEASURED_EVIDENCE
+    ) and not (
+        evidence_class.is_value
+        and evidence_class.value is EvidenceClass.COMPILATION_ASSESSED
+    )
+    evidence_class_notices = (
+        (_evidence_class_notice(quantity, source_reference),)
+        if non_measured_comparison
+        else ()
+    )
+    approximate_value_notices = (
+        (
+            Notice(
+                kind=NoticeKind.APPROXIMATE_VALUE,
+                affected_quantities=(quantity,),
+                reason="approximate_printed_value",
+                origin=reference.observation_id,
+            ),
+        )
+        if reference.value.approximate
+        else ()
+    )
+    notices = union_notices(
+        reference.notices,
+        flagged_notices,
+        evidence_class_notices,
+        approximate_value_notices,
+        _quench_notices(reference),
+    )
+    liquid_sample_domain_notice = liquid_model_subsolidus_sample_notice(
+        identity,
+        engine=engine,
+        experiment=experiment,
+        measured_condensed_form=(
+            (reference.provenance or {}).get("measured_condensed_form")
+        ),
+        measured_sample_phase=(
+            (reference.provenance or {}).get("measured_sample_phase")
+        ),
+        origin=reference.observation_id,
+    )
+    if liquid_sample_domain_notice is not None:
+        notices = union_notices(notices, (liquid_sample_domain_notice,))
+    notices = union_notices(
+        notices,
+        _validation_notices_for_residual(
+            context,
+            source_reference,
+            lineage_observation_id,
+            quantity,
+        ),
+    )
+    if any(
+        notice.reason == "fusion_source_reference_phase_unprinted"
+        or notice.reason.startswith("fusion conversion missing input:")
+        or notice.reason.startswith("fusion conversion missing input for ")
+        or notice.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT)
+        for notice in notices
+    ):
+        return None
+    temperature_K = temperature_of(identity)
+    key = residual_key(
+        reference_id=reference.observation_id,
+        quantity=quantity,
+        engine=engine,
+        rail=rail,
+        temperature_K=temperature_K,
+    )
+    return _refused_residual(
+        reference,
+        engine,
+        quantity,
+        rail,
+        key,
+        RefusalReason.UNSUPPORTED,
+        static_detail,
+        Execution(state=ExecutionState.UNSUPPORTED),
+        notices,
+        check_refs=(),
+    )
+
+
 def compile_residual(
     reference: Observation,
     engine: Engine,
@@ -12572,31 +12881,15 @@ def compile_residual(
             notices,
             (engine_intrinsic_fo2_notice(quantity),),
         )
-    validation_notices: list[Notice] = []
-    for observation_id in dict.fromkeys(
-        (source_reference.observation_id, lineage_observation_id)
-    ):
-        if observation_id is None:
-            continue
-        issues = context.hard_issues_by_observation.get(observation_id, ())
-        if not issues:
-            continue
-        issue_codes = set()
-        for issue in issues:
-            location = observation_issue_location(issue.path)
-            field = "" if location is None else location[1]
-            issue_codes.add(
-                issue.reason.value if not field else f"{issue.reason.value}:{field}"
-            )
-        validation_notices.append(
-            Notice(
-                kind=NoticeKind.VALIDATION_HARD_ISSUE_LABEL,
-                affected_quantities=() if quantity is None else (quantity,),
-                reason="hard_validation_issue:" + ",".join(sorted(issue_codes)),
-                origin=observation_id,
-            )
-        )
-    notices = union_notices(notices, tuple(validation_notices))
+    notices = union_notices(
+        notices,
+        _validation_notices_for_residual(
+            context,
+            source_reference,
+            lineage_observation_id,
+            quantity,
+        ),
+    )
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -12609,40 +12902,22 @@ def compile_residual(
         source_relation: SourceRelation = SourceRelation.UNKNOWN,
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
-        all_notices = union_notices(notices, extra_notices)
-        result_mode = fo2_mode or _fo2_mode_from_notices(all_notices)
-        excl = exclusions or ("status_match_or_mismatch",)
-        if (
-            not _reference_has_measured_evidence(reference)
-            and "reference_measured_evidence" not in excl
-        ):
-            excl = (*excl, "reference_measured_evidence")
-        return (
-            Residual(
-                key=_key_for_fo2_mode(key, result_mode),
-                reference=reference.observation_id,
-                execution=execution,
-                rail=rail,
-                status=ResidualStatus.REFUSED,
-                source_relation=source_relation,
-                score_eligible=False,
-                exclusions=excl,
-                notices=all_notices,
-                candidate=None if candidate is None else candidate.observation_id,
-                candidate_request=None
-                if candidate is not None
-                else CandidateRequest(
-                    reference.experiment_id,
-                    quantity or Quantity.P_SAT,
-                    engine,
-                    ENGINE_CHANNELS[engine],
-                ),
-                numeric=None,
-                refusal=ResidualRefusal(reason, dict(detail), check_refs=_check_refs(gates, reason)),
-                quench_state=_residual_quench_state(reference),
-                fo2_mode=result_mode,
-            ),
-            candidate,
+        return _refused_residual(
+            reference,
+            engine,
+            quantity,
+            rail,
+            key,
+            reason,
+            detail,
+            execution,
+            notices,
+            check_refs=_check_refs(gates, reason),
+            extra_notices=extra_notices,
+            candidate=candidate,
+            source_relation=source_relation,
+            exclusions=exclusions,
+            fo2_mode=fo2_mode,
         )
 
     if _is_quantity_not_predicted(quantity):
@@ -14099,10 +14374,36 @@ def _score_store_with_decisions(
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
         observations.values()
     )
+    engine_lineage_completeness = {
+        engine: lineage_complete_for(
+            ENGINE_COEFFICIENT_SOURCES[engine],
+            works=context.works,
+            observations=observations,
+            experiments=context.experiments,
+        )
+        for engine in engine_set
+    }
     empirical_ids = comparison_ids
     started = time.monotonic()
     last_progress = started
     done = 0
+
+    def report_progress_if_due() -> None:
+        nonlocal last_progress
+        now = time.monotonic()
+        if now - last_progress < 60:
+            return
+        if _stream is not None:
+            _stream.flush()
+        progress = f"score progress {done}/{total} residuals"
+        if _stream is not None:
+            progress += f" written={_stream.count}"
+        print(
+            f"{progress} {int(now - started)}s host={context.hostname}",
+            flush=True,
+        )
+        last_progress = now
+
     total = sum(
         _compilation_series_point_count(obs, origins.get(obs.observation_id))
         for obs in refs
@@ -14176,13 +14477,47 @@ def _score_store_with_decisions(
                         derived_band = kems_partial_pressure_band
                         derived_band_reason = None
                     for engine in engine_set:
-                        prediction = None
-                        if (
+                        lineage_id = (
+                            obs.observation_id
+                            if point.observation_id != obs.observation_id
+                            else None
+                        )
+                        diagnostic_prediction = (
                             diagnostic
                             and point.observation_id not in fusion_diagnostic_ids
                             and predict is None
                             and not compilation_thermo
+                        )
+                        early_refusal = None
+                        if not diagnostic_prediction and (
+                            predict is None
+                            or quantity is Quantity.LOG10_K_REACTION
                         ):
+                            early_refusal = _early_static_quantity_refusal(
+                                point,
+                                engine,
+                                context=live_context,
+                                lineage_observation_id=lineage_id,
+                                table_index=table_index,
+                                point_observations=point_observations_by_experiment.get(
+                                    point.experiment_id, ()
+                                ),
+                                engine_lineage_complete=(
+                                    engine_lineage_completeness[engine]
+                                ),
+                            )
+                        if early_refusal is not None:
+                            residual, candidate = early_refusal
+                            if _stream is None:
+                                assert residuals is not None
+                                residuals.append(residual)
+                            else:
+                                _stream.append(residual, candidate)
+                            done += 1
+                            report_progress_if_due()
+                            continue
+                        prediction = None
+                        if diagnostic_prediction:
                             prediction = EnginePrediction(
                                 engine=engine,
                                 channel=ENGINE_CHANNELS[engine],
@@ -14240,11 +14575,7 @@ def _score_store_with_decisions(
                             comparison_ids=comparison_ids,
                             predict=predict,
                             handles=resolved_handles,
-                            lineage_observation_id=(
-                                obs.observation_id
-                                if point.observation_id != obs.observation_id
-                                else None
-                            ),
+                            lineage_observation_id=lineage_id,
                             table_index=table_index,
                             derived_band=derived_band,
                             derived_band_reason=derived_band_reason,
@@ -14305,19 +14636,7 @@ def _score_store_with_decisions(
                         if candidate is not None and _stream is None:
                             candidates[candidate.observation_id] = candidate
                         done += 1
-                        now = time.monotonic()
-                        if now - last_progress >= 60:
-                            if _stream is not None:
-                                _stream.flush()
-                            progress = f"score progress {done}/{total} residuals"
-                            if _stream is not None:
-                                progress += f" written={_stream.count}"
-                            print(
-                                f"{progress} {int(now - started)}s "
-                                f"host={context.hostname}",
-                                flush=True,
-                            )
-                            last_progress = now
+                        report_progress_if_due()
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
             close_battery_engine_handles,
