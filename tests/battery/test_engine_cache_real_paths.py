@@ -446,7 +446,8 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason() -> 
             for name, child in value.items():
                 yield from leaves(child, (*path, name), seen)
         elif isinstance(value, (list, tuple, set, frozenset)):
-            for index, child in enumerate(value):
+            children = sorted(value, key=repr) if isinstance(value, (set, frozenset)) else value
+            for index, child in enumerate(children):
                 yield from leaves(child, (*path, index), seen)
         else:
             try:
@@ -474,6 +475,10 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason() -> 
             updated = list(value)
             updated[part] = replace(value[part], tuple(tail), replacement)
             return tuple(updated)
+        if isinstance(value, (set, frozenset)):
+            updated = sorted(value, key=repr)
+            updated[part] = replace(updated[part], tuple(tail), replacement)
+            return type(value)(updated)
         child = getattr(value, part)
         updated_child = replace(child, tuple(tail), replacement)
         try:
@@ -503,7 +508,8 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason() -> 
                 handle.backend
             )
             for path, reason in dropped.items():
-                assert path and runtime_reasons.get(str(path[-1])) == reason, path
+                assert path and engine_cache._setting_drop_reason(path) == reason, path
+                assert reason in runtime_reasons.values(), path
             chem_version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine.value]
             baseline_key = engine_cache.engine_cache_key(
                 engine.value, chem_version, settings
@@ -531,7 +537,7 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason() -> 
                         assert dropped_prefixes, (engine.value, path)
                         for dropped_path in dropped_prefixes:
                             assert (
-                                runtime_reasons.get(str(dropped_path[-1]))
+                                engine_cache._setting_drop_reason(dropped_path)
                                 == changed_drops[dropped_path]
                             ), (engine.value, path, dropped_path)
                 finally:
@@ -569,6 +575,7 @@ def test_cache_settings_exclude_warm_pool_runtime_state() -> None:
 
     assert first == second
     assert first["_config"] == {"temperature_units": "C"}
+    assert first["_warm_pool"] == {}
 
 
 @pytest.mark.parametrize(
@@ -855,6 +862,11 @@ def test_internal_analytical_high_temperature_mode_is_keyed_and_cache_equivalent
         "po2_request": Po2Request(PO2_COMMANDED, 1e-10),
         "include_diagnostic_shadows": False,
     }
+    key_request = {
+        "call": "residue_vapor_pressure",
+        **request,
+        "po2_request": request["po2_request"].as_payload(),
+    }
 
     def evaluate(mode: str, *, cache: bool) -> Any:
         handle = open_available_engine(
@@ -879,21 +891,21 @@ def test_internal_analytical_high_temperature_mode_is_keyed_and_cache_equivalent
     try:
         openimcc_backend.backend._core._high_t_melt_activity = "openimcc"
         openimcc_settings = engine_cache.engine_cache_backend_settings(
-            openimcc_backend.backend
+            openimcc_backend.backend._core
         )
         openimcc_key = engine_cache.engine_cache_key(
             "internal-analytical",
             engine_cache.ENGINE_CHEMISTRY_VERSION["internal-analytical"],
-            {"request": request, "engine_settings": openimcc_settings},
+            {**key_request, "engine_settings": openimcc_settings},
         )
         openimcc_backend.backend._core._high_t_melt_activity = "constant_gamma"
         constant_gamma_settings = engine_cache.engine_cache_backend_settings(
-            openimcc_backend.backend
+            openimcc_backend.backend._core
         )
         constant_gamma_key = engine_cache.engine_cache_key(
             "internal-analytical",
             engine_cache.ENGINE_CHEMISTRY_VERSION["internal-analytical"],
-            {"request": request, "engine_settings": constant_gamma_settings},
+            {**key_request, "engine_settings": constant_gamma_settings},
         )
     finally:
         close_battery_engine_handle(openimcc_backend)
