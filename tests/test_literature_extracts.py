@@ -5100,6 +5100,11 @@ _SOURCE_BLIND_PINS_CEILING = 0
 # Scored observation ids that name more than one row. Zero on this corpus:
 # schema validation already rejects duplicates. The ceiling cannot rise.
 _AMBIGUOUS_OBSERVATION_IDS_CEILING = 0
+# Scored rows whose observation_id is not a non-empty string. Zero on this
+# corpus: schema validation already rejects them. The ceiling cannot rise.
+# Counting them here is what stops certification from omitting them when
+# schema validation is skipped.
+_MISSING_OBSERVATION_IDS_CEILING = 0
 
 
 def test_fidelity_source_warning_ratchet():
@@ -5116,6 +5121,7 @@ def test_fidelity_source_warning_ratchet():
     pilot_pins = 0
     source_blind_pins = 0
     ambiguous_ids = 0
+    missing_ids = 0
     for path in vle.discover_extracts():
         doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         if not isinstance(doc, dict):
@@ -5131,6 +5137,7 @@ def test_fidelity_source_warning_ratchet():
         unattested_samples += by_kind.get("unattested_sample", 0)
         source_blind_pins += by_kind.get("source_blind_pin", 0)
         ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
+        missing_ids += by_kind.get("missing_observation_id", 0)
         pilot = by_kind.get("auto_migrated_pilot_pin", 0)
         pilot_pins += pilot
         if pilot:
@@ -5142,6 +5149,7 @@ def test_fidelity_source_warning_ratchet():
     assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
     assert source_blind_pins <= _SOURCE_BLIND_PINS_CEILING, source_blind_pins
     assert ambiguous_ids <= _AMBIGUOUS_OBSERVATION_IDS_CEILING, ambiguous_ids
+    assert missing_ids <= _MISSING_OBSERVATION_IDS_CEILING, missing_ids
 
 
 def test_auto_migrated_pilot_pin_counts_each_sample():
@@ -7215,6 +7223,494 @@ def test_source_artifact_provenance_is_required_at_every_promoter(
     )
     assert any(warning.kind == "source_blind_pin" for warning in warnings)
     assert accepts == (role in _ARTIFACT_ROLE_PASS)
+
+
+# Stored value versus the sample spelling. ``within`` pairs satisfy
+# abs(sample-stored) <= 0.6 * max(abs(sample), abs(stored)) and fail that
+# test at 0.1. The pass/fail oracle below uses only these labels. It does
+# not call the gate's matcher or its numeric regex.
+_TOLERANCE_EXTRACT = {
+    "float": 0.48,
+    "int": 14,
+    "list": [0.48, 0.52],
+    "dict": {"alpha": 0.48, "beta": 0.52},
+    "range": [1700.0, 1800.0],
+}
+_TOLERANCE_SAMPLE = {
+    "float": 0.24,
+    "int": 10,
+    "list": [0.24, 0.31],
+    "dict": {"alpha": 0.24, "beta": 0.31},
+    "range": [1000.0, 1200.0],
+}
+_TOLERANCE_SHAPES = ("float", "int", "list", "dict", "range")
+_TOLERANCE_RELATIONS = ("equal", "within", "outside")
+_TOLERANCE_SOURCES = ("sample", "extract", "both", "neither")
+
+
+def _tolerance_cases() -> list[tuple[str, str, str, str]]:
+    cases = []
+    for shape in _TOLERANCE_SHAPES:
+        addressings = ("path",) if shape == "range" else ("path", "structured")
+        for addressing in addressings:
+            for relation in _TOLERANCE_RELATIONS:
+                for source in _TOLERANCE_SOURCES:
+                    cases.append((shape, addressing, relation, source))
+    return cases
+
+
+def _tolerance_pair(shape: str, relation: str) -> tuple[object, object]:
+    extract = copy.deepcopy(_TOLERANCE_EXTRACT[shape])
+    if relation == "equal":
+        return copy.deepcopy(extract), extract
+    return copy.deepcopy(_TOLERANCE_SAMPLE[shape]), extract
+
+
+def _literal_number_tokens(value: object) -> list[str]:
+    """Spellings this fixture writes. Not the gate's token grammar."""
+    if isinstance(value, bool) or value is None:
+        raise AssertionError(value)
+    if isinstance(value, (int, float)):
+        return [str(value)]
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        tokens: list[str] = []
+        for child in value.values():
+            tokens.extend(_literal_number_tokens(child))
+        return tokens
+    if isinstance(value, list):
+        tokens = []
+        for child in value:
+            tokens.extend(_literal_number_tokens(child))
+        return tokens
+    raise AssertionError(type(value))
+
+
+def _resolved_tokens_are_cited(relation: str, source: str) -> bool:
+    """True when the fixture's cited text contains the stored number."""
+    if relation == "equal":
+        return source != "neither"
+    return source in {"extract", "both"}
+
+
+def _sample_tokens_are_cited(relation: str, source: str) -> bool:
+    """True when the fixture's cited text contains the sample number."""
+    if relation == "equal":
+        return source != "neither"
+    return source in {"sample", "both"}
+
+
+def _tolerance_match_holds(relation: str) -> bool:
+    return relation != "outside"
+
+
+def _tolerance_certifies(relation: str, source: str) -> bool:
+    """Independent of the gate.
+
+    Certification passes only when the sample matches the stored leaf
+    (exactly, or within the declared tolerance) and the cited text contains
+    both the sample spelling and the stored number. A within-tolerance
+    sample whose text cites only the sample number does not pass.
+    """
+    return (
+        _tolerance_match_holds(relation)
+        and _resolved_tokens_are_cited(relation, source)
+        and _sample_tokens_are_cited(relation, source)
+    )
+
+
+def _tolerance_source_text(shape: str, relation: str, source: str) -> str:
+    sample, extract = _tolerance_pair(shape, relation)
+    sample_line = "sample " + " ".join(_literal_number_tokens(sample))
+    extract_line = "stored " + " ".join(_literal_number_tokens(extract))
+    if shape == "range":
+        # The values pin is a separate leaf and is always cited.
+        prefix = "alpha 0.24\n"
+    else:
+        prefix = ""
+    if source == "sample":
+        body = sample_line
+    elif source == "extract":
+        body = extract_line
+    elif source == "both":
+        body = sample_line + "\n" + extract_line
+    elif source == "neither":
+        body = "no measured numbers"
+    else:
+        raise AssertionError(source)
+    return prefix + body + "\n"
+
+
+def _attested_sample(value: object, *, rel_tol: float | None, path: str, structured: dict | None) -> dict:
+    sample: dict = {
+        "value": copy.deepcopy(value),
+        "reviewed_by": "independent reviewer",
+        "reviewed_on": "2026-11-10",
+        "locator": {"source_path": "text/paper.txt", "page": 1},
+    }
+    if rel_tol is not None:
+        sample["rel_tol"] = rel_tol
+    if structured is None:
+        sample["path"] = path
+        return sample
+    sample.update(structured)
+    return sample
+
+
+def _tolerance_document(root: Path, shape: str, addressing: str, relation: str, source: str) -> dict:
+    """One attested pin. The cited text is the fixture literal, not a gate spelling."""
+    sample_value, extract_value = _tolerance_pair(shape, relation)
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text(
+        _tolerance_source_text(shape, relation, source),
+        encoding="utf-8",
+    )
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    row = doc["species"]["Fe"]["observations"][0]
+    rel_tol = {"within": 0.6, "outside": 0.1, "equal": None}[relation]
+    if shape == "range":
+        row["values"] = {"alpha": 0.24}
+        row["T_range_K"] = copy.deepcopy(extract_value)
+        values_pin = _attested_sample(
+            0.24,
+            rel_tol=None,
+            path="species.Fe.observations[fe_alpha_1].values.alpha",
+            structured=None,
+        )
+        range_pin = _attested_sample(
+            sample_value,
+            rel_tol=rel_tol,
+            path="species.Fe.observations[fe_alpha_1].T_range_K",
+            structured=None,
+        )
+        doc["fidelity_samples"] = [values_pin, range_pin]
+        return doc
+    if shape == "list":
+        row["values"] = copy.deepcopy(extract_value)
+        path = "species.Fe.observations[fe_alpha_1].values"
+        structured = {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+        }
+    elif shape == "dict":
+        row["values"] = copy.deepcopy(extract_value)
+        path = "species.Fe.observations[fe_alpha_1].values"
+        structured = {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+        }
+    else:
+        row["values"] = {"alpha": copy.deepcopy(extract_value)}
+        path = "species.Fe.observations[fe_alpha_1].values.alpha"
+        structured = {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+            "field": "alpha",
+        }
+    doc["fidelity_samples"] = [
+        _attested_sample(
+            sample_value,
+            rel_tol=rel_tol,
+            path=path,
+            structured=structured if addressing == "structured" else None,
+        )
+    ]
+    return doc
+
+
+def test_tolerance_pairs_sit_on_the_declared_side_of_rel_tol():
+    """The matrix labels are the language tolerance, not the gate's matcher."""
+    for shape in _TOLERANCE_SHAPES:
+        sample, extract = _tolerance_pair(shape, "within")
+        assert _fixture_isclose(sample, extract, 0.6), shape
+        assert not _fixture_isclose(sample, extract, 0.1), shape
+
+
+def _fixture_isclose(sample: object, extract: object, rel_tol: float) -> bool:
+    if isinstance(sample, bool) or isinstance(extract, bool):
+        return False
+    if isinstance(sample, (int, float)) and isinstance(extract, (int, float)):
+        return math.isclose(float(sample), float(extract), rel_tol=rel_tol, abs_tol=0.0)
+    if isinstance(sample, dict) and isinstance(extract, dict):
+        if set(sample) != set(extract):
+            return False
+        return all(
+            _fixture_isclose(sample[key], extract[key], rel_tol) for key in sample
+        )
+    if isinstance(sample, list) and isinstance(extract, list):
+        if len(sample) != len(extract):
+            return False
+        return all(
+            _fixture_isclose(left, right, rel_tol)
+            for left, right in zip(sample, extract)
+        )
+    return False
+
+
+@pytest.mark.parametrize(
+    ("shape", "addressing", "relation", "source"),
+    _tolerance_cases(),
+    ids=lambda item: item if isinstance(item, str) else str(item),
+)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_resolved_extract_value_is_what_certification_searches(
+    shape: str,
+    addressing: str,
+    relation: str,
+    source: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: the stored leaf is in the opened source, or certification refuses.
+
+    ``float`` / ``within`` / ``sample`` is the bypass: stored 0.48, sample
+    0.24, rel_tol 0.6, and cited text that contains only 0.24. Coverage used
+    to clear on the tolerance and the source check searched the sample
+    spelling. Every stored shape and every promoter goes through
+    ``certify_extract_source_fidelity``.
+    """
+    doc = _tolerance_document(tmp_path, shape, addressing, relation, source)
+    cited = (tmp_path / "text" / "paper.txt").read_text(encoding="utf-8")
+    _sample, extract = _tolerance_pair(shape, relation)
+    if relation != "equal" and source == "sample":
+        for token in _literal_number_tokens(extract):
+            assert token not in cited, (shape, token, cited)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    expects = _tolerance_certifies(relation, source)
+    if expects:
+        assert errors == [], (shape, addressing, relation, source, entry, errors)
+        return
+    assert errors, (shape, addressing, relation, source, entry)
+    if entry != "certify":
+        return
+    joined = "\n".join(errors)
+    if not _resolved_tokens_are_cited(relation, source) or not _sample_tokens_are_cited(
+        relation, source
+    ):
+        assert "source_blind_pin" in joined, (shape, addressing, relation, source, errors)
+    if relation == "outside":
+        assert "fidelity sample value mismatch" in joined
+    if relation == "within" and source == "sample":
+        for token in _literal_number_tokens(extract):
+            assert token in joined, (shape, addressing, token, errors)
+    if shape == "float" and relation == "within" and source == "sample":
+        draft = copy.deepcopy(doc)
+        draft["review_status"] = "draft"
+        draft_errors = vle.validate_extract_document(
+            draft,
+            expected_source_id="fixture-source",
+            artifact_root=tmp_path,
+        )
+        assert draft_errors == [], draft_errors
+        warnings = vle.fidelity_source_warnings(
+            draft, label="draft", artifact_root=tmp_path
+        )
+        assert any(warning.kind == "source_blind_pin" for warning in warnings)
+
+
+# Scored rows that schema validation rejects and certification used to omit.
+# ``absent`` deletes the key. The other values are not non-empty strings.
+_UNUSABLE_OBSERVATION_IDS = (
+    "absent",
+    "none",
+    "empty",
+    "zero",
+    "one",
+    "float",
+    "false",
+    "true",
+    "list",
+    "mapping",
+    "row_number",
+    "row_text",
+)
+_IDLESS_PAYLOADS = ("numeric", "label", "range")
+
+
+def _unusable_id_value(case: str) -> object:
+    if case == "absent":
+        return None
+    if case == "none":
+        return None
+    if case == "empty":
+        return ""
+    if case == "zero":
+        return 0
+    if case == "one":
+        return 1
+    if case == "float":
+        return 0.24
+    if case == "false":
+        return False
+    if case == "true":
+        return True
+    if case == "list":
+        return []
+    if case == "mapping":
+        return {}
+    raise AssertionError(case)
+
+
+def _idless_cases() -> list[tuple[str, str]]:
+    cases = [
+        (case, payload)
+        for case in _UNUSABLE_OBSERVATION_IDS
+        if case not in {"row_number", "row_text"}
+        for payload in _IDLESS_PAYLOADS
+    ]
+    cases.append(("row_number", "numeric"))
+    cases.append(("row_text", "numeric"))
+    return cases
+
+
+def _idless_document(case: str, payload: str) -> dict:
+    """A reviewed-shaped extract with no fidelity samples and one bad scored row."""
+    doc = _minimal_extract()
+    doc["fidelity_samples"] = []
+    if case == "row_number":
+        doc["species"]["Fe"]["observations"] = [0.48]
+        return doc
+    if case == "row_text":
+        doc["species"]["Fe"]["observations"] = ["0.48"]
+        return doc
+    row: dict = {
+        "type": "alpha",
+        "locator": {"table": "1", "page": 2},
+        "units": "dimensionless",
+        "values": {"alpha": 0.48},
+    }
+    if payload == "label":
+        row["values"] = {"quantity": "alpha"}
+    elif payload == "range":
+        row["values"] = {"quantity": "alpha"}
+        row["T_range_K"] = [1700.0, 1800.0]
+    if case != "absent":
+        row["observation_id"] = _unusable_id_value(case)
+    doc["species"]["Fe"]["observations"] = [row]
+    return doc
+
+
+@pytest.mark.parametrize(
+    ("case", "payload"),
+    _idless_cases(),
+    ids=[f"{case}-{payload}" for case, payload in _idless_cases()],
+)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_scored_row_without_usable_id_refuses_every_promoter(
+    case: str,
+    payload: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: a scored row with no usable id is a refusal, not a skip.
+
+    No fidelity samples, so nothing opens a source. Numeric, label, and
+    temperature-range payloads used to produce neither a coverage warning
+    nor a certification refusal. ``load_extracts(require_valid=False)`` and
+    the index builder are in the promoter list.
+    """
+    doc = _idless_document(case, payload)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    joined = "\n".join(errors)
+    assert "missing_observation_id" in joined, (case, payload, entry, errors)
+    if entry == "certify":
+        warnings = vle.fidelity_source_warnings(doc, label="idless")
+        found = next(
+            warning for warning in warnings if warning.kind == "missing_observation_id"
+        )
+        assert found.count == 1
+        assert "species.Fe.observations[0]" in found.detail
+        assert not any(warning.kind == "uncovered_observation" for warning in warnings)
+        draft = copy.deepcopy(doc)
+        draft["review_status"] = "draft"
+        draft_warnings: list = []
+        draft_errors = vle.validate_extract_document(
+            draft,
+            expected_source_id="fixture-source",
+            fidelity_warnings=draft_warnings,
+        )
+        assert draft_errors, (case, payload)
+        assert any(warning.kind == "missing_observation_id" for warning in draft_warnings)
+        assert any("observation_id" in error or "observation must be a mapping" in error for error in draft_errors)
+
+
+def test_two_idless_rows_are_two_refusals():
+    """Each omitted row is its own count. They do not collapse into one."""
+    doc = _idless_document("absent", "numeric")
+    second = copy.deepcopy(doc["species"]["Fe"]["observations"][0])
+    second["values"] = {"alpha": 0.91}
+    doc["species"]["Fe"]["observations"].append(second)
+    warnings = vle.fidelity_source_warnings(doc, label="two-idless")
+    found = next(warning for warning in warnings if warning.kind == "missing_observation_id")
+    assert found.count == 2
+    refusals = vle.certify_extract_source_fidelity(doc, label="two-idless")
+    assert any("missing_observation_id count=2" in line for line in refusals)
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_certified_sibling_does_not_hide_an_idless_row(
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """A certified Fe row does not cover an id-less Mg row in the same extract."""
+    doc = _literal_source_document(tmp_path, 0.91, "alpha 0.91 measured\n")
+    doc["species"]["Mg"] = {
+        "observations": [
+            {
+                "type": "alpha",
+                "locator": {"table": "2", "page": 3},
+                "units": "dimensionless",
+                "values": {"alpha": 0.48},
+                "T_range_K": [1700.0, 1800.0],
+            }
+        ]
+    }
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    joined = "\n".join(errors)
+    assert "missing_observation_id" in joined, (entry, errors)
+    if entry == "certify":
+        warnings = vle.fidelity_source_warnings(
+            doc, label="sibling", artifact_root=tmp_path
+        )
+        found = next(
+            warning for warning in warnings if warning.kind == "missing_observation_id"
+        )
+        assert found.count == 1
+        assert "species.Mg.observations[0]" in found.detail
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_context_row_without_id_is_outside_scored_coverage(
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Context is unscored. A missing id there is not ``missing_observation_id``."""
+    doc = _literal_source_document(tmp_path, 0.91, "alpha 0.91 measured\n")
+    doc["species"]["Fe"]["context"] = [
+        {
+            "type": "apparatus",
+            "locator": {"page": 4, "section": "setup"},
+            "units": "as printed",
+            "values": {"furnace": "muffle", "setpoint": 1800},
+        }
+    ]
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    joined = "\n".join(errors)
+    assert "missing_observation_id" not in joined, (entry, errors)
+    if entry == "certify":
+        assert errors == [], errors
+    if entry == "validate":
+        assert any("observation_id is required" in error for error in errors)
 
 
 def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(tmp_path):

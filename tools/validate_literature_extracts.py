@@ -22,16 +22,21 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
 * source fidelity is a typed, counted warning at this chokepoint
   (``uncovered_observation`` / ``unattested_sample`` /
   ``auto_migrated_pilot_pin`` / ``source_blind_pin`` /
-  ``ambiguous_observation_id``). A draft corpus is not rejected for those
-  warnings. Promoting the extract (``review_status: reviewed``, graduation,
-  load, emit, or the index) refuses while any remain. Certification opens
-  a source artifact (paper, OCR, or quotes — not the extract and not
-  program source) and requires each pinned number as a complete token:
-  sign and exponent belong to the token, so 0.24 is not -0.24 or 0.24e-5,
-  and 1.0 is not 1. Unicode numeric signs are folded onto that grammar
-  before the match, so a Unicode minus is a minus and −0.24 is not 0.24.
-  An observation id that names more than one scored row is not collapsed
-  into one coverage entry; certification refuses it.
+  ``ambiguous_observation_id`` / ``missing_observation_id``). A draft
+  corpus is not rejected for those warnings. Promoting the extract
+  (``review_status: reviewed``, graduation, load, emit, or the index)
+  refuses while any remain. Certification opens a source artifact
+  (paper, OCR, or quotes — not the extract and not program source) and
+  requires each resolved extract number as a complete token: sign and
+  exponent belong to the token, so 0.24 is not -0.24 or 0.24e-5, and
+  1.0 is not 1. A sample value within ``rel_tol`` of a different stored
+  number does not certify that stored number; the opened source must
+  contain the resolved leaf. Unicode numeric signs are folded onto that
+  grammar before the match, so a Unicode minus is a minus and −0.24 is
+  not 0.24. An observation id that names more than one scored row is not
+  collapsed into one coverage entry; certification refuses it. A scored
+  row whose ``observation_id`` is not a non-empty string is not omitted
+  from that decision; certification refuses it.
   A recorded locator that is not opened is source-blind. An equipment
   pin does not cover a measured payload. Coverage holds only when every
   measured leaf of the observation's evidence has a matching pin of that
@@ -1286,6 +1291,19 @@ def check_all_fidelity_samples_match(
     return errors
 
 
+def _usable_observation_id(observation: Mapping[str, Any]) -> str | None:
+    """The id coverage can name, or None when the row cannot be addressed.
+
+    Same rule as schema validation: a non-empty string. A missing key,
+    a blank string, or a non-string is not an id. Callers refuse those
+    scored rows. They do not drop them from certification.
+    """
+    observation_id = observation.get("observation_id")
+    if isinstance(observation_id, str) and observation_id:
+        return observation_id
+    return None
+
+
 def _fidelity_sample_observation_key(
     doc: Mapping[str, Any], sample: Mapping[str, Any]
 ) -> tuple[str, str] | None:
@@ -1315,14 +1333,12 @@ def _fidelity_sample_observation_key(
             observation = resolve_field_path(doc, ".".join(parts[:3]))
         except KeyError:
             return None
-        observation_id = (
-            observation.get("observation_id")
-            if isinstance(observation, Mapping)
-            else None
-        )
-        if isinstance(observation_id, str) and observation_id:
-            return species_id, observation_id
-        return None
+        if not isinstance(observation, Mapping):
+            return None
+        observation_id = _usable_observation_id(observation)
+        if observation_id is None:
+            return None
+        return species_id, observation_id
 
     if not structured_keys or not isinstance(sample.get("species"), str):
         return None
@@ -1347,10 +1363,10 @@ def _fidelity_sample_observation_key(
         observation is row for row in observations
     ):
         return None
-    observation_id = observation.get("observation_id")
-    if isinstance(observation_id, str) and observation_id:
-        return species_id, observation_id
-    return None
+    observation_id = _usable_observation_id(observation)
+    if observation_id is None:
+        return None
+    return species_id, observation_id
 
 
 # Auto-migrated pilot pins copied the first stored payload. They are not a
@@ -1364,6 +1380,7 @@ _FIDELITY_WARNING_KINDS = (
     "auto_migrated_pilot_pin",
     "source_blind_pin",
     "ambiguous_observation_id",
+    "missing_observation_id",
 )
 _ARTIFACT_PATH_KEYS = ("source_path", "quotes_path")
 _FIDELITY_DETAIL_CAP = 3
@@ -1422,8 +1439,9 @@ def _scored_observations(
 ) -> tuple[
     dict[tuple[str, str], Mapping[str, Any]],
     list[tuple[str, str, int]],
+    list[tuple[str, int]],
 ]:
-    """Unique scored rows, and ids that name more than one scored row.
+    """Unique scored rows, ambiguous ids, and rows with no usable id.
 
     Context rows are unscored (d-032) and are not part of this coverage set.
     Coverage keys are ``(species_id, observation_id)``. A second row with the
@@ -1432,8 +1450,15 @@ def _scored_observations(
     that names more than one row is omitted from the unique map and returned
     as ``(species_id, observation_id, row_count)``. Certification refuses
     those ids. They are not a covered observation.
+
+    A scored row whose ``observation_id`` is not a non-empty string used to
+    disappear from the required set, so a reviewed document with no samples
+    certified without opening a source. Those rows are returned as
+    ``(species_id, row_index)``. A non-mapping entry in ``observations``
+    has no id and is returned the same way. Certification refuses them.
     """
     grouped: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
+    missing: list[tuple[str, int]] = []
     species_map = doc.get("species") or {}
     if isinstance(species_map, Mapping):
         for species_id, block in species_map.items():
@@ -1442,14 +1467,17 @@ def _scored_observations(
             )
             if not isinstance(observations, list):
                 continue
-            for observation in observations:
+            for row_index, observation in enumerate(observations):
                 if not isinstance(observation, Mapping):
+                    missing.append((str(species_id), row_index))
                     continue
-                observation_id = observation.get("observation_id")
-                if isinstance(observation_id, str) and observation_id:
-                    grouped.setdefault(
-                        (str(species_id), observation_id), []
-                    ).append(observation)
+                observation_id = _usable_observation_id(observation)
+                if observation_id is None:
+                    missing.append((str(species_id), row_index))
+                    continue
+                grouped.setdefault(
+                    (str(species_id), observation_id), []
+                ).append(observation)
     unique: dict[tuple[str, str], Mapping[str, Any]] = {}
     ambiguous: list[tuple[str, str, int]] = []
     for key in sorted(grouped):
@@ -1458,7 +1486,7 @@ def _scored_observations(
             unique[key] = rows[0]
         else:
             ambiguous.append((key[0], key[1], len(rows)))
-    return unique, ambiguous
+    return unique, ambiguous, missing
 
 
 def _scored_measured_leaves(observation: Mapping[str, Any]) -> list[tuple[Any, ...]]:
@@ -2001,12 +2029,44 @@ def _leaf_in_text(leaf: Any, text: str) -> bool:
     return False
 
 
+def _certification_scalar_leaves(
+    sample: Mapping[str, Any],
+    doc: Mapping[str, Any] | None,
+) -> tuple[list[Any], str | None]:
+    """Scalar leaves the opened source must contain.
+
+    The sample spelling and the resolved extract value are both required.
+    ``rel_tol`` can make those numbers differ. Dropping the resolved leaf
+    would certify a stored number the source was never searched for.
+    """
+    try:
+        expected = _sample_expected_value(sample)
+    except KeyError as exc:
+        return [], f"locator was not opened: {exc}"
+    leaves = _scalar_leaves(expected)
+    if doc is not None:
+        try:
+            resolved = resolve_fidelity_sample(doc, sample)
+        except KeyError:
+            resolved = None
+        if resolved is not None:
+            leaves.extend(_scalar_leaves(resolved))
+    if not leaves:
+        return [], "locator was not opened: pinned value has no scalar leaf to find"
+    return leaves, None
+
+
 def _locator_source_blind_reason(
     sample: Mapping[str, Any],
     *,
     artifact_root: Path,
+    doc: Mapping[str, Any] | None = None,
 ) -> str | None:
-    """None only when the locator was opened and the pinned leaves are in it."""
+    """None only when the locator was opened and the certified leaves are in it.
+
+    Certified leaves are the sample value and the resolved extract value.
+    A tolerant sample match does not stand in for the stored number.
+    """
     keys = [key for key in ("locator", "source_locator") if key in sample]
     if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
         return "locator was not opened: attestation locator is missing"
@@ -2028,13 +2088,9 @@ def _locator_source_blind_reason(
             "locator was not opened: no source_path, quotes_path, or file record "
             "points at a text artifact"
         )
-    try:
-        expected = _sample_expected_value(sample)
-    except KeyError as exc:
-        return f"locator was not opened: {exc}"
-    leaves = _scalar_leaves(expected)
-    if not leaves:
-        return "locator was not opened: pinned value has no scalar leaf to find"
+    leaves, leaf_error = _certification_scalar_leaves(sample, doc)
+    if leaf_error:
+        return leaf_error
     reasons: list[str] = []
     for path in candidates:
         provenance = _source_artifact_refusal(artifact_root, path)
@@ -2060,8 +2116,8 @@ def _locator_source_blind_reason(
             return None
         rendered = ", ".join(repr(leaf) for leaf in missing[:3])
         reasons.append(
-            f"opened {path.name} but the pinned value is not in the cited text "
-            f"({rendered})"
+            f"opened {path.name} but the resolved extract value is not in the "
+            f"cited text ({rendered})"
         )
     return "locator source-blind: " + "; ".join(reasons)
 
@@ -2074,10 +2130,14 @@ def fidelity_source_warnings(
 ) -> list[FidelityWarning]:
     """Count source-fidelity holes. Empty means the certification invariant holds.
 
-    Invariant: a scored value is certified only when its observation id
-    names exactly one scored row and the opened source contains that value
-    as a complete token of the same sign. A Unicode minus is a minus.
-    Duplicate observation ids are a typed refusal, never one coverage entry.
+    Invariant: a scored measured leaf is certified only when its observation
+    id is one non-empty string naming exactly one scored row, and the opened
+    source contains that resolved extract leaf as a complete token of the
+    same sign. The sample's own spelling is not a substitute: a ``rel_tol``
+    match of a different number does not certify the stored leaf. A scored
+    row with no usable observation id is a typed refusal, never omitted.
+    A Unicode minus is a minus. Duplicate observation ids are a typed
+    refusal, never one coverage entry.
 
     Every measured leaf of a scored observation's evidence is covered only
     by a matching sample that names that observation and whose address is
@@ -2103,7 +2163,10 @@ def fidelity_source_warnings(
     complete token (sign and exponent included; Unicode signs folded onto
     that token). The extract document and program source are not artifacts.
     Drift stays a match error. ``source_blind_pin`` is that unopened or
-    absent-value count. These warnings do not reject a draft corpus.
+    absent-value count, including a resolved extract leaf the cited text
+    does not contain. A scored row with no usable observation id is
+    ``missing_observation_id`` and is not dropped from this count. These
+    warnings do not reject a draft corpus.
     """
     samples = doc.get("fidelity_samples")
     if samples is None:
@@ -2111,7 +2174,7 @@ def fidelity_source_warnings(
     elif not isinstance(samples, list):
         samples = []
 
-    observation_map, ambiguous_ids = _scored_observations(doc)
+    observation_map, ambiguous_ids, missing_ids = _scored_observations(doc)
     required = set(observation_map)
     # Leaf addresses each observation still needs. This is the only coverage
     # write: a pin adds an address only when its own address is that leaf or
@@ -2166,7 +2229,9 @@ def fidelity_source_warnings(
         else:
             # Attestation-complete pins are the ones that would otherwise certify
             # without opening the source. Unattested pins stay on that count.
-            blind = _locator_source_blind_reason(sample, artifact_root=root)
+            blind = _locator_source_blind_reason(
+                sample, artifact_root=root, doc=doc
+            )
             if blind:
                 source_blind += 1
                 _note_reason(
@@ -2271,6 +2336,25 @@ def fidelity_source_warnings(
                 _finish_detail(ambiguous_reasons, ambiguous_extra[0]),
             )
         )
+    if missing_ids:
+        missing_reasons: list[str] = []
+        missing_extra = [0]
+        for species_id, row_index in missing_ids:
+            _note_reason(
+                missing_reasons,
+                missing_extra,
+                f"{label}: scored observation "
+                f"species.{species_id}.observations[{row_index}] "
+                "has no usable observation_id",
+            )
+        warnings.append(
+            FidelityWarning(
+                "missing_observation_id",
+                len(missing_ids),
+                label,
+                _finish_detail(missing_reasons, missing_extra[0]),
+            )
+        )
     return warnings
 
 
@@ -2296,15 +2380,19 @@ def certify_extract_source_fidelity(
 ) -> list[str]:
     """Refuse source certification while any fidelity hole remains.
 
-    Invariant: an empty list is the only pass. A scored value is certified
-    only when its observation id names exactly one scored row and the opened
-    source contains that value as a complete token of the same sign. Every
-    measured leaf of a scored observation's evidence (``values`` and each
-    scored numeric condition) must be covered by a matching, non-pilot,
-    attested sample whose address is that leaf or an ancestor, and whose
-    source artifact was opened and contains each pinned number as a complete
-    token. A Unicode minus is a minus. An observation id that names more
-    than one scored row refuses; the rows are not one coverage entry.
+    Invariant: an empty list is the only pass. A scored measured leaf is
+    certified only when its observation id is one non-empty string naming
+    exactly one scored row, and the opened source contains that resolved
+    extract leaf as a complete token of the same sign. The sample's own
+    spelling is not a substitute: a ``rel_tol`` match of a different number
+    does not certify the stored leaf. A scored row with no usable
+    observation id refuses; the row is not omitted. Every measured leaf of
+    a scored observation's evidence (``values`` and each scored numeric
+    condition) must be covered by a matching, non-pilot, attested sample
+    whose address is that leaf or an ancestor, and whose source artifact
+    was opened and contains each resolved number as a complete token. A
+    Unicode minus is a minus. An observation id that names more than one
+    scored row refuses; the rows are not one coverage entry.
     Repeating a pin of one address does not cover a sibling, even when the
     numbers are equal, and a ``values`` pin does not cover a sibling
     condition. A descriptive label does not stand in for a number it does
