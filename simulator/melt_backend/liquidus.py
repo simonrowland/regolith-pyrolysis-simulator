@@ -921,12 +921,15 @@ def _annotate_renormalised_threshold(
 ) -> None:
     """Attach ΔT_bound when a renormalised sample is in a threshold pair.
 
-    ΔT_bound = δ / s with s = |ΔF/ΔT| from the two bracketing samples
-    and δ the sample's own raw-sum excess. The acceptance tolerance is
-    ``_MODE_TOKEN_ABS`` (abs 1e-4), not this slope. Unit: δ is
-    dimensionless and s is 1/K, so ΔT_bound is in K. A zero slope makes
-    the shift unbounded. The largest bound is kept. The result itself
-    is not changed.
+    The 1e-3 excess cap is derived in ``magemin.py`` (premise, algebra,
+    unit check, sanity). This function evaluates that derivation's
+    temperature map for one bracket. ΔT_bound = δ / s with
+    s = |ΔF/ΔT| from the two bracketing samples and δ the sample's own
+    raw-sum excess. Unit: δ is dimensionless and s is 1/K, so
+    ΔT_bound is in K. A zero slope makes the shift unbounded. When
+    ΔT_bound is missing or greater than tolerance_C the notice sets
+    renormalisation_may_shift_bracket. The largest bound is kept. The
+    melt fraction is not changed (d-367).
     """
     if not notices:
         return
