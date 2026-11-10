@@ -1079,7 +1079,8 @@ def test_zigo_equation_and_prose_locators_bind_to_their_physical_pages():
         )
         if equation is not None:
             assert locator["equation"] == equation
-    assert "1987) 179" in page9 and "1987) 180" in page10
+    assert re.search(r"\(1987\)\s+179", page9)
+    assert re.search(r"\(1987\)\s+180", page10)
 
 
 def test_figure_caption_regex_handles_spacing_and_japanese_suffix():
