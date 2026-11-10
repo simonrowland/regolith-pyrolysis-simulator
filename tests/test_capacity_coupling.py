@@ -31,7 +31,7 @@ from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
     NA_COLLECTOR_STAGE_KEY,
 )
-from simulator.core import PyrolysisSimulator
+from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL, PyrolysisSimulator
 from simulator.evaporation import (
     EvaporationFluxRefusal,
     _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS,
@@ -1938,6 +1938,72 @@ def test_binding_cold_train_does_not_turn_redox_no_capacity_into_fo2_move(
     assert reservoir.redox_source_terms_applied is False
     assert reservoir.redox_source_skip_reason == "no_melt_redox_capacity"
     assert len(sim.atom_ledger.transitions) == before_transitions
+
+
+def test_reductive_source_beyond_ferric_capacity_is_refused_before_runaway(
+    monkeypatch,
+):
+    sim = _build_sim(
+        "s_type_asteroid_silicate",
+        _load_yaml("vapor_pressures.yaml"),
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("setpoints.yaml"),
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 0.2
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -80.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1873.15
+    sim._sync_oxygen_reservoir_mirror()
+    monkeypatch.setattr(
+        sim,
+        "_resolved_melt_redox_gate_authority",
+        lambda _gate_authority: None,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_liquid_fraction_factor",
+        lambda *_args, **_kwargs: 1.0,
+    )
+
+    source = {"redox_source:c3_na_shuttle_reduction": -1.0}
+    capacity = sim._melt_redox_source_capacity_mol_per_ln_fO2(
+        fO2_log=-80.0,
+        T_K=1873.15,
+        gate_authority=None,
+    )
+    assert capacity > OXYGEN_RESERVOIR_NOOP_MOL
+
+    reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        source,
+        exchange_direction="redox_source:c3_na_shuttle_reduction",
+        temperature_K=1873.15,
+        gate_authority=None,
+    )
+
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(-80.0)
+    assert sim.melt.melt_fO2_log == pytest.approx(-80.0)
+    assert reservoir.redox_source_terms_applied is False
+    assert reservoir.redox_source_skip_reason == "redox_capacity_saturation_refusal"
+    assert reservoir.redox_source_skipped_terms_mol_o2_equiv == pytest.approx(
+        source
+    )
+    assert reservoir.redox_source_refusal_context["candidate_fO2_log"] < -1000.0
+
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_source_capacity_mol_per_ln_fO2",
+        lambda **_kwargs: 0.0,
+    )
+    reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        source,
+        exchange_direction="redox_source:c3_na_shuttle_reduction",
+        temperature_K=1873.15,
+        gate_authority=None,
+    )
+
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(-80.0)
+    assert sim.melt.melt_fO2_log == pytest.approx(-80.0)
+    assert reservoir.redox_source_skip_reason == "no_melt_redox_capacity"
 
 
 @pytest.mark.parametrize("finite_headspace_enabled", [False, True])
