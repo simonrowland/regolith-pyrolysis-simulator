@@ -10241,14 +10241,14 @@ def test_static_lineage_resolver_reuses_store_resolution_per_run(
 
     resolver_type = getattr(score_mod, "_ScoringLineageResolver", None)
     assert resolver_type is not None
-    resolver = resolver_type(context, (engine,))
+    resolver = resolver_type(context, {engine: complete})
 
     assert resolver.for_reference(reference, engine) == expected
     calls_after_first = calls.copy()
     assert resolver.for_reference(reference, engine) == expected
     assert calls == calls_after_first
     assert calls == Counter(
-        {"coefficient": 2, "tables": 1, "assets": 1, "observation": 1}
+        {"coefficient": 1, "tables": 1, "assets": 1, "observation": 1}
     )
 
 
@@ -12610,7 +12610,7 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
     context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
     monkeypatch.setattr(
         score_mod,
-        "compile_residual",
+        "_compile_residual_with_lineage",
         lambda reference, engine, **_kwargs: (
             fixture_residuals[reference.observation_id],
             fixture_candidates.get(
@@ -12809,7 +12809,7 @@ def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
     )
     monkeypatch.setattr(
         score_mod,
-        "compile_residual",
+        "_compile_residual_with_lineage",
         lambda reference, _engine, **_kwargs: (
             fixture_residuals[reference.observation_id],
             fixture_candidates.get(
@@ -12907,7 +12907,9 @@ def test_static_quantity_refusal_skips_compile_with_identical_residual(
     def unexpected_compile(*_args, **_kwargs):
         raise AssertionError("static quantity refusal reached compile_residual")
 
-    monkeypatch.setattr(score_mod, "compile_residual", unexpected_compile)
+    monkeypatch.setattr(
+        score_mod, "_compile_residual_with_lineage", unexpected_compile
+    )
     residuals, candidates = score_store(
         context,
         engines=(Engine.ALPHAMELTS,),
@@ -12947,7 +12949,7 @@ def test_streamed_unrailed_measured_tier_matches_legacy_zero_grid(
     )
     monkeypatch.setattr(
         score_mod,
-        "compile_residual",
+        "_compile_residual_with_lineage",
         lambda reference, engine, **_kwargs: (
             fixture_residuals[reference.observation_id],
             None,
@@ -12996,7 +12998,7 @@ def test_streamed_measured_grid_omits_selected_engine_without_rail_rows(
     context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
     monkeypatch.setattr(
         score_mod,
-        "compile_residual",
+        "_compile_residual_with_lineage",
         lambda reference, _engine, **_kwargs: (
             fixture_residuals[reference.observation_id],
             fixture_candidates.get(
@@ -13077,7 +13079,9 @@ def test_streaming_interruption_preserves_previous_complete_file(
         emitted.append(residual.key)
         return residual, None
 
-    monkeypatch.setattr(score_mod, "compile_residual", interrupt_after_two)
+    monkeypatch.setattr(
+        score_mod, "_compile_residual_with_lineage", interrupt_after_two
+    )
     target = tmp_path / "residuals.jsonl"
     previous = b"previous complete result\n"
     target.write_bytes(previous)
@@ -13170,7 +13174,7 @@ def test_battery_failed_rerun_preserves_published_output_set(
             None,
         )
 
-    monkeypatch.setattr(score_mod, "compile_residual", compile_stub)
+    monkeypatch.setattr(score_mod, "_compile_residual_with_lineage", compile_stub)
     if failure_stage == "summary":
         original_write_summary = battery_score._write_headline_summary_from_accumulator_json
 
