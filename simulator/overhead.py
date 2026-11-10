@@ -782,32 +782,6 @@ def _solve_same_hour_headspace_closure(
         for left, right in zip(samples, samples[1:]):
             left_g, left_evaluation, left_has_flow = left
             right_g, right_evaluation, right_has_flow = right
-            # A coarse g step can jump across a valid finite-outlet root
-            # into the depletion/admission cutoff. G then becomes zero only
-            # because the callback discarded its tiny tail, not because the
-            # physical source vanished. Refine that boundary until a flowing
-            # negative residual brackets the root, or the existing relative
-            # resolution/evaluation budget is exhausted. Never bracket on the
-            # zero-flow discontinuity itself.
-            while (
-                left_has_flow and not right_has_flow
-                and left_evaluation[2] > 0.0
-                and right_g - left_g > relative_tolerance
-                * max(abs(left_g), abs(right_g), 1.0e-300)
-            ):
-                middle_g = left_g + (right_g - left_g) / 2.0
-                middle_evaluation = evaluate(middle_g)
-                last_evaluation = middle_evaluation
-                sampled_g_points.append(middle_g)
-                if molar_flow(middle_evaluation) > 0.0:
-                    if middle_evaluation[2] <= 0.0:
-                        right_g, right_evaluation, right_has_flow = (
-                            middle_g, middle_evaluation, True
-                        )
-                    else:
-                        left_g, left_evaluation = middle_g, middle_evaluation
-                else:
-                    right_g, right_evaluation = middle_g, middle_evaluation
             if not left_has_flow or not right_has_flow:
                 continue
             left_residual = left_evaluation[2]
@@ -901,7 +875,7 @@ def _solve_same_hour_headspace_closure(
                 converged=abs(selected_evaluation[2])
                 <= relative_tolerance * max(abs(selected_g), 1.0e-300),
                 status='roots_found_by_sampling',
-                scan_evaluations=len(sampled_g_points),
+                scan_evaluations=len(ordered_g),
                 roots_g=tuple(root_g for root_g, _ in roots),
                 sampling_evidence=sampling_evidence,
             )
@@ -910,7 +884,7 @@ def _solve_same_hour_headspace_closure(
             {},
             converged=False,
             status='no_root_found_by_sampling',
-            scan_evaluations=len(sampled_g_points),
+            scan_evaluations=len(ordered_g),
             roots_g=tuple(sampled_root_g_values),
             sampling_evidence=sampling_evidence,
         )

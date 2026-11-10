@@ -4705,12 +4705,18 @@ class EvaporationMixin:
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
         parent_groups: dict[str, list[dict]] = defaultdict(list)
 
+        # Closure probes this law down to its positive small-flow limit.
+        # For parent demand q [kg/h] and inventory m [kg], the admitted draw
+        # is m*(-expm1(-q*dt/m)) [kg]; its species shares / dt [h] tend to
+        # the raw rates as q*dt/m -> 0. An absolute rate/mass cutoff breaks
+        # that continuity and can erase a finite-outlet root. Keep positive
+        # computed tails; they are not evidence of resolved product capture.
         for species in sorted(raw_rates_kg_hr):
             raw_rate_kg_hr = (
                 float(raw_rates_kg_hr.get(species, 0.0))
                 * phase_scalar
             )
-            if raw_rate_kg_hr <= 1e-12:
+            if raw_rate_kg_hr <= 0.0:
                 continue
             sp_data = metals_data.get(species, {})
             if not sp_data:
@@ -4719,7 +4725,7 @@ class EvaporationMixin:
             parent_oxide = stoich['parent_oxide']
             oxide_per_product_kg = float(stoich['oxide_per_product_kg'])
             parent_draw_kg_hr = raw_rate_kg_hr * oxide_per_product_kg
-            if parent_draw_kg_hr <= 1e-12:
+            if parent_draw_kg_hr <= 0.0:
                 continue
             parent_groups[parent_oxide].append({
                 'species': species,
@@ -4736,7 +4742,7 @@ class EvaporationMixin:
             available_parent_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
             total_parent_draw_kg_hr = sum(
                 entry['parent_draw_kg_hr'] for entry in entries)
-            if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= 1e-12:
+            if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= 0.0:
                 continue
             k_hr = total_parent_draw_kg_hr / available_parent_kg
             depletion_fraction = -math.expm1(-k_hr * dt_hr)
@@ -4750,7 +4756,7 @@ class EvaporationMixin:
                     * share
                     / float(entry['stoich']['oxide_per_product_kg'])
                 )
-                if product_kg > 1e-12:
+                if product_kg > 0.0:
                     effective_rates[entry['species']] = product_kg / dt_hr
 
         o2_draws: list[tuple[str, float]] = []

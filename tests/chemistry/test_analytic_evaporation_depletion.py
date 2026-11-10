@@ -295,3 +295,18 @@ def test_representative_c2a_parent_pool_depletes_as_tail_not_dump(
     assert effective_rates[0] > effective_rates[1] > 1e-12
     assert effective_rates[0] / effective_rates[1] < 10.0
     assert max(mass_balance) <= 5e-12
+
+
+@pytest.mark.parametrize("raw_rate", [1.0e-10, 1.0e-14, 1.0e-18])
+def test_depletion_retains_continuous_small_flow_limit(
+    vapor_pressure_data, feedstocks_data, setpoints_data, raw_rate
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    rates = sim._analytic_evaporation_depletion_rates(
+        {"Na": raw_rate}, dt_hr=1.0, phase_scalar=1.0,
+        cleaned_melt_kg=sim.atom_ledger.kg_by_account("process.cleaned_melt"),
+        available_o2_kg=0.0,
+    )
+    # The analytical small-exposure limit is rate_out/rate_in -> 1.
+    # This checks continuity of the depletion law, not resolved capture mass.
+    assert rates["Na"] / raw_rate == pytest.approx(1.0, rel=1e-10)
