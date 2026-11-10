@@ -105,6 +105,56 @@ def test_every_launch_uses_headless_env_and_slot(monkeypatch, tmp_path, launch):
     assert held == []
 
 
+def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
+    monkeypatch, tmp_path,
+):
+    import simulator.engine_local_config as local_config
+
+    monkeypatch.setattr(local_config, 'cache_version_for', lambda _: None)
+    monkeypatch.setattr(local_config, 'warn_legacy_once', lambda *_args: None)
+    run_calls = []
+    slot_calls = []
+
+    @contextmanager
+    def slot(timeout_s):
+        slot_calls.append(timeout_s)
+        yield
+
+    def run(args, **kwargs):
+        run_calls.append((args, kwargs))
+        return subprocess.CompletedProcess(
+            args, 0, stdout='MAGEMin 1.9.6\n', stderr=''
+        )
+
+    monkeypatch.setattr(magemin, '_magemin_subprocess_slot', slot)
+    monkeypatch.setattr(magemin.subprocess, 'run', run)
+    binary = tmp_path / 'MAGEMin'
+    first = MAGEMinBackend()
+    first._binary_path = binary
+    second = MAGEMinBackend()
+    second._binary_path = binary
+
+    assert first.get_engine_version() == 'MAGEMin 1.9.6'
+    assert second.get_engine_version() == 'MAGEMin 1.9.6'
+    assert len(run_calls) == 1
+    assert slot_calls == [5]
+
+    @contextmanager
+    def timed_out_slot(_timeout_s):
+        raise magemin._MAGEMinEngineLifecycleError(
+            'MAGEMinSubprocessSlotTimeout', 'slot timed out'
+        )
+        yield
+
+    monkeypatch.setattr(magemin, '_magemin_subprocess_slot', timed_out_slot)
+    busy = MAGEMinBackend()
+    busy._binary_path = tmp_path / 'BusyMAGEMin'
+    assert busy.get_engine_version() == (
+        f'MAGEMin subprocess ({busy._binary_path.resolve()})'
+    )
+    assert len(run_calls) == 1
+
+
 @pytest.mark.parametrize('value, expected', [(None, 2), ('1', 1), ('4', 4),
                                              ('0', 2), ('bad', 2)])
 def test_host_limit_default_and_override(monkeypatch, value, expected):

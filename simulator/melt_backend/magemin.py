@@ -105,6 +105,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import warnings
 from dataclasses import dataclass
@@ -183,6 +184,8 @@ _MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
 _MAGEMIN_SUBPROCESS_LOCK = _MAGEMIN_SUBPROCESS_LOCK_DIR / (
     f'magemin-subprocess-{os.getuid()}.lock'
 )
+_MAGEMIN_ENGINE_VERSION_CACHE: Dict[str, str] = {}
+_MAGEMIN_ENGINE_VERSION_CACHE_LOCK = threading.Lock()
 
 
 def _magemin_subprocess_slot_count() -> int:
@@ -2166,28 +2169,40 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if binary_path is None:
             return 'unavailable'
         resolved_binary_path = binary_path.resolve()
-        try:
-            with _magemin_subprocess_slot(5), tempfile.TemporaryDirectory() as tmpdir:
-                result = subprocess.run(
-                    [
-                        str(resolved_binary_path),
-                        '--version',
-                        '--db',
-                        self._database,
-                    ],
-                    cwd=tmpdir,
-                    capture_output=True,
-                    text=True,
-                    timeout=5,
-                    env=_magemin_subprocess_env(),
-                )
-            lines = (result.stdout or result.stderr).strip().splitlines()
-            if result.returncode == 0 and lines:
-                legacy = lines[0].strip()
-            else:
-                legacy = f'MAGEMin subprocess ({resolved_binary_path})'
-        except (OSError, subprocess.TimeoutExpired):
-            legacy = f'MAGEMin subprocess ({resolved_binary_path})'
+        version_key = str(resolved_binary_path)
+        with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
+            legacy = _MAGEMIN_ENGINE_VERSION_CACHE.get(version_key)
+            if legacy is None:
+                try:
+                    with (
+                        _magemin_subprocess_slot(5),
+                        tempfile.TemporaryDirectory() as tmpdir,
+                    ):
+                        result = subprocess.run(
+                            [
+                                str(resolved_binary_path),
+                                '--version',
+                                '--db',
+                                self._database,
+                            ],
+                            cwd=tmpdir,
+                            capture_output=True,
+                            text=True,
+                            timeout=5,
+                            env=_magemin_subprocess_env(),
+                        )
+                    lines = (result.stdout or result.stderr).strip().splitlines()
+                    if result.returncode == 0 and lines:
+                        legacy = lines[0].strip()
+                        _MAGEMIN_ENGINE_VERSION_CACHE[version_key] = legacy
+                    else:
+                        legacy = f'MAGEMin subprocess ({resolved_binary_path})'
+                except (
+                    _MAGEMinEngineLifecycleError,
+                    OSError,
+                    subprocess.TimeoutExpired,
+                ):
+                    legacy = f'MAGEMin subprocess ({resolved_binary_path})'
         warn_legacy_once(
             'magemin',
             'engines.local.toml absent; using legacy MAGEMin '
