@@ -156,10 +156,9 @@ def _without_engine_versions(value):
 @pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(5400)
 def test_green_full_lunar_capture_pin(route_totals, tmp_path):
-    # full_lunar Fe capture totals are the studio-3 actuals (pins2 log, tree
-    # 9666fc129 plus the de32c69ca runner regen); Cr and SiO are the studio-3
-    # actuals at 16fcc5985, identical across two isolated runs. Lunar full runs
-    # diverge between the laptop and studio-3, so this pin is not a laptop re-run.
+    # Full-lunar route totals are the controller's rpp-ctrl actuals at
+    # 380dd203a (receipt-r6-condpins-380dd20.log; d-365 with d-144). The
+    # full run is host-specific and is not a laptop re-run.
     # The production band pin records the controller's intended area-weighted
     # cutoff: 33 equal strips span 900-1200 C, and only 17 strips at/below the
     # inclusive 1050 C SiO reactive-product cutoff capture. The other 16 pass
@@ -177,10 +176,9 @@ def test_green_full_lunar_capture_pin(route_totals, tmp_path):
 
 @pytest.mark.parametrize("staged", [False, True], ids=["lunar_24h", "c2a_staged"])
 def test_green_runner_capture_pin(staged, route_totals, tmp_path):
-    # lunar_24h and c2a_staged runner_sha256 are the studio-3 actuals (pins2
-    # log, tree 9666fc129 plus the de32c69ca runner regen). Lunar and Mars
-    # full runs diverge between the laptop and studio-3, so these digests are
-    # not a laptop re-run.
+    # lunar_24h and c2a_staged route totals and runner digests are the
+    # controller's rpp-ctrl actuals at 380dd203a
+    # (receipt-r6-condpins-380dd20.log; d-365 with d-144), not laptop re-runs.
     patch = (load_recipe_patch(Path("data/recipes/c2a_staged_temperature_ladder.yaml"))
              if staged else {})
     run = PyrolysisRun(
