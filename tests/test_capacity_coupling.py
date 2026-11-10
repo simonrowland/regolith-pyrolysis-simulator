@@ -1971,11 +1971,27 @@ def test_reductive_source_beyond_ferric_capacity_reaches_fe_metal_saturation(
         lambda *_args, **_kwargs: 1.0,
     )
 
-    source = {"redox_source:c3_na_shuttle_reduction": -1.0}
-    # A finite -1 mol O2-equivalent source and C_m = |n| / ((base - target)
-    # ln(10)) produce a -2.7e13 log10-fO2 tangent: mol divided by
-    # (mol per ln) is dimensionless, and C_m remains above the no-op floor.
-    capacity_for_runaway = 1.0 / (
+    pressure_bar = floor_vacuum_pressure_bar(
+        sim.melt.p_total_mbar / 1000.0,
+        floor_bar=sim._vacuum_floor_bar(),
+    )
+    ferric_fraction = sim._fe3_over_sigma_fe_at_fO2(
+        sim._melt_oxide_wt_pct(),
+        fO2_log=base_fO2_log,
+        T_K=1873.15,
+        pressure_bar=pressure_bar,
+    )
+    active_fe_mol = (
+        sim._cleaned_melt_fe_atom_mol()
+        * sim._melt_redox_liquid_fraction_factor(1873.15, gate_authority=None)
+    )
+    ferric_buffer_o2_mol = active_fe_mol * ferric_fraction / 4.0
+    source_demand_o2_mol = ferric_buffer_o2_mol + 1.0
+    source = {"redox_source:c3_na_shuttle_reduction": -source_demand_o2_mol}
+    # Candidate log10(fO2) = base + n_O2/(C_m ln(10)); solving for C_m
+    # gives |n_O2| / ((base - target) ln(10)). Units are mol/(mol per ln),
+    # so the tangent is dimensionless, and this finite source yields -2.7e13.
+    capacity_for_runaway = source_demand_o2_mol / (
         (base_fO2_log - -2.7e13) * math.log(10.0)
     )
     monkeypatch.setattr(
@@ -2044,7 +2060,7 @@ def test_reductive_source_beyond_ferric_capacity_reaches_fe_metal_saturation(
     )
     assert reservoir.redox_source_refusal_context[
         "unspent_reducing_equivalents_mol_o2_equiv"
-    ] > 0.0
+    ] == pytest.approx(1.0)
 
     monkeypatch.setattr(
         sim,
