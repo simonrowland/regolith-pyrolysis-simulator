@@ -25,6 +25,7 @@ from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
     PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
+    _KERNEL_SEAM_DEBIT_SPECIES,
     _evaporation_legacy_shadow_pressure_map,
     _pre_rg_effective_pressure_source,
 )
@@ -1059,18 +1060,73 @@ def test_source_guard_flags_effective_pressure_source_argument() -> None:
         )
 
 
-def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> None:
-    """Only the named seam may read compatibility values in the flux route."""
+# Invariant: the flux debit is the batch selected pressure after the single
+# kernel-seam chokepoint. That chokepoint copies a finite effective-pressure
+# value onto Na, K, Ca, Mg, Ti, and Si. Every other carrier keeps the batch
+# value. The flux context never reads the compatibility map. Catalog
+# ``answer.pressure`` stays the catalog number on both classes.
+_PINNED_KERNEL_SEAM_SPECIES = frozenset({"Na", "K", "Ca", "Mg", "Ti", "Si"})
+_TRIPWIRE_CATALOG_PA = 1.0
+_TRIPWIRE_KERNEL_PA = 999.0
+_TRIPWIRE_NON_SEAM_SPECIES = (
+    "Al",
+    "Fe",
+    "SiO",
+    "Al2",
+    "Al2O",
+    "Al2O2",
+    "Al2O3_gas",
+    "AlO",
+    "AlO2",
+    "CrO",
+    "CrO2",
+)
 
-    compatibility = CompatibilityPressureMapReadTripwire({"Na": 999.0})
-    backend_shadow = CompatibilityPressureMapReadTripwire({"Na": 777.0})
+
+def _tripwire_species_cases() -> list:
+    cases = [
+        pytest.param(species_id, True, id=f"seam-{species_id}")
+        for species_id in sorted(_PINNED_KERNEL_SEAM_SPECIES)
+    ]
+    cases.extend(
+        pytest.param(species_id, False, id=f"nonseam-{species_id}")
+        for species_id in _TRIPWIRE_NON_SEAM_SPECIES
+    )
+    return cases
+
+
+@pytest.mark.parametrize(
+    ("species_id", "on_seam"),
+    _tripwire_species_cases(),
+)
+def test_runtime_tripwire_records_zero_flux_context_compatibility_reads(
+    species_id: str,
+    on_seam: bool,
+) -> None:
+    """Kernel-seam species debit 999 Pa. Every other carrier stays at catalog 1 Pa.
+
+    The compatibility map is the effective-pressure source. Reading it under
+    the flux context is still forbidden. The seam copy happens in the named
+    effective-pressure context, then the flux consumer reads the batch.
+    """
+
+    assert _KERNEL_SEAM_DEBIT_SPECIES == _PINNED_KERNEL_SEAM_SPECIES
+    assert _PINNED_KERNEL_SEAM_SPECIES.isdisjoint(_TRIPWIRE_NON_SEAM_SPECIES)
+    assert (species_id in _KERNEL_SEAM_DEBIT_SPECIES) is on_seam
+    expected_pa = _TRIPWIRE_KERNEL_PA if on_seam else _TRIPWIRE_CATALOG_PA
+    compatibility = CompatibilityPressureMapReadTripwire(
+        {species_id: _TRIPWIRE_KERNEL_PA}
+    )
+    backend_shadow = CompatibilityPressureMapReadTripwire({species_id: 777.0})
     captured: dict[str, Any] = {}
     captured_controls: dict[str, Any] = {}
-    batch = _toy_batch({"Na"}, pressures={"Na": 1.0})
 
     def _builder(**kwargs):
         captured.update(kwargs)
-        return batch
+        return _toy_batch(
+            {species_id},
+            pressures={species_id: _TRIPWIRE_CATALOG_PA},
+        )
 
     def _dispatch(_intent, *, control_inputs, redox_state=None):
         captured_controls.update(control_inputs)
@@ -1083,7 +1139,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
     host = SimpleNamespace(
         vapor_pressures={
             "metals": {
-                "Na": {"evaporation_alpha": {"value": 1.0}},
+                species_id: {"evaporation_alpha": {"value": 1.0}},
             },
             "oxide_vapors": {},
         },
@@ -1104,9 +1160,9 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
         _melt_activity_engine_inputs=engine_inputs,
         build_vapour_batch=_builder,
         _build_evaporation_aux_maps=lambda _pressures: (
-            {"Na": 0.023},
-            {"Na": {}},
-            {"Na": 1.0},
+            {species_id: 0.023},
+            {species_id: {}},
+            {species_id: 1.0},
         ),
         _build_partial_melt_offgassing_diagnostic=(
             lambda _equilibrium, **_kwargs: {}
@@ -1129,7 +1185,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
     )
     equilibrium = SimpleNamespace(
         vapor_pressures_Pa=compatibility,
-        vapor_pressures_source={"Na": "compatibility_poison"},
+        vapor_pressures_source={species_id: "compatibility_poison"},
         activity_coefficients={},
         diagnostics={},
         liquid_fraction=1.0,
@@ -1142,6 +1198,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
             overhead_partials_override_Pa={},
         )
 
+    answer = host._last_vapour_batch.channel(species_id)
     assert flux.species_kg_hr == {}
     assert compatibility.read_count("flux") == 0
     assert backend_shadow.read_count("flux") == 0
@@ -1154,10 +1211,20 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
     assert {context for context, _operation in backend_shadow.reads} == {
         "shadow_comparison"
     }
-    assert captured_controls[CONTROL_FLUX_PRESSURES_KEY] == {"Na": 1.0}
+    assert answer.pressure.pa == _TRIPWIRE_CATALOG_PA
+    assert answer.selected_runtime_pressure.pa == expected_pa
+    assert captured_controls[CONTROL_FLUX_PRESSURES_KEY] == {
+        species_id: expected_pa
+    }
+    if on_seam:
+        assert answer.source_label == "compatibility_poison"
+        assert answer.extra.get("kernel_seam_provenance_missing") is not True
+    else:
+        assert answer.source_label == "test"
+        assert "kernel_seam_provenance_missing" not in answer.extra
     assert (
         captured["flux_activation_context"].effective_pressure_species_ids
-        == frozenset({"Na"})
+        == frozenset({species_id})
     )
     assert "selected_runtime_pressures_Pa" not in captured
     assert captured["melt_activity_shadow_enabled"] is True
