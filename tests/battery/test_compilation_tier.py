@@ -3516,7 +3516,7 @@ def test_vaporock_gas_census_score_bytes_match_compile_with_memo_modes(
                     context,
                     reference,
                     census_fixture_predict,
-                    use_default_predictor=True,
+                    memo_enabled=True,
                 )
         else:
             _assert_vaporock_census_fixture_parity(
@@ -3524,7 +3524,7 @@ def test_vaporock_gas_census_score_bytes_match_compile_with_memo_modes(
                 context,
                 reference,
                 census_fixture_predict,
-                use_default_predictor=False,
+                memo_enabled=False,
             )
 
 
@@ -3534,10 +3534,10 @@ def _assert_vaporock_census_fixture_parity(
     reference,
     fixture_predict,
     *,
-    use_default_predictor: bool,
+    memo_enabled: bool,
 ) -> None:
     for engine in score_module.SCORE_ENGINE_SET:
-        predict = None if use_default_predictor else fixture_predict
+        predict = None if memo_enabled else fixture_predict
         scored, candidates = score_module.score_store(
             context,
             engines=(engine,),
@@ -3558,7 +3558,7 @@ def _assert_vaporock_census_fixture_parity(
             scored_residual, scored_candidate
         ).encode("utf-8") == score_module.dumps_residual_line(
             compiled_residual, compiled_candidate
-        ).encode("utf-8"), f"{engine.value} memo={use_default_predictor}"
+        ).encode("utf-8"), f"{engine.value} memo={memo_enabled}"
         if engine is Engine.VAPOROCK:
             assert scored_residual.source_relation is SourceRelation.SAME_INPUT
             assert compiled_residual.source_relation is SourceRelation.SAME_INPUT

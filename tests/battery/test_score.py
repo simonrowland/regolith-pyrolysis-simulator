@@ -2740,14 +2740,9 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict(
     assert outside_band_residual.numeric.value == Decimal("-2")
     assert outside_band_residual.status is ResidualStatus.NO_BAND
 
-    memo_reference_quantities = []
     prediction_request_quantities = []
     lineage_checks = []
     relation_checks = []
-
-    def cached_lineage(_resolver, cached_reference, _engine):
-        memo_reference_quantities.append(quantity_token(cached_reference.identity))
-        return True, SourceRelation.SAME_INPUT
 
     def unsupported_rewritten_request(engine, observation, **_kwargs):
         prediction_request_quantities.append(quantity_token(observation.identity))
@@ -2774,9 +2769,6 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict(
         return SourceRelation.UNKNOWN
 
     monkeypatch.setattr(
-        score_mod._ScoringLineageResolver, "for_reference", cached_lineage
-    )
-    monkeypatch.setattr(
         score_mod, "_score_predict_with_engine", unsupported_rewritten_request
     )
     monkeypatch.setattr(score_mod, "lineage_complete_for", lineage_complete)
@@ -2787,7 +2779,6 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict(
         include_diagnostics=False,
     )
 
-    assert memo_reference_quantities == [Quantity.EVAPORATION_COEFFICIENT_ALPHA]
     assert prediction_request_quantities == [Quantity.ACTIVITY_COEFFICIENT]
     assert ("rewritten-request-source",) in lineage_checks
     assert relation_checks == [("rewritten-request-source",)]
@@ -10264,85 +10255,6 @@ def test_mapped_coefficient_sources_decide_circularity() -> None:
     assert independent is SourceRelation.INDEPENDENT
 
 
-def test_static_lineage_resolver_reuses_store_resolution_per_run(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    from simulator.battery.score import (
-        ENGINE_COEFFICIENT_SOURCES,
-        expand_coefficient_sources,
-        lineage_complete_for,
-    )
-
-    work = F.work()
-    experiment = F.tabulation_experiment()
-    reference = F.observation(
-        "lineage-cache-reference",
-        experiment.experiment_id,
-        F.o2_identity(),
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="janaf-4th",
-    )
-    context = _context(work, experiment, reference)
-    engine = Engine.VAPOROCK
-    sources = expand_coefficient_sources(ENGINE_COEFFICIENT_SOURCES[engine])
-    complete = lineage_complete_for(
-        sources,
-        works=context.works,
-        observations=context.observations,
-        experiments=context.experiments,
-    )
-    expected = (
-        complete,
-        resolve_source_relation(
-            reference,
-            sources,
-            complete,
-            works=context.works,
-            observations=context.observations,
-            experiments=context.experiments,
-        ),
-    )
-
-    calls = Counter()
-    original_resolve = score_mod._resolve_coefficient_sources
-    original_observation_lineage = score_mod._observation_lineage
-    original_table_ids = score_mod._table_ids
-    original_asset_ids = score_mod._asset_ids
-
-    def track(name, function):
-        def counted(*args, **kwargs):
-            calls[name] += 1
-            return function(*args, **kwargs)
-
-        return counted
-
-    monkeypatch.setattr(
-        score_mod,
-        "_resolve_coefficient_sources",
-        track("coefficient", original_resolve),
-    )
-    monkeypatch.setattr(
-        score_mod,
-        "_observation_lineage",
-        track("observation", original_observation_lineage),
-    )
-    monkeypatch.setattr(score_mod, "_table_ids", track("tables", original_table_ids))
-    monkeypatch.setattr(score_mod, "_asset_ids", track("assets", original_asset_ids))
-
-    resolver_type = getattr(score_mod, "_ScoringLineageResolver", None)
-    assert resolver_type is not None
-    resolver = resolver_type(context, {engine: complete})
-
-    assert resolver.for_reference(reference, engine) == expected
-    calls_after_first = calls.copy()
-    assert resolver.for_reference(reference, engine) == expected
-    assert calls == calls_after_first
-    assert calls == Counter(
-        {"coefficient": 1, "tables": 1, "assets": 1, "observation": 1}
-    )
-
-
 def test_static_lineage_memo_matches_the_prediction_source_relation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -10380,6 +10292,22 @@ def test_static_lineage_memo_matches_the_prediction_source_relation(
         source_id="janaf-4th",
     )
     context = _context(F.work(), experiment, reference)
+    default_sources = score_mod.ENGINE_COEFFICIENT_SOURCES[Engine.VAPOROCK]
+    default_complete = score_mod.lineage_complete_for(
+        default_sources,
+        works=context.works,
+        observations=context.observations,
+        experiments=context.experiments,
+    )
+    assert default_complete
+    assert resolve_source_relation(
+        reference,
+        default_sources,
+        default_complete,
+        works=context.works,
+        observations=context.observations,
+        experiments=context.experiments,
+    ) is SourceRelation.SAME_INPUT
 
     def refusal_with_other_sources(engine, observation, **_kwargs):
         return EnginePrediction(
