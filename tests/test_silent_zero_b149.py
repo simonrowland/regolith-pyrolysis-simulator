@@ -254,15 +254,10 @@ def _flux_answer(species_id, pressure, flux):
     )
 
 
-def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
+def test_evaporation_partial_channel_refusal_is_typed_per_species(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Instance 4 / dead-write regression: pre-dispatch refused_upstream notes
-    must survive the fresh kernel-diagnostic assignment.
-
-    Numeric neutrality: Na still debits at the kernel flux value and K stays
-    absent from the flux map.
-    """
+    """A refused requested species cannot disappear beside a debiting peer."""
     from simulator.evaporation import EvaporationMixin
     from simulator.vapour_rail.batch import (
         FluxEligible,
@@ -285,11 +280,6 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
         channels_by_species={"Na": na_answer, "K": k_answer},
         flux_active_species_ids=frozenset({"Na"}),
     )
-    kernel_marker = note_dict(
-        ZeroBecause.KERNEL_OK_EMPTY,
-        site="kernel.stub",
-        doctrine_category=CATEGORY_PROVEN_ZERO,
-    )
     sim = SimpleNamespace(
         melt=SimpleNamespace(temperature_C=1600.0),
         setpoints={},
@@ -299,12 +289,9 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
         _silent_zero_notes=[],
         _record_degraded_path_engagement=lambda *a, **k: None,
         _resolve_evaporation_vapour_batch=lambda eq, **kw: batch,
-        _dispatch_only=lambda intent, **kw: SimpleNamespace(
+        _dispatch_only=lambda *_a, **_kw: SimpleNamespace(
             status="ok",
-            diagnostic={
-                "evaporation_flux_kg_hr": {"Na": 0.25},
-                "silent_zero_notes": [kernel_marker],
-            },
+            diagnostic={"evaporation_flux_kg_hr": {"Na": 0.25}},
             result={},
         ),
         _evaporation_bulk_partial_pressure_pa=lambda sp: 0.0,
@@ -321,50 +308,87 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
         temperature_C=1600.0,
         vapor_pressures_Pa={"Na": 1.5},
     )
-    # Invoked as an explicit class call inside _calculate_evaporation.
     monkeypatch.setattr(
         EvaporationMixin,
         "_evaporation_flux_control_inputs",
-        lambda self, eq, **kw: ({}, {}),
+        lambda *_a, **_kw: ({}, {}),
+    )
+    flux = EvaporationMixin._calculate_evaporation(sim, equilibrium)
+
+    assert flux.species_kg_hr == {"Na": 0.25}
+    k_authority = flux.carrier_authority_by_species["K"]
+    assert k_authority["is_refused"] is True
+    assert k_authority["flux"]["kind"] == "refusal"
+    assert k_authority["flux"]["code"] == "test_refusal"
+    k_refusal = sim._last_evaporation_flux_diagnostic[
+        "species_refusals"
+    ]["K"]
+    assert k_refusal["status"] == "refused"
+    assert k_refusal["refusal_code"] == "test_refusal"
+
+
+def test_pre_rg_eligible_dormant_channel_refuses_only_that_species(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Positive-inventory catalog eligibility cannot become a silent zero."""
+    from simulator.evaporation import EvaporationMixin
+    from simulator.vapour_rail.batch import FluxEligible, PressureValue, VapourBatch
+
+    na_answer = _flux_answer(
+        "Na", PressureValue(pa=1.5), FluxEligible(alpha_ref="alpha:Na")
+    )
+    batch = VapourBatch(
+        requested_species_ids=frozenset({"Na", "K"}),
+        channels_by_species={
+            "Na": na_answer,
+            "K": _flux_answer(
+                "K", PressureValue(pa=5.0), FluxEligible(alpha_ref="alpha:K")
+            )
+        },
+        flux_active_species_ids=frozenset({"Na"}),
+    )
+    sim = SimpleNamespace(
+        melt=SimpleNamespace(temperature_C=1600.0),
+        setpoints={},
+        vapor_pressures={"metals": {"Na": {"evaporation_alpha": {"value": 0.13}}}},
+        _last_vapor_pressure_diagnostic={},
+        _last_vapour_batch_resolve_error={},
+        _resolve_evaporation_vapour_batch=lambda *_a, **_kw: batch,
+        _record_degraded_path_engagement=lambda *_a, **_kw: None,
+        _dispatch_only=lambda *_a, **_kw: SimpleNamespace(
+            status="ok",
+            diagnostic={"evaporation_flux_kg_hr": {"Na": 0.25}},
+            result={},
+        ),
+        _evaporation_bulk_partial_pressure_pa=lambda _species: 0.0,
+        _build_partial_melt_offgassing_diagnostic=lambda *_a, **_kw: {},
+        _freeze_gate_enabled=lambda: False,
+    )
+    sim._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        sim,
+    )
+    equilibrium = SimpleNamespace(
+        liquid_fraction=1.0,
+        diagnostics={},
+        temperature_C=1600.0,
+        vapor_pressures_Pa={"Na": 1.5, "K": 5.0},
+    )
+    monkeypatch.setattr(
+        EvaporationMixin,
+        "_evaporation_flux_control_inputs",
+        lambda *_a, **_kw: ({}, {}),
     )
 
     flux = EvaporationMixin._calculate_evaporation(sim, equilibrium)
 
-    # Numeric neutrality: kernel flux values pass through unchanged; the
-    # refused K channel stays out of the flux map.
     assert flux.species_kg_hr == {"Na": 0.25}
-    assert flux.total_kg_hr == pytest.approx(0.25)
-    assert "K" not in flux.species_kg_hr
-
-    diagnostic = sim._last_evaporation_flux_diagnostic
-    assert diagnostic.get("evaporation_flux_kg_hr") == {"Na": 0.25}
-
-    # Dead-write regression: BOTH writes survive in the final diagnostic —
-    # the kernel-produced marker note and the pre-dispatch refusal note.
-    notes = diagnostic.get("silent_zero_notes") or []
-    assert any(
-        n.get("zero_because") == ZeroBecause.KERNEL_OK_EMPTY.value
-        and n.get("site") == "kernel.stub"
-        for n in notes
-    )
-    refusal_notes = [
-        n
-        for n in notes
-        if n.get("zero_because") == ZeroBecause.REFUSED_UPSTREAM.value
-    ]
-    assert len(refusal_notes) == 1
-    refusal = refusal_notes[0]
-    assert refusal["doctrine_category"] == CATEGORY_REFUSE
-    assert refusal["site"] == "evaporation.partial_channel_refusal"
-    assert refusal["species"] == "K"
-    assert refusal["field"] == "batch_channel_state"
-
-    # Host list carries the refusal note as well.
-    assert any(
-        n.get("zero_because") == ZeroBecause.REFUSED_UPSTREAM.value
-        and n.get("species") == "K"
-        for n in (sim._silent_zero_notes or [])
-    )
+    k_authority = flux.carrier_authority_by_species["K"]
+    assert k_authority["is_refused"] is True
+    assert k_authority["flux"]["code"] == "pre_rg_effective_pressure_missing"
+    assert sim._last_evaporation_flux_diagnostic["species_refusals"]["K"][
+        "status"
+    ] == "refused"
 
 
 # ---------------------------------------------------------------------------

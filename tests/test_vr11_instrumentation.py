@@ -842,6 +842,23 @@ def test_legacy_shadow_is_independent_or_typed_absent() -> None:
     assert absent["shadow_outcome"] == SHADOW_ABSENT_COMPARISON
 
 
+def test_nonfinite_runtime_pressure_is_typed_evaporation_refusal() -> None:
+    vapor_pressure_data = {
+        "metals": {
+            "Na": {"evaporation_alpha": {"value": 1.0}},
+        }
+    }
+
+    with pytest.raises(EvaporationFluxRefusal) as exc_info:
+        _pre_rg_effective_pressure_source(
+            vapor_pressure_data,
+            SimpleNamespace(vapor_pressures_Pa={"Na": float("nan")}),
+        )
+
+    assert exc_info.value.reason == "invalid_effective_pressure_input"
+    assert exc_info.value.diagnostic["field"] == "equilibrium.vapor_pressures_Pa"
+
+
 def test_flux_pressures_batch_only_eligible_does_not_expand_live() -> None:
     """Batch-only eligible channels are recorded, not added to flux map."""
 

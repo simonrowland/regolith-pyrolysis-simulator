@@ -711,11 +711,23 @@ def _pre_rg_effective_pressure_source(
     and the remaining DESIGN-REV5 §7.4 cutover preconditions are green.
     """
 
-    effective_pressures = _legacy_evaporation_shadow_pressure_map(
-        vapor_pressure_data,
-        getattr(equilibrium, 'vapor_pressures_Pa', {}),
-        read_context=EFFECTIVE_PRESSURE_SOURCE_CONTEXT,
-    )
+    try:
+        effective_pressures = _legacy_evaporation_shadow_pressure_map(
+            vapor_pressure_data,
+            getattr(equilibrium, 'vapor_pressures_Pa', {}),
+            read_context=EFFECTIVE_PRESSURE_SOURCE_CONTEXT,
+        )
+    except (TypeError, ValueError) as exc:
+        reason = 'invalid_effective_pressure_input'
+        raise EvaporationFluxRefusal(
+            reason,
+            {
+                'reason': reason,
+                'field': 'equilibrium.vapor_pressures_Pa',
+                'detail': str(exc),
+                'evaporation_flux_kg_hr': {},
+            },
+        ) from exc
     temperature_C = float(getattr(equilibrium, 'temperature_C', math.inf))
     physical_zero_reason = None
     if (
@@ -978,6 +990,91 @@ class EvaporationMixin:
             self._last_evaporation_flux_diagnostic = diagnostic
             raise EvaporationFluxRefusal(reason, diagnostic)
 
+        channel_states = dict(
+            flux_overlay_report.get('batch_channel_states', {}) or {}
+        )
+        species_refusals: dict[str, dict[str, Any]] = {}
+        batch_refusals = dict((batch_report or {}).get('refusals_by_species') or {})
+        for species_id, refusal in batch_refusals.items():
+            if not isinstance(refusal, Mapping):
+                continue
+            flux_outcome = dict(refusal.get('flux') or {})
+            refusal_code = str(
+                refusal.get('refusal_code')
+                or flux_outcome.get('code')
+                or 'vapour_batch_channel_refused'
+            )
+            species_refusals[str(species_id)] = {
+                'status': 'refused',
+                'reason': refusal_code,
+                'disposition': 'retained_in_source_inventory',
+                'refusal_code': refusal_code,
+                'pressure': refusal.get('pressure'),
+                'flux': flux_outcome,
+            }
+
+        dormant_species: list[str] = []
+        if effective_pressure_source.physical_zero_reason is None:
+            for species_id, state in channel_states.items():
+                if str(state) != 'dormant_by_epoch':
+                    continue
+                answer = vapour_batch.channels_by_species.get(species_id)
+                if answer is None or not answer.is_flux_active:
+                    continue
+                applicability = dict(answer.extra).get(
+                    'applicability_evidence'
+                )
+                if (
+                    isinstance(applicability, Mapping)
+                    and applicability.get('flux_dormant') is True
+                ):
+                    continue
+                try:
+                    catalog_pressure_pa = float(answer.pressure.pa)
+                except (AttributeError, TypeError, ValueError):
+                    continue
+                if math.isfinite(catalog_pressure_pa) and catalog_pressure_pa > 0.0:
+                    dormant_species.append(str(species_id))
+        if dormant_species:
+            refusal_code = 'pre_rg_effective_pressure_missing'
+            detail = (
+                'catalog-eligible channel with positive parent inventory is '
+                'absent from the pre-RG effective-pressure set'
+            )
+            for species_id in sorted(dormant_species):
+                carrier = dict(
+                    flux.carrier_authority_by_species.get(species_id, {}) or {}
+                )
+                extra = carrier.get('extra')
+                extra = dict(extra) if isinstance(extra, Mapping) else {}
+                extra['refusal_detail'] = detail
+                carrier.update(
+                    {
+                        'flux': {
+                            'kind': 'refusal',
+                            'code': refusal_code,
+                            'detail': detail,
+                        },
+                        'refusal_code': refusal_code,
+                        'is_refused': True,
+                        'is_flux_active': False,
+                        'is_flux_dormant_by_epoch': False,
+                        'reason': refusal_code,
+                        'authority_level': 'unavailable',
+                        'extra': extra,
+                    }
+                )
+                flux.carrier_authority_by_species[species_id] = carrier
+                species_refusals[species_id] = {
+                    'status': 'refused',
+                    'reason': refusal_code,
+                    'disposition': 'retained_in_source_inventory',
+                    'refusal_code': refusal_code,
+                    'pressure': carrier.get('pressure'),
+                    'flux': dict(carrier['flux']),
+                    'detail': detail,
+                }
+
         liquid_state_admits_inventory_zero = liquid_fraction is None
         if (
             isinstance(liquid_fraction, Real)
@@ -1135,6 +1232,7 @@ class EvaporationMixin:
                         'empty flux is authorized'
                     ),
                     'batch_channel_states': channel_states,
+                    'species_refusals': species_refusals,
                     'evaporation_flux_kg_hr': {},
                     'vapour_batch_flux_overlay': flux_overlay_report,
                     'vapour_batch': batch_report,
@@ -1150,6 +1248,7 @@ class EvaporationMixin:
                     'physical-zero proof'
                 ),
                 'provider_zero_reason': zero_reason,
+                'species_refusals': species_refusals,
                 'evaporation_flux_kg_hr': {},
                 'vapour_batch_flux_overlay': flux_overlay_report,
                 'vapour_batch': batch_report,
@@ -1161,51 +1260,6 @@ class EvaporationMixin:
             )
         if T_K < 400:  # Catalog pressure exists; thermal physical zero.
             return flux
-        # b-149 instance 4: partial channel refusals. When some channels debit
-        # and others are typed refusals, refused species drop out of
-        # vapor_pressures and surface as flux 0 with no raise (all-non-debit
-        # already refuses above). Record each refused species so incomplete
-        # extraction is visible while the catalog can still subtract.
-        _channel_states_partial = dict(
-            flux_overlay_report.get('batch_channel_states', {}) or {}
-        )
-        _partial_sz_notes: list = []
-        if _channel_states_partial:
-            from simulator.silent_zero import (
-                CATEGORY_REFUSE,
-                ZeroBecause,
-                note_dict,
-                record_on_host,
-            )
-
-            for _sp, _state in sorted(_channel_states_partial.items()):
-                if str(_state) != 'refusal':
-                    continue
-                if _sp in vapor_pressures:
-                    continue
-                _n = note_dict(
-                    ZeroBecause.REFUSED_UPSTREAM,
-                    site='evaporation.partial_channel_refusal',
-                    species=str(_sp),
-                    field='batch_channel_state',
-                    detail=(
-                        f'channel state=refusal while peer channels still '
-                        f'debit; species omitted from flux (silent zero residual '
-                        f'of b-126 F3). Counted as category-1 missing input; '
-                        f'hard raise deferred pending blast-radius rebaseline.'
-                    ),
-                    doctrine_category=CATEGORY_REFUSE,
-                )
-                _partial_sz_notes.append(_n)
-                record_on_host(
-                    self,
-                    ZeroBecause.REFUSED_UPSTREAM,
-                    site='evaporation.partial_channel_refusal',
-                    species=str(_sp),
-                    field='batch_channel_state',
-                    detail=_n['detail'],
-                    doctrine_category=CATEGORY_REFUSE,
-                )
         self._last_partial_melt_offgassing_diagnostic = (
             self._build_partial_melt_offgassing_diagnostic(
                 equilibrium,
@@ -1270,14 +1324,15 @@ class EvaporationMixin:
         diagnostic['vapour_batch_flux_shadow_outcome'] = (
             flux_overlay_report.get('shadow_outcome')
         )
-        if _partial_sz_notes:
-            # b-149 dead-write fix: merge the partial-refusal notes into the
-            # final kernel diagnostic. They were previously written to
-            # _last_evaporation_flux_diagnostic before the kernel dispatch and
-            # then clobbered by this fresh assignment — instrumentation lost.
-            from simulator.silent_zero import merge_notes_into_mapping
-
-            merge_notes_into_mapping(diagnostic, _partial_sz_notes)
+        if species_refusals:
+            kernel_species_refusals = diagnostic.get('species_refusals')
+            kernel_species_refusals = (
+                dict(kernel_species_refusals)
+                if isinstance(kernel_species_refusals, Mapping)
+                else {}
+            )
+            kernel_species_refusals.update(species_refusals)
+            diagnostic['species_refusals'] = kernel_species_refusals
         self._last_evaporation_flux_diagnostic = diagnostic
         missing_transport = diagnostic.get('missing_transport_parameters', {})
         if isinstance(missing_transport, Mapping):
