@@ -4759,6 +4759,8 @@ class EvaporationMixin:
                 if product_kg > 0.0:
                     effective_rates[entry['species']] = product_kg / dt_hr
 
+        # The same positive-tail rule applies to the O2 reactant budget:
+        # even a tiny oxygen-consuming carrier still requires oxygen.
         o2_draws: list[tuple[str, float]] = []
         for parent_oxide in sorted(parent_groups):
             for entry in parent_groups[parent_oxide]:
@@ -4766,11 +4768,11 @@ class EvaporationMixin:
                 rate_kg_hr = float(effective_rates.get(species, 0.0))
                 O2_per_product_kg = float(
                     entry['stoich'].get('O2_per_product_kg', 0.0))
-                if rate_kg_hr > 1e-12 and O2_per_product_kg < -1e-12:
+                if rate_kg_hr > 0.0 and O2_per_product_kg < -1e-12:
                     o2_draws.append(
                         (species, rate_kg_hr * abs(O2_per_product_kg)))
         total_o2_draw_kg_hr = sum(draw for _species, draw in o2_draws)
-        if total_o2_draw_kg_hr <= 1e-12:
+        if total_o2_draw_kg_hr <= 0.0:
             return effective_rates
 
         if available_o2_kg <= 1e-12:
@@ -4785,7 +4787,7 @@ class EvaporationMixin:
         allowed_o2_draw_kg = float(available_o2_kg) * depletion_fraction
         by_species_draw = dict(o2_draws)
         for species, required_o2_kg_hr in o2_draws:
-            if required_o2_kg_hr <= 1e-12:
+            if required_o2_kg_hr <= 0.0:
                 continue
             allowed_draw_kg = (
                 allowed_o2_draw_kg
@@ -4795,7 +4797,7 @@ class EvaporationMixin:
             current_rate = float(effective_rates.get(species, 0.0))
             allowed_rate = current_rate * (
                 allowed_draw_kg / by_species_draw[species])
-            if allowed_rate <= 1e-12:
+            if allowed_rate <= 0.0:
                 effective_rates.pop(species, None)
             else:
                 effective_rates[species] = min(current_rate, allowed_rate)

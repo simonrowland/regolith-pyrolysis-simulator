@@ -310,3 +310,24 @@ def test_depletion_retains_continuous_small_flow_limit(
     # The analytical small-exposure limit is rate_out/rate_in -> 1.
     # This checks continuity of the depletion law, not resolved capture mass.
     assert rates["Na"] / raw_rate == pytest.approx(1.0, rel=1e-10)
+
+
+@pytest.mark.parametrize("available_o2_kg", [0.0, 1.0e-6])
+def test_subthreshold_oxygen_consuming_flow_obeys_reactant_budget(
+    vapor_pressure_data, feedstocks_data, setpoints_data, available_o2_kg
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    raw_rate = 1.0e-14
+    rates = sim._analytic_evaporation_depletion_rates(
+        {"CrO2": raw_rate}, dt_hr=1.0, phase_scalar=1.0,
+        cleaned_melt_kg=sim.atom_ledger.kg_by_account("process.cleaned_melt"),
+        available_o2_kg=available_o2_kg,
+    )
+    if available_o2_kg == 0.0:
+        assert "CrO2" not in rates
+    else:
+        stoich = sim._evaporation_stoich("CrO2", _species_data(sim, "CrO2"))
+        # Finite O2 exposure can reduce the raw rate; it cannot erase a
+        # positive supported tail or consume more reactant than available.
+        assert 0.0 < rates["CrO2"] <= raw_rate
+        assert rates["CrO2"] * abs(stoich["O2_per_product_kg"]) <= available_o2_kg
