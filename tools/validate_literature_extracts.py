@@ -21,13 +21,17 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   (species, observable, T/index, value, locator)
 * source fidelity is a typed, counted warning at this chokepoint
   (``uncovered_observation`` / ``unattested_sample`` /
-  ``auto_migrated_pilot_pin`` / ``source_blind_pin``). A draft corpus is
-  not rejected for those warnings. Promoting the extract
-  (``review_status: reviewed``, graduation, load, emit, or the index)
-  refuses while any remain. Certification opens a source artifact
-  (paper, OCR, or quotes — not the extract and not program source) and
-  requires each pinned number as a complete token: sign and exponent
-  belong to the token, so 0.24 is not -0.24 or 0.24e-5, and 1.0 is not 1.
+  ``auto_migrated_pilot_pin`` / ``source_blind_pin`` /
+  ``ambiguous_observation_id``). A draft corpus is not rejected for those
+  warnings. Promoting the extract (``review_status: reviewed``, graduation,
+  load, emit, or the index) refuses while any remain. Certification opens
+  a source artifact (paper, OCR, or quotes — not the extract and not
+  program source) and requires each pinned number as a complete token:
+  sign and exponent belong to the token, so 0.24 is not -0.24 or 0.24e-5,
+  and 1.0 is not 1. Unicode numeric signs are folded onto that grammar
+  before the match, so a Unicode minus is a minus and −0.24 is not 0.24.
+  An observation id that names more than one scored row is not collapsed
+  into one coverage entry; certification refuses it.
   A recorded locator that is not opened is source-blind. An equipment
   pin does not cover a measured payload. Coverage holds only when every
   measured leaf of the observation's evidence has a matching pin of that
@@ -185,14 +189,79 @@ LOCATOR_KEYS = frozenset(
 
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ABS_PATH_RE = re.compile(r"^(/|[A-Za-z]:\\|\\\\)")
+# Unicode minus and the other dash/plus signs are not ASCII "+" or "-".
+# The citation grammar below only sees ASCII signs, so a raw scan of
+# "−0.24" (U+2212) yields the token "0.24" and certifies the opposite
+# sign. Fold these onto ASCII before that grammar runs. Plus-minus is
+# absent here on purpose: it is neither "+" nor "-" and stays in the
+# grammar as its own sign.
+_UNICODE_MINUS_SIGNS = (
+    "\u2212"  # MINUS SIGN
+    "\u2010"  # HYPHEN
+    "\u2011"  # NON-BREAKING HYPHEN
+    "\u2012"  # FIGURE DASH
+    "\u2013"  # EN DASH
+    "\u2014"  # EM DASH
+    "\u2015"  # HORIZONTAL BAR
+    "\ufe63"  # SMALL HYPHEN-MINUS
+    "\uff0d"  # FULLWIDTH HYPHEN-MINUS
+    "\u02d7"  # MODIFIER LETTER MINUS SIGN
+    "\u207b"  # SUPERSCRIPT MINUS
+    "\u208b"  # SUBSCRIPT MINUS
+    "\u2796"  # HEAVY MINUS SIGN
+)
+_UNICODE_PLUS_SIGNS = (
+    "\uff0b"  # FULLWIDTH PLUS SIGN
+    "\ufe62"  # SMALL PLUS SIGN
+    "\u207a"  # SUPERSCRIPT PLUS
+    "\u208a"  # SUBSCRIPT PLUS
+    "\u2795"  # HEAVY PLUS SIGN
+)
+_NUMERIC_SIGN_FOLD = str.maketrans(
+    {ord(ch): "-" for ch in _UNICODE_MINUS_SIGNS}
+    | {ord(ch): "+" for ch in _UNICODE_PLUS_SIGNS}
+)
+# Plus-minus stays a distinct sign so "±0.24" is not the token "0.24",
+# and so it does not compare equal to an ASCII minus or plus.
+_DISTINCT_NUMERIC_SIGNS = "\u00b1\u2213"
+# "-" is first or last in each class so it is literal, not a range.
+_TOKEN_SIGN_CLASS = "-" + "+" + _DISTINCT_NUMERIC_SIGNS
+_TOKEN_LOOKBEHIND_CLASS = "A-Za-z0-9_." + "+" + _DISTINCT_NUMERIC_SIGNS + "-"
 # Sign and exponent are part of one token. The lookbehind also rejects a
 # preceding sign so the match cannot start on the digits of -0.24. The
 # optional exponent group consumes 0.24e-5 whole, so a shorter spelling is
 # not a second match. This is the citation token used by t-1333, kept here
-# so certification does not invent a second numeric grammar.
+# so certification does not invent a second numeric grammar. Callers scan
+# text only through ``_citation_token_matches``, which folds Unicode signs
+# first.
 _NUMERIC_TOKEN_RE = re.compile(
-    r"(?<![A-Za-z0-9_.+-])[-+]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(?![A-Za-z0-9_.])"
+    f"(?<![{_TOKEN_LOOKBEHIND_CLASS}])"
+    f"[{_TOKEN_SIGN_CLASS}]?"
+    r"\d+(?:\.\d+)?"
+    f"(?:[eE][{_TOKEN_SIGN_CLASS}]?"
+    r"\d+)?"
+    r"(?![A-Za-z0-9_.])"
 )
+
+
+def _fold_numeric_signs(text: str) -> str:
+    """Map Unicode minus and plus onto the ASCII signs the token grammar sees.
+
+    One code point becomes one code point, so token spans stay aligned.
+    Plus-minus is not folded: it remains its own sign.
+    """
+    return text.translate(_NUMERIC_SIGN_FOLD)
+
+
+def _citation_token_matches(text: str) -> list[re.Match[str]]:
+    """Numeric tokens after Unicode signs are folded.
+
+    Leaf detection, spelling equality, and string alignment all read this
+    list. A sign cannot be dropped on one of those paths and kept on another.
+    """
+    return list(_NUMERIC_TOKEN_RE.finditer(_fold_numeric_signs(text)))
+
+
 # Repository-relative roots that hold a paper, OCR, quotes, or a reference
 # transcription. The extract tree and the gate implementation are absent
 # on purpose: a pin must not certify against its own YAML or this file.
@@ -1294,6 +1363,7 @@ _FIDELITY_WARNING_KINDS = (
     "unattested_sample",
     "auto_migrated_pilot_pin",
     "source_blind_pin",
+    "ambiguous_observation_id",
 )
 _ARTIFACT_PATH_KEYS = ("source_path", "quotes_path")
 _FIDELITY_DETAIL_CAP = 3
@@ -1349,26 +1419,46 @@ _CONDITION_PROVENANCE_KEYS = frozenset({"locator"})
 
 def _scored_observations(
     doc: Mapping[str, Any],
-) -> dict[tuple[str, str], Mapping[str, Any]]:
-    """Scored rows are ``species.*.observations[]`` with a non-empty id.
+) -> tuple[
+    dict[tuple[str, str], Mapping[str, Any]],
+    list[tuple[str, str, int]],
+]:
+    """Unique scored rows, and ids that name more than one scored row.
 
     Context rows are unscored (d-032) and are not part of this coverage set.
+    Coverage keys are ``(species_id, observation_id)``. A second row with the
+    same id used to overwrite the first, while a path pin resolves the first
+    row, so an attested pin of the first value covered the last row. An id
+    that names more than one row is omitted from the unique map and returned
+    as ``(species_id, observation_id, row_count)``. Certification refuses
+    those ids. They are not a covered observation.
     """
-    found: dict[tuple[str, str], Mapping[str, Any]] = {}
+    grouped: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
     species_map = doc.get("species") or {}
-    if not isinstance(species_map, Mapping):
-        return found
-    for species_id, block in species_map.items():
-        observations = block.get("observations") if isinstance(block, Mapping) else None
-        if not isinstance(observations, list):
-            continue
-        for observation in observations:
-            if not isinstance(observation, Mapping):
+    if isinstance(species_map, Mapping):
+        for species_id, block in species_map.items():
+            observations = (
+                block.get("observations") if isinstance(block, Mapping) else None
+            )
+            if not isinstance(observations, list):
                 continue
-            observation_id = observation.get("observation_id")
-            if isinstance(observation_id, str) and observation_id:
-                found[(str(species_id), observation_id)] = observation
-    return found
+            for observation in observations:
+                if not isinstance(observation, Mapping):
+                    continue
+                observation_id = observation.get("observation_id")
+                if isinstance(observation_id, str) and observation_id:
+                    grouped.setdefault(
+                        (str(species_id), observation_id), []
+                    ).append(observation)
+    unique: dict[tuple[str, str], Mapping[str, Any]] = {}
+    ambiguous: list[tuple[str, str, int]] = []
+    for key in sorted(grouped):
+        rows = grouped[key]
+        if len(rows) == 1:
+            unique[key] = rows[0]
+        else:
+            ambiguous.append((key[0], key[1], len(rows)))
+    return unique, ambiguous
 
 
 def _scored_measured_leaves(observation: Mapping[str, Any]) -> list[tuple[Any, ...]]:
@@ -1493,7 +1583,7 @@ def _measured_leaf_addresses(
     if isinstance(value, float):
         return [prefix] if math.isfinite(value) else []
     if isinstance(value, str):
-        if value.strip() and _NUMERIC_TOKEN_RE.search(value):
+        if value.strip() and _citation_token_matches(value):
             return [prefix]
         return []
     if isinstance(value, Mapping):
@@ -1846,9 +1936,8 @@ def _numeric_spellings(leaf: int | float) -> set[str]:
 
 def _spelling_is_complete_token(spelling: str, text: str) -> bool:
     """True when ``spelling`` is one whole numeric token in ``text``."""
-    return any(
-        match.group(0) == spelling for match in _NUMERIC_TOKEN_RE.finditer(text)
-    )
+    folded = _fold_numeric_signs(spelling)
+    return any(match.group(0) == folded for match in _citation_token_matches(text))
 
 
 def _string_leaf_in_text(leaf: str, text: str) -> bool:
@@ -1856,14 +1945,17 @@ def _string_leaf_in_text(leaf: str, text: str) -> bool:
 
     A non-numeric leaf stays a substring. A leaf that contains a number
     matches only where each of those numbers is the same complete token,
-    so the string ``0.24`` is not ``-0.24`` or ``0.24e-5``.
+    so the string ``0.24`` is not ``-0.24`` or ``0.24e-5``. Unicode signs
+    are folded before either string is searched, so ``−0.24`` is ``-0.24``.
     """
-    leaf_tokens = list(_NUMERIC_TOKEN_RE.finditer(leaf))
+    leaf = _fold_numeric_signs(leaf)
+    text = _fold_numeric_signs(text)
+    leaf_tokens = _citation_token_matches(leaf)
     placed: dict[tuple[int, int], str] = {}
     if leaf_tokens:
         placed = {
             (match.start(), match.end()): match.group(0)
-            for match in _NUMERIC_TOKEN_RE.finditer(text)
+            for match in _citation_token_matches(text)
         }
     start = 0
     while True:
@@ -1886,7 +1978,8 @@ def _leaf_in_text(leaf: Any, text: str) -> bool:
 
     Numeric leaves match a complete token only. Sign and exponent belong to
     the token, so 0.24 does not match -0.24, 0.24e-5, or 10.24, and 1.0 does
-    not match 1. This is a cited-text grep, not a unit conversion.
+    not match 1. A Unicode minus is a minus, so −0.24 does not match 0.24
+    and does match -0.24. This is a cited-text grep, not a unit conversion.
     """
     if isinstance(leaf, bool):
         token = "true" if leaf else "false"
@@ -1981,12 +2074,17 @@ def fidelity_source_warnings(
 ) -> list[FidelityWarning]:
     """Count source-fidelity holes. Empty means the certification invariant holds.
 
-    Invariant: every measured leaf of a scored observation's evidence is
-    covered only by a matching sample that names that observation and whose
-    address is that leaf or an ancestor of it. Evidence is ``values`` plus
-    each present scored numeric condition (``_SCORED_NUMERIC_CONDITIONS``):
-    the fields the scored temperature payload copies beside ``values``.
-    A locator inside a condition is provenance, not a leaf. Repeating a pin
+    Invariant: a scored value is certified only when its observation id
+    names exactly one scored row and the opened source contains that value
+    as a complete token of the same sign. A Unicode minus is a minus.
+    Duplicate observation ids are a typed refusal, never one coverage entry.
+
+    Every measured leaf of a scored observation's evidence is covered only
+    by a matching sample that names that observation and whose address is
+    that leaf or an ancestor of it. Evidence is ``values`` plus each
+    present scored numeric condition (``_SCORED_NUMERIC_CONDITIONS``): the
+    fields the scored temperature payload copies beside ``values``. A
+    locator inside a condition is provenance, not a leaf. Repeating a pin
     of one address does not cover a sibling, even when the numbers are
     equal, and a ``values`` pin does not cover a sibling condition. A
     measured leaf is a finite int or float (not a boolean), or a string
@@ -1998,13 +2096,14 @@ def fidelity_source_warnings(
     unattested sample can still supply addresses toward
     ``uncovered_observation``; attestation is its own count. Certification
     refuses while any of these counts is non-zero: a pilot pin or an
-    unattested sample anywhere in the file, or an attestation-complete pin
-    whose locator was not opened. An opened locator must be a paper, OCR,
-    quotes, or reference transcription and must contain each pinned number
-    as a complete token (sign and exponent included). The extract document
-    and program source are not artifacts. Drift stays a match error.
-    ``source_blind_pin`` is that unopened or absent-value count. These
-    warnings do not reject a draft corpus.
+    unattested sample anywhere in the file, an attestation-complete pin
+    whose locator was not opened, or an observation id that names more
+    than one scored row. An opened locator must be a paper, OCR, quotes,
+    or reference transcription and must contain each pinned number as a
+    complete token (sign and exponent included; Unicode signs folded onto
+    that token). The extract document and program source are not artifacts.
+    Drift stays a match error. ``source_blind_pin`` is that unopened or
+    absent-value count. These warnings do not reject a draft corpus.
     """
     samples = doc.get("fidelity_samples")
     if samples is None:
@@ -2012,7 +2111,7 @@ def fidelity_source_warnings(
     elif not isinstance(samples, list):
         samples = []
 
-    observation_map = _scored_observations(doc)
+    observation_map, ambiguous_ids = _scored_observations(doc)
     required = set(observation_map)
     # Leaf addresses each observation still needs. This is the only coverage
     # write: a pin adds an address only when its own address is that leaf or
@@ -2154,6 +2253,24 @@ def fidelity_source_warnings(
                 _finish_detail(source_blind_reasons, source_blind_extra[0]),
             )
         )
+    if ambiguous_ids:
+        ambiguous_reasons: list[str] = []
+        ambiguous_extra = [0]
+        for species_id, observation_id, row_count in ambiguous_ids:
+            _note_reason(
+                ambiguous_reasons,
+                ambiguous_extra,
+                f"{label}: ambiguous observation_id {observation_id!r} under "
+                f"species {species_id} names {row_count} scored rows",
+            )
+        warnings.append(
+            FidelityWarning(
+                "ambiguous_observation_id",
+                len(ambiguous_ids),
+                label,
+                _finish_detail(ambiguous_reasons, ambiguous_extra[0]),
+            )
+        )
     return warnings
 
 
@@ -2179,19 +2296,22 @@ def certify_extract_source_fidelity(
 ) -> list[str]:
     """Refuse source certification while any fidelity hole remains.
 
-    Invariant: an empty list is the only pass. Every measured leaf of a
-    scored observation's evidence (``values`` and each scored numeric
-    condition) must be covered by a matching, non-pilot, attested sample
-    whose address is that leaf or an ancestor, and whose source artifact
-    was opened and contains each pinned number as a complete token.
+    Invariant: an empty list is the only pass. A scored value is certified
+    only when its observation id names exactly one scored row and the opened
+    source contains that value as a complete token of the same sign. Every
+    measured leaf of a scored observation's evidence (``values`` and each
+    scored numeric condition) must be covered by a matching, non-pilot,
+    attested sample whose address is that leaf or an ancestor, and whose
+    source artifact was opened and contains each pinned number as a complete
+    token. A Unicode minus is a minus. An observation id that names more
+    than one scored row refuses; the rows are not one coverage entry.
     Repeating a pin of one address does not cover a sibling, even when the
     numbers are equal, and a ``values`` pin does not cover a sibling
     condition. A descriptive label does not stand in for a number it does
     not contain. The extract itself and program source do not qualify.
     Equipment pins, unopened locators, and copied values that are absent
-    from the artifact refuse. ``warnings`` is
-    accepted for existing callers and is not the decision: a supplied empty
-    list cannot hide a hole.
+    from the artifact refuse. ``warnings`` is accepted for existing callers
+    and is not the decision: a supplied empty list cannot hide a hole.
     """
     _ = warnings
     warnings = fidelity_source_warnings(

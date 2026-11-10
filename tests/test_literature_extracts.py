@@ -5097,6 +5097,9 @@ _PILOT_PINS_CEILING = 57
 # Attestation-complete pins whose locator is not opened. Zero on this corpus:
 # no sample carries reviewed_by. The ceiling may only fall.
 _SOURCE_BLIND_PINS_CEILING = 0
+# Scored observation ids that name more than one row. Zero on this corpus:
+# schema validation already rejects duplicates. The ceiling cannot rise.
+_AMBIGUOUS_OBSERVATION_IDS_CEILING = 0
 
 
 def test_fidelity_source_warning_ratchet():
@@ -5112,6 +5115,7 @@ def test_fidelity_source_warning_ratchet():
     pilot_extracts = 0
     pilot_pins = 0
     source_blind_pins = 0
+    ambiguous_ids = 0
     for path in vle.discover_extracts():
         doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         if not isinstance(doc, dict):
@@ -5126,6 +5130,7 @@ def test_fidelity_source_warning_ratchet():
             uncovered_obs += uncovered
         unattested_samples += by_kind.get("unattested_sample", 0)
         source_blind_pins += by_kind.get("source_blind_pin", 0)
+        ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
         pilot = by_kind.get("auto_migrated_pilot_pin", 0)
         pilot_pins += pilot
         if pilot:
@@ -5136,6 +5141,7 @@ def test_fidelity_source_warning_ratchet():
     assert pilot_pins <= _PILOT_PINS_CEILING, pilot_pins
     assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
     assert source_blind_pins <= _SOURCE_BLIND_PINS_CEILING, source_blind_pins
+    assert ambiguous_ids <= _AMBIGUOUS_OBSERVATION_IDS_CEILING, ambiguous_ids
 
 
 def test_auto_migrated_pilot_pin_counts_each_sample():
@@ -6742,6 +6748,9 @@ _TOKEN_CASES = (
     ("comma", 0.24, "alpha 0.24, next\n", True),
     ("leading_minus", 0.24, "alpha -0.24 measured\n", False),
     ("leading_plus", 0.24, "alpha +0.24 measured\n", False),
+    # Literal U+2212. The pin is 0.24 and the artifact contains only −0.24.
+    ("unicode_minus", 0.24, "alpha \u22120.24 measured\n", False),
+    ("unicode_minus_same_sign", -0.24, "delta \u22120.24 measured\n", True),
     ("exponent_neg", 0.24, "alpha 0.24e-5 measured\n", False),
     ("exponent_pos", 0.24, "alpha 0.24E+2 measured\n", False),
     ("exponent_bare", 0.24, "alpha 0.24e5 measured\n", False),
@@ -6829,6 +6838,229 @@ def test_complete_numeric_token_is_required_at_every_promoter(
         draft, label="draft", artifact_root=tmp_path
     )
     assert any(warning.kind == "source_blind_pin" for warning in warnings)
+
+
+# The sign class, written here and not read from the gate. ``kind`` is the
+# rule: a minus certifies only a negative token, a plus certifies only the
+# string "+0.24", and a distinct sign certifies only a pin that already
+# carries that same character. ASCII "+" and "-" are in the class so the
+# Unicode rows are not a separate grammar.
+_CERTIFICATION_SIGNS = (
+    ("ascii_minus", "-", "minus"),
+    ("ascii_plus", "+", "plus"),
+    ("minus_sign", "\u2212", "minus"),
+    ("hyphen", "\u2010", "minus"),
+    ("nb_hyphen", "\u2011", "minus"),
+    ("figure_dash", "\u2012", "minus"),
+    ("en_dash", "\u2013", "minus"),
+    ("em_dash", "\u2014", "minus"),
+    ("horizontal_bar", "\u2015", "minus"),
+    ("small_hyphen", "\ufe63", "minus"),
+    ("fullwidth_hyphen", "\uff0d", "minus"),
+    ("modifier_minus", "\u02d7", "minus"),
+    ("superscript_minus", "\u207b", "minus"),
+    ("subscript_minus", "\u208b", "minus"),
+    ("heavy_minus", "\u2796", "minus"),
+    ("fullwidth_plus", "\uff0b", "plus"),
+    ("small_plus", "\ufe62", "plus"),
+    ("superscript_plus", "\u207a", "plus"),
+    ("subscript_plus", "\u208a", "plus"),
+    ("heavy_plus", "\u2795", "plus"),
+    ("plus_minus", "\u00b1", "distinct"),
+    ("minus_or_plus", "\u2213", "distinct"),
+)
+_CERTIFICATION_SIGN_PINS = (
+    "unsigned_float",
+    "neg_float",
+    "unsigned_string",
+    "neg_string",
+    "pos_string",
+    "same_string",
+)
+
+
+def _certification_pin(pin_name: str, sign: str) -> object:
+    if pin_name == "unsigned_float":
+        return 0.24
+    if pin_name == "neg_float":
+        return -0.24
+    if pin_name == "unsigned_string":
+        return "0.24"
+    if pin_name == "neg_string":
+        return "-0.24"
+    if pin_name == "pos_string":
+        return "+0.24"
+    if pin_name == "same_string":
+        return f"{sign}0.24"
+    raise AssertionError(pin_name)
+
+
+def _sign_certifies(kind: str, pin_name: str) -> bool:
+    """Independent of the gate. The cited text is always ``{sign}0.24``."""
+    if pin_name == "same_string":
+        return True
+    if kind == "minus":
+        return pin_name in {"neg_float", "neg_string"}
+    if kind == "plus":
+        return pin_name == "pos_string"
+    return False
+
+
+def test_certification_sign_catalog_is_the_whole_class():
+    """Every sign the gate folds or treats as distinct is in the matrix."""
+    catalog = {sign for _name, sign, _kind in _CERTIFICATION_SIGNS}
+    gate = (
+        set(vle._UNICODE_MINUS_SIGNS)
+        | set(vle._UNICODE_PLUS_SIGNS)
+        | set(vle._DISTINCT_NUMERIC_SIGNS)
+        | set("+-")
+    )
+    assert catalog == gate
+
+
+@pytest.mark.parametrize(
+    ("sign_name", "sign", "kind"),
+    _CERTIFICATION_SIGNS,
+    ids=[row[0] for row in _CERTIFICATION_SIGNS],
+)
+@pytest.mark.parametrize("pin_name", _CERTIFICATION_SIGN_PINS)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_unicode_sign_is_part_of_the_certified_token(
+    sign_name: str,
+    sign: str,
+    kind: str,
+    pin_name: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: a numeric sign is part of the certified token.
+
+    The artifact contains only ``{sign}0.24``. An unsigned pin certifies
+    none of these signs. A minus certifies ``-0.24`` and not ``0.24``.
+    U+2212 with pin ``0.24`` is the opposite-sign bypass. Every promoter
+    calls ``certify_extract_source_fidelity``.
+    """
+    pin = _certification_pin(pin_name, sign)
+    doc = _literal_source_document(tmp_path, pin, f"{sign}0.24\n")
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    accepts = _sign_certifies(kind, pin_name)
+    if accepts:
+        assert errors == [], (sign_name, pin_name, entry, errors)
+        return
+    assert errors, (sign_name, pin_name, entry)
+    if entry != "certify":
+        return
+    joined = "\n".join(errors)
+    assert "source_blind_pin" in joined
+    assert "uncovered_observation" not in joined
+    assert "ambiguous_observation_id" not in joined
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+@pytest.mark.parametrize(
+    ("pin_sign", "source_sign"),
+    [("\u00b1", "\u2213"), ("\u2213", "\u00b1")],
+    ids=["plusminus_vs_minusplus", "minusplus_vs_plusminus"],
+)
+def test_distinct_unicode_signs_do_not_certify_each_other(
+    pin_sign: str,
+    source_sign: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Plus-minus and minus-or-plus are different signs."""
+    doc = _literal_source_document(tmp_path, f"{pin_sign}0.24", f"{source_sign}0.24\n")
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    assert errors, (pin_sign, source_sign, entry)
+    if entry == "certify":
+        assert "source_blind_pin" in "\n".join(errors)
+
+
+# One id, several scored rows. ``one_row`` is the control: the same pin and
+# the same artifact pass when the id names that row only. The source cites
+# 0.24, so a refusal is the ambiguous id and not a missing token.
+_AMBIGUOUS_ID_CASES = (
+    ("one_row", (0.24,), False),
+    ("two_values", (0.24, 0.91), True),
+    ("equal_values", (0.24, 0.24), True),
+    ("three_rows", (0.24, 0.91, 0.5), True),
+)
+
+
+def _ambiguous_id_document(
+    root: Path, values: tuple[float, ...], addressing: str
+) -> dict:
+    doc = _literal_source_document(root, values[0], "0.24\n")
+    row = doc["species"]["Fe"]["observations"][0]
+    rows = []
+    for value in values:
+        cloned = copy.deepcopy(row)
+        cloned["observation_id"] = "fe_alpha_1"
+        cloned["values"] = {"alpha": value}
+        rows.append(cloned)
+    doc["species"]["Fe"]["observations"] = rows
+    if addressing == "structured":
+        doc["fidelity_samples"] = [
+            {
+                "species": "Fe",
+                "observable": "alpha",
+                "observation_id": "fe_alpha_1",
+                "field": "alpha",
+                "value": values[0],
+                "reviewed_by": "independent reviewer",
+                "reviewed_on": "2026-11-10",
+                "locator": {"source_path": "text/paper.txt", "page": 2},
+            }
+        ]
+    return doc
+
+
+@pytest.mark.parametrize(
+    ("case_name", "values", "ambiguous"),
+    _AMBIGUOUS_ID_CASES,
+    ids=[row[0] for row in _AMBIGUOUS_ID_CASES],
+)
+@pytest.mark.parametrize("addressing", ("path", "structured"))
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_ambiguous_observation_id_refuses_every_promoter(
+    case_name: str,
+    values: tuple[float, ...],
+    ambiguous: bool,
+    addressing: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: an observation id certifies at most one scored row.
+
+    Two rows with id ``fe_alpha_1`` and values 0.24 and 0.91 are the
+    collapse: a path pin resolves the first row and coverage used to record
+    the last. Equal values still refuse. Schema validation also rejects
+    duplicates; certification refuses when schema validation is skipped.
+    """
+    doc = _ambiguous_id_document(tmp_path, values, addressing)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    if not ambiguous:
+        assert errors == [], (case_name, addressing, entry, errors)
+        return
+    joined = "\n".join(errors)
+    assert "ambiguous_observation_id" in joined, (case_name, addressing, entry, errors)
+    if entry == "certify":
+        assert "source_blind_pin" not in joined
+        assert "uncovered_observation" not in joined
+        warnings = vle.fidelity_source_warnings(
+            doc, label="dup", artifact_root=tmp_path
+        )
+        found = next(
+            warning for warning in warnings if warning.kind == "ambiguous_observation_id"
+        )
+        assert found.count == 1
+        assert "fe_alpha_1" in found.detail
+        assert f"names {len(values)} scored rows" in found.detail
+    if entry == "validate":
+        assert "duplicate observation_id" in joined
 
 
 def _artifact_role_document(root: Path, role: str) -> tuple[dict, bool]:
