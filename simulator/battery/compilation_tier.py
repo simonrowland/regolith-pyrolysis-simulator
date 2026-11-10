@@ -2051,8 +2051,10 @@ def _tabulated_gas_basis_matches(
     owner establishes that the 298.15 K reference is this ideal gas. B677's
     standalone K(g) table is such a match; its combined K(c,l,g) table is not.
     A reference-state table that is crystal at 298.15 K does not, including
-    temperatures where the stable phase has become gas. H−H298 is the only
-    quantity that calls this. Cp and S do not.
+    temperatures where the stable phase has become gas. B1259 also matches a
+    record whose phase string is one ideal-gas span over the whole grid and
+    whose 298.15 K H−H298 cell is 0. H−H298 is the only quantity that calls
+    this. Cp and S do not.
     """
 
     if _is_janaf_compilation_observation(observation, None):
@@ -2061,6 +2063,7 @@ def _tabulated_gas_basis_matches(
     from simulator.battery.generators.usgs_b1259 import (
         SOURCE_ID as b1259_source,
         reference_enthalpy_zero_is_ideal_gas as b1259_ideal_gas,
+        reference_enthalpy_zero_is_ideal_gas_span as b1259_ideal_gas_span,
     )
     from simulator.battery.generators.usgs_b1452 import (
         SOURCE_ID as b1452_source,
@@ -2068,7 +2071,9 @@ def _tabulated_gas_basis_matches(
     )
 
     if source_id == b1259_source:
-        return b1259_ideal_gas(formula)
+        return b1259_ideal_gas(formula) or b1259_ideal_gas_span(
+            _locator_table_id(observation)
+        )
     if source_id == b1452_source:
         return b1452_ideal_gas(formula)
     if source_id == "pankratz-1984-usbm-b677":

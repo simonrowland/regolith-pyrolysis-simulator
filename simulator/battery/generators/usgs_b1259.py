@@ -1648,6 +1648,80 @@ def reference_enthalpy_zero_is_ideal_gas(formula: str) -> bool:
     return phase_token(species) is Phase.G and species.formula == formula
 
 
+# One printed span, optional molecularity word, optional trailing footnote digit.
+_IDEAL_GAS_SPAN_RE = re.compile(
+    r"ideal(?:\s+[a-z]+)?\s+gas\s+"
+    r"(\d+(?:\.\d+)?)\s*°\s*to\s+"
+    r"(\d+(?:\.\d+)?)\s*°\s*k\.?",
+    re.IGNORECASE,
+)
+
+
+def _b1259_record(record_id: str) -> Mapping[str, Any] | None:
+    if (
+        not record_id
+        or "/" in record_id
+        or "\\" in record_id
+        or record_id.startswith(".")
+    ):
+        return None
+    path = RECORDS_DIR / f"{record_id}.json"
+    if not path.is_file():
+        return None
+    return load_record(path)
+
+
+@lru_cache(maxsize=None)
+def reference_enthalpy_zero_is_ideal_gas_span(record_id: str) -> bool:
+    """True when this record prints one ideal-gas span over its whole grid.
+
+    The 298.15 K H−H298 cell on that grid is 0, so the table uses the
+    ideal-gas enthalpy zero. ``reference_enthalpy_zero_is_ideal_gas`` stays
+    the one-element 298.15 K test. A reference-state schedule that is
+    crystal or liquid at 298.15 K, including one that becomes gas later,
+    is not this span.
+    """
+
+    record = _b1259_record(record_id)
+    if record is None:
+        return False
+    phase = re.sub(r"\s+\d+$", "", str(record.get("phase") or "").strip()).strip()
+    match = _IDEAL_GAS_SPAN_RE.fullmatch(phase)
+    if match is None:
+        return False
+    low = Decimal(match.group(1))
+    high = Decimal(match.group(2))
+    temperatures: list[Decimal] = []
+    saw_reference_zero = False
+    for row in record.get("rows") or ():
+        if not isinstance(row, Mapping) or row.get("kind") != "data":
+            continue
+        temperature = row.get("temperature")
+        if not isinstance(temperature, Mapping) or temperature.get("value") is None:
+            return False
+        try:
+            node = Decimal(str(temperature["value"]))
+        except (InvalidOperation, ValueError):
+            return False
+        if node < low or node > high:
+            return False
+        temperatures.append(node)
+        if node != REFERENCE_TEMPERATURE_K:
+            continue
+        cell = row.get("H_minus_H298")
+        if not isinstance(cell, Mapping):
+            return False
+        try:
+            published = Decimal(str(cell.get("as_published")).strip())
+            numeric = Decimal(str(cell.get("value")))
+        except (InvalidOperation, ValueError, AttributeError):
+            return False
+        if published != 0 or numeric != 0:
+            return False
+        saw_reference_zero = True
+    return bool(temperatures) and saw_reference_zero
+
+
 def _formation_identity(
     product: Species, basis: str, temperature: Decimal
 ) -> tuple[Reaction, tuple[tuple[str, Species], ...]] | None:
