@@ -1664,10 +1664,11 @@ def test_magemin_hour156_mode_sum_is_renormalised_to_one(monkeypatch):
 
     assert result.status == 'ok'
     assert sum(result.phase_masses_kg.values()) == 1.0
-    # 1.00003/1.00011 and the last-token remainder. A wrong split that
-    # still sums to 1 fails these two pins.
+    # Liquid is 1.00003/1.00011. Olivine stays 0.00008/1.00011.
+    # The largest component takes the closure residual, so a last-token
+    # remainder fails the olivine pin.
     assert result.phase_masses_kg['liq'] == 0.9999200087990321
-    assert result.phase_masses_kg['ol'] == 0.00007999120096791046
+    assert result.phase_masses_kg['ol'] == 7.999120096789353e-05
     notice = _renormalised_mode_notice(result)
     assert notice['raw_tokens'] == [
         {'phase': 'liq', 'raw_token': '1.00003'},
@@ -1686,7 +1687,8 @@ def test_magemin_mode_100003_00005_sums_to_one_and_native_mode_agrees():
     )
 
     assert parsed['liq']['mass_kg'] == 0.99995000399968
-    assert parsed['ol']['mass_kg'] == 4.9996000319962874e-05
+    # 0.00005/1.00008. The largest component takes the closure residual.
+    assert parsed['ol']['mass_kg'] == 4.99960003199744e-05
     assert parsed['liq']['mass_kg'] + parsed['ol']['mass_kg'] == 1.0
     assert metadata['mode_fractions']['liq'] == parsed['liq']['mass_kg']
     assert metadata['mode_fractions']['ol'] == parsed['ol']['mass_kg']
@@ -1694,6 +1696,35 @@ def test_magemin_mode_100003_00005_sums_to_one_and_native_mode_agrees():
     assert notice['kind'] == 'mode_vector_renormalised'
     assert notice['raw_sum'] == pytest.approx(1.00008)
     assert notice['mass_residual'] == pytest.approx(1.2e-5)
+
+
+def test_magemin_trace_phase_survives_renormalisation():
+    """A 1e-20 olivine beside liquid 1.0002 stays a positive phase.
+
+    Controller ruling 2026-11-10: the closure residual is written onto
+    the largest component. The last-token assignment rounds this liquid
+    to 1 and replaces the olivine with 0, and the parser then drops it.
+    d-367 forbids that silent zero. The olivine pin is the independent
+    quotient 1e-20 / (1.0002 + 1e-20).
+    """
+    metadata: dict = {}
+    parsed = MAGEMinBackend._parse_subprocess_stdout(
+        f'{_VERB0_MASS_RESIDUAL_1E5}'
+        'Phase: liq ol\nMode: 1.0002 1e-20\n',
+        metadata=metadata,
+    )
+
+    assert parsed['liq']['mass_kg'] == 1.0
+    assert parsed['ol']['mass_kg'] == 9.998000399920016e-21
+    assert metadata['mode_fractions']['ol'] == parsed['ol']['mass_kg']
+    assert metadata['mode_fractions']['liq'] == parsed['liq']['mass_kg']
+    assert parsed['liq']['mass_kg'] + parsed['ol']['mass_kg'] == 1.0
+    notice = metadata['mode_token_notices'][0]
+    assert notice['kind'] == 'mode_vector_renormalised'
+    assert notice['raw_tokens'] == [
+        {'phase': 'liq', 'raw_token': '1.0002'},
+        {'phase': 'ol', 'raw_token': '1e-20'},
+    ]
 
 
 def test_magemin_mode_deficit_outside_green_closure_stays_refusal():
@@ -1946,7 +1977,7 @@ def test_magemin_mode_closure_is_one_class_for_every_vector(
     # preserves the total can still fail.
     if phases == 'liq ol' and modes == '1.00003 0.00008':
         assert metadata['mode_fractions']['liq'] == 0.9999200087990321
-        assert metadata['mode_fractions']['ol'] == 0.00007999120096791046
+        assert metadata['mode_fractions']['ol'] == 7.999120096789353e-05
 
 
 def test_magemin_duplicate_phase_names_close_before_they_are_summed():

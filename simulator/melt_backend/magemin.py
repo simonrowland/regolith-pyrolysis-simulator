@@ -951,7 +951,9 @@ def _close_printed_mode_vector(
       is in [0, 1], or the printed decimal sum is already 1;
     - a renormalisation, when the raw sum exceeds 1 by at most 1e-3 and
       every token is in [0, 1+1e-3]. Stored fractions are the raw tokens
-      divided by the raw sum. A lone 1.0002 and hour 156 are this class;
+      divided by the raw sum, and the closure residual is written onto
+      the largest component so a positive quotient is not replaced by 0.
+      A lone 1.0002 and hour 156 are this class;
     - a typed refusal: a token outside [0, 1+1e-3] (including 1.0011), a
       mass deficit outside the green closure, or a sum excess above 1e-3.
 
@@ -1015,9 +1017,20 @@ def _close_printed_mode_vector(
             float(token / raw_sum)
             for _name, token, _raw, _fraction in raw_rows
         ]
-        # The last token absorbs the rounding so the stored floats sum
-        # to 1. x + (1 - x) is 1 for a finite x.
-        scaled[-1] = 1.0 - sum(scaled[:-1])
+        # The closure residual goes to the largest component. Writing it
+        # onto the last token erases a positive trace: Mode 1.0002 1e-20
+        # rounds liquid to 1, then 1 - 1 = 0 and the olivine is dropped.
+        # d-367 forbids that silent zero (controller ruling 2026-11-10).
+        # A tie keeps the later index, which is the old last-token
+        # assignment when that token is one of the largest. For a finite
+        # sum of the others, largest + (1 - that sum) is 1.
+        largest = max(
+            range(len(scaled)),
+            key=lambda index: (scaled[index], index),
+        )
+        scaled[largest] = 1.0 - sum(
+            value for index, value in enumerate(scaled) if index != largest
+        )
         parsed_modes = [
             (name, value)
             for (name, _token, _raw, _fraction), value in zip(
