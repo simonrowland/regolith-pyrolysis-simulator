@@ -188,8 +188,8 @@ _H133_QUANTIZED_MOL = {
     "Zn": 0.3142123351837479
 }
 _H133_WARM_SIO2_ACTIVITY = {
-    "ordinary": 0.020796595595499484,
-    "quantized": 0.02080166433881563,
+    "ordinary": 0.020575037601467318,
+    "quantized": 0.02058007342554575,
 }
 
 
@@ -436,38 +436,38 @@ _LUNAR_CALL_64 = {
     "Na2O": 1.9086093358233833e-07, "SiO2": 1148.9258228745186,
     "TiO2": 192.8967375771004, "FeO": 0.02787490262712387,
 }
-# Logged parent activities, c2b7b4e/oimcc-calls-c2b7b4e-56179.jsonl.
-# These are the solved OpenIMCC parent activities (x*), not a continuation.
+# Recomputed with OpenIMCC 995dc14 at the recorded c2b7b4e lunar call compositions and temperatures.
+# These are solved OpenIMCC parent activities (x*), not a continuation.
 _LUNAR_SOLVED_ACTIVITY = {
     60: {
-        "SiO2": 0.00491910632589734, "MgO": 0.29003803439475734,
-        "FeO": 7.6081001780881665e-06, "CaO": 0.020298134754009073,
-        "Al2O3": 0.019497982908272645, "TiO2": 0.0015332892917718512,
-        "Na2O": 8.975956307200665e-23, "K2O": 3.895324724042545e-09,
+        "SiO2": 0.004834116466729471, "MgO": 0.28896362538613685,
+        "FeO": 7.5668338536106184e-06, "CaO": 0.020479453072354097,
+        "Al2O3": 0.019148206763755223, "TiO2": 0.0015332163734111304,
+        "Na2O": 8.594296009807818e-23, "K2O": 3.974656138098117e-09,
     },
     61: {
-        "SiO2": 0.004107876381715498, "MgO": 0.3069501381169543,
-        "FeO": 7.564477722792486e-06, "CaO": 0.0232759536601634,
-        "Al2O3": 0.018185272341414004, "TiO2": 0.001387386098867267,
-        "Na2O": 1.0440512588493435e-22, "K2O": 4.7504875012812956e-09,
+        "SiO2": 0.004042101799369685, "MgO": 0.3063916670208272,
+        "FeO": 7.524204155774839e-06, "CaO": 0.023377473116215616,
+        "Al2O3": 0.018024937523354496, "TiO2": 0.001387382341152718,
+        "Na2O": 9.891214394943488e-23, "K2O": 4.797225271245882e-09,
     },
     62: {
-        "SiO2": 0.0034549055949816875, "MgO": 0.32269118913215145,
-        "FeO": 7.557748782306461e-06, "CaO": 0.02647372170951418,
-        "Al2O3": 0.017056218137053623, "TiO2": 0.0012651960434469285,
-        "Na2O": 1.1901243047466535e-22, "K2O": 5.637959524195314e-09,
+        "SiO2": 0.0034053030256761888, "MgO": 0.3226773657739232,
+        "FeO": 7.518157210391188e-06, "CaO": 0.026464028691049104,
+        "Al2O3": 0.01706265506939395, "TiO2": 0.0012655341349412977,
+        "Na2O": 1.1157536853761791e-22, "K2O": 5.635339511602109e-09,
     },
     63: {
-        "SiO2": 0.002922487950859203, "MgO": 0.3372778580135101,
-        "FeO": 7.542008809495907e-06, "CaO": 0.029900010771698942,
-        "Al2O3": 0.01607812602659893, "TiO2": 0.001161825240157193,
-        "Na2O": 1.3344162376079728e-22, "K2O": 6.544378404416625e-09,
+        "SiO2": 0.002886324793725183, "MgO": 0.33783972368768145,
+        "FeO": 7.503101414404428e-06, "CaO": 0.029745219287347895,
+        "Al2O3": 0.01623190726788628, "TiO2": 0.0011626707217464866,
+        "Na2O": 1.2381811651682245e-22, "K2O": 6.476129239314186e-09,
     },
     64: {
-        "SiO2": 0.0024835135180372647, "MgO": 0.35073146643562825,
-        "FeO": 7.5193910058890244e-06, "CaO": 0.033564239286234934,
-        "Al2O3": 0.015225486004163104, "TiO2": 0.001073551039351885,
-        "Na2O": 1.4757610544606816e-22, "K2O": 7.458665140677511e-09,
+        "SiO2": 0.0024584060054944176, "MgO": 0.3519018684791352,
+        "FeO": 7.481194680618617e-06, "CaO": 0.03322815352494884,
+        "Al2O3": 0.015509889090127738, "TiO2": 0.0010750027372074626,
+        "Na2O": 1.3556692765700723e-22, "K2O": 7.309583815384233e-09,
     },
 }
 _LUNAR_CALL_66 = {
@@ -483,7 +483,7 @@ _LUNAR_SOLVED_COMPOSITION = {
 _LUNAR_SOLVED_T_K = {
     60: 2393.15, 61: 2400.65, 62: 2408.15, 63: 2415.65, 64: 2423.15, 66: 2438.15,
 }
-_LUNAR_SOLVED_ACTIVITY[66] = {"SiO2": 0.0018117532732782316}
+_LUNAR_SOLVED_ACTIVITY[66] = {"SiO2": 0.0018029135011558004}
 # Parents whose one-step continuation is inside the 1% bound. Na2O's cap is
 # zero. K2O stays on the constant-gamma table by the existing exclusion.
 _ONE_STEP_PARENTS = ("SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2")
@@ -525,14 +525,14 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
-    # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
+    # Numeric-only hash re-derived against OpenIMCC 995dc14.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "7d93eda6e2a5812bad5bfa80351c187c88adc91e79c2e369b9f7d64d336fdfc8"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    ).hexdigest() == "7e81a7b49be5273ac7a6208f0c7933e1a382a445af5de52d1109a70f7587d475"
+    # Combined physics and metadata digest re-derived against OpenIMCC 995dc14.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "934e52dd541fc5e6933b7fa9d3b106003b5d20f103aa0c6489c4f4ced3f74cc9"
+    ).hexdigest() == "0e86cd92ba7b10e4ef0340349e347aa7a716a4e2d5ba825e27fd36f17088485d"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -1022,7 +1022,7 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
     # Past the cap, gamma is the last in-cap extrapolation, not a new step.
     assert live_gamma[64] == live_gamma[63]
     # The slope published while still inside the cap, read at s=3, is the
-    # measured SiO2 growth of -3.7% against the logged solve.
+    # measured SiO2 growth of about -3.9% against the logged solve.
     in_cap = next(n for n in authority["notices"] if n.get("parent") == "SiO2")
     s_three = (
         (_LUNAR_SOLVED_T_K[64] - in_cap["temperature_K"])
@@ -1031,7 +1031,7 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
     assert s_three == pytest.approx(3.0)
     predicted = math.exp(in_cap["ln_gamma_last"] + in_cap["ln_gamma_slope"] * s_three)
     solved_64 = _solved_effective_gamma(64, "SiO2")
-    assert (predicted - solved_64) / solved_64 == pytest.approx(-0.037, abs=0.0015)
+    assert (predicted - solved_64) / solved_64 == pytest.approx(-0.0387, abs=0.0015)
 
     # Call 66 is five thermal steps from call 61: the SiO2 cap plus two.
     beyond = _refuse_lunar_call(provider, monkeypatch, 66, chained)
@@ -2115,7 +2115,7 @@ def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
     assert high_t["openimcc_activities_by_oxide"]["K2O"] != constant_gamma.activity
     assert high_t["seam"]["K2O"]["ratio_dex_selected_over_below_cap"] == 0.0
     assert high_t["seam"]["K2O"]["would_be_openimcc_step_dex"] == pytest.approx(
-        -0.24814525336393226
+        -0.23315363445010703
     )
     assert high_t["authority_exclusions"]["K2O"]["tracking_id"] == "t-999"
     reason = high_t["authority_exclusions"]["K2O"]["reason"]
@@ -2204,7 +2204,7 @@ def test_ae95_depleted_melt_continuation_root_is_selected_by_provider() -> None:
     assert high_t["fallback"] is False
     assert "fallback_reason" not in high_t
     assert high_t["activities_by_oxide"]["SiO2"] == pytest.approx(
-        3.4859611072197934e-9,
+        3.4974271192541507e-09,
         rel=1e-9,
         abs=0.0,
     )

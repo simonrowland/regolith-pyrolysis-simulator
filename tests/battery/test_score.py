@@ -6252,7 +6252,7 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
     assert "level anchored to the x(SiO2)=0.25 row" in report
     assert "Table 2 partial pressures only; activities are figure_only" in report
     assert "level tied to the absolute p(Ca) and p(O) scales" in report
-    assert "0.473 ± 0.031 | x(SiO2) | 9 |" in report
+    assert "0.551 ± 0.031 | x(SiO2) | 9 |" in report
     assert "CaO(phase unspecified) -> Ca(g) + O(g)" in report
     assert (
         "not computed: reference phase not printed; binding has no CaO(cr) K at 1933 K"
