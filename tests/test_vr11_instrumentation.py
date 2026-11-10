@@ -25,25 +25,31 @@ from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
     PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
+    _EMPTY_FLUX_AUTHORIZING_STATES,
+    _KERNEL_SEAM_DEBIT_SPECIES,
+    _authorize_empty_species_flux,
     _evaporation_legacy_shadow_pressure_map,
     _pre_rg_effective_pressure_source,
 )
 from simulator.vapour_rail.batch import (
+    FLUX_ACTIVATION_EPOCH_PRE_RG,
     FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
     FluxActivationContext,
+    FluxDiagnosticUpperBound,
     FluxEligible,
     FluxRefusal,
     PressureRefusal,
+    PressureUpperBound,
     PressureValue,
     VapourAnswer,
     VapourBatch,
+    ZeroByPhysics,
 )
 from simulator.vapour_rail.instrumentation import (
     AUDITED_OPERATOR_T_COND_SPECIES,
     CompatibilityPressureMapReadTripwire,
     CONTROL_FLUX_PRESSURES_KEY,
     EFFECTIVE_PRESSURE_SOURCE_CONTEXT,
-    EffectivePressureSource,
     FLUX_CONSUMER_RELPATHS,
     SETPOINTS_T_COND_AUDIT,
     SHADOW_MISMATCH,
@@ -725,24 +731,10 @@ def _flux_with_live_shadow(
     batch: VapourBatch | None,
     live: dict[str, float],
     *,
-    effective: dict[str, float] | None = None,
     resolution_error: dict[str, Any] | None = None,
 ) -> tuple[dict[str, float], dict[str, Any]]:
-    source_values = (
-        {
-            species_id: live[species_id]
-            for species_id in batch.flux_active_species_ids
-            if species_id in live
-        }
-        if effective is None and batch is not None
-        else dict(effective or {})
-    )
     flux, report = flux_pressures_from_batch(
         batch,
-        effective_pressure_source=EffectivePressureSource(
-            "test_effective_pressure_source",
-            source_values,
-        ),
         resolution_error=resolution_error,
     )
     report.update(
@@ -757,41 +749,51 @@ def _flux_with_live_shadow(
 
 
 def test_flux_pressures_from_batch_channel_unions() -> None:
-    """Batch gates channels while the typed source supplies effective Pa."""
+    """Batch channel selection and selected runtime Pa reach the flux path."""
 
     live = {"Na": 12.5, "SiO": 3.0, "Fe": 0.0}
-    selected = {"Na": 9.0, "SiO": 2.0, "Fe": 0.0}
+    selected_runtime = {"Na": 999.0, "SiO": 999.0, "Fe": 999.0}
     batch = _toy_batch(
         {"Na", "SiO", "Fe", "K"},
         pressures={"Na": 1.0, "SiO": 1.0, "Fe": 1.0, "K": 0.5},
-        selected_runtime_pressures={"Na": 999.0, "SiO": 999.0, "Fe": 999.0},
+        selected_runtime_pressures=selected_runtime,
         flux_active=set(live),
     )
-    flux, report = _flux_with_live_shadow(batch, live, effective=selected)
-    assert flux == selected
+    flux, report = _flux_with_live_shadow(
+        batch,
+        live,
+    )
+    assert flux == selected_runtime
     # Batch-only answerable channel is dormant in the pre-RG epoch.
     assert "K" not in flux
     assert report["batch_pa_by_species"]["K"] == 0.5
     assert report["batch_flux_active_not_in_live"] == []
-    assert report["selection_source"] == "test_effective_pressure_source"
+    assert report["selection_source"] == "vapour_batch_selected_runtime_pressure"
     assert report["batch_pa_by_species"]["Na"] == 1.0
-    assert report["selected_runtime_pa_by_species"]["Na"] == 9.0
+    assert report["selected_runtime_pa_by_species"]["Na"] == 999.0
     assert report["shadow_equal"] is False
     assert report["shadow_outcome"] == SHADOW_MISMATCH
     assert report["catalog_pa_shadow_equal"] is False
 
 
-def test_in_domain_effective_pressure_set_mismatch_fails_closed() -> None:
-    batch = _toy_batch({"Na"}, pressures={"Na": 1.0})
+def test_invalid_selected_runtime_pressure_fails_closed() -> None:
+    answer = replace(
+        _toy_answer("Na"),
+        selected_runtime_pressure=PressureRefusal(
+            code="test_missing_runtime_pressure",
+            detail="selected runtime pressure is unavailable",
+        ),
+    )
+    batch = VapourBatch(
+        requested_species_ids=frozenset({"Na"}),
+        channels_by_species={"Na": answer},
+        flux_active_species_ids=frozenset({"Na"}),
+    )
 
-    flux, report = _flux_with_live_shadow(batch, {"Na": 12.5}, effective={})
+    flux, report = _flux_with_live_shadow(batch, {"Na": 12.5})
 
     assert flux == {}
-    assert report["selection_source"] == (
-        "typed_failure_effective_pressure_species_set_mismatch"
-    )
-    assert report["missing_effective_pressure_species"] == ["Na"]
-    assert report["catalog_continuation_flux_species"] == []
+    assert report["batch_channel_states"]["Na"] == "refusal"
 
 
 def test_flux_pressures_proved_when_legacy_and_batch_agree() -> None:
@@ -955,6 +957,346 @@ def test_evaporation_healthy_empty_batch_at_900c_keeps_cheap_zero() -> None:
     assert flux.species_kg_hr == {}
 
 
+# Invariant: an empty species flux is never a silent 0.0. Every requested
+# species is a computed debit or a selected outcome that authorizes zero
+# (dormant epoch, upper bound, zero-by-physics). Refusal, incomplete,
+# missing, and invalid selected pressures are typed refusals of that empty
+# flux. A numeric catalog pressure does not authorize the zero. The sub-1050 C
+# physical-zero shortcut and the below-400 K kinetic floor both go through
+# that one rule.
+# Kernel-seam carriers, the non-seam tripwire carriers, and the sibling that
+# rides the 900 C Fe batch. Kept literal here because those sets are defined
+# later in this module; the coverage test pins the equality.
+_EMPTY_FLUX_SPECIES = (
+    "Al",
+    "Al2",
+    "Al2O",
+    "Al2O2",
+    "Al2O3_gas",
+    "AlO",
+    "AlO2",
+    "Ca",
+    "CrO",
+    "CrO2",
+    "Fe",
+    "FeO_association_gas",
+    "K",
+    "Mg",
+    "Na",
+    "Si",
+    "SiO",
+    "Ti",
+)
+_EMPTY_FLUX_BLOCKING_SHAPES = (
+    "selected_refusal_dormant_catalog",
+    "flux_refusal_numeric_selected",
+    "incomplete_channel",
+    "invalid_selected_active",
+    "both_pressures_refused",
+    "refusal_beside_authorizing_peer",
+)
+_EMPTY_FLUX_AUTHORIZING_SHAPES = (
+    "dormant_eligible",
+    "upper_bound",
+    "inactive_zero_by_physics",
+)
+_EMPTY_FLUX_STATE_BY_SHAPE = {
+    "selected_refusal_dormant_catalog": "refusal",
+    "flux_refusal_numeric_selected": "refusal",
+    "incomplete_channel": "incomplete_channel",
+    "invalid_selected_active": "invalid_selected_runtime_pressure",
+    "both_pressures_refused": "refusal",
+    "refusal_beside_authorizing_peer": "refusal",
+    "dormant_eligible": "dormant_by_epoch",
+    "upper_bound": "upper_bound",
+    "inactive_zero_by_physics": "dormant_by_epoch",
+}
+_AUTHORIZING_PEER = "AuthorizingPeer"
+_EMPTY_FLUX_TEMPERATURES = (
+    pytest.param(900.0, False, id="sub1050-900C"),
+    pytest.param(100.0, True, id="kinetic-floor-100C"),
+    pytest.param(1600.0, False, id="hot-1600C"),
+)
+
+
+def _channel_answer(
+    species_id: str,
+    *,
+    pressure: Any,
+    selected: Any,
+    flux: Any,
+) -> VapourAnswer:
+    return VapourAnswer(
+        species_id=species_id,
+        pressure=pressure,
+        selected_runtime_pressure=selected,
+        flux=flux,
+        source_label="test",
+        formula_id=species_id,
+        source_account="process.cleaned_melt",
+        solve_group_id="g1",
+        state_fingerprint="state:test",
+        validation_status="pending_validation",
+    )
+
+
+def _empty_flux_batch(species_id: str, shape: str) -> VapourBatch:
+    """One selected-outcome shape. Catalog Pa stays numeric wherever the shape has one."""
+
+    value = PressureValue(pa=1.0)
+    selected_value = PressureValue(pa=2.0)
+    eligible = FluxEligible(alpha_ref=f"alpha:{species_id}")
+    refusal = PressureRefusal(code="missing_ellingham_input", detail="missing")
+    flux_refusal = FluxRefusal(code="missing_ellingham_input", detail="missing")
+    channels: dict[str, VapourAnswer] = {}
+    active: set[str] = set()
+    if shape == "selected_refusal_dormant_catalog":
+        channels[species_id] = _channel_answer(
+            species_id, pressure=value, selected=refusal, flux=flux_refusal
+        )
+    elif shape == "flux_refusal_numeric_selected":
+        channels[species_id] = _channel_answer(
+            species_id, pressure=value, selected=selected_value, flux=flux_refusal
+        )
+    elif shape == "incomplete_channel":
+        channels[species_id] = _channel_answer(
+            species_id,
+            pressure=value,
+            selected=ZeroByPhysics(evidence_ref="test:incomplete"),
+            flux=eligible,
+        )
+    elif shape == "invalid_selected_active":
+        channels[species_id] = _channel_answer(
+            species_id,
+            pressure=value,
+            selected=PressureValue(pa=float("nan")),
+            flux=eligible,
+        )
+        active.add(species_id)
+    elif shape == "both_pressures_refused":
+        channels[species_id] = _channel_answer(
+            species_id, pressure=refusal, selected=refusal, flux=flux_refusal
+        )
+    elif shape == "refusal_beside_authorizing_peer":
+        channels[species_id] = _channel_answer(
+            species_id, pressure=refusal, selected=refusal, flux=flux_refusal
+        )
+        channels[_AUTHORIZING_PEER] = _channel_answer(
+            _AUTHORIZING_PEER,
+            pressure=value,
+            selected=selected_value,
+            flux=FluxEligible(alpha_ref="alpha:peer"),
+        )
+    elif shape == "dormant_eligible":
+        channels[species_id] = _channel_answer(
+            species_id, pressure=value, selected=selected_value, flux=eligible
+        )
+    elif shape == "upper_bound":
+        channels[species_id] = _channel_answer(
+            species_id,
+            pressure=value,
+            selected=PressureUpperBound(pa=3.0, evidence_ref="test:bound"),
+            flux=FluxDiagnosticUpperBound(alpha_ref=f"alpha:{species_id}"),
+        )
+    elif shape == "inactive_zero_by_physics":
+        zero = ZeroByPhysics(evidence_ref="test:zero")
+        channels[species_id] = _channel_answer(
+            species_id, pressure=zero, selected=zero, flux=eligible
+        )
+    else:
+        raise AssertionError(shape)
+    return VapourBatch(
+        requested_species_ids=frozenset(channels),
+        channels_by_species=channels,
+        flux_active_species_ids=frozenset(active),
+    )
+
+
+def _run_empty_backend(
+    batch: VapourBatch,
+    temperature_C: float,
+    *,
+    kinetic_floor: bool,
+) -> tuple[str, str | None, dict[str, Any]]:
+    diagnostics: dict[str, Any] = {}
+    if kinetic_floor:
+        diagnostics["vapor_pressure_zero_reason"] = (
+            "internal_analytical_below_400K"
+        )
+    model = SimpleNamespace(
+        melt=SimpleNamespace(temperature_C=temperature_C),
+        setpoints={},
+        vapor_pressures={},
+        _last_vapour_batch_resolve_error={},
+        _last_vapor_pressure_diagnostic={},
+        _resolve_evaporation_vapour_batch=(
+            lambda equilibrium, temperature_K, effective_pressure_source: batch
+        ),
+    )
+    model._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        model,
+    )
+    equilibrium = SimpleNamespace(
+        temperature_C=temperature_C,
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={},
+        status="ok",
+        diagnostics=diagnostics,
+    )
+    try:
+        EvaporationMixin._calculate_evaporation(model, equilibrium)
+    except EvaporationFluxRefusal as exc:
+        overlay = dict(exc.diagnostic.get("vapour_batch_flux_overlay") or {})
+        return "refused", exc.reason, overlay
+    diagnostic = dict(getattr(model, "_last_evaporation_flux_diagnostic", {}) or {})
+    overlay = dict(getattr(model, "_last_vapour_batch_flux_overlay", {}) or {})
+    return "returned", diagnostic.get("reason"), overlay
+
+
+def _authorizing_empty_flux_reason(
+    shape: str,
+    temperature_C: float,
+    *,
+    kinetic_floor: bool,
+) -> str:
+    if kinetic_floor:
+        return "internal_analytical_below_400K"
+    # Inactive zero-by-physics is reclassified dormant and has no catalog Pa,
+    # so the sub-1050 shortcut's coverage proof does not fire.
+    if shape == "inactive_zero_by_physics" or temperature_C >= 1050.0:
+        return "vapour_batch_all_channels_non_debiting"
+    return "pre_rg_backend_below_effective_pressure_threshold"
+
+
+@pytest.mark.parametrize("species_id", _EMPTY_FLUX_SPECIES)
+@pytest.mark.parametrize("shape", _EMPTY_FLUX_BLOCKING_SHAPES)
+@pytest.mark.parametrize(("temperature_C", "kinetic_floor"), _EMPTY_FLUX_TEMPERATURES)
+def test_empty_flux_refuses_every_nonauthorizing_selected_outcome(
+    species_id: str,
+    shape: str,
+    temperature_C: float,
+    kinetic_floor: bool,
+) -> None:
+    """A dormant catalog Pa or an empty backend map cannot hide a bad selection.
+
+    Fails while the sub-1050 C shortcut or the below-400 K floor returns an
+    empty flux for this shape.
+    """
+
+    outcome, reason, overlay = _run_empty_backend(
+        _empty_flux_batch(species_id, shape),
+        temperature_C,
+        kinetic_floor=kinetic_floor,
+    )
+    states = overlay.get("batch_channel_states") or {}
+    assert states.get(species_id) == _EMPTY_FLUX_STATE_BY_SHAPE[shape]
+    if shape == "refusal_beside_authorizing_peer":
+        assert states.get(_AUTHORIZING_PEER) == "dormant_by_epoch"
+        assert _AUTHORIZING_PEER in (overlay.get("batch_pa_by_species") or {})
+    assert outcome == "refused", (species_id, shape, temperature_C, reason)
+    assert reason == "vapour_batch_no_debiting_pressure_outcome"
+    assert reason != "pre_rg_backend_below_effective_pressure_threshold"
+
+
+@pytest.mark.parametrize("species_id", _EMPTY_FLUX_SPECIES)
+@pytest.mark.parametrize("shape", _EMPTY_FLUX_AUTHORIZING_SHAPES)
+@pytest.mark.parametrize(("temperature_C", "kinetic_floor"), _EMPTY_FLUX_TEMPERATURES)
+def test_empty_flux_keeps_authorizing_selected_outcomes(
+    species_id: str,
+    shape: str,
+    temperature_C: float,
+    kinetic_floor: bool,
+) -> None:
+    """Dormant, upper-bound, and zero-by-physics outcomes still authorize zero."""
+
+    outcome, reason, overlay = _run_empty_backend(
+        _empty_flux_batch(species_id, shape),
+        temperature_C,
+        kinetic_floor=kinetic_floor,
+    )
+    states = overlay.get("batch_channel_states") or {}
+    assert states.get(species_id) == _EMPTY_FLUX_STATE_BY_SHAPE[shape]
+    assert outcome == "returned", (species_id, shape, temperature_C, reason)
+    assert reason == _authorizing_empty_flux_reason(
+        shape, temperature_C, kinetic_floor=kinetic_floor
+    )
+
+
+_FE_900C_ELLINGHAM_OMISSIONS = (
+    ("missing_activity", {"fO2_bar": 1.0e-9}, "activity"),
+    ("missing_pO2", {"source_reaction_activities": {"Fe": 0.2}}, "pO2"),
+)
+
+
+@pytest.mark.parametrize(
+    ("omission_id", "state_overrides", "detail_needle"),
+    _FE_900C_ELLINGHAM_OMISSIONS,
+    ids=[item[0] for item in _FE_900C_ELLINGHAM_OMISSIONS],
+)
+def test_fe_900c_missing_ellingham_input_is_not_a_cold_physical_zero(
+    omission_id: str,
+    state_overrides: dict[str, Any],
+    detail_needle: str,
+) -> None:
+    """900 C, liquid FeO, empty backend map: missing Ellingham input refuses.
+
+    Fe's dormant catalog pressure stays numeric, so batch_pa_by_species is
+    truthy. That coverage must not authorize the sub-1050 C physical zero.
+    """
+
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+    from simulator.vapour_rail.u0_manifest import load_u0_manifest
+
+    catalog = _fe_cold_catalog(compile_vapour_rail_catalog, load_u0_manifest)
+    state = {
+        "temperature_K": 900.0 + 273.15,
+        "process_phase": "hot_train",
+        "stage": "evaporation",
+    }
+    state.update(state_overrides)
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"FeO": 1.0}},
+        state,
+        flux_activation_context=FluxActivationContext(
+            epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+            effective_pressure_species_ids=frozenset(),
+        ),
+    )
+    answer = batch.channel("Fe")
+    assert isinstance(answer.pressure, PressureValue)
+    assert math.isfinite(answer.pressure.pa)
+    assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+    assert answer.selected_runtime_pressure.code == "missing_ellingham_input"
+    assert detail_needle in answer.selected_runtime_pressure.detail
+    assert isinstance(answer.flux, FluxRefusal)
+    outcome, reason, overlay = _run_empty_backend(
+        batch, 900.0, kinetic_floor=False
+    )
+    assert overlay["batch_channel_states"]["Fe"] == "refusal"
+    assert "Fe" in overlay["batch_pa_by_species"]
+    assert (
+        overlay.get("effective_pressure_zero_reason")
+        == "pre_rg_backend_below_effective_pressure_threshold"
+    )
+    assert outcome == "refused", (omission_id, reason)
+    assert reason == "vapour_batch_no_debiting_pressure_outcome"
+
+
+_FE_COLD_CATALOG: dict[str, Any] = {}
+
+
+def _fe_cold_catalog(compile_vapour_rail_catalog: Any, load_u0_manifest: Any) -> Any:
+    cached = _FE_COLD_CATALOG.get("catalog")
+    if cached is None:
+        payload = yaml.safe_load((ROOT / "data" / "vapor_pressures.yaml").read_text())
+        cached = compile_vapour_rail_catalog(
+            payload, u0_manifest=load_u0_manifest()
+        )
+        _FE_COLD_CATALOG["catalog"] = cached
+    return cached
+
+
 def test_batch_refusal_drops_live_positive_species() -> None:
     """Refused channel must not retain live-positive pressure (Codex P1-1)."""
 
@@ -1025,6 +1367,12 @@ def test_source_guard_no_flux_consumer_iterates_compatibility_maps() -> None:
         relpath: (ROOT / relpath).read_text(encoding="utf-8")
         for relpath in FLUX_CONSUMER_RELPATHS
     }
+    assert {
+        "engines/builtin/evaporation_flux.py",
+        "simulator/evaporation.py",
+        "simulator/vapour_rail/instrumentation.py",
+        "simulator/vapour_rail/request.py",
+    } <= set(FLUX_CONSUMER_RELPATHS)
     assert_no_flux_consumer_iterates_compatibility_maps(sources)
     kernel = sources["engines/builtin/evaporation_flux.py"]
     assert "vapour_batch_flux_pressures_Pa" in kernel
@@ -1047,18 +1395,188 @@ def test_source_guard_flags_live_map_argument_on_batch_flux_consumer() -> None:
         )
 
 
-def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> None:
-    """Only the named seam may read compatibility values in the flux route."""
+def test_source_guard_flags_effective_pressure_source_argument() -> None:
+    bad = (
+        "def flux_pressures_from_batch(batch, *, effective_pressure_source):\n"
+        "    return effective_pressure_source.pressure_pa('Na')\n"
+    )
+    with pytest.raises(AssertionError, match="compatibility pressure argument"):
+        assert_no_flux_consumer_iterates_compatibility_maps(
+            {"simulator/vapour_rail/instrumentation.py": bad}
+        )
 
-    compatibility = CompatibilityPressureMapReadTripwire({"Na": 999.0})
-    backend_shadow = CompatibilityPressureMapReadTripwire({"Na": 777.0})
+
+# Invariant: the flux debit is the batch selected pressure after the single
+# kernel-seam chokepoint. That chokepoint copies a finite effective-pressure
+# value onto Na, K, Ca, Mg, Ti, and Si. Every other carrier keeps the batch
+# value. The flux context never reads the compatibility map. Catalog
+# ``answer.pressure`` stays the catalog number on both classes.
+_PINNED_KERNEL_SEAM_SPECIES = frozenset({"Na", "K", "Ca", "Mg", "Ti", "Si"})
+_TRIPWIRE_CATALOG_PA = 1.0
+_TRIPWIRE_KERNEL_PA = 999.0
+_TRIPWIRE_NON_SEAM_SPECIES = (
+    "Al",
+    "Fe",
+    "SiO",
+    "Al2",
+    "Al2O",
+    "Al2O2",
+    "Al2O3_gas",
+    "AlO",
+    "AlO2",
+    "CrO",
+    "CrO2",
+)
+
+
+# Every channel state flux_pressures_from_batch can publish. A new state
+# fails this list until it is classified as authorizing or blocking.
+_EMPTY_FLUX_PUBLISHED_STATES = (
+    "missing_channel",
+    "dormant_by_epoch",
+    "refusal",
+    "upper_bound",
+    "incomplete_channel",
+    "zero_by_physics",
+    "eligible",
+    "invalid_selected_runtime_pressure",
+)
+
+
+@pytest.mark.parametrize("state", _EMPTY_FLUX_PUBLISHED_STATES)
+@pytest.mark.parametrize("kinetic_floor", [False, True])
+@pytest.mark.parametrize("catalog_pressure_present", [False, True])
+@pytest.mark.parametrize(
+    "physical_zero_reason",
+    [None, "pre_rg_backend_below_effective_pressure_threshold"],
+)
+def test_authorizer_blocks_every_nonauthorizing_state(
+    state: str,
+    kinetic_floor: bool,
+    catalog_pressure_present: bool,
+    physical_zero_reason: str | None,
+) -> None:
+    """The zero gate reads selected outcomes, not catalog Pa or temperature."""
+
+    result = _authorize_empty_species_flux(
+        {"Fe": state, "Na": "dormant_by_epoch"},
+        kinetic_floor=kinetic_floor,
+        physical_zero_reason=physical_zero_reason,
+        catalog_pressure_present=catalog_pressure_present,
+    )
+    authorizes = state in _EMPTY_FLUX_AUTHORIZING_STATES
+    if not authorizes:
+        assert result is None
+        return
+    assert result is not None
+    kind, reason = result
+    if kinetic_floor:
+        assert (kind, reason) == ("kinetic_floor", "internal_analytical_below_400K")
+    elif physical_zero_reason and catalog_pressure_present:
+        assert (kind, reason) == ("physical_zero", physical_zero_reason)
+    else:
+        # A dormant peer keeps an all-zero-by-physics map from taking that token.
+        assert (kind, reason) == (
+            "typed_non_debit",
+            "vapour_batch_all_channels_non_debiting",
+        )
+
+
+def test_authorizer_all_zero_by_physics_is_its_own_token() -> None:
+    result = _authorize_empty_species_flux(
+        {"Fe": "zero_by_physics", "Na": "zero_by_physics"},
+        kinetic_floor=False,
+        physical_zero_reason=None,
+        catalog_pressure_present=False,
+    )
+    assert result == ("zero_by_physics", "zero_by_physics")
+
+
+def test_authorizer_empty_states_still_need_a_typed_proof() -> None:
+    assert (
+        _authorize_empty_species_flux(
+            {},
+            kinetic_floor=False,
+            physical_zero_reason=None,
+            catalog_pressure_present=False,
+        )
+        is None
+    )
+    assert _authorize_empty_species_flux(
+        {},
+        kinetic_floor=False,
+        physical_zero_reason="pre_rg_backend_below_effective_pressure_threshold",
+        catalog_pressure_present=True,
+    ) == (
+        "physical_zero",
+        "pre_rg_backend_below_effective_pressure_threshold",
+    )
+    assert _authorize_empty_species_flux(
+        {},
+        kinetic_floor=True,
+        physical_zero_reason="pre_rg_backend_below_effective_pressure_threshold",
+        catalog_pressure_present=True,
+    ) == ("kinetic_floor", "internal_analytical_below_400K")
+
+
+def test_empty_flux_returns_call_the_authorizer_once() -> None:
+    source = (ROOT / "simulator" / "evaporation.py").read_text(encoding="utf-8")
+    assert source.count("_authorize_empty_species_flux(") == 2
+    assert "and flux_overlay_report.get('batch_pa_by_species')" not in source
+
+
+def test_empty_flux_species_cover_b114_carriers() -> None:
+    assert set(_EMPTY_FLUX_SPECIES) == (
+        set(_PINNED_KERNEL_SEAM_SPECIES)
+        | set(_TRIPWIRE_NON_SEAM_SPECIES)
+        | {"FeO_association_gas"}
+    )
+
+
+def _tripwire_species_cases() -> list:
+    cases = [
+        pytest.param(species_id, True, id=f"seam-{species_id}")
+        for species_id in sorted(_PINNED_KERNEL_SEAM_SPECIES)
+    ]
+    cases.extend(
+        pytest.param(species_id, False, id=f"nonseam-{species_id}")
+        for species_id in _TRIPWIRE_NON_SEAM_SPECIES
+    )
+    return cases
+
+
+@pytest.mark.parametrize(
+    ("species_id", "on_seam"),
+    _tripwire_species_cases(),
+)
+def test_runtime_tripwire_records_zero_flux_context_compatibility_reads(
+    species_id: str,
+    on_seam: bool,
+) -> None:
+    """Kernel-seam species debit 999 Pa. Every other carrier stays at catalog 1 Pa.
+
+    The compatibility map is the effective-pressure source. Reading it under
+    the flux context is still forbidden. The seam copy happens in the named
+    effective-pressure context, then the flux consumer reads the batch.
+    """
+
+    assert _KERNEL_SEAM_DEBIT_SPECIES == _PINNED_KERNEL_SEAM_SPECIES
+    assert _PINNED_KERNEL_SEAM_SPECIES.isdisjoint(_TRIPWIRE_NON_SEAM_SPECIES)
+    assert (species_id in _KERNEL_SEAM_DEBIT_SPECIES) is on_seam
+    expected_pa = _TRIPWIRE_KERNEL_PA if on_seam else _TRIPWIRE_CATALOG_PA
+    compatibility = CompatibilityPressureMapReadTripwire(
+        {species_id: _TRIPWIRE_KERNEL_PA}
+    )
+    backend_shadow = CompatibilityPressureMapReadTripwire({species_id: 777.0})
     captured: dict[str, Any] = {}
     captured_controls: dict[str, Any] = {}
-    batch = _toy_batch({"Na"}, pressures={"Na": 1.0})
 
     def _builder(**kwargs):
         captured.update(kwargs)
-        return batch
+        return _toy_batch(
+            {species_id},
+            pressures={species_id: _TRIPWIRE_CATALOG_PA},
+        )
 
     def _dispatch(_intent, *, control_inputs, redox_state=None):
         captured_controls.update(control_inputs)
@@ -1071,7 +1589,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
     host = SimpleNamespace(
         vapor_pressures={
             "metals": {
-                "Na": {"evaporation_alpha": {"value": 1.0}},
+                species_id: {"evaporation_alpha": {"value": 1.0}},
             },
             "oxide_vapors": {},
         },
@@ -1092,9 +1610,9 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
         _melt_activity_engine_inputs=engine_inputs,
         build_vapour_batch=_builder,
         _build_evaporation_aux_maps=lambda _pressures: (
-            {"Na": 0.023},
-            {"Na": {}},
-            {"Na": 1.0},
+            {species_id: 0.023},
+            {species_id: {}},
+            {species_id: 1.0},
         ),
         _build_partial_melt_offgassing_diagnostic=(
             lambda _equilibrium, **_kwargs: {}
@@ -1117,7 +1635,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
     )
     equilibrium = SimpleNamespace(
         vapor_pressures_Pa=compatibility,
-        vapor_pressures_source={"Na": "compatibility_poison"},
+        vapor_pressures_source={species_id: "compatibility_poison"},
         activity_coefficients={},
         diagnostics={},
         liquid_fraction=1.0,
@@ -1130,6 +1648,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
             overhead_partials_override_Pa={},
         )
 
+    answer = host._last_vapour_batch.channel(species_id)
     assert flux.species_kg_hr == {}
     assert compatibility.read_count("flux") == 0
     assert backend_shadow.read_count("flux") == 0
@@ -1142,10 +1661,20 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
     assert {context for context, _operation in backend_shadow.reads} == {
         "shadow_comparison"
     }
-    assert captured_controls[CONTROL_FLUX_PRESSURES_KEY] == {"Na": 999.0}
+    assert answer.pressure.pa == _TRIPWIRE_CATALOG_PA
+    assert answer.selected_runtime_pressure.pa == expected_pa
+    assert captured_controls[CONTROL_FLUX_PRESSURES_KEY] == {
+        species_id: expected_pa
+    }
+    if on_seam:
+        assert answer.source_label == "compatibility_poison"
+        assert answer.extra.get("kernel_seam_provenance_missing") is not True
+    else:
+        assert answer.source_label == "test"
+        assert "kernel_seam_provenance_missing" not in answer.extra
     assert (
         captured["flux_activation_context"].effective_pressure_species_ids
-        == frozenset({"Na"})
+        == frozenset({species_id})
     )
     assert "selected_runtime_pressures_Pa" not in captured
     assert captured["melt_activity_shadow_enabled"] is True
@@ -1266,7 +1795,7 @@ def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
         },
     )
     assert controls[CONTROL_FLUX_PRESSURES_KEY] == {"Na": 5.0}
-    # Reporting keeps live; the typed seam supplied the already batch-gated key.
+    # Reporting keeps the live projection; the batch supplied the debit key.
     assert controls["vapor_pressures_Pa"] == {"Na": 5.0}
     assert controls["vapour_batch_flux_shadow_equal"] is True
     assert controls["vapour_batch_flux_shadow_outcome"] == SHADOW_PROVED
