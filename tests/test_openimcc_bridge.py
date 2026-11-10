@@ -1417,9 +1417,8 @@ def test_imported_openimcc_commit_matches_recorded_pin_when_importable() -> None
 def test_default_pack_identity_uses_the_openimcc_profile_files() -> None:
     _openimcc_or_skip()
     import hashlib
-    from importlib import resources
+    from importlib import metadata, resources
 
-    import openimcc
     from openimcc.profiles import load_profile
     from simulator.melt_backend import openimcc_bridge
 
@@ -1438,7 +1437,7 @@ def test_default_pack_identity_uses_the_openimcc_profile_files() -> None:
     }
 
     assert _load_pack("default").binding_digest == profile.melt_pack.binding_digest
-    assert identity["package_version"] == openimcc.__version__
+    assert identity["package_version"] == metadata.version("openimcc")
     assert identity["commit"] == imported_openimcc_commit()
     assert identity["packs"] == {
         name: {
