@@ -294,7 +294,13 @@ class PublisherAlphaDecision:
 
 
 def fallback_species_allowlist(raw: Any) -> set[str] | None:
-    """None permits every species. A string is one species, not characters."""
+    """None permits every species.
+
+    A string or bytes value already stored on the controls map is one
+    species. That is green's publisher parser. ``alpha_policy_controls``
+    does not store a kernel string that way: ``tuple("Al2")`` is the
+    characters ``A``, ``l``, ``2`` (b-1170, not fixed here).
+    """
 
     if raw is None:
         return None
@@ -311,7 +317,8 @@ def publisher_alpha_policy(
     Call this on the controls map ``alpha_policy_controls`` built, not
     the raw kernel. An absent allowlist key means every species. That
     builder stores a present null as an empty tuple, which this parser
-    reads as nobody. A string is one species name, not its characters.
+    reads as nobody. A string already on the controls map is one species
+    name. The builder does not leave a kernel string there.
     """
 
     mapping = config if isinstance(config, Mapping) else {}
@@ -326,10 +333,12 @@ def publisher_alpha_policy(
 def alpha_policy_controls(kernel_config: Mapping[str, Any] | None) -> dict[str, Any]:
     """Alpha-policy keys the flux controls and the closure both consume.
 
-    A string allowlist stays a string. ``tuple("Al2")`` would split it
-    into characters and the publisher would permit the wrong set. A
-    present null is stored as an empty tuple, which the parser reads as
-    nobody; that is the controls builder's existing null.
+    Green's normalisation, the only one both callers use. A present
+    value is ``tuple(raw or ())``. ``tuple("Al2")`` is the characters
+    ``("A", "l", "2")``, so the publisher refuses the species name.
+    That character split is b-1170; this ticket does not fix it. A
+    present null is an empty tuple, which the parser reads as nobody.
+    An absent key is omitted, which the parser reads as every species.
     """
 
     mapping = kernel_config if isinstance(kernel_config, Mapping) else {}
@@ -339,11 +348,9 @@ def alpha_policy_controls(kernel_config: Mapping[str, Any] | None) -> dict[str, 
         ),
     }
     if "unmeasured_alpha_fallback_species" in mapping:
-        raw = mapping.get("unmeasured_alpha_fallback_species")
-        if isinstance(raw, (str, bytes)):
-            controls["unmeasured_alpha_fallback_species"] = str(raw)
-        else:
-            controls["unmeasured_alpha_fallback_species"] = tuple(raw or ())
+        controls["unmeasured_alpha_fallback_species"] = tuple(
+            mapping.get("unmeasured_alpha_fallback_species") or ()
+        )
     return controls
 
 
@@ -395,12 +402,14 @@ def resolve_gas_resistance_enabled(
     """Film flag shared by the surface closure and the flux publisher.
 
     The nested ``evaporation_series_resistance`` key wins. Otherwise the
-    parent map supplies it: ``chemistry_kernel`` in the closure, and the
-    flux controls in the publisher. Otherwise the conservative default
-    is on. Present null is absent, and a quoted false stays false. A
-    top-level ``gas_resistance_enabled: false`` with no nested override
-    is free-molecular on both sides. At 10 mbar that is the 5.3423 Pa Ca
-    root, not the film root at 5.7893 Pa.
+    parent map supplies it, and otherwise the conservative default is
+    on. Present null is absent, and a quoted false stays false. The
+    evaporation mixin passes an empty parent and does not copy
+    ``chemistry_kernel['gas_resistance_enabled']`` onto the publisher
+    controls, so a top-level kernel false leaves the film on. A direct
+    provider call that sets the key on its own controls is that parent,
+    which green did honor. A nested false at 10 mbar is the free-molecular
+    5.3423 Pa Ca root; the film root is 5.7893 Pa.
     """
 
     series = series_config if isinstance(series_config, Mapping) else {}

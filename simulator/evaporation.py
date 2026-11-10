@@ -873,11 +873,13 @@ class EvaporationMixin:
         series_config = dict(
             kernel_config.get("evaporation_series_resistance", {}) or {}
         )
-        # Same resolver the flux publisher calls. The parent map is the
-        # kernel here; the publisher sees that top-level flag copied onto
-        # its controls by ``_evaporation_flux_control_inputs``.
+        # Green's publisher film policy, the same parent the flux
+        # controls will have. Nested ``evaporation_series_resistance``
+        # wins; otherwise the film is on. The top-level kernel flag is
+        # not that parent and is not copied onto the controls: a
+        # buffered in-band melt keeps green's film. b-906 round 7.
         gas_resistance_enabled = resolve_gas_resistance_enabled(
-            series_config, kernel_config
+            series_config, {}
         )
         overhead_model = getattr(self, "overhead_model", None)
         try:
@@ -4432,15 +4434,10 @@ class EvaporationMixin:
             'evaporation_series_resistance': dict(
                 kernel_config.get('evaporation_series_resistance', {}) or {}
             ),
-            # The publisher's film default is this key, then True. Copy the
-            # top-level kernel flag so a nested-absent False is free-molecular
-            # in the publisher as well as in the closure. Null stays null;
-            # ``resolve_gas_resistance_enabled`` treats it as absent.
-            **(
-                {'gas_resistance_enabled': kernel_config['gas_resistance_enabled']}
-                if 'gas_resistance_enabled' in kernel_config
-                else {}
-            ),
+            # Do not copy chemistry_kernel['gas_resistance_enabled'].
+            # Green's publisher never read that top-level key: the film
+            # stays on unless the nested series override says otherwise.
+            # Copying it changed buffered in-band rates. b-906 round 7.
             'alpha': _measured_alpha_control_view(
                 _load_evaporation_alpha_by_species(self.vapor_pressures)
             ),

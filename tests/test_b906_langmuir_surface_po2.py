@@ -52,13 +52,19 @@ vacuum film under a root that used the O2 gas film. A step that did
 not close a root keeps the vapor-map backpressure. An explicit
 override is filmed once and handed to both.
 
-Publisher policy. The alpha and the gas-film flag in that residual
-are the publisher's own decision (``publisher_effective_alpha`` and
-``resolve_gas_resistance_enabled``). A measured row, a ``*`` wildcard,
-and a permitted unmeasured fallback are in the residual at that alpha.
-A carrier the policy refuses is not emitted and keeps its published
-pressure. Nested, top-level, null, and quoted film flags select the
-same law in the closure and in the flux kernel.
+Publisher policy, one chokepoint. ``alpha_policy_controls`` and the
+film parent the closure passes are what ``_evaporation_flux_control_inputs``
+hands the flux kernel. Green's film policy: the nested
+``evaporation_series_resistance.gas_resistance_enabled`` wins, and a
+top-level kernel flag is not copied onto those controls and is not
+that parent. Absent or null nested means the film is on. The closure
+and the publisher therefore share that flag on an open gate, and a
+closed gate keeps green's rates. The allowlist is green's
+``tuple(raw or ())``. A string splits into characters (b-1170, not
+fixed here), so ``"Al2"`` does not permit Al2. A measured row, a
+``*`` wildcard, and a permitted unmeasured fallback are in the
+residual at that alpha. A carrier the policy refuses is not emitted
+and keeps its published pressure.
 
 Persisted headspace. The partial vector the film sums is every
 positive finite entry of the persisted composition. The vapor map is
@@ -2215,30 +2221,36 @@ def test_publisher_film_matches_the_surface_root_on_every_path(
 
 
 # Placements of the one film flag. ``absent`` omits the key. None is a
-# present null. Nested wins; null is absent and falls through; a quoted
-# false and a numeric 0 stay off. Top-level false with no nested key is
-# the reviewer's split: the closure was free-molecular and the publisher
-# stayed on the film.
+# present null. The third column is green's publisher decision: the
+# nested key wins, null and absent fall through to on, and a quoted
+# false or a numeric 0 on that nested key stays off. The top-level
+# kernel flag is not an input, on either gate.
 _GAS_FLAG_PLACEMENTS = (
     ("absent", "absent", True),
-    ("absent", False, False),
+    ("absent", False, True),
     ("absent", True, True),
     ("absent", None, True),
-    ("absent", "false", False),
-    ("absent", 0, False),
+    ("absent", "false", True),
+    ("absent", 0, True),
     (False, "absent", False),
     (True, "absent", True),
     (False, True, False),
     (True, False, True),
-    (None, False, False),
+    (None, False, True),
     (None, "absent", True),
     (None, None, True),
+    ("false", True, False),
+    (0, False, False),
+    (False, "false", False),
 )
 _ALPHA_POLICIES = (
     "off",
     "on",
     "allow-Al2",
+    "allow-tuple",
     "allow-string",
+    "allow-bytes",
+    "allow-empty",
     "allow-other",
     "allow-null",
     "wildcard",
@@ -2276,10 +2288,26 @@ def _alpha_kernel(policy: str) -> dict:
             "allow_unmeasured_alpha_fallback": True,
             "unmeasured_alpha_fallback_species": ["Al2"],
         }
+    if policy == "allow-tuple":
+        return {
+            "allow_unmeasured_alpha_fallback": True,
+            "unmeasured_alpha_fallback_species": ("Al2",),
+        }
     if policy == "allow-string":
+        # b-1170. Green's ``tuple("Al2")`` is the characters, not Al2.
         return {
             "allow_unmeasured_alpha_fallback": True,
             "unmeasured_alpha_fallback_species": "Al2",
+        }
+    if policy == "allow-bytes":
+        return {
+            "allow_unmeasured_alpha_fallback": True,
+            "unmeasured_alpha_fallback_species": b"Al2",
+        }
+    if policy == "allow-empty":
+        return {
+            "allow_unmeasured_alpha_fallback": True,
+            "unmeasured_alpha_fallback_species": [],
         }
     if policy == "allow-other":
         return {
@@ -2478,6 +2506,7 @@ def _dispatch_parented_flux_provider(host, captured, molar_kg) -> None:
     host._dispatch_only = _dispatch_only
 
 
+@pytest.mark.parametrize("gate", ("open", "buffered"))
 @pytest.mark.parametrize(
     ("nested", "top", "enabled"),
     _GAS_FLAG_PLACEMENTS,
@@ -2486,16 +2515,18 @@ def _dispatch_parented_flux_provider(host, captured, molar_kg) -> None:
         for nested, top, _enabled in _GAS_FLAG_PLACEMENTS
     ],
 )
-def test_closure_and_publisher_share_every_film_flag(
-    nested, top, enabled: bool
+def test_publisher_film_is_greens_on_every_placement(
+    nested, top, enabled: bool, gate: str
 ) -> None:
-    """One film flag for the closure and the publisher, at every placement.
+    """Green's film policy, at every placement, on both gates.
 
-    Invariant: ``resolve_gas_resistance_enabled`` is the film decision.
-    Nested key, else the top-level kernel key, else on. Null is absent.
-    A top-level false with no nested override is free-molecular (5.3423 Pa
-    at this publication), and the publisher's Ca flux is that law, not
-    the 10 mbar film.
+    Invariant: the closure and the publisher share one film flag, and
+    that flag is green's. Nested ``evaporation_series_resistance``
+    wins; null and absent are on; the top-level kernel key is not on
+    the publisher controls and does not select the flag. A top-level
+    false with no nested override stays on the 10 mbar film. The open
+    gate's Ca pressure is that law's root. The buffered in-band gate
+    leaves the publication alone and the Ca flux is still that law.
     """
 
     from engines.builtin.evaporation_flux import resolve_gas_resistance_enabled
@@ -2515,31 +2546,47 @@ def test_closure_and_publisher_share_every_film_flag(
         temperature_K=_T_K,
         legacy=legacy,
     )
+    capacity = 0.0 if gate == "open" else _BUFFERED_CAPACITY_MOL_PER_LN
     host, equilibrium = _host(
         compiled,
         legacy,
         diagnostic,
         published,
-        redox_capacity_mol_per_ln_fO2=0.0,
+        redox_capacity_mol_per_ln_fO2=capacity,
         p_total_mbar=10.0,
         chemistry_kernel=_gas_kernel(nested, top),
     )
     captured: dict = {}
     _dispatch_real_flux_provider(host, captured)
     EvaporationMixin._calculate_evaporation(host, equilibrium)
-    notice = host._last_langmuir_surface_oxygen
     controls = captured["controls"]
+    # The chokepoint. Green's controls builder never copied this key.
+    assert "gas_resistance_enabled" not in controls
     kernel_map = controls[CONTROL_FLUX_PRESSURES_KEY]
     resolved_flag = resolve_gas_resistance_enabled(
         controls.get("evaporation_series_resistance"),
         controls,
     )
+    transport = EvaporationMixin._langmuir_transport(
+        host,
+        {},
+        _T_K,
+        float(controls["overhead_pressure_pa"]),
+    )
     assert resolved_flag is enabled
-    expected_pa = film_pa if enabled else ideal_pa
-    other_pa = ideal_pa if enabled else film_pa
-    assert kernel_map["Ca"] == pytest.approx(expected_pa, rel=1.0e-6)
-    assert kernel_map["Ca"] != pytest.approx(other_pa, rel=1.0e-3)
-    assert float(notice["relative_residual"]) < 1.0e-4
+    assert transport.gas_resistance_enabled is enabled
+    if gate == "open":
+        notice = host._last_langmuir_surface_oxygen
+        expected_pa = film_pa if enabled else ideal_pa
+        other_pa = ideal_pa if enabled else film_pa
+        assert kernel_map["Ca"] == pytest.approx(expected_pa, rel=1.0e-6)
+        assert kernel_map["Ca"] != pytest.approx(other_pa, rel=1.0e-3)
+        assert float(notice["relative_residual"]) < 1.0e-4
+    else:
+        assert not hasattr(host, "_last_langmuir_surface_oxygen")
+        assert kernel_map["Ca"] == pytest.approx(published_ca, rel=1.0e-12)
+        assert kernel_map["Ca"] != pytest.approx(film_pa, rel=1.0e-3)
+        assert kernel_map["Ca"] != pytest.approx(ideal_pa, rel=1.0e-3)
     provider = captured["provider"]
     assert provider is not None and str(provider.status) == "ok"
     provider_flux = dict(
@@ -2573,20 +2620,25 @@ def test_closure_and_publisher_share_every_film_flag(
     )
 
 
+@pytest.mark.parametrize("gate", ("open", "buffered"))
 @pytest.mark.parametrize("policy", _ALPHA_POLICIES)
-def test_every_species_uses_the_publisher_alpha_policy(policy: str) -> None:
-    """The residual contains each carrier the publisher's alpha policy emits.
+def test_every_species_uses_the_publisher_alpha_policy(
+    policy: str, gate: str
+) -> None:
+    """Eligibility is green's tuple normalisation, on both gates.
 
     Species classes in one CaO/Al2O3 map, plus synthetic Zr:
     measured rows (Ca, Al, CaO_gas, Ca2), broad-proxy rows the measured
     view strips (Al2, Al2O, AlO, and the other Al oxides), and Zr, a
     proxy-tagged row that is not Al2. Policies: fallback off, fallback
-    on, a list allowlist, a string allowlist, an allowlist that names
-    nobody here, a present-null allowlist (nobody), and a ``*`` wildcard.
+    on, a list, a tuple, a string, bytes, an empty list, a list that
+    names nobody here, a present-null allowlist (nobody), and a ``*``
+    wildcard. ``alpha_policy_controls`` stores ``tuple(raw or ())``.
+    ``tuple("Al2")`` is the characters, so Al2 stays refused (b-1170).
     A parent mass is present, so a refused species is a typed
-    missing-alpha and not a flux. An emitted carrier is rescaled with
-    the policy alpha, and the publisher's kilogram flux is that same
-    pressure and alpha.
+    missing-alpha and not a flux. The open gate rescales an emitted
+    carrier. The buffered in-band gate leaves every pressure on the
+    publication, and the same eligibility decides the flux.
     """
 
     from engines.builtin.evaporation_flux import (
@@ -2617,12 +2669,13 @@ def test_every_species_uses_the_publisher_alpha_policy(policy: str) -> None:
     diagnostic["vapor_pressures_Pa"] = published
     diagnostic["vapor_pressure_numerator_provenance"] = provenance
     source_bar = float(diagnostic["source_reaction_fO2_bar"])
+    capacity = 0.0 if gate == "open" else _BUFFERED_CAPACITY_MOL_PER_LN
     host, equilibrium = _host(
         compiled,
         legacy,
         diagnostic,
         published,
-        redox_capacity_mol_per_ln_fO2=0.0,
+        redox_capacity_mol_per_ln_fO2=capacity,
         chemistry_kernel=kernel,
     )
     captured: dict = {}
@@ -2632,13 +2685,23 @@ def test_every_species_uses_the_publisher_alpha_policy(policy: str) -> None:
         lambda species: _species_molar_kg(legacy, species),
     )
     EvaporationMixin._calculate_evaporation(host, equilibrium)
-    notice = host._last_langmuir_surface_oxygen
-    assert notice["applied"] is True
-    assert notice["surface_pO2_bar"] is not None
-    assert float(notice["relative_residual"]) < 1.0e-4
-    surface = float(notice["surface_pO2_bar"])
+    if gate == "open":
+        notice = host._last_langmuir_surface_oxygen
+        assert notice["applied"] is True
+        assert notice["surface_pO2_bar"] is not None
+        assert float(notice["relative_residual"]) < 1.0e-4
+        surface = float(notice["surface_pO2_bar"])
+    else:
+        assert not hasattr(host, "_last_langmuir_surface_oxygen")
+        surface = None
     controls = captured["controls"]
     closed = dict(controls[CONTROL_FLUX_PRESSURES_KEY])
+    if "unmeasured_alpha_fallback_species" in kernel:
+        assert controls["unmeasured_alpha_fallback_species"] == tuple(
+            kernel["unmeasured_alpha_fallback_species"] or ()
+        )
+    else:
+        assert "unmeasured_alpha_fallback_species" not in controls
     allow, allowlist = publisher_alpha_policy(alpha_policy_controls(kernel))
     # The controls the publisher actually read are that same policy.
     published_allow, published_allowlist = publisher_alpha_policy(controls)
@@ -2690,7 +2753,9 @@ def test_every_species_uses_the_publisher_alpha_policy(policy: str) -> None:
             assert flux.get(species, 0.0) == pytest.approx(
                 expected_kg_hr, rel=1.0e-5, abs=1.0e-12
             )
-            if exponent != 0.0:
+            if gate == "buffered":
+                assert closed[species] == pytest.approx(published_pa)
+            elif exponent != 0.0:
                 expected_pa = published_pa * (surface / pref) ** exponent
                 assert closed[species] == pytest.approx(
                     expected_pa, rel=1.0e-4, abs=1.0e-12
@@ -2709,11 +2774,21 @@ def test_every_species_uses_the_publisher_alpha_policy(policy: str) -> None:
         assert alpha_used["Zr"] == pytest.approx(_WILDCARD_ALPHA)
         assert "Al2" not in fallback_rows
         assert "Zr" not in missing
-    if policy == "allow-string":
+    if policy in ("allow-Al2", "allow-tuple"):
         assert "Al2" in alpha_used
         assert alpha_used["Al2"] == pytest.approx(1.0)
         assert "Zr" in missing
         assert "Al2O" in missing
+    if policy == "allow-string":
+        # Characters, not the species. Buffered and open gates both refuse.
+        assert "Al2" in missing
+        assert "Al2" not in alpha_used
+        assert "Al2" not in flux
+        assert "Zr" in missing
+        assert "Al2O" in missing
+    if policy in ("allow-bytes", "allow-empty", "allow-other", "allow-null"):
+        assert "Al2" in missing
+        assert "Al2" not in flux
 
 
 # d-376 amendment 1, stated as the spec. Not imported from the solver.
@@ -3003,7 +3078,11 @@ def _assert_host_bound(entry: str, film_on: bool) -> None:
     answer = _bound_answer("open")
     diagnostic = answer.diagnostic
     published, published_ca, p_ref_bar = _published_ca(diagnostic)
-    kernel = {"gas_resistance_enabled": film_on}
+    # Nested override is green's film switch. A top-level kernel flag
+    # is not an input; the generative placement test pins that.
+    kernel = {
+        "evaporation_series_resistance": {"gas_resistance_enabled": film_on},
+    }
     # Persisted headspace for the live path. Reclose starts from an empty
     # headspace and then enters with the O2 vector, the capacity iteration.
     headspace = {"O2": 1.0} if entry == "live" else {}
@@ -3355,7 +3434,11 @@ def _assert_persisted_headspace(pairs: tuple[tuple[str, float], ...], entry: str
         redox_capacity_mol_per_ln_fO2=_film_capacity(gate),
         p_total_mbar=commanded_mbar,
         headspace_partials_mbar=headspace,
-        chemistry_kernel={"gas_resistance_enabled": film_on},
+        chemistry_kernel={
+            "evaporation_series_resistance": {
+                "gas_resistance_enabled": film_on,
+            },
+        },
     )
     if entry == "reader":
         _assert_reader_keeps_every_persisted_gas(host, published, expected_pa)
