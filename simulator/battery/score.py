@@ -5558,7 +5558,7 @@ def cell_notices(
             )
     status_reason = getattr(cell, "vapor_pressure_backend_status_reason", None)
     backend_status = getattr(cell, "vapor_pressure_backend_status", None)
-    if backend_status == AUTHORITY_FALLBACK or (
+    if backend_status == AUTHORITY_FALLBACK or status_reason == "fallback" or (
         isinstance(status_reason, str) and "fallback" in status_reason
     ):
         notices.append(
@@ -5571,7 +5571,9 @@ def cell_notices(
                 destination="antoine_fallback",
             )
         )
-    if isinstance(status_reason, str) and _FLOOR_INVERSION_REASON in status_reason:
+    if status_reason == "floor" or (
+        isinstance(status_reason, str) and _FLOOR_INVERSION_REASON in status_reason
+    ):
         notices.append(
             Notice(
                 kind=NoticeKind.FLOOR_INVERSION,

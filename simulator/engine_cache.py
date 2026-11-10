@@ -134,7 +134,7 @@ def _connect(
         else:
             connection.execute(
                 f"CREATE TABLE IF NOT EXISTS {table} "
-                "(key BLOB PRIMARY KEY, value TEXT NOT NULL, engine TEXT NOT NULL, "
+                "(key BLOB PRIMARY KEY, value BLOB NOT NULL, engine TEXT NOT NULL, "
                 "chem_version TEXT NOT NULL, source_box TEXT NOT NULL, "
                 "row_seq INTEGER NOT NULL) WITHOUT ROWID"
             )
@@ -216,8 +216,14 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         ).fetchone()
         if row is not None:
             try:
-                result = json.loads(row[0])
-            except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
+                stored_value = row[0]
+                if isinstance(stored_value, str):
+                    # Older databases stored uncompressed JSON text.
+                    hot_json = stored_value
+                else:
+                    hot_json = zlib.decompress(stored_value)
+                result = json.loads(hot_json)
+            except (TypeError, UnicodeDecodeError, json.JSONDecodeError, zlib.error):
                 row = None
             else:
                 counts["hits"] += 1
@@ -229,8 +235,15 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     if _is_refusal(result) or readonly or connection is None:
         return hot
     try:
-        hot_value = json.dumps(
-            hot, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False
+        hot_value = zlib.compress(
+            json.dumps(
+                hot,
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=True,
+                allow_nan=False,
+            ).encode("ascii"),
+            level=9,
         )
         cold_value = zlib.compress(pickle.dumps(cold, protocol=5), level=6)
     except (TypeError, ValueError) as exc:
@@ -243,7 +256,14 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         connection.execute(
             f"INSERT OR REPLACE INTO {_TABLE} "
             "(key, value, engine, chem_version, source_box, row_seq) VALUES (?, ?, ?, ?, ?, ?)",
-            (cache_key, hot_value, engine_id, str(chem_version), source_box, row_seq),
+            (
+                cache_key,
+                sqlite3.Binary(hot_value),
+                engine_id,
+                str(chem_version),
+                source_box,
+                row_seq,
+            ),
         )
         connection.commit()
         cold_connection = _connect(
@@ -275,7 +295,18 @@ def load_cache_rows(
         values.append(
             (
                 digest,
-                json.dumps(hot, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False),
+                sqlite3.Binary(
+                    zlib.compress(
+                        json.dumps(
+                            hot,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                            ensure_ascii=True,
+                            allow_nan=False,
+                        ).encode("ascii"),
+                        level=6,
+                    )
+                ),
                 engine,
                 str(version),
                 source_box,

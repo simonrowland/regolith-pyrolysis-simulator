@@ -19,6 +19,7 @@ from typing import Any, ClassVar, Dict, List, Mapping, Optional, Sequence
 
 from engines.domain_reason import OutOfDomainReason
 from simulator.melt_regime import liquid_fraction_invalidity
+from simulator.scalar_boundary import finite_float
 
 
 BACKEND_CAPABILITY_KEYS = (
@@ -36,40 +37,19 @@ DEFAULT_BACKEND_CAPABILITIES = {
 
 REDOX_MODE_NOT_AN_INPUT = 'not_an_input'
 
+ANTOINE_FALLBACK_SOURCE_PREFIX = 'antoine_fallback_from_vaporock'
 _EQUILIBRIUM_CACHE_HOT_FIELDS = frozenset({
-    'liquid_fraction',
-    'phase_assemblage_available',
-    'vapor_pressures_Pa',
-    'vapor_pressures_source',
     'activity_coefficients',
-    'warnings',
-    'status',
     'reported_activity_coefficients',
     'activity_coefficient_details',
+    'vapor_pressures_Pa',
+    'vapor_pressures_source',
     'vaporock_full_speciation_Pa',
-    'imcc_notices',
-    'imcc_model_id',
+    'liquid_fraction',
+    'phase_assemblage_available',
+    'status',
     'liquid_composition_wt_pct',
     'fe_redox_split',
-})
-_EQUILIBRIUM_CACHE_DIAGNOSTIC_FIELDS = frozenset({
-    'backend_status_reason',
-    'empty_speciation_cause',
-    'backend_failure_reason_code',
-    'backend_failure_category',
-    'backend_failure_disposition',
-    'subprocess_failure',
-    'input_composition_projection',
-    'engine_reason',
-    'vapor_pressure_backend_status',
-    'vapor_pressure_backend_status_reason',
-    'authoritative_for_requested_vapor_pressure',
-    'vapor_pressure_diagnostic',
-    'commissioning_notice',
-    'authority',
-    'certified_band',
-    'imcc_notices',
-    'fo2_gas_only',
 })
 
 
@@ -83,36 +63,164 @@ def _equilibrium_cache_json(value: Any) -> Any:
     return value
 
 
+def _cache_map(
+    value: Any, *, positive: bool = False, pressure: bool = False
+) -> dict[str, float | None]:
+    if not isinstance(value, Mapping):
+        return {}
+    result: dict[str, float | None] = {}
+    for key, raw in sorted(value.items(), key=lambda item: str(item[0])):
+        number = finite_float(raw)
+        if pressure:
+            if number is not None and number > 0.0:
+                result[str(key)] = number
+            elif number is None or number < 0.0:
+                result[str(key)] = None
+        elif number is not None and (not positive or number > 0.0):
+            result[str(key)] = number
+    return result
+
+
+def vapor_pressure_source_code(source: Any) -> str | None:
+    """Keep only source labels that affect battery classification."""
+    if not isinstance(source, str):
+        return None
+    if source in {"fallback", "speciation", "floor"}:
+        return source
+    if source.startswith(ANTOINE_FALLBACK_SOURCE_PREFIX) or "fallback" in source:
+        return 'fallback'
+    if source == 'vaporock' or source.startswith(('vaporock', 'builtin_authoritative')):
+        return 'speciation'
+    if (
+        'melt_dissociation_pO2_floor_inverted_through_mass_action' in source
+        or 'value_is_floor' in source
+    ):
+        return 'floor'
+    return None
+
+
+def _activity_detail_pairs(value: Any) -> list[list[Any]]:
+    if not isinstance(value, Mapping):
+        return []
+    pairs: list[list[Any]] = []
+    for key, detail in sorted(value.items(), key=lambda item: str(item[0])):
+        if not isinstance(detail, Mapping):
+            continue
+        standard = detail.get('standard_state')
+        if not isinstance(standard, Mapping):
+            standard = {}
+        values = (
+            _equilibrium_cache_json(detail.get('coefficient_basis')),
+            _equilibrium_cache_json(standard.get('convention')),
+            _equilibrium_cache_json(standard.get('phase')),
+            _equilibrium_cache_json(standard.get('component_basis')),
+        )
+        if any(value is not None for value in values):
+            pairs.append([str(key), *values])
+    return pairs
+
+
+def equilibrium_cache_from_value(payload: Any) -> dict[str, Any]:
+    """Restore the fixed scorer projection from its compact JSON array."""
+    if not isinstance(payload, list) or len(payload) != 11:
+        raise ValueError('invalid compact equilibrium cache value')
+
+    def restore_pairs(pairs: Any) -> dict[str, Any]:
+        if isinstance(pairs, Mapping):
+            return {str(key): value for key, value in pairs.items()}
+        if not isinstance(pairs, list):
+            raise ValueError('invalid compact equilibrium cache map')
+        result: dict[str, Any] = {}
+        for pair in pairs:
+            if not isinstance(pair, list) or len(pair) != 2 or not isinstance(pair[0], str):
+                raise ValueError('invalid compact equilibrium cache map entry')
+            result[pair[0]] = pair[1]
+        return result
+
+    restored: dict[str, Any] = {}
+    status, liquid_fraction, phase_available = payload[:3]
+    if status is not None:
+        restored['status'] = status
+    if liquid_fraction is not None:
+        restored['liquid_fraction'] = liquid_fraction
+    if phase_available is not None:
+        restored['phase_assemblage_available'] = bool(phase_available)
+    for index, field_name in (
+        (3, 'activity_coefficients'),
+        (4, 'reported_activity_coefficients'),
+        (6, 'vapor_pressures_Pa'),
+        (7, 'vapor_pressures_source'),
+        (8, 'vaporock_full_speciation_Pa'),
+        (9, 'liquid_composition_wt_pct'),
+        (10, 'fe_redox_split'),
+    ):
+        values = restore_pairs(payload[index])
+        if values:
+            restored[field_name] = values
+    details: dict[str, Any] = {}
+    if not isinstance(payload[5], list):
+        raise ValueError('invalid compact equilibrium activity details')
+    for pair in payload[5]:
+        if not isinstance(pair, list) or len(pair) != 5 or not isinstance(pair[0], str):
+            raise ValueError('invalid compact equilibrium activity detail')
+        _name, basis, convention, phase, component_basis = pair
+        detail: dict[str, Any] = {}
+        if basis is not None:
+            detail['coefficient_basis'] = basis
+        standard = {
+            name: value
+            for name, value in (
+                ('convention', convention),
+                ('phase', phase),
+                ('component_basis', component_basis),
+            )
+            if value is not None
+        }
+        if standard:
+            detail['standard_state'] = standard
+        details[_name] = detail
+    if details:
+        restored['activity_coefficient_details'] = details
+    return restored
+
+
 def equilibrium_cache_value(values: Mapping[str, Any]) -> Any:
     """Split the scorer-consumed equilibrium projection from COLD fields."""
     from simulator.engine_cache import CacheValue
 
-    hot: dict[str, Any] = {}
-    cold: dict[str, Any] = {}
-    diagnostics = values.get('diagnostics')
-    if isinstance(diagnostics, Mapping):
-        diagnostic_hot = {
-            name: value
-            for name, value in diagnostics.items()
-            if name in _EQUILIBRIUM_CACHE_DIAGNOSTIC_FIELDS
-        }
-        diagnostic_cold = {
-            name: value
-            for name, value in diagnostics.items()
-            if name not in _EQUILIBRIUM_CACHE_DIAGNOSTIC_FIELDS
-        }
-        if diagnostic_hot:
-            hot['diagnostics'] = _equilibrium_cache_json(diagnostic_hot)
-        if diagnostic_cold:
-            cold['diagnostics'] = diagnostic_cold
+    sources = values.get('vapor_pressures_source')
+    compact_sources = []
+    if isinstance(sources, Mapping):
+        for name, source in sorted(sources.items(), key=lambda item: str(item[0])):
+            code = vapor_pressure_source_code(source)
+            if code is not None:
+                compact_sources.append([str(name), code])
 
+    liquid_fraction = finite_float(values.get('liquid_fraction'))
+    phase_available = values.get('phase_assemblage_available', True)
+    status = _equilibrium_cache_json(values.get('status'))
+    hot = [
+        status,
+        liquid_fraction,
+        None if phase_available is True else bool(phase_available),
+        _cache_map(values.get('activity_coefficients'), positive=True),
+        _cache_map(values.get('reported_activity_coefficients'), positive=True),
+        _activity_detail_pairs(values.get('activity_coefficient_details')),
+        _cache_map(values.get('vapor_pressures_Pa'), pressure=True),
+        {name: code for name, code in compact_sources},
+        _cache_map(values.get('vaporock_full_speciation_Pa'), pressure=True),
+        _cache_map(values.get('liquid_composition_wt_pct')),
+        _cache_map(values.get('fe_redox_split')),
+    ]
+    cold: dict[str, Any] = {}
     for name, value in values.items():
-        if name == 'diagnostics':
-            continue
-        if name in _EQUILIBRIUM_CACHE_HOT_FIELDS:
-            hot[name] = _equilibrium_cache_json(value)
-        else:
+        if name not in _EQUILIBRIUM_CACHE_HOT_FIELDS:
             cold[name] = value
+    # Keep the original provenance and detail maps in COLD; HOT carries only
+    # authority codes and the exact coefficient basis the scorer reads.
+    for name in ('vapor_pressures_source', 'activity_coefficient_details'):
+        if name in values:
+            cold[name] = values[name]
     return CacheValue(hot, cold)
 
 # More than one oxidation state in silicate melts over the fO2 range these
@@ -889,10 +997,14 @@ class EquilibriumResult:
         return equilibrium_cache_value(vars(self))
 
     @classmethod
-    def from_engine_cache_value(cls, payload: Mapping[str, Any]) -> EquilibriumResult:
+    def from_engine_cache_value(cls, payload: Any) -> EquilibriumResult:
         """Rebuild the battery-visible equilibrium fields from the HOT JSON."""
         from dataclasses import fields
 
+        if isinstance(payload, list):
+            payload = equilibrium_cache_from_value(payload)
+        if not isinstance(payload, Mapping):
+            raise TypeError('equilibrium cache value must be a mapping or compact array')
         field_names = {item.name for item in fields(cls)}
         result = cls(**{name: value for name, value in payload.items() if name in field_names})
         for name, value in payload.items():

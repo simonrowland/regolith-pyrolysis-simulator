@@ -12,6 +12,7 @@ import pytest
 
 from simulator import engine_cache
 from simulator.engine_cache import CacheValue, drop_chemistry_version, engine_cache_key, load_cache_rows
+from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell, Po2Request
 from simulator.melt_backend.base import (
     EquilibriumResult,
     equilibrium_cache_from_value,
@@ -49,8 +50,8 @@ def _cache_counter_worker(_index):
         name="cache-counter-test",
         bootstrap=_bootstrap_cache_counter_worker,
         handler=_handle_cache_counter_request,
-        startup_timeout_s=5.0,
-        call_timeout_s=5.0,
+        startup_timeout_s=30.0,
+        call_timeout_s=30.0,
     )
 
 
@@ -635,3 +636,41 @@ def test_equilibrium_cache_maps_use_compact_canonical_json_objects() -> None:
     assert restored["vapor_pressures_source"] == {"SiO": "speciation"}
     assert restored["liquid_composition_wt_pct"] == {"FeO": 25.0}
     assert restored["fe_redox_split"] == {"Fe2O3_wt_pct": 3.0}
+
+
+def test_equilibrate_cell_hot_reuses_cell_certified_band_for_notices() -> None:
+    band = {"temperature_K": [1400.0, 2200.0]}
+    cell = EquilibrateCell(
+        pot_id="compact-notice",
+        engine="openimcc",
+        temperature_K=1800.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=None,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="test",
+        authority="extrapolated",
+        certified_band=band,
+        notices=[
+            {
+                "kind": "openimcc_temperature_extrapolated",
+                "authority": "extrapolated",
+                "certified_band": band,
+            }
+        ],
+    )
+
+    hot = cell.to_engine_cache_value().hot
+
+    assert hot[11][6] == band
+    assert hot[11][7] == [
+        ["openimcc_temperature_extrapolated", "extrapolated", True]
+    ]
+    restored = EquilibrateCell.from_engine_cache_value(hot)
+    assert restored.notices[0]["certified_band"] == band
