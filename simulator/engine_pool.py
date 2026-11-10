@@ -350,22 +350,31 @@ def _run_engine_worker(
                 break
             if request is None:
                 break
+            from simulator.engine_cache import engine_cache_counters
+
+            engine_cache_counters(reset=True)
             try:
                 result = handler(resource, request, errlog)
-                connection.send(('ok', result))
             except EngineWorkerTimeout as exc:
+                counters = engine_cache_counters(reset=True)
                 connection.send((
                     'timeout',
                     exc.worker_name,
                     exc.timeout_s,
                     exc.phase,
+                    counters,
                 ))
             except BaseException as exc:  # pragma: no cover - native boundary
+                counters = engine_cache_counters(reset=True)
                 connection.send((
                     'error', type(exc).__name__, str(exc),
                     traceback.format_exc(),
                     getattr(exc, 'failure_disposition', None),
+                    counters,
                 ))
+            else:
+                counters = engine_cache_counters(reset=True)
+                connection.send(('ok', result, counters))
     except EngineWorkerTimeout as exc:  # pragma: no cover - nested bootstrap
         try:
             connection.send((
@@ -1413,10 +1422,21 @@ class WarmEngineWorker:
                 f'{self.name} worker exited without a result',
                 returncode=getattr(process, 'exitcode', None),
             )
+        counters = {}
+        if message[0] == 'ok' and len(message) > 2:
+            counters = message[2]
+        elif message[0] == 'timeout' and len(message) > 4:
+            counters = message[4]
+        elif message[0] == 'error' and len(message) > 5:
+            counters = message[5]
+        if isinstance(counters, dict) and counters:
+            from simulator.engine_cache import _record_engine_cache_counters
+
+            _record_engine_cache_counters(counters)
         if message[0] == 'ok':
             return message[1]
         if message[0] == 'timeout':
-            _tag, worker_name, timeout_s, phase = message
+            _tag, worker_name, timeout_s, phase = message[:4]
             _pool_debug(
                 f'{self.name}: worker-side timeout phase={phase} '
                 f'wall={timeout_s}'

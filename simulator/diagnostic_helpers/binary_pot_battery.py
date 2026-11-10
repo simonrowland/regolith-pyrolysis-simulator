@@ -86,6 +86,25 @@ IMCC_ENGINE_NAMES: tuple[str, ...] = OPENIMCC_ENGINE_NAMES
 MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
 
 
+def _hostname() -> str:
+    env_name = os.environ.get("GOALFLIGHT_HOSTNAME") or os.environ.get("HOSTNAME")
+    if env_name:
+        return str(env_name)
+    try:
+        probed = subprocess.run(
+            ["hostname"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        ).stdout.strip()
+        if probed:
+            return probed
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return socket.gethostname()
+
+
 def _openimcc_gas_channels_and_omission_notices(
     parent_oxides: Sequence[str], datapack: Any, gas_result: Any | None = None
 ) -> tuple[list[Any], tuple[dict[str, Any], ...]]:

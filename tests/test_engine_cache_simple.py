@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 import sqlite3
+import pickle
+import zlib
 from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
 
 from simulator import engine_cache
+from simulator.engine_cache import CacheValue, drop_chemistry_version, engine_cache_key, load_cache_rows
+from simulator.melt_backend.base import EquilibriumResult
+from simulator.engine_pool import EngineWorkerPool, WarmEngineWorker
 
 
 def _cached_engine_call():
@@ -19,6 +24,28 @@ def _engine_cache_counters(*, reset: bool = False):
     counters = getattr(engine_cache, "engine_cache_counters", None)
     assert callable(counters), "engine_cache must expose process-local counters"
     return counters(reset=reset)
+
+
+def _bootstrap_cache_counter_worker():
+    return None, "cache-counter-test-ready"
+
+
+def _handle_cache_counter_request(_resource, request, _diagnostic_log):
+    return engine_cache.cached_engine_call(
+        "openimcc",
+        request,
+        lambda: {"answer": request["answer"]},
+    )
+
+
+def _cache_counter_worker(_index):
+    return WarmEngineWorker(
+        name="cache-counter-test",
+        bootstrap=_bootstrap_cache_counter_worker,
+        handler=_handle_cache_counter_request,
+        startup_timeout_s=5.0,
+        call_timeout_s=5.0,
+    )
 
 
 @dataclass(frozen=True)
@@ -83,7 +110,156 @@ def test_cache_uses_canonical_request_and_wal_sqlite(
         ).fetchall()
         assert tables == [("engine_outputs",)]
         columns = connection.execute("PRAGMA table_info(engine_outputs)").fetchall()
-        assert [column[1] for column in columns] == ["key", "value"]
+        assert [column[1] for column in columns] == [
+            "key", "value", "engine", "chem_version", "source_box", "row_seq"
+        ]
+        schema = connection.execute(
+            "SELECT sql FROM sqlite_master WHERE name='engine_outputs'"
+        ).fetchone()[0]
+        assert "WITHOUT ROWID" in schema.upper()
+
+
+def test_raw_key_hot_json_cold_compression_and_exact_round_trip(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    _engine_cache_counters(reset=True)
+    hot = {"status": "ok", "activity": 0.12345678901234566}
+    cold = {"diagnostic": "not read on the hot path", "values": [1, 2, 3]}
+    request = {"temperature_K": 1700.0}
+    digest = engine_cache_key("openimcc", "1", request)
+
+    assert isinstance(digest, bytes) and len(digest) == 32
+    assert engine_cache.cached_engine_call(
+        "openimcc", request, lambda: CacheValue(hot, cold)
+    ) == hot
+    assert engine_cache.cached_engine_call(
+        "openimcc", request, lambda: pytest.fail("expected hot hit")
+    ) == hot
+
+    cold_database = database.with_name(database.name + ".cold")
+    with sqlite3.connect(database) as connection:
+        row = connection.execute(
+            "SELECT key, value, engine, chem_version, source_box, row_seq "
+            "FROM engine_outputs"
+        ).fetchone()
+    assert row[0] == digest
+    assert row[1] == '{"activity":0.12345678901234566,"status":"ok"}'
+    assert row[2:4] == ("openimcc", "1")
+    with sqlite3.connect(cold_database) as connection:
+        cold_value = connection.execute(
+            "SELECT value FROM engine_outputs_cold WHERE key=?", (digest,)
+        ).fetchone()[0]
+    assert pickle.loads(zlib.decompress(cold_value)) == cold
+
+
+def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _call_cached_backend_equilibrate,
+    )
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "engine-cache.sqlite"))
+    _engine_cache_counters(reset=True)
+    expected = EquilibriumResult(
+        liquid_fraction=0.25,
+        phase_compositions={"melt": {"FeO": 0.5}},
+        activity_coefficients={"FeO": 0.75},
+    )
+    expected.diagnostics = {"backend_status_reason": "fixture-code"}
+    handle = SimpleNamespace(name="thermoengine", engine_settings={})
+    calls = 0
+
+    def solve() -> EquilibriumResult:
+        nonlocal calls
+        calls += 1
+        return expected
+
+    cold = _call_cached_backend_equilibrate(handle, {"temperature_C": 1000.0}, solve)
+    warm = _call_cached_backend_equilibrate(handle, {"temperature_C": 1000.0}, solve)
+
+    assert isinstance(cold, EquilibriumResult)
+    assert isinstance(warm, EquilibriumResult)
+    assert warm.phase_compositions == expected.phase_compositions
+    assert warm.activity_coefficients == expected.activity_coefficients
+    assert warm.diagnostics == expected.diagnostics
+    assert calls == 1
+    assert _engine_cache_counters(reset=True)["thermoengine"] == {
+        "hits": 1,
+        "misses": 1,
+        "stores": 1,
+    }
+
+
+def test_bulk_loader_is_idempotent_and_chemistry_version_can_be_dropped(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    digest = engine_cache_key("magemin", "1", {"pressure_bar": 1.0})
+    rows = [(digest, {"status": "ok"}, "magemin", "1", "box-a", 1001)]
+
+    assert load_cache_rows(database, rows) == 1
+    assert load_cache_rows(database, rows) == 0
+    with sqlite3.connect(database) as connection:
+        assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
+    assert drop_chemistry_version("magemin", "1") == 1
+    with sqlite3.connect(database) as connection:
+        assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 0
+
+
+def test_readonly_mode_serves_hits_and_solves_misses_without_writing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    digest = engine_cache_key("vaporock", "1", {"temperature_K": 900.0})
+    load_cache_rows(
+        database,
+        [(digest, {"pressure": 2.0}, "vaporock", "1", "box-b", 2001)],
+    )
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    _engine_cache_counters(reset=True)
+
+    assert engine_cache.cached_engine_call(
+        "vaporock", {"temperature_K": 900.0}, lambda: pytest.fail("expected hit")
+    ) == {"pressure": 2.0}
+    assert engine_cache.cached_engine_call(
+        "vaporock", {"temperature_K": 901.0}, lambda: {"pressure": 3.0}
+    ) == {"pressure": 3.0}
+    assert _engine_cache_counters(reset=True)["vaporock"] == {
+        "hits": 1, "misses": 1, "stores": 0
+    }
+    with sqlite3.connect(database) as connection:
+        assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
+
+
+def test_engine_worker_returns_cache_counters_to_parent(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    _engine_cache_counters(reset=True)
+    pool = EngineWorkerPool(_cache_counter_worker, size=1)
+    request = {"answer": 42}
+    try:
+        assert pool.submit(request, timeout_s=5.0).result(timeout=6.0) == request
+        assert pool.submit(request, timeout_s=5.0).result(timeout=6.0) == request
+        assert _engine_cache_counters(reset=True)["openimcc"] == {
+            "hits": 1,
+            "misses": 1,
+            "stores": 1,
+        }
+    finally:
+        pool.close(cancel_pending=True, timeout_s=5.0)
 
 
 def test_exceptions_and_typed_refusals_are_not_stored(
