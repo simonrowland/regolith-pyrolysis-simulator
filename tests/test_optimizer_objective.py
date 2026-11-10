@@ -50,6 +50,22 @@ from scripts.sso2_owner_recipe_report import _markdown_report
 from simulator.pumping_cost import MARS_DATUM_AMBIENT_PA, estimate_subambient_pump_cost
 
 
+@pytest.fixture(scope="module")
+def pinned_lunar_c2a_session():
+    from simulator.runner import PyrolysisRun
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=2,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    run._run_session(session)
+    return session
+
+
 DEFINITIONS = (
     ObjectiveDefinition("oxygen_kg", "maximize", "kg", ordinal=0),
     ObjectiveDefinition(ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC, "minimize", "kWh", ordinal=1),
@@ -538,6 +554,70 @@ def test_missing_stage_3_capture_refuses_silica_objective_with_reason() -> None:
     assert evidence["value_status"] == "unavailable"
     assert evidence["certification_flag"]["status"] == "unavailable"
     assert evidence["certification_flag"]["reason"] == "stage_3_missing"
+
+
+@pytest.mark.xdist_group("serial")
+def test_pinned_lunar_refused_products_are_unavailable_to_optimizer(
+    pinned_lunar_c2a_session,
+) -> None:
+    metrics = (
+        "metals_plus_o2_kg",
+        "metals_total_kg",
+        "O2_kg",
+        "oxygen_kg",
+        "oxygen_stored_kg",
+        "oxygen_vented_kg",
+    )
+    profile = {
+        "objectives": [
+            {"metric": metric, "sense": "maximize", "units": "kg"}
+            for metric in metrics
+        ]
+    }
+
+    objectives = compute_objectives(profile, pinned_lunar_c2a_session)
+
+    assert dict(objectives.as_mapping()) == {metric: None for metric in metrics}
+    for metric in metrics:
+        evidence = objectives.evidence[metric]
+        assert evidence["value_status"] == "unavailable"
+        assert evidence["availability_flag"]["status"] == "unavailable"
+
+
+@pytest.mark.xdist_group("serial")
+def test_pinned_lunar_unavailable_notice_has_no_zero_kg_total(
+    pinned_lunar_c2a_session,
+) -> None:
+    from simulator.three_product_report import classify_products
+    from simulator.three_product_report_markdown import (
+        format_three_product_markdown,
+    )
+
+    products = classify_products(pinned_lunar_c2a_session.simulator)
+    markdown = format_three_product_markdown(
+        products,
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+    )
+
+    for name in ("metals_plus_O2", "oxygen"):
+        bucket = products[name]
+        assert bucket["status"] == "unavailable"
+        assert bucket["class_total_kg"] is None
+        availability_flag = bucket["availability_flag"]
+        assert availability_flag["status"] == "unavailable"
+        reason = availability_flag["reason"]
+        assert reason.startswith("No computed product is available")
+        assert "refused contributions:" in reason
+        assert "0 kg" not in reason
+        assert "0.0 kg" not in reason
+        assert all(item["reason"] in reason for item in bucket["excluded"])
+        prediction = bucket["prediction_flag"]
+        assert prediction["status"] == "flagged prediction"
+        assert "0 kg" not in prediction["reason"]
+        assert "0.0 kg" not in prediction["reason"]
+        assert "unavailable" in markdown
+        assert reason in markdown
 
 
 def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:
