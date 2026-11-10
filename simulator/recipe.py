@@ -23,7 +23,7 @@ from simulator.canonical import canonical_json_dumps
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v12"
+allowlist_version = "allowlist-v13"
 O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v12"
 O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
 _RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
@@ -2008,6 +2008,38 @@ def _setpoint_sourced_allowlist(
     setpoints: Mapping[str, Any],
 ) -> tuple[KnobSpec, ...]:
     converted_source_prefix = "engineering_envelope converted from setpoints:"
+    pipe_segment_default_path = (
+        "overhead_headspace",
+        "pipe_segment_temperatures_C",
+        "default_C",
+    )
+    pipe_segment_names = {
+        spec.path[3]
+        for spec in RecipeSchema.ALLOWLIST
+        if len(spec.path) == 5
+        and spec.path[:3]
+        == (
+            "overhead_headspace",
+            "pipe_segment_temperatures_C",
+            "segments",
+        )
+        and spec.path[-1] == "default_C"
+    }
+    pipe_config = _nested_default(
+        setpoints,
+        pipe_segment_default_path[:-1],
+        {},
+    )
+    configured_segments = (
+        pipe_config.get("segments", {})
+        if isinstance(pipe_config, Mapping)
+        else {}
+    )
+    pipe_segment_default_is_inert = bool(pipe_segment_names) and isinstance(
+        configured_segments, Mapping
+    ) and all(
+        configured_segments.get(name) is not None for name in pipe_segment_names
+    )
     downstream_bounds = {
         tuple((
             "overhead_headspace.pipe_segment_temperatures_C.segments."
@@ -2017,6 +2049,14 @@ def _setpoint_sourced_allowlist(
     }
     resolved: list[KnobSpec] = []
     for spec in template_allowlist:
+        if (
+            spec.path == pipe_segment_default_path
+            and pipe_segment_default_is_inert
+        ):
+            # The runtime applies this default only when a named pipe segment
+            # has no per-segment config; all current pipe segments have one.
+            resolved.append(replace(spec, search_enabled=False))
+            continue
         if spec.path in downstream_bounds:
             low, high = downstream_bounds[spec.path]
             resolved.append(replace(spec, low=low, high=high))

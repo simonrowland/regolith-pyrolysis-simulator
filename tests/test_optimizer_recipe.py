@@ -152,7 +152,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "d40d619c3228beccd37ca6b683c5213a7894edcbe07ffc105a2ef58ff2c6ec55"
+        "09ca6fabe637fac68f092e8420e67153d069105534ee6bd9c752e976294baed0"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -599,10 +599,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
     assert unpinned is schema
-    assert len(paths) == 65
+    assert len(paths) == 64
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
+        == "347013a0535470aa4b2405f24b1c1a66508cede0c9bb0f89af7f4ba55e1139dd"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -816,7 +816,7 @@ def test_furnace_max_t_c_bounds_are_allowlist_epoch_pinned() -> None:
     # bound values meant a failure named none of them -- the diff said only "at
     # index 2", and an epoch drift and a bounds drift were indistinguishable.
     # One assertion per fact, so the failure names the fact.
-    assert schema.allowlist_version == "allowlist-v12"
+    assert schema.allowlist_version == "allowlist-v13"
     assert O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION == "allowlist-v12"
     # The knob's bounds ARE the furnace envelope -- that identity is the claim
     # worth pinning here. The envelope's own VALUE is owned by the catalog and

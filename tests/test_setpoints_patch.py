@@ -1,21 +1,27 @@
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 
 import pytest
 import yaml
 
 from simulator.backends import BackendSelectionPolicy
+from simulator.condensation import CondensationModel
 from simulator.core import CampaignPhase
+from simulator.overhead import OverheadGasModel
+from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.runner import (
     PyrolysisRun,
     RunnerError,
+    ShadowedWallTemperatureDefaultWarning,
     _canonical_runtime_campaign_overrides,
     _deep_merge_setpoints,
     _parse_runtime_campaign_overrides_json,
 )
 from simulator.session import SimSession, SimSessionConfig
 from simulator.session_cli import _parse_setpoint_overrides
+from simulator.state import CondensationTrain, MeltState
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -71,6 +77,111 @@ def test_setpoints_patch_deep_merges_without_mutating_base() -> None:
     assert patched_c2a["phase_r_added_key"] == 7.0
     assert patched.setpoints["campaigns"]["C2B"] == base_c2b
     assert "phase_r_added_key" not in base_c2a
+
+
+def test_pipe_segment_default_patch_preserves_wall_temperatures_for_all_campaigns(
+) -> None:
+    base = _load_yaml("setpoints.yaml")
+    path = (
+        "overhead_headspace",
+        "pipe_segment_temperatures_C",
+        "default_C",
+    )
+    segment_names = tuple(
+        segment.name
+        for segment in CondensationModel(
+            CondensationTrain.create_default(base)
+        ).pipe_segments
+    )
+    baseline = OverheadGasModel(base["overhead_headspace"])
+    patched_models = []
+    schema = RecipeSchema(setpoints=base)
+
+    for wall_temperature_C in (1400.0, 1750.0):
+        recipe_patch = schema.to_setpoints_patch(
+            RecipePatch({path: wall_temperature_C})
+        )
+        patched_setpoints = _deep_merge_setpoints(base, recipe_patch)
+        patched_models.append(
+            OverheadGasModel(patched_setpoints["overhead_headspace"])
+        )
+
+    campaigns = tuple(
+        campaign
+        for campaign in CampaignPhase
+        if campaign not in {CampaignPhase.IDLE, CampaignPhase.COMPLETE}
+    )
+    for campaign in campaigns:
+        for hour in range(25):
+            melt = MeltState(
+                campaign=campaign,
+                campaign_hour=float(hour),
+                hour=float(hour),
+            )
+            expected_liner = baseline.resolve_pipe_temperature_C(melt)
+            expected = baseline.resolve_pipe_segment_temperatures_C(
+                segment_names,
+                melt,
+            )
+            for model in patched_models:
+                assert model.resolve_pipe_temperature_C(melt) == expected_liner
+                assert model.resolve_pipe_segment_temperatures_C(
+                    segment_names,
+                    melt,
+                ) == expected
+
+
+def test_shadowed_pipe_segment_default_warns_with_schedule_details() -> None:
+    base = _load_yaml("setpoints.yaml")
+    path = (
+        "overhead_headspace",
+        "pipe_segment_temperatures_C",
+        "default_C",
+    )
+    patch = RecipeSchema(setpoints=base).to_setpoints_patch(
+        RecipePatch({path: 1400.0})
+    )
+    run = PyrolysisRun(
+        feedstock_id=FEEDSTOCK,
+        campaign="C2A_staged",
+        setpoints_patch=patch,
+    )
+
+    with pytest.warns(ShadowedWallTemperatureDefaultWarning) as captured:
+        run._session_config()
+
+    notice = captured[0].message
+    assert notice.code == "overhead_wall_temperature_default_shadowed"
+    assert "overhead_headspace.pipe_segment_temperatures_C.default_C" in str(
+        notice
+    )
+    assert "C2A_STAGED" in str(notice)
+    assert all(
+        f"stage_{stage}_to_stage_{stage + 1}" in str(notice)
+        for stage in range(7)
+    )
+
+
+def test_shadowed_pipe_segment_default_does_not_warn_without_campaign_schedule(
+) -> None:
+    base = _load_yaml("setpoints.yaml")
+    path = (
+        "overhead_headspace",
+        "pipe_segment_temperatures_C",
+        "default_C",
+    )
+    patch = RecipeSchema(setpoints=base).to_setpoints_patch(
+        RecipePatch({path: 1400.0})
+    )
+    run = PyrolysisRun(
+        feedstock_id=FEEDSTOCK,
+        campaign="C0",
+        setpoints_patch=patch,
+    )
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", ShadowedWallTemperatureDefaultWarning)
+        run._session_config()
 
 
 def test_setpoints_patch_fallback_and_runtime_override_precedence() -> None:

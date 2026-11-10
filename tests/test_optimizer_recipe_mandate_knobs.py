@@ -8,6 +8,7 @@ import yaml
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
+from simulator.condensation import CondensationModel
 from simulator.optimize.recipe import (
     CANONICAL_TO_RUNTIME_PATH,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
@@ -82,7 +83,7 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v12" == schema.allowlist_version
+    assert "allowlist-v13" == schema.allowlist_version
 
     # P1 #1: campaigns.C2A_staged.stages.fe_hot_hold.target_C is a silent no-op
     # (the runtime holds fe_hot_hold at default_hold_T_C / the C4-style override,
@@ -100,6 +101,39 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
     searchable_paths = {spec.path for spec in schema.search_allowlist}
     assert optional_ca_harvest_spec.search_enabled is False
     assert optional_ca_harvest_po2 not in searchable_paths
+
+
+def test_pipe_segment_default_is_excluded_when_all_segments_have_overrides() -> None:
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    runtime_segments = {
+        segment.name
+        for segment in CondensationModel(
+            CondensationTrain.create_default(setpoints)
+        ).pipe_segments
+    }
+    pipe_config = setpoints["overhead_headspace"]["pipe_segment_temperatures_C"]
+    segment_overrides = pipe_config["segments"]
+
+    assert runtime_segments == set(segment_overrides)
+    schema = RecipeSchema(setpoints=setpoints)
+    default_path = _path(
+        "overhead_headspace.pipe_segment_temperatures_C.default_C"
+    )
+    default_spec = schema.spec_for(default_path)
+    searchable_paths = {spec.path for spec in schema.search_allowlist}
+
+    assert default_spec.search_enabled is False
+    assert default_path not in searchable_paths
+
+    setpoints_without_one_segment_override = yaml.safe_load(
+        SETPOINTS_PATH.read_text()
+    )
+    del setpoints_without_one_segment_override["overhead_headspace"][
+        "pipe_segment_temperatures_C"
+    ]["segments"][next(iter(runtime_segments))]
+    partial_schema = RecipeSchema(setpoints=setpoints_without_one_segment_override)
+
+    assert partial_schema.spec_for(default_path).search_enabled is True
 
 
 def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:

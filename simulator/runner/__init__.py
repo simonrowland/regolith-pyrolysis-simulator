@@ -36,6 +36,7 @@ import math
 import subprocess
 import sys
 import threading
+import warnings
 import weakref
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -102,6 +103,7 @@ from simulator.condensation import (
     gram_lab_exposed_melt_area_bridge,
     stage_purity_report,
 )
+from simulator.overhead import OverheadGasModel
 from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
@@ -274,6 +276,12 @@ class RunnerError(RuntimeError):
     and are caught in :meth:`PyrolysisRun.run` to populate the
     ``status=failed`` envelope.
     """
+
+
+class ShadowedWallTemperatureDefaultWarning(UserWarning):
+    """Notice when a patched wall default is shadowed by segment schedules."""
+
+    code = "overhead_wall_temperature_default_shadowed"
 
 
 class EngineBugAbort(RunnerError):
@@ -894,6 +902,90 @@ def _deep_merge_setpoints(
     return merged
 
 
+def _shadowed_pipe_segment_default_notice(
+    setpoints: Mapping[str, Any],
+    setpoints_patch: Mapping[str, Any],
+    campaign: str,
+) -> str | None:
+    overhead_patch = setpoints_patch.get("overhead_headspace", {})
+    pipe_patch = (
+        overhead_patch.get("pipe_segment_temperatures_C", {})
+        if isinstance(overhead_patch, Mapping)
+        else {}
+    )
+    if not isinstance(pipe_patch, Mapping) or "default_C" not in pipe_patch:
+        return None
+
+    overhead = setpoints.get("overhead_headspace", {})
+    pipe_config = (
+        overhead.get("pipe_segment_temperatures_C", {})
+        if isinstance(overhead, Mapping)
+        else {}
+    )
+    segment_configs = (
+        pipe_config.get("segments", {})
+        if isinstance(pipe_config, Mapping)
+        else {}
+    )
+    if not isinstance(segment_configs, Mapping):
+        return None
+
+    if not segment_configs:
+        return None
+
+    campaign_name = str(getattr(campaign, "name", campaign) or "")
+    shadowing_schedules: list[tuple[str, Mapping[str, Any]]] = []
+    for name in sorted(segment_configs):
+        segment_config = segment_configs[name]
+        if not isinstance(segment_config, Mapping):
+            return None
+        schedule = segment_config.get("schedule", ())
+        if isinstance(schedule, Mapping):
+            schedule = schedule.get("segments", ())
+        if not isinstance(schedule, (list, tuple)):
+            return None
+
+        selected = None
+        for row in schedule:
+            if not isinstance(row, Mapping):
+                continue
+            if not OverheadGasModel._campaign_matches(
+                row.get("campaign"), campaign_name
+            ):
+                continue
+            start_hour = OverheadGasModel._optional_float(
+                row.get("from_campaign_hour", row.get("start_hour")),
+                0.0,
+            )  # hr — schedule segment start
+            end_raw = row.get("to_campaign_hour", row.get("end_hour"))
+            end_hour = (
+                None
+                if end_raw is None
+                else OverheadGasModel._optional_float(end_raw, 0.0)
+            )  # hr or None — schedule segment end
+            if start_hour > 0.0:
+                continue
+            if end_hour is not None and end_hour < 0.0:
+                selected = row
+                continue
+            selected = row
+            break
+        if selected is None:
+            return None
+        shadowing_schedules.append((str(name), selected))
+
+    schedule_details = "; ".join(
+        f"{name}: {dict(schedule)!r}"
+        for name, schedule in shadowing_schedules
+    )
+    return (
+        f"{ShadowedWallTemperatureDefaultWarning.code}: "
+        "overhead_headspace.pipe_segment_temperatures_C.default_C is shadowed "
+        f"for every pipe segment in campaign {campaign_name!r} at hour 0 by "
+        f"the configured campaign schedules ({schedule_details})"
+    )
+
+
 def _additives_with_c3_alkali_dosing(
     additives_kg: Mapping[str, float],
     setpoints: Mapping[str, Any],
@@ -1209,6 +1301,16 @@ class PyrolysisRun:
         feedstocks = bundle.feedstocks
         setpoints = copy.deepcopy(bundle.setpoints)
         setpoints = _deep_merge_setpoints(setpoints, self.setpoints_patch)
+        if notice := _shadowed_pipe_segment_default_notice(
+            setpoints,
+            self.setpoints_patch,
+            self.campaign,
+        ):
+            warnings.warn(
+                notice,
+                ShadowedWallTemperatureDefaultWarning,
+                stacklevel=2,
+            )
         if self.high_t_melt_activity is not None:
             setpoints = _deep_merge_setpoints(
                 setpoints,
