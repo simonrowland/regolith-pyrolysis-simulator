@@ -17,7 +17,7 @@ from simulator.chemistry.kernel.validation import (
     validate_atom_balance,
     validate_proposal_accounts,
 )
-from simulator.state import CampaignPhase
+from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MOLAR_MASS
 from tests.chemistry.conftest import _atom_check, _build_sim
 
 
@@ -357,7 +357,12 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
             None,
         )
         closure = partition.get("same_hour_headspace_closure") or {}
-        assert partition["native_fe_vapor_mol"] == pytest.approx(0.0)
+        selected_kg_hr = partition["native_fe_vapor_capacity_kg_hr"]
+        assert selected_kg_hr > 0.0
+        assert selected_kg_hr == pytest.approx(closure["rates_kg_hr"]["Fe"])
+        assert partition["native_fe_vapor_mol"] * MOLAR_MASS["Fe"] / 1000.0 == pytest.approx(selected_kg_hr)
+        assert partition["selected_partition"] == "same_hour_headspace_closure"
+        _assert_selected_forward_pressure(sim, partition)
         assert partition["P_bulk_Pa"] > 0.0
         assert partition["reason"] == "viscous_p_bulk_transport_out_of_domain"
         assert bound is not None
@@ -380,10 +385,44 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
             float(species_kg.get("Fe", 0.0) or 0.0)
             for species_kg in accounts.values()
         )
-        # The old 0.168 kg pin is the labelled HKL upper bound above.
-        # The solved vacuum command is transitional, so the ledger commits none.
-        assert routed_fe_kg == pytest.approx(0.0, abs=1e-12)
-        assert sim.train.stages[1].collected_kg.get("Fe", 0.0) == pytest.approx(
-            0.0,
-            abs=1e-12,
-        )
+        # Route the closed prediction, retaining the distinct HKL bound.
+        assert routed_fe_kg == pytest.approx(selected_kg_hr, abs=1e-12)
+        assert selected_kg_hr < bound["upper_bound_kg_hr"]
+        assert 0.0 < sim.train.stages[1].collected_kg["Fe"] <= routed_fe_kg
+
+
+def _assert_selected_forward_pressure(sim, partition):
+    selected_rate = partition["native_fe_vapor_capacity_kg_hr"]
+    flux = EvaporationFlux(species_kg_hr={"Fe": selected_rate})
+    flux.update_totals()
+    transport = sim.overhead_model.estimate_transport_state(
+        flux, sim.melt, p_downstream_bar=sim._headspace_downstream_pressure_bar(None),
+    )
+    partials = sim.overhead_model.species_partial_pressures(
+        flux, transport["vapor_pressure_mbar"], sim.species_formula_registry,
+    )
+    assert partials["Fe"] * 100.0 == pytest.approx(partition["P_bulk_Pa"], rel=1e-8)
+    notice = next(n for n in partition["notices"] if n.get("kind") == "transport_domain_extension")
+    assert notice["overhead_pressure_pa"] == partition["overhead_pressure_pa"]
+    assert notice["knudsen_number"] == partition["series_resistance"]["knudsen_number"]
+    assert notice["authority"] == "extrapolated"
+    assert partition["ledger_yields_authorized"] is True
+
+
+@pytest.mark.parametrize("pool_mol", [100.0, 0.5])
+def test_native_fe_selects_closed_transitional_stream(
+    vapor_pressure_data, feedstocks_data, setpoints_data, pool_mol
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.melt.temperature_C = 1670.0
+    sim.melt.campaign = CampaignPhase.C2A_STAGED
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.p_total_mbar = 0.0
+    sim.overhead.headspace_temperature_K = 1943.15
+    partition = sim._native_fe_partition_diagnostic(pool_mol)
+    closure = partition["same_hour_headspace_closure"]
+    assert closure["converged"] is True
+    assert partition["native_fe_vapor_capacity_kg_hr"] == pytest.approx(closure["rates_kg_hr"]["Fe"])
+    assert partition["native_fe_vapor_capacity_kg_hr"] > 0.0
+    assert partition["native_fe_vapor_mol"] + partition["native_fe_tap_mol"] == pytest.approx(pool_mol)
+    _assert_selected_forward_pressure(sim, partition)

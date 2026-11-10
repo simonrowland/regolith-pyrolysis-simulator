@@ -8128,6 +8128,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _series_resistance_evaporation_flux_kg_m2_s,
         )
         from simulator.evaporation import (
+            _predict_transport_domain_extension,
             evaporation_flux_refusal_from_configuration_error,
             viscous_p_bulk_out_of_domain_diagnostic,
         )
@@ -8384,12 +8385,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or vacuum_kn >= FREE_MOLECULAR_KNUDSEN_MIN
         )
         series_flux = series_flux_at(P_bulk_Pa, overhead_pressure_pa)
-        # Transitional Kn domain: this bounded native-Fe projection
-        # suppresses capacity under its diagnostic-limited policy when
-        # continuum transport is load-bearing (pyrolysis). Stage 0
-        # bakeout marks and keeps the computed HKL capacity. The
-        # authoritative EVAPORATION_FLUX provider refuses the pyrolysis
-        # case; t-379 lifts this suppression.
+        # A converged finite-outlet stream remains the selected prediction
+        # outside continuum validity; uncertainty must not select a new zero.
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
             knudsen_number=float(series_flux.knudsen_number),
             overhead_pressure_pa=overhead_pressure_pa,
@@ -8399,6 +8396,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             campaign_name=campaign_name,
             asking_site='core.native_fe_vapor_partition',
         )
+        domain_diag = _predict_transport_domain_extension(domain_diag)
         closure_record = {
             'regime': (
                 'pressure_held'
@@ -8424,11 +8422,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             iterations_by_hour.setdefault(
                 int(getattr(self.melt, 'hour', 0)), {}
             )['native_fe'] = int(closure.iterations)
-        capacity_kg_hr = (
-            0.0
-            if continuum_validity_refuses(domain_diag)
-            else max(0.0, float(closure.rates_kg_hr.get('Fe', 0.0)))
-        )
+        capacity_kg_hr = max(0.0, float(closure.rates_kg_hr.get('Fe', 0.0)))
         unclosed_hkl_upper_bound = None
         if (
             commanded_free_molecular
@@ -8463,9 +8457,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pool = native_fe_available_mol
         series_diag = series_flux.as_diagnostic()
         if domain_diag is not None:
-            # Relabel series diagnostic with the typed continuum-validity
-            # vocabulary. Pyrolysis refusals still suppress flux; bakeout
-            # marks keep the computed HKL number.
+            # This diagnostic describes the selected stream at its own Kn.
             series_diag = dict(series_diag)
             series_update = {
                 'authority_class': domain_diag['authority_class'],
@@ -8489,8 +8481,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'carrier_gas': domain_diag['carrier_gas'],
                 'framing': domain_diag['framing'],
             }
-            if continuum_validity_refuses(domain_diag):
-                series_update['flux_kg_s_m2'] = 0.0
             series_diag.update(series_update)
         diagnostic = {
             'native_fe_pool_mol': pool,
@@ -8528,6 +8518,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             'series_resistance': series_diag,
             'same_hour_headspace_closure': closure_record,
+            'selected_partition': 'same_hour_headspace_closure',
         }
         if pressure_held_total_Pa is not None:
             diagnostic['notices'] = [_o2_coproduct_exclusion_notice()]
@@ -8555,6 +8546,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 unclosed_hkl_upper_bound
             )
         if domain_diag is not None:
+            diagnostic.setdefault('notices', []).append(domain_diag)
             diagnostic.update(
                 {
                     'authority_class': domain_diag['authority_class'],
