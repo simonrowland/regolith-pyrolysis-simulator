@@ -9612,6 +9612,51 @@ def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = 
     return extract
 
 
+def test_prose_percent_fraction_conversion_keeps_basis_and_semicolon_units(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="S6+/ΣS as printed in percent",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "mass_loss_fraction": "74.5",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.745")
+
+    semicolon = select_declared_source(
+        Quantity.MASS_LOSS_FRACTION,
+        "experimental time in hours; evaporated fraction in percent",
+        {"mass_loss_fraction": "74.5"},
+    )
+    assert semicolon.value.point == Decimal("0.745")
+    assert semicolon.unit_trail == "percent_to_fraction"
+
+    wt_percent = select_declared_source(
+        Quantity.MASS_LOSS_FRACTION,
+        "wt%",
+        {"mass_loss_fraction": "74.5"},
+    )
+    assert wt_percent.value.point == Decimal("0.745")
+    assert wt_percent.unit_trail == "percent_to_fraction"
+
+    reduced_valence = select_declared_source(
+        Quantity.VALENCE_RATIO,
+        "% of total Mn",
+        {"value": "0.045", "value_as_published": "4.5"},
+    )
+    assert reduced_valence.value.point == Decimal("0.045")
+    assert reduced_valence.unit_trail != "percent_to_fraction"
+
+
 def test_partial_molar_enthalpy_value_field_migrates_as_numeric_point(
     tmp_path: Path,
 ) -> None:

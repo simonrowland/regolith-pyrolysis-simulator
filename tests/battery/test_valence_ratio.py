@@ -68,6 +68,7 @@ from simulator.battery.score import (
     selected_lineage_level,
     score_store,
 )
+from simulator.battery.validate import validate_corpus
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -772,6 +773,7 @@ def test_out_of_range_fraction_valence_values_are_kept_with_notice(
     assert "range [0, 1]" in notices[0].reason
     assert f"by {excess}" in notices[0].reason
 
+
     score_observation = _quench_row(
         observation,
         observation_id=observation.observation_id,
@@ -802,6 +804,28 @@ def test_out_of_range_fraction_valence_values_are_kept_with_notice(
         assert residuals[0].refusal.detail["observed_value"] == value
     else:
         assert residuals[0].numeric is not None
+
+
+def test_validator_keeps_printed_out_of_range_fraction_valence_value(tmp_path: Path) -> None:
+    migrator, observation = _migrate_valence_fixture(
+        tmp_path, "Cr2plus_over_total_Cr", "1.01"
+    )
+    observations = dict(migrator.result.observations)
+    observations[observation.observation_id] = observation
+
+    report = validate_corpus(
+        migrator.result.works,
+        migrator.result.experiments,
+        observations,
+        benches=migrator.result.benches,
+    )
+
+    assert observation.value.point == Decimal("1.01")
+    assert not any(
+        issue.path == f"observation[{observation.observation_id}].value"
+        and issue.reason is RefusalReason.INVALID_SOURCE
+        for issue in report.hard_issues
+    )
 
 
 def test_average_oxidation_state_without_named_bounds_gets_no_range_notice(
