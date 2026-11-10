@@ -86,6 +86,7 @@ def _series_resistance_reference_flux(
     diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
     closure = diagnostic.get("same_hour_headspace_closure")
     assert isinstance(closure, dict), "reference requires the same-hour closure"
+    closure_rates = dict(closure.get("rates_kg_hr") or {})
     same_hour_partials_Pa = closure.get("partial_pressures_Pa")
     assert isinstance(same_hour_partials_Pa, dict), (
         "same-hour closure must expose projected source partial pressures"
@@ -94,8 +95,8 @@ def _series_resistance_reference_flux(
     if not roots_g:
         return {
             str(species): float(rate)
-            for species, rate in dict(closure.get("rates_kg_hr") or {}).items()
-            if float(rate) > 1e-12
+            for species, rate in closure_rates.items()
+            if math.isfinite(float(rate)) and float(rate) > 0.0
         }
     projection_g = float(roots_g[0])
     accepted_pressure_Pa = max(
@@ -109,9 +110,7 @@ def _series_resistance_reference_flux(
     T_K = sim.melt.temperature_C + 273.15
     flux: dict[str, float] = {}
     molar_masses_kg_mol: dict[str, float] = {}
-    admitted_species = set(
-        dict(diagnostic.get("evaporation_series_resistance") or {})
-    )
+    admitted_species = set(closure_rates)
     series_by_species = dict(
         diagnostic.get("evaporation_series_resistance") or {}
     )
@@ -200,7 +199,7 @@ def _series_resistance_reference_flux(
         denominator = molar_resistance + projection_g
         molar_rate = P_eq_Pa / denominator if denominator > 0.0 else 0.0
         rate_kg_hr = molar_rate * M_kg_mol
-        if rate_kg_hr > 1e-12:
+        if math.isfinite(rate_kg_hr) and rate_kg_hr > 0.0:
             flux[species] = rate_kg_hr
 
     liquid_factor = (
@@ -222,7 +221,7 @@ def _series_resistance_reference_flux(
     return {
         species: rate
         for species, rate in admitted_rates.items()
-        if rate > 1e-12
+        if math.isfinite(rate) and rate > 0.0
     }
 
 
@@ -1080,13 +1079,11 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
     # exposes the real holdup-derived pO2 (vacuum-floor 1e-9 bar) in
     # HARD_VACUUM atmosphere instead of the pre-flip synthetic
     # conductance-ratio derived floor. Under the new trajectory the
-    # 1/sqrt(pO2) suppression factor multiplies P_eq too aggressively
-    # at 1000 C and ALL species drop below the legacy loop's
-    # 1e-12 kg/hr reporting threshold (empty flux dict). The 2026-06-14
-    # dense VapoRock pseudo-Antoine refit also drops the 1200 C fixture
-    # below that floor; 1300 C restores species output while staying below
-    # recipe operating T of 1600-1700 C. The provider-vs-legacy parity
-    # contract is unchanged.
+    # 1/sqrt(pO2) suppression factor strongly lowers P_eq at 1000 C, and
+    # the 2026-06-14 dense VapoRock pseudo-Antoine refit keeps the 1200 C
+    # fixture's rates small. At 1300 C the comparison has a clear signal
+    # while staying below recipe operating T of 1600-1700 C. Parity includes
+    # every positive finite tail.
     while sim.melt.temperature_C < 1300.0:
         if sim.paused_for_decision:
             decision = sim.pending_decision
@@ -1260,7 +1257,10 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
                 sim, vapor_pressures_Pa
             )
         else:
-            assert not any(rate > 1e-12 for rate in kernel_flux.values()), (
+            assert not any(
+                math.isfinite(rate) and rate > 0.0
+                for rate in kernel_flux.values()
+            ), (
                 "positive accepted flux requires a same-hour closure"
             )
             reference_flux = {}
