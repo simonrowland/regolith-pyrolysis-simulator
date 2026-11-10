@@ -7382,6 +7382,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._degraded_path_engagement = degraded_before
 
     def _compute_capacity_coupling_shadow_impl(self, equilibrium):
+        # Drop the previous hour's publication. A skipped resolve must
+        # not re-close this hour on that map.
+        self._langmuir_flux_closure_context = None
         from engines.builtin.evaporation_flux import (
             BuiltinEvaporationFluxProvider,
         )
@@ -7487,6 +7490,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             iteration_controls['overhead_pressure_pa'] = (
                 self._evaporation_overhead_total_pressure_Pa(partials_Pa)
             )
+            # The map in ``controls`` was closed on the partials at the
+            # start of this shadow. Each trial vector re-enters the same
+            # closure from the stored publication. Do not write the
+            # diagnostic here: the resolver owns it, and the live
+            # evaporation call closes on the solved vector afterwards.
+            reclosed = self._reclose_langmuir_pressures(partials_Pa)
+            if reclosed is not None:
+                iteration_controls['vapour_batch_flux_pressures_Pa'] = dict(
+                    reclosed.pressures_Pa
+                )
             request = IntentRequest(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
                 account_view=account_view,

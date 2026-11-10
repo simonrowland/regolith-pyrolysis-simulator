@@ -766,6 +766,213 @@ class EvaporationMixin:
             self, '_melt_headspace_composition_mbar', {}) or {}
         return float(melt_headspace_partials_mbar.get(species, 0.0)) * 100.0
 
+    def _langmuir_headspace_partials_Pa(
+        self,
+        species_ids: Mapping[str, Any] | Any,
+    ) -> dict[str, float]:
+        """Species backpressures (Pa) for one surface closure.
+
+        Includes O2 even when the vapor map has no O2 row: the balance's
+        synthetic O2 channel uses that partial. A missing reader is an
+        empty headspace, not a zero substituted for a measurement the
+        caller withheld.
+        """
+
+        reader = getattr(self, "_evaporation_bulk_partial_pressure_pa", None)
+        if not callable(reader):
+            return {}
+        names = [str(species) for species in species_ids]
+        if "O2" not in names:
+            names.append("O2")
+        partials: dict[str, float] = {}
+        for species in names:
+            try:
+                value = float(reader(species))
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(value) and value > 0.0:
+                partials[species] = value
+        return partials
+
+    def _langmuir_transport(
+        self,
+        partials_Pa: Mapping[str, float],
+        temperature_K: float,
+    ) -> Any:
+        """Series-resistance knobs matching the evaporation flux provider."""
+
+        from simulator.config_flags import bool_feature_flag
+        from simulator.condensation import _knudsen_number
+        from simulator.langmuir_surface_oxygen import LangmuirTransport
+        from simulator.transport_regime import continuum_validity_refuses
+
+        kernel_config = dict(
+            (getattr(self, "setpoints", {}) or {}).get("chemistry_kernel", {})
+            or {}
+        )
+        series_config = dict(
+            kernel_config.get("evaporation_series_resistance", {}) or {}
+        )
+        gas_resistance_enabled = bool_feature_flag(
+            series_config,
+            "gas_resistance_enabled",
+            bool_feature_flag(kernel_config, "gas_resistance_enabled", True),
+        )
+        overhead_model = getattr(self, "overhead_model", None)
+        try:
+            pipe_diameter_m = float(
+                getattr(overhead_model, "pipe_diameter_m", 0.12) or 0.12
+            )
+        except (TypeError, ValueError):
+            pipe_diameter_m = 0.12
+        overhead = getattr(self, "overhead", None)
+        try:
+            gas_temperature_K = float(
+                getattr(overhead, "headspace_temperature_K", 0.0) or 0.0
+            )
+        except (TypeError, ValueError):
+            gas_temperature_K = 0.0
+        if not math.isfinite(gas_temperature_K) or gas_temperature_K <= 0.0:
+            gas_temperature_K = float(temperature_K)
+        stir = getattr(getattr(self, "melt", None), "stir_state", None)
+        try:
+            axial = clamp_stir_factor(float(getattr(stir, "axial", 0.0) or 0.0))
+        except (TypeError, ValueError):
+            axial = 0.0
+        try:
+            radial_source = getattr(stir, "radial", 1.0) if stir is not None else 1.0
+            radial = clamp_stir_factor(float(radial_source or 0.0))
+        except (TypeError, ValueError):
+            radial = 1.0
+        total_reader = getattr(self, "_evaporation_overhead_total_pressure_Pa", None)
+        if callable(total_reader):
+            overhead_pressure_Pa = float(total_reader(partials_Pa))
+        else:
+            overhead_pressure_Pa = sum(
+                max(0.0, float(value)) for value in partials_Pa.values()
+            )
+        carrier_resolver = getattr(self, "_resolve_condensation_carrier_gas", None)
+        carrier_gas = carrier_resolver() if callable(carrier_resolver) else "N2"
+        campaign = getattr(
+            getattr(getattr(self, "melt", None), "campaign", None),
+            "name",
+            None,
+        )
+        if not isinstance(campaign, str) or not campaign.strip():
+            campaign = None
+        else:
+            campaign = campaign.strip()
+        catalog = getattr(self, "vapor_pressures", None)
+        hkl = frozenset(
+            _load_hkl_upper_bound_transport_species(
+                catalog if isinstance(catalog, dict) else {}
+            )
+        )
+        extrapolate = False
+        if gas_resistance_enabled and overhead_pressure_Pa > 0.0 and pipe_diameter_m > 0.0:
+            knudsen = _knudsen_number(
+                overhead_pressure_Pa,
+                max(gas_temperature_K, 1.0),
+                pipe_diameter_m,
+                carrier_gas=str(carrier_gas),
+            )
+            commanded_pressure_Pa = max(
+                0.0,
+                float(
+                    getattr(getattr(self, "melt", None), "p_total_mbar", 0.0)
+                    or 0.0
+                )
+                * 100.0,
+            )
+            diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
+                knudsen_number=knudsen,
+                overhead_pressure_pa=overhead_pressure_Pa,
+                commanded_pressure_pa=commanded_pressure_Pa,
+                pipe_diameter_m=pipe_diameter_m,
+                gas_temperature_K=gas_temperature_K,
+                carrier_gas=str(carrier_gas),
+                campaign_name=campaign,
+                asking_site="simulator.langmuir_surface_oxygen",
+            )
+            extrapolate = bool(
+                diagnostic
+                and continuum_validity_refuses(diagnostic)
+                and diagnostic.get("reason") == "viscous_p_bulk_transport_out_of_domain"
+            )
+        return LangmuirTransport(
+            temperature_K=float(temperature_K),
+            pipe_diameter_m=pipe_diameter_m,
+            gas_temperature_K=gas_temperature_K,
+            carrier_gas=str(carrier_gas or "N2"),
+            axial_stir_factor=axial,
+            radial_stir_factor=radial,
+            overhead_pressure_Pa=overhead_pressure_Pa,
+            gas_resistance_enabled=gas_resistance_enabled,
+            hkl_upper_bound_species=hkl,
+            extrapolate_continuum=extrapolate,
+            campaign_name=campaign,
+        )
+
+    def _closed_langmuir_pressures_for_partials(
+        self,
+        publication_Pa: Mapping[str, float],
+        *,
+        temperature_K: float,
+        overhead_partials_Pa: Mapping[str, float] | None,
+        provenance_by_species: Mapping[str, Mapping[str, Any]] | None,
+        source_reaction_fO2_bar: float | None,
+        transport_pO2_bar: float | None,
+        melt_redox_capacity_mol_per_ln_fO2: float | None,
+    ) -> Any:
+        """Close the flux map on one partial vector. The only writer call."""
+
+        from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
+
+        partials = dict(overhead_partials_Pa or {})
+        return apply_langmuir_surface_oxygen(
+            publication_Pa,
+            temperature_K=temperature_K,
+            provenance_by_species=provenance_by_species,
+            source_reaction_fO2_bar=source_reaction_fO2_bar,
+            transport_pO2_bar=transport_pO2_bar,
+            legacy_catalog=getattr(self, "vapor_pressures", None),
+            compiled_catalog=getattr(self, "vapour_rail_catalog", None),
+            melt_redox_capacity_mol_per_ln_fO2=(
+                melt_redox_capacity_mol_per_ln_fO2
+            ),
+            overhead_partials_Pa=partials,
+            transport=EvaporationMixin._langmuir_transport(
+                self, partials, temperature_K
+            ),
+        )
+
+    def _reclose_langmuir_pressures(
+        self,
+        overhead_partials_Pa: Mapping[str, float],
+    ) -> Any | None:
+        """Re-enter the closure for a later partial vector on this step.
+
+        Finite-capacity iterations must not keep the map closed on the
+        partials from the start of the step. A missing context means this
+        step did not publish a flux map.
+        """
+
+        context = getattr(self, "_langmuir_flux_closure_context", None)
+        if not isinstance(context, Mapping):
+            return None
+        return EvaporationMixin._closed_langmuir_pressures_for_partials(
+            self,
+            context["publication_Pa"],
+            temperature_K=float(context["temperature_K"]),
+            overhead_partials_Pa=overhead_partials_Pa,
+            provenance_by_species=context.get("provenance_by_species"),
+            source_reaction_fO2_bar=context.get("source_reaction_fO2_bar"),
+            transport_pO2_bar=context.get("transport_pO2_bar"),
+            melt_redox_capacity_mol_per_ln_fO2=context.get(
+                "melt_redox_capacity_mol_per_ln_fO2"
+            ),
+        )
+
     def _langmuir_overhead_pO2_bar(self) -> float | None:
         """Upstream headspace O2 partial, in bar.
 
@@ -850,6 +1057,7 @@ class EvaporationMixin:
         equilibrium: Any,
         *,
         temperature_K: float,
+        overhead_partials_Pa: Mapping[str, float] | None = None,
     ) -> tuple[
         dict[str, float],
         dict[str, Any],
@@ -872,14 +1080,17 @@ class EvaporationMixin:
         evaluated pO2 is at the physical floor or the reservoir
         no-buffer test is true (source capacity <= the noop floor, not
         ``equilibrium.liquid_fraction`` times ``C_m_full``). Transport-
-        headspace pressures, including SiO, stay published. An overhead
-        O2 partial then floors the surface while O2 is net-leaving.
-        Everywhere else the map stays the reservoir / mass-action
-        publication. Finite cold-train
-        capacity (``_compute_capacity_coupling_shadow_impl``) and live
-        evaporation both price this map. ``equilibrium`` vapor pressures
-        stay the mass-action law; the shadow comparison above the
-        closure still checks that provider seam.
+        headspace pressures, including SiO, stay published. The root is
+        the publisher net-flux balance at ``overhead_partials_Pa`` (the
+        persisted headspace when the caller passes none). It is not a
+        vacuum root clamped to the overhead partial. Everywhere else the
+        map stays the reservoir / mass-action publication. Finite
+        cold-train capacity re-enters through
+        ``_reclose_langmuir_pressures`` on each partial vector, starting
+        from the publication stored here, so a later headspace does not
+        keep the first vector's pressures. ``equilibrium`` vapor
+        pressures stay the mass-action law; the shadow comparison above
+        the closure still checks that provider seam.
         """
         vapor_pressure_diagnostic = dict(
             getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
@@ -917,7 +1128,6 @@ class EvaporationMixin:
         # balance below is the flux boundary both consumers must share.
         if hasattr(self, "_last_langmuir_surface_oxygen"):
             del self._last_langmuir_surface_oxygen
-        from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
 
         source_reaction_fO2_bar = vapor_pressure_diagnostic.get(
             "source_reaction_fO2_bar"
@@ -931,35 +1141,66 @@ class EvaporationMixin:
                 eval_pO2_bar = None
         # Namespace fakes bind this resolver without the mixin helpers.
         # A missing reader is not a measurement: capacity stays unknown
-        # (not ``C_m ~ 0``) and there is no overhead bound.
+        # (not ``C_m ~ 0``) and there is no headspace partial.
         capacity_reader = getattr(
             self, "_langmuir_melt_redox_capacity_mol_per_ln_fO2", None
         )
-        overhead_reader = getattr(self, "_langmuir_overhead_pO2_bar", None)
-        langmuir_surface = apply_langmuir_surface_oxygen(
-            vapor_pressures,
-            temperature_K=temperature_K,
-            provenance_by_species=(
-                vapor_pressure_diagnostic.get(
-                    "vapor_pressure_numerator_provenance"
-                )
-                or {}
-            ),
-            source_reaction_fO2_bar=source_reaction_fO2_bar,
-            transport_pO2_bar=vapor_pressure_diagnostic.get("pO2_bar"),
-            legacy_catalog=getattr(self, "vapor_pressures", None),
-            compiled_catalog=getattr(self, "vapour_rail_catalog", None),
-            melt_redox_capacity_mol_per_ln_fO2=(
-                capacity_reader(
-                    temperature_K=temperature_K,
-                    eval_pO2_bar=eval_pO2_bar,
-                )
-                if callable(capacity_reader)
-                else None
-            ),
-            overhead_pO2_bar=(
-                overhead_reader() if callable(overhead_reader) else None
-            ),
+        capacity = (
+            capacity_reader(
+                temperature_K=temperature_K,
+                eval_pO2_bar=eval_pO2_bar,
+            )
+            if callable(capacity_reader)
+            else None
+        )
+        if overhead_partials_Pa is None:
+            # Call the mixin directly. A namespace host binds the
+            # resolver without copying every helper onto itself; the
+            # helper then uses whatever bulk reader that host has.
+            partials = EvaporationMixin._langmuir_headspace_partials_Pa(
+                self, vapor_pressures
+            )
+        else:
+            # This evaluation's vector, including explicit zeros. Do not
+            # fill gaps from the persisted headspace: a same-step
+            # accumulation that omitted a species has no bulk for it.
+            partials = {}
+            for species, value in overhead_partials_Pa.items():
+                try:
+                    number = float(value)
+                except (TypeError, ValueError):
+                    continue
+                if math.isfinite(number):
+                    partials[str(species)] = number
+        provenance = (
+            vapor_pressure_diagnostic.get(
+                "vapor_pressure_numerator_provenance"
+            )
+            or {}
+        )
+        transport_pO2_bar = vapor_pressure_diagnostic.get("pO2_bar")
+        # Pre-close publication. Capacity iterations re-enter from this
+        # map; closing the already-adjusted map would apply the power
+        # law twice. Only this resolver stores the diagnostic.
+        self._langmuir_flux_closure_context = {
+            "publication_Pa": dict(vapor_pressures),
+            "temperature_K": float(temperature_K),
+            "provenance_by_species": provenance,
+            "source_reaction_fO2_bar": source_reaction_fO2_bar,
+            "transport_pO2_bar": transport_pO2_bar,
+            "melt_redox_capacity_mol_per_ln_fO2": capacity,
+        }
+        langmuir_surface = (
+            EvaporationMixin._closed_langmuir_pressures_for_partials(
+                self,
+                vapor_pressures,
+                temperature_K=temperature_K,
+                overhead_partials_Pa=partials,
+                provenance_by_species=provenance,
+                source_reaction_fO2_bar=source_reaction_fO2_bar,
+                transport_pO2_bar=transport_pO2_bar,
+                melt_redox_capacity_mol_per_ln_fO2=capacity,
+            )
         )
         if langmuir_surface.applied:
             vapor_pressures = dict(langmuir_surface.pressures_Pa)
@@ -1085,6 +1326,7 @@ class EvaporationMixin:
         ) = self._resolve_evaporation_batch_flux_state(
             equilibrium,
             temperature_K=T_K,
+            overhead_partials_Pa=overhead_partials_override_Pa,
         )
         batch_report = serialize_vapour_batch(vapour_batch)
         if isinstance(batch_report, Mapping):
@@ -1367,11 +1609,14 @@ class EvaporationMixin:
         # Uses the previous hour's upstream melt-headspace/duct partials as
         # backpressure. ``overhead.composition`` is the physically distinct
         # post-condensation report, so near-total capture must not erase P_bulk
-        # above the melt. The flux map was already closed at one surface pO2
-        # in ``_resolve_evaporation_batch_flux_state``. Do not solve again
-        # here: a second pass would scale the adjusted pressures as if they
-        # were still the persisted melt-fO2 publication. equilibrium
-        # vapor pressures stay the melt-supported law.
+        # above the melt. The flux map was already closed on THESE partials
+        # in ``_resolve_evaporation_batch_flux_state`` (the override when
+        # the capacity shadow supplies one). Do not solve again here: a
+        # second pass would scale the adjusted pressures as if they were
+        # still the persisted melt-fO2 publication. A different partial
+        # vector re-enters from the stored publication via
+        # ``_reclose_langmuir_pressures``. equilibrium vapor pressures
+        # stay the melt-supported law.
         langmuir_notice = getattr(self, "_last_langmuir_surface_oxygen", None)
         if isinstance(langmuir_notice, dict) and langmuir_notice.get("warning"):
             equilibrium_warnings = getattr(equilibrium, "warnings", None)

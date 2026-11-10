@@ -16,48 +16,66 @@ capacity is negligible (``C_m ~ 0``). The physical floor is
 the unphysical 2.6e13 Pa Ca pressure. Every other in-band evaporation
 keeps the reservoir / mass-action pressures.
 
-Overhead. While that closure has O2 net-leaving, the surface pO2 is
-not set below the overhead pO2. The vacuum root is raised to the
-overhead partial, and the metal pressures follow the same power law
-there.
+Overhead. The root is the oxygen balance of the net fluxes the
+evaporation publisher will emit at the same partials: Hertz-Knudsen
+drive ``max(0, P_eq - P_bulk)`` and, where that publisher enables it,
+the species-specific gas-film resistance. A vacuum root that is then
+clamped to the overhead partial is not a root of that balance. While
+O2 is net-leaving, the solved surface is not below the overhead pO2,
+because the O2 drive is zero at and below that partial.
 
 A failed root drops only below-band carriers. An in-band failure keeps
 the published pressures and names the warning.
 
-Invariant. This function is the only writer of the flux map. The
+Invariant. ``apply_langmuir_surface_oxygen`` is the only writer of the
+flux map, and every caller (live evaporation and each finite-capacity
+partial vector) enters it with the partials of that evaluation. The
 closure runs only when the evaluated pO2 is at the physical floor or
 the reservoir source capacity is at or below
 ``OXYGEN_RESERVOIR_NOOP_MOL`` (d-072 ``no_melt_redox_capacity``).
 ``equilibrium.liquid_fraction`` is not that test. Every species is
 then one of three outcomes: the published pressure (closure closed,
 transport-headspace channel, or no melt-surface law), the single
-surface-pO2 law below, or a typed refusal. Nothing writes ``0.0`` in
-place of a published pressure, and nothing drops a participating
-carrier's reaction oxygen demand because a cap zeroed the local slope.
+surface-pO2 law below, or a typed refusal. The published surface is
+the root of ``sum (nO_i - dO_i) J_i = 0`` where ``J_i`` is that
+species' publisher net flux at those partials, and the reported
+residual is that root's residual. Nothing writes ``0.0`` in place of
+a published pressure. Nothing drops a participating carrier's reaction
+oxygen demand because a cap zeroed the local slope. A condensed-metal
+rail never publishes above ``P_sat``, including when the solve itself
+drives a subunit activity across 1.
 
 Algebra. Reaction stoichiometry and pressure sensitivity are separate.
 The reaction exponent ``n`` is the mass-action slope off any activity
 cap. A carrier published at ``P_pub`` (Pa) and reference ``p_ref``
 (bar) is ``P(p) = P_pub*(p/p_ref)^n`` at surface ``p`` (bar) when it
-is not capped. A condensed-metal rail with ``raw > 1`` is published at
-``P_sat`` (the cap). Its local slope at that point is 0, but the
-parent reaction is unchanged. The cap releases when
-``raw*(p/p_ref)^n = 1``, i.e. ``p_uncap = p_ref*(1/raw)^(1/n)`` with
-``n < 0``, so ``p_uncap > p_ref``. Below ``p_uncap``, ``P = P_sat``.
-Above it, ``P = P_sat*raw*(p/p_ref)^n``. Sanity: ``raw = 100``,
-``n = -1/2`` gives ``p_uncap/p_ref = 1e4``. The O2 coefficient of the
+is not capped. Every condensed-metal rail uses that cap, not only a
+rail already published at pure metal. ``P_pub = min(raw, 1)*P_sat``.
+Activity at surface ``p`` is ``raw*(p/p_ref)^n``. While that product
+is at least 1, ``P = P_sat``. Below it, ``P = P_sat*raw*(p/p_ref)^n``.
+Raising ``p`` releases a cap (``n < 0``); lowering ``p`` drives a
+subunit activity up through 1 and the pressure stops at ``P_sat``
+instead of following the power law past it. Sanity: ``raw = 100``,
+``n = -1/2`` gives ``p_uncap/p_ref = 1e4``. The same ``raw = 0.25``
+enters the cap at ``p/p_ref = 1/16``. The O2 coefficient of the
 reaction is ``nu_O2 = -n``, so the parent supplies
 ``dO = nO_gas - 2*n`` oxygen atoms per vapor molecule whether or not
 the cap is binding. The Hertz-Knudsen molar flux is
 ``J = alpha*P/sqrt(2*pi*M*R*T)``, and the surface root is
 ``sum_i (nO_i - dO_i)*J_i = 0``. The factor ``1/sqrt(2*pi*R*T)`` is
 common and cancels, leaving
-``sum_i (nO_i - dO_i)*alpha_i*P_i/sqrt(M_i) = 0``. The signed weight
-``(nO - dO)`` equals ``2*n`` from the reaction, not from the local
-slope. Off the cap the slope in ``log10(p)`` has the sign of ``n^2``
-and does not fold; on the cap the metal term is flat and O2 still
-lifts the residual. The independent variable is ``log10(p/bar)`` on
-``(-30, 0]``.
+``sum_i (nO_i - dO_i)*alpha_i*P_i/sqrt(M_i) = 0``. With backpressure
+and gas resistance the publisher flux is
+``J_i = k_i*max(0, P_i - P_bulk,i)`` where
+``k_i = 1/(M_i*(R_interface,i + R_gas,i))`` and
+``R_interface = 1/(alpha*k_HK)``. ``R_gas`` is 0 in free molecular
+flow, so ``k_i`` collapses to ``alpha/sqrt(2*pi*M*R*T)`` and a zero
+bulk recovers the vacuum balance. Unequal ``k_i`` does not cancel.
+The signed weight ``(nO - dO)`` equals ``2*n`` from the reaction, not
+from the local slope. Off the cap the slope in ``log10(p)`` has the
+sign of ``n^2`` and does not fold; on the cap the metal term is flat
+and O2 still lifts the residual. The independent variable is
+``log10(p/bar)`` on ``(-30, 0]``.
 
 Transport. A ``transport_headspace`` carrier, including SiO, is priced
 at the headspace oxygen potential. It is not a function of the melt
@@ -108,6 +126,31 @@ _METAL_RAILS = frozenset({"gas_fugacity", "condensed_raoult_psat"})
 
 
 @dataclass(frozen=True)
+class LangmuirTransport:
+    """Publisher knobs that set species conductance for one partial vector.
+
+    ``overhead_pressure_Pa`` is the total pressure the flux provider
+    passes into the series law (partial sum, floored by the commanded
+    melt pressure). It is not a per-species backpressure. Species
+    backpressures travel separately as partials. ``extrapolate_continuum``
+    is the provider's transitional continuation: True only when that
+    provider would keep the continuum film on instead of refusing.
+    """
+
+    temperature_K: float
+    pipe_diameter_m: float
+    gas_temperature_K: float
+    carrier_gas: str
+    axial_stir_factor: float
+    radial_stir_factor: float
+    overhead_pressure_Pa: float
+    gas_resistance_enabled: bool
+    hkl_upper_bound_species: frozenset[str]
+    extrapolate_continuum: bool
+    campaign_name: str | None = None
+
+
+@dataclass(frozen=True)
 class LangmuirSurfaceOxygen:
     """Flux-map adjustment. ``pressures_Pa`` is the caller's map when not applied."""
 
@@ -155,6 +198,11 @@ class _Carrier:
     # Condensed rail published at pure-metal activity.
     activity_capped: bool
     raw_activity: float | None
+    # Antoine P_sat (Pa) when this condensed rail has a saturation cap.
+    # None for gas-fugacity rails and for condensed rails with no raw
+    # activity. The pressure law caps whenever activity would exceed 1,
+    # not only when the publication was already capped.
+    cap_psat_Pa: float | None = None
 
 
 def _needs_surface_balance(carrier: _Carrier) -> bool:
@@ -250,6 +298,9 @@ def apply_langmuir_surface_oxygen(
     compiled_catalog: Any | None = None,
     melt_redox_capacity_mol_per_ln_fO2: float | None = None,
     overhead_pO2_bar: float | None = None,
+    overhead_partials_Pa: Mapping[str, float] | None = None,
+    transport: LangmuirTransport | None = None,
+    conductance_mol_s_m2_Pa: Mapping[str, float] | None = None,
 ) -> LangmuirSurfaceOxygen:
     """Return flux pressures at the d-376 amendment 1 surface pO2.
 
@@ -261,9 +312,11 @@ def apply_langmuir_surface_oxygen(
     shared pO2. Reaction stoichiometry, not the local cap slope, is the
     oxygen demand, and a condensed-metal cap follows the uncap law.
     Transport-headspace pressures, including SiO, stay published.
-    The surface is then raised to the overhead pO2 while O2 is
-    net-leaving. A failed root drops only the below-band carriers and
-    names the reason. Neither path writes a silent 0.
+    The root already includes overhead backpressure and the publisher
+    gas resistance, so the surface is not clamped to the overhead
+    partial afterwards. While O2 is net-leaving that root is not below
+    the overhead pO2. A failed root drops only the below-band carriers
+    and names the reason. Neither path writes a silent 0.
     """
 
     provenance_by_species = provenance_by_species or {}
@@ -339,6 +392,9 @@ def apply_langmuir_surface_oxygen(
         rows=legacy,
         legacy_catalog=legacy_catalog,
         overhead_pO2_bar=overhead_pO2_bar,
+        overhead_partials_Pa=overhead_partials_Pa,
+        transport=transport,
+        conductance_mol_s_m2_Pa=conductance_mol_s_m2_Pa,
         capacity_negligible=capacity_negligible,
         eval_pO2_below_physical_floor=below_floor,
     )
@@ -350,6 +406,24 @@ def _certified_min_bar() -> float:
     )
 
     return float(MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR)
+
+
+def _nonnegative_partials(
+    partials_Pa: Mapping[str, float] | None,
+) -> dict[str, float]:
+    """Species backpressures in Pa. Non-positive entries are not a bulk."""
+
+    if not isinstance(partials_Pa, Mapping):
+        return {}
+    partials: dict[str, float] = {}
+    for species, value in partials_Pa.items():
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(number) and number > 0.0:
+            partials[str(species)] = number
+    return partials
 
 
 def _positive(value: Any) -> float | None:
@@ -391,16 +465,44 @@ def _evaluator(compiled_catalog: Any, species: str) -> Any | None:
     return getattr(compiled, "evaluator", None)
 
 
-def _condensed_activity_capped(provenance: Mapping[str, Any]) -> bool:
-    """True when the condensed rail is already sitting on pure metal."""
+def _condensed_cap(
+    provenance: Mapping[str, Any],
+    pressure_Pa: float,
+) -> tuple[bool, float | None, float | None]:
+    """Return ``(already_capped, raw_activity, P_sat_Pa)``.
+
+    ``P_pub = min(raw, 1) * P_sat``. An already-capped publication has
+    ``raw > 1`` and ``P_pub = P_sat``. A subunit publication has
+    ``raw < 1`` and ``P_pub = raw * P_sat``. Both use the same law: the
+    cap binds whenever ``raw*(p/p_ref)^n >= 1``, which includes a solve
+    that lowers ``p`` until a subunit activity crosses 1. Gas-fugacity
+    rails are not capped. A condensed rail with no positive raw activity
+    has no cap to apply.
+    """
 
     if str(provenance.get("pressure_rail") or "") != "condensed_raoult_psat":
-        return False
+        return False, None, None
     activity = _positive(provenance.get("activity_factor"))
     raw = _positive(provenance.get("raw_metal_activity_root"))
-    if activity is None or raw is None:
-        return False
-    return activity >= 1.0 - 1.0e-12 and raw > 1.0
+    if raw is None and activity is not None and activity < 1.0 - 1.0e-12:
+        # Uncapped publication: the activity factor is the raw root.
+        raw = activity
+    already = bool(
+        activity is not None
+        and raw is not None
+        and activity >= 1.0 - 1.0e-12
+        and raw > 1.0
+    )
+    if raw is None or pressure_Pa <= 0.0:
+        return already, None, None
+    p_sat = _positive(provenance.get("P_reference_Antoine_Pa"))
+    if p_sat is None:
+        # min(raw, 1) is dimensionless. Dividing Pa by it yields Pa.
+        factor = min(raw, 1.0)
+        if factor <= 0.0:
+            return already, None, None
+        p_sat = pressure_Pa / factor
+    return already, raw, p_sat
 
 
 def _is_transport_channel(
@@ -533,11 +635,9 @@ def _classify_carrier(
         evaluator,
         rail,
     )
-    activity_capped = _condensed_activity_capped(provenance)
-    raw_activity = (
-        _positive(provenance.get("raw_metal_activity_root"))
-        if activity_capped
-        else None
+    activity_capped, raw_activity, cap_psat_Pa = _condensed_cap(
+        provenance,
+        pressure,
     )
     p_ref = _reference_pO2_bar(
         species,
@@ -565,6 +665,7 @@ def _classify_carrier(
         transport_channel,
         activity_capped,
         raw_activity,
+        cap_psat_Pa,
     )
 
 
@@ -670,19 +771,21 @@ def _capped_pressure_Pa(carrier: _Carrier, surface_pO2_bar: float) -> float:
     (negative). Log space avoids forming ``P_sat * raw`` when the raw
     activity at the floor is huge. Unit check: ``raw`` is dimensionless,
     both pressures are bar, ``P`` is Pa. The ``log_raw >= 0`` branch is
-    the pure-metal cap; the other branch is the mass-action continuation.
+    the pure-metal cap (``P_sat``, not the uncapped publication);
+    the other branch is the mass-action continuation.
     """
 
     assert carrier.reaction_exponent is not None
     assert carrier.p_ref_bar is not None
     assert carrier.raw_activity is not None
+    assert carrier.cap_psat_Pa is not None
     log_raw = math.log10(carrier.raw_activity) + (
         carrier.reaction_exponent
         * math.log10(surface_pO2_bar / carrier.p_ref_bar)
     )
     if log_raw >= 0.0:
-        return carrier.pressure_Pa
-    log_p = math.log10(carrier.pressure_Pa) + log_raw
+        return carrier.cap_psat_Pa
+    log_p = math.log10(carrier.cap_psat_Pa) + log_raw
     if not math.isfinite(log_p) or log_p > 300.0:
         raise ValueError("langmuir pressure law overflowed")
     if log_p < -300.0:
@@ -693,7 +796,7 @@ def _capped_pressure_Pa(carrier: _Carrier, surface_pO2_bar: float) -> float:
 def _pressure_at_surface(carrier: _Carrier, surface_pO2_bar: float) -> float:
     """Melt-surface pressure law. Transport carriers never reach this."""
 
-    if carrier.activity_capped:
+    if carrier.cap_psat_Pa is not None and carrier.raw_activity is not None:
         return _capped_pressure_Pa(carrier, surface_pO2_bar)
     assert carrier.reaction_exponent is not None
     assert carrier.p_ref_bar is not None
@@ -705,19 +808,156 @@ def _pressure_at_surface(carrier: _Carrier, surface_pO2_bar: float) -> float:
     )
 
 
-def _solve_piecewise_surface_balance(
+def _ideal_molar_conductance(
+    alpha: float,
+    molar_mass_kg_per_mol: float,
+    temperature_K: float,
+) -> float:
+    """``alpha / sqrt(2*pi*M*R*T)``, mol s^-1 m^-2 Pa^-1.
+
+    This is the free-molecular Hertz-Knudsen conductance. Multiplying
+    by a driving pressure in Pa yields mol m^-2 s^-1.
+    """
+
+    from simulator.physical_constants import GAS_CONSTANT
+
+    return alpha / math.sqrt(
+        2.0 * math.pi * GAS_CONSTANT * temperature_K * molar_mass_kg_per_mol
+    )
+
+
+def publisher_net_law(
+    *,
+    species: str,
+    alpha: float,
+    molar_mass_kg_per_mol: float,
+    bulk_pressure_Pa: float,
+    temperature_K: float,
+    transport: LangmuirTransport | None,
+) -> tuple[float, float]:
+    """Return ``(k, bulk)`` for ``J = k * max(0, P_eq - bulk)``.
+
+    ``k`` is mol s^-1 m^-2 Pa^-1 and ``bulk`` is Pa. With no transport
+    context the law is ideal Hertz-Knudsen of the supplied backpressure
+    (``R_gas = 0``). With a transport context the law is the evaporation
+    publisher's: an HKL upper-bound carrier, or gas resistance disabled,
+    drops the backpressure and the film; every other carrier uses
+    ``_series_resistance_evaporation_flux_kg_m2_s``. The 1 Pa probe is
+    valid because that flux is linear in ``P_eq - P_bulk`` (``R_gas``
+    does not depend on the driving pressure). Sanity: free-molecular
+    flow returns the ideal conductance and the species bulk.
+    """
+
+    if (
+        not math.isfinite(alpha)
+        or alpha <= 0.0
+        or not math.isfinite(molar_mass_kg_per_mol)
+        or molar_mass_kg_per_mol <= 0.0
+    ):
+        return 0.0, 0.0
+    bulk = (
+        bulk_pressure_Pa
+        if math.isfinite(bulk_pressure_Pa) and bulk_pressure_Pa > 0.0
+        else 0.0
+    )
+    if transport is None:
+        if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+            raise ValueError("publisher net flux requires a positive temperature")
+        return (
+            _ideal_molar_conductance(
+                alpha, molar_mass_kg_per_mol, temperature_K
+            ),
+            bulk,
+        )
+    return _publisher_net_law_with_transport(
+        species=species,
+        alpha=alpha,
+        molar_mass_kg_per_mol=molar_mass_kg_per_mol,
+        bulk=bulk,
+        transport=transport,
+    )
+
+
+def _publisher_net_law_with_transport(
+    *,
+    species: str,
+    alpha: float,
+    molar_mass_kg_per_mol: float,
+    bulk: float,
+    transport: LangmuirTransport,
+) -> tuple[float, float]:
+    ideal = _ideal_molar_conductance(
+        alpha, molar_mass_kg_per_mol, transport.temperature_K
+    )
+    hkl_bound = species in transport.hkl_upper_bound_species
+    if not transport.gas_resistance_enabled or hkl_bound:
+        # Publisher: P_bulk is forced to 0 and R_gas is off.
+        return ideal, 0.0
+    from engines.builtin.evaporation_flux import (
+        EvaporationFluxConfigurationError,
+        _series_resistance_evaporation_flux_kg_m2_s,
+    )
+
+    try:
+        probed = _series_resistance_evaporation_flux_kg_m2_s(
+            species=species,
+            P_eq_pa=bulk + 1.0,
+            P_bulk_pa=bulk,
+            T_surface_K=transport.temperature_K,
+            molar_mass_kg_mol=molar_mass_kg_per_mol,
+            alpha_i=alpha,
+            pipe_diameter_m=transport.pipe_diameter_m,
+            overhead_pressure_pa=transport.overhead_pressure_Pa,
+            axial_stir_factor=transport.axial_stir_factor,
+            radial_stir_factor=transport.radial_stir_factor,
+            carrier_gas=transport.carrier_gas,
+            T_gas_K=transport.gas_temperature_K,
+            gas_resistance_enabled=True,
+            extrapolate_continuum=transport.extrapolate_continuum,
+            melt_resistance_enabled=False,
+        )
+    except EvaporationFluxConfigurationError as exc:
+        raise ValueError(
+            f"publisher net flux unavailable for {species}: {exc}"
+        ) from exc
+    flux_kg_s_m2 = float(probed.flux_kg_s_m2)
+    if not math.isfinite(flux_kg_s_m2) or flux_kg_s_m2 < 0.0:
+        raise ValueError(f"publisher net flux invalid for {species}")
+    if flux_kg_s_m2 == 0.0:
+        return 0.0, bulk
+    # J_mol = flux_kg / M. The probe drive is 1 Pa, so k = J_mol / 1 Pa.
+    conductance = flux_kg_s_m2 / molar_mass_kg_per_mol
+    if not math.isfinite(conductance) or conductance < 0.0:
+        raise ValueError(f"publisher conductance invalid for {species}")
+    return conductance, bulk
+
+
+def _solve_net_surface_balance(
     coupled: list[_Carrier],
     channels: list[Any],
     *,
-    temperature_K: float,
+    law: Mapping[str, tuple[float, float]],
 ) -> Any:
-    """Root of the cap-aware pressure law.
+    """Root of the publisher net-flux balance, cap included.
 
-    The shared vacuum solver checks that every channel is one power law.
-    A condensed-metal cap is flat and then a power law, so that check
-    does not apply. The residual is the same one: reaction demand, not
-    the local slope, times the Hertz-Knudsen weight. O2 is strictly
-    increasing, so the sum does not fold across the kink.
+    ``law[species]`` is ``(k, bulk)`` with ``J = k*max(0, P - bulk)``
+    in mol m^-2 s^-1. ``k`` already contains alpha and gas resistance.
+    The vacuum power-law exponent check does not apply: a condensed cap
+    is flat and then a power law, and a backpressure clip is not a pure
+    power of pO2. O2's drive still rises with pO2 and a metal's drive
+    does not, so the residual does not fold across the cap. The
+    returned residual is this root's residual.
+
+    d-376 amendment 1. The residual is ``sum (nO_i - dO_i) J_i``. For
+    congruent CaO, Ca has ``nO = 0`` and ``n = -1/2``, so ``dO = 1``
+    and the weight is ``-1``. O2 has ``nO = 2`` and ``n = +1``, so
+    ``dO = 0`` and the weight is ``+2``. One parent oxygen leaves with
+    each Ca, as half an O2, and the root is ``J_Ca = 2 J_O2``. While
+    that metal demand is positive, O2 must be net-leaving. O2's drive
+    is ``max(0, P_O2 - P_bulk)``, which is zero at and below the
+    overhead partial, so the root sits strictly above that partial.
+    Clamping the surface onto the partial zeroes O2 and leaves the
+    metal flux unbalanced.
     """
 
     from scipy.optimize import brentq
@@ -726,18 +966,19 @@ def _solve_piecewise_surface_balance(
         OxygenBalanceBracketBoundary,
         _VacuumOxygenBalance,
     )
-    from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
+    from simulator.physical_constants import PA_PER_BAR
 
     by_species = {carrier.species: carrier for carrier in coupled}
     low, high = -30.0, 0.0
 
     def parts(
         logp: float,
-    ) -> tuple[float, dict[str, float], float, float]:
+    ) -> tuple[float, dict[str, float], float, float, dict[str, float]]:
         surface = 10.0 ** logp
         oxygen = 0.0
         parent = 0.0
         pressures: dict[str, float] = {}
+        fluxes: dict[str, float] = {}
         for channel in channels:
             carrier = by_species.get(channel.species)
             if carrier is None:
@@ -748,15 +989,20 @@ def _solve_piecewise_surface_balance(
                 raise ValueError(
                     f"pressure law returned invalid {channel.species!r} pressure"
                 )
+            conductance, bulk = law[channel.species]
+            drive = pressure - bulk
+            if drive < 0.0:
+                drive = 0.0
+            flux = conductance * drive
+            if not math.isfinite(flux) or flux < 0.0:
+                raise ValueError(
+                    f"net flux invalid for {channel.species!r}"
+                )
             pressures[channel.species] = pressure
-            # Proportional to mol m^-2 s^-1. The shared 1/sqrt(2*pi*R*T)
-            # cancels in the residual and in the relative residual.
-            factor = channel.alpha * pressure / math.sqrt(
-                channel.molar_mass_kg_per_mol
-            )
-            oxygen += channel.oxygen_atoms * factor
-            parent += channel.parent_oxygen_demand * factor
-        return oxygen - parent, pressures, oxygen, parent
+            fluxes[channel.species] = flux
+            oxygen += channel.oxygen_atoms * flux
+            parent += channel.parent_oxygen_demand * flux
+        return oxygen - parent, pressures, oxygen, parent, fluxes
 
     f_low = parts(low)[0]
     f_high = parts(high)[0]
@@ -785,56 +1031,20 @@ def _solve_piecewise_surface_balance(
         ))
         bracket = None
 
-    residual, pressures, oxygen, parent = parts(root)
+    residual, pressures, oxygen, parent, fluxes = parts(root)
     relative = abs(residual) / max(oxygen, parent, 1.0e-300)
-    hk = 1.0 / math.sqrt(2.0 * math.pi * GAS_CONSTANT * temperature_K)
-    fluxes = {
-        channel.species: hk * channel.alpha * pressures[channel.species] / math.sqrt(
-            channel.molar_mass_kg_per_mol
-        )
-        for channel in channels
-    }
     return _VacuumOxygenBalance(
         pO2_bar=10.0 ** root,
         bracket_boundary=bracket,
         pressures_Pa=pressures,
         channel_fluxes_mol_m2_s=fluxes,
-        oxygen_atom_flux_mol_m2_s=oxygen * hk,
-        parent_oxygen_demand_flux_mol_m2_s=parent * hk,
+        oxygen_atom_flux_mol_m2_s=oxygen,
+        parent_oxygen_demand_flux_mol_m2_s=parent,
         relative_residual=relative,
         alpha_sources={
             channel.species: channel.alpha_source for channel in channels
         },
     )
-
-
-def _surface_with_overhead_floor(
-    vacuum_pO2_bar: float,
-    o2_flux_mol_m2_s: float,
-    overhead_pO2_bar: float | None,
-) -> tuple[float, bool]:
-    """Raise a net-leaving O2 root up to the overhead partial.
-
-    d-376 amendment 1. The vacuum root is the pO2 where the O2 flux
-    balances the parent oxygen demand against zero overhead. Net O2
-    leaving the surface into an overhead requires
-    ``p_surface >= p_overhead``: a root below that partial would be
-    O2 flowing toward the surface. The bound is that floor. Metal
-    pressures then follow ``P = P_pub * (p / p_ref)^n`` at the floored
-    p. The reported residual stays the vacuum root's residual; the
-    overhead is a bound, not a second root. ``o2_flux`` is mol m^-2 s^-1
-    and both pressures are bar.
-    """
-
-    overhead = _positive(overhead_pO2_bar)
-    if (
-        overhead is None
-        or overhead <= vacuum_pO2_bar
-        or not math.isfinite(o2_flux_mol_m2_s)
-        or o2_flux_mol_m2_s <= 0.0
-    ):
-        return vacuum_pO2_bar, False
-    return overhead, True
 
 
 def _solve_or_refuse(
@@ -847,6 +1057,9 @@ def _solve_or_refuse(
     rows: Mapping[str, Any],
     legacy_catalog: Mapping[str, Any] | None,
     overhead_pO2_bar: float | None = None,
+    overhead_partials_Pa: Mapping[str, float] | None = None,
+    transport: LangmuirTransport | None = None,
+    conductance_mol_s_m2_Pa: Mapping[str, float] | None = None,
     capacity_negligible: bool = False,
     eval_pO2_below_physical_floor: bool = False,
 ) -> LangmuirSurfaceOxygen:
@@ -863,8 +1076,8 @@ def _solve_or_refuse(
         _OXYGEN_GAS_ALPHA,
         _OXYGEN_GAS_ALPHA_SOURCE,
         _VacuumOxygenChannel,
-        _solve_vacuum_oxygen_balance,
     )
+    from simulator.physical_constants import PA_PER_BAR
 
     refused: dict[str, str] = {}
     channels: list[Any] = []
@@ -950,46 +1163,40 @@ def _solve_or_refuse(
             )
         )
 
-    laws = {
-        carrier.species: carrier
-        for carrier in coupled
-        if carrier.species not in refused
+    partials = _nonnegative_partials(overhead_partials_Pa)
+    if "O2" not in partials:
+        overhead_bar = _positive(overhead_pO2_bar)
+        if overhead_bar is not None:
+            partials["O2"] = overhead_bar * PA_PER_BAR
+    override = {
+        str(species): float(value)
+        for species, value in dict(conductance_mol_s_m2_Pa or {}).items()
     }
-
-    def pressure_model(log10_pO2_bar: float) -> dict[str, float]:
-        surface = 10.0 ** log10_pO2_bar
-        modeled: dict[str, float] = {}
-        for carrier in laws.values():
-            # Uncapped carriers only. A cap is piecewise and uses the
-            # other solver; this model stays one power law per channel
-            # so the exponent check still applies.
-            assert carrier.reaction_exponent is not None
-            assert carrier.p_ref_bar is not None
-            modeled[carrier.species] = _scaled_pressure_Pa(
-                carrier.pressure_Pa,
-                carrier.reaction_exponent,
-                carrier.p_ref_bar,
-                surface,
-            )
-        if "O2" not in laws:
-            from simulator.physical_constants import PA_PER_BAR
-
-            modeled["O2"] = surface * PA_PER_BAR
-        return modeled
-
     try:
-        if any(carrier.activity_capped for carrier in coupled):
-            balance = _solve_piecewise_surface_balance(
-                coupled,
-                channels,
+        law: dict[str, tuple[float, float]] = {}
+        for channel in channels:
+            bulk = partials.get(channel.species, 0.0)
+            if channel.species in override:
+                conductance = override[channel.species]
+                if not math.isfinite(conductance) or conductance < 0.0:
+                    raise ValueError(
+                        f"conductance override invalid for {channel.species!r}"
+                    )
+                law[channel.species] = (conductance, bulk)
+                continue
+            law[channel.species] = publisher_net_law(
+                species=channel.species,
+                alpha=channel.alpha,
+                molar_mass_kg_per_mol=channel.molar_mass_kg_per_mol,
+                bulk_pressure_Pa=bulk,
                 temperature_K=temperature_K,
+                transport=transport,
             )
-        else:
-            balance = _solve_vacuum_oxygen_balance(
-                pressure_model,
-                channels,
-                temperature_K=temperature_K,
-            )
+        balance = _solve_net_surface_balance(
+            coupled,
+            channels,
+            law=law,
+        )
     except ValueError as exc:
         return _refuse_inverted(
             pressures_Pa,
@@ -1022,47 +1229,42 @@ def _solve_or_refuse(
             eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         )
 
-    surface_pO2_bar, overhead_bounded = _surface_with_overhead_floor(
-        float(balance.pO2_bar),
-        float(balance.channel_fluxes_mol_m2_s.get("O2", 0.0) or 0.0),
-        overhead_pO2_bar,
-    )
-    adjusted = dict(pressures_Pa)
-    for species in refused:
-        adjusted.pop(species, None)
-    try:
-        for carrier in coupled:
-            if carrier.species in refused or carrier.reaction_exponent is None:
-                continue
-            if carrier.p_ref_bar is None:
-                continue
-            if overhead_bounded or carrier.activity_capped:
-                adjusted[carrier.species] = _pressure_at_surface(
-                    carrier,
-                    surface_pO2_bar,
-                )
-                continue
-            solved = balance.pressures_Pa.get(carrier.species)
-            if solved is None:
-                continue
-            adjusted[carrier.species] = float(solved)
-    except ValueError as exc:
+    surface_pO2_bar = float(balance.pO2_bar)
+    o2_bulk_Pa = law.get("O2", (0.0, 0.0))[1]
+    o2_flux = float(balance.channel_fluxes_mol_m2_s.get("O2", 0.0) or 0.0)
+    # O2 drive is zero at and below the overhead partial. A positive O2
+    # flux therefore means the solved surface is above that partial.
+    overhead_bounded = o2_bulk_Pa > 0.0 and o2_flux > 0.0
+    if overhead_bounded and surface_pO2_bar * PA_PER_BAR < o2_bulk_Pa:
         return _refuse_inverted(
             pressures_Pa,
             inverted,
             persisted,
-            detail=str(exc),
+            detail=(
+                "solved surface pO2 is below the overhead partial "
+                "while O2 is net-leaving"
+            ),
             extra_refused=refused,
             capacity_negligible=capacity_negligible,
             eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         )
+    adjusted = dict(pressures_Pa)
+    for species in refused:
+        adjusted.pop(species, None)
+    for carrier in coupled:
+        if carrier.species in refused:
+            continue
+        solved = balance.pressures_Pa.get(carrier.species)
+        if solved is None:
+            continue
+        adjusted[carrier.species] = float(solved)
     warning = (
         f"{LANGMUIR_SURFACE_PO2_REASON}: "
         f"surface_pO2_bar={surface_pO2_bar:.6e} "
         f"relative_residual={residual:.3e}"
     )
     if overhead_bounded:
-        warning += f" overhead_pO2_bar={surface_pO2_bar:.6e}"
+        warning += f" overhead_pO2_bar={o2_bulk_Pa / PA_PER_BAR:.6e}"
     if refused:
         warning += " refused=" + ",".join(sorted(refused))
     return LangmuirSurfaceOxygen(

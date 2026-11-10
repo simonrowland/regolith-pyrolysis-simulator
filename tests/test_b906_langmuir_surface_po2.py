@@ -10,10 +10,11 @@ Green (16c8dabfa) prices the persisted melt fO2. Pure CaO at 2200 C:
 d-376 amendment 1 keeps the congruent closure (J_O2 = 1/2 J_M) only
 when that eval pO2 is at the physical floor, or the d-072 redox
 capacity is negligible. Pure CaO has no Fe, so the capacity term is
-0 and the in-band identity takes the congruent root, 5.3423 Pa at
-2.386749e-5 bar. A Fe2+/Fe3+ melt above the floor keeps green's
-mass-action pressure. While O2 is net-leaving, an overhead pO2 above
-the congruent root floors the surface.
+0 and the free-molecular in-band identity takes the congruent root,
+5.3423 Pa at 2.386749e-5 bar. A Fe2+/Fe3+ melt above the floor keeps
+green's mass-action pressure. With O2 in the overhead, the surface
+stays at or above that partial while O2 is net-leaving, because the
+root is the publisher net flux at those partials, not a clamp.
 
 The pins go through the evaporation resolver, which exists at green.
 On green the resolver is the identity map, so the sub-floor pin and
@@ -22,15 +23,23 @@ side. The buffered pin fails when that pressure is moved off green.
 The candidate-only helpers are bound only when this mixin already
 has them, so the same fixture reaches that identity resolver.
 
-Invariant, enforced only inside the resolver's surface adjustment:
-every species is the published pressure (closure closed, or not a
+Invariant, enforced only inside ``apply_langmuir_surface_oxygen``:
+every caller enters with the partials of that evaluation, and every
+species is the published pressure (closure closed, or not a
 melt-surface carrier), the one shared surface-pO2 law, or a typed
-refusal. A condensed-metal cap does not zero that carrier's oxygen
-demand, and its pressure leaves P_sat once the surface rises past the
-cap. Transport-headspace pressures are not rewritten. The closure
-opens only for the physical floor or a reservoir source capacity at
-or under the noop floor. ``equilibrium.liquid_fraction`` is not that
-test.
+refusal. The published surface is the root of
+``sum (nO - dO) J = 0`` with ``J = k * max(0, P - P_bulk)`` using the
+publisher conductance (ideal Hertz-Knudsen when the film is off).
+The reported residual is that root's residual. A condensed-metal cap
+never publishes above P_sat, including when the solve lowers pO2 and
+a subunit activity crosses 1, and the cap does not zero that
+carrier's oxygen demand. Transport-headspace pressures are not
+rewritten. The closure opens only for the physical floor or a
+reservoir source capacity at or under the noop floor.
+``equilibrium.liquid_fraction`` is not that test. The free-molecular
+host uses ``p_total_mbar = 0`` (production vacuum default) so the
+5.3423 Pa anchor stays the ideal root. A positive total pressure is
+its own case: the series film is inside the same residual.
 """
 
 from __future__ import annotations
@@ -221,6 +230,8 @@ def _host(
     headspace_o2_mbar: float | None = None,
     liquid_fraction: float = 1.0,
     temperature_C: float = _T_C,
+    p_total_mbar: float = 0.0,
+    headspace_partials_mbar: dict[str, float] | None = None,
 ):
     equilibrium = EquilibriumResult(
         temperature_C=temperature_C,
@@ -234,7 +245,7 @@ def _host(
         melt=SimpleNamespace(
             temperature_C=temperature_C,
             melt_surface_area_m2=1.0,
-            p_total_mbar=10.0,
+            p_total_mbar=p_total_mbar,
             stir_state=SimpleNamespace(axial=0.0, radial=0.0),
             campaign=SimpleNamespace(name="C2A"),
         ),
@@ -246,9 +257,13 @@ def _host(
         _last_vapor_pressure_diagnostic=dict(diagnostic),
         _last_vapour_batch_resolve_error={},
         _melt_headspace_composition_mbar=(
-            {}
-            if headspace_o2_mbar is None
-            else {"O2": float(headspace_o2_mbar)}
+            dict(headspace_partials_mbar)
+            if headspace_partials_mbar is not None
+            else (
+                {}
+                if headspace_o2_mbar is None
+                else {"O2": float(headspace_o2_mbar)}
+            )
         ),
         _resolve_evaporation_vapour_batch=_passthrough_batch,
     )
@@ -486,14 +501,17 @@ def test_buffered_melt_keeps_green_in_band_pressure() -> None:
     )
 
 
-def test_overhead_po2_above_congruent_bounds_surface() -> None:
-    """Overhead pO2 above the congruent root floors the surface while O2 leaves.
+def test_overhead_po2_above_congruent_resolves_net_flux() -> None:
+    """Overhead O2 above the vacuum root is inside the net-flux balance.
 
-    Pure CaO is ``C_m ~ 0``, so the vacuum root is 2.386749e-5 bar and
-    Ca is 5.3423 Pa. Headspace O2 at 1e-3 bar is above that root. The
-    surface becomes the overhead partial and Ca follows
-    ``P_pub * (p_overhead / p_ref)^(-1/2)``. Green keeps the published
-    825.3377 Pa, which is the high side of this pin.
+    Pure CaO is ``C_m ~ 0``. The free-molecular root is 2.386749e-5 bar
+    and Ca is 5.3423 Pa. Headspace O2 at 1e-3 bar (100 Pa) is above that
+    root and is already viscous, so the publisher film is on. Clamping
+    the surface to 1e-3 bar leaves net O2 escape at zero while Ca still
+    leaves (the old pin, about 0.825 Pa) and keeps the vacuum residual.
+    The root here is recomputed from
+    ``_series_resistance_evaporation_flux_kg_m2_s``, not from the
+    solver's reported residual. Green keeps the published 825.3377 Pa.
     """
 
     capacity = _d072_capacity_mol_per_ln_fO2({"CaO": 100.0}, 0.0, -9.0)
@@ -506,9 +524,10 @@ def test_overhead_po2_above_congruent_bounds_surface() -> None:
         published_ca, p_ref_bar
     )
     assert _OVERHEAD_O2_BAR > surface_pO2_bar
-    bounded_pa = published_ca * (_OVERHEAD_O2_BAR / p_ref_bar) ** (-0.5)
-    assert bounded_pa < congruent_pa
-    assert published_ca > bounded_pa
+    # The rejected clamp: surface fixed at the overhead, Ca on the power law.
+    clamped_pa = published_ca * (_OVERHEAD_O2_BAR / p_ref_bar) ** (-0.5)
+    assert clamped_pa < congruent_pa
+    assert published_ca > clamped_pa
 
     host, equilibrium = _host(
         compiled,
@@ -520,9 +539,48 @@ def test_overhead_po2_above_congruent_bounds_surface() -> None:
     )
     resolved = _resolve(host, equilibrium)
     notice = host._last_langmuir_surface_oxygen
+    o2_bulk_pa = _OVERHEAD_O2_BAR * PA_PER_BAR
+    root_bar, root_ca = _series_cao_root(
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=o2_bulk_pa,
+        bulk_ca_pa=0.0,
+        overhead_pa=o2_bulk_pa,
+        temperature_K=_T_K,
+        legacy=legacy,
+    )
     assert notice["overhead_bounded"] is True
-    assert notice["surface_pO2_bar"] == pytest.approx(_OVERHEAD_O2_BAR, rel=1.0e-12)
-    assert resolved["Ca"] == pytest.approx(bounded_pa, rel=1.0e-6)
+    assert notice["surface_pO2_bar"] > _OVERHEAD_O2_BAR
+    assert notice["surface_pO2_bar"] == pytest.approx(root_bar, rel=1.0e-6)
+    assert notice["relative_residual"] < 1.0e-4
+    assert resolved["Ca"] == pytest.approx(root_ca, rel=1.0e-6)
+    assert resolved["Ca"] != pytest.approx(clamped_pa, rel=1.0e-3)
+    assert resolved["Ca"] < clamped_pa
+    residual = _series_cao_residual(
+        notice["surface_pO2_bar"],
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=o2_bulk_pa,
+        bulk_ca_pa=0.0,
+        overhead_pa=o2_bulk_pa,
+        temperature_K=_T_K,
+        legacy=legacy,
+        pressure_ca_pa=resolved["Ca"],
+    )
+    assert residual < 1.0e-4
+    # The vacuum root's pressures are not closed once O2 has this bulk.
+    vacuum_residual = _series_cao_residual(
+        surface_pO2_bar,
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=o2_bulk_pa,
+        bulk_ca_pa=0.0,
+        overhead_pa=o2_bulk_pa,
+        temperature_K=_T_K,
+        legacy=legacy,
+        pressure_ca_pa=congruent_pa,
+    )
+    assert vacuum_residual > 1.0e-3
     assert equilibrium.vapor_pressures_Pa["Ca"] == published_ca
     _assert_kernel_prices(host, equilibrium, resolved["Ca"])
     assert any(_SURFACE_REASON in item for item in equilibrium.warnings)
@@ -970,3 +1028,833 @@ def test_unsolvable_surface_refuses_inverted_carriers_without_silent_zero() -> N
         assert resolved[species] > 0.0
     for pressure in resolved.values():
         assert pressure > 0.0
+
+
+def _catalog_alpha(legacy, species: str, temperature_K: float) -> float:
+    from engines.builtin.evaporation_flux import _evaluate_alpha_control
+    from simulator.evaporation import (
+        _load_evaporation_alpha_by_species,
+        _measured_alpha_control_view,
+    )
+
+    alphas = _measured_alpha_control_view(
+        _load_evaporation_alpha_by_species(dict(legacy))
+    )
+    value, _evaluation = _evaluate_alpha_control(
+        species, temperature_K, alphas[species]
+    )
+    return float(value)
+
+
+def _ideal_molar_k(alpha: float, molar_mass: float, temperature_K: float) -> float:
+    """``alpha / sqrt(2*pi*M*R*T)``, mol s^-1 m^-2 Pa^-1. Not the solver."""
+
+    from simulator.physical_constants import GAS_CONSTANT
+
+    return alpha / math.sqrt(
+        2.0 * math.pi * GAS_CONSTANT * temperature_K * molar_mass
+    )
+
+
+def _series_molar_flux(
+    *,
+    species: str,
+    pressure_pa: float,
+    bulk_pa: float,
+    molar_mass: float,
+    alpha: float,
+    temperature_K: float,
+    overhead_pa: float,
+) -> float:
+    """Publisher series flux in mol m^-2 s^-1. Not the surface solver."""
+
+    from engines.builtin.evaporation_flux import (
+        _series_resistance_evaporation_flux_kg_m2_s,
+    )
+
+    probed = _series_resistance_evaporation_flux_kg_m2_s(
+        species=species,
+        P_eq_pa=pressure_pa,
+        P_bulk_pa=bulk_pa,
+        T_surface_K=temperature_K,
+        molar_mass_kg_mol=molar_mass,
+        alpha_i=alpha,
+        pipe_diameter_m=0.12,
+        overhead_pressure_pa=overhead_pa,
+        axial_stir_factor=0.0,
+        radial_stir_factor=0.0,
+        carrier_gas="N2",
+        T_gas_K=temperature_K,
+        gas_resistance_enabled=True,
+        extrapolate_continuum=False,
+        melt_resistance_enabled=False,
+    )
+    return float(probed.flux_kg_s_m2) / molar_mass
+
+
+def _series_cao_signed(
+    surface_pO2_bar: float,
+    published_ca: float,
+    p_ref_bar: float,
+    *,
+    bulk_o2_pa: float,
+    bulk_ca_pa: float,
+    overhead_pa: float,
+    temperature_K: float,
+    alpha_ca: float,
+    pressure_ca_pa: float | None = None,
+) -> tuple[float, float, float]:
+    """Return ``(2*J_O2 - J_Ca, J_Ca, J_O2)`` from the publisher series law.
+
+    Ca weight is ``nO - dO = -1``. O2 weight is ``+2``. The common
+    temperature factor does not cancel once the film resistances differ.
+    """
+
+    if pressure_ca_pa is None:
+        pressure_ca_pa = published_ca * (surface_pO2_bar / p_ref_bar) ** (-0.5)
+    pressure_o2_pa = surface_pO2_bar * PA_PER_BAR
+    j_ca = _series_molar_flux(
+        species="Ca",
+        pressure_pa=pressure_ca_pa,
+        bulk_pa=bulk_ca_pa,
+        molar_mass=_M_CA,
+        alpha=alpha_ca,
+        temperature_K=temperature_K,
+        overhead_pa=overhead_pa,
+    )
+    j_o2 = _series_molar_flux(
+        species="O2",
+        pressure_pa=pressure_o2_pa,
+        bulk_pa=bulk_o2_pa,
+        molar_mass=_M_O2,
+        alpha=1.0,
+        temperature_K=temperature_K,
+        overhead_pa=overhead_pa,
+    )
+    return 2.0 * j_o2 - j_ca, j_ca, j_o2
+
+
+def _series_cao_residual(
+    surface_pO2_bar: float,
+    published_ca: float,
+    p_ref_bar: float,
+    *,
+    bulk_o2_pa: float,
+    bulk_ca_pa: float,
+    overhead_pa: float,
+    temperature_K: float,
+    legacy,
+    pressure_ca_pa: float | None = None,
+) -> float:
+    alpha_ca = _catalog_alpha(legacy, "Ca", temperature_K)
+    signed, j_ca, j_o2 = _series_cao_signed(
+        surface_pO2_bar,
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=bulk_o2_pa,
+        bulk_ca_pa=bulk_ca_pa,
+        overhead_pa=overhead_pa,
+        temperature_K=temperature_K,
+        alpha_ca=alpha_ca,
+        pressure_ca_pa=pressure_ca_pa,
+    )
+    return abs(signed) / max(j_ca, 2.0 * j_o2, 1.0e-300)
+
+
+def _series_cao_root(
+    published_ca: float,
+    p_ref_bar: float,
+    *,
+    bulk_o2_pa: float,
+    bulk_ca_pa: float,
+    overhead_pa: float,
+    temperature_K: float,
+    legacy,
+) -> tuple[float, float]:
+    """Independent Ca+O2 root on the publisher series law."""
+
+    from scipy.optimize import brentq
+
+    alpha_ca = _catalog_alpha(legacy, "Ca", temperature_K)
+
+    def signed(log_p: float) -> float:
+        return _series_cao_signed(
+            10.0 ** log_p,
+            published_ca,
+            p_ref_bar,
+            bulk_o2_pa=bulk_o2_pa,
+            bulk_ca_pa=bulk_ca_pa,
+            overhead_pa=overhead_pa,
+            temperature_K=temperature_K,
+            alpha_ca=alpha_ca,
+        )[0]
+
+    low = signed(-30.0)
+    high = signed(0.0)
+    assert low < 0.0 < high
+    log_root = brentq(signed, -30.0, 0.0, xtol=1.0e-12, rtol=1.0e-12, maxiter=200)
+    surface = 10.0 ** log_root
+    pressure = published_ca * (surface / p_ref_bar) ** (-0.5)
+    return surface, pressure
+
+
+def _assert_viscous_film(overhead_pa: float, temperature_K: float) -> None:
+    from simulator.condensation import _knudsen_number
+    from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
+
+    knudsen = _knudsen_number(
+        overhead_pa, temperature_K, 0.12, carrier_gas="N2"
+    )
+    assert knudsen < VISCOUS_KNUDSEN_MAX
+
+
+def test_viscous_total_pressure_uses_publisher_film() -> None:
+    """A 10 mbar control floor is viscous. The film is inside the residual.
+
+    Free-molecular closure at ``p_total_mbar = 0`` stays at 5.3423 Pa.
+    The same publication at 10 mbar (1000 Pa, the recipe control floor)
+    does not: Ca and O2 no longer share one Hertz-Knudsen factor.
+    """
+
+    capacity = _d072_capacity_mol_per_ln_fO2({"CaO": 100.0}, 0.0, -9.0)
+    compiled, legacy = _catalog()
+    answer = _cao_answer(-9.0)
+    diagnostic = answer.diagnostic
+    published, published_ca, p_ref_bar = _published_ca(diagnostic)
+    _surface, ideal_pa, _flux = _congruent_cao_surface(published_ca, p_ref_bar)
+    overhead_pa = 10.0 * 100.0
+    _assert_viscous_film(overhead_pa, _T_K)
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=capacity,
+        p_total_mbar=10.0,
+    )
+    resolved = _resolve(host, equilibrium)
+    notice = host._last_langmuir_surface_oxygen
+    root_bar, root_pa = _series_cao_root(
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=0.0,
+        bulk_ca_pa=0.0,
+        overhead_pa=overhead_pa,
+        temperature_K=_T_K,
+        legacy=legacy,
+    )
+    assert resolved["Ca"] == pytest.approx(root_pa, rel=1.0e-6)
+    assert resolved["Ca"] != pytest.approx(ideal_pa, rel=1.0e-3)
+    assert notice["surface_pO2_bar"] == pytest.approx(root_bar, rel=1.0e-6)
+    assert notice["relative_residual"] < 1.0e-4
+    assert notice["overhead_bounded"] is False
+    assert _series_cao_residual(
+        notice["surface_pO2_bar"],
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=0.0,
+        bulk_ca_pa=0.0,
+        overhead_pa=overhead_pa,
+        temperature_K=_T_K,
+        legacy=legacy,
+        pressure_ca_pa=resolved["Ca"],
+    ) < 1.0e-4
+    alpha_ca = _catalog_alpha(legacy, "Ca", _T_K)
+    k_ca = _ideal_molar_k(alpha_ca, _M_CA, _T_K)
+    k_o2 = _ideal_molar_k(1.0, _M_O2, _T_K)
+    ideal_signed = (
+        2.0 * k_o2 * (notice["surface_pO2_bar"] * PA_PER_BAR)
+        - k_ca * resolved["Ca"]
+    )
+    ideal_scale = max(
+        k_ca * resolved["Ca"],
+        2.0 * k_o2 * notice["surface_pO2_bar"] * PA_PER_BAR,
+        1.0e-300,
+    )
+    assert abs(ideal_signed) / ideal_scale > 1.0e-3
+
+
+def test_live_override_and_reclose_use_that_partial_vector() -> None:
+    """Each partial vector closes on itself. A stale map does not.
+
+    Paths through the one writer: persisted headspace via resolve,
+    a later vector via ``_reclose_langmuir_pressures``, and the live
+    override via ``_calculate_evaporation``. The vacuum publication is
+    not closed at 100 Pa of O2. Closing on that vector is.
+    """
+
+    capacity = _d072_capacity_mol_per_ln_fO2({"CaO": 100.0}, 0.0, -9.0)
+    compiled, legacy = _catalog()
+    answer = _cao_answer(-9.0)
+    diagnostic = answer.diagnostic
+    published, published_ca, p_ref_bar = _published_ca(diagnostic)
+    _surface, ideal_pa, _flux = _congruent_cao_surface(published_ca, p_ref_bar)
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=capacity,
+    )
+    vacuum = _resolve(host, equilibrium)
+    assert vacuum["Ca"] == pytest.approx(ideal_pa, rel=1.0e-6)
+    o2_bulk_pa = _OVERHEAD_O2_BAR * PA_PER_BAR
+    _assert_viscous_film(o2_bulk_pa, _T_K)
+    root_bar, root_pa = _series_cao_root(
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=o2_bulk_pa,
+        bulk_ca_pa=0.0,
+        overhead_pa=o2_bulk_pa,
+        temperature_K=_T_K,
+        legacy=legacy,
+    )
+    stale = _series_cao_residual(
+        host._last_langmuir_surface_oxygen["surface_pO2_bar"],
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=o2_bulk_pa,
+        bulk_ca_pa=0.0,
+        overhead_pa=o2_bulk_pa,
+        temperature_K=_T_K,
+        legacy=legacy,
+        pressure_ca_pa=vacuum["Ca"],
+    )
+    assert stale > 1.0e-3
+    override = {"O2": o2_bulk_pa}
+    reclosed = EvaporationMixin._reclose_langmuir_pressures(host, override)
+    assert reclosed is not None
+    assert reclosed.surface_pO2_bar == pytest.approx(root_bar, rel=1.0e-6)
+    assert reclosed.pressures_Pa["Ca"] == pytest.approx(root_pa, rel=1.0e-6)
+    assert reclosed.pressures_Pa["Ca"] != pytest.approx(ideal_pa, rel=1.0e-3)
+    assert reclosed.relative_residual < 1.0e-4
+    # The re-close must not replace the resolver's diagnostic.
+    assert host._last_langmuir_surface_oxygen["surface_pO2_bar"] == pytest.approx(
+        _surface, rel=1.0e-6
+    )
+    captured: dict = {}
+
+    def _dispatch_only(intent, *args, **kwargs):
+        del args
+        captured["intent"] = intent
+        captured["controls"] = kwargs["control_inputs"]
+        return SimpleNamespace(
+            status="ok",
+            diagnostic={"evaporation_flux_kg_hr": {}},
+        )
+
+    host._dispatch_only = _dispatch_only
+    EvaporationMixin._calculate_evaporation(
+        host,
+        equilibrium,
+        overhead_partials_override_Pa=override,
+    )
+    live_ca = captured["controls"][CONTROL_FLUX_PRESSURES_KEY]["Ca"]
+    assert live_ca == pytest.approx(root_pa, rel=1.0e-6)
+    assert live_ca != pytest.approx(ideal_pa, rel=1.0e-3)
+    assert captured["controls"]["overhead_partials_Pa"]["O2"] == pytest.approx(
+        o2_bulk_pa
+    )
+
+
+def test_metal_backpressure_is_inside_the_host_balance() -> None:
+    """A Ca bulk the vacuum root cannot clear moves the root until it can."""
+
+    capacity = _d072_capacity_mol_per_ln_fO2({"CaO": 100.0}, 0.0, -9.0)
+    compiled, legacy = _catalog()
+    answer = _cao_answer(-9.0)
+    diagnostic = answer.diagnostic
+    published, published_ca, p_ref_bar = _published_ca(diagnostic)
+    _surface, ideal_pa, _flux = _congruent_cao_surface(published_ca, p_ref_bar)
+    # 0.5 mbar = 50 Pa. Above the 5.34 Pa free-molecular root, and viscous.
+    bulk_ca_pa = 0.5 * 100.0
+    _assert_viscous_film(bulk_ca_pa, _T_K)
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=capacity,
+        headspace_partials_mbar={"Ca": 0.5},
+    )
+    resolved = _resolve(host, equilibrium)
+    notice = host._last_langmuir_surface_oxygen
+    root_bar, root_pa = _series_cao_root(
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=0.0,
+        bulk_ca_pa=bulk_ca_pa,
+        overhead_pa=bulk_ca_pa,
+        temperature_K=_T_K,
+        legacy=legacy,
+    )
+    assert resolved["Ca"] == pytest.approx(root_pa, rel=1.0e-6)
+    assert resolved["Ca"] > bulk_ca_pa
+    assert resolved["Ca"] != pytest.approx(ideal_pa, rel=1.0e-3)
+    assert notice["surface_pO2_bar"] == pytest.approx(root_bar, rel=1.0e-6)
+    assert notice["relative_residual"] < 1.0e-4
+    assert notice["overhead_bounded"] is False
+    # The drive is P_Ca - 50 Pa, about 0.075 Pa. A 1e-6 relative miss on
+    # P_Ca is a much larger miss on that drive, so the flux residual is
+    # checked at the independent root itself. The solver lands on that root.
+    assert _series_cao_residual(
+        root_bar,
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=0.0,
+        bulk_ca_pa=bulk_ca_pa,
+        overhead_pa=bulk_ca_pa,
+        temperature_K=_T_K,
+        legacy=legacy,
+    ) < 1.0e-4
+    clipped = _series_cao_residual(
+        _surface,
+        published_ca,
+        p_ref_bar,
+        bulk_o2_pa=0.0,
+        bulk_ca_pa=bulk_ca_pa,
+        overhead_pa=bulk_ca_pa,
+        temperature_K=_T_K,
+        legacy=legacy,
+        pressure_ca_pa=ideal_pa,
+    )
+    assert clipped > 1.0e-3
+
+
+def test_subunit_condensed_metal_caps_when_surface_lowers_po2() -> None:
+    """A no-buffer solve that lowers pO2 cannot publish Fe above P_sat.
+
+    Published Fe is subunit: raw = 0.25, P = 1000 Pa, P_sat = 4000 Pa,
+    p_ref = 1e-2 bar. The cap binds at ``p <= p_ref * raw**2`` because
+    ``n = -1/2``. The oxygen balance at p_ref is oxygen-heavy, so the
+    root drops through that threshold. The ordinary power law would
+    exceed P_sat. The published pressure is P_sat, and Fe's parent
+    oxygen still enters the residual (otherwise the root would sit on
+    the uncapped law).
+    """
+
+    from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
+
+    compiled, legacy = _catalog()
+    p_ref = 1.0e-2
+    raw = 0.25
+    p_sat = 4000.0
+    published_fe = raw * p_sat
+    result = apply_langmuir_surface_oxygen(
+        {"Fe": published_fe},
+        temperature_K=_GEN_T_K,
+        provenance_by_species={
+            "Fe": {
+                "pressure_rail": "condensed_raoult_psat",
+                "pO2_bar": p_ref,
+                "activity_factor": raw,
+                "raw_metal_activity_root": raw,
+                "P_reference_Antoine_Pa": p_sat,
+            }
+        },
+        source_reaction_fO2_bar=p_ref,
+        legacy_catalog=legacy,
+        compiled_catalog=compiled,
+        melt_redox_capacity_mol_per_ln_fO2=0.0,
+    )
+    surface = result.surface_pO2_bar
+    assert surface is not None
+    assert result.refused_species == {}
+    p_uncap = p_ref * (raw ** 2.0)
+    assert surface < p_uncap
+    uncapped = p_sat * raw * (surface / p_ref) ** (-0.5)
+    assert uncapped > p_sat
+    assert result.pressures_Pa["Fe"] == pytest.approx(p_sat, rel=1.0e-6)
+    assert result.pressures_Pa["Fe"] < uncapped
+    alpha_fe = _catalog_alpha(legacy, "Fe", _GEN_T_K)
+    k_fe = _ideal_molar_k(alpha_fe, _M_FE, _GEN_T_K)
+    k_o2 = _ideal_molar_k(1.0, _M_O2, _GEN_T_K)
+    j_fe = k_fe * p_sat
+    j_o2 = k_o2 * surface * PA_PER_BAR
+    # dO_Fe = 1, so the residual is 2*J_O2 - J_Fe. Dropping Fe's demand
+    # would leave 2*J_O2, which does not close.
+    assert abs(2.0 * j_o2 - j_fe) / max(j_fe, 2.0 * j_o2) < 1.0e-4
+    assert j_o2 / max(j_fe, 1.0e-300) > 1.0e-4
+    assert result.relative_residual < 1.0e-4
+
+
+_NET_SPECIES_SETS = (
+    "ca",
+    "ca-fe-capped",
+    "fe-cross",
+    "ca-sio-tio2",
+    "channels-only",
+)
+_NET_PARTIALS = ("none", "o2-high", "o2-low", "metal", "both")
+_NET_LAWS = ("ideal", "scaled")
+_NET_GATES = ("closed", "open-capacity", "open-floor")
+
+
+def _net_gate(mode: str) -> tuple[float, bool, float, float]:
+    """Return capacity, at_floor, source pO2, and the metal law's p_ref.
+
+    The floor gate opens because the evaluated source pO2 is 1e-30 bar.
+    The published metal pressures stay the in-band law at 1e-9 bar.
+    Publishing 1e6 Pa at 1e-30 bar is not a mass-action floor (that
+    publication is ~1e13 Pa) and the balance then refuses. Keeping the
+    law reference in band makes every partial class solvable, and the
+    carriers are not below-band refusals.
+    """
+
+    if mode == "closed":
+        return 1.0, False, _GEN_IN_BAND_PO2_BAR, _GEN_IN_BAND_PO2_BAR
+    if mode == "open-capacity":
+        return 0.0, False, _GEN_IN_BAND_PO2_BAR, _GEN_IN_BAND_PO2_BAR
+    if mode == "open-floor":
+        return 1.0, True, _GEN_FLOOR_PO2_BAR, _GEN_IN_BAND_PO2_BAR
+    raise AssertionError(mode)
+
+
+def _net_specs(species_set: str, p_ref_bar: float) -> list[dict]:
+    """Carrier classes the closure has to tell apart.
+
+    ``fe-cross`` keeps its own reference at 1e-2 bar so a falling
+    surface can drive the subunit activity through 1. The other metals
+    use the gate's publication pO2. SiO is transport. TiO2_gas is the
+    neutral exponent.
+    """
+
+    specs: list[dict] = []
+    if species_set in ("ca", "ca-fe-capped", "ca-sio-tio2"):
+        specs.append({
+            "species": "Ca",
+            "kind": "gas",
+            "published": _GEN_P_CA,
+            "p_ref": p_ref_bar,
+            "exponent": _GEN_N_METAL,
+            "alpha": _GEN_ALPHA_CA,
+            "molar_mass": _M_CA,
+            "n_o": 0.0,
+            "scale": 3.0,
+        })
+    if species_set == "ca-fe-capped":
+        specs.append({
+            "species": "Fe",
+            "kind": "capped",
+            "published": _GEN_P_FE,
+            "p_sat": _GEN_P_FE,
+            "raw": _GEN_FE_RAW,
+            "p_ref": p_ref_bar,
+            "exponent": _GEN_N_METAL,
+            "alpha": _GEN_ALPHA_FE,
+            "molar_mass": _M_FE,
+            "n_o": 0.0,
+            "scale": 2.0,
+        })
+    if species_set == "fe-cross":
+        specs.append({
+            "species": "Fe",
+            "kind": "capped",
+            "published": 1000.0,
+            "p_sat": 4000.0,
+            "raw": 0.25,
+            "p_ref": 1.0e-2,
+            "exponent": _GEN_N_METAL,
+            "alpha": _GEN_ALPHA_FE,
+            "molar_mass": _M_FE,
+            "n_o": 0.0,
+            "scale": 2.0,
+        })
+    if species_set in ("ca-sio-tio2", "channels-only"):
+        specs.append({
+            "species": "SiO",
+            "kind": "transport",
+            "published": _GEN_P_SIO,
+            "p_ref": _GEN_TRANSPORT_PO2_BAR,
+            "exponent": -0.5,
+            "alpha": 1.0,
+            "molar_mass": parse_formula("SiO").molar_mass_kg_per_mol(),
+            "n_o": 1.0,
+            "scale": 1.0,
+        })
+        specs.append({
+            "species": "TiO2_gas",
+            "kind": "neutral",
+            "published": _GEN_P_TIO2,
+            "p_ref": p_ref_bar,
+            "exponent": 0.0,
+            "alpha": 1.0,
+            "molar_mass": parse_formula("TiO2").molar_mass_kg_per_mol(),
+            "n_o": 2.0,
+            "scale": 1.0,
+        })
+    return specs
+
+
+def _net_provenance(spec: dict) -> dict:
+    if spec["kind"] == "transport":
+        return {
+            "oxygen_fugacity_channel": "transport_headspace",
+            "pO2_bar": spec["p_ref"],
+            "pO2_exponent": spec["exponent"],
+        }
+    if spec["kind"] == "neutral":
+        return {
+            "oxygen_fugacity_channel": "intrinsic_melt",
+            "pO2_bar": spec["p_ref"],
+            "pO2_exponent": 0.0,
+        }
+    if spec["kind"] == "capped":
+        return {
+            "pressure_rail": "condensed_raoult_psat",
+            "pO2_bar": spec["p_ref"],
+            "activity_factor": 1.0 if spec["raw"] > 1.0 else spec["raw"],
+            "raw_metal_activity_root": spec["raw"],
+            "P_reference_Antoine_Pa": spec["p_sat"],
+        }
+    return {
+        "pressure_rail": "gas_fugacity",
+        "pO2_bar": spec["p_ref"],
+        "activity_factor": 0.2,
+        "raw_metal_activity_root": 0.2,
+    }
+
+
+def _net_partials(mode: str, specs: list[dict]) -> dict[str, float]:
+    metals = {
+        spec["species"]: 1.0
+        for spec in specs
+        if spec["kind"] in ("gas", "capped")
+    }
+    if mode == "none":
+        return {}
+    if mode == "o2-high":
+        return {"O2": 1000.0}
+    if mode == "o2-low":
+        return {"O2": 1.0}
+    if mode == "metal":
+        return metals
+    if mode == "both":
+        return {"O2": 100.0, **metals}
+    raise AssertionError(mode)
+
+
+def _net_expected_pressure(spec: dict, surface_pO2_bar: float) -> float:
+    if spec["kind"] in ("transport", "neutral"):
+        return spec["published"]
+    exponent = spec["exponent"]
+    if spec["kind"] == "gas":
+        return spec["published"] * (surface_pO2_bar / spec["p_ref"]) ** exponent
+    log_raw = math.log10(spec["raw"]) + exponent * math.log10(
+        surface_pO2_bar / spec["p_ref"]
+    )
+    if log_raw >= 0.0:
+        return spec["p_sat"]
+    return spec["p_sat"] * (10.0 ** log_raw)
+
+
+def _net_conductance(
+    specs: list[dict],
+    *,
+    scaled: bool,
+) -> dict[str, float]:
+    conductance: dict[str, float] = {}
+    for spec in specs:
+        if spec["kind"] == "transport":
+            continue
+        value = _ideal_molar_k(spec["alpha"], spec["molar_mass"], _GEN_T_K)
+        if scaled:
+            value *= spec["scale"]
+        conductance[spec["species"]] = value
+    o2 = _ideal_molar_k(1.0, _M_O2, _GEN_T_K)
+    conductance["O2"] = o2 * (0.4 if scaled else 1.0)
+    return conductance
+
+
+def _net_relative(
+    surface_pO2_bar: float,
+    specs: list[dict],
+    partials: dict[str, float],
+    conductance: dict[str, float],
+    *,
+    pressures: dict[str, float] | None = None,
+) -> tuple[float, float]:
+    """Independent ``|sum (nO-dO) J| / scale`` and the O2 molar flux.
+
+    ``J = k * max(0, P - P_bulk)``. Transport channels are not in the sum.
+    """
+
+    oxygen = 0.0
+    parent = 0.0
+    for spec in specs:
+        if spec["kind"] == "transport":
+            continue
+        if pressures is None:
+            pressure = _net_expected_pressure(spec, surface_pO2_bar)
+        else:
+            pressure = pressures[spec["species"]]
+        bulk = partials.get(spec["species"], 0.0)
+        flux = conductance[spec["species"]] * max(0.0, pressure - bulk)
+        demand = spec["n_o"] - 2.0 * spec["exponent"]
+        oxygen += spec["n_o"] * flux
+        parent += demand * flux
+    o2_pressure = surface_pO2_bar * PA_PER_BAR
+    o2_bulk = partials.get("O2", 0.0)
+    j_o2 = conductance["O2"] * max(0.0, o2_pressure - o2_bulk)
+    oxygen += 2.0 * j_o2
+    return abs(oxygen - parent) / max(oxygen, parent, 1.0e-300), j_o2
+
+
+def _net_opens(specs: list[dict], capacity: float, at_floor: bool) -> bool:
+    participating = any(
+        spec["kind"] in ("gas", "capped") for spec in specs
+    )
+    if not participating:
+        return False
+    if at_floor:
+        return True
+    return capacity <= float(OXYGEN_RESERVOIR_NOOP_MOL)
+
+
+@pytest.mark.parametrize("species_set", _NET_SPECIES_SETS)
+@pytest.mark.parametrize("partial_mode", _NET_PARTIALS)
+@pytest.mark.parametrize("law", _NET_LAWS)
+@pytest.mark.parametrize("gate", _NET_GATES)
+def test_net_flux_invariant_over_species_partials_and_conductance(
+    species_set: str,
+    partial_mode: str,
+    law: str,
+    gate: str,
+) -> None:
+    """The chokepoint residual is the net flux of every carrier class.
+
+    Species classes: uncapped Ca, already-capped Fe, subunit Fe that can
+    cross into the cap, transport SiO, neutral TiO2_gas, and a map with
+    no melt-surface carrier. Partials: none, O2 above a typical root,
+    O2 below it, metal backpressure, and both. Conductance: ideal
+    Hertz-Knudsen, or a species-specific scale standing in for unequal
+    film resistance. Gates: buffered in-band (closed), no buffer, and
+    the physical floor.
+
+    An open case is closed on its own partials and conductances.
+    Replaying those pressures at an O2 bulk equal to the solved surface
+    is not closed, and solving that second vector is. A closed case
+    keeps the published map. A condensed pressure is never above P_sat.
+    Nothing in an open map is a silent 0.
+    """
+
+    from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
+
+    capacity, at_floor, source_pO2, p_ref = _net_gate(gate)
+    specs = _net_specs(species_set, p_ref)
+    partials = _net_partials(partial_mode, specs)
+    scaled = law == "scaled"
+    conductance = _net_conductance(specs, scaled=scaled)
+    published = {spec["species"]: spec["published"] for spec in specs}
+    provenance = {spec["species"]: _net_provenance(spec) for spec in specs}
+    _compiled, legacy = _catalog()
+    result = apply_langmuir_surface_oxygen(
+        published,
+        temperature_K=_GEN_T_K,
+        provenance_by_species=provenance,
+        source_reaction_fO2_bar=source_pO2,
+        transport_pO2_bar=_GEN_TRANSPORT_PO2_BAR,
+        legacy_catalog=legacy,
+        compiled_catalog=_compiled,
+        melt_redox_capacity_mol_per_ln_fO2=capacity,
+        overhead_partials_Pa=partials,
+        conductance_mol_s_m2_Pa=conductance if scaled else None,
+    )
+    assert set(result.pressures_Pa) == set(published)
+    for pressure in result.pressures_Pa.values():
+        assert math.isfinite(pressure)
+        assert pressure > 0.0
+    for spec in specs:
+        if spec["kind"] in ("transport", "neutral"):
+            assert result.pressures_Pa[spec["species"]] == spec["published"]
+        if spec["kind"] == "capped":
+            assert result.pressures_Pa[spec["species"]] <= spec["p_sat"] * (
+                1.0 + 1.0e-9
+            )
+    opens = _net_opens(specs, capacity, at_floor)
+    if not opens:
+        assert result.applied is False
+        assert result.pressures_Pa == published
+        assert result.surface_pO2_bar is None
+        return
+
+    surface = result.surface_pO2_bar
+    assert surface is not None
+    assert surface > 0.0
+    assert result.refused_species == {}
+    assert result.relative_residual < 1.0e-4
+    assert result.eval_pO2_below_physical_floor is at_floor
+    assert result.capacity_negligible is (
+        capacity <= float(OXYGEN_RESERVOIR_NOOP_MOL)
+    )
+    for spec in specs:
+        if spec["kind"] in ("transport", "neutral"):
+            continue
+        expected = _net_expected_pressure(spec, surface)
+        assert result.pressures_Pa[spec["species"]] == pytest.approx(
+            expected, rel=1.0e-5, abs=1.0e-12
+        )
+        if spec["kind"] == "capped":
+            log_raw = math.log10(spec["raw"]) + spec["exponent"] * math.log10(
+                surface / spec["p_ref"]
+            )
+            if log_raw >= 0.0:
+                uncapped = spec["p_sat"] * spec["raw"] * (
+                    surface / spec["p_ref"]
+                ) ** spec["exponent"]
+                assert uncapped > spec["p_sat"]
+                assert result.pressures_Pa[spec["species"]] == pytest.approx(
+                    spec["p_sat"], rel=1.0e-6
+                )
+    residual, j_o2 = _net_relative(
+        surface, specs, partials, conductance, pressures=dict(result.pressures_Pa)
+    )
+    assert residual < 1.0e-4
+    o2_bulk = partials.get("O2", 0.0)
+    if j_o2 > 0.0 and o2_bulk > 0.0:
+        assert surface * PA_PER_BAR >= o2_bulk * (1.0 - 1.0e-9)
+        assert result.overhead_bounded is True
+    else:
+        assert result.overhead_bounded is False
+
+    stale = dict(partials)
+    stale["O2"] = surface * PA_PER_BAR
+    stale_residual, _stale_o2 = _net_relative(
+        surface,
+        specs,
+        stale,
+        conductance,
+        pressures=dict(result.pressures_Pa),
+    )
+    assert stale_residual > 1.0e-3
+    again = apply_langmuir_surface_oxygen(
+        published,
+        temperature_K=_GEN_T_K,
+        provenance_by_species=provenance,
+        source_reaction_fO2_bar=source_pO2,
+        transport_pO2_bar=_GEN_TRANSPORT_PO2_BAR,
+        legacy_catalog=legacy,
+        compiled_catalog=_compiled,
+        melt_redox_capacity_mol_per_ln_fO2=capacity,
+        overhead_partials_Pa=stale,
+        conductance_mol_s_m2_Pa=conductance if scaled else None,
+    )
+    assert again.surface_pO2_bar is not None
+    assert again.surface_pO2_bar * PA_PER_BAR > stale["O2"]
+    assert again.relative_residual < 1.0e-4
+    again_residual, again_o2 = _net_relative(
+        again.surface_pO2_bar,
+        specs,
+        stale,
+        conductance,
+        pressures=dict(again.pressures_Pa),
+    )
+    assert again_residual < 1.0e-4
+    assert again_o2 > 0.0
+    assert again.overhead_bounded is True
+    for spec in specs:
+        if spec["kind"] != "capped":
+            continue
+        assert again.pressures_Pa[spec["species"]] <= spec["p_sat"] * (
+            1.0 + 1.0e-9
+        )
