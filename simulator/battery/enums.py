@@ -21,6 +21,13 @@ from __future__ import annotations
 from decimal import Decimal
 from enum import StrEnum
 
+from simulator.backend_names import (
+    PROPRIETARY_ENGINE_NAME,
+    PROPRIETARY_ENGINE_REFUSAL_CODE,
+    ProprietaryEngineRefusal,
+    is_proprietary_engine,
+    refuse_proprietary_engine_use as _refuse_proprietary_engine_use,
+)
 from simulator.state_types import StateTag
 
 
@@ -37,6 +44,13 @@ class Engine(StrEnum):
     VAPOROCK = "vaporock"
     MAGEMIN = "magemin"
     OPENIMCC = "openimcc"
+    PROPRIETARY_REMOTE = PROPRIETARY_ENGINE_NAME
+
+    @property
+    def proprietary(self) -> bool:
+        """Whether this engine's outputs require the aggregate-only route."""
+
+        return is_proprietary_engine(self)
 
 
 class Fo2Mode(StrEnum):
@@ -174,6 +188,7 @@ class RefusalReason(StrEnum):
     DECISION_RULE_MISSING = "decision_rule_missing"
     METRIC_DOMAIN = "metric_domain"
     UNSUPPORTED = "unsupported"
+    PROPRIETARY_ENGINE_EXCLUDED = PROPRIETARY_ENGINE_REFUSAL_CODE
     NOT_PROBED = "not_probed"
     ATTEMPTED_UNAVAILABLE = "attempted_unavailable"
     ADMISSION_NOT_ADMITTED = "admission_not_admitted"
@@ -198,6 +213,20 @@ class RefusalReason(StrEnum):
     ENGINE_DOES_NOT_MODEL_SULFUR = "engine_does_not_model_sulfur"
     ENGINE_DOES_NOT_MODEL_CHLORIDE = "engine_does_not_model_chloride"
     CAPACITY_DEFINITION_NOT_IMPLEMENTED = "capacity_definition_not_implemented"
+
+
+def refuse_proprietary_engine_use(engine: Engine | str, *, mode: str) -> None:
+    """Resolve battery tokens and retain their typed refusal reason."""
+
+    try:
+        resolved = engine if isinstance(engine, Engine) else Engine(str(engine))
+    except ValueError:
+        return
+    try:
+        _refuse_proprietary_engine_use(resolved, mode=mode)
+    except ProprietaryEngineRefusal as exc:
+        exc.reason = RefusalReason.PROPRIETARY_ENGINE_EXCLUDED
+        raise
 
 
 class CellMaterial(StrEnum):

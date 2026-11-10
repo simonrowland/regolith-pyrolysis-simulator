@@ -31,6 +31,7 @@ from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
+    refuse_proprietary_engine_use,
 )
 from simulator.backends import (
     BackendSelectionPolicy,
@@ -795,6 +796,10 @@ def evaluate(
             patch=validated_patch,
             candidate_id=candidate_id,
         ) from exc
+    refuse_proprietary_engine_use(
+        run_config.backend_name,
+        mode="optimizer evaluation",
+    )
     key = cache_key(spec)
     objective_profile = _objective_profile_for_spec(profile, spec)
     domain_reason = real_backend_feedstock_domain_reason(

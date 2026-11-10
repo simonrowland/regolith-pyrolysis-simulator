@@ -111,8 +111,8 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
-from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
 from simulator.fe_redox import RedoxState, normalize_redox_state
+from simulator.oxygen_buffers import oneill_qfm_log10_fO2_bar
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,

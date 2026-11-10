@@ -1776,8 +1776,9 @@ def oxygen_condition(
     # Buffer relations (graphite C–CO and Frost condensed buffers) are heavier
     # derivations than any printed pO2 above, so they rank last.
     if control is not None and control.buffer is not None and control.buffer.state.is_value:
-        from simulator.chemistry.graphite_c_co import (
-            is_c_co_buffer_token,
+        from simulator.chemistry.graphite_c_co import is_c_co_buffer_token
+        from simulator.oxygen_buffers import (
+            frost_condensed_buffer_log10_fO2_bar,
             log10_fo2_c_co_bar,
         )
         from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
@@ -1794,16 +1795,9 @@ def oxygen_condition(
                 if temperature.kind is ValueKind.POINT and pressure_value.kind is ValueKind.POINT:
                     T = temperature.point
                     # Premise: paper states graphite / C–CO buffering and prints
-                    # T and P_CO (or total P when CO is the stated gas). The
-                    # named half-reaction is C + 1/2 O2 = CO; at graphite
-                    # saturation the lab C–O fluid is the published CCO buffer
-                    # (Jakobsson & Oskarsson 1994 via LEPR) — see
-                    # simulator.chemistry.graphite_c_co.
-                    # Algebra: log10(fO2)=log10(fO2_ref)
-                    # +2*log10(P_CO/P_ref) from K=P_CO/sqrt(fO2).
-                    # Units: Pa/1e5 → bar; pressure ratio is dimensionless.
-                    # Sanity: at 1473.15 K, 1 atm → -10.475 and
-                    # 0.1 atm → -12.475.
+                    # T and P_CO (or total P when CO is the stated gas); the
+                    # Jakobsson & Oskarsson 1994 CCO calibration is in
+                    # simulator.oxygen_buffers.
                     P_bar = pressure_value.point / Decimal(100000)
                     log_fo2 = log10_fo2_c_co_bar(float(T), float(P_bar))
                     routes.append(Waypoint(
@@ -1826,12 +1820,16 @@ def oxygen_condition(
                         and buffer.T_min_K <= temperature.point <= buffer.T_max_K):
                     T = temperature.point
                     P = pressure.value.point / Decimal(100000)
-                    # Premise: Frost (1991), doi:10.2138/rmg.1991.25.1, Table 1,
-                    # condensed buffer equilibrium inside its published T domain.
-                    # Algebra: log10(fO2/bar)=A/T+B+C*(P_bar-1)/T.
-                    # Units: K/K and (K/bar)*bar/K are dimensionless.
-                    # Sanity: IW at 1000 K, 1 bar gives -20.787.
-                    value = as_decimal(buffer.A_K) / T + as_decimal(buffer.B) + as_decimal(buffer.pressure_coefficient_K_per_bar) * (P - 1) / T
+                    # Premise: Frost (1991) Table 1's condensed buffer line is
+                    # within its published T domain; its equation is in
+                    # simulator.oxygen_buffers.
+                    value = frost_condensed_buffer_log10_fO2_bar(
+                        as_decimal(buffer.A_K),
+                        as_decimal(buffer.B),
+                        as_decimal(buffer.pressure_coefficient_K_per_bar),
+                        T,
+                        P,
+                    )
                     routes.append(Waypoint("oxygen_condition", Value.point_of(value),
                         "buffer_relation", WaypointAuthority.DERIVED,
                         ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))

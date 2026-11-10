@@ -11,23 +11,13 @@ from simulator.feedstock_composition import (
     feot_equivalent_wt_pct,
     iron_oxide_values,
 )
+from simulator.oxygen_buffers import (
+    FE_FEO_BUFFER_STANDARD,
+    Kress91InvalidControls,
+    feo_iw_log10_fO2_bar,
+    legacy_iw_log10_fO2_bar,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
-
-
-class Kress91InvalidControls(ValueError):
-    """Invalid finite-control input for the Kress91 Fe-redox relation."""
-
-
-def legacy_iw_log10_fO2_bar(
-    temperature_K: float,
-    *,
-    vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
-) -> float:
-    """Return the legacy IW line, flooring T unless it is strictly positive."""
-    temperature = float(temperature_K)
-    if not (temperature > 0.0):
-        return math.log10(vacuum_floor_bar)
-    return -27215.0 / temperature + 6.57
 
 
 def intrinsic_melt_fO2(
@@ -319,12 +309,6 @@ HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C = (
     (1600.0, 1.66),
 )
 
-# Holzheid et al. 1997, DOI 10.1016/S0009-2541(97)00030-2:
-# Delta G("FeO"_l) = -244118 + 115.559*T - 8.474*T*ln(T) J/mol.
-HOLZHEID_FEO_LIQUID_DG_A_J_MOL = -244118.0
-HOLZHEID_FEO_LIQUID_DG_B_J_MOL_K = 115.559
-HOLZHEID_FEO_LIQUID_DG_C_J_MOL_K = -8.474
-
 # Ban-ya 1993, ISIJ Int. 33:2-11, DOI not present in local OCR:
 # clean OCR alpha_ij values in J from docs-private/.../ocr-extracted-params.md.
 BAN_YA_ALPHA_J: dict[frozenset[str], float] = {
@@ -507,35 +491,6 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
     }
 
 
-def holzheid_feo_liquid_delta_g_j_mol(T_K: float) -> float:
-    T = float(T_K)
-    if T <= 0.0 or not math.isfinite(T):
-        raise Kress91InvalidControls(
-            f'FeO liquid DeltaG invalid control T_K: expected finite positive '
-            f'value, got {T_K!r}'
-        )
-    return (
-        HOLZHEID_FEO_LIQUID_DG_A_J_MOL
-        + HOLZHEID_FEO_LIQUID_DG_B_J_MOL_K * T
-        + HOLZHEID_FEO_LIQUID_DG_C_J_MOL_K * T * math.log(T)
-    )
-
-
-def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
-    activity = max(float(a_feo), 1.0e-300)
-    R = 8.31446261815324
-    ln_fO2 = 2.0 * (
-        math.log(activity)
-        + holzheid_feo_liquid_delta_g_j_mol(T_K) / (R * float(T_K))
-    )
-    return ln_fO2 / math.log(10.0)
-
-
-# This identifier follows the coded line's wustite-liquid standard. Holzheid
-# et al. (1997), Eq. 9, constructed it from O'Neill and Pownceby (1993) and
-# Barin (1989); the paper states no uncertainty for the line, and this code
-# states no validity range.
-FE_FEO_BUFFER_STANDARD = 'wustite_FeO_l_holzheid1997_eq9'
 REDOX_BUFFER_LINES: Mapping[str, Callable[[float], float]] = MappingProxyType(
     {
         FE_FEO_BUFFER_STANDARD: lambda T_K: feo_iw_log10_fO2_bar(

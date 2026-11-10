@@ -5,8 +5,8 @@ O'Neill and Eggins 2002 Table 7 are the rows that print a log fO2 on
 activity-coefficient observations. The log stays on point conditions.
 identity.fO2_Pa is the same conversion used for redox rows.
 
-A named buffer offset is not converted. There is no buffer curve in this
-owner. A row with no printed oxygen stays unknown.
+A named buffer offset uses its cited calibration when available. A row with
+no printed oxygen or buffer offset stays unknown.
 """
 
 from __future__ import annotations
@@ -261,7 +261,7 @@ def test_unitless_log_iw_band_edges_follow_the_row_temperature(tmp_path: Path) -
     The centre is ``feo_iw_log10_fO2_bar`` at the row temperature, then
     ``Decimal(str(centre))``, the same conversion the migrator applies.
     """
-    from simulator.fe_redox import feo_iw_log10_fO2_bar
+    from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 
     temperature = Decimal("1677")
     centre = Decimal(str(feo_iw_log10_fO2_bar(float(temperature), a_feo=1.0)))
@@ -348,12 +348,12 @@ def test_unitless_log_without_temperature_stays_unknown(tmp_path: Path) -> None:
     assert "fO2_Pa" in outcome.fields
 
 
-def test_activity_buffer_offset_stays_unknown(tmp_path: Path) -> None:
+def test_activity_buffer_offset_uses_canonical_qfm(tmp_path: Path) -> None:
     result = _migrate_fixture(
         tmp_path,
         quantity="activity",
         point={
-            "T_K": 1673,
+            "T_K": 1200,
             "activity": "0.2",
             "point_conditions": {
                 "fO2_control": {
@@ -373,21 +373,24 @@ def test_activity_buffer_offset_stays_unknown(tmp_path: Path) -> None:
     ]
     assert len(matches) == 1
     oxygen = matches[0].identity.fO2_Pa
-    assert oxygen is not None and oxygen.is_unknown
-    assert oxygen.reason is not None
-    assert oxygen.reason.startswith("buffer-relative fO2 (")
-    assert "FMQ+2.7" in oxygen.reason
+    assert oxygen is not None and oxygen.is_value
+    # O'Neill (1987), reaction (2): μ°O2 = -587474 + 1584.427T
+    # - 203.3164T ln(T) + 0.092710T² J/mol. At 1200 K, division by
+    # R T ln(10) gives -12.296398239 log10(fO2/bar); adding FMQ+2.7 gives
+    # this independent literal. J/mol over R T is dimensionless.
+    expected_log = Decimal("-9.596398239")
+    assert abs(oxygen.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
     assert matches[0].point_conditions["fO2_control"].state.value == "FMQ+2.7"
 
 
 def test_child_buffer_beats_parent_log(tmp_path: Path) -> None:
-    # Parent log -9 bar is 1e-4 Pa. The child's named buffer is a refusal.
+    # The child's buffer-relative value takes precedence over parent fallback.
     result = _migrate_fixture(
         tmp_path,
         quantity="activity",
         parent={"log_fO2": {"value": "-9", "units": "log10(bar)"}},
         point={
-            "T_K": 1673,
+            "T_K": 1000,
             "activity": "0.2",
             "oxygen_buffer_as_published": "IW",
             "point_conditions": {
@@ -409,10 +412,72 @@ def test_child_buffer_beats_parent_log(tmp_path: Path) -> None:
     ]
     assert len(matches) == 1
     oxygen = matches[0].identity.fO2_Pa
-    assert oxygen is not None and oxygen.is_unknown
-    assert oxygen.reason is not None
-    assert oxygen.reason.startswith("buffer-relative fO2 (")
-    assert "IW+2" in oxygen.reason
+    assert oxygen is not None and oxygen.is_value
+    # O'Neill (1988) eq. 11 first segment at 1000 K gives -20.799980169
+    # log10(fO2/bar), then the printed IW+2 adds to -18.799980169. μ°/(R T)
+    # is dimensionless and division by ln(10) gives the base-10 log.
+    expected_log = Decimal("-18.799980169")
+    assert abs(oxygen.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
+
+
+def test_jugo_sb5_uses_canonical_fmq_with_frost_pressure_correction() -> None:
+    result = _migrated("jugo-2010-sulfur-xanes.yaml")
+    matches = [
+        observation
+        for observation in result.observations.values()
+        if isinstance((observation.point_conditions or {}).get("fO2_control"), Located)
+        and observation.point_conditions["fO2_control"].state.is_value
+        and observation.point_conditions["fO2_control"].state.value == "FMQ+2.7"
+    ]
+    assert len(matches) == 1
+    observation = matches[0]
+
+    assert _decimal_point(observation.identity.temperature_K) == Decimal("1323.15")
+    assert _decimal_point(observation.identity.total_pressure_Pa) == Decimal("200000000")
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    # O'Neill (1987) reaction (2) supplies the canonical 1-bar FMQ base at
+    # 1323.15 K. Frost's beta-quartz molar-volume term adds
+    # 0.110 K/bar * (2000 - 1) bar / 1323.15 K = 0.166186751 dex; the printed
+    # FMQ+2.7 then gives this independent nine-decimal log literal.
+    expected_log = Decimal("-7.491317884")
+    assert abs(oxygen.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
+    notices = [
+        notice.reason
+        for notice in observation.notices
+        if notice.reason.startswith("buffer_relative_fO2_converted:")
+    ]
+    assert len(notices) == 1
+    reason = notices[0]
+    assert "offset_as_printed=FMQ+2.7" in reason
+    assert "calibration=oneill_1987_ammin_72_reaction2_emf" in reason
+    assert "band=±0.125419 dex" in reason
+    assert "band_basis=absolute canonical-to-Frost 1991 spread" in reason
+    assert "pressure=2000 bar" in reason
+    assert "pressure correction=Frost 1991 molar-volume ΔV term" in reason
+
+
+def test_mavrogenes_mav1_uses_pressure_delta_v_after_inheritance() -> None:
+    result = _migrated("mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas.yaml")
+    observation = _one(result, "mavrogenes_oneill_1999_mav1_s_in_quenched_glass")
+
+    assert _decimal_point(observation.identity.temperature_K) == Decimal("1673.15")
+    assert _decimal_point(observation.identity.total_pressure_Pa) == Decimal("500000000")
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    # O'Neill (1988) eq. 11 third segment is the 1-bar IW base at 1673.15 K:
+    # μ° = -551159 + 269.404T - 16.9484T ln(T) J/mol, then μ°/(R T ln 10).
+    # Frost's published IW pressure term adds 0.055(5000-1)/T dex, followed
+    # by the printed -1.56. All terms are dimensionless; independent evaluation
+    # gives -11.101141516 log10(fO2/bar) (predict-and-flag above IW's range).
+    expected_log = Decimal("-11.101141516")
+    assert abs(oxygen.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
+    assert any(
+        "delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7"
+        in notice.reason
+        and "pressure correction=Frost 1991 molar-volume ΔV term" in notice.reason
+        for notice in observation.notices
+    )
 
 
 def test_child_typed_pressure_beats_parent_log(tmp_path: Path) -> None:

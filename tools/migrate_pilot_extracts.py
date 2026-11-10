@@ -6,9 +6,9 @@ Sources:
 * CEA sweep DRAFT → ``nasa-cea-thermo.yaml``
 * vp-acquire-5 / vp-acquire-6 DRAFT YAML fences → per-source extract files
 
-Reads research paths from the main worktree when the local clone lacks them
-(docs-private research is often gitignored). Re-run is idempotent overwrite
-of pilot extract files only.
+Reads research paths from this checkout and, when needed, an explicitly
+provided ``--research-root`` checkout. Re-run is idempotent overwrite of
+pilot extract files only.
 """
 
 from __future__ import annotations
@@ -38,19 +38,16 @@ EXTRACTS = ROOT / "data" / "literature" / "extracts"
 _REWRITE_JANAF = "janaf-4th.yaml"
 _STALE_RICHTER = "richter-et-al-2011.yaml"
 
-# Prefer sibling main checkout for gitignored research drafts.
-_CANDIDATE_MAINS = [
-    ROOT,
-    Path(
-        "/Users/simonrowland/Library/CloudStorage/Dropbox/"
-        "Starship Mission Design/Regolith Processing/"
-        "regolith-pyrolysis-simulator"
-    ),
-]
+# Optional second checkout containing gitignored research drafts.
+_RESEARCH_ROOT: Path | None = None
+
+
+def _candidate_mains() -> tuple[Path, ...]:
+    return (ROOT,) if _RESEARCH_ROOT is None else (ROOT, _RESEARCH_ROOT)
 
 
 def _find_research(*parts: str) -> Path | None:
-    for base in _CANDIDATE_MAINS:
+    for base in _candidate_mains():
         p = base.joinpath(*parts)
         if p.is_file() or p.is_dir():
             return p
@@ -60,7 +57,7 @@ def _find_research(*parts: str) -> Path | None:
 def _repo_relative(path: Path | str) -> str:
     """Normalize provenance to a repository-relative path (never machine-local)."""
     p = Path(path).resolve() if not isinstance(path, Path) else path.resolve()
-    for base in _CANDIDATE_MAINS:
+    for base in _candidate_mains():
         try:
             return str(p.relative_to(base.resolve()))
         except ValueError:
@@ -1667,7 +1664,9 @@ def annotate_all_extracts_fidelity() -> int:
     return n
 
 
-def main() -> int:
+def main(research_root: Path | None = None) -> int:
+    global _RESEARCH_ROOT
+    _RESEARCH_ROOT = research_root.resolve() if research_root is not None else None
     EXTRACTS.mkdir(parents=True, exist_ok=True)
     planned = [_REWRITE_JANAF] if (EXTRACTS / _REWRITE_JANAF).is_file() else []
     retired = [_STALE_RICHTER] if (EXTRACTS / _STALE_RICHTER).is_file() else []
@@ -1719,13 +1718,18 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "One-shot pilot migration: acquisition DRAFT blocks → literature extracts. "
-            "Importing this module is side-effect free; running without flags executes "
-            "the migration."
+            "Pass --research-root to identify the checkout containing private research inputs."
         )
+    )
+    parser.add_argument(
+        "--research-root",
+        type=Path,
+        required=True,
+        help="repository checkout containing docs-private/research inputs",
     )
     return parser.parse_args(argv)
 
 
 if __name__ == "__main__":
-    _parse_args()
-    raise SystemExit(main())
+    args = _parse_args()
+    raise SystemExit(main(args.research_root))
