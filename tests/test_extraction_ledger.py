@@ -40,6 +40,7 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.session_cli import SessionScriptRunner
 import simulator.session_cli as session_cli_module
 from simulator.state import (
+    FARADAY,
     MOLAR_MASS,
     OXIDE_TO_METAL,
     CampaignPhase,
@@ -271,7 +272,7 @@ def _enable_c5_mre(sim, *, target_species: str, max_voltage_V: float) -> None:
     sim.campaign_mgr.c5_enabled = True
 
 
-def test_unknown_cleaned_melt_oxide_does_not_add_fabricated_mre_charge(
+def test_unmapped_cleaned_melt_oxide_uses_flagged_stoichiometric_mre_charge(
     monkeypatch,
 ):
     from simulator.accounting.formulas import resolve_species_formula
@@ -320,13 +321,12 @@ def test_unknown_cleaned_melt_oxide_does_not_add_fabricated_mre_charge(
     assert control is not None
     outcome = sim._execute_mre_interval(control, execution_origin="plant")
 
-    assert outcome["committed_electron_charge_C"] == pytest.approx(0.0)
-    assert outcome["effective_current_A"] == pytest.approx(0.0)
+    assert outcome["committed_electron_charge_C"] == pytest.approx(10 * FARADAY)
+    assert outcome["effective_current_A"] == pytest.approx(10 * FARADAY / 3600.0)
     assert outcome["diagnostic"]["notices"] == [{
-        "kind": "mre_effective_current_partial",
+        "kind": "mre_electron_count_from_formula_stoichiometry",
         "quantity": "effective_current_A",
-        "status": "partial_estimate",
-        "reason": "oxide_electron_count_unavailable",
+        "status": "estimated",
         "oxides": [oxide],
     }]
     assert (
