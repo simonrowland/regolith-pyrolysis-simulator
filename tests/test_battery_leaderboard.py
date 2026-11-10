@@ -295,6 +295,87 @@ def test_groups_keep_units_separate_include_flags_and_exclude_refusals() -> None
     assert measured == {"cao-ratio": pytest.approx(10.0), "cao-enthalpy": pytest.approx(10.0)}
 
 
+def test_candidate_flag_spelling_drives_display_and_group_statistics() -> None:
+    candidate_flagged = _residual("fe-candidate-flag", predicted=10.0)
+    candidate_flagged["candidate_observation"]["notices"] = [
+        {"kind": "unverified-apparatus"}
+    ]
+    rows = [
+        _residual("fe-unflagged", predicted=10.0 ** 0.3),
+        candidate_flagged,
+    ]
+
+    groups = leaderboard_module.leaderboard(rows, feedstock="all", level="group")
+    iron = next(row for row in groups["rows"] if row["species"] == "Fe")
+    assert iron["flagged_n"] == 1
+    assert iron["rms_unflagged_only"] == pytest.approx(
+        float(_median_rms_from_float64([0.3])[1])
+    )
+
+    predictions = leaderboard_module.leaderboard(
+        rows, feedstock="all", level="row", limit=10
+    )
+    flagged = next(
+        row for row in predictions["rows"]
+        if row["observation_id"] == "fe-candidate-flag"
+    )
+    assert flagged["flags"] == ["unverified_apparatus"]
+
+
+def test_speciesless_refusals_count_and_are_marked_unattributed(
+    tmp_path: Path,
+) -> None:
+    rows = [
+        _residual("fe-good", engine="openimcc"),
+        {
+            "experiment_id": "speciesless-refusal",
+            "candidate_request": {
+                "engine": "openimcc",
+                "quantity": "p_partial",
+                "channel": "vapour",
+            },
+            "status": "refused",
+            "refusal": {"reason": "unsupported_species", "detail": {}},
+        },
+    ]
+    result = leaderboard_module.leaderboard(
+        rows,
+        feedstock="all",
+        engine="openimcc",
+        rail="vapour",
+        species="Fe",
+        level="row",
+    )
+    assert result["total"] == 1
+    assert result["filters"]["refused_count"] == 1
+
+    archive = tmp_path / "speciesless-refusal.tgz"
+    _write_archive(archive, rows)
+    output = tmp_path / "filtered.md"
+    assert leaderboard_module.main(
+        [
+            "--archive",
+            str(archive),
+            "--feedstock",
+            "all",
+            "--engine",
+            "openimcc",
+            "--rail",
+            "vapour",
+            "--species",
+            "Fe",
+            "--format",
+            "md",
+            "--out",
+            str(output),
+        ]
+    ) == 0
+    markdown = output.read_text(encoding="utf-8")
+    assert "Refused rows excluded: 1." in markdown
+    assert "Refusals by engine/rail: openimcc/unknown=1." in markdown
+    assert "Unattributed to selected rail/species filters: openimcc/unknown=1." in markdown
+
+
 def test_archive_run_report_and_versioned_json_markdown_and_csv(tmp_path: Path) -> None:
     rows = [
         _residual(
