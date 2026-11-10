@@ -76,10 +76,12 @@ paths.
 
 ### How many
 
-Every scored observation needs a sample that names its observation id, pins
-its measured `values` payload (an equipment field does not cover), and
-matches the stored value. One sample per file is not coverage. Until the
-corpus is re-audited, missing coverage, missing reviewer/date/locator,
+Every scored observation needs samples that name its observation id and pin
+every measured leaf address under `values` (a repeated pin of one address
+does not cover a sibling with the same number; an equipment field does not
+cover), and each pin matches the stored value. One sample per file is not
+coverage. Until the corpus is re-audited, missing coverage, missing
+reviewer/date/locator,
 auto-migrated pilot notes, and attestation-complete pins whose locator was
 not opened are typed counted warnings (`uncovered_observation`,
 `unattested_sample`, `auto_migrated_pilot_pin`, `source_blind_pin`). They do

@@ -5207,11 +5207,19 @@ def _values_pin_document(
                 "locator": dict(locator),
             }
             if field is not None:
-                sample["field"] = field
+                if field.startswith("["):
+                    # ``[0]`` indexes the values list. A dotted tail is a path pin.
+                    bracket, _sep, rest = field.partition("]")
+                    if rest:
+                        raise AssertionError(field)
+                    sample["index"] = int(bracket[1:])
+                else:
+                    sample["field"] = field
         else:
             path = "species.Fe.observations[fe_alpha_1].values"
             if field is not None:
-                path = f"{path}.{field}"
+                # ``[0]`` and ``[0].P_Pa`` sit on the values segment itself.
+                path = f"{path}{field}" if field.startswith("[") else f"{path}.{field}"
             sample = {
                 "path": path,
                 "value": copy.deepcopy(value),
@@ -5279,6 +5287,44 @@ _MEASURED_PIN_CASES = {
         "pins": [("alpha", 0.91), ("beta", 0.5)],
         "source_text": "0.91\n0.5\n",
         "structured": False,
+    },
+    # Literal citation. Both stored numbers are 0.24. The artifact names alpha
+    # twice and never beta. Two alpha pins must not supply beta's occurrence.
+    "duplicate_alpha_pins": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [("alpha", 0.24), ("alpha", 0.24)],
+        "source_text": "alpha 0.24 measured\nalpha 0.24 measured\n",
+        "structured": False,
+    },
+    "duplicate_alpha_pins_structured": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [("alpha", 0.24), ("alpha", 0.24)],
+        "source_text": "alpha 0.24 measured\nalpha 0.24 measured\n",
+        "structured": True,
+    },
+    "equal_siblings_split": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [("alpha", 0.24), ("beta", 0.24)],
+        "source_text": "alpha 0.24 measured\nbeta 0.24 measured\n",
+        "structured": False,
+    },
+    "equal_siblings_split_structured": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [("alpha", 0.24), ("beta", 0.24)],
+        "source_text": "alpha 0.24 measured\nbeta 0.24 measured\n",
+        "structured": True,
+    },
+    "equal_siblings_whole": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [(None, {"alpha": 0.24, "beta": 0.24})],
+        "source_text": "alpha 0.24 measured\nbeta 0.24 measured\n",
+        "structured": False,
+    },
+    "equal_siblings_whole_structured": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [(None, {"alpha": 0.24, "beta": 0.24})],
+        "source_text": "alpha 0.24 measured\nbeta 0.24 measured\n",
+        "structured": True,
     },
 }
 
@@ -5406,6 +5452,10 @@ _PASS_PIN_CLASSES = (
     "numeric_beside_label",
     "numeric_beside_label_structured",
     "split_two_numbers",
+    "equal_siblings_split",
+    "equal_siblings_split_structured",
+    "equal_siblings_whole",
+    "equal_siblings_whole_structured",
 )
 _DEFECT_PIN_CLASSES = (
     "equipment_pin",
@@ -5430,6 +5480,8 @@ _DEFECT_PIN_CLASSES = (
     "partial_number_structured",
     "printed_string_beside_number",
     "series_element",
+    "duplicate_alpha_pins",
+    "duplicate_alpha_pins_structured",
 )
 _DEFECT_KIND = {
     "equipment_pin": "uncovered_observation",
@@ -5454,6 +5506,8 @@ _DEFECT_KIND = {
     "partial_number_structured": "uncovered_observation",
     "printed_string_beside_number": "uncovered_observation",
     "series_element": "uncovered_observation",
+    "duplicate_alpha_pins": "uncovered_observation",
+    "duplicate_alpha_pins_structured": "uncovered_observation",
 }
 _PROMOTION_ENTRIES = (
     "certify",
@@ -5603,8 +5657,10 @@ def test_draft_defects_stay_schema_valid_and_warn(pin_class: str, tmp_path: Path
 
 # Every leaf class a ``values`` payload can hold. The oracle below is the
 # invariant, written separately from the gate: a measured leaf is a finite
-# int, a finite float, or a string that contains a numeric token. A bool
-# and a label are not. Coverage is the multiset union of the pins.
+# int, a finite float, or a string that contains a numeric token, at its
+# address under ``values``. A bool and a label are not leaves. A pin covers
+# an address only when that address is the pin or a descendant of it.
+# Repeating one address does not cover a sibling that stores the same number.
 _EVIDENCE_LEAF_CATALOG = (
     ("alpha", 0.91),
     ("count", 3),
@@ -5613,46 +5669,96 @@ _EVIDENCE_LEAF_CATALOG = (
     ("printed", "0.24 mol"),
     ("series", [0.2, 0.5]),
 )
+_ORACLE_TEMPERATURE_KEYS = ("T_K", "T", "temperature_K", "temp_K")
 
 
-def _oracle_measured_leaves(value: object) -> list[tuple[type, object]]:
-    """Independent leaf rule for the generative coverage test."""
+def _oracle_measured_addresses(
+    value: object, prefix: tuple[object, ...] = ()
+) -> list[tuple[object, ...]]:
+    """Independent address rule. The gate's walker is not consulted."""
     if isinstance(value, bool):
         return []
     if isinstance(value, int):
-        return [(int, value)]
+        return [prefix]
     if isinstance(value, float):
         if not math.isfinite(value):
             return []
-        return [(float, value)]
+        return [prefix]
     if isinstance(value, str):
         if value.strip() and vle._NUMERIC_TOKEN_RE.search(value):
-            return [(str, value)]
+            return [prefix]
         return []
     if isinstance(value, dict):
-        found: list[tuple[type, object]] = []
-        for child in value.values():
-            found.extend(_oracle_measured_leaves(child))
+        found: list[tuple[object, ...]] = []
+        for key, child in value.items():
+            found.extend(_oracle_measured_addresses(child, prefix + (key,)))
         return found
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, list):
         found = []
-        for child in value:
-            found.extend(_oracle_measured_leaves(child))
+        for index, child in enumerate(value):
+            found.extend(_oracle_measured_addresses(child, prefix + (index,)))
         return found
     return []
 
 
-def _oracle_leaves_cover(
-    present: list[tuple[type, object]],
-    required: list[tuple[type, object]],
+def _oracle_pin_address(field: str | None, *, structured: bool) -> tuple[object, ...]:
+    """Address of one ``_values_pin_document`` field. ``None`` is the payload."""
+    if field is None:
+        return ()
+    if structured:
+        if field.startswith("["):
+            bracket, _sep, rest = field.partition("]")
+            if rest or not bracket[1:].isdigit():
+                raise AssertionError(field)
+            return (int(bracket[1:]),)
+        return (field,)
+    steps: list[object] = []
+    text = field
+    if text.startswith("["):
+        end = text.find("]")
+        inner = text[1:end]
+        if end < 0 or not inner.isdigit():
+            raise AssertionError(field)
+        steps.append(int(inner))
+        text = text[end + 1 :]
+        if text.startswith("."):
+            text = text[1:]
+        elif text:
+            raise AssertionError(field)
+        if not text:
+            return tuple(steps)
+    for segment in text.split("."):
+        bracket_at = segment.find("[")
+        if bracket_at < 0:
+            steps.append(segment)
+            continue
+        if segment.count("[") != 1 or not segment.endswith("]"):
+            raise AssertionError(segment)
+        key = segment[:bracket_at]
+        inner = segment[bracket_at + 1 : -1]
+        if not key or not inner.isdigit():
+            raise AssertionError(segment)
+        steps.append(key)
+        steps.append(int(inner))
+    return tuple(steps)
+
+
+def _oracle_addresses_cover(
+    required: list[tuple[object, ...]],
+    pins: list[tuple[str | None, object]],
+    *,
+    structured: bool,
 ) -> bool:
-    pool = list(present)
-    for leaf in required:
-        try:
-            pool.remove(leaf)
-        except ValueError:
-            return False
-    return True
+    """True when every required address has a pin that is it or its ancestor."""
+    if not required:
+        return True
+    covered: set[tuple[object, ...]] = set()
+    for field, _pinned in pins:
+        pin_address = _oracle_pin_address(field, structured=structured)
+        for leaf in required:
+            if leaf[: len(pin_address)] == pin_address:
+                covered.add(leaf)
+    return set(required) <= covered
 
 
 def _source_text_for(value: object) -> list[str]:
@@ -5676,25 +5782,170 @@ def _source_text_for(value: object) -> list[str]:
     return []
 
 
+def _value_at_address(
+    values: object, field: str, *, structured: bool
+) -> object:
+    """Payload node at the oracle address of ``field``. Independent of the gate."""
+    current = values
+    for step in _oracle_pin_address(field, structured=structured):
+        current = current[step]  # type: ignore[index]
+    return current
+
+
+def _oracle_temperature_index(points: object, target: object) -> int | None:
+    """First point whose temperature key matches. Independent of the gate."""
+    wanted = float(target)  # type: ignore[arg-type]
+    if not isinstance(points, list):
+        return None
+    for index, point in enumerate(points):
+        if not isinstance(point, dict):
+            continue
+        for key in _ORACLE_TEMPERATURE_KEYS:
+            if key not in point:
+                continue
+            try:
+                seen = float(point[key])
+            except (TypeError, ValueError):
+                continue
+            if math.isclose(seen, wanted, rel_tol=0.0, abs_tol=1e-6):
+                return index
+    return None
+
+
+def _selector_pin_address(values: object, extra: dict) -> tuple[object, ...]:
+    if "index" in extra:
+        address: tuple[object, ...] = (int(extra["index"]),)
+    else:
+        target = extra["T_K"] if "T_K" in extra else extra["T"]
+        found = _oracle_temperature_index(values, target)
+        if found is None:
+            raise AssertionError(extra)
+        address = (found,)
+    if "field" in extra:
+        address = address + (extra["field"],)
+    return address
+
+
+def _structured_selector_document(
+    root: Path,
+    *,
+    values: object,
+    pins: list[tuple[dict, object]],
+    source_text: str,
+) -> dict:
+    """Structured index or temperature pins. ``pins`` is (selector, value)."""
+    locator = _source_locator(root, source_text)
+    doc = _minimal_extract()
+    doc["review_status"] = "reviewed"
+    doc["species"]["Fe"]["observations"][0]["values"] = copy.deepcopy(values)
+    samples = []
+    for extra, value in pins:
+        sample = {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+            "value": copy.deepcopy(value),
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": dict(locator),
+        }
+        sample.update(extra)
+        samples.append(sample)
+    doc["fidelity_samples"] = samples
+    return doc
+
+
+def _check_temperature_addresses(root: Path, failures: list[str]) -> None:
+    """Equal P_Pa at two points. Repeating one point's P_Pa does not cover the other.
+
+    The temperatures differ, so they are pinned on their own addresses. A value
+    count still sees two 0.24 leaves and would accept the repeated pin.
+    """
+    for key in _ORACLE_TEMPERATURE_KEYS:
+        values = [
+            {key: 1700.0, "P_Pa": 0.24},
+            {key: 1800.0, "P_Pa": 0.24},
+        ]
+        sample_temperature = "T" if key == "T" else "T_K"
+        both_temperatures = [
+            ({sample_temperature: 1700.0, "field": key}, 1700.0),
+            ({sample_temperature: 1800.0, "field": key}, 1800.0),
+        ]
+        repeated = both_temperatures + [
+            ({sample_temperature: 1700.0, "field": "P_Pa"}, 0.24),
+            ({sample_temperature: 1700.0, "field": "P_Pa"}, 0.24),
+        ]
+        covered = both_temperatures + [
+            ({sample_temperature: 1700.0, "field": "P_Pa"}, 0.24),
+            ({sample_temperature: 1800.0, "field": "P_Pa"}, 0.24),
+        ]
+        for label, pins in (("repeat", repeated), ("each", covered)):
+            required = _oracle_measured_addresses(values)
+            got: set[tuple[object, ...]] = set()
+            for extra, _value in pins:
+                pin_address = _selector_pin_address(values, extra)
+                for leaf in required:
+                    if leaf[: len(pin_address)] == pin_address:
+                        got.add(leaf)
+            expect_cover = set(required) <= got
+            source = "\n".join(
+                line for _extra, value in pins for line in _source_text_for(value)
+            ) + "\n"
+            doc = _structured_selector_document(
+                root, values=values, pins=pins, source_text=source
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label="temperature", artifact_root=root
+            )
+            if expect_cover:
+                if errors:
+                    failures.append(f"temperature {key} {label} expected cover: {errors}")
+                continue
+            if "uncovered_observation" not in "\n".join(errors):
+                failures.append(
+                    f"temperature {key} {label} expected uncovered: {errors}"
+                )
+
+    # Structured index + field. Four equal numbers, three addresses.
+    values = [
+        {"P_Pa": 0.24, "other": 0.24},
+        {"P_Pa": 0.24, "other": 0.24},
+    ]
+    repeated_index = [
+        ({"index": 0, "field": "P_Pa"}, 0.24),
+        ({"index": 0, "field": "P_Pa"}, 0.24),
+        ({"index": 1, "field": "P_Pa"}, 0.24),
+        ({"index": 1, "field": "other"}, 0.24),
+    ]
+    source = "0.24\n"
+    doc = _structured_selector_document(
+        root, values=values, pins=repeated_index, source_text=source
+    )
+    errors = vle.certify_extract_source_fidelity(
+        doc, label="index-field", artifact_root=root
+    )
+    if "uncovered_observation" not in "\n".join(errors):
+        failures.append(f"structured index field expected uncovered: {errors}")
+
+
 def test_measured_number_coverage_enumerates_every_leaf_class(tmp_path: Path):
-    """Invariant: every measured number in ``values`` is inside some matching pin.
+    """Invariant: a measured leaf is covered only at its own address.
 
     The matrix is every non-empty subset of the leaf catalog, each single
     field and the whole payload, in both addressing modes. A split pair of
     pins must cover when each measured field is pinned and must refuse when
-    one measured field is left out. A list element does not cover its sibling.
+    one measured field is left out. Equal numbers at two addresses are a
+    separate class: repeating one address does not cover the other, including
+    nested keys, list indexes, and a field under an index.
     """
     names = [name for name, _value in _EVIDENCE_LEAF_CATALOG]
     catalog = dict(_EVIDENCE_LEAF_CATALOG)
     failures: list[str] = []
 
     def check(case: str, values: object, pins: list[tuple[str | None, object]], *, structured: bool) -> None:
-        required = _oracle_measured_leaves(values)
-        present: list[tuple[type, object]] = []
-        for _field, pinned in pins:
-            present.extend(_oracle_measured_leaves(pinned))
-        # No measured number: any values pin covers, because nothing is unchecked.
-        expect_cover = _oracle_leaves_cover(present, required) if required else True
+        required = _oracle_measured_addresses(values)
+        # No measured leaf: any values pin covers, because nothing is unchecked.
+        expect_cover = _oracle_addresses_cover(required, pins, structured=structured)
         source = "\n".join(
             line for _field, pinned in pins for line in _source_text_for(pinned)
         ) + "\n"
@@ -5737,7 +5988,7 @@ def test_measured_number_coverage_enumerates_every_leaf_class(tmp_path: Path):
             measured_fields = [
                 name
                 for name in chosen
-                if _oracle_measured_leaves(catalog[name])
+                if _oracle_measured_addresses(catalog[name])
             ]
             if len(measured_fields) >= 2:
                 check(
@@ -5792,7 +6043,125 @@ def test_measured_number_coverage_enumerates_every_leaf_class(tmp_path: Path):
     if "uncovered_observation" not in "\n".join(indexed):
         failures.append(f"list index expected uncovered: {indexed}")
 
+    # Same stored number, two addresses. The oracle refuses a repeated address
+    # and accepts one pin per address or one ancestor pin.
+    same = 0.24
+    point = {"P_Pa": same, "other": same}
+    collision_cases = (
+        ("siblings", {"alpha": same, "beta": same}, ("alpha", "beta"), False),
+        ("siblings-structured", {"alpha": same, "beta": same}, ("alpha", "beta"), True),
+        (
+            "nested",
+            {"pair": {"alpha": same, "beta": same}},
+            ("pair.alpha", "pair.beta"),
+            False,
+        ),
+        ("series", {"series": [same, same]}, ("series[0]", "series[1]"), False),
+        ("ints", {"count": 3, "copies": 3}, ("count", "copies"), False),
+        (
+            "printed",
+            {"left": "0.24 mol", "right": "0.24 mol"},
+            ("left", "right"),
+            False,
+        ),
+        (
+            "triple",
+            {"alpha": same, "beta": same, "gamma": same},
+            ("alpha", "beta", "gamma"),
+            False,
+        ),
+        ("list-root", [same, same], ("[0]", "[1]"), False),
+        ("list-root-structured", [same, same], ("[0]", "[1]"), True),
+        (
+            "index-field",
+            [point, dict(point)],
+            ("[0].P_Pa", "[0].other", "[1].P_Pa", "[1].other"),
+            False,
+        ),
+        (
+            "label-and-equals",
+            {"quantity": "alpha", "alpha": same, "beta": same},
+            ("alpha", "beta"),
+            False,
+        ),
+    )
+    for case, values, fields, structured in collision_cases:
+        leaves = {
+            field: _value_at_address(values, field, structured=structured)
+            for field in fields
+        }
+        # Repeat the first address once per measured leaf. A value count sees
+        # enough copies; the address oracle still misses every other address.
+        copies = len(_oracle_measured_addresses(values))
+        first = fields[0]
+        check(
+            f"repeat {case}",
+            values,
+            [(first, leaves[first])] * copies,
+            structured=structured,
+        )
+        check(
+            f"each {case}",
+            values,
+            [(field, leaves[field]) for field in fields],
+            structured=structured,
+        )
+        check(
+            f"ancestor {case}",
+            values,
+            [(None, values)],
+            structured=structured,
+        )
+    # Nested parent is an ancestor that is not the whole payload.
+    nested = {"pair": {"alpha": same, "beta": same}}
+    check(
+        "nested parent",
+        nested,
+        [("pair", nested["pair"])],
+        structured=False,
+    )
+    check(
+        "series parent",
+        {"series": [same, same]},
+        [("series", [same, same])],
+        structured=False,
+    )
+    # Two pins of the first index's first field, plus both fields of the second
+    # index, still leave the first index's other field unchecked. Four equal
+    # numbers would satisfy a value count.
+    check(
+        "index-field repeated sibling",
+        [point, dict(point)],
+        [
+            ("[0].P_Pa", same),
+            ("[0].P_Pa", same),
+            ("[1].P_Pa", same),
+            ("[1].other", same),
+        ],
+        structured=False,
+    )
+
+    _check_temperature_addresses(tmp_path, failures)
+
     assert failures == []
+
+
+def test_duplicate_alpha_pins_leave_equal_beta_uncovered(tmp_path: Path):
+    """Literal: two attested pins of ``values.alpha`` do not cover ``values.beta``.
+
+    Both stored numbers are 0.24. The artifact cites alpha twice and does not
+    cite beta. Counting the number 0.24 would accept the extract.
+    """
+    spec = _MEASURED_PIN_CASES["duplicate_alpha_pins"]
+    assert spec["source_text"] == "alpha 0.24 measured\nalpha 0.24 measured\n"
+    assert "beta" not in spec["source_text"]
+    doc = _values_pin_document(tmp_path, **spec)
+    errors = vle.certify_extract_source_fidelity(
+        doc, label="dup-alpha", artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    assert "uncovered_observation" in joined
+    assert "source_blind_pin" not in joined
 
 
 # Literal source text, written independently of the pin. A helper that copies
