@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
@@ -269,6 +270,9 @@ def test_cli_filters_hero_envelope_and_scores_flagged_but_excludes_refused_rows(
 
     assert completed.returncode == 0, completed.stderr
     report = json.loads(out.with_suffix(".json").read_text())
+    assert hashlib.sha256(out.with_suffix(".json").read_bytes()).hexdigest() == (
+        "19b0111dbc6b280c2692ea22f9200fbc2e7e26a0dbb9fe33876cb1a70f712b51"
+    )
     envelope = report["hero_envelope"]
     assert envelope["feedstock_composition_class"] == load_config_bundle().feedstocks[
         "lunar_mare_low_ti"
