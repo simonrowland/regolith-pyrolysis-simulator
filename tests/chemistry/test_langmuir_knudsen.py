@@ -189,6 +189,77 @@ def test_series_flux_default_inputs_keep_pre_extension_golden_values():
     }
 
 
+def test_series_flux_uses_total_pressure_mixture_and_printed_flow():
+    common = {
+        "species": "MnO_gas",
+        "p_eq_pa": 100.0,
+        "p_bulk_pa": 0.0,
+        "T_surface_K": 1800.0,
+        "molar_mass_kg_mol": 0.070937044,
+        "alpha": 0.5,
+        "total_pressure_pa": 101325.0,
+        "transport_length_m": 0.03,
+        "pipe_diameter_m": 0.042,
+    }
+    co_dominant = series_flux(
+        **common,
+        carrier_gas_mixture={"CO": 0.8, "CO2": 0.2},
+        flow_rate_sccm=200.0,
+    )
+    no_flow = series_flux(
+        **common,
+        carrier_gas_mixture={"CO": 0.8, "CO2": 0.2},
+        flow_rate_sccm=None,
+    )
+    co2_dominant = series_flux(
+        **common,
+        carrier_gas_mixture={"CO": 0.2, "CO2": 0.8},
+        flow_rate_sccm=200.0,
+    )
+    double_pressure = series_flux(
+        **{**common, "total_pressure_pa": 202650.0},
+        carrier_gas_mixture={"CO": 0.8, "CO2": 0.2},
+        flow_rate_sccm=200.0,
+    )
+
+    assert co_dominant.r_gas > 0.0
+    assert co_dominant.series.knudsen_number < 0.01
+    assert co_dominant.series.radial_stir_applied > no_flow.series.radial_stir_applied
+    assert co_dominant.r_gas < no_flow.r_gas
+    assert "carrier_gas_dominant_CO_approximated_as_N2" in (
+        co_dominant.transport_assumption_flags
+    )
+    assert co_dominant.series.d_ab_m2_s != co2_dominant.series.d_ab_m2_s
+    assert double_pressure.series.d_ab_m2_s == pytest.approx(
+        co_dominant.series.d_ab_m2_s / 2.0, rel=1e-14
+    )
+
+
+def test_series_flux_unprinted_flow_and_geometry_use_flagged_defaults():
+    result = series_flux(
+        "MnO_gas",
+        100.0,
+        0.0,
+        1800.0,
+        0.070937044,
+        0.5,
+        total_pressure_pa=101325.0,
+        carrier_gas_mixture={"CO2": 1.0},
+        flow_rate_sccm=None,
+        pipe_diameter_m=None,
+        transport_length_m=None,
+    )
+
+    assert result.series.radial_stir_applied == 1.0
+    assert result.series.transport_length_m == 0.12
+    assert "gas_flow_unprinted_default_radial_stir_factor_1" in (
+        result.transport_assumption_flags
+    )
+    assert "pipe_geometry_unprinted_default_0.12_m" in (
+        result.transport_assumption_flags
+    )
+
+
 def test_grounded_alpha_and_p_eq_match_provider_wiring():
     T_K = 1700.0
     alpha_na, _ = grounded_alpha("Na", T_K)

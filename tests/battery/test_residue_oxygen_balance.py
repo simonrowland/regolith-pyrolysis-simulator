@@ -762,6 +762,49 @@ def test_buffered_residue_keeps_printed_fo2_and_accounts_reservoir_exchange() ->
     assert result.atom_closure_mol["Fe"] == pytest.approx(0.0, abs=1.0e-15)
 
 
+def test_buffered_residue_passes_open_furnace_transport_to_series_flux(monkeypatch) -> None:
+    import simulator.chemistry.langmuir_knudsen as langmuir_knudsen
+    from simulator.battery.residue import ResidueChannel, integrate_residue_inventory
+
+    original_series_flux = langmuir_knudsen.series_flux
+    observed = []
+
+    def record_series_flux(*args, **kwargs):
+        result = original_series_flux(*args, **kwargs)
+        observed.append((kwargs, result))
+        return result
+
+    monkeypatch.setattr(langmuir_knudsen, "series_flux", record_series_flux)
+    conditions = {
+        "total_pressure_pa": 101_325.0,
+        "carrier_gas_mixture": {"CO2": 1.0},
+        "flow_rate_sccm": 200.0,
+        "pipe_diameter_m": 0.042,
+        "transport_length_m": 0.03,
+    }
+    result = integrate_residue_inventory(
+        {"FeO": 1.0e-3},
+        (ResidueChannel("Fe", "Fe", "FeO", 0.5, "test"),),
+        lambda _inventory, _logp: {"Fe": 1.0e-3},
+        temperature_K=1773.15,
+        duration_s=60.0,
+        area_evolution_m2=(1.0e-4,),
+        buffered_fO2_log=-4.0,
+        transport_conditions=conditions,
+    )
+
+    assert len(observed) == 1
+    kwargs, flux = observed[0]
+    assert kwargs["total_pressure_pa"] == 101_325.0
+    assert kwargs["carrier_gas_mixture"] == {"CO2": 1.0}
+    assert kwargs["flow_rate_sccm"] == 200.0
+    assert kwargs["pipe_diameter_m"] == 0.042
+    assert kwargs["transport_length_m"] == 0.03
+    assert flux.series.knudsen_number < 0.01
+    assert flux.r_gas > 0.0
+    assert result.evaporated_mol["Fe"] > 0.0
+
+
 @pytest.mark.parametrize(
     ("alpha", "zero_parent_pressure"),
     ((0.0, False), (0.2, True)),
