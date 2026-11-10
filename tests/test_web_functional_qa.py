@@ -512,6 +512,54 @@ def test_advisory_product_story_renders_unavailable_and_prediction_metadata() ->
     assert "includes estimated transport for SiO (status_bearing)" in text
 
 
+def test_advisory_prediction_metadata_renders_without_numeric_units() -> None:
+    payload = {
+        "product_story_status": "ok",
+        "product_story": {
+            "oxygen": {
+                "availability_flag": {
+                    "status": "partial",
+                    "authority": "provider_computed",
+                    "reason": "An omitted contribution is reported.",
+                },
+                "prediction_flag": {
+                    "status": "flagged prediction",
+                    "category": 3,
+                    "kind": "predict_and_flag",
+                    "authority": "extrapolated",
+                    "authority_level": "extrapolated",
+                    "band": "d-359 B/C/E follow-ups pending",
+                    "reason": "Interim class estimates are pending follow-ups.",
+                },
+            },
+        },
+        "products": {},
+    }
+    rendered = _render_product_story(
+        html=(
+            '<div id="product-ledger-state"></div>'
+            '<div id="product-ledger-content"></div>'
+        ),
+        payload=payload,
+    )
+
+    text = rendered["text"]["product-ledger-content"]
+    assert (
+        "prediction flag: authority extrapolated; "
+        "authority level extrapolated; "
+        "band d-359 B/C/E follow-ups pending; category 3; "
+        "kind predict_and_flag; "
+        "reason Interim class estimates are pending follow-ups.; "
+        "status flagged prediction"
+    ) in text, text
+    assert (
+        "availability flag: authority provider_computed; "
+        "reason An omitted contribution is reported.; status partial"
+    ) in text, text
+    assert "unavailable" not in text
+    assert " kg" not in text
+
+
 def test_advisory_product_story_renders_available_estimated_transport() -> None:
     payload = {
         "product_story_status": "ok",
