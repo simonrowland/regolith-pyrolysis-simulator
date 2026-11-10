@@ -1922,16 +1922,23 @@ def test_coverage_ledger_is_observation_first_and_exact(
     # The batch6 +16 named on the KEMS count move the total to 2085 and the
     # skipped count to 2064. Comparable stays 21: the new Ichise rows and the
     # Markova type move are typed refusals, not scored points.
+    # b-253 / d-374: hashimoto_1983_cao_al2o3_residue_enrichment was the
+    # second scored rate/order row (ordering-pass 6/6 on lunar_mare_low_ti).
+    # It names no composition, so that point is now
+    # typed-refusal:missing_condition:melt_composition. Comparable 21 -> 20,
+    # skipped 2064 -> 2065, comparable points 26 -> 25, gap points
+    # 2043 -> 2044. The Hashimoto volatility order stays scored (24/27).
     assert coverage["observations"] == sum(
         obs.adoption_basis != "superseded" for obs in adopted_observations
     ) == 2085
-    assert coverage["comparable"] == 21
-    assert coverage["skipped"] == 2064
+    assert coverage["comparable"] == 20
+    assert coverage["skipped"] == 2065
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
-    assert coverage["comparable_points"] == 26
+    assert coverage["comparable_points"] == 25
     # Gap records follow the same +16: Ichise Table 4 adds 17 gap points and
-    # the Markova VI row leaves one. Comparable points stay 26.
-    assert coverage["gap_points"] == 2043
+    # the Markova VI row leaves one, then the residue refusal replaces its
+    # scored point with one gap record.
+    assert coverage["gap_points"] == 2044
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")
@@ -1954,12 +1961,14 @@ def test_coverage_ledger_is_observation_first_and_exact(
         for key, row in by_type.items()
     } == {
         # activity +13, gibbs +4, rate -1: the Ichise Table 4 split and the
-        # Markova VI type move named on the KEMS count.
+        # Markova VI type move named on the KEMS count. b-253 withdraws the
+        # residue enrichment from the scored rate_series set: comparable
+        # 2 -> 1, skipped 818 -> 819, comparable points 2 -> 1.
         "activity_coefficient": (517, 1, 516, 1),
         "alpha": (71, 2, 69, 6),
         "gibbs_table": (305, 0, 305, 0),
         "psat_series": (260, 1, 259, 2),
-        "rate_series": (820, 2, 818, 2),
+        "rate_series": (820, 1, 819, 1),
         "transition_point": (112, 15, 97, 15),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
@@ -1972,7 +1981,9 @@ def test_coverage_ledger_is_observation_first_and_exact(
         "alpha": (71, 2, 6),
         "gibbs_table": (305, 0, 0),
         "ordering_activity": (120, 0, 0),
-        "ordering_bound": (161, 2, 2),
+        # The residue row stays ordering-not-evaluable, so it remains an
+        # ordering_bound observation, but it is no longer a scored point.
+        "ordering_bound": (161, 1, 1),
         "psat_series": (260, 1, 2),
         "rate_hkl": (658, 0, 0),
         "relative_volatility": (1, 0, 0),
