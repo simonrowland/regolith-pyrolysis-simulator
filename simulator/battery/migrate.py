@@ -9364,7 +9364,14 @@ def _percent_named_fraction_field(
     unit = re.sub(r"\s+", " ", str(units or "").strip().lower())
     if re.search(r"%\s+of\s+total\b", unit):
         return False
-    return bool(_PERCENT_FRACTION_UNIT_RE.search(unit))
+    clauses = unit.split(";")
+    if _PERCENT_FRACTION_UNIT_RE.search(clauses[0]):
+        return True
+    return any(
+        _PERCENT_FRACTION_UNIT_RE.search(clause)
+        and re.search(r"\b(?:fraction|yield|loss|evaporated|as printed)\b", clause)
+        for clause in clauses[1:]
+    )
 
 
 _NAMED_FRACTION_BOUND_PREFIX_RE = re.compile(
