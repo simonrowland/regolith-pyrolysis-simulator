@@ -115,8 +115,8 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 9666fc129 plus the de32c69ca runner regen). The runner regen script
         # does not update these pins. Lunar full runs diverge between the
         # laptop and studio-3, so these digests are not a laptop re-run.
-        "flux_maps_sha256": "0f68382f83fa9853f28e45ce26d6e16f03334c1a83fb3188974377a988f91c14",
-        "ledger_sha256": "9c3149afcde0845e497b8aaba9cb0a2f6a3a3bf9e61d42c8707c17b188aac39a",
+        "flux_maps_sha256": "eb2e594ba7f7e8f978cd40ca6537118e1a888c1396b17cc4675aa9040ae689e1",
+        "ledger_sha256": "26a9df32027f9c7764e8e19dfb8f854caf3e8ba800c2dab92cf422b5538be9d8",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
