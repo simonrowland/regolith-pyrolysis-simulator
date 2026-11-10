@@ -4135,6 +4135,8 @@ class _MELTSBackendSupport(MeltBackend):
             def number(name: str) -> float:
                 return float(values[headers.index(name)])
 
+            non_finite_columns: list[str] = []
+
             def optional_number(name: str) -> Optional[float]:
                 if name not in headers:
                     return None
@@ -4147,10 +4149,13 @@ class _MELTSBackendSupport(MeltBackend):
                     raise ValueError(
                         f'System_main_tbl.txt invalid {name}={raw_value!r}'
                     ) from exc
+                # nan/inf is not a property value. Omit it. Required columns
+                # (system mass, absolute fO2) still fail closed when the
+                # omitted value leaves them absent. A non-numeric token still
+                # raises: that row is not this typed omission.
                 if not math.isfinite(value):
-                    raise ValueError(
-                        f'System_main_tbl.txt non-finite {name}={raw_value!r}'
-                    )
+                    non_finite_columns.append(name)
+                    return None
                 return value
 
             fO2_index = next(
@@ -4209,6 +4214,10 @@ class _MELTSBackendSupport(MeltBackend):
                 and solid_density_g_cm3 > 0.0
                 else None
             )
+            if non_finite_columns:
+                payload['non_finite_system_columns'] = tuple(
+                    non_finite_columns
+                )
             return payload
         return {}
 
@@ -4837,6 +4846,26 @@ class _MELTSBackendSupport(MeltBackend):
             )
             if key in system_values
         }
+        non_finite_columns = tuple(
+            str(name)
+            for name in (system_values.get('non_finite_system_columns') or ())
+        )
+        non_finite_notice: dict[str, object] | None = None
+        if non_finite_columns:
+            # The engine returned an assemblage and a system row, and some
+            # thermo cells are nan. Keep the finite cells. Do not abort the
+            # run and do not publish nan as an enthalpy or entropy.
+            non_finite_notice = {
+                'kind': 'alphamelts_system_property_notice',
+                'reason': 'non_finite_system_property',
+                'authority': 'alphamelts',
+                'band': {'columns': list(non_finite_columns)},
+                'temperature_C': executed_temperature_C,
+            }
+            result_warnings.append(
+                'AlphaMELTS system table omitted non-finite columns: '
+                + ', '.join(non_finite_columns)
+            )
         result_diagnostics = self._merge_diagnostics(
             success_diagnostics,
             {
@@ -4848,6 +4877,11 @@ class _MELTSBackendSupport(MeltBackend):
                 **property_diagnostics,
                 'phase_instance_masses_solver_basis_kg': (
                     phase_instance_masses_kg
+                ),
+                **(
+                    {'alphamelts_system_property_notice': non_finite_notice}
+                    if non_finite_notice is not None
+                    else {}
                 ),
             },
         )

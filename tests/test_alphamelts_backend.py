@@ -2599,6 +2599,81 @@ def test_hour4_typed_vapor_outcome_is_visible_on_equilibrium_diagnostics(
     )
 
 
+# Captured at 160 C on the same lunar C2A superliquidus path. The assemblage
+# is stable and fO2, mass, V, and Cp are finite. H and S are the token nan.
+_NONFINITE_SYSTEM_ROW = (
+    "Title:regolith_pyrolysis_simulator\n"
+    "\n"
+    "System Thermodynamic Data:\n"
+    "index Pressure Temperature mass F phi H S V Cp dVdP*10^6 "
+    "dVdT*10^6 fO2(absolute) fO2-9.0) rhol rhos viscosity aH2O chisqr\n"
+    "1 1.00 160.00 101.890973 0.9996783730972626 0.999699 nan nan "
+    "33.862292 145.986649 -297.163069 2848.404292 -9.000 0.000 "
+    "3.008919 3.211769 15.942 n/a n/a\n"
+)
+
+
+def test_nonfinite_system_enthalpy_is_omitted_and_flagged():
+    """Kill mutation: abort_run_on_nonfinite_system_enthalpy."""
+    backend = AlphaMELTSBackend()
+    # Stdout liquid is 101.858164 g and the trace solid is 0.032809 g.
+    # Those sum to the system-table mass, and the printed melt fraction
+    # matches liquid mass / phase mass. A liquid-only row at the system
+    # mass would fail liquid_fraction_mismatch before the enthalpy check.
+    output = (
+        "<> Stable liquid solid assemblage achieved.\n"
+        "Initial alphaMELTS calculation at: P 1.000000 (bars), "
+        "T 160.000000 (C)\n"
+        "liquid: SiO2\n"
+        "101.858164 g 44.9571\n"
+        "clinopyroxene1: 0.032809 g\n"
+        "Melt fraction = 0.999678\n"
+    )
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=160.0,
+        total_input_kg=0.101890973,
+        system_output=_NONFINITE_SYSTEM_ROW,
+    )
+
+    assert result.status == 'ok'
+    assert result.system_enthalpy is None
+    assert result.system_entropy is None
+    assert result.system_volume == pytest.approx(33.862292e-6)
+    assert result.system_heat_capacity_Cp == pytest.approx(145.986649)
+    notice = result.diagnostics['alphamelts_system_property_notice']
+    assert notice['reason'] == 'non_finite_system_property'
+    assert notice['authority'] == 'alphamelts'
+    assert notice['band']['columns'] == ['H', 'S']
+    assert any('non-finite columns: H, S' in warning for warning in result.warnings)
+
+
+def test_nonfinite_system_fo2_still_refuses():
+    """A nan fO2 echo is not the optional-thermo omission."""
+    backend = AlphaMELTSBackend()
+    system = _NONFINITE_SYSTEM_ROW.replace('-9.000', 'nan', 1)
+    output = (
+        "<> Stable liquid solid assemblage achieved.\n"
+        "Initial alphaMELTS calculation at: P 1.000000 (bars), "
+        "T 160.000000 (C)\n"
+        "liquid: SiO2\n"
+        "101.890973 g 44.9571\n"
+        "Melt fraction = 0.999678\n"
+    )
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='absolute engine fO2',
+    ):
+        _parse_subprocess_fixture(
+            backend,
+            output,
+            temperature_C=160.0,
+            total_input_kg=0.101890973,
+            system_output=system,
+        )
+
+
 @pytest.mark.parametrize(
     'composition, provider_status, reason_fragment',
     [
