@@ -23,6 +23,7 @@ from enum import StrEnum
 
 from simulator.backend_names import (
     PROPRIETARY_ENGINE_NAME,
+    PROPRIETARY_ENGINE_REFUSAL_CODE,
     ProprietaryEngineRefusal,
     is_proprietary_engine,
     refuse_proprietary_engine_use as _refuse_proprietary_engine_use,
@@ -187,7 +188,7 @@ class RefusalReason(StrEnum):
     DECISION_RULE_MISSING = "decision_rule_missing"
     METRIC_DOMAIN = "metric_domain"
     UNSUPPORTED = "unsupported"
-    PROPRIETARY_ENGINE_EXCLUDED = "proprietary_engine_excluded"
+    PROPRIETARY_ENGINE_EXCLUDED = PROPRIETARY_ENGINE_REFUSAL_CODE
     NOT_PROBED = "not_probed"
     ATTEMPTED_UNAVAILABLE = "attempted_unavailable"
     ADMISSION_NOT_ADMITTED = "admission_not_admitted"

@@ -542,17 +542,15 @@ def test_engine_proprietary_is_the_only_hardcoded_policy_owner() -> None:
             continue
         path = ROOT / relative
         lines = path.read_text(encoding="utf-8").splitlines()
-        if relative != "simulator/battery/enums.py":
-            value_occurrences.extend(
-                f"{relative}:{number}" for number, line in enumerate(lines, 1)
-                if "proprietary_remote" in line
-            )
-        if relative != "simulator/battery/enums.py":
-            token_owners[relative] = [
-                f"{number}: {line.strip()}"
-                for number, line in enumerate(lines, 1)
-                if "Engine.PROPRIETARY_REMOTE" in line
-            ]
+        value_occurrences.extend(
+            f"{relative}:{number}" for number, line in enumerate(lines, 1)
+            if "proprietary_remote" in line
+        )
+        token_owners[relative] = [
+            f"{number}: {line.strip()}"
+            for number, line in enumerate(lines, 1)
+            if "Engine.PROPRIETARY_REMOTE" in line
+        ]
 
     score_registry = token_owners.pop("simulator/battery/score.py", [])
     assert [line.split(": ", 1)[1] for line in score_registry] == [
