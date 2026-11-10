@@ -30,12 +30,16 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   belong to the token, so 0.24 is not -0.24 or 0.24e-5, and 1.0 is not 1.
   A recorded locator that is not opened is source-blind. An equipment
   pin does not cover a measured payload. Coverage holds only when every
-  measured leaf address under that observation's ``values`` has a matching
-  pin of that address or of an ancestor. A measured leaf is a finite int
-  or float (not a boolean), or a string that contains a numeric token.
-  Repeating a pin of one address does not cover a sibling, even when the
-  numbers are equal. A descriptive label such as ``quantity: alpha`` does
-  not cover a sibling number.
+  measured leaf of the observation's evidence has a matching pin of that
+  address or of an ancestor. Evidence is ``values`` plus each scored
+  numeric condition the temperature payload copies beside it
+  (``T_range_K``, ``T_K``, ``T_C``, ``temperature_C``, ``temp_C``,
+  ``point_conditions``). A locator inside a condition is provenance, not
+  a leaf. A measured leaf is a finite int or float (not a boolean), or a
+  string that contains a numeric token. Repeating a pin of one address
+  does not cover a sibling, even when the numbers are equal, and a
+  ``values`` pin does not cover a sibling condition. A descriptive label
+  such as ``quantity: alpha`` does not cover a sibling number.
 * structured fidelity samples resolve rows in ``observations[]`` or the
   sibling ``context[]`` container (d-032); an id matching rows in both
   containers is an ambiguity error, not a silent pick
@@ -770,7 +774,9 @@ def _path_is_observation_evidence(path: str) -> bool:
 
     Required shape::
 
-        species.<id>.(observations|context)[<id|index>].(values|equipment)[....]
+        species.<id>.(observations|context)[<id|index>].(values|equipment|<condition>)[....]
+
+    ``<condition>`` is a scored numeric condition (``_SCORED_NUMERIC_CONDITIONS``).
     """
     if not path or not isinstance(path, str):
         return False
@@ -789,7 +795,8 @@ def _path_is_observation_evidence(path: str) -> bool:
     leaf_seg = _PATH_SEGMENT_RE.match(parts[3])
     if not leaf_seg:
         return False
-    return leaf_seg.group(1) in ("values", "equipment")
+    name = leaf_seg.group(1)
+    return name in ("values", "equipment") or name in _SCORED_NUMERIC_CONDITIONS
 
 
 def _sample_expected_value(sample: Mapping[str, Any]) -> Any:
@@ -1324,13 +1331,30 @@ def _finish_detail(reasons: list[str], extra: int) -> str:
     return text
 
 
-def _scored_observation_values(doc: Mapping[str, Any]) -> dict[tuple[str, str], Any]:
+# Observation fields the scored temperature payload copies beside ``values``
+# (simulator/battery/migrate.py, the select_declared_source temperature read).
+# This is the only condition set coverage walks. A new scored condition is
+# added here, not as another branch in the coverage loop.
+_SCORED_NUMERIC_CONDITIONS = (
+    "T_range_K",
+    "T_K",
+    "T_C",
+    "temperature_C",
+    "temp_C",
+    "point_conditions",
+)
+# A locator cites a condition. Its page numbers are not measured leaves.
+_CONDITION_PROVENANCE_KEYS = frozenset({"locator"})
+
+
+def _scored_observations(
+    doc: Mapping[str, Any],
+) -> dict[tuple[str, str], Mapping[str, Any]]:
     """Scored rows are ``species.*.observations[]`` with a non-empty id.
 
     Context rows are unscored (d-032) and are not part of this coverage set.
-    The mapped value is that observation's ``values`` payload.
     """
-    found: dict[tuple[str, str], Any] = {}
+    found: dict[tuple[str, str], Mapping[str, Any]] = {}
     species_map = doc.get("species") or {}
     if not isinstance(species_map, Mapping):
         return found
@@ -1343,8 +1367,33 @@ def _scored_observation_values(doc: Mapping[str, Any]) -> dict[tuple[str, str], 
                 continue
             observation_id = observation.get("observation_id")
             if isinstance(observation_id, str) and observation_id:
-                found[(str(species_id), observation_id)] = observation.get("values")
+                found[(str(species_id), observation_id)] = observation
     return found
+
+
+def _scored_measured_leaves(observation: Mapping[str, Any]) -> list[tuple[Any, ...]]:
+    """Measured leaves of ``values`` and of each scored numeric condition.
+
+    Addresses sit in one evidence tree. ``("values", "alpha")`` and
+    ``("T_range_K", 0)`` are different leaves even when the numbers are
+    equal. A ``locator`` inside a condition is provenance and is not a
+    leaf. Locator keys inside ``values`` stay leaves; that container is
+    unchanged.
+    """
+    leaves: list[tuple[Any, ...]] = []
+    if "values" in observation:
+        leaves.extend(_measured_leaf_addresses(observation.get("values"), ("values",)))
+    for key in _SCORED_NUMERIC_CONDITIONS:
+        if key not in observation or observation.get(key) is None:
+            continue
+        leaves.extend(
+            _measured_leaf_addresses(
+                observation.get(key),
+                (key,),
+                skip_keys=_CONDITION_PROVENANCE_KEYS,
+            )
+        )
+    return leaves
 
 
 def _path_selector_names_observation_id(sample: Mapping[str, Any]) -> bool:
@@ -1392,13 +1441,13 @@ def _sample_attestation_defects(sample: Mapping[str, Any]) -> list[str]:
     return defects
 
 
-def _sample_addresses_values(sample: Mapping[str, Any]) -> bool:
-    """True when the pin's address is under ``observation.values``.
+def _sample_addresses_scored_evidence(sample: Mapping[str, Any]) -> bool:
+    """True when the pin's address is ``values`` or a scored numeric condition.
 
-    This is not coverage. The fourth path segment is the payload container
-    (``species.<id>.observations[<id>].values...``). An equipment path may be
-    a legal sample and still must not contribute evidence. Structured samples
-    resolve through ``values`` only.
+    This is not coverage. The fourth path segment names the container.
+    An equipment path may be a legal sample and still must not contribute.
+    Structured samples resolve through ``values`` only; a condition needs
+    a path pin.
     """
     path_keys, structured_keys = _sample_addressing_keys(sample)
     if path_keys:
@@ -1411,7 +1460,10 @@ def _sample_addresses_values(sample: Mapping[str, Any]) -> bool:
         if len(parts) < 4:
             return False
         leaf = _PATH_SEGMENT_RE.match(parts[3])
-        return bool(leaf and leaf.group(1) == "values")
+        if not leaf:
+            return False
+        name = leaf.group(1)
+        return name == "values" or name in _SCORED_NUMERIC_CONDITIONS
     return bool(structured_keys)
 
 
@@ -1420,7 +1472,10 @@ _ADDRESS_MISS = object()
 
 
 def _measured_leaf_addresses(
-    value: Any, prefix: tuple[Any, ...] = ()
+    value: Any,
+    prefix: tuple[Any, ...] = (),
+    *,
+    skip_keys: frozenset[str] = frozenset(),
 ) -> list[tuple[Any, ...]]:
     """Addresses of measured leaves under ``value``.
 
@@ -1428,6 +1483,8 @@ def _measured_leaf_addresses(
     that contains a numeric token. The address is the path of mapping keys
     and list indexes from ``value``. A container is not a leaf. A label with
     no numeric token is not a leaf. ``()`` is a measured scalar payload.
+    ``skip_keys`` drops a provenance mapping (a condition ``locator``) and
+    does not apply when walking ``values``.
     """
     if isinstance(value, bool):
         return []
@@ -1442,12 +1499,22 @@ def _measured_leaf_addresses(
     if isinstance(value, Mapping):
         found: list[tuple[Any, ...]] = []
         for key, child in value.items():
-            found.extend(_measured_leaf_addresses(child, prefix + (key,)))
+            if key in skip_keys:
+                continue
+            found.extend(
+                _measured_leaf_addresses(
+                    child, prefix + (key,), skip_keys=skip_keys
+                )
+            )
         return found
     if isinstance(value, (list, tuple)):
         found = []
         for index, child in enumerate(value):
-            found.extend(_measured_leaf_addresses(child, prefix + (index,)))
+            found.extend(
+                _measured_leaf_addresses(
+                    child, prefix + (index,), skip_keys=skip_keys
+                )
+            )
         return found
     return []
 
@@ -1471,25 +1538,32 @@ def _step_bracket(cur: Any, bracket: str, address: list[Any]) -> Any:
     return _ADDRESS_MISS
 
 
-def _path_values_address(doc: Mapping[str, Any], path: Any) -> tuple[Any, ...] | None:
-    """Values-relative address of a path pin. ``()`` is the whole payload."""
+def _path_evidence_address(doc: Mapping[str, Any], path: Any) -> tuple[Any, ...] | None:
+    """Evidence-tree address of a path pin.
+
+    The first element is ``values`` or a scored condition key.
+    ``(container,)`` is that whole container. None covers nothing.
+    """
     if not isinstance(path, str):
         return None
     parts = path.split(".")
     if len(parts) < 4:
         return None
-    values_segment = _PATH_SEGMENT_RE.match(parts[3])
-    if values_segment is None or values_segment.group(1) != "values":
+    container_segment = _PATH_SEGMENT_RE.match(parts[3])
+    if container_segment is None:
+        return None
+    container = container_segment.group(1)
+    if container != "values" and container not in _SCORED_NUMERIC_CONDITIONS:
         return None
     try:
         observation = resolve_field_path(doc, ".".join(parts[:3]))
     except KeyError:
         return None
-    if not isinstance(observation, Mapping) or "values" not in observation:
+    if not isinstance(observation, Mapping) or container not in observation:
         return None
-    cur: Any = observation.get("values")
-    address: list[Any] = []
-    bracket = values_segment.group(2)
+    cur: Any = observation.get(container)
+    address: list[Any] = [container]
+    bracket = container_segment.group(2)
     if bracket is not None:
         cur = _step_bracket(cur, bracket, address)
         if cur is _ADDRESS_MISS:
@@ -1566,20 +1640,24 @@ def _structured_values_address(
     return tuple(address)
 
 
-def _sample_values_address(
+def _sample_evidence_address(
     doc: Mapping[str, Any], sample: Mapping[str, Any]
 ) -> tuple[Any, ...] | None:
-    """Address of this pin under ``observation.values``.
+    """Address of this pin in the scored evidence tree.
 
-    ``()`` pins the whole payload. None means the pin does not resolve to a
-    values node, so it covers nothing. The walk uses the same selectors as
-    ``resolve_fidelity_sample``: path brackets, structured ``index``, ``T_K``
-    / ``T``, and one ``field`` key.
+    ``("values",)`` pins the whole payload. ``("T_range_K",)`` pins that
+    whole condition. None means the pin does not resolve to scored evidence,
+    so it covers nothing. Structured samples address ``values`` only. The
+    walk uses the same selectors as ``resolve_fidelity_sample``: path
+    brackets, structured ``index``, ``T_K`` / ``T``, and one ``field`` key.
     """
     path_keys, _structured = _sample_addressing_keys(sample)
     if path_keys:
-        return _path_values_address(doc, sample.get(path_keys[0]))
-    return _structured_values_address(doc, sample)
+        return _path_evidence_address(doc, sample.get(path_keys[0]))
+    inner = _structured_values_address(doc, sample)
+    if inner is None:
+        return None
+    return ("values",) + inner
 
 
 def _parse_line_range(raw: Any) -> tuple[int, int] | None:
@@ -1903,16 +1981,20 @@ def fidelity_source_warnings(
 ) -> list[FidelityWarning]:
     """Count source-fidelity holes. Empty means the certification invariant holds.
 
-    Invariant: every measured leaf address under a scored observation's
-    ``values`` is covered only by a matching sample that names that
-    observation and whose address is that leaf or an ancestor of it.
-    Repeating a pin of one address does not cover a sibling, even when the
-    numbers are equal. A measured leaf is a finite int or float (not a
-    boolean), or a string that contains a numeric token. A descriptive label
-    is not a leaf and does not cover a sibling number. Several samples may
-    each pin part of the payload. Equipment pins and a numeric observation
-    index do not contribute. A payload with no measured leaf is covered by
-    any matching values pin, because no number is left unchecked. A pilot or
+    Invariant: every measured leaf of a scored observation's evidence is
+    covered only by a matching sample that names that observation and whose
+    address is that leaf or an ancestor of it. Evidence is ``values`` plus
+    each present scored numeric condition (``_SCORED_NUMERIC_CONDITIONS``):
+    the fields the scored temperature payload copies beside ``values``.
+    A locator inside a condition is provenance, not a leaf. Repeating a pin
+    of one address does not cover a sibling, even when the numbers are
+    equal, and a ``values`` pin does not cover a sibling condition. A
+    measured leaf is a finite int or float (not a boolean), or a string
+    that contains a numeric token. A descriptive label is not a leaf and
+    does not cover a sibling number. Several samples may each pin part of
+    the evidence. Equipment pins and a numeric observation index do not
+    contribute. Evidence with no measured leaf is covered by any matching
+    evidence pin, because no number is left unchecked. A pilot or
     unattested sample can still supply addresses toward
     ``uncovered_observation``; attestation is its own count. Certification
     refuses while any of these counts is non-zero: a pilot pin or an
@@ -1930,13 +2012,15 @@ def fidelity_source_warnings(
     elif not isinstance(samples, list):
         samples = []
 
-    value_map = _scored_observation_values(doc)
-    required = set(value_map)
+    observation_map = _scored_observations(doc)
+    required = set(observation_map)
     # Leaf addresses each observation still needs. This is the only coverage
     # write: a pin adds an address only when its own address is that leaf or
-    # an ancestor. Value equality does not transfer coverage to a sibling.
+    # an ancestor. Value equality does not transfer coverage to a sibling,
+    # and a values pin does not transfer coverage to a condition.
     needed_addresses = {
-        key: _measured_leaf_addresses(payload) for key, payload in value_map.items()
+        key: _scored_measured_leaves(observation)
+        for key, observation in observation_map.items()
     }
     covered_addresses: dict[tuple[str, str], set[tuple[Any, ...]]] = {
         key: set() for key in required
@@ -1998,10 +2082,10 @@ def fidelity_source_warnings(
             and observation_key is not None
             and observation_key in required
             and _path_selector_names_observation_id(sample)
-            and _sample_addresses_values(sample)
+            and _sample_addresses_scored_evidence(sample)
         ):
             addressed.add(observation_key)
-            pin_address = _sample_values_address(doc, sample)
+            pin_address = _sample_evidence_address(doc, sample)
             if pin_address is None:
                 continue
             for leaf in needed_addresses[observation_key]:
@@ -2009,10 +2093,11 @@ def fidelity_source_warnings(
                     covered_addresses[observation_key].add(leaf)
 
     # Invariant: an observation is covered only when every measured leaf
-    # address has a pin of that address or an ancestor. A repeated pin of
-    # one address does not cover an equal sibling.
+    # of its evidence has a pin of that address or an ancestor. A repeated
+    # pin of one address does not cover an equal sibling, and a values pin
+    # does not cover a scored condition.
     covered: set[tuple[str, str]] = set()
-    for key in value_map:
+    for key in observation_map:
         needed = needed_addresses[key]
         if not needed:
             if key in addressed:
@@ -2094,15 +2179,17 @@ def certify_extract_source_fidelity(
 ) -> list[str]:
     """Refuse source certification while any fidelity hole remains.
 
-    Invariant: an empty list is the only pass. Every measured leaf address
-    in a scored observation's ``values`` must be covered by a matching,
-    non-pilot, attested sample whose address is that leaf or an ancestor,
-    and whose source artifact was opened and contains each pinned number
-    as a complete token. Repeating a pin of one address does not cover a
-    sibling, even when the numbers are equal. A descriptive label does not
-    stand in for a number it does not contain. The extract itself and
-    program source do not qualify. Equipment pins, unopened locators, and
-    copied values that are absent from the artifact refuse. ``warnings`` is
+    Invariant: an empty list is the only pass. Every measured leaf of a
+    scored observation's evidence (``values`` and each scored numeric
+    condition) must be covered by a matching, non-pilot, attested sample
+    whose address is that leaf or an ancestor, and whose source artifact
+    was opened and contains each pinned number as a complete token.
+    Repeating a pin of one address does not cover a sibling, even when the
+    numbers are equal, and a ``values`` pin does not cover a sibling
+    condition. A descriptive label does not stand in for a number it does
+    not contain. The extract itself and program source do not qualify.
+    Equipment pins, unopened locators, and copied values that are absent
+    from the artifact refuse. ``warnings`` is
     accepted for existing callers and is not the decision: a supplied empty
     list cannot hide a hole.
     """
@@ -2459,8 +2546,9 @@ def _check_fidelity_sample_shape(
 
     When ``enforce_observation_paths`` is True (non-allowlisted / new extracts),
         path-based samples must pin under
-        ``species.*.(observations|context)[...].(values|equipment)`` so
-        metadata-only paths cannot satisfy the gate.
+        ``species.*.(observations|context)[...].(values|equipment|<condition>)``
+        so metadata-only paths cannot satisfy the gate. ``<condition>`` is
+        a scored numeric condition.
     """
     path_keys, structured_keys = _sample_addressing_keys(sample)
     path = sample.get(path_keys[0]) if len(path_keys) == 1 else None
@@ -2484,7 +2572,7 @@ def _check_fidelity_sample_shape(
             errors.append(
                 f"{sp}: path-based fidelity sample on new extracts must pin "
                 f"observation or context evidence "
-                f"(species.*.(observations|context)[id].(values|equipment)...); "
+                f"(species.*.(observations|context)[id].(values|equipment|<condition>)...); "
                 f"got path={path!r} (metadata-only paths refused)"
             )
     if "value" not in sample and "draft_value" not in sample:

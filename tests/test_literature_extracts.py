@@ -2439,11 +2439,13 @@ def test_fresh_unattested_extract_warns_and_refuses_certification():
         "unattested_sample",
         "auto_migrated_pilot_pin",
     }
-    assert by_kind["uncovered_observation"].count == 1
+    # The pilot pin covers values.alpha only. The fixture T_range_K is a
+    # second measured leaf, so the pinned row is uncovered too.
+    assert by_kind["uncovered_observation"].count == 2
     assert by_kind["unattested_sample"].count == 1
     assert by_kind["auto_migrated_pilot_pin"].count == 1
     rendered = " ".join(warning.render() for warning in warnings)
-    assert "uncovered_observation count=1" in rendered
+    assert "uncovered_observation count=2" in rendered
     assert "reviewed_by is required for source attestation" in rendered
     assert "auto-migrated pilot sample cannot be source-attested" in rendered
     refusals = vle.certify_extract_source_fidelity(doc, warnings=warnings)
@@ -2496,6 +2498,7 @@ def test_attested_page_locator_without_an_opened_artifact_does_not_certify():
     ``review_status: reviewed`` does not.
     """
     doc = _minimal_extract()
+    _strip_scored_conditions(doc)
     sample = doc["fidelity_samples"][0]
     sample["reviewed_by"] = "independent reviewer"
     sample["reviewed_on"] = "2026-11-10"
@@ -5078,10 +5081,14 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # observation only when the pins together contain every measured number.
 # Descriptive labels, printed numeric strings, and partial numeric pins that
 # used to clear coverage are now uncovered: 46,343 -> 48,603 observations and
-# 525 -> 611 extracts. Unattested samples, pilot pins, and source-blind pins
-# did not move. Each ceiling may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 48603
-_UNCOVERED_EXTRACTS_CEILING = 611
+# 525 -> 611 extracts. Scored numeric conditions beside ``values``
+# (T_range_K, T_K, T_C, temperature_C, temp_C, point_conditions, with
+# condition locators excluded) then uncover rows whose values were fully
+# pinned: 48,603 -> 48,631 observations and 611 -> 616 extracts.
+# Unattested samples, pilot pins, and source-blind pins did not move.
+# Each ceiling may only fall.
+_UNCOVERED_OBSERVATIONS_CEILING = 48631
+_UNCOVERED_EXTRACTS_CEILING = 616
 _UNATTESTED_SAMPLES_CEILING = 3128
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
@@ -5142,6 +5149,19 @@ def test_auto_migrated_pilot_pin_counts_each_sample():
     assert pilot.count == 2
 
 
+def _strip_scored_conditions(doc: dict) -> None:
+    """Remove scored conditions so a values-only fixture stays values-only."""
+    species = doc.get("species") or {}
+    for block in species.values():
+        if not isinstance(block, dict):
+            continue
+        for row in block.get("observations") or []:
+            if not isinstance(row, dict):
+                continue
+            for key in vle._SCORED_NUMERIC_CONDITIONS:
+                row.pop(key, None)
+
+
 def _opened_payload_document(root: Path, *, structured: bool) -> dict:
     """One scored observation whose pin is in an opened text artifact."""
     artifact = root / "text" / "paper.txt"
@@ -5151,6 +5171,7 @@ def _opened_payload_document(root: Path, *, structured: bool) -> dict:
         encoding="utf-8",
     )
     doc = _minimal_extract()
+    _strip_scored_conditions(doc)
     doc["review_status"] = "reviewed"
     locator = {"source_path": "text/paper.txt", "line_range": "5-5", "page": 2}
     if structured:
@@ -5192,6 +5213,7 @@ def _values_pin_document(
     """Attested pins of ``values``. ``None`` as the field pins the whole payload."""
     locator = _source_locator(root, source_text)
     doc = _minimal_extract()
+    _strip_scored_conditions(doc)
     doc["review_status"] = "reviewed"
     doc["species"]["Fe"]["observations"][0]["values"] = copy.deepcopy(values)
     samples = []
@@ -5836,6 +5858,7 @@ def _structured_selector_document(
     """Structured index or temperature pins. ``pins`` is (selector, value)."""
     locator = _source_locator(root, source_text)
     doc = _minimal_extract()
+    _strip_scored_conditions(doc)
     doc["review_status"] = "reviewed"
     doc["species"]["Fe"]["observations"][0]["values"] = copy.deepcopy(values)
     samples = []
@@ -6164,6 +6187,553 @@ def test_duplicate_alpha_pins_leave_equal_beta_uncovered(tmp_path: Path):
     assert "source_blind_pin" not in joined
 
 
+def _temperature_range_document(root: Path, *, pin_range: bool) -> dict:
+    """Reviewer row: opened alpha pin, unpinned ``T_range_K: [2000, 2300]``.
+
+    The artifact cites alpha and does not cite the temperature bounds.
+    """
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text("alpha 0.24 measured\n", encoding="utf-8")
+    doc = _minimal_extract()
+    doc["review_status"] = "reviewed"
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["values"] = {"alpha": 0.24}
+    observation["T_range_K"] = [2000, 2300]
+    locator = {"source_path": "text/paper.txt", "line_range": "1-1", "page": 2}
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values.alpha",
+            "value": 0.24,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": dict(locator),
+        }
+    ]
+    if pin_range:
+        artifact.write_text("alpha 0.24 measured\n2000\n2300\n", encoding="utf-8")
+        doc["fidelity_samples"].append(
+            {
+                "path": "species.Fe.observations[fe_alpha_1].T_range_K",
+                "value": [2000, 2300],
+                "reviewed_by": "independent reviewer",
+                "reviewed_on": "2026-11-10",
+                "locator": {
+                    "source_path": "text/paper.txt",
+                    "line_range": "1-3",
+                    "page": 2,
+                },
+            }
+        )
+    return doc
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_unpinned_temperature_range_refuses_every_promoter(
+    entry: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """An opened alpha pin does not cover a sibling ``T_range_K``.
+
+    This is the kems-008 temperature-range hole: the stored bounds can be
+    wrong and every promoter still accepts the extract when coverage only
+    walks ``values``.
+    """
+    doc = _temperature_range_document(tmp_path, pin_range=False)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    assert errors, (entry, errors)
+    if entry == "certify":
+        joined = "\n".join(errors)
+        assert "uncovered_observation" in joined
+        assert "source_blind_pin" not in joined
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (entry, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == "uncovered_observation" for warning in warnings)
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_pinned_temperature_range_passes_every_promoter(
+    entry: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """A path pin of the whole range covers both bounds when the artifact has them."""
+    doc = _temperature_range_document(tmp_path, pin_range=True)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    assert errors == [], (entry, errors)
+
+
+def _scored_condition_document(
+    root: Path,
+    *,
+    condition_key: str,
+    condition_value: object,
+    values: object,
+    pins: list[tuple[str, str | None, object]],
+    source_lines: tuple[str, ...],
+) -> dict:
+    """One Fe observation plus the listed attested pins.
+
+    A pin is ``("path", path, value)`` or ``("structured", None, value)``.
+    ``source_lines`` is the literal artifact, not a copy of an unpinned leaf.
+    """
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text("\n".join(source_lines) + "\n", encoding="utf-8")
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["review_status"] = "reviewed"
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["values"] = copy.deepcopy(values)
+    if condition_value is not None:
+        observation[condition_key] = copy.deepcopy(condition_value)
+    locator = {"source_path": "text/paper.txt", "page": 2}
+    samples = []
+    for kind, path, value in pins:
+        sample: dict = {
+            "value": copy.deepcopy(value),
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": dict(locator),
+        }
+        if kind == "structured":
+            sample.update(
+                {
+                    "species": "Fe",
+                    "observable": "alpha",
+                    "observation_id": "fe_alpha_1",
+                    "field": "alpha",
+                }
+            )
+        elif kind == "path":
+            sample["path"] = path
+        else:
+            raise AssertionError(kind)
+        samples.append(sample)
+    doc["fidelity_samples"] = samples
+    return doc
+
+
+def test_scored_condition_coverage_enumerates_every_condition(tmp_path: Path):
+    """Invariant: every scored condition leaf is covered only at its address.
+
+    The matrix is every key in ``_SCORED_NUMERIC_CONDITIONS``, each input
+    class of that key (range, scalar, nested state, locator page, equal
+    siblings), and both addressing modes for ``values``. Expected results
+    are written on the case. A values-only oracle does not decide them.
+    """
+    alpha_path = "species.Fe.observations[fe_alpha_1].values.alpha"
+    values_alpha = ("path", alpha_path, 0.24)
+    structured_alpha = ("structured", None, 0.24)
+    alpha_lines = ("alpha 0.24 measured",)
+    failures: list[str] = []
+    seen: set[str] = set()
+
+    def check(
+        case: str,
+        key: str,
+        condition: object,
+        pins: list[tuple[str, str | None, object]],
+        lines: tuple[str, ...],
+        expect: str,
+        *,
+        values: object = None,
+        mutate=None,
+    ) -> None:
+        seen.add(key)
+        doc = _scored_condition_document(
+            tmp_path,
+            condition_key=key,
+            condition_value=condition,
+            values={"alpha": 0.24} if values is None else values,
+            pins=pins,
+            source_lines=lines,
+        )
+        if mutate is not None:
+            mutate(doc)
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=case, artifact_root=tmp_path
+        )
+        joined = "\n".join(errors)
+        if expect == "cover":
+            if errors:
+                failures.append(f"{case} expected cover: {errors}")
+            return
+        if expect == "uncovered":
+            if "uncovered_observation" not in joined:
+                failures.append(f"{case} expected uncovered: {errors}")
+            if "source_blind_pin" in joined:
+                failures.append(f"{case} source_blind masked coverage: {errors}")
+            return
+        if expect == "source_blind":
+            if "source_blind_pin" not in joined or "uncovered_observation" in joined:
+                failures.append(f"{case} expected source_blind only: {errors}")
+            return
+        raise AssertionError(expect)
+
+    distinct = [2000, 2300]
+    whole = ("path", "species.Fe.observations[fe_alpha_1].T_range_K", distinct)
+    bound0 = ("path", "species.Fe.observations[fe_alpha_1].T_range_K[0]", 2000)
+    bound1 = ("path", "species.Fe.observations[fe_alpha_1].T_range_K[1]", 2300)
+    check(
+        "T_range values only",
+        "T_range_K",
+        distinct,
+        [values_alpha],
+        alpha_lines,
+        "uncovered",
+    )
+    check(
+        "T_range whole",
+        "T_range_K",
+        distinct,
+        [values_alpha, whole],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "cover",
+    )
+    check(
+        "T_range one bound",
+        "T_range_K",
+        distinct,
+        [values_alpha, bound0],
+        ("alpha 0.24 measured", "2000"),
+        "uncovered",
+    )
+    check(
+        "T_range both bounds",
+        "T_range_K",
+        distinct,
+        [values_alpha, bound0, bound1],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "cover",
+    )
+    check(
+        "T_range structured values",
+        "T_range_K",
+        distinct,
+        [structured_alpha],
+        alpha_lines,
+        "uncovered",
+    )
+    check(
+        "T_range structured plus path",
+        "T_range_K",
+        distinct,
+        [structured_alpha, whole],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "cover",
+    )
+    check(
+        "T_range numeric index",
+        "T_range_K",
+        distinct,
+        [
+            values_alpha,
+            ("path", "species.Fe.observations[0].T_range_K", distinct),
+        ],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "uncovered",
+    )
+    check(
+        "T_range condition only",
+        "T_range_K",
+        distinct,
+        [whole],
+        ("2000", "2300"),
+        "uncovered",
+    )
+    check(
+        "T_range copied into values",
+        "T_range_K",
+        distinct,
+        [
+            (
+                "path",
+                "species.Fe.observations[fe_alpha_1].values",
+                {"alpha": 0.24, "bounds": distinct},
+            )
+        ],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "uncovered",
+        values={"alpha": 0.24, "bounds": [2000, 2300]},
+    )
+    equal = [1700.0, 1700.0]
+    equal0 = ("path", "species.Fe.observations[fe_alpha_1].T_range_K[0]", 1700.0)
+    equal1 = ("path", "species.Fe.observations[fe_alpha_1].T_range_K[1]", 1700.0)
+    check(
+        "T_range equal bound repeated",
+        "T_range_K",
+        equal,
+        [values_alpha, equal0, equal0],
+        ("alpha 0.24 measured", "1700.0", "1700.0"),
+        "uncovered",
+    )
+    check(
+        "T_range equal both bounds",
+        "T_range_K",
+        equal,
+        [values_alpha, equal0, equal1],
+        ("alpha 0.24 measured", "1700.0", "1700.0"),
+        "cover",
+    )
+    printed = ["2000", "2300"]
+    check(
+        "T_range printed strings unpinned",
+        "T_range_K",
+        printed,
+        [values_alpha],
+        alpha_lines,
+        "uncovered",
+    )
+    check(
+        "T_range printed strings pinned",
+        "T_range_K",
+        printed,
+        [
+            values_alpha,
+            ("path", "species.Fe.observations[fe_alpha_1].T_range_K", printed),
+        ],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "cover",
+    )
+    check(
+        "T_range copied wrong bounds",
+        "T_range_K",
+        distinct,
+        [values_alpha, whole],
+        ("alpha 0.24 measured", "1700", "1800"),
+        "source_blind",
+    )
+
+    for key, number in (
+        ("T_K", 1700.0),
+        ("T_C", 1427),
+        ("temperature_C", "1427"),
+        ("temp_C", 1427.0),
+    ):
+        condition_pin = (
+            "path",
+            f"species.Fe.observations[fe_alpha_1].{key}",
+            number,
+        )
+        number_line = str(number)
+        check(
+            f"{key} values only",
+            key,
+            number,
+            [values_alpha],
+            alpha_lines,
+            "uncovered",
+        )
+        check(
+            f"{key} pinned",
+            key,
+            number,
+            [values_alpha, condition_pin],
+            ("alpha 0.24 measured", number_line),
+            "cover",
+        )
+        check(
+            f"{key} structured values",
+            key,
+            number,
+            [structured_alpha],
+            alpha_lines,
+            "uncovered",
+        )
+        check(
+            f"{key} condition only",
+            key,
+            number,
+            [condition_pin],
+            (number_line,),
+            "uncovered",
+        )
+
+    nested = {
+        "temperature_K": {
+            "state": {"tag": "value", "value": 1773},
+            "locator": {"page": 4},
+        }
+    }
+    state_pin = (
+        "path",
+        "species.Fe.observations[fe_alpha_1].point_conditions.temperature_K.state.value",
+        1773,
+    )
+    page_pin = (
+        "path",
+        "species.Fe.observations[fe_alpha_1].point_conditions.temperature_K.locator.page",
+        4,
+    )
+    check(
+        "point_conditions values only",
+        "point_conditions",
+        nested,
+        [values_alpha],
+        alpha_lines,
+        "uncovered",
+    )
+    check(
+        "point_conditions state value",
+        "point_conditions",
+        nested,
+        [values_alpha, state_pin],
+        ("alpha 0.24 measured", "1773"),
+        "cover",
+    )
+    check(
+        "point_conditions locator page",
+        "point_conditions",
+        nested,
+        [values_alpha, page_pin],
+        ("alpha 0.24 measured", "4"),
+        "uncovered",
+    )
+    check(
+        "point_conditions whole",
+        "point_conditions",
+        nested,
+        [
+            values_alpha,
+            ("path", "species.Fe.observations[fe_alpha_1].point_conditions", nested),
+        ],
+        ("alpha 0.24 measured", "value", "1773", "4"),
+        "cover",
+    )
+    siblings = {
+        "temperature_K": {"state": {"tag": "value", "value": 1700}},
+        "reference_temperature_K": {"state": {"tag": "value", "value": 1700}},
+    }
+    sibling_a = (
+        "path",
+        "species.Fe.observations[fe_alpha_1].point_conditions.temperature_K.state.value",
+        1700,
+    )
+    sibling_b = (
+        "path",
+        "species.Fe.observations[fe_alpha_1].point_conditions.reference_temperature_K.state.value",
+        1700,
+    )
+    check(
+        "point_conditions equal sibling repeated",
+        "point_conditions",
+        siblings,
+        [values_alpha, sibling_a, sibling_a],
+        ("alpha 0.24 measured", "1700", "1700"),
+        "uncovered",
+    )
+    check(
+        "point_conditions equal siblings split",
+        "point_conditions",
+        siblings,
+        [values_alpha, sibling_a, sibling_b],
+        ("alpha 0.24 measured", "1700", "1700"),
+        "cover",
+    )
+    unknown = {
+        "temperature_K": {
+            "state": {"tag": "unknown", "reason": "not printed"},
+            "locator": {"page": 4, "published_page": 199},
+        }
+    }
+    check(
+        "point_conditions locator is not a leaf",
+        "point_conditions",
+        unknown,
+        [values_alpha],
+        alpha_lines,
+        "cover",
+    )
+    bare = {"temperature_K": 1773}
+    check(
+        "point_conditions bare number",
+        "point_conditions",
+        bare,
+        [
+            values_alpha,
+            (
+                "path",
+                "species.Fe.observations[fe_alpha_1].point_conditions.temperature_K",
+                1773,
+            ),
+        ],
+        ("alpha 0.24 measured", "1773"),
+        "cover",
+    )
+    check(
+        "point_conditions bare number unpinned",
+        "point_conditions",
+        bare,
+        [values_alpha],
+        alpha_lines,
+        "uncovered",
+    )
+
+    def add_magnesium(doc: dict) -> None:
+        doc["species"]["Mg"] = {
+            "observations": [
+                {
+                    "observation_id": "mg_alpha_1",
+                    "type": "alpha",
+                    "locator": {"table": "1", "page": 2},
+                    "units": "dimensionless",
+                    "values": {"alpha": 0.24},
+                    "T_range_K": [2000, 2300],
+                }
+            ]
+        }
+
+    check(
+        "second species",
+        "T_range_K",
+        distinct,
+        [values_alpha, whole],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "uncovered",
+        mutate=add_magnesium,
+    )
+
+    def add_context_range(doc: dict) -> None:
+        doc["species"]["Fe"]["context"] = [
+            {
+                "observation_id": "fe_bench_note",
+                "type": "apparatus",
+                "locator": {"page": 3, "section": "experimental"},
+                "units": "as printed",
+                "values": {"furnace": "muffle"},
+                "T_range_K": [2000, 2300],
+            }
+        ]
+
+    check(
+        "context range does not cover scored range",
+        "T_range_K",
+        distinct,
+        [
+            values_alpha,
+            (
+                "path",
+                "species.Fe.context[fe_bench_note].T_range_K",
+                distinct,
+            ),
+        ],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "uncovered",
+        mutate=add_context_range,
+    )
+
+    missing = set(vle._SCORED_NUMERIC_CONDITIONS) - seen
+    assert not missing, missing
+    assert failures == []
+
+
 # Literal source text, written independently of the pin. A helper that copies
 # the pin into the artifact cannot show these refusals.
 _TOKEN_CASES = (
@@ -6202,6 +6772,7 @@ def _literal_source_document(root: Path, pin: object, source_text: str) -> dict:
     artifact.parent.mkdir(parents=True, exist_ok=True)
     artifact.write_text(source_text, encoding="utf-8")
     doc = _minimal_extract()
+    _strip_scored_conditions(doc)
     doc["review_status"] = "reviewed"
     doc["species"]["Fe"]["observations"][0]["values"] = {"alpha": pin}
     doc["fidelity_samples"] = [

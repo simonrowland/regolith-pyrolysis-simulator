@@ -38,7 +38,15 @@ def _document() -> dict:
                 "locator": {"page": 2, "pdf_page_index": 1, "table": "1"},
                 "reviewed_by": "pytest fixture reviewer",
                 "reviewed_on": "2026-11-10",
-            }
+            },
+            {
+                "path": "species.Fe.observations[fe_alpha_1].T_range_K",
+                "value": [1700.0, 1800.0],
+                "note": "fixture temperature-range pin",
+                "locator": {"page": 2, "pdf_page_index": 1, "table": "1"},
+                "reviewed_by": "pytest fixture reviewer",
+                "reviewed_on": "2026-11-10",
+            },
         ],
         "species": {
             "Fe": {
@@ -854,6 +862,8 @@ def test_mixed_series_transition_compositions_are_checked_per_point(
         ],
     }
     doc["species"] = {"FeO": {"observations": [row]}}
+    row.pop("T_range_K", None)
+    doc["fidelity_samples"] = [doc["fidelity_samples"][0]]
     # The whole values payload: one temperature does not cover the other
     # measured numbers in the points.
     doc["fidelity_samples"][0]["path"] = (
@@ -891,6 +901,8 @@ def test_inherited_transition_composition_applies_to_unmarked_points(
         ],
     }
     doc["species"] = {"FeO": {"observations": [row]}}
+    row.pop("T_range_K", None)
+    doc["fidelity_samples"] = [doc["fidelity_samples"][0]]
     # The whole values payload: one temperature does not cover the composition
     # numbers or the other point.
     doc["fidelity_samples"][0]["path"] = (
@@ -1158,7 +1170,28 @@ def test_cli_audits_extract_with_explicit_tree(tmp_path: Path, capsys):
             "locator": {"source_path": artifact_rel, "page": 1, "table": "1"},
         }
     )
-    artifact.write_text(" ".join(_cited_tokens(pinned)) + "\n", encoding="utf-8")
+    doc["fidelity_samples"][1]["locator"] = {
+        "source_path": artifact_rel,
+        "page": 1,
+        "table": "1",
+    }
+    point = observation["point_conditions"]["temperature_K"]["state"]["value"]
+    doc["fidelity_samples"].append(
+        {
+            "path": (
+                "species.Fe.observations[fe_alpha_1]"
+                ".point_conditions.temperature_K.state.value"
+            ),
+            "value": point,
+            "reviewed_by": "pytest fixture reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": {"source_path": artifact_rel, "page": 1, "table": "1"},
+        }
+    )
+    tokens = _cited_tokens(pinned)
+    for sample in doc["fidelity_samples"][1:]:
+        tokens.extend(_cited_tokens(sample["value"]))
+    artifact.write_text(" ".join(tokens) + "\n", encoding="utf-8")
     try:
         path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
 
