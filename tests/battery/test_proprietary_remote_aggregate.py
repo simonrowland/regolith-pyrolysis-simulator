@@ -560,7 +560,9 @@ def test_engine_proprietary_is_the_only_hardcoded_policy_owner() -> None:
         "Engine.PROPRIETARY_REMOTE: (),",
     ]
     assert not {path: lines for path, lines in token_owners.items() if lines}
-    assert not value_occurrences
+    assert [item.split(":", 1)[0] for item in value_occurrences] == [
+        "simulator/backend_names.py"
+    ]
     assert Engine.PROPRIETARY_REMOTE.proprietary
     assert all(
         not engine.proprietary

@@ -31,8 +31,8 @@ from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
+    refuse_proprietary_engine_use,
 )
-from simulator.battery.enums import refuse_proprietary_engine_use
 from simulator.backends import (
     BackendSelectionPolicy,
     BackendUnavailableError,

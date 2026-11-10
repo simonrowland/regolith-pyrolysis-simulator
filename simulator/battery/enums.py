@@ -21,6 +21,12 @@ from __future__ import annotations
 from decimal import Decimal
 from enum import StrEnum
 
+from simulator.backend_names import (
+    PROPRIETARY_ENGINE_NAME,
+    ProprietaryEngineRefusal,
+    is_proprietary_engine,
+    refuse_proprietary_engine_use as _refuse_proprietary_engine_use,
+)
 from simulator.state_types import StateTag
 
 
@@ -37,13 +43,13 @@ class Engine(StrEnum):
     VAPOROCK = "vaporock"
     MAGEMIN = "magemin"
     OPENIMCC = "openimcc"
-    PROPRIETARY_REMOTE = "proprietary_remote"
+    PROPRIETARY_REMOTE = PROPRIETARY_ENGINE_NAME
 
     @property
     def proprietary(self) -> bool:
         """Whether this engine's outputs require the aggregate-only route."""
 
-        return self is Engine.PROPRIETARY_REMOTE
+        return is_proprietary_engine(self)
 
 
 class Fo2Mode(StrEnum):
@@ -208,28 +214,18 @@ class RefusalReason(StrEnum):
     CAPACITY_DEFINITION_NOT_IMPLEMENTED = "capacity_definition_not_implemented"
 
 
-class ProprietaryEngineRefusal(ValueError):
-    """Typed refusal when a proprietary engine enters a row or grind workflow."""
-
-    def __init__(self, engine: Engine, *, mode: str):
-        self.engine = engine
-        self.mode = str(mode)
-        self.code = RefusalReason.PROPRIETARY_ENGINE_EXCLUDED.value
-        self.reason = RefusalReason.PROPRIETARY_ENGINE_EXCLUDED
-        super().__init__(
-            f"{self.code}: engine={engine.value!r} is not allowed in {self.mode}"
-        )
-
-
 def refuse_proprietary_engine_use(engine: Engine | str, *, mode: str) -> None:
-    """Raise a typed refusal using Engine.proprietary as the sole policy rule."""
+    """Resolve battery tokens and retain their typed refusal reason."""
 
     try:
         resolved = engine if isinstance(engine, Engine) else Engine(str(engine))
     except ValueError:
         return
-    if resolved.proprietary:
-        raise ProprietaryEngineRefusal(resolved, mode=mode)
+    try:
+        _refuse_proprietary_engine_use(resolved, mode=mode)
+    except ProprietaryEngineRefusal as exc:
+        exc.reason = RefusalReason.PROPRIETARY_ENGINE_EXCLUDED
+        raise
 
 
 class CellMaterial(StrEnum):

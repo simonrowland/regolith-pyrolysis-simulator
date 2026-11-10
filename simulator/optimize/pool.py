@@ -28,8 +28,8 @@ from typing import Any
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
+    refuse_proprietary_engine_use,
 )
-from simulator.battery.enums import refuse_proprietary_engine_use
 from simulator.backends import requires_stage0_subprocess
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evaluate import (
