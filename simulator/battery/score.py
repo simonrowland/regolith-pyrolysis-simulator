@@ -4124,6 +4124,19 @@ def band_dimension_matches(
         operation or metric_operation(quantity)
     ) in {MetricOperation.RELATIVE, MetricOperation.DEX}:
         return True
+    # These two output dimensions are intentionally subtype-defined. The
+    # printed-width resolver matches this scale to identity.subtype; permit
+    # only its absolute path here and keep other units fail-closed.
+    if (
+        quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and band.unit == "mass_percent"
+    ):
+        return operation is MetricOperation.ABSOLUTE
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and band.unit in {"mass_percent", "mole_percent"}
+    ):
+        return operation is MetricOperation.ABSOLUTE
     quantity_dim = unit_dimension(QUANTITY_UNITS[quantity])
     band_dim = unit_dimension(band.unit)
     return quantity_dim is not None and quantity_dim == band_dim
@@ -4823,9 +4836,80 @@ def _convert_uncertainty_width(
     quantity: Quantity,
     width: Decimal,
     source_unit: str,
+    *,
+    source_observation: Observation | None = None,
 ) -> tuple[Decimal | None, str | None]:
     unit = re.sub(r"\s+", "", source_unit).casefold()
     expected = QUANTITY_UNITS[quantity]
+    if quantity in {
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    }:
+        identity = (
+            source_observation.identity
+            if source_observation is not None
+            and isinstance(source_observation.identity, Identity)
+            else None
+        )
+        subtype_state = None if identity is None else identity.subtype
+        subtype = (
+            str(subtype_state.value)
+            if isinstance(subtype_state, State) and subtype_state.is_value
+            else None
+        )
+        # These quantities have no quantity-wide unit: QUANTITY_UNITS says
+        # subtype_defined, while the component's declared scale lives in
+        # identity.subtype (wt_percent / oxide_wt_percent or mole_percent).
+        # Therefore preserve a printed width only when its unit names that
+        # same scale; wt% cannot be assigned to a mole_fraction observation.
+        # A series point inherits its unit from the parent column and carries
+        # that parent id; its subtype supplies the same explicit scale. Sanity:
+        # a 0.17 wt% width stays 0.17 mass_percent, never 0.0017.
+        mass_percent_subtypes = {"wt_percent", "oxide_wt_percent", "mass_percent"}
+        mole_percent_subtypes = {"mole_percent", "mol_percent"}
+        declared_scale = (
+            "mass_percent"
+            if subtype in mass_percent_subtypes
+            else "mole_percent"
+            if subtype in mole_percent_subtypes
+            else None
+        )
+        mass_percent_units = {
+            "wt%", "wt.%", "wt_percent", "mass%", "masspercent",
+            "mass_percent", "mass-percent",
+        }
+        mole_percent_units = {
+            "mol%", "mol.%", "molpct", "mole%", "molepercent",
+            "mole_percent", "mole-percent",
+        }
+        if unit in mass_percent_units | mole_percent_units:
+            source_scale = (
+                "mass_percent"
+                if unit in mass_percent_units
+                else "mole_percent"
+            )
+            if declared_scale != source_scale:
+                return None, expected
+            return width, source_scale
+        raw_uncertainty = (
+            None
+            if source_observation is None
+            else source_observation.uncertainty.verbatim
+        )
+        inherited_series_width = (
+            isinstance(raw_uncertainty, Mapping)
+            and "parent" in raw_uncertainty
+            and "unit" not in raw_uncertainty
+            and "units" not in raw_uncertainty
+        )
+        if (
+            unit == expected.casefold()
+            and inherited_series_width
+            and declared_scale is not None
+        ):
+            return width, declared_scale
+        if unit in {"%", "percent", "percentage"}:
+            return None, expected
     if unit in {expected.casefold(), "1", "fraction", "relative"}:
         return width, "fraction" if unit in {"fraction", "relative"} else expected
     if unit in {"%", "percent", "percentage"}:
@@ -5033,7 +5117,10 @@ def _printed_uncertainty_band(
     else:
         width = source_value
     converted, converted_unit = _convert_uncertainty_width(
-        quantity, width, source_unit
+        quantity,
+        width,
+        source_unit,
+        source_observation=source_observation,
     )
     if converted is None:
         return _PrintedBandResolution(
@@ -5066,7 +5153,13 @@ def _printed_uncertainty_band(
             kind = "printed_unstated"
     elif kind == "printed_1sigma":
         ticket *= NORMAL_95_TICKET_MULTIPLIER
-    unit = "dimensionless" if operation in {MetricOperation.RELATIVE, MetricOperation.DEX} else QUANTITY_UNITS[quantity]
+    unit = (
+        "dimensionless"
+        if operation in {MetricOperation.RELATIVE, MetricOperation.DEX}
+        else converted_unit
+        if converted_unit in {"mass_percent", "mole_percent"}
+        else QUANTITY_UNITS[quantity]
+    )
     rule = f"{kind}: source-printed uncertainty; original={raw_text}"
     notice = _confidence_level_notice(
         quantity, uncertainty, source_observation, source_value

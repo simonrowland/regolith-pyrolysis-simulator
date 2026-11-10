@@ -196,8 +196,8 @@ class EngineSummary:
     refusals: Counter[str] = field(default_factory=Counter)
     refused_by_rail: Counter[str] = field(default_factory=Counter)
     not_observable_by_rail: Counter[str] = field(default_factory=Counter)
-    excluded_d139_rows: int = 0
-    excluded_d139_by_rail: Counter[str] = field(default_factory=Counter)
+    uncalibrated_kems_flagged_rows: int = 0
+    uncalibrated_kems_flagged_by_rail: Counter[str] = field(default_factory=Counter)
     non_dex_rows: int = 0
     missing_identity_rows: int = 0
     source_relations: Counter[str] = field(default_factory=Counter)
@@ -301,16 +301,16 @@ class _SQLiteCompositionSio2(Mapping[str, float]):
         return 0 if row is None else int(row[0])
 
 
-def _d139_exclusion_counts(
+def _uncalibrated_kems_flag_counts(
     data: ScorePlotData, *, rail: str | None = None
 ) -> tuple[tuple[str, int], ...]:
     counts: list[tuple[str, int]] = []
     for engine in _ordered_hero_engines(data.engines):
         summary = data.summaries[engine]
         count = (
-            summary.excluded_d139_rows
+            summary.uncalibrated_kems_flagged_rows
             if rail is None
-            else summary.excluded_d139_by_rail[rail]
+            else summary.uncalibrated_kems_flagged_by_rail[rail]
         )
         if count:
             counts.append((engine, count))
@@ -455,6 +455,12 @@ def _is_d139_uncalibrated_kems_row(row: Mapping[str, Any]) -> bool:
         if isinstance(source, Sequence) and not isinstance(source, (str, bytes))
         for notice in source
     )
+
+
+def _hero_row_flagged(
+    row: Mapping[str, Any], *, d139_uncalibrated_kems: bool
+) -> bool:
+    return d139_uncalibrated_kems or bool(_flagged_payload_strata(row))
 
 
 def _row_formula(row: Mapping[str, Any]) -> str:
@@ -1236,11 +1242,11 @@ def read_scores(
                     if selected_rail:
                         summary.missing_identity_rows += 1
                     continue
-                if _is_d139_uncalibrated_kems_row(row):
+                d139_uncalibrated_kems = _is_d139_uncalibrated_kems_row(row)
+                if d139_uncalibrated_kems:
                     # Use the scorer's d-139 output marker; do not infer calibration here.
-                    summary.excluded_d139_rows += 1
-                    summary.excluded_d139_by_rail[rail] += 1
-                    continue
+                    summary.uncalibrated_kems_flagged_rows += 1
+                    summary.uncalibrated_kems_flagged_by_rail[rail] += 1
                 formula = _species_formula(identity)
                 temperature_raw = _state_value(identity.get("temperature_K"))
                 temperature = _finite_float(temperature_raw)
@@ -1258,7 +1264,9 @@ def read_scores(
                 if not experiment:
                     experiment = row.get("reference") or row.get("key") or f"line:{line_number}"
 
-                flagged = bool(_flagged_payload_strata(row))
+                flagged = _hero_row_flagged(
+                    row, d139_uncalibrated_kems=d139_uncalibrated_kems
+                )
                 source_relation = str(row.get("source_relation") or "unknown")
                 if rail in selected:
                     summary.source_relations[source_relation] += 1
@@ -3456,8 +3464,7 @@ def _collection_row_database(
                 continue
             if numeric.get("operation") != "dex":
                 continue
-            if _is_d139_uncalibrated_kems_row(row):
-                continue
+            d139_uncalibrated_kems = _is_d139_uncalibrated_kems_row(row)
             residual = _finite_float(numeric.get("value"))
             identity = _row_identity(row)
             temperature_raw = _state_value(identity.get("temperature_K"))
@@ -3513,7 +3520,11 @@ def _collection_row_database(
                     composition_label,
                     _row_formula(row),
                     residual,
-                    int(bool(_flagged_payload_strata(row))),
+                    int(
+                        _hero_row_flagged(
+                            row, d139_uncalibrated_kems=d139_uncalibrated_kems
+                        )
+                    ),
                 )
             )
             if len(pending) >= 5000:
@@ -4049,7 +4060,7 @@ def _write_collection_methods(
                 "## Known caveats",
                 "",
                 "- Melt activity includes echo rows whose input is the analysed melt.",
-                "- The scorer's all-numeric RMS includes uncalibrated KEMS p_partial rows excluded from plotted points under d-139.",
+                "- The plotted scatter, chart A, and the headline RMS share one population; uncalibrated KEMS p_partial rows (d-139) are drawn tinted and counted, not excluded.",
                 "- Source-disagreement-flagged vapour rows are separated from unflagged rows in the all-rows table.",
                 "- Fingerprint cells with fewer than three scored rows are blank.",
                 "",
@@ -4252,6 +4263,9 @@ def _draw_temperature_png(
         plotted_n = int(panel.get("plotted_n") or 0)
         rms = _format_dex(panel.get("rms_dex"))
         flagged = int(panel.get("flagged_n") or 0)
+        uncalibrated_kems_flagged = int(
+            panel.get("uncalibrated_kems_flagged_n") or 0
+        )
         clipped_low = int(panel.get("clipped_low_n") or 0)
         clipped_high = int(panel.get("clipped_high_n") or 0)
         count_label = f"{plotted_n} plotted of {n} scored"
@@ -4368,30 +4382,44 @@ def _draw_temperature_png(
             if row["rail"] == rail and row["engine"] == engine and row["clipped"].casefold() == "true"
         ]
         for clipped_side, marker in (("low", "v"), ("high", "^")):
-            selected_outliers = [
-                row for row in outliers
-                if (float(row["residual_dex"]) < -3) == (clipped_side == "low")
-            ]
-            if selected_outliers:
-                axis.scatter(
-                    [float(row["temperature_K"]) for row in selected_outliers],
-                    [-3.0 if clipped_side == "low" else 3.0] * len(selected_outliers),
-                    s=16,
-                    marker=marker,
-                    color=color,
-                    linewidths=0,
-                    zorder=4,
-                )
+            for is_flagged in (False, True):
+                selected_outliers = [
+                    row
+                    for row in outliers
+                    if (float(row["residual_dex"]) < -3) == (clipped_side == "low")
+                    and row["flagged"] == str(int(is_flagged))
+                ]
+                if selected_outliers:
+                    axis.scatter(
+                        [float(row["temperature_K"]) for row in selected_outliers],
+                        [-3.0 if clipped_side == "low" else 3.0]
+                        * len(selected_outliers),
+                        s=16,
+                        marker=marker,
+                        color=(
+                            _lighten_colour(color, 0.35) if is_flagged else color
+                        ),
+                        linewidths=0,
+                        zorder=4,
+                    )
         axis.set_xlim(low, high)
         axis.set_ylim(*Y_LIMITS)
         axis.set_ylabel("Signed error (dex)", fontsize=7)
         axis.grid(color="#94a3b8", alpha=0.17, linewidth=0.45)
         axis.tick_params(labelsize=6)
-        title = (
-            f"{engine} · no scored rows"
-            if n == 0
-            else f"{engine} · {count_label} · all-scored RMS {rms} dex · {flagged} extrapolated · {clipped_low + clipped_high} beyond ±3 dex"
+        flagged_kems_label = (
+            f"{uncalibrated_kems_flagged} flagged (uncalibrated KEMS)"
         )
+        if n == 0:
+            title = f"{engine} · no scored rows"
+            if uncalibrated_kems_flagged:
+                title += f" · {flagged_kems_label}"
+        else:
+            title = (
+                f"{engine} · {count_label} · all-scored RMS {rms} dex · "
+                f"{flagged} extrapolated · {flagged_kems_label} · "
+                f"{clipped_low + clipped_high} beyond ±3 dex"
+            )
         axis.set_title(title, loc="left", fontsize=7.5)
     axes_flat[-1].set_xlabel("Temperature (K)", fontsize=7)
     observable = dict(COLLECTION_OBSERVABLES)[rail]
@@ -5079,7 +5107,7 @@ function plotError(){
   ctx.strokeStyle='#263238';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(m.l,y(0));ctx.lineTo(w-m.r,y(0));ctx.stroke();
   ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted');ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(x(TEMPERATURE_FLOOR_K),m.t);ctx.lineTo(x(TEMPERATURE_FLOOR_K),h-m.b);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--ink');ctx.font='12px system-ui';ctx.fillText('Temperature (K)',w/2-42,h-8);ctx.save();ctx.translate(14,h/2+38);ctx.rotate(-Math.PI/2);ctx.fillText('Signed error (dex)',0,0);ctx.restore();
-  for(const row of rows){if(row.rail!==rail||!enabled(row.engine)||!inWindow(row))continue;const px=x(+row.temperature_K),py=y(+row.residual_dex);ctx.globalAlpha=row.flagged?.72:.35;ctx.fillStyle=row.flagged?lighten(PALETTE[row.engine],.38):PALETTE[row.engine];ctx.beginPath();if(+row.residual_dex>3){ctx.moveTo(px,py-4);ctx.lineTo(px-4,py+4);ctx.lineTo(px+4,py+4);ctx.closePath();}else if(+row.residual_dex < -3){ctx.moveTo(px,py+4);ctx.lineTo(px-4,py-4);ctx.lineTo(px+4,py-4);ctx.closePath();}else ctx.arc(px,py,2.1,0,Math.PI*2);ctx.fill();}
+  for(const row of rows){if(row.rail!==rail||!enabled(row.engine)||!inWindow(row))continue;const flagged=Number(row.flagged)===1,px=x(+row.temperature_K),py=y(+row.residual_dex);ctx.globalAlpha=flagged?.72:.35;ctx.fillStyle=flagged?lighten(PALETTE[row.engine],.38):PALETTE[row.engine];ctx.beginPath();if(+row.residual_dex>3){ctx.moveTo(px,py-4);ctx.lineTo(px-4,py+4);ctx.lineTo(px+4,py+4);ctx.closePath();}else if(+row.residual_dex < -3){ctx.moveTo(px,py+4);ctx.lineTo(px-4,py-4);ctx.lineTo(px+4,py-4);ctx.closePath();}else ctx.arc(px,py,2.1,0,Math.PI*2);ctx.fill();}
   ctx.globalAlpha=1;errorCanvas._plot={x,y,m,pw,ph,lo,hi,rail};
 }
 function plotMap(){
@@ -5265,6 +5293,11 @@ def render_hero_collection(
             name: _read_collection_csv(files[f"table:{name}"])
             for name in _COLLECTION_TABLE_FIELDS
         }
+        for panel in csv_rows["panels"]:
+            summary = data.summaries[panel["engine"]]
+            panel["uncalibrated_kems_flagged_n"] = str(
+                summary.uncalibrated_kems_flagged_by_rail[panel["rail"]]
+            )
         chart_files: dict[str, Path] = {}
         path = output_dir / "battery-hero-A-scorecard.png"
         _draw_scorecard_png(path, csv_rows["scorecard"], observables)
@@ -6300,15 +6333,16 @@ def render_hero_charts(
                 "data with its pure-liquid model reference; main's fix is pending."
             )
         if rail == Rail.VAPOUR.value:
-            d139_counts = _d139_exclusion_counts(data, rail=rail)
+            d139_counts = _uncalibrated_kems_flag_counts(data, rail=rail)
             if d139_counts:
                 counts = ", ".join(
-                    f"{engine} {_compact_count(count)}"
+                    f"{engine} {_compact_count(count)} flagged (uncalibrated KEMS)"
                     for engine, count in d139_counts
                 )
                 caption += (
-                    "\nVapour scatter excludes uncalibrated KEMS p_partial rows "
-                    f"under d-139: {counts}; scorer all-numeric and same-row RMS include them."
+                    "\nVapour scatter, chart A, and the headline RMS share one "
+                    "population; uncalibrated KEMS p_partial rows (d-139) are "
+                    f"drawn tinted and counted: {counts}."
                 )
             openimcc_pack = _openimcc_default_pack(data) or "not recorded in score metadata"
             caption += (
@@ -7007,12 +7041,12 @@ def render_plots(
         openimcc_commit=openimcc_commit,
         render_date=render_date,
     )
-    d139_exclusions = [
-        f"{engine} {count:,} uncalibrated KEMS p_partial"
-        for engine, count in _d139_exclusion_counts(data)
+    uncalibrated_kems_flags = [
+        f"{engine} {count:,} flagged (uncalibrated KEMS)"
+        for engine, count in _uncalibrated_kems_flag_counts(data)
     ]
-    if d139_exclusions:
-        footer += "  |  excluded under d-139: " + ", ".join(d139_exclusions)
+    if uncalibrated_kems_flags:
+        footer += "  |  " + ", ".join(uncalibrated_kems_flags)
     files: dict[str, Path] = {}
     empty_engines = _empty_engine_names(data)
     tile_engines = (

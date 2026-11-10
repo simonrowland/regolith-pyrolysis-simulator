@@ -6,12 +6,12 @@ This document covers the campaign catalog, how to choose and configure a recipe,
 
 All setpoints live in `data/setpoints.yaml`. The campaigns are listed in extraction order; a batch normally runs C0, then one or more later campaigns in sequence.
 
-### C0 — Vacuum Bakeoff & Volatile Recovery
+### C0 — Dry Inert Bakeoff & Volatile Recovery
 
-**Temperature**: 20–950 °C, 50 °C/hr ramp.  
-**Atmosphere**: hard vacuum.  
+**Temperature**: 20–950 °C, 200 °C/hr ramp.  
+**Atmosphere**: dry Ar cover at 1 mbar.  
 **Target species**: H₂O, CO₂, S₂, CHNOPS.  
-**Endpoint**: IR signal decay to <5 % of peak for all target species.
+**Endpoint**: computed exit on the Na + K purity threshold and the gas-evacuation bound (`max_hold_hr: 25`).
 
 Removes solar-wind-implanted volatiles and separates nanophase Fe⁰ by magnetic tapping (zero additional energy cost). Volatile release is complete by ~700 °C; alkali onset is >900 °C, thermally separated from the volatile window. C0 is mandatory for all feedstocks. For carbonaceous or Mars feedstocks the Stage 0 profile is more complex (see `data/feedstocks.yaml` per-feedstock `stage0_profile` keys and [`docs/feedstocks.md`](feedstocks.md)).
 
@@ -33,23 +33,25 @@ Source: `data/setpoints.yaml` campaign key `campaigns.C0b_p_cleanup`.
 
 ### C2A_continuous — Continuous Adaptive Carrier-gas Ramp (N₂ default)
 
-**Temperature**: 1050–1600 °C, adaptive ramp.  
+**Temperature**: 1050 °C up to the furnace ceiling (`temp_range_C: [1050, 1843]`; the runtime peak is capped by `furnace_max_T_C`), adaptive ramp.  
 **Atmosphere**: selectable carrier/buffer gas (N₂ default) at 5–15 mbar total, 8–12 mbar optimal; Fe-granule sorbent holds pO₂ < 1×10⁻⁸ bar.
 **Target species**: Na, K, Fe, SiO, CrO₂.  
 **Typical duration**: 18–28 h.  
 **Endpoint**: Na/K/Fe signals decay to <5 % peak; SiO signal reaches target a(SiO₂) reduction.
 
-This is the preferred default. A single continuous solar-thermal ramp meters dT/dt to keep instantaneous outgassing flux ≤ 60–80 % of hot-wall pipe capacity, monitored by Stage 0 IR (Na 589 nm early, Fe 370 nm mid, SiO 230 nm UV dominant above 1400 °C). Co-extracts Na, K, Fe, and SiO in a single ramp without discrete atmosphere switches.
+A single continuous solar-thermal ramp meters dT/dt to keep instantaneous outgassing flux ≤ 60–80 % of hot-wall pipe capacity, monitored by Stage 0 IR (Na 589 nm early, Fe 370 nm mid, SiO 230 nm UV dominant above 1400 °C). Co-extracts Na, K, Fe, and SiO in a single ramp without discrete atmosphere switches.
 
-Downstream effects: C3 shuttle scope is halved (0–1 K cycle + 1 Na cycle); C5 MRE scope is reduced 20–40 %; overall batch cycle is 8–20 % shorter than Path B.
+Path A has two forms, C2A_continuous and C2A_staged. `data/setpoints.yaml` describes both as the preferred route in different places: the `path_selection` decision tree marks Path A (C2A_continuous) as preferred, while the campaign entries set `preferred_default: true` on C2A_staged. The interactive decision panel recommends `A`; non-interactive runs (the CLI runner) auto-select `A_staged`, and the canonical recipe uses C2A_staged followed by a final C2A_continuous boil-off.
 
-Product metrics for a typical `lunar_mare_low_ti` batch: Na 2.3–4.0 kg, K 0.8–1.35 kg, Fe 85–130 kg, SiO₂ glass 100–160 kg, source-side O₂ potential 48–70 kg. The O₂ number is emitted/source-side potential, not recovered or analyzer-visible O₂; downstream sink/recovery accounting is Phase B.
+Downstream effects: C3 shuttle scope is halved (one Na cycle); C5 MRE scope is reduced 20–40 %; overall batch cycle is 8–20 % shorter than Path B.
+
+Product metrics for a typical `lunar_mare_low_ti` batch: Na 2.3–4.0 kg, K 0.8–1.35 kg, Fe 85–130 kg, SiO₂ glass 100–160 kg, source-side O₂ potential 48–70 kg. The Fe, SiO₂ glass and O₂ figures are design targets, not yet verified against engine yields. The O₂ number is emitted/source-side potential, not recovered or analyzer-visible O₂; recovered-O₂ accounting is an upcoming feature.
 
 Source: `data/setpoints.yaml` campaign key `campaigns.C2A_continuous`.
 
 ### C2A_staged — Staged Carrier-gas Bakeout (N₂ default)
 
-**Temperature**: 1250–1750 °C (furnace ceiling 1800 °C).  
+**Temperature**: 1250–1750 °C (hold bounds 1650–1800 °C; the furnace ceiling follows `furnace_material`).  
 **Atmosphere**: selectable carrier/buffer gas (N₂ default), same pressure band as C2A_continuous.
 **Target species**: Na, K, SiO, Fe (in sequence).  
 **Default hold temperature**: 1750 °C.
@@ -59,18 +61,18 @@ An alternative to C2A_continuous that uses explicit stage holds for sequential p
 1. **alkali_early_fe** — ramp to 1250 °C, 600 °C/hr, 4 h: Na and K.
 2. **sio_window** — ramp to 1600 °C, 175 °C/hr, 3 h: SiO with minor Fe co-evolution.
 3. **fe_hot_hold** — ramp to 1750 °C, 150 °C/hr, 1 h: Fe thermal depletion to ~88 % (residual FeO ~20–24 kg).
-4. **cool_for_na_shuttle** — cool to 1150 °C before C3_NA (Na-only) shuttle dose. The K shuttle is no longer used at this stage under JANAF-4th multiphase Ellingham (2026-07-09 re-ground): K/Fe crossover is ~836 °C, well below any practical melt T, so engine refuses K→FeO reduction. C2A_staged now advances to C3_NA (not C3_K) and uses Na as the sole reductant in the cool window where Na/Fe margin is still positive (Na/Fe crossover @ 1181.5 °C).
+4. **cool_for_na_shuttle** — cool to 1150 °C before the C3_NA (Na-only) shuttle dose. Under the JANAF-4th multiphase Ellingham refit the K/Fe crossover is ~836 °C, well below any practical melt temperature, so the engine refuses K→FeO reduction. C2A_staged therefore advances to C3_NA (not C3_K) and uses Na as the sole reductant in the cool window, where the Na/Fe margin is still positive (Na/Fe crossover at 1181.5 °C).
 
 **Operator knobs** (via session script):
 
 | Knob | Default | Command form | Role |
 |---|---|---|---|
 | `hold_temp_C` | 1750 | `adjust campaign_override C2A_staged hold_temp_C <C>` | Cycle-time lever; bounds 1650–1800 °C |
-| `Na_additive_kg` | 12 | `start --additive=Na=<kg>` | Yield-ceiling lever for cool Na shuttle |
+| `Na_additive_kg` | 12 | recipe knob `campaigns.C3.alkali_dosing.Na_kg` | Yield-ceiling lever for cool Na shuttle |
 
 Note on `hold_temp_C`: this is a cycle-time lever, not a thermal-yield ceiling breaker. Running hotter within the 1650–1800 °C bounds increases the thermal Fe extraction fraction but does not remove the physical FeO floor that requires the shuttle.
 
-**Engine policy (post-V1c)**: the shuttle T-acceptance gate (S1b) refuses any K→FeO reduction (margin negative everywhere in practical melt T per JANAF-4th multiphase) and refuses Na→FeO above the 1181.5 °C crossover (2026-07-09 multiphase re-ground). The C2A_staged cool window @ 1150 °C is the only physically defended Na-shuttle T; the engine reports `status="refused"` with structured diagnostic if the operator overrides T above the crossover. K added via `--additive=K=<kg>` will not produce Fe from the shuttle — operators wanting K product should expect it from C2A_continuous evaporation only, not C3.
+**Engine policy**: the shuttle temperature-acceptance gate refuses any K→FeO reduction (the margin is negative at every practical melt temperature under the JANAF-4th multiphase refit) and refuses Na→FeO above the 1181.5 °C crossover. The C2A_staged cool window at 1150 °C is the only physically defended Na-shuttle T; the engine reports `status="refused"` with structured diagnostic if the operator overrides T above the crossover. K added via `--additive=K=<kg>` will not produce Fe from the shuttle — operators wanting K product should expect it from C2A_continuous evaporation only, not C3.
 
 Source: `data/setpoints.yaml` campaign key `campaigns.C2A_staged`.
 
@@ -87,20 +89,20 @@ Path B deliberately holds pO₂ high enough to suppress SiO while still extracti
 
 Source: `data/setpoints.yaml` campaign key `campaigns.C2B`.
 
-### C3_NA — Na Metallothermic Polish (post-V1c default)
+### C3 — Na metallothermic polish
 
 **Temperature**: inject 1050–1150 °C (cool window), bakeout 1520–1680 °C.  
 **Atmosphere**: Fe-granule sorbent + precision O₂ micro-bleed (pO₂ 0.5–1.5 mbar bakeout).  
 **Reductant**: Na only.  
-**Status**: legacy C3 was a mixed Na/K shuttle; under the JANAF-4th multiphase re-ground (2026-07-09) the K phase is refused at any practical melt T (K/Fe crossover ~836 °C) and the engine `status="refused"` is recorded in `shuttle_refusal_history`. The surviving recipe is Na-only.
+**Status**: legacy C3 was a mixed Na/K shuttle, and the setpoints label it "Deprecated Na/K Metallothermic Polish". Under the JANAF-4th multiphase refit the K phase is refused at any practical melt temperature (K/Fe crossover ~836 °C), and the refusal is recorded in `shuttle_refusal_history`. The live use is the Na-only cleanup in the C2A_staged cool window (C3_NA).
 
-The shuttle architecture is one tier per injection: inject Na → reduce FeO at 1050–1150 °C → tap Fe metal → pO₂ bakeout → recover Na. The shuttle does not chemically reduce Cr, Ti, or Mn at C3 temperatures — those targets are refused by the executable thermodynamic gate (S1b). Si conditioning is a melt-activity side effect of Na₂O accumulation, not a separate cycle.
+The shuttle architecture is one tier per injection: inject Na → reduce FeO at 1050–1150 °C → tap Fe metal → pO₂ bakeout → recover Na. Cr₂O₃ is reduced when its in-band margin is positive; TiO₂ is refused by the shuttle temperature-acceptance gate, and MnO is not a supported C3 target. Si conditioning is a melt-activity side effect of Na₂O accumulation, not a separate cycle.
 
 Cycles after Path A: 1 Na. Cycles after Path B: 2 Na (Path B preserved more FeO and SiO₂ in the melt, so the post-C2B shuttle has more work). Na₂O solubility cap in the melt is 8–12 wt%.
 
-Honest limit: the Na/Fe crossover is 1181.5 °C (2026-07-09 multiphase re-ground), leaving a positive (~31 °C) margin at the 1150 °C inject T. Running the inject T above the crossover causes the engine to refuse the step and record the refusal verbatim. K added via `--additive=K=<kg>` is ignored by the C3 shuttle gate — operators wanting K product should expect it from C2A_continuous evaporation, not C3.
+Limit: the Na/Fe crossover is 1181.5 °C, leaving a positive (~31 °C) margin at the 1150 °C inject T. Running the inject T above the crossover causes the engine to refuse the step and record the refusal verbatim. K added via `--additive=K=<kg>` is ignored by the C3 shuttle gate — operators wanting K product should expect it from C2A_continuous evaporation, not C3.
 
-Source: `data/setpoints.yaml` §1 `C3:` block (the YAML key is still `C3` for backward compat with goldens; the engine resolves the surviving phases at dispatch).
+Source: `data/setpoints.yaml` §1 `C3:` block (YAML key `C3`; the engine resolves the Na and K phases at dispatch).
 
 ### C4 — Selective Mg Pyrolysis (Branch Two)
 
@@ -108,7 +110,7 @@ Source: `data/setpoints.yaml` §1 `C3:` block (the YAML key is still `C3` for ba
 **Atmosphere**: controlled O₂ (pO₂ 0.08–0.35 mbar).  
 **Prerequisite**: SiO₂ activity reduced 30–50 % by C3 conditioning; otherwise SiO co-extraction is 10–40× higher than under pure vacuum.
 
-The former `~0.5 bar at 1600 °C` claim confused pure-metal volatility with release from MgO and is withdrawn. With `a_MgO = 0.0926`, `P_Mg = 0.01 bar`, and the melt oxygen potential assumed to have reached the CF-1 ambient floor, the current runtime's Mg-metal-phase-correct targets are 1892 °C (Moon) and 1768 °C (asteroid), with derived roots 1892.647/1768.703 °C. These are diagnostic thresholds, not universal body-only constants: stage composition changes `a_MgO`, and the surface must actually reach the ambient fO₂. The current 1670 °C C4 hold is therefore below the grounded lunar opening threshold and its legacy 18–42 kg/t yield is not certified by this threshold calculation.
+The former `~0.5 bar at 1600 °C` claim confused pure-metal volatility with release from MgO and is withdrawn. With `a_MgO = 0.0926`, `P_Mg = 0.01 bar`, and the melt oxygen potential assumed to have reached the ambient vacuum floor, the current runtime's Mg-metal-phase-correct targets are 1892 °C (Moon) and 1768 °C (asteroid), with derived roots 1892.647/1768.703 °C. These are diagnostic thresholds, not universal body-only constants: stage composition changes `a_MgO`, and the surface must actually reach the ambient fO₂. The current 1670 °C C4 hold is therefore below the grounded lunar opening threshold and its legacy 18–42 kg/t yield is not certified by this threshold calculation.
 
 With the default N₂ carrier, buffer pressure changes gas transport but does not replace the melt fO₂ in the MgO dissociation equilibrium. No `~0.1 bar` Mg claim is certified for the legacy 1500–1580 °C band; use that range only as an explicitly ungrounded experimental sweep until a stage-specific melt-redox trajectory supports it.
 
@@ -154,7 +156,7 @@ Key decisions:
 
 | Decision type | Options | Default | Note |
 |---|---|---|---|
-| `PATH_AB` | `A`, `A_staged`, `B` | `A` | C2 path selection |
+| `PATH_AB` | `A`, `A_staged`, `B` | panel recommends `A`; CLI auto-selects `A_staged` | C2 path selection (see C2A_continuous above) |
 | Branch selection | `one`, `two` | `two` | C4 Mg pyrolysis or full MRE |
 | C6 yes/no | `yes`, `no` | `yes` | Thermite reduction |
 | Ti retention in C5 | stop before Ti sweep | operator choice | Produces Al–Ti alloy instead of pure Al |
@@ -169,23 +171,23 @@ Objective: maximum pressure-and-temperature-driven extraction from a lunar mare
 feedstock before any MRE electrolysis load.  The pinned bundle is
 `data/recipes/canonical_lunar_full_yield.yaml`.
 
-Sequence: **C0 → C0b → C2A_staged → C3 → C4 → C2A_continuous final boiloff**.
-C5 is disabled in the canonical profile.
+Sequence: **C0 → C0b → C2A_staged → C3 → C4 → C2A_continuous final boiloff → C6**.
+C5 stays off in the canonical profile.
 
 - C0b is recommended for all lunar feedstocks even at low P₂O₅; it adds only 0.5–2.5 h and prevents P carryover into C2.
 - C2A_staged separates alkali/SiO/Fe before the cool C3 cleanup.
-- C3_NA (Na-only post-V1c) cleans residual FeO at the cool ~1150 °C window; the legacy K-shuttle path is refused by the engine under V1c-JANAF and is no longer used here.
+- C3_NA (Na-only) cleans residual FeO at the cool ~1150 °C window; the legacy K-shuttle path is refused by the engine under the JANAF-4th refit and is not used here.
 - The non-FeO dissociation driver engages in the 1150 °C C3_NA window and recovers Mg before C4; C4 remains enabled before the final kinetic-pyrolysis pass.
 - After C4, C2A_continuous is re-enabled. Its configured band midpoints require 82 h from the catalogued 1150 °C post-shuttle floor through 1320 °C to 1843 °C; the 160 h cap is the conservative slow-band 132 h ramp plus the existing 28 h extraction window. The endpoint is `dense_alumina_max.max_service_T_C` from `data/furnace_materials.yaml`, not a yield fit.
-- C5 is disabled (`allow_mre_voltage_cap_V: 0`); this canonical profile is pyrolysis-only.
-- Optional C6 thermite remains a separate downstream recipe; it is not part of this pyrolysis-only default.
+- C5 stays off (`campaigns.C5.allow_mre_voltage_cap_V: 0`), so no electrolysis is involved.
+- Run non-interactively, the batch continues into the C6 Mg thermite after the final boil-off.
 
 ```shell
 python -m simulator.runner --feedstock lunar_mare_low_ti --campaign C0 --hours 400 \
   --recipe data/recipes/canonical_lunar_full_yield.yaml --output canonical-lunar.json
 ```
 
-Pinned 2026-07-25 outputs for a `lunar_mare_low_ti` 1-tonne, 400-hour request that completed 276 process hours with `status=partial` are Fe 86.950 kg, SiO 8.967 kg, Na 1.121 kg, K 0.853 kg, and Mg 5.367 kg. That artifact auto-proceeded through 20 C6 hours (global hours 257–276), so these are post-C6 yields rather than the pyrolysis-only pre-C6 state. Source: `docs-private/research/2026-07-25-b092-fix/report.md`.
+Pinned 2026-07-25 outputs for a `lunar_mare_low_ti` 1-tonne, 400-hour request that completed 276 process hours with `status=partial` are Fe 86.950 kg, SiO 8.967 kg, Na 1.121 kg, K 0.853 kg, and Mg 5.367 kg. That artifact auto-proceeded through 20 C6 hours (global hours 257–276), so these yields include 20 h of C6 rather than the pre-C6 state. A public reference run of the canonical demo is `web/report_viewer/sample-run-artifact.json`.
 
 ### Industrial-glass mode
 
@@ -194,17 +196,17 @@ Objective: preserve the CMAS melt for direct tapping as structural glass or cera
 Sequence: **C0 → C0b → C2B (Path B) → partial C3 → early melt tap**
 
 - C2B at pO₂ 0.8–2.3 mbar extracts Fe while holding SiO₂ in the melt.
-- A partial C3_NA shuttle cleans residual FeO at the cool window (full 2-cycle scope; Path B does not pre-deplete). The K-shuttle path is not used post-V1c — see §C2A_staged.
+- A partial C3_NA shuttle cleans residual FeO at the cool window (full 2-cycle scope; Path B does not pre-deplete). The K-shuttle path is not used — see §C2A_staged.
 - Tap the melt before the SiO release window.
 - The result is a Ca–Mg–Al–Si glass with controlled alkali content.
 
-Honest note: Kress91 ferric/ferrous splitting is now live for Fe `a_FeO`, but the intrinsic fO₂ source remains an ungrounded composition heuristic / diagnostic input and the pure-FeO IW anchor is still conservative. See `docs/model-limitations.md`.
+Note: Kress91 ferric/ferrous splitting is now live for Fe `a_FeO`, but the intrinsic fO₂ source remains an ungrounded composition heuristic / diagnostic input and the pure-FeO IW anchor is still conservative. See `docs/model-limitations.md`.
 
 ### Ceramic-bootstrap mode
 
 Objective: demonstrate that refractory liner material is available as a by-product of any full-sequence run.
 
-Sequence: any full-sequence run (C0 → C2A → C3 → C4 → C5 → C6) produces the ceramic rump by physics.
+Sequence: any full-sequence run (C0 → C2A → C3 → C4 → C5 → C6) produces the ceramic rump by physics. C5 consumes refractory oxides only on Branch One.
 
 For a `lunar_mare_low_ti` batch the C6 terminal slag contains Ca, Al-residual, REE (0.5–1.0 wt%), and Ti, in a ~10–15 kg doloma-equivalent per tonne. This is the natural feedstock for hot-duct liners and crucible refractory. The bootstrap is not a recipe achievement — it is a physical consequence of oxide stability: CaO, residual Al₂O₃, TiO₂, and REE oxides do not vaporise at any temperature the furnace itself survives.
 
@@ -214,15 +216,15 @@ REE-enriched feedstocks (KREEP variants, targeted super-KREEP ore) yield proport
 
 **Hold temperature in C2A_staged** (`hold_temp_C`, default 1750 °C): a cycle-time lever. Running hotter within the 1650–1800 °C bounds shortens the time to reach target Fe depletion but does not raise the extraction ceiling — the C3_NA cool-window shuttle handles the residual FeO floor regardless. Do not expect higher hold temperatures to substitute for the shuttle dose.
 
-**Alkali dose** (`Na_additive_kg`, default 12 kg): the yield-ceiling lever for the cool C3_NA shuttle. The shuttle cannot reduce more FeO than the additive dose permits (subject to the Na₂O solubility cap of ~10 wt% in the melt). Increasing the dose raises the Fe extraction ceiling; decreasing it leaves more residual FeO for C5. (`K_additive_kg` is accepted by the runner but ignored by the post-V1c shuttle gate, which refuses K→FeO at any practical melt T.)
+**Alkali dose** (`Na_additive_kg`, default 12 kg): the yield-ceiling lever for the cool C3_NA shuttle. The shuttle cannot reduce more FeO than the additive dose permits (subject to the Na₂O solubility cap of ~10 wt% in the melt). Increasing the dose raises the Fe extraction ceiling; decreasing it leaves more residual FeO for C5. (`K_additive_kg` is accepted by the runner but does not reduce FeO: the shuttle gate refuses K→FeO at any practical melt temperature.)
 
-**Carrier/buffer pressure** (5–15 mbar band): provides engineering margin above the viscous-flow boundary and controls transport capacity. The N₂-default hot-wall pipe boundary is about 0.318 mbar at 1500 °C; the transport limit at 8–12 mbar is 7–16 g/s SiO. Pressures below 5 mbar reduce the margin but do not by themselves imply molecular flow. See [the carrier-gas boundary derivation](concepts.md#carrier--buffer-gas-n₂-default).
+**Carrier/buffer pressure** (5–15 mbar band): provides engineering margin above the viscous-flow boundary and controls transport capacity and dilution. The flow regime is a reported diagnostic: transitional and free-molecular transport are modelled and flagged, not refused. The N₂-default hot-wall pipe boundary is about 0.318 mbar at 1500 °C; the transport limit at 8–12 mbar is 7–16 g/s SiO. Pressures below 5 mbar reduce the margin but do not by themselves imply molecular flow. See [the carrier-gas boundary derivation](concepts.md#carrier--buffer-gas-n₂-default).
 
 ## Diagnostic patterns
 
 - **Rump approaching 10–15 kg**: the refractory floor is being reached after a full C0–C6 sequence on low-Ti mare.
 - **`wall_deposit_kg[SiO]` growing fast**: carrier/buffer pressure is insufficient or a cold wall is upstream of Stage 3. Check the pressure setpoint and liner temperature schedule (see `data/setpoints.yaml` §14 `overhead_headspace.liner_temperature_C`).
 - **Fe yield plateau around 88–90 % in C2A_staged**: expected thermal extraction limit; residual FeO (20–24 kg) is the shuttle's feed. This is correct behavior, not a failure.
-- **Very low non-refractory yields on first run without shuttle dose**: the shuttle is reagent-limited when the Na additive is not loaded. Confirm `--additive=Na=12` is present for C2A_staged, or that Na shuttle stock has accumulated from prior C2 cycles. (`--additive=K=...` is accepted but ignored by the post-V1c shuttle gate; it will not raise Fe yield.)
+- **Very low non-refractory yields on first run without shuttle dose**: the shuttle is reagent-limited when the Na additive is not loaded. Confirm the recipe knob `campaigns.C3.alkali_dosing.Na_kg` is set (12 kg is the documented default dose), or that Na shuttle stock has accumulated from prior C2 cycles. (`--additive=K=...` is accepted but does not reduce FeO; it will not raise Fe yield.)
 
-**`shuttle_refusal_history` non-empty in the runner output**: at least one shuttle step was refused by the S1b T-acceptance gate. Each entry names the campaign, hour, melt T, and the engine's thermodynamic margin. Common cause: inject T above the species-pair crossover (Na/Fe @ 1181.5 °C, K/Fe @ 836 °C; 2026-07-09 multiphase re-ground). The whole-run `status` stays `ok` or `partial` for per-step refusals; only `KnudsenRegimeRefusal`-class halts escalate to `status="refused"`. See [`docs/runner-output-schema.md`](runner-output-schema.md) §"Shuttle refusal history".
+**`shuttle_refusal_history` non-empty in the runner output**: at least one shuttle step was refused by the shuttle temperature-acceptance gate. Each entry names the campaign, hour, melt T, and the engine's thermodynamic margin. Common cause: inject T above the species-pair crossover (Na/Fe at 1181.5 °C, K/Fe at 836 °C). The whole-run `status` stays `ok` or `partial` for per-step refusals; only whole-run typed refusals (for example a C2A_staged pN₂ band violation) escalate to `status="refused"`. See [`docs/runner-output-schema.md`](runner-output-schema.md) §"Shuttle refusal history".

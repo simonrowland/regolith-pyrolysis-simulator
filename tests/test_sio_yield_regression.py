@@ -414,8 +414,8 @@ def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
 
     The shared Studio emitter produces the live quantity; the committed SiO
     fixture owns its expected value. Keep this guard to catch a consumer
-    acquiring a separate baseline again. LAPTOP_BASELINES in the emitter and
-    docs/ci-local-divergence.md remain deliberately historical snapshots.
+    acquiring a separate baseline again. LAPTOP_BASELINES in the emitter
+    remain deliberately historical snapshots.
     """
     fixture_dir = Path(__file__).resolve().parent / "fixtures" / "sio_yield"
 

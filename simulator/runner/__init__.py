@@ -6169,8 +6169,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         choices=("pyrolysis", "mre_baseline"),
                         help="Process track tag (default: pyrolysis)")
     parser.add_argument("--engines",
-                        help="Path to engines config YAML (Goal #19 forward "
-                             "compat).  Per-intent engine selection.")
+                        help="Path to an engines config YAML for "
+                             "per-intent engine selection (recorded in "
+                             "run_metadata.engines_used).")
     parser.add_argument("--engine", action="append", default=[],
                         metavar="INTENT:PROVIDER",
                         help="Per-intent engine override "

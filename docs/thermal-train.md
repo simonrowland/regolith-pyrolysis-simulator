@@ -89,7 +89,6 @@ refrigeration tail.
 ## Simulator status
 
 This is the current design baseline: pressurized LOX storage, passive
-condensation near 120–132 K, and peak-mass-flow sizing. The simulator still
-carries the earlier frost-cavern representation in its thermal-train model.
-Updating the code and reports to represent the pressurized-LOX baseline is
-planned work.
+condensation near 120–132 K, and peak-mass-flow sizing. Coming in an upcoming
+release: the thermal-train model moves to this pressurized-LOX baseline; current
+reports use the earlier frost-cavern representation.
