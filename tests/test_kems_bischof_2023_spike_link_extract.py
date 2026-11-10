@@ -8,6 +8,7 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.enums import Engine, Rail
+from simulator.battery.migrate import PrintedOxygenFacts, printed_oxygen_decision
 from simulator.battery.score import (
     SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE,
     rail_for_quantity,
@@ -167,7 +168,46 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
             assert row.identity.total_pressure_Pa.is_unknown
             assert row.identity.total_pressure_Pa.reason == "in_cell_total_pressure_not_derivable"
             assert row.point_conditions["composition"].state.is_unknown
-            assert row.identity.fO2_Pa is not None and row.identity.fO2_Pa.is_unknown
+            if sid == "kems-137-bischof-2023":
+                temperature = row.identity.temperature_K.value
+                printed_point = next(
+                    point
+                    for point in _series_points(
+                        documents[sid], row.observation_id.split("::")[-2]
+                    )
+                    if Decimal(str(point["T_K"])) == temperature
+                )
+                delta_iw = Decimal(str(printed_point["delta_IW"]))
+                control = row.point_conditions["fO2_control"]
+                assert control.state.is_value
+                assert control.state.value == (
+                    f"IW buffer-relative; printed ΔIW={delta_iw}"
+                )
+                # Supplement Table S1, p. 2, prints the row's ΔIW beside T;
+                # e.g. "1586.4 ... ΔIW 1.66".
+                assert control.locator.page == 2
+                assert control.locator.table == "S1"
+                decision = printed_oxygen_decision(
+                    PrintedOxygenFacts(),
+                    raw_item={"delta_IW": str(delta_iw)},
+                    point_conditions=None,
+                    scope="row",
+                    run_temperature_K=temperature,
+                    run_pressure_bar=Decimal(1),
+                    source_id=sid,
+                )
+                assert decision is not None and decision.state.is_value
+                assert row.identity.fO2_Pa == decision.state
+                conversion_notice = next(
+                    notice
+                    for notice in row.notices
+                    if notice.reason.startswith("buffer_relative_fO2_converted:")
+                )
+                assert conversion_notice.kind.value == decision.notice_kind.value
+                assert conversion_notice.reason == decision.notice_reason
+                assert conversion_notice.band == decision.notice_band
+            else:
+                assert row.identity.fO2_Pa is not None and row.identity.fO2_Pa.is_unknown
             experiment = migrated[sid].experiments[row.experiment_id]
             assert rail_for_quantity(
                 row.identity.quantity.value,
@@ -193,6 +233,17 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
                     else 9
                 )
                 assert row.point_conditions["temperature_K"].locator.page == expected_page
+
+    bare_iw = printed_oxygen_decision(
+        PrintedOxygenFacts(),
+        raw_item={"oxygen_buffer_as_published": "ΔIW"},
+        point_conditions=None,
+        scope="row",
+        run_temperature_K=Decimal("1586.4"),
+        run_pressure_bar=Decimal(1),
+        source_id="kems-137-bischof-2023",
+    )
+    assert bare_iw is not None and bare_iw.state.is_unknown
 
     by_parent_temp = {
         (row.observation_id.split("::")[-2], row.identity.temperature_K.value): row
