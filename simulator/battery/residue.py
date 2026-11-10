@@ -3551,25 +3551,27 @@ def _sossi_transport_conditions(
 ) -> dict[str, Any]:
     """Translate the Sossi table and shared bench dimensions to series inputs.
 
-    Premise: Table 2 reports CO and CO2 component flows in the same sccm
-    unit, so those values are proportional to mole flow at the standard
-    reference state. Their inferred total is ``Q = Q_CO + Q_CO2``; equal
-    units preserve sccm (for example, 1.8 + 200 = 201.8 sccm). The separate
-    component values are normalized into mixture fractions. A printed dash
-    means that component is not metered; two dashes leave mixture and flow
-    unknown. The source values are non-negative and the example total is
-    positive, as required by the flow conversion.
-    The furnace prints a 42 mm tube ID and a 3 cm hotspot. SI conversion is
-    ``42 mm * 1e-3 m/mm = 0.042 m`` and ``3 cm * 1e-2 m/cm = 0.03 m``;
-    both values are characteristic dimensions in metres. The 70 cm tube
-    length is not used because the transport proxy uses the local hotspot
-    length. Checks: conversions are below one metre and preserve positive
-    geometry; the source values round-trip to 42 mm and 3 cm.
+    Premise: printed CO and CO2 component flows share the sccm unit, so their
+    sum ``Q = Q_CO + Q_CO2`` remains in sccm and the component ratios are
+    dimensionless (for example, 1.8 + 200 = 201.8 sccm). A dash is an
+    unreported component, not a zero: it is omitted from the mixture and a
+    single remaining component is used as the carrier approximation with a
+    typed flag. Table 2's other printed component remains the flow input only
+    where §2.1's approximately 200 sccm total-flow statement supports that
+    reading; two dashes leave both inputs unknown. The checks distinguish a
+    dash from a numeric zero and preserve the positive printed flows.
+    The furnace prints a 42 mm tube ID and a 3 cm hotspot on physical PDF
+    page 6. SI conversion is ``42 mm * 1e-3 m/mm = 0.042 m`` and
+    ``3 cm * 1e-2 m/cm = 0.03 m``; both are characteristic dimensions in
+    metres. The 70 cm tube length is not used because the transport proxy
+    uses the local hotspot length. Checks: conversions are below one metre,
+    preserve positive geometry, and round-trip to 42 mm and 3 cm.
     """
     pressure = experiment.get("pressure_environment")
     if not isinstance(pressure, Mapping):
         pressure = {}
     mixture: dict[str, float] | None = None
+    transport_assumption_flags: list[str] = []
     mixture_record = pressure.get("sweep_gas_mixture")
     if isinstance(mixture_record, Mapping):
         mixture_state = mixture_record.get("state")
@@ -3581,10 +3583,12 @@ def _sossi_transport_conditions(
         )
         if isinstance(raw_components, Mapping):
             parsed_components: dict[str, float] = {}
+            unprinted_components: list[str] = []
             for gas in ("CO", "CO2"):
                 raw_value = raw_components.get(gas)
                 if raw_value == "-":
-                    parsed_components[gas] = 0.0
+                    unprinted_components.append(gas)
+                    continue
                 else:
                     try:
                         value = float(raw_value)
@@ -3597,6 +3601,13 @@ def _sossi_transport_conditions(
                     parsed_components[gas] = value
             if parsed_components and math.fsum(parsed_components.values()) > 0.0:
                 mixture = parsed_components
+                if len(unprinted_components) == 1 and len(parsed_components) == 1:
+                    printed_carrier = next(iter(parsed_components))
+                    transport_assumption_flags.append(
+                        "sweep_gas_"
+                        f"{unprinted_components[0]}_unprinted_"
+                        f"{printed_carrier}_carrier_approximation"
+                    )
 
     flow_rate_sccm: float | None = None
     flow_record = pressure.get("flow_rate_sccm")
@@ -3627,6 +3638,7 @@ def _sossi_transport_conditions(
         "flow_rate_sccm": flow_rate_sccm,
         "pipe_diameter_m": diameter_m,
         "transport_length_m": hotspot_length_m,
+        "transport_assumption_flags": tuple(transport_assumption_flags),
     }
 
 
@@ -3737,6 +3749,9 @@ def _predict_sossi_residue_cohort(
         transport_conditions = _sossi_transport_conditions(
             experiment, total_pressure_Pa
         )
+        table2_source_location = experiment.get("locator")
+        if not isinstance(table2_source_location, Mapping):
+            table2_source_location = {}
         inventory, sample_mass_kg, initial_melt_mass_kg = _sossi_initial_inventory(
             experiment, starting_trace_ppm_by_experiment.get(experiment_id, {})
         )
@@ -4021,7 +4036,14 @@ def _predict_sossi_residue_cohort(
             pipe_diameter_m=transport_conditions["pipe_diameter_m"],
             transport_length_m=transport_conditions["transport_length_m"],
         )
-        transport_assumption_flags = transport_probe.transport_assumption_flags
+        transport_assumption_flags = tuple(
+            dict.fromkeys(
+                (
+                    *transport_probe.transport_assumption_flags,
+                    *transport_conditions["transport_assumption_flags"],
+                )
+            )
+        )
         liquid_rows_used = (
             _hashimoto_liquid_row_provenance(
                 gas_pack,
@@ -4168,11 +4190,10 @@ def _predict_sossi_residue_cohort(
                             "section": "Abstract",
                         },
                         "sweep_gas_mixture_and_flow_rate_sccm": {
-                            "page": 54,
-                            "table": "2",
+                            **dict(table2_source_location),
                         },
                         "tube_geometry": {
-                            "page": 4,
+                            "page": 6,
                             "section": "2.1 Experimental Methods",
                         },
                     },
@@ -4248,7 +4269,6 @@ def _predict_sossi_residue_cohort(
                         "pt_wire_loop_bead_geometry_assumed": True,
                         "density_fallback_2700_kg_m3": area_fallback,
                         "sample_surface_area_fallback_2700_kg_m3": area_fallback,
-                        "bc_open_furnace_langmuir_limit_diagnostic": True,
                     },
                 },
             )

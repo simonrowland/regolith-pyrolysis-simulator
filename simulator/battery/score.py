@@ -12235,13 +12235,60 @@ def _sossi_residue_prediction(
         }
         provenance["predicted_element_ppm"] = value
         provenance["sensitivity_band_ppm_for_cell"] = band
+        transport_conditions = provenance.get("transport_conditions")
+        if not isinstance(transport_conditions, Mapping):
+            transport_conditions = {}
+        transport_locations = provenance.get("transport_source_locations")
+        if not isinstance(transport_locations, Mapping):
+            transport_locations = {}
+        pressure_location = transport_locations.get("total_pressure_pa")
+        table2_location = transport_locations.get(
+            "sweep_gas_mixture_and_flow_rate_sccm"
+        )
+        geometry_location = transport_locations.get("tube_geometry")
+        pressure_location = (
+            pressure_location if isinstance(pressure_location, Mapping) else {}
+        )
+        table2_location = (
+            table2_location if isinstance(table2_location, Mapping) else {}
+        )
+        geometry_location = (
+            geometry_location if isinstance(geometry_location, Mapping) else {}
+        )
+        carrier_gas_input = transport_conditions.get("carrier_gas_mixture")
+        if carrier_gas_input is None:
+            carrier_gas_input = "unprinted; N2 default"
+        else:
+            carrier_gas_input = f"{carrier_gas_input} sccm"
+        flow_input = transport_conditions.get("flow_rate_sccm")
+        if flow_input is None:
+            flow_input = "unprinted; radial-factor default 1.0"
+        else:
+            flow_input = f"{flow_input} sccm"
+        pipe_diameter_input = transport_conditions.get("pipe_diameter_m")
+        if pipe_diameter_input is None:
+            pipe_diameter_input = "default"
+        transport_length_input = transport_conditions.get("transport_length_m")
+        if transport_length_input is None:
+            transport_length_input = "default"
+        transport_notice_band = (
+            "series-resistance gas film; "
+            f"P_total={transport_conditions.get('total_pressure_pa', 'unprinted')} Pa "
+            f"(Abstract, PDF p. {pressure_location.get('page', 'unknown')}); "
+            f"CO/CO2 component flows={carrier_gas_input}; "
+            f"total flow={flow_input} "
+            f"(Table 2, PDF p. {table2_location.get('page', 'unknown')}); "
+            f"tube ID={pipe_diameter_input} m, "
+            f"hotspot={transport_length_input} m "
+            f"(Methods §2.1, PDF p. {geometry_location.get('page', 'unknown')})"
+        )
         notices = [
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                 affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                reason="bc_open_furnace_langmuir_limit_diagnostic",
+                reason="sossi_open_furnace_series_resistance_transport",
                 origin="sossi-residue-r5",
-                band="open furnace at 101325 Pa; no gas-film resistance",
+                band=transport_notice_band,
             ),
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,

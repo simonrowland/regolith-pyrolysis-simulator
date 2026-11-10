@@ -19,7 +19,7 @@ benches:
   identity: {basis: described_in_this_work}
   apparatus_family:
     state: {tag: value, value: GERO vertical alumina tube gas-mixing furnace}
-    locator: &sossi_apparatus {page: 4, section: '2.1 Experimental Methods'}
+    locator: &sossi_apparatus {page: 6, section: '2.1 Experimental Methods'}
   heating_method:
     state: {tag: value, value: vertical alumina tube furnace at set temperature}
     locator: *sossi_apparatus
@@ -290,7 +290,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '200'}}
       units: sccm
       locator: *id002
-      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
+      inference:
+        relation: printed_remaining_component_as_approximate_total_flow
+        note: >-
+          CO is unprinted and remains unknown; use the printed CO2 flow as carrier and
+          approximate total under §2.1's ≈200 sccm total-flow statement except in air
+          and at ANU (physical PDF page 6). The missing CO component is flagged.
     regime:
       regime_class:
         tag: value
@@ -686,7 +691,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '200'}}
       units: sccm
       locator: *id005
-      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
+      inference:
+        relation: printed_remaining_component_as_approximate_total_flow
+        note: >-
+          CO is unprinted and remains unknown; use the printed CO2 flow as carrier and
+          approximate total under §2.1's ≈200 sccm total-flow statement except in air
+          and at ANU (physical PDF page 6). The missing CO component is flagged.
     regime:
       regime_class:
         tag: value
@@ -818,7 +828,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '200'}}
       units: sccm
       locator: *id006
-      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
+      inference:
+        relation: printed_remaining_component_as_approximate_total_flow
+        note: >-
+          CO is unprinted and remains unknown; use the printed CO2 flow as carrier and
+          approximate total under §2.1's ≈200 sccm total-flow statement except in air
+          and at ANU (physical PDF page 6). The missing CO component is flagged.
     regime:
       regime_class:
         tag: value
@@ -1345,7 +1360,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '200'}}
       units: sccm
       locator: *id010
-      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
+      inference:
+        relation: printed_remaining_component_as_approximate_total_flow
+        note: >-
+          CO is unprinted and remains unknown; use the printed CO2 flow as carrier and
+          approximate total under §2.1's ≈200 sccm total-flow statement except in air
+          and at ANU (physical PDF page 6). The missing CO component is flagged.
     regime:
       regime_class:
         tag: value
@@ -1609,7 +1629,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '180'}}
       units: sccm
       locator: *id012
-      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
+      inference:
+        relation: printed_remaining_component_as_approximate_total_flow
+        note: >-
+          CO is unprinted and remains unknown; use the printed CO2 flow as carrier and
+          approximate total under §2.1's ≈200 sccm total-flow statement except in air
+          and at ANU (physical PDF page 6). The missing CO component is flagged.
     regime:
       regime_class:
         tag: value
@@ -2663,7 +2688,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '200'}}
       units: sccm
       locator: *id020
-      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
+      inference:
+        relation: printed_remaining_component_as_approximate_total_flow
+        note: >-
+          CO is unprinted and remains unknown; use the printed CO2 flow as carrier and
+          approximate total under §2.1's ≈200 sccm total-flow statement except in air
+          and at ANU (physical PDF page 6). The missing CO component is flagged.
     regime:
       regime_class:
         tag: value
@@ -3472,7 +3502,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id027
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run C17/12/15b; row mapping re-read from the PDF.
@@ -3554,7 +3584,7 @@ experiments:
           kind: point
           point: '7200'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 120.0 min; unit conversion only
@@ -3574,7 +3604,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -3604,7 +3634,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id028
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 1M-1/3/16b; row mapping re-read from the PDF.
@@ -3686,7 +3716,7 @@ experiments:
           kind: point
           point: '7200'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 120.0 min; unit conversion only
@@ -3706,7 +3736,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -3736,7 +3766,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id029
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 3M-29/2/16b; row mapping re-read from the PDF.
@@ -3818,7 +3848,7 @@ experiments:
           kind: point
           point: '55800'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 930.0 min; unit conversion only
@@ -3838,7 +3868,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -3867,7 +3897,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id030
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run C17/12/15c; row mapping re-read from the PDF.
@@ -3949,7 +3979,7 @@ experiments:
           kind: point
           point: '43200'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 720.0 min; unit conversion only
@@ -3969,7 +3999,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -3999,7 +4029,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id031
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 2M-16-07-16e; row mapping re-read from the PDF.
@@ -4081,7 +4111,7 @@ experiments:
           kind: point
           point: '900'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 15.0 min; unit conversion only
@@ -4101,7 +4131,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -4130,7 +4160,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id032
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 2M-16-07-16a; row mapping re-read from the PDF.
@@ -4212,7 +4242,7 @@ experiments:
           kind: point
           point: '900'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 15.0 min; unit conversion only
@@ -4232,7 +4262,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -4244,7 +4274,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '200'}}
       units: sccm
       locator: *id032
-      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
+      inference:
+        relation: printed_remaining_component_as_approximate_total_flow
+        note: >-
+          CO is unprinted and remains unknown; use the printed CO2 flow as carrier and
+          approximate total under §2.1's ≈200 sccm total-flow statement except in air
+          and at ANU (physical PDF page 6). The missing CO component is flagged.
     regime:
       regime_class:
         tag: value
@@ -4262,7 +4297,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id033
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 2M-16-07-16b; row mapping re-read from the PDF.
@@ -4344,7 +4379,7 @@ experiments:
           kind: point
           point: '900'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 15.0 min; unit conversion only
@@ -4364,7 +4399,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -4394,7 +4429,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id034
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 2M-16-07-16c; row mapping re-read from the PDF.
@@ -4476,7 +4511,7 @@ experiments:
           kind: point
           point: '900'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 15.0 min; unit conversion only
@@ -4496,7 +4531,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -4526,7 +4561,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id035
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 3M-2/3/16; row mapping re-read from the PDF.
@@ -4608,7 +4643,7 @@ experiments:
           kind: point
           point: '3600'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 60.0 min; unit conversion only
@@ -4628,7 +4663,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -4657,7 +4692,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id036
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 2M-17-07-16a; row mapping re-read from the PDF.
@@ -4739,7 +4774,7 @@ experiments:
           kind: point
           point: '3600'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 60.0 min; unit conversion only
@@ -4759,7 +4794,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -4771,7 +4806,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '200'}}
       units: sccm
       locator: *id036
-      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
+      inference:
+        relation: printed_remaining_component_as_approximate_total_flow
+        note: >-
+          CO is unprinted and remains unknown; use the printed CO2 flow as carrier and
+          approximate total under §2.1's ≈200 sccm total-flow statement except in air
+          and at ANU (physical PDF page 6). The missing CO component is flagged.
     regime:
       regime_class:
         tag: value
@@ -4789,7 +4829,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id037
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 2M-17-07-16b; row mapping re-read from the PDF.
@@ -4871,7 +4911,7 @@ experiments:
           kind: point
           point: '3600'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 60.0 min; unit conversion only
@@ -4891,7 +4931,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -4921,7 +4961,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id038
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 2M-17-07-16c; row mapping re-read from the PDF.
@@ -5003,7 +5043,7 @@ experiments:
           kind: point
           point: '3600'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 60.0 min; unit conversion only
@@ -5023,7 +5063,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -5053,7 +5093,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id039
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 2M-16-07-16f; row mapping re-read from the PDF.
@@ -5135,7 +5175,7 @@ experiments:
           kind: point
           point: '900'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 15.0 min; unit conversion only
@@ -5155,7 +5195,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -5184,7 +5224,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id040
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 2M-16-07-16g; row mapping re-read from the PDF.
@@ -5266,7 +5306,7 @@ experiments:
           kind: point
           point: '900'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 15.0 min; unit conversion only
@@ -5286,7 +5326,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -5298,7 +5338,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '200'}}
       units: sccm
       locator: *id040
-      inference: {relation: sum_printed_CO_and_CO2_flow_cells_sccm, note: a printed dash is no metered component flow}
+      inference:
+        relation: printed_remaining_component_as_approximate_total_flow
+        note: >-
+          CO is unprinted and remains unknown; use the printed CO2 flow as carrier and
+          approximate total under §2.1's ≈200 sccm total-flow statement except in air
+          and at ANU (physical PDF page 6). The missing CO component is flagged.
     regime:
       regime_class:
         tag: value
@@ -5316,7 +5361,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id041
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run P11-06-18b; row mapping re-read from the PDF.
@@ -5398,7 +5443,7 @@ experiments:
           kind: point
           point: '900'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 15.0 min; unit conversion only
@@ -5418,7 +5463,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -5448,7 +5493,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id042
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 2M-16-07-16h; row mapping re-read from the PDF.
@@ -5530,7 +5575,7 @@ experiments:
           kind: point
           point: '900'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 15.0 min; unit conversion only
@@ -5550,7 +5595,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -5580,7 +5625,7 @@ experiments:
   bench_id: gero-open-furnace
   method: langmuir_free_evaporation
   locator: &id043
-    page: 54
+    page: 55
     table: '2'
     section: Results — Run conditions and LA-ICP-MS trace element data
     note: Printed Table 2 physical run 2M-16-07-16d; row mapping re-read from the PDF.
@@ -5662,7 +5707,7 @@ experiments:
           kind: point
           point: '900'
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed 15.0 min; unit conversion only
@@ -5682,7 +5727,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 54
+        page: 55
         table: '2'
         section: Results — Run conditions and LA-ICP-MS trace element data
         note: Printed CO–CO2 flow columns are a two-gas mixture not representable by this single-species field.
@@ -7097,6 +7142,8 @@ species:
           units: m2
           locator:
             source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
+            page: 6
+            section: 2.1 Experimental Methods
             paragraph: surface areas ≈ 2×10^-5 m
             line_range: '71'
         cell_material:
