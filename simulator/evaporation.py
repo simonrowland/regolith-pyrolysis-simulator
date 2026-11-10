@@ -4431,6 +4431,9 @@ class EvaporationMixin:
         condensed_kg = max(
             0.0, rate_kg_hr - remaining_kg_hr,
         )
+        # d-378: M2 has no distinct condensate. Credit n mol M on the
+        # monomer account. The copy leaves the catalog row unchanged.
+        sp_data = self._dimer_monomer_condensate_sp_data(species, sp_data)
         credited_condensed_kg = self._dispatch_condensation_route(
             species, condensed_kg, sp_data, route_result,
         )
@@ -4581,6 +4584,36 @@ class EvaporationMixin:
             'native_fe_uncondensed_kg': remaining_kg,
             'native_fe_uncondensed_mol': float(remaining_kg / fe_molar_mass),
         }
+
+    def _dimer_monomer_condensate_sp_data(self, species: str, sp_data: dict) -> dict:
+        """Return sp_data that credits a contracted metal dimer as monomer.
+
+        d-378: M2(g) -> n M(l/s) on the monomer's account. ``n`` is the dimer
+        formula's count of the monomer element. The kernel already applies
+        ``condensation_products_mol_per_mol_vapor``, and the caller checks
+        atom balance. A catalog row that already names products is kept.
+        Dimers with no monomer collection contract are not rewritten.
+        """
+
+        from simulator.condensation_routing import dimer_collection_monomer
+
+        monomer = dimer_collection_monomer(species)
+        if monomer is None:
+            return sp_data
+        source = sp_data or {}
+        if source.get('condensation_products_mol_per_mol_vapor'):
+            return sp_data
+        formula = resolve_species_formula(
+            species, self.species_formula_registry)
+        atom_count = float(formula.elements.get(monomer, 0.0))
+        if atom_count <= 0.0:
+            return sp_data
+        copied = dict(source)
+        # Homonuclear n=2 and M_M2 = 2 M_M, so credited kg equals vapor kg.
+        copied['condensation_products_mol_per_mol_vapor'] = {
+            monomer: atom_count,
+        }
+        return copied
 
     def _dispatch_condensation_route(
         self,
@@ -5140,7 +5173,15 @@ class EvaporationMixin:
             return
         product_kg_by_species = product_kg_by_species or {
             species: credited_condensed_kg}
-        intended_condensed_kg = route_result.condensed_for_species(species)
+        # d-378 books M2 condensate on the monomer stage account. The
+        # gas species is still the dispatch key for the vapor debit.
+        from simulator.condensation_routing import (
+            dimer_collection_monomer,
+            stage_list_index_for_destination,
+        )
+
+        account = dimer_collection_monomer(species) or species
+        intended_condensed_kg = route_result.condensed_for_species(account)
         if intended_condensed_kg <= 1e-12:
             return
         scale = credited_condensed_kg / intended_condensed_kg
@@ -5149,12 +5190,11 @@ class EvaporationMixin:
             for product, kg in product_kg_by_species.items()
             if kg > 1e-12
         }
-        from simulator.condensation_routing import stage_list_index_for_destination
 
         for stage_key, stage_species in (
             route_result.condensed_by_stage_species.items()
         ):
-            projected_kg = stage_species.get(species, 0.0) * scale
+            projected_kg = stage_species.get(account, 0.0) * scale
             if projected_kg <= 1e-12:
                 continue
             stage_idx = stage_list_index_for_destination(
@@ -5166,7 +5206,7 @@ class EvaporationMixin:
             is_impurity = (
                 route_result.impurity_by_stage_species
                 .get(stage_key, {})
-                .get(species, 0.0)
+                .get(account, 0.0)
                 > 0.0
             )
             for product, product_fraction in product_scale.items():

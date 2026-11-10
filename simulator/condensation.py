@@ -131,7 +131,9 @@ from simulator.lab_geometry import (
 )
 from simulator.condensation_routing import (
     DESIGNATED_STAGE,
+    DIMER_ALPHA_FROM_MONOMER_PROXY,
     K_TRAP_STAGE_KEY,
+    METAL_DIMER_SPECIES,
     MISSING_COLLECTION_PRODUCT_CONTRACT_REASON,
     MISSING_COLLECTION_PRODUCT_CONTRACT_SPECIES,
     NA_COLLECTOR_STAGE_KEY,
@@ -139,7 +141,9 @@ from simulator.condensation_routing import (
     accepted_species_for_stage_number,
     coproduct_species_for_stage_number,
     designated_stage_number,
+    dimer_collection_monomer,
     is_designated_for_stage,
+    monomer_condensate_credit_kg,
     species_accepted_on_stage,
     stage_key_for_stage,
 )
@@ -983,6 +987,21 @@ def _sticking_wall_product_class(species: str) -> str | None:
         product_class,
     )
     return str(product_class)
+
+
+def _flag_dimer_alpha_proxy(
+    record: Mapping[str, Any],
+    *,
+    gas_species: str,
+    monomer: str,
+) -> dict[str, Any]:
+    """Monomer alpha used for a dimer, marked per d-367 / d-378."""
+
+    flagged = dict(record)
+    flagged['notice'] = DIMER_ALPHA_FROM_MONOMER_PROXY
+    flagged['alpha_source_species'] = monomer
+    flagged['gas_species'] = gas_species
+    return flagged
 
 
 def _reactive_product_backstop_authorized(species: str) -> bool:
@@ -3212,23 +3231,26 @@ class CondensationModel:
                 )
             ):
                 continue
+            # d-378: a contracted dimer uses the monomer's stage temperature.
+            # The dimer's own formation row is not a wall saturation curve.
+            physics = dimer_collection_monomer(species) or species
             stage_route_by_species[species] = {
                 'T_cond_C': _species_condensation_temperature_C(
-                    species, temps=self.condensation_temperatures_C,
+                    physics, temps=self.condensation_temperatures_C,
                     vapor_pressure_data=self.vapor_pressure_data,
                 ),
                 'hkl_condensed_by_stage_key': {},
                 'stage_alpha_records_by_stage': {},
             }
 
-        # Dimers with no collection-product contract cannot use a flowing
-        # partial they were not given. That missing input belongs to the
-        # carrier: refusing it later must not abort every other species.
+        # A metal dimer with no supplied partial pressure refuses that
+        # quantity later. The gap stays on the dimer and must not abort
+        # every other species on the route.
         missing_partial_species = sorted(
             species for species, rate in evap_flux.species_kg_hr.items()
             if rate > 0.0 and species in stage_route_by_species
             and species not in self.wall_species_partial_pressures_pa
-            and species not in MISSING_COLLECTION_PRODUCT_CONTRACT_SPECIES
+            and species not in METAL_DIMER_SPECIES
         )
         if missing_partial_species:
             raise ValueError(
@@ -3248,10 +3270,16 @@ class CondensationModel:
             # can consume the supply; a clean stage cannot hide missing alpha.
             alpha_surface = _stage_alpha_surface_key(stage)
             for species, route in stage_route_by_species.items():
-                if flowing_rates.get(species, 0.0) <= 1e-15 or _stage_isolation_blocks(stage, species):
+                monomer = dimer_collection_monomer(species)
+                physics = monomer or species
+                if flowing_rates.get(species, 0.0) <= 1e-15 or _stage_isolation_blocks(stage, physics):
                     continue
-                record = _stage_alpha_record(stage, species, self.materials)
-                _required_record_alpha_s(record, species=species, site='stage_deposition')
+                record = _stage_alpha_record(stage, physics, self.materials)
+                if monomer is not None:
+                    record = _flag_dimer_alpha_proxy(
+                        record, gas_species=species, monomer=monomer,
+                    )
+                _required_record_alpha_s(record, species=physics, site='stage_deposition')
                 route['stage_alpha_records_by_stage'][alpha_surface] = record
             for segment in self.pipe_segments:
                 # The K trap shares stage number 4 and has no duct. The
@@ -3277,20 +3305,37 @@ class CondensationModel:
                     supply = flowing_rates.get(species, 0.0)
                     if supply <= 1e-15:
                         continue
+                    monomer = dimer_collection_monomer(species)
                     # Reuse the existing wall owner and its refusal handling.
                     # Only this segment receives supply, so its result cannot
-                    # be rescaled against another wall's candidate.
-                    candidates = self._wall_deposit_candidates_by_segment_kg(
-                        species=species, rate_kg_hr=supply,
-                        T_cond_C=route['T_cond_C'],
-                        melt_temperature_C=float(melt.temperature_C),
-                        supply_by_segment_kg={
-                            item.name: supply if item.name == segment.name else 0.0
-                            for item in self.pipe_segments
-                        },
-                        antoine_extrapolations=antoine_extrapolations,
-                        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-                    )
+                    # be rescaled against another wall's candidate. A contracted
+                    # dimer uses the monomer's stage and saturation.
+                    try:
+                        candidates = self._wall_deposit_candidates_by_segment_kg(
+                            species=species, rate_kg_hr=supply,
+                            T_cond_C=route['T_cond_C'],
+                            melt_temperature_C=float(melt.temperature_C),
+                            supply_by_segment_kg={
+                                item.name: supply if item.name == segment.name else 0.0
+                                for item in self.pipe_segments
+                            },
+                            antoine_extrapolations=antoine_extrapolations,
+                            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                            collection_species=monomer,
+                        )
+                    except DepositionInputRefusal as exc:
+                        if monomer is None or exc.value is not None:
+                            raise
+                        efficiency_outcomes_by_species.setdefault(species, []).append({
+                            'status': 'refused',
+                            'reason': str(exc),
+                            'output_status': 'refused',
+                            'species': species,
+                            'parameter': exc.parameter,
+                            'eta': None,
+                            'refusal_type': type(exc).__name__,
+                        })
+                        continue
                     deposit = candidates.get(segment.name, 0.0)
                     if deposit > 0.0:
                         wall_hkl_by_species.setdefault(species, {})[segment.name] = deposit
@@ -3306,8 +3351,10 @@ class CondensationModel:
             )[stage_key]
             stage_removed: dict[str, float] = {}
             for species, route in stage_route_by_species.items():
+                monomer = dimer_collection_monomer(species)
+                physics = monomer or species
                 supply = flowing_rates.get(species, 0.0)
-                if supply <= 1e-15 or _stage_isolation_blocks(stage, species):
+                if supply <= 1e-15 or _stage_isolation_blocks(stage, physics):
                     continue
                 alpha_record = route['stage_alpha_records_by_stage'][alpha_surface]
                 try:
@@ -3317,12 +3364,13 @@ class CondensationModel:
                         available_kg=supply,
                         inlet_partial_pressure_pa=partials.get(species),
                         alpha_s_value=_required_record_alpha_s(
-                            alpha_record, species=species, site='stage_deposition',
+                            alpha_record, species=physics, site='stage_deposition',
                         ),
                         alpha_record=alpha_record,
                         antoine_extrapolations=antoine_extrapolations,
                         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                         efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
+                        saturation_species=monomer,
                     )
                 except (WallSaturationPressureRefusal, DepositionInputRefusal) as exc:
                     if isinstance(exc, DepositionInputRefusal) and exc.value is not None:
@@ -3354,7 +3402,7 @@ class CondensationModel:
                         include_collector_fallback=True,
                     )
                     route['hkl_condensed_by_stage_key'][stage_key] = deposit
-                    if not species_accepted_on_stage(stage, species):
+                    if not species_accepted_on_stage(stage, physics):
                         route.setdefault('impurity_stage_keys', set()).add(
                             stage_key,
                         )
@@ -3414,6 +3462,15 @@ class CondensationModel:
                         str(species)
                     ][str(segment_name)]['refusal_type'] = refusal_type
 
+        # d-378 credits are applied after every species is booked, so a
+        # monomer's own deposit is not overwritten by the dimer mass.
+        pending_stage_credit: dict[str, dict[str, float]] = {}
+        pending_impurity_credit: dict[str, dict[str, float]] = {}
+        pending_wall_segment_credit: dict[str, dict[str, float]] = {}
+        monomer_credit_kg: dict[str, float] = {}
+        dimer_removed_kg: dict[str, float] = {}
+        dimer_alpha_proxy_by_species: dict[str, str] = {}
+
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
 
             if species in cleanup_offgas_authorization:
@@ -3459,6 +3516,8 @@ class CondensationModel:
                 }
                 continue
 
+            monomer = dimer_collection_monomer(species)
+            physics = monomer or species
             wall_deposit_fraction_by_species[species] = 0.0
             wall_deposit_account_fractions_by_species[species] = {}
 
@@ -3474,22 +3533,27 @@ class CondensationModel:
                 wall_hkl_by_species.get(species, {})
             )
             candidate_segments = self._mixed_temperature_wall_candidate_segments(
-                species)
+                physics)
             candidate_segments = [segment for segment in candidate_segments
                                   if segment.name not in self.wall_temperature_input_refusals]
             if candidate_segments:
-                alpha_records = [
-                    _wall_alpha_record(
-                        species,
+                alpha_records = []
+                for segment in candidate_segments:
+                    record = _wall_alpha_record(
+                        physics,
                         self.materials,
                         segment=segment,
                     )
-                    for segment in candidate_segments
-                ]
+                    if monomer is not None:
+                        record = _flag_dimer_alpha_proxy(
+                            record, gas_species=species, monomer=monomer,
+                        )
+                        dimer_alpha_proxy_by_species[species] = monomer
+                    alpha_records.append(record)
                 wall_sticking_alpha_by_species[species] = max(
                     _required_record_alpha_s(
                         record,
-                        species=species,
+                        species=physics,
                         site='wall_segment_alpha',
                     )
                     for record in alpha_records
@@ -3510,25 +3574,83 @@ class CondensationModel:
             alpha_provenance = wall_sticking_alpha_provenance_by_species.setdefault(species, {})
             for surface_key, record in stage_alpha_records_by_stage.items():
                 alpha_provenance[str(surface_key)] = copy.deepcopy(record)
+                if monomer is not None and record.get('notice') == DIMER_ALPHA_FROM_MONOMER_PROXY:
+                    dimer_alpha_proxy_by_species[species] = monomer
 
-            if wall_hkl_kg > 1e-15:
-                wall_deposit_by_species[species] = wall_hkl_kg
-                for segment_name, deposit in wall_hkl_by_segment.items():
-                    wall_deposit_by_segment_species.setdefault(segment_name, {})[species] = deposit
-                wall_deposit_fraction_by_species[species] = (
-                    wall_hkl_kg / (wall_hkl_kg + hkl_condensed_total_kg)
-                )
-                wall_deposit_account_fractions_by_species[species] = (
-                    _wall_segment_account_fractions(
-                        wall_deposit_by_segment_species, species, wall_hkl_kg, self.pipe_segments,
+            if monomer is None:
+                if wall_hkl_kg > 1e-15:
+                    wall_deposit_by_species[species] = wall_hkl_kg
+                    for segment_name, deposit in wall_hkl_by_segment.items():
+                        wall_deposit_by_segment_species.setdefault(segment_name, {})[species] = deposit
+                    wall_deposit_fraction_by_species[species] = (
+                        wall_hkl_kg / (wall_hkl_kg + hkl_condensed_total_kg)
                     )
+                    wall_deposit_account_fractions_by_species[species] = (
+                        _wall_segment_account_fractions(
+                            wall_deposit_by_segment_species, species, wall_hkl_kg, self.pipe_segments,
+                        )
+                    )
+                impurity_stage_keys = stage_route.get('impurity_stage_keys', ())
+                for stage_key, deposit in hkl_condensed_by_stage_key.items():
+                    condensed_by_stage_species.setdefault(stage_key, {})[species] = deposit
+                    if stage_key in impurity_stage_keys:
+                        impurity_by_stage_species.setdefault(stage_key, {})[species] = deposit
+            else:
+                # M2 mass leaves the dimer stream. The condensate is 2 M
+                # on the monomer account, not an M2 product.
+                impurity_stage_keys = stage_route.get('impurity_stage_keys', ())
+                removed_kg = 0.0
+                credited_kg = 0.0
+                for stage_key, deposit in hkl_condensed_by_stage_key.items():
+                    credit = monomer_condensate_credit_kg(species, monomer, deposit)
+                    pending_stage_credit.setdefault(monomer, {})
+                    pending_stage_credit[monomer][stage_key] = (
+                        pending_stage_credit[monomer].get(stage_key, 0.0) + credit
+                    )
+                    if stage_key in impurity_stage_keys:
+                        pending_impurity_credit.setdefault(monomer, {})
+                        pending_impurity_credit[monomer][stage_key] = (
+                            pending_impurity_credit[monomer].get(stage_key, 0.0) + credit
+                        )
+                    removed_kg += deposit
+                    credited_kg += credit
+                for segment_name, deposit in wall_hkl_by_segment.items():
+                    credit = monomer_condensate_credit_kg(species, monomer, deposit)
+                    pending_wall_segment_credit.setdefault(monomer, {})
+                    pending_wall_segment_credit[monomer][segment_name] = (
+                        pending_wall_segment_credit[monomer].get(segment_name, 0.0) + credit
+                    )
+                    removed_kg += deposit
+                    credited_kg += credit
+                dimer_removed_kg[species] = removed_kg
+                monomer_credit_kg[monomer] = (
+                    monomer_credit_kg.get(monomer, 0.0) + credited_kg
                 )
-            impurity_stage_keys = stage_route.get('impurity_stage_keys', ())
-            for stage_key, deposit in hkl_condensed_by_stage_key.items():
-                condensed_by_stage_species.setdefault(stage_key, {})[species] = deposit
-                if stage_key in impurity_stage_keys:
-                    impurity_by_stage_species.setdefault(stage_key, {})[species] = deposit
             remaining_by_species[species] = flowing_rates[species]
+
+        for credited_monomer, by_stage in pending_stage_credit.items():
+            for stage_key, credit_kg in by_stage.items():
+                bucket = condensed_by_stage_species.setdefault(stage_key, {})
+                bucket[credited_monomer] = bucket.get(credited_monomer, 0.0) + credit_kg
+        for credited_monomer, by_stage in pending_impurity_credit.items():
+            for stage_key, credit_kg in by_stage.items():
+                bucket = impurity_by_stage_species.setdefault(stage_key, {})
+                bucket[credited_monomer] = bucket.get(credited_monomer, 0.0) + credit_kg
+        for credited_monomer, by_segment in pending_wall_segment_credit.items():
+            added_kg = 0.0
+            for segment_name, credit_kg in by_segment.items():
+                bucket = wall_deposit_by_segment_species.setdefault(segment_name, {})
+                bucket[credited_monomer] = bucket.get(credited_monomer, 0.0) + credit_kg
+                added_kg += credit_kg
+            wall_deposit_by_species[credited_monomer] = (
+                wall_deposit_by_species.get(credited_monomer, 0.0) + added_kg
+            )
+        # The kernel reads wall_deposit_fraction_by_species by gas species
+        # and applies it to that species' own condensed kg. Rebuilding the
+        # monomer fraction from monomer-plus-dimer mass would move the
+        # monomer's own wall split. The dimer's fraction stays 0: the wall
+        # path would otherwise credit an M2 condensate, and d-378 has no
+        # distinct dimer condensate. Dimer mass is the monomer product.
 
         from simulator.diagnostics import (
             _status_bearing_alpha_record,
@@ -3539,6 +3661,16 @@ class CondensationModel:
             wall_sticking_alpha_by_species,
             wall_sticking_alpha_provenance_by_species,
         )
+        if dimer_alpha_proxy_by_species:
+            # d-367: the monomer alpha is a flagged proxy, not a measured
+            # dimer coefficient. The deposit is still predicted.
+            sticking_notice = dict(sticking_notice)
+            sticking_notice['severity'] = 'warning'
+            sticking_notice['authoritative_for_deposit_mass'] = False
+            sticking_notice['deposit_output_status'] = 'status_bearing'
+            sticking_notice[DIMER_ALPHA_FROM_MONOMER_PROXY] = dict(
+                sorted(dimer_alpha_proxy_by_species.items())
+            )
         current_alpha_provenance = sticking_notice.get(
             'alpha_s_provenance_by_species',
             {},
@@ -3818,6 +3950,30 @@ class CondensationModel:
                 float(wall_deposit_by_species.get(species, 0.0) or 0.0),
             )
             condensed_mass = stage_condensed_mass + wall_deposit_mass
+            # d-378 moves M2 mass onto the monomer account. The dimer
+            # books that mass as removed; the monomer books it as received.
+            # Homonuclear M2 has the same mass as 2 M, so both sides close.
+            # Sum the accounts before subtracting the supply. Subtracting
+            # each account from the inlet is a different float association
+            # and leaves a 1-ulp residual when the positive sum is exact.
+            credited_out = dimer_removed_kg.get(species, 0.0)
+            credited_in = monomer_credit_kg.get(species, 0.0)
+            supplied_mass = input_mass + credited_in
+            accounted_mass = (
+                remaining_mass
+                + retained_source_mass
+                + condensed_mass
+                + credited_out
+            )
+            if credited_in != 0.0 or credited_out != 0.0:
+                mass_closure_error = abs(accounted_mass - supplied_mass)
+            else:
+                mass_closure_error = abs(
+                    input_mass
+                    - remaining_mass
+                    - retained_source_mass
+                    - condensed_mass
+                )
             authority.update({
                 'input_mass_kg_hr': input_mass,
                 'remaining_mass_kg_hr': remaining_mass,
@@ -3825,12 +3981,7 @@ class CondensationModel:
                 'stage_condensed_mass_kg_hr': stage_condensed_mass,
                 'wall_deposit_mass_kg_hr': wall_deposit_mass,
                 'condensed_mass_kg_hr': condensed_mass,
-                'mass_closure_error_kg_hr': abs(
-                    input_mass
-                    - remaining_mass
-                    - retained_source_mass
-                    - condensed_mass
-                ),
+                'mass_closure_error_kg_hr': mass_closure_error,
                 'authoritative_for_terminal_offgas': (
                     False
                     if retained_source_mass > 1e-15
@@ -4173,18 +4324,20 @@ class CondensationModel:
         supply_by_segment_kg: Mapping[str, float],
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
         antoine_extrapolation_warnings: list[str] | None = None,
+        collection_species: str | None = None,
     ) -> Dict[str, float]:
+        curve = collection_species or species
         if (
             antoine_extrapolations is not None
             or antoine_extrapolation_warnings is not None
         ):
             for segment in self._mixed_temperature_wall_candidate_segments(
-                species,
+                curve,
             ):
                 if segment.name in self.wall_temperature_input_refusals:
                     continue
                 _record_wall_surface_antoine_telemetry(
-                    species,
+                    curve,
                     segment.wall_temperature_C,
                     vapor_pressure_data=self.vapor_pressure_data,
                     antoine_extrapolations=antoine_extrapolations,
@@ -4204,6 +4357,7 @@ class CondensationModel:
                 melt_temperature_C=melt_temperature_C,
                 supply_by_segment_kg=supply_by_segment_kg,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                collection_species=collection_species,
             )
         finally:
             _reset_antoine_telemetry_context(token)
@@ -4284,8 +4438,14 @@ class CondensationModel:
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
         antoine_extrapolation_warnings: list[str] | None = None,
         efficiency_outcomes: list[dict[str, Any]] | None = None,
+        saturation_species: str | None = None,
     ) -> float:
-        """Equilibrium-capped kinetic capture integrated over the stage band."""
+        """Equilibrium-capped kinetic capture integrated over the stage band.
+
+        ``saturation_species`` selects the wall saturation curve when it is
+        not the gas molecule. d-378 uses the monomer curve for a metal dimer.
+        Molar mass and the flowing partial stay on ``species``.
+        """
         def _mint_zero(reason: str, **detail: Any) -> float:
             if efficiency_outcomes is not None:
                 efficiency_outcomes.append({
@@ -4353,9 +4513,10 @@ class CondensationModel:
         lo_C, hi_C = _stage_temp_band_C(stage)
         width_C = hi_C - lo_C
         sample_count = 1 if width_C == 0.0 else HKL_BAND_SAMPLES
-        reactive_backstop_authorized = _reactive_product_backstop_authorized(species)
+        curve = saturation_species or species
+        reactive_backstop_authorized = _reactive_product_backstop_authorized(curve)
         stable_product_backstop_authorized = (
-            _stable_condensation_product_backstop_authorized(species)
+            _stable_condensation_product_backstop_authorized(curve)
         )
         notices = antoine_extrapolations if antoine_extrapolations is not None else {}
         # Gas-side length: a configured stage hydraulic diameter, else the
@@ -4422,6 +4583,7 @@ class CondensationModel:
                     T_gas_K=T_gas_K,
                     overhead_pressure_pa=overhead_pressure_pa,
                     carrier_gas=self.carrier_gas,
+                    saturation_species=curve,
                     **pressure_options,
                 )
             except WallSaturationPressureRefusal:
@@ -4546,7 +4708,7 @@ class CondensationModel:
             if segment is not None:
                 _, _, pressure_pa = segment
         eta = (p_in - pressure_pa) / p_in
-        notice = notices.get(f'{species}#wall:{midpoint_T_K}')
+        notice = notices.get(f'{curve}#wall:{midpoint_T_K}')
         if isinstance(notice, Mapping) and efficiency_outcomes is not None:
             efficiency_outcomes.append({
                 **notice, 'status': 'extrapolated', 'authority_level': 'extrapolated',
@@ -6611,7 +6773,11 @@ def _wall_deposition_driving_pressure_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     diagnostic_out: MutableMapping[str, Any] | None = None,
+    saturation_species: str | None = None,
 ) -> float:
+    # d-378: a dimer deposit is driven by the monomer's wall curve.
+    if saturation_species is not None:
+        species = saturation_species
     try:
         local_pressure_pa = float(P_local_pa)
     except (TypeError, ValueError):
@@ -6841,6 +7007,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     diagnostic_out: MutableMapping[str, Any] | None = None,
+    saturation_species: str | None = None,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -6971,6 +7138,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             diagnostic_out=diagnostic_out,
+            saturation_species=saturation_species,
         )
     except WallSaturationPressureRefusal as exc:
         if diagnostic_out is not None:

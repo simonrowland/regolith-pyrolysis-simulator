@@ -70,6 +70,7 @@ def wall_deposit_candidates_by_segment_kg(
     melt_temperature_C: float,
     supply_by_segment_kg: Mapping[str, float],
     antoine_extrapolation_warnings: list[str] | None = None,
+    collection_species: str | None = None,
 ) -> dict[str, float]:
     from simulator.condensation import (
         KnudsenRegimeRefusal,
@@ -80,7 +81,9 @@ def wall_deposit_candidates_by_segment_kg(
     rate_kg_hr = _deposition_finite_scalar("rate_kg_hr", rate_kg_hr)
     if rate_kg_hr <= 0.0 or not model.pipe_segments:
         return {}
-    reachable_segments = model._mixed_temperature_wall_candidate_segments(species)
+    # d-378: dimer wall reach follows the monomer's designated stage.
+    stage_species = collection_species or species
+    reachable_segments = model._mixed_temperature_wall_candidate_segments(stage_species)
     if not reachable_segments:
         return {}
     candidates: dict[str, float] = {}
@@ -107,6 +110,7 @@ def wall_deposit_candidates_by_segment_kg(
                 regime_factor=_segment_wall_regime_factor(model, segment),
                 segment=segment,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                collection_species=collection_species,
             )
         except KnudsenRegimeRefusal as exc:
             record = {
@@ -194,6 +198,7 @@ def wall_deposit_candidate_for_surface_kg(
     regime_factor: float | None = None,
     segment: Any | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
+    collection_species: str | None = None,
 ) -> float | dict[str, Any]:
     from simulator.condensation import (
         DepositionInputRefusal,
@@ -239,6 +244,9 @@ def wall_deposit_candidate_for_surface_kg(
         return 0.0
 
     materials = getattr(model, "materials", None)
+    # Stage, saturation, and sticking follow the monomer. The gas
+    # molecule, its partial pressure, and its molar mass stay on species.
+    alpha_species = collection_species or species
     wall_config = _wall_material_config(materials)
     segment_liner = str(getattr(segment, "liner_material", "") or "")
     wall_liner = str(wall_config.get("liner_material") or "")
@@ -249,9 +257,9 @@ def wall_deposit_candidate_for_surface_kg(
         _liner_material_config(wall_liner, materials) if wall_liner else {},
     ):
         entries = config.get("alpha_s_by_species") or {}
-        if not isinstance(entries, Mapping) or entries.get(species) is None:
+        if not isinstance(entries, Mapping) or entries.get(alpha_species) is None:
             continue
-        raw_alpha = _alpha_s_spec_from_entry(species, entries[species])
+        raw_alpha = _alpha_s_spec_from_entry(alpha_species, entries[alpha_species])
         if raw_alpha is not None and not isinstance(raw_alpha, Mapping):
             declared_alpha = _deposition_finite_scalar("alpha_s", raw_alpha)
             if not 0.0 <= declared_alpha <= 1.0:
@@ -261,13 +269,20 @@ def wall_deposit_candidate_for_surface_kg(
         break
     T_wall_K = max(float(wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
     alpha_record = _wall_alpha_record(
-        species,
+        alpha_species,
         materials,
         segment=segment,
         T_K=T_wall_K,
     )
+    if collection_species is not None and collection_species != species:
+        from simulator.condensation_routing import DIMER_ALPHA_FROM_MONOMER_PROXY
+
+        alpha_record = dict(alpha_record)
+        alpha_record["notice"] = DIMER_ALPHA_FROM_MONOMER_PROXY
+        alpha_record["alpha_source_species"] = collection_species
+        alpha_record["gas_species"] = species
     alpha_s = _required_record_alpha_s(
-        alpha_record, species=species, site="wall_deposit_candidate_for_surface_kg"
+        alpha_record, species=alpha_species, site="wall_deposit_candidate_for_surface_kg"
     )
 
     segment_name = str(getattr(segment, "name", "")) if segment is not None else ""
@@ -380,11 +395,12 @@ def wall_deposit_candidate_for_surface_kg(
                 # wall (above T_cond) mass-deposit reactive products — the inverse
                 # of the 07fa3fe stage fix (wall-path residual tracked as t-404).
                 reactive_product_backstop=(
-                    _reactive_product_backstop_authorized(species)
+                    _reactive_product_backstop_authorized(alpha_species)
                     and float(wall_temperature_C) <= float(T_cond_C)
                 ),
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=rate_diagnostic,
+                saturation_species=collection_species,
             )
         except WallSaturationPressureRefusal:
             if not rate_diagnostic.get("wall_saturation_pressure_refused"):

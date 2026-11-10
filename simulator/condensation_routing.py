@@ -113,16 +113,67 @@ DESIGNATED_STAGE: dict[str, str] = {
     'Mg': NA_COLLECTOR_STAGE_KEY,
 }
 
-# Melt-side formation only. These rows have no wall saturation curve,
-# stable collected phase, accommodation coefficient, or kinetics.
-# Designating M2 onto the M stage would credit two atoms as one product.
-MISSING_COLLECTION_PRODUCT_CONTRACT_SPECIES: frozenset[str] = frozenset({
+# Homonuclear metal dimers. d-378: M2(g) has no distinct condensate.
+# M2(g) -> 2 M(l/s) on the monomer's stage when that monomer already
+# has a collection contract. The gas-phase M2 = 2 M equilibrium is one
+# element saturation condition, so the stage and the wall saturation are
+# the monomer's. Sticking uses the monomer alpha as a flagged proxy.
+METAL_DIMER_SPECIES: frozenset[str] = frozenset({
     'Al2',
     'Ca2',
     'K2',
     'Mg2',
     'Na2',
 })
+DIMER_ALPHA_FROM_MONOMER_PROXY = 'dimer_alpha_from_monomer_proxy'
+
+
+def dimer_collection_monomer(species: str) -> str | None:
+    """Monomer collection account for a metal dimer, or None.
+
+    None means the monomer itself has no condenser contract. Those
+    dimers keep the typed missing-collection-product refusal.
+    """
+
+    if species not in METAL_DIMER_SPECIES:
+        return None
+    monomer = species[:-1]
+    if monomer not in DESIGNATED_STAGE:
+        return None
+    return monomer
+
+
+def monomer_condensate_credit_kg(
+    dimer: str,
+    monomer: str,
+    dimer_kg: float,
+) -> float:
+    """kg of M credited for ``dimer_kg`` of M2.
+
+    d-378: M2(g) -> n M(l/s), where n is the dimer formula's count of the
+    monomer element. Credited mass is n * (dimer_kg / M_M2) * M_M.
+    A homonuclear dimer has n = 2 and M_M2 = 2 M_M, so the credited
+    mass equals the dimer mass and the atom count is 2 mol M per mol M2.
+    """
+
+    from simulator.accounting.formulas import resolve_species_formula
+
+    dimer_formula = resolve_species_formula(dimer)
+    monomer_formula = resolve_species_formula(monomer)
+    atom_count = float(dimer_formula.elements.get(monomer, 0.0))
+    if atom_count <= 0.0:
+        raise ValueError(f'{dimer} has no {monomer} atoms to credit')
+    dimer_molar_mass = float(dimer_formula.molar_mass_g_per_mol())
+    monomer_molar_mass = float(monomer_formula.molar_mass_g_per_mol())
+    return float(dimer_kg) * atom_count * monomer_molar_mass / dimer_molar_mass
+
+
+# Monomer has no condenser contract. The vapor stays in the stream.
+MISSING_COLLECTION_PRODUCT_CONTRACT_SPECIES: frozenset[str] = frozenset(
+    species
+    for species in METAL_DIMER_SPECIES
+    if dimer_collection_monomer(species) is None
+)
 MISSING_COLLECTION_PRODUCT_CONTRACT_REASON = (
     'missing_collection_product_contract'
 )

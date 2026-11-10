@@ -1361,10 +1361,13 @@ class ExtractionMixin:
                 route_result.remaining_by_species.get(species, 0.0)
             )
             condensed_kg = max(0.0, rate_kg_hr - remaining_kg_hr)
-            sp_data = dict(
-                (self.vapor_pressures.get('metals', {}) or {}).get(
-                    species, {}
-                )
+            sp_data = self._dimer_monomer_condensate_sp_data(
+                species,
+                dict(
+                    (self.vapor_pressures.get('metals', {}) or {}).get(
+                        species, {}
+                    )
+                ),
             )
             credited_condensed_kg = self._dispatch_condensation_route(
                 species,
