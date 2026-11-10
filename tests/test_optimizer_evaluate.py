@@ -3570,6 +3570,10 @@ def test_parametric_runner_fouling_report_binds_no_unqualified_deposition(
     assert coating.authoritative is False
     report = result.feasibility_margins["coating"].status_payload
     assert report["campaigns_to_resinter"] == "resinter_threshold_kg / 0.5"
+    assert report["campaigns_to_resinter_worst_segment"] == (
+        "resinter_threshold_kg / 0.5"
+    )
+    assert report["campaigns_to_resinter_total"] == "resinter_threshold_kg / 0.5"
     assert report["resinter_threshold_basis"] == "parameter required"
     assert report["authoritative"] is False
     assert report["authoritative_for_resinter"] is False
