@@ -86,18 +86,22 @@ def two_hour_run(request, vapor_pressure_data, feedstocks_data, setpoints_data):
 
 
 def test_oxygen_partitions_inherit_partial_product_flag(two_hour_run, monkeypatch):
+    oxygen_partition = {
+        "stored": 4.5688e-7,
+        "total": 4.5688e-7,
+    }
     monkeypatch.setattr(
         two_hour_run,
         "_oxygen_terminal_partition_kg",
-        lambda: {"stored": 1.0, "total": 1.0},
+        lambda: oxygen_partition,
     )
     products = classify_products(two_hour_run)
-    assert products["oxygen"]["class_total_kg"] == 1.0
+    assert products["oxygen"]["class_total_kg"] == oxygen_partition["total"]
     assert products["oxygen"]["status"] == "partial"
     assert (
         products["oxygen"]["excluded"] == products["oxygen"]["flag"]["excluded"]
     )
-    assert products["oxygen"]["partition_kg"] == {"stored": 1.0, "total": 1.0}
+    assert products["oxygen"]["partition_kg"] == oxygen_partition
     metals_partition = products["metals_plus_O2"]["O2_partition_kg"]
     assert all(value is not None for value in metals_partition.values())
     for bucket in ("oxygen", "metals_plus_O2"):
@@ -125,9 +129,12 @@ def test_oxygen_partitions_inherit_partial_product_flag(two_hour_run, monkeypatc
         assert notice["pending_follow_ups"] == [
             "d-359 B", "d-359 C", "d-359 E",
         ]
-        expected_total = products[bucket]["class_total_kg"]
+        partition_key = (
+            "partition_kg" if bucket == "oxygen" else "O2_partition_kg"
+        )
+        expected_o2_total = products[bucket][partition_key]["total"]
         assert (
-            f"The shipped molecular-O₂ ledger total is {expected_total:.1f} kg"
+            f"The shipped molecular-O₂ ledger total is {expected_o2_total:.3g} kg"
             in notice["reason"]
         )
         assert (

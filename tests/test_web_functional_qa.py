@@ -265,7 +265,7 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         assert runner["oxygen"]["status"] == "partial"
         reason = oxygen_flag["reason"]
         assert reason.startswith(
-            "The shipped molecular-O₂ ledger total is 0.0 kg; B/C/E interim "
+            "The shipped molecular-O₂ ledger total is 0 kg; B/C/E interim "
             "estimates remain non-authoritative and pending their follow-ups. "
         )
         predictions = oxygen_flag["class_predictions"]

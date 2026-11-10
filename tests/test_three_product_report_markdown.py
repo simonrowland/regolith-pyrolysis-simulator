@@ -300,7 +300,7 @@ def test_flagged_zero_oxygen_renders_d367_notice_in_runner_report():
             "authority_level": "extrapolated",
             "band": "d-359 B/C/E follow-ups pending",
             "reason": (
-                "The shipped molecular-O₂ ledger total is 0.0 kg; B/C/E "
+                "The shipped molecular-O₂ ledger total is 0 kg; B/C/E "
                 "interim estimates remain non-authoritative and pending their "
                 "follow-ups. Class B activity ladder: SiO uses provider "
                 "activity 0.436 with its evidence link missing; the ladder "
@@ -320,7 +320,7 @@ def test_flagged_zero_oxygen_renders_d367_notice_in_runner_report():
         "- Availability flag: status=flagged prediction; "
         "category=3; kind=predict_and_flag; authority=extrapolated; "
         "authority_level=extrapolated; band=d-359 B/C/E follow-ups pending; "
-        "reason=The shipped molecular-O₂ ledger total is 0.0 kg; B/C/E "
+        "reason=The shipped molecular-O₂ ledger total is 0 kg; B/C/E "
         "interim estimates remain non-authoritative and pending their "
         "follow-ups. Class B activity ladder: SiO uses provider activity "
         "0.436 with its evidence link missing; the ladder continues through "
