@@ -272,7 +272,7 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         assert "provider activity" in reason
         assert "published gamma*x" in reason
         assert "outside_declared_evaluator_domain" in reason
-        assert "domain [1519, 2273.15] K" in reason
+        assert "domain [1519.0, 2273.15] K" in reason
         assert "stage0_only" in reason
         assert "phase-independent K" in reason
         assert "Pending d-359 follow-ups: B, C, E." in reason
