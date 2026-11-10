@@ -75,6 +75,7 @@ from simulator.vapour_rail.instrumentation import (
     CONTROL_FLUX_PRESSURES_KEY,
     FLUX_CONSUMER_RELPATHS,
     SHADOW_PROVED,
+    SHADOW_SELF_AGREEMENT,
     assert_no_flux_consumer_iterates_compatibility_maps,
     compare_live_shadow_to_batch_flux,
     flux_pressures_from_batch,
@@ -1110,13 +1111,19 @@ def test_cross_feedstock_request_activation_and_seam_parity(
         assert isinstance(answer.pressure, PressureValue)
         assert isinstance(answer.flux, FluxEligible)
 
-    # Shadow proof: seam live == batch-gated seam values.
+    # Seam numbers are checked below. shadow_equal is proof only when no
+    # compared species recomputes a shared reported activity.
     shadow = surface["shadow"]
-    assert shadow["shadow_equal"] is True, (
-        f"{feedstock_id}: seam/batch shadow mismatch blocks activation: "
-        f"{shadow}"
-    )
-    assert shadow["shadow_outcome"] == SHADOW_PROVED
+    if shadow.get("self_agreement_species"):
+        assert shadow["shadow_equal"] is False, shadow
+        assert shadow["shadow_outcome"] == SHADOW_SELF_AGREEMENT
+        assert shadow["mismatched_species"] == []
+    else:
+        assert shadow["shadow_equal"] is True, (
+            f"{feedstock_id}: seam/batch shadow mismatch blocks activation: "
+            f"{shadow}"
+        )
+        assert shadow["shadow_outcome"] == SHADOW_PROVED
     assert surface["effective_source_id"] == (
         "equilibrium_backend_effective_pressure_pre_rg"
     )

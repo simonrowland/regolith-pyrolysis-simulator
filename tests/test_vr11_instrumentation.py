@@ -12,6 +12,7 @@ Acceptance (DECOMPOSITION VR-11 / DESIGN-REV5 U4):
 from __future__ import annotations
 
 from dataclasses import replace
+from itertools import product
 import math
 from pathlib import Path
 from types import MethodType, SimpleNamespace
@@ -27,6 +28,10 @@ from simulator.evaporation import (
     PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
     _evaporation_legacy_shadow_pressure_map,
     _pre_rg_effective_pressure_source,
+)
+from simulator.vapour_rail.activity import (
+    ActivityVerdictKind,
+    SourceReactionActivity,
 )
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
@@ -51,6 +56,7 @@ from simulator.vapour_rail.instrumentation import (
     SHADOW_MISSING_BATCH,
     SHADOW_MISSING_KEYS,
     SHADOW_PROVED,
+    SHADOW_SELF_AGREEMENT,
     SHADOW_REFUSED_VS_LIVE,
     SHADOW_RESOLUTION_ERROR,
     SOURCE_VAPOUR_CEILING_ROWS,
@@ -792,6 +798,126 @@ def test_in_domain_effective_pressure_set_mismatch_fails_closed() -> None:
     )
     assert report["missing_effective_pressure_species"] == ["Na"]
     assert report["catalog_continuation_flux_species"] == []
+
+
+_SHADOW_PANEL = ("Na", "K", "Fe")
+_SHADOW_ROLES = (
+    "independent",
+    "self_agreement",
+    "seam_mismatch",
+    "catalog_mismatch",
+)
+
+
+def _self_agreement_activity() -> SourceReactionActivity:
+    return SourceReactionActivity(
+        component_id="oxide",
+        value=0.25,
+        verdict=ActivityVerdictKind.POINT,
+        bound_direction=None,
+        reason="provider_reported_thermodynamic_activity",
+        standard_state=None,
+        phase_assemblage_ref=None,
+        chemical_potential_ref=None,
+        state_fingerprint=None,
+        solve_group_id=None,
+        provider="test_activity_provider",
+        derivation={"algebra": "a_source = a_reported"},
+    )
+
+
+def _shadow_assignment(
+    roles: tuple[str, ...],
+) -> tuple[VapourBatch, dict[str, float], dict[str, float]]:
+    channels = {}
+    live: dict[str, float] = {}
+    batch_flux: dict[str, float] = {}
+    for index, (species_id, role) in enumerate(zip(_SHADOW_PANEL, roles)):
+        base = 10.0 + index
+        if role == "seam_mismatch":
+            live_pa, flux_pa, catalog_pa, shared = base, base + 100.0, base, False
+        elif role == "catalog_mismatch":
+            live_pa, flux_pa, catalog_pa, shared = base, base, base + 100.0, True
+        elif role == "self_agreement":
+            live_pa, flux_pa, catalog_pa, shared = base, base, base, True
+        else:
+            live_pa, flux_pa, catalog_pa, shared = base, base, base, False
+        channels[species_id] = VapourAnswer(
+            species_id=species_id,
+            pressure=PressureValue(pa=catalog_pa),
+            selected_runtime_pressure=PressureValue(pa=catalog_pa),
+            flux=FluxEligible(alpha_ref=f"alpha:{species_id}"),
+            source_label="test",
+            formula_id=species_id,
+            source_account="process.cleaned_melt",
+            solve_group_id="g1",
+            state_fingerprint="state:test",
+            validation_status="pending_validation",
+            source_reaction_activity=(
+                _self_agreement_activity() if shared else None
+            ),
+        )
+        live[species_id] = live_pa
+        batch_flux[species_id] = flux_pa
+    batch = VapourBatch(
+        requested_species_ids=frozenset(channels),
+        channels_by_species=channels,
+        flux_active_species_ids=frozenset(channels),
+    )
+    return batch, live, batch_flux
+
+
+@pytest.mark.parametrize(
+    "roles",
+    list(product(_SHADOW_ROLES, repeat=len(_SHADOW_PANEL))),
+    ids=["-".join(roles) for roles in product(_SHADOW_ROLES, repeat=len(_SHADOW_PANEL))],
+)
+def test_shadow_proof_classifies_every_species(roles: tuple[str, ...]) -> None:
+    """No species is proved by a shared activity, and no mismatch is dropped.
+
+    Roles cover independent agreement, self-agreement, a seam mismatch, and
+    a catalog mismatch on every panel species.
+    """
+
+    batch, live, batch_flux = _shadow_assignment(roles)
+    report = compare_live_shadow_to_batch_flux(
+        batch=batch,
+        live_pressures_Pa=live,
+        batch_flux_pressures_Pa=batch_flux,
+    )
+    by_role = dict(zip(_SHADOW_PANEL, roles))
+    seam_mismatch = {sid for sid, role in by_role.items() if role == "seam_mismatch"}
+    catalog_mismatch = {
+        sid for sid, role in by_role.items() if role == "catalog_mismatch"
+    }
+    self_agreement = {
+        sid for sid, role in by_role.items() if role == "self_agreement"
+    }
+    assert {row["species"] for row in report["mismatched_species"]} == seam_mismatch
+    assert {
+        row["species"]
+        for row in (report.get("catalog_pa_mismatched_species") or [])
+    } == catalog_mismatch
+    assert set(report.get("self_agreement_species") or []) == self_agreement
+    assert set(
+        report.get("catalog_pa_self_agreement_species") or []
+    ) == self_agreement
+    assert report["shadow_equal"] is not (bool(seam_mismatch) or bool(self_agreement))
+    if seam_mismatch:
+        assert report["shadow_outcome"] == SHADOW_MISMATCH
+    elif self_agreement:
+        assert report["shadow_outcome"] == SHADOW_SELF_AGREEMENT
+    else:
+        assert report["shadow_outcome"] == SHADOW_PROVED
+    assert report["catalog_pa_shadow_equal"] is not (
+        bool(catalog_mismatch) or bool(self_agreement)
+    )
+    if catalog_mismatch:
+        assert report["catalog_pa_shadow_outcome"] == SHADOW_MISMATCH
+    elif self_agreement:
+        assert report["catalog_pa_shadow_outcome"] == SHADOW_SELF_AGREEMENT
+    else:
+        assert report["catalog_pa_shadow_outcome"] == SHADOW_PROVED
 
 
 def test_flux_pressures_proved_when_legacy_and_batch_agree() -> None:

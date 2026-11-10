@@ -107,6 +107,8 @@ REFUSAL_NO_COMPLETE_BUNDLE_SOURCE = "no_complete_bundle_source"
 # Outcome-determining process state missing (HI-8 / DESIGN-REV5 §1.2):
 # never fabricate PressureValue(0.0) + FluxEligible as a stand-in.
 REFUSAL_MISSING_OUTCOME_STATE = "missing_outcome_determining_state"
+# RG-1: an unread compound-bearing assemblage refuses flux only (d-367, d-019).
+REFUSAL_COMPOUND_BEARING_STATE_UNKNOWN = "compound_bearing_state_unknown"
 # t-571 chemical-potential channel refusals (design §9).  Distinct from the
 # legacy formula/evaluator/route channel-contract check below. Alpha is a
 # flux input and is not part of that check.
@@ -1225,10 +1227,13 @@ def refusal_closure(
     supplied_compound_state = (
         state.extras.get("compound_bearing_state") if state is not None else None
     )
-    compound_bearing_state = (
+    # Explicit bool only. Omitting the extra does not mean the assemblage was
+    # read and found compound-bearing; that default turned the spinel gate on
+    # for every compound_bearing declaration (d-367, d-019).
+    compound_bearing_known: bool | None = (
         supplied_compound_state
-        if rg_manifest_activation and isinstance(supplied_compound_state, bool)
-        else rg_manifest_activation
+        if isinstance(supplied_compound_state, bool)
+        else None
     )
     state_identity_error: str | None = None
     try:
@@ -1415,7 +1420,7 @@ def refusal_closure(
                         reported_activity_evidence_ref=evidence_ref,
                         reported_activity_standard_state=reported_standard_state,
                         reported_activity_provenance=reported_provenance,
-                        compound_bearing_state=compound_bearing_state,
+                        compound_bearing_state=compound_bearing_known is True,
                     )
                 )
                 if source_reaction_activity.verdict is ActivityVerdictKind.REFUSAL:
@@ -1663,8 +1668,11 @@ def refusal_closure(
             else:
                 pressure = PressureValue(pa=float(pressure_pa))
 
-            # Sole alpha chokepoint. The pressure above is the evaluator
-            # result; a missing or non-executable alpha refuses flux only.
+            # Sole quantity chokepoint. The pressure above is the evaluator
+            # result. A missing alpha, or an unread compound-bearing
+            # assemblage, refuses flux only and keeps that pressure (d-367,
+            # d-019). The spinel proxy ban is not this default: it runs only
+            # when compound_bearing_known is True.
             if not _alpha_contract_available(alpha):
                 flux = FluxRefusal(
                     code="missing_evaporation_alpha",
@@ -1682,6 +1690,21 @@ def refusal_closure(
                 flux = FluxEligible(
                     alpha_ref=alpha_ref,
                     reaction_id=rule.source_reaction_id,
+                )
+            if (
+                rg_manifest_activation
+                and compound_bearing_known is None
+                and rule.source_reaction_activity is not None
+                and rule.source_reaction_activity.compound_bearing
+                and not isinstance(flux, FluxRefusal)
+            ):
+                flux = FluxRefusal(
+                    code=REFUSAL_COMPOUND_BEARING_STATE_UNKNOWN,
+                    detail=(
+                        "compound-bearing state was not read from an "
+                        f"assemblage; the calculable pressure for "
+                        f"{rule.species_id} is retained and flux is refused"
+                    ),
                 )
         else:
             contract_detail = _channel_contract_refusal(rule)
@@ -1709,6 +1732,11 @@ def refusal_closure(
             verdict = VERDICT_STATUS_BEARING_NON_AUTHORITATIVE
 
         extra_payload: dict[str, Any] = {"origin": rule.origin}
+        if (
+            isinstance(flux, FluxRefusal)
+            and flux.code == REFUSAL_COMPOUND_BEARING_STATE_UNKNOWN
+        ):
+            extra_payload["compound_bearing_state"] = "unknown"
         evidence = _applicability_evidence(rule, state)
         if evidence:
             extra_payload["applicability_evidence"] = evidence

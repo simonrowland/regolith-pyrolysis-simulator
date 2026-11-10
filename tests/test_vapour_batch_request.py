@@ -60,6 +60,7 @@ from simulator.vapour_rail.catalog import (
 )
 from simulator.vapour_rail.request import (
     REFUSAL_ABSENT_SOURCE_ATOM,
+    REFUSAL_COMPOUND_BEARING_STATE_UNKNOWN,
     REFUSAL_INAPPLICABLE_PREDICATE,
     REFUSAL_MISSING_OUTCOME_STATE,
     REFUSAL_NO_COMPLETE_BUNDLE_SOURCE,
@@ -83,7 +84,7 @@ from simulator.vapour_rail.request import (
 )
 from simulator.vapour_rail.instrumentation import (
     EffectivePressureSource,
-    SHADOW_ABSENT_COMPARISON,
+    SHADOW_SELF_AGREEMENT,
     compare_live_shadow_to_batch_flux,
     flux_pressures_from_batch,
     serialize_melt_activity_shadow,
@@ -1910,10 +1911,18 @@ def test_unknown_compound_state_refuses_rg_activity_but_keeps_pre_rg_seam() -> N
         state,
         flux_activation_context=_rg_activation_context(),
     ).channel("K")
-    assert isinstance(rg.pressure, PressureRefusal)
+    assert isinstance(rg.pressure, PressureValue)
+    assert rg.pressure.pa == pre_rg.pressure.pa
+    assert rg.pressure.pa > 0.0
+    assert isinstance(rg.flux, FluxRefusal)
+    assert rg.flux.code == REFUSAL_COMPOUND_BEARING_STATE_UNKNOWN
+    assert rg.extra["compound_bearing_state"] == "unknown"
     assert rg.source_reaction_activity is not None
-    assert rg.source_reaction_activity.verdict is ActivityVerdictKind.REFUSAL
-    assert "compound-bearing" in (rg.source_reaction_activity.detail or "")
+    assert rg.source_reaction_activity.verdict is not ActivityVerdictKind.REFUSAL
+    assert (
+        rg.source_reaction_activity.refusal_code
+        is not ActivityRefusalCode.COMPOUND_PROXY_FORBIDDEN
+    )
 
 
 def test_backend_reported_activity_does_not_prove_catalog_pressure_parity() -> None:
@@ -1934,8 +1943,174 @@ def test_backend_reported_activity_does_not_prove_catalog_pressure_parity() -> N
         batch_flux_pressures_Pa={"K": pressure_pa},
     )
 
+    assert report["shadow_equal"] is False
+    assert report["shadow_outcome"] == SHADOW_SELF_AGREEMENT
+    assert report["self_agreement_species"] == ["K"]
+    assert report["mismatched_species"] == []
     assert report["catalog_pa_shadow_equal"] is False
-    assert report["catalog_pa_shadow_outcome"] == SHADOW_ABSENT_COMPARISON
+    assert report["catalog_pa_shadow_outcome"] == SHADOW_SELF_AGREEMENT
+    assert report["catalog_pa_self_agreement_species"] == ["K"]
+    assert (report.get("catalog_pa_mismatched_species") or []) == []
+
+
+def _vapor_species_rows() -> list[tuple[str, dict]]:
+    rows: list[tuple[str, dict]] = []
+    for family in _yaml("vapor_pressures.yaml")["families"].values():
+        species = (family.get("physical_properties") or {}).get("species") or {}
+        for species_id, row in species.items():
+            rows.append((str(species_id), row))
+    return rows
+
+
+def _compound_bearing_species_ids() -> tuple[str, ...]:
+    found: list[str] = []
+    for species_id, row in _vapor_species_rows():
+        for reaction in row.get("source_reactions") or []:
+            activity = reaction.get("activity_input") or {}
+            if activity.get("compound_bearing") is True:
+                found.append(species_id)
+                break
+    return tuple(sorted(set(found)))
+
+
+_COMPOUND_BEARING_SPECIES = _compound_bearing_species_ids()
+_ALL_VAPOR_SPECIES = tuple(
+    sorted({species_id for species_id, _row in _vapor_species_rows()})
+)
+
+
+@pytest.fixture(scope="module")
+def compiled_vapour_catalog():
+    return compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), u0_manifest=load_u0_manifest()
+    )
+
+
+def _rg_answer_for_species(catalog, species_id: str, *, compound_state):
+    """Resolve one catalog rule. ``compound_state`` None means unread."""
+
+    species = catalog.species[species_id]
+    declaration = species.source_reaction_activity
+    lo, hi = species.valid_temperature_K
+    temperature_K = (float(lo) + float(hi)) / 2.0
+    state_kwargs: dict[str, Any] = {
+        "temperature_K": temperature_K,
+        "source_reaction_fO2_bar": 1.0e-8,
+        "fO2_bar": 1.0e-8,
+    }
+    if declaration is not None:
+        state_kwargs.update(
+            source_reaction_activities={species_id: 0.25},
+            source_reaction_activity_provider="test_activity_provider",
+            source_reaction_activity_evidence_refs={
+                species_id: "doi:10.1234/test-activity"
+            },
+            source_reaction_activity_standard_states={
+                species_id: declaration.standard_state
+            },
+        )
+    if compound_state is not None:
+        state_kwargs["extras"] = {"compound_bearing_state": compound_state}
+    rule = next(
+        item
+        for item in catalog.request_rules
+        if item.species_id == species_id and item.origin == "catalog"
+    )
+    parents = set(rule.parent_species_ids)
+    if rule.parent_oxide:
+        parents.add(rule.parent_oxide)
+    ledger = {rule.source_account: {parent: 1.0 for parent in parents}}
+    return refusal_closure(
+        requested=frozenset({species_id}),
+        rules=(rule,),
+        ledger_snapshot=ledger,
+        state=VapourResolveState(**state_kwargs),
+        catalog_species=catalog.species,
+        flux_activation_context=_rg_activation_context(),
+    ).answers[species_id], species, temperature_K
+
+
+@pytest.mark.parametrize("species_id", _ALL_VAPOR_SPECIES)
+def test_unread_compound_state_does_not_default_the_spinel_gate(
+    compiled_vapour_catalog,
+    species_id: str,
+) -> None:
+    """Every catalog species: an unread assemblage does not turn the gate on.
+
+    Compound-bearing declarations keep a calculable pressure and refuse
+    flux with ``compound_bearing_state_unknown`` (alpha refusal wins when
+    alpha itself is missing). Na is that pinned pressure, not a proxy
+    refusal. Other species are not flux-refused by this flag.
+    """
+
+    answer, species, temperature_K = _rg_answer_for_species(
+        compiled_vapour_catalog,
+        species_id,
+        compound_state=None,
+    )
+    activity = answer.source_reaction_activity
+    if activity is not None and activity.refusal_code is not None:
+        assert activity.refusal_code is not (
+            ActivityRefusalCode.COMPOUND_PROXY_FORBIDDEN
+        )
+    declaration = species.source_reaction_activity
+    compound_bearing = bool(
+        declaration is not None and declaration.compound_bearing
+    )
+    if not isinstance(answer.pressure, (PressureValue, PressureUpperBound)):
+        if species_id == "Na":
+            raise AssertionError(
+                f"Na pressure was refused ({answer.pressure!r}) instead of pinned"
+            )
+        return
+    assert answer.pressure.pa > 0.0
+    assert math.isfinite(answer.pressure.pa)
+    if species.evaluator is not None and (
+        declaration is None or declaration.activity_model == (
+            "provider_reported_thermodynamic_activity"
+        )
+    ):
+        expected = species.evaluator.evaluate(
+            temperature_K,
+            source_activity=0.25 if declaration is not None else 1.0,
+            pO2_bar=1.0e-8,
+        ).pressure_pa
+        assert answer.pressure.pa == pytest.approx(expected)
+    if compound_bearing:
+        assert isinstance(answer.flux, FluxRefusal)
+        alpha_executable = _alpha_contract_available(
+            species.vaporisation_coefficients.evaporation_alpha
+        )
+        if alpha_executable:
+            assert answer.flux.code == REFUSAL_COMPOUND_BEARING_STATE_UNKNOWN
+            assert answer.extra["compound_bearing_state"] == "unknown"
+        else:
+            assert answer.flux.code == "missing_evaporation_alpha"
+        if species_id == "Na":
+            assert isinstance(answer.pressure, PressureValue)
+    else:
+        flux_code = getattr(answer.flux, "code", None)
+        assert flux_code != REFUSAL_COMPOUND_BEARING_STATE_UNKNOWN
+
+
+@pytest.mark.parametrize("species_id", _COMPOUND_BEARING_SPECIES)
+def test_known_compound_bearing_state_still_refuses_the_free_oxide_proxy(
+    compiled_vapour_catalog,
+    species_id: str,
+) -> None:
+    """An explicit compound-bearing fact, not the default, arms the gate."""
+
+    answer, _species, _temperature_K = _rg_answer_for_species(
+        compiled_vapour_catalog,
+        species_id,
+        compound_state=True,
+    )
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert answer.source_reaction_activity is not None
+    assert (
+        answer.source_reaction_activity.refusal_code
+        is ActivityRefusalCode.COMPOUND_PROXY_FORBIDDEN
+    )
 
 
 def test_fe_pure_component_sidecar_is_refused_for_rg_flux() -> None:

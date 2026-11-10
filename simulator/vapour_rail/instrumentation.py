@@ -17,7 +17,7 @@ import ast
 import copy
 import math
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Collection, Mapping, Sequence
 from contextlib import contextmanager
 from contextvars import ContextVar
 from types import MappingProxyType
@@ -47,6 +47,9 @@ SHADOW_REFUSED_VS_LIVE = "refused_vs_live_disagreement"
 SHADOW_MISSING_KEYS = "missing_keys"
 SHADOW_NONFINITE_LIVE = "nonfinite_live"
 SHADOW_ABSENT_COMPARISON = "absent_comparison"
+# Shared reported activity: numeric agreement is not independent evidence.
+SHADOW_SELF_AGREEMENT = "self_agreement_not_evidence"
+_SELF_AGREEMENT_ALGEBRA = "a_source = a_reported"
 
 _SHADOW_EQUAL_TRUE_OUTCOMES = frozenset({SHADOW_PROVED})
 
@@ -1085,6 +1088,72 @@ def flux_pressures_from_batch(
     return flux_pressures, report
 
 
+def _reported_activity_species(
+    batch: VapourBatch,
+    catalog_pa_by_species: Mapping[str, float],
+) -> frozenset[str]:
+    """Species whose catalog pressure recomputes a reported activity."""
+
+    found: list[str] = []
+    for species_id, answer in batch.channels_by_species.items():
+        if species_id not in catalog_pa_by_species:
+            continue
+        activity = answer.source_reaction_activity
+        if activity is None:
+            continue
+        derivation = activity.derivation
+        if (
+            isinstance(derivation, Mapping)
+            and derivation.get("algebra") == _SELF_AGREEMENT_ALGEBRA
+        ):
+            found.append(str(species_id))
+    return frozenset(found)
+
+
+def _demote_self_agreement_proof(
+    comparison: dict[str, Any],
+    *,
+    self_agreement_species: Collection[str],
+    compared_species: Collection[str],
+) -> dict[str, Any]:
+    """A shared activity is not evidence, and it must not hide a mismatch.
+
+    ``shadow_equal`` stays true only when every compared species agrees
+    independently. Species that agree by recomputing ``a_reported`` are
+    listed and cannot prove the set. A numeric mismatch stays in
+    ``mismatched_species`` even when another species is self-agreement.
+    """
+
+    participating = {str(species) for species in compared_species}
+    shared = {str(species) for species in self_agreement_species} & participating
+    mismatched_rows = [
+        row
+        for row in (comparison.get("mismatched_species") or [])
+        if isinstance(row, Mapping)
+    ]
+    mismatched_ids = {
+        str(row["species"]) for row in mismatched_rows if "species" in row
+    }
+    not_evidence = sorted(shared - mismatched_ids)
+    # Omit an empty list. Runner goldens snapshot this dict, and a missing
+    # key means no species in this comparison is self-agreement.
+    if not_evidence:
+        comparison["self_agreement_species"] = not_evidence
+    if mismatched_rows:
+        comparison["shadow_equal"] = False
+        if comparison.get("shadow_outcome") == SHADOW_PROVED:
+            comparison["shadow_outcome"] = SHADOW_MISMATCH
+        return comparison
+    if not_evidence and comparison.get("shadow_outcome") == SHADOW_PROVED:
+        comparison["shadow_equal"] = False
+        comparison["shadow_outcome"] = SHADOW_SELF_AGREEMENT
+        comparison["detail"] = (
+            "numeric agreement recomputes a shared reported activity "
+            "and is not independent evidence"
+        )
+    return comparison
+
+
 def compare_live_shadow_to_batch_flux(
     *,
     batch: VapourBatch | None,
@@ -1198,33 +1267,57 @@ def compare_live_shadow_to_batch_flux(
     )
 
     if batch is not None and not resolution_error:
-        shared_reported_activity = any(
-            species_id in catalog_pa_by_species
-            and answer.source_reaction_activity is not None
-            and answer.source_reaction_activity.derivation.get("algebra")
-            == "a_source = a_reported"
-            for species_id, answer in batch.channels_by_species.items()
+        # Per species. One self-agreement must not blank the comparison, and
+        # a numeric match on a shared reported activity is not proof.
+        self_agreement_ids = _reported_activity_species(
+            batch, catalog_pa_by_species
         )
-        if shared_reported_activity:
-            # The catalog pressure reuses the backend-reported activity that
-            # produced the legacy pressure. Numeric agreement proves the
-            # plumbing matches; it is not an independent physics comparison.
-            comparison["catalog_pa_shadow_equal"] = False
-            comparison["catalog_pa_shadow_outcome"] = SHADOW_ABSENT_COMPARISON
-        else:
-            catalog_vs_live = compare_legacy_vs_batch_flux_paths(
-                legacy_pressures_Pa=live,
-                batch_flux_pressures_Pa=catalog_pa_by_species,
-                legacy_flux_active_species_ids=tuple(live),
-                batch_flux_active_species_ids=tuple(batch.flux_active_species_ids),
-                batch_present=True,
-            )
-            comparison["catalog_pa_shadow_equal"] = catalog_vs_live[
-                "shadow_equal"
-            ]
-            comparison["catalog_pa_shadow_outcome"] = catalog_vs_live[
-                "shadow_outcome"
-            ]
+        catalog_vs_live = compare_legacy_vs_batch_flux_paths(
+            legacy_pressures_Pa=live,
+            batch_flux_pressures_Pa=catalog_pa_by_species,
+            legacy_flux_active_species_ids=tuple(live),
+            batch_flux_active_species_ids=tuple(batch.flux_active_species_ids),
+            batch_present=True,
+        )
+        catalog_participants = set(catalog_pa_by_species) & set(live)
+        catalog_vs_live = _demote_self_agreement_proof(
+            catalog_vs_live,
+            self_agreement_species=self_agreement_ids,
+            compared_species=catalog_participants,
+        )
+        comparison["catalog_pa_shadow_equal"] = catalog_vs_live["shadow_equal"]
+        comparison["catalog_pa_shadow_outcome"] = catalog_vs_live[
+            "shadow_outcome"
+        ]
+        catalog_mismatches = list(
+            catalog_vs_live.get("mismatched_species") or []
+        )
+        if catalog_mismatches:
+            comparison["catalog_pa_mismatched_species"] = catalog_mismatches
+        catalog_self = list(
+            catalog_vs_live.get("self_agreement_species") or []
+        )
+        if catalog_self:
+            comparison["catalog_pa_self_agreement_species"] = catalog_self
+        shared_proof: list[str] = []
+        for species_id in self_agreement_ids:
+            if species_id not in catalog_pa_by_species or species_id not in live:
+                continue
+            if not _pressures_equal(
+                live[species_id], catalog_pa_by_species[species_id]
+            ):
+                continue
+            batch_pa = batch_flux_pressures_Pa.get(species_id)
+            if batch_pa is None or not _pressures_equal(
+                float(batch_pa), catalog_pa_by_species[species_id]
+            ):
+                continue
+            shared_proof.append(species_id)
+        comparison = _demote_self_agreement_proof(
+            comparison,
+            self_agreement_species=shared_proof,
+            compared_species=set(live) & {str(key) for key in batch_flux_pressures_Pa},
+        )
     return comparison
 
 
