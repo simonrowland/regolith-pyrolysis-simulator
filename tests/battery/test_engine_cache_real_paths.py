@@ -453,7 +453,16 @@ def test_every_opened_backend_simple_attribute_changes_key_or_has_a_reason() -> 
             try:
                 attributes = vars(value)
             except TypeError:
-                return
+                attributes = {}
+                for cls in type(value).__mro__:
+                    slots = getattr(cls, "__slots__", ())
+                    if isinstance(slots, str):
+                        slots = (slots,)
+                    for name in slots:
+                        if name not in {"__dict__", "__weakref__"} and hasattr(
+                            value, name
+                        ):
+                            attributes[name] = getattr(value, name)
             for name, child in attributes.items():
                 yield from leaves(child, (*path, name), seen)
 
