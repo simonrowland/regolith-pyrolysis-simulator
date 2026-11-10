@@ -3736,38 +3736,73 @@ def test_parallel_composition_target_stub_study_completes(
     pareto_path = tmp_path / "study" / "pareto.json"
     assert pareto_path.exists()
     payload = json.loads(pareto_path.read_text())
-    assert result.status == "completed-no-feasible-winner"
-    assert result.winner is None
-    assert result.pareto == ()
-    assert payload["status"] == "completed-no-feasible-winner"
-    assert payload["winner_candidate_id"] is None
-    assert payload["pareto"] == []
-    assert result.records
+    # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to the
+    # 20 C collector band. The Morris base (seed 0, level 1/3) now places the
+    # upstream walls at 746.67 C. The same unit coordinate on the old
+    # 1400-2200 C map was about 1667 C, which is the SiO wall-fit hole:
+    # Psat is refused at 1773.15 K, inside the published 1400-2273.15 K
+    # numeric range but outside the finite positive-denominator branch. At
+    # 746.67 C the three base points are no longer SiO-refused. Deposit mass
+    # is a measured zero, furnace amortization is available at batch cost 0,
+    # and those points form a priced Pareto, so the study completes and
+    # writes winner.recipe.yaml. The thermo step s003 still sits on the
+    # 2200 C ceiling and still refuses SiO at 1773.15 K on
+    # stage_0_to_stage_1 and stage_1_to_stage_2. t-1368 still owns that
+    # rail; s003 stays feasible, unpriced, and off the Pareto.
+    priced_ids = {
+        "morris-screen-0-t0000-s000",
+        "morris-screen-0-t0000-s001",
+        "morris-screen-0-t0000-s002",
+    }
+    hot_id = "morris-screen-0-t0000-s003"
+    assert result.status == "completed"
+    assert result.winner is not None
+    assert result.winner.candidate_id == "morris-screen-0-t0000-s000"
+    assert {record.candidate_id for record in result.pareto} == priced_ids
+    assert payload["status"] == "completed"
+    assert payload["winner_candidate_id"] == "morris-screen-0-t0000-s000"
+    assert {row["candidate_id"] for row in payload["pareto"]} == priced_ids
+    assert (tmp_path / "study" / "winner.recipe.yaml").is_file()
+    assert {record.candidate_id for record in result.records} == priced_ids | {hot_id}
     assert all(record.feasible for record in result.records)
 
-    # t-1368 owns the missing SiO wall-pressure rail; until it lands, these
-    # candidates must remain unpriced and cannot restore a study winner.
     for candidate in result.records:
         summary = candidate.product_summary
-        assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
-        refusal = summary["wall_deposit_refusal"]
-        authority = refusal["authority"]
-        assert "wall_deposit_saturation_pressure_refused" in authority["codes"]
-        assert "SiO" in authority["wall_saturation_pressure_refused_species"]
-        sio_refusals = authority["wall_saturation_pressure_refusals_by_species"][
-            "SiO"
-        ]
-        assert sio_refusals
-        assert all(
-            record["status"] == "refused"
-            for record in sio_refusals.values()
-        )
+        if candidate.candidate_id in priced_ids:
+            assert summary["furnace_amortization_status"] == "available"
+            assert summary["wall_deposit_total_kg"] == 0.0
+            assert summary["has_positive_qualified_fouling"] is False
+            refusal = summary.get("wall_deposit_refusal") or {}
+            authority = refusal.get("authority") or {}
+            refused = authority.get("wall_saturation_pressure_refused_species") or []
+            assert "SiO" not in refused
+        else:
+            assert candidate.candidate_id == hot_id
+            assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
+            refusal = summary["wall_deposit_refusal"]
+            authority = refusal["authority"]
+            assert "wall_deposit_saturation_pressure_refused" in authority["codes"]
+            assert authority["wall_saturation_pressure_refused_species"] == ["SiO"]
+            sio_refusals = authority["wall_saturation_pressure_refusals_by_species"][
+                "SiO"
+            ]
+            assert set(sio_refusals) == {
+                "stage_0_to_stage_1",
+                "stage_1_to_stage_2",
+            }
+            assert all(
+                record["status"] == "refused"
+                and record["temperature_K"] == pytest.approx(1773.15)
+                for record in sio_refusals.values()
+            )
 
         wall_authority = summary["wall_deposit_sticking_authority"]
         fe_records = wall_authority["alpha_s_provenance_by_species"]["Fe"].values()
-        # The shipped Stage-1 wall is 1150 C = 1423.15 K, just below the
-        # Tachibana fit's 1443 K lower bound, so this path predicts and flags
-        # the Arrhenius flank instead of using the retired 0.02 scalar.
+        # The shipped Stage-1 condenser wall stays 1150 C = 1423.15 K. That
+        # is the train's fixed Fe stage, not a searched overhead dew point,
+        # and it remains just below the Tachibana fit's 1443 K lower bound.
+        # This pins the Arrhenius domain of the sticking coefficient. It does
+        # not pin an Fe dew point or an Fe Psat number (d-383 owns Psat).
         assert any(
             record.get("alpha_s_form") == "arrhenius"
             and record.get("citation_status") == "CITED"
@@ -6707,11 +6742,35 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     )
     assert good.returncode == 0, good.stderr
     assert (out_dir / "pareto.json").exists()
-    assert (out_dir / "winner.recipe.yaml").exists()
+    # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to
+    # 20 C. Seed 7's liner is now about 822 C; the same unit coordinate on
+    # the old 1400-2200 C map was about 1694 C. At 822 C the CrO2 wall
+    # saturation pressure is refused, furnace amortization is
+    # batch_cost_unavailable, and the objective scores are empty. The
+    # candidate stays feasible on furnace temperature, but there is no
+    # priced winner. The honest study status is completed-no-feasible-winner,
+    # and the writer omits winner.recipe.yaml. A status of completed with
+    # no winner file would be a bug; this run is not that status.
+    assert not (out_dir / "winner.recipe.yaml").exists()
     status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
-    assert status["status"] == "SUCCEEDED"
+    assert status["status"] == "completed-no-feasible-winner"
+    assert status["study_status"] == "completed-no-feasible-winner"
     assert status["success"] is True
-    assert status["winner_candidate_id"]
+    assert "winner_candidate_id" not in status
+    pareto = json.loads((out_dir / "pareto.json").read_text(encoding="utf-8"))
+    assert pareto["status"] == "completed-no-feasible-winner"
+    assert pareto["winner_candidate_id"] is None
+    provenance = _read_provenance(out_dir)
+    assert len(provenance) == 1
+    assert provenance[0]["feasible"] is True
+    assert provenance[0]["failing_gates"] == []
+    summary = provenance[0]["product_summary"]
+    assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
+    assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
+    refused = summary["wall_deposit_refusal"]["authority"][
+        "wall_saturation_pressure_refused_species"
+    ]
+    assert refused == ["CrO2"]
 
 
 def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> None:
@@ -6873,7 +6932,23 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    assert rows[0]["lifespan_cost_status"] == "wall_deposit_unavailable"
+    # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to
+    # 20 C. Seed 0's pipe default is now about 782 C; the same unit
+    # coordinate on the old 1400-2200 C map was about 1680 C. Saturation at
+    # the colder wall is no longer a refusal: wall_deposit_total_kg is a
+    # measured 0, so lifespan status is threshold_unavailable because
+    # resinter_threshold_kg is still null. The consumed fraction stays
+    # empty and the row remains rank 1.
+    assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
+    provenance = _read_provenance(out_dir)
+    assert len(provenance) == 1
+    summary = provenance[0]["product_summary"]
+    assert summary["lifespan_cost_status"] == "threshold_unavailable"
+    assert "resinter_threshold_kg is null" in summary["lifespan_cost_status_reason"]
+    assert summary["wall_deposit_total_kg"] == 0.0
+    assert summary["resinter_threshold_kg"] is None
+    assert summary["has_positive_qualified_fouling"] is False
+    assert summary["furnace_amortization_status"] == "available"
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(
