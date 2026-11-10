@@ -13,9 +13,11 @@ from simulator.battery.enums import (
     Engine,
     MetricOperation,
     Phase,
+    ProprietaryEngineRefusal,
     Quantity,
     RefusalReason,
     ValueKind,
+    refuse_proprietary_engine_use,
 )
 from simulator.battery.identity import Identity
 from simulator.battery.records import Admission, Observation, Species, State, Value
@@ -23,6 +25,20 @@ from simulator.battery import score
 
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_proprietary_engine_refusal_contract_is_stable() -> None:
+    with pytest.raises(ProprietaryEngineRefusal) as caught:
+        refuse_proprietary_engine_use(
+            Engine.PROPRIETARY_REMOTE, mode="contract-test"
+        )
+
+    assert caught.value.engine is Engine.PROPRIETARY_REMOTE
+    assert caught.value.code == "proprietary_engine_excluded"
+    assert str(caught.value) == (
+        "proprietary_engine_excluded: engine='proprietary_remote' "
+        "is not allowed in contract-test"
+    )
 
 
 def _observation(
