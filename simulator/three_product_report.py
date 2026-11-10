@@ -430,10 +430,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     computed_mass_by_class = {
         'metals_plus_O2': {
             **({'metals_total_kg': metals_total_kg} if has_metal_product else {}),
-            **({'O2_kg': o2_kg} if has_oxygen_product else {}),
+            'O2_kg': o2_kg,
         },
         'ingots_metals': dict(metals_kg) if has_metal_product else {},
-        'oxygen': {'O2_kg': o2_kg} if has_oxygen_product else {},
+        'oxygen': {'O2_kg': o2_kg},
         'pure_silica_glass': (
             {'qualified_capture_kg': silica_product_kg}
             if has_silica_capture else {}

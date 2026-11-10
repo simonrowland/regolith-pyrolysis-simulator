@@ -613,6 +613,7 @@ def product_class_availability(
         if has_computed_part
         else {}
     )
+    molecular_o2_total_kg = available_parts_kg.get("O2_kg")
     total_kg = sum(parts.values())
     excluded: list[dict[str, Any]] = []
     if refusals:
@@ -688,16 +689,16 @@ def product_class_availability(
         status = "partial"
     prediction_flag = None
     if pending_classes:
+        total_notice = (
+            f"The shipped molecular-O₂ ledger total is "
+            f"{float(molecular_o2_total_kg):.3g} kg; "
+            if contains_o2_target and molecular_o2_total_kg is not None
+            else f"This product-class total is {float(total_kg):.1f} kg; "
+        )
         reason_parts = [
-            (
-                f"The shipped molecular-O₂ ledger total is {float(total_kg):.1f} kg; "
-                "B/C/E interim estimates remain non-authoritative and pending "
-                "their follow-ups."
-                if contains_o2_target
-                else f"This product-class total is {float(total_kg):.1f} kg; "
-                "B/C/E interim estimates remain non-authoritative and pending "
-                "their follow-ups."
-            )
+            total_notice
+            + "B/C/E interim estimates remain non-authoritative and pending "
+            "their follow-ups."
         ]
         if d359_refusals["B"]:
             reason_parts.append(
