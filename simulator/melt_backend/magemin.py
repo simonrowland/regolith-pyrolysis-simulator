@@ -112,6 +112,10 @@ from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Seque
 
 from engines.domain_reason import OutOfDomainReason
 from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
+from simulator.composition_projection import (
+    PROJECTED_BULK_CLASSIFICATION_KEY,
+    classify_projected_bulk,
+)
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
@@ -482,6 +486,25 @@ def composition_projected_liquidus_notice(
     """
     if not isinstance(diagnostics, Mapping):
         return None
+
+    def classify_notice(notice: Dict[str, Any]) -> Dict[str, Any]:
+        # Premise: each mass_fraction is kg dropped per kg of source bulk.
+        # Supplying source_sum=1 kg/kg makes the classifier compute
+        # 100*(kg/kg)/(kg/kg) in wt%; the units cancel, and the limiting
+        # 0.01 kg/kg drop is exactly 1 wt%, which remains within the limit.
+        classification = classify_projected_bulk(
+            {
+                row['component']: row['mass_fraction']
+                for row in notice['dropped_components']
+            },
+            source_sum_wt_pct=1.0,
+        )
+        if classification.verdict == 'over_threshold':
+            notice[PROJECTED_BULK_CLASSIFICATION_KEY] = (
+                classification.as_diagnostics()
+            )
+        return notice
+
     direct = _as_mapping(diagnostics.get('composition_projected_notice'))
     if direct is not None and direct.get('dropped_components'):
         rows = []
@@ -506,7 +529,7 @@ def composition_projected_liquidus_notice(
                 ),
             })
         band = _as_mapping(direct.get('certified_band')) or {}
-        return {
+        return classify_notice({
             'kind': COMPOSITION_PROJECTED,
             'reason': COMPOSITION_PROJECTED,
             'authority': str(direct.get('authority') or 'extrapolated'),
@@ -518,7 +541,7 @@ def composition_projected_liquidus_notice(
                 ],
             },
             'dropped_components': rows,
-        }
+        })
 
     containers: list[Mapping[str, Any]] = [diagnostics]
     nested = _as_mapping(diagnostics.get('backend_diagnostics'))
@@ -541,7 +564,7 @@ def composition_projected_liquidus_notice(
                 'composition_projected_missing_mass_fraction: '
                 f'{missing}'
             )
-        return {
+        return classify_notice({
             'kind': COMPOSITION_PROJECTED,
             'reason': COMPOSITION_PROJECTED,
             'authority': 'extrapolated',
@@ -563,7 +586,7 @@ def composition_projected_liquidus_notice(
                 }
                 for name in components
             ],
-        }
+        })
     return None
 
 
@@ -2016,6 +2039,33 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             notice is not None
             and result.status == 'out_of_domain'
         ):
+            classification = _as_mapping(
+                notice.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+            )
+            if (
+                classification is not None
+                and classification.get('projection_verdict')
+                != 'within_threshold'
+            ):
+                diagnostics['composition_projected_notice'] = notice
+                warnings_out.append(
+                    'MAGEMin projected-bulk liquidus retry vetoed: '
+                    f"{classification.get('projection_verdict')}; dropped "
+                    f"{float(classification['dropped_total_wt_pct']):g} wt% "
+                    f"exceeds the {float(classification['threshold_wt_pct']):g} "
+                    'wt% limit'
+                )
+                return LiquidusSolidusResult(
+                    liquidus_T_C=result.liquidus_T_C,
+                    liquidus_T_K=result.liquidus_T_K,
+                    solidus_T_C=result.solidus_T_C,
+                    liquid_fraction=result.liquid_fraction,
+                    status=result.status,
+                    warnings=tuple(warnings_out),
+                    samples=result.samples,
+                    iterations=result.iterations,
+                    diagnostics=diagnostics,
+                )
             projection_payload = (
                 diagnostics.get('input_composition_projection') or {}
             )

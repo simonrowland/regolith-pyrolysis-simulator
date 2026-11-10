@@ -701,7 +701,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((1018.75, 0.0), (1320.3125, 1.0)),
             ),
         ],
-        # Executable capture: 12 hours, six hour-local curve reads per hour.
+        # The >1 wt% projection is rejected once; its Kress floor is reused.
         'ci_carbonaceous_chondrite_C2B_12h': [
             (
                 'C2B',
@@ -710,7 +710,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 1200.000001,
                 ((1200.0, 0.0), (1200.000001, 1.0)),
             ),
-        ] * 72,
+        ],
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
@@ -727,12 +727,12 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             return record
         curve = record['curve']
         if current_scenario[0] == 'ci_carbonaceous_chondrite_C2B_12h':
-            notice = curve['gate_provider_refusal']
-            assert notice['authority'] == 'extrapolated (lower-rung)'
-            assert notice['outcome'] == 'numerical_failure'
-            assert notice['provider_diagnostic']['backend_diagnostics'][
-                'projected_liquidus_status'
-            ] in {'unavailable', 'not_converged'}
+            notice = curve['composition_projected_notice']
+            classification = notice['composition_projection_classification']
+            assert classification['projection_verdict'] == 'over_threshold'
+            assert sim._freeze_gate_provider_outcome is (
+                GateCurveProviderOutcome.STABLE_REFUSAL
+            )
         row = (
             sim.melt.campaign.name,
             curve['source'],
@@ -774,7 +774,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             assert result['status'] == 'ok'
             artifact = build_run_artifact(result, run_id='ci-first-call-floor')
             assert len(artifact['timesteps']) == scenario['hours']
-            assert rebuild_counts.get(name, 0) == 0
+            assert rebuild_counts.get(name, 0) == 1
             assert equilibrium_count[0] > equilibrations_before
 
     assert observed == expected
