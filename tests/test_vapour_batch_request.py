@@ -1729,18 +1729,18 @@ def test_missing_activity_uses_d359_ladder_before_henrian_upper_bound() -> None:
 
 
 def test_missing_gamma_row_uses_flagged_ideal_mixing_activity() -> None:
-    payload = _minimal_family("Fe", parent_oxide="FeO")
-    reaction = payload["families"]["fe_test_family"][
+    payload = _minimal_family("Ni", parent_oxide="NiO")
+    reaction = payload["families"]["ni_test_family"][
         "physical_properties"
-    ]["species"]["Fe"]["source_reactions"][0]
-    reaction["reactants"] = [{"formula": "FeO", "stoichiometry": 1.0}]
+    ]["species"]["Ni"]["source_reactions"][0]
+    reaction["reactants"] = [{"formula": "NiO", "stoichiometry": 1.0}]
     reaction["products"] = [
-        {"formula": "Fe", "stoichiometry": 1.0},
+        {"formula": "Ni", "stoichiometry": 1.0},
         {"formula": "O2", "stoichiometry": 0.5},
     ]
-    reaction["activity_input"]["component_id"] = "FeO"
-    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("Fe"))
-    ledger = {"process.cleaned_melt": {"FeO": 1.0, "SiO2": 3.0}}
+    reaction["activity_input"]["component_id"] = "NiO"
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("Ni"))
+    ledger = {"process.cleaned_melt": {"NiO": 1.0, "SiO2": 3.0}}
     state = VapourResolveState(
         temperature_K=1500.0,
         source_reaction_fO2_bar=1.0e-8,
@@ -1750,11 +1750,11 @@ def test_missing_gamma_row_uses_flagged_ideal_mixing_activity() -> None:
         ledger,
         state,
         flux_activation_context=_pre_rg_activation_context(),
-    ).channel("Fe")
+    ).channel("Ni")
 
     expected_x = single_cation_mole_fractions(
-        {"FeO": 1.0, "SiO2": 3.0}
-    )["FeO"]
+        {"NiO": 1.0, "SiO2": 3.0}
+    )["NiO"]
     assert isinstance(answer.pressure, PressureValue)
     assert isinstance(answer.flux, FluxEligible)
     assert answer.source_reaction_activity is not None
