@@ -296,15 +296,23 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
     primary = next(
         row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM
     )
+    runtime = next(
+        row for row in predictions if row.alpha_arm == "alpha_runtime_catalog"
+    )
 
     assert primary.experiment_id == "hashimoto-1983-run-17c3-2"
     assert primary.primary_geometry_policy_id == "sphere_shrinking"
-    alpha_by_channel = {
-        row["channel"]: row for row in primary.provenance["alpha_by_channel"]
-    }
-    assert alpha_by_channel["Si2O2"]["alpha_bridged_from_SiO"] is True
-    assert alpha_by_channel["AlSiO"]["multi_parent_channel_interim"] is True
-    assert primary.provenance["evaporated_mol_by_geometry"]["sphere_shrinking"]
+    for prediction in (primary, runtime):
+        alpha_by_channel = {
+            row["channel"]: row
+            for row in prediction.provenance["alpha_by_channel"]
+        }
+        assert alpha_by_channel["Si2O2"]["alpha_bridged_from_SiO"] is True
+        assert alpha_by_channel["AlSiO"]["alpha_bridged_from_SiO"] is True
+        assert alpha_by_channel["AlSiO"]["multi_parent_channel_interim"] is True
+        assert prediction.provenance["evaporated_mol_by_geometry"][
+            "sphere_shrinking"
+        ]
     assert {
         oxide: value.hex()
         for oxide, value in primary.primary_oxide_wt_pct.items()
