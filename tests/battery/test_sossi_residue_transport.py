@@ -221,3 +221,101 @@ def test_sossi_table_and_bead_area_locators_use_physical_pdf_pages():
     )
     assert area_record["locator"]["page"] == 6
     assert area_record["locator"]["section"] == "2.1 Experimental Methods"
+
+
+def test_missing_tio2_transport_uses_flagged_langmuir_limit_only_for_tio2():
+    from simulator.battery import residue
+    from simulator.chemistry.langmuir_knudsen import langmuir_flux
+    from simulator.battery.residue import _formula_terms
+
+    experiment = _source_experiment("2m-15-07-16c")
+    conditions = _sossi_transport_conditions(experiment, 101325.0)
+    kwargs = {
+        "species": "TiO2",
+        "p_eq_pa": 100.0,
+        "p_bulk_pa": 0.0,
+        "T_surface_K": 1673.15,
+        "molar_mass_kg_mol": _formula_terms("TiO2")[1],
+        "alpha": 0.85,
+        "carrier_gas": "N2",
+        "T_gas_K": 1673.15,
+        "melt_resistance_enabled": False,
+        "gas_resistance_enabled": True,
+        **{
+            key: conditions[key]
+            for key in (
+                "total_pressure_pa",
+                "carrier_gas_mixture",
+                "flow_rate_sccm",
+                "pipe_diameter_m",
+                "transport_length_m",
+            )
+        },
+    }
+
+    result, fallback_flag = residue._series_flux_with_missing_ce_fallback(**kwargs)
+
+    expected = langmuir_flux(
+        "TiO2",
+        1673.15,
+        100.0,
+        0.0,
+        0.85,
+        molar_mass_kg_mol=_formula_terms("TiO2")[1],
+    )
+    assert result.flux_kg_s_m2 == pytest.approx(expected)
+    assert fallback_flag is not None
+    assert "TiO2" in fallback_flag
+    assert "N2" in fallback_flag
+    assert "missing_chapman_enskog_parameters" in fallback_flag
+    assert "langmuir_limit" in fallback_flag
+    assert "low_authority" in fallback_flag
+
+
+def test_parameterless_tio2_does_not_refuse_supported_mn_flux(monkeypatch):
+    from simulator.battery.residue import (
+        ResidueChannel,
+        _ChannelTerms,
+        _finite_step_fluxes,
+        _formula_terms,
+    )
+    from simulator.chemistry.langmuir_knudsen import series_flux
+
+    calls = []
+    original_series_flux = series_flux
+
+    def capture_series_flux(**kwargs):
+        calls.append((kwargs["species"], kwargs["gas_resistance_enabled"]))
+        return original_series_flux(**kwargs)
+
+    monkeypatch.setattr(
+        "simulator.chemistry.langmuir_knudsen.series_flux", capture_series_flux
+    )
+
+    def channel(species, formula, parent):
+        return _ChannelTerms(
+            source=ResidueChannel(species, formula, parent, 0.85, "test"),
+            molar_mass_kg_mol=_formula_terms(formula)[1],
+            atom_counts={},
+            parent_moles_per_product=1.0,
+            parent_oxygen_demand=0.0,
+            al_sio_sio2_moles_per_product=0.0,
+            oxide_per_product_kg=0.0,
+            o2_per_product_kg=0.0,
+        )
+
+    conditions = _sossi_transport_conditions(
+        _source_experiment("2m-15-07-16c"), 101325.0
+    )
+    rates = _finite_step_fluxes(
+        [channel("Mn", "Mn", "MnO"), channel("TiO2", "TiO2", "TiO2")],
+        {"MnO": 1.0, "TiO2": 1.0},
+        temperature_K=1673.15,
+        area_m2=2.0e-5,
+        pressures_Pa={"Mn": 100.0, "TiO2": 100.0},
+        transport_conditions=conditions,
+    )
+
+    assert rates["Mn"] > 0.0
+    assert rates["TiO2"] > 0.0
+    assert calls == [("Mn", True), ("TiO2", True), ("TiO2", False)]
