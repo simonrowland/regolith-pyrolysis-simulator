@@ -642,6 +642,14 @@ def test_scored_fixture_rows_match_cache_off_cold_and_warm(
     }
     assert not warm_engine_calls, f"warm engine calls remain: {warm_engine_calls}"
     assert sum(warm_counts[engine.value]["hits"] for engine in engines) > 0
+    parallel_warm_hits = {
+        engine.value: parallel_counts[engine.value]["hits"]
+        for engine in engines
+        if parallel_counts[engine.value]["hits"] <= 0
+    }
+    assert not parallel_warm_hits, (
+        f"parallel warm worker cache hits missing: {parallel_warm_hits}"
+    )
     assert warm_counts[Engine.OPENIMCC.value]["calls_by_kind"] == {
         "equilibrate_cell": 0,
         "evaluate": 0,
