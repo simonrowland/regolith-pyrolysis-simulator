@@ -5106,6 +5106,11 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # sugawara-akaogi-2004-liquid-calorimetry,
 # woermann-1969-mg-fe-ti-oxides, and
 # wright-okamura-1977-makaopuhi-cooling.
+# A complete-token boundary (spaced units, grouped numbers, micro and
+# degree signs) does not move these ceilings. No sample has reviewed_by,
+# so the source matcher does not run, and no extract is review_status
+# reviewed. ivtan-mno-coo-thermo and sf04-magma-companion-workbook were
+# already draft. Certification-state changes from this boundary: 0.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 48661
 _UNCOVERED_EXTRACTS_CEILING = 616
@@ -6955,6 +6960,14 @@ _TOKEN_CASES = (
         "alpha 0.24000000000000002 measured\n",
         True,
     ),
+    # The whole stored value. "1 K" is not "1 KPa", and 1 is not "1,000".
+    ("spaced_unit_exact", "1 K", "1 K\n", True),
+    ("spaced_unit_tail", "1 K", "1 KPa\n", False),
+    ("grouped_int", 1, "1,000\n", False),
+    ("grouped_string_exact", "1,000", "1,000\n", True),
+    ("grouped_string_tail", "1,000", "1,000,000\n", False),
+    ("micro_tail", "1", "1µ\n", False),
+    ("degree_tail", "1", "1°\n", False),
 )
 
 
@@ -7134,15 +7147,16 @@ def test_every_numeric_spelling_certifies_only_its_exact_token(tmp_path: Path):
 
 # Product of printed measurements. Expected certification is the rule below,
 # not the gate's scanner: a digit-bearing leaf certifies only when the source
-# carries that printed value. A bordering letter, digit, sign, dot, or
-# underscore means the source carries a different value.
+# carries that printed value as a complete token. An extending neighbour is
+# an ASCII letter or digit, a Unicode letter, µ, or °, or a dot or comma
+# followed by a digit. A sign immediately before the number refuses when it
+# changes the value.
 _DIGIT_LEAF_SIGNS = ("", "-", "+")
 _DIGIT_LEAF_MANTISSAS = ("1", "0.91", ".91", "91.", "1e3", "1.2E-3", "1,000")
 _DIGIT_LEAF_JOINS = ("", " ", "\u00a0")
 _DIGIT_LEAF_UNITS = ("", "Pa", "K", "%", "wt%")
-_RULE_VALUE_BOUNDARY = frozenset(
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-._\u00b1\u2213"
-)
+_RULE_VALUE_LETTERS = frozenset("µμ°")
+_RULE_UNITS = ("wt%", "Pa", "K", "%")
 
 
 def _digit_leaf_product() -> list[str]:
@@ -7164,28 +7178,110 @@ def _digit_leaf_case_id(leaf: str) -> str:
     )
 
 
+def _rule_char_extends(text: str, index: int, nxt: str, *, sign_attaches: bool) -> bool:
+    """Independent of the gate. The certification boundary, written here."""
+    if index < 0 or index >= len(text):
+        return False
+    ch = text[index]
+    if ch.isascii() and ch.isalnum():
+        return True
+    if ch.isalpha() or ch in _RULE_VALUE_LETTERS:
+        return True
+    if ch in ".,":
+        return len(nxt) == 1 and nxt.isascii() and nxt.isdigit()
+    if sign_attaches and ch in "+-":
+        return len(nxt) == 1 and (nxt.isdigit() or nxt == ".")
+    return False
+
+
+def _rule_span_complete(text: str, start: int, end: int) -> bool:
+    if not (0 <= start < end <= len(text)):
+        return False
+    if start > 0 and _rule_char_extends(
+        text, start - 1, text[start], sign_attaches=True
+    ):
+        return False
+    if end < len(text) and _rule_char_extends(
+        text,
+        end,
+        text[end + 1] if end + 1 < len(text) else "",
+        sign_attaches=False,
+    ):
+        return False
+    return True
+
+
+def _rule_leaf_number(leaf: str) -> float | None:
+    """Printed number of ``leaf``, unit stripped. Not the gate's parser."""
+    body = leaf
+    for unit in _RULE_UNITS:
+        if body.endswith(unit) and len(body) > len(unit):
+            body = body[: -len(unit)]
+            break
+    body = body.replace("\u00a0", "").replace(" ", "").replace(",", "")
+    if not body:
+        return None
+    try:
+        value = float(body)
+    except ValueError:
+        return None
+    if not math.isfinite(value):
+        return None
+    return value
+
+
+def _rule_sign_prefix_changes_value(prefix: str, leaf: str) -> bool:
+    """True when prefixing ``prefix`` changes the printed number."""
+    base = _rule_leaf_number(leaf)
+    signed = _rule_leaf_number(prefix + leaf)
+    if base is None or signed is None:
+        return False
+    return signed != base or math.copysign(1.0, signed) != math.copysign(1.0, base)
+
+
 def _rule_source_carries_printed_value(leaf: str, source: str) -> bool:
     """Independent of the gate.
 
     A digit-bearing leaf is carried only when ``leaf`` itself occurs in
-    ``source`` and neither side of that occurrence continues a number or
-    an identifier. This is the certification rule for every generated
-    spelling, including spellings a numeric grammar does not read.
+    ``source`` and neither side of that occurrence extends it. A dot or
+    comma extends only when the next character is a digit. A sign
+    immediately before the number refuses when it changes the value.
     """
     if not any(ch in "0123456789" for ch in leaf):
         return False
     start = 0
-    limit = len(source)
     while True:
         index = source.find(leaf, start)
         if index < 0:
             return False
-        before_ok = index == 0 or source[index - 1] not in _RULE_VALUE_BOUNDARY
-        after = index + len(leaf)
-        after_ok = after == limit or source[after] not in _RULE_VALUE_BOUNDARY
-        if before_ok and after_ok:
+        end = index + len(leaf)
+        if _rule_span_complete(source, index, end) and not (
+            index > 0
+            and source[index - 1] in "+-"
+            and _rule_sign_prefix_changes_value(source[index - 1], leaf)
+        ):
             return True
         start = index + 1
+
+
+def _rule_extension_sources(leaf: str) -> list[str]:
+    """Sources that extend ``leaf``. Expected carry comes from the rule."""
+    sources = [
+        leaf + "9",
+        leaf + ",000",
+        leaf + ".5",
+        leaf + "Pa",
+        leaf + "µ",
+        leaf + "°",
+        "9" + leaf,
+        "1," + leaf,
+        "µ" + leaf,
+        "°" + leaf,
+    ]
+    for sign in ("-", "+"):
+        if _rule_sign_prefix_changes_value(sign, leaf):
+            sources.append(sign + leaf)
+    return sources
 
 
 @pytest.mark.parametrize("leaf", _digit_leaf_product(), ids=_digit_leaf_case_id)
@@ -7198,11 +7294,24 @@ def test_digit_bearing_leaf_certifies_only_when_source_carries_it(
     The expected boolean is ``_rule_source_carries_printed_value``, which
     does not call the gate. A quantity pin against the word pressure does
     not cover the measurement. ``0.91Pa`` and ``91.`` are in this product.
+    Each positive also refuses a source that extends it: a digit, ``,000``,
+    ``.5``, or a unit letter on the right, and a digit, ``1,``, or a sign
+    that changes the value on the left.
     """
     carried = f"\n{leaf}\n"
     withheld = f"\n9{leaf}\n"
     assert _rule_source_carries_printed_value(leaf, carried)
     assert not _rule_source_carries_printed_value(leaf, withheld)
+    extensions = _rule_extension_sources(leaf)
+    # A right-hand digit, grouped continuation, decimal, or unit letter
+    # extends every leaf in this product. ``1,`` on the left extends only
+    # when the comma is followed by a digit; a leading sign or decimal is
+    # still the whole leaf. The expected boolean is the rule, not a blanket
+    # refusal.
+    for suffix in ("9", ",000", ".5", "Pa", "µ", "°"):
+        assert not _rule_source_carries_printed_value(leaf, f"\n{leaf}{suffix}\n")
+    for prefix in ("9", "µ", "°"):
+        assert not _rule_source_carries_printed_value(leaf, f"\n{prefix}{leaf}\n")
     recognized = vle._measured_leaf_addresses(
         {"quantity": "pressure", "measured": leaf}
     )
@@ -7223,6 +7332,17 @@ def test_digit_bearing_leaf_certifies_only_when_source_carries_it(
     withheld_ok = _rule_source_carries_printed_value(leaf, withheld)
     assert (missed_errors == []) is withheld_ok, (leaf, withheld_ok, missed_errors)
     assert "source_blind_pin" in "\n".join(missed_errors)
+
+    for extended in extensions:
+        source = f"\n{extended}\n"
+        expected = _rule_source_carries_printed_value(leaf, source)
+        extended_doc = _literal_source_document(tmp_path, leaf, source)
+        extended_errors = vle.certify_extract_source_fidelity(
+            extended_doc, label="digit", artifact_root=tmp_path
+        )
+        assert (extended_errors == []) is expected, (leaf, extended, expected, extended_errors)
+        if not expected:
+            assert "source_blind_pin" in "\n".join(extended_errors)
 
     hidden = _values_pin_document(
         tmp_path,

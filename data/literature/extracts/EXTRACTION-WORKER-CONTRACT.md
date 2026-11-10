@@ -92,6 +92,8 @@ not reject a draft. Setting `review_status: reviewed` refuses while any
 warning remains. Certification opens a source artifact at the locator
 (paper, OCR, or quotes — not this extract and not program source) and
 requires each pinned number as a complete token, sign and exponent included.
+The whole stored value, including a spaced or attached unit, must match, and
+neither neighbour may extend it: `1 K` is not `1 KPa`, and `1` is not `1,000`.
 A digit-bearing string the parser cannot read is uncovered unless that
 printed value occurs whole in the opened source.
 Do not stamp reviewers or copy pins to clear them.

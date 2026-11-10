@@ -249,9 +249,11 @@ _TOKEN_LOOKBEHIND_CLASS = "A-Za-z0-9_." + "+" + _DISTINCT_NUMERIC_SIGNS + "-"
 # decimal: ".24" is a number. Without that alternative the string ".91"
 # is not a measured leaf, and the non-numeric substring path treats ".24"
 # as text inside "-.24". Callers scan text only through
-# ``_citation_token_matches``, which folds Unicode signs first. A second
-# scanner would let one path drop a sign or a leading decimal that
-# another path keeps.
+# ``_citation_token_matches``, which folds Unicode signs first and drops
+# any span ``_span_is_complete_printed_value`` rejects. The grammar is not
+# the boundary: a comma is not a hard edge here, and a yielded match is
+# still not a token of ``1,000``. A second scanner would let one path drop
+# a sign or a leading decimal that another path keeps.
 _NUMERIC_TOKEN_RE = re.compile(
     f"(?<![{_TOKEN_LOOKBEHIND_CLASS}])"
     f"[{_TOKEN_SIGN_CLASS}]?"
@@ -275,20 +277,27 @@ def _citation_token_matches(text: str) -> list[re.Match[str]]:
     """Numeric tokens after Unicode signs are folded.
 
     Spelling equality and string alignment read this list. A sign cannot
-    be dropped on one of those paths and kept on another. This grammar is
-    not the coverage membership test: a string that contains a digit is a
-    measured leaf even when this list is empty.
+    be dropped on one of those paths and kept on another. A match whose
+    span fails ``_span_is_complete_printed_value`` is not a token, so
+    ``1`` is not a token of ``1,000``. This grammar is not the coverage
+    membership test: a string that contains a digit is a measured leaf
+    even when this list is empty.
     """
-    return list(_NUMERIC_TOKEN_RE.finditer(_fold_numeric_signs(text)))
+    folded = _fold_numeric_signs(text)
+    return [
+        match
+        for match in _NUMERIC_TOKEN_RE.finditer(folded)
+        if _span_is_complete_printed_value(folded, match.start(), match.end())
+    ]
 
 
 _ASCII_DIGITS = "0123456789"
-# A printed value ends where a longer number or identifier would continue.
-# The same class the token grammar uses as a lookaround, plus nothing else.
-_PRINTED_VALUE_BOUNDARY = frozenset(
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-._"
-    + _DISTINCT_NUMERIC_SIGNS
-)
+# Signs that belong to the number when they sit immediately before it.
+# Unicode plus and minus are folded onto ASCII before this set is used.
+# Plus-minus stays distinct, so it is listed here and not folded.
+_ATTACHED_VALUE_SIGNS = frozenset("+-") | frozenset(_DISTINCT_NUMERIC_SIGNS)
+# Micro sign, Greek mu, and degree sign. Degree is not str.isalpha.
+_VALUE_LETTER_SIGNS = frozenset("µμ°")
 
 
 def _string_has_ascii_digit(text: str) -> bool:
@@ -319,25 +328,69 @@ def _parser_reads_every_digit(text: str) -> bool:
     )
 
 
+def _extends_printed_value(text: str, index: int, nxt: str, *, sign_attaches: bool) -> bool:
+    """True when ``text[index]`` continues a printed value.
+
+    An extending character is an ASCII letter or digit, a Unicode letter,
+    or µ/°. A '.' or ',' extends only when the next character is a digit.
+    A numeric sign extends only on the left (``sign_attaches``) and only
+    when it sits on a digit or a leading decimal, because that sign
+    belongs to the number.
+    """
+    ch = text[index]
+    if ch.isascii() and ch.isalnum():
+        return True
+    if ch.isalpha() or ch in _VALUE_LETTER_SIGNS:
+        return True
+    if ch in ".,":
+        return len(nxt) == 1 and nxt in _ASCII_DIGITS
+    if sign_attaches and ch in _ATTACHED_VALUE_SIGNS:
+        return len(nxt) == 1 and (nxt in _ASCII_DIGITS or nxt == ".")
+    return False
+
+
+def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
+    """The only boundary predicate. Every matcher accepts a span through it.
+
+    Invariant: a digit-bearing value matches source text only as a complete
+    token. The whole stored value, number plus any attached or spaced unit,
+    occupies ``[start, end)``, and neither neighbour extends that span.
+    ``1 K`` is not ``1 KPa``. ``1`` is not ``1,000``. ``1,000`` is not
+    ``1,000,000``. ``1`` is not ``-1`` or ``1µ``.
+    """
+    if not (0 <= start < end <= len(text)):
+        return False
+    if start > 0 and _extends_printed_value(
+        text, start - 1, text[start], sign_attaches=True
+    ):
+        return False
+    if end < len(text) and _extends_printed_value(
+        text,
+        end,
+        text[end + 1] if end + 1 < len(text) else "",
+        sign_attaches=False,
+    ):
+        return False
+    return True
+
+
 def _printed_value_carried(leaf: str, text: str) -> bool:
     """True when sign-folded ``leaf`` occurs in sign-folded ``text`` whole.
 
-    The character on either side must not continue a number or an
-    identifier. ``0.91Pa`` is not ``10.91Pa`` or ``0.91Pascal``, and
-    ``91.`` is not ``91.0``.
+    Acceptance is ``_span_is_complete_printed_value`` on that span.
+    ``0.91Pa`` is not ``10.91Pa`` or ``0.91Pascal``, ``91.`` is not
+    ``91.0``, ``1 K`` is not ``1 KPa``, and ``1,000`` is not ``1,000,000``.
     """
+    leaf = _fold_numeric_signs(leaf)
+    text = _fold_numeric_signs(text)
     if not leaf:
         return False
     start = 0
-    limit = len(text)
     while True:
         index = text.find(leaf, start)
         if index < 0:
             return False
-        before_ok = index == 0 or text[index - 1] not in _PRINTED_VALUE_BOUNDARY
-        after = index + len(leaf)
-        after_ok = after == limit or text[after] not in _PRINTED_VALUE_BOUNDARY
-        if before_ok and after_ok:
+        if _span_is_complete_printed_value(text, index, index + len(leaf)):
             return True
         start = index + 1
 
@@ -2086,41 +2139,53 @@ def _numeric_spellings(leaf: int | float) -> set[str]:
 
 
 def _spelling_is_complete_token(spelling: str, text: str) -> bool:
-    """True when ``spelling`` is one whole numeric token in ``text``."""
+    """True when ``spelling`` is one whole numeric token in ``text``.
+
+    The span has to pass ``_span_is_complete_printed_value`` and equal a
+    citation token. ``1`` is not a token of ``1,000``.
+    """
     folded = _fold_numeric_signs(spelling)
+    if not _printed_value_carried(folded, text):
+        return False
     return any(match.group(0) == folded for match in _citation_token_matches(text))
 
 
 def _string_leaf_in_text(leaf: str, text: str) -> bool:
     """Substring match that does not slice a numeric token.
 
-    A label with no digit stays a substring. A digit-bearing leaf the
-    numeric parser cannot read is not that shortcut: it is carried only
-    when the printed value occurs whole, so ``0.91Pa`` is not ``10.91Pa``.
-    A leaf the parser does read matches only where each of those numbers
-    is the same complete token, so ``0.24`` is not ``-0.24`` or ``0.24e-5``.
-    A leading decimal is a number, so ``.24`` is not ``-.24`` or ``10.24``.
-    Unicode signs are folded before either string is searched, so ``−0.24``
-    is ``-0.24``.
+    A label with no digit stays a substring. A digit-bearing leaf matches
+    only when the whole stored value, number plus any attached or spaced
+    unit, passes ``_span_is_complete_printed_value``. ``1 K`` is not
+    ``1 KPa``, ``1,000`` is not ``1,000,000``, and ``0.91Pa`` is not
+    ``10.91Pa``. A leaf the parser reads also needs each of those numbers
+    to be the same complete token, so ``0.24`` is not ``-0.24`` or
+    ``0.24e-5``. A leading decimal is a number, so ``.24`` is not ``-.24``
+    or ``10.24``. Unicode signs are folded before either string is
+    searched, so ``−0.24`` is ``-0.24``.
     """
     leaf = _fold_numeric_signs(leaf)
     text = _fold_numeric_signs(text)
-    if _string_has_ascii_digit(leaf) and not _parser_reads_every_digit(leaf):
-        return _printed_value_carried(leaf, text)
+    if not _string_has_ascii_digit(leaf):
+        return leaf in text
+    if not _printed_value_carried(leaf, text):
+        return False
+    if not _parser_reads_every_digit(leaf):
+        return True
     leaf_tokens = _citation_token_matches(leaf)
-    placed: dict[tuple[int, int], str] = {}
-    if leaf_tokens:
-        placed = {
-            (match.start(), match.end()): match.group(0)
-            for match in _citation_token_matches(text)
-        }
+    if not leaf_tokens:
+        return True
+    placed = {
+        (match.start(), match.end()): match.group(0)
+        for match in _citation_token_matches(text)
+    }
     start = 0
     while True:
         index = text.find(leaf, start)
         if index < 0:
             return False
-        if not leaf_tokens:
-            return True
+        if not _span_is_complete_printed_value(text, index, index + len(leaf)):
+            start = index + 1
+            continue
         if all(
             placed.get((index + token.start(), index + token.end()))
             == token.group(0)
@@ -2136,10 +2201,12 @@ def _leaf_in_text(leaf: Any, text: str) -> bool:
     Numeric leaves match a complete token only. Sign and exponent belong to
     the token, so 0.24 does not match -0.24, 0.24e-5, or 10.24, and 1.0 does
     not match 1. A leading decimal is a token, so .24 does not match -.24.
-    A float matches only a spelling that parses back to that stored number,
-    so 0.24000000000000002 does not match 0.24. A Unicode minus is a minus,
-    so −0.24 does not match 0.24 and does match -0.24. This is a cited-text
-    grep, not a unit conversion.
+    The whole stored value has to pass ``_span_is_complete_printed_value``,
+    so 1 does not match 1,000, 1 K does not match 1 KPa, and 1,000 does not
+    match 1,000,000. A float matches only a spelling that parses back to
+    that stored number, so 0.24000000000000002 does not match 0.24. A
+    Unicode minus is a minus, so −0.24 does not match 0.24 and does match
+    -0.24. This is a cited-text grep, not a unit conversion.
     """
     if isinstance(leaf, bool):
         token = "true" if leaf else "false"
@@ -2265,7 +2332,11 @@ def fidelity_source_warnings(
     Invariant: a scored measured leaf is certified only when its observation
     id is one non-empty string naming exactly one scored row, and the opened
     source contains that resolved extract leaf as a complete token of the
-    same sign and the same digits. A leading decimal is a numeric token.
+    same sign and the same digits. The whole value, including a spaced or
+    attached unit, must match, and neither neighbour may extend the span:
+    an ASCII letter or digit, a Unicode letter, µ, or °, or a dot or comma
+    followed by a digit. ``1 K`` is not ``1 KPa`` and ``1`` is not ``1,000``.
+    A leading decimal is a numeric token.
     A spelling that rounds the stored float to a different number is not
     that token. The sample's own spelling is not a substitute: a ``rel_tol``
     match of a different number does not certify the stored leaf. A scored
@@ -2526,8 +2597,11 @@ def certify_extract_source_fidelity(
     certified only when its observation id is one non-empty string naming
     exactly one scored row, and the opened source contains that resolved
     extract leaf as a complete token of the same sign and the same digits.
-    A leading decimal is a numeric token. A spelling that rounds the stored
-    float to a different number is not that token. The sample's own
+    The whole value, including a spaced or attached unit, must match, and
+    neither neighbour may extend the span. ``1 K`` is not ``1 KPa`` and
+    ``1`` is not ``1,000``. A leading decimal is a numeric token. A spelling
+    that rounds the stored float to a different number is not that token.
+    The sample's own
     spelling is not a substitute: a ``rel_tol`` match of a different number
     does not certify the stored leaf. A scored row with no usable
     observation id refuses; the row is not omitted. Every measured leaf of

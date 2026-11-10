@@ -132,7 +132,11 @@ file under a source-evidence root: `raw/`, `corpus/`, `text/`, `tables/`,
 source are not source artifacts, including a copy parked on a source root.
 A numeric pin matches only a complete token: the sign and the exponent
 belong to the token, so `0.24` is not `-0.24` or `0.24e-5`, and `1.0` is
-not `1`. The token must appear in the cited `line_range` when one is set,
+not `1`. The whole stored value, including a spaced or attached unit, must
+match, and the characters on either side must not extend it. An extending
+character is an ASCII letter or digit, a Unicode letter, µ, or °, or a
+dot or comma followed by a digit. So `1 K` is not `1 KPa`, and `1` is not
+`1,000`. The token must appear in the cited `line_range` when one is set,
 otherwise in the opened text. A page or table number alone is not an open.
 A PDF is not opened as text. Do not backfill reviewer fields from the
 extract's own value.
