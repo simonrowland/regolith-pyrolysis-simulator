@@ -2429,9 +2429,18 @@ def test_refuses_absolute_provenance_path():
 
 
 def test_repo_extracts_validate_green():
-    """All pilot extracts in the tree must be validator-green."""
-    errors = vle.validate_all()
-    assert errors == [], "\n".join(errors[:20])
+    """Discovery and the committed extract set are the same partition.
+
+    The whole-corpus ``validate_all()`` call that used to live here omitted
+    fidelity matching, kept only the first 20 errors, and exceeded the 300 s
+    CPU budget, so a timeout replaced the invalid-extract list (b-539).
+    ``test_literature_extract_validation_gate`` owns that validator call.
+    """
+    import test_literature_extract_validation_gate as gate
+
+    committed = gate.committed_extract_paths()
+    assert set(vle.discover_extracts()) == set(committed)
+    assert {gate.family_of(path) for path in committed} == set(gate.FAMILIES)
 
 
 def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None:
