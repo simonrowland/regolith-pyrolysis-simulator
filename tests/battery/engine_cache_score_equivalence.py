@@ -16,7 +16,8 @@ def assert_residue_score_cache_equivalence(
     tmp_path: Path,
     *,
     source: str,
-    experiment_ids: tuple[str, ...],
+    test_experiment_ids: tuple[str, ...],
+    required_refusal_reason: str | None,
 ) -> None:
     import pytest
 
@@ -44,7 +45,7 @@ def assert_residue_score_cache_equivalence(
                 rail=Rail.RESIDUE_COMPOSITION,
                 include_diagnostics=False,
                 workers=workers,
-                experiment_ids=experiment_ids,
+                _test_experiment_ids=test_experiment_ids,
             )
         finally:
             if previous is None:
@@ -57,25 +58,40 @@ def assert_residue_score_cache_equivalence(
         )
 
     off, _off_counts = score("off")
+    off_parallel, _off_parallel_counts = score("off-parallel", workers=3)
     serial_cache = tmp_path / "openimcc-residue-serial.sqlite"
+    parallel_cache = tmp_path / "openimcc-residue-parallel.sqlite"
     cold, cold_counts = score("cold", serial_cache)
+    cold_parallel, cold_parallel_counts = score(
+        "cold-parallel", parallel_cache, workers=3
+    )
     warm, warm_counts = score("warm", serial_cache)
-    parallel_warm, parallel_counts = score("parallel-warm", serial_cache, workers=3)
+    parallel_warm, parallel_counts = score(
+        "parallel-warm", parallel_cache, workers=3
+    )
 
     assert off
-    assert len(off.splitlines()) <= 12
-    assert b'"status":"refused"' in off
+    assert len(off.splitlines()) <= 20
+    if required_refusal_reason is None:
+        # Hashimoto's admitted cells are its five modeled oxide channels. They
+        # have no source-level unsupported-species refusal path.
+        assert b'"outside_supported_species"' not in off
+    else:
+        assert f'"reason":"{required_refusal_reason}"'.encode() in off
     _assert_runs_match_off(
         off,
         {
+            "off-parallel": off_parallel,
             "cold": cold,
+            "cold-parallel": cold_parallel,
             "warm": warm,
             "parallel-warm": parallel_warm,
         },
     )
-    engine = cold_counts[Engine.OPENIMCC.value]
-    assert engine["misses"] > 0
-    assert engine["stores"] > 0
+    for counts in (cold_counts, cold_parallel_counts):
+        engine = counts[Engine.OPENIMCC.value]
+        assert engine["misses"] > 0
+        assert engine["stores"] > 0
     for counts in (warm_counts, parallel_counts):
         engine = counts[Engine.OPENIMCC.value]
         assert engine["hits"] > 0

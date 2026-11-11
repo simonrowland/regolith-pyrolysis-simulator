@@ -13,7 +13,11 @@ def test_scored_sossi_residues_match_off_cold_warm_and_parallel_cache(
     assert_residue_score_cache_equivalence(
         tmp_path,
         source="kems-012-sossi-2019",
-        experiment_ids=(
+        # Short 900 s runs at 1573.15 K and 1673.15 K. Each has supported Mn/Ti
+        # cells and admitted Gd/La/Sc/V/Yb/Zr cells refused by the scorer.
+        test_experiment_ids=(
             "10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-15-07-16c",
+            "10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-ps2",
         ),
+        required_refusal_reason="outside_supported_species",
     )
