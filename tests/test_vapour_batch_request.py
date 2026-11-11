@@ -4396,10 +4396,407 @@ def test_fe_selected_runtime_pressure_is_ellingham_not_dormant_antoine() -> None
     assert isinstance(answer.selected_runtime_pressure, PressureValue)
     assert isinstance(answer.pressure, PressureValue)
     assert answer.selected_runtime_pressure.pa == pytest.approx(
-        0.05051779907237128, rel=1e-12
+        0.05051779907237128, rel=1e-12, abs=0.0
     )
-    assert answer.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
-    assert answer.source_label == "catalog"
+    assert answer.pressure.pa == pytest.approx(
+        4.871162269407267, rel=1e-12, abs=0.0
+    )
+    # 1673.15 K is inside the dormant 1400–1900 K fit and outside the
+    # pure sidecar's 1809–3134 K construction band. The selected answer
+    # flags that sidecar, not the dormant in-band fit.
+    assert answer.source_label == (
+        "ellingham_rail:condensed_raoult_psat:extrapolated"
+    )
+    assert answer.extra["out_of_range"] is True
+    selected_law = answer.extra["selected_law"]
+    assert selected_law["authority"] == "extrapolated"
+    assert selected_law["band_K"] == [1809.0, 3134.0]
+    assert selected_law["out_of_range"] is True
+
+
+_PSEUDO_PSAT_FIT_TARGET = "pseudo_psat_backsolved_from_vaporock"
+
+
+def _pseudo_psat_species_rows() -> dict[str, dict[str, Any]]:
+    """Every shipped species whose dormant fit is the pseudo-psat target."""
+
+    payload = _yaml("vapor_pressures.yaml")
+    families = payload.get("families")
+    if not isinstance(families, dict):
+        raise AssertionError("vapor_pressures.yaml has no families mapping")
+    found: dict[str, dict[str, Any]] = {}
+    for family in families.values():
+        if not isinstance(family, dict):
+            continue
+        physical = family.get("physical_properties")
+        if not isinstance(physical, dict):
+            continue
+        species_map = physical.get("species")
+        if not isinstance(species_map, dict):
+            continue
+        for species_id, row in species_map.items():
+            if not isinstance(row, dict):
+                continue
+            models = row.get("pressure_models") or []
+            if any(
+                isinstance(model, dict)
+                and model.get("fit_target") == _PSEUDO_PSAT_FIT_TARGET
+                for model in models
+            ):
+                found[str(species_id)] = row
+    if not found:
+        raise AssertionError(
+            "vapor_pressures.yaml has no "
+            f"{_PSEUDO_PSAT_FIT_TARGET} species"
+        )
+    return found
+
+
+def _selected_law_domain_cases() -> list[dict[str, Any]]:
+    """Temperature classes where the dormant fit and the selected laws differ.
+
+    Bands come from the shipped row and the Ellingham fit, not from the
+    publisher. Each named class has to land on the relation in its name,
+    so a yaml edit cannot silently drop a disagreement.
+    """
+
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_authority_limit,
+        ellingham_fit_range_K,
+    )
+
+    cases: list[dict[str, Any]] = []
+    for species_id, row in _pseudo_psat_species_rows().items():
+        pure = row["pure_component_antoine"]["construction_support_range_K"]
+        plow, phigh = float(pure[0]), float(pure[1])
+        model = next(
+            item
+            for item in row["pressure_models"]
+            if isinstance(item, dict)
+            and item.get("fit_target") == _PSEUDO_PSAT_FIT_TARGET
+        )
+        eval_low, eval_high = (
+            float(item) for item in model["valid_domain"]["temperature_K"]
+        )
+        fit_low, fit_high = ellingham_fit_range_K(species_id)
+        overlap_low = max(plow, fit_low)
+        overlap_high = min(phigh, fit_high)
+        if overlap_high < overlap_low:
+            raise AssertionError(
+                f"{species_id}: pure sidecar and Ellingham fit do not overlap"
+            )
+        points = (
+            ("below_sidecar_inside_ellingham", plow - 1.0, None),
+            ("inside_both_laws", (overlap_low + overlap_high) / 2.0, None),
+            ("ellingham_out_sidecar_in", fit_high + 1.0, None),
+            ("above_both", max(phigh, fit_high) + 50.0, None),
+            ("below_both", min(plow, fit_low) - 50.0, None),
+        )
+        if species_id == "Fe":
+            points = (
+                *points,
+                ("review_1673K", 1673.15, 0.05051779907237128),
+            )
+        aimed = {
+            "below_sidecar_inside_ellingham": (True, False),
+            "inside_both_laws": (False, False),
+            "ellingham_out_sidecar_in": (False, True),
+            "above_both": (True, True),
+            "below_both": (True, True),
+            "review_1673K": (True, False),
+        }
+        for name, temperature_K, pressure_pa in points:
+            pure_out = not (plow <= temperature_K <= phigh)
+            ell_out = (
+                ellingham_authority_limit(
+                    temperature_K,
+                    species=species_id,
+                    consumer="selected-law-domain-cases",
+                )
+                is not None
+            )
+            if aimed[name] != (pure_out, ell_out):
+                raise AssertionError(
+                    f"{species_id}:{name} at {temperature_K} K is "
+                    f"pure_out={pure_out} ell_out={ell_out}, "
+                    f"wanted {aimed[name]}"
+                )
+            cases.append(
+                {
+                    "id": f"{species_id}:{name}",
+                    "name": name,
+                    "species_id": species_id,
+                    "parent_oxide": str(row.get("parent_oxide") or ""),
+                    "temperature_K": temperature_K,
+                    "pure_band": [plow, phigh],
+                    "eval_domain": [eval_low, eval_high],
+                    "pressure_pa": pressure_pa,
+                }
+            )
+    return cases
+
+
+def _expected_selected_law_domain(case: dict[str, Any]) -> dict[str, Any]:
+    """Domain the selected rail must publish, read from yaml and thermo.
+
+    This does not call the catalog publisher. Pure-out is T against the
+    sidecar construction band. Ellingham-out is an authority limit.
+    The published band is the first constituent that excludes T.
+    """
+
+    from simulator.chemistry.ellingham_thermo import (
+        ELLINGHAM_METAL_PHASE_GAS,
+        ellingham_authority_limit,
+        ellingham_fit_range_K,
+        ellingham_metal_phase_kind,
+        ellingham_segment_for_temperature,
+    )
+
+    temperature_K = float(case["temperature_K"])
+    species_id = str(case["species_id"])
+    plow, phigh = (float(item) for item in case["pure_band"])
+    eval_low, eval_high = (float(item) for item in case["eval_domain"])
+    pure_out = not (plow <= temperature_K <= phigh)
+    evaluator_oor = temperature_K < eval_low or temperature_K > eval_high
+    limit = ellingham_authority_limit(
+        temperature_K,
+        species=species_id,
+        consumer="selected-law-domain-test",
+    )
+    if limit is None:
+        segment = ellingham_segment_for_temperature(species_id, temperature_K)
+        ell_band = [float(segment.range_K[0]), float(segment.range_K[1])]
+        ell_out = False
+    else:
+        ell_out = True
+        fit = limit.get("fit_range_K")
+        if isinstance(fit, tuple) and len(fit) == 2:
+            ell_band = [float(fit[0]), float(fit[1])]
+        else:
+            fit_low, fit_high = ellingham_fit_range_K(species_id)
+            ell_band = [float(fit_low), float(fit_high)]
+    phase = ellingham_metal_phase_kind(species_id, temperature_K)
+    rail = (
+        "gas_fugacity"
+        if phase == ELLINGHAM_METAL_PHASE_GAS
+        else "condensed_raoult_psat"
+    )
+    constituents = [
+        {
+            "law": "ellingham_fit",
+            "authority": "extrapolated" if ell_out else "certified",
+            "band_K": ell_band,
+            "out_of_range": ell_out,
+        }
+    ]
+    if rail != "gas_fugacity":
+        constituents.append(
+            {
+                "law": "pure_component_antoine",
+                "authority": "extrapolated" if pure_out else "certified",
+                "band_K": [plow, phigh],
+                "out_of_range": pure_out,
+            }
+        )
+    expected_oor = any(item["out_of_range"] for item in constituents)
+    failing = next(
+        (
+            item
+            for item in constituents
+            if item["out_of_range"] and item["band_K"]
+        ),
+        None,
+    )
+    if failing is not None:
+        band_K = list(failing["band_K"])
+    else:
+        band_K = list(constituents[-1]["band_K"])
+    return {
+        "evaluator_oor": evaluator_oor,
+        "expected_oor": expected_oor,
+        "rail": rail,
+        "authority": "extrapolated" if expected_oor else "certified",
+        "band_K": band_K,
+        "constituents": constituents,
+    }
+
+
+_SELECTED_LAW_DOMAIN_CASES = _selected_law_domain_cases()
+
+
+@pytest.fixture(scope="module")
+def _production_vapour_catalog():
+    return compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"),
+        u0_manifest=load_u0_manifest(),
+    )
+
+
+@pytest.mark.parametrize(
+    "case",
+    _SELECTED_LAW_DOMAIN_CASES,
+    ids=[case["id"] for case in _SELECTED_LAW_DOMAIN_CASES],
+)
+def test_selected_runtime_pressure_publishes_its_law_domain(
+    case: dict[str, Any],
+    _production_vapour_catalog: Any,
+) -> None:
+    """INVARIANT: a numeric selected pressure carries its producing law.
+
+    The dormant catalog fit's in-band flag is not reused. Authority is
+    extrapolated when the pure sidecar or the Ellingham fit excludes T,
+    and certified only when every constituent contains T. The published
+    band is the first excluding constituent, else the last constituent.
+    An out-of-band law is a flagged estimate (d-367), not a refusal and
+    not an unflagged extrapolation. The pascal value stays on the rail.
+    """
+
+    expected = _expected_selected_law_domain(case)
+    species_id = case["species_id"]
+    temperature_K = float(case["temperature_K"])
+    batch = _production_vapour_catalog.resolve_batch(
+        {"process.cleaned_melt": {case["parent_oxide"]: 1.0}},
+        {
+            "temperature_K": temperature_K,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "fO2_bar": 1.0e-9,
+            "source_reaction_fO2_bar": 1.0e-9,
+            "source_reaction_activities": {species_id: 0.2},
+        },
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel(species_id)
+    assert isinstance(answer.selected_runtime_pressure, PressureValue)
+    assert isinstance(answer.pressure, PressureValue)
+    assert math.isfinite(answer.selected_runtime_pressure.pa)
+    assert answer.selected_runtime_pressure.pa > 0.0
+    if case["pressure_pa"] is not None:
+        assert answer.selected_runtime_pressure.pa == pytest.approx(
+            case["pressure_pa"], rel=1e-12, abs=0.0
+        )
+    authority = expected["authority"]
+    assert answer.source_label == (
+        f"ellingham_rail:{expected['rail']}:{authority}"
+    )
+    assert answer.source_label != "catalog"
+    assert answer.extra["out_of_range"] is expected["expected_oor"]
+    selected_law = answer.extra["selected_law"]
+    assert selected_law["law"] == f"ellingham_rail:{expected['rail']}"
+    assert selected_law["authority"] == authority
+    assert selected_law["out_of_range"] is expected["expected_oor"]
+    assert selected_law["pressure_rail"] == expected["rail"]
+    assert selected_law["band_K"] == expected["band_K"]
+    assert selected_law["constituents"] == expected["constituents"]
+    if expected["expected_oor"] and selected_law["band_K"]:
+        low, high = selected_law["band_K"]
+        assert not (low <= temperature_K <= high)
+    if not expected["expected_oor"] and selected_law["band_K"]:
+        low, high = selected_law["band_K"]
+        assert low <= temperature_K <= high
+    if expected["evaluator_oor"] != expected["expected_oor"]:
+        assert answer.extra["out_of_range"] is not expected["evaluator_oor"]
+        assert selected_law["band_K"] != [float(item) for item in case["eval_domain"]]
+    extra = dict(answer.extra)
+    if expected["expected_oor"]:
+        assert extra.get("status") == OUT_OF_RANGE_STATUS
+        assert extra.get("acquisition_flag") == (
+            f"vapour_pressure_out_of_range:{species_id}"
+        )
+        notice = extra["extrapolation_notice"]
+        assert notice["reason"] == "selected_law_out_of_band"
+        assert notice["authority_level"] == "extrapolated"
+        assert notice["valid_range_K"] == selected_law["band_K"]
+        assert notice["temperature_K"] == temperature_K
+    else:
+        assert extra.get("status") != OUT_OF_RANGE_STATUS
+        flag = extra.get("acquisition_flag")
+        assert not (
+            isinstance(flag, str)
+            and flag.startswith("vapour_pressure_out_of_range:")
+        )
+        notice = extra.get("extrapolation_notice")
+        if isinstance(notice, dict):
+            assert notice.get("reason") not in {
+                "metal_vapor_pressure_out_of_validated_range",
+                "selected_law_out_of_band",
+            }
+    payload = serialize_vapour_answer(answer)
+    assert payload["out_of_range"] is expected["expected_oor"]
+    assert payload["source_label"] == answer.source_label
+    for other_id, other in batch.channels_by_species.items():
+        if other_id == species_id:
+            continue
+        assert "selected_law" not in dict(other.extra)
+    _pressures, report = flux_pressures_from_batch(batch)
+    listed = species_id in report["extrapolated_flux_species"]
+    if species_id in batch.flux_active_species_ids:
+        assert listed is expected["expected_oor"]
+    else:
+        assert listed is False
+
+
+def test_pseudo_psat_domain_cases_cover_both_disagreements() -> None:
+    """The generated set includes both dormant-flag disagreements.
+
+    One class is inside the dormant fit and outside a selected law.
+    The other is outside the dormant fit and inside every selected law.
+    """
+
+    pairs = {
+        (
+            _expected_selected_law_domain(case)["evaluator_oor"],
+            _expected_selected_law_domain(case)["expected_oor"],
+        )
+        for case in _SELECTED_LAW_DOMAIN_CASES
+    }
+    assert (False, True) in pairs
+    assert (True, False) in pairs
+    assert {case["species_id"] for case in _SELECTED_LAW_DOMAIN_CASES}
+
+
+def test_gas_rail_domain_does_not_inherit_the_pure_sidecar_band() -> None:
+    """A gas-standard rail has no condensed sidecar constituent.
+
+    Shipped pseudo-psat rows are condensed, so resolve never takes this
+    branch. The domain helper still has it: the standard-pressure rail
+    must not publish the sidecar construction band.
+    """
+
+    from simulator.vapour_rail.catalog import _ellingham_selected_law_domain
+
+    row = _pseudo_psat_species_rows()["Fe"]
+    domain = _ellingham_selected_law_domain(
+        species_id="Fe",
+        temperature_K=1673.15,
+        row=row,
+        pressure_rail="gas_fugacity",
+    )
+    assert domain["pressure_rail"] == "gas_fugacity"
+    assert [item["law"] for item in domain["constituents"]] == ["ellingham_fit"]
+    assert domain["out_of_range"] is False
+    assert domain["authority"] == "certified"
+    assert domain["source_label"] == "ellingham_rail:gas_fugacity:certified"
+    low, high = domain["band_K"]
+    assert low <= 1673.15 <= high
+    assert domain["band_K"] != [1809.0, 3134.0]
+
+
+def test_numeric_selected_pressure_has_one_catalog_publisher() -> None:
+    """One catalog writer attaches a numeric selected pressure.
+
+    A second ``PressureValue`` assignment would publish a number with
+    the dormant law's in-band flag. Refusals and authorized zeros are
+    not that writer.
+    """
+
+    source = (
+        DATA_DIR.parent / "simulator" / "vapour_rail" / "catalog.py"
+    ).read_text()
+    assert source.count("def _publish_selected_pressure(") == 1
+    assert source.count("_publish_selected_pressure(") == 2
+    assert "selected_runtime_pressure=PressureValue(" not in source
+    assert "selected_runtime_pressure=pressure," in source
 
 
 def test_fe_missing_ellingham_input_refuses_instead_of_dormant_antoine() -> None:

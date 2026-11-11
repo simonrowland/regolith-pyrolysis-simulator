@@ -1971,6 +1971,194 @@ def _authorized_pure_metal_evaporation_zero(
     )
 
 
+def _ellingham_selected_law_domain(
+    *,
+    species_id: str,
+    temperature_K: float,
+    row: Mapping[str, Any],
+    pressure_rail: str,
+) -> dict[str, Any]:
+    """Domain of the Ellingham rail that replaced a dormant pseudo-psat.
+
+    The condensed rail multiplies the activity root by the pure-component
+    sidecar. The gas rail uses the standard pressure and does not. Each
+    constituent is certified only inside its own band. The published band
+    is the first constituent that does not contain T, or the last
+    constituent's band when every constituent does. Authority is
+    extrapolated when any constituent is outside its band.
+    """
+
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_authority_limit,
+        ellingham_fit_range_K,
+        ellingham_segment_for_temperature,
+    )
+
+    limit = ellingham_authority_limit(
+        temperature_K,
+        species=species_id,
+        consumer="vapour-rail-selected-pressure",
+    )
+    if limit is None:
+        segment = ellingham_segment_for_temperature(species_id, temperature_K)
+        ell_band = [float(segment.range_K[0]), float(segment.range_K[1])]
+        ell_out = False
+    else:
+        fit = limit.get("fit_range_K")
+        if (
+            isinstance(fit, tuple)
+            and len(fit) == 2
+        ):
+            ell_band = [float(fit[0]), float(fit[1])]
+        else:
+            fit_low, fit_high = ellingham_fit_range_K(species_id)
+            ell_band = [float(fit_low), float(fit_high)]
+        ell_out = True
+    constituents: list[dict[str, Any]] = [
+        {
+            "law": "ellingham_fit",
+            "authority": "extrapolated" if ell_out else "certified",
+            "band_K": ell_band,
+            "out_of_range": ell_out,
+        }
+    ]
+    rail = (
+        "gas_fugacity"
+        if pressure_rail == "gas_fugacity"
+        else "condensed_raoult_psat"
+    )
+    if rail != "gas_fugacity":
+        pure = row.get("pure_component_antoine")
+        band = (
+            pure.get("construction_support_range_K")
+            if isinstance(pure, Mapping)
+            else None
+        )
+        pure_band: list[float] = []
+        pure_out = True
+        if (
+            isinstance(band, Sequence)
+            and not isinstance(band, (str, bytes))
+            and len(band) == 2
+        ):
+            try:
+                low = float(band[0])
+                high = float(band[1])
+            except (TypeError, ValueError):
+                low = high = float("nan")
+            if (
+                math.isfinite(low)
+                and math.isfinite(high)
+                and high >= low
+            ):
+                pure_band = [low, high]
+                pure_out = not (low <= temperature_K <= high)
+        constituents.append(
+            {
+                "law": "pure_component_antoine",
+                "authority": "extrapolated" if pure_out else "certified",
+                "band_K": pure_band,
+                "out_of_range": pure_out,
+            }
+        )
+    out = any(item["out_of_range"] for item in constituents)
+    failing = next(
+        (item for item in constituents if item["out_of_range"] and item["band_K"]),
+        None,
+    )
+    if failing is not None:
+        band_K = list(failing["band_K"])
+    else:
+        band_K = list(constituents[-1]["band_K"] or constituents[0]["band_K"])
+    authority = "extrapolated" if out else "certified"
+    law = f"ellingham_rail:{rail}"
+    notice = None
+    if out and band_K:
+        notice = {
+            "temperature_K": float(temperature_K),
+            "valid_range_K": list(band_K),
+            "authority_level": "extrapolated",
+            "certified_band": {"temperature_K": list(band_K)},
+            "reason": "selected_law_out_of_band",
+        }
+    return {
+        "law": law,
+        "authority": authority,
+        "band_K": band_K,
+        "out_of_range": out,
+        "pressure_rail": rail,
+        "source_label": f"{law}:{authority}",
+        "constituents": constituents,
+        "extrapolation_notice": notice,
+        "acquisition_flag": (
+            f"vapour_pressure_out_of_range:{species_id}" if out else None
+        ),
+    }
+
+
+def _publish_selected_pressure(
+    answer: Any,
+    pressure: PressureValue,
+    domain: Mapping[str, Any],
+) -> Any:
+    """Attach a numeric selected pressure and the law that produced it.
+
+    INVARIANT: every numeric selected runtime pressure published here
+    carries that law's authority, validity band, and extrapolation
+    status. The dormant evaluator's in-band flag is not reused. An
+    out-of-band law stays a flagged estimate (d-367). This is the only
+    catalog writer of a numeric ``selected_runtime_pressure``.
+    """
+
+    extra = dict(answer.extra)
+    out_of_range = bool(domain["out_of_range"])
+    record = {
+        "law": domain["law"],
+        "authority": domain["authority"],
+        "band_K": list(domain["band_K"]),
+        "out_of_range": out_of_range,
+        "pressure_rail": domain["pressure_rail"],
+        "constituents": [dict(item) for item in domain["constituents"]],
+    }
+    extra["selected_law"] = record
+    extra["out_of_range"] = out_of_range
+    if out_of_range:
+        extra["status"] = OUT_OF_RANGE_STATUS
+        extra["acquisition_flag"] = (
+            domain.get("acquisition_flag")
+            or f"vapour_pressure_out_of_range:{answer.species_id}"
+        )
+        notice = domain.get("extrapolation_notice")
+        if isinstance(notice, Mapping):
+            extra["extrapolation_notice"] = dict(notice)
+    else:
+        # The dormant fit may have been outside its own band. That flag
+        # does not describe the selected law.
+        if extra.get("status") == OUT_OF_RANGE_STATUS:
+            extra.pop("status", None)
+        flag = extra.get("acquisition_flag")
+        if isinstance(flag, str) and flag.startswith(
+            "vapour_pressure_out_of_range:"
+        ):
+            extra.pop("acquisition_flag", None)
+        notice = extra.get("extrapolation_notice")
+        if (
+            isinstance(notice, Mapping)
+            and notice.get("reason")
+            in {
+                "metal_vapor_pressure_out_of_validated_range",
+                "selected_law_out_of_band",
+            }
+        ):
+            extra.pop("extrapolation_notice", None)
+    return replace(
+        answer,
+        selected_runtime_pressure=pressure,
+        source_label=str(domain["source_label"]),
+        extra=MappingProxyType(extra),
+    )
+
+
 class VapourRailCatalog:
     """Compiled schema-v2 catalog plus its temporary legacy projection."""
 
@@ -2155,6 +2343,11 @@ class VapourRailCatalog:
         The dormant pseudo Antoine (A = 9.408547, B = 23312.312336,
         C = 1000) is 4.871162269407267 Pa and matches neither this value
         nor the diagnostic. ``answer.pressure`` stays that catalog reference.
+
+        The dormant fit's 1400–1900 K band contains 1673.15 K. The pure
+        sidecar's construction band is 1809–3134 K, so it does not. The
+        selected answer takes the sidecar and Ellingham bands
+        (``_publish_selected_pressure``), not the dormant in-band flag.
         """
 
         if batch is None:
@@ -2295,7 +2488,7 @@ class VapourRailCatalog:
                 phase_kind = ellingham_metal_phase_kind(
                     species_id, temperature_K
                 )
-                selected_pa, _factor, _root, _rail = (
+                selected_pa, _factor, _root, pressure_rail = (
                     ellingham_metal_equilibrium_pressure_Pa(
                         species=species_id,
                         temperature_K=temperature_K,
@@ -2349,9 +2542,18 @@ class VapourRailCatalog:
                 refused_ids.add(species_id)
                 changed = True
                 continue
-            channels[species_id] = replace(
+            # INVARIANT: this numeric selection is published only through
+            # _publish_selected_pressure, which attaches the producing
+            # law's authority, band, and extrapolation status.
+            channels[species_id] = _publish_selected_pressure(
                 answer,
-                selected_runtime_pressure=PressureValue(pa=float(selected_pa)),
+                PressureValue(pa=float(selected_pa)),
+                _ellingham_selected_law_domain(
+                    species_id=species_id,
+                    temperature_K=temperature_K,
+                    row=row,
+                    pressure_rail=pressure_rail,
+                ),
             )
             changed = True
         if not changed:

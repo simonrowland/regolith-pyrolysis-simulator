@@ -1534,27 +1534,37 @@ def test_ci_cold_tick_fe_missing_ellingham_input_is_authorized_upper_bound_zero(
     expected = _independent_fe_channel_bounds(temperature_C + 273.15)
     assert expected["total_kg"] is not None
     assert expected["total_kg"] < DEFAULT_BALANCE_TOLERANCE_KG
-    assert record["bound_kg"] == pytest.approx(expected["total_kg"], rel=1e-12)
+    assert record["bound_kg"] == pytest.approx(
+        expected["total_kg"], rel=1e-12, abs=0.0
+    )
     fe_channel = record["channels"]["Fe"]
     feo_channel = record["channels"]["FeO_gas"]
     assert fe_channel["law"] == "pure_component_antoine"
     assert fe_channel["authority"] == "extrapolated"
-    assert fe_channel["pressure_pa"] == pytest.approx(expected["fe_pa"], rel=1e-12)
-    assert fe_channel["mass_kg"] == pytest.approx(expected["fe_kg"], rel=1e-12)
+    assert fe_channel["pressure_pa"] == pytest.approx(
+        expected["fe_pa"], rel=1e-12, abs=0.0
+    )
+    assert fe_channel["mass_kg"] == pytest.approx(
+        expected["fe_kg"], rel=1e-12, abs=0.0
+    )
     assert feo_channel["law"] == "janaf_congruent_sublimation"
     assert feo_channel["authority"] == "certified"
     assert feo_channel["phase"] == "crystal"
     assert feo_channel["tables"] == ["Fe-021", "Fe-018"]
-    assert feo_channel["pressure_pa"] == pytest.approx(expected["feo_pa"], rel=1e-12)
-    assert feo_channel["mass_kg"] == pytest.approx(expected["feo_kg"], rel=1e-12)
-    # Changing FeO's molar mass is not a pressure bound. The two
-    # activity-1 pressures differ, and the tick bound is their mass sum.
-    # pytest.approx's default absolute tolerance is 1e-12, which treats
-    # these sub-tolerance pressures as equal, so compare the ratio.
-    fe_to_feo = fe_channel["pressure_pa"] / feo_channel["pressure_pa"]
-    assert fe_to_feo > 2.0 or fe_to_feo < 0.5
+    assert feo_channel["pressure_pa"] == pytest.approx(
+        expected["feo_pa"], rel=1e-12, abs=0.0
+    )
+    assert feo_channel["mass_kg"] == pytest.approx(
+        expected["feo_kg"], rel=1e-12, abs=0.0
+    )
+    # Cold pressures sit many orders below pytest's default abs=1e-12.
+    # The pins above use abs=0. The two activity-1 laws are not one
+    # pressure copied onto both channels.
+    assert expected["fe_pa"] != pytest.approx(
+        expected["feo_pa"], rel=0.0, abs=0.0
+    )
     assert record["bound_kg"] == pytest.approx(
-        fe_channel["mass_kg"] + feo_channel["mass_kg"], rel=1e-12
+        fe_channel["mass_kg"] + feo_channel["mass_kg"], rel=1e-12, abs=0.0
     )
     assert math.isfinite(record["p_sat_pa"]) and record["p_sat_pa"] > 0.0
     assert math.isfinite(answer.extra["dormant_catalog_pressure_pa"])
@@ -1780,7 +1790,7 @@ def test_fe_upper_bound_requires_every_channel_own_saturation(
             assert produced is not None
             assert produced["law"] == "janaf_congruent_sublimation"
             assert produced["pressure_pa"] == pytest.approx(
-                expected["feo_pa"], rel=1e-12
+                expected["feo_pa"], rel=1e-12, abs=0.0
             )
             if branch == "liquid_sum_over":
                 assert produced["phase"] == "liquid"
@@ -1825,7 +1835,12 @@ def test_fe_upper_bound_requires_every_channel_own_saturation(
         p_from_logk = _JANAF_STANDARD_PRESSURE_PA * 10.0 ** (
             log_gas - log_crystal
         )
-        assert expected["feo_pa"] == pytest.approx(p_from_logk, rel=5e-3)
+        # Printed log10 Kf is rounded to 0.001 (~0.23% in P). abs=0 keeps
+        # that relative band from also accepting a 1e-12 absolute miss
+        # on a pressure far below that floor.
+        assert expected["feo_pa"] == pytest.approx(
+            p_from_logk, rel=5e-3, abs=0.0
+        )
 
     if branch == "feo_proof_unavailable":
         # Fe's own extrapolated mass is under the tolerance. The refusal
@@ -1841,24 +1856,25 @@ def test_fe_upper_bound_requires_every_channel_own_saturation(
         assert record["law"] == "per_channel_activity_one_saturation"
         assert expected["total_kg"] is not None
         assert expected["total_kg"] < DEFAULT_BALANCE_TOLERANCE_KG
-        assert record["bound_kg"] == pytest.approx(expected["total_kg"], rel=1e-12)
+        assert record["bound_kg"] == pytest.approx(
+            expected["total_kg"], rel=1e-12, abs=0.0
+        )
         channels = record["channels"]
         assert set(channels) == {"Fe", "FeO_gas"}
         assert channels["Fe"]["pressure_pa"] == pytest.approx(
-            expected["fe_pa"], rel=1e-12
+            expected["fe_pa"], rel=1e-12, abs=0.0
         )
         assert channels["FeO_gas"]["pressure_pa"] == pytest.approx(
-            expected["feo_pa"], rel=1e-12
+            expected["feo_pa"], rel=1e-12, abs=0.0
         )
-        # Default abs tolerance on pytest.approx is 1e-12, so a
-        # relative inequality is invisible for these pressures.
-        fe_to_feo = (
-            channels["Fe"]["pressure_pa"] / channels["FeO_gas"]["pressure_pa"]
+        # abs=0: these pressures are far below pytest's default 1e-12.
+        assert expected["fe_pa"] != pytest.approx(
+            expected["feo_pa"], rel=0.0, abs=0.0
         )
-        assert fe_to_feo > 2.0 or fe_to_feo < 0.5
         assert record["bound_kg"] == pytest.approx(
             channels["Fe"]["mass_kg"] + channels["FeO_gas"]["mass_kg"],
             rel=1e-12,
+            abs=0.0,
         )
         for channel, molar_g in _FE_CHANNEL_MOLAR_MASS_G:
             recorded = channels[channel]
@@ -1868,7 +1884,9 @@ def test_fe_upper_bound_requires_every_channel_own_saturation(
                 * _CI_TICK_AREA_M2
                 * _CI_TICK_DURATION_S
             )
-            assert recorded["mass_kg"] == pytest.approx(own_mass_kg, rel=1e-12)
+            assert recorded["mass_kg"] == pytest.approx(
+                own_mass_kg, rel=1e-12, abs=0.0
+            )
         assert answer.is_refused is False
     else:
         assert isinstance(answer.pressure, PressureValue)
