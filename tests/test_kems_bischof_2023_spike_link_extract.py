@@ -271,14 +271,17 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
                 )
                 assert row.point_conditions["temperature_K"].locator.page == expected_page
 
-    # Table S1's 1_low gamma row carries the same printed ΔIW condition as
-    # the matching psat row. Check the migrated identities, not a synthetic
-    # citation passed directly to the resolver.
+    # The Table S1–S4 gamma rows must carry their cited buffer calibration
+    # through migration, not only a synthetic citation passed to the resolver.
     migrated_137 = migrated["kems-137-bischof-2023"]
     gamma_parent_ids = {
         "bischof_2023_gao15_gamma_s1_1low_polytherm",
+        "bischof_2023_gao15_gamma_s2_1low_isotherm",
+        "bischof_2023_gao15_gamma_s4_3high_polytherm",
         "bischof_2023_gao15_gamma_s3_2low_polytherm",
         "bischof_2023_ino15_gamma_s1_1low_polytherm",
+        "bischof_2023_ino15_gamma_s2_1low_isotherm",
+        "bischof_2023_ino15_gamma_s4_3high_polytherm",
         "bischof_2023_ino15_gamma_s3_2low_polytherm",
     }
     expected_calibration = "oneill_pownceby_1993_iw_fe_feo"
@@ -287,7 +290,7 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
         for row in migrated_137.observations.values()
         if row.observation_id.split("::")[-2] in gamma_parent_ids
     ]
-    assert len(gamma_rows) == 76
+    assert len(gamma_rows) == 128
     for gamma_row in gamma_rows:
         assert gamma_row.identity.temperature_K is not None
         assert gamma_row.identity.temperature_K.is_value
@@ -297,6 +300,33 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
         assert any(
             expected_calibration in notice.reason
             for notice in gamma_row.notices
+        )
+    gamma_at_1741_9_delta_iw_1_51 = [
+        row
+        for row in gamma_rows
+        if row.identity.temperature_K is not None
+        and row.identity.temperature_K.is_value
+        and row.identity.temperature_K.value == Decimal("1741.9")
+        and row.identity.fO2_Pa is not None
+        and row.identity.fO2_Pa.is_value
+        and row.identity.fO2_Pa.value == Decimal("0.002752615375078678784221966689")
+    ]
+    assert {row.identity.species.formula for row in gamma_at_1741_9_delta_iw_1_51} == {
+        "Ga",
+        "In",
+    }
+    assert {
+        row.observation_id.split("::")[-2]
+        for row in gamma_at_1741_9_delta_iw_1_51
+    } == {
+        "bischof_2023_gao15_gamma_s2_1low_isotherm",
+        "bischof_2023_ino15_gamma_s2_1low_isotherm",
+    }
+    for row in gamma_at_1741_9_delta_iw_1_51:
+        assert any(
+            expected_calibration in notice.reason
+            and "predict_and_flag_outside_range_833_1644_K" in notice.reason
+            for notice in row.notices
         )
     gamma_at_1586 = [
         row
