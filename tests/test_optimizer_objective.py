@@ -11,7 +11,12 @@ from simulator.optimize import study
 import simulator.optimize.objective as objective_module
 from scripts import sso_r_validation_map as validation_map
 from simulator.cost_parameters import CostParameters
-from simulator.optimize.evaluate import RunReference, ScoredResult, _run_reference
+from simulator.optimize.evaluate import (
+    RunReference,
+    ScoredResult,
+    _optimizer_refused_flux_bounds,
+    _run_reference,
+)
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
@@ -1353,17 +1358,19 @@ def test_nonnegligible_refused_wall_species_uses_supply_bound_and_stays_ranked(
 # Invariant at ``_book_wall_deposits_at_vapour_supply``, the only place a
 # refused wall species becomes a priced deposit. Every scoring channel
 # (the booking itself, the coating product summary, the furnace-lifespan
-# summary, and the tap-hour projection) goes through it.
+# summary, and the tap-hour projection) goes through it, and every reader
+# reports that mass.
 #
-# - No computed flux, or no charge mass to fix the ledger resolution:
-#   not booked. The measured entries stay, and the refusal still blocks
-#   the figure.
+# - No computed flux, a missing flux interval, or no charge mass to fix
+#   the ledger resolution: not booked. A partial integral is not a supply.
+#   The measured entries stay, and the refusal still blocks the figure.
 # - Supply at or below the ledger resolution: authorized zero. Existing
 #   entries of that species are removed. The scored mass is 0, which is
 #   the booking's deposit_kg and is <= the supply.
 # - Supply above that resolution: the priced aggregate equals the supply,
 #   once, on one eligible segment. A partial measurement is removed
 #   first, so the score is not the partial and not partial + supply.
+#   A later reader must not replace that positive mass with zero.
 # - The maximum segment load equals the closed form
 #   max_s (existing_load_s + sum of non-negligible supplies eligible at s).
 #   Species order does not change it. Every supply is booked wholly on
@@ -1566,8 +1573,137 @@ _WALL_BOUND_CASES = (
         "entries": ((("cold_wall", "SiO"), 0.1),),
         "species": (("SiO", None, None, None),),
     },
+    # Both hours publish SiO. The supply is the sum, not either hour alone.
+    {
+        "deposit": (),
+        "flux_snapshots": (
+            {"hour": 1, "duration_h": 1.0, "flux": (("SiO", 1.0),)},
+            {"hour": 2, "duration_h": 1.0, "flux": (("SiO", 0.5),)},
+        ),
+        "refused": (("SiO", "hot_wall"),),
+        "charge": 1000.0,
+        "entries": ((("hot_wall", "SiO"), 1.5),),
+        "species": (("SiO", _WALL_BOUND_UPPER, 1.5, 1.5),),
+    },
+    # One hour records SiO. The next hour has no evaporation flux. The
+    # first hour's mass is not the supply, and the refusal stays.
+    {
+        "deposit": ((("cold_wall", "SiO"), 0.1),),
+        "flux_snapshots": (
+            {"hour": 1, "duration_h": 1.0, "flux": (("SiO", 1.0),)},
+            {"hour": 2, "duration_h": 1.0, "unavailable": True},
+        ),
+        "refused": (("SiO", "hot_wall"),),
+        "charge": 1000.0,
+        "entries": ((("cold_wall", "SiO"), 0.1),),
+        "species": (("SiO", None, None, None),),
+    },
+    # The gap is the window, not one species. Mg was recorded on the same
+    # hour as SiO and is still not a supply.
+    {
+        "deposit": ((("cold_wall", "Na"), 3.0),),
+        "flux_snapshots": (
+            {
+                "hour": 1,
+                "duration_h": 1.0,
+                "flux": (("SiO", 1.0), ("Mg", 0.5)),
+            },
+            {"hour": 2, "duration_h": 1.0, "unavailable": True},
+        ),
+        "refused": (("SiO", "hot_wall"), ("Mg", "hot_wall")),
+        "charge": 1000.0,
+        "entries": ((("cold_wall", "Na"), 3.0),),
+        "species": (
+            ("SiO", None, None, None),
+            ("Mg", None, None, None),
+        ),
+    },
+    # An explicit zero rate is evidence. It contributes no mass.
+    {
+        "deposit": (),
+        "flux_snapshots": (
+            {"hour": 1, "duration_h": 1.0, "flux": (("SiO", 1.0),)},
+            {"hour": 2, "duration_h": 1.0, "flux": (("SiO", 0.0),)},
+        ),
+        "refused": (("SiO", "hot_wall"),),
+        "charge": 1000.0,
+        "entries": ((("hot_wall", "SiO"), 1.0),),
+        "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
+    },
+    # A present map that omits SiO is not a missing interval. The published
+    # map drops a carrier with no rate. The observed hour is the supply.
+    {
+        "deposit": (),
+        "flux_snapshots": (
+            {"hour": 1, "duration_h": 1.0, "flux": (("SiO", 1.0),)},
+            {"hour": 2, "duration_h": 1.0, "flux": (("Mg", 0.4),)},
+        ),
+        "refused": (("SiO", "hot_wall"),),
+        "charge": 1000.0,
+        "entries": ((("hot_wall", "SiO"), 1.0),),
+        "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
+    },
+    # Zero duration adds no mass, so a missing map there is not a gap.
+    {
+        "deposit": (),
+        "flux_snapshots": (
+            {"hour": 1, "duration_h": 1.0, "flux": (("SiO", 1.0),)},
+            {"hour": 2, "duration_h": 0.0, "unavailable": True},
+        ),
+        "refused": (("SiO", "hot_wall"),),
+        "charge": 1000.0,
+        "entries": ((("hot_wall", "SiO"), 1.0),),
+        "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
+    },
+    # 1 kg charge: ledger resolution is 5e-14 kg. 5e-13 kg is above that
+    # resolution and below the old 1e-12 kg reader cutoff. Scoring must
+    # keep 5e-13 kg. Collapsing it to zero makes lifetime infinite.
+    {
+        "deposit": (),
+        "flux": (("SiO", 5.0e-13),),
+        "refused": (("SiO", "hot_wall"),),
+        "charge": 1.0,
+        "entries": ((("hot_wall", "SiO"), 5.0e-13),),
+        "species": (("SiO", _WALL_BOUND_UPPER, 5.0e-13, 5.0e-13),),
+    },
 )
 _WALL_BOUND_CHANNELS = ("book", "product_summary", "lifespan", "tap")
+
+
+def _wall_bound_flux_windows(case: Mapping[str, object]) -> tuple[Mapping[str, object], ...]:
+    raw = case.get("flux_snapshots")
+    if raw is None:
+        return (
+            {
+                "hour": 1,
+                "duration_h": 1.0,
+                "flux": case["flux"],
+                "published_flux": case.get("published_flux"),
+            },
+        )
+    return tuple(raw)
+
+
+def _wall_bound_evap_flux(window: Mapping[str, object]) -> SimpleNamespace | None:
+    if window.get("unavailable"):
+        return None
+    flux = {
+        str(species): float(kg)
+        for species, kg in window.get("flux", ())
+    }
+    published = window.get("published_flux")
+    return SimpleNamespace(
+        species_kg_hr=flux,
+        **(
+            {}
+            if published is None
+            else {
+                "published_species_kg_hr": {
+                    str(species): float(kg) for species, kg in published
+                }
+            }
+        ),
+    )
 
 
 def _wall_bound_execution(case: Mapping[str, object]):
@@ -1575,8 +1711,6 @@ def _wall_bound_execution(case: Mapping[str, object]):
         (segment, species): float(kg)
         for (segment, species), kg in case["deposit"]
     }
-    flux = {species: float(kg) for species, kg in case["flux"]}
-    published = case.get("published_flux")
     refused_by_species: dict[str, list[str]] = {}
     for species, segment in case["refused"]:
         segments = refused_by_species.setdefault(str(species), [])
@@ -1588,24 +1722,18 @@ def _wall_bound_execution(case: Mapping[str, object]):
     for segments in refused_by_species.values():
         for segment in segments:
             zones.setdefault(segment, "Hot")
-    snapshots = (
+    snapshots = tuple(
         SimpleNamespace(
-            hour=1,
-            duration_h=1.0,
-            evap_flux=SimpleNamespace(
-                species_kg_hr=flux,
-                **(
-                    {}
-                    if published is None
-                    else {
-                        "published_species_kg_hr": {
-                            species: float(kg) for species, kg in published
-                        }
-                    }
-                ),
+            hour=int(window.get("hour", index)),
+            duration_h=float(window.get("duration_h", 1.0)),
+            evap_flux=_wall_bound_evap_flux(window),
+            **(
+                {"wall_deposit_by_segment_species_delta": dict(deposit)}
+                if index == 1
+                else {}
             ),
-            wall_deposit_by_segment_species_delta=dict(deposit),
-        ),
+        )
+        for index, window in enumerate(_wall_bound_flux_windows(case), start=1)
     )
     authority = {
         "wall_saturation_pressure_refusals_by_species": {
@@ -1660,7 +1788,7 @@ def _wall_bound_entries(deposit: Mapping[object, object]) -> dict[tuple[str, str
         if not isinstance(key, tuple) or len(key) != 2 or kg is None:
             continue
         amount = float(kg)
-        if amount <= 1.0e-12:
+        if amount <= 0.0:
             continue
         entries[(str(key[0]), str(key[1]))] = amount
     return entries
@@ -1673,10 +1801,68 @@ def _wall_bound_flatten_segments(
     for segment, species_kg in by_segment.items():
         for species, kg in species_kg.items():
             amount = float(kg)
-            if amount <= 1.0e-12:
+            if amount <= 0.0:
                 continue
             entries[(str(segment), str(species))] = amount
     return entries
+
+
+def _wall_bound_zone_species_kg(
+    by_zone: Mapping[str, Mapping[str, float]] | None,
+) -> dict[str, float]:
+    totals: dict[str, float] = {}
+    if not isinstance(by_zone, Mapping):
+        return totals
+    for species_kg in by_zone.values():
+        if not isinstance(species_kg, Mapping):
+            continue
+        for species, kg in species_kg.items():
+            amount = float(kg)
+            if amount <= 0.0:
+                continue
+            totals[str(species)] = totals.get(str(species), 0.0) + amount
+    return totals
+
+
+def _oracle_complete_flux_supply_kg(
+    snapshots: tuple[object, ...],
+    species_names: tuple[str, ...],
+) -> dict[str, float]:
+    """Independent supply oracle.
+
+    A positive-duration snapshot with no rate map is a missing interval and
+    the window has no supply. Otherwise the supply is the sum of numeric
+    rates on the snapshots that name the species. An omitted key on a
+    present map adds nothing. A species never named is not a supply.
+    """
+
+    totals = {species: 0.0 for species in species_names}
+    observed: set[str] = set()
+    missing_interval = False
+    for snapshot in snapshots:
+        duration_h = float(getattr(snapshot, "duration_h", 1.0))
+        flux = getattr(snapshot, "evap_flux", None)
+        published = getattr(flux, "published_species_kg_hr", None)
+        rates = published if isinstance(published, Mapping) else getattr(
+            flux, "species_kg_hr", None
+        )
+        if not isinstance(rates, Mapping):
+            if duration_h > 0.0:
+                missing_interval = True
+            continue
+        for species in species_names:
+            if species not in rates:
+                continue
+            totals[species] += float(rates[species]) * duration_h
+            if duration_h > 0.0:
+                observed.add(species)
+    if missing_interval:
+        return {}
+    return {
+        species: totals[species]
+        for species in species_names
+        if species in observed
+    }
 
 
 def _wall_bound_view(channel: str, case: Mapping[str, object]) -> dict[str, object]:
@@ -1711,7 +1897,7 @@ def _wall_bound_view(channel: str, case: Mapping[str, object]) -> dict[str, obje
         summary = objective_module._tap_coating_product_summary(
             execution,
             snapshots,
-            1,
+            max(objective_module._snapshot_hour(snapshot) for snapshot in snapshots),
         )
     else:
         raise AssertionError(channel)
@@ -1738,7 +1924,7 @@ def _wall_bound_view(channel: str, case: Mapping[str, object]) -> dict[str, obje
             else set()
         )
         scored = summary.get("campaigns_to_resinter") is not None
-    return {
+    view = {
         "entries": entries,
         "species_kg": species_kg,
         "bookings": bookings,
@@ -1746,6 +1932,13 @@ def _wall_bound_view(channel: str, case: Mapping[str, object]) -> dict[str, obje
         "refused_species": refused,
         "upper_flag": bool(summary.get("wall_deposit_upper_bound_used")),
     }
+    if "campaigns_to_resinter" in summary:
+        view["lifetime"] = summary["campaigns_to_resinter"]
+    if "wall_deposit_kg_by_zone_species" in summary:
+        view["zone_kg"] = _wall_bound_zone_species_kg(
+            summary["wall_deposit_kg_by_zone_species"]
+        )
+    return view
 
 
 def _wall_bound_species_totals(
@@ -1778,11 +1971,29 @@ def _wall_bound_species_totals(
     "published_not_committed_negligible",
     "published_not_committed_partial",
     "missing_charge",
+    "two_hours_both_observed",
+    "mixed_observed_and_missing_flux",
+    "missing_interval_blocks_every_species",
+    "explicit_zero_rate_is_evidence",
+    "omitted_key_on_present_map",
+    "zero_duration_missing_map_is_not_a_gap",
+    "supply_above_resolution_below_old_cutoff",
 ))
 def test_refused_wall_deposit_aggregate_follows_the_supply_bound(
     channel: str,
     case: Mapping[str, object],
 ) -> None:
+    execution, snapshots, _deposit = _wall_bound_execution(case)
+    refused_names = tuple(dict.fromkeys(str(species) for species, _segment in case["refused"]))
+    produced_bounds = _optimizer_refused_flux_bounds(
+        snapshots,
+        refused_names,
+        campaigns_elapsed=1.0,
+    )
+    oracle_bounds = _oracle_complete_flux_supply_kg(snapshots, refused_names)
+    assert set(produced_bounds) == set(oracle_bounds)
+    for species, supply_kg in oracle_bounds.items():
+        assert produced_bounds[species] == pytest.approx(supply_kg)
     view = _wall_bound_view(channel, case)
     expected_entries = {
         (segment, species): float(kg)
@@ -1829,6 +2040,17 @@ def test_refused_wall_deposit_aggregate_follows_the_supply_bound(
                     assert priced == pytest.approx(0.0)
                 else:
                     assert priced == pytest.approx(float(supply))
+        if view.get("zone_kg") is not None and booking_kg is not None:
+            assert view["zone_kg"].get(species, 0.0) == pytest.approx(
+                float(booking_kg)
+            )
+        if (
+            "lifetime" in view
+            and view["scored"]
+            and booking_kg is not None
+            and float(booking_kg) > 0.0
+        ):
+            assert view["lifetime"] not in (None, "infinite")
     expects_upper = any(
         reason == _WALL_BOUND_UPPER
         for _species, reason, _booking_kg, _supply in case["species"]

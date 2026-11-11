@@ -44,7 +44,7 @@ from simulator.diagnostics import (
     wall_deposit_remobilization_by_segment_species,
     wall_deposit_sticking_authority_status,
 )
-from simulator.trace import wall_deposit_kg_by_zone_species
+from simulator.trace import _priced_wall_deposit_kg, wall_deposit_kg_by_zone_species
 from simulator.optimize.backend_status import (
     backend_statuses_from_carrier as _backend_statuses_from_carrier,
     carrier_has_crash_point as _carrier_has_crash_point,
@@ -4306,10 +4306,17 @@ def _wall_deposit_by_segment_species_summary(
         amount = _finite_float(kg, f"wall_deposit[{segment!r}][{species!r}]")
         if amount < 0.0:
             continue
-        if amount <= _EPS:
-            amount = 0.0
+        # A measured zero stays a recorded zero. Every positive kilogram is
+        # kept: _priced_wall_deposit_kg is the only reader floor, and it does
+        # not replace a supply above ledger resolution with zero.
+        if amount == 0.0:
+            priced = 0.0
+        else:
+            priced = _priced_wall_deposit_kg(amount)
+            if priced is None:
+                continue
         species_kg = by_segment.setdefault(segment, {})
-        species_kg[species] = species_kg.get(species, 0.0) + amount
+        species_kg[species] = species_kg.get(species, 0.0) + priced
     return MappingProxyType({
         segment: MappingProxyType(dict(sorted(species_kg.items())))
         for segment, species_kg in sorted(by_segment.items())
@@ -4689,8 +4696,9 @@ def _book_wall_deposits_at_vapour_supply(
     summary, furnace lifespan, and the tap-hour projection all read the
     map this function returns. No other path prices a refused wall species.
 
-    - No computed vapour flux: not booked. A missing flux is not a zero
-      and not a bound. The refusal keeps blocking the figure.
+    - No computed vapour flux, or a window with a missing flux interval:
+      not booked. A missing map is not a zero, and the partial sum of the
+      other snapshots is not a supply. The refusal keeps blocking the figure.
     - Supply at or below the mass-balance ledger resolution: authorized
       physical zero (``below_wall_supply_upper_bound``), carrying the
       bound. Existing entries of that species are removed, so a
@@ -4700,6 +4708,10 @@ def _book_wall_deposits_at_vapour_supply(
       supply, once (``wall_deposit_upper_bound_used``), on exactly one
       eligible segment. Partial measurements of that species are removed
       first. ``deposit_wall,i == supply_i``.
+
+    Readers of the map this function returns report that mass. They do
+    not apply a second absolute cutoff. Ledger resolution is the only
+    floor, and it is applied here.
 
     The segments are chosen together, not one species at a time. The
     maximum segment load equals the closed form in
@@ -5023,8 +5035,9 @@ def _wall_deposit_by_species_summary(
         if kg is None:
             continue
         amount = _finite_float(kg, f"wall_deposit[{key!r}]")
-        if amount > 1e-12:
-            by_species[species] = by_species.get(species, 0.0) + amount
+        priced = _priced_wall_deposit_kg(amount)
+        if priced is not None:
+            by_species[species] = by_species.get(species, 0.0) + priced
     return MappingProxyType(dict(sorted(by_species.items())))
 
 

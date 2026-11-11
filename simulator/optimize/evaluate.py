@@ -1916,18 +1916,49 @@ def _optimizer_feedstock_charge_mass(
     return mass
 
 
+def _snapshot_refused_flux_rates(snapshot: Any) -> Any:
+    """Rate map for one snapshot, or None when evaporation flux is unavailable.
+
+    The ledger-committed map omits a carrier that produced no evaporation
+    transition. The wall supply is the published vapour rate condensation
+    was shown (published_species_kg_hr). Fall back to species_kg_hr when
+    that map was not retained. A species absent from a present map is
+    unobserved on that snapshot, not an explicit zero. A missing map is
+    not the same thing: the interval has no flux evidence at all.
+    """
+
+    flux = getattr(snapshot, "evap_flux", None)
+    published = getattr(flux, "published_species_kg_hr", None)
+    if isinstance(published, MappingABC):
+        return published
+    return getattr(flux, "species_kg_hr", None)
+
+
 def _optimizer_refused_flux_bounds(
     snapshots: Any,
     refused_species: tuple[str, ...],
     *,
     campaigns_elapsed: float = 1.0,
 ) -> dict[str, float]:
-    """Bound refused wall deposits by all observed vapour flux in the campaign.
+    """Bound refused wall deposits by a complete vapour-flux integral.
 
-    A wall deposit is downstream of the source vapour. Summing each refused
-    species' non-negative kg/hr flux over snapshot duration therefore gives an
-    upper bound for every segment, even when the wall saturation quantity was
-    refused. Missing species/rate evidence remains missing, never zero.
+    Invariant: a returned number is the integral of that species over every
+    positive-duration snapshot in the window. It is not a partial sum.
+
+    A positive-duration snapshot with no flux map is a missing interval.
+    There is no separate explicit bound for that interval on the snapshot,
+    so the partial sum of the other snapshots is not a supply and this
+    function returns no bounds. Callers already treat an omitted species as
+    having no finite bound: the wall refusal stays, and d-045 leaves the
+    campaign upper bound unavailable instead of clearing it.
+
+    A present map that omits a species is not a missing interval. The
+    published map drops a carrier with no rate. A species absent from every
+    map stays unobserved, never a fabricated zero. An explicit 0 rate is
+    evidence and contributes nothing to the integral.
+
+    A zero-duration snapshot adds no mass. A missing map on that snapshot
+    is not a gap.
     """
 
     if not refused_species:
@@ -1939,19 +1970,8 @@ def _optimizer_refused_flux_bounds(
         )
     totals = {species: 0.0 for species in refused_species}
     observed: set[str] = set()
+    missing_interval = False
     for snapshot in tuple(snapshots or ()):
-        flux = getattr(snapshot, "evap_flux", None)
-        # The ledger-committed map omits a carrier that produced no
-        # evaporation transition. The wall supply is the published vapour
-        # rate condensation was shown (published_species_kg_hr). Fall back
-        # to species_kg_hr when that map was not retained. A species absent
-        # from both is unobserved, not zero.
-        published = getattr(flux, "published_species_kg_hr", None)
-        rates = published if isinstance(published, MappingABC) else getattr(
-            flux, "species_kg_hr", None
-        )
-        if not isinstance(rates, MappingABC):
-            continue
         raw_duration = getattr(snapshot, "duration_h", 1.0)
         if isinstance(raw_duration, bool) or not isinstance(raw_duration, int | float):
             raise CoatingFeasibilityReportError(
@@ -1963,6 +1983,11 @@ def _optimizer_refused_flux_bounds(
                 "snapshot duration_h must be finite and non-negative for "
                 "refused flux bounds"
             )
+        rates = _snapshot_refused_flux_rates(snapshot)
+        if not isinstance(rates, MappingABC):
+            if duration_h > 0.0:
+                missing_interval = True
+            continue
         for species in refused_species:
             if species not in rates:
                 continue
@@ -1978,7 +2003,10 @@ def _optimizer_refused_flux_bounds(
                     "and non-negative"
                 )
             totals[species] += rate * duration_h
-            observed.add(species)
+            if duration_h > 0.0:
+                observed.add(species)
+    if missing_interval:
+        return {}
     return {
         species: float(totals[species] / campaigns_elapsed)
         for species in refused_species
