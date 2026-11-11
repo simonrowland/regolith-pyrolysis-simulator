@@ -85,6 +85,11 @@ from simulator.state import CampaignPhase, EvaporationFlux, HourSnapshot
 from simulator.transport_regime import TransportRegimeRefusal
 from optimizer_fixtures import StubSmokeConstraintSet
 
+# The ceramic-rump autouse wraps campaign_product_claim_keys at test time.
+# Capture the shipped function at import so the gate pin can put it back.
+# A C0 terminal-rump objective stays unclaimed only on this function.
+_SHIPPED_CAMPAIGN_PRODUCT_CLAIM_KEYS = objective_module.campaign_product_claim_keys
+
 
 def test_optimizer_trace_preserves_high_t_melt_activity_notice() -> None:
     notice = {
@@ -2739,6 +2744,330 @@ def test_withhold_notice_is_built_only_inside_the_scoring_chokepoint() -> None:
     # The feasible return, the infeasible publisher, and the earned
     # out-of-domain return. The definition itself is the fourth hit.
     assert source.count("_notes_for_executed_campaign_score(") == 4
+
+
+# INVARIANT: an objective the executed campaign does not claim never imposes
+# an evaluation gate. These pairs are the claim-distinct campaigns for the
+# pools those gates read. C2B's products include CMAS_glass, which authorizes
+# residual_rump_at_stop and cleaned_melt_at_stage0_exit. No shipped campaign
+# claims refractory_ceramic_rump, so a terminal-rump row never gates. The
+# expects_gate flag is that table, not a call back into composition_target_specs.
+_GLASS_GATE_PAIRS = (
+    ("C0", "C0", False),
+    ("C2B", "C2B", True),
+    ("C2B", "C0", False),
+    ("C0", "C2B", True),
+)
+_CERAMIC_GATE_PAIRS = (
+    ("C0", "C0", False),
+    ("C2B", "C0", False),
+    ("C0", "C2B", False),
+)
+_EXECUTED_GATE_KINDS = (
+    ("rump_terminal", _CERAMIC_GATE_PAIRS),
+    ("stage0_exit", _GLASS_GATE_PAIRS),
+    ("coating", _GLASS_GATE_PAIRS),
+    ("composition_target_order", _GLASS_GATE_PAIRS),
+    ("extraction_thresholds", _GLASS_GATE_PAIRS),
+)
+_GATE_OBJECTIVE_WEIGHT = 0.5
+_GATE_ENERGY_WEIGHT = 0.3
+_GATE_DURATION_WEIGHT = 0.2
+_ORDER_GATE_DETAIL = (
+    "order: Mg extract with Na/K retain requires explicit C3 re-dose route"
+)
+
+
+def _executed_gate_cases() -> list[tuple[str, str, str, bool]]:
+    cases: list[tuple[str, str, str, bool]] = []
+    for kind, pairs in _EXECUTED_GATE_KINDS:
+        for authored, evaluated, expects_gate in pairs:
+            cases.append((kind, authored, evaluated, expects_gate))
+    return cases
+
+
+def _executed_gate_case_id(
+    kind: str,
+    authored: str,
+    evaluated: str,
+    expects_gate: bool,
+) -> str:
+    flag = "gates" if expects_gate else "withheld"
+    return f"{kind}-{authored}-executed-{evaluated}-{flag}"
+
+
+@pytest.fixture
+def shipped_product_claims(
+    monkeypatch: pytest.MonkeyPatch,
+    _claim_ceramic_rump_for_scorer_mechanics: None,
+) -> None:
+    """Score with the shipped claim table.
+
+    The module autouse adds refractory_ceramic_rump so the scorer tests can
+    reach a terminal-rump row. This pin is the campaign that does not claim
+    that product. Depending on the autouse forces its patch to land first;
+    the setattr here is the one the test runs under.
+    """
+
+    monkeypatch.setattr(
+        objective_module,
+        "campaign_product_claim_keys",
+        _SHIPPED_CAMPAIGN_PRODUCT_CLAIM_KEYS,
+    )
+
+
+def _gate_target(kind: str) -> dict:
+    """One composition objective built to impose ``kind`` when it is claimed."""
+
+    if kind == "rump_terminal":
+        pool = "terminal_rump_earned"
+        target_id = "gate-rump"
+        species_vector = {"Ca": "retain"}
+        extraction = None
+        require_coating_gate = None
+        maturity = {"mode": "campaign_hours", "campaign": "C2B", "hours": 1}
+    elif kind == "stage0_exit":
+        pool = "cleaned_melt_at_stage0_exit"
+        target_id = "gate-stage0"
+        species_vector = {"Ca": "retain"}
+        extraction = None
+        require_coating_gate = None
+        maturity = {"mode": "campaign_hours", "campaign": "C2B", "hours": 1}
+    elif kind == "coating":
+        pool = "residual_rump_at_stop"
+        target_id = "gate-coating"
+        species_vector = {"Ca": "retain"}
+        extraction = None
+        require_coating_gate = None
+        maturity = {"mode": "campaign_hours", "campaign": "C2B", "hours": 1}
+    elif kind == "composition_target_order":
+        pool = "residual_rump_at_stop"
+        target_id = "order-gate"
+        species_vector = {"Mg": "extract", "Na": "retain"}
+        extraction = {
+            "basis": "input_element_mol",
+            "captured_pool": "captured_products",
+            "completeness_min": {"Mg": 0.5},
+        }
+        require_coating_gate = False
+        # Maturity names C2B, not C3, and the id has no "c3", so an eligible
+        # row refuses on the order gate.
+        maturity = {"mode": "campaign_hours", "campaign": "C2B", "hours": 1}
+    elif kind == "extraction_thresholds":
+        pool = "residual_rump_at_stop"
+        target_id = "gate-extraction"
+        species_vector = {"Fe": "extract"}
+        extraction = {
+            "basis": "input_element_mol",
+            "captured_pool": "captured_products",
+            "completeness_min": {"Fe": 0.5},
+        }
+        require_coating_gate = None
+        maturity = {"mode": "campaign_hours", "campaign": "C2B", "hours": 1}
+    else:
+        raise AssertionError(kind)
+    target = {
+        "pool": pool,
+        "species_vector": species_vector,
+        "composition_window": {
+            "pool": pool,
+            "basis": "oxide_wt_pct",
+            "mode": "hard_window",
+            "oxides": {"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+        },
+        "maturity": maturity,
+        "score_weights": {"extraction": 0.0, "composition": 1.0},
+    }
+    if extraction is not None:
+        target["extraction"] = extraction
+    if require_coating_gate is not None:
+        target["require_coating_gate"] = require_coating_gate
+    return {
+        "type": "composition_target",
+        "id": target_id,
+        "metric": f"composition_target:{target_id}",
+        "sense": "maximize",
+        "units": "score_0_1",
+        "weight": _GATE_OBJECTIVE_WEIGHT,
+        "rationale": f"test {kind} gate",
+        "target": target,
+    }
+
+
+def _gate_eval_profile(kind: str, authored: str, evaluated: str) -> dict:
+    profile = copy.deepcopy(PROFILE)
+    profile["profile_id"] = f"unclaimed-gate-{kind}"
+    profile["constraints"] = {"gates": ["furnace_temperature"]}
+    profile["run"] = {**profile["run"], "campaign": authored}
+    profile["fidelities"] = {
+        "fast": {
+            "backend_name": "internal-analytical",
+            "hours": 1,
+            "campaign": evaluated,
+        }
+    }
+    profile["objectives"] = [
+        _gate_target(kind),
+        {
+            "metric": ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+            "sense": "min",
+            "units": "kWh",
+            "weight": _GATE_ENERGY_WEIGHT,
+            "rationale": "test energy objective evidence",
+        },
+        {
+            "metric": "duration_h",
+            "sense": "min",
+            "units": "h",
+            "weight": _GATE_DURATION_WEIGHT,
+            "rationale": "test duration objective evidence",
+        },
+    ]
+    return profile
+
+
+def _withhold_note_for(target_id: str) -> str:
+    # Weights 0.5, 0.3, 0.2. One withheld row of 0.5 over a declared total
+    # of 1, so the fraction formats as 0.5. Retained weights are not rescaled.
+    metric = f"composition_target:{target_id}"
+    return (
+        "campaign_does_not_claim_product: "
+        f"{metric} weight=0.5 reason=campaign_does_not_claim_product; "
+        "withheld_weight_fraction=0.5"
+    )
+
+
+@pytest.mark.parametrize(
+    ("kind", "authored", "evaluated", "expects_gate"),
+    _executed_gate_cases(),
+    ids=[
+        _executed_gate_case_id(*case)
+        for case in _executed_gate_cases()
+    ],
+)
+def test_unclaimed_composition_objective_does_not_gate_the_run(
+    kind: str,
+    authored: str,
+    evaluated: str,
+    expects_gate: bool,
+    shipped_product_claims: None,
+) -> None:
+    """Every objective-derived gate, on the campaign that does and does not claim it.
+
+    The reviewer case is in this matrix: authored C0, executed C0, a
+    terminal_rump_earned objective beside energy and duration. That run
+    scores the retained objectives and names the withheld row. It does not
+    return rump_terminal_completion_unknown. The ceramic-claim autouse is
+    not in force.
+    """
+
+    profile = _gate_eval_profile(kind, authored, evaluated)
+    target_id = str(profile["objectives"][0]["id"])
+    if kind == "extraction_thresholds":
+        # A missing extraction trace fail-closes whether or not the threshold
+        # is installed. The composer is the path that installs it.
+        constraints = _composition_target_constraints(
+            profile,
+            PhysicsConstraintSet(
+                active_gates=("extraction_completeness", "furnace_temperature"),
+                target_species=("Fe",),
+            ),
+            campaign=evaluated,
+        )
+        assert profile["run"]["campaign"] == authored
+        assert constraints is not None
+        installed = constraints.extraction_min_fraction_by_species
+        if expects_gate:
+            assert set(installed) == {"Fe"}
+            assert installed["Fe"].value == pytest.approx(0.5)
+            assert "completeness_min.Fe" in installed["Fe"].source_ref
+        else:
+            assert installed == {}
+        return
+
+    executor = FakeExecutor(_execution())
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=executor,
+    )
+
+    assert profile["run"]["campaign"] == authored
+    assert result.eval_spec is not None
+    assert result.eval_spec.campaign == evaluated
+    expect_stop = kind == "stage0_exit" and expects_gate
+    assert result.eval_spec.stop_at_stage0_exit is expect_stop
+    assert executor.config.stop_at_stage0_exit is expect_stop
+    if expects_gate:
+        assert result.eval_spec.target_spec_id == target_id
+    else:
+        assert result.eval_spec.target_spec_id == ""
+    joined_notes = " ".join(result.notes)
+    assert "rump_terminal_completion_unknown" not in joined_notes
+    assert "rump_terminal_unproven" not in joined_notes
+
+    if kind == "composition_target_order" and expects_gate:
+        assert result.feasible is False
+        assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+        assert result.objectives is None
+        assert result.failing_gates == ("composition_target_order",)
+        assert _ORDER_GATE_DETAIL in result.notes
+        assert not any(
+            note.startswith("campaign_does_not_claim_product:")
+            for note in result.notes
+        )
+        return
+
+    assert result.feasible is True
+    assert result.failure_category is None
+    assert result.objectives is not None
+    mapping = result.objectives.as_mapping()
+    assert mapping[ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC] == pytest.approx(44.0)
+    assert mapping["duration_h"] == pytest.approx(1.0)
+    composition_metric = f"composition_target:{target_id}"
+    if expects_gate:
+        assert composition_metric in mapping
+        assert result.notes == ()
+    else:
+        assert composition_metric not in mapping
+        assert 0.0 not in mapping.values()
+        assert result.notes == (_withhold_note_for(target_id),)
+    if kind != "composition_target_order":
+        assert ("coating" in result.feasibility_margins) is (
+            expects_gate and kind in {"coating", "stage0_exit"}
+        )
+
+
+def test_unearned_out_of_domain_does_not_become_an_unclaimed_rump_gate(
+    shipped_product_claims: None,
+) -> None:
+    """An out-of-domain C0 run stays out of domain.
+
+    The unevaluated terminal-rump row used to replace that verdict with
+    rump_terminal_unproven. The campaign does not claim the ceramic, so the
+    row imposes no gate. This path does not publish a vector.
+    """
+
+    profile = _gate_eval_profile("rump_terminal", "C0", "C0")
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(_execution(backend_status="out_of_domain")),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.failing_gates == ("backend_domain",)
+    assert result.eval_spec is not None
+    assert result.eval_spec.campaign == "C0"
+    assert result.eval_spec.target_spec_id == ""
+    joined_notes = " ".join(result.notes)
+    assert "rump_terminal_completion_unknown" not in joined_notes
+    assert "rump_terminal_unproven" not in joined_notes
 
 
 def _authoritative_sio_carrier() -> dict[str, object]:

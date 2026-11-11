@@ -1182,7 +1182,11 @@ def evaluate(
             profile,
             pumping_margin,
         )
-    target_reason = composition_target_infeasible_reason(profile)
+    # Gates use the executed campaign. ``objective_profile`` is stamped with
+    # EvalSpec.campaign, and ``composition_target_specs`` drops objectives
+    # that campaign does not claim. An unclaimed terminal-rump row must not
+    # replace the retained score with rump_terminal_completion_unknown.
+    target_reason = composition_target_infeasible_reason(objective_profile)
     if target_reason:
         return _target_infeasible_result(
             candidate_id,
@@ -1194,7 +1198,7 @@ def evaluate(
             detail=target_reason,
             notes=(target_reason,),
         )
-    if composition_targets_require_terminal_rump(profile):
+    if composition_targets_require_terminal_rump(objective_profile):
         if _trace_has_unearned_rump_terminal(run_execution):
             return _target_infeasible_result(
                 candidate_id,
@@ -2959,8 +2963,16 @@ def _build_eval_inputs_impl(
     feedstock = bundle.feedstocks[feedstock_id]
     profile_id = str(profile.get("profile_id") or profile.get("id") or "inline-profile")
     profile_digest = _profile_digest(profile)
-    target_metadata = composition_target_eval_metadata(profile)
-    stop_at_stage0_exit = composition_targets_require_stage0_exit(profile)
+    # The digest stays the authored profile. Gate metadata uses the executed
+    # campaign, the same id stored on EvalSpec.campaign. An unclaimed
+    # composition objective does not stop the run at stage 0 and does not
+    # enter the target digest.
+    gate_profile = profile_with_executed_campaign(
+        profile,
+        str(run_options["campaign"]),
+    )
+    target_metadata = composition_target_eval_metadata(gate_profile)
+    stop_at_stage0_exit = composition_targets_require_stage0_exit(gate_profile)
     run_options = _run_options_with_conditional_pins(
         run_options, conditional_context
     )
@@ -4306,6 +4318,11 @@ def _composition_target_constraints(
     recipe_patch: RecipePatch | None = None,
     campaign: str | None = None,
 ) -> PhysicsConstraintSet | None:
+    # ``campaign`` is the executed campaign, including a fidelity overlay.
+    # Stamp it before coating and extraction read the scoring rows. An
+    # unclaimed composition objective then imposes neither gate.
+    if campaign is not None:
+        profile = profile_with_executed_campaign(profile, str(campaign))
     active = constraints or physics_constraints_from_profile(profile)
     active = _with_recipe_local_furnace_ceiling(
         profile,
@@ -5169,6 +5186,8 @@ def _out_of_domain_result(
             notes=_notes_for_executed_campaign_score(assessment.notes, campaign_score),
         )
 
+    # ``profile`` here is the scoring profile the caller stamped with
+    # EvalSpec.campaign. The rump gate follows that campaign's claims.
     if composition_targets_require_terminal_rump(profile):
         return _target_infeasible_result(
             candidate_id,

@@ -108,7 +108,11 @@ _MASS_OBJECTIVE_METRICS = frozenset(
 # The executed campaign is the fidelity overlay on ``profile.run`` (the same
 # value EvalSpec.campaign stores). Otherwise the objective is withheld from
 # every scoring path (objective definitions, compute_objectives, strategy
-# metrics, and the study scalar). It is never entered as 0.0. Retained
+# metrics, and the study scalar) and from every objective-derived gate.
+# Those gates are terminal rump, stage-0 stop, coating, composition order,
+# extraction thresholds, and target metadata. They read
+# ``composition_target_specs``, which is the scoring rows. A withheld
+# objective cannot impose one. It is never entered as 0.0. Retained
 # weights stay declared.
 # The notice names each withheld objective, its weight, the reason
 # campaign_does_not_claim_product, and the withheld weight fraction.
@@ -499,12 +503,36 @@ def normalize_composition_target_objective(
 
 
 def composition_target_specs(profile: Mapping[str, Any]) -> tuple[Mapping[str, Any], ...]:
-    specs: list[Mapping[str, Any]] = []
-    raw_objectives = profile.get("objectives", ())
-    if not isinstance(raw_objectives, (list, tuple)):
+    """Composition objectives the executed campaign claims.
+
+    INVARIANT: an objective whose product the executed campaign does not
+    claim never imposes a score, a study-scalar weight, or an evaluation
+    gate. Terminal rump, stage-0 stop, coating, composition order,
+    extraction thresholds, and target metadata all read this tuple. This
+    tuple is ``_scoring_objective_rows`` restricted to composition targets,
+    so a withheld objective is absent and cannot impose a gate. It is named
+    only in the withhold notice. The caller stamps the executed campaign
+    onto ``profile.run`` first. An unstamped profile uses its authored run,
+    or C0 when that run names none.
+
+    Pre-fix objective vectors miss only after a VERSION bump. The same
+    requirement is named on ``_scoring_objective_rows``: evalspec.py scopes
+    EvalSpec keys by the repo VERSION file. This function does not add a
+    cache-key dimension, and corpus_version stays at the green tag.
+    """
+
+    authored = profile.get("objectives", ())
+    if not isinstance(authored, (list, tuple)):
         return ()
-    for ordinal, raw in enumerate(raw_objectives):
-        if not isinstance(raw, Mapping):
+    eligible_rows = _scoring_objective_rows(profile)
+    if not isinstance(eligible_rows, (list, tuple)):
+        return ()
+    # Authored ordinals stay in validation errors. Membership is the scoring
+    # list, not a second claim check.
+    eligible = {id(row) for row in eligible_rows}
+    specs: list[Mapping[str, Any]] = []
+    for ordinal, raw in enumerate(authored):
+        if id(raw) not in eligible or not isinstance(raw, Mapping):
             continue
         if objective_type(raw) == COMPOSITION_TARGET_TYPE:
             specs.append(
@@ -1814,7 +1842,8 @@ def _scoring_objective_rows(profile: Mapping[str, Any]) -> Any:
     """Rows that enter the scored vector.
 
     One chokepoint: objective definitions, ``compute_objectives``, strategy
-    metrics, and the study scalar all read this list. A product objective the
+    metrics, the study scalar, and ``composition_target_specs`` (every
+    objective-derived gate) all read this list. A product objective the
     executed campaign does not claim is dropped here. Composition rows are
     judged by their own target product. There is no flag that puts one back,
     and description text is not read.

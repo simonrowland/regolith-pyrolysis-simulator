@@ -16,7 +16,10 @@ does not claim glass, metals, or ceramic. Every spelling of one route
 claims that route's setpoint products, plus oxygen iff the route credits
 a terminal oxygen account. C6 and C7 do not. A composition target is eligible
 only for its own pool product. ``captured_products`` requires every extracted
-species. A dynamic ``{species}_kg`` row is that ledger species. It is
+species. An unclaimed composition objective imposes no evaluation gate:
+terminal rump, stage-0 stop, coating, composition order, extraction
+thresholds, and target metadata read the scoring rows of the executed
+campaign. A dynamic ``{species}_kg`` row is that ledger species. It is
 claimed only when ``species`` itself is a products key: ``native_Fe`` does
 not claim ``Fe_kg``, and ``SiO2_glass`` does not claim ``Si_kg``. An
 energy-per-product intensity is not a ledger species. Its denominator is
@@ -39,6 +42,7 @@ import yaml
 
 from simulator.campaigns import CampaignManager, campaign_evolves_terminal_oxygen
 from simulator.config import DEFAULT_DATA_DIR
+from simulator.optimize.evaluate import _composition_target_constraints
 from simulator.optimize.objective import (
     COMPOSITION_TARGET_METRIC_PREFIX,
     COMPOSITION_VECTOR_SPECIES,
@@ -53,6 +57,12 @@ from simulator.optimize.objective import (
     _energy_per_product_metric,
     campaign_claims_product_objective,
     campaign_product_claim_keys,
+    composition_target_eval_metadata,
+    composition_target_infeasible_reason,
+    composition_target_specs,
+    composition_targets_require_coating,
+    composition_targets_require_stage0_exit,
+    composition_targets_require_terminal_rump,
     compute_objectives,
     executed_campaign_id,
     objective_definitions,
@@ -62,6 +72,7 @@ from simulator.optimize.objective import (
     unclaimed_product_withheld_weight_fraction,
     unrenormalized_study_scalar_weights,
 )
+from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.state import CampaignPhase, TERMINAL_OXYGEN_ROUTE_PHASES
 from simulator.optimize.profiles import (
     VALID_FIDELITIES,
@@ -1646,3 +1657,189 @@ def test_file_load_waits_for_the_executed_campaign(
     scored = {definition.metric for definition in objective_definitions(stamped)}
     assert "pure_silica_glass_kg" in scored
     assert unclaimed_product_withheld_objective_note(stamped) is None
+
+
+# Closed set of gates a composition objective can impose. Each row is shaped
+# so that gate is on exactly when the executed campaign claims the row.
+_OBJECTIVE_DERIVED_GATES = (
+    "rump_terminal",
+    "stage0_exit",
+    "coating",
+    "composition_target_order",
+    "extraction_thresholds",
+)
+_ORDER_GATE_DETAIL = (
+    "order: Mg extract with Na/K retain requires explicit C3 re-dose route"
+)
+
+
+def _objective_derived_gate_cases() -> list[tuple[str | None, str]]:
+    return [
+        (campaign, gate)
+        for campaign in _campaign_ids()
+        for gate in _OBJECTIVE_DERIVED_GATES
+    ]
+
+
+def _gate_objective(kind: str) -> dict:
+    """One composition row built to impose ``kind`` when it is eligible."""
+
+    if kind == "rump_terminal":
+        return _composition_target_row(
+            "terminal_rump_earned",
+            species_vector={"Ca": "retain"},
+            target_id="gate-rump",
+        )
+    if kind == "stage0_exit":
+        return _composition_target_row(
+            "cleaned_melt_at_stage0_exit",
+            species_vector={"Ca": "retain"},
+            target_id="gate-stage0",
+        )
+    if kind == "coating":
+        return _composition_target_row(
+            "residual_rump_at_stop",
+            species_vector={"Ca": "retain"},
+            target_id="gate-coating",
+        )
+    if kind == "composition_target_order":
+        row = _composition_target_row(
+            "residual_rump_at_stop",
+            species_vector={"Mg": "extract", "Na": "retain"},
+            target_id="order-gate",
+        )
+        row["target"]["require_coating_gate"] = False
+        row["target"]["maturity"] = {
+            "mode": "campaign_hours",
+            "campaign": "C2B",
+            "hours": 1,
+        }
+        row["target"]["extraction"] = {
+            "basis": "input_element_mol",
+            "captured_pool": "captured_products",
+            "completeness_min": {"Mg": 0.5},
+        }
+        return row
+    if kind == "extraction_thresholds":
+        row = _composition_target_row(
+            "residual_rump_at_stop",
+            species_vector={"Fe": "extract"},
+            target_id="gate-extraction",
+        )
+        row["target"]["extraction"] = {
+            "basis": "input_element_mol",
+            "captured_pool": "captured_products",
+            "completeness_min": {"Fe": 0.5},
+        }
+        return row
+    raise AssertionError(kind)
+
+
+def _extraction_species(kind: str) -> tuple[str, ...]:
+    if kind == "composition_target_order":
+        return ("Mg",)
+    return ("Fe",)
+
+
+@pytest.mark.parametrize(
+    ("campaign", "gate"),
+    _objective_derived_gate_cases(),
+    ids=[
+        f"{campaign or 'absent'}-{gate}"
+        for campaign, gate in _objective_derived_gate_cases()
+    ],
+)
+def test_unclaimed_composition_objective_imposes_no_gate(
+    campaign: str | None,
+    gate: str,
+) -> None:
+    """Every campaign spelling, every objective-derived gate.
+
+    INVARIANT: an objective the executed campaign does not claim is absent
+    from the scoring rows, so it imposes no score and no gate. The oracle
+    is the setpoint products map, not ``composition_target_specs``.
+    """
+
+    row = _gate_objective(gate)
+    profile = _profile(row, campaign=campaign, prose="description-edited")
+    claim_keys = _oracle_claims(executed_campaign_id(profile))
+    claimed = _oracle_composition_claimed(row["target"], claim_keys)
+    specs = composition_target_specs(profile)
+    metrics = {str(spec["metric"]) for spec in specs}
+    assert (row["metric"] in metrics) is claimed
+    assert composition_targets_require_terminal_rump(profile) is (
+        claimed and gate == "rump_terminal"
+    )
+    assert composition_targets_require_stage0_exit(profile) is (
+        claimed and gate == "stage0_exit"
+    )
+    assert composition_targets_require_coating(profile) is (
+        claimed and gate != "composition_target_order"
+    )
+    reason = composition_target_infeasible_reason(profile)
+    if claimed and gate == "composition_target_order":
+        assert reason == _ORDER_GATE_DETAIL
+    else:
+        assert reason == ""
+    metadata = composition_target_eval_metadata(profile)
+    if claimed:
+        assert metadata["target_spec_id"] == str(row["id"])
+    else:
+        assert metadata["target_spec_id"] == ""
+        assert metadata["target_spec_digest"] == ""
+        assert not composition_targets_require_terminal_rump(profile)
+        assert not composition_targets_require_stage0_exit(profile)
+        assert not composition_targets_require_coating(profile)
+    constraints = _composition_target_constraints(
+        profile,
+        PhysicsConstraintSet(
+            active_gates=("extraction_completeness",),
+            target_species=_extraction_species(gate),
+        ),
+        campaign=executed_campaign_id(profile),
+    )
+    assert constraints is not None
+    installed = constraints.extraction_min_fraction_by_species
+    if claimed and gate in {"composition_target_order", "extraction_thresholds"}:
+        assert installed
+    else:
+        assert installed == {}
+
+
+def test_objective_derived_gates_read_the_scoring_rows() -> None:
+    """The gate readers have one chokepoint: the scoring rows."""
+
+    import inspect
+
+    import simulator.optimize.evaluate as evaluate_module
+    import simulator.optimize.objective as objective_module
+
+    specs_source = inspect.getsource(objective_module.composition_target_specs)
+    assert "_scoring_objective_rows(" in specs_source
+    for name in (
+        "composition_target_eval_metadata",
+        "composition_targets_require_coating",
+        "composition_targets_require_terminal_rump",
+        "composition_targets_require_stage0_exit",
+        "composition_target_infeasible_reason",
+    ):
+        source = inspect.getsource(getattr(objective_module, name))
+        assert "composition_target_specs(" in source
+        assert "_scoring_objective_rows(" not in source
+    extract_source = inspect.getsource(
+        evaluate_module._with_composition_target_extraction_thresholds
+    )
+    assert "composition_target_specs(" in extract_source
+    evaluate_source = inspect.getsource(evaluate_module.evaluate)
+    assert "composition_target_infeasible_reason(objective_profile)" in evaluate_source
+    assert (
+        "composition_targets_require_terminal_rump(objective_profile)"
+        in evaluate_source
+    )
+    impl_source = inspect.getsource(evaluate_module._build_eval_inputs_impl)
+    assert "composition_target_eval_metadata(gate_profile)" in impl_source
+    assert "composition_targets_require_stage0_exit(gate_profile)" in impl_source
+    constraints_source = inspect.getsource(
+        evaluate_module._composition_target_constraints
+    )
+    assert "profile_with_executed_campaign(" in constraints_source
