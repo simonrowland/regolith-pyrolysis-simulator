@@ -1089,6 +1089,76 @@ def test_equilibrium_cache_maps_use_compact_canonical_json_objects() -> None:
     assert restored["fe_redox_split"] == {"Fe2O3_wt_pct": 3.0}
 
 
+def test_engine_notice_codes_round_trip_with_typed_values() -> None:
+    from simulator.melt_backend.base import (
+        ENGINE_CACHE_NOTICE_CODE_TABLE,
+        decode_engine_notice_codes,
+        encode_engine_notice_codes,
+    )
+
+    notices = [
+        {
+            "kind": "openimcc_temperature_extrapolated",
+            "authority": "extrapolated",
+            "certified_band": {"temperature_K": [1400.0, 2200.0]},
+        },
+        {
+            "kind": "openimcc_gas_flag",
+            "authority": "extrapolated",
+            "species": "CO(g)",
+            "reason": "outside-domain",
+        },
+    ]
+    codes, values = encode_engine_notice_codes("openimcc", notices)
+
+    assert codes == tuple(sorted(codes))
+    assert all(type(code) is int and 0 < code < 256 for code in codes)
+    assert decode_engine_notice_codes("openimcc", codes, values) == notices
+    assert len({(engine, number) for engine, number, _code, _description in ENGINE_CACHE_NOTICE_CODE_TABLE}) == len(
+        ENGINE_CACHE_NOTICE_CODE_TABLE
+    )
+    assert len({(engine, code) for engine, _number, code, _description in ENGINE_CACHE_NOTICE_CODE_TABLE}) == len(
+        ENGINE_CACHE_NOTICE_CODE_TABLE
+    )
+
+
+def test_unknown_engine_notice_code_requires_table_entry() -> None:
+    from simulator.melt_backend.base import encode_engine_notice_codes
+
+    with pytest.raises(ValueError, match="unregistered openimcc engine notice code"):
+        encode_engine_notice_codes("openimcc", [{"kind": "future_notice"}])
+
+
+def test_equilibrium_hot_uses_notice_and_warning_codes_with_parameters() -> None:
+    from simulator.melt_backend.base import (
+        equilibrium_cache_from_value,
+        equilibrium_cache_value,
+    )
+
+    notice = {
+        "kind": "openimcc_gas_flag",
+        "authority": "extrapolated",
+        "species": "CO(g)",
+        "reason": "outside-domain",
+    }
+    value = equilibrium_cache_value(
+        {
+            "status": "ok",
+            "warnings": ["OpenIMCC emitted a diagnostic warning"],
+            "diagnostics": {"imcc_notices": [notice]},
+        },
+        engine_id="openimcc",
+    )
+
+    metadata = value.hot[11]
+    assert metadata["notice_codes"] == tuple(sorted(metadata["notice_codes"]))
+    assert metadata["warning_codes"] == tuple(sorted(metadata["warning_codes"]))
+    assert all(type(code) is int for code in metadata["notice_codes"])
+    restored = equilibrium_cache_from_value(value.hot, engine_id="openimcc")
+    assert restored["diagnostics"]["imcc_notices"] == [notice]
+    assert restored["warnings"] == ["OpenIMCC emitted a diagnostic warning"]
+
+
 def test_equilibrate_cell_hot_reuses_cell_certified_band_for_notices() -> None:
     band = {"temperature_K": [1400.0, 2200.0]}
     cell = EquilibrateCell(
