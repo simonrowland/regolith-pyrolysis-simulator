@@ -17446,7 +17446,7 @@ def _relative_oxygen_decision(
         band_basis = (
             "O'Neill and Pownceby 1993 Fe-'FeO' muO2 uncertainty"
             if calibration_id == "oneill_pownceby_1993_iw_fe_feo"
-            else "canonical-to-Frost 1991 comparison spread"
+            else "absolute canonical-to-Frost 1991 spread"
         )
     elif calibration_text:
         band_text = "not reported (printed calibration used exactly)"
