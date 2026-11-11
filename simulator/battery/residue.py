@@ -408,6 +408,8 @@ class _HashimotoResiduePrediction:
     primary_oxide_wt_pct: Mapping[str, float]
     geometry_oxide_wt_pct: Mapping[str, Mapping[str, float]]
     sensitivity_band_wt_pct: Mapping[str, tuple[float, float]]
+    initial_inventory_mol: Mapping[str, float]
+    primary_inventory_mol: Mapping[str, float]
     provenance: Mapping[str, object]
 
 
@@ -2021,11 +2023,20 @@ def predict_knudsen_residue_composition(
         except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
             diagnostic = {"refusal": getattr(exc, "reason", str(exc))}
         _append_omission_notices(notices, pressure_callbacks)
+        formula_oxygen_atoms_mol = math.fsum(
+            amount * _formula_terms(oxide)[0].get("O", 0.0)
+            for oxide, amount in primary.residue_mol.items()
+        )
         return {
             "composition_wt_pct": composition, "linear_temperature_diagnostic": diagnostic,
             "measured_mass_loss_fraction": target, "temperature_path": path,
             "oxygen_sources": oxygen_sources, "notices": tuple(notices),
+            "initial_inventory_mol": dict(initial),
+            "final_inventory_mol": dict(primary.residue_mol),
             "retained_oxygen_atoms_mol": primary.retained_oxygen_atoms_mol,
+            "final_bulk_mass_adjustment_kg": (
+                primary.retained_oxygen_atoms_mol - formula_oxygen_atoms_mol
+            ) * _formula_terms("O")[1],
             "atom_closure_mol": dict(primary.atom_closure_mol),
             "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / math.fsum(n * _formula_terms(s)[1] for s, n in initial.items()),
             "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
@@ -2974,6 +2985,7 @@ def _predict_hashimoto_residue_cohort(
         )
         for alpha_arm, channels, alpha_records, row_key in arm_channels:
             geometry_predictions: dict[str, dict[str, float]] = {}
+            geometry_inventory_mol: dict[str, dict[str, float]] = {}
             pO2_ranges: dict[str, list[float] | None] = {}
             pO2_balance_floor_by_geometry: dict[
                 str, dict[str, float | int | None]
@@ -3002,14 +3014,7 @@ def _predict_hashimoto_residue_cohort(
                 refinement_status = "unconverged_at_cap"
                 while True:
                     started_cpu = time.process_time()
-                    (
-                        values,
-                        pO2_steps,
-                        exhaustions,
-                        refusal,
-                        atom_closure,
-                        pO2_balance_floor,
-                    ) = _hashimoto_integrate_geometry(
+                    integrated = _hashimoto_integrate_geometry(
                         run_initial_mol,
                         channels,
                         pressure_model,
@@ -3018,6 +3023,15 @@ def _predict_hashimoto_residue_cohort(
                         steps=steps,
                         geometry_policy_id=geometry,
                         initial_area_m2=geometry_areas[geometry],
+                    )
+                    values = integrated.composition_wt_pct
+                    pO2_steps = integrated.pO2_steps
+                    exhaustions = integrated.exhaustion_notices
+                    refusal = integrated.refusal
+                    atom_closure = integrated.atom_closure
+                    pO2_balance_floor = integrated.pO2_balance_floor
+                    geometry_inventory_mol[geometry] = dict(
+                        integrated.inventory_mol
                     )
                     cpu_seconds += time.process_time() - started_cpu
                     tried_steps.append(steps)
@@ -3135,6 +3149,10 @@ def _predict_hashimoto_residue_cohort(
                 "sample_mass_kg": sample_mass_kg,
                 "starting_composition_wt_pct": dict(run_wt_pct),
                 "starting_preform_mm": dict(preform_dimensions_mm),
+                "initial_inventory_mol": dict(run_initial_mol),
+                "integrated_inventory_mol": dict(
+                    geometry_inventory_mol[primary_geometry]
+                ),
                 "sample_surface_area_status": "not_tabulated",
                 "primary_geometry_policy_id": primary_geometry,
                 "geometry_primary_argument": (
@@ -3244,6 +3262,10 @@ def _predict_hashimoto_residue_cohort(
                     primary_oxide_wt_pct=dict(geometry_predictions[primary_geometry]),
                     geometry_oxide_wt_pct=geometry_predictions,
                     sensitivity_band_wt_pct=band,
+                    initial_inventory_mol=dict(run_initial_mol),
+                    primary_inventory_mol=dict(
+                        geometry_inventory_mol[primary_geometry]
+                    ),
                     provenance=provenance,
                 )
             )
@@ -3343,6 +3365,116 @@ def _inventory_bulk_and_element_masses_kg(
         )
         element_mass_kg[element] = element_moles * _formula_terms(element)[1]
     return total_mass_kg, element_mass_kg
+
+
+def _printed_fm_definition(located_definition: object | None) -> tuple[str, Mapping[str, Any]]:
+    state = getattr(located_definition, "state", None)
+    value = getattr(state, "value", None) if getattr(state, "is_value", False) else None
+    if not isinstance(value, Mapping):
+        raise ResidueInventoryRefusal(
+            "fo_definition_unprinted", "missing point_conditions.fm_definition"
+        )
+    definition = value.get("definition")
+    quote = value.get("quote")
+    page = value.get("page")
+    if (
+        definition not in {"concentration_retention", "mass_retention"}
+        or not isinstance(quote, str)
+        or not quote.strip()
+        or isinstance(page, bool)
+        or not isinstance(page, int)
+        or page <= 0
+    ):
+        raise ResidueInventoryRefusal(
+            "fo_definition_unprinted",
+            "fm_definition needs a named definition, printed quote, and page",
+        )
+    return str(definition), value
+
+
+def _require_element_retention_transport_inputs(inputs: Mapping[str, object]) -> None:
+    def has_value(value: object) -> bool:
+        if value is None:
+            return False
+        if isinstance(value, str):
+            return bool(value.strip())
+        if isinstance(value, Mapping):
+            return bool(value) and all(has_value(item) for item in value.values())
+        if isinstance(value, (tuple, list)):
+            return bool(value) and all(has_value(item) for item in value)
+        kind = getattr(value, "kind", None)
+        if getattr(kind, "value", kind) == "unavailable":
+            return False
+        state = getattr(value, "state", None)
+        if state is None and hasattr(value, "is_value"):
+            state = value
+        if state is not None and hasattr(state, "is_value"):
+            return bool(state.is_value) and has_value(state.value)
+        return True
+
+    labels = (
+        ("duration", "duration_missing", "duration"),
+        ("temperature", "temperature_missing", "T"),
+        ("fO2", "fO2_missing", "fO2"),
+        ("starting_composition", "starting_composition_missing", "starting composition"),
+        ("sample_area_or_geometry", "sample_area_or_geometry_missing", "sample area/geometry"),
+        ("gas_conditions", "gas_conditions_missing", "gas conditions"),
+    )
+    for key, reason, label in labels:
+        value = inputs.get(key)
+        if not has_value(value):
+            raise ResidueInventoryRefusal(reason, f"missing {label}")
+
+
+def _element_retention_ratio_from_inventories(
+    initial_inventory_mol: Mapping[str, float],
+    final_inventory_mol: Mapping[str, float],
+    element: str,
+    definition: str,
+    *,
+    initial_oxygen_exchange_mol: float = 0.0,
+    final_oxygen_exchange_mol: float = 0.0,
+    initial_bulk_mass_adjustment_kg: float = 0.0,
+    final_bulk_mass_adjustment_kg: float = 0.0,
+) -> float:
+    if definition not in {"concentration_retention", "mass_retention"}:
+        raise ResidueInventoryRefusal("fo_definition_unprinted")
+    if not any(
+        float(amount) > 0.0 and _formula_terms(formula)[0].get(element, 0.0) > 0.0
+        for formula, amount in initial_inventory_mol.items()
+    ):
+        raise ResidueInventoryRefusal(
+            "element_unavailable", f"integrator does not carry {element}"
+        )
+    initial_bulk_mass_kg, initial_element_mass_kg = (
+        _inventory_bulk_and_element_masses_kg(
+            initial_inventory_mol, initial_oxygen_exchange_mol, (element,)
+        )
+    )
+    final_bulk_mass_kg, final_element_mass_kg = (
+        _inventory_bulk_and_element_masses_kg(
+            final_inventory_mol, final_oxygen_exchange_mol, (element,)
+        )
+    )
+    initial_bulk_mass_kg += initial_bulk_mass_adjustment_kg
+    final_bulk_mass_kg += final_bulk_mass_adjustment_kg
+    initial_element_mass = initial_element_mass_kg[element]
+    final_element_mass = final_element_mass_kg[element]
+    if initial_element_mass <= 0.0:
+        raise ResidueInventoryRefusal(
+            "starting_component_missing", f"no initial {element} in integrated inventory"
+        )
+    if final_element_mass < 0.0 or not math.isfinite(final_element_mass):
+        raise ResidueInventoryRefusal(
+            "element_inventory_invalid", f"invalid final {element} inventory"
+        )
+    mass_retention = final_element_mass / initial_element_mass
+    if definition == "mass_retention":
+        return mass_retention
+    bulk_mass_factor = final_bulk_mass_kg / initial_bulk_mass_kg
+    if not math.isfinite(bulk_mass_factor) or bulk_mass_factor <= 0.0:
+        raise ResidueInventoryRefusal("residue_bulk_mass_invalid")
+    return mass_retention / bulk_mass_factor
 
 
 def _sossi_project_element_ppm(
@@ -3709,6 +3841,7 @@ def _predict_sossi_residue_cohort(
         areas = _sossi_geometry_areas(sample_mass_kg)
         steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
         geometry_predictions: dict[str, dict[str, float]] = {}
+        geometry_inventory_mol: dict[str, dict[str, float]] = {}
         geometry_buffer_exchange: dict[str, float] = {}
         geometry_refinement: dict[str, dict[str, Any]] = {}
         run_refusal: ResidueEngineNonconvergence | None = None
@@ -3772,6 +3905,7 @@ def _predict_sossi_residue_cohort(
             if run_refusal is not None:
                 break
             geometry_predictions[geometry] = accepted
+            geometry_inventory_mol[geometry] = dict(current_inventory)
             geometry_buffer_exchange[geometry] = buffer_exchange
             geometry_refinement[geometry] = {
                 "steps_tried": tried,
@@ -3811,6 +3945,8 @@ def _predict_sossi_residue_cohort(
             )
             for element in supported_elements
         }
+        primary_inventory = geometry_inventory_mol[_SOSSI_PRIMARY_GEOMETRY]
+        primary_buffer_exchange = geometry_buffer_exchange[_SOSSI_PRIMARY_GEOMETRY]
         printed_composition = sample.get("printed_composition", {})
         prediction_rows.append(
             _SossiResiduePrediction(
@@ -3826,6 +3962,8 @@ def _predict_sossi_residue_cohort(
                     "code_revision": code_revision,
                     "sample_mass_kg": sample_mass_kg,
                     "total_pressure_Pa": total_pressure_Pa,
+                    "temperature_K": temperature_K,
+                    "duration_s": duration_s,
                     "buffered_fO2_log": buffered_logp,
                     "buffered_boundary": "printed log10 fO2; reservoir oxygen exchange included",
                     "buffer_oxygen_exchange_mol_by_geometry": geometry_buffer_exchange,
@@ -3846,6 +3984,8 @@ def _predict_sossi_residue_cohort(
                     "starting_trace_basis": "element ppm on the printed approximately 25 mg chemical basis",
                     "geometry_policy_id": _SOSSI_PRIMARY_GEOMETRY,
                     "geometry_areas_m2": areas,
+                    "integrated_inventory_mol": primary_inventory,
+                    "initial_inventory_mol": dict(inventory),
                     "area_m2_initial_by_geometry": areas,
                     "area_evolution_by_geometry": {
                         _SOSSI_GEOMETRIES[0]: "constant sphere area",

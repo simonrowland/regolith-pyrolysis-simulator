@@ -379,6 +379,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.EVOLVED_GAS_YIELD: MetricOperation.RELATIVE,
     Quantity.ISOTOPE_DELTA: MetricOperation.ABSOLUTE,
     Quantity.RESIDUE_COMPONENT_COMPOSITION: MetricOperation.ABSOLUTE,
+    Quantity.ELEMENT_RETENTION_RATIO: MetricOperation.DEX,
     # Equilibrium ratios (not a closed phase basis) are absolute. Printed
     # component amounts and L_X are dex; metric_operation_for_identity
     # returns dex when the subtype is a PHASE_BASIS_TOKENS value.
@@ -1149,7 +1150,10 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
     does not fall through onto SiO_evolution.
     """
 
-    if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+    if quantity in {
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        Quantity.ELEMENT_RETENTION_RATIO,
+    }:
         return Rail.RESIDUE_COMPOSITION
     if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION or quantity in PRINTED_CAPACITY_QUANTITIES:
         return Rail.MELT_ACTIVITY
@@ -11798,6 +11802,9 @@ def _hashimoto_residue_prediction(
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    quantity = quantity_token(reference.identity)
+    is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
+    reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     cache_key = (_HASHIMOTO_SOURCE_ID, engine)
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
@@ -11926,15 +11933,57 @@ def _hashimoto_residue_prediction(
                 str(run_refusal.get("reason") or "hashimoto_run_refused"),
                 json.dumps(run_refusal, sort_keys=True, default=str),
             )
+        from simulator.battery.residue import (
+            ResidueInventoryRefusal,
+            _element_retention_ratio_from_inventories,
+            _printed_fm_definition,
+            _require_element_retention_transport_inputs,
+        )
+
         formula = reference.identity.species.formula
-        value = primary.primary_oxide_wt_pct.get(formula)
-        band = primary.sensitivity_band_wt_pct.get(formula)
-        if value is None or band is None:
+        if is_retention:
+            definition, definition_record = _printed_fm_definition(
+                (reference.point_conditions or {}).get("fm_definition")
+            )
+            _require_element_retention_transport_inputs(
+                {
+                    "duration": primary_provenance.get("duration_s"),
+                    "temperature": primary_provenance.get("temperature_K"),
+                    "fO2": primary_provenance.get("oxygen_boundary"),
+                    "starting_composition": primary.initial_inventory_mol,
+                    "sample_area_or_geometry": primary_provenance.get(
+                        "starting_preform_mm"
+                    ),
+                    "gas_conditions": {
+                        "total_pressure_Pa": primary_provenance.get(
+                            "total_pressure_Pa"
+                        ),
+                        "oxygen_boundary": primary_provenance.get(
+                            "oxygen_boundary"
+                        ),
+                    },
+                }
+            )
+            value = _element_retention_ratio_from_inventories(
+                primary.initial_inventory_mol,
+                primary.primary_inventory_mol,
+                formula,
+                definition,
+            )
+            band = None
+        else:
+            value = primary.primary_oxide_wt_pct.get(formula)
+            band = primary.sensitivity_band_wt_pct.get(formula)
+        if value is None or (band is None and not is_retention):
             raise ValueError("hashimoto_oxide_prediction_missing:" + formula)
+        if is_retention and value <= 0.0:
+            raise ResidueInventoryRefusal(
+                "residue_metric_domain", f"no positive Hashimoto {formula} retention"
+            )
         notices = [
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                affected_quantities=(reported_quantity,),
                 reason="feo_melt_redox_stack2_pending; regimes=M5,M2,M4",
                 origin="hashimoto-residue-r4",
                 band="1973-2273 K; engine tip 191960ce8",
@@ -11959,7 +12008,7 @@ def _hashimoto_residue_prediction(
                     Notice(
                         kind=NoticeKind.FLOOR_INVERSION,
                         affected_quantities=(
-                            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                            reported_quantity,
                         ),
                         reason="surface_pO2_at_balance_floor",
                         origin="residue-oxygen-balance",
@@ -11976,7 +12025,7 @@ def _hashimoto_residue_prediction(
             notices.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                    affected_quantities=(reported_quantity,),
                     reason="residue_time_refinement_unconverged; finest prediction retained",
                     origin="hashimoto-residue-r3",
                     band=f"N={integration.get('steps')}; N_cap=256",
@@ -11996,7 +12045,7 @@ def _hashimoto_residue_prediction(
                 call_evidence=f"{engine.value}:hashimoto:{reference.experiment_id}:alpha_common_unity_sensitivity",
             ),
             value=Decimal(str(value)),
-            unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            unit=QUANTITY_UNITS[reported_quantity],
             coefficient_sources=sources,
             lineage_complete=False,
             notices=tuple(notices),
@@ -12004,7 +12053,15 @@ def _hashimoto_residue_prediction(
             # liquid's bulk oxide inventory; quenching preserves that inventory.
             identity=reference.identity,
             version=str(primary.provenance.get("code_revision") or "unknown"),
-            refusal_detail=primary_provenance,
+            refusal_detail=(
+                {
+                    **primary_provenance,
+                    "fm_definition": dict(definition_record),
+                    "predicted_element_retention_ratio": value,
+                }
+                if is_retention
+                else primary_provenance
+            ),
         )
     except Exception as exc:  # the scorer records typed per-cell refusal and continues
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
@@ -12061,9 +12118,15 @@ _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 
 def _knudsen_residue_prediction(context, reference, engine, cache=None) -> EnginePrediction:
     """Translate the residue owner's extent result to the scoring contract."""
+    quantity = quantity_token(reference.identity)
+    is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
+    reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     from simulator.battery.residue import (
         ResidueEngineNonconvergence, ResidueInventoryRefusal,
+        _element_retention_ratio_from_inventories,
+        _printed_fm_definition,
         predict_knudsen_residue_composition,
+        _require_element_retention_transport_inputs,
     )
 
     experiment = context.experiments.get(reference.experiment_id)
@@ -12079,13 +12142,83 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
             if cache is not None:
                 cache[cache_key] = result
         provenance = {k: v for k, v in result.items() if k != "notices"}
-        value = result["composition_wt_pct"].get(reference.identity.species.formula)
+        if is_retention:
+            definition, definition_record = _printed_fm_definition(
+                (reference.point_conditions or {}).get("fm_definition")
+            )
+            thermal_schedule = (
+                None if experiment is None else experiment.thermal_schedule
+            )
+            pressure_environment = (
+                None if experiment is None else experiment.pressure_environment
+            )
+            fO2_input = (reference.point_conditions or {}).get("fO2_Pa") or (
+                reference.point_conditions or {}
+            ).get("fO2_log")
+            if fO2_input is None and experiment is not None:
+                control = experiment.fO2_control
+                if control is not None:
+                    fO2_input = (
+                        control.buffer
+                        or control.oxygen_partial_pressure_Pa
+                        or (
+                            None
+                            if control.gas_ratio is None
+                            else control.gas_ratio.value
+                        )
+                    )
+            _require_element_retention_transport_inputs(
+                {
+                    "duration": (
+                        None
+                        if thermal_schedule is None
+                        else thermal_schedule.total_duration_s
+                    ),
+                    "temperature": reference.identity.temperature_K,
+                    "fO2": fO2_input,
+                    "starting_composition": result.get("initial_inventory_mol"),
+                    "sample_area_or_geometry": (
+                        reference.point_conditions or {}
+                    ).get("sample_area_or_geometry"),
+                    "gas_conditions": (
+                        None
+                        if pressure_environment is None
+                        else {
+                            "total_pressure_Pa": pressure_environment.total_pressure_Pa,
+                            "sweep_gas": pressure_environment.sweep_gas,
+                        }
+                    ),
+                }
+            )
+            value = _element_retention_ratio_from_inventories(
+                result.get("initial_inventory_mol") or {},
+                result.get("final_inventory_mol") or {},
+                reference.identity.species.formula,
+                definition,
+                final_bulk_mass_adjustment_kg=float(
+                    result.get("final_bulk_mass_adjustment_kg") or 0.0
+                ),
+            )
+            if value <= 0.0:
+                raise ResidueInventoryRefusal(
+                    "residue_metric_domain",
+                    f"no positive Knudsen {reference.identity.species.formula} retention",
+                )
+            provenance["fm_definition"] = dict(definition_record)
+            provenance["predicted_element_retention_ratio"] = value
+        else:
+            value = result["composition_wt_pct"].get(
+                reference.identity.species.formula
+            )
         if value is None:
-            raise ResidueInventoryRefusal("channel_missing", reference.identity.species.formula)
+            raise ResidueInventoryRefusal(
+                "element_unavailable" if is_retention else "channel_missing",
+                reference.identity.species.formula,
+            )
         return EnginePrediction(
             engine=engine, channel=ENGINE_CHANNELS[engine],
             execution=Execution(state=ExecutionState.PRODUCED, call_evidence=f"{engine.value}:knudsen_residue_extent"),
-            value=Decimal(str(value)), unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            value=Decimal(str(value)), unit=QUANTITY_UNITS[reported_quantity],
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
             notices=result["notices"], identity=reference.identity,
             refusal_detail=provenance,
@@ -12110,6 +12243,9 @@ def _sossi_residue_prediction(
     """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    quantity = quantity_token(reference.identity)
+    is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
+    reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     formula = reference.identity.species.formula
     if formula not in {"Mn", "Ti"}:
         return EnginePrediction(
@@ -12120,9 +12256,11 @@ def _sossi_residue_prediction(
             lineage_complete=False,
             refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
             refusal_detail={
-                "reason": "channel_missing",
+                "reason": (
+                    "element_unavailable" if is_retention else "channel_missing"
+                ),
                 "element": formula,
-                "quantity": Quantity.RESIDUE_COMPONENT_COMPOSITION.value,
+                "quantity": reported_quantity.value,
             },
             identity=reference.identity,
         )
@@ -12130,7 +12268,10 @@ def _sossi_residue_prediction(
     try:
         from simulator.battery.residue import (
             ResidueInventoryRefusal,
+            _element_retention_ratio_from_inventories,
+            _printed_fm_definition,
             _predict_sossi_residue_cohort,
+            _require_element_retention_transport_inputs,
         )
 
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
@@ -12213,13 +12354,54 @@ def _sossi_residue_prediction(
             )
         if formula in prediction.channel_missing_elements:
             raise ResidueInventoryRefusal(
-                "channel_missing", f"no {formula} evaporation channel for {engine.value}"
+                "element_unavailable" if is_retention else "channel_missing",
+                f"no {formula} evaporation channel for {engine.value}",
             )
-        value = prediction.primary_element_ppm.get(formula)
-        band = prediction.sensitivity_band_ppm.get(formula)
-        if value is None or band is None or value <= 0.0:
+        if is_retention:
+            definition, definition_record = _printed_fm_definition(
+                (reference.point_conditions or {}).get("fm_definition")
+            )
+            provenance = dict(prediction.provenance)
+            pressure = provenance.get("total_pressure_Pa")
+            buffered_fO2 = provenance.get("buffered_fO2_log")
+            gas_conditions = (
+                {
+                    "total_pressure_Pa": pressure,
+                    "buffered_fO2_log": buffered_fO2,
+                }
+                if pressure is not None and buffered_fO2 is not None
+                else None
+            )
+            transport_inputs = {
+                "duration": provenance.get("duration_s"),
+                "temperature": provenance.get("temperature_K"),
+                "fO2": provenance.get("buffered_fO2_log"),
+                "starting_composition": provenance.get("initial_inventory_mol"),
+                "sample_area_or_geometry": (reference.point_conditions or {}).get(
+                    "sample_area_or_geometry"
+                ),
+                "gas_conditions": gas_conditions,
+            }
+            _require_element_retention_transport_inputs(transport_inputs)
+            final_buffer_exchange = (
+                provenance.get("buffer_oxygen_exchange_mol_by_geometry", {})
+                .get(str(provenance.get("geometry_policy_id") or ""), 0.0)
+            )
+            value = _element_retention_ratio_from_inventories(
+                provenance.get("initial_inventory_mol") or {},
+                provenance.get("integrated_inventory_mol") or {},
+                formula,
+                definition,
+                final_oxygen_exchange_mol=float(final_buffer_exchange),
+            )
+            band = None
+        else:
+            value = prediction.primary_element_ppm.get(formula)
+            band = prediction.sensitivity_band_ppm.get(formula)
+        if value is None or (band is None and not is_retention) or value <= 0.0:
             raise ResidueInventoryRefusal(
-                "residue_metric_domain", f"no positive Sossi {formula} prediction"
+                "element_unavailable" if is_retention and value is None else "residue_metric_domain",
+                f"no positive Sossi {formula} prediction",
             )
         provenance = dict(prediction.provenance)
         sources = (
@@ -12238,22 +12420,26 @@ def _sossi_residue_prediction(
             "locator": to_plain(reference.locator),
             "read_from": reference.read_from,
         }
-        provenance["predicted_element_ppm"] = value
-        provenance["sensitivity_band_ppm_for_cell"] = band
+        if is_retention:
+            provenance["fm_definition"] = dict(definition_record)
+            provenance["predicted_element_retention_ratio"] = value
+        else:
+            provenance["predicted_element_ppm"] = value
+            provenance["sensitivity_band_ppm_for_cell"] = band
         notices = [
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                affected_quantities=(reported_quantity,),
                 reason="bc_open_furnace_langmuir_limit_diagnostic",
                 origin="sossi-residue-r5",
                 band="open furnace at 101325 Pa; no gas-film resistance",
             ),
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                affected_quantities=(reported_quantity,),
                 reason="pt_wire_loop_bead_geometry_assumed",
                 origin="sossi-residue-r5",
-                band=str(band),
+                band=str(band) if band is not None else None,
             ),
         ]
         activity_extensions = provenance.get("melt_activity_extensions")
@@ -12270,7 +12456,7 @@ def _sossi_residue_prediction(
             notices.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                    affected_quantities=(reported_quantity,),
                     reason=str(
                         mno_activity_extension.get("reason")
                         or "MnO activity uses an uncertified extension"
@@ -12296,7 +12482,7 @@ def _sossi_residue_prediction(
             notices.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                    affected_quantities=(reported_quantity,),
                     reason="residue_time_refinement_unconverged; finest prediction retained",
                     origin="sossi-residue-r5",
                     band=f"N_cap=256; experiment={short_id}",
@@ -12310,7 +12496,7 @@ def _sossi_residue_prediction(
                 call_evidence=f"{engine.value}:sossi:{short_id}:alpha_runtime_catalog",
             ),
             value=Decimal(str(value)),
-            unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            unit=QUANTITY_UNITS[reported_quantity],
             coefficient_sources=sources,
             lineage_complete=False,
             notices=tuple(notices),
@@ -12930,7 +13116,10 @@ def compile_residual(
 
     if (
         prediction is None and predict in (None, predict_with_engine)
-        and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and quantity in {
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            Quantity.ELEMENT_RETENTION_RATIO,
+        }
         and experiment is not None and experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
     ):
@@ -14192,7 +14381,10 @@ def _score_store_with_decisions(
                         if (
                             predict is None
                             and isinstance(point.identity, Identity)
-                            and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                            and quantity in {
+                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                                Quantity.ELEMENT_RETENTION_RATIO,
+                            }
                             and point.source_id == _HASHIMOTO_SOURCE_ID
                             and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
                         ):
@@ -14205,7 +14397,10 @@ def _score_store_with_decisions(
                         if (
                             predict is None
                             and isinstance(point.identity, Identity)
-                            and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                            and quantity in {
+                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                                Quantity.ELEMENT_RETENTION_RATIO,
+                            }
                             and point.source_id == _SOSSI_SOURCE_ID
                             and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
                         ):
@@ -14218,7 +14413,10 @@ def _score_store_with_decisions(
                         if (
                             predict is None
                             and isinstance(point.identity, Identity)
-                            and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                            and quantity in {
+                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                                Quantity.ELEMENT_RETENTION_RATIO,
+                            }
                             and experiment is not None and experiment.method.is_value
                             and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
                         ):
@@ -18596,8 +18794,11 @@ def render_score_report(
         studio_hostname=studio_hostname,
         store_stamp=derive_store_stamp(root or REPO_ROOT),
     )
-    return _append_quench_pair_diagnostics(
+    report = _append_quench_pair_diagnostics(
         report, paired_quench_diagnostics(context)
+    )
+    return _append_element_retention_diagnostics(
+        report, residuals, context.observations
     )
 
 
@@ -18621,6 +18822,131 @@ def _append_quench_pair_diagnostics(
             f"{row['glass_ratio']} | {row['quench_state']} | "
             f"{row['delta_log10']} |"
         )
+    section = "\n".join(lines)
+    return f"{report.rstrip()}\n\n{section}\n"
+
+
+def _append_element_retention_diagnostics(
+    report: str,
+    rows: Iterable[Residual | Mapping[str, object]],
+    observations: Mapping[str, Observation],
+) -> str:
+    cells: list[tuple[str, str, str, str, str, str, Decimal | None]] = []
+    loss_bins: dict[str, set[str]] = {
+        "negative (FM > 1)": set(),
+        "0–1%": set(),
+        ">1–10%": set(),
+        ">10–50%": set(),
+        ">50%": set(),
+    }
+    for row in rows:
+        if isinstance(row, Residual):
+            reference_id = row.reference
+            status = row.status.value
+            numeric = None if row.numeric is None else row.numeric.value
+            engine = (
+                row.candidate_request.engine.value
+                if row.candidate_request is not None
+                else "—"
+            )
+        else:
+            reference_id = str(row.get("reference") or "")
+            status = str(row.get("status") or "unknown")
+            numeric_payload = row.get("numeric")
+            raw_numeric = (
+                numeric_payload.get("value")
+                if isinstance(numeric_payload, Mapping)
+                else None
+            )
+            try:
+                numeric = None if raw_numeric is None else Decimal(str(raw_numeric))
+            except (ArithmeticError, TypeError, ValueError):
+                numeric = None
+            request = row.get("candidate_request")
+            engine = (
+                str(request.get("engine") or "—")
+                if isinstance(request, Mapping)
+                else "—"
+            )
+        observation = observations.get(reference_id)
+        if (
+            observation is None
+            or not isinstance(observation.identity, Identity)
+            or quantity_token(observation.identity)
+            is not Quantity.ELEMENT_RETENTION_RATIO
+        ):
+            continue
+        fm = observation.value.point if observation.value.kind is ValueKind.POINT else None
+        loss = None if fm is None else Decimal(1) - fm
+        loss_bin = "—"
+        if fm is not None and fm > 0:
+            if loss is not None and loss < 0:
+                loss_bin = "negative (FM > 1)"
+            elif loss is not None and loss <= Decimal("0.01"):
+                loss_bin = "0–1%"
+            elif loss is not None and loss <= Decimal("0.10"):
+                loss_bin = ">1–10%"
+            elif loss is not None and loss <= Decimal("0.50"):
+                loss_bin = ">10–50%"
+            else:
+                loss_bin = ">50%"
+            loss_bins[loss_bin].add(observation.observation_id)
+        uncertainty = observation.uncertainty
+        raw_uncertainty = uncertainty.verbatim
+        if raw_uncertainty is None and uncertainty.value is not None:
+            raw_uncertainty = f"{uncertainty.value} {uncertainty.basis or ''}".strip()
+        if raw_uncertainty is None:
+            uncertainty_text = "not printed"
+        elif isinstance(raw_uncertainty, Mapping):
+            uncertainty_text = json.dumps(
+                raw_uncertainty, sort_keys=True, ensure_ascii=False
+            )
+        else:
+            uncertainty_text = str(raw_uncertainty)
+        cells.append(
+            (
+                observation.observation_id,
+                engine,
+                status,
+                "—" if fm is None else str(fm),
+                "—" if loss is None else str(loss),
+                uncertainty_text,
+                numeric,
+            )
+        )
+    if not cells:
+        return report
+
+    def markdown(value: str) -> str:
+        return value.replace("|", "\\|").replace("\n", " ")
+
+    lines = [
+        "## Element retention diagnostics",
+        "",
+        "Observed loss is 1 − FM; printed uncertainty is shown without rescaling.",
+        "Loss bins are reporting diagnostics and do not affect residual weights.",
+        "",
+        "| observation | engine | status | FM observed | observed loss | printed uncertainty | residual (dex) |",
+        "|---|---|---|---:|---:|---|---:|",
+    ]
+    for observation_id, engine, status, fm, loss, uncertainty, numeric in cells:
+        lines.append(
+            f"| {markdown(observation_id)} | {markdown(engine)} | {markdown(status)} | "
+            f"{fm} | {loss} | {markdown(uncertainty)} | "
+            f"{'—' if numeric is None else numeric} |"
+        )
+    lines.extend(
+        [
+            "",
+            "### Observed loss bins",
+            "",
+            "| observed loss | n rows |",
+            "|---|---:|",
+        ]
+    )
+    lines.extend(
+        f"| {label} | {len(loss_bins[label])} |" for label in loss_bins
+    )
     section = "\n".join(lines)
     return f"{report.rstrip()}\n\n{section}\n"
 
@@ -20796,9 +21122,10 @@ def render_score_report_from_payloads(
     if observations is None:
         return report
     pair_context = ScoreContext({}, {}, observations, origins or {})
-    return _append_quench_pair_diagnostics(
+    report = _append_quench_pair_diagnostics(
         report, paired_quench_diagnostics(pair_context)
     )
+    return _append_element_retention_diagnostics(report, rows, observations)
 
 
 def _legacy_bucket(row: Mapping[str, object]) -> str:
