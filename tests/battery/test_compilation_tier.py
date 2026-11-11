@@ -395,7 +395,12 @@ class _CpuTimerProbeBackend:
         )
 
 
-def _bootstrap_ia_timer_probe(engine: str, *, marker_path: str):
+def _bootstrap_ia_timer_probe(
+    engine: str,
+    engine_settings=None,
+    *,
+    marker_path: str,
+):
     from simulator.diagnostic_helpers.binary_pot_battery import (
         EngineHandle,
         _IsolatedCellEngine,
@@ -409,7 +414,7 @@ def _bootstrap_ia_timer_probe(engine: str, *, marker_path: str):
         takes_fo2=False,
         supports_intrinsic_fo2=False,
     )
-    return _IsolatedCellEngine(handle), "cpu-timer-probe"
+    return _IsolatedCellEngine(handle, engine_settings), "cpu-timer-probe"
 
 
 def test_compilation_census_isolates_each_ia_row_with_cpu_timer(
