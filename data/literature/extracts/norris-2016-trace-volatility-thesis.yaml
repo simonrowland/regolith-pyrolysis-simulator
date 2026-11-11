@@ -1,0 +1,5305 @@
+schema_version: literature_extract.v1
+source_id: norris-2016-trace-volatility-thesis
+source:
+  citation: Norris CA (2016). Volatilities of trace elements in silicate melts. DPhil thesis, University of Oxford.
+  doi: 10.5287/ora-qmdvbxydr
+  year: 2016
+extraction:
+  method: pdftotext -layout transcription, with the requested table pages visually checked
+  date: '2026-11-11'
+  worker: w1111xnor
+  source_pdf: corpus/raw/norris-2016-trace-volatility-thesis/norris-2016-trace-volatility-thesis.pdf
+review_status: draft
+fidelity_samples:
+- species: Ag
+  observation_id: norris_2016_table5_7_ag_logfo2_neg7
+  field: FM
+  value: '0.646'
+  note: First Table 5.7 volatility factor cell.
+  locator:
+    page: 232
+    pdf_page_index: 231
+    published_page: 202
+    table: '5.7'
+    row: '-7'
+    column: Ag
+notes:
+- Table 5.7 values are the same measurements shown figure-only in norris-2017-earth-volatiles-nature observations
+  norris_2017_figure3_volatility_factors_neg7, norris_2017_figure3_volatility_factors_neg9, norris_2017_figure3_volatility_factors_neg11,
+  and norris_2017_figure3_volatility_factors_neg13. That separate extract is unchanged.
+- The values above 1 for Cr, Ga, V, W, and other cells are retained exactly as printed; the thesis discusses these
+  as within-error constancy or contamination rather than physical negative loss.
+benches:
+- id: stirred-gas-mixing-furnace
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: One-atmosphere gas-mixing furnace with mechanical stirring
+    locator:
+      page: 214
+      pdf_page_index: 213
+      published_page: 184
+      section: 5.4.1 Stirring Furnace Experiments
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Nickel crucible and nickel stirrer
+    locator:
+      page: 231
+      pdf_page_index: 230
+      published_page: 201
+      table: '5.4'
+      note: Wetted material listed as nickel
+experiments:
+- experiment_id: volatile-loss-logfo2-neg7
+  bench_id: stirred-gas-mixing-furnace
+  method: quench_equilibration
+  locator:
+    page: 231
+    pdf_page_index: 230
+    published_page: 201
+    table: '5.4'
+    row: F008
+  sample:
+    name: EBT1
+    printed_composition:
+      state:
+        tag: value
+        value: &id001
+          SiO2: '50.66'
+          TiO2: '0.96'
+          Al2O3: '15.11'
+          FeO: '9.69'
+          MnO: '0.20'
+          MgO: '8.90'
+          CaO: '12.28'
+          Na2O: '1.96'
+          K2O: '0.07'
+      locator:
+        page: 220
+        pdf_page_index: 219
+        published_page: 190
+        table: '5.2'
+        row: EBT1
+  conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F008
+    duration_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        note: Table reports 60 minute experiments
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 230
+        pdf_page_index: 229
+        published_page: 200
+        section: 5.4.1 Stirring Furnace Experiments
+        note: one-atmosphere gas-mixing furnace
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F008
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: CO/CO2 gas mixture; ratio not printed alongside the run record
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F008
+  apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
+  crucible_as_printed: nickel
+  log_fO2_as_published: '-7'
+- experiment_id: volatile-loss-logfo2-neg9
+  bench_id: stirred-gas-mixing-furnace
+  method: quench_equilibration
+  locator:
+    page: 231
+    pdf_page_index: 230
+    published_page: 201
+    table: '5.4'
+    row: F014
+  sample:
+    name: EBT1
+    printed_composition:
+      state:
+        tag: value
+        value: *id001
+      locator:
+        page: 220
+        pdf_page_index: 219
+        published_page: 190
+        table: '5.2'
+        row: EBT1
+  conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F014
+    duration_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        note: Table reports 60 minute experiments
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 230
+        pdf_page_index: 229
+        published_page: 200
+        section: 5.4.1 Stirring Furnace Experiments
+        note: one-atmosphere gas-mixing furnace
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F014
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: CO/CO2 gas mixture; ratio not printed alongside the run record
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F014
+  apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
+  crucible_as_printed: nickel
+  log_fO2_as_published: '-9'
+- experiment_id: volatile-loss-logfo2-neg11
+  bench_id: stirred-gas-mixing-furnace
+  method: quench_equilibration
+  locator:
+    page: 231
+    pdf_page_index: 230
+    published_page: 201
+    table: '5.4'
+    row: F018
+  sample:
+    name: EBT1
+    printed_composition:
+      state:
+        tag: value
+        value: *id001
+      locator:
+        page: 220
+        pdf_page_index: 219
+        published_page: 190
+        table: '5.2'
+        row: EBT1
+  conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F018
+    duration_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        note: Table reports 60 minute experiments
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 230
+        pdf_page_index: 229
+        published_page: 200
+        section: 5.4.1 Stirring Furnace Experiments
+        note: one-atmosphere gas-mixing furnace
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F018
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: CO/CO2 gas mixture; ratio not printed alongside the run record
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F018
+  apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
+  crucible_as_printed: nickel
+  log_fO2_as_published: '-11'
+- experiment_id: volatile-loss-logfo2-neg13
+  bench_id: stirred-gas-mixing-furnace
+  method: quench_equilibration
+  locator:
+    page: 231
+    pdf_page_index: 230
+    published_page: 201
+    table: '5.4'
+    row: F019
+  sample:
+    name: EBT1
+    printed_composition:
+      state:
+        tag: value
+        value: *id001
+      locator:
+        page: 220
+        pdf_page_index: 219
+        published_page: 190
+        table: '5.2'
+        row: EBT1
+  conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F019
+    duration_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        note: Table reports 60 minute experiments
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 230
+        pdf_page_index: 229
+        published_page: 200
+        section: 5.4.1 Stirring Furnace Experiments
+        note: one-atmosphere gas-mixing furnace
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F019
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: CO/CO2 gas mixture; ratio not printed alongside the run record
+      locator:
+        page: 231
+        pdf_page_index: 230
+        published_page: 201
+        table: '5.4'
+        row: F019
+  apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
+  crucible_as_printed: nickel
+  log_fO2_as_published: '-13'
+species:
+  Ag:
+    observations:
+    - observation_id: norris_2016_table5_7_ag_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Ag
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id002
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id002
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id002
+        FM: 0.646
+        FM_as_published: '0.646'
+        mass_loss_fraction: 0.646
+        sigma_as_published: '0.117'
+        sigma: 0.117
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.117'
+        units: dimensionless
+        verbatim: '0.117'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_ag_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Ag
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id003
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id003
+        FM: 0.198
+        FM_as_published: '0.198'
+        mass_loss_fraction: 0.198
+        sigma_as_published: '0.017'
+        sigma: 0.017
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.017'
+        units: dimensionless
+        verbatim: '0.017'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_ag_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Ag
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id004
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id004
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id004
+        FM: 0.127
+        FM_as_published: '0.127'
+        mass_loss_fraction: 0.127
+        sigma_as_published: '0.007'
+        sigma: 0.007
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.007'
+        units: dimensionless
+        verbatim: '0.007'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_ag_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Ag
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id005
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id005
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id005
+        FM: 0.022
+        FM_as_published: '0.022'
+        mass_loss_fraction: 0.022
+        sigma_as_published: '0.019'
+        sigma: 0.019
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.019'
+        units: dimensionless
+        verbatim: '0.019'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Bi:
+    observations:
+    - observation_id: norris_2016_table5_7_bi_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Bi
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id006
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id006
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id006
+        FM: 0.227
+        FM_as_published: '0.227'
+        mass_loss_fraction: 0.227
+        sigma_as_published: '0.080'
+        sigma: 0.08
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.080'
+        units: dimensionless
+        verbatim: '0.080'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_bi_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Bi
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id007
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id007
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id007
+        FM: 0.17
+        FM_as_published: '0.170'
+        mass_loss_fraction: 0.17
+        sigma_as_published: '0.078'
+        sigma: 0.078
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.078'
+        units: dimensionless
+        verbatim: '0.078'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_bi_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Bi
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id008
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id008
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id008
+        FM: 0.074
+        FM_as_published: '0.074'
+        mass_loss_fraction: 0.074
+        sigma_as_published: '0.007'
+        sigma: 0.007
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.007'
+        units: dimensionless
+        verbatim: '0.007'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_bi_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Bi
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id009
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id009
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id009
+        FM: 0.008
+        FM_as_published: '0.008'
+        mass_loss_fraction: 0.008
+        sigma_as_published: '0.007'
+        sigma: 0.007
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.007'
+        units: dimensionless
+        verbatim: '0.007'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Cd:
+    observations:
+    - observation_id: norris_2016_table5_7_cd_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Cd
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id010
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id010
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id010
+        FM: 0.228
+        FM_as_published: '0.228'
+        mass_loss_fraction: 0.228
+        sigma_as_published: '0.057'
+        sigma: 0.057
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.057'
+        units: dimensionless
+        verbatim: '0.057'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_cd_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Cd
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id011
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id011
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id011
+        FM: 0.071
+        FM_as_published: '0.071'
+        mass_loss_fraction: 0.071
+        sigma_as_published: '0.014'
+        sigma: 0.014
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.014'
+        units: dimensionless
+        verbatim: '0.014'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_cd_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Cd
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id012
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id012
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id012
+        FM: 0.019
+        FM_as_published: '0.019'
+        mass_loss_fraction: 0.019
+        sigma_as_published: '0.003'
+        sigma: 0.003
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.003'
+        units: dimensionless
+        verbatim: '0.003'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_cd_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Cd
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id013
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id013
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id013
+        FM: 0.019
+        FM_as_published: '0.019'
+        mass_loss_fraction: 0.019
+        sigma_as_published: '0.009'
+        sigma: 0.009
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.009'
+        units: dimensionless
+        verbatim: '0.009'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Cr:
+    observations:
+    - observation_id: norris_2016_table5_7_cr_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Cr
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id014
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id014
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id014
+        FM: 1.021
+        FM_as_published: '1.021'
+        mass_loss_fraction: 1.021
+        sigma_as_published: '0.179'
+        sigma: 0.179
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.179'
+        units: dimensionless
+        verbatim: '0.179'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_cr_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Cr
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id015
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id015
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id015
+        FM: 1.192
+        FM_as_published: '1.192'
+        mass_loss_fraction: 1.192
+        sigma_as_published: '0.179'
+        sigma: 0.179
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.179'
+        units: dimensionless
+        verbatim: '0.179'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_cr_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Cr
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id016
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id016
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id016
+        FM: 0.998
+        FM_as_published: '0.998'
+        mass_loss_fraction: 0.998
+        sigma_as_published: '0.150'
+        sigma: 0.15
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.150'
+        units: dimensionless
+        verbatim: '0.150'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_cr_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Cr
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id017
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id017
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id017
+        FM: 1.171
+        FM_as_published: '1.171'
+        mass_loss_fraction: 1.171
+        sigma_as_published: '0.265'
+        sigma: 0.265
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.265'
+        units: dimensionless
+        verbatim: '0.265'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Cu:
+    observations:
+    - observation_id: norris_2016_table5_7_cu_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Cu
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id018
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id018
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id018
+        FM: 0.618
+        FM_as_published: '0.618'
+        mass_loss_fraction: 0.618
+        sigma_as_published: '0.072'
+        sigma: 0.072
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.072'
+        units: dimensionless
+        verbatim: '0.072'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_cu_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Cu
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id019
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id019
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id019
+        FM: 0.331
+        FM_as_published: '0.331'
+        mass_loss_fraction: 0.331
+        sigma_as_published: '0.030'
+        sigma: 0.03
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.030'
+        units: dimensionless
+        verbatim: '0.030'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_cu_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Cu
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id020
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id020
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id020
+        FM: 0.367
+        FM_as_published: '0.367'
+        mass_loss_fraction: 0.367
+        sigma_as_published: '0.030'
+        sigma: 0.03
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.030'
+        units: dimensionless
+        verbatim: '0.030'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_cu_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Cu
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id021
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id021
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id021
+        FM: 0.176
+        FM_as_published: '0.176'
+        mass_loss_fraction: 0.176
+        sigma_as_published: '0.138'
+        sigma: 0.138
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.138'
+        units: dimensionless
+        verbatim: '0.138'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Ga:
+    observations:
+    - observation_id: norris_2016_table5_7_ga_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Ga
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id022
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id022
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id022
+        FM: 1.454
+        FM_as_published: '1.454'
+        mass_loss_fraction: 1.454
+        sigma_as_published: '0.432'
+        sigma: 0.432
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.432'
+        units: dimensionless
+        verbatim: '0.432'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_ga_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Ga
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id023
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id023
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id023
+        FM: 1.217
+        FM_as_published: '1.217'
+        mass_loss_fraction: 1.217
+        sigma_as_published: '0.361'
+        sigma: 0.361
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.361'
+        units: dimensionless
+        verbatim: '0.361'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_ga_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Ga
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id024
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id024
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id024
+        FM: 1.314
+        FM_as_published: '1.314'
+        mass_loss_fraction: 1.314
+        sigma_as_published: '0.388'
+        sigma: 0.388
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.388'
+        units: dimensionless
+        verbatim: '0.388'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_ga_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Ga
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id025
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id025
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id025
+        FM: 0.669
+        FM_as_published: '0.669'
+        mass_loss_fraction: 0.669
+        sigma_as_published: '0.380'
+        sigma: 0.38
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.380'
+        units: dimensionless
+        verbatim: '0.380'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Ge:
+    observations:
+    - observation_id: norris_2016_table5_7_ge_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Ge
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id026
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id026
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id026
+        FM: 0.315
+        FM_as_published: '0.315'
+        mass_loss_fraction: 0.315
+        sigma_as_published: '0.090'
+        sigma: 0.09
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.090'
+        units: dimensionless
+        verbatim: '0.090'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_ge_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Ge
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id027
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id027
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id027
+        FM: 0.168
+        FM_as_published: '0.168'
+        mass_loss_fraction: 0.168
+        sigma_as_published: '0.050'
+        sigma: 0.05
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.050'
+        units: dimensionless
+        verbatim: '0.050'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_ge_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Ge
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id028
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id028
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id028
+        FM: 0.045
+        FM_as_published: '0.045'
+        mass_loss_fraction: 0.045
+        sigma_as_published: '0.013'
+        sigma: 0.013
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.013'
+        units: dimensionless
+        verbatim: '0.013'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_ge_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Ge
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id029
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id029
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id029
+        FM: 0.014
+        FM_as_published: '0.014'
+        mass_loss_fraction: 0.014
+        sigma_as_published: '0.005'
+        sigma: 0.005
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.005'
+        units: dimensionless
+        verbatim: '0.005'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  In:
+    observations:
+    - observation_id: norris_2016_table5_7_in_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: In
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id030
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id030
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id030
+        FM: 0.816
+        FM_as_published: '0.816'
+        mass_loss_fraction: 0.816
+        sigma_as_published: '0.095'
+        sigma: 0.095
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.095'
+        units: dimensionless
+        verbatim: '0.095'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_in_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: In
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id031
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id031
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id031
+        FM: 0.622
+        FM_as_published: '0.622'
+        mass_loss_fraction: 0.622
+        sigma_as_published: '0.074'
+        sigma: 0.074
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.074'
+        units: dimensionless
+        verbatim: '0.074'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_in_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: In
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id032
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id032
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id032
+        FM: 0.621
+        FM_as_published: '0.621'
+        mass_loss_fraction: 0.621
+        sigma_as_published: '0.068'
+        sigma: 0.068
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.068'
+        units: dimensionless
+        verbatim: '0.068'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_in_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: In
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id033
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id033
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id033
+        FM: 0.192
+        FM_as_published: '0.192'
+        mass_loss_fraction: 0.192
+        sigma_as_published: '0.142'
+        sigma: 0.142
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.142'
+        units: dimensionless
+        verbatim: '0.142'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Mo:
+    observations:
+    - observation_id: norris_2016_table5_7_mo_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Mo
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id034
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id034
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id034
+        FM: 1.26
+        FM_as_published: '1.260'
+        mass_loss_fraction: 1.26
+        sigma_as_published: '0.144'
+        sigma: 0.144
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.144'
+        units: dimensionless
+        verbatim: '0.144'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_mo_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Mo
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id035
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id035
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id035
+        FM: 1.168
+        FM_as_published: '1.168'
+        mass_loss_fraction: 1.168
+        sigma_as_published: '0.125'
+        sigma: 0.125
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.125'
+        units: dimensionless
+        verbatim: '0.125'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_mo_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Mo
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id036
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id036
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id036
+        FM: 1.13
+        FM_as_published: '1.130'
+        mass_loss_fraction: 1.13
+        sigma_as_published: '0.120'
+        sigma: 0.12
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.120'
+        units: dimensionless
+        verbatim: '0.120'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_mo_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Mo
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id037
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id037
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id037
+        FM: 0.624
+        FM_as_published: '0.624'
+        mass_loss_fraction: 0.624
+        sigma_as_published: '0.349'
+        sigma: 0.349
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.349'
+        units: dimensionless
+        verbatim: '0.349'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Pb:
+    observations:
+    - observation_id: norris_2016_table5_7_pb_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Pb
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id038
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id038
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id038
+        FM: 1.03
+        FM_as_published: '1.030'
+        mass_loss_fraction: 1.03
+        sigma_as_published: '0.087'
+        sigma: 0.087
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.087'
+        units: dimensionless
+        verbatim: '0.087'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_pb_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Pb
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id039
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id039
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id039
+        FM: 0.646
+        FM_as_published: '0.646'
+        mass_loss_fraction: 0.646
+        sigma_as_published: '0.069'
+        sigma: 0.069
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.069'
+        units: dimensionless
+        verbatim: '0.069'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_pb_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Pb
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id040
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id040
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id040
+        FM: 0.365
+        FM_as_published: '0.365'
+        mass_loss_fraction: 0.365
+        sigma_as_published: '0.022'
+        sigma: 0.022
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.022'
+        units: dimensionless
+        verbatim: '0.022'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_pb_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Pb
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id041
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id041
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id041
+        FM: 0.116
+        FM_as_published: '0.116'
+        mass_loss_fraction: 0.116
+        sigma_as_published: '0.099'
+        sigma: 0.099
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.099'
+        units: dimensionless
+        verbatim: '0.099'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Sb:
+    observations:
+    - observation_id: norris_2016_table5_7_sb_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Sb
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id042
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id042
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id042
+        FM: 0.457
+        FM_as_published: '0.457'
+        mass_loss_fraction: 0.457
+        sigma_as_published: '0.084'
+        sigma: 0.084
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.084'
+        units: dimensionless
+        verbatim: '0.084'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_sb_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Sb
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id043
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id043
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id043
+        FM: 0.21
+        FM_as_published: '0.210'
+        mass_loss_fraction: 0.21
+        sigma_as_published: '0.071'
+        sigma: 0.071
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.071'
+        units: dimensionless
+        verbatim: '0.071'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_sb_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Sb
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id044
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id044
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id044
+        FM: 0.012
+        FM_as_published: '0.012'
+        mass_loss_fraction: 0.012
+        sigma_as_published: '0.001'
+        sigma: 0.001
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.001'
+        units: dimensionless
+        verbatim: '0.001'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_sb_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Sb
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id045
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id045
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id045
+        FM: 0.002
+        FM_as_published: '0.002'
+        mass_loss_fraction: 0.002
+        sigma_as_published: '0.001'
+        sigma: 0.001
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.001'
+        units: dimensionless
+        verbatim: '0.001'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Sn:
+    observations:
+    - observation_id: norris_2016_table5_7_sn_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Sn
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id046
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id046
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id046
+        FM: 0.471
+        FM_as_published: '0.471'
+        mass_loss_fraction: 0.471
+        sigma_as_published: '0.031'
+        sigma: 0.031
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.031'
+        units: dimensionless
+        verbatim: '0.031'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_sn_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Sn
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id047
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id047
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id047
+        FM: 0.194
+        FM_as_published: '0.194'
+        mass_loss_fraction: 0.194
+        sigma_as_published: '0.017'
+        sigma: 0.017
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.017'
+        units: dimensionless
+        verbatim: '0.017'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_sn_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Sn
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id048
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id048
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id048
+        FM: 0.201
+        FM_as_published: '0.201'
+        mass_loss_fraction: 0.201
+        sigma_as_published: '0.009'
+        sigma: 0.009
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.009'
+        units: dimensionless
+        verbatim: '0.009'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_sn_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Sn
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id049
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id049
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id049
+        FM: 0.038
+        FM_as_published: '0.038'
+        mass_loss_fraction: 0.038
+        sigma_as_published: '0.035'
+        sigma: 0.035
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.035'
+        units: dimensionless
+        verbatim: '0.035'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Tl:
+    observations:
+    - observation_id: norris_2016_table5_7_tl_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Tl
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id050
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id050
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id050
+        FM: 0.525
+        FM_as_published: '0.525'
+        mass_loss_fraction: 0.525
+        sigma_as_published: '0.052'
+        sigma: 0.052
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.052'
+        units: dimensionless
+        verbatim: '0.052'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_tl_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Tl
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id051
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id051
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id051
+        FM: 0.397
+        FM_as_published: '0.397'
+        mass_loss_fraction: 0.397
+        sigma_as_published: '0.040'
+        sigma: 0.04
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.040'
+        units: dimensionless
+        verbatim: '0.040'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_tl_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Tl
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id052
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id052
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id052
+        FM: 0.125
+        FM_as_published: '0.125'
+        mass_loss_fraction: 0.125
+        sigma_as_published: '0.007'
+        sigma: 0.007
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.007'
+        units: dimensionless
+        verbatim: '0.007'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_tl_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Tl
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id053
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id053
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id053
+        FM: 0.069
+        FM_as_published: '0.069'
+        mass_loss_fraction: 0.069
+        sigma_as_published: '0.057'
+        sigma: 0.057
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.057'
+        units: dimensionless
+        verbatim: '0.057'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  V:
+    observations:
+    - observation_id: norris_2016_table5_7_v_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: V
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id054
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id054
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id054
+        FM: 1.219
+        FM_as_published: '1.219'
+        mass_loss_fraction: 1.219
+        sigma_as_published: '0.141'
+        sigma: 0.141
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.141'
+        units: dimensionless
+        verbatim: '0.141'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_v_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: V
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id055
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id055
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id055
+        FM: 1.226
+        FM_as_published: '1.226'
+        mass_loss_fraction: 1.226
+        sigma_as_published: '0.139'
+        sigma: 0.139
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.139'
+        units: dimensionless
+        verbatim: '0.139'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_v_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: V
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id056
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id056
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id056
+        FM: 1.179
+        FM_as_published: '1.179'
+        mass_loss_fraction: 1.179
+        sigma_as_published: '0.134'
+        sigma: 0.134
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.134'
+        units: dimensionless
+        verbatim: '0.134'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_v_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: V
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id057
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id057
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id057
+        FM: 1.112
+        FM_as_published: '1.112'
+        mass_loss_fraction: 1.112
+        sigma_as_published: '0.125'
+        sigma: 0.125
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.125'
+        units: dimensionless
+        verbatim: '0.125'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  W:
+    observations:
+    - observation_id: norris_2016_table5_7_w_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: W
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id058
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id058
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id058
+        FM: 2.508
+        FM_as_published: '2.508'
+        mass_loss_fraction: 2.508
+        sigma_as_published: '0.416'
+        sigma: 0.416
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.416'
+        units: dimensionless
+        verbatim: '0.416'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_w_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: W
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id059
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id059
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id059
+        FM: 2.347
+        FM_as_published: '2.347'
+        mass_loss_fraction: 2.347
+        sigma_as_published: '0.383'
+        sigma: 0.383
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.383'
+        units: dimensionless
+        verbatim: '0.383'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_w_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: W
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id060
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id060
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id060
+        FM: 2.223
+        FM_as_published: '2.223'
+        mass_loss_fraction: 2.223
+        sigma_as_published: '0.365'
+        sigma: 0.365
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.365'
+        units: dimensionless
+        verbatim: '0.365'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_w_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: W
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id061
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id061
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id061
+        FM: 1.975
+        FM_as_published: '1.975'
+        mass_loss_fraction: 1.975
+        sigma_as_published: '0.405'
+        sigma: 0.405
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.405'
+        units: dimensionless
+        verbatim: '0.405'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+  Zn:
+    observations:
+    - observation_id: norris_2016_table5_7_zn_logfo2_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-7'
+        column: Zn
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id062
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F008
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-7'
+          locator: *id062
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-7'
+          units: ''
+          locator: *id062
+        FM: 1.038
+        FM_as_published: '1.038'
+        mass_loss_fraction: 1.038
+        sigma_as_published: '0.069'
+        sigma: 0.069
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F008
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.069'
+        units: dimensionless
+        verbatim: '0.069'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_zn_logfo2_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-9'
+        column: Zn
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id063
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F014
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-9'
+          locator: *id063
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-9'
+          units: ''
+          locator: *id063
+        FM: 0.617
+        FM_as_published: '0.617'
+        mass_loss_fraction: 0.617
+        sigma_as_published: '0.053'
+        sigma: 0.053
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F014
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.053'
+        units: dimensionless
+        verbatim: '0.053'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_zn_logfo2_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-11'
+        column: Zn
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id064
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F018
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-11'
+          locator: *id064
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-11'
+          units: ''
+          locator: *id064
+        FM: 0.488
+        FM_as_published: '0.488'
+        mass_loss_fraction: 0.488
+        sigma_as_published: '0.021'
+        sigma: 0.021
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F018
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.021'
+        units: dimensionless
+        verbatim: '0.021'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
+    - observation_id: norris_2016_table5_7_zn_logfo2_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: mass_loss
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        row: '-13'
+        column: Zn
+      phase: l
+      units: dimensionless
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id065
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            table: '5.4'
+            row: F019
+        fO2_log:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '-13'
+          locator: *id065
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2: '50.66'
+              TiO2: '0.96'
+              Al2O3: '15.11'
+              FeO: '9.69'
+              MnO: '0.20'
+              MgO: '8.90'
+              CaO: '12.28'
+              Na2O: '1.96'
+              K2O: '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: EBT1
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_tabulated
+        T_C: 1300
+        log_fO2:
+          value: '-13'
+          units: ''
+          locator: *id065
+        FM: 0.13
+        FM_as_published: '0.130'
+        mass_loss_fraction: 0.13
+        sigma_as_published: '0.087'
+        sigma: 0.087
+        formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
+        duration_min_as_published: '60'
+        run_as_published: F019
+        note: FM is the printed final/initial concentration ratio; values above 1 are retained as published and
+          are not coerced to physical loss fractions.
+      uncertainty:
+        kind: standard_deviation
+        value: '0.087'
+        units: dimensionless
+        verbatim: '0.087'
+        confidence_level: not_stated
+        basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
