@@ -457,63 +457,120 @@ def test_engine_opener_and_cache_share_canonical_settings_projection(
     from simulator import backends
     from simulator.diagnostic_helpers import binary_pot_battery
     from simulator.engine_cache import (
+        ENGINE_CHEMISTRY_VERSION,
+        engine_cache_key,
         engine_cache_settings,
         normalize_engine_settings,
     )
-
-    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "MELTS")
-    alpha = normalize_engine_settings(
-        "alphamelts",
-        {
-            "transport": "subprocess",
-            "ambient_calc_mode": "pMELTS",
-            "raw_model_name": "rhyolite-MELTS",
-            "redox_buffer": "QFM",
-            "fO2_offset": 0.5,
-            "Fe3Fet_ratio": 0.3,
-        },
+    from simulator.melt_backend.alphamelts import (
+        AlphaMELTSBackend,
+        AlphaMELTSSubprocessContractError,
+        AlphaMELTSSubprocessRunMode,
     )
-    captured: dict[str, Any] = {}
+    import signal
+
+    parent_mode = "parent-process-sentinel"
+    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", parent_mode)
+    common = {
+        "transport": "subprocess",
+        "raw_model_name": "MELTSv1.0.2",
+        "redox_buffer": "QFM",
+        "fO2_offset": 0.5,
+        "Fe3Fet_ratio": 0.3,
+    }
+    p_melts_settings = normalize_engine_settings(
+        "alphamelts", {**common, "ambient_calc_mode": "pMELTS"}
+    )
+    melts_settings = normalize_engine_settings(
+        "alphamelts", {**common, "ambient_calc_mode": "MELTS"}
+    )
+    omitted_settings = normalize_engine_settings("alphamelts", common)
+    assert omitted_settings["effective_calc_mode"] == "MELTS"
+    assert engine_cache_settings("alphamelts", omitted_settings) == engine_cache_settings(
+        "alphamelts", normalize_engine_settings(
+            "alphamelts", {**common, "ambient_calc_mode": "MELTS"}
+        )
+    )
+
+    def projection_key(settings: dict[str, Any]) -> bytes:
+        return engine_cache_key(
+            "alphamelts",
+            ENGINE_CHEMISTRY_VERSION["alphamelts"],
+            {"engine_settings": engine_cache_settings("alphamelts", settings)},
+        )
+
+    assert projection_key(p_melts_settings) != projection_key(melts_settings)
+    assert projection_key(omitted_settings) == projection_key(melts_settings)
+
+    captured_configs: list[dict[str, Any]] = []
+    launched_modes: list[str] = []
 
     def fake_resolve_backend(
         _name: str, _policy: Any, *, backend_config: dict[str, Any]
     ) -> Any:
-        captured.update(backend_config)
-        return SimpleNamespace()
+        captured_configs.append(dict(backend_config))
+        backend = AlphaMELTSBackend(model_name=backend_config["model"])
+        backend._mode = "subprocess"
+        backend._binary_path = Path("fake-alphamelts")
+        backend._engine_version = "captured-test"
+        backend._effective_subprocess_calc_mode = backend_config[
+            "effective_calc_mode"
+        ]
+        backend._subprocess_calc_mode_conflict = backend_config[
+            "calc_mode_conflict"
+        ]
+        backend._subprocess_model_error = backend_config["subprocess_model_error"]
+        return backend
 
     monkeypatch.setattr(backends, "resolve_backend", fake_resolve_backend)
-    binary_pot_battery._open_resolved_backend(
-        "alphamelts",
-        {
-            "transport": "subprocess",
-            "ambient_calc_mode": "pMELTS",
-            "raw_model_name": "rhyolite-MELTS",
-            "redox_buffer": "QFM",
-            "fO2_offset": 0.5,
-            "Fe3Fet_ratio": 0.3,
-        },
+    monkeypatch.setattr(
+        "simulator.engine_cache.record_engine_open", lambda *_args: None
     )
 
-    assert alpha["transport"] == "subprocess"
-    assert alpha["ambient_calc_mode"] == "pMELTS"
-    assert alpha["raw_model_name"] == "rhyolite-MELTS"
-    assert (
-        engine_cache_settings("alphamelts", alpha)["ambient_calc_mode"]
-        == "pMELTS"
-    )
-    assert captured["mode"] == alpha["transport"]
-    assert captured["model"] == alpha["raw_model_name"]
-    assert os.environ["ALPHAMELTS_CALC_MODE"] == alpha["ambient_calc_mode"]
+    def fake_run(_args: Any, **kwargs: Any) -> Any:
+        launched_modes.append(kwargs["env"]["ALPHAMELTS_CALC_MODE"])
+        return SimpleNamespace(returncode=-signal.SIGABRT, stdout="", stderr="")
 
-    # Explicit absence means the opener removes the inherited parent value.
-    absent = {"transport": "subprocess"}
-    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "pMELTS")
-    projected_with_parent = engine_cache_settings("alphamelts", absent)
-    binary_pot_battery._open_resolved_backend("alphamelts", absent)
-    assert "ALPHAMELTS_CALC_MODE" not in os.environ
-    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "MELTS")
-    assert engine_cache_settings("alphamelts", absent) == projected_with_parent
-    assert projected_with_parent["ambient_calc_mode"] is None
+    monkeypatch.setattr(
+        "simulator.melt_backend.alphamelts._run_alphamelts_subprocess", fake_run
+    )
+    p_melts_handle = binary_pot_battery._open_battery_engine_with_settings(
+        "alphamelts", {**common, "ambient_calc_mode": "pMELTS"}
+    )
+    melts_handle = binary_pot_battery._open_battery_engine_with_settings(
+        "alphamelts", {**common, "ambient_calc_mode": "MELTS"}
+    )
+    try:
+        assert os.environ["ALPHAMELTS_CALC_MODE"] == parent_mode
+        assert [config["effective_calc_mode"] for config in captured_configs] == [
+            "pMELTS",
+            "MELTS",
+        ]
+        assert p_melts_handle.engine_settings["effective_calc_mode"] == "pMELTS"
+        assert melts_handle.engine_settings["effective_calc_mode"] == "MELTS"
+        call = {
+            "temperature_C": 1400.0,
+            "comp_wt": {
+                "SiO2": 49.0,
+                "Al2O3": 15.0,
+                "FeO": 10.0,
+                "MgO": 10.0,
+            },
+            "fO2_log": -9.0,
+            "pressure_bar": 1.0,
+            "total_input_kg": 100.0,
+            "run_mode": AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+        }
+        with pytest.raises(AlphaMELTSSubprocessContractError):
+            p_melts_handle.backend._equilibrate_subprocess(**call)
+        melts_handle.backend._equilibrate_subprocess(**call)
+        assert launched_modes == ["MELTS"]
+        assert os.environ["ALPHAMELTS_CALC_MODE"] == parent_mode
+        assert captured_configs[0]["calc_mode_conflict"] is True
+        assert captured_configs[1]["calc_mode_conflict"] is False
+    finally:
+        close_battery_engine_handle(p_melts_handle)
+        close_battery_engine_handle(melts_handle)
 
 
 def test_magemin_python_bridge_alias_is_normalized_before_open_and_key(
@@ -627,7 +684,7 @@ def test_melts_redox_projection_covers_shared_normalizer_inputs(engine: str) -> 
             {
                 "transport": "subprocess",
                 "ambient_calc_mode": "MELTS",
-                "raw_model_name": "MELTS-v1.0",
+                "raw_model_name": "MELTSv1.0.2",
                 "redox_buffer": "QFM",
                 "fO2_offset": 0.25,
                 "Fe3Fet_ratio": 0.35,
@@ -659,7 +716,7 @@ def test_melts_redox_projection_covers_shared_normalizer_inputs(engine: str) -> 
         (
             "thermoengine",
             {
-                "model": "MELTS-v1.0",
+                "model": "MELTSv1.0.2",
                 "configured_vapor_transport_pO2_bar": 1.0e-8,
                 "configured_vapor_transport_floor_bar": 1.0e-9,
                 "redox_buffer": "QFM",
@@ -709,11 +766,18 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
     backend_config_sources = {
         "alphamelts": {
             "mode": "transport",
+            "python_bridge": "constructor:python_bridge",
+            "alphamelts": "constructor:alphamelts",
             "model": "raw_model_name",
             "fO2_buffer": "redox_buffer",
+            "redox_buffer": "constructor:redox_buffer_fallback",
             "fO2_offset": "fO2_offset",
             "Fe3Fet_Liq": "Fe3Fet_ratio",
+            "fe3fet_ratio": "constructor:fe3fet_ratio_fallback",
             "warm_worker": "warm_worker",
+            "petthermotools_warm_call_timeout_s": "constructor:petthermotools_warm_call_timeout_s",
+            "timeout_s": "constructor:timeout_s",
+            "require_petthermotools": "constructor:require_petthermotools",
             "vapor_transport_pO2_bar": "configured_vapor_transport_pO2_bar",
             "vapor_transport_floor_bar": "configured_vapor_transport_floor_bar",
         },
@@ -730,12 +794,19 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
             "warm_worker": "warm_worker",
         },
         "thermoengine": {
+            "mode": "constructor:mode",
+            "alphamelts": "constructor:alphamelts",
+            "thermoengine": "constructor:thermoengine",
             "model": "model",
             "vapor_transport_pO2_bar": "configured_vapor_transport_pO2_bar",
             "vapor_transport_floor_bar": "configured_vapor_transport_floor_bar",
             "fO2_buffer": "redox_buffer",
+            "redox_buffer": "constructor:redox_buffer_fallback",
             "fO2_offset": "fO2_offset",
             "Fe3Fet_Liq": "Fe3Fet_ratio",
+            "fe3fet_ratio": "constructor:fe3fet_ratio_fallback",
+            "thermoengine_health_timeout_s": "constructor:thermoengine_health_timeout_s",
+            "thermoengine_equilibrate_timeout_s": "constructor:thermoengine_equilibrate_timeout_s",
         },
     }
 
@@ -831,6 +902,9 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
         for recorded in constructor_reads:
             for key in recorded.reads:
                 source = sources[key]
+                if source.startswith("constructor:"):
+                    assert source in neutral and neutral[source], key
+                    continue
                 if source in neutral:
                     continue
                 assert source in opener_settings
@@ -933,7 +1007,17 @@ def test_each_real_backend_equilibrate_warm_pair_matches_cache_off(
 
     handle = open_available_engine(engine, nodeid="real backend cache warm pair")
     pots, _metadata = load_binary_pots()
-    pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
+    if engine is Engine.ALPHAMELTS:
+        from simulator.diagnostic_helpers.binary_pot_battery import BinaryPot
+
+        pot = BinaryPot(
+            pot_id="alphamelts_cache_in_domain",
+            kato_1993_table4_system=None,
+            why="Known liquid-forming sodium silicate composition.",
+            composition_wt_pct={"SiO2": 47.0, "Na2O": 53.0},
+        )
+    else:
+        pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
     common = {
         "temperature_K": 1700.0,
         "po2": Po2Request(mode="engine_default", po2_bar=None),
@@ -972,6 +1056,43 @@ def test_each_real_backend_equilibrate_warm_pair_matches_cache_off(
             "store_error": 0,
             "read_error": 0,
         }
+    finally:
+        close_battery_engine_handle(handle)
+
+
+def test_alphamelts_out_of_domain_cell_is_not_stored(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        Po2Request,
+        close_battery_engine_handle,
+        equilibrate_cell,
+        load_binary_pots,
+    )
+    from tests.battery.cache_test_support import open_available_engine
+
+    handle = open_available_engine(
+        Engine.ALPHAMELTS, nodeid="AlphaMELTS out-of-domain cache refusal"
+    )
+    pots, _metadata = load_binary_pots()
+    pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "alpha-ood.sqlite"))
+    engine_cache.engine_cache_counters(reset=True)
+    try:
+        cell = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1700.0,
+            po2=Po2Request(mode="engine_default", po2_bar=None),
+            timeout_s=90.0,
+            isolated=False,
+        )
+        assert cell.engine_status == "out_of_domain"
+        assert engine_cache.engine_cache_counters(reset=True)["alphamelts"][
+            "stores"
+        ] == 0
     finally:
         close_battery_engine_handle(handle)
 
