@@ -10302,7 +10302,7 @@ def test_static_lineage_memo_matches_the_prediction_source_relation(
     assert default_complete
     assert resolve_source_relation(
         reference,
-        default_sources,
+        score_mod.expand_coefficient_sources(default_sources),
         default_complete,
         works=context.works,
         observations=context.observations,
