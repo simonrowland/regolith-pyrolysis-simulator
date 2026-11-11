@@ -24,7 +24,7 @@ import os
 import re
 import sys
 from collections import Counter
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 from pathlib import Path
 
 import pytest
@@ -5123,6 +5123,11 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # does not run. Ceilings do not move. Certification-state changes from
 # this rule: 0. ivtan-mno-coo-thermo and sf04-magma-companion-workbook
 # stay draft from the earlier demotion.
+# Numeric table cells compare with decimal.Decimal, not float. ``1e-999``
+# is not 0 and ``9007199254740993`` is not ``9007199254740992``. No sample
+# has reviewed_by and no extract is review_status reviewed, so the source
+# matcher still does not run. Ceilings do not move. Certification-state
+# changes from this comparison: 0.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 48661
 _UNCOVERED_EXTRACTS_CEILING = 616
@@ -7897,11 +7902,16 @@ def test_source_artifact_provenance_is_required_at_every_promoter(
 # Tabular sources. The expected result is the whole-cell rule: a CSV or TSV
 # row is parsed, and a cell certifies a value only when the whole trimmed
 # cell parses to that number, or equals the stored string. ``0.91,0.92``
-# certifies 0.91 and 0.92. ``0.9100`` certifies 0.91. A cell ``1/2`` does
-# not certify 1. A quoted cell ``1,000`` does not certify 1 or 1000, and
-# neither does a TSV cell ``1,000``. A cell ``1 KPa`` does not certify
-# ``1 K``. The same row in a prose artifact stays digit grouping; that
-# case lives in ``_TOKEN_CASES``.
+# certifies 0.91 and 0.92. ``0.9100`` certifies 0.91. ``1e-999`` does not
+# certify 0. ``9007199254740993`` does not certify ``9007199254740992``
+# and does certify itself. A cell ``1/2`` does not certify 1. A quoted
+# cell ``1,000`` does not certify 1 or 1000, and neither does a TSV cell
+# ``1,000``. A cell ``1 KPa`` does not certify ``1 K``. NaN, Infinity, and
+# an exponent Decimal rejects do not certify a number. The same row in a
+# prose artifact stays digit grouping; that case lives in ``_TOKEN_CASES``.
+# Twenty nines is past the Decimal exponent limit, so the constructor
+# raises InvalidOperation. The grammar still matches the text.
+_CELL_INVALID_EXPONENT = "1e" + ("9" * 20)
 _TABULAR_CELL_CASES = (
     ("csv_first_cell", "csv", "0.91,0.92\n", 0.91, True),
     ("csv_second_cell", "csv", "0.91,0.92\n", 0.92, True),
@@ -7935,6 +7945,17 @@ _TABULAR_CELL_CASES = (
     ("tsv_fraction_whole", "tsv", "1/2\n", "1/2", True),
     ("tsv_unit_exact", "tsv", "1 K\n", "1 K", True),
     ("tsv_unit_tail", "tsv", "1 KPa\n", "1 K", False),
+    ("csv_underflow_refuses_zero", "csv", "1e-999\n", 0, False),
+    ("csv_underflow_refuses_zero_float", "csv", "1e-999\n", 0.0, False),
+    ("tsv_underflow_refuses_zero", "tsv", "1e-999\n", 0, False),
+    ("tsv_underflow_refuses_zero_float", "tsv", "1e-999\n", 0.0, False),
+    ("csv_int_precision_refuses_neighbor", "csv", "9007199254740993\n", 9007199254740992, False),
+    ("tsv_int_precision_refuses_neighbor", "tsv", "9007199254740993\n", 9007199254740992, False),
+    ("csv_int_precision_exact", "csv", "9007199254740993\n", 9007199254740993, True),
+    ("tsv_int_precision_exact", "tsv", "9007199254740993\n", 9007199254740993, True),
+    ("tsv_nan_cell_refuses_zero", "tsv", "NaN\n", 0, False),
+    ("csv_infinity_cell_refuses_zero", "csv", "Infinity\n", 0, False),
+    ("tsv_invalid_exponent_refuses_zero", "tsv", _CELL_INVALID_EXPONENT + "\n", 0, False),
 )
 
 
@@ -7989,12 +8010,15 @@ def test_tabular_source_matches_each_cell(
     """Invariant: a table cell certifies a value only when the whole cell is that value.
 
     The row ``0.91,0.92`` certifies 0.91 and 0.92, each as its own cell.
-    ``0.9100`` certifies 0.91 because the parsed numbers are equal, and
-    the string ``0.91`` does not. A cell ``1/2`` does not certify 1. A
-    quoted cell ``1,000`` certifies that printed value and not 1 or 1000.
-    A TSV cell ``1,000`` does the same. ``91.`` does not parse, so it does
-    not certify 91. ``1 K`` is not ``1 KPa`` inside a cell. Every promoter
-    calls ``certify_extract_source_fidelity``.
+    ``0.9100`` certifies 0.91 because the parsed Decimals are equal, and
+    the string ``0.91`` does not. ``1e-999`` does not certify 0.
+    ``9007199254740993`` does not certify ``9007199254740992``. A cell
+    ``1/2`` does not certify 1. A quoted cell ``1,000`` certifies that
+    printed value and not 1 or 1000. A TSV cell ``1,000`` does the same.
+    ``91.`` does not parse, so it does not certify 91. ``1 K`` is not
+    ``1 KPa`` inside a cell. NaN, Infinity, and an exponent Decimal
+    rejects do not certify 0. Every promoter calls
+    ``certify_extract_source_fidelity``.
     """
     doc = _tabular_source_document(tmp_path, pin, suffix, source_text)
     errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
@@ -8149,34 +8173,62 @@ def _one_cell_table(cell: str, suffix: str) -> str:
 # decimal, optional fraction digits, optional exponent. The pattern has
 # to consume the cell. A grouping comma, a slash, a trailing dot, and a
 # unit do not match. This is not a spelling list and it does not call
-# the gate.
+# the gate. Value comparison is Decimal, not a binary float.
 _ORACLE_CELL_NUMBER_RE = re.compile(
     r"[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?"
 )
 
 
-def _oracle_parse_whole_cell(cell: str) -> float | None:
-    """Parse the whole trimmed cell as one number. Not the gate's grammar."""
+def _oracle_finite_decimal(text: str) -> Decimal | None:
+    """One finite Decimal, or None. Independent of the gate."""
+    try:
+        parsed = Decimal(text)
+    except DecimalException:
+        return None
+    if not parsed.is_finite():
+        return None
+    return parsed
+
+
+def _oracle_parse_whole_cell(cell: str) -> Decimal | None:
+    """Parse the whole trimmed cell as one Decimal. Not the gate's grammar.
+
+    ``1e-999`` stays that Decimal. ``9007199254740993`` stays that
+    integer. NaN, Infinity, and InvalidOperation are refusals.
+    """
     text = cell.strip()
     if _ORACLE_CELL_NUMBER_RE.fullmatch(text) is None:
         return None
-    try:
-        parsed = float(text)
-    except ValueError:
+    return _oracle_finite_decimal(text)
+
+
+def _oracle_stored_decimal(leaf: int | float) -> Decimal | None:
+    """Exact Decimal of a stored int or float. Independent of the gate.
+
+    A float uses ``repr``. An int uses ``str``. A non-finite value refuses.
+    """
+    if isinstance(leaf, bool):
         return None
-    if not math.isfinite(parsed):
+    if isinstance(leaf, float):
+        text = repr(leaf)
+    elif isinstance(leaf, int):
+        text = str(leaf)
+    else:
         return None
-    return parsed
+    return _oracle_finite_decimal(text)
 
 
 def _oracle_whole_cell_certifies(leaf: object, cell: str) -> bool:
     """The table rule, written here. It does not call the gate.
 
     Trim the cell. A string certifies only when the cell equals it. A
-    number certifies only when the whole cell parses to that number:
-    ``0.9100`` and ``.91`` are 0.91, and ``1.0`` is 1. A slash, a grouping
-    comma, a trailing dot, a unit, or any other extra character refuses.
-    The sign of zero is part of the value.
+    number certifies only when ``Decimal`` of the whole cell equals
+    ``Decimal`` of the stored spelling: ``0.9100`` and ``.91`` are 0.91,
+    ``1.0`` is 1, ``1e-999`` is not 0, and ``9007199254740993`` is not
+    ``9007199254740992``. A slash, a grouping comma, a trailing dot, a
+    unit, NaN, Infinity, or InvalidOperation refuses. The sign of zero
+    is part of the value. ``Decimal`` equality drops that sign, so the
+    sign bits are compared when the value is zero.
     """
     trimmed = cell.strip()
     if isinstance(leaf, str):
@@ -8184,15 +8236,63 @@ def _oracle_whole_cell_certifies(leaf: object, cell: str) -> bool:
     if isinstance(leaf, bool):
         return trimmed.lower() == ("true" if leaf else "false")
     if isinstance(leaf, (int, float)):
-        if isinstance(leaf, float) and not math.isfinite(leaf):
-            return False
         parsed = _oracle_parse_whole_cell(trimmed)
-        if parsed is None:
+        stored = _oracle_stored_decimal(leaf)
+        if parsed is None or stored is None:
             return False
-        if parsed != leaf:
+        if parsed != stored:
             return False
-        return math.copysign(1.0, parsed) == math.copysign(1.0, float(leaf))
+        if parsed.is_zero():
+            return parsed.as_tuple().sign == stored.as_tuple().sign
+        return True
     return False
+
+
+def _exact_stored_leaf(number: Decimal) -> int | float | None:
+    """A Python number that is exactly ``number``, or None.
+
+    This builds a stored leaf. It is not the certification decision.
+    An int is exact. A float is kept only when ``Decimal(repr(candidate))``
+    equals ``number``, so ``1e-999`` is not stored as 0 and
+    ``9007199254740993`` is not stored as ``9007199254740992``.
+    """
+    if not number.is_finite():
+        return None
+    exponent = number.as_tuple().exponent
+    if abs(exponent) > 10000 or len(number.as_tuple().digits) > 10000:
+        return None
+    if number == number.to_integral_value():
+        if number.is_zero():
+            return -0.0 if number.as_tuple().sign else 0
+        return int(number)
+    try:
+        candidate = float(number)
+    except (OverflowError, ValueError):
+        return None
+    if not math.isfinite(candidate):
+        return None
+    stored = Decimal(repr(candidate))
+    if stored != number:
+        return None
+    if number.is_zero() and stored.as_tuple().sign != number.as_tuple().sign:
+        return None
+    return candidate
+
+
+def _remember_exact_leaf(leaves: list[object], leaf: object) -> None:
+    """Append ``leaf`` unless the same value and zero-sign are already present."""
+    if isinstance(leaf, float) and leaf == 0.0:
+        for item in leaves:
+            if (
+                isinstance(item, float)
+                and item == 0.0
+                and math.copysign(1.0, item) == math.copysign(1.0, leaf)
+            ):
+                return
+        leaves.append(leaf)
+        return
+    if leaf not in leaves:
+        leaves.append(leaf)
 
 
 def _table_cell_leaves(probe: str, cell: str) -> list[object]:
@@ -8246,9 +8346,23 @@ def test_table_cell_certifies_only_the_whole_cell(
     """
     assert "vle." not in inspect.getsource(_oracle_whole_cell_certifies)
     assert "vle." not in inspect.getsource(_oracle_parse_whole_cell)
+    assert "vle." not in inspect.getsource(_oracle_stored_decimal)
     assert "_numeric_spellings" not in inspect.getsource(_oracle_whole_cell_certifies)
     assert "_numeric_spellings" not in inspect.getsource(vle._cell_certifies_leaf)
     assert "_numeric_spellings" not in inspect.getsource(vle._whole_cell_number)
+    for function in (
+        _oracle_finite_decimal,
+        _oracle_parse_whole_cell,
+        _oracle_stored_decimal,
+        _oracle_whole_cell_certifies,
+        vle._finite_decimal,
+        vle._whole_cell_number,
+        vle._stored_number_decimal,
+        vle._cell_certifies_leaf,
+        vle._leaf_in_table,
+    ):
+        assert "float(" not in inspect.getsource(function), function.__name__
+    assert "_cell_certifies_leaf" in inspect.getsource(vle._leaf_in_table)
     assert not _oracle_whole_cell_certifies(1, "1/2")
     assert not _oracle_whole_cell_certifies(1, "1,000")
     assert not _oracle_whole_cell_certifies(1000, "1,000")
@@ -8311,6 +8425,13 @@ _CELL_PARSE_BODIES = (
     "10.91",
     "1 K",
     "0.91Pa",
+    "1e-999",
+    "0e-999",
+    "9007199254740993",
+    "9007199254740992",
+    _CELL_INVALID_EXPONENT,
+    "NaN",
+    "Infinity",
 )
 _CELL_PARSE_PROBES = (
     0.91,
@@ -8323,6 +8444,12 @@ _CELL_PARSE_PROBES = (
     0.0,
     -0.0,
     0.0012,
+    0,
+    9007199254740993,
+    9007199254740992,
+    float("nan"),
+    float("inf"),
+    float("-inf"),
 )
 
 
@@ -8339,15 +8466,38 @@ def test_numeric_table_cell_certifies_only_when_the_whole_cell_parses_equal(
 ):
     """Invariant: a numeric table cell certifies iff the whole cell parses equal.
 
-    The product is every sign, every mantissa class (trailing zeros, leading
-    decimal, exponent, integer, grouping, fraction, trailing dot, unit),
-    and both CSV and TSV. The expected boolean is
-    ``_oracle_whole_cell_certifies``, which parses the cell and does not
-    use a spelling list. ``0.9100`` certifies 0.91. ``1/2`` does not
-    certify 1. ``1,000`` does not certify 1 or 1000. A string certifies
-    only the same string. ``91.`` does not parse.
+    The product is every sign and every mantissa class: trailing zeros,
+    leading decimal, exponent, integer, grouping, fraction, trailing dot,
+    unit, underflow (``1e-999``), integer past the float mantissa, NaN,
+    Infinity, and an exponent Decimal rejects. Both CSV and TSV. The
+    expected boolean is ``_oracle_whole_cell_certifies``, which compares
+    Decimals and does not use a spelling list or a float conversion.
+    ``0.9100`` certifies 0.91. ``1e-999`` does not certify 0.
+    ``9007199254740993`` does not certify ``9007199254740992``. ``1/2``
+    does not certify 1. ``1,000`` does not certify 1 or 1000. A string
+    certifies only the same string. ``91.`` does not parse.
     """
-    assert _oracle_whole_cell_certifies(0.91, "0.9100")
+    literal_pins = (
+        (0.91, "0.9100", True),
+        (0, "1e-999", False),
+        (0.0, "1e-999", False),
+        (9007199254740992, "9007199254740993", False),
+        (9007199254740993, "9007199254740993", True),
+        (0, _CELL_INVALID_EXPONENT, False),
+        (float("nan"), "NaN", False),
+        (float("inf"), "Infinity", False),
+        (float("-inf"), "-Infinity", False),
+        (0, "0e-999", True),
+        (-0.0, "-0e-999", True),
+        (0.0, "-0e-999", False),
+        (0.0, "-0.0", False),
+        (-0.0, "-0.0", True),
+    )
+    for leaf, cell, expected in literal_pins:
+        assert _oracle_whole_cell_certifies(leaf, cell) is expected, (leaf, cell)
+        assert vle._cell_certifies_leaf(leaf, cell) is expected, (leaf, cell)
+    assert _exact_stored_leaf(Decimal("1e-999")) is None
+    assert _exact_stored_leaf(Decimal("9007199254740993")) == 9007199254740993
     assert _oracle_whole_cell_certifies(0.91, ".91")
     assert _oracle_whole_cell_certifies(1, "1.0")
     assert _oracle_whole_cell_certifies(1.0, "1")
@@ -8369,8 +8519,9 @@ def test_numeric_table_cell_certifies_only_when_the_whole_cell_parses_equal(
     for cell in _cell_parse_product():
         leaves: list[object] = [*_CELL_PARSE_PROBES, cell]
         parsed = _oracle_parse_whole_cell(cell)
-        if parsed is not None:
-            leaves.append(parsed)
+        exact = _exact_stored_leaf(parsed) if parsed is not None else None
+        if exact is not None:
+            _remember_exact_leaf(leaves, exact)
         for leaf in leaves:
             expected = _oracle_whole_cell_certifies(leaf, cell)
             got = vle._cell_certifies_leaf(leaf, cell)
@@ -8381,8 +8532,8 @@ def test_numeric_table_cell_certifies_only_when_the_whole_cell_parses_equal(
         for suffix in _TABLE_CELL_SUFFIXES:
             text = _one_cell_table(cell, suffix)
             public_leaves: list[object] = [0.91, 1, cell]
-            if parsed is not None:
-                public_leaves.append(parsed)
+            if exact is not None:
+                _remember_exact_leaf(public_leaves, exact)
             for leaf in public_leaves:
                 expected = _oracle_whole_cell_certifies(leaf, cell)
                 doc = _tabular_source_document(tmp_path, leaf, suffix, text)

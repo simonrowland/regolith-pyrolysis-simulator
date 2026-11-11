@@ -34,7 +34,10 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   artifact with that suffix, is parsed completely before the locator is
   applied. A cell certifies a stored value only when the whole trimmed,
   unquoted cell parses to that number, or equals the stored string.
-  0.9100 parses to 0.91. A substring does not certify, so a cell 1/2 is
+  The comparison is decimal.Decimal of that whole cell against repr of a
+  stored float or str of a stored int, so 0.9100 is 0.91, 1e-999 is not 0,
+  and 9007199254740993 is not 9007199254740992. NaN, Infinity, and
+  InvalidOperation do not certify. A substring does not certify, so a cell 1/2 is
   not 1 and a cell 1,000 is not 1. A line_range selects only records that lie entirely
   inside it. A span that cuts through a quoted cell is source-blind and
   is not re-parsed from the sliced lines. 1 K is not 1 KPa.
@@ -90,6 +93,7 @@ import argparse
 import csv
 from copy import deepcopy
 from dataclasses import dataclass
+from decimal import Decimal, DecimalException
 from functools import lru_cache
 import math
 import re
@@ -506,34 +510,68 @@ def _cited_table_cells(
     return cells, None
 
 
-def _whole_cell_number(cell: str) -> float | None:
-    """Parse the entire trimmed cell as one number, or return None.
+def _finite_decimal(text: str) -> Decimal | None:
+    """One finite Decimal, or None when ``text`` is not that number.
 
-    The numeric token grammar has to consume the whole cell. ``0.9100``
-    parses to 0.91. ``.91`` parses to 0.91. ``1/2``, ``1,000``, ``91.``,
-    and ``0.91Pa`` do not parse. This is not a list of spellings of a
-    stored leaf.
+    InvalidOperation, Overflow, and a non-finite value (NaN, Infinity)
+    are refusals. Callers treat None as "this number does not certify".
+    """
+    try:
+        parsed = Decimal(text)
+    except DecimalException:
+        return None
+    if not parsed.is_finite():
+        return None
+    return parsed
+
+
+def _whole_cell_number(cell: str) -> Decimal | None:
+    """Parse the entire trimmed cell as one finite Decimal, or return None.
+
+    The numeric token grammar has to consume the whole cell. Value
+    comparison is ``Decimal``, never a float conversion: ``0.9100`` is
+    ``0.91``, ``1e-999`` is not ``0``, and ``9007199254740993`` is not
+    ``9007199254740992``. ``1/2``, ``1,000``, ``91.``, and ``0.91Pa`` do
+    not parse. NaN, Infinity, and an exponent Decimal rejects are
+    refusals. This is not a list of spellings of a stored leaf.
     """
     folded = _fold_numeric_signs(cell.strip())
     if _NUMERIC_TOKEN_RE.fullmatch(folded) is None:
         return None
-    try:
-        parsed = float(folded)
-    except ValueError:
+    return _finite_decimal(folded)
+
+
+def _stored_number_decimal(leaf: int | float) -> Decimal | None:
+    """Exact Decimal of a stored int or float.
+
+    A float uses ``repr`` (shortest round-trip). An int uses ``str``.
+    Neither path does float arithmetic on the cell. A non-finite float
+    and a bool are refusals.
+    """
+    if isinstance(leaf, bool):
         return None
-    if not math.isfinite(parsed):
+    if isinstance(leaf, float):
+        text = repr(leaf)
+    elif isinstance(leaf, int):
+        text = str(leaf)
+    else:
         return None
-    return parsed
+    return _finite_decimal(text)
 
 
 def _cell_certifies_leaf(leaf: Any, cell: str) -> bool:
     """True when the whole trimmed, unquoted cell is ``leaf``.
 
-    Invariant: a numeric cell certifies only when the whole cell parses
-    to that number. ``0.9100`` is ``0.91``. ``1.0`` is ``1``. ``1/2`` is
-    not ``1``. ``1,000`` is not ``1`` and is not ``1000``. A string matches
-    only that string. Spellings are not enumerated. The sign of zero is
-    part of the value, so ``-0.0`` is not ``0.0``.
+    Invariant: every numeric table cell is decided here. The whole cell
+    certifies a stored number only when ``Decimal`` of that cell equals
+    ``Decimal`` of the stored spelling (``repr`` of a float, ``str`` of an
+    int), including the sign of zero. ``0.9100`` is ``0.91``. ``1.0`` is
+    ``1``. ``1e-999`` is not ``0``. ``9007199254740993`` is not
+    ``9007199254740992``. ``1/2`` is not ``1``. ``1,000`` is not ``1``.
+    A cell that is not one finite number does not certify. A string
+    matches only that string. Spellings are not enumerated. ``Decimal``
+    equality treats negative zero as zero, so the sign bit is compared
+    when the value is zero: ``-0.0`` is not ``0.0``.
     """
     folded = _fold_numeric_signs(cell.strip())
     if isinstance(leaf, str):
@@ -541,23 +579,27 @@ def _cell_certifies_leaf(leaf: Any, cell: str) -> bool:
     if isinstance(leaf, bool):
         return folded.lower() == ("true" if leaf else "false")
     if isinstance(leaf, (int, float)):
-        if isinstance(leaf, float) and not math.isfinite(leaf):
-            return False
         parsed = _whole_cell_number(cell)
-        if parsed is None:
+        stored = _stored_number_decimal(leaf)
+        if parsed is None or stored is None:
             return False
-        if parsed != leaf:
+        if parsed != stored:
             return False
-        return math.copysign(1.0, parsed) == math.copysign(1.0, float(leaf))
+        # Decimal equality collapses the sign of zero. The sign is part
+        # of the value, so a negative zero does not certify a positive zero.
+        if parsed.is_zero():
+            return parsed.as_tuple().sign == stored.as_tuple().sign
+        return True
     return False
 
 
 def _leaf_in_table(leaf: Any, cells: Sequence[str]) -> bool:
     """True when one whole cell is ``leaf``.
 
-    Comparison is ``_cell_certifies_leaf`` only. A numeric cell parses
-    equal, so ``0.9100`` is ``0.91``. The prose matcher is not used, so a
-    digit inside ``1/2`` or ``note 1`` is not that stored number.
+    Comparison is ``_cell_certifies_leaf`` only. A numeric cell is an
+    exact ``Decimal``, so ``0.9100`` is ``0.91`` and ``1e-999`` is not
+    ``0``. The prose matcher is not used, so a digit inside ``1/2`` or
+    ``note 1`` is not that stored number.
     """
     return any(_cell_certifies_leaf(leaf, cell) for cell in cells)
 
@@ -2523,7 +2565,10 @@ def fidelity_source_warnings(
     is not ``1,000``. A CSV or TSV source is parsed completely before the
     locator is applied. A cell certifies a stored value only when the whole
     trimmed, unquoted cell parses to that number, or equals the stored
-    string. ``0.9100`` is ``0.91``. A substring does not certify, so
+    string. ``0.9100`` is ``0.91``. The numbers are ``Decimal`` values,
+    so ``1e-999`` is not ``0`` and ``9007199254740993`` is not
+    ``9007199254740992``. NaN, Infinity, and InvalidOperation do not
+    certify. A substring does not certify, so
     a cell ``1/2`` is not ``1`` and a cell ``1,000`` is not ``1``. A
     ``line_range`` selects records that lie entirely inside it. A span that
     cuts through a quoted cell is source-blind and is not re-parsed from
@@ -2795,7 +2840,10 @@ def certify_extract_source_fidelity(
     ``1`` matches ``the value is 1.``. A CSV or TSV source is parsed
     completely before the locator is applied. A cell certifies a stored
     value only when the whole trimmed, unquoted cell parses to that
-    number, or equals the stored string. ``0.9100`` is ``0.91``. A
+    number, or equals the stored string. ``0.9100`` is ``0.91``. The
+    numbers are ``Decimal`` values, so ``1e-999`` is not ``0`` and
+    ``9007199254740993`` is not ``9007199254740992``. NaN, Infinity, and
+    InvalidOperation do not certify. A
     substring does not certify, so a cell ``1/2`` is not ``1`` and a cell
     ``1,000`` is not ``1``. A span
     that cuts through a quoted cell is source-blind and is not re-parsed
