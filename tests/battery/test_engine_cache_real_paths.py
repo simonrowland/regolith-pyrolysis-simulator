@@ -342,6 +342,52 @@ def test_engine_cache_settings_are_the_named_prediction_projection(
     assert set(settings) == expected_fields
 
 
+@pytest.mark.parametrize(
+    ("engine", "configuration", "setting", "changed"),
+    (
+        ("openimcc", {"pack": "core"}, "pack", "extended"),
+        ("alphamelts", {"redox_buffer": "QFM"}, "redox_buffer", "NNO"),
+        ("vaporock", {"temperature_units": "C"}, "temperature_units", "K"),
+        ("magemin", {"database": "ig"}, "database", "mp"),
+        ("thermoengine", {"model": "MELTS-v1.0"}, "model", "rhyolite-MELTS"),
+    ),
+)
+def test_isolated_engine_config_prediction_settings_change_the_key(
+    engine: str,
+    configuration: dict[str, Any],
+    setting: str,
+    changed: str,
+) -> None:
+    from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, engine_cache_key, engine_cache_settings
+
+    first = engine_cache_settings(engine, configuration)
+    first_key = engine_cache_key(
+        engine, ENGINE_CHEMISTRY_VERSION[engine], {"settings": first}
+    )
+    configuration[setting] = changed
+    second = engine_cache_settings(engine, configuration)
+    second_key = engine_cache_key(
+        engine, ENGINE_CHEMISTRY_VERSION[engine], {"settings": second}
+    )
+
+    assert first_key != second_key
+
+
+@pytest.mark.parametrize(
+    "engine",
+    ("openimcc", "alphamelts", "vaporock", "magemin", "thermoengine"),
+)
+def test_worker_scheduling_config_does_not_change_prediction_settings(engine: str) -> None:
+    from simulator.engine_cache import engine_cache_settings
+
+    configuration = {"warm_worker": False}
+    before = engine_cache_settings(engine, configuration)
+    configuration["warm_worker"] = True
+
+    # warm_worker selects process scheduling, not the prediction.
+    assert engine_cache_settings(engine, configuration) == before
+
+
 def test_engine_cache_settings_do_not_read_or_mutate_unprojected_backend_state() -> None:
     from simulator.engine_cache import engine_cache_settings
 
