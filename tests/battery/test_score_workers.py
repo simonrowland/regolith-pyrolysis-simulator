@@ -159,12 +159,13 @@ def test_parallel_score_crash_preserves_completed_rows_and_publishes_failure(
         workers=2,
     )
 
+    residual_bytes = (tmp_path / "crashed-shard.jsonl.partial").read_bytes()
+    assert residual_bytes.endswith(b"\n")
     rows = [
         json.loads(line)
-        for line in (tmp_path / "crashed-shard.jsonl.partial")
-        .read_text(encoding="utf-8")
-        .splitlines()[1:]
+        for line in residual_bytes.decode("utf-8").splitlines()[1:]
     ]
+    assert len({row["reference"] for row in rows}) == len(rows)
     completed_ids = {
         observation.observation_id for observation in failed_chunk[:crash_index]
     }
