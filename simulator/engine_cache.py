@@ -17,10 +17,8 @@ import zlib
 from collections import OrderedDict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from enum import Enum
 from functools import lru_cache
 from pathlib import Path
-from types import ModuleType
 from types import SimpleNamespace
 from typing import Any
 from urllib.parse import quote
@@ -93,148 +91,6 @@ _RUNTIME_IDENTITIES: dict[str, str] = {}
 _RUNTIME_WARNED: set[str] = set()
 _RUNTIME_OPEN_RECORDED: set[str] = set()
 
-# Each omitted field has an exact-name reason. Chemistry-bearing objects such
-# as _core, _pack, _gas, _package, worker pools, and workers are walked; unknown
-# fields stay in the request and can cause harmless extra misses.
-_RUNTIME_ONLY_SETTING_REASONS = {
-    "_available": "Backend availability affects refusal handling, not successful predictions.",
-    "_unavailable_reason": "Backend availability detail affects refusal handling, not successful predictions.",
-    "_last_error": "This is the previous call's error state, not an input.",
-    "_warnings": "These are diagnostics from initialization or a prior call.",
-    "_logger": "Logger state is operational and does not change engine inputs.",
-    "logger": "Logger state is operational and does not change engine inputs.",
-    "_diagnostic_log": "The diagnostic output destination does not change engine inputs.",
-    "_startup_failure_disposition": "This is the previous worker startup outcome.",
-    "_last_pressure_authority_warning": "This is a diagnostic from a prior call.",
-    "_last_vapor_pressure_diagnostic": "This contains the previous call's vapor output and diagnostics.",
-    "_last_vapor_pressures_source": "This contains source labels from the previous vapor-pressure call.",
-    "_last_high_t_melt_activity_temperature_K": "The direct residue request projects this continuation temperature separately; equilibrate clears it before solving.",
-    "_last_high_t_melt_activity": "The direct residue request projects this continuation certificate separately; equilibrate clears it before solving.",
-    "_high_t_melt_activity_fallback_steps": "These record the previous call's high-temperature fallback diagnostics.",
-    "_chem_kernel": "This per-call kernel is derived from keyed setpoints and request inputs.",
-    "atom_ledger": "The direct residue adapter rebuilds this ledger from composition already present in the request.",
-    "_last_empty_speciation_cause": "This is a diagnostic from a prior call.",
-    "_last_empty_speciation_stats": "This is a diagnostic from a prior call.",
-    "_last_empty_speciation_reason": "This is a diagnostic from a prior call.",
-    "_last_empty_speciation_error": "This is a diagnostic from a prior call.",
-    "_last_silent_zero_notes": "These are diagnostics from a prior call.",
-    "_binary_path": "The launched native runtime path is diagnostic; chemistry changes use the explicit chemistry version.",
-    "_engine_path": "The launched native runtime path is diagnostic; chemistry changes use the explicit chemistry version.",
-    "binary_path": "The selected native runtime is diagnostic; chemistry changes use the explicit chemistry version.",
-    "_engine_root": "The native runtime location is diagnostic; chemistry changes use the explicit chemistry version.",
-    "engine_root": "The native runtime location is diagnostic; chemistry changes use the explicit chemistry version.",
-    "diagnostic_path": "This path receives logs and does not affect engine inputs.",
-    "working_directory": "The process working directory is operational, not a prediction input.",
-    "workdir": "The process working directory is operational, not a prediction input.",
-    "_engine_version": "Runtime version text is diagnostic; chemistry changes use the explicit chemistry version.",
-    "_thermoengine_transport._melts_version": "Runtime version text is diagnostic; chemistry changes use the explicit chemistry version.",
-    "engine_version": "Runtime version text is diagnostic; chemistry changes use the explicit chemistry version.",
-    "runtime_identity": "Runtime identity is diagnostic; chemistry changes use the explicit chemistry version.",
-    "ready_payload": "The worker handshake reports runtime readiness and is not an engine input.",
-    "_transport_close_count": "This counts lifecycle operations and does not affect engine inputs.",
-    "_health_timeout_s": "This timeout only bounds runtime health checks.",
-    "_equilibrate_timeout_s": "This timeout only bounds worker calls.",
-    "_warm_call_timeout_s": "This timeout only bounds worker calls.",
-    "_worker_startup_timeout_s": "This timeout only bounds worker startup.",
-    "_pool_size": "Worker count changes scheduling, not prediction inputs.",
-    "_cache": "This is cache implementation state, not an engine input.",
-    "_cache_path": "The cache location does not change engine inputs.",
-    "_process": "Process lifecycle state is operational and not an engine input.",
-    "process": "Process lifecycle state is operational and not an engine input.",
-    "pid": "A process identifier does not change engine inputs.",
-    "returncode": "A process exit status describes a completed worker, not an input.",
-    "stderr": "Captured process diagnostics do not change engine inputs.",
-    "stdout": "Captured process diagnostics do not change engine inputs.",
-    "call_timeout_s": "This timeout only bounds worker calls.",
-    "startup_timeout_s": "This timeout only bounds worker startup.",
-    "warm_call_timeout_s": "This timeout only bounds worker calls.",
-    "worker_startup_timeout_s": "This timeout only bounds worker startup.",
-    "warm_pool_size": "Worker count changes scheduling, not prediction inputs.",
-    "_warm_pool_size": "Worker count changes scheduling, not prediction inputs.",
-    "_warm_worker_enabled": "Warm worker use changes scheduling, not prediction inputs.",
-    "warm_worker": "Warm worker use changes scheduling, not prediction inputs.",
-    "uses_warm_pool": "Whether a runtime pool is active changes scheduling, not prediction inputs.",
-    "pool_size": "Worker count changes scheduling, not prediction inputs.",
-    "worker_count": "Worker count changes scheduling, not prediction inputs.",
-    "slots": "Worker count changes scheduling, not prediction inputs.",
-    "_pack_name": "The effective pack identity is serialized separately for the loaded OpenIMCC pack.",
-    "call_count": "This counter records completed worker calls and does not change engine inputs.",
-    "_queue": "Queued requests are transient scheduling state, not backend configuration.",
-    "_threads": "Worker threads are transient scheduling state.",
-    "_active_requests": "Active requests are transient scheduling state.",
-    "_request_workers": "Request-to-worker assignments are transient scheduling state.",
-    "_diagnostic_written_futures": "Future diagnostics are transient scheduling state.",
-    "_active_requests_lock": "This lock is process synchronization state.",
-    "_lifecycle_lock": "This lock is process synchronization state.",
-    "_close_complete": "This event is process lifecycle state.",
-    "_cancel_pending": "This event is process lifecycle state.",
-    "_pool_seq": "This number only names worker threads.",
-    "_state_lock": "This lock is process synchronization state.",
-    "_pending_reap": "Pending process cleanup is lifecycle state.",
-    "_native_output_capture": "Native output capture is diagnostic process state.",
-    "_pool_call_abort_event": "This event coordinates a transient worker call.",
-    "_active_frame_readers": "Frame reader counts are transient transport state.",
-    "_close_after_frame_read": "Deferred connection closes are transient transport state.",
-    "_closed": "Pool lifecycle state does not change engine inputs.",
-    "_lock": "This lock is process synchronization state.",
-    "lock": "This lock is process synchronization state.",
-    "_condition": "This condition is process synchronization state.",
-    "_condition_lock": "This lock is process synchronization state.",
-    "_bootstrap_args[0]": "The executable location is runtime metadata; chemistry changes use the explicit chemistry version.",
-    "diagnostic_log_path": "Worker log destinations do not change engine inputs.",
-    "_diagnostic_log_path": "Worker log destinations do not change engine inputs.",
-    "_last_normalization_warnings": "These are diagnostics from a prior call.",
-    "diagnostic_signal": "Diagnostic signal selection affects reporting, not engine inputs.",
-    "watchdog_grace_s": "Worker watchdog timing changes process management, not prediction inputs.",
-    "_watchdog_grace_s": "Worker watchdog timing changes process management, not prediction inputs.",
-    "_diagnostic_signal": "Diagnostic signal selection affects reporting, not engine inputs.",
-    "daemon": "Worker daemon mode changes lifecycle, not prediction inputs.",
-    "connection": "The worker connection is transient transport state.",
-    "start_count": "Worker start counts describe lifecycle state only.",
-    "disabled": "Worker availability changes refusal handling, not successful predictions.",
-    "_operation_sequence": "The operation counter names native requests and does not change prediction inputs.",
-    "_operation_parent": "The native operation label is diagnostic process metadata.",
-    "_operation_roots": "Native operation roots are transient resource cleanup state.",
-    "_health_cache": "Cached health checks describe worker availability, not prediction inputs.",
-    "__builtins__": "Interpreter builtins are not engine settings.",
-    "__file__": "Module source locations are diagnostic; chemistry changes use the explicit chemistry version.",
-    "__cached__": "Module bytecode locations are runtime metadata.",
-    "__loader__": "The module loader is runtime metadata.",
-    "__spec__": "The module import specification is runtime metadata.",
-    "__package__": "The module package name is runtime metadata.",
-    "_identity.version": "OpenIMCC runtime version text is diagnostic; chemistry changes use the explicit chemistry version.",
-    "_identity.pack_version": "The selected pack is keyed by its effective pack name; chemistry changes use the explicit chemistry version.",
-    "_identity.pack_digest": "Pack digests are diagnostic; chemistry changes use the explicit chemistry version.",
-    "_identity.openimcc_commit": "The runtime commit is diagnostic; chemistry changes use the explicit chemistry version.",
-    "_identity.engine_binding_identity": "Binding identity is diagnostic; chemistry changes use the explicit chemistry version.",
-    "melt.composition_kg": "The direct residue request keys the composition and rebuilds this melt field.",
-    "melt.temperature_C": "The direct residue request keys temperature and assigns it to this melt field.",
-    "melt.atmosphere": "The direct residue request keys the oxygen condition and assigns this controlled atmosphere.",
-    "melt.pO2_mbar": "The direct residue request keys pO2 and assigns it to this melt field.",
-    "melt.p_total_mbar": "The direct residue request keys pressure and assigns it to this melt field.",
-    "melt.fO2_log": "The direct residue request keys fO2 and assigns it to this melt field.",
-    "melt.melt_fO2_log": "The direct residue request keys fO2 and assigns it to this melt field.",
-    "melt.total_mass_kg": "This total is derived from the request composition assigned to the melt.",
-    "melt.oxygen_reservoir.melt_intrinsic_fO2_log": "The direct residue request keys fO2 and assigns this oxygen state.",
-    "melt.oxygen_reservoir.headspace_ledger_pO2_bar": "The direct residue request keys pO2 and assigns this oxygen state.",
-    "melt.oxygen_reservoir.headspace_transport_pO2_bar": "The direct residue request keys pO2 and assigns this oxygen state.",
-}
-
-_OPAQUE_SETTING_REASONS = {
-    ("_gas", "gas_df", "_mgr"): (
-        "OpenIMCC gas table contents are covered by the chemistry version and the "
-        "selected gas-pack name."
-    ),
-    ("backend",): (
-        "InternalAnalyticalBackend is a stateless empty marker; prediction settings "
-        "remain visible on the enclosing core."
-    ),
-    ("_core", "backend"): (
-        "InternalAnalyticalBackend is a stateless empty marker; prediction settings "
-        "remain visible on the enclosing core."
-    ),
-}
-
 
 @dataclass(frozen=True)
 class CacheValue:
@@ -257,201 +113,107 @@ def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> b
     return hashlib.sha256(payload).digest()
 
 
-def _simple_cache_setting(value: Any) -> bool:
-    return value is None or isinstance(value, (bool, int, float, str))
+def engine_cache_settings(engine_name: str, backend: Any) -> dict[str, Any]:
+    """Project only named prediction inputs from an opened backend or its config."""
+    if engine_name == "internal-analytical":
+        # Residue calls consume prior-call state and are deliberately uncached.
+        return {}
 
+    is_config = isinstance(backend, Mapping)
+    fields = backend if is_config else vars(backend)
 
-def _setting_drop_reason(path: tuple[Any, ...]) -> str | None:
-    if not path:
-        return None
-    if len(path) > 1 and str(path[-2]) == "_bootstrap_args" and path[-1] == 0:
-        return _RUNTIME_ONLY_SETTING_REASONS["_bootstrap_args[0]"]
-    path_names = tuple(str(part) for part in path)
-    for start in range(len(path_names) - 1):
-        scoped_name = ".".join(path_names[start:])
-        if scoped_name in _RUNTIME_ONLY_SETTING_REASONS:
-            return _RUNTIME_ONLY_SETTING_REASONS[scoped_name]
-    name = str(path[-1])
-    if len(path) > 1 and str(path[-2]) == "_identity":
-        scoped_name = f"_identity.{name}"
-        if scoped_name in _RUNTIME_ONLY_SETTING_REASONS:
-            return _RUNTIME_ONLY_SETTING_REASONS[scoped_name]
-    return _RUNTIME_ONLY_SETTING_REASONS.get(name)
-
-
-def _setting_type_name(value: Any) -> str:
-    value_type = type(value)
-    return f"{value_type.__module__}.{value_type.__qualname__}"
-
-
-def _opaque_setting_reason(path: tuple[Any, ...]) -> str | None:
-    """Return the explicit reason an engine setting at this path is opaque."""
-    return _OPAQUE_SETTING_REASONS.get(path)
-
-
-def _object_settings(value: Any) -> dict[str, Any] | None:
-    try:
-        attributes = dict(vars(value))
-    except TypeError:
-        attributes = {}
-    except Exception:
-        return None
-    for cls in type(value).__mro__:
-        slots = getattr(cls, "__slots__", ())
-        if isinstance(slots, str):
-            slots = (slots,)
-        for name in slots:
-            if name in {"__dict__", "__weakref__"}:
-                continue
-            try:
-                attributes[name] = getattr(value, name)
-            except AttributeError:
-                continue
-            except Exception:
-                return None
-        for name, descriptor in vars(cls).items():
-            if (
-                cls.__module__.startswith("simulator.")
-                and isinstance(descriptor, property)
-                and descriptor.fget is not None
-                and name not in attributes
-            ):
-                try:
-                    attributes[name] = getattr(value, name)
-                except AttributeError:
-                    continue
-                except Exception:
-                    return None
-    if attributes:
-        return attributes
-    return None
-
-
-def _settings_value(
-    value: Any,
-    seen: dict[int, tuple[Any, ...]],
-    dropped: dict[tuple[Any, ...], str],
-    opaque: dict[tuple[Any, ...], str],
-    path: tuple[Any, ...] = (),
-) -> Any:
-    if isinstance(value, Enum):
-        return _settings_value(value.value, seen, dropped, opaque, path)
-    if _simple_cache_setting(value):
-        return value
-    if isinstance(value, Path):
-        return str(value)
-    if isinstance(value, (bytes, bytearray, memoryview)):
-        return bytes(value).hex()
-    if type(value).__module__.split(".", 1)[0] == "numpy":
-        tolist = getattr(value, "tolist", None)
-        if callable(tolist):
-            return _settings_value(tolist(), seen, dropped, opaque, path)
-        item = getattr(value, "item", None)
-        if callable(item):
-            return _settings_value(item(), seen, dropped, opaque, path)
-    if isinstance(value, ModuleType):
-        # A module is executable implementation code; chemistry changes to it
-        # are represented by the engine's opt-in chemistry version in the key.
-        return {"$module": value.__name__}
-    if callable(value):
+    if engine_name == "openimcc":
+        if is_config:
+            melt_pack = fields.get("pack") or "default"
+            gas_pack = fields.get("gas_pack", "default")
+        else:
+            identity = fields.get("_identity")
+            loaded_pack = identity.get("pack") if isinstance(identity, Mapping) else None
+            melt_pack = loaded_pack or fields.get("_pack_name", "default")
+            gas_pack = fields.get("_gas_pack_name", "default")
         return {
-            "$callable": f"{getattr(value, '__module__', '')}."
-            f"{getattr(value, '__qualname__', type(value).__qualname__)}"
+            "melt_pack": melt_pack,  # Selects melt coefficients and activities.
+            "gas_pack": gas_pack,  # Selects gas species thermochemistry.
         }
-
-    marker = id(value)
-    if marker in seen:
-        return {"$ref": list(seen[marker])}
-    seen[marker] = path
-
-    if _opaque_setting_reason(path) is not None:
-        opaque[path] = _setting_type_name(value)
-        return {"$opaque": _setting_type_name(value)}
-
-    if isinstance(value, Mapping):
-        output: dict[str, Any] = {}
-        for key, child in value.items():
-            name = str(key)
-            child_path = (*path, name)
-            reason = _setting_drop_reason(child_path)
-            if reason is not None:
-                dropped[child_path] = reason
-                continue
-            output[name] = _settings_value(child, seen, dropped, opaque, child_path)
-        return output
-    if isinstance(value, (tuple, list)):
-        return [
-            _settings_value(child, seen, dropped, opaque, (*path, index))
-            for index, child in enumerate(value)
-        ]
-    if isinstance(value, (set, frozenset)):
-        ordered = sorted(value, key=repr)
-        return [
-            _settings_value(child, seen, dropped, opaque, (*path, index))
-            for index, child in enumerate(ordered)
-        ]
-
-    attributes = _object_settings(value)
-    if attributes is None:
-        opaque[path] = _setting_type_name(value)
-        return {"$opaque": _setting_type_name(value)}
-    output = {}
-    try:
-        effective_pack_name = getattr(value, "_effective_pack_name")
-    except AttributeError:
-        effective_pack_name = _MISSING
-    for name, child in attributes.items():
-        child_path = (*path, name)
-        if (
-            name == "_bootstrap_args"
-            and isinstance(child, (tuple, list))
-            and child
-            and isinstance(child[0], str)
-            and Path(child[0]).is_absolute()
-        ):
-            dropped[(*child_path, 0)] = _RUNTIME_ONLY_SETTING_REASONS[
-                "_bootstrap_args[0]"
-            ]
-            child = (None, *child[1:])
-        if name == "_pack_name" and effective_pack_name is not _MISSING:
-            dropped[child_path] = _RUNTIME_ONLY_SETTING_REASONS["_pack_name"]
-            continue
-        reason = _setting_drop_reason(child_path)
-        if reason is not None:
-            dropped[child_path] = reason
-            continue
-        output[name] = _settings_value(child, seen, dropped, opaque, child_path)
-    if effective_pack_name is not _MISSING:
-        output["_effective_pack_name"] = _settings_value(
-            effective_pack_name,
-            seen,
-            dropped,
-            opaque,
-            (*path, "_effective_pack_name"),
-        )
-    return output
-
-
-_MISSING = object()
-
-
-def _engine_cache_backend_settings_with_drops(
-    backend: Any,
-) -> tuple[
-    dict[str, Any],
-    dict[tuple[Any, ...], str],
-    dict[tuple[Any, ...], str],
-]:
-    dropped: dict[tuple[Any, ...], str] = {}
-    opaque: dict[tuple[Any, ...], str] = {}
-    settings = _settings_value(backend, {}, dropped, opaque)
-    return (settings if isinstance(settings, dict) else {}), dropped, opaque
-
-
-def engine_cache_backend_settings(backend: Any) -> dict[str, Any]:
-    """Collect backend inputs recursively, omitting only named runtime fields."""
-    settings, _dropped, _opaque = _engine_cache_backend_settings_with_drops(backend)
-    return settings
+    if engine_name == "alphamelts":
+        if is_config:
+            transport_mode = (
+                fields.get("transport")
+                or fields.get("ambient_calc_mode")
+                or os.environ.get("ALPHAMELTS_CALC_MODE")
+            )
+            model = fields.get("raw_model_name")
+            redox_buffer = fields.get("redox_buffer")
+            fo2_offset = fields.get("fO2_offset")
+            fe3fet_ratio = fields.get("Fe3Fet_ratio")
+            api_model = fields.get("python_api_model")
+            vapor_pO2 = fields.get("configured_vapor_transport_pO2_bar")
+            vapor_floor = fields.get("configured_vapor_transport_floor_bar")
+        else:
+            transport_mode = fields.get("_mode")
+            model = fields.get("_model")
+            redox_buffer = fields.get("_redox_buffer")
+            fo2_offset = fields.get("_fo2_offset")
+            fe3fet_ratio = fields.get("_fe3fet_ratio")
+            api_model = fields.get("_python_api_model")
+            vapor_pO2 = fields.get("_configured_vapor_transport_pO2_bar")
+            vapor_floor = fields.get("_configured_vapor_transport_floor_bar")
+        if isinstance(api_model, tuple):
+            api_model = list(api_model)
+        return {
+            "transport_mode": transport_mode,  # Selects the MELTS calculation route.
+            "model": model,  # Selects the thermodynamic model.
+            "python_api_model": api_model,  # Selects the Python API model revision.
+            "redox_buffer": redox_buffer,  # Sets iron redox when no explicit split is given.
+            "fo2_offset": fo2_offset,  # Offsets the selected oxygen buffer.
+            "fe3fet_ratio": fe3fet_ratio,  # Sets the ferrous/ferric input split.
+            "vapor_transport_pO2_bar": vapor_pO2,  # Sets vapor-transport oxygen pressure.
+            "vapor_transport_floor_bar": vapor_floor,  # Sets the vapor-transport floor.
+        }
+    if engine_name == "vaporock":
+        if is_config:
+            temperature_units = fields.get("temperature_units", "C")
+            pressure_units = fields.get("pressure_units", "bar")
+            vapor_pressure_units = fields.get("vapor_pressure_units", "bar")
+        else:
+            temperature_units = fields.get("_temperature_units", "C")
+            pressure_units = fields.get("_pressure_units", "bar")
+            vapor_pressure_units = fields.get("_vapor_pressure_units", "bar")
+        return {
+            "temperature_units": temperature_units,  # Converts the input temperature.
+            "pressure_units": pressure_units,  # Converts the input pressure.
+            "vapor_pressure_units": vapor_pressure_units,  # Converts reported vapor pressure.
+        }
+    if engine_name == "magemin":
+        if is_config:
+            database = fields.get("database")
+            bridge = fields.get("bridge", fields.get("python_bridge"))
+            fO2_buffer = fields.get("fO2_buffer")
+        else:
+            database = fields.get("_database")
+            bridge = fields.get("_bridge")
+            config = fields.get("_config")
+            fO2_buffer = config.get("fO2_buffer") if isinstance(config, Mapping) else None
+        return {
+            "database": database,  # Selects the phase database.
+            "bridge": bridge,  # Selects the engine execution implementation.
+            "fO2_buffer": fO2_buffer,  # Selects the oxygen buffer constraint.
+        }
+    if engine_name == "thermoengine":
+        if is_config:
+            model = fields.get("model")
+            vapor_pO2 = fields.get("configured_vapor_transport_pO2_bar")
+            vapor_floor = fields.get("configured_vapor_transport_floor_bar")
+        else:
+            model = fields.get("_model")
+            vapor_pO2 = fields.get("_configured_vapor_transport_pO2_bar")
+            vapor_floor = fields.get("_configured_vapor_transport_floor_bar")
+        return {
+            "model": model,  # Selects the ThermoEngine thermodynamic model.
+            "vapor_transport_pO2_bar": vapor_pO2,  # Sets vapor-transport oxygen pressure.
+            "vapor_transport_floor_bar": vapor_floor,  # Sets the vapor-transport floor.
+        }
+    raise ValueError(f"unknown engine {engine_name!r}")
 
 
 def _configured_engine_cache_path() -> str | None:

@@ -1142,6 +1142,27 @@ def _evaluate_uncached(
     )
 
 
+def _evaluate_request_vector(
+    composition_mol: Mapping[str, float] | None = None,
+    temperature_K: float | None = None,
+    *,
+    composition_kg: Mapping[str, float] | None = None,
+    pack: str | None = None,
+    allow_extrapolation: bool = False,
+    allow_out_of_envelope: bool = False,
+) -> dict[str, Any]:
+    """Build the shared cache vector for direct and residue OpenIMCC evaluations."""
+    return {
+        "call": "evaluate",
+        "composition_mol": composition_mol,
+        "composition_kg": composition_kg,
+        "temperature_K": temperature_K,
+        "pack": DEFAULT_BACKEND_PACK_NAME if pack is None else pack,
+        "allow_extrapolation": allow_extrapolation,
+        "allow_out_of_envelope": allow_out_of_envelope,
+    }
+
+
 def evaluate(
     composition_mol: Mapping[str, float] | None = None,
     temperature_K: float | None = None,
@@ -1155,15 +1176,14 @@ def evaluate(
 
     record_engine_open("openimcc")
 
-    request = {
-        "call": "evaluate",
-        "composition_mol": composition_mol,
-        "composition_kg": composition_kg,
-        "temperature_K": temperature_K,
-        "pack": pack,
-        "allow_extrapolation": allow_extrapolation,
-        "allow_out_of_envelope": allow_out_of_envelope,
-    }
+    request = _evaluate_request_vector(
+        composition_mol=composition_mol,
+        temperature_K=temperature_K,
+        composition_kg=composition_kg,
+        pack=pack,
+        allow_extrapolation=allow_extrapolation,
+        allow_out_of_envelope=allow_out_of_envelope,
+    )
     payload = cached_engine_call(
         "openimcc",
         request,

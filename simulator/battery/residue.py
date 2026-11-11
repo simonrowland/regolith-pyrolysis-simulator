@@ -1346,14 +1346,12 @@ def _make_residue_pressure_model(
 
                     state_payload = cached_engine_call(
                         "openimcc",
-                        {
-                            "call": "evaluate",
-                            "composition_mol": current_composition,
-                            "temperature_K": temperature_K,
-                            "pack": None,
-                            "allow_extrapolation": True,
-                            "allow_out_of_envelope": True,
-                        },
+                        openimcc_bridge._evaluate_request_vector(
+                            composition_mol=current_composition,
+                            temperature_K=temperature_K,
+                            allow_extrapolation=True,
+                            allow_out_of_envelope=True,
+                        ),
                         lambda: _evaluate_openimcc_isolated(
                             openimcc_bridge._evaluate_uncached,
                             timeout_s=timeout_s,
@@ -3546,14 +3544,12 @@ def _predict_sossi_residue_cohort(
 
                         state_payload = cached_engine_call(
                             "openimcc",
-                            {
-                                "call": "evaluate",
-                                "composition_mol": activity_composition,
-                                "temperature_K": temperature_K,
-                                "pack": None,
-                                "allow_extrapolation": True,
-                                "allow_out_of_envelope": True,
-                            },
+                            openimcc_bridge._evaluate_request_vector(
+                                composition_mol=activity_composition,
+                                temperature_K=temperature_K,
+                                allow_extrapolation=True,
+                                allow_out_of_envelope=True,
+                            ),
                             lambda: _evaluate_openimcc_isolated(
                                 openimcc_bridge._evaluate_uncached,
                                 timeout_s=timeout_s,
