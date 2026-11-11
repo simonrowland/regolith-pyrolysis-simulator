@@ -160,19 +160,24 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
             shard = Path(shard_path)
             shard.write_bytes(b'{"store_stamp":true}\n')
             shard.with_name(shard.name + ".order").write_text("", encoding="utf-8")
+            counters = (
+                {}
+                if engine.value == "internal-analytical"
+                else {
+                    engine.value: {
+                        "hits": 1,
+                        "misses": 0,
+                        "stores": 0,
+                        "store_error": 0,
+                        "read_error": 0,
+                    }
+                }
+            )
             results.append(
                 (
                     str(shard),
                     0,
-                    {
-                        engine.value: {
-                            "hits": 1,
-                            "misses": 0,
-                            "stores": 0,
-                            "store_error": 0,
-                            "read_error": 0,
-                        }
-                    },
+                    counters,
                 )
             )
         assert len(results) == 2 * len(SCORE_ENGINE_SET)
@@ -187,9 +192,13 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
 
     assert metadata.engine_cache_counters is not None
     assert set(metadata.engine_cache_counters) == {
-        engine.value for engine in SCORE_ENGINE_SET
+        engine.value
+        for engine in SCORE_ENGINE_SET
+        if engine.value != "internal-analytical"
     }
     for engine in SCORE_ENGINE_SET:
+        if engine.value == "internal-analytical":
+            continue
         counters = metadata.engine_cache_counters[engine.value]
         assert counters["hits"] == 2
         assert counters["misses"] == 0
