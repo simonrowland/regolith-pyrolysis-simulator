@@ -361,24 +361,37 @@ def _direct_continuation_band(
         return None
 
 
+# Every map this provider publishes to say a vapour pressure was
+# extrapolated. The registrar below is the only reader. A new map is a new
+# row here; the generative test enumerates the rows and fails while the map
+# is undisclosed. ``temperature_band`` is copied onto carrier notices before
+# publication. ``ellingham_fit_band`` is not: its record is
+# ``authority_status="extrapolation_limited"``, and a compiled neighbour's
+# disclosure does not name that Ellingham law.
+PUBLISHED_EXTRAPOLATION_CLASSES: tuple[tuple[str, str], ...] = (
+    ("temperature_band", "extrapolated_beyond_valid_range_K"),
+    ("ellingham_fit_band", "ellingham_extrapolated_beyond_fit_range_K"),
+)
+
+
 def _register_direct_flagged_continuations(
     *,
     vapor_pressures: Mapping[str, float],
     vapor_pressure_provenance: Mapping[str, Mapping[str, Any]],
     disclosure_before: Sequence[Mapping[str, Any]],
+    published_extrapolation_maps: Mapping[str, Mapping[str, Any]],
 ) -> None:
     """Register every published continuation that did not execute a compiled law.
 
-    Invariant: a vapour pressure that is published with an extrapolated
-    continuation notice is in the run disclosure under the law that produced
-    it. Compiled laws register inside ``CompiledPressureEvaluator.evaluate``.
-    The SiO pressure above its band is the Antoine expression in this
-    provider, which never calls that method. This is the one other call of
-    ``register_executed_law``. A species already registered by evaluate()
-    during this dispatch is not registered again.
+    Invariant: a published vapour pressure whose publication map says the
+    producing law was extrapolated is in the run disclosure under that law.
+    The maps are ``PUBLISHED_EXTRAPOLATION_CLASSES``. Compiled laws register
+    inside ``CompiledPressureEvaluator.evaluate``. This is the one other call
+    of ``register_executed_law``. A temperature or carrier-notice continuation
+    already registered by evaluate() for that species is not registered again.
+    An Ellingham fit-band continuation is a different law (``species:ellingham``)
+    and is registered even when a compiled carrier already disclosed the species.
     """
-
-    from types import SimpleNamespace
 
     from simulator.vapour_rail.instrumentation import public_carrier_notices
     from simulator.vapour_rail.run_disclosure import (
@@ -387,11 +400,90 @@ def _register_direct_flagged_continuations(
         register_executed_law,
     )
 
-    registered_species = {
-        str(item.get("law_id") or "").split(":", 1)[0]
-        for item in disclosure_delta(disclosure_before, active_snapshot())
+    delta = disclosure_delta(disclosure_before, active_snapshot())
+    registered_law_ids = {
+        str(item.get("law_id") or "")
+        for item in delta
         if item.get("law_id")
     }
+    registered_species = {
+        law_id.split(":", 1)[0] for law_id in registered_law_ids
+    }
+    executions: list[tuple[Any, Any]] = []
+    for class_name, diagnostic_key in PUBLISHED_EXTRAPOLATION_CLASSES:
+        records = published_extrapolation_maps[diagnostic_key]
+        if class_name == "temperature_band":
+            executions.extend(
+                _temperature_band_executions(
+                    vapor_pressures=vapor_pressures,
+                    vapor_pressure_provenance=vapor_pressure_provenance,
+                    temperature_records=records,
+                    registered_species=registered_species,
+                    public_carrier_notices=public_carrier_notices,
+                )
+            )
+        elif class_name == "ellingham_fit_band":
+            executions.extend(
+                _ellingham_fit_band_executions(
+                    vapor_pressures=vapor_pressures,
+                    vapor_pressure_provenance=vapor_pressure_provenance,
+                    ellingham_records=records,
+                    registered_law_ids=registered_law_ids,
+                )
+            )
+        else:
+            raise RuntimeError(
+                f"unpublished extrapolation class {class_name}"
+            )
+    for evaluator, evaluation in executions:
+        register_executed_law(evaluator, evaluation)
+
+
+def _antoine_continuation_execution(
+    species: str,
+    *,
+    notices: Sequence[Mapping[str, Any]],
+):
+    """One direct Antoine continuation. The expression is log10(P/Pa) = A - B/(T+C)."""
+
+    from types import SimpleNamespace
+
+    banded = [
+        notice
+        for notice in notices
+        if _direct_continuation_band(notice) is not None
+    ]
+    chosen = banded[0] if banded else notices[0]
+    reasons: list[str] = []
+    for notice in notices:
+        reason = str(notice.get("reason") or "").strip()
+        if reason and reason not in reasons:
+            reasons.append(reason)
+    evaluator = SimpleNamespace(
+        species_id=str(species),
+        evaluator_family="antoine",
+        valid_temperature_K=_direct_continuation_band(chosen),
+        diagnostic_admission_notice=None,
+    )
+    evaluation = SimpleNamespace(
+        out_of_range=True,
+        status="; ".join(reasons) if reasons else "extrapolated",
+    )
+    return evaluator, evaluation
+
+
+def _temperature_band_executions(
+    *,
+    vapor_pressures: Mapping[str, float],
+    vapor_pressure_provenance: Mapping[str, Mapping[str, Any]],
+    temperature_records: Mapping[str, Any],
+    registered_species: set[str],
+    public_carrier_notices,
+) -> list[tuple[Any, Any]]:
+    """Carrier notices, including the temperature map copied onto provenance."""
+
+    executions: list[tuple[Any, Any]] = []
+    covered: set[str] = set()
     for species in vapor_pressures:
         if species in registered_species:
             continue
@@ -404,31 +496,74 @@ def _register_direct_flagged_continuations(
         ]
         if not extrapolated:
             continue
-        banded = [
-            notice
-            for notice in extrapolated
-            if _direct_continuation_band(notice) is not None
-        ]
-        chosen = banded[0] if banded else extrapolated[0]
-        reasons: list[str] = []
-        for notice in extrapolated:
-            reason = str(notice.get("reason") or "").strip()
-            if reason and reason not in reasons:
-                reasons.append(reason)
-        # The executed expression is log10(P/Pa) = A - B/(T+C). The family
-        # is antoine, not the compiled standard-reaction evaluator, which
-        # this dispatch did not call.
+        executions.append(
+            _antoine_continuation_execution(species, notices=extrapolated)
+        )
+        covered.add(str(species))
+    for species, notice in temperature_records.items():
+        if species not in vapor_pressures or species in registered_species:
+            continue
+        if species in covered or not isinstance(notice, Mapping):
+            continue
+        executions.append(
+            _antoine_continuation_execution(str(species), notices=(notice,))
+        )
+    return executions
+
+
+def _ellingham_fit_band_executions(
+    *,
+    vapor_pressures: Mapping[str, float],
+    vapor_pressure_provenance: Mapping[str, Mapping[str, Any]],
+    ellingham_records: Mapping[str, Any],
+    registered_law_ids: set[str],
+) -> list[tuple[Any, Any]]:
+    """Published pressures whose Ellingham fit was used outside its band.
+
+    The record's ``authority_status`` is ``extrapolation_limited``. That is
+    not a carrier notice, so the temperature reader does not see it. The law
+    is ``species:ellingham``, whether the rail is gas fugacity or condensed
+    Raoult. A compiled disclosure of the same species is a different law.
+    """
+
+    from types import SimpleNamespace
+
+    executions: list[tuple[Any, Any]] = []
+    for species, record in ellingham_records.items():
+        if species not in vapor_pressures or not isinstance(record, Mapping):
+            continue
+        if record.get("authority_status") != "extrapolation_limited":
+            continue
+        law_id = f"{species}:ellingham"
+        if law_id in registered_law_ids:
+            continue
+        fit = record.get("fit_range_K")
+        band = None
+        if (
+            isinstance(fit, (list, tuple))
+            and not isinstance(fit, (str, bytes))
+            and len(fit) == 2
+        ):
+            try:
+                band = (float(fit[0]), float(fit[1]))
+            except (TypeError, ValueError):
+                band = None
+        rail = str(
+            (vapor_pressure_provenance.get(species) or {}).get("pressure_rail")
+            or ""
+        ).strip()
+        status = "extrapolation_limited"
+        if rail:
+            status = f"{status}; {rail}"
         evaluator = SimpleNamespace(
             species_id=str(species),
-            evaluator_family="antoine",
-            valid_temperature_K=_direct_continuation_band(chosen),
+            evaluator_family="ellingham",
+            valid_temperature_K=band,
             diagnostic_admission_notice=None,
         )
-        evaluation = SimpleNamespace(
-            out_of_range=True,
-            status="; ".join(reasons) if reasons else "extrapolated",
-        )
-        register_executed_law(evaluator, evaluation)
+        evaluation = SimpleNamespace(out_of_range=True, status=status)
+        executions.append((evaluator, evaluation))
+    return executions
 
 
 def _vapor_pressure_temperature_extrapolation_notice(
@@ -4990,6 +5125,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             vapor_pressures=vapor_pressures,
             vapor_pressure_provenance=vapor_pressure_provenance,
             disclosure_before=disclosure_before,
+            published_extrapolation_maps={
+                key: diagnostic[key]
+                for _class_name, key in PUBLISHED_EXTRAPOLATION_CLASSES
+            },
         )
 
         return IntentResult(

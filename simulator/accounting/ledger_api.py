@@ -142,13 +142,12 @@ class LedgerAPI:
 
     def snapshot(self) -> dict[str, Any]:
         report = self.ledger.close_report()
-        from simulator.vapour_rail.run_disclosure import active_snapshot
+        from simulator.vapour_rail.run_disclosure import owning_run_disclosures
 
-        law_disclosures = active_snapshot()
-        if not law_disclosures:
-            law_disclosures = tuple(
-                getattr(getattr(self, "sim", None), "law_disclosures", ()) or ()
-            )
+        # The ledger belongs to this simulator's run. The bound registry may
+        # be another run, or a computation sub-registry whose snapshot is
+        # only part of this run. A measured empty on the owner stays empty.
+        law_disclosures = owning_run_disclosures(getattr(self, "sim", None))
         provenance = {
             "mass_balance_attested": bool(report.get("balanced")),
             # Schema-2 compatibility: retain the configured tolerance in

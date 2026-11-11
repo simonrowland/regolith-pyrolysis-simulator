@@ -38,6 +38,9 @@ a measured row with empty authority.
   the parent. Cache writes read the computation, never the whole run.
 - Typed carrier notices stay lists (exact duplicates dropped). Bare-float
   helpers do not carry notices.
+- A publisher reads the owning run via ``owning_run_disclosures``. The
+  bound registry is another run or a computation sub-registry and does not
+  replace that owner's snapshot, including a measured empty.
 
 The ContextVar default is ``None``. That slot is not a registry. ``SimSession``
 creates the ``RunDisclosure`` that is returned with the run. There is no
@@ -734,6 +737,31 @@ def accept_stored_memo(
     if not stored_disclosures_known(record):
         return None
     return publish_stored_disclosures(record, owner=owner)
+
+
+def owning_run_disclosures(owner: Any) -> tuple[dict[str, Any], ...]:
+    """Disclosures of the run that owns ``owner``, including a measured empty.
+
+    The context variable is not this owner. Another run's registry, and a
+    computation sub-registry, are not the owner's accumulated disclosure.
+    A registry stored on the owner wins, including when its snapshot is
+    empty. A ``law_disclosures`` attribute with no registry is the same
+    measurement, empty or not. Absence of both is a measured empty. Neither
+    case is filled from whatever registry happens to be bound.
+    """
+
+    if owner is None:
+        return ()
+    for attr in ("_law_disclosure_registry", "_law_disclosure"):
+        registry = getattr(owner, attr, None)
+        if isinstance(registry, RunDisclosure) and not registry.computation:
+            return registry.snapshot()
+    if not hasattr(owner, "law_disclosures"):
+        return ()
+    raw = getattr(owner, "law_disclosures")
+    if not raw:
+        return ()
+    return tuple(dict(item) for item in raw if isinstance(item, Mapping))
 
 
 def published_run_disclosures(execution: Any) -> tuple[dict[str, Any], ...]:

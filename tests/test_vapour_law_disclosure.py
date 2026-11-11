@@ -22,12 +22,17 @@ pressure cache, the KEMS surface cache, the residue pressure closures, and
 the Sossi, Hashimoto, and Knudsen rows of the residue-prediction cache are
 read only through that gate.
 Registration of a new row is ``register_executed_law``. Compiled laws call
-it from ``CompiledPressureEvaluator.evaluate``. A published Antoine
-continuation that never calls evaluate(), including out-of-band SiO, calls
-it once from the provider publication chokepoint. A non-diagnostic law is
-registered when the evaluation leaves a certified domain: the temperature
-band, the oxygen evaluator band, or the oxygen mass-action floor. An
-in-domain non-diagnostic evaluation registers nothing. A hit does not execute
+it from ``CompiledPressureEvaluator.evaluate``. Every other published
+extrapolation is one chokepoint, ``PUBLISHED_EXTRAPOLATION_CLASSES``: the
+temperature band (direct Antoine, including out-of-band SiO) and the
+Ellingham fit band (``species:ellingham``, including a gas-fugacity
+pressure past the fit). A compiled neighbour does not name the Ellingham
+law. A non-diagnostic law is registered when the evaluation leaves a
+certified domain: the temperature band, the Ellingham fit, the oxygen
+evaluator band, or the oxygen mass-action floor. An in-domain
+non-diagnostic evaluation registers nothing. A publisher of a run reads
+that run's registry via ``owning_run_disclosures``. The bound registry is
+not a substitute, and a measured empty stays empty. A hit does not execute
 the law; it
 re-registers the disclosures stored with that computation, and evaluation
 counts add. An empty disclosure is a measured zero only when the computation
@@ -86,9 +91,12 @@ from simulator.reduced_real_determinism import (
     canonical_physics_bucket_key_from_replay_key,
 )
 from simulator.vapour_rail.catalog import CompiledPressureEvaluator
+from engines.builtin.vapor_pressure import PUBLISHED_EXTRAPOLATION_CLASSES
 from simulator.vapour_rail.run_disclosure import (
     LawDisclosureParentError,
+    RunDisclosure,
     active_snapshot,
+    bind_run_registry,
     bind_simulation_run,
     computation_disclosure,
     disclosure_metadata,
@@ -3967,97 +3975,326 @@ def test_standalone_kems_publishes_the_sio_antoine_law() -> None:
         assert runtime["vapor_pressures_Pa"]["SiO"] > 0.0
 
 
-def test_every_published_extrapolation_is_disclosed() -> None:
-    """Every species pressure published with an extrapolation notice is disclosed.
+def _mixed_extrapolation_dispatch():
+    """One dispatch that publishes both extrapolation classes.
 
-    The class is the provider's published set at 2300 K, not one neighbour
-    law. SiO is the Antoine continuation. Deleting the publication registrar
-    drops SiO and any other direct continuation while compiled neighbours
-    such as SiO2_gas can still be present.
+    2700 K is past the Ellingham fit (1100, 2600) K and past the SiO
+    Antoine band. Mg and Ca are gas-fugacity pressures from that fit.
+    Fe's compiled carrier is a different law from Fe:ellingham. SiO is
+    the direct Antoine continuation.
     """
 
     from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
     from simulator.chemistry.kernel.capabilities import ChemistryIntent
     from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
-    case, _observations = _sio_oob_kems_inputs()
-    oxide = str(case["oxide"]["formula"])
-    pO2_bar = float(case["provider_inputs"]["pO2_bar"])
-    exterior_pa = float(case["exterior_chamber_pressure"]["value_pa"])
     provider = BuiltinVaporPressureProvider(_live_vapor())
     request = IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
         account_view=ProviderAccountView(
-            accounts={"process.cleaned_melt": {oxide: 1.0}},
+            accounts={
+                "process.cleaned_melt": {
+                    "MgO": 1.0,
+                    "CaO": 1.0,
+                    "FeO": 1.0,
+                    "SiO2": 1.0,
+                }
+            },
             species_formula_registry={},
         ),
-        temperature_C=_SIO_OOB_K - 273.15,
-        pressure_bar=max(exterior_pa / 100000.0, 1e-30),
-        fO2_log=math.log10(pO2_bar),
-        control_inputs={"pO2_bar": pO2_bar, "pO2_admission": "observation"},
+        temperature_C=2700.0 - 273.15,
+        pressure_bar=1e-6,
+        fO2_log=math.log10(1e-9),
+        control_inputs={"pO2_bar": 1e-9, "pO2_admission": "observation"},
     )
     with disclosure_scope(inherit=False) as registry:
         result = provider.dispatch(request)
         snapshot = registry.snapshot()
+    return result, snapshot
+
+
+def test_extrapolation_publication_maps_are_the_registrar_table() -> None:
+    """A new ``extrapolated_beyond`` publication map is undisclosed until listed."""
+
+    import re
+
+    source = (_ROOT / "engines/builtin/vapor_pressure.py").read_text(encoding="utf-8")
+    # Diagnostic-map assignments only. Source-label fragments such as
+    # ``extrapolated_beyond_ellingham_fit_range_K`` are not maps.
+    keys = set(
+        re.findall(
+            r'"([^"]*extrapolated_beyond[^"]*)"\s*:',
+            source,
+        )
+    )
+    table = dict(PUBLISHED_EXTRAPOLATION_CLASSES)
+    assert set(table.values()) == keys
+    assert set(table) == {"temperature_band", "ellingham_fit_band"}
+    registrar = source.split("def _register_direct_flagged_continuations(", 1)[1]
+    registrar = registrar.split("\ndef ", 1)[0]
+    for class_name, diagnostic_key in PUBLISHED_EXTRAPOLATION_CLASSES:
+        assert class_name in registrar
+        assert diagnostic_key in source
+
+
+@pytest.mark.parametrize(
+    "publication_class",
+    [name for name, _key in PUBLISHED_EXTRAPOLATION_CLASSES],
+)
+def test_every_published_extrapolation_class_is_disclosed(
+    publication_class: str,
+) -> None:
+    """Each publication class discloses the law that produced the pressure.
+
+    Deleting the temperature reader drops SiO:antoine. Deleting the
+    Ellingham reader drops Mg:ellingham and Ca:ellingham while Mg2 and
+    Fe:nasa_cea_9 can still be present. Those neighbours do not name the
+    Ellingham law.
+    """
+
+    diagnostic_key = dict(PUBLISHED_EXTRAPOLATION_CLASSES)[publication_class]
+    result, snapshot = _mixed_extrapolation_dispatch()
     assert result.status == "ok"
     diagnostic = result.diagnostic or {}
     pressures = diagnostic.get("vapor_pressures_Pa") or {}
-    extrapolations = diagnostic.get("extrapolated_beyond_valid_range_K") or {}
-    assert "SiO" in pressures
-    assert pressures["SiO"] > 0.0
-    assert "SiO" in extrapolations
+    records = diagnostic.get(diagnostic_key) or {}
+    provenance = diagnostic.get("vapor_pressure_numerator_provenance") or {}
     published = [
         species
-        for species, notice in extrapolations.items()
+        for species, notice in records.items()
         if species in pressures and isinstance(notice, dict)
     ]
-    assert "SiO" in published
+    assert published, publication_class
     problems: list[str] = []
+    if publication_class == "temperature_band":
+        assert "SiO" in published
+        assert pressures["SiO"] > 0.0
+        for species in published:
+            notice = records[species]
+            rows = [
+                item
+                for item in snapshot
+                if str(item.get("law_id") or "").split(":", 1)[0] == species
+            ]
+            if not rows:
+                problems.append(f"{species}: no disclosure")
+                continue
+            row = rows[0]
+            if species == "SiO":
+                chosen = next(
+                    (
+                        item
+                        for item in rows
+                        if item.get("law_id") == _SIO_PUBLISHED_LAW_ID
+                    ),
+                    None,
+                )
+                if chosen is None:
+                    problems.append(
+                        f"SiO laws {[item.get('law_id') for item in rows]}"
+                    )
+                    continue
+                row = chosen
+            if row.get("authority") != "extrapolated":
+                problems.append(f"{species}: authority {row.get('authority')}")
+            reason = str(notice.get("reason") or "")
+            row_provenance = str(row.get("provenance") or "")
+            if str(row.get("law_id") or "").endswith(":antoine"):
+                if reason and reason not in row_provenance:
+                    problems.append(
+                        f"{species}: provenance {row_provenance!r} lacks {reason!r}"
+                    )
+            elif not row_provenance:
+                problems.append(f"{species}: empty provenance")
+            band = notice.get("valid_range_K")
+            if (
+                isinstance(band, (list, tuple))
+                and len(band) == 2
+                and row.get("certified_band_K")
+                != [float(band[0]), float(band[1])]
+            ):
+                problems.append(f"{species}: band {row.get('certified_band_K')}")
+        assert problems == []
+        sio = next(
+            item for item in snapshot if item["law_id"] == _SIO_PUBLISHED_LAW_ID
+        )
+        _assert_published_sio(sio)
+        return
+    if publication_class != "ellingham_fit_band":
+        raise AssertionError(publication_class)
+    gas_species = [
+        species
+        for species in published
+        if (provenance.get(species) or {}).get("pressure_rail") == "gas_fugacity"
+    ]
+    assert "Mg" in gas_species
+    assert "Ca" in gas_species
     for species in published:
-        notice = extrapolations[species]
-        rows = [
-            item
-            for item in snapshot
-            if str(item.get("law_id") or "").split(":", 1)[0] == species
-        ]
-        if not rows:
-            problems.append(f"{species}: no disclosure")
+        law_id = f"{species}:ellingham"
+        rows = [item for item in snapshot if item.get("law_id") == law_id]
+        if len(rows) != 1:
+            problems.append(
+                f"{species}: laws {[item.get('law_id') for item in snapshot if str(item.get('law_id') or '').startswith(species + ':')]}"
+            )
             continue
         row = rows[0]
-        if species == "SiO":
-            chosen = next(
-                (item for item in rows if item.get("law_id") == _SIO_PUBLISHED_LAW_ID),
-                None,
-            )
-            if chosen is None:
-                problems.append(
-                    f"SiO laws {[item.get('law_id') for item in rows]}"
-                )
-                continue
-            row = chosen
         if row.get("authority") != "extrapolated":
             problems.append(f"{species}: authority {row.get('authority')}")
-        reason = str(notice.get("reason") or "")
-        provenance = str(row.get("provenance") or "")
-        # Direct Antoine continuations quote the published notice. Compiled
-        # laws quote evaluate()'s out-of-range status instead.
-        if str(row.get("law_id") or "").endswith(":antoine"):
-            if reason and reason not in provenance:
-                problems.append(
-                    f"{species}: provenance {provenance!r} lacks {reason!r}"
-                )
-        elif not provenance:
-            problems.append(f"{species}: empty provenance")
-        band = notice.get("valid_range_K")
-        if (
-            isinstance(band, (list, tuple))
-            and len(band) == 2
-            and row.get("certified_band_K") != [float(band[0]), float(band[1])]
-        ):
+        row_provenance = str(row.get("provenance") or "")
+        if "extrapolation_limited" not in row_provenance:
+            problems.append(f"{species}: provenance {row_provenance!r}")
+        rail = str((provenance.get(species) or {}).get("pressure_rail") or "")
+        if rail and rail not in row_provenance:
+            problems.append(f"{species}: provenance lacks {rail}")
+        fit = records[species].get("fit_range_K")
+        if row.get("certified_band_K") != [float(fit[0]), float(fit[1])]:
             problems.append(f"{species}: band {row.get('certified_band_K')}")
+        if row.get("evaluation_count") != 1:
+            problems.append(f"{species}: count {row.get('evaluation_count')}")
     assert problems == []
-    sio = next(item for item in snapshot if item["law_id"] == _SIO_PUBLISHED_LAW_ID)
-    _assert_published_sio(sio)
+    # Fe's compiled carrier remains a different law. It does not disclose
+    # the Ellingham fit that produced the published Fe pressure.
+    assert any(item["law_id"] == "Fe:nasa_cea_9" for item in snapshot)
+    assert any(item["law_id"] == "Fe:ellingham" for item in snapshot)
+    law_ids = {item["law_id"] for item in snapshot}
+    assert "Mg:ellingham" in law_ids
+    assert "Mg2:nasa_cea_9" in law_ids
+    assert "Ca:ellingham" in law_ids
+
+
+def _owner_law(law_id: str, *, count: int = 2) -> dict:
+    return {
+        "law_id": law_id,
+        "provenance": "owner-registry probe",
+        "authority": "extrapolated",
+        "certified_band_K": [1100.0, 2600.0],
+        "anchor_gaps_dex": {},
+        "closer": "",
+        "certification_route": [],
+        "evaluation_count": count,
+    }
+
+
+def _disclosure_owner(rows: tuple[dict, ...] | None, *, registry: bool):
+    """A simulator whose disclosure is its own, not the bound registry."""
+
+    from types import SimpleNamespace
+
+    stored = RunDisclosure()
+    if rows:
+        stored.reregister_public(rows)
+    ledger = SimpleNamespace(
+        close_report=lambda: {"balanced": True},
+        balance_tolerance_kg=1.0e-12,
+        balance_relative_tolerance=1.0e-12,
+        balance_absolute_floor_kg=1.0e-15,
+        mol_by_account=lambda: {},
+        origin_atom_moles_by_account=lambda: {},
+        unresolved_origin_atom_moles_by_account=lambda: {},
+        origin_attribution_methods_by_account=lambda: {},
+        gross_account_flows=lambda: {},
+        gross_account_flow_events=lambda: [],
+    )
+    owner = SimpleNamespace(atom_ledger=ledger, law_disclosures=stored.snapshot())
+    if registry:
+        owner._law_disclosure_registry = stored
+    return owner
+
+
+def _published_owner_disclosures(publisher: str, owner) -> tuple[dict, ...]:
+    if publisher == "ledger_api":
+        from simulator.accounting.ledger_api import LedgerAPI
+
+        snapshot = LedgerAPI(owner).snapshot()
+        raw = snapshot["provenance"].get("law_disclosures") or ()
+        return tuple(raw)
+    if publisher == "yield_disposition":
+        from types import SimpleNamespace
+
+        from simulator.accounting.yield_disposition import (
+            capture_ledger_snapshot,
+            ledger_snapshots_from_sim,
+        )
+
+        capture_ledger_snapshot(
+            owner,
+            SimpleNamespace(hour=1, campaign="C0", campaign_hour=1),
+        )
+        rows = ledger_snapshots_from_sim(owner)
+        assert rows
+        raw = rows[-1].get("law_disclosures") or ()
+        return tuple(raw)
+    raise AssertionError(publisher)
+
+
+_OWNER_PUBLISHERS = ("ledger_api", "yield_disposition")
+_OWNER_SCENARIOS = (
+    "other_run_bound",
+    "computation_partial",
+    "measured_empty",
+    "attribute_measured_empty",
+)
+
+
+@pytest.mark.parametrize("publisher", _OWNER_PUBLISHERS)
+@pytest.mark.parametrize("scenario", _OWNER_SCENARIOS)
+def test_publisher_reads_the_owning_run_disclosure(
+    publisher: str,
+    scenario: str,
+) -> None:
+    """A publisher emits the owner's registry, including a measured empty.
+
+    The bound registry in these arms is a different run or a computation
+    sub-registry. Reading ``active_snapshot`` would publish that partial
+    or foreign disclosure. Deleting ``owning_run_disclosures`` from either
+    publisher makes that publisher's arms fail.
+    """
+
+    owner_law = _owner_law("Fe:ellingham", count=2)
+    foreign_law = _owner_law("SiO:antoine", count=1)
+    if scenario == "other_run_bound":
+        owner = _disclosure_owner((owner_law,), registry=True)
+        with disclosure_scope(inherit=False) as foreign:
+            foreign.reregister_public((foreign_law,))
+            assert any(
+                item["law_id"] == "SiO:antoine" for item in active_snapshot()
+            )
+            published = _published_owner_disclosures(publisher, owner)
+        ids = {item["law_id"] for item in published}
+        assert ids == {"Fe:ellingham"}
+        assert published[0]["evaluation_count"] == 2
+        return
+    if scenario == "computation_partial":
+        owner = _disclosure_owner((owner_law,), registry=True)
+        with bind_run_registry(owner._law_disclosure_registry):
+            with computation_disclosure() as child:
+                child.reregister_public((foreign_law,))
+                assert [item["law_id"] for item in active_snapshot()] == [
+                    "SiO:antoine"
+                ]
+                published = _published_owner_disclosures(publisher, owner)
+        ids = {item["law_id"] for item in published}
+        assert ids == {"Fe:ellingham"}
+        assert published[0]["evaluation_count"] == 2
+        return
+    if scenario == "measured_empty":
+        owner = _disclosure_owner((), registry=True)
+        with disclosure_scope(inherit=False) as foreign:
+            foreign.reregister_public((foreign_law,))
+            assert active_snapshot()
+            published = _published_owner_disclosures(publisher, owner)
+        assert published == ()
+        return
+    if scenario == "attribute_measured_empty":
+        owner = _disclosure_owner((), registry=False)
+        assert not hasattr(owner, "_law_disclosure_registry")
+        assert owner.law_disclosures == ()
+        with disclosure_scope(inherit=False) as foreign:
+            foreign.reregister_public((foreign_law,))
+            published = _published_owner_disclosures(publisher, owner)
+        assert published == ()
+        return
+    raise AssertionError(scenario)
 
 
 _DISCLOSURE_EXERCISERS = {
