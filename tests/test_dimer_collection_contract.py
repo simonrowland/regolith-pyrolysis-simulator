@@ -2189,3 +2189,285 @@ def test_route_debits_one_wall_budget_through_the_segment_loop(
         assert captured == pytest.approx(transport)
         assert removed_monomer + removed_dimer != pytest.approx(2.0 * transport)
     assert model._wall_element_supply_kg_hr is None
+
+
+# Invariant. A pressure-refused arrival is not an admitted wall supply.
+# Its kilogram stays out of the element-budget denominator. The only
+# split of that budget is _element_wall_capture_kg_hr. The direct
+# surface call, route()'s cold-wall segment loop, and the stage
+# channel all reach that rule or, for the stage, never put the refused
+# mass in a denominator. The ledger handoff of the cold-wall route is
+# pinned in tests/chemistry/test_dimer_wall_deposit_ledger.py.
+#
+# Reviewer arithmetic. Equal supplies m and transport T < m, with the
+# partner partial missing, used to deposit eta * m with
+# eta = T / (m + m) = 1/2. For m = 1 kg/h and T = 0.1 kg/h that is
+# 0.05 kg/h on the admitted species and nothing on the refused one.
+# The admitted budget is min(T, m). These cases scale that ratio:
+# equal supplies are 4 T, so the bug deposits T/2 and the fix deposits T.
+
+_REFUSED_SUPPLIES = ("transport_limited_equal", "admitted_below_transport")
+
+
+def _pressure_refused_partner_cases():
+    cases = []
+    for monomer, dimer in CONTRACTED_PAIRS:
+        for kp_case in ("finite", "infinite"):
+            for supply in _REFUSED_SUPPLIES:
+                for refused in ("dimer", "monomer"):
+                    cases.append(pytest.param(
+                        monomer, dimer, refused, supply, kp_case, "direct",
+                        id=f"direct-{monomer}-{refused}-{supply}-{kp_case}",
+                    ))
+                cases.append(pytest.param(
+                    monomer, dimer, "dimer", supply, kp_case, "route",
+                    id=f"route-{monomer}-dimer-{supply}-{kp_case}",
+                ))
+                cases.append(pytest.param(
+                    monomer, dimer, "dimer", supply, kp_case, "stage",
+                    id=f"stage-{monomer}-dimer-{supply}-{kp_case}",
+                ))
+        # A missing monomer partial still aborts the train. That is not
+        # a silent dilution. One pin per pair, not a capture number.
+        cases.append(pytest.param(
+            monomer, dimer, "monomer", "transport_limited_equal", "finite", "route",
+            id=f"route-{monomer}-monomer-aborts",
+        ))
+    return cases
+
+
+def _refused_partner_supplies(refused, supply, transport):
+    """Rates, the admitted budget, and the diluted debit the bug booked.
+
+    Admitted-below puts the admitted supply under T and the refused
+    supply at 4 T. Equal supplies are both 4 T. The diluted debit is
+    admitted * min(1, T / (m_M + m_M2)), which is what a denominator
+    that still contains the refused kilogram produces.
+    """
+
+    over = transport * 4.0
+    under = transport * 0.05
+    if supply == "transport_limited_equal":
+        monomer_rate = over
+        dimer_rate = over
+    elif refused == "dimer":
+        monomer_rate = under
+        dimer_rate = over
+    else:
+        monomer_rate = over
+        dimer_rate = under
+    admitted_rate = monomer_rate if refused == "dimer" else dimer_rate
+    expected = min(admitted_rate, transport)
+    diluted = admitted_rate * min(
+        1.0, transport / (monomer_rate + dimer_rate),
+    )
+    return monomer_rate, dimer_rate, expected, diluted
+
+
+def _refused_partner_partials_pa(refused):
+    """Partials that keep p_elem = 6 Pa with the refused key absent.
+
+    Monomer admitted: p_M = 6 Pa, no dimer key. Dimer admitted:
+    p_M2 = 3 Pa, no monomer key, so p_elem = 2 * 3 = 6 Pa. The
+    transport oracle is the same 6 Pa element total.
+    """
+
+    if refused == "dimer":
+        return _BUDGET_P_ELEM_PA, 0.0
+    return 0.0, _BUDGET_P_ELEM_PA / 2.0
+
+
+def _staged_species_kg(route, species):
+    return sum(
+        by_species.get(species, 0.0)
+        for by_species in route.condensed_by_stage_species.values()
+    )
+
+
+def _route_refused_partner(
+    monomer,
+    dimer,
+    monomer_rate,
+    dimer_rate,
+    monomer_partial_pa,
+    dimer_partial_pa,
+    *,
+    cold_wall,
+):
+    partials_mbar = {}
+    if monomer_partial_pa > 0.0:
+        partials_mbar[monomer] = monomer_partial_pa / 100.0
+    if dimer_partial_pa > 0.0:
+        partials_mbar[dimer] = dimer_partial_pa / 100.0
+    species_kg = {}
+    if monomer_rate > 0.0:
+        species_kg[monomer] = monomer_rate
+    if dimer_rate > 0.0:
+        species_kg[dimer] = dimer_rate
+    model = _model(partials=partials_mbar)
+    temperatures = {
+        segment.name: 1500.0 for segment in model.pipe_segments
+    }
+    if cold_wall:
+        temperatures["stage_3_to_stage_4"] = 250.0
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar=partials_mbar,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+        pipe_segment_temperatures_C=temperatures,
+    )
+    if cold_wall:
+        # Collectors were copied onto the duct at configure time. Zeroing
+        # the stage map leaves the cold duct as the only capture surface.
+        model.stage_area_m2_by_stage = {
+            key: 0.0 for key in model.stage_area_m2_by_stage
+        }
+    route = model.route(
+        EvaporationFlux(
+            species_kg_hr=species_kg,
+            total_kg_hr=float(sum(species_kg.values())),
+        ),
+        MeltState(temperature_C=1500.0),
+    )
+    return model, route, species_kg
+
+
+def _assert_pressure_refusal(route, species):
+    outcomes = route.condensation_refusals_by_species[species].get(
+        "stage_outcomes", (),
+    )
+    parameters = {item.get("parameter") for item in outcomes}
+    assert "P_local_pa" in parameters
+    assert _staged_species_kg(route, species) == pytest.approx(0.0, abs=0.0)
+    assert species not in route.wall_deposit_by_species
+
+
+@pytest.mark.parametrize(
+    "monomer,dimer,refused,supply,kp_case,path",
+    _pressure_refused_partner_cases(),
+)
+def test_pressure_refused_partner_is_excluded_from_the_wall_budget(
+    monkeypatch, monomer, dimer, refused, supply, kp_case, path,
+):
+    """Every contracted pair, refused side, and capture path.
+
+    Direct calls exercise the chokepoint with either partner missing.
+    The cold-wall route is the segment loop with collectors off. The
+    stage path keeps collectors and hot walls, and the admitted stage
+    kilograms must match an admitted-only feed. A missing monomer
+    partial on route() aborts the train instead of diluting.
+    """
+
+    kp_pa = _BUDGET_KP_PA if kp_case == "finite" else math.inf
+    _install_budget_physics(monkeypatch, kp_pa)
+    transport = _budget_transport_kg_hr(monomer, kp_pa)
+    monomer_rate, dimer_rate, expected, diluted = _refused_partner_supplies(
+        refused, supply, transport,
+    )
+    monomer_partial_pa, dimer_partial_pa = _refused_partner_partials_pa(refused)
+    assert expected != pytest.approx(diluted)
+
+    if path == "direct":
+        from simulator.wall_deposition import wall_deposit_candidate_for_surface_kg
+        from tests.test_condensation_input_refusals import _configured_model
+
+        model = _configured_model()
+        partials = {}
+        if monomer_partial_pa > 0.0:
+            partials[monomer] = monomer_partial_pa
+        if dimer_partial_pa > 0.0:
+            partials[dimer] = dimer_partial_pa
+        model.wall_species_partial_pressures_pa = partials
+        model._wall_element_supply_kg_hr = {
+            monomer: monomer_rate,
+            dimer: dimer_rate,
+        }
+        debits = {}
+        refusals = {}
+        for species, rate, collected in (
+            (monomer, monomer_rate, None),
+            (dimer, dimer_rate, monomer),
+        ):
+            try:
+                debits[species] = wall_deposit_candidate_for_surface_kg(
+                    model,
+                    species=species,
+                    rate_kg_hr=rate,
+                    T_cond_C=250.0,
+                    melt_temperature_C=1500.0,
+                    wall_temperature_C=250.0,
+                    surface_area_m2=1.0,
+                    collection_species=collected,
+                )
+            except DepositionInputRefusal as exc:
+                refusals[species] = exc
+        refused_name = dimer if refused == "dimer" else monomer
+        admitted_name = monomer if refused == "dimer" else dimer
+        assert refusals[refused_name].parameter == "P_local_pa"
+        assert admitted_name not in refusals
+        assert debits[admitted_name] == pytest.approx(
+            expected, rel=1e-12, abs=1e-15,
+        )
+        assert debits[admitted_name] != pytest.approx(diluted)
+        assert sum(debits.values()) == pytest.approx(
+            expected, rel=1e-12, abs=1e-15,
+        )
+        return
+
+    if path == "route" and refused == "monomer":
+        with pytest.raises(ValueError, match="wall species partial pressures"):
+            _route_refused_partner(
+                monomer,
+                dimer,
+                monomer_rate,
+                dimer_rate,
+                monomer_partial_pa,
+                dimer_partial_pa,
+                cold_wall=True,
+            )
+        return
+
+    model, route, species_kg = _route_refused_partner(
+        monomer,
+        dimer,
+        monomer_rate,
+        dimer_rate,
+        monomer_partial_pa,
+        dimer_partial_pa,
+        cold_wall=(path == "route"),
+    )
+    _assert_pressure_refusal(route, dimer)
+    assert route.remaining_by_species[dimer] == pytest.approx(dimer_rate)
+    assert _mass_closure_kg(route, species_kg) == pytest.approx(0.0, abs=1e-12)
+    assert model._wall_element_supply_kg_hr is None
+    if path == "route":
+        wall = route.wall_deposit_by_species.get(monomer, 0.0)
+        assert wall == pytest.approx(expected, rel=1e-12, abs=1e-12)
+        assert wall != pytest.approx(diluted)
+        assert _staged_species_kg(route, monomer) == pytest.approx(0.0, abs=0.0)
+        return
+
+    # Stage channel. Hot walls deposit nothing. The refused dimer's mass
+    # must not move the monomer's stage capture relative to the same
+    # monomer feed with no dimer in the stream.
+    assert route.wall_deposit_by_species.get(monomer, 0.0) == pytest.approx(
+        0.0, abs=0.0,
+    )
+    _solo_model, solo, _solo_inlet = _route_refused_partner(
+        monomer,
+        dimer,
+        monomer_rate,
+        0.0,
+        monomer_partial_pa,
+        0.0,
+        cold_wall=False,
+    )
+    solo_stage = _staged_species_kg(solo, monomer)
+    mixed_stage = _staged_species_kg(route, monomer)
+    assert solo_stage > 0.0
+    assert mixed_stage == pytest.approx(solo_stage, rel=1e-12, abs=1e-12)
+    assert solo.wall_deposit_by_species.get(monomer, 0.0) == pytest.approx(
+        0.0, abs=0.0,
+    )

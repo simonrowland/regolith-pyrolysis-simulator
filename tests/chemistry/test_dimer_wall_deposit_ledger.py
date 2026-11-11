@@ -366,3 +366,112 @@ def test_mg2_dust_sio2_subfloor_rollback_books_monomer(
     assert element_mol("Si") == pytest.approx(si_before, rel=0.0, abs=1e-18)
     assert element_mol("O") == pytest.approx(o_before, rel=0.0, abs=1e-18)
     assert mg_before == pytest.approx(2.0 * arrival_mol, rel=0.0, abs=1e-12)
+
+
+@pytest.mark.parametrize(
+    "monomer,dimer",
+    (("Na", "Na2"), ("K", "K2"), ("Mg", "Mg2")),
+)
+def test_pressure_refused_dimer_does_not_dilute_the_wall_ledger(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    monomer,
+    dimer,
+):
+    """Cold wall, zero collector. A missing dimer partial is not half the budget.
+
+    Both masses are 4 T and only the monomer partial is admitted. The
+    old denominator eta = T / (4T + 4T) booked T/2 on the wall account
+    and left the refused dimer uncaptured. The ledger handoff is
+    _dispatch_condensation_route. The wall account must receive T, and
+    the collector must stay empty. T is the contract-test transport at
+    p_elem = 6 Pa and A = 1 m2, not the route's own output.
+    """
+
+    from tests.test_dimer_collection_contract import (
+        _BUDGET_KP_PA,
+        _BUDGET_P_ELEM_PA,
+        _budget_transport_kg_hr,
+        _install_budget_physics,
+    )
+
+    _install_budget_physics(monkeypatch, _BUDGET_KP_PA)
+    transport = _budget_transport_kg_hr(monomer, _BUDGET_KP_PA)
+    monomer_rate = transport * 4.0
+    dimer_rate = transport * 4.0
+    partials_mbar = {monomer: _BUDGET_P_ELEM_PA / 100.0}
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    model = sim.condensation_model
+    temperatures = {segment.name: 1500.0 for segment in model.pipe_segments}
+    temperatures[_COLD_SEGMENT] = 250.0
+    model.configure_operating_conditions(
+        wall_temperature_C=1500.0,
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar=partials_mbar,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+        pipe_segment_temperatures_C=temperatures,
+    )
+    model.stage_area_m2_by_stage = {
+        key: 0.0 for key in model.stage_area_m2_by_stage
+    }
+    inlet = {monomer: monomer_rate, dimer: dimer_rate}
+    route = model.route(
+        EvaporationFlux(
+            species_kg_hr=inlet,
+            total_kg_hr=monomer_rate + dimer_rate,
+        ),
+        MeltState(temperature_C=1500.0),
+    )
+    removed_monomer = monomer_rate - route.remaining_by_species[monomer]
+    assert removed_monomer == pytest.approx(transport, rel=1e-12, abs=1e-12)
+    assert removed_monomer != pytest.approx(transport / 2.0)
+    assert route.remaining_by_species[dimer] == pytest.approx(dimer_rate)
+    assert route.condensed_by_stage_species == {}
+    assert route.wall_deposit_by_species.get(monomer, 0.0) == pytest.approx(
+        transport, rel=1e-12, abs=1e-12,
+    )
+    assert dimer not in route.wall_deposit_by_species
+    assert route.wall_deposit_fraction_by_species[monomer] == pytest.approx(1.0)
+    outcomes = route.condensation_refusals_by_species[dimer]["stage_outcomes"]
+    assert any(item.get("parameter") == "P_local_pa" for item in outcomes)
+
+    cold = next(
+        segment for segment in model.pipe_segments if segment.name == _COLD_SEGMENT
+    )
+    wall_account = cold.wall_deposit_account
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {monomer: removed_monomer},
+        source="b-325 pressure-refused partner wall budget",
+        material_origin="feedstock",
+    )
+    credited_train_kg = sim._dispatch_condensation_route(
+        monomer, removed_monomer, {}, route,
+    )
+    wall_kg = sim.atom_ledger.kg_by_account(wall_account)
+    train_kg = sim.atom_ledger.kg_by_account("process.condensation_train")
+    overhead = sim.atom_ledger.kg_by_account("process.overhead_gas")
+    assert wall_kg.get(dimer, 0.0) == 0.0
+    assert train_kg.get(dimer, 0.0) == 0.0
+    assert train_kg.get(monomer, 0.0) == pytest.approx(0.0, abs=1e-12)
+    assert overhead.get(monomer, 0.0) == pytest.approx(0.0, abs=0.0)
+    assert credited_train_kg == pytest.approx(0.0, abs=1e-12)
+    assert wall_kg[monomer] == pytest.approx(transport, rel=1e-12, abs=1e-12)
+    monomer_mol = wall_kg[monomer] / (
+        resolve_species_formula(monomer, sim.species_formula_registry)
+        .molar_mass_kg_per_mol()
+    )
+    removed_mol = removed_monomer / (
+        resolve_species_formula(monomer, sim.species_formula_registry)
+        .molar_mass_kg_per_mol()
+    )
+    assert monomer_mol == pytest.approx(removed_mol, rel=0.0, abs=1e-12)

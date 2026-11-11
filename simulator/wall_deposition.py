@@ -226,13 +226,22 @@ def _element_wall_capture_kg_hr(
         T = (J_M + 2 J_M2) * A
         captured = min(T, m_M + m_M2)
 
-    Invariant. T is one element budget for this wall. A homonuclear
-    dimer has M_M2 = 2 M_M, so gas mass is element mass. The two
-    arrivals split that one budget in proportion to their inlet
-    supplies, eta = min(1, T / (m_M + m_M2)), debit_i = eta * m_i.
-    The debits sum to min(T, m_M + m_M2). Neither arrival receives T
-    on its own when the other supply is positive. A pure arrival has
-    the other supply at zero, so debit = min(T, m_i), the same cap.
+    Invariant. T is one element budget for this wall, and a
+    pressure-refused arrival is not an admitted supply. A homonuclear
+    dimer has M_M2 = 2 M_M, so gas mass is element mass. Two arrivals
+    whose partials were both admitted split that budget in proportion
+    to their inlet supplies, eta = min(1, T / (m_M + m_M2)),
+    debit_i = eta * m_i. Those debits sum to min(T, m_M + m_M2).
+    Neither admitted arrival receives T on its own while the other
+    admitted supply is positive.
+
+    A partner with no admitted partial is left out of the denominator.
+    Zero coexistence (no partner supply) and a pressure-refused partner
+    (positive supply, missing partial) both keep debit = min(T, m_i).
+    Route publishes every positive mass before the partial check, and a
+    direct caller can pass the same map. The exclusion is here, so
+    neither path can spend the refused kilogram. The refused species
+    deposits nothing on its own call and keeps the typed refusal.
 
     p_M comes from re-speciation of p_elem and p_M2 = p_M^2 / K_p.
     R_melt is 0. As K_p -> inf, p_M -> p_elem and J_M2 -> 0, so the
@@ -339,8 +348,9 @@ def _element_wall_capture_kg_hr(
         if not math.isfinite(transport_kg_hr) or transport_kg_hr <= 0.0:
             return 0.0
         # Flowing partner partial. p_elem = p_M + 2 p_M2, so the other
-        # form is fixed once this arrival's partial is known. A pure
-        # arrival has that partial at zero and keeps min(T, m_i).
+        # form is fixed once this arrival's partial is known. No
+        # admitted partner partial means this arrival keeps min(T, m_i),
+        # whether the partner supply is zero or pressure-refused.
         if species == monomer:
             partner_partial_pa = (p_elem_pa - p_species_pa) / 2.0
         else:
@@ -358,17 +368,24 @@ def _element_wall_capture_kg_hr(
                 "element wall budget requires both gas supplies when "
                 f"{monomer} and {dimer} partials are both positive"
             )
-        if (
-            partner_supply is None
-            or not math.isfinite(partner_supply)
-            or partner_supply <= 0.0
-        ):
-            # Pure arrival, or the partner partial is carried by this
-            # inventory. min(T, m_i) is the one budget.
+        # Admitted co-arrival only. A missing partial is this partner's
+        # own pressure refusal when its mass was still published.
+        # eta = T / (m_admitted + m_refused) would spend that refused
+        # kilogram: equal 1 kg/h supplies and T = 0.1 kg/h deposit
+        # 0.05 on the admitted species and nothing on the refused one.
+        # The admitted budget is min(T, m_i), same as a pure arrival.
+        partner_admitted = (
+            partner_partial_pa > 0.0
+            and partner_supply is not None
+            and math.isfinite(partner_supply)
+            and partner_supply > 0.0
+        )
+        if not partner_admitted:
             return min(rate_kg_hr, transport_kg_hr)
-        # Both supplies are positive. eta = min(1, T / (m_M + m_M2)).
-        # Homonuclear M_M2 = 2 M_M, so the kilogram supplies are the
-        # element supply. The two debits sum to min(T, m_M + m_M2).
+        # Both partials and both supplies are admitted.
+        # eta = min(1, T / (m_M + m_M2)). Homonuclear M_M2 = 2 M_M,
+        # so the kilogram supplies are the element supply. The two
+        # debits sum to min(T, m_M + m_M2).
         element_supply_kg_hr = rate_kg_hr + partner_supply
         eta = min(1.0, transport_kg_hr / element_supply_kg_hr)
         return rate_kg_hr * eta
@@ -541,7 +558,10 @@ def wall_deposit_candidate_for_surface_kg(
         # One element criterion for a monomer arrival and a dimer arrival.
         # The flowing partial stays on the gas molecule. The saturation
         # comparison uses the chokepoint's re-speciated p_M. A missing
-        # partner key is zero coexistence, not a missing-pressure refusal.
+        # partner key is zero for that partial. It does not refuse this
+        # arrival. A positive partner mass with no partial is that
+        # partner's pressure refusal, and the capture helper below
+        # excludes that mass from the element budget.
         P_compare_pa = P_local_pa
         saturation_flag = None
         if P_local_pa is not None:

@@ -3328,10 +3328,11 @@ class CondensationModel:
                     inlet_rates, {segment.name: flowing_rates},
                 )[segment.name]
                 self.wall_species_partial_pressures_pa_by_segment[segment.name] = partials
-                # One element budget for this wall. Both arrivals read
-                # these inlet supplies and split min((J_M + 2 J_M2)*A,
-                # m_M + m_M2). Debiting happens after the loop, so neither
-                # call sees the other's removal.
+                # Inlet masses for this wall. Debiting happens after the
+                # loop, so neither call sees the other's removal.
+                # Admission is the partial, not this map: the capture
+                # helper drops a partner whose partial was refused, and
+                # that kilogram is not in the element budget.
                 self._wall_element_supply_kg_hr = {
                     name: float(flowing_rates.get(name, 0.0))
                     for name in stage_route_by_species
