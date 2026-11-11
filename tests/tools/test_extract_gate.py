@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import copy
 import json
 import shutil
 import subprocess
 import sys
 from contextlib import nullcontext
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -34,7 +36,17 @@ def _document() -> dict:
                 "value": 0.24,
                 "note": "fixture fidelity sample",
                 "locator": {"page": 2, "pdf_page_index": 1, "table": "1"},
-            }
+                "reviewed_by": "pytest fixture reviewer",
+                "reviewed_on": "2026-11-10",
+            },
+            {
+                "path": "species.Fe.observations[fe_alpha_1].T_range_K",
+                "value": [1700.0, 1800.0],
+                "note": "fixture temperature-range pin",
+                "locator": {"page": 2, "pdf_page_index": 1, "table": "1"},
+                "reviewed_by": "pytest fixture reviewer",
+                "reviewed_on": "2026-11-10",
+            },
         ],
         "species": {
             "Fe": {
@@ -56,6 +68,66 @@ def _document() -> dict:
     }
 
 
+def _cited_tokens(value: object) -> list[str]:
+    """Spell a pinned scalar the way certification searches the opened text.
+
+    Floats keep a decimal or exponent. ``format(1.0, ".16g")`` is ``1``, and
+    that token must not stand in for 1.0.
+    """
+    if isinstance(value, bool):
+        return ["true" if value else "false"]
+    if isinstance(value, int):
+        return [str(value)]
+    if isinstance(value, float):
+        return [str(value)]
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        tokens: list[str] = []
+        for child in value.values():
+            tokens.extend(_cited_tokens(child))
+        return tokens
+    if isinstance(value, (list, tuple)):
+        tokens = []
+        for child in value:
+            tokens.extend(_cited_tokens(child))
+        return tokens
+    return []
+
+
+def _open_attested_samples(root: Path, doc: dict) -> None:
+    """Point attestation-complete page locators at a text file under ``root``.
+
+    The gate certifies every extract. A page number is not an open. Tests that
+    are about another check keep reviewer and date, so the cited file has to
+    contain the pinned value or the gate refuses before that check runs.
+    Samples that already name a file, or that lack a reviewer, are left alone.
+    """
+    tokens: list[str] = []
+    for sample in doc.get("fidelity_samples") or []:
+        if not isinstance(sample, dict):
+            continue
+        reviewer = sample.get("reviewed_by")
+        if not isinstance(reviewer, str) or not reviewer.strip():
+            continue
+        locator = sample.get("locator")
+        if not isinstance(locator, dict):
+            continue
+        if any(
+            isinstance(locator.get(key), str) and str(locator.get(key)).strip()
+            for key in ("source_path", "quotes_path", "record")
+        ):
+            continue
+        value = sample["value"] if "value" in sample else sample.get("draft_value")
+        tokens.extend(_cited_tokens(value))
+        locator["source_path"] = "text/paper.txt"
+        locator["line_range"] = "1-1"
+    if tokens:
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text(" ".join(tokens) + "\n", encoding="utf-8")
+
+
 def _run_gate(
     tmp_path: Path,
     doc: dict,
@@ -63,6 +135,7 @@ def _run_gate(
     raw: str | None = None,
     corpus: Path | None = None,
 ):
+    _open_attested_samples(tmp_path, doc)
     path = tmp_path / "fixture-source.yaml"
     raw = raw if raw is not None else yaml.safe_dump(doc, sort_keys=False)
     path.write_text(raw, encoding="utf-8")
@@ -72,8 +145,13 @@ def _run_gate(
         path=path,
         expected_source_id=path.stem,
         pre_policy_ids=set(),
+        artifact_root=tmp_path,
     )
-    errors.extend(validator.check_all_fidelity_samples_match(parsed, label=path.stem))
+    errors.extend(
+        validator.certify_extract_source_fidelity(
+            parsed, label=path.stem, artifact_root=tmp_path
+        )
+    )
     return evaluate_extract(
         path,
         parsed,
@@ -97,6 +175,72 @@ def test_isolated_migration_reports_kinds_and_refusals(tmp_path: Path, monkeypat
     monkeypatch.setattr(gate, "_migrate_one", lambda *_args: ["forced refusal"])
     report = _run_gate(tmp_path, _document())
     assert next(item for item in report.findings if item.check == "isolated-migration").severity == "HARD"
+
+
+def test_fidelity_gate_requires_sample_coverage_for_every_observation(tmp_path: Path):
+    doc = _document()
+    doc["species"]["Fe"]["observations"].append(
+        {
+            "observation_id": "fe_alpha_2",
+            "type": "alpha",
+            "locator": {"table": "1", "page": 2, "pdf_page_index": 1},
+            "units": "dimensionless",
+            "values": {"alpha": 0.31},
+        }
+    )
+
+    report = _run_gate(tmp_path, doc)
+
+    assert report.hard_failed
+    assert any(
+        "fidelity sample coverage missing" in finding.detail
+        for finding in report.findings
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("reviewed_by", None),
+        ("reviewed_on", None),
+        ("reviewed_on", "2026-02-30"),
+        ("locator", None),
+    ],
+)
+def test_fidelity_gate_requires_per_sample_reviewer_attestation(
+    tmp_path: Path, field: str, value: str | None
+):
+    doc = _document()
+    if field == "reviewed_by":
+        # A copied value can match the extract exactly and still lack source evidence.
+        doc["fidelity_samples"][0]["value"] = 0.9
+        doc["species"]["Fe"]["observations"][0]["values"]["alpha"] = 0.9
+    if value is None:
+        del doc["fidelity_samples"][0][field]
+    else:
+        doc["fidelity_samples"][0][field] = value
+
+    report = _run_gate(tmp_path, doc)
+
+    assert report.hard_failed
+    assert any(field in finding.detail for finding in report.findings)
+
+
+def test_fidelity_gate_rejects_auto_migrated_sample_even_with_reviewer_fields(
+    tmp_path: Path,
+):
+    doc = _document()
+    doc["fidelity_samples"][0]["note"] = (
+        "auto fidelity sample from first observation payload (pilot migration)"
+    )
+
+    report = _run_gate(tmp_path, doc)
+
+    assert report.hard_failed
+    assert any(
+        "auto-migrated pilot sample cannot be source-attested" in finding.detail
+        for finding in report.findings
+    )
 
 
 def test_kress_pdf_lineage_resolves_in_stub_index_gate(monkeypatch):
@@ -718,10 +862,14 @@ def test_mixed_series_transition_compositions_are_checked_per_point(
         ],
     }
     doc["species"] = {"FeO": {"observations": [row]}}
+    row.pop("T_range_K", None)
+    doc["fidelity_samples"] = [doc["fidelity_samples"][0]]
+    # The whole values payload: one temperature does not cover the other
+    # measured numbers in the points.
     doc["fidelity_samples"][0]["path"] = (
-        "species.FeO.observations[mixed_transition_series].values.points[0].T_K"
+        "species.FeO.observations[mixed_transition_series].values"
     )
-    doc["fidelity_samples"][0]["value"] = 1800
+    doc["fidelity_samples"][0]["value"] = copy.deepcopy(row["values"])
 
     report = _run_gate(tmp_path, doc)
 
@@ -753,10 +901,14 @@ def test_inherited_transition_composition_applies_to_unmarked_points(
         ],
     }
     doc["species"] = {"FeO": {"observations": [row]}}
+    row.pop("T_range_K", None)
+    doc["fidelity_samples"] = [doc["fidelity_samples"][0]]
+    # The whole values payload: one temperature does not cover the composition
+    # numbers or the other point.
     doc["fidelity_samples"][0]["path"] = (
-        "species.FeO.observations[inherited_transition_series].values.points[0].T_K"
+        "species.FeO.observations[inherited_transition_series].values"
     )
-    doc["fidelity_samples"][0]["value"] = 1800
+    doc["fidelity_samples"][0]["value"] = copy.deepcopy(row["values"])
 
     report = _run_gate(tmp_path, doc)
 
@@ -1004,25 +1156,58 @@ def test_cli_audits_extract_with_explicit_tree(tmp_path: Path, capsys):
             },
         }
     )
+    # Pin the whole values payload. A single T_K does not cover the
+    # composition numbers. The opened note is written for this call and
+    # removed before the function returns; the validator source is not it.
+    observation["values"]["T_K"] = 1966
+    pinned = copy.deepcopy(observation["values"])
+    artifact_rel = "docs/references/cli-audit-equilibrium-fixture.txt"
+    artifact = REPO_ROOT / artifact_rel
     doc["fidelity_samples"][0].update(
         {
-            "path": "species.Fe.observations[fe_alpha_1].values.quantity",
-            "value": "equilibrium_phase_composition",
+            "path": "species.Fe.observations[fe_alpha_1].values",
+            "value": pinned,
+            "locator": {"source_path": artifact_rel, "page": 1, "table": "1"},
         }
     )
-    path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
-
-    status = extract_gate.main(
-        [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
+    doc["fidelity_samples"][1]["locator"] = {
+        "source_path": artifact_rel,
+        "page": 1,
+        "table": "1",
+    }
+    point = observation["point_conditions"]["temperature_K"]["state"]["value"]
+    doc["fidelity_samples"].append(
+        {
+            "path": (
+                "species.Fe.observations[fe_alpha_1]"
+                ".point_conditions.temperature_K.state.value"
+            ),
+            "value": point,
+            "reviewed_by": "pytest fixture reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": {"source_path": artifact_rel, "page": 1, "table": "1"},
+        }
     )
+    tokens = _cited_tokens(pinned)
+    for sample in doc["fidelity_samples"][1:]:
+        tokens.extend(_cited_tokens(sample["value"]))
+    artifact.write_text(" ".join(tokens) + "\n", encoding="utf-8")
+    try:
+        path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
 
-    output = capsys.readouterr().out
-    assert status == 0, output
-    assert f"TREE {REPO_ROOT} HEAD " in output
-    assert "MIGRATION observations by ValueKind:" in output
-    assert "HARD schema/fidelity:" not in output
-    assert "HARD isolated-migration:" not in output
-    assert "unsupported quantity" not in output
+        status = extract_gate.main(
+            [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
+        )
+
+        output = capsys.readouterr().out
+        assert status == 0, output
+        assert f"TREE {REPO_ROOT} HEAD " in output
+        assert "MIGRATION observations by ValueKind:" in output
+        assert "HARD schema/fidelity:" not in output
+        assert "HARD isolated-migration:" not in output
+        assert "unsupported quantity" not in output
+    finally:
+        artifact.unlink(missing_ok=True)
 
     doc = _document()
     doc["extraction"]["date"] = "2026-10-18"
@@ -1048,11 +1233,14 @@ def test_cli_audits_changed_extracts(tmp_path: Path, monkeypatch, capsys):
     repo = tmp_path / "repo"
     extracts = repo / "data/literature/extracts"
     extracts.mkdir(parents=True)
+    doc = _document()
+    _open_attested_samples(repo, doc)
     (extracts / "fixture-source.yaml").write_text(
-        yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8"
+        yaml.safe_dump(doc, sort_keys=False), encoding="utf-8"
     )
     (extracts / "_policy.yaml").write_text("ignored: true\n", encoding="utf-8")
     monkeypatch.setattr(extract_gate, "REPO_ROOT", REPO_ROOT)
+    monkeypatch.setattr(validator, "ROOT", repo)
     monkeypatch.setattr(
         extract_gate,
         "_tree_head",
@@ -1092,10 +1280,13 @@ def test_cli_audits_extract_by_source_id(tmp_path: Path, monkeypatch, capsys):
     repo = tmp_path / "repo"
     extracts = repo / "data/literature/extracts"
     extracts.mkdir(parents=True)
+    doc = _document()
+    _open_attested_samples(repo, doc)
     (extracts / "fixture-source.yaml").write_text(
-        yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8"
+        yaml.safe_dump(doc, sort_keys=False), encoding="utf-8"
     )
     monkeypatch.setattr(extract_gate, "REPO_ROOT", REPO_ROOT)
+    monkeypatch.setattr(validator, "ROOT", repo)
     monkeypatch.setattr(extract_gate, "_tree_head", lambda _path: (repo, "test-head"))
     monkeypatch.setattr(
         extract_gate,
@@ -1234,6 +1425,35 @@ def test_internal_gate_attribute_error_is_not_a_tree_import_error(
             [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
         )
     assert "HARD tree-import:" not in capsys.readouterr().out
+
+
+def test_tree_without_attestation_helper_uses_legacy_fidelity_check(
+    tmp_path: Path, monkeypatch, capsys
+):
+    path = tmp_path / "fixture-source.yaml"
+    path.write_text(yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8")
+    checked: list[str] = []
+    old_validator = SimpleNamespace(
+        pre_policy_source_ids=lambda: set(),
+        validate_extract_document=lambda *_args, **_kwargs: [],
+        check_all_fidelity_samples_match=lambda _doc, *, label: checked.append(label)
+        or [],
+    )
+    monkeypatch.setattr(
+        extract_gate,
+        "_tree_modules",
+        lambda _tree: nullcontext(
+            (gate, old_validator, yaml_cache, yaml_cache.yaml_mapping_source_issues)
+        ),
+    )
+
+    status = extract_gate.main(
+        [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
+    )
+
+    output = capsys.readouterr().out
+    assert status == 0, output
+    assert checked == ["fixture-source"]
 
 
 def test_tree_import_refuses_missing_migrator_without_fallback(tmp_path: Path, capsys):
