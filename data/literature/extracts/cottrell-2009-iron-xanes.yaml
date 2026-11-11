@@ -430,7 +430,7 @@ conditions_source_locators:
     note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   568_temperature: &568_temperature_locator
     page: 2
-    published_page: '169'
+    published_page: '168'
     section: '2.2 High temperature experiments'
     note: VG568 chip held at 1550 °C for 72 h.
   rhyolite_conditions: &rhyolite_conditions_locator
@@ -1833,7 +1833,7 @@ species:
         type: concentration_series
         locator:
           page: 3
-          published_page: '170'
+          published_page: '169'
           section: '3.1 Mössbauer spectroscopy'
           note: Mössbauer measurements for VG568_2, DT_46, and DT_39.
         phase: quenched silicate glass
@@ -1849,7 +1849,7 @@ species:
               value: not_printed
             locator:
               page: 3
-              published_page: '170'
+              published_page: '169'
               section: '3.1 Mössbauer spectroscopy'
               note: Fitted spectrum areas are not tabulated as numeric cells.
         values:
@@ -2360,7 +2360,7 @@ species:
             average_1sigma_Fe3_sumFe_times_100_as_published: '1.89'
             equation_as_published: 'Fe3+/SumFe = a + b(x − μ) + c(x − μ)^2'
         derived_from:
-          - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
+          - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=29ea154dd367
           - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:0
           - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:1
           - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
@@ -2370,7 +2370,7 @@ species:
         derivation:
           relation: Weighted least-squares second-order fit of the seven Table 2 rhyolite glasses; y is footnote-f wet chemistry for the six Moore glasses and the Mössbauer Fe3_over_FeT value for 568_2.
           inputs:
-            - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
+            - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=29ea154dd367
             - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:0
             - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:1
             - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
