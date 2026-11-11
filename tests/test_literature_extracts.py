@@ -12,14 +12,19 @@ t-510 fidelity gate:
 from __future__ import annotations
 
 import copy
+import csv
 import hashlib
+import io
 import importlib.util
+import inspect
+import itertools
 import json
 import math
 import os
+import re
 import sys
 from collections import Counter
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 from pathlib import Path
 
 import pytest
@@ -2441,6 +2446,137 @@ def test_structured_fidelity_sample_accepted():
     assert errs == []
     match_errs = vle.check_all_fidelity_samples_match(doc, label="fixture")
     assert match_errs == []
+
+
+def test_fresh_unattested_extract_warns_and_refuses_certification():
+    """A new unattested extract warns at the chokepoint and cannot be certified.
+
+    Schema validation still accepts the document. Certification refuses while
+    an observation is uncovered, a sample lacks reviewer/date/locator, or a
+    sample is an auto-migrated pilot pin. This fails at green, which has
+    neither the typed warnings nor a certification refusal.
+    """
+    doc = _minimal_extract()
+    doc["fidelity_samples"][0]["note"] = (
+        "auto fidelity sample from first observation payload (pilot migration)"
+    )
+    extra = copy.deepcopy(doc["species"]["Fe"]["observations"][0])
+    extra["observation_id"] = "fe_alpha_2"
+    extra["values"] = {"alpha": 0.31}
+    doc["species"]["Fe"]["observations"].append(extra)
+
+    collected: list = []
+    errors = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        fidelity_warnings=collected,
+    )
+    assert errors == [], errors
+    warnings = collected
+    assert warnings == vle.fidelity_source_warnings(doc)
+    by_kind = {warning.kind: warning for warning in warnings}
+    assert set(by_kind) == {
+        "uncovered_observation",
+        "unattested_sample",
+        "auto_migrated_pilot_pin",
+    }
+    # The pilot pin covers values.alpha only. The fixture T_range_K is a
+    # second measured leaf, so the pinned row is uncovered too.
+    assert by_kind["uncovered_observation"].count == 2
+    assert by_kind["unattested_sample"].count == 1
+    assert by_kind["auto_migrated_pilot_pin"].count == 1
+    rendered = " ".join(warning.render() for warning in warnings)
+    assert "uncovered_observation count=2" in rendered
+    assert "reviewed_by is required for source attestation" in rendered
+    assert "auto-migrated pilot sample cannot be source-attested" in rendered
+    refusals = vle.certify_extract_source_fidelity(doc, warnings=warnings)
+    assert refusals
+    assert all("source certification refused" in line for line in refusals)
+    assert any("uncovered_observation" in line for line in refusals)
+    assert any("unattested_sample" in line for line in refusals)
+    assert any("auto_migrated_pilot_pin" in line for line in refusals)
+
+
+def test_corpus_fidelity_gate_rejects_copied_unattested_values():
+    """A pin copied into the extract cannot attest itself through the corpus gate."""
+    doc = _minimal_extract()
+    doc["fidelity_samples"][0]["value"] = 0.9
+    doc["species"]["Fe"]["observations"][0]["values"]["alpha"] = 0.9
+
+    errors = vle._check_fidelity_gate(doc, label="copied-pin")
+
+    assert any("reviewed_by is required" in error for error in errors), errors
+
+
+def test_numeric_index_path_does_not_cover_a_scored_observation():
+    """``observations[0]`` is a position. Reordering would retarget the pin."""
+    doc = _minimal_extract()
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[0].values.alpha",
+            "value": 0.24,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": {"page": 2, "table": "1"},
+        }
+    ]
+    errors = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert errors == [], errors
+    warnings = vle.fidelity_source_warnings(doc, label="index-pin")
+    by_kind = {warning.kind: warning.count for warning in warnings}
+    assert by_kind.get("uncovered_observation") == 1
+    assert "unattested_sample" not in by_kind
+    assert "auto_migrated_pilot_pin" not in by_kind
+    refusals = vle.certify_extract_source_fidelity(doc, label="index-pin")
+    assert any("uncovered_observation" in line for line in refusals)
+
+
+def test_attested_page_locator_without_an_opened_artifact_does_not_certify():
+    """Reviewer, date, and a page locator do not open the source.
+
+    The payload pin still covers drift. Certification refuses because the
+    locator was never opened. A draft stays schema-valid and warns;
+    ``review_status: reviewed`` does not.
+    """
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    sample = doc["fidelity_samples"][0]
+    sample["reviewed_by"] = "independent reviewer"
+    sample["reviewed_on"] = "2026-11-10"
+    warnings = vle.fidelity_source_warnings(doc, label="attested")
+    by_kind = {warning.kind: warning.count for warning in warnings}
+    assert by_kind.get("source_blind_pin") == 1
+    assert "uncovered_observation" not in by_kind
+    assert "unattested_sample" not in by_kind
+    refusals = vle.certify_extract_source_fidelity(doc, label="attested")
+    assert any("source_blind_pin" in line for line in refusals)
+    draft_errors = vle.validate_extract_document(
+        doc, expected_source_id="fixture-source"
+    )
+    assert draft_errors == [], draft_errors
+    doc["review_status"] = "reviewed"
+    reviewed_errors = vle.validate_extract_document(
+        doc, expected_source_id="fixture-source"
+    )
+    assert any("source_blind_pin" in line for line in reviewed_errors)
+
+
+def test_corpus_fidelity_gate_rejects_observation_id_as_evidence():
+    """Pinning observation metadata does not cover its numeric evidence."""
+    doc = _minimal_extract()
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].observation_id",
+            "value": "fe_alpha_1",
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": {"page": 2, "table": "1"},
+        }
+    ]
+
+    errors = vle._check_fidelity_gate(doc, label="metadata-pin")
+
+    assert any("fidelity sample coverage missing" in error for error in errors), errors
 
 
 def test_structured_sample_requires_locator():
@@ -4967,15 +5103,4441 @@ def _extract_paths_with_samples() -> list[Path]:
     ids=lambda p: p.stem,
 )
 def test_fidelity_sample_matches_extract(extract_path: Path):
-    """Every fidelity sample still matches extract content (extraction-drift fuse).
+    """Corpus pins still match the stored extract (drift fuse).
 
-    Null-hypothesis: a silent rewrite of a pinned field (bad regeneration,
-    migrator regression) leaves samples stale while the file stays
-    schema-valid — this test must go RED.
+    Source-fidelity holes are not a per-file failure. The shrink-only counts
+    live in ``test_fidelity_source_warning_ratchet``.
     """
     doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
-    errs = vle.check_all_fidelity_samples_match(doc, label=extract_path.stem)
-    assert errs == [], "\n".join(errs)
+    match_errors = vle.check_all_fidelity_samples_match(
+        doc, label=extract_path.stem
+    )
+    assert match_errors == [], "\n".join(match_errors)
+
+
+# Measured on this corpus. Six ``observations[<integer>]`` pins are positions
+# and do not cover; counting them would report 46,335 observations in 524
+# extracts. Equipment pins also do not cover a measured payload
+# (46,341 -> 46,343 observations, still 525 extracts). A values pin covers an
+# observation only when the pins together contain every measured number.
+# Descriptive labels, printed numeric strings, and partial numeric pins that
+# used to clear coverage are now uncovered: 46,343 -> 48,603 observations and
+# 525 -> 611 extracts. Scored numeric conditions beside ``values``
+# (T_range_K, T_K, T_C, temperature_C, temp_C, point_conditions, with
+# condition locators excluded) then uncover rows whose values were fully
+# pinned: 48,603 -> 48,631 observations and 611 -> 616 extracts.
+# Unattested samples, pilot pins, and source-blind pins did not move.
+# Leading-decimal strings such as ".19" are measured leaves. Remeasured
+# on this corpus they sit in observations that were already uncovered, so
+# these ceilings did not move.
+# Every string that contains a digit [0-9] is a measured leaf, including
+# printed measurements the numeric grammar does not read. Remeasured on
+# this corpus: 48,631 -> 48,661 observations. The 30 newly uncovered
+# observations are in 13 extracts that were already uncovered, so the
+# extract ceiling did not move and no extract changed certify pass/fail.
+# None of those extracts were review_status reviewed. The ids are
+# barin-1995, filiberto-lpsc2011-2064-volatiles,
+# hertl-1967-solid-sio-disproportionation-vaporization,
+# kems-012-sossi-2019, kems-137-bischof-2023, metsoc-2024-6224,
+# nazarov-2015-dhofar-silicides,
+# richet-bottinga-1986-silicate-thermochemistry,
+# schumm-1981-alkali-aluminosilicate-thermochemical-tables,
+# sossi-2020-cu-zn-isotope-evap-formalism,
+# sugawara-akaogi-2004-liquid-calorimetry,
+# woermann-1969-mg-fe-ti-oxides, and
+# wright-okamura-1977-makaopuhi-cooling.
+# A complete-token boundary (spaced units, grouped numbers, micro and
+# degree signs) does not move these ceilings. No sample has reviewed_by,
+# so the source matcher does not run, and no extract is review_status
+# reviewed. ivtan-mno-coo-thermo and sf04-magma-companion-workbook were
+# already draft. Certification-state changes from this boundary: 0.
+# A sentence period is not an extending character. No sample has
+# reviewed_by, so the source matcher still does not run, and this does
+# not move the ceilings or any extract's certification state.
+# Whole-cell table matching parses the complete CSV or TSV before the
+# locator and refuses a substring inside a cell. No sample has reviewed_by
+# and no extract is review_status reviewed, so the source matcher still
+# does not run. Ceilings do not move. Certification-state changes from
+# this rule: 0. ivtan-mno-coo-thermo and sf04-magma-companion-workbook
+# stay draft from the earlier demotion.
+# Numeric table cells compare with decimal.Decimal, not float. ``1e-999``
+# is not 0 and ``9007199254740993`` is not ``9007199254740992``. No sample
+# has reviewed_by and no extract is review_status reviewed, so the source
+# matcher still does not run. Ceilings do not move. Certification-state
+# changes from this comparison: 0.
+# Each ceiling may only fall.
+_UNCOVERED_OBSERVATIONS_CEILING = 48661
+_UNCOVERED_EXTRACTS_CEILING = 616
+_UNATTESTED_SAMPLES_CEILING = 3128
+_PILOT_PIN_EXTRACTS_CEILING = 57
+# The warning count, not the number of extracts that have at least one.
+# A second pilot pin inside an already-affected extract must still fail.
+_PILOT_PINS_CEILING = 57
+# Attestation-complete pins whose locator is not opened. Zero on this corpus:
+# no sample carries reviewed_by. The ceiling may only fall.
+_SOURCE_BLIND_PINS_CEILING = 0
+# Scored observation ids that name more than one row. Zero on this corpus:
+# schema validation already rejects duplicates. The ceiling cannot rise.
+_AMBIGUOUS_OBSERVATION_IDS_CEILING = 0
+# Scored rows whose observation_id is not a non-empty string. Zero on this
+# corpus: schema validation already rejects them. The ceiling cannot rise.
+# Counting them here is what stops certification from omitting them when
+# schema validation is skipped.
+_MISSING_OBSERVATION_IDS_CEILING = 0
+# Non-finite measured values (NaN, +Inf, -Inf) refuse certification.
+# Scored evidence in this corpus has none, and no extract is
+# review_status reviewed. Certification-state changes from this refusal: 0.
+# The ceiling may only fall.
+_NON_FINITE_EVIDENCE_CEILING = 0
+
+
+def test_fidelity_source_warning_ratchet():
+    """Source-fidelity holes are an upper bound, not a green bill of health.
+
+    ``auto_migrated_pilot_pin`` is the number of pilot samples. Counting
+    affected extracts alone would miss another pilot pin in an extract that
+    already has one.
+    """
+    uncovered_obs = 0
+    uncovered_extracts = 0
+    unattested_samples = 0
+    pilot_extracts = 0
+    pilot_pins = 0
+    source_blind_pins = 0
+    ambiguous_ids = 0
+    missing_ids = 0
+    non_finite = 0
+    for path in vle.discover_extracts():
+        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+        if not isinstance(doc, dict):
+            continue
+        if doc.get("schema_version") != vle.SCHEMA_VERSION:
+            continue
+        warnings = vle.fidelity_source_warnings(doc, label=path.stem)
+        by_kind = {warning.kind: warning.count for warning in warnings}
+        uncovered = by_kind.get("uncovered_observation", 0)
+        if uncovered:
+            uncovered_extracts += 1
+            uncovered_obs += uncovered
+        unattested_samples += by_kind.get("unattested_sample", 0)
+        source_blind_pins += by_kind.get("source_blind_pin", 0)
+        ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
+        missing_ids += by_kind.get("missing_observation_id", 0)
+        non_finite += by_kind.get("non_finite_evidence", 0)
+        pilot = by_kind.get("auto_migrated_pilot_pin", 0)
+        pilot_pins += pilot
+        if pilot:
+            pilot_extracts += 1
+    assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
+    assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
+    assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, unattested_samples
+    assert pilot_pins <= _PILOT_PINS_CEILING, pilot_pins
+    assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
+    assert source_blind_pins <= _SOURCE_BLIND_PINS_CEILING, source_blind_pins
+    assert ambiguous_ids <= _AMBIGUOUS_OBSERVATION_IDS_CEILING, ambiguous_ids
+    assert missing_ids <= _MISSING_OBSERVATION_IDS_CEILING, missing_ids
+    assert non_finite <= _NON_FINITE_EVIDENCE_CEILING, non_finite
+
+
+def test_auto_migrated_pilot_pin_counts_each_sample():
+    """Two pilot notes in one extract are two violations, not one extract."""
+    doc = _minimal_extract()
+    note = "auto fidelity sample from first observation payload (pilot migration)"
+    doc["fidelity_samples"][0]["note"] = note
+    doc["fidelity_samples"].append(copy.deepcopy(doc["fidelity_samples"][0]))
+    warnings = vle.fidelity_source_warnings(doc, label="two-pilots")
+    pilot = next(warning for warning in warnings if warning.kind == "auto_migrated_pilot_pin")
+    assert pilot.count == 2
+
+
+def _strip_scored_conditions(doc: dict) -> None:
+    """Remove scored conditions so a values-only fixture stays values-only."""
+    species = doc.get("species") or {}
+    for block in species.values():
+        if not isinstance(block, dict):
+            continue
+        for row in block.get("observations") or []:
+            if not isinstance(row, dict):
+                continue
+            for key in vle._SCORED_NUMERIC_CONDITIONS:
+                row.pop(key, None)
+
+
+def _opened_payload_document(root: Path, *, structured: bool) -> dict:
+    """One scored observation whose pin is in an opened text artifact."""
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text(
+        "line 1\nline 2\nline 3\nline 4\nalpha 0.24 measured\n",
+        encoding="utf-8",
+    )
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["review_status"] = "reviewed"
+    locator = {"source_path": "text/paper.txt", "line_range": "5-5", "page": 2}
+    if structured:
+        doc["fidelity_samples"] = [
+            {
+                "species": "Fe",
+                "observable": "alpha",
+                "observation_id": "fe_alpha_1",
+                "field": "alpha",
+                "value": 0.24,
+                "reviewed_by": "independent reviewer",
+                "reviewed_on": "2026-11-10",
+                "locator": locator,
+            }
+        ]
+    else:
+        sample = doc["fidelity_samples"][0]
+        sample["reviewed_by"] = "independent reviewer"
+        sample["reviewed_on"] = "2026-11-10"
+        sample["locator"] = locator
+    return doc
+
+
+def _source_locator(root: Path, text: str) -> dict:
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text(text, encoding="utf-8")
+    return {"source_path": "text/paper.txt", "page": 2}
+
+
+def _values_pin_document(
+    root: Path,
+    *,
+    values: object,
+    pins: list[tuple[str | None, object]],
+    source_text: str,
+    structured: bool,
+) -> dict:
+    """Attested pins of ``values``. ``None`` as the field pins the whole payload."""
+    locator = _source_locator(root, source_text)
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["review_status"] = "reviewed"
+    doc["species"]["Fe"]["observations"][0]["values"] = copy.deepcopy(values)
+    samples = []
+    for field, value in pins:
+        if structured:
+            sample: dict = {
+                "species": "Fe",
+                "observable": "alpha",
+                "observation_id": "fe_alpha_1",
+                "value": copy.deepcopy(value),
+                "reviewed_by": "independent reviewer",
+                "reviewed_on": "2026-11-10",
+                "locator": dict(locator),
+            }
+            if field is not None:
+                if field.startswith("["):
+                    # ``[0]`` indexes the values list. A dotted tail is a path pin.
+                    bracket, _sep, rest = field.partition("]")
+                    if rest:
+                        raise AssertionError(field)
+                    sample["index"] = int(bracket[1:])
+                else:
+                    sample["field"] = field
+        else:
+            path = "species.Fe.observations[fe_alpha_1].values"
+            if field is not None:
+                # ``[0]`` and ``[0].P_Pa`` sit on the values segment itself.
+                path = f"{path}{field}" if field.startswith("[") else f"{path}.{field}"
+            sample = {
+                "path": path,
+                "value": copy.deepcopy(value),
+                "reviewed_by": "independent reviewer",
+                "reviewed_on": "2026-11-10",
+                "locator": dict(locator),
+            }
+        samples.append(sample)
+    doc["fidelity_samples"] = samples
+    return doc
+
+
+# Literal payloads. The source text is not derived from the unchecked number.
+_MEASURED_PIN_CASES = {
+    "descriptive_quantity": {
+        "values": {"quantity": "alpha", "alpha": 0.91},
+        "pins": [("quantity", "alpha")],
+        "source_text": "alpha 0.24 measured\n",
+        "structured": False,
+    },
+    "descriptive_quantity_structured": {
+        "values": {"quantity": "alpha", "alpha": 0.91},
+        "pins": [("quantity", "alpha")],
+        "source_text": "alpha 0.24 measured\n",
+        "structured": True,
+    },
+    # Literal citation. The sibling is the string ".91", the spelling in
+    # centolanzi-1966 figure legends. The artifact names the label only.
+    "leading_decimal_label": {
+        "values": {"quantity": "alpha", "alpha": ".91"},
+        "pins": [("quantity", "alpha")],
+        "source_text": "alpha\n",
+        "structured": False,
+    },
+    "leading_decimal_label_structured": {
+        "values": {"quantity": "alpha", "alpha": ".91"},
+        "pins": [("quantity", "alpha")],
+        "source_text": "alpha\n",
+        "structured": True,
+    },
+    "partial_number": {
+        "values": {"alpha": 0.91, "beta": 0.5},
+        "pins": [("alpha", 0.91)],
+        "source_text": "alpha 0.91 measured\n",
+        "structured": False,
+    },
+    "partial_number_structured": {
+        "values": {"alpha": 0.91, "beta": 0.5},
+        "pins": [("alpha", 0.91)],
+        "source_text": "alpha 0.91 measured\n",
+        "structured": True,
+    },
+    "printed_string_beside_number": {
+        "values": {"alpha": 0.91, "printed": "0.24 mol"},
+        "pins": [("printed", "0.24 mol")],
+        "source_text": "0.24 mol\n",
+        "structured": False,
+    },
+    "series_element": {
+        "values": {"series": [0.2, 0.5]},
+        "pins": [("series[0]", 0.2)],
+        "source_text": "0.2\n",
+        "structured": False,
+    },
+    "numeric_beside_label": {
+        "values": {"quantity": "alpha", "alpha": 0.91},
+        "pins": [("alpha", 0.91)],
+        "source_text": "alpha 0.91 measured\n",
+        "structured": False,
+    },
+    "numeric_beside_label_structured": {
+        "values": {"quantity": "alpha", "alpha": 0.91},
+        "pins": [("alpha", 0.91)],
+        "source_text": "alpha 0.91 measured\n",
+        "structured": True,
+    },
+    "leading_decimal_pinned": {
+        "values": {"quantity": "alpha", "alpha": ".91"},
+        "pins": [("alpha", ".91")],
+        "source_text": "legend .91\n",
+        "structured": False,
+    },
+    "leading_decimal_pinned_structured": {
+        "values": {"quantity": "alpha", "alpha": ".91"},
+        "pins": [("alpha", ".91")],
+        "source_text": "legend .91\n",
+        "structured": True,
+    },
+    "split_two_numbers": {
+        "values": {"alpha": 0.91, "beta": 0.5},
+        "pins": [("alpha", 0.91), ("beta", 0.5)],
+        "source_text": "0.91\n0.5\n",
+        "structured": False,
+    },
+    # Literal citation. Both stored numbers are 0.24. The artifact names alpha
+    # twice and never beta. Two alpha pins must not supply beta's occurrence.
+    "duplicate_alpha_pins": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [("alpha", 0.24), ("alpha", 0.24)],
+        "source_text": "alpha 0.24 measured\nalpha 0.24 measured\n",
+        "structured": False,
+    },
+    "duplicate_alpha_pins_structured": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [("alpha", 0.24), ("alpha", 0.24)],
+        "source_text": "alpha 0.24 measured\nalpha 0.24 measured\n",
+        "structured": True,
+    },
+    "equal_siblings_split": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [("alpha", 0.24), ("beta", 0.24)],
+        "source_text": "alpha 0.24 measured\nbeta 0.24 measured\n",
+        "structured": False,
+    },
+    "equal_siblings_split_structured": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [("alpha", 0.24), ("beta", 0.24)],
+        "source_text": "alpha 0.24 measured\nbeta 0.24 measured\n",
+        "structured": True,
+    },
+    "equal_siblings_whole": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [(None, {"alpha": 0.24, "beta": 0.24})],
+        "source_text": "alpha 0.24 measured\nbeta 0.24 measured\n",
+        "structured": False,
+    },
+    "equal_siblings_whole_structured": {
+        "values": {"alpha": 0.24, "beta": 0.24},
+        "pins": [(None, {"alpha": 0.24, "beta": 0.24})],
+        "source_text": "alpha 0.24 measured\nbeta 0.24 measured\n",
+        "structured": True,
+    },
+}
+
+
+def _defect_document(pin_class: str, root: Path) -> dict:
+    """One input class. Pass classes are ``_PASS_PIN_CLASSES``."""
+    if pin_class in _MEASURED_PIN_CASES:
+        spec = _MEASURED_PIN_CASES[pin_class]
+        return _values_pin_document(root, **spec)
+    if pin_class == "structured_context":
+        # Structured selectors also read context rows. That pin must not cover
+        # the scored observation, even when the artifact contains the text.
+        doc = _opened_payload_document(root, structured=True)
+        doc["species"]["Fe"]["context"] = [
+            {
+                "observation_id": "fe_bench_note",
+                "type": "apparatus",
+                "locator": {"page": 3, "section": "experimental"},
+                "units": "as printed",
+                "values": {"furnace": "muffle"},
+            }
+        ]
+        sample = doc["fidelity_samples"][0]
+        sample["observation_id"] = "fe_bench_note"
+        sample["observable"] = "apparatus"
+        sample["field"] = "furnace"
+        sample["value"] = "muffle"
+        sample["locator"] = {"source_path": "text/paper.txt", "page": 3}
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("muffle\n", encoding="utf-8")
+        return doc
+    doc = _opened_payload_document(root, structured=pin_class == "structured_payload")
+    sample = doc["fidelity_samples"][0]
+    if pin_class in ("opened_payload", "structured_payload"):
+        return doc
+    if pin_class == "equipment_pin":
+        doc["species"]["Fe"]["observations"][0]["equipment"] = {
+            "sample_mass_g": {"value": 0.24, "locator": {"page": 1}}
+        }
+        sample["path"] = (
+            "species.Fe.observations[fe_alpha_1].equipment.sample_mass_g.value"
+        )
+        sample["value"] = 0.24
+        return doc
+    if pin_class == "metadata_id":
+        sample["path"] = "species.Fe.observations[fe_alpha_1].observation_id"
+        sample["value"] = "fe_alpha_1"
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("fe_alpha_1\n", encoding="utf-8")
+        sample["locator"] = {"source_path": "text/paper.txt", "page": 2}
+        return doc
+    if pin_class == "numeric_index":
+        sample["path"] = "species.Fe.observations[0].values.alpha"
+        return doc
+    if pin_class == "second_observation":
+        extra = copy.deepcopy(doc["species"]["Fe"]["observations"][0])
+        extra["observation_id"] = "fe_alpha_2"
+        extra["values"] = {"alpha": 0.31}
+        doc["species"]["Fe"]["observations"].append(extra)
+        return doc
+    if pin_class == "pilot_note":
+        sample["note"] = (
+            "auto fidelity sample from first observation payload (pilot migration)"
+        )
+        return doc
+    if pin_class == "missing_reviewer":
+        del sample["reviewed_by"]
+        return doc
+    if pin_class == "missing_date":
+        del sample["reviewed_on"]
+        return doc
+    if pin_class == "missing_locator":
+        del sample["locator"]
+        sample["note"] = "locatable only by note"
+        return doc
+    if pin_class == "prose_locator":
+        sample["locator"] = {"page": 2, "table": "1"}
+        return doc
+    if pin_class == "artifact_missing":
+        sample["locator"] = {"source_path": "missing.txt", "page": 2}
+        return doc
+    if pin_class == "value_absent":
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("line 1\nno numeric payload here\n", encoding="utf-8")
+        sample["locator"] = {"source_path": "text/paper.txt", "page": 2}
+        return doc
+    if pin_class == "pdf_artifact":
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_bytes(b"%PDF-1.4\nnot text\n")
+        return doc
+    if pin_class == "path_escape":
+        sample["locator"] = {"source_path": "../paper.txt", "page": 2}
+        return doc
+    if pin_class == "copied_value":
+        sample["value"] = 0.91
+        doc["species"]["Fe"]["observations"][0]["values"]["alpha"] = 0.91
+        return doc
+    if pin_class == "context_pin":
+        doc["species"]["Fe"]["context"] = [
+            {
+                "observation_id": "fe_bench_note",
+                "type": "apparatus",
+                "locator": {"page": 3, "section": "experimental"},
+                "units": "as printed",
+                "values": {"furnace": "muffle"},
+            }
+        ]
+        sample["path"] = "species.Fe.context[fe_bench_note].values.furnace"
+        sample["value"] = "muffle"
+        artifact = root / "text" / "paper.txt"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("muffle\n", encoding="utf-8")
+        sample["locator"] = {"source_path": "text/paper.txt", "page": 3}
+        return doc
+    raise AssertionError(pin_class)
+
+
+_PASS_PIN_CLASSES = (
+    "opened_payload",
+    "structured_payload",
+    "numeric_beside_label",
+    "numeric_beside_label_structured",
+    "split_two_numbers",
+    "equal_siblings_split",
+    "equal_siblings_split_structured",
+    "equal_siblings_whole",
+    "equal_siblings_whole_structured",
+    "leading_decimal_pinned",
+    "leading_decimal_pinned_structured",
+)
+_DEFECT_PIN_CLASSES = (
+    "equipment_pin",
+    "metadata_id",
+    "numeric_index",
+    "second_observation",
+    "pilot_note",
+    "missing_reviewer",
+    "missing_date",
+    "missing_locator",
+    "prose_locator",
+    "artifact_missing",
+    "value_absent",
+    "pdf_artifact",
+    "path_escape",
+    "copied_value",
+    "context_pin",
+    "structured_context",
+    "descriptive_quantity",
+    "descriptive_quantity_structured",
+    "partial_number",
+    "partial_number_structured",
+    "printed_string_beside_number",
+    "series_element",
+    "duplicate_alpha_pins",
+    "duplicate_alpha_pins_structured",
+    "leading_decimal_label",
+    "leading_decimal_label_structured",
+)
+_DEFECT_KIND = {
+    "equipment_pin": "uncovered_observation",
+    "metadata_id": "uncovered_observation",
+    "numeric_index": "uncovered_observation",
+    "second_observation": "uncovered_observation",
+    "pilot_note": "auto_migrated_pilot_pin",
+    "missing_reviewer": "unattested_sample",
+    "missing_date": "unattested_sample",
+    "missing_locator": "unattested_sample",
+    "prose_locator": "source_blind_pin",
+    "artifact_missing": "source_blind_pin",
+    "value_absent": "source_blind_pin",
+    "pdf_artifact": "source_blind_pin",
+    "path_escape": "source_blind_pin",
+    "copied_value": "source_blind_pin",
+    "context_pin": "uncovered_observation",
+    "structured_context": "uncovered_observation",
+    "descriptive_quantity": "uncovered_observation",
+    "descriptive_quantity_structured": "uncovered_observation",
+    "partial_number": "uncovered_observation",
+    "partial_number_structured": "uncovered_observation",
+    "printed_string_beside_number": "uncovered_observation",
+    "series_element": "uncovered_observation",
+    "duplicate_alpha_pins": "uncovered_observation",
+    "duplicate_alpha_pins_structured": "uncovered_observation",
+    "leading_decimal_label": "uncovered_observation",
+    "leading_decimal_label_structured": "uncovered_observation",
+}
+_PROMOTION_ENTRIES = (
+    "certify",
+    "validate",
+    "load_require_valid",
+    "load_skip_valid",
+    "graduation",
+    "index",
+)
+
+
+def _promotion_errors(entry: str, doc: dict, root: Path, monkeypatch) -> list[str]:
+    """Every promoter. Empty means the extract was accepted as reviewed."""
+    reviewed = copy.deepcopy(doc)
+    reviewed["review_status"] = "reviewed"
+    if entry == "certify":
+        return vle.certify_extract_source_fidelity(
+            reviewed, label="pin", artifact_root=root
+        )
+    if entry == "validate":
+        return vle.validate_extract_document(
+            reviewed,
+            expected_source_id=reviewed["source_id"],
+            artifact_root=root,
+        )
+    if entry in ("load_require_valid", "load_skip_valid"):
+        folder = root / entry
+        folder.mkdir()
+        (folder / "fixture-source.yaml").write_text(
+            yaml.safe_dump(reviewed), encoding="utf-8"
+        )
+        try:
+            loaded = em.load_extracts(
+                folder,
+                require_valid=entry == "load_require_valid",
+                artifact_root=root,
+            )
+        except SystemExit as exc:
+            return [str(exc)]
+        if any(item.get("review_status") == "reviewed" for item in loaded):
+            return []
+        return ["reviewed status was not propagated"]
+    if entry == "graduation":
+        extracts = root / "policy-extracts"
+        extracts.mkdir()
+        (extracts / "fixture-source.yaml").write_text(
+            yaml.safe_dump(reviewed), encoding="utf-8"
+        )
+        policy = {
+            "schema_version": "literature_extract_fidelity_policy.v1",
+            "policy": "ENFORCED_FOR_NEW",
+            "closed_set_source_ids": ["fixture-source"],
+            "active_pre_policy_source_ids": [],
+            "graduated_pre_policy_source_ids": ["fixture-source"],
+        }
+        ledger = {
+            "schema_version": "literature_extract_fidelity_graduation_ledger.v1",
+            "graduated_pre_policy_source_ids": ["fixture-source"],
+        }
+        policy_path = root / "policy.yaml"
+        ledger_path = root / "ledger.yaml"
+        policy_path.write_text(yaml.safe_dump(policy), encoding="utf-8")
+        ledger_path.write_text(yaml.safe_dump(ledger), encoding="utf-8")
+        monkeypatch.setattr(vle, "EXTRACTS_DIR", extracts)
+        _policy, errors = vle.load_fidelity_policy(
+            policy_path,
+            graduated_ledger_path=ledger_path,
+            artifact_root=root,
+        )
+        return [error for error in errors if "source certification refused" in error]
+    if entry == "index":
+        literature = root / "data" / "literature" / "extracts"
+        literature.mkdir(parents=True, exist_ok=True)
+        (literature / "fixture-source.yaml").write_text(
+            yaml.safe_dump(reviewed), encoding="utf-8"
+        )
+        spec = importlib.util.spec_from_file_location(
+            "literature_index_fidelity",
+            REPO_ROOT / "data" / "literature" / "build_index.py",
+        )
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        try:
+            loaded = module.load_extracts(root)
+        except ValueError as exc:
+            return [str(exc)]
+        status = loaded["fixture-source"]["files"][0]["review_status"]
+        if status == "reviewed":
+            return []
+        return [f"index recorded {status}"]
+    raise AssertionError(entry)
+
+
+@pytest.mark.parametrize("pin_class", _PASS_PIN_CLASSES)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_source_certification_accepts_only_an_opened_payload_pin(
+    pin_class: str, entry: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """Both addressing modes pass every promoter when the artifact contains the value."""
+    doc = _defect_document(pin_class, tmp_path)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    assert errors == [], (pin_class, entry, errors)
+
+
+@pytest.mark.parametrize("pin_class", _DEFECT_PIN_CLASSES)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_source_certification_refuses_every_unopened_or_uncovered_pin(
+    pin_class: str, entry: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """No promoter accepts a reviewed extract that misses the payload or the source."""
+    doc = _defect_document(pin_class, tmp_path)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    assert errors, (pin_class, entry)
+    if entry == "certify":
+        assert _DEFECT_KIND[pin_class] in "\n".join(errors)
+        # A caller-supplied empty warning list is not a waiver.
+        waived = vle.certify_extract_source_fidelity(
+            doc,
+            label="pin",
+            warnings=[],
+            artifact_root=tmp_path,
+        )
+        assert waived
+        assert _DEFECT_KIND[pin_class] in "\n".join(waived)
+
+
+@pytest.mark.parametrize(
+    "pin_class",
+    [name for name in _DEFECT_PIN_CLASSES if name != "metadata_id"],
+)
+def test_draft_defects_stay_schema_valid_and_warn(pin_class: str, tmp_path: Path):
+    """The committed corpus may stay schema-valid. The hole is a typed warning."""
+    doc = _defect_document(pin_class, tmp_path)
+    doc["review_status"] = "draft"
+    errors = vle.validate_extract_document(
+        doc,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert errors == [], (pin_class, errors)
+    warnings = vle.fidelity_source_warnings(
+        doc, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == _DEFECT_KIND[pin_class] for warning in warnings)
+
+
+# Every leaf class a ``values`` payload can hold. The oracle below is the
+# invariant, written separately from the gate: a measured leaf is a finite
+# int, a finite float, or a string that contains any digit [0-9], at its
+# address under ``values``. A label with no digit is not a leaf. The
+# scanner below is not the gate regex, and the expected token is the
+# spelling a case constructs. A bool and a label are not leaves. A pin
+# covers an address only when that address is the pin or a descendant of
+# it. Repeating one address does not cover a sibling that stores the same
+# number.
+_ORACLE_TOKEN_SIGNS = frozenset("+-\u00b1\u2213")
+_ORACLE_BEFORE_BLOCK = frozenset(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.+\u00b1\u2213-"
+)
+# A period is not in this set. It extends a token only when a digit
+# follows, which ``_oracle_after_blocks`` decides. Sentence punctuation
+# must not swallow the number.
+_ORACLE_AFTER_BLOCK = frozenset(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_"
+)
+
+
+def _oracle_after_blocks(text: str, end: int) -> bool:
+    """True when the character after a candidate token extends it.
+
+    Independent of the gate. A period extends only when a digit follows,
+    so ``1`` remains a token of ``the value is 1.``.
+    """
+    if end >= len(text):
+        return False
+    ch = text[end]
+    if ch == ".":
+        nxt = text[end + 1] if end + 1 < len(text) else ""
+        return len(nxt) == 1 and nxt.isdigit()
+    return ch in _ORACLE_AFTER_BLOCK
+
+
+def _oracle_fold_signs(text: str) -> str:
+    """Fold the sign catalog onto ASCII. Distinct signs stay themselves."""
+    folded = text
+    for _name, sign, kind in _CERTIFICATION_SIGNS:
+        if kind == "minus" and sign != "-":
+            folded = folded.replace(sign, "-")
+        elif kind == "plus" and sign != "+":
+            folded = folded.replace(sign, "+")
+    return folded
+
+
+def _oracle_mantissa_end(text: str, index: int) -> int | None:
+    size = len(text)
+    if index >= size:
+        return None
+    if text[index] == ".":
+        cursor = index + 1
+        if cursor >= size or not text[cursor].isdigit():
+            return None
+        cursor += 1
+        while cursor < size and text[cursor].isdigit():
+            cursor += 1
+        return cursor
+    if not text[index].isdigit():
+        return None
+    cursor = index + 1
+    while cursor < size and text[cursor].isdigit():
+        cursor += 1
+    if (
+        cursor < size
+        and text[cursor] == "."
+        and cursor + 1 < size
+        and text[cursor + 1].isdigit()
+    ):
+        cursor += 2
+        while cursor < size and text[cursor].isdigit():
+            cursor += 1
+    return cursor
+
+
+def _oracle_exponent_end(text: str, index: int) -> int | None:
+    cursor = index + 1
+    size = len(text)
+    if cursor < size and text[cursor] in _ORACLE_TOKEN_SIGNS:
+        cursor += 1
+    if cursor >= size or not text[cursor].isdigit():
+        return None
+    cursor += 1
+    while cursor < size and text[cursor].isdigit():
+        cursor += 1
+    return cursor
+
+
+def _oracle_numeric_tokens(text: str) -> list[str]:
+    """Numeric tokens in ``text``. This scanner does not call the gate."""
+    folded = _oracle_fold_signs(text)
+    tokens: list[str] = []
+    index = 0
+    size = len(folded)
+    while index < size:
+        if index > 0 and folded[index - 1] in _ORACLE_BEFORE_BLOCK:
+            index += 1
+            continue
+        start = index
+        cursor = index
+        if folded[cursor] in _ORACLE_TOKEN_SIGNS:
+            cursor += 1
+        end = _oracle_mantissa_end(folded, cursor)
+        if end is None:
+            index = start + 1
+            continue
+        if end < size and folded[end] in "eE":
+            exponent = _oracle_exponent_end(folded, end)
+            if exponent is None:
+                index = start + 1
+                continue
+            end = exponent
+        if _oracle_after_blocks(folded, end):
+            index = start + 1
+            continue
+        if end == start:
+            index = start + 1
+            continue
+        tokens.append(folded[start:end])
+        index = end
+    return tokens
+
+
+_EVIDENCE_LEAF_CATALOG = (
+    ("alpha", 0.91),
+    ("count", 3),
+    ("flag", True),
+    ("quantity", "alpha"),
+    ("printed", "0.24 mol"),
+    ("legend", ".19"),
+    ("series", [0.2, 0.5]),
+)
+_ORACLE_TEMPERATURE_KEYS = ("T_K", "T", "temperature_K", "temp_K")
+
+
+def _oracle_measured_addresses(
+    value: object, prefix: tuple[object, ...] = ()
+) -> list[tuple[object, ...]]:
+    """Independent address rule. The gate's walker is not consulted."""
+    if isinstance(value, bool):
+        return []
+    if isinstance(value, int):
+        return [prefix]
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            return []
+        return [prefix]
+    if isinstance(value, str):
+        if any(ch in "0123456789" for ch in value):
+            return [prefix]
+        return []
+    if isinstance(value, dict):
+        found: list[tuple[object, ...]] = []
+        for key, child in value.items():
+            found.extend(_oracle_measured_addresses(child, prefix + (key,)))
+        return found
+    if isinstance(value, list):
+        found = []
+        for index, child in enumerate(value):
+            found.extend(_oracle_measured_addresses(child, prefix + (index,)))
+        return found
+    return []
+
+
+def _oracle_pin_address(field: str | None, *, structured: bool) -> tuple[object, ...]:
+    """Address of one ``_values_pin_document`` field. ``None`` is the payload."""
+    if field is None:
+        return ()
+    if structured:
+        if field.startswith("["):
+            bracket, _sep, rest = field.partition("]")
+            if rest or not bracket[1:].isdigit():
+                raise AssertionError(field)
+            return (int(bracket[1:]),)
+        return (field,)
+    steps: list[object] = []
+    text = field
+    if text.startswith("["):
+        end = text.find("]")
+        inner = text[1:end]
+        if end < 0 or not inner.isdigit():
+            raise AssertionError(field)
+        steps.append(int(inner))
+        text = text[end + 1 :]
+        if text.startswith("."):
+            text = text[1:]
+        elif text:
+            raise AssertionError(field)
+        if not text:
+            return tuple(steps)
+    for segment in text.split("."):
+        bracket_at = segment.find("[")
+        if bracket_at < 0:
+            steps.append(segment)
+            continue
+        if segment.count("[") != 1 or not segment.endswith("]"):
+            raise AssertionError(segment)
+        key = segment[:bracket_at]
+        inner = segment[bracket_at + 1 : -1]
+        if not key or not inner.isdigit():
+            raise AssertionError(segment)
+        steps.append(key)
+        steps.append(int(inner))
+    return tuple(steps)
+
+
+def _oracle_addresses_cover(
+    required: list[tuple[object, ...]],
+    pins: list[tuple[str | None, object]],
+    *,
+    structured: bool,
+) -> bool:
+    """True when every required address has a pin that is it or its ancestor."""
+    if not required:
+        return True
+    covered: set[tuple[object, ...]] = set()
+    for field, _pinned in pins:
+        pin_address = _oracle_pin_address(field, structured=structured)
+        for leaf in required:
+            if leaf[: len(pin_address)] == pin_address:
+                covered.add(leaf)
+    return set(required) <= covered
+
+
+def _source_text_for(value: object) -> list[str]:
+    """Lines that contain each pinned scalar as the gate's token grammar reads it."""
+    if isinstance(value, bool):
+        return ["true" if value else "false"]
+    if isinstance(value, (int, float)):
+        return [str(value)]
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        lines: list[str] = []
+        for child in value.values():
+            lines.extend(_source_text_for(child))
+        return lines
+    if isinstance(value, (list, tuple)):
+        lines = []
+        for child in value:
+            lines.extend(_source_text_for(child))
+        return lines
+    return []
+
+
+def _value_at_address(
+    values: object, field: str, *, structured: bool
+) -> object:
+    """Payload node at the oracle address of ``field``. Independent of the gate."""
+    current = values
+    for step in _oracle_pin_address(field, structured=structured):
+        current = current[step]  # type: ignore[index]
+    return current
+
+
+def _oracle_temperature_index(points: object, target: object) -> int | None:
+    """First point whose temperature key matches. Independent of the gate."""
+    wanted = float(target)  # type: ignore[arg-type]
+    if not isinstance(points, list):
+        return None
+    for index, point in enumerate(points):
+        if not isinstance(point, dict):
+            continue
+        for key in _ORACLE_TEMPERATURE_KEYS:
+            if key not in point:
+                continue
+            try:
+                seen = float(point[key])
+            except (TypeError, ValueError):
+                continue
+            if math.isclose(seen, wanted, rel_tol=0.0, abs_tol=1e-6):
+                return index
+    return None
+
+
+def _selector_pin_address(values: object, extra: dict) -> tuple[object, ...]:
+    if "index" in extra:
+        address: tuple[object, ...] = (int(extra["index"]),)
+    else:
+        target = extra["T_K"] if "T_K" in extra else extra["T"]
+        found = _oracle_temperature_index(values, target)
+        if found is None:
+            raise AssertionError(extra)
+        address = (found,)
+    if "field" in extra:
+        address = address + (extra["field"],)
+    return address
+
+
+def _structured_selector_document(
+    root: Path,
+    *,
+    values: object,
+    pins: list[tuple[dict, object]],
+    source_text: str,
+) -> dict:
+    """Structured index or temperature pins. ``pins`` is (selector, value)."""
+    locator = _source_locator(root, source_text)
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["review_status"] = "reviewed"
+    doc["species"]["Fe"]["observations"][0]["values"] = copy.deepcopy(values)
+    samples = []
+    for extra, value in pins:
+        sample = {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+            "value": copy.deepcopy(value),
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": dict(locator),
+        }
+        sample.update(extra)
+        samples.append(sample)
+    doc["fidelity_samples"] = samples
+    return doc
+
+
+def _check_temperature_addresses(root: Path, failures: list[str]) -> None:
+    """Equal P_Pa at two points. Repeating one point's P_Pa does not cover the other.
+
+    The temperatures differ, so they are pinned on their own addresses. A value
+    count still sees two 0.24 leaves and would accept the repeated pin.
+    """
+    for key in _ORACLE_TEMPERATURE_KEYS:
+        values = [
+            {key: 1700.0, "P_Pa": 0.24},
+            {key: 1800.0, "P_Pa": 0.24},
+        ]
+        sample_temperature = "T" if key == "T" else "T_K"
+        both_temperatures = [
+            ({sample_temperature: 1700.0, "field": key}, 1700.0),
+            ({sample_temperature: 1800.0, "field": key}, 1800.0),
+        ]
+        repeated = both_temperatures + [
+            ({sample_temperature: 1700.0, "field": "P_Pa"}, 0.24),
+            ({sample_temperature: 1700.0, "field": "P_Pa"}, 0.24),
+        ]
+        covered = both_temperatures + [
+            ({sample_temperature: 1700.0, "field": "P_Pa"}, 0.24),
+            ({sample_temperature: 1800.0, "field": "P_Pa"}, 0.24),
+        ]
+        for label, pins in (("repeat", repeated), ("each", covered)):
+            required = _oracle_measured_addresses(values)
+            got: set[tuple[object, ...]] = set()
+            for extra, _value in pins:
+                pin_address = _selector_pin_address(values, extra)
+                for leaf in required:
+                    if leaf[: len(pin_address)] == pin_address:
+                        got.add(leaf)
+            expect_cover = set(required) <= got
+            source = "\n".join(
+                line for _extra, value in pins for line in _source_text_for(value)
+            ) + "\n"
+            doc = _structured_selector_document(
+                root, values=values, pins=pins, source_text=source
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label="temperature", artifact_root=root
+            )
+            if expect_cover:
+                if errors:
+                    failures.append(f"temperature {key} {label} expected cover: {errors}")
+                continue
+            if "uncovered_observation" not in "\n".join(errors):
+                failures.append(
+                    f"temperature {key} {label} expected uncovered: {errors}"
+                )
+
+    # Structured index + field. Four equal numbers, three addresses.
+    values = [
+        {"P_Pa": 0.24, "other": 0.24},
+        {"P_Pa": 0.24, "other": 0.24},
+    ]
+    repeated_index = [
+        ({"index": 0, "field": "P_Pa"}, 0.24),
+        ({"index": 0, "field": "P_Pa"}, 0.24),
+        ({"index": 1, "field": "P_Pa"}, 0.24),
+        ({"index": 1, "field": "other"}, 0.24),
+    ]
+    source = "0.24\n"
+    doc = _structured_selector_document(
+        root, values=values, pins=repeated_index, source_text=source
+    )
+    errors = vle.certify_extract_source_fidelity(
+        doc, label="index-field", artifact_root=root
+    )
+    if "uncovered_observation" not in "\n".join(errors):
+        failures.append(f"structured index field expected uncovered: {errors}")
+
+
+def test_measured_number_coverage_enumerates_every_leaf_class(tmp_path: Path):
+    """Invariant: a measured leaf is covered only at its own address.
+
+    The matrix is every non-empty subset of the leaf catalog, each single
+    field and the whole payload, in both addressing modes. A split pair of
+    pins must cover when each measured field is pinned and must refuse when
+    one measured field is left out. Equal numbers at two addresses are a
+    separate class: repeating one address does not cover the other, including
+    nested keys, list indexes, and a field under an index.
+    """
+    names = [name for name, _value in _EVIDENCE_LEAF_CATALOG]
+    catalog = dict(_EVIDENCE_LEAF_CATALOG)
+    failures: list[str] = []
+
+    def check(case: str, values: object, pins: list[tuple[str | None, object]], *, structured: bool) -> None:
+        required = _oracle_measured_addresses(values)
+        # No measured leaf: any values pin covers, because nothing is unchecked.
+        expect_cover = _oracle_addresses_cover(required, pins, structured=structured)
+        source = "\n".join(
+            line for _field, pinned in pins for line in _source_text_for(pinned)
+        ) + "\n"
+        doc = _values_pin_document(
+            tmp_path,
+            values=values,
+            pins=pins,
+            source_text=source,
+            structured=structured,
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label="leaf", artifact_root=tmp_path
+        )
+        if expect_cover:
+            if errors:
+                failures.append(f"{case} structured={structured} expected cover: {errors}")
+            return
+        joined = "\n".join(errors)
+        if "uncovered_observation" not in joined:
+            failures.append(f"{case} structured={structured} expected uncovered: {errors}")
+
+    for size in range(1, len(names) + 1):
+        for chosen in itertools.combinations(names, size):
+            values = {name: catalog[name] for name in chosen}
+            for name in chosen:
+                for structured in (False, True):
+                    check(
+                        f"field {chosen} pin {name}",
+                        values,
+                        [(name, catalog[name])],
+                        structured=structured,
+                    )
+            for structured in (False, True):
+                check(
+                    f"whole {chosen}",
+                    values,
+                    [(None, values)],
+                    structured=structured,
+                )
+            measured_fields = [
+                name
+                for name in chosen
+                if _oracle_measured_addresses(catalog[name])
+            ]
+            if len(measured_fields) >= 2:
+                check(
+                    f"split {chosen}",
+                    values,
+                    [(name, catalog[name]) for name in measured_fields],
+                    structured=False,
+                )
+                omitted = measured_fields[:-1]
+                check(
+                    f"split-omit {chosen} without {measured_fields[-1]}",
+                    values,
+                    [(name, catalog[name]) for name in omitted],
+                    structured=False,
+                )
+
+    # One element of a series, and one index of a list payload.
+    check(
+        "series element",
+        {"series": [0.2, 0.5]},
+        [("series[0]", 0.2)],
+        structured=False,
+    )
+    list_doc = _values_pin_document(
+        tmp_path,
+        values=[0.2, 0.5],
+        pins=[(None, [0.2, 0.5])],
+        source_text="0.2\n0.5\n",
+        structured=True,
+    )
+    whole_list = vle.certify_extract_source_fidelity(
+        list_doc, label="leaf", artifact_root=tmp_path
+    )
+    if whole_list:
+        failures.append(f"whole list expected cover: {whole_list}")
+    list_doc["fidelity_samples"] = [
+        {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+            "index": 0,
+            "value": 0.2,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": {"source_path": "text/paper.txt", "page": 2},
+        }
+    ]
+    (tmp_path / "text" / "paper.txt").write_text("0.2\n", encoding="utf-8")
+    indexed = vle.certify_extract_source_fidelity(
+        list_doc, label="leaf", artifact_root=tmp_path
+    )
+    if "uncovered_observation" not in "\n".join(indexed):
+        failures.append(f"list index expected uncovered: {indexed}")
+
+    # Same stored number, two addresses. The oracle refuses a repeated address
+    # and accepts one pin per address or one ancestor pin.
+    same = 0.24
+    point = {"P_Pa": same, "other": same}
+    collision_cases = (
+        ("siblings", {"alpha": same, "beta": same}, ("alpha", "beta"), False),
+        ("siblings-structured", {"alpha": same, "beta": same}, ("alpha", "beta"), True),
+        (
+            "nested",
+            {"pair": {"alpha": same, "beta": same}},
+            ("pair.alpha", "pair.beta"),
+            False,
+        ),
+        ("series", {"series": [same, same]}, ("series[0]", "series[1]"), False),
+        ("ints", {"count": 3, "copies": 3}, ("count", "copies"), False),
+        (
+            "printed",
+            {"left": "0.24 mol", "right": "0.24 mol"},
+            ("left", "right"),
+            False,
+        ),
+        (
+            "leading-decimal",
+            {"left": ".24", "right": ".24"},
+            ("left", "right"),
+            False,
+        ),
+        (
+            "triple",
+            {"alpha": same, "beta": same, "gamma": same},
+            ("alpha", "beta", "gamma"),
+            False,
+        ),
+        ("list-root", [same, same], ("[0]", "[1]"), False),
+        ("list-root-structured", [same, same], ("[0]", "[1]"), True),
+        (
+            "index-field",
+            [point, dict(point)],
+            ("[0].P_Pa", "[0].other", "[1].P_Pa", "[1].other"),
+            False,
+        ),
+        (
+            "label-and-equals",
+            {"quantity": "alpha", "alpha": same, "beta": same},
+            ("alpha", "beta"),
+            False,
+        ),
+    )
+    for case, values, fields, structured in collision_cases:
+        leaves = {
+            field: _value_at_address(values, field, structured=structured)
+            for field in fields
+        }
+        # Repeat the first address once per measured leaf. A value count sees
+        # enough copies; the address oracle still misses every other address.
+        copies = len(_oracle_measured_addresses(values))
+        first = fields[0]
+        check(
+            f"repeat {case}",
+            values,
+            [(first, leaves[first])] * copies,
+            structured=structured,
+        )
+        check(
+            f"each {case}",
+            values,
+            [(field, leaves[field]) for field in fields],
+            structured=structured,
+        )
+        check(
+            f"ancestor {case}",
+            values,
+            [(None, values)],
+            structured=structured,
+        )
+    # Nested parent is an ancestor that is not the whole payload.
+    nested = {"pair": {"alpha": same, "beta": same}}
+    check(
+        "nested parent",
+        nested,
+        [("pair", nested["pair"])],
+        structured=False,
+    )
+    check(
+        "series parent",
+        {"series": [same, same]},
+        [("series", [same, same])],
+        structured=False,
+    )
+    # Two pins of the first index's first field, plus both fields of the second
+    # index, still leave the first index's other field unchecked. Four equal
+    # numbers would satisfy a value count.
+    check(
+        "index-field repeated sibling",
+        [point, dict(point)],
+        [
+            ("[0].P_Pa", same),
+            ("[0].P_Pa", same),
+            ("[1].P_Pa", same),
+            ("[1].other", same),
+        ],
+        structured=False,
+    )
+
+    _check_temperature_addresses(tmp_path, failures)
+
+    assert failures == []
+
+
+def test_duplicate_alpha_pins_leave_equal_beta_uncovered(tmp_path: Path):
+    """Literal: two attested pins of ``values.alpha`` do not cover ``values.beta``.
+
+    Both stored numbers are 0.24. The artifact cites alpha twice and does not
+    cite beta. Counting the number 0.24 would accept the extract.
+    """
+    spec = _MEASURED_PIN_CASES["duplicate_alpha_pins"]
+    assert spec["source_text"] == "alpha 0.24 measured\nalpha 0.24 measured\n"
+    assert "beta" not in spec["source_text"]
+    doc = _values_pin_document(tmp_path, **spec)
+    errors = vle.certify_extract_source_fidelity(
+        doc, label="dup-alpha", artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    assert "uncovered_observation" in joined
+    assert "source_blind_pin" not in joined
+
+
+def _temperature_range_document(root: Path, *, pin_range: bool) -> dict:
+    """Reviewer row: opened alpha pin, unpinned ``T_range_K: [2000, 2300]``.
+
+    The artifact cites alpha and does not cite the temperature bounds.
+    """
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text("alpha 0.24 measured\n", encoding="utf-8")
+    doc = _minimal_extract()
+    doc["review_status"] = "reviewed"
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["values"] = {"alpha": 0.24}
+    observation["T_range_K"] = [2000, 2300]
+    locator = {"source_path": "text/paper.txt", "line_range": "1-1", "page": 2}
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values.alpha",
+            "value": 0.24,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": dict(locator),
+        }
+    ]
+    if pin_range:
+        artifact.write_text("alpha 0.24 measured\n2000\n2300\n", encoding="utf-8")
+        doc["fidelity_samples"].append(
+            {
+                "path": "species.Fe.observations[fe_alpha_1].T_range_K",
+                "value": [2000, 2300],
+                "reviewed_by": "independent reviewer",
+                "reviewed_on": "2026-11-10",
+                "locator": {
+                    "source_path": "text/paper.txt",
+                    "line_range": "1-3",
+                    "page": 2,
+                },
+            }
+        )
+    return doc
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_unpinned_temperature_range_refuses_every_promoter(
+    entry: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """An opened alpha pin does not cover a sibling ``T_range_K``.
+
+    This is the kems-008 temperature-range hole: the stored bounds can be
+    wrong and every promoter still accepts the extract when coverage only
+    walks ``values``.
+    """
+    doc = _temperature_range_document(tmp_path, pin_range=False)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    assert errors, (entry, errors)
+    if entry == "certify":
+        joined = "\n".join(errors)
+        assert "uncovered_observation" in joined
+        assert "source_blind_pin" not in joined
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (entry, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == "uncovered_observation" for warning in warnings)
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_pinned_temperature_range_passes_every_promoter(
+    entry: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """A path pin of the whole range covers both bounds when the artifact has them."""
+    doc = _temperature_range_document(tmp_path, pin_range=True)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    assert errors == [], (entry, errors)
+
+
+def _scored_condition_document(
+    root: Path,
+    *,
+    condition_key: str,
+    condition_value: object,
+    values: object,
+    pins: list[tuple[str, str | None, object]],
+    source_lines: tuple[str, ...],
+) -> dict:
+    """One Fe observation plus the listed attested pins.
+
+    A pin is ``("path", path, value)`` or ``("structured", None, value)``.
+    ``source_lines`` is the literal artifact, not a copy of an unpinned leaf.
+    """
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text("\n".join(source_lines) + "\n", encoding="utf-8")
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["review_status"] = "reviewed"
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["values"] = copy.deepcopy(values)
+    if condition_value is not None:
+        observation[condition_key] = copy.deepcopy(condition_value)
+    locator = {"source_path": "text/paper.txt", "page": 2}
+    samples = []
+    for kind, path, value in pins:
+        sample: dict = {
+            "value": copy.deepcopy(value),
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": dict(locator),
+        }
+        if kind == "structured":
+            sample.update(
+                {
+                    "species": "Fe",
+                    "observable": "alpha",
+                    "observation_id": "fe_alpha_1",
+                    "field": "alpha",
+                }
+            )
+        elif kind == "path":
+            sample["path"] = path
+        else:
+            raise AssertionError(kind)
+        samples.append(sample)
+    doc["fidelity_samples"] = samples
+    return doc
+
+
+def test_scored_condition_coverage_enumerates_every_condition(tmp_path: Path):
+    """Invariant: every scored condition leaf is covered only at its address.
+
+    The matrix is every key in ``_SCORED_NUMERIC_CONDITIONS``, each input
+    class of that key (range, scalar, nested state, locator page, equal
+    siblings), and both addressing modes for ``values``. Expected results
+    are written on the case. A values-only oracle does not decide them.
+    """
+    alpha_path = "species.Fe.observations[fe_alpha_1].values.alpha"
+    values_alpha = ("path", alpha_path, 0.24)
+    structured_alpha = ("structured", None, 0.24)
+    alpha_lines = ("alpha 0.24 measured",)
+    failures: list[str] = []
+    seen: set[str] = set()
+
+    def check(
+        case: str,
+        key: str,
+        condition: object,
+        pins: list[tuple[str, str | None, object]],
+        lines: tuple[str, ...],
+        expect: str,
+        *,
+        values: object = None,
+        mutate=None,
+    ) -> None:
+        seen.add(key)
+        doc = _scored_condition_document(
+            tmp_path,
+            condition_key=key,
+            condition_value=condition,
+            values={"alpha": 0.24} if values is None else values,
+            pins=pins,
+            source_lines=lines,
+        )
+        if mutate is not None:
+            mutate(doc)
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=case, artifact_root=tmp_path
+        )
+        joined = "\n".join(errors)
+        if expect == "cover":
+            if errors:
+                failures.append(f"{case} expected cover: {errors}")
+            return
+        if expect == "uncovered":
+            if "uncovered_observation" not in joined:
+                failures.append(f"{case} expected uncovered: {errors}")
+            if "source_blind_pin" in joined:
+                failures.append(f"{case} source_blind masked coverage: {errors}")
+            return
+        if expect == "source_blind":
+            if "source_blind_pin" not in joined or "uncovered_observation" in joined:
+                failures.append(f"{case} expected source_blind only: {errors}")
+            return
+        raise AssertionError(expect)
+
+    distinct = [2000, 2300]
+    whole = ("path", "species.Fe.observations[fe_alpha_1].T_range_K", distinct)
+    bound0 = ("path", "species.Fe.observations[fe_alpha_1].T_range_K[0]", 2000)
+    bound1 = ("path", "species.Fe.observations[fe_alpha_1].T_range_K[1]", 2300)
+    check(
+        "T_range values only",
+        "T_range_K",
+        distinct,
+        [values_alpha],
+        alpha_lines,
+        "uncovered",
+    )
+    check(
+        "T_range whole",
+        "T_range_K",
+        distinct,
+        [values_alpha, whole],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "cover",
+    )
+    check(
+        "T_range one bound",
+        "T_range_K",
+        distinct,
+        [values_alpha, bound0],
+        ("alpha 0.24 measured", "2000"),
+        "uncovered",
+    )
+    check(
+        "T_range both bounds",
+        "T_range_K",
+        distinct,
+        [values_alpha, bound0, bound1],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "cover",
+    )
+    check(
+        "T_range structured values",
+        "T_range_K",
+        distinct,
+        [structured_alpha],
+        alpha_lines,
+        "uncovered",
+    )
+    check(
+        "T_range structured plus path",
+        "T_range_K",
+        distinct,
+        [structured_alpha, whole],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "cover",
+    )
+    check(
+        "T_range numeric index",
+        "T_range_K",
+        distinct,
+        [
+            values_alpha,
+            ("path", "species.Fe.observations[0].T_range_K", distinct),
+        ],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "uncovered",
+    )
+    check(
+        "T_range condition only",
+        "T_range_K",
+        distinct,
+        [whole],
+        ("2000", "2300"),
+        "uncovered",
+    )
+    check(
+        "T_range copied into values",
+        "T_range_K",
+        distinct,
+        [
+            (
+                "path",
+                "species.Fe.observations[fe_alpha_1].values",
+                {"alpha": 0.24, "bounds": distinct},
+            )
+        ],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "uncovered",
+        values={"alpha": 0.24, "bounds": [2000, 2300]},
+    )
+    equal = [1700.0, 1700.0]
+    equal0 = ("path", "species.Fe.observations[fe_alpha_1].T_range_K[0]", 1700.0)
+    equal1 = ("path", "species.Fe.observations[fe_alpha_1].T_range_K[1]", 1700.0)
+    check(
+        "T_range equal bound repeated",
+        "T_range_K",
+        equal,
+        [values_alpha, equal0, equal0],
+        ("alpha 0.24 measured", "1700.0", "1700.0"),
+        "uncovered",
+    )
+    check(
+        "T_range equal both bounds",
+        "T_range_K",
+        equal,
+        [values_alpha, equal0, equal1],
+        ("alpha 0.24 measured", "1700.0", "1700.0"),
+        "cover",
+    )
+    printed = ["2000", "2300"]
+    check(
+        "T_range printed strings unpinned",
+        "T_range_K",
+        printed,
+        [values_alpha],
+        alpha_lines,
+        "uncovered",
+    )
+    check(
+        "T_range printed strings pinned",
+        "T_range_K",
+        printed,
+        [
+            values_alpha,
+            ("path", "species.Fe.observations[fe_alpha_1].T_range_K", printed),
+        ],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "cover",
+    )
+    check(
+        "T_range copied wrong bounds",
+        "T_range_K",
+        distinct,
+        [values_alpha, whole],
+        ("alpha 0.24 measured", "1700", "1800"),
+        "source_blind",
+    )
+
+    for key, number in (
+        ("T_K", 1700.0),
+        ("T_C", 1427),
+        ("temperature_C", "1427"),
+        ("temp_C", 1427.0),
+    ):
+        condition_pin = (
+            "path",
+            f"species.Fe.observations[fe_alpha_1].{key}",
+            number,
+        )
+        number_line = str(number)
+        check(
+            f"{key} values only",
+            key,
+            number,
+            [values_alpha],
+            alpha_lines,
+            "uncovered",
+        )
+        check(
+            f"{key} pinned",
+            key,
+            number,
+            [values_alpha, condition_pin],
+            ("alpha 0.24 measured", number_line),
+            "cover",
+        )
+        check(
+            f"{key} structured values",
+            key,
+            number,
+            [structured_alpha],
+            alpha_lines,
+            "uncovered",
+        )
+        check(
+            f"{key} condition only",
+            key,
+            number,
+            [condition_pin],
+            (number_line,),
+            "uncovered",
+        )
+
+    nested = {
+        "temperature_K": {
+            "state": {"tag": "value", "value": 1773},
+            "locator": {"page": 4},
+        }
+    }
+    state_pin = (
+        "path",
+        "species.Fe.observations[fe_alpha_1].point_conditions.temperature_K.state.value",
+        1773,
+    )
+    page_pin = (
+        "path",
+        "species.Fe.observations[fe_alpha_1].point_conditions.temperature_K.locator.page",
+        4,
+    )
+    check(
+        "point_conditions values only",
+        "point_conditions",
+        nested,
+        [values_alpha],
+        alpha_lines,
+        "uncovered",
+    )
+    check(
+        "point_conditions state value",
+        "point_conditions",
+        nested,
+        [values_alpha, state_pin],
+        ("alpha 0.24 measured", "1773"),
+        "cover",
+    )
+    check(
+        "point_conditions locator page",
+        "point_conditions",
+        nested,
+        [values_alpha, page_pin],
+        ("alpha 0.24 measured", "4"),
+        "uncovered",
+    )
+    check(
+        "point_conditions whole",
+        "point_conditions",
+        nested,
+        [
+            values_alpha,
+            ("path", "species.Fe.observations[fe_alpha_1].point_conditions", nested),
+        ],
+        ("alpha 0.24 measured", "value", "1773", "4"),
+        "cover",
+    )
+    siblings = {
+        "temperature_K": {"state": {"tag": "value", "value": 1700}},
+        "reference_temperature_K": {"state": {"tag": "value", "value": 1700}},
+    }
+    sibling_a = (
+        "path",
+        "species.Fe.observations[fe_alpha_1].point_conditions.temperature_K.state.value",
+        1700,
+    )
+    sibling_b = (
+        "path",
+        "species.Fe.observations[fe_alpha_1].point_conditions.reference_temperature_K.state.value",
+        1700,
+    )
+    check(
+        "point_conditions equal sibling repeated",
+        "point_conditions",
+        siblings,
+        [values_alpha, sibling_a, sibling_a],
+        ("alpha 0.24 measured", "1700", "1700"),
+        "uncovered",
+    )
+    check(
+        "point_conditions equal siblings split",
+        "point_conditions",
+        siblings,
+        [values_alpha, sibling_a, sibling_b],
+        ("alpha 0.24 measured", "1700", "1700"),
+        "cover",
+    )
+    unknown = {
+        "temperature_K": {
+            "state": {"tag": "unknown", "reason": "not printed"},
+            "locator": {"page": 4, "published_page": 199},
+        }
+    }
+    check(
+        "point_conditions locator is not a leaf",
+        "point_conditions",
+        unknown,
+        [values_alpha],
+        alpha_lines,
+        "cover",
+    )
+    bare = {"temperature_K": 1773}
+    check(
+        "point_conditions bare number",
+        "point_conditions",
+        bare,
+        [
+            values_alpha,
+            (
+                "path",
+                "species.Fe.observations[fe_alpha_1].point_conditions.temperature_K",
+                1773,
+            ),
+        ],
+        ("alpha 0.24 measured", "1773"),
+        "cover",
+    )
+    check(
+        "point_conditions bare number unpinned",
+        "point_conditions",
+        bare,
+        [values_alpha],
+        alpha_lines,
+        "uncovered",
+    )
+
+    def add_magnesium(doc: dict) -> None:
+        doc["species"]["Mg"] = {
+            "observations": [
+                {
+                    "observation_id": "mg_alpha_1",
+                    "type": "alpha",
+                    "locator": {"table": "1", "page": 2},
+                    "units": "dimensionless",
+                    "values": {"alpha": 0.24},
+                    "T_range_K": [2000, 2300],
+                }
+            ]
+        }
+
+    check(
+        "second species",
+        "T_range_K",
+        distinct,
+        [values_alpha, whole],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "uncovered",
+        mutate=add_magnesium,
+    )
+
+    def add_context_range(doc: dict) -> None:
+        doc["species"]["Fe"]["context"] = [
+            {
+                "observation_id": "fe_bench_note",
+                "type": "apparatus",
+                "locator": {"page": 3, "section": "experimental"},
+                "units": "as printed",
+                "values": {"furnace": "muffle"},
+                "T_range_K": [2000, 2300],
+            }
+        ]
+
+    check(
+        "context range does not cover scored range",
+        "T_range_K",
+        distinct,
+        [
+            values_alpha,
+            (
+                "path",
+                "species.Fe.context[fe_bench_note].T_range_K",
+                distinct,
+            ),
+        ],
+        ("alpha 0.24 measured", "2000", "2300"),
+        "uncovered",
+        mutate=add_context_range,
+    )
+
+    missing = set(vle._SCORED_NUMERIC_CONDITIONS) - seen
+    assert not missing, missing
+    assert failures == []
+
+
+# Literal source text, written independently of the pin. A helper that copies
+# the pin into the artifact cannot show these refusals.
+_TOKEN_CASES = (
+    ("exact_float", 0.24, "alpha 0.24 measured\n", True),
+    ("parens", 0.24, "alpha (0.24)\n", True),
+    ("comma", 0.24, "alpha 0.24, next\n", True),
+    ("leading_minus", 0.24, "alpha -0.24 measured\n", False),
+    ("leading_plus", 0.24, "alpha +0.24 measured\n", False),
+    # Literal U+2212. The pin is 0.24 and the artifact contains only −0.24.
+    ("unicode_minus", 0.24, "alpha \u22120.24 measured\n", False),
+    ("unicode_minus_same_sign", -0.24, "delta \u22120.24 measured\n", True),
+    ("exponent_neg", 0.24, "alpha 0.24e-5 measured\n", False),
+    ("exponent_pos", 0.24, "alpha 0.24E+2 measured\n", False),
+    ("exponent_bare", 0.24, "alpha 0.24e5 measured\n", False),
+    ("longer_prefix", 0.24, "alpha 10.24 measured\n", False),
+    ("longer_suffix", 0.24, "alpha 0.241 measured\n", False),
+    ("glued_ident", 0.24, "alpha x0.24 measured\n", False),
+    ("float_one_against_bare", 1.0, "ratio 1 only\n", False),
+    ("float_one_exact", 1.0, "ratio 1.0 only\n", True),
+    ("float_one_exponent", 1.0, "ratio 1.0e0 only\n", False),
+    ("int_exact", 1, "count 1 sample\n", True),
+    ("int_leading_minus", 1, "count -1 sample\n", False),
+    ("int_exponent", 1, "count 1e-5 sample\n", False),
+    ("int_decimal", 1, "count 1.0 sample\n", False),
+    ("int_longer_prefix", 1, "count 21 sample\n", False),
+    ("int_longer_suffix", 1, "count 10 sample\n", False),
+    ("neg_float_exact", -0.24, "delta -0.24 measured\n", True),
+    ("neg_float_unsigned", -0.24, "delta 0.24 measured\n", False),
+    ("string_exact", "0.24", "alpha 0.24 measured\n", True),
+    ("string_minus", "0.24", "alpha -0.24 measured\n", False),
+    ("string_exponent", "0.24", "alpha 0.24e-5 measured\n", False),
+    ("string_one_against_bare", "1.0", "ratio 1 only\n", False),
+    # Literal citation. ".24" is not "-.24", "10.24", or ".24e-5".
+    ("leading_decimal_exact", ".24", "alpha .24 measured\n", True),
+    ("leading_decimal_opposite_sign", ".24", "alpha -.24 measured\n", False),
+    ("leading_decimal_unicode_minus", ".24", "alpha \u2212.24 measured\n", False),
+    ("leading_decimal_unicode_same", "-.24", "delta \u2212.24 measured\n", True),
+    ("leading_decimal_longer", ".24", "alpha 10.24 measured\n", False),
+    ("leading_decimal_exponent_exact", ".24e-5", "alpha .24e-5 measured\n", True),
+    ("leading_decimal_exponent_truncated", ".24", "alpha .24e-5 measured\n", False),
+    # Literal neighbour. format(this, ".16g") is "0.24", a different float.
+    ("rounded_neighbour", 0.24000000000000002, "alpha 0.24 measured\n", False),
+    (
+        "rounded_neighbour_exact",
+        0.24000000000000002,
+        "alpha 0.24000000000000002 measured\n",
+        True,
+    ),
+    # The whole stored value. "1 K" is not "1 KPa", and 1 is not "1,000".
+    ("spaced_unit_exact", "1 K", "1 K\n", True),
+    ("spaced_unit_tail", "1 K", "1 KPa\n", False),
+    ("grouped_int", 1, "1,000\n", False),
+    ("grouped_string_exact", "1,000", "1,000\n", True),
+    ("grouped_string_tail", "1,000", "1,000,000\n", False),
+    ("micro_tail", "1", "1µ\n", False),
+    ("degree_tail", "1", "1°\n", False),
+    # Sentence punctuation. The period has no following digit, so it does
+    # not extend the token. Integer 1 and the string "1" both certify.
+    ("sentence_period_int", 1, "the value is 1.\n", True),
+    ("sentence_period_string", "1", "the value is 1.\n", True),
+    ("sentence_period_then_word", 1, "the value is 1. Next\n", True),
+    ("sentence_period_float", 0.24, "alpha 0.24.\n", True),
+    ("sentence_period_string_float", "0.24", "alpha 0.24.\n", True),
+    # Prose keeps the digit-grouping boundary. The same bytes in a CSV
+    # certify per cell; here the comma is not a delimiter.
+    ("prose_adjacent_decimals", 0.91, "0.91,0.92\n", False),
+    ("prose_adjacent_decimals_second", 0.92, "0.91,0.92\n", False),
+)
+
+
+def _literal_source_document(root: Path, pin: object, source_text: str) -> dict:
+    """One attested pin. ``source_text`` is a literal, not derived from ``pin``."""
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text(source_text, encoding="utf-8")
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["review_status"] = "reviewed"
+    doc["species"]["Fe"]["observations"][0]["values"] = {"alpha": pin}
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values.alpha",
+            "value": pin,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": {"source_path": "text/paper.txt", "page": 2},
+        }
+    ]
+    return doc
+
+
+@pytest.mark.parametrize(
+    ("case_name", "pin", "source_text", "accepts"),
+    _TOKEN_CASES,
+    ids=[row[0] for row in _TOKEN_CASES],
+)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_complete_numeric_token_is_required_at_every_promoter(
+    case_name: str,
+    pin: object,
+    source_text: str,
+    accepts: bool,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: sign and exponent belong to the certified token.
+
+    ``0.24`` is not ``-0.24`` or ``0.24e-5``. ``1.0`` is not ``1``.
+    ``.24`` is not ``-.24``. ``0.24000000000000002`` is not ``0.24``.
+    Every promoter calls ``certify_extract_source_fidelity``. Drafts stay
+    schema-valid and carry a typed ``source_blind_pin`` warning.
+    """
+    doc = _literal_source_document(tmp_path, pin, source_text)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    if accepts:
+        assert errors == [], (case_name, entry, errors)
+        return
+    assert errors, (case_name, entry)
+    if entry != "certify":
+        return
+    assert "source_blind_pin" in "\n".join(errors)
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (case_name, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == "source_blind_pin" for warning in warnings)
+
+
+# Mantissa classes the certification token claims to recognize. A leading
+# decimal is one of them. The expected token is the spelling built here.
+_NUMERIC_MANTISSAS = ("0", "24", "0.24", "1.0", "10.24", ".24", ".5", ".91")
+_NUMERIC_SIGNS = ("", "-", "+")
+_NUMERIC_EXPONENTS = ("", "e-5", "E+2")
+
+
+def _opposite_numeric_spelling(spelling: str) -> str:
+    """The other sign of ``spelling``. Independent of the gate."""
+    if spelling.startswith("-"):
+        return spelling[1:]
+    if spelling.startswith("+"):
+        return "-" + spelling[1:]
+    return "-" + spelling
+
+
+def _spelling_preserves_float(spelling: str, leaf: float) -> bool:
+    """True when ``spelling`` is this float. Not the gate's spelling helper."""
+    if "." not in spelling and "e" not in spelling.lower():
+        return False
+    try:
+        parsed = float(spelling)
+    except ValueError:
+        return False
+    return parsed == leaf and math.copysign(1.0, parsed) == math.copysign(1.0, leaf)
+
+
+def test_measured_leaf_oracle_does_not_call_the_gate_scanner():
+    """The coverage oracle has its own scanner, so a shared regex cannot hide a hole."""
+    for function in (_oracle_measured_addresses, _oracle_numeric_tokens):
+        source = inspect.getsource(function)
+        assert "vle." not in source
+        assert "_NUMERIC_TOKEN_RE" not in source
+        assert "_citation_token_matches" not in source
+
+
+def test_every_numeric_spelling_certifies_only_its_exact_token(tmp_path: Path):
+    """Invariant: a stored number certifies only as that complete token.
+
+    The matrix is every mantissa class (integer, fraction, leading decimal),
+    every sign (none, minus, plus), and every exponent class (none, negative,
+    positive). The expected token is the constructed spelling. A label pin
+    does not cover a sibling leading decimal. ``.24`` is not ``-.24`` or
+    ``.241``.
+    """
+    failures: list[str] = []
+    for mantissa in _NUMERIC_MANTISSAS:
+        for sign in _NUMERIC_SIGNS:
+            for exponent in _NUMERIC_EXPONENTS:
+                spelling = f"{sign}{mantissa}{exponent}"
+                context = f"alpha {spelling} measured"
+                expected = [spelling]
+                oracle = _oracle_numeric_tokens(context)
+                gate = [match.group(0) for match in vle._citation_token_matches(context)]
+                if oracle != expected or gate != expected:
+                    failures.append(
+                        f"token {spelling!r} oracle={oracle} gate={gate}"
+                    )
+                    continue
+                ended = f"alpha {spelling}."
+                if (
+                    _oracle_numeric_tokens(ended) != expected
+                    or [
+                        match.group(0)
+                        for match in vle._citation_token_matches(ended)
+                    ]
+                    != expected
+                ):
+                    failures.append(
+                        f"period token {spelling!r} "
+                        f"oracle={_oracle_numeric_tokens(ended)} "
+                        f"gate={[match.group(0) for match in vle._citation_token_matches(ended)]}"
+                    )
+                ended_doc = _literal_source_document(
+                    tmp_path, spelling, ended + "\n"
+                )
+                ended_errors = vle.certify_extract_source_fidelity(
+                    ended_doc, label="spell", artifact_root=tmp_path
+                )
+                if ended_errors:
+                    failures.append(f"period {spelling!r}: {ended_errors}")
+                values = {"quantity": "alpha", "alpha": spelling}
+                if _oracle_measured_addresses(values) != [("alpha",)]:
+                    failures.append(f"oracle address {spelling!r}")
+                if list(vle._measured_leaf_addresses(values)) != [("alpha",)]:
+                    failures.append(f"gate address {spelling!r}")
+                exact = _literal_source_document(tmp_path, spelling, context + "\n")
+                exact_errors = vle.certify_extract_source_fidelity(
+                    exact, label="spell", artifact_root=tmp_path
+                )
+                if exact_errors:
+                    failures.append(f"exact {spelling!r}: {exact_errors}")
+                longer = _literal_source_document(
+                    tmp_path, spelling, f"alpha {spelling}1 measured\n"
+                )
+                longer_errors = vle.certify_extract_source_fidelity(
+                    longer, label="spell", artifact_root=tmp_path
+                )
+                if "source_blind_pin" not in "\n".join(longer_errors):
+                    failures.append(f"longer {spelling!r}: {longer_errors}")
+                opposite = _opposite_numeric_spelling(spelling)
+                opposed = _literal_source_document(
+                    tmp_path, spelling, f"alpha {opposite} measured\n"
+                )
+                opposed_errors = vle.certify_extract_source_fidelity(
+                    opposed, label="spell", artifact_root=tmp_path
+                )
+                if "source_blind_pin" not in "\n".join(opposed_errors):
+                    failures.append(f"sign {spelling!r} vs {opposite!r}: {opposed_errors}")
+                if not mantissa.startswith("."):
+                    continue
+                for structured in (False, True):
+                    hidden = _values_pin_document(
+                        tmp_path,
+                        values=values,
+                        pins=[("quantity", "alpha")],
+                        source_text="alpha\n",
+                        structured=structured,
+                    )
+                    hidden_errors = vle.certify_extract_source_fidelity(
+                        hidden, label="spell", artifact_root=tmp_path
+                    )
+                    joined = "\n".join(hidden_errors)
+                    if "uncovered_observation" not in joined or "source_blind_pin" in joined:
+                        failures.append(
+                            f"label {spelling!r} structured={structured}: {hidden_errors}"
+                        )
+    assert failures == []
+
+
+# Product of printed measurements. Expected certification is the rule below,
+# not the gate's scanner: a digit-bearing leaf certifies only when the source
+# carries that printed value as a complete token. An extending neighbour is
+# an ASCII letter or digit, a Unicode letter, µ, or °, or a dot or comma
+# followed by a digit. A sign immediately before the number refuses when it
+# changes the value.
+_DIGIT_LEAF_SIGNS = ("", "-", "+")
+_DIGIT_LEAF_MANTISSAS = ("1", "0.91", ".91", "91.", "1e3", "1.2E-3", "1,000")
+_DIGIT_LEAF_JOINS = ("", " ", "\u00a0")
+_DIGIT_LEAF_UNITS = ("", "Pa", "K", "%", "wt%")
+_RULE_VALUE_LETTERS = frozenset("µμ°")
+_RULE_UNITS = ("wt%", "Pa", "K", "%")
+
+
+def _digit_leaf_product() -> list[str]:
+    leaves: list[str] = []
+    for sign in _DIGIT_LEAF_SIGNS:
+        for mantissa in _DIGIT_LEAF_MANTISSAS:
+            for join in _DIGIT_LEAF_JOINS:
+                for unit in _DIGIT_LEAF_UNITS:
+                    leaves.append(f"{sign}{mantissa}{join}{unit}")
+    return leaves
+
+
+def _digit_leaf_case_id(leaf: str) -> str:
+    return (
+        leaf.replace(" ", "SP")
+        .replace("\u00a0", "NBSP")
+        .replace("%", "PCT")
+        .replace(",", "COMMA")
+    )
+
+
+def _rule_char_extends(text: str, index: int, nxt: str, *, sign_attaches: bool) -> bool:
+    """Independent of the gate. The certification boundary, written here."""
+    if index < 0 or index >= len(text):
+        return False
+    ch = text[index]
+    if ch.isascii() and ch.isalnum():
+        return True
+    if ch.isalpha() or ch in _RULE_VALUE_LETTERS:
+        return True
+    if ch in ".,":
+        return len(nxt) == 1 and nxt.isascii() and nxt.isdigit()
+    if sign_attaches and ch in "+-":
+        return len(nxt) == 1 and (nxt.isdigit() or nxt == ".")
+    return False
+
+
+def _rule_span_complete(text: str, start: int, end: int) -> bool:
+    if not (0 <= start < end <= len(text)):
+        return False
+    if start > 0 and _rule_char_extends(
+        text, start - 1, text[start], sign_attaches=True
+    ):
+        return False
+    if end < len(text) and _rule_char_extends(
+        text,
+        end,
+        text[end + 1] if end + 1 < len(text) else "",
+        sign_attaches=False,
+    ):
+        return False
+    return True
+
+
+def _rule_leaf_number(leaf: str) -> float | None:
+    """Printed number of ``leaf``, unit stripped. Not the gate's parser."""
+    body = leaf
+    for unit in _RULE_UNITS:
+        if body.endswith(unit) and len(body) > len(unit):
+            body = body[: -len(unit)]
+            break
+    body = body.replace("\u00a0", "").replace(" ", "").replace(",", "")
+    if not body:
+        return None
+    try:
+        value = float(body)
+    except ValueError:
+        return None
+    if not math.isfinite(value):
+        return None
+    return value
+
+
+def _rule_sign_prefix_changes_value(prefix: str, leaf: str) -> bool:
+    """True when prefixing ``prefix`` changes the printed number."""
+    base = _rule_leaf_number(leaf)
+    signed = _rule_leaf_number(prefix + leaf)
+    if base is None or signed is None:
+        return False
+    return signed != base or math.copysign(1.0, signed) != math.copysign(1.0, base)
+
+
+def _rule_source_carries_printed_value(leaf: str, source: str) -> bool:
+    """Independent of the gate.
+
+    A digit-bearing leaf is carried only when ``leaf`` itself occurs in
+    ``source`` and neither side of that occurrence extends it. A dot or
+    comma extends only when the next character is a digit. A sign
+    immediately before the number refuses when it changes the value.
+    """
+    if not any(ch in "0123456789" for ch in leaf):
+        return False
+    start = 0
+    while True:
+        index = source.find(leaf, start)
+        if index < 0:
+            return False
+        end = index + len(leaf)
+        if _rule_span_complete(source, index, end) and not (
+            index > 0
+            and source[index - 1] in "+-"
+            and _rule_sign_prefix_changes_value(source[index - 1], leaf)
+        ):
+            return True
+        start = index + 1
+
+
+def _rule_extension_sources(leaf: str) -> list[str]:
+    """Sources that extend ``leaf``. Expected carry comes from the rule."""
+    sources = [
+        leaf + "9",
+        leaf + ",000",
+        leaf + ".5",
+        leaf + "Pa",
+        leaf + "µ",
+        leaf + "°",
+        "9" + leaf,
+        "1," + leaf,
+        "µ" + leaf,
+        "°" + leaf,
+    ]
+    for sign in ("-", "+"):
+        if _rule_sign_prefix_changes_value(sign, leaf):
+            sources.append(sign + leaf)
+    return sources
+
+
+def _rule_punctuation_sources(leaf: str) -> list[str]:
+    """Sentence punctuation around ``leaf``. The rule decides, not the gate.
+
+    A period or comma extends only when the next character is a digit.
+    Parentheses, a semicolon, a colon, and a question mark never extend.
+    ``the value is 1.`` carries ``1``. ``1.5`` and ``1,000`` do not.
+    """
+    return [
+        f"the value is {leaf}.",
+        f"the value is {leaf}. Next",
+        f"({leaf})",
+        f"{leaf}, next",
+        f"{leaf};",
+        f"{leaf}?",
+    ]
+
+
+@pytest.mark.parametrize("leaf", _digit_leaf_product(), ids=_digit_leaf_case_id)
+def test_digit_bearing_leaf_certifies_only_when_source_carries_it(
+    leaf: str, tmp_path: Path
+):
+    """Invariant: a digit in a measured string requires source coverage.
+
+    The leaf certifies only when the source carries that printed value.
+    The expected boolean is ``_rule_source_carries_printed_value``, which
+    does not call the gate. A quantity pin against the word pressure does
+    not cover the measurement. ``0.91Pa`` and ``91.`` are in this product.
+    Each positive also refuses a source that extends it: a digit, ``,000``,
+    ``.5``, or a unit letter on the right, and a digit, ``1,``, or a sign
+    that changes the value on the left. Sentence punctuation does not
+    extend the leaf: ``the value is 1.`` carries ``1``, and the same
+    period, comma, parenthesis, semicolon, and question mark carry every
+    other leaf in the product.
+    """
+    carried = f"\n{leaf}\n"
+    withheld = f"\n9{leaf}\n"
+    assert _rule_source_carries_printed_value(leaf, carried)
+    assert not _rule_source_carries_printed_value(leaf, withheld)
+    extensions = _rule_extension_sources(leaf)
+    # A right-hand digit, grouped continuation, decimal, or unit letter
+    # extends every leaf in this product. ``1,`` on the left extends only
+    # when the comma is followed by a digit; a leading sign or decimal is
+    # still the whole leaf. The expected boolean is the rule, not a blanket
+    # refusal.
+    for suffix in ("9", ",000", ".5", "Pa", "µ", "°"):
+        assert not _rule_source_carries_printed_value(leaf, f"\n{leaf}{suffix}\n")
+    for prefix in ("9", "µ", "°"):
+        assert not _rule_source_carries_printed_value(leaf, f"\n{prefix}{leaf}\n")
+    recognized = vle._measured_leaf_addresses(
+        {"quantity": "pressure", "measured": leaf}
+    )
+    assert ("measured",) in recognized
+    assert ("quantity",) not in recognized
+
+    pinned = _literal_source_document(tmp_path, leaf, carried)
+    pinned_errors = vle.certify_extract_source_fidelity(
+        pinned, label="digit", artifact_root=tmp_path
+    )
+    carried_ok = _rule_source_carries_printed_value(leaf, carried)
+    assert (pinned_errors == []) is carried_ok, (leaf, carried_ok, pinned_errors)
+
+    missed = _literal_source_document(tmp_path, leaf, withheld)
+    missed_errors = vle.certify_extract_source_fidelity(
+        missed, label="digit", artifact_root=tmp_path
+    )
+    withheld_ok = _rule_source_carries_printed_value(leaf, withheld)
+    assert (missed_errors == []) is withheld_ok, (leaf, withheld_ok, missed_errors)
+    assert "source_blind_pin" in "\n".join(missed_errors)
+
+    for extended in extensions:
+        source = f"\n{extended}\n"
+        expected = _rule_source_carries_printed_value(leaf, source)
+        extended_doc = _literal_source_document(tmp_path, leaf, source)
+        extended_errors = vle.certify_extract_source_fidelity(
+            extended_doc, label="digit", artifact_root=tmp_path
+        )
+        assert (extended_errors == []) is expected, (leaf, extended, expected, extended_errors)
+        if not expected:
+            assert "source_blind_pin" in "\n".join(extended_errors)
+
+    for punctuated in _rule_punctuation_sources(leaf):
+        source = f"\n{punctuated}\n"
+        expected = _rule_source_carries_printed_value(leaf, source)
+        assert expected, (leaf, punctuated)
+        punctuated_doc = _literal_source_document(tmp_path, leaf, source)
+        punctuated_errors = vle.certify_extract_source_fidelity(
+            punctuated_doc, label="digit", artifact_root=tmp_path
+        )
+        assert punctuated_errors == [], (leaf, punctuated, punctuated_errors)
+
+    hidden = _values_pin_document(
+        tmp_path,
+        values={"quantity": "pressure", "measured": leaf},
+        pins=[("quantity", "pressure")],
+        source_text="pressure\n",
+        structured=False,
+    )
+    hidden_errors = vle.certify_extract_source_fidelity(
+        hidden, label="digit", artifact_root=tmp_path
+    )
+    joined = "\n".join(hidden_errors)
+    assert "uncovered_observation" in joined
+    assert "source_blind_pin" not in joined
+
+
+def test_float_spellings_certify_only_the_stored_number(tmp_path: Path):
+    """Invariant: rounding does not substitute for the stored float.
+
+    ``format(0.24000000000000002, ".16g")`` is ``0.24``. That spelling is a
+    different number and must not certify. A spelling is accepted only when
+    parsing it returns the stored float, including the sign of zero. The
+    predicate is float equality, not ``_numeric_spellings``.
+    """
+    leaves = [
+        0.0,
+        -0.0,
+        math.nextafter(0.0, math.inf),
+        math.nextafter(0.0, -math.inf),
+    ]
+    for base in (
+        0.24,
+        0.5,
+        1.0,
+        1.5,
+        10.0,
+        0.1,
+        2.5,
+        -0.24,
+        0.91,
+        3.0,
+        100.0,
+        1e-4,
+        1e-20,
+        math.pi,
+    ):
+        leaves.append(float(base))
+        direction = math.inf if base > 0.0 else -math.inf
+        leaves.append(math.nextafter(float(base), direction))
+    seen: list[float] = []
+    failures: list[str] = []
+    for leaf in leaves:
+        if any(candidate.hex() == leaf.hex() for candidate in seen):
+            continue
+        seen.append(leaf)
+        candidates = (str(leaf), format(leaf, ".16g"))
+        preserved = {
+            spelling
+            for spelling in candidates
+            if _spelling_preserves_float(spelling, leaf)
+        }
+        gate = vle._numeric_spellings(leaf)
+        if gate != preserved:
+            failures.append(f"spellings {leaf.hex()} gate={gate} preserved={preserved}")
+            continue
+        for spelling in candidates:
+            doc = _literal_source_document(
+                tmp_path, leaf, f"alpha {spelling} measured\n"
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label="round", artifact_root=tmp_path
+            )
+            if spelling in preserved:
+                if errors:
+                    failures.append(f"exact {leaf.hex()} {spelling!r}: {errors}")
+                continue
+            if "source_blind_pin" not in "\n".join(errors):
+                failures.append(f"rounded {leaf.hex()} {spelling!r}: {errors}")
+    assert failures == []
+
+
+# The sign class, written here and not read from the gate. ``kind`` is the
+# rule: a minus certifies only a negative token, a plus certifies only the
+# string "+0.24", and a distinct sign certifies only a pin that already
+# carries that same character. ASCII "+" and "-" are in the class so the
+# Unicode rows are not a separate grammar.
+_CERTIFICATION_SIGNS = (
+    ("ascii_minus", "-", "minus"),
+    ("ascii_plus", "+", "plus"),
+    ("minus_sign", "\u2212", "minus"),
+    ("hyphen", "\u2010", "minus"),
+    ("nb_hyphen", "\u2011", "minus"),
+    ("figure_dash", "\u2012", "minus"),
+    ("en_dash", "\u2013", "minus"),
+    ("em_dash", "\u2014", "minus"),
+    ("horizontal_bar", "\u2015", "minus"),
+    ("small_hyphen", "\ufe63", "minus"),
+    ("fullwidth_hyphen", "\uff0d", "minus"),
+    ("modifier_minus", "\u02d7", "minus"),
+    ("superscript_minus", "\u207b", "minus"),
+    ("subscript_minus", "\u208b", "minus"),
+    ("heavy_minus", "\u2796", "minus"),
+    ("fullwidth_plus", "\uff0b", "plus"),
+    ("small_plus", "\ufe62", "plus"),
+    ("superscript_plus", "\u207a", "plus"),
+    ("subscript_plus", "\u208a", "plus"),
+    ("heavy_plus", "\u2795", "plus"),
+    ("plus_minus", "\u00b1", "distinct"),
+    ("minus_or_plus", "\u2213", "distinct"),
+)
+_CERTIFICATION_SIGN_PINS = (
+    "unsigned_float",
+    "neg_float",
+    "unsigned_string",
+    "neg_string",
+    "pos_string",
+    "same_string",
+)
+
+
+def _certification_pin(pin_name: str, sign: str) -> object:
+    if pin_name == "unsigned_float":
+        return 0.24
+    if pin_name == "neg_float":
+        return -0.24
+    if pin_name == "unsigned_string":
+        return "0.24"
+    if pin_name == "neg_string":
+        return "-0.24"
+    if pin_name == "pos_string":
+        return "+0.24"
+    if pin_name == "same_string":
+        return f"{sign}0.24"
+    raise AssertionError(pin_name)
+
+
+def _sign_certifies(kind: str, pin_name: str) -> bool:
+    """Independent of the gate. The cited text is always ``{sign}0.24``."""
+    if pin_name == "same_string":
+        return True
+    if kind == "minus":
+        return pin_name in {"neg_float", "neg_string"}
+    if kind == "plus":
+        return pin_name == "pos_string"
+    return False
+
+
+def test_certification_sign_catalog_is_the_whole_class():
+    """Every sign the gate folds or treats as distinct is in the matrix."""
+    catalog = {sign for _name, sign, _kind in _CERTIFICATION_SIGNS}
+    gate = (
+        set(vle._UNICODE_MINUS_SIGNS)
+        | set(vle._UNICODE_PLUS_SIGNS)
+        | set(vle._DISTINCT_NUMERIC_SIGNS)
+        | set("+-")
+    )
+    assert catalog == gate
+
+
+@pytest.mark.parametrize(
+    ("sign_name", "sign", "kind"),
+    _CERTIFICATION_SIGNS,
+    ids=[row[0] for row in _CERTIFICATION_SIGNS],
+)
+@pytest.mark.parametrize("pin_name", _CERTIFICATION_SIGN_PINS)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_unicode_sign_is_part_of_the_certified_token(
+    sign_name: str,
+    sign: str,
+    kind: str,
+    pin_name: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: a numeric sign is part of the certified token.
+
+    The artifact contains only ``{sign}0.24``. An unsigned pin certifies
+    none of these signs. A minus certifies ``-0.24`` and not ``0.24``.
+    U+2212 with pin ``0.24`` is the opposite-sign bypass. Every promoter
+    calls ``certify_extract_source_fidelity``.
+    """
+    pin = _certification_pin(pin_name, sign)
+    doc = _literal_source_document(tmp_path, pin, f"{sign}0.24\n")
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    accepts = _sign_certifies(kind, pin_name)
+    if accepts:
+        assert errors == [], (sign_name, pin_name, entry, errors)
+        return
+    assert errors, (sign_name, pin_name, entry)
+    if entry != "certify":
+        return
+    joined = "\n".join(errors)
+    assert "source_blind_pin" in joined
+    assert "uncovered_observation" not in joined
+    assert "ambiguous_observation_id" not in joined
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+@pytest.mark.parametrize(
+    ("pin_sign", "source_sign"),
+    [("\u00b1", "\u2213"), ("\u2213", "\u00b1")],
+    ids=["plusminus_vs_minusplus", "minusplus_vs_plusminus"],
+)
+def test_distinct_unicode_signs_do_not_certify_each_other(
+    pin_sign: str,
+    source_sign: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Plus-minus and minus-or-plus are different signs."""
+    doc = _literal_source_document(tmp_path, f"{pin_sign}0.24", f"{source_sign}0.24\n")
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    assert errors, (pin_sign, source_sign, entry)
+    if entry == "certify":
+        assert "source_blind_pin" in "\n".join(errors)
+
+
+# One id, several scored rows. ``one_row`` is the control: the same pin and
+# the same artifact pass when the id names that row only. The source cites
+# 0.24, so a refusal is the ambiguous id and not a missing token.
+_AMBIGUOUS_ID_CASES = (
+    ("one_row", (0.24,), False),
+    ("two_values", (0.24, 0.91), True),
+    ("equal_values", (0.24, 0.24), True),
+    ("three_rows", (0.24, 0.91, 0.5), True),
+)
+
+
+def _ambiguous_id_document(
+    root: Path, values: tuple[float, ...], addressing: str
+) -> dict:
+    doc = _literal_source_document(root, values[0], "0.24\n")
+    row = doc["species"]["Fe"]["observations"][0]
+    rows = []
+    for value in values:
+        cloned = copy.deepcopy(row)
+        cloned["observation_id"] = "fe_alpha_1"
+        cloned["values"] = {"alpha": value}
+        rows.append(cloned)
+    doc["species"]["Fe"]["observations"] = rows
+    if addressing == "structured":
+        doc["fidelity_samples"] = [
+            {
+                "species": "Fe",
+                "observable": "alpha",
+                "observation_id": "fe_alpha_1",
+                "field": "alpha",
+                "value": values[0],
+                "reviewed_by": "independent reviewer",
+                "reviewed_on": "2026-11-10",
+                "locator": {"source_path": "text/paper.txt", "page": 2},
+            }
+        ]
+    return doc
+
+
+@pytest.mark.parametrize(
+    ("case_name", "values", "ambiguous"),
+    _AMBIGUOUS_ID_CASES,
+    ids=[row[0] for row in _AMBIGUOUS_ID_CASES],
+)
+@pytest.mark.parametrize("addressing", ("path", "structured"))
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_ambiguous_observation_id_refuses_every_promoter(
+    case_name: str,
+    values: tuple[float, ...],
+    ambiguous: bool,
+    addressing: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: an observation id certifies at most one scored row.
+
+    Two rows with id ``fe_alpha_1`` and values 0.24 and 0.91 are the
+    collapse: a path pin resolves the first row and coverage used to record
+    the last. Equal values still refuse. Schema validation also rejects
+    duplicates; certification refuses when schema validation is skipped.
+    """
+    doc = _ambiguous_id_document(tmp_path, values, addressing)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    if not ambiguous:
+        assert errors == [], (case_name, addressing, entry, errors)
+        return
+    joined = "\n".join(errors)
+    assert "ambiguous_observation_id" in joined, (case_name, addressing, entry, errors)
+    if entry == "certify":
+        assert "source_blind_pin" not in joined
+        assert "uncovered_observation" not in joined
+        warnings = vle.fidelity_source_warnings(
+            doc, label="dup", artifact_root=tmp_path
+        )
+        found = next(
+            warning for warning in warnings if warning.kind == "ambiguous_observation_id"
+        )
+        assert found.count == 1
+        assert "fe_alpha_1" in found.detail
+        assert f"names {len(values)} scored rows" in found.detail
+    if entry == "validate":
+        assert "duplicate observation_id" in joined
+
+
+def _artifact_role_document(root: Path, role: str) -> tuple[dict, bool]:
+    """Pin 0.91 against one artifact role. The source text is a literal."""
+    doc = _literal_source_document(root, 0.91, "alpha 0.91 measured\n")
+    sample = doc["fidelity_samples"][0]
+    literal = "alpha 0.91 measured\n"
+
+    def place(relative: str, text: str | None = None, *, binary: bytes | None = None) -> None:
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if binary is not None:
+            path.write_bytes(binary)
+        else:
+            path.write_text(text if text is not None else literal, encoding="utf-8")
+        sample["locator"] = {"source_path": relative, "page": 1}
+
+    if role == "source_text":
+        return doc, True
+    if role == "raw_text":
+        place("raw/paper.txt")
+        return doc, True
+    if role == "corpus_text":
+        place("corpus/paper.txt")
+        return doc, True
+    if role == "supporting_text":
+        place("supporting/note.txt")
+        return doc, True
+    if role == "ocr_text":
+        place("text/fixture-source/mineru/page.md")
+        return doc, True
+    if role == "reference_note":
+        place("docs/references/note.md")
+        return doc, True
+    if role == "quotes_table":
+        place("tables/t1.csv", "alpha,0.91\n")
+        sample["locator"] = {"quotes_path": "tables/t1.csv", "page": 1}
+        return doc, True
+    if role == "extract_self":
+        sample["locator"] = {"source_path": "fixture-source.yaml", "page": 1}
+        (root / "fixture-source.yaml").write_text(
+            yaml.safe_dump(doc), encoding="utf-8"
+        )
+        return doc, False
+    if role == "extract_copy_yaml":
+        place("text/self.yaml", yaml.safe_dump(doc))
+        return doc, False
+    if role == "extract_copy_txt":
+        dumped = yaml.safe_dump(doc)
+        place("text/self.txt", dumped)
+        return doc, False
+    if role == "validator_source":
+        place("tools/validate_literature_extracts.py", "alpha = 0.91\n")
+        return doc, False
+    if role == "gate_source":
+        place("tools/extract_gate.py", "VALUE = 0.91\n")
+        return doc, False
+    if role == "test_module":
+        place("tests/tools/test_extract_gate.py", "ALPHA = 0.91\n")
+        return doc, False
+    if role == "schema_doc":
+        place("data/literature/extracts/SCHEMA.md", "The example alpha is 0.91.\n")
+        return doc, False
+    if role == "implementation_under_source_root":
+        place("docs/references/reader.py", "alpha = 0.91\n")
+        return doc, False
+    if role == "pipeline_yaml":
+        place("docs/references/doi_verification.yaml", "alpha: 0.91\n")
+        return doc, False
+    if role == "companion_table":
+        place(
+            "tables/t1.yaml",
+            yaml.safe_dump(
+                {"schema_version": "literature_extract_table.v1", "alpha": 0.91}
+            ),
+        )
+        return doc, False
+    if role == "path_escapes_into_code":
+        place("tools/validate_literature_extracts.py", "alpha = 0.91\n")
+        sample["locator"] = {
+            "source_path": "text/../tools/validate_literature_extracts.py",
+            "page": 1,
+        }
+        return doc, False
+    raise AssertionError(role)
+
+
+_ARTIFACT_ROLES = (
+    "source_text",
+    "raw_text",
+    "corpus_text",
+    "supporting_text",
+    "ocr_text",
+    "reference_note",
+    "quotes_table",
+    "extract_self",
+    "extract_copy_yaml",
+    "extract_copy_txt",
+    "validator_source",
+    "gate_source",
+    "test_module",
+    "schema_doc",
+    "implementation_under_source_root",
+    "pipeline_yaml",
+    "companion_table",
+    "path_escapes_into_code",
+)
+_ARTIFACT_ROLE_PASS = {
+    "source_text",
+    "raw_text",
+    "corpus_text",
+    "supporting_text",
+    "ocr_text",
+    "reference_note",
+    "quotes_table",
+}
+
+
+@pytest.mark.parametrize("role", _ARTIFACT_ROLES)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_source_artifact_provenance_is_required_at_every_promoter(
+    role: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: the opened file is source evidence, not the extract or the gate.
+
+    Self-reference, a renamed extract, validator source, and a path that
+    normalizes into program source all refuse. Drafts warn ``source_blind_pin``
+    instead of failing schema validation.
+    """
+    doc, accepts = _artifact_role_document(tmp_path, role)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    if accepts:
+        assert errors == [], (role, entry, errors)
+        return
+    assert errors, (role, entry)
+    if entry != "certify":
+        return
+    assert "source_blind_pin" in "\n".join(errors)
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (role, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == "source_blind_pin" for warning in warnings)
+    assert accepts == (role in _ARTIFACT_ROLE_PASS)
+
+
+# Tabular sources. The expected result is the whole-cell rule: a CSV or TSV
+# row is parsed, and a cell certifies a value only when the whole trimmed
+# cell parses to that number, or equals the stored string. ``0.91,0.92``
+# certifies 0.91 and 0.92. ``0.9100`` certifies 0.91. ``1e-999`` does not
+# certify 0. ``9007199254740993`` does not certify ``9007199254740992``
+# and does certify itself. A cell ``1/2`` does not certify 1. A quoted
+# cell ``1,000`` does not certify 1 or 1000, and neither does a TSV cell
+# ``1,000``. A cell ``1 KPa`` does not certify ``1 K``. NaN, Infinity, and
+# an exponent Decimal rejects do not certify a number. ``91.`` certifies
+# 91 because the cell is parsed with Decimal, not the prose grammar.
+# The same row in a prose artifact stays digit grouping; that case lives
+# in ``_TOKEN_CASES``. Twenty nines is past the Decimal exponent limit,
+# so the constructor raises InvalidOperation.
+_CELL_INVALID_EXPONENT = "1e" + ("9" * 20)
+_TABULAR_CELL_CASES = (
+    ("csv_first_cell", "csv", "0.91,0.92\n", 0.91, True),
+    ("csv_second_cell", "csv", "0.91,0.92\n", 0.92, True),
+    ("csv_quoted_group_refuses_one", "csv", '"1,000"\n', 1, False),
+    ("csv_quoted_group_refuses_thousand", "csv", '"1,000"\n', 1000, False),
+    ("csv_quoted_group_whole", "csv", '"1,000"\n', "1,000", True),
+    ("csv_trailing_zeros", "csv", "0.9100\n", 0.91, True),
+    ("csv_trailing_zeros_string_differs", "csv", "0.9100\n", "0.91", False),
+    ("csv_trailing_zeros_string", "csv", "0.9100\n", "0.9100", True),
+    ("csv_leading_decimal", "csv", ".91\n", 0.91, True),
+    ("csv_decimal_certifies_int", "csv", "1.0\n", 1, True),
+    ("csv_int_text_certifies_float_one", "csv", "1\n", 1.0, True),
+    ("csv_trailing_dot", "csv", "91.\n", 91.0, True),
+    ("csv_fraction_refuses_one", "csv", "1/2\n", 1, False),
+    ("csv_fraction_refuses_string_one", "csv", "1/2\n", "1", False),
+    ("csv_fraction_whole", "csv", "1/2\n", "1/2", True),
+    ("csv_fraction_neighbor_refuses_one", "csv", "1/2,0.91\n", 1, False),
+    ("csv_fraction_neighbor_certifies_other", "csv", "1/2,0.91\n", 0.91, True),
+    ("csv_unit_exact", "csv", "1 K\n", "1 K", True),
+    ("csv_unit_tail", "csv", "1 KPa\n", "1 K", False),
+    ("csv_joined_row_is_not_a_cell", "csv", "0.91,0.92\n", "0.91,0.92", False),
+    ("tsv_first_cell", "tsv", "0.91\t0.92\n", 0.91, True),
+    ("tsv_second_cell", "tsv", "0.91\t0.92\n", 0.92, True),
+    ("tsv_grouped_cell_refuses_one", "tsv", "1,000\n", 1, False),
+    ("tsv_grouped_cell_refuses_thousand", "tsv", "1,000\n", 1000, False),
+    ("tsv_grouped_cell_whole", "tsv", "1,000\n", "1,000", True),
+    ("tsv_trailing_zeros", "tsv", "0.9100\n", 0.91, True),
+    ("tsv_leading_decimal", "tsv", ".91\n", 0.91, True),
+    ("tsv_trailing_dot", "tsv", "91.\n", 91.0, True),
+    ("tsv_fraction_refuses_one", "tsv", "1/2\n", 1, False),
+    ("tsv_fraction_whole", "tsv", "1/2\n", "1/2", True),
+    ("tsv_unit_exact", "tsv", "1 K\n", "1 K", True),
+    ("tsv_unit_tail", "tsv", "1 KPa\n", "1 K", False),
+    ("csv_underflow_refuses_zero", "csv", "1e-999\n", 0, False),
+    ("csv_underflow_refuses_zero_float", "csv", "1e-999\n", 0.0, False),
+    ("tsv_underflow_refuses_zero", "tsv", "1e-999\n", 0, False),
+    ("tsv_underflow_refuses_zero_float", "tsv", "1e-999\n", 0.0, False),
+    ("csv_int_precision_refuses_neighbor", "csv", "9007199254740993\n", 9007199254740992, False),
+    ("tsv_int_precision_refuses_neighbor", "tsv", "9007199254740993\n", 9007199254740992, False),
+    ("csv_int_precision_exact", "csv", "9007199254740993\n", 9007199254740993, True),
+    ("tsv_int_precision_exact", "tsv", "9007199254740993\n", 9007199254740993, True),
+    ("tsv_nan_cell_refuses_zero", "tsv", "NaN\n", 0, False),
+    ("csv_infinity_cell_refuses_zero", "csv", "Infinity\n", 0, False),
+    ("tsv_invalid_exponent_refuses_zero", "tsv", _CELL_INVALID_EXPONENT + "\n", 0, False),
+)
+
+
+def _tabular_source_document(
+    root: Path,
+    pin: object,
+    suffix: str,
+    source_text: str,
+    *,
+    line_range: str | None = None,
+) -> dict:
+    """One attested pin. ``source_text`` is the table literal, not derived from ``pin``."""
+    relative = f"tables/t1.{suffix}"
+    path = root / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(source_text, encoding="utf-8")
+    locator: dict = {"quotes_path": relative, "page": 1}
+    if line_range is not None:
+        locator["line_range"] = line_range
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["review_status"] = "reviewed"
+    doc["species"]["Fe"]["observations"][0]["values"] = {"alpha": pin}
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values.alpha",
+            "value": pin,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": locator,
+        }
+    ]
+    return doc
+
+
+@pytest.mark.parametrize(
+    ("case_name", "suffix", "source_text", "pin", "accepts"),
+    _TABULAR_CELL_CASES,
+    ids=[row[0] for row in _TABULAR_CELL_CASES],
+)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_tabular_source_matches_each_cell(
+    case_name: str,
+    suffix: str,
+    source_text: str,
+    pin: object,
+    accepts: bool,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: a table cell certifies a value only when the whole cell is that value.
+
+    The row ``0.91,0.92`` certifies 0.91 and 0.92, each as its own cell.
+    ``0.9100`` certifies 0.91 because the parsed Decimals are equal, and
+    the string ``0.91`` does not. ``1e-999`` does not certify 0.
+    ``9007199254740993`` does not certify ``9007199254740992``. A cell
+    ``1/2`` does not certify 1. A quoted cell ``1,000`` certifies that
+    printed value and not 1 or 1000. A TSV cell ``1,000`` does the same.
+    ``91.`` certifies 91. ``1 K`` is not
+    ``1 KPa`` inside a cell. NaN, Infinity, and an exponent Decimal
+    rejects do not certify 0. Every promoter calls
+    ``certify_extract_source_fidelity``.
+    """
+    doc = _tabular_source_document(tmp_path, pin, suffix, source_text)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    if accepts:
+        assert errors == [], (case_name, entry, errors)
+        return
+    assert errors, (case_name, entry)
+    if entry != "certify":
+        return
+    assert "source_blind_pin" in "\n".join(errors)
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (case_name, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == "source_blind_pin" for warning in warnings)
+
+
+# Locator against a parsed table. ``cuts`` is the rule that a line_range
+# overlapping a record without covering it is source-blind. Expected
+# acceptance of a covered cell is whole-cell equality, not a substring.
+# name, suffix, text, line_range, pin, accepts, cuts
+_TABLE_SPAN_CASES = (
+    ("csv_line2_refuses_one", "csv", '"note\n1,000"\n', "2", 1, False, True),
+    ("csv_line2_refuses_grouped_text", "csv", '"note\n1,000"\n', "2", "1,000", False, True),
+    ("csv_line2_refuses_whole_cell", "csv", '"note\n1,000"\n', "2", "note\n1,000", False, True),
+    ("csv_covered_span_whole_cell", "csv", '"note\n1,000"\n', "1-2", "note\n1,000", True, False),
+    ("csv_covered_span_refuses_one", "csv", '"note\n1,000"\n', "1-2", 1, False, False),
+    ("csv_covered_span_refuses_grouped", "csv", '"note\n1,000"\n', "1-2", "1,000", False, False),
+    ("csv_covered_note_one_refuses_one", "csv", '"note\n1"\n', "1-2", 1, False, False),
+    ("csv_covered_note_one_whole", "csv", '"note\n1"\n', "1-2", "note\n1", True, False),
+    ("tsv_line2_refuses_one", "tsv", '"note\n1,000"\n', "2", 1, False, True),
+    ("tsv_line2_refuses_whole_cell", "tsv", '"note\n1,000"\n', "2", "note\n1,000", False, True),
+    ("tsv_covered_span_whole_cell", "tsv", '"note\n1,000"\n', "1-2", "note\n1,000", True, False),
+    ("csv_cut_blocks_following_cell", "csv", '"note\n1,000"\n0.91\n', "2-3", 0.91, False, True),
+    ("tsv_cut_blocks_following_cell", "tsv", '"note\n1,000"\n0.91\n', "2-3", 0.91, False, True),
+    ("csv_following_line_certifies", "csv", '"note\n1,000"\n0.91\n', "3", 0.91, True, False),
+    ("csv_following_line_refuses_one", "csv", '"note\n1,000"\n0.91\n', "3", 1, False, False),
+    ("csv_covered_file_certifies_following", "csv", '"note\n1,000"\n0.91\n', "1-3", 0.91, True, False),
+    ("csv_second_row", "csv", "0.91,0.92\n1.5,2.5\n", "2", 1.5, True, False),
+    ("csv_second_row_misses_first", "csv", "0.91,0.92\n1.5,2.5\n", "2", 0.91, False, False),
+    ("tsv_second_row", "tsv", "0.91\t0.92\n1.5\t2.5\n", "2", 1.5, True, False),
+)
+
+
+@pytest.mark.parametrize(
+    ("case_name", "suffix", "source_text", "line_range", "pin", "accepts", "cuts"),
+    _TABLE_SPAN_CASES,
+    ids=[row[0] for row in _TABLE_SPAN_CASES],
+)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_table_locator_selects_parsed_cells(
+    case_name: str,
+    suffix: str,
+    source_text: str,
+    line_range: str,
+    pin: object,
+    accepts: bool,
+    cuts: bool,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: parse the complete table, then select cited records.
+
+    A locator on line 2 of ``\"note\\n1,000\"`` cuts through the quoted cell.
+    That span is source-blind. It is not re-parsed, so the fragment cell
+    ``1`` does not certify 1, and the whole cell is not cited either. The
+    span ``1-2`` cites the cell ``note\\n1,000`` and not the digit inside it.
+    A cell ``1/2`` is covered by the whole-cell cases above. Every promoter
+    calls ``certify_extract_source_fidelity``.
+    """
+    assert not (accepts and cuts)
+    doc = _tabular_source_document(
+        tmp_path, pin, suffix, source_text, line_range=line_range
+    )
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    if accepts:
+        assert errors == [], (case_name, entry, errors)
+        return
+    assert errors, (case_name, entry)
+    if entry != "certify":
+        return
+    joined = "\n".join(errors)
+    assert "source_blind_pin" in joined
+    if cuts:
+        assert "cuts through" in joined, (case_name, errors)
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (case_name, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == "source_blind_pin" for warning in warnings)
+
+
+# Embeddings that put a probe inside a larger cell. The expected boolean is
+# the oracle below, which does not call the gate. ``exact`` is the only
+# embedding that can certify the probe.
+_TABLE_CELL_PROBES = ("1", "0.91", "1,000", ".91", "1 K", "1/2")
+_TABLE_CELL_EMBEDDINGS = (
+    "exact",
+    "fraction",
+    "grouped",
+    "unit",
+    "prefix",
+    "slash_lead",
+    "doubled",
+)
+_TABLE_CELL_SUFFIXES = ("csv", "tsv")
+
+
+def _embedded_table_cell(probe: str, embedding: str) -> str:
+    """One cell built from ``probe``. Independent of the gate."""
+    if embedding == "exact":
+        return probe
+    if embedding == "fraction":
+        return f"{probe}/2"
+    if embedding == "grouped":
+        return f"{probe},000"
+    if embedding == "unit":
+        return f"{probe}Pa"
+    if embedding == "prefix":
+        return f"note {probe}"
+    if embedding == "slash_lead":
+        return f"1/{probe}"
+    if embedding == "doubled":
+        return f"{probe} {probe}"
+    raise AssertionError(embedding)
+
+
+def _one_cell_table(cell: str, suffix: str) -> str:
+    """A one-cell CSV or TSV whose parsed cell is ``cell``."""
+    delimiter = "," if suffix == "csv" else "\t"
+    buffer = io.StringIO(newline="")
+    csv.writer(buffer, delimiter=delimiter, lineterminator="\n").writerow([cell])
+    return buffer.getvalue()
+
+
+def _oracle_finite_decimal(text: str) -> Decimal | None:
+    """One finite Decimal, or None. Independent of the gate."""
+    try:
+        parsed = Decimal(text)
+    except DecimalException:
+        return None
+    if not parsed.is_finite():
+        return None
+    return parsed
+
+
+def _oracle_parse_whole_cell(cell: str) -> Decimal | None:
+    """Parse the whole trimmed cell with Decimal. Not the gate's grammar.
+
+    The cell is the token. A trailing dot parses: ``91.`` is 91.
+    ``1e-999`` stays that Decimal. ``9007199254740993`` stays that
+    integer. NaN, Infinity, and InvalidOperation are refusals. A slash,
+    a grouping comma, and a unit do not parse.
+    """
+    return _oracle_finite_decimal(cell.strip())
+
+
+def _oracle_stored_decimal(leaf: int | float) -> Decimal | None:
+    """Exact Decimal of a stored int or float. Independent of the gate.
+
+    A float uses ``repr``. An int uses ``str``. A non-finite value refuses.
+    """
+    if isinstance(leaf, bool):
+        return None
+    if isinstance(leaf, float):
+        text = repr(leaf)
+    elif isinstance(leaf, int):
+        text = str(leaf)
+    else:
+        return None
+    return _oracle_finite_decimal(text)
+
+
+def _oracle_whole_cell_certifies(leaf: object, cell: str) -> bool:
+    """The table rule, written here. It does not call the gate.
+
+    Trim the cell. A string certifies only when the cell equals it. A
+    number certifies only when ``Decimal`` of the whole cell equals
+    ``Decimal`` of the stored spelling: ``0.9100`` and ``.91`` are 0.91,
+    ``1.0`` is 1, ``91.`` is 91, ``1e-999`` is not 0, and
+    ``9007199254740993`` is not ``9007199254740992``. A slash, a grouping
+    comma, a unit, NaN, Infinity, or InvalidOperation refuses. The sign of zero
+    is part of the value. ``Decimal`` equality drops that sign, so the
+    sign bits are compared when the value is zero.
+    """
+    trimmed = cell.strip()
+    if isinstance(leaf, str):
+        return trimmed == leaf
+    if isinstance(leaf, bool):
+        return trimmed.lower() == ("true" if leaf else "false")
+    if isinstance(leaf, (int, float)):
+        parsed = _oracle_parse_whole_cell(trimmed)
+        stored = _oracle_stored_decimal(leaf)
+        if parsed is None or stored is None:
+            return False
+        if parsed != stored:
+            return False
+        if parsed.is_zero():
+            return parsed.as_tuple().sign == stored.as_tuple().sign
+        return True
+    return False
+
+
+def _exact_stored_leaf(number: Decimal) -> int | float | None:
+    """A Python number that is exactly ``number``, or None.
+
+    This builds a stored leaf. It is not the certification decision.
+    An int is exact. A float is kept only when ``Decimal(repr(candidate))``
+    equals ``number``, so ``1e-999`` is not stored as 0 and
+    ``9007199254740993`` is not stored as ``9007199254740992``.
+    """
+    if not number.is_finite():
+        return None
+    exponent = number.as_tuple().exponent
+    if abs(exponent) > 10000 or len(number.as_tuple().digits) > 10000:
+        return None
+    if number == number.to_integral_value():
+        if number.is_zero():
+            return -0.0 if number.as_tuple().sign else 0
+        return int(number)
+    try:
+        candidate = float(number)
+    except (OverflowError, ValueError):
+        return None
+    if not math.isfinite(candidate):
+        return None
+    stored = Decimal(repr(candidate))
+    if stored != number:
+        return None
+    if number.is_zero() and stored.as_tuple().sign != number.as_tuple().sign:
+        return None
+    return candidate
+
+
+def _remember_exact_leaf(leaves: list[object], leaf: object) -> None:
+    """Append ``leaf`` unless the same value and zero-sign are already present."""
+    if isinstance(leaf, float) and leaf == 0.0:
+        for item in leaves:
+            if (
+                isinstance(item, float)
+                and item == 0.0
+                and math.copysign(1.0, item) == math.copysign(1.0, leaf)
+            ):
+                return
+        leaves.append(leaf)
+        return
+    if leaf not in leaves:
+        leaves.append(leaf)
+
+
+def _table_cell_leaves(probe: str, cell: str) -> list[object]:
+    """Leaves this cell is asked to certify. The oracle decides each one."""
+    leaves: list[object] = [probe, cell, 1, "1"]
+    if probe == "0.91":
+        leaves.append(0.91)
+    elif probe == ".91":
+        leaves.append(float(".91"))
+    unique: list[object] = []
+    for leaf in leaves:
+        if leaf not in unique:
+            unique.append(leaf)
+    return unique
+
+
+def _whole_cell_cases() -> list[tuple[str, str, str, str]]:
+    cases = []
+    for probe in _TABLE_CELL_PROBES:
+        for embedding in _TABLE_CELL_EMBEDDINGS:
+            for suffix in _TABLE_CELL_SUFFIXES:
+                ident = (
+                    f"{suffix}-{embedding}-"
+                    f"{probe.replace(' ', 'SP').replace(',', 'COMMA').replace('/', 'SLASH').replace('.', 'DOT')}"
+                )
+                cases.append((ident, suffix, probe, embedding))
+    return cases
+
+
+@pytest.mark.parametrize(
+    ("case_name", "suffix", "probe", "embedding"),
+    _whole_cell_cases(),
+    ids=[row[0] for row in _whole_cell_cases()],
+)
+def test_table_cell_certifies_only_the_whole_cell(
+    case_name: str,
+    suffix: str,
+    probe: str,
+    embedding: str,
+    tmp_path: Path,
+):
+    """Invariant: no substring of a table cell certifies.
+
+    The product is every probe (``1``, ``0.91``, ``1,000``, ``.91``,
+    ``1 K``, ``1/2``) embedded as the whole cell, a fraction, a grouped
+    continuation, a unit, a word prefix, a slash prefix, or a doubled
+    token, in both CSV and TSV. The expected boolean is
+    ``_oracle_whole_cell_certifies``, which parses the cell. A cell
+    ``1/2`` does not certify 1. A cell ``1,000`` does not certify 1 and
+    does certify the string ``1,000``. A cell ``.91`` certifies 0.91.
+    """
+    assert "vle." not in inspect.getsource(_oracle_whole_cell_certifies)
+    assert "vle." not in inspect.getsource(_oracle_parse_whole_cell)
+    assert "vle." not in inspect.getsource(_oracle_stored_decimal)
+    assert "_numeric_spellings" not in inspect.getsource(_oracle_whole_cell_certifies)
+    assert "_numeric_spellings" not in inspect.getsource(vle._cell_certifies_leaf)
+    assert "_numeric_spellings" not in inspect.getsource(vle._whole_cell_number)
+    assert "_NUMERIC_TOKEN_RE" not in inspect.getsource(vle._whole_cell_number)
+    assert "_NUMERIC_TOKEN_RE" not in inspect.getsource(_oracle_parse_whole_cell)
+    assert "_ORACLE_CELL_NUMBER_RE" not in inspect.getsource(_oracle_parse_whole_cell)
+    for function in (
+        _oracle_finite_decimal,
+        _oracle_parse_whole_cell,
+        _oracle_stored_decimal,
+        _oracle_whole_cell_certifies,
+        vle._finite_decimal,
+        vle._whole_cell_number,
+        vle._stored_number_decimal,
+        vle._cell_certifies_leaf,
+        vle._leaf_in_table,
+    ):
+        assert "float(" not in inspect.getsource(function), function.__name__
+    assert "_cell_certifies_leaf" in inspect.getsource(vle._leaf_in_table)
+    assert not _oracle_whole_cell_certifies(1, "1/2")
+    assert not _oracle_whole_cell_certifies(1, "1,000")
+    assert not _oracle_whole_cell_certifies(1000, "1,000")
+    assert _oracle_whole_cell_certifies("1,000", "1,000")
+    assert _oracle_whole_cell_certifies(1, "1")
+    assert _oracle_whole_cell_certifies(0.91, "0.91")
+    assert _oracle_whole_cell_certifies(0.91, "0.9100")
+    assert _oracle_whole_cell_certifies(0.91, ".91")
+    assert _oracle_whole_cell_certifies(1, "1.0")
+    assert _oracle_whole_cell_certifies(1.0, "1")
+    assert not _oracle_whole_cell_certifies("0.91", "0.9100")
+    assert _oracle_whole_cell_certifies(91.0, "91.")
+    assert _oracle_whole_cell_certifies(1.0, "1.")
+    assert _oracle_whole_cell_certifies(1, "1.")
+    cell = _embedded_table_cell(probe, embedding)
+    text = _one_cell_table(cell, suffix)
+    delimiter = "," if suffix == "csv" else "\t"
+    parsed = list(csv.reader(io.StringIO(text, newline=""), delimiter=delimiter))
+    assert parsed == [[cell]], (case_name, parsed, text)
+    for leaf in _table_cell_leaves(probe, cell):
+        expected = _oracle_whole_cell_certifies(leaf, cell)
+        doc = _tabular_source_document(tmp_path, leaf, suffix, text)
+        errors = vle.certify_extract_source_fidelity(
+            doc, label="cell", artifact_root=tmp_path
+        )
+        if expected:
+            assert errors == [], (case_name, leaf, cell, errors)
+            continue
+        assert errors, (case_name, leaf, cell)
+        assert "source_blind_pin" in "\n".join(errors)
+
+
+# Spellings of one number, and strings that are not that number. The
+# expected boolean is the whole-cell parse, not a list of spellings.
+_CELL_PARSE_SIGNS = ("", "+", "-")
+_CELL_PARSE_BODIES = (
+    "0",
+    "0.0",
+    "0.91",
+    "0.9100",
+    "0.910000",
+    ".91",
+    "9.1e-1",
+    "91e-2",
+    "9.10E-1",
+    "1",
+    "1.0",
+    "1.00",
+    "1e0",
+    "1.0e0",
+    "1e3",
+    "1.2E-3",
+    "1000",
+    "1000.0",
+    "01",
+    "00.91",
+    "1,000",
+    "1/2",
+    "91.",
+    "1.",
+    "0.911",
+    "10.91",
+    "1 K",
+    "0.91Pa",
+    "1e-999",
+    "0e-999",
+    "9007199254740993",
+    "9007199254740992",
+    _CELL_INVALID_EXPONENT,
+    "NaN",
+    "Infinity",
+)
+_CELL_PARSE_PROBES = (
+    0.91,
+    -0.91,
+    1,
+    1.0,
+    1000,
+    1000.0,
+    91.0,
+    0.0,
+    -0.0,
+    0.0012,
+    0,
+    9007199254740993,
+    9007199254740992,
+    float("nan"),
+    float("inf"),
+    float("-inf"),
+)
+
+
+def _cell_parse_product() -> list[str]:
+    return [
+        f"{sign}{body}"
+        for sign in _CELL_PARSE_SIGNS
+        for body in _CELL_PARSE_BODIES
+    ]
+
+
+def test_numeric_table_cell_certifies_only_when_the_whole_cell_parses_equal(
+    tmp_path: Path,
+):
+    """Invariant: a numeric table cell certifies iff the whole cell parses equal.
+
+    The product is every sign and every mantissa class: trailing zeros,
+    leading decimal, exponent, integer, grouping, fraction, trailing dot,
+    unit, underflow (``1e-999``), integer past the float mantissa, NaN,
+    Infinity, and an exponent Decimal rejects. Both CSV and TSV. The
+    expected boolean is ``_oracle_whole_cell_certifies``, which compares
+    Decimals and does not use a spelling list or a float conversion.
+    ``0.9100`` certifies 0.91. ``1e-999`` does not certify 0.
+    ``9007199254740993`` does not certify ``9007199254740992``. ``1/2``
+    does not certify 1. ``1,000`` does not certify 1 or 1000. A string
+    certifies only the same string. ``91.`` certifies 91.0. ``1.`` certifies 1.
+    """
+    literal_pins = (
+        (0.91, "0.9100", True),
+        (0, "1e-999", False),
+        (0.0, "1e-999", False),
+        (9007199254740992, "9007199254740993", False),
+        (9007199254740993, "9007199254740993", True),
+        (0, _CELL_INVALID_EXPONENT, False),
+        (float("nan"), "NaN", False),
+        (float("inf"), "Infinity", False),
+        (float("-inf"), "-Infinity", False),
+        (0, "0e-999", True),
+        (-0.0, "-0e-999", True),
+        (0.0, "-0e-999", False),
+        (0.0, "-0.0", False),
+        (-0.0, "-0.0", True),
+        (91.0, "91.", True),
+        (1.0, "1.", True),
+        (1, "1.", True),
+    )
+    for leaf, cell, expected in literal_pins:
+        assert _oracle_whole_cell_certifies(leaf, cell) is expected, (leaf, cell)
+        assert vle._cell_certifies_leaf(leaf, cell) is expected, (leaf, cell)
+    assert _exact_stored_leaf(Decimal("1e-999")) is None
+    assert _exact_stored_leaf(Decimal("9007199254740993")) == 9007199254740993
+    assert _oracle_whole_cell_certifies(0.91, ".91")
+    assert _oracle_whole_cell_certifies(1, "1.0")
+    assert _oracle_whole_cell_certifies(1.0, "1")
+    assert _oracle_whole_cell_certifies(1000, "1e3")
+    assert _oracle_whole_cell_certifies(1000.0, "1e3")
+    assert not _oracle_whole_cell_certifies(1, "1/2")
+    assert not _oracle_whole_cell_certifies(1, "1,000")
+    assert not _oracle_whole_cell_certifies(1000, "1,000")
+    assert _oracle_whole_cell_certifies(91.0, "91.")
+    assert _oracle_whole_cell_certifies(1.0, "1.")
+    assert _oracle_whole_cell_certifies(1, "1.")
+    assert not _oracle_whole_cell_certifies(0.91, "0.911")
+    assert not _oracle_whole_cell_certifies("0.91", "0.9100")
+    assert _oracle_whole_cell_certifies("1,000", "1,000")
+    assert _oracle_whole_cell_certifies("1/2", "1/2")
+    # A Unicode minus folds onto ASCII before the cell is parsed.
+    assert vle._cell_certifies_leaf(-0.91, "\u22120.91")
+    assert not vle._cell_certifies_leaf(0.91, "\u22120.91")
+    assert vle._cell_certifies_leaf("-0.91", "\u22120.91")
+    failures: list[str] = []
+    for cell in _cell_parse_product():
+        leaves: list[object] = [*_CELL_PARSE_PROBES, cell]
+        parsed = _oracle_parse_whole_cell(cell)
+        exact = _exact_stored_leaf(parsed) if parsed is not None else None
+        if exact is not None:
+            _remember_exact_leaf(leaves, exact)
+        for leaf in leaves:
+            expected = _oracle_whole_cell_certifies(leaf, cell)
+            got = vle._cell_certifies_leaf(leaf, cell)
+            if got != expected:
+                failures.append(f"{cell!r} {leaf!r} gate={got} oracle={expected}")
+        if failures:
+            continue
+        for suffix in _TABLE_CELL_SUFFIXES:
+            text = _one_cell_table(cell, suffix)
+            public_leaves: list[object] = [0.91, 1, cell]
+            if exact is not None:
+                _remember_exact_leaf(public_leaves, exact)
+            for leaf in public_leaves:
+                expected = _oracle_whole_cell_certifies(leaf, cell)
+                doc = _tabular_source_document(tmp_path, leaf, suffix, text)
+                errors = vle.certify_extract_source_fidelity(
+                    doc, label="parse", artifact_root=tmp_path
+                )
+                if expected:
+                    if errors:
+                        failures.append(f"certify {suffix} {cell!r} {leaf!r}: {errors}")
+                    continue
+                if not errors or "source_blind_pin" not in "\n".join(errors):
+                    failures.append(
+                        f"refuse {suffix} {cell!r} {leaf!r}: {errors}"
+                    )
+    assert failures == []
+
+
+_TABLE_CUT_INNERS = ("1,000", "1", "1/2", "0.91")
+_TABLE_CUT_MODES = ("cut_line2", "cut_line1", "cover")
+
+
+def _multiline_cell_table(inner: str, suffix: str) -> tuple[str, str]:
+    """A quoted cell ``note\\n<inner>``. Returns the file text and the cell."""
+    cell = "note\n" + inner
+    delimiter = "," if suffix == "csv" else "\t"
+    buffer = io.StringIO(newline="")
+    csv.writer(buffer, delimiter=delimiter, lineterminator="\n").writerow([cell])
+    return buffer.getvalue(), cell
+
+
+def _table_cut_cases() -> list[tuple[str, str, str, str]]:
+    cases = []
+    for inner in _TABLE_CUT_INNERS:
+        for suffix in _TABLE_CELL_SUFFIXES:
+            for mode in _TABLE_CUT_MODES:
+                label = inner.replace(",", "COMMA").replace("/", "SLASH").replace(".", "DOT")
+                cases.append((f"{suffix}-{mode}-{label}", suffix, inner, mode))
+    return cases
+
+
+@pytest.mark.parametrize(
+    ("case_name", "suffix", "inner", "mode"),
+    _table_cut_cases(),
+    ids=[row[0] for row in _table_cut_cases()],
+)
+def test_table_locator_that_cuts_a_cell_is_source_blind(
+    case_name: str,
+    suffix: str,
+    inner: str,
+    mode: str,
+    tmp_path: Path,
+):
+    """Invariant: a locator that cuts a quoted cell never certifies.
+
+    The table is one quoted cell ``note\\n<inner>``. Citing line 1 or line 2
+    cuts that cell, so every leaf refuses, including a leaf the sliced line
+    would certify. Citing lines 1-2 selects the whole cell, which certifies
+    only when ``_oracle_whole_cell_certifies`` says the cell is that leaf.
+    For inner ``1,000``, a CSV line 2 parses as a cell ``1``; the gate
+    still refuses 1. A TSV line 2 stays the one cell ``1,000"`` and does
+    not certify 1. The cut refuses either way.
+    """
+    text, cell = _multiline_cell_table(inner, suffix)
+    assert text.splitlines() == ['"note', inner + '"'], (case_name, text)
+    delimiter = "," if suffix == "csv" else "\t"
+    parsed = list(csv.reader(io.StringIO(text, newline=""), delimiter=delimiter))
+    assert parsed == [[cell]], (case_name, parsed)
+    if mode == "cut_line2" and inner == "1,000":
+        fragment = text.splitlines()[1]
+        fragment_rows = list(
+            csv.reader(io.StringIO(fragment + "\n", newline=""), delimiter=delimiter)
+        )
+        fragment_cells = [item for row in fragment_rows for item in row]
+        fragment_certifies_one = any(
+            _oracle_whole_cell_certifies(1, item) for item in fragment_cells
+        )
+        if suffix == "csv":
+            # A comma splits the sliced line, so a re-parse would see a
+            # cell that is the number 1. The gate must still refuse.
+            assert fragment_certifies_one, fragment_cells
+        else:
+            # A tab does not split ``1,000"``. The fragment stays one cell
+            # and does not certify 1. The cut refusal is checked below.
+            assert fragment_cells == ['1,000"'], fragment_cells
+            assert not fragment_certifies_one, fragment_cells
+    if mode == "cover":
+        line_range = "1-2"
+    elif mode == "cut_line1":
+        line_range = "1"
+    elif mode == "cut_line2":
+        line_range = "2"
+    else:
+        raise AssertionError(mode)
+    leaves: list[object] = [1, "1", inner, cell]
+    if inner == "0.91":
+        leaves.append(0.91)
+    seen: list[object] = []
+    for leaf in leaves:
+        if leaf not in seen:
+            seen.append(leaf)
+    for leaf in seen:
+        if mode == "cover":
+            expected = _oracle_whole_cell_certifies(leaf, cell)
+        else:
+            expected = False
+        doc = _tabular_source_document(
+            tmp_path, leaf, suffix, text, line_range=line_range
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label="cut", artifact_root=tmp_path
+        )
+        if expected:
+            assert errors == [], (case_name, leaf, errors)
+            continue
+        assert errors, (case_name, leaf)
+        joined = "\n".join(errors)
+        assert "source_blind_pin" in joined
+        if mode != "cover":
+            assert "cuts through" in joined, (case_name, leaf, errors)
+
+
+# Stored value versus the sample spelling. ``within`` pairs satisfy
+# abs(sample-stored) <= 0.6 * max(abs(sample), abs(stored)) and fail that
+# test at 0.1. The pass/fail oracle below uses only these labels. It does
+# not call the gate's matcher or its numeric regex.
+_TOLERANCE_EXTRACT = {
+    "float": 0.48,
+    "int": 14,
+    "list": [0.48, 0.52],
+    "dict": {"alpha": 0.48, "beta": 0.52},
+    "range": [1700.0, 1800.0],
+}
+_TOLERANCE_SAMPLE = {
+    "float": 0.24,
+    "int": 10,
+    "list": [0.24, 0.31],
+    "dict": {"alpha": 0.24, "beta": 0.31},
+    "range": [1000.0, 1200.0],
+}
+_TOLERANCE_SHAPES = ("float", "int", "list", "dict", "range")
+_TOLERANCE_RELATIONS = ("equal", "within", "outside")
+_TOLERANCE_SOURCES = ("sample", "extract", "both", "neither")
+
+
+def _tolerance_cases() -> list[tuple[str, str, str, str]]:
+    cases = []
+    for shape in _TOLERANCE_SHAPES:
+        addressings = ("path",) if shape == "range" else ("path", "structured")
+        for addressing in addressings:
+            for relation in _TOLERANCE_RELATIONS:
+                for source in _TOLERANCE_SOURCES:
+                    cases.append((shape, addressing, relation, source))
+    return cases
+
+
+def _tolerance_pair(shape: str, relation: str) -> tuple[object, object]:
+    extract = copy.deepcopy(_TOLERANCE_EXTRACT[shape])
+    if relation == "equal":
+        return copy.deepcopy(extract), extract
+    return copy.deepcopy(_TOLERANCE_SAMPLE[shape]), extract
+
+
+def _literal_number_tokens(value: object) -> list[str]:
+    """Spellings this fixture writes. Not the gate's token grammar."""
+    if isinstance(value, bool) or value is None:
+        raise AssertionError(value)
+    if isinstance(value, (int, float)):
+        return [str(value)]
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        tokens: list[str] = []
+        for child in value.values():
+            tokens.extend(_literal_number_tokens(child))
+        return tokens
+    if isinstance(value, list):
+        tokens = []
+        for child in value:
+            tokens.extend(_literal_number_tokens(child))
+        return tokens
+    raise AssertionError(type(value))
+
+
+def _resolved_tokens_are_cited(relation: str, source: str) -> bool:
+    """True when the fixture's cited text contains the stored number."""
+    if relation == "equal":
+        return source != "neither"
+    return source in {"extract", "both"}
+
+
+def _sample_tokens_are_cited(relation: str, source: str) -> bool:
+    """True when the fixture's cited text contains the sample number."""
+    if relation == "equal":
+        return source != "neither"
+    return source in {"sample", "both"}
+
+
+def _tolerance_match_holds(relation: str) -> bool:
+    return relation != "outside"
+
+
+def _tolerance_certifies(relation: str, source: str) -> bool:
+    """Independent of the gate.
+
+    Certification passes only when the sample matches the stored leaf
+    (exactly, or within the declared tolerance) and the cited text contains
+    both the sample spelling and the stored number. A within-tolerance
+    sample whose text cites only the sample number does not pass.
+    """
+    return (
+        _tolerance_match_holds(relation)
+        and _resolved_tokens_are_cited(relation, source)
+        and _sample_tokens_are_cited(relation, source)
+    )
+
+
+def _tolerance_source_text(shape: str, relation: str, source: str) -> str:
+    sample, extract = _tolerance_pair(shape, relation)
+    sample_line = "sample " + " ".join(_literal_number_tokens(sample))
+    extract_line = "stored " + " ".join(_literal_number_tokens(extract))
+    if shape == "range":
+        # The values pin is a separate leaf and is always cited.
+        prefix = "alpha 0.24\n"
+    else:
+        prefix = ""
+    if source == "sample":
+        body = sample_line
+    elif source == "extract":
+        body = extract_line
+    elif source == "both":
+        body = sample_line + "\n" + extract_line
+    elif source == "neither":
+        body = "no measured numbers"
+    else:
+        raise AssertionError(source)
+    return prefix + body + "\n"
+
+
+def _attested_sample(value: object, *, rel_tol: float | None, path: str, structured: dict | None) -> dict:
+    sample: dict = {
+        "value": copy.deepcopy(value),
+        "reviewed_by": "independent reviewer",
+        "reviewed_on": "2026-11-10",
+        "locator": {"source_path": "text/paper.txt", "page": 1},
+    }
+    if rel_tol is not None:
+        sample["rel_tol"] = rel_tol
+    if structured is None:
+        sample["path"] = path
+        return sample
+    sample.update(structured)
+    return sample
+
+
+def _tolerance_document(root: Path, shape: str, addressing: str, relation: str, source: str) -> dict:
+    """One attested pin. The cited text is the fixture literal, not a gate spelling."""
+    sample_value, extract_value = _tolerance_pair(shape, relation)
+    artifact = root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text(
+        _tolerance_source_text(shape, relation, source),
+        encoding="utf-8",
+    )
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    row = doc["species"]["Fe"]["observations"][0]
+    rel_tol = {"within": 0.6, "outside": 0.1, "equal": None}[relation]
+    if shape == "range":
+        row["values"] = {"alpha": 0.24}
+        row["T_range_K"] = copy.deepcopy(extract_value)
+        values_pin = _attested_sample(
+            0.24,
+            rel_tol=None,
+            path="species.Fe.observations[fe_alpha_1].values.alpha",
+            structured=None,
+        )
+        range_pin = _attested_sample(
+            sample_value,
+            rel_tol=rel_tol,
+            path="species.Fe.observations[fe_alpha_1].T_range_K",
+            structured=None,
+        )
+        doc["fidelity_samples"] = [values_pin, range_pin]
+        return doc
+    if shape == "list":
+        row["values"] = copy.deepcopy(extract_value)
+        path = "species.Fe.observations[fe_alpha_1].values"
+        structured = {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+        }
+    elif shape == "dict":
+        row["values"] = copy.deepcopy(extract_value)
+        path = "species.Fe.observations[fe_alpha_1].values"
+        structured = {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+        }
+    else:
+        row["values"] = {"alpha": copy.deepcopy(extract_value)}
+        path = "species.Fe.observations[fe_alpha_1].values.alpha"
+        structured = {
+            "species": "Fe",
+            "observable": "alpha",
+            "observation_id": "fe_alpha_1",
+            "field": "alpha",
+        }
+    doc["fidelity_samples"] = [
+        _attested_sample(
+            sample_value,
+            rel_tol=rel_tol,
+            path=path,
+            structured=structured if addressing == "structured" else None,
+        )
+    ]
+    return doc
+
+
+def test_tolerance_pairs_sit_on_the_declared_side_of_rel_tol():
+    """The matrix labels are the language tolerance, not the gate's matcher."""
+    for shape in _TOLERANCE_SHAPES:
+        sample, extract = _tolerance_pair(shape, "within")
+        assert _fixture_isclose(sample, extract, 0.6), shape
+        assert not _fixture_isclose(sample, extract, 0.1), shape
+
+
+def _fixture_isclose(sample: object, extract: object, rel_tol: float) -> bool:
+    if isinstance(sample, bool) or isinstance(extract, bool):
+        return False
+    if isinstance(sample, (int, float)) and isinstance(extract, (int, float)):
+        return math.isclose(float(sample), float(extract), rel_tol=rel_tol, abs_tol=0.0)
+    if isinstance(sample, dict) and isinstance(extract, dict):
+        if set(sample) != set(extract):
+            return False
+        return all(
+            _fixture_isclose(sample[key], extract[key], rel_tol) for key in sample
+        )
+    if isinstance(sample, list) and isinstance(extract, list):
+        if len(sample) != len(extract):
+            return False
+        return all(
+            _fixture_isclose(left, right, rel_tol)
+            for left, right in zip(sample, extract)
+        )
+    return False
+
+
+@pytest.mark.parametrize(
+    ("shape", "addressing", "relation", "source"),
+    _tolerance_cases(),
+    ids=lambda item: item if isinstance(item, str) else str(item),
+)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_resolved_extract_value_is_what_certification_searches(
+    shape: str,
+    addressing: str,
+    relation: str,
+    source: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: the stored leaf is in the opened source, or certification refuses.
+
+    ``float`` / ``within`` / ``sample`` is the bypass: stored 0.48, sample
+    0.24, rel_tol 0.6, and cited text that contains only 0.24. Coverage used
+    to clear on the tolerance and the source check searched the sample
+    spelling. Every stored shape and every promoter goes through
+    ``certify_extract_source_fidelity``.
+    """
+    doc = _tolerance_document(tmp_path, shape, addressing, relation, source)
+    cited = (tmp_path / "text" / "paper.txt").read_text(encoding="utf-8")
+    _sample, extract = _tolerance_pair(shape, relation)
+    if relation != "equal" and source == "sample":
+        for token in _literal_number_tokens(extract):
+            assert token not in cited, (shape, token, cited)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    expects = _tolerance_certifies(relation, source)
+    if expects:
+        assert errors == [], (shape, addressing, relation, source, entry, errors)
+        return
+    assert errors, (shape, addressing, relation, source, entry)
+    if entry != "certify":
+        return
+    joined = "\n".join(errors)
+    if not _resolved_tokens_are_cited(relation, source) or not _sample_tokens_are_cited(
+        relation, source
+    ):
+        assert "source_blind_pin" in joined, (shape, addressing, relation, source, errors)
+    if relation == "outside":
+        assert "fidelity sample value mismatch" in joined
+    if relation == "within" and source == "sample":
+        for token in _literal_number_tokens(extract):
+            assert token in joined, (shape, addressing, token, errors)
+    if shape == "float" and relation == "within" and source == "sample":
+        draft = copy.deepcopy(doc)
+        draft["review_status"] = "draft"
+        draft_errors = vle.validate_extract_document(
+            draft,
+            expected_source_id="fixture-source",
+            artifact_root=tmp_path,
+        )
+        assert draft_errors == [], draft_errors
+        warnings = vle.fidelity_source_warnings(
+            draft, label="draft", artifact_root=tmp_path
+        )
+        assert any(warning.kind == "source_blind_pin" for warning in warnings)
+
+
+# Scored rows that schema validation rejects and certification used to omit.
+# ``absent`` deletes the key. The other values are not non-empty strings.
+_UNUSABLE_OBSERVATION_IDS = (
+    "absent",
+    "none",
+    "empty",
+    "zero",
+    "one",
+    "float",
+    "false",
+    "true",
+    "list",
+    "mapping",
+    "row_number",
+    "row_text",
+)
+_IDLESS_PAYLOADS = ("numeric", "label", "range")
+
+
+def _unusable_id_value(case: str) -> object:
+    if case == "absent":
+        return None
+    if case == "none":
+        return None
+    if case == "empty":
+        return ""
+    if case == "zero":
+        return 0
+    if case == "one":
+        return 1
+    if case == "float":
+        return 0.24
+    if case == "false":
+        return False
+    if case == "true":
+        return True
+    if case == "list":
+        return []
+    if case == "mapping":
+        return {}
+    raise AssertionError(case)
+
+
+def _idless_cases() -> list[tuple[str, str]]:
+    cases = [
+        (case, payload)
+        for case in _UNUSABLE_OBSERVATION_IDS
+        if case not in {"row_number", "row_text"}
+        for payload in _IDLESS_PAYLOADS
+    ]
+    cases.append(("row_number", "numeric"))
+    cases.append(("row_text", "numeric"))
+    return cases
+
+
+def _idless_document(case: str, payload: str) -> dict:
+    """A reviewed-shaped extract with no fidelity samples and one bad scored row."""
+    doc = _minimal_extract()
+    doc["fidelity_samples"] = []
+    if case == "row_number":
+        doc["species"]["Fe"]["observations"] = [0.48]
+        return doc
+    if case == "row_text":
+        doc["species"]["Fe"]["observations"] = ["0.48"]
+        return doc
+    row: dict = {
+        "type": "alpha",
+        "locator": {"table": "1", "page": 2},
+        "units": "dimensionless",
+        "values": {"alpha": 0.48},
+    }
+    if payload == "label":
+        row["values"] = {"quantity": "alpha"}
+    elif payload == "range":
+        row["values"] = {"quantity": "alpha"}
+        row["T_range_K"] = [1700.0, 1800.0]
+    if case != "absent":
+        row["observation_id"] = _unusable_id_value(case)
+    doc["species"]["Fe"]["observations"] = [row]
+    return doc
+
+
+@pytest.mark.parametrize(
+    ("case", "payload"),
+    _idless_cases(),
+    ids=[f"{case}-{payload}" for case, payload in _idless_cases()],
+)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_scored_row_without_usable_id_refuses_every_promoter(
+    case: str,
+    payload: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: a scored row with no usable id is a refusal, not a skip.
+
+    No fidelity samples, so nothing opens a source. Numeric, label, and
+    temperature-range payloads used to produce neither a coverage warning
+    nor a certification refusal. ``load_extracts(require_valid=False)`` and
+    the index builder are in the promoter list.
+    """
+    doc = _idless_document(case, payload)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    joined = "\n".join(errors)
+    assert "missing_observation_id" in joined, (case, payload, entry, errors)
+    if entry == "certify":
+        warnings = vle.fidelity_source_warnings(doc, label="idless")
+        found = next(
+            warning for warning in warnings if warning.kind == "missing_observation_id"
+        )
+        assert found.count == 1
+        assert "species.Fe.observations[0]" in found.detail
+        assert not any(warning.kind == "uncovered_observation" for warning in warnings)
+        draft = copy.deepcopy(doc)
+        draft["review_status"] = "draft"
+        draft_warnings: list = []
+        draft_errors = vle.validate_extract_document(
+            draft,
+            expected_source_id="fixture-source",
+            fidelity_warnings=draft_warnings,
+        )
+        assert draft_errors, (case, payload)
+        assert any(warning.kind == "missing_observation_id" for warning in draft_warnings)
+        assert any("observation_id" in error or "observation must be a mapping" in error for error in draft_errors)
+
+
+def test_two_idless_rows_are_two_refusals():
+    """Each omitted row is its own count. They do not collapse into one."""
+    doc = _idless_document("absent", "numeric")
+    second = copy.deepcopy(doc["species"]["Fe"]["observations"][0])
+    second["values"] = {"alpha": 0.91}
+    doc["species"]["Fe"]["observations"].append(second)
+    warnings = vle.fidelity_source_warnings(doc, label="two-idless")
+    found = next(warning for warning in warnings if warning.kind == "missing_observation_id")
+    assert found.count == 2
+    refusals = vle.certify_extract_source_fidelity(doc, label="two-idless")
+    assert any("missing_observation_id count=2" in line for line in refusals)
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_certified_sibling_does_not_hide_an_idless_row(
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """A certified Fe row does not cover an id-less Mg row in the same extract."""
+    doc = _literal_source_document(tmp_path, 0.91, "alpha 0.91 measured\n")
+    doc["species"]["Mg"] = {
+        "observations": [
+            {
+                "type": "alpha",
+                "locator": {"table": "2", "page": 3},
+                "units": "dimensionless",
+                "values": {"alpha": 0.48},
+                "T_range_K": [1700.0, 1800.0],
+            }
+        ]
+    }
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    joined = "\n".join(errors)
+    assert "missing_observation_id" in joined, (entry, errors)
+    if entry == "certify":
+        warnings = vle.fidelity_source_warnings(
+            doc, label="sibling", artifact_root=tmp_path
+        )
+        found = next(
+            warning for warning in warnings if warning.kind == "missing_observation_id"
+        )
+        assert found.count == 1
+        assert "species.Mg.observations[0]" in found.detail
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_context_row_without_id_is_outside_scored_coverage(
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Context is unscored. A missing id there is not ``missing_observation_id``."""
+    doc = _literal_source_document(tmp_path, 0.91, "alpha 0.91 measured\n")
+    doc["species"]["Fe"]["context"] = [
+        {
+            "type": "apparatus",
+            "locator": {"page": 4, "section": "setup"},
+            "units": "as printed",
+            "values": {"furnace": "muffle", "setpoint": 1800},
+        }
+    ]
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    joined = "\n".join(errors)
+    assert "missing_observation_id" not in joined, (entry, errors)
+    if entry == "certify":
+        assert errors == [], errors
+    if entry == "validate":
+        assert any("observation_id is required" in error for error in errors)
+
+
+def _non_finite_float(kind: str) -> float:
+    """The three non-finite floats. Independent of the gate."""
+    if kind == "nan":
+        return float("nan")
+    if kind == "inf":
+        return float("inf")
+    if kind == "-inf":
+        return float("-inf")
+    raise AssertionError(kind)
+
+
+def _rule_classify_measured(
+    value: object,
+    prefix: tuple[object, ...] = (),
+    skip: frozenset[str] = frozenset(),
+) -> tuple[list[tuple[object, ...]], list[tuple[object, ...]]]:
+    """Coverable addresses and non-finite addresses. Does not call the gate.
+
+    A non-finite float is the second list. It is never omitted. A finite
+    number and a digit-bearing string are coverable. A label is neither.
+    """
+    if isinstance(value, bool):
+        return [], []
+    if isinstance(value, int):
+        return [prefix], []
+    if isinstance(value, float):
+        if math.isfinite(value):
+            return [prefix], []
+        return [], [prefix]
+    if isinstance(value, str):
+        if any(ch in "0123456789" for ch in value):
+            return [prefix], []
+        return [], []
+    if isinstance(value, dict):
+        coverable: list[tuple[object, ...]] = []
+        non_finite: list[tuple[object, ...]] = []
+        for key, child in value.items():
+            if key in skip:
+                continue
+            child_coverable, child_non_finite = _rule_classify_measured(
+                child, prefix + (key,), skip
+            )
+            coverable.extend(child_coverable)
+            non_finite.extend(child_non_finite)
+        return coverable, non_finite
+    if isinstance(value, list):
+        coverable = []
+        non_finite = []
+        for index, child in enumerate(value):
+            child_coverable, child_non_finite = _rule_classify_measured(
+                child, prefix + (index,), skip
+            )
+            coverable.extend(child_coverable)
+            non_finite.extend(child_non_finite)
+        return coverable, non_finite
+    return [], []
+
+
+_NON_FINITE_KINDS = ("nan", "inf", "-inf")
+# Every scored container the coverage walk reads, plus the nestings that
+# used to drop a non-finite sibling. ``direct_pin`` attests the non-finite
+# value itself. ``values_only_label`` is the empty-address hole.
+_NON_FINITE_PLACEMENTS = (
+    "values_sibling",
+    "values_sibling_structured",
+    "values_nested",
+    "values_list",
+    "values_only_label",
+    "direct_pin",
+    "T_range_K",
+    "T_K",
+    "T_C",
+    "temperature_C",
+    "temp_C",
+    "point_conditions",
+    "point_conditions_beside_locator",
+    "values_unpinned_sibling",
+)
+# The finite sibling is fully pinned and the source matches, so the only
+# refusal is the non-finite value.
+_NON_FINITE_CLEAN_PLACEMENTS = frozenset(
+    {
+        "values_sibling",
+        "values_sibling_structured",
+        "values_nested",
+        "values_list",
+        "values_only_label",
+        "T_range_K",
+        "T_K",
+        "T_C",
+        "temperature_C",
+        "temp_C",
+        "point_conditions",
+        "point_conditions_beside_locator",
+    }
+)
+
+
+def _non_finite_payloads(bad: float) -> list[tuple[str, object, frozenset[str]]]:
+    """Structures the walker must classify. The skip set is part of the case."""
+    locator = frozenset({"locator"})
+    return [
+        ("sibling", {"alpha": 0.91, "beta": bad}, frozenset()),
+        ("nested", {"alpha": 0.91, "pair": {"beta": bad}}, frozenset()),
+        ("list", {"series": [0.91, bad]}, frozenset()),
+        ("label", {"quantity": "alpha", "beta": bad}, frozenset()),
+        ("scalar", bad, frozenset()),
+        ("bare_list", [0.91, bad], frozenset()),
+        (
+            "beside_locator",
+            {"temperature_K": bad, "locator": {"page": 4}},
+            locator,
+        ),
+        ("locator_kept", {"temperature_K": bad, "locator": {"page": 4}}, frozenset()),
+        ("finite_only", {"alpha": 0.91, "quantity": "alpha"}, frozenset()),
+    ]
+
+
+def test_non_finite_float_is_classified_and_never_omitted():
+    """Invariant: a non-finite float is a refusal address, not an empty walk.
+
+    The product is NaN, +Inf, and -Inf in a sibling, a nested mapping, a
+    list, a label payload, a scalar, and beside a locator. The expected
+    addresses are ``_rule_classify_measured``. The gate's coverable list
+    is that same walk, so it cannot drop the non-finite half.
+    """
+    assert "_classify_measured_leaves" in inspect.getsource(vle._measured_leaf_addresses)
+    assert "_classify_measured_leaves" in inspect.getsource(vle._scored_evidence_leaves)
+    assert "_scored_evidence_leaves" in inspect.getsource(vle.fidelity_source_warnings)
+    failures: list[str] = []
+    for kind in _NON_FINITE_KINDS:
+        bad = _non_finite_float(kind)
+        assert not math.isfinite(bad)
+        for name, payload, skip in _non_finite_payloads(bad):
+            expected_coverable, expected_non_finite = _rule_classify_measured(
+                payload, skip=skip
+            )
+            got_coverable, got_non_finite = vle._classify_measured_leaves(
+                payload, skip_keys=skip
+            )
+            got_public = vle._measured_leaf_addresses(payload, skip_keys=skip)
+            if list(got_coverable) != expected_coverable or got_public != expected_coverable:
+                failures.append(
+                    f"{kind} {name} coverable gate={got_coverable} "
+                    f"public={got_public} rule={expected_coverable}"
+                )
+            if list(got_non_finite) != expected_non_finite:
+                failures.append(
+                    f"{kind} {name} non_finite gate={got_non_finite} "
+                    f"rule={expected_non_finite}"
+                )
+            if name == "finite_only":
+                if expected_non_finite:
+                    failures.append(f"{kind} finite_only rule kept a non-finite")
+            elif name != "locator_kept" and not expected_non_finite:
+                failures.append(f"{kind} {name} rule omitted the non-finite value")
+    assert failures == []
+
+
+def _non_finite_document(root: Path, kind: str, placement: str) -> dict:
+    """Attested finite sibling, with ``kind`` stored beside it.
+
+    The source text cites the finite value only, except ``values_only_label``,
+    which cites the label. ``direct_pin`` also pins the non-finite value.
+    """
+    bad = _non_finite_float(kind)
+    alpha_line = "alpha 0.91 measured"
+    if placement in {
+        "values_sibling",
+        "values_sibling_structured",
+        "values_nested",
+        "direct_pin",
+    }:
+        values: object = {"alpha": 0.91, "beta": bad}
+        if placement == "values_nested":
+            values = {"alpha": 0.91, "pair": {"beta": bad}}
+        pins: list[tuple[str | None, object]] = [("alpha", 0.91)]
+        if placement == "direct_pin":
+            pins.append(("beta", bad))
+        return _values_pin_document(
+            root,
+            values=values,
+            pins=pins,
+            source_text=alpha_line + "\n",
+            structured=placement == "values_sibling_structured",
+        )
+    if placement == "values_list":
+        return _values_pin_document(
+            root,
+            values={"series": [0.91, bad]},
+            pins=[("series[0]", 0.91)],
+            source_text="0.91\n",
+            structured=False,
+        )
+    if placement == "values_only_label":
+        return _values_pin_document(
+            root,
+            values={"quantity": "alpha", "beta": bad},
+            pins=[("quantity", "alpha")],
+            source_text="alpha\n",
+            structured=False,
+        )
+    if placement == "values_unpinned_sibling":
+        return _values_pin_document(
+            root,
+            values={"alpha": 0.91, "gamma": 0.5, "beta": bad},
+            pins=[("alpha", 0.91)],
+            source_text=alpha_line + "\n",
+            structured=False,
+        )
+    alpha_pin = (
+        "path",
+        "species.Fe.observations[fe_alpha_1].values.alpha",
+        0.91,
+    )
+    if placement == "point_conditions_beside_locator":
+        condition_key = "point_conditions"
+        condition_value = {
+            "temperature_K": bad,
+            "locator": {"page": 4, "table": "1"},
+        }
+    elif placement == "T_range_K":
+        # Schema requires a two-element range. Both bounds are non-finite,
+        # so the range adds no coverable leaf.
+        condition_key = placement
+        condition_value = [bad, bad]
+    elif placement in vle._SCORED_NUMERIC_CONDITIONS:
+        condition_key = placement
+        condition_value = bad
+    else:
+        raise AssertionError(placement)
+    return _scored_condition_document(
+        root,
+        condition_key=condition_key,
+        condition_value=condition_value,
+        values={"alpha": 0.91},
+        pins=[alpha_pin],
+        source_lines=(alpha_line,),
+    )
+
+
+@pytest.mark.parametrize("kind", _NON_FINITE_KINDS)
+@pytest.mark.parametrize("placement", _NON_FINITE_PLACEMENTS)
+def test_non_finite_measured_value_refuses_certification(
+    kind: str, placement: str, tmp_path: Path
+):
+    """Invariant: NaN and ±Inf refuse that observation at every container.
+
+    ``values: {alpha: 0.91, beta: .nan}`` with only alpha attested refuses.
+    The same holds for +Inf and -Inf, for a nested value, a list element,
+    a label-only payload, each scored condition, and a direct pin of the
+    non-finite value. A finite sibling pin is not coverage of the hole.
+    """
+    doc = _non_finite_document(tmp_path, kind, placement)
+    errors = vle.certify_extract_source_fidelity(
+        doc, label=placement, artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    assert "non_finite_evidence" in joined, (kind, placement, errors)
+    if placement in _NON_FINITE_CLEAN_PLACEMENTS:
+        assert "uncovered_observation" not in joined, (kind, placement, errors)
+        assert "source_blind_pin" not in joined, (kind, placement, errors)
+    if placement == "values_unpinned_sibling":
+        assert "uncovered_observation" in joined, (kind, placement, errors)
+        assert "source_blind_pin" not in joined, (kind, placement, errors)
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (kind, placement, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    found = next(warning for warning in warnings if warning.kind == "non_finite_evidence")
+    assert found.count == 1
+    assert "non_finite_evidence" in found.render()
+
+
+@pytest.mark.parametrize("kind", _NON_FINITE_KINDS)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_non_finite_sibling_refuses_every_promoter(
+    kind: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Every promoter refuses ``{alpha: 0.91, beta: non-finite}`` with alpha attested."""
+    doc = _non_finite_document(tmp_path, kind, "values_sibling")
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    joined = "\n".join(errors)
+    assert "non_finite_evidence" in joined, (kind, entry, errors)
+    if entry == "certify":
+        assert "uncovered_observation" not in joined
+        assert "source_blind_pin" not in joined
+
+
+def test_two_non_finite_observations_are_two_refusals(tmp_path: Path):
+    """Each observation with a non-finite value is its own count."""
+    doc = _non_finite_document(tmp_path, "nan", "values_sibling")
+    doc["species"]["Mg"] = copy.deepcopy(doc["species"]["Fe"])
+    doc["species"]["Mg"]["observations"][0]["observation_id"] = "mg_alpha_1"
+    doc["species"]["Mg"]["observations"][0]["values"] = {
+        "alpha": 0.91,
+        "beta": float("inf"),
+    }
+    doc["fidelity_samples"].append(
+        {
+            "path": "species.Mg.observations[mg_alpha_1].values.alpha",
+            "value": 0.91,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": dict(doc["fidelity_samples"][0]["locator"]),
+        }
+    )
+    warnings = vle.fidelity_source_warnings(
+        doc, label="two-non-finite", artifact_root=tmp_path
+    )
+    found = next(warning for warning in warnings if warning.kind == "non_finite_evidence")
+    assert found.count == 2
+    refusals = vle.certify_extract_source_fidelity(
+        doc, label="two-non-finite", artifact_root=tmp_path
+    )
+    assert any("non_finite_evidence count=2" in line for line in refusals)
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_context_non_finite_is_outside_scored_coverage(
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Context is unscored. A non-finite value there is not ``non_finite_evidence``."""
+    doc = _literal_source_document(tmp_path, 0.91, "alpha 0.91 measured\n")
+    doc["species"]["Fe"]["context"] = [
+        {
+            "observation_id": "fe_bench_note",
+            "type": "apparatus",
+            "locator": {"page": 4, "section": "setup"},
+            "units": "as printed",
+            "values": {"setpoint": float("nan")},
+        }
+    ]
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    joined = "\n".join(errors)
+    assert "non_finite_evidence" not in joined, (entry, errors)
+    if entry == "certify":
+        assert errors == [], errors
 
 
 def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(tmp_path):
