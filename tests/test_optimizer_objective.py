@@ -1366,10 +1366,11 @@ def test_nonnegligible_refused_wall_species_uses_supply_bound_and_stays_ranked(
 #   first, so the score is not the partial and not partial + supply.
 # - The maximum segment load equals the closed form
 #   max_s (existing_load_s + sum of non-negligible supplies eligible at s).
-#   Species order does not change it. The argmax segment s* receives
-#   every supply eligible there. A species not eligible at s* takes the
-#   smaller eligible segment id, because those candidates tie on the
-#   maximum. An equal closed form takes the smaller segment id.
+#   Species order does not change it. Every supply is booked wholly on
+#   the eligible segment with the highest closed-form load. The smaller
+#   segment id wins only when those loads are equal. A species eligible
+#   at the argmax s* therefore lands on s*. A species that cannot use s*
+#   lands on its own best closed-form segment, not on its smallest id.
 _WALL_BOUND_UPPER = objective_module.WALL_DEPOSIT_UPPER_BOUND_USED
 _WALL_BOUND_BELOW = objective_module.BELOW_WALL_SUPPLY_UPPER_BOUND
 _WALL_BOUND_CASES = (
@@ -1515,7 +1516,7 @@ _WALL_BOUND_CASES = (
         "refused": (("SiO", "A"), ("SiO", "B")),
         "charge": 1000.0,
         "entries": (
-            (("A", "SiO"), 1.0),
+            (("B", "SiO"), 1.0),
             (("B", "K"), 3.0),
             (("C", "Na"), 10.0),
         ),
@@ -1771,7 +1772,7 @@ def _wall_bound_species_totals(
     "negligible_clamps_every_segment",
     "binding_load_not_name_order",
     "binding_load_tie_smaller_id",
-    "binding_load_tie_ignores_heavier_outsider",
+    "off_star_books_best_closed_form_segment",
     "negligible_empty",
     "missing_flux",
     "published_not_committed_negligible",
@@ -1928,16 +1929,19 @@ def _oracle_binding_assignment(
 ) -> dict[str, object]:
     """Species placement the closed form requires.
 
-    Every species eligible at the argmax s* goes wholly to s*. A species
-    that cannot use s* takes the smaller eligible segment id: those
-    candidates tie on the maximum, which s* already meets. Equal closed
-    forms take the smaller segment id.
+    chosen(i) is the argmax of the closed form over segments where i is
+    eligible. The smaller segment id wins a tie. That is s* whenever i
+    is eligible at s*, and it is i's own best segment otherwise. The
+    smallest eligible id is not a placement rule.
     """
 
     closed = _closed_form_segment_loads(existing, supplies, eligible)
     binding = min(closed, key=lambda segment: (-closed[segment], segment))
     assignment = {
-        species: binding if binding in candidates else min(candidates)
+        species: min(
+            candidates,
+            key=lambda segment: (-closed[segment], segment),
+        )
         for species, candidates in eligible.items()
     }
     loads = {
@@ -2035,6 +2039,82 @@ def _binding_cases() -> tuple[dict[str, object], ...]:
                 "order": order,
                 "channel_pin": False,
             })
+    cases.extend(_off_star_cases())
+    return tuple(cases)
+
+
+def _off_star_cases() -> tuple[dict[str, object], ...]:
+    """Off-s* eligibility, preload, companion subset, and species order.
+
+    Fe's 100 kg sits on one segment, so that segment is s*. Mg is eligible
+    only on the other two segments and therefore never at s*. Zn's
+    eligibility is every non-empty subset of A, B, and C, plus the cases
+    with no Zn. A preload of 5 kg on the later Mg segment makes Mg's best
+    closed-form segment differ from its smallest id. Equal 5 kg preloads
+    make those closed forms tie, so the smaller id wins. The canonical
+    unequal case is pinned on every scoring channel.
+    """
+
+    segments = ("A", "B", "C")
+    companion_sets = tuple(
+        tuple(
+            segment
+            for index, segment in enumerate(segments)
+            if mask & (1 << index)
+        )
+        for mask in range(1, 1 << len(segments))
+    )
+    cases: list[dict[str, object]] = []
+    for anchor in segments:
+        off_segments = tuple(segment for segment in segments if segment != anchor)
+        later = off_segments[-1]
+        earlier = off_segments[0]
+        preloads = (
+            ("off_empty", ()),
+            (
+                "off_heavy_later",
+                ((later, "Na", 5.0),),
+            ),
+            (
+                "off_tied",
+                ((earlier, "Na", 5.0), (later, "K", 5.0)),
+            ),
+        )
+        rosters = (
+            (("Fe", "Mg"), {"Fe": 100.0, "Mg": 1.0}, None),
+            (
+                ("Fe", "Mg", "Zn"),
+                {"Fe": 100.0, "Mg": 1.0, "Zn": 4.0},
+                companion_sets,
+            ),
+        )
+        for roster, supplies, companions in rosters:
+            companion_options: tuple[tuple[str, ...] | None, ...] = (
+                (None,) if companions is None else companions
+            )
+            for companion in companion_options:
+                eligible: dict[str, tuple[str, ...]] = {
+                    "Fe": (anchor,),
+                    "Mg": off_segments,
+                }
+                if companion is not None:
+                    eligible["Zn"] = companion
+                for existing_id, existing in preloads:
+                    orders = (roster, tuple(reversed(roster)))
+                    for order in orders:
+                        canonical = (
+                            anchor == "C"
+                            and existing_id == "off_heavy_later"
+                            and companion is None
+                        )
+                        cases.append({
+                            "supplies": dict(supplies),
+                            "eligible": dict(eligible),
+                            "existing": existing,
+                            "existing_id": f"{existing_id}-{anchor}",
+                            "order": order,
+                            "channel_pin": canonical,
+                        })
     return tuple(cases)
 
 
@@ -2112,6 +2192,22 @@ def _assert_binding_booking_matches_oracle(
         assert booked["closed_form_kg"]["A"] == pytest.approx(1.0)
         assert booked["closed_form_kg"]["B"] == pytest.approx(4.0)
         assert assignment == {"Mg": "B", "SiO": "B"}
+    if (
+        case["existing_id"] == "off_heavy_later-C"
+        and "Zn" not in supplies
+    ):
+        # C holds Fe's 100 kg, so s* is C. Mg is eligible at A and B only.
+        # B already holds 5 kg, so Mg's closed form is 1 at A and 6 at B.
+        # The smallest id is A. The booked segment is B.
+        assert booked["binding_segment"] == "C"
+        assert booked["worst_max_load_kg"] == pytest.approx(100.0)
+        assert booked["segment_loads_kg"]["C"] == pytest.approx(100.0)
+        assert booked["segment_loads_kg"]["B"] == pytest.approx(6.0)
+        assert "A" not in booked["segment_loads_kg"]
+        assert booked["closed_form_kg"]["A"] == pytest.approx(1.0)
+        assert booked["closed_form_kg"]["B"] == pytest.approx(6.0)
+        assert booked["closed_form_kg"]["C"] == pytest.approx(100.0)
+        assert assignment == {"Fe": "C", "Mg": "B"}
 
 
 @pytest.mark.parametrize("case", _BINDING_BOOK_CASES, ids=_BINDING_BOOK_IDS)
@@ -2137,16 +2233,50 @@ def test_refused_wall_binding_load_matches_the_closed_form_at_the_chokepoint(
     _assert_binding_booking_matches_oracle(booked, case)
 
 
+def test_off_star_enumeration_covers_best_segment_and_id_tie_break() -> None:
+    """The off-s* suite is not vacuous and not the smallest-id rule.
+
+    Mg is never eligible at s*. Some cases put Mg on a segment other than
+    its smallest id, which is the defect class. Some cases tie, and the
+    smaller id still wins those.
+    """
+
+    differed = 0
+    tied = 0
+    for case in _off_star_cases():
+        supplies = case["supplies"]
+        eligible = case["eligible"]
+        existing = _existing_loads_excluding_supplies(case["existing"], supplies)
+        oracle = _oracle_binding_assignment(existing, supplies, eligible)
+        assert oracle["binding_segment"] not in eligible["Mg"]
+        chosen = oracle["assignment"]["Mg"]
+        candidates = eligible["Mg"]
+        closed = oracle["closed_form"]
+        smallest = min(candidates)
+        top = max(closed[segment] for segment in candidates)
+        winners = [
+            segment for segment in candidates if closed[segment] == top
+        ]
+        assert chosen == min(winners)
+        if chosen != smallest:
+            differed += 1
+        elif len(winners) >= 2:
+            tied += 1
+    assert differed > 0
+    assert tied > 0
+
+
 @pytest.mark.parametrize("channel", _WALL_BOUND_CHANNELS)
 @pytest.mark.parametrize("case", _BINDING_CHANNEL_CASES, ids=_BINDING_CHANNEL_IDS)
 def test_closed_form_binding_load_holds_on_every_scoring_channel(
     channel: str,
     case: Mapping[str, object],
 ) -> None:
-    """Mg 1 kg on A and B, SiO 3 kg only on B, both species orders.
+    """Every scoring channel reads the closed-form booking.
 
-    Empty walls put 4 kg on B. A preload, a tie, an outsider segment, and
-    a measured partial of the refused species stay on that same closed form.
+    Empty walls put Mg 1 kg and SiO 3 kg on B. The off-s* pin puts Fe's
+    100 kg on C and Mg's 1 kg on B, where B already holds 5 kg. Mg's
+    smallest eligible id is A.
     """
 
     view = _wall_bound_view(channel, _binding_execution_case(case))
@@ -2174,6 +2304,15 @@ def test_closed_form_binding_load_holds_on_every_scoring_channel(
         assert view["entries"][("B", "SiO")] == pytest.approx(3.0)
         assert ("A", "Mg") not in view["entries"]
         assert ("A", "SiO") not in view["entries"]
+    if (
+        case["existing_id"] == "off_heavy_later-C"
+        and view["entries"] is not None
+    ):
+        assert view["entries"][("C", "Fe")] == pytest.approx(100.0)
+        assert view["entries"][("B", "Mg")] == pytest.approx(1.0)
+        assert view["entries"][("B", "Na")] == pytest.approx(5.0)
+        assert ("A", "Mg") not in view["entries"]
+        assert ("A", "Fe") not in view["entries"]
 
 
 @pytest.mark.parametrize("order", (("Mg", "SiO"), ("SiO", "Mg")))

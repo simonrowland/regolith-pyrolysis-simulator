@@ -4420,9 +4420,10 @@ def _replace_species_deposit_with_supply(
     Measured kilograms are the same vapour, not a second source. Leaving
     them and also writing the supply counts that mass twice. Keeping only
     the measured part prices a partial deposit under the supply-bound
-    flag. ``segment`` is this species' closed-form segment: the binding
-    segment when the species is eligible there, otherwise the smaller
-    eligible segment id.
+    flag. ``segment`` is this species' best closed-form segment: the
+    argmax of the closed form over segments where it is eligible. The
+    smaller segment id wins a tie. That is the binding segment whenever
+    the species is eligible there.
     """
 
     _drop_species_wall_deposit(wall_deposit, species)
@@ -4510,31 +4511,45 @@ def _assign_refused_supplies_at_binding_load(
     supplies: Mapping[str, float],
     eligible: Mapping[str, Sequence[str]],
 ) -> dict[str, Any]:
-    """Place every refused supply so the maximum segment load is exact.
+    """Place every refused supply on its best closed-form segment.
 
-    Invariant, independent of species order:
+    Invariant, independent of species order. Each supply is booked
+    wholly on one eligible segment:
 
-        worst_max_load = max over segments s of (
-            existing_booked_load_s
-            + sum over refused species i eligible at s of supply_i
-        )
+        chosen(i) = argmax over s eligible for i of closed_form(s)
+        tie-break: smaller segment id
+
+        closed_form(s) = existing_booked_load_s
+            + sum over refused species j eligible at s of supply_j
+
+        s* = argmax over every segment of closed_form(s)
+        same tie-break
+        worst_max_load = closed_form(s*)
+
+    Species eligible at s* are booked on s*. s* is the global argmax and
+    the smallest id on a tie, so it wins inside every candidate set that
+    contains it. A species not eligible at s* takes the argmax over its
+    own candidates, not the smallest eligible id. That segment's closed
+    form cannot exceed closed_form(s*), so the booked maximum stays
+    worst_max_load. The smaller id breaks ties only. It is not a
+    placement rule for every off-s* species.
 
     The max-segment load is what campaigns-to-resinter uses. It is
     maximised by concentrating every eligible supply into one segment.
-    Splitting a supply across segments never raises that maximum: segment
-    s can receive at most the supplies eligible there, so no assignment
-    exceeds the closed form, and putting every species eligible at the
-    argmax s* onto s* meets it. Each of those supplies goes wholly to s*.
-    A species not eligible at s* goes to its own best segment. Every
-    candidate of that species has a closed-form term no larger than s*,
-    so the resulting maximum segment load ties at worst_max_load and the
-    smaller segment id wins. That is the same tie-break as a single
-    supply whose candidates do not change the maximum.
+    Splitting a supply across segments never raises that maximum:
+    segment s can receive at most the supplies eligible there, so no
+    assignment exceeds the closed form, and putting every species
+    eligible at s* onto s* meets it.
 
     Placing species one at a time understates the maximum. With empty
     walls, Mg eligible at A and B ties and the smaller id takes A; SiO
     eligible only at B is booked afterwards. The maximum is then 3 kg.
     Both supplies are eligible at B, and B's closed form is 4 kg.
+
+    Off s*: C already holds 10 kg, B holds 3 kg, and 1 kg of SiO is
+    eligible at A and B. Closed form A=1, B=4, C=10, so s* is C. SiO's
+    best closed-form segment is B. Booking A, the smaller id, leaves B
+    at its existing 3 kg.
 
     The returned per-segment loads are the loads after this assignment.
     ``binding_segment`` is s*. ``closed_form_kg`` is the per-segment
@@ -4567,17 +4582,20 @@ def _assign_refused_supplies_at_binding_load(
             if segment in candidates
         )
         closed_form[segment] = float(existing_loads.get(segment, 0.0)) + extra
-    # Smaller segment id wins an equal closed-form load.
-    binding_segment = min(
-        closed_form,
-        key=lambda segment: (-closed_form[segment], segment),
-    )
-    segment_by_species: dict[str, str] = {}
-    for species, candidates in normalized.items():
-        if binding_segment in candidates:
-            segment_by_species[species] = binding_segment
-            continue
-        segment_by_species[species] = min(candidates)
+
+    def best_segment(candidates: Sequence[str]) -> str:
+        # One rank for s* and for every species. The smaller segment id
+        # wins only when the closed-form loads are equal.
+        return min(
+            candidates,
+            key=lambda segment: (-closed_form[segment], segment),
+        )
+
+    binding_segment = best_segment(tuple(closed_form))
+    segment_by_species = {
+        species: best_segment(candidates)
+        for species, candidates in normalized.items()
+    }
     segment_loads: dict[str, float] = {
         str(segment): float(load)
         for segment, load in existing_loads.items()
@@ -4687,9 +4705,10 @@ def _book_wall_deposits_at_vapour_supply(
     maximum segment load equals the closed form in
     ``_assign_refused_supplies_at_binding_load`` and does not depend on
     species order. ``binding_segment`` is the argmax s* of that closed
-    form. ``segment_loads_kg`` is the load on each segment after every
-    non-negligible supply has been placed. ``worst_max_load_kg`` is that
-    maximum.
+    form. Each species, including one that cannot use s*, is booked on
+    its own argmax of that same closed form. ``segment_loads_kg`` is the
+    load on each segment after every non-negligible supply has been
+    placed. ``worst_max_load_kg`` is that maximum.
 
     The refusal stays on the notice authority in every branch.
     """
