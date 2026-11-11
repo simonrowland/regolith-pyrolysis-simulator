@@ -40,6 +40,7 @@ DISCLOSURE_CARRYING = frozenset({
     "store:simulator/battery/residue.py:pressure_state_cache",
     "store:simulator/battery/score.py:residue_prediction_cache",
     "store:simulator/diagnostic_helpers/extract_reproduction.py:_MELT_PSAT_CACHE",
+    "store:simulator/diagnostic_helpers/kems.py:_surface_cache",
 })
 
 
@@ -861,13 +862,13 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Compiled provider object. Dispatch still evaluates the law, so the cached object is not a flagged pressure.',
     },
-    'store:simulator/diagnostic_helpers/kems.py:surface_cache': {
+    'store:simulator/diagnostic_helpers/kems.py:_surface_cache': {
         "path": 'simulator/diagnostic_helpers/kems.py',
-        "line": 653,
+        "line": 595,
         "kind": 'store',
-        "name": 'surface_cache',
-        "carries_disclosure": False,
-        "how": 'Local scratch for rates, equilibrium constants, metadata, or validation. It does not store a vapour-law disclosure.',
+        "name": '_surface_cache',
+        "carries_disclosure": True,
+        "how": 'KEMS provider pressures for one case and temperature. _read_kems_surface_cache is the only read and calls accept_stored_memo. A row with no law_disclosures is a miss. The published runtime row carries that disclosure.',
     },
     'store:simulator/engine_binding_admission.py:grouped_entries': {
         "path": 'simulator/engine_binding_admission.py',
@@ -1269,6 +1270,12 @@ def classify_controller_cache_line(
         return _classification_of("store:simulator/battery/score.py:residue_prediction_cache")
     if path == "simulator/battery/residue.py" and re.search(r"\bcache\s*:\s*dict\b", text):
         return _classification_of("store:simulator/battery/residue.py:pressure_cache")
+    if path == "simulator/diagnostic_helpers/kems.py" and re.search(
+        r"\bcache\s*:\s*dict\b", text
+    ):
+        return _classification_of(
+            "store:simulator/diagnostic_helpers/kems.py:_surface_cache"
+        )
     if not matches:
         return _extra_cache_line(path, stripped)
     carrying = [

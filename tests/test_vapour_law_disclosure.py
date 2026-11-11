@@ -18,8 +18,9 @@ disclosure field is unknown and is a miss. The held curve, the local slot,
 and the shared slot are one gate, ``accept_stored_memo``: unknown
 recomputes, and a known disclosure is re-registered before the record is
 returned. Upper-case ``_CACHE`` stores are in that same inventory. The melt
-pressure cache, the residue pressure closures, and the Sossi, Hashimoto, and
-Knudsen rows of the residue-prediction cache are read only through that gate.
+pressure cache, the KEMS surface cache, the residue pressure closures, and
+the Sossi, Hashimoto, and Knudsen rows of the residue-prediction cache are
+read only through that gate.
 Registration is the one
 ``CompiledPressureEvaluator.evaluate`` call. A non-diagnostic law is registered
 when the evaluation leaves a certified domain: the temperature band, the
@@ -2891,6 +2892,21 @@ def test_cache_inventory_matches_the_production_scan() -> None:
     assert "accept_stored_memo(" in melt_read
     melt_body = melt.split("def _engine_melt_psat_pa(", 1)[1].split("\ndef ", 1)[0]
     assert "_MELT_PSAT_CACHE" not in melt_body
+    kems = (_ROOT / "simulator/diagnostic_helpers/kems.py").read_text(encoding="utf-8")
+    assert kems.count("_surface_cache.get(") == 0
+    assert kems.count("_surface_cache[") == 0
+    kems_read = kems.split("def _read_kems_surface_cache(", 1)[1].split("\ndef ", 1)[0]
+    assert "cache.get(" in kems_read
+    assert "accept_stored_memo(" in kems_read
+    kems_store = kems.split("def _store_kems_surface_cache(", 1)[1].split(
+        "\ndef ", 1
+    )[0]
+    assert "cache[key]" in kems_store
+    kems_eval = kems.split("def evaluate(", 1)[1].split("\ndef ", 1)[0]
+    assert "_surface_cache[" not in kems_eval
+    assert "_surface_cache.get(" not in kems_eval
+    assert kems_eval.count("_read_kems_surface_cache(") == 1
+    assert kems_eval.count("_store_kems_surface_cache(") == 1
     hashimoto = score.split("def _hashimoto_residue_prediction(", 1)[1].split(
         "\ndef ", 1
     )[0]
@@ -3650,6 +3666,176 @@ def _exercise_residue_prediction_cache(tmp_path, monkeypatch) -> None:
     _exercise_knudsen_result(tmp_path, monkeypatch)
 
 
+# 2300 K is above the shared [1400.0, 2273.15] K band. The provider's SiO
+# pressure at that point is the Antoine continuation, which does not call
+# catalog evaluate(). The same dispatch does evaluate the compiled Si-family
+# laws, and those register with authority=extrapolated.
+_SIO_OOB_K = 2300.0
+_SIO_COMPILED_LAW_ID = "SiO2_gas:nasa_cea_9"
+
+
+def _compiled_extrapolated_rows(rows) -> list[dict]:
+    return [
+        item
+        for item in rows
+        if item.get("law_id") == _SIO_COMPILED_LAW_ID
+        and item.get("authority") == "extrapolated"
+    ]
+
+
+def _assert_compiled_extrapolated(row: dict) -> None:
+    assert row["law_id"] == _SIO_COMPILED_LAW_ID
+    assert row["authority"] == "extrapolated"
+    assert row["provenance"] == "out_of_range_conservative_continuation"
+    assert row["certified_band_K"] == [1400.0, 2273.15]
+    assert isinstance(row["evaluation_count"], int)
+    assert row["evaluation_count"] >= 1
+
+
+def _assert_sio_extrapolation_notice(runtime: dict) -> None:
+    notice = runtime["extrapolated_beyond_valid_range_K"]["SiO"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["reason"] == "oxide_vapor_pressure_out_of_validated_range"
+    assert tuple(notice["valid_range_K"]) == (1400.0, 2273.15)
+
+
+def _sio_oob_kems_inputs() -> tuple[dict, dict]:
+    """A valid KEMS program with two observations at one out-of-band temperature."""
+
+    from simulator.diagnostic_helpers.kems import load_kems_case
+
+    case = load_kems_case(_ROOT / "data/presets/kems/halwax_2024_mgo.yaml")
+    case["case_id"] = "sio_oob_disclosure"
+    case["oxide"] = {
+        "formula": "SiO2",
+        "identity": "synthetic silica for the disclosure probe",
+        "purity_fraction": case["oxide"]["purity_fraction"],
+        "purity_source": case["oxide"]["purity_source"],
+    }
+    program = case["temperature_program"]
+    program["start_K"] = 2200.0
+    program["end_K"] = 2400.0
+    program["isothermal_hold"]["temperature_K"] = _SIO_OOB_K
+    case["measurement_selectors"] = [
+        {
+            "observable_id": "sio_p",
+            "observable": "partial_pressure_pa",
+            "species": "SiO",
+            "evidence_scope": "species-resolved-clean-oxide-kems",
+        }
+    ]
+    point = {
+        "observable_id": "sio_p",
+        "species": "SiO",
+        "allow_total_pressure_fallback": False,
+        "coordinate": {"temperature_K": _SIO_OOB_K},
+        "partial_pressure_pa": None,
+        "uncertainty": {
+            "temperature_K": 5.0,
+            "observable_pa": None,
+            "observable_status": "not_reported",
+        },
+        "status": "absent",
+        "source_locator": {"figure": 1, "published_page": 1},
+        "extraction_method": "synthetic",
+        "note": "repeated observation at one out-of-band temperature",
+    }
+    observations = {
+        "schema_version": 1,
+        "sources": {
+            case["source_id"]: {
+                "citation": "synthetic disclosure probe",
+                "doi": "10.0000/synthetic",
+                "url": "https://example.invalid/sio",
+                "extraction_note": "two observations at one out-of-band temperature",
+            }
+        },
+        "cases": {
+            case["case_id"]: {
+                "case_id": case["case_id"],
+                "source_id": case["source_id"],
+                "points": [dict(point), dict(point)],
+            }
+        },
+    }
+    return case, observations
+
+
+def _exercise_kems_surface_cache(_tmp_path, monkeypatch) -> None:
+    """Warm the KEMS surface in run A and replay it in fresh run B.
+
+    The program's two observations share one out-of-band SiO temperature.
+    The first publication is the cold dispatch. The second is the cache hit.
+    Both carry the extrapolated SiO law. Run B reads the stored row and does
+    not dispatch again. A row with the disclosure field removed recomputes.
+    """
+
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
+    from simulator.diagnostic_helpers.kems import KEMSAdapter
+
+    case, observations = _sio_oob_kems_inputs()
+    adapter = KEMSAdapter(_live_vapor())
+    calls = {"n": 0}
+    dispatch = BuiltinVaporPressureProvider.dispatch
+
+    def counting(provider, request):
+        calls["n"] += 1
+        return dispatch(provider, request)
+
+    monkeypatch.setattr(BuiltinVaporPressureProvider, "dispatch", counting)
+
+    def published_sio(run):
+        found = []
+        for runtime in run.runtime_rows:
+            match = _compiled_extrapolated_rows(runtime["law_disclosures"])
+            assert match, runtime["law_disclosures"]
+            for item in match:
+                _assert_compiled_extrapolated(item)
+            found.append(match[0])
+            _assert_sio_extrapolation_notice(runtime)
+            assert runtime["vapor_pressures_Pa"]["SiO"] > 0.0
+        return found
+
+    with disclosure_scope(inherit=False) as run_a:
+        first = adapter.evaluate(case, observations)
+        assert calls["n"] == 1
+        published = published_sio(first)
+        assert len(published) == 2
+        assert published[0]["law_id"] == published[1]["law_id"]
+        stored = next(iter(adapter._surface_cache.values()))
+        stored_law = _compiled_extrapolated_rows(stored["law_disclosures"])
+        assert stored_law
+        _assert_compiled_extrapolated(stored_law[0])
+        run_a_law = _compiled_extrapolated_rows(run_a.snapshot())
+        assert run_a_law
+        # The cold dispatch registers once. The repeated observation replays it.
+        assert run_a_law[0]["evaluation_count"] == (
+            2 * stored_law[0]["evaluation_count"]
+        )
+
+    with disclosure_scope(inherit=False) as run_b:
+        second = adapter.evaluate(case, observations)
+        assert calls["n"] == 1
+        published_sio(second)
+        replayed = _compiled_extrapolated_rows(run_b.snapshot())
+        assert replayed[0]["evaluation_count"] == (
+            2 * stored_law[0]["evaluation_count"]
+        )
+        _assert_compiled_extrapolated(replayed[0])
+        assert (
+            second.runtime_rows[0]["vapor_pressures_Pa"]
+            == first.runtime_rows[0]["vapor_pressures_Pa"]
+        )
+
+    stored.pop("law_disclosures")
+    with disclosure_scope(inherit=False) as run_c:
+        third = adapter.evaluate(case, observations)
+        assert calls["n"] == 2
+        published_sio(third)
+        assert _compiled_extrapolated_rows(run_c.snapshot())
+
+
 _DISCLOSURE_EXERCISERS = {
     "store:simulator/reduced_real_determinism.py:_entries": _exercise_pt0_memory,
     "class:simulator/reduced_real_determinism.py:PT1PersistentEquilibriumStore": _exercise_pt1,
@@ -3666,6 +3852,9 @@ _DISCLOSURE_EXERCISERS = {
     "store:simulator/battery/score.py:residue_prediction_cache": _exercise_residue_prediction_cache,
     "store:simulator/diagnostic_helpers/extract_reproduction.py:_MELT_PSAT_CACHE": (
         _exercise_melt_psat
+    ),
+    "store:simulator/diagnostic_helpers/kems.py:_surface_cache": (
+        _exercise_kems_surface_cache
     ),
 }
 
