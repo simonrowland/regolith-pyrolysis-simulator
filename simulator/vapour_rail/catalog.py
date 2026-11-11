@@ -1161,11 +1161,13 @@ class CompiledPressureEvaluator:
                 )
             ),
         )
-        # Non-field attribute so t-622 dataclass canonicalization is unchanged.
-        # Every *_notice on the oxygen receipt is copied. The named
-        # extrapolation field stays, including None, so an in-band evaluation
-        # keeps that attribute. A floor notice fills it only when the receipt
-        # did not carry one.
+        # Non-field attributes so t-622 dataclass canonicalization is unchanged.
+        # The collector is the only reader. The legacy extrapolation slot
+        # stays, including None, so an in-band evaluation keeps that
+        # attribute. A floor notice fills it only when the collected receipt
+        # did not carry one. Every other receipt notice, and every notice on
+        # the evaluator (a diagnostic admission that is the only one, or a
+        # future *_notice), is copied by the same scan. Pressure is unchanged.
         from simulator.vapour_rail.instrumentation import public_carrier_notices
 
         receipt = (
@@ -1197,15 +1199,8 @@ class CompiledPressureEvaluator:
             if notice_key == "extrapolation_notice":
                 continue
             object.__setattr__(evaluation, notice_key, notice)
-        # Same non-field slot. A diagnostic admission discloses the unfitted
-        # law and the anchor it disagrees with. It does not change pressure.
-        diagnostic_notice = getattr(self, "diagnostic_admission_notice", None)
-        if diagnostic_notice is not None:
-            object.__setattr__(
-                evaluation,
-                "diagnostic_admission_notice",
-                _copy_diagnostic_notice(diagnostic_notice),
-            )
+        for notice_key, notice in public_carrier_notices(self).items():
+            object.__setattr__(evaluation, notice_key, notice)
         return evaluation
 
     def evaluate_typed_shadow(
@@ -2909,29 +2904,6 @@ def _notice_from_law_and_disagreement(
             "gap_dex_law_vs_rail": math.log10(law_pressure / rail),
             "vaporock_pressure_Pa": vaporock,
             "gap_dex_law_vs_vaporock": math.log10(law_pressure / vaporock),
-        },
-    }
-
-
-def _copy_diagnostic_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
-    comparators = notice["comparators"]
-    return {
-        "authority": notice["authority"],
-        "reason": notice["reason"],
-        "law_provenance": notice["law_provenance"],
-        "provenance_status": notice["provenance_status"],
-        "evaluator_form": notice["evaluator_form"],
-        "closes_with": notice["closes_with"],
-        "executed_species_id": notice["executed_species_id"],
-        "anchor": notice["anchor"],
-        "anchor_role": notice["anchor_role"],
-        "temperature_K": notice["temperature_K"],
-        "law_pressure_Pa": notice["law_pressure_Pa"],
-        "comparators": {
-            "rail_pressure_Pa": comparators["rail_pressure_Pa"],
-            "gap_dex_law_vs_rail": comparators["gap_dex_law_vs_rail"],
-            "vaporock_pressure_Pa": comparators["vaporock_pressure_Pa"],
-            "gap_dex_law_vs_vaporock": comparators["gap_dex_law_vs_vaporock"],
         },
     }
 

@@ -1500,21 +1500,26 @@ def refusal_closure(
                 provenance = state.source_reaction_activity_provenance.get(
                     rule.species_id, {}
                 )
-                source_notice = provenance.get("extrapolation_notice")
-                if source_notice is None:
-                    # Floor inversion is published on the existing
-                    # extrapolation_notice field. Do not replace a
-                    # temperature-range notice already on that key.
-                    source_notice = provenance.get("floor_inversion_notice")
-                if source_notice is not None:
-                    evaluation_extra["extrapolation_notice"] = dict(source_notice)
-                # Every *_notice on the evaluation. A diagnostic admission
-                # that is the only notice is included. The alias above is
-                # left in place.
+                # Every *_notice on the source provenance and on the
+                # evaluation. A diagnostic admission that is the only notice
+                # on either carrier is included. Callers do not select
+                # extrapolation_notice by name. Floor inversion keeps its
+                # existing public alias: when the collected provenance has
+                # no extrapolation_notice, that notice is also published
+                # under extrapolation_notice. A notice already on that key
+                # is left in place.
                 from simulator.vapour_rail.instrumentation import (
                     apply_public_carrier_notices,
                 )
 
+                apply_public_carrier_notices(evaluation_extra, provenance)
+                if (
+                    "extrapolation_notice" not in evaluation_extra
+                    and "floor_inversion_notice" in evaluation_extra
+                ):
+                    evaluation_extra["extrapolation_notice"] = dict(
+                        evaluation_extra["floor_inversion_notice"]
+                    )
                 apply_public_carrier_notices(evaluation_extra, evaluation)
                 if _unit_activity_note is not None:
                     from simulator.silent_zero import merge_notes_into_mapping

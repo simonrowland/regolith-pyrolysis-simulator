@@ -304,6 +304,8 @@ def _attach_pO2_floor_inversion_notices(
 ) -> dict[str, dict[str, Any]]:
     """Single choke: flag published metal P that used the pO2 floor."""
 
+    from simulator.vapour_rail.instrumentation import public_carrier_notices
+
     notices: dict[str, dict[str, Any]] = {}
     token = MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
     for species, pressure_Pa in vapor_pressures.items():
@@ -321,11 +323,11 @@ def _attach_pO2_floor_inversion_notices(
             continue
         notices[str(species)] = notice
         provenance["floor_inversion_notice"] = notice
-        # Public carrier extra copies provenance["extrapolation_notice"]
-        # (request.py). Dual-write so wall/Pareto see the existing
-        # reason/authority/band without a new result field. Do not replace
-        # a temperature-range notice already on that key.
-        if provenance.get("extrapolation_notice") is None:
+        # Public carrier extra publishes every *_notice. Dual-write this
+        # floor notice onto extrapolation_notice so wall/Pareto keep the
+        # existing field. Do not replace a temperature-range notice the
+        # collector already sees on that key.
+        if "extrapolation_notice" not in public_carrier_notices(provenance):
             provenance["extrapolation_notice"] = notice
         vapor_pressure_provenance[str(species)] = provenance
         source = str(vapor_pressure_sources.get(species) or "")
@@ -3209,9 +3211,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             temperature_K=T_K,
             reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
         )
-        transport_notice = transport_o2.observation_or_setpoint_receipt.get(
-            "extrapolation_notice"
+        from simulator.vapour_rail.instrumentation import public_carrier_notices
+
+        transport_notices = public_carrier_notices(
+            transport_o2.observation_or_setpoint_receipt
         )
+        # The warning text quotes the oxygen-band notice. The collector
+        # already holds every *_notice on the receipt; this selects the
+        # legacy warning body and does not publish the carrier.
+        transport_notice = transport_notices.get("extrapolation_notice")
         if transport_notice is not None:
             warnings.append(
                 f"{transport_notice['reason']}: "
@@ -4619,18 +4627,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
-                oxygen_notice = (
-                    evaluation.extrapolation_notice
-                    if compiled_evaluator is not None
-                    else transport_notice if pO2_scaled else None
-                )
-                if oxygen_notice is not None:
-                    vapor_pressure_provenance[name].setdefault(
-                        "extrapolation_notice", dict(oxygen_notice)
-                    )
                 if compiled_evaluator is not None:
                     apply_public_carrier_notices(
                         vapor_pressure_provenance[name], evaluation
+                    )
+                elif pO2_scaled:
+                    apply_public_carrier_notices(
+                        vapor_pressure_provenance[name],
+                        transport_o2.observation_or_setpoint_receipt,
                     )
                 if source_activity_floor_notice is not None:
                     vapor_pressure_provenance[name][

@@ -2283,10 +2283,11 @@ def _assert_published_diagnostic_notice(notice: dict) -> None:
 
 
 def _published_diagnostic_notice(surface: str) -> dict:
-    """Feed one carrier whose extra holds only the diagnostic notice.
+    """Feed one carrier whose only notice is the diagnostic admission.
 
-    Each arm is a public surface that publishes a vapour pressure or a
-    quantity derived from it. The carrier has no extrapolation_notice.
+    Each arm calls the production entry point. The carrier has no
+    extrapolation_notice. Deleting that surface's collector call drops
+    the provenance, the comparator gaps, and the t-1723 closer.
     """
 
     notice = _diagnostic_only_carrier_notice()
@@ -2295,49 +2296,131 @@ def _published_diagnostic_notice(surface: str) -> dict:
 
     if surface == "batch_request_answer":
         from simulator.vapour_rail.batch import (
-            FluxEligible,
+            FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
+            FluxActivationContext,
             PressureValue,
-            VapourAnswer,
         )
         from simulator.vapour_rail.instrumentation import (
-            apply_public_carrier_notices,
+            public_carrier_notices,
             serialize_vapour_answer,
         )
 
-        evaluation = SimpleNamespace(diagnostic_admission_notice=deepcopy(notice))
-        published_extra: dict = {}
-        apply_public_carrier_notices(published_extra, evaluation)
-        answer = VapourAnswer(
-            species_id="Fe",
-            pressure=PressureValue(pa=_FE_PSEUDO_LAW_1750_PA),
-            selected_runtime_pressure=PressureValue(pa=_FE_PSEUDO_LAW_1750_PA),
-            flux=FluxEligible(alpha_ref="diagnostic-only"),
-            source_label="diagnostic-only",
-            formula_id="antoine",
-            source_account="process.cleaned_melt",
-            solve_group_id="fe",
-            state_fingerprint="fe",
-            validation_status="pending_validation",
-            extra=published_extra,
+        # Live Fe evaluate() attaches only diagnostic_admission_notice.
+        # 1750 K is inside 1400-1900 K and the oxygen exponent is 0, so
+        # the floor slot on the evaluation is None and the collector
+        # omits it. Resolution must copy the evaluator notice.
+        provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
+        catalog = provider._vapour_rail_catalog
+        assert catalog is not None
+        evaluator = catalog.species["Fe"].evaluator
+        assert evaluator is not None
+        evaluation = evaluator.evaluate(1750.0)
+        assert list(public_carrier_notices(evaluation)) == [
+            "diagnostic_admission_notice"
+        ]
+        batch = catalog.resolve_batch(
+            {"process.cleaned_melt": {"FeO": 1.0}},
+            {
+                "temperature_K": 1750.0,
+                "process_phase": "hot_train",
+                "stage": "evaporation",
+                "fO2_bar": 1.0e-9,
+                "source_reaction_fO2_bar": 1.0e-9,
+            },
+            flux_activation_context=FluxActivationContext(
+                epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST
+            ),
         )
-        public = serialize_vapour_answer(answer)
-        assert public["pressure"]["pa"] == pytest.approx(
+        answer = batch.channel("Fe")
+        assert answer.refusal_code is None
+        assert isinstance(answer.pressure, PressureValue)
+        assert answer.pressure.pa == pytest.approx(
             _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
         )
+        public = serialize_vapour_answer(answer)
+        assert "extrapolation_notice" not in public["extra"]
+        return public["extra"]["diagnostic_admission_notice"]
+
+    if surface == "source_provenance":
+        from simulator.vapour_rail.batch import (
+            FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
+            FluxActivationContext,
+            PressureValue,
+        )
+        from simulator.vapour_rail.instrumentation import serialize_vapour_answer
+        from tests.test_vapour_batch_request import _u0_stub
+
+        # Evidenced Antoine: the evaluator carries no diagnostic notice.
+        # The only notice is on source provenance. Resolution must copy it.
+        payload = _effective_pressure_fit_fixture()
+        row = payload["families"]["potassium_test_family"][
+            "physical_properties"
+        ]["species"]["K"]
+        model = row["pressure_models"][0]
+        _set_fit_evidence(row, model, "full")
+        catalog = compile_vapour_rail_catalog(
+            payload, u0_manifest=_u0_stub("K")
+        )
+        evaluator = catalog.species["K"].evaluator
+        assert evaluator is not None
+        assert getattr(evaluator, "diagnostic_admission_notice", None) is None
+        batch = catalog.resolve_batch(
+            {"process.cleaned_melt": {"K2O": 1.0}},
+            {
+                "temperature_K": 1100.0,
+                "process_phase": "hot_train",
+                "source_reaction_activity_provenance": {
+                    "K": {"diagnostic_admission_notice": deepcopy(notice)},
+                },
+            },
+            flux_activation_context=FluxActivationContext(
+                epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST
+            ),
+        )
+        answer = batch.channel("K")
+        assert answer.refusal_code is None
+        assert isinstance(answer.pressure, PressureValue)
+        # log10(P/Pa) = 10 - 10000/1100. Same coefficients as the fixture.
+        assert answer.pressure.pa == pytest.approx(
+            _SYNTHETIC_DIAGNOSTIC_1100_PA, rel=1e-12, abs=0.0
+        )
+        public = serialize_vapour_answer(answer)
         assert "extrapolation_notice" not in public["extra"]
         return public["extra"]["diagnostic_admission_notice"]
 
     if surface == "oxide_provenance":
-        from simulator.vapour_rail.instrumentation import (
-            apply_public_carrier_notices,
-        )
+        from simulator.vapour_rail.instrumentation import public_carrier_notices
 
-        provenance = {"P_eq_Pa": _FE_PSEUDO_LAW_1750_PA}
-        evaluation = SimpleNamespace(diagnostic_admission_notice=deepcopy(notice))
-        apply_public_carrier_notices(provenance, evaluation)
-        assert provenance["P_eq_Pa"] == pytest.approx(
-            _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
+        # Live FeO association at 1600 C (1873.15 K), inside 1400-1900 K.
+        # pO2 1e-9 bar is not the dissociation floor and the oxygen
+        # exponent is positive, so the evaluation's only notice is the
+        # diagnostic admission. Provider dispatch must copy it.
+        provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
+        catalog = provider._vapour_rail_catalog
+        assert catalog is not None
+        evaluator = catalog.species["FeO_association_gas"].evaluator
+        assert evaluator is not None
+        evaluation = evaluator.evaluate(1873.15, pO2_bar=1.0e-9)
+        assert list(public_carrier_notices(evaluation)) == [
+            "diagnostic_admission_notice"
+        ]
+        result = provider.dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.VAPOR_PRESSURE,
+                account_view=ProviderAccountView(
+                    accounts={"process.cleaned_melt": {"FeO": 1.0}},
+                    species_formula_registry={},
+                ),
+                temperature_C=1600.0,
+                pressure_bar=1e-6,
+                control_inputs={"pO2_bar": 1.0e-9},
+            )
         )
+        assert result.status == "ok"
+        provenance = result.diagnostic["vapor_pressure_numerator_provenance"][
+            "FeO_association_gas"
+        ]
+        assert provenance["P_eq_Pa"] > 0.0
         assert "extrapolation_notice" not in provenance
         return provenance["diagnostic_admission_notice"]
 
@@ -2603,6 +2686,7 @@ def _published_diagnostic_notice(surface: str) -> dict:
     "surface",
     [
         "batch_request_answer",
+        "source_provenance",
         "oxide_provenance",
         "diagnostics_summary",
         "pareto_table",
