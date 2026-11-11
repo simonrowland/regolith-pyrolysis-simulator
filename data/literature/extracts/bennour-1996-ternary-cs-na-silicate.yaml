@@ -801,7 +801,9 @@ species:
       composition_derivation: 'Total oxide mole fractions are derived from the printed quasi-binary path: X_Cs2O=(1-X_SiO2)*x_Cs2O
         and X_Na2O=(1-X_SiO2)*(1-x_Cs2O).'
     - observation_id: bennour_1996_fig7_cs2o_x_sio2_0p5
-      type: activity
+      type: activity_coefficient
+      derived_from:
+      - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
       locator:
         page: 14
         published_page: 241
@@ -827,10 +829,10 @@ species:
           x: mole fraction xCs2O
           y: 'activity of aCs2O; dimensionless'
         component_as_published: aCs2O
-        note: Digitized read of the smooth unmarked curve; point values retain read uncertainty.
+        note: 'Digitized read of the smooth unmarked curve; point values retain read uncertainty. Table II integration fit is retained as context: bennour_1996_table_ii_x_sio2_0p5_fit.'
         derivation:
           relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity ratios and the matching Table II fit.
-          inputs: [bennour_1996_table_i_x_sio2_0p5_log_ion_ratio, bennour_1996_table_ii_x_sio2_0p5_fit]
+          inputs: [bennour_1996_table_i_x_sio2_0p5_log_ion_ratio]
           output_unit: dimensionless activity
         method: digitized
         axis_calibration: &id001
@@ -863,7 +865,6 @@ species:
             Cs2O: '0.00000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '76'
@@ -906,7 +907,6 @@ species:
             Cs2O: '0.05000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.010'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '282'
@@ -949,7 +949,6 @@ species:
             Cs2O: '0.10000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '487'
@@ -992,7 +991,6 @@ species:
             Cs2O: '0.15000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '693'
@@ -1035,7 +1033,6 @@ species:
             Cs2O: '0.20000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '898'
@@ -1078,7 +1075,6 @@ species:
             Cs2O: '0.22500'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1001'
@@ -1121,7 +1117,6 @@ species:
             Cs2O: '0.27500'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1207'
@@ -1164,7 +1159,6 @@ species:
             Cs2O: '0.30000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1310'
@@ -1207,7 +1201,6 @@ species:
             Cs2O: '0.35000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1515'
@@ -1250,7 +1243,6 @@ species:
             Cs2O: '0.40000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1721'
@@ -1293,7 +1285,6 @@ species:
             Cs2O: '0.42500'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1823'
@@ -1336,7 +1327,6 @@ species:
             Cs2O: '0.45000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.010'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1926'
@@ -1379,7 +1369,6 @@ species:
             Cs2O: '0.50000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '2131'
@@ -1415,7 +1404,9 @@ species:
       temperature_derivation: T_C = T_K - 273.15; printed T_K = 1573 K.
       composition_derivation: Total X_Cs2O=(1-X_SiO2)*x_path; X_Na2O=(1-X_SiO2)*(1-x_path).
     - observation_id: bennour_1996_fig7_cs2o_x_sio2_0p85
-      type: activity
+      type: activity_coefficient
+      derived_from:
+      - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
       locator:
         page: 14
         published_page: 241
@@ -1441,10 +1432,10 @@ species:
           x: mole fraction xCs2O
           y: 'activity of aCs2O; dimensionless'
         component_as_published: aCs2O
-        note: Digitized read of the smooth unmarked curve; point values retain read uncertainty.
+        note: 'Digitized read of the smooth unmarked curve; point values retain read uncertainty. Table II integration fit is retained as context: bennour_1996_table_ii_x_sio2_0p85_fit.'
         derivation:
           relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity ratios and the matching Table II fit.
-          inputs: [bennour_1996_table_i_x_sio2_0p85_log_ion_ratio, bennour_1996_table_ii_x_sio2_0p85_fit]
+          inputs: [bennour_1996_table_i_x_sio2_0p85_log_ion_ratio]
           output_unit: dimensionless activity
         method: digitized
         axis_calibration: *id001
@@ -1462,7 +1453,6 @@ species:
             Cs2O: '0.00000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '76'
@@ -1505,7 +1495,6 @@ species:
             Cs2O: '0.01500'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.010'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '282'
@@ -1548,7 +1537,6 @@ species:
             Cs2O: '0.03000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '487'
@@ -1591,7 +1579,6 @@ species:
             Cs2O: '0.04500'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '693'
@@ -1634,7 +1621,6 @@ species:
             Cs2O: '0.06000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '898'
@@ -1677,7 +1663,6 @@ species:
             Cs2O: '0.06750'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1001'
@@ -1720,7 +1705,6 @@ species:
             Cs2O: '0.08250'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1207'
@@ -1763,7 +1747,6 @@ species:
             Cs2O: '0.09000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1310'
@@ -1806,7 +1789,6 @@ species:
             Cs2O: '0.10500'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1515'
@@ -1849,7 +1831,6 @@ species:
             Cs2O: '0.12000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1721'
@@ -1892,7 +1873,6 @@ species:
             Cs2O: '0.12750'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1823'
@@ -1935,7 +1915,6 @@ species:
             Cs2O: '0.13500'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.010'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1926'
@@ -1978,7 +1957,6 @@ species:
             Cs2O: '0.15000'
           derived_from:
           - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
-          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '2131'

@@ -5057,7 +5057,7 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
         if row["observation_id"].startswith("bennour_1996_fig7_cs2o_")
     ]
     assert len(figures) == 2
-    assert {row["type"] for row in figures} == {"activity"}
+    assert {row["type"] for row in figures} == {"activity_coefficient"}
     assert all(row["locator"]["pdf_page_index"] == 13 for row in figures)
     assert all(row["values"]["quantity"] == "activity" for row in figures)
     assert {row["values"]["section_as_published"] for row in figures} == {
@@ -5067,13 +5067,20 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
         values = row["values"]
         assert values["caption"] == figure_caption
         assert values["component_as_published"] == "aCs2O"
+        section = "0p5" if "0p5" in row["observation_id"] else "0p85"
+        assert row["derived_from"] == [
+            f"bennour_1996_table_i_x_sio2_{section}_log_ion_ratio"
+        ]
         assert len(values["points"]) == 13
         for point in values["points"]:
             assert point["activity"] == point["a_Cs2O_as_digitized"]
             assert sum(Decimal(str(x)) for x in point["composition_mole_fraction"].values()) == 1
-            assert len(point["derived_from"]) == 2
-            assert any("table_i_" in parent for parent in point["derived_from"])
-            assert any("table_ii_" in parent for parent in point["derived_from"])
+            section = "0p5" if "0p5" in row["observation_id"] else "0p85"
+            assert point["derived_from"] == [
+                f"bennour_1996_table_i_x_sio2_{section}_log_ion_ratio"
+            ]
+        section = "0p5" if "0p5" in row["observation_id"] else "0p85"
+        assert f"bennour_1996_table_ii_x_sio2_{section}_fit" in values["note"]
 
     na_figures = {
         row["observation_id"]: row
