@@ -2870,6 +2870,14 @@ def test_scored_withhold_notice_follows_evaluated_campaign(
     """
 
     profile = _fidelity_overlay_profile(authored, evaluated)
+    if branch == "infeasible":
+        # b2f520812: listing delivered_stream_purity reports a provisional
+        # diagnostic. This branch is the completed hard-gate failure, so the
+        # profile opts into the 95% threshold. A mixed stream then fails.
+        profile["constraints"] = {
+            **profile["constraints"],
+            "enforce_delivered_stream_purity": True,
+        }
     result = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
@@ -3279,15 +3287,27 @@ def _alias_gate_case_id(
 def _alias_gate_trace() -> SimpleNamespace:
     """Coating rejects when installed. Fe extraction passes either threshold.
 
-    50 kg Fe against 0.01 kg FeO is near a full extraction in
-    target-equivalent mol, above the code default 0.95 and above the
-    objective threshold 0.5. The wall report is the unavailable empty
-    deposit the coating gate refuses.
+    The gate scores the yield-disposition melt boundary (b2f520812), not the
+    product ledger. 50 mol-atoms of Fe in product_condensed against 0.01
+    retained leaves the melt at 50/50.01, above the code default 0.95 and
+    above the objective threshold 0.5. A trace with no disposition rows is
+    unavailable and fails closed. The ledger numbers stay as the captured
+    diagnostic. The wall report is the unavailable empty deposit the coating
+    gate refuses.
     """
 
     trace = _trace()
     trace.product_ledger_kg = {"SiO": 95.0, "Fe": 50.0}
     trace.terminal_rump_by_species_kg = {"CaO": 2.0, "FeO": 0.01}
+    trace.yield_disposition_fraction_table_rows = (
+        {
+            "element": "Fe",
+            "destination_mol_atoms": {
+                "product_condensed": 50.0,
+                "melt_retained": 0.01,
+            },
+        },
+    )
     delattr(trace, "wall_deposit_by_segment_species_delta")
     delattr(trace, "wall_deposit_sticking_authority")
     trace.wall_deposit_by_segment_species_kg = {}
