@@ -64,6 +64,22 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1873.15, 2273.15]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3379238246485715130851197644'
+        - - Al2O3
+          - '0.01776054124964630516635698291'
+        - - FeO
+          - '0.2794942400441881150076001642'
+        - - MgO
+          - '0.3389669610365857597845753442'
+        - - CaO
+          - '0.02585443302100830695634774455'
+        amount_basis: mole_fraction
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -86,6 +102,127 @@ observations:
     note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
     source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   read_from: pdftotext:kems-015-hashimoto-1983
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3379238246485715130851197644'
+          - - Al2O3
+            - '0.01776054124964630516635698291'
+          - - FeO
+            - '0.2794942400441881150076001642'
+          - - MgO
+            - '0.3389669610365857597845753442'
+          - - CaO
+            - '0.02585443302100830695634774455'
+          amount_basis: mole_fraction
+      locator:
+        section: ABSTRACT
+        line_range: '11'
+        note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+        source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              section: ABSTRACT
+              line_range: '11'
+              note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+              source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              section: ABSTRACT
+              line_range: '11'
+              note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+              source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              section: ABSTRACT
+              line_range: '11'
+              note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+              source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              section: ABSTRACT
+              line_range: '11'
+              note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+              source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              section: ABSTRACT
+              line_range: '11'
+              note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+              source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              section: ABSTRACT
+              line_range: '11'
+              note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+              source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              section: ABSTRACT
+              line_range: '11'
+              note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+              source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              section: ABSTRACT
+              line_range: '11'
+              note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+              source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              section: ABSTRACT
+              line_range: '11'
+              note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+              source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              section: ABSTRACT
+              line_range: '11'
+              note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+              source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        output_unit: mole_fraction
+        references: []
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_fe_fcmas_free_evap_geometry
   experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
