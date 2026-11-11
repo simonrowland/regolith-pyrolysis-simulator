@@ -1180,6 +1180,10 @@ def _run_scenario(scenario: dict, *, capture: bool = False):
 
 
 def _assert_authoritative_flux_capture(payload: dict, capture: dict) -> None:
+    assert payload.get("status") == "ok", (
+        "runner output must complete successfully before its flux or ledger "
+        f"digests are accepted, got {payload.get('status')!r}"
+    )
     flux_maps = capture.get("flux_maps")
     assert flux_maps, (
         "runner completed without any BuiltinEvaporationFluxProvider dispatch; "
