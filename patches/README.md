@@ -148,7 +148,7 @@ Clean. No local patches.
 
 ### magemin — v1.9.6 / upstream `40ed109`
 
-Three fixes held as patches pending upstream, with a draft pull-request description in
+Three existing fixes held as patches pending upstream, with a draft pull-request description in
 `patches/magemin/UPSTREAM-PR.md` (not yet filed):
 
 - `0001` THERMOCALC `aMgO`: the `tc` branch of `compute_activities()` never stored the periclase
@@ -162,6 +162,9 @@ Three fixes held as patches pending upstream, with a draft pull-request descript
 - `0003` sb21 `aFeO`: the four-cation wustite scaling was computed and then overwritten
   (printed aFeO ~5.6e25 for a basaltic sb21 bulk; 0.473 after). sb24 has no `FeO` oxide; its
   `aFeO` comes from the later Fe+O block, which already divides by 4 and is not touched.
+- `0004` headless singleton MPI defaults: exclude hwloc's unused OpenCL probe and set local
+  transport defaults for standalone MPI launches. Draft issue and PR text are in
+  `patches/magemin/UPSTREAM-SUBMISSION.md`.
 
 The patch files keep MAGEMin's CRLF line endings: apply them with `git am --keep-cr` (or `git apply`),
 and edit them byte-safely. `enginepatch.sh` maps

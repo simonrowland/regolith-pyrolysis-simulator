@@ -1,0 +1,41 @@
+From cde42469ec0fc1fd555a3e98e8d9d236e402f368 Mon Sep 17 00:00:00 2001
+From: Simon Rowland <simon@simonrowland.com>
+Date: Tue, 10 Nov 2026 23:43:37 -0500
+Subject: [PATCH] Default MPI singletons to headless local transport
+
+MAGEMin does not use GPU topology. Avoid the OpenCL hwloc probe that opens WindowServer connections, and constrain singleton PMIx/PRTE transports to loopback to prevent per-call listening sockets. Preserve explicit user settings and leave MPI launcher transport settings untouched.
+---
+ src/MAGEMin.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/src/MAGEMin.c b/src/MAGEMin.c
+index 8cd5d92..4e88e71 100644
+--- a/src/MAGEMin.c
++++ b/src/MAGEMin.c
+@@ -67,6 +67,23 @@ int main(		int    argc,
+ 	int 	rank;
+ 	
+ 	#ifdef USE_MPI
++		/* Measured per call on macOS: OpenCL probing contacted WindowServer,
++		   and singleton PMIx/PRTE opened LISTEN sockets. */
++		setenv("HWLOC_COMPONENTS", "-opencl", 0);
++		if (getenv("PMIX_RANK") == NULL &&
++			getenv("OMPI_COMM_WORLD_SIZE") == NULL &&
++			getenv("PMI_RANK") == NULL) {
++#ifdef __APPLE__
++			const char *loopback = "lo0";
++#else
++			const char *loopback = "lo";
++#endif
++			setenv("OMPI_MCA_btl", "self", 0);
++			setenv("OMPI_MCA_pml", "ob1", 0);
++			setenv("PMIX_MCA_ptl_base_if_include", loopback, 0);
++			setenv("PRTE_MCA_prte_if_include", loopback, 0);
++		}
++
+ 		MPI_Init(&argc, &argv);
+ 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+ 	#endif
+-- 
+2.53.0
+
