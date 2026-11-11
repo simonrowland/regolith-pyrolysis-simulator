@@ -409,10 +409,12 @@ COMMITTED_STATUS = REPO_ROOT / "data" / "literature" / "SOURCE_STATUS.yaml"
 
 def test_repo_source_status_counts_match_rows() -> None:
     status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
+    # build_index.py omits a stage whose row count is zero.
     by_stage = {
         stage: sum(row["stage"] == stage for row in status["sources"])
         for stage in builder.STATUS_STAGES
     }
+    by_stage = {name: count for name, count in by_stage.items() if count}
     assert status["counts"] == {
         "sources": len(status["sources"]),
         "by_stage": by_stage,
@@ -437,7 +439,6 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
         "in_progress": 192,
         "ingested_partial": 183,
         "ingested_complete": 149,
-        "wired": 0,
         "unknown": 357,
     }
 
