@@ -149,10 +149,10 @@ from simulator.condensation_routing import (
     coproduct_species_for_stage_number,
     designated_stage_number,
     dimer_collection_monomer,
+    draw_element_partial_pa,
     element_collection_pair,
     element_equilibrium_comparison_pa,
     element_partial_pa,
-    final_element_partial_pa,
     is_designated_for_stage,
     monomer_condensate_credit_kg,
     species_accepted_on_stage,
@@ -4756,9 +4756,13 @@ class CondensationModel:
             and not element_supersaturated_without_kp
         ):
             monomer_name, dimer_name = element_pair
+            # The notice is written by the drawdown chokepoint, including
+            # when this arrival is the monomer. A missing sink is created
+            # so a direct efficiency call cannot drop the proxy.
             proxy = getattr(self, '_dimer_hk_alpha_proxy', None)
-            if isinstance(proxy, dict):
-                proxy[dimer_name] = monomer_name
+            if not isinstance(proxy, dict):
+                proxy = {}
+                self._dimer_hk_alpha_proxy = proxy
             molar_mass = (
                 _molecular_mass_kg_per_molecule(
                     species, vapor_pressure_data=self.vapor_pressure_data,
@@ -4797,10 +4801,13 @@ class CondensationModel:
                 p_elem = element_partial_pa(
                     p_in, float(coexisting_dimer_partial_pa or 0.0),
                 )
-            p_elem_final = final_element_partial_pa(
+            p_elem_final = draw_element_partial_pa(
                 element_partial_initial_pa=p_elem,
                 residence_s=residence_s,
                 strips=element_strips,
+                monomer=monomer_name,
+                dimer=dimer_name,
+                proxy_notice=proxy,
             )
             eta = (p_elem - p_elem_final) / p_elem
             notice = notices.get(f'{curve}#wall:{midpoint_T_K}')

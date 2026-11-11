@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import MutableMapping
 
 
 STAGE_KEY_BY_NUMBER: dict[int, str] = {
@@ -738,6 +739,11 @@ def final_element_partial_pa(
     p(t) = P_sat + (p0 - P_sat) exp(-k t) on each active set. The dimer
     term is nonlinear and uses the adaptive exponential instead. The
     element never falls below p_elem,sat = P_sat + 2 P_sat^2 / K_p.
+
+    Production strips that apply the monomer sticking coefficient to
+    the dimer call ``draw_element_partial_pa``, which records
+    ``dimer_alpha_from_monomer_proxy`` and then calls this. A direct
+    call here is the integral only and does not publish that notice.
     """
 
     partial = float(element_partial_initial_pa)
@@ -763,6 +769,56 @@ def final_element_partial_pa(
     if updated > partial:
         return partial
     return updated
+
+
+def _strip_uses_monomer_alpha_for_dimer(
+    strips: tuple[tuple[float, float, float, float], ...],
+) -> bool:
+    """True when a strip applies a finite-K_p dimer coefficient.
+
+    That coefficient is the monomer accommodation used as alpha_M2.
+    K_p -> inf drops the dimer drive, and a zero coefficient never
+    applies the proxy. The no-K_p upper bound does not build these strips.
+    """
+
+    for _k_monomer, k_dimer, _saturation, kp_pa in strips:
+        kp = float(kp_pa)
+        if float(k_dimer) > 0.0 and math.isfinite(kp) and kp > 0.0:
+            return True
+    return False
+
+
+def draw_element_partial_pa(
+    *,
+    element_partial_initial_pa: float,
+    residence_s: float,
+    strips: tuple[tuple[float, float, float, float], ...] | list[
+        tuple[float, float, float, float]
+    ],
+    monomer: str,
+    dimer: str,
+    proxy_notice: MutableMapping[str, str],
+) -> float:
+    """The only production integral of the parallel dimer channel.
+
+    Invariant. Whenever a strip uses the monomer sticking coefficient
+    as alpha_M2 (k_M2 > 0 and K_p finite), this records
+    ``proxy_notice[dimer] = monomer`` and then integrates. Stage
+    efficiency and wall capture both call this and do not integrate
+    that channel anywhere else. A monomer-only feed is the same
+    channel as a dimer feed: the gas re-speciates, and a cold wall
+    with zero collector area still deposits K2 with alpha_K. K_p -> inf
+    records nothing, because the dimer drive is gone.
+    """
+
+    rows = tuple(strips)
+    if _strip_uses_monomer_alpha_for_dimer(rows):
+        proxy_notice[str(dimer)] = str(monomer)
+    return final_element_partial_pa(
+        element_partial_initial_pa=element_partial_initial_pa,
+        residence_s=residence_s,
+        strips=rows,
+    )
 
 
 # Monomer has no condenser contract. The vapor stays in the stream.

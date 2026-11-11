@@ -9,7 +9,7 @@ Layer rule: process physics does not live in simulator.accounting.
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping
+from collections.abc import Mapping, MutableMapping
 from typing import Any
 
 from simulator.accounting.exceptions import AccountingError
@@ -201,6 +201,7 @@ def _element_wall_capture_kg_hr(
     flux_mol_m2_s: float,
     gas_temperature_K: float,
     vapor_pressure_data: Mapping[str, Any] | None,
+    proxy_notice: MutableMapping[str, str] | None = None,
 ) -> float:
     """kg/hr of this gas species removed by the element drawdown.
 
@@ -228,7 +229,10 @@ def _element_wall_capture_kg_hr(
         _hkl_impingement_flux_mol_m2_s,
         _molecular_mass_kg_per_molecule,
     )
-    from simulator.condensation_routing import final_element_partial_pa
+    from simulator.condensation_routing import (
+        draw_element_partial_pa,
+        final_element_partial_pa,
+    )
 
     if (
         rate_kg_hr <= 0.0
@@ -271,7 +275,16 @@ def _element_wall_capture_kg_hr(
             dimer, 1.0, gas_temperature_K,
             vapor_pressure_data=vapor_pressure_data,
         )
-        final = final_element_partial_pa(
+        # Same chokepoint as the stage band. A monomer-only feed still
+        # re-speciates M2 and deposits it with the monomer alpha, so the
+        # proxy notice is recorded here rather than only when the arriving
+        # gas species is the dimer.
+        if not isinstance(proxy_notice, MutableMapping):
+            raise ValueError(
+                "dimer Hertz-Knudsen wall channel requires the "
+                "monomer-alpha proxy notice"
+            )
+        final = draw_element_partial_pa(
             element_partial_initial_pa=p_elem_pa,
             residence_s=1.0,
             strips=((
@@ -280,6 +293,9 @@ def _element_wall_capture_kg_hr(
                 saturation_pa,
                 float(kp_pa),
             ),),
+            monomer=monomer,
+            dimer=dimer,
+            proxy_notice=proxy_notice,
         )
     if not math.isfinite(final) or p_elem_pa <= 0.0:
         return 0.0
@@ -380,6 +396,11 @@ def wall_deposit_candidate_for_surface_kg(
         segment=segment,
         T_K=T_wall_K,
     )
+    # The arriving gas being the dimer is not the proxy gate. A
+    # monomer-only feed re-speciates M2 and still uses this alpha.
+    # draw_element_partial_pa records that on the route notice when
+    # the dimer channel actually runs. This record only labels the
+    # coefficient lookup for a dimer gas species.
     if collection_species is not None and collection_species != species:
         from simulator.condensation_routing import DIMER_ALPHA_FROM_MONOMER_PROXY
 
@@ -654,6 +675,10 @@ def wall_deposit_candidate_for_surface_kg(
         and isinstance(flux, (int, float))
         and math.isfinite(float(flux))
     ):
+        proxy_notice = getattr(model, "_dimer_hk_alpha_proxy", None)
+        if not isinstance(proxy_notice, dict):
+            proxy_notice = {}
+            model._dimer_hk_alpha_proxy = proxy_notice
         captured_kg_hr = _element_wall_capture_kg_hr(
             species=species,
             rate_kg_hr=rate_kg_hr,
@@ -669,6 +694,7 @@ def wall_deposit_candidate_for_surface_kg(
             flux_mol_m2_s=float(flux),
             gas_temperature_K=float(gas_temperature_K),
             vapor_pressure_data=vapor_pressure_data,
+            proxy_notice=proxy_notice,
         )
     carrier_gas = str(getattr(model, "carrier_gas", "N2") or "N2")
     knudsen_number = None if "zero_reason" in rate_diagnostic else _knudsen_number(

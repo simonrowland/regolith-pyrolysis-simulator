@@ -639,6 +639,7 @@ def test_every_contracted_arrival_uses_the_element_capture_fraction(
         expected = (WORKED_P_ELEM_PA - final) / WORKED_P_ELEM_PA
         assert eta == pytest.approx(expected, rel=1.0e-6, abs=1.0e-9)
         assert eta != pytest.approx(eta_linear)
+        assert model._dimer_hk_alpha_proxy[dimer] == monomer
         return
 
     from simulator.wall_deposition import wall_deposit_candidate_for_surface_kg
@@ -662,6 +663,7 @@ def test_every_contracted_arrival_uses_the_element_capture_fraction(
     assert calls, species
     assert calls[0] == pytest.approx(_p_monomer)
     assert deposited > 0.0
+    assert model._dimer_hk_alpha_proxy[dimer] == monomer
 
 
 def _parallel_element_rate(pressure, kp, psat, k_monomer, k_dimer):
@@ -1419,6 +1421,133 @@ def test_monomer_only_potassium_flags_the_dimer_alpha_proxy():
     notice = route.sticking_alpha_provenance_notice
     assert notice[DIMER_ALPHA_FROM_MONOMER_PROXY]["K2"] == "K"
     assert notice["authoritative_for_deposit_mass"] is False
+
+
+# Invariant. The monomer sticking coefficient used as alpha_M2 is
+# published as dimer_alpha_from_monomer_proxy. draw_element_partial_pa
+# is the only production integral of that channel: it records the
+# proxy, then integrates. Stage efficiency and wall capture both call
+# it. The grid is every contracted pair, every arrival (monomer only,
+# dimer only, both), and every surface (wall only, stage only, both).
+# Wall-only keeps the duct area and then sets every collector area to
+# 0, so the stage integral never runs. 250 C is cold enough that 10 Pa
+# of K, Na, and Mg are all supersaturated on that duct. 40 C, the
+# potassium trap, refuses Na's wall curve, so the shared grid does not
+# use it; the potassium counterexample below does. A 1500 C duct and a
+# species with no contracted dimer do not record the proxy.
+
+
+PROXY_ARRIVALS = ("monomer", "dimer", "both")
+PROXY_SURFACES = ("wall_only", "stage_only", "both")
+# Cold enough for 10 Pa of K, Na, and Mg. Hotter than this, K's
+# extrapolated P_sat rises through the partial and the wall channel
+# stays off (measured: 300 C deposits nothing).
+PROXY_COLD_WALL_C = 250.0
+
+
+def _proxy_route(monomer, dimer, arrival, surface, *, wall_c=None):
+    species_kg = {}
+    partials = {}
+    if arrival in ("monomer", "both"):
+        species_kg[monomer] = 1.0
+        partials[monomer] = 0.1
+    if arrival in ("dimer", "both"):
+        species_kg[dimer] = 1.0
+        partials[dimer] = 0.1
+    model = _model(partials=partials)
+    # Duct area is copied from the collector area at configure time.
+    # Pass 1 m2 so the duct stays a real surface, then zero the
+    # collectors when this case is wall-only.
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar=partials,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+        pipe_segment_temperatures_C={
+            segment.name: (
+                PROXY_COLD_WALL_C if wall_c is None else wall_c
+            )
+            if surface != "stage_only"
+            else 1500.0
+            for segment in model.pipe_segments
+        },
+    )
+    if surface == "wall_only":
+        model.stage_area_m2_by_stage = {
+            key: 0.0 for key in model.stage_area_m2_by_stage
+        }
+    if surface == "stage_only":
+        model.pipe_segments = []
+    return model.route(
+        EvaporationFlux(
+            species_kg_hr=species_kg,
+            total_kg_hr=float(sum(species_kg.values())),
+        ),
+        MeltState(temperature_C=1500.0),
+    )
+
+
+@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
+@pytest.mark.parametrize("arrival", PROXY_ARRIVALS)
+@pytest.mark.parametrize("surface", PROXY_SURFACES)
+def test_dimer_alpha_proxy_is_published_whenever_the_channel_runs(
+    monomer, dimer, arrival, surface,
+):
+    """Every path that deposits with alpha_M as alpha_M2 names the proxy."""
+
+    route = _proxy_route(monomer, dimer, arrival, surface)
+    notice = route.sticking_alpha_provenance_notice
+    assert notice[DIMER_ALPHA_FROM_MONOMER_PROXY][dimer] == monomer
+    assert notice["authoritative_for_deposit_mass"] is False
+    deposited = _deposited_kg(route, monomer)
+    assert deposited > 0.0
+    if surface == "wall_only":
+        staged = sum(
+            by_species.get(monomer, 0.0)
+            for by_species in route.condensed_by_stage_species.values()
+        )
+        assert staged == pytest.approx(0.0, abs=0.0)
+        assert route.wall_deposit_by_species.get(monomer, 0.0) > 0.0
+
+
+def test_monomer_only_potassium_on_a_40c_wall_flags_the_proxy():
+    """Reviewer's route: pure K, 40 C duct, every collector area zero.
+
+    The stage integral returns before the dimer channel. The wall
+    still re-speciates K2 and deposits it with alpha_K.
+    """
+
+    route = _proxy_route("K", "K2", "monomer", "wall_only", wall_c=40.0)
+    notice = route.sticking_alpha_provenance_notice
+    assert notice[DIMER_ALPHA_FROM_MONOMER_PROXY]["K2"] == "K"
+    assert notice["authoritative_for_deposit_mass"] is False
+    assert route.wall_deposit_by_species.get("K", 0.0) > 0.0
+    staged = sum(
+        by_species.get("K", 0.0)
+        for by_species in route.condensed_by_stage_species.values()
+    )
+    assert staged == pytest.approx(0.0, abs=0.0)
+
+
+def test_hot_wall_with_zero_collector_does_not_invent_the_proxy():
+    """1500 C is undersaturated for 10 Pa of K, so the dimer channel stays off."""
+
+    route = _proxy_route("K", "K2", "monomer", "wall_only", wall_c=1500.0)
+    assert route.wall_deposit_by_species.get("K", 0.0) == pytest.approx(0.0, abs=0.0)
+    assert DIMER_ALPHA_FROM_MONOMER_PROXY not in route.sticking_alpha_provenance_notice
+
+
+@pytest.mark.parametrize(
+    "species",
+    ("Al", "Al2", "Ca", "Ca2", "Fe", "SiO", "Cr"),
+)
+def test_uncontracted_species_do_not_publish_a_dimer_alpha_proxy(species):
+    route = _route({species: 1.0}, partials={species: 0.1})
+    notice = route.sticking_alpha_provenance_notice
+    proxy = notice.get(DIMER_ALPHA_FROM_MONOMER_PROXY, {})
+    assert species not in proxy
+    assert f"{species}2" not in proxy
 
 
 @pytest.mark.parametrize(
