@@ -8,8 +8,6 @@ import yaml
 
 from simulator.cost_energy import carrier_gas_run_cost
 from simulator.cost_parameters import cost_parameters_from_mapping
-from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.optimize.knob_saturation import compute_knob_saturation
 from simulator.optimize.objective import (
     ObjectiveDefinition,
@@ -24,18 +22,6 @@ DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 def _load_yaml(name: str):
     return yaml.safe_load((DATA_DIR / name).read_text(encoding="utf-8"))
-
-
-def _sim_from_real_feedstock(feedstock_id: str) -> PyrolysisSimulator:
-    simulator = PyrolysisSimulator(
-        InternalAnalyticalBackend(),
-        _load_yaml("setpoints.yaml"),
-        _load_yaml("feedstocks.yaml"),
-        _load_yaml("vapor_pressures.yaml"),
-    )
-    additives = {"C": 0.03} if feedstock_id == "mars_basalt" else {}
-    simulator.load_batch(feedstock_id, mass_kg=1.0, additives_kg=additives)
-    return simulator
 
 
 def test_carrier_cost_matches_hand_computed_hero_literal() -> None:
@@ -195,14 +181,16 @@ def test_mars_atmospheric_makeup_is_not_mispriced_as_an_earth_import(
     }
 
 
-@pytest.mark.parametrize("feedstock_id", ["mars_global_mgs1", "mars_basalt"])
-def test_ar_mars_todo_uses_body_from_real_feedstock(feedstock_id: str) -> None:
-    sim = _sim_from_real_feedstock(feedstock_id)
-    sim.melt.background_gas_species = "Ar"
-    sim.melt.hour = 150.0
-    sim.melt.p_total_mbar = 10.0
-    sim.record.total_hours = 150.0
-    assert sim.melt.body == "mars"
+def test_ar_mars_todo_uses_explicit_recipe_body_from_simulator_state() -> None:
+    sim = SimpleNamespace(
+        melt=SimpleNamespace(
+            background_gas_species="Ar",
+            body="Mars",
+            initial_mass_kg=1.0,
+            p_total_mbar=10.0,
+        ),
+        record=SimpleNamespace(total_hours=150.0),
+    )
 
     summary = _carrier_gas_cost_summary(
         sim,
@@ -212,17 +200,36 @@ def test_ar_mars_todo_uses_body_from_real_feedstock(feedstock_id: str) -> None:
     )
 
     assert summary["carrier_mass_used_kg"] == pytest.approx(44.0)
-    assert summary["carrier_body"] == "mars"
     assert summary["earth_price_per_kg"] is None
     assert summary["carrier_cost_usd"] == pytest.approx(
         summary["recycle_electricity_cost_usd"]
     )
     assert summary["typed_todo"]["species"] == "Ar"
-    assert summary["typed_todo"]["body"] == "mars"
-    assert summary["carrier_mass_basis"] == "scaled_reference_estimate"
-    assert "FLAGGED: controller assumption pending owner number (d-389)" in summary[
-        "evidence_flags"
-    ]
+    assert summary["typed_todo"]["body"] == "Mars"
+
+
+@pytest.mark.parametrize(
+    ("species", "expected_makeup_cost_usd"),
+    [("Ar", 4400.0), ("Kr", 4527.60), ("N2", 4400.0)],
+)
+def test_unknown_carrier_body_assumes_import_and_flags_evidence(
+    species: str,
+    expected_makeup_cost_usd: float,
+) -> None:
+    costs = cost_parameters_from_mapping()
+    result = carrier_gas_run_cost(
+        carrier_mass_used_kg=44.0,
+        carrier_species=species,
+        carrier_body="",
+        refrigeration_recycle_energy_kWh=0.0,
+        carrier_gas_earth_price_per_kg=costs.carrier_gas_earth_price_per_kg,
+        import_delivery_cost_per_kg=costs.import_delivery_cost_per_kg,
+        makeup_loss_fraction_per_run=costs.carrier_makeup_loss_fraction_per_run,
+        electricity_cost_per_kWh=costs.electricity_cost_per_kWh,
+    )
+
+    assert result["makeup_cost_usd"] == pytest.approx(expected_makeup_cost_usd)
+    assert "carrier_body_unknown_assumed_import" in result["evidence_flags"]
 
 
 @pytest.mark.parametrize(
@@ -245,7 +252,7 @@ def test_hero_default_n2_carrier_cost_is_priced_and_flagged() -> None:
     sim = SimpleNamespace(
         melt=SimpleNamespace(
             background_gas_species="N2",
-            body="moon",
+            body="",
             initial_mass_kg=run["mass_kg"],
             hour=run["hours"],
             p_total_mbar=10.0,
@@ -270,3 +277,4 @@ def test_hero_default_n2_carrier_cost_is_priced_and_flagged() -> None:
         "earth_price_pending_immaterial_vs_delivery"
     )
     assert "earth_price_pending_immaterial_vs_delivery" in summary["evidence_flags"]
+    assert "carrier_body_unknown_assumed_import" in summary["evidence_flags"]

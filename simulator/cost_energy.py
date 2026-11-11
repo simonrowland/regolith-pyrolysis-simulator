@@ -176,6 +176,7 @@ def carrier_gas_run_cost(
     )
     earth_price = None if mars_local_source else prices.get(species)
     has_import_price = earth_price is not None
+    body_unknown_assumed_import = not body and has_import_price
     earth_price_pending = (
         has_import_price
         and species in {"Ar", "N2"}
@@ -231,6 +232,8 @@ def carrier_gas_run_cost(
     evidence_flags = []
     if earth_price_source_tag:
         evidence_flags.append(str(earth_price_source_tag))
+    if body_unknown_assumed_import:
+        evidence_flags.append("carrier_body_unknown_assumed_import")
     if earth_price_pending:
         evidence_flags.append("earth_price_pending_immaterial_vs_delivery")
     if makeup_loss_source_tag:

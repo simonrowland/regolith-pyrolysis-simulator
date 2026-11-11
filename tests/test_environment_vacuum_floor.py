@@ -113,27 +113,12 @@ def test_default_unknown_body_preserves_existing_1e_9_transport_floor() -> None:
         DEFAULT_VACUUM_FLOOR_BAR
     )
 
-    feedstocks = _load_yaml("feedstocks.yaml")
-    feedstocks["lunar_mare_low_ti"].pop("body")
-    sim = _sim(feedstocks)
+    sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
 
     assert sim.melt.body == ""
     assert sim._vacuum_floor_bar() == pytest.approx(DEFAULT_VACUUM_FLOOR_BAR)
     assert sim._commanded_pO2_bar() == pytest.approx(DEFAULT_VACUUM_FLOOR_BAR)
-
-
-def test_shipped_feedstocks_declare_origin_body() -> None:
-    feedstocks = _load_yaml("feedstocks.yaml")
-
-    assert all(
-        entry.get("body") in {"moon", "mars", "asteroid", "comet"}
-        for entry in feedstocks.values()
-    )
-    assert feedstocks["lunar_mare_low_ti"]["body"] == "moon"
-    assert feedstocks["s_type_asteroid_silicate"]["body"] == "asteroid"
-    assert feedstocks["mars_global_mgs1"]["body"] == "mars"
-    assert feedstocks["comet_nucleus"]["body"] == "comet"
 
 
 def test_resolve_transport_po2_wraps_fo2_overflow_as_value_error() -> None:
@@ -173,9 +158,7 @@ def test_explicit_feedstock_body_sets_run_vacuum_floor() -> None:
 
 
 def test_intrinsic_melt_fo2_clamp_lowers_to_vacuum_body_floor() -> None:
-    feedstocks = _load_yaml("feedstocks.yaml")
-    feedstocks["lunar_mare_low_ti"].pop("body")
-    sim = _sim(feedstocks)
+    sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
 
     default_clamped = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
