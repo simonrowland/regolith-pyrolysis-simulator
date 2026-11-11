@@ -11696,6 +11696,8 @@ def _hashimoto_residue_prediction(
     reference: Observation,
     engine: Engine,
     cache: dict[tuple[str, Engine], Mapping[str, object]],
+    *,
+    experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
@@ -11715,6 +11717,10 @@ def _hashimoto_residue_prediction(
                 for row in context.observations.values()
                 if row.source_id == _HASHIMOTO_SOURCE_ID
                 and row.observation_id.startswith(_HASHIMOTO_SOURCE_ID + "::")
+                and (
+                    experiment_ids is None
+                    or row.experiment_id in experiment_ids
+                )
                 and isinstance(row.identity, Identity)
                 and quantity_token(row.identity)
                 is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -11724,10 +11730,17 @@ def _hashimoto_residue_prediction(
                 for row in observations
                 if row.experiment_id in context.experiments
             }
-            if len(experiments_by_id) != 24:
+            expected_experiments = experiment_ids or frozenset(experiments_by_id)
+            expected_count = 24 if experiment_ids is None else len(experiment_ids)
+            if (
+                len(experiments_by_id) != expected_count
+                or set(experiments_by_id) != set(expected_experiments)
+            ):
                 raise ResidueInventoryRefusal(
                     "hashimoto_cohort_invalid",
-                    f"scorer found {len(experiments_by_id)} Hashimoto runs, expected 24",
+                    "scorer found "
+                    f"{len(experiments_by_id)} Hashimoto runs, expected "
+                    f"{expected_count}",
                 )
             source_path = (
                 REPO_ROOT
@@ -11757,6 +11770,7 @@ def _hashimoto_residue_prediction(
                 preform_dimensions_mm=geometry,
                 code_revision=revision,
                 engine=engine.value,
+                _allow_partial_cohort_for_test=experiment_ids is not None,
             )
             cache[cache_key] = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
@@ -12010,6 +12024,8 @@ def _sossi_residue_prediction(
     reference: Observation,
     engine: Engine,
     cache: dict[tuple[str, Engine], Mapping[str, object]],
+    *,
+    experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
     """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
     channel = ENGINE_CHANNELS[engine]
@@ -12044,6 +12060,10 @@ def _sossi_residue_prediction(
                 row
                 for row in context.observations.values()
                 if row.source_id == _SOSSI_SOURCE_ID
+                and (
+                    experiment_ids is None
+                    or row.experiment_id in experiment_ids
+                )
                 and isinstance(row.identity, Identity)
                 and quantity_token(row.identity)
                 is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -12066,10 +12086,13 @@ def _sossi_residue_prediction(
                         trace_ppm_by_experiment.setdefault(short_id, {})[
                             element
                         ] = float(trace.state.value)
-            if len(experiments_by_run) != 43:
+            expected_count = 43 if experiment_ids is None else len(experiment_ids)
+            if len(experiments_by_run) != expected_count:
                 raise ResidueInventoryRefusal(
                     "sossi_cohort_invalid",
-                    f"scorer found {len(experiments_by_run)} Sossi runs, expected 43",
+                    "scorer found "
+                    f"{len(experiments_by_run)} Sossi runs, expected "
+                    f"{expected_count}",
                 )
             source = load_yaml(
                 REPO_ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
@@ -13928,6 +13951,7 @@ class _PreparedScoreRun:
     source_band_reasons: Mapping[str, str]
     kems_partial_pressure_band: DecisionBand | None
     series_point_counts: Mapping[str, int]
+    experiment_ids: frozenset[str] | None
 
 
 def _prepare_score_run(
@@ -13939,6 +13963,7 @@ def _prepare_score_run(
     limit: int | None,
     include_diagnostics: bool,
     measured_only: bool,
+    experiment_ids: Sequence[str] | None = None,
 ) -> _PreparedScoreRun:
     """Build global score inputs once so spawned shards share one snapshot."""
     engine_set = (
@@ -14001,6 +14026,13 @@ def _prepare_score_run(
             if rail_for_quantity(quantity, species_formula=formula) is rail:
                 kept.append(obs)
         refs = kept
+    selected_experiment_ids = (
+        None
+        if experiment_ids is None
+        else frozenset(str(value) for value in experiment_ids)
+    )
+    if selected_experiment_ids is not None:
+        refs = [obs for obs in refs if obs.experiment_id in selected_experiment_ids]
     refs.sort(key=lambda o: o.observation_id)
     if limit is not None:
         refs = refs[: int(limit)]
@@ -14046,6 +14078,7 @@ def _prepare_score_run(
         source_band_reasons=source_band_reasons,
         kems_partial_pressure_band=kems_partial_pressure_band,
         series_point_counts=series_point_counts,
+        experiment_ids=selected_experiment_ids,
     )
 
 
@@ -14087,6 +14120,7 @@ def _score_store_with_decisions(
     limit: int | None = None,
     include_diagnostics: bool = True,
     measured_only: bool = False,
+    experiment_ids: Sequence[str] | None = None,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
     _prepared: _PreparedScoreRun | None = None,
@@ -14102,6 +14136,7 @@ def _score_store_with_decisions(
         limit=limit,
         include_diagnostics=include_diagnostics,
         measured_only=measured_only,
+        experiment_ids=experiment_ids,
     )
     if prepared.context is not context:
         raise ValueError("prepared score context does not match the scoring context")
@@ -14230,6 +14265,7 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                                experiment_ids=prepared.experiment_ids,
                             )
                         if (
                             predict is None
@@ -14243,6 +14279,7 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                                experiment_ids=prepared.experiment_ids,
                             )
                         if (
                             predict is None
@@ -14501,6 +14538,7 @@ def _score_store_to_jsonl(
     limit: int | None = None,
     include_diagnostics: bool = True,
     measured_only: bool = False,
+    experiment_ids: Sequence[str] | None = None,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
     workers: int = 1,
@@ -14530,6 +14568,7 @@ def _score_store_to_jsonl(
                 limit=limit,
                 include_diagnostics=include_diagnostics,
                 measured_only=measured_only,
+                experiment_ids=experiment_ids,
                 predict=predict,
                 handles=handles,
                 _stream=stream,
@@ -14545,6 +14584,7 @@ def _score_store_to_jsonl(
                 limit=limit,
                 include_diagnostics=include_diagnostics,
                 measured_only=measured_only,
+                experiment_ids=experiment_ids,
             )
             chunks = _partition_score_refs(prepared.refs, workers=workers)
             populated_chunks = [
