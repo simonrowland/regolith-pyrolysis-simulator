@@ -846,9 +846,10 @@ def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
         notes=tuple(_json_load(row["notes"])),
         law_disclosures=_law_disclosures_from_row(row),
     )
-    from simulator.vapour_rail.run_disclosure import reregister_cached_disclosures
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
 
-    reregister_cached_disclosures(result.law_disclosures)
+    # The row is the cache entry. This is the only read that re-registers it.
+    accept_stored_memo({"law_disclosures": row["law_disclosures"]})
     reasons = _read_compatibility_rejections(result)
     if not reasons:
         return result

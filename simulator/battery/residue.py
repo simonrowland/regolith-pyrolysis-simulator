@@ -53,6 +53,84 @@ def _isolated_law_disclosure(fn):
             return fn(*args, **kwargs)
 
     return wrapper
+
+
+def _cached_pressure_hit(
+    cache: Mapping[Any, Any], key: Any
+) -> Mapping[str, float] | None:
+    """Read one pressure-cache row through the disclosure accessor.
+
+    No readable disclosure is a miss. The caller recomputes. A known row,
+    including a measured empty disclosure, is the stored pressure map and
+    has already been re-registered on the active run.
+    """
+
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+    record = cache.get(key)
+    if not isinstance(record, Mapping):
+        return None
+    if accept_stored_memo(record) is None:
+        return None
+    pressures = record.get("pressures")
+    if not isinstance(pressures, Mapping):
+        return None
+    return pressures
+
+
+def _remember_cached_pressures(
+    cache: dict[Any, Any],
+    key: Any,
+    pressures: Mapping[str, float],
+    before: Sequence[Mapping[str, Any]],
+) -> None:
+    """Store pressures with this evaluation's disclosure, or not at all.
+
+    No active registry means the disclosure was not measured. Caching the
+    pressures alone would replay them later as an unflagged hit.
+    """
+
+    from simulator.vapour_rail.run_disclosure import (
+        active_registry,
+        active_snapshot,
+        disclosure_delta,
+    )
+
+    if active_registry() is None:
+        return
+    cache[key] = {
+        "pressures": dict(pressures),
+        "law_disclosures": [
+            dict(item) for item in disclosure_delta(before, active_snapshot())
+        ],
+    }
+
+
+def _sossi_prediction(
+    *,
+    experiment_id: str,
+    primary_element_ppm: Mapping[str, float],
+    geometry_element_ppm: Mapping[str, Mapping[str, float]],
+    sensitivity_band_ppm: Mapping[str, tuple[float, float]],
+    channel_missing_elements: tuple[str, ...],
+    provenance: Mapping[str, object],
+) -> "_SossiResiduePrediction":
+    """One Sossi row. A non-empty run disclosure is part of its provenance."""
+
+    from simulator.vapour_rail.run_disclosure import active_snapshot
+
+    published = dict(provenance)
+    snapshot = active_snapshot()
+    if snapshot:
+        published["law_disclosures"] = [dict(item) for item in snapshot]
+    return _SossiResiduePrediction(
+        experiment_id=experiment_id,
+        primary_element_ppm=primary_element_ppm,
+        geometry_element_ppm=geometry_element_ppm,
+        sensitivity_band_ppm=sensitivity_band_ppm,
+        channel_missing_elements=channel_missing_elements,
+        provenance=published,
+    )
 _OXYGEN_CHANNELS = frozenset({"O", "O2"})
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
 _HASHIMOTO_PRIMARY_GEOMETRY = "sphere_shrinking"
@@ -1358,8 +1436,11 @@ def _make_residue_pressure_model(
             key = tuple(
                 sorted((str(oxide), float(amount)) for oxide, amount in inventory.items())
             )
-            base_pressure_bar = pressure_state_cache.get(key)
+            base_pressure_bar = _cached_pressure_hit(pressure_state_cache, key)
             if base_pressure_bar is None:
+                from simulator.vapour_rail.run_disclosure import active_snapshot
+
+                disclosure_before = active_snapshot()
                 current_composition = {
                     oxide: amount for oxide, amount in key if amount > 0.0
                 }
@@ -1399,7 +1480,12 @@ def _make_residue_pressure_model(
                     parent_oxides=state.parent_oxides,
                     allow_extrapolation=True,
                 )
-                pressure_state_cache[key] = base_pressure_bar
+                _remember_cached_pressures(
+                    pressure_state_cache,
+                    key,
+                    base_pressure_bar,
+                    disclosure_before,
+                )
             pO2_bar = 10.0**float(log10_pO2_bar)
             return {
                 str(species): (
@@ -3437,480 +3523,487 @@ def _predict_sossi_residue_cohort(
         gas_channels = []
 
     prediction_rows: list[_SossiResiduePrediction] = []
+    from simulator.vapour_rail.run_disclosure import disclosure_scope
     for experiment in experiments:
-        experiment_id = str(experiment.get("experiment_id") or "")
-        if not experiment_id:
-            raise ResidueInventoryRefusal("sossi_experiment_id_missing")
-        schedule = experiment.get("thermal_schedule", {})
-        setpoints = schedule.get("setpoints_and_holds", ())
-        if not setpoints or not isinstance(setpoints[0], Mapping):
-            raise ResidueInventoryRefusal("sossi_temperature_missing")
-        temperature_K = _hashimoto_point_value(
-            setpoints[0].get("temperature_K", {})
-        )
-        duration_s = _hashimoto_point_value(
-            schedule.get("total_duration_s", {})
-        )
-        sample = experiment.get("sample") or {}
-        total_pressure_Pa = _hashimoto_point_value(
-            experiment.get("pressure_environment", {}).get("total_pressure_Pa", {})
-        )
-        inventory, sample_mass_kg, initial_melt_mass_kg = _sossi_initial_inventory(
-            experiment, starting_trace_ppm_by_experiment.get(experiment_id, {})
-        )
-        try:
-            buffered_logp = float(buffered_fO2_log_by_experiment[experiment_id])
-        except (KeyError, TypeError, ValueError, OverflowError) as exc:
-            raise ResidueInventoryRefusal("oxygen_condition_missing", experiment_id) from exc
-        if not math.isfinite(buffered_logp) or buffered_logp > 0.0:
-            raise ResidueInventoryRefusal("oxygen_condition_invalid", experiment_id)
+        with disclosure_scope(inherit=False):
+            experiment_id = str(experiment.get("experiment_id") or "")
+            if not experiment_id:
+                raise ResidueInventoryRefusal("sossi_experiment_id_missing")
+            schedule = experiment.get("thermal_schedule", {})
+            setpoints = schedule.get("setpoints_and_holds", ())
+            if not setpoints or not isinstance(setpoints[0], Mapping):
+                raise ResidueInventoryRefusal("sossi_temperature_missing")
+            temperature_K = _hashimoto_point_value(
+                setpoints[0].get("temperature_K", {})
+            )
+            duration_s = _hashimoto_point_value(
+                schedule.get("total_duration_s", {})
+            )
+            sample = experiment.get("sample") or {}
+            total_pressure_Pa = _hashimoto_point_value(
+                experiment.get("pressure_environment", {}).get("total_pressure_Pa", {})
+            )
+            inventory, sample_mass_kg, initial_melt_mass_kg = _sossi_initial_inventory(
+                experiment, starting_trace_ppm_by_experiment.get(experiment_id, {})
+            )
+            try:
+                buffered_logp = float(buffered_fO2_log_by_experiment[experiment_id])
+            except (KeyError, TypeError, ValueError, OverflowError) as exc:
+                raise ResidueInventoryRefusal("oxygen_condition_missing", experiment_id) from exc
+            if not math.isfinite(buffered_logp) or buffered_logp > 0.0:
+                raise ResidueInventoryRefusal("oxygen_condition_invalid", experiment_id)
 
-        selected_channels: list[tuple[str, str, float, str]] = []
-        missing_elements: list[str] = []
-        for element, parent in _SOSSI_TRACE_PARENTS.items():
-            available = [
-                item for item in gas_channels if item[1] == parent
-            ] if engine == "openimcc" else [
-                (str(row.get("formula")), parent, 1.0, 0.0)
-                for _name, row in catalog_rows
-                if row.get("formula")
-                and row.get("parent_oxide") == parent
-                and row.get("flux_dormant") is not True
-            ]
-            added = 0
-            for species, channel_parent, _reaction_n, _reaction_o2 in available:
-                matches = [
-                    (name, row)
-                    for name, row in catalog_rows
-                    if str(row.get("formula")) == species
-                    and row.get("parent_oxide") == channel_parent
+            selected_channels: list[tuple[str, str, float, str]] = []
+            missing_elements: list[str] = []
+            for element, parent in _SOSSI_TRACE_PARENTS.items():
+                available = [
+                    item for item in gas_channels if item[1] == parent
+                ] if engine == "openimcc" else [
+                    (str(row.get("formula")), parent, 1.0, 0.0)
+                    for _name, row in catalog_rows
+                    if row.get("formula")
+                    and row.get("parent_oxide") == parent
                     and row.get("flux_dormant") is not True
                 ]
-                if not matches:
-                    continue
-                catalog_name, catalog_row = matches[0]
-                alpha_spec = alpha_specs.get(catalog_name)
-                if alpha_spec is None:
-                    continue
-                alpha_context: dict[str, Any] = {"coefficient_spec": alpha_spec}
-                try:
-                    alpha = float(alpha_s(catalog_name, temperature_K, alpha_context))
-                except (TypeError, ValueError, ArithmeticError):
-                    continue
-                raw_alpha = catalog_row.get("evaporation_alpha")
-                source = (
-                    str(raw_alpha.get("source") or raw_alpha.get("cite") or catalog_name)
-                    if isinstance(raw_alpha, Mapping)
-                    else catalog_name
-                )
-                selected_channels.append((species, parent, alpha, f"{catalog_name}: {source}"))
-                added += 1
-            if added == 0:
-                missing_elements.append(element)
-        if len(missing_elements) == len(_SOSSI_TRACE_PARENTS):
-            raise ResidueInventoryRefusal(
-                "channel_missing", ",".join(missing_elements)
-            )
-        # A missing channel is a refusal for that element, never a retained
-        # trace prediction. Remove its unsupported oxide from this engine's
-        # starting inventory before evaluating the supported channel.
-        for element in missing_elements:
-            inventory.pop(_SOSSI_TRACE_PARENTS[element], None)
-        channels = tuple(
-            ResidueChannel(species, species, parent, alpha, source)
-            for species, parent, alpha, source in selected_channels
-        )
-        pressure_cache: dict[tuple[tuple[str, float], ...], Mapping[str, float]] = {}
-        melt_pack_identity: dict[str, str] = {}
-        melt_activity_input_policy: dict[str, Any] = {}
-        melt_activity_extensions: dict[str, dict[str, Any]] = {}
-        if engine == "openimcc":
-            from simulator.diagnostic_helpers.binary_pot_battery import (
-                _ENGINE_OUTER_TIMEOUT_S,
-            )
-
-            pO2_exponents = {
-                species: (1.0 if species == "O2" else -reaction_o2 / reaction_parent)
-                for species, _parent, reaction_parent, reaction_o2 in gas_channels
-            }
-            mno_channel_active = any(
-                parent == "MnO"
-                for _species, parent, _reaction_parent, _reaction_o2 in gas_channels
-            )
-
-            def pressure_model(
-                composition: Mapping[str, float], log10_pO2_bar: float
-            ) -> Mapping[str, float]:
-                key = tuple(sorted((str(k), float(v)) for k, v in composition.items()))
-                base = pressure_cache.get(key)
-                if base is None:
+                added = 0
+                for species, channel_parent, _reaction_n, _reaction_o2 in available:
+                    matches = [
+                        (name, row)
+                        for name, row in catalog_rows
+                        if str(row.get("formula")) == species
+                        and row.get("parent_oxide") == channel_parent
+                        and row.get("flux_dormant") is not True
+                    ]
+                    if not matches:
+                        continue
+                    catalog_name, catalog_row = matches[0]
+                    alpha_spec = alpha_specs.get(catalog_name)
+                    if alpha_spec is None:
+                        continue
+                    alpha_context: dict[str, Any] = {"coefficient_spec": alpha_spec}
                     try:
-                        activity_composition, activity_input_policy = (
-                            openimcc_bridge._cleaned_melt_policy(composition)
-                        )
-                        melt_activity_input_policy.update(activity_input_policy)
-                        state = _evaluate_openimcc_isolated(
-                            openimcc_bridge.evaluate,
-                            timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
-                            composition_mol=activity_composition,
-                            temperature_K=temperature_K,
-                            allow_extrapolation=True,
-                            allow_out_of_envelope=True,
-                        )
-                    except ImccNonconvergenceError as exc:
-                        raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
-                    except TimeoutError as exc:
-                        raise ResidueEngineNonconvergence(
-                            "openimcc",
-                            f"Sossi residue cohort OpenIMCC timeout: {exc}",
-                            reason="engine_timeout:openimcc:sossi_residue_cohort",
-                        ) from exc
-                    gas_parent_oxide_activities = dict(
-                        state.parent_oxide_activities
+                        alpha = float(alpha_s(catalog_name, temperature_K, alpha_context))
+                    except (TypeError, ValueError, ArithmeticError):
+                        continue
+                    raw_alpha = catalog_row.get("evaporation_alpha")
+                    source = (
+                        str(raw_alpha.get("source") or raw_alpha.get("cite") or catalog_name)
+                        if isinstance(raw_alpha, Mapping)
+                        else catalog_name
                     )
-                    gas_parent_oxides = tuple(state.parent_oxides)
-                    if mno_channel_active:
-                        from simulator.chemistry.melt_activity import (
-                            melt_oxide_activity,
-                        )
-
-                        mno_activity = melt_oxide_activity(
-                            "MnO", composition, temperature_K=temperature_K
-                        )
-                        if mno_activity is None:
-                            raise ResidueInventoryRefusal(
-                                "melt_activity_unavailable",
-                                "OpenIMCC Mn gas channel needs a caller-supplied MnO activity",
-                            )
-                        mno_parent_activity = (
-                            mno_activity.thermodynamic_parent_activity()
-                        )
-                        if (
-                            not math.isfinite(mno_parent_activity)
-                            or mno_parent_activity < 0.0
-                        ):
-                            raise ResidueInventoryRefusal(
-                                "melt_activity_invalid",
-                                f"MnO activity extension returned {mno_parent_activity!r}",
-                            )
-                        gas_parent_oxide_activities["MnO"] = mno_parent_activity
-                        gas_parent_oxides += ("MnO",)
-                        melt_activity_extensions.setdefault(
-                            "MnO",
-                            {
-                                "reason": (
-                                    "MnO is outside the IMCC-SF04 melt-activity domain; "
-                                    "the simulator constant-gamma extension supplies the "
-                                    "activity required by the new Mn gas channel"
-                                ),
-                                "authority_level": mno_activity.evidence_tier,
-                                "certified_band_K": mno_activity.valid_range_K,
-                                "activity_provenance": mno_activity.provenance(),
-                            },
-                        )
-                    gas_result = evaluate_gas(
-                        gas_parent_oxide_activities,
-                        temperature_K,
-                        1.0,
-                        gas_pack,
-                        parent_oxides=gas_parent_oxides,
-                        allow_extrapolation=True,
-                    )
-                    melt_pack_identity.update(
-                        {
-                            "model_id": str(state.pack_model_id),
-                            "datapack_version": str(state.pack_version),
-                            "pack_digest": str(state.pack_digest),
-                            "openimcc_version": str(state.openimcc_version),
-                        }
-                    )
-                    base = dict(gas_result)
-                    pressure_cache[key] = base
-                pO2_bar = 10.0**log10_pO2_bar
-                return {
-                    species: float(base.get(species, 0.0))
-                    * pO2_bar ** pO2_exponents[species]
-                    * 100_000.0
-                    for species, _parent, _n, _o2 in gas_channels
-                    if species in pO2_exponents
-                }
-        else:
-            from simulator.diagnostic_helpers.binary_pot_battery import (
-                PO2_COMMANDED,
-                Po2Request,
-                _internal_analytical_vapor_pressure_adapter,
-                _new_internal_analytical_core,
-            )
-
-            analytical_core = _new_internal_analytical_core()
-
-            def pressure_model(
-                composition: Mapping[str, float], log10_pO2_bar: float
-            ) -> Mapping[str, float]:
-                response = _internal_analytical_vapor_pressure_adapter(
-                    core=analytical_core,
-                    temperature_C=temperature_K - 273.15,
-                    pressure_bar=total_pressure_Pa / 100_000.0,
-                    composition_kg=None,
-                    composition_mol=composition,
-                    fO2_log=log10_pO2_bar,
-                    po2_request=Po2Request(
-                        mode=PO2_COMMANDED,
-                        po2_bar=10.0**log10_pO2_bar,
-                    ),
-                    include_diagnostic_shadows=False,
-                )
-                return response.vapor_pressures_Pa
-
-        try:
-            initial_pressures = pressure_model(inventory, buffered_logp)
-        except ResidueEngineNonconvergence as exc:
-            prediction_rows.append(
-                _SossiResiduePrediction(
-                    experiment_id=experiment_id,
-                    primary_element_ppm={},
-                    geometry_element_ppm={},
-                    sensitivity_band_ppm={},
-                    channel_missing_elements=tuple(missing_elements),
-                    provenance={
-                        "source_id": _SOSSI_SOURCE_ID,
-                        "experiment_id": experiment_id,
-                        "engine": engine,
-                        "run_refusal": {
-                            **exc.as_record(),
-                            "cohort": "sossi_residue_cohort",
-                        },
-                    },
-                )
-            )
-            continue
-        pressure_species = {
-            species
-            for species, pressure in initial_pressures.items()
-            if math.isfinite(float(pressure)) and float(pressure) >= 0.0
-        }
-        channels = tuple(
-            channel for channel in channels if channel.species in pressure_species
-        )
-        for element, parent in _SOSSI_TRACE_PARENTS.items():
-            if not any(channel.parent_oxide == parent for channel in channels):
-                if element not in missing_elements:
+                    selected_channels.append((species, parent, alpha, f"{catalog_name}: {source}"))
+                    added += 1
+                if added == 0:
                     missing_elements.append(element)
-                inventory.pop(parent, None)
-        if not channels:
-            raise ResidueInventoryRefusal(
-                "channel_missing", ",".join(missing_elements)
+            if len(missing_elements) == len(_SOSSI_TRACE_PARENTS):
+                raise ResidueInventoryRefusal(
+                    "channel_missing", ",".join(missing_elements)
+                )
+            # A missing channel is a refusal for that element, never a retained
+            # trace prediction. Remove its unsupported oxide from this engine's
+            # starting inventory before evaluating the supported channel.
+            for element in missing_elements:
+                inventory.pop(_SOSSI_TRACE_PARENTS[element], None)
+            channels = tuple(
+                ResidueChannel(species, species, parent, alpha, source)
+                for species, parent, alpha, source in selected_channels
             )
-        supported_elements = tuple(
-            element for element in _SOSSI_TRACE_PARENTS if element not in missing_elements
-        )
-        if not supported_elements:
-            raise ResidueInventoryRefusal(
-                "channel_missing", ",".join(missing_elements)
-            )
-        initial_melt_mass_kg = math.fsum(
-            amount * _formula_terms(oxide)[1]
-            for oxide, amount in inventory.items()
-        )
-        liquid_rows_used = (
-            _hashimoto_liquid_row_provenance(
-                gas_pack,
-                tuple(
-                    (channel.species, (str(channel.parent_oxide), 1.0, 0.0))
-                    for channel in channels
-                ),
-                temperature_K,
-            )
-            if engine == "openimcc"
-            else ()
-        )
+            pressure_cache: dict[tuple[tuple[str, float], ...], Mapping[str, float]] = {}
+            melt_pack_identity: dict[str, str] = {}
+            melt_activity_input_policy: dict[str, Any] = {}
+            melt_activity_extensions: dict[str, dict[str, Any]] = {}
+            if engine == "openimcc":
+                from simulator.diagnostic_helpers.binary_pot_battery import (
+                    _ENGINE_OUTER_TIMEOUT_S,
+                )
 
-        areas = _sossi_geometry_areas(sample_mass_kg)
-        steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
-        geometry_predictions: dict[str, dict[str, float]] = {}
-        geometry_buffer_exchange: dict[str, float] = {}
-        geometry_refinement: dict[str, dict[str, Any]] = {}
-        run_refusal: ResidueEngineNonconvergence | None = None
-        for geometry in _SOSSI_GEOMETRIES:
+                pO2_exponents = {
+                    species: (1.0 if species == "O2" else -reaction_o2 / reaction_parent)
+                    for species, _parent, reaction_parent, reaction_o2 in gas_channels
+                }
+                mno_channel_active = any(
+                    parent == "MnO"
+                    for _species, parent, _reaction_parent, _reaction_o2 in gas_channels
+                )
+
+                def pressure_model(
+                    composition: Mapping[str, float], log10_pO2_bar: float
+                ) -> Mapping[str, float]:
+                    key = tuple(sorted((str(k), float(v)) for k, v in composition.items()))
+                    base = _cached_pressure_hit(pressure_cache, key)
+                    if base is None:
+                        from simulator.vapour_rail.run_disclosure import active_snapshot
+
+                        disclosure_before = active_snapshot()
+                        try:
+                            activity_composition, activity_input_policy = (
+                                openimcc_bridge._cleaned_melt_policy(composition)
+                            )
+                            melt_activity_input_policy.update(activity_input_policy)
+                            state = _evaluate_openimcc_isolated(
+                                openimcc_bridge.evaluate,
+                                timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
+                                composition_mol=activity_composition,
+                                temperature_K=temperature_K,
+                                allow_extrapolation=True,
+                                allow_out_of_envelope=True,
+                            )
+                        except ImccNonconvergenceError as exc:
+                            raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
+                        except TimeoutError as exc:
+                            raise ResidueEngineNonconvergence(
+                                "openimcc",
+                                f"Sossi residue cohort OpenIMCC timeout: {exc}",
+                                reason="engine_timeout:openimcc:sossi_residue_cohort",
+                            ) from exc
+                        gas_parent_oxide_activities = dict(
+                            state.parent_oxide_activities
+                        )
+                        gas_parent_oxides = tuple(state.parent_oxides)
+                        if mno_channel_active:
+                            from simulator.chemistry.melt_activity import (
+                                melt_oxide_activity,
+                            )
+
+                            mno_activity = melt_oxide_activity(
+                                "MnO", composition, temperature_K=temperature_K
+                            )
+                            if mno_activity is None:
+                                raise ResidueInventoryRefusal(
+                                    "melt_activity_unavailable",
+                                    "OpenIMCC Mn gas channel needs a caller-supplied MnO activity",
+                                )
+                            mno_parent_activity = (
+                                mno_activity.thermodynamic_parent_activity()
+                            )
+                            if (
+                                not math.isfinite(mno_parent_activity)
+                                or mno_parent_activity < 0.0
+                            ):
+                                raise ResidueInventoryRefusal(
+                                    "melt_activity_invalid",
+                                    f"MnO activity extension returned {mno_parent_activity!r}",
+                                )
+                            gas_parent_oxide_activities["MnO"] = mno_parent_activity
+                            gas_parent_oxides += ("MnO",)
+                            melt_activity_extensions.setdefault(
+                                "MnO",
+                                {
+                                    "reason": (
+                                        "MnO is outside the IMCC-SF04 melt-activity domain; "
+                                        "the simulator constant-gamma extension supplies the "
+                                        "activity required by the new Mn gas channel"
+                                    ),
+                                    "authority_level": mno_activity.evidence_tier,
+                                    "certified_band_K": mno_activity.valid_range_K,
+                                    "activity_provenance": mno_activity.provenance(),
+                                },
+                            )
+                        gas_result = evaluate_gas(
+                            gas_parent_oxide_activities,
+                            temperature_K,
+                            1.0,
+                            gas_pack,
+                            parent_oxides=gas_parent_oxides,
+                            allow_extrapolation=True,
+                        )
+                        melt_pack_identity.update(
+                            {
+                                "model_id": str(state.pack_model_id),
+                                "datapack_version": str(state.pack_version),
+                                "pack_digest": str(state.pack_digest),
+                                "openimcc_version": str(state.openimcc_version),
+                            }
+                        )
+                        base = dict(gas_result)
+                        _remember_cached_pressures(
+                            pressure_cache, key, base, disclosure_before
+                        )
+                    pO2_bar = 10.0**log10_pO2_bar
+                    return {
+                        species: float(base.get(species, 0.0))
+                        * pO2_bar ** pO2_exponents[species]
+                        * 100_000.0
+                        for species, _parent, _n, _o2 in gas_channels
+                        if species in pO2_exponents
+                    }
+            else:
+                from simulator.diagnostic_helpers.binary_pot_battery import (
+                    PO2_COMMANDED,
+                    Po2Request,
+                    _internal_analytical_vapor_pressure_adapter,
+                    _new_internal_analytical_core,
+                )
+
+                analytical_core = _new_internal_analytical_core()
+
+                def pressure_model(
+                    composition: Mapping[str, float], log10_pO2_bar: float
+                ) -> Mapping[str, float]:
+                    response = _internal_analytical_vapor_pressure_adapter(
+                        core=analytical_core,
+                        temperature_C=temperature_K - 273.15,
+                        pressure_bar=total_pressure_Pa / 100_000.0,
+                        composition_kg=None,
+                        composition_mol=composition,
+                        fO2_log=log10_pO2_bar,
+                        po2_request=Po2Request(
+                            mode=PO2_COMMANDED,
+                            po2_bar=10.0**log10_pO2_bar,
+                        ),
+                        include_diagnostic_shadows=False,
+                    )
+                    return response.vapor_pressures_Pa
+
+            try:
+                initial_pressures = pressure_model(inventory, buffered_logp)
+            except ResidueEngineNonconvergence as exc:
+                prediction_rows.append(
+                    _sossi_prediction(
+                        experiment_id=experiment_id,
+                        primary_element_ppm={},
+                        geometry_element_ppm={},
+                        sensitivity_band_ppm={},
+                        channel_missing_elements=tuple(missing_elements),
+                        provenance={
+                            "source_id": _SOSSI_SOURCE_ID,
+                            "experiment_id": experiment_id,
+                            "engine": engine,
+                            "run_refusal": {
+                                **exc.as_record(),
+                                "cohort": "sossi_residue_cohort",
+                            },
+                        },
+                    )
+                )
+                continue
+            pressure_species = {
+                species
+                for species, pressure in initial_pressures.items()
+                if math.isfinite(float(pressure)) and float(pressure) >= 0.0
+            }
+            channels = tuple(
+                channel for channel in channels if channel.species in pressure_species
+            )
+            for element, parent in _SOSSI_TRACE_PARENTS.items():
+                if not any(channel.parent_oxide == parent for channel in channels):
+                    if element not in missing_elements:
+                        missing_elements.append(element)
+                    inventory.pop(parent, None)
+            if not channels:
+                raise ResidueInventoryRefusal(
+                    "channel_missing", ",".join(missing_elements)
+                )
+            supported_elements = tuple(
+                element for element in _SOSSI_TRACE_PARENTS if element not in missing_elements
+            )
+            if not supported_elements:
+                raise ResidueInventoryRefusal(
+                    "channel_missing", ",".join(missing_elements)
+                )
+            initial_melt_mass_kg = math.fsum(
+                amount * _formula_terms(oxide)[1]
+                for oxide, amount in inventory.items()
+            )
+            liquid_rows_used = (
+                _hashimoto_liquid_row_provenance(
+                    gas_pack,
+                    tuple(
+                        (channel.species, (str(channel.parent_oxide), 1.0, 0.0))
+                        for channel in channels
+                    ),
+                    temperature_K,
+                )
+                if engine == "openimcc"
+                else ()
+            )
+
+            areas = _sossi_geometry_areas(sample_mass_kg)
             steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
-            previous: dict[str, float] | None = None
-            accepted: dict[str, float] = {}
-            tried: list[int] = []
-            differences: list[float] = []
-            buffer_exchange = 0.0
-            while True:
-                current_inventory = dict(inventory)
+            geometry_predictions: dict[str, dict[str, float]] = {}
+            geometry_buffer_exchange: dict[str, float] = {}
+            geometry_refinement: dict[str, dict[str, Any]] = {}
+            run_refusal: ResidueEngineNonconvergence | None = None
+            for geometry in _SOSSI_GEOMETRIES:
+                steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
+                previous: dict[str, float] | None = None
+                accepted: dict[str, float] = {}
+                tried: list[int] = []
+                differences: list[float] = []
                 buffer_exchange = 0.0
-                initial_total_mass = initial_melt_mass_kg
-                dt = duration_s / steps
-                for _step in range(steps):
-                    current_mass = math.fsum(
-                        amount * _formula_terms(oxide)[1]
-                        for oxide, amount in current_inventory.items()
-                    ) + min(0.0, buffer_exchange) * _formula_terms("O")[1]
-                    if geometry == "pt_loop_bead_sphere_shrinking":
-                        area = _self_similar_area_m2(
-                            areas[geometry], current_mass, initial_total_mass
-                        )
-                    else:
-                        area = areas[geometry]
-                    try:
-                        step_result = integrate_residue_inventory(
-                            current_inventory,
-                            channels,
-                            pressure_model,
-                            temperature_K=temperature_K,
-                            duration_s=dt,
-                            area_evolution_m2=(area,),
-                            buffered_fO2_log=buffered_logp,
-                        )
-                    except ResidueEngineNonconvergence as exc:
-                        run_refusal = exc
+                while True:
+                    current_inventory = dict(inventory)
+                    buffer_exchange = 0.0
+                    initial_total_mass = initial_melt_mass_kg
+                    dt = duration_s / steps
+                    for _step in range(steps):
+                        current_mass = math.fsum(
+                            amount * _formula_terms(oxide)[1]
+                            for oxide, amount in current_inventory.items()
+                        ) + min(0.0, buffer_exchange) * _formula_terms("O")[1]
+                        if geometry == "pt_loop_bead_sphere_shrinking":
+                            area = _self_similar_area_m2(
+                                areas[geometry], current_mass, initial_total_mass
+                            )
+                        else:
+                            area = areas[geometry]
+                        try:
+                            step_result = integrate_residue_inventory(
+                                current_inventory,
+                                channels,
+                                pressure_model,
+                                temperature_K=temperature_K,
+                                duration_s=dt,
+                                area_evolution_m2=(area,),
+                                buffered_fO2_log=buffered_logp,
+                            )
+                        except ResidueEngineNonconvergence as exc:
+                            run_refusal = exc
+                            break
+                        current_inventory = dict(step_result.residue_mol)
+                        buffer_exchange += step_result.buffer_oxygen_exchange_mol
+                    if run_refusal is not None:
                         break
-                    current_inventory = dict(step_result.residue_mol)
-                    buffer_exchange += step_result.buffer_oxygen_exchange_mol
+                    accepted = _sossi_project_element_ppm(
+                        current_inventory, buffer_exchange, supported_elements
+                    )
+                    tried.append(steps)
+                    if previous is not None:
+                        difference = max(
+                            abs(math.log10(accepted[element] / previous[element]))
+                            for element in supported_elements
+                            if accepted[element] > 0.0 and previous[element] > 0.0
+                        )
+                        differences.append(difference)
+                        if difference < 0.05:
+                            break
+                    if steps >= _HASHIMOTO_N_CAP:
+                        break
+                    previous = accepted
+                    steps = min(_HASHIMOTO_N_CAP, steps * 2)
                 if run_refusal is not None:
                     break
-                accepted = _sossi_project_element_ppm(
-                    current_inventory, buffer_exchange, supported_elements
-                )
-                tried.append(steps)
-                if previous is not None:
-                    difference = max(
-                        abs(math.log10(accepted[element] / previous[element]))
-                        for element in supported_elements
-                        if accepted[element] > 0.0 and previous[element] > 0.0
-                    )
-                    differences.append(difference)
-                    if difference < 0.05:
-                        break
-                if steps >= _HASHIMOTO_N_CAP:
-                    break
-                previous = accepted
-                steps = min(_HASHIMOTO_N_CAP, steps * 2)
-            if run_refusal is not None:
-                break
-            geometry_predictions[geometry] = accepted
-            geometry_buffer_exchange[geometry] = buffer_exchange
-            geometry_refinement[geometry] = {
-                "steps_tried": tried,
-                "max_difference_dex": differences,
-                "status": (
-                    "converged"
-                    if differences and differences[-1] < 0.05
-                    else "unconverged_at_cap"
-                ),
-            }
+                geometry_predictions[geometry] = accepted
+                geometry_buffer_exchange[geometry] = buffer_exchange
+                geometry_refinement[geometry] = {
+                    "steps_tried": tried,
+                    "max_difference_dex": differences,
+                    "status": (
+                        "converged"
+                        if differences and differences[-1] < 0.05
+                        else "unconverged_at_cap"
+                    ),
+                }
 
-        if run_refusal is not None:
+            if run_refusal is not None:
+                prediction_rows.append(
+                    _sossi_prediction(
+                        experiment_id=experiment_id,
+                        primary_element_ppm={},
+                        geometry_element_ppm=geometry_predictions,
+                        sensitivity_band_ppm={},
+                        channel_missing_elements=tuple(missing_elements),
+                        provenance={
+                            "source_id": _SOSSI_SOURCE_ID,
+                            "experiment_id": experiment_id,
+                            "engine": engine,
+                            "run_refusal": {
+                                **run_refusal.as_record(),
+                                "cohort": "sossi_residue_cohort",
+                            },
+                        },
+                    )
+                )
+                continue
+
+            bands = {
+                element: (
+                    min(row[element] for row in geometry_predictions.values()),
+                    max(row[element] for row in geometry_predictions.values()),
+                )
+                for element in supported_elements
+            }
+            printed_composition = sample.get("printed_composition", {})
             prediction_rows.append(
-                _SossiResiduePrediction(
+                _sossi_prediction(
                     experiment_id=experiment_id,
-                    primary_element_ppm={},
+                    primary_element_ppm=dict(geometry_predictions[_SOSSI_PRIMARY_GEOMETRY]),
                     geometry_element_ppm=geometry_predictions,
-                    sensitivity_band_ppm={},
+                    sensitivity_band_ppm=bands,
                     channel_missing_elements=tuple(missing_elements),
                     provenance={
                         "source_id": _SOSSI_SOURCE_ID,
                         "experiment_id": experiment_id,
                         "engine": engine,
-                        "run_refusal": {
-                            **run_refusal.as_record(),
-                            "cohort": "sossi_residue_cohort",
+                        "code_revision": code_revision,
+                        "sample_mass_kg": sample_mass_kg,
+                        "total_pressure_Pa": total_pressure_Pa,
+                        "buffered_fO2_log": buffered_logp,
+                        "buffered_boundary": "printed log10 fO2; reservoir oxygen exchange included",
+                        "buffer_oxygen_exchange_mol_by_geometry": geometry_buffer_exchange,
+                        "host_composition_wt_pct": dict(
+                            printed_composition.get("state", {}).get("value", {})
+                        ),
+                        "host_composition_source": printed_composition.get("locator"),
+                        "apparatus_source": (experiment.get("apparatus") or {}).get(
+                            "cell_material_and_liner", {}
+                        ).get("locator"),
+                        "geometry_model_note": (
+                            "Pt wire-loop bead from the printed apparatus; spherical bead, "
+                            "shrinking sphere, and equal-volume disk are declared sensitivity assumptions"
+                        ),
+                        "starting_trace_ppm": dict(
+                            starting_trace_ppm_by_experiment.get(experiment_id, {})
+                        ),
+                        "starting_trace_basis": "element ppm on the printed approximately 25 mg chemical basis",
+                        "geometry_policy_id": _SOSSI_PRIMARY_GEOMETRY,
+                        "geometry_areas_m2": areas,
+                        "area_m2_initial_by_geometry": areas,
+                        "area_evolution_by_geometry": {
+                            _SOSSI_GEOMETRIES[0]: "constant sphere area",
+                            _SOSSI_GEOMETRIES[1]: "sphere area scales with remaining mass to 2/3",
+                            _SOSSI_GEOMETRIES[2]: "constant equal-volume disk area",
+                        },
+                        "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
+                        "density_source": _SOSSI_DENSITY_SOURCE,
+                        "alpha_arm": "alpha_runtime_catalog",
+                        "alpha_by_channel": [
+                            {
+                                "species": channel.species,
+                                "parent_oxide": channel.parent_oxide,
+                                "alpha_value": channel.alpha,
+                                "alpha_assumed": True,
+                                "alpha_source": channel.alpha_source,
+                            }
+                            for channel in channels
+                        ],
+                        "geometry_sensitivity_band_ppm": bands,
+                        "integration": geometry_refinement,
+                        "gas_channel_omissions": omissions,
+                        "channel_missing_elements": tuple(missing_elements),
+                        **(
+                            {"engine_binding_identity": engine_binding_identity}
+                            if engine_binding_identity is not None
+                            else {}
+                        ),
+                        "liquid_rows_used": liquid_rows_used,
+                        "melt_pack_identity": dict(melt_pack_identity),
+                        **(
+                            {"melt_activity_input_policy": dict(melt_activity_input_policy)}
+                            if melt_activity_input_policy
+                            else {}
+                        ),
+                        **(
+                            {"melt_activity_extensions": dict(melt_activity_extensions)}
+                            if melt_activity_extensions
+                            else {}
+                        ),
+                        "assumption_flags": {
+                            "pt_wire_loop_bead_geometry_assumed": True,
+                            "density_fallback_2700_kg_m3": True,
+                            "bc_open_furnace_langmuir_limit_diagnostic": True,
                         },
                     },
                 )
             )
-            continue
-
-        bands = {
-            element: (
-                min(row[element] for row in geometry_predictions.values()),
-                max(row[element] for row in geometry_predictions.values()),
-            )
-            for element in supported_elements
-        }
-        printed_composition = sample.get("printed_composition", {})
-        prediction_rows.append(
-            _SossiResiduePrediction(
-                experiment_id=experiment_id,
-                primary_element_ppm=dict(geometry_predictions[_SOSSI_PRIMARY_GEOMETRY]),
-                geometry_element_ppm=geometry_predictions,
-                sensitivity_band_ppm=bands,
-                channel_missing_elements=tuple(missing_elements),
-                provenance={
-                    "source_id": _SOSSI_SOURCE_ID,
-                    "experiment_id": experiment_id,
-                    "engine": engine,
-                    "code_revision": code_revision,
-                    "sample_mass_kg": sample_mass_kg,
-                    "total_pressure_Pa": total_pressure_Pa,
-                    "buffered_fO2_log": buffered_logp,
-                    "buffered_boundary": "printed log10 fO2; reservoir oxygen exchange included",
-                    "buffer_oxygen_exchange_mol_by_geometry": geometry_buffer_exchange,
-                    "host_composition_wt_pct": dict(
-                        printed_composition.get("state", {}).get("value", {})
-                    ),
-                    "host_composition_source": printed_composition.get("locator"),
-                    "apparatus_source": (experiment.get("apparatus") or {}).get(
-                        "cell_material_and_liner", {}
-                    ).get("locator"),
-                    "geometry_model_note": (
-                        "Pt wire-loop bead from the printed apparatus; spherical bead, "
-                        "shrinking sphere, and equal-volume disk are declared sensitivity assumptions"
-                    ),
-                    "starting_trace_ppm": dict(
-                        starting_trace_ppm_by_experiment.get(experiment_id, {})
-                    ),
-                    "starting_trace_basis": "element ppm on the printed approximately 25 mg chemical basis",
-                    "geometry_policy_id": _SOSSI_PRIMARY_GEOMETRY,
-                    "geometry_areas_m2": areas,
-                    "area_m2_initial_by_geometry": areas,
-                    "area_evolution_by_geometry": {
-                        _SOSSI_GEOMETRIES[0]: "constant sphere area",
-                        _SOSSI_GEOMETRIES[1]: "sphere area scales with remaining mass to 2/3",
-                        _SOSSI_GEOMETRIES[2]: "constant equal-volume disk area",
-                    },
-                    "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
-                    "density_source": _SOSSI_DENSITY_SOURCE,
-                    "alpha_arm": "alpha_runtime_catalog",
-                    "alpha_by_channel": [
-                        {
-                            "species": channel.species,
-                            "parent_oxide": channel.parent_oxide,
-                            "alpha_value": channel.alpha,
-                            "alpha_assumed": True,
-                            "alpha_source": channel.alpha_source,
-                        }
-                        for channel in channels
-                    ],
-                    "geometry_sensitivity_band_ppm": bands,
-                    "integration": geometry_refinement,
-                    "gas_channel_omissions": omissions,
-                    "channel_missing_elements": tuple(missing_elements),
-                    **(
-                        {"engine_binding_identity": engine_binding_identity}
-                        if engine_binding_identity is not None
-                        else {}
-                    ),
-                    "liquid_rows_used": liquid_rows_used,
-                    "melt_pack_identity": dict(melt_pack_identity),
-                    **(
-                        {"melt_activity_input_policy": dict(melt_activity_input_policy)}
-                        if melt_activity_input_policy
-                        else {}
-                    ),
-                    **(
-                        {"melt_activity_extensions": dict(melt_activity_extensions)}
-                        if melt_activity_extensions
-                        else {}
-                    ),
-                    "assumption_flags": {
-                        "pt_wire_loop_bead_geometry_assumed": True,
-                        "density_fallback_2700_kg_m3": True,
-                        "bc_open_furnace_langmuir_limit_diagnostic": True,
-                    },
-                },
-            )
-        )
     return tuple(prediction_rows)

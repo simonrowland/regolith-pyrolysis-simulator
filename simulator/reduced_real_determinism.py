@@ -435,7 +435,7 @@ class PT0DeterminismStore:
             if self.persistent_path is not None
             else None
         )
-        self.entries: dict[str, dict[str, Any]] = {}
+        self._entries: dict[str, dict[str, Any]] = {}
         self.physics_bucket_entries: dict[str, str] = {}
         self.capture_sequence: list[dict[str, Any]] = []
         self.replay_sequence: list[dict[str, Any]] = []
@@ -483,7 +483,7 @@ class PT0DeterminismStore:
             strict_vapor_gate=self.strict_vapor_gate,
             control_quantization=self._control_quantization,
         )
-        clone.entries = copy.deepcopy(self.entries)
+        clone._entries = copy.deepcopy(self._entries)
         clone.physics_bucket_entries = copy.deepcopy(self.physics_bucket_entries)
         clone.capture_sequence = copy.deepcopy(self.capture_sequence)
         clone.quantize_live_controls = self.quantize_live_controls
@@ -1029,7 +1029,7 @@ class PT0DeterminismStore:
             state_counts_by_artifact[artifact][event["cache_state"]] += 1
         summary = {
             "mode": self.mode,
-            "entries": len(self.entries),
+            "entries": len(self._entries),
             "capture_calls": len(self.capture_sequence),
             "replay_calls": len(self.replay_sequence),
             "hits": self.hits,
@@ -1115,7 +1115,7 @@ class PT0DeterminismStore:
                 "physics_bucket_hash": physics_bucket_hash,
             }
         )
-        existing = self.entries.get(key_hash)
+        existing = self._entries.get(key_hash)
         if existing is not None:
             if existing["payload_hash"] != payload_hash:
                 raise PT0CacheCollision(
@@ -1168,7 +1168,7 @@ class PT0DeterminismStore:
             )
             self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
             return
-        self.entries[key_hash] = {
+        self._entries[key_hash] = {
             "artifact": artifact,
             "key": copy.deepcopy(dict(key)),
             "key_hash": key_hash,
@@ -1405,7 +1405,7 @@ class PT0DeterminismStore:
         key_bytes: bytes,
         key_hash: str,
     ) -> dict[str, Any] | None:
-        entry = self.entries.get(key_hash)
+        entry = self._entries.get(key_hash)
         if entry is None and self.persistent_store is not None:
             entry = self.persistent_store.get(
                 artifact=artifact,
@@ -1414,7 +1414,7 @@ class PT0DeterminismStore:
                 key_hash=key_hash,
             )
             if entry is not None:
-                self.entries[key_hash] = copy.deepcopy(entry)
+                self._entries[key_hash] = copy.deepcopy(entry)
         if entry is not None:
             self._verify_entry(artifact, key, key_bytes, key_hash, entry)
         return entry
@@ -1427,7 +1427,7 @@ class PT0DeterminismStore:
         physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
         physics_bucket_hash = _sha256(physics_bucket_bytes)
         key_hash = self.physics_bucket_entries.get(physics_bucket_hash)
-        entry = self.entries.get(key_hash) if key_hash is not None else None
+        entry = self._entries.get(key_hash) if key_hash is not None else None
         if entry is None and self.persistent_store is not None:
             entry = self.persistent_store.get_by_physics_bucket(
                 artifact=artifact,
@@ -1437,7 +1437,7 @@ class PT0DeterminismStore:
             )
             if entry is not None:
                 row_hash = str(entry["key_hash"])
-                self.entries[row_hash] = copy.deepcopy(entry)
+                self._entries[row_hash] = copy.deepcopy(entry)
                 self.physics_bucket_entries.setdefault(
                     physics_bucket_hash,
                     row_hash,
@@ -1457,20 +1457,16 @@ class PT0DeterminismStore:
         the run that publishes the disclosure when no registry is active.
         """
 
-        if not _disclosures_known(entry):
+        from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+        # One read gate. Unknown stays a miss. The list, including [], is the
+        # measurement a later record must store; it is not read from the dict.
+        self._accepted_hit_disclosures = None
+        published = accept_stored_memo(entry, owner=owner)
+        if published is None:
             return None
-        self._reregister_cached_law_disclosures(entry, owner=owner)
+        self._accepted_hit_disclosures = published
         return copy.deepcopy(entry["payload"])
-
-    def _reregister_cached_law_disclosures(
-        self,
-        entry: Mapping[str, Any],
-        *,
-        owner: Any = None,
-    ) -> None:
-        from simulator.vapour_rail.run_disclosure import reregister_cached_disclosures
-
-        reregister_cached_disclosures(entry.get("law_disclosures"), owner=owner)
 
     def _merged_neighbor_disclosures(
         self,
@@ -1523,7 +1519,7 @@ class PT0DeterminismStore:
             exclude_key_hash=key_hash,
         )
         for candidate in candidates:
-            self.entries[str(candidate["key_hash"])] = copy.deepcopy(candidate)
+            self._entries[str(candidate["key_hash"])] = copy.deepcopy(candidate)
         attempt = attempt_cached_interpolation(key, candidates)
         if attempt is None:
             return None
@@ -1584,7 +1580,7 @@ class PT0DeterminismStore:
             query_key=query_key,
         )
         if entry is not None:
-            self.entries[str(entry["key_hash"])] = copy.deepcopy(entry)
+            self._entries[str(entry["key_hash"])] = copy.deepcopy(entry)
         return entry
 
     def _verify_entry(

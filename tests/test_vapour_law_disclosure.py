@@ -85,10 +85,10 @@ from simulator.vapour_rail.run_disclosure import (
     bind_simulation_run,
     computation_disclosure,
     disclosure_metadata,
+    accept_stored_memo,
     disclosure_scope,
     open_computation,
     publish_stored_disclosures,
-    reregister_cached_disclosures,
     stored_disclosures_known,
 )
 from tests.test_optimizer_results_store import _base_spec, _scored
@@ -848,10 +848,10 @@ def test_sio_oxygen_extrapolation_survives_cache_hit_and_ranking() -> None:
     assert cold_snapshot == (
         {**one[0], "evaluation_count": 2},
     )
-    stored = memory.entries[_key_hash(key_a)]["law_disclosures"]
+    stored = memory._entries[_key_hash(key_a)]["law_disclosures"]
     assert stored[0]["provenance"] == _OXYGEN_BAND_REASON
     assert stored[0]["evaluation_count"] == 1
-    assert memory.entries[_key_hash(key_clean)]["law_disclosures"] == ()
+    assert memory._entries[_key_hash(key_clean)]["law_disclosures"] == ()
     with disclosure_scope(inherit=False) as warm:
         memory._lookup("freeze_gate_curve", key_a)
         memory._lookup("freeze_gate_curve", key_b)
@@ -877,7 +877,12 @@ def test_cache_publication_paths_use_the_disclosure_chokepoint() -> None:
     assert 'return copy.deepcopy(attempt["payload"])' not in reduced
     accept = reduced.split("def _accept_cached_hit", 1)[1].split("\n    def ", 1)[0]
     assert 'return copy.deepcopy(entry["payload"])' in accept
+    assert "accept_stored_memo(" in accept
+    assert "reregister_cached_disclosures(" not in accept
+    assert "self._accepted_hit_disclosures = published" in accept
     assert "def _active_law_disclosures" not in reduced
+    assert "self.entries" not in reduced
+    assert "self._entries" in reduced
 
     core = (_ROOT / "simulator/core.py").read_text(encoding="utf-8")
     head = core.split("    def _get_equilibrium(", 1)[1].split(
@@ -1058,8 +1063,8 @@ def _capture_two_fe_and_one_clean(store: PT0DeterminismStore):
             assert clean.snapshot() == ()
         cold_snapshot = cold.snapshot()
     assert cold_snapshot[0]["evaluation_count"] == 2
-    assert store.entries[_key_hash(fe_a_key)]["law_disclosures"][0]["evaluation_count"] == 1
-    assert store.entries[_key_hash(clean_key)]["law_disclosures"] == ()
+    assert store._entries[_key_hash(fe_a_key)]["law_disclosures"][0]["evaluation_count"] == 1
+    assert store._entries[_key_hash(clean_key)]["law_disclosures"] == ()
     return fe_a_key, fe_b_key, clean_key, cold_snapshot
 
 
@@ -1126,7 +1131,7 @@ def test_published_cache_classes_obey_disclosure_invariant(kind: str, tmp_path: 
         )
         _replay_exact(replay, fe_a_key, fe_b_key, clean_key, cold_snapshot)
         if kind == "memory_exact":
-            capture.entries[_key_hash(fe_a_key)]["law_disclosures"] = None
+            capture._entries[_key_hash(fe_a_key)]["law_disclosures"] = None
             with disclosure_scope(inherit=False) as refused:
                 with pytest.raises(PT0CacheMiss):
                     capture._lookup("freeze_gate_curve", fe_a_key)
@@ -2164,6 +2169,14 @@ def test_core_liquidus_memo_misses_without_disclosure_and_replays_known(
         law_id=_FE_ASSOCIATION_LAW_ID,
         count=1,
     )
+    with bind_run_registry(memo_hit._law_disclosure):
+        PyrolysisSimulator._melt_redox_liquidus_gate_record(reader)
+    # A second read of the same memo adds the stored count once, not twice.
+    _assert_fe_disclosure(
+        memo_hit.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=2,
+    )
 
     calls = []
     host = _core_gate_host(calls, stored)
@@ -2199,17 +2212,19 @@ class _DisclosureHitStore:
 
     def replay_equilibrium(self, _sim):
         self.calls.append("replay_equilibrium")
-        reregister_cached_disclosures(self.disclosures)
+        accept_stored_memo({"law_disclosures": self.disclosures})
         return {"status": "replayed"}
 
     def cached_equilibrium(self, _sim):
         self.calls.append("cached_equilibrium")
-        reregister_cached_disclosures(self.disclosures)
+        accept_stored_memo({"law_disclosures": self.disclosures})
         return {"status": "cached"}
 
     def replay_gate_curve(self, _sim, **_kwargs):
         self.calls.append("replay_gate_curve")
-        reregister_cached_disclosures(self.disclosures)
+        self._accepted_hit_disclosures = accept_stored_memo(
+            {"law_disclosures": self.disclosures}
+        )
         return {"status": "in_range", "tag": "replayed"}
 
 
@@ -2324,6 +2339,7 @@ def test_standalone_hit_publishes_a_known_disclosure(kind: str, monkeypatch) -> 
         assert payload["curve"]["tag"] == "cached"
     elif kind == "gate_replay":
         assert calls == ["replay_gate_curve"]
+        assert payload["law_disclosures"][0]["law_id"] == _FE_ASSOCIATION_LAW_ID
     elif kind == "equilibrium_replay":
         assert calls == ["replay_equilibrium"]
         assert payload["status"] == "replayed"
@@ -2795,3 +2811,288 @@ def test_publishers_keep_measured_disclosures_over_overrides(
         law_id=_FE_ASSOCIATION_LAW_ID,
         count=1,
     )
+
+
+def test_pt0_entries_are_private() -> None:
+    """The raw PT0 dict is not a public attribute."""
+
+    store = PT0DeterminismStore("capture")
+    assert not hasattr(store, "entries")
+    assert isinstance(store._entries, dict)
+
+
+def test_cached_reads_reregister_only_through_accept_stored_memo() -> None:
+    """No production reader calls reregister_cached_disclosures itself."""
+
+    import subprocess
+
+    listed = subprocess.check_output(
+        ["git", "ls-files", "simulator", "engines"],
+        cwd=_ROOT,
+        text=True,
+    )
+    offenders: list[str] = []
+    definition = 0
+    for line in listed.splitlines():
+        if not line.endswith(".py"):
+            continue
+        text = (_ROOT / line).read_text(encoding="utf-8")
+        count = text.count("reregister_cached_disclosures(")
+        if line.endswith("simulator/vapour_rail/run_disclosure.py"):
+            definition = count
+            continue
+        if count:
+            offenders.append(f"{line}:{count}")
+    assert offenders == []
+    # The definition plus the one call inside publish_stored_disclosures.
+    assert definition == 2
+
+
+def test_cache_inventory_matches_the_production_scan() -> None:
+    """A new lru_cache or memo dict fails until CACHE_SITES names it."""
+
+    from simulator.vapour_rail.disclosure_cache_inventory import (
+        CACHE_SITES,
+        DISCLOSURE_CARRYING,
+        scan_cache_sites,
+    )
+
+    scanned = scan_cache_sites(_ROOT)
+    assert set(scanned) == set(CACHE_SITES)
+    for site_id, row in CACHE_SITES.items():
+        assert row["how"]
+        assert row["carries_disclosure"] is (site_id in DISCLOSURE_CARRYING)
+        if row["carries_disclosure"]:
+            assert site_id in _DISCLOSURE_EXERCISERS
+    residue = (_ROOT / "simulator/battery/residue.py").read_text(encoding="utf-8")
+    assert residue.count("_cached_pressure_hit(") == 3
+    assert residue.count("_remember_cached_pressures(") == 3
+    score = (_ROOT / "simulator/battery/score.py").read_text(encoding="utf-8")
+    assert "row.experiment_id: row for row in rows" in score
+    assert "refusal_detail=provenance" in score
+
+
+def _assert_replayed_fe(snapshot) -> None:
+    match = [item for item in snapshot if item["law_id"] == _FE_ASSOCIATION_LAW_ID]
+    assert match
+    _assert_fe_disclosure(
+        match[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=match[0]["evaluation_count"],
+    )
+    assert match[0]["evaluation_count"] >= 1
+
+
+def _exercise_pt0_memory(_tmp_path, _monkeypatch) -> None:
+    store = PT0DeterminismStore("capture")
+    fe_a_key, _fe_b, _clean, _cold = _capture_two_fe_and_one_clean(store)
+    with disclosure_scope(inherit=False) as run_b:
+        store._lookup("freeze_gate_curve", fe_a_key)
+        _assert_replayed_fe(run_b.snapshot())
+
+
+def _exercise_pt1(tmp_path, _monkeypatch) -> None:
+    db_path = tmp_path / "inventory-pt1.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    fe_a_key, _fe_b, _clean, _cold = _capture_two_fe_and_one_clean(capture)
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    with disclosure_scope(inherit=False) as run_b:
+        replay._lookup("freeze_gate_curve", fe_a_key)
+        _assert_replayed_fe(run_b.snapshot())
+
+
+def _exercise_result_store(tmp_path, _monkeypatch) -> None:
+    spec = _base_spec(campaign="inventory-fe")
+    path = tmp_path / "inventory-optimizer.sqlite"
+    store = ResultStore(
+        path,
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+    with disclosure_scope(inherit=False):
+        with computation_disclosure() as first:
+            _fe_pressure("FeO_association_gas")
+            one = first.snapshot()
+    store.store(
+        spec,
+        replace(_scored(spec), law_disclosures=one),
+        created_at="2026-11-11T00:00:00Z",
+    )
+    with disclosure_scope(inherit=False) as run_b:
+        loaded = store.lookup(spec)
+        assert loaded is not None
+        _assert_replayed_fe(run_b.snapshot())
+
+
+def _exercise_journal(_tmp_path, _monkeypatch) -> None:
+    spec = _base_spec(campaign="inventory-journal")
+    with disclosure_scope(inherit=False):
+        with computation_disclosure() as first:
+            _fe_pressure("FeO_association_gas")
+            one = first.snapshot()
+    payload = _scored_result_journal_payload(
+        replace(_scored(spec), law_disclosures=one)
+    )
+    with disclosure_scope(inherit=False) as run_b:
+        _scored_result_from_journal_payload(payload)
+        _assert_replayed_fe(run_b.snapshot())
+
+
+def _exercise_held(_tmp_path, monkeypatch) -> None:
+    stored = _fe_disclosure_rows()
+    owner, _calls, payload = _standalone_hit("held_memo", stored, monkeypatch)
+    assert payload["law_disclosures"][0]["law_id"] == _FE_ASSOCIATION_LAW_ID
+    _assert_replayed_fe(owner.law_disclosures)
+
+
+def _exercise_local(_tmp_path, monkeypatch) -> None:
+    stored = _fe_disclosure_rows()
+    owner, _calls, payload = _standalone_hit("local_memo", stored, monkeypatch)
+    assert payload["law_disclosures"][0]["law_id"] == _FE_ASSOCIATION_LAW_ID
+    _assert_replayed_fe(owner.law_disclosures)
+
+
+def _exercise_shared(_tmp_path, monkeypatch) -> None:
+    stored = _fe_disclosure_rows()
+    owner, _calls, payload = _standalone_hit("shared_memo", stored, monkeypatch)
+    assert payload["law_disclosures"][0]["law_id"] == _FE_ASSOCIATION_LAW_ID
+    _assert_replayed_fe(owner.law_disclosures)
+
+
+def _exercise_gate_replay(_tmp_path, monkeypatch) -> None:
+    stored = _fe_disclosure_rows()
+    owner, _calls, payload = _standalone_hit("gate_replay", stored, monkeypatch)
+    assert payload["law_disclosures"][0]["law_id"] == _FE_ASSOCIATION_LAW_ID
+    _assert_replayed_fe(owner.law_disclosures)
+
+
+def _exercise_core_slot(monkeypatch, *, memo: bool) -> None:
+    import simulator.engine_binding_admission as admission
+    import simulator.reduced_real_determinism as determinism
+    from simulator.core import PyrolysisSimulator
+    from simulator.session import SimSession
+    from simulator.vapour_rail.run_disclosure import bind_run_registry
+
+    monkeypatch.setattr(
+        determinism, "gate_curve_memo_is_cacheable", lambda *_a, **_k: True
+    )
+    monkeypatch.setattr(
+        admission, "gate_curve_memo_origin_matches", lambda *_a, **_k: True
+    )
+    stored = [dict(item) for item in _fe_disclosure_rows()]
+    host = _core_gate_host([], [])
+    record = _core_memo_record(disclosures=stored)
+    if memo:
+        host._freeze_gate_liquid_fraction_curve_memo["memo-key"] = record
+    else:
+        host._freeze_gate_liquid_fraction_cache = record
+    session = SimSession()
+    with bind_run_registry(session._law_disclosure):
+        PyrolysisSimulator._melt_redox_liquidus_gate_record(host)
+    _assert_replayed_fe(session.law_disclosures)
+
+
+def _exercise_core_cache(_tmp_path, monkeypatch) -> None:
+    _exercise_core_slot(monkeypatch, memo=False)
+
+
+def _exercise_core_memo(_tmp_path, monkeypatch) -> None:
+    _exercise_core_slot(monkeypatch, memo=True)
+
+
+def _exercise_pressure_cache(_tmp_path, _monkeypatch) -> None:
+    from simulator.battery.residue import (
+        _cached_pressure_hit,
+        _remember_cached_pressures,
+    )
+
+    cache: dict = {}
+    with disclosure_scope(inherit=False) as run_a:
+        before = run_a.snapshot()
+        _fe_pressure("FeO_association_gas")
+        _remember_cached_pressures(
+            cache, ("FeO",), {"Fe": 8.537731922030234}, before
+        )
+    assert "law_disclosures" in cache[("FeO",)]
+    with disclosure_scope(inherit=False) as run_b:
+        hit = _cached_pressure_hit(cache, ("FeO",))
+        assert hit is not None
+        assert hit["Fe"] == 8.537731922030234
+        _assert_replayed_fe(run_b.snapshot())
+
+
+def _one_internal_analytical_sossi_row(monkeypatch):
+    from types import SimpleNamespace
+
+    import yaml
+
+    import simulator.battery.residue as residue
+
+    def no_evaporation(inventory, *_args, **_kwargs):
+        return SimpleNamespace(
+            residue_mol=dict(inventory),
+            buffer_oxygen_exchange_mol=0.0,
+        )
+
+    monkeypatch.setattr(residue, "integrate_residue_inventory", no_evaporation)
+    source = yaml.safe_load(
+        (_ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    experiment = source["experiments"][0]
+    experiment_id = experiment["experiment_id"]
+    starting_trace = {
+        element: source["species"][element]["observations"][0]["values"][
+            "starting_measured_ppm"
+        ]
+        for element in ("Mn", "Ti")
+    }
+    catalog = yaml.safe_load(
+        (_ROOT / "data/vapor_pressures.yaml").read_text(encoding="utf-8")
+    )
+    return residue._predict_sossi_residue_cohort(
+        [experiment],
+        catalog,
+        starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+        buffered_fO2_log_by_experiment={experiment_id: -10.0},
+        code_revision="b-119-disclosure",
+        engine="internal-analytical",
+    )[0]
+
+
+def _exercise_sossi_row(_tmp_path, monkeypatch) -> None:
+    row = _one_internal_analytical_sossi_row(monkeypatch)
+    assert "run_refusal" not in row.provenance
+    raw = row.provenance["law_disclosures"]
+    assert isinstance(raw, list) and raw
+    with disclosure_scope(inherit=False) as run_b:
+        published = accept_stored_memo({"law_disclosures": raw})
+        assert published is not None
+        _assert_replayed_fe(run_b.snapshot())
+
+
+_DISCLOSURE_EXERCISERS = {
+    "store:simulator/reduced_real_determinism.py:_entries": _exercise_pt0_memory,
+    "class:simulator/reduced_real_determinism.py:PT1PersistentEquilibriumStore": _exercise_pt1,
+    "class:simulator/optimize/results_store.py:ResultStore": _exercise_result_store,
+    "fn:simulator/optimize/study.py:_scored_result_from_journal_payload": _exercise_journal,
+    "store:simulator/core.py:_freeze_gate_liquid_fraction_cache": _exercise_core_cache,
+    "store:simulator/core.py:_freeze_gate_held_curve_record": _exercise_held,
+    "store:simulator/core.py:_freeze_gate_liquid_fraction_curve_memo": _exercise_core_memo,
+    "store:simulator/evaporation.py:_freeze_gate_liquid_fraction_cache": _exercise_local,
+    "store:simulator/evaporation.py:_freeze_gate_held_curve_record": _exercise_held,
+    "attr:simulator/evaporation.py:_freeze_gate_shared_curve_cache": _exercise_shared,
+    "store:simulator/battery/residue.py:pressure_cache": _exercise_pressure_cache,
+    "store:simulator/battery/residue.py:pressure_state_cache": _exercise_pressure_cache,
+    "store:simulator/battery/score.py:residue_prediction_cache": _exercise_sossi_row,
+}
+
+
+@pytest.mark.parametrize("site_id", sorted(_DISCLOSURE_EXERCISERS))
+def test_disclosure_cache_replays_into_a_fresh_run(
+    site_id: str, tmp_path: Path, monkeypatch
+) -> None:
+    """Warm a disclosure-bearing cache in run A and read it in fresh run B."""
+
+    _DISCLOSURE_EXERCISERS[site_id](tmp_path, monkeypatch)

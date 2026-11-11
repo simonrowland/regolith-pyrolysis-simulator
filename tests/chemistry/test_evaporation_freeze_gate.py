@@ -1813,7 +1813,7 @@ def test_uncacheable_gate_failure_survives_in_progress_redox_bootstrap(
     assert uncacheable_replay_disposition(sim)
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
-    assert store.entries == {}
+    assert store._entries == {}
     assert store.capture_sequence == []
 
 
@@ -7260,7 +7260,7 @@ def test_failed_freeze_gate_refusal_preserves_repair_notices_without_memoizing(
         assert [notice['site'] for notice in sim._reduced_real_repair_notices] == ['SR18', 'SR18']
         assert sim._freeze_gate_liquid_fraction_cache is None
         assert shared_cache == {}
-        assert store.entries == {}
+        assert store._entries == {}
     assert len(gate_provider_calls) == 2
 
 

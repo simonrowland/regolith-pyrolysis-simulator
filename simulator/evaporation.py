@@ -2338,11 +2338,20 @@ class EvaporationMixin:
                 replay_notices = getattr(
                     self, '_last_reduced_real_replay_notices', None
                 )
+                # The store already re-registered this hit. Copy that
+                # measurement onto the record. A second accept here would
+                # count the same read twice. None means the hit was unknown.
+                published = getattr(store, '_accepted_hit_disclosures', None)
                 return gate_curve_memo_record(
                     curve,
                     None,
                     replay_notices if isinstance(replay_notices, list) else (),
                     'replay',
+                    **(
+                        {'law_disclosures': published}
+                        if published is not None
+                        else {}
+                    ),
                 )
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None

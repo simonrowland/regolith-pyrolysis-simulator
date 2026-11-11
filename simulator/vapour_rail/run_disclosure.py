@@ -23,9 +23,14 @@ a measured row with empty authority.
 - Disclosure is metadata on the cached row, not a cache-key dimension.
 - A row with no disclosure field is unknown. Callers treat that as a miss or
   as unusable for ranking. Absence is never a measured "no flagged law".
-- Every stored freeze-gate memo return goes through ``accept_stored_memo``:
-  the same-hour held curve, the local slot, and the shared slot. That
-  function is the miss-or-replay gate. A new return that skips it is a bug.
+- ``accept_stored_memo`` is the only read of a disclosure-bearing cache.
+  The PT0 store, the persistent equilibrium row, an interpolated hit, the
+  optimizer result store, a journal replay, the freeze-gate memos, and a
+  residue pressure-cache row all re-register through it. A new reader that
+  calls ``reregister_cached_disclosures`` itself is a bug. The raw PT0 dict
+  is ``_entries``. ``replay_gate_curve`` leaves the accepted list on
+  ``_accepted_hit_disclosures`` so the replay record stores that measurement
+  without counting the same read twice.
 - A computation scope records only that computation, then adds its counts to
   the parent. Cache writes read the computation, never the whole run.
 - Typed carrier notices stay lists (exact duplicates dropped). Bare-float

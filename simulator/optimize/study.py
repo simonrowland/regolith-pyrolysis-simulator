@@ -2283,9 +2283,10 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
         notes=tuple(str(item) for item in payload.get("notes", ())),
         law_disclosures=_journal_law_disclosures(payload),
     )
-    from simulator.vapour_rail.run_disclosure import reregister_cached_disclosures
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
 
-    reregister_cached_disclosures(result.law_disclosures)
+    # Journal replay is a cache read. The payload is the stored entry.
+    accept_stored_memo(payload)
     return result
 
 
