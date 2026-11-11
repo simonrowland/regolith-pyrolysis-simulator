@@ -1,6 +1,9 @@
 schema_version: literature_extract.v1
 source_id: holzheid-lodders-2001-copper-solubility
-figure_policy: Figures are deferred to a figure pass. No numeric figure points are stored.
+figure_policy: >-
+  Numeric figure points are not separately transcribed because the requested scope is the printed tables. Figure 1 is a
+  photomicrograph; Figures 2–5 show plotted partition, temperature, valence and activity-coefficient data. The figures remain
+  context-only, and their scope decisions are documented in the transcription audit.
 source:
   citation: Holzheid, A. and Lodders, K. (2001). Solubility of copper in silicate melts as function of oxygen and sulfur fugacities,
     temperature, and silicate composition. Geochimica et Cosmochimica Acta 65(12), 1933-1951.
@@ -15,7 +18,10 @@ extraction:
     S-II-5 ΔIW cell is the printed minus 1.22 in both system blocks. Table 5 caption IW-06 and Table 6 Altman (1978) c2 −0.72–0.03
     were checked on the page renders and stored as printed. Parenthetical uncertainties are the printed relative-percent 1σ
     figures. Bounds, n.d. and lost-phase dashes are unavailable, not zeros. Partition coefficients and fit coefficients have
-    no quantity token and are context. Figures are deferred.
+    no quantity token and are context. Tables 1–6 are the requested extraction scope. Figures 1–5 were inspected and retained
+    as context records; their plotted points are outside the request for printed tables, and Figure 5 additionally includes
+    points attributed to earlier studies. Table 2 was visually checked in its rotated printed layout. A page/table/method
+    inventory and row-level CSV audit accompany the extract in the dispatch notes.
   date: '2026-10-19'
   worker: fam14-1019
 review_status: draft
