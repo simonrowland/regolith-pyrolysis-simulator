@@ -1,3 +1,8 @@
+"""Known-red quarantine pytest plugin.
+
+Disable it with ``-p no:tests._plugins.known_red``.
+"""
+
 from __future__ import annotations
 
 import re
@@ -7,9 +12,9 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from _pytest_loadgroup_order import strip_loadgroup_suffix
+from tests._plugins.loadgroup_order import strip_loadgroup_suffix
 
-_DEFAULT_ROSTER = Path(__file__).resolve().parent / "tests" / "known_red.toml"
+_DEFAULT_ROSTER = Path(__file__).resolve().parents[1] / "known_red.toml"
 _REQUIRED_FIELDS = {"node", "ticket", "tier", "reason", "since"}
 _TICKET_RE = re.compile(r"[a-z]+-\d+\Z")
 _SHA_RE = re.compile(r"[0-9a-f]{7,40}\Z")

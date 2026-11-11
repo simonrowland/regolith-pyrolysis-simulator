@@ -229,9 +229,10 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
             ("Fe" if name == "T.Fe" else name): Decimal(amount)
             for name, amount in printed_map.items()
         }
-        # b-704 projects only the printed metallic-iron trace at or below the
+        # b-704 projects only the printed Fe/T.Fe component at or below the
         # 0.5 wt% dropped-component threshold from an otherwise closed assay.
-        if expected.get("Fe", Decimal("0")) <= Decimal("0.5"):
+        dropped_iron = expected.get("Fe", Decimal("0"))
+        if dropped_iron <= Decimal("0.5"):
             expected.pop("Fe", None)
         kept_total = sum(expected.values(), Decimal("0"))
         printed_oxides = dict(expected)
@@ -241,6 +242,15 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
         if observation.identity.composition.is_value:
             assert observation.identity.composition.value.amount_basis.value == "mass_percent"
             assert observation.identity.composition.value.as_map() == expected
+            if Decimal("0") < dropped_iron <= Decimal("0.5"):
+                projection_notices = [
+                    notice
+                    for notice in observation.notices
+                    if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+                ]
+                assert len(projection_notices) == 1
+                assert projection_notices[0].dropped == ("Fe",)
+                assert f"Fe={dropped_iron} wt%" in projection_notices[0].reason
             if kept_total > Decimal("102"):
                 renormalized_rows += 1
                 expected_moles = wt_pct_to_mole_fraction(printed_oxides)

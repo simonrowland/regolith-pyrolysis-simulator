@@ -1670,7 +1670,12 @@ def test_ungrounded_resinter_lifetime_returns_typed_amortization_status(
     )
 
     assert summary["furnace_amortization_status"] == "resinter_threshold_ungrounded"
-    assert summary["furnace_amortization_batch_cost_equivalents"] == 0.0
+    assert summary["furnace_amortization_batch_cost_equivalents"] is None
+    assert "furnace_amortization_cost_per_run_usd" in summary
+    assert summary["furnace_amortization_status_reason"] == (
+        "resinter_threshold_kg is not qualified"
+    )
+    assert summary["furnace_amortization_cost_per_run_usd"] is None
     assert summary["campaigns_to_resinter"] == campaigns_to_resinter
 
 

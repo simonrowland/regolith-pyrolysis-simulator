@@ -2173,6 +2173,15 @@ species:
         section: Experimental
       values:
         experiment_id: shornikov-2026-wollastonite-kems-runset
+        note: >-
+          not_published: no experimental run-order sequence is stated. The tabular rows are temperature-ordered;
+          they do not identify chronological run order. Depletion is unreported: no conversion, initial/final mass
+          difference, or fractional mass loss is reported. Eq. (11) defines q_i but the paper gives no numerical
+          evaporated amount; pressures are not back-solved into depletion. No final mass is reported. The determined
+          molecular composition of the gas phase above wollastonite indicates that wollastonite evaporated via the
+          reaction [CaSiO3] = (CaSiO3), followed by dissociation of CaSiO3 gas to gaseous oxides (CaO) + (SiO2).
+          Source quote: "[CaSiO3] = (CaSiO3)" (PDF page 10, published page 617, Eq. (1)); the paper defines square
+          brackets as condensed-phase components and parentheses as gas-phase components.
         observable:
           quantity: p_partial
           gas_species: Ca, CaO, SiO, SiO2, Si2O2, O2, CaSiO3, O
@@ -2224,38 +2233,6 @@ species:
           state:
             tag: unknown
             reason: 'not_published: no per-point sample composition is given.'
-          locator:
-            page: 9
-            pdf_page_index: 8
-            published_page: 616
-            section: Experimental
-        charge_sequence:
-          state:
-            tag: unknown
-            reason: >-
-              not_published: no experimental run-order sequence is stated. The tabular rows are temperature-ordered;
-              they do not identify chronological run order.
-          locator:
-            page: 9
-            pdf_page_index: 8
-            published_page: 616
-            section: Experimental
-        depletion_evidence:
-          state:
-            tag: unknown
-            reason: >-
-              not_published: unreported; no conversion, initial/final mass difference, or fractional mass loss is reported. Eq. (11)
-              defines q_i but the paper gives no numerical evaporated amount; pressures are not back-solved into depletion.
-          locator:
-            page: 9
-            pdf_page_index: 8
-            published_page: 616
-            section: Experimental
-            note: Eq. (11) is on page 10 (published page 617).
-        final_mass_kg:
-          state:
-            tag: unknown
-            reason: 'not_published: no final mass is reported.'
           locator:
             page: 9
             pdf_page_index: 8
@@ -2314,19 +2291,6 @@ species:
               pdf_page_index: 9
               published_page: 617
               equation: '(11)'
-        vaporization_statement:
-          state:
-            tag: value
-            value: >-
-              The determined molecular composition of the gas phase above wollastonite indicates that wollastonite
-              evaporated via the reaction [CaSiO3] = (CaSiO3), followed by dissociation of CaSiO3 gas to gaseous oxides
-              (CaO) + (SiO2).
-          locator:
-            page: 10
-            pdf_page_index: 9
-            published_page: 617
-            equation: '(1)'
-            note: The paper defines square brackets as condensed-phase components and parentheses as gas-phase components.
         congruence_classification:
           state:
             tag: unknown

@@ -24,6 +24,8 @@ from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
 from engines.builtin.vapor_pressure import VaporPressureRangeError
 import scripts.make_recipe_db_profile as generator
 from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.chemistry.kernel import ProposalRejected
+from simulator.core import PoisonedHourError, PoisonedHourState
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -5120,7 +5122,9 @@ def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
     assert all(key not in trace for key in primary_captures)
     bound_margin = constraints.extraction_completeness(SimpleNamespace(**trace))
     assert not bound_margin.feasible
-    assert "trace missing product_ledger_kg" in bound_margin.detail
+    assert bound_margin.status == "unavailable"
+    assert bound_margin.observed is None
+    assert "yield-disposition fraction table unavailable" in bound_margin.detail
 
     threshold = ThresholdSpec(
         id="extraction_completeness_min",
@@ -5224,7 +5228,9 @@ def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
             }
         )
     )
-    assert math.isfinite(bound.observed)
+    assert bound.status == "unavailable"
+    assert bound.observed is None
+    assert "yield-disposition fraction table unavailable" in bound.detail
     assert not bound.feasible
 
     stored = store.lookup(spec)
@@ -6252,6 +6258,83 @@ def test_typed_physics_refusals_are_stored_and_study_continues(tmp_path) -> None
         assert expected_reason in row["notes"]
         assert row["feasibility_margins"]["physics_refusal"]["detail"] == expected_reason
         assert row["trace_summary"]["refusal_reason"] == expected_reason
+
+
+def test_poisoned_candidate_is_recorded_and_study_evaluates_healthy_candidate(
+    tmp_path,
+) -> None:
+    poisoned = PoisonedHourError(
+        PoisonedHourState(
+            hour=160,
+            committed_transition_count=3,
+            aborting_exception_summary=(
+                "ProposalRejected: partial withdrawal from mixed-origin "
+                "process.overhead_gas.Na requires an explicitly amalgamated pool"
+            ),
+            aborting_exception_type=ProposalRejected,
+        )
+    )
+    healthy_evaluator = _evaluator()
+
+    def evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        if _sequence(candidate_id) == 0:
+            return evaluate(
+                patch,
+                feedstock,
+                fidelity,
+                profile=profile,
+                candidate_id=candidate_id,
+                executor=_StudyFakeExecutor(exc=poisoned),
+                schema=kwargs.get("schema") or RecipeSchema(),
+                constraints=kwargs.get("constraints"),
+            )
+        return healthy_evaluator(
+            patch,
+            feedstock,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate_id,
+            **kwargs,
+        )
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        1,
+        2,
+        tmp_path / "poisoned-candidate-study",
+        seed=7,
+        evaluator=evaluator,
+    )
+
+    assert result.status == study.COMPLETED_STATUS
+    assert len(result.records) == 2
+    poisoned_record = next(
+        record for record in result.records if record.candidate_id.endswith("000000")
+    )
+    healthy_record = next(
+        record for record in result.records if record.candidate_id.endswith("000001")
+    )
+    assert poisoned_record.failure_category == FailureCategory.PHYSICS_REFUSED.value
+    assert poisoned_record.failing_gates == ("physics_refusal",)
+    assert "process.overhead_gas.Na" in poisoned_record.feasibility_margins[
+        "physics_refusal"
+    ]["detail"]
+    assert healthy_record.feasible
+    summary = json.loads(
+        (tmp_path / "poisoned-candidate-study" / "pareto.json").read_text()
+    )
+    assert summary["failure_counts"] == {"physics_refused": 1}
 
 
 def test_all_invalid_recipe_results_fail_loud_with_counts(tmp_path) -> None:

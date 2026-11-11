@@ -38,7 +38,7 @@ def _run_pytest(path: Path, *args: str) -> subprocess.CompletedProcess[str]:
 
 def _write_harness_conftest(path: Path) -> None:
     (path / "conftest.py").write_text(
-        'pytest_plugins = ("_pytest_loadgroup_order",)\n',
+        'pytest_plugins = ("tests._plugins.loadgroup_order",)\n',
         encoding="utf-8",
     )
 

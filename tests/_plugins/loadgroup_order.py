@@ -8,7 +8,7 @@ from typing import Protocol
 import pytest
 
 
-_HINTS_PATH = Path(__file__).with_name("tests") / "xdist_loadgroup_durations.json"
+_HINTS_PATH = Path(__file__).resolve().parents[1] / "xdist_loadgroup_durations.json"
 _LOADGROUP_SUFFIX = re.compile(r"@[A-Za-z0-9_.-]+\Z")
 
 
