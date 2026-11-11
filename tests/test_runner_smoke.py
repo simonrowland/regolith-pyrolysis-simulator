@@ -681,6 +681,7 @@ def test_completed_run_reports_unresolved_wall_species_without_aborting(
     payload = run._run_session(session)
 
     assert payload["status"] == "ok"
+    assert payload["final"]["wall_deposit_by_species_kg"]["Cr"] == 0.0
     assert species not in payload["final"]["wall_deposit_by_species_kg"]
     assert payload["run_metadata"]["refusal_diagnostic"][
         "wall_deposit_report"

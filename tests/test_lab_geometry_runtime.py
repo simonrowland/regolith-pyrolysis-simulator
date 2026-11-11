@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import math
+from types import SimpleNamespace
 
 import pytest
 
@@ -24,7 +25,13 @@ from simulator.lab_geometry import (
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
-from simulator.runner import _wall_deposit_mol_by_species, _wall_deposit_report_kg
+from simulator.runner import (
+    _attach_wall_deposit_report_refusal,
+    _wall_deposit_mol_by_species,
+    _wall_deposit_not_modelled_by_species,
+    _wall_deposit_report_kg,
+    _wall_deposit_report_refusal,
+)
 from simulator.runner import PyrolysisRun
 from simulator.state import (
     CondensationTrain,
@@ -920,3 +927,66 @@ def test_wall_deposit_report_includes_formula_only_species() -> None:
         ledger.project_account_kg(account)["In2O"]
     )
     assert unresolved_species_mol == {}
+
+
+def test_wall_deposit_report_distinguishes_supported_and_refused_carriers() -> None:
+    unresolved_species_mol: dict[str, float] = {}
+    wall_deposit_kg = _wall_deposit_report_kg(
+        {},
+        None,
+        unresolved_species_mol,
+    )
+    assert wall_deposit_kg["Cr"] == 0.0
+    assert "CrO" not in wall_deposit_kg
+
+    execution = SimpleNamespace(
+        snapshots=(
+            SimpleNamespace(
+                evap_flux=SimpleNamespace(
+                    species_kg_hr={
+                        "CrO": 1.0e-14,
+                        "CrO2": 2.0e-14,
+                        "SiO": 0.0,
+                    }
+                )
+            ),
+        ),
+        per_hour=(
+            {
+                "condensation_refusals_by_species": {
+                    "CrO": {
+                        "status": "refused",
+                        "reason": (
+                            "wall_saturation_pressure_refused: no wall curve"
+                        ),
+                    },
+                    "CrO2": {
+                        "status": "refused",
+                        "reason": (
+                            "wall_saturation_pressure_refused: no wall curve"
+                        ),
+                    },
+                    "SiO": {
+                        "status": "refused",
+                        "reason": "stage_capture_input_refused",
+                    },
+                }
+            },
+        ),
+    )
+    not_modelled = _wall_deposit_not_modelled_by_species(execution)
+    report = _wall_deposit_report_refusal({}, not_modelled)
+    run_metadata: dict[str, object] = {}
+    _attach_wall_deposit_report_refusal(run_metadata, {}, not_modelled)
+
+    assert report is not None
+    assert report["status"] == "not_modelled"
+    assert run_metadata["refusal_diagnostic"]["wall_deposit_report"] == report
+    assert report["not_modelled_wall_deposit_by_species"] == {
+        species: {
+            "status": "not_modelled",
+            "reason": "wall_saturation_pressure_refused: no wall curve",
+            "flags": ["below_wall_supply_upper_bound"],
+        }
+        for species in ("CrO", "CrO2")
+    }

@@ -191,7 +191,14 @@ SIO_YIELD_STAGE_KEYS: dict[str, str] = {
     K_TRAP_STAGE_KEY: "stage_4b_k_trap_carryover",
     COLLECTOR_STAGE_KEY_BY_NUMBER[5]: "stage_5_dust_filter_carryover",
 }
-SIO_WALL_DEPOSIT_SPECIES: tuple[str, ...] = ("SiO", "Na", "K", "Mg", "Fe")
+SIO_WALL_DEPOSIT_SPECIES: tuple[str, ...] = (
+    "SiO",
+    "Na",
+    "K",
+    "Mg",
+    "Fe",
+    "Cr",
+)
 NOT_APPLICABLE_UNTIL_P0 = "not_applicable_until_p0"
 PRESET_PROVENANCE_METADATA_KEY = "preset"
 SIO_TSWEEP_SCHEMA_VERSION = "sio-tsweep-v1"
@@ -1715,6 +1722,7 @@ class PyrolysisRun:
         _attach_wall_deposit_report_refusal(
             run_metadata,
             unresolved_wall_deposit_species_mol,
+            _wall_deposit_not_modelled_by_species(execution),
         )
         per_hour_summary = _safe_failure_value(
             lambda: _cached_execution_per_hour_summary(
@@ -3608,27 +3616,90 @@ def _wall_deposit_report_kg(
 
 def _wall_deposit_report_refusal(
     unresolved_species_mol_by_species: Mapping[str, float],
+    not_modelled_by_species: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, Any] | None:
-    if not unresolved_species_mol_by_species:
+    not_modelled_entries = {
+        str(species): dict(record)
+        for species, record in sorted((not_modelled_by_species or {}).items())
+        if isinstance(record, Mapping)
+    }
+    if not unresolved_species_mol_by_species and not not_modelled_entries:
         return None
-    return {
-        "status": "refused",
-        "reason": "unknown_species_formula",
-        "unresolved_wall_deposit_species": [
+    report: dict[str, Any] = {
+        "status": (
+            "refused" if unresolved_species_mol_by_species else "not_modelled"
+        ),
+        "reason": (
+            "unknown_species_formula"
+            if unresolved_species_mol_by_species
+            else "wall_saturation_pressure_refused"
+        ),
+    }
+    if unresolved_species_mol_by_species:
+        report["unresolved_wall_deposit_species"] = [
             {
                 "species": species,
                 "mol": float(mol),
             }
             for species, mol in sorted(unresolved_species_mol_by_species.items())
-        ],
-    }
+        ]
+    if not_modelled_entries:
+        report["not_modelled_wall_deposit_by_species"] = not_modelled_entries
+    return report
+
+
+def _wall_deposit_not_modelled_by_species(
+    execution: Any,
+) -> dict[str, dict[str, Any]]:
+    """Keep evaporating species with refused wall saturation explicitly typed."""
+
+    snapshots = tuple(getattr(execution, "snapshots", ()) or ())
+    per_hour = tuple(getattr(execution, "per_hour", ()) or ())
+    not_modelled: dict[str, dict[str, Any]] = {}
+    for index, row in enumerate(per_hour):
+        if not isinstance(row, Mapping) or index >= len(snapshots):
+            continue
+        snapshot = snapshots[index]
+        flux = getattr(snapshot, "evap_flux", None)
+        rates = getattr(flux, "species_kg_hr", None)
+        refusals = row.get("condensation_refusals_by_species")
+        if not isinstance(rates, Mapping) or not isinstance(refusals, Mapping):
+            continue
+        for species, refusal in refusals.items():
+            if (
+                not isinstance(refusal, Mapping)
+                or refusal.get("status") != "refused"
+            ):
+                continue
+            reason = str(refusal.get("reason") or "")
+            if not reason.startswith("wall_saturation_pressure_refused"):
+                continue
+            try:
+                supply_rate_kg_hr = float(rates.get(species, 0.0))
+            except (TypeError, ValueError):
+                continue
+            if not math.isfinite(supply_rate_kg_hr) or supply_rate_kg_hr <= 0.0:
+                continue
+            not_modelled.setdefault(
+                str(species),
+                {
+                    "status": "not_modelled",
+                    "reason": reason,
+                    "flags": ["below_wall_supply_upper_bound"],
+                },
+            )
+    return {species: not_modelled[species] for species in sorted(not_modelled)}
 
 
 def _attach_wall_deposit_report_refusal(
     run_metadata: dict[str, Any],
     unresolved_species_mol_by_species: Mapping[str, float],
+    not_modelled_by_species: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> None:
-    refusal = _wall_deposit_report_refusal(unresolved_species_mol_by_species)
+    refusal = _wall_deposit_report_refusal(
+        unresolved_species_mol_by_species,
+        not_modelled_by_species,
+    )
     if refusal is None:
         return
     refusal_diagnostic = dict(run_metadata.get("refusal_diagnostic") or {})
