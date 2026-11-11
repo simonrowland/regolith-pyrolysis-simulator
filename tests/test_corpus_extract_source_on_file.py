@@ -31,12 +31,13 @@ SKIP_REASON = "corpus_checkout_not_required_by_this_gate"
 
 # Census of data/literature/extracts/*.yaml at 6badf9e3b. This change does not
 # add or remove extracts. Names starting with '_' are store policy, not
-# extracts (SCHEMA.md). 781 extracts carry 781 source_id values. 780 are
+# extracts (SCHEMA.md). 782 extracts carry 782 source_id values (wood-wade-2013-trace-activities
+# landed on green after 6badf9e3b; its corpus raw/ is on file). 781 are
 # distinct: bencze-yazhenskikh-2016.yaml and
 # bencze-yazhenskikh-2016-table-s1-k.yaml share one source_id.
-EXPECTED_EXTRACT_COUNT = 781
-EXPECTED_SOURCE_ID_COUNT = 781
-EXPECTED_DISTINCT_SOURCE_IDS = 780
+EXPECTED_EXTRACT_COUNT = 782
+EXPECTED_SOURCE_ID_COUNT = 782
+EXPECTED_DISTINCT_SOURCE_IDS = 781
 
 # Root source_id in the preamble, YAML or JSON-style. Checked against a full
 # document load of every extract at the census commit.
