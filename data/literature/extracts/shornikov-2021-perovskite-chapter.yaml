@@ -1,0 +1,3353 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2021-perovskite-chapter
+source:
+  citation: 'Shornikov, S. (2021), “Thermodynamics of Perovskite: Solid, Liquid, and Gas Phases,” in Perovskite and Piezoelectric
+    Materials, edited by Someshwar Pola, Neeraj Panwar, and Indrani Coondoo, IntechOpen, pp. 115–138. DOI: 10.5772/intechopen.91309.'
+  year: 2021
+  corpus_asset: shornikov-2021-perovskite-chapter.pdf
+  corpus_sha256: d68511b8f69d438d8bd496213cd57e4fb3fab46b373d9523285b82888c1c9e6a
+extraction:
+  method: Manual transcription checked against every rendered PDF page at 250 dpi; OCR text used only as a locator. Tables
+    1–3 transcribed completely; figure curves retained as figure-only context and not digitized.
+  date: '2026-10-05'
+  worker: codex-resume-91453-1791208257
+  review_status: draft
+benches:
+- id: shornikov-molybdenum-knudsen-ms
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: High-temperature mass spectrometric method with Knudsen effusion cells
+    locator:
+      published_page: 127
+      pdf_page_index: 16
+      section: Evaporation of perovskite and its melts
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum Knudsen effusion cells
+    locator:
+      published_page: 127
+      pdf_page_index: 16
+      section: Evaporation of perovskite and its melts
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 127
+      pdf_page_index: 16
+      section: Evaporation of perovskite and its melts
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 128
+        pdf_page_index: 17
+        section: Evaporation of perovskite and its melts
+        note: The Clausing coefficient depends on hole diameter/thickness ratio, but neither dimension is printed.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 128
+        pdf_page_index: 17
+        section: Evaporation of perovskite and its melts
+        note: Not reported.
+  ionization:
+    electron_energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20'
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        section: Mass spectra
+        note: Printed as ionizing electron energy, 20 eV.
+    cross_sections_and_source:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        section: Mass spectra
+        note: Not reported in this chapter.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        section: Evaporation of perovskite and its melts
+        note: Temperature ranges are reported, but the measuring instrument and calibration are not identified here.
+  method:
+    state:
+      tag: value
+      value: Partial pressures calculated with Hertz–Knudsen equation (38) and Komlev correction (39); αi values cited from
+        [91].
+    locator:
+      published_page: 128
+      pdf_page_index: 17
+      equations: 38–39
+  temperature_calibration:
+    sensor_calibration:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        section: Evaporation of perovskite and its melts
+        note: No calibration procedure or uncertainty is specified in this chapter.
+- id: zhang-iridium-wire-langmuir-vacuum-furnace
+  identity:
+    basis: cited_by_author
+    ref:
+      work_id: null
+      cited_as: Zhang et al. [4]
+      for_parameters:
+      - apparatus_family
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        section: Evaporation of perovskite and its melts
+  apparatus_family:
+    state:
+      tag: value
+      value: Vacuum furnace with perovskite melt suspended on an iridium wire; Langmuir method
+    locator:
+      published_page: 127
+      pdf_page_index: 16
+      section: Evaporation of perovskite and its melts
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        section: Evaporation of perovskite and its melts
+  temperature_calibration:
+    sensor_calibration:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        section: Evaporation of perovskite and its melts
+- id: banon-molybdenum-kems
+  identity:
+    basis: cited_by_author
+    ref:
+      work_id: null
+      cited_as: Banon et al. [52]
+      for_parameters:
+      - apparatus_family
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+  apparatus_family:
+    state:
+      tag: value
+      value: Differential mass spectrometry with molybdenum Knudsen effusion cells
+    locator:
+      published_page: 125
+      pdf_page_index: 14
+      section: The gas phase over perovskite
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum Knudsen effusion cells
+    locator:
+      published_page: 125
+      pdf_page_index: 14
+      section: The gas phase over perovskite
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 125
+      pdf_page_index: 14
+      section: The gas phase over perovskite
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+  ionization:
+    electron_energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '13'
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+        note: Low ionizing voltage of 13 eV to avoid possible TiO2+ fragmentation.
+    cross_sections_and_source:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+        note: Not reported here.
+    multiplier_and_isotope_corrections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+  temperature_calibration:
+    sensor_calibration:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+- id: stolyarova-tungsten-effusion-ms
+  identity:
+    basis: cited_by_author
+    ref:
+      work_id: null
+      cited_as: Stolyarova et al. [63]
+      for_parameters:
+      - apparatus_family
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+  apparatus_family:
+    state:
+      tag: value
+      value: High-temperature mass spectrometry using tungsten Knudsen effusion cells
+    locator:
+      published_page: 121
+      pdf_page_index: 10
+      section: The thermodynamic properties of perovskite melts
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Tungsten Knudsen effusion cells
+    locator:
+      published_page: 121
+      pdf_page_index: 10
+      section: The thermodynamic properties of perovskite melts
+  cell_materials:
+  - state:
+      tag: value
+      value: W
+    locator:
+      published_page: 121
+      pdf_page_index: 10
+      section: The thermodynamic properties of perovskite melts
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+  temperature_calibration:
+    sensor_calibration:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+  ionization:
+    electron_energy_eV:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+    cross_sections_and_source:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+    multiplier_and_isotope_corrections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+- id: lopatin-semenov-tungsten-kems
+  identity:
+    basis: cited_by_author
+    ref:
+      work_id: null
+      cited_as: Lopatin and Semenov [84]
+      for_parameters:
+      - apparatus_family
+      - cell_material_and_liner
+      - calibration
+      locator:
+        published_page: 125–126
+        pdf_page_index: 14–15
+        section: The gas phase over perovskite; Mass spectra
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      published_page: 125
+      pdf_page_index: 14
+      section: The gas phase over perovskite
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Tungsten Knudsen cell
+    locator:
+      published_page: 125
+      pdf_page_index: 14
+      section: The gas phase over perovskite
+  cell_materials:
+  - state:
+      tag: value
+      value: W
+    locator:
+      published_page: 125
+      pdf_page_index: 14
+      section: The gas phase over perovskite
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+  ionization:
+    electron_energy_eV:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 126
+        pdf_page_index: 15
+        section: Mass spectra
+        note: Electron ionization energy for the pressure measurements is not stated here.
+    cross_sections_and_source:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 126
+        pdf_page_index: 15
+        section: Mass spectra
+        note: Equation (31) uses effective ionization-cross-section ratios; their source is not given here.
+    multiplier_and_isotope_corrections:
+      state:
+        tag: value
+        value: Equation (31) accounts for isotope distributions and individual ion efficiencies.
+      locator:
+        published_page: 126
+        pdf_page_index: 15
+        section: Mass spectra
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+  temperature_calibration:
+    sensor_calibration:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+  sample:
+    form:
+      state:
+        tag: value
+        value: Mixture of calcium carbonate (CaCO3) and titanium dioxide (TiO2); phase not stated
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+    initial_composition:
+      state:
+        tag: value
+        value: Mixture of CaCO3 and TiO2
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        note: Mixture is stated; purity, proportions and preparation are not reported here.
+experiments:
+- experiment_id: shornikov-solid-perovskite
+  bench_id: shornikov-molybdenum-knudsen-ms
+  method: knudsen_effusion
+  locator:
+    published_page: 127
+    pdf_page_index: 16
+    section: Evaporation of perovskite and its melts
+    note: Shornikov [64, 77] solid perovskite runs summarized here.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1791'
+          interval_high: '2182'
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        section: Evaporation of perovskite and its melts
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 128
+          pdf_page_index: 17
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 128
+          pdf_page_index: 17
+    calibration:
+      pressure_method:
+        state:
+          tag: value
+          value: Hertz–Knudsen equation (38) with Komlev correction (39); evaporation coefficients cited from [91]
+        locator:
+          published_page: 128
+          pdf_page_index: 17
+          equations: 38–39
+      reference_substance:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 128
+          pdf_page_index: 17
+          section: Vapor pressure calculations
+          note: Silver is named only as appearance-energy standard, not pressure calibration.
+      ion_signal_to_pressure_method:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 128
+          pdf_page_index: 17
+          section: Vapor pressure calculations
+          note: The chapter gives the Hertz–Knudsen mass-loss/evaporation equation, but does not state how mass-spectrometer
+            ion currents were calibrated into qi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        note: No chamber/background pressure is reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        note: No carrier-gas sweep is stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: shornikov-cao-tio2-melts
+  bench_id: shornikov-molybdenum-knudsen-ms
+  method: knudsen_effusion
+  locator:
+    published_page: 122
+    pdf_page_index: 11
+    section: The thermodynamic properties of perovskite melts
+    note: More than 200 melt compositions summarized from [64].
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '2241'
+          interval_high: '2441'
+      locator:
+        published_page: 122
+        pdf_page_index: 11
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: More than 200 CaO–TiO2 system compositions, 34–98 mol% TiO2; CaO–TiO2–SiO2 residual melts contained up to 1
+          mol% SiO2, lost during high-temperature evaporation.
+      locator:
+        published_page: 122
+        pdf_page_index: 11
+        section: The thermodynamic properties of perovskite melts
+    characterization:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 122
+        pdf_page_index: 11
+        note: Starting materials and purity are not described here.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 122
+        pdf_page_index: 11
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        published_page: 122
+        pdf_page_index: 11
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  apparatus:
+    calibration:
+      ion_signal_to_pressure_method:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 128
+          pdf_page_index: 17
+          section: Vapor pressure calculations
+          note: The chapter gives the Hertz–Knudsen mass-loss/evaporation equation, but does not state how mass-spectrometer
+            ion currents were calibrated into qi.
+- experiment_id: shornikov-melt-2278k
+  bench_id: shornikov-molybdenum-knudsen-ms
+  method: knudsen_effusion
+  locator:
+    published_page: 127
+    pdf_page_index: 16
+    section: Mass spectra
+    note: Melt ion-current ratios; Figure 8b pressure curves attributed to [64].
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2278'
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 57.81 ± 0.15 mol% TiO2
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        section: Mass spectra
+  apparatus:
+    calibration:
+      ion_signal_to_pressure_method:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 128
+          pdf_page_index: 17
+          section: Vapor pressure calculations
+          note: The chapter gives the Hertz–Knudsen mass-loss/evaporation equation, but does not state how mass-spectrometer
+            ion currents were calibrated into qi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        section: Mass spectra
+        note: No chamber/background pressure reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: zhang-perovskite-melt-langmuir
+  bench_id: zhang-iridium-wire-langmuir-vacuum-furnace
+  method: langmuir_free_evaporation
+  locator:
+    published_page: 127
+    pdf_page_index: 16
+    section: Evaporation of perovskite and its melts
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2278'
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+    temperature_measurement:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+  sample:
+    form:
+      state:
+        tag: value
+        value: Perovskite melt suspended on iridium wire
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+    initial_composition:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        note: Exact starting composition and purity not reported here.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        note: Vacuum furnace stated; residual pressure not given.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 127
+          pdf_page_index: 16
+          note: Langmuir free evaporation; no Knudsen orifice.
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 127
+          pdf_page_index: 16
+          note: Langmuir free evaporation; no Knudsen orifice.
+    calibration:
+      total_pressure_method:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 127
+          pdf_page_index: 16
+          note: Total pressure was evaluated from evaporation data; the pressure conversion details are not summarized here.
+- experiment_id: banon-ca-ti-oxide-melts
+  bench_id: banon-molybdenum-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 125
+    pdf_page_index: 14
+    section: The gas phase over perovskite
+    note: Ref. [52], as summarized in this chapter.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1900'
+          interval_high: '2200'
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 125
+          pdf_page_index: 14
+          section: The gas phase over perovskite
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 125
+          pdf_page_index: 14
+          section: The gas phase over perovskite
+    calibration:
+      ion_signal_to_pressure_method:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 125
+          pdf_page_index: 14
+          section: The gas phase over perovskite
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 24 compositions in the CaTiO3–Ti2O3–TiO2 system; compositions reached up to 90.2 mol% Ti2O3 and up to 42 mol%
+          TiO2, and included CaTiO3 compound.
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+    characterization:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+        note: Starting-material purity not given here.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: stolyarova-cao-tio2-sio2-melts
+  bench_id: stolyarova-tungsten-effusion-ms
+  method: knudsen_effusion
+  locator:
+    published_page: 121
+    pdf_page_index: 10
+    section: The thermodynamic properties of perovskite melts
+    note: Ref. [63], as summarized in this chapter.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1800'
+          interval_high: '2200'
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 121
+          pdf_page_index: 10
+          section: The thermodynamic properties of perovskite melts
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 121
+          pdf_page_index: 10
+          section: The thermodynamic properties of perovskite melts
+    calibration:
+      ion_signal_to_pressure_method:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 121
+          pdf_page_index: 10
+          section: The thermodynamic properties of perovskite melts
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 14 CaO–TiO2–SiO2 compositions; synthesized compositions contained up to 70 mol% CaO, up to 69 mol% SiO2, and
+          up to 40 mol% TiO2.
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+    characterization:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+        note: Starting-material purity not stated in this chapter.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        published_page: 121
+        pdf_page_index: 10
+        section: The thermodynamic properties of perovskite melts
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: lopatin-semenov-cao-tio2-mixture
+  bench_id: lopatin-semenov-tungsten-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 125–126
+    pdf_page_index: 14–15
+    section: The gas phase over perovskite; Mass spectra
+    note: Comparator study [84], summarized by Shornikov (2021).
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '2100'
+          interval_high: '2500'
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Mixture of CaCO3 and TiO2
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+        section: The gas phase over perovskite
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 125
+          pdf_page_index: 14
+    calibration:
+      pressure_method:
+        state:
+          tag: value
+          value: Partial pressures calculated by comparison with accepted gold vapor pressures as standard using equation (31).
+        locator:
+          published_page: 126
+          pdf_page_index: 15
+          section: Mass spectra
+          equations: '31'
+      reference_substance:
+        state:
+          tag: value
+          value: Gold vapor pressure; gold-ion appearance energy used as the appearance-energy standard.
+        locator:
+          published_page: 126
+          pdf_page_index: 15
+          section: Mass spectra
+      ion_signal_to_pressure_method:
+        state:
+          tag: value
+          value: Ion-current comparison with gold using equation (31), including effective ionization-cross-section ratios,
+            isotope distributions, and individual ion efficiencies.
+        locator:
+          published_page: 126
+          pdf_page_index: 15
+          section: Mass spectra
+      appearance_energy_eV:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '8'
+            interval_high: '10'
+        locator:
+          published_page: 126
+          pdf_page_index: 15
+          section: Mass spectra
+          note: CaTiO3+ appearance energy printed as 9 ± 1 eV.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        published_page: 125
+        pdf_page_index: 14
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+species:
+  CaTiO3:
+    context:
+    - observation_id: table1_formation_enthalpy_entropy
+      type: thermodynamic_example
+      locator:
+        table: '1'
+        published_page: 117
+        pdf_page_index: 6
+        note: Enthalpy and entropy of perovskite formation from simple oxides (calculated per 1 mol of compound).
+      units: As tabulated; see per-column units.
+      values:
+        quantity: thermodynamic data transcribed from Table 1
+        method_class: quoted_attributed
+        attribution: Values attributed to numbered references in each row and transcribed as reproduced in this review chapter.
+        row_count: 25
+        rows:
+        - row: 1
+          experimental_approach: HF/HCl solution calorimetry
+          T_K_min: 298
+          T_K_max: 298
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_T_J_mol_K: 1.05
+          delta_S_uncertainty_J_mol_K: 0.21
+          reference: '25'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 2
+          experimental_approach: HF/HCl solution calorimetry
+          T_K_min: 298
+          T_K_max: 298
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -40.48
+          delta_H_uncertainty_kJ_mol: 0.42
+          delta_S_T_J_mol_K: 1.86
+          delta_S_uncertainty_J_mol_K: 0.71
+          reference: '33'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 3
+          experimental_approach: Bomb calorimetry
+          T_K_min: 298
+          T_K_max: 298
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -41.84
+          delta_H_uncertainty_kJ_mol: 1.88
+          delta_S_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '32'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 4
+          experimental_approach: Adiabatic calorimetry
+          T_K_min: 298
+          T_K_max: 298
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -40.48
+          delta_H_uncertainty_kJ_mol: 1.65
+          delta_S_T_J_mol_K: 2.4
+          delta_S_uncertainty_J_mol_K: 0.35
+          reference: '26'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 5
+          experimental_approach: Adiabatic calorimetry
+          T_K_min: 298
+          T_K_max: 298
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -47.11
+          delta_H_uncertainty_kJ_mol: 1.41
+          delta_S_T_J_mol_K: 2.72
+          delta_S_uncertainty_J_mol_K: 0.23
+          reference: '28'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 6
+          experimental_approach: Na6Mo4O15 solution calorimetry
+          T_K_min: 298
+          T_K_max: 298
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -42.98
+          delta_H_uncertainty_kJ_mol: 1.96
+          delta_S_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '34'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 7
+          experimental_approach: EMF
+          T_K_min: 888
+          T_K_max: 972
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -37.05
+          delta_H_uncertainty_kJ_mol: 3.28
+          delta_S_T_J_mol_K: 4.62
+          delta_S_uncertainty_J_mol_K: 3.54
+          reference: '35'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 8
+          experimental_approach: EMF
+          T_K_min: 900
+          T_K_max: 1250
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -40.07
+          delta_H_uncertainty_kJ_mol: 0.05
+          delta_S_T_J_mol_K: 3.15
+          delta_S_uncertainty_J_mol_K: 0.05
+          reference: '36'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 9
+          experimental_approach: Pb2B2O5 solution calorimetry
+          T_K_min: 973
+          T_K_max: 973
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -38.73
+          delta_H_uncertainty_kJ_mol: 1.34
+          delta_S_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '37'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 10
+          experimental_approach: Na6Mo4O15 solution calorimetry
+          T_K_min: 975
+          T_K_max: 975
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -42.25
+          delta_H_uncertainty_kJ_mol: 1.05
+          delta_S_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '38'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 11
+          experimental_approach: Na6Mo4O15 solution calorimetry
+          T_K_min: 975
+          T_K_max: 975
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -41.88
+          delta_H_uncertainty_kJ_mol: 1.36
+          delta_S_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '39'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 12
+          experimental_approach: Na6Mo4O15 solution calorimetry
+          T_K_min: 976
+          T_K_max: 976
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -42.86
+          delta_H_uncertainty_kJ_mol: 1.71
+          delta_S_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '40'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 13
+          experimental_approach: Pb2B2O5 solution calorimetry
+          T_K_min: 1046
+          T_K_max: 1046
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -42.38
+          delta_H_uncertainty_kJ_mol: 1.82
+          delta_S_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '37'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 14
+          experimental_approach: (Li,Na)BO2 solution calorimetry
+          T_K_min: 1068
+          T_K_max: 1068
+          T_uncertainty_K: 2
+          delta_H_T_kJ_mol: -40.45
+          delta_H_uncertainty_kJ_mol: 1.15
+          delta_S_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '41'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 15
+          experimental_approach: Pb2B2O5 solution calorimetry
+          T_K_min: 1073
+          T_K_max: 1073
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -40.43
+          delta_H_uncertainty_kJ_mol: 1.87
+          delta_S_T_J_mol_K: 4.37
+          delta_S_uncertainty_J_mol_K: 1.23
+          reference: '42'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 16
+          experimental_approach: Pb2B2O5 solution calorimetry
+          T_K_min: 1074
+          T_K_max: 1074
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -43.78
+          delta_H_uncertainty_kJ_mol: 1.73
+          delta_S_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '43'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 17
+          experimental_approach: Pb2B2O5 solution calorimetry
+          T_K_min: 1078
+          T_K_max: 1078
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -42.83
+          delta_H_uncertainty_kJ_mol: 3.12
+          delta_S_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '44'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 18
+          experimental_approach: EMF
+          T_K_min: 1180
+          T_K_max: 1290
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -26.88
+          delta_H_uncertainty_kJ_mol: 8.05
+          delta_S_T_J_mol_K: 11.07
+          delta_S_uncertainty_J_mol_K: 6.44
+          reference: '45'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 19
+          experimental_approach: Raman spectroscopy
+          T_K_min: 1300
+          T_K_max: 1300
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_T_J_mol_K: 2.82
+          delta_S_uncertainty_J_mol_K: 1.29
+          reference: '46'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 20
+          experimental_approach: Thermochemical calculations
+          T_K_min: 1600
+          T_K_max: 1800
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -37.19
+          delta_H_uncertainty_kJ_mol: 0.14
+          delta_S_T_J_mol_K: 5.85
+          delta_S_uncertainty_J_mol_K: 0.09
+          reference: '22'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 21
+          experimental_approach: Thermochemical calculations
+          T_K_min: 1600
+          T_K_max: 2100
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -38.23
+          delta_H_uncertainty_kJ_mol: 0.04
+          delta_S_T_J_mol_K: 5.0
+          delta_S_uncertainty_J_mol_K: 0.02
+          reference: '23'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 22
+          experimental_approach: Thermochemical calculations
+          T_K_min: 1600
+          T_K_max: 2100
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -37.47
+          delta_H_uncertainty_kJ_mol: 0.03
+          delta_S_T_J_mol_K: 5.6
+          delta_S_uncertainty_J_mol_K: 0.02
+          reference: '24'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 23
+          experimental_approach: DTA
+          T_K_min: 1740
+          T_K_max: 1740
+          T_uncertainty_K: 20
+          delta_H_T_kJ_mol: -37.55
+          delta_H_uncertainty_kJ_mol: 3.76
+          delta_S_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '47'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 24
+          experimental_approach: Knudsen mass spectrometry
+          T_K_min: 1791
+          T_K_max: 2241
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: -39.98
+          delta_H_uncertainty_kJ_mol: 0.54
+          delta_S_T_J_mol_K: 3.15
+          delta_S_uncertainty_J_mol_K: 0.28
+          reference: '48'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 25
+          experimental_approach: Knudsen mass spectrometry
+          T_K_min: 2241
+          T_K_max: 2398
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_T_kJ_mol: 7.73
+          delta_H_uncertainty_kJ_mol: 1.76
+          delta_S_T_J_mol_K: 24.39
+          delta_S_uncertainty_J_mol_K: 0.76
+          reference: '48'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+    - observation_id: table2_melting
+      type: thermodynamic_example
+      locator:
+        table: '2'
+        published_page: 120
+        pdf_page_index: 9
+        note: Temperatures, enthalpies, and entropies of melting of compounds in the CaO–TiO2 system (calculated per 1 mol
+          of compound).
+      units: As tabulated; see per-column units.
+      values:
+        quantity: thermodynamic data transcribed from Table 2
+        method_class: quoted_attributed
+        attribution: Values attributed to numbered references in each row and transcribed as reproduced in this review chapter.
+        row_count: 13
+        rows:
+        - row: 1
+          compound: CaO
+          T_K: 2843
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_melt_kJ_mol: 52.0
+          delta_H_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_melt_J_mol_K: 18.29
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '59'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 2
+          compound: CaO
+          T_K: 2845
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_melt_kJ_mol: 79.5
+          delta_H_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_melt_J_mol_K: 27.94
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '24'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 3
+          compound: CaO
+          T_K: 3200
+          T_uncertainty_K: 50
+          delta_H_melt_kJ_mol: 79.5
+          delta_H_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_melt_J_mol_K: 24.84
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '58'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 4
+          compound: CaO
+          T_K: 3210
+          T_uncertainty_K: 10
+          delta_H_melt_kJ_mol: 55.2
+          delta_H_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_melt_J_mol_K: 17.2
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '60'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 5
+          compound: CaTiO3
+          T_K: 2188
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_melt_kJ_mol: 41.84
+          delta_H_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_melt_J_mol_K: 19.12
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '61'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 6
+          compound: CaTiO3
+          T_K: 2220
+          T_uncertainty_K: 20
+          delta_H_melt_kJ_mol: 56.65
+          delta_H_uncertainty_kJ_mol: 11.33
+          delta_S_melt_J_mol_K: 25.52
+          delta_S_uncertainty_J_mol_K: 5.1
+          reference: '47'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 7
+          compound: CaTiO3
+          T_K: 2233
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_melt_kJ_mol: 53.32
+          delta_H_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_melt_J_mol_K: 23.88
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '24'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 8
+          compound: CaTiO3
+          T_K: 2241
+          T_uncertainty_K: 10
+          delta_H_melt_kJ_mol: 47.61
+          delta_H_uncertainty_kJ_mol: 1.84
+          delta_S_melt_J_mol_K: 21.24
+          delta_S_uncertainty_J_mol_K: 0.81
+          reference: '48'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 9
+          compound: CaTiO3
+          T_K: 2243
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_melt_kJ_mol: 63.65
+          delta_H_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_melt_J_mol_K: 28.38
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '59'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 10
+          compound: TiO2
+          T_K: 2103
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_melt_kJ_mol: 66.9
+          delta_H_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_melt_J_mol_K: 31.81
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '59'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 11
+          compound: TiO2
+          T_K: 2130
+          T_uncertainty_K: 20
+          delta_H_melt_kJ_mol: 66.94
+          delta_H_uncertainty_kJ_mol: 16.7
+          delta_S_melt_J_mol_K: 31.43
+          delta_S_uncertainty_J_mol_K: 7.84
+          reference: 23, 58
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 12
+          compound: TiO2
+          T_K: 2130
+          T_uncertainty_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_H_melt_kJ_mol: 46.02
+          delta_H_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_S_melt_J_mol_K: 21.61
+          delta_S_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '24'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 13
+          compound: TiO2
+          T_K: 2185
+          T_uncertainty_K: 10
+          delta_H_melt_kJ_mol: 68.0
+          delta_H_uncertainty_kJ_mol: 8.0
+          delta_S_melt_J_mol_K: 31.12
+          delta_S_uncertainty_J_mol_K: 3.66
+          reference: '57'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+    - observation_id: table3_catio3_reactions
+      type: thermodynamic_example
+      locator:
+        table: '3'
+        published_page: 127
+        pdf_page_index: 16
+        note: Enthalpies and entropies of reactions involving the CaTiO3 molecule.
+      units: As tabulated; see per-column units.
+      values:
+        quantity: thermodynamic data transcribed from Table 3
+        method_class: quoted_attributed
+        attribution: Values attributed to numbered references in each row and transcribed as reproduced in this review chapter.
+        row_count: 10
+        rows:
+        - row: 1
+          reaction_as_grouped: (CaTiO3) = (CaO) + (TiO2)
+          T_K_min: 2287
+          T_K_max: 2466
+          delta_rH298_kJ_mol: 545
+          delta_rH_uncertainty_kJ_mol: 8
+          delta_rH_T_kJ_mol: 284
+          delta_rH_T_uncertainty_kJ_mol: 44
+          delta_rS_T_J_mol_K: 28
+          delta_rS_T_uncertainty_J_mol_K: 19
+          reference: '84'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 2
+          reaction_as_grouped: (CaTiO3) = (CaO) + (TiO2)
+          T_K_min: 2000
+          T_K_max: 2000
+          delta_rH298_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_T_kJ_mol: 298
+          delta_rH_T_uncertainty_kJ_mol: 30
+          delta_rS_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rS_T_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '85'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 3
+          reaction_as_grouped: (CaTiO3) = (CaO) + (TiO2)
+          T_K_min: 1956
+          T_K_max: 2182
+          delta_rH298_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_T_kJ_mol: 287
+          delta_rH_T_uncertainty_kJ_mol: 12
+          delta_rS_T_J_mol_K: 18
+          delta_rS_T_uncertainty_J_mol_K: 6
+          reference: '77'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 4
+          reaction_as_grouped: '[Ca] + [Ti] + 3/2 (O2) = (CaTiO3)'
+          T_K_min: 2287
+          T_K_max: 2466
+          delta_rH298_kJ_mol: -826
+          delta_rH_uncertainty_kJ_mol: 26
+          delta_rH_T_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_T_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rS_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rS_T_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '84'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 5
+          reaction_as_grouped: '[Ca] + [Ti] + 3/2 (O2) = (CaTiO3)'
+          T_K_min: 1956
+          T_K_max: 2182
+          delta_rH298_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_T_kJ_mol: -760
+          delta_rH_T_uncertainty_kJ_mol: 10
+          delta_rS_T_J_mol_K: -242
+          delta_rS_T_uncertainty_J_mol_K: 5
+          reference: '77'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 6
+          reaction_as_grouped: (CaTiO3) = (Ca) + (Ti) + 3(O)
+          T_K_min: 2287
+          T_K_max: 2466
+          delta_rH298_kJ_mol: 2225
+          delta_rH_uncertainty_kJ_mol: 26
+          delta_rH_T_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_T_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rS_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rS_T_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '84'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 7
+          reaction_as_grouped: (CaTiO3) = (Ca) + (Ti) + 3(O)
+          T_K_min: 2000
+          T_K_max: 2000
+          delta_rH298_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_T_kJ_mol: 1983
+          delta_rH_T_uncertainty_kJ_mol: 81
+          delta_rS_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rS_T_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '85'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 8
+          reaction_as_grouped: (CaTiO3) = (Ca) + (Ti) + 3(O)
+          T_K_min: 1956
+          T_K_max: 2182
+          delta_rH298_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_T_kJ_mol: 1993
+          delta_rH_T_uncertainty_kJ_mol: 15
+          delta_rS_T_J_mol_K: 396
+          delta_rS_T_uncertainty_J_mol_K: 7
+          reference: '77'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 9
+          reaction_as_grouped: '[CaTiO3] = (CaTiO3)'
+          T_K_min: 2000
+          T_K_max: 2000
+          delta_rH298_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_T_kJ_mol: 1030
+          delta_rH_T_uncertainty_kJ_mol: 22
+          delta_rS_T_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rS_T_uncertainty_J_mol_K:
+            state:
+              tag: unknown
+              reason: not_published
+          reference: '85'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+        - row: 10
+          reaction_as_grouped: '[CaTiO3] = (CaTiO3)'
+          T_K_min: 1956
+          T_K_max: 2182
+          delta_rH298_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_uncertainty_kJ_mol:
+            state:
+              tag: unknown
+              reason: not_published
+          delta_rH_T_kJ_mol: 1027
+          delta_rH_T_uncertainty_kJ_mol: 10
+          delta_rS_T_J_mol_K: 297
+          delta_rS_T_uncertainty_J_mol_K: 5
+          reference: '77'
+          method_class: quoted_attributed
+          attribution: Shornikov (2021) reproduces the cited source(s) named in the reference cell.
+    - observation_id: activity_definitions
+      type: thermodynamic_example
+      locator:
+        published_page: 122
+        pdf_page_index: 11
+        section: The thermodynamic properties of perovskite melts
+        equations: 5–8
+      units: as printed
+      values:
+        quantity: oxide activities
+        method_class: quoted_attributed
+        attribution: Shornikov [64], using Lewis [65], Belton–Fruehan [66] and Gibbs–Duhem [67].
+        activity_definitions:
+        - oxide: CaO
+          relation: Lewis equation ai=pi/pi°; pure individual oxide vapor pressure divided into melt vapor pressure.
+          defining_ion: The Lewis ratio is pressure-based; equation (7) gives the TiO2/CaO activity ratio from ICa/ITiO.
+          standard_state: Pure individual oxide vapor-pressure reference; whether condensed oxide is solid or liquid is unspecified.
+        - oxide: TiO2
+          relation: Lewis equation ai=pi/pi°; activity also by the Belton–Fruehan integration (6) and equation (7).
+          defining_ion: Ca+ and TiO+ current ratio in equation (7).
+          standard_state: Pure individual oxide vapor-pressure reference; whether condensed oxide is solid or liquid is unspecified.
+    - observation_id: figures_1_to_8_figure_only
+      type: thermodynamic_example
+      locator:
+        published_page: 116–130
+        pdf_page_index: 5–19
+        figure: 1–8
+      units: figure-only; curves not digitized
+      values:
+        quantity: all chapter figures
+        method_class: figure_only
+        figures:
+        - figure: '1'
+          note: Figure-only; no plotted values digitized.
+          locator: {published_page: 116, pdf_page_index: 5, figure: '1'}
+          caption_as_printed: 'The phase diagram of the CaO-TiO2 system [7, 18, 19]: (1) CaO + liquid; (2) CaO + Ca3Ti2O7; (3) Ca3Ti2O7 + liquid; (4) Ca4Ti3O10 + liquid; (5) Ca3Ti2O7 + Ca4Ti3O10; (6) Ca4Ti3O10 + CaTiO3; (7, 8) CaTiO3 + liquid; (9) CaTiO3 + TiO2; (10) TiO2 + liquid; (11) liquid.'
+        - figure: '2'
+          note: Figure-only; no plotted values digitized.
+          locator: {published_page: 116, pdf_page_index: 5, figure: '2'}
+          caption_as_printed: 'Heat capacity of perovskite: (1–5) determined via high-temperature calorimetry [26–30], respectively, and (6) taken from [22].'
+        - figure: '3'
+          note: Figure-only; no plotted values digitized.
+          locator: {published_page: 119, pdf_page_index: 8, figure: '3'}
+          caption_as_printed: 'The Gibbs energy of the formation of perovskite, determined via (1, 2) calorimetry [28, 42], respectively; (3–6) EMF [35, 36, 45, 51], respectively; (7–9) Knudsen effusion mass spectrometric method in [48, 52, 53], respectively; (10, 11) calculated from thermochemical data in [24, 26], respectively.'
+        - figure: '4'
+          note: Figure-only; no plotted values digitized.
+          locator: {published_page: 119, pdf_page_index: 8, figure: '4'}
+          caption_as_printed: 'Activities of CaO (1–3) and TiO2 (4–8) in perovskite, determined (1–3, 6–8) via Knudsen effusion mass spectrometry [48, 52, 53] and (4, 5) in studying the heterogeneous equilibria of multicomponent melts [54, 55], respectively.'
+        - figure: '5'
+          note: Figure-only; no plotted values digitized.
+          locator: {published_page: 121, pdf_page_index: 10, figure: '5'}
+          caption_as_printed: 'The activities of CaO (1, 2), TiO2 (3, 4), and CaTiO3 (5, 6) in the CaO-TiO2 melts, determined at 2057 K (1) in [63], at 2150 K (3, 5) in [52], and at 2250 K (2, 4, 6) in [64].'
+          transcription_note: 'The caption prints 2250 K; the discussion and Figures 6 and 8 separately print 2278 K. Both are retained at their printed locators.'
+        - figure: '6'
+          note: Figure-only; no plotted values digitized.
+          locator: {published_page: 123, pdf_page_index: 12, figure: '6'}
+          caption_as_printed: 'The thermodynamic properties of the CaO-TiO2 melts at 2278 K [64] (the chemical potentials of oxides and the mixing energy (a), the partial enthalpies of oxides and the enthalpy of formation (b), and the partial entropies of oxides and the entropy of formation (c)); symbols: (1) CaO, (2) TiO2, (3) integral thermodynamic characteristics (mixing energy, enthalpy, and entropy of formation of the melts, respectively; the vertical dashed line marks the boundary of the “CaO + liquid” region and the melt) and the comparison of mixing energies (d) in the CaO-TiO2 (4), CaO-SiO2 (5), and CaO-Al2O3 (6) melts determined by the Knudsen effusion mass spectrometric method in [64, 68, 69], respectively (the dashed lines correspond to heterogeneous areas).'
+        - figure: '7'
+          note: Figure-only; no plotted values digitized.
+          locator: {published_page: 126, pdf_page_index: 15, figure: '7'}
+          caption_as_printed: 'The partial pressure of Ca (a), TiO (b), TiO2 (c), and O (d) over perovskite (1–3) and oxides of calcium (4, 5, 9) and titanium (6–8, 10) vs. the inverse temperature, determined via Knudsen mass spectrometry: (1) in [77], (2) in [52], (4) in [78], (5) in [79], (6) in [80], (7) in [81], and (8) in [71]; using the vacuum furnace (according to Langmuir), (3) in [4]; and calculated, (9) and (10), according to the thermochemical data [57]; the vertical dashed lines (11) and (12) indicate melting points of titanium oxide and perovskite, respectively.'
+        - figure: '8'
+          note: Figure-only; no plotted values digitized.
+          locator: {published_page: 130, pdf_page_index: 19, figure: '8'}
+          caption_as_printed: 'The partial pressure values of vapor species over perovskite (a) [77] and over the CaO-TiO2 melts at 2278 K (b) [64]: (1) Ca, (2) CaO, (3) Ti, (4) TiO, (5) TiO2, (6) O, (7) O2, and (8) CaTiO3.'
+    - observation_id: calibration_and_corrections
+      type: method
+      locator:
+        published_page: 128
+        pdf_page_index: 17
+        section: Mass spectra
+      units: as printed
+      values:
+        quantity: calibration and correction facts
+        method_class: quoted_unattributed
+        ion_appearance_standard: Silver ion appearance energy used as standard for CaTiO3+ appearance-energy determination
+        pressure_calibration_substance:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          note: No pressure-calibration substance identified; silver is an appearance-energy standard.
+        isotope_and_multiplier_corrections:
+          state:
+            tag: unknown
+            reason: not_published
+        shornikov_catio3_appearance_energy_eV:
+          printed_value: 8.5 ± 0.6
+          nominal_eV: 8.5
+          uncertainty_eV: 0.6
+          standard: Silver ion appearance energy
+          locator:
+            published_page: 128
+            pdf_page_index: 17
+            section: Mass spectra
+        lopatin_semenov_pressure_calibration:
+          attribution: Lopatin and Semenov [84]
+          standard_substance: Gold vapor
+          method: Ion-current comparison with accepted gold vapor pressure using equation (31)
+          equation_corrections: Effective ionization-cross-section ratios, isotope distributions, and individual ion efficiencies
+          catio3_appearance_energy_printed: 9 ± 1 eV
+          catio3_appearance_energy_nominal_eV: 9
+          catio3_appearance_energy_uncertainty_eV: 1
+          appearance_energy_standard: Gold ion
+          locator:
+            published_page: 126
+            pdf_page_index: 15
+            section: Mass spectra
+    - observation_id: ion_current_ratios_and_interference
+      type: thermodynamic_example
+      locator:
+        published_page: 127
+        pdf_page_index: 16
+        section: Mass spectra
+      units: relative ion-current ratios as printed
+      values:
+        quantity: ion-current ratios and fragment/interference qualifications
+        method_class: quoted_attributed
+        attribution: Shornikov (2021) reports ratios for the cited evaporation studies; no ion-current table is printed.
+        fragmentation_ratio:
+          ions: ICaTi:ICaTiO:ICaTiO2:ICaTiO3
+          ratio_as_printed: 6:10:13:100
+          ratio_values:
+          - 6
+          - 10
+          - 13
+          - 100
+        solid_perovskite_2182K:
+          ions: ICa:ICaO:ITi:ITiO:ITiO2:ICaTiO3:IO:IO2
+          ratio_as_printed: 80:0.04:0.1:75:100:0.02:40:0.3
+          temperature_K: 2182
+          ratio_values:
+          - 80
+          - 0.04
+          - 0.1
+          - 75
+          - 100
+          - 0.02
+          - 40
+          - 0.3
+        melt_2278K:
+          ions: ICa:ICaO:ITi:ITiO:ITiO2:ICaTiO3:IO:IO2
+          ratio_as_printed: 25:0.02:0.1:56:100:0.13:0.44:0.012
+          temperature_K: 2278
+          TiO2_mol_percent:
+            value: 57.81
+            uncertainty: 0.15
+          ratio_values:
+          - 25
+          - 0.02
+          - 0.1
+          - 56
+          - 100
+          - 0.13
+          - 0.44
+          - 0.012
+        interference_and_qualification: TiO+ contains a fragment component of TiO2+ in the Lopatin and Semenov study [84];
+          MoOi+ (i=0–3) signals are associated with molybdenum-cell evaporation and perovskite/cell interaction.
+        laser_perovskite_ratio:
+          attribution: Zakharov and Protas [73]
+          ions: IO:ICa:ICaO:ITi:ITiO:ICaTiO3
+          ratio_as_printed: 0.41:100:0.17:4.32:0.54:0.05
+          ratio_values:
+          - 0.41
+          - 100
+          - 0.17
+          - 4.32
+          - 0.54
+          - 0.05
+          pulse_duration_microseconds:
+          - '800'
+          - '1000'
+          wavelength_angstrom: 6943
+          pulse_energy_joule_low: 3
+          pulse_energy_joule_high: 5
+          locator:
+            published_page: 125
+            pdf_page_index: 14
+        cell_interaction_ratio:
+          ions: ITiO2:IMo:IMoO:IMoO2:IMoO3
+          ratio_as_printed: 100:0.8:2.6:7.3:0.6
+          ratio_values:
+          - 100
+          - 0.8
+          - 2.6
+          - 7.3
+          - 0.6
+    - observation_id: located_numeric_gas_and_method_context
+      type: laboratory_conditions
+      locator:
+        published_page: 124–129
+        pdf_page_index: 13–18
+        section: The gas phase over perovskite
+      units: as printed
+      values:
+        quantity: located numeric background and method facts
+        method_class: quoted_unattributed
+        facts:
+        - statement: Other vapor species over the oxides do not exceed 1% of total concentration at 1700–2200 K.
+          locator:
+            published_page: 125
+            pdf_page_index: 14
+            section: The gas phase over perovskite
+        - statement: The partial pressures at 1791–2182 K and melts at 2278 K have an error not exceeding 8%.
+          locator:
+            published_page: 129
+            pdf_page_index: 18
+            section: Vapor-pressure calculation
+            figure: '8'
+        - statement: At 1881 K, pMoO2 was initially 10–10^2 times higher than pTiO2 and gradually decreased until comparable
+            with pTiO2.
+          locator:
+            published_page: 128
+            pdf_page_index: 17
+            section: Cell interaction
+        - statement: CaTiO3+ appearance energy was 8.5 ± 0.6 eV; silver ion appearance energy was the standard.
+          locator:
+            published_page: 128
+            pdf_page_index: 17
+            section: Mass spectra
+        - statement: Banon et al. recorded spectra at 13 eV to avoid possible TiO2+ fragmentation into Ti+ and TiO+.
+          locator:
+            published_page: 125
+            pdf_page_index: 14
+            section: The gas phase over perovskite
+        - statement: Laser ion-emission measurements used 800–1000 μs pulse duration, 6943 Å wavelength, and 3–5 J energy;
+            estimated heating temperature was 4890 ± 70 K, called approximate, within the compared 4000–6000 K range.
+          locator:
+            published_page: 125
+            pdf_page_index: 14
+            section: The gas phase over perovskite
+    - observation_id: qualifying_and_directional_statements
+      type: thermodynamic_example
+      locator:
+        published_page: 115–132
+        pdf_page_index: 4–21
+        section: Introduction through Conclusions
+      units: Verbatim English text
+      values:
+        quantity: qualifying, comparative and directional statements rechecked against page images
+        method_class: quoted_unattributed
+        claims:
+        - quote: Calcium titanate (CaTiO3) or perovskite was found by Rose [1] in the Ural Mountains in 1839 and named after
+            the Russian Statesman Count Lev Perovski.
+          locator:
+            published_page: 115
+            pdf_page_index: 4
+            section: Introduction
+        - quote: In addition to perovskite, two more calcium titanates, Ca3Ti2O7 [6] and Ca4Ti3O10 [7], melting incongruently,
+            were found in the CaO-TiO2 system.
+          locator:
+            published_page: 115
+            pdf_page_index: 4
+            section: Introduction
+        - quote: They also seem to be unstable, which does not exclude their possible existence [17].
+          locator:
+            published_page: 115
+            pdf_page_index: 4
+            section: Introduction
+        - quote: High-temperature heat capacity of perovskite Cp(CaTiO3) is reported over 15–398 K [26], 293–773 K [27], 376–1184
+            K [28], 383–1794 K [29], and 413–1825 K [30].
+          locator:
+            published_page: 115
+            pdf_page_index: 4
+            section: Thermodynamic properties of perovskite solid phase
+        - quote: 'Naylor and Cook [29] determined the enthalpy of perovskite phase transition: 2.30 ± 0.07 kJ/mol at 1530
+            ± 1 K.'
+          locator:
+            published_page: 116
+            pdf_page_index: 5
+            figure: '2'
+        - quote: The overlapping phase transitions in perovskite observed by Guyot et al. [30] were explained as consequences
+            of a structural change, i.e., a transition from orthorhombic (Pbnm) to orthorhombic (Cmcm) structure at 1384 ±
+            10 K and the overlapping of transitions from orthorhombic to tetragonal (I4/mcm) and tetragonal to cubic phase
+            (Pm3m) at 1520 ± 10 K with heat effects of 1.0 ± 0.5 and 5.5 ± 0.5 kJ/mol, respectively.
+          locator:
+            published_page: 116
+            pdf_page_index: 5
+            figure: '2'
+        - quote: At 1873 K, Suito et al. [54, 55] studied the equilibrium [Ti] + 2(O) = [TiO2] in CaO-TiOx (or CaO-TiOx-Al2O3)
+            slags with liquid nickel relative to oxygen and nitrogen, depending on Ti (or Al) content in the metal. Crucibles
+            of CaO or Al2O3 were used.
+          locator:
+            published_page: 118
+            pdf_page_index: 7
+            equation: '4'
+        - quote: Banon et al. [52] investigated 24 compositions of the CaTiO3-Ti2O3-TiO2 system from molybdenum containers
+            at 1900–2200 K. The synthesized compositions contained up to 90.2 mol% Ti2O3 and up to 42 mol% TiO2 as well as
+            CaTiO3 compound.
+          locator:
+            published_page: 121
+            pdf_page_index: 10
+            section: The thermodynamic properties of perovskite melts
+        - quote: Stolyarova et al. [63] investigated 14 compositions of the CaO-TiO2-SiO2 system using tungsten effusion containers
+            at 1800–2200 K; the synthesized compositions contained up to 70 mol% CaO, up to 69 mol% SiO2, and up to 40 mol%
+            TiO2.
+          locator:
+            published_page: 121
+            pdf_page_index: 10
+            section: The thermodynamic properties of perovskite melts
+        - quote: Shornikov [64] investigated evaporation from molybdenum containers of more than 200 compositions of the CaO-TiO2
+            system containing 34–98 mol% TiO2 at 2241–2441 K. The studied compositions were residual CaO-TiO2-SiO2 melts containing
+            up to 1 mol% SiO2 that was lost during high-temperature evaporation.
+          locator:
+            published_page: 122
+            pdf_page_index: 11
+            section: The thermodynamic properties of perovskite melts
+        - quote: A comparison of mixing energies in the CaO-TiO2 melts at 2300 K with those for the CaO-SiO2 [68] and CaO-Al2O3
+            [69] melts indicates a stronger chemical interaction in the CaO-TiO2 melts than the CaO-Al2O3 melts, but smaller
+            than in the CaO-SiO2 melts. It manifests in more positive values of the mixing energy of the melts.
+          locator:
+            published_page: 124
+            pdf_page_index: 13
+            figure: 6d
+        - quote: The mass spectra were recorded at a low ionizing voltage of 13 eV in order to avoid possible fragmentation
+            of the TiO2+ molecular ion into Ti+ and TiO+ fragmentation ions, which were also molecular ions.
+          locator:
+            published_page: 125
+            pdf_page_index: 14
+            section: The gas phase over perovskite
+        - quote: The appearance energy of CaTiO3+ ion in the mass spectra of vapor over perovskite was equal to 8.5 ± 0.6
+            eV (the appearance energy of silver ion was used as a standard).
+          locator:
+            published_page: 128
+            pdf_page_index: 17
+            section: Mass spectra
+        - quote: The Clausing coefficient does not exceed 1 and depends on the ratio of the diameter of the effusion hole
+            to its thickness.
+          locator:
+            published_page: 128
+            pdf_page_index: 17
+            section: Hertz-Knudsen equation
+        - quote: The concentration dependences of vapor species containing titanium are almost constant in the region of 75–100
+            mol% TiO2, after increasing up to 65–70 mol% TiO2.
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+            figure: 8b
+        - quote: They also seem to be unstable, which does not exclude their possible existence.
+          locator:
+            published_page: 115
+            pdf_page_index: 4
+        - quote: The differences between the data do not exceed 5 J/(mol K) up to a temperature of 1200 K, but they are quite
+            contradictory at higher temperatures.
+          locator:
+            published_page: 115
+            pdf_page_index: 4
+        - quote: The considerable anomaly of perovskite heat capacity above 1520 K could be caused by strong disordering of
+            the cubic phase up to the temperature of perovskite melting.
+          locator:
+            published_page: 116
+            pdf_page_index: 5
+        - quote: The reactions of dissolution were more complete than combustion reaction (1).
+          locator:
+            published_page: 118
+            pdf_page_index: 7
+        - quote: They determined the value of ΔHT(CaTiO3), which lies in the range of −44 to −39 kJ/mol; the accuracy of measurements
+            was 2 kJ/mol.
+          locator:
+            published_page: 118
+            pdf_page_index: 7
+        - quote: Perovskite and its oxides are poorly soluble in oxide solvent Pb2B2O5; Na6Mo4O15 liquid alloy is quite volatile
+            and cannot be used at temperatures above 1000 K; (Li,Na)BO2 solution is hygroscopic, which creates difficulties
+            in synthesizing [49].
+          locator:
+            published_page: 118
+            pdf_page_index: 7
+        - quote: The data obtained by Sato et al. [28] using adiabatic calorimetry deviate negligibly (by as much as 7 kJ/mol)
+            in the enthalpy values of (HT−H298) in the temperature range above 1000 K.
+          locator:
+            published_page: 118
+            pdf_page_index: 7
+        - quote: At the same time, the entropy of perovskite formation determined by Sato et al. [28] is in satisfactory agreement
+            with the results obtained by Kelley and Mah [20], Woodfield et al. [26], and Prasanna and Navrotsky [42] and calculated
+            by Gillet et al. [46] based on information obtained on Raman spectra (Table 1).
+          locator:
+            published_page: 118
+            pdf_page_index: 7
+        - quote: The Gibbs energy of perovskite ΔGT(CaTiO3) was calculated based on a compilation of fairly approximate literature
+            data and their own estimates of the thermodynamic properties of the [Ti2O] compound. This produced a considerable
+            error in determining this value (Figure 3).
+          locator:
+            published_page: 118
+            pdf_page_index: 7
+        - quote: However, the non-systematic errors in determining ΔHT(CaTiO3) and ΔST(CaTiO3) values were considerable (Table
+            1).
+          locator:
+            published_page: 118
+            pdf_page_index: 7
+        - quote: The obtained ΔGT(CaTiO3) values were close to the results of Rezukhina et al. [35].
+          locator:
+            published_page: 118
+            pdf_page_index: 7
+        - quote: The obtained value is consistent with the results of thermochemical calculations, although it has a significant
+            error.
+          locator:
+            published_page: 118
+            pdf_page_index: 7
+        - quote: The activity (ai) of titanium oxide was estimated indirectly, depending on the content of Al, Ti, and O in
+            the slag, and using data on the Gibbs energies of oxide formation (Figure 4).
+          locator:
+            published_page: 118
+            pdf_page_index: 7
+        - quote: The resulting values correlated with one another within the experimental error (up to 2.5 kJ/mol); however,
+            the ΔGT(CaTiO3) was obtained at a temperature ~1000 K higher than in the earlier results (Figure 3).
+          locator:
+            published_page: 119
+            pdf_page_index: 8
+        - quote: As the temperature grows, there is a slight trend toward the higher activities of calcium and titanium oxides
+            in the crystalline perovskite phase. This trend is less noticeable in the area of the liquid phase.
+          locator:
+            published_page: 120
+            pdf_page_index: 9
+        - quote: The activities of titanium oxide calculated based on studying of equilibria in slags [54, 55] are fairly
+            approximate but not inconsistent with the results in [48, 52, 53].
+          locator:
+            published_page: 120
+            pdf_page_index: 9
+        - quote: The values of Gibbs energy of perovskite formation determined at 800–1200 K via EMF [35, 36, 51] and solution
+            calorimetry [42] correlate satisfactorily with the obtained via Knudsen effusion mass spectrometric method [48,
+            52, 53, 56].
+          locator:
+            published_page: 120
+            pdf_page_index: 9
+        - quote: Figure 3 shows a good agreement between these data and the results from thermochemical calculations performed
+            by Woodfield et al. [26].
+          locator:
+            published_page: 120
+            pdf_page_index: 9
+        - quote: The difference between our findings and the thermochemical data calculated by Bale et al. [24] is large in
+            the perovskite melting area, but is still less than 3 kJ/mol.
+          locator:
+            published_page: 120
+            pdf_page_index: 9
+        - quote: The ΔHT(CaTiO3) and ΔST(CaTiO3) values determined in [48] correlate with the results from studies performed
+            via solution calorimetry [37, 41, 42, 44] and EMF [35, 36] at lower temperatures and by Raman spectroscopy [46]
+            and DTA [47] at similar temperatures (Table 1).
+          locator:
+            published_page: 120
+            pdf_page_index: 9
+        - quote: The data characterizing the melting of simple oxides [23, 24, 57–60] are quite rough (Table 2).
+          locator:
+            published_page: 120
+            pdf_page_index: 9
+        - quote: According to different thermochemical data, perovskite’s melting temperature lies in the range of 2188 to
+            2243 K.
+          locator:
+            published_page: 120
+            pdf_page_index: 9
+        - quote: Shornikov [48] based on his own data (Table 1) has obtained more accurate values, characterizing the perovskite
+            melting (Table 2).
+          locator:
+            published_page: 120
+            pdf_page_index: 9
+        - quote: Differences with values obtained by Stolyarova et al. [63] (Figure 5, points 1), are caused, apparently,
+            by the low accuracy of the latter.
+          locator:
+            published_page: 124
+            pdf_page_index: 13
+        - quote: The partial and integral thermodynamic regularities presented in Figure 6 characterizing the CaO-TiO2 melts
+            are symbate. The enthalpy and entropy of melt formation are positive.
+          locator:
+            published_page: 124
+            pdf_page_index: 13
+        - quote: The extreme values of the integral thermodynamic properties of the melts are in the concentration ranges
+            close to perovskite, which confirms its stability in the melt.
+          locator:
+            published_page: 124
+            pdf_page_index: 13
+        - quote: Some displacement of the extremum of integral thermodynamic functions can be caused by the presence of oxide
+            compounds with a large amount of CaO in comparison with perovskite CaTiO3 in the melt.
+          locator:
+            published_page: 124
+            pdf_page_index: 13
+        - quote: A comparison of mixing energies in the CaO-TiO2 melts at 2300 K with those for the CaO-SiO2 [68] and CaO-Al2O3
+            [69] melts (Figure 6d) indicates a stronger chemical interaction in the CaO-TiO2 melts than the CaO-Al2O3 melts,
+            but smaller than in the CaO-SiO2 melts. It manifests in more positive values of the mixing energy of the melts.
+          locator:
+            published_page: 124
+            pdf_page_index: 13
+        - quote: The content of other vapor species does not exceed 1% of the total concentration at 1700–2200 K.
+          locator:
+            published_page: 125
+            pdf_page_index: 14
+        - quote: The TiO2+ ion was not observed in the mass spectrum of vapor over both perovskite CaTiO3 and rutile TiO2.
+            This is explained by the peculiarity of the mass spectrometric experiment using a laser, in which the easily ionizable
+            molecular species dominate the mass spectra of vapor and the not readily ionizable molecules are discriminated.
+            This selectivity of detected ions in the mass spectra of vapor significantly limits the accuracy and applicability
+            of this method [76].
+          locator:
+            published_page: 125
+            pdf_page_index: 14
+        - quote: The estimated temperature of heating of perovskite under the action of laser radiation based on the possible
+            equilibrium in the gas phase is 4890 ± 70 K, which is approximate, but does not contradict the conditions of similar
+            laser-impact mass spectrometry experiments in the range 4000–6000 K.
+          locator:
+            published_page: 125
+            pdf_page_index: 14
+        - quote: Atomic calcium was the dominant component of the gas phase over the composites. The complex gaseous oxide
+            (CaTiO3) was not detected.
+          locator:
+            published_page: 125
+            pdf_page_index: 14
+        - quote: Gaseous perovskite was also not detected in the mass spectrometric studies of high-temperature evaporation
+            of various compositions of the CaO-TiO2-SiO2 system from molybdenum and tungsten Knudsen effusion cells at 1700–2500
+            K [53, 63, 82, 83] presumably because the sensitivity of the equipment used in [63, 83] was insufficient for determining
+            the CaTiO3+ ion or because this was not the purpose of the study [53, 82].
+          locator:
+            published_page: 125
+            pdf_page_index: 14
+        - quote: The presence of a small amount of (CaTiO3) molecules in the gas phase over perovskite is probably due to
+            the reaction [CaTiO3] = (CaTiO3).
+          locator:
+            published_page: 128
+            pdf_page_index: 17
+        - quote: The partial pressures of vapor species over perovskite at 1791–2182 K and its melts at 2278 K calculated
+            using the relationships (38) and (39) with an error not exceeding 8% are shown in Figure 8.
+          locator:
+            published_page: 129
+            pdf_page_index: 18
+        - quote: The partial pressure of atomic oxygen determined using the relationships (38) and (39) agrees satisfactorily
+            with those calculated using the thermochemical data [57] on Kr(T) equilibrium constants.
+          locator:
+            published_page: 129
+            pdf_page_index: 18
+        - quote: The pO values calculated according to the independent reactions in the gas phase over perovskite (40)–(45)
+            were the same. It confirmed the assumption about the molecular origin of the identified ions in the mass spectrum
+            of vapor over perovskite.
+          locator:
+            published_page: 129
+            pdf_page_index: 18
+        - quote: As it follows from Figure 8a, the defined partial pressures of vapor species over perovskite can be represented
+            as linear logarithmic dependence vs. the inverse temperature.
+          locator:
+            published_page: 129
+            pdf_page_index: 18
+        - quote: Therefore, the obtained values characterized by the evaporation of perovskite were not under reducing conditions
+            (from molybdenum cell), but, in contrary, under chemically neutral conditions (in the absence of interaction of
+            perovskite with the cell material).
+          locator:
+            published_page: 129–130
+            pdf_page_index: 18–19
+        - quote: As we noted earlier [85], the greatest effect of cell materials on the vapor composition are observed with
+            the oxygen-“deficient” species such as atomic calcium, titanium monoxide, and atomic oxygen itself. There are
+            no differences in the partial pressure of gaseous titanium dioxide determined in evaporation experiments using
+            molybdenum [81] and tungsten [71] cells.
+          locator:
+            published_page: 130
+            pdf_page_index: 19
+        - quote: The total vapor pressure over the perovskite melt at 2278 K obtained by Zhang et al. [4] is consistent with
+            the extrapolated values of partial pressures of the predominant vapor species of the gas phase—atomic calcium
+            and titanium dioxide—found in [77].
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+        - quote: Similar slopes of lg pCa and lg pO vs. the inverse temperature for calcium oxide and perovskite indicate
+            a predominant effect of calcium component on evaporation of calcium from perovskite.
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+        - quote: This also can explain the difference in the slope of lg pTiO in the case of perovskite and rutile according
+            to the equilibriums (18) and (24).
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+        - quote: The enthalpy and entropy of reactions involving CaTiO3 gaseous complex oxide are in good agreement with those
+            found by Lopatin and Semenov [84] and earlier estimates [85].
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+        - quote: The concentration dependences of partial pressures of vapor species over perovskite melts show a sharp decrease
+            in pCa and pCaO with increasing of TiO2 content in the melt.
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+        - quote: The vapor species containing titanium—(Ti), (TiO), and (TiO2)—are increased with increasing TiO2 concentration
+            up to 65–70 mol% TiO2, and further they are almost constant in the region of 75–100 mol% TiO2, which may indicate
+            the immiscibility of the melt observed by Banon et al. [52].
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+        - quote: The partial pressures of (O) and (O2) slightly vary throughout the concentration range under consideration,
+            showing a minimum in the perovskite concentration.
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+        - quote: The (CaTiO3) partial pressures have maximum values in the melt region with a high calcium content compared
+            to the perovskite concentration.
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+        - quote: The thermodynamic properties of perovskite determined by different calorimetric approaches and EMF method
+            agree with the results obtained via Knudsen effusion mass spectrometry at high temperatures.
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+        - quote: The resulting values of oxide activities in perovskite, as well as the Gibbs energy, the entropy and enthalpy
+            of the formation of perovskite from simple oxides, and the melting enthalpy of perovskite are consistent with
+            each other.
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+        - quote: The enthalpy of perovskite formation is constant throughout the temperature range, and the entropy of perovskite
+            formation tends to increase slightly.
+          locator:
+            published_page: 131
+            pdf_page_index: 20
+        - quote: The observed concentration dependences of the partial pressures of vapor species over the perovskite melts
+            correspond to those characterizing the condensed phase.
+          locator:
+            published_page: 132
+            pdf_page_index: 21
+        claim_count: 67
+    - observation_id: located_intro_numeric_context
+      type: thermodynamic_example
+      locator:
+        published_page: 115–116
+        pdf_page_index: 4–5
+        section: Introduction; thermodynamic properties of perovskite solid phase
+      units: as printed
+      values:
+        quantity: introductory and discussion numeric claims
+        method_class: quoted_attributed
+        attribution: 'Rose [1]; heat-capacity intervals [26], [27], [28], [29], [30], respectively; transition enthalpy Naylor and Cook [29]; structural transitions and heat effects Guyot et al. [30].'
+        discovery_year: 1839
+        heat_capacity_ranges_K:
+        - - 15
+          - 398
+        - - 293
+          - 773
+        - - 376
+          - 1184
+        - - 383
+          - 1794
+        - - 413
+          - 1825
+        phase_transition_enthalpy_kJ_mol:
+          value: 2.3
+          uncertainty: 0.07
+          temperature_K:
+            value: 1530
+            uncertainty: 1
+        structural_transitions_K:
+        - value: 1384
+          uncertainty: 10
+          transition: Pbnm to Cmcm
+        - value: 1520
+          uncertainty: 10
+          transition: overlapping Cmcm to I4/mcm and I4/mcm to Pm3m
+        associated_heat_effects_kJ_mol:
+        - value: 1.0
+          uncertainty: 0.5
+        - value: 5.5
+          uncertainty: 0.5
+        source_note: All numbers are reported statements from the review, not newly inferred values.
+    - observation_id: printed_equations_p117
+      type: thermodynamic_example
+      locator: {published_page: 117, pdf_page_index: 6, section: 'Printed equations'}
+      units: as printed; symbolic relations retained without evaluation
+      values:
+        method_class: quoted_attributed
+        attribution: 'Shornikov (2021), equations as reproduced in this chapter; cited sources retained in the printed bibliography.'
+        equations_as_printed:
+        - {equation: 1, relation: '[CaCO_3]+[TiO_2]=[CaTiO_3]+(CO_2)'}
+        - {equation: 2, relation: '[CaO]+[TiO_2]=[CaTiO_3]'}
+        notation_as_printed: 'Square brackets denote condensed phases; parentheses denote gas phases.'
+    - observation_id: printed_equations_p118
+      type: thermodynamic_example
+      locator: {published_page: 118, pdf_page_index: 7, section: 'Printed equations'}
+      units: as printed; symbolic relations retained without evaluation
+      values:
+        method_class: quoted_attributed
+        attribution: 'Shornikov (2021), equations as reproduced in this chapter; cited sources retained in the printed bibliography.'
+        equations_as_printed:
+        - {equation: 3, relation: '[CaO]+\frac{1}{2}[Ti_2O]+\frac{3}{4}(O_2)=[CaTiO_3]'}
+        - {equation: 4, relation: '[Ti]+2(O)=[TiO_2]'}
+    - observation_id: printed_equations_p122
+      type: thermodynamic_example
+      locator: {published_page: 122, pdf_page_index: 11, section: 'Printed equations'}
+      units: as printed; symbolic relations retained without evaluation
+      values:
+        method_class: quoted_attributed
+        attribution: 'Shornikov (2021), equations as reproduced in this chapter; cited sources retained in the printed bibliography.'
+        equations_as_printed:
+        - {equation: 5, relation: 'a_i=p_i/p_i^\circ'}
+        - {equation: 6, relation: '\ln a_i=-\int x_j\,d\ln(a_j/a_i)'}
+        - {equation: 7, relation: '\ln a_{TiO_2}=-\int x_{CaO}\,d\ln(p_{CaO}/p_{TiO_2})=-\int x_{CaO}\,d\ln(p_{Ca}p_O/(p_{TiO}p_O))=-\int x_{CaO}\,d\ln(I_{Ca}/I_{TiO})'}
+        - {equation: 8, relation: '\ln a_{CaO}=-\int (x_{TiO_2}/x_{CaO})\,d\ln a_{TiO_2}'}
+        - {equation: 9, relation: '\Delta\mu_i=RT\ln a_i'}
+        - {equation: 10, relation: '\Delta\mu_i=\Delta H_i-T\Delta S_i'}
+        - {equation: 11, relation: '\Delta H_i=\frac{d(\Delta\mu_i/T)}{d(1/T)}=R\frac{d\ln a_i}{d(1/T)}'}
+        - {equation: 12, relation: '\Delta S_i=-d\Delta\mu_i/dT'}
+    - observation_id: printed_equations_p123
+      type: thermodynamic_example
+      locator: {published_page: 123, pdf_page_index: 12, section: 'Printed equations'}
+      units: as printed; symbolic relations retained without evaluation
+      values:
+        method_class: quoted_attributed
+        attribution: 'Shornikov (2021), equations as reproduced in this chapter; cited sources retained in the printed bibliography.'
+        equations_as_printed:
+        - {equation: 13, relation: '\Delta G_T^m=\sum_i x_i\Delta\mu_i'}
+        - {equation: 14, relation: '\Delta H_T=\sum_i x_i\Delta H_i'}
+        - {equation: 15, relation: '\Delta S_T=\sum_i x_i\Delta S_i'}
+        - {equation: 16, relation: '\Delta G_T^m=\Delta H_T-T\Delta S_T'}
+    - observation_id: printed_equations_p124
+      type: thermodynamic_example
+      locator: {published_page: 124, pdf_page_index: 13, section: 'Printed equations'}
+      units: as printed; symbolic relations retained without evaluation
+      values:
+        method_class: quoted_attributed
+        attribution: 'Shornikov (2021), equations as reproduced in this chapter; cited sources retained in the printed bibliography.'
+        equations_as_printed:
+        - {equation: 17, relation: '[CaO]=(CaO)'}
+        - {equation: 18, relation: '(CaO)=(Ca)+(O)'}
+        - {equation: 19, relation: '2(Ca)=(Ca_2)'}
+        - {equation: 20, relation: '2(O)=(O_2)'}
+        - {equation: 21, relation: '3(O)=(O_3)'}
+        - {equation: 22, relation: '4(O)=(O_4)'}
+        - {equation: 23, relation: '[TiO_2]=(TiO_2)'}
+        - {equation: 24, relation: '(TiO_2)=(TiO)+(O)'}
+        - {equation: 25, relation: '(TiO)=(Ti)+(O)'}
+        - {equation: 26, relation: '2(Ti)=(Ti_2)'}
+        - {equation: 27, relation: '3(Ti)=(Ti_3)'}
+        - {equation: 28, relation: '2(TiO_2)=(Ti_2O_4)'}
+        - {equation: 29, relation: '(Ti_2O_4)=(Ti_2O_3)+(O)'}
+    - observation_id: printed_equations_p125
+      type: thermodynamic_example
+      locator: {published_page: 125, pdf_page_index: 14, section: 'Printed equations'}
+      units: as printed; symbolic relations retained without evaluation
+      values:
+        method_class: quoted_attributed
+        attribution: 'Shornikov (2021), equations as reproduced in this chapter; cited sources retained in the printed bibliography.'
+        equations_as_printed:
+        - {equation: 30, relation: '(Ca)+(TiO)=(CaO)+(Ti)'}
+    - observation_id: printed_equations_p126
+      type: thermodynamic_example
+      locator: {published_page: 126, pdf_page_index: 15, section: 'Printed equations'}
+      units: as printed; symbolic relations retained without evaluation
+      values:
+        method_class: quoted_attributed
+        attribution: 'Shornikov (2021), equations as reproduced in this chapter; cited sources retained in the printed bibliography.'
+        equations_as_printed:
+        - {equation: 31, relation: 'p_i=\frac{I_i T_i}{I_s T_s}p_s\times\frac{\sigma_s\gamma_s\eta_s}{\sigma_i\gamma_i\eta_i}'}
+        - {equation: 32, relation: '(CaTiO_3)=(CaO)+(TiO_2)'}
+        symbols_as_printed: 'Ii (Is): ion-current intensity of component (standard) at Ti (Ts); σi/σs: effective ionization cross sections; ηi/ηs: isotope distributions; γi/γs: individual ion efficiencies.'
+    - observation_id: printed_equations_p127
+      type: thermodynamic_example
+      locator: {published_page: 127, pdf_page_index: 16, section: 'Printed equations'}
+      units: as printed; symbolic relations retained without evaluation
+      values:
+        method_class: quoted_attributed
+        attribution: 'Shornikov (2021), equations as reproduced in this chapter; cited sources retained in the printed bibliography.'
+        equations_as_printed:
+        - {equation: 33, relation: '[Mo]=(Mo)'}
+    - observation_id: printed_equations_p128
+      type: thermodynamic_example
+      locator: {published_page: 128, pdf_page_index: 17, section: 'Printed equations'}
+      units: as printed; symbolic relations retained without evaluation
+      values:
+        method_class: quoted_attributed
+        attribution: 'Shornikov (2021), equations as reproduced in this chapter; cited sources retained in the printed bibliography.'
+        equations_as_printed:
+        - {equation: 34, relation: '(Mo)+(O)=(MoO)'}
+        - {equation: 35, relation: '(MoO)+(O)=(MoO_2)'}
+        - {equation: 36, relation: '(MoO_2)+(O)=(MoO_3)'}
+        - {equation: 37, relation: '[CaTiO_3]=(CaTiO_3)'}
+        - {equation: 38, relation: 'p_i=K_\alpha\frac{q_i}{s_{or}C_{or}t}\sqrt{\frac{2\pi RT}{M_i}}'}
+        - {equation: 39, relation: 'K_\alpha=\frac{1}{C_{or}}+s_{or}\frac{1-C_c\alpha_i}{S_v\alpha_i C_c}'}
+        symbols_as_printed: 'qi: amount of ith component evaporated from the effusion cell; Mi: molecular weight; t: time of evaporation; T: temperature; Cor: Clausing coefficient of the effusion hole; sor: hole area; αi: evaporation coefficient; Sv: evaporating surface area; Cc: Clausing coefficient of the effusion cell. αi values are taken from [91] on p. 129.'
+    - observation_id: printed_equations_p129
+      type: thermodynamic_example
+      locator: {published_page: 129, pdf_page_index: 18, section: 'Printed equations'}
+      units: as printed; symbolic relations retained without evaluation
+      values:
+        method_class: quoted_attributed
+        attribution: 'Shornikov (2021), equations as reproduced in this chapter; cited sources retained in the printed bibliography.'
+        equations_as_printed:
+        - {equation: 40, relation: 'p_O=\frac{p_{CaO}}{p_{Ca}}K_{18}(T)'}
+        - {equation: 41, relation: 'p_O=\frac{p_{TiO_2}}{p_{TiO}}K_{24}(T)'}
+        - {equation: 42, relation: 'p_O=\frac{p_{TiO}}{p_{Ti}}K_{25}(T)'}
+        - {equation: 43, relation: 'p_O=\sqrt{\frac{p_{O_2}^2}{K_{20}(T)}}'}
+        - {equation: 44, relation: 'p_O=\frac{p_{MoO_3}}{p_{MoO_2}}K_{36}(T)'}
+        - {equation: 45, relation: '\lg p_i=a_i/T+b_i'}
+        - {equation: 46, relation: 'R\ln K_r(T)=-\frac{\Delta_r G_T}{T}=-\frac{\Delta_r H_T}{T}+\Delta_r S_T'}
+        transcription_note: 'Equation (43) prints a squared pO2 numerator under the square root; retained without correcting a possible print error. No ai or bi fitted coefficients are printed for equation (45).'
+    - observation_id: additional_printed_numeric_and_method_context
+      type: thermodynamic_example
+      locator: {published_page: '115–129', pdf_page_index: '4–18', section: 'Located printed statements'}
+      units: as printed
+      values:
+        method_class: quoted_attributed
+        attribution: 'Shornikov (2021), with the original cited studies named in each located fact.'
+        facts:
+        - locator: {published_page: 115, pdf_page_index: 4, section: Introduction}
+          statement_as_printed: 'The other calcium titanates, Ca4TiO6 [8], Ca3TiO5 [9], Ca8Ti3O14 [8, 10], Ca2TiO4 [9], Ca5Ti4O13 [11], Ca2Ti3O8 [6], CaTi2O5 [12, 13], CaTi3O7 [14], Ca2Ti5O12 [15], and CaTi4O9 [16], are mentioned in the literature. They also seem to be unstable, which does not exclude their possible existence [17].'
+        - locator: {published_page: 117, pdf_page_index: 6, section: Structural transitions}
+          statement_as_printed: 'However, based on diffraction data about the perovskite structure obtained in the temperature range of 296–1720 K, Yashima and Ali [31] concluded that the Cmcm phase does not exist and claimed that the first transition is the (Pbnm) → (I4/mcm) at 1512 ± 13 K, followed by the (I4/mcm) → (Pm3m) transition at 1635 ± 2 K.'
+        - locator: {published_page: 117, pdf_page_index: 6, section: Formation enthalpy}
+          statement_as_printed: 'Although the obtained value was determined with poor accuracy due to the difficulty of determining the amounts of substances in the reaction products (1), it corresponded satisfactorily to the more accurate results of Kelley et al. [33], who determined this value according to the reaction:'
+        - locator: {published_page: 118, pdf_page_index: 7, section: Calorimetry}
+          statement_as_printed: 'Navrotsky et al. [19, 26, 34, 37–43] performed a number of studies by various calorimetric methods, using adiabatic calorimetry [26] and solution calorimetry in the (Li, Na)BO2 [41], Pb2B2O5 [37, 42, 43], and Na6Mo4O15 [19, 34, 38–40] salts in the temperature range 973–1074 K.'
+        - locator: {published_page: 118, pdf_page_index: 7, section: Calorimetry}
+          statement_as_printed: 'The ΔH1078(CaTiO3) value determined by Koito et al. [44] by similar method (solution calorimetry in Pb2B2O5 salt) is less accurate but close to the results obtained by Navrotsky et al. [19, 34, 37–43].'
+        - locator: {published_page: 118, pdf_page_index: 7, section: EMF studies}
+          statement_as_printed: 'A mixture of FeO and Fe (or NbO and Nb) was used as the reference electrode, and a mixture of La2O3-ThO2 crystals was used as the solid electrolyte.'
+          attribution: 'Golubenko and Rezukhina [45]'
+        - locator: {published_page: 118, pdf_page_index: 7, section: EMF studies}
+          statement_as_printed: 'Rezukhina et al. [35] later made more precise measurements of ΔGT(CaTiO3) in the temperature range of 888–972 K, inside a galvanic cell with CaF2 as the electrolyte (Figure 3).'
+        - locator: {published_page: 118, pdf_page_index: 7, section: EMF studies}
+          statement_as_printed: 'Taylor and Schmalzried [51] (at 873 K) and Jacob and Abraham [36] (at 900–1250 K) also determined the perovskite Gibbs energy via EMF using the same solid electrolyte.'
+        - locator: {published_page: 119, pdf_page_index: 8, section: Oxide activities}
+          statement_as_printed: 'Banon et al. [52] (at 2150 K) and Shornikov et al. [48, 53, 56] (at 1791–2398 K) determined the values of CaO and TiO2 activities (Figure 4) and ΔGT(CaTiO3) via Knudsen effusion mass spectrometric method.'
+        - locator: {published_page: 121, pdf_page_index: 10, section: Melting of perovskite}
+          statement_as_printed: 'The enthalpy of perovskite melting estimated using Walden’s empirical rule [62] is also close to the result obtained by Shornikov [48]: ΔHmelt = 8.8 [J/(g-at K)] Tmelt = 49.39 kJ/mol.'
+        - locator: {published_page: 121, pdf_page_index: 10, section: Perovskite melts}
+          statement_as_printed: 'Based on the partial vapor pressures (Ca), (TiO), and (TiO2) over melts at 2150 K, the authors calculated the Ti, TiO, Ti2O3, TiO2, and CaTiO3 activities, as well as mixing energies in the melts.'
+          attribution: 'Banon et al. [52]'
+          activity_standard_states: {state: {tag: unknown, reason: not_published}, note: 'The chapter does not specify the reference phases or standard states for these five activities.'}
+        - locator: {published_page: 121, pdf_page_index: 10, section: Perovskite melts}
+          statement_as_printed: 'In the case of the CaTiO3-TiO2 melts, the TiO2 and CaTiO3 activities were calculated by extrapolation from the data relating to the CaTiO3-Ti2O3-TiO2 system and thus had, according to the authors themselves, low accuracy, which apparently was caused by inconsistency with different versions of the CaO-TiO2 phase diagram [7, 9, 11, 18]. Nevertheless Banon et al. [52], interpreting the obtained high values of TiO2 activities in the region close to titanium dioxide (Figure 5), assumed the presence of immiscibility of the CaO-TiO2 melts in this region.'
+        - locator: {published_page: '121–122', pdf_page_index: '10–11', section: Perovskite melts}
+          statement_as_printed: 'As it is shown in Figure 5, one of the two studied compositions of the CaO-TiO2 system at 2057 K was in the “CaO + liquid” region, and thus its value should be close to 1. The second composition was in the region of “Ca4Ti3O10 + liquid” according to the information presented in [7, 18], or in the region of “Ca3Ti2O7 + liquid”, as follows from the data presented by Tulgar [11]. However, the calculated values are quite close (Figure 5), which contradicts the CaO-TiO2 phase diagram (Figure 1). A possible reason for the discrepancies seems to be a significant error in the measurements of CaO activities in the melt, which may be, in our opinion, more than 50%.'
+          attribution: 'Stolyarova et al. [63] results; chapter author’s expectation and possible-error assessment, not measured activity 1 or a measured uncertainty.'
+        - locator: {published_page: 123, pdf_page_index: 12, section: Perovskite melts}
+          statement_as_printed: 'The results presented by Banon et al. [52] correlate with the data found in [64]. Some difference in values, as mentioned above, is probably due to the procedures for extrapolating information obtained by Banon et al. [52] for compositions of the CaTiO3-Ti2O3-TiO2 triple system, which could reduce their accuracy. The observed behavior of TiO2 activity in melts in the concentration region close to rutile may indicate some immiscibility of the melt, which follows from the observed inflection of the concentration dependence (Figure 5, line 3). However, in our opinion, the behavior of TiO2 and CaTiO3 activities (Figure 5, lines 4 and 6) are close to the ideal.'
+        - locator: {published_page: 124, pdf_page_index: 13, section: The gas phase over perovskite}
+          statement_as_printed: 'Balducci et al. [72] detected (Ti2O3) and (Ti2O4) molecules in the gas phase over cobalt titanate CoTiO3 at 2210–2393 K by the Knudsen effusion mass spectrometric method, which can be involved in the following equilibria:'
+        - locator: {published_page: 125, pdf_page_index: 14, section: The gas phase over perovskite}
+          statement_as_printed: 'The partial pressures of the (Ca), (TiO), (TiO2), and (O) vapor over perovskite at 2150 K were calculated using the thermochemical data of [57] and are shown in Figure 7 as a function of the inverse temperature (for easily understanding, the temperature scale was scaled appropriately).'
+          attribution: 'Banon et al. [52], as discussed by Shornikov'
+        - locator: {published_page: 126, pdf_page_index: 15, section: Mass spectra}
+          statement_as_printed: 'The TiO+ ion also contained a fragment component of the TiO2+ ion, and the Ti+ ion was completely fragmentary.'
+          attribution: 'Lopatin and Semenov [84]; sentence begins on p. 125'
+        - locator: {published_page: 127, pdf_page_index: 16, section: Mass spectra}
+          statement_as_printed: 'It corresponded to that observed by Samoilova and Kazenas [78] in the same temperature range at evaporation of CaO from alundum cell and by Semenov [86] at evaporation of TiO2 from a tungsten cell.'
+          note: 'Comparison refers to the preceding ion-current ratio for perovskite at 2182 K.'
+        - locator: {published_page: 128, pdf_page_index: 17, section: Cell interaction}
+          statement_as_printed: 'Note that Berkowitz et al. [81] found that during evaporation of titanium oxide from a molybdenum liner inserted into a tantalum crucible at 1881 K, pMoO2 was initially 10–10^2 times higher than pTiO2.'
+        - locator: {published_page: 128, pdf_page_index: 17, section: Cell interaction}
+          statement_as_printed: 'The high pMoO2 observed in [81] probably was due to poor quality of the molybdenum liner material (or its alloy). Possibly it was made using powder technology from MoO3 reduced to metal molybdenum at ~1300 K. It could lead to such an excess of partial pressure of (MoO3) and its decrease as it evaporates from the surface layers of the liner material.'
+          note: 'Explicitly speculative liner-manufacturing explanation; not a measured sample-preparation fact.'
+        - locator: {published_page: 128, pdf_page_index: 17, section: Mass spectra}
+          statement_as_printed: 'The appearance energies of ions in the mass spectra of vapor over perovskite were determined by the Warren method [87] and corresponded to the accepted values of the ionization energies of atoms and molecules [88].'
+        - locator: {published_page: 129, pdf_page_index: 18, section: Vapor-pressure comparisons}
+          statement_as_printed: 'The partial pressures of the predominant vapor species of the gas phase over perovskite (Ca, TiO, TiO2 and O) are compared in Figure 7 with the results on evaporation of simple oxides (CaO and TiO2) under similar redox conditions caused by the interaction of oxygen with molybdenum [79, 81], tungsten [71], and tantalum [80] effusion cells or in chemically neutral conditions (in the absence of this interaction) for alundum cell [78].'
+        - locator: {published_page: 129, pdf_page_index: 18, section: Vapor-pressure comparisons}
+          statement_as_printed: 'We used the TiO and TiO2 activities as well as the Gibbs energy of perovskite obtained by Banon et al. [52] and thermochemical data [52] on equilibriums (17), (18), (23), and (24) to estimate the partial pressure of vapor species over the perovskite at 2150 K.'
+    - observation_id: printed_publication_metadata_context
+      type: thermodynamic_example
+      locator: {pdf_page_index: '2–27', section: 'Front matter; chapter heading; acknowledgements; bibliography'}
+      units: publication identifiers as printed; unscored metadata
+      values:
+        front_matter:
+          locator: {pdf_page_index: 2, section: Copyright and publication details}
+          book_doi: '10.5772/intechopen.87690'
+          copyright_and_first_publication_year: 2021
+          act_year: 1988
+          chapter_licence: Creative Commons Attribution 3.0 Unported License
+          compilation_rights: 'All rights to the book as a whole are reserved by IntechOpen Limited; the individual chapters carry CC BY 3.0.'
+          registration_number: '11086078'
+          address_as_printed: '5 Princes Gate Court, London, SW7 2QJ, United Kingdom'
+          print_isbn: '978-1-78985-665-1'
+          online_isbn: '978-1-78985-666-8'
+          ebook_pdf_isbn: '978-1-78985-678-1'
+        section_heading:
+          locator: {published_page: 113, pdf_page_index: 3}
+          statement_as_printed: 'Section 3: Thermal and Physical Properties of Perovskites'
+        chapter_heading:
+          locator: {published_page: 115, pdf_page_index: 4}
+          chapter_number: 6
+        acknowledgements_and_chapter_copyright:
+          locator: {published_page: 132, pdf_page_index: 21, section: Acknowledgements and footer}
+          program_number: 7
+          grant_as_printed: '19-05-00801A'
+          chapter_copyright_year: 2020
+          chapter_licence_url_as_printed: 'http://creativecommons.org/licenses/by/3.0'
+        reference_pages:
+        - locator: {published_page: 133, pdf_page_index: 22, section: References}
+          printed_reference_page_text: |-
+            Thermodynamics of Perovskite: Solid, Liquid, and Gas Phases
+            DOI: http://dx.doi.org/10.5772/intechopen.91309
+
+            References
+            [1] Rose G. Uber einige neue mineralien
+
+            des Urals. Journal für Praktische
+            Chemie. 1840;19:459-468
+            [2] Stefanovsky SV, Yudintsev SV.
+
+            Titanates, zirconates, aluminates and
+            ferrites as waste forms for actinide
+            immobilization. Russian Chemical
+            Reviews. 2016;85:962-994
+            [3] Wark D, Boynton WV. The
+            formation of rims on calciumaluminum-rich inclusions: Step I—Flash
+            heating. Meteoritics & Planetary
+            Science. 2001;36:1135-1166
+            [4] Zhang J, Huang S, Davis AM,
+
+            Dauphas N, Hashimoto A, Jacobsen SB.
+            Calcium and titanium isotopic
+            fractionations during evaporation.
+            Geochimica et Cosmochimica Acta.
+            2014;140:365-380
+            [5] Ivanova MA. Ca-Al-rich inclusions
+
+            in carbonaceous chondrites: The
+            oldest solar system objects.
+            Geochemistry International. 2016;54:
+            387-402
+            [6] Parga Pondal I, Bergt K. Sobre la
+            combinacion de la cal en los sistemas
+            CaO–TiO2 y CaO–SiO2–TiO2. Anales de
+            la Sociedad Española de Física y
+            Química. 1933;31:623-637
+            [7] Roth RS. Revision of the phase
+
+            equilibrium diagram of the binary
+            system calcia–titania, showing the
+            compound Ca4Ti3O10. Journal of
+            Research of NBS. 1958;61:437-440
+            [8] Lazaro SR. Estudo teorico-
+
+            experimental do titanato de
+            calcio—CaTiO3 [thesis]. Sao Carlos:
+            Universidade Estadual Paulista, Intituto
+            de Quimica; 2002. p. 57
+            [9] Wartenberg HV, Reusch HJ, Saran E.
+
+            Schmelzpunktsdiagramme
+            hochstfeuerfester oxyde. VII. Systeme
+            mit CaO und BeO. Zeitschrift für
+            133
+
+            Anorganische und Allgemeine Chemie.
+            1937;230:257-276
+            [10] Pontes FM, Pinheiro CD, Longo E,
+            Leite ER, Lazaro SR, Varela JA, et al.
+            The role of network modifiers in the
+            creation of photoluminescence in
+            CaTiO3. Materials Chemistry and
+            Physics. 2003;78:227-233
+            [11] Tulgar HE. Solid state relationships
+
+            in the system calcium oxide—Titanium
+            dioxide. Istanbul Teknik Üniversitesi
+            Bülteni. 1976;29:111-129
+            [12] Kisel NG, Limar TF,
+
+            Cherednichenko IF. On calcium
+            dititanate. Russian Journal
+            of Inorganic Chemistry. 1972;8:
+            1782-1785
+            [13] Pfaff G. Peroxide route to synthesize
+            calcium titanate powders of different
+            composition. Journal of the European
+            Ceramic Society. 1992;9:293-299
+            [14] Seko A, Hayashi H, Kashima H,
+
+            Tanaka I. Matrix- and tensor-based
+            recommender systems for the discovery
+            of currently unknown inorganic
+            compounds. Physical Review Materials.
+            2018;2:13805-1-13805-9
+            [15] Savenko VG, Sakharov VV.
+
+            Formation of calcium titanate Ca2Ti5O12
+            on thermolysis of mixed titanium and
+            calcium hydroxides. Russian Journal of
+            Inorganic Chemistry. 1979;24:1389-1391
+            [16] Limar TF, Kisel NG,
+            Cherednichenko IF, Savos’kina AI. On
+            calcium tetratitanate. Russian Journal of
+            Inorganic Chemistry. 1972;17:559-561
+            [17] Oganov AR, Ma Y, Lyakhov AO,
+
+            Valle M, Gatti C. Evolutionary crystal
+            structure prediction as a method for the
+            discovery of minerals and materials.
+            Reviews in Mineralogy and
+            Geochemistry. 2010;71:271-298
+        - locator: {published_page: 134, pdf_page_index: 23, section: References}
+          printed_reference_page_text: |-
+            Perovskite and Piezoelectric Materials
+
+            [18] DeVries RC, Roy R, Osborn EF.
+            Phase equilibria in the system CaO–
+            TiO2. The Journal of Physical Chemistry.
+            1954;58:1069-1073
+            [19] Gong W, Wu L, Navrotsky A.
+            Combined experimental and
+            computational investigation of
+            thermodynamics and phase equilibria in
+            the CaO–TiO2 system. Journal of the
+            American Ceramic Society. 2018;101:
+            1361-1370
+            [20] Kelley KK, Mah AD. Metallurgical
+            thermochemistry of titanium. U. S. Bur.
+            Min. Repts. 1959. No. 5490. 48 p
+            [21] Reznitskii LA, Guzei AS.
+            Thermodynamic properties of alkaline
+            earth titanates, zirconates, and hafnates.
+            Russian Chemical Reviews. 1978;47:
+            99-119
+            [22] Robie RA, Hemingway BS.
+            Thermodynamic properties of mineral
+            and related substances at 298.15 K and 1
+            bar (105 Pascals) pressure and high
+            temperatures. U. S. Geol. Surv. Bull.
+            1995. No. 2131. p. 461
+            [23] Barin I. Thermochemical Data of
+            Pure Substances. VCH: Weinheim; 1995.
+            p. 2003
+            [24] Bale CW, Belisle E, Chartrand P,
+            Decterov SA, Eriksson G, Gheribi AE,
+            et al. FactSage thermochemical software
+            and databases, 2010–2016. Calphad.
+            2016;54:35-53
+            [25] Shomate CH. Heat capacities at low
+            temperatures of the metatitanates of
+            iron, calcium and magnesium. Journal of
+            the American Chemical Society. 1946;
+            68:964-966
+            [26] Woodfield BF, Shapiro JL,
+            Stevens R, Boerio-Goates J, Putnam RL,
+            Helean KB, et al. Molar heat capacity
+            and thermodynamic functions for
+            CaTiO3. The Journal of Chemical
+            Thermodynamics. 1999;31:1573-1583
+            [27] Buykx WJ. Specific heat, thermal
+            diffusivity and thermal conductivity of
+            synroc, perovskite, zirconolite and
+            barium hollandite. Journal of Nuclear
+            Materials. 1982;107:78-82
+            [28] Sato T, Yamazaki S, Yamashita T,
+            Matsui T, Nagasaki T. Enthalpy and heat
+            capacity of (Ca1–xPux)TiO3 (x = 0 and
+            0.20). Journal of Nuclear Materials.
+            2001;294:135-140
+            [29] Naylor BF, Cook OA. High-
+            temperature contents of the
+            metatitanates of calcium, iron and
+            magnesium. Journal of the American
+            Chemical Society. 1946;68:1003-1005
+            [30] Guyot F, Richet P, Courtial P,
+            Gillet P. High-temperature heat capacity
+            and phase transitions of CaTiO3
+            perovskite. Physics and Chemistry of
+            Minerals. 1993;20:141-146
+            [31] Yashima M, Ali R. Structural phase
+            transition and octahedral tilting in the
+            calcium titanate perovskite CaTiO3.
+            Solid State Ionics. 2009;180:120-126
+            [32] Panfilov BI, Fedos’ev NN. Heat of
+            formation of metatitanate calcium,
+            strontium and barium. Russian Journal
+            of Inorganic Chemistry. 1964;9:
+            2685-2692
+            [33] Kelley KK, Todd SS, King EG. Heat
+            and free energy data for titanates of iron
+            and the alkaline-earth metals. U. S. Bur.
+            Min. Repts. 1954. No. 5059. p. 37
+            [34] Feng D, Shivaramaiah R,
+            Navrotsky A. Rare-earth perovskites
+            along the CaTiO3–Na0.5La0.5TiO3 join:
+            Phase transitions, formation enthalpies,
+            and implications for loparite minerals.
+            American Mineralogist. 2016;101:
+            2051-2056
+            [35] Rezukhina TN, Levitskii VA,
+            Frenkel’ MY. Thermodynamic
+            properties of barium and calcium
+            tungstates. Russian Inorganic Materials.
+            1966;2:325-331
+
+            134
+        - locator: {published_page: 135, pdf_page_index: 24, section: References}
+          printed_reference_page_text: |-
+            Thermodynamics of Perovskite: Solid, Liquid, and Gas Phases
+            DOI: http://dx.doi.org/10.5772/intechopen.91309
+
+            [36] Jacob KT, Abraham KP.
+            Thermodynamic properties of calcium
+            titanates: CaTiO3, Ca4Ti3O10, and
+            Ca3Ti2O7. The Journal of Chemical
+            Thermodynamics. 2009;41:816-820
+            [37] Putnam RL, Navrotsky A,
+            Woodfield BF, Boerio-Goates J,
+            Shapiro JL. Thermodynamics of
+            formation for zirconolite (CaZrTi2O7)
+            from T = 298.15 K to T = 1500 K. The
+            Journal of Chemical Thermodynamics.
+            1999;31:229-243
+            [38] Navi NU, Shneck RZ, Shvareva TY,
+            Kimmel G, Zabicky J, Mintz MH, et al.
+            Thermochemistry of (CaxSr1–x)TiO3,
+            (BaxSr1–x)TiO3, and (BaxCa1–x)TiO3
+            perovskite solid solutions. Journal of the
+            American Ceramic Society. 2012;95:
+            1717-1726
+            [39] Sahu SK, Maram PS, Navrotsky A.
+            Thermodynamics of nanoscale calcium
+            and strontium titanate perovskites.
+            Journal of the American Ceramic
+            Society. 2013;96:3670-3676
+            [40] Helean KB, Navrotsky A, Vance ER, Carter ML, Ebbinghaus B, Krikorian O, et al. Enthalpies of formation of Ce-pyrochlore, Ca0.93Ce1.00Ti2.035O7.00, U-pyrochlore, Ca1.46U^{4+}_{0.23}U^{6+}_{0.46}Ti1.85O7.00 and Gd-pyrochlore, Gd2Ti2O7: Three materials relevant to the proposed waste form for excess weapons plutonium. Journal of Nuclear Materials. 2002;303:226-239
+            [41] Takayama-Muromachi E,
+            Navrotsky A. Energetics of compounds
+            (A2+B4+O3) with the perovskite
+            structure. Journal of Solid State
+            Chemistry. 1988;72:244-256
+            [42] Prasanna TRS, Navrotsky A.
+            Energetics in the brownmillerite-
+            perovskite pseudobinary Ca2Fe2O5–
+            CaTiO3. Journal of Materials Research.
+            1994;9:3121-3124
+            [43] Linton J, Navrotsky A, Fei Y. The
+            thermodynamics of ordered perovskites
+            on the CaTiO3–FeTiO3 join. Physics
+            and Chemistry of Minerals. 1998;25:
+            591-596
+            [44] Koito S, Akaogi M, Kubota O,
+            Suzuki T. Calorimetric measurements of
+            perovskites in the system CaTiO3–
+            CaSiO3 and experimental and calculated
+            phase equilibria for high-pressure
+            dissociation of diopside. Physics of the
+            Earth and Planetary Interiors. 2000;120:
+            1-10
+            [45] Golubenko AN, Rezukhina TN.
+            Thermodynamic properties of calcium
+            titanate from electrochemical
+            measurements at elevated temperatures.
+            Russian Journal of Physical Chemistry.
+            1964;38:2920-2923
+            [46] Gillet P, Guyot F, Price GD,
+            Tournerie B, LeCleach A. Phase changes
+            and thermodynamic properties of
+            CaTiO3. Spectroscopic data, vibrational
+            modelling and some insights on the
+            properties of MgSiO3 perovskite.
+            Physics and Chemistry of Minerals.
+            1993;20:159-170
+            [47] Klimm D, Schmidt M, Wolff N,
+            Guguschev C, Ganschow S. On melt
+            solutions for the growth of CaTiO3
+            crystals. Journal of Crystal Growth.
+            2018;486:117-121
+            [48] Shornikov SI. High-temperature
+            mass spectrometric study of the
+            thermodynamic properties of CaTiO3
+            perovskite. Russian Journal of Physical
+            Chemistry A. 2019;93:1428-1434
+            [49] Topor ND, Suponitskii YL. The
+            high-temperature microcalorimetry of
+            inorganic substances. Russian Chemical
+            Reviews. 1984;53:827-850
+            [50] Aronson S. Estimation of the heat of
+            formation of refractory mixed oxides.
+            Journal of Nuclear Materials. 1982;107:
+            343-346
+            [51] Taylor RW, Schmalzried H. The free
+            energy of formation of some titanates,
+
+            135
+        - locator: {published_page: 136, pdf_page_index: 25, section: References}
+          printed_reference_page_text: |-
+            Perovskite and Piezoelectric Materials
+
+            silicates and magnesium aluminate from
+            measurements made with galvanic cells
+            involving solid electrolyte. The Journal of
+            Physical Chemistry. 1964;68:2444-2449
+            [52] Banon S, Chatillon C, Allibert M.
+            Free energy of mixing in CaTiO3–Ti2O3–
+            TiO2 melts by mass spectrometry.
+            Canadian Metallurgical Quarterly. 1981;
+            20:79-84
+            [53] Shornikov SI, Archakov IY. Mass
+            spectrometric study of thermodynamic
+            properties of the SiO2–CaTiO3 melts. In:
+            Kudin L, Butman M, Smirnov A,
+            editors. Proc. II Intern. Symp. on High
+            Temperature Mass Spectrometry.
+            Ivanovo: ISUCST; 2003. pp. 112-116
+            [54] Cho SW, Suito H. Thermodynamics
+            of oxygen and nitrogen in liquid nickel
+            equilibrated with CaO–TiOx and CaO–
+            TiOx–Al2O3 melts. Metallurgical and
+            Materials Transactions A. 1994;25:5-13
+            [55] Kishi M, Suito H. Thermodynamics
+            of oxygen, nitrogen and sulfur in liquid
+            iron equilibrated with CaO–TiOx and
+            CaO–TiOx–Al2O3 melts. Steel Research.
+            1994;65:261-266
+            [56] Shornikov SI, Archakov IY,
+            Shultz MM. Thermodynamic properties
+            of the melts, containing titanium
+            dioxide. In: Gorynin IV, Ushkov SS,
+            editors. Proc. 9th World Conf. on
+            Titanium. Vol. 3. Saint-Petersburg:
+            Prometey; 2000. pp. 1469-1473
+            [57] Glushko VP, Gurvich LV,
+            Bergman GA, Veitz IV, Medvedev VA,
+            Khachkuruzov GA, et al.
+            Thermodynamic Properties of
+            Individual Substances. Moscow: Nauka;
+            1978–1982 [in Russian]
+            [58] Chase MW. NIST-JANAF
+            themochemical tables. Journal of
+            Physical and Chemical Reference Data.
+            1998. p. 1951
+            [59] Nerad I, Danek V. Thermodynamic
+            analysis of pseudobinary subsystems of
+            the system CaO–TiO2–SiO2. Chemical
+            Papers. 2002;56:77-83
+            [60] Seo W-G, Zhou D, Tsukihashi F.
+            Calculation of thermodynamic
+            properties and phase diagrams for the
+            CaO–CaF2, BaO–CaO and BaO–CaF2
+            systems by molecular dynamics
+            simulation. Materials Transactions.
+            2005;46:643-650
+            [61] Bottinga Y, Richet P.
+            Thermodynamics of liquid silicates, a
+            preliminary report. Earth and Planetary
+            Science Letters. 1978;40:382-400
+            [62] Kulikov IS. Thermal Dissociation of
+            Compounds. 2nd ed. Metallurgiya:
+            Moscow; 1969. p. 576 [in Russian]
+            [63] Stolyarova VL, Zhegalin DO,
+            Stolyar SV. Mass spectrometric study of
+            the thermodynamic properties of melts
+            in the CaO–TiO2–SiO2 system. Glass
+            Physics and Chemistry. 2004;30:
+            142-150
+            [64] Shornikov SI. Thermodynamic
+            properties of CaO–TiO2 system:
+            Experimental data and calculations. In:
+            Gladyshev PP, editor. Physical and
+            Analytical Chemistry of Natural and
+            Technogenic Systems, New
+            Technologies and Materials—
+            Khodakovsky’s Readings. Dubna: Dubna
+            State University; 2019. pp. 185-190 [in
+            Russian]
+            [65] Lewis GN, Randall M.
+            Thermodynamics and the Free Energy
+            of Chemical Substances. N. Y. &
+            London: McGrow-Hill Book Comp.;
+            1923. p. 676
+            [66] Belton GR, Fruehan RJ. The
+            determination of activities of mass
+            spectrometry: Some additional methods.
+            Metallurgical and Materials
+            Transactions B. 1971;2:291-296
+            [67] Prigogine I, Defay R. Chemical
+            Thermodynamics. London: Longman;
+            1954. p. 543
+
+            136
+        - locator: {published_page: 137, pdf_page_index: 26, section: References}
+          printed_reference_page_text: |-
+            Thermodynamics of Perovskite: Solid, Liquid, and Gas Phases
+            DOI: http://dx.doi.org/10.5772/intechopen.91309
+
+            [68] Shornikov SI, Archakov IY. Mass
+            spectrometric study of phase relations
+            and vaporization processes in the
+            CaO–SiO2 system. Glass Science and
+            Technology: International Journal of the
+            German Society of Glass Technology.
+            2000;73C2:51-57
+            [69] Shornikov SI, Stolyarova VL,
+            Shultz MM. A mass-spectrometric study
+            of vapor composition and
+            thermodynamic properties of CaO–
+            Al2O3 melts. Russian Journal of Physical
+            Chemistry. 1997;71:19-22
+            [70] Kulikov IS. Thermodynamics of
+            Oxides. Metallurgiya: Moscow; 1986.
+            p. 344 [in Russian]
+            [71] Kazenas EK, Tsvetkov YV.
+            Evaporation of Oxides. Moscow: Nauka;
+            1997. p. 543 [in Russian]
+            [72] Balducci G, Gigli G, Guido M.
+            Identification and stability determinations
+            for the gaseous titanium oxide molecules
+            Ti2O3 and Ti2O4. The Journal of Chemical
+            Physics. 1985;83:1913-1916
+            [73] Zakharov VP, Protas IM. Mass
+            spectrometric study of ion emission
+            during evaporation of complex
+            substances under the influence of laser
+            radiation. Izvestiya Akademii Nauk
+            SSSR. Seriya Fizicheskaya (Bulletin of
+            the Russian Academy of Sciences:
+            Physics) 1974;38:238-243
+            [74] Schwarz H, Tourltellotte HA.
+            Vacuum deposition by high-energy laser
+            with emphasis on barium titanate films.
+            Journal of Vacuum Science and
+            Technology B. 1969;6:373-378
+            [75] Hao J, Si W, Xia XX, Guo R,
+            Bhalla AS, Cross LE. Dielectric
+            properties of pulsed-laser-deposited
+            calcium titanate thin films. Applied
+            Physics Letters. 2000;76:3100-3102
+            [76] Knox BE. Laser ion source analysis of
+            solids. In: Ahearn AJ, editor. Trace
+            Analysis by Mass Spectrometry. N. Y. &
+            London: Academic Press; 1972.
+            pp. 423-444
+            [77] Shornikov SI. Mass-spectrometric
+            study of perovskite evaporation.
+            Russian Journal of Physical
+            Chemistry A. 2019;93:866-873
+            [78] Samoilova IO, Kazenas EK.
+            Thermodynamics of dissociation and
+            sublimation of calcium oxide. Russel
+            Metals. 1995:33-35
+            [79] Shornikov SI. Evaporation processes
+            and thermodynamic properties of the
+            CaO–Al2O3–SiO2 system and the
+            materials based on this system [thesis].
+            Institute of Silicate Chemistry of RAS:
+            Saint-Petersburg; 1993. p. 21 [in Russian]
+            [80] Groves WO, Hoch M, Johnston HL.
+            Vapor–solid equilibria in the titanium–
+            oxygen system. The Journal of Physical
+            Chemistry. 1955;59:127-131
+            [81] Berkowitz J, Chupka WA,
+            Inghram MG. Thermodynamics of the
+            Ti–Ti2O3 system and the dissociation
+            energy of TiO and TiO2. The Journal of
+            Physical Chemistry. 1957;61:1569-1572
+            [82] Archakov IY, Shornikov SI,
+            Tchemekova TY, Shultz MM. The
+            behavior of titanium dioxide in the slag
+            melts. In: Gorynin IV, Ushkov SS,
+            editors. Proc. 9th World Conf. on
+            Titanium. Vol. 3. Saint-Petersburg:
+            Prometey; 2000. pp. 1464-1468
+            [83] Ostrovski O, Tranell G,
+            Stolyarova VL, Shultz MM,
+            Shornikov SI, Ishkildin AI. High-
+            temperature mass spectrometric study
+            of the CaO–TiO2–SiO2 system. High
+            Temperature Materials and Processes.
+            2000;19:345-356
+            [84] Lopatin SI, Semenov GA.
+            Thermochemical study of gaseous salts
+            of oxygen-containing acids: XI.
+            Alkaline-earth metal titanates. Russ. J.
+            General Chemistry. 2001;71:1522-1526
+
+            137
+        - locator: {published_page: 138, pdf_page_index: 27, section: References}
+          printed_reference_page_text: |-
+            Perovskite and Piezoelectric Materials
+
+            [85] Shornikov SI, Yakovlev OI. Study of
+
+            complex molecular species in the gas
+            phase over the CaO–MgO–Al2O3–TiO2–
+            SiO2 system. Geochemistry
+            International. 2015;53:690-699
+            [86] Semenov GA. The evaporation of
+            titanium dioxide. Russian Inorganic
+            Materials. 1969;5:67-73
+            [87] Warren JW. Measurement of
+
+            appearance potentials of ions produced
+            by electron impact, using a mass
+            spectrometer. Nature. 1950;165:810-811
+            [88] Gurvich LV, Karachevtsev GV,
+
+            Kondratev VN, Lebedev YA,
+            Medvedev VA, Potapov VK, et al. Bond
+            Dissociation Energies, Ionization
+            Potentials, and Electron Affinity.
+            Moscow: Nauka; 1974. p. 351
+            [in Russian]
+            [89] Shornikov SI. Thermodynamic
+
+            study of the mullite solid solution region
+            in the Al2O3–SiO2 system by mass
+            spectrometric techniques. Geochemistry
+            International. 2002;40:S46-S60
+            [90] Komlev GA. On determination of
+            saturated steam pressure by effusion
+            method. Russian Journal of Physical
+            Chemistry. 1964;38:2747-2748
+            [91] Shornikov SI. Vaporization
+
+            coefficients of oxides contained in the
+            melts of Ca-Al-inclusions in chondrites.
+            Geochemistry International. 2015;53:
+            1080-1089
+
+            138
+        transcription_notes: 'Reference [22] prints 1 bar (105 Pascals), with 5 on the baseline; preserved as typography, without silently rewriting it as 10^5 Pa. Reference [40] subscripts and U oxidation-state superscripts were checked against the image and transcribed explicitly. Bibliography pp. 134–137 reads left column then right column; reference [43], [59] and [76] continuations immediately follow their left-column beginnings. Reference [51] starts on p. 135 and continues at the opening of p. 136, retaining both printed page locators.'
+    observations: []
+review_status: draft
