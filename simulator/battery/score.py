@@ -14150,8 +14150,8 @@ def _score_store_with_decisions(
     _engine_set: Sequence[Engine] | None = None,
     _refs: Sequence[Observation] | None = None,
     _stream: _ResidualJsonlStream | None = None,
-    _progress_callback: Callable[[], None] | None = None,
     _shard_failure_reason: str | None = None,
+    _skip_sort_orders: frozenset[tuple[str, int, int, int]] = frozenset(),
 ) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
     prepared = _prepared or _prepare_score_run(
         context,
@@ -14369,16 +14369,18 @@ def _score_store_with_decisions(
                             assert residuals is not None
                             residuals.append(residual)
                         else:
-                            _stream.append(
-                                residual,
-                                candidate,
-                                sort_order=(
-                                    obs.observation_id,
-                                    point_index,
-                                    engine_order[engine],
-                                    0,
-                                ),
+                            sort_order = (
+                                obs.observation_id,
+                                point_index,
+                                engine_order[engine],
+                                0,
                             )
+                            if sort_order not in _skip_sort_orders:
+                                _stream.append(
+                                    residual,
+                                    candidate,
+                                    sort_order=sort_order,
+                                )
                         if (
                             residual.fo2_mode is Fo2Mode.SHARED_LADDER
                             and intrinsic_redox_activity
@@ -14422,24 +14424,24 @@ def _score_store_with_decisions(
                                 assert residuals is not None
                                 residuals.append(intrinsic_residual)
                             else:
-                                _stream.append(
-                                    intrinsic_residual,
-                                    intrinsic_candidate,
-                                    sort_order=(
-                                        obs.observation_id,
-                                        point_index,
-                                        engine_order[engine],
-                                        1,
-                                    ),
+                                sort_order = (
+                                    obs.observation_id,
+                                    point_index,
+                                    engine_order[engine],
+                                    1,
                                 )
+                                if sort_order not in _skip_sort_orders:
+                                    _stream.append(
+                                        intrinsic_residual,
+                                        intrinsic_candidate,
+                                        sort_order=sort_order,
+                                    )
                             if intrinsic_candidate is not None and _stream is None:
                                 candidates[intrinsic_candidate.observation_id] = (
                                     intrinsic_candidate
                                 )
                         if candidate is not None and _stream is None:
                             candidates[candidate.observation_id] = candidate
-                        if _progress_callback is not None:
-                            _progress_callback()
                         done += 1
                         now = time.monotonic()
                         if now - last_progress >= 60:
@@ -14491,9 +14493,6 @@ _SCORE_WORKER_SETUP: (
     ]
 ) | None = None
 
-# This is a no-progress watchdog; engine calls keep their own per-cell timeouts.
-_SCORE_SHARD_IDLE_TIMEOUT_SECONDS = 5 * 60
-
 
 @dataclass(frozen=True)
 class _ScoreShardResult:
@@ -14502,6 +14501,7 @@ class _ScoreShardResult:
     counters: Mapping[str, Mapping[str, object]] | None = None
     runtime_identities: Mapping[str, str] | None = None
     failure: str | None = None
+    refused_rows: int = 0
 
 
 def _sum_engine_cache_counters(
@@ -14612,18 +14612,6 @@ def _score_shard_worker_error_result(
     )
 
 
-def _score_shard_timeout_result(
-    _task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
-    elapsed_seconds: float,
-) -> _ScoreShardResult:
-    return _ScoreShardResult(
-        failure=(
-            "score shard made no progress for "
-            f"{elapsed_seconds:.3f}s"
-        ),
-    )
-
-
 def _initialize_score_worker(
     prepared: _PreparedScoreRun,
     predict: Callable[..., EnginePrediction] | None,
@@ -14632,59 +14620,13 @@ def _initialize_score_worker(
     _SCORE_WORKER_SETUP = (prepared, predict)
 
 
-def _score_shard_start_marker_path(
-    task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
-) -> Path:
-    return Path(f"{task[3]}.started")
-
-
-def _score_shard_progress_marker_path(
-    task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
-) -> Path:
-    return Path(f"{task[3]}.progress")
-
-
-def _clear_score_shard_start_marker(
-    task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
-) -> None:
-    for marker in (
-        _score_shard_start_marker_path(task),
-        _score_shard_progress_marker_path(task),
-    ):
-        try:
-            marker.unlink()
-        except (FileNotFoundError, OSError):
-            continue
-
-
-def _score_shard_has_started(
-    task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
-) -> bool:
-    return _score_shard_start_marker_path(task).is_file()
-
-
-def _score_shard_progress_time(
-    task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
-) -> int | None:
-    try:
-        return _score_shard_progress_marker_path(task).stat().st_mtime_ns
-    except OSError:
-        return None
-
-
 def _score_group_shard(
     task: tuple[int, Engine, tuple[Observation, ...], str, str | None]
 ) -> _ScoreShardResult:
     prepared, predict = _SCORE_WORKER_SETUP or (None, None)
     if prepared is None:
         raise RuntimeError("battery score worker was not initialized")
-    shard_index, engine, refs, path_text, root_text = task
-    del shard_index
-    start_marker = _score_shard_start_marker_path(task)
-    start_marker.parent.mkdir(parents=True, exist_ok=True)
-    start_marker.write_text(f"{os.getpid()}\n", encoding="utf-8")
-    progress_marker = _score_shard_progress_marker_path(task)
-    progress_marker.touch()
+    _shard_index, engine, refs, path_text, root_text = task
     stream = _ResidualJsonlStream(
         Path(path_text),
         root=None if root_text is None else Path(root_text),
@@ -14704,7 +14646,6 @@ def _score_group_shard(
             _engine_set=(engine,),
             _refs=refs,
             _stream=stream,
-            _progress_callback=progress_marker.touch,
         )
         counters = engine_cache_counters(reset=True)
         runtime_identities = engine_cache_runtime_identities()
@@ -14716,7 +14657,6 @@ def _score_group_shard(
         )
     finally:
         stream.close()
-        _clear_score_shard_start_marker(task)
         from simulator.diagnostic_helpers.binary_pot_battery import (
             _close_isolated_cell_workers,
         )
@@ -14728,35 +14668,84 @@ def _materialize_failed_score_shard(
     task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
     result: _ScoreShardResult,
     prepared: _PreparedScoreRun,
+    *,
+    expected_header: bytes,
 ) -> _ScoreShardResult:
     if result.failure is None:
         return result
     path = Path(task[3])
     partial_path = path.with_name(path.name + ".partial")
     order_path = partial_path.with_name(partial_path.name + ".order")
-    partial_path.unlink(missing_ok=True)
-    order_path.unlink(missing_ok=True)
-    failure_stream = _ResidualJsonlStream(
-        path,
+    recovered_path = path.with_name(path.name + ".recovered")
+    recovered_stream = _ResidualJsonlStream(
+        recovered_path,
         root=None if task[4] is None else Path(task[4]),
         sort_on_finalize=False,
     )
+    completed_orders: set[tuple[str, int, int, int]] = set()
     try:
+        if partial_path.is_file() and order_path.is_file():
+            with (
+                partial_path.open("rb") as shard,
+                order_path.open("rb") as order_file,
+            ):
+                if shard.readline() == expected_header:
+                    order_lines = iter(order_file)
+                    for line in shard:
+                        if not line.endswith(b"\n"):
+                            break
+                        try:
+                            order_line = next(order_lines)
+                        except StopIteration:
+                            break
+                        if not order_line.endswith(b"\n"):
+                            break
+                        try:
+                            payload = json.loads(line)
+                            order_value = json.loads(order_line)
+                        except (UnicodeDecodeError, json.JSONDecodeError):
+                            continue
+                        if (
+                            not isinstance(payload, Mapping)
+                            or is_store_stamp_payload(payload)
+                            or not isinstance(order_value, list)
+                            or len(order_value) != 4
+                            or not isinstance(order_value[0], str)
+                            or any(
+                                type(value) is not int for value in order_value[1:]
+                            )
+                        ):
+                            continue
+                        stable_order = (
+                            order_value[0],
+                            order_value[1],
+                            order_value[2],
+                            order_value[3],
+                        )
+                        if stable_order in completed_orders:
+                            continue
+                        recovered_stream.append_payload_line(
+                            line,
+                            sort_order=stable_order,
+                        )
+                        completed_orders.add(stable_order)
         _score_store_with_decisions(
             prepared.context,
             _prepared=prepared,
             _engine_set=(task[1],),
             _refs=task[2],
-            _stream=failure_stream,
+            _stream=recovered_stream,
             _shard_failure_reason=result.failure,
+            _skip_sort_orders=frozenset(completed_orders),
         )
         return replace(
             result,
-            partial_path=str(failure_stream.partial_path),
-            row_count=failure_stream.count,
+            partial_path=str(recovered_stream.partial_path),
+            row_count=recovered_stream.count,
+            refused_rows=recovered_stream.count - len(completed_orders),
         )
     finally:
-        failure_stream.close()
+        recovered_stream.close()
 
 
 def _score_store_to_jsonl(
@@ -14789,7 +14778,7 @@ def _score_store_to_jsonl(
 
     cache_counters: dict[str, dict[str, object]] | None = None
     cache_runtime_identities: dict[str, str] | None = None
-    shard_failures: list[str] = []
+    shard_failures: list[Mapping[str, object]] = []
     try:
         if workers == 1:
             engine_cache_counters(reset=True)
@@ -14860,11 +14849,7 @@ def _score_store_to_jsonl(
                             predict,
                         ),
                         mp_context=mp.get_context("spawn"),
-                        timeout_seconds=_SCORE_SHARD_IDLE_TIMEOUT_SECONDS,
-                        has_started=_score_shard_has_started,
-                        progress_time=_score_shard_progress_time,
-                        before_submit=_clear_score_shard_start_marker,
-                        handle_timeout=_score_shard_timeout_result,
+                        timeout_seconds=None,
                         handle_worker_error=_score_shard_worker_error_result,
                     )
                     with stream.partial_path.open("rb") as output:
@@ -14878,10 +14863,15 @@ def _score_store_to_jsonl(
                                 task,
                                 shard_result,
                                 prepared,
+                                expected_header=header,
                             )
                             shard_failures.append(
-                                f"chunk={task[0]} engine={task[1].value}: "
-                                f"{shard_result.failure}"
+                                {
+                                    "chunk": task[0],
+                                    "engine": task[1].value,
+                                    "reason": shard_result.failure,
+                                    "refused_rows": shard_result.refused_rows,
+                                }
                             )
                         if shard_result.partial_path is None:
                             raise RuntimeError("score shard returned no residual file")
@@ -14945,7 +14935,11 @@ def _score_store_to_jsonl(
             print(
                 "score run notice: failed score shards were written as "
                 "ATTEMPTED_UNAVAILABLE rows: "
-                + "; ".join(shard_failures),
+                + "; ".join(
+                    "chunk={chunk} engine={engine} refused_rows={refused_rows}: "
+                    "{reason}".format(**failure)
+                    for failure in shard_failures
+                ),
                 file=sys.stderr,
                 flush=True,
             )
@@ -15219,7 +15213,7 @@ class _ResidualReportMetadata:
     aggregate: _ScorePayloadAccumulator | None = None
     engine_cache_counters: Mapping[str, Mapping[str, object]] | None = None
     engine_cache_runtime_identities: Mapping[str, str] | None = None
-    shard_failures: tuple[str, ...] = ()
+    shard_failures: tuple[Mapping[str, object], ...] = ()
 
 
 class _ResidualJsonlRows:
@@ -19278,6 +19272,7 @@ def _render_score_report_from_payloads_legacy(
     studio_hostname: str | None = None,
     store_stamp: Mapping[str, object] | None = None,
     _aggregate: _ScorePayloadAccumulator | None = None,
+    shard_failures: Sequence[Mapping[str, object]] = (),
 ) -> str:
     aggregate = _aggregate or _ScorePayloadAccumulator.from_rows(
         rows, context=context, engines=engines
@@ -19549,8 +19544,35 @@ def _render_score_report_from_payloads_legacy(
         )
     elif has_residuals:
         lines.extend(["", "All mapped legacy keys have a v2.1 comparison slot."])
+    if shard_failures:
+        lines.extend(["", *_score_shard_failure_report_lines(shard_failures)])
     lines.append("")
     return "\n".join(lines)
+
+
+def _score_shard_failure_report_lines(
+    failures: Sequence[Mapping[str, object]],
+) -> list[str]:
+    lines = [
+        "## Score shard failures",
+        "",
+        "Failed shards were completed with typed refusals for rows that had no output.",
+        "",
+        "| chunk | engine | refused rows | reason |",
+        "|---:|---|---:|---|",
+    ]
+    for failure in failures:
+        reason = (
+            str(failure.get("reason", ""))
+            .replace("|", "\\|")
+            .replace("`", "\\`")
+            .replace("\n", " ")
+        )
+        lines.append(
+            f"| {failure.get('chunk', '—')} | {failure.get('engine', '—')} | "
+            f"{failure.get('refused_rows', 0)} | `{reason}` |"
+        )
+    return lines
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -20046,9 +20068,18 @@ class _ResidualJsonlStream:
         numeric_value: str | None,
         sort_order: tuple[str, int, int, int] | None,
     ) -> None:
+        stable_order = sort_order or ("", self.count, 0, 0)
+        if not self.sort_on_finalize:
+            assert self._order_file is not None
+            # The sidecar is written first. After both flushes, each complete
+            # residual line has exactly one recoverable serial-order entry.
+            self._order_file.write(
+                json.dumps(stable_order, ensure_ascii=False, separators=(",", ":"))
+                + "\n"
+            )
+            self._order_file.flush()
         offset = self.file.tell()
         self.file.write(line + b"\n")
-        stable_order = sort_order or ("", self.count, 0, 0)
         if self.sort_on_finalize:
             self._pending.append(
                 (
@@ -20064,11 +20095,9 @@ class _ResidualJsonlStream:
             if len(self._pending) >= self._INDEX_BATCH:
                 self._flush_index()
         else:
-            assert self._order_file is not None
-            self._order_file.write(
-                json.dumps(stable_order, ensure_ascii=False, separators=(",", ":"))
-                + "\n"
-            )
+            # Shard workers may die without running Python cleanup. A flushed
+            # line is therefore the unit recovery can safely preserve.
+            self.file.flush()
         self.count += 1
         now = time.monotonic()
         if self.count % self._FLUSH_LINES == 0 or now - self._last_flush >= 5:
@@ -20088,9 +20117,9 @@ class _ResidualJsonlStream:
         self._pending.clear()
 
     def flush(self) -> None:
-        self.file.flush()
         if self._order_file is not None:
             self._order_file.flush()
+        self.file.flush()
         self._last_flush = time.monotonic()
 
     def finalize(
@@ -21154,10 +21183,14 @@ def _write_headline_summary_from_accumulator_json(
     path: Path,
     *,
     store_stamp: Mapping[str, object] | None,
+    shard_failures: Sequence[Mapping[str, object]] = (),
 ) -> None:
-    _write_headline_summary_payload_json(
-        aggregate.summary_payload(store_stamp), path
-    )
+    payload = aggregate.summary_payload(store_stamp)
+    if shard_failures:
+        payload["score_shard_failures"] = [
+            dict(failure) for failure in shard_failures
+        ]
+    _write_headline_summary_payload_json(payload, path)
 
 
 def _write_headline_summary_payload_json(
