@@ -154,7 +154,9 @@ def _cro2_train_sim():
 
 
 def _bypass_analytic_depletion(sim):
-    sim._apply_analytic_evaporation_depletion = lambda flux: flux
+    # b-1146 calls this with the tick duration. The double still skips
+    # depletion; it only has to accept the duration the caller now passes.
+    sim._apply_analytic_evaporation_depletion = lambda flux, *, dt_hr=1.0: flux
     sim.campaign_mgr.check_endpoint = lambda *args, **kwargs: False
 
 

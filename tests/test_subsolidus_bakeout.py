@@ -701,7 +701,8 @@ def test_joint_release_stays_within_pipe_capacity():
         return original(**kwargs)
 
     sim._apply_c0_bakeout = _bakeout
-    sim._apply_analytic_evaporation_depletion = lambda flux: flux
+    # b-1146 passes the tick duration. The double still skips depletion.
+    sim._apply_analytic_evaporation_depletion = lambda flux, *, dt_hr=1.0: flux
     sim.step()
     decision = [
         call for call in transport_calls

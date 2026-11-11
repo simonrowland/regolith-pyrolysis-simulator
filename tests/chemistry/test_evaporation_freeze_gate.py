@@ -1246,9 +1246,15 @@ def test_freeze_gate_dispatches_intrinsic_fo2_to_declared_gate(
 
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
+            # Fe is the only species in the equilibrium sample, so it is the
+            # only carrier with a molar mass. A Na stub is omitted by the
+            # same-hour closure as a missing molar mass, which hides the
+            # freeze scaling this test is checking. No series row keeps the
+            # Fe rate an unclosed provider estimate, so the gate still
+            # scales 10 kg/hr by the liquid fraction.
             return SimpleNamespace(
                 status='ok',
-                diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
+                diagnostic={'evaporation_flux_kg_hr': {'Fe': 10.0}},
             )
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
             captured.append((intent, kwargs))
@@ -1276,7 +1282,7 @@ def test_freeze_gate_dispatches_intrinsic_fo2_to_declared_gate(
 
     flux = sim._calculate_evaporation(_equilibrium())
 
-    assert flux.species_kg_hr['Na'] == pytest.approx(5.0)
+    assert flux.species_kg_hr['Fe'] == pytest.approx(5.0)
     assert [intent for intent, _ in captured] == [
         ChemistryIntent.GATE_LIQUID_FRACTION,
     ]
@@ -1417,9 +1423,12 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
 
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
+            # Same sampled-carrier constraint as the intrinsic-fO2 test:
+            # Fe has a molar mass, Na does not, and the missing series row
+            # leaves freeze scaling on the unclosed provider rate.
             return SimpleNamespace(
                 status='ok',
-                diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
+                diagnostic={'evaporation_flux_kg_hr': {'Fe': 10.0}},
             )
         return original_dispatch(intent, *args, **kwargs)
 
@@ -1429,7 +1438,7 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
     for temperature_C in (950.0, 1150.0, 1400.0):
         sim.melt.temperature_C = temperature_C
         flux = sim._calculate_evaporation(_equilibrium())
-        rates.append(flux.species_kg_hr.get('Na', 0.0))
+        rates.append(flux.species_kg_hr.get('Fe', 0.0))
 
     assert rates == pytest.approx([0.0, 5.0, 10.0])
     assert len(authoritative.requests) == 1

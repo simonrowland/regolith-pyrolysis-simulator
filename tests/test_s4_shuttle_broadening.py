@@ -128,7 +128,7 @@ def test_c3_step_refreshes_equilibrium_after_shuttle_before_evaporation(
     monkeypatch.setattr(
         sim,
         "_apply_analytic_evaporation_depletion",
-        lambda flux: flux,
+        lambda flux, *, dt_hr=1.0: flux,
     )
     monkeypatch.setattr(sim, "_update_melt_composition", lambda flux: None)
     monkeypatch.setattr(sim, "_get_turbine_spec", lambda: None)
