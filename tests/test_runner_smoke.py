@@ -1182,7 +1182,9 @@ def _run_scenario(scenario: dict, *, capture: bool = False):
 def _assert_authoritative_flux_capture(payload: dict, capture: dict) -> None:
     assert payload.get("status") == "ok", (
         "runner output must complete successfully before its flux or ledger "
-        f"digests are accepted, got {payload.get('status')!r}"
+        f"digests are accepted; status={payload.get('status')!r}, "
+        f"reason={payload.get('reason')!r}, "
+        f"error_message={payload.get('error_message')!r}"
     )
     flux_maps = capture.get("flux_maps")
     assert flux_maps, (
@@ -1213,7 +1215,8 @@ def _assert_authoritative_flux_capture(payload: dict, capture: dict) -> None:
     )
 
 
-def _flux_ledger_pins(capture: dict) -> dict[str, str]:
+def _flux_ledger_pins(payload: dict, capture: dict) -> dict[str, str]:
+    _assert_authoritative_flux_capture(payload, capture)
     assert capture["flux_maps"], (
         "cannot calculate runner flux digest from an empty provider capture"
     )
@@ -2102,7 +2105,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     actual, capture, expected_text = runner_golden_loader(scenario)
     expected = json.loads(expected_text)
 
-    _assert_authoritative_flux_capture(actual, capture)
+    pins = _flux_ledger_pins(actual, capture)
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
     assert actual["status"] == "ok"
@@ -2117,7 +2120,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         "`python3 scripts/regenerate_runner_goldens.py` if the change is "
         "intentional; the bare simulator.runner CLI omits scenario inputs."
     )
-    assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
+    assert pins == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
     if scenario["name"] == "mars_basalt_C2A_12h":
         # Pin the merged d-137 envelope while keeping t-423's default carrier
         # covered. d-137 adds wall-deposit authority metadata to each row.

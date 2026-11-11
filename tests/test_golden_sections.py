@@ -43,9 +43,12 @@ def test_runner_byte_roundtrip_on_current_fixture(
     current = (ROOT / path).read_bytes()
     generated_current, directory = generated_runner_sections[scenario["name"]]
     assert generated_current == current
-    actual, _, expected_text = runner_golden_loader(scenario)
-    assert current == expected_text.encode() == json_bytes(actual)
+    actual, capture, expected_text = runner_golden_loader(scenario)
     files = read_sections(directory)
+    _assert_raw_flux_capture_continuity(
+        actual, current, files, capture["flux_maps"]
+    )
+    assert current == expected_text.encode() == json_bytes(actual)
     assert partition(load_json(current)) == files
     assert reassemble(files) == current
 
@@ -112,13 +115,21 @@ print(h.hexdigest())
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
 def test_raw_flux_capture_continuity(scenario, runner_golden_loader, generated_runner_sections):
-    _, capture, expected_text = runner_golden_loader(scenario)
+    payload, capture, expected_text = runner_golden_loader(scenario)
     current, directory = generated_runner_sections[scenario["name"]]
     assert current == expected_text.encode()
-    _assert_raw_flux_capture_continuity(current, read_sections(directory), capture["flux_maps"])
+    _assert_raw_flux_capture_continuity(
+        payload, current, read_sections(directory), capture["flux_maps"]
+    )
 
 
-def _assert_raw_flux_capture_continuity(current, files, flux_maps):
+def _assert_raw_flux_capture_continuity(payload, current, files, flux_maps):
+    assert payload.get("status") == "ok", (
+        "runner fixture must complete successfully before checking its flux "
+        f"capture; status={payload.get('status')!r}, "
+        f"reason={payload.get('reason')!r}, "
+        f"error_message={payload.get('error_message')!r}"
+    )
     assert reassemble(files) == current
     assert flux_maps, (
         "cannot validate flux capture continuity from an empty provider capture"
@@ -139,6 +150,10 @@ def test_value_only_fixture_move_roundtrips_with_capture_continuity(
 ):
     current, directory = generated_runner_sections[scenario["name"]]
     before = read_sections(directory)
+    run_payload, capture, _ = runner_golden_loader(scenario)
+    _assert_raw_flux_capture_continuity(
+        run_payload, current, before, capture["flux_maps"]
+    )
     payload = load_json(current)
     payload["per_hour_summary"][0]["T_C"] += 1.0
     moved_fixture = tmp_path / scenario["fixture"]
@@ -150,8 +165,9 @@ def test_value_only_fixture_move_roundtrips_with_capture_continuity(
     after = read_sections(destination)
     assert _runner_structure(after) == _runner_structure(before)
     assert _section_content_digest(after) != _section_content_digest(before)
-    _, capture, _ = runner_golden_loader(scenario)
-    _assert_raw_flux_capture_continuity(moved, after, capture["flux_maps"])
+    _assert_raw_flux_capture_continuity(
+        run_payload, moved, after, capture["flux_maps"]
+    )
 
 
 def _declaration(old, new):

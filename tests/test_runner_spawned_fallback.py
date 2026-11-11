@@ -22,7 +22,7 @@ def _run_lunar_with_unavailable_gate_engine(result_queue):
             "status": payload["status"],
             "gate_fallback": payload["melt_redox_gate_floor_fallback_engagement"],
             "flux_count": len(capture["flux_maps"]),
-            "flux_pins": _flux_ledger_pins(capture),
+            "flux_pins": _flux_ledger_pins(payload, capture),
             "active_hour_temperatures": [
                 float(row["T_C"])
                 for row in payload["per_hour_summary"]

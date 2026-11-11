@@ -2546,13 +2546,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         backend = provider._ensure_backend()
         if backend is None or not backend.is_available():
+            import multiprocessing
+
+            if multiprocessing.current_process().daemon:
+                reason = (
+                    "liquid_fraction_provider_unavailable_daemonic_process_"
+                    "cannot_start_child_workers"
+                )
+                detail = (
+                    "the MAGEMin liquid-fraction provider is unavailable, and "
+                    "a daemonic process cannot start child worker processes"
+                )
+            else:
+                reason = "liquid_fraction_provider_missing_input"
+                detail = reason
             raise EvaporationFluxRefusal(
-                'liquid_fraction_provider_missing_input',
+                reason,
                 {
-                    'reason': 'missing_input',
+                    'reason': reason,
                     'input': 'liquid_fraction_provider',
                     'provider': self._liquid_fraction_provider,
                     'status': 'unavailable',
+                    'detail': detail,
                 },
             )
 
