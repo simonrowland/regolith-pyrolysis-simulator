@@ -41,7 +41,13 @@ from simulator.optimize import pool as optimizer_pool
 from simulator.optimize import study
 from simulator.optimize.doe import SCIPY_SOBOL_SAMPLER, sample_recipe_candidates
 from simulator.optimize.evalspec import EvalSpec, cache_key
-from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
+from simulator.optimize.evaluate import (
+    FailureCategory,
+    MASS_BALANCE_ABORT_PCT,
+    RunReference,
+    ScoredResult,
+    _build_eval_inputs,
+)
 from simulator.optimize.evaluate import evaluate
 from simulator.optimize.knob_saturation import compute_knob_saturation
 from simulator.optimize.objective import (
@@ -6707,7 +6713,36 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     )
     assert good.returncode == 0, good.stderr
     assert (out_dir / "pareto.json").exists()
+    # This stub is where the congruent surface balance ADDS a CrO2 wall
+    # saturation-pressure refusal. The supply is below the mass-balance
+    # ledger resolution, so the wall entry is an authorized physical zero
+    # and the candidate still wins. The constrained-max 1-hour C0 smoke
+    # below is a different scenario: it does not remove this refusal.
     assert (out_dir / "winner.recipe.yaml").exists()
+    with sqlite3.connect(out_dir / "cache.sqlite") as conn:
+        stored_references = [
+            json.loads(raw)
+            for (raw,) in conn.execute("SELECT run_reference FROM results")
+        ]
+    cro2_booked = []
+    for reference in stored_references:
+        summary = reference.get("product_summary") or {}
+        for booking in summary.get("wall_supply_bound_bookings") or []:
+            if booking.get("species") == "CrO2":
+                cro2_booked.append((summary, booking))
+    assert cro2_booked, stored_references
+    summary, cro2 = cro2_booked[0]
+    assert summary["furnace_amortization_status"] == "available"
+    assert cro2["reason"] == "below_wall_supply_upper_bound"
+    assert cro2["deposit_kg"] == 0.0
+    assert cro2["supply_upper_bound_kg"] <= cro2["ledger_resolution_kg"]
+    assert cro2["ledger_resolution_kg"] == pytest.approx(
+        1000.0 * MASS_BALANCE_ABORT_PCT / 100.0
+    )
+    refused = (
+        summary.get("wall_deposit_sticking_authority") or {}
+    ).get("wall_saturation_pressure_refused_species") or []
+    assert "CrO2" in list(refused)
     status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
     assert status["status"] == "SUCCEEDED"
     assert status["success"] is True
@@ -6873,13 +6908,12 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    # d-376 amendment 1. lifespan_cost_status is wall_deposit_unavailable only
-    # while the wall figure is refused (has_positive_qualified_fouling is
-    # None). This 1-hour C0 smoke has no melt redox capacity, so the congruent
-    # surface balance republishes the vapour carriers the wall-sticking
-    # authority is built from, and that refusal is gone. resinter_threshold_kg
-    # is still null, so the status is threshold_unavailable and the consumed
-    # fraction stays empty. The fd4a97-alone gate still writes the winner.
+    # This 1-hour C0 smoke is not the stub above. The stub
+    # (test_cli_help_unknowns_and_budget_one_stub_run) is where the congruent
+    # surface balance ADDS a CrO2 wall saturation-pressure refusal, booked as
+    # an authorized zero. Here resinter_threshold_kg is null, so
+    # lifespan_cost_status stays threshold_unavailable and the consumed
+    # fraction stays empty. The winner is still written.
     assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
 
 

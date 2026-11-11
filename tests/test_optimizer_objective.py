@@ -1256,6 +1256,100 @@ def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> 
     )
 
 
+def test_nonnegligible_refused_wall_species_uses_supply_bound_and_stays_ranked(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.5)
+    execution = _refused_empty_wall_deposit_execution()
+    execution.trace.wall_zone_by_segment = {"hot_wall": "Hot"}
+    execution.trace.wall_deposit_sticking_authority = {
+        "wall_saturation_pressure_refusals_by_species": {
+            "SiO": {
+                "hot_wall": {
+                    "status": "refused",
+                    "output_status": "status_bearing",
+                    "reason": "antoine domain refused for SiO",
+                }
+            }
+        }
+    }
+    execution.snapshots = (
+        SimpleNamespace(
+            duration_h=1.0,
+            evap_flux=SimpleNamespace(species_kg_hr={"SiO": 0.25}),
+        ),
+    )
+    reference = _run_reference(
+        execution,
+        {},
+        cost_parameters=_furnace_test_cost_parameters(),
+    )
+    summary = reference.product_summary
+
+    assert summary["furnace_amortization_status"] == "available"
+    assert summary["wall_deposit_upper_bound_used"] is True
+    booking = next(
+        item
+        for item in summary["wall_supply_bound_bookings"]
+        if item["species"] == "SiO"
+    )
+    assert booking["reason"] == "wall_deposit_upper_bound_used"
+    assert booking["flag"] == "wall_deposit_upper_bound_used"
+    assert booking["deposit_kg"] == pytest.approx(0.25)
+    assert booking["supply_upper_bound_kg"] == pytest.approx(0.25)
+    assert "antoine domain refused" in booking["refusal_reason"]
+    authority = summary["wall_deposit_sticking_authority"]
+    assert "SiO" in authority["wall_saturation_pressure_refused_species"]
+    assert summary["wall_deposit_kg_by_species"]["SiO"] == pytest.approx(0.25)
+    adjusted = cost_adjusted_objective_scores(
+        {"oxygen_kg": 10.0, "energy_kWh": 1.0},
+        DEFINITIONS,
+        product_summary=summary,
+    )
+    unpenalised = cost_adjusted_objective_scores(
+        {"oxygen_kg": 10.0, "energy_kWh": 1.0},
+        DEFINITIONS,
+        product_summary=_available_furnace_summary(0.0),
+    )
+    assert adjusted[0] is not None and unpenalised[0] is not None
+    assert adjusted[0] < unpenalised[0]
+    # The penalty multiplies minimized energy too, so a same-energy twin is
+    # not dominated. This twin has less oxygen and more energy than the
+    # penalised scores, and the bounded candidate still owns the front.
+    penalty = summary["furnace_amortization_batch_cost_equivalents"]
+    bounded = {
+        "id": "bounded",
+        "objectives": {"oxygen_kg": 10.0, "energy_kWh": 1.0},
+        "summary": summary,
+    }
+    dominated = {
+        "id": "dominated",
+        "objectives": {
+            "oxygen_kg": 0.1,
+            "energy_kWh": (1.0 + penalty) + 1.0,
+        },
+        "summary": _available_furnace_summary(0.0),
+    }
+    front = pareto_front(
+        (bounded, dominated),
+        DEFINITIONS,
+        objective_getter=lambda item: item["objectives"],
+        score_getter=lambda item: cost_adjusted_objective_scores(
+            item["objectives"],
+            DEFINITIONS,
+            product_summary=item["summary"],
+        ),
+    )
+    assert [item["id"] for item in front] == ["bounded"]
+    record = SimpleNamespace(
+        candidate_id="bounded",
+        cache_key="bounded",
+        objectives=bounded["objectives"],
+        product_summary=summary,
+    )
+    assert study._record_objective_scores(record, DEFINITIONS) == adjusted
+
+
 def test_finite_threshold_null_coating_rate_stays_unavailable_in_run_reference() -> None:
     reference = _run_reference(
         _refused_empty_wall_deposit_execution(),
