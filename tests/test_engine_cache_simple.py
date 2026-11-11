@@ -32,11 +32,10 @@ from simulator.engine_pool import EngineWorkerPool, WarmEngineWorker
 # normalization, engine_cache.py settings projection, and
 # binary_pot_battery.py request construction. All rows also include the
 # commissioning source and data table because its notice is carried in HOT.
-# OpenIMCC adds its direct-call request vector; AlphaMELTS and MAGEMin add
-# liquidus.py prediction helpers. Internal-analytical is deliberately uncached.
+# OpenIMCC adds its direct-call request vector. Internal-analytical is
+# deliberately uncached.
 _CACHED_ENGINE_SOURCE_PINS = {
-    # R32 pins its HOT commissioning notice inputs. The external OpenIMCC pack
-    # is selected by name in the request and versioned by this engine's pin.
+    # OpenIMCC files that change a stored HOT value for a fixed request.
     "openimcc": (
         1,
         "05cfafc5ed51fae128376b34083668aec11529495fab0e8ef859f8757980d7f4",
@@ -55,14 +54,12 @@ _CACHED_ENGINE_SOURCE_PINS = {
             "simulator/melt_backend/imcc_adapter_labels.py",
         ),
     ),
-    # R32 covers the subprocess vapor/O2 projection and its compiled catalog,
-    # extract, activity, and Antoine dependencies.
+    # AlphaMELTS files that change a stored HOT value for a fixed request.
     "alphamelts": (
         2,
-        "22da4954fb7c7966ad58563b9c1766f32614363c214cfc24f84064349472f7c7",
+        "15c8fdbb65d74b59907d3b714f035d1029aa2be6d065befcf9921736bcceed13",
         (
             "simulator/melt_backend/alphamelts.py",
-            "simulator/melt_backend/liquidus.py",
             "simulator/melt_backend/base.py",
             "simulator/engine_cache.py",
             "simulator/diagnostic_helpers/binary_pot_battery.py",
@@ -78,14 +75,14 @@ _CACHED_ENGINE_SOURCE_PINS = {
             "simulator/chemistry/kernel/dto.py",
             "simulator/chemistry/kernel/provider.py",
             "simulator/melt_backend/vaporock.py",
-            "simulator/melt_backend/melt_envelope.py",
             "simulator/melt_backend/openimcc_bridge.py",
             "simulator/melt_backend/alphamelts_contract.py",
             "simulator/config.py",
-            "simulator/environment.py",
             "simulator/feedstock_composition.py",
             "simulator/fe_redox.py",
             "simulator/alphamelts_reference_pressure.py",
+            "simulator/state.py",
+            "simulator/composition_projection.py",
             "simulator/chemistry/offgas_fo2.py",
             "simulator/chemistry/ellingham_graph.py",
             "simulator/chemistry/ellingham_thermo.py",
@@ -93,7 +90,6 @@ _CACHED_ENGINE_SOURCE_PINS = {
             "simulator/chemistry/melt_activity.py",
             "simulator/vapour_rail/activity.py",
             "simulator/alpha_kinetics.py",
-            "simulator/vapour_rail/batch.py",
             "simulator/vapour_rail/catalog.py",
             "simulator/vapour_rail/domain_policy.py",
             "simulator/vapour_rail/nasa_cea.py",
@@ -108,11 +104,10 @@ _CACHED_ENGINE_SOURCE_PINS = {
             "data/literature/extracts/ivtan-mno-coo-thermo.yaml",
         ),
     ),
-    # R32 covers the shared MELTS Antoine fallback and VapoRock projection,
-    # including their catalog/extract and transport dependencies.
+    # ThermoEngine files that change a stored HOT value for a fixed request.
     "thermoengine": (
         2,
-        "7b9bdc9e552132b1d1fe268dcdceb35df26f0135ec0323deedf42d39e81dcef0",
+        "59ca75c6177f8d63eef1ad65b7ea7f0e3633c45be655a6df9b7a1cacaf8f95b8",
         (
             "simulator/melt_backend/thermoengine.py",
             "simulator/melt_backend/base.py",
@@ -124,8 +119,6 @@ _CACHED_ENGINE_SOURCE_PINS = {
             "engines/alphamelts/thermoengine.py",
             "simulator/melt_backend/alphamelts.py",
             "simulator/melt_backend/vaporock.py",
-            "simulator/melt_backend/melt_envelope.py",
-            "simulator/melt_backend/pure_phase.py",
             "simulator/config.py",
             "engines/antoine.py",
             "engines/builtin/vapor_pressure.py",
@@ -139,7 +132,6 @@ _CACHED_ENGINE_SOURCE_PINS = {
             "simulator/chemistry/kernel/provider.py",
             "simulator/vapour_rail/activity.py",
             "simulator/alpha_kinetics.py",
-            "simulator/vapour_rail/batch.py",
             "simulator/vapour_rail/channels.py",
             "simulator/vapour_rail/catalog.py",
             "simulator/vapour_rail/domain_policy.py",
@@ -154,10 +146,10 @@ _CACHED_ENGINE_SOURCE_PINS = {
             "data/literature/extracts/ivtan-mno-coo-thermo.yaml",
         ),
     ),
-    # R32 pins VapoRock's commissioning notice source and data inputs.
+    # VapoRock files that change a stored HOT value for a fixed request.
     "vaporock": (
         1,
-        "5d7892b99d066835fdab68869b8343ecdd6e7f436124200688a59f6e22500a2d",
+        "99872562ce57967f747f834ca2f6f9ca1323e8ed7c3a3bfa970f1a9a93a5556e",
         (
             "simulator/melt_backend/vaporock.py",
             "simulator/melt_backend/base.py",
@@ -165,20 +157,16 @@ _CACHED_ENGINE_SOURCE_PINS = {
             "simulator/diagnostic_helpers/binary_pot_battery.py",
             "engines/engine_commissioning.py",
             "data/engine_commissioning.yaml",
-            "simulator/melt_backend/melt_envelope.py",
             "engines/domain_reason.py",
-            "simulator/engine_local_config.py",
-            "simulator/silent_zero.py",
             "simulator/state.py",
         ),
     ),
-    # R32 includes the QFM fit and MAGEMin's result/domain projection helpers.
+    # MAGEMin files that change a stored HOT value for a fixed request.
     "magemin": (
         2,
-        "808984db49c6253d106b35c5f51cda504cea129c8d01c3def1197928005d175a",
+        "f7462b493f77744d018c3ccfdbe2b1d15a0247a6c712a6f67ef78ded35198362",
         (
             "simulator/melt_backend/magemin.py",
-            "simulator/melt_backend/liquidus.py",
             "simulator/melt_backend/base.py",
             "simulator/engine_cache.py",
             "simulator/diagnostic_helpers/binary_pot_battery.py",
@@ -186,10 +174,8 @@ _CACHED_ENGINE_SOURCE_PINS = {
             "data/engine_commissioning.yaml",
             "engines/domain_reason.py",
             "engines/magemin/domain.py",
-            "simulator/fe_redox.py",
             "simulator/state.py",
             "simulator/feedstock_composition.py",
-            "simulator/melt_backend/pure_phase.py",
             "simulator/chemistry/qfm_oneill.py",
         ),
     ),
