@@ -1,7 +1,7 @@
 # Battery v2.1 migration report
 
 rows in: 91208
-records out (observations): 186647
+records out (observations): 186648
 works: 785
 experiments: 7001
 queue size: 124428
@@ -19555,7 +19555,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/romero-serrano-1999-binary-ternary-silicates.yaml` | 4 | 4 | 8 |
 | `data/literature/extracts/rusiecka-2026-chlorine-data.yaml` | 1911 | 1911 | 3822 |
 | `data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml` | 11 | 13 | 46 |
-| `data/literature/extracts/rys-2007-alkali-oxide-thermodynamics.yaml` | 56 | 1001 | 62 |
+| `data/literature/extracts/rys-2007-alkali-oxide-thermodynamics.yaml` | 56 | 1002 | 62 |
 | `data/literature/extracts/rzehak-2021-ti-isotope-redox-lunar-melts.yaml` | 3 | 18 | 0 |
 | `data/literature/extracts/sack-2021-melilite-thermochemistry.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sack-ghiorso-2017-fassaite-thermodynamics.yaml` | 0 | 0 | 1 |
@@ -19886,8 +19886,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 317592
+advisory issues: 317594
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 317592 |
+| `identity_incomplete` | 317594 |

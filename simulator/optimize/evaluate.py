@@ -1882,14 +1882,14 @@ def _trace_with_optimizer_coating_report(
         "resinter_threshold_kg / "
     ):
         threshold_parametric = True
-        campaigns = math.inf
+        # Keep an unqualified threshold symbolic so economics can refuse the
+        # lifetime instead of pricing it as infinite campaigns.
     if aggregate_campaigns == "infinite":
         aggregate_campaigns = math.inf
     elif isinstance(aggregate_campaigns, str) and aggregate_campaigns.startswith(
         "resinter_threshold_kg / "
     ):
         threshold_parametric = True
-        aggregate_campaigns = math.inf
     if threshold_parametric:
         authoritative = False
         output_status = "non-authoritative-threshold"
