@@ -22,11 +22,15 @@ CACHEABLE_TEST_ENGINES = tuple(
 )
 
 _ENGINE_CONFIG_NON_PREDICTION_REASONS = {
-    "openimcc": {},
+    "openimcc": {
+        "warm_worker": "The battery opener does not forward worker scheduling to OpenIMCC."
+    },
     "alphamelts": {"warm_worker": "Worker reuse changes scheduling, not chemistry."},
     "vaporock": {"warm_worker": "Worker reuse changes scheduling, not chemistry."},
     "magemin": {"warm_worker": "Worker reuse changes scheduling, not chemistry."},
-    "thermoengine": {},
+    "thermoengine": {
+        "warm_worker": "The battery opener does not forward worker scheduling to ThermoEngine."
+    },
 }
 
 
@@ -455,6 +459,214 @@ def test_worker_scheduling_config_does_not_change_prediction_settings(engine: st
     assert engine_cache_settings(engine, configuration) == before
 
 
+def test_engine_opener_and_cache_share_canonical_settings_projection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.engine_cache import (
+        engine_cache_settings,
+        normalize_engine_settings,
+    )
+
+    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "MELTS")
+    alpha = normalize_engine_settings(
+        "alphamelts",
+        {
+            "transport": "subprocess",
+            "ambient_calc_mode": "pMELTS",
+            "raw_model_name": "rhyolite-MELTS",
+            "redox_buffer": "QFM",
+            "fO2_offset": 0.5,
+            "Fe3Fet_ratio": 0.3,
+        },
+    )
+
+    assert alpha["transport"] == "subprocess"
+    assert alpha["ambient_calc_mode"] == "pMELTS"
+    assert alpha["model"] == "rhyolite-MELTS"
+    assert (
+        engine_cache_settings("alphamelts", alpha)["ambient_calc_mode"]
+        == "pMELTS"
+    )
+
+    # Explicit absence means the opener removes the inherited parent value.
+    absent = {"transport": "subprocess"}
+    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "pMELTS")
+    projected_with_parent = engine_cache_settings("alphamelts", absent)
+    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "MELTS")
+    assert engine_cache_settings("alphamelts", absent) == projected_with_parent
+    assert projected_with_parent["ambient_calc_mode"] is None
+
+
+def test_magemin_python_bridge_alias_is_normalized_before_open_and_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.engine_cache import (
+        engine_cache_settings,
+        normalize_engine_settings,
+    )
+    from simulator import backends
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    captured: dict[str, Any] = {}
+
+    def fake_try_backend(_backend_class: Any, config: dict[str, Any]) -> Any:
+        captured.update(config)
+        return SimpleNamespace()
+
+    monkeypatch.setattr(backends, "_try_backend", fake_try_backend)
+
+    settings = normalize_engine_settings("magemin", {"python_bridge": "julia"})
+    backend = binary_pot_battery._open_resolved_backend("magemin", settings)
+
+    assert backend is not None
+    assert settings["bridge"] == "julia"
+    assert "python_bridge" not in settings
+    assert captured["python_bridge"] == "julia"
+    assert engine_cache_settings("magemin", settings)["bridge"] == "julia"
+
+
+def test_openimcc_unused_gas_pack_setting_is_not_a_cache_input() -> None:
+    from simulator.engine_cache import engine_cache_settings
+
+    assert engine_cache_settings("openimcc", {"pack": "default"}) == (
+        engine_cache_settings(
+            "openimcc", {"pack": "default", "gas_pack": "unused-custom-pack"}
+        )
+    )
+
+
+@pytest.mark.parametrize("engine", ("alphamelts", "thermoengine"))
+def test_melts_redox_projection_covers_shared_normalizer_inputs(engine: str) -> None:
+    from simulator.engine_cache import engine_cache_settings
+
+    if engine == "alphamelts":
+        settings = {
+            "redox_buffer": "QFM",
+            "fO2_offset": 0.25,
+            "Fe3Fet_ratio": 0.35,
+        }
+        expected = {
+            "redox_buffer": "QFM",
+            "fo2_offset": 0.25,
+            "fe3fet_ratio": 0.35,
+        }
+    else:
+        settings = {
+            "redox_buffer": "QFM",
+            "fO2_offset": 0.25,
+            "Fe3Fet_ratio": 0.35,
+        }
+        expected = {
+            "redox_buffer": "QFM",
+            "fo2_offset": 0.25,
+            "fe3fet_ratio": 0.35,
+        }
+
+    projected = engine_cache_settings(engine, settings)
+
+    for name, value in expected.items():
+        assert projected[name] == value
+
+
+@pytest.mark.parametrize(
+    "engine,configuration",
+    (
+        ("openimcc", {"pack": "openimcc-v1.0.2", "gas_pack": "ignored"}),
+        (
+            "alphamelts",
+            {
+                "transport": "subprocess",
+                "ambient_calc_mode": "MELTS",
+                "raw_model_name": "MELTS-v1.0",
+                "redox_buffer": "QFM",
+                "fO2_offset": 0.25,
+                "Fe3Fet_ratio": 0.35,
+                "python_api_model": ("MELTS", 1),
+                "configured_vapor_transport_pO2_bar": 1.0e-8,
+                "configured_vapor_transport_floor_bar": 1.0e-9,
+                "warm_worker": False,
+            },
+        ),
+        (
+            "vaporock",
+            {
+                "temperature_units": "C",
+                "pressure_units": "bar",
+                "vapor_pressure_units": "bar",
+                "warm_worker": False,
+            },
+        ),
+        (
+            "magemin",
+            {
+                "database": "ig",
+                "python_bridge": "subprocess",
+                "fO2_buffer": "QFM",
+                "warm_worker": False,
+            },
+        ),
+        (
+            "thermoengine",
+            {
+                "model": "MELTS-v1.0",
+                "configured_vapor_transport_pO2_bar": 1.0e-8,
+                "configured_vapor_transport_floor_bar": 1.0e-9,
+                "redox_buffer": "QFM",
+                "fO2_offset": 0.25,
+                "Fe3Fet_ratio": 0.35,
+                "warm_worker": False,
+            },
+        ),
+    ),
+)
+def test_opener_settings_reads_are_projected_or_declared_neutral(
+    engine: str, configuration: dict[str, Any]
+) -> None:
+    from collections.abc import Iterator, Mapping
+
+    from simulator.engine_cache import (
+        engine_cache_settings,
+        normalize_engine_settings,
+    )
+
+    class RecordingMapping(Mapping[str, Any]):
+        def __init__(self, values: dict[str, Any]) -> None:
+            self.values = values
+            self.reads: set[str] = set()
+
+        def __getitem__(self, key: str) -> Any:
+            self.reads.add(key)
+            return self.values[key]
+
+        def __iter__(self) -> Iterator[str]:
+            return iter(self.values)
+
+        def __len__(self) -> int:
+            return len(self.values)
+
+    raw = RecordingMapping(configuration)
+    normalized = normalize_engine_settings(engine, raw)
+    projected = engine_cache_settings(engine, normalized)
+    neutral = _ENGINE_CONFIG_NON_PREDICTION_REASONS[engine]
+
+    assert raw.reads <= set(configuration) | set(neutral)
+    for key in raw.reads - set(neutral):
+        changed = dict(configuration)
+        value = changed[key]
+        if isinstance(value, bool):
+            changed[key] = not value
+        elif isinstance(value, (int, float)):
+            changed[key] = value + 1
+        elif isinstance(value, str):
+            changed[key] = value + "-changed"
+        elif isinstance(value, tuple):
+            changed[key] = (*value, 2)
+        else:
+            pytest.fail(f"cannot mutate recorded setting {engine}.{key}: {value!r}")
+        assert engine_cache_settings(engine, changed) != projected, key
+    assert projected
+
+
 def test_internal_analytical_projection_does_not_inspect_uncacheable_backend() -> None:
     from simulator.engine_cache import engine_cache_settings
 
@@ -547,6 +759,15 @@ def test_each_real_backend_equilibrate_warm_pair_matches_cache_off(
     def stable(cell: Any) -> Any:
         return cell.to_engine_cache_value().hot
 
+    def consumer_flags(cell: Any) -> Any:
+        return (
+            cell.authority,
+            cell.authoritative_for_requested_vapor_pressure,
+            cell.vapor_pressure_backend_status,
+            cell.vapor_pressure_backend_status_reason,
+            tuple(dict(notice) for notice in cell.notices),
+        )
+
     try:
         monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
         cache_off = equilibrate_cell(handle, pot, **common)
@@ -558,6 +779,7 @@ def test_each_real_backend_equilibrate_warm_pair_matches_cache_off(
         warm = equilibrate_cell(handle, pot, **common)
 
         assert stable(cache_off) == stable(cold) == stable(warm)
+        assert consumer_flags(cache_off) == consumer_flags(cold) == consumer_flags(warm)
         assert engine_cache.engine_cache_counters(reset=True)[engine.value] == {
             "hits": 1,
             "misses": 1,
