@@ -16,6 +16,8 @@ import time
 import zlib
 from collections import OrderedDict
 from collections.abc import Iterable, Mapping
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -96,6 +98,9 @@ _RUNTIME_BACKENDS: dict[str, Any] = {}
 _RUNTIME_IDENTITIES: dict[str, str] = {}
 _RUNTIME_WARNED: set[str] = set()
 _RUNTIME_OPEN_RECORDED: set[str] = set()
+_CACHE_BYPASSED: ContextVar[bool] = ContextVar(
+    "regolith_engine_cache_bypassed", default=False
+)
 
 ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS = {
     "openimcc": {
@@ -752,6 +757,8 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         # The backend's core carries state across residue requests, so even a
         # direct cache-helper caller must execute the live solve.
         return _hot_and_cold(solve())[0]
+    if _CACHE_BYPASSED.get():
+        return _hot_and_cold(solve())[0]
     path_value = _configured_engine_cache_path()
     if not path_value:
         return _hot_and_cold(solve())[0]
@@ -871,6 +878,16 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         _prepare_memory_cache()
         _remember_memory_value(memory_key, hot)
     return hot
+
+
+@contextmanager
+def _without_engine_cache():
+    """Bypass nested engine cache calls for an uncached parent calculation."""
+    token = _CACHE_BYPASSED.set(True)
+    try:
+        yield
+    finally:
+        _CACHE_BYPASSED.reset(token)
 
 
 def load_cache_rows(

@@ -305,7 +305,12 @@ def _call_cached_backend_equilibrate(
     *,
     cache: bool = True,
 ) -> Any:
-    if not cache or handle.name == "internal-analytical":
+    if handle.name == "internal-analytical":
+        from simulator.engine_cache import _without_engine_cache
+
+        with _without_engine_cache():
+            return solve()
+    if not cache:
         return solve()
     if handle.name == "openimcc":
         # The OpenIMCC bridge owns the engine cache seam for this path.
@@ -3837,20 +3842,21 @@ def internal_analytical_residue_vapor_pressure(
     include_diagnostic_shadows: bool,
 ) -> Any:
     """Run one direct internal-analytical residue pressure request."""
-    from simulator.engine_cache import record_engine_open
+    from simulator.engine_cache import _without_engine_cache, record_engine_open
 
     record_engine_open("internal-analytical", core)
 
-    return _internal_analytical_vapor_pressure_adapter(
-        core=core,
-        temperature_C=temperature_C,
-        pressure_bar=pressure_bar,
-        composition_kg=composition_kg,
-        composition_mol=composition_mol,
-        fO2_log=fO2_log,
-        po2_request=po2_request,
-        include_diagnostic_shadows=include_diagnostic_shadows,
-    )
+    with _without_engine_cache():
+        return _internal_analytical_vapor_pressure_adapter(
+            core=core,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            composition_kg=composition_kg,
+            composition_mol=composition_mol,
+            fO2_log=fO2_log,
+            po2_request=po2_request,
+            include_diagnostic_shadows=include_diagnostic_shadows,
+        )
 
 
 class _InternalAnalyticalBatteryBackend:
