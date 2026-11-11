@@ -378,6 +378,63 @@ def _loaded(feedstocks: dict):
     return sim
 
 
+def test_mars_hour_passes_surface_oxygen_and_log_guard_to_backend(monkeypatch):
+    feedstocks = copy.deepcopy(_yaml("feedstocks.yaml"))
+    feedstocks["lunar_mare_low_ti"].update({
+        "body": "mars",
+        "environment": {"surface_pressure_mbar": 6.1, "atmosphere": "CO2"},
+    })
+    sim = _loaded(feedstocks)
+
+    class RecordingBackend:
+        def __init__(self):
+            self.kwargs = None
+
+        def is_available(self):
+            return True
+
+        def equilibrate(
+            self, *, temperature_C, composition_mol, species_formula_registry,
+            fO2_log, pressure_bar, composition_mol_by_account=None,
+            vapor_transport_pO2_bar=None, vapor_transport_floor_bar=None,
+            vapor_transport_pO2_admission="environment",
+        ):
+            self.kwargs = {
+                "pressure_bar": pressure_bar,
+                "vapor_transport_pO2_bar": vapor_transport_pO2_bar,
+                "vapor_transport_floor_bar": vapor_transport_floor_bar,
+                "vapor_transport_pO2_admission": vapor_transport_pO2_admission,
+            }
+            return SimpleNamespace(
+                ledger_transition=None,
+                phase_species_mol={},
+                phase_species_kg={},
+                phase_masses_kg={},
+            )
+
+    backend = RecordingBackend()
+    sim.backend = backend
+    monkeypatch.setattr(
+        sim, "_record_equilibrium_status", lambda result, **_kwargs: result,
+    )
+
+    sim._get_equilibrium()
+
+    surface_pO2_bar = sim._hour_interface_oxygen.surface_pO2_bar
+    mars_ambient_bar = sim._vacuum_floor_bar()
+    assert mars_ambient_bar == pytest.approx(6.1e-3)
+    assert backend.kwargs["pressure_bar"] == pytest.approx(mars_ambient_bar)
+    assert backend.kwargs["vapor_transport_pO2_bar"] == pytest.approx(
+        surface_pO2_bar,
+    )
+    assert backend.kwargs["vapor_transport_floor_bar"] == pytest.approx(
+        DEFAULT_VACUUM_FLOOR_BAR,
+    )
+    assert backend.kwargs["vapor_transport_pO2_admission"] == "environment"
+    for oxygen_slot in ("vapor_transport_pO2_bar", "vapor_transport_floor_bar"):
+        assert backend.kwargs[oxygen_slot] != pytest.approx(mars_ambient_bar)
+
+
 def test_production_fe_channel_uses_catalog_stoichiometry() -> None:
     sim = _loaded(_yaml("feedstocks.yaml"))
     channels = {

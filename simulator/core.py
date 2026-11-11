@@ -10651,7 +10651,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     )
                 if self._backend_accepts_kwarg('vapor_transport_floor_bar'):
                     backend_kwargs['vapor_transport_floor_bar'] = (
-                        self._vacuum_floor_bar()
+                        self._oxygen_log_guard_bar()
                     )
                 if self._backend_accepts_kwarg('vapor_transport_pO2_admission'):
                     backend_kwargs['vapor_transport_pO2_admission'] = 'environment'
