@@ -4,7 +4,7 @@
 
 The extract covers the three prose activity-coefficient calculations, Table 1, the model-derived Table 1 FeO activity coefficient, and digitized points from every labelled contour in Figures 1–4. The source paper is `wood-wade-2013-trace-activities.pdf`; PDF text was decoded with `pdftotext -layout`, and the figure panels were checked against rendered pages. The private OpenIMCC transcription was used as a page-cited starting aid, with every retained value checked against the source PDF. No MinerU run was used.
 
-The Table 1 audit has 16 numeric cells: 14 measured phase-composition assay cells, the reported silicate total of 99.0 wt%, and calculated gamma FeO = 0.92. The 14 assay cells are separate measured observations. The total and calculated gamma remain distinct from measured assay values. The full printed cell audit remains in `wood-wade-2013-trace-activities.table1-cell-audit.csv`; the table has 21 printed row slots including headings.
+The Table 1 audit has 16 numeric cells: 14 measured phase-composition assay cells, the reported silicate total of 99.0 on a mass-percent basis, and calculated gamma FeO = 0.92. The 14 assay cells are separate measured observations. The total and calculated gamma remain distinct from measured assay values. The full printed cell audit remains in `wood-wade-2013-trace-activities.table1-cell-audit.csv`; the table has 21 printed row slots including headings.
 
 ## Observation inventory
 
@@ -31,6 +31,19 @@ Table 1 includes no numeric Ag activity coefficient. The printed total and gamma
 ## Locator page checks
 
 Physical PDF pages are one-based, PDF indices zero-based, and published page numbers follow the journal folio.
+
+| Source item | Proof string | Physical page | PDF index | Published page |
+| --- | --- | ---: | ---: | ---: |
+| PbO activity coefficient | `0.22 at 1,923 K` | 8 | 7 | 918 |
+| CuO0.5 activity coefficient | `3.5 in the silicate melt at 1,923 K` | 8 | 7 | 918 |
+| InO1.5 activity coefficient | `0.02 in the SiO2-rich liquid at 1,923 K` | 9 | 8 | 919 |
+| Pure-liquid standard state | `standard state of pure liquid at 1 bar` | 8 | 7 | 918 |
+| BW1102 run conditions | `1.5 GPa and 1,650 °C` | 8 | 7 | 918 |
+| Table 1 conditions | `Compositions of phases produced at 1.5 GPa/1,650 °C` | 8 | 7 | 918 |
+| Calculated FeO activity coefficient | `calculated to be 0.92 from Eq. (4)` | 8 | 7 | 918 |
+| FeO model-fit provenance | `83 data from the literature` | 4 | 3 | 914 |
+| InO1.5 melting entropy | `26.25 J.K-1` | 8 | 7 | 918 |
+| Starting silicate composition | `starting silicate composition of Diopside28–Forsterite22–Anorthite50` | 8 | 7 | 918 |
 
 | Source item | Physical page | PDF index | Published page |
 | --- | ---: | ---: | ---: |

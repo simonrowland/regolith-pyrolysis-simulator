@@ -6,7 +6,7 @@ source:
   year: 2013
   corpus_asset: raw/wood-wade-2013-trace-activities/wood-wade-2013-trace-activities.pdf
 extraction:
-  method: "Table 1 assay cells were reconciled across pdftotext, MinerU, and the page render. The printed BW1102 activity coefficients and fitted Fig. 1–4 contour surfaces were transcribed separately; contour points were digitized from the embedded figure panels using calibrated Diopside–Anorthite–Forsterite triangle vertices."
+  method: "Table 1 assay cells were reconciled across pdftotext and the page render. The printed BW1102 activity coefficients and fitted Fig. 1–4 contour surfaces were transcribed separately; contour points were digitized from the embedded figure panels using calibrated Diopside–Anorthite–Forsterite triangle vertices."
   date: '2026-11-10'
   worker: codex-resume-87981-1794369303
 review_status: draft
@@ -144,7 +144,7 @@ experiments:
         published_page: 918
         pdf_page_index: 7
         table: '1'
-        note: "Analyzed oxides are recorded on the controller-set wt% basis; their printed values total 99.0 wt%."
+        note: "Analyzed oxides are recorded on a mass-percent basis; their printed values total 99.0."
     quench_status:
       state:
         tag: unknown
@@ -184,7 +184,7 @@ species:
         published_page: 918
         pdf_page_index: 7
         table: '1'
-        note: "Table 1, identifier BW1102; proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’. MinerU and pdftotext agree on the numeric cell text; the PDF render confirms row/column placement."
+        note: "Table 1, identifier BW1102; proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’. The numeric cell text was checked against pdftotext; the PDF render confirms row/column placement."
       units: as printed
       values:
         method_class: method_only
@@ -391,7 +391,7 @@ species:
         standard_state_as_printed: pure liquid at 1 bar and the temperature of interest
         T_K: '1923'
         experimental_T_C_as_printed: '1650'
-        composition_window_as_printed: Single SiO2-saturated silicate composition produced from Diopside28–Forsterite22–Anorthite50; Table 1 analyzed silicate oxides in wt%; the five listed values total 99.0 wt%.
+        composition_window_as_printed: Single SiO2-saturated silicate composition produced from Diopside28–Forsterite22–Anorthite50; Table 1 analyzed silicate oxides by mass; the five listed values total 99.0.
         fO2_as_printed:
           state: unknown
           reason: No fO2 value or control is printed for BW1102.
@@ -462,7 +462,7 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Analyzed silicate bulk composition, Table 1; oxide mass percentages total 99.0 wt% as printed. Composition conversion normalizes the listed oxide proportions; no missing component is supplied."
+            note: "Analyzed silicate bulk composition, Table 1; oxide mass percentages total 99.0. Composition conversion normalizes the listed oxide proportions; no missing component is supplied."
       derived_from:
       - wood-wade-2013-trace-activities::wood_wade_2013_bw1102_table1_silicate_pb_measured
       - wood-wade-2013-trace-activities::wood_wade_2013_bw1102_table1_metal_pb_measured
@@ -522,7 +522,7 @@ species:
         standard_state_as_printed: pure liquid at 1 bar and the temperature of interest
         T_K: '1923'
         experimental_T_C_as_printed: '1650'
-        composition_window_as_printed: Single SiO2-saturated silicate composition produced from Diopside28–Forsterite22–Anorthite50; Table 1 analyzed silicate oxides in wt%; the five listed values total 99.0 wt%.
+        composition_window_as_printed: Single SiO2-saturated silicate composition produced from Diopside28–Forsterite22–Anorthite50; Table 1 analyzed silicate oxides by mass; the five listed values total 99.0.
         fO2_as_printed:
           state: unknown
           reason: No fO2 value or control is printed for BW1102.
@@ -593,7 +593,7 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Analyzed silicate bulk composition, Table 1; oxide mass percentages total 99.0 wt% as printed. Composition conversion normalizes the listed oxide proportions; no missing component is supplied."
+            note: "Analyzed silicate bulk composition, Table 1; oxide mass percentages total 99.0. Composition conversion normalizes the listed oxide proportions; no missing component is supplied."
       derived_from:
       - wood-wade-2013-trace-activities::wood_wade_2013_bw1102_table1_silicate_cu_measured
       - wood-wade-2013-trace-activities::wood_wade_2013_bw1102_table1_metal_cu_measured
@@ -653,7 +653,7 @@ species:
         standard_state_as_printed: pure liquid at 1 bar and the temperature of interest
         T_K: '1923'
         experimental_T_C_as_printed: '1650'
-        composition_window_as_printed: Single SiO2-saturated silicate composition produced from Diopside28–Forsterite22–Anorthite50; Table 1 analyzed silicate oxides in wt%; the five listed values total 99.0 wt%.
+        composition_window_as_printed: Single SiO2-saturated silicate composition produced from Diopside28–Forsterite22–Anorthite50; Table 1 analyzed silicate oxides by mass; the five listed values total 99.0.
         fO2_as_printed:
           state: unknown
           reason: No fO2 value or control is printed for BW1102.
@@ -724,7 +724,7 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Analyzed silicate bulk composition, Table 1; oxide mass percentages total 99.0 wt% as printed. Composition conversion normalizes the listed oxide proportions; no missing component is supplied."
+            note: "Analyzed silicate bulk composition, Table 1; oxide mass percentages total 99.0. Composition conversion normalizes the listed oxide proportions; no missing component is supplied."
       derived_from:
       - wood-wade-2013-trace-activities::wood_wade_2013_bw1102_table1_silicate_in_measured
       - wood-wade-2013-trace-activities::wood_wade_2013_bw1102_table1_metal_in_measured
@@ -835,7 +835,7 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Bulk analyzed silicate composition, wt%; total listed oxide mass is 99.0 wt%."
+            note: "Bulk analyzed silicate composition by mass; total listed oxide mass is 99.0."
 
     - observation_id: wood_wade_2013_bw1102_table1_metal_ag_measured
       experiment: wood_wade_2013_bw1102
@@ -986,7 +986,7 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Bulk analyzed silicate composition, wt%; total listed oxide mass is 99.0 wt%."
+            note: "Bulk analyzed silicate composition by mass; total listed oxide mass is 99.0."
 
   CaO:
     observations:
@@ -1069,7 +1069,7 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Bulk analyzed silicate composition, wt%; total listed oxide mass is 99.0 wt%."
+            note: "Bulk analyzed silicate composition by mass; total listed oxide mass is 99.0."
 
   Cu:
     observations:
@@ -1152,7 +1152,7 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Bulk analyzed silicate composition, wt%; total listed oxide mass is 99.0 wt%."
+            note: "Bulk analyzed silicate composition by mass; total listed oxide mass is 99.0."
 
     - observation_id: wood_wade_2013_bw1102_table1_metal_cu_measured
       experiment: wood_wade_2013_bw1102
@@ -1297,7 +1297,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_0p5_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -1388,7 +1388,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_0p5_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -1479,7 +1479,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_0p5_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -1570,7 +1570,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_0p5_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -1661,7 +1661,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_0p5_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -1752,7 +1752,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_0p5_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -1843,7 +1843,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_0p5_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -1934,7 +1934,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -2025,7 +2025,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -2116,7 +2116,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -2207,7 +2207,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -2298,7 +2298,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -2389,7 +2389,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -2480,7 +2480,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -2571,7 +2571,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -2662,7 +2662,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -2753,7 +2753,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -2844,7 +2844,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -2935,7 +2935,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -3026,7 +3026,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -3117,7 +3117,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -3208,7 +3208,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_015
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -3299,7 +3299,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_016
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -3390,7 +3390,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p0_branch_1_point_017
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -3481,7 +3481,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -3572,7 +3572,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -3663,7 +3663,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -3754,7 +3754,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -3845,7 +3845,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -3936,7 +3936,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -4027,7 +4027,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -4118,7 +4118,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -4209,7 +4209,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -4300,7 +4300,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -4391,7 +4391,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -4482,7 +4482,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -4573,7 +4573,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -4664,7 +4664,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -4755,7 +4755,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_015
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -4846,7 +4846,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_016
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -4937,7 +4937,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_017
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -5028,7 +5028,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_018
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -5119,7 +5119,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_019
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -5210,7 +5210,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_020
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -5301,7 +5301,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_021
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -5392,7 +5392,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_1p5_branch_1_point_022
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -5483,7 +5483,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -5574,7 +5574,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -5665,7 +5665,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -5756,7 +5756,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -5847,7 +5847,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -5938,7 +5938,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -6029,7 +6029,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -6120,7 +6120,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -6211,7 +6211,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -6302,7 +6302,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -6393,7 +6393,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -6484,7 +6484,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -6575,7 +6575,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -6666,7 +6666,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p0_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -6757,7 +6757,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p5_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -6848,7 +6848,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p5_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -6939,7 +6939,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p5_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -7030,7 +7030,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p5_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -7121,7 +7121,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p5_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -7212,7 +7212,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_gamma_2p5_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -7379,7 +7379,7 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Bulk analyzed silicate composition, wt%; total listed oxide mass is 99.0 wt%."
+            note: "Bulk analyzed silicate composition by mass; total listed oxide mass is 99.0."
 
     - observation_id: wood_wade_2013_bw1102_table1_feo_activity_coefficient
       experiment: wood_wade_2013_bw1102
@@ -7471,7 +7471,7 @@ species:
     - observation_id: wood_wade_2013_fig2_feo_digitization_context
       type: figure_record
       locator:
-        page: 915
+        page: 5
         published_page: 915
         pdf_page_index: 4
         figure: '2'
@@ -7578,7 +7578,7 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Bulk analyzed silicate composition, wt%; total listed oxide mass is 99.0 wt%."
+            note: "Bulk analyzed silicate composition by mass; total listed oxide mass is 99.0."
 
     - observation_id: wood_wade_2013_bw1102_table1_metal_in_measured
       experiment: wood_wade_2013_bw1102
@@ -7729,14 +7729,14 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Bulk analyzed silicate composition, wt%; total listed oxide mass is 99.0 wt%."
+            note: "Bulk analyzed silicate composition by mass; total listed oxide mass is 99.0."
 
   MoO2:
     observations:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -7827,7 +7827,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -7918,7 +7918,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -8009,7 +8009,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -8100,7 +8100,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -8191,7 +8191,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -8282,7 +8282,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -8373,7 +8373,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -8464,7 +8464,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -8555,7 +8555,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -8646,7 +8646,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -8737,7 +8737,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -8828,7 +8828,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -8919,7 +8919,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -9010,7 +9010,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_015
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -9101,7 +9101,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_016
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -9192,7 +9192,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_017
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -9283,7 +9283,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_018
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -9374,7 +9374,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_019
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -9465,7 +9465,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_020
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -9556,7 +9556,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_021
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -9647,7 +9647,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_022
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -9738,7 +9738,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_023
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -9829,7 +9829,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_024
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -9920,7 +9920,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_5p0_branch_1_point_025
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -10011,7 +10011,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -10102,7 +10102,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -10193,7 +10193,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -10284,7 +10284,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -10375,7 +10375,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -10466,7 +10466,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -10557,7 +10557,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -10648,7 +10648,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -10739,7 +10739,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -10830,7 +10830,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -10921,7 +10921,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -11012,7 +11012,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -11103,7 +11103,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -11194,7 +11194,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -11285,7 +11285,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_1_point_015
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -11376,7 +11376,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_001
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -11467,7 +11467,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_002
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -11558,7 +11558,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_003
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -11649,7 +11649,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_004
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -11740,7 +11740,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_005
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -11831,7 +11831,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_006
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -11922,7 +11922,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_007
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -12013,7 +12013,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_008
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -12104,7 +12104,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_009
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -12195,7 +12195,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_010
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -12286,7 +12286,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_011
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -12377,7 +12377,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_012
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -12468,7 +12468,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_013
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -12559,7 +12559,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_014
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -12650,7 +12650,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_015
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -12741,7 +12741,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_016
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -12832,7 +12832,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_017
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -12923,7 +12923,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_018
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -13014,7 +13014,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_019
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -13105,7 +13105,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_020
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -13196,7 +13196,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_50_branch_2_point_021
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -13287,7 +13287,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_75_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -13378,7 +13378,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_75_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -13469,7 +13469,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_75_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -13560,7 +13560,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_75_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -13651,7 +13651,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_75_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -13742,7 +13742,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_75_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -13833,7 +13833,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_75_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -13924,7 +13924,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_75_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -14015,7 +14015,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_75_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -14106,7 +14106,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_75_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -14197,7 +14197,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_100_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -14288,7 +14288,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_100_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -14379,7 +14379,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_100_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -14470,7 +14470,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_100_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -14561,7 +14561,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_100_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -14652,7 +14652,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_gamma_100_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -14744,7 +14744,7 @@ species:
     - observation_id: wood_wade_2013_fig3_moo2_digitization_context
       type: figure_record
       locator:
-        page: 916
+        page: 6
         published_page: 916
         pdf_page_index: 5
         figure: '3'
@@ -14775,7 +14775,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -14866,7 +14866,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -14957,7 +14957,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -15048,7 +15048,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -15139,7 +15139,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -15230,7 +15230,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -15321,7 +15321,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -15412,7 +15412,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -15503,7 +15503,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -15594,7 +15594,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -15685,7 +15685,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -15776,7 +15776,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -15867,7 +15867,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -15958,7 +15958,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_1p5_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -16049,7 +16049,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -16140,7 +16140,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -16231,7 +16231,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -16322,7 +16322,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -16413,7 +16413,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -16504,7 +16504,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -16595,7 +16595,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -16686,7 +16686,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -16777,7 +16777,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -16868,7 +16868,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -16959,7 +16959,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -17050,7 +17050,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -17141,7 +17141,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -17232,7 +17232,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -17323,7 +17323,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_015
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -17414,7 +17414,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_016
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -17505,7 +17505,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_017
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -17596,7 +17596,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_018
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -17687,7 +17687,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_019
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -17778,7 +17778,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_020
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -17869,7 +17869,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_021
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -17960,7 +17960,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_022
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -18051,7 +18051,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_023
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -18142,7 +18142,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_024
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -18233,7 +18233,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p0_branch_1_point_025
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -18324,7 +18324,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -18415,7 +18415,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -18506,7 +18506,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -18597,7 +18597,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -18688,7 +18688,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -18779,7 +18779,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -18870,7 +18870,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -18961,7 +18961,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -19052,7 +19052,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -19143,7 +19143,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -19234,7 +19234,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -19325,7 +19325,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -19416,7 +19416,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -19507,7 +19507,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -19598,7 +19598,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_015
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -19689,7 +19689,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_016
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -19780,7 +19780,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_017
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -19871,7 +19871,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_2p5_branch_1_point_018
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -19962,7 +19962,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_3p0_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -20053,7 +20053,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_3p0_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -20144,7 +20144,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_3p0_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -20235,7 +20235,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_3p0_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -20326,7 +20326,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_3p0_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -20417,7 +20417,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_3p0_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -20508,7 +20508,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_3p0_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -20599,7 +20599,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_3p0_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -20690,7 +20690,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_3p0_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -20781,7 +20781,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_3p0_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -20872,7 +20872,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_gamma_3p0_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -20964,7 +20964,7 @@ species:
     - observation_id: wood_wade_2013_fig1_nio_digitization_context
       type: figure_record
       locator:
-        page: 913
+        page: 3
         published_page: 913
         pdf_page_index: 2
         figure: '1'
@@ -21071,7 +21071,7 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Bulk analyzed silicate composition, wt%; total listed oxide mass is 99.0 wt%."
+            note: "Bulk analyzed silicate composition by mass; total listed oxide mass is 99.0."
 
     - observation_id: wood_wade_2013_bw1102_table1_metal_pb_measured
       experiment: wood_wade_2013_bw1102
@@ -21222,14 +21222,14 @@ species:
             published_page: 918
             pdf_page_index: 7
             table: '1'
-            note: "Bulk analyzed silicate composition, wt%; total listed oxide mass is 99.0 wt%."
+            note: "Bulk analyzed silicate composition by mass; total listed oxide mass is 99.0."
 
   WO3:
     observations:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p001_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -21320,7 +21320,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p001_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -21411,7 +21411,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p001_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -21502,7 +21502,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p001_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -21593,7 +21593,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p001_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -21684,7 +21684,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p001_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -21775,7 +21775,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p001_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -21866,7 +21866,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p001_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -21957,7 +21957,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p001_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -22048,7 +22048,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p001_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -22139,7 +22139,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -22230,7 +22230,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -22321,7 +22321,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -22412,7 +22412,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -22503,7 +22503,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -22594,7 +22594,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -22685,7 +22685,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -22776,7 +22776,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -22867,7 +22867,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -22958,7 +22958,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -23049,7 +23049,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -23140,7 +23140,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -23231,7 +23231,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -23322,7 +23322,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -23413,7 +23413,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_015
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -23504,7 +23504,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p005_branch_1_point_016
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -23595,7 +23595,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -23686,7 +23686,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -23777,7 +23777,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -23868,7 +23868,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -23959,7 +23959,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -24050,7 +24050,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -24141,7 +24141,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -24232,7 +24232,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -24323,7 +24323,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -24414,7 +24414,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -24505,7 +24505,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -24596,7 +24596,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -24687,7 +24687,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -24778,7 +24778,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -24869,7 +24869,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_015
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -24960,7 +24960,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_016
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -25051,7 +25051,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_017
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -25142,7 +25142,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_018
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -25233,7 +25233,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_019
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -25324,7 +25324,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p01_branch_1_point_020
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -25415,7 +25415,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -25506,7 +25506,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -25597,7 +25597,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -25688,7 +25688,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -25779,7 +25779,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -25870,7 +25870,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -25961,7 +25961,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -26052,7 +26052,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -26143,7 +26143,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -26234,7 +26234,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -26325,7 +26325,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -26416,7 +26416,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -26507,7 +26507,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -26598,7 +26598,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -26689,7 +26689,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_015
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -26780,7 +26780,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_016
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -26871,7 +26871,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_017
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -26962,7 +26962,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_018
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -27053,7 +27053,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_019
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -27144,7 +27144,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_020
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -27235,7 +27235,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_021
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -27326,7 +27326,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_022
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -27417,7 +27417,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_023
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -27508,7 +27508,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p02_branch_1_point_024
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -27599,7 +27599,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_001
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -27690,7 +27690,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_002
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -27781,7 +27781,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_003
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -27872,7 +27872,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_004
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -27963,7 +27963,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_005
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -28054,7 +28054,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_006
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -28145,7 +28145,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_007
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -28236,7 +28236,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_008
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -28327,7 +28327,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_009
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -28418,7 +28418,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_010
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -28509,7 +28509,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_011
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -28600,7 +28600,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_012
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -28691,7 +28691,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_013
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -28782,7 +28782,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_014
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -28873,7 +28873,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_015
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -28964,7 +28964,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_016
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -29055,7 +29055,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_017
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -29146,7 +29146,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_018
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -29237,7 +29237,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_019
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -29328,7 +29328,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_020
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -29419,7 +29419,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_021
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -29510,7 +29510,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_022
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -29601,7 +29601,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_023
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -29692,7 +29692,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_024
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -29783,7 +29783,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_025
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -29874,7 +29874,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_gamma_0p05_branch_1_point_026
       type: activity_coefficient
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
@@ -29966,7 +29966,7 @@ species:
     - observation_id: wood_wade_2013_fig4_wo3_digitization_context
       type: figure_record
       locator:
-        page: 917
+        page: 7
         published_page: 917
         pdf_page_index: 6
         figure: '4'
