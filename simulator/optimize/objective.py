@@ -40,6 +40,10 @@ from simulator.cost_energy import (
 from simulator.core import read_high_t_melt_activity_fallback_notice
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.thermal_train import (
+    OXYGEN_MOLAR_MASS_KG_PER_MOL,
+    OXYGEN_NORMAL_BOILING_POINT_K,
+    OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL,
+    oxygen_cp_shomate_j_per_mol_k,
     thermal_train_parameters_from_mapping,
 )
 from simulator.wall_deposit_availability import wall_deposit_figure_availability
@@ -62,11 +66,27 @@ from simulator.optimize.backend_status import (
 _MISSING = object()
 FURNACE_INSTANT_DEATH_FACTOR = 10.0
 # NIST Chemistry WebBook SRD 69 gas data and phase-change rows. N2 uses
-# Cp=7/2 R at 300 K; monatomic Ar and Kr use Cp=5/2 R.
+# Cp=7/2 R at 300 K; monatomic Ar and Kr use Cp=5/2 R. O2 phase constants
+# and its NIST Shomate Cp are reused from the thermal-train owner. For CO2,
+# NIST gives 25.2 kJ/mol sublimation enthalpy at 195 K and molecular weight
+# 44.0095 g/mol; its Antoine range gives 194.7 K at 1 atm. Its 300 K Cp from
+# the Chase Shomate coefficients is
+# A + B*t + C*t^2 + D*t^3 + E/t^2 = 37.217621149 J/(mol K), t = 0.300.
+# The helper holds this Cp constant down to 194.7 K; the NIST Shomate fit
+# starts at 298 K, so that low-temperature sensible term is approximate.
+# Phase-change data: https://webbook.nist.gov/cgi/cbook.cgi?ID=C124389&Mask=4
+# Gas Cp: https://webbook.nist.gov/cgi/cbook.cgi?ID=C124389&Mask=1
 _CARRIER_CONDENSATION_PROPERTIES = {
     "Ar": (87.28, 6469.7192, 2.5 * GAS_CONSTANT, 0.039948),
     "Kr": (119.73, 9080.0, 2.5 * GAS_CONSTANT, 0.083798),
     "N2": (77.34, 5600.0, 3.5 * GAS_CONSTANT, 0.0280134),
+    "O2": (
+        OXYGEN_NORMAL_BOILING_POINT_K,
+        OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL,
+        oxygen_cp_shomate_j_per_mol_k(300.0),
+        OXYGEN_MOLAR_MASS_KG_PER_MOL,
+    ),
+    "CO2": (194.7, 25_200.0, 37.217621149, 0.0440095),
 }
 # Economics resolution: one millionth of the coating model's smallest
 # operational lifetime observation (one completed campaign). The model's
@@ -4929,23 +4949,93 @@ def _carrier_gas_cost_summary(
     )
     loss_fraction = cost_parameters.carrier_makeup_loss_fraction_per_run
     recirculated_mass_kg = carrier_mass_used_kg * (1.0 - loss_fraction)
-    refrigeration_kWh_per_kg = _carrier_refrigeration_kWh_per_kg(species)
-    refrigeration_kWh = recirculated_mass_kg * refrigeration_kWh_per_kg
+    condensation_properties = _CARRIER_CONDENSATION_PROPERTIES.get(species)
+    refrigeration_basis_available = condensation_properties is not None
+    if refrigeration_basis_available:
+        refrigeration_kWh_per_kg = _carrier_refrigeration_kWh_per_kg(species)
+        refrigeration_kWh = recirculated_mass_kg * refrigeration_kWh_per_kg
+        refrigeration_unavailable_reason = None
+    else:
+        refrigeration_kWh_per_kg = None
+        refrigeration_kWh = None
+        refrigeration_unavailable_reason = (
+            "carrier_recycle_basis_unavailable: no condensation properties "
+            f"for {species!r}"
+        )
+
+    carrier_prices = cost_parameters.carrier_gas_earth_price_per_kg
+    if not refrigeration_basis_available:
+        # carrier_gas_run_cost owns makeup pricing. Its required recycle-energy
+        # input is a temporary zero only; both recycle outputs are replaced by
+        # typed unavailable values below, leaving the numeric makeup charge as
+        # the optimizer's flagged import lower bound.
+        carrier_prices = {**carrier_prices, species: 0.0}
     cost = carrier_gas_run_cost(
         carrier_mass_used_kg=carrier_mass_used_kg,
         carrier_species=species,
         carrier_body=str(getattr(melt, "body", "") or ""),
-        refrigeration_recycle_energy_kWh=refrigeration_kWh,
-        carrier_gas_earth_price_per_kg=(
-            cost_parameters.carrier_gas_earth_price_per_kg
+        refrigeration_recycle_energy_kWh=(
+            refrigeration_kWh if refrigeration_basis_available else 0.0
         ),
+        carrier_gas_earth_price_per_kg=carrier_prices,
         import_delivery_cost_per_kg=cost_parameters.import_delivery_cost_per_kg,
         makeup_loss_fraction_per_run=loss_fraction,
         electricity_cost_per_kWh=cost_parameters.electricity_cost_per_kWh,
     )
+    if not refrigeration_basis_available:
+        unavailable_reason = refrigeration_unavailable_reason or "unavailable"
+        cost = {
+            **cost,
+            "status": "unavailable",
+            "pricing_status": "unavailable",
+            "refrigeration_recycle_energy_kWh": unavailable_quantity(
+                reason=unavailable_reason,
+                units="kWh",
+            ),
+            "recycle_electricity_cost_usd": unavailable_quantity(
+                reason=unavailable_reason,
+                units="USD",
+            ),
+            "refrigeration_kWh_per_kg": unavailable_quantity(
+                reason=unavailable_reason,
+                units="kWh/kg",
+            ),
+            "earth_price_per_kg": 0.0,
+            "earth_price_pending": True,
+            "earth_price_source_tag": (
+                f"FLAGGED: Earth carrier-gas price pending for {species}; "
+                "makeup uses delivery cost only"
+            ),
+            "typed_todo": {
+                "code": "carrier_recycle_basis_unavailable",
+                "species": species,
+                "detail": (
+                    "TODO: establish a recycle-separation basis for this carrier; "
+                    "makeup remains priced as an import"
+                ),
+            },
+            "evidence_flags": list(dict.fromkeys(
+                [
+                    *cost["evidence_flags"],
+                    "carrier_recycle_basis_unavailable",
+                    "carrier_recycle_energy_unavailable",
+                    "carrier_earth_price_pending",
+                ]
+            )),
+        }
+    elif species == "CO2":
+        cost = {
+            **cost,
+            "evidence_flags": list(dict.fromkeys([
+                *cost["evidence_flags"],
+                "carrier_co2_cp_held_at_300K_below_shomate_range",
+            ])),
+        }
     return MappingProxyType({
         **cost,
-        "status": "estimated",
+        "status": (
+            "estimated" if refrigeration_basis_available else "unavailable"
+        ),
         "carrier_mass_basis": "scaled_reference_estimate",
         "carrier_mass_scale": {
             "reference_carrier_mass_kg": 44.0,
@@ -4958,12 +5048,21 @@ def _carrier_gas_cost_summary(
             "total_scale": mass_kg * (duration_h / 150.0) * (pressure / 10.0),
         },
         "refrigeration_basis": (
-            "carrier vapor sensible cooling from 300 K to its normal boiling point "
-            "plus condensation latent heat; Carnot lift to train reject temperature "
-            "at train eta_2ndlaw; NIST Chemistry WebBook SRD 69 species data, with "
+            "carrier vapor sensible cooling from 300 K using constant Cp to its "
+            "1-atm condensation "
+            "or sublimation point plus phase-change enthalpy; Carnot lift to "
+            "reject temperature at train eta_2ndlaw; NIST Chemistry WebBook SRD 69 "
+            "species data, with "
             "argon latent heat from NIST NBS NSRDS 27 Table 11"
         ),
-        "refrigeration_kWh_per_kg": refrigeration_kWh_per_kg,
+        "refrigeration_kWh_per_kg": (
+            refrigeration_kWh_per_kg
+            if refrigeration_basis_available
+            else unavailable_quantity(
+                reason=refrigeration_unavailable_reason or "unavailable",
+                units="kWh/kg",
+            )
+        ),
     })
 
 
@@ -4973,26 +5072,29 @@ def _carrier_pressure_mbar(sim: Any) -> Any:
 
 
 def _carrier_refrigeration_kWh_per_kg(species: str) -> float:
-    """Estimate sensible-plus-latent condensation duty and its Carnot lift."""
+    """Estimate sensible-plus-phase-change duty and its Carnot lift."""
 
     properties = _CARRIER_CONDENSATION_PROPERTIES.get(str(species))
     if properties is None:
         raise ObjectiveComputationError(
             f"carrier refrigeration properties are unavailable for {species!r}"
         )
-    boiling_K, vaporization_J_per_mol, cp_J_per_mol_K, molar_mass_kg_per_mol = (
-        properties
-    )
+    (
+        phase_change_K,
+        phase_change_enthalpy_J_per_mol,
+        cp_J_per_mol_K,
+        molar_mass_kg_per_mol,
+    ) = properties
     params = thermal_train_parameters_from_mapping()
     reject_K = params.T_reject_K
     efficiency = params.eta_2ndlaw
     # Premise: one kg of ideal carrier vapor enters at 300 K, cools to its 1-atm
-    # normal boiling point at constant Cp, then condenses there; the whole cold
-    # load is lifted to the train's reject temperature. Algebra: q_cold =
-    # [Cp*(300 K - T_nbp) + DeltaHvap] / M gives J/kg; W = q_cold *
-    # (T_reject/T_nbp - 1) / eta_2ndlaw, then kWh/kg = W / 3.6e6. Units:
-    # (J/mol)/ (kg/mol) = J/kg and both lift factors are dimensionless. At
-    # T_reject == T_nbp work tends to zero; eta_2ndlaw == 1 gives Carnot work.
+    # phase-change temperature at constant Cp, then condenses or sublimes there;
+    # the whole cold load is lifted to the train's reject temperature. Algebra:
+    # q_cold = [Cp*(300 K - T_phase) + DeltaH_phase] / M gives J/kg; W =
+    # q_cold * (T_reject/T_phase - 1) / eta_2ndlaw, then kWh/kg = W / 3.6e6.
+    # Units: (J/mol)/(kg/mol) = J/kg and both lift factors are dimensionless.
+    # At T_reject == T_phase work tends to zero; eta_2ndlaw == 1 gives Carnot work.
     # Constants: NIST Chemistry WebBook SRD 69, Kr C7439909, N2 C7727379, and
     # Ar C7440371 (https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439909&Mask=4,
     # https://webbook.nist.gov/cgi/cbook.cgi?ID=C7727379&Mask=4, and
@@ -5002,11 +5104,12 @@ def _carrier_refrigeration_kWh_per_kg(species: str) -> float:
     # by 1546.3 cal/mol * 4.184 J/cal = 6469.7 J/mol. Kr uses 119.73 K, within
     # the WebBook's reported 119.78 +/- 0.05 K.
     cold_load_J_per_kg = (
-        cp_J_per_mol_K * (300.0 - boiling_K) + vaporization_J_per_mol
+        cp_J_per_mol_K * (300.0 - phase_change_K)
+        + phase_change_enthalpy_J_per_mol
     ) / molar_mass_kg_per_mol
     return (
         cold_load_J_per_kg
-        * (reject_K / boiling_K - 1.0)
+        * (reject_K / phase_change_K - 1.0)
         / efficiency
         / 3.6e6
     )

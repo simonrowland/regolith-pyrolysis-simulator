@@ -789,6 +789,57 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
         evidence["marginal_cost_usd"]
     )
 
+    sim.melt.background_gas_species = "He"
+    sim.overhead.composition = {"He": 10.0}
+    helium_computed = compute_objectives(objective_profile, run_execution)
+    helium_evidence = helium_computed.evidence["throughput_cost_owner_ratify_usd"]
+    helium_score = helium_computed.as_mapping()["throughput_cost_owner_ratify_usd"]
+
+    assert isinstance(helium_score, float)
+    assert math.isfinite(helium_score)
+    assert helium_evidence["carrier_gas"]["pricing_status"] == "unavailable"
+    assert helium_evidence["carrier_gas"]["typed_todo"]["code"] == (
+        "carrier_recycle_basis_unavailable"
+    )
+    assert helium_evidence["carrier_gas"]["refrigeration_recycle_energy_kWh"][
+        "status"
+    ] == "unavailable"
+    assert helium_evidence["carrier_gas"]["earth_price_pending"] is True
+    assert "carrier_recycle_energy_unavailable" in helium_evidence["carrier_gas"][
+        "evidence_flags"
+    ]
+    assert helium_evidence["carrier_gas"]["makeup_cost_usd"] == pytest.approx(
+        0.44 * cost_parameters.import_delivery_cost_per_kg
+    )
+    assert helium_score == pytest.approx(helium_evidence["marginal_cost_usd"])
+
+    helium_candidates = (
+        {
+            "id": "more-expensive-carrier-candidate",
+            "objectives": {
+                "throughput_cost_owner_ratify_usd": helium_score + 1.0,
+            },
+        },
+        {
+            "id": "helium-carrier-candidate",
+            "objectives": {
+                "throughput_cost_owner_ratify_usd": helium_score,
+            },
+        },
+    )
+    helium_front = pareto_front(
+        helium_candidates,
+        (
+            ObjectiveDefinition(
+                "throughput_cost_owner_ratify_usd",
+                "minimize",
+                "USD",
+            ),
+        ),
+        objective_getter=lambda item: item["objectives"],
+    )
+    assert [item["id"] for item in helium_front] == ["helium-carrier-candidate"]
+
 
 def test_lifespan_cost_metric_is_not_costed_when_threshold_is_unavailable(monkeypatch) -> None:
     monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: None)
