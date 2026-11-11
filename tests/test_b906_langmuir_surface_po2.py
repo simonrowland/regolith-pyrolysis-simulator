@@ -3054,7 +3054,8 @@ def _provider_drive_bulks(*, film_on: bool) -> dict[str, float]:
                 "pipe_diameter_m": 0.12,
                 "gas_temperature_K": _T_K,
                 "carrier_gas": "N2",
-                "gas_resistance_enabled": film_on,
+                # Nested series key is the film switch. A parent False is
+                # green's audited-default ValueError, not a second switch.
                 "evaporation_series_resistance": {
                     "gas_resistance_enabled": film_on,
                 },

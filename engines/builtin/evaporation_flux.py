@@ -401,28 +401,27 @@ def resolve_gas_resistance_enabled(
 ) -> bool:
     """Film flag shared by the surface closure and the flux publisher.
 
-    The nested ``evaporation_series_resistance`` key wins. Otherwise the
-    parent map supplies it, and otherwise the conservative default is
-    on. Present null is absent, and a quoted false stays false. The
-    evaporation mixin passes an empty parent and does not copy
-    ``chemistry_kernel['gas_resistance_enabled']`` onto the publisher
-    controls, so a top-level kernel false leaves the film on. A direct
-    provider call that sets the key on its own controls is that parent,
-    which green did honor. A nested false at 10 mbar is the free-molecular
+    Green's publisher expression. The nested series map is read with
+    the parent flag as ``bool_feature_flag``'s default. A parent
+    ``False`` is not a legal default for this audited-True key, so
+    that call raises ``ValueError`` before the series map is read.
+    Present null is absent. The evaporation mixin passes an empty
+    parent and does not copy ``chemistry_kernel['gas_resistance_enabled']``
+    onto the publisher controls, so a top-level kernel false leaves
+    the film on. A nested false at 10 mbar is the free-molecular
     5.3423 Pa Ca root; the film root is 5.7893 Pa.
     """
 
     series = series_config if isinstance(series_config, Mapping) else {}
     parent = parent_config if isinstance(parent_config, Mapping) else {}
-    # ``bool_feature_flag`` rejects a default other than True for this
-    # key, so a parent result of False cannot be that default argument.
-    # Present null is absent and falls through to the parent, then to on.
-    if (
-        "gas_resistance_enabled" in series
-        and series.get("gas_resistance_enabled") is not None
-    ):
-        return bool_feature_flag(series, "gas_resistance_enabled", True)
-    return bool_feature_flag(parent, "gas_resistance_enabled", True)
+    # b-906 round 7 and the 2026-11-11 controller ruling: do not swallow
+    # a parent False. Green passes it as the default, and the helper
+    # rejects a default other than True for this key.
+    return bool_feature_flag(
+        series,
+        "gas_resistance_enabled",
+        bool_feature_flag(parent, "gas_resistance_enabled", True),
+    )
 
 
 def species_drive_bulk_Pa(

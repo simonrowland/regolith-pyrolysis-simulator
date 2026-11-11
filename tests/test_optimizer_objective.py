@@ -1359,10 +1359,12 @@ def test_nonnegligible_refused_wall_species_uses_supply_bound_and_stays_ranked(
 #   not booked. The measured entries stay, and the refusal still blocks
 #   the figure.
 # - Supply at or below the ledger resolution: authorized zero. Existing
-#   entries are not rewritten to the supply.
+#   entries of that species are removed. The scored mass is 0, which is
+#   the booking's deposit_kg and is <= the supply.
 # - Supply above that resolution: the priced aggregate equals the supply,
-#   once. A partial measurement is removed first, so the score is not the
-#   partial and not partial + supply.
+#   once, on the candidate segment that maximises the maximum segment
+#   load. A tie takes the smaller segment id. A partial measurement is
+#   removed first, so the score is not the partial and not partial + supply.
 _WALL_BOUND_UPPER = objective_module.WALL_DEPOSIT_UPPER_BOUND_USED
 _WALL_BOUND_BELOW = objective_module.BELOW_WALL_SUPPLY_UPPER_BOUND
 _WALL_BOUND_CASES = (
@@ -1464,8 +1466,55 @@ _WALL_BOUND_CASES = (
         "flux": (("CrO2", 1.0e-12),),
         "refused": (("CrO2", "hot_wall"),),
         "charge": 1000.0,
-        "entries": ((("cold_wall", "CrO2"), 0.2),),
+        "entries": (),
         "species": (("CrO2", _WALL_BOUND_BELOW, 0.0, 1.0e-12),),
+    },
+    {
+        "deposit": (
+            (("A", "CrO2"), 0.15),
+            (("B", "CrO2"), 0.05),
+            (("B", "Na"), 3.0),
+        ),
+        "flux": (("CrO2", 1.0e-12),),
+        "refused": (("CrO2", "A"), ("CrO2", "B")),
+        "charge": 1000.0,
+        "entries": ((("B", "Na"), 3.0),),
+        "species": (("CrO2", _WALL_BOUND_BELOW, 0.0, 1.0e-12),),
+    },
+    {
+        "deposit": ((("B", "Na"), 3.0),),
+        "flux": (("SiO", 1.0),),
+        "refused": (("SiO", "A"), ("SiO", "B")),
+        "charge": 1000.0,
+        "entries": (
+            (("B", "SiO"), 1.0),
+            (("B", "Na"), 3.0),
+        ),
+        "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
+    },
+    {
+        "deposit": ((("A", "Na"), 3.0), (("B", "K"), 3.0)),
+        "flux": (("SiO", 1.0),),
+        "refused": (("SiO", "B"), ("SiO", "A")),
+        "charge": 1000.0,
+        "entries": (
+            (("A", "SiO"), 1.0),
+            (("A", "Na"), 3.0),
+            (("B", "K"), 3.0),
+        ),
+        "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
+    },
+    {
+        "deposit": ((("C", "Na"), 10.0), (("B", "K"), 3.0)),
+        "flux": (("SiO", 1.0),),
+        "refused": (("SiO", "A"), ("SiO", "B")),
+        "charge": 1000.0,
+        "entries": (
+            (("A", "SiO"), 1.0),
+            (("B", "K"), 3.0),
+            (("C", "Na"), 10.0),
+        ),
+        "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
     },
     {
         "deposit": (),
@@ -1522,12 +1571,17 @@ def _wall_bound_execution(case: Mapping[str, object]):
     }
     flux = {species: float(kg) for species, kg in case["flux"]}
     published = case.get("published_flux")
-    refused = {species: segment for species, segment in case["refused"]}
+    refused_by_species: dict[str, list[str]] = {}
+    for species, segment in case["refused"]:
+        segments = refused_by_species.setdefault(str(species), [])
+        if segment not in segments:
+            segments.append(segment)
     zones: dict[str, str] = {}
     for segment, _species in deposit:
         zones[segment] = "Rest" if "cold" in segment else "Hot"
-    for segment in refused.values():
-        zones.setdefault(segment, "Hot")
+    for segments in refused_by_species.values():
+        for segment in segments:
+            zones.setdefault(segment, "Hot")
     snapshots = (
         SimpleNamespace(
             hour=1,
@@ -1555,8 +1609,9 @@ def _wall_bound_execution(case: Mapping[str, object]):
                     "output_status": "status_bearing",
                     "reason": f"antoine domain refused for {species}",
                 }
+                for segment in segments
             }
-            for species, segment in refused.items()
+            for species, segments in refused_by_species.items()
         }
     }
     sim = _FakeProductSim()
@@ -1707,7 +1762,11 @@ def _wall_bound_species_totals(
     "neighbour_kept",
     "two_nonnegligible",
     "upper_and_negligible",
-    "negligible_keeps_measured",
+    "negligible_clamps_measured",
+    "negligible_clamps_every_segment",
+    "binding_load_not_name_order",
+    "binding_load_tie_smaller_id",
+    "binding_load_tie_ignores_heavier_outsider",
     "negligible_empty",
     "missing_flux",
     "published_not_committed_negligible",
@@ -1748,12 +1807,22 @@ def test_refused_wall_deposit_aggregate_follows_the_supply_bound(
         assert species in booking["refusal_reason"]
         if reason == _WALL_BOUND_UPPER:
             assert booking["flag"] == _WALL_BOUND_UPPER
-            priced = None if view["species_kg"] is None else view["species_kg"].get(
-                species,
-                0.0,
-            )
-            if priced is not None:
-                assert priced == pytest.approx(supply)
+        priced = None if view["species_kg"] is None else view["species_kg"].get(
+            species,
+            0.0,
+        )
+        if priced is not None and supply is not None:
+            # deposit_wall,i <= supply_i, and the scored mass is the booking.
+            assert priced <= float(supply) + 1.0e-12
+            assert priced == pytest.approx(float(booking_kg))
+            if case["charge"] is not None:
+                resolution = objective_module._mass_balance_ledger_resolution_kg(
+                    float(case["charge"])
+                )
+                if float(supply) <= resolution:
+                    assert priced == pytest.approx(0.0)
+                else:
+                    assert priced == pytest.approx(float(supply))
     expects_upper = any(
         reason == _WALL_BOUND_UPPER
         for _species, reason, _booking_kg, _supply in case["species"]
@@ -1766,6 +1835,129 @@ def test_refused_wall_deposit_aggregate_follows_the_supply_bound(
     if view["refused_species"] is not None:
         for species, _segment in case["refused"]:
             assert species in view["refused_species"]
+
+
+def test_refused_supply_is_booked_on_the_segment_that_maximises_binding_load(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """SiO refused in A and B, supply 1 kg, B already holding 3 kg.
+
+    Alphabetical placement books A and leaves the maximum at 3 kg, so a
+    4.5 kg threshold reports 1.5 campaigns. The conservative booking puts
+    the supply in B. The maximum is 4 kg and the lifetime is 1.125
+    campaigns, which is the amortization that ranks the candidate.
+    """
+
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.5)
+    execution, _snapshots, _deposit = _wall_bound_execution({
+        "deposit": ((("B", "Na"), 3.0),),
+        "flux": (("SiO", 1.0),),
+        "refused": (("SiO", "A"), ("SiO", "B")),
+        "charge": 1000.0,
+    })
+    reference = _run_reference(
+        execution,
+        {},
+        cost_parameters=_furnace_test_cost_parameters(),
+    )
+    summary = reference.product_summary
+    segments = summary["wall_deposit_kg_by_segment_species"]
+
+    assert segments["B"]["SiO"] == pytest.approx(1.0)
+    assert segments["B"]["Na"] == pytest.approx(3.0)
+    assert "SiO" not in segments.get("A", {})
+    assert summary["wall_deposit_kg_by_species"]["SiO"] == pytest.approx(1.0)
+    assert summary["campaigns_to_resinter"] == pytest.approx(4.5 / 4.0)
+    assert summary["campaigns_to_resinter"] != pytest.approx(4.5 / 3.0)
+    conservative = furnace_amortization_cost_per_run(
+        20.0,
+        4.5 / 4.0,
+        500.0,
+        1.0,
+        has_positive_fouling=True,
+    )
+    alphabetical = furnace_amortization_cost_per_run(
+        20.0,
+        4.5 / 3.0,
+        500.0,
+        1.0,
+        has_positive_fouling=True,
+    )
+    assert summary["furnace_amortization_cost_per_run_usd"] == pytest.approx(
+        conservative
+    )
+    assert conservative > alphabetical
+    assert summary["furnace_amortization_status"] == "available"
+    assert summary["wall_deposit_upper_bound_used"] is True
+
+
+def test_below_resolution_wall_booking_scores_the_authorized_zero(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """0.2 kg of booked CrO2 against a 1e-12 kg supply scores as 0.
+
+    The booking's deposit_kg was already the authorized zero. The priced
+    map, the lifetime, and a pre-booking coating margin that still quotes
+    the 0.2 kg must follow that zero.
+    """
+
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.5)
+    execution, _snapshots, _deposit = _wall_bound_execution({
+        "deposit": ((("cold_wall", "CrO2"), 0.2),),
+        "flux": (("CrO2", 1.0e-12),),
+        "refused": (("CrO2", "hot_wall"),),
+        "charge": 1000.0,
+    })
+    reference = _run_reference(
+        execution,
+        {},
+        cost_parameters=_furnace_test_cost_parameters(),
+        coating_margin=SimpleNamespace(
+            status="warning",
+            status_reason="wall saturation pressure refused for CrO2",
+            status_payload={
+                "coating_verdict": "warning",
+                "campaigns_to_resinter_worst_segment": 4.5 / 0.2,
+                "wall_deposit_kg_per_campaign": 0.2,
+                "wall_saturation_pressure_refusals_by_species": {
+                    "CrO2": {
+                        "hot_wall": {
+                            "status": "refused",
+                            "output_status": "status_bearing",
+                            "reason": "antoine domain refused for CrO2",
+                        }
+                    }
+                },
+            },
+        ),
+    )
+    summary = reference.product_summary
+    segments = summary["wall_deposit_kg_by_segment_species"]
+
+    assert "CrO2" not in segments.get("cold_wall", {})
+    assert "CrO2" not in segments.get("hot_wall", {})
+    assert summary["wall_deposit_kg_by_species"].get("CrO2", 0.0) == pytest.approx(0.0)
+    assert summary["campaigns_to_resinter"] == "infinite"
+    assert summary["campaigns_to_resinter"] != pytest.approx(4.5 / 0.2)
+    booking = next(
+        item
+        for item in summary["wall_supply_bound_bookings"]
+        if item["species"] == "CrO2"
+    )
+    assert booking["reason"] == "below_wall_supply_upper_bound"
+    assert booking["deposit_kg"] == 0.0
+    assert booking["supply_upper_bound_kg"] == pytest.approx(1.0e-12)
+    assert summary["furnace_amortization_cost_per_run_usd"] == pytest.approx(0.0)
+    assert summary["furnace_amortization_status"] == "available"
+    assert "CrO2" in summary["wall_deposit_sticking_authority"][
+        "wall_saturation_pressure_refused_species"
+    ]
+    adjusted = cost_adjusted_objective_scores(
+        {"oxygen_kg": 10.0, "energy_kWh": 1.0},
+        DEFINITIONS,
+        product_summary=summary,
+    )
+    assert all(score is not None for score in adjusted)
 
 
 def test_mixed_measured_and_refused_wall_deposit_scores_the_full_supply(

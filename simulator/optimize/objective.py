@@ -4415,13 +4415,13 @@ def _replace_species_deposit_with_supply(
     segment: str,
     supply: float,
 ) -> None:
-    """Book ``supply`` once for ``species``.
+    """Book ``supply`` once for ``species`` on ``segment``.
 
     Measured kilograms are the same vapour, not a second source. Leaving
     them and also writing the supply counts that mass twice. Keeping only
     the measured part prices a partial deposit under the supply-bound
-    flag. The refusal segment carries the whole supply, so one segment
-    sees the conservative worst case: all of the supply deposits.
+    flag. ``segment`` is the candidate whose placement maximises the
+    lifetime's maximum segment load.
     """
 
     _drop_species_wall_deposit(wall_deposit, species)
@@ -4442,28 +4442,81 @@ def _wall_supply_booking_fields(booked: Mapping[str, Any]) -> dict[str, Any]:
     return fields
 
 
-def _refusal_segment_and_reason(
+def _refusal_candidate_segments(
     authority: Mapping[str, Any],
     species: str,
-) -> tuple[str, str]:
+) -> tuple[str, ...]:
     records = authority.get("wall_saturation_pressure_refusals_by_species")
-    segment = "upstream"
-    reason = ""
     if isinstance(records, Mapping):
         by_segment = records.get(species)
         if isinstance(by_segment, Mapping) and by_segment:
-            segment = str(sorted(by_segment, key=str)[0])
+            return tuple(sorted(str(segment) for segment in by_segment))
+    return ("upstream",)
+
+
+def _refusal_reason(
+    authority: Mapping[str, Any],
+    species: str,
+    segment: str,
+) -> str:
+    records = authority.get("wall_saturation_pressure_refusals_by_species")
+    reason = ""
+    if isinstance(records, Mapping):
+        by_segment = records.get(species)
+        if isinstance(by_segment, Mapping):
             record = by_segment.get(segment)
             if isinstance(record, Mapping):
                 raw_reason = record.get("reason")
                 if isinstance(raw_reason, str):
                     reason = raw_reason.strip()
-    if not reason:
-        message = authority.get("message")
-        reason = message.strip() if isinstance(message, str) and message.strip() else (
-            "wall saturation pressure refusal"
-        )
-    return segment, reason
+    if reason:
+        return reason
+    message = authority.get("message")
+    if isinstance(message, str) and message.strip():
+        return message.strip()
+    return "wall saturation pressure refusal"
+
+
+def _segment_maximising_binding_load(
+    wall_deposit: Mapping[Any, Any],
+    species: str,
+    supply: float,
+    candidates: Sequence[str],
+) -> str:
+    """Place ``supply`` where the lifetime's maximum segment load is largest.
+
+    Campaigns to resinter use that maximum. Each candidate is scored by
+    the maximum that remains after this species' own kilograms are
+    removed and ``supply`` is added there. Segments that did not refuse,
+    and deposits of other species, stay in the maximum. Equal maxima
+    take the smaller segment id. Name order is only that tie-break.
+    """
+
+    loads: dict[str, float] = {}
+    for key, kg in wall_deposit.items():
+        if not isinstance(key, tuple) or len(key) != 2 or kg is None:
+            continue
+        if str(key[1]) == species:
+            continue
+        try:
+            amount = float(kg)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(amount) or amount <= 0.0:
+            continue
+        segment = str(key[0])
+        loads[segment] = loads.get(segment, 0.0) + amount
+    best_segment = ""
+    best_binding = -1.0
+    for segment in sorted(str(item) for item in candidates):
+        candidate_loads = dict(loads)
+        candidate_loads[segment] = candidate_loads.get(segment, 0.0) + float(supply)
+        binding = max(candidate_loads.values(), default=0.0)
+        # Strictly greater keeps the earlier segment id on a tie.
+        if best_segment == "" or binding > best_binding:
+            best_segment = segment
+            best_binding = binding
+    return best_segment
 
 
 def _authority_without_booked_refusals(
@@ -4538,17 +4591,20 @@ def _book_wall_deposits_at_vapour_supply(
     """Book each refused species at its vapour-supply bound.
 
     Invariant, for every refused species, at this chokepoint:
+    ``deposit_wall,i <= supply_i``. The priced map is that deposit.
+    Lifetime, cost, and rank read the map this function returns.
 
     - No computed vapour flux: not booked. A missing flux is not a zero
       and not a bound. The refusal keeps blocking the figure.
     - Supply at or below the mass-balance ledger resolution: authorized
       physical zero (``below_wall_supply_upper_bound``), carrying the
-      bound. Existing entries are left in place; they are not rewritten
-      to the supply.
+      bound. Existing entries of that species are removed, so a
+      measurement above the supply cannot stay priced.
     - Supply above that resolution: the priced aggregate equals the
       supply, once (``wall_deposit_upper_bound_used``). Partial
-      measurements of that species are removed first. The supply is not
-      added beside them, and the partial is not what the flag prices.
+      measurements of that species are removed first. The supply is
+      written on the candidate segment that maximises the maximum
+      segment load, with the smaller segment id on a tie.
 
     The refusal stays on the notice authority in every branch.
     """
@@ -4589,11 +4645,19 @@ def _book_wall_deposits_at_vapour_supply(
         if species not in supply_kg:
             continue
         supply = float(supply_kg[species])
-        segment, refusal_reason = _refusal_segment_and_reason(
-            notice_authority,
-            species,
-        )
         if supply <= resolution_kg:
+            # Authorized physical zero. deposit_wall,i <= supply_i still
+            # applies: a kept measurement would price mass above the
+            # supply. The priced map is 0, matching deposit_kg.
+            _drop_species_wall_deposit(booked_deposit, species)
+            reason_segment = _refusal_candidate_segments(
+                notice_authority, species
+            )[0]
+            refusal_reason = _refusal_reason(
+                notice_authority,
+                species,
+                reason_segment,
+            )
             bookings.append({
                 "species": species,
                 "reason": BELOW_WALL_SUPPLY_UPPER_BOUND,
@@ -4607,7 +4671,16 @@ def _book_wall_deposits_at_vapour_supply(
         # d-376 amendment 1 wall-deposit ruling: the scored mass is the
         # supply bound. A partial deposit kept in another segment is the
         # same vapour, so the aggregate is the supply and not
-        # measured + supply.
+        # measured + supply. The kilogram goes on the segment that
+        # maximises the binding load.
+        candidates = _refusal_candidate_segments(notice_authority, species)
+        segment = _segment_maximising_binding_load(
+            booked_deposit,
+            species,
+            supply,
+            candidates,
+        )
+        refusal_reason = _refusal_reason(notice_authority, species, segment)
         _replace_species_deposit_with_supply(
             booked_deposit,
             species,
@@ -4733,22 +4806,22 @@ def _coating_lifetime_projection(
     if isinstance(payload, Mapping) and payload.get(
         "coating_constraint_mode"
     ) != "no_unqualified_deposition":
-        # The coating margin is built from the unbooked deposit. A null
-        # rate there is that pre-booking refusal. Once every saturation
-        # refusal the margin names has been booked, the availability
-        # authority no longer refuses and the booked projection is the
-        # quantity. A null rate with no named saturation refusal is still
-        # unavailable.
-        stale_booked_null = (
+        # The coating margin is the pre-booking gate. Once every
+        # saturation refusal it names has been booked, its rate and
+        # lifetime describe the unbooked deposit. The booked deposit
+        # is the priced mass (the supply, or the authorized zero). A
+        # null rate with no named saturation refusal is still unavailable.
+        margin_refusals_are_booked = (
             availability.status != "refused"
             and bool(_margin_wall_refused_species(payload))
         )
-        if "campaigns_to_resinter_worst_segment" in payload:
+        if not margin_refusals_are_booked and (
+            "campaigns_to_resinter_worst_segment" in payload
+        ):
             rate = payload.get("wall_deposit_kg_per_campaign")
             raw_lifetime = payload["campaigns_to_resinter_worst_segment"]
             if raw_lifetime is None or rate is None:
-                if not stale_booked_null:
-                    unavailable = True
+                unavailable = True
             else:
                 if isinstance(rate, bool) or not isinstance(rate, int | float):
                     raise ObjectiveComputationError(
@@ -4762,9 +4835,9 @@ def _coating_lifetime_projection(
                 lifetime = raw_lifetime
                 has_positive_fouling = numeric_rate > 0.0
         elif (
-            "wall_deposit_kg_per_campaign" in payload
+            not margin_refusals_are_booked
+            and "wall_deposit_kg_per_campaign" in payload
             and payload["wall_deposit_kg_per_campaign"] is None
-            and not stale_booked_null
         ):
             unavailable = True
 
