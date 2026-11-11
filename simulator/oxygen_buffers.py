@@ -162,11 +162,28 @@ ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K = (
 ONEILL_POWNCEBY_1993_IW_UNCERTAINTY_J_MOL = 150.0
 
 
+def _oneill_pownceby_1993_iw_mu_o2_uncertainty_log10_dex(
+    temperature_K: float,
+) -> float:
+    temperature = _require_finite_positive(temperature_K, "temperature_K")
+    # Premise: the printed Fe–"FeO" equation labels its μO2 uncertainty
+    # ±150 J/mol.
+    # Algebra: log10(fO2/bar) = μO2 / (R T ln 10), so the band is
+    # ΔμO2 / (R T ln 10). Unit check: (J mol⁻¹) / ((J mol⁻¹ K⁻¹) K)
+    # is dimensionless and therefore a base-10 log band in dex.
+    # Sanity check: at 1586.4 K, 150 J/mol gives 0.004939 dex.
+    return ONEILL_POWNCEBY_1993_IW_UNCERTAINTY_J_MOL / (
+        _ONEILL_IW_R * temperature * _ONEILL_IW_LN10
+    )
+
+
 def oneill_pownceby_1993_iw_log10_fO2_bar(temperature_K: float) -> float:
     """Return O'Neill & Pownceby (1993) Fe–\"FeO\" log10(fO2/bar).
 
     The three recommended µO2 equations are printed in the abstract, in
-    J/mol O2 with T in K and a 1 bar reference. The uncertainty is ±150 J/mol.
+    J/mol O2 with T in K and a 1 bar reference. The abstract reports an overall
+    precision of ±100 J/mol (one standard deviation); the specific Fe–\"FeO\"
+    equation is marked ±150 J/mol.
     """
     temperature = _require_finite_positive(temperature_K, "temperature_K")
     if temperature < 1042.0:

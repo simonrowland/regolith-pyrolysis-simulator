@@ -17222,7 +17222,7 @@ def _relative_buffer_calibration(
     pressure_bar: float,
     printed_calibration: str | None,
 ) -> tuple[float, str, tuple[float, float], str, float | None] | None:
-    """Return log fO2, calibration id, range, authority, and spread band."""
+    """Return log fO2, calibration id, range, authority, and dex band."""
     from simulator.oxygen_buffers import (
         FROST_BUFFER_TEMPERATURE_RANGES_K,
         ONEILL_IW_TEMPERATURE_RANGES_K,
@@ -17266,11 +17266,14 @@ def _relative_buffer_calibration(
             return None
         from simulator.oxygen_buffers import (
             ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K,
-            ONEILL_POWNCEBY_1993_IW_UNCERTAINTY_J_MOL,
+            _oneill_pownceby_1993_iw_mu_o2_uncertainty_log10_dex,
             oneill_pownceby_1993_iw_log10_fO2_bar,
         )
 
         value = oneill_pownceby_1993_iw_log10_fO2_bar(temperature_K)
+        band_dex = _oneill_pownceby_1993_iw_mu_o2_uncertainty_log10_dex(
+            temperature_K
+        )
         lo = ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K[0][0]
         hi = ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K[-1][1]
         return (
@@ -17278,7 +17281,7 @@ def _relative_buffer_calibration(
             "oneill_pownceby_1993_iw_fe_feo",
             (lo, hi),
             "primary_EMF",
-            ONEILL_POWNCEBY_1993_IW_UNCERTAINTY_J_MOL,
+            band_dex,
         )
     if use_printed_frost:
         value = frost_log(buffer, temperature_K, corrected_pressure_bar)
@@ -17440,13 +17443,26 @@ def _relative_oxygen_decision(
         flags.append("phase_boundary_extrapolation_above_1811_K_Fe_melting")
     if band is not None:
         band_text = f"±{band:.6g} dex"
-        band_basis = "absolute canonical-to-Frost 1991 spread"
+        band_basis = (
+            "O'Neill and Pownceby 1993 Fe-'FeO' muO2 uncertainty"
+            if calibration_id == "oneill_pownceby_1993_iw_fe_feo"
+            else "canonical-to-Frost 1991 comparison spread"
+        )
     elif calibration_text:
         band_text = "not reported (printed calibration used exactly)"
         band_basis = "printed calibration used exactly"
     else:
         band_text = "not available (no independent cited comparison calibration)"
         band_basis = "no independent cited comparison calibration"
+    if calibration_id == "oneill_pownceby_1993_iw_fe_feo":
+        pressure_correction = (
+            "none; O'Neill and Pownceby 1993 equation is evaluated at its 1 bar "
+            "reference"
+        )
+    elif pressure_bar > 1:
+        pressure_correction = "Frost 1991 molar-volume ΔV term"
+    else:
+        pressure_correction = "none at or below 1 bar"
     reason = (
         f"buffer_relative_fO2_converted: buffer={buffer}; "
         f"offset_as_printed={offset_as_printed}; calibration={calibration_id}; "
@@ -17454,8 +17470,7 @@ def _relative_oxygen_decision(
         f"calibration_range={lo:g}–{hi:g} K; band={band_text}; "
         f"band_basis={band_basis}; "
         f"pressure={pressure_bar} bar; "
-        "pressure correction="
-        f"{'Frost 1991 molar-volume ΔV term' if pressure_bar > 1 else 'none at or below 1 bar'}"
+        f"pressure correction={pressure_correction}"
     )
     if method_notice:
         reason += f"; relative_definition_notice={method_notice}"

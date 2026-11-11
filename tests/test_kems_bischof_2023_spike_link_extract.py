@@ -188,15 +188,16 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
                 # e.g. "1586.4 ... ΔIW 1.66".
                 assert control.locator.page == 2
                 assert control.locator.table == "S1"
+                relative_item = {
+                    "delta_IW": str(delta_iw),
+                    "oxygen_buffer_as_published": (
+                        f"IW buffer-relative; printed ΔIW={delta_iw}; "
+                        "O’Neill and Pownceby, 1993"
+                    ),
+                }
                 decision = printed_oxygen_decision(
                     PrintedOxygenFacts(),
-                    raw_item={
-                        "delta_IW": str(delta_iw),
-                        "oxygen_buffer_as_published": (
-                            f"IW buffer-relative; printed ΔIW={delta_iw}; "
-                            "O’Neill and Pownceby, 1993"
-                        ),
-                    },
+                    raw_item=relative_item,
                     point_conditions=None,
                     scope="row",
                     run_temperature_K=temperature,
@@ -209,6 +210,29 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
                     assert "oneill_pownceby_1993_iw_fe_feo" in decision.notice_reason
                     assert decision.state.value == Decimal(
                         "0.0001130368308746852372423477753"
+                    )
+                    pressure_decision = printed_oxygen_decision(
+                        PrintedOxygenFacts(),
+                        raw_item=relative_item,
+                        point_conditions=None,
+                        scope="row",
+                        run_temperature_K=temperature,
+                        run_pressure_bar=Decimal(10),
+                        source_id=sid,
+                    )
+                    assert (
+                        pressure_decision is not None
+                        and pressure_decision.state == decision.state
+                        and pressure_decision.notice_band == "±0.00493888 dex"
+                        and pressure_decision.notice_reason is not None
+                        and (
+                            "band=±0.00493888 dex; "
+                            "band_basis=O'Neill and Pownceby 1993 Fe-'FeO' "
+                            "muO2 uncertainty; pressure=10 bar; "
+                            "pressure correction=none; O'Neill and Pownceby "
+                            "1993 equation is evaluated at its 1 bar reference"
+                        )
+                        in pressure_decision.notice_reason
                     )
                 assert row.identity.fO2_Pa == decision.state
                 conversion_notice = next(
