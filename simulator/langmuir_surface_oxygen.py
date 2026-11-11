@@ -22,15 +22,18 @@ drive ``max(0, P_eq - P_bulk)`` and, where that publisher enables it,
 the species-specific gas-film resistance. A vacuum root that is then
 clamped to the overhead partial is not a root of that balance. While
 O2 is net-leaving, the solved surface is not below the overhead pO2,
-because the O2 drive is zero at and below that partial. The O2
-partial is that backpressure on every transport branch.
-``species_drive_bulk_Pa`` is the only bulk decision, shared with the
-flux publisher. A disabled film and an HKL upper bound set
-``R_gas = 0`` (ideal Hertz-Knudsen); they do not zero the O2 partial.
-Free-molecular ``k_O2/k_Ca = sqrt(M_Ca/M_O2) = 1.119``. The 10 mbar
-film ratio is 1.424. ``p_total = 0`` with no O2 partial recovers the
-vacuum root. The exit check compares the solved surface with the
-caller's partial, not with a bulk a branch already discarded.
+because the O2 drive is zero at and below that partial. Inside this
+root the O2 partial is that backpressure on every transport branch.
+``species_drive_bulk_Pa`` is the only bulk decision. This module calls
+it with ``surface_oxygen_bound`` true. The flux publisher passes the
+same flag only when the root closed; a closed gate uses green's film
+rule for O2 as well. A disabled film and an HKL upper bound set
+``R_gas = 0`` (ideal Hertz-Knudsen); they do not zero the O2 partial
+of a root that owns the drive. Free-molecular
+``k_O2/k_Ca = sqrt(M_Ca/M_O2) = 1.119``. The 10 mbar film ratio is
+1.424. ``p_total = 0`` with no O2 partial recovers the vacuum root.
+The exit check compares the solved surface with the caller's partial,
+not with a bulk a branch already discarded.
 
 A failed root drops only below-band carriers. An in-band failure keeps
 the published pressures and names the warning.
@@ -45,7 +48,9 @@ the reservoir source capacity is at or below
 net-leaving, the solved surface is not below the caller's overhead
 O2 partial. That partial is the O2 drive bulk for every film flag
 and every HKL membership; the exit of this solve checks the caller's
-partial, not a bulk a branch zeroed. Every species is then one of
+partial, not a bulk a branch zeroed. The flux publisher uses that
+bulk only when it is emitting this root. A closed gate does not.
+Every species is then one of
 three outcomes: the published pressure (closure closed,
 transport-headspace channel, or no melt-surface law), the single
 surface-pO2 law below, or a typed refusal. The published surface is
@@ -894,11 +899,14 @@ def publisher_net_law(
     ``k`` is mol s^-1 m^-2 Pa^-1 and ``bulk`` is Pa. With no transport
     context the law is ideal Hertz-Knudsen of the supplied backpressure
     (``R_gas = 0``). With a transport context the conductance is the
-    evaporation publisher's and the bulk is ``species_drive_bulk_Pa``:
-    overhead O2 on every branch, and every other species only when the
-    film is on and the carrier is not an HKL upper bound. A disabled
-    film or an HKL upper bound is ideal Hertz-Knudsen (``R_gas = 0``),
-    not a zero O2 bulk. Every other carrier uses
+    evaporation publisher's and the bulk is ``species_drive_bulk_Pa``
+    with the surface root owning the drive: overhead O2 on every
+    branch, and every other species only when the film is on and the
+    carrier is not an HKL upper bound. A disabled film or an HKL upper
+    bound is ideal Hertz-Knudsen (``R_gas = 0``), not a zero O2 bulk.
+    The gate-closed publisher does not use this law; it passes
+    ``surface_oxygen_bound`` false and O2 follows the film rule.
+    Every other carrier uses
     ``_series_resistance_evaporation_flux_kg_m2_s``. The 1 Pa probe is
     valid because that flux is linear in ``P_eq - P_bulk`` (``R_gas``
     does not depend on the driving pressure). Sanity: free-molecular
@@ -966,6 +974,7 @@ def _publisher_net_law_with_transport(
         bulk,
         gas_resistance_enabled=transport.gas_resistance_enabled,
         hkl_upper_bound=hkl_bound,
+        surface_oxygen_bound=True,
     )
     if not transport.gas_resistance_enabled or hkl_bound:
         return ideal, drive_bulk

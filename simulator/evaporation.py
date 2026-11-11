@@ -4399,6 +4399,17 @@ class EvaporationMixin:
         )
         carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
         carrier_gas = carrier_resolver() if callable(carrier_resolver) else 'N2'
+        # d-376 amendment 1 O2 lower bound. The publisher subtracts
+        # overhead O2 on a disabled film or an HKL upper bound only
+        # when this step closed a surface root. ``root_closed`` is that
+        # predicate (applied and a solved surface). A missing context,
+        # and a closed gate, leave the key false: every species,
+        # including O2, keeps green's film rule. Round 7.
+        closure_context = getattr(self, "_langmuir_flux_closure_context", None)
+        surface_oxygen_bound = bool(
+            isinstance(closure_context, Mapping)
+            and closure_context.get("root_closed")
+        )
         controls: dict[str, Any] = {
             # Batch-gated flux map; pre-RG values came through the typed seam.
             CONTROL_FLUX_PRESSURES_KEY: vapor_pressures,
@@ -4468,6 +4479,7 @@ class EvaporationMixin:
                 )
                 or ''
             ),
+            'surface_oxygen_bound': surface_oxygen_bound,
         }
         if vapour_batch_report is not None:
             controls[CONTROL_BATCH_REPORT_KEY] = dict(vapour_batch_report)

@@ -30,9 +30,13 @@ melt-surface carrier), the one shared surface-pO2 law, or a typed
 refusal. The published surface is the root of
 ``sum (nO - dO) J = 0`` with ``J = k * max(0, P - P_bulk)`` using the
 publisher conductance (ideal Hertz-Knudsen when the film is off).
-Overhead O2 is that ``P_bulk`` on every branch: a disabled film and an
-HKL upper bound set ``R_gas = 0`` and do not discard the partial.
-While O2 is net-leaving the surface is not below it. The reported
+Inside that root, overhead O2 is ``P_bulk`` on every branch: a
+disabled film and an HKL upper bound set ``R_gas = 0`` and do not
+discard the partial. While O2 is net-leaving the surface is not below
+it. The flux publisher applies that O2 bulk only when the root owns
+the evaluation (``surface_oxygen_bound``). A closed gate uses green's
+film rule for O2 as well, so a disabled film and an HKL upper bound
+publish a zero O2 bulk. The reported
 residual is that root's residual. A condensed-metal cap
 never publishes above P_sat, including when the solve lowers pO2 and
 a subunit activity crosses 1, and the cap does not zero that
@@ -59,7 +63,10 @@ hands the flux kernel. Green's film policy: the nested
 top-level kernel flag is not copied onto those controls and is not
 that parent. Absent or null nested means the film is on. The closure
 and the publisher therefore share that flag on an open gate, and a
-closed gate keeps green's rates. The allowlist is green's
+closed gate keeps green's rates. ``species_drive_bulk_Pa`` is the only
+melt-surface bulk. Overhead O2 survives a disabled film or an HKL
+upper bound only when ``surface_oxygen_bound`` is true. The allowlist
+is green's
 ``tuple(raw or ())``. A string splits into characters (b-1170, not
 fixed here), so ``"Al2"`` does not permit Al2. A measured row, a
 ``*`` wildcard, and a permitted unmeasured fallback are in the
@@ -2792,19 +2799,22 @@ def test_every_species_uses_the_publisher_alpha_policy(
 
 
 # d-376 amendment 1, stated as the spec. Not imported from the solver.
-# Overhead O2 is the drive bulk on every transport branch. Every other
-# species keeps a bulk only while the film is on and the carrier is not
-# an HKL upper bound. A disabled film is ideal Hertz-Knudsen, R_gas = 0.
+# The surface root owns the O2 lower bound: overhead O2 is the drive
+# bulk on every transport branch. Every other species, and O2 when the
+# root did not run, keeps a bulk only while the film is on and the
+# carrier is not an HKL upper bound. A disabled film is ideal
+# Hertz-Knudsen, R_gas = 0.
 def _spec_drive_bulk(
     species: str,
     physical_pa: float,
     *,
     film_on: bool,
     hkl: frozenset[str],
+    surface_oxygen_bound: bool = True,
 ) -> float:
     if not math.isfinite(physical_pa) or physical_pa <= 0.0:
         return 0.0
-    if species == "O2":
+    if surface_oxygen_bound and species == "O2":
         return physical_pa
     if film_on and species not in hkl:
         return physical_pa
@@ -3017,8 +3027,14 @@ def _assert_direct_bound(film_on: bool, hkl_name: str, partial_name: str, gate: 
         assert result.pressures_Pa["Ca"] == pytest.approx(root_pa, rel=1.0e-5)
 
 
-def _provider_drive_bulks(*, film_on: bool) -> dict[str, float]:
-    """Real flux provider. O2 partial must survive a disabled film; Ca does not."""
+def _provider_drive_bulks(
+    *,
+    film_on: bool,
+    surface_oxygen_bound: bool,
+    hkl: frozenset[str] = frozenset(),
+    pressures_Pa: dict[str, float] | None = None,
+) -> dict:
+    """Real flux provider. The O2 lower bound is the root's, not the film's."""
 
     from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 
@@ -3033,7 +3049,9 @@ def _provider_drive_bulks(*, film_on: bool) -> dict[str, float]:
             temperature_C=_T_C,
             pressure_bar=0.0,
             control_inputs={
-                "vapour_batch_flux_pressures_Pa": {"O2": 250.0, "Ca": 80.0},
+                "vapour_batch_flux_pressures_Pa": dict(
+                    pressures_Pa or {"O2": 250.0, "Ca": 80.0}
+                ),
                 "overhead_partials_Pa": {"O2": 100.0, "Ca": 50.0},
                 "overhead_pressure_pa": 150.0,
                 "commanded_pressure_pa": 0.0,
@@ -3054,6 +3072,8 @@ def _provider_drive_bulks(*, film_on: bool) -> dict[str, float]:
                 "pipe_diameter_m": 0.12,
                 "gas_temperature_K": _T_K,
                 "carrier_gas": "N2",
+                "hkl_upper_bound_transport_species": tuple(hkl),
+                "surface_oxygen_bound": surface_oxygen_bound,
                 # Nested series key is the film switch. A parent False is
                 # green's audited-default ValueError, not a second switch.
                 "evaporation_series_resistance": {
@@ -3063,11 +3083,7 @@ def _provider_drive_bulks(*, film_on: bool) -> dict[str, float]:
         )
     )
     assert str(result.status) == "ok", result.diagnostic
-    series = (result.diagnostic or {}).get("evaporation_series_resistance") or {}
-    return {
-        species: float(series[species]["P_bulk_Pa"])
-        for species in ("O2", "Ca")
-    }
+    return result.diagnostic or {}
 
 
 def _assert_host_bound(entry: str, film_on: bool) -> None:
@@ -3154,9 +3170,24 @@ def _assert_host_bound(entry: str, film_on: bool) -> None:
         assert float(ca_diag["r_gas"]) > 0.0
     else:
         assert float(ca_diag["r_gas"]) == pytest.approx(0.0)
-    bulks = _provider_drive_bulks(film_on=film_on)
-    assert bulks["O2"] == pytest.approx(100.0)
-    assert bulks["Ca"] == pytest.approx(50.0 if film_on else 0.0)
+    # The open root owns the O2 lower bound. The provider call below
+    # is that same flag, not a gate-closed dispatch.
+    assert controls["surface_oxygen_bound"] is True
+    diagnostic = _provider_drive_bulks(
+        film_on=film_on,
+        surface_oxygen_bound=True,
+    )
+    series = diagnostic.get("evaporation_series_resistance") or {}
+    assert series["O2"]["P_bulk_Pa"] == pytest.approx(
+        _spec_drive_bulk(
+            "O2", 100.0, film_on=film_on, hkl=hkl, surface_oxygen_bound=True
+        )
+    )
+    assert series["Ca"]["P_bulk_Pa"] == pytest.approx(
+        _spec_drive_bulk(
+            "Ca", 50.0, film_on=film_on, hkl=hkl, surface_oxygen_bound=True
+        )
+    )
 
 
 @pytest.mark.parametrize("case", _bound_cases(), ids=_bound_case_id)
@@ -3178,6 +3209,166 @@ def test_overhead_o2_bound_holds_on_every_transport_branch(case: tuple) -> None:
         _assert_direct_bound(film_on, hkl_name, partial_name, gate)
     else:
         _assert_host_bound(entry, film_on)
+
+
+# Equilibrium relative to each species' own overhead partial.
+# ``above`` is the reviewer's 250 Pa O2 against 100 Pa of overhead.
+_DRIVE_PARTIALS = {"O2": 100.0, "Ca": 50.0}
+_DRIVE_PEQ = {
+    "above": 2.5,
+    "equal": 1.0,
+    "below": 0.5,
+}
+
+
+def _drive_cases() -> list[tuple]:
+    return [
+        (film_on, hkl_name, bound, peq_name)
+        for film_on in (False, True)
+        for hkl_name in _BOUND_HKL
+        for bound in (False, True)
+        for peq_name in _DRIVE_PEQ
+    ]
+
+
+def _drive_case_id(case: tuple) -> str:
+    film_on, hkl_name, bound, peq_name = case
+    film = "film" if film_on else "nofilm"
+    owner = "root" if bound else "green"
+    return f"{film}-hkl-{hkl_name}-{owner}-{peq_name}"
+
+
+@pytest.mark.parametrize("case", _drive_cases(), ids=_drive_case_id)
+def test_o2_backpressure_follows_the_surface_root_on_every_branch(case: tuple) -> None:
+    """Gate-closed O2 drive equals green. The root alone keeps the lower bound.
+
+    Invariant. ``species_drive_bulk_Pa`` is the only melt-surface bulk.
+    The closure law calls it with the root owning the drive. The flux
+    publisher's gas-transport scan and its emitted flux both call it
+    with ``surface_oxygen_bound`` from that root. Branches: film on and
+    off, HKL membership of O2 and of Ca, the root owning the drive or
+    not, and equilibrium above, at, and below the overhead partial.
+    Species: O2 and Ca.
+
+    The reviewer's closed-gate case is ``nofilm-hkl-none-green-above``
+    and ``nofilm-hkl-none-green-equal``: 250 Pa of O2 against 100 Pa of
+    overhead is a 250 Pa drive, and an equilibrium at or below 100 Pa
+    still evaporates. ``nofilm-hkl-O2-green-above`` and
+    ``film-hkl-O2-green-above`` are that hole for an HKL upper bound.
+    With the root owning the drive, O2 bulk stays the partial on every
+    one of those branches. Ca never does unless the film is on and Ca
+    is not the HKL carrier.
+
+    The closure law's bulk is the root-owned oracle on every row. A
+    publisher that applies the lower bound with the gate closed fails
+    the green rows, and a root that drops it fails the law rows.
+    """
+
+    from engines.builtin.evaporation_flux import species_drive_bulk_Pa
+    from simulator.langmuir_surface_oxygen import publisher_net_law
+
+    film_on, hkl_name, bound, peq_name = case
+    hkl = _BOUND_HKL[hkl_name]
+    scale = _DRIVE_PEQ[peq_name]
+    pressures = {
+        species: partial * scale
+        for species, partial in _DRIVE_PARTIALS.items()
+    }
+    transport = _bound_transport(film_on, hkl, _DRIVE_PARTIALS)
+    diagnostic = _provider_drive_bulks(
+        film_on=film_on,
+        surface_oxygen_bound=bound,
+        hkl=hkl,
+        pressures_Pa=pressures,
+    )
+    flux = diagnostic.get("evaporation_flux_kg_hr") or {}
+    series = diagnostic.get("evaporation_series_resistance") or {}
+    masses = {"O2": _M_O2, "Ca": _M_CA}
+    for species, partial in _DRIVE_PARTIALS.items():
+        publisher_bulk = _spec_drive_bulk(
+            species,
+            partial,
+            film_on=film_on,
+            hkl=hkl,
+            surface_oxygen_bound=bound,
+        )
+        root_bulk = _spec_drive_bulk(
+            species,
+            partial,
+            film_on=film_on,
+            hkl=hkl,
+            surface_oxygen_bound=True,
+        )
+        assert species_drive_bulk_Pa(
+            species,
+            partial,
+            gas_resistance_enabled=film_on,
+            hkl_upper_bound=species in hkl,
+            surface_oxygen_bound=bound,
+        ) == pytest.approx(publisher_bulk)
+        _k, law_bulk = publisher_net_law(
+            species=species,
+            alpha=1.0,
+            molar_mass_kg_per_mol=masses[species],
+            bulk_pressure_Pa=partial,
+            temperature_K=_T_K,
+            transport=transport,
+        )
+        assert law_bulk == pytest.approx(root_bulk)
+        if pressures[species] > publisher_bulk:
+            assert series[species]["P_bulk_Pa"] == pytest.approx(publisher_bulk)
+            assert flux[species] > 0.0
+        else:
+            assert species not in flux
+            assert species not in series
+
+
+@pytest.mark.parametrize("gate", ("open", "floor", "buffered"))
+@pytest.mark.parametrize("film_on", (False, True))
+def test_surface_oxygen_bound_is_set_only_by_a_closed_root(
+    gate: str,
+    film_on: bool,
+) -> None:
+    """The live publisher learns the O2 lower bound from the root, not the film.
+
+    Open and floor gates set the flag. A buffered in-band melt does
+    not, with the film on or off. The capacity-iteration reclose uses
+    the same predicate: applied, and a solved surface.
+    """
+
+    compiled, legacy = _catalog()
+    answer = _bound_answer(gate)
+    diagnostic = answer.diagnostic
+    published, _ca, _p_ref = _published_ca(diagnostic)
+    kernel = {
+        "evaporation_series_resistance": {"gas_resistance_enabled": film_on},
+    }
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=_bound_capacity(gate),
+        p_total_mbar=0.0,
+        headspace_partials_mbar={"O2": 1.0},
+        chemistry_kernel=kernel,
+    )
+    captured: dict = {}
+    _dispatch_real_flux_provider(host, captured)
+    EvaporationMixin._calculate_evaporation(host, equilibrium)
+    owns = gate != "buffered"
+    assert captured["controls"]["surface_oxygen_bound"] is owns
+    notice = getattr(host, "_last_langmuir_surface_oxygen", None)
+    if owns:
+        assert isinstance(notice, dict)
+        assert notice.get("surface_pO2_bar") is not None
+    else:
+        assert not isinstance(notice, dict) or notice.get("surface_pO2_bar") is None
+    reclosed = EvaporationMixin._reclose_langmuir_pressures(host, {"O2": 100.0})
+    assert reclosed is not None
+    assert bool(
+        reclosed.applied and reclosed.surface_pO2_bar is not None
+    ) is owns
 
 
 # d-376 round 6. The vapor map is not an allowlist. Every positive

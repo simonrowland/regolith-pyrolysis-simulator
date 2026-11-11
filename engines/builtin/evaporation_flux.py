@@ -430,19 +430,31 @@ def species_drive_bulk_Pa(
     *,
     gas_resistance_enabled: bool,
     hkl_upper_bound: bool,
+    surface_oxygen_bound: bool,
 ) -> float:
     """Pa backpressure in ``J = k * max(0, P_eq - P_bulk)``.
 
-    The only decision shared by the flux publisher and the surface
-    closure. d-376 amendment 1: overhead O2 is the lower bound on
-    surface pO2 while O2 is net-leaving. A disabled gas film and an
-    HKL upper-bound carrier turn ``R_gas`` off; they do not discard
-    that partial. The O2 drive is zero at and below it, so the
-    congruent root sits above it. Every other species keeps the
-    free-evaporation bound: the physical partial is the drive only
-    when the film is on and the carrier is not an HKL upper bound.
-    Zeroing O2 with those flags published the vacuum surface
-    (2.38675e-5 bar) under 100 Pa of overhead O2.
+    The only bulk decision for a melt-surface flux. Both publisher
+    sites (the gas-transport scan and the emitted flux) and the
+    surface-closure net law call this function and no other formula.
+
+    Invariant. Overhead O2 is a backpressure on a disabled film, and
+    on an HKL upper-bound carrier, only when ``surface_oxygen_bound``
+    is true: this evaluation closed a d-376 amendment 1 surface root.
+    While O2 is net-leaving, that root's drive is zero at and below
+    the overhead partial, so the surface sits above it. Zeroing O2
+    inside the root published the vacuum surface (2.38675e-5 bar)
+    under 100 Pa of overhead O2. Every other species, and O2 when the
+    root did not run, keeps green's rule: the physical partial is the
+    drive only when the film is on and the carrier is not an HKL
+    upper bound. A closed gate therefore publishes green's drive. A
+    250 Pa O2 equilibrium against 100 Pa of overhead stays a 250 Pa
+    drive when the film is off, and a positive green flux at or below
+    that overhead stays positive.
+
+    The solid-host bakeout prices its reaction driver with the raw
+    overhead partial and a disabled film. That path is green's and
+    does not consult this gate.
     """
 
     try:
@@ -451,7 +463,7 @@ def species_drive_bulk_Pa(
         return 0.0
     if not math.isfinite(partial) or partial <= 0.0:
         return 0.0
-    if species == "O2":
+    if surface_oxygen_bound and species == "O2":
         return partial
     if gas_resistance_enabled and not hkl_upper_bound:
         return partial
@@ -1577,6 +1589,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         gas_resistance_enabled = resolve_gas_resistance_enabled(
             series_config, controls
         )
+        # True only when this evaluation closed a surface root. Absent
+        # is green: a direct provider call did not run the closure.
+        surface_oxygen_bound = controls.get("surface_oxygen_bound") is True
         hkl_upper_bound_transport_species = frozenset(
             str(species)
             for species in (
@@ -1634,6 +1649,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     hkl_upper_bound=(
                         species in hkl_upper_bound_transport_species
                     ),
+                    surface_oxygen_bound=surface_oxygen_bound,
                 )
                 if P_eq_Pa <= P_bulk_Pa:
                     continue
@@ -1836,17 +1852,18 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 gas_resistance_enabled
                 and species not in hkl_upper_bound_transport_species
             )
-            # R_gas is off when the film is disabled or the carrier is an
-            # HKL upper bound. That is not a zero bulk for overhead O2:
-            # species_drive_bulk_Pa keeps the O2 partial on every branch
-            # (d-376 amendment 1). Other species stay on the
-            # free-evaporation bound, so a viscous partial does not
-            # suppress their drive.
+            # Same helper as the gas-transport scan above. R_gas is off
+            # when the film is disabled or the carrier is an HKL upper
+            # bound. Overhead O2 stays a backpressure on those branches
+            # only when the surface root owns this evaluation. A closed
+            # gate uses green's film rule for O2 too, so a viscous
+            # partial does not suppress that drive.
             P_bulk_Pa = species_drive_bulk_Pa(
                 species,
                 float(overhead_partials.get(species, 0.0)),
                 gas_resistance_enabled=gas_resistance_enabled,
                 hkl_upper_bound=species in hkl_upper_bound_transport_species,
+                surface_oxygen_bound=surface_oxygen_bound,
             )
             delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
             if delta_p_Pa <= 0:

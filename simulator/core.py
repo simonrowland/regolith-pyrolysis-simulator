@@ -7496,10 +7496,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # diagnostic here: the resolver owns it, and the live
             # evaporation call closes on the solved vector afterwards.
             reclosed = self._reclose_langmuir_pressures(partials_Pa)
+            # The trial's map and its O2 drive bound are one state.
+            # ``root_closed`` is applied and a solved surface. A trial
+            # that did not close a root keeps green's drive, including
+            # O2 on a disabled film or an HKL upper bound. The controls
+            # copied above were closed on the partials at the start of
+            # the shadow; this trial must not keep that flag.
+            owns_oxygen_drive = False
             if reclosed is not None:
                 iteration_controls['vapour_batch_flux_pressures_Pa'] = dict(
                     reclosed.pressures_Pa
                 )
+                owns_oxygen_drive = bool(
+                    reclosed.applied and reclosed.surface_pO2_bar is not None
+                )
+            iteration_controls['surface_oxygen_bound'] = owns_oxygen_drive
             request = IntentRequest(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
                 account_view=account_view,
