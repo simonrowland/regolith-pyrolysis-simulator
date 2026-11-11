@@ -20423,7 +20423,7 @@ def _relative_buffer_calibration(
     pressure_bar: float,
     printed_calibration: str | None,
 ) -> tuple[float, str, tuple[float, float], str, float | None] | None:
-    """Return log fO2, calibration id, range, authority, and spread band."""
+    """Return log fO2, calibration id, range, authority, and dex band."""
     from simulator.oxygen_buffers import (
         FROST_BUFFER_TEMPERATURE_RANGES_K,
         ONEILL_IW_TEMPERATURE_RANGES_K,
@@ -20448,10 +20448,42 @@ def _relative_buffer_calibration(
     use_printed_oneill_1987 = (
         "o'neill" in calibration_text and "1987" in calibration_text
     )
+    use_printed_oneill_pownceby_1993 = (
+        "o'neill" in calibration_text
+        and "pownceby" in calibration_text
+        and "1993" in calibration_text
+    )
     if printed_calibration and not any(
-        (use_printed_frost, use_printed_oneill_1988, use_printed_oneill_1987)
+        (
+            use_printed_frost,
+            use_printed_oneill_1988,
+            use_printed_oneill_1987,
+            use_printed_oneill_pownceby_1993,
+        )
     ):
         return None
+    if use_printed_oneill_pownceby_1993:
+        if buffer != "IW":
+            return None
+        from simulator.oxygen_buffers import (
+            ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K,
+            _oneill_pownceby_1993_iw_mu_o2_uncertainty_log10_dex,
+            oneill_pownceby_1993_iw_log10_fO2_bar,
+        )
+
+        value = oneill_pownceby_1993_iw_log10_fO2_bar(temperature_K)
+        band_dex = _oneill_pownceby_1993_iw_mu_o2_uncertainty_log10_dex(
+            temperature_K
+        )
+        lo = ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K[0][0]
+        hi = ONEILL_POWNCEBY_1993_IW_TEMPERATURE_RANGES_K[-1][1]
+        return (
+            value,
+            "oneill_pownceby_1993_iw_fe_feo",
+            (lo, hi),
+            "primary_EMF",
+            band_dex,
+        )
     if use_printed_frost:
         value = frost_log(buffer, temperature_K, corrected_pressure_bar)
         valid_range = FROST_BUFFER_TEMPERATURE_RANGES_K.get(buffer)
