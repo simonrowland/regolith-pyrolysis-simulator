@@ -33,12 +33,17 @@ objectives:
   - metric: energy_electrical_plus_evaporation_kWh
     sense: minimize
     units: kWh
-    weight: 0.10
+    weight: 0.08
     rationale: throughput cost
+  - metric: throughput_cost_owner_ratify_usd
+    sense: minimize
+    units: USD
+    weight: 0.03
+    rationale: carrier makeup/recycle energy, reagent loss, and run-local extraction cost
   - metric: duration_h
     sense: minimize
     units: h
-    weight: 0.06
+    weight: 0.05
     rationale: furnace occupancy
 constraints:
   gates:

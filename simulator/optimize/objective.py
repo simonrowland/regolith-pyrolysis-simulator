@@ -31,8 +31,18 @@ from simulator.optimize.physics import (
     target_species_yield_report,
 )
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
-from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
+from simulator.cost_energy import (
+    carrier_gas_run_cost,
+    is_unavailable_quantity,
+    unavailable_quantity,
+    unavailable_reason_of,
+)
 from simulator.core import read_high_t_melt_activity_fallback_notice
+from simulator.thermal_train import (
+    OXYGEN_MOLAR_MASS_KG_PER_MOL,
+    cryogenic_tail,
+    thermal_train_parameters_from_mapping,
+)
 from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.three_product_report import classify_products
@@ -1473,6 +1483,16 @@ def compute_objectives(
                 constraints=_extraction_constraints_from_profile(profile),
             )
             evidence[definition.metric] = reader_evidence
+        elif definition.metric in THROUGHPUT_OWNER_COST_METRICS:
+            marginal_summary = _marginal_extraction_cost_summary(
+                sim,
+                product_ledger,
+                run_execution=run_execution,
+                cost_parameters=active_cost_parameters,
+                profile=profile,
+            )
+            value = marginal_summary["marginal_cost_usd"]
+            evidence[definition.metric] = _plain_payload(marginal_summary)
         else:
             value = _metric_value(
                 definition.metric,
@@ -1481,6 +1501,7 @@ def compute_objectives(
                 product_classes,
                 run_execution=run_execution,
                 cost_parameters=active_cost_parameters,
+                profile=profile,
             )
             if definition.metric == "pure_silica_glass_kg":
                 evidence[definition.metric] = _silica_objective_evidence(
@@ -1492,15 +1513,6 @@ def compute_objectives(
                     _product_class_objective_evidence(
                         definition.metric,
                         product_classes,
-                    )
-                )
-            if definition.metric in THROUGHPUT_OWNER_COST_METRICS:
-                evidence[definition.metric] = _plain_payload(
-                    _marginal_extraction_cost_summary(
-                        sim,
-                        product_ledger,
-                        run_execution=run_execution,
-                        cost_parameters=active_cost_parameters,
                     )
                 )
             if definition.metric in FURNACE_LIFESPAN_COST_METRICS:
@@ -4713,6 +4725,7 @@ def _metric_value(
     *,
     run_execution: Any | None = None,
     cost_parameters: CostParameters | None = None,
+    profile: Mapping[str, Any] | None = None,
 ) -> float | None:
     if metric == "pure_silica_glass_kg":
         return _silica_product_objective_value(product_classes)
@@ -4774,6 +4787,7 @@ def _metric_value(
             product_ledger,
             run_execution=run_execution,
             cost_parameters=cost_parameters or cost_parameters_from_mapping(),
+            profile=profile,
         )["marginal_cost_usd"]
     if metric in FURNACE_LIFESPAN_COST_METRICS:
         return _furnace_lifespan_consumed_fraction(run_execution, sim)
@@ -4812,12 +4826,156 @@ def _product_class_mass_value(
     return value
 
 
+def _carrier_gas_cost_summary(
+    sim: Any,
+    run_execution: Any | None,
+    *,
+    profile: Mapping[str, Any] | None,
+    cost_parameters: CostParameters,
+) -> Mapping[str, Any]:
+    melt = getattr(sim, "melt", None)
+    species = str(getattr(melt, "background_gas_species", "") or "").strip()
+    if not species:
+        return MappingProxyType({
+            "status": "not_configured",
+            "carrier_species": None,
+            "carrier_mass_used_kg": 0.0,
+            "refrigeration_recycle_energy_kWh": 0.0,
+            "recycle_electricity_cost_usd": 0.0,
+            "makeup_cost_usd": 0.0,
+            "carrier_cost_usd": 0.0,
+            "typed_todo": None,
+        })
+
+    pressure_mbar = _carrier_pressure_mbar(sim)
+    run_profile = profile.get("run", {}) if isinstance(profile, Mapping) else {}
+    raw_mass_kg = (
+        run_profile.get("mass_kg")
+        if isinstance(run_profile, Mapping)
+        else None
+    )
+    if raw_mass_kg is None:
+        raw_mass_kg = getattr(melt, "initial_mass_kg", None)
+    raw_duration_h: Any = None
+    try:
+        raw_duration_h = _duration_hours(sim)
+    except ObjectiveComputationError:
+        if isinstance(run_profile, Mapping):
+            raw_duration_h = run_profile.get("hours")
+
+    unavailable_reason: str | None = None
+    unavailable_code: str | None = None
+    try:
+        mass_kg = _finite_float(raw_mass_kg, "carrier cost feed mass")
+        duration_h = _finite_float(raw_duration_h, "carrier cost run duration")
+        pressure = _finite_float(pressure_mbar, "carrier cost partial pressure")
+    except ObjectiveComputationError as exc:
+        unavailable_reason = f"carrier_cost_inputs_unavailable: {exc}"
+        unavailable_code = "carrier_cost_inputs_missing"
+    else:
+        if mass_kg < 0.0 or duration_h < 0.0 or pressure < 0.0:
+            unavailable_reason = "carrier_cost_inputs_must_be_non_negative"
+            unavailable_code = "carrier_cost_inputs_invalid"
+    if unavailable_reason is not None:
+        return MappingProxyType({
+            "status": "unavailable",
+            "carrier_species": species,
+            "carrier_mass_used_kg": unavailable_quantity(
+                reason=unavailable_reason,
+                units="kg",
+            ),
+            "refrigeration_recycle_energy_kWh": unavailable_quantity(
+                reason=unavailable_reason,
+                units="kWh",
+            ),
+            "recycle_electricity_cost_usd": unavailable_quantity(
+                reason=unavailable_reason,
+                units="USD",
+            ),
+            "makeup_cost_usd": unavailable_quantity(
+                reason=unavailable_reason,
+                units="USD",
+            ),
+            "carrier_cost_usd": unavailable_quantity(
+                reason=unavailable_reason,
+                units="USD",
+            ),
+            "typed_todo": {
+                "code": unavailable_code,
+                "detail": unavailable_reason,
+            },
+        })
+
+    # No carrier flow ledger exists yet. Premise: the owner supplied a 44 kg
+    # carrier use for the 1 kg, 150 h hero; the configured C2A total-pressure
+    # basis is 10 mbar. Estimate used mass as 44 kg * (feed kg / 1 kg) * (run h / 150 h)
+    # * (carrier mbar / 10 mbar). Units reduce to kg, the hero limit returns
+    # exactly 44 kg, and zero feed, duration, or carrier pressure returns zero.
+    carrier_mass_used_kg = (
+        44.0
+        * mass_kg
+        * (duration_h / 150.0)
+        * (pressure / 10.0)
+    )
+    loss_fraction = cost_parameters.carrier_makeup_loss_fraction_per_run
+    recirculated_mass_kg = carrier_mass_used_kg * (1.0 - loss_fraction)
+    refrigeration_kWh_per_kg = _carrier_refrigeration_kWh_per_kg()
+    refrigeration_kWh = recirculated_mass_kg * refrigeration_kWh_per_kg
+    cost = carrier_gas_run_cost(
+        carrier_mass_used_kg=carrier_mass_used_kg,
+        carrier_species=species,
+        carrier_body=str(getattr(melt, "body", "") or ""),
+        refrigeration_recycle_energy_kWh=refrigeration_kWh,
+        carrier_gas_earth_price_per_kg=(
+            cost_parameters.carrier_gas_earth_price_per_kg
+        ),
+        import_delivery_cost_per_kg=cost_parameters.import_delivery_cost_per_kg,
+        makeup_loss_fraction_per_run=loss_fraction,
+        electricity_cost_per_kWh=cost_parameters.electricity_cost_per_kWh,
+    )
+    return MappingProxyType({
+        **cost,
+        "status": "estimated",
+        "carrier_mass_basis": "flagged_44kg_hero_reference_scaled_by_feed_time_pressure",
+        "refrigeration_basis": (
+            "O2 cryogenic_tail refrigeration work per kg from "
+            "simulator.thermal_train.cryogenic_tail; applied to carrier stream"
+        ),
+        "refrigeration_kWh_per_kg": refrigeration_kWh_per_kg,
+    })
+
+
+def _carrier_pressure_mbar(sim: Any) -> Any:
+    melt = getattr(sim, "melt", None)
+    return getattr(melt, "p_total_mbar", None)
+
+
+def _carrier_refrigeration_kWh_per_kg() -> float:
+    """Use the existing O2 cold-tail work per kg as the carrier proxy."""
+
+    params = thermal_train_parameters_from_mapping()
+    tail = cryogenic_tail(
+        1.0,
+        temperature_floor_K=params.T_floor_K,
+        temperature_frost_K=params.T_frost_K,
+        temperature_reject_K=params.T_reject_K,
+        eta_2ndlaw=params.eta_2ndlaw,
+        segment_K=params.dT_segment_K,
+    )
+    # data/thermal_train_params.yaml and docs/thermal-train.md describe the
+    # train's O2 duty, not carrier recirculation. Use its refrigeration work per
+    # kg O2 as the requested carrier-stream proxy: (W at 1 mol/s) / (kg/s) /
+    # 3.6e6 J/kWh. This retains the train's enthalpy and Carnot-lift assumptions.
+    return float(tail["refrigeration_work_W"]) / OXYGEN_MOLAR_MASS_KG_PER_MOL / 3.6e6
+
+
 def _marginal_extraction_cost_summary(
     sim: Any,
     product_ledger: Mapping[str, float],
     *,
     run_execution: Any | None,
     cost_parameters: CostParameters,
+    profile: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
     electrical_kWh = _energy_component_value(
         sim,
@@ -4836,6 +4994,19 @@ def _marginal_extraction_cost_summary(
         solar_heat_kWh * cost_parameters.solar_heat_cost_per_kWh
     )
     energy_cost_usd = electrical_cost_usd + solar_heat_cost_usd
+    carrier = _carrier_gas_cost_summary(
+        sim,
+        run_execution,
+        profile=profile,
+        cost_parameters=cost_parameters,
+    )
+    carrier_cost_usd = carrier.get("carrier_cost_usd")
+    carrier_cost_available = (
+        carrier_cost_usd is not None
+        and not is_unavailable_quantity(carrier_cost_usd)
+    )
+    if carrier_cost_available:
+        energy_cost_usd += float(carrier.get("recycle_electricity_cost_usd", 0.0))
     reagent = _reagent_consumption_cost_summary(
         sim,
         product_ledger,
@@ -4852,9 +5023,11 @@ def _marginal_extraction_cost_summary(
     depreciation_usd = depreciation["depreciation_expense_per_run_usd"]
     total = (
         None
-        if depreciation_usd is None
+        if depreciation_usd is None or not carrier_cost_available
         else (
-            energy_cost_usd
+            electrical_cost_usd
+            + solar_heat_cost_usd
+            + float(carrier_cost_usd)
             + float(reagent["reagent_cost_usd"])
             + float(depreciation_usd)
         )
@@ -4862,8 +5035,8 @@ def _marginal_extraction_cost_summary(
     return MappingProxyType({
         "schema_version": "optimizer-marginal-cost-v1",
         "accounting_principle": (
-            "marginal extraction cost: variable energy + reagent consumption "
-            "+ per-run depreciation"
+            "marginal extraction cost: variable energy + carrier makeup/recycle "
+            "+ reagent consumption + per-run depreciation"
         ),
         "marginal_cost_usd": total,
         "energy_electrical_kWh": electrical_kWh,
@@ -4873,6 +5046,8 @@ def _marginal_extraction_cost_summary(
         "electrical_cost_usd": electrical_cost_usd,
         "solar_heat_cost_usd": solar_heat_cost_usd,
         "energy_cost_usd": energy_cost_usd,
+        "carrier_gas": carrier,
+        "carrier_cost_usd": carrier_cost_usd,
         "reagent": reagent,
         "depreciation": depreciation,
     })

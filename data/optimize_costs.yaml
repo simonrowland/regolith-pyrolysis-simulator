@@ -13,6 +13,26 @@ parameters:
     rationale: "Bootstrap microgrid planning rate; rounded above recent EIA industrial retail electricity to cover off-Earth generation/storage margin."
     source_tag: "U.S. EIA, Electric Power Monthly, Table 5.6.A, Average Price of Electricity to Ultimate Customers by End-Use Sector, accessed 2026-07-12, https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_06_a; owner bootstrap margin"
 
+  import_delivery_cost_per_kg:
+    value: 10000.0
+    units: USD/kg
+    rationale: "Owner-ratified import delivery cost, before Earth purchase price."
+    source_tag: "owner ratified 2026-11-11 (d-389): imports at $10k/kg plus Earth cost"
+
+  carrier_gas_earth_price_per_kg:
+    units: USD/kg
+    rationale: "approximate European small-quantity price, Ullmann's (1999) via Wikipedia 'Prices of chemical elements'; USGS MCS 2026 reports rare-gas prices unavailable"
+    source_tag: "FLAGGED dated estimate 2026-11-11: Ullmann's (1999) via Wikipedia 'Prices of chemical elements'; USGS MCS 2026 reports rare-gas prices unavailable"
+    values:
+      Kr:
+        value: 290.0
+
+  carrier_makeup_loss_fraction_per_run:
+    value: 0.01
+    units: fraction/run
+    rationale: "Assumed fraction of recirculated carrier lost per run; visible design input pending an owner value."
+    source_tag: "FLAGGED: controller assumption pending owner number (d-389)"
+
   furnace_resinter_cost_usd:
     value: 5000.0
     units: USD/resinter

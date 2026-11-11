@@ -24,6 +24,9 @@ DEFAULT_COST_PARAMETERS_PATH = DEFAULT_DATA_DIR / "optimize_costs.yaml"
 DEFAULT_SOLAR_HEAT_COST_PER_KWH = 0.05
 DEFAULT_FURNACE_LIFETIME_COST_MULTIPLIER = 500.0
 DEFAULT_MIN_FOULING_PENALTY = 1.0
+DEFAULT_IMPORT_DELIVERY_COST_PER_KG = 10000.0
+DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG = {"Kr": 290.0}
+DEFAULT_CARRIER_MAKEUP_LOSS_FRACTION_PER_RUN = 0.01
 ENERGY_COST_DEFAULT_SOURCE = "owner-t7-two-price-energy-v1"
 PAYLOAD_ABSENT_COST_PROVENANCE = (
     "canonical defaults; payload carried no cost parameters"
@@ -37,8 +40,12 @@ _REQUIRED_SCALAR_PARAMETERS = (
     "generic_reagent_cost_per_kg",
     "furnace_lifetime_cost_multiplier",
     "min_fouling_penalty",
+    "import_delivery_cost_per_kg",
+    "carrier_makeup_loss_fraction_per_run",
 )
 _SHUTTLE_PARAMETER = "shuttle_reagent_replacement_cost_per_kg"
+_CARRIER_PRICE_PARAMETER = "carrier_gas_earth_price_per_kg"
+_CARRIER_PRICE_SPECIES = frozenset({"Kr"})
 
 
 @dataclass(frozen=True)
@@ -51,6 +58,13 @@ class CostParameters:
     solar_heat_cost_per_kWh: float = DEFAULT_SOLAR_HEAT_COST_PER_KWH
     furnace_lifetime_cost_multiplier: float = DEFAULT_FURNACE_LIFETIME_COST_MULTIPLIER
     min_fouling_penalty: float = DEFAULT_MIN_FOULING_PENALTY
+    import_delivery_cost_per_kg: float = DEFAULT_IMPORT_DELIVERY_COST_PER_KG
+    carrier_gas_earth_price_per_kg: Mapping[str, float] = field(
+        default_factory=lambda: dict(DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG)
+    )
+    carrier_makeup_loss_fraction_per_run: float = (
+        DEFAULT_CARRIER_MAKEUP_LOSS_FRACTION_PER_RUN
+    )
 
     def __post_init__(self) -> None:
         for field_name in _REQUIRED_SCALAR_PARAMETERS:
@@ -74,6 +88,20 @@ class CostParameters:
             self,
             "shuttle_reagent_replacement_cost_per_kg",
             MappingProxyType(shuttle),
+        )
+        carrier_prices = {
+            str(species): _finite_nonnegative(value, f"{_CARRIER_PRICE_PARAMETER}.{species}")
+            for species, value in dict(self.carrier_gas_earth_price_per_kg).items()
+        }
+        if set(carrier_prices) != _CARRIER_PRICE_SPECIES:
+            raise ValueError(
+                f"{_CARRIER_PRICE_PARAMETER} must define exactly "
+                f"{', '.join(sorted(_CARRIER_PRICE_SPECIES))}"
+            )
+        object.__setattr__(
+            self,
+            "carrier_gas_earth_price_per_kg",
+            MappingProxyType(carrier_prices),
         )
 
     def reagent_cost_per_kg(self, species: str) -> float:
@@ -147,7 +175,9 @@ def normalize_cost_parameters(
     raw_parameters = payload.get("parameters")
     if not isinstance(raw_parameters, Mapping):
         raise ValueError("cost parameter payload missing parameters mapping")
-    raw_parameters = _with_missing_solar_heat_default(raw_parameters)
+    raw_parameters = _with_missing_carrier_cost_defaults(
+        _with_missing_solar_heat_default(raw_parameters)
+    )
 
     parameters: dict[str, Any] = {}
     for name in _REQUIRED_SCALAR_PARAMETERS:
@@ -184,6 +214,33 @@ def normalize_cost_parameters(
         "values": shuttle_values,
     }
 
+    carrier_price_entry = _parameter_entry(raw_parameters, _CARRIER_PRICE_PARAMETER)
+    raw_carrier_prices = carrier_price_entry.get("values")
+    if not isinstance(raw_carrier_prices, Mapping):
+        raise ValueError(f"{_CARRIER_PRICE_PARAMETER} must define values")
+    if set(str(key) for key in raw_carrier_prices) != _CARRIER_PRICE_SPECIES:
+        raise ValueError(
+            f"{_CARRIER_PRICE_PARAMETER} must define exactly "
+            f"{', '.join(sorted(_CARRIER_PRICE_SPECIES))}"
+        )
+    carrier_price_values: dict[str, Any] = {}
+    for species in sorted(_CARRIER_PRICE_SPECIES):
+        raw_species = raw_carrier_prices[species]
+        species_entry = dict(raw_species) if isinstance(raw_species, Mapping) else {}
+        value = species_entry.get("value") if species_entry else raw_species
+        carrier_price_values[species] = {
+            **{str(key): copy.deepcopy(item) for key, item in species_entry.items() if key != "value"},
+            "value": _finite_nonnegative(value, f"{_CARRIER_PRICE_PARAMETER}.{species}"),
+        }
+    parameters[_CARRIER_PRICE_PARAMETER] = {
+        **{
+            str(key): copy.deepcopy(value)
+            for key, value in carrier_price_entry.items()
+            if key != "values"
+        },
+        "values": carrier_price_values,
+    }
+
     return {
         "schema_version": OPTIMIZE_COSTS_SCHEMA_VERSION,
         "parameters": parameters,
@@ -216,6 +273,11 @@ def cost_parameter_values(payload: Mapping[str, Any] | None = None) -> dict[str,
         species: _finite_nonnegative(entry["value"], f"{_SHUTTLE_PARAMETER}.{species}")
         for species, entry in sorted(shuttle.items())
     }
+    carrier_prices = raw_parameters[_CARRIER_PRICE_PARAMETER]["values"]
+    values[_CARRIER_PRICE_PARAMETER] = {
+        species: _finite_nonnegative(entry["value"], f"{_CARRIER_PRICE_PARAMETER}.{species}")
+        for species, entry in sorted(carrier_prices.items())
+    }
     return {
         "schema_version": OPTIMIZE_COSTS_SCHEMA_VERSION,
         "parameters": values,
@@ -242,6 +304,11 @@ def cost_parameters_from_mapping(payload: Mapping[str, Any] | None = None) -> Co
         generic_reagent_cost_per_kg=values["generic_reagent_cost_per_kg"],
         furnace_lifetime_cost_multiplier=values["furnace_lifetime_cost_multiplier"],
         min_fouling_penalty=values["min_fouling_penalty"],
+        import_delivery_cost_per_kg=values["import_delivery_cost_per_kg"],
+        carrier_gas_earth_price_per_kg=values[_CARRIER_PRICE_PARAMETER],
+        carrier_makeup_loss_fraction_per_run=values[
+            "carrier_makeup_loss_fraction_per_run"
+        ],
         shuttle_reagent_replacement_cost_per_kg=values[_SHUTTLE_PARAMETER],
     )
 
@@ -300,6 +367,55 @@ def _with_missing_solar_heat_default(
     return result
 
 
+def _with_missing_carrier_cost_defaults(
+    parameters: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Keep saved v1 recipe cost blocks usable as new carrier inputs land."""
+
+    result = dict(parameters)
+    result.setdefault(
+        "import_delivery_cost_per_kg",
+        {
+            "value": DEFAULT_IMPORT_DELIVERY_COST_PER_KG,
+            "units": "USD/kg",
+            "rationale": "Owner-ratified import delivery cost, before Earth purchase price.",
+            "source_tag": "owner ratified 2026-11-11 (d-389): imports at $10k/kg plus Earth cost",
+        },
+    )
+    result.setdefault(
+        _CARRIER_PRICE_PARAMETER,
+        {
+            "units": "USD/kg",
+            "rationale": (
+                "approximate European small-quantity price, Ullmann's (1999) via "
+                "Wikipedia 'Prices of chemical elements'; USGS MCS 2026 reports "
+                "rare-gas prices unavailable"
+            ),
+            "source_tag": (
+                "FLAGGED dated estimate 2026-11-11: Ullmann's (1999) via Wikipedia "
+                "'Prices of chemical elements'; USGS MCS 2026 reports rare-gas prices unavailable"
+            ),
+            "values": {
+                "Kr": {
+                    "value": DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG["Kr"],
+                }
+            },
+        },
+    )
+    result.setdefault(
+        "carrier_makeup_loss_fraction_per_run",
+        {
+            "value": DEFAULT_CARRIER_MAKEUP_LOSS_FRACTION_PER_RUN,
+            "units": "fraction/run",
+            "rationale": (
+                "Assumed fraction of recirculated carrier lost per run; visible design input pending an owner value."
+            ),
+            "source_tag": "FLAGGED: controller assumption pending owner number (d-389)",
+        },
+    )
+    return result
+
+
 def _parameter_entry(parameters: Mapping[str, Any], name: str) -> Mapping[str, Any]:
     raw = parameters.get(name)
     if isinstance(raw, Mapping):
@@ -316,7 +432,10 @@ def _parameter_value(parameters: Mapping[str, Any], name: str) -> float:
 
 def _validated_scalar_parameter(value: Any, name: str) -> float:
     if name != "min_fouling_penalty":
-        return _finite_nonnegative(value, name)
+        number = _finite_nonnegative(value, name)
+        if name == "carrier_makeup_loss_fraction_per_run" and number > 1.0:
+            raise ValueError(f"{name} must be at most 1.0")
+        return number
     if isinstance(value, bool):
         raise TypeError(f"{name} must be numeric")
     try:

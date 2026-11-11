@@ -713,6 +713,29 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
         run_execution=run_execution,
         cost_parameters=cost_parameters,
     ) == pytest.approx(42.5)
+    sim.melt = SimpleNamespace(
+        background_gas_species="Kr",
+        initial_mass_kg=1.0,
+        p_total_mbar=10.0,
+    )
+    sim.overhead = SimpleNamespace(composition={"Kr": 10.0})
+    sim.record.total_hours = 150.0
+    carrier_profile = {"run": {"mass_kg": 1.0, "hours": 150}}
+    carrier_cost = objective_module._carrier_gas_cost_summary(
+        sim,
+        run_execution,
+        profile=carrier_profile,
+        cost_parameters=cost_parameters,
+    )
+    assert _metric_value(
+        "throughput_cost_owner_ratify_usd",
+        sim,
+        {"consumed_Fe_reagent": 2.0},
+        product_classes,
+        run_execution=run_execution,
+        cost_parameters=cost_parameters,
+        profile=carrier_profile,
+    ) == pytest.approx(42.5 + carrier_cost["carrier_cost_usd"])
     assert _metric_value(
         "furnace_lifespan_consumed_fraction",
         sim,
@@ -720,6 +743,35 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
         product_classes,
         run_execution=run_execution,
     ) == pytest.approx(0.125)
+
+    monkeypatch.setattr(
+        objective_module,
+        "classify_products",
+        lambda *_args, **_kwargs: product_classes,
+    )
+    monkeypatch.setattr(
+        objective_module,
+        "_product_ledger",
+        lambda _sim: {"consumed_Fe_reagent": 2.0},
+    )
+    objective_profile = {
+        "run": {"mass_kg": 1.0, "hours": 150},
+        "objectives": [
+            {
+                "metric": "throughput_cost_owner_ratify_usd",
+                "sense": "minimize",
+                "units": "USD",
+                "weight": 1.0,
+                "rationale": "carrier and run-local extraction costs",
+            }
+        ],
+    }
+    computed = compute_objectives(objective_profile, run_execution)
+    evidence = computed.evidence["throughput_cost_owner_ratify_usd"]
+    assert evidence["carrier_gas"]["carrier_mass_used_kg"] == pytest.approx(44.0)
+    assert computed.as_mapping()["throughput_cost_owner_ratify_usd"] == pytest.approx(
+        evidence["marginal_cost_usd"]
+    )
 
 
 def test_lifespan_cost_metric_is_not_costed_when_threshold_is_unavailable(monkeypatch) -> None:
