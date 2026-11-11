@@ -331,6 +331,8 @@ number from the simulator: it carries the per-domain error budget and the known 
 disagreements. The validation battery holds 186,644 observations. 101,709 are experimental
 measurements from the published literature, and each engine is scored against them rail by rail;
 [`docs/validation-battery.md`](docs/validation-battery.md) explains the scoring and how to read it.
+Use its [leaderboard](docs/validation-battery.md#leaderboard) to page through best and worst
+predictions by feedstock, engine, rail, and species.
 The other 84,935 sit in 969 compilation shards of assessed reference tables, which the engines
 read as data. An observation an engine cannot yet score carries a
 typed reason, never a silent gap. The extract-reproduction rollup is generated into

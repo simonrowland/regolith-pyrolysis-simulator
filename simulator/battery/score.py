@@ -1645,6 +1645,41 @@ def compute_metric(
     return None
 
 
+def _reference_from_metric(
+    operation: MetricOperation,
+    candidate: Decimal,
+    residual: Decimal,
+) -> Decimal | None:
+    """Recover a numeric reference from a scored candidate and residual."""
+
+    if not candidate.is_finite() or not residual.is_finite():
+        return None
+    if operation is MetricOperation.ABSOLUTE:
+        return candidate - residual
+    if operation is MetricOperation.RELATIVE:
+        for denominator, positive_reference in (
+            (Decimal(1) + residual, True),
+            (Decimal(1) - residual, False),
+        ):
+            if denominator == 0:
+                continue
+            reference = candidate / denominator
+            if (positive_reference and reference > 0) or (
+                not positive_reference and reference < 0
+            ):
+                return reference
+        return None
+    if operation is MetricOperation.DEX:
+        if candidate <= 0:
+            return None
+        try:
+            ratio = Decimal(str(10.0 ** float(residual)))
+        except (OverflowError, ValueError):
+            return None
+        return candidate / ratio if ratio.is_finite() and ratio > 0 else None
+    return None
+
+
 def score_eligible_from_conjuncts(conjuncts: EligibleConjuncts) -> bool:
     return conjuncts.eligible()
 

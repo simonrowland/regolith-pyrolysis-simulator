@@ -3798,7 +3798,11 @@ def _furnace_amortization_summary(
     ):
         return MappingProxyType({
             "furnace_amortization_status": "resinter_threshold_ungrounded",
-            "furnace_amortization_batch_cost_equivalents": 0.0,
+            "furnace_amortization_status_reason": (
+                "resinter_threshold_kg is not qualified"
+            ),
+            "furnace_amortization_cost_per_run_usd": None,
+            "furnace_amortization_batch_cost_equivalents": None,
             "campaigns_to_resinter": campaigns_to_resinter,
         })
     amortization = furnace_amortization_cost_per_run(
