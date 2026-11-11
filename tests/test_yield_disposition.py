@@ -1715,6 +1715,30 @@ def test_native_metal_taps_remain_distinct_from_retained_metal_phase() -> None:
     )
 
 
+def test_stage0_salt_feed_is_dispositioned_as_cleanup_sequestered() -> None:
+    account = "process.stage0_salt_feed"
+    ledger = AtomLedger()
+    ledger.load_external(
+        account,
+        {"FeSO4": 0.4, "CaSO4": 0.6},
+        source="retained Stage 0 salts",
+        material_origin="feedstock",
+    )
+
+    payload = build_yield_disposition(_sim(ledger))
+
+    salt_streams = {
+        stream["species"]: stream
+        for stream in payload["terminal_species_streams"]
+        if stream["account"] == account
+    }
+    assert set(salt_streams) == {"FeSO4", "CaSO4"}
+    assert salt_streams["FeSO4"]["destination"] == "cleanup_sequestered"
+    assert salt_streams["FeSO4"]["terminal_kg"] == pytest.approx(0.4)
+    assert salt_streams["CaSO4"]["destination"] == "cleanup_sequestered"
+    assert salt_streams["CaSO4"]["terminal_kg"] == pytest.approx(0.6)
+
+
 def test_known_metal_staging_and_condensation_holdup_accounts_are_mapped() -> None:
     ledger = AtomLedger()
     ledger.load_external(

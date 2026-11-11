@@ -85,6 +85,7 @@ _ACCOUNT_TO_BIN: Mapping[str, str] = {
     "process.reagent_inventory": "product_condensed",
     "process.solid_char_carbon": "melt_retained",
     "process.spent_reductant_residue": "melt_retained",
+    "process.stage0_salt_feed": "cleanup_sequestered",
     "reservoir.fo2_buffer": "redox_buffer_retained",
     "reservoir.oxygen_cistern_liquid_inventory": "product_oxygen",
     "reservoir.reagent.C": "charge_unprocessed",
