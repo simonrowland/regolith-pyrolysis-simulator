@@ -28,14 +28,17 @@ from simulator.melt_backend.base import (
 from simulator.engine_pool import EngineWorkerPool, WarmEngineWorker
 
 
-# Fingerprint the explicit prediction path for every cached backend: its
-# backend/parser, shared result normalization, and cache request projection.
-# liquidus.py is included for AlphaMELTS and MAGEMin because both use its
-# prediction helpers. Internal-analytical is deliberately uncached.
+# Each row includes that engine's backend/parser plus base.py result
+# normalization, engine_cache.py settings projection, and
+# binary_pot_battery.py request construction. OpenIMCC adds its direct-call
+# request vector; AlphaMELTS and MAGEMin add liquidus.py prediction helpers.
+# Internal-analytical is deliberately uncached.
 _CACHED_ENGINE_SOURCE_PINS = {
+    # Re-pinned because engine_cache.py records other engines' v2 bumps;
+    # OpenIMCC's prediction path did not change in R31.
     "openimcc": (
         1,
-        "ffa5d62a1fefb95d91bf9a7e5f502c52242f4f3a2d4507a680c357cd0dc41dc5",
+        "0308892c8eb319d7128ac33ec958ac18da3dab3c1c83001c770e441cfa08a1ae",
         (
             "simulator/melt_backend/openimcc_bridge.py",
             "simulator/melt_backend/base.py",
@@ -44,8 +47,8 @@ _CACHED_ENGINE_SOURCE_PINS = {
         ),
     ),
     "alphamelts": (
-        1,
-        "c258ef9b92a3324299b1f1b45c280f1f4f73e46cc60bbc157fe17b46e4d1da65",
+        2,
+        "558bf9f533e6c1fb4d8874e98a1776035c029531663d13f5924af12bae1626ba",
         (
             "simulator/melt_backend/alphamelts.py",
             "simulator/melt_backend/liquidus.py",
@@ -54,9 +57,11 @@ _CACHED_ENGINE_SOURCE_PINS = {
             "simulator/diagnostic_helpers/binary_pot_battery.py",
         ),
     ),
+    # Re-pinned because engine_cache.py records v2; the ThermoEngine source
+    # change prompting its v2 bump is documented in the chemistry changelog.
     "thermoengine": (
-        1,
-        "851311691c4ae1831c98d71eb98686bc1860bbbc28134afbc0d06c8231b76333",
+        2,
+        "7511dc5b33756f40212957c1063fb34a83ac29a7b45df3fe90387be7c31f69d2",
         (
             "simulator/melt_backend/thermoengine.py",
             "simulator/melt_backend/base.py",
@@ -64,9 +69,11 @@ _CACHED_ENGINE_SOURCE_PINS = {
             "simulator/diagnostic_helpers/binary_pot_battery.py",
         ),
     ),
+    # Re-pinned because engine_cache.py records other engines' v2 bumps;
+    # VapoRock's prediction path did not change in R31.
     "vaporock": (
         1,
-        "7717d7cb170405555fe87f7425ebd0bb57c833940a961e7e65c20dd63d66ed3f",
+        "a0e6c0d764a348c9d76e3c42f1172599ff24122cc5fdddf39deacb89eb2f6e70",
         (
             "simulator/melt_backend/vaporock.py",
             "simulator/melt_backend/base.py",
@@ -75,8 +82,8 @@ _CACHED_ENGINE_SOURCE_PINS = {
         ),
     ),
     "magemin": (
-        1,
-        "d0c526c7924e145669c882f117723e728f1cc050c19d23068c69a5bdddbe9198",
+        2,
+        "7bc437c502870dc74ee8086eaa7e42aff8eb43303c699fe48dfb0393e715975f",
         (
             "simulator/melt_backend/magemin.py",
             "simulator/melt_backend/liquidus.py",
