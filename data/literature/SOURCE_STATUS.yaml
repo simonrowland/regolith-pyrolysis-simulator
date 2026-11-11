@@ -10,13 +10,12 @@ scan:
 counts:
   sources: 2978
   by_stage:
-    located: 206
-    inbox: 1904
-    in_progress: 170
-    ingested_partial: 185
-    ingested_complete: 151
-    wired: 0
     unknown: 362
+    in_progress: 172
+    inbox: 1902
+    ingested_complete: 151
+    located: 206
+    ingested_partial: 185
 anti_loss:
   corpus_uncommitted:
     count: 0
@@ -26,7 +25,7 @@ anti_loss:
     ids: []
   extract_mirror_parity:
     simulator_only:
-      count: 402
+      count: 404
       ids:
       - 1997jonesthermo
       - abdeyazdan-2026-na-sn-si-phase-thermodynamics
@@ -132,6 +131,7 @@ anti_loss:
       - ferkl-2026-waste-glass-thermal-redox
       - florin-2025-cu-silicate-evaporation
       - forsberg-2002-ca-fe-o-incongruent-melting
+      - fortin-2014-sulfur-saturation-natural-melts-thesis
       - fredrickson-chasanov-1973-na2o-enthalpy-1300k
       - frischat-oel-1966-sodium-calcium-silicate-transport
       - fujisawa-1994-na-sn-carbonate-thermodynamics
@@ -142,6 +142,7 @@ anti_loss:
       - georges-2000-potassium-evaporation-thesis
       - gibbons-1963-thesis-cas-slags-cas
       - gorojovsky-wood-2026-sulfur-crustal
+      - greig-1927-immiscibility-part2
       - gribchenkova-2017-al2o3-mgo
       - gronvold-sveen-1974-magnetite-high-temperature-cp
       - hamuyuni-2016-copper-oxide-solubility-thesis-summary
@@ -448,7 +449,7 @@ anti_loss:
       - yakovlev-2011-meteorite-cai-evaporation
       - yakovlev-2016-cai-evaporation
     byte_mismatch:
-      count: 340
+      count: 343
       ids:
       - 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
       - adamkovicova-1980-casio3-heat-of-fusion
@@ -497,6 +498,7 @@ anti_loss:
       - giauque-ruehrwein-1939-hcn-psat
       - gran-sichen-2012-molten12-ladle-slag-liquidus
       - green-1971-apollo12-basalt-petrology
+      - greig-1927-ajs-immiscibility-silicate-melts-part1
       - guo-2021-mgo-activity-cmas-slag
       - habermann-daane-1964
       - hashimoto-nakano-2021-bubbles-to-chondrites-ii
@@ -724,6 +726,7 @@ anti_loss:
       - shornikov-2018-thermodynamic-evaporation-model
       - shornikov-2019-ca-feo-vapor
       - shornikov-2019-mgo-titania-melts
+      - shornikov-2019-perovskite-evaporation
       - shornikov-2019-perovskite-evaporation-rjpc
       - shornikov-2019-spinel-evaporation-abstract
       - shornikov-2020-cao-mgo-thermodynamics
@@ -772,6 +775,7 @@ anti_loss:
       - ta-shirai-2000-lpsc
       - ta-yamanaka-1997-metsoc
       - tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+      - takeda-1990-sn-slag-matertrans
       - thomas-2022-chlorine-bonding-silicate-melts
       - thomas-wood-2021-chlorine-silicate-melts
       - ts1985
@@ -791,7 +795,7 @@ anti_loss:
       - zaitsev-2000-ms2000-045
       - zigo-1987-gehlenite-fusion
   stale_inbox:
-    count: 1781
+    count: 1780
     ids:
     - abdelkarim-1977-ferrous-oxide-activities
     - abdellatif-2006-pilot-condenser
@@ -1287,7 +1291,6 @@ anti_loss:
     - green-1975-apollo17-experimental-petrology
     - green-2001-silica-oxynitride-review
     - green-2018-sio2-fluid-eos
-    - greig-1927-immiscibility-part2
     - gross-wilson-gutteridge-1970-nacro2-formation
     - grosu-2017-natural-magnetite-thermophysical-storage
     - grote-nd-transient-beam
@@ -10663,13 +10666,12 @@ sources:
   total_rows: 5
   inbox_exclusion_reason: null
 - source_id: fortin-2014-sulfur-saturation-natural-melts-thesis
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/fortin-2014-sulfur-saturation-natural-melts-thesis/SOURCE.md
-    - raw/fortin-2014-sulfur-saturation-natural-melts-thesis/fortin-2014-sulfur-saturation-natural-melts-thesis.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/fortin-2014-sulfur-saturation-natural-melts-thesis.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -12072,12 +12074,12 @@ sources:
   total_rows: 3
   inbox_exclusion_reason: null
 - source_id: greig-1927-immiscibility-part2
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/greig-1927-immiscibility-part2/greig-1927-immiscibility-part2.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/greig-1927-immiscibility-part2.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null

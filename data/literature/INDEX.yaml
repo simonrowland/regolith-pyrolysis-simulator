@@ -9,14 +9,14 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 828
-  extracts: 826
+  sources: 830
+  extracts: 828
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 80
+  extracts_with_private_locators: 81
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 826
-  alias_groups_needing_resolution: 91
+  extracts_without_pdf: 828
+  alias_groups_needing_resolution: 92
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
@@ -172,6 +172,7 @@ gaps:
   - florin-2025-cu-silicate-evaporation
   - folstad-2024-metals-cao-dissolution-cas
   - forsberg-2002-ca-fe-o-incongruent-melting
+  - fortin-2014-sulfur-saturation-natural-melts-thesis
   - fray-schmitt-2009-ch4-1
   - fray-schmitt-2009-co-1
   - fray-schmitt-2009-nh3
@@ -194,6 +195,7 @@ gaps:
   - gran-sichen-2012-molten12-ladle-slag-liquidus
   - green-1971-apollo12-basalt-petrology
   - greig-1927-ajs-immiscibility-silicate-melts-part1
+  - greig-1927-immiscibility-part2
   - greig-barth-1938-nepheline-albite
   - gribchenkova-2017-al2o3-mgo
   - gronvold-sveen-1974-magnetite-high-temperature-cp
@@ -861,6 +863,7 @@ gaps:
   - day-2020-trinitite-volatility
   - fegley-2023-chemical-equilibrium-calculations-bu
   - filiberto-lpsc2011-2064-volatiles
+  - fortin-2014-sulfur-saturation-natural-melts-thesis
   - georges-2000-potassium-evaporation-thesis
   - itoh-hino-banya-1998-spinel
   - jgr-p-2024-mars-sam-clay-sulfate-ega
@@ -1241,6 +1244,12 @@ gaps:
     source_ids:
     - giauque-powell-1939-cl2
     - giauque-ruehrwein-1939-hcn-psat
+    resolution: owner/controller
+  - type: source_id_alias
+    key: greig-1927
+    source_ids:
+    - greig-1927-ajs-immiscibility-silicate-melts-part1
+    - greig-1927-immiscibility-part2
     resolution: owner/controller
   - type: source_id_alias
     key: haskin-1991
@@ -10514,6 +10523,65 @@ sources:
       last_stage: null
       date: null
     commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: fortin-2014-sulfur-saturation-natural-melts-thesis
+  aliases: []
+  citation: Fortin, Marc-Antoine (2014). The effect of water on the sulphur concentration at sulphide
+    saturation (SCSS) in natural melts. M.Sc. thesis, Earth and Planetary Sciences, McGill University.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/fortin-2014-sulfur-saturation-natural-melts-thesis.yaml
+    review_status: draft
+    rows: 688
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/fortin-2014-sulfur-saturation-natural-melts-thesis/fortin-2014-sulfur-saturation-natural-melts-thesis.pdf
+      present: true
+      sha256: ceaf6414de5f53ae31d3398f685b5e9b459f0bfeb047041babd78babcade3367
+      matches_simulator: null
+    sidecar:
+      path: raw/fortin-2014-sulfur-saturation-natural-melts-thesis/sidecar.yaml
+      present: true
+    text:
+      path: text/fortin-2014-sulfur-saturation-natural-melts-thesis
+      exists: true
+      file_count: 44
+    tables:
+      path: tables/fortin-2014-sulfur-saturation-natural-melts-thesis
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/fortin-2014-sulfur-saturation-natural-melts-thesis.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/fortin-2014-sulfur-saturation-natural-melts-thesis.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: fray-schmitt-2009-ch4-1
   aliases:
   - fray-schmitt-2009-co-1
@@ -11771,7 +11839,7 @@ sources:
   extracts:
   - path: data/literature/extracts/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml
     review_status: draft
-    rows: 3
+    rows: 7
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -11797,13 +11865,71 @@ sources:
     extract:
       path: extracts/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml
       present: true
       error: null
       last_stage: extracted
       date: '2026-10-05'
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: greig-1927-immiscibility-part2
+  aliases: []
+  citation: J. W. Greig, “Immiscibility in Silicate Melts. Part II,” American Journal of Science, 5th
+    series, 13 (74), 133–154 (1927).
+  doi: 10.2475/ajs.s5-13.74.133
+  report_number: null
+  identifier: 10.2475/ajs.s5-13.74.133
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/greig-1927-immiscibility-part2.yaml
+    review_status: draft
+    rows: 11
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/greig-1927-immiscibility-part2/greig-1927-immiscibility-part2.pdf
+      present: true
+      sha256: 2042fca9672b285443cf0631cf18f37dcf34a97fb69aee4435c9ee37b652ca3c
+      matches_simulator: null
+    sidecar:
+      path: raw/greig-1927-immiscibility-part2/sidecar.yaml
+      present: true
+    text:
+      path: text/greig-1927-immiscibility-part2
+      exists: true
+      file_count: 22
+    tables:
+      path: tables/greig-1927-immiscibility-part2
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/greig-1927-immiscibility-part2.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/greig-1927-immiscibility-part2.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: greig-barth-1938-nepheline-albite
   aliases: []
@@ -24725,7 +24851,7 @@ sources:
     text:
       path: text/lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
       exists: true
-      file_count: 1
+      file_count: 40
     tables:
       path: tables/lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
       exists: false
@@ -36584,7 +36710,7 @@ sources:
   extracts:
   - path: data/literature/extracts/shornikov-1997-diopside-vaporization.yaml
     review_status: draft
-    rows: 25
+    rows: 33
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -39592,7 +39718,7 @@ sources:
     extract:
       path: extracts/shornikov-2019-perovskite-evaporation.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/shornikov-2019-perovskite-evaporation.yaml
       present: true
@@ -44769,7 +44895,7 @@ sources:
   extracts:
   - path: data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml
     review_status: draft
-    rows: 13
+    rows: 15
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -44795,7 +44921,7 @@ sources:
     extract:
       path: extracts/takeda-1990-sn-slag-matertrans.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/takeda-1990-sn-slag-matertrans.yaml
       present: true
