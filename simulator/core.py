@@ -10328,10 +10328,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         standalone equilibrium probes omit it.
 
         Behaviour:
-          - Below 400 K this method returns before kernel dispatch and preserves
+          - Below 400 K this method skips kernel vapor evaluation and preserves
             the backend vapor-pressure surface and matching activity-source
-            notices. It does not establish that either surface is empty; that
-            is a separate provider contract.
+            notices. An empty surface on this path means no prediction, not a
+            measured zero. The diagnostic records only this call's CO2 notice,
+            when present; it never reuses an earlier kernel diagnostic.
           - When the kernel returns a populated ``vapor_pressures_Pa``
             it replaces the equilibrium-result dict in place. For
             ThermoEngine-sourced species whose backend value agrees with
@@ -10395,6 +10396,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             if co2_diagnostic:
                 self._last_vapor_pressure_diagnostic = {'co2_dissociation': dict(co2_diagnostic)}
+            else:
+                self._last_vapor_pressure_diagnostic = {}
             return
 
         backend_sources = dict(

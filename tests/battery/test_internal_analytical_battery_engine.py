@@ -142,6 +142,9 @@ def test_internal_analytical_low_temperature_result_ignores_prior_core_diagnosti
 def test_internal_analytical_battery_results_are_independent_of_request_order() -> None:
     """Every request keeps its full result across low-T, normal, and CO2 paths."""
     from copy import deepcopy
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _InternalAnalyticalBatteryBackend,
+    )
     from simulator.state import Atmosphere
 
     composition_mol = _markova_first_interval_moles()
@@ -174,7 +177,8 @@ def test_internal_analytical_battery_results_are_independent_of_request_order() 
     )
     outputs_by_order: list[dict[str, dict[str, object]]] = []
     for order in orders:
-        core = _new_internal_analytical_core()
+        backend = _InternalAnalyticalBatteryBackend()
+        core = backend._core
         outputs: dict[str, dict[str, object]] = {}
         for request_name in order:
             spec = request_specs[request_name]
@@ -189,11 +193,9 @@ def test_internal_analytical_battery_results_are_independent_of_request_order() 
                 assert core._headspace_co2_dissociation_diagnostic["notices"]
             else:
                 core._headspace_co2_dissociation_diagnostic = {}
-            result = _internal_analytical_vapor_pressure_adapter(
-                core=core,
+            result = backend.equilibrate(
                 temperature_C=float(spec["temperature_C"]),
                 pressure_bar=float(spec["pressure_bar"]),
-                composition_kg=None,
                 composition_mol=composition_mol,
                 fO2_log=float(spec["fO2_log"]),
                 po2_request=Po2Request(
