@@ -1361,6 +1361,39 @@ def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:
     assert result.pack_digest == openimcc_bridge._pack_digest(expected_pack)
 
 
+def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None:
+    from simulator import engine_cache
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setattr(openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-ext")
+    monkeypatch.setattr(engine_cache, "record_engine_open", lambda *_args: None)
+    requests = []
+
+    def cache_call(engine, request, solve):
+        requests.append((engine, request))
+        return solve()
+
+    monkeypatch.setattr(engine_cache, "cached_engine_call", cache_call)
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_evaluate_uncached",
+        lambda **_kwargs: SimpleNamespace(to_transport=lambda: {"ok": True}),
+    )
+    monkeypatch.setattr(
+        OpenImccBridgeResult,
+        "from_transport",
+        classmethod(lambda _cls, payload: payload),
+    )
+
+    result = openimcc_bridge.evaluate(
+        composition_mol={"SiO2": 1.0}, temperature_K=1700.0
+    )
+
+    assert result == {"ok": True}
+    assert requests[0][0] == "openimcc"
+    assert requests[0][1]["pack"] == "published-ext"
+
+
 def test_redox_result_keeps_its_type_across_cache_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
