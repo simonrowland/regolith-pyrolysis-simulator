@@ -11964,6 +11964,11 @@ def _hashimoto_residue_prediction(
                     },
                 }
             )
+            if primary.primary_inventory_mol is None:
+                raise ResidueInventoryRefusal(
+                    "element_inventory_unavailable",
+                    "Hashimoto integrator did not expose its final inventory",
+                )
             value = _element_retention_ratio_from_inventories(
                 primary.initial_inventory_mol,
                 primary.primary_inventory_mol,

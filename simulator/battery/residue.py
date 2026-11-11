@@ -409,7 +409,7 @@ class _HashimotoResiduePrediction:
     geometry_oxide_wt_pct: Mapping[str, Mapping[str, float]]
     sensitivity_band_wt_pct: Mapping[str, tuple[float, float]]
     initial_inventory_mol: Mapping[str, float]
-    primary_inventory_mol: Mapping[str, float]
+    primary_inventory_mol: Mapping[str, float] | None
     provenance: Mapping[str, object]
 
 
@@ -2985,7 +2985,7 @@ def _predict_hashimoto_residue_cohort(
         )
         for alpha_arm, channels, alpha_records, row_key in arm_channels:
             geometry_predictions: dict[str, dict[str, float]] = {}
-            geometry_inventory_mol: dict[str, dict[str, float]] = {}
+            geometry_inventory_mol: dict[str, Mapping[str, float] | None] = {}
             pO2_ranges: dict[str, list[float] | None] = {}
             pO2_balance_floor_by_geometry: dict[
                 str, dict[str, float | int | None]
@@ -3014,7 +3014,7 @@ def _predict_hashimoto_residue_cohort(
                 refinement_status = "unconverged_at_cap"
                 while True:
                     started_cpu = time.process_time()
-                    integrated = _hashimoto_integrate_geometry(
+                    integration_result = _hashimoto_integrate_geometry(
                         run_initial_mol,
                         channels,
                         pressure_model,
@@ -3024,14 +3024,21 @@ def _predict_hashimoto_residue_cohort(
                         geometry_policy_id=geometry,
                         initial_area_m2=geometry_areas[geometry],
                     )
-                    values = integrated.composition_wt_pct
-                    pO2_steps = integrated.pO2_steps
-                    exhaustions = integrated.exhaustion_notices
-                    refusal = integrated.refusal
-                    atom_closure = integrated.atom_closure
-                    pO2_balance_floor = integrated.pO2_balance_floor
-                    geometry_inventory_mol[geometry] = dict(
-                        integrated.inventory_mol
+                    (
+                        values,
+                        pO2_steps,
+                        exhaustions,
+                        refusal,
+                        atom_closure,
+                        pO2_balance_floor,
+                    ) = integration_result
+                    integrated_inventory = getattr(
+                        integration_result, "inventory_mol", None
+                    )
+                    geometry_inventory_mol[geometry] = (
+                        dict(integrated_inventory)
+                        if isinstance(integrated_inventory, Mapping)
+                        else None
                     )
                     cpu_seconds += time.process_time() - started_cpu
                     tried_steps.append(steps)
@@ -3150,9 +3157,6 @@ def _predict_hashimoto_residue_cohort(
                 "starting_composition_wt_pct": dict(run_wt_pct),
                 "starting_preform_mm": dict(preform_dimensions_mm),
                 "initial_inventory_mol": dict(run_initial_mol),
-                "integrated_inventory_mol": dict(
-                    geometry_inventory_mol[primary_geometry]
-                ),
                 "sample_surface_area_status": "not_tabulated",
                 "primary_geometry_policy_id": primary_geometry,
                 "geometry_primary_argument": (
@@ -3254,6 +3258,10 @@ def _predict_hashimoto_residue_cohort(
                 ),
                 "assumption_flags": assumption_flags,
             }
+            if geometry_inventory_mol[primary_geometry] is not None:
+                provenance["integrated_inventory_mol"] = dict(
+                    geometry_inventory_mol[primary_geometry]
+                )
             prediction_rows.append(
                 _HashimotoResiduePrediction(
                     experiment_id=experiment_id,
@@ -3263,8 +3271,10 @@ def _predict_hashimoto_residue_cohort(
                     geometry_oxide_wt_pct=geometry_predictions,
                     sensitivity_band_wt_pct=band,
                     initial_inventory_mol=dict(run_initial_mol),
-                    primary_inventory_mol=dict(
-                        geometry_inventory_mol[primary_geometry]
+                    primary_inventory_mol=(
+                        None
+                        if geometry_inventory_mol[primary_geometry] is None
+                        else dict(geometry_inventory_mol[primary_geometry])
                     ),
                     provenance=provenance,
                 )
