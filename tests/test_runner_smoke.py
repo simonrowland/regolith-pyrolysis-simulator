@@ -22,7 +22,7 @@ without spinning up a child process.
 from __future__ import annotations
 
 import hashlib
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import replace
 import json
 import math
@@ -1154,11 +1154,13 @@ def _run_scenario(scenario: dict, *, capture: bool = False):
         return run.run()
 
     flux_maps = []
+    flux_dispatch_temperatures = []
     dispatch = BuiltinEvaporationFluxProvider.dispatch
 
     def capture_flux_maps(provider, request):
         result = dispatch(provider, request)
         flux_maps.append((result.diagnostic or {}).get("evaporation_flux_kg_hr"))
+        flux_dispatch_temperatures.append(float(request.temperature_C))
         return result
 
     with patch.object(BuiltinEvaporationFluxProvider, "dispatch", capture_flux_maps):
@@ -1170,10 +1172,48 @@ def _run_scenario(scenario: dict, *, capture: bool = False):
         ],
         "final_state": payload["final_state"],
     }
-    return payload, {"flux_maps": flux_maps, "ledger_output": ledger_output}
+    return payload, {
+        "flux_maps": flux_maps,
+        "flux_dispatch_temperatures": flux_dispatch_temperatures,
+        "ledger_output": ledger_output,
+    }
+
+
+def _assert_authoritative_flux_capture(payload: dict, capture: dict) -> None:
+    flux_maps = capture.get("flux_maps")
+    assert flux_maps, (
+        "runner completed without any BuiltinEvaporationFluxProvider dispatch; "
+        "empty flux captures must not satisfy golden or digest pins"
+    )
+
+    dispatch_temperatures = capture.get("flux_dispatch_temperatures", ())
+    assert len(dispatch_temperatures) == len(flux_maps)
+    dispatched_by_temperature = Counter(dispatch_temperatures)
+    hours_by_temperature = Counter(
+        float(row["T_C"])
+        for row in payload["per_hour_summary"]
+        if int(
+            ((row.get("vapour_batch_summary") or {}).get("n_flux_active", 0))
+            or 0
+        )
+        > 0
+    )
+    missing_hours = {
+        temperature: count - dispatched_by_temperature[temperature]
+        for temperature, count in hours_by_temperature.items()
+        if dispatched_by_temperature[temperature] < count
+    }
+    assert not missing_hours, (
+        "the authoritative evaporation flux provider did not serve every "
+        f"runner hour: {missing_hours}"
+    )
 
 
 def _flux_ledger_pins(capture: dict) -> dict[str, str]:
+    assert capture["flux_maps"], (
+        "cannot calculate runner flux digest from an empty provider capture"
+    )
+
     def canonical_json(value):
         return json.dumps(
             value, sort_keys=True, separators=(",", ":"), allow_nan=False
@@ -2058,6 +2098,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     actual, capture, expected_text = runner_golden_loader(scenario)
     expected = json.loads(expected_text)
 
+    _assert_authoritative_flux_capture(actual, capture)
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
     assert actual["status"] == "ok"

@@ -120,6 +120,9 @@ def test_raw_flux_capture_continuity(scenario, runner_golden_loader, generated_r
 
 def _assert_raw_flux_capture_continuity(current, files, flux_maps):
     assert reassemble(files) == current
+    assert flux_maps, (
+        "cannot validate flux capture continuity from an empty provider capture"
+    )
     flux = flux_sections(flux_maps)
     restored = reassemble_flux(flux)
     # Keys normalize only the captured evidence, with dispatch ordinal intact.
