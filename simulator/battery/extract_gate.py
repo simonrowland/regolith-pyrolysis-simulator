@@ -13,7 +13,7 @@ from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 
 from simulator.battery import migrate
 from simulator.battery.enums import Quantity

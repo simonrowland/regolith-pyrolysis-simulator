@@ -1072,10 +1072,11 @@ def test_openimcc_measured_ferric_split_keeps_feo_equivalent_projection_notice()
     }
 
 
-def test_recorded_openimcc_pin_matches_pyproject_extra() -> None:
+def test_recorded_openimcc_pin_matches_pyproject_dependency() -> None:
     # The refusal remedies cite OPENIMCC_RECORDED_PIN; it must name the same openimcc
-    # commit as the pyproject `imcc` optional extra, so a remedy can never point at a
-    # revision that lacks the features the code requires.
+    # commit that pyproject installs, so a remedy can never point at a revision that
+    # lacks the features the code requires. openimcc is a core dependency, and the
+    # `imcc` extra is kept empty only so existing ".[imcc]" installs still resolve.
     import tomllib
     from pathlib import Path
 
@@ -1083,9 +1084,14 @@ def test_recorded_openimcc_pin_matches_pyproject_extra() -> None:
 
     pyproject = tomllib.loads(
         (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text()
-    )
-    extra = pyproject["project"]["optional-dependencies"]["imcc"]
-    assert extra == [OPENIMCC_RECORDED_PIN]
+    )["project"]
+    openimcc_requirements = [
+        requirement
+        for requirement in pyproject["dependencies"]
+        if requirement.split("@", 1)[0].strip() == "openimcc"
+    ]
+    assert openimcc_requirements == [OPENIMCC_RECORDED_PIN]
+    assert pyproject["optional-dependencies"]["imcc"] == []
 
 
 def test_imported_openimcc_commit_comes_from_its_distribution(monkeypatch, tmp_path) -> None:

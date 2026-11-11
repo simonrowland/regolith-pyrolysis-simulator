@@ -214,6 +214,50 @@ def test_every_typed_row_migrates_as_its_printed_point_with_identity_and_conditi
             assert observation.identity.subtype.value == raw["values"]["basis"]
 
 
+def test_unpaginated_preprint_line_numbers_are_never_published_folios(document):
+    seen: set[int] = set()
+
+    def mappings(value):
+        if isinstance(value, dict):
+            if id(value) in seen:
+                return
+            seen.add(id(value))
+            yield value
+            for child in value.values():
+                yield from mappings(child)
+        elif isinstance(value, list):
+            for child in value:
+                yield from mappings(child)
+
+    all_mappings = list(mappings(document))
+    assert not any("published_page" in item for item in all_mappings)
+    assert sum(item.get("line_range") == "280" for item in all_mappings) == 105
+
+    experiment = next(
+        item
+        for item in document["experiments"]
+        if item["sample_id_as_printed"] == "B-1"
+    )
+    assert experiment["locator"]["line_range"] == "280"
+
+    row = observation_for(
+        document, 7, "B-1", "SiO2", "equilibrium_phase_composition"
+    )
+    assert row["locator"]["line_range"] == "280"
+    assert row["values"]["point_conditions"]["temperature_K"]["locator"][
+        "line_range"
+    ] == "280"
+
+    figure7 = next(
+        item
+        for item in document["species"]["SiO2"]["context"]
+        if item.get("type") == "figure_context"
+        and item["locator"].get("figure") == "7"
+    )
+    assert figure7["locator"]["line_range"] == "307"
+    assert document["fidelity_samples"][0]["locator"]["line_range"] == "280"
+
+
 def test_context_captures_unscored_tables_and_figures_without_digitized_points(document):
     contexts = document["species"]["SiO2"]["context"]
     by_id = {item["observation_id"]: item for item in contexts}

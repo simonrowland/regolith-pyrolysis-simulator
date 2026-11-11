@@ -342,6 +342,47 @@ def test_section_boundary_grid_has_total_latent_ownership_and_continuous_load(
             assert abs(above - below) <= load_discretization_epsilon_W
 
 
+def test_al_ti_capture_threshold_is_not_a_vapour_pressure_source() -> None:
+    """Al 1180 °C and Ti 1500 °C are in-source capture thresholds.
+
+    They are not condenser setpoints and not vapour-pressure crossings.
+    The thermal report must not attribute those temperatures to
+    data.vapor_pressures.condensation_T_C_at_1mbar. Fe stays an operator
+    override. AlO, which is absent from the in-source table, keeps the
+    catalogue fallback.
+    """
+
+    from simulator.condensation import authoritative_condensation_temperature
+
+    setpoints = _setpoints()
+    report = report_from_recorded_series(
+        [{"Al": 0.05, "Ti": 0.05, "Fe": 0.05}],
+        [0.0],
+        [1800.0 + 273.15],
+        setpoints=setpoints,
+    )
+    al = report["condensation_crossings"]["Al"]
+    ti = report["condensation_crossings"]["Ti"]
+    fe = report["condensation_crossings"]["Fe"]
+    assert al["temperature_K"] == pytest.approx(1180.0 + 273.15)
+    assert ti["temperature_K"] == pytest.approx(1500.0 + 273.15)
+    assert fe["temperature_K"] == pytest.approx(1250.0 + 273.15)
+    assert al["source"] == (
+        "simulator.condensation.CONDENSATION_TEMPS_C.capture_threshold"
+    )
+    assert ti["source"] == al["source"]
+    assert al["authority"] == "capture_threshold_fallback"
+    assert ti["authority"] == "capture_threshold_fallback"
+    assert "vapor_pressure" not in al["source"]
+    assert "vapor_pressure" not in ti["source"]
+    assert fe["authority"] == "condensation_temperature_override"
+    assert "vapor_pressure" not in fe["source"]
+    alo = authoritative_condensation_temperature("AlO", setpoints=setpoints)
+    assert alo["source"] == "data.vapor_pressures.condensation_T_C_at_1mbar"
+    assert alo["authority"] == "condensation_temperature_fallback"
+    assert alo["temperature_C"] != pytest.approx(1180.0)
+
+
 def test_antoine_dew_column_reports_local_partial_pressure_and_provenance() -> None:
     report = report_from_recorded_series(
         [{"Mg": 1.0}],

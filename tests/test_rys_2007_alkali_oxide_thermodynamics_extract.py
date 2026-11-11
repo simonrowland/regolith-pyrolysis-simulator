@@ -124,7 +124,8 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     collect_locators(document)
     # Typing Tables 7 and 9 adds 158 locators and 73 observations; the KEMS
     # apparatus and experiment registry add three locators.
-    assert len(locators) == 2229
+    # Restoring Na Table 10a row 8 adds its row locator and condition locator.
+    assert len(locators) == 2231
     assert all(
         locator["page"] == locator["pdf_page_index"] + 1
         and "published_page" in locator
@@ -138,7 +139,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
                 continue
             for point in observation.get("values", {}).get("points", []):
                 appendix_rows[point["locator"]["table"]] += 1
-    assert sum(appendix_rows.values()) == 888
+    assert sum(appendix_rows.values()) == 889
     assert appendix_rows == Counter(
         {
             "1": 59,
@@ -150,7 +151,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
             "7": 74,
             "8": 76,
             "9": 72,
-            "10a": 56,
+            "10a": 57,
             "10b": 52,
             "11a": 62,
             "11b": 64,
@@ -187,7 +188,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     migrator.finalize()
     result = migrator.result
     assert result.validation.hard_issues == ()
-    assert len(result.observations) == 1001
+    assert len(result.observations) == 1002
 
     partial_pressures = [
         row
@@ -195,9 +196,9 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
         if row.identity.quantity.is_value
         and row.identity.quantity.value is Quantity.P_PARTIAL
     ]
-    assert len(partial_pressures) == 516
+    assert len(partial_pressures) == 517
     assert Counter(row.identity.species.formula for row in partial_pressures) == Counter(
-        {"Na": 329, "K": 86, "NaO": 33, "O2": 31, "Na2O": 37}
+        {"Na": 330, "K": 86, "NaO": 33, "O2": 31, "Na2O": 37}
     )
 
     rys_experiment = next(

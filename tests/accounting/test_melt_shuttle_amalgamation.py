@@ -4,6 +4,8 @@ import pytest
 
 from simulator.accounting.ledger import AtomLedger, LedgerTransition
 from simulator.accounting.lots import MaterialLot
+from simulator.core import PyrolysisSimulator
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import MOLAR_MASS
 
 
@@ -90,3 +92,170 @@ def test_melt_shuttle_credit_allows_partial_evaporation_with_pro_rata_origins(
     else:
         assert origin_debit["feedstock"]["Mg"] == pytest.approx(1.5)
         assert origin_debit["reagent"]["Mg"] == pytest.approx(1.5)
+
+
+def test_evaporated_sodium_allows_partial_withdrawal_from_mixed_overhead_gas() -> None:
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "sodium_oxide": {
+                "label": "Sodium oxide",
+                "composition_wt_pct": {"Na2O": 100.0},
+            }
+        },
+        {"metals": {"Na": {"parent_oxide": "Na2O"}}, "oxide_vapors": {}},
+    )
+    sim.load_batch("sodium_oxide", mass_kg=1.0)
+    ledger = sim.atom_ledger
+    ledger.load_external_mol(
+        "process.reagent_inventory", {"Na": 2.0}, material_origin="reagent"
+    )
+    ledger.load_external_mol(
+        "process.cleaned_melt", {"FeO": 1.0}, material_origin="feedstock"
+    )
+    ledger.apply(
+        LedgerTransition(
+            name="c3_na_shuttle_fe_reduction",
+            debits=(
+                _lot("process.reagent_inventory", "Na", 2.0),
+                _lot("process.cleaned_melt", "FeO", 1.0),
+            ),
+            credits=(
+                _lot("process.cleaned_melt", "Na2O", 1.0),
+                _lot("process.metal_phase", "Fe", 1.0),
+            ),
+        )
+    )
+    ledger.mark_amalgamated_pool("process.cleaned_melt", ("Na",))
+
+    sodium_data = sim.vapor_pressures["metals"]["Na"]
+    stoich = sim._evaporation_stoich("Na", sodium_data)
+    available_oxide_kg = ledger.kg_by_account("process.cleaned_melt")["Na2O"]
+    sodium_kg = 0.25 * available_oxide_kg / stoich["oxide_per_product_kg"]
+    sim._credit_evaporation_transition(
+        "Na",
+        sodium_kg,
+        sodium_kg,
+        sodium_data,
+        apply_evaporative_redox_source_terms=False,
+    )
+
+    overhead_origins = ledger.origin_atom_moles_by_account()["process.overhead_gas"]["Na"]
+    assert overhead_origins["feedstock"] > 0.0
+    assert overhead_origins["reagent"] > 0.0
+    overhead_na_kg = ledger.kg_by_account("process.overhead_gas")["Na"]
+    ledger.move(
+        "partial_sodium_condensation",
+        "process.overhead_gas",
+        "process.condensation_train",
+        {"Na": overhead_na_kg / 2.0},
+    )
+
+    # A half-pool withdrawal takes half of each known origin, preserving their
+    # source ratio; the ledger's existing allocator supplies that split.
+    origin_debit = ledger.transitions[-1].debits[0].origin_atom_moles["feedstock"]["Na"]
+    assert origin_debit == pytest.approx(overhead_origins["feedstock"] / 2.0)
+    assert ledger.transitions[-1].debits[0].origin_atom_moles["reagent"]["Na"] == pytest.approx(
+        overhead_origins["reagent"] / 2.0
+    )
+    ledger.assert_balanced()
+
+
+@pytest.mark.parametrize(
+    ("element", "oxide", "reactant_oxide", "reagent_mol"),
+    [("K", "K2O", "FeO", 2.0), ("Mg", "MgO", "Al2O3", 3.0)],
+)
+def test_evaporated_shuttle_cations_allow_partial_withdrawal_from_overhead_gas(
+    element: str,
+    oxide: str,
+    reactant_oxide: str,
+    reagent_mol: float,
+) -> None:
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    feedstock_id = f"{element.lower()}_oxide"
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            feedstock_id: {
+                "label": f"{element} oxide",
+                "composition_wt_pct": {oxide: 100.0},
+            }
+        },
+        {"metals": {element: {"parent_oxide": oxide}}, "oxide_vapors": {}},
+    )
+    sim.load_batch(feedstock_id, mass_kg=1.0)
+    ledger = sim.atom_ledger
+    ledger.load_external_mol(
+        "process.reagent_inventory", {element: reagent_mol}, material_origin="reagent"
+    )
+    ledger.load_external_mol(
+        "process.cleaned_melt", {reactant_oxide: 1.0}, material_origin="feedstock"
+    )
+
+    if element == "K":
+        shuttle_transition = LedgerTransition(
+            name="c3_k_shuttle_fe_reduction",
+            debits=(
+                _lot("process.reagent_inventory", "K", 2.0),
+                _lot("process.cleaned_melt", "FeO", 1.0),
+            ),
+            credits=(
+                _lot("process.cleaned_melt", "K2O", 1.0),
+                _lot("process.metal_phase", "Fe", 1.0),
+            ),
+        )
+    else:
+        shuttle_transition = LedgerTransition(
+            name="c6_mg_thermite_primary",
+            debits=(
+                _lot("process.reagent_inventory", "Mg", 3.0),
+                _lot("process.cleaned_melt", "Al2O3", 1.0),
+            ),
+            credits=(
+                _lot("process.cleaned_melt", "MgO", 3.0),
+                _lot("process.metal_phase", "Al", 2.0),
+            ),
+        )
+    ledger.apply(shuttle_transition)
+    ledger.mark_amalgamated_pool("process.cleaned_melt", (element,))
+
+    vapor_data = sim.vapor_pressures["metals"][element]
+    stoich = sim._evaporation_stoich(element, vapor_data)
+    available_oxide_kg = ledger.kg_by_account("process.cleaned_melt")[oxide]
+    evaporated_element_kg = (
+        0.25 * available_oxide_kg / stoich["oxide_per_product_kg"]
+    )
+    sim._credit_evaporation_transition(
+        element,
+        evaporated_element_kg,
+        evaporated_element_kg,
+        vapor_data,
+        apply_evaporative_redox_source_terms=False,
+    )
+
+    overhead_origins = ledger.origin_atom_moles_by_account()["process.overhead_gas"][
+        element
+    ]
+    assert overhead_origins["feedstock"] > 0.0
+    assert overhead_origins["reagent"] > 0.0
+    overhead_element_kg = ledger.kg_by_account("process.overhead_gas")[element]
+    ledger.move(
+        f"partial_{element}_condensation",
+        "process.overhead_gas",
+        "process.condensation_train",
+        {element: overhead_element_kg / 2.0},
+    )
+
+    origin_debit = ledger.transitions[-1].debits[0].origin_atom_moles
+    assert origin_debit["feedstock"][element] == pytest.approx(
+        overhead_origins["feedstock"] / 2.0
+    )
+    assert origin_debit["reagent"][element] == pytest.approx(
+        overhead_origins["reagent"] / 2.0
+    )
+    ledger.assert_balanced()

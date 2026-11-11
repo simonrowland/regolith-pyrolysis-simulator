@@ -900,7 +900,7 @@ def test_setpoints_condensation_temperature_overrides_refuse_bad_input():
 def test_shipped_setpoints_pass_the_override_guard_unchanged():
     """The guard must be golden-neutral against the config we actually ship.
 
-    All 11 entries under condensation_train.condensation_temperatures_C are
+    All 9 entries under condensation_train.condensation_temperatures_C are
     known species with parseable values AND already equal the defaults, so a
     correct guard changes nothing here. If this fails, either the guard is too
     strict or setpoints.yaml gained an entry nobody reviewed.

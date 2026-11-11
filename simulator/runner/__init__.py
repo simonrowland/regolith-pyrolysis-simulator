@@ -37,7 +37,6 @@ import subprocess
 import sys
 import threading
 import weakref
-from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -80,6 +79,7 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.accounting.stage0_inventory import sibling_artifact_payload
+from simulator.vapor_pressure_report import vapor_pressure_source_report_fields
 from simulator.accounting.yield_disposition import (
     build_yield_disposition,
     capture_ledger_snapshot,
@@ -157,7 +157,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.9.0"
+RUNNER_SCHEMA_VERSION = "1.10.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -1511,6 +1511,7 @@ class PyrolysisRun:
         _attach_composition_projected_liquidus_notice(run_metadata, sim)
         _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
         _attach_c0_exit_notice(run_metadata, sim)
+        _attach_stage0_carbon_allocation_notice(run_metadata, sim)
         run_metadata.update(
             canonicalize_fidelity_emission(
                 backend_name=self.backend_name,
@@ -2017,6 +2018,7 @@ def _empty_vapor_pressure_source_report() -> dict[str, object]:
         "species": {},
         "summary": {},
         "total_species": 0,
+        "activity_sources": {},
         "vapor_pressure_backend_status": "",
         "vapor_pressure_backend_status_summary": {},
         "vapor_pressure_backend_status_reason": "",
@@ -2026,34 +2028,23 @@ def _empty_vapor_pressure_source_report() -> dict[str, object]:
 
 
 def _vapor_pressure_source_report(sim: PyrolysisSimulator) -> dict[str, object]:
-    source_by_species = {
-        str(species): str(source)
-        for species, source in sorted(
-            (getattr(sim, "_last_vapor_pressures_source", {}) or {}).items()
-        )
-    }
-    total = len(source_by_species)
-    counts = Counter(source_by_species.values())
     diagnostics = dict(getattr(sim, "_last_backend_diagnostics", {}) or {})
+    source_fields = vapor_pressure_source_report_fields(
+        getattr(sim, "_last_vapor_pressures_source", {}) or {},
+        diagnostics.get("activity_source_by_species"),
+    )
+    total_species = int(source_fields["total_species"])
     facet_status = str(
         diagnostics.get("vapor_pressure_backend_status") or ""
     ).strip()
     report: dict[str, object] = {
-        "species": source_by_species,
-        "summary": {
-            source: {
-                "count": count,
-                "percentage": round(count / total * 100.0, 6) if total else 0.0,
-            }
-            for source, count in sorted(counts.items())
-        },
-        "total_species": total,
+        **source_fields,
         "vapor_pressure_backend_status": facet_status,
         "vapor_pressure_backend_status_summary": (
             {
                 facet_status: {
-                    "count": total,
-                    "percentage": 100.0 if total else 0.0,
+                    "count": total_species,
+                    "percentage": 100.0 if total_species else 0.0,
                 }
             }
             if facet_status
@@ -3845,6 +3836,43 @@ def _attach_high_t_melt_activity_fallback_notice(
     )
 
 
+def _stage0_carbon_allocation_notice(sim: Any) -> dict[str, Any] | None:
+    if sim is None:
+        return None
+    reader = getattr(sim, "stage0_carbon_allocation_run_notice", None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
+
+
+def _attach_stage0_carbon_allocation_notice(
+    run_metadata: dict[str, Any],
+    sim: Any,
+) -> None:
+    _attach_run_metadata_report(
+        run_metadata,
+        "stage0_carbon_allocation_notice",
+        lambda: _stage0_carbon_allocation_notice(sim),
+    )
+
+
+def _stage0_carbon_allocation_sentence(notice: Mapping[str, Any]) -> str:
+    species = ", ".join(
+        str(item) for item in (notice.get("out_of_domain_species") or ())
+    )
+    order = ", ".join(str(item) for item in (notice.get("order") or ()))
+    temperature = notice.get("temperature_K")
+    return (
+        "**Stage-0 sulfate carbon**: allocation ranked by tabulated dG per mol C "
+        f"({order}) at {temperature} K. "
+        f"Out of the foulant table for {species}; "
+        "reported masses are a flagged best estimate."
+    )
+
+
 def _attach_c0_exit_notice(
     run_metadata: dict[str, Any],
     sim: Any,
@@ -4038,6 +4066,10 @@ def _product_classification_report(
             diagnostic_notice
         )
         sentences.append(_diagnostic_gate_authority_sentence(diagnostic_notice))
+    carbon_notice = _stage0_carbon_allocation_notice(sim)
+    if carbon_notice and carbon_notice.get("out_of_domain"):
+        report["stage0_carbon_allocation_notice"] = _json_safe(carbon_notice)
+        sentences.append(_stage0_carbon_allocation_sentence(carbon_notice))
     if sentences:
         report["markdown"] = _markdown_with_notice_sentences(markdown, sentences)
     return report
@@ -5866,6 +5898,7 @@ def _runner_failure_result(
     _attach_composition_projected_liquidus_notice(run_metadata, sim)
     _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
     _attach_c0_exit_notice(run_metadata, sim)
+    _attach_stage0_carbon_allocation_notice(run_metadata, sim)
     final_state = (
         _safe_failure_value(
             lambda: _json_safe(_final_state_from_ledger(sim)),
@@ -6163,8 +6196,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         choices=("pyrolysis", "mre_baseline"),
                         help="Process track tag (default: pyrolysis)")
     parser.add_argument("--engines",
-                        help="Path to engines config YAML (Goal #19 forward "
-                             "compat).  Per-intent engine selection.")
+                        help="Path to an engines config YAML for "
+                             "per-intent engine selection (recorded in "
+                             "run_metadata.engines_used).")
     parser.add_argument("--engine", action="append", default=[],
                         metavar="INTENT:PROVIDER",
                         help="Per-intent engine override "

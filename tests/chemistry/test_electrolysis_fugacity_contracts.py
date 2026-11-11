@@ -7,11 +7,7 @@ from dataclasses import replace
 
 import pytest
 
-from engines.builtin.electrolysis_step import (
-    MRE_INVALID_GAS_FUGACITY_REFUSAL,
-    MRE_INVALID_TARGET_REFUSAL,
-    BuiltinElectrolysisStepProvider,
-)
+from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_CONDENSED,
     ELLINGHAM_METAL_PHASE_GAS,
@@ -22,6 +18,8 @@ from simulator.electrolysis import (
     ELECTRONS_PER_OXIDE,
     ElectrolysisModel,
     MRE_INVALID_CONTROL_REFUSAL,
+    MRE_INVALID_GAS_FUGACITY_REFUSAL,
+    MRE_INVALID_TARGET_REFUSAL,
     MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
     mre_selectivity_weight,
 )

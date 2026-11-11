@@ -1269,6 +1269,43 @@ def test_tsukihashi_split_temperature_locators_use_figure7() -> None:
         assert locator["figure"] == "7"
         assert "table" not in locator
         assert locator["note"].startswith("Figure 7 isotherm at ")
+        assert (locator["published_page"], locator["pdf_page_index"]) == (820, 5)
+
+
+def test_tsukihashi_locator_pages_follow_the_cited_evidence() -> None:
+    doc = yaml.safe_load((EXTRACTS / "ts1985.yaml").read_text())
+    observations = {
+        row["observation_id"]: row
+        for species in doc["species"].values()
+        for row in species.get("observations", [])
+    }
+
+    synopsis = observations["ts1985_na2o_prose_1200C_range"]["locator"]
+    assert (synopsis["page"], synopsis["published_page"], synopsis["pdf_page_index"]) == (
+        1, 815, 0
+    )
+    assert synopsis["paragraph"] == "English Synopsis"
+
+    table1 = observations["ts1985_gamma_Na_in_Pb_table1"]["locator"]
+    assert (table1["page"], table1["published_page"], table1["pdf_page_index"]) == (
+        3, 817, 2
+    )
+    assert table1["table"] == "1"
+
+    experiments = [
+        item for item in doc["experiments"]
+        if item["experiment_id"].startswith("na2o-sio2-xna2o-")
+    ]
+    assert len(experiments) == 12
+    for experiment in experiments:
+        method_locators = (
+            experiment["thermal_schedule"]["total_duration_s"]["locator"],
+            experiment["sample"]["mass_kg"]["locator"],
+            experiment["sample"]["form"]["locator"],
+        )
+        for locator in method_locators:
+            assert (locator["published_page"], locator["pdf_page_index"]) == (818, 3)
+            assert locator["section"] == "4.1 Experimental method"
 
 
 def test_run_split_observations_keep_source_species_bucket() -> None:

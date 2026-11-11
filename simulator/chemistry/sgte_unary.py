@@ -11,7 +11,9 @@ from __future__ import annotations
 
 import hashlib
 import math
+import os
 import re
+import urllib.request
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from pathlib import Path
@@ -23,7 +25,18 @@ from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 COMPILATION_ROOT = ROOT / "data" / "literature" / "compilations" / "sgte-unary"
-SOURCE_TDB = COMPILATION_ROOT / "source" / "unary50.tdb"
+SOURCE_SIDECAR = COMPILATION_ROOT / "source" / "sidecar.yaml"
+SGTE_DOWNLOAD_PAGE = "https://www.sgte.net/en/free-pure-elements-database"
+
+
+def cached_source_tdb_path() -> Path:
+    cache_root = Path(os.environ.get(
+        "REGOLITH_DATA_CACHE", Path.home() / ".cache" / "regolith-pyrolysis-simulator"
+    ))
+    return cache_root / "sgte" / "unary50.tdb"
+
+
+SOURCE_TDB = cached_source_tdb_path()
 MANIFEST_PATH = COMPILATION_ROOT / "manifest.yaml"
 RECORDS_DIR = COMPILATION_ROOT / "records"
 FEEDSTOCKS_PATH = ROOT / "data" / "feedstocks.yaml"
@@ -56,6 +69,37 @@ _COMMENTED_PARAM_RE = re.compile(r"PARAMETER\s+((?:G|TC|BM|BMAGN)\([^)]+\))")
 
 class SgteUnaryError(ValueError):
     """Published TDB text could not be parsed without guessing."""
+
+
+class MissingSgteUnaryInputError(SgteUnaryError):
+    """The checksum-verified SGTE input is not available in the local cache."""
+
+
+def ensure_source_tdb() -> Path:
+    """Return the checksum-verified SGTE TDB, fetching it only when absent."""
+    path = cached_source_tdb_path()
+    url = SGTE_DOWNLOAD_PAGE
+    try:
+        sidecar = yaml.safe_load(SOURCE_SIDECAR.read_text(encoding="utf-8"))
+        source = next(item for item in sidecar["files"] if item["name"] == "unary50.tdb")
+        url = source["retrieved_url"]
+        expected = source["sha256"]
+        if path.is_file():
+            payload = path.read_bytes()
+        else:
+            with urllib.request.urlopen(url, timeout=30) as response:
+                payload = response.read()
+        digest = hashlib.sha256(payload).hexdigest()
+        if digest != expected:
+            raise ValueError(f"sha256 {digest} != {expected}")
+        if not path.is_file():
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(payload)
+        return path
+    except Exception as exc:
+        raise MissingSgteUnaryInputError(
+            f"SGTE unary50.tdb unavailable from {url}; cache path {path}: {exc}"
+        ) from exc
 
 
 class TemperatureOutOfIntervalError(SgteUnaryError):
@@ -1019,13 +1063,16 @@ def parse_tdb(text: str, *, source_path: str, source_sha256: str) -> ParsedDatab
 
 
 def load_tdb(path: Path | None = None) -> ParsedDatabase:
-    tdb_path = path or SOURCE_TDB
+    tdb_path = path if path is not None else ensure_source_tdb()
     payload = tdb_path.read_text(encoding="utf-8")
     relative = tdb_path.as_posix()
     try:
         relative = tdb_path.resolve().relative_to(ROOT.resolve()).as_posix()
     except ValueError:
-        relative = str(tdb_path)
+        if tdb_path.resolve() == cached_source_tdb_path().resolve():
+            relative = "data/literature/compilations/sgte-unary/source/unary50.tdb"
+        else:
+            relative = str(tdb_path)
     return parse_tdb(payload, source_path=relative, source_sha256=sha256_file(tdb_path))
 
 
@@ -1514,3 +1561,17 @@ def function_round_trip_failures(database: ParsedDatabase) -> list[dict[str, Any
                     }
                 )
     return failures
+
+
+def main() -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Manage the cached SGTE unary input")
+    parser.add_argument("command", choices=("fetch",))
+    parser.parse_args()
+    print(ensure_source_tdb())
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

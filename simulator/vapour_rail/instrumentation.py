@@ -1479,10 +1479,11 @@ def condensation_refusals_payload(
 
 
 # Operator T_cond override audit (setpoints.yaml) — VR-11 §7.2.
-# Al and Ti are present as operator-routing estimates; no additional
-# Al/Ti/trace overrides may be added without independent engineering policy.
+# Al and Ti are not condenser overrides: Al leaves as C6 metal and Ti
+# is non-volatile. Do not put them back on this list, or add any further
+# Al/Ti/trace T_cond override, without independent engineering policy.
 AUDITED_OPERATOR_T_COND_SPECIES: frozenset[str] = frozenset(
-    {"Fe", "SiO", "CrO2", "Mg", "Na", "K", "Ca", "Mn", "Cr", "Al", "Ti"}
+    {"Fe", "SiO", "CrO2", "Mg", "Na", "K", "Ca", "Mn", "Cr"}
 )
 
 SETPOINTS_T_COND_AUDIT: Mapping[str, Any] = MappingProxyType(
@@ -1490,9 +1491,13 @@ SETPOINTS_T_COND_AUDIT: Mapping[str, Any] = MappingProxyType(
         "schema": "setpoints_t_cond_audit.v1",
         "operator_override_species": sorted(AUDITED_OPERATOR_T_COND_SPECIES),
         "al_ti_policy": (
-            "Al and Ti overrides are estimated/operator-routing only; "
-            "no additional Al/Ti/trace T_cond overrides without independent "
-            "engineering policy approval (DESIGN-REV5 §7.2)."
+            "Al and Ti are not operator condenser overrides and have no "
+            "designated condenser stage. Al leaves as metal via C6 "
+            "Mg-thermite; Ti is non-volatile. Any Al, Ti, AlO, or TiO "
+            "vapour that does occur is accounted to an existing ledger "
+            "account, not dropped. No additional Al/Ti/trace T_cond "
+            "overrides without independent engineering policy approval "
+            "(DESIGN-REV5 §7.2)."
         ),
         "reaction_fixed_windows": (
             "Reaction-fixed condensation windows remain non-operator settings."

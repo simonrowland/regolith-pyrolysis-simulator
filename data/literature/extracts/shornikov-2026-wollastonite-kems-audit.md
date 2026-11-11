@@ -21,21 +21,45 @@ No other extract on this base has this title, this DOI, or these vapor-pressure 
 
 ## Tables
 
-The corpus text directory contains `pdftotext-layout.txt` only. There is no MinerU content list, so `mineru_table_draft.py` emit was not run. Born-digital tables were transcribed and checked against 600 dpi renders. Dashes are absent and are omitted, never stored as zero.
+The corpus text directory contains `pdftotext-layout.txt` only. There is no MinerU markdown or content-list JSON under either MinerU location. The seat table draft converter reported no content-list JSON and the QA pre-screen found no table blocks, so there was no independent MinerU comparison. Contrary to the task's expected limitation, the born-digital pdftotext layer includes Tables 3–7, including every Table 5 row. It is the primary text read; renders were used for the printed table layouts and Table 5's slash, intervals, signs, and coefficients. Dashes are absent and are omitted, never stored as zero.
 
 | table | published page | what was admitted |
 | --- | --- | --- |
 | 1 | 611–612 | nothing. Literature survey plus two this-study rows that duplicate the 2024 extract |
 | 2 | 614 | nothing. Other experiments only. No this-study row |
 | 3 | 618 | 146 partial pressures. CaO has 7 values (1910–2087 K). Mo has 13 values (the 1751 K cell is a dash). Nine other species have 14 values |
-| 4 | 619 | 14 Hertz–Knudsen p(O) values, column (11)–(13), plus 76 equilibrium-constant cells in columns (14)–(19). Eight printed dashes are omitted |
-| 5 | 620 | 15 coefficient rows. Each printed a_i and b_i falls inside its printed ± when refit to the parent pressures |
+| 4 | 619 | 14 Hertz–Knudsen p(O) values, column (11)–(13), plus 76 equilibrium-constant cells in columns (14)–(19). Eight printed dashes are omitted. The 7% error bound applies only to (11)–(13) |
+| 5 | 620 | 15 fitted coefficient rows. Each row's printed T interval is stored as an interval condition; no midpoint is assigned |
 | 6 | 621 | four this-study records: sublimation enthalpy, sublimation entropy, dissociation enthalpy, dissociation entropy. Each migrates UNAVAILABLE. BaSiO3 and CaTiO3 rows are other work and are not stored |
 | 7 | 623 | 22 literature melting-temperature and heat-of-fusion rows. The this-study melting calculation stays context; it duplicates the 2024 extract |
 
 Table 3 and Table 4 are rotated on the portrait page. pdftotext reading order matched a rotated 600 dpi render, including every mantissa, exponent, and dash that was checked.
 
 Eq. (20) and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the slash. The slash is on the 600 dpi crop. The fit stored here is log10(p) = a_i/T + b_i.
+
+### Table 5 full-cell audit
+
+All Table 5 numeric cells below are from physical PDF page 13, printed Table 5, and were checked against the 600 dpi render (verification method (b)). The row number maps each species, temperature interval, a_i and b_i cell to the source. Their ± widths are retained separately for the two fitted parameters; the paper does not identify a confidence level.
+
+| row | species | T interval, K | a_i, K | b_i, dimensionless | verification |
+| --- | --- | --- | --- | --- | --- |
+| 1 | O | 1751–1817 | −27820 ± 392 | 6.164 ± 0.219 | p13/table5/row1 (b) |
+| 2 | O | 1817–2087 | −28311 ± 146 | 6.444 ± 0.075 | p13/table5/row2 (b) |
+| 3 | O2 | 1751–1817 | −29787 ± 440 | 5.792 ± 0.246 | p13/table5/row3 (b) |
+| 4 | O2 | 1817–2087 | −30049 ± 278 | 5.929 ± 0.143 | p13/table5/row4 (b) |
+| 5 | Ca | 1751–1817 | −29978 ± 426 | 7.397 ± 0.238 | p13/table5/row5 (b) |
+| 6 | Ca | 1817–2087 | −27468 ± 126 | 6.007 ± 0.065 | p13/table5/row6 (b) |
+| 7 | CaO | 1910–2087 | −35633 ± 92 | 7.061 ± 0.046 | p13/table5/row7 (b) |
+| 8 | SiO | 1751–1817 | −27767 ± 347 | 10.104 ± 0.194 | p13/table5/row8 (b) |
+| 9 | SiO | 1817–2087 | −26284 ± 161 | 9.280 ± 0.082 | p13/table5/row9 (b) |
+| 10 | SiO2 | 1751–1817 | −30893 ± 209 | 8.664 ± 0.117 | p13/table5/row10 (b) |
+| 11 | SiO2 | 1817–2087 | −29601 ± 95 | 7.964 ± 0.049 | p13/table5/row11 (b) |
+| 12 | Si2O2 | 1751–1817 | −30142 ± 323 | 8.781 ± 0.181 | p13/table5/row12 (b) |
+| 13 | Si2O2 | 1817–2087 | −27068 ± 270 | 7.084 ± 0.139 | p13/table5/row13 (b) |
+| 14 | CaSiO3 | 1751–1817 | −44065 ± 573 | 14.687 ± 0.321 | p13/table5/row14 (b) |
+| 15 | CaSiO3 | 1817–2087 | −40293 ± 215 | 12.617 ± 0.110 | p13/table5/row15 (b) |
+
+Table 3 has 14 temperature rows and 146 nonblank pressure cells across its 11 species columns. Its entire independent grid is pinned by the focused test and the row/column assignment was checked against the rotated 600 dpi render of physical page 11 (method (b)). Table 4 has 14 Hertz–Knudsen values and 76 calculated values across the 14 printed temperatures; all 90 cells and the rotated row/column layout were checked against the 600 dpi render of physical page 12 (method (b)). Table 7's 11 literature rows contain 22 stored values and 22 printed widths; its Table 7 values and uncertainty forms are independently pinned by the focused test against the 600 dpi render of physical page 16 (method (b)). Its twelfth row is this study's 1818 ± 7 K and 27.64 ± 0.57 kJ/mol result, retained as context because it duplicates the 2024 extract.
 
 Eq. (25) on the 600 dpi crop has no square on p_SiO. The pdftotext "p 2" is the subscript of SiO2. Activities are not re-admitted, so the equation is quoted only as the reference-state sentence.
 
@@ -47,13 +71,31 @@ Isolated migration emits 277 observations.
 
 The 90 Table 4 points are 14 Hertz–Knudsen values, method_class measured_tabulated, and 76 equilibrium-constant cells, method_class model_derived. The 15 Table 5 fits keep their parent links. Oxygen's parent is the Table 4 Hertz–Knudsen series. Every other fit's parents are the Table 3 cells on that side of the printed 1817 K split. The 4 Table 6 records are explicit observations, not one collapsed context record.
 
-Against the previous 170-observation migration: 170 − 2 prose activities + 90 Table 4 points + 15 Table 5 fits + 4 Table 6 records = 277. Against the 281-observation typing: 281 − 26 Fig. 3 series-23 points, which stay context, + 22 Table 7 literature rows = 277.
+Compared with green, the candidate also emits 277 observations and all 277 observation IDs are identical, so the expected observation delta is zero. It retains 19 unavailable values, matching green.
 
 The prose activities are not scored. `shornikov_2024_cao_activity_prose` and `shornikov_2024_sio2_activity_prose` already hold them. The overlap record names those two ids and does not repeat the numbers. Rankinite stays the one context record. Tables 1 and 2 stay context. The Table 7 this-study melting calculation stays context.
 
 Fig. 3 series-23 marker reads, including the two markers inside 1818±7 K, stay context. Fig. 10 series 1 stays context. The printed Fig. 10 axes are `O + O2, mol %` on panel a and `O2 + O, mol %` on panel b. The caption still calls panel b the O2/O ratio.
 
-Hard issues on that migration: 84, all conditional_field. 76 are Table 4 model points whose Glushko equilibrium constants are not printed, so derived_from does not resolve; the unit conversion derivation is present. 8 are the four Table 6 records, each missing derived_from and a derivation, because delta_rH and delta_rS are not store quantities. That is the same 84 conditional_field class as the observation-level typing. It is expected. 19 values are UNAVAILABLE: the 15 fits have no numeric pressure, and the 4 Table 6 quantities are unsupported.
+The isolated migration emitted 277 observations, zero hard issues, and 19 unavailable values. The 15 Table 5 rows are fit coefficients rather than scalar partial pressures; the migrator therefore retains their printed intervals and coefficients but emits no numeric p_partial. The four Table 6 reaction-enthalpy and reaction-entropy values are typed refusals. There are no registry issues or quantity-unknown rows outside those four declared schema gaps, and no phase-unknown rows.
+
+## Uncertainty envelope
+
+The migrated count is 201 observations with uncertainty kind `printed` and confidence `not_stated`, plus 76 Table 4 equilibrium-constant rows with no printed uncertainty. Table 3's 146 pressure values and Table 4's 14 column (11)–(13) values carry the printed “errors are no higher than 7%” relative bound; this is not a point-specific symmetric sigma. The confidence level is not stated. Table 4 columns (14)–(19) have no printed uncertainty; each note says the 7% bound does not apply. Table 5 retains separate printed half-widths for a_i and b_i. Table 6 and Table 7 store each printed half-width with its units and exact `value_as_published` form. None of these sources identifies a confidence level, so `not_stated` is retained rather than treating the widths as one sigma.
+
+## Experiment linkage and engine readiness
+
+The 146 Table 3 rows, 90 Table 4 points, and 15 Table 5 fits link to experiment `shornikov-2026-wollastonite-kems-runset`. The experiment's initial charge is one printed formula unit of CaSiO3 on an oxide basis of CaO 1 and SiO2 1; the printed oxide-component sum is 2. This charge is linked to Tables 3–5 through the experiment FK and is marked `initial_charge_only`, not as a measurement-state composition. The scorer emits its own `composition_from_initial_charge` flag from that existing proxy. The source does not report chronological run order, a final mass, or a conversion/mass-loss value. The temperature ordering in the tables is not treated as chronological order, and the pressures are not used to back-solve depletion. The context records depletion as unreported and the final mass and run order as located `not_published` absences.
+
+The Experimental section describes a molybdenum Knudsen effusion cell and an MI-1201 mass spectrometer. Its temperature sentence is “accuracy better than 10 at 2400 K”; the unit for 10 is missing in the source text, so no K-valued temperature uncertainty is inferred. The Mo cell material is recorded; orifice dimensions and the Clausing factor are not printed, and no external pressure-calibration standard is reported. The measured residual-gas bound is ≤10⁻¹⁰ atm, but that is not the total pressure of the vapor mixture. No carrier gas or gas flow is reported. Table 3 prints pO2, which migrates to fO2_Pa; Table 4 and Table 5 do not print a point-specific oxygen condition. Table 5 supplies only row-specific T intervals, not scalar temperatures.
+
+The target observable is `p_partial` for gas species. Per `simulator/battery/score.py::rail_for_quantity`, the 118 Table 3, 90 Table 4, and 11 non-silicon Table 5 rows target the `vapour` rail (219 rows total); the 28 Table 3 and four Table 5 SiO/SiO2 rows target `SiO_evolution` (32 total). `simulator/battery/waypoints.py::consumer_readiness` reports zero MAGEMin engine-point-ready rows for all 251 observations: Table 3, 0/146 ready, lacks `experiment.pressure_environment.total_pressure_Pa`, `bench.other_facts.gas_load_Pa_m3_s`, and `bench.pumping_speed_m3_s`; Table 4, 0/90 ready, lacks those pressure-boundary inputs and `fO2_log`, `experiment.fO2_control`, and `total_pressure_Pa`; Table 5, 0/15 ready, lacks those oxygen and pressure inputs and has interval rather than point `temperature_K`. The KEMS input contract in `simulator/battery/consumer_inputs.py::REQUIREMENTS` is also incomplete: no sample mass, post-mass, purity, orifice dimensions/area, Clausing factor, effective escape area, temperature program, numeric temperature uncertainty, repeat count, hold duration, total experiment pressure, calibration, or measurement selectors are printed. The molybdenum cell material is printed; its liner is not stated. Table 3 supplies pO2 for its rows; Table 4 and Table 5 have no point-specific oxygen condition. The residual-gas upper bound is not used as the total pressure of the vapor mixture. No score gate is bypassed or made ready by relabeling the source's measured results.
+
+The 11 Table 5 rows named in the repair request (Ca, CaO, CaSiO3, O, O2, Si2O2) all now carry their row-specific printed intervals with table 5/page 13/row locators. Those rows and the four other Table 5 rows contain fitted coefficients for a pressure-temperature relation, not scalar pressure points; the migrator emits them as unavailable `p_partial` values. Adding the printed intervals therefore makes zero rows engine-ready. Existing IDs are unchanged.
+
+## Table 6 schema gap
+
+The four Table 6 rows print reaction enthalpy ΔrH and reaction entropy ΔrS for stated reactions, not formation enthalpy or absolute entropy. They remain descriptive quantity-unknown rows and migrate unavailable. The closed quantity set has formation enthalpy `simulator/battery/enums.py::Quantity.DELTA_FH`, heat of fusion `simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION`, and entropy `simulator/battery/enums.py::Quantity.S`; none means the printed reaction quantity exactly. The aliases are closed in `simulator/battery/migrate.py::QUANTITY_ALIASES`; `gibbs_table` infers only `simulator/battery/enums.py::Quantity.DELTA_FG` through `simulator/battery/migrate.py::TYPE_QUANTITY`. The observation-type set is closed in `tools/validate_literature_extracts.py::OBSERVATION_TYPES`. The extract uses explicit descriptive labels so no type fallback turns these into ΔfG. The four Table 6 IDs are the entire migrated quantity-unknown set; all phases remain known. No exact reaction-enthalpy or reaction-entropy quantity is present in the existing extract set.
 
 ## Standard state
 
@@ -92,7 +134,7 @@ Rankinite, 600 dpi crop of published page 623: −42.63±0.63 kJ/mol and 2.39±0
 
 120 dpi glances only, no marker centres: PDF pages 17 and 19 (Figs. 8, 9, 11 and 12).
 
-Not rendered: published page 616 (PDF page 9), the experimental paragraph. The residual-gas exponent is an en dash in pdftotext, and the pyrometer phrase is "better than 10" with no unit in the text extract. Neither number is stored. Ion-current ratios and appearance energies on that page are not stored as numbers.
+Not rendered: published page 616 (PDF page 9), the experimental paragraph. Its pyrometer accuracy has an unspecified unit for 10 and is retained as a located typed absence; the residual-gas upper bound is stored separately from total vapor pressure. Ion-current ratios and appearance energies on that page are not stored as numbers.
 
 ## Figure decisions
 
@@ -196,4 +238,6 @@ Other series on the same pages, not part of the two series the review named, sta
 
 ## Not stored
 
-Evaporation coefficients are adopted from Shornikov 2015 and are not printed. Orifice area, Clausing factors, and ionization cross sections are named in Eqs. (11)–(13) and are not given numerical values. Neutral-redox pressures in Figs. 9b and 10–11 have no table. The residual-gas bound and the pyrometer unit were not render-checked.
+Evaporation coefficients are adopted from Shornikov 2015 and are not printed. Orifice area, Clausing factors, and ionization cross sections are named in Eqs. (11)–(13) and are not given numerical values. Neutral-redox pressures in Figs. 9b and 10–11 have no table. The study does not explicitly classify its vaporization as congruent or incongruent; the located Table 6 context records the molecular vaporization and gas-phase dissociation statements without assigning that classification.
+
+The binding d-355 ruling is implemented with the existing `initial_charge_only` extraction proxy. The `composition_from_initial_charge` flag is scorer output from regolith-engine t-1696, not an extract token. The experiment context retains the initial charge and row linkage, unreported run sequence and depletion evidence, final-mass absence, and located vaporization statements. `charge_sequence`, `final_mass_kg`, and `vaporization_statement` are context fields and are not currently migrated into store fields.

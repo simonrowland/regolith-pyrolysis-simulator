@@ -44,17 +44,19 @@ This guide is for contributors and coding agents that need to find the right fil
 - `simulator/melt_backend/base.py` defines `MeltBackend` ABC, `EquilibriumResult` DTO, and `InternalAnalyticalBackend` fallback (the `internal-analytical` model; legacy backend name `stub`).
 - `simulator/backend_names.py` defines canonical analytical-backend naming (`stub` and `diagnostic_stub` are accepted input aliases that fold onto the `internal-analytical` serialization token).
 - `simulator/melt_backend/alphamelts.py` wires PetThermoTools and subprocess paths.
-- `simulator/melt_backend/magemin.py` is the MAGEMin today-hook adapter (`MeltBackend` subclass), a shadow silicate solver alongside alphaMELTS.
-- `simulator/melt_backend/vaporock.py` is the VapoRock today-hook adapter for equilibrium vapor speciation over silicate melts.
+- `simulator/melt_backend/magemin.py` is the MAGEMin backend adapter (`MeltBackend` subclass), a shadow silicate solver alongside alphaMELTS.
+- `simulator/melt_backend/vaporock.py` is the VapoRock backend adapter for equilibrium vapor speciation over silicate melts.
 - `simulator/melt_backend/installer.py` installs engine binaries and dependencies.
-- FactSAGE/ChemApp adapter files were removed/archived; `backend=factsage` is not a supported active backend.
+- `simulator/melt_backend/thermoengine.py` is the `ThermoEngineBackend` peer backend (ThermoEngine transport lives in `engines/alphamelts/`).
+- `simulator/melt_backend/openimcc_bridge.py` is the diagnostic bridge to the external openimcc package (IMCC).
 
 ## Engine Source Trees
 
-- `engines/__init__.py` documents the chemistry-engine refactor: kernel-shadow provider source lives here; today-hook adapters stay in `simulator/melt_backend/`.
-- `engines/builtin/` is the live authoritative chemistry plane — sixteen kernel-registered `ChemistryProvider` classes: fifteen rows in `PyrolysisSimulator._BUILTIN_PROVIDER_REGISTRATIONS` plus the separately wired `BuiltinVaporPressureProvider`. Every `LedgerTransitionProposal` they emit is routed through `ChemistryKernel.commit_batch` (the sole writer to `AtomLedger`); no `simulator/*.py` module mutates the ledger directly anymore.
+- `engines/__init__.py` documents the chemistry-engine refactor: kernel-shadow provider source lives here; backend adapters stay in `simulator/melt_backend/`.
+- `engines/builtin/` is the live authoritative chemistry plane — seventeen `ChemistryProvider` classes: sixteen registered at kernel build (fifteen rows in `PyrolysisSimulator._BUILTIN_PROVIDER_REGISTRATIONS` plus the separately wired `BuiltinVaporPressureProvider`) and one, `BuiltinMetalPhaseStratificationProvider`, registered on first use by the extraction mixin. Every `LedgerTransitionProposal` they emit is routed through `ChemistryKernel.commit_batch` (the sole writer to `AtomLedger`); no `simulator/*.py` module mutates the ledger directly anymore.
   - `engines/builtin/_common.py` provides shared helpers: `reject_wrong_intent`, `unpack_controls`, and `composition_wt_pct_from_account_view` (fail-closed via `UnknownSpeciesError`, mirroring `_load_ledger_account`).
-  - `engines/builtin/README.md` documents the migration plan and per-provider conventions.
+  - `engines/builtin/cco_redox_buffer.py`, `foulant_disposition.py` and `melt_effect_adjustment.py` hold dataclasses and typed results; they define no provider class.
+  - `engines/builtin/README.md` documents how to add a builtin provider.
 
   Provider to intent mapping (registered by `PyrolysisSimulator._build_chemistry_kernel` in `simulator/core.py`):
 
@@ -76,11 +78,14 @@ This guide is for contributors and coding agents that need to find the right fil
   | `engines/builtin/oxygen_bubbler.py` | `BuiltinOxygenBubblerProvider` | `OXYGEN_BUBBLER` | authoritative, ledger-mutating | `process.overhead_gas`, `reservoir.fo2_buffer` |
   | `engines/builtin/oxygen_reservoir_exchange.py` | `BuiltinOxygenReservoirExchangeProvider` | `OXYGEN_RESERVOIR_EXCHANGE` | authoritative, ledger-mutating | `process.overhead_gas`, `reservoir.fo2_buffer` |
   | `engines/builtin/backend_equilibrium.py` | `BuiltinBackendEquilibriumProvider` | `BACKEND_EQUILIBRIUM` | authoritative, validates/forwards backend transitions | `process.cleaned_melt`, `process.metal_phase`, `process.overhead_gas`, `reservoir.fo2_buffer` |
+  | `engines/builtin/metal_phase_stratification.py` | `BuiltinMetalPhaseStratificationProvider` | `METAL_PHASE_STRATIFICATION` | authoritative, registered on first use | `process.metal_phase`, `process.metal_phase_bottom_pool`, `process.metal_phase_float_layer` |
 
 - `engines/magemin/__init__.py` re-exports the MAGEMin shadow provider surface (`MAGEMinShadowProvider`, `MAGEMinDomainGate`, `MAGEMinParityComparator`, `ParityReport`).
 - `engines/magemin/provider.py` is the registered `MAGEMinShadowProvider` kernel shadow provider. Its capability profile declares `SILICATE_LIQUIDUS`, `SILICATE_EQUILIBRIUM`, and `GATE_LIQUID_FRACTION`; only `GATE_LIQUID_FRACTION` is fallback-authoritative, and `dispatch()` returns `IntentResult` diagnostics, including `unsupported` for wrong intents.
 - `engines/magemin/domain.py` is the `MAGEMinDomainGate` composition-range gate (14-oxide MELTS basis).
 - `engines/magemin/parity.py` is the `MAGEMinParityComparator` shadow-vs-authoritative comparator (±50 K liquidus, ±2 wt% modal).
+- `engines/vaporock/` holds `VapoRockProvider`, the diagnostic `VAPOR_PRESSURE` shadow wired by `simulator/core.py::_register_vapor_pressure_pair`.
+- `engines/alphamelts/` holds the alphaMELTS kernel provider and `ThermoEngineTransport`.
 - `engines/magemin/README.md` documents the deliberate two-path split: `simulator/melt_backend/magemin.py` remains the backend adapter, while `engines/magemin/` is the registered kernel-shadow provider package that delegates to it.
 
 ## Chemistry Kernel

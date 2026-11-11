@@ -933,3 +933,98 @@ def test_ec_propagates_untagged_runtime_error():
             liquidus_T_C=1100.0,
             grid_step_C=100.0,
         )
+
+
+def _renormalised_notice(raw_sum: float) -> dict:
+    return {
+        'type': 'typed_notice',
+        'kind': 'mode_vector_renormalised',
+        'raw_tokens': [{'phase': 'liq', 'raw_token': str(raw_sum)}],
+        'raw_sum': raw_sum,
+        'bound': 0.001,
+        'mass_residual': None,
+    }
+
+
+def test_renormalised_sample_on_steep_bracket_has_no_shift_flag():
+    """δ / s stays inside tolerance_C when the bracket is steep.
+
+    F rises from 0 to 1 over 100 K, so s = 0.01 per K. δ = 1e-3 gives
+    ΔT_bound = 0.1 K, below the 2 K finder tolerance. The melt fraction
+    is kept and the shift flag is absent.
+    """
+    notice = _renormalised_notice(1.001)
+
+    def sample(temperature_C: float):
+        temperature_C = float(temperature_C)
+        frac = max(0.0, min(1.0, (temperature_C - 1000.0) / 100.0))
+        if temperature_C == 1100.0:
+            return frac, notice
+        return frac
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=1000.0,
+        max_T_C=1200.0,
+        scan_step_C=50.0,
+        tolerance_C=2.0,
+    )
+
+    assert result.status == 'ok'
+    assert result.liquidus_T_C == pytest.approx(1100.0, abs=2.0)
+    assert notice['delta_T_bound'] == pytest.approx(0.1)
+    assert 'renormalisation_may_shift_bracket' not in notice
+
+
+def test_renormalised_sample_on_flat_bracket_is_flagged():
+    """δ / s exceeds tolerance_C when the liquidus bracket is flat.
+
+    From 1100 C the slope is 4e-6 per K. δ = 1e-3 gives ΔT_bound = 250 K.
+    The result is kept and the notice carries the flag.
+    """
+    notice = _renormalised_notice(1.001)
+
+    def fraction(temperature_C: float) -> float:
+        temperature_C = float(temperature_C)
+        if temperature_C <= 1000.0:
+            return 0.0
+        if temperature_C <= 1050.0:
+            return 0.5 * (temperature_C - 1000.0) / 50.0
+        if temperature_C <= 1100.0:
+            return 0.5 + 0.498 * (temperature_C - 1050.0) / 50.0
+        return 0.998 + 0.002 * (temperature_C - 1100.0) / 500.0
+
+    def sample(temperature_C: float):
+        temperature_C = float(temperature_C)
+        frac = fraction(temperature_C)
+        if temperature_C == 1350.0:
+            return frac, notice
+        return frac
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=1000.0,
+        max_T_C=1600.0,
+        scan_step_C=50.0,
+        tolerance_C=2.0,
+    )
+
+    assert result.status == 'ok'
+    assert result.liquidus_T_C == pytest.approx(1350.0, abs=2.0)
+    assert notice['delta_T_bound'] == pytest.approx(250.0)
+    assert notice['renormalisation_may_shift_bracket'] is True
+
+
+def test_renormalised_threshold_flags_a_zero_slope_bracket():
+    notice = _renormalised_notice(1.001)
+    low = MeltFractionSample(1000.0, 0.5)
+    high = MeltFractionSample(1100.0, 0.5)
+    liquidus_module._annotate_renormalised_threshold(
+        (low, high),
+        low,
+        high,
+        2.0,
+        {1000.0: notice},
+    )
+    assert notice['renormalisation_may_shift_bracket'] is True
+    assert notice['delta_T_bound'] is None

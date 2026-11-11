@@ -12,7 +12,7 @@ The simulated process is organized as staged campaigns:
 - `C0b` mild oxidative P cleanup: dilute melt P₂O₅ feeds analytical PO, PO₂, P₂, P₄, P₄O₆, and P₄O₁₀ evaporation channels, with phosphorus conserved through overhead gas into terminal offgas.
 - `C2A` low-pO2 or sweep-gas pyrolysis for Fe and SiO-bearing flows.
 - `C2B` pO2-managed Fe pyrolysis that preserves more silica-rich glass.
-- `C3_NA` Na metallothermic shuttle chemistry at the cool 1150 °C FeO window. Legacy `C3_K` and Cr/Ti targets are refused by the S1b engine gate under the V1c JANAF Ellingham refit and recorded in `shuttle_refusal_history`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
+- `C3_NA` Na metallothermic shuttle chemistry at the cool 1150 °C FeO window. `C3_K` and TiO₂ targets are refused by the shuttle temperature gate under the JANAF-4th Ellingham refit (Cr₂O₃ passes when its in-band margin is positive), and refusals are recorded in `shuttle_refusal_history`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 - `C4` selective Mg pyrolysis.
 - `C5` limited MRE for Si and selected metals.
 - `C6` Mg thermite reduction for aluminum-rich residues; the static recipe now holds at 1400 °C, below the 1471.4 °C Mg/Al₂O₃ JANAF-4th multiphase crossover with +13.864 kJ/mol-O₂ margin. The 2026-07-11 executable residual-melt sweep shows a within-noise 1400-1450 °C Al-yield plateau for lunar mare low/high-Ti, lunar highland, and Mars basalt, so ties break toward margin headroom and lower heating energy; CI remains a typed refusal because its staged residual has no workable liquid-fraction window.
@@ -25,13 +25,13 @@ Each hourly step updates:
 - Melt temperature and composition.
 - Vapor pressures and evaporation fluxes; provenance per species is recorded in `vapor_pressure_source_report` (normally `builtin_authoritative`; `thermoengine`, `builtin_fallback`, `kernel_diagnostic`, or legacy backend labels may appear on confirmed, fallback, or older artifacts). VapoRock shadow speciation is diagnostic-only and lives under `vaporock_full_speciation_Pa`, not as ledger-authoritative provenance.
 - Overhead gas pressure and partial pressures.
-- Pipe transport saturation, ramp throttling, and per-pipe-segment wall temperatures + cold-spot diagnostics (F2). The `knudsen_regime_diagnostic` in `run_metadata` exposes the transport-regime check per segment.
+- Pipe transport saturation, ramp throttling, and per-pipe-segment wall temperatures + cold-spot diagnostics. The `knudsen_regime_diagnostic` in `run_metadata` exposes the transport-regime check per segment.
 - Turbine load, O2 compression, venting, and accumulator inventory, with
   melt/offgas O2 and MRE anode O2 kept as separate mol bins.
-- Condensed products by species, plus a `stage_purity_report` exposing designated-vs-impurity mass per stage (F1 canonical species → stage registry).
+- Condensed products by species, plus a `stage_purity_report` exposing designated-vs-impurity mass per stage (canonical species → stage registry).
 - Stage 0 foulant disposition by hour and group for chlorides, sulfates, carbonates, perchlorate, carbon, and fluorides. The diagnostic groups are `trapped_gasses`, `refractory_carbon`, and `other_mineral_contaminant`; contaminant-impact flags warn without stopping the run before melt-equilibrium engines are called.
 - Wall deposits per species (`wall_deposit_kg`) — sole-written via `commit_batch` inside the ≤5×10⁻¹² % mass-balance closure; parameterised by pN₂ / Knudsen regime and per-segment wall T.
-- Per-species rump composition + by-class rump composition (F4) on the terminal payload.
+- Per-species rump composition + by-class rump composition on the terminal payload.
 - MRE voltage, current, metal production, and electrical energy.
 - Shuttle dispatch outcomes — accepted steps mutate the ledger; refused steps land in `shuttle_refusal_history` with the engine's structured diagnostic.
 - Total mass balance and cumulative products.
@@ -82,7 +82,7 @@ ledger unchanged. Its purpose is to expose gas-train and residual-rump hazards
 before melt-equilibrium providers are asked to evaluate the silicate handoff.
 
 The Stage 0 sulfate/sulfide bucketing is refined by an optional sulfur-saturation
-gate backed by PySulfSat: when the `[sulfur]` extra is installed and the cleaned
+gate backed by PySulfSat: when PySulfSat is installed (provisioned by `install-engines.py`) and the cleaned
 melt composition falls inside the SCSS (Smythe 2017) and SCAS (Chowdhury &
 Dasgupta 2019) calibration windows, the gate reports SCSS, SCAS, and the
 S6+/S2- partitioning fraction (Jugo 2010) so the sulfide- and sulfate-bearing

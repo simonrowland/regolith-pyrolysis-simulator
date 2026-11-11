@@ -10,7 +10,7 @@ JSON output for downstream analysis.
 
 ## Prerequisites
 
-- Python 3.12+ (the simulator and its tests are developed against 3.12; 3.13+ may encounter compatibility issues with optional engine packages). The core also needs Python 3.11 or later because it uses `tomllib`; the optional `imcc` extra (openimcc) and the project lock file require 3.12, so 3.12 is the supported floor.
+- Python 3.12 (required; `requires-python >=3.12`). 3.13 may hit compatibility issues with optional engine packages.
 - `git`, `uv` or `pip` available on `PATH`
 - For the full thermochemical engine stack on macOS arm64: Xcode command-line tools (`xcode-select --install`) and [Homebrew](https://brew.sh) — the installer uses `brew` to fetch `nlopt`, `open-mpi`, and `gsl` before compiling MAGEMin and ThermoEngine from source
 
@@ -67,18 +67,19 @@ python3 regolith-pyrolysis-run.py
 Open `http://127.0.0.1:3000/` in a browser.
 
 1. Select feedstock `Lunar Mare Basalt (Low-Ti)` from the feedstock panel.
-2. Leave the campaign at the default (`C0 — Vacuum Bakeoff`).
+2. Leave the campaign at the default (`C0`), click **Load recipe** and choose `canonical_lunar_full_yield` from the recipe library.
 3. Click **Start**. The hourly panel begins streaming.
 
 Things to look for during the run:
 
 - **Campaign sequence**: the simulator advances through C0/C0b, staged Path A,
   the cool Na shuttle where the Mg driver engages, C4, and a final continuous
-  C2A boiloff to the alumina ceiling. C5/MRE is absent.
+  C2A boil-off to the 1843 °C alumina ceiling, followed by the C6 Mg thermite.
+  C5/MRE stays off.
 - **SiO flux peak in the 1400–1600 °C window**: under the default Path A pN₂ sweep (C2A_continuous), SiO co-evolves with Fe. The `condensation_train_kg` column shows SiO glass accumulating in Stage 3. Under pO₂ control (C2B), SiO flux is suppressed >300× at 1 mbar pO₂.
 - **Mass balance closure**: the `mass_balance_pct` field should remain below `5e-12 %` at every tick. A nonzero drift indicates a regression; see `tests/test_mass_balance.py`.
 - **Stage purity** (in the runner JSON output's `stage_purity_report`): each stage carries a `verdict` (`PURE` / `MIXED` / `CONTAMINATED` / `INDETERMINATE`) and a per-species kg breakdown of designated vs impurity material. Empty stages are `INDETERMINATE`, not `PURE`. Stage 3 should be `PURE` SiO under default Path A when it actually captured.
-- **Shuttle refusals** (in `shuttle_refusal_history`): empty list means every C3 step the engine accepted; entries name the campaign, hour, melt T, and thermodynamic margin. Under V1c-JANAF a stray `--additive=K=…` will be quietly ignored by the gate (this is the surviving design, not a bug); see [`docs/recipe-playbook.md`](recipe-playbook.md) for the policy.
+- **Shuttle refusals** (in `shuttle_refusal_history`): empty list means every C3 step the engine accepted; entries name the campaign, hour, melt T, and thermodynamic margin. K additions do not reduce FeO: the shuttle gate accepts Na only at practical melt temperatures (K/Fe crossover ≈ 836 °C). See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
 
 ## First run via the CLI
@@ -100,14 +101,14 @@ Key CLI flags:
 
 | Flag | Default | Notes |
 |---|---|---|
-| `--feedstock` | required | ID from `data/feedstocks.yaml` |
+| `--feedstock` | required unless `--preset` supplies one | ID from `data/feedstocks.yaml` |
 | `--output` | required | Path for JSON output |
 | `--campaign` | `C0` | Starting campaign phase |
 | `--hours` | `24` | Simulated hours to run |
 | `--mass-kg` | `1000` | Batch mass in kg |
 | `--backend` | `internal-analytical` | `internal-analytical` (legacy alias `stub`), `alphamelts`, or `thermoengine`; `auto` only on web/API autodetect |
 | `--track` | `pyrolysis` | `pyrolysis` or `mre_baseline` |
-| `--additive` | none | Repeatable: `--additive=Na=12`. Post-V1c the C3 shuttle gate uses Na only; `--additive=K=…` is accepted but ignored by the gate. |
+| `--additive` | none | Repeatable: `--additive=Na=12`. The C3 shuttle gate uses Na only; `--additive=K=…` is accepted but does not reduce FeO. |
 
 For field definitions in the output JSON, see [`docs/runner-output-schema.md`](runner-output-schema.md).
 

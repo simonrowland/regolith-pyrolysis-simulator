@@ -142,6 +142,15 @@ benches:
       published_page: 616
       pdf_page_index: 8
       section: Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum Knudsen effusion cell; liner not stated.
+    locator:
+      page: 9
+      published_page: 616
+      pdf_page_index: 8
+      section: Experimental
   cell_materials:
   - state:
       tag: value
@@ -164,13 +173,15 @@ benches:
         section: Experimental
     accuracy:
       state:
-        tag: value
-        value: better than 10 K at 2400 K
+        tag: unknown
+        reason: not_published
       locator:
         page: 9
         published_page: 616
         pdf_page_index: 8
         section: Experimental
+        note: The source says "accuracy better than 10 at 2400 K" but prints no unit for 10; no temperature-uncertainty width
+          is inferred.
   heating_method:
     state:
       tag: value
@@ -3184,6 +3195,154 @@ context:
   work_id: 10.1134/s0016702926700035
   source_id: shornikov-2026-wollastonite-kems
   species: SiO
+- observation_id: shornikov_2026_initial_charge_and_readiness_context
+  type: experiment_record
+  units: Table 3 and Table 4 pressure in atm; Table 5 log10(atm) with a_i in K and b_i dimensionless.
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 616
+    section: Experimental
+  values:
+    experiment_id: shornikov-2026-wollastonite-kems-runset
+    note: 'not_published: no experimental run-order sequence is stated. The tabular rows are temperature-ordered; they do
+      not identify chronological run order. Depletion is unreported: no conversion, initial/final mass difference, or fractional
+      mass loss is reported. Eq. (11) defines q_i but the paper gives no numerical evaporated amount; pressures are not back-solved
+      into depletion. No final mass is reported. The determined molecular composition of the gas phase above wollastonite
+      indicates that wollastonite evaporated via the reaction [CaSiO3] = (CaSiO3), followed by dissociation of CaSiO3 gas
+      to gaseous oxides (CaO) + (SiO2). Source quote: "[CaSiO3] = (CaSiO3)" (PDF page 10, published page 617, Eq. (1)); the
+      paper defines square brackets as condensed-phase components and parentheses as gas-phase components.'
+    observable:
+      quantity: p_partial
+      gas_species: Ca, CaO, SiO, SiO2, Si2O2, O2, CaSiO3, O
+      printed_forms: Table 3 and Table 4 pressures in atm; Table 5 log10 pressure fits over reciprocal temperature.
+    initial_charge:
+      role: initial_charge
+      formula_as_printed: CaSiO3 (wollastonite)
+      oxide_basis:
+        basis: printed_formula_stoichiometry
+        amount_basis: mol_inventory
+        components:
+        - - CaO
+          - '1'
+        - - SiO2
+          - '1'
+        printed_formula_units: '1'
+        oxide_component_sum: '2'
+        sum_note: One CaSiO3 formula unit maps to one CaO plus one SiO2 formula unit; no assay sum is printed.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 608
+        note: The abstract identifies wollastonite as CaSiO3.
+    charge_to_row_linkage:
+      state:
+        tag: value
+        value: The Experimental section identifies the synthesized wollastonite sample used in this mass-spectrometric study;
+          Tables 3, 4, and 5 title their values as gas pressures or pressure fits over wollastonite. The rows share the experiment
+          FK above.
+      locators:
+      - page: 9
+        pdf_page_index: 8
+        published_page: 616
+        section: Experimental
+      - page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '3'
+      - page: 12
+        pdf_page_index: 11
+        published_page: 619
+        table: '4'
+      - page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+    measurement_state_composition:
+      state:
+        tag: unknown
+        reason: 'not_published: no per-point sample composition is given.'
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 616
+        section: Experimental
+    residual_gas_pressure:
+      state:
+        tag: value
+        value:
+          kind: upper_bound
+          bound_operator: <=
+          bound_value: 1e-10
+      units: atm
+      role: total residual-gas pressure in the mass spectrometer near the effusion cell; not a scalar total pressure of the
+        wollastonite vapor mixture.
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 616
+        section: Experimental
+    carrier_gas:
+      state:
+        tag: unknown
+        reason: 'not_published: no carrier gas or flow rate is reported.'
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 616
+        section: Experimental
+    apparatus_determinants:
+      cell_material:
+        state:
+          tag: value
+          value: molybdenum
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 616
+          section: Experimental
+      orifice_geometry:
+        state:
+          tag: unknown
+          reason: 'not_published: Eq. (11) names the orifice area and Clausing factor but gives no values.'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          published_page: 617
+          equation: (11)
+      pressure_calibration:
+        state:
+          tag: unknown
+          reason: 'not_published: the paper describes the pressure reduction but gives no external pressure-calibration standard.
+            The Ag appearance-energy standard calibrates ion appearance energy, not pressure.'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          published_page: 617
+          equation: (11)
+    congruence_classification:
+      state:
+        tag: unknown
+        reason: 'not_published: the paper does not explicitly classify this vaporization as congruent or incongruent.'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: 617
+        equation: (1)
+    melt_fractionation_statement:
+      state:
+        tag: value
+        value: The calcium oxide content controls the direction of chemical fractionation of melt compositions during evaporation;
+          the source does not quantify the depletion for this run.
+      locator:
+        page: 20
+        pdf_page_index: 19
+        published_page: 627
+        section: Conclusions
+  context_id: shornikov-2026-wollastonite-kems::context::shornikov_2026_initial_charge_and_readiness_context
+  work_id: 10.1134/s0016702926700035
+  source_id: shornikov-2026-wollastonite-kems
+  species: Ca
 - observation_id: shornikov_2026_molybdenum_cell_ion_current_ratios
   type: ion_intensity_context
   locator:

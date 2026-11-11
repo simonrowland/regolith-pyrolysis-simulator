@@ -7,7 +7,6 @@ JSON frame per script command. It is the browser-free operator test surface for
 the web/simulator flow.
 
 **Protocol version:** `1.0.0`
-**Owning goal:** `WEB-THIN-DRIVER Step 4`
 
 Run the CLI as:
 
@@ -38,7 +37,9 @@ quoting via `shlex`, so quoted strings may contain spaces.
 start --feedstock=<id> [--campaign=<phase>] [--mass-kg=<kg>]
       [--backend=internal-analytical|alphamelts] [--track=pyrolysis|mre_baseline]
       [--additive=SPECIES=KG ...] [--c4-max-temp=<C>]
+      [--c5-enabled[=BOOL]] [--mre-target-species=<sp>] [--mre-max-voltage-V=<V>]
       [--setpoint=CAMPAIGN.FIELD=VALUE ...]
+      [--setpoints-overrides=<json>] [--runtime-campaign-overrides=<json>]
 advance [N]
 decide <choice>
 adjust <param> <value>
@@ -54,6 +55,11 @@ quit
 `--additive=SPECIES=KG`. Session-only startup operands are
 `--c4-max-temp=<C>` and repeated `--setpoint=CAMPAIGN.FIELD=VALUE`, which map
 to `SimSessionConfig.c4_max_temp` and `setpoints_overrides`.
+`--c5-enabled` (default off) enables C5; `--mre-target-species` and
+`--mre-max-voltage-V` set the C5 MRE target and voltage cap.
+`--runtime-campaign-overrides` takes a JSON object of per-campaign overrides
+(`--setpoints-overrides` is its deprecated alias); repeated `--setpoint` values
+are merged on top.
 Campaign aliases include `C2A_continuous` -> `C2A` and
 `C2A_staged` -> `C2A_STAGED`; `C2A_staged.hold_temp_C` is the staged hot-hold
 operator knob.
@@ -61,8 +67,7 @@ operator knob.
 The default backend is `internal-analytical` (legacy input alias `stub`; both
 names resolve identically and frames serialize `internal-analytical` in `backend`).
 Backend resolution uses `BackendSelectionPolicy.RUNNER_STRICT`, matching the
-deterministic runner path. `factsage` is archived/removed and is rejected as an
-unknown backend.
+deterministic runner path. Any other backend name is rejected.
 
 ## Frames
 

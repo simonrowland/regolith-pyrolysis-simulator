@@ -12,8 +12,8 @@ from types import SimpleNamespace
 import pytest
 
 import conftest as project_conftest
-import _pytest_session_safety as session_safety
-from _pytest_session_safety import (
+import tests._plugins.session_safety as session_safety
+from tests._plugins.session_safety import (
     CHILD_HANDSHAKE_TIMEOUT_SECONDS,
     HANDSHAKE_EXIT_CODE,
     ProcessTreeSnapshot,

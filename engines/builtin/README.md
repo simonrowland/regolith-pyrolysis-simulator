@@ -1,31 +1,37 @@
-# `engines/builtin/` — builtin chemistry provider plane
+# `engines/builtin/` — builtin chemistry providers
 
-Kernel-registered builtin chemistry. See the
-[binding spec §3 (authority matrix)](../../docs-private/chemistry-engine-binding-spec-2026-05-14.md)
-for which intents the builtin owns. Source for the seven-intent extraction
-goal `\goal BUILTIN-ENGINE-EXTRACTION` (#7) in
-[codex-goal-queue-2026-05-14.md](../../docs-private/codex-goal-queue-2026-05-14.md).
+Every builtin chemistry intent is implemented in this directory as a
+`ChemistryProvider`: vapour pressure, evaporation flux and transition,
+condensation routing, electrolysis, metallothermic and aluminothermic steps,
+Stage 0 pretreatment, overhead-gas equilibrium and bleed, the O₂ bubbler,
+oxygen-reservoir exchange, Fe redox respeciation, native-Fe saturation and
+tapping, metal-phase stratification and backend equilibrium. The
+provider-to-intent table is in
+[`docs/developer-map.md`](../../docs/developer-map.md) ("Engine Source
+Trees"), and kernel routing is described in
+[`docs/architecture.md`](../../docs/architecture.md).
 
-## Intent-by-intent migration plan
+## Adding a builtin provider
 
-| # | Intent                   | Status this commit          | Source path                              |
-|---|--------------------------|------------------------------|-------------------------------------------|
-| 1 | `VAPOR_PRESSURE`         | **Wired (this commit)**      | `engines/builtin/vapor_pressure.py`       |
-| 2 | `EVAPORATION_FLUX`       | Pending                      | `simulator/evaporation.py`                |
-| 3 | `EVAPORATION_TRANSITION` | Pending                      | `simulator/evaporation.py`                |
-| 4 | `CONDENSATION_ROUTE`     | Pending                      | `simulator/condensation.py`               |
-| 5 | `ELECTROLYSIS_STEP`      | Pending                      | `simulator/electrolysis.py`               |
-| 6 | `METALLOTHERMIC_STEP`    | Pending                      | `simulator/extraction.py`                 |
-| 7 | `STAGE0_PRETREATMENT`    | Pending                      | `simulator/core.py` (`_stage0_*`)         |
+1. Implement the provider class in a new module here.
+2. Declare the accounts it may touch in its `CapabilityProfile.declared_accounts`.
+3. Add one row to `simulator/core.py::_BUILTIN_PROVIDER_REGISTRATIONS`. No
+   change to `_build_chemistry_kernel` is needed.
+4. Return ledger changes as proposals. `ChemistryKernel.commit_batch` is the
+   only writer to the ledger.
 
-Each flip lands per the per-intent rule: ship the provider, run shadow
-parity (1e-9 mol per species on lunar + Mars + asteroid feedstocks),
-flip the legacy call site, remove the shadow comparison.
+`_common.py` holds shared helpers. `cco_redox_buffer.py`,
+`foulant_disposition.py` and `melt_effect_adjustment.py` hold dataclasses and
+typed results and define no provider class.
 
-## Authority
+## Vapour pressure
 
-VAPOR_PRESSURE: **authoritative** (builtin Antoine/Ellingham). Result is
-diagnostic — `transition=None` — because VAPOR_PRESSURE owns no ledger
-mutation (vapor pressures are an input to `EVAPORATION_FLUX`, which is the
-intent that emits the LedgerTransition). VapoRock is a diagnostic-only
-shadow; `\goal VAPOROCK-AUTHORITY-PROMOTION` (#10) is a historical name only.
+`VAPOR_PRESSURE` is authoritative in the builtin (Antoine + Ellingham). It is
+registered separately from the table above, through
+`simulator/core.py::_register_vapor_pressure_pair`, because it needs the
+simulator-owned `data/vapor_pressures.yaml` payload. Its result is diagnostic
+(`transition=None`): vapour pressures are an input to `EVAPORATION_FLUX`,
+which computes the flux; the ledger transition itself is proposed by the
+evaporation-transition provider
+(`engines/builtin/evaporation_transition.py::BuiltinEvaporationTransitionProvider`).
+VapoRock is a diagnostic-only shadow.

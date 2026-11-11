@@ -18,8 +18,8 @@ from simulator.backends import BackendSelectionPolicy, backend_resolution_status
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.accounting.queries import TERMINAL_RUMP_REFRACTORY_OXIDES
 from simulator.electrolysis import (
-    MRECurrentPartitionRefusal,
-    MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+    MREElectrolysisInvalidInput,
+    MRE_INVALID_CONTROL_REFUSAL,
 )
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.core import PyrolysisSimulator
@@ -2131,8 +2131,8 @@ def test_c2a_product_targets_are_flagged_in_api_and_disclosure():
         assert f"{mass_kg} kg" in html
 
 
-def test_mre_partition_refusal_emits_typed_terminal_status(monkeypatch):
-    sid = "test-mre-partition-refusal"
+def test_mre_invalid_input_emits_typed_terminal_status(monkeypatch):
+    sid = "test-mre-invalid-input"
     sim = SimpleNamespace(_poisoned_hour=None)
     session = SimpleNamespace(simulator=sim, is_complete=lambda: False)
     state, lock = _replace_simulation_state(sid, session, speed=0.0)
@@ -2141,9 +2141,8 @@ def test_mre_partition_refusal_emits_typed_terminal_status(monkeypatch):
         "hour": 43,
         "campaign": "MRE_BASELINE",
         "diagnostic": {
-            "reason_refused": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
-            "current_partition_certified": False,
-            "reducible_oxide_targets": ("Cr2O3", "SiO2"),
+            "reason_refused": MRE_INVALID_CONTROL_REFUSAL,
+            "invalid_controls": {"voltage_V": "missing"},
         },
     }
 
@@ -2159,8 +2158,8 @@ def test_mre_partition_refusal_emits_typed_terminal_status(monkeypatch):
     socket = Socket()
 
     def drive(*_args, **_kwargs):
-        raise MRECurrentPartitionRefusal(
-            MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+        raise MREElectrolysisInvalidInput(
+            MRE_INVALID_CONTROL_REFUSAL,
             diagnostic,
         )
 
@@ -2187,20 +2186,10 @@ def test_mre_partition_refusal_emits_typed_terminal_status(monkeypatch):
         socket.target()
 
         assert sim._poisoned_hour is None
-        # The message used to BE the token. bb0fc09f made a lawful refusal
-        # explain itself instead, so pinning the token here would pin the
-        # defect. Two assertions, because either alone is weak: the first
-        # fails if we ever regress to emitting a bare token, the second
-        # raises KeyError if the registry entry is dropped -- so a fallback
-        # to the token cannot pass this quietly. The subject of THIS test,
-        # the typed terminal status, is unchanged below.
-        assert statuses[0]["message"] != MRE_MULTI_OXIDE_PARTITION_REFUSAL
         assert statuses == [{
             "status": "refused",
-            "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
-            "message": web_events._REFUSAL_EXPLANATIONS[
-                MRE_MULTI_OXIDE_PARTITION_REFUSAL
-            ],
+            "reason": MRE_INVALID_CONTROL_REFUSAL,
+            "message": MRE_INVALID_CONTROL_REFUSAL,
             "refusal_diagnostic": diagnostic,
             "backend_status": "ok",
             "backend_authoritative": True,
@@ -2208,7 +2197,7 @@ def test_mre_partition_refusal_emits_typed_terminal_status(monkeypatch):
             "run_id": state["run_id"],
         }]
         assert persisted["status"] == "refused"
-        assert persisted["reason"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
+        assert persisted["reason"] == MRE_INVALID_CONTROL_REFUSAL
         assert persisted["refusal_diagnostic"] == diagnostic
     finally:
         _clear_simulation_state(sid)

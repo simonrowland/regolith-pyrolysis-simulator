@@ -9,9 +9,9 @@ disagree, the CSS wins — update this doc to match.
 An **APP UI**: a data-dense scientific instrument (a furnace control + ledger
 dashboard), not a marketing site. Design serves **legibility, hierarchy, and
 truthful data presentation** — never decoration. This tracks the project North
-Star: the UI's job is to show the model honestly, not to look pretty. No AI-slop
-patterns (no card-grid hero, no purple gradients, no centered everything, no
-decorative blobs).
+Star: the UI's job is to show the model honestly, not to look pretty. Avoid
+decorative patterns: no hero card grids, gradients, centred-everything layouts
+or blobs.
 
 Classifier rules: App UI — calm surface hierarchy, strong typography, few colors,
 dense but readable, minimal chrome. Cards only when the card *is* the interaction.
@@ -105,8 +105,5 @@ from the chart/condensation-train internals — low priority given the usage.
 
 ## Known debt (prioritized for future design passes)
 
-1. `_attic/game/static/css/game.css` (Lunar Operator, archived) hardcodes ~10 hex chip colors —
-   tokenize and dedupe against the shared vars.
-2. Optional explicit light/dark toggle (theme is OS-driven only today).
-3. Delightful motion + performance polish (self-host the CDN deps for offline +
-   lazy-load) — the last lever to a clean A.
+1. Optional explicit light/dark toggle (theme is OS-driven only today).
+2. Self-host CDN dependencies for offline use and lazy-load charts.

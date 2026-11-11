@@ -34,9 +34,9 @@ _TEMPERATURE_ROUTES = (
     ("kems-049-kato-1993-ms-review", "kato_1993_table1_si_psat_1873k", "1873.0", "table", "1"),
     ("kems-049-kato-1993-ms-review", "kato_1993_table1_w_psat_1873k", "1873.0", "table", "1"),
     # The locator prints 1300 C; the migrator applies its Celsius-to-Kelvin conversion once.
-    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=7be86db87718", "1573.15", "table", "3"),
-    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=0537dd72731f", "1573.15", "table", "3"),
-    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=7b2b66dd3504", "1573.15", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=90ea453f2e72", "1573.15", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=dd92bb9c709c", "1573.15", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=3a0639d50db0", "1573.15", "table", "3"),
     ("kems-057-kambayashi-1985", "kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only", "1573.15", "figure", "2"),
     # Fig. 8 slope: "Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C".
     ("kems-057-kambayashi-1985", "kambayashi_1985_fe_sublimation_enthalpy_1370c", "1643.15", "figure", "8"),

@@ -72,9 +72,6 @@ class EngineInstaller:
         # alphaMELTS binary
         status['alphaMELTS_binary'] = self._check_binary()
 
-        # ChemApp (Python module presence only)
-        status['ChemApp_module'] = self._check_chemapp()
-
         return status
 
     def _check_binary(self) -> bool:
@@ -86,16 +83,6 @@ class EngineInstaller:
 
         # Check system PATH
         return shutil.which('alphamelts') is not None
-
-    def _check_chemapp(self) -> bool:
-        """Check whether a supported ChemApp Python module is importable."""
-        for module_name in ('chemapp.friendly', 'ChemApp'):
-            try:
-                __import__(module_name)
-                return True
-            except ImportError:
-                continue
-        return False
 
     def install_alphamelts(self, progress_callback=None) -> bool:
         """
@@ -225,11 +212,6 @@ class EngineInstaller:
             lines.append('  alphaMELTS binary: found')
         else:
             lines.append('  alphaMELTS binary: not found')
-
-        if status.get('ChemApp_module'):
-            lines.append('  ChemApp module: found')
-        else:
-            lines.append('  ChemApp module: not available')
 
         if not any(status.values()):
             lines.append('')

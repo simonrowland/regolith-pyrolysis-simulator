@@ -79,8 +79,8 @@ converted into invented numeric scores.
 
 ## 4. A right value on the wrong basis is still wrong
 
-This is the rule that a naive "we cited it" misses, and it is worth stating on its own because it has
-already bitten us.
+This is the rule that a naive "we cited it" misses, and it is worth stating on its own because it is
+a common failure.
 
 An activity coefficient, an equilibrium constant, a vapor pressure — these are defined *relative to a
 reference*: a **standard state** (Raoultian pure-liquid vs Henrian infinite-dilution), a **component
@@ -92,7 +92,7 @@ So a citation for such a value must state its basis, and the code must apply it 
 end-to-end: the source's standard state must match the reaction's `K` reference, and the mole/cation
 normalization the source fit must be the one the code computes.
 
-**Worked example — the melt activity coefficients (CF-3).** Sossi & Fegley 2018 Table 2 tabulate
+**Worked example — the melt activity coefficients.** Sossi & Fegley 2018 Table 2 tabulate
 alkali-oxide activity coefficients on the **single-cation `NaO0.5`/`KO0.5` basis**, **Raoultian**
 (their Eqn 24: activity → 1 for the pure oxide), for the reaction `NaO0.5(l) = Na(g) + 1/4 O2` (their
 Eqn 25) — which makes the sodium partial pressure **linear** in the activity coefficient,
@@ -102,7 +102,7 @@ residual-glass analyses and HKL/logK* fitting, and corroborated by DeMaria 1971 
 used that value on the di-cation `Na2O` basis with a square-root exponent and a weight-fraction proxy
 was *wrong by construction* — it recovered only `sqrt(gamma)` of the suppression — even though the
 number and the DOI were correct. The citation is not complete until the basis is stated and the code
-honours it. (Full trace: `docs-private/deep-research/cf3-alkali-activity-synthesis.md`.)
+honours it.
 
 ## 5. Uncertainty is a deliverable, not a footnote
 
@@ -130,9 +130,9 @@ citation as the code.
 Three layers, cheapest first:
 
 1. **Inline citation** at the value's definition — the minimum, always present. This is the commitment.
-2. **The benchmark literature corpus** (`docs-private/deep-research/literature/<paper>/`) — the OCR'd
-   primary paper with the actual table, held so the number can be re-checked against its source at any
-   time.
+2. **The benchmark literature corpus** — a locally held copy of each primary paper, kept outside the
+   public repository for copyright reasons, with the actual table, so the number can be re-checked against
+   its source at any time.
 3. **The fact-forest** (curated provenance pages) — the synthesized, cross-referenced write-up of a
    value and its competing sources. This is the richest layer and is built as a deliberate follow-on;
    the inline citation and the corpus paper are what must exist *now*.

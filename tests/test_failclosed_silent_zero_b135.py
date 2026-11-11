@@ -34,10 +34,13 @@ from simulator.optimize.evaluate import (
     RumpTerminalAssessment,
     _rump_terminal_margin,
 )
+from simulator.accounting.completeness import extraction_completeness_by_target
 from simulator.optimize.physics import (
     PhysicsConstraintSet,
-    _target_extraction_result_from_payload,
+    extraction_completeness_report,
 )
+from simulator.accounting.yield_disposition import YIELD_DISPOSITION_BINS
+from simulator.state import MOLAR_MASS
 from simulator.vapour_rail.batch import VapourRequestConstructionError
 from simulator.vapour_rail.instrumentation import finite_live_pressure_map
 from simulator.vapour_rail.request import (
@@ -97,38 +100,70 @@ def test_l1_stage0_populated_fractions_still_partition() -> None:
 
 
 def test_l2_missing_product_mol_refuses_completeness_not_zero_product() -> None:
-    result = _target_extraction_result_from_payload(
-        "Na",
-        {
-            "completeness_fraction": 0.95,
-            # product_target_equiv_mol intentionally omitted
-            "residual_target_equiv_mol": 0.05,
-            "denominator_target_equiv_mol": 1.0,
-        },
-    )
+    # Successor of _target_extraction_result_from_payload: a claimed
+    # completeness fraction is not evidence. Completeness is the
+    # yield-disposition left/not-left mol split. Omitting destination
+    # mol-atoms (the old "missing product_target_equiv_mol") refuses the
+    # fraction, leaves the basis mols None, and does not publish a product mol.
+    product_kg = {"Na": 0.95 * MOLAR_MASS["Na"] / 1000.0}
+    residual_kg = {"Na2O": 0.05 * MOLAR_MASS["Na2O"] / 1000.0}
+    result = extraction_completeness_by_target(
+        ("Na",),
+        {"Na": ("Na2O", "Na")},
+        product_kg,
+        residual_kg,
+        yield_disposition_fraction_table_rows=({"element": "Na"},),
+    )["Na"]
     assert result.completeness_fraction is None
-    assert "missing mol fields" in result.reason
-    assert "product_target_equiv_mol" in result.reason
-    # Gate path treats None fraction as fail-closed, not 95% extracted
-    constraints = PhysicsConstraintSet(target_species=("Na",))
-    # Stored field is honest: missing product mol is None, never a silent 0.0.
-    assert result.product_target_equiv_mol is None
-    # The fail-closed detail must not claim a 0.95 product story.
+    assert "missing" in result.reason
+    assert "destination" in result.reason
+    assert result.left_melt_target_equiv_mol is None
+    assert result.not_left_melt_target_equiv_mol is None
+    assert result.denominator_target_equiv_mol is None
+    # Known ledger product is kept, not replaced with a silent 0.
+    assert result.product_target_equiv_mol == pytest.approx(0.95)
     assert result.completeness_fraction is not 0.95
+
+    constraints = PhysicsConstraintSet(
+        target_species=("Na",),
+        residual_species_by_target={"Na": ("Na2O", "Na")},
+        active_gates=("extraction_completeness",),
+    )
+    trace = SimpleNamespace(
+        product_ledger_kg=product_kg,
+        terminal_rump_by_species_kg=residual_kg,
+        process_inventory_residual_kg={},
+        yield_disposition_fraction_table_rows=({"element": "Na"},),
+        yield_disposition_fraction_table_error="",
+        snapshots=(),
+    )
+    report = extraction_completeness_report(trace, constraints)
+    target = report["targets"]["Na"]
+    assert target["completeness_fraction"] is None
+    assert target["product_target_equiv_mol"] is None
+    assert "missing" in target["reason"]
+    assert "destination" in target["reason"]
+    margin = constraints.extraction_completeness(trace)
+    assert margin.feasible is False
+    assert margin.status == "unavailable"
+    assert margin.observed is None
 
 
 def test_l2_explicit_zero_product_with_fraction_still_parses() -> None:
-    result = _target_extraction_result_from_payload(
-        "Na",
-        {
-            "completeness_fraction": 0.0,
-            "product_target_equiv_mol": 0.0,
-            "residual_target_equiv_mol": 1.0,
-            "denominator_target_equiv_mol": 1.0,
-        },
-    )
+    destinations = {name: 0.0 for name in YIELD_DISPOSITION_BINS}
+    destinations["melt_retained"] = 1.0
+    result = extraction_completeness_by_target(
+        ("Na",),
+        {"Na": ("Na2O", "Na")},
+        {},
+        {"Na2O": MOLAR_MASS["Na2O"] / 1000.0},
+        yield_disposition_fraction_table_rows=(
+            {"element": "Na", "destination_mol_atoms": destinations},
+        ),
+    )["Na"]
     assert result.completeness_fraction == pytest.approx(0.0)
     assert result.product_target_equiv_mol == pytest.approx(0.0)
+    assert result.left_melt_target_equiv_mol == pytest.approx(0.0)
 
 
 # ---------------------------------------------------------------------------

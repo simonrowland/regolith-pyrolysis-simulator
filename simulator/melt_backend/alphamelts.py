@@ -44,8 +44,6 @@ import time
 import traceback
 import warnings
 from dataclasses import dataclass
-from functools import lru_cache
-from itertools import product
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
@@ -65,7 +63,10 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
-from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.chemistry.melt_activity import (
+    melt_oxide_activity,
+    melt_oxide_activity_coefficient,
+)
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
     resolve_alphamelts_python_api_model,
@@ -1039,16 +1040,16 @@ PETTHERMOTOOLS_NON_PHASE_KEYS = {
 # to the prior local literal (8.31446261815324).
 GAS_CONSTANT_J_PER_MOL_K = GAS_CONSTANT
 ACTIVITY_KEYS_BY_VAPOR_SPECIES = {
-    'Na': ('Na', 'Na2O', 'NaAlSi3O8'),
-    'K': ('K', 'K2O', 'KAlSi3O8'),
-    'Mg': ('Mg', 'MgO', 'Mg2SiO4', 'MgSiO3'),
-    'Fe': ('Fe', 'FeO', 'Fe2SiO4', 'FeSiO3'),
-    'Ca': ('Ca', 'CaO', 'CaSiO3', 'CaMgSi2O6', 'CaAl2Si2O8'),
-    'Al': ('Al', 'Al2O3', 'CaAl2Si2O8', 'NaAlSi3O8', 'KAlSi3O8'),
-    'Si': ('Si', 'SiO2', 'CaSiO3', 'Mg2SiO4', 'MgSiO3'),
-    'SiO': ('SiO', 'SiO2', 'CaSiO3', 'Mg2SiO4', 'MgSiO3'),
+    'Na': ('Na', 'Na2O'),
+    'K': ('K', 'K2O'),
+    'Mg': ('Mg', 'MgO'),
+    'Fe': ('Fe', 'FeO'),
+    'Ca': ('Ca', 'CaO'),
+    'Al': ('Al', 'Al2O3'),
+    'Si': ('Si', 'SiO2'),
+    'SiO': ('SiO', 'SiO2'),
     'Ti': ('Ti', 'TiO2'),
-    'Cr': ('Cr', 'Cr2O3', 'CrO2'),
+    'Cr': ('Cr', 'Cr2O3'),
     'CrO2': ('CrO2', 'Cr2O3'),
     'Mn': ('Mn', 'MnO'),
 }
@@ -1056,7 +1057,7 @@ ACTIVITY_KEYS_BY_VAPOR_SPECIES = {
 
 @dataclass(frozen=True)
 class VaporPressureActivityRefusal:
-    """Status-bearing refusal for an incomplete activity projection."""
+    """Status-bearing refusal when a required vapor-pressure input is missing."""
 
     missing_precursor_species: tuple[str, ...]
     context: str
@@ -1069,98 +1070,6 @@ class VaporPressureActivityRefusal:
             'missing_precursor_species': list(self.missing_precursor_species),
             'context': self.context,
         }
-
-
-@lru_cache(maxsize=None)
-def _activity_formula_atoms(formula: str) -> tuple[tuple[str, float], ...]:
-    """Parse a MELTS activity label, including decimal endmember subscripts."""
-    text = str(formula).strip().strip('"\'')
-    try:
-        atoms = dict(resolve_species_formula(text).atoms)
-    except UnknownSpeciesError:
-        # The accounting parser treats ASCII '.' as a hydrate separator, while
-        # ThermoEngine names Mn/Co/Ni endmembers with Si0.5. Those names contain
-        # no groups, so a complete token cover is an exact decimal-safe parse.
-        tokens = list(re.finditer(r'([A-Z][a-z]?)(\d+(?:\.\d+)?)?', text))
-        if not tokens or ''.join(token.group(0) for token in tokens) != text:
-            return ()
-        atoms = {}
-        for token in tokens:
-            element = token.group(1)
-            count = float(token.group(2) or 1.0)
-            atoms[element] = atoms.get(element, 0.0) + count
-    return tuple(sorted((str(element), float(count)) for element, count in atoms.items()))
-
-
-@lru_cache(maxsize=None)
-def _oxide_component_stoichiometry(
-    endmember: str,
-) -> tuple[tuple[str, float], ...]:
-    """Derive the unique MELTS-oxide decomposition of an endmember formula.
-
-    Premise: the endmember atom vector E is a sum of MELTS oxide vectors O_j.
-    Algebra: for each cation c, nu_j = n_c(E) / n_c(O_j); accept the mapping
-    only when one combination reconstructs every atom, including oxygen.
-    nu_j has units mol oxide component / mol endmember. Multiplying the
-    dimensionless endmember activity by nu_j therefore remains dimensionless;
-    it is a component-equivalent proxy for this explicitly non-authoritative
-    fallback, not a claim of a pure-oxide chemical-potential standard state.
-
-    Sanity checks: Na2SiO3 = 1 Na2O + 1 SiO2 (O: 1 + 2 = 3);
-    KAlSiO4 = 0.5 K2O + 0.5 Al2O3 + 1 SiO2 because K: 1/2 =
-    0.5 and Al: 1/2 = 0.5 (O: 0.5 + 1.5 + 2 = 4);
-    MgCr2O4 = 1 MgO + 1 Cr2O3 (O: 1 + 3 = 4); and
-    MnSi0.5O2 = 1 MnO + 0.5 SiO2 (O: 1 + 1 = 2). H2O has no
-    MELTS oxide component used by the vapor rail, so it returns no mapping.
-    """
-    atoms = dict(_activity_formula_atoms(str(endmember)))
-    if not atoms or float(atoms.get('O', 0.0)) <= 0.0:
-        return ()
-    cations = tuple(sorted(element for element in atoms if element != 'O'))
-    oxide_atoms = {
-        oxide: dict(_activity_formula_atoms(oxide))
-        for oxide in MELTS_OXIDE_BASIS
-    }
-    choices: list[list[tuple[str, float]]] = []
-    for cation in cations:
-        candidates: list[tuple[str, float]] = []
-        for oxide, component_atoms in oxide_atoms.items():
-            component_cations = {
-                element for element in component_atoms if element != 'O'
-            }
-            if component_cations != {cation}:
-                continue
-            coefficient = atoms[cation] / component_atoms[cation]
-            candidates.append((oxide, coefficient))
-        if not candidates:
-            return ()
-        choices.append(candidates)
-
-    decompositions: list[dict[str, float]] = []
-    for combination in product(*choices):
-        reconstructed: dict[str, float] = {}
-        coefficients: dict[str, float] = {}
-        for oxide, coefficient in combination:
-            coefficients[oxide] = coefficients.get(oxide, 0.0) + coefficient
-            for element, count in oxide_atoms[oxide].items():
-                reconstructed[element] = (
-                    reconstructed.get(element, 0.0) + coefficient * count
-                )
-        if set(reconstructed) != set(atoms):
-            continue
-        if all(
-            math.isclose(
-                reconstructed[element],
-                atoms[element],
-                rel_tol=0.0,
-                abs_tol=1e-12,
-            )
-            for element in atoms
-        ):
-            decompositions.append(coefficients)
-    if len(decompositions) != 1:
-        return ()
-    return tuple(sorted(decompositions[0].items()))
 
 
 def activity_from_chem_potential(mu: float, mu0: float, T_K: float) -> float:
@@ -3248,6 +3157,7 @@ class _MELTSBackendSupport(MeltBackend):
                     eq.activity_coefficients,
                     comp_wt,
                     context='PetThermoTools VapoRock fallback unavailable',
+                    use_melt_activity_ladder=True,
                     **antoine_kwargs,
                 )
                 eq.vapor_pressures_Pa, source = self._finalize_antoine_projection(
@@ -6281,6 +6191,7 @@ class _MELTSBackendSupport(MeltBackend):
                 dict(melt_wt),
                 pO2_bar=10.0 ** float(fO2_log),
                 context='VapoRock helper unavailable',
+                use_melt_activity_ladder=True,
             )
             return self._finalize_antoine_projection(
                 projection,
@@ -6357,6 +6268,7 @@ class _MELTSBackendSupport(MeltBackend):
                 dict(melt_wt),
                 pO2_bar=10.0 ** float(fO2_log),
                 context=f'VapoRock status {result.status!r}',
+                use_melt_activity_ladder=True,
             )
             return self._finalize_antoine_projection(
                 projection,
@@ -6374,6 +6286,7 @@ class _MELTSBackendSupport(MeltBackend):
         *,
         pO2_bar: float | None = None,
         context: str,
+        use_melt_activity_ladder: bool = False,
     ) -> Dict[str, float] | VaporPressureActivityRefusal:
         table = self._load_vapor_pressure_table()
         if not table:
@@ -6383,12 +6296,22 @@ class _MELTSBackendSupport(MeltBackend):
                 'because it would silently zero evaporation flux'
             )
 
+        account_mol = (
+            self._oxide_activity_account_mol_from_wt_pct(comp_wt)
+            if use_melt_activity_ladder
+            else None
+        )
+        temperature_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
         pressures = self._activities_times_antoine(
             T_C,
             activities,
             comp_wt,
             pO2_bar=pO2_bar,
+            account_mol=account_mol,
+            use_melt_activity_ladder=use_melt_activity_ladder,
         )
+        if isinstance(pressures, VaporPressureActivityRefusal):
+            return pressures
         # Partial activity maps that omit melt-present volatiles (e.g. Na/K
         # when only FeO/SiO2 activities are present) would debit those
         # species as zero by omission. Refuse the whole projection.
@@ -6396,6 +6319,9 @@ class _MELTSBackendSupport(MeltBackend):
             comp_wt,
             table,
             activities,
+            account_mol=account_mol,
+            temperature_K=temperature_K,
+            use_melt_activity_ladder=use_melt_activity_ladder,
         )
         if missing_precursor_species:
             return VaporPressureActivityRefusal(
@@ -6540,6 +6466,15 @@ class _MELTSBackendSupport(MeltBackend):
                 str(species): dict(notice)
                 for species, notice in notices.items()
             }
+        activity_sources = (
+            getattr(self, "_antoine_activity_source_notices", None) or {}
+        )
+        if activity_sources:
+            payload["activity_source_by_species"] = {
+                str(species): dict(notice)
+                for species, notice in activity_sources.items()
+            }
+        self._antoine_activity_source_notices = {}
         if isinstance(source, VaporPressureActivityRefusal):
             payload['vapor_pressure_backend_status'] = 'refused'
             payload['vapor_pressure_backend_status_reason'] = source.reason
@@ -6572,22 +6507,25 @@ class _MELTSBackendSupport(MeltBackend):
             )
         return payload
 
-    def _activities_times_antoine(self, T_C: float,
-                                    activities: dict,
-                                    _comp_wt: dict,
-                                    *,
-                                    pO2_bar: float | None = None) -> Dict[str, float]:
+    def _activities_times_antoine(
+        self,
+        T_C: float,
+        activities: Mapping[str, object],
+        comp_wt: Mapping[str, object],
+        *,
+        pO2_bar: float | None = None,
+        account_mol: Mapping[str, float] | None = None,
+        use_melt_activity_ladder: bool = False,
+    ) -> Dict[str, float] | VaporPressureActivityRefusal:
         """Project melt-source reactions when VapoRock is unavailable.
 
-        Activities may come from direct tables, gamma*x, or mu/mu0. Missing
-        precursor activities are refused by _activities_times_antoine_or_fail.
+        Exact engine activities take precedence. AlphaMELTS can resolve a
+        missing oxide activity from composition through the shared melt ladder.
         Pressure math belongs to the catalog/Ellingham owner, never to a
         pure-component wall-saturation sidecar in this adapter.
         """
-        if not activities:
-            return {}
         table = self._load_vapor_pressure_table()
-        if not table:
+        if not table or (not activities and not use_melt_activity_ladder):
             return {}
         from simulator.chemistry.ellingham_graph import (
             ELLINGHAM_THERMO,
@@ -6604,25 +6542,46 @@ class _MELTSBackendSupport(MeltBackend):
         )
 
         T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
+        if use_melt_activity_ladder and account_mol is None:
+            account_mol = self._oxide_activity_account_mol_from_wt_pct(
+                comp_wt
+            )
         pressures: Dict[str, float] = {}
+        missing_pO2_species: list[str] = []
         self._antoine_floor_inversion_notices = {}
+        self._antoine_activity_source_notices = {}
         for species, spec in table.items():
             if species not in ELLINGHAM_THERMO and not spec.get('antoine'):
                 # Retain this bridge's original oxide-gas request surface.
                 continue
-            raw_activity = self._activity_for_vapor_species(species, activities)
+            if use_melt_activity_ladder:
+                raw_activity, activity_notice = (
+                    self._activity_for_vapor_species_with_composition(
+                        species,
+                        activities,
+                        account_mol or {},
+                        temperature_K=T_K,
+                    )
+                )
+            else:
+                raw_activity = self._activity_for_vapor_species(
+                    species,
+                    activities,
+                )
+                activity_notice = None
             if raw_activity is None or not self._is_number(raw_activity):
                 continue
+            if activity_notice is not None:
+                self._antoine_activity_source_notices[str(species)] = (
+                    activity_notice
+                )
             reaction = spec.get('liquid_oxide_standard_reaction') or spec
             pO2_exponent = float(reaction.get('pO2_exponent', 0.0) or 0.0)
             uses_sidecar = bool(spec.get('pure_component_antoine'))
             uses_catalog = bool(spec.get('reference_pressure_model') or spec.get('liquid_oxide_standard_reaction'))
             if pO2_bar is None and (pO2_exponent or uses_sidecar or uses_catalog):
-                raise RuntimeError(
-                    'AlphaMELTS Antoine fallback cannot evaluate '
-                    f'{species} melt-source reaction without pO2_bar; '
-                    'refusing activity-only vapor pressure'
-                )
+                missing_pO2_species.append(str(species))
+                continue
             pO2_value = validate_physical_pO2_bar(pO2_bar) if pO2_bar is not None else 1.0
             if self._antoine_uses_reaction_pressure(spec):
                 group = 'metals' if species in ELLINGHAM_THERMO else 'oxide_vapors'
@@ -6659,6 +6618,12 @@ class _MELTSBackendSupport(MeltBackend):
                 str(species), spec, self._pseudo_vapor_pressure_warning_seen,
                 stacklevel=3,
             )
+        if missing_pO2_species:
+            return VaporPressureActivityRefusal(
+                missing_precursor_species=tuple(missing_pO2_species),
+                context='pO2_bar is required for melt-source pressure',
+                reason='missing_input',
+            )
         return pressures
 
     def _melt_has_antoine_vapor_precursor(
@@ -6685,12 +6650,20 @@ class _MELTSBackendSupport(MeltBackend):
         comp_wt: Mapping[str, float],
         table: Mapping[str, Mapping[str, object]],
         activities: Mapping[str, object],
+        *,
+        account_mol: Mapping[str, float] | None = None,
+        temperature_K: float | None = None,
+        use_melt_activity_ladder: bool = False,
     ) -> list[str]:
         """Vapor species whose melt precursor is present but activity is not.
 
-        Used to refuse partial activity×Antoine maps that would omit Na/K
-        (and similar) while still succeeding for other species.
+        A missing engine oxide activity is supported by the shared melt
+        activity ladder when the solved liquid composition contains its oxide.
         """
+        if use_melt_activity_ladder and account_mol is None:
+            account_mol = self._oxide_activity_account_mol_from_wt_pct(
+                comp_wt
+            )
         missing: list[str] = []
         for vapor_species in table:
             activity_keys = ACTIVITY_KEYS_BY_VAPOR_SPECIES.get(
@@ -6704,70 +6677,137 @@ class _MELTSBackendSupport(MeltBackend):
                     break
             if not melt_has_precursor:
                 continue
-            raw = self._activity_for_vapor_species(str(vapor_species), dict(activities))
+            if use_melt_activity_ladder:
+                raw, _notice = (
+                    self._activity_for_vapor_species_with_composition(
+                        str(vapor_species),
+                        activities,
+                        account_mol or {},
+                        temperature_K=temperature_K,
+                    )
+                )
+            else:
+                raw = self._activity_for_vapor_species(
+                    str(vapor_species),
+                    activities,
+                )
             if raw is None or not self._is_number(raw):
                 missing.append(str(vapor_species))
         return sorted(missing)
 
     @staticmethod
-    def _activity_for_vapor_species(species: str, activities: dict) -> Optional[float]:
-        # ThermoEngine reports liquid oxide/endmember activities, not vapor
-        # species activities. Direct vapor keys win; mapped oxide/endmember
-        # keys are proxy activities for this non-authoritative fallback.
+    def _oxide_activity_account_mol_from_wt_pct(
+        comp_wt: Mapping[str, object],
+    ) -> dict[str, float]:
+        """Convert solved oxide weight percentages to relative mole amounts."""
+        account_mol: dict[str, float] = {}
+        for raw_name, raw_wt_pct in (comp_wt or {}).items():
+            oxide = canonical_melt_oxide_activity_name(str(raw_name))
+            if oxide not in MELTS_OXIDE_BASIS:
+                continue
+            try:
+                wt_pct = float(raw_wt_pct)
+            except (TypeError, ValueError):
+                continue
+            if not math.isfinite(wt_pct) or wt_pct <= 0.0:
+                continue
+            molar_mass = resolve_species_formula(
+                oxide
+            ).molar_mass_kg_per_mol()
+            # Premise: all reported wt% share one mass basis, and n_i is
+            # proportional to wt_i/M_i. Unit check: wt/M is mol per shared
+            # mass unit; the common scale cancels in mole fractions. In a
+            # pure-oxide limit the fraction is 1 and the owner returns a->1.
+            account_mol[oxide] = account_mol.get(oxide, 0.0) + (
+                wt_pct / molar_mass
+            )
+        return account_mol
+
+    @staticmethod
+    def _parent_oxide_for_vapor_species(species: str) -> str | None:
         keys = ACTIVITY_KEYS_BY_VAPOR_SPECIES.get(
             str(species), (str(species),)
         )
-        target_oxide = next(
+        return next(
             (
-                canonical_melt_oxide_activity_name(key)
+                oxide
                 for key in keys
-                if canonical_melt_oxide_activity_name(key) is not None
+                if (oxide := canonical_melt_oxide_activity_name(key)) is not None
             ),
             None,
+        )
+
+    def _activity_for_vapor_species_with_composition(
+        self,
+        species: str,
+        activities: Mapping[str, object],
+        account_mol: Mapping[str, float],
+        *,
+        temperature_K: float | None = None,
+    ) -> tuple[float | None, dict[str, object] | None]:
+        direct = self._activity_for_vapor_species(species, activities)
+        if direct is not None:
+            return direct, None
+        parent_oxide = self._parent_oxide_for_vapor_species(species)
+        if parent_oxide is None:
+            return None, None
+        resolved = melt_oxide_activity(
+            parent_oxide,
+            account_mol,
+            temperature_K=temperature_K,
+        )
+        if resolved is None:
+            return None, None
+        coefficient = melt_oxide_activity_coefficient(parent_oxide)
+        if coefficient is None:
+            rung = 'ideal_mixing'
+            source = 'ideal'
+        else:
+            rung = 'published_gamma'
+            source = resolved.citation
+        notice = {
+            'rung': rung,
+            'source': source,
+            'x': resolved.x_single_cation,
+            'reason': 'alphaMELTS supplied no oxide-component activity',
+        }
+        if resolved.warning:
+            notice['warning'] = resolved.warning
+        return resolved.activity, notice
+
+    @staticmethod
+    def _activity_for_vapor_species(
+        species: str,
+        activities: Mapping[str, object],
+    ) -> Optional[float]:
+        """Return an engine activity only for the vapor key or its exact oxide."""
+        keys = ACTIVITY_KEYS_BY_VAPOR_SPECIES.get(
+            str(species), (str(species),)
+        )
+        target_oxide = _MELTSBackendSupport._parent_oxide_for_vapor_species(
+            str(species)
         )
         if target_oxide is None:
             return None
 
-        # Keep the declared carrier preference without treating an endmember
-        # activity as though it were already an oxide activity. Exact species
-        # or oxide keys need no projection; endmembers use the formula-derived
-        # mol oxide / mol endmember coefficient above.
-        for key in keys:
-            if key not in activities:
-                continue
-            try:
-                activity = float(activities[key])
-            except (TypeError, ValueError):
-                continue
-            if not math.isfinite(activity):
-                continue
-            if key == str(species) or key == target_oxide:
-                return activity
-            coefficient = dict(
-                _oxide_component_stoichiometry(str(key))
-            ).get(target_oxide)
-            if coefficient is not None:
-                return coefficient * activity
+        canonical_activities: dict[str, list[object]] = {}
+        for raw_key, raw_activity in activities.items():
+            key = canonical_melt_oxide_activity_name(raw_key) or str(raw_key)
+            canonical_activities.setdefault(key, []).append(raw_activity)
 
-        candidates: list[float] = []
-        for endmember, raw_activity in activities.items():
-            if endmember in keys:
+        # A melt endmember activity cannot be converted into a pure-oxide
+        # liquid activity without a matching standard-state definition.
+        for key in keys:
+            canonical_key = canonical_melt_oxide_activity_name(key) or key
+            if canonical_key not in {str(species), target_oxide}:
                 continue
-            coefficient = dict(
-                _oxide_component_stoichiometry(str(endmember))
-            ).get(target_oxide)
-            if coefficient is None:
-                continue
-            try:
-                activity = float(raw_activity)
-            except (TypeError, ValueError):
-                continue
-            if math.isfinite(activity):
-                candidates.append(coefficient * activity)
-        # Never sum two endmember activities as if they were extensive moles.
-        # One unique carrier supplies the proxy; ambiguity leaves the gate red.
-        if len(candidates) == 1:
-            return candidates[0]
+            for raw_activity in canonical_activities.get(canonical_key, ()):
+                try:
+                    activity = float(raw_activity)
+                except (TypeError, ValueError):
+                    continue
+                if math.isfinite(activity):
+                    return activity
         return None
 
     def _load_vapor_pressure_table(self) -> dict:

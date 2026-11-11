@@ -7,7 +7,10 @@ Use `data/recipes/canonical_lunar_full_yield.yaml` with a 1-tonne
 C3 Na/K shuttle inventory, and lets the non-FeO dissociation driver recover Mg
 in the 1150 °C C3_NA window before C4. It then re-enables the continuous Path A
 boiloff. It keeps C5/MRE off and stops that final ramp at the
-1843 °C dense-alumina maximum-service limit from `data/furnace_materials.yaml`.
+1843 °C dense-alumina maximum-service limit from `data/furnace_materials.yaml`
+(the recipe pins `furnace_max_T_C: 1843`; the default furnace material is
+`zirconia_ysz`). Run non-interactively, the batch then continues into the C6 Mg
+thermite, with no electrolysis.
 
 ```shell
 python -m simulator.runner --feedstock lunar_mare_low_ti --campaign C0 --hours 400 \

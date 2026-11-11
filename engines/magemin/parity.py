@@ -1,8 +1,7 @@
 """MAGEMin shadow-vs-authoritative parity comparator.
 
 The kernel runs MAGEMin as a shadow alongside the authoritative
-``SILICATE_LIQUIDUS`` / ``SILICATE_EQUILIBRIUM`` engine (alphaMELTS today;
-possibly FactSAGE post-license). The shadow result NEVER becomes a
+``SILICATE_LIQUIDUS`` / ``SILICATE_EQUILIBRIUM`` engine (alphaMELTS). The shadow result NEVER becomes a
 ``LedgerTransition`` — its only job is to flag disagreement so an
 operator can investigate fO2 sensitivity, solid-solution differences, or
 basis-projection bugs.

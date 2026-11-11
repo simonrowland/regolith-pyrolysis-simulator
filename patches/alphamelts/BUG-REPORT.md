@@ -75,5 +75,5 @@ Fe-free melt: that would refuse inputs the engine can compute.
 The upstream repository is public and AGPL-3.0, but this workspace has no
 alphaMELTS source checkout; only the compiled 2.3.1 app bundle is installed.
 Therefore this package contains a bug-report draft, not a speculative binary
-patch. Any future redistribution of a patched executable/source fork is gated
-on project decision `q-004`; this draft makes no licensing-posture decision.
+patch. Redistribution of a patched executable or source fork is not planned;
+this draft makes no licensing-posture decision.

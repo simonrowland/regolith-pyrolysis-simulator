@@ -44,7 +44,11 @@ from simulator.state import (
     CampaignPhase,
     MeltState,
 )
-from web.events import _completion_payload
+from web.events import (
+    _browser_socket_payload,
+    _completion_payload,
+    _per_hour_summary_entry,
+)
 
 
 def _sim(feedstocks, setpoints=None):
@@ -264,6 +268,176 @@ def _enable_c5_mre(sim, *, target_species: str, max_voltage_V: float) -> None:
     sim.melt.mre_target_species = target_species
     sim.melt.mre_max_voltage_V = max_voltage_V
     sim.campaign_mgr.c5_enabled = True
+
+
+def test_c5_fallback_voltage_commit_is_flagged_without_changing_amount():
+    def _sim_with_feo():
+        sim = _sim(
+            {
+                "feo": {
+                    "label": "FeO",
+                    "composition_wt_pct": {"FeO": 100.0},
+                }
+            }
+        )
+        sim.load_batch("feo", mass_kg=1000.0)
+        _enable_c5_mre(sim, target_species="FeO", max_voltage_V=3.0)
+        sim.melt.campaign = CampaignPhase.C5
+        sim.melt.temperature_C = 1600.0
+        sim._mre_voltage_sequence = [{
+            "voltage": 3.0,
+            "species": ["FeO"],
+            "min_hold_hours": 0,
+        }]
+        sim._mre_voltage_step_idx = 0
+        sim._mre_hold_hours = 0
+        sim._mre_effective_current_A = 100.0
+        return sim
+
+    fallback_sim = _sim_with_feo()
+    with patch(
+        "simulator.mre_ladder.ellingham_segment_for_temperature",
+        side_effect=LookupError("test raw reference unavailable"),
+    ):
+        fallback_sim._step_mre()
+
+    fallback_sim.atom_ledger.assert_balanced()
+    committed_fe_mol = fallback_sim.atom_ledger.mol_by_account(
+        "process.metal_phase"
+    )["Fe"]
+    assert committed_fe_mol > 0.0
+    # Binary64 output captured from the committed fallback path at a6308d063.
+    assert committed_fe_mol.hex() == "0x1.61c6e00091064p+3"
+    notice = next(
+        notice
+        for notice in fallback_sim._mre_ellingham_ladder_diagnostic[
+            "notices"
+        ]
+        if notice.get("kind") == "mre_raw_margin_unassessed"
+    )
+    assert notice["oxide"] == "FeO"
+    assert notice["temperature_C"] == pytest.approx(1600.0)
+    assert notice["applied_voltage_V"] == pytest.approx(3.0)
+    assert notice["fallback_requirement_V"] == pytest.approx(
+        3.0 - fallback_sim._mre_effective_voltage_margin_V_by_oxide["FeO"]
+    )
+    assert notice["reason"] == "raw_graph_voltage_missing"
+    assert notice["authority"] == "fallback_heuristic"
+
+
+def test_successful_baseline_fallback_notice_survives_runner_and_web_summaries():
+    sim = _sim(
+        {
+            "feo": {
+                "label": "FeO",
+                "composition_wt_pct": {"FeO": 100.0},
+            }
+        }
+    )
+    sim.load_batch("feo", mass_kg=1000.0)
+    sim.melt.campaign = CampaignPhase.MRE_BASELINE
+    sim.melt.temperature_C = 1600.0
+    sim._mre_voltage_sequence = [{
+        "voltage": 3.0,
+        "species": ["FeO"],
+        "min_hold_hours": 0,
+    }]
+    sim._mre_voltage_step_idx = 0
+    sim._mre_hold_hours = 0
+
+    with patch(
+        "simulator.mre_ladder.ellingham_segment_for_temperature",
+        side_effect=LookupError("test raw reference unavailable"),
+    ):
+        sim._step_mre()
+
+    from simulator.runner import build_per_hour_summary
+
+    summary = build_per_hour_summary(sim, sim._make_snapshot())
+    diagnostic = sim._mre_ellingham_ladder_diagnostic
+    assert summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    assert _per_hour_summary_entry(summary)[
+        "mre_ellingham_ladder_diagnostic"
+    ] == diagnostic
+    assert any(
+        notice.get("kind") == "mre_raw_margin_unassessed"
+        for notice in diagnostic["notices"]
+    )
+
+
+def test_successful_reproduction_fallback_notice_survives_runner_and_web_summaries(
+    monkeypatch,
+):
+    from tests.mre_reproduction_fixtures import synthetic_program
+    from simulator.mre_reproduction import run_mre_reproduction
+
+    bundle = load_config_bundle()
+    feedstocks = dict(bundle.feedstocks)
+    feedstocks["pure_feo_notice_test"] = {
+        "label": "Pure FeO notice test",
+        "composition_wt_pct": {"FeO": 100.0},
+    }
+    program = synthetic_program("one_hour", max_interval_min=60.0)
+    program = replace(
+        program,
+        feedstock_id="pure_feo_notice_test",
+        mass_kg=1000.0,
+        current_program={**program.current_program, "current_A": 100.0},
+        voltage_program=tuple(
+            {**point, "voltage_V": 3.0}
+            for point in program.voltage_program
+        ),
+        gas_boundary={
+            **program.gas_boundary,
+            "runtime_inlet_pO2_bar": 1e-6,
+        },
+    )
+    executed = []
+    original_execute = PyrolysisSimulator._execute_mre_interval
+
+    def capture_execution(self, control, **kwargs):
+        outcome = original_execute(self, control, **kwargs)
+        executed.append((self, outcome))
+        return outcome
+
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "_execute_mre_interval",
+        capture_execution,
+    )
+    with patch(
+        "simulator.mre_ladder.ellingham_segment_for_temperature",
+        side_effect=LookupError("test raw reference unavailable"),
+    ):
+        result = run_mre_reproduction(
+            program,
+            feedstocks=feedstocks,
+            setpoints=bundle.setpoints,
+            vapor_pressures=bundle.vapor_pressures,
+            materials=bundle.materials,
+            backend_name="internal-analytical",
+        )
+
+    assert result["status"] == "ok"
+    assert executed
+    sim, outcome = executed[-1]
+    diagnostic = outcome["diagnostic"]["mre_ellingham_ladder_diagnostic"]
+    interval_diagnostic = result["mre_reproduction"]["intervals"][-1][
+        "mre_ellingham_ladder_diagnostic"
+    ]
+    assert interval_diagnostic == diagnostic
+
+    from simulator.runner import build_per_hour_summary
+
+    summary = build_per_hour_summary(sim, sim._make_snapshot())
+    assert summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    assert _per_hour_summary_entry(summary)[
+        "mre_ellingham_ladder_diagnostic"
+    ] == diagnostic
+    assert any(
+        notice.get("kind") == "mre_raw_margin_unassessed"
+        for notice in diagnostic["notices"]
+    )
 
 
 def _assert_product_matches_account(sim, account, species):
@@ -630,7 +804,10 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
     assert produced_kg == pytest.approx(o2_kg_from_mol)
 
 
-def test_mre_refused_partition_fails_loud_without_energy_or_products():
+@pytest.mark.parametrize("campaign", [CampaignPhase.C5, CampaignPhase.MRE_BASELINE])
+def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products(
+    campaign,
+):
     sim = _sim(
         {
             "mixed": {
@@ -646,7 +823,7 @@ def test_mre_refused_partition_fails_loud_without_energy_or_products():
     )
     sim.load_batch("mixed", mass_kg=1000.0)
     _enable_c5_mre(sim, target_species="", max_voltage_V=2.0)
-    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.campaign = campaign
     sim.melt.temperature_C = 1600.0
     sim.melt.hour = 42
     sim.melt.campaign_hour = 7
@@ -666,8 +843,26 @@ def test_mre_refused_partition_fails_loud_without_energy_or_products():
         sim.atom_ledger.kg_by_account("terminal.oxygen_mre_anode_stored")
     )
 
-    with pytest.raises(RuntimeError, match=MRE_MULTI_OXIDE_PARTITION_REFUSAL):
-        sim._step_mre()
+    sim._step_mre()
+
+    from simulator.runner import build_per_hour_summary
+
+    diagnostic = sim._mre_ellingham_ladder_diagnostic
+    runner_summary = build_per_hour_summary(sim, sim._make_snapshot())
+    assert runner_summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    web_summary = _browser_socket_payload("per_hour_summary", runner_summary)
+    assert web_summary == _per_hour_summary_entry(runner_summary)
+    assert web_summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    tick_projection = _browser_socket_payload(
+        "simulation_tick",
+        {"per_hour_summary_delta": runner_summary},
+    )
+    assert (
+        tick_projection["per_hour_summary_delta"][
+            "mre_ellingham_ladder_diagnostic"
+        ]
+        == diagnostic
+    )
 
     assert sim._chem_no_op_dispatch_count == no_op_before + 1
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt") == pytest.approx(
@@ -682,25 +877,73 @@ def test_mre_refused_partition_fails_loud_without_energy_or_products():
     assert sim.product_ledger() == {}
     assert sim._mre_metals_this_hr == {}
     assert sim._mre_energy_this_hr == pytest.approx(0.0)
-    assert sim._mre_voltage_V == pytest.approx(0.0)
-    assert sim._mre_current_A == pytest.approx(0.0)
+    assert sim._mre_voltage_V == pytest.approx(2.0)
     assert sim._mre_effective_current_A == pytest.approx(0.0)
-    assert sim.melt.mre_voltage_V == pytest.approx(0.0)
+    assert sim.melt.mre_voltage_V == pytest.approx(2.0)
     assert sim.melt.mre_current_A == pytest.approx(0.0)
 
-    refusal = sim._last_mre_refusal_diagnostic
-    assert refusal["intent"] == ChemistryIntent.ELECTROLYSIS_STEP.name
-    assert refusal["hour"] == 42
-    assert refusal["campaign_hour"] == 7
-    assert refusal["campaign"] == CampaignPhase.C5.name
-    assert refusal["temperature_C"] == pytest.approx(1600.0)
-    assert refusal["voltage_V"] == pytest.approx(2.0)
-    assert refusal["current_A"] == pytest.approx(1000.0)
-    assert refusal["diagnostic"]["reason_refused"] == (
-        MRE_MULTI_OXIDE_PARTITION_REFUSAL
+    step_outcome = diagnostic["step_outcome"]
+    assert step_outcome == {
+        "status": "refused",
+        "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+    }
+    assert diagnostic["notices"][0] == {
+        "kind": "mre_step_refusal",
+        "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+    }
+
+
+def test_vetoed_c5_mre_preserves_spent_residue_account():
+    from simulator.electrolysis import MRE_RAW_MARGIN_REFUSAL
+
+    def with_spent_residue():
+        sim = _sim(
+            {
+                "sodium oxide": {
+                    "label": "Sodium oxide",
+                    "composition_wt_pct": {"Na2O": 100.0},
+                }
+            }
+        )
+        sim.load_batch("sodium oxide", mass_kg=10.0)
+        sim._move_ledger_species(
+            "test_seed_spent_reductant_residue",
+            "process.cleaned_melt",
+            SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+            "Na2O",
+            10.0,
+            reason="seed the C5 spent-residue regression fixture",
+        )
+        return sim
+
+    sim = with_spent_residue()
+    mre_off = with_spent_residue()
+    _enable_c5_mre(sim, target_species="Na2O", max_voltage_V=0.75)
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.temperature_C = 30.0
+    sim._mre_voltage_sequence = [{
+        "voltage": 0.5,
+        "species": ["Na2O"],
+        "min_hold_hours": 1,
+    }]
+    sim._mre_voltage_step_idx = 0
+    sim._mre_hold_hours = 0
+
+    sim._step_mre()
+
+    assert sim._mre_ellingham_ladder_diagnostic["step_outcome"] == {
+        "status": "refused",
+        "reason": MRE_RAW_MARGIN_REFUSAL,
+    }
+    assert sim.atom_ledger.kg_by_account(
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT
+    ) == pytest.approx(
+        mre_off.atom_ledger.kg_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT)
     )
-    assert "energy_kWh" not in refusal["diagnostic"]
-    assert sim._mre_refusal_history == [refusal]
+    assert not any(
+        transition.name == "c5_mre_spent_residue_to_cleaned_melt"
+        for transition in sim.atom_ledger.transitions
+    )
 
 
 def test_condensed_species_projection_does_not_double_count_across_stages():

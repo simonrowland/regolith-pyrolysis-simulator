@@ -22,8 +22,7 @@ Post-decomposition reality (0de9c6d / t-499 / RG-1 precondition):
   until activity-corrected catalog ``P_eff`` lands. The parity gate therefore
   compares batch **eligibility / refusal / set** authority plus seam values —
   **not** catalog-evaluated pure-component ``P_sat`` numbers.
-- Studio-config doctrine (``docs/ci-local-divergence.md``): no bare laptop
-  golden pins. This suite is structural / mol-native / shadow-proved; it does
+- CI doctrine: no bare laptop golden pins. This suite is structural / mol-native / shadow-proved; it does
   not commit engine-routed numeric fixtures.
 """
 

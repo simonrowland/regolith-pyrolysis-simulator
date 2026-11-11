@@ -57,7 +57,7 @@ There is **no top-level `runner.py`** — the CLI is the `simulator.runner` modu
   --output runs/my_run.json
 ```
 
-`--feedstock` and `--output` are **required**. The run writes a single JSON result
+`--output` is required; `--feedstock` is required unless `--preset` supplies it. The run writes a single JSON result
 document to `--output` (parent dirs are created automatically); nothing useful goes to
 stdout. Convention is to drop outputs under `runs/`.
 
@@ -137,7 +137,7 @@ ledger = run(feedstock_id="lunar_mare_low_ti", campaign="C2A", hours=24)
 #   process_inventory_spent_reductant, unclassified
 ```
 
-`unclassified` is the honesty account: mass the classifier could not assign to a product
+`unclassified` is the catch-all account: mass the classifier could not assign to a product
 class. A growing `unclassified` is a finding about the classifier, not a product.
 
 Its CLI twin (writes a markdown or JSON report; diagnostic — no threshold enforcement):
@@ -248,9 +248,8 @@ directly too, which is why `--campaign C2A` works.
   `supports_intrinsic_fO2`. Same cost profile as `alphamelts`, and it needs the native
   ThermoEngine build from `install-engines.py`; without it the backend resolves
   unavailable and the run fails loudly rather than silently downgrading.
-- A *fast real-fidelity* path is in progress (the reduced-real MAGEMin cache + `cached-real`
-  backend) — the intent is to make the real melt-phase fidelity fast enough to be the
-  default.
+- Coming soon: a cached real-fidelity path (`cached-real`, backed by the reduced-real
+  MAGEMin cache), configured in-process via `reduced_real_cache`.
 - `magemin` / `vaporock` are not selectable as the active melt backend from this flag;
   the reduced-real cached path (`cached-real`) is configured in-process via
   `reduced_real_cache`, not the runner flag.
@@ -267,9 +266,9 @@ directly too, which is why `--campaign C2A` works.
 
 | command | purpose |
 |---|---|
-| `python -m simulator.optimize --feedstock <id> --strategy {bayes,nsga2,random,screen,staged} --fidelity {internal-analytical,fast,high,auto} --budget N` | Phase-O recipe optimizer (`simulator.optimize.cli` is the same entry point; `--fidelity stub` is still accepted and canonicalises to `internal-analytical`) |
+| `python -m simulator.optimize --feedstock <id> --strategy {bayes,nsga2,random,screen,staged} --fidelity {internal-analytical,fast,high,auto} --budget N` | Recipe optimizer (see `docs/optimizer-user-guide.md`; `simulator.optimize.cli` is the same entry point; `--fidelity stub` is still accepted and canonicalises to `internal-analytical`) |
 | `python scripts/populate_reduced_real_cache.py --profile <p> --feedstock <id> --campaign <c> --db <path>` | build the reduced-real equilibrium cache from real trajectories |
-| `python scripts/cal_threshold_calibration.py --feedstock <id> --campaign <c> --output-dir <d>` | SG-3 vapor yield-threshold calibration (default `--backend alphamelts`; `--allow-internal-analytical` to use the `internal-analytical` model; legacy flag alias `--allow-stub`) |
+| `python scripts/cal_threshold_calibration.py --feedstock <id> --campaign <c> --output-dir <d>` | Vapor yield-threshold calibration (default `--backend alphamelts`; `--allow-internal-analytical` to use the `internal-analytical` model; legacy flag alias `--allow-stub`) |
 | `python scripts/vaporock_antoine_shadow_matrix.py` | record alphaMELTS/VapoRock vs Antoine shadow vapor pressures |
 
 ---
@@ -278,8 +277,7 @@ directly too, which is why `--campaign C2A` works.
 
 - **No root `runner.py`.** Use the module form `-m simulator.runner`. `simulator.runner` is
   a package directory (`simulator/runner/`), which also carries `sio_yield`, `sio_tsweep`
-  and `sio_wall_sweep` submodules. Stale copies under `.claude/worktrees/` are not the
-  live code.
+  and `sio_wall_sweep` submodules.
 - **Always `./.venv/bin/python`**, not a bare `python`.
 - **Run from the repo root** so `data/` and `engines/` resolve; `--output` is relative to
   the current directory.
@@ -293,21 +291,9 @@ directly too, which is why `--campaign C2A` works.
   not a run-document key.
 - **Failed/refused runs still produce a JSON file and a non-zero exit** — gate on the exit
   code (or `status` field), not file existence.
-- **Machine-sensitive goldens regenerate on Studio 1 only.** Engine-touched fixtures
-  (runner smoke, sio_yield, coating diagnostic SHA, staged-bakeout / capacity pins) are
-  sensitive to `engines/engines.local.toml` + the Studio engine binaries. Laptop regens
-  have red-on-gate history (train11). Use `scripts/studio-regen.sh` — it rsyncs a tip-pinned
-  worktree to `mac-studio-256-1` with the same config/venv/PATH/ulimit stanzas as
-  `~/Repos/studio-ci.sh`, runs the family regenerator there, and pulls **only** the
-  regenerated outputs back into the local worktree (no commit/push). Examples:
-
-  ```bash
-  scripts/studio-regen.sh --dry-run HEAD coating
-  scripts/studio-regen.sh HEAD coating          # pilot / SHA pin
-  scripts/studio-regen.sh HEAD runner sio_yield # fixture families
-  ```
-
-  Refuses if the local target paths are dirty. Entry points: coating →
-  `scripts/regenerate_coating_diagnostic_golden.py`; runner →
-  `scripts/regenerate_runner_goldens.py`; sio_yield →
-  `python -m simulator.runner.sio_yield` (form in commit `4fce2f0`).
+- **Engine-sensitive golden fixtures** (runner smoke, sio_yield, coating diagnostic SHA,
+  staged-bakeout / capacity pins) depend on the local engine configuration
+  (`engines/engines.local.toml` and the engine binaries). Regenerate them on the reference
+  engine build. Entry points: coating → `scripts/regenerate_coating_diagnostic_golden.py`;
+  runner → `scripts/regenerate_runner_goldens.py`; sio_yield →
+  `python -m simulator.runner.sio_yield`.

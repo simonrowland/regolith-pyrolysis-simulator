@@ -39394,6 +39394,33 @@ entries:
       published_page: 696
       pdf_page_index: 7
       table: '6'
+- work_id: 10.1007/s00410-013-0896-z
+  source: data/literature/extracts/wood-wade-2013-trace-activities.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: wood-wade-2013-trace-activities::wood_wade_2013_cuo05_activity_coefficient
+    locator:
+      page: 8
+      published_page: 918
+      pdf_page_index: 7
+      note: 'Proof string: ‘3.5 in the silicate melt at 1,923 K’. Derivation sentence: ‘Applying this activity coefficient
+        for Cu in the metal leads to γ_CuO0.5 of 3.5 in the silicate melt at 1,923 K.’'
+  - observation_id: wood-wade-2013-trace-activities::wood_wade_2013_ino15_activity_coefficient
+    locator:
+      page: 9
+      published_page: 919
+      pdf_page_index: 8
+      note: 'Proof string: ‘0.02 in the SiO2-rich liquid at 1,923 K’. Derivation sentence: ‘Applying this to the In partitioning
+        data leads to an activity coefficient of InO1.5 of 0.02 in the SiO2-rich liquid at 1,923 K.’'
+  - observation_id: wood-wade-2013-trace-activities::wood_wade_2013_pbo_activity_coefficient
+    locator:
+      page: 8
+      published_page: 918
+      pdf_page_index: 7
+      note: 'Proof string: ‘0.22 at 1,923 K’. Derivation sentence: ‘Applying these results and using LogK_Pb above leads to
+        an activity coefficient γ_PbO in silicate melt of 0.22 at 1,923 K.’'
 - work_id: 10.1007/s00410-013-0943-9
   source: data/literature/extracts/borisov-behrens-holtz-2013-ti-p-fe-redox.yaml
   why: source does not state method
@@ -221856,7 +221883,7 @@ entries:
       table: '8'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
-  why: declared quantity is unknown; unsupported quantity 'delta_rH'; refusing to pick a number
+  why: declared quantity is unknown; unsupported quantity 'reaction_enthalpy_of_named_reaction'; refusing to pick a number
   axes:
   - value
   observations:
@@ -221867,7 +221894,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrHT = 479 ± 12 kJ/mol. Missing
-        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.'
+        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_enthalpy
     locator:
       page: 14
@@ -221876,10 +221903,10 @@ entries:
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). Table header: "Enthalpies and entropies
         of reactions". ΔrHT = 771 ± 13 kJ/mol. Missing quantity: reaction enthalpy of a stated reaction, not delta_fH and
-        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.'
+        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.; row=2'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
-  why: declared quantity is unknown; unsupported quantity 'delta_rS'; refusing to pick a number
+  why: declared quantity is unknown; unsupported quantity 'reaction_entropy_of_named_reaction'; refusing to pick a number
   axes:
   - value
   observations:
@@ -221890,7 +221917,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrST = 47 ± 6 J/(mol K). Missing
-        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_entropy
     locator:
       page: 14
@@ -221898,7 +221925,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). ΔrST = 242 ± 5 J/(mol K). Missing
-        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.; row=2'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: no mapped numeric p_partial selected; temperature_range_K [1751, 1817] is a temperature domain, not the observable
@@ -221912,7 +221939,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=5
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_casio3_low
     locator:
       page: 13
@@ -221920,7 +221947,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=14
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o2_low
     locator:
       page: 13
@@ -221928,7 +221955,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=3
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o_low
     locator:
       page: 13
@@ -221936,7 +221963,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=1
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_si2o2_low
     locator:
       page: 13
@@ -221944,7 +221971,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=12
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio2_low
     locator:
       page: 13
@@ -221952,7 +221979,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=10
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio_low
     locator:
       page: 13
@@ -221960,7 +221987,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=8
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: no mapped numeric p_partial selected; temperature_range_K [1817, 2087] is a temperature domain, not the observable
@@ -221974,7 +222001,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=6
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_casio3_high
     locator:
       page: 13
@@ -221982,7 +222009,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=15
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o2_high
     locator:
       page: 13
@@ -221990,7 +222017,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=4
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o_high
     locator:
       page: 13
@@ -221998,7 +222025,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=2
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_si2o2_high
     locator:
       page: 13
@@ -222006,7 +222033,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=13
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio2_high
     locator:
       page: 13
@@ -222014,7 +222041,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=11
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio_high
     locator:
       page: 13
@@ -222022,7 +222049,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=9
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: no mapped numeric p_partial selected; temperature_range_K [1910, 2087] is a temperature domain, not the observable
@@ -222036,7 +222063,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=7
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: regime 'Calculation based on the phase diagram' is not a closed method token (kems_effusion alone is insufficient)
@@ -222240,7 +222267,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=5
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_casio3_low
     locator:
       page: 13
@@ -222248,7 +222275,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=14
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o2_low
     locator:
       page: 13
@@ -222256,7 +222283,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=3
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o_low
     locator:
       page: 13
@@ -222264,7 +222291,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=1
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_si2o2_low
     locator:
       page: 13
@@ -222272,7 +222299,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=12
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio2_low
     locator:
       page: 13
@@ -222280,7 +222307,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=10
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio_low
     locator:
       page: 13
@@ -222288,7 +222315,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=8
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: source T_range_K [1751, 2087]; no midpoint invented
@@ -222362,7 +222389,7 @@ entries:
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). Table header: "Enthalpies and entropies
         of reactions". ΔrHT = 771 ± 13 kJ/mol. Missing quantity: reaction enthalpy of a stated reaction, not delta_fH and
-        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.'
+        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.; row=2'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_entropy
     locator:
       page: 14
@@ -222370,7 +222397,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). ΔrST = 242 ± 5 J/(mol K). Missing
-        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.; row=2'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: source T_range_K [1817, 2087]; no midpoint invented
@@ -222384,7 +222411,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=6
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_casio3_high
     locator:
       page: 13
@@ -222392,7 +222419,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=15
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o2_high
     locator:
       page: 13
@@ -222400,7 +222427,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=4
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_o_high
     locator:
       page: 13
@@ -222408,7 +222435,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=2
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_si2o2_high
     locator:
       page: 13
@@ -222416,7 +222443,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=13
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio2_high
     locator:
       page: 13
@@ -222424,7 +222451,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=11
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table5_sio_high
     locator:
       page: 13
@@ -222432,7 +222459,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=9
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: source T_range_K [1910, 2087]; no midpoint invented
@@ -222454,7 +222481,7 @@ entries:
       pdf_page_index: 12
       table: '5'
       note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext dropped the
-        slash. The coefficients below are the printed values.
+        slash. The coefficients below are the printed values.; row=7
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: source T_range_K [1910, 2187]; no midpoint invented
@@ -222468,7 +222495,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrHT = 479 ± 12 kJ/mol. Missing
-        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.'
+        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_dissociation_entropy
     locator:
       page: 14
@@ -222476,7 +222503,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrST = 47 ± 6 J/(mol K). Missing
-        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.; row=5'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
   why: source does not state a numeric total_pressure_Pa
@@ -222573,7 +222600,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrHT = 479 ± 12 kJ/mol. Missing
-        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.'
+        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_dissociation_entropy
     locator:
       page: 14
@@ -222581,7 +222608,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrST = 47 ± 6 J/(mol K). Missing
-        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_enthalpy
     locator:
       page: 14
@@ -222590,7 +222617,7 @@ entries:
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). Table header: "Enthalpies and entropies
         of reactions". ΔrHT = 771 ± 13 kJ/mol. Missing quantity: reaction enthalpy of a stated reaction, not delta_fH and
-        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.'
+        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.; row=2'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_entropy
     locator:
       page: 14
@@ -222598,10 +222625,10 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). ΔrST = 242 ± 5 J/(mol K). Missing
-        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.; row=2'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
-  why: unsupported quantity 'delta_rH'
+  why: unsupported quantity 'reaction_enthalpy_of_named_reaction'
   axes:
   - quantity
   observations:
@@ -222612,7 +222639,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrHT = 479 ± 12 kJ/mol. Missing
-        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.'
+        quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_enthalpy
     locator:
       page: 14
@@ -222621,10 +222648,10 @@ entries:
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). Table header: "Enthalpies and entropies
         of reactions". ΔrHT = 771 ± 13 kJ/mol. Missing quantity: reaction enthalpy of a stated reaction, not delta_fH and
-        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.'
+        not a labeled 2nd-law or 3rd-law enthalpy of vaporization.; row=2'
 - work_id: 10.1134/s0016702926700035
   source: data/literature/extracts/shornikov-2026-wollastonite-kems.yaml
-  why: unsupported quantity 'delta_rS'
+  why: unsupported quantity 'reaction_entropy_of_named_reaction'
   axes:
   - quantity
   observations:
@@ -222635,7 +222662,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrST = 47 ± 6 J/(mol K). Missing
-        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated gas-phase dissociation, not S and not entropy_of_fusion.; row=5'
   - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table6_sublimation_entropy
     locator:
       page: 14
@@ -222643,7 +222670,7 @@ entries:
       pdf_page_index: 13
       table: '6'
       note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). ΔrST = 242 ± 5 J/(mol K). Missing
-        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.'
+        quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.; row=2'
 - work_id: 10.1134/s0020168517050077
   source: data/literature/extracts/gribchenkova-2017-al2o3-mgo.yaml
   why: regime 'Knudsen effusion mass spectrometry; Mg ion current converted to absolute partial pressure using the instrument
@@ -253102,129 +253129,129 @@ entries:
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r02_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r03_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r04_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r05_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r06_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r07_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r08_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r09_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, A-0, Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: A-0, Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t09_r02_c04
     locator:
       page: 20
-      published_page: '304'
       pdf_page_index: 19
       table: '9'
+      line_range: '304'
       note: Table 9, B-1, SrO cell; every numeric cell was checked against the 600 dpi page render.
       record: B-1, SrO
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t09_r03_c04
     locator:
       page: 20
-      published_page: '304'
       pdf_page_index: 19
       table: '9'
+      line_range: '304'
       note: Table 9, B-2, SrO cell; every numeric cell was checked against the 600 dpi page render.
       record: B-2, SrO
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t09_r04_c04
     locator:
       page: 20
-      published_page: '304'
       pdf_page_index: 19
       table: '9'
+      line_range: '304'
       note: Table 9, B-3, SrO cell; every numeric cell was checked against the 600 dpi page render.
       record: B-3, SrO
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t09_r05_c04
     locator:
       page: 20
-      published_page: '304'
       pdf_page_index: 19
       table: '9'
+      line_range: '304'
       note: Table 9, B-4, SrO cell; every numeric cell was checked against the 600 dpi page render.
       record: B-4, SrO
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t09_r06_c04
     locator:
       page: 20
-      published_page: '304'
       pdf_page_index: 19
       table: '9'
+      line_range: '304'
       note: Table 9, B-5, SrO cell; every numeric cell was checked against the 600 dpi page render.
       record: B-5, SrO
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t09_r07_c04
     locator:
       page: 20
-      published_page: '304'
       pdf_page_index: 19
       table: '9'
+      line_range: '304'
       note: Table 9, B-6, SrO cell; every numeric cell was checked against the 600 dpi page render.
       record: B-6, SrO
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t09_r08_c04
     locator:
       page: 20
-      published_page: '304'
       pdf_page_index: 19
       table: '9'
+      line_range: '304'
       note: Table 9, B-7, SrO cell; every numeric cell was checked against the 600 dpi page render.
       record: B-7, SrO
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t09_r09_c04
     locator:
       page: 20
-      published_page: '304'
       pdf_page_index: 19
       table: '9'
+      line_range: '304'
       note: Table 9, B-8, SrO cell; every numeric cell was checked against the 600 dpi page render.
       record: B-8, SrO
 - work_id: 10.2139/ssrn.7065037
@@ -253236,169 +253263,169 @@ entries:
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r02_c04
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r02_c05
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r02_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r03_c04
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r03_c05
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r03_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r04_c04
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r04_c05
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r04_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r05_c04
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r05_c05
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r05_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r06_c04
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r06_c05
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r06_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r07_c04
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r07_c05
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r07_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r08_c04
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r08_c05
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
   - observation_id: terashima-2026-sro-slag-activity-preprint::terashima_2026_sro_t04_r08_c06
     locator:
       page: 13
-      published_page: '225'
       pdf_page_index: 12
       table: '4'
+      line_range: '225'
       note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
       record: Ueda et al.[14], Sr
 - work_id: 10.2172/7145613
@@ -295007,151 +295034,151 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table2_partial_molar_1873k::rows:h=0758aeef330e
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '2'
       note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table2_partial_molar_1873k::rows:h=0d54cf403420
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '2'
       note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table2_partial_molar_1873k::rows:h=751da78be197
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '2'
       note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table2_partial_molar_1873k::rows:h=8b2bea61f2ab
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '2'
       note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table2_partial_molar_1873k::rows:h=b0a65c110221
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '2'
       note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table2_partial_molar_1873k::rows:h=ba1776284d61
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '2'
       note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table2_partial_molar_1873k::rows:h=c9ce25b294c1
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '2'
       note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table3_partial_molar_1773k::rows:h=0515cf2e0072
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '3'
       note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table3_partial_molar_1773k::rows:h=0846ec7237b7
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '3'
       note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table3_partial_molar_1773k::rows:h=2b3204194e6d
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '3'
       note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table3_partial_molar_1773k::rows:h=985d59b07e68
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '3'
       note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table3_partial_molar_1773k::rows:h=c423bfe9d24c
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '3'
       note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table3_partial_molar_1773k::rows:h=d60ce8306d04
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '3'
       note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table3_partial_molar_1773k::rows:h=db49cd151f2a
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '3'
       note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=003cfbe1f34b
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=10cb2d2df105
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=125453766aa9
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=3e57c23d7625
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=7c151ce96dd7
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=8cea2072bd16
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=aaa9d38f8861
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=b3a335a4e0a6
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=d8676abf0944
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=dd58d9ba8255
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=edfe4a899fff
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295164,7 +295191,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table1_activity_equations
     locator:
       published_page: 552
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '1'
       note: Table 1 experimental values for activities or activity coefficients
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295176,7 +295203,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_kems_geometry_and_calibration
     locator:
       published_page: 550
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: '2.3'
       note: Hitachi RM6K; alumina Knudsen cell (details in ref 9); W/W-26Re thermocouple
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295189,7 +295216,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_gamma0_W_1873k
     locator:
       published_page: 549
-      pdf_page_index: 1
+      pdf_page_index: 0
       note: Synopsis gamma0_W(s)=7.6(+/-1.1), epsilon_W^W=-2.2(+/-0.8) at 1873 K
 - work_id: 10.2355/tetsutohagane1955.70.6_549
   source: data/literature/extracts/kems-120-ueshima-1984.yaml
@@ -295200,73 +295227,73 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table1_activity_equations
     locator:
       published_page: 552
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '1'
       note: Table 1 experimental values for activities or activity coefficients
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=003cfbe1f34b
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=10cb2d2df105
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=125453766aa9
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=3e57c23d7625
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=7c151ce96dd7
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=8cea2072bd16
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=aaa9d38f8861
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=b3a335a4e0a6
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=d8676abf0944
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=dd58d9ba8255
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=edfe4a899fff
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295278,73 +295305,73 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table1_activity_equations
     locator:
       published_page: 552
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '1'
       note: Table 1 experimental values for activities or activity coefficients
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=003cfbe1f34b
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=10cb2d2df105
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=125453766aa9
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=3e57c23d7625
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=7c151ce96dd7
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=8cea2072bd16
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=aaa9d38f8861
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=b3a335a4e0a6
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=d8676abf0944
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=dd58d9ba8255
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=edfe4a899fff
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295356,7 +295383,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table1_activity_equations
     locator:
       published_page: 552
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '1'
       note: Table 1 experimental values for activities or activity coefficients
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295368,7 +295395,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table3_partial_molar_1773k::rows:h=0515cf2e0072
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '3'
       note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295393,7 +295420,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_gamma0_W_1873k
     locator:
       published_page: 549
-      pdf_page_index: 1
+      pdf_page_index: 0
       note: Synopsis gamma0_W(s)=7.6(+/-1.1), epsilon_W^W=-2.2(+/-0.8) at 1873 K
 - work_id: 10.2355/tetsutohagane1955.70.6_549
   source: data/literature/extracts/kems-120-ueshima-1984.yaml
@@ -295404,13 +295431,13 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_fig3_activities_1873k_figure_only
     locator:
       published_page: 551
-      pdf_page_index: 3
+      pdf_page_index: 2
       figure: '3'
       note: Activities of Fe-W alloys at 1873 K; 0.5 and 0.7 mm orifice points
   - observation_id: kems-120-ueshima-1984::ueshima_1984_kems_geometry_and_calibration
     locator:
       published_page: 550
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: '2.3'
       note: Hitachi RM6K; alumina Knudsen cell (details in ref 9); W/W-26Re thermocouple
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295422,7 +295449,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table2_partial_molar_1873k::rows:h=0758aeef330e
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '2'
       note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295434,7 +295461,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=003cfbe1f34b
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295446,7 +295473,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table1_activity_equations
     locator:
       published_page: 552
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '1'
       note: Table 1 experimental values for activities or activity coefficients
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295471,7 +295498,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_kems_geometry_and_calibration
     locator:
       published_page: 550
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: '2.3'
       note: Hitachi RM6K; alumina Knudsen cell (details in ref 9); W/W-26Re thermocouple
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295483,7 +295510,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table1_activity_equations
     locator:
       published_page: 552
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '1'
       note: Table 1 experimental values for activities or activity coefficients
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295495,7 +295522,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_fig3_activities_1873k_figure_only
     locator:
       published_page: 551
-      pdf_page_index: 3
+      pdf_page_index: 2
       figure: '3'
       note: Activities of Fe-W alloys at 1873 K; 0.5 and 0.7 mm orifice points
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295520,7 +295547,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table1_activity_equations
     locator:
       published_page: 552
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '1'
       note: Table 1 experimental values for activities or activity coefficients
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295532,7 +295559,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_kems_geometry_and_calibration
     locator:
       published_page: 550
-      pdf_page_index: 2
+      pdf_page_index: 1
       section: '2.3'
       note: Hitachi RM6K; alumina Knudsen cell (details in ref 9); W/W-26Re thermocouple
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295544,19 +295571,19 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table2_partial_molar_1873k::rows:h=0758aeef330e
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '2'
       note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table3_partial_molar_1773k::rows:h=0515cf2e0072
     locator:
       published_page: 553
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '3'
       note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
   - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised::rows:h=003cfbe1f34b
     locator:
       published_page: 554
-      pdf_page_index: 6
+      pdf_page_index: 5
       table: '4'
       note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
 - work_id: 10.2355/tetsutohagane1955.70.6_549
@@ -295568,7 +295595,7 @@ entries:
   - observation_id: kems-120-ueshima-1984::ueshima_1984_gamma0_W_1873k
     locator:
       published_page: 549
-      pdf_page_index: 1
+      pdf_page_index: 0
       note: Synopsis gamma0_W(s)=7.6(+/-1.1), epsilon_W^W=-2.2(+/-0.8) at 1873 K
 - work_id: 10.2355/tetsutohagane1955.71.15_1765
   source: data/literature/extracts/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml
@@ -295905,52 +295932,52 @@ entries:
   axes:
   - value
   observations:
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=07d9bab79214
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=02d173285c6c
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '4'
       note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=19e1b061ed47
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=47b92f76255f
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '4'
       note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=6ace7ddbfb69
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=a98f3de3f035
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '4'
       note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=98d95bbbdb06
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=be62d0f5ba14
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '4'
       note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=9f7ba5043d28
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=ce4068c9d465
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '4'
       note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=bf7b4a9a9ac1
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=d870ebc165bc
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '4'
       note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=ed6d75ffebc7
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=f7a1cfc7a0d0
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '4'
       note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=f27bfb6c8bf9
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=fffca02c858c
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '4'
       note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -295962,13 +295989,13 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_literature
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '2'
       note: Table 2 appearance potentials of the ionic species
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_this_work
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '2'
       note: Table 2 appearance potentials of the ionic species
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -295980,7 +296007,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table1_ionic_species
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '1'
       note: Table 1 ionic species for PbO-P2O5 and FetO-P2O5
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -295992,7 +296019,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pd_internal_standard_pbo_system
     locator:
       published_page: 1912
-      pdf_page_index: 2
+      pdf_page_index: 1
       figure: '1'
       section: '2.1'
       note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
@@ -296005,7 +296032,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_kems_geometry_and_calibration
     locator:
       published_page: 1912
-      pdf_page_index: 2
+      pdf_page_index: 1
       figure: '1'
       section: '2.1'
       note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
@@ -296018,7 +296045,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fe_sublimation_enthalpy_1370c
     locator:
       published_page: 1916
-      pdf_page_index: 6
+      pdf_page_index: 5
       figure: '8'
       equation: '9'
       note: Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C
@@ -296031,7 +296058,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fe_sublimation_enthalpy_1370c
     locator:
       published_page: 1916
-      pdf_page_index: 6
+      pdf_page_index: 5
       figure: '8'
       equation: '9'
       note: Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C
@@ -296044,7 +296071,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fe_sublimation_enthalpy_1370c
     locator:
       published_page: 1916
-      pdf_page_index: 6
+      pdf_page_index: 5
       figure: '8'
       equation: '9'
       note: Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C
@@ -296057,7 +296084,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_feto_raoultian_gibbs_duhem_fig7_figure_only
     locator:
       published_page: 1916
-      pdf_page_index: 6
+      pdf_page_index: 5
       figure: '7'
       equation: '8'
       note: 'Raoultian a_FetO from Gibbs-Duhem on Fe0.95O-P2O5; figure-only placeholder; no digitization. bound_not_point_ordering:
@@ -296065,49 +296092,49 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       figure: '2'
       note: 'Ion current ratios vs X_PbO for PbO-P2O5 at 1300 C; dashed Gibbs-Duhem; figure-only placeholder; no digitization.
         bound_not_point_ordering: ordering or bound only, never a point value.'
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig3_time_dependence_figure_only
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       figure: '3'
       note: 'Time dependence of ion current ratios at X_P2O5=0.0499; figure-only placeholder; no digitization. bound_not_point_ordering:
         ordering or bound only, never a point value.'
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig4_time_dependence_figure_only
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       figure: '4'
       note: 'Temperature-cycle reproducibility at X_P2O5=0.0427; figure-only placeholder; no digitization. bound_not_point_ordering:
         ordering or bound only, never a point value.'
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig5_temperature_dependence_figure_only
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       figure: '5'
       note: 'Activity ion-current ratio vs T for samples 1-8; figure-only placeholder; no digitization. bound_not_point_ordering:
         ordering or bound only, never a point value.'
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig6_henrian_a_p2o5_figure_only
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       figure: '6'
       note: 'Henrian activity of P2O5 for FetO-P2O5 from Table 5 and eq. (3''); figure-only placeholder; no digitization.
         bound_not_point_ordering: ordering or bound only, never a point value.'
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig7_raoultian_activities_figure_only
     locator:
       published_page: 1916
-      pdf_page_index: 6
+      pdf_page_index: 5
       figure: '7'
       note: 'Raoultian a_P2O5 and a_FetO vs X_P2O5; figure-only placeholder; no digitization. bound_not_point_ordering: ordering
         or bound only, never a point value.'
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig8_ion_current_vs_1T_figure_only
     locator:
       published_page: 1916
-      pdf_page_index: 6
+      pdf_page_index: 5
       figure: '8'
       note: 'ln I_Fe+ T vs 1/T x 10^4 for FetO-P2O5 samples; figure-only placeholder; no digitization. bound_not_point_ordering:
         ordering or bound only, never a point value.'
@@ -296118,22 +296145,22 @@ entries:
   axes:
   - value
   observations:
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c::T=1573.15:h=482e2c02ed60
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c::T=1573.15:h=3a19962dde07
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '3'
       note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c::T=1573.15:h=c2cd864b38d4
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c::T=1573.15:h=4eecaa554fe8
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '3'
       note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c::T=1573.15:h=d3c7b2b65c7c
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c::T=1573.15:h=c48549543dc9
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '3'
       note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296143,22 +296170,22 @@ entries:
   axes:
   - value
   observations:
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=0537dd72731f
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=3a0639d50db0
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '3'
       note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=7b2b66dd3504
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=90ea453f2e72
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '3'
       note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=7be86db87718
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=dd92bb9c709c
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '3'
       note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296169,148 +296196,148 @@ entries:
   axes:
   - value
   observations:
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=314a7f3c52d6
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=3830633e3ea7
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=316b77cc7a33
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=3e93f4f9aab7
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=40491d673940
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=6cc2925c5ab0
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=421cd230d51a
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=7d1c06e4765f
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=6ba2bcd211f0
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=8cc7a9ed8531
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=a0220ba42733
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=9986f2edb260
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=c74e40dcba76
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=b112afbb4653
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=de94ed7ed5f5
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=dd27a821fcd4
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=f6fc73831909
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=e8a700e6d2a8
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=fb9ca583fbc3
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=f314312b32bc
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=397d28689385
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=10aa42c9d891
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=65807d300a0f
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=4cf79bf11862
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=6affeae2a58c
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=68b920cf39ca
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=8225f1f84b80
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=77a687223b53
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=8a9e5af58555
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=d8566223d581
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=955f40827ec9
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=e3c2bd22f27c
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=b63cbc48e339
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=f59ac36d026a
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=1c927c06479b
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=033f437893d6
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=278817ce1289
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=445d0a99acdd
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=6bb0d9d89ee9
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=643fd8259d35
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=70e748a47902
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=8a2430e93168
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=a62fee798806
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=b928c85a08f7
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=ef4817b63498
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=f8262fffb3ed
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=f85158d8d710
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=fc312c7843a3
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       table: '5'
       note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296322,7 +296349,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fe_sublimation_enthalpy_1370c
     locator:
       published_page: 1916
-      pdf_page_index: 6
+      pdf_page_index: 5
       figure: '8'
       equation: '9'
       note: Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C
@@ -296335,12 +296362,12 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson::T=1643.15:h=c330ca7b9a5b
     locator:
       published_page: 1917
-      pdf_page_index: 7
+      pdf_page_index: 6
       note: Converted using Turkdogan and Pearson P2O5(s)=P2O5(l) Delta-G
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_solid_std_henry::T=1643.15:h=3cac5d14acef
     locator:
       published_page: 1911
-      pdf_page_index: 1
+      pdf_page_index: 0
       note: Synopsis and p. 1917/1918 conclusion; Henry region 0 < X_P2O5 < 0.08; standard state P2O5(s)
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
   source: data/literature/extracts/kems-057-kambayashi-1985.yaml
@@ -296351,7 +296378,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_kems_geometry_and_calibration
     locator:
       published_page: 1912
-      pdf_page_index: 2
+      pdf_page_index: 1
       figure: '1'
       section: '2.1'
       note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
@@ -296364,7 +296391,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pd_internal_standard_pbo_system
     locator:
       published_page: 1912
-      pdf_page_index: 2
+      pdf_page_index: 1
       figure: '1'
       section: '2.1'
       note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
@@ -296377,7 +296404,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_literature
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '2'
       note: Table 2 appearance potentials of the ionic species
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296389,13 +296416,13 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table1_ionic_species
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '1'
       note: Table 1 ionic species for PbO-P2O5 and FetO-P2O5
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_this_work
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '2'
       note: Table 2 appearance potentials of the ionic species
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296407,28 +296434,28 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       figure: '2'
       note: 'Ion current ratios vs X_PbO for PbO-P2O5 at 1300 C; dashed Gibbs-Duhem; figure-only placeholder; no digitization.
         bound_not_point_ordering: ordering or bound only, never a point value.'
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig3_time_dependence_figure_only
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       figure: '3'
       note: 'Time dependence of ion current ratios at X_P2O5=0.0499; figure-only placeholder; no digitization. bound_not_point_ordering:
         ordering or bound only, never a point value.'
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig4_time_dependence_figure_only
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       figure: '4'
       note: 'Temperature-cycle reproducibility at X_P2O5=0.0427; figure-only placeholder; no digitization. bound_not_point_ordering:
         ordering or bound only, never a point value.'
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig5_temperature_dependence_figure_only
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       figure: '5'
       note: 'Activity ion-current ratio vs T for samples 1-8; figure-only placeholder; no digitization. bound_not_point_ordering:
         ordering or bound only, never a point value.'
@@ -296438,10 +296465,10 @@ entries:
   axes:
   - method
   observations:
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated::T=1643.0:h=6de20728937e
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated::T=1643.0:h=fc593b6e815c
     locator:
       published_page: 1917
-      pdf_page_index: 7
+      pdf_page_index: 6
       section: 4.3.3
       note: P_P4O10_sat from JANAF P4O10(s) extrapolated past 1500 K
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296453,7 +296480,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_literature
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '2'
       note: Table 2 appearance potentials of the ionic species
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296465,26 +296492,26 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_kems_geometry_and_calibration
     locator:
       published_page: 1912
-      pdf_page_index: 2
+      pdf_page_index: 1
       figure: '1'
       section: '2.1'
       note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table1_ionic_species
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '1'
       note: Table 1 ionic species for PbO-P2O5 and FetO-P2O5
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_literature
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '2'
       note: Table 2 appearance potentials of the ionic species
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_this_work
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '2'
       note: Table 2 appearance potentials of the ionic species
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296496,14 +296523,14 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig5_temperature_dependence_figure_only
     locator:
       published_page: 1915
-      pdf_page_index: 5
+      pdf_page_index: 4
       figure: '5'
       note: 'Activity ion-current ratio vs T for samples 1-8; figure-only placeholder; no digitization. bound_not_point_ordering:
         ordering or bound only, never a point value.'
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated::T=1643.0:h=6de20728937e
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated::T=1643.0:h=fc593b6e815c
     locator:
       published_page: 1917
-      pdf_page_index: 7
+      pdf_page_index: 6
       section: 4.3.3
       note: P_P4O10_sat from JANAF P4O10(s) extrapolated past 1500 K
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296515,7 +296542,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson::T=1643.15:h=c330ca7b9a5b
     locator:
       published_page: 1917
-      pdf_page_index: 7
+      pdf_page_index: 6
       note: Converted using Turkdogan and Pearson P2O5(s)=P2O5(l) Delta-G
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
   source: data/literature/extracts/kems-057-kambayashi-1985.yaml
@@ -296526,13 +296553,13 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_literature
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '2'
       note: Table 2 appearance potentials of the ionic species
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_this_work
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '2'
       note: Table 2 appearance potentials of the ionic species
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296544,7 +296571,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table1_ionic_species
     locator:
       published_page: 1913
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '1'
       note: Table 1 ionic species for PbO-P2O5 and FetO-P2O5
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296556,7 +296583,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pd_internal_standard_pbo_system
     locator:
       published_page: 1912
-      pdf_page_index: 2
+      pdf_page_index: 1
       figure: '1'
       section: '2.1'
       note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
@@ -296569,7 +296596,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_kems_geometry_and_calibration
     locator:
       published_page: 1912
-      pdf_page_index: 2
+      pdf_page_index: 1
       figure: '1'
       section: '2.1'
       note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
@@ -296579,10 +296606,10 @@ entries:
   axes:
   - quantity
   observations:
-  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=07d9bab79214
+  - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=02d173285c6c
     locator:
       published_page: 1914
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: '4'
       note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
@@ -296594,7 +296621,7 @@ entries:
   - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fe_sublimation_enthalpy_1370c
     locator:
       published_page: 1916
-      pdf_page_index: 6
+      pdf_page_index: 5
       figure: '8'
       equation: '9'
       note: Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C
@@ -296652,12 +296679,12 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_na2o_prose_1200C_range
     locator:
-      page: 2
+      page: 1
       published_page: 815
-      pdf_page_index: 1
-      paragraph: English Synopsis + Japanese 結言 (2)
-      note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55).
-        5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+      pdf_page_index: 0
+      paragraph: English Synopsis
+      note: English synopsis states the 1200 °C span; the 60 mol% endpoint is not in Table 2 (which stops at X=0.55). 5e-5
+        at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
 - work_id: 10.2355/tetsutohagane1955.71.7_815
   source: data/literature/extracts/ts1985.yaml
   why: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient_Na_in_Pb'; refusing to pick
@@ -296667,9 +296694,9 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_gamma_Na_in_Pb_table1
     locator:
-      page: 4
+      page: 3
       published_page: 817
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '1'
       note: Auxiliary γ°_Na in Pb-Na, required to convert alloy Na analyses into a_Na2O via eq. (4). NOT melt γ_Na2O. Column
         header 「γ°_Na in Pb」 / 「鉛-ナトリウム合金中のナトリウムの無限希釈での活量係数」.
@@ -296694,12 +296721,12 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_na2o_prose_1200C_range
     locator:
-      page: 2
+      page: 1
       published_page: 815
-      pdf_page_index: 1
-      paragraph: English Synopsis + Japanese 結言 (2)
-      note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55).
-        5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+      pdf_page_index: 0
+      paragraph: English Synopsis
+      note: English synopsis states the 1200 °C span; the 60 mol% endpoint is not in Table 2 (which stops at X=0.55). 5e-5
+        at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
   - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=09c92b1c7b22
     locator:
       page: 7
@@ -296725,9 +296752,9 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_gamma_Na_in_Pb_table1
     locator:
-      page: 4
+      page: 3
       published_page: 817
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '1'
       note: Auxiliary γ°_Na in Pb-Na, required to convert alloy Na analyses into a_Na2O via eq. (4). NOT melt γ_Na2O. Column
         header 「γ°_Na in Pb」 / 「鉛-ナトリウム合金中のナトリウムの無限希釈での活量係数」.
@@ -296755,12 +296782,12 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_na2o_prose_1200C_range
     locator:
-      page: 2
+      page: 1
       published_page: 815
-      pdf_page_index: 1
-      paragraph: English Synopsis + Japanese 結言 (2)
-      note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55).
-        5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+      pdf_page_index: 0
+      paragraph: English Synopsis
+      note: English synopsis states the 1200 °C span; the 60 mol% endpoint is not in Table 2 (which stops at X=0.55). 5e-5
+        at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
 - work_id: 10.2355/tetsutohagane1955.71.7_815
   source: data/literature/extracts/ts1985.yaml
   why: regime 'chemical_equilibration_Na2O-silicate_FeCsat_PbNa' is not a closed method token (kems_effusion alone is insufficient)
@@ -296769,9 +296796,9 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_gamma_Na_in_Pb_table1
     locator:
-      page: 4
+      page: 3
       published_page: 817
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '1'
       note: Auxiliary γ°_Na in Pb-Na, required to convert alloy Na analyses into a_Na2O via eq. (4). NOT melt γ_Na2O. Column
         header 「γ°_Na in Pb」 / 「鉛-ナトリウム合金中のナトリウムの無限希釈での活量係数」.
@@ -296783,12 +296810,12 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_na2o_prose_1200C_range
     locator:
-      page: 2
+      page: 1
       published_page: 815
-      pdf_page_index: 1
-      paragraph: English Synopsis + Japanese 結言 (2)
-      note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55).
-        5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+      pdf_page_index: 0
+      paragraph: English Synopsis
+      note: English synopsis states the 1200 °C span; the 60 mol% endpoint is not in Table 2 (which stops at X=0.55). 5e-5
+        at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
   - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1100C
     locator:
       page: 7
@@ -296915,9 +296942,9 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_gamma_Na_in_Pb_table1
     locator:
-      page: 4
+      page: 3
       published_page: 817
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '1'
       note: Auxiliary γ°_Na in Pb-Na, required to convert alloy Na analyses into a_Na2O via eq. (4). NOT melt γ_Na2O. Column
         header 「γ°_Na in Pb」 / 「鉛-ナトリウム合金中のナトリウムの無限希釈での活量係数」.
@@ -296952,9 +296979,9 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_gamma_Na_in_Pb_table1
     locator:
-      page: 4
+      page: 3
       published_page: 817
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '1'
       note: Auxiliary γ°_Na in Pb-Na, required to convert alloy Na analyses into a_Na2O via eq. (4). NOT melt γ_Na2O. Column
         header 「γ°_Na in Pb」 / 「鉛-ナトリウム合金中のナトリウムの無限希釈での活量係数」.
@@ -296966,12 +296993,12 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_na2o_prose_1200C_range
     locator:
-      page: 2
+      page: 1
       published_page: 815
-      pdf_page_index: 1
-      paragraph: English Synopsis + Japanese 結言 (2)
-      note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55).
-        5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+      pdf_page_index: 0
+      paragraph: English Synopsis
+      note: English synopsis states the 1200 °C span; the 60 mol% endpoint is not in Table 2 (which stops at X=0.55). 5e-5
+        at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
 - work_id: 10.2355/tetsutohagane1955.71.7_815
   source: data/literature/extracts/ts1985.yaml
   why: unsupported quantity 'activity_and_raoultian_gamma'
@@ -296996,12 +297023,12 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_na2o_prose_1200C_range
     locator:
-      page: 2
+      page: 1
       published_page: 815
-      pdf_page_index: 1
-      paragraph: English Synopsis + Japanese 結言 (2)
-      note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55).
-        5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+      pdf_page_index: 0
+      paragraph: English Synopsis
+      note: English synopsis states the 1200 °C span; the 60 mol% endpoint is not in Table 2 (which stops at X=0.55). 5e-5
+        at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
 - work_id: 10.2355/tetsutohagane1955.71.7_815
   source: data/literature/extracts/ts1985.yaml
   why: unsupported quantity 'infinite_dilution_activity_coefficient_Na_in_Pb'
@@ -297010,9 +297037,9 @@ entries:
   observations:
   - observation_id: ts1985::ts1985_gamma_Na_in_Pb_table1
     locator:
-      page: 4
+      page: 3
       published_page: 817
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: '1'
       note: Auxiliary γ°_Na in Pb-Na, required to convert alloy Na analyses into a_Na2O via eq. (4). NOT melt γ_Na2O. Column
         header 「γ°_Na in Pb」 / 「鉛-ナトリウム合金中のナトリウムの無限希釈での活量係数」.

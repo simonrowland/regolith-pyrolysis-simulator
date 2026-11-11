@@ -3435,14 +3435,16 @@ def test_vaporock_gas_census_preserves_same_input_relation(monkeypatch) -> None:
         source_id="nist-janaf-4th",
     )
     residuals = []
-    compile_residual = score_module.compile_residual
+    compile_with_lineage = score_module._compile_residual_with_lineage
 
     def capture_residual(*args, **kwargs):
-        result = compile_residual(*args, **kwargs)
+        result = compile_with_lineage(*args, **kwargs)
         residuals.append(result[0])
         return result
 
-    monkeypatch.setattr(score_module, "compile_residual", capture_residual)
+    monkeypatch.setattr(
+        score_module, "_compile_residual_with_lineage", capture_residual
+    )
     census = compilation_tier_census(
         _context(reference),
         engines=(Engine.VAPOROCK,),
@@ -3455,10 +3457,140 @@ def test_vaporock_gas_census_preserves_same_input_relation(monkeypatch) -> None:
     )
     assert row["reachable"] == 1
     assert row["numeric"] == 1
+    assert any(
+        stratum["relation"] == SourceRelation.SAME_INPUT.value
+        for stratum in row["decision_strata"]
+    )
     assert row["refused"] == {}
-    assert len(residuals) == 1
-    assert residuals[0].reference == reference.observation_id
-    assert residuals[0].source_relation is SourceRelation.SAME_INPUT
+    census_residuals = [
+        residual
+        for residual in residuals
+        if residual.reference == reference.observation_id
+    ]
+    assert len(census_residuals) == 1
+    assert census_residuals[0].source_relation is SourceRelation.SAME_INPUT
+
+
+def test_vaporock_gas_census_score_bytes_match_compile_with_memo_modes(
+    monkeypatch,
+) -> None:
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    from simulator.battery import score as score_module
+
+    reference = _same_table_gas(
+        "kgas-cp-janaf-parity",
+        "K",
+        Quantity.CP,
+        Decimal("1200"),
+        Decimal("20.787"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    context = _context(reference)
+    builtin_predict = score_module._score_predict_with_engine
+
+    def census_fixture_predict(engine, observation, **kwargs):
+        if engine is Engine.VAPOROCK:
+            return builtin_predict(engine, observation, **kwargs)
+        return score_module.EnginePrediction(
+            engine=engine,
+            channel=score_module.ENGINE_CHANNELS[engine],
+            execution=score_module.Execution(
+                state=score_module.ExecutionState.UNSUPPORTED
+            ),
+            coefficient_sources=score_module.ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=score_module.RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "quantity_not_predicted",
+                "quantity": Quantity.CP.value,
+            },
+            identity=observation.identity,
+        )
+
+    with monkeypatch.context() as memo_patch:
+        memo_patch.setattr(
+            score_module,
+            "_score_predict_with_engine",
+            census_fixture_predict,
+        )
+        memo_enabled_bytes = _assert_vaporock_census_fixture_parity(
+            score_module,
+            context,
+            reference,
+            census_fixture_predict,
+            memo_enabled=True,
+        )
+    memo_disabled_bytes = _assert_vaporock_census_fixture_parity(
+        score_module,
+        context,
+        reference,
+        census_fixture_predict,
+        memo_enabled=False,
+    )
+    assert memo_enabled_bytes == memo_disabled_bytes
+
+
+def _assert_vaporock_census_fixture_parity(
+    score_module,
+    context,
+    reference,
+    fixture_predict,
+    *,
+    memo_enabled: bool,
+) -> dict[Engine, bytes]:
+    residual_bytes_by_engine = {}
+    # Match the decision-band inputs that score_store derives for this point.
+    ratchet_entries, _, _ = score_module._read_decision_band_ratchet(context.root)
+    source_bands, _, source_band_reasons = score_module._source_band_catalog(
+        context, ratchet_entries
+    )
+    group_key = score_module._source_alignment_group_key(
+        reference, tier="compilation"
+    )
+    assert group_key is not None
+    group_token = score_module._group_token(group_key)
+    derived_band = source_bands.get(group_token)
+    derived_band_reason = source_band_reasons.get(group_token)
+    for engine in score_module.SCORE_ENGINE_SET:
+        predict = None if memo_enabled else fixture_predict
+        scored, candidates = score_module.score_store(
+            context,
+            engines=(engine,),
+            include_diagnostics=True,
+            predict=predict,
+        )
+        assert scored, f"{engine.value} memo={memo_enabled} scored no rows"
+        scored_for_reference = [
+            row for row in scored if row.reference == reference.observation_id
+        ]
+        assert scored_for_reference, f"{engine.value} missed the gas reference"
+        scored_residual = scored_for_reference[0]
+        scored_candidate = candidates.get(scored_residual.candidate or "")
+        compiled_residual, compiled_candidate = score_module.compile_residual(
+            reference,
+            engine,
+            context=context,
+            comparison_ids={reference.observation_id},
+            predict=predict,
+            derived_band=derived_band,
+            derived_band_reason=derived_band_reason,
+        )
+        scored_bytes = score_module.dumps_residual_line(
+            scored_residual, scored_candidate
+        ).encode("utf-8")
+        compiled_bytes = score_module.dumps_residual_line(
+            compiled_residual, compiled_candidate
+        ).encode("utf-8")
+        assert scored_bytes == compiled_bytes, f"{engine.value} memo={memo_enabled}"
+        if engine is Engine.VAPOROCK:
+            assert scored_residual.source_relation is SourceRelation.SAME_INPUT
+            assert compiled_residual.source_relation is SourceRelation.SAME_INPUT
+        residual_bytes_by_engine[engine] = scored_bytes
+    return residual_bytes_by_engine
 
 
 def test_vaporock_gas_refuses_missing_and_charged_species() -> None:

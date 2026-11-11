@@ -4781,6 +4781,12 @@ species:
         quantity: qualitative_volatility_order
         method_class: measured_direct_qualitative
         system_class: silicate_melt
+        composition_wt_pct:
+          SiO2: 35.43
+          Al2O3: 3.16
+          FeO: 35.04
+          MgO: 23.84
+          CaO: 2.53
         semantics: bound_not_point_ordering
         order_tiers:
         - - Fe
@@ -4798,7 +4804,8 @@ species:
         numeric_rate_status: not_reported_do_not_infer
         note: The source's gross sequence supports relative extraction order only. Mg and Si change
           relative behavior with evaporation stage, so their adjacency is typed as one tier rather
-          than a fixed pairwise rate ranking.
+          than a fixed pairwise rate ranking. composition_wt_pct is Table 1 row (1) Ave., which
+          the paper regards as the starting composition of this melt.
       equipment:
         chamber_pressure:
           value: 0.0001

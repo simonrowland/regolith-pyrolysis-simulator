@@ -1,10 +1,12 @@
-# AlphaMELTS expedited grid grinder
+# Scripts runbook
+
+## AlphaMELTS expedited grid grinder
 
 The daemon uses worker processes only for AlphaMELTS calls. One parent SQLite
 writer commits batches under WAL mode; harvest readers do not pause the daemon,
 and a crash can lose at most the current uncommitted batch.
 
-## Local smoke
+### Local smoke
 
 From the repository root:
 
@@ -12,13 +14,13 @@ From the repository root:
 .venv/bin/python scripts/grid_pregrind.py \
   --prepare-only \
   --limit 12 \
-  --db docs-private/recipe-db/grind-alphamelts-expedited.db
+  --db /tmp/grind-smoke.db
 
 .venv/bin/python scripts/grid_pregrind.py \
   --drain-only \
   --workers 2 \
   --limit 6 \
-  --db docs-private/recipe-db/grind-alphamelts-expedited.db
+  --db /tmp/grind-smoke.db
 ```
 
 The first command is the only path that generates the grid or imports Kress91
@@ -30,7 +32,7 @@ records host, worker, and engine-probe facts in `last_drain_run` metadata.
 Inspect counts directly with:
 
 ```bash
-sqlite3 docs-private/recipe-db/grind-alphamelts-expedited.db \
+sqlite3 /tmp/grind-smoke.db \
   'select status, count(*) from alphamelts_outputs group by status order by status;'
 ```
 
@@ -91,157 +93,11 @@ Existing refusal rows from the pre-v2 smoke batch, including IDs below
 compatible schema migration only adds nullable provenance columns; it never
 rewrites or deletes those rows.
 
-## Studio-1 deploy
-
-Target: `mac-studio-256-1`. The grinder is niced below MinerU, LiteLLM, and
-OMLX. Do not deploy to a different fleet member from an older host map.
-
-1. Inspect the studio checkout before updating, then fast-forward from the
-   public `3a0e64c` baseline:
-
-   ```bash
-   git status --short
-   git pull --ff-only origin main
-   git merge-base --is-ancestor 3a0e64c HEAD
-   ```
-
-2. Run the engine-stack check mode and the grinder's direct AlphaMELTS probe:
-
-   ```bash
-   python3 install-engines.py --check
-   .venv/bin/python scripts/grid_pregrind.py --probe-only
-   ```
-
-   The frozen `3a0e64c` installer does not yet accept `--check`. If the pulled
-   release still lacks that mode, use the direct probe as the fail-closed check;
-   do not run the installer's mutating default mode merely to verify the stack.
-
-3. Materialize Studio-1's quasi-uniform shard on the laptop. This seeds
-   `grid_keys` and output AUTOINCREMENT IDs at the Studio-1 block starting at
-   `1000000000`; ranks are assigned once and shard by `shuffle_rank % 3`:
-
-   ```bash
-   .venv/bin/python scripts/grid_pregrind.py \
-     --prepare-only \
-     --shard 0 \
-     --db docs-private/recipe-db/grind-alphamelts-studio1.db
-   ```
-
-   Shards 1 and 2 use the identical command with their shard number and a
-   separate DB. Their ID blocks start at 2000000000 and 3000000000. Do not
-   launch them until those studios are cleared.
-
-   `id_block_registry` records the source namespace. IDs below 1000000000 are
-   laptop/dev/smoke; leading block 1 is Studio-1, 2 is Studio-2, and 3 is
-   Studio-3. Blocks 4000000000, 5000000000, and later are reserved for future
-   named run types or sources and must be added to the registry when allocated.
-   The leading block therefore identifies provenance even during raw-ID merge.
-
-4. Create studio-local storage outside Dropbox, copy the prepared shard DB,
-   and render the plist template:
-
-   ```bash
-   mkdir -p "$HOME/Library/Application Support/regolith-grid" \
-     "$HOME/Library/Logs/regolith-grid"
-   cp scripts/com.rpp.grid-pregrind.plist.template \
-     "$HOME/Library/LaunchAgents/com.rpp.grid-pregrind.plist"
-   ```
-
-   Replace `__HOME__`, `__REPO_ROOT__`, `__LOCAL_DB_PATH__`, `__STATUS_PATH__`,
-   and `__LOG_DIR__`. Recommended local paths:
-
-   - DB: `$HOME/Library/Application Support/regolith-grid/grind-alphamelts-expedited.db`
-   - status: `$HOME/Library/Application Support/regolith-grid/status.json`
-   - logs: `$HOME/Library/Logs/regolith-grid`
-
-   Copy `grind-alphamelts-studio1.db` to the configured studio-local DB path
-   before loading the agent. The template pins `--drain-only --shard 0`; it
-   cannot regenerate or re-partition the laptop-prepared queue. As a preflight,
-   run the rendered command once with `--workers 2 --limit 6` and confirm it
-   produces output rows without importing `simulator.fe_redox`.
-
-   Never omit `--drain-only` on a studio. A normal run against a DB that already
-   contains stored batch seed/params refuses and directs the operator back to
-   `--drain-only`, preventing cross-version key rematerialization.
-
-5. Validate and install the LaunchAgent:
-
-   ```bash
-   plutil -lint "$HOME/Library/LaunchAgents/com.rpp.grid-pregrind.plist"
-   launchctl bootstrap "gui/$(id -u)" \
-     "$HOME/Library/LaunchAgents/com.rpp.grid-pregrind.plist"
-   launchctl print "gui/$(id -u)/com.rpp.grid-pregrind"
-   ```
-
-SIGTERM stops new submissions, waits for active calls, commits the final batch,
-and closes SQLite. The plist sets `Nice=10`, `KeepAlive=true`, and 22 workers
-(80% of the studio's 28 cores).
-
-Existing grind caches do not gain the PhaseContext lookup indexes until
-those indexes are created on the file (lookup is `mode=ro` and cannot
-`CREATE INDEX`). The route depends on schema:
-
-- **v2 databases** (`grid_keys` has `input_payload_json` and the other
-  provenance columns): `GridCacheWriter(..., existing_only=True)` installs
-  them, and the next `grid_pregrind` or `grind_harvest` writer open does
-  too. One-liner against a v2 cache path (not the live accumulator):
-  `.venv/bin/python -c "from scripts.grid_pregrind_writer import GridCacheWriter; from pathlib import Path; w=GridCacheWriter(Path('path/to/v2-grid-cache.db'), existing_only=True).__enter__(); w.__exit__(None, None, None)"`
-
-- **Legacy databases**, including the live
-  `docs-private/recipe-db/grind-accumulator.db` (predates those columns):
-  `GridCacheWriter`, `grid_pregrind`, and `grind_harvest` all refuse with
-  `ValueError: existing database lacks v2 provenance columns: input_payload_json`.
-  They do **not** install the indexes on that file. Apply the DDL directly
-  (measured 10.7 s wall on a copy of the 1.17 GB / 45k-row accumulator):
-
-  ```bash
-  sqlite3 docs-private/recipe-db/grind-accumulator.db <<'SQL'
-  CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_phase_context_liquidus
-  ON alphamelts_outputs(
-      status,
-      status_kind,
-      engine_epoch,
-      generic_phase_assemblage_available,
-      COALESCE(alpha_liquidus_T_C, generic_liquidus_T_C)
-  );
-  CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_phase_context_isothermal
-  ON alphamelts_outputs(
-      status,
-      status_kind,
-      generic_phase_assemblage_available,
-      generic_temperature_C
-  )
-  WHERE engine_epoch >= 2;
-  SQL
-  ```
-
-  Same DDL via the helper (still a raw `sqlite3` connection, not the
-  writer): `.venv/bin/python -c "import sqlite3; from pathlib import Path; from scripts.grid_pregrind_writer import install_phase_context_lookup_indexes; p=Path('docs-private/recipe-db/grind-accumulator.db'); c=sqlite3.connect(p); install_phase_context_lookup_indexes(c); c.commit(); c.close()"`
-
-  To bench an indexed **copy** without mutating production (legacy or v2):
-  `.venv/bin/python scripts/replay_phase_context_lookup_identity.py --db docs-private/recipe-db/grind-accumulator.db --bench --index-copy /tmp/t735-indexed`
-
-## Incremental harvest
-
-Run manually or from cron on the laptop. The remote backup is a WAL-consistent
-SQLite snapshot; the local accumulator advances its last-seen output ID per
-host/table and ignores canonical-key replays:
-
-```bash
-.venv/bin/python scripts/grind_harvest.py \
-  --host mac-studio-256-1 \
-  --remote-db "$HOME/Library/Application Support/regolith-grid/grind-alphamelts-expedited.db" \
-  --accumulator docs-private/recipe-db/grind-alphamelts-accumulator.db
-```
-
-The command prints pulled, inserted, conflict-skipped, source-total, and
-accumulator-total counts. Harvest can run at any cadence without stopping the
-daemon.
-
 ## Battery residual diagnostics
 
 `scripts/battery_residuals_report.py` reads a `residuals.jsonl` ledger one
-line at a time. It does not score the store. A temperature band is half-open
+line at a time (the ledger is written by the battery scorer and is not
+tracked in git). It does not score the store. A temperature band is half-open
 in kelvin, `t-min <= T < t-max`, using the identity temperature stored on the
 residual key. Rows with no identity temperature are outside every band.
 

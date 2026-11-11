@@ -151,6 +151,7 @@ _THRESHOLD_CONSTRAINT_KEYS = MappingProxyType({
 _CONSTRAINT_KEYS = frozenset({
     "gates",
     "target_species",
+    "enforce_delivered_stream_purity",
     *_THRESHOLD_CONSTRAINT_KEYS,
 })
 _SEED_KEYS = frozenset(
@@ -504,6 +505,10 @@ def physics_constraints_from_profile(
         updates["target_species"] = tuple(
             str(species) for species in raw_constraints["target_species"]
         )
+    if "enforce_delivered_stream_purity" in raw_constraints:
+        updates["enforce_delivered_stream_purity"] = (
+            raw_constraints["enforce_delivered_stream_purity"]
+        )
     updates["active_gates"] = tuple(str(gate) for gate in raw_constraints["gates"])
     return replace(base, **updates)
 
@@ -611,6 +616,13 @@ def _validate_constraints(raw: Any, *, source: str | Path) -> None:
     for gate in gates:
         if gate not in known:
             raise ProfileValidationError(f"{source}: unknown constraint gate {gate!r}")
+    if "enforce_delivered_stream_purity" in raw and not isinstance(
+        raw["enforce_delivered_stream_purity"],
+        bool,
+    ):
+        raise ProfileValidationError(
+            f"{source}: constraints.enforce_delivered_stream_purity must be a bool"
+        )
     for key in _THRESHOLD_CONSTRAINT_KEYS:
         if key not in raw:
             continue

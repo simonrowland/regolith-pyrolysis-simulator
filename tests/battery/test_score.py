@@ -20,6 +20,7 @@ from collections.abc import Mapping
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from typing import Mapping
 
 import pytest
 import yaml
@@ -203,6 +204,40 @@ def _context(work=None, experiment=None, *observations, review=None) -> ScoreCon
         extract_review=extract_review,
         hostname="test",
     )
+
+
+def _assert_score_store_matches_compile_jsonl(
+    context: ScoreContext,
+    reference: Observation,
+    *,
+    engines: tuple[Engine, ...],
+    predict=None,
+) -> dict[Engine, tuple[Residual, Observation | None]]:
+    compiled_rows = {}
+    for engine in engines:
+        scored, candidates = score_store(
+            context,
+            engines=(engine,),
+            include_diagnostics=False,
+            predict=predict,
+        )
+        assert len(scored) == 1
+        scored_residual = scored[0]
+        scored_candidate = candidates.get(scored_residual.candidate or "")
+        compiled_residual, compiled_candidate = compile_residual(
+            reference,
+            engine,
+            context=context,
+            comparison_ids={reference.observation_id},
+            predict=predict,
+        )
+        assert dumps_residual_line(
+            scored_residual, scored_candidate
+        ).encode("utf-8") == dumps_residual_line(
+            compiled_residual, compiled_candidate
+        ).encode("utf-8"), engine.value
+        compiled_rows[engine] = (compiled_residual, compiled_candidate)
+    return compiled_rows
 
 
 def _with_activity_reference_polymorph(
@@ -1503,6 +1538,212 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
 
 
 @pytest.mark.parametrize(
+    ("subtype", "source_unit", "scale_unit", "quantity", "reference", "width"),
+    (
+        ("wt_percent", "wt%", "mass_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "5.77", "0.09"),
+        ("wt_percent", "wt.%", "mass_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "5.77", "0.09"),
+        ("wt_percent", "wt_percent", "mass_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "5.77", "0.09"),
+        ("wt_percent", "mass percent", "mass_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "5.77", "0.09"),
+        ("mole_percent", "mol %", "mole_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "35", "0.4"),
+        ("mole_percent", "mol pct", "mole_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "35", "0.4"),
+        ("mole_percent", "mol%", "mole_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "35", "0.4"),
+        ("mole_percent", "mol.%", "mole_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "35", "0.4"),
+        ("mole_percent", "mole percent", "mole_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "35", "0.4"),
+    ),
+)
+def test_composition_printed_width_resolves_on_declared_subtype_scale(
+    subtype: str,
+    source_unit: str,
+    scale_unit: str,
+    quantity: Quantity,
+    reference: str,
+    width: str,
+) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    # The measured component basis is identity.subtype; the attached bulk
+    # composition has its own amount basis and must not supply this scale.
+    identity = Identity(
+        quantity=quantity,
+        species=Species("SiO2", Phase.L),
+        composition=State.of(
+            Composition(
+                "printed_bulk",
+                (("SiO2", Decimal("0.9")), ("CaO", Decimal("0.1"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        subtype=State.of(subtype),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={
+            "value": width,
+            "units": source_unit,
+            "confidence_level": "one_sigma",
+        },
+    )
+    observation = replace(
+        F.observation(
+            "composition-width",
+            "composition-width-experiment",
+            identity,
+            Decimal(reference),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="composition-width-source",
+        ),
+        uncertainty=uncertainty,
+    )
+
+    resolved = _printed_uncertainty_band(
+        quantity,
+        uncertainty,
+        Decimal(reference),
+        source_observation=observation,
+    )
+
+    operation = score_mod._residual_metric_operation(quantity, observation)
+    expected_width = score_mod._metric_uncertainty_width(
+        operation,
+        quantity,
+        Decimal(reference),
+        Decimal(width),
+        scale_unit,
+    )
+    assert expected_width is not None
+    assert resolved.refusal is None
+    assert resolved.notice is None
+    assert resolved.band is not None
+    assert resolved.band.value == expected_width * score_mod.NORMAL_95_TICKET_MULTIPLIER
+    assert resolved.band.unit == (
+        "dimensionless"
+        if operation in {MetricOperation.RELATIVE, MetricOperation.DEX}
+        else scale_unit
+    )
+    assert score_mod.decision_band_for(
+        quantity,
+        SourceRelation.INDEPENDENT,
+        printed_band=resolved.band,
+        operation=operation,
+    ) is resolved.band
+
+
+def test_composition_printed_width_rejects_a_declared_basis_mismatch() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    quantity = Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    identity = Identity(
+        quantity=quantity,
+        species=Species("SiO2", Phase.L),
+        composition=State.of(
+            Composition(
+                "printed_bulk",
+                (("SiO2", Decimal("0.9")), ("CaO", Decimal("0.1"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        subtype=State.of("mole_fraction"),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={
+            "value": "0.4",
+            "units": "wt%",
+            "confidence_level": "one_sigma",
+        },
+    )
+    observation = replace(
+        F.observation(
+            "composition-width-mismatch",
+            "composition-width-experiment",
+            identity,
+            Decimal("0.35"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="composition-width-source",
+        ),
+        uncertainty=uncertainty,
+    )
+
+    resolved = _printed_uncertainty_band(
+        quantity,
+        uncertainty,
+        Decimal("0.35"),
+        source_observation=observation,
+    )
+
+    assert resolved.band is None
+    assert resolved.refusal == {
+        "reason": "printed_uncertainty_unit_unmapped",
+        "quantity": quantity.value,
+        "source_unit": "wt%",
+        "original": score_mod._uncertainty_original(uncertainty),
+    }
+    derived = DecisionBand(Decimal("0.01"), "dimensionless", "derived_scatter: test")
+    assert score_mod.decision_band_for(
+        quantity,
+        SourceRelation.INDEPENDENT,
+        printed_refusal=resolved.refusal,
+        derived_band=derived,
+        operation=MetricOperation.DEX,
+    ) is None
+
+
+def test_inherited_residue_width_uses_its_oxide_weight_percent_subtype() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    quantity = Quantity.RESIDUE_COMPONENT_COMPOSITION
+    identity = Identity(
+        quantity=quantity,
+        species=Species("MgO", Phase.L),
+        composition=State.of(
+            Composition(
+                "printed_bulk",
+                (("SiO2", Decimal("0.9")), ("MgO", Decimal("0.1"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        subtype=State.of("oxide_wt_percent"),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={
+            "sigma": "0.17",
+            "parent": "series-parent",
+            "confidence_level": "one_sigma",
+        },
+    )
+    observation = replace(
+        F.observation(
+            "inherited-residue-width",
+            "residue-width-experiment",
+            identity,
+            Decimal("10.29"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="residue-width-source",
+        ),
+        uncertainty=uncertainty,
+    )
+
+    resolved = _printed_uncertainty_band(
+        quantity,
+        uncertainty,
+        Decimal("10.29"),
+        source_observation=observation,
+    )
+
+    assert resolved.refusal is None
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("0.17") * score_mod.NORMAL_95_TICKET_MULTIPLIER
+    assert resolved.band.unit == "mass_percent"
+    assert score_mod.decision_band_for(
+        quantity,
+        SourceRelation.INDEPENDENT,
+        printed_band=resolved.band,
+        operation=MetricOperation.ABSOLUTE,
+    ) is resolved.band
+
+
+@pytest.mark.parametrize(
     "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
 )
 def test_source_method_uncertainty_supplies_a_source_method_band(
@@ -2403,7 +2644,9 @@ def test_stolyarova_rows_do_not_move_any_kems_band_path(tmp_path: Path) -> None:
 
 
 
-def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
+def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     exp = F.kems_experiment()
     identity = replace(
         F.activity_identity(formula="NaO0.5"),
@@ -2457,12 +2700,13 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
             coefficient_basis=SINGLE_CATION_COEFFICIENT_BASIS,
         )
 
-    residual, candidate = compile_residual(
+    compiled_rows = _assert_score_store_matches_compile_jsonl(
+        ctx,
         reference,
-        Engine.INTERNAL_ANALYTICAL,
-        context=ctx,
+        engines=SCORE_ENGINE_SET,
         predict=predict,
     )
+    residual, candidate = compiled_rows[Engine.INTERNAL_ANALYTICAL]
     assert candidate is not None
     assert residual.numeric is not None
     assert residual.numeric.verdict == "consistent"
@@ -2496,6 +2740,46 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
     assert outside_band_residual.numeric.verdict == "outside_literature_band"
     assert outside_band_residual.numeric.value == Decimal("-2")
     assert outside_band_residual.status is ResidualStatus.NO_BAND
+
+    prediction_request_quantities = []
+    lineage_checks = []
+
+    def unsupported_rewritten_request(engine, observation, **_kwargs):
+        prediction_request_quantities.append(quantity_token(observation.identity))
+        return EnginePrediction(
+            engine=engine,
+            channel=engine.value,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=("rewritten-request-source",),
+            lineage_complete=False,
+            identity=observation.identity,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "quantity_not_predicted",
+                "quantity": Quantity.ACTIVITY_COEFFICIENT.value,
+            },
+        )
+
+    def candidate_lineage(sources, **_kwargs):
+        lineage_checks.append(tuple(sources))
+        return False, None
+
+    monkeypatch.setattr(
+        score_mod, "_score_predict_with_engine", unsupported_rewritten_request
+    )
+    monkeypatch.setattr(
+        score_mod, "_candidate_lineage_for_sources", candidate_lineage
+    )
+    rewritten_residuals, _ = score_store(
+        ctx,
+        engines=(Engine.VAPOROCK,),
+        include_diagnostics=False,
+    )
+
+    assert prediction_request_quantities == [Quantity.ACTIVITY_COEFFICIENT]
+    assert ("rewritten-request-source",) in lineage_checks
+    assert len(rewritten_residuals) == 1
+    assert rewritten_residuals[0].source_relation is SourceRelation.UNKNOWN
 
 
 @pytest.mark.parametrize("reported_basis", ["parent_oxide", None])
@@ -9969,6 +10253,90 @@ def test_mapped_coefficient_sources_decide_circularity() -> None:
     assert independent is SourceRelation.INDEPENDENT
 
 
+def test_static_lineage_memo_matches_the_prediction_source_relation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.kems_experiment()
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"),
+        quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        species=Species("Na", Phase.L),
+        subtype=State.of("langmuir_alpha"),
+        per=State.of(PerBasis.DIMENSIONLESS),
+        reference_state=State.not_applicable(
+            "alpha row does not carry activity standard state"
+        ),
+        reservoir=State.of(Species("Na", Phase.G)),
+        sweep_gas=State.of(
+            SweepIdentity(
+                species="N2",
+                flow_sccm=State.of(Decimal("1")),
+                partial_pressure_Pa=State.of(Decimal("1")),
+            )
+        ),
+        exposure=State.of(
+            Exposure(
+                area_m2=State.of(Decimal("1")),
+                duration_s=State.of(Decimal("1")),
+            )
+        ),
+    )
+    reference = F.observation(
+        "static-lineage-source-mismatch",
+        experiment.experiment_id,
+        identity,
+        Decimal("1e-6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-paper",
+    )
+    context = _context(F.work(), experiment, reference)
+    default_sources = score_mod.ENGINE_COEFFICIENT_SOURCES[Engine.VAPOROCK]
+    default_complete = score_mod.lineage_complete_for(
+        default_sources,
+        works=context.works,
+        observations=context.observations,
+        experiments=context.experiments,
+    )
+    assert default_complete
+    assert resolve_source_relation(
+        reference,
+        score_mod.expand_coefficient_sources(default_sources),
+        default_complete,
+        works=context.works,
+        observations=context.observations,
+        experiments=context.experiments,
+    ) is SourceRelation.SAME_INPUT
+
+    def refusal_with_other_sources(engine, observation, **_kwargs):
+        return EnginePrediction(
+            engine=engine,
+            channel=engine.value,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=("not-the-engine-default",),
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "quantity_not_predicted",
+                "quantity": Quantity.EVAPORATION_COEFFICIENT_ALPHA.value,
+            },
+            identity=observation.identity,
+        )
+
+    monkeypatch.setattr(
+        score_mod, "_score_predict_with_engine", refusal_with_other_sources
+    )
+    compiled_rows = _assert_score_store_matches_compile_jsonl(
+        context,
+        reference,
+        engines=(Engine.VAPOROCK,),
+    )
+
+    assert (
+        compiled_rows[Engine.VAPOROCK][0].source_relation
+        is SourceRelation.UNKNOWN
+    )
+
+
 def _printed_unresolved_observation(
     observation_id: str,
     experiment_id: str,
@@ -12327,7 +12695,7 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
     context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
     monkeypatch.setattr(
         score_mod,
-        "compile_residual",
+        "_compile_residual_with_lineage",
         lambda reference, engine, **_kwargs: (
             fixture_residuals[reference.observation_id],
             fixture_candidates.get(
@@ -12444,6 +12812,188 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
     assert any(row.get("status") == ResidualStatus.REFUSED.value for row in rows)
 
 
+def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery.records import CandidateRequest, ResidualRefusal
+
+    context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
+    static_id = "fixture-measured-refusal"
+    static_row = fixture_residuals[static_id]
+    fixture_residuals[static_id] = replace(
+        static_row,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        candidate_request=CandidateRequest(
+            context.observations[static_id].experiment_id,
+            Quantity.P_SAT,
+            engine,
+            engine.value,
+        ),
+        refusal=ResidualRefusal(
+            RefusalReason.UNSUPPORTED,
+            {"reason": "quantity_not_predicted", "quantity": Quantity.P_SAT.value},
+        ),
+    )
+    phase_static_id = "fixture-derived-01"
+    phase_static_row = fixture_residuals[phase_static_id]
+    fixture_residuals[phase_static_id] = replace(
+        phase_static_row,
+        rail=Rail.MELT_ACTIVITY,
+        status=ResidualStatus.REFUSED,
+        numeric=None,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        candidate_request=CandidateRequest(
+            context.observations[phase_static_id].experiment_id,
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            engine,
+            engine.value,
+        ),
+        refusal=ResidualRefusal(
+            RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+            {"reason": "engine_does_not_report_phase_composition"},
+        ),
+    )
+    called_id = "fixture-derived-02"
+    called_row = fixture_residuals[called_id]
+    fixture_residuals[called_id] = replace(
+        called_row,
+        rail=Rail.MELT_ACTIVITY,
+        status=ResidualStatus.REFUSED,
+        numeric=None,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="equilibrate_cell:fixture",
+        ),
+        candidate_request=CandidateRequest(
+            context.observations[called_id].experiment_id,
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            engine,
+            engine.value,
+        ),
+        refusal=ResidualRefusal(
+            RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+            {"reason": "engine_does_not_report_phase_composition"},
+        ),
+    )
+    dynamic_id = "fixture-derived-00"
+    dynamic_row = fixture_residuals[dynamic_id]
+    fixture_residuals[dynamic_id] = replace(
+        dynamic_row,
+        status=ResidualStatus.REFUSED,
+        numeric=None,
+        candidate_request=CandidateRequest(
+            context.observations[dynamic_id].experiment_id,
+            Quantity.DELTA_FG,
+            engine,
+            engine.value,
+        ),
+        refusal=ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {"reason": "input_missing"},
+        ),
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_compile_residual_with_lineage",
+        lambda reference, _engine, **_kwargs: (
+            fixture_residuals[reference.observation_id],
+            fixture_candidates.get(
+                fixture_residuals[reference.observation_id].candidate or ""
+            ),
+        ),
+    )
+
+    default_path = tmp_path / "default.jsonl"
+    default_written, _default_metadata = score_mod._score_store_to_jsonl(
+        context, default_path, root=score_mod.REPO_ROOT, engines=(engine,)
+    )
+    default_partial = default_path.with_name(default_path.name + ".partial")
+    default_rows = score_mod.load_residuals_jsonl(default_partial)
+    assert default_written == len(fixture_residuals)
+    assert score_mod.load_residuals_stamp(default_partial).get("static_refusals") is None
+    assert any(row["reference"] == static_id for row in default_rows)
+
+    compact_path = tmp_path / "compact.jsonl"
+    compact_written, compact_metadata = score_mod._score_store_to_jsonl(
+        context,
+        compact_path,
+        root=score_mod.REPO_ROOT,
+        engines=(engine,),
+        compact_static_refusals=True,
+    )
+    compact_partial = compact_path.with_name(compact_path.name + ".partial")
+    compact_rows = score_mod.load_residuals_jsonl(compact_partial)
+    expected_static = [
+        {
+            "engine": engine.value,
+            "rail": Rail.MELT_ACTIVITY.value,
+            "reason": "engine_does_not_report_phase_composition/engine_does_not_report_phase_composition",
+            "count": 1,
+        },
+        {
+            "engine": engine.value,
+            "rail": Rail.VAPOUR.value,
+            "reason": "unsupported/quantity_not_predicted",
+            "count": 1,
+        }
+    ]
+    assert compact_written == default_written - 2
+    assert compact_metadata.static_refusals == expected_static
+    assert score_mod.load_residuals_stamp(compact_partial)["static_refusals"] == expected_static
+    assert all(row["reference"] != static_id for row in compact_rows)
+    assert all(row["reference"] != phase_static_id for row in compact_rows)
+    assert any(row["reference"] == dynamic_id for row in compact_rows)
+    assert any(row["reference"] == called_id for row in compact_rows)
+
+    def numeric_lines(path: Path) -> list[bytes]:
+        return [
+            line
+            for line in path.read_bytes().splitlines()
+            if b'"numeric":{' in line
+        ]
+
+    assert numeric_lines(default_partial) == numeric_lines(compact_partial)
+    summary = compact_metadata.aggregate.summary_payload(
+        score_mod.load_residuals_stamp(compact_partial)
+    )
+    assert summary["schema_version"] == "v1.1"
+    assert summary["static_refusals"] == expected_static
+
+
+def test_static_thermo_refusal_matches_compile_on_all_score_engines(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.tabulation_experiment()
+    identity = replace(F.o2_identity(), quantity=Quantity.H_MINUS_H298)
+    reference = F.observation(
+        "fixture-static-thermo-refusal",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+    )
+    context = _context(F.work(), experiment, reference)
+    monkeypatch.setattr(
+        score_mod,
+        "comparison_candidates",
+        lambda _context: (reference,),
+    )
+    monkeypatch.setattr(score_mod, "diagnostic_references", lambda _context: ())
+    monkeypatch.setattr(
+        score_mod, "_refusal_diagnostic_references", lambda _context: ()
+    )
+
+    compiled_rows = _assert_score_store_matches_compile_jsonl(
+        context,
+        reference,
+        engines=SCORE_ENGINE_SET,
+    )
+    assert all(
+        residual.status is ResidualStatus.REFUSED
+        for residual, _candidate in compiled_rows.values()
+    )
+
+
 def test_streamed_unrailed_measured_tier_matches_legacy_zero_grid(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -12472,7 +13022,7 @@ def test_streamed_unrailed_measured_tier_matches_legacy_zero_grid(
     )
     monkeypatch.setattr(
         score_mod,
-        "compile_residual",
+        "_compile_residual_with_lineage",
         lambda reference, engine, **_kwargs: (
             fixture_residuals[reference.observation_id],
             None,
@@ -12521,7 +13071,7 @@ def test_streamed_measured_grid_omits_selected_engine_without_rail_rows(
     context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
     monkeypatch.setattr(
         score_mod,
-        "compile_residual",
+        "_compile_residual_with_lineage",
         lambda reference, _engine, **_kwargs: (
             fixture_residuals[reference.observation_id],
             fixture_candidates.get(
@@ -12602,7 +13152,9 @@ def test_streaming_interruption_preserves_previous_complete_file(
         emitted.append(residual.key)
         return residual, None
 
-    monkeypatch.setattr(score_mod, "compile_residual", interrupt_after_two)
+    monkeypatch.setattr(
+        score_mod, "_compile_residual_with_lineage", interrupt_after_two
+    )
     target = tmp_path / "residuals.jsonl"
     previous = b"previous complete result\n"
     target.write_bytes(previous)
@@ -12695,7 +13247,7 @@ def test_battery_failed_rerun_preserves_published_output_set(
             None,
         )
 
-    monkeypatch.setattr(score_mod, "compile_residual", compile_stub)
+    monkeypatch.setattr(score_mod, "_compile_residual_with_lineage", compile_stub)
     if failure_stage == "summary":
         original_write_summary = battery_score._write_headline_summary_from_accumulator_json
 

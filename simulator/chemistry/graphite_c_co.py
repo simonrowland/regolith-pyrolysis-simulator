@@ -70,6 +70,14 @@ C_CO_SOURCE = (
     "Stagno & Frost 2010 EPSL 300:72-84 graphite-saturation context"
 )
 
+# Chase 1998 NIST-JANAF formation values at 298 K give the linear
+# Ellingham approximation for 2 C + O2 -> 2 CO, per mol O2:
+# ΔH = 2*(-110.527) = -221.054 kJ; ΔG = 2*(-137.163) = -274.326 kJ;
+# ΔS = (ΔH - ΔG)/T = 0.17877 kJ/K. The pure-CO limit is distinct from the
+# CCO buffer above, which includes the CO2 share through Boudouard equilibrium.
+_C_TO_CO_DH_KJ_PER_MOL_O2 = -221.054
+_C_TO_CO_DS_KJ_PER_K_PER_MOL_O2 = 0.17877
+
 # Buffer tokens that mean graphite / C–CO (not Frost IW/NNO/QFM/WM, and not
 # free prose about CO/Ar mixing). Normalized by _normalize_buffer_token.
 _C_CO_BUFFER_TOKENS = frozenset(
@@ -142,9 +150,28 @@ def log10_fo2_c_co_bar(temperature_K: float, p_co_bar: float) -> float:
     )
 
 
+def carbon_delta_g_co_kj_per_mol_o2(temperature_K: float) -> float:
+    """ΔG(2 C + O2 -> 2 CO) per mol O2. Falls with T."""
+    try:
+        temperature = float(temperature_K)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            f"temperature_K must be a finite number, got {temperature_K!r}"
+        ) from exc
+    if not math.isfinite(temperature):
+        raise ValueError(
+            f"temperature_K must be a finite number, got {temperature_K!r}"
+        )
+    return (
+        _C_TO_CO_DH_KJ_PER_MOL_O2
+        - temperature * _C_TO_CO_DS_KJ_PER_K_PER_MOL_O2
+    )
+
+
 __all__ = [
     "C_CO_FORMULATION",
     "C_CO_SOURCE",
+    "carbon_delta_g_co_kj_per_mol_o2",
     "cco_log10_fO2_bar",
     "is_c_co_buffer_token",
     "log10_fo2_c_co_bar",

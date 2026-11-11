@@ -8,11 +8,12 @@ produces **no** battery scoring rows
 ## Provenance
 
 - **Database:** SGTE Pure Element Database (UNARY) version 5.0, 2 June 2009.
-- **File:** `unary50.tdb` (Thermo-Calc TDB), 118 145 bytes.
+- **File:** `unary50.tdb` (Thermo-Calc TDB), 118 145 bytes; not distributed in this repository.
 - **Official URL:** https://www.sgte.net/en/free-pure-elements-database
-- **Download:** `unary50.tdb` (115.4 KiB) from sgte.net without login.
+- **Download:** fetch on demand from the official SGTE URL, then verify against the SHA-256 in `source/sidecar.yaml`.
 - **Citation:** Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317–425. DOI 10.1016/0364-5916(91)90011-S. The 1991 paper is Elsevier-paywalled and was **not** downloaded; this ingest is the official free TDB only.
-- **Local copy:** `source/unary50.tdb` (sha256 `8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f`) and the corpus sidecar `source/sidecar.yaml`.
+- **Cache:** `$REGOLITH_DATA_CACHE/sgte/unary50.tdb`, defaulting to `~/.cache/regolith-pyrolysis-simulator/sgte/unary50.tdb`. Fetch it with `python -m simulator.chemistry.sgte_unary fetch`; imports and tests never fetch it.
+- **SHA-256:** `8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f`.
 - **Licence (verbatim from the official SGTE free-pure-elements page):**
   > This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure elements.
 
@@ -28,6 +29,8 @@ Records keep Thermo-Calc TDB form:
 No unit conversion, no smoothing, no merging of phases. Ions are not in this unary file; condensed metastable phases, GAS N2/O2, ELECTRON_GAS, and VACUUM are ingested.
 
 One YAML file per `(element, phase)` in `records/`. The harvester is `tools/harvest_sgte_unary_compilation.py`; the loader is `simulator/chemistry/sgte_unary.py`.
+
+The harvester reads the checksum-verified cached TDB. It does not copy the source file into the repository.
 
 ## Known gaps and ambiguities
 

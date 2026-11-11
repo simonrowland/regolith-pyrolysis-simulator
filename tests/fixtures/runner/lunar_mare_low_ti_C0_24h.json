@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.9.0",
+  "schema_version": "1.10.0",
   "run_metadata": {
-    "schema_version": "1.9.0",
+    "schema_version": "1.10.0",
     "feedstock_id": "lunar_mare_low_ti",
     "campaign": "C0",
     "hours_requested": 24,
@@ -14151,8 +14151,8 @@
             2792.0
           ]
         },
-        "authority": "condensation_temperature_override",
-        "source": "Estimated/operator-routing override for completeness; no source-backed 1 mbar condensation-temperature row is declared. VR-11 audit: Al/Ti overrides are operator-routing only -- do not add further Al/Ti/trace T_cond overrides without independent engineering policy approval (DESIGN-REV5 section 7.2).",
+        "authority": "capture_threshold_fallback",
+        "source": "simulator.condensation.CONDENSATION_TEMPS_C.capture_threshold",
         "stage_window_K": null,
         "temperature_K": 1453.15
       },
@@ -15374,6 +15374,7 @@
       }
     },
     "total_species": 32,
+    "activity_sources": {},
     "vapor_pressure_backend_status": "",
     "vapor_pressure_backend_status_summary": {},
     "vapor_pressure_backend_status_reason": "",
@@ -30055,7 +30056,6 @@
     "setpoints_t_cond_audit": {
       "schema": "setpoints_t_cond_audit.v1",
       "operator_override_species": [
-        "Al",
         "Ca",
         "Cr",
         "CrO2",
@@ -30064,10 +30064,9 @@
         "Mg",
         "Mn",
         "Na",
-        "SiO",
-        "Ti"
+        "SiO"
       ],
-      "al_ti_policy": "Al and Ti overrides are estimated/operator-routing only; no additional Al/Ti/trace T_cond overrides without independent engineering policy approval (DESIGN-REV5 \u00a77.2).",
+      "al_ti_policy": "Al and Ti are not operator condenser overrides and have no designated condenser stage. Al leaves as metal via C6 Mg-thermite; Ti is non-volatile. Any Al, Ti, AlO, or TiO vapour that does occur is accounted to an existing ledger account, not dropped. No additional Al/Ti/trace T_cond overrides without independent engineering policy approval (DESIGN-REV5 \u00a77.2).",
       "reaction_fixed_windows": "Reaction-fixed condensation windows remain non-operator settings."
     },
     "shadow_equal": false,

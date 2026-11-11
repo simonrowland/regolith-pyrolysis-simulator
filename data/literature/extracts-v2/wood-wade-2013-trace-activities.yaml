@@ -1,0 +1,549 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/wood-wade-2013-trace-activities.yaml
+observations:
+- observation_id: wood-wade-2013-trace-activities::wood_wade_2013_cuo05_activity_coefficient
+  experiment_id: 10.1007/s00410-013-0896-z::experiment::wood_wade_2013_bw1102
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: CuO0.5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1923'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CuO0.5
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: CuO0.5
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: The analyzed silicate major-oxide values have no printed unit or composition basis.
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '1500000000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '3.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width is printed for the calculated coefficient; Table 1 input-analysis uncertainties are preserved
+        in the linked context.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wood-wade-2013-trace-activities::wood_wade_2013_cuo05_activity_coefficient
+  source_id: wood-wade-2013-trace-activities
+  locator:
+    page: 8
+    published_page: 918
+    pdf_page_index: 7
+    note: 'Proof string: ‘3.5 in the silicate melt at 1,923 K’. Derivation sentence: ‘Applying this activity coefficient for
+      Cu in the metal leads to γ_CuO0.5 of 3.5 in the silicate melt at 1,923 K.’'
+  read_from: pdf:wood-wade-2013-trace-activities
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1650'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘1.5 GPa and 1,650 °C’.'
+    T_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘3.5 in the silicate melt at 1,923 K’.'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘1.5 GPa and 1,650 °C’; the run description gives no fO2 control or value.'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1500000000'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        table: '1'
+        note: 'Proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’.'
+    composition:
+      state:
+        tag: unknown
+        reason: The analyzed silicate major-oxide values have no printed unit or composition basis.
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        table: '1'
+        note: 'Proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’; major-oxide units are absent from the
+          table.'
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘3.5 in the silicate melt at 1,923 K’. Derivation sentence: ‘Applying this activity coefficient
+          for Cu in the metal leads to γ_CuO0.5 of 3.5 in the silicate melt at 1,923 K.’'
+  derived_from:
+  - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
+  - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
+  derivation:
+    relation: Author model-derived CuO0.5 melt activity coefficient from the measured BW1102 phase-partition data, gamma_FeO
+      = 0.92 calculated from Eq. (4), the printed CuO0.5–Fe exchange equilibrium constant and the extrapolated infinite-dilution
+      Cu activity coefficient in liquid Fe.
+    inputs:
+    - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
+    - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: wood-wade-2013-trace-activities::wood_wade_2013_ino15_activity_coefficient
+  experiment_id: 10.1007/s00410-013-0896-z::experiment::wood_wade_2013_bw1102
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: InO1.5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1923'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: The analyzed silicate major-oxide values have no printed unit or composition basis.
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '1500000000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.02'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width is printed for the calculated coefficient; Table 1 input-analysis uncertainties are preserved
+        in the linked context.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wood-wade-2013-trace-activities::wood_wade_2013_ino15_activity_coefficient
+  source_id: wood-wade-2013-trace-activities
+  locator:
+    page: 9
+    published_page: 919
+    pdf_page_index: 8
+    note: 'Proof string: ‘0.02 in the SiO2-rich liquid at 1,923 K’. Derivation sentence: ‘Applying this to the In partitioning
+      data leads to an activity coefficient of InO1.5 of 0.02 in the SiO2-rich liquid at 1,923 K.’'
+  read_from: pdf:wood-wade-2013-trace-activities
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1650'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘1.5 GPa and 1,650 °C’.'
+    T_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 9
+        published_page: 919
+        pdf_page_index: 8
+        note: 'Proof string: ‘0.02 in the SiO2-rich liquid at 1,923 K’.'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘1.5 GPa and 1,650 °C’; the run description gives no fO2 control or value.'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1500000000'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        table: '1'
+        note: 'Proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’.'
+    composition:
+      state:
+        tag: unknown
+        reason: The analyzed silicate major-oxide values have no printed unit or composition basis.
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        table: '1'
+        note: 'Proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’; major-oxide units are absent from the
+          table.'
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 9
+        published_page: 919
+        pdf_page_index: 8
+        note: 'Proof string: ‘0.02 in the SiO2-rich liquid at 1,923 K’. Derivation sentence: ‘Applying this to the In partitioning
+          data leads to an activity coefficient of InO1.5 of 0.02 in the SiO2-rich liquid at 1,923 K.’'
+  derived_from:
+  - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
+  - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
+  derivation:
+    relation: Author model-derived reduction of the measured BW1102 In metal-silicate partition data using gamma_FeO = 0.92
+      calculated from Eq. (4), the printed regular-solution treatment for dilute Fe-In alloys, and the InO1.5–Fe exchange
+      constant derived using the assumed InO1.5 melting entropy of 26.25 J.K-1 at 2,183 K.
+    inputs:
+    - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
+    - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: The authors assume highly dilute liquid Fe-In alloys behave as regular solutions, adopt W_In = 52 kJ mol-1,
+          calculate an infinite-dilution In activity coefficient in liquid Fe of 25.8 at 1,923 K, and apply it to the In partitioning
+          data.
+      locator:
+        page: 9
+        published_page: 919
+        pdf_page_index: 8
+        note: 'Proof string: ‘52 kJ mol-1 and calculated an activity coefficient infinitely dilute in Fe metal of 25.8 at
+          1,923 K’.'
+    references:
+    - Barin et al. (1989)
+    - Okamoto (1990)
+- observation_id: wood-wade-2013-trace-activities::wood_wade_2013_pbo_activity_coefficient
+  experiment_id: 10.1007/s00410-013-0896-z::experiment::wood_wade_2013_bw1102
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: PbO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1923'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PbO
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: PbO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: The analyzed silicate major-oxide values have no printed unit or composition basis.
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '1500000000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.22'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width is printed for the calculated coefficient; Table 1 input-analysis uncertainties are preserved
+        in the linked context.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wood-wade-2013-trace-activities::wood_wade_2013_pbo_activity_coefficient
+  source_id: wood-wade-2013-trace-activities
+  locator:
+    page: 8
+    published_page: 918
+    pdf_page_index: 7
+    note: 'Proof string: ‘0.22 at 1,923 K’. Derivation sentence: ‘Applying these results and using LogK_Pb above leads to
+      an activity coefficient γ_PbO in silicate melt of 0.22 at 1,923 K.’'
+  read_from: pdf:wood-wade-2013-trace-activities
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1650'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘1.5 GPa and 1,650 °C’.'
+    T_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘0.22 at 1,923 K’.'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘1.5 GPa and 1,650 °C’; the run description gives no fO2 control or value.'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1500000000'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        table: '1'
+        note: 'Proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’.'
+    composition:
+      state:
+        tag: unknown
+        reason: The analyzed silicate major-oxide values have no printed unit or composition basis.
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        table: '1'
+        note: 'Proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’; major-oxide units are absent from the
+          table.'
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘0.22 at 1,923 K’. Derivation sentence: ‘Applying these results and using LogK_Pb above leads
+          to an activity coefficient γ_PbO in silicate melt of 0.22 at 1,923 K.’'
+  derived_from:
+  - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
+  - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
+  derivation:
+    relation: Author model-derived PbO melt activity coefficient from the measured BW1102 phase-partition data, gamma_FeO
+      = 0.92 calculated from Eq. (4), the printed PbO–Fe exchange equilibrium constant and the author-selected Pb activity
+      coefficient in liquid Fe.
+    inputs:
+    - wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
+    - wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
+    parameters: []
+    output_unit: as_published
+    references: []

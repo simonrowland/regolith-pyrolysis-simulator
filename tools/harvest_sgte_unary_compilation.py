@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-"""Copy unary50.tdb and emit one native record per (element, phase)."""
+"""Emit one native record per (element, phase) from the cached SGTE TDB."""
 
 from __future__ import annotations
 
 import argparse
-import shutil
-from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
@@ -18,43 +16,22 @@ from simulator.chemistry.sgte_unary import (  # noqa: E402
     COMPILATION_ROOT,
     build_manifest,
     build_records,
+    ensure_source_tdb,
     load_tdb,
     record_to_yaml,
-    sha256_file,
 )
-
-DEFAULT_SOURCE = Path("/Users/simonrowland/Repos/regolith-corpus-ctl/raw/sgte-unary-5.0")
-
 
 def cli() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source-dir", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--output-root", type=Path, default=COMPILATION_ROOT)
     return parser.parse_args()
 
 
 def main() -> int:
     args = cli()
-    source_dir: Path = args.source_dir
     output_root: Path = args.output_root
-    source_tdb = source_dir / "unary50.tdb"
-    source_sidecar = source_dir / "sidecar.yaml"
-    if not source_tdb.is_file():
-        raise SystemExit(f"missing source TDB: {source_tdb}")
-
-    dest_source = output_root / "source"
-    dest_source.mkdir(parents=True, exist_ok=True)
-    dest_tdb = dest_source / "unary50.tdb"
-    shutil.copy2(source_tdb, dest_tdb)
-    if source_sidecar.is_file():
-        shutil.copy2(source_sidecar, dest_source / "sidecar.yaml")
-
-    expected = "8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f"
-    digest = sha256_file(dest_tdb)
-    if digest != expected:
-        raise SystemExit(f"unary50.tdb sha256 {digest} != {expected}")
-
-    database = load_tdb(dest_tdb)
+    source_tdb = ensure_source_tdb()
+    database = load_tdb(source_tdb)
     records = build_records(database)
     records_dir = output_root / "records"
     if records_dir.exists():
@@ -77,7 +54,7 @@ def main() -> int:
     print(
         f"records={len(records)} functions={len(database.functions)} "
         f"ambiguities={manifest['summary']['parse_ambiguity_count']} "
-        f"sha256={digest} dest={output_root}"
+        f"sha256={database.source_sha256} dest={output_root}"
     )
     return 0
 

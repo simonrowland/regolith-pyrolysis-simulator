@@ -90,7 +90,11 @@ from simulator.feedstock_composition import iron_oxide_values
 from simulator.core import (
     MOLAR_MASS, OXIDE_TO_METAL, FARADAY, GAS_CONSTANT, MeltState,
 )
-from simulator.mre_ladder import DECOMP_VOLTAGES, mre_decomposition_voltage_reference
+from simulator.mre_ladder import (
+    DECOMP_VOLTAGES,
+    MREDecompositionVoltageReference,
+    mre_decomposition_voltage_reference,
+)
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -118,25 +122,95 @@ MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
 MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL = "electrolysis_control_out_of_domain"
 MRE_INVALID_CONTROL_REFUSAL = "invalid_electrolysis_control"
+MRE_INVALID_TARGET_REFUSAL = "invalid_allowed_oxides"
+MRE_INVALID_GAS_FUGACITY_REFUSAL = "invalid_gas_product_fugacity"
 MRE_RAW_MARGIN_REFUSAL = "non_authoritative_fallback_raw_margin_nonpositive"
 MRE_PRODUCT_PHASE_MISMATCH_REFUSAL = "mre_product_phase_mismatch_refused"
-MRE_TERMINAL_PHYSICS_REFUSAL_REASONS = frozenset({
-    MRE_INVALID_CONTROL_REFUSAL,
-    MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
-    MRE_MULTI_OXIDE_PARTITION_REFUSAL,
-    MRE_RAW_MARGIN_REFUSAL,
-    MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
-})
 MRE_ACTIVITY_FLOOR = 1.0e-30
 MRE_SELECTIVITY_EXPONENT_CAP = 3.0
-# C1-01 validates the fallback/raw acceptance split for FeO.  Other fallback
-# oxides keep their existing policy until their margins are independently
-# validated; their raw requirements are still surfaced in diagnostics below.
-MRE_RAW_MARGIN_GUARDED_OXIDES = frozenset({"FeO"})
 MRE_FIXED_REDUCIBLE_OXIDES = tuple(
     oxide for oxide in DECOMP_VOLTAGES
     if oxide != 'Fe2O3'
 )
+
+
+def _mre_raw_margin_unassessed_notice(
+    *,
+    oxide: str,
+    temperature_C: float,
+    applied_voltage_V: float,
+    fallback_requirement_V: float,
+    reference: MREDecompositionVoltageReference | None,
+    heuristic_reference_V: float | None = None,
+) -> dict[str, object] | None:
+    if (
+        heuristic_reference_V is None
+        and reference is not None
+        and reference.raw_graph_voltage_V is not None
+    ):
+        return None
+
+    if heuristic_reference_V is not None:
+        reason = FERRIC_TO_FERROUS_REFERENCE_STATUS
+        reference_status = FERRIC_TO_FERROUS_REFERENCE_STATUS
+    else:
+        reason = (
+            'decomposition_voltage_reference_missing'
+            if reference is None
+            else 'raw_graph_voltage_missing'
+        )
+        reference_status = None if reference is None else reference.status
+
+    notice: dict[str, object] = {
+        'kind': 'mre_raw_margin_unassessed',
+        'oxide': oxide,
+        'temperature_C': temperature_C,
+        'applied_voltage_V': applied_voltage_V,
+        'fallback_requirement_V': fallback_requirement_V,
+        'reason': reason,
+        'authority': 'fallback_heuristic',
+    }
+    if reference_status is not None:
+        notice['reference_status'] = reference_status
+    if heuristic_reference_V is not None:
+        notice['heuristic_reference_V'] = heuristic_reference_V
+    return notice
+
+
+def _mre_raw_margin_assessment(
+    *,
+    voltage_V: float,
+    fallback_requirement_V: float,
+    fallback_margin_V: float,
+    reference: MREDecompositionVoltageReference | None,
+) -> tuple[float | None, float | None, dict[str, object] | None]:
+    if reference is None or reference.raw_graph_voltage_V is None:
+        return None, None, None
+
+    # Premise: fallback and raw E0 share the same Nernst activity, pO2, and
+    # product-phase terms. Thus E_raw = E_fallback + (E0_raw - E0_fallback),
+    # with every term in V. The raw margin is V_applied - E_raw; it is zero at
+    # the support boundary, which is refused below (<= 0 V).
+    raw_requirement_V = (
+        fallback_requirement_V
+        + reference.raw_graph_voltage_V
+        - reference.voltage
+    )
+    raw_margin_V = voltage_V - raw_requirement_V
+    refusal = None
+    if (
+        fallback_margin_V > 0.0
+        and not reference.authoritative
+        and raw_margin_V <= 0.0
+    ):
+        refusal = {
+            'fallback_requirement_V': fallback_requirement_V,
+            'fallback_margin_V': fallback_margin_V,
+            'raw_requirement_V': raw_requirement_V,
+            'raw_margin_V': raw_margin_V,
+            'voltage_status': reference.status,
+        }
+    return raw_requirement_V, raw_margin_V, refusal
 
 
 def mre_control_domain_assessment(
@@ -327,19 +401,9 @@ def _faraday_reduced_extent(
 
 
 class MREElectrolysisRefusal(RuntimeError):
-    """Typed terminal refusal for a classified MRE physics limitation.
+    """Base typed refusal for invalid run-level MRE inputs."""
 
-    Constructed for the classified reasons in
-    ``MRE_TERMINAL_PHYSICS_REFUSAL_REASONS``. ``core.step`` uses
-    ``terminal_refusal`` to restore the attempted hour instead of poisoning
-    a simulator that already committed an earlier transition during that
-    hour. Invalid temperature, activity, oxide, or fugacity inputs retain
-    their ValueError/TypeError behavior. Invalid MRE controls use the
-    MREElectrolysisInvalidInput subclass so RuntimeError and ValueError
-    handlers both retain their contract.
-    """
-
-    terminal_refusal = True
+    terminal_refusal = False
 
     def __init__(self, reason: str, diagnostic: Mapping[str, object]):
         self.reason = str(reason)
@@ -349,6 +413,8 @@ class MREElectrolysisRefusal(RuntimeError):
 
 class MREElectrolysisInvalidInput(MREElectrolysisRefusal, ValueError):
     """Typed invalid-control refusal caught as both RuntimeError and ValueError."""
+
+    terminal_refusal = True
 
     def __init__(self, reason: str, diagnostic: Mapping[str, object]):
         super().__init__(reason, diagnostic)
@@ -363,10 +429,6 @@ class MREElectrolysisInvalidInput(MREElectrolysisRefusal, ValueError):
         self.args = (
             f"{self.reason}: {detail}" if detail else self.reason,
         )
-
-
-class MRECurrentPartitionRefusal(MREElectrolysisRefusal):
-    """Typed terminal refusal for an uncertified MRE current partition."""
 
 
 def _require_finite_real(
@@ -891,6 +953,7 @@ class ElectrolysisModel:
 
         # Find all reducible species at this voltage
         reducible = []
+        unassessed_notices: list[dict[str, object]] = []
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if oxide not in melt_state.composition_kg:
                 continue
@@ -953,40 +1016,22 @@ class ElectrolysisModel:
                 )
 
             fallback_margin_V = voltage_V - E_nernst
-            raw_margin_V = None
-            if (
-                reference is not None
-                and reference.raw_graph_voltage_V is not None
-            ):
-                # The Nernst activity/pO2 shift is identical for the selected
-                # fallback and raw graph E0.  Replacing E0 therefore shifts the
-                # full requirement by exactly (E0_raw - E0_fallback).
-                raw_requirement_V = (
-                    E_nernst
-                    + reference.raw_graph_voltage_V
-                    - reference.voltage
+            raw_requirement_V, raw_margin_V, raw_margin_refusal = (
+                _mre_raw_margin_assessment(
+                    voltage_V=voltage_V,
+                    fallback_requirement_V=E_nernst,
+                    fallback_margin_V=fallback_margin_V,
+                    reference=reference,
                 )
-                raw_margin_V = voltage_V - raw_requirement_V
+            )
+            if raw_margin_V is not None:
                 result['mre_raw_graph_requirement_V_by_oxide'][oxide] = (
                     raw_requirement_V
                 )
                 result['mre_raw_voltage_margin_V_by_oxide'][oxide] = raw_margin_V
 
-            if (
-                fallback_margin_V > 0.0
-                and oxide in MRE_RAW_MARGIN_GUARDED_OXIDES
-                and reference is not None
-                and not reference.authoritative
-                and raw_margin_V is not None
-                and raw_margin_V <= 0.0
-            ):
-                result['mre_raw_margin_refused_targets'][oxide] = {
-                    'fallback_requirement_V': E_nernst,
-                    'fallback_margin_V': fallback_margin_V,
-                    'raw_requirement_V': raw_requirement_V,
-                    'raw_margin_V': raw_margin_V,
-                    'voltage_status': reference.status,
-                }
+            if raw_margin_refusal is not None:
+                result['mre_raw_margin_refused_targets'][oxide] = raw_margin_refusal
                 continue
 
             if fallback_margin_V > 0.0:
@@ -1113,6 +1158,20 @@ class ElectrolysisModel:
                 result['oxides_reduced_kg'][oxide] = kg_oxide_reduced
                 result['oxides_reduced_mol'][oxide] = moles_reduced
                 result['oxide_charge_electrons'][oxide] = n
+                unassessed_notice = _mre_raw_margin_unassessed_notice(
+                    oxide=oxide,
+                    temperature_C=T_C,
+                    applied_voltage_V=voltage_V,
+                    fallback_requirement_V=E,
+                    reference=reference,
+                    heuristic_reference_V=(
+                        FERRIC_TO_FERROUS_REFERENCE_V
+                        if mode == 'ferric_to_ferrous'
+                        else None
+                    ),
+                )
+                if unassessed_notice is not None:
+                    unassessed_notices.append(unassessed_notice)
 
                 if mode == "ferric_to_ferrous":
                     feo_mol = moles_reduced * FERRIC_TO_FERROUS_FEO_PER_FE2O3
@@ -1167,6 +1226,8 @@ class ElectrolysisModel:
         # Preserve exact commanded energy when no cap bound.
         energy_current_A = billable_current_A if any_capped else current_A
         result['energy_kWh'] = voltage_V * energy_current_A * 1.0 / 1000.0
+        if unassessed_notices:
+            result.setdefault('notices', []).extend(unassessed_notices)
 
         return result
 

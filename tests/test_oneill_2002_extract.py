@@ -1,5 +1,6 @@
 """Regression pin for O'Neill & Eggins (2002) printed FeO uncertainties."""
 
+from collections import Counter
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -122,6 +123,40 @@ def test_feo_table_7_rows_keep_their_own_printed_one_sigma():
     ]
 
 
+def test_locator_pages_are_physical_pdf_pages_for_printed_folios():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    locators = []
+
+    def collect(value):
+        if isinstance(value, dict):
+            if {"page", "published_page", "pdf_page_index"} <= value.keys():
+                locators.append(value)
+            for child in value.values():
+                collect(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect(child)
+
+    collect(document)
+    expected_pages = {156: 6, 157: 7, 159: 9, 160: 10, 161: 11}
+    changed_locators = [
+        locator
+        for locator in locators
+        if locator["published_page"] in expected_pages
+    ]
+    assert Counter(locator["published_page"] for locator in changed_locators) == {
+        156: 230,
+        157: 211,
+        159: 270,
+        160: 152,
+        161: 248,
+    }
+    for locator in changed_locators:
+        page = expected_pages[locator["published_page"]]
+        assert locator["page"] == page
+        assert locator["pdf_page_index"] == page - 1
+
+
 def test_phase_parent_pressure_inference_survives_in_observation_provenance():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     source_parents = [
@@ -185,7 +220,7 @@ def test_mo_fit_links_match_table5_and_pressure_locator_page():
     for parent in phase_parents:
         locator = parent["values"]["point_conditions"]["total_pressure_Pa"]["locator"]
         assert (locator["page"], locator["published_page"], locator["pdf_page_index"]) == (
-            156,
+            6,
             156,
             5,
         )

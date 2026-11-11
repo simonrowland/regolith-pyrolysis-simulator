@@ -137,7 +137,10 @@ def test_engine_verify_fails_install_when_a_fresh_import_fails(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import importlib.util
+    from contextlib import contextmanager
     from types import SimpleNamespace
+    from simulator.melt_backend import alphamelts as alphamelts_backend
+    from simulator.melt_backend import magemin as magemin_backend
 
     installer_path = LOCK_PATH.parents[1] / "install-engines.py"
     spec = importlib.util.spec_from_file_location("install_engines_verify_test", installer_path)
@@ -150,6 +153,9 @@ def test_engine_verify_fails_install_when_a_fresh_import_fails(
     magemin.parent.mkdir(parents=True)
     magemin.write_bytes(b"fake binary")
     import_environments: list[dict[str, str]] = []
+    magemin_verifications: list[list[str]] = []
+    launch_order: list[str] = []
+    launch_envs: list[dict[str, str] | None] = []
 
     def fail_import(command, **kwargs):
         if "-c" in command:
@@ -157,13 +163,57 @@ def test_engine_verify_fails_install_when_a_fresh_import_fails(
             return SimpleNamespace(returncode=1, stdout="", stderr="import failed")
         return SimpleNamespace(returncode=0, stdout="MAGEMin", stderr="")
 
+    def verify_magemin(command, **kwargs):
+        launch_order.append("launch")
+        magemin_verifications.append(command)
+        launch_envs.append(kwargs.get("env"))
+        return SimpleNamespace(returncode=0, stdout="MAGEMin", stderr="")
+
+    @contextmanager
+    def recording_slot(_timeout: float):
+        launch_order.append("enter")
+        try:
+            yield
+        finally:
+            launch_order.append("exit")
+
+    # Parent values differ from the launch contract so a bare environ copy
+    # cannot satisfy the child-env assertions.
+    monkeypatch.setenv("DISPLAY", ":99")
+    monkeypatch.setenv("OMPI_MCA_btl", "tcp")
+    monkeypatch.setenv("OMPI_MCA_pml", "cm")
+    monkeypatch.setenv("HWLOC_COMPONENTS", "opencl")
+    monkeypatch.setenv("MPLBACKEND", "MacOSX")
     monkeypatch.setattr(installer.subprocess, "run", fail_import)
+    monkeypatch.setattr(
+        alphamelts_backend,
+        "_run_alphamelts_subprocess",
+        verify_magemin,
+    )
+    monkeypatch.setattr(
+        magemin_backend,
+        "_magemin_subprocess_slot",
+        recording_slot,
+    )
     monkeypatch.setattr(installer, "checkout_matches_pin", lambda _pin, _path: True)
 
     with pytest.raises(SystemExit, match="Engine verification failed"):
         installer.verify(Path("/fake/python"), lock, root)
 
     assert len(import_environments) == 5
+    assert magemin_verifications == [[str(magemin), "--version"]]
+    assert launch_order == ["enter", "launch", "exit"]
+    assert len(launch_envs) == 1 and launch_envs[0] is not None
+    child = launch_envs[0]
+    expected = magemin_backend._magemin_subprocess_env()
+    assert child["OMPI_MCA_btl"] == expected["OMPI_MCA_btl"] == "self"
+    assert child["OMPI_MCA_pml"] == expected["OMPI_MCA_pml"] == "ob1"
+    assert child["HWLOC_COMPONENTS"] == expected["HWLOC_COMPONENTS"] == "-opencl"
+    assert child["MPLBACKEND"] == expected["MPLBACKEND"] == "Agg"
+    assert "DISPLAY" not in child
+    assert "DISPLAY" not in expected
+    assert os.environ["DISPLAY"] == ":99"
+    assert os.environ["OMPI_MCA_btl"] == "tcp"
     assert all(
         environment["DYLD_FALLBACK_LIBRARY_PATH"].startswith(
             str(Path.home() / "lib")

@@ -180,6 +180,7 @@ from simulator.battery.source_lineage import (
     openimcc_pack_coefficient_sources,
 )
 from simulator.battery.validate import (
+    Ancestry,
     ValidationIssue,
     _asset_ids,
     _observation_lineage,
@@ -753,8 +754,95 @@ def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
     return {"reason": "quantity_not_predicted", "quantity": quantity.value}
 
 
+_STATIC_REFUSAL_DETAILS = frozenset(
+    {
+        "quantity_not_predicted",
+        "engine-thermo-does-not-emit",
+        "engine_does_not_report_phase_composition",
+        "engine_does_not_report_fe_redox",
+        "engine_does_not_report_melt_activity",
+        "engine_missing_observable",
+        "pure-phase-is-crystal-only",
+        "pure-phase-symbol-unmapped",
+        "outside_supported_species",
+        "not_a_vapour_quantity",
+        "non_alkali_kinetic",
+        "vaporock-species-not-in-janaf-table",
+    }
+)
+
+
+def _static_refusal_summary_key(
+    residual: Residual,
+) -> tuple[str, str, str] | None:
+    request = residual.candidate_request
+    refusal = residual.refusal
+    if (
+        residual.status is not ResidualStatus.REFUSED
+        or request is None
+        or refusal is None
+        or residual.execution.call_evidence is not None
+        or refusal.detail.get("reason") not in _STATIC_REFUSAL_DETAILS
+    ):
+        return None
+    rail = residual.rail or rail_for_quantity(request.quantity)
+    return (
+        request.engine.value,
+        "unassigned" if rail is None else rail.value,
+        f"{refusal.reason.value}/{refusal.detail['reason']}",
+    )
+
+
 def _is_quantity_not_predicted(quantity: Quantity | None) -> bool:
     return quantity is Quantity.LOG10_K_REACTION
+
+
+def _engine_lacks_quantity_capability(
+    engine: Engine,
+    quantity: Quantity,
+    phase_basis: str | None,
+) -> bool:
+    """Whether the declared predictor capability can never emit this row."""
+
+    if _is_quantity_not_predicted(quantity):
+        return True
+    if (
+        quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
+        or (engine is Engine.MAGEMIN and quantity in _VAPOUR_EQUILIBRIUM)
+        or quantity is Quantity.FE3_FE2_RATIO
+        or quantity in PRINTED_CAPACITY_QUANTITIES
+        or quantity is Quantity.DISTRIBUTION_RATIO
+        or (
+            quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and phase_basis in PHASE_BASIS_TOKENS
+        )
+        or quantity in _ENGINE_CELL_PREDICTED_QUANTITIES
+    ):
+        return False
+    if quantity in FUSION_QUANTITIES:
+        return False
+    from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+    return quantity not in _engine_thermo_quantities(engine)
+
+
+def _engine_quantity_not_predicted_detail(
+    engine: Engine,
+    identity: Identity | None,
+) -> dict[str, str] | None:
+    if not isinstance(identity, Identity):
+        return None
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return None
+    phase_basis = (
+        identity.subtype.value
+        if identity.subtype is not None and identity.subtype.is_value
+        else None
+    )
+    if not _engine_lacks_quantity_capability(engine, quantity, phase_basis):
+        return None
+    return _quantity_not_predicted_detail(quantity)
 
 
 @dataclass(frozen=True)
@@ -1647,6 +1735,41 @@ def compute_metric(
         # Decimal.ln / ln(10); math.log10 on float is the same operation
         # for the reported grain. Keep Decimal via log10 of the ratio.
         return Decimal(str(math.log10(float(ratio))))
+    return None
+
+
+def _reference_from_metric(
+    operation: MetricOperation,
+    candidate: Decimal,
+    residual: Decimal,
+) -> Decimal | None:
+    """Recover a numeric reference from a scored candidate and residual."""
+
+    if not candidate.is_finite() or not residual.is_finite():
+        return None
+    if operation is MetricOperation.ABSOLUTE:
+        return candidate - residual
+    if operation is MetricOperation.RELATIVE:
+        for denominator, positive_reference in (
+            (Decimal(1) + residual, True),
+            (Decimal(1) - residual, False),
+        ):
+            if denominator == 0:
+                continue
+            reference = candidate / denominator
+            if (positive_reference and reference > 0) or (
+                not positive_reference and reference < 0
+            ):
+                return reference
+        return None
+    if operation is MetricOperation.DEX:
+        if candidate <= 0:
+            return None
+        try:
+            ratio = Decimal(str(10.0 ** float(residual)))
+        except (OverflowError, ValueError):
+            return None
+        return candidate / ratio if ratio.is_finite() and ratio > 0 else None
     return None
 
 
@@ -3794,6 +3917,28 @@ def expand_coefficient_sources(sources: Sequence[str]) -> tuple[str, ...]:
     return tuple(out)
 
 
+def _candidate_lineage_for_sources(
+    sources: Sequence[str],
+    *,
+    works: Mapping[str, Work] | None = None,
+    observations: Mapping[str, Observation] | None = None,
+    experiments: Mapping[str, Experiment] | None = None,
+) -> tuple[bool, Ancestry | None]:
+    lineage_sources = coefficient_lineage_sources(sources)
+    if not lineage_sources:
+        return False, None
+    for src in lineage_sources:
+        if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
+            return False, None
+    expanded = expand_coefficient_sources(lineage_sources)
+    if works is None or observations is None:
+        return True, None
+    candidate_lineage = _resolve_coefficient_sources(
+        expanded, observations, works, experiments
+    )
+    return candidate_lineage.complete, candidate_lineage
+
+
 def lineage_complete_for(
     sources: Sequence[str],
     *,
@@ -3808,18 +3953,13 @@ def lineage_complete_for(
     complete ancestry. An incomplete result is not independence.
     """
 
-    lineage_sources = coefficient_lineage_sources(sources)
-    if not lineage_sources:
-        return False
-    for src in lineage_sources:
-        if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
-            return False
-    expanded = expand_coefficient_sources(lineage_sources)
-    if works is None or observations is None:
-        return True
-    return _resolve_coefficient_sources(
-        expanded, observations, works, experiments
-    ).complete
+    complete, _candidate_lineage = _candidate_lineage_for_sources(
+        sources,
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    )
+    return complete
 
 
 def resolve_source_relation(
@@ -3834,28 +3974,108 @@ def resolve_source_relation(
     if not lineage_complete:
         return SourceRelation.UNKNOWN
     table_ids = _table_ids(works)
-    ref_ids = _observation_lineage(
+    reference_lineage = _observation_lineage(
         reference.observation_id,
         observations,
         table_ids,
         asset_ids=_asset_ids(works),
     )
-    cand_ids = _resolve_coefficient_sources(
+    candidate_lineage = _resolve_coefficient_sources(
         coefficient_lineage_sources(coefficient_sources),
         observations,
         works,
         experiments,
     )
+    return _source_relation_from_lineages(reference_lineage, candidate_lineage)
+
+
+def _source_relation_from_lineages(
+    reference_lineage: Ancestry, candidate_lineage: Ancestry
+) -> SourceRelation:
     if (
-        not ref_ids.complete
-        or not cand_ids.complete
-        or ref_ids.ids is None
-        or cand_ids.ids is None
+        not reference_lineage.complete
+        or not candidate_lineage.complete
+        or reference_lineage.ids is None
+        or candidate_lineage.ids is None
     ):
         return SourceRelation.UNKNOWN
-    if ref_ids.ids & cand_ids.ids:
+    if reference_lineage.ids & candidate_lineage.ids:
         return SourceRelation.SAME_INPUT
     return SourceRelation.INDEPENDENT
+
+
+class _ScoringLineageResolver:
+    """Reuse resolved ancestry and relations within one scoring run."""
+
+    def __init__(self, context: ScoreContext) -> None:
+        self.context = context
+        self.table_ids = _table_ids(context.works)
+        self.asset_ids = _asset_ids(context.works)
+        self._candidate_lineages: dict[
+            tuple[str, ...], tuple[bool, Ancestry | None]
+        ] = {}
+        self._reference_lineages: dict[str, Ancestry] = {}
+        self._source_relations: dict[
+            tuple[tuple[str, ...], tuple[str, ...]], SourceRelation
+        ] = {}
+
+    def _candidate_lineage(
+        self, sources: Sequence[str]
+    ) -> tuple[bool, Ancestry | None]:
+        source_key = tuple(sources)
+        cached = self._candidate_lineages.get(source_key)
+        if cached is not None:
+            return cached
+
+        result = _candidate_lineage_for_sources(
+            source_key,
+            works=self.context.works,
+            observations=self.context.observations,
+            experiments=self.context.experiments,
+        )
+        self._candidate_lineages[source_key] = result
+        return result
+
+    def lineage_complete_for(self, sources: Sequence[str]) -> bool:
+        return self._candidate_lineage(sources)[0]
+
+    def for_reference(
+        self, reference: Observation, sources: Sequence[str]
+    ) -> tuple[bool, SourceRelation]:
+        complete, candidate_lineage = self._candidate_lineage(sources)
+        if not complete or candidate_lineage is None:
+            return complete, SourceRelation.UNKNOWN
+
+        reference_lineage = self._reference_lineages.get(
+            reference.observation_id
+        )
+        if reference_lineage is None:
+            reference_lineage = _observation_lineage(
+                reference.observation_id,
+                self.context.observations,
+                self.table_ids,
+                asset_ids=self.asset_ids,
+            )
+            self._reference_lineages[reference.observation_id] = reference_lineage
+
+        if (
+            not reference_lineage.complete
+            or reference_lineage.ids is None
+            or candidate_lineage.ids is None
+        ):
+            return complete, SourceRelation.UNKNOWN
+
+        relation_key = (
+            tuple(sorted(reference_lineage.ids)),
+            tuple(sorted(candidate_lineage.ids)),
+        )
+        relation = self._source_relations.get(relation_key)
+        if relation is None:
+            relation = _source_relation_from_lineages(
+                reference_lineage, candidate_lineage
+            )
+            self._source_relations[relation_key] = relation
+        return complete, relation
 
 
 KC91_CALIBRATION_SOURCES = {
@@ -4006,6 +4226,19 @@ def band_dimension_matches(
         operation or metric_operation(quantity)
     ) in {MetricOperation.RELATIVE, MetricOperation.DEX}:
         return True
+    # These two output dimensions are intentionally subtype-defined. The
+    # printed-width resolver matches this scale to identity.subtype; permit
+    # only its absolute path here and keep other units fail-closed.
+    if (
+        quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and band.unit == "mass_percent"
+    ):
+        return operation is MetricOperation.ABSOLUTE
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and band.unit in {"mass_percent", "mole_percent"}
+    ):
+        return operation is MetricOperation.ABSOLUTE
     quantity_dim = unit_dimension(QUANTITY_UNITS[quantity])
     band_dim = unit_dimension(band.unit)
     return quantity_dim is not None and quantity_dim == band_dim
@@ -4705,9 +4938,80 @@ def _convert_uncertainty_width(
     quantity: Quantity,
     width: Decimal,
     source_unit: str,
+    *,
+    source_observation: Observation | None = None,
 ) -> tuple[Decimal | None, str | None]:
     unit = re.sub(r"\s+", "", source_unit).casefold()
     expected = QUANTITY_UNITS[quantity]
+    if quantity in {
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    }:
+        identity = (
+            source_observation.identity
+            if source_observation is not None
+            and isinstance(source_observation.identity, Identity)
+            else None
+        )
+        subtype_state = None if identity is None else identity.subtype
+        subtype = (
+            str(subtype_state.value)
+            if isinstance(subtype_state, State) and subtype_state.is_value
+            else None
+        )
+        # These quantities have no quantity-wide unit: QUANTITY_UNITS says
+        # subtype_defined, while the component's declared scale lives in
+        # identity.subtype (wt_percent / oxide_wt_percent or mole_percent).
+        # Therefore preserve a printed width only when its unit names that
+        # same scale; wt% cannot be assigned to a mole_fraction observation.
+        # A series point inherits its unit from the parent column and carries
+        # that parent id; its subtype supplies the same explicit scale. Sanity:
+        # a 0.17 wt% width stays 0.17 mass_percent, never 0.0017.
+        mass_percent_subtypes = {"wt_percent", "oxide_wt_percent", "mass_percent"}
+        mole_percent_subtypes = {"mole_percent", "mol_percent"}
+        declared_scale = (
+            "mass_percent"
+            if subtype in mass_percent_subtypes
+            else "mole_percent"
+            if subtype in mole_percent_subtypes
+            else None
+        )
+        mass_percent_units = {
+            "wt%", "wt.%", "wt_percent", "mass%", "masspercent",
+            "mass_percent", "mass-percent",
+        }
+        mole_percent_units = {
+            "mol%", "mol.%", "molpct", "mole%", "molepercent",
+            "mole_percent", "mole-percent",
+        }
+        if unit in mass_percent_units | mole_percent_units:
+            source_scale = (
+                "mass_percent"
+                if unit in mass_percent_units
+                else "mole_percent"
+            )
+            if declared_scale != source_scale:
+                return None, expected
+            return width, source_scale
+        raw_uncertainty = (
+            None
+            if source_observation is None
+            else source_observation.uncertainty.verbatim
+        )
+        inherited_series_width = (
+            isinstance(raw_uncertainty, Mapping)
+            and "parent" in raw_uncertainty
+            and "unit" not in raw_uncertainty
+            and "units" not in raw_uncertainty
+        )
+        if (
+            unit == expected.casefold()
+            and inherited_series_width
+            and declared_scale is not None
+        ):
+            return width, declared_scale
+        if unit in {"%", "percent", "percentage"}:
+            return None, expected
     if unit in {expected.casefold(), "1", "fraction", "relative"}:
         return width, "fraction" if unit in {"fraction", "relative"} else expected
     if unit in {"%", "percent", "percentage"}:
@@ -4915,7 +5219,10 @@ def _printed_uncertainty_band(
     else:
         width = source_value
     converted, converted_unit = _convert_uncertainty_width(
-        quantity, width, source_unit
+        quantity,
+        width,
+        source_unit,
+        source_observation=source_observation,
     )
     if converted is None:
         return _PrintedBandResolution(
@@ -4948,7 +5255,13 @@ def _printed_uncertainty_band(
             kind = "printed_unstated"
     elif kind == "printed_1sigma":
         ticket *= NORMAL_95_TICKET_MULTIPLIER
-    unit = "dimensionless" if operation in {MetricOperation.RELATIVE, MetricOperation.DEX} else QUANTITY_UNITS[quantity]
+    unit = (
+        "dimensionless"
+        if operation in {MetricOperation.RELATIVE, MetricOperation.DEX}
+        else converted_unit
+        if converted_unit in {"mass_percent", "mole_percent"}
+        else QUANTITY_UNITS[quantity]
+    )
     rule = f"{kind}: source-printed uncertainty; original={raw_text}"
     notice = _confidence_level_notice(
         quantity, uncertainty, source_observation, source_value
@@ -9371,7 +9684,8 @@ def _predict_with_engine(
     _require_score_engine(engine)
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-    if _is_quantity_not_predicted(quantity):
+    static_refusal_detail = _engine_quantity_not_predicted_detail(engine, identity)
+    if static_refusal_detail is not None:
         return EnginePrediction(
             engine=engine,
             channel=ENGINE_CHANNELS[engine],
@@ -9379,7 +9693,7 @@ def _predict_with_engine(
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
             lineage_complete=False,
             refusal_reason=RefusalReason.UNSUPPORTED,
-            refusal_detail=_quantity_not_predicted_detail(quantity),
+            refusal_detail=static_refusal_detail,
             identity=identity,
         )
     sample_phase_detail = (
@@ -9472,23 +9786,6 @@ def _predict_with_engine(
         return _predict_phase_row(
             engine, observation, identity, channel, sources, handles=handles
         )
-    if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
-
-        if (
-            quantity not in _engine_thermo_quantities(engine)
-            and quantity not in FUSION_QUANTITIES
-        ):
-            return EnginePrediction(
-                engine=engine,
-                channel=channel,
-                execution=Execution(state=ExecutionState.UNSUPPORTED),
-                coefficient_sources=sources,
-                lineage_complete=False,
-                refusal_reason=RefusalReason.UNSUPPORTED,
-                refusal_detail=_quantity_not_predicted_detail(quantity),
-                identity=identity,
-            )
     formula = identity.species.formula
     if (
         quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
@@ -12381,7 +12678,95 @@ def _is_selected_condition_observation(
     return derivation is not None and reference.observation_id in derivation.inputs
 
 
-def compile_residual(
+def _validation_notices_for_residual(
+    context: ScoreContext,
+    source_reference: Observation,
+    lineage_observation_id: str | None,
+    quantity: Quantity | None,
+) -> tuple[Notice, ...]:
+    validation_notices: list[Notice] = []
+    for observation_id in dict.fromkeys(
+        (source_reference.observation_id, lineage_observation_id)
+    ):
+        if observation_id is None:
+            continue
+        issues = context.hard_issues_by_observation.get(observation_id, ())
+        if not issues:
+            continue
+        issue_codes = set()
+        for issue in issues:
+            location = observation_issue_location(issue.path)
+            field = "" if location is None else location[1]
+            issue_codes.add(
+                issue.reason.value if not field else f"{issue.reason.value}:{field}"
+            )
+        validation_notices.append(
+            Notice(
+                kind=NoticeKind.VALIDATION_HARD_ISSUE_LABEL,
+                affected_quantities=() if quantity is None else (quantity,),
+                reason="hard_validation_issue:" + ",".join(sorted(issue_codes)),
+                origin=observation_id,
+            )
+        )
+    return tuple(validation_notices)
+
+
+def _refused_residual(
+    reference: Observation,
+    engine: Engine,
+    quantity: Quantity | None,
+    rail: Rail | None,
+    key: str,
+    reason: RefusalReason,
+    detail: Mapping[str, object],
+    execution: Execution,
+    notices: tuple[Notice, ...],
+    *,
+    check_refs: tuple[str, ...],
+    extra_notices: tuple[Notice, ...] = (),
+    candidate: Observation | None = None,
+    source_relation: SourceRelation = SourceRelation.UNKNOWN,
+    exclusions: tuple[str, ...] = (),
+    fo2_mode: Fo2Mode | None = None,
+) -> tuple[Residual, Observation | None]:
+    all_notices = union_notices(notices, extra_notices)
+    result_mode = fo2_mode or _fo2_mode_from_notices(all_notices)
+    excl = exclusions or ("status_match_or_mismatch",)
+    if (
+        not _reference_has_measured_evidence(reference)
+        and "reference_measured_evidence" not in excl
+    ):
+        excl = (*excl, "reference_measured_evidence")
+    return (
+        Residual(
+            key=_key_for_fo2_mode(key, result_mode),
+            reference=reference.observation_id,
+            execution=execution,
+            rail=rail,
+            status=ResidualStatus.REFUSED,
+            source_relation=source_relation,
+            score_eligible=False,
+            exclusions=excl,
+            notices=all_notices,
+            candidate=None if candidate is None else candidate.observation_id,
+            candidate_request=None
+            if candidate is not None
+            else CandidateRequest(
+                reference.experiment_id,
+                quantity or Quantity.P_SAT,
+                engine,
+                ENGINE_CHANNELS[engine],
+            ),
+            numeric=None,
+            refusal=ResidualRefusal(reason, dict(detail), check_refs=check_refs),
+            quench_state=_residual_quench_state(reference),
+            fo2_mode=result_mode,
+        ),
+        candidate,
+    )
+
+
+def _compile_residual_with_lineage(
     reference: Observation,
     engine: Engine,
     *,
@@ -12397,6 +12782,7 @@ def compile_residual(
     ratchet_missing: bool = False,
     point_observations: Sequence[Observation] | None = None,
     fo2_mode: Fo2Mode | None = None,
+    _source_relation_resolver: _ScoringLineageResolver | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     precomputed_prediction = prediction is not None
@@ -12513,31 +12899,15 @@ def compile_residual(
             notices,
             (engine_intrinsic_fo2_notice(quantity),),
         )
-    validation_notices: list[Notice] = []
-    for observation_id in dict.fromkeys(
-        (source_reference.observation_id, lineage_observation_id)
-    ):
-        if observation_id is None:
-            continue
-        issues = context.hard_issues_by_observation.get(observation_id, ())
-        if not issues:
-            continue
-        issue_codes = set()
-        for issue in issues:
-            location = observation_issue_location(issue.path)
-            field = "" if location is None else location[1]
-            issue_codes.add(
-                issue.reason.value if not field else f"{issue.reason.value}:{field}"
-            )
-        validation_notices.append(
-            Notice(
-                kind=NoticeKind.VALIDATION_HARD_ISSUE_LABEL,
-                affected_quantities=() if quantity is None else (quantity,),
-                reason="hard_validation_issue:" + ",".join(sorted(issue_codes)),
-                origin=observation_id,
-            )
-        )
-    notices = union_notices(notices, tuple(validation_notices))
+    notices = union_notices(
+        notices,
+        _validation_notices_for_residual(
+            context,
+            source_reference,
+            lineage_observation_id,
+            quantity,
+        ),
+    )
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -12550,40 +12920,22 @@ def compile_residual(
         source_relation: SourceRelation = SourceRelation.UNKNOWN,
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
-        all_notices = union_notices(notices, extra_notices)
-        result_mode = fo2_mode or _fo2_mode_from_notices(all_notices)
-        excl = exclusions or ("status_match_or_mismatch",)
-        if (
-            not _reference_has_measured_evidence(reference)
-            and "reference_measured_evidence" not in excl
-        ):
-            excl = (*excl, "reference_measured_evidence")
-        return (
-            Residual(
-                key=_key_for_fo2_mode(key, result_mode),
-                reference=reference.observation_id,
-                execution=execution,
-                rail=rail,
-                status=ResidualStatus.REFUSED,
-                source_relation=source_relation,
-                score_eligible=False,
-                exclusions=excl,
-                notices=all_notices,
-                candidate=None if candidate is None else candidate.observation_id,
-                candidate_request=None
-                if candidate is not None
-                else CandidateRequest(
-                    reference.experiment_id,
-                    quantity or Quantity.P_SAT,
-                    engine,
-                    ENGINE_CHANNELS[engine],
-                ),
-                numeric=None,
-                refusal=ResidualRefusal(reason, dict(detail), check_refs=_check_refs(gates, reason)),
-                quench_state=_residual_quench_state(reference),
-                fo2_mode=result_mode,
-            ),
-            candidate,
+        return _refused_residual(
+            reference,
+            engine,
+            quantity,
+            rail,
+            key,
+            reason,
+            detail,
+            execution,
+            notices,
+            check_refs=_check_refs(gates, reason),
+            extra_notices=extra_notices,
+            candidate=candidate,
+            source_relation=source_relation,
+            exclusions=exclusions,
+            fo2_mode=fo2_mode,
         )
 
     if _is_quantity_not_predicted(quantity):
@@ -13023,12 +13375,17 @@ def compile_residual(
             notices,
             (_pressure_independent_comparison_notice(quantity, prediction),),
         )
-    expanded_sources = expand_coefficient_sources(prediction.coefficient_sources)
-    lineage_complete = lineage_complete_for(
-        prediction.coefficient_sources,
-        works=context.works,
-        observations=context.observations,
-        experiments=context.experiments,
+    prediction_sources = tuple(prediction.coefficient_sources)
+    expanded_sources = expand_coefficient_sources(prediction_sources)
+    lineage_complete = (
+        lineage_complete_for(
+            prediction_sources,
+            works=context.works,
+            observations=context.observations,
+            experiments=context.experiments,
+        )
+        if _source_relation_resolver is None
+        else _source_relation_resolver.lineage_complete_for(prediction_sources)
     )
     prediction = replace(
         prediction,
@@ -13056,14 +13413,19 @@ def compile_residual(
     relation_reference = reference
     if lineage_observation_id and lineage_observation_id != reference.observation_id:
         relation_reference = replace(reference, observation_id=lineage_observation_id)
-    source_relation = resolve_source_relation(
-        relation_reference,
-        prediction.coefficient_sources,
-        prediction.lineage_complete,
-        works=context.works,
-        observations=context.observations,
-        experiments=context.experiments,
-    )
+    if _source_relation_resolver is None:
+        source_relation = resolve_source_relation(
+            relation_reference,
+            prediction.coefficient_sources,
+            prediction.lineage_complete,
+            works=context.works,
+            observations=context.observations,
+            experiments=context.experiments,
+        )
+    else:
+        _complete, source_relation = _source_relation_resolver.for_reference(
+            relation_reference, prediction_sources
+        )
     if (
         rail is Rail.REDOX
         and engine is Engine.INTERNAL_ANALYTICAL
@@ -13723,6 +14085,41 @@ def compile_residual(
     )
 
 
+def compile_residual(
+    reference: Observation,
+    engine: Engine,
+    *,
+    context: ScoreContext,
+    prediction: EnginePrediction | None = None,
+    comparison_ids: set[str] | None = None,
+    predict: Callable[..., EnginePrediction] | None = None,
+    handles: Mapping[str, object] | None = None,
+    lineage_observation_id: str | None = None,
+    table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
+    derived_band: DecisionBand | None = None,
+    derived_band_reason: str | None = None,
+    ratchet_missing: bool = False,
+    point_observations: Sequence[Observation] | None = None,
+    fo2_mode: Fo2Mode | None = None,
+) -> tuple[Residual, Observation | None]:
+    return _compile_residual_with_lineage(
+        reference,
+        engine,
+        context=context,
+        prediction=prediction,
+        comparison_ids=comparison_ids,
+        predict=predict,
+        handles=handles,
+        lineage_observation_id=lineage_observation_id,
+        table_index=table_index,
+        derived_band=derived_band,
+        derived_band_reason=derived_band_reason,
+        ratchet_missing=ratchet_missing,
+        point_observations=point_observations,
+        fo2_mode=fo2_mode,
+    )
+
+
 def _check_refs(gates: GateOutcome, reason: RefusalReason) -> tuple[str, ...]:
     if not gates.passed and gates.reason is reason and gates.primary_check:
         return (gates.primary_check,)
@@ -14196,12 +14593,30 @@ def _score_store_with_decisions(
     residuals: list[Residual] | None = [] if _stream is None else None
     candidates: dict[str, Observation] = {}
     empirical_ids = comparison_ids
+    lineage_resolver = _ScoringLineageResolver(live_context)
     started = time.monotonic()
     last_progress = started
     done = 0
     total = sum(
         prepared.series_point_counts.get(obs.observation_id, 1) for obs in refs
     ) * max(len(engine_set), 1)
+
+    def report_progress_if_due() -> None:
+        nonlocal last_progress
+        now = time.monotonic()
+        if now - last_progress < 60:
+            return
+        if _stream is not None:
+            _stream.flush()
+        progress = f"score progress {done}/{total} residuals"
+        if _stream is not None:
+            progress += f" written={_stream.count}"
+        print(
+            f"{progress} {int(now - started)}s host={context.hostname}",
+            flush=True,
+        )
+        last_progress = now
+
     residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
@@ -14270,12 +14685,19 @@ def _score_store_with_decisions(
                             if _shard_failure_reason is not None
                             else predict
                         )
-                        if (
+                        lineage_id = (
+                            obs.observation_id
+                            if point.observation_id != obs.observation_id
+                            else None
+                        )
+                        diagnostic_prediction = (
                             diagnostic
                             and point.observation_id not in fusion_diagnostic_ids
                             and predict is None
                             and not compilation_thermo
-                        ):
+                        )
+                        prediction = None
+                        if diagnostic_prediction:
                             prediction = EnginePrediction(
                                 engine=engine,
                                 channel=ENGINE_CHANNELS[engine],
@@ -14330,7 +14752,7 @@ def _score_store_with_decisions(
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(
                             engine, point
                         )
-                        residual, candidate = compile_residual(
+                        residual, candidate = _compile_residual_with_lineage(
                             point,
                             engine,
                             context=live_context,
@@ -14338,11 +14760,7 @@ def _score_store_with_decisions(
                             comparison_ids=comparison_ids,
                             predict=scoring_predict,
                             handles=resolved_handles,
-                            lineage_observation_id=(
-                                obs.observation_id
-                                if point.observation_id != obs.observation_id
-                                else None
-                            ),
+                            lineage_observation_id=lineage_id,
                             table_index=table_index,
                             derived_band=derived_band,
                             derived_band_reason=derived_band_reason,
@@ -14355,6 +14773,7 @@ def _score_store_with_decisions(
                                 if intrinsic_redox_activity
                                 else None
                             ),
+                            _source_relation_resolver=lineage_resolver,
                         )
                         if _shard_failure_reason is not None:
                             residual = _score_failed_shard_residual(
@@ -14369,17 +14788,17 @@ def _score_store_with_decisions(
                             assert residuals is not None
                             residuals.append(residual)
                         else:
-                            sort_order = (
+                            base_sort_order = (
                                 obs.observation_id,
                                 point_index,
                                 engine_order[engine],
                                 0,
                             )
-                            if sort_order not in _skip_sort_orders:
+                            if base_sort_order not in _skip_sort_orders:
                                 _stream.append(
                                     residual,
                                     candidate,
-                                    sort_order=sort_order,
+                                    sort_order=base_sort_order,
                                 )
                         if (
                             residual.fo2_mode is Fo2Mode.SHARED_LADDER
@@ -14424,17 +14843,17 @@ def _score_store_with_decisions(
                                 assert residuals is not None
                                 residuals.append(intrinsic_residual)
                             else:
-                                sort_order = (
+                                intrinsic_sort_order = (
                                     obs.observation_id,
                                     point_index,
                                     engine_order[engine],
                                     1,
                                 )
-                                if sort_order not in _skip_sort_orders:
+                                if intrinsic_sort_order not in _skip_sort_orders:
                                     _stream.append(
                                         intrinsic_residual,
                                         intrinsic_candidate,
-                                        sort_order=sort_order,
+                                        sort_order=intrinsic_sort_order,
                                     )
                             if intrinsic_candidate is not None and _stream is None:
                                 candidates[intrinsic_candidate.observation_id] = (
@@ -14443,19 +14862,7 @@ def _score_store_with_decisions(
                         if candidate is not None and _stream is None:
                             candidates[candidate.observation_id] = candidate
                         done += 1
-                        now = time.monotonic()
-                        if now - last_progress >= 60:
-                            if _stream is not None:
-                                _stream.flush()
-                            progress = f"score progress {done}/{total} residuals"
-                            if _stream is not None:
-                                progress += f" written={_stream.count}"
-                            print(
-                                f"{progress} {int(now - started)}s "
-                                f"host={context.hostname}",
-                                flush=True,
-                            )
-                            last_progress = now
+                        report_progress_if_due()
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
             close_battery_engine_handles,
@@ -14763,6 +15170,7 @@ def _score_store_to_jsonl(
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
     workers: int = 1,
+    compact_static_refusals: bool = False,
 ) -> tuple[int, _ResidualReportMetadata]:
     """Score directly to a sorted ``.partial`` JSONL without retaining rows."""
 
@@ -14770,7 +15178,11 @@ def _score_store_to_jsonl(
         raise ValueError("workers must be at least 1")
     if workers > 1 and handles:
         raise ValueError("spawned score workers open their own engine handles")
-    stream = _ResidualJsonlStream(path, root=root)
+    stream = _ResidualJsonlStream(
+        path,
+        root=root,
+        compact_static_refusals=compact_static_refusals,
+    )
     from simulator.engine_cache import (
         engine_cache_counters,
         engine_cache_runtime_identities,
@@ -14951,6 +15363,7 @@ def _score_store_to_jsonl(
             engine_cache_counters=cache_counters,
             engine_cache_runtime_identities=cache_runtime_identities,
             shard_failures=tuple(shard_failures),
+            static_refusals=stream.static_refusals,
         )
     finally:
         stream.close()
@@ -15048,6 +15461,12 @@ def dumps_store_stamp(stamp: Mapping[str, object]) -> str:
         "queue": int(stamp["queue"]),
         "hard_issues": int(stamp["hard_issues"]),
     }
+    if stamp.get("static_refusals"):
+        payload["static_refusals"] = [
+            dict(row)
+            for row in stamp["static_refusals"]
+            if isinstance(row, Mapping)
+        ]
     return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
 
 
@@ -15214,6 +15633,7 @@ class _ResidualReportMetadata:
     engine_cache_counters: Mapping[str, Mapping[str, object]] | None = None
     engine_cache_runtime_identities: Mapping[str, str] | None = None
     shard_failures: tuple[Mapping[str, object], ...] = ()
+    static_refusals: Sequence[Mapping[str, object]] = ()
 
 
 class _ResidualJsonlRows:
@@ -18774,13 +19194,17 @@ def headline_summary_payload(
     records: Sequence[Mapping[str, object]],
     *,
     store_stamp: Mapping[str, object] | None = None,
+    static_refusals: Sequence[Mapping[str, object]] = (),
 ) -> dict[str, object]:
-    return {
+    payload: dict[str, object] = {
         "kind": HEADLINE_SUMMARY_KIND,
-        "schema_version": "v1",
+        "schema_version": "v1.1" if static_refusals else "v1",
         "store": None if store_stamp is None else dict(store_stamp),
         "records": [dict(record) for record in records],
     }
+    if static_refusals:
+        payload["static_refusals"] = [dict(row) for row in static_refusals]
+    return payload
 
 
 def write_headline_summary_json(
@@ -19942,15 +20366,18 @@ class _ResidualJsonlStream:
         *,
         root: Path | None = None,
         sort_on_finalize: bool = True,
+        compact_static_refusals: bool = False,
     ) -> None:
         self.sort_on_finalize = sort_on_finalize
         self.partial_path = path.with_name(path.name + ".partial")
+        self.root = root or REPO_ROOT
+        self.compact_static_refusals = compact_static_refusals
+        self.static_refusal_counts: Counter[tuple[str, str, str]] = Counter()
+        self.store_stamp = derive_store_stamp(self.root)
         path.parent.mkdir(parents=True, exist_ok=True)
         self.file = self.partial_path.open("wb")
         self.file.write(
-            (dumps_store_stamp(derive_store_stamp(root or REPO_ROOT)) + "\n").encode(
-                "utf-8"
-            )
+            (dumps_store_stamp(self.store_stamp) + "\n").encode("utf-8")
         )
         self.file.flush()
         self._temporary: tempfile.TemporaryDirectory | None = None
@@ -20004,6 +20431,20 @@ class _ResidualJsonlStream:
         self.count = 0
         self._last_flush = time.monotonic()
 
+    @property
+    def static_refusals(self) -> list[dict[str, object]]:
+        return [
+            {
+                "engine": engine,
+                "rail": rail,
+                "reason": reason,
+                "count": count,
+            }
+            for (engine, rail, reason), count in sorted(
+                self.static_refusal_counts.items()
+            )
+        ]
+
     def append(
         self,
         residual: Residual,
@@ -20011,6 +20452,11 @@ class _ResidualJsonlStream:
         *,
         sort_order: tuple[str, int, int, int] | None = None,
     ) -> None:
+        if self.compact_static_refusals:
+            static_key = _static_refusal_summary_key(residual)
+            if static_key is not None:
+                self.static_refusal_counts[static_key] += 1
+                return
         line = dumps_residual_line(residual, candidate).encode("utf-8")
         numeric = residual.numeric
         decision_band = None if numeric is None else numeric.decision_band
@@ -20141,6 +20587,7 @@ class _ResidualJsonlStream:
         report_aggregate = _ScorePayloadAccumulator(
             context,
             engines,
+            static_refusals=self.static_refusals,
             typed_family_band_values=self.band_values,
             typed_headline_band_values=self.headline_band_values,
             typed_tier_band_values=self.tier_band_values,
@@ -20153,7 +20600,12 @@ class _ResidualJsonlStream:
             ) as output:
                 temporary_path = Path(output.name)
                 with self.partial_path.open("rb") as source:
-                    output.write(source.readline())
+                    stamp = dict(self.store_stamp)
+                    if self.static_refusals:
+                        stamp["static_refusals"] = self.static_refusals
+                    output.write(
+                        (dumps_store_stamp(stamp) + "\n").encode("utf-8")
+                    )
                     rows = self._database.execute(
                         "SELECT offset, band_value, numeric_value "
                         "FROM residual_order "
@@ -20547,6 +20999,7 @@ class _ScorePayloadAccumulator:
         context: ScoreContext,
         engines: Sequence[Engine],
         *,
+        static_refusals: Sequence[Mapping[str, object]] = (),
         typed_family_band_values: Mapping[
             tuple[str, str, str, str], set[str]
         ] | None = None,
@@ -20562,6 +21015,7 @@ class _ScorePayloadAccumulator:
         self.context = context
         self.engines = tuple(engines)
         self.engine_names = {engine.value for engine in engines}
+        self.static_refusals = tuple(dict(row) for row in static_refusals)
         self._row_metadata_cache: dict[
             str,
             tuple[
@@ -21153,7 +21607,9 @@ class _ScorePayloadAccumulator:
 
     def summary_payload(self, store_stamp: Mapping[str, object] | None) -> dict[str, object]:
         return headline_summary_payload(
-            self.headline_records(), store_stamp=store_stamp
+            self.headline_records(),
+            store_stamp=store_stamp,
+            static_refusals=self.static_refusals,
         )
 
 

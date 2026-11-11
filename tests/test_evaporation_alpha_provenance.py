@@ -367,7 +367,6 @@ def test_sossi_and_wetzel_withdrawals_reach_runtime_and_user_facing_docs():
         for path in (
             "docs/chemistry-methods.md",
             "docs/model-limitations.md",
-            "docs/lab-validation-whitepaper.md",
             "docs/references/index.html",
             "docs/references/topics/evaporation.html",
         )

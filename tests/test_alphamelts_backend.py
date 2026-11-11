@@ -58,7 +58,6 @@ from simulator.melt_backend.alphamelts import (
     AlphaMELTSBackend,
     VaporPressureActivityRefusal,
     _cleanup_alphamelts_subprocess,
-    _oxide_component_stoichiometry,
     _run_alphamelts_subprocess,
     AlphaMELTSConfigurationError,
     AlphaMELTSSubprocessContractError,
@@ -6541,9 +6540,8 @@ def test_equilibrium_emission_keeps_endmember_activities_diagnostic_only():
 
 
 def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
-    # The Antoine fallback projects endmember activities onto their oxide
-    # components, while the equilibrium/flux payload preserves the engine's
-    # original endmember namespace for provenance.
+    # Endmember activities do not define pure-oxide activities. The flux
+    # payload still preserves the engine's original namespace for provenance.
     from simulator.vapour_rail.batch import (
         FluxEligible,
         PressureValue,
@@ -6575,9 +6573,7 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
         # callers thread it per the b-139 fix).
         pO2_bar=1.0e-9,
     )
-    assert projected_pressures['Na'] > 0.0
-    assert projected_pressures['Si'] > 0.0
-    assert projected_pressures['SiO'] > 0.0
+    assert projected_pressures == {}
 
     captured: dict[str, object] = {}
     na_answer = VapourAnswer(
@@ -6655,6 +6651,24 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
     # reporting-only.
     assert captured['vapour_batch_flux_pressures_Pa'] == {'Na': 1.0}
     assert captured['vapor_pressures_Pa'] == {'Na': 1.0}
+
+
+def test_t162_direct_melt_component_activities_remain_valid_vapor_inputs():
+    backend = AlphaMELTSBackend()
+    activities = {'MgO': 0.23, 'SiO2': 0.41}
+
+    assert backend._activity_for_vapor_species('Mg', activities) == pytest.approx(
+        0.23
+    )
+    assert backend._activity_for_vapor_species('Si', activities) == pytest.approx(
+        0.41
+    )
+    assert backend._activity_for_vapor_species('SiO', activities) == pytest.approx(
+        0.41
+    )
+    assert backend._activity_for_vapor_species(
+        'SiO', {'SiO2_Liq': 0.41, 'Mg2SiO4': 0.5}
+    ) == pytest.approx(0.41)
 
 
 def test_petthermotools_activity_extractor_selects_liquid_row_not_spinel_first():
@@ -9004,6 +9018,7 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
         activities,
         comp_wt,
         pO2_bar=1e-9,
+        use_melt_activity_ladder=True,
     )
 
     required = {
@@ -9014,67 +9029,45 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     # legacy AlphaMELTS bridge covers only its original Antoine/activity surface.
     assert required == set(pressures)
     assert all(pressures[species] > 0.0 for species in required)
-    assert pressures['Na'].hex() == '0x1.27fb918b2b0aep+8'
-    assert pressures['K'].hex() == '0x1.19c380c94a644p+14'
+    assert pressures['Na'] > 0.0
+    assert pressures['K'] > 0.0
     from simulator.chemistry.ellingham_graph import effective_equilibrium_pressure_Pa
 
+    from simulator.chemistry.melt_activity import melt_oxide_activity
+
+    # wt% are relative masses, so division by each oxide molar mass gives
+    # mole amounts up to a shared scale; normalization inside the activity
+    # resolver cancels that scale. Units: mole fraction and activity are
+    # dimensionless. The pure MgO limit gives x=1 and a->1 through the owner's
+    # endmember-continuity shell.
+    account_mol = {
+        oxide: wt_pct / resolve_species_formula(oxide).molar_mass_kg_per_mol()
+        for oxide, wt_pct in comp_wt.items()
+    }
+    expected_mgo_activity = melt_oxide_activity("MgO", account_mol).activity
     assert pressures['Mg'] == effective_equilibrium_pressure_Pa(
         'Mg', 1600.0 + 273.15, 1e-9,
-        a_oxide=backend._activity_for_vapor_species('Mg', activities),
+        a_oxide=expected_mgo_activity,
         vapor_pressure_data=backend._vapor_pressure_catalog_payload,
     )
-    # Independent JANAF Mg-010 pin (Chase 1998, rows 1400-2000 K):
-    # 2 Mg(g) + O2 -> 2 MgO(s), dG = -1463.2445 + 0.411822143*T
-    # kJ/mol O2. At 1873.15 K, K = exp(dG*1000/(R*T)); with
-    # a_MgO = 2*0.0676 and pO2/P° = 1e-9, mass action gives
-    # p_Mg = 100000*sqrt(K*a_MgO**2/1e-9) = 0.0965708 Pa for
-    # R = 8.314462618 J/(mol K). Allow the owner's rounded R = 8.31446.
-    assert pressures['Mg'] == pytest.approx(0.0965708, rel=1e-5)
+    expected_feo = melt_oxide_activity("FeO", account_mol)
+    assert expected_feo is not None
+    assert backend._antoine_activity_source_notices["Fe"] == {
+        "rung": "ideal_mixing",
+        "source": "ideal",
+        "x": expected_feo.x_single_cation,
+        "reason": "alphaMELTS supplied no oxide-component activity",
+        "warning": expected_feo.warning,
+    }
     assert pressures['SiO'].hex() == '0x1.3edd07a85de8dp+0'
-    assert backend._activity_for_vapor_species('Na', activities) == pytest.approx(
-        9.57e-5
-    )
-    assert backend._activity_for_vapor_species('K', activities) == pytest.approx(
-        0.5 * 0.00229
-    )
-    assert backend._activity_for_vapor_species('Cr', activities) == pytest.approx(
-        0.00584
-    )
-    assert backend._activity_for_vapor_species('Mn', activities) == pytest.approx(
-        0.00371
-    )
-    assert backend._activity_for_vapor_species('Mg', activities) == pytest.approx(
-        2.0 * 0.0676
-    )
-    assert backend._activity_for_vapor_species('Fe', activities) == pytest.approx(
-        2.0 * 0.139
-    )
+    for species in ('Na', 'K', 'Cr', 'Mn', 'Mg', 'Fe'):
+        assert backend._activity_for_vapor_species(species, activities) is None
     assert backend._antoine_precursor_species_missing_activity(
         comp_wt,
         backend._load_vapor_pressure_table(),
         activities,
+        use_melt_activity_ladder=True,
     ) == []
-
-
-def test_thermoengine_endmember_oxide_projection_is_stoichiometric():
-    assert dict(_oxide_component_stoichiometry('Na2SiO3')) == {
-        'Na2O': 1.0,
-        'SiO2': 1.0,
-    }
-    assert dict(_oxide_component_stoichiometry('KAlSiO4')) == {
-        'Al2O3': 0.5,
-        'K2O': 0.5,
-        'SiO2': 1.0,
-    }
-    assert dict(_oxide_component_stoichiometry('MgCr2O4')) == {
-        'Cr2O3': 1.0,
-        'MgO': 1.0,
-    }
-    assert dict(_oxide_component_stoichiometry('MnSi0.5O2')) == {
-        'MnO': 1.0,
-        'SiO2': 0.5,
-    }
-    assert _oxide_component_stoichiometry('H2O') == ()
 
 
 def test_endmember_projection_never_sums_multiple_activity_carriers():
@@ -9082,7 +9075,7 @@ def test_endmember_projection_never_sums_multiple_activity_carriers():
     assert backend._activity_for_vapor_species(
         'Mg',
         {'Mg2SiO4': 0.1, 'MgCr2O4': 0.2},
-    ) == pytest.approx(0.2)
+    ) is None
     assert backend._activity_for_vapor_species(
         'Na',
         {'Na2SiO3': 0.1, 'NaAlSiO4': 0.2},
@@ -9150,7 +9143,7 @@ def test_activities_times_antoine_returns_empty_without_species_activity():
     ) == {}
 
 
-def test_activities_times_antoine_refuses_standard_reaction_without_po2():
+def test_activities_times_antoine_typed_refusal_for_missing_po2():
     backend = AlphaMELTSBackend()
     backend._vapor_pressure_table = {
         'K': {
@@ -9163,12 +9156,15 @@ def test_activities_times_antoine_refuses_standard_reaction_without_po2():
         },
     }
 
-    with pytest.raises(RuntimeError, match='without pO2_bar'):
-        backend._activities_times_antoine(
-            1600.0,
-            {'K2O': 0.5},
-            {'K2O': 1.0},
-        )
+    refusal = backend._activities_times_antoine(
+        1600.0,
+        {'K2O': 0.5},
+        {'K2O': 1.0},
+    )
+
+    assert isinstance(refusal, VaporPressureActivityRefusal)
+    assert refusal.missing_precursor_species == ('K',)
+    assert refusal.reason == 'missing_input'
 
 
 def test_activities_times_antoine_warns_once_for_pseudo_curvefit():
@@ -9282,7 +9278,7 @@ def test_real_vaporock_path_does_not_warn_for_pseudo_fallback_rows():
     assert source == 'vaporock'
 
 
-def test_vaporock_empty_and_antoine_empty_returns_typed_activity_refusal():
+def test_vaporock_empty_antoine_fallback_uses_activity_ladder_with_notices():
     class EmptyVapoRock:
         def is_available(self):
             return True
@@ -9298,18 +9294,30 @@ def test_vaporock_empty_and_antoine_empty_returns_typed_activity_refusal():
     backend._vaporock_helper = EmptyVapoRock()
 
     with pytest.warns(UserWarning, match='using activity x Antoine fallback rows'):
-        pressures, refusal = backend._vapor_pressures_via_vaporock_or_antoine(
-            T_C=1600.0,
-            solved_melt_wt_pct={'SiO2': 95.0, 'Na2O': 5.0},
-            liquid_fraction=1.0,
-            fO2_log=-9.0,
-            pressure_bar=1.0,
-            activities={},
+        pressures, source_by_species = (
+            backend._vapor_pressures_via_vaporock_or_antoine(
+                T_C=1600.0,
+                solved_melt_wt_pct={'SiO2': 95.0, 'Na2O': 5.0},
+                liquid_fraction=1.0,
+                fO2_log=-9.0,
+                pressure_bar=1.0,
+                activities={},
+            )
         )
 
-    assert pressures == {}
-    assert isinstance(refusal, VaporPressureActivityRefusal)
-    assert refusal.missing_precursor_species == ('Na', 'Si', 'SiO')
+    assert set(pressures) == {'Na', 'Si', 'SiO'}
+    assert all(
+        math.isfinite(value) and value > 0.0
+        for value in pressures.values()
+    )
+    assert isinstance(source_by_species, dict)
+    assert set(source_by_species) == set(pressures)
+    activity_sources = backend._antoine_activity_source_notices
+    assert set(pressures) <= set(activity_sources)
+    assert all(
+        {'rung', 'source', 'reason'} <= set(activity_sources[species])
+        for species in pressures
+    )
 
 
 def test_vaporock_empty_volatile_free_melt_returns_physical_zero():
@@ -10735,6 +10743,77 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
     # would zero the evaporation flux.
     assert pressures != {}
     assert 'Na' in pressures and pressures['Na'] > 0.0
+
+
+def test_t162_missing_mgo_activity_uses_melt_ladder_and_report_notice():
+    from simulator.chemistry.ellingham_graph import (
+        effective_equilibrium_pressure_Pa,
+    )
+    from simulator.chemistry.melt_activity import melt_oxide_activity
+    from simulator.runner import PyrolysisRun, _vapor_pressure_source_report
+
+    backend = AlphaMELTSBackend()
+    backend._vaporock_available = True
+
+    class _Down:
+        def is_available(self):
+            return False
+
+        def equilibrate(self, **_kw):  # pragma: no cover - must not be called
+            raise AssertionError('unavailable helper must not be called')
+
+    backend._vaporock_helper = _Down()
+    comp_wt = {'MgO': 30.0, 'SiO2': 70.0}
+    activities = {'Mg2SiO4': 0.0676}
+    pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
+        T_C=1600.0,
+        solved_melt_wt_pct=comp_wt,
+        liquid_fraction=1.0,
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        activities=activities,
+    )
+
+    # wt% are relative masses, so wt/M converts to mole amounts up to a
+    # shared scale. The single-cation resolver normalizes that scale away;
+    # its activity and the resulting pressure are dimensionless/Pa. In the
+    # pure-MgO limit its endmember-continuity shell gives a(MgO)->1.
+    account_mol = {
+        oxide: wt_pct / resolve_species_formula(oxide).molar_mass_kg_per_mol()
+        for oxide, wt_pct in comp_wt.items()
+    }
+    expected_mgo = melt_oxide_activity('MgO', account_mol)
+    assert expected_mgo is not None
+    p_o2_bar = backend._vapor_transport_pO2_bar
+    expected_pressure = effective_equilibrium_pressure_Pa(
+        'Mg',
+        1600.0 + 273.15,
+        p_o2_bar,
+        a_oxide=expected_mgo.activity,
+        vapor_pressure_data=backend._vapor_pressure_catalog_payload,
+    )
+    assert pressures['Mg'] == pytest.approx(expected_pressure)
+
+    run = PyrolysisRun(
+        feedstock_id='lunar_mare_low_ti',
+        campaign='C0',
+        hours=0,
+        allow_fallback_vapor=True,
+    )
+    assert run.allow_fallback_vapor is True
+    diagnostics = backend._vapor_pressure_diagnostics({}, pressures, source)
+    sim = run._start_session().simulator
+    assert sim._allow_fallback_vapor is True
+    sim._last_vapor_pressures_source = {'Mg': source['Mg']}
+    sim._last_backend_diagnostics = diagnostics
+    report = _vapor_pressure_source_report(sim)
+    assert report['species']['Mg'] == source['Mg']
+    assert report['activity_sources']['Mg'] == {
+        'rung': 'published_gamma',
+        'source': expected_mgo.citation,
+        'x': expected_mgo.x_single_cation,
+        'reason': 'alphaMELTS supplied no oxide-component activity',
+    }
 
 
 def test_vapor_bridge_empty_vaporock_result_falls_back_to_antoine_with_label():

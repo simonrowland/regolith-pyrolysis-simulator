@@ -113,6 +113,13 @@ REFUSAL_CHEMICAL_POTENTIAL_CHANNEL = "refused_missing_channel_input"
 REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING = "refused_halide_reservoir_owner_missing"
 REFUSAL_SULFUR_RESERVOIR_OWNER_MISSING = "refused_sulfur_reservoir_owner_missing"
 REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING = "refused_channel_runtime_owner_missing"
+# b-122: a unity-gamma activity the coefficient table classifies as a lower
+# bound must not be published as PressureUpperBound. That label understates
+# volatilization. The pressure quantity is refused; the activity answer still
+# carries the lower-bound classification.
+REFUSAL_ACTIVITY_LOWER_BOUND_NOT_UPPER = (
+    "activity_lower_bound_not_pressure_upper_bound"
+)
 
 DEFAULT_SOURCE_ACCOUNT = "process.cleaned_melt"
 DEFAULT_SOLVE_GROUP_PREFIX = "u0_v:"
@@ -1599,16 +1606,38 @@ def refusal_closure(
             # FluxEligible (status/acquisition/certification strip authority).
             # A diagnostic alpha upper bound remains visible but non-debiting
             # both inside and outside the evaluator domain.
-            # INCOMING activity semantics (b-121/b-122): only a genuine Henrian
-            # activity bound (UPPER or LOWER) remains non-debiting; OOD gamma
-            # is status-bearing and flux-driving.
+            # b-121: OOD gamma is status-bearing and flux-driving.
+            # b-122: only an activity UPPER_BOUND stays non-debiting. A
+            # LOWER_BOUND (gamma>1 at a positive exponent, or a negative
+            # exponent reversing a gamma<=1 anchor) is refused here: P from
+            # that activity is a lower bound, and PressureUpperBound would
+            # understate volatilization.
+            if (
+                source_reaction_activity is not None
+                and source_reaction_activity.verdict
+                is ActivityVerdictKind.LOWER_BOUND
+            ):
+                derivation = source_reaction_activity.derivation
+                gamma_property = ""
+                if isinstance(derivation, Mapping):
+                    raw_property = derivation.get("gamma_property")
+                    if raw_property is not None:
+                        gamma_property = str(raw_property)
+                detail = (
+                    "unity-gamma activity is a lower bound on pressure"
+                    + (f" ({gamma_property})" if gamma_property else "")
+                    + "; refusing to report it as an upper bound"
+                )
+                return _make_refusal(
+                    rule,
+                    REFUSAL_ACTIVITY_LOWER_BOUND_NOT_UPPER,
+                    detail,
+                    source_reaction_activity=source_reaction_activity,
+                )
             activity_is_bound = (
                 source_reaction_activity is not None
                 and source_reaction_activity.verdict
-                in {
-                    ActivityVerdictKind.UPPER_BOUND,
-                    ActivityVerdictKind.LOWER_BOUND,
-                }
+                is ActivityVerdictKind.UPPER_BOUND
             )
             alpha_is_diagnostic_bound = (
                 alpha_authority_status == "diagnostic_upper_bound"

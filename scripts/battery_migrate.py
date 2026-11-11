@@ -5,15 +5,16 @@ Writes works, extract-v2 / observations-v2 siblings, the alias registry,
 migration-queue.yaml, and migration-report.md. Does not rewrite extract
 sources, generate residuals, or touch pins.
 
-The process exits 1 whenever hard_issues is non-zero, including on a
-healthy run against the long-standing baseline. Assert the printed
-hard_issues count against that baseline, not the exit status.
+Completed writes exit 0 even when the report contains known hard issues.
+Use --check-store to verify that regenerating from the current inputs would
+produce byte-identical derived-store files without changing the worktree.
 
-Landing a store change is three steps:
+Landing a store change is four steps:
 
 1. .venv/bin/python scripts/battery_migrate.py
 2. .venv/bin/python data/literature/build_index.py --write-store-summary
-3. the battery gate
+3. .venv/bin/python scripts/battery_migrate.py --check-store
+4. the battery gate
 
 ``python -m simulator.battery.migrate`` is the same CLI.
 """
