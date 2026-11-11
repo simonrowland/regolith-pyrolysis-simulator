@@ -60,6 +60,10 @@ from simulator.core import (
     PoisonedHourError,
     read_high_t_melt_activity_fallback_notice,
 )
+from simulator.evaporation import (
+    WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR,
+    WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE,
+)
 from simulator.silent_zero import CATEGORY_PROVEN_ZERO, ZeroBecause
 from simulator.vapour_rail.instrumentation import (
     VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
@@ -2079,6 +2083,23 @@ def _carrier_record_is_below_bound_zero(record: Any, species: str) -> bool:
     return not _carrier_record_blocks_physical_zero(record)
 
 
+def _interval_physical_zero_reason(flux: Any) -> str:
+    """Whole-interval physical zero, or ``""``.
+
+    Producers set this only when the hour evaporates no species: no
+    liquid, a non-evaporation campaign, a frozen melt, the sub-400 K
+    floor, empty vapour inventory, or the pre-RG below-threshold seam.
+    A zero-net carrier is a computed 0 on the rate map, not this record.
+    """
+
+    record = getattr(flux, WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR, None)
+    if not isinstance(record, MappingABC):
+        return ""
+    if str(record.get("evidence") or "") != WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE:
+        return ""
+    return str(record.get("reason") or "").strip()
+
+
 def _physical_zero_evidence(flux: Any, species: str) -> str:
     """``authorized_zero`` or ``below_bound_zero``, or ``""`` when neither is on record.
 
@@ -2108,14 +2129,20 @@ def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyIn
       non-negative magnitude counts, including 0 and a rate at or below
       the 1e-12 kg/h melt-debit floor. Ledger resolution is not applied
       here. A numeric rate wins over a refusal flag on the same interval.
+      A zero-net carrier (``P_eq <= P_bulk``) is this class at rate 0.
     - ``physical_zero``: the species is absent from that map and the
-      interval carries a typed authorized zero (``pressure.kind``
-      ``zero_by_physics`` with an eligible flux) or a typed below-bound
-      zero (``proven_below_threshold``, doctrine category 3).
+      interval carries typed evidence. Two forms. A whole-interval
+      record (``wall_supply_interval_physical_zero``, evidence
+      ``authorized_zero``) covers every absent species, including one
+      whose channel was copied and then discarded by the freeze or
+      campaign gate. A species-specific authorized zero
+      (``pressure.kind`` ``zero_by_physics`` with an eligible flux) or
+      below-bound zero (``proven_below_threshold``, doctrine category
+      3) covers that species when the interval record is absent.
     - ``unavailable``: every other positive-duration interval. Absence
       from a present map without that typed record is unavailable, never
-      zero. A missing flux map is unavailable. A typed refusal is
-      unavailable.
+      zero. A missing flux map is unavailable. A typed refusal without
+      an interval record is unavailable.
 
     A non-positive duration is ``outside_window``. It adds no mass and
     is not a gap.
@@ -2139,6 +2166,15 @@ def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyIn
             evidence="computed_rate",
         )
     flux = getattr(snapshot, "evap_flux", None)
+    # The interval record outranks a stale channel. It is set only when
+    # the hour evaporates nothing, so a pressure channel copied before
+    # the freeze or campaign return is not an unexplained omission.
+    interval_reason = _interval_physical_zero_reason(flux)
+    if interval_reason:
+        return _WallSupplyInterval(
+            _WALL_SUPPLY_PHYSICAL_ZERO,
+            evidence=f"interval_physical_zero:{interval_reason}",
+        )
     evidence = _physical_zero_evidence(flux, species)
     if evidence:
         return _WallSupplyInterval(_WALL_SUPPLY_PHYSICAL_ZERO, evidence=evidence)

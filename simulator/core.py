@@ -671,6 +671,8 @@ from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+    attach_wall_supply_interval_physical_zero,
+    evaporation_flux_for_campaign_hour,
     publish_wall_supply_on_flux,
 )
 from simulator.extraction import ExtractionMixin
@@ -15897,10 +15899,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Hertz-Knudsen-Langmuir: how fast each species leaves the melt.
         # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
         # Not during MRE (C5) — electrolysis produces O₂ at the anode.
-        evap_flux = EvaporationFlux()
         # Drop the previous hour before this hour's publisher runs. A
-        # non-evaporation campaign leaves the map empty.
+        # non-evaporation campaign leaves the rate map empty and stamps
+        # the interval physical zero, so the empty map is not a gap.
         self._wall_supply_computed_kg_hr = {}
+        self._wall_supply_interval_physical_zero = None
+        evap_flux = evaporation_flux_for_campaign_hour(
+            evaporation_campaign=evaporation_campaign,
+            host=self,
+        )
         capacity_result = None
         if evaporation_campaign:
             if (
@@ -16257,7 +16264,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         # Routing writes the supply map when it runs. This call is the
         # same writer: it covers a skipped route and does not scale an
-        # already published map a second time.
+        # already published map a second time. The interval zero is
+        # copied here, after condensation may have replaced the flux
+        # object, so a known non-evaporating hour still carries it.
+        attach_wall_supply_interval_physical_zero(evap_flux, self)
         publish_wall_supply_on_flux(
             evap_flux,
             getattr(self, "_wall_supply_computed_kg_hr", None),

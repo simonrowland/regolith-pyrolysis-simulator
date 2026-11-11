@@ -156,6 +156,12 @@ def project_publisher_vapour_rates(
     ``below_threshold_evaporation_flux``, so the two buckets cannot
     double-count. Only the published bucket can enter the debit, and
     only above the floor, which is the pre-existing melt-debit rule.
+
+    ``zero_net_evaporation_flux`` is a computed drive of zero
+    (``P_eq <= P_bulk``, or a series flux of zero). Those species enter
+    the supply at 0 and stay out of the debit. A positive number in
+    that bucket is not a rate. A species already stored from a
+    published or below-threshold bucket is left as that rate.
     """
 
     payload = diagnostic if isinstance(diagnostic, Mapping) else {}
@@ -211,6 +217,19 @@ def project_publisher_vapour_rates(
             continue
         gated = _cap_fe(name, float(raw) * factor, record=False)
         _store(name, gated, debit_eligible=False)
+    zero_net = payload.get("zero_net_evaporation_flux")
+    if isinstance(zero_net, Mapping):
+        for species, raw in zero_net.items():
+            name = str(species)
+            if name in supply:
+                continue
+            if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+                continue
+            rate = float(raw)
+            # Exact zero only. A positive value here would be a second
+            # publisher, and a negative value is not a computed supply.
+            if math.isfinite(rate) and rate == 0.0:
+                supply[name] = 0.0
     return ProjectedVapourRates(debit, supply, fe_allocation)
 
 
@@ -286,6 +305,96 @@ def publish_wall_supply_on_flux(
     published = wall_supply_rates_kg_hr(computed, debit_layer)
     flux.published_species_kg_hr = published
     return published
+
+
+# Dynamic attribute, not an EvaporationFlux field. Condensation keys off
+# species_kg_hr and carrier_authority_by_species; this evidence is read
+# only by the wall-supply interval classifier.
+WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR = "wall_supply_interval_physical_zero"
+WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE = "authorized_zero"
+# Whole-interval physical zeros. A zero-net carrier is not in this set:
+# that species' computed rate is 0 on the supply map, and a sibling the
+# publisher did not compute stays an omission.
+WALL_SUPPLY_INTERVAL_ZERO_REASONS = frozenset({
+    "zero_liquid",
+    "non_evaporation_campaign",
+    "frozen_before_evaporation",
+    "below_400K",
+    "proven_empty_inventory",
+    "pre_rg_below_effective_pressure",
+})
+
+
+def note_wall_supply_interval_physical_zero(
+    flux: Any,
+    *,
+    reason: str,
+    host: Any | None = None,
+) -> None:
+    """Record that this interval evaporates no species.
+
+    The snapshot writer copies the host record onto whatever flux
+    object is stored, including a condensation replacement. The
+    classifier then treats every species absent from that interval's
+    rate map as this physical zero. A computed rate on the same
+    interval is unchanged. Callers are the known non-evaporating
+    returns only. An unexplained omission must not call this.
+    """
+
+    token = str(reason).strip()
+    if token not in WALL_SUPPLY_INTERVAL_ZERO_REASONS:
+        raise ValueError(
+            "unknown wall-supply interval physical-zero reason "
+            f"{reason!r}"
+        )
+    record = {
+        "reason": token,
+        "evidence": WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE,
+    }
+    setattr(flux, WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR, dict(record))
+    if host is not None:
+        host._wall_supply_interval_physical_zero = dict(record)
+
+
+def evaporation_flux_for_campaign_hour(
+    *,
+    evaporation_campaign: bool,
+    host: Any | None = None,
+) -> EvaporationFlux:
+    """Flux object for one hour.
+
+    C5, MRE, C6, and C7 do not evaporate. The empty rate map is a
+    physical zero for every species, not a missing flux.
+    """
+
+    flux = EvaporationFlux()
+    if not evaporation_campaign:
+        note_wall_supply_interval_physical_zero(
+            flux,
+            reason="non_evaporation_campaign",
+            host=host,
+        )
+    return flux
+
+
+def attach_wall_supply_interval_physical_zero(flux: Any, host: Any) -> None:
+    """Copy the hour's interval zero onto the flux the snapshot keeps."""
+
+    record = getattr(host, "_wall_supply_interval_physical_zero", None)
+    if not isinstance(record, Mapping):
+        return
+    reason = str(record.get("reason") or "").strip()
+    evidence = str(record.get("evidence") or "")
+    if (
+        reason not in WALL_SUPPLY_INTERVAL_ZERO_REASONS
+        or evidence != WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE
+    ):
+        return
+    setattr(
+        flux,
+        WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR,
+        {"reason": reason, "evidence": evidence},
+    )
 
 
 def viscous_p_bulk_out_of_domain_diagnostic(
@@ -1595,8 +1704,10 @@ class EvaporationMixin:
         T_K = self.melt.temperature_C + 273.15
         flux = EvaporationFlux()
         # A previous hour's computed rates must not leak into a tick that
-        # returns before the publisher projection.
+        # returns before the publisher projection. The interval-zero
+        # record is the same: a later real flux must not inherit it.
         self._wall_supply_computed_kg_hr = {}
+        self._wall_supply_interval_physical_zero = None
         self._last_partial_melt_offgassing_diagnostic = {}
         if hasattr(self, "_last_langmuir_surface_oxygen"):
             del self._last_langmuir_surface_oxygen
@@ -1642,6 +1753,11 @@ class EvaporationMixin:
             self._last_vapour_batch_flux_overlay = {}
             self._last_vapour_batch_resolve_error = {}
             self._last_imcc_activity_shadow = {}
+            note_wall_supply_interval_physical_zero(
+                flux,
+                reason="zero_liquid",
+                host=self,
+            )
             return flux
 
         # VR-11: batch owns channel refusal, eligibility, and active membership.
@@ -1763,6 +1879,11 @@ class EvaporationMixin:
                 doctrine_category=CATEGORY_PROVEN_ZERO,
             )
             self._last_evaporation_flux_diagnostic = diagnostic
+            note_wall_supply_interval_physical_zero(
+                flux,
+                reason="proven_empty_inventory",
+                host=self,
+            )
             return flux
 
         if not vapor_pressures:
@@ -1781,6 +1902,11 @@ class EvaporationMixin:
                     'vapour_batch_flux_overlay': flux_overlay_report,
                     'vapour_batch': batch_report,
                 }
+                note_wall_supply_interval_physical_zero(
+                    flux,
+                    reason="below_400K",
+                    host=self,
+                )
                 return flux
             if (
                 effective_pressure_source.physical_zero_reason is not None
@@ -1790,6 +1916,11 @@ class EvaporationMixin:
                 # while the batch proves catalog pressure coverage. A refused
                 # or missing catalog channel still reaches fail-closed handling
                 # below (kernel_ok_empty split remains intact).
+                note_wall_supply_interval_physical_zero(
+                    flux,
+                    reason="pre_rg_below_effective_pressure",
+                    host=self,
+                )
                 return flux
             vapor_pressure_diagnostic = dict(
                 getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
@@ -1881,6 +2012,11 @@ class EvaporationMixin:
                 diagnostic,
             )
         if T_K < 400:  # Catalog pressure exists; thermal physical zero.
+            note_wall_supply_interval_physical_zero(
+                flux,
+                reason="below_400K",
+                host=self,
+            )
             return flux
         # b-149 instance 4: partial channel refusals. When some channels debit
         # and others are typed refusals, refused species drop out of
@@ -2158,6 +2294,15 @@ class EvaporationMixin:
                 # below-only hour is still projected below. Expanding the
                 # gate to that hour would ask for a liquid-fraction curve
                 # the published bucket never needed. Default setpoint: off.
+                # The published rates are not the supply: the melt is
+                # frozen, so this hour evaporates nothing. The empty map
+                # needs the interval record or the wall integral withholds
+                # every species for the whole run.
+                note_wall_supply_interval_physical_zero(
+                    flux,
+                    reason="frozen_before_evaporation",
+                    host=self,
+                )
                 flux.update_totals()
                 return flux
         below_fluxes: Mapping[str, Any] = {}

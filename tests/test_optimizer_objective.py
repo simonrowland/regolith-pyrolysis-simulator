@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import math
+from dataclasses import replace
 from types import SimpleNamespace
 from typing import Mapping
 
@@ -15,12 +16,18 @@ from simulator.cost_parameters import CostParameters
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import (
     EvaporationMixin,
+    attach_wall_supply_interval_physical_zero,
+    evaporation_flux_for_campaign_hour,
+    note_wall_supply_interval_physical_zero,
     project_publisher_vapour_rates,
     publish_wall_supply_on_flux,
 )
+import simulator.optimize.evaluate as evaluate_module
 from simulator.optimize.evaluate import (
     RunReference,
     ScoredResult,
+    _WallSupplyInterval,
+    _classify_wall_supply_interval,
     _optimizer_refused_flux_bounds,
     _run_reference,
 )
@@ -1759,10 +1766,19 @@ def _wall_bound_evap_flux(window: Mapping[str, object]) -> SimpleNamespace | Non
         fields["published_species_kg_hr"] = {
             str(species): float(kg) for species, kg in published
         }
-    if refused:
-        fields["carrier_authority_by_species"] = {
-            str(species): _transport_refusal_channel(str(species))
-            for species in refused
+    channels = {
+        str(species): _transport_refusal_channel(str(species))
+        for species in refused
+    }
+    for species in tuple(window.get("eligible_channels") or ()):
+        channels[str(species)] = _eligible_channel_record(str(species))
+    if channels:
+        fields["carrier_authority_by_species"] = channels
+    interval_zero = window.get("interval_physical_zero")
+    if interval_zero:
+        fields["wall_supply_interval_physical_zero"] = {
+            "reason": str(interval_zero),
+            "evidence": "authorized_zero",
         }
     return SimpleNamespace(**fields)
 
@@ -1927,6 +1943,29 @@ def _oracle_record_blocks_physical_zero(record: Mapping[str, object]) -> bool:
     return _oracle_transport_refusal(record)
 
 
+def _approx_kg(value: float):
+    """Supply comparison. Default ``abs=1e-12`` accepts 5e-13 kg as zero."""
+
+    return pytest.approx(value, rel=1e-9, abs=0.0)
+
+
+def _oracle_interval_physical_zero(flux: object) -> str:
+    """Whole-interval physical zero, written from the interval rule.
+
+    The hour evaporates no species. Every species absent from the rate
+    map contributes that zero. A computed rate still wins. This is not
+    the species-specific channel record, and it is not an unexplained
+    omission. The field name and the evidence token are the rule's.
+    """
+
+    record = getattr(flux, "wall_supply_interval_physical_zero", None)
+    if not isinstance(record, Mapping):
+        return ""
+    if str(record.get("evidence") or "") != "authorized_zero":
+        return ""
+    return str(record.get("reason") or "").strip()
+
+
 def _oracle_physical_zero_evidence(flux: object, species: str) -> str:
     """Typed physical-zero evidence, or ``""``.
 
@@ -1997,6 +2036,9 @@ def _oracle_complete_flux_supply_kg(
                 continue
             if species in rates:
                 totals[species] += float(rates[species]) * duration_h
+                observed.add(species)
+                continue
+            if _oracle_interval_physical_zero(flux):
                 observed.add(species)
                 continue
             if _oracle_physical_zero_evidence(flux, species):
@@ -2139,7 +2181,7 @@ def test_refused_wall_deposit_aggregate_follows_the_supply_bound(
     oracle_bounds = _oracle_complete_flux_supply_kg(snapshots, refused_names)
     assert set(produced_bounds) == set(oracle_bounds)
     for species, supply_kg in oracle_bounds.items():
-        assert produced_bounds[species] == pytest.approx(supply_kg)
+        assert produced_bounds[species] == _approx_kg(supply_kg)
     view = _wall_bound_view(channel, case)
     expected_entries = {
         (segment, species): float(kg)
@@ -2150,12 +2192,12 @@ def test_refused_wall_deposit_aggregate_follows_the_supply_bound(
     if view["entries"] is not None:
         assert set(view["entries"]) == set(expected_entries)
         for key, kg in expected_entries.items():
-            assert view["entries"][key] == pytest.approx(kg)
+            assert view["entries"][key] == _approx_kg(kg)
     if view["species_kg"] is not None:
         for species, kg in expected_totals.items():
-            assert view["species_kg"].get(species, 0.0) == pytest.approx(kg)
+            assert view["species_kg"].get(species, 0.0) == _approx_kg(kg)
         for species, _reason, _booking_kg, _supply in case["species"]:
-            assert view["species_kg"].get(species, 0.0) == pytest.approx(
+            assert view["species_kg"].get(species, 0.0) == _approx_kg(
                 expected_totals.get(species, 0.0)
             )
     for species, reason, booking_kg, supply in case["species"]:
@@ -2165,8 +2207,8 @@ def test_refused_wall_deposit_aggregate_follows_the_supply_bound(
             continue
         assert booking is not None
         assert booking["reason"] == reason
-        assert booking["deposit_kg"] == pytest.approx(booking_kg)
-        assert booking["supply_upper_bound_kg"] == pytest.approx(supply)
+        assert booking["deposit_kg"] == _approx_kg(booking_kg)
+        assert booking["supply_upper_bound_kg"] == _approx_kg(supply)
         assert species in booking["refusal_reason"]
         if reason == _WALL_BOUND_UPPER:
             assert booking["flag"] == _WALL_BOUND_UPPER
@@ -2177,17 +2219,17 @@ def test_refused_wall_deposit_aggregate_follows_the_supply_bound(
         if priced is not None and supply is not None:
             # deposit_wall,i <= supply_i, and the scored mass is the booking.
             assert priced <= float(supply) + 1.0e-12
-            assert priced == pytest.approx(float(booking_kg))
+            assert priced == _approx_kg(float(booking_kg))
             if case["charge"] is not None:
                 resolution = objective_module._mass_balance_ledger_resolution_kg(
                     float(case["charge"])
                 )
                 if float(supply) <= resolution:
-                    assert priced == pytest.approx(0.0)
+                    assert priced == _approx_kg(0.0)
                 else:
-                    assert priced == pytest.approx(float(supply))
+                    assert priced == _approx_kg(float(supply))
         if view.get("zone_kg") is not None and booking_kg is not None:
-            assert view["zone_kg"].get(species, 0.0) == pytest.approx(
+            assert view["zone_kg"].get(species, 0.0) == _approx_kg(
                 float(booking_kg)
             )
         if (
@@ -2328,6 +2370,7 @@ def _interval_flux_snapshot(
     committed: Mapping[str, float] | None = None,
     publish: bool = True,
     unavailable: bool = False,
+    interval_physical_zero: str | None = None,
 ) -> SimpleNamespace:
     if unavailable:
         return SimpleNamespace(hour=hour, duration_h=duration_h, evap_flux=None)
@@ -2346,6 +2389,11 @@ def _interval_flux_snapshot(
         }
     if records:
         fields["carrier_authority_by_species"] = dict(records)
+    if interval_physical_zero:
+        fields["wall_supply_interval_physical_zero"] = {
+            "reason": interval_physical_zero,
+            "evidence": "authorized_zero",
+        }
     return SimpleNamespace(
         hour=hour,
         duration_h=duration_h,
@@ -2682,15 +2730,15 @@ def test_publisher_projection_keeps_every_computed_rate(
     )
     expected_supply = _independent_supply_rate(rate, liquid)
     expected_debit = _independent_debit_rate(rate, bucket, liquid)
-    assert projected.supply_kg_hr[species] == pytest.approx(expected_supply)
+    assert projected.supply_kg_hr[species] == _approx_kg(expected_supply)
     assert set(projected.supply_kg_hr) == {species}
     if expected_debit is None:
         assert species not in projected.debit_kg_hr
     else:
-        assert projected.debit_kg_hr[species] == pytest.approx(expected_debit)
+        assert projected.debit_kg_hr[species] == _approx_kg(expected_debit)
         assert set(projected.debit_kg_hr) == {species}
     # Both buckets naming one rate must not sum it.
-    assert projected.supply_kg_hr[species] == pytest.approx(expected_supply)
+    assert projected.supply_kg_hr[species] == _approx_kg(expected_supply)
 
     flux = SimpleNamespace(species_kg_hr=dict(projected.debit_kg_hr))
     publish_wall_supply_on_flux(
@@ -2699,7 +2747,7 @@ def test_publisher_projection_keeps_every_computed_rate(
         debit_kg_hr=projected.debit_kg_hr,
     )
     assert flux.species_kg_hr == projected.debit_kg_hr
-    assert flux.published_species_kg_hr[species] == pytest.approx(expected_supply)
+    assert flux.published_species_kg_hr[species] == _approx_kg(expected_supply)
 
     bounds = _optimizer_refused_flux_bounds(
         (
@@ -2712,7 +2760,7 @@ def test_publisher_projection_keeps_every_computed_rate(
         (species,),
         campaigns_elapsed=1.0,
     )
-    assert bounds[species] == pytest.approx(expected_supply)
+    assert bounds[species] == _approx_kg(expected_supply)
 
     if expected_supply <= _DEBIT_FLOOR_KG_HR:
         # Mutation: the old publication gate. Dropping the sub-floor
@@ -2898,7 +2946,7 @@ def test_all_subthreshold_hours_still_return_a_supply_bound() -> None:
         ("SiO",),
         campaigns_elapsed=1.0,
     )
-    assert bounds["SiO"] == pytest.approx(1.0e-12)
+    assert bounds["SiO"] == _approx_kg(1.0e-12)
     assert bounds["SiO"] > objective_module._mass_balance_ledger_resolution_kg(1.0)
 
 
@@ -2910,6 +2958,8 @@ _WALL_SUPPLY_INTERVAL_KINDS = (
     "computed_below_threshold",
     "authorized_zero",
     "below_bound_zero",
+    "interval_physical_zero",
+    "interval_physical_zero_with_channel",
     "refused",
     "absent_no_record",
     "absent_flux_map",
@@ -2922,10 +2972,17 @@ _WALL_SUPPLY_WINDOWS = (
     ("computed_below_threshold",),
     ("authorized_zero",),
     ("below_bound_zero",),
+    ("interval_physical_zero",),
+    ("interval_physical_zero_with_channel",),
     ("refused",),
     ("absent_no_record",),
     ("absent_flux_map",),
     ("computed_above_threshold", "absent_no_record"),
+    ("computed_above_threshold", "interval_physical_zero"),
+    ("interval_physical_zero_with_channel", "computed_above_threshold"),
+    ("computed_below_threshold", "interval_physical_zero"),
+    ("interval_physical_zero", "absent_no_record"),
+    ("interval_physical_zero", "refused"),
     ("computed_above_threshold", "computed_below_threshold"),
     ("computed_below_threshold", "authorized_zero"),
     ("computed_below_threshold", "below_bound_zero"),
@@ -2958,6 +3015,18 @@ def _authorized_zero_record(species: str) -> dict[str, object]:
     }
 
 
+def _eligible_channel_record(species: str) -> dict[str, object]:
+    return {
+        "species_id": species,
+        "pressure": {"kind": "value", "pa": 1.0},
+        "flux": {
+            "kind": "eligible",
+            "alpha_ref": f"alpha:{species}",
+            "reaction_id": "test",
+        },
+    }
+
+
 def _below_bound_zero_record(species: str) -> dict[str, object]:
     return {
         "species_id": species,
@@ -2978,6 +3047,7 @@ def _supply_kind_snapshot(
         return SimpleNamespace(hour=hour, duration_h=1.0, evap_flux=None)
     rates: dict[str, float] = {sibling: _WALL_SUPPLY_SIBLING_KG_HR}
     records: dict[str, object] = {}
+    interval_zero: str | None = None
     if kind == "computed_above_threshold":
         rates[species] = _WALL_SUPPLY_ABOVE_KG_HR
     elif kind == "computed_below_threshold":
@@ -2988,13 +3058,27 @@ def _supply_kind_snapshot(
         records[species] = _authorized_zero_record(species)
     elif kind == "below_bound_zero":
         records[species] = _below_bound_zero_record(species)
+    elif kind == "interval_physical_zero":
+        # C5 / zero-liquid shape: empty of this species, no channel.
+        interval_zero = "non_evaporation_campaign"
+    elif kind == "interval_physical_zero_with_channel":
+        # Frozen hour: the batch channel was copied, then the gate
+        # discarded the rate. The interval record still covers it.
+        records[species] = _eligible_channel_record(species)
+        interval_zero = "frozen_before_evaporation"
     elif kind == "refused":
         records[species] = _transport_refusal_channel(species)
     elif kind == "absent_no_record":
         pass
     else:
         raise AssertionError(kind)
-    return _interval_flux_snapshot(hour, 1.0, rates, records or None)
+    return _interval_flux_snapshot(
+        hour,
+        1.0,
+        rates,
+        records or None,
+        interval_physical_zero=interval_zero,
+    )
 
 
 def _supply_window_snapshots(
@@ -3015,7 +3099,13 @@ def _kind_contribution_kg(kind: str) -> float | None:
         return _WALL_SUPPLY_ABOVE_KG_HR
     if kind == "computed_below_threshold":
         return _WALL_SUPPLY_BELOW_KG_HR
-    if kind in {"authorized_zero", "below_bound_zero", "explicit_zero"}:
+    if kind in {
+        "authorized_zero",
+        "below_bound_zero",
+        "explicit_zero",
+        "interval_physical_zero",
+        "interval_physical_zero_with_channel",
+    }:
         return 0.0
     if kind in {"refused", "absent_no_record", "absent_flux_map"}:
         return None
@@ -3052,7 +3142,7 @@ def _assert_supply_map(
     }
     assert set(bounds) == set(expected)
     for name, kg in expected.items():
-        assert bounds[name] == pytest.approx(kg)
+        assert bounds[name] == _approx_kg(kg)
 
 
 def _mutated_interval_kind(kind: str) -> str:
@@ -3068,6 +3158,8 @@ def _mutated_interval_kind(kind: str) -> str:
         "computed_below_threshold",
         "authorized_zero",
         "below_bound_zero",
+        "interval_physical_zero",
+        "interval_physical_zero_with_channel",
     }:
         return "absent_no_record"
     if kind in {"refused", "absent_no_record"}:
@@ -3160,8 +3252,265 @@ def test_wall_supply_interval_contributes_exactly_one_class(
         mutated_sibling_kg,
     )
     # The mutated class is a different supply. Keeping the unmutated
-    # number would fail this test.
+    # number would fail this test. Swapping the fixture kind does not
+    # show that a classifier which floors a subthreshold rate to 0 is
+    # rejected; that mutation is the next test.
     assert mutated_species_kg != species_kg
+
+
+def test_subthreshold_floor_mutation_fails_the_supply_oracle(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Replacing a 5e-13 kg/h computed rate with 0 fails the oracle.
+
+    The mutation is inside the classifier, not the fixture. Default
+    pytest absolute tolerance 1e-12 would treat 5e-13 as equal to 0.
+    """
+
+    species = "SiO"
+    sibling = "Mg"
+    window = ("computed_below_threshold",)
+    snapshots = _supply_window_snapshots(species, sibling, window)
+    live = _optimizer_refused_flux_bounds(
+        snapshots,
+        (species, sibling),
+        campaigns_elapsed=1.0,
+    )
+    oracle = _oracle_complete_flux_supply_kg(snapshots, (species, sibling))
+    _assert_supply_map(live, species, sibling, oracle[species], oracle[sibling])
+    assert oracle[species] == _approx_kg(_WALL_SUPPLY_BELOW_KG_HR)
+    assert live[species] != _approx_kg(0.0)
+
+    real = _classify_wall_supply_interval
+
+    def floor_subthreshold(snapshot: object, name: str) -> _WallSupplyInterval:
+        interval = real(snapshot, name)
+        if (
+            interval.kind == "computed"
+            and interval.rate_kg_hr is not None
+            and interval.rate_kg_hr <= _DEBIT_FLOOR_KG_HR
+        ):
+            return replace(interval, rate_kg_hr=0.0)
+        return interval
+
+    monkeypatch.setattr(
+        evaluate_module,
+        "_classify_wall_supply_interval",
+        floor_subthreshold,
+    )
+    mutated = _optimizer_refused_flux_bounds(
+        snapshots,
+        (species, sibling),
+        campaigns_elapsed=1.0,
+    )
+    assert mutated[species] == 0.0
+    with pytest.raises(AssertionError):
+        _assert_supply_map(
+            mutated,
+            species,
+            sibling,
+            oracle[species],
+            oracle[sibling],
+        )
+
+
+def test_dropping_interval_physical_zero_fails_the_supply_oracle(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A classifier that ignores a known-zero hour withholds the supply."""
+
+    species = "SiO"
+    sibling = "Mg"
+    window = ("computed_above_threshold", "interval_physical_zero")
+    snapshots = _supply_window_snapshots(species, sibling, window)
+    live = _optimizer_refused_flux_bounds(
+        snapshots,
+        (species, sibling),
+        campaigns_elapsed=1.0,
+    )
+    oracle = _oracle_complete_flux_supply_kg(snapshots, (species, sibling))
+    _assert_supply_map(live, species, sibling, oracle[species], oracle[sibling])
+    assert oracle[species] == _approx_kg(_WALL_SUPPLY_ABOVE_KG_HR)
+
+    real = _classify_wall_supply_interval
+
+    def drop_interval_zero(snapshot: object, name: str) -> _WallSupplyInterval:
+        interval = real(snapshot, name)
+        if str(interval.evidence).startswith("interval_physical_zero"):
+            return _WallSupplyInterval("unavailable", evidence="absent_no_record")
+        return interval
+
+    monkeypatch.setattr(
+        evaluate_module,
+        "_classify_wall_supply_interval",
+        drop_interval_zero,
+    )
+    mutated = _optimizer_refused_flux_bounds(
+        snapshots,
+        (species,),
+        campaigns_elapsed=1.0,
+    )
+    assert species not in mutated
+    with pytest.raises(AssertionError):
+        _assert_supply_map(
+            _optimizer_refused_flux_bounds(
+                snapshots,
+                (species, sibling),
+                campaigns_elapsed=1.0,
+            ),
+            species,
+            sibling,
+            oracle[species],
+            oracle[sibling],
+        )
+
+
+def test_non_evaporation_campaign_keeps_an_earlier_supply() -> None:
+    """Positive SiO, then a C5 hour. The empty map is a typed zero."""
+
+    host = SimpleNamespace()
+    campaign_flux = evaporation_flux_for_campaign_hour(
+        evaporation_campaign=False,
+        host=host,
+    )
+    replaced = SimpleNamespace(species_kg_hr={})
+    attach_wall_supply_interval_physical_zero(replaced, host)
+    publish_wall_supply_on_flux(replaced, {})
+    assert replaced.wall_supply_interval_physical_zero["reason"] == (
+        "non_evaporation_campaign"
+    )
+    assert campaign_flux.species_kg_hr == {}
+    evaporating = evaporation_flux_for_campaign_hour(
+        evaporation_campaign=True,
+        host=SimpleNamespace(),
+    )
+    assert not hasattr(evaporating, "wall_supply_interval_physical_zero")
+    bounds = _optimizer_refused_flux_bounds(
+        (
+            _interval_flux_snapshot(1, 1.0, {"SiO": 1.0}),
+            SimpleNamespace(hour=2, duration_h=1.0, evap_flux=replaced),
+        ),
+        ("SiO",),
+        campaigns_elapsed=1.0,
+    )
+    assert bounds["SiO"] == _approx_kg(1.0)
+    bare = SimpleNamespace(
+        hour=2,
+        duration_h=1.0,
+        evap_flux=SimpleNamespace(
+            species_kg_hr={},
+            published_species_kg_hr={},
+        ),
+    )
+    withheld = _optimizer_refused_flux_bounds(
+        (
+            _interval_flux_snapshot(1, 1.0, {"SiO": 1.0}),
+            bare,
+        ),
+        ("SiO",),
+        campaigns_elapsed=1.0,
+    )
+    assert "SiO" not in withheld
+
+
+def test_zero_liquid_hour_stamps_interval_physical_zero() -> None:
+    sim = SimpleNamespace(
+        melt=SimpleNamespace(temperature_C=1500.0),
+        setpoints={},
+    )
+    flux = EvaporationMixin._calculate_evaporation(
+        sim,
+        SimpleNamespace(liquid_fraction=0.0),
+    )
+    assert flux.species_kg_hr == {}
+    assert flux.wall_supply_interval_physical_zero == {
+        "reason": "zero_liquid",
+        "evidence": "authorized_zero",
+    }
+    assert sim._wall_supply_interval_physical_zero["reason"] == "zero_liquid"
+    publish_wall_supply_on_flux(flux, {})
+    bounds = _optimizer_refused_flux_bounds(
+        (
+            _interval_flux_snapshot(1, 1.0, {"SiO": 1.0}),
+            SimpleNamespace(hour=2, duration_h=1.0, evap_flux=flux),
+        ),
+        ("SiO",),
+        campaigns_elapsed=1.0,
+    )
+    assert bounds["SiO"] == _approx_kg(1.0)
+
+
+def test_zero_net_bucket_is_supply_zero_and_not_a_debit() -> None:
+    projected = project_publisher_vapour_rates(
+        {
+            "evaporation_flux_kg_hr": {"Mg": 0.4},
+            "zero_net_evaporation_flux": {"SiO": 0.0, "Na": 3.0},
+        },
+        liquid_fraction_factor=1.0,
+    )
+    assert projected.debit_kg_hr == {"Mg": pytest.approx(0.4)}
+    assert projected.supply_kg_hr["Mg"] == _approx_kg(0.4)
+    assert projected.supply_kg_hr["SiO"] == _approx_kg(0.0)
+    assert "Na" not in projected.supply_kg_hr
+    flux = SimpleNamespace(species_kg_hr=dict(projected.debit_kg_hr))
+    publish_wall_supply_on_flux(flux, projected.supply_kg_hr)
+    bounds = _optimizer_refused_flux_bounds(
+        (
+            _interval_flux_snapshot(1, 1.0, {"SiO": 1.0}),
+            SimpleNamespace(hour=2, duration_h=1.0, evap_flux=flux),
+        ),
+        ("SiO", "Mg"),
+        campaigns_elapsed=1.0,
+    )
+    assert bounds["SiO"] == _approx_kg(1.0)
+    assert bounds["Mg"] == _approx_kg(0.4)
+
+
+def test_unknown_interval_physical_zero_reason_is_rejected() -> None:
+    with pytest.raises(ValueError, match="unknown wall-supply"):
+        note_wall_supply_interval_physical_zero(
+            SimpleNamespace(),
+            reason="not_a_producer",
+        )
+
+
+def test_known_zero_interval_still_prices_the_refused_wall() -> None:
+    """C5 after SiO, and a frozen hour before SiO, stay on the supply."""
+
+    def _case(snapshots: tuple[object, ...]) -> Mapping[str, object]:
+        return {
+            "deposit": (),
+            "flux_snapshots": snapshots,
+            "refused": (("SiO", "hot_wall"),),
+            "charge": 1000.0,
+            "entries": ((("hot_wall", "SiO"), 1.0),),
+            "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
+        }
+
+    after_c5 = _case((
+        {"hour": 1, "duration_h": 1.0, "flux": (("SiO", 1.0),)},
+        {
+            "hour": 2,
+            "duration_h": 1.0,
+            "flux": (),
+            "interval_physical_zero": "non_evaporation_campaign",
+        },
+    ))
+    before_evaporation = _case((
+        {
+            "hour": 1,
+            "duration_h": 1.0,
+            "flux": (),
+            "interval_physical_zero": "frozen_before_evaporation",
+            "eligible_channels": ("SiO",),
+        },
+        {"hour": 2, "duration_h": 1.0, "flux": (("SiO", 1.0),)},
+    ))
+    for case in (after_c5, before_evaporation):
+        view = _wall_bound_view("book", case)
+        assert view["scored"] is True
+        assert view["upper_flag"] is True
+        assert view["species_kg"]["SiO"] == _approx_kg(1.0)
 
 
 def test_fe_residual_cap_applies_to_supply_without_changing_the_record() -> None:
@@ -3219,7 +3568,7 @@ def test_depletion_keeps_a_rate_the_debit_floor_never_enters() -> None:
         supply_out=supply_out,
     )
     assert debit == {}
-    assert supply_out["SiO"] == pytest.approx(5.0e-13)
+    assert supply_out["SiO"] == _approx_kg(5.0e-13)
 
 
 def test_depletion_keeps_a_positive_product_below_the_debit_floor() -> None:
@@ -3244,7 +3593,7 @@ def test_depletion_keeps_a_positive_product_below_the_debit_floor() -> None:
         supply_out=supply_out,
     )
     assert "SiO" not in debit
-    assert supply_out["SiO"] == pytest.approx(drawn_kg)
+    assert supply_out["SiO"] == _approx_kg(drawn_kg)
     assert drawn_kg <= _DEBIT_FLOOR_KG_HR
     assert drawn_kg > 0.0
 
@@ -3365,8 +3714,8 @@ def test_depletion_supply_keeps_every_computed_draw(
     if expected_debit is None:
         assert "SiO" not in live
     else:
-        assert live["SiO"] == pytest.approx(expected_debit)
-    assert supply_out["SiO"] == pytest.approx(expected_supply)
+        assert live["SiO"] == _approx_kg(expected_debit)
+    assert supply_out["SiO"] == _approx_kg(expected_supply)
 
 
 def test_subthreshold_sibling_does_not_change_the_parent_debit() -> None:
@@ -3392,8 +3741,8 @@ def test_subthreshold_sibling_does_not_change_the_parent_debit() -> None:
     )
     assert live == shadow
     assert "Mg" not in live
-    assert supply_out["Mg"] == pytest.approx(5.0e-13)
-    assert supply_out["SiO"] == pytest.approx(live["SiO"])
+    assert supply_out["Mg"] == _approx_kg(5.0e-13)
+    assert supply_out["SiO"] == _approx_kg(live["SiO"])
 
 
 def test_physical_scale_keeps_a_rate_below_the_debit_reporting_floor() -> None:

@@ -1805,6 +1805,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
         flux_kg_hr: dict[str, float] = {}
         below_threshold_flux_kg_hr: dict[str, float] = {}
+        # Computed drive of zero. These stay out of the debit map.
+        # Omitting them makes a wall-supply interval look like a missing
+        # rate and withholds the species for the whole run (d-367).
+        zero_net_flux_kg_hr: dict[str, float] = {}
         alpha_used_by_species: dict[str, float] = {}
         alpha_evaluations_by_species: dict[str, dict[str, Any]] = {}
         alpha_authority_status_by_species: dict[str, str] = {}
@@ -1820,6 +1824,26 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         for species, P_eq_Pa in vapor_pressures.items():
             P_eq_Pa = float(P_eq_Pa)
             if P_eq_Pa <= 0:
+                # No evaporative drive. Record a computed zero only when
+                # this carrier has the mass and stoich a positive flux
+                # would have used. Missing mass or stoich stays an
+                # omission, not a physical zero, and does not grow the
+                # missing-molar-mass warning this branch has always skipped.
+                named = str(species)
+                molar = molar_masses_kg_mol.get(species)
+                if molar is None or float(molar) <= 0.0:
+                    molar_g = MOLAR_MASS.get(named)
+                    computable_mass = (
+                        molar_g is not None and float(molar_g) > 0.0
+                    )
+                else:
+                    computable_mass = True
+                stoich_zero = stoich_by_species.get(species) or {}
+                oxide_per_product = float(
+                    stoich_zero.get("oxide_per_product_kg") or 0.0
+                )
+                if computable_mass and oxide_per_product > 0.0:
+                    zero_net_flux_kg_hr[named] = 0.0
                 continue
 
             # Molar mass: prefer the per-species value the caller looked
@@ -1867,6 +1891,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
             delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
             if delta_p_Pa <= 0:
+                # P_eq <= P_bulk. Net flux is the computed zero of
+                # J = k * max(0, P_eq - P_bulk), not an absent rate.
+                zero_net_flux_kg_hr[str(species)] = 0.0
                 continue
             decision = publisher_effective_alpha(
                 species,
@@ -2005,6 +2032,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
             series_flux_diagnostics[species] = series_diagnostic
             if J_kg_s_m2 <= 0:
+                zero_net_flux_kg_hr[str(species)] = 0.0
                 continue
 
             rate_kg_hr = J_kg_s_m2 * melt_surface_area_m2 * 3600.0
@@ -2057,6 +2085,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 "threshold_kg_hr": _NONTRIVIAL_FLUX_KG_HR,
                 "fluxes_kg_hr": below_threshold_flux_kg_hr,
             }
+        if zero_net_flux_kg_hr:
+            diagnostic["zero_net_evaporation_flux"] = zero_net_flux_kg_hr
         if alpha_authority_status_by_species:
             diagnostic["alpha_authority_status_by_species"] = (
                 alpha_authority_status_by_species
