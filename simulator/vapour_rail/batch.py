@@ -204,6 +204,30 @@ class VapourAnswer:
         )
 
 
+def recount_published_refusal_metadata(
+    metadata: Mapping[str, Any],
+    channels: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Return ``metadata`` with ``n_refused`` counted from ``channels``.
+
+    INVARIANT: ``n_refused`` is the number of channels whose ``is_refused``
+    is true, on the batch and on every publisher that copies this metadata.
+    Request resolution snapshots the count. A later rewrite that turns a
+    refusal into an authorized physical zero must publish this recount, or
+    the runner reports the corrected serialization count beside the old
+    one. Other keys are request facts and are copied unchanged.
+    ``n_flux_active``, ``n_solve_bundles``, and ``n_flux_dormant_by_epoch``
+    are not functions of ``is_refused`` alone. The caller updates those
+    only when it also changes those sets.
+    """
+
+    recounted = dict(metadata)
+    recounted["n_refused"] = sum(
+        1 for answer in channels.values() if answer.is_refused
+    )
+    return recounted
+
+
 def _freeze_channels(
     channels: Mapping[str, VapourAnswer],
 ) -> MappingProxyType[str, VapourAnswer]:

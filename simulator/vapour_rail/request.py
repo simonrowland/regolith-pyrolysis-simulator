@@ -68,6 +68,7 @@ from simulator.vapour_rail.batch import (
     VapourAnswer,
     VapourBatch,
     VapourRequestConstructionError,
+    recount_published_refusal_metadata,
 )
 from simulator.vapour_rail.u0_manifest import (
     canonicalize_gas_id,
@@ -2831,18 +2832,22 @@ def resolve_vapour_batch(
         solve_bundle_ids=bundles,
         flux_active_species_ids=flux_active,
         metadata=MappingProxyType(
-            {
-                "refusal_closure_fixed_point": bool(closure.reached_fixed_point),
-                "refusal_closure_iterations": int(closure.iterations),
-                "n_requested": len(requested),
-                "n_refused": sum(1 for a in answers.values() if a.is_refused),
-                "n_flux_active": len(flux_active),
-                "n_flux_dormant_by_epoch": len(
-                    union_eligible - (flux_active | step4_refused)
-                ),
-                "flux_activation_epoch": flux_activation_context.epoch,
-                "n_solve_bundles": len(bundles),
-            }
+            recount_published_refusal_metadata(
+                {
+                    "refusal_closure_fixed_point": bool(
+                        closure.reached_fixed_point
+                    ),
+                    "refusal_closure_iterations": int(closure.iterations),
+                    "n_requested": len(requested),
+                    "n_flux_active": len(flux_active),
+                    "n_flux_dormant_by_epoch": len(
+                        union_eligible - (flux_active | step4_refused)
+                    ),
+                    "flux_activation_epoch": flux_activation_context.epoch,
+                    "n_solve_bundles": len(bundles),
+                },
+                answers,
+            )
         ),
         melt_activity_shadow=melt_activity_shadow,
     )

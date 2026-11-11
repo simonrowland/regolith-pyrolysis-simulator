@@ -654,6 +654,42 @@ def _debiting_answer(species_id: str, pressure_pa: float):
     )
 
 
+# Request resolution freezes these before a later classification rewrite.
+# The dormant count and the bundle count are sentinels, not the lengths
+# of the empty sets on these batches. A recount that also copies the
+# catalog's flux-set update would replace them.
+_SNAPSHOT_CLOSURE_ITERATIONS = 4
+_SNAPSHOT_DORMANT = 7
+_SNAPSHOT_SOLVE_BUNDLES = 2
+_SNAPSHOT_EPOCH = "pre_rg_legacy_live"
+
+
+def _request_refusal_snapshot(channels, flux_active) -> dict:
+    """Metadata ``resolve_vapour_batch`` freezes from the pre-rewrite answers.
+
+    ``n_refused`` counts those answers. The other keys are request facts
+    and must survive a refusal recount.
+    """
+
+    return {
+        "refusal_closure_fixed_point": True,
+        "refusal_closure_iterations": _SNAPSHOT_CLOSURE_ITERATIONS,
+        "n_requested": len(channels),
+        "n_refused": sum(1 for answer in channels.values() if answer.is_refused),
+        "n_flux_active": len(flux_active),
+        "n_flux_dormant_by_epoch": _SNAPSHOT_DORMANT,
+        "flux_activation_epoch": _SNAPSHOT_EPOCH,
+        "n_solve_bundles": _SNAPSHOT_SOLVE_BUNDLES,
+    }
+
+
+def _assert_snapshot_except_refusal_count(metadata, snapshot) -> None:
+    for key, value in snapshot.items():
+        if key == "n_refused":
+            continue
+        assert metadata[key] == value
+
+
 def _path_batch(peer: bool, species: str = _PATH_CARRIER):
     from simulator.vapour_rail.batch import VapourBatch
 
@@ -666,6 +702,7 @@ def _path_batch(peer: bool, species: str = _PATH_CARRIER):
         requested_species_ids=frozenset(channels),
         channels_by_species=channels,
         flux_active_species_ids=active,
+        metadata=_request_refusal_snapshot(channels, active),
     )
 
 
@@ -747,6 +784,8 @@ _PUBLISHED_ZERO_SURFACES = (
     "serialized.refusal_code",
     "serialized.refusals_by_species",
     "serialized.n_refused",
+    "batch.metadata.n_refused",
+    "serialized.metadata.n_refused",
     "carrier_authority.is_refused",
     "carrier_authority.refusal_code",
     "carrier_authority.status",
@@ -790,6 +829,17 @@ def _assert_published_authorized_zero(
     assert "missing_channel_contract" not in channel["flux"]
     assert species not in report["refusals_by_species"]
     assert report["n_refused"] == len(report["refusals_by_species"])
+    assert report["metadata"]["n_refused"] == report["n_refused"]
+    assert report["metadata"]["n_flux_dormant_by_epoch"] == _SNAPSHOT_DORMANT
+    assert report["metadata"]["n_solve_bundles"] == _SNAPSHOT_SOLVE_BUNDLES
+    assert report["metadata"]["refusal_closure_iterations"] == (
+        _SNAPSHOT_CLOSURE_ITERATIONS
+    )
+    assert report["metadata"]["flux_activation_epoch"] == _SNAPSHOT_EPOCH
+    assert report["metadata"]["n_requested"] == len(
+        report["channels_by_species"]
+    )
+    assert report["metadata"]["n_flux_active"] == report["n_flux_active"]
     assert authority[species] == channel
     assert authority[species]["is_refused"] is False
     assert authority[species]["refusal_code"] is None
@@ -920,7 +970,14 @@ def test_subtolerance_missing_alpha_with_debiting_peer_is_not_refused_upstream(
     assert peer_notes == []
 
 
-def _published_classification(species: str, answer, overlay, report, authority):
+def _published_classification(
+    species: str,
+    answer,
+    overlay,
+    report,
+    authority,
+    metadata,
+):
     """Read every publisher. Callers compare this map; they do not re-derive it."""
 
     from simulator.vapour_rail.instrumentation import vapour_carrier_authority_status
@@ -948,6 +1005,8 @@ def _published_classification(species: str, answer, overlay, report, authority):
         "serialized.refusal_code": channel["refusal_code"],
         "serialized.refusals_by_species": species in report["refusals_by_species"],
         "serialized.n_refused": report["n_refused"],
+        "batch.metadata.n_refused": metadata["n_refused"],
+        "serialized.metadata.n_refused": report["metadata"]["n_refused"],
         "carrier_authority.is_refused": bool(auth["is_refused"]),
         "carrier_authority.refusal_code": auth["refusal_code"],
         "carrier_authority.status": vapour_carrier_authority_status(
@@ -957,6 +1016,8 @@ def _published_classification(species: str, answer, overlay, report, authority):
     }
     assert set(found) == set(_PUBLISHED_ZERO_SURFACES)
     assert report["n_refused"] == len(report["refusals_by_species"])
+    assert metadata["n_refused"] == report["n_refused"]
+    assert report["metadata"]["n_refused"] == report["n_refused"]
     assert auth == channel
     return found
 
@@ -978,6 +1039,8 @@ def _expected_published_classification(branch: str) -> dict:
             "serialized.refusal_code": None,
             "serialized.refusals_by_species": False,
             "serialized.n_refused": 0,
+            "batch.metadata.n_refused": 0,
+            "serialized.metadata.n_refused": 0,
             "carrier_authority.is_refused": False,
             "carrier_authority.refusal_code": None,
             "carrier_authority.status": "proven_zero",
@@ -1000,6 +1063,8 @@ def _expected_published_classification(branch: str) -> dict:
             "serialized.refusal_code": None,
             "serialized.refusals_by_species": False,
             "serialized.n_refused": 0,
+            "batch.metadata.n_refused": 0,
+            "serialized.metadata.n_refused": 0,
             "carrier_authority.is_refused": False,
             "carrier_authority.refusal_code": None,
             "carrier_authority.status": "status_bearing",
@@ -1019,6 +1084,8 @@ def _expected_published_classification(branch: str) -> dict:
         "serialized.refusal_code": "missing_channel_contract",
         "serialized.refusals_by_species": True,
         "serialized.n_refused": 1,
+        "batch.metadata.n_refused": 1,
+        "serialized.metadata.n_refused": 1,
         "carrier_authority.is_refused": True,
         "carrier_authority.refusal_code": "missing_channel_contract",
         "carrier_authority.status": "refused",
@@ -1042,10 +1109,13 @@ def _classify_branch_through_batch(species: str, branch: str):
     else:
         answer = _missing_alpha_answer(species, detail=numbers["detail"])
         active = frozenset()
+    channels = {species: answer}
+    snapshot = _request_refusal_snapshot(channels, active)
     batch = VapourBatch(
-        requested_species_ids=frozenset({species}),
-        channels_by_species={species: answer},
+        requested_species_ids=frozenset(channels),
+        channels_by_species=channels,
         flux_active_species_ids=active,
+        metadata=snapshot,
     )
     pressures, _overlay = flux_pressures_from_batch(batch)
     screen = screened_missing_alpha_records(
@@ -1065,7 +1135,16 @@ def _classify_branch_through_batch(species: str, branch: str):
         str(sid): dict(channel)
         for sid, channel in report["channels_by_species"].items()
     }
-    return screen, pressures, debit_pressures, rewritten, overlay, report, authority
+    return (
+        screen,
+        pressures,
+        debit_pressures,
+        rewritten,
+        overlay,
+        report,
+        authority,
+        snapshot,
+    )
 
 
 @pytest.mark.parametrize("species", _SOLE_MISSING_ALPHA_SPECIES)
@@ -1091,7 +1170,11 @@ def test_published_surfaces_share_one_missing_alpha_classification(
         overlay,
         report,
         authority,
+        snapshot,
     ) = _classify_branch_through_batch(species, branch)
+    assert snapshot["n_refused"] == (0 if branch == "already_debiting" else 1)
+    _assert_snapshot_except_refusal_count(rewritten.metadata, snapshot)
+    _assert_snapshot_except_refusal_count(report["metadata"], snapshot)
     assert set(debit_pressures) == set(pressures)
     if branch in {"below_tolerance", "zero_pressure"}:
         assert species in screen.authorized_zeros
@@ -1110,8 +1193,106 @@ def test_published_surfaces_share_one_missing_alpha_classification(
         overlay,
         report,
         authority,
+        rewritten.metadata,
     )
     assert found == _expected_published_classification(branch)
+
+
+_REFUSAL_COUNT_BRANCHES = (
+    "below_tolerance",
+    "zero_pressure",
+    "above_tolerance",
+    "missing_pressure",
+    "already_debiting",
+)
+
+
+@pytest.mark.parametrize("species", _SOLE_MISSING_ALPHA_SPECIES)
+@pytest.mark.parametrize("branch", _REFUSAL_COUNT_BRANCHES)
+def test_metadata_n_refused_counts_only_channels_still_refused(
+    species: str,
+    branch: str,
+) -> None:
+    """INVARIANT: ``metadata.n_refused`` is the channels still refused.
+
+    The snapshot is the request-time count, so a proved zero starts
+    inside it. After the rewrite the count is that zero's absence plus
+    the peer that stays a typed refusal. It is not zero merely because
+    one carrier was authorized, and the closure, epoch, dormant, and
+    bundle fields stay the request facts.
+    """
+
+    from simulator.evaporation import _apply_authorized_missing_alpha_zeros
+    from simulator.vapour_rail.batch import VapourBatch
+    from simulator.vapour_rail.instrumentation import (
+        flux_pressures_from_batch,
+        serialize_vapour_batch,
+    )
+
+    numbers = _branch_numbers(species, branch)
+    if branch == "already_debiting":
+        subject = _debiting_answer(species, numbers["pressure"])
+        active = frozenset({species, "Na"})
+    else:
+        subject = _missing_alpha_answer(species, detail=numbers["detail"])
+        active = frozenset({"Na"})
+    channels = {
+        species: subject,
+        "Na": _debiting_answer("Na", 1.5),
+        "SiO": _missing_alpha_answer(
+            "SiO",
+            detail="channel contract incomplete: missing formula",
+        ),
+    }
+    snapshot = _request_refusal_snapshot(channels, active)
+    subject_refused_before = branch != "already_debiting"
+    assert snapshot["n_refused"] == 1 + int(subject_refused_before)
+    batch = VapourBatch(
+        requested_species_ids=frozenset(channels),
+        channels_by_species=channels,
+        flux_active_species_ids=active,
+        solve_bundle_ids={"na": frozenset({"Na"})},
+        metadata=snapshot,
+    )
+    pressures, _overlay = flux_pressures_from_batch(batch)
+    flux = dict(pressures)
+    if branch == "already_debiting":
+        flux[species] = numbers["pressure"]
+    screen = screened_missing_alpha_records(
+        batch,
+        flux_pressures_Pa=flux,
+        seam_pressure_pa=numbers["seam"],
+        molar_mass_g_mol=numbers["molar"],
+        temperature_K=numbers["temperature_K"],
+        area_m2=numbers["area_m2"],
+        duration_s=numbers["duration_s"],
+        balance_tolerance_kg=numbers["tolerance"],
+    )
+    rewritten = _apply_authorized_missing_alpha_zeros(batch, screen)
+    report = serialize_vapour_batch(rewritten)
+    subject_still_refused = branch not in {
+        "below_tolerance",
+        "zero_pressure",
+        "already_debiting",
+    }
+    expected = 1 + int(subject_still_refused)
+    assert "SiO" in report["refusals_by_species"]
+    assert "Na" not in report["refusals_by_species"]
+    assert (species in report["refusals_by_species"]) is subject_still_refused
+    assert report["n_refused"] == expected
+    assert rewritten.metadata["n_refused"] == expected
+    assert report["metadata"]["n_refused"] == expected
+    assert report["n_refused"] == sum(
+        1 for answer in rewritten.channels_by_species.values() if answer.is_refused
+    )
+    _assert_snapshot_except_refusal_count(rewritten.metadata, snapshot)
+    _assert_snapshot_except_refusal_count(report["metadata"], snapshot)
+    if branch in {"below_tolerance", "zero_pressure"}:
+        assert species in screen.authorized_zeros
+        assert rewritten.channel(species).is_refused is False
+    elif subject_still_refused:
+        assert species in screen.refusals
+        assert rewritten.channel(species).is_refused is True
 
 
 @pytest.mark.parametrize("species", _SOLE_MISSING_ALPHA_SPECIES)
@@ -1189,6 +1370,10 @@ def test_evaporation_path_keeps_an_above_tolerance_missing_alpha_refusal(
     assert species in report["refusals_by_species"]
     assert report["channels_by_species"][species]["is_refused"] is True
     assert report["n_refused"] == 1
+    assert report["metadata"]["n_refused"] == 1
+    assert report["metadata"]["n_flux_dormant_by_epoch"] == _SNAPSHOT_DORMANT
+    assert report["metadata"]["n_solve_bundles"] == _SNAPSHOT_SOLVE_BUNDLES
+    assert host._last_vapour_batch.metadata["n_refused"] == 1
     overlay = host._last_vapour_batch_flux_overlay
     assert overlay["batch_channel_states"][species] == "refusal"
     diagnostic = raised.value.diagnostic

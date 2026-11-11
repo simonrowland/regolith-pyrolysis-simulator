@@ -54,6 +54,7 @@ from simulator.vapour_rail.batch import (
     FluxEligible,
     PressureValue,
     ZeroByPhysics,
+    recount_published_refusal_metadata,
 )
 from simulator.vapour_rail.activity import StandardStateIdentity
 from simulator.vapour_rail.instrumentation import (
@@ -359,13 +360,20 @@ def _apply_authorized_missing_alpha_zeros(
     INVARIANT: that carrier is ``zero_by_physics`` on every surface that
     reads the answer, and it is not also a refusal. Those surfaces are
     the channel gate, ``is_refused``, ``refusal_code``, serialized
-    pressure and flux kinds, ``refusals_by_species``, ``n_refused``, and
-    carrier authority. A string written only onto
-    ``batch_channel_states`` leaves serialization on the catalog
+    pressure and flux kinds, ``refusals_by_species``, the serialized
+    ``n_refused``, ``metadata["n_refused"]``, and carrier authority.
+    ``metadata["n_refused"]`` is the request-time snapshot. Rewriting
+    the channels without recounting it leaves the runner publishing the
+    corrected count beside the old one. The recount is
+    ``recount_published_refusal_metadata``: ``n_refused`` becomes the
+    number of channels that are still refused. A string written only
+    onto ``batch_channel_states`` leaves serialization on the catalog
     refusal. A carrier whose bound is not proved is absent from
     ``authorized_zeros`` and keeps the typed
     ``fail_loud_missing_alpha`` refusal. The species stays out of the
-    flux map: ``ZeroByPhysics`` is not a debit.
+    flux map: ``ZeroByPhysics`` is not a debit. Flux-active, bundle,
+    and dormant counts are request facts of those sets, not of
+    ``is_refused``, and this rewrite does not change the sets.
     """
 
     if batch is None or not screen.authorized_zeros:
@@ -383,7 +391,14 @@ def _apply_authorized_missing_alpha_zeros(
             changed = True
     if not changed:
         return batch
-    return replace(batch, channels_by_species=channels)
+    return replace(
+        batch,
+        channels_by_species=channels,
+        metadata=recount_published_refusal_metadata(
+            getattr(batch, "metadata", {}) or {},
+            channels,
+        ),
+    )
 
 
 def _publish_evaporation_flux_diagnostic(

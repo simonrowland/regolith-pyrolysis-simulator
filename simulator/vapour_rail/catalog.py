@@ -43,6 +43,7 @@ from simulator.vapour_rail.batch import (
     PressureRefusal,
     PressureValue,
     ZeroByPhysics,
+    recount_published_refusal_metadata,
 )
 from simulator.vapour_rail.channels import (
     CHANNEL_O2,
@@ -2586,10 +2587,7 @@ class VapourRailCatalog:
             remaining = frozenset(members) - drop_ids
             if remaining:
                 solve_bundles[bundle_id] = remaining
-        metadata = dict(batch.metadata)
-        metadata["n_refused"] = sum(
-            1 for answer in channels.values() if answer.is_refused
-        )
+        metadata = recount_published_refusal_metadata(batch.metadata, channels)
         metadata["n_flux_active"] = len(flux_active)
         metadata["n_solve_bundles"] = len(solve_bundles)
         if authorized_zero_ids:
