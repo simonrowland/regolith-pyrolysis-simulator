@@ -96,6 +96,7 @@ ENGINE_CACHE_NOTICE_CODE_TABLE = (
     ('thermoengine', 1, 'out_of_certified_band', 'ThermoEngine ran outside its certified band.'),
     ('thermoengine', 2, 'engine_model_caveat', 'ThermoEngine reported a model caveat.'),
     ('thermoengine', 3, 'fo2_gas_only', 'External oxygen fugacity was applied to gas only.'),
+    ('thermoengine', 4, 'fallback', 'ThermoEngine result included a fallback notice.'),
     ('thermoengine', 90, 'warning_text', 'ThermoEngine warning text used by cell classification.'),
     ('vaporock', 1, 'out_of_certified_band', 'VapoRock ran outside its certified band.'),
     ('vaporock', 90, 'warning_text', 'VapoRock warning text used by cell classification.'),
