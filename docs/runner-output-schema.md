@@ -401,6 +401,14 @@ omit it.
   change the gate or any simulated number. The same notice is copied into
   `product_classification` for operator markdown rendering and forwarded
   into optimizer traces and product summaries.
+* `stage0_carbon_allocation_notice` is emitted when competing stage-0 cation
+  sulfates were ranked with a foulant dG outside its table, or when that
+  ranking was refused because the table is not the cleanup reaction. A
+  ranking carries the species order, each claim's basis and `out_of_domain`
+  flag, and the carbon demand. A refusal carries the refused species, the
+  table reaction, and why it is not a ranking input. In-domain rankings
+  omit the key. The same notice is copied into `product_classification`
+  when the ranking was extrapolated.
 * Handled failure envelopes emit the same base fidelity fields as successful
   runs: `backend_status`, `backend_authoritative`, `backend_real_active`,
   `evidence_class`, `runtime_status`, `label_source`,
