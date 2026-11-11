@@ -281,12 +281,10 @@ def merge_run_snapshot(
 def _distinct_public_notices(
     carriers: Sequence[Any],
 ) -> dict[str, list[dict[str, Any]]]:
-    """Every distinct ``*_notice`` payload across carriers, in encounter order.
+    """Every distinct notice across carriers, in encounter order.
 
-    Invariant: merging snapshots of one species keeps every distinct notice.
-    The singular key holds one mapping. The plural key (that key plus ``s``)
-    holds every distinct payload, including payloads a previous merge already
-    stored there. Both are read.
+    The collector folds singular and plural keys. Exact duplicates collapse.
+    The merged extra stores that list on the singular key.
     """
 
     collected: dict[str, list[dict[str, Any]]] = {}
@@ -304,23 +302,8 @@ def _distinct_public_notices(
     for carrier in carriers:
         if not isinstance(carrier, Mapping):
             continue
-        found = public_carrier_notices(carrier)
-        extra = carrier.get("extra")
-        extra_map = extra if isinstance(extra, Mapping) else {}
-        keys = list(found)
-        for raw_key in extra_map:
-            if not isinstance(raw_key, str) or not raw_key.endswith("_notices"):
-                continue
-            singular = raw_key[:-1]
-            if singular.endswith("_notice") and singular not in keys:
-                keys.append(singular)
-        for key in keys:
-            if key in found:
-                add(key, found[key])
-            plural = extra_map.get(f"{key}s")
-            if isinstance(plural, (str, bytes)) or not isinstance(plural, Sequence):
-                continue
-            for item in plural:
+        for key, items in public_carrier_notices(carrier).items():
+            for item in items:
                 add(key, item)
     return collected
 
@@ -416,9 +399,8 @@ def _merged_wall_deposit_sticking_authority(
                         > vapour_carrier_authority_severity(current_status)
                     ):
                         carriers_by_species[species_key] = record
-                    # Singular keys stay one mapping for existing readers.
-                    # Every distinct payload is on the plural key, so two
-                    # diagnostic notices of one species both survive.
+                    # One list on the singular key. Distinct disclosures
+                    # are kept; exact duplicates are not.
                     collected = _distinct_public_notices((current, record))
                     if collected:
                         extra = carriers_by_species[species_key].setdefault(
@@ -426,8 +408,7 @@ def _merged_wall_deposit_sticking_authority(
                         )
                         if isinstance(extra, dict):
                             for key, items in collected.items():
-                                extra.setdefault(key, items[0])
-                                extra[f"{key}s"] = items
+                                extra[key] = items
         raw_lineage = authority.get(
             "vapour_carrier_lineage_by_deposited_species"
         )

@@ -28,6 +28,31 @@ from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
 
 _SECONDS_PER_HOUR = 3_600.0
+
+
+def _stamp_law_disclosure_metadata(metadata: dict[str, str]) -> None:
+    """Publish the active run disclosure on a battery row. Empty stays absent."""
+
+    from simulator.vapour_rail.run_disclosure import active_snapshot
+
+    snapshot = active_snapshot()
+    if snapshot:
+        metadata["law_disclosures"] = json.dumps(
+            [dict(item) for item in snapshot],
+            sort_keys=True,
+        )
+
+
+def _isolated_law_disclosure(fn):
+    """One registry per battery row, not the caller's run."""
+
+    def wrapper(*args, **kwargs):
+        from simulator.vapour_rail.run_disclosure import disclosure_scope
+
+        with disclosure_scope(inherit=False):
+            return fn(*args, **kwargs)
+
+    return wrapper
 _OXYGEN_CHANNELS = frozenset({"O", "O2"})
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
 _HASHIMOTO_PRIMARY_GEOMETRY = "sphere_shrinking"
@@ -1853,6 +1878,7 @@ def _mass_loss_corner_bounds(
     return bounds, {"pO2_low_bar": low, "pO2_high_bar": high,
                     "inventory_capped_channels": sorted(inventory_caps)}
 
+@_isolated_law_disclosure
 def predict_knudsen_residue_composition(
     engine: str, reference, experiment, observations, bench=None,
 ) -> dict[str, object]:
@@ -2021,6 +2047,7 @@ def predict_knudsen_residue_composition(
         except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
             diagnostic = {"refusal": getattr(exc, "reason", str(exc))}
         _append_omission_notices(notices, pressure_callbacks)
+        _stamp_law_disclosure_metadata(metadata)
         return {
             "composition_wt_pct": composition, "linear_temperature_diagnostic": diagnostic,
             "measured_mass_loss_fraction": target, "temperature_path": path,
@@ -2037,6 +2064,7 @@ def predict_knudsen_residue_composition(
         raise
 
 
+@_isolated_law_disclosure
 def predict_mass_loss_fraction(
     engine: str,
     experiment: object,
@@ -2383,6 +2411,7 @@ def predict_mass_loss_fraction(
         payload = omission_payload()
         if payload is not None:
             metadata["below_threshold_omissions"] = payload
+        _stamp_law_disclosure_metadata(metadata)
         return ResidueMassLossPrediction(
             mass_loss_fraction=point_loss_kg / sample_mass_kg,
             engine_flags=tuple(sorted(flags)), engine_metadata=metadata,

@@ -65,7 +65,7 @@ from simulator.optimize.result_trust import (
     result_trust_carriers as _admission_carriers,
 )
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 OBJECTIVE_EVIDENCE_SCHEMA_VERSION = 1
 DEFAULT_BUSY_TIMEOUT_MS = 30000
 WRITE_RETRY_ATTEMPTS = 8
@@ -326,9 +326,10 @@ class ResultStore:
                     code_version, corpus_version, data_digests, result_scope,
                     feasible, failure_category, objectives, feasibility_margins,
                     failing_gates, candidate_id,
-                    result_blob, run_reference, eval_spec, notes, created_at
+                    result_blob, run_reference, eval_spec, notes,
+                    law_disclosures, created_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(cache_key) DO UPDATE SET
                     feedstock_id = excluded.feedstock_id,
                     recipe_id = excluded.recipe_id,
@@ -348,6 +349,7 @@ class ResultStore:
                     run_reference = excluded.run_reference,
                     eval_spec = excluded.eval_spec,
                     notes = excluded.notes,
+                    law_disclosures = excluded.law_disclosures,
                     created_at = excluded.created_at
                 """,
                 (
@@ -374,6 +376,9 @@ class ResultStore:
                     _json_dump(_serialize_run_reference(scored_result.run_reference)),
                     _json_dump(_serialize_eval_spec(eval_spec)),
                     _json_dump(list(scored_result.notes)),
+                    _json_dump([
+                        dict(item) for item in scored_result.law_disclosures
+                    ]),
                     created_at,
                 ),
             )
@@ -633,6 +638,7 @@ class ResultStore:
                 run_reference TEXT NOT NULL,
                 eval_spec TEXT NOT NULL,
                 notes TEXT NOT NULL,
+                law_disclosures TEXT NOT NULL DEFAULT '[]',
                 created_at TEXT NOT NULL
             )
             """,
@@ -725,6 +731,21 @@ class ResultStore:
                 (str(SCHEMA_VERSION),),
             )
             version = 5
+        if version < 6:
+            if not _column_exists(conn, "results", "law_disclosures"):
+                conn.execute(
+                    "ALTER TABLE results ADD COLUMN law_disclosures "
+                    "TEXT NOT NULL DEFAULT '[]'"
+                )
+            conn.execute(
+                """
+                INSERT INTO store_meta(key, value)
+                VALUES ('schema_version', ?)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                """,
+                (str(SCHEMA_VERSION),),
+            )
+            version = 6
         if version != SCHEMA_VERSION:
             raise ResultStoreSchemaError(f"unsupported result store schema {version}")
         self._refresh_current_selector_index(conn)
@@ -771,6 +792,19 @@ class ResultStore:
         raise last_error if last_error is not None else RuntimeError("write retry failed")
 
 
+def _law_disclosures_from_row(row: sqlite3.Row) -> tuple[dict[str, Any], ...]:
+    keys = row.keys() if hasattr(row, "keys") else ()
+    if "law_disclosures" not in keys:
+        return ()
+    raw = row["law_disclosures"]
+    if not raw:
+        return ()
+    parsed = _json_load(raw)
+    if not isinstance(parsed, list):
+        return ()
+    return tuple(dict(item) for item in parsed if isinstance(item, Mapping))
+
+
 def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
     failure_category = row["failure_category"]
     failure = FailureCategory(failure_category) if failure_category is not None else None
@@ -800,7 +834,11 @@ def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
             _json_load(row["result_blob"]),
         ),
         notes=tuple(_json_load(row["notes"])),
+        law_disclosures=_law_disclosures_from_row(row),
     )
+    from simulator.vapour_rail.run_disclosure import reregister_cached_disclosures
+
+    reregister_cached_disclosures(result.law_disclosures)
     reasons = _read_compatibility_rejections(result)
     if not reasons:
         return result
@@ -891,6 +929,7 @@ def reground_scored_result(scored_result: ScoredResult) -> ScoredResult:
         failing_gates=failing_gates,
         run_reference=scored_result.run_reference,
         notes=scored_result.notes,
+        law_disclosures=scored_result.law_disclosures,
     )
 
 

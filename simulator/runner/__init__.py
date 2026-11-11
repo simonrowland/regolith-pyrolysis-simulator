@@ -1427,6 +1427,15 @@ class PyrolysisRun:
             "liquid_fraction_provider": sim.record.liquid_fraction_provider,
             "kernel_commit_sha": kernel_commit_sha,
         }
+        law_disclosures = tuple(getattr(sim, "law_disclosures", ()) or ())
+        if not law_disclosures:
+            from simulator.vapour_rail.run_disclosure import active_snapshot
+
+            law_disclosures = active_snapshot()
+        if law_disclosures:
+            run_metadata["law_disclosures"] = [
+                dict(item) for item in law_disclosures
+            ]
         c3_credit_dose_kg = _c3_alkali_dosing_kg_by_species(
             session_config.setpoints
         )
@@ -2926,19 +2935,21 @@ def build_per_hour_summary(
                     continue
                 found = public_carrier_notices(channel)
                 if found:
-                    pressure_notices[str(species)] = found
-        # Existing consumers read the extrapolation notice body under this
-        # key. Every other notice is published beside it. A carrier whose
-        # only notice is a diagnostic admission still appears.
+                    pressure_notices[str(species)] = {
+                        key: [dict(item) for item in items]
+                        for key, items in found.items()
+                    }
+        # Each notice key publishes the full list. A carrier whose only
+        # notice is a diagnostic admission still appears.
         extrapolation_notices = {
-            species: dict(notices["extrapolation_notice"])
+            species: notices["extrapolation_notice"]
             for species, notices in pressure_notices.items()
-            if "extrapolation_notice" in notices
+            if notices.get("extrapolation_notice")
         }
         other_notices = {
             species: {
-                key: dict(notice)
-                for key, notice in notices.items()
+                key: items
+                for key, items in notices.items()
                 if key != "extrapolation_notice"
             }
             for species, notices in pressure_notices.items()

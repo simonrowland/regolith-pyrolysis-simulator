@@ -328,7 +328,7 @@ def _attach_pO2_floor_inversion_notices(
         # existing field. Do not replace a temperature-range notice the
         # collector already sees on that key.
         if "extrapolation_notice" not in public_carrier_notices(provenance):
-            provenance["extrapolation_notice"] = notice
+            provenance["extrapolation_notice"] = [dict(notice)]
         vapor_pressure_provenance[str(species)] = provenance
         source = str(vapor_pressure_sources.get(species) or "")
         if source and token not in source.split(":"):
@@ -3219,8 +3219,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         # The warning text quotes the oxygen-band notice. The collector
         # already holds every *_notice on the receipt; this selects the
         # legacy warning body and does not publish the carrier.
-        transport_notice = transport_notices.get("extrapolation_notice")
-        if transport_notice is not None:
+        transport_items = transport_notices.get("extrapolation_notice") or ()
+        if transport_items:
+            transport_notice = transport_items[0]
             warnings.append(
                 f"{transport_notice['reason']}: "
                 f"pO2_bar={transport_notice['pO2_bar_used']!r} "
@@ -4144,10 +4145,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "raw_metal_activity_root": metal_activity_root,
                     "source_label": source_label,
                 }
-                if species in metal_extrapolations:
-                    provenance["extrapolation_notice"] = dict(
-                        metal_extrapolations[species]
-                    )
                 if P_reference_Pa is not None:
                     provenance["P_reference_Antoine_Pa"] = P_reference_Pa
                 if reconstructed_vapor_limit is not None:
@@ -4637,12 +4634,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         transport_o2.observation_or_setpoint_receipt,
                     )
                 if source_activity_floor_notice is not None:
+                    from simulator.vapour_rail.instrumentation import (
+                        merge_public_notice,
+                    )
+
                     vapor_pressure_provenance[name][
                         "source_activity_floor_notice"
-                    ] = dict(source_activity_floor_notice)
-                    vapor_pressure_provenance[name].setdefault(
+                    ] = [dict(source_activity_floor_notice)]
+                    # Distinct from a temperature-range notice already on
+                    # the key. Exact duplicates collapse.
+                    merge_public_notice(
+                        vapor_pressure_provenance[name],
                         "extrapolation_notice",
-                        dict(source_activity_floor_notice),
+                        source_activity_floor_notice,
                     )
                 if compiled_evaluator is not None:
                     vapor_pressure_provenance[name][
@@ -4691,7 +4695,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 notice.setdefault("reason", reason)
                 provenance = vapor_pressure_provenance.get(species)
                 if provenance is not None:
-                    provenance["extrapolation_notice"] = dict(notice)
+                    # A temperature-range notice joins any disclosure already
+                    # on the key. Replacing the key would drop a distinct
+                    # floor or admission notice. Exact duplicates collapse.
+                    from simulator.vapour_rail.instrumentation import (
+                        merge_public_notice,
+                    )
+
+                    merge_public_notice(
+                        provenance,
+                        "extrapolation_notice",
+                        notice,
+                    )
 
         # YAML authority/bracket labels (pressure-neutral; Bug B pattern).
         species_authority: dict[str, dict[str, Any]] = {}

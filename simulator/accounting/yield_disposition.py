@@ -161,6 +161,13 @@ def capture_ledger_snapshot(sim: Any, snapshot: Any) -> None:
             if event.get("account") == _CONDENSATION_ACCOUNT
         ],
     }
+    from simulator.vapour_rail.run_disclosure import active_snapshot
+
+    law_disclosures = active_snapshot()
+    if not law_disclosures:
+        law_disclosures = tuple(getattr(sim, "law_disclosures", ()) or ())
+    if law_disclosures:
+        rows[key]["law_disclosures"] = [dict(item) for item in law_disclosures]
 
 
 def ledger_snapshots_from_sim(sim: Any) -> tuple[Mapping[str, Any], ...]:

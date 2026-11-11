@@ -1517,9 +1517,19 @@ def refusal_closure(
                     "extrapolation_notice" not in evaluation_extra
                     and "floor_inversion_notice" in evaluation_extra
                 ):
-                    evaluation_extra["extrapolation_notice"] = dict(
-                        evaluation_extra["floor_inversion_notice"]
-                    )
+                    floor = evaluation_extra["floor_inversion_notice"]
+                    if isinstance(floor, Mapping):
+                        floor_items = [dict(floor)]
+                    elif isinstance(floor, (list, tuple)):
+                        floor_items = [
+                            dict(item)
+                            for item in floor
+                            if isinstance(item, Mapping)
+                        ]
+                    else:
+                        floor_items = []
+                    if floor_items:
+                        evaluation_extra["extrapolation_notice"] = floor_items
                 apply_public_carrier_notices(evaluation_extra, evaluation)
                 if _unit_activity_note is not None:
                     from simulator.silent_zero import merge_notes_into_mapping

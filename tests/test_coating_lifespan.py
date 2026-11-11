@@ -310,18 +310,21 @@ def test_merge_equal_severity_carriers_preserves_source_extrapolation_notices(
     assert merged.wall_deposit_by_segment_species_kg["hot_wall"]["Mg"] == 0.2
     assert merged.wall_deposit_sticking_authority["authoritative_for_resinter"] is False
     extra = merged.wall_deposit_sticking_authority["vapour_carrier_authority_by_species"]["Mg"]["extra"]
-    assert extra["extrapolation_notice"]["reason"] == "outside source band"
-    assert extra["extrapolation_notice"]["valid_range_K"] == (701.0, 1361.0)
-    assert {notice["temperature_K"] for notice in extra["extrapolation_notices"]} == {
+    published = extra["extrapolation_notice"]
+    assert isinstance(published, (list, tuple))
+    assert len(published) == len(expected)
+    assert all(
+        notice["reason"] == "outside source band"
+        and tuple(notice["valid_range_K"]) == (701.0, 1361.0)
+        and notice["authority_level"] == "extrapolated"
+        for notice in published
+    )
+    assert {notice["temperature_K"] for notice in published} == {
         notice["temperature_K"] for notice in expected
     }
-    assert all(notice["reason"] == "outside source band"
-               and notice["valid_range_K"] == (701.0, 1361.0)
-               and notice["authority_level"] == "extrapolated"
-               for notice in extra["extrapolation_notices"])
     repeated, _ = merge_run_snapshot(merged, snapshots[1])
     repeated_extra = repeated.wall_deposit_sticking_authority["vapour_carrier_authority_by_species"]["Mg"]["extra"]
-    assert repeated_extra["extrapolation_notices"] == extra["extrapolation_notices"]
+    assert list(repeated_extra["extrapolation_notice"]) == list(published)
 
 
 @pytest.mark.parametrize(
@@ -385,7 +388,8 @@ def test_merge_preserves_distinct_notices_for_one_key(
     extra = merged.wall_deposit_sticking_authority[
         "vapour_carrier_authority_by_species"
     ]["Fe"]["extra"]
-    plural = extra[f"{notice_key}s"]
+    plural = extra[notice_key]
+    assert isinstance(plural, (list, tuple))
     by_marker = {item["marker"]: item for item in plural}
     assert set(by_marker) == {"first", "second"}
     assert by_marker["first"]["law_provenance"] == (
@@ -399,11 +403,11 @@ def test_merge_preserves_distinct_notices_for_one_key(
     assert by_marker["second"]["comparators"]["gap_dex_law_vs_vaporock"] == (
         pytest.approx(3.5, rel=0, abs=1e-12)
     )
-    assert extra[notice_key]["marker"] in by_marker
+    assert {item["marker"] for item in extra[notice_key]} == {"first", "second"}
     repeated, _ = merge_run_snapshot(merged, snapshots[1])
     repeated_plural = repeated.wall_deposit_sticking_authority[
         "vapour_carrier_authority_by_species"
-    ]["Fe"]["extra"][f"{notice_key}s"]
+    ]["Fe"]["extra"][notice_key]
     assert len(repeated_plural) == 2
     assert {item["marker"] for item in repeated_plural} == {"first", "second"}
 

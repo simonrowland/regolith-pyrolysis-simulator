@@ -1576,8 +1576,14 @@ def _attach_pareto_source_notices(
         if not notices:
             continue
         entry = by_species.setdefault(species, {"status": "unavailable", "reason": "evaporation_series_metadata_unavailable"})
-        for key, notice in notices.items():
-            published = _plain_mapping(notice)
+        for key, notice_items in notices.items():
+            published = [
+                _plain_mapping(item)
+                for item in notice_items
+                if isinstance(item, Mapping)
+            ]
+            if not published:
+                continue
             if key == "extrapolation_notice":
                 entry["vapour_pressure_extrapolation_notice"] = published
                 entry["authority_level"] = "extrapolated"

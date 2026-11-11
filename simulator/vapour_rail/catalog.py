@@ -1168,7 +1168,11 @@ class CompiledPressureEvaluator:
         # did not carry one. Every other receipt notice, and every notice on
         # the evaluator (a diagnostic admission that is the only one, or a
         # future *_notice), is copied by the same scan. Pressure is unchanged.
-        from simulator.vapour_rail.instrumentation import public_carrier_notices
+        from simulator.vapour_rail.instrumentation import (
+            notice_attribute,
+            public_carrier_notices,
+        )
+        from simulator.vapour_rail.run_disclosure import register_executed_law
 
         receipt = (
             o2_potential.observation_or_setpoint_receipt
@@ -1180,11 +1184,15 @@ class CompiledPressureEvaluator:
             if isinstance(receipt, Mapping)
             else {}
         )
+        # The attribute stays one dict when the carrier has one notice.
+        # Publication lists are applied by the request/provider surfaces.
+        extrapolation_items = receipt_notices.get("extrapolation_notice") or ()
         object.__setattr__(
             evaluation,
             "extrapolation_notice",
-            receipt_notices.get("extrapolation_notice")
-            or _pO2_floor_inversion_notice(
+            notice_attribute(extrapolation_items)
+            if extrapolation_items
+            else _pO2_floor_inversion_notice(
                 species_id=self.species_id,
                 pressure_pa=pressure_pa,
                 pO2_exponent=self.pO2_exponent,
@@ -1195,12 +1203,14 @@ class CompiledPressureEvaluator:
                 was_clamped=False,
             ),
         )
-        for notice_key, notice in receipt_notices.items():
+        for notice_key, items in receipt_notices.items():
             if notice_key == "extrapolation_notice":
                 continue
-            object.__setattr__(evaluation, notice_key, notice)
-        for notice_key, notice in public_carrier_notices(self).items():
-            object.__setattr__(evaluation, notice_key, notice)
+            object.__setattr__(evaluation, notice_key, notice_attribute(items))
+        for notice_key, items in public_carrier_notices(self).items():
+            object.__setattr__(evaluation, notice_key, notice_attribute(items))
+        # Single registration site for an admitted diagnostic or extrapolated law.
+        register_executed_law(self)
         return evaluation
 
     def evaluate_typed_shadow(
@@ -1350,8 +1360,13 @@ class CompiledPressureEvaluator:
             "activity_verdict": activity.verdict.value,
             "flux_disposition": "instrumented_not_selected",
         }
-        from simulator.vapour_rail.instrumentation import public_carrier_notices
+        from simulator.vapour_rail.instrumentation import (
+            apply_public_carrier_notices,
+            public_carrier_notices,
+        )
 
+        # Shadow has no behavior authority and is not a second registration
+        # site. Notices on this typed payload are still a list.
         if self.pO2_exponent and math.isfinite(ln_pressure):
             pressure_pa = math.exp(float(ln_pressure))
             receipt = o2_potential.observation_or_setpoint_receipt
@@ -1360,25 +1375,29 @@ class CompiledPressureEvaluator:
                 if isinstance(receipt, Mapping)
                 else {}
             )
-            notice = receipt_notices.get(
-                "extrapolation_notice"
-            ) or _pO2_floor_inversion_notice(
-                species_id=self.species_id,
-                pressure_pa=pressure_pa,
-                pO2_exponent=self.pO2_exponent,
-                pO2_bar_used=oxygen,
-                was_clamped=False,
-            )
-            if notice is not None:
-                payload["extrapolation_notice"] = dict(notice)
-            for notice_key, item in receipt_notices.items():
-                if notice_key == "extrapolation_notice":
-                    continue
-                payload.setdefault(notice_key, item)
-        # The evaluator is the carrier for a diagnostic admission. This
-        # shadow publishes ln_pressure, so that notice rides with it.
-        for notice_key, item in public_carrier_notices(self).items():
-            payload.setdefault(notice_key, item)
+            extrapolation_items = receipt_notices.get("extrapolation_notice") or ()
+            if not extrapolation_items:
+                floor = _pO2_floor_inversion_notice(
+                    species_id=self.species_id,
+                    pressure_pa=pressure_pa,
+                    pO2_exponent=self.pO2_exponent,
+                    pO2_bar_used=oxygen,
+                    was_clamped=False,
+                )
+                if floor is not None:
+                    extrapolation_items = (floor,)
+            if extrapolation_items:
+                payload["extrapolation_notice"] = [
+                    dict(item) for item in extrapolation_items
+                ]
+            receipt_carrier = {
+                key: list(items)
+                for key, items in receipt_notices.items()
+                if key != "extrapolation_notice"
+            }
+            if receipt_carrier:
+                apply_public_carrier_notices(payload, receipt_carrier)
+        apply_public_carrier_notices(payload, self)
         return MappingProxyType(payload)
 
     def _out_of_domain_log10_continuation(self, temperature_K: float) -> float:

@@ -2190,8 +2190,9 @@ def test_diagnostic_admission_reaches_every_public_carrier() -> None:
                 _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
             )
         public = serialize_vapour_answer(answer)
-        public_notice = public["extra"]["diagnostic_admission_notice"]
-        assert public_notice == evaluation_notice
+        public_notices = public["extra"]["diagnostic_admission_notice"]
+        assert public_notices == [evaluation_notice]
+        public_notice = public_notices[0]
         assert public_notice["authority"] == _DIAGNOSTIC_AUTHORITY
         assert public_notice["law_provenance"] == _DIAGNOSTIC_LAW_PROVENANCE
         assert public_notice["closes_with"] == _DIAGNOSTIC_CLOSER
@@ -2222,10 +2223,10 @@ def test_diagnostic_admission_reaches_every_public_carrier() -> None:
         assert evaluator is not None
         expected = getattr(evaluator, "diagnostic_admission_notice", None)
         provenance = provenance_by_species[species_id]
-        assert provenance["diagnostic_admission_notice"] == expected
+        assert provenance["diagnostic_admission_notice"] == [expected]
         if expected["executed_species_id"] == "Fe":
             _assert_fe_pseudo_law_disclosure(
-                provenance["diagnostic_admission_notice"]
+                provenance["diagnostic_admission_notice"][0]
             )
     # The metal Fe pressure is the pure-component rail, not this law.
     metal_fe = provenance_by_species.get("Fe")
@@ -2264,7 +2265,23 @@ def _diagnostic_only_carrier_notice() -> dict:
     }
 
 
-def _assert_published_diagnostic_notice(notice: dict) -> None:
+def _assert_published_diagnostic_notice(notice: object) -> None:
+    assert isinstance(notice, (list, tuple)), type(notice)
+    items = [item for item in notice if isinstance(item, dict)]
+    assert items
+    canonical = [
+        item
+        for item in items
+        if item.get("closes_with") == _DIAGNOSTIC_CLOSER
+        and item.get("executed_species_id") == "Fe"
+        and abs(
+            float(item["comparators"]["gap_dex_law_vs_rail"])
+            - 1.1127636390496998
+        )
+        < 1e-9
+    ]
+    assert canonical, items
+    notice = canonical[0]
     assert notice["authority"] == _DIAGNOSTIC_AUTHORITY
     assert notice["law_provenance"] == _DIAGNOSTIC_LAW_PROVENANCE
     assert notice["provenance_status"] == "diagnostic_only"
@@ -2601,8 +2618,28 @@ def _published_diagnostic_notice(surface: str) -> dict:
             _FE_PSEUDO_LAW_1750_PA, rel=1e-12, abs=0.0
         )
         assert "extrapolation_notice" not in carrier["extra"]
-        plural = carrier["extra"]["diagnostic_admission_notices"]
+        plural = carrier["extra"]["diagnostic_admission_notice"]
+        assert isinstance(plural, (list, tuple))
         assert len(plural) == 2
+        from simulator.diagnostics import pressure_coating_pareto_diagnostic
+
+        published = pressure_coating_pareto_diagnostic(
+            SimpleNamespace(
+                condensation_model=SimpleNamespace(
+                    last_sticking_alpha_provenance_notice=(
+                        merged.wall_deposit_sticking_authority
+                    ),
+                )
+            ),
+            target_species=("Fe",),
+        )
+        pareto_notices = published["by_species"]["Fe"][
+            "diagnostic_admission_notice"
+        ]
+        assert len(pareto_notices) == 2
+        assert sorted(
+            item["comparators"]["gap_dex_law_vs_rail"] for item in pareto_notices
+        ) == pytest.approx([1.1127636390496998, 2.25], rel=0, abs=1e-12)
         rail_gaps = sorted(
             item["comparators"]["gap_dex_law_vs_rail"] for item in plural
         )

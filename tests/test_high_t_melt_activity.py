@@ -269,11 +269,16 @@ def _physics_metadata_payload(
         # every notice field that was already present on green.
         for record in provenance.values():
             notice = record.get("extrapolation_notice")
-            if not isinstance(notice, dict):
+            if isinstance(notice, dict):
+                bodies = [notice]
+            elif isinstance(notice, (list, tuple)):
+                bodies = [item for item in notice if isinstance(item, dict)]
+            else:
                 continue
-            if not {"temperature_K", "valid_range_K"} <= notice.keys():
-                continue
-            notice.pop("certified_band", None)
+            for body in bodies:
+                if not {"temperature_K", "valid_range_K"} <= body.keys():
+                    continue
+                body.pop("certified_band", None)
     return (
         dict(diagnostic["vapor_pressures_source"]),
         provenance,

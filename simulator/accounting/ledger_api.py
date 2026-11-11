@@ -142,21 +142,32 @@ class LedgerAPI:
 
     def snapshot(self) -> dict[str, Any]:
         report = self.ledger.close_report()
+        from simulator.vapour_rail.run_disclosure import active_snapshot
+
+        law_disclosures = active_snapshot()
+        if not law_disclosures:
+            law_disclosures = tuple(
+                getattr(getattr(self, "sim", None), "law_disclosures", ()) or ()
+            )
+        provenance = {
+            "mass_balance_attested": bool(report.get("balanced")),
+            # Schema-2 compatibility: retain the configured tolerance in
+            # snapshots. Initial kg balances use MaterialLot normalization.
+            "balance_tolerance_kg": float(self.ledger.balance_tolerance_kg),
+            "balance_projection_relative_tolerance": float(
+                self.ledger.balance_relative_tolerance
+            ),
+            "balance_projection_absolute_floor_kg": float(
+                self.ledger.balance_absolute_floor_kg
+            ),
+            "writer": "commit_batch",
+        }
+        # Absent when empty so schema 3.0.0 snapshots stay unchanged.
+        if law_disclosures:
+            provenance["law_disclosures"] = [dict(item) for item in law_disclosures]
         return {
             "ledger_schema_version": LEDGER_SCHEMA_VERSION,
-            "provenance": {
-                "mass_balance_attested": bool(report.get("balanced")),
-                # Schema-2 compatibility: retain the configured tolerance in
-                # snapshots. Initial kg balances use MaterialLot normalization.
-                "balance_tolerance_kg": float(self.ledger.balance_tolerance_kg),
-                "balance_projection_relative_tolerance": float(
-                    self.ledger.balance_relative_tolerance
-                ),
-                "balance_projection_absolute_floor_kg": float(
-                    self.ledger.balance_absolute_floor_kg
-                ),
-                "writer": "commit_batch",
-            },
+            "provenance": provenance,
             **report,
         }
 

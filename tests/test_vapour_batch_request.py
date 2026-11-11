@@ -1270,7 +1270,9 @@ def test_t568_typed_evaluator_refuses_wrong_target_and_claimed_authority(
     # oxygen decades contribute +2, +7.75 and -0.75 pressure decades.
     assert valid_result["oxygen_term_ln"] / math.log(10.0) == pytest.approx(oxygen_decades)
     if oxygen != 1e-8:
-        notice = valid_result["extrapolation_notice"]
+        notices = valid_result["extrapolation_notice"]
+        assert isinstance(notices, list)
+        notice = notices[0]
         assert notice["reason"] == "pO2_outside_evaluator_band"
         assert notice["pO2_bar_used"] == oxygen
         assert notice["certified_band"]["pO2_bar"] == (1e-30, 100.0)

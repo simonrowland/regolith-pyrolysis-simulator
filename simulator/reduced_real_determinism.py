@@ -320,6 +320,51 @@ def _melt_fO2_log_at_gate_key_reference_T(sim: Any, fO2_log: float) -> float:
     )
 
 
+def _active_law_disclosures() -> tuple[dict[str, Any], ...]:
+    from simulator.vapour_rail.run_disclosure import active_snapshot
+
+    return tuple(dict(item) for item in active_snapshot())
+
+
+def _prefer_law_disclosures(
+    existing: Any,
+    incoming: Any,
+) -> tuple[dict[str, Any], ...]:
+    """Keep a stored disclosure. Fill an empty sidecar from the active run."""
+
+    def _plain(value: Any) -> tuple[dict[str, Any], ...]:
+        if isinstance(value, Mapping):
+            items = (value,)
+        elif isinstance(value, (list, tuple)) and not isinstance(value, (str, bytes)):
+            items = value
+        else:
+            return ()
+        return tuple(dict(item) for item in items if isinstance(item, Mapping) and item)
+
+    stored = _plain(existing)
+    if stored:
+        return stored
+    return _plain(incoming)
+
+
+def _law_disclosures_json(items: Any) -> str:
+    return json.dumps(
+        list(_prefer_law_disclosures((), items)),
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def _law_disclosures_from_json(raw: Any) -> tuple[dict[str, Any], ...]:
+    if not raw:
+        return ()
+    try:
+        parsed = json.loads(raw)
+    except (TypeError, ValueError):
+        return ()
+    return _prefer_law_disclosures((), parsed)
+
+
 class PT0DeterminismStore:
     """PT-0 capture/replay store, optionally backed by the PT-1 SQLite DB."""
 
@@ -1011,6 +1056,7 @@ class PT0DeterminismStore:
         repair_notices: Sequence[Mapping[str, Any]] = (),
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
+        incoming_disclosures = _active_law_disclosures()
         key_bytes = canonical_json_bytes(key)
         payload_bytes = canonical_json_bytes(payload)
         repair_notices_json = encode_repair_notices_json(repair_notices)
@@ -1067,8 +1113,16 @@ class PT0DeterminismStore:
                     f"PT-1 capture disappeared after write: {key_hash}"
                 )
             effective_notices_json = persisted["repair_notices_json"]
+            incoming_disclosures = _prefer_law_disclosures(
+                persisted.get("law_disclosures"),
+                incoming_disclosures,
+            )
         if existing is not None:
             existing["repair_notices_json"] = effective_notices_json
+            existing["law_disclosures"] = _prefer_law_disclosures(
+                existing.get("law_disclosures"),
+                incoming_disclosures,
+            )
             self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
             return
         self.entries[key_hash] = {
@@ -1079,6 +1133,7 @@ class PT0DeterminismStore:
             "payload": copy.deepcopy(dict(payload)),
             "payload_hash": payload_hash,
             "repair_notices_json": effective_notices_json,
+            "law_disclosures": incoming_disclosures,
             "physics_bucket_key": copy.deepcopy(dict(physics_bucket_key)),
             "physics_bucket_hash": physics_bucket_hash,
             "cache_state": "live_fill",
@@ -1143,6 +1198,7 @@ class PT0DeterminismStore:
             self.hits += 1
             self.last_cache_state = "cached_exact"
             self._record_cache_event(artifact, "cached_exact")
+            self._reregister_cached_law_disclosures(entry)
             replay_notices = _emit_repair_notices(
                 sim,
                 (entry.get("repair_notices_json"),),
@@ -1286,6 +1342,7 @@ class PT0DeterminismStore:
         self.hits += 1
         self.last_cache_state = cache_state
         self._record_cache_event(artifact, cache_state)
+        self._reregister_cached_law_disclosures(entry)
         if cache_state == "cached_exact":
             _emit_repair_notices(sim, (entry.get("repair_notices_json"),))
         else:
@@ -1341,6 +1398,11 @@ class PT0DeterminismStore:
                     row_hash,
                 )
         return entry
+
+    def _reregister_cached_law_disclosures(self, entry: Mapping[str, Any]) -> None:
+        from simulator.vapour_rail.run_disclosure import reregister_cached_disclosures
+
+        reregister_cached_disclosures(entry.get("law_disclosures"))
 
     def _record_cache_event(self, artifact: str, cache_state: str) -> None:
         self.cache_events.append(
@@ -1549,6 +1611,7 @@ class PT1PersistentEquilibriumStore:
         if physics_bucket_hash is None:
             physics_bucket_hash = _sha256(physics_bucket_bytes)
         ladder_values = _physics_ladder_values_from_replay_key(key)
+        incoming_disclosures = _active_law_disclosures()
         with self._connect() as conn:
             self._initialize(conn)
             existing = self._fetch(conn, key_hash)
@@ -1592,6 +1655,18 @@ class PT1PersistentEquilibriumStore:
                         physics_bucket_bytes=physics_bucket_bytes,
                         physics_bucket_hash=physics_bucket_hash,
                         ladder_values=ladder_values,
+                    )
+                    self._write_law_disclosures(
+                        conn,
+                        key_hash,
+                        _prefer_law_disclosures(
+                            _law_disclosures_from_json(
+                                existing["law_disclosures_json"]
+                                if "law_disclosures_json" in existing.keys()
+                                else None
+                            ),
+                            incoming_disclosures,
+                        ),
                     )
                     return
                 if effective_notices_json == existing_notices_json:
@@ -1702,6 +1777,33 @@ class PT1PersistentEquilibriumStore:
                     source_git_dirty,
                 ),
             )
+            stored = None
+            if existing is not None and "law_disclosures_json" in existing.keys():
+                stored = existing["law_disclosures_json"]
+            self._write_law_disclosures(
+                conn,
+                key_hash,
+                _prefer_law_disclosures(
+                    _law_disclosures_from_json(stored),
+                    incoming_disclosures,
+                ),
+            )
+
+    def _write_law_disclosures(
+        self,
+        conn: sqlite3.Connection,
+        key_hash: str,
+        disclosures: Any,
+    ) -> None:
+        if not self._table_has_column(
+            conn, PT1_EQUILIBRIUM_TABLE, "law_disclosures_json"
+        ):
+            return
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET law_disclosures_json = ? WHERE key_hash = ?",
+            (_law_disclosures_json(disclosures), key_hash),
+        )
 
     def get(
         self,
@@ -2075,6 +2177,7 @@ class PT1PersistentEquilibriumStore:
             "physics_bucket_h40c_distance": "REAL",
             "physics_bucket_h30c_sha256": "TEXT",
             "physics_bucket_h30c_distance": "REAL",
+            "law_disclosures_json": "TEXT",
         }
         for name, column_type in columns.items():
             if name not in existing:
@@ -2163,6 +2266,11 @@ class PT1PersistentEquilibriumStore:
                 if self._table_has_column(conn, table, "repair_notices_json")
                 else "NULL"
             )
+            law_column = (
+                "law_disclosures_json"
+                if self._table_has_column(conn, table, "law_disclosures_json")
+                else "NULL"
+            )
             row = conn.execute(
                 f"""
                 SELECT
@@ -2180,7 +2288,8 @@ class PT1PersistentEquilibriumStore:
                     data_digests_json,
                     created_at,
                     git_dirty,
-                    {repair_column} AS repair_notices_json
+                    {repair_column} AS repair_notices_json,
+                    {law_column} AS law_disclosures_json
                 FROM {table}
                 WHERE key_hash = ?
                 """,
@@ -2266,6 +2375,11 @@ class PT1PersistentEquilibriumStore:
             "payload": copy.deepcopy(dict(row_payload)),
             "payload_hash": row["payload_sha256"],
             "repair_notices_json": repair_notices_json,
+            "law_disclosures": _law_disclosures_from_json(
+                row["law_disclosures_json"]
+                if "law_disclosures_json" in row.keys()
+                else None
+            ),
             "cache_state": "live_fill",
         }
 

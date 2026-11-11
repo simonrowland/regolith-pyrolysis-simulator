@@ -200,6 +200,27 @@ def _campaigns_elapsed_from_session_history(
     return float(fallback)
 
 
+def _bind_run_law_disclosure(method):
+    """Share one run registry across the session and keep it on the simulator."""
+
+    def wrapper(self, *args, **kwargs):
+        from simulator.vapour_rail.run_disclosure import (
+            active_snapshot,
+            disclosure_scope,
+        )
+
+        with disclosure_scope(inherit=True):
+            execution = method(self, *args, **kwargs)
+            snap = active_snapshot()
+            if snap and execution is not None:
+                sim = getattr(execution, "simulator", None)
+                if sim is not None:
+                    sim.law_disclosures = snap
+            return execution
+
+    return wrapper
+
+
 class RunExecutor:
     """Drive a configured session and return structured execution data."""
 
@@ -231,6 +252,7 @@ class RunExecutor:
             kwargs["stop_at_stage0_exit"] = True
         return self.execute_session(session, **kwargs)
 
+    @_bind_run_law_disclosure
     def execute_session(
         self,
         session: SimSession,
