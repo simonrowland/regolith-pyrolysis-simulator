@@ -14,6 +14,7 @@ from simulator.battery.enums import Phase, PhaseRole, Quantity, ValueKind
 from simulator.battery.migrate import (
     _point_condition_from_plain,
     _pressure_locator_is_unprinted,
+    _printed_source_point_condition_pressure,
     _without_unprinted_total_pressure,
 )
 from simulator.battery.records import Located, State
@@ -251,10 +252,13 @@ def test_unprinted_pressure_guard_uses_source_provenance() -> None:
     assert _without_unprinted_total_pressure({"total_pressure_Pa": inferred}) == {
         "total_pressure_Pa": inferred
     }
+    assert _printed_source_point_condition_pressure(inferred) is None
     assert parsed_unlocated.inference is None
+    assert _printed_source_point_condition_pressure(parsed_unlocated) is None
     assert _without_unprinted_total_pressure(
         {"total_pressure_Pa": parsed_unlocated}
     ) is None
+    assert _printed_source_point_condition_pressure(unlocated) is None
     assert _without_unprinted_total_pressure({"total_pressure_Pa": unlocated}) is None
 
 

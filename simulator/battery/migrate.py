@@ -12252,11 +12252,12 @@ def _source_point_condition_total_pressure_pa(
 def _printed_source_point_condition_pressure(
     located: Located[Any] | None,
 ) -> Decimal | None:
-    """Return a condition pressure unless its provenance marks it unprinted."""
+    """Return only an exact point backed by a printed source locator."""
 
     if (
         located is None
         or not located.state.is_value
+        or located.locator is None
         or _located_pressure_is_unprinted(located)
     ):
         return None
@@ -12278,11 +12279,25 @@ def _keeps_phase_composition_unknown_total(observation: Observation) -> bool:
 def _without_unprinted_total_pressure(
     point_conditions: Mapping[str, Located[Any]] | None,
 ) -> Mapping[str, Located[Any]] | None:
-    """Drop total pressure only when source provenance marks it unprinted.
+    """Keep pressure conditions with source location or explicit inference.
 
-    An explicit value without a locator is still printed source data. Inferred
-    pressure stays in point conditions with its derivation, while identity
-    pressure remains unknown. The value is never promoted from a partial sum.
+    Pressure evidence truth table; each condition result applies to series-row,
+    explicit-row, and point-level inputs:
+
+    locator | evidence             | series | explicit | point | printed identity
+    yes     | inferred             | keep   | keep     | keep  | no
+    yes     | printed/unclassified | keep   | keep     | keep  | exact point only
+    no      | inferred             | keep   | keep     | keep  | no
+    no      | unclassified point   | drop   | drop     | drop  | no
+    no      | unclassified interval| keep   | keep     | keep  | no
+    no      | claimed printed      | drop   | drop     | drop  | no locator proof
+
+    A locator with no inferred marker supplies print location, so located
+    unclassified data follows the printed row. A locatorless interval remains
+    a condition boundary but is not an identity point. Identity requires a
+    located exact point with no inferred or unprinted marker. Locatorless
+    point values stay in conditions only when their inference is explicit. A
+    partial-pressure sum is never promoted to total pressure.
     """
 
     if not point_conditions or "total_pressure_Pa" not in point_conditions:
@@ -12291,7 +12306,14 @@ def _without_unprinted_total_pressure(
     if (
         isinstance(located, Located)
         and located.state.is_value
-        and not _located_pressure_is_unprinted(located)
+        and (
+            located.locator is not None
+            or _pressure_inference_is_unprinted(located.inference)
+            or (
+                isinstance(located.state.value, Value)
+                and located.state.value.kind is ValueKind.INTERVAL
+            )
+        )
     ):
         return point_conditions
     kept = {
