@@ -42,6 +42,7 @@ from simulator.optimize.evaluate import (
     _is_stale_profile_refusal,
     _stale_profile_result,
 )
+from simulator.optimize.objective import _merged_run_for_fidelity
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
@@ -953,18 +954,9 @@ def _warm_runtime_spec(tasks: Sequence[_PoolTask]) -> _WarmRuntimeSpec | None:
 
 
 def _task_backend_name(task: _PoolTask) -> str:
-    merged: dict[str, Any] = {}
-    profile = task.profile
-    run_options = profile.get("run", {}) if isinstance(profile, Mapping) else {}
-    if isinstance(run_options, Mapping):
-        merged.update(run_options)
-    fidelities = profile.get("fidelities", {}) if isinstance(profile, Mapping) else {}
-    if isinstance(fidelities, Mapping):
-        selected = fidelities.get(task.fidelity, {})
-        if isinstance(selected, Mapping):
-            merged.update(selected)
-    # Fold legacy `stub` onto canonical `internal-analytical` when reading the
-    # profile boundary; mirrors EvalSpec.backend_name canonicalization.
+    # Same overlay evaluate uses. An alias spelling cannot select a second block.
+    profile = task.profile if isinstance(task.profile, Mapping) else {}
+    merged = _merged_run_for_fidelity(profile, task.fidelity)
     return canonical_backend_name(
         str(
             merged.get("backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN)

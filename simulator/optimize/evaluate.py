@@ -757,6 +757,9 @@ def evaluate(
         return _invalid_patch_result(candidate_id, str(exc))
 
     try:
+        # Campaign is `_merged_run_for_fidelity`: the request and the profile
+        # key fold through canonical_backend_name before this read. Gates
+        # below are the campaign the run executes, not the literal spelling.
         active_constraints = _composition_target_constraints(
             profile,
             constraints,
@@ -3633,20 +3636,12 @@ def _positive_eval_mass_kg(raw: Any) -> float:
 
 
 def _validate_eval_mass_basis(profile: Mapping[str, Any], fidelity: str) -> None:
-    raw_mass: Any = None
-    found = False
-    run_options = profile.get("run")
-    if isinstance(run_options, MappingABC) and "mass_kg" in run_options:
-        raw_mass = run_options["mass_kg"]
-        found = True
-    fidelity_options = profile.get("fidelities")
-    if isinstance(fidelity_options, MappingABC):
-        selected = fidelity_options.get(fidelity)
-        if isinstance(selected, MappingABC) and "mass_kg" in selected:
-            raw_mass = selected["mass_kg"]
-            found = True
-    if found:
-        _positive_eval_mass_kg(raw_mass)
+    # The mass the run executes. Alias spellings share `_merged_run_for_fidelity`
+    # with the campaign lookup, so a `stub` request cannot validate the authored
+    # mass while the overlay runs a different one.
+    merged = _merged_run_for_fidelity(profile, fidelity)
+    if "mass_kg" in merged:
+        _positive_eval_mass_kg(merged["mass_kg"])
 
 
 def _thermal_scheduled_run_options(

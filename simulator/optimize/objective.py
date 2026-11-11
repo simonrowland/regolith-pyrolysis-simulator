@@ -16,6 +16,7 @@ from typing import Any, Mapping, TypeVar
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.accounting.completeness import evaporation_quantity_unavailability
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.backend_names import canonical_backend_name
 from simulator.cost_parameters import (
     SHUTTLE_REAGENT_SPECIES,
     CostParameters,
@@ -106,9 +107,13 @@ _MASS_OBJECTIVE_METRICS = frozenset(
 # credit O2 to a terminal account (evaporation coproduct or electrolysis
 # anode). The products map alone is a hand list and omits that by-product.
 # The executed campaign is the fidelity overlay on ``profile.run`` (the same
-# value EvalSpec.campaign stores). Otherwise the objective is withheld from
-# every scoring path (objective definitions, compute_objectives, strategy
-# metrics, and the study scalar) and from every objective-derived gate.
+# value EvalSpec.campaign stores). `_merged_run_for_fidelity` folds the
+# requested fidelity and every profile key through `canonical_backend_name`
+# before that campaign is read. `stub` and `internal-analytical` are one
+# fidelity: an alias spelling cannot give the vector one campaign and the
+# gates another. An objective whose product that campaign does not claim is
+# withheld from every scoring path (objective definitions, compute_objectives,
+# strategy metrics, and the study scalar) and from every objective-derived gate.
 # Those gates are terminal rump, stage-0 stop, coating, composition order,
 # extraction thresholds, and target metadata. They read
 # ``composition_target_specs``, which is the scoring rows. A withheld
@@ -1445,15 +1450,57 @@ def _require_objective_keys(
         )
 
 
+def _canonical_fidelity_token(fidelity: str) -> str:
+    """Analytical alias folded; every other fidelity name stays byte-for-byte."""
+
+    canonical = canonical_backend_name(fidelity)
+    if canonical is None:
+        return str(fidelity)
+    return str(canonical)
+
+
+def _fidelity_overlay_block(
+    fidelity_options: Mapping[Any, Any],
+    fidelity: str,
+) -> Mapping[str, Any]:
+    """The one overlay block ``fidelity`` executes.
+
+    The requested name and each profile key fold through
+    ``canonical_backend_name``. ``stub`` stored under the profile and
+    ``internal-analytical`` on the request are the same block, and the
+    reverse spelling is the same block. Two keys that fold together are
+    the duplicate ``canonicalize_profile_backend_names`` refuses. A
+    non-mapping block does not overlay.
+    """
+
+    requested = _canonical_fidelity_token(fidelity)
+    matched: list[Any] = []
+    for key, raw in fidelity_options.items():
+        if _canonical_fidelity_token(str(key)) == requested:
+            matched.append(raw)
+    if len(matched) > 1:
+        # Lazy: profiles.py imports this module.
+        from simulator.optimize.profiles import ProfileValidationError
+
+        raise ProfileValidationError(
+            f"duplicate fidelity after alias normalization {requested!r}"
+        )
+    selected = matched[0] if matched else {}
+    if not isinstance(selected, Mapping):
+        return {}
+    return selected
+
+
 def _merged_run_for_fidelity(
     profile: Mapping[str, Any],
     fidelity: str | None,
 ) -> dict[str, Any]:
     """``profile.run`` with one fidelity block laid over it.
 
-    This is the merge ``_run_options`` uses. ``fidelity is None`` does not
-    consult ``fidelities``. The fidelity name is used as the dict key: callers
-    that canonicalize backend aliases must do so before this lookup.
+    This is the merge ``_run_options`` and ``executed_campaign_id`` use, so
+    objective eligibility, the study scalar, and objective-derived gates
+    read one campaign. ``fidelity is None`` does not consult ``fidelities``.
+    Analytical aliases are folded here. Callers do not pre-canonicalize.
     """
 
     merged = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
@@ -1461,9 +1508,7 @@ def _merged_run_for_fidelity(
         return merged
     fidelity_options = profile.get("fidelities", {})
     if isinstance(fidelity_options, Mapping):
-        raw_selected = fidelity_options.get(fidelity, {})
-        if isinstance(raw_selected, Mapping):
-            merged.update(dict(raw_selected))
+        merged.update(dict(_fidelity_overlay_block(fidelity_options, fidelity)))
     return merged
 
 

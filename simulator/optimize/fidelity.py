@@ -29,6 +29,7 @@ from simulator.backend_names import (
 from simulator.optimize.evaluate import EvaluationAbort, ScoredResult
 from simulator.optimize.objective import (
     ObjectiveValue,
+    _merged_run_for_fidelity,
     canonical_objective_metric,
     objective_metric_aliases,
 )
@@ -677,17 +678,9 @@ def _task_backend_name(task: _FidelityTask) -> str:
 
 
 def _task_run_options(task: _FidelityTask) -> dict[str, Any]:
-    merged: dict[str, Any] = {}
-    profile = task.profile
-    run_options = profile.get("run", {}) if isinstance(profile, Mapping) else {}
-    if isinstance(run_options, Mapping):
-        merged.update(run_options)
-    fidelities = profile.get("fidelities", {}) if isinstance(profile, Mapping) else {}
-    if isinstance(fidelities, Mapping):
-        selected = fidelities.get(task.fidelity, {})
-        if isinstance(selected, Mapping):
-            merged.update(selected)
-    return merged
+    # Same overlay evaluate uses. An alias spelling cannot select a second block.
+    profile = task.profile if isinstance(task.profile, Mapping) else {}
+    return _merged_run_for_fidelity(profile, task.fidelity)
 
 
 def _arm_backend_authority(

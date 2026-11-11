@@ -22,7 +22,10 @@ import simulator.optimize.objective as objective_module
 from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
-from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_ALIASES,
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+)
 from simulator.campaigns import (
     CampaignPressureSetpointRefusal,
     campaign_evolves_terminal_oxygen,
@@ -3038,6 +3041,269 @@ def test_unclaimed_composition_objective_does_not_gate_the_run(
         assert ("coating" in result.feasibility_margins) is (
             expects_gate and kind in {"coating", "stage0_exit"}
         )
+
+
+# INVARIANT: one fidelity has one executed campaign. Analytical alias
+# spellings, on the request and on the profile key, cannot install gates
+# from a campaign the run does not execute. The matrix is every alias token
+# crossed with every other, plus case and surrounding whitespace crossed
+# with the canonical token in both directions. C2B claims the residual-melt
+# glass, so its overlay keeps coating and the Fe extraction threshold. C0
+# does not, so those gates stay off and the row is withheld.
+def _analytical_fidelity_tokens() -> tuple[str, ...]:
+    return (
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        *sorted(ANALYTICAL_BACKEND_ALIASES),
+    )
+
+
+def _alias_gate_cases() -> list[tuple[str, str, str, str]]:
+    tokens = _analytical_fidelity_tokens()
+    canonical = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    pairs = (("C2B", "C0"), ("C0", "C2B"))
+    cases: list[tuple[str, str, str, str]] = []
+    seen: set[tuple[str, str, str, str]] = set()
+
+    def add(request: str, key: str, authored: str, evaluated: str) -> None:
+        row = (request, key, authored, evaluated)
+        if row in seen:
+            return
+        seen.add(row)
+        cases.append(row)
+
+    for request in tokens:
+        for key in tokens:
+            for authored, evaluated in pairs:
+                add(request, key, authored, evaluated)
+    for token in tokens:
+        for surface in (token.upper(), f" {token} "):
+            if surface == token:
+                continue
+            for authored, evaluated in pairs:
+                add(surface, canonical, authored, evaluated)
+                add(canonical, surface, authored, evaluated)
+    return cases
+
+
+def _alias_gate_case_id(
+    request: str,
+    key: str,
+    authored: str,
+    evaluated: str,
+) -> str:
+    def show(value: str) -> str:
+        if value != value.strip():
+            return "pad-" + value.strip()
+        return value
+
+    return f"req-{show(request)}__key-{show(key)}__{authored}-executed-{evaluated}"
+
+
+def _alias_gate_trace() -> SimpleNamespace:
+    """Coating rejects when installed. Fe extraction passes either threshold.
+
+    50 kg Fe against 0.01 kg FeO is near a full extraction in
+    target-equivalent mol, above the code default 0.95 and above the
+    objective threshold 0.5. The wall report is the unavailable empty
+    deposit the coating gate refuses.
+    """
+
+    trace = _trace()
+    trace.product_ledger_kg = {"SiO": 95.0, "Fe": 50.0}
+    trace.terminal_rump_by_species_kg = {"CaO": 2.0, "FeO": 0.01}
+    delattr(trace, "wall_deposit_by_segment_species_delta")
+    delattr(trace, "wall_deposit_sticking_authority")
+    trace.wall_deposit_by_segment_species_kg = {}
+    return trace
+
+
+def _alias_gate_profile(profile_key: str, authored: str, evaluated: str) -> dict:
+    profile = _gate_eval_profile("extraction_thresholds", authored, evaluated)
+    profile["profile_id"] = "alias-gate"
+    profile["constraints"] = {
+        "gates": ["furnace_temperature", "extraction_completeness"],
+        "target_species": ["Fe"],
+    }
+    profile["fidelities"] = {
+        profile_key: {
+            "backend_name": "internal-analytical",
+            "hours": 1,
+            "campaign": evaluated,
+        }
+    }
+    return profile
+
+
+@pytest.mark.parametrize(
+    ("request_fidelity", "profile_key", "authored", "evaluated"),
+    _alias_gate_cases(),
+    ids=[_alias_gate_case_id(*case) for case in _alias_gate_cases()],
+)
+def test_fidelity_alias_gates_follow_the_executed_campaign(
+    request_fidelity: str,
+    profile_key: str,
+    authored: str,
+    evaluated: str,
+    shipped_product_claims: None,
+) -> None:
+    """Both alias directions, every analytical spelling.
+
+    Authored C2B, overlay C0, fidelity ``stub`` against a profile key
+    ``internal-analytical`` is the reviewer case, and the swap of those two
+    spellings is the other direction. A residual-melt target sits beside
+    energy and duration. C0 withholds it: no coating gate, the Fe threshold
+    stays the code default 0.95, and the run scores. C2B keeps the target:
+    coating rejects the empty wall report, and the Fe threshold is 0.5.
+    """
+
+    expects_gates = evaluated == "C2B"
+    profile = _alias_gate_profile(profile_key, authored, evaluated)
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        request_fidelity,
+        profile=profile,
+        executor=FakeExecutor(_execution(trace=_alias_gate_trace())),
+    )
+
+    assert profile["run"]["campaign"] == authored
+    assert result.eval_spec is not None
+    assert result.eval_spec.campaign == evaluated
+    assert result.eval_spec.fidelity == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    assert ("coating" in result.feasibility_margins) is expects_gates
+    extraction = result.feasibility_margins["extraction_completeness"]
+    if expects_gates:
+        assert result.feasible is False
+        assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+        assert result.failing_gates == ("coating",)
+        assert extraction.threshold.value == pytest.approx(0.5)
+        assert extraction.threshold.source == "profile"
+        assert extraction.threshold.source_ref.endswith(
+            "target.extraction.completeness_min.Fe"
+        )
+        assert result.eval_spec.target_spec_id == "gate-extraction"
+        assert not any(
+            note.startswith("campaign_does_not_claim_product:")
+            for note in result.notes
+        )
+        return
+
+    assert result.feasible is True
+    assert result.failure_category is None
+    assert result.failing_gates == ()
+    assert extraction.threshold.value == pytest.approx(0.95)
+    assert extraction.threshold.source == "code_default"
+    assert extraction.threshold.id == "extraction_completeness_min"
+    assert result.eval_spec.target_spec_id == ""
+    assert result.objectives is not None
+    mapping = result.objectives.as_mapping()
+    assert "composition_target:gate-extraction" not in mapping
+    assert mapping[ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC] == pytest.approx(44.0)
+    assert mapping["duration_h"] == pytest.approx(1.0)
+    assert 0.0 not in mapping.values()
+    assert result.notes == (_withhold_note_for("gate-extraction"),)
+
+
+@pytest.mark.parametrize("request_fidelity", ("fast", "high"))
+def test_non_analytical_fidelity_does_not_inherit_an_analytical_overlay(
+    request_fidelity: str,
+    shipped_product_claims: None,
+) -> None:
+    """``fast`` and ``high`` are not aliases of ``internal-analytical``.
+
+    The analytical overlay selects C0. ``fast`` has its own C2B block.
+    ``high`` has none, so the authored C2B run stands. Neither withholds
+    the residual-melt target.
+    """
+
+    profile = _alias_gate_profile("internal-analytical", "C2B", "C0")
+    profile["fidelities"]["fast"] = {
+        "backend_name": "internal-analytical",
+        "hours": 1,
+        "campaign": "C2B",
+    }
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        request_fidelity,
+        profile=profile,
+        executor=FakeExecutor(_execution(trace=_alias_gate_trace())),
+    )
+
+    assert result.eval_spec is not None
+    assert result.eval_spec.campaign == "C2B"
+    assert result.eval_spec.fidelity == request_fidelity
+    assert result.feasible is False
+    assert result.failing_gates == ("coating",)
+    extraction = result.feasibility_margins["extraction_completeness"]
+    assert extraction.threshold.value == pytest.approx(0.5)
+
+
+@pytest.mark.parametrize("request_fidelity", ("stub", "internal-analytical"))
+def test_duplicate_analytical_fidelity_keys_refuse_before_the_run(
+    request_fidelity: str,
+) -> None:
+    """Two keys that fold to one fidelity are not a silent choice of campaign."""
+
+    profile = _alias_gate_profile("internal-analytical", "C2B", "C0")
+    profile["fidelities"]["stub"] = {
+        "backend_name": "internal-analytical",
+        "hours": 1,
+        "campaign": "C2B",
+    }
+    executor = FakeExecutor(_execution(trace=_alias_gate_trace()))
+
+    with pytest.raises(
+        ProfileValidationError,
+        match="duplicate fidelity after alias normalization 'internal-analytical'",
+    ):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            request_fidelity,
+            profile=profile,
+            executor=executor,
+        )
+
+    assert executor.calls == 0
+
+
+@pytest.mark.parametrize(
+    ("request_fidelity", "profile_key"),
+    (
+        ("stub", "internal-analytical"),
+        ("internal-analytical", "stub"),
+    ),
+)
+def test_invalid_alias_overlay_mass_is_refused(
+    request_fidelity: str,
+    profile_key: str,
+) -> None:
+    """A zero mass on the overlay is the mass that refuses, not the authored mass."""
+
+    profile = copy.deepcopy(PROFILE)
+    profile["run"] = {**profile["run"], "mass_kg": 1000.0}
+    profile["fidelities"] = {
+        profile_key: {
+            "backend_name": "internal-analytical",
+            "hours": 1,
+            "mass_kg": 0.0,
+        }
+    }
+    executor = FakeExecutor(_execution())
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        request_fidelity,
+        profile=profile,
+        executor=executor,
+    )
+
+    assert executor.calls == 0
+    assert result.eval_spec is None
+    assert result.failure_category is FailureCategory.ZERO_INPUT_BASIS_BREACH
+    assert ZERO_INPUT_BASIS_BREACH in result.notes[0]
 
 
 def test_unearned_out_of_domain_does_not_become_an_unclaimed_rump_gate(
