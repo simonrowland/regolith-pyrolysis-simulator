@@ -11,6 +11,7 @@ import time
 import zlib
 from dataclasses import dataclass
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -85,6 +86,24 @@ def test_disabled_cache_calls_solver_without_creating_store(
     assert calls == 2
     assert _engine_cache_counters(reset=True) == {}
     assert list(tmp_path.iterdir()) == []
+
+
+def test_internal_analytical_scope_bypasses_nested_engine_cache(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    _engine_cache_counters(reset=True)
+
+    with engine_cache._without_engine_cache():
+        assert _cached_engine_call()(
+            "openimcc", {"request": "nested-internal-analytical"},
+            lambda: {"answer": 7},
+        ) == {"answer": 7}
+
+    assert _engine_cache_counters(reset=True) == {}
+    assert not database.exists()
 
 
 def test_concurrent_processes_can_write_the_same_cache_key(
@@ -1173,6 +1192,103 @@ def test_engine_notice_codes_round_trip_with_typed_values() -> None:
     assert len({(engine, code) for engine, _number, code, _description in ENGINE_CACHE_NOTICE_CODE_TABLE}) == len(
         ENGINE_CACHE_NOTICE_CODE_TABLE
     )
+
+
+def test_engine_notice_emitters_use_registered_codes() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        engine_flags_from_result,
+    )
+    from simulator.melt_backend.base import (
+        decode_engine_notice_codes,
+        encode_engine_notice_codes,
+    )
+
+    openimcc_notices = [
+        {"kind": "openimcc_flag"},
+        {"kind": "imcc_complex_saturation"},
+        {"kind": "openimcc_temperature_extrapolated"},
+        {"kind": "openimcc_composition_outside_validated_envelope"},
+        {"kind": "openimcc_notice"},
+        {"kind": "openimcc_notice", "code": "openimcc_fe2o3_fold"},
+        {
+            "kind": "openimcc_notice",
+            "code": "openimcc_ferric_component_collapsed",
+        },
+        {
+            "kind": "openimcc_notice",
+            "code": "openimcc_projection_crmn_relaxed",
+        },
+        {"kind": "openimcc_notice", "code": "openimcc_projected_bulk"},
+        {"kind": "openimcc_gas_flag"},
+        {"kind": "openimcc_gas_unavailable"},
+        {"kind": "fo2_oxygen_balance_effusion_solved"},
+        {"kind": "input_omitted"},
+    ]
+    emitted = {
+        "openimcc": [
+            SimpleNamespace(
+                diagnostics={
+                    "imcc_notices": openimcc_notices
+                },
+                warnings=(),
+            )
+        ],
+        "alphamelts": [
+            SimpleNamespace(
+                diagnostics={
+                    "commissioning_notice": {
+                        "kind": "out_of_certified_band",
+                        "authority": "extrapolated",
+                    },
+                    "fo2_gas_only": {"notice": "external_fO2_gas_only"},
+                },
+                warnings=(
+                    "AlphaMELTS provider omitted diagnostic_oxide_activities field FeO",
+                ),
+            )
+        ],
+        "thermoengine": [
+            SimpleNamespace(
+                diagnostics={
+                    "commissioning_notice": {
+                        "kind": "engine_model_caveat",
+                        "authority": "extrapolated",
+                    },
+                    "fo2_gas_only": {"notice": "external_fO2_gas_only"},
+                    "imcc_notices": [{"kind": "fallback"}],
+                },
+                warnings=(),
+            )
+        ],
+        "vaporock": [
+            SimpleNamespace(
+                diagnostics={
+                    "commissioning_notice": {
+                        "kind": "out_of_certified_band",
+                        "authority": "extrapolated",
+                    }
+                },
+                warnings=(),
+            )
+        ],
+        "magemin": [
+            SimpleNamespace(
+                diagnostics={
+                    "commissioning_notice": {
+                        "kind": "input_omitted",
+                        "authority": "extrapolated",
+                    }
+                },
+                warnings=(),
+            )
+        ],
+    }
+
+    for engine_id, results in emitted.items():
+        for result in results:
+            notices, _authority, _band = engine_flags_from_result(result)
+            codes, values = encode_engine_notice_codes(engine_id, notices)
+            assert decode_engine_notice_codes(engine_id, codes, values) == notices
 
 
 def test_unknown_engine_notice_code_requires_table_entry() -> None:
