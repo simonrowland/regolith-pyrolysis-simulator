@@ -422,28 +422,23 @@ def test_repo_source_status_counts_match_rows() -> None:
 def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     index = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
     counts = index["counts"]
-    # Index base is landing batch f3d5d78d5 (783/781/781/84), itself green
-    # 91061cdad (775/773/773/83) plus that batch's index delta. Stack-owned
-    # index deltas are unchanged.
-    assert counts["sources"] == 783 + 18  # landing 783 + stack delta 18
-    assert counts["extracts"] == 781 + 18  # landing 781 + stack delta 18
-    assert counts["extracts_without_pdf"] == 781 + 18  # landing 781 + stack delta 18
-    assert counts["alias_groups_needing_resolution"] == 84 + 2  # landing 84 + stack delta 2
+    # Pin the generated index for the approved combined-offer merge stack.
+    assert counts["sources"] == 850
+    assert counts["extracts"] == 848
+    assert counts["extracts_without_pdf"] == 848
+    assert counts["alias_groups_needing_resolution"] == 94
 
     status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
-    # Status rows are landing f3d5d78d5 (2318 sources, in_progress 256).
-    # Landing is green 91061cdad (2311 / in_progress 249) plus seven
-    # in_progress sources. Stack 4's header had counted only green plus its
-    # delta and left those seven rows uncounted.
-    assert status["counts"]["sources"] == 2318 + 16  # landing 2318 + stack delta 16
+    # SOURCE_STATUS is restricted to green plus extracts in this merge stack.
+    assert status["counts"]["sources"] == 2338
     assert status["counts"]["by_stage"] == {
-        "located": 209 + 0,  # landing 209 + stack delta 0
-        "inbox": 1261 - 12,  # landing 1261 + stack delta -12
-        "in_progress": 256 + 2,  # landing 256 + stack delta 2
-        "ingested_partial": 145 + 10,  # landing 145 + stack delta 10
-        "ingested_complete": 130 + 6,  # landing 130 + stack delta 6
-        "wired": 0 + 0,  # neither side has a wired row
-        "unknown": 317 + 10,  # landing 317 + stack delta 10
+        "located": 206,
+        "inbox": 1251,
+        "in_progress": 192,
+        "ingested_partial": 183,
+        "ingested_complete": 149,
+        "wired": 0,
+        "unknown": 357,
     }
 
 
