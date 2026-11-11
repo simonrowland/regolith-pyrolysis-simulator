@@ -122,6 +122,10 @@ def imported_openimcc_commit() -> str | None:
                 if isinstance(commit_id, str) and commit_id:
                     return commit_id
 
+    # A loose openimcc.py module is not an identifiable source checkout.
+    if imported_path.name != "__init__.py" or imported_path.parent.name != "openimcc":
+        return None
+
     # A PYTHONPATH source checkout may shadow a stale distribution. In that
     # case report the checkout's HEAD, never the unrelated dist-info commit.
     if "site-packages" in imported_path.parts or any(

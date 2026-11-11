@@ -316,16 +316,15 @@ def _call_cached_backend_equilibrate(
     if handle.name == "openimcc":
         # OpenIMCC's battery adapter discards pressure before calling the bridge.
         request_kwargs.pop("pressure_bar", None)
-    if handle.name == "alphamelts":
-        request_kwargs["engine_environment"] = {
-            "ALPHAMELTS_CALC_MODE": os.environ.get("ALPHAMELTS_CALC_MODE")
-        }
+    # The resolved handle owns AlphaMELTS's child-environment snapshot. Never
+    # reread the parent environment while building a request key.
     po2_request = request_kwargs.get("po2_request")
     if isinstance(po2_request, Po2Request):
         request_kwargs["po2_request"] = po2_request.as_payload()
     from types import SimpleNamespace
 
     from simulator.engine_cache import (
+        BATTERY_ENGINE_CACHE_SCHEMA,
         _is_refusal,
         cached_engine_call,
         engine_cache_settings,
@@ -341,29 +340,36 @@ def _call_cached_backend_equilibrate(
         if _is_refusal(result):
             return result
         if isinstance(result, EquilibriumResult):
-            return result.to_engine_cache_value()
+            return result.to_engine_cache_value(engine_id=handle.name)
         if isinstance(result, SimpleNamespace):
-            return equilibrium_cache_value(vars(result))
+            return equilibrium_cache_value(vars(result), engine_id=handle.name)
         if isinstance(result, Mapping):
-            return equilibrium_cache_value(result)
+            return equilibrium_cache_value(result, engine_id=handle.name)
         return result
 
-    adapter_settings = engine_cache_settings(handle.name, handle.backend)
+    adapter_settings = engine_cache_settings(
+        handle.name,
+        handle.backend,
+        effective_settings=handle.engine_settings,
+    )
 
     payload = cached_engine_call(
         handle.name,
         {
+            "battery_cache_schema": BATTERY_ENGINE_CACHE_SCHEMA,
             "kwargs": request_kwargs,
             "engine_settings": adapter_settings,
         },
         solve_cache_value,
     )
     if isinstance(payload, list):
-        payload = equilibrium_cache_from_value(payload)
+        payload = equilibrium_cache_from_value(payload, engine_id=handle.name)
     if isinstance(payload, Mapping):
         if handle.name == "internal-analytical":
             return SimpleNamespace(**payload)
-        return EquilibriumResult.from_engine_cache_value(payload)
+        return EquilibriumResult.from_engine_cache_value(
+            payload, engine_id=handle.name
+        )
     return payload
 
 
@@ -730,28 +736,24 @@ class EquilibrateCell:
                 "vapor_pressures_source": self.vapor_pressures_source,
                 "liquid_composition_wt_pct": self.liquid_composition_wt_pct,
                 "fe_redox_split": self.fe_redox_split,
-            }
+            },
+            engine_id=self.engine,
         )
-        compact_notices = []
-        for notice in self.notices:
-            if not isinstance(notice, Mapping):
-                continue
-            kind = notice.get("kind")
-            if isinstance(kind, Enum):
-                kind = kind.value
-            authority = notice.get("authority")
-            certified_band = notice.get("certified_band")
-            if kind is None and authority is None and certified_band is None:
-                continue
-            if certified_band == self.certified_band and certified_band is not None:
-                certified_band = True
-            compact_notices.append(
-                [
-                    None if kind is None else str(kind),
-                    None if authority is None else str(authority),
-                    certified_band,
-                ]
-            )
+        from simulator.melt_backend.base import encode_engine_notice_codes
+
+        code_numbers, code_values = encode_engine_notice_codes(
+            self.engine,
+            [
+                notice
+                for notice in self.notices
+                if isinstance(notice, Mapping)
+            ],
+        )
+        compact_notices = {
+            "engine": self.engine,
+            "codes": code_numbers,
+            "values": code_values,
+        }
         flags = [
             self.engine_status,
             _activity_reference_phase(self.engine_reason),
@@ -817,26 +819,18 @@ class EquilibrateCell:
             invalid_components,
             failure_disposition,
         ) = flags
-        if not isinstance(raw_notices, list) or not isinstance(invalid_components, list):
+        if not isinstance(raw_notices, Mapping) or not isinstance(invalid_components, list):
             raise ValueError("invalid compact EquilibrateCell notices or components")
-        notices = []
-        for row in raw_notices:
-            if (
-                not isinstance(row, list)
-                or len(row) != 3
-                or any(value is not None and not isinstance(value, str) for value in row[:2])
-            ):
-                raise ValueError("invalid compact EquilibrateCell notice")
-            notice: dict[str, Any] = {}
-            if row[0] is not None:
-                notice["kind"] = row[0]
-            if row[1] is not None:
-                notice["authority"] = row[1]
-            if row[2] is True:
-                notice["certified_band"] = certified_band
-            elif row[2] is not None:
-                notice["certified_band"] = row[2]
-            notices.append(notice)
+        from simulator.melt_backend.base import decode_engine_notice_codes
+
+        notice_engine = raw_notices.get("engine")
+        if not isinstance(notice_engine, str):
+            raise ValueError("invalid compact EquilibrateCell notice engine")
+        notices = decode_engine_notice_codes(
+            notice_engine,
+            raw_notices.get("codes", ()),
+            raw_notices.get("values", ()),
+        )
         values = {
             "status": base.get("status") or "ok",
             "engine_status": engine_status,
@@ -4384,9 +4378,16 @@ class _IsolatedCellEngine:
 def _bootstrap_isolated_cell_engine(
     engine: str,
     engine_settings: Mapping[str, Any] | None = None,
+    effective_settings: Mapping[str, Any] | None = None,
 ) -> tuple[_IsolatedCellEngine, str]:
     """Resolve the battery engine before WarmEngineWorker signals ready."""
     settings = dict(engine_settings or {})
+    if engine == "alphamelts" and not settings:
+        ambient = (effective_settings or {}).get("ambient_calc_mode")
+        if ambient is None:
+            os.environ.pop("ALPHAMELTS_CALC_MODE", None)
+        else:
+            os.environ["ALPHAMELTS_CALC_MODE"] = str(ambient)
     handle = _open_battery_engine_with_settings(engine, settings or None)
     return _IsolatedCellEngine(handle, settings), engine
 
@@ -4450,11 +4451,17 @@ class _IsolatedCellWorker:
     ) -> None:
         self.engine = str(engine)
         self.engine_settings = dict(engine_settings or {})
+        from simulator.engine_cache import normalize_engine_settings
+
+        self.effective_engine_settings = normalize_engine_settings(
+            self.engine,
+            engine_settings if engine_settings else None,
+        )
         self._lock = threading.Lock()
         bootstrap_args = (
-            (self.engine, self.engine_settings)
-            if engine_settings
-            else (self.engine,)
+            self.engine,
+            self.engine_settings or None,
+            self.effective_engine_settings,
         )
         self._worker = WarmEngineWorker(
             name=f"{self.engine} battery cell",
@@ -4537,16 +4544,23 @@ class _IsolatedCellWorker:
                     )
                 if result.get("status") == "refusal":
                     return result
-                return EquilibrateCell.from_payload(result).to_engine_cache_value()
+            if self.engine == "internal-analytical":
+                return result
+            return EquilibrateCell.from_payload(result).to_engine_cache_value()
 
         if self.engine == "internal-analytical":
             result = solve()
         else:
-            from simulator.engine_cache import cached_engine_call, engine_cache_settings
+            from simulator.engine_cache import (
+                BATTERY_ENGINE_CACHE_SCHEMA,
+                cached_engine_call,
+                engine_cache_settings,
+            )
 
             request["engine_settings"] = engine_cache_settings(
-                self.engine, request.get("engine_settings", {})
+                self.engine, self.effective_engine_settings
             )
+            request["battery_cache_schema"] = BATTERY_ENGINE_CACHE_SCHEMA
             result = cached_engine_call(self.engine, request, solve)
         if isinstance(result, list):
             result = EquilibrateCell.from_engine_cache_value(result).as_payload()
@@ -4747,6 +4761,8 @@ def _equilibrate_takes_fo2(backend: Any) -> bool:
 def _open_resolved_backend(
     name: str,
     engine_settings: Mapping[str, Any] | None = None,
+    *,
+    normalized_settings: Mapping[str, Any] | None = None,
 ) -> Any:
     from simulator.backends import (
         BackendSelectionPolicy,
@@ -4755,7 +4771,13 @@ def _open_resolved_backend(
         resolve_backend,
     )
     from simulator.melt_backend.magemin import MAGEMinBackend
-    settings = dict(engine_settings or {})
+    from simulator.engine_cache import normalize_engine_settings
+
+    settings = (
+        normalized_settings
+        if normalized_settings is not None
+        else normalize_engine_settings(name, engine_settings)
+    )
 
     if name in OPENIMCC_ENGINE_NAMES:
         return _OpenImccBatteryBackend(name, pack_name=settings.get("pack"))
@@ -4784,7 +4806,7 @@ def _open_resolved_backend(
                 "vapor_pressure_units": settings.get(
                     "vapor_pressure_units", "bar"
                 ),
-                "warm_worker": False,
+                "warm_worker": settings["warm_worker"],
             }
         ):
             raise BackendUnavailableError(
@@ -4799,7 +4821,7 @@ def _open_resolved_backend(
                 "database": settings.get("database"),
                 "fO2_buffer": settings.get("fO2_buffer"),
                 "python_bridge": settings.get("bridge"),
-                "warm_worker": False,
+                "warm_worker": settings["warm_worker"],
             }
         )
         backend = _try_backend(MAGEMinBackend, backend_config)
@@ -4808,25 +4830,27 @@ def _open_resolved_backend(
                 "MAGEMin unavailable; binary missing or initialize() failed"
             )
         return backend
-    if engine_settings is not None and name == "alphamelts":
+    if name == "alphamelts":
         ambient_calc_mode = settings.get("ambient_calc_mode")
         if ambient_calc_mode is None:
             os.environ.pop("ALPHAMELTS_CALC_MODE", None)
         else:
             os.environ["ALPHAMELTS_CALC_MODE"] = str(ambient_calc_mode)
+
+    if engine_settings is not None and name == "alphamelts":
         backend_config = {
             "mode": settings.get("transport"),
             "model": settings.get("raw_model_name"),
             "fO2_buffer": settings.get("redox_buffer"),
             "fO2_offset": settings.get("fO2_offset"),
             "Fe3Fet_Liq": settings.get("Fe3Fet_ratio"),
-            "warm_worker": False,
-            "vapor_transport_pO2_bar": settings.get(
+            "warm_worker": settings["warm_worker"],
+            "vapor_transport_pO2_bar": settings[
                 "configured_vapor_transport_pO2_bar"
-            ),
-            "vapor_transport_floor_bar": settings.get(
+            ],
+            "vapor_transport_floor_bar": settings[
                 "configured_vapor_transport_floor_bar"
-            ),
+            ],
         }
         backend = resolve_backend(
             name,
@@ -4840,12 +4864,15 @@ def _open_resolved_backend(
     if engine_settings is not None and name == "thermoengine":
         backend_config = {
             "model": settings.get("model"),
-            "vapor_transport_pO2_bar": settings.get(
+            "vapor_transport_pO2_bar": settings[
                 "configured_vapor_transport_pO2_bar"
-            ),
-            "vapor_transport_floor_bar": settings.get(
+            ],
+            "vapor_transport_floor_bar": settings[
                 "configured_vapor_transport_floor_bar"
-            ),
+            ],
+            "fO2_buffer": settings["redox_buffer"],
+            "fO2_offset": settings["fO2_offset"],
+            "Fe3Fet_Liq": settings["Fe3Fet_ratio"],
         }
         return resolve_backend(
             name,
@@ -4862,10 +4889,16 @@ def _open_battery_engine_with_settings(
     """Resolve one battery engine. Unavailable is a typed handle, not a crash."""
 
     from simulator.backends import BackendUnavailableError
+    from simulator.engine_cache import normalize_engine_settings
 
     identity_block = _engine_identities_from_toml().get(name, {})
+    normalized_settings = normalize_engine_settings(name, engine_settings)
     try:
-        backend = _open_resolved_backend(name, engine_settings)
+        backend = _open_resolved_backend(
+            name,
+            engine_settings,
+            normalized_settings=normalized_settings,
+        )
         from simulator.engine_cache import record_engine_open
 
         record_engine_open(name, backend)
@@ -4880,7 +4913,7 @@ def _open_battery_engine_with_settings(
             takes_fo2=False,
             supports_intrinsic_fo2=False,
             identity=identity_block,
-            engine_settings=dict(engine_settings or {}),
+            engine_settings=normalized_settings,
         )
     except Exception as exc:  # noqa: BLE001 - probe must not crash the battery
         return EngineHandle(
@@ -4891,6 +4924,7 @@ def _open_battery_engine_with_settings(
             takes_fo2=False,
             supports_intrinsic_fo2=False,
             identity=identity_block,
+            engine_settings=normalized_settings,
         )
 
     # A resolved backend object is called even when is_available() is False
@@ -4907,7 +4941,7 @@ def _open_battery_engine_with_settings(
             getattr(backend, "supports_intrinsic_fO2", False)
         ),
         identity=identity_block,
-        engine_settings=dict(engine_settings or {}),
+        engine_settings=normalized_settings,
     )
 
 

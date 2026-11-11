@@ -114,6 +114,13 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         self._thermoengine_import_error = None
         self._unavailable_reason = None
         self._model = str(config.get('model', self._model))
+        self._redox_buffer = self._normalize_redox_buffer(
+            config.get('fO2_buffer', config.get('redox_buffer'))
+        )
+        self._fo2_offset = self._optional_float(config.get('fO2_offset'))
+        self._fe3fet_ratio = self._normalize_fe3fet_ratio(
+            config.get('Fe3Fet_Liq', config.get('fe3fet_ratio'))
+        )
         self._initialize_vapor_transport(config)
         raw_health_timeout_s = config.get(
             'thermoengine_health_timeout_s',
