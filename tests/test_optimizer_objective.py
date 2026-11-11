@@ -3,7 +3,7 @@ from __future__ import annotations
 import inspect
 import math
 from dataclasses import replace
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 from typing import Mapping
 
 import pytest
@@ -21,6 +21,15 @@ from simulator.evaporation import (
     note_wall_supply_interval_physical_zero,
     project_publisher_vapour_rates,
     publish_wall_supply_on_flux,
+)
+from simulator.melt_backend.base import EquilibriumResult
+from simulator.vapour_rail.batch import (
+    FluxDiagnosticUpperBound,
+    FluxEligible,
+    FluxRefusal,
+    PressureValue,
+    VapourAnswer,
+    VapourBatch,
 )
 import simulator.optimize.evaluate as evaluate_module
 from simulator.optimize.evaluate import (
@@ -1927,14 +1936,20 @@ def _oracle_transport_refusal(record: Mapping[str, object]) -> bool:
 
 
 def _oracle_record_blocks_physical_zero(record: Mapping[str, object]) -> bool:
-    """Refusal shapes. Written from the interval rule, not the classifier."""
+    """Refusal and upper-bound shapes. Written from the interval rule.
+
+    Not from the classifier. A pressure or flux refusal, a diagnostic
+    upper bound, and a pressure upper bound are missing input. None of
+    them is a zero hour, and a whole-interval certificate does not
+    make them one.
+    """
 
     if _oracle_payload_kind(record, "flux") in {
         "diagnostic_upper_bound",
         "refusal",
     }:
         return True
-    if _oracle_payload_kind(record, "pressure") == "refusal":
+    if _oracle_payload_kind(record, "pressure") in {"refusal", "upper_bound"}:
         return True
     if _oracle_payload_kind(record, "selected_runtime_pressure") == "refusal":
         return True
@@ -1949,13 +1964,31 @@ def _approx_kg(value: float):
     return pytest.approx(value, rel=1e-9, abs=0.0)
 
 
+def _oracle_channel_blocks_interval_zero(flux: object, species: str) -> bool:
+    """A present refusal or upper bound is not covered by the certificate.
+
+    Written from the interval rule. No channel means the certificate
+    may still cover the species. A non-mapping channel is not this
+    block. A computed rate is handled by the caller before this.
+    """
+
+    channels = getattr(flux, "carrier_authority_by_species", None)
+    if not isinstance(channels, Mapping) or species not in channels:
+        return False
+    record = channels[species]
+    if not isinstance(record, Mapping):
+        return False
+    return _oracle_record_blocks_physical_zero(record)
+
+
 def _oracle_interval_physical_zero(flux: object) -> str:
     """Whole-interval physical zero, written from the interval rule.
 
-    The hour evaporates no species. Every species absent from the rate
-    map contributes that zero. A computed rate still wins. This is not
-    the species-specific channel record, and it is not an unexplained
-    omission. The field name and the evidence token are the rule's.
+    The hour evaporates no species. A species absent from the rate map
+    contributes that zero when its channel does not block it. A
+    computed rate still wins. This is not the species-specific channel
+    record, and it is not an unexplained omission. The field name and
+    the evidence token are the rule's.
     """
 
     record = getattr(flux, "wall_supply_interval_physical_zero", None)
@@ -2037,6 +2070,9 @@ def _oracle_complete_flux_supply_kg(
             if species in rates:
                 totals[species] += float(rates[species]) * duration_h
                 observed.add(species)
+                continue
+            if _oracle_channel_blocks_interval_zero(flux, species):
+                withheld.add(species)
                 continue
             if _oracle_interval_physical_zero(flux):
                 observed.add(species)
@@ -2960,6 +2996,8 @@ _WALL_SUPPLY_INTERVAL_KINDS = (
     "below_bound_zero",
     "interval_physical_zero",
     "interval_physical_zero_with_channel",
+    "interval_physical_zero_refused",
+    "interval_physical_zero_upper_bound",
     "refused",
     "absent_no_record",
     "absent_flux_map",
@@ -2983,6 +3021,11 @@ _WALL_SUPPLY_WINDOWS = (
     ("computed_below_threshold", "interval_physical_zero"),
     ("interval_physical_zero", "absent_no_record"),
     ("interval_physical_zero", "refused"),
+    ("interval_physical_zero_refused",),
+    ("interval_physical_zero_upper_bound",),
+    ("computed_above_threshold", "interval_physical_zero_refused"),
+    ("interval_physical_zero_upper_bound", "computed_below_threshold"),
+    ("interval_physical_zero_refused", "authorized_zero"),
     ("computed_above_threshold", "computed_below_threshold"),
     ("computed_below_threshold", "authorized_zero"),
     ("computed_below_threshold", "below_bound_zero"),
@@ -3066,6 +3109,36 @@ def _supply_kind_snapshot(
         # discarded the rate. The interval record still covers it.
         records[species] = _eligible_channel_record(species)
         interval_zero = "frozen_before_evaporation"
+    elif kind == "interval_physical_zero_refused":
+        # PressureValue fills batch_pa. FluxRefusal produces no flux.
+        # A whole-interval certificate must not turn that into a zero.
+        records[species] = {
+            "species_id": species,
+            "pressure": {"kind": "value", "pa": 1.0},
+            "flux": {
+                "kind": "refusal",
+                "code": "flux_refused",
+                "detail": "refused",
+            },
+        }
+        interval_zero = "frozen_before_evaporation"
+    elif kind == "interval_physical_zero_upper_bound":
+        # Pressure upper bound below 1050 C is not a physical zero,
+        # with or without a whole-interval certificate.
+        records[species] = {
+            "species_id": species,
+            "pressure": {
+                "kind": "upper_bound",
+                "pa": 1.0,
+                "evidence_ref": "diagnostic alpha",
+            },
+            "flux": {
+                "kind": "eligible",
+                "alpha_ref": f"alpha:{species}",
+                "reaction_id": "test",
+            },
+        }
+        interval_zero = "frozen_before_evaporation"
     elif kind == "refused":
         records[species] = _transport_refusal_channel(species)
     elif kind == "absent_no_record":
@@ -3107,7 +3180,13 @@ def _kind_contribution_kg(kind: str) -> float | None:
         "interval_physical_zero_with_channel",
     }:
         return 0.0
-    if kind in {"refused", "absent_no_record", "absent_flux_map"}:
+    if kind in {
+        "refused",
+        "absent_no_record",
+        "absent_flux_map",
+        "interval_physical_zero_refused",
+        "interval_physical_zero_upper_bound",
+    }:
         return None
     raise AssertionError(kind)
 
@@ -3145,28 +3224,64 @@ def _assert_supply_map(
         assert bounds[name] == _approx_kg(kg)
 
 
-def _mutated_interval_kind(kind: str) -> str:
-    """The wrong class for this kind.
+def _mutate_classified_interval(kind: str, species: str):
+    """Classifier mutation for one interval kind.
 
-    Computed rates and typed zeros become a bare omission. A refusal or
-    a bare omission becomes an authorized zero. A missing map becomes an
-    explicit computed 0. Each one changes the supply.
+    The fixture stays the true kind. The wrapper changes only what the
+    classifier returns for ``species``. A rate above the debit floor
+    becomes a gap. A subthreshold rate becomes 0. A typed zero becomes
+    a gap. A gap, including a certificate sitting on a refusal or an
+    upper bound, becomes a physical zero. The unchanged oracle rejects
+    each of those.
     """
 
-    if kind in {
-        "computed_above_threshold",
-        "computed_below_threshold",
-        "authorized_zero",
-        "below_bound_zero",
-        "interval_physical_zero",
-        "interval_physical_zero_with_channel",
-    }:
-        return "absent_no_record"
-    if kind in {"refused", "absent_no_record"}:
-        return "authorized_zero"
-    if kind == "absent_flux_map":
-        return "explicit_zero"
-    raise AssertionError(kind)
+    real = _classify_wall_supply_interval
+
+    def mutated(snapshot: object, name: str) -> _WallSupplyInterval:
+        interval = real(snapshot, name)
+        if name != species:
+            return interval
+        if (
+            kind == "computed_above_threshold"
+            and interval.kind == "computed"
+            and interval.rate_kg_hr is not None
+            and interval.rate_kg_hr > _DEBIT_FLOOR_KG_HR
+        ):
+            return _WallSupplyInterval(
+                "unavailable",
+                evidence="absent_no_record",
+            )
+        if (
+            kind == "computed_below_threshold"
+            and interval.kind == "computed"
+            and interval.rate_kg_hr is not None
+            and interval.rate_kg_hr <= _DEBIT_FLOOR_KG_HR
+        ):
+            return replace(interval, rate_kg_hr=0.0)
+        if kind in {
+            "authorized_zero",
+            "below_bound_zero",
+            "interval_physical_zero",
+            "interval_physical_zero_with_channel",
+        } and interval.kind == "physical_zero":
+            return _WallSupplyInterval(
+                "unavailable",
+                evidence="absent_no_record",
+            )
+        if kind in {
+            "refused",
+            "absent_no_record",
+            "absent_flux_map",
+            "interval_physical_zero_refused",
+            "interval_physical_zero_upper_bound",
+        } and interval.kind == "unavailable":
+            return _WallSupplyInterval(
+                "physical_zero",
+                evidence="authorized_zero",
+            )
+        return interval
+
+    return mutated
 
 
 def test_wall_supply_integral_uses_only_the_interval_classifier() -> None:
@@ -3224,38 +3339,62 @@ def test_wall_supply_interval_contributes_exactly_one_class(
             (species,),
             campaigns_elapsed=1.0,
         )
-    if len(window) != 1:
-        return
-    kind = window[0]
-    mutated_kind = _mutated_interval_kind(kind)
-    mutated = _supply_window_snapshots(species, sibling, (mutated_kind,))
-    mutated_bounds = _optimizer_refused_flux_bounds(
-        mutated,
+    if window == (
+        "computed_above_threshold",
+        "interval_physical_zero_refused",
+    ):
+        # The certificate on the refused hour must not price the 1 kg.
+        assert species not in _optimizer_refused_flux_bounds(
+            snapshots,
+            (species,),
+            campaigns_elapsed=1.0,
+        )
+
+
+@pytest.mark.parametrize("kind", _WALL_SUPPLY_INTERVAL_KINDS)
+def test_each_interval_kind_mutation_fails_the_unmutated_oracle(
+    kind: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A classifier that mis-classes this kind is rejected by the oracle.
+
+    The snapshot stays the true kind. The mutation is inside the
+    classifier. The oracle is not patched, so it still scores the
+    fixture from the interval rule.
+    """
+
+    species = "SiO"
+    sibling = "Mg"
+    snapshots = _supply_window_snapshots(species, sibling, (kind,))
+    species_kg = _window_species_supply_kg((kind,))
+    sibling_kg = _window_sibling_supply_kg((kind,))
+    live = _optimizer_refused_flux_bounds(
+        snapshots,
         (species, sibling),
         campaigns_elapsed=1.0,
     )
-    mutated_species_kg = _window_species_supply_kg((mutated_kind,))
-    mutated_sibling_kg = _window_sibling_supply_kg((mutated_kind,))
-    _assert_supply_map(
-        mutated_bounds,
-        species,
-        sibling,
-        mutated_species_kg,
-        mutated_sibling_kg,
+    oracle = _oracle_complete_flux_supply_kg(snapshots, (species, sibling))
+    _assert_supply_map(live, species, sibling, species_kg, sibling_kg)
+    _assert_supply_map(oracle, species, sibling, species_kg, sibling_kg)
+    monkeypatch.setattr(
+        evaluate_module,
+        "_classify_wall_supply_interval",
+        _mutate_classified_interval(kind, species),
     )
-    mutated_oracle = _oracle_complete_flux_supply_kg(mutated, (species, sibling))
-    _assert_supply_map(
-        mutated_oracle,
-        species,
-        sibling,
-        mutated_species_kg,
-        mutated_sibling_kg,
+    mutated = _optimizer_refused_flux_bounds(
+        snapshots,
+        (species, sibling),
+        campaigns_elapsed=1.0,
     )
-    # The mutated class is a different supply. Keeping the unmutated
-    # number would fail this test. Swapping the fixture kind does not
-    # show that a classifier which floors a subthreshold rate to 0 is
-    # rejected; that mutation is the next test.
-    assert mutated_species_kg != species_kg
+    assert mutated != oracle
+    with pytest.raises(AssertionError):
+        _assert_supply_map(
+            mutated,
+            species,
+            sibling,
+            species_kg,
+            sibling_kg,
+        )
 
 
 def test_subthreshold_floor_mutation_fails_the_supply_oracle(
@@ -3464,6 +3603,94 @@ def test_zero_net_bucket_is_supply_zero_and_not_a_debit() -> None:
     )
     assert bounds["SiO"] == _approx_kg(1.0)
     assert bounds["Mg"] == _approx_kg(0.4)
+
+
+def _pre_rg_channel_answer(species: str, kind: str) -> VapourAnswer:
+    """One catalog channel that fills batch_pa and debits nothing."""
+
+    pressure = PressureValue(pa=1.0)
+    if kind == "refusal":
+        flux = FluxRefusal(code="flux_refused", detail="refused")
+    elif kind == "upper_bound":
+        flux = FluxDiagnosticUpperBound(alpha_ref=f"alpha:{species}")
+    elif kind == "dormant":
+        flux = FluxEligible(alpha_ref=f"alpha:{species}")
+    else:
+        raise AssertionError(kind)
+    return VapourAnswer(
+        species_id=species,
+        pressure=pressure,
+        selected_runtime_pressure=pressure,
+        flux=flux,
+        source_label="test",
+        formula_id=species,
+        source_account="process.cleaned_melt",
+        solve_group_id=f"test:{species}",
+        state_fingerprint="test",
+        validation_status="validated",
+    )
+
+
+@pytest.mark.parametrize("kind", ("refusal", "upper_bound", "dormant"))
+def test_pre_rg_empty_map_below_1050_does_not_price_a_partial_supply(
+    kind: str,
+) -> None:
+    """Below 1050 C an empty effective-pressure map is not a wall-supply zero.
+
+    ``batch_pa_by_species`` holds any finite PressureValue, including one
+    paired with FluxRefusal or a diagnostic upper bound. Stamping that
+    hour as a physical zero would book Na2 from the other hour. Na2 is
+    absent from this batch. The answered channel stays unavailable too.
+    """
+
+    answered = "SiO"
+    batch = VapourBatch(
+        requested_species_ids=frozenset({answered}),
+        channels_by_species={
+            answered: _pre_rg_channel_answer(answered, kind),
+        },
+        flux_active_species_ids=frozenset(),
+    )
+    model = SimpleNamespace(
+        melt=SimpleNamespace(temperature_C=900.0),
+        setpoints={},
+        vapor_pressures={},
+        _last_vapour_batch_resolve_error={},
+        _resolve_evaporation_vapour_batch=(
+            lambda equilibrium, temperature_K, effective_pressure_source: batch
+        ),
+    )
+    model._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        model,
+    )
+    equilibrium = EquilibriumResult(
+        temperature_C=900.0,
+        pressure_bar=1e-6,
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={},
+        status="ok",
+    )
+    flux = EvaporationMixin._calculate_evaporation(model, equilibrium)
+    assert flux.species_kg_hr == {}
+    assert not hasattr(flux, "wall_supply_interval_physical_zero")
+    assert model._last_vapour_batch_flux_overlay["batch_pa_by_species"][answered] == (
+        1.0
+    )
+    assert model._last_vapour_batch_flux_overlay[
+        "effective_pressure_zero_reason"
+    ] == "pre_rg_backend_below_effective_pressure_threshold"
+    later = _interval_flux_snapshot(2, 1.0, {answered: 1.0, "Na2": 1.0})
+    bounds = _optimizer_refused_flux_bounds(
+        (
+            SimpleNamespace(hour=1, duration_h=1.0, evap_flux=flux),
+            later,
+        ),
+        (answered, "Na2"),
+        campaigns_elapsed=1.0,
+    )
+    assert answered not in bounds
+    assert "Na2" not in bounds
 
 
 def test_unknown_interval_physical_zero_reason_is_rejected() -> None:

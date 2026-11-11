@@ -2024,11 +2024,13 @@ def _require_vapour_supply_rate(raw_rate: Any, species: str) -> float:
 
 
 def _carrier_record_blocks_physical_zero(record: Mapping[str, Any]) -> bool:
-    """True when this record is a refusal, not evidence of a physical zero.
+    """True when this record is a refusal or an upper bound, not a zero.
 
-    A diagnostic upper bound is not a kg/h. A refused runtime pressure,
-    a transport-unavailable extra, or a pressure/flux refusal is missing
-    input. None of those is a zero hour.
+    A diagnostic upper bound is not a kg/h. A pressure upper bound is
+    the same class. A refused runtime pressure, a transport-unavailable
+    extra, or a pressure/flux refusal is missing input. None of those
+    is a zero hour, and a whole-interval certificate does not make
+    them one.
     """
 
     if _carrier_mapping_kind(record, "flux") in {
@@ -2036,7 +2038,7 @@ def _carrier_record_blocks_physical_zero(record: Mapping[str, Any]) -> bool:
         "refusal",
     }:
         return True
-    if _carrier_mapping_kind(record, "pressure") == "refusal":
+    if _carrier_mapping_kind(record, "pressure") in {"refusal", "upper_bound"}:
         return True
     if _carrier_mapping_kind(record, "selected_runtime_pressure") == "refusal":
         return True
@@ -2088,8 +2090,9 @@ def _interval_physical_zero_reason(flux: Any) -> str:
 
     Producers set this only when the hour evaporates no species: no
     liquid, a non-evaporation campaign, a frozen melt, the sub-400 K
-    floor, empty vapour inventory, or the pre-RG below-threshold seam.
-    A zero-net carrier is a computed 0 on the rate map, not this record.
+    floor, or empty vapour inventory. The pre-RG empty map below
+    1050 C is not this record. A zero-net carrier is a computed 0 on
+    the rate map, not this record.
     """
 
     record = getattr(flux, WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR, None)
@@ -2119,30 +2122,53 @@ def _physical_zero_evidence(flux: Any, species: str) -> str:
     return ""
 
 
+def _interval_certificate_leaves_species_uncovered(
+    flux: Any,
+    species: str,
+) -> bool:
+    """True when a refusal or upper bound on ``species`` blocks the certificate.
+
+    No channel, or an eligible channel whose rate the freeze or campaign
+    gate discarded, returns False: the certificate covers that species.
+    A refusal or an upper bound returns True. The supply integral then
+    withholds the species instead of booking the other hours (d-367).
+    """
+
+    channels = getattr(flux, "carrier_authority_by_species", None)
+    if not isinstance(channels, MappingABC) or species not in channels:
+        return False
+    record = channels[species]
+    if not isinstance(record, MappingABC):
+        return False
+    return _carrier_record_blocks_physical_zero(record)
+
+
 def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyInterval:
     """Classify one refused-wall species on one interval.
 
-    Invariant (d-367), the only classifier the supply integral uses.
-    A positive-duration interval contributes exactly one of:
+    Invariant (d-367). This is the only classifier the supply integral
+    uses. A positive-duration interval contributes exactly one of:
 
     - ``computed``: the rate map names this species. Any finite
       non-negative magnitude counts, including 0 and a rate at or below
       the 1e-12 kg/h melt-debit floor. Ledger resolution is not applied
-      here. A numeric rate wins over a refusal flag on the same interval.
+      here. A numeric rate wins over a refusal on the same interval.
       A zero-net carrier (``P_eq <= P_bulk``) is this class at rate 0.
-    - ``physical_zero``: the species is absent from that map and the
-      interval carries typed evidence. Two forms. A whole-interval
-      record (``wall_supply_interval_physical_zero``, evidence
-      ``authorized_zero``) covers every absent species, including one
-      whose channel was copied and then discarded by the freeze or
-      campaign gate. A species-specific authorized zero
-      (``pressure.kind`` ``zero_by_physics`` with an eligible flux) or
-      below-bound zero (``proven_below_threshold``, doctrine category
-      3) covers that species when the interval record is absent.
-    - ``unavailable``: every other positive-duration interval. Absence
-      from a present map without that typed record is unavailable, never
-      zero. A missing flux map is unavailable. A typed refusal without
-      an interval record is unavailable.
+    - ``physical_zero``: the species is absent from that map and typed
+      evidence covers this species. A whole-interval certificate
+      (``wall_supply_interval_physical_zero``, evidence
+      ``authorized_zero``) covers an absent species and a stale eligible
+      channel whose rate the freeze or campaign gate discarded. It does
+      not cover a refusal or an upper bound on that species. A
+      species-specific authorized zero (``pressure.kind``
+      ``zero_by_physics`` with an eligible flux) or below-bound zero
+      (``proven_below_threshold``, doctrine category 3) covers that
+      species when the certificate does not.
+    - ``unavailable``: every other positive-duration interval. A
+      refusal, an upper bound, a missing flux map, or absence from a
+      present map without a covering record is unavailable, never zero.
+      One unavailable interval drops the species. The partial sum of
+      the other intervals is not a supply.
 
     A non-positive duration is ``outside_window``. It adds no mass and
     is not a gap.
@@ -2166,9 +2192,12 @@ def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyIn
             evidence="computed_rate",
         )
     flux = getattr(snapshot, "evap_flux", None)
-    # The interval record outranks a stale channel. It is set only when
-    # the hour evaporates nothing, so a pressure channel copied before
-    # the freeze or campaign return is not an unexplained omission.
+    # A refusal or upper bound outranks the certificate. An eligible
+    # channel copied and then discarded by the freeze or campaign gate
+    # does not: that species is absent from the rate map and the
+    # certificate covers it.
+    if _interval_certificate_leaves_species_uncovered(flux, species):
+        return _WallSupplyInterval(_WALL_SUPPLY_UNAVAILABLE, evidence="refused")
     interval_reason = _interval_physical_zero_reason(flux)
     if interval_reason:
         return _WallSupplyInterval(

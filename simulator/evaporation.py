@@ -314,14 +314,16 @@ WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR = "wall_supply_interval_physical_zero"
 WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE = "authorized_zero"
 # Whole-interval physical zeros. A zero-net carrier is not in this set:
 # that species' computed rate is 0 on the supply map, and a sibling the
-# publisher did not compute stays an omission.
+# publisher did not compute stays an omission. The pre-RG empty
+# effective-pressure map below 1050 C is not in this set either: a
+# PressureValue can sit on a FluxRefusal or an upper bound, and that
+# channel is not a physical zero (d-367).
 WALL_SUPPLY_INTERVAL_ZERO_REASONS = frozenset({
     "zero_liquid",
     "non_evaporation_campaign",
     "frozen_before_evaporation",
     "below_400K",
     "proven_empty_inventory",
-    "pre_rg_below_effective_pressure",
 })
 
 
@@ -335,8 +337,10 @@ def note_wall_supply_interval_physical_zero(
 
     The snapshot writer copies the host record onto whatever flux
     object is stored, including a condensation replacement. The
-    classifier then treats every species absent from that interval's
-    rate map as this physical zero. A computed rate on the same
+    classifier then treats a species absent from that interval's rate
+    map as this physical zero, unless that species' channel is a
+    refusal or an upper bound. Those stay unavailable: the certificate
+    does not price the other hours. A computed rate on the same
     interval is unchanged. Callers are the known non-evaporating
     returns only. An unexplained omission must not call this.
     """
@@ -1912,15 +1916,18 @@ class EvaporationMixin:
                 effective_pressure_source.physical_zero_reason is not None
                 and flux_overlay_report.get('batch_pa_by_species')
             ):
-                # The typed pre-RG seam proves its own below-threshold zero,
-                # while the batch proves catalog pressure coverage. A refused
-                # or missing catalog channel still reaches fail-closed handling
-                # below (kernel_ok_empty split remains intact).
-                note_wall_supply_interval_physical_zero(
-                    flux,
-                    reason="pre_rg_below_effective_pressure",
-                    host=self,
-                )
+                # Evaporation cheap zero only. Below 1050 C an empty
+                # effective-pressure map plus any finite catalog
+                # PressureValue returns no flux. That PressureValue is
+                # not physical-zero evidence: it is written for a
+                # FluxRefusal and for a diagnostic upper bound as well
+                # as for a dormant eligible channel. A whole-interval
+                # certificate would cover every absent species, including
+                # those channels and any wall species this hour did not
+                # answer, and the other hours' partial sum would be
+                # booked (d-367). Species with their own zero record
+                # stay covered at the classifier. This return does not
+                # stamp one.
                 return flux
             vapor_pressure_diagnostic = dict(
                 getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
