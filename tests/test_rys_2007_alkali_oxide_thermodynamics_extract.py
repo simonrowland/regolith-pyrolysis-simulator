@@ -153,8 +153,9 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     collect_locators(document)
     # Typing Tables 7 and 9 adds 162 locators and 75 observations; the KEMS
     # apparatus and experiment registry add three locators.
-    # Restoring Na Table 10a row 8 adds its row locator and condition locator.
-    assert len(locators) == 2231
+    # The merged document keeps the two Table 9 NaAlSi_6 points and Na Table
+    # 10a row 8, each with a row locator and a condition locator.
+    assert len(locators) == 2235
     assert all(
         locator["page"] == locator["pdf_page_index"] + 1
         and "published_page" in locator
@@ -168,7 +169,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
                 continue
             for point in observation.get("values", {}).get("points", []):
                 appendix_rows[point["locator"]["table"]] += 1
-    assert sum(appendix_rows.values()) == 889
+    assert sum(appendix_rows.values()) == 891
     assert appendix_rows == Counter(
         {
             "1": 59,
@@ -179,7 +180,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
             "6": 56,
             "7": 74,
             "8": 76,
-            "9": 72,
+            "9": 74,
             "10a": 57,
             "10b": 52,
             "11a": 62,
