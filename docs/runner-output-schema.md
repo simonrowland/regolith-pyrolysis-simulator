@@ -415,11 +415,6 @@ omit it.
   any handled simulation refusal. Campaign-pressure refusals populate only
   this generic field. Knudsen refusals also populate
   `knudsen_regime_diagnostic` for transport-specific consumers.
-  `refusal_diagnostic.wall_deposit_report.not_modelled_wall_deposit_by_species`
-  identifies evaporating species whose wall saturation pressure was refused;
-  each keyed record has `status: "not_modelled"`, the refusal reason, and a
-  `below_wall_supply_upper_bound` flag. These records keep refused quantities
-  distinct from measured zero wall deposits.
 * `knudsen_regime_diagnostic` reports the transport-regime check for
   the condensation train when a run reaches condensation routing.
 * `pressure_coating_pareto_diagnostic` is diagnostic-only. It replays the
@@ -470,11 +465,12 @@ omit it.
 ```
 
 * `wall_deposit_by_species_kg` is the aggregate kg projection used by
-  existing SiO report surfaces. It includes Cr when no Cr deposit is recorded,
-  since the shared wall model has a Cr metal saturation curve. A refused wall
-  saturation pressure is reported separately under
-  `run_metadata.refusal_diagnostic.wall_deposit_report`; it is not converted
-  to a numeric zero.
+  existing SiO report surfaces. It includes every species with positive
+  evaporated supply in the run, using the committed wall-account mass for that
+  species (zero when the model booked no wall deposit); a positive amount is a
+  deposited outcome. Per-hour `condensation_refusals_by_species` retains the
+  condensation model's outcome labels and reasons, including pass-through and
+  wall-pressure refusals.
 * `deposit_by_surface_species_kg` is the final wall deposit projection
   by interstage segment/species, sourced from the same snapshot/trace
   wall-deposit data exported per hour.
