@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from functools import partial
 import hashlib
 import json
 from pathlib import Path
+import time
 
 from simulator.battery.enums import AdmissionStatus, Engine, EvidenceClass
 from simulator.battery.score import (
+    _partition_score_refs,
     _ResidualJsonlStream,
     _ResidualJsonlRows,
     ScoreContext,
@@ -17,14 +20,16 @@ from simulator.battery.score import (
 from tests.battery import factories as F
 
 
-def _worker_fixture() -> ScoreContext:
+def _worker_fixture(experiment_count: int = 30) -> ScoreContext:
     work = F.work()
     experiments = {
         experiment_id: F.tabulation_experiment(
             experiment_id=experiment_id,
             work_id=work.work_id,
         )
-        for experiment_id in (f"worker-exp-{index:02d}" for index in range(30))
+        for experiment_id in (
+            f"worker-exp-{index:02d}" for index in range(experiment_count)
+        )
     }
     observations = {}
     origins = {}
@@ -48,6 +53,43 @@ def _worker_fixture() -> ScoreContext:
         observations=observations,
         origins=origins,
         extract_review={},
+    )
+
+
+def _worker_test_predict(
+    engine,
+    observation,
+    *,
+    delay_seconds: float = 0.0,
+    hang_observation_id: str | None = None,
+    hang_seconds: float = 0.0,
+    **_kwargs,
+):
+    if observation.observation_id == hang_observation_id:
+        time.sleep(hang_seconds)
+    elif delay_seconds:
+        time.sleep(delay_seconds)
+    from simulator.battery.enums import Authority, ExecutionState
+    from simulator.battery.records import Execution
+    from simulator.battery.score import EnginePrediction
+    from simulator.engine_cache import _record_engine_cache_counters
+
+    _record_engine_cache_counters(
+        {engine.value: {"hits": 1, "misses": 0, "stores": 0}}
+    )
+    return EnginePrediction(
+        engine=engine,
+        channel=engine.value,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="test:worker_predict",
+        ),
+        value=Decimal("1"),
+        unit="Pa",
+        authority=Authority.CERTIFIED,
+        coefficient_sources=("test",),
+        lineage_complete=True,
+        identity=observation.identity,
     )
 
 
@@ -95,6 +137,81 @@ def test_parallel_scoring_matches_serial_rows_and_summary(tmp_path: Path) -> Non
     )
     assert parallel_rows == serial_rows
     assert parallel_summary == serial_summary
+
+
+def test_parallel_score_shards_use_progress_instead_of_total_wall_deadline(
+    tmp_path: Path, monkeypatch
+) -> None:
+    import simulator.battery.score as score_module
+
+    monkeypatch.setattr(
+        score_module, "SCORE_SHARD_IDLE_TIMEOUT_SECONDS", 0.15, raising=False
+    )
+    context = _worker_fixture(experiment_count=8)
+    started = time.monotonic()
+    written, metadata = _score_store_to_jsonl(
+        context,
+        tmp_path / "slow-but-progressing.jsonl",
+        engines=(Engine.VAPOROCK,),
+        predict=partial(_worker_test_predict, delay_seconds=0.05),
+        workers=2,
+    )
+
+    assert time.monotonic() - started > 0.15
+    assert written > 0
+    assert metadata.shard_failures == ()
+
+
+def test_parallel_score_hung_shard_becomes_refusals_and_keeps_other_shards(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    import simulator.battery.score as score_module
+
+    monkeypatch.setattr(
+        score_module, "SCORE_SHARD_IDLE_TIMEOUT_SECONDS", 0.2, raising=False
+    )
+    context = _worker_fixture(experiment_count=8)
+    chunks = _partition_score_refs(tuple(context.observations.values()), workers=2)
+    failed_chunk_index = next(index for index, chunk in enumerate(chunks) if chunk)
+    failed_observation = chunks[failed_chunk_index][0].observation_id
+    healthy_chunk = chunks[1 - failed_chunk_index]
+    assert healthy_chunk
+    written, metadata = _score_store_to_jsonl(
+        context,
+        tmp_path / "hung-shard.jsonl",
+        engines=(Engine.VAPOROCK,),
+        predict=partial(
+            _worker_test_predict,
+            hang_observation_id=failed_observation,
+            hang_seconds=10.0,
+        ),
+        workers=2,
+    )
+
+    rows = [
+        json.loads(line)
+        for line in (tmp_path / "hung-shard.jsonl.partial")
+        .read_text(encoding="utf-8")
+        .splitlines()[1:]
+    ]
+    failed_ids = {
+        observation.observation_id for observation in chunks[failed_chunk_index]
+    }
+    healthy_ids = {observation.observation_id for observation in healthy_chunk}
+    failed_rows = [row for row in rows if row["reference"] in failed_ids]
+    healthy_rows = [row for row in rows if row["reference"] in healthy_ids]
+    assert written == len(rows)
+    assert failed_rows and healthy_rows
+    assert all(
+        row["execution"]["state"] == "attempted_unavailable"
+        and row["refusal"]["reason"] == "attempted_unavailable"
+        and row["refusal"]["detail"]["reason"] == "score_shard_failed"
+        for row in failed_rows
+    )
+    assert any(row["execution"]["state"] == "produced" for row in healthy_rows)
+    assert metadata.shard_failures
+    assert metadata.engine_cache_counters[Engine.VAPOROCK.value]["hits"] > 0
+    assert "score run notice" in capsys.readouterr().err
 
 
 def test_group_partition_keeps_series_and_sossi_cohort_together() -> None:
