@@ -1013,6 +1013,9 @@ def _install_freeze_gate_curve(
         curve,
     )
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
+    # Measured zero: this fixture curve did not execute a flagged law.
+    # Omitting the field makes the core reader recompute it.
+    record['law_disclosures'] = []
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -5807,6 +5810,7 @@ def test_core_gate_curve_local_slot_reads_match_green_provenance_count(
         curve,
     )
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
+    record['law_disclosures'] = []
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -5870,6 +5874,7 @@ def test_gate_memo_origin_reuses_live_binding_provenance_per_read(
         curve,
     )
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
+    record['law_disclosures'] = []
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -6432,6 +6437,7 @@ def test_gate_memo_reuses_live_curve_without_metadata_receipt_digests(
     }
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
+    record['law_disclosures'] = []
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,

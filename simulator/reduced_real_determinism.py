@@ -3144,6 +3144,22 @@ def gate_curve_provider_outcome_is_reusable(
     }
 
 
+_LAW_DISCLOSURES_OMITTED = object()
+
+
+def _copy_stored_law_disclosures(raw: Any) -> Any:
+    """Copy a disclosure field without turning a bad row into a shorter list."""
+
+    if isinstance(raw, tuple):
+        raw = list(raw)
+    if not isinstance(raw, list):
+        return raw
+    copied: list[Any] = []
+    for item in raw:
+        copied.append(dict(item) if isinstance(item, Mapping) else item)
+    return copied
+
+
 def gate_curve_memo_record(
     curve: Mapping[str, Any],
     origin: Mapping[str, Any] | None,
@@ -3151,8 +3167,14 @@ def gate_curve_memo_record(
     disposition: str,
     *,
     provider_outcome: GateCurveProviderOutcome | str | None = None,
+    law_disclosures: Any = _LAW_DISCLOSURES_OMITTED,
 ) -> dict[str, Any]:
-    """Build the runtime record shared by the producer and core reader."""
+    """Build the runtime record shared by the producer and core reader.
+
+    ``law_disclosures`` is omitted unless the caller measured one. A passed
+    list, including ``[]``, is that measurement and is stored with the
+    record. Leaving the field off is unknown, not a measured zero.
+    """
 
     record = {
         "curve": dict(curve),
@@ -3162,6 +3184,8 @@ def gate_curve_memo_record(
     }
     if provider_outcome is not None:
         record["provider_outcome"] = GateCurveProviderOutcome(provider_outcome)
+    if law_disclosures is not _LAW_DISCLOSURES_OMITTED:
+        record["law_disclosures"] = _copy_stored_law_disclosures(law_disclosures)
     return record
 
 

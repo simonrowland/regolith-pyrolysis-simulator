@@ -913,6 +913,22 @@ def test_cache_publication_paths_use_the_disclosure_chokepoint() -> None:
     assert body.index("replay_gate_curve(") < local_accept < shared_accept
     assert shared_accept < body.index(live_open)
     assert body.index(live_open) < body.rindex("store.capture_gate_curve(")
+    liquidus = core.split("    def _melt_redox_liquidus_gate_record(", 1)[1].split(
+        "    def _melt_redox_liquid_fraction_factor(", 1
+    )[0]
+    # The core local cache and the core curve memo are the two reads.
+    # Both admit through accept_stored_memo before any live recompute,
+    # and the curve-memo write keeps the measured field.
+    assert liquidus.count("accept_stored_memo(") == 2
+    first_accept = liquidus.index("accept_stored_memo(")
+    second_accept = liquidus.index("accept_stored_memo(", first_accept + 1)
+    live_record = liquidus.index("self._freeze_gate_curve_record(")
+    assert first_accept < second_accept < live_record
+    memo_write = liquidus.split("memo[key] = gate_curve_memo_record(", 1)[1]
+    assert "_carried_disclosures(normalized_record)" in memo_write.split(
+        "self._record_composition_projected_liquidus_notice_from_curve",
+        1,
+    )[0]
     assert "with open_computation()" not in body
     assert "with computation_disclosure()" not in body
     disclosure = (_ROOT / "simulator/vapour_rail/run_disclosure.py").read_text(
@@ -2001,6 +2017,163 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
     assert calls == []
     assert held_zero_record["curve"]["tag"] == "cached"
     assert held_zero.law_disclosures == ()
+
+
+def _core_gate_curve(tag: str) -> dict:
+    return {
+        "tag": tag,
+        "source": "unit-test",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1300.0,
+        "path": ((1000.0, 0.0), (1300.0, 1.0)),
+    }
+
+
+def _core_memo_record(*, disclosures, tag: str = "cached") -> dict:
+    record = {
+        "key": "memo-key",
+        "curve": _core_gate_curve(tag),
+        "repair_notices": [],
+        "disposition": "live",
+        "provider_outcome": "produced",
+        "origin": {"producer_pid": 1},
+    }
+    if disclosures is not None:
+        record["law_disclosures"] = disclosures
+    return record
+
+
+def _core_gate_host(calls: list[str], recomputed_disclosures):
+    from types import SimpleNamespace
+
+    from simulator.core import PyrolysisSimulator
+
+    host = object.__new__(PyrolysisSimulator)
+    host._liquid_fraction_provider = "declared"
+    host.melt = SimpleNamespace(
+        hour=1,
+        p_total_mbar=1000.0,
+        campaign_hour=1,
+        campaign=SimpleNamespace(name="C0"),
+    )
+    host._current_melt_redox_fO2_log = lambda: -8.0
+    host._freeze_gate_redox_key_fO2_log = lambda **kwargs: kwargs["fO2_log"]
+    host._freeze_gate_cache_key = lambda **_kwargs: "memo-key"
+    host._freeze_gate_curve_in_progress = False
+    host._freeze_gate_liquid_fraction_cache = None
+    host._freeze_gate_liquid_fraction_curve_memo = {}
+    host._last_reduced_real_replay_notices = None
+
+    def _recompute(**_kwargs):
+        calls.append("recompute")
+        return _core_memo_record(
+            disclosures=recomputed_disclosures,
+            tag="recomputed",
+        )
+
+    host._freeze_gate_curve_record = _recompute
+    return host
+
+
+def test_core_liquidus_memo_misses_without_disclosure_and_replays_known(
+    monkeypatch,
+) -> None:
+    """The core liquidus reader misses an unknown memo and replays a known one.
+
+    Evaporation's held, local, and shared slots already use accept_stored_memo.
+    This arms the same gate on the core local cache and the core curve memo,
+    and checks that normalization keeps the measured field on the written memo.
+    """
+
+    import simulator.engine_binding_admission as admission
+    import simulator.reduced_real_determinism as determinism
+    from simulator.core import PyrolysisSimulator
+    from simulator.session import SimSession
+    from simulator.vapour_rail.run_disclosure import bind_run_registry
+
+    monkeypatch.setattr(
+        determinism, "gate_curve_memo_is_cacheable", lambda *_a, **_k: True
+    )
+    monkeypatch.setattr(
+        admission, "gate_curve_memo_origin_matches", lambda *_a, **_k: True
+    )
+    stored = [dict(item) for item in _fe_disclosure_rows()]
+
+    def _call(host):
+        session = SimSession()
+        with bind_run_registry(session._law_disclosure):
+            record = PyrolysisSimulator._melt_redox_liquidus_gate_record(host)
+        return session, record
+
+    calls: list[str] = []
+    host = _core_gate_host(calls, [])
+    host._freeze_gate_liquid_fraction_cache = _core_memo_record(disclosures=None)
+    missed, missed_record = _call(host)
+    assert calls == ["recompute"]
+    assert missed_record["curve"]["tag"] == "recomputed"
+    assert missed.law_disclosures == ()
+    assert (
+        host._freeze_gate_liquid_fraction_curve_memo["memo-key"]["law_disclosures"]
+        == []
+    )
+    assert "law_disclosures" in host._freeze_gate_liquid_fraction_cache
+
+    calls = []
+    host = _core_gate_host(calls, [])
+    host._freeze_gate_liquid_fraction_cache = _core_memo_record(disclosures=stored)
+    hit, hit_record = _call(host)
+    assert calls == []
+    assert hit_record["curve"]["tag"] == "cached"
+    assert hit_record["law_disclosures"][0]["law_id"] == _FE_ASSOCIATION_LAW_ID
+    _assert_fe_disclosure(
+        hit.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+
+    calls = []
+    host = _core_gate_host(calls, [])
+    host._freeze_gate_liquid_fraction_cache = _core_memo_record(disclosures=[])
+    zero, zero_record = _call(host)
+    assert calls == []
+    assert zero_record["curve"]["tag"] == "cached"
+    assert zero.law_disclosures == ()
+
+    calls = []
+    host = _core_gate_host(calls, stored)
+    host._freeze_gate_liquid_fraction_curve_memo["memo-key"] = _core_memo_record(
+        disclosures=None,
+        tag="stale",
+    )
+    memo_miss, memo_miss_record = _call(host)
+    assert calls == ["recompute"]
+    assert memo_miss_record["curve"]["tag"] == "recomputed"
+    assert memo_miss.law_disclosures == ()
+    written = host._freeze_gate_liquid_fraction_curve_memo["memo-key"]
+    assert written["curve"]["tag"] == "recomputed"
+    assert written["law_disclosures"][0]["law_id"] == _FE_ASSOCIATION_LAW_ID
+
+    calls = []
+    reader = _core_gate_host(calls, [])
+    reader._freeze_gate_liquid_fraction_curve_memo["memo-key"] = written
+    memo_hit, memo_hit_record = _call(reader)
+    assert calls == []
+    assert memo_hit_record["curve"]["tag"] == "recomputed"
+    _assert_fe_disclosure(
+        memo_hit.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+
+    calls = []
+    host = _core_gate_host(calls, stored)
+    host._freeze_gate_liquid_fraction_curve_memo["memo-key"] = _core_memo_record(
+        disclosures=[]
+    )
+    memo_zero, memo_zero_record = _call(host)
+    assert calls == []
+    assert memo_zero_record["curve"]["tag"] == "cached"
+    assert memo_zero.law_disclosures == ()
 
 
 _STANDALONE_HIT_CLASSES = (

@@ -5248,6 +5248,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_curve_memo_is_cacheable,
             record_repair_notice,
         )
+        from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+        def _carried_disclosures(
+            source: Mapping[str, Any] | None,
+        ) -> dict[str, Any]:
+            # Normalization rebuilds the record. A measured disclosure field,
+            # including [], must survive that rebuild. Absence stays absent.
+            if isinstance(source, Mapping) and "law_disclosures" in source:
+                return {"law_disclosures": source.get("law_disclosures")}
+            return {}
 
         self._last_reduced_real_replay_notices = None
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
@@ -5289,6 +5299,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 **redox_state_kwargs,
             )
         )
+        published_cache = None
+        if cache_hit:
+            # Same miss-or-replay gate as the evaporation slots. No field
+            # is unknown, so this row is not a curve. A known field is
+            # re-registered onto this session before the curve is used.
+            published_cache = accept_stored_memo(cache, owner=self)
+            if published_cache is None:
+                cache_hit = False
         if not cache_hit:
             curve = None
         else:
@@ -5298,6 +5316,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 cache_notices,
                 'memo-hit',
                 provider_outcome=cache.get('provider_outcome'),
+                law_disclosures=published_cache,
             )
 
         memo = getattr(
@@ -5326,16 +5345,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     **redox_state_kwargs,
                 )
             ):
-                record = gate_curve_memo_record(
-                    memoized_record['curve'],
-                    memoized_record.get('origin'),
-                    memoized_record.get('repair_notices'),
-                    'memo-hit',
-                    provider_outcome=memoized_record.get('provider_outcome'),
+                published_memo = accept_stored_memo(
+                    memoized_record,
+                    owner=self,
                 )
-                curve = record['curve']
-                cache_notices = record['repair_notices']
-                core_memo_hit = True
+                if published_memo is None:
+                    memo.pop(key, None)
+                else:
+                    record = gate_curve_memo_record(
+                        memoized_record['curve'],
+                        memoized_record.get('origin'),
+                        memoized_record.get('repair_notices'),
+                        'memo-hit',
+                        provider_outcome=memoized_record.get(
+                            'provider_outcome'
+                        ),
+                        law_disclosures=published_memo,
+                    )
+                    curve = record['curve']
+                    cache_notices = record['repair_notices']
+                    core_memo_hit = True
             elif memoized_record is not None:
                 memo.pop(key, None)
 
@@ -5422,6 +5451,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             record.get('repair_notices'),
             record.get('disposition', 'live'),
             provider_outcome=record.get('provider_outcome'),
+            **_carried_disclosures(record),
         )
         validated_cache = self._freeze_gate_liquid_fraction_cache
         if cache_hit:
@@ -5464,6 +5494,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     provider_outcome=normalized_record.get(
                         'provider_outcome'
                     ),
+                    **_carried_disclosures(normalized_record),
                 ),
                 'key': key,
             }
@@ -5482,6 +5513,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 cache_notices,
                 normalized_record.get('disposition', 'live'),
                 provider_outcome=normalized_record.get('provider_outcome'),
+                **_carried_disclosures(normalized_record),
             )
         self._record_composition_projected_liquidus_notice_from_curve(
             normalized_curve

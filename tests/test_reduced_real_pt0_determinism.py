@@ -2037,6 +2037,7 @@ def test_pt0_gate_replay_separates_buffers_at_same_scalar_fO2(
         ),
         redox_state=state_a,
     )
+    record["law_disclosures"] = []
     capture_sim._freeze_gate_liquid_fraction_cache = {
         **record,
         "key": local_key,

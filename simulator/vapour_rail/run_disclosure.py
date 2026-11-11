@@ -715,8 +715,9 @@ def accept_stored_memo(
     """Re-register one stored memo, or refuse it as unknown.
 
     This is the only gate a freeze-gate memo return may use. The same-hour
-    held curve, the local slot, and the shared slot all call it, and a hit
-    is the list it returns. ``None`` means the row never recorded a readable
+    held curve, the local slot, the shared slot, and the core liquidus
+    reader (its local cache and its curve memo) all call it. A hit is the
+    list it returns. ``None`` means the row never recorded a readable
     disclosure: the caller misses and recomputes. A list, including ``[]``,
     is a known measurement and has already been re-registered onto the
     active run or ``owner``. Absence is never an empty disclosure.
