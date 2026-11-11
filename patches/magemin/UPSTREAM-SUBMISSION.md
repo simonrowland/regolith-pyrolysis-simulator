@@ -70,8 +70,9 @@ side effects while preserving caller overrides and parallel launcher settings.
 
 ## Verification
 
-Verified outside a sandbox on macOS 27.2 with Homebrew Open MPI 5.0.9 and hwloc 2.13.0, with no
-environment overrides. Build A (`40ed109` plus patch 0002) recorded 1 WindowServer connection,
+Verified on a second machine (an Apple-silicon laptop, logged-in console session, outside a sandbox)
+on macOS 27.2 with Homebrew Open MPI 5.0.9 and hwloc 2.13.0, with no environment overrides. Socket
+counts differ between the two machines (4 LISTEN on the Mac Studio above, 2 here); both drop to zero. Build A (`40ed109` plus patch 0002) recorded 1 WindowServer connection,
 2 SkyLight lines, 4 OpenCL lines, 1 TCC line, and 2 LISTEN sockets for one PID. Build B (A plus
 patch 0004) recorded zero for all five counts. Under `mpirun -np 2`, both builds returned 0 and
 produced byte-identical pseudosection output (SHA-256

@@ -148,8 +148,9 @@ Clean. No local patches.
 
 ### magemin — v1.9.6 / upstream `40ed109`
 
-Three existing fixes held as patches pending upstream, with a draft pull-request description in
-`patches/magemin/UPSTREAM-PR.md` (not yet filed):
+Four fixes held as patches pending upstream (not yet filed): `0001`-`0003` share the draft
+pull-request description in `patches/magemin/UPSTREAM-PR.md`; `0004` has its own draft in
+`patches/magemin/UPSTREAM-SUBMISSION.md`:
 
 - `0001` THERMOCALC `aMgO`: the `tc` branch of `compute_activities()` never stored the periclase
   `gbase`, so `aMgO` printed `exp(Gamma_MgO/RT)` (~1e-21). Until the adapter-side recompute
