@@ -10353,8 +10353,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             the existing zero-state behaviour is preserved.
           - If the kernel raises, propagate — silent fallback was
             explicitly forbidden by the goal spec.
+
+        Published vapor and high-temperature diagnostics are cleared at
+        entry so a failure cannot expose a prior call's result. The prior
+        high-temperature activity snapshot is retained locally as a
+        continuation input for this dispatch; only a successful dispatch
+        publishes this call's activity state.
         """
 
+        previous_high_t_melt_activity = getattr(
+            self, '_last_high_t_melt_activity', {}
+        ) or {}
+        previous_high_t_melt_activity_temperature_K = getattr(
+            self, '_last_high_t_melt_activity_temperature_K', None
+        )
+        self._last_vapor_pressure_diagnostic = {}
+        self._last_vapor_pressures_source = {}
+        self._last_high_t_melt_activity = {}
+        self._last_high_t_melt_activity_temperature_K = None
         backend_diagnostics = dict(
             getattr(self, '_last_backend_diagnostics', {}) or {}
         )
@@ -10389,15 +10405,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     result.warnings.append(warning)
         if T_C + 273.15 < 400:
             restore_retained_backend_activity_sources()
-            self._last_high_t_melt_activity = {}
-            self._last_high_t_melt_activity_temperature_K = None
             self._last_vapor_pressures_source = dict(
                 getattr(result, 'vapor_pressures_source', {}) or {}
             )
             if co2_diagnostic:
                 self._last_vapor_pressure_diagnostic = {'co2_dissociation': dict(co2_diagnostic)}
-            else:
-                self._last_vapor_pressure_diagnostic = {}
             return
 
         backend_sources = dict(
@@ -10442,12 +10454,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'backend_vapor_pressures_source': dict(backend_sources),
                     'backend_vapor_pressures_Pa': dict(backend_vp),
                 }
-                self._last_vapor_pressures_source = {}
                 if getattr(self, '_headspace_co2_dissociation_diagnostic', None):
                     diagnostic['co2_dissociation'] = dict(self._headspace_co2_dissociation_diagnostic)
                 self._last_vapor_pressure_diagnostic = diagnostic
-                self._last_high_t_melt_activity = {}
-                self._last_high_t_melt_activity_temperature_K = None
                 return
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
@@ -10502,12 +10511,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'high_t_melt_activity': getattr(
                     self, '_high_t_melt_activity', 'openimcc'
                 ),
-                'high_t_melt_activity_previous_temperature_K': getattr(
-                    self, '_last_high_t_melt_activity_temperature_K', None
+                'high_t_melt_activity_previous_temperature_K': (
+                    previous_high_t_melt_activity_temperature_K
                 ),
-                'high_t_melt_activity_previous': getattr(
-                    self, '_last_high_t_melt_activity', {}
-                ),
+                'high_t_melt_activity_previous': previous_high_t_melt_activity,
                 'simulation_hour': simulation_hour,
             }
         dispatch_kwargs = {
