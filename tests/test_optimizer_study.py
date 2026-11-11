@@ -3887,8 +3887,10 @@ def test_parallel_composition_target_winner_ignores_completion_order(
 
 # Non-tied fronts. Rank order and sampling order disagree, so a tie-only
 # regression cannot see a Pareto list that is still sorted by `_rank_key`.
-# `trial` is None when the strategy did not store one; candidate id is then
-# the whole sampling key. Dominated and infeasible rows must stay off the front.
+# `ask_ordinal`, when set, is the whole sampling key even if `trial_number`
+# and the candidate id sort the other way. With no ordinal, `trial` is the
+# index when the strategy stored one; candidate id is then the remainder.
+# Dominated and infeasible rows must stay off the front.
 _PARETO_PUBLICATION_CASES = {
     "reviewer_non_tied": {
         "rows": (
@@ -3913,6 +3915,19 @@ _PARETO_PUBLICATION_CASES = {
         "ranked": ("a-second", "m-third", "z-first"),
         "winner": "a-second",
     },
+    # Ask order is z then a. Trial order and lexical id order are a then z.
+    # Dropping ask_ordinal publishes the trial/id order.
+    "ask_ordinal_beats_trial_and_candidate_id": {
+        "rows": (
+            ("z-asked-first", 10.0, 1.0, 5, True, 1),
+            ("a-asked-second", 20.0, 5.0, 0, True, 2),
+            ("m-dominated", 1.0, 50.0, 1, True, 3),
+            ("b-infeasible", 80.0, 0.1, 4, False, 4),
+        ),
+        "published": ("z-asked-first", "a-asked-second"),
+        "ranked": ("a-asked-second", "z-asked-first"),
+        "winner": "a-asked-second",
+    },
 }
 
 
@@ -3922,10 +3937,13 @@ def _pareto_publication_record(
     energy: float,
     trial: int | None,
     feasible: bool,
+    ask_ordinal: int | None = None,
 ) -> study.StudyRecord:
     provenance: dict[str, Any] = {}
     if trial is not None:
         provenance["trial_number"] = trial
+    if ask_ordinal is not None:
+        provenance["ask_ordinal"] = ask_ordinal
     return study.StudyRecord(
         candidate_id=candidate_id,
         patch=RecipePatch({}),

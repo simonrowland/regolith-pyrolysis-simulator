@@ -161,8 +161,8 @@ STRATEGY_CLASS_NAMES = {
 WINNER_SELECTION_RULE = (
     "choose the feasible Pareto point with the best primary objective "
     "(profile objective ordinal 0); ties compare the remaining profile "
-    "objectives in order using their declared directions, then sampling "
-    "order (trial index, otherwise candidate_id)"
+    "objectives in order using their declared directions, then ask ordinal "
+    "(journal ask_seq; records without one use trial_number, else candidate_id)"
 )
 COMPLETED_STATUS = "completed"
 COMPLETED_NO_FEASIBLE_WINNER_STATUS = "completed-no-feasible-winner"
@@ -844,11 +844,19 @@ def run(
             for candidate, scored, cache_hit in results:
                 _assert_honest_result(scored, definitions)
                 light_scored = _strip_heavy_result(scored)
+                try:
+                    ask_ordinal = ask_seq_by_id[candidate.id]
+                except KeyError as exc:
+                    raise StudyError(
+                        "candidate was evaluated without an ask ordinal: "
+                        f"{candidate.id!r}"
+                    ) from exc
                 record = _to_record(
                     candidate,
                     light_scored,
                     cache_hit=cache_hit,
                     already_light=True,
+                    ask_ordinal=ask_ordinal,
                 )
                 with store.write_lock():
                     if scored.eval_spec is not None:
@@ -1879,7 +1887,14 @@ def _load_study_journal(
             )
             tell_batch.append((candidate, scored))
             told_ids.add(candidate_id)
-            records.append(_to_record(candidate, scored, cache_hit=bool(row.get("cache_hit"))))
+            records.append(
+                _to_record(
+                    candidate,
+                    scored,
+                    cache_hit=bool(row.get("cache_hit")),
+                    ask_ordinal=int(row["ask_seq"]),
+                )
+            )
         if tell_batch:
             _replay_tell_batch(
                 active_strategy,
@@ -4344,11 +4359,15 @@ def _to_record(
     *,
     cache_hit: bool,
     already_light: bool = False,
+    ask_ordinal: int | None = None,
 ) -> StudyRecord:
     light_scored = scored if already_light else _strip_heavy_result(scored)
     failure = light_scored.failure_category
     objectives = _objective_mapping(light_scored.objectives)
-    search_provenance = _search_provenance_from_candidate(candidate)
+    search_provenance = _search_provenance_with_ask_ordinal(
+        _search_provenance_from_candidate(candidate),
+        ask_ordinal,
+    )
     result_blob = _result_blob(light_scored)
     return StudyRecord(
         candidate_id=candidate.id,
@@ -4397,6 +4416,7 @@ def _search_provenance_from_candidate(candidate: Candidate) -> Mapping[str, Any]
         "parent_candidate_id",
         "parent_cache_key",
         "trial_number",
+        "ask_ordinal",
         "seed_id",
         "conditional_mask",
         "conditional_subspace_digest",
@@ -4866,33 +4886,70 @@ def _json_dump_value(value: Any) -> str:
     )
 
 
-def _sampling_order_key(record: StudyRecord) -> tuple[int, str]:
-    """Ask order: trial index, then candidate id.
+def _sampling_index(value: Any) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value
 
-    Optuna stores ``trial_number``. Screen, random, and staged zero-pad the
-    same index into ``candidate_id``. ``cache_key`` is a hash of the spec, so
-    it is not an order: a later sample can sort first, and one spec byte that
-    differs between machines reshuffles which tied point wins.
 
-    This key is the tie-break inside ``_rank_key`` and the only order in
-    which a Pareto front is published.
+def _search_provenance_with_ask_ordinal(
+    provenance: Mapping[str, Any],
+    ask_ordinal: int | None,
+) -> Mapping[str, Any]:
+    """Attach the journal ask counter without disturbing an already-copied one.
+
+    Callers that just asked pass ``ask_ordinal``. Certification rebuilds the
+    candidate from a record that already carries the counter in metadata, and
+    ``_search_provenance_from_candidate`` copies that field through.
     """
 
-    trial = record.search_provenance.get("trial_number")
-    if isinstance(trial, bool) or not isinstance(trial, int):
+    if ask_ordinal is None:
+        return provenance
+    index = _sampling_index(ask_ordinal)
+    if index is None:
+        raise StudyError(f"ask_ordinal must be an int, got {ask_ordinal!r}")
+    merged = dict(provenance)
+    merged["ask_ordinal"] = index
+    return MappingProxyType(merged)
+
+
+def _sampling_order_key(record: StudyRecord) -> tuple[int, int, str]:
+    """Ask order for exact objective ties and Pareto publication.
+
+    INVARIANT: every record that carries ``ask_ordinal`` sorts by that
+    integer alone. The ordinal is the study ask counter (journal
+    ``ask_seq``), copied onto the record in ``_to_record``. It is not
+    ``trial_number``, not the spelling of ``candidate_id``, not
+    ``cache_key``, and not completion order. Staged search asks seeds
+    before Sobol children, and a Sobol id sorts first lexicographically;
+    the ordinal keeps the earlier ask first on every publication path.
+
+    The leading 0 marks a stamped record. Records with no ordinal (fixtures
+    and cache rows that have no journal ask) stay on the previous key,
+    grouped after every stamped record: ``trial_number`` when it is an int,
+    otherwise ``candidate_id``.
+    """
+
+    ordinal = _sampling_index(record.search_provenance.get("ask_ordinal"))
+    if ordinal is not None:
+        return (0, ordinal, "")
+    trial = _sampling_index(record.search_provenance.get("trial_number"))
+    if trial is None:
         trial = 0
-    return (trial, record.candidate_id)
+    return (1, trial, record.candidate_id)
 
 
 def _publish_pareto(members: Sequence[StudyRecord]) -> tuple[StudyRecord, ...]:
     """Sampling-order publication of one Pareto set.
 
-    INVARIANT: every published Pareto sequence is this order. That covers
-    ``StudyResult.pareto``, ``StudyReplayResult.pareto``, and ``pareto.json``
-    rows from the study loop, replay, certify, two-phase certification, and
-    the aborted-cache writer. The winner is the ``_rank_key`` minimum of the
-    same set, chosen separately. Objective rank, completion order, and
-    ``cache_key`` do not reorder the published sequence.
+    INVARIANT: every published Pareto sequence is ask order
+    (``_sampling_order_key``). That covers ``StudyResult.pareto``,
+    ``StudyReplayResult.pareto``, and ``pareto.json`` rows from the study
+    loop, replay, certify, two-phase certification, and the aborted-cache
+    writer. The winner is the ``_rank_key`` minimum of the same set, chosen
+    separately. Objective rank, completion order, ``trial_number``,
+    ``candidate_id``, and ``cache_key`` do not reorder a sequence whose
+    records carry ``ask_ordinal``.
     """
 
     return tuple(sorted(members, key=_sampling_order_key))
@@ -6186,13 +6243,47 @@ def _records_from_cache_sqlite(
         data_digests=selector_spec.data_digests,
         result_scope=result_scope_payload(selector_spec),
     )
+    ask_ordinals = _ask_ordinals_from_journal(out / STUDY_EVENTS_NAME)
     records: list[StudyRecord] = []
     for index, scored in enumerate(scoped):
         if not _cached_extraction_completion_feasible(scored, active_constraints):
             continue
         candidate = _candidate_from_cached_scored(scored, index=index, schema=schema)
-        records.append(_to_record(candidate, scored, cache_hit=True))
+        records.append(
+            _to_record(
+                candidate,
+                scored,
+                cache_hit=True,
+                ask_ordinal=ask_ordinals.get(candidate.id),
+            )
+        )
     return tuple(records)
+
+
+def _ask_ordinals_from_journal(events_path: Path) -> dict[str, int]:
+    """Map candidate id to journal ``ask_seq``.
+
+    Cache insertion follows completion order. The journal ask counter is the
+    sampling order. A missing or unreadable journal leaves the map empty so
+    those rows keep the unstamped fallback key instead of the sqlite row order.
+    """
+
+    if not events_path.is_file():
+        return {}
+    try:
+        events = _load_replay_events(events_path)
+    except StudyReplayError:
+        return {}
+    ordinals: dict[str, int] = {}
+    for row in events:
+        if row.get("event_kind") != "candidate_asked":
+            continue
+        candidate_id = row.get("candidate_id")
+        ask_seq = _sampling_index(row.get("ask_seq"))
+        if not isinstance(candidate_id, str) or not candidate_id or ask_seq is None:
+            continue
+        ordinals[candidate_id] = ask_seq
+    return ordinals
 
 
 def _candidate_from_cached_scored(
