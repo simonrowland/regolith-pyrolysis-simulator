@@ -1346,19 +1346,133 @@ def _ci_tick_state(temperature_C: float, overrides: dict[str, Any]) -> dict[str,
     return state
 
 
-def _pure_fe_tick_bound_kg(temperature_K: float) -> float:
+# JANAF Fe-020 crystal ↔ liquid. Crystal Fe-018 below this, liquid Fe-019
+# at and above it. Gas is Fe-021. P° is the printed 0.1 MPa.
+_FEO_CONGRUENT_MELT_K = 1650.0
+_JANAF_STANDARD_PRESSURE_PA = 100_000.0
+_FEO_JANAF_TABLES = {"gas": "Fe-021", "crystal": "Fe-018", "liquid": "Fe-019"}
+_JANAF_GIBBS_CACHE: dict[str, tuple[tuple[float, float], ...]] = {}
+
+
+def _janaf_dfg_points(table_id: str) -> tuple[tuple[float, float], ...]:
+    cached = _JANAF_GIBBS_CACHE.get(table_id)
+    if cached is not None:
+        return cached
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    points: list[tuple[float, float]] = []
+    for row in document["table"]["values"]:
+        temperature = row.get("temperature") or {}
+        gibbs = row.get("formation_gibbs_energy") or {}
+        t_value = temperature.get("value")
+        g_value = gibbs.get("value")
+        if t_value is None or g_value is None:
+            continue
+        points.append((float(t_value), float(g_value)))
+    points.sort()
+    frozen = tuple(points)
+    _JANAF_GIBBS_CACHE[table_id] = frozen
+    return frozen
+
+
+def _bracket_dfg_kJ(
+    points: tuple[tuple[float, float], ...],
+    temperature_K: float,
+) -> float | None:
+    if temperature_K < points[0][0] or temperature_K > points[-1][0]:
+        return None
+    for (left_T, left_G), (right_T, right_G) in zip(points, points[1:]):
+        if left_T <= temperature_K <= right_T:
+            if right_T == left_T:
+                return left_G
+            return left_G + (right_G - left_G) * (
+                (temperature_K - left_T) / (right_T - left_T)
+            )
+    return None
+
+
+def _independent_fe_channel_bounds(temperature_K: float) -> dict[str, float | None]:
+    """Activity-1 tick masses from each channel's own saturation law.
+
+    Fe uses the shipped pure Antoine (``_FE_PURE_ANTOINE``). FeO(g) is
+    not that pressure. Congruent sublimation FeO(s/l) -> FeO(g) at
+    a_FeO = 1 has nu_O2 = 0, so pO2 does not enter.
+
+    ΔfG° is the linear bracket of the printed JANAF nodes, in kJ/mol:
+    Fe-021 for the gas, Fe-018 for the crystal below 1650 K, Fe-019 for
+    the liquid at and above 1650 K. Then
+
+        P/Pa = 1e5 * exp(-(ΔfG_gas - ΔfG_cond) * 1000 / (R T))
+
+    with R = ``simulator.physical_constants.GAS_CONSTANT`` and P° = 1e5 Pa.
+    Each tick mass is k_HK(T, M) * P * A * t. The bound is the sum.
+    ``feo_pa`` is None when T is outside a printed grid: that table has
+    no extrapolation authority, so the proof is unavailable.
+    """
+
     from engines.antoine import _antoine_log10_pressure
     from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+    from simulator.physical_constants import GAS_CONSTANT
 
     antoine_a, antoine_b, antoine_c = _FE_PURE_ANTOINE
-    pure_pa = 10.0 ** _antoine_log10_pressure(
+    fe_pa = 10.0 ** _antoine_log10_pressure(
         antoine_a, antoine_b, antoine_c, temperature_K
     )
-    channel_flux = [
-        hertz_knudsen_k_kg_s_m2_pa(temperature_K, molar_g / 1000.0) * pure_pa
-        for _channel, molar_g in _FE_CHANNEL_MOLAR_MASS_G
-    ]
-    return max(channel_flux) * _CI_TICK_AREA_M2 * _CI_TICK_DURATION_S
+    condensed_id = (
+        _FEO_JANAF_TABLES["crystal"]
+        if temperature_K < _FEO_CONGRUENT_MELT_K
+        else _FEO_JANAF_TABLES["liquid"]
+    )
+    g_gas = _bracket_dfg_kJ(_janaf_dfg_points(_FEO_JANAF_TABLES["gas"]), temperature_K)
+    g_condensed = _bracket_dfg_kJ(_janaf_dfg_points(condensed_id), temperature_K)
+    feo_pa: float | None
+    if g_gas is None or g_condensed is None:
+        feo_pa = None
+    else:
+        # kJ/mol -> J/mol inside the exponent. R T is J/mol.
+        exponent = -((g_gas - g_condensed) * 1000.0) / (GAS_CONSTANT * temperature_K)
+        feo_pa = math.exp(exponent) * _JANAF_STANDARD_PRESSURE_PA
+    masses: dict[str, float] = {}
+    pressures = {"Fe": fe_pa, "FeO_gas": feo_pa}
+    for channel, molar_g in _FE_CHANNEL_MOLAR_MASS_G:
+        pressure = pressures[channel]
+        if pressure is None:
+            masses[channel] = math.nan
+            continue
+        masses[channel] = (
+            hertz_knudsen_k_kg_s_m2_pa(temperature_K, molar_g / 1000.0)
+            * pressure
+            * _CI_TICK_AREA_M2
+            * _CI_TICK_DURATION_S
+        )
+    total = None if feo_pa is None else masses["Fe"] + masses["FeO_gas"]
+    return {
+        "fe_pa": fe_pa,
+        "feo_pa": feo_pa,
+        "fe_kg": masses["Fe"],
+        "feo_kg": masses["FeO_gas"],
+        "total_kg": total,
+    }
+
+
+def _janaf_printed_log10_kf(table_id: str, temperature_K: float) -> float | None:
+    """Printed log10 Kf at an exact JANAF node. None off-node or blank."""
+
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    for row in document["table"]["values"]:
+        temperature = row.get("temperature") or {}
+        t_value = temperature.get("value")
+        if t_value is None or float(t_value) != temperature_K:
+            continue
+        logk = row.get("log10_formation_equilibrium_constant") or {}
+        value = logk.get("value")
+        if value is None:
+            return None
+        return float(value)
+    return None
 
 
 def _resolve_fe_cold(
@@ -1396,9 +1510,10 @@ def test_ci_cold_tick_fe_missing_ellingham_input_is_authorized_upper_bound_zero(
     Green books Fe dormant_by_epoch and does not add a partial-channel
     silent_zero note. The Ellingham refusal moved that note (campaign
     silent_zero 49 with refused_upstream 2, and n_flux_active/n_refused
-    16/1). The pure-metal tick mass is below the closure tolerance, so Fe
-    is zero_by_physics with the bound and the extrapolated P_sat band, not
-    a refusal and not another silent_zero note.
+    16/1). The sum of the two activity-1 channel masses is below the
+    closure tolerance, so Fe is zero_by_physics with that bound and the
+    extrapolated Fe P_sat band, not a refusal and not another silent_zero
+    note. FeO(g) carries its own congruent pressure, not P_sat,Fe.
     """
 
     from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
@@ -1413,12 +1528,34 @@ def test_ci_cold_tick_fe_missing_ellingham_input_is_authorized_upper_bound_zero(
     assert "evaporation_tick" not in answer.state_fingerprint
     record = answer.extra["below_evaporation_upper_bound"]
     assert record["reason"] == "below_evaporation_upper_bound"
-    assert record["law"] == "pure_component_antoine"
+    assert record["law"] == "per_channel_activity_one_saturation"
     assert record["authority"] == "extrapolated"
     assert record["band_K"] == list(_FE_CONSTRUCTION_BAND_K)
-    expected_kg = _pure_fe_tick_bound_kg(temperature_C + 273.15)
-    assert expected_kg < DEFAULT_BALANCE_TOLERANCE_KG
-    assert record["bound_kg"] == pytest.approx(expected_kg, rel=1e-12)
+    expected = _independent_fe_channel_bounds(temperature_C + 273.15)
+    assert expected["total_kg"] is not None
+    assert expected["total_kg"] < DEFAULT_BALANCE_TOLERANCE_KG
+    assert record["bound_kg"] == pytest.approx(expected["total_kg"], rel=1e-12)
+    fe_channel = record["channels"]["Fe"]
+    feo_channel = record["channels"]["FeO_gas"]
+    assert fe_channel["law"] == "pure_component_antoine"
+    assert fe_channel["authority"] == "extrapolated"
+    assert fe_channel["pressure_pa"] == pytest.approx(expected["fe_pa"], rel=1e-12)
+    assert fe_channel["mass_kg"] == pytest.approx(expected["fe_kg"], rel=1e-12)
+    assert feo_channel["law"] == "janaf_congruent_sublimation"
+    assert feo_channel["authority"] == "certified"
+    assert feo_channel["phase"] == "crystal"
+    assert feo_channel["tables"] == ["Fe-021", "Fe-018"]
+    assert feo_channel["pressure_pa"] == pytest.approx(expected["feo_pa"], rel=1e-12)
+    assert feo_channel["mass_kg"] == pytest.approx(expected["feo_kg"], rel=1e-12)
+    # Changing FeO's molar mass is not a pressure bound. The two
+    # activity-1 pressures differ, and the tick bound is their mass sum.
+    # pytest.approx's default absolute tolerance is 1e-12, which treats
+    # these sub-tolerance pressures as equal, so compare the ratio.
+    fe_to_feo = fe_channel["pressure_pa"] / feo_channel["pressure_pa"]
+    assert fe_to_feo > 2.0 or fe_to_feo < 0.5
+    assert record["bound_kg"] == pytest.approx(
+        fe_channel["mass_kg"] + feo_channel["mass_kg"], rel=1e-12
+    )
     assert math.isfinite(record["p_sat_pa"]) and record["p_sat_pa"] > 0.0
     assert math.isfinite(answer.extra["dormant_catalog_pressure_pa"])
     assert answer.is_refused is False
@@ -1556,9 +1693,9 @@ def test_fe_missing_ellingham_input_refuses_when_upper_bound_exceeds_tolerance(
 
     from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
 
-    assert _pure_fe_tick_bound_kg(temperature_C + 273.15) >= (
-        DEFAULT_BALANCE_TOLERANCE_KG
-    )
+    expected = _independent_fe_channel_bounds(temperature_C + 273.15)
+    assert expected["total_kg"] is not None
+    assert expected["total_kg"] >= DEFAULT_BALANCE_TOLERANCE_KG
     batch = _resolve_fe_cold(temperature_C, state_overrides)
     answer = batch.channel("Fe")
     assert isinstance(answer.pressure, PressureValue)
@@ -1567,6 +1704,179 @@ def test_fe_missing_ellingham_input_refuses_when_upper_bound_exceeds_tolerance(
     assert detail_needle in answer.selected_runtime_pressure.detail
     assert isinstance(answer.flux, FluxRefusal)
     assert "below_evaporation_upper_bound" not in answer.extra
+    assert omission_id
+
+
+# Every branch of the Fe upper-bound chokepoint. ``authorize`` is true only
+# when both channel proofs exist and their tick-mass sum is under closure.
+# Shipped congruent FeO(g) is far below P_sat,Fe on this tick, so the
+# Fe-negligible / FeO-not branch is forced with a 1 Pa congruent pressure.
+_FE_BOUND_BRANCHES = (
+    ("both_under", 35.0, None, True),
+    ("both_under", 145.0, None, True),
+    ("both_under", 400.0, None, True),
+    # 300.0 - 273.15 is the printed JANAF 300 K node (float round-trips).
+    ("printed_node", 300.0 - 273.15, None, True),
+    ("feo_channel_over", 400.0, 1.0, False),
+    ("sum_over", 700.0, None, False),
+    ("sum_over", 900.0, None, False),
+    # 1700 C = 1973.15 K is inside the FeO liquid grid (Fe-019).
+    ("liquid_sum_over", 1700.0, None, False),
+    # 250 K is below Fe-018's first formation-Gibbs node (298.15 K).
+    ("feo_proof_unavailable", -23.15, None, False),
+)
+
+
+@pytest.mark.parametrize(
+    ("branch", "temperature_C", "feo_override_pa", "authorize"),
+    _FE_BOUND_BRANCHES,
+    ids=[f"{item[0]}:{item[1]}" for item in _FE_BOUND_BRANCHES],
+)
+@pytest.mark.parametrize(
+    ("omission_id", "state_overrides", "detail_needle"),
+    _FE_900C_ELLINGHAM_OMISSIONS,
+    ids=[item[0] for item in _FE_900C_ELLINGHAM_OMISSIONS],
+)
+def test_fe_upper_bound_requires_every_channel_own_saturation(
+    monkeypatch: pytest.MonkeyPatch,
+    branch: str,
+    temperature_C: float,
+    feo_override_pa: float | None,
+    authorize: bool,
+    omission_id: str,
+    state_overrides: dict[str, Any],
+    detail_needle: str,
+) -> None:
+    """INVARIANT: zero_by_physics iff every Fe channel has its own bound.
+
+    Authorize only when Fe and FeO(g) each have an activity-1 saturation
+    pressure and the sum of the alpha=1 Hertz-Knudsen masses on this tick
+    is strictly below the mass-balance closure tolerance. One channel's
+    pressure is never the other's. A channel with no evaluable law keeps
+    the typed missing_ellingham_input refusal.
+
+    Fe is P_sat,Fe(T) from the shipped pure Antoine. FeO(g) is P of
+    congruent FeO(s/l) -> FeO(g) at a_FeO = 1, from JANAF formation
+    Gibbs (see ``_independent_fe_channel_bounds``). The association model
+    is not that bound: it needs pO2 and can exceed P_sat,Fe.
+    """
+
+    from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
+    from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+    from simulator.vapour_rail.catalog import _feo_congruent_saturation_pa
+
+    overrides = dict(state_overrides)
+    if branch == "printed_node":
+        temperature_K = 300.0
+        overrides["temperature_K"] = temperature_K
+    else:
+        temperature_K = temperature_C + 273.15
+    expected = _independent_fe_channel_bounds(temperature_K)
+    if feo_override_pa is None:
+        produced = _feo_congruent_saturation_pa(temperature_K)
+        if expected["feo_pa"] is None:
+            assert produced is None
+        else:
+            assert produced is not None
+            assert produced["law"] == "janaf_congruent_sublimation"
+            assert produced["pressure_pa"] == pytest.approx(
+                expected["feo_pa"], rel=1e-12
+            )
+            if branch == "liquid_sum_over":
+                assert produced["phase"] == "liquid"
+                assert produced["tables"] == ["Fe-021", "Fe-019"]
+            elif branch != "feo_proof_unavailable":
+                assert produced["phase"] == "crystal"
+                assert produced["tables"] == ["Fe-021", "Fe-018"]
+    else:
+        # Congruent JANAF FeO(g) stays negligible wherever Fe's Antoine
+        # mass is under 1e-12 kg, so the tables never isolate this branch.
+        # A 1 Pa activity-1 FeO pressure does. The pre-fix bound multiplied
+        # both Hertz-Knudsen coefficients by P_sat,Fe and would still
+        # authorize here.
+        monkeypatch.setattr(
+            "simulator.vapour_rail.catalog._feo_congruent_saturation_pa",
+            lambda _temperature_K: {
+                "pressure_pa": feo_override_pa,
+                "law": "janaf_congruent_sublimation",
+                "authority": "certified",
+                "band_K": [298.15, 6000.0],
+                "phase": "crystal",
+                "tables": ["Fe-021", "Fe-018"],
+            },
+        )
+        feo_molar_g = dict(_FE_CHANNEL_MOLAR_MASS_G)["FeO_gas"]
+        feo_mass_kg = (
+            hertz_knudsen_k_kg_s_m2_pa(temperature_K, feo_molar_g / 1000.0)
+            * feo_override_pa
+            * _CI_TICK_AREA_M2
+            * _CI_TICK_DURATION_S
+        )
+        assert expected["fe_kg"] < DEFAULT_BALANCE_TOLERANCE_KG
+        assert feo_mass_kg >= DEFAULT_BALANCE_TOLERANCE_KG
+
+    if branch == "printed_node":
+        log_gas = _janaf_printed_log10_kf("Fe-021", 300.0)
+        log_crystal = _janaf_printed_log10_kf("Fe-018", 300.0)
+        assert log_gas is not None and log_crystal is not None
+        # Printed log10 Kf, same element reference, not the ΔfG column.
+        # K_sub = Kf(FeO(g)) / Kf(FeO(cr)); P/Pa = 1e5 * K_sub.
+        # log10 Kf is printed to 0.001, which moves P by about 0.23%.
+        p_from_logk = _JANAF_STANDARD_PRESSURE_PA * 10.0 ** (
+            log_gas - log_crystal
+        )
+        assert expected["feo_pa"] == pytest.approx(p_from_logk, rel=5e-3)
+
+    if branch == "feo_proof_unavailable":
+        # Fe's own extrapolated mass is under the tolerance. The refusal
+        # is the missing FeO proof, not the Fe channel.
+        assert expected["fe_kg"] < DEFAULT_BALANCE_TOLERANCE_KG
+        assert expected["feo_pa"] is None
+
+    batch = _resolve_fe_cold(temperature_C, overrides)
+    answer = batch.channel("Fe")
+    if authorize:
+        assert isinstance(answer.selected_runtime_pressure, ZeroByPhysics)
+        record = answer.extra["below_evaporation_upper_bound"]
+        assert record["law"] == "per_channel_activity_one_saturation"
+        assert expected["total_kg"] is not None
+        assert expected["total_kg"] < DEFAULT_BALANCE_TOLERANCE_KG
+        assert record["bound_kg"] == pytest.approx(expected["total_kg"], rel=1e-12)
+        channels = record["channels"]
+        assert set(channels) == {"Fe", "FeO_gas"}
+        assert channels["Fe"]["pressure_pa"] == pytest.approx(
+            expected["fe_pa"], rel=1e-12
+        )
+        assert channels["FeO_gas"]["pressure_pa"] == pytest.approx(
+            expected["feo_pa"], rel=1e-12
+        )
+        # Default abs tolerance on pytest.approx is 1e-12, so a
+        # relative inequality is invisible for these pressures.
+        fe_to_feo = (
+            channels["Fe"]["pressure_pa"] / channels["FeO_gas"]["pressure_pa"]
+        )
+        assert fe_to_feo > 2.0 or fe_to_feo < 0.5
+        assert record["bound_kg"] == pytest.approx(
+            channels["Fe"]["mass_kg"] + channels["FeO_gas"]["mass_kg"],
+            rel=1e-12,
+        )
+        for channel, molar_g in _FE_CHANNEL_MOLAR_MASS_G:
+            recorded = channels[channel]
+            own_mass_kg = (
+                hertz_knudsen_k_kg_s_m2_pa(temperature_K, molar_g / 1000.0)
+                * recorded["pressure_pa"]
+                * _CI_TICK_AREA_M2
+                * _CI_TICK_DURATION_S
+            )
+            assert recorded["mass_kg"] == pytest.approx(own_mass_kg, rel=1e-12)
+        assert answer.is_refused is False
+    else:
+        assert isinstance(answer.pressure, PressureValue)
+        assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+        assert answer.selected_runtime_pressure.code == "missing_ellingham_input"
+        assert detail_needle in answer.selected_runtime_pressure.detail
+        assert isinstance(answer.flux, FluxRefusal)
+        assert "below_evaporation_upper_bound" not in answer.extra
     assert omission_id
 
 

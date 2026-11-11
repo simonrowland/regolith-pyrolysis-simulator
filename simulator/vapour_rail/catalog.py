@@ -1607,10 +1607,19 @@ class CompiledSpecies:
     source_reaction_activity: ActivityInputDeclaration | None = None
 
 
-# Fe's missing a_FeO / pO2 bound. Same P_sat,Fe for both carriers: FeO(g)
-# has no activity-free saturation law, and the heavier mass only raises k_HK.
+# Fe's missing a_FeO / pO2 bound. Each carrier has its own activity-1
+# saturation pressure. FeO(g) is not P_sat,Fe with a heavier molar mass.
 _FE_UPPER_BOUND_REASON = "below_evaporation_upper_bound"
 _FE_UPPER_BOUND_CHANNELS = ("Fe", "FeO_gas")
+# JANAF Fe-020 crystal ↔ liquid, the same 1650 K boundary as
+# ellingham_thermo._ELLINGHAM_PHASE_INTERVALS["FeO"].
+_FEO_CONGRUENT_MELT_K = 1650.0
+_FEO_GAS_JANAF_TABLE = "Fe-021"
+_FEO_CRYSTAL_JANAF_TABLE = "Fe-018"
+_FEO_LIQUID_JANAF_TABLE = "Fe-019"
+# Printed JANAF standard pressure is 0.1 MPa.
+_JANAF_STANDARD_PRESSURE_PA = 100_000.0
+_JANAF_GIBBS_POINTS: dict[str, tuple[tuple[float, float], ...]] = {}
 
 
 def _legacy_projection_species_row(
@@ -1626,6 +1635,127 @@ def _legacy_projection_species_row(
     return None
 
 
+def _janaf_formation_gibbs_points(
+    table_id: str,
+) -> tuple[tuple[float, float], ...] | None:
+    """Printed (T/K, ΔfG°/kJ/mol) nodes. None when the table cannot be read."""
+
+    cached = _JANAF_GIBBS_POINTS.get(table_id)
+    if cached is not None:
+        return cached
+    try:
+        from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+        document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+        table = document.get("table")
+        rows = table.get("values") if isinstance(table, Mapping) else None
+        if not isinstance(rows, list):
+            return None
+        points: list[tuple[float, float]] = []
+        for row in rows:
+            if not isinstance(row, Mapping):
+                continue
+            temperature = row.get("temperature")
+            gibbs = row.get("formation_gibbs_energy")
+            if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
+                continue
+            t_value = temperature.get("value")
+            g_value = gibbs.get("value")
+            if t_value is None or g_value is None:
+                continue
+            t_node = float(t_value)
+            g_node = float(g_value)
+            if math.isfinite(t_node) and math.isfinite(g_node):
+                points.append((t_node, g_node))
+    except (OSError, ValueError, TypeError, KeyError, yaml.YAMLError):
+        return None
+    if len(points) < 2:
+        return None
+    points.sort()
+    frozen = tuple(points)
+    _JANAF_GIBBS_POINTS[table_id] = frozen
+    return frozen
+
+
+def _interpolate_printed_gibbs_kJ(
+    points: tuple[tuple[float, float], ...],
+    temperature_K: float,
+) -> float | None:
+    """Linear ΔfG between the printed nodes that bracket T.
+
+    Outside the printed grid this returns None. These tables have no
+    extrapolation grant, so a temperature past either end is not a bound.
+    """
+
+    if temperature_K < points[0][0] or temperature_K > points[-1][0]:
+        return None
+    for (left_T, left_G), (right_T, right_G) in zip(points, points[1:]):
+        if left_T <= temperature_K <= right_T:
+            if right_T == left_T:
+                return left_G
+            span = right_T - left_T
+            return left_G + (right_G - left_G) * ((temperature_K - left_T) / span)
+    return None
+
+
+def _feo_congruent_saturation_pa(temperature_K: float) -> dict[str, Any] | None:
+    """P(FeO(g)) over pure condensed FeO at a_FeO = 1.
+
+    Congruent sublimation FeO(s/l) -> FeO(g). The stoichiometry has no O2,
+    so the pressure does not depend on pO2. Gas thermo is JANAF Fe-021.
+    The stable condensed phase is the crystal (Fe-018) below 1650 K and
+    the liquid (Fe-019) at and above that point.
+
+    Premise: both formation reactions use the JANAF element reference, so
+    ΔG_sub = ΔfG(gas) − ΔfG(condensed).
+    Algebra: K = P/P° = exp(−ΔG_sub/(R T)), with ΔfG in kJ/mol and
+    P° = 1e5 Pa, so
+        P/Pa = 1e5 * exp(−(ΔfG_gas − ΔfG_cond) * 1000 / (R T)).
+    Units: exp argument dimensionless, result Pa.
+    Sanity: at 1800 K this is about 0.9 Pa, below P_sat,Fe; at 308 K it
+    is about 1e-75 Pa. A temperature outside either printed grid has no
+    extrapolation authority and returns None.
+    """
+
+    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+        return None
+    condensed_id = (
+        _FEO_CRYSTAL_JANAF_TABLE
+        if temperature_K < _FEO_CONGRUENT_MELT_K
+        else _FEO_LIQUID_JANAF_TABLE
+    )
+    phase = "crystal" if condensed_id == _FEO_CRYSTAL_JANAF_TABLE else "liquid"
+    gas_points = _janaf_formation_gibbs_points(_FEO_GAS_JANAF_TABLE)
+    condensed_points = _janaf_formation_gibbs_points(condensed_id)
+    if gas_points is None or condensed_points is None:
+        return None
+    g_gas = _interpolate_printed_gibbs_kJ(gas_points, temperature_K)
+    g_condensed = _interpolate_printed_gibbs_kJ(condensed_points, temperature_K)
+    if g_gas is None or g_condensed is None:
+        return None
+    from simulator.physical_constants import GAS_CONSTANT
+
+    # kJ/mol to J/mol, then ΔG/(R T).
+    exponent = -((g_gas - g_condensed) * 1000.0) / (GAS_CONSTANT * temperature_K)
+    try:
+        pressure_pa = math.exp(exponent) * _JANAF_STANDARD_PRESSURE_PA
+    except OverflowError:
+        return None
+    if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+        return None
+    return {
+        "pressure_pa": pressure_pa,
+        "law": "janaf_congruent_sublimation",
+        "authority": "certified",
+        "band_K": [
+            max(gas_points[0][0], condensed_points[0][0]),
+            min(gas_points[-1][0], condensed_points[-1][0]),
+        ],
+        "phase": phase,
+        "tables": [_FEO_GAS_JANAF_TABLE, condensed_id],
+    }
+
+
 def _authorized_pure_metal_evaporation_zero(
     legacy_projection: Mapping[str, Any],
     answer: Any,
@@ -1633,22 +1763,30 @@ def _authorized_pure_metal_evaporation_zero(
     temperature_K: float | None,
     state: Any,
 ) -> Any | None:
-    """Authorized Fe zero when the pure-metal tick mass is below closure.
+    """Authorized Fe zero when every channel's own tick mass sums under closure.
 
-    ``a_Fe <= 1`` implies ``P_Fe <= P_sat,Fe(T)`` from the shipped pure
-    sidecar, with no Ellingham input. The tick mass is the max Hertz-Knudsen
-    flux of Fe and FeO(g) at activity 1 and alpha 1 (neither coefficient can
-    exceed 1; gas resistance would only lower the flux). Alpha on the Fe row
-    is not used: an upper bound that justified a zero with alpha < 1 would
-    be smaller than the physical ceiling.
+    INVARIANT: a missing Ellingham input becomes ``zero_by_physics`` only
+    when every Fe carrier channel has its own activity-1 saturation
+    pressure and the sum of the alpha=1 Hertz-Knudsen masses over this
+    tick is strictly below ``DEFAULT_BALANCE_TOLERANCE_KG``. One channel's
+    pressure is never reused as another's. A channel with no evaluable
+    law (no thermo, or outside its grid with no extrapolation authority)
+    returns None, and the caller keeps the typed ``missing_ellingham_input``
+    refusal.
 
-    The comparison is ``DEFAULT_BALANCE_TOLERANCE_KG`` over this tick's area
-    and duration. A missing tick cannot prove the mass is negligible. A
-    temperature outside ``construction_support_range_K`` is extrapolated,
-    not a refusal, when that mass is still below the tolerance. The 700 C
-    reference (~6.5e-10 kg/m^2/h) is the sublimation Clausius-Clapeyron
-    check; this function uses the shipped Antoine, whose cold-T pressure is
-    higher, so a zero authorized here is inside that check.
+    Fe: ``a_Fe <= 1`` implies ``P_Fe <= P_sat,Fe(T)`` from the shipped pure
+    sidecar. Outside ``construction_support_range_K`` that sidecar is the
+    shipped continuation, recorded as extrapolated, not a refusal.
+    FeO(g): ``P_FeO <= P`` of congruent FeO(s/l) -> FeO(g) at a_FeO = 1.
+    That reaction has no pO2 term. Alpha is not used on either channel:
+    an upper bound that justified a zero with alpha < 1 would sit below
+    the physical ceiling. Gas resistance would only lower the flux.
+
+    The 700 C reference (~6.5e-10 kg/m^2/h) is the sublimation
+    Clausius-Clapeyron check. This function uses the shipped Antoine for
+    Fe, whose cold-T pressure is higher, so a zero authorized here is
+    inside that check only when the FeO channel's own bound is also below
+    the same tolerance.
     """
 
     if (
@@ -1730,8 +1868,39 @@ def _authorized_pure_metal_evaporation_zero(
         return None
     if not math.isfinite(pure_pa) or pure_pa < 0.0:
         return None
+    # FeO(g) has its own saturation law. Unavailable proof keeps the refusal.
+    feo = _feo_congruent_saturation_pa(temperature_K)
+    if not isinstance(feo, Mapping):
+        return None
+    try:
+        feo_pa = float(feo["pressure_pa"])
+    except (KeyError, TypeError, ValueError):
+        return None
+    if not math.isfinite(feo_pa) or feo_pa < 0.0:
+        return None
 
-    channel_flux_kg_s_m2: list[float] = []
+    fe_authority = (
+        "certified"
+        if band_low <= temperature_K <= band_high
+        else "extrapolated"
+    )
+    channel_pressure_pa = {"Fe": pure_pa, "FeO_gas": feo_pa}
+    channel_laws: dict[str, dict[str, Any]] = {
+        "Fe": {
+            "law": "pure_component_antoine",
+            "authority": fe_authority,
+            "band_K": [band_low, band_high],
+        },
+        "FeO_gas": {
+            "law": feo.get("law"),
+            "authority": feo.get("authority"),
+            "band_K": list(feo.get("band_K") or []),
+            "phase": feo.get("phase"),
+            "tables": list(feo.get("tables") or []),
+        },
+    }
+    channel_records: dict[str, dict[str, Any]] = {}
+    bound_kg = 0.0
     for channel_id in _FE_UPPER_BOUND_CHANNELS:
         channel_row = row if channel_id == "Fe" else _legacy_projection_species_row(
             legacy_projection, channel_id
@@ -1744,22 +1913,34 @@ def _authorized_pure_metal_evaporation_zero(
             return None
         if not math.isfinite(molar_g) or molar_g <= 0.0:
             return None
+        pressure_pa = channel_pressure_pa[channel_id]
         flux_kg_s_m2 = hertz_knudsen_k_kg_s_m2_pa(
             temperature_K, molar_g / 1000.0
-        ) * pure_pa
+        ) * pressure_pa
         if not math.isfinite(flux_kg_s_m2) or flux_kg_s_m2 < 0.0:
             return None
-        channel_flux_kg_s_m2.append(flux_kg_s_m2)
-    bound_kg = max(channel_flux_kg_s_m2) * area_m2 * duration_s
+        mass_kg = flux_kg_s_m2 * area_m2 * duration_s
+        if not math.isfinite(mass_kg) or mass_kg < 0.0:
+            return None
+        bound_kg += mass_kg
+        channel_records[channel_id] = {
+            "pressure_pa": pressure_pa,
+            "molar_mass_g_mol": molar_g,
+            "mass_kg": mass_kg,
+            **channel_laws[channel_id],
+        }
     if not math.isfinite(bound_kg) or bound_kg < 0.0:
         return None
     if not bound_kg < DEFAULT_BALANCE_TOLERANCE_KG:
         return None
 
     authority = (
-        "certified"
-        if band_low <= temperature_K <= band_high
-        else "extrapolated"
+        "extrapolated"
+        if "extrapolated" in (
+            fe_authority,
+            channel_laws["FeO_gas"].get("authority"),
+        )
+        else fe_authority
     )
     extra = dict(answer.extra)
     if isinstance(answer.pressure, PressureValue):
@@ -1769,8 +1950,9 @@ def _authorized_pure_metal_evaporation_zero(
         "bound_kg": bound_kg,
         "authority": authority,
         "band_K": [band_low, band_high],
-        "law": "pure_component_antoine",
+        "law": "per_channel_activity_one_saturation",
         "p_sat_pa": pure_pa,
+        "channels": channel_records,
     }
     zero = ZeroByPhysics(
         evidence_ref=(
@@ -1951,14 +2133,18 @@ class VapourRailCatalog:
         realized pO2 is the 1e-9 bar transport floor, the same floor the
         diagnostic uses. The 85x gap is this skipped term, not a second pO2.
         A missing activity or pO2 is a typed refusal of the selected
-        quantity, except when the activity-free pure-metal Hertz-Knudsen
-        mass of Fe and FeO(g) over the tick is below the mass-balance
-        closure tolerance. That case is an authorized physical zero
-        (``below_evaporation_upper_bound``), not a refusal and not a
-        silent zero. Any other failure to evaluate the rail is a typed
-        refusal. The dormant Antoine stays on ``answer.pressure`` for a
-        refusal and is copied onto ``extra`` for the authorized zero. It
-        is not selected and it is not flux-eligible.
+        quantity, except when every Fe carrier channel has its own
+        activity-1 saturation pressure and the sum of those alpha=1
+        Hertz-Knudsen masses over the tick is below the mass-balance
+        closure tolerance. Fe uses the pure-metal Antoine. FeO(g) uses
+        congruent FeO(s/l) -> FeO(g), which needs no pO2. A channel whose
+        bound cannot be evaluated leaves the typed refusal in place.
+        That authorized case is ``below_evaporation_upper_bound``, not a
+        refusal and not a silent zero. Any other failure to evaluate the
+        rail is a typed refusal. The dormant Antoine stays on
+        ``answer.pressure`` for a refusal and is copied onto ``extra``
+        for the authorized zero. It is not selected and it is not
+        flux-eligible.
 
         Worked point, T = 1673.15 K, a_FeO = 0.2, pO2 = 1e-9 bar:
         dG = -330.157642 kJ/mol O2, K = 4.930535300796167e-11,
