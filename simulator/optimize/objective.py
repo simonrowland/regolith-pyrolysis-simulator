@@ -4420,8 +4420,9 @@ def _replace_species_deposit_with_supply(
     Measured kilograms are the same vapour, not a second source. Leaving
     them and also writing the supply counts that mass twice. Keeping only
     the measured part prices a partial deposit under the supply-bound
-    flag. ``segment`` is the candidate whose placement maximises the
-    lifetime's maximum segment load.
+    flag. ``segment`` is this species' closed-form segment: the binding
+    segment when the species is eligible there, otherwise the smaller
+    eligible segment id.
     """
 
     _drop_species_wall_deposit(wall_deposit, species)
@@ -4477,26 +4478,21 @@ def _refusal_reason(
     return "wall saturation pressure refusal"
 
 
-def _segment_maximising_binding_load(
+def _positive_segment_loads_kg(
     wall_deposit: Mapping[Any, Any],
-    species: str,
-    supply: float,
-    candidates: Sequence[str],
-) -> str:
-    """Place ``supply`` where the lifetime's maximum segment load is largest.
+    excluded_species: set[str],
+) -> dict[str, float]:
+    """Segment loads that stay booked while refused supplies are replaced.
 
-    Campaigns to resinter use that maximum. Each candidate is scored by
-    the maximum that remains after this species' own kilograms are
-    removed and ``supply`` is added there. Segments that did not refuse,
-    and deposits of other species, stay in the maximum. Equal maxima
-    take the smaller segment id. Name order is only that tie-break.
+    A refused species' measured kilograms are the same vapour as its
+    supply. They are excluded here and written back once, on one segment.
     """
 
     loads: dict[str, float] = {}
     for key, kg in wall_deposit.items():
         if not isinstance(key, tuple) or len(key) != 2 or kg is None:
             continue
-        if str(key[1]) == species:
+        if str(key[1]) in excluded_species:
             continue
         try:
             amount = float(kg)
@@ -4506,17 +4502,98 @@ def _segment_maximising_binding_load(
             continue
         segment = str(key[0])
         loads[segment] = loads.get(segment, 0.0) + amount
-    best_segment = ""
-    best_binding = -1.0
-    for segment in sorted(str(item) for item in candidates):
-        candidate_loads = dict(loads)
-        candidate_loads[segment] = candidate_loads.get(segment, 0.0) + float(supply)
-        binding = max(candidate_loads.values(), default=0.0)
-        # Strictly greater keeps the earlier segment id on a tie.
-        if best_segment == "" or binding > best_binding:
-            best_segment = segment
-            best_binding = binding
-    return best_segment
+    return loads
+
+
+def _assign_refused_supplies_at_binding_load(
+    existing_loads: Mapping[str, float],
+    supplies: Mapping[str, float],
+    eligible: Mapping[str, Sequence[str]],
+) -> dict[str, Any]:
+    """Place every refused supply so the maximum segment load is exact.
+
+    Invariant, independent of species order:
+
+        worst_max_load = max over segments s of (
+            existing_booked_load_s
+            + sum over refused species i eligible at s of supply_i
+        )
+
+    The max-segment load is what campaigns-to-resinter uses. It is
+    maximised by concentrating every eligible supply into one segment.
+    Splitting a supply across segments never raises that maximum: segment
+    s can receive at most the supplies eligible there, so no assignment
+    exceeds the closed form, and putting every species eligible at the
+    argmax s* onto s* meets it. Each of those supplies goes wholly to s*.
+    A species not eligible at s* goes to its own best segment. Every
+    candidate of that species has a closed-form term no larger than s*,
+    so the resulting maximum segment load ties at worst_max_load and the
+    smaller segment id wins. That is the same tie-break as a single
+    supply whose candidates do not change the maximum.
+
+    Placing species one at a time understates the maximum. With empty
+    walls, Mg eligible at A and B ties and the smaller id takes A; SiO
+    eligible only at B is booked afterwards. The maximum is then 3 kg.
+    Both supplies are eligible at B, and B's closed form is 4 kg.
+
+    The returned per-segment loads are the loads after this assignment.
+    ``binding_segment`` is s*. ``closed_form_kg`` is the per-segment
+    closed form, including segments that receive no supply.
+    """
+
+    closed_form: dict[str, float] = {
+        str(segment): float(load)
+        for segment, load in existing_loads.items()
+        if float(load) > 0.0
+    }
+    normalized: dict[str, tuple[str, ...]] = {}
+    for species in supplies:
+        candidates = tuple(
+            dict.fromkeys(
+                str(segment)
+                for segment in eligible.get(species, ())
+                if str(segment)
+            )
+        )
+        if not candidates:
+            candidates = ("upstream",)
+        normalized[species] = candidates
+        for segment in candidates:
+            closed_form.setdefault(segment, float(existing_loads.get(segment, 0.0)))
+    for segment in tuple(closed_form):
+        extra = sum(
+            float(supplies[species])
+            for species, candidates in normalized.items()
+            if segment in candidates
+        )
+        closed_form[segment] = float(existing_loads.get(segment, 0.0)) + extra
+    # Smaller segment id wins an equal closed-form load.
+    binding_segment = min(
+        closed_form,
+        key=lambda segment: (-closed_form[segment], segment),
+    )
+    segment_by_species: dict[str, str] = {}
+    for species, candidates in normalized.items():
+        if binding_segment in candidates:
+            segment_by_species[species] = binding_segment
+            continue
+        segment_by_species[species] = min(candidates)
+    segment_loads: dict[str, float] = {
+        str(segment): float(load)
+        for segment, load in existing_loads.items()
+        if float(load) > 0.0
+    }
+    for species, segment in segment_by_species.items():
+        segment_loads[segment] = (
+            segment_loads.get(segment, 0.0) + float(supplies[species])
+        )
+    return {
+        "segment_by_species": segment_by_species,
+        "binding_segment": binding_segment,
+        "segment_loads_kg": segment_loads,
+        "closed_form_kg": closed_form,
+        "worst_max_load_kg": closed_form[binding_segment],
+    }
 
 
 def _authority_without_booked_refusals(
@@ -4590,9 +4667,9 @@ def _book_wall_deposits_at_vapour_supply(
 ) -> dict[str, Any]:
     """Book each refused species at its vapour-supply bound.
 
-    Invariant, for every refused species, at this chokepoint:
-    ``deposit_wall,i <= supply_i``. The priced map is that deposit.
-    Lifetime, cost, and rank read the map this function returns.
+    Invariant, for every refused species, at this chokepoint. Product
+    summary, furnace lifespan, and the tap-hour projection all read the
+    map this function returns. No other path prices a refused wall species.
 
     - No computed vapour flux: not booked. A missing flux is not a zero
       and not a bound. The refusal keeps blocking the figure.
@@ -4600,11 +4677,19 @@ def _book_wall_deposits_at_vapour_supply(
       physical zero (``below_wall_supply_upper_bound``), carrying the
       bound. Existing entries of that species are removed, so a
       measurement above the supply cannot stay priced.
+      ``deposit_wall,i`` is 0, which is <= ``supply_i``.
     - Supply above that resolution: the priced aggregate equals the
-      supply, once (``wall_deposit_upper_bound_used``). Partial
-      measurements of that species are removed first. The supply is
-      written on the candidate segment that maximises the maximum
-      segment load, with the smaller segment id on a tie.
+      supply, once (``wall_deposit_upper_bound_used``), on exactly one
+      eligible segment. Partial measurements of that species are removed
+      first. ``deposit_wall,i == supply_i``.
+
+    The segments are chosen together, not one species at a time. The
+    maximum segment load equals the closed form in
+    ``_assign_refused_supplies_at_binding_load`` and does not depend on
+    species order. ``binding_segment`` is the argmax s* of that closed
+    form. ``segment_loads_kg`` is the load on each segment after every
+    non-negligible supply has been placed. ``worst_max_load_kg`` is that
+    maximum.
 
     The refusal stays on the notice authority in every branch.
     """
@@ -4641,22 +4726,49 @@ def _book_wall_deposits_at_vapour_supply(
     booked_deposit = dict(wall_deposit)
     bookings: list[dict[str, Any]] = []
     booked_species: set[str] = set()
+    classified: list[tuple[str, float, tuple[str, ...], bool]] = []
     for species in refused:
         if species not in supply_kg:
             continue
         supply = float(supply_kg[species])
-        if supply <= resolution_kg:
+        candidates = _refusal_candidate_segments(notice_authority, species)
+        classified.append((species, supply, candidates, supply <= resolution_kg))
+    for species, _supply, _candidates, negligible in classified:
+        if negligible:
             # Authorized physical zero. deposit_wall,i <= supply_i still
             # applies: a kept measurement would price mass above the
-            # supply. The priced map is 0, matching deposit_kg.
+            # supply. Drop it before the closed form reads existing load.
             _drop_species_wall_deposit(booked_deposit, species)
-            reason_segment = _refusal_candidate_segments(
-                notice_authority, species
-            )[0]
+    upper_species = {
+        species for species, _supply, _candidates, negligible in classified
+        if not negligible
+    }
+    assignment: dict[str, Any] | None = None
+    if upper_species:
+        assignment = _assign_refused_supplies_at_binding_load(
+            _positive_segment_loads_kg(booked_deposit, upper_species),
+            {
+                species: supply
+                for species, supply, _candidates, negligible in classified
+                if not negligible
+            },
+            {
+                species: candidates
+                for species, _supply, candidates, negligible in classified
+                if not negligible
+            },
+        )
+    placements = (
+        {}
+        if assignment is None
+        else assignment["segment_by_species"]
+    )
+    for species, supply, candidates, negligible in classified:
+        if negligible:
             refusal_reason = _refusal_reason(
                 notice_authority,
                 species,
-                reason_segment,
+                candidates[0],
             )
             bookings.append({
                 "species": species,
@@ -4671,15 +4783,8 @@ def _book_wall_deposits_at_vapour_supply(
         # d-376 amendment 1 wall-deposit ruling: the scored mass is the
         # supply bound. A partial deposit kept in another segment is the
         # same vapour, so the aggregate is the supply and not
-        # measured + supply. The kilogram goes on the segment that
-        # maximises the binding load.
-        candidates = _refusal_candidate_segments(notice_authority, species)
-        segment = _segment_maximising_binding_load(
-            booked_deposit,
-            species,
-            supply,
-            candidates,
-        )
+        # measured + supply. The kilogram goes on the closed-form segment.
+        segment = str(placements[species])
         refusal_reason = _refusal_reason(notice_authority, species, segment)
         _replace_species_deposit_with_supply(
             booked_deposit,
@@ -4697,7 +4802,7 @@ def _book_wall_deposits_at_vapour_supply(
             "flag": WALL_DEPOSIT_UPPER_BOUND_USED,
         })
         booked_species.add(species)
-    return {
+    booked = {
         "deposit": booked_deposit,
         "availability_authority": _authority_without_booked_refusals(
             notice_authority,
@@ -4706,6 +4811,12 @@ def _book_wall_deposits_at_vapour_supply(
         "notice_authority": notice_authority,
         "bookings": tuple(bookings),
     }
+    if assignment is not None:
+        booked["binding_segment"] = assignment["binding_segment"]
+        booked["segment_loads_kg"] = assignment["segment_loads_kg"]
+        booked["closed_form_kg"] = assignment["closed_form_kg"]
+        booked["worst_max_load_kg"] = assignment["worst_max_load_kg"]
+    return booked
 
 
 def _margin_wall_refused_species(payload: Mapping[str, Any]) -> tuple[str, ...]:

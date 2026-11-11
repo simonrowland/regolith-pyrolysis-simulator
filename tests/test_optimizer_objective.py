@@ -1362,9 +1362,14 @@ def test_nonnegligible_refused_wall_species_uses_supply_bound_and_stays_ranked(
 #   entries of that species are removed. The scored mass is 0, which is
 #   the booking's deposit_kg and is <= the supply.
 # - Supply above that resolution: the priced aggregate equals the supply,
-#   once, on the candidate segment that maximises the maximum segment
-#   load. A tie takes the smaller segment id. A partial measurement is
-#   removed first, so the score is not the partial and not partial + supply.
+#   once, on one eligible segment. A partial measurement is removed
+#   first, so the score is not the partial and not partial + supply.
+# - The maximum segment load equals the closed form
+#   max_s (existing_load_s + sum of non-negligible supplies eligible at s).
+#   Species order does not change it. The argmax segment s* receives
+#   every supply eligible there. A species not eligible at s* takes the
+#   smaller eligible segment id, because those candidates tie on the
+#   maximum. An equal closed form takes the smaller segment id.
 _WALL_BOUND_UPPER = objective_module.WALL_DEPOSIT_UPPER_BOUND_USED
 _WALL_BOUND_BELOW = objective_module.BELOW_WALL_SUPPLY_UPPER_BOUND
 _WALL_BOUND_CASES = (
@@ -1889,6 +1894,457 @@ def test_refused_supply_is_booked_on_the_segment_that_maximises_binding_load(
     assert conservative > alphabetical
     assert summary["furnace_amortization_status"] == "available"
     assert summary["wall_deposit_upper_bound_used"] is True
+
+
+def _closed_form_segment_loads(
+    existing: Mapping[str, float],
+    supplies: Mapping[str, float],
+    eligible: Mapping[str, tuple[str, ...]],
+) -> dict[str, float]:
+    """Independent closed form, not a call into the booking helper.
+
+    worst_max_load = max over s of (
+        existing_s + sum of supplies eligible at s
+    )
+    """
+
+    segments = set(existing)
+    for candidates in eligible.values():
+        segments.update(candidates)
+    return {
+        segment: float(existing.get(segment, 0.0)) + sum(
+            float(supplies[species])
+            for species, candidates in eligible.items()
+            if segment in candidates
+        )
+        for segment in segments
+    }
+
+
+def _oracle_binding_assignment(
+    existing: Mapping[str, float],
+    supplies: Mapping[str, float],
+    eligible: Mapping[str, tuple[str, ...]],
+) -> dict[str, object]:
+    """Species placement the closed form requires.
+
+    Every species eligible at the argmax s* goes wholly to s*. A species
+    that cannot use s* takes the smaller eligible segment id: those
+    candidates tie on the maximum, which s* already meets. Equal closed
+    forms take the smaller segment id.
+    """
+
+    closed = _closed_form_segment_loads(existing, supplies, eligible)
+    binding = min(closed, key=lambda segment: (-closed[segment], segment))
+    assignment = {
+        species: binding if binding in candidates else min(candidates)
+        for species, candidates in eligible.items()
+    }
+    loads = {
+        segment: float(kg) for segment, kg in existing.items() if float(kg) > 0.0
+    }
+    for species, segment in assignment.items():
+        loads[segment] = loads.get(segment, 0.0) + float(supplies[species])
+    return {
+        "binding_segment": binding,
+        "closed_form": closed,
+        "assignment": assignment,
+        "loads": loads,
+        "worst_max_load": closed[binding],
+    }
+
+
+def _existing_loads_excluding_supplies(
+    existing_rows: tuple[tuple[str, str, float], ...],
+    supplies: Mapping[str, float],
+) -> dict[str, float]:
+    loads: dict[str, float] = {}
+    for segment, species, kg in existing_rows:
+        if species in supplies:
+            continue
+        loads[segment] = loads.get(segment, 0.0) + float(kg)
+    return loads
+
+
+def _binding_execution_case(case: Mapping[str, object]) -> dict[str, object]:
+    order = tuple(case["order"])
+    supplies = case["supplies"]
+    eligible = case["eligible"]
+    return {
+        "deposit": tuple(
+            ((segment, species), float(kg))
+            for segment, species, kg in case["existing"]
+        ),
+        "flux": tuple((species, float(supplies[species])) for species in order),
+        "refused": tuple(
+            (species, segment)
+            for species in order
+            for segment in eligible[species]
+        ),
+        "charge": 1000.0,
+    }
+
+
+def _binding_cases() -> tuple[dict[str, object], ...]:
+    eligibility = (("A",), ("B",), ("A", "B"))
+    supply_pairs = (
+        (("Mg", 1.0), ("SiO", 3.0)),
+        (("Mg", 3.0), ("SiO", 1.0)),
+    )
+    existing_rows = (
+        ("empty", ()),
+        ("b_na", (("B", "Na", 3.0),)),
+        ("tie", (("A", "Na", 3.0), ("B", "K", 3.0))),
+        ("outsider", (("C", "Na", 10.0), ("B", "K", 3.0))),
+        ("measured", (("A", "Mg", 0.4), ("B", "SiO", 0.25))),
+        ("measured_neighbour", (("A", "Mg", 0.4), ("B", "Na", 3.0))),
+    )
+    cases: list[dict[str, object]] = []
+    for pair in supply_pairs:
+        supplies = dict(pair)
+        for existing_id, existing in existing_rows:
+            for mg_eligible in eligibility:
+                for sio_eligible in eligibility:
+                    pin = (
+                        supplies["Mg"] == 1.0
+                        and supplies["SiO"] == 3.0
+                        and mg_eligible == ("A", "B")
+                        and sio_eligible == ("B",)
+                    )
+                    for order in (("Mg", "SiO"), ("SiO", "Mg")):
+                        cases.append({
+                            "supplies": dict(supplies),
+                            "eligible": {"Mg": mg_eligible, "SiO": sio_eligible},
+                            "existing": existing,
+                            "existing_id": existing_id,
+                            "order": order,
+                            "channel_pin": pin,
+                        })
+    # A third species eligible only where the binding segment is not.
+    # Fe on A, Mg on A and B, SiO only on B. Sequential booking leaves
+    # the maximum at 3 kg; the closed form is 4 kg at B.
+    fe_supplies = {"Fe": 2.0, "Mg": 1.0, "SiO": 3.0}
+    fe_eligible = {"Fe": ("A",), "Mg": ("A", "B"), "SiO": ("B",)}
+    for existing_id, existing in existing_rows:
+        for order in (("Fe", "Mg", "SiO"), ("SiO", "Mg", "Fe")):
+            cases.append({
+                "supplies": dict(fe_supplies),
+                "eligible": dict(fe_eligible),
+                "existing": existing,
+                "existing_id": existing_id,
+                "order": order,
+                "channel_pin": False,
+            })
+    return tuple(cases)
+
+
+def _binding_case_id(case: Mapping[str, object]) -> str:
+    supplies = case["supplies"]
+    eligible = case["eligible"]
+    bits = [
+        f"{name}{supplies[name]:g}@{''.join(eligible[name])}"
+        for name in case["order"]
+    ]
+    return f"{case['existing_id']}-" + "-".join(bits)
+
+
+_BINDING_BOOK_CASES = _binding_cases()
+_BINDING_BOOK_IDS = tuple(_binding_case_id(case) for case in _BINDING_BOOK_CASES)
+_BINDING_CHANNEL_CASES = tuple(
+    case for case in _BINDING_BOOK_CASES if case["channel_pin"]
+)
+_BINDING_CHANNEL_IDS = tuple(
+    _binding_case_id(case) for case in _BINDING_CHANNEL_CASES
+)
+
+
+def _assert_binding_booking_matches_oracle(
+    booked: Mapping[str, object],
+    case: Mapping[str, object],
+) -> None:
+    supplies = case["supplies"]
+    eligible = case["eligible"]
+    existing = _existing_loads_excluding_supplies(case["existing"], supplies)
+    oracle = _oracle_binding_assignment(existing, supplies, eligible)
+    closed = oracle["closed_form"]
+    worst = max(closed.values())
+    assert worst == pytest.approx(oracle["worst_max_load"])
+    assert booked["worst_max_load_kg"] == pytest.approx(worst)
+    assert booked["binding_segment"] == oracle["binding_segment"]
+    assert set(booked["closed_form_kg"]) == set(closed)
+    for segment, kg in closed.items():
+        assert booked["closed_form_kg"][segment] == pytest.approx(kg)
+    loads = booked["segment_loads_kg"]
+    assert max(loads.values()) == pytest.approx(worst)
+    assert set(loads) == set(oracle["loads"])
+    for segment, kg in oracle["loads"].items():
+        assert loads[segment] == pytest.approx(kg)
+    priced: dict[tuple[str, str], float] = {}
+    for key, kg in booked["deposit"].items():
+        amount = float(kg)
+        if amount <= 1.0e-12:
+            continue
+        priced[(str(key[0]), str(key[1]))] = amount
+    assignment = oracle["assignment"]
+    for species, segment in assignment.items():
+        assert segment in eligible[species]
+        species_keys = [key for key in priced if key[1] == species]
+        assert species_keys == [(segment, species)]
+        assert priced[(segment, species)] == pytest.approx(float(supplies[species]))
+        assert priced[(segment, species)] <= float(supplies[species]) + 1.0e-12
+    for segment, species, kg in case["existing"]:
+        if species in supplies:
+            continue
+        assert priced[(segment, species)] == pytest.approx(float(kg))
+    if (
+        case["existing_id"] == "empty"
+        and supplies.get("Mg") == 1.0
+        and supplies.get("SiO") == 3.0
+        and eligible.get("Mg") == ("A", "B")
+        and eligible.get("SiO") == ("B",)
+        and "Fe" not in supplies
+    ):
+        # Report the ruling's case: s* is B, per-segment load is 4 kg
+        # there, and both supplies sit on B in either species order.
+        assert booked["binding_segment"] == "B"
+        assert booked["segment_loads_kg"]["B"] == pytest.approx(4.0)
+        assert booked["segment_loads_kg"].get("A", 0.0) == pytest.approx(0.0)
+        assert booked["closed_form_kg"]["A"] == pytest.approx(1.0)
+        assert booked["closed_form_kg"]["B"] == pytest.approx(4.0)
+        assert assignment == {"Mg": "B", "SiO": "B"}
+
+
+@pytest.mark.parametrize("case", _BINDING_BOOK_CASES, ids=_BINDING_BOOK_IDS)
+def test_refused_wall_binding_load_matches_the_closed_form_at_the_chokepoint(
+    case: Mapping[str, object],
+) -> None:
+    """Every eligibility, preload, supply pair, and species order.
+
+    The chokepoint is ``_book_wall_deposits_at_vapour_supply``. Product
+    summary, lifespan, and tap read its map. The oracle is the closed
+    form itself: the booked maximum equals that maximum, and each supply
+    is wholly on one eligible segment.
+    """
+
+    execution, _snapshots, deposit = _wall_bound_execution(
+        _binding_execution_case(case)
+    )
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        dict(deposit),
+        execution.trace.wall_deposit_sticking_authority,
+        execution,
+    )
+    _assert_binding_booking_matches_oracle(booked, case)
+
+
+@pytest.mark.parametrize("channel", _WALL_BOUND_CHANNELS)
+@pytest.mark.parametrize("case", _BINDING_CHANNEL_CASES, ids=_BINDING_CHANNEL_IDS)
+def test_closed_form_binding_load_holds_on_every_scoring_channel(
+    channel: str,
+    case: Mapping[str, object],
+) -> None:
+    """Mg 1 kg on A and B, SiO 3 kg only on B, both species orders.
+
+    Empty walls put 4 kg on B. A preload, a tie, an outsider segment, and
+    a measured partial of the refused species stay on that same closed form.
+    """
+
+    view = _wall_bound_view(channel, _binding_execution_case(case))
+    supplies = case["supplies"]
+    eligible = case["eligible"]
+    existing = _existing_loads_excluding_supplies(case["existing"], supplies)
+    oracle = _oracle_binding_assignment(existing, supplies, eligible)
+    worst = max(oracle["closed_form"].values())
+    if view["entries"] is not None:
+        loads: dict[str, float] = {}
+        for (segment, _species), kg in view["entries"].items():
+            loads[segment] = loads.get(segment, 0.0) + float(kg)
+        assert max(loads.values()) == pytest.approx(worst)
+        for species, segment in oracle["assignment"].items():
+            assert view["entries"][(segment, species)] == pytest.approx(
+                float(supplies[species])
+            )
+    if view["species_kg"] is not None:
+        for species, supply in supplies.items():
+            assert view["species_kg"][species] == pytest.approx(float(supply))
+    assert view["upper_flag"] is True
+    assert view["scored"] is True
+    if case["existing_id"] == "empty" and view["entries"] is not None:
+        assert view["entries"][("B", "Mg")] == pytest.approx(1.0)
+        assert view["entries"][("B", "SiO")] == pytest.approx(3.0)
+        assert ("A", "Mg") not in view["entries"]
+        assert ("A", "SiO") not in view["entries"]
+
+
+@pytest.mark.parametrize("order", (("Mg", "SiO"), ("SiO", "Mg")))
+def test_empty_walls_book_mg_and_sio_at_four_kg_on_b(
+    order: tuple[str, str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Empty walls; Mg 1 kg eligible at A and B; SiO 3 kg eligible only at B.
+
+    s* is B. The closed form is 1 kg at A and 4 kg at B. Both supplies go
+    to B, so the booked load is 4 kg and the lifetime is 4.5/4 campaigns.
+    The same booking is produced for both species orders.
+    """
+
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.5)
+    case = {
+        "supplies": {"Mg": 1.0, "SiO": 3.0},
+        "eligible": {"Mg": ("A", "B"), "SiO": ("B",)},
+        "existing": (),
+        "existing_id": "empty",
+        "order": order,
+    }
+    execution, _snapshots, deposit = _wall_bound_execution(
+        _binding_execution_case(case)
+    )
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        dict(deposit),
+        execution.trace.wall_deposit_sticking_authority,
+        execution,
+    )
+    _assert_binding_booking_matches_oracle(booked, case)
+    reference = _run_reference(
+        execution,
+        {},
+        cost_parameters=_furnace_test_cost_parameters(),
+    )
+    summary = reference.product_summary
+    segments = summary["wall_deposit_kg_by_segment_species"]
+
+    assert booked["binding_segment"] == "B"
+    assert booked["worst_max_load_kg"] == pytest.approx(4.0)
+    assert booked["segment_loads_kg"] == {"B": pytest.approx(4.0)}
+    assert booked["closed_form_kg"]["A"] == pytest.approx(1.0)
+    assert booked["closed_form_kg"]["B"] == pytest.approx(4.0)
+    assert segments["B"]["Mg"] == pytest.approx(1.0)
+    assert segments["B"]["SiO"] == pytest.approx(3.0)
+    assert "Mg" not in segments.get("A", {})
+    assert "SiO" not in segments.get("A", {})
+    assert summary["campaigns_to_resinter"] == pytest.approx(4.5 / 4.0)
+    assert summary["furnace_amortization_status"] == "available"
+    assert summary["wall_deposit_upper_bound_used"] is True
+
+
+@pytest.mark.parametrize("order", (("Mg", "SiO", "CrO2"), ("CrO2", "SiO", "Mg")))
+def test_negligible_refused_mass_is_outside_the_closed_form(
+    order: tuple[str, ...],
+) -> None:
+    """10 kg of measured CrO2 against a 1e-12 kg supply is not existing load.
+
+    Leaving that measurement in the closed form would make A the binding
+    segment. The authorized zero removes it, and Mg plus SiO still book
+    4 kg at B.
+    """
+
+    eligible = {
+        "Mg": ("A", "B"),
+        "SiO": ("B",),
+        "CrO2": ("A", "B"),
+    }
+    supplies = {"Mg": 1.0, "SiO": 3.0, "CrO2": 1.0e-12}
+    execution, _snapshots, _deposit = _wall_bound_execution({
+        "deposit": ((("A", "CrO2"), 10.0),),
+        "flux": tuple((species, supplies[species]) for species in order),
+        "refused": tuple(
+            (species, segment)
+            for species in order
+            for segment in eligible[species]
+        ),
+        "charge": 1000.0,
+    })
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        dict(execution.trace.wall_deposit_by_segment_species_kg),
+        execution.trace.wall_deposit_sticking_authority,
+        execution,
+    )
+    upper_case = {
+        "supplies": {"Mg": 1.0, "SiO": 3.0},
+        "eligible": {"Mg": ("A", "B"), "SiO": ("B",)},
+        "existing": (),
+        "existing_id": "empty",
+        "order": tuple(species for species in order if species != "CrO2"),
+    }
+    _assert_binding_booking_matches_oracle(booked, upper_case)
+    priced_species = {
+        str(key[1])
+        for key, kg in booked["deposit"].items()
+        if float(kg) > 1.0e-12
+    }
+    assert "CrO2" not in priced_species
+    cro2 = next(item for item in booked["bookings"] if item["species"] == "CrO2")
+    assert cro2["reason"] == "below_wall_supply_upper_bound"
+    assert cro2["deposit_kg"] == 0.0
+    assert cro2["supply_upper_bound_kg"] == pytest.approx(1.0e-12)
+
+
+@pytest.mark.parametrize("order", (("Mg", "SiO"), ("SiO", "Mg")))
+def test_missing_vapour_flux_stays_out_of_the_supply_sum(
+    order: tuple[str, str],
+) -> None:
+    """SiO with no computed flux keeps its measured 2 kg and is not a zero.
+
+    That 2 kg is existing load. Mg's 1 kg supply, eligible at A and B,
+    then books on B. The closed form is 3 kg at B. SiO stays refused.
+    """
+
+    flux_species = tuple(species for species in order if species != "SiO")
+    execution, _snapshots, deposit = _wall_bound_execution({
+        "deposit": ((("B", "SiO"), 2.0),),
+        "flux": tuple((species, 1.0) for species in flux_species),
+        "refused": tuple(
+            (species, segment)
+            for species, segments in (
+                ("Mg", ("A", "B")),
+                ("SiO", ("B",)),
+            )
+            for segment in segments
+            if species in order
+        ),
+        "charge": 1000.0,
+    })
+    # Refusal records follow the requested species order.
+    by_species = {}
+    for species in order:
+        segments = ("A", "B") if species == "Mg" else ("B",)
+        by_species[species] = {
+            segment: {
+                "status": "refused",
+                "output_status": "status_bearing",
+                "reason": f"antoine domain refused for {species}",
+            }
+            for segment in segments
+        }
+    execution.trace.wall_deposit_sticking_authority = {
+        "wall_saturation_pressure_refusals_by_species": by_species,
+    }
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        dict(deposit),
+        execution.trace.wall_deposit_sticking_authority,
+        execution,
+    )
+    case = {
+        "supplies": {"Mg": 1.0},
+        "eligible": {"Mg": ("A", "B")},
+        "existing": (("B", "SiO", 2.0),),
+        "existing_id": "kept_sio",
+        "order": ("Mg",),
+    }
+    _assert_binding_booking_matches_oracle(booked, case)
+    assert booked["binding_segment"] == "B"
+    assert booked["worst_max_load_kg"] == pytest.approx(3.0)
+    assert booked["segment_loads_kg"]["B"] == pytest.approx(3.0)
+    assert {item["species"] for item in booked["bookings"]} == {"Mg"}
+    notice = booked["notice_authority"][
+        "wall_saturation_pressure_refusals_by_species"
+    ]
+    availability = booked["availability_authority"][
+        "wall_saturation_pressure_refusals_by_species"
+    ]
+    assert "SiO" in notice and "Mg" in notice
+    assert "SiO" in availability
+    assert "Mg" not in availability
 
 
 def test_below_resolution_wall_booking_scores_the_authorized_zero(
