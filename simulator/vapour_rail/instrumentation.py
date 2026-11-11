@@ -763,8 +763,11 @@ def _channel_flux_pressure_pa(answer: VapourAnswer) -> tuple[float | None, str]:
     """Return the selected answer value only after its batch gates pass."""
 
     state = _channel_flux_gate_state(answer)
+    # INVARIANT: zero_by_physics is a typed non-debit. A numeric 0 Pa would
+    # be a claimed seam debit of nothing. Callers must not put it in the
+    # flux map.
     if state == "zero_by_physics":
-        return 0.0, "zero_by_physics"
+        return None, "zero_by_physics"
     if state != "eligible":
         return None, state
     pressure = answer.selected_runtime_pressure
@@ -938,8 +941,10 @@ def flux_pressures_from_batch(
 
     Active path: require batch, iterate ``requested_species_ids``, branch on
     pressure/flux unions, enforce the batch-active set, then consume
-    ``selected_runtime_pressure`` from each answer. Refusal/upper-bound/zero
-    remain typed non-debit states. Extrapolated point estimates are named
+    ``selected_runtime_pressure`` from each answer. Refusal, upper bound,
+    and zero-by-physics stay typed non-debits: this function never writes
+    a numeric 0 Pa for them, even when the species is still listed in
+    ``flux_active_species_ids``. Extrapolated point estimates are named
     explicitly for status/degraded accounting.
     Absent batch or resolve error → empty flux map + typed failure report;
     this consumer accepts no anonymous compatibility mapping.
@@ -1003,8 +1008,7 @@ def flux_pressures_from_batch(
                 "vapour_batch_selected_runtime_pressure"
             )
         elif state == "zero_by_physics":
-            selected_runtime_pa_by_species[species_id] = 0.0
-            flux_pressures[species_id] = 0.0
+            # Typed non-debit. Do not publish 0 Pa under any source label.
             selected_pressure_source_by_species[species_id] = "zero_by_physics"
         # refusal / upper_bound / nonfinite / dormant eligible: no debit
 

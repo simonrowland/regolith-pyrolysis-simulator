@@ -1261,6 +1261,49 @@ def test_empty_flux_keeps_authorizing_selected_outcomes(
     )
 
 
+@pytest.mark.parametrize("species_id", _EMPTY_FLUX_SPECIES)
+@pytest.mark.parametrize("claimed", (False, True))
+def test_zero_by_physics_never_debits_zero_pa(
+    species_id: str,
+    claimed: bool,
+) -> None:
+    """INVARIANT: a typed physical zero is never a numeric flux debit.
+
+    Every carrier, whether or not the pre-resolution active set claimed
+    it. ``zero_by_physics`` must not appear in the flux map, including as
+    0 Pa, and ``selected_runtime_pa_by_species`` must not record that 0.
+    An unclaimed channel stays dormant. A claimed channel stays
+    ``zero_by_physics`` and still does not debit.
+    """
+
+    zero = ZeroByPhysics(evidence_ref="below_evaporation_upper_bound;test")
+    answer = _channel_answer(
+        species_id,
+        pressure=zero,
+        selected=zero,
+        flux=FluxEligible(alpha_ref=f"alpha:{species_id}"),
+    )
+    batch = VapourBatch(
+        requested_species_ids=frozenset({species_id}),
+        channels_by_species={species_id: answer},
+        flux_active_species_ids=frozenset({species_id} if claimed else ()),
+    )
+    flux, report = flux_pressures_from_batch(batch)
+    assert species_id not in flux
+    assert all(value != 0.0 for value in flux.values())
+    assert species_id not in report["selected_runtime_pa_by_species"]
+    assert 0.0 not in report["selected_runtime_pa_by_species"].values()
+    if claimed:
+        assert report["batch_channel_states"][species_id] == "zero_by_physics"
+        assert (
+            report["selected_pressure_source_by_species"][species_id]
+            == "zero_by_physics"
+        )
+        return
+    assert report["batch_channel_states"][species_id] == "dormant_by_epoch"
+    assert species_id not in report["selected_pressure_source_by_species"]
+
+
 _FE_900C_ELLINGHAM_OMISSIONS = (
     ("missing_activity", {"fO2_bar": 1.0e-9}, "activity"),
     ("missing_pO2", {"source_reaction_activities": {"Fe": 0.2}}, "pO2"),
@@ -1580,7 +1623,60 @@ def test_ci_cold_tick_fe_missing_ellingham_input_is_authorized_upper_bound_zero(
     _pressures, report = flux_pressures_from_batch(batch)
     assert report["batch_channel_states"]["Fe"] == "dormant_by_epoch"
     assert "Fe" not in _pressures
+    assert "Fe" not in report["selected_runtime_pa_by_species"]
     _assert_cold_fe_adds_no_partial_silent_zero(batch, temperature_C)
+    assert omission_id
+    assert detail_needle
+
+
+@pytest.mark.parametrize("temperature_C", _CI_COLD_TICK_C)
+@pytest.mark.parametrize(
+    ("omission_id", "state_overrides", "detail_needle"),
+    _FE_900C_ELLINGHAM_OMISSIONS,
+    ids=[item[0] for item in _FE_900C_ELLINGHAM_OMISSIONS],
+)
+def test_claimed_cold_fe_authorized_zero_is_not_a_seam_debit(
+    temperature_C: float,
+    omission_id: str,
+    state_overrides: dict[str, Any],
+    detail_needle: str,
+) -> None:
+    """A kernel-seam claim does not keep the authorized Fe zero flux-active.
+
+    The pre-resolution effective-pressure set includes Fe, which is how
+    the cold tick used to stay in ``flux_active_species_ids`` and debit
+    0 Pa. After the upper bound authorizes the zero, Fe leaves that set
+    and every solve bundle. The debit map has no Fe entry.
+    """
+
+    from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+    from simulator.vapour_rail.u0_manifest import load_u0_manifest
+
+    catalog = _fe_cold_catalog(compile_vapour_rail_catalog, load_u0_manifest)
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"FeO": 1.0}},
+        _ci_tick_state(temperature_C, state_overrides),
+        flux_activation_context=FluxActivationContext(
+            epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+            effective_pressure_species_ids=frozenset({"Fe"}),
+        ),
+        balance_tolerance_kg=DEFAULT_BALANCE_TOLERANCE_KG,
+    )
+    answer = batch.channel("Fe")
+    assert isinstance(answer.selected_runtime_pressure, ZeroByPhysics)
+    assert answer.extra["below_evaporation_upper_bound"]["reason"] == (
+        "below_evaporation_upper_bound"
+    )
+    assert "Fe" not in batch.flux_active_species_ids
+    assert all(
+        "Fe" not in members for members in batch.solve_bundle_ids.values()
+    )
+    assert batch.metadata["n_flux_active"] == len(batch.flux_active_species_ids)
+    pressures, report = flux_pressures_from_batch(batch)
+    assert "Fe" not in pressures
+    assert "Fe" not in report["selected_runtime_pa_by_species"]
+    assert report["batch_channel_states"]["Fe"] == "dormant_by_epoch"
     assert omission_id
     assert detail_needle
 

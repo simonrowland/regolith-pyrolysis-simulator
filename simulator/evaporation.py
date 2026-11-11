@@ -303,6 +303,28 @@ def screened_missing_alpha_records(
     return SoleMissingAlphaScreen(refusals, authorized_zeros)
 
 
+def _publish_evaporation_flux_diagnostic(
+    host: Any,
+    diagnostic: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Stamp the flux diagnostic without looking up a method on the host.
+
+    INVARIANT: every evaporation exit publishes through this function.
+    The evaporation methods are bound onto duck-typed hosts that are not
+    ``EvaporationMixin`` instances. A private-method lookup on that host
+    raises ``AttributeError`` before the typed ``EvaporationFluxRefusal``.
+    The screened missing-alpha partition is merged here, then the stamped
+    mapping is stored on the host by attribute assignment.
+    """
+
+    stamped = _merge_screened_missing_alpha(
+        diagnostic,
+        getattr(host, "_screened_missing_alpha_records", None),
+    )
+    host._last_evaporation_flux_diagnostic = stamped
+    return stamped
+
+
 def _merge_screened_missing_alpha(
     diagnostic: Mapping[str, Any],
     screen: SoleMissingAlphaScreen | Mapping[str, Any] | None,
@@ -1236,16 +1258,6 @@ def _screen_sole_missing_alpha(
 
 
 class EvaporationMixin:
-    def _publish_evaporation_flux_diagnostic(
-        self, diagnostic: Mapping[str, Any]
-    ) -> dict[str, Any]:
-        stamped = _merge_screened_missing_alpha(
-            diagnostic,
-            getattr(self, "_screened_missing_alpha_records", None),
-        )
-        self._last_evaporation_flux_diagnostic = stamped
-        return stamped
-
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
 
@@ -1396,7 +1408,7 @@ class EvaporationMixin:
                     'and dp_eq/dC_i'
                 ),
             }
-            stamped = self._publish_evaporation_flux_diagnostic(diagnostic)
+            stamped = _publish_evaporation_flux_diagnostic(self, diagnostic)
             raise EvaporationFluxRefusal(
                 'uncertified_melt_resistance_model',
                 stamped,
@@ -1479,7 +1491,7 @@ class EvaporationMixin:
                 'evaporation_flux_kg_hr': {},
                 'vapour_batch_flux_overlay': flux_overlay_report,
             }
-            stamped = self._publish_evaporation_flux_diagnostic(diagnostic)
+            stamped = _publish_evaporation_flux_diagnostic(self, diagnostic)
             raise EvaporationFluxRefusal(reason, stamped)
 
         liquid_state_admits_inventory_zero = liquid_fraction is None
@@ -1545,7 +1557,7 @@ class EvaporationMixin:
                 detail=_sz['detail'],
                 doctrine_category=CATEGORY_PROVEN_ZERO,
             )
-            self._publish_evaporation_flux_diagnostic(diagnostic)
+            _publish_evaporation_flux_diagnostic(self, diagnostic)
             return flux
 
         if not vapor_pressures:
@@ -1579,7 +1591,7 @@ class EvaporationMixin:
             if authorization is not None and authorization[0] == 'kinetic_floor':
                 # The guarded producer explicitly skipped pressure evaluation
                 # under its existing kinetic floor; absent Pa alone is no proof.
-                self._publish_evaporation_flux_diagnostic({
+                _publish_evaporation_flux_diagnostic(self, {
                     'reason': authorization[1],
                     'evaporation_flux_kg_hr': {},
                     'vapour_batch_flux_overlay': flux_overlay_report,
@@ -1587,7 +1599,7 @@ class EvaporationMixin:
                 })
                 return flux
             if authorization is not None and authorization[0] == 'physical_zero':
-                self._publish_evaporation_flux_diagnostic({
+                _publish_evaporation_flux_diagnostic(self, {
                     'reason': authorization[1],
                     'evaporation_flux_kg_hr': {},
                     'vapour_batch_flux_overlay': flux_overlay_report,
@@ -1622,13 +1634,13 @@ class EvaporationMixin:
                 except (TypeError, ValueError):
                     pass
             if regime_diagnostic:
-                self._publish_evaporation_flux_diagnostic(regime_diagnostic)
+                _publish_evaporation_flux_diagnostic(self, regime_diagnostic)
             if authorization is not None and authorization[0] == 'zero_by_physics':
                 if (
                     not regime_diagnostic
                     and getattr(self, "_screened_missing_alpha_records", None)
                 ):
-                    self._publish_evaporation_flux_diagnostic({
+                    _publish_evaporation_flux_diagnostic(self, {
                         "reason": _EMPTY_FLUX_ZERO_BY_PHYSICS,
                         "evaporation_flux_kg_hr": {},
                         "vapour_batch_flux_overlay": flux_overlay_report,
@@ -1649,7 +1661,7 @@ class EvaporationMixin:
                 'typed_non_debit',
                 _EMPTY_FLUX_PARTIAL,
             ) and not partial_reaches_kernel:
-                self._publish_evaporation_flux_diagnostic({
+                _publish_evaporation_flux_diagnostic(self, {
                     **regime_diagnostic,
                     'reason': 'vapour_batch_all_channels_non_debiting',
                     'detail': (
@@ -1678,14 +1690,14 @@ class EvaporationMixin:
                     'vapour_batch_flux_overlay': flux_overlay_report,
                     'vapour_batch': batch_report,
                 }
-                stamped = self._publish_evaporation_flux_diagnostic(diagnostic)
+                stamped = _publish_evaporation_flux_diagnostic(self, diagnostic)
                 raise EvaporationFluxRefusal(
                     reason,
                     stamped,
                 )
         if T_K < 400:  # Catalog pressure exists; thermal physical zero.
             if getattr(self, "_screened_missing_alpha_records", None):
-                self._publish_evaporation_flux_diagnostic({
+                _publish_evaporation_flux_diagnostic(self, {
                     "reason": _EMPTY_FLUX_KINETIC_FLOOR,
                     "evaporation_flux_kg_hr": {},
                     "vapour_batch_flux_overlay": flux_overlay_report,
@@ -1812,7 +1824,7 @@ class EvaporationMixin:
         # transport-only unavailable result into a run abort: that decision
         # reads the kernel diagnostic, before the stamp.
         kernel_diagnostic = diagnostic
-        diagnostic = self._publish_evaporation_flux_diagnostic(kernel_diagnostic)
+        diagnostic = _publish_evaporation_flux_diagnostic(self, kernel_diagnostic)
         missing_transport = kernel_diagnostic.get('missing_transport_parameters', {})
         if isinstance(missing_transport, Mapping):
             for species, refusal in missing_transport.items():

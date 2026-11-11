@@ -2344,7 +2344,9 @@ class VapourRailCatalog:
         rail is a typed refusal. The dormant Antoine stays on
         ``answer.pressure`` for a refusal and is copied onto ``extra``
         for the authorized zero. It is not selected and it is not
-        flux-eligible.
+        flux-eligible. A pre-resolution claim that included Fe is dropped
+        from ``flux_active_species_ids`` with the refusal set, so the
+        authorized zero cannot stay active and debit 0 Pa.
 
         Worked point, T = 1673.15 K, a_FeO = 0.2, pO2 = 1e-9 bar:
         dG = -330.157642 kJ/mol O2, K = 4.930535300796167e-11,
@@ -2571,31 +2573,17 @@ class VapourRailCatalog:
             changed = True
         if not changed:
             return batch
-        dormant_count: int | None = None
-        if authorized_zero_ids:
-            active_after = frozenset(batch.flux_active_species_ids) - refused_ids
-            dormant_count = sum(
-                1
-                for species_id, channel in channels.items()
-                if channel.is_flux_active and species_id not in active_after
-            )
-        if not refused_ids:
-            if dormant_count is None:
-                return replace(batch, channels_by_species=channels)
-            metadata = dict(batch.metadata)
-            metadata["n_flux_dormant_by_epoch"] = dormant_count
-            return replace(
-                batch,
-                channels_by_species=channels,
-                metadata=metadata,
-            )
-        # Refusal is post-resolution. Counts and bundles were derived from
-        # the pre-refusal channels, so a Fe-only batch would still report
-        # Fe as active and keep it in its solve bundle.
-        flux_active = frozenset(batch.flux_active_species_ids) - refused_ids
+        # Refusal and the authorized physical zero are post-resolution.
+        # Counts and bundles were derived from the pre-resolution channels.
+        # Leaving an authorized Fe zero in the claim set kept it
+        # flux-active, and the debit chokepoint then published 0 Pa.
+        drop_ids = refused_ids | authorized_zero_ids
+        if not drop_ids:
+            return replace(batch, channels_by_species=channels)
+        flux_active = frozenset(batch.flux_active_species_ids) - drop_ids
         solve_bundles: dict[str, frozenset[str]] = {}
         for bundle_id, members in batch.solve_bundle_ids.items():
-            remaining = frozenset(members) - refused_ids
+            remaining = frozenset(members) - drop_ids
             if remaining:
                 solve_bundles[bundle_id] = remaining
         metadata = dict(batch.metadata)
@@ -2604,8 +2592,12 @@ class VapourRailCatalog:
         )
         metadata["n_flux_active"] = len(flux_active)
         metadata["n_solve_bundles"] = len(solve_bundles)
-        if dormant_count is not None:
-            metadata["n_flux_dormant_by_epoch"] = dormant_count
+        if authorized_zero_ids:
+            metadata["n_flux_dormant_by_epoch"] = sum(
+                1
+                for species_id, channel in channels.items()
+                if channel.is_flux_active and species_id not in flux_active
+            )
         return replace(
             batch,
             channels_by_species=channels,
