@@ -14,6 +14,7 @@ import math
 import pytest
 
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
 from simulator.condensation import (
     CondensationModel,
     DepositionInputRefusal,
@@ -133,7 +134,13 @@ def test_dimer_credits_two_monomer_moles_and_closes_mass(dimer):
     assert _moles(monomer, deposited_monomer) == pytest.approx(
         2.0 * _moles(dimer, captured_dimer)
     )
-    assert _mass_closure_kg(route, inlet) == pytest.approx(0.0, abs=0.0)
+    # The stage split is a partition of the inlet. Summing the buckets
+    # and the successively subtracted remainder differs by one ulp
+    # (K2 route closure -1.1e-16, Mg2 authority 1.1e-16). That residual
+    # is inside the ledger balance tolerance, not a missing kilogram.
+    assert _mass_closure_kg(route, inlet) == pytest.approx(
+        0.0, abs=DEFAULT_BALANCE_TOLERANCE_KG,
+    )
     assert route.retained_in_source_by_species.get(dimer, 0.0) == 0.0
     assert route.condensation_refusals_by_species.get(dimer, {}).get("reason") != (
         CONTRACT_REASON
@@ -146,7 +153,13 @@ def test_dimer_credits_two_monomer_moles_and_closes_mass(dimer):
     assert dimer not in route.wall_deposit_by_species
 
     authority = route.condensation_authority_by_species[dimer]
-    assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0, abs=0.0)
+    # Same one-ulp partition as the route sum above. The authority adds
+    # the running credit total; the route sum adds the stage buckets.
+    # Either association can miss by one ulp. The ledger's
+    # DEFAULT_BALANCE_TOLERANCE_KG (1e-12 kg) is the closure gate.
+    assert authority["mass_closure_error_kg_hr"] == pytest.approx(
+        0.0, abs=DEFAULT_BALANCE_TOLERANCE_KG,
+    )
 
     notice = route.sticking_alpha_provenance_notice
     assert notice[DIMER_ALPHA_FROM_MONOMER_PROXY][dimer] == monomer
@@ -171,9 +184,13 @@ def test_monomer_present_with_its_dimer_keeps_both_masses():
     # to the inlet within one ulp.
     assert _mass_closure_kg(route, inlet) == pytest.approx(0.0, abs=1.0e-15)
     for species in inlet:
+        # Na's authority residual is 2.2e-16 kg: the monomer's own
+        # deposit and the dimer credit are partitioned from two inlets,
+        # and (remaining + credited) - supplied is one ulp. Same ledger
+        # gate as the dimer-only closure.
         assert route.condensation_authority_by_species[species][
             "mass_closure_error_kg_hr"
-        ] == pytest.approx(0.0, abs=0.0)
+        ] == pytest.approx(0.0, abs=DEFAULT_BALANCE_TOLERANCE_KG)
     assert route.sticking_alpha_provenance_notice[
         DIMER_ALPHA_FROM_MONOMER_PROXY
     ]["Na2"] == "Na"
@@ -1667,6 +1684,77 @@ def test_infinite_kp_matches_the_shared_series_solver(monkeypatch, species):
     )
 
 
+@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
+def test_infinite_kp_mixture_keeps_each_arrival_on_its_own_partial(
+    monkeypatch, monomer, dimer,
+):
+    """K_p -> inf in a mixture uses the green partial, not p_elem.
+
+    lunar_24h with the probe on failed Na stage 4 by +1.08e-5 relative
+    while the condenser inlet matched. The stage solver was fed
+    p_elem = p_M + 2 p_M2, and the dimer arrival was collected onto the
+    monomer. Green does neither. The wall form is a different expression
+    and is not this assertion: these ducts are the hot defaults, so the
+    wall does not deposit.
+
+    The oracle is the series-flux pressure, not the route's captured
+    mass. A second route with the dimer removed would change the mole
+    fractions, so it is not green's mixture.
+    """
+
+    from simulator.condensation import (
+        _series_resistance_deposition_flux_mol_m2_s,
+    )
+
+    def kp_inf(name, temperature_K, vapor_pressure_data=None):
+        if name == dimer:
+            return math.inf
+        return dimer_dissociation_kp_pa(
+            name, temperature_K, vapor_pressure_data,
+        )
+
+    monkeypatch.setattr(
+        "simulator.condensation.dimer_dissociation_kp_pa", kp_inf,
+    )
+    # (species, partial passed to the series flux, this arrival's inlet).
+    stage_calls: list[tuple[str, float, float]] = []
+    in_stage = {"on": False}
+    current_inlet = {"pa": None}
+    original_efficiency = CondensationModel._condensation_efficiency
+    original_flux = _series_resistance_deposition_flux_mol_m2_s
+
+    def efficiency(self, **kwargs):
+        current_inlet["pa"] = float(kwargs["inlet_partial_pressure_pa"])
+        in_stage["on"] = True
+        try:
+            return original_efficiency(self, **kwargs)
+        finally:
+            in_stage["on"] = False
+
+    def flux(species, partial_pa, *args, **kwargs):
+        if in_stage["on"]:
+            stage_calls.append((
+                str(species), float(partial_pa), float(current_inlet["pa"]),
+            ))
+        return original_flux(species, partial_pa, *args, **kwargs)
+
+    monkeypatch.setattr(CondensationModel, "_condensation_efficiency", efficiency)
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        flux,
+    )
+    inlet = {monomer: 1.0, dimer: 0.25}
+    route = _route(inlet, partials={monomer: 0.2, dimer: 0.05})
+    assert route.remaining_by_species[dimer] == inlet[dimer]
+    assert _deposited_kg(route, dimer) == 0.0
+    monomer_calls = [row for row in stage_calls if row[0] == monomer]
+    assert monomer_calls
+    assert [row for row in stage_calls if row[0] == dimer] == []
+    for _species, passed, own in monomer_calls:
+        # p_elem would be own + 2 * p_dimer. The flux must see own.
+        assert passed == own
+
+
 def test_hot_wall_with_zero_collector_does_not_invent_the_proxy():
     """1500 C is undersaturated for 10 Pa of K, so the dimer channel stays off."""
 
@@ -1736,3 +1824,278 @@ def test_route_hands_both_partials_to_monomer_and_dimer_arrivals(monkeypatch):
     )
     assert seen["Na"]["coexisting_dimer_partial_pa"] > 0.0
     assert seen["Na2"]["coexisting_monomer_partial_pa"] > 0.0
+
+
+# Invariant. One contracted element on one wall has one capture budget,
+# min((J_M + 2 J_M2) * A, m_M + m_M2). The gas-species debits split that
+# budget by inlet supply. They never each receive the combined transport.
+# The chokepoint is _element_wall_capture_kg_hr. Every wall path reaches
+# it through wall_deposit_candidate_for_surface_kg: the direct surface
+# call, route()'s per-segment debit, and the ledger handoff of that
+# route. A mixed partial with no declared partner supply refuses instead
+# of applying T twice. K_p -> inf is the same expression with J_M2 = 0.
+# Homonuclear M_M2 = 2 M_M, so a kilogram of either gas is a kilogram of
+# element. The grid is every contracted pair, every supply class, and
+# both K_p limits.
+
+_BUDGET_K_MONOMER = 1.0e-4
+_BUDGET_K_DIMER = 2.0e-4
+_BUDGET_PSAT_PA = 1.0
+_BUDGET_KP_PA = 1.0
+_BUDGET_P_ELEM_PA = 6.0
+_BUDGET_ARRIVALS = (
+    "monomer",
+    "dimer",
+    "mixed_equal",
+    "mixed_unbalanced",
+    "mixed_supply_limited",
+    "mixed_one_over",
+)
+
+
+def _budget_transport_kg_hr(monomer, kp_pa):
+    """(J_M + 2 J_M2) * A * M_M * 3600 at p_elem = 6 Pa, A = 1 m2.
+
+    Finite K_p = 1 Pa. p_M = (K_p/4) (sqrt(1 + 8*6) - 1) = 1.5 Pa,
+    so p_M2 = p_M^2 / K_p = 2.25 Pa. Drives are p_M - P_sat = 0.5 Pa and
+    (p_M^2 - P_sat^2) / K_p = 1.25 Pa. K_p -> inf has p_M = p_elem and
+    no dimer drive. The stand-in conductances are 1e-4 and 2e-4
+    mol/(m2 s Pa). This arithmetic does not call the production helper.
+    """
+
+    molar_mass = resolve_species_formula(monomer).molar_mass_kg_per_mol()
+    if math.isinf(kp_pa):
+        monomer_partial = _BUDGET_P_ELEM_PA
+        dimer_drive = 0.0
+    else:
+        monomer_partial = (2.0 * _BUDGET_P_ELEM_PA) / (
+            math.sqrt(1.0 + 8.0 * _BUDGET_P_ELEM_PA / kp_pa) + 1.0
+        )
+        dimer_drive = (
+            monomer_partial * monomer_partial
+            - _BUDGET_PSAT_PA * _BUDGET_PSAT_PA
+        ) / kp_pa
+    monomer_drive = monomer_partial - _BUDGET_PSAT_PA
+    assert monomer_drive > 0.0
+    assert dimer_drive >= 0.0
+    element_mol_s = (
+        _BUDGET_K_MONOMER * monomer_drive
+        + 2.0 * _BUDGET_K_DIMER * dimer_drive
+    )
+    return element_mol_s * molar_mass * 3600.0
+
+
+def _budget_case(arrival, transport):
+    """Inlet partials at p_elem = 6 Pa, and supplies relative to T."""
+
+    over = transport * 4.0
+    under = transport * 0.05
+    if arrival == "monomer":
+        return 6.0, 0.0, over, 0.0
+    if arrival == "dimer":
+        return 0.0, 3.0, 0.0, over
+    if arrival == "mixed_equal":
+        return 1.5, 2.25, over, over
+    if arrival == "mixed_unbalanced":
+        return 1.5, 2.25, over, over * 3.0
+    if arrival == "mixed_supply_limited":
+        return 1.5, 2.25, under, under
+    if arrival == "mixed_one_over":
+        return 1.5, 2.25, over, under
+    raise AssertionError(arrival)
+
+
+def _install_budget_physics(monkeypatch, kp_pa):
+    def kp_of(_name, _temperature_K, vapor_pressure_data=None):
+        return kp_pa
+
+    def coefficients(*_args, **_kwargs):
+        return _BUDGET_K_MONOMER, _BUDGET_K_DIMER
+
+    def flux(_species, pressure, temperature_K, _alpha, **kwargs):
+        diagnostic = kwargs.get("diagnostic_out")
+        hot = float(temperature_K) >= 1000.0
+        saturation = 1.0e12 if hot else _BUDGET_PSAT_PA
+        if isinstance(diagnostic, dict):
+            diagnostic["wall_saturation_pressure_pa"] = saturation
+            diagnostic["wall_saturation_pressure_refused"] = False
+        if hot:
+            return 0.0
+        return max(0.0, float(pressure) - saturation)
+
+    monkeypatch.setattr(
+        "simulator.condensation.dimer_dissociation_kp_pa", kp_of,
+    )
+    monkeypatch.setattr(
+        "simulator.condensation._element_series_coefficients_mol_m2_s_pa",
+        coefficients,
+    )
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        flux,
+    )
+
+
+def _expected_debits(monomer_rate, dimer_rate, transport):
+    element_supply = monomer_rate + dimer_rate
+    captured = min(transport, element_supply)
+    if element_supply <= 0.0:
+        return 0.0, 0.0, captured
+    eta = captured / element_supply
+    return monomer_rate * eta, dimer_rate * eta, captured
+
+
+@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
+@pytest.mark.parametrize("arrival", _BUDGET_ARRIVALS)
+@pytest.mark.parametrize("kp_case", ("finite", "infinite"))
+def test_one_wall_budget_is_split_across_both_arrivals(
+    monkeypatch, monomer, dimer, arrival, kp_case,
+):
+    """Direct surface calls share one T. The doubled cap is the old bug."""
+
+    from simulator.wall_deposition import wall_deposit_candidate_for_surface_kg
+    from tests.test_condensation_input_refusals import _configured_model
+
+    kp_pa = _BUDGET_KP_PA if kp_case == "finite" else math.inf
+    _install_budget_physics(monkeypatch, kp_pa)
+    transport = _budget_transport_kg_hr(monomer, kp_pa)
+    monomer_partial, dimer_partial, monomer_rate, dimer_rate = _budget_case(
+        arrival, transport,
+    )
+    expected_monomer, expected_dimer, captured = _expected_debits(
+        monomer_rate, dimer_rate, transport,
+    )
+    model = _configured_model()
+    partials = {}
+    if monomer_partial > 0.0:
+        partials[monomer] = monomer_partial
+    if dimer_partial > 0.0:
+        partials[dimer] = dimer_partial
+    model.wall_species_partial_pressures_pa = partials
+    model._wall_element_supply_kg_hr = {
+        monomer: monomer_rate,
+        dimer: dimer_rate,
+    }
+    debits = {}
+    for species, rate, collected in (
+        (monomer, monomer_rate, None),
+        (dimer, dimer_rate, monomer),
+    ):
+        if rate <= 0.0:
+            continue
+        debits[species] = wall_deposit_candidate_for_surface_kg(
+            model,
+            species=species,
+            rate_kg_hr=rate,
+            T_cond_C=250.0,
+            melt_temperature_C=1500.0,
+            wall_temperature_C=250.0,
+            surface_area_m2=1.0,
+            collection_species=collected,
+        )
+    assert debits.get(monomer, 0.0) == pytest.approx(expected_monomer, rel=1e-12, abs=1e-15)
+    assert debits.get(dimer, 0.0) == pytest.approx(expected_dimer, rel=1e-12, abs=1e-15)
+    assert sum(debits.values()) == pytest.approx(captured, rel=1e-12, abs=1e-15)
+    if monomer_rate > transport and dimer_rate > transport:
+        doubled = min(monomer_rate, transport) + min(dimer_rate, transport)
+        assert doubled == pytest.approx(2.0 * transport)
+        assert sum(debits.values()) == pytest.approx(transport)
+        assert sum(debits.values()) != pytest.approx(doubled)
+
+
+@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
+def test_mixed_partials_without_supplies_refuse_a_second_budget(
+    monkeypatch, monomer, dimer,
+):
+    """Both partials and no supply map is not a license to take T per arrival."""
+
+    from simulator.wall_deposition import wall_deposit_candidate_for_surface_kg
+    from tests.test_condensation_input_refusals import _configured_model
+
+    _install_budget_physics(monkeypatch, _BUDGET_KP_PA)
+    model = _configured_model()
+    model.wall_species_partial_pressures_pa = {monomer: 1.5, dimer: 2.25}
+    assert not isinstance(getattr(model, "_wall_element_supply_kg_hr", None), dict)
+    with pytest.raises(ValueError, match="element wall budget"):
+        wall_deposit_candidate_for_surface_kg(
+            model,
+            species=monomer,
+            rate_kg_hr=1.0,
+            T_cond_C=250.0,
+            melt_temperature_C=1500.0,
+            wall_temperature_C=250.0,
+            surface_area_m2=1.0,
+        )
+
+
+@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
+@pytest.mark.parametrize("arrival", _BUDGET_ARRIVALS)
+@pytest.mark.parametrize("kp_case", ("finite", "infinite"))
+def test_route_debits_one_wall_budget_through_the_segment_loop(
+    monkeypatch, monomer, dimer, arrival, kp_case,
+):
+    """route() publishes both supplies, then the segment loop debits once."""
+
+    kp_pa = _BUDGET_KP_PA if kp_case == "finite" else math.inf
+    _install_budget_physics(monkeypatch, kp_pa)
+    transport = _budget_transport_kg_hr(monomer, kp_pa)
+    monomer_partial, dimer_partial, monomer_rate, dimer_rate = _budget_case(
+        arrival, transport,
+    )
+    _expected_monomer, _expected_dimer, captured = _expected_debits(
+        monomer_rate, dimer_rate, transport,
+    )
+    species_kg = {}
+    partials_mbar = {}
+    if monomer_rate > 0.0:
+        species_kg[monomer] = monomer_rate
+        partials_mbar[monomer] = monomer_partial / 100.0
+    if dimer_rate > 0.0:
+        species_kg[dimer] = dimer_rate
+        partials_mbar[dimer] = dimer_partial / 100.0
+    model = _model(partials=partials_mbar)
+    temperatures = {
+        segment.name: 1500.0 for segment in model.pipe_segments
+    }
+    temperatures["stage_3_to_stage_4"] = 250.0
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar=partials_mbar,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+        pipe_segment_temperatures_C=temperatures,
+    )
+    # Collectors are off. The duct area was copied at configure time, so
+    # the cold segment stays the only capture surface.
+    model.stage_area_m2_by_stage = {
+        key: 0.0 for key in model.stage_area_m2_by_stage
+    }
+    route = model.route(
+        EvaporationFlux(
+            species_kg_hr=species_kg,
+            total_kg_hr=float(sum(species_kg.values())),
+        ),
+        MeltState(temperature_C=1500.0),
+    )
+    removed_monomer = monomer_rate - route.remaining_by_species.get(monomer, 0.0)
+    removed_dimer = dimer_rate - route.remaining_by_species.get(dimer, 0.0)
+    staged = sum(
+        sum(by_species.values())
+        for by_species in route.condensed_by_stage_species.values()
+    )
+    assert staged == pytest.approx(0.0, abs=0.0)
+    assert removed_monomer == pytest.approx(_expected_monomer, rel=1e-12, abs=1e-12)
+    assert removed_dimer == pytest.approx(_expected_dimer, rel=1e-12, abs=1e-12)
+    assert removed_monomer + removed_dimer == pytest.approx(
+        captured, rel=1e-12, abs=1e-12,
+    )
+    assert route.wall_deposit_by_species.get(monomer, 0.0) == pytest.approx(
+        captured, rel=1e-12, abs=1e-12,
+    )
+    assert dimer not in route.wall_deposit_by_species
+    assert _mass_closure_kg(route, species_kg) == pytest.approx(0.0, abs=1e-12)
+    if monomer_rate > transport and dimer_rate > transport:
+        assert captured == pytest.approx(transport)
+        assert removed_monomer + removed_dimer != pytest.approx(2.0 * transport)
+    assert model._wall_element_supply_kg_hr is None

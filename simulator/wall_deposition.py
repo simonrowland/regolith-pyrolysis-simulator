@@ -210,20 +210,29 @@ def _element_wall_capture_kg_hr(
     carrier_gas: str = "N2",
     diameter_proxy: MutableMapping[str, str] | None = None,
     formula_registry: Mapping[str, Any] | None = None,
+    partner_rate_kg_hr: float | None = None,
 ) -> float:
     """kg/hr of this gas species removed by the element wall.
 
     d-378 amendment 2, wall form. The series-resistance call is the
     saturation gate (p_M against P_sat,M). Each form diffuses through
-    its own series conductance. The captured rate is that inlet flux
-    times area, capped by this species' supply. There is no residence
-    integral and no separate case at K_p -> inf:
+    its own series conductance. There is no residence integral and no
+    separate case at K_p -> inf:
 
         G_M = A / (1/(alpha_M k_HK,M) + R_gas,M(Kn) + R_melt)
         G_M2 = A / (1/(alpha_M2 k_HK,M2) + R_gas,M2(Kn))
         J_M = (G_M / A) max(p_M - P_sat,M, 0)
         J_M2 = (G_M2 / A) max(p_M2 - P_sat,M^2 / K_p, 0)
-        captured = min((J_M + 2 J_M2) * A, element supply)
+        T = (J_M + 2 J_M2) * A
+        captured = min(T, m_M + m_M2)
+
+    Invariant. T is one element budget for this wall. A homonuclear
+    dimer has M_M2 = 2 M_M, so gas mass is element mass. The two
+    arrivals split that one budget in proportion to their inlet
+    supplies, eta = min(1, T / (m_M + m_M2)), debit_i = eta * m_i.
+    The debits sum to min(T, m_M + m_M2). Neither arrival receives T
+    on its own when the other supply is positive. A pure arrival has
+    the other supply at zero, so debit = min(T, m_i), the same cap.
 
     p_M comes from re-speciation of p_elem and p_M2 = p_M^2 / K_p.
     R_melt is 0. As K_p -> inf, p_M -> p_elem and J_M2 -> 0, so the
@@ -329,7 +338,40 @@ def _element_wall_capture_kg_hr(
         )
         if not math.isfinite(transport_kg_hr) or transport_kg_hr <= 0.0:
             return 0.0
-        return min(rate_kg_hr, transport_kg_hr)
+        # Flowing partner partial. p_elem = p_M + 2 p_M2, so the other
+        # form is fixed once this arrival's partial is known. A pure
+        # arrival has that partial at zero and keeps min(T, m_i).
+        if species == monomer:
+            partner_partial_pa = (p_elem_pa - p_species_pa) / 2.0
+        else:
+            partner_partial_pa = p_elem_pa - 2.0 * p_species_pa
+        if (
+            not math.isfinite(partner_partial_pa)
+            or partner_partial_pa <= 0.0
+        ):
+            partner_partial_pa = 0.0
+        partner_supply = (
+            None if partner_rate_kg_hr is None else float(partner_rate_kg_hr)
+        )
+        if partner_partial_pa > 0.0 and partner_supply is None:
+            raise ValueError(
+                "element wall budget requires both gas supplies when "
+                f"{monomer} and {dimer} partials are both positive"
+            )
+        if (
+            partner_supply is None
+            or not math.isfinite(partner_supply)
+            or partner_supply <= 0.0
+        ):
+            # Pure arrival, or the partner partial is carried by this
+            # inventory. min(T, m_i) is the one budget.
+            return min(rate_kg_hr, transport_kg_hr)
+        # Both supplies are positive. eta = min(1, T / (m_M + m_M2)).
+        # Homonuclear M_M2 = 2 M_M, so the kilogram supplies are the
+        # element supply. The two debits sum to min(T, m_M + m_M2).
+        element_supply_kg_hr = rate_kg_hr + partner_supply
+        eta = min(1.0, transport_kg_hr / element_supply_kg_hr)
+        return rate_kg_hr * eta
     if not math.isfinite(final) or p_elem_pa <= 0.0:
         return 0.0
     eta = (p_elem_pa - final) / p_elem_pa
@@ -722,6 +764,18 @@ def wall_deposit_candidate_for_surface_kg(
         if not isinstance(diameter_proxy, dict):
             diameter_proxy = {}
             model._dimer_collision_diameter_proxy = diameter_proxy
+        monomer_name = str(element_capture["monomer"])
+        dimer_name = str(element_capture["dimer"])
+        # The route publishes both inlet supplies before either arrival
+        # is debited. Absent map + both partials refuses inside the
+        # helper, so a second call cannot take T again.
+        partner_rate_kg_hr = None
+        supplies = getattr(model, "_wall_element_supply_kg_hr", None)
+        if isinstance(supplies, Mapping):
+            partner_name = (
+                dimer_name if species == monomer_name else monomer_name
+            )
+            partner_rate_kg_hr = float(supplies.get(partner_name, 0.0) or 0.0)
         captured_kg_hr = _element_wall_capture_kg_hr(
             species=species,
             rate_kg_hr=rate_kg_hr,
@@ -732,8 +786,8 @@ def wall_deposit_candidate_for_surface_kg(
             p_compare_pa=float(P_compare_pa),
             saturation_pa=float(wall_saturation_pressure_pa),
             kp_pa=kp_value,
-            monomer=str(element_capture["monomer"]),
-            dimer=str(element_capture["dimer"]),
+            monomer=monomer_name,
+            dimer=dimer_name,
             flux_mol_m2_s=float(flux),
             gas_temperature_K=float(gas_temperature_K),
             vapor_pressure_data=vapor_pressure_data,
@@ -746,6 +800,7 @@ def wall_deposit_candidate_for_surface_kg(
             carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
             diameter_proxy=diameter_proxy,
             formula_registry=getattr(model, "species_formula_registry", None),
+            partner_rate_kg_hr=partner_rate_kg_hr,
         )
     carrier_gas = str(getattr(model, "carrier_gas", "N2") or "N2")
     knudsen_number = None if "zero_reason" in rate_diagnostic else _knudsen_number(

@@ -48,11 +48,14 @@ Key physics:
     Na, K, and Mg do not use that monomer drive. d-378 amendment 2
     deposits the monomer and the dimer in parallel. Each form diffuses
     through its own series conductance, and the stage inventory
-    integrates J_M + 2 J_M2. K_p -> inf leaves the dimer channel off
-    and uses the linear solver above. The wall does not integrate.
-    It takes min((J_M + 2 J_M2) * A, element supply) at the inlet
-    partial, and that same expression at K_p -> inf is the monomer
-    series flux. Amendment 1 still decides supersaturation.
+    integrates J_M + 2 J_M2. K_p -> inf leaves the dimer channel off.
+    The linear solver then sees the arrival's own partial, the same
+    input as a species with no dimer, not p_elem. The wall does not
+    integrate.
+    It takes min((J_M + 2 J_M2) * A, element supply) once per wall.
+    The monomer and dimer supplies split that one budget. The same
+    expression at K_p -> inf is the monomer series flux. Amendment 1
+    still decides supersaturation.
     K_p is the JANAF primary table.
     Walls and stages remove vapor in physical order; every capture stays
     at its location and the remainder goes to terminal offgas.
@@ -3323,50 +3326,61 @@ class CondensationModel:
                     inlet_rates, {segment.name: flowing_rates},
                 )[segment.name]
                 self.wall_species_partial_pressures_pa_by_segment[segment.name] = partials
+                # One element budget for this wall. Both arrivals read
+                # these inlet supplies and split min((J_M + 2 J_M2)*A,
+                # m_M + m_M2). Debiting happens after the loop, so neither
+                # call sees the other's removal.
+                self._wall_element_supply_kg_hr = {
+                    name: float(flowing_rates.get(name, 0.0))
+                    for name in stage_route_by_species
+                }
                 wall_removed: dict[str, float] = {}
-                for species, route in stage_route_by_species.items():
-                    supply = flowing_rates.get(species, 0.0)
-                    if supply <= 1e-15:
-                        continue
-                    monomer = dimer_collection_monomer(species)
-                    # Reuse the existing wall owner and its refusal handling.
-                    # Only this segment receives supply, so its result cannot
-                    # be rescaled against another wall's candidate. A contracted
-                    # dimer uses the monomer's stage and saturation.
-                    try:
-                        candidates = self._wall_deposit_candidates_by_segment_kg(
-                            species=species, rate_kg_hr=supply,
-                            T_cond_C=route['T_cond_C'],
-                            melt_temperature_C=float(melt.temperature_C),
-                            supply_by_segment_kg={
-                                item.name: supply if item.name == segment.name else 0.0
-                                for item in self.pipe_segments
-                            },
-                            antoine_extrapolations=antoine_extrapolations,
-                            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-                            collection_species=monomer,
-                        )
-                    except DepositionInputRefusal as exc:
-                        # Same chokepoint as the stage handler. A missing
-                        # partial refuses this species only, including
-                        # Al2 and Ca2. A missing coefficient or wall
-                        # temperature still aborts the train.
-                        if deposition_input_refusal_aborts_train(exc):
-                            raise
-                        efficiency_outcomes_by_species.setdefault(species, []).append({
-                            'status': 'refused',
-                            'reason': str(exc),
-                            'output_status': 'refused',
-                            'species': species,
-                            'parameter': exc.parameter,
-                            'eta': None,
-                            'refusal_type': type(exc).__name__,
-                        })
-                        continue
-                    deposit = candidates.get(segment.name, 0.0)
-                    if deposit > 0.0:
-                        wall_hkl_by_species.setdefault(species, {})[segment.name] = deposit
-                        wall_removed[species] = deposit
+                try:
+                    for species, route in stage_route_by_species.items():
+                        supply = flowing_rates.get(species, 0.0)
+                        if supply <= 1e-15:
+                            continue
+                        monomer = dimer_collection_monomer(species)
+                        # Reuse the existing wall owner and its refusal handling.
+                        # Only this segment receives supply, so its result cannot
+                        # be rescaled against another wall's candidate. A contracted
+                        # dimer uses the monomer's stage and saturation.
+                        try:
+                            candidates = self._wall_deposit_candidates_by_segment_kg(
+                                species=species, rate_kg_hr=supply,
+                                T_cond_C=route['T_cond_C'],
+                                melt_temperature_C=float(melt.temperature_C),
+                                supply_by_segment_kg={
+                                    item.name: supply if item.name == segment.name else 0.0
+                                    for item in self.pipe_segments
+                                },
+                                antoine_extrapolations=antoine_extrapolations,
+                                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                                collection_species=monomer,
+                            )
+                        except DepositionInputRefusal as exc:
+                            # Same chokepoint as the stage handler. A missing
+                            # partial refuses this species only, including
+                            # Al2 and Ca2. A missing coefficient or wall
+                            # temperature still aborts the train.
+                            if deposition_input_refusal_aborts_train(exc):
+                                raise
+                            efficiency_outcomes_by_species.setdefault(species, []).append({
+                                'status': 'refused',
+                                'reason': str(exc),
+                                'output_status': 'refused',
+                                'species': species,
+                                'parameter': exc.parameter,
+                                'eta': None,
+                                'refusal_type': type(exc).__name__,
+                            })
+                            continue
+                        deposit = candidates.get(segment.name, 0.0)
+                        if deposit > 0.0:
+                            wall_hkl_by_species.setdefault(species, {})[segment.name] = deposit
+                            wall_removed[species] = deposit
+                finally:
+                    self._wall_element_supply_kg_hr = None
                 for species, deposit in wall_removed.items():
                     flowing_rates[species] = max(0.0, flowing_rates[species] - deposit)
 
@@ -4684,6 +4698,22 @@ class CondensationModel:
                         vapor_pressure_data=self.vapor_pressure_data,
                     )
                 )
+                if (
+                    sample_kp is not None
+                    and math.isinf(float(sample_kp))
+                    and float(sample_kp) > 0.0
+                ):
+                    # K_p -> +inf is the no-dimer limit, and this solver
+                    # is green's. Green feeds the arrival's own flowing
+                    # partial. p_elem = p_M + 2 p_M2 is the dimer channel:
+                    # with both forms present it moved lunar_24h Na stage
+                    # 4 by +1.08e-5 relative while the condenser inlet
+                    # still matched. A dimer arrival is not collected.
+                    # Green had no dimer contract; collecting it here
+                    # would credit that mass onto the monomer stage.
+                    if species == element_dimer:
+                        continue
+                    p_sample = p_in
             comparison_pressures.append(p_sample)
 
             diagnostic: dict[str, Any] = {}
@@ -4756,9 +4786,9 @@ class CondensationModel:
                             float(saturation_pressure),
                             float(sample_kp),
                         ))
-                    # K_p -> inf: the dimer channel is gone. This sample
-                    # stays on the series-resistance strips. The linear
-                    # solver below is the green path.
+                    # K_p -> inf: the dimer channel is gone. p_sample was
+                    # restored to this arrival's own partial above, so
+                    # these strips and the linear solver are green's.
                 if flux > 0.0:
                     conductance = flux / sample_driving_pressure
                     if conductance > 0.0:
