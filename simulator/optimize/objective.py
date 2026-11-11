@@ -1900,12 +1900,28 @@ def _tap_coating_product_summary(
         hour,
     )
     authority = _coating_authority_status(raw_by_segment, run_execution)
-    lifetime = _coating_lifetime_projection(
+    # Same chokepoint as the terminal coating summary. The integral stops
+    # at the tap hour: later vapour is not this projection's supply.
+    booked = _book_wall_deposits_at_vapour_supply(
         raw_by_segment,
-        campaigns_elapsed=campaigns_elapsed,
-        authority=authority,
+        authority,
+        run_execution,
+        snapshots=tuple(
+            snapshot
+            for snapshot in snapshots
+            if _snapshot_hour(snapshot) <= hour
+        ),
     )
-    if not raw_by_segment:
+    priced_deposit = booked["deposit"]
+    availability = booked["availability_authority"]
+    notice = booked["notice_authority"]
+    lifetime = _coating_lifetime_projection(
+        priced_deposit,
+        campaigns_elapsed=campaigns_elapsed,
+        authority=availability,
+    )
+    booking_fields = _wall_supply_booking_fields(booked)
+    if not priced_deposit:
         return MappingProxyType(
             {
                 "wall_deposit_kg_by_segment_species": MappingProxyType({}),
@@ -1913,11 +1929,12 @@ def _tap_coating_product_summary(
                 "wall_deposit_remobilization_by_segment_species": MappingProxyType({}),
                 **lifetime,
                 **_furnace_lifespan_cost_summary_from_raw(
-                    raw_by_segment,
+                    priced_deposit,
                     campaigns_elapsed=campaigns_elapsed,
-                    authority=authority,
+                    authority=availability,
                 ),
-                **_coating_authority_summary(authority),
+                **_coating_authority_summary(notice),
+                **booking_fields,
             }
         )
     zone_by_segment = _coating_zone_by_segment(run_execution)
@@ -1925,16 +1942,16 @@ def _tap_coating_product_summary(
         raise ObjectiveComputationError(
             "best_tap coating projection requires wall_zone_by_segment trace"
         )
-    by_segment = _wall_deposit_by_segment_species_summary(raw_by_segment)
+    by_segment = _wall_deposit_by_segment_species_summary(priced_deposit)
     try:
-        by_zone = wall_deposit_kg_by_zone_species(raw_by_segment, zone_by_segment)
+        by_zone = wall_deposit_kg_by_zone_species(priced_deposit, zone_by_segment)
     except (TypeError, ValueError) as exc:
         raise ObjectiveComputationError(str(exc)) from exc
     sim = getattr(run_execution, "simulator", run_execution)
     remobilization = wall_deposit_remobilization_by_segment_species(
         sim,
         snapshots=snapshots,
-        cumulative_deposits_kg=raw_by_segment,
+        cumulative_deposits_kg=priced_deposit,
         through_hour=hour,
     )
     return MappingProxyType(
@@ -1955,11 +1972,12 @@ def _tap_coating_product_summary(
             }),
             **lifetime,
             **_furnace_lifespan_cost_summary_from_raw(
-                raw_by_segment,
+                priced_deposit,
                 campaigns_elapsed=campaigns_elapsed,
-                authority=authority,
+                authority=availability,
             ),
-            **_coating_authority_summary(authority),
+            **_coating_authority_summary(notice),
+            **booking_fields,
         }
     )
 
@@ -3653,7 +3671,13 @@ def product_summary(
             else None
         )
         margin_status = str(getattr(coating_margin, "status", ""))
-        if margin_status == "unavailable" or verdict == "unavailable":
+        if (
+            (margin_status == "unavailable" or verdict == "unavailable")
+            and not _booked_margin_refusal_is_priced(
+                summary,
+                margin_payload if isinstance(margin_payload, Mapping) else {},
+            )
+        ):
             coating_unavailable_reason = (
                 str(getattr(coating_margin, "status_reason", "") or "")
                 or str(summary.get("coating_unavailable_reason", "") or "")
@@ -3946,13 +3970,7 @@ def _coating_product_summary(
         ),
         **_coating_authority_summary(booked["notice_authority"]),
     }
-    if booked["bookings"]:
-        summary["wall_supply_bound_bookings"] = booked["bookings"]
-        if any(
-            item.get("reason") == WALL_DEPOSIT_UPPER_BOUND_USED
-            for item in booked["bookings"]
-        ):
-            summary["wall_deposit_upper_bound_used"] = True
+    summary.update(_wall_supply_booking_fields(booked))
     return MappingProxyType(summary)
 
 
@@ -4355,37 +4373,73 @@ def _run_charge_mass_kg(run_execution: Any) -> float | None:
 def _refused_vapour_supply_kg(
     run_execution: Any,
     refused_species: tuple[str, ...],
+    snapshots: Sequence[Any] | None = None,
 ) -> dict[str, float]:
     """Integral of each refused species' computed vapour flux over the run.
 
     Missing species stay missing. A flux that was not computed is not zero.
+    ``snapshots`` is the integral window. The tap-hour projection passes
+    the hours up to the tap so later vapour cannot raise that bound.
     """
 
     if not refused_species:
         return {}
     from simulator.optimize.evaluate import _optimizer_refused_flux_bounds
 
+    if snapshots is None:
+        snapshots = getattr(run_execution, "snapshots", ())
     # campaigns_elapsed=1 keeps the snapshot sum. That sum is the run
     # integral; dividing by the campaign count would shrink the bound.
     return _optimizer_refused_flux_bounds(
-        getattr(run_execution, "snapshots", ()),
+        snapshots,
         refused_species,
         campaigns_elapsed=1.0,
     )
 
 
-def _species_wall_deposit_kg(
-    wall_deposit: Mapping[Any, Any],
+def _drop_species_wall_deposit(
+    wall_deposit: dict[Any, Any],
     species: str,
-) -> float:
-    total = 0.0
-    for key, kg in wall_deposit.items():
-        if not isinstance(key, tuple) or len(key) != 2 or str(key[1]) != species:
-            continue
-        if kg is None:
-            continue
-        total += _finite_float(kg, f"wall_deposit[{key!r}]")
-    return total
+) -> None:
+    for key in [
+        key
+        for key in wall_deposit
+        if isinstance(key, tuple) and len(key) == 2 and str(key[1]) == species
+    ]:
+        del wall_deposit[key]
+
+
+def _replace_species_deposit_with_supply(
+    wall_deposit: dict[Any, Any],
+    species: str,
+    segment: str,
+    supply: float,
+) -> None:
+    """Book ``supply`` once for ``species``.
+
+    Measured kilograms are the same vapour, not a second source. Leaving
+    them and also writing the supply counts that mass twice. Keeping only
+    the measured part prices a partial deposit under the supply-bound
+    flag. The refusal segment carries the whole supply, so one segment
+    sees the conservative worst case: all of the supply deposits.
+    """
+
+    _drop_species_wall_deposit(wall_deposit, species)
+    wall_deposit[(segment, species)] = supply
+
+
+def _wall_supply_booking_fields(booked: Mapping[str, Any]) -> dict[str, Any]:
+    bookings = booked.get("bookings") or ()
+    if not bookings:
+        return {}
+    fields: dict[str, Any] = {"wall_supply_bound_bookings": bookings}
+    if any(
+        isinstance(item, Mapping)
+        and item.get("reason") == WALL_DEPOSIT_UPPER_BOUND_USED
+        for item in bookings
+    ):
+        fields["wall_deposit_upper_bound_used"] = True
+    return fields
 
 
 def _refusal_segment_and_reason(
@@ -4479,14 +4533,24 @@ def _book_wall_deposits_at_vapour_supply(
     wall_deposit: Mapping[Any, Any],
     authority: Mapping[str, Any],
     run_execution: Any,
+    snapshots: Sequence[Any] | None = None,
 ) -> dict[str, Any]:
     """Book each refused species at its vapour-supply bound.
 
-    Supply below the mass-balance ledger resolution is an authorized
-    physical zero (``below_wall_supply_upper_bound``). A non-negligible
-    supply whose wall saturation pressure was refused deposits in full
-    (``wall_deposit_upper_bound_used``). Species with no computed flux
-    stay refused: a missing flux is not a zero and not a bound.
+    Invariant, for every refused species, at this chokepoint:
+
+    - No computed vapour flux: not booked. A missing flux is not a zero
+      and not a bound. The refusal keeps blocking the figure.
+    - Supply at or below the mass-balance ledger resolution: authorized
+      physical zero (``below_wall_supply_upper_bound``), carrying the
+      bound. Existing entries are left in place; they are not rewritten
+      to the supply.
+    - Supply above that resolution: the priced aggregate equals the
+      supply, once (``wall_deposit_upper_bound_used``). Partial
+      measurements of that species are removed first. The supply is not
+      added beside them, and the partial is not what the flag prices.
+
+    The refusal stays on the notice authority in every branch.
     """
 
     notice_authority = _plain_payload(authority)
@@ -4498,7 +4562,11 @@ def _book_wall_deposits_at_vapour_supply(
             "notice_authority": notice_authority,
             "bookings": (),
         }
-    supply_kg = _refused_vapour_supply_kg(run_execution, refused)
+    supply_kg = _refused_vapour_supply_kg(
+        run_execution,
+        refused,
+        snapshots,
+    )
     charge_kg = _run_charge_mass_kg(run_execution)
     if charge_kg is None or not supply_kg:
         return {
@@ -4525,7 +4593,6 @@ def _book_wall_deposits_at_vapour_supply(
             notice_authority,
             species,
         )
-        measured = _species_wall_deposit_kg(booked_deposit, species)
         if supply <= resolution_kg:
             bookings.append({
                 "species": species,
@@ -4537,15 +4604,20 @@ def _book_wall_deposits_at_vapour_supply(
             })
             booked_species.add(species)
             continue
-        if measured <= resolution_kg:
-            booked_deposit[(segment, species)] = supply
-            deposit_kg = supply
-        else:
-            deposit_kg = measured
+        # d-376 amendment 1 wall-deposit ruling: the scored mass is the
+        # supply bound. A partial deposit kept in another segment is the
+        # same vapour, so the aggregate is the supply and not
+        # measured + supply.
+        _replace_species_deposit_with_supply(
+            booked_deposit,
+            species,
+            segment,
+            supply,
+        )
         bookings.append({
             "species": species,
             "reason": WALL_DEPOSIT_UPPER_BOUND_USED,
-            "deposit_kg": deposit_kg,
+            "deposit_kg": supply,
             "supply_upper_bound_kg": supply,
             "ledger_resolution_kg": resolution_kg,
             "refusal_reason": refusal_reason,
@@ -4561,6 +4633,46 @@ def _book_wall_deposits_at_vapour_supply(
         "notice_authority": notice_authority,
         "bookings": tuple(bookings),
     }
+
+
+def _margin_wall_refused_species(payload: Mapping[str, Any]) -> tuple[str, ...]:
+    """Saturation-refused species named on a coating-margin payload."""
+
+    sources: list[Mapping[str, Any]] = [payload]
+    for key in ("sticking_alpha_authority", "wall_deposit_sticking_authority"):
+        nested = payload.get(key)
+        if isinstance(nested, Mapping):
+            sources.append(nested)
+    refusal = payload.get("wall_deposit_refusal")
+    if isinstance(refusal, Mapping):
+        authority = refusal.get("authority")
+        if isinstance(authority, Mapping):
+            sources.append(authority)
+    return _coating_wall_refused_species(*sources)
+
+
+def _booked_margin_refusal_is_priced(
+    summary: Mapping[str, Any],
+    payload: Mapping[str, Any],
+) -> bool:
+    """True when the margin's saturation refusals are already supply-booked.
+
+    The margin is the pre-booking gate. Copying its unavailable verdict
+    back onto the summary would unprice a figure the supply bound replaced.
+    A margin that names no saturation refusal, or a summary whose coating
+    quantity is still unavailable, keeps the gate verdict.
+    """
+
+    refused = _margin_wall_refused_species(payload)
+    if not refused or str(summary.get("coating_status", "")) == "unavailable":
+        return False
+    bookings = summary.get("wall_supply_bound_bookings") or ()
+    booked = {
+        str(item.get("species"))
+        for item in bookings
+        if isinstance(item, Mapping) and item.get("species")
+    }
+    return all(species in booked for species in refused)
 
 
 def _coating_lifetime_projection(
@@ -4621,11 +4733,22 @@ def _coating_lifetime_projection(
     if isinstance(payload, Mapping) and payload.get(
         "coating_constraint_mode"
     ) != "no_unqualified_deposition":
+        # The coating margin is built from the unbooked deposit. A null
+        # rate there is that pre-booking refusal. Once every saturation
+        # refusal the margin names has been booked, the availability
+        # authority no longer refuses and the booked projection is the
+        # quantity. A null rate with no named saturation refusal is still
+        # unavailable.
+        stale_booked_null = (
+            availability.status != "refused"
+            and bool(_margin_wall_refused_species(payload))
+        )
         if "campaigns_to_resinter_worst_segment" in payload:
             rate = payload.get("wall_deposit_kg_per_campaign")
             raw_lifetime = payload["campaigns_to_resinter_worst_segment"]
             if raw_lifetime is None or rate is None:
-                unavailable = True
+                if not stale_booked_null:
+                    unavailable = True
             else:
                 if isinstance(rate, bool) or not isinstance(rate, int | float):
                     raise ObjectiveComputationError(
@@ -4641,6 +4764,7 @@ def _coating_lifetime_projection(
         elif (
             "wall_deposit_kg_per_campaign" in payload
             and payload["wall_deposit_kg_per_campaign"] is None
+            and not stale_booked_null
         ):
             unavailable = True
 
@@ -4738,13 +4862,7 @@ def _furnace_lifespan_cost_summary(
             authority=booked["availability_authority"],
         )
     )
-    if booked["bookings"]:
-        summary["wall_supply_bound_bookings"] = booked["bookings"]
-        if any(
-            item.get("reason") == WALL_DEPOSIT_UPPER_BOUND_USED
-            for item in booked["bookings"]
-        ):
-            summary["wall_deposit_upper_bound_used"] = True
+    summary.update(_wall_supply_booking_fields(booked))
     return MappingProxyType(summary)
 
 

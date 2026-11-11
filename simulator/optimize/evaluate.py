@@ -1941,7 +1941,15 @@ def _optimizer_refused_flux_bounds(
     observed: set[str] = set()
     for snapshot in tuple(snapshots or ()):
         flux = getattr(snapshot, "evap_flux", None)
-        rates = getattr(flux, "species_kg_hr", None)
+        # The ledger-committed map omits a carrier that produced no
+        # evaporation transition. The wall supply is the published vapour
+        # rate condensation was shown (published_species_kg_hr). Fall back
+        # to species_kg_hr when that map was not retained. A species absent
+        # from both is unobserved, not zero.
+        published = getattr(flux, "published_species_kg_hr", None)
+        rates = published if isinstance(published, MappingABC) else getattr(
+            flux, "species_kg_hr", None
+        )
         if not isinstance(rates, MappingABC):
             continue
         raw_duration = getattr(snapshot, "duration_h", 1.0)

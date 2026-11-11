@@ -4902,6 +4902,20 @@ class EvaporationMixin:
             ),
         )
         committed_flux.update_totals()
+        # d-376 amendment 1 wall-deposit ruling: the supply bound is the
+        # vapour condensation was shown, not only the ledger debit.
+        # species_kg_hr stays the committed subset, so a carrier with no
+        # evaporation transition (refused or proven-zero authority, or mass
+        # retained in the source) does not change the melt debit. The wall
+        # still saw that rate. Keep it beside the debit, scaled by the same
+        # phase scalar the committed rate uses, so the two agree when both
+        # exist. Not a dataclass field: melt, ledger, and snapshot totals
+        # keep reading species_kg_hr.
+        phase_scale = 1.0 if phase_scalar is None else float(phase_scalar)
+        committed_flux.published_species_kg_hr = {
+            str(species): float(rate_kg_hr) * phase_scale
+            for species, rate_kg_hr in evap_flux.species_kg_hr.items()
+        }
         self._ledger_committed_evap_flux_this_tick = committed_flux
 
         residual_flux = EvaporationFlux(

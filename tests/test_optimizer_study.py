@@ -3728,8 +3728,9 @@ def test_parallel_composition_target_stub_study_completes(
         == 0
     )
 
+    profile = yaml.safe_load(profile_path.read_text())
     result = study.run(
-        yaml.safe_load(profile_path.read_text()),
+        profile,
         "lunar_mare_low_ti",
         "screen",
         "internal-analytical",
@@ -3742,34 +3743,51 @@ def test_parallel_composition_target_stub_study_completes(
     pareto_path = tmp_path / "study" / "pareto.json"
     assert pareto_path.exists()
     payload = json.loads(pareto_path.read_text())
-    assert result.status == "completed-no-feasible-winner"
-    assert result.winner is None
-    assert result.pareto == ()
-    assert payload["status"] == "completed-no-feasible-winner"
-    assert payload["winner_candidate_id"] is None
-    assert payload["pareto"] == []
+    # Physics ruling 2026-11-10 (b-906 at 62247cb0e, extends d-367): a refused
+    # wall P_sat is priced at the vapour supply (wall_deposit_upper_bound_used)
+    # or, below ledger resolution, as an authorized zero. t-1368 still owns
+    # the SiO wall-pressure rail, so the refusal stays on the notice. The
+    # candidate is ranked on that conservative deposit and is not dropped.
+    assert result.status == "completed"
+    assert result.winner is not None
+    assert result.pareto
+    assert payload["status"] == "completed"
+    assert payload["winner_candidate_id"]
+    assert payload["pareto"]
     assert result.records
+    assert result.leaderboard
     assert all(record.feasible for record in result.records)
-
-    # t-1368 owns the missing SiO wall-pressure rail; until it lands, these
-    # candidates must remain unpriced and cannot restore a study winner.
+    assert result.winner.candidate_id == result.leaderboard[0].candidate_id
+    assert result.winner.candidate_id in {
+        record.candidate_id for record in result.pareto
+    }
+    definitions = objective_definitions(profile)
     for candidate in result.records:
+        scores = study._record_objective_scores(candidate, definitions)
+        assert scores
+        assert all(score is not None for score in scores)
         summary = candidate.product_summary
-        assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
-        refusal = summary["wall_deposit_refusal"]
-        authority = refusal["authority"]
-        assert "wall_deposit_saturation_pressure_refused" in authority["codes"]
-        assert "SiO" in authority["wall_saturation_pressure_refused_species"]
-        sio_refusals = authority["wall_saturation_pressure_refusals_by_species"][
-            "SiO"
+        assert summary["furnace_amortization_status"] == "available"
+        assert "wall_deposit_refusal" not in summary
+        bookings = [
+            item
+            for item in (summary.get("wall_supply_bound_bookings") or ())
+            if item.get("species") == "SiO"
         ]
-        assert sio_refusals
-        assert all(
-            record["status"] == "refused"
-            for record in sio_refusals.values()
-        )
-
+        assert bookings, summary.get("wall_supply_bound_bookings")
+        booking = bookings[0]
+        assert booking["species"] == "SiO"
+        assert booking["refusal_reason"]
+        # This stub's SiO vapour integral is below the mass-balance ledger
+        # resolution, so the ruling books an authorized physical zero and
+        # carries the bound. The non-negligible branch, which replaces a
+        # partial deposit with the full supply, is the objective-file case.
+        assert booking["reason"] == "below_wall_supply_upper_bound"
+        assert booking["deposit_kg"] == 0.0
+        assert booking["supply_upper_bound_kg"] <= booking["ledger_resolution_kg"]
         wall_authority = summary["wall_deposit_sticking_authority"]
+        refused = wall_authority.get("wall_saturation_pressure_refused_species") or []
+        assert "SiO" in list(refused)
         fe_records = wall_authority["alpha_s_provenance_by_species"]["Fe"].values()
         # The shipped Stage-1 wall is 1150 C = 1423.15 K, just below the
         # Tachibana fit's 1443 K lower bound, so this path predicts and flags
@@ -6719,18 +6737,23 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     # and the candidate still wins. The constrained-max 1-hour C0 smoke
     # below is a different scenario: it does not remove this refusal.
     assert (out_dir / "winner.recipe.yaml").exists()
-    with sqlite3.connect(out_dir / "cache.sqlite") as conn:
-        stored_references = [
-            json.loads(raw)
-            for (raw,) in conn.execute("SELECT run_reference FROM results")
-        ]
+    # The analytical smoke reports backend status unavailable, so the result
+    # store rejects the sqlite row. The scored summary is the pareto artifact.
+    pareto_payload = json.loads((out_dir / "pareto.json").read_text())
+    winner_id = pareto_payload["winner_candidate_id"]
+    winner_rows = [
+        row
+        for row in pareto_payload["pareto"]
+        if row.get("candidate_id") == winner_id
+    ]
+    assert winner_rows, pareto_payload["pareto"]
     cro2_booked = []
-    for reference in stored_references:
-        summary = reference.get("product_summary") or {}
+    for row in winner_rows:
+        summary = row.get("product_summary") or {}
         for booking in summary.get("wall_supply_bound_bookings") or []:
             if booking.get("species") == "CrO2":
                 cro2_booked.append((summary, booking))
-    assert cro2_booked, stored_references
+    assert cro2_booked, winner_rows
     summary, cro2 = cro2_booked[0]
     assert summary["furnace_amortization_status"] == "available"
     assert cro2["reason"] == "below_wall_supply_upper_bound"
