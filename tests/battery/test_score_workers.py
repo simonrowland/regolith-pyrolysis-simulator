@@ -65,7 +65,8 @@ def _worker_test_predict(
 ):
     if observation.observation_id == crash_observation_id:
         os._exit(17)
-    from simulator.battery.enums import Authority, ExecutionState
+    from simulator.battery.enums import Authority, ExecutionState, Quantity
+    from simulator.battery.identity import quantity_token
     from simulator.battery.records import Execution
     from simulator.battery.score import EnginePrediction
     from simulator.engine_cache import _record_engine_cache_counters
@@ -81,7 +82,7 @@ def _worker_test_predict(
             call_evidence="test:worker_predict",
         ),
         value=Decimal("1"),
-        unit="Pa",
+        unit="1" if quantity_token(observation.identity) is Quantity.ACTIVITY else "Pa",
         authority=Authority.CERTIFIED,
         coefficient_sources=("test",),
         lineage_complete=True,
@@ -225,6 +226,70 @@ def test_parallel_score_crash_preserves_completed_rows_and_publishes_failure(
     assert f"{failed_chunk_index}" in report
     assert "BrokenProcessPool" in report
     assert str(len(failed_ids)) in report
+
+
+def test_failed_shard_recovery_does_not_add_intrinsic_sibling_to_completed_activity(
+    tmp_path: Path,
+) -> None:
+    work = F.work()
+    experiment_id = "completed-activity-crash-exp"
+    experiment = F.tabulation_experiment(
+        experiment_id=experiment_id,
+        work_id=work.work_id,
+    )
+    activity = F.observation(
+        "a-completed-activity",
+        experiment_id,
+        F.activity_identity(formula="FeO"),
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        admission=AdmissionStatus.ADMITTED,
+        source_id=work.work_id,
+    )
+    crash = F.observation(
+        "z-crash-after-activity",
+        experiment_id,
+        F.psat_identity("Na", T_K=Decimal("1100")),
+        Decimal("1000"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        admission=AdmissionStatus.ADMITTED,
+        source_id=work.work_id,
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment_id: experiment},
+        observations={activity.observation_id: activity, crash.observation_id: crash},
+        origins={
+            activity.observation_id: "gibbs_battery_residual_ledger.yaml",
+            crash.observation_id: "gibbs_battery_residual_ledger.yaml",
+        },
+        extract_review={},
+    )
+
+    written, _metadata = _score_store_to_jsonl(
+        context,
+        tmp_path / "completed-activity.jsonl",
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=partial(
+            _worker_test_predict,
+            crash_observation_id=crash.observation_id,
+        ),
+        workers=2,
+    )
+
+    rows = [
+        json.loads(line)
+        for line in (tmp_path / "completed-activity.jsonl.partial")
+        .read_text(encoding="utf-8")
+        .splitlines()[1:]
+    ]
+    activity_rows = [
+        row for row in rows if row["reference"] == activity.observation_id
+    ]
+    assert written == len(rows)
+    assert len(activity_rows) == 1
+    assert activity_rows[0]["fo2_mode"] == "shared_ladder"
+    assert activity_rows[0]["execution"]["state"] == "produced"
 
 
 def test_group_partition_keeps_series_and_sossi_cohort_together() -> None:
