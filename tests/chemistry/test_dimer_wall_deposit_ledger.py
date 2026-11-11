@@ -102,7 +102,9 @@ def test_cold_upstream_na2_wall_books_monomer_not_collector(
     assert train_kg.get("Na2", 0.0) == 0.0
     assert overhead.get("Na2", 0.0) == pytest.approx(0.0, abs=0.0)
     wall_na = wall_kg["Na"]
-    train_na = train_kg["Na"]
+    # kg_by_account omits a zero balance. This cold wall takes the
+    # whole parcel, so the collector account has no Na key.
+    train_na = train_kg.get("Na", 0.0)
     assert wall_na == pytest.approx(projected_wall_na, rel=0.0, abs=1e-12)
     assert train_na == pytest.approx(credited_baffle_kg, rel=0.0, abs=1e-12)
     assert train_na == pytest.approx(removed_kg - wall_na, rel=0.0, abs=1e-12)

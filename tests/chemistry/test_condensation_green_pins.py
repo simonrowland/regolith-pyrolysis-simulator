@@ -1,17 +1,25 @@
 """Measured condensation-route pins for physical output shifts."""
 
+import copy
 import json
 import hashlib
+import math
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 from simulator.condensation import CondensationModel
-from simulator.condensation_routing import stage_key_for_stage
+from simulator.condensation_routing import METAL_DIMER_SPECIES, stage_key_for_stage
 from simulator.recipe_io import load_recipe_patch
+from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun
+from simulator.state import EvaporationFlux, MeltState
 from tests.chemistry.conftest import full_builtin_provider_run
+from tests.test_lab_geometry_runtime import (
+    dynamic_lab_schedule,
+    dynamic_surface_geometry_fixture,
+)
 
 
 SPECIES = ("Fe", "Na", "K", "Mg", "SiO", "Cr")
@@ -214,8 +222,10 @@ def test_kp_inf_reproduces_green_alkali_on_full_lunar(
 
     del route_totals, monkeypatch, tmp_path
     pytest.skip(
-        "mixed-arrival full_lunar versus the green pin is an owner-card "
-        "move; monomer-only continuity is test_infinite_kp_matches_the_shared_series_solver"
+        "2026-11-11 physics ruling: green reproduction applies only to "
+        "monomer-only arrivals, and full_lunar is a mixed feed. "
+        "The running comparison is "
+        "test_monomer_only_scenario_reproduces_green."
     )
 
 
@@ -233,6 +243,271 @@ def test_kp_inf_reproduces_green_alkali_on_runner_pins(
 
     del staged, route_totals, monkeypatch, tmp_path
     pytest.skip(
-        "mixed-arrival runner pins versus green are an owner-card move; "
-        "monomer-only continuity is test_infinite_kp_matches_the_shared_series_solver"
+        "2026-11-11 physics ruling: green reproduction applies only to "
+        "monomer-only arrivals, and these runner pins are mixed feeds. "
+        "The running comparison is "
+        "test_monomer_only_scenario_reproduces_green."
     )
+
+
+# Invariant. CondensationModel.route is the runner's condensation entry.
+# On every call, a monomer-only arrival (no metal dimer in the flux and
+# no dimer partial) matches green: K_p = inf and the no-pair series path
+# agree on each stage, the wall, and the remainder, to 1e-12 relative.
+# Mixed-arrival pins are outside that domain and stay skipped.
+_CONTRACTED_ELEMENT_SPECIES = frozenset({
+    "Na", "Na2", "K", "K2", "Mg", "Mg2",
+})
+_GREEN_RELATIVE = 1.0e-12
+_GREEN_ABSOLUTE = 1.0e-18
+
+
+def _clone_route_model(model):
+    """Copy one configured train without deepcopying the frozen catalog.
+
+    The vapor payload, materials table, and formula registry are frozen
+    and shared. deepcopy of those hits a mappingproxy. Everything route
+    mutates (histories, partials, pipe list) is copied.
+    """
+
+    saved = {}
+    for name in (
+        "vapor_pressure_data",
+        "materials",
+        "species_formula_registry",
+    ):
+        saved[name] = getattr(model, name)
+        setattr(model, name, None)
+    try:
+        clone = copy.deepcopy(model)
+    finally:
+        for name, value in saved.items():
+            setattr(model, name, value)
+    for name, value in saved.items():
+        setattr(clone, name, value)
+    return clone
+
+
+def _monomer_only_flux(flux):
+    """Drop every metal dimer. The monomer rates stay as the scenario set them."""
+
+    species = {
+        name: rate
+        for name, rate in flux.species_kg_hr.items()
+        if name not in METAL_DIMER_SPECIES
+    }
+    cloned = EvaporationFlux(
+        species_kg_hr=dict(species),
+        alpha_authority_status_by_species={
+            name: status
+            for name, status in flux.alpha_authority_status_by_species.items()
+            if name not in METAL_DIMER_SPECIES
+        },
+        carrier_authority_by_species={
+            name: copy.deepcopy(record)
+            for name, record in flux.carrier_authority_by_species.items()
+            if name not in METAL_DIMER_SPECIES
+        },
+    )
+    cloned.update_totals()
+    return cloned
+
+
+def _drop_dimer_partials(model):
+    model.species_partial_pressures_mbar = {
+        name: value
+        for name, value in model.species_partial_pressures_mbar.items()
+        if name not in METAL_DIMER_SPECIES
+    }
+
+
+def _record_c2a_hour_routes():
+    """One C2A runner hour, every CondensationModel.route call.
+
+    The melt is held at 1700 C by the lab schedule so Na, K, and Mg
+    arrive in that hour. The liquid-fraction provider is analytical:
+    this is the runner's condensation path, and it does not need a
+    MAGEMin binary. The recorded models are clones taken before route
+    mutates the live hour.
+    """
+
+    recorded = []
+    original = CondensationModel.route
+
+    def record(self, flux, melt):
+        recorded.append((
+            _clone_route_model(self),
+            copy.deepcopy(flux),
+            float(melt.temperature_C),
+            melt.campaign,
+        ))
+        return original(self, flux, melt)
+
+    CondensationModel.route = record
+    try:
+        run = PyrolysisRun(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C2A",
+            hours=1,
+            mass_kg=1000.0,
+            backend_name="internal-analytical",
+            chemistry_kernel={"liquid_fraction_provider": "analytical"},
+            setpoints_patch={
+                "lab_geometry": dynamic_surface_geometry_fixture(),
+            },
+            lab_schedule=dynamic_lab_schedule(),
+            force_builtin_vapor_pressure=True,
+            allow_fallback_vapor=True,
+            allow_unmeasured_alpha_fallback=True,
+            run_metadata_overrides={
+                "started_at_utc": "2026-05-15T00:00:00Z",
+                "kernel_commit_sha": "b325-monomer-only",
+            },
+        )
+        execution = RunExecutor().execute(run._session_config())
+    finally:
+        CondensationModel.route = original
+    return execution, recorded
+
+
+def _channel_pairs(left, right, species):
+    """Stage keys, wall, and remainder for one species. Absent is zero."""
+
+    left_stages = {}
+    right_stages = {}
+    keys = set()
+    for key, amounts in left.condensed_by_stage_species.items():
+        if species in amounts:
+            keys.add(key)
+            left_stages[key] = amounts[species]
+    for key, amounts in right.condensed_by_stage_species.items():
+        if species in amounts:
+            keys.add(key)
+            right_stages[key] = amounts[species]
+    for key in sorted(keys):
+        yield (
+            f"stage:{key}",
+            left_stages.get(key, 0.0),
+            right_stages.get(key, 0.0),
+        )
+    yield (
+        "wall",
+        left.wall_deposit_by_species.get(species, 0.0),
+        right.wall_deposit_by_species.get(species, 0.0),
+    )
+    yield (
+        "remaining",
+        left.remaining_by_species.get(species, 0.0),
+        right.remaining_by_species.get(species, 0.0),
+    )
+
+
+def _compare_monomer_only_to_green(recorded):
+    """K_p = inf versus the no-pair series path, per call and species.
+
+    Returns mismatches, whether a contracted dimer arrived on the live
+    flux, and the summed Na/K/Mg stage capture on the inf path. One K
+    wall kilogram can differ by a single ulp: the inf root and the
+    monomer series evaluation round the same conductance differently.
+    That is inside 1e-12 relative. The oracle does not call a production
+    helper for the expected value; it is the other live path.
+    """
+
+    import simulator.condensation as condensation
+    import simulator.condensation_routing as routing
+
+    mismatches = []
+    saw_contracted_dimer = False
+    alkali_stage_kg = {"Na": 0.0, "K": 0.0, "Mg": 0.0}
+    saved_kp = condensation.dimer_dissociation_kp_pa
+    saved_pair_condensation = condensation.element_collection_pair
+    saved_pair_routing = routing.element_collection_pair
+
+    def kp_inf(*_args, **_kwargs):
+        return math.inf
+
+    def no_pair(name):
+        if name in _CONTRACTED_ELEMENT_SPECIES:
+            return None
+        return saved_pair_routing(name)
+
+    try:
+        for index, (model, flux, temperature_C, campaign) in enumerate(recorded):
+            for name, rate in flux.species_kg_hr.items():
+                if name in _CONTRACTED_ELEMENT_SPECIES and name.endswith("2"):
+                    if float(rate) > 0.0:
+                        saw_contracted_dimer = True
+            mono = _monomer_only_flux(flux)
+            assert not any(
+                name in METAL_DIMER_SPECIES for name in mono.species_kg_hr
+            )
+            inf_model = _clone_route_model(model)
+            green_model = _clone_route_model(model)
+            _drop_dimer_partials(inf_model)
+            _drop_dimer_partials(green_model)
+            for partials in (
+                inf_model.species_partial_pressures_mbar,
+                green_model.species_partial_pressures_mbar,
+            ):
+                assert not any(
+                    name in METAL_DIMER_SPECIES and float(value) > 0.0
+                    for name, value in partials.items()
+                )
+            replay_melt = MeltState(temperature_C=temperature_C)
+            replay_melt.campaign = campaign
+            condensation.dimer_dissociation_kp_pa = kp_inf
+            inf_route = inf_model.route(mono, replay_melt)
+            condensation.dimer_dissociation_kp_pa = saved_kp
+            condensation.element_collection_pair = no_pair
+            routing.element_collection_pair = no_pair
+            green_route = green_model.route(copy.deepcopy(mono), replay_melt)
+            condensation.element_collection_pair = saved_pair_condensation
+            routing.element_collection_pair = saved_pair_routing
+            for species in sorted(mono.species_kg_hr):
+                for channel, actual, expected in _channel_pairs(
+                    inf_route, green_route, species,
+                ):
+                    if channel.startswith("stage:") and species in alkali_stage_kg:
+                        alkali_stage_kg[species] += actual
+                    if actual != pytest.approx(
+                        expected, rel=_GREEN_RELATIVE, abs=_GREEN_ABSOLUTE,
+                    ):
+                        mismatches.append({
+                            "call": index,
+                            "species": species,
+                            "channel": channel,
+                            "kp_inf": actual,
+                            "green": expected,
+                        })
+    finally:
+        condensation.dimer_dissociation_kp_pa = saved_kp
+        condensation.element_collection_pair = saved_pair_condensation
+        routing.element_collection_pair = saved_pair_routing
+    return mismatches, saw_contracted_dimer, alkali_stage_kg
+
+
+def test_monomer_only_scenario_reproduces_green():
+    """Real C2A hour, monomer-only arrivals, against the green series path.
+
+    2026-11-11 ruling: green reproduction is monomer-only. The stored
+    lunar_24h, c2a_staged, and full_lunar pins carry mixed arrivals, so
+    those comparisons stay skipped. This hour goes through PyrolysisRun
+    and RunExecutor. Every CondensationModel.route call is projected to
+    a monomer-only arrival and compared, species by species, on stage,
+    wall, and remainder. The live hour does arrive Na2 and K2; those
+    are removed before the comparison, which is the monomer-only domain.
+    """
+
+    execution, recorded = _record_c2a_hour_routes()
+    assert execution.status == "ok", getattr(execution, "error_message", None)
+    assert recorded, "the runner hour did not call CondensationModel.route"
+    mismatches, saw_contracted_dimer, alkali_stage_kg = (
+        _compare_monomer_only_to_green(recorded)
+    )
+    assert saw_contracted_dimer, (
+        "the runner hour arrived no Na2/K2/Mg2, so the strip was vacuous"
+    )
+    assert alkali_stage_kg["Na"] > 0.0
+    assert alkali_stage_kg["K"] > 0.0
+    assert alkali_stage_kg["Mg"] > 0.0
+    assert not mismatches, mismatches
