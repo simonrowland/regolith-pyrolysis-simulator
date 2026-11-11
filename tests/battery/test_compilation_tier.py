@@ -3452,7 +3452,10 @@ def test_vaporock_gas_census_preserves_same_input_relation(monkeypatch) -> None:
     )
     assert row["reachable"] == 1
     assert row["numeric"] == 1
-    assert row["same_source"] == 1
+    assert any(
+        stratum["relation"] == SourceRelation.SAME_INPUT.value
+        for stratum in row["decision_strata"]
+    )
     assert row["refused"] == {}
     census_residuals = [
         residual
@@ -3503,29 +3506,27 @@ def test_vaporock_gas_census_score_bytes_match_compile_with_memo_modes(
             identity=observation.identity,
         )
 
-    for memo_enabled in (True, False):
-        if memo_enabled:
-            with monkeypatch.context() as memo_patch:
-                memo_patch.setattr(
-                    score_module,
-                    "_score_predict_with_engine",
-                    census_fixture_predict,
-                )
-                _assert_vaporock_census_fixture_parity(
-                    score_module,
-                    context,
-                    reference,
-                    census_fixture_predict,
-                    memo_enabled=True,
-                )
-        else:
-            _assert_vaporock_census_fixture_parity(
-                score_module,
-                context,
-                reference,
-                census_fixture_predict,
-                memo_enabled=False,
-            )
+    with monkeypatch.context() as memo_patch:
+        memo_patch.setattr(
+            score_module,
+            "_score_predict_with_engine",
+            census_fixture_predict,
+        )
+        memo_enabled_bytes = _assert_vaporock_census_fixture_parity(
+            score_module,
+            context,
+            reference,
+            census_fixture_predict,
+            memo_enabled=True,
+        )
+    memo_disabled_bytes = _assert_vaporock_census_fixture_parity(
+        score_module,
+        context,
+        reference,
+        census_fixture_predict,
+        memo_enabled=False,
+    )
+    assert memo_enabled_bytes == memo_disabled_bytes
 
 
 def _assert_vaporock_census_fixture_parity(
@@ -3535,17 +3536,22 @@ def _assert_vaporock_census_fixture_parity(
     fixture_predict,
     *,
     memo_enabled: bool,
-) -> None:
+) -> dict[Engine, bytes]:
+    residual_bytes_by_engine = {}
     for engine in score_module.SCORE_ENGINE_SET:
         predict = None if memo_enabled else fixture_predict
         scored, candidates = score_module.score_store(
             context,
             engines=(engine,),
-            include_diagnostics=False,
+            include_diagnostics=True,
             predict=predict,
         )
-        assert len(scored) == 1
-        scored_residual = scored[0]
+        assert scored, f"{engine.value} memo={memo_enabled} scored no rows"
+        scored_for_reference = [
+            row for row in scored if row.reference == reference.observation_id
+        ]
+        assert scored_for_reference, f"{engine.value} missed the gas reference"
+        scored_residual = scored_for_reference[0]
         scored_candidate = candidates.get(scored_residual.candidate or "")
         compiled_residual, compiled_candidate = score_module.compile_residual(
             reference,
@@ -3554,14 +3560,18 @@ def _assert_vaporock_census_fixture_parity(
             comparison_ids={reference.observation_id},
             predict=predict,
         )
-        assert score_module.dumps_residual_line(
+        scored_bytes = score_module.dumps_residual_line(
             scored_residual, scored_candidate
-        ).encode("utf-8") == score_module.dumps_residual_line(
+        ).encode("utf-8")
+        compiled_bytes = score_module.dumps_residual_line(
             compiled_residual, compiled_candidate
-        ).encode("utf-8"), f"{engine.value} memo={memo_enabled}"
+        ).encode("utf-8")
+        assert scored_bytes == compiled_bytes, f"{engine.value} memo={memo_enabled}"
         if engine is Engine.VAPOROCK:
             assert scored_residual.source_relation is SourceRelation.SAME_INPUT
             assert compiled_residual.source_relation is SourceRelation.SAME_INPUT
+        residual_bytes_by_engine[engine] = scored_bytes
+    return residual_bytes_by_engine
 
 
 def test_vaporock_gas_refuses_missing_and_charged_species() -> None:
