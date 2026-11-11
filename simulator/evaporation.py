@@ -120,6 +120,174 @@ def evaporation_flux_refusal_from_configuration_error(
     )
 
 
+# Melt debit, ledger totals, and ``species_kg_hr`` omit a vapour rate at or
+# below this floor. The publisher's ``_NONTRIVIAL_FLUX_KG_HR`` is the same
+# number. Wall-supply accounting does not use it: the integral keeps the
+# computed rate, and booking applies ledger resolution.
+_VAPOUR_DEBIT_FLOOR_KG_HR = 1e-12
+
+
+class ProjectedVapourRates(NamedTuple):
+    """Debit map, supply map, and the Fe residual-cap record.
+
+    ``debit_kg_hr`` is the publication-gated melt debit. ``supply_kg_hr``
+    is every finite non-negative gated rate, including rates the debit
+    floor dropped and rates the publisher stored only under
+    ``below_threshold_evaporation_flux``.
+    """
+
+    debit_kg_hr: dict[str, float]
+    supply_kg_hr: dict[str, float]
+    fe_allocation: dict[str, Any] | None
+
+
+def project_publisher_vapour_rates(
+    diagnostic: Mapping[str, Any] | None,
+    *,
+    liquid_fraction_factor: float = 1.0,
+    fe_residual_kg_hr: float | None = None,
+) -> ProjectedVapourRates:
+    """Split one publisher diagnostic into the melt debit and the supply.
+
+    Invariant: a finite non-negative rate the publisher computed is in
+    ``supply_kg_hr`` after the liquid-fraction factor and, for Fe, the
+    residual cap. The debit floor does not remove it. A species present
+    in ``evaporation_flux_kg_hr`` is not also taken from
+    ``below_threshold_evaporation_flux``, so the two buckets cannot
+    double-count. Only the published bucket can enter the debit, and
+    only above the floor, which is the pre-existing melt-debit rule.
+    """
+
+    payload = diagnostic if isinstance(diagnostic, Mapping) else {}
+    published = payload.get("evaporation_flux_kg_hr") or {}
+    if not isinstance(published, Mapping):
+        published = {}
+    below_payload = payload.get("below_threshold_evaporation_flux")
+    below: Mapping[str, Any] = {}
+    if isinstance(below_payload, Mapping):
+        raw_below = below_payload.get("fluxes_kg_hr")
+        if isinstance(raw_below, Mapping):
+            below = raw_below
+    factor = float(liquid_fraction_factor)
+    published_names = {str(species) for species in published}
+    debit: dict[str, float] = {}
+    supply: dict[str, float] = {}
+    fe_allocation: dict[str, Any] | None = None
+
+    def _store(species: str, gated: float, *, debit_eligible: bool) -> None:
+        if math.isfinite(gated) and gated >= 0.0:
+            supply[species] = gated
+        if debit_eligible and gated > _VAPOUR_DEBIT_FLOOR_KG_HR:
+            debit[species] = gated
+
+    def _cap_fe(species: str, gated: float, *, record: bool) -> float:
+        nonlocal fe_allocation
+        if species != "Fe" or fe_residual_kg_hr is None:
+            return gated
+        original = gated
+        capped = min(gated, float(fe_residual_kg_hr))
+        if record:
+            # Same record the debit loop wrote before this split. It is
+            # the capped rate, including a rate the debit floor then drops.
+            fe_allocation = {
+                "rule": "pool_first_residual",
+                "native_pool_activity_argument": (
+                    "not modeled; allocation is an explicit pool-first "
+                    "scheduling policy"
+                ),
+                "melt_fe_raw_kg_hr": float(original),
+                "melt_fe_residual_capacity_kg_hr": float(fe_residual_kg_hr),
+                "melt_fe_applied_kg_hr": float(capped),
+            }
+        return capped
+
+    for species, raw in published.items():
+        name = str(species)
+        gated = _cap_fe(name, float(raw) * factor, record=True)
+        _store(name, gated, debit_eligible=True)
+    for species, raw in below.items():
+        name = str(species)
+        if name in published_names:
+            continue
+        gated = _cap_fe(name, float(raw) * factor, record=False)
+        _store(name, gated, debit_eligible=False)
+    return ProjectedVapourRates(debit, supply, fe_allocation)
+
+
+def wall_supply_rates_kg_hr(
+    *layers: Mapping[str, Any] | None,
+) -> dict[str, float]:
+    """Union of computed vapour rates. A later layer overwrites a species.
+
+    This is the wall-supply integrand. Every finite rate >= 0 that a
+    layer computed is retained. The melt-debit floor is not applied.
+    A missing layer adds nothing and is not a zero. Non-finite and
+    negative rates are not a computed supply. Ledger resolution is
+    applied at booking, not here.
+    """
+
+    merged: dict[str, float] = {}
+    for layer in layers:
+        if not isinstance(layer, Mapping):
+            continue
+        for species, raw in layer.items():
+            if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+                continue
+            rate = float(raw)
+            if not math.isfinite(rate) or rate < 0.0:
+                continue
+            merged[str(species)] = rate
+    return merged
+
+
+def publish_wall_supply_on_flux(
+    flux: Any,
+    computed: Mapping[str, Any] | None,
+    *,
+    debit_kg_hr: Mapping[str, Any] | None = None,
+    phase_scale: float | None = 1.0,
+) -> dict[str, float]:
+    """Write the wall-supply integrand onto ``flux.published_species_kg_hr``.
+
+    This is the only writer of that map. ``species_kg_hr`` stays the
+    melt debit: a carrier at or below the debit floor, or one whose
+    evaporation transition was not committed, may be absent there. The
+    supply map still carries every computed rate.
+
+    An existing published map is already the phase-scaled debit plus any
+    computed rates merged earlier, so a second call does not scale it
+    again. Otherwise the debit layer is ``debit_kg_hr``, or
+    ``flux.species_kg_hr`` when that argument is omitted, multiplied by
+    ``phase_scale`` (None means 1). Computed rates the debit layer
+    omitted are added from ``computed``. Where both name a species, the
+    debit layer wins, so a post-depletion rate is not replaced by the
+    pre-depletion publisher rate.
+    """
+
+    existing = getattr(flux, "published_species_kg_hr", None)
+    if isinstance(existing, Mapping):
+        debit_layer: Mapping[str, Any] = existing
+    else:
+        source = (
+            debit_kg_hr
+            if debit_kg_hr is not None
+            else getattr(flux, "species_kg_hr", None)
+        )
+        scale = 1.0 if phase_scale is None else float(phase_scale)
+        scaled: dict[str, float] = {}
+        if isinstance(source, Mapping):
+            for species, raw in source.items():
+                if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+                    continue
+                rate = float(raw) * scale
+                if math.isfinite(rate) and rate >= 0.0:
+                    scaled[str(species)] = rate
+        debit_layer = scaled
+    published = wall_supply_rates_kg_hr(computed, debit_layer)
+    flux.published_species_kg_hr = published
+    return published
+
+
 def viscous_p_bulk_out_of_domain_diagnostic(
     *,
     knudsen_number: float,
@@ -1426,6 +1594,9 @@ class EvaporationMixin:
         """
         T_K = self.melt.temperature_C + 273.15
         flux = EvaporationFlux()
+        # A previous hour's computed rates must not leak into a tick that
+        # returns before the publisher projection.
+        self._wall_supply_computed_kg_hr = {}
         self._last_partial_melt_offgassing_diagnostic = {}
         if hasattr(self, "_last_langmuir_surface_oxygen"):
             del self._last_langmuir_surface_oxygen
@@ -1982,50 +2153,63 @@ class EvaporationMixin:
                 melt_regime(liquid_fraction=liquid_fraction_factor)
                 == MeltRegime.FROZEN
             ):
+                # Frozen melt: this early return is the pre-existing gate.
+                # It runs only when the published bucket is non-empty, so a
+                # below-only hour is still projected below. Expanding the
+                # gate to that hour would ask for a liquid-fraction curve
+                # the published bucket never needed. Default setpoint: off.
                 flux.update_totals()
                 return flux
-        for species, rate_kg_hr in flux_kg_hr.items():
-            gated_rate_kg_hr = float(rate_kg_hr) * liquid_fraction_factor
-            if species == 'Fe':
-                residual_capacity_mol = getattr(
-                    self,
-                    '_native_fe_vapor_residual_capacity_mol_this_hr',
-                    None,
+        below_fluxes: Mapping[str, Any] = {}
+        below_payload = diagnostic.get('below_threshold_evaporation_flux')
+        if isinstance(below_payload, Mapping):
+            raw_below = below_payload.get('fluxes_kg_hr')
+            if isinstance(raw_below, Mapping):
+                below_fluxes = raw_below
+        # Fe in either publisher bucket shares the residual cap. The
+        # allocation record stays on the published bucket only, which is
+        # what project_publisher_vapour_rates records.
+        fe_in_publisher = (
+            (isinstance(flux_kg_hr, Mapping) and 'Fe' in flux_kg_hr)
+            or 'Fe' in below_fluxes
+        )
+        fe_residual_kg_hr = None
+        if fe_in_publisher:
+            residual_capacity_mol = getattr(
+                self,
+                '_native_fe_vapor_residual_capacity_mol_this_hr',
+                None,
+            )
+            if residual_capacity_mol is not None:
+                fe_molar_mass = float(molar_masses_kg_mol.get('Fe', 0.0) or 0.0)
+                # Explicit scheduling policy, not an activity calculation:
+                # native-pool Fe claims the shared transport capacity first,
+                # then melt-derived Fe is capped at the residual molar
+                # capacity times M_Fe [kg/mol], yielding kg/h. No pool or
+                # melt activity is an operand here. Limiting cases: zero
+                # residual gives zero melt-derived Fe; residual >= raw
+                # rate/M_Fe leaves the raw melt-derived rate unchanged.
+                fe_residual_kg_hr = (
+                    max(0.0, float(residual_capacity_mol)) * fe_molar_mass
                 )
-                if residual_capacity_mol is not None:
-                    fe_molar_mass = float(molar_masses_kg_mol.get('Fe', 0.0) or 0.0)
-                    residual_capacity_kg_hr = max(
-                        0.0,
-                        float(residual_capacity_mol),
-                    ) * fe_molar_mass
-                    # Explicit scheduling policy, not an activity calculation:
-                    # native-pool Fe claims the shared transport capacity first,
-                    # then melt-derived Fe is capped at the residual molar
-                    # capacity times M_Fe [kg/mol], yielding kg/h. No pool or
-                    # melt activity is an operand here. Limiting cases: zero
-                    # residual gives zero melt-derived Fe; residual >= raw
-                    # rate/M_Fe leaves the raw melt-derived rate unchanged.
-                    original_gated_rate = gated_rate_kg_hr
-                    gated_rate_kg_hr = min(gated_rate_kg_hr, residual_capacity_kg_hr)
-                    diagnostic['native_fe_capacity_allocation'] = {
-                        'rule': 'pool_first_residual',
-                        'native_pool_activity_argument': (
-                            'not modeled; allocation is an explicit pool-first '
-                            'scheduling policy'
-                        ),
-                        'melt_fe_raw_kg_hr': float(original_gated_rate),
-                        'melt_fe_residual_capacity_kg_hr': float(
-                            residual_capacity_kg_hr
-                        ),
-                        'melt_fe_applied_kg_hr': float(gated_rate_kg_hr),
-                    }
-            if gated_rate_kg_hr > 1e-12:
-                flux.species_kg_hr[species] = gated_rate_kg_hr
-                alpha_authority_status = alpha_authority_statuses.get(species)
-                if alpha_authority_status is not None:
-                    flux.alpha_authority_status_by_species[species] = str(
-                        alpha_authority_status
-                    )
+        projected = project_publisher_vapour_rates(
+            diagnostic,
+            liquid_fraction_factor=liquid_fraction_factor,
+            fe_residual_kg_hr=fe_residual_kg_hr,
+        )
+        if projected.fe_allocation is not None:
+            diagnostic['native_fe_capacity_allocation'] = projected.fe_allocation
+        for species, gated_rate_kg_hr in projected.debit_kg_hr.items():
+            flux.species_kg_hr[species] = gated_rate_kg_hr
+            alpha_authority_status = alpha_authority_statuses.get(species)
+            if alpha_authority_status is not None:
+                flux.alpha_authority_status_by_species[species] = str(
+                    alpha_authority_status
+                )
+        # Supply keeps the sub-floor rates the debit map just dropped.
+        # Depletion and the C0 scales update this map in place; the
+        # snapshot writer is publish_wall_supply_on_flux.
+        self._wall_supply_computed_kg_hr = dict(projected.supply_kg_hr)
 
         flux.update_totals()
         return flux
@@ -4550,6 +4734,52 @@ class EvaporationMixin:
                 )
         return source_mol_hr
 
+    def _scale_wall_supply_computed(self, scale: float) -> None:
+        """Apply one physical scale to every computed supply rate.
+
+        The melt debit may drop a product at or below its reporting
+        floor. This scale does not. A non-positive result is kept when
+        it is exactly zero so the hour stays an evidenced zero.
+        """
+
+        computed = getattr(self, "_wall_supply_computed_kg_hr", None)
+        if not isinstance(computed, Mapping):
+            return
+        factor = float(scale)
+        scaled: dict[str, float] = {}
+        for species, raw in computed.items():
+            if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+                continue
+            rate = float(raw) * factor
+            if math.isfinite(rate) and rate >= 0.0:
+                scaled[str(species)] = rate
+        self._wall_supply_computed_kg_hr = scaled
+
+    def _overlay_depleted_wall_supply(
+        self,
+        supply_out: Mapping[str, float],
+        *,
+        phase_scale: float | None,
+    ) -> None:
+        """Fold post-depletion rates into the computed supply map.
+
+        Subthreshold rates never enter the debit, so depletion does not
+        see them. They take the same phase scale the debit rates took.
+        ``supply_out`` is already phase-scaled and overwrites those
+        species, including a positive rate the debit floor then dropped
+        and an explicit zero where the parent or oxygen inventory is gone.
+        """
+
+        scale = 1.0 if phase_scale is None else float(phase_scale)
+        if scale != 1.0:
+            self._scale_wall_supply_computed(scale)
+        computed = dict(getattr(self, "_wall_supply_computed_kg_hr", {}) or {})
+        for species, raw in supply_out.items():
+            rate = float(raw)
+            if math.isfinite(rate) and rate >= 0.0:
+                computed[str(species)] = rate
+        self._wall_supply_computed_kg_hr = computed
+
     def _apply_analytic_evaporation_depletion(
         self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,
     ) -> EvaporationFlux:
@@ -4559,6 +4789,7 @@ class EvaporationMixin:
 
         phase_scalar = self._record_phase_context_diagnostic(
             'evaporation_depletion', scalar_liquid_fraction=1.0)
+        supply_out: dict[str, float] = {}
         effective_rates = self._analytic_evaporation_depletion_rates(
             evap_flux.species_kg_hr,
             dt_hr=dt_hr,
@@ -4571,6 +4802,11 @@ class EvaporationMixin:
                     'O2', 0.0
                 )
             ),
+            supply_out=supply_out,
+        )
+        self._overlay_depleted_wall_supply(
+            supply_out,
+            phase_scale=phase_scalar,
         )
         smoothed = EvaporationFlux(
             species_kg_hr=effective_rates,
@@ -4598,13 +4834,31 @@ class EvaporationMixin:
         phase_scalar: float,
         cleaned_melt_kg: Mapping[str, float],
         available_o2_kg: float,
+        supply_out: dict[str, float] | None = None,
     ) -> dict[str, float]:
-        """Pure frozen-inventory transform from raw HK rates to actual rates."""
+        """Pure frozen-inventory transform from raw HK rates to actual rates.
+
+        ``supply_out``, when passed, receives every input species' computed
+        post-depletion rate, including a positive rate at or below the
+        debit floor and a zero where parent or oxygen inventory is gone.
+        It does not change the debit map this function returns.
+        """
+
+        def _note(species: object, rate: float) -> None:
+            if supply_out is None:
+                return
+            value = float(rate)
+            if math.isfinite(value) and value >= 0.0:
+                supply_out[str(species)] = value
+
         if dt_hr <= 0.0 or not raw_rates_kg_hr:
-            return {
+            kept = {
                 str(species): max(0.0, float(rate))
                 for species, rate in raw_rates_kg_hr.items()
             }
+            for species, rate in kept.items():
+                _note(species, rate)
+            return kept
 
         metals_data = self.vapor_pressures.get('metals', {}) or {}
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
@@ -4616,6 +4870,8 @@ class EvaporationMixin:
                 * phase_scalar
             )
             if raw_rate_kg_hr <= 1e-12:
+                # Debit floor. The computed rate is still the supply.
+                _note(species, raw_rate_kg_hr if raw_rate_kg_hr > 0.0 else 0.0)
                 continue
             sp_data = metals_data.get(species, {})
             if not sp_data:
@@ -4625,6 +4881,7 @@ class EvaporationMixin:
             oxide_per_product_kg = float(stoich['oxide_per_product_kg'])
             parent_draw_kg_hr = raw_rate_kg_hr * oxide_per_product_kg
             if parent_draw_kg_hr <= 1e-12:
+                _note(species, raw_rate_kg_hr)
                 continue
             parent_groups[parent_oxide].append({
                 'species': species,
@@ -4641,8 +4898,18 @@ class EvaporationMixin:
             available_parent_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
             total_parent_draw_kg_hr = sum(
                 entry['parent_draw_kg_hr'] for entry in entries)
-            if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= 1e-12:
+            # Empty inventory has no draw. A positive mass uses one
+            # first-order draw. The debit still requires the group and
+            # the product to clear 1e-12 kg; a smaller positive product
+            # is the supply and is not a debit.
+            if available_parent_kg <= 0.0 or total_parent_draw_kg_hr <= 0.0:
+                for entry in entries:
+                    _note(entry['species'], 0.0)
                 continue
+            group_clears_debit_floor = (
+                available_parent_kg > 1e-12
+                and total_parent_draw_kg_hr > 1e-12
+            )
             k_hr = total_parent_draw_kg_hr / available_parent_kg
             depletion_fraction = -math.expm1(-k_hr * dt_hr)
             depletion_fraction = max(
@@ -4655,8 +4922,13 @@ class EvaporationMixin:
                     * share
                     / float(entry['stoich']['oxide_per_product_kg'])
                 )
-                if product_kg > 1e-12:
-                    effective_rates[entry['species']] = product_kg / dt_hr
+                product_rate = product_kg / dt_hr
+                if group_clears_debit_floor and product_kg > 1e-12:
+                    effective_rates[entry['species']] = product_rate
+                _note(
+                    entry['species'],
+                    product_rate if product_kg > 0.0 else 0.0,
+                )
 
         o2_draws: list[tuple[str, float]] = []
         for parent_oxide in sorted(parent_groups):
@@ -4675,6 +4947,7 @@ class EvaporationMixin:
         if available_o2_kg <= 1e-12:
             for species, _draw in o2_draws:
                 effective_rates.pop(species, None)
+                _note(species, 0.0)
             return effective_rates
 
         max_fraction = math.nextafter(1.0, 0.0)
@@ -4696,8 +4969,11 @@ class EvaporationMixin:
                 allowed_draw_kg / by_species_draw[species])
             if allowed_rate <= 1e-12:
                 effective_rates.pop(species, None)
+                _note(species, allowed_rate if allowed_rate > 0.0 else 0.0)
             else:
-                effective_rates[species] = min(current_rate, allowed_rate)
+                applied = min(current_rate, allowed_rate)
+                effective_rates[species] = applied
+                _note(species, applied)
         return effective_rates
 
     def _route_to_condensation(
@@ -4915,19 +5191,20 @@ class EvaporationMixin:
         )
         committed_flux.update_totals()
         # d-376 amendment 1 wall-deposit ruling: the supply bound is the
-        # vapour condensation was shown, not only the ledger debit.
+        # vapour the publisher computed, not only the ledger debit.
         # species_kg_hr stays the committed subset, so a carrier with no
-        # evaporation transition (refused or proven-zero authority, or mass
-        # retained in the source) does not change the melt debit. The wall
-        # still saw that rate. Keep it beside the debit, scaled by the same
-        # phase scalar the committed rate uses, so the two agree when both
-        # exist. Not a dataclass field: melt, ledger, and snapshot totals
-        # keep reading species_kg_hr.
+        # evaporation transition does not change the melt debit. The supply
+        # map keeps that shown debit, phase-scaled, and every computed rate
+        # the debit floor dropped (including below_threshold_evaporation_flux).
+        # publish_wall_supply_on_flux is the only writer. Not a dataclass
+        # field: melt, ledger, and snapshot totals keep reading species_kg_hr.
         phase_scale = 1.0 if phase_scalar is None else float(phase_scalar)
-        committed_flux.published_species_kg_hr = {
-            str(species): float(rate_kg_hr) * phase_scale
-            for species, rate_kg_hr in evap_flux.species_kg_hr.items()
-        }
+        publish_wall_supply_on_flux(
+            committed_flux,
+            getattr(self, "_wall_supply_computed_kg_hr", None),
+            debit_kg_hr=evap_flux.species_kg_hr,
+            phase_scale=phase_scale,
+        )
         self._ledger_committed_evap_flux_this_tick = committed_flux
 
         residual_flux = EvaporationFlux(

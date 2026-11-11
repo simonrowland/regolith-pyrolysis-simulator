@@ -1976,11 +1976,13 @@ def _carrier_records_transport_refusal(record: Mapping[str, Any]) -> bool:
 def _omitted_species_flux_withholds_supply(flux: Any, species: str) -> bool:
     """True when an omitted rate is not evidence of physical zero.
 
-    Called only for a species absent from a present rate map. No carrier
-    record means the publisher dropped a carrier with no rate. The gate
-    is ``gated_rate_kg_hr > 1e-12`` in ``_calculate_evaporation``, so that
-    omission contributes zero. ``proven_zero`` / ``zero_by_physics`` is the
-    same evidence. A typed refusal is not.
+    Called only for a species absent from a present rate map. The supply
+    map is built by ``publish_wall_supply_on_flux`` and already contains
+    every finite non-negative computed rate, including a rate at or below
+    the 1e-12 kg/h melt-debit floor. An eligible or authoritative channel
+    that is still absent had no computed positive rate. That omission is
+    a physical zero. ``proven_zero`` / ``zero_by_physics`` is the same
+    evidence. A typed refusal is not.
 
     d-367: missing input stays a refusal. It does not become a zero hour
     inside an otherwise numeric integral.
@@ -2013,8 +2015,9 @@ def _omitted_species_flux_withholds_supply(flux: Any, species: str) -> bool:
         VAPOUR_CARRIER_AUTHORITY_MISSING,
     }:
         return True
-    # Eligible or authoritative channel, no published rate: the 1e-12 kg/h
-    # gate dropped it. That is a physical zero for this interval.
+    # Eligible or authoritative channel, no rate in the supply map: the
+    # publisher computed no positive rate. The debit floor does not create
+    # this absence. That omission is a physical zero for this interval.
     return False
 
 
@@ -2044,12 +2047,13 @@ def _optimizer_refused_flux_bounds(
     campaign upper bound unavailable instead of clearing it.
 
     A present map that omits a species is a physical zero only when the
-    carrier authority does not record a refusal. The published map drops
-    a carrier at or below 1e-12 kg/h, and proven-zero authority is an
-    explicit zero. An explicit 0 rate in the map is that same evidence
-    and contributes nothing. A species absent from every map, and never
-    refused, stays unobserved. This function does not fabricate a zero
-    supply for it.
+    carrier authority does not record a refusal. The supply map keeps a
+    computed rate at or below the 1e-12 kg/h melt-debit floor; omission
+    is not that floor. Proven-zero authority is an explicit zero. An
+    explicit 0 rate in the map is that same evidence and contributes
+    nothing. A species absent from every map, and never refused, stays
+    unobserved. This function does not fabricate a zero supply for it.
+    Ledger resolution is not applied here. Booking applies it.
 
     A published numeric rate is the computed interval even when a refusal
     flag is also present. The refusal rule applies to an omitted key.

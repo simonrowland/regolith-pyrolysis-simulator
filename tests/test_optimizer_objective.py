@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import math
 from types import SimpleNamespace
 from typing import Mapping
@@ -11,6 +12,12 @@ from simulator.optimize import study
 import simulator.optimize.objective as objective_module
 from scripts import sso_r_validation_map as validation_map
 from simulator.cost_parameters import CostParameters
+from simulator.core import PyrolysisSimulator
+from simulator.evaporation import (
+    EvaporationMixin,
+    project_publisher_vapour_rates,
+    publish_wall_supply_on_flux,
+)
 from simulator.optimize.evaluate import (
     RunReference,
     ScoredResult,
@@ -1683,8 +1690,12 @@ _WALL_BOUND_CASES = (
         "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
     },
     # 1 kg charge: ledger resolution is 5e-14 kg. 5e-13 kg is above that
-    # resolution and below the old 1e-12 kg reader cutoff. Scoring must
-    # keep 5e-13 kg. Collapsing it to zero makes lifetime infinite.
+    # resolution and below the 1e-12 kg/h debit floor. Scoring must keep
+    # 5e-13 kg once the rate is on the supply map. This row injects the
+    # rate into the snapshot. The production projector, which used to
+    # drop it before the map existed, is
+    # test_publisher_projection_keeps_every_computed_rate and
+    # test_mixed_subthreshold_hours_book_the_full_integral.
     {
         "deposit": (),
         "flux": (("SiO", 5.0e-13),),
@@ -1909,9 +1920,10 @@ def _oracle_omitted_interval_withholds(flux: object, species: str) -> bool:
     """Independent rule for a species absent from a present rate map.
 
     No carrier record, proven_zero, or an evaluated eligible channel is
-    a physical zero (the publisher drops rates at or below 1e-12 kg/h).
-    A refusal, a missing record body, a diagnostic upper bound, a refused
-    runtime pressure, or a transport-unavailable extra is not.
+    a physical zero. The supply map keeps a computed rate at or below
+    1e-12 kg/h, so this rule is not that floor. A refusal, a missing
+    record body, a diagnostic upper bound, a refused runtime pressure,
+    or a transport-unavailable extra is not a zero.
     """
 
     channels = getattr(flux, "carrier_authority_by_species", None)
@@ -2336,8 +2348,11 @@ _FLUX_INTERVAL_CASES = (
     ("explicit_zero", "explicit_zero", 1.0, 0.9),
     ("omitted_no_authority", "omitted", 1.0, 0.9),
     ("omitted_proven_zero", "proven_zero", 1.0, 0.9),
-    ("omitted_eligible_below_cutoff", "eligible", 1.0, 0.9),
-    ("omitted_authoritative_below_cutoff", "authoritative", 1.0, 0.9),
+    # Eligible or authoritative, and absent from the map: no computed
+    # rate. A computed rate at or below 1e-12 kg/h is not this row. The
+    # generative supply test keeps that rate.
+    ("omitted_eligible_no_computed_rate", "eligible", 1.0, 0.9),
+    ("omitted_authoritative_no_computed_rate", "authoritative", 1.0, 0.9),
     ("omitted_transport_refusal", "transport", None, 0.9),
     ("omitted_is_refused_flag", "is_refused_flag", None, 0.9),
     ("omitted_flux_kind_refusal", "flux_refusal", None, 0.9),
@@ -2551,6 +2566,613 @@ def test_vapour_supply_integral_classifies_every_flux_interval(
         )
         assert priced == pytest.approx(supply)
         assert priced <= float(supply) + 1.0e-12
+
+
+# Publisher rate classes. The supply oracle is rate * liquid fraction.
+# It does not apply the 1e-12 kg/h debit floor. "both" names the same
+# rate in the published bucket and the below-threshold bucket; the
+# supply counts it once. The species list is the wall-refusal set this
+# ticket books, plus the carriers the debit floor already pins.
+_COMPUTED_RATE_GRID = (0.0, 5.0e-13, 1.0e-12, 2.0e-12, 1.0)
+_COMPUTED_BUCKETS = ("published", "below", "both")
+_COMPUTED_LIQUID_FRACTIONS = (1.0, 0.25)
+_COMPUTED_SPECIES = (
+    "SiO",
+    "Mg",
+    "Fe",
+    "CrO2",
+    "Al2O",
+    "Al2O2",
+    "AlO",
+    "CaO_gas",
+    "CrO",
+    "K2",
+    "K2O_gas",
+    "MgO_gas",
+    "Na2",
+    "Na2O_gas",
+    "SiO2_gas",
+    "TiO",
+    "TiO2_gas",
+)
+_DEBIT_FLOOR_KG_HR = 1.0e-12
+
+
+def _publisher_diagnostic(
+    rate: float,
+    bucket: str,
+    species: str = "SiO",
+) -> dict[str, object]:
+    published: dict[str, float] = {}
+    below: dict[str, float] = {}
+    if bucket in ("published", "both"):
+        published[species] = float(rate)
+    if bucket in ("below", "both"):
+        below[species] = float(rate)
+    diagnostic: dict[str, object] = {"evaporation_flux_kg_hr": published}
+    if below:
+        diagnostic["below_threshold_evaporation_flux"] = {
+            "threshold_kg_hr": _DEBIT_FLOOR_KG_HR,
+            "fluxes_kg_hr": below,
+        }
+    return diagnostic
+
+
+def _independent_supply_rate(rate: float, liquid: float) -> float:
+    """Gated publisher rate. The debit floor is not an operand."""
+
+    return float(rate) * float(liquid)
+
+
+def _independent_debit_rate(rate: float, bucket: str, liquid: float) -> float | None:
+    """Melt debit. The below-threshold bucket never debits.
+
+    A published rate debits only after the liquid-fraction gate, and
+    only above the historical floor. That floor is the debit rule, not
+    the supply rule.
+    """
+
+    if bucket == "below":
+        return None
+    gated = _independent_supply_rate(rate, liquid)
+    if gated > _DEBIT_FLOOR_KG_HR:
+        return gated
+    return None
+
+
+@pytest.mark.parametrize("species", _COMPUTED_SPECIES)
+@pytest.mark.parametrize("liquid", _COMPUTED_LIQUID_FRACTIONS)
+@pytest.mark.parametrize("bucket", _COMPUTED_BUCKETS)
+@pytest.mark.parametrize("rate", _COMPUTED_RATE_GRID)
+def test_publisher_projection_keeps_every_computed_rate(
+    rate: float,
+    bucket: str,
+    liquid: float,
+    species: str,
+) -> None:
+    """Every computed vapour rate reaches the supply integral.
+
+    The grid is the publisher's two buckets, the debit floor, a liquid
+    fraction that can move a published rate across that floor, and each
+    species the wall bound can book. The supply oracle is the gated
+    rate. It does not drop a rate for being at or below 1e-12 kg/h.
+    The debit oracle still does.
+    """
+
+    projected = project_publisher_vapour_rates(
+        _publisher_diagnostic(rate, bucket, species),
+        liquid_fraction_factor=liquid,
+    )
+    expected_supply = _independent_supply_rate(rate, liquid)
+    expected_debit = _independent_debit_rate(rate, bucket, liquid)
+    assert projected.supply_kg_hr[species] == pytest.approx(expected_supply)
+    assert set(projected.supply_kg_hr) == {species}
+    if expected_debit is None:
+        assert species not in projected.debit_kg_hr
+    else:
+        assert projected.debit_kg_hr[species] == pytest.approx(expected_debit)
+        assert set(projected.debit_kg_hr) == {species}
+    # Both buckets naming one rate must not sum it.
+    assert projected.supply_kg_hr[species] == pytest.approx(expected_supply)
+
+    flux = SimpleNamespace(species_kg_hr=dict(projected.debit_kg_hr))
+    publish_wall_supply_on_flux(
+        flux,
+        projected.supply_kg_hr,
+        debit_kg_hr=projected.debit_kg_hr,
+    )
+    assert flux.species_kg_hr == projected.debit_kg_hr
+    assert flux.published_species_kg_hr[species] == pytest.approx(expected_supply)
+
+    bounds = _optimizer_refused_flux_bounds(
+        (
+            SimpleNamespace(
+                hour=1,
+                duration_h=1.0,
+                evap_flux=flux,
+            ),
+        ),
+        (species,),
+        campaigns_elapsed=1.0,
+    )
+    assert bounds[species] == pytest.approx(expected_supply)
+
+    if expected_supply <= _DEBIT_FLOOR_KG_HR:
+        # Mutation: the old publication gate. Dropping the sub-floor
+        # rate removes the species, so the integral returns no supply.
+        mutated = SimpleNamespace(
+            species_kg_hr={
+                name: kg
+                for name, kg in flux.published_species_kg_hr.items()
+                if float(kg) > _DEBIT_FLOOR_KG_HR
+            },
+            published_species_kg_hr={
+                name: kg
+                for name, kg in flux.published_species_kg_hr.items()
+                if float(kg) > _DEBIT_FLOOR_KG_HR
+            },
+        )
+        mutated_bounds = _optimizer_refused_flux_bounds(
+            (SimpleNamespace(hour=1, duration_h=1.0, evap_flux=mutated),),
+            (species,),
+            campaigns_elapsed=1.0,
+        )
+        assert species not in mutated_bounds
+
+
+def test_mixed_subthreshold_hours_book_the_full_integral() -> None:
+    """1 kg charge, resolution 5e-14 kg. Hour one 2e-12, hour two 5e-13.
+
+    The debit floor keeps hour one and drops hour two. The supply
+    integral is 2.5e-12 kg, which is above ledger resolution, so the
+    refused species is booked at that supply and stays scored. A map
+    that keeps only the above-floor hour books 2e-12 kg.
+    """
+
+    hour_one = project_publisher_vapour_rates(
+        {"evaporation_flux_kg_hr": {"SiO": 2.0e-12}},
+        liquid_fraction_factor=1.0,
+    )
+    hour_two = project_publisher_vapour_rates(
+        {
+            "evaporation_flux_kg_hr": {},
+            "below_threshold_evaporation_flux": {
+                "threshold_kg_hr": _DEBIT_FLOOR_KG_HR,
+                "fluxes_kg_hr": {"SiO": 5.0e-13},
+            },
+        },
+        liquid_fraction_factor=1.0,
+    )
+    assert hour_one.debit_kg_hr["SiO"] == pytest.approx(2.0e-12)
+    assert "SiO" not in hour_two.debit_kg_hr
+    assert hour_two.supply_kg_hr["SiO"] == pytest.approx(5.0e-13)
+
+    def _flux(projected):
+        flux = SimpleNamespace(species_kg_hr=dict(projected.debit_kg_hr))
+        publish_wall_supply_on_flux(
+            flux,
+            projected.supply_kg_hr,
+            debit_kg_hr=projected.debit_kg_hr,
+        )
+        return flux
+
+    snapshots = (
+        SimpleNamespace(hour=1, duration_h=1.0, evap_flux=_flux(hour_one)),
+        SimpleNamespace(hour=2, duration_h=1.0, evap_flux=_flux(hour_two)),
+    )
+    # Independent of either map: the two computed rates, no floor.
+    oracle = 2.0e-12 + 5.0e-13
+    for order in (("SiO",), ("SiO", "Mg")):
+        bounds = _optimizer_refused_flux_bounds(
+            snapshots,
+            order,
+            campaigns_elapsed=1.0,
+        )
+        assert bounds["SiO"] == pytest.approx(oracle)
+        assert "Mg" not in bounds
+
+    resolution = objective_module._mass_balance_ledger_resolution_kg(1.0)
+    assert resolution == pytest.approx(5.0e-14)
+    assert oracle > resolution
+    execution, _snapshots, deposit = _wall_bound_execution({
+        "deposit": (),
+        "flux_snapshots": (
+            {
+                "hour": 1,
+                "duration_h": 1.0,
+                "flux": tuple(hour_one.debit_kg_hr.items()),
+                "published_flux": tuple(hour_one.supply_kg_hr.items()),
+            },
+            {
+                "hour": 2,
+                "duration_h": 1.0,
+                "flux": (),
+                "published_flux": tuple(hour_two.supply_kg_hr.items()),
+            },
+        ),
+        "refused": (("SiO", "hot_wall"),),
+        "charge": 1.0,
+    })
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        dict(deposit),
+        objective_module._coating_authority_status(deposit, execution),
+        execution,
+    )
+    booking = booked["bookings"][0]
+    assert booking["species"] == "SiO"
+    assert booking["reason"] == _WALL_BOUND_UPPER
+    assert booking["deposit_kg"] == pytest.approx(oracle)
+    assert booking["supply_upper_bound_kg"] == pytest.approx(oracle)
+    assert _wall_bound_refused_names(booked["availability_authority"]) == set()
+    assert _wall_bound_refused_names(booked["notice_authority"]) == {"SiO"}
+
+    # Mutation: drop the sub-floor hour the way the debit map does.
+    # The integral falls to the above-floor hour and the assertion
+    # against the full oracle fails.
+    mutated_snapshots = (
+        snapshots[0],
+        SimpleNamespace(
+            hour=2,
+            duration_h=1.0,
+            evap_flux=SimpleNamespace(
+                species_kg_hr={},
+                published_species_kg_hr={},
+            ),
+        ),
+    )
+    mutated = _optimizer_refused_flux_bounds(
+        mutated_snapshots,
+        ("SiO",),
+        campaigns_elapsed=1.0,
+    )
+    assert mutated["SiO"] == pytest.approx(2.0e-12)
+    assert mutated["SiO"] != oracle
+
+
+@pytest.mark.parametrize("order", (("Mg", "SiO"), ("SiO", "Mg")))
+def test_subthreshold_supply_does_not_depend_on_species_order(order: tuple[str, str]) -> None:
+    diagnostic = {
+        "evaporation_flux_kg_hr": {"SiO": 2.0e-12},
+        "below_threshold_evaporation_flux": {
+            "threshold_kg_hr": _DEBIT_FLOOR_KG_HR,
+            "fluxes_kg_hr": {"Mg": 5.0e-13},
+        },
+    }
+    projected = project_publisher_vapour_rates(
+        diagnostic,
+        liquid_fraction_factor=1.0,
+    )
+    flux = SimpleNamespace(species_kg_hr=dict(projected.debit_kg_hr))
+    publish_wall_supply_on_flux(
+        flux,
+        projected.supply_kg_hr,
+        debit_kg_hr=projected.debit_kg_hr,
+    )
+    bounds = _optimizer_refused_flux_bounds(
+        (SimpleNamespace(hour=1, duration_h=1.0, evap_flux=flux),),
+        order,
+        campaigns_elapsed=1.0,
+    )
+    assert bounds["SiO"] == pytest.approx(2.0e-12)
+    assert bounds["Mg"] == pytest.approx(5.0e-13)
+    assert list(bounds) == [species for species in order if species in bounds]
+
+
+def test_all_subthreshold_hours_still_return_a_supply_bound() -> None:
+    projected = project_publisher_vapour_rates(
+        {
+            "evaporation_flux_kg_hr": {},
+            "below_threshold_evaporation_flux": {
+                "threshold_kg_hr": _DEBIT_FLOOR_KG_HR,
+                "fluxes_kg_hr": {"SiO": 5.0e-13},
+            },
+        },
+        liquid_fraction_factor=1.0,
+    )
+    flux = SimpleNamespace(species_kg_hr={})
+    publish_wall_supply_on_flux(flux, projected.supply_kg_hr)
+    bounds = _optimizer_refused_flux_bounds(
+        (
+            SimpleNamespace(hour=1, duration_h=1.0, evap_flux=flux),
+            SimpleNamespace(hour=2, duration_h=1.0, evap_flux=flux),
+        ),
+        ("SiO",),
+        campaigns_elapsed=1.0,
+    )
+    assert bounds["SiO"] == pytest.approx(1.0e-12)
+    assert bounds["SiO"] > objective_module._mass_balance_ledger_resolution_kg(1.0)
+
+
+def test_fe_residual_cap_applies_to_supply_without_changing_the_record() -> None:
+    projected = project_publisher_vapour_rates(
+        {"evaporation_flux_kg_hr": {"Fe": 1.0}},
+        liquid_fraction_factor=1.0,
+        fe_residual_kg_hr=0.25,
+    )
+    assert projected.debit_kg_hr["Fe"] == pytest.approx(0.25)
+    assert projected.supply_kg_hr["Fe"] == pytest.approx(0.25)
+    assert projected.fe_allocation["melt_fe_raw_kg_hr"] == pytest.approx(1.0)
+    assert projected.fe_allocation["melt_fe_applied_kg_hr"] == pytest.approx(0.25)
+    below_only = project_publisher_vapour_rates(
+        {
+            "evaporation_flux_kg_hr": {},
+            "below_threshold_evaporation_flux": {
+                "fluxes_kg_hr": {"Fe": 5.0e-13},
+            },
+        },
+        liquid_fraction_factor=1.0,
+        fe_residual_kg_hr=1.0e-16,
+    )
+    assert below_only.fe_allocation is None
+    assert "Fe" not in below_only.debit_kg_hr
+    assert below_only.supply_kg_hr["Fe"] == pytest.approx(1.0e-16)
+
+
+class _DepletionParent:
+    """Stoich stand-in. The depletion method only reads these two hooks."""
+
+    def __init__(self, *, o2_per_product_kg: float = 0.0) -> None:
+        self.vapor_pressures = {
+            "metals": {"SiO": {"present": True}},
+            "oxide_vapors": {},
+        }
+        self._o2_per_product_kg = o2_per_product_kg
+
+    def _evaporation_stoich(self, species: str, sp_data: Mapping[str, object]) -> dict:
+        return {
+            "parent_oxide": "SiO2",
+            "oxide_per_product_kg": 1.0,
+            "O2_per_product_kg": self._o2_per_product_kg,
+        }
+
+
+def test_depletion_keeps_a_rate_the_debit_floor_never_enters() -> None:
+    supply_out: dict[str, float] = {}
+    debit = EvaporationMixin._analytic_evaporation_depletion_rates(
+        _DepletionParent(),
+        {"SiO": 5.0e-13},
+        dt_hr=1.0,
+        phase_scalar=1.0,
+        cleaned_melt_kg={"SiO2": 1.0},
+        available_o2_kg=1.0,
+        supply_out=supply_out,
+    )
+    assert debit == {}
+    assert supply_out["SiO"] == pytest.approx(5.0e-13)
+
+
+def test_depletion_keeps_a_positive_product_below_the_debit_floor() -> None:
+    """Parent inventory 5e-13 kg, raw demand 2e-12 kg/h.
+
+    k = 2e-12 / 5e-13 = 4 / h. Over one hour the drawn parent mass is
+    5e-13 * (1 - exp(-4)) kg, which is below the debit floor and is
+    still the computed vapour.
+    """
+
+    available_kg = 5.0e-13
+    raw_kg_hr = 2.0e-12
+    drawn_kg = available_kg * -math.expm1(-raw_kg_hr / available_kg)
+    supply_out: dict[str, float] = {}
+    debit = EvaporationMixin._analytic_evaporation_depletion_rates(
+        _DepletionParent(),
+        {"SiO": raw_kg_hr},
+        dt_hr=1.0,
+        phase_scalar=1.0,
+        cleaned_melt_kg={"SiO2": available_kg},
+        available_o2_kg=1.0,
+        supply_out=supply_out,
+    )
+    assert "SiO" not in debit
+    assert supply_out["SiO"] == pytest.approx(drawn_kg)
+    assert drawn_kg <= _DEBIT_FLOOR_KG_HR
+    assert drawn_kg > 0.0
+
+
+def test_depletion_inventory_exhaustion_is_an_explicit_supply_zero() -> None:
+    supply_out: dict[str, float] = {}
+    debit = EvaporationMixin._analytic_evaporation_depletion_rates(
+        _DepletionParent(),
+        {"SiO": 1.0},
+        dt_hr=1.0,
+        phase_scalar=1.0,
+        cleaned_melt_kg={"SiO2": 0.0},
+        available_o2_kg=1.0,
+        supply_out=supply_out,
+    )
+    assert debit == {}
+    assert supply_out["SiO"] == 0.0
+
+
+def _independent_depletion(
+    raw_kg_hr: float,
+    available_parent_kg: float,
+    *,
+    phase: float,
+    available_o2_kg: float,
+    o2_per_product_kg: float,
+    dt_hr: float = 1.0,
+) -> tuple[float | None, float]:
+    """Debit rate, or None, and the supply rate.
+
+    The first-order draw is ``available * (1 - exp(-k dt))``, capped
+    just under the inventory. A rate at or below 1e-12 kg/h does not
+    enter that draw, so its supply is the computed rate. Empty parent
+    inventory is an explicit zero. The debit keeps a product only when
+    the parent mass, the draw, and the product each exceed 1e-12 kg.
+    Oxygen limiting applies only to that debit.
+    """
+
+    rate = float(raw_kg_hr) * float(phase)
+    if rate <= _DEBIT_FLOOR_KG_HR:
+        return None, (rate if rate > 0.0 else 0.0)
+    parent_draw = rate
+    if parent_draw <= _DEBIT_FLOOR_KG_HR:
+        return None, rate
+    if available_parent_kg <= 0.0 or parent_draw <= 0.0:
+        return None, 0.0
+    cap = math.nextafter(1.0, 0.0)
+    fraction = -math.expm1(-parent_draw / available_parent_kg * dt_hr)
+    fraction = max(0.0, min(cap, fraction))
+    product_kg = available_parent_kg * fraction
+    supply = product_kg / dt_hr if product_kg > 0.0 else 0.0
+    if not (
+        available_parent_kg > _DEBIT_FLOOR_KG_HR
+        and parent_draw > _DEBIT_FLOOR_KG_HR
+        and product_kg > _DEBIT_FLOOR_KG_HR
+    ):
+        return None, supply
+    if o2_per_product_kg >= -1.0e-12:
+        return supply, supply
+    required = supply * abs(o2_per_product_kg)
+    if required <= _DEBIT_FLOOR_KG_HR:
+        return supply, supply
+    if available_o2_kg <= _DEBIT_FLOOR_KG_HR:
+        return None, 0.0
+    o2_fraction = -math.expm1(-required / available_o2_kg * dt_hr)
+    o2_fraction = max(0.0, min(cap, o2_fraction))
+    allowed_rate = supply * ((available_o2_kg * o2_fraction) / required)
+    if allowed_rate <= _DEBIT_FLOOR_KG_HR:
+        kept = allowed_rate if allowed_rate > 0.0 else 0.0
+        return None, kept
+    applied = min(supply, allowed_rate)
+    return applied, applied
+
+
+@pytest.mark.parametrize("phase", (1.0, 0.5))
+@pytest.mark.parametrize(
+    ("o2_per_product_kg", "available_o2_kg"),
+    ((0.0, 0.0), (-1.0, 0.0), (-1.0, 100.0)),
+)
+@pytest.mark.parametrize("available_parent_kg", (0.0, 5.0e-13, 100.0))
+@pytest.mark.parametrize("raw_kg_hr", _COMPUTED_RATE_GRID)
+def test_depletion_supply_keeps_every_computed_draw(
+    raw_kg_hr: float,
+    available_parent_kg: float,
+    o2_per_product_kg: float,
+    available_o2_kg: float,
+    phase: float,
+) -> None:
+    """Supply follows the draw. The shadow debit does not see supply_out."""
+
+    expected_debit, expected_supply = _independent_depletion(
+        raw_kg_hr,
+        available_parent_kg,
+        phase=phase,
+        available_o2_kg=available_o2_kg,
+        o2_per_product_kg=o2_per_product_kg,
+    )
+    parent = _DepletionParent(o2_per_product_kg=o2_per_product_kg)
+    kwargs = {
+        "dt_hr": 1.0,
+        "phase_scalar": phase,
+        "cleaned_melt_kg": {"SiO2": available_parent_kg},
+        "available_o2_kg": available_o2_kg,
+    }
+    shadow = EvaporationMixin._analytic_evaporation_depletion_rates(
+        parent,
+        {"SiO": raw_kg_hr},
+        **kwargs,
+    )
+    supply_out: dict[str, float] = {}
+    live = EvaporationMixin._analytic_evaporation_depletion_rates(
+        parent,
+        {"SiO": raw_kg_hr},
+        supply_out=supply_out,
+        **kwargs,
+    )
+    assert live == shadow
+    if expected_debit is None:
+        assert "SiO" not in live
+    else:
+        assert live["SiO"] == pytest.approx(expected_debit)
+    assert supply_out["SiO"] == pytest.approx(expected_supply)
+
+
+def test_subthreshold_sibling_does_not_change_the_parent_debit() -> None:
+    parent = _DepletionParent()
+    raw = {"Mg": 5.0e-13, "SiO": 1.0}
+    kwargs = {
+        "dt_hr": 1.0,
+        "phase_scalar": 1.0,
+        "cleaned_melt_kg": {"SiO2": 100.0},
+        "available_o2_kg": 1.0,
+    }
+    shadow = EvaporationMixin._analytic_evaporation_depletion_rates(
+        parent,
+        raw,
+        **kwargs,
+    )
+    supply_out: dict[str, float] = {}
+    live = EvaporationMixin._analytic_evaporation_depletion_rates(
+        parent,
+        {"SiO": 1.0, "Mg": 5.0e-13},
+        supply_out=supply_out,
+        **kwargs,
+    )
+    assert live == shadow
+    assert "Mg" not in live
+    assert supply_out["Mg"] == pytest.approx(5.0e-13)
+    assert supply_out["SiO"] == pytest.approx(live["SiO"])
+
+
+def test_physical_scale_keeps_a_rate_below_the_debit_reporting_floor() -> None:
+    host = SimpleNamespace(
+        _wall_supply_computed_kg_hr={"SiO": 1.0e-15, "Mg": 0.0},
+    )
+    EvaporationMixin._scale_wall_supply_computed(host, 0.5)
+    assert host._wall_supply_computed_kg_hr["SiO"] == pytest.approx(5.0e-16)
+    assert host._wall_supply_computed_kg_hr["Mg"] == 0.0
+    assert not (1.0e-15 * 0.5 > 1.0e-15)
+
+
+def test_republish_does_not_scale_the_supply_map_again() -> None:
+    flux = SimpleNamespace(species_kg_hr={"SiO": 2.0e-12})
+    publish_wall_supply_on_flux(
+        flux,
+        {"SiO": 2.0e-12, "Mg": 5.0e-13},
+        debit_kg_hr={"SiO": 5.0e-13},
+        phase_scale=1.0,
+    )
+    # Post-depletion debit wins over the pre-depletion computed rate.
+    assert flux.published_species_kg_hr["SiO"] == pytest.approx(5.0e-13)
+    assert flux.published_species_kg_hr["Mg"] == pytest.approx(5.0e-13)
+    first = dict(flux.published_species_kg_hr)
+    publish_wall_supply_on_flux(
+        flux,
+        {"SiO": 2.0e-12, "Mg": 5.0e-13},
+        debit_kg_hr={"SiO": 99.0},
+        phase_scale=0.5,
+    )
+    assert flux.published_species_kg_hr == first
+
+
+def test_depletion_without_oxygen_zeros_the_supply_and_the_debit() -> None:
+    supply_out: dict[str, float] = {}
+    debit = EvaporationMixin._analytic_evaporation_depletion_rates(
+        _DepletionParent(o2_per_product_kg=-1.0),
+        {"SiO": 1.0},
+        dt_hr=1.0,
+        phase_scalar=1.0,
+        cleaned_melt_kg={"SiO2": 100.0},
+        available_o2_kg=0.0,
+        supply_out=supply_out,
+    )
+    assert debit == {}
+    assert supply_out["SiO"] == 0.0
+
+
+def test_wall_supply_map_has_one_writer() -> None:
+    writer = inspect.getsource(publish_wall_supply_on_flux)
+    assert "published_species_kg_hr =" in writer
+    route = inspect.getsource(EvaporationMixin._route_to_condensation)
+    calculate = inspect.getsource(EvaporationMixin._calculate_evaporation)
+    step = inspect.getsource(PyrolysisSimulator.step)
+    assert "publish_wall_supply_on_flux(" in route
+    assert "published_species_kg_hr =" not in route
+    assert "project_publisher_vapour_rates(" in calculate
+    assert "publish_wall_supply_on_flux(" in step
+    evaporation_text = inspect.getsource(inspect.getmodule(publish_wall_supply_on_flux))
+    assert evaporation_text.count("published_species_kg_hr =") == 1
 
 
 def test_refused_supply_is_booked_on_the_segment_that_maximises_binding_load(

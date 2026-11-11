@@ -671,6 +671,7 @@ from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+    publish_wall_supply_on_flux,
 )
 from simulator.extraction import ExtractionMixin
 from simulator.melt_backend.base import (
@@ -7525,6 +7526,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     str(diagnostic.get('reason') or result.status),
                     diagnostic,
                 )
+            # Debit vector only. Rates at or below the 1e-12 kg/h floor
+            # stay out of this solve so the partials stay on the published
+            # flux closure. Wall supply reads the live publisher diagnostic
+            # after this solve, which keeps those rates.
             rates = {
                 species: float(rate) * liquid_fraction_factor
                 for species, rate in dict(
@@ -15040,6 +15045,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if rate * scale > 1.0e-15
         }
         evap_flux.update_totals()
+        # Same scale on the supply map, without the 1e-15 debit floor.
+        self._scale_wall_supply_computed(scale)
         pending = getattr(self, "_subsolidus_pending_release", None)
         if scale <= 0.0 or not pending:
             self._subsolidus_pending_release = None
@@ -15891,6 +15898,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
         # Not during MRE (C5) — electrolysis produces O₂ at the anode.
         evap_flux = EvaporationFlux()
+        # Drop the previous hour before this hour's publisher runs. A
+        # non-evaporation campaign leaves the map empty.
+        self._wall_supply_computed_kg_hr = {}
         capacity_result = None
         if evaporation_campaign:
             if (
@@ -15990,6 +16000,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if rate * joint_scale > 1.0e-15
                 }
                 evap_flux.update_totals()
+                self._scale_wall_supply_computed(joint_scale)
         # Ruling A: C0 joint release (ordinary gas plus solid-host gas)
         # is capped this step. Outside C0 this leaves the flux alone.
         evap_flux = self._cap_c0_joint_release_to_pipe_capacity(evap_flux)
@@ -16244,6 +16255,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             snapshot.imcc_activity_shadow = self._imcc_activity_shadow_for_hour(
                 snapshot
             )
+        # Routing writes the supply map when it runs. This call is the
+        # same writer: it covers a skipped route and does not scale an
+        # already published map a second time.
+        publish_wall_supply_on_flux(
+            evap_flux,
+            getattr(self, "_wall_supply_computed_kg_hr", None),
+        )
         snapshot.evap_flux = evap_flux
         snapshot.melt_headspace_composition_mbar = dict(
             self._melt_headspace_composition_mbar
