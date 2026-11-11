@@ -30,7 +30,11 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   requires each resolved extract number as a complete token: sign and
   exponent belong to the token, so 0.24 is not -0.24 or 0.24e-5, and
   1.0 is not 1. A sentence period does not extend that token, so 1
-  matches "the value is 1." A leading decimal is a number, so .24 is not a label
+  matches "the value is 1." A CSV or TSV source, including a table
+  artifact with that suffix, is matched per cell: the delimiter is not
+  part of the token. Inside a cell the same boundary applies, so a cell
+  1,000 does not certify 1 and 1 K is not 1 KPa.
+  A leading decimal is a number, so .24 is not a label
   and is not the token -0.24, 10.24, or 0.24. A float spelling is kept
   only when it parses back to the stored number, so
   ``format(0.24000000000000002, ".16g")`` is 0.24 and does not certify
@@ -79,6 +83,8 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import csv
+import io
 from copy import deepcopy
 from dataclasses import dataclass
 from functools import lru_cache
@@ -363,6 +369,8 @@ def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
     occupies ``[start, end)``, and neither neighbour extends that span.
     ``1 K`` is not ``1 KPa``. ``1`` is not ``1,000``. ``1,000`` is not
     ``1,000,000``. ``1`` is not ``-1`` or ``1µ``. ``1`` is ``the value is 1.``
+    This predicate does not know about table delimiters. A CSV or TSV
+    source passes one cell at a time, so a delimiter is never a neighbour.
     """
     if not (0 <= start < end <= len(text)):
         return False
@@ -399,6 +407,39 @@ def _printed_value_carried(leaf: str, text: str) -> bool:
         if _span_is_complete_printed_value(text, index, index + len(leaf)):
             return True
         start = index + 1
+
+
+# Certification opens these as tables. A companion ``literature_extract_table``
+# document stays an extract, not a source. The cell is the token: the
+# delimiter is not passed to the prose boundary predicate.
+_TABULAR_SOURCE_DELIMITERS = {
+    ".csv": ",",
+    ".tsv": "\t",
+}
+
+
+def _tabular_delimiter(path: Path) -> str | None:
+    """Comma or tab when ``path`` is a tabular source, else None."""
+    return _TABULAR_SOURCE_DELIMITERS.get(path.suffix.lower())
+
+
+def _table_cell_texts(text: str, delimiter: str) -> list[str]:
+    """Cell strings. ``csv.Error`` means the table was not parsed.
+
+    Callers refuse that parse. Searching the raw row would treat the
+    delimiter as digit grouping.
+    """
+    reader = csv.reader(io.StringIO(text, newline=""), delimiter=delimiter)
+    return [cell for row in reader for cell in row]
+
+
+def _leaf_in_table(leaf: Any, cells: Sequence[str]) -> bool:
+    """True when one cell carries ``leaf`` under the prose boundary.
+
+    The cell text is the whole source for that comparison, so a delimiter
+    cannot extend the token. A cell ``1,000`` does not certify ``1``.
+    """
+    return any(_leaf_in_text(leaf, cell) for cell in cells)
 
 
 # Repository-relative roots that hold a paper, OCR, quotes, or a reference
@@ -2316,7 +2357,18 @@ def _locator_source_blind_reason(
         if cited is None:
             reasons.append(span_error or "cited span was not opened")
             continue
-        missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
+        delimiter = _tabular_delimiter(path)
+        if delimiter is None:
+            missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
+        else:
+            try:
+                cells = _table_cell_texts(cited, delimiter)
+            except csv.Error as exc:
+                reasons.append(
+                    f"opened {path.name} but the table could not be parsed ({exc})"
+                )
+                continue
+            missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
         if not missing:
             return None
         rendered = ", ".join(repr(leaf) for leaf in missing[:3])
@@ -2343,7 +2395,9 @@ def fidelity_source_warnings(
     an ASCII letter or digit, a Unicode letter, µ, or °, or a dot or comma
     followed by a digit. A sentence period does not extend the token, so
     ``1`` matches ``the value is 1.``. ``1 K`` is not ``1 KPa`` and ``1``
-    is not ``1,000``.
+    is not ``1,000``. A CSV or TSV source is matched per cell, so the
+    delimiter is not a neighbour. Inside a cell the same boundary applies:
+    a cell ``1,000`` is not ``1``, and ``1 K`` is not ``1 KPa``.
     A leading decimal is a numeric token.
     A spelling that rounds the stored float to a different number is not
     that token. The sample's own spelling is not a substitute: a ``rel_tol``
@@ -2608,7 +2662,10 @@ def certify_extract_source_fidelity(
     The whole value, including a spaced or attached unit, must match, and
     neither neighbour may extend the span. ``1 K`` is not ``1 KPa`` and
     ``1`` is not ``1,000``. A sentence period does not extend the span, so
-    ``1`` matches ``the value is 1.``. A leading decimal is a numeric token. A spelling
+    ``1`` matches ``the value is 1.``. A CSV or TSV source is matched per
+    cell, so the delimiter is not a neighbour; inside a cell the same
+    boundary applies, and a cell ``1,000`` is not ``1``. A leading decimal
+    is a numeric token. A spelling
     that rounds the stored float to a different number is not that token.
     The sample's own
     spelling is not a substitute: a ``rel_tol`` match of a different number

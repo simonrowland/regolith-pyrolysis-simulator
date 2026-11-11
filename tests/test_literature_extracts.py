@@ -6996,6 +6996,10 @@ _TOKEN_CASES = (
     ("sentence_period_then_word", 1, "the value is 1. Next\n", True),
     ("sentence_period_float", 0.24, "alpha 0.24.\n", True),
     ("sentence_period_string_float", "0.24", "alpha 0.24.\n", True),
+    # Prose keeps the digit-grouping boundary. The same bytes in a CSV
+    # certify per cell; here the comma is not a delimiter.
+    ("prose_adjacent_decimals", 0.91, "0.91,0.92\n", False),
+    ("prose_adjacent_decimals_second", 0.92, "0.91,0.92\n", False),
 )
 
 
@@ -7879,6 +7883,99 @@ def test_source_artifact_provenance_is_required_at_every_promoter(
     )
     assert any(warning.kind == "source_blind_pin" for warning in warnings)
     assert accepts == (role in _ARTIFACT_ROLE_PASS)
+
+
+# Tabular sources. The expected result is the cell rule: a CSV or TSV row
+# is parsed, and each cell is its own token. ``0.91,0.92`` certifies 0.91
+# and 0.92. A quoted cell ``1,000`` does not certify 1, and neither does a
+# TSV cell ``1,000``. A cell ``1 KPa`` does not certify ``1 K``. The same
+# row in a prose artifact stays digit grouping; that case lives in
+# ``_TOKEN_CASES``.
+_TABULAR_CELL_CASES = (
+    ("csv_first_cell", "csv", "0.91,0.92\n", 0.91, True),
+    ("csv_second_cell", "csv", "0.91,0.92\n", 0.92, True),
+    ("csv_quoted_group_refuses_one", "csv", '"1,000"\n', 1, False),
+    ("csv_quoted_group_whole", "csv", '"1,000"\n', "1,000", True),
+    ("csv_unit_exact", "csv", "1 K\n", "1 K", True),
+    ("csv_unit_tail", "csv", "1 KPa\n", "1 K", False),
+    ("csv_joined_row_is_not_a_cell", "csv", "0.91,0.92\n", "0.91,0.92", False),
+    ("tsv_first_cell", "tsv", "0.91\t0.92\n", 0.91, True),
+    ("tsv_second_cell", "tsv", "0.91\t0.92\n", 0.92, True),
+    ("tsv_grouped_cell_refuses_one", "tsv", "1,000\n", 1, False),
+    ("tsv_grouped_cell_whole", "tsv", "1,000\n", "1,000", True),
+    ("tsv_unit_exact", "tsv", "1 K\n", "1 K", True),
+    ("tsv_unit_tail", "tsv", "1 KPa\n", "1 K", False),
+)
+
+
+def _tabular_source_document(
+    root: Path, pin: object, suffix: str, source_text: str
+) -> dict:
+    """One attested pin. ``source_text`` is the table literal, not derived from ``pin``."""
+    relative = f"tables/t1.{suffix}"
+    path = root / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(source_text, encoding="utf-8")
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["review_status"] = "reviewed"
+    doc["species"]["Fe"]["observations"][0]["values"] = {"alpha": pin}
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values.alpha",
+            "value": pin,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": {"quotes_path": relative, "page": 1},
+        }
+    ]
+    return doc
+
+
+@pytest.mark.parametrize(
+    ("case_name", "suffix", "source_text", "pin", "accepts"),
+    _TABULAR_CELL_CASES,
+    ids=[row[0] for row in _TABULAR_CELL_CASES],
+)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_tabular_source_matches_each_cell(
+    case_name: str,
+    suffix: str,
+    source_text: str,
+    pin: object,
+    accepts: bool,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: a CSV or TSV delimiter is not digit grouping.
+
+    The row ``0.91,0.92`` certifies 0.91 and 0.92, each as its own cell.
+    A quoted cell ``1,000`` certifies that printed value and not 1. A TSV
+    cell ``1,000`` does the same. ``1 K`` is not ``1 KPa`` inside a cell.
+    Every promoter calls ``certify_extract_source_fidelity``.
+    """
+    doc = _tabular_source_document(tmp_path, pin, suffix, source_text)
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    if accepts:
+        assert errors == [], (case_name, entry, errors)
+        return
+    assert errors, (case_name, entry)
+    if entry != "certify":
+        return
+    assert "source_blind_pin" in "\n".join(errors)
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (case_name, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == "source_blind_pin" for warning in warnings)
 
 
 # Stored value versus the sample spelling. ``within`` pairs satisfy
