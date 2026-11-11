@@ -7255,11 +7255,13 @@ def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> Non
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
 
+    subset_residuals = tuple(
+        (tmp_path / "data" / "battery" / "subsets").glob("*/residuals.jsonl")
+    )
+    assert len(subset_residuals) == 1
     wrapper_rows = tuple(
         json.loads(line)
-        for line in (tmp_path / "data" / "battery" / "residuals.jsonl")
-        .read_text(encoding="utf-8")
-        .splitlines()
+        for line in subset_residuals[0].read_text(encoding="utf-8").splitlines()
         if line.strip()
     )
     wrapper_records = tuple(
@@ -13196,9 +13198,20 @@ def test_battery_failed_rerun_preserves_published_output_set(
     )
     context = _context(work, experiment, *references)
     root = tmp_path / "rerun-root"
-    battery = root / "data" / "battery"
+    battery_root = root / "data" / "battery"
+    battery_root.mkdir(parents=True)
+    (battery_root / "pins.yaml").touch()
+    filters = battery_score._scoring_filter_record(
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=None,
+        work_id=None,
+        limit=None,
+        species_formulas=(),
+    )
+    battery = battery_score._scoring_output_directory(
+        root, filters, subset=True
+    )
     battery.mkdir(parents=True)
-    (battery / "pins.yaml").touch()
     paths = {
         "residuals": battery / "residuals.jsonl",
         "summary": battery / "score-summary.json",
@@ -13436,6 +13449,16 @@ def test_battery_normal_report_includes_fit_comparison_stratum(
     context = _context(work, experiment, reference)
     root = tmp_path / "normal-report-root"
     (root / "data" / "battery").mkdir(parents=True)
+    filters = battery_score._scoring_filter_record(
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=None,
+        work_id=None,
+        limit=1,
+        species_formulas=(),
+    )
+    output_directory = battery_score._scoring_output_directory(
+        root, filters, subset=True
+    )
     stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
     monkeypatch.setattr(score_mod, "derive_store_stamp", lambda _root: stamp)
     monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
@@ -13482,13 +13505,13 @@ def test_battery_normal_report_includes_fit_comparison_stratum(
         )
         == 0
     )
-    report = (root / "data" / "battery" / "score-report.md").read_text(
+    report = (output_directory / "score-report.md").read_text(
         encoding="utf-8"
     )
     assert "## NASA-9 fit comparison stratum" in report
     assert "| internal-analytical | cp | 1 | 1 | 0 |" in report
     residual_rows = score_mod.load_residuals_jsonl(
-        root / "data" / "battery" / "residuals.jsonl"
+        output_directory / "residuals.jsonl"
     )
     assert not any(
         "nasa9_fit" in str(row.get("source_relation")) for row in residual_rows

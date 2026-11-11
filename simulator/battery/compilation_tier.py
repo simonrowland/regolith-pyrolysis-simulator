@@ -3535,6 +3535,7 @@ def _write_compilation_comparisons_jsonl(
     *,
     engines: Sequence[Engine],
     invoke_pure_phase: bool,
+    observation_filter: Callable[[Observation], bool] | None = None,
 ) -> int:
     """Write comparison rows for the selected engine execution policy."""
 
@@ -3560,6 +3561,10 @@ def _write_compilation_comparisons_jsonl(
         ) as stream:
             temporary_path = Path(stream.name)
             for observation in context.observations.values():
+                if observation_filter is not None and not observation_filter(
+                    observation
+                ):
+                    continue
                 origin = context.origins.get(observation.observation_id)
                 if not _is_janaf_compilation_observation(observation, origin):
                     continue
@@ -3648,10 +3653,14 @@ def _write_compilation_comparisons_jsonl(
                             + "\n"
                         )
                         written += 1
+            nasa9_kwargs = {}
+            if observation_filter is not None:
+                nasa9_kwargs["observation_filter"] = observation_filter
             for comparison in _nasa9_fit_comparisons(
                 context,
                 engines=engines,
                 invoke_pure_phase=invoke_pure_phase,
+                **nasa9_kwargs,
             ):
                 residual = comparison.residual
                 numeric = residual.numeric
@@ -3782,6 +3791,7 @@ def _nasa9_fit_comparisons(
     engines: Sequence[Engine],
     invoke_pure_phase: bool,
     fit_records: Sequence[Mapping[str, object]] | None = None,
+    observation_filter: Callable[[Observation], bool] | None = None,
 ) -> list[_Nasa9FitComparison]:
     """Score NASA-9 cells with one lineage index for this store snapshot."""
 
@@ -3795,6 +3805,7 @@ def _nasa9_fit_comparisons(
             engines=engines,
             invoke_pure_phase=invoke_pure_phase,
             fit_records=fit_records,
+            observation_filter=observation_filter,
         )
 
 
@@ -3804,6 +3815,7 @@ def _nasa9_fit_comparisons_with_bound_lineage(
     engines: Sequence[Engine],
     invoke_pure_phase: bool,
     fit_records: Sequence[Mapping[str, object]] | None = None,
+    observation_filter: Callable[[Observation], bool] | None = None,
 ) -> list[_Nasa9FitComparison]:
     """Score precision-qualified NASA-9 grid points with the shared residual owner."""
 
@@ -3820,6 +3832,8 @@ def _nasa9_fit_comparisons_with_bound_lineage(
         str, dict[tuple[str, str, str, Decimal], Observation | _CompilationSeriesCell]
     ] = {}
     for observation in context.observations.values():
+        if observation_filter is not None and not observation_filter(observation):
+            continue
         origin = context.origins.get(observation.observation_id)
         if not _is_janaf_compilation_observation(observation, origin):
             continue

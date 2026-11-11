@@ -9,6 +9,7 @@ derived from resolve_backend.
 
 from __future__ import annotations
 
+import difflib
 import json
 import math
 import os
@@ -1299,6 +1300,95 @@ def no_headline_rail_reason(
     if quantity in KINETIC_YIELD_QUANTITIES:
         return "non_alkali_kinetic"
     return f"no_headline_rail:{quantity.value}"
+
+
+class SpeciesFilterError(ValueError):
+    """Base class for invalid species filters supplied to the scorer."""
+
+
+class UnknownSpeciesFilterError(SpeciesFilterError):
+    def __init__(self, query: str, near_matches: Sequence[str]) -> None:
+        self.query = query
+        self.near_matches = tuple(near_matches)
+        suggestions = ", ".join(self.near_matches) or "none"
+        super().__init__(
+            f"unknown species filter {query!r}; near matches: {suggestions}"
+        )
+
+
+class AmbiguousSpeciesFilterError(SpeciesFilterError):
+    def __init__(self, query: str, matches: Sequence[str]) -> None:
+        self.query = query
+        self.matches = tuple(matches)
+        candidates = ", ".join(self.matches)
+        super().__init__(
+            f"ambiguous species filter {query!r}; matching stored formulas: {candidates}"
+        )
+
+
+def normalize_species_filters(
+    context: ScoreContext, queries: Sequence[str] | None
+) -> tuple[str, ...]:
+    """Resolve query spellings against identity formulas without parsing them.
+
+    Queries are trimmed, exact stored spelling wins, and case-insensitive
+    spelling is accepted only when it names one stored formula. Results are
+    sorted and unique. Phase is a separate identity axis, so ``Mn`` also
+    selects gas-phase Mn while never matching ``MnO``.
+    """
+
+    if not queries:
+        return ()
+    formulas = sorted(
+        {
+            observation.identity.species.formula
+            for observation in context.observations.values()
+            if isinstance(observation.identity, Identity)
+            and observation.identity.species is not None
+        }
+    )
+    formulas_by_fold: dict[str, list[str]] = {}
+    for formula in formulas:
+        formulas_by_fold.setdefault(formula.casefold(), []).append(formula)
+
+    resolved: set[str] = set()
+    for raw_query in queries:
+        query = raw_query.strip()
+        if query in formulas:
+            resolved.add(query)
+            continue
+        if not query:
+            raise UnknownSpeciesFilterError(query, formulas[:5])
+        folded_matches = formulas_by_fold.get(query.casefold(), [])
+        if len(folded_matches) == 1:
+            resolved.add(folded_matches[0])
+            continue
+        if len(folded_matches) > 1:
+            raise AmbiguousSpeciesFilterError(query, folded_matches)
+        ranked = sorted(
+            formulas,
+            key=lambda formula: (
+                -difflib.SequenceMatcher(
+                    None, query.casefold(), formula.casefold()
+                ).ratio(),
+                formula,
+            ),
+        )
+        raise UnknownSpeciesFilterError(query, ranked[:5])
+    return tuple(sorted(resolved))
+
+
+def _matches_species_filter(
+    observation: Observation, species_formulas: set[str]
+) -> bool:
+    if not species_formulas:
+        return True
+    identity = observation.identity
+    return (
+        isinstance(identity, Identity)
+        and identity.species is not None
+        and identity.species.formula in species_formulas
+    )
 
 
 # Spellings written by residual_key. Readers parse them with residual_key_slots.
@@ -11963,6 +12053,8 @@ def _hashimoto_residue_prediction(
     reference: Observation,
     engine: Engine,
     cache: dict[tuple[str, Engine], Mapping[str, object]],
+    *,
+    selected_experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
@@ -12024,6 +12116,7 @@ def _hashimoto_residue_prediction(
                 preform_dimensions_mm=geometry,
                 code_revision=revision,
                 engine=engine.value,
+                selected_experiment_ids=selected_experiment_ids,
             )
             cache[cache_key] = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
@@ -12275,6 +12368,8 @@ def _sossi_residue_prediction(
     reference: Observation,
     engine: Engine,
     cache: dict[tuple[str, Engine], Mapping[str, object]],
+    *,
+    selected_experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
     """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
     channel = ENGINE_CHANNELS[engine]
@@ -12364,6 +12459,7 @@ def _sossi_residue_prediction(
                 buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
                 code_revision=revision,
                 engine=engine.value,
+                selected_experiment_ids=selected_experiment_ids,
             )
             cache[cache_key] = {
                 row.experiment_id: row for row in rows
@@ -14279,6 +14375,7 @@ def _score_store_with_decisions(
     *,
     engines: Sequence[Engine] | None = None,
     rail: Rail | None = None,
+    species_formulas: Sequence[str] = (),
     work_id: str | None = None,
     limit: int | None = None,
     include_diagnostics: bool = True,
@@ -14331,22 +14428,54 @@ def _score_store_with_decisions(
             elif obs.source_id == work_id:
                 filtered.append(obs)
         refs = filtered
-    if rail is not None:
+    if rail is not None or species_formulas:
+        selected_species = set(species_formulas)
         kept: list[Observation] = []
         for obs in refs:
-            quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
+            if selected_species and not _matches_species_filter(
+                obs, selected_species
+            ):
+                continue
+            identity = obs.identity if isinstance(obs.identity, Identity) else None
+            quantity = quantity_token(identity) if identity is not None else None
             formula = (
-                obs.identity.species.formula
-                if isinstance(obs.identity, Identity)
-                and obs.identity.species is not None
+                identity.species.formula
+                if identity is not None and identity.species is not None
                 else ""
             )
-            if rail_for_quantity(quantity, species_formula=formula) is rail:
-                kept.append(obs)
+            if rail is not None and rail_for_quantity(
+                quantity, species_formula=formula
+            ) is not rail:
+                continue
+            kept.append(obs)
         refs = kept
     refs.sort(key=lambda o: o.observation_id)
     if limit is not None:
         refs = refs[: int(limit)]
+    hashimoto_experiment_ids = frozenset(
+        obs.experiment_id
+        for obs in refs
+        if obs.source_id == _HASHIMOTO_SOURCE_ID
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity)
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    sossi_experiment_ids = frozenset(
+        obs.experiment_id.rsplit("::", 1)[-1]
+        for obs in refs
+        if obs.source_id == _SOSSI_SOURCE_ID
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity)
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    if _stream is not None:
+        _stream.selected_reference_count = len(refs)
+        if species_formulas:
+            print(
+                f"species references selected={len(refs)} "
+                f"formulas={','.join(species_formulas)}",
+                flush=True,
+            )
     from simulator.battery.compilation_tier import (
         _compilation_series_point_count,
         _iter_compilation_series_cells,
@@ -14494,6 +14623,7 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                                selected_experiment_ids=hashimoto_experiment_ids,
                             )
                         if (
                             predict is None
@@ -14507,6 +14637,7 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                                selected_experiment_ids=sossi_experiment_ids,
                             )
                         if (
                             predict is None
@@ -14629,6 +14760,7 @@ def _score_store_to_jsonl(
     root: Path | None = None,
     engines: Sequence[Engine] | None = None,
     rail: Rail | None = None,
+    species_formulas: Sequence[str] = (),
     work_id: str | None = None,
     limit: int | None = None,
     include_diagnostics: bool = True,
@@ -14649,6 +14781,7 @@ def _score_store_to_jsonl(
             context,
             engines=engines,
             rail=rail,
+            species_formulas=species_formulas,
             work_id=work_id,
             limit=limit,
             include_diagnostics=include_diagnostics,
@@ -14663,6 +14796,7 @@ def _score_store_to_jsonl(
             tier_band_values=dict(stream.tier_band_values),
             aggregate=stream.report_aggregate,
             static_refusals=stream.static_refusals,
+            selected_reference_count=stream.selected_reference_count,
         )
     finally:
         stream.close()
@@ -14930,6 +15064,7 @@ class _ResidualReportMetadata:
     tier_band_values: Mapping[tuple[str, str, str, str, str, str], set[str]]
     aggregate: _ScorePayloadAccumulator | None = None
     static_refusals: Sequence[Mapping[str, object]] = ()
+    selected_reference_count: int = 0
 
 
 class _ResidualJsonlRows:
@@ -19668,6 +19803,7 @@ class _ResidualJsonlStream:
         ] = defaultdict(set)
         self.report_aggregate: _ScorePayloadAccumulator | None = None
         self.count = 0
+        self.selected_reference_count = 0
         self._last_flush = time.monotonic()
 
     @property

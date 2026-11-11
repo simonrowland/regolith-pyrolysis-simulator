@@ -327,8 +327,8 @@ def test_compilation_comparison_writer_filters_observations(
     )
 
     formulas = score_mod.normalize_species_filters(context, ["Mn"])
-    observation_filter = lambda observation: score_mod._observation_matches_species_filter(
-        observation, formulas
+    observation_filter = lambda observation: score_mod._matches_species_filter(
+        observation, set(formulas)
     )
     assert compilation_tier._write_compilation_comparisons_jsonl(
         context,
