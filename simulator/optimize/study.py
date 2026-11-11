@@ -434,6 +434,9 @@ class StudyResult:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "artifacts", MappingProxyType(dict(self.artifacts)))
+        # Publication order is sampling order even if a caller handed over
+        # the rank-sorted front. Winner stays the separate rank-key field.
+        object.__setattr__(self, "pareto", _publish_pareto(self.pareto))
 
 
 STUDY_EVENTS_NAME = "study.events.jsonl"
@@ -473,7 +476,7 @@ class StudyReplayResult:
         object.__setattr__(self, "manifest", MappingProxyType(dict(self.manifest)))
         object.__setattr__(self, "records", tuple(self.records))
         object.__setattr__(self, "leaderboard", tuple(self.leaderboard))
-        object.__setattr__(self, "pareto", tuple(self.pareto))
+        object.__setattr__(self, "pareto", _publish_pareto(self.pareto))
         object.__setattr__(self, "pending_candidates", tuple(self.pending_candidates))
         object.__setattr__(self, "warnings", tuple(self.warnings))
         object.__setattr__(self, "strategy_state", MappingProxyType(dict(self.strategy_state)))
@@ -971,15 +974,7 @@ def run(
     failure_counts = _failure_counts(records)
     feasible = tuple(record for record in records if record.feasible)
     explore_leaderboard = tuple(sorted(feasible, key=lambda row: _rank_key(row, definitions)))
-    explore_pareto = pareto_front(
-        feasible,
-        definitions,
-        objective_getter=lambda row: row.objectives,
-        score_getter=lambda row: _record_objective_scores(row, definitions),
-    )
-    explore_pareto_ranked = tuple(
-        sorted(explore_pareto, key=lambda row: _rank_key(row, definitions))
-    )
+    explore_selection = _select_pareto(feasible, definitions)
     non_finite_count = failure_counts.get(FailureCategory.NON_FINITE_PAYLOAD.value, 0)
     if not records:
         _write_empty_artifacts(
@@ -1014,7 +1009,7 @@ def run(
             "all candidates failed with non_finite_payload; "
             f"failure_counts={dict(failure_counts)}"
         )
-    if not explore_pareto_ranked:
+    if explore_selection.winner is None:
         if _no_feasible_config_failure(failure_counts, len(records)):
             _write_empty_artifacts(
                 out,
@@ -1087,7 +1082,9 @@ def run(
         certification = _run_exact_certification(
             _two_phase_certification_pool(
                 leaderboard=explore_leaderboard,
-                pareto=explore_pareto_ranked,
+                # Truncation is selection, so extras stay in rank order.
+                # The certified front is published in sampling order below.
+                pareto=explore_selection.ranked,
                 top_k=two_phase.top_k,
                 include_pareto_extras=len(definitions) > 1,
             ),
@@ -1108,15 +1105,15 @@ def run(
             requested_top_k=two_phase.top_k,
         )
         leaderboard = certification.leaderboard
-        pareto_ranked = certification.pareto
+        pareto = certification.pareto
         winner = certification.winner
         certification_artifact = certification.artifact
         result_status = certification.status
         result_reason = certification.reason
     else:
         leaderboard = explore_leaderboard
-        pareto_ranked = explore_pareto_ranked
-        winner = pareto_ranked[0]
+        pareto = explore_selection.published
+        winner = explore_selection.winner
 
     artifacts = _write_artifacts(
         out,
@@ -1124,7 +1121,7 @@ def run(
         feedstock=feedstock,
         fidelity=fidelity,
         definitions=definitions,
-        pareto=pareto_ranked,
+        pareto=pareto,
         leaderboard=leaderboard,
         winner=winner,
         schema=active_schema,
@@ -1162,7 +1159,7 @@ def run(
         artifacts=artifacts,
         records=tuple(sorted(records, key=_sampling_order_key)),
         leaderboard=leaderboard,
-        pareto=pareto_ranked,
+        pareto=pareto,
         winner=winner,
         status=result_status,
         reason=result_reason,
@@ -1316,18 +1313,8 @@ def run_certify(
         if eligible
         else (record,)
     )
-    pareto_ranked = tuple(
-        sorted(
-            pareto_front(
-                eligible,
-                definitions,
-                objective_getter=lambda row: row.objectives,
-                score_getter=lambda row: _record_objective_scores(row, definitions),
-            ),
-            key=lambda row: _rank_key(row, definitions),
-        )
-    )
-    winner = pareto_ranked[0] if pareto_ranked else None
+    selection = _select_pareto(eligible, definitions)
+    winner = selection.winner
     result_status = (
         COMPLETED_STATUS if winner is not None else COMPLETED_NO_FEASIBLE_WINNER_STATUS
     )
@@ -1337,7 +1324,7 @@ def run_certify(
         feedstock=feedstock,
         fidelity=fidelity,
         definitions=definitions,
-        pareto=pareto_ranked,
+        pareto=selection.published,
         leaderboard=leaderboard,
         winner=winner,
         schema=active_schema,
@@ -1359,7 +1346,7 @@ def run_certify(
         artifacts=artifacts,
         records=(record,),
         leaderboard=leaderboard,
-        pareto=pareto_ranked,
+        pareto=selection.published,
         winner=winner,
         status=result_status,
         reason=result_status,
@@ -1914,17 +1901,7 @@ def _load_study_journal(
         if feasible
         else tuple(sorted(records, key=_sampling_order_key))
     )
-    pareto = tuple(
-        sorted(
-            pareto_front(
-                feasible,
-                definitions,
-                objective_getter=lambda row: row.objectives,
-                score_getter=lambda row: _record_objective_scores(row, definitions),
-            ),
-            key=lambda row: _rank_key(row, definitions),
-        )
-    )
+    pareto = _select_pareto(feasible, definitions).published
     replay_state = _strategy_replay_state(active_strategy, *staged_strategies)
     stored_state = _load_latest_strategy_state(root / STRATEGY_STATE_NAME)
     if stored_state is not None and stored_state != replay_state:
@@ -2790,14 +2767,8 @@ def _run_exact_certification(
             reason=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
         )
     leaderboard = tuple(sorted(certified_feasible, key=lambda row: _rank_key(row, definitions)))
-    pareto = pareto_front(
-        certified_feasible,
-        definitions,
-        objective_getter=lambda row: row.objectives,
-        score_getter=lambda row: _record_objective_scores(row, definitions),
-    )
-    pareto_ranked = tuple(sorted(pareto, key=lambda row: _rank_key(row, definitions)))
-    if not pareto_ranked:
+    selection = _select_pareto(certified_feasible, definitions)
+    if selection.winner is None:
         return _CertificationPassResult(
             leaderboard=leaderboard,
             pareto=(),
@@ -2806,11 +2777,10 @@ def _run_exact_certification(
             status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
             reason=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
         )
-    winner = pareto_ranked[0]
     return _CertificationPassResult(
         leaderboard=leaderboard,
-        pareto=pareto_ranked,
-        winner=winner,
+        pareto=selection.published,
+        winner=selection.winner,
         artifact=artifact,
     )
 
@@ -4897,18 +4867,74 @@ def _json_dump_value(value: Any) -> str:
 
 
 def _sampling_order_key(record: StudyRecord) -> tuple[int, str]:
-    """Ask order for an exact objective tie.
+    """Ask order: trial index, then candidate id.
 
     Optuna stores ``trial_number``. Screen, random, and staged zero-pad the
     same index into ``candidate_id``. ``cache_key`` is a hash of the spec, so
     it is not an order: a later sample can sort first, and one spec byte that
     differs between machines reshuffles which tied point wins.
+
+    This key is the tie-break inside ``_rank_key`` and the only order in
+    which a Pareto front is published.
     """
 
     trial = record.search_provenance.get("trial_number")
     if isinstance(trial, bool) or not isinstance(trial, int):
         trial = 0
     return (trial, record.candidate_id)
+
+
+def _publish_pareto(members: Sequence[StudyRecord]) -> tuple[StudyRecord, ...]:
+    """Sampling-order publication of one Pareto set.
+
+    INVARIANT: every published Pareto sequence is this order. That covers
+    ``StudyResult.pareto``, ``StudyReplayResult.pareto``, and ``pareto.json``
+    rows from the study loop, replay, certify, two-phase certification, and
+    the aborted-cache writer. The winner is the ``_rank_key`` minimum of the
+    same set, chosen separately. Objective rank, completion order, and
+    ``cache_key`` do not reorder the published sequence.
+    """
+
+    return tuple(sorted(members, key=_sampling_order_key))
+
+
+@dataclass(frozen=True)
+class _ParetoSelection:
+    """One front shared by every study path.
+
+    ``published`` is sampling order. ``ranked`` and ``winner`` use
+    ``_rank_key``. Certification-pool truncation is selection, so it
+    consumes ``ranked``. Publication consumes ``published``.
+    """
+
+    published: tuple[StudyRecord, ...]
+    ranked: tuple[StudyRecord, ...]
+    winner: StudyRecord | None
+
+
+def _select_pareto(
+    feasible: Sequence[StudyRecord],
+    definitions: Sequence[ObjectiveDefinition],
+) -> _ParetoSelection:
+    """Build the feasible front once, then split winner from publication.
+
+    Infeasible rows are dropped here so a caller that still holds the full
+    arrival batch cannot put a refused point on the published front.
+    """
+
+    feasible_rows = tuple(record for record in feasible if record.feasible)
+    front = pareto_front(
+        feasible_rows,
+        definitions,
+        objective_getter=lambda row: row.objectives,
+        score_getter=lambda row: _record_objective_scores(row, definitions),
+    )
+    ranked = tuple(sorted(front, key=lambda row: _rank_key(row, definitions)))
+    return _ParetoSelection(
+        published=_publish_pareto(front),
+        ranked=ranked,
+        winner=ranked[0] if ranked else None,
+    )
 
 
 def _rank_key(
@@ -6088,24 +6114,14 @@ def _write_aborted_artifacts_from_cache(
         if feasible
         else tuple(sorted(records, key=_sampling_order_key))
     )
-    pareto_ranked = tuple(
-        sorted(
-            pareto_front(
-                feasible,
-                definitions,
-                objective_getter=lambda row: row.objectives,
-                score_getter=lambda row: _record_objective_scores(row, definitions),
-            ),
-            key=lambda row: _rank_key(row, definitions),
-        )
-    )
+    published_pareto = _select_pareto(feasible, definitions).published
     _write_artifacts(
         out,
         profile=profile,
         feedstock=feedstock,
         fidelity=fidelity,
         definitions=definitions,
-        pareto=pareto_ranked,
+        pareto=published_pareto,
         leaderboard=leaderboard,
         winner=None,
         schema=schema,
@@ -6351,7 +6367,10 @@ def _pareto_payload(
         "feedstock": feedstock,
         "fidelity": fidelity,
         "objectives": [_definition_payload(definition) for definition in definitions],
-        "pareto": [_record_payload(record, schema, profile) for record in pareto],
+        "pareto": [
+            _record_payload(record, schema, profile)
+            for record in _publish_pareto(pareto)
+        ],
         "profile": profile_id(profile),
         "selection_rule": WINNER_SELECTION_RULE,
         "status": (

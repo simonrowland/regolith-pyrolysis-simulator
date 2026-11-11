@@ -4,6 +4,7 @@ import copy
 import csv
 from dataclasses import is_dataclass, fields, replace
 import hashlib
+import itertools
 import json
 import logging
 import math
@@ -3879,6 +3880,340 @@ def test_parallel_composition_target_winner_ignores_completion_order(
     assert [record.candidate_id for record in reversed_result.pareto] == priced_order
     assert [record.candidate_id for record in reference.records] == record_order
     assert [record.candidate_id for record in reversed_result.records] == record_order
+    assert (tmp_path / "reference" / "pareto.json").read_bytes() == (
+        tmp_path / "reversed" / "pareto.json"
+    ).read_bytes()
+
+
+# Non-tied fronts. Rank order and sampling order disagree, so a tie-only
+# regression cannot see a Pareto list that is still sorted by `_rank_key`.
+# `trial` is None when the strategy did not store one; candidate id is then
+# the whole sampling key. Dominated and infeasible rows must stay off the front.
+_PARETO_PUBLICATION_CASES = {
+    "reviewer_non_tied": {
+        "rows": (
+            ("s000", 10.0, 1.0, None, True),
+            ("s001", 20.0, 5.0, None, True),
+            ("s002", 1.0, 50.0, None, True),
+            ("s-bad", 100.0, 0.0, None, False),
+        ),
+        "published": ("s000", "s001"),
+        "ranked": ("s001", "s000"),
+        "winner": "s001",
+    },
+    "trial_before_candidate_id": {
+        "rows": (
+            ("z-first", 10.0, 1.0, 0, True),
+            ("a-second", 30.0, 9.0, 1, True),
+            ("m-third", 20.0, 4.0, 2, True),
+            ("q-dominated", 5.0, 40.0, 3, True),
+            ("b-infeasible", 80.0, 0.1, 4, False),
+        ),
+        "published": ("z-first", "a-second", "m-third"),
+        "ranked": ("a-second", "m-third", "z-first"),
+        "winner": "a-second",
+    },
+}
+
+
+def _pareto_publication_record(
+    candidate_id: str,
+    oxygen: float,
+    energy: float,
+    trial: int | None,
+    feasible: bool,
+) -> study.StudyRecord:
+    provenance: dict[str, Any] = {}
+    if trial is not None:
+        provenance["trial_number"] = trial
+    return study.StudyRecord(
+        candidate_id=candidate_id,
+        patch=RecipePatch({}),
+        feasible=feasible,
+        status="ok" if feasible else "infeasible",
+        objectives={
+            "oxygen_kg": oxygen,
+            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: energy,
+        },
+        feasibility_margins={},
+        cache_key=f"cache-{candidate_id}",
+        product_summary={
+            "furnace_amortization_status": "available",
+            "furnace_amortization_batch_cost_equivalents": 0.0,
+        },
+        search_provenance=provenance,
+    )
+
+
+def _pareto_publication_case(
+    case_name: str,
+) -> tuple[tuple[study.StudyRecord, ...], tuple[str, ...], tuple[str, ...], str]:
+    case = _PARETO_PUBLICATION_CASES[case_name]
+    records = tuple(_pareto_publication_record(*row) for row in case["rows"])
+    return records, case["published"], case["ranked"], case["winner"]
+
+
+def _published_ids_for_sink(
+    sink: str,
+    records: tuple[study.StudyRecord, ...],
+    *,
+    definitions: list[study.ObjectiveDefinition],
+    out: Path,
+) -> list[str]:
+    """One publication boundary. File sinks receive whatever order `records` has."""
+
+    if sink == "select_pareto":
+        return [
+            record.candidate_id
+            for record in study._select_pareto(records, definitions).published
+        ]
+    if sink == "pareto_payload":
+        payload = study._pareto_payload(
+            PROFILE,
+            FEEDSTOCK,
+            "internal-analytical",
+            definitions,
+            records,
+            None,
+            RecipeSchema(),
+        )
+        return [row["candidate_id"] for row in payload["pareto"]]
+    if sink == "study_result":
+        result = study.StudyResult(
+            out_dir=out,
+            store_path=out / "cache.sqlite",
+            artifacts={},
+            records=records,
+            leaderboard=records,
+            pareto=records,
+            winner=None,
+        )
+        return [record.candidate_id for record in result.pareto]
+    if sink == "replay_result":
+        replay = study.StudyReplayResult(
+            run_dir=out,
+            manifest={},
+            strategy=_FixedCandidateStrategy(()),
+            records=records,
+            leaderboard=records,
+            pareto=records,
+        )
+        return [record.candidate_id for record in replay.pareto]
+    if sink == "write_artifacts":
+        out.mkdir(parents=True, exist_ok=True)
+        study._write_artifacts(
+            out,
+            profile=PROFILE,
+            feedstock=FEEDSTOCK,
+            fidelity="internal-analytical",
+            definitions=definitions,
+            pareto=records,
+            leaderboard=records,
+            winner=None,
+            schema=RecipeSchema(),
+            failure_counts={},
+            strategy_name="fixed",
+        )
+        payload = json.loads((out / "pareto.json").read_text(encoding="utf-8"))
+        return [row["candidate_id"] for row in payload["pareto"]]
+    if sink == "aborted_cache":
+        out.mkdir(parents=True, exist_ok=True)
+        wrote = study._write_aborted_artifacts_from_cache(
+            out,
+            profile=PROFILE,
+            feedstock=FEEDSTOCK,
+            fidelity="internal-analytical",
+            definitions=definitions,
+            fallback_records=records,
+            schema=RecipeSchema(),
+            failure_counts={},
+            strategy_name="fixed",
+        )
+        assert wrote is True
+        payload = json.loads((out / "pareto.json").read_text(encoding="utf-8"))
+        return [row["candidate_id"] for row in payload["pareto"]]
+    raise AssertionError(f"unknown Pareto publication sink {sink}")
+
+
+@pytest.mark.parametrize("case_name", tuple(_PARETO_PUBLICATION_CASES))
+@pytest.mark.parametrize(
+    "sink",
+    (
+        "select_pareto",
+        "pareto_payload",
+        "study_result",
+        "replay_result",
+        "write_artifacts",
+        "aborted_cache",
+    ),
+)
+def test_pareto_publication_is_sampling_order_on_every_path(
+    case_name: str,
+    sink: str,
+    tmp_path: Path,
+) -> None:
+    """Published Pareto order is sampling order on every sink.
+
+    The winner stays the `_rank_key` minimum. Arrival order, including the
+    objective-rank order a caller might hand a sink, must not leak out.
+    `select_pareto` and the aborted-cache writer also drop dominated and
+    infeasible rows. The other sinks publish the set they are given; those
+    calls pass only the front, in every arrival permutation and in rank order.
+    """
+
+    records, published, ranked, winner = _pareto_publication_case(case_name)
+    assert published != ranked
+    definitions = study.objective_definitions(PROFILE)
+    by_id = {record.candidate_id: record for record in records}
+    front = tuple(by_id[candidate_id] for candidate_id in published)
+    rank_ordered_front = tuple(by_id[candidate_id] for candidate_id in ranked)
+    filters_membership = sink in {"select_pareto", "aborted_cache"}
+    if sink == "select_pareto":
+        # Every arrival order of the full batch, including dominated and
+        # infeasible rows. This is the chokepoint the other sinks publish.
+        arrivals = tuple(itertools.permutations(records))
+    elif sink == "aborted_cache":
+        # Same selector as select_pareto, then pareto.json. The distinguishing
+        # arrivals are the reverse batch, objective rank, and rank-then-rest.
+        rest = tuple(record for record in records if record.candidate_id not in published)
+        arrivals = (
+            tuple(reversed(records)),
+            tuple(sorted(records, key=lambda row: study._rank_key(row, definitions))),
+            rank_ordered_front + rest,
+        )
+    else:
+        arrivals = tuple(itertools.permutations(front))
+    checked_rank_order = False
+    for index, arrival in enumerate(arrivals):
+        ids = _published_ids_for_sink(
+            sink,
+            arrival,
+            definitions=definitions,
+            out=tmp_path / f"{case_name}-{sink}-{index}",
+        )
+        assert ids == list(published)
+        if arrival == rank_ordered_front:
+            checked_rank_order = True
+    if not filters_membership:
+        assert checked_rank_order
+        # The reviewer's counterexample, handed over already sorted by objective.
+        ids = _published_ids_for_sink(
+            sink,
+            rank_ordered_front,
+            definitions=definitions,
+            out=tmp_path / f"{case_name}-{sink}-ranked",
+        )
+        assert ids == list(published)
+        assert ids != list(ranked)
+    else:
+        selection = study._select_pareto(rank_ordered_front, definitions)
+        assert selection.winner is not None
+        assert selection.winner.candidate_id == winner
+        assert [record.candidate_id for record in selection.ranked] == list(ranked)
+        assert [record.candidate_id for record in selection.published] == list(published)
+
+
+def _non_tied_front_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    """s000 oxygen 10 energy 1, s001 oxygen 20 energy 5, s002 dominated."""
+
+    oxygen, energy = {
+        0: (10.0, 1.0),
+        1: (20.0, 5.0),
+        2: (1.0, 50.0),
+    }[_sequence(candidate_id)]
+    spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", oxygen, "kg", ordinal=0),
+                ObjectiveValue("energy_kWh", "minimize", energy, "kWh", ordinal=1),
+            )
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=_run_reference(
+            status="ok",
+            trace={
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+            },
+            product_summary={
+                "oxygen_kg": oxygen,
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                },
+            },
+            backend_status="ok",
+            backend_authoritative=True,
+        ),
+    )
+
+
+def test_non_tied_pareto_publication_ignores_completion_order(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """A better later sample wins, and the front is still published in ask order.
+
+    Serial ask order is the reference. Reversing each evaluation batch is the
+    completion-order perturbation. Two-phase certification and journal replay
+    publish that same id order. Objective rank would emit the winner first.
+    """
+
+    run_kwargs = dict(
+        feedstock=FEEDSTOCK,
+        strategy="random",
+        fidelity="internal-analytical",
+        parallel=2,
+        budget=3,
+        seed=7,
+        evaluator=_non_tied_front_evaluator,
+    )
+    reference = study.run(PROFILE, out_dir=tmp_path / "reference", **run_kwargs)
+    original = study._evaluate_candidates
+
+    def reversed_completion(*args: Any, **kwargs: Any):
+        completed, prefix_evals, pool = original(*args, **kwargs)
+        return tuple(reversed(completed)), prefix_evals, pool
+
+    monkeypatch.setattr(study, "_evaluate_candidates", reversed_completion)
+    reversed_result = study.run(PROFILE, out_dir=tmp_path / "reversed", **run_kwargs)
+    monkeypatch.setattr(study, "_evaluate_candidates", original)
+    certified = study.run(
+        PROFILE,
+        out_dir=tmp_path / "certified",
+        two_phase_certify={"enabled": True, "top_k": 1},
+        **run_kwargs,
+    )
+    replay = study.replay_study(tmp_path / "reference")
+
+    sampling_order = ["random-7-000000", "random-7-000001"]
+    rank_order = ["random-7-000001", "random-7-000000"]
+    assert sampling_order != rank_order
+    assert reference.winner is not None
+    assert reference.winner.candidate_id == "random-7-000001"
+    assert [record.candidate_id for record in reference.leaderboard[:2]] == rank_order
+    for result in (reference, reversed_result, certified):
+        assert result.winner is not None
+        assert result.winner.candidate_id == reference.winner.candidate_id
+        assert [record.candidate_id for record in result.pareto] == sampling_order
+        payload = json.loads((result.out_dir / "pareto.json").read_text(encoding="utf-8"))
+        assert [row["candidate_id"] for row in payload["pareto"]] == sampling_order
+        assert payload["winner_candidate_id"] == "random-7-000001"
+    assert [record.candidate_id for record in replay.pareto] == sampling_order
     assert (tmp_path / "reference" / "pareto.json").read_bytes() == (
         tmp_path / "reversed" / "pareto.json"
     ).read_bytes()
