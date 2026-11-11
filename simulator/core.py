@@ -645,6 +645,8 @@ from simulator.state import (
     Atmosphere,
     BatchRecord,
     CampaignPhase,
+    EVAPORATION_ROUTE_PHASES,
+    MRE_ANODE_OXYGEN_PHASES,
     CondensationStage,
     CondensationTrain,
     DecisionPoint,
@@ -15814,8 +15816,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._shuttle_metal_this_hr = 0.0
             self._shuttle_phase = ''
 
-        if self.melt.campaign in (CampaignPhase.C5,
-                                   CampaignPhase.MRE_BASELINE):
+        if self.melt.campaign in MRE_ANODE_OXYGEN_PHASES:
             mre_O2_kg = self._step_mre(sample_time_h=sample_time_h)
             self._mre_anode_O2_kg_this_hr = mre_O2_kg
             mre_energy_kWh = self._mre_energy_this_hr
@@ -15847,12 +15848,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.melt.campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             self._step_c7_ca_aluminothermic()
 
-        evaporation_campaign = self.melt.campaign in (
-            CampaignPhase.C0, CampaignPhase.C0B,
-            CampaignPhase.C2A, CampaignPhase.C2A_STAGED,
-            CampaignPhase.C2B, CampaignPhase.C3_K,
-            CampaignPhase.C3_NA, CampaignPhase.C4,
-        )
+        evaporation_campaign = self.melt.campaign in EVAPORATION_ROUTE_PHASES
         self._apply_fe_redox_respeciation()
         self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
         self._refresh_oxygen_reservoir_transport_pO2_for_vapor()

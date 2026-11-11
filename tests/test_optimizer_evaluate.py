@@ -23,7 +23,10 @@ from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
-from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.campaigns import (
+    CampaignPressureSetpointRefusal,
+    campaign_evolves_terminal_oxygen,
+)
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     ChemistryKernel,
@@ -2579,7 +2582,8 @@ _SCORED_RESULT_BRANCHES = (
     "out_of_domain_scored",
 )
 # Claim-distinct setpoint campaigns this stub run admits. Claims below are
-# read from setpoints ``products``, not from the production claim helper.
+# the setpoints ``products`` keys plus ``O2`` when the hour-step route
+# credits a terminal oxygen account. The production claim helper is not read.
 _OVERLAY_CAMPAIGNS = ("C0", "C2A_continuous", "C2B")
 _GLASS_CLAIM_KEY = "SiO2_glass"
 _OXYGEN_CLAIM_KEY = "O2"
@@ -2594,7 +2598,10 @@ _DECLARED_OBJECTIVE_ROWS = (
 def _setpoint_product_keys(campaign: str) -> frozenset[str]:
     loaded = yaml.safe_load((DEFAULT_DATA_DIR / "setpoints.yaml").read_text())
     products = loaded["campaigns"][campaign].get("products") or {}
-    return frozenset(str(key) for key in products)
+    keys = frozenset(str(key) for key in products)
+    if campaign_evolves_terminal_oxygen(campaign):
+        return keys | frozenset({"O2"})
+    return keys
 
 
 def _literal_scored_metrics_and_note(

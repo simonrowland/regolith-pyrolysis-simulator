@@ -2917,8 +2917,9 @@ def test_default_profile_leaderboard_uses_scoped_energy_metric_and_legacy_alias(
         expected_feedstock=FEEDSTOCK,
     )
     definitions = study.objective_definitions(profile)
-    # C0 claims volatiles and native_Fe, not O2, so oxygen_kg is withheld.
+    # C0 claims oxygen because its evaporation route credits terminal O2.
     assert [definition.metric for definition in definitions] == [
+        "oxygen_kg",
         ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
         "duration_h",
     ]
@@ -2951,8 +2952,10 @@ def test_default_profile_leaderboard_uses_scoped_energy_metric_and_legacy_alias(
         reader = csv.DictReader(handle)
         row = next(reader)
         assert reader.fieldnames is not None
+        assert "oxygen_kg" in reader.fieldnames
         assert ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC in reader.fieldnames
         assert LEGACY_ENERGY_KWH_METRIC not in reader.fieldnames
+    assert float(row["oxygen_kg"]) == pytest.approx(1.0)
     assert float(row[ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC]) == pytest.approx(2.0)
 
 

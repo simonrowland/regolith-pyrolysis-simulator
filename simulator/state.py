@@ -385,6 +385,34 @@ class CampaignPhase(Enum):
     MRE_BASELINE = auto()     # Standard MRE baseline (root branch alt)
     COMPLETE = auto()         # Batch finished
 
+
+# Hour-step routes that credit free O2 into a terminal oxygen account.
+# ``core._step_one_hour`` and the optimizer product-claim gate both read
+# these sets, so a campaign cannot "not claim" oxygen while its own route
+# evolves it.
+# Evaporation: oxide reduction's O2 coproduct (SiO2 -> SiO + 1/2 O2, and
+# metal oxide -> metal + O2) is credited to overhead gas; OVERHEAD_BLEED
+# moves it into the melt-offgas terminal bins. That is the disproportionation
+# by-product accumulated at the terminal.
+# Electrolysis: anode O2 is credited to terminal.oxygen_mre_anode_stored.
+# C6 thermite and C7 aluminothermy leave the oxygen in the oxide product.
+# They are not in either set.
+EVAPORATION_ROUTE_PHASES = frozenset({
+    CampaignPhase.C0,
+    CampaignPhase.C0B,
+    CampaignPhase.C2A,
+    CampaignPhase.C2A_STAGED,
+    CampaignPhase.C2B,
+    CampaignPhase.C3_K,
+    CampaignPhase.C3_NA,
+    CampaignPhase.C4,
+})
+MRE_ANODE_OXYGEN_PHASES = frozenset({
+    CampaignPhase.C5,
+    CampaignPhase.MRE_BASELINE,
+})
+TERMINAL_OXYGEN_ROUTE_PHASES = EVAPORATION_ROUTE_PHASES | MRE_ANODE_OXYGEN_PHASES
+
 class DecisionType(Enum):
     """Decision points where the operator must choose."""
     ROOT_BRANCH = auto()      # Pyrolysis Track vs Standard MRE

@@ -97,9 +97,12 @@ _MASS_OBJECTIVE_METRICS = frozenset(
         "oxygen_vented_kg",
     }
 )
-# INVARIANT: a product objective is scored only when the executed campaign's
-# setpoints ``products`` claim THAT objective's product. The executed campaign
-# is the fidelity overlay on ``profile.run`` (the same value EvalSpec.campaign
+# INVARIANT: a product objective is scored only when the executed campaign
+# claims THAT objective's product. Claim keys are the setpoints ``products``
+# keys plus ``O2`` when the campaign's hour-step routes credit O2 to a
+# terminal account (evaporation coproduct or MRE anode). The products map
+# alone is a hand list and omits that by-product. The executed campaign is
+# the fidelity overlay on ``profile.run`` (the same value EvalSpec.campaign
 # stores). Otherwise the objective is withheld from every scoring path
 # (objective definitions, compute_objectives, strategy metrics, and the study
 # scalar). It is never entered as 0.0. Retained weights stay declared.
@@ -124,9 +127,11 @@ _MASS_OBJECTIVE_METRICS = frozenset(
 # integer. VERSION is train-owned. The landing offer asks the train to bump
 # VERSION, or to carry b-080 in the next release, so pre-fix objective
 # vectors miss. ``_scoring_objective_rows`` does not change the cache key.
-# C0 claims volatiles and native_Fe only. native_Fe is nanophase magnetic
-# separation, not the pyrolysis metal product, so it authorizes no named
-# metal metric and no energy-per-product intensity here.
+# C0's products map is volatiles and native_Fe. native_Fe is nanophase
+# magnetic separation, not the pyrolysis metal product, so it authorizes no
+# named metal metric and no energy-per-product intensity here. C0 still
+# claims ``O2``: its hour step runs the evaporation route, which credits the
+# oxide-reduction coproduct and OVERHEAD_BLEED stores it at the terminal.
 # File load is not an evaluation. The remaining-weight refusal runs only
 # once a fidelity has selected the executed campaign.
 _FINAL_PRODUCT_OBJECTIVE_METRICS = frozenset(
@@ -1504,23 +1509,46 @@ def _campaign_product_claims_by_id() -> Mapping[str, frozenset[str]]:
         for name, cfg in campaigns.items():
             products = cfg.get("products") if isinstance(cfg, Mapping) else None
             if isinstance(products, Mapping):
-                claims[str(name)] = frozenset(str(key) for key in products)
+                keys = frozenset(str(key) for key in products)
             else:
-                claims[str(name)] = frozenset()
+                keys = frozenset()
+            # The products map is the named-product hand list. It omits O2
+            # wherever the hour-step route evolves that by-product to a
+            # terminal account. Union it here; do not invent other keys.
+            claims[str(name)] = keys | _terminal_oxygen_claim(str(name))
     return MappingProxyType(claims)
 
 
-def campaign_product_claim_keys(campaign_id: str | None) -> frozenset[str]:
-    """Product keys declared on ``campaigns.<id>.products`` in setpoints.
+def _terminal_oxygen_claim(campaign_id: str) -> frozenset[str]:
+    """``O2`` when this campaign's routes credit a terminal oxygen account."""
 
-    An absent, blank, or unknown campaign claims nothing. Description text is
-    not consulted.
+    from simulator.campaigns import campaign_evolves_terminal_oxygen
+
+    if campaign_evolves_terminal_oxygen(campaign_id):
+        return frozenset({"O2"})
+    return frozenset()
+
+
+def campaign_product_claim_keys(campaign_id: str | None) -> frozenset[str]:
+    """Product keys the executed campaign claims.
+
+    Setpoint ``products`` keys, plus ``O2`` when the campaign's routes credit
+    a terminal oxygen account. An absent, blank, or unknown campaign claims
+    nothing. A phase name that is not a setpoint key still claims ``O2`` when
+    that phase's route does. Description text is not consulted.
     """
 
     if not isinstance(campaign_id, str) or not campaign_id.strip():
         return frozenset()
-    key = _SETPOINT_CAMPAIGN_ALIASES.get(campaign_id.strip(), campaign_id.strip())
-    return _campaign_product_claims_by_id().get(key, frozenset())
+    token = campaign_id.strip()
+    key = _SETPOINT_CAMPAIGN_ALIASES.get(token, token)
+    found = _campaign_product_claims_by_id().get(key)
+    if found is not None:
+        return found
+    oxygen = _terminal_oxygen_claim(token)
+    if key != token:
+        oxygen = oxygen | _terminal_oxygen_claim(key)
+    return oxygen
 
 
 def _profile_product_claim_keys(profile: Mapping[str, Any]) -> frozenset[str]:

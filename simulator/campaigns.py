@@ -54,6 +54,7 @@ from simulator.state import (
     Atmosphere,
     BatchRecord,
     CampaignPhase,
+    TERMINAL_OXYGEN_ROUTE_PHASES,
     CondensationTrain,
     DecisionPoint,
     DecisionType,
@@ -64,6 +65,24 @@ from simulator.state import (
     clamp_stir_state,
     partial_pressure_exceeds_total,
 )
+
+def campaign_evolves_terminal_oxygen(campaign_id: str) -> bool:
+    """True when this campaign's hour-step routes credit O2 to a terminal account.
+
+    Evaporation campaigns credit the oxide-reduction O2 coproduct, and
+    OVERHEAD_BLEED moves it into the melt-offgas terminal bins. C5 and
+    MRE baseline credit anode O2 to ``terminal.oxygen_mre_anode_stored``.
+    Phase membership is ``TERMINAL_OXYGEN_ROUTE_PHASES``, the same sets
+    ``core._step_one_hour`` runs, resolved by
+    ``CampaignManager._campaign_phases_for_override_key``. C6 thermite and
+    C7 aluminothermy keep the oxygen in the oxide product and return false.
+    """
+
+    if not isinstance(campaign_id, str) or not campaign_id.strip():
+        return False
+    phases = CampaignManager._campaign_phases_for_override_key(campaign_id.strip())
+    return any(phase in TERMINAL_OXYGEN_ROUTE_PHASES for phase in phases)
+
 
 C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
 C2A_STAGED_DEPLETION_YIELD_FLOOR_MOL = 1.0e-12

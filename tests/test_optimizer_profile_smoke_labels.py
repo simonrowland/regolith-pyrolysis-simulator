@@ -1,15 +1,17 @@
 """Campaign product-claim gate for optimizer scoring.
 
-INVARIANT: no product objective is scored unless the executed campaign's
-setpoints ``products`` claim THAT objective's product. The executed campaign
-is the fidelity overlay on ``profile.run`` (EvalSpec.campaign). Otherwise the
-objective is absent from objective definitions, ``compute_objectives``,
-strategy metrics, and the study scalar. It is named in a notice with its
-weight, the reason ``campaign_does_not_claim_product``, and the withheld
-weight fraction. It is never entered as 0.0. Retained weights are not
-renormalized. Description text is not an eligibility input. An absent, blank,
-or unknown campaign claims nothing; a missing run campaign is the ``C0``
-default and still claims no scored product. A composition target is eligible
+INVARIANT: no product objective is scored unless the executed campaign claims
+THAT objective's product. Claim keys are the setpoints ``products`` keys plus
+``O2`` when the campaign's hour-step routes credit O2 to a terminal account.
+The executed campaign is the fidelity overlay on ``profile.run``
+(EvalSpec.campaign). Otherwise the objective is absent from objective
+definitions, ``compute_objectives``, strategy metrics, and the study scalar.
+It is named in a notice with its weight, the reason
+``campaign_does_not_claim_product``, and the withheld weight fraction. It is
+never entered as 0.0. Retained weights are not renormalized. Description text
+is not an eligibility input. An absent, blank, or unknown campaign claims
+nothing. A missing run campaign executes as ``C0``, which claims oxygen and
+does not claim glass, metals, or ceramic. A composition target is eligible
 only for its own pool product. ``captured_products`` requires every extracted
 species. A dynamic ``{species}_kg`` row is that ledger species. It is
 claimed only when ``species`` itself is a products key: ``native_Fe`` does
@@ -32,6 +34,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from simulator.campaigns import campaign_evolves_terminal_oxygen
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.optimize.objective import (
     COMPOSITION_TARGET_METRIC_PREFIX,
@@ -118,6 +121,28 @@ _LITERAL_ALIASES = {
     "C3_K": "C3",
     "C3_NA": "C3",
 }
+# Setpoint ids whose hour-step route credits terminal O2. The products map
+# omits that by-product except on C2A_continuous. C6 thermite and C7
+# aluminothermy keep the oxygen in the oxide and are the complement.
+_TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS = frozenset({
+    "C0",
+    "C0b_p_cleanup",
+    "C2A_continuous",
+    "C2A_staged",
+    "C2B",
+    "C3",
+    "C4",
+    "C5",
+    "mre_baseline",
+})
+_NO_TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS = frozenset({"C6", "C7"})
+_OXYGEN_OBJECTIVE_METRICS = frozenset({
+    "O2_kg",
+    "o2_kg",
+    "oxygen_kg",
+    "oxygen_stored_kg",
+    "oxygen_vented_kg",
+})
 # Intensities. They end in ``_kg`` and are not ledger species. Each one
 # divides by metals_plus_O2.class_total_kg, so the claim is the same combined
 # product as metals_plus_o2_kg: O2 and one of Fe, Mg, Ti. The production
@@ -239,13 +264,48 @@ def _setpoints_product_keys() -> dict[str, frozenset[str]]:
     return claims
 
 
+def _route_claim_keys() -> dict[str, frozenset[str]]:
+    """YAML product keys, plus ``O2`` for campaigns whose route evolves it.
+
+    The oxygen id set is a literal. It must equal the setpoint campaigns
+    whose phases ``campaign_evolves_terminal_oxygen`` accepts, so a second
+    hand list in production cannot drift from the hour-step route.
+    """
+
+    yaml_keys = _setpoints_product_keys()
+    assert set(yaml_keys) == (
+        _TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS | _NO_TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS
+    )
+    claims: dict[str, frozenset[str]] = {}
+    for name, keys in yaml_keys.items():
+        evolves = campaign_evolves_terminal_oxygen(name)
+        if name in _TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS:
+            assert evolves, name
+            claims[name] = keys | frozenset({"O2"})
+        else:
+            assert not evolves, name
+            assert "O2" not in keys, name
+            claims[name] = keys
+    return claims
+
+
 def test_campaign_product_claims_match_setpoints_yaml() -> None:
-    oracle = _setpoints_product_keys()
+    oracle = _route_claim_keys()
     assert oracle, "setpoints campaigns block was not read"
     for campaign_id, keys in oracle.items():
         assert campaign_product_claim_keys(campaign_id) == keys
     for alias, target in _LITERAL_ALIASES.items():
         assert campaign_product_claim_keys(alias) == oracle[target]
+    # Phase names and the short C0b override are not setpoint ids. They claim
+    # oxygen only when that phase's route credits a terminal account. Bare
+    # "MRE" is not a phase and claims nothing. C0b does not inherit the
+    # phosphorus key, which lives on C0b_p_cleanup.
+    for phase_name in ("MRE_BASELINE", "C0B", "C0b", "C2A_STAGED"):
+        assert campaign_evolves_terminal_oxygen(phase_name)
+        assert campaign_product_claim_keys(phase_name) == frozenset({"O2"})
+    assert campaign_product_claim_keys("MRE") == frozenset()
+    assert campaign_evolves_terminal_oxygen("MRE") is False
+    assert campaign_evolves_terminal_oxygen("C7_CA_ALUMINOTHERMIC") is False
     assert campaign_product_claim_keys(None) == frozenset()
     assert campaign_product_claim_keys("") == frozenset()
     assert campaign_product_claim_keys("   ") == frozenset()
@@ -255,9 +315,20 @@ def test_campaign_product_claims_match_setpoints_yaml() -> None:
 def _oracle_claims(campaign_id: str | None) -> frozenset[str]:
     if not isinstance(campaign_id, str) or not campaign_id.strip():
         return frozenset()
-    oracle = _setpoints_product_keys()
-    key = _LITERAL_ALIASES.get(campaign_id.strip(), campaign_id.strip())
-    return oracle.get(key, frozenset())
+    token = campaign_id.strip()
+    key = _LITERAL_ALIASES.get(token, token)
+    yaml_keys = _setpoints_product_keys()
+    found = yaml_keys.get(key)
+    if found is not None:
+        if key in _TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS:
+            return found | frozenset({"O2"})
+        return found
+    oxygen = frozenset()
+    if campaign_evolves_terminal_oxygen(token):
+        oxygen = frozenset({"O2"})
+    if key != token and campaign_evolves_terminal_oxygen(key):
+        oxygen = oxygen | frozenset({"O2"})
+    return oxygen
 
 
 def _oracle_pool_claimed(
@@ -607,12 +678,20 @@ def test_product_objective_membership_follows_campaign_claims(
     metric: str,
     prose: str,
 ) -> None:
-    """Every campaign, every product metric, with the description already edited."""
+    """Every campaign, every product metric, with the description already edited.
 
-    claim_keys = _oracle_claims(campaign)
-    claimed = _oracle_claims_metric(metric, claim_keys)
-    assert campaign_claims_product_objective(metric, claim_keys) is claimed
+    The helper is asked about the raw id, so an absent campaign claims
+    nothing. Scoring uses the executed campaign: a missing run campaign is
+    C0, which claims oxygen.
+    """
+
+    direct_keys = _oracle_claims(campaign)
+    assert campaign_claims_product_objective(metric, direct_keys) is (
+        _oracle_claims_metric(metric, direct_keys)
+    )
     profile = _profile(_product_row(metric), campaign=campaign, prose=prose)
+    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    claimed = _oracle_claims_metric(metric, executed_keys)
     scored = {definition.metric for definition in objective_definitions(profile)}
     if claimed:
         assert metric in scored
@@ -630,10 +709,11 @@ _TERMINAL_METRIC = f"{COMPOSITION_TARGET_METRIC_PREFIX}ceramic"
     (*FINAL_PRODUCT_METRICS, _TERMINAL_METRIC, "Fe_kg", "Mg_kg"),
 )
 def test_c0_prose_does_not_change_claim_membership(metric: str, prose: str) -> None:
-    """Copy lunar_highland's C0 run and edit either prose field: still withheld.
+    """Copy lunar_highland's C0 run and edit either prose field.
 
-    ``Fe_kg`` and ``Mg_kg`` are ledger species. C0's ``native_Fe`` claim does
-    not keep them, and the prose fields are not eligibility.
+    C0 claims oxygen, so the oxygen metrics stay. ``Fe_kg`` and ``Mg_kg`` are
+    ledger species. C0's ``native_Fe`` claim does not keep them, and the
+    prose fields are not eligibility. Glass and ceramic stay withheld.
     """
 
     if metric == _TERMINAL_METRIC:
@@ -645,6 +725,17 @@ def test_c0_prose_does_not_change_claim_membership(metric: str, prose: str) -> N
     else:
         row = _product_row(metric)
     profile = _profile(row, campaign="C0", prose=prose)
+    target = row.get("target")
+    claimed = _oracle_claims_metric(
+        metric,
+        _oracle_claims("C0"),
+        target=target if isinstance(target, Mapping) else None,
+    )
+    if claimed:
+        scored = {definition.metric for definition in objective_definitions(profile)}
+        assert metric in scored
+        assert unclaimed_product_withheld_objective_note(profile) is None
+        return
     ledger = {metric[:-3]: _LEDGER_KG} if metric.endswith("_kg") else None
     _assert_withheld(profile, {metric}, label=f"C0:{metric}:{prose}", ledger=ledger)
 
@@ -694,14 +785,23 @@ def test_shipped_profiles_withhold_unclaimed_products_for_every_prose(prose: str
         if (profile.get("run") or {}).get("campaign") != "C0":
             continue
         declared = [str(objective["metric"]) for objective in profile["objectives"]]
-        withheld = set(declared) & set(FINAL_PRODUCT_METRICS)
-        if not withheld:
-            continue
+        claim_keys = _oracle_claims("C0")
+        withheld = {
+            metric
+            for metric in declared
+            if metric in set(FINAL_PRODUCT_METRICS)
+            and not _oracle_claims_metric(metric, claim_keys)
+        }
+        # C0 claims oxygen. Every other declared final product stays withheld,
+        # and that set is non-empty on every shipped profile.
+        for metric in declared:
+            if metric in _OXYGEN_OBJECTIVE_METRICS:
+                assert metric not in withheld, f"{name}:{metric}"
+        assert withheld, name
         _assert_withheld(profile, withheld, label=f"{name}:{prose}")
         retained = _declared_retained(raw)
         assert [metric for metric, _weight in retained] == [
-            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
-            "duration_h",
+            metric for metric in declared if metric not in withheld
         ]
         weights = tuple(weight for _metric, weight in retained)
         assert unrenormalized_study_scalar_weights(profile) == weights
@@ -712,9 +812,10 @@ def test_shipped_profiles_withhold_unclaimed_products_for_every_prose(prose: str
 def test_synthetic_study_scalar_uses_stub_energy_and_duration() -> None:
     """Literal metrics, weights, and scalar through ``_study_progress``.
 
-    Retained weights are the declared 0.10 and 0.06. The stub reports energy
-    10.0 kWh and duration 4.0 h. Both senses are minimize and the furnace
-    penalty is 0, so the scalar is 0.10 * -10 + 0.06 * -4 = -1.24.
+    C0 claims oxygen and withholds glass and metals. The stub reports 0 kg
+    of oxygen, energy 10.0 kWh, and duration 4.0 h. Oxygen is maximize, so
+    its term is 0.24 * 0. Energy and duration are minimize and the furnace
+    penalty is 0, so the scalar stays 0.10 * -10 + 0.06 * -4 = -1.24.
     """
 
     profile = _profile(
@@ -730,10 +831,11 @@ def test_synthetic_study_scalar_uses_stub_energy_and_duration() -> None:
     _assert_study_scalar(
         profile,
         metrics={
+            "oxygen_kg": 0.0,
             ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: _STUB_ENERGY_KWH,
             "duration_h": _STUB_DURATION_H,
         },
-        weights=(_RETAINED_ENERGY_WEIGHT, _RETAINED_DURATION_WEIGHT),
+        weights=(0.24, _RETAINED_ENERGY_WEIGHT, _RETAINED_DURATION_WEIGHT),
         scalar=_SYNTHETIC_SCALAR,
     )
 
@@ -745,15 +847,28 @@ def test_shipped_study_scalars_use_declared_retained_weights() -> None:
         profile = _apply_prose(raw, "description-edited")
         retained = _declared_retained(raw)
         weights = tuple(weight for _metric, weight in retained)
+        # C0 keeps declared oxygen metrics. The stub's terminal oxygen is 0 kg.
+        # Other final products stay withheld. Energy and duration are minimized.
+        declared = [str(objective["metric"]) for objective in raw["objectives"]]
+        oxygen_kept = [
+            metric for metric in declared if metric in _OXYGEN_OBJECTIVE_METRICS
+        ]
+        assert [metric for metric, _weight in retained] == [
+            *oxygen_kept,
+            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+            "duration_h",
+        ]
         metrics = {
-            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: _STUB_ENERGY_KWH,
-            "duration_h": _STUB_DURATION_H,
+            metric: 0.0 for metric in oxygen_kept
         }
-        assert [metric for metric, _weight in retained] == list(metrics)
+        metrics[ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC] = _STUB_ENERGY_KWH
+        metrics["duration_h"] = _STUB_DURATION_H
         # yaml weights, not the helper's return value used as its own expectation
         scalar = math.fsum(
-            weight * -value
-            for weight, value in zip(weights, metrics.values(), strict=True)
+            weight * (value if metric in _OXYGEN_OBJECTIVE_METRICS else -value)
+            for (metric, _declared_weight), weight, value in zip(
+                retained, weights, metrics.values(), strict=True
+            )
         )
         _assert_study_scalar(profile, metrics=metrics, weights=weights, scalar=scalar)
         assert name
@@ -789,7 +904,11 @@ def test_scoring_strategies_use_the_claim_chokepoint() -> None:
             prose="description-edited",
         )
         expected = tuple(definition.metric for definition in objective_definitions(profile))
-        assert metric not in expected
+        # C0 claims oxygen. Every other product class stays withheld.
+        if metric in _OXYGEN_OBJECTIVE_METRICS:
+            assert metric in expected
+        else:
+            assert metric not in expected
         for strategy_cls in strategies:
             strategy = strategy_cls(schema, seed=0, objective_profile=profile)
             if strategy_cls is StagedStrategy:
@@ -797,7 +916,10 @@ def test_scoring_strategies_use_the_claim_chokepoint() -> None:
             else:
                 got = tuple(strategy.objective_metrics)
             assert got == expected, f"{strategy_cls.__name__} {metric}"
-            assert metric not in got
+            if metric in _OXYGEN_OBJECTIVE_METRICS:
+                assert metric in got
+            else:
+                assert metric not in got
 
     claimed = _profile(
         _product_row("pure_silica_glass_kg"),
