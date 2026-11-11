@@ -39,6 +39,22 @@ def _run_lunar_with_unavailable_gate_engine(result_queue):
         result_queue.put({"error": repr(exc)})
 
 
+def _run_lunar_in_daemonic_process(result_queue):
+    from tests.test_runner_smoke import SCENARIOS, _run_scenario
+
+    try:
+        payload, capture = _run_scenario(SCENARIOS[0], capture=True)
+        result_queue.put({
+            "status": payload.get("status"),
+            "reason": payload.get("reason"),
+            "error_message": payload.get("error_message"),
+            "n_hours": len(payload.get("per_hour_summary") or []),
+            "flux_count": len(capture["flux_maps"]),
+        })
+    except BaseException as exc:  # relay child-side errors to the test process
+        result_queue.put({"error": repr(exc)})
+
+
 def test_spawned_runner_flags_unavailable_gate_fallback_and_keeps_flux_capture():
     context = multiprocessing.get_context("spawn")
     result_queue = context.Queue()
@@ -81,3 +97,53 @@ def test_spawned_runner_flags_unavailable_gate_fallback_and_keeps_flux_capture()
             result["active_hour_temperatures"]
         ).items()
     )
+
+
+def test_flux_pin_helper_rejects_refused_envelope_before_hashing():
+    from tests.test_runner_smoke import _flux_ledger_pins
+
+    payload = {
+        "status": "refused",
+        "reason": "daemon_child_process_unavailable",
+        "error_message": "daemonic process cannot launch child workers",
+    }
+    capture = {"flux_maps": [{"must_not_be_hashed": True}], "ledger_output": {}}
+
+    try:
+        _flux_ledger_pins(payload, capture)
+    except AssertionError as exc:
+        message = str(exc)
+        assert payload["status"] in message
+        assert payload["reason"] in message
+        assert payload["error_message"] in message
+    else:
+        raise AssertionError("refused runner envelope was accepted for hashing")
+
+
+def test_daemonic_runner_refusal_names_child_process_limit():
+    context = multiprocessing.get_context("spawn")
+    result_queue = context.Queue()
+    process = context.Process(
+        target=_run_lunar_in_daemonic_process,
+        args=(result_queue,),
+        daemon=True,
+    )
+    process.start()
+    try:
+        try:
+            result = result_queue.get(timeout=60)
+        except queue.Empty:
+            process.terminate()
+            process.join(timeout=10)
+            raise AssertionError("daemonic lunar refusal witness timed out")
+    finally:
+        result_queue.close()
+    process.join(timeout=10)
+
+    assert process.exitcode == 0
+    assert "error" not in result, result.get("error")
+    assert result["status"] == "refused"
+    assert result["n_hours"] == 0
+    assert result["flux_count"] == 0
+    refusal = f"{result.get('reason') or ''} {result.get('error_message') or ''}".casefold()
+    assert "daemon" in refusal and "child" in refusal, refusal
