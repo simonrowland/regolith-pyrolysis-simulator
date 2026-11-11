@@ -34,6 +34,11 @@ ENGINE_CHEMISTRY_VERSION = {
     "thermoengine": 1,
 }
 
+# Request-key discriminator for the battery HOT payload layout. Change it when
+# a reader starts requiring fields absent from entries written by the prior
+# layout; chemistry versions remain reserved for prediction changes.
+BATTERY_ENGINE_CACHE_SCHEMA = 2
+
 # Bump only when an engine change can alter predictions. Runtime identity is
 # diagnostic and never participates in the cache key.
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 Darwin arm64 binary - initial cache version
@@ -91,6 +96,24 @@ _RUNTIME_IDENTITIES: dict[str, str] = {}
 _RUNTIME_WARNED: set[str] = set()
 _RUNTIME_OPEN_RECORDED: set[str] = set()
 
+ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS = {
+    "openimcc": {
+        "warm_worker": "The OpenIMCC battery adapter has no worker scheduling option."
+    },
+    "alphamelts": {
+        "warm_worker": "The opener fixes warm_worker=False; worker reuse changes scheduling only."
+    },
+    "vaporock": {
+        "warm_worker": "The opener fixes warm_worker=False; worker reuse changes scheduling only."
+    },
+    "magemin": {
+        "warm_worker": "The opener fixes warm_worker=False; worker reuse changes scheduling only."
+    },
+    "thermoengine": {
+        "warm_worker": "The ThermoEngine battery opener does not forward worker scheduling."
+    },
+}
+
 
 @dataclass(frozen=True)
 class CacheValue:
@@ -113,105 +136,228 @@ def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> b
     return hashlib.sha256(payload).digest()
 
 
-def engine_cache_settings(engine_name: str, backend: Any) -> dict[str, Any]:
-    """Project only named prediction inputs from an opened backend or its config."""
+def normalize_engine_settings(
+    engine_name: str,
+    settings: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Normalize battery settings once for both backend opening and cache keys.
+
+    A missing settings mapping preserves the engine's default-open path. For
+    AlphaMELTS it also snapshots the inherited child environment at open time;
+    an explicitly supplied mapping with no ambient mode means the opener pops
+    that variable before resolving the backend.
+    """
+    fields: Mapping[str, Any] = settings or {}
+    if engine_name == "internal-analytical":
+        return {"oxygen_balance_backend": fields.get("oxygen_balance_backend")}
+    if engine_name == "openimcc":
+        from simulator.melt_backend.openimcc_bridge import DEFAULT_BACKEND_PACK_NAME
+
+        return {"pack": fields.get("pack") or DEFAULT_BACKEND_PACK_NAME}
+    if engine_name == "alphamelts":
+        ambient = (
+            os.environ.get("ALPHAMELTS_CALC_MODE")
+            if settings is None
+            else fields.get("ambient_calc_mode")
+        )
+        return {
+            "transport": fields.get("transport"),
+            "ambient_calc_mode": ambient,
+            "raw_model_name": fields.get("raw_model_name"),
+            "redox_buffer": fields.get("redox_buffer"),
+            "fO2_offset": fields.get("fO2_offset"),
+            "Fe3Fet_ratio": fields.get("Fe3Fet_ratio"),
+            "python_api_model": fields.get("python_api_model"),
+            "configured_vapor_transport_pO2_bar": fields.get(
+                "configured_vapor_transport_pO2_bar"
+            ),
+            "configured_vapor_transport_floor_bar": fields.get(
+                "configured_vapor_transport_floor_bar"
+            ),
+            "warm_worker": False,
+        }
+    if engine_name == "vaporock":
+        return {
+            "temperature_units": fields.get("temperature_units", "C"),
+            "pressure_units": fields.get("pressure_units", "bar"),
+            "vapor_pressure_units": fields.get("vapor_pressure_units", "bar"),
+            "warm_worker": False,
+        }
+    if engine_name == "magemin":
+        bridge = fields.get("bridge") or fields.get("python_bridge")
+        return {
+            "database": fields.get("database"),
+            "bridge": bridge,
+            "fO2_buffer": fields.get("fO2_buffer"),
+            "warm_worker": False,
+        }
+    if engine_name == "thermoengine":
+        return {
+            "model": fields.get("model"),
+            "configured_vapor_transport_pO2_bar": fields.get(
+                "configured_vapor_transport_pO2_bar"
+            ),
+            "configured_vapor_transport_floor_bar": fields.get(
+                "configured_vapor_transport_floor_bar"
+            ),
+            "redox_buffer": fields.get("redox_buffer"),
+            "fO2_offset": fields.get("fO2_offset"),
+            "Fe3Fet_ratio": fields.get("Fe3Fet_ratio"),
+            "warm_worker": False,
+        }
+    raise ValueError(f"unknown engine {engine_name!r}")
+
+
+def engine_cache_settings(
+    engine_name: str,
+    backend: Any,
+    *,
+    effective_settings: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Project named prediction inputs from normalized opener settings/backend."""
     if engine_name == "internal-analytical":
         # Residue calls consume prior-call state and are deliberately uncached.
         return {}
 
-    is_config = isinstance(backend, Mapping)
-    fields = backend if is_config else vars(backend)
+    if isinstance(backend, Mapping):
+        fields = normalize_engine_settings(engine_name, backend)
+        if engine_name == "openimcc":
+            # Reads _pack_name via _effective_pack_name for the melt call and
+            # _gas for vapor calls (binary_pot_battery.py:3080-3111, 3209-3304).
+            # _gas_pack_name is selected at initialization (:3015-3018).
+            return {"melt_pack": fields["pack"], "gas_pack": "default"}
+        if engine_name == "alphamelts":
+            # Opener fields map to _mode, _model, _python_api_model,
+            # _redox_buffer, _fo2_offset, _fe3fet_ratio, and configured vapor
+            # inputs (alphamelts.py:1640-1824, 3052-3064, 3133-3136).
+            api_model = fields["python_api_model"]
+            if isinstance(api_model, tuple):
+                api_model = list(api_model)
+            return {
+                "transport_mode": fields["transport"],
+                "ambient_calc_mode": fields["ambient_calc_mode"],
+                "model": fields["raw_model_name"],
+                "python_api_model": api_model,
+                "redox_buffer": fields["redox_buffer"],
+                "fo2_offset": fields["fO2_offset"],
+                "fe3fet_ratio": fields["Fe3Fet_ratio"],
+                "vapor_transport_pO2_bar": fields[
+                    "configured_vapor_transport_pO2_bar"
+                ],
+                "vapor_transport_floor_bar": fields[
+                    "configured_vapor_transport_floor_bar"
+                ],
+            }
+        if engine_name == "vaporock":
+            # Backend reads _temperature_units/_pressure_units at
+            # vaporock.py:2089-2098, 2392-2419, and _vapor_pressure_units at
+            # :2761-2767.
+            return {
+                name: fields[name]
+                for name in (
+                    "temperature_units",
+                    "pressure_units",
+                    "vapor_pressure_units",
+                )
+            }
+        if engine_name == "magemin":
+            # Backend reads _database/_bridge and _config['fO2_buffer'] at
+            # magemin.py:1318-1344, 1426-1445, 2688-2783, and 3393-3445.
+            return {
+                "database": fields["database"],
+                "bridge": fields["bridge"],
+                "fO2_buffer": fields["fO2_buffer"],
+            }
+        if engine_name == "thermoengine":
+            # _model is selected at thermoengine.py:116-143; configured vapor
+            # settings are read by the shared path at alphamelts.py:1665-1669;
+            # shared MELTS reads _fe3fet_ratio/_redox_buffer/_fo2_offset at
+            # :3052-3064, 3133-3136.
+            return {
+                "model": fields["model"],
+                "vapor_transport_pO2_bar": fields[
+                    "configured_vapor_transport_pO2_bar"
+                ],
+                "vapor_transport_floor_bar": fields[
+                    "configured_vapor_transport_floor_bar"
+                ],
+                "redox_buffer": fields["redox_buffer"],
+                "fo2_offset": fields["fO2_offset"],
+                "fe3fet_ratio": fields["Fe3Fet_ratio"],
+            }
+        raise ValueError(f"unknown engine {engine_name!r}")
 
+    fields = vars(backend)
     if engine_name == "openimcc":
-        if is_config:
-            melt_pack = fields.get("pack") or "default"
-            gas_pack = fields.get("gas_pack", "default")
-        else:
-            identity = fields.get("_identity")
-            loaded_pack = identity.get("pack") if isinstance(identity, Mapping) else None
-            melt_pack = loaded_pack or fields.get("_pack_name", "default")
-            gas_pack = fields.get("_gas_pack_name", "default")
+        # Reads _pack_name via _effective_pack_name for the melt call and _gas
+        # for vapor calls (binary_pot_battery.py:3080-3111, 3209-3304); _gas is
+        # the packaged default from :3049-3063.
+        identity = fields.get("_identity", vars(type(backend)).get("_identity"))
+        loaded_pack = identity.get("pack") if isinstance(identity, Mapping) else None
         return {
-            "melt_pack": melt_pack,  # Selects melt coefficients and activities.
-            "gas_pack": gas_pack,  # Selects gas species thermochemistry.
+            "melt_pack": loaded_pack or fields.get("_pack_name", "default"),
+            "gas_pack": fields.get("_gas_pack_name", "default"),
         }
     if engine_name == "alphamelts":
-        if is_config:
-            transport_mode = (
-                fields.get("transport")
-                or fields.get("ambient_calc_mode")
-                or os.environ.get("ALPHAMELTS_CALC_MODE")
-            )
-            model = fields.get("raw_model_name")
-            redox_buffer = fields.get("redox_buffer")
-            fo2_offset = fields.get("fO2_offset")
-            fe3fet_ratio = fields.get("Fe3Fet_ratio")
-            api_model = fields.get("python_api_model")
-            vapor_pO2 = fields.get("configured_vapor_transport_pO2_bar")
-            vapor_floor = fields.get("configured_vapor_transport_floor_bar")
-        else:
-            transport_mode = fields.get("_mode")
-            model = fields.get("_model")
-            redox_buffer = fields.get("_redox_buffer")
-            fo2_offset = fields.get("_fo2_offset")
-            fe3fet_ratio = fields.get("_fe3fet_ratio")
-            api_model = fields.get("_python_api_model")
-            vapor_pO2 = fields.get("_configured_vapor_transport_pO2_bar")
-            vapor_floor = fields.get("_configured_vapor_transport_floor_bar")
+        # Reads _mode, _model, _python_api_model, _redox_buffer, _fo2_offset,
+        # _fe3fet_ratio, and configured vapor inputs (alphamelts.py:1640-1824,
+        # 3052-3064, 3133-3136).
+        api_model = fields.get("_python_api_model")
         if isinstance(api_model, tuple):
             api_model = list(api_model)
+        effective = normalize_engine_settings(
+            engine_name, effective_settings or {}
+        )
         return {
-            "transport_mode": transport_mode,  # Selects the MELTS calculation route.
-            "model": model,  # Selects the thermodynamic model.
-            "python_api_model": api_model,  # Selects the Python API model revision.
-            "redox_buffer": redox_buffer,  # Sets iron redox when no explicit split is given.
-            "fo2_offset": fo2_offset,  # Offsets the selected oxygen buffer.
-            "fe3fet_ratio": fe3fet_ratio,  # Sets the ferrous/ferric input split.
-            "vapor_transport_pO2_bar": vapor_pO2,  # Sets vapor-transport oxygen pressure.
-            "vapor_transport_floor_bar": vapor_floor,  # Sets the vapor-transport floor.
+            "transport_mode": fields.get("_mode"),
+            "ambient_calc_mode": effective["ambient_calc_mode"],
+            "model": fields.get("_model"),
+            "python_api_model": api_model,
+            "redox_buffer": fields.get("_redox_buffer"),
+            "fo2_offset": fields.get("_fo2_offset"),
+            "fe3fet_ratio": fields.get("_fe3fet_ratio"),
+            "vapor_transport_pO2_bar": fields.get(
+                "_configured_vapor_transport_pO2_bar"
+            ),
+            "vapor_transport_floor_bar": fields.get(
+                "_configured_vapor_transport_floor_bar"
+            ),
         }
     if engine_name == "vaporock":
-        if is_config:
-            temperature_units = fields.get("temperature_units", "C")
-            pressure_units = fields.get("pressure_units", "bar")
-            vapor_pressure_units = fields.get("vapor_pressure_units", "bar")
-        else:
-            temperature_units = fields.get("_temperature_units", "C")
-            pressure_units = fields.get("_pressure_units", "bar")
-            vapor_pressure_units = fields.get("_vapor_pressure_units", "bar")
+        # Reads _temperature_units/_pressure_units at vaporock.py:2089-2098,
+        # 2392-2419, and _vapor_pressure_units at :2761-2767.
         return {
-            "temperature_units": temperature_units,  # Converts the input temperature.
-            "pressure_units": pressure_units,  # Converts the input pressure.
-            "vapor_pressure_units": vapor_pressure_units,  # Converts reported vapor pressure.
+            "temperature_units": fields.get("_temperature_units", "C"),
+            "pressure_units": fields.get("_pressure_units", "bar"),
+            "vapor_pressure_units": fields.get("_vapor_pressure_units", "bar"),
         }
     if engine_name == "magemin":
-        if is_config:
-            database = fields.get("database")
-            bridge = fields.get("bridge", fields.get("python_bridge"))
-            fO2_buffer = fields.get("fO2_buffer")
-        else:
-            database = fields.get("_database")
-            bridge = fields.get("_bridge")
-            config = fields.get("_config")
-            fO2_buffer = config.get("fO2_buffer") if isinstance(config, Mapping) else None
+        # Reads _database/_bridge and _config['fO2_buffer'] at
+        # magemin.py:1318-1344, 1426-1445, 2688-2783, and 3393-3445.
+        config = fields.get("_config")
         return {
-            "database": database,  # Selects the phase database.
-            "bridge": bridge,  # Selects the engine execution implementation.
-            "fO2_buffer": fO2_buffer,  # Selects the oxygen buffer constraint.
+            "database": fields.get("_database"),
+            "bridge": fields.get("_bridge"),
+            "fO2_buffer": config.get("fO2_buffer")
+            if isinstance(config, Mapping)
+            else None,
         }
     if engine_name == "thermoengine":
-        if is_config:
-            model = fields.get("model")
-            vapor_pO2 = fields.get("configured_vapor_transport_pO2_bar")
-            vapor_floor = fields.get("configured_vapor_transport_floor_bar")
-        else:
-            model = fields.get("_model")
-            vapor_pO2 = fields.get("_configured_vapor_transport_pO2_bar")
-            vapor_floor = fields.get("_configured_vapor_transport_floor_bar")
+        # _model is selected at thermoengine.py:116-143; configured vapor
+        # settings are read by the shared path at alphamelts.py:1665-1669;
+        # shared MELTS reads _fe3fet_ratio/_redox_buffer/_fo2_offset at
+        # :3052-3064, 3133-3136.
         return {
-            "model": model,  # Selects the ThermoEngine thermodynamic model.
-            "vapor_transport_pO2_bar": vapor_pO2,  # Sets vapor-transport oxygen pressure.
-            "vapor_transport_floor_bar": vapor_floor,  # Sets the vapor-transport floor.
+            "model": fields.get("_model"),
+            "vapor_transport_pO2_bar": fields.get(
+                "_configured_vapor_transport_pO2_bar"
+            ),
+            "vapor_transport_floor_bar": fields.get(
+                "_configured_vapor_transport_floor_bar"
+            ),
+            "redox_buffer": fields.get("_redox_buffer"),
+            "fo2_offset": fields.get("_fo2_offset"),
+            "fe3fet_ratio": fields.get("_fe3fet_ratio"),
         }
     raise ValueError(f"unknown engine {engine_name!r}")
 
@@ -581,6 +727,10 @@ def _next_row_sequence(connection: sqlite3.Connection, source_box: str) -> int:
 
 
 def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
+    if engine_id == "internal-analytical":
+        # The backend's core carries state across residue requests, so even a
+        # direct cache-helper caller must execute the live solve.
+        return _hot_and_cold(solve())[0]
     path_value = _configured_engine_cache_path()
     if not path_value:
         return _hot_and_cold(solve())[0]
