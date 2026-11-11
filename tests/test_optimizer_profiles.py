@@ -440,8 +440,21 @@ def test_stock_sso2_objective_is_explicit_reachable_and_profile_owned() -> None:
     }
     assert constraints.stream_purity_min.value == pytest.approx(0.95)
     assert constraints.stream_purity_min.source == "profile"
+    assert constraints.enforce_delivered_stream_purity is False
     assert owner_seed["source_campaign"] == "C2A_staged"
     assert stock_patch.canonical_json() == sso2_owner_recipe_patch().canonical_json()
+
+
+def test_profile_can_explicitly_reenable_delivered_stream_purity_gate() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["constraints"]["enforce_delivered_stream_purity"] = True
+
+    constraints = physics_constraints_from_profile(
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti"),
+        source="purity-enforced-profile.yaml",
+    )
+
+    assert constraints.enforce_delivered_stream_purity is True
 
 
 def test_stock_product_class_objectives_are_minimal_reachable_and_noncommercial() -> None:

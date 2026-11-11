@@ -20,10 +20,20 @@ from simulator.accounting.completeness import (
     validate_completion_contract_coverage,
     vapor_contract_completeness,
 )
+from simulator.accounting.yield_disposition import (
+    YIELD_DISPOSITION_BINS,
+)
+from simulator.optimize.physics import target_species_yield_report
 from simulator.state import MOLAR_MASS
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
+
+def _yield_disposition_rows(element: str, **amounts: float) -> tuple[dict, ...]:
+    destinations = {name: 0.0 for name in YIELD_DISPOSITION_BINS}
+    destinations.update(amounts)
+    return ({"element": element, "destination_mol_atoms": destinations},)
 
 
 def _load_setpoints() -> dict:
@@ -511,6 +521,108 @@ def test_extraction_completeness_counts_spent_residue_as_residual_basis() -> Non
     assert result.residual_target_equiv_mol == pytest.approx(2.0)
     assert result.denominator_target_equiv_mol == pytest.approx(3.0)
     assert result.completeness_fraction == pytest.approx(1.0 / 3.0)
+
+
+def test_extraction_completeness_credits_terminal_offgas_from_fraction_table() -> None:
+    products = {"Fe": 0.2 * MOLAR_MASS["Fe"] / 1000.0}
+    residual = {"FeO": 0.3 * MOLAR_MASS["FeO"] / 1000.0}
+    rows = _yield_disposition_rows(
+        "Fe",
+        product_condensed=0.2,
+        offgas_vented=0.5,
+        melt_retained=0.3,
+        cleanup_sequestered=0.1,
+    )
+    captured = extraction_completeness_by_target(
+        ("Fe",), {"Fe": ("FeO", "Fe")}, products, residual,
+        require_residual_species=True,
+    )["Fe"]
+    result = extraction_completeness_by_target(
+        ("Fe",), {"Fe": ("FeO", "Fe")}, products, residual,
+        yield_disposition_fraction_table_rows=rows,
+        require_residual_species=True,
+    )["Fe"]
+
+    assert captured.completeness_fraction == pytest.approx(0.4)
+    assert result.captured_basis_completeness_fraction == pytest.approx(0.4)
+    assert result.terminal_offgas_target_equiv_mol == pytest.approx(0.5)
+    assert result.left_melt_target_equiv_mol == pytest.approx(0.7)
+    assert result.not_left_melt_target_equiv_mol == pytest.approx(0.3)
+    assert result.cleanup_sequestered_target_equiv_mol == pytest.approx(0.1)
+    assert result.denominator_target_equiv_mol == pytest.approx(1.0)
+    assert result.completeness_fraction == pytest.approx(0.7)
+
+
+def test_extraction_completeness_counts_and_reports_wall_deposit() -> None:
+    rows = _yield_disposition_rows(
+        "Fe",
+        product_condensed=0.4,
+        wall_deposit=0.2,
+        melt_retained=0.4,
+    )
+    result = extraction_completeness_by_target(
+        ("Fe",),
+        {"Fe": ("FeO", "Fe")},
+        {"Fe": 0.4 * MOLAR_MASS["Fe"] / 1000.0},
+        {"FeO": 0.4 * MOLAR_MASS["FeO"] / 1000.0},
+        yield_disposition_fraction_table_rows=rows,
+        require_residual_species=True,
+    )["Fe"]
+
+    assert result.captured_basis_completeness_fraction == pytest.approx(0.5)
+    assert result.wall_deposit_target_equiv_mol == pytest.approx(0.2)
+    assert result.left_melt_target_equiv_mol == pytest.approx(0.6)
+    assert result.not_left_melt_target_equiv_mol == pytest.approx(0.4)
+    assert result.denominator_target_equiv_mol == pytest.approx(1.0)
+    assert result.completeness_fraction == pytest.approx(0.6)
+
+
+def test_target_species_yield_report_normalizes_gas_account_suffixes() -> None:
+    class Ledger:
+        def project_account_kg(self, account: str) -> dict[str, float]:
+            if account == "process.condensation_train":
+                return {
+                    "CaO_gas": 0.25 * MOLAR_MASS["CaO"] / 1000.0,
+                    "MgO_gas": 0.5 * MOLAR_MASS["MgO"] / 1000.0,
+                }
+            return {}
+
+        def kg_by_account(self, account: str | None = None):
+            accounts = {
+                "process.condensation_train": self.project_account_kg(
+                    "process.condensation_train"
+                )
+            }
+            return accounts if account is None else dict(accounts.get(account, {}))
+
+    class Sim:
+        atom_ledger = Ledger()
+        _feedstock_recovered_reagent_kg_by_species = {}
+        _non_feedstock_reagent_element_kg_by_account = {}
+
+        def __init__(self) -> None:
+            self.record = SimpleNamespace(
+                initial_inventory=SimpleNamespace(
+                    melt_oxide_kg={
+                        "CaO": MOLAR_MASS["CaO"] / 1000.0,
+                        "MgO": MOLAR_MASS["MgO"] / 1000.0,
+                    },
+                    inert_melt_components_kg={},
+                ),
+                additives_kg={},
+            )
+
+        def _unspent_additive_reagents_kg(self) -> dict[str, float]:
+            return {}
+
+        def _c3_alkali_credit_outstanding_kg_by_species(self) -> dict[str, float]:
+            return {}
+
+    report = target_species_yield_report(Sim(), target_species=("Ca", "Mg"))
+
+    assert report["status"] == "reported"
+    assert report["targets"]["Ca"]["yield_fraction"] == pytest.approx(0.25)
+    assert report["targets"]["Mg"]["yield_fraction"] == pytest.approx(0.5)
 
 
 def test_e1b_target_yield_excludes_additive_overcredit() -> None:

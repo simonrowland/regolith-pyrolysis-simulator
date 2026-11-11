@@ -47,7 +47,7 @@ import pytest
 
 from tests._cpu_budget import cpu_budget_seconds, wall_guard_seconds
 
-from _pytest_session_safety import (
+from tests._plugins.session_safety import (
     CHILD_HANDSHAKE_TIMEOUT_SECONDS,
     SessionWatchdog,
     gateway_child_label,
@@ -61,8 +61,8 @@ from tests.e2e.playwright_support import (
 
 
 pytest_plugins = (
-    "_pytest_loadgroup_order",
-    "_pytest_known_red",
+    "tests._plugins.loadgroup_order",
+    "tests._plugins.known_red",
     "tests.suite_shape_guard",
 )
 
