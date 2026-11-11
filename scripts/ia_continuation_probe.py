@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import dataclasses
+import argparse
 import json
 import math
 import statistics
@@ -133,8 +134,9 @@ def _measure(label: str, consumer: Callable[[], Any]) -> dict[str, Any]:
     dispatch = PyrolysisSimulator._dispatch_only
     refresh = PyrolysisSimulator._refresh_vapor_pressures_from_kernel
 
-    def run(cold_start: bool) -> tuple[Any, dict[str, int]]:
+    def run(cold_start: bool) -> tuple[Any, dict[str, int], list[dict[str, Any]]]:
         counts = {"path_a_later_success": 0, "path_b_refusal_continuation": 0}
+        call_outputs: list[dict[str, Any]] = []
 
         def traced_dispatch(core, intent, *args, **kwargs):
             result = dispatch(core, intent, *args, **kwargs)
@@ -146,6 +148,18 @@ def _measure(label: str, consumer: Callable[[], Any]) -> dict[str, Any]:
                 ) or {}
                 diagnostic = (getattr(result, "diagnostic", None) or {}).get(
                     "high_t_melt_activity", {}
+                )
+                request_diagnostic = getattr(result, "diagnostic", None) or {}
+                call_outputs.append(
+                    {
+                        "vapor_pressures_Pa": request_diagnostic.get(
+                            "vapor_pressures_Pa", {}
+                        ),
+                        "activities": diagnostic.get("activities_by_oxide", {}),
+                        "status": getattr(result, "status", None),
+                        "refusal": diagnostic.get("fallback_reason"),
+                        "flags": diagnostic.get("openimcc_flags", ()),
+                    }
                 )
                 current_certificates = diagnostic.get(
                     "certified_effective_gamma_by_parent", {}
@@ -176,21 +190,24 @@ def _measure(label: str, consumer: Callable[[], Any]) -> dict[str, Any]:
         if cold_start:
             PyrolysisSimulator._refresh_vapor_pressures_from_kernel = cold_refresh
         try:
-            return _plain(consumer()), counts
+            return _plain(consumer()), counts, call_outputs
         finally:
             PyrolysisSimulator._dispatch_only = dispatch
             PyrolysisSimulator._refresh_vapor_pressures_from_kernel = refresh
 
-    warm, warm_counts = run(False)
-    cold, cold_counts = run(True)
+    warm, warm_counts, warm_calls = run(False)
+    cold, cold_counts, cold_calls = run(True)
     return {
         "consumer": label,
         "calls": {"warm": warm_counts, "forced_cold": cold_counts},
-        **_comparison(warm, cold),
+        **_comparison(
+            {"consumer_output": warm, "ia_request_outputs": warm_calls},
+            {"consumer_output": cold, "ia_request_outputs": cold_calls},
+        ),
     }
 
 
-def _residue_probes() -> list[dict[str, Any]]:
+def _residue_probes(only: str | None = None) -> list[dict[str, Any]]:
     from simulator.battery.residue import (
         ResidueChannel,
         _predict_hashimoto_residue_cohort,
@@ -202,13 +219,28 @@ def _residue_probes() -> list[dict[str, Any]]:
     hashimoto_source = yaml.safe_load(
         (DATA / "literature/extracts/kems-015-hashimoto-1983.yaml").read_text()
     )
+    hashimoto_store = yaml.safe_load(
+        (DATA / "literature/extracts-v2/kems-015-hashimoto-1983.yaml").read_text()
+    )
+    measured_prefix = "::hashimoto_1983_table3_residue_composition_series::"
+    experiment_ids = sorted(
+        {
+            row["experiment_id"].split("::experiment::")[-1]
+            for row in hashimoto_store["observations"]
+            if measured_prefix in row["observation_id"]
+            and row["value"].get("kind") == "point"
+        }
+    )
+    experiments_by_id = {
+        row["experiment_id"]: row for row in hashimoto_source["experiments"]
+    }
     geometry = next(
         row["values"]["starting_preform_mm"]
         for row in hashimoto_source["metadata"]
         if row["observation_id"] == "hashimoto_1983_fe_fcmas_free_evap_geometry_quoted"
     )
     hashimoto = lambda: _predict_hashimoto_residue_cohort(
-        (hashimoto_source["experiments"][0],),
+        (experiments_by_id[experiment_ids[0]],),
         catalog,
         preform_dimensions_mm=geometry,
         code_revision="ia-continuation-probe",
@@ -278,21 +310,26 @@ def _residue_probes() -> list[dict[str, Any]]:
             linear_temperature=True,
         )
 
+    probes = {
+        "hashimoto": ("Hashimoto residue integration", hashimoto),
+        "sossi": ("Sossi residue integration", sossi),
+        "knudsen": ("Knudsen residue integration", knudsen),
+    }
     return [
-        _measure("Hashimoto residue integration", hashimoto),
-        _measure("Sossi residue integration", sossi),
-        _measure("Knudsen residue integration", knudsen),
+        _measure(label, consumer)
+        for key, (label, consumer) in probes.items()
+        if only is None or only == key
     ]
 
 
-def _runner_probes() -> list[dict[str, Any]]:
+def _runner_probes(only: str | None = None) -> list[dict[str, Any]]:
     from unittest.mock import patch
 
     from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
     from simulator.runner import PyrolysisRun
 
     scenarios = (
-        ("lunar_mare_low_ti_C0_24h", "lunar_mare_low_ti", "C0", 3, {}),
+        ("lunar_mare_low_ti_C0_24h", "lunar_mare_low_ti", "C0", 9, {}),
         ("mars_basalt_C2A_12h", "mars_basalt", "C2A", 3, {"C": 30.0}),
         (
             "ci_carbonaceous_chondrite_C2B_12h",
@@ -304,6 +341,14 @@ def _runner_probes() -> list[dict[str, Any]]:
     )
     output = []
     for name, feedstock, campaign, hours, additives in scenarios:
+        key = {
+            "lunar_mare_low_ti_C0_24h": "runner-c0",
+            "mars_basalt_C2A_12h": "runner-c2a",
+            "ci_carbonaceous_chondrite_C2B_12h": "runner-c2b",
+        }[name]
+        if only is not None and only != key:
+            continue
+
         def run():
             flux_maps = []
             dispatch = BuiltinEvaporationFluxProvider.dispatch
@@ -336,7 +381,22 @@ def _runner_probes() -> list[dict[str, Any]]:
 
 
 def main() -> None:
-    print(json.dumps(_residue_probes() + _runner_probes(), indent=2, sort_keys=True))
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--consumer",
+        choices=("all", "hashimoto", "sossi", "knudsen", "runner-c0", "runner-c2a", "runner-c2b"),
+        default="all",
+    )
+    consumer = parser.parse_args().consumer
+    selected = None if consumer == "all" else consumer
+    probes = (
+        _runner_probes(selected)
+        if selected is not None and selected.startswith("runner-")
+        else _residue_probes(selected)
+        if selected is not None
+        else _residue_probes() + _runner_probes()
+    )
+    print(json.dumps(probes, indent=2, sort_keys=True), flush=True)
 
 
 if __name__ == "__main__":
