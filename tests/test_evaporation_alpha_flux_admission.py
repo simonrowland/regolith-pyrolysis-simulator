@@ -546,3 +546,270 @@ def test_sole_missing_alpha_is_refusal_or_authorized_zero(
         )
     else:
         assert refusal["bound"] == "unavailable"
+
+
+# Evaporation-path temperature. 1600 C is 1873.15 K, above the 400 K gate
+# where an empty flux refuses and a partial refusal is noted. The screen
+# tests above never enter those decisions.
+_PATH_TEMPERATURE_C = 1600.0
+_PATH_CARRIER = "CrO2"
+_PATH_MOLAR_G_MOL = 84.0
+_PATH_AREA_M2 = 1.0
+_PATH_PRESSURE_PA = 1.0e-30
+_PATH_DURATION_S = 3600.0
+
+
+def _path_tick_mass_kg() -> float:
+    """Alpha=1 Hertz-Knudsen tick mass the evaporation path must record.
+
+    T = 1600 + 273.15 = 1873.15 K, M = 0.084 kg/mol, P = 1e-30 Pa,
+    A = 1 m^2, t = 3600 s, R = 8.314462618 J/mol/K:
+        k = sqrt(M / (2 * pi * R * T))
+        mass = k * P * A * t
+    The product is about 3.3e-30 kg, below the 1e-12 kg closure tolerance.
+    """
+
+    from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+
+    temperature_K = _PATH_TEMPERATURE_C + 273.15
+    return (
+        hertz_knudsen_k_kg_s_m2_pa(temperature_K, _PATH_MOLAR_G_MOL / 1000.0)
+        * _PATH_PRESSURE_PA
+        * _PATH_AREA_M2
+        * _PATH_DURATION_S
+    )
+
+
+def _missing_alpha_answer(species_id: str):
+    from types import MappingProxyType
+
+    from simulator.vapour_rail.batch import (
+        FluxRefusal,
+        PressureRefusal,
+        VapourAnswer,
+    )
+    from simulator.vapour_rail.request import REFUSAL_MISSING_CHANNEL_CONTRACT
+
+    detail = "channel contract incomplete: missing alpha"
+    refusal = PressureRefusal(
+        code=REFUSAL_MISSING_CHANNEL_CONTRACT,
+        detail=detail,
+    )
+    flux = FluxRefusal(code=REFUSAL_MISSING_CHANNEL_CONTRACT, detail=detail)
+    return VapourAnswer(
+        species_id=species_id,
+        pressure=refusal,
+        selected_runtime_pressure=refusal,
+        flux=flux,
+        source_label="refusal_closure",
+        formula_id=species_id,
+        source_account="process.cleaned_melt",
+        solve_group_id="g",
+        state_fingerprint="s",
+        validation_status="pending_validation",
+        refusal_code=REFUSAL_MISSING_CHANNEL_CONTRACT,
+        extra=MappingProxyType({"detail": detail}),
+    )
+
+
+def _debiting_answer(species_id: str, pressure_pa: float):
+    from simulator.vapour_rail.batch import (
+        FluxEligible,
+        PressureValue,
+        VapourAnswer,
+    )
+
+    pressure = PressureValue(pa=pressure_pa)
+    return VapourAnswer(
+        species_id=species_id,
+        pressure=pressure,
+        selected_runtime_pressure=pressure,
+        flux=FluxEligible(alpha_ref=f"alpha:{species_id}"),
+        source_label="test",
+        formula_id=species_id,
+        source_account="process.cleaned_melt",
+        solve_group_id="g",
+        state_fingerprint="s",
+        validation_status="pending_validation",
+    )
+
+
+def _path_batch(peer: bool):
+    from simulator.vapour_rail.batch import VapourBatch
+
+    channels = {_PATH_CARRIER: _missing_alpha_answer(_PATH_CARRIER)}
+    active: frozenset[str] = frozenset()
+    if peer:
+        channels["Na"] = _debiting_answer("Na", 1.5)
+        active = frozenset({"Na"})
+    return VapourBatch(
+        requested_species_ids=frozenset(channels),
+        channels_by_species=channels,
+        flux_active_species_ids=active,
+    )
+
+
+def _path_host(batch, dispatch):
+    from types import MethodType, SimpleNamespace
+
+    from simulator.evaporation import EvaporationMixin
+
+    host = SimpleNamespace(
+        melt=SimpleNamespace(
+            temperature_C=_PATH_TEMPERATURE_C,
+            melt_surface_area_m2=_PATH_AREA_M2,
+        ),
+        setpoints={},
+        vapor_pressures={
+            "metals": {
+                _PATH_CARRIER: {
+                    "molar_mass_g_mol": _PATH_MOLAR_G_MOL,
+                    "evaporation_alpha": {
+                        "value": 0.9,
+                        "source": "synthetic test proxy",
+                        "tag": "broad_proxy_not_intrinsic",
+                        "tier": 2,
+                    },
+                }
+            }
+        },
+        _last_vapor_pressure_diagnostic={},
+        _last_vapour_batch_resolve_error={},
+        _silent_zero_notes=[],
+        _record_degraded_path_engagement=lambda *args, **kwargs: None,
+        _resolve_evaporation_vapour_batch=(
+            lambda equilibrium, temperature_K, effective_pressure_source: batch
+        ),
+        _evaporation_bulk_partial_pressure_pa=lambda species: 0.0,
+        _build_partial_melt_offgassing_diagnostic=(
+            lambda *args, **kwargs: {"reached_partial_loop": True}
+        ),
+        _dispatch_only=dispatch,
+        _freeze_gate_enabled=lambda: False,
+    )
+    host._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        host,
+    )
+    return host
+
+
+def _path_equilibrium():
+    from types import SimpleNamespace
+
+    return SimpleNamespace(
+        liquid_fraction=1.0,
+        temperature_C=_PATH_TEMPERATURE_C,
+        vapor_pressures_Pa={_PATH_CARRIER: _PATH_PRESSURE_PA},
+        vapor_pressures_source={},
+        status="ok",
+        diagnostics={},
+    )
+
+
+def _assert_authorized_carrier(host, expected_mass_kg: float) -> None:
+    from simulator.silent_zero import CATEGORY_REFUSE, ZeroBecause
+
+    diagnostic = host._last_evaporation_flux_diagnostic
+    assert _PATH_CARRIER not in (diagnostic.get("missing_alpha") or {})
+    record = diagnostic["below_evaporation_upper_bound"][_PATH_CARRIER]
+    assert record["reason"] == "below_evaporation_upper_bound"
+    assert record["law"] == "alpha_1_hertz_knudsen_on_kernel_seam"
+    assert record["authority"] == "kernel_seam"
+    assert record["pressure_pa"] == _PATH_PRESSURE_PA
+    assert record["bound_kg"] == pytest.approx(
+        expected_mass_kg, rel=1e-12, abs=0.0
+    )
+    assert 0.0 < record["bound_kg"] < DEFAULT_BALANCE_TOLERANCE_KG
+    overlay = host._last_vapour_batch_flux_overlay
+    assert overlay["batch_channel_states"][_PATH_CARRIER] == "zero_by_physics"
+    notes = list(diagnostic.get("silent_zero_notes") or [])
+    notes.extend(host._silent_zero_notes or [])
+    refused = [
+        note
+        for note in notes
+        if note.get("zero_because") == ZeroBecause.REFUSED_UPSTREAM.value
+        and note.get("species") == _PATH_CARRIER
+        and note.get("doctrine_category") == CATEGORY_REFUSE
+    ]
+    assert refused == []
+
+
+def test_sole_subtolerance_missing_alpha_authorizes_on_evaporation_path() -> None:
+    """A sole missing-alpha carrier below tolerance is an authorized zero.
+
+    The screen classifies it, but the evaporation path used to leave the
+    channel state as ``refusal``. At 1873.15 K that sole refusal raises
+    ``EvaporationFluxRefusal``. Dropping the authorized-zero feed into
+    ``batch_channel_states`` makes this raise again.
+    """
+
+    from simulator.evaporation import EvaporationFluxRefusal, EvaporationMixin
+
+    def _kernel_must_not_run(*args, **kwargs):
+        raise AssertionError("sole authorized zero must not reach the kernel")
+
+    assert _PATH_TEMPERATURE_C + 273.15 >= 400.0
+    expected_mass_kg = _path_tick_mass_kg()
+    assert expected_mass_kg < DEFAULT_BALANCE_TOLERANCE_KG
+    host = _path_host(_path_batch(peer=False), dispatch=_kernel_must_not_run)
+    try:
+        flux = EvaporationMixin._calculate_evaporation(host, _path_equilibrium())
+    except EvaporationFluxRefusal as exc:
+        raise AssertionError(
+            f"authorized zero raised {exc.reason}"
+        ) from exc
+    assert flux.species_kg_hr == {}
+    assert host._last_evaporation_flux_diagnostic.get("reason") == (
+        "zero_by_physics"
+    )
+    _assert_authorized_carrier(host, expected_mass_kg)
+
+
+def test_subtolerance_missing_alpha_with_debiting_peer_is_not_refused_upstream(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A proved missing-alpha zero beside a debit is not category-1.
+
+    The peer still debits. The authorized carrier is omitted from the
+    flux map and must not receive ``REFUSED_UPSTREAM``. Dropping the
+    authorized-zero feed into ``batch_channel_states`` records that note.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.evaporation import EvaporationMixin
+    from simulator.silent_zero import CATEGORY_REFUSE, ZeroBecause
+
+    assert _PATH_TEMPERATURE_C + 273.15 >= 400.0
+    expected_mass_kg = _path_tick_mass_kg()
+    assert expected_mass_kg < DEFAULT_BALANCE_TOLERANCE_KG
+    monkeypatch.setattr(
+        EvaporationMixin,
+        "_evaporation_flux_control_inputs",
+        lambda self, equilibrium, **kwargs: ({}, {}),
+    )
+    host = _path_host(
+        _path_batch(peer=True),
+        dispatch=lambda *args, **kwargs: SimpleNamespace(
+            status="ok",
+            diagnostic={"evaporation_flux_kg_hr": {"Na": 0.25}},
+        ),
+    )
+    flux = EvaporationMixin._calculate_evaporation(host, _path_equilibrium())
+    assert flux.species_kg_hr == {"Na": 0.25}
+    assert _PATH_CARRIER not in flux.species_kg_hr
+    assert host._last_partial_melt_offgassing_diagnostic == {
+        "reached_partial_loop": True
+    }
+    states = host._last_vapour_batch_flux_overlay["batch_channel_states"]
+    assert states["Na"] == "eligible"
+    _assert_authorized_carrier(host, expected_mass_kg)
+    peer_notes = [
+        note
+        for note in (host._silent_zero_notes or [])
+        if note.get("species") == "Na"
+        and note.get("zero_because") == ZeroBecause.REFUSED_UPSTREAM.value
+        and note.get("doctrine_category") == CATEGORY_REFUSE
+    ]
+    assert peer_notes == []

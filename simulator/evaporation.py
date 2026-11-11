@@ -303,6 +303,29 @@ def screened_missing_alpha_records(
     return SoleMissingAlphaScreen(refusals, authorized_zeros)
 
 
+def _feed_authorized_zeros_into_channel_states(
+    flux_overlay_report: dict[str, Any],
+    screen: SoleMissingAlphaScreen,
+) -> None:
+    """Publish a proved missing-alpha zero on ``batch_channel_states``.
+
+    Screening stores ``authorized_zeros`` and leaves the catalog refusal
+    in the channel-state map. The empty-flux authorization and the
+    partial-channel note both read that map. At >= 400 K a sole proved
+    zero still raises ``EvaporationFluxRefusal``, and the same carrier
+    beside a debiting peer receives a category-1 ``REFUSED_UPSTREAM``
+    note. The proved zero is ``zero_by_physics``.
+    """
+
+    if not screen.authorized_zeros:
+        return
+    raw_states = flux_overlay_report.get("batch_channel_states")
+    states = dict(raw_states) if isinstance(raw_states, Mapping) else {}
+    for species in screen.authorized_zeros:
+        states[str(species)] = "zero_by_physics"
+    flux_overlay_report["batch_channel_states"] = states
+
+
 def _publish_evaporation_flux_diagnostic(
     host: Any,
     diagnostic: Mapping[str, Any],
@@ -1319,7 +1342,7 @@ class EvaporationMixin:
             )
         )
         melt = getattr(self, "melt", None)
-        self._screened_missing_alpha_records = _screen_sole_missing_alpha(
+        screen = _screen_sole_missing_alpha(
             vapour_batch,
             vapor_pressures,
             effective_pressure_source,
@@ -1327,6 +1350,8 @@ class EvaporationMixin:
             vapor_pressure_data=getattr(self, "vapor_pressures", None),
             melt_surface_area_m2=getattr(melt, "melt_surface_area_m2", None),
         )
+        self._screened_missing_alpha_records = screen
+        _feed_authorized_zeros_into_channel_states(flux_overlay_report, screen)
         return (
             vapor_pressures,
             flux_overlay_report,
