@@ -328,7 +328,7 @@ def test_run_isolated_cell_worker_closes_acquired_handle(
             raise RuntimeError("fake cell failure")
         return SimpleNamespace(as_payload=lambda: {"status": "ok"})
 
-    monkeypatch.setattr(battery, "equilibrate_cell", equilibrate)
+    monkeypatch.setattr(battery, "_equilibrate_cell_uncached", equilibrate)
     payload = {
         "pot_id": "isolated-worker-test",
         "composition_wt_pct": {"SiO2": 100.0},
@@ -369,7 +369,7 @@ def test_run_isolated_cell_worker_leaves_supplied_handle_to_owner(
     )
     monkeypatch.setattr(
         battery,
-        "equilibrate_cell",
+        "_equilibrate_cell_uncached",
         lambda *_args, **_kwargs: SimpleNamespace(
             as_payload=lambda: {"status": "ok"}
         ),
@@ -2650,6 +2650,7 @@ class _InternalAnalyticalBudgetBackend:
 def _internal_analytical_budget_bootstrap(
     _engine: str,
     engine_settings: Mapping[str, Any] | None = None,
+    _effective_settings: Mapping[str, Any] | None = None,
     *,
     mode: str,
     cpu_budget_s: float | None,
