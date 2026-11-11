@@ -161,8 +161,8 @@ STRATEGY_CLASS_NAMES = {
 WINNER_SELECTION_RULE = (
     "choose the feasible Pareto point with the best primary objective "
     "(profile objective ordinal 0); ties compare the remaining profile "
-    "objectives in order using their declared directions, then cache_key, "
-    "then candidate_id"
+    "objectives in order using their declared directions, then sampling "
+    "order (trial index, otherwise candidate_id)"
 )
 COMPLETED_STATUS = "completed"
 COMPLETED_NO_FEASIBLE_WINNER_STATUS = "completed-no-feasible-winner"
@@ -1033,7 +1033,7 @@ def run(
                 "no feasible candidates due to config/runtime failure; "
                 f"failure_counts={dict(failure_counts)}"
             )
-        leaderboard = tuple(records)
+        leaderboard = tuple(sorted(records, key=_sampling_order_key))
         artifacts = _write_artifacts(
             out,
             profile=resolved_profile,
@@ -1065,7 +1065,7 @@ def run(
             out_dir=out,
             store_path=store.path,
             artifacts=artifacts,
-            records=tuple(records),
+            records=tuple(sorted(records, key=_sampling_order_key)),
             leaderboard=leaderboard,
             pareto=(),
             winner=None,
@@ -1160,7 +1160,7 @@ def run(
         out_dir=out,
         store_path=store.path,
         artifacts=artifacts,
-        records=tuple(records),
+        records=tuple(sorted(records, key=_sampling_order_key)),
         leaderboard=leaderboard,
         pareto=pareto_ranked,
         winner=winner,
@@ -1912,7 +1912,7 @@ def _load_study_journal(
     leaderboard = (
         tuple(sorted(feasible, key=lambda row: _rank_key(row, definitions)))
         if feasible
-        else tuple(records)
+        else tuple(sorted(records, key=_sampling_order_key))
     )
     pareto = tuple(
         sorted(
@@ -1935,7 +1935,7 @@ def _load_study_journal(
         run_dir=root,
         manifest=manifest,
         strategy=active_strategy,
-        records=tuple(records),
+        records=tuple(sorted(records, key=_sampling_order_key)),
         leaderboard=leaderboard,
         pareto=pareto,
         pending_candidates=tuple(pending_candidates),
@@ -4896,6 +4896,21 @@ def _json_dump_value(value: Any) -> str:
     )
 
 
+def _sampling_order_key(record: StudyRecord) -> tuple[int, str]:
+    """Ask order for an exact objective tie.
+
+    Optuna stores ``trial_number``. Screen, random, and staged zero-pad the
+    same index into ``candidate_id``. ``cache_key`` is a hash of the spec, so
+    it is not an order: a later sample can sort first, and one spec byte that
+    differs between machines reshuffles which tied point wins.
+    """
+
+    trial = record.search_provenance.get("trial_number")
+    if isinstance(trial, bool) or not isinstance(trial, int):
+        trial = 0
+    return (trial, record.candidate_id)
+
+
 def _rank_key(
     record: StudyRecord,
     definitions: Sequence[ObjectiveDefinition],
@@ -4903,8 +4918,7 @@ def _rank_key(
     scores = _record_objective_scores(record, definitions)
     return (
         *_rank_score_components(scores),
-        record.cache_key or "",
-        record.candidate_id,
+        *_sampling_order_key(record),
     )
 
 
@@ -6072,7 +6086,7 @@ def _write_aborted_artifacts_from_cache(
     leaderboard = (
         tuple(sorted(feasible, key=lambda row: _rank_key(row, definitions)))
         if feasible
-        else tuple(records)
+        else tuple(sorted(records, key=_sampling_order_key))
     )
     pareto_ranked = tuple(
         sorted(

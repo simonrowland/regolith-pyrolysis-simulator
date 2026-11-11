@@ -3812,6 +3812,78 @@ def test_parallel_composition_target_stub_study_completes(
         )
 
 
+def test_parallel_composition_target_winner_ignores_completion_order(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Exact objective ties keep the earliest sample even if results arrive reversed.
+
+    s000/s001/s002 share one priced objective vector (deposit 0, batch cost 0).
+    Serial ask order is the reference winner. Reversing each evaluation batch
+    is the completion-order perturbation: the winner, Pareto id order, and
+    pareto.json bytes stay on that reference.
+    """
+
+    monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
+    profile_path = tmp_path / "lunar_mare_low_ti__pc-glass-retain-na-k-c3.real.yaml"
+    assert (
+        generator.main(
+            [
+                "lunar_mare_low_ti",
+                "--target",
+                "pc-glass-retain-na-k-c3",
+                "--campaign",
+                "C3",
+                "--hours",
+                "24",
+                "--gate",
+                "physics",
+                "--db",
+                str(tmp_path / "profile.db"),
+                "--out",
+                str(profile_path),
+            ]
+        )
+        == 0
+    )
+    profile = yaml.safe_load(profile_path.read_text())
+    run_kwargs = dict(
+        feedstock="lunar_mare_low_ti",
+        strategy="screen",
+        fidelity="internal-analytical",
+        parallel=2,
+        budget=4,
+        seed=0,
+    )
+    reference = study.run(profile, out_dir=tmp_path / "reference", **run_kwargs)
+    original = study._evaluate_candidates
+
+    def reversed_completion(*args: Any, **kwargs: Any):
+        completed, prefix_evals, pool = original(*args, **kwargs)
+        return tuple(reversed(completed)), prefix_evals, pool
+
+    monkeypatch.setattr(study, "_evaluate_candidates", reversed_completion)
+    reversed_result = study.run(profile, out_dir=tmp_path / "reversed", **run_kwargs)
+
+    priced_order = [
+        "morris-screen-0-t0000-s000",
+        "morris-screen-0-t0000-s001",
+        "morris-screen-0-t0000-s002",
+    ]
+    record_order = priced_order + ["morris-screen-0-t0000-s003"]
+    assert reference.winner is not None
+    assert reference.winner.candidate_id == "morris-screen-0-t0000-s000"
+    assert reversed_result.winner is not None
+    assert reversed_result.winner.candidate_id == reference.winner.candidate_id
+    assert [record.candidate_id for record in reference.pareto] == priced_order
+    assert [record.candidate_id for record in reversed_result.pareto] == priced_order
+    assert [record.candidate_id for record in reference.records] == record_order
+    assert [record.candidate_id for record in reversed_result.records] == record_order
+    assert (tmp_path / "reference" / "pareto.json").read_bytes() == (
+        tmp_path / "reversed" / "pareto.json"
+    ).read_bytes()
+
+
 def test_leaderboard_separates_certified_envelope_from_preference_score(tmp_path) -> None:
     record = study.StudyRecord(
         candidate_id="targeted",
@@ -5660,7 +5732,10 @@ def _all_slow_evaluator(
 
 
 @pytest.mark.cpu_budget(25)
-@pytest.mark.timeout(25)
+# 6x the CPU budget, the project wall guard. An explicit 25s mark fires while
+# the eval-timeout process pool is still waiting on a loaded studio. Two 30s
+# sleeps still cannot pass: the rows must record timeout, not ok.
+@pytest.mark.timeout(150)
 def test_parallel_all_timeouts_is_a_designed_no_winner_outcome(tmp_path) -> None:
     """Every candidate timing out is a DESIGNED outcome, not a crash.
 
@@ -5849,44 +5924,50 @@ def test_single_feasible_point_is_winner(tmp_path) -> None:
     assert [row["candidate_id"] for row in pareto_payload["pareto"]] == ["random-7-000001"]
 
 
-def test_winner_tie_determinism_uses_cache_key_then_candidate_id(tmp_path) -> None:
-    def tied(
-        patch: RecipePatch,
-        feedstock: str,
-        fidelity: str,
-        *,
-        profile: Mapping[str, Any],
-        candidate_id: str | None = None,
-        **_: Any,
-    ) -> ScoredResult:
-        spec = _spec(patch, feedstock, fidelity, profile)
-        return ScoredResult(
+def test_winner_tie_determinism_uses_sampling_order_not_cache_key() -> None:
+    """Exact ties follow sampling order even when cache_key sorts the other way.
+
+    Records arrive last-sample-first, which is what a reversed completion
+    batch looks like. ``cache_key`` is not part of the rank key: a smaller
+    hash on the later sample must not win, and dropping the sampling-order
+    component makes a stable sort keep that arrival order.
+    """
+
+    definitions = study.objective_definitions(PROFILE)
+
+    def record(candidate_id: str, cache: str) -> study.StudyRecord:
+        return study.StudyRecord(
             candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key=cache_key(spec),
+            patch=RecipePatch({}),
             feasible=True,
-            objectives=ObjectiveVector(
-                (
-                    ObjectiveValue("oxygen_kg", "maximize", 10.0, "kg", ordinal=0),
-                    ObjectiveValue("energy_kWh", "minimize", 5.0, "kWh", ordinal=1),
-                )
-            ),
-            feasibility_margins={"delivered_stream_purity": _margin()},
-            run_reference=_run_reference(
-                status="ok",
-                trace={"backend_status": "diagnostic_stub"},
-            ),
+            status="ok",
+            objectives={
+                "oxygen_kg": 10.0,
+                ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: 5.0,
+            },
+            feasibility_margins={},
+            cache_key=cache,
+            product_summary={
+                "furnace_amortization_status": "available",
+                "furnace_amortization_batch_cost_equivalents": 0.0,
+            },
         )
 
-    first = study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 3, tmp_path / "first", seed=7, evaluator=tied)
-    second = study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 3, tmp_path / "second", seed=7, evaluator=tied)
-
-    expected = min(first.pareto, key=lambda record: (record.cache_key or "", record.candidate_id))
-    assert first.winner.candidate_id == expected.candidate_id
-    assert second.winner.candidate_id == expected.candidate_id
-    assert [record.candidate_id for record in first.pareto] == [
-        record.candidate_id for record in second.pareto
+    # Arrival order is the reverse of sampling order. Later samples also
+    # carry the lexicographically smaller cache key.
+    records = (
+        record("random-7-000002", "reverse-000000"),
+        record("random-7-000001", "reverse-000001"),
+        record("random-7-000000", "reverse-000002"),
+    )
+    ranked = sorted(records, key=lambda row: study._rank_key(row, definitions))
+    assert [row.candidate_id for row in ranked] == [
+        "random-7-000000",
+        "random-7-000001",
+        "random-7-000002",
     ]
+    by_cache = sorted(records, key=lambda row: (row.cache_key or "", row.candidate_id))
+    assert by_cache[0].candidate_id == "random-7-000002"
 
 
 def test_completed_rerun_preserves_provenance_without_duplicating_rows(tmp_path) -> None:
