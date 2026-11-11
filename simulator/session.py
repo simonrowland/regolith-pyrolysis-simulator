@@ -326,6 +326,9 @@ class SimSession:
             disclosures = self.law_disclosures
             sim = self._sim
             if sim is not None:
+                # Later solves on this simulator attach here when the session
+                # context is not bound. The object is the session registry.
+                sim._law_disclosure_registry = self._law_disclosure
                 sim.law_disclosures = disclosures
             if outer is not None and outer is not self._law_disclosure:
                 delta = disclosure_delta(before, disclosures)
@@ -344,6 +347,16 @@ class SimSession:
     ) -> "SimSession":
         """Build, load, and start a simulator from explicit config."""
 
+        # A reused session (two CLI start commands) must not keep the previous
+        # run's laws. Replace the registry before the bind snapshots it, so
+        # the outer delta is only what this run adds.
+        from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+        self._law_disclosure = RunDisclosure()
+        sim = self._sim
+        if sim is not None:
+            sim._law_disclosure_registry = self._law_disclosure
+            sim.law_disclosures = ()
         with self._bound_law_disclosure():
             return self._start_impl(config, backend=backend)
 
@@ -591,11 +604,17 @@ class SimSession:
                 and sim.pending_decision is not None
                 else None
             )
-            summary = dict(self._build_per_hour_summary(sim, snapshot))
-            disclosures = self.law_disclosures
-            if disclosures:
-                summary["law_disclosures"] = [dict(item) for item in disclosures]
             try:
+                # Projection runs after step() has committed. A failure here
+                # must poison the session; building the summary outside this
+                # block left _poisoned_error unset and the next advance skipped
+                # the hour.
+                summary = dict(self._build_per_hour_summary(sim, snapshot))
+                disclosures = self.law_disclosures
+                if disclosures:
+                    summary["law_disclosures"] = [
+                        dict(item) for item in disclosures
+                    ]
                 result = StepResult(
                     snapshot=snapshot,
                     per_hour_summary=summary,

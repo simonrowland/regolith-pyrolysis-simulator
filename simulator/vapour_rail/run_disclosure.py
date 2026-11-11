@@ -1,11 +1,11 @@
 """Run-scoped disclosure of an admitted diagnostic or extrapolated vapour law.
 
-Invariant: the run registry is owned by the SimSession. Every advance binds
-that registry, and every publisher reads it from the session. A computation
-merges into that parent. Opening a computation with no parent raises.
-``open_computation`` is the production hot path: with a parent it merges, and
-with none it keeps a detached computation so a cache row can store the laws
-that solve executed. It does not publish a run.
+Invariant: a vapour-law computation is never detached. ``open_computation``
+raises before the solve unless a durable run registry is already bound. The
+session owns that registry. A simulator that is itself the run keeps one on
+the instance via ``bind_simulation_run``; the snapshot is merged into it and
+published on ``law_disclosures``. A stored disclosure with any malformed entry
+is unknown, never a measured empty.
 
 - The only registration site is ``CompiledPressureEvaluator.evaluate``.
 - A cache hit does not execute the law. It re-registers the disclosure stored
@@ -376,23 +376,61 @@ def computation_disclosure() -> Iterator[RunDisclosure]:
         parent.reregister_public(created.snapshot())
 
 
+def _owner_run_registry(owner: Any) -> RunDisclosure:
+    """The durable registry stored on ``owner``, creating it once.
+
+    A computation flag on the stored object is not a run registry. Failing to
+    store the registry raises: there is no temporary registry to discard.
+    """
+
+    registry = getattr(owner, "_law_disclosure_registry", None)
+    if isinstance(registry, RunDisclosure) and not registry.computation:
+        return registry
+    registry = RunDisclosure()
+    try:
+        owner._law_disclosure_registry = registry
+    except Exception as exc:
+        raise LawDisclosureParentError(
+            "computation disclosure requires a durable run registry"
+        ) from exc
+    return registry
+
+
+@contextmanager
+def bind_simulation_run(owner: Any) -> Iterator[RunDisclosure]:
+    """Bind the owner's run registry when no session registry is active.
+
+    A session bind already on the context stays the parent. Otherwise the
+    owner's registry is the run: it survives this context, and its snapshot is
+    published on ``owner.law_disclosures``. Nested calls do not replace it.
+    """
+
+    current = _ACTIVE.get()
+    if current is not None:
+        yield current
+        return
+    registry = _owner_run_registry(owner)
+    token = _ACTIVE.set(registry)
+    try:
+        yield registry
+    finally:
+        _ACTIVE.reset(token)
+        owner.law_disclosures = registry.snapshot()
+
+
 @contextmanager
 def open_computation() -> Iterator[RunDisclosure]:
-    """One production computation.
+    """One production computation. Requires a bound durable run registry.
 
-    A bound run receives the counts. A solve with no run keeps a detached
-    computation so the cache row stores that solve's laws, and publishes
-    nothing. Direct ``computation_disclosure()`` with no parent still raises.
+    No detached registry. A solve that has neither a session nor
+    ``bind_simulation_run`` raises before the law executes, and nothing is
+    published as an unflagged result.
     """
 
     if _ACTIVE.get() is None:
-        created = RunDisclosure(computation=True)
-        token = _ACTIVE.set(created)
-        try:
-            yield created
-        finally:
-            _ACTIVE.reset(token)
-        return
+        raise LawDisclosureParentError(
+            "computation disclosure requires the session-owned run registry"
+        )
     with computation_disclosure() as created:
         yield created
 
@@ -406,6 +444,8 @@ def parse_stored_disclosure_field(
 
     A present empty list is a measured zero. ``None`` means unknown: the
     caller must miss or refuse to rank, and must not treat it as unflagged.
+    One malformed entry makes the whole field unknown. Dropping it would
+    publish the remaining rows as a measured zero.
     """
 
     if not present or raw is None:
@@ -425,35 +465,46 @@ def parse_stored_disclosure_field(
         return None
     measured: list[dict[str, Any]] = []
     for item in raw:
-        if isinstance(item, Mapping) and item.get("law_id"):
-            measured.append(dict(item))
+        parsed = _well_formed_disclosure(item)
+        if parsed is None:
+            return None
+        measured.append(parsed)
     return tuple(measured)
 
 
+def _well_formed_disclosure(item: Any) -> dict[str, Any] | None:
+    """A disclosure row with a law id, or None when the row is malformed."""
+
+    if not isinstance(item, Mapping) or isinstance(item, (str, bytes)):
+        return None
+    law_id = item.get("law_id")
+    if not isinstance(law_id, str) or not law_id:
+        return None
+    return dict(item)
+
+
 def reregister_cached_disclosures(disclosures: Any) -> None:
-    """Re-register disclosures stored beside a cached value. Does not execute."""
+    """Re-register disclosures stored beside a cached value. Does not execute.
+
+    Malformed rows are not registered. The caller must have treated them as
+    a miss; registering the well-formed subset would hide the bad entry.
+    """
 
     current = _ACTIVE.get()
     if current is None or disclosures is None:
         return
-    if isinstance(disclosures, Mapping):
-        items: Sequence[Any] = (disclosures,)
-    elif isinstance(disclosures, (list, tuple)) and not isinstance(
-        disclosures, (str, bytes)
-    ):
-        items = disclosures
-    else:
+    measured = parse_stored_disclosure_field(disclosures, present=True)
+    if not measured:
         return
-    current.reregister_public(
-        tuple(item for item in items if isinstance(item, Mapping))
-    )
+    current.reregister_public(measured)
 
 
 def stored_disclosures_known(record: Mapping[str, Any] | None) -> bool:
     """True when the row recorded a disclosure field that parses.
 
-    An empty list is known (a measured zero). Absence and unreadable values
-    are unknown. A hit path must miss on unknown before it returns the row.
+    An empty list is known (a measured zero). Absence, unreadable values, and
+    any malformed entry are unknown. A hit path must miss on unknown before
+    it returns the row.
     """
 
     if not isinstance(record, Mapping) or "law_disclosures" not in record:
@@ -503,19 +554,11 @@ def published_run_disclosures(execution: Any) -> tuple[dict[str, Any], ...]:
     return tuple(dict(item) for item in active_snapshot())
 
 
-def disclosure_metadata(disclosures: Any) -> tuple[dict[str, Any], ...]:
-    """Plain snapshot tuples for a stored disclosure payload."""
+def disclosure_metadata(
+    disclosures: Any,
+) -> tuple[dict[str, Any], ...] | None:
+    """Measured disclosure rows, or None when the payload is unknown."""
 
-    if isinstance(disclosures, Mapping):
-        items: Sequence[Any] = (disclosures,)
-    elif isinstance(disclosures, (list, tuple)) and not isinstance(
-        disclosures, (str, bytes)
-    ):
-        items = disclosures
-    else:
-        return ()
-    plain: list[dict[str, Any]] = []
-    for item in items:
-        if isinstance(item, Mapping) and item.get("law_id"):
-            plain.append(dict(item))
-    return tuple(plain)
+    if disclosures is None:
+        return None
+    return parse_stored_disclosure_field(disclosures, present=True)

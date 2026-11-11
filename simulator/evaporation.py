@@ -2272,6 +2272,7 @@ class EvaporationMixin:
             recorded_law_disclosures,
         )
         from simulator.vapour_rail.run_disclosure import (
+            bind_simulation_run,
             open_computation,
             publish_stored_disclosures,
             stored_disclosures_known,
@@ -2492,9 +2493,10 @@ class EvaporationMixin:
         self._invalid_projected_liquidus_notice = None
         # The live curve is one computation. Its memo and PT-0 row store
         # only the laws this solve executes. A later hit re-registers them.
-        # open_computation merges into the session when one is bound and
-        # keeps a detached computation when this solve has no run.
-        with open_computation() as gate_computation:
+        # The session registry is the parent when one is bound. Otherwise
+        # this simulator keeps the registry. open_computation does not
+        # build a detached one.
+        with bind_simulation_run(self), open_computation() as gate_computation:
             try:
                 reasons: list[str] = []
                 repair_notices: list[dict[str, Any]] = []

@@ -9939,11 +9939,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             cached_result = store.cached_equilibrium(self)
             if cached_result is not None:
                 return cached_result
-        from simulator.vapour_rail.run_disclosure import open_computation
+        from simulator.vapour_rail.run_disclosure import (
+            bind_simulation_run,
+            open_computation,
+        )
 
         # The live solve is one computation. Its cache row stores only the
         # laws this solve executes. A bound session receives those counts.
-        with open_computation():
+        # With no session, the simulator registry keeps them: open_computation
+        # raises rather than discard a parentless solve.
+        with bind_simulation_run(self), open_computation():
             return self._get_equilibrium_live(
                 store,
                 cache_write_through=cache_write_through,

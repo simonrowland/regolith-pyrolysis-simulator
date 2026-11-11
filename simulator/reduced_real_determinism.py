@@ -385,9 +385,15 @@ def _law_disclosures_from_json(raw: Any) -> tuple[dict[str, Any], ...] | None:
 
 
 def _disclosures_known(entry: Mapping[str, Any]) -> bool:
-    """False when the row never recorded a disclosure. Empty is known."""
+    """False when the row's disclosure is unknown. Empty is known.
 
-    return "law_disclosures" in entry and entry["law_disclosures"] is not None
+    Malformed entries are unknown. Presence of the field is not enough:
+    ``[null]`` and ``[{}]`` must miss, not publish as an unflagged hit.
+    """
+
+    from simulator.vapour_rail.run_disclosure import stored_disclosures_known
+
+    return stored_disclosures_known(entry)
 
 
 def recorded_law_disclosures(record: Mapping[str, Any] | None) -> Any:

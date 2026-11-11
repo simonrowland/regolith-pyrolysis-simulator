@@ -1,8 +1,12 @@
 """Run-scoped disclosure of an admitted diagnostic or extrapolated vapour law.
 
-Invariant: the run registry is owned by the SimSession. Every advance binds it,
-and every publisher reads that session registry. A computation merges into the
-parent; opening one with no parent raises. A cache or memo hit with no stored
+Invariant: a vapour-law computation is never detached. ``open_computation``
+raises before the law runs unless a durable run registry is already bound.
+The session owns that registry. A simulator that is itself the run keeps one
+via ``bind_simulation_run``, and the snapshot is published on that owner.
+A stored disclosure with any malformed entry is unknown, never a measured
+empty. A new ``SimSession.start`` owns a fresh registry. Projection after a
+committed step poisons the session. A cache or memo hit with no stored
 disclosure field is unknown and is a miss. Registration is the one
 ``CompiledPressureEvaluator.evaluate`` call. A hit does not execute the law; it
 re-registers the disclosures stored with that computation, and evaluation
@@ -61,10 +65,15 @@ from simulator.reduced_real_determinism import (
 )
 from simulator.vapour_rail.catalog import CompiledPressureEvaluator
 from simulator.vapour_rail.run_disclosure import (
+    LawDisclosureParentError,
     active_snapshot,
+    bind_simulation_run,
     computation_disclosure,
+    disclosure_metadata,
     disclosure_scope,
+    open_computation,
     publish_stored_disclosures,
+    stored_disclosures_known,
 )
 from tests.test_optimizer_results_store import _base_spec, _scored
 
@@ -589,21 +598,21 @@ def test_cache_publication_paths_use_the_disclosure_chokepoint() -> None:
     head = core.split("    def _get_equilibrium(", 1)[1].split(
         "    def _get_equilibrium_live(", 1
     )[0]
-    assert "with open_computation()" in head
+    live_open = "with bind_simulation_run(self), open_computation()"
+    assert live_open in head
+    assert "with open_computation()" not in head
     assert "computation_disclosure()" not in head
-    assert head.index("replay_enabled") < head.index("with open_computation()")
-    assert head.index("cached_equilibrium") < head.index("with open_computation()")
+    assert head.index("replay_enabled") < head.index(live_open)
+    assert head.index("cached_equilibrium") < head.index(live_open)
     assert "capture_equilibrium" not in head
 
     evaporation = (_ROOT / "simulator/evaporation.py").read_text(encoding="utf-8")
     body = evaporation.split("    def _freeze_gate_curve_record(", 1)[1].split(
         "    def _freeze_gate_liquidus_fO2_log(", 1
     )[0]
-    assert body.index("recorded_law_disclosures(cache)") < body.index(
-        "with open_computation()"
-    )
+    assert body.index("recorded_law_disclosures(cache)") < body.index(live_open)
     assert body.index("recorded_law_disclosures(process_cached)") < body.index(
-        "with open_computation()"
+        live_open
     )
     assert body.count("publish_stored_disclosures(") == 2
     assert body.index("stored_disclosures_known(cache)") < body.index(
@@ -612,15 +621,12 @@ def test_cache_publication_paths_use_the_disclosure_chokepoint() -> None:
     assert body.index("stored_disclosures_known(process_cached)") < body.index(
         "publish_stored_disclosures(process_cached)"
     )
-    assert body.index("publish_stored_disclosures(cache)") < body.index(
-        "with open_computation()"
-    )
+    assert body.index("publish_stored_disclosures(cache)") < body.index(live_open)
     assert body.index("publish_stored_disclosures(process_cached)") < body.index(
-        "with open_computation()"
+        live_open
     )
-    assert body.index("with open_computation()") < body.rindex(
-        "store.capture_gate_curve("
-    )
+    assert body.index(live_open) < body.rindex("store.capture_gate_curve(")
+    assert "with open_computation()" not in body
     assert "with computation_disclosure()" not in body
 
     results = (_ROOT / "simulator/optimize/results_store.py").read_text(encoding="utf-8")
@@ -983,21 +989,205 @@ def test_published_cache_classes_obey_disclosure_invariant(kind: str, tmp_path: 
         _scored_result_from_journal_payload(unreadable)
 
 
-def test_computation_without_a_parent_raises() -> None:
-    from simulator.vapour_rail.run_disclosure import (
-        LawDisclosureParentError,
-        open_computation,
+@pytest.mark.parametrize("opener", [computation_disclosure, open_computation])
+def test_parentless_computation_raises_before_the_law_runs(opener) -> None:
+    """A computation with no durable parent raises before Fe executes.
+
+    The body must not run. A detached registry that recorded Fe and then
+    reset without publishing is the drop this pin forbids.
+    """
+
+    ran = False
+    with pytest.raises(LawDisclosureParentError):
+        with opener():
+            ran = True
+            _fe_pressure("FeO_association_gas")
+    assert ran is False
+    assert active_snapshot() == ()
+
+
+def test_simulator_owned_run_publishes_every_computation() -> None:
+    """No session: the simulator registry keeps both Fe counts."""
+
+    from types import SimpleNamespace
+
+    owner = SimpleNamespace()
+    with bind_simulation_run(owner):
+        with open_computation() as first:
+            _fe_pressure("FeO_association_gas")
+            assert first.snapshot()[0]["evaluation_count"] == 1
+        with open_computation() as second:
+            _fe_pressure("FeO_association_gas")
+            assert second.snapshot()[0]["evaluation_count"] == 1
+    assert active_snapshot() == ()
+    _assert_fe_disclosure(
+        owner.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=2,
+    )
+    with bind_simulation_run(owner):
+        with open_computation():
+            _fe_pressure("FeO_association_gas")
+    _assert_fe_disclosure(
+        owner.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=3,
     )
 
-    with pytest.raises(LawDisclosureParentError):
-        with computation_disclosure():
-            pass
-    with open_computation() as child:
-        _fe_pressure("FeO_association_gas")
-        snapshot = child.snapshot()
+
+def test_bound_session_is_the_parent_of_a_simulation_computation() -> None:
+    from types import SimpleNamespace
+
+    owner = SimpleNamespace()
+    with disclosure_scope(inherit=False) as session:
+        with bind_simulation_run(owner):
+            with open_computation():
+                _fe_pressure("FeO_association_gas")
+        _assert_fe_disclosure(
+            session.snapshot()[0],
+            law_id=_FE_ASSOCIATION_LAW_ID,
+            count=1,
+        )
+    assert not hasattr(owner, "law_disclosures")
     assert active_snapshot() == ()
-    assert len(snapshot) == 1
-    _assert_fe_disclosure(snapshot[0], law_id=_FE_ASSOCIATION_LAW_ID, count=1)
+
+
+def test_every_production_open_computation_binds_a_durable_run() -> None:
+    """Every production ``open_computation`` call sits inside a durable bind."""
+
+    import re
+
+    opener = "open_computation("
+    offenders: list[str] = []
+    disclosure = (_ROOT / "simulator/vapour_rail/run_disclosure.py").read_text(
+        encoding="utf-8"
+    )
+    body = disclosure.split("def open_computation", 1)[1].split("\ndef ", 1)[0]
+    assert "LawDisclosureParentError" in body
+    assert "RunDisclosure(computation=True)" not in body
+    for path in sorted((_ROOT / "simulator").rglob("*.py")):
+        if path.name == "run_disclosure.py":
+            continue
+        func = "<module>"
+        bound = False
+        for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if re.match(r"(?:    )?def ", line) or line.startswith("class "):
+                func = line.strip()
+                bound = False
+            if "bind_simulation_run(" in line:
+                bound = True
+            if opener in line and "def open_computation" not in line and not bound:
+                offenders.append(f"{path.relative_to(_ROOT)}:{lineno} {func}")
+    assert offenders == []
+
+
+_MALFORMED_DISCLOSURES = (
+    None,
+    [None],
+    [{}],
+    [{"law_id": ""}],
+    [{"not_a_law": "Fe:nasa_cea_9"}],
+    [{"law_id": "Fe:nasa_cea_9"}, None],
+    [{"law_id": "Fe:nasa_cea_9"}, {}],
+    "null",
+    "[null]",
+    "[{}]",
+    1,
+    "not-json",
+)
+
+
+@pytest.mark.parametrize("raw", _MALFORMED_DISCLOSURES)
+def test_malformed_stored_disclosure_is_unknown(raw) -> None:
+    """One bad entry is unknown on every reader. It is not dropped to ()."""
+
+    from simulator.optimize.study import _journal_law_disclosures
+    from simulator.reduced_real_determinism import _disclosures_known
+
+    record = {"law_disclosures": raw}
+    assert stored_disclosures_known(record) is False
+    assert _disclosures_known(record) is False
+    assert disclosure_metadata(raw) is None
+    with disclosure_scope(inherit=False) as registry:
+        assert publish_stored_disclosures(record) is None
+        assert registry.snapshot() == ()
+    with pytest.raises(StudyReplayError, match="unreadable"):
+        _journal_law_disclosures(record)
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        [],
+        "[]",
+        [{"law_id": "Fe:nasa_cea_9", "evaluation_count": 1}],
+    ],
+)
+def test_well_formed_stored_disclosure_stays_measured(raw) -> None:
+    from simulator.optimize.study import _journal_law_disclosures
+    from simulator.reduced_real_determinism import _disclosures_known
+
+    record = {"law_disclosures": raw}
+    assert stored_disclosures_known(record) is True
+    assert _disclosures_known(record) is True
+    assert disclosure_metadata(raw) is not None
+    measured = _journal_law_disclosures(record)
+    assert isinstance(measured, tuple)
+    with disclosure_scope(inherit=False) as registry:
+        published = publish_stored_disclosures(record)
+        assert published is not None
+        if published:
+            assert registry.snapshot()[0]["law_id"] == "Fe:nasa_cea_9"
+        else:
+            assert registry.snapshot() == ()
+
+
+def test_session_start_forgets_the_previous_run_disclosure(monkeypatch) -> None:
+    from simulator.session import SimSession
+
+    session = SimSession()
+
+    def _start(config, backend=None):
+        _fe_pressure("FeO_association_gas")
+        return session
+
+    monkeypatch.setattr(session, "_start_impl", _start)
+    session.start(object())
+    _assert_fe_disclosure(
+        session.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+    session.start(object())
+    _assert_fe_disclosure(
+        session.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+
+
+def test_projection_failure_poisons_the_session_before_another_advance() -> None:
+    session = _probe_session(use_fe=False)
+    calls: list[int] = []
+    sim = session._sim
+    original_step = sim.step
+
+    def counting_step():
+        calls.append(len(calls) + 1)
+        return original_step()
+
+    sim.step = counting_step
+
+    def broken_summary(*_args):
+        raise ValueError("projection broke")
+
+    session._build_per_hour_summary = broken_summary
+    with pytest.raises(RuntimeError, match="projection failed"):
+        session.advance()
+    assert calls == [1]
+    with pytest.raises(RuntimeError, match="session is poisoned"):
+        session.advance()
+    assert calls == [1]
 
 
 def _probe_simulator(*, use_fe: bool):
@@ -1117,7 +1307,7 @@ def test_session_registry_reaches_every_publisher(monkeypatch) -> None:
             session=failed,
             simulator=None,
             per_hour=(failed_step.per_hour_summary,),
-            backend_status="failed",
+            backend_status="unavailable",
             backend_authoritative=False,
             refusal_diagnostic={},
             campaigns_elapsed=1.0,
@@ -1189,7 +1379,7 @@ def test_session_registry_reaches_every_publisher(monkeypatch) -> None:
                 state=SimpleNamespace(
                     is_value=True,
                     value=SimpleNamespace(
-                        components={"SiO2": 1.0},
+                        components=(("SiO2", 1.0),),
                         amount_basis="mole_fraction",
                     ),
                 )
