@@ -1511,6 +1511,7 @@ class PyrolysisRun:
         _attach_composition_projected_liquidus_notice(run_metadata, sim)
         _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
         _attach_c0_exit_notice(run_metadata, sim)
+        _attach_stage0_carbon_allocation_notice(run_metadata, sim)
         run_metadata.update(
             canonicalize_fidelity_emission(
                 backend_name=self.backend_name,
@@ -3841,6 +3842,43 @@ def _attach_high_t_melt_activity_fallback_notice(
     )
 
 
+def _stage0_carbon_allocation_notice(sim: Any) -> dict[str, Any] | None:
+    if sim is None:
+        return None
+    reader = getattr(sim, "stage0_carbon_allocation_run_notice", None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
+
+
+def _attach_stage0_carbon_allocation_notice(
+    run_metadata: dict[str, Any],
+    sim: Any,
+) -> None:
+    _attach_run_metadata_report(
+        run_metadata,
+        "stage0_carbon_allocation_notice",
+        lambda: _stage0_carbon_allocation_notice(sim),
+    )
+
+
+def _stage0_carbon_allocation_sentence(notice: Mapping[str, Any]) -> str:
+    species = ", ".join(
+        str(item) for item in (notice.get("out_of_domain_species") or ())
+    )
+    order = ", ".join(str(item) for item in (notice.get("order") or ()))
+    temperature = notice.get("temperature_K")
+    return (
+        "**Stage-0 sulfate carbon**: allocation ranked by tabulated dG per mol C "
+        f"({order}) at {temperature} K. "
+        f"Out of the foulant table for {species}; "
+        "reported masses are a flagged best estimate."
+    )
+
+
 def _attach_c0_exit_notice(
     run_metadata: dict[str, Any],
     sim: Any,
@@ -4034,6 +4072,10 @@ def _product_classification_report(
             diagnostic_notice
         )
         sentences.append(_diagnostic_gate_authority_sentence(diagnostic_notice))
+    carbon_notice = _stage0_carbon_allocation_notice(sim)
+    if carbon_notice and carbon_notice.get("out_of_domain"):
+        report["stage0_carbon_allocation_notice"] = _json_safe(carbon_notice)
+        sentences.append(_stage0_carbon_allocation_sentence(carbon_notice))
     if sentences:
         report["markdown"] = _markdown_with_notice_sentences(markdown, sentences)
     return report
@@ -5862,6 +5904,7 @@ def _runner_failure_result(
     _attach_composition_projected_liquidus_notice(run_metadata, sim)
     _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
     _attach_c0_exit_notice(run_metadata, sim)
+    _attach_stage0_carbon_allocation_notice(run_metadata, sim)
     final_state = (
         _safe_failure_value(
             lambda: _json_safe(_final_state_from_ledger(sim)),

@@ -3631,6 +3631,11 @@ def product_summary(
     high_t_activity = read_high_t_melt_activity_fallback_notice(sim)
     if high_t_activity:
         summary["high_t_melt_activity_fallback_notice"] = high_t_activity
+    carbon_reader = getattr(sim, "stage0_carbon_allocation_run_notice", None)
+    if callable(carbon_reader):
+        carbon_notice = carbon_reader()
+        if isinstance(carbon_notice, Mapping) and carbon_notice:
+            summary["stage0_carbon_allocation_notice"] = dict(carbon_notice)
     summary.update(
         _coating_product_summary(
             run_execution,
