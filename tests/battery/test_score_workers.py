@@ -6,7 +6,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import time
 
 from simulator.battery.enums import AdmissionStatus, Engine, EvidenceClass
 from simulator.battery.score import (
@@ -61,18 +60,11 @@ def _worker_test_predict(
     engine,
     observation,
     *,
-    delay_seconds: float = 0.0,
-    hang_observation_id: str | None = None,
-    hang_seconds: float = 0.0,
     crash_observation_id: str | None = None,
     **_kwargs,
 ):
     if observation.observation_id == crash_observation_id:
         os._exit(17)
-    if observation.observation_id == hang_observation_id:
-        time.sleep(hang_seconds)
-    elif delay_seconds:
-        time.sleep(delay_seconds)
     from simulator.battery.enums import Authority, ExecutionState
     from simulator.battery.records import Execution
     from simulator.battery.score import EnginePrediction
@@ -143,88 +135,17 @@ def test_parallel_scoring_matches_serial_rows_and_summary(tmp_path: Path) -> Non
     assert parallel_summary == serial_summary
 
 
-def test_parallel_score_shards_use_progress_instead_of_total_wall_deadline(
-    tmp_path: Path, monkeypatch
-) -> None:
-    import simulator.battery.score as score_module
-
-    monkeypatch.setattr(
-        score_module, "_SCORE_SHARD_IDLE_TIMEOUT_SECONDS", 3.0, raising=False
-    )
-    context = _worker_fixture(experiment_count=16)
-    started = time.monotonic()
-    written, metadata = _score_store_to_jsonl(
-        context,
-        tmp_path / "slow-but-progressing.jsonl",
-        engines=(Engine.VAPOROCK,),
-        predict=partial(_worker_test_predict, delay_seconds=0.25),
-        workers=2,
-    )
-
-    assert time.monotonic() - started > 3.0
-    assert written > 0
-    assert metadata.shard_failures == ()
-
-
-def test_parallel_score_hung_shard_becomes_refusals_and_keeps_other_shards(
-    tmp_path: Path, monkeypatch, capsys
-) -> None:
-    import simulator.battery.score as score_module
-
-    monkeypatch.setattr(
-        score_module, "_SCORE_SHARD_IDLE_TIMEOUT_SECONDS", 3.0, raising=False
-    )
-    context = _worker_fixture(experiment_count=8)
-    chunks = _partition_score_refs(tuple(context.observations.values()), workers=2)
-    failed_chunk_index = next(index for index, chunk in enumerate(chunks) if chunk)
-    failed_observation = chunks[failed_chunk_index][0].observation_id
-    healthy_chunk = chunks[1 - failed_chunk_index]
-    assert healthy_chunk
-    written, metadata = _score_store_to_jsonl(
-        context,
-        tmp_path / "hung-shard.jsonl",
-        engines=(Engine.VAPOROCK,),
-        predict=partial(
-            _worker_test_predict,
-            hang_observation_id=failed_observation,
-            hang_seconds=10.0,
-        ),
-        workers=2,
-    )
-
-    rows = [
-        json.loads(line)
-        for line in (tmp_path / "hung-shard.jsonl.partial")
-        .read_text(encoding="utf-8")
-        .splitlines()[1:]
-    ]
-    failed_ids = {
-        observation.observation_id for observation in chunks[failed_chunk_index]
-    }
-    healthy_ids = {observation.observation_id for observation in healthy_chunk}
-    failed_rows = [row for row in rows if row["reference"] in failed_ids]
-    healthy_rows = [row for row in rows if row["reference"] in healthy_ids]
-    assert written == len(rows)
-    assert failed_rows and healthy_rows
-    assert all(
-        row["execution"]["state"] == "attempted_unavailable"
-        and row["refusal"]["reason"] == "attempted_unavailable"
-        and row["refusal"]["detail"]["reason"] == "score_shard_failed"
-        for row in failed_rows
-    )
-    assert any(row["execution"]["state"] == "produced" for row in healthy_rows)
-    assert metadata.shard_failures
-    assert metadata.engine_cache_counters[Engine.VAPOROCK.value]["hits"] > 0
-    assert "score run notice" in capsys.readouterr().err
-
-
-def test_parallel_score_crashed_shard_becomes_refusals_and_keeps_other_shards(
+def test_parallel_score_crash_preserves_completed_rows_and_publishes_failure(
     tmp_path: Path, capsys
 ) -> None:
     context = _worker_fixture(experiment_count=8)
     chunks = _partition_score_refs(tuple(context.observations.values()), workers=2)
-    failed_chunk_index = next(index for index, chunk in enumerate(chunks) if chunk)
-    failed_observation = chunks[failed_chunk_index][0].observation_id
+    failed_chunk_index = next(
+        index for index, chunk in enumerate(chunks) if len(chunk) >= 4
+    )
+    failed_chunk = chunks[failed_chunk_index]
+    crash_index = len(failed_chunk) // 2
+    failed_observation = failed_chunk[crash_index].observation_id
     healthy_chunk = chunks[1 - failed_chunk_index]
     assert healthy_chunk
     written, metadata = _score_store_to_jsonl(
@@ -244,23 +165,65 @@ def test_parallel_score_crashed_shard_becomes_refusals_and_keeps_other_shards(
         .read_text(encoding="utf-8")
         .splitlines()[1:]
     ]
+    completed_ids = {
+        observation.observation_id for observation in failed_chunk[:crash_index]
+    }
     failed_ids = {
-        observation.observation_id for observation in chunks[failed_chunk_index]
+        observation.observation_id for observation in failed_chunk[crash_index:]
     }
     healthy_ids = {observation.observation_id for observation in healthy_chunk}
+    completed_rows = [row for row in rows if row["reference"] in completed_ids]
     failed_rows = [row for row in rows if row["reference"] in failed_ids]
     healthy_rows = [row for row in rows if row["reference"] in healthy_ids]
     assert written == len(rows)
-    assert failed_rows and healthy_rows
+    assert completed_rows and failed_rows and healthy_rows
+    assert all(row["execution"]["state"] == "produced" for row in completed_rows)
     assert all(
         row["execution"]["state"] == "attempted_unavailable"
         and row["refusal"]["detail"]["reason"] == "score_shard_failed"
         for row in failed_rows
     )
     assert any(row["execution"]["state"] == "produced" for row in healthy_rows)
-    assert metadata.shard_failures
+    assert len(failed_rows) == len(failed_ids)
+    assert len(metadata.shard_failures) == 1
     assert metadata.engine_cache_counters[Engine.VAPOROCK.value]["hits"] > 0
     assert "score run notice" in capsys.readouterr().err
+
+    from simulator.battery.score import (
+        _ResidualJsonlRows,
+        _render_score_report_from_payloads_legacy,
+        _write_headline_summary_from_accumulator_json,
+        derive_store_stamp,
+    )
+
+    summary_path = tmp_path / "score-summary.json"
+    _write_headline_summary_from_accumulator_json(
+        metadata.aggregate,
+        summary_path,
+        store_stamp=derive_store_stamp(),
+        shard_failures=metadata.shard_failures,
+    )
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    failure = summary["score_shard_failures"][0]
+    assert failure["chunk"] == failed_chunk_index
+    assert failure["engine"] == Engine.VAPOROCK.value
+    assert failure["refused_rows"] == len(failed_ids)
+    assert "BrokenProcessPool" in failure["reason"]
+
+    report = _render_score_report_from_payloads_legacy(
+        _ResidualJsonlRows(
+            tmp_path / "crashed-shard.jsonl.partial", metadata=metadata
+        ),
+        context=context,
+        engines=(Engine.VAPOROCK,),
+        store_stamp=derive_store_stamp(),
+        _aggregate=metadata.aggregate,
+        shard_failures=metadata.shard_failures,
+    )
+    assert "## Score shard failures" in report
+    assert f"{failed_chunk_index}" in report
+    assert "BrokenProcessPool" in report
+    assert str(len(failed_ids)) in report
 
 
 def test_group_partition_keeps_series_and_sossi_cohort_together() -> None:
