@@ -33,9 +33,9 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   matches "the value is 1." A CSV or TSV source, including a table
   artifact with that suffix, is parsed completely before the locator is
   applied. A cell certifies a stored value only when the whole trimmed,
-  unquoted cell is that value: a spelling of the number, or the stored
-  string. A substring does not certify, so a cell 1/2 is not 1 and a cell
-  1,000 is not 1. A line_range selects only records that lie entirely
+  unquoted cell parses to that number, or equals the stored string.
+  0.9100 parses to 0.91. A substring does not certify, so a cell 1/2 is
+  not 1 and a cell 1,000 is not 1. A line_range selects only records that lie entirely
   inside it. A span that cuts through a quoted cell is source-blind and
   is not re-parsed from the sliced lines. 1 K is not 1 KPa.
   A leading decimal is a number, so .24 is not a label
@@ -506,33 +506,58 @@ def _cited_table_cells(
     return cells, None
 
 
+def _whole_cell_number(cell: str) -> float | None:
+    """Parse the entire trimmed cell as one number, or return None.
+
+    The numeric token grammar has to consume the whole cell. ``0.9100``
+    parses to 0.91. ``.91`` parses to 0.91. ``1/2``, ``1,000``, ``91.``,
+    and ``0.91Pa`` do not parse. This is not a list of spellings of a
+    stored leaf.
+    """
+    folded = _fold_numeric_signs(cell.strip())
+    if _NUMERIC_TOKEN_RE.fullmatch(folded) is None:
+        return None
+    try:
+        parsed = float(folded)
+    except ValueError:
+        return None
+    if not math.isfinite(parsed):
+        return None
+    return parsed
+
+
 def _cell_certifies_leaf(leaf: Any, cell: str) -> bool:
     """True when the whole trimmed, unquoted cell is ``leaf``.
 
-    Never a substring. ``1/2`` is not ``1``. ``1,000`` is not ``1``.
-    ``1 K`` is not ``1 KPa``. A string matches only that string. An int
-    matches only its decimal spelling. A float matches only a spelling
-    ``_numeric_spellings`` keeps, which parses back to that float.
+    Invariant: a numeric cell certifies only when the whole cell parses
+    to that number. ``0.9100`` is ``0.91``. ``1.0`` is ``1``. ``1/2`` is
+    not ``1``. ``1,000`` is not ``1`` and is not ``1000``. A string matches
+    only that string. Spellings are not enumerated. The sign of zero is
+    part of the value, so ``-0.0`` is not ``0.0``.
     """
     folded = _fold_numeric_signs(cell.strip())
     if isinstance(leaf, str):
         return folded == _fold_numeric_signs(leaf)
     if isinstance(leaf, bool):
         return folded.lower() == ("true" if leaf else "false")
-    if isinstance(leaf, int):
-        return folded == str(leaf)
-    if isinstance(leaf, float):
-        if not math.isfinite(leaf):
+    if isinstance(leaf, (int, float)):
+        if isinstance(leaf, float) and not math.isfinite(leaf):
             return False
-        return folded in _numeric_spellings(leaf)
+        parsed = _whole_cell_number(cell)
+        if parsed is None:
+            return False
+        if parsed != leaf:
+            return False
+        return math.copysign(1.0, parsed) == math.copysign(1.0, float(leaf))
     return False
 
 
 def _leaf_in_table(leaf: Any, cells: Sequence[str]) -> bool:
     """True when one whole cell is ``leaf``.
 
-    Comparison is ``_cell_certifies_leaf`` only. The prose matcher is not
-    used, so a digit inside ``1/2`` or ``note 1`` is not that stored number.
+    Comparison is ``_cell_certifies_leaf`` only. A numeric cell parses
+    equal, so ``0.9100`` is ``0.91``. The prose matcher is not used, so a
+    digit inside ``1/2`` or ``note 1`` is not that stored number.
     """
     return any(_cell_certifies_leaf(leaf, cell) for cell in cells)
 
@@ -2497,7 +2522,8 @@ def fidelity_source_warnings(
     ``1`` matches ``the value is 1.``. ``1 K`` is not ``1 KPa`` and ``1``
     is not ``1,000``. A CSV or TSV source is parsed completely before the
     locator is applied. A cell certifies a stored value only when the whole
-    trimmed, unquoted cell is that value. A substring does not certify, so
+    trimmed, unquoted cell parses to that number, or equals the stored
+    string. ``0.9100`` is ``0.91``. A substring does not certify, so
     a cell ``1/2`` is not ``1`` and a cell ``1,000`` is not ``1``. A
     ``line_range`` selects records that lie entirely inside it. A span that
     cuts through a quoted cell is source-blind and is not re-parsed from
@@ -2768,8 +2794,10 @@ def certify_extract_source_fidelity(
     ``1`` is not ``1,000``. A sentence period does not extend the span, so
     ``1`` matches ``the value is 1.``. A CSV or TSV source is parsed
     completely before the locator is applied. A cell certifies a stored
-    value only when the whole trimmed, unquoted cell is that value, so a
-    cell ``1/2`` is not ``1`` and a cell ``1,000`` is not ``1``. A span
+    value only when the whole trimmed, unquoted cell parses to that
+    number, or equals the stored string. ``0.9100`` is ``0.91``. A
+    substring does not certify, so a cell ``1/2`` is not ``1`` and a cell
+    ``1,000`` is not ``1``. A span
     that cuts through a quoted cell is source-blind and is not re-parsed
     from the sliced lines. A leading decimal
     is a numeric token. A spelling

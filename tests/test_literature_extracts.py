@@ -21,6 +21,7 @@ import itertools
 import json
 import math
 import os
+import re
 import sys
 from collections import Counter
 from decimal import Decimal
@@ -7895,16 +7896,25 @@ def test_source_artifact_provenance_is_required_at_every_promoter(
 
 # Tabular sources. The expected result is the whole-cell rule: a CSV or TSV
 # row is parsed, and a cell certifies a value only when the whole trimmed
-# cell is that value. ``0.91,0.92`` certifies 0.91 and 0.92. A cell ``1/2``
-# does not certify 1. A quoted cell ``1,000`` does not certify 1, and neither
-# does a TSV cell ``1,000``. A cell ``1 KPa`` does not certify ``1 K``. The
-# same row in a prose artifact stays digit grouping; that case lives in
-# ``_TOKEN_CASES``.
+# cell parses to that number, or equals the stored string. ``0.91,0.92``
+# certifies 0.91 and 0.92. ``0.9100`` certifies 0.91. A cell ``1/2`` does
+# not certify 1. A quoted cell ``1,000`` does not certify 1 or 1000, and
+# neither does a TSV cell ``1,000``. A cell ``1 KPa`` does not certify
+# ``1 K``. The same row in a prose artifact stays digit grouping; that
+# case lives in ``_TOKEN_CASES``.
 _TABULAR_CELL_CASES = (
     ("csv_first_cell", "csv", "0.91,0.92\n", 0.91, True),
     ("csv_second_cell", "csv", "0.91,0.92\n", 0.92, True),
     ("csv_quoted_group_refuses_one", "csv", '"1,000"\n', 1, False),
+    ("csv_quoted_group_refuses_thousand", "csv", '"1,000"\n', 1000, False),
     ("csv_quoted_group_whole", "csv", '"1,000"\n', "1,000", True),
+    ("csv_trailing_zeros", "csv", "0.9100\n", 0.91, True),
+    ("csv_trailing_zeros_string_differs", "csv", "0.9100\n", "0.91", False),
+    ("csv_trailing_zeros_string", "csv", "0.9100\n", "0.9100", True),
+    ("csv_leading_decimal", "csv", ".91\n", 0.91, True),
+    ("csv_decimal_certifies_int", "csv", "1.0\n", 1, True),
+    ("csv_int_text_certifies_float_one", "csv", "1\n", 1.0, True),
+    ("csv_trailing_dot_refuses", "csv", "91.\n", 91.0, False),
     ("csv_fraction_refuses_one", "csv", "1/2\n", 1, False),
     ("csv_fraction_refuses_string_one", "csv", "1/2\n", "1", False),
     ("csv_fraction_whole", "csv", "1/2\n", "1/2", True),
@@ -7916,7 +7926,11 @@ _TABULAR_CELL_CASES = (
     ("tsv_first_cell", "tsv", "0.91\t0.92\n", 0.91, True),
     ("tsv_second_cell", "tsv", "0.91\t0.92\n", 0.92, True),
     ("tsv_grouped_cell_refuses_one", "tsv", "1,000\n", 1, False),
+    ("tsv_grouped_cell_refuses_thousand", "tsv", "1,000\n", 1000, False),
     ("tsv_grouped_cell_whole", "tsv", "1,000\n", "1,000", True),
+    ("tsv_trailing_zeros", "tsv", "0.9100\n", 0.91, True),
+    ("tsv_leading_decimal", "tsv", ".91\n", 0.91, True),
+    ("tsv_trailing_dot_refuses", "tsv", "91.\n", 91.0, False),
     ("tsv_fraction_refuses_one", "tsv", "1/2\n", 1, False),
     ("tsv_fraction_whole", "tsv", "1/2\n", "1/2", True),
     ("tsv_unit_exact", "tsv", "1 K\n", "1 K", True),
@@ -7975,10 +7989,12 @@ def test_tabular_source_matches_each_cell(
     """Invariant: a table cell certifies a value only when the whole cell is that value.
 
     The row ``0.91,0.92`` certifies 0.91 and 0.92, each as its own cell.
-    A cell ``1/2`` does not certify 1. A quoted cell ``1,000`` certifies
-    that printed value and not 1. A TSV cell ``1,000`` does the same.
-    ``1 K`` is not ``1 KPa`` inside a cell. Every promoter calls
-    ``certify_extract_source_fidelity``.
+    ``0.9100`` certifies 0.91 because the parsed numbers are equal, and
+    the string ``0.91`` does not. A cell ``1/2`` does not certify 1. A
+    quoted cell ``1,000`` certifies that printed value and not 1 or 1000.
+    A TSV cell ``1,000`` does the same. ``91.`` does not parse, so it does
+    not certify 91. ``1 K`` is not ``1 KPa`` inside a cell. Every promoter
+    calls ``certify_extract_source_fidelity``.
     """
     doc = _tabular_source_document(tmp_path, pin, suffix, source_text)
     errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
@@ -8129,42 +8145,53 @@ def _one_cell_table(cell: str, suffix: str) -> str:
     return buffer.getvalue()
 
 
-def _oracle_float_spellings(leaf: float) -> set[str]:
-    """Spellings that are this float. Not the gate's helper."""
-    spellings: set[str] = set()
-    for spelling in (str(leaf), format(leaf, ".16g")):
-        if "." not in spelling and "e" not in spelling.lower():
-            continue
-        try:
-            parsed = float(spelling)
-        except ValueError:
-            continue
-        if parsed == leaf and math.copysign(1.0, parsed) == math.copysign(1.0, leaf):
-            spellings.add(spelling)
-    return spellings
+# Whole-cell number, written here. Optional sign, digits or a leading
+# decimal, optional fraction digits, optional exponent. The pattern has
+# to consume the cell. A grouping comma, a slash, a trailing dot, and a
+# unit do not match. This is not a spelling list and it does not call
+# the gate.
+_ORACLE_CELL_NUMBER_RE = re.compile(
+    r"[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?"
+)
+
+
+def _oracle_parse_whole_cell(cell: str) -> float | None:
+    """Parse the whole trimmed cell as one number. Not the gate's grammar."""
+    text = cell.strip()
+    if _ORACLE_CELL_NUMBER_RE.fullmatch(text) is None:
+        return None
+    try:
+        parsed = float(text)
+    except ValueError:
+        return None
+    if not math.isfinite(parsed):
+        return None
+    return parsed
 
 
 def _oracle_whole_cell_certifies(leaf: object, cell: str) -> bool:
     """The table rule, written here. It does not call the gate.
 
-    Trim the cell. A string certifies only when the cell equals it. An int
-    certifies only when the cell is the decimal spelling of that int. A
-    float certifies only when the cell is ``str(leaf)`` or
-    ``format(leaf, '.16g')``, that spelling parses back to the same float,
-    and it contains a decimal point or an exponent. A slash, a grouping
-    comma, a unit, or any other extra character refuses.
+    Trim the cell. A string certifies only when the cell equals it. A
+    number certifies only when the whole cell parses to that number:
+    ``0.9100`` and ``.91`` are 0.91, and ``1.0`` is 1. A slash, a grouping
+    comma, a trailing dot, a unit, or any other extra character refuses.
+    The sign of zero is part of the value.
     """
     trimmed = cell.strip()
     if isinstance(leaf, str):
         return trimmed == leaf
     if isinstance(leaf, bool):
         return trimmed.lower() == ("true" if leaf else "false")
-    if isinstance(leaf, int):
-        return trimmed == str(leaf)
-    if isinstance(leaf, float):
-        if not math.isfinite(leaf):
+    if isinstance(leaf, (int, float)):
+        if isinstance(leaf, float) and not math.isfinite(leaf):
             return False
-        return trimmed in _oracle_float_spellings(leaf)
+        parsed = _oracle_parse_whole_cell(trimmed)
+        if parsed is None:
+            return False
+        if parsed != leaf:
+            return False
+        return math.copysign(1.0, parsed) == math.copysign(1.0, float(leaf))
     return False
 
 
@@ -8213,17 +8240,27 @@ def test_table_cell_certifies_only_the_whole_cell(
     ``1 K``, ``1/2``) embedded as the whole cell, a fraction, a grouped
     continuation, a unit, a word prefix, a slash prefix, or a doubled
     token, in both CSV and TSV. The expected boolean is
-    ``_oracle_whole_cell_certifies``. A cell ``1/2`` does not certify 1.
-    A cell ``1,000`` does not certify 1 and does certify the string
-    ``1,000``.
+    ``_oracle_whole_cell_certifies``, which parses the cell. A cell
+    ``1/2`` does not certify 1. A cell ``1,000`` does not certify 1 and
+    does certify the string ``1,000``. A cell ``.91`` certifies 0.91.
     """
     assert "vle." not in inspect.getsource(_oracle_whole_cell_certifies)
+    assert "vle." not in inspect.getsource(_oracle_parse_whole_cell)
+    assert "_numeric_spellings" not in inspect.getsource(_oracle_whole_cell_certifies)
+    assert "_numeric_spellings" not in inspect.getsource(vle._cell_certifies_leaf)
+    assert "_numeric_spellings" not in inspect.getsource(vle._whole_cell_number)
     assert not _oracle_whole_cell_certifies(1, "1/2")
     assert not _oracle_whole_cell_certifies(1, "1,000")
+    assert not _oracle_whole_cell_certifies(1000, "1,000")
     assert _oracle_whole_cell_certifies("1,000", "1,000")
     assert _oracle_whole_cell_certifies(1, "1")
     assert _oracle_whole_cell_certifies(0.91, "0.91")
-    assert not _oracle_whole_cell_certifies(0.91, ".91")
+    assert _oracle_whole_cell_certifies(0.91, "0.9100")
+    assert _oracle_whole_cell_certifies(0.91, ".91")
+    assert _oracle_whole_cell_certifies(1, "1.0")
+    assert _oracle_whole_cell_certifies(1.0, "1")
+    assert not _oracle_whole_cell_certifies("0.91", "0.9100")
+    assert not _oracle_whole_cell_certifies(91.0, "91.")
     cell = _embedded_table_cell(probe, embedding)
     text = _one_cell_table(cell, suffix)
     delimiter = "," if suffix == "csv" else "\t"
@@ -8240,6 +8277,127 @@ def test_table_cell_certifies_only_the_whole_cell(
             continue
         assert errors, (case_name, leaf, cell)
         assert "source_blind_pin" in "\n".join(errors)
+
+
+# Spellings of one number, and strings that are not that number. The
+# expected boolean is the whole-cell parse, not a list of spellings.
+_CELL_PARSE_SIGNS = ("", "+", "-")
+_CELL_PARSE_BODIES = (
+    "0",
+    "0.0",
+    "0.91",
+    "0.9100",
+    "0.910000",
+    ".91",
+    "9.1e-1",
+    "91e-2",
+    "9.10E-1",
+    "1",
+    "1.0",
+    "1.00",
+    "1e0",
+    "1.0e0",
+    "1e3",
+    "1.2E-3",
+    "1000",
+    "1000.0",
+    "01",
+    "00.91",
+    "1,000",
+    "1/2",
+    "91.",
+    "1.",
+    "0.911",
+    "10.91",
+    "1 K",
+    "0.91Pa",
+)
+_CELL_PARSE_PROBES = (
+    0.91,
+    -0.91,
+    1,
+    1.0,
+    1000,
+    1000.0,
+    91.0,
+    0.0,
+    -0.0,
+    0.0012,
+)
+
+
+def _cell_parse_product() -> list[str]:
+    return [
+        f"{sign}{body}"
+        for sign in _CELL_PARSE_SIGNS
+        for body in _CELL_PARSE_BODIES
+    ]
+
+
+def test_numeric_table_cell_certifies_only_when_the_whole_cell_parses_equal(
+    tmp_path: Path,
+):
+    """Invariant: a numeric table cell certifies iff the whole cell parses equal.
+
+    The product is every sign, every mantissa class (trailing zeros, leading
+    decimal, exponent, integer, grouping, fraction, trailing dot, unit),
+    and both CSV and TSV. The expected boolean is
+    ``_oracle_whole_cell_certifies``, which parses the cell and does not
+    use a spelling list. ``0.9100`` certifies 0.91. ``1/2`` does not
+    certify 1. ``1,000`` does not certify 1 or 1000. A string certifies
+    only the same string. ``91.`` does not parse.
+    """
+    assert _oracle_whole_cell_certifies(0.91, "0.9100")
+    assert _oracle_whole_cell_certifies(0.91, ".91")
+    assert _oracle_whole_cell_certifies(1, "1.0")
+    assert _oracle_whole_cell_certifies(1.0, "1")
+    assert _oracle_whole_cell_certifies(1000, "1e3")
+    assert _oracle_whole_cell_certifies(1000.0, "1e3")
+    assert not _oracle_whole_cell_certifies(1, "1/2")
+    assert not _oracle_whole_cell_certifies(1, "1,000")
+    assert not _oracle_whole_cell_certifies(1000, "1,000")
+    assert not _oracle_whole_cell_certifies(91.0, "91.")
+    assert not _oracle_whole_cell_certifies(0.91, "0.911")
+    assert not _oracle_whole_cell_certifies("0.91", "0.9100")
+    assert _oracle_whole_cell_certifies("1,000", "1,000")
+    assert _oracle_whole_cell_certifies("1/2", "1/2")
+    # A Unicode minus folds onto ASCII before the cell is parsed.
+    assert vle._cell_certifies_leaf(-0.91, "\u22120.91")
+    assert not vle._cell_certifies_leaf(0.91, "\u22120.91")
+    assert vle._cell_certifies_leaf("-0.91", "\u22120.91")
+    failures: list[str] = []
+    for cell in _cell_parse_product():
+        leaves: list[object] = [*_CELL_PARSE_PROBES, cell]
+        parsed = _oracle_parse_whole_cell(cell)
+        if parsed is not None:
+            leaves.append(parsed)
+        for leaf in leaves:
+            expected = _oracle_whole_cell_certifies(leaf, cell)
+            got = vle._cell_certifies_leaf(leaf, cell)
+            if got != expected:
+                failures.append(f"{cell!r} {leaf!r} gate={got} oracle={expected}")
+        if failures:
+            continue
+        for suffix in _TABLE_CELL_SUFFIXES:
+            text = _one_cell_table(cell, suffix)
+            public_leaves: list[object] = [0.91, 1, cell]
+            if parsed is not None:
+                public_leaves.append(parsed)
+            for leaf in public_leaves:
+                expected = _oracle_whole_cell_certifies(leaf, cell)
+                doc = _tabular_source_document(tmp_path, leaf, suffix, text)
+                errors = vle.certify_extract_source_fidelity(
+                    doc, label="parse", artifact_root=tmp_path
+                )
+                if expected:
+                    if errors:
+                        failures.append(f"certify {suffix} {cell!r} {leaf!r}: {errors}")
+                    continue
+                if not errors or "source_blind_pin" not in "\n".join(errors):
+                    failures.append(
+                        f"refuse {suffix} {cell!r} {leaf!r}: {errors}"
+                    )
+    assert failures == []
 
 
 _TABLE_CUT_INNERS = ("1,000", "1", "1/2", "0.91")
@@ -8283,8 +8441,9 @@ def test_table_locator_that_cuts_a_cell_is_source_blind(
     cuts that cell, so every leaf refuses, including a leaf the sliced line
     would certify. Citing lines 1-2 selects the whole cell, which certifies
     only when ``_oracle_whole_cell_certifies`` says the cell is that leaf.
-    For inner ``1,000``, line 2 alone parses as a cell ``1``; the gate still
-    refuses 1.
+    For inner ``1,000``, a CSV line 2 parses as a cell ``1``; the gate
+    still refuses 1. A TSV line 2 stays the one cell ``1,000"`` and does
+    not certify 1. The cut refuses either way.
     """
     text, cell = _multiline_cell_table(inner, suffix)
     assert text.splitlines() == ['"note', inner + '"'], (case_name, text)
@@ -8297,9 +8456,18 @@ def test_table_locator_that_cuts_a_cell_is_source_blind(
             csv.reader(io.StringIO(fragment + "\n", newline=""), delimiter=delimiter)
         )
         fragment_cells = [item for row in fragment_rows for item in row]
-        assert any(
+        fragment_certifies_one = any(
             _oracle_whole_cell_certifies(1, item) for item in fragment_cells
-        ), fragment_cells
+        )
+        if suffix == "csv":
+            # A comma splits the sliced line, so a re-parse would see a
+            # cell that is the number 1. The gate must still refuse.
+            assert fragment_certifies_one, fragment_cells
+        else:
+            # A tab does not split ``1,000"``. The fragment stays one cell
+            # and does not certify 1. The cut refusal is checked below.
+            assert fragment_cells == ['1,000"'], fragment_cells
+            assert not fragment_certifies_one, fragment_cells
     if mode == "cover":
         line_range = "1-2"
     elif mode == "cut_line1":
