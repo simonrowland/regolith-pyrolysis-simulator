@@ -2568,7 +2568,10 @@ def test_simulated_crash_yields_engine_crash() -> None:
 
 
 def _fake_isolated_cell_bootstrap(
-    _engine: str, *, initialization_delay_s: float = 0.0
+    _engine: str,
+    _engine_settings: Mapping[str, Any] | None = None,
+    *,
+    initialization_delay_s: float = 0.0,
 ):
     time.sleep(initialization_delay_s)
     return None, "fake-ready"
@@ -2840,6 +2843,7 @@ class _NestedWarmHangBackend:
 
 def _nested_warm_hang_bootstrap(
     engine: str,
+    _engine_settings: Mapping[str, Any] | None = None,
     *,
     budget_path: str,
     pid_path: str,
