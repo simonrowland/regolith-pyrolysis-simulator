@@ -4853,14 +4853,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         species: tuple[str, ...],
     ) -> dict[str, float]:
         trial_pO2_bar = 10.0 ** float(log10_pO2_bar)
-        control_inputs, intrinsic_fO2_log = self._vapor_pressure_control_inputs(
+        control_inputs, _reservoir_log = self._vapor_pressure_control_inputs(
             pO2_bar=trial_pO2_bar,
             temperature_C=float(self.melt.temperature_C),
         )
+        # P_eq,i(ξ_s). The reservoir log is the melt state, not this trial.
+        # A shuttle debit integrated as n/C_m stored log10 fO2 of -47.88;
+        # dissociation of that log clamps non-Fe pressures at 1e-30 bar and
+        # the residual is then flat. The trial log is the potential.
+        trial_log = float(log10_pO2_bar)
+        control_inputs['intrinsic_fO2_log'] = trial_log
         result = self._dispatch_only(
             ChemistryIntent.VAPOR_PRESSURE,
             control_inputs=control_inputs,
-            fO2_log=intrinsic_fO2_log,
+            fO2_log=trial_log,
             include_diagnostic_shadows=False,
         )
         status = str(getattr(result, 'status', '') or '')

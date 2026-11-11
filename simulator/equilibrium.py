@@ -574,6 +574,17 @@ class EquilibriumMixin:
                 intrinsic_fO2_log = float(getattr(self.melt, 'fO2_log', -9.0))
         else:
             intrinsic_fO2_log = float(intrinsic_fO2_value)
+        # Once the hour has a surface, every channel's oxygen potential is
+        # ξ_s. The reservoir log stays the melt state for redox; it is not
+        # the vapour denominator. An extrapolated reservoir (n/C_m) would
+        # otherwise clamp non-Fe mass action at the dissociation floor.
+        solution = getattr(self, "_hour_interface_oxygen", None)
+        surface_log = (
+            getattr(solution, "surface_log10_pO2_bar", None)
+            if solution is not None else None
+        )
+        if surface_log is not None and math.isfinite(float(surface_log)):
+            intrinsic_fO2_log = float(surface_log)
 
         melt_dissociation_pO2_bar, melt_pO2_clamped = (
             physical_melt_dissociation_pO2_bar(intrinsic_fO2_log)
