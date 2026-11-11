@@ -14,6 +14,7 @@ import io
 
 import pytest
 
+from tests.test_runner_smoke import PER_HOUR_OPTIONAL_KEYS
 from simulator.session_cli import SessionScriptRunner, run_script
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 
@@ -64,20 +65,11 @@ PER_HOUR_KEYS = {
     "mre_current_A",
     "oxygen_reservoir",
 }
-PER_HOUR_DIAGNOSTIC_KEYS = {
-    "fe_redox_split",
-    "redox_source_breakdown",
-    "stage_3_capture",
+PER_HOUR_SESSION_ONLY_KEYS = {
     # VR-11 exposes the selected vapour batch and its flux overlay on advanced
     # steps; the pre-advance snapshot remains the compact per-hour surface.
     "vapour_batch_summary",
     "vapour_batch_flux_overlay",
-    # Emitted only when a refusal actually fired (runner/__init__.py:2582
-    # guards it with `if refusals:`). It began appearing on this recipe at
-    # 1742cbb8, which routed admission-refusal and flux_dormant through the
-    # typed refused status instead of letting the debit reader evaporate them
-    # silently -- so the key showing up is the fix working, not a leak.
-    "condensation_refusals_by_species",
 }
 
 
@@ -258,9 +250,10 @@ def test_session_script_exercises_every_verb_as_ndjson():
     # dropped a key.
     step_keys = set(frames[2]["steps"][0])
     assert PER_HOUR_KEYS <= step_keys, PER_HOUR_KEYS - step_keys
-    assert step_keys <= PER_HOUR_KEYS | PER_HOUR_DIAGNOSTIC_KEYS, (
-        step_keys - (PER_HOUR_KEYS | PER_HOUR_DIAGNOSTIC_KEYS)
+    allowed_step_keys = (
+        PER_HOUR_KEYS | PER_HOUR_OPTIONAL_KEYS | PER_HOUR_SESSION_ONLY_KEYS
     )
+    assert step_keys <= allowed_step_keys, step_keys - allowed_step_keys
     assert frames[2]["steps"][0]["furnace_heat_status"] == "partial"
     assert frames[2]["steps"][0]["fe_redox_split"]
     assert set(frames[2]["steps"][0]["stage_3_capture"]) == {
