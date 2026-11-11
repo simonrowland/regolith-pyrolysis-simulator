@@ -2307,6 +2307,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
     def get_engine_version(self) -> str:
         from simulator.engine_local_config import (
+            _cache_version_for_binary,
             cache_version_for,
             warn_legacy_once,
         )
@@ -2370,10 +2371,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     legacy = f'MAGEMin subprocess ({resolved_binary_path})'
         warn_legacy_once(
             'magemin',
-            'engines.local.toml absent; using legacy MAGEMin '
-            'path-based identity for cache comparison',
+            'engines.local.toml absent; using MAGEMin release and binary '
+            'SHA-256 identity for cache comparison',
         )
-        return legacy
+        return _cache_version_for_binary(
+            'magemin',
+            resolved_binary_path,
+            legacy or 'MAGEMin',
+        ) or 'unavailable'
 
     def _import_magemin_bridge(
         self, *, requested: Optional[Any]
