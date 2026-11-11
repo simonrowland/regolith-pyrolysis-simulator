@@ -218,7 +218,8 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     migrator.finalize()
     result = migrator.result
     assert result.validation.hard_issues == ()
-    assert len(result.observations) == 1002
+    # The two kept Table 9 NaAlSi_6 liquidus points raise the migrated count.
+    assert len(result.observations) == 1004
 
     partial_pressures = [
         row
