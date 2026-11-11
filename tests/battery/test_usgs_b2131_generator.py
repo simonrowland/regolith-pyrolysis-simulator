@@ -12,7 +12,11 @@ from simulator.battery.generators.usgs_b2131 import (
     owns_record,
     phase_windows,
 )
-from simulator.battery.generators.usgs_b2131_raster import FORMULA_RASTER, PHASE_SENTENCE
+from simulator.battery.generators.usgs_b2131_raster import (
+    FORMULA_RASTER,
+    PHASE_SENTENCE,
+    PRINTED_FORMULA_TRANSCRIPTIONS,
+)
 from simulator.battery.identity import bar_to_pa, quantity_token
 from simulator.battery.migrate import REPO_ROOT
 
@@ -157,8 +161,10 @@ def test_calcium_windows_do_not_span_a_printed_bound() -> None:
 def test_high_temperature_rows_use_raster_corrected_temperature() -> None:
     printed_points = {
         "high-temperature-p189": (Decimal("1200"), Decimal("-81.2")),
+        "high-temperature-p199": (Decimal("1700"), Decimal("-256.9")),
         "high-temperature-p205": (Decimal("1800"), Decimal("146.4")),
         "high-temperature-p217": (Decimal("1800"), Decimal("-512.4")),
+        "high-temperature-p219": (Decimal("700"), Decimal("-430.8")),
         "high-temperature-p223": (Decimal("500"), Decimal("-846.0")),
     }
     for record_id, printed_point in printed_points.items():
@@ -170,6 +176,88 @@ def test_high_temperature_rows_use_raster_corrected_temperature() -> None:
         ]
         assert len(gibbs) == 1
         assert printed_point in gibbs[0].value.series
+
+
+def test_unparsed_high_temperature_gibbs_is_unavailable_per_phase_window() -> None:
+    printed_windows = {
+        "high-temperature-p069": 2,
+        "high-temperature-p075": 2,
+        "high-temperature-p085": 2,
+        "high-temperature-p089": 1,
+        "high-temperature-p099": 2,
+        "high-temperature-p102": 2,
+        "high-temperature-p115": 1,
+    }
+    for record_id, window_count in printed_windows.items():
+        document = _load(f"records/{record_id}.json")
+        gibbs = [
+            observation
+            for observation in generate_record(document).observations
+            if quantity_token(observation.identity) is Quantity.DELTA_FG
+        ]
+        assert len(gibbs) == window_count
+        assert all(obs.value.kind is ValueKind.UNAVAILABLE for obs in gibbs)
+        assert all(
+            "unparsed OCR tokens" in (obs.value.unavailable_reason or "")
+            for obs in gibbs
+        )
+        assert all(not obs.value.series and obs.value.point is None for obs in gibbs)
+
+
+def test_unparsed_reference_gibbs_is_owned_and_unavailable() -> None:
+    for record_id in (
+        "reference-p005-05",
+        "reference-p005-11",
+        "reference-p006-05",
+        "reference-p007-13",
+    ):
+        document = _load(f"summary/{record_id}.json")
+        generated = generate_record(document)
+        gibbs = [
+            observation
+            for observation in generated.observations
+            if quantity_token(observation.identity) is Quantity.DELTA_FG
+        ]
+        assert owns_record(document)
+        assert len(gibbs) == 1
+        assert gibbs[0].value.kind is ValueKind.UNAVAILABLE
+        assert "unparsed" in (gibbs[0].value.unavailable_reason or "")
+        assert gibbs[0].identity.temperature_K.value == Decimal("298.15")
+
+
+def test_printed_formula_transcriptions_restore_numeric_rows() -> None:
+    expected = {
+        "high-temperature-p274": (
+            "Sr003",
+            "SrCO3",
+            (Decimal("298.15"), Decimal("-1137.6")),
+            (Decimal("1400"), Decimal("-850.8")),
+        ),
+        "high-temperature-p367": (
+            "KAlSi309",
+            "KAlSi3O8",
+            (Decimal("298.15"), Decimal("-3745.8")),
+            (Decimal("1400"), Decimal("-2902.2")),
+        ),
+    }
+    for record_id, (ocr_formula, printed_formula, first, last) in expected.items():
+        document = _load(f"records/{record_id}.json")
+        assert PRINTED_FORMULA_TRANSCRIPTIONS[record_id][:2] == (
+            ocr_formula,
+            printed_formula,
+        )
+        formula, evidence = formula_for_record(document)
+        assert formula == printed_formula
+        assert evidence and "printed page" in evidence
+        gibbs = [
+            observation
+            for observation in generate_record(document).observations
+            if quantity_token(observation.identity) is Quantity.DELTA_FG
+        ]
+        assert all(obs.identity.species.formula == printed_formula for obs in gibbs)
+        points = [point for obs in gibbs for point in obs.value.series]
+        assert first in points and last in points
+        assert len(points) == 13
 
 
 def test_reference_state_second_line_is_the_printed_uncertainty() -> None:
@@ -270,16 +358,6 @@ def test_records_without_a_parsed_thermochemical_cell_stay_generic() -> None:
     assert generate_record(_load("records/high-temperature-p193.json")).observations == ()
     assert owns_record(_load("summary/reference-p005-13.json")) is False
     assert generate_record(_load("summary/reference-p005-13.json")).observations == ()
-    # Sr003 cannot align to SrCO3, and KAlSi309 cannot align to KAlSi3O8.
-    for record_id, published in (
-        ("high-temperature-p274", "Sr003"),
-        ("high-temperature-p367", "KAlSi309"),
-    ):
-        document = _load(_compilation_path(record_id))
-        assert document["formula_as_published"] == published
-        assert formula_for_record(document) == (published, None)
-        assert owns_record(document) is True
-        assert generate_record(document).observations == ()
     ammonia = generate_record(_load("records/high-temperature-p280.json"))
     assert ammonia.observations
     assert {obs.identity.species.formula for obs in ammonia.observations} == {"NH4NO3"}
