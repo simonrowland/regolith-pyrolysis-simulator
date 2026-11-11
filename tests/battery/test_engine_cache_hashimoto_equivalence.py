@@ -14,6 +14,6 @@ def test_scored_hashimoto_residues_match_off_cold_warm_and_parallel_cache(
         tmp_path,
         source="kems-015-hashimoto-1983",
         experiment_ids=(
-            "10.2343/geochemj.17.111::experiment::hashimoto-1983-run-17c3-2",
+            "10.2343/geochemj.17.111::experiment::hashimoto-1983-run-20b2",
         ),
     )

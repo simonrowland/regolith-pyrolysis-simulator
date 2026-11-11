@@ -14,6 +14,6 @@ def test_scored_sossi_residues_match_off_cold_warm_and_parallel_cache(
         tmp_path,
         source="kems-012-sossi-2019",
         experiment_ids=(
-            "10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-1m-15-07-16b",
+            "10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-15-07-16c",
         ),
     )
