@@ -768,7 +768,23 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
     }
     computed = compute_objectives(objective_profile, run_execution)
     evidence = computed.evidence["throughput_cost_owner_ratify_usd"]
+    assert evidence["energy_cost_usd"] == pytest.approx(
+        evidence["electrical_cost_usd"] + evidence["solar_heat_cost_usd"]
+    )
+    assert evidence["energy_cost_usd"] == pytest.approx(1.5)
     assert evidence["carrier_gas"]["carrier_mass_used_kg"] == pytest.approx(44.0)
+    assert evidence["carrier_gas"]["earth_price_source_tag"].startswith(
+        "FLAGGED dated estimate 2026-11-11"
+    )
+    assert evidence["carrier_gas"]["makeup_loss_source_tag"] == (
+        "FLAGGED: controller assumption pending owner number (d-389)"
+    )
+    assert evidence["carrier_gas"]["carrier_mass_basis"] == (
+        "scaled_reference_estimate"
+    )
+    assert evidence["carrier_gas"]["carrier_mass_scale"]["total_scale"] == pytest.approx(
+        1.0
+    )
     assert computed.as_mapping()["throughput_cost_owner_ratify_usd"] == pytest.approx(
         evidence["marginal_cost_usd"]
     )

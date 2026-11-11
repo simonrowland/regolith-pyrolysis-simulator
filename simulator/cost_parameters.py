@@ -25,7 +25,7 @@ DEFAULT_SOLAR_HEAT_COST_PER_KWH = 0.05
 DEFAULT_FURNACE_LIFETIME_COST_MULTIPLIER = 500.0
 DEFAULT_MIN_FOULING_PENALTY = 1.0
 DEFAULT_IMPORT_DELIVERY_COST_PER_KG = 10000.0
-DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG = {"Kr": 290.0}
+DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG = {"Ar": 0.0, "Kr": 290.0, "N2": 0.0}
 DEFAULT_CARRIER_MAKEUP_LOSS_FRACTION_PER_RUN = 0.01
 ENERGY_COST_DEFAULT_SOURCE = "owner-t7-two-price-energy-v1"
 PAYLOAD_ABSENT_COST_PROVENANCE = (
@@ -45,7 +45,7 @@ _REQUIRED_SCALAR_PARAMETERS = (
 )
 _SHUTTLE_PARAMETER = "shuttle_reagent_replacement_cost_per_kg"
 _CARRIER_PRICE_PARAMETER = "carrier_gas_earth_price_per_kg"
-_CARRIER_PRICE_SPECIES = frozenset({"Kr"})
+_CARRIER_PRICE_SPECIES = frozenset({"Ar", "Kr", "N2"})
 
 
 @dataclass(frozen=True)
@@ -93,10 +93,16 @@ class CostParameters:
             str(species): _finite_nonnegative(value, f"{_CARRIER_PRICE_PARAMETER}.{species}")
             for species, value in dict(self.carrier_gas_earth_price_per_kg).items()
         }
-        if set(carrier_prices) != _CARRIER_PRICE_SPECIES:
+        extra_carrier_prices = set(carrier_prices).difference(_CARRIER_PRICE_SPECIES)
+        if extra_carrier_prices:
             raise ValueError(
-                f"{_CARRIER_PRICE_PARAMETER} must define exactly "
+                f"{_CARRIER_PRICE_PARAMETER} supports only "
                 f"{', '.join(sorted(_CARRIER_PRICE_SPECIES))}"
+            )
+        for species in _CARRIER_PRICE_SPECIES:
+            carrier_prices.setdefault(
+                species,
+                DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG[species],
             )
         object.__setattr__(
             self,
@@ -396,12 +402,41 @@ def _with_missing_carrier_cost_defaults(
                 "'Prices of chemical elements'; USGS MCS 2026 reports rare-gas prices unavailable"
             ),
             "values": {
+                "Ar": {
+                    "value": DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG["Ar"],
+                    "source_tag": "earth_price_pending_immaterial_vs_delivery",
+                },
                 "Kr": {
                     "value": DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG["Kr"],
-                }
+                },
+                "N2": {
+                    "value": DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG["N2"],
+                    "source_tag": "earth_price_pending_immaterial_vs_delivery",
+                },
             },
         },
     )
+    carrier_price_entry = result.get(_CARRIER_PRICE_PARAMETER)
+    if isinstance(carrier_price_entry, Mapping):
+        raw_values = carrier_price_entry.get("values")
+        if isinstance(raw_values, Mapping):
+            values = dict(raw_values)
+            for species in _CARRIER_PRICE_SPECIES:
+                values.setdefault(
+                    species,
+                    {
+                        "value": DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG[species],
+                        **(
+                            {"source_tag": "earth_price_pending_immaterial_vs_delivery"}
+                            if species in {"Ar", "N2"}
+                            else {}
+                        ),
+                    },
+                )
+            result[_CARRIER_PRICE_PARAMETER] = {
+                **dict(carrier_price_entry),
+                "values": values,
+            }
     result.setdefault(
         "carrier_makeup_loss_fraction_per_run",
         {

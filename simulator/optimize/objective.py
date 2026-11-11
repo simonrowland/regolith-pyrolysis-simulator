@@ -38,9 +38,8 @@ from simulator.cost_energy import (
     unavailable_reason_of,
 )
 from simulator.core import read_high_t_melt_activity_fallback_notice
+from simulator.physical_constants import GAS_CONSTANT
 from simulator.thermal_train import (
-    OXYGEN_MOLAR_MASS_KG_PER_MOL,
-    cryogenic_tail,
     thermal_train_parameters_from_mapping,
 )
 from simulator.wall_deposit_availability import wall_deposit_figure_availability
@@ -62,6 +61,13 @@ from simulator.optimize.backend_status import (
 
 _MISSING = object()
 FURNACE_INSTANT_DEATH_FACTOR = 10.0
+# NIST Chemistry WebBook SRD 69 gas data and phase-change rows. N2 uses
+# Cp=7/2 R at 300 K; monatomic Ar and Kr use Cp=5/2 R.
+_CARRIER_CONDENSATION_PROPERTIES = {
+    "Ar": (87.28, 6469.7192, 2.5 * GAS_CONSTANT, 0.039948),
+    "Kr": (119.73, 9080.0, 2.5 * GAS_CONSTANT, 0.083798),
+    "N2": (77.34, 5600.0, 3.5 * GAS_CONSTANT, 0.0280134),
+}
 # Economics resolution: one millionth of the coating model's smallest
 # operational lifetime observation (one completed campaign). The model's
 # EPSILON_KG is mass-space and cannot dimensionally define a campaign floor.
@@ -4919,7 +4925,7 @@ def _carrier_gas_cost_summary(
     )
     loss_fraction = cost_parameters.carrier_makeup_loss_fraction_per_run
     recirculated_mass_kg = carrier_mass_used_kg * (1.0 - loss_fraction)
-    refrigeration_kWh_per_kg = _carrier_refrigeration_kWh_per_kg()
+    refrigeration_kWh_per_kg = _carrier_refrigeration_kWh_per_kg(species)
     refrigeration_kWh = recirculated_mass_kg * refrigeration_kWh_per_kg
     cost = carrier_gas_run_cost(
         carrier_mass_used_kg=carrier_mass_used_kg,
@@ -4936,10 +4942,22 @@ def _carrier_gas_cost_summary(
     return MappingProxyType({
         **cost,
         "status": "estimated",
-        "carrier_mass_basis": "flagged_44kg_hero_reference_scaled_by_feed_time_pressure",
+        "carrier_mass_basis": "scaled_reference_estimate",
+        "carrier_mass_scale": {
+            "reference_carrier_mass_kg": 44.0,
+            "reference_feed_mass_kg": 1.0,
+            "feed_mass_scale": mass_kg,
+            "reference_duration_h": 150.0,
+            "duration_scale": duration_h / 150.0,
+            "reference_pressure_mbar": 10.0,
+            "pressure_scale": pressure / 10.0,
+            "total_scale": mass_kg * (duration_h / 150.0) * (pressure / 10.0),
+        },
         "refrigeration_basis": (
-            "O2 cryogenic_tail refrigeration work per kg from "
-            "simulator.thermal_train.cryogenic_tail; applied to carrier stream"
+            "carrier vapor sensible cooling from 300 K to its normal boiling point "
+            "plus condensation latent heat; Carnot lift to train reject temperature "
+            "at train eta_2ndlaw; NIST Chemistry WebBook SRD 69 species data, with "
+            "argon latent heat from NIST NBS NSRDS 27 Table 11"
         ),
         "refrigeration_kWh_per_kg": refrigeration_kWh_per_kg,
     })
@@ -4950,23 +4968,44 @@ def _carrier_pressure_mbar(sim: Any) -> Any:
     return getattr(melt, "p_total_mbar", None)
 
 
-def _carrier_refrigeration_kWh_per_kg() -> float:
-    """Use the existing O2 cold-tail work per kg as the carrier proxy."""
+def _carrier_refrigeration_kWh_per_kg(species: str) -> float:
+    """Estimate sensible-plus-latent condensation duty and its Carnot lift."""
 
-    params = thermal_train_parameters_from_mapping()
-    tail = cryogenic_tail(
-        1.0,
-        temperature_floor_K=params.T_floor_K,
-        temperature_frost_K=params.T_frost_K,
-        temperature_reject_K=params.T_reject_K,
-        eta_2ndlaw=params.eta_2ndlaw,
-        segment_K=params.dT_segment_K,
+    properties = _CARRIER_CONDENSATION_PROPERTIES.get(str(species))
+    if properties is None:
+        raise ObjectiveComputationError(
+            f"carrier refrigeration properties are unavailable for {species!r}"
+        )
+    boiling_K, vaporization_J_per_mol, cp_J_per_mol_K, molar_mass_kg_per_mol = (
+        properties
     )
-    # data/thermal_train_params.yaml and docs/thermal-train.md describe the
-    # train's O2 duty, not carrier recirculation. Use its refrigeration work per
-    # kg O2 as the requested carrier-stream proxy: (W at 1 mol/s) / (kg/s) /
-    # 3.6e6 J/kWh. This retains the train's enthalpy and Carnot-lift assumptions.
-    return float(tail["refrigeration_work_W"]) / OXYGEN_MOLAR_MASS_KG_PER_MOL / 3.6e6
+    params = thermal_train_parameters_from_mapping()
+    reject_K = params.T_reject_K
+    efficiency = params.eta_2ndlaw
+    # Premise: one kg of ideal carrier vapor enters at 300 K, cools to its 1-atm
+    # normal boiling point at constant Cp, then condenses there; the whole cold
+    # load is lifted to the train's reject temperature. Algebra: q_cold =
+    # [Cp*(300 K - T_nbp) + DeltaHvap] / M gives J/kg; W = q_cold *
+    # (T_reject/T_nbp - 1) / eta_2ndlaw, then kWh/kg = W / 3.6e6. Units:
+    # (J/mol)/ (kg/mol) = J/kg and both lift factors are dimensionless. At
+    # T_reject == T_nbp work tends to zero; eta_2ndlaw == 1 gives Carnot work.
+    # Constants: NIST Chemistry WebBook SRD 69, Kr C7439909, N2 C7727379, and
+    # Ar C7440371 (https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439909&Mask=4,
+    # https://webbook.nist.gov/cgi/cbook.cgi?ID=C7727379&Mask=4, and
+    # https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440371&Mask=4). Argon's
+    # 1546.3 cal/mol latent heat is NIST NBS NSRDS 27 Table 11
+    # (https://nvlpubs.nist.gov/nistpubs/Legacy/NSRDS/nbsnsrds27.pdf), converted
+    # by 1546.3 cal/mol * 4.184 J/cal = 6469.7 J/mol. Kr uses 119.73 K, within
+    # the WebBook's reported 119.78 +/- 0.05 K.
+    cold_load_J_per_kg = (
+        cp_J_per_mol_K * (300.0 - boiling_K) + vaporization_J_per_mol
+    ) / molar_mass_kg_per_mol
+    return (
+        cold_load_J_per_kg
+        * (reject_K / boiling_K - 1.0)
+        / efficiency
+        / 3.6e6
+    )
 
 
 def _marginal_extraction_cost_summary(
@@ -5005,8 +5044,6 @@ def _marginal_extraction_cost_summary(
         carrier_cost_usd is not None
         and not is_unavailable_quantity(carrier_cost_usd)
     )
-    if carrier_cost_available:
-        energy_cost_usd += float(carrier.get("recycle_electricity_cost_usd", 0.0))
     reagent = _reagent_consumption_cost_summary(
         sim,
         product_ledger,

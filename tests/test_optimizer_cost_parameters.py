@@ -74,7 +74,11 @@ def test_yaml_defaults_load_with_recipe_default_provenance() -> None:
     assert values["furnace_lifetime_cost_multiplier"] == pytest.approx(500.0)
     assert values["min_fouling_penalty"] == pytest.approx(1.0)
     assert values["import_delivery_cost_per_kg"] == pytest.approx(10000.0)
-    assert values["carrier_gas_earth_price_per_kg"] == {"Kr": pytest.approx(290.0)}
+    assert values["carrier_gas_earth_price_per_kg"] == {
+        "Ar": pytest.approx(0.0),
+        "Kr": pytest.approx(290.0),
+        "N2": pytest.approx(0.0),
+    }
     assert values["carrier_makeup_loss_fraction_per_run"] == pytest.approx(0.01)
     assert set(values["shuttle_reagent_replacement_cost_per_kg"]) == SHUTTLE_REAGENT_SPECIES
 
@@ -98,6 +102,8 @@ def test_carrier_cost_inputs_share_yaml_and_owner_ratify_cost_metadata() -> None
 
     assert parsed.import_delivery_cost_per_kg == pytest.approx(10000.0)
     assert parsed.carrier_gas_earth_price_per_kg["Kr"] == pytest.approx(290.0)
+    assert parsed.carrier_gas_earth_price_per_kg["N2"] == pytest.approx(0.0)
+    assert parsed.carrier_gas_earth_price_per_kg["Ar"] == pytest.approx(0.0)
     assert parsed.carrier_makeup_loss_fraction_per_run == pytest.approx(0.01)
     assert IMPORT_DELIVERY_USD_PER_KG.value == parameters[
         "import_delivery_cost_per_kg"
@@ -115,6 +121,12 @@ def test_carrier_cost_inputs_share_yaml_and_owner_ratify_cost_metadata() -> None
         "carrier_gas_earth_price_per_kg.Kr",
         "carrier_makeup_loss_fraction_per_run",
     }.issubset({parameter.name for parameter in owner_ratify_cost_placeholders()})
+    assert parameters["carrier_gas_earth_price_per_kg"]["values"]["N2"][
+        "source_tag"
+    ] == "earth_price_pending_immaterial_vs_delivery"
+    assert parameters["carrier_gas_earth_price_per_kg"]["values"]["Ar"][
+        "source_tag"
+    ] == "earth_price_pending_immaterial_vs_delivery"
 
 
 def test_older_v1_recipe_cost_block_gets_new_carrier_cost_defaults() -> None:
@@ -134,6 +146,17 @@ def test_older_v1_recipe_cost_block_gets_new_carrier_cost_defaults() -> None:
     )
 
     assert cost_parameter_values(normalized) == cost_parameter_values(current)
+
+    kr_only = copy.deepcopy(current)
+    kr_only["parameters"]["carrier_gas_earth_price_per_kg"]["values"] = {
+        "Kr": {"value": 290.0}
+    }
+    normalized_kr_only = normalize_cost_parameters(
+        kr_only,
+        source="kr-only.recipe.yaml",
+        defaults_applied=False,
+    )
+    assert cost_parameter_values(normalized_kr_only) == cost_parameter_values(current)
 
 
 def test_report_and_optimizer_share_yaml_electricity_price_and_citation() -> None:

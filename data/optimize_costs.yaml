@@ -21,11 +21,17 @@ parameters:
 
   carrier_gas_earth_price_per_kg:
     units: USD/kg
-    rationale: "approximate European small-quantity price, Ullmann's (1999) via Wikipedia 'Prices of chemical elements'; USGS MCS 2026 reports rare-gas prices unavailable"
+    rationale: "Kr uses the approximate European small-quantity price from Ullmann's (1999); N2 and Ar use flagged zero Earth prices because no in-repo price is available and the $10,000/kg delivery term dominates."
     source_tag: "FLAGGED dated estimate 2026-11-11: Ullmann's (1999) via Wikipedia 'Prices of chemical elements'; USGS MCS 2026 reports rare-gas prices unavailable"
     values:
+      Ar:
+        value: 0.0
+        source_tag: "earth_price_pending_immaterial_vs_delivery"
       Kr:
         value: 290.0
+      N2:
+        value: 0.0
+        source_tag: "earth_price_pending_immaterial_vs_delivery"
 
   carrier_makeup_loss_fraction_per_run:
     value: 0.01

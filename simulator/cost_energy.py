@@ -42,6 +42,11 @@ class OwnerRatifyCostParameter:
 # Owner D35 (2026-09-05): ratified the YAML's EIA-cited 0.15 USD/kWh electricity
 # rate, superseding the 10.0 USD/kWh owner-ratify placeholder.
 _COST_PARAMETER_ENTRIES = load_cost_parameters()["parameters"]
+_CARRIER_GAS_PRICE_ENTRY = _COST_PARAMETER_ENTRIES["carrier_gas_earth_price_per_kg"]
+_CARRIER_MAKEUP_LOSS_SOURCE_TAG = _COST_PARAMETER_ENTRIES[
+    "carrier_makeup_loss_fraction_per_run"
+]["source_tag"]
+_MARS_LOCAL_CARRIER_SPECIES = frozenset({"Ar", "CO2", "N2"})
 ELECTRICAL_USD_PER_KWH = OwnerRatifyCostParameter(
     name="electrical_usd_per_kWh",
     value=DEFAULT_ELECTRICAL_COST_PER_KWH,
@@ -166,21 +171,52 @@ def carrier_gas_run_cost(
     # zero loss only the recirculation electricity term remains.
     makeup_kg = mass_kg * loss_fraction
     recirculated_kg = mass_kg - makeup_kg
-    earth_price = prices.get(species) if species == "Kr" else None
+    mars_local_source = (
+        body.casefold() == "mars" and species in _MARS_LOCAL_CARRIER_SPECIES
+    )
+    earth_price = None if mars_local_source else prices.get(species)
     has_import_price = earth_price is not None
+    earth_price_pending = (
+        has_import_price
+        and species in {"Ar", "N2"}
+        and float(earth_price) == 0.0
+    )
     makeup_cost_usd = (
         makeup_kg * (float(earth_price) + delivery)
         if has_import_price
         else 0.0
     )
     recycle_cost_usd = recycle_kWh * electricity
+    price_metadata = _CARRIER_GAS_PRICE_ENTRY["values"].get(species, {})
+    configured_earth_price = price_metadata.get("value")
+    earth_price_source_tag = (
+        (
+            price_metadata.get("source_tag")
+            or _CARRIER_GAS_PRICE_ENTRY["source_tag"]
+        )
+        if has_import_price
+        and configured_earth_price is not None
+        and float(earth_price) == float(configured_earth_price)
+        else None
+    )
+    configured_loss_fraction = _COST_PARAMETER_ENTRIES[
+        "carrier_makeup_loss_fraction_per_run"
+    ]["value"]
+    makeup_loss_source_tag = (
+        str(_CARRIER_MAKEUP_LOSS_SOURCE_TAG)
+        if loss_fraction == float(configured_loss_fraction)
+        else None
+    )
     todo = None
-    if species == "Ar" and body.casefold() == "mars":
+    if mars_local_source:
         todo = {
             "code": "carrier_local_source_price_pending",
-            "species": "Ar",
+            "species": species,
             "body": body,
-            "detail": "TODO: model local Ar sourcing on Mars; no Earth import price is charged.",
+            "detail": (
+                f"TODO: model local {species} sourcing on Mars; "
+                "no Earth import price is charged."
+            ),
         }
     elif not has_import_price:
         todo = {
@@ -188,10 +224,20 @@ def carrier_gas_run_cost(
             "species": species,
             "body": body or None,
             "detail": (
-                "Earth purchase and delivery prices are configured only for Kr; "
-                "no import price is charged for this carrier."
+                "Earth purchase and delivery prices are configured only for N2, Ar, "
+                "and Kr; no import price is charged for this carrier."
             ),
         }
+    evidence_flags = []
+    if earth_price_source_tag:
+        evidence_flags.append(str(earth_price_source_tag))
+    if earth_price_pending:
+        evidence_flags.append("earth_price_pending_immaterial_vs_delivery")
+    if makeup_loss_source_tag:
+        evidence_flags.append(makeup_loss_source_tag)
+    if todo is not None:
+        evidence_flags.append(str(todo["code"]))
+    evidence_flags = list(dict.fromkeys(evidence_flags))
     return {
         "carrier_species": species,
         "carrier_body": body or None,
@@ -200,6 +246,8 @@ def carrier_gas_run_cost(
         "makeup_mass_kg": makeup_kg,
         "recirculated_mass_kg": recirculated_kg,
         "earth_price_per_kg": earth_price,
+        "earth_price_source_tag": earth_price_source_tag,
+        "earth_price_pending": earth_price_pending,
         "import_delivery_cost_per_kg": delivery if has_import_price else None,
         "makeup_cost_usd": makeup_cost_usd,
         "refrigeration_recycle_energy_kWh": recycle_kWh,
@@ -207,6 +255,8 @@ def carrier_gas_run_cost(
         "carrier_cost_usd": makeup_cost_usd + recycle_cost_usd,
         "pricing_status": "priced" if has_import_price else "price_pending",
         "typed_todo": todo,
+        "makeup_loss_source_tag": makeup_loss_source_tag,
+        "evidence_flags": evidence_flags,
     }
 
 
