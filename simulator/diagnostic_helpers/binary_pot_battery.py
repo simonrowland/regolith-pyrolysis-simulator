@@ -307,17 +307,17 @@ def _call_cached_backend_equilibrate(
 ) -> Any:
     if not cache or handle.name == "internal-analytical":
         return solve()
+    if handle.name == "openimcc":
+        # The OpenIMCC bridge owns the engine cache seam for this path.
+        return solve()
     from simulator.engine_cache import _configured_engine_cache_path
 
     if _configured_engine_cache_path() is None:
         return solve()
     request_kwargs = dict(kwargs)
     request_kwargs.pop("call_timeout_s", None)
-    if handle.name == "openimcc":
-        # OpenIMCC's battery adapter discards pressure before calling the bridge.
-        request_kwargs.pop("pressure_bar", None)
-    # The resolved handle owns AlphaMELTS's child-environment snapshot. Never
-    # reread the parent environment while building a request key.
+    # The resolved handle owns AlphaMELTS's effective child calculation mode.
+    # Never reread the parent environment while building a request key.
     po2_request = request_kwargs.get("po2_request")
     if isinstance(po2_request, Po2Request):
         request_kwargs["po2_request"] = po2_request.as_payload()
@@ -350,7 +350,7 @@ def _call_cached_backend_equilibrate(
     adapter_settings = engine_cache_settings(
         handle.name,
         handle.backend,
-        effective_settings=handle.engine_settings,
+        effective_settings=getattr(handle, "engine_settings", None),
     )
 
     payload = cached_engine_call(
@@ -4378,16 +4378,9 @@ class _IsolatedCellEngine:
 def _bootstrap_isolated_cell_engine(
     engine: str,
     engine_settings: Mapping[str, Any] | None = None,
-    effective_settings: Mapping[str, Any] | None = None,
 ) -> tuple[_IsolatedCellEngine, str]:
     """Resolve the battery engine before WarmEngineWorker signals ready."""
     settings = dict(engine_settings or {})
-    if engine == "alphamelts" and not settings:
-        ambient = (effective_settings or {}).get("ambient_calc_mode")
-        if ambient is None:
-            os.environ.pop("ALPHAMELTS_CALC_MODE", None)
-        else:
-            os.environ["ALPHAMELTS_CALC_MODE"] = str(ambient)
     handle = _open_battery_engine_with_settings(engine, settings or None)
     return _IsolatedCellEngine(handle, settings), engine
 
@@ -4451,17 +4444,10 @@ class _IsolatedCellWorker:
     ) -> None:
         self.engine = str(engine)
         self.engine_settings = dict(engine_settings or {})
-        from simulator.engine_cache import normalize_engine_settings
-
-        self.effective_engine_settings = normalize_engine_settings(
-            self.engine,
-            engine_settings if engine_settings else None,
-        )
         self._lock = threading.Lock()
         bootstrap_args = (
             self.engine,
             self.engine_settings or None,
-            self.effective_engine_settings,
         )
         self._worker = WarmEngineWorker(
             name=f"{self.engine} battery cell",
@@ -4494,21 +4480,6 @@ class _IsolatedCellWorker:
         self, payload: Mapping[str, Any], *, timeout_s: float
     ) -> dict[str, Any]:
         started_wall, started_cpu = time.perf_counter(), time.process_time()
-        request = {
-            key: payload[key]
-            for key in (
-                "composition_wt_pct",
-                "temperature_K",
-                "physical_pressure_bar",
-                "po2",
-                "engine_settings",
-                "native_activity_formula",
-            )
-            if key in payload
-        }
-        if payload.get("simulate_crash") is not None:
-            request["simulate_crash"] = payload["simulate_crash"]
-
         def solve() -> Any:
             with self._lock:
                 try:
@@ -4548,7 +4519,7 @@ class _IsolatedCellWorker:
                 return result
             return EquilibrateCell.from_payload(result).to_engine_cache_value()
 
-        if self.engine == "internal-analytical":
+        if self.engine in {"internal-analytical", "openimcc"}:
             result = solve()
         else:
             from simulator.engine_cache import (
@@ -4557,8 +4528,22 @@ class _IsolatedCellWorker:
                 engine_cache_settings,
             )
 
+            request = {
+                key: payload[key]
+                for key in (
+                    "composition_wt_pct",
+                    "temperature_K",
+                    "physical_pressure_bar",
+                    "po2",
+                    "engine_settings",
+                    "native_activity_formula",
+                )
+                if key in payload
+            }
+            if payload.get("simulate_crash") is not None:
+                request["simulate_crash"] = payload["simulate_crash"]
             request["engine_settings"] = engine_cache_settings(
-                self.engine, self.effective_engine_settings
+                self.engine, self.engine_settings
             )
             request["battery_cache_schema"] = BATTERY_ENGINE_CACHE_SCHEMA
             result = cached_engine_call(self.engine, request, solve)
@@ -4831,27 +4816,26 @@ def _open_resolved_backend(
             )
         return backend
     if name == "alphamelts":
-        ambient_calc_mode = settings.get("ambient_calc_mode")
-        if ambient_calc_mode is None:
-            os.environ.pop("ALPHAMELTS_CALC_MODE", None)
-        else:
-            os.environ["ALPHAMELTS_CALC_MODE"] = str(ambient_calc_mode)
-
-    if engine_settings is not None and name == "alphamelts":
         backend_config = {
             "mode": settings.get("transport"),
             "model": settings.get("raw_model_name"),
+            "effective_calc_mode": settings["effective_calc_mode"],
+            "model_calc_mode": settings["model_calc_mode"],
+            "calc_mode_conflict": settings["calc_mode_conflict"],
+            "subprocess_model_error": settings["subprocess_model_error"],
             "fO2_buffer": settings.get("redox_buffer"),
             "fO2_offset": settings.get("fO2_offset"),
             "Fe3Fet_Liq": settings.get("Fe3Fet_ratio"),
             "warm_worker": settings["warm_worker"],
-            "vapor_transport_pO2_bar": settings[
-                "configured_vapor_transport_pO2_bar"
-            ],
-            "vapor_transport_floor_bar": settings[
-                "configured_vapor_transport_floor_bar"
-            ],
         }
+        if settings["configured_vapor_transport_pO2_bar"] is not None:
+            backend_config["vapor_transport_pO2_bar"] = settings[
+                "configured_vapor_transport_pO2_bar"
+            ]
+        if settings["configured_vapor_transport_floor_bar"] is not None:
+            backend_config["vapor_transport_floor_bar"] = settings[
+                "configured_vapor_transport_floor_bar"
+            ]
         backend = resolve_backend(
             name,
             BackendSelectionPolicy.RUNNER_STRICT,
