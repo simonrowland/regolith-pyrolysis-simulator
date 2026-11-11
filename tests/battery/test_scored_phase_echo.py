@@ -724,8 +724,9 @@ def test_taniguchi_metal_fe_reaches_the_basis_gate(
 ) -> None:
     """A metal Fe assay is not analysed glass, so the basis gate runs.
 
-    Equilibrate must not run: the printed mass-percent identity is refused
-    first.
+    Table 1 sample 101 prints Fe = 0.437 wt%. Elemental phase admission
+    keeps that mass. The total is below 95 wt%, so the partial analysis
+    is refused and equilibrate does not run.
     """
 
     _block_equilibrate(monkeypatch)
@@ -735,7 +736,9 @@ def test_taniguchi_metal_fe_reaches_the_basis_gate(
     )
     composition = observation.identity.composition
     assert composition is not None and composition.is_unknown
-    assert "printed oxide wt% map has no positive mass" in composition.reason
+    assert composition.reason.endswith(
+        "partial analysis: kept sum=0.437 wt% is below 95 wt%"
+    )
     prediction = _predict(observation, observation.identity, experiment)
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert prediction.refusal_detail["input"] == "composition"
@@ -763,7 +766,11 @@ def test_kunisada_final_slag_refuses_before_the_basis_gate(
 def test_kim_2014_measured_v_row_is_not_stamped_analysed_glass(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Phase 'l' and a V/Mo/Ni mass-percent map are not analysed glass."""
+    """Phase 'l' and a V/Mo/Ni/C mass-percent map are not analysed glass.
+
+    Table 1 row 01 prints V=0, Mo=0, Ni=0 and C=5.41. The kept sum is
+    that printed total, which is below 95 wt%.
+    """
 
     _block_equilibrate(monkeypatch)
     observation, experiment = _observation(
@@ -772,7 +779,9 @@ def test_kim_2014_measured_v_row_is_not_stamped_analysed_glass(
     )
     composition = observation.identity.composition
     assert composition is not None and composition.is_unknown
-    assert "printed oxide wt% map has no positive mass" in composition.reason
+    assert composition.reason.endswith(
+        "partial analysis: kept sum=5.41 wt% is below 95 wt%"
+    )
     prediction = _predict(observation, observation.identity, experiment)
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert prediction.refusal_detail["input"] == "composition"
