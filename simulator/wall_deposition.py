@@ -209,30 +209,31 @@ def _element_wall_capture_kg_hr(
     overhead_pressure_pa: float | None = None,
     carrier_gas: str = "N2",
     diameter_proxy: MutableMapping[str, str] | None = None,
+    formula_registry: Mapping[str, Any] | None = None,
 ) -> float:
-    """kg/hr of this gas species removed by the element drawdown.
+    """kg/hr of this gas species removed by the element wall.
 
-    d-378 amendment 2. The series-resistance call is the saturation
-    gate (p_M against P_sat,M). The mass is not that flux and it is not
-    min(supply, flux * area). Each form diffuses through its own series
-    conductance, and the conserved element is integrated:
+    d-378 amendment 2, wall form. The series-resistance call is the
+    saturation gate (p_M against P_sat,M). Each form diffuses through
+    its own series conductance. The captured rate is that inlet flux
+    times area, capped by this species' supply. There is no residence
+    integral and no separate case at K_p -> inf:
 
         G_M = A / (1/(alpha_M k_HK,M) + R_gas,M(Kn) + R_melt)
         G_M2 = A / (1/(alpha_M2 k_HK,M2) + R_gas,M2(Kn))
-        J_M = (G_M / A) (p_M - P_sat,M)
-        J_M2 = (G_M2 / A) (p_M2 - P_sat,M^2 / K_p)
+        J_M = (G_M / A) max(p_M - P_sat,M, 0)
+        J_M2 = (G_M2 / A) max(p_M2 - P_sat,M^2 / K_p, 0)
+        captured = min((J_M + 2 J_M2) * A, element supply)
 
-    with p_M2 = p_M^2 / K_p and p_M from re-speciation of p_elem.
-    R_melt is 0. N = n_dot * τ and q = p / N, so
-    k τ = (p / n_dot) * A * (G/A). One second with that k τ is the
-    same ODE as residence τ. A large area reaches p_elem,sat and stops.
-    Worked check: p_elem = 6 Pa, K_p = 1 Pa gives p_M = 1.5 Pa and
-    p_M2 = 2.25 Pa. At P_sat = 1 Pa, p_M = p_M2 = 1, p_elem,sat = 3 Pa,
-    and the removable fraction is 1/2.
+    p_M comes from re-speciation of p_elem and p_M2 = p_M^2 / K_p.
+    R_melt is 0. As K_p -> inf, p_M -> p_elem and J_M2 -> 0, so the
+    expression is the monomer series flux. A large area hits the
+    supply cap. It does not stop at p_elem,sat; that exponential
+    drawdown is a different correction.
 
     No K_p: the flagged upper bound integrates p_elem toward P_sat with
     the arriving species' series-resistance conductance. It does not
-    invent a dimer drive. K_p -> inf does not call this function.
+    invent a dimer drive.
     """
 
     from simulator.condensation import (
@@ -241,8 +242,8 @@ def _element_wall_capture_kg_hr(
         _molecular_mass_kg_per_molecule,
     )
     from simulator.condensation_routing import (
-        draw_element_partial_pa,
         final_element_partial_pa,
+        respeciated_monomer_partial_pa,
     )
 
     if (
@@ -281,11 +282,12 @@ def _element_wall_capture_kg_hr(
             raise ValueError(
                 "dimer series wall channel requires the gas-side length"
             )
-        # Same chokepoint as the stage band. A monomer-only feed still
-        # re-speciates M2 and deposits it with the monomer alpha, so the
-        # proxy notice is recorded here rather than only when the arriving
-        # gas species is the dimer.
-        if not isinstance(proxy_notice, MutableMapping):
+        kp = float(kp_pa)
+        # Finite K_p publishes the monomer-alpha and monomer-sigma
+        # proxies. K_p -> inf has no dimer drive, so it publishes
+        # neither. The mass formula below is the same either way.
+        publish_proxy = math.isfinite(kp) and kp > 0.0
+        if publish_proxy and not isinstance(proxy_notice, MutableMapping):
             raise ValueError(
                 "dimer series wall channel requires the "
                 "monomer-alpha proxy notice"
@@ -302,22 +304,32 @@ def _element_wall_capture_kg_hr(
             overhead_pressure_pa=overhead_pressure_pa,
             carrier_gas=carrier_gas,
             vapor_pressure_data=vapor_pressure_data,
-            diameter_proxy=diameter_proxy,
+            diameter_proxy=diameter_proxy if publish_proxy else None,
         )
-        scale = (p_species_pa / n_dot) * surface_area_m2
-        final = draw_element_partial_pa(
-            element_partial_initial_pa=p_elem_pa,
-            residence_s=1.0,
-            strips=((
-                scale * k_monomer,
-                scale * k_dimer,
-                saturation_pa,
-                float(kp_pa),
-            ),),
-            monomer=monomer,
-            dimer=dimer,
-            proxy_notice=proxy_notice,
+        if publish_proxy and k_dimer > 0.0:
+            proxy_notice[str(dimer)] = str(monomer)
+        p_monomer = respeciated_monomer_partial_pa(p_elem_pa, kp)
+        monomer_drive = p_monomer - saturation_pa
+        if math.isinf(kp):
+            dimer_drive = 0.0
+        else:
+            dimer_drive = (
+                p_monomer * p_monomer - saturation_pa * saturation_pa
+            ) / kp
+        j_monomer = k_monomer * max(monomer_drive, 0.0)
+        j_dimer = k_dimer * max(dimer_drive, 0.0)
+        molar_mass_kg_mol = resolve_species_formula(
+            monomer, formula_registry,
+        ).molar_mass_kg_per_mol()
+        transport_kg_hr = (
+            (j_monomer + 2.0 * j_dimer)
+            * surface_area_m2
+            * molar_mass_kg_mol
+            * SECONDS_PER_HOUR
         )
+        if not math.isfinite(transport_kg_hr) or transport_kg_hr <= 0.0:
+            return 0.0
+        return min(rate_kg_hr, transport_kg_hr)
     if not math.isfinite(final) or p_elem_pa <= 0.0:
         return 0.0
     eta = (p_elem_pa - final) / p_elem_pa
@@ -419,9 +431,10 @@ def wall_deposit_candidate_for_surface_kg(
     )
     # The arriving gas being the dimer is not the proxy gate. A
     # monomer-only feed re-speciates M2 and still uses this alpha.
-    # draw_element_partial_pa records that on the route notice when
-    # the dimer channel actually runs. This record only labels the
-    # coefficient lookup for a dimer gas species.
+    # The inlet wall form records dimer -> monomer on the route
+    # notice when K_p is finite and the dimer coefficient is positive.
+    # This record only labels the coefficient lookup for a dimer gas
+    # species.
     if collection_species is not None and collection_species != species:
         from simulator.condensation_routing import DIMER_ALPHA_FROM_MONOMER_PROXY
 
@@ -679,22 +692,19 @@ def wall_deposit_candidate_for_surface_kg(
         surface_area_m2=surface_area_m2,
         formula_registry=getattr(model, "species_formula_registry", None),
     )
-    # The series-resistance flux is the saturation gate. For a contracted
-    # element with a finite K_p the captured mass is the parallel series
-    # drawdown of p_elem, stopped on this surface's own p_elem,sat. It is
-    # not min(supply, flux * area): a large area removes half of
-    # p_elem = 6 Pa when K_p = P_sat = 1 Pa, not the whole supply.
-    # K_p -> inf leaves this budget in place. That is the green wall.
+    # The series-resistance flux is the saturation gate. A contracted
+    # element, including K_p -> inf, then replaces that single-species
+    # budget with min((J_M + 2 J_M2) * A at the inlet drive, supply).
+    # K_p -> inf is the same expression with the dimer drive at zero.
     captured_kg_hr = min(rate_kg_hr, budget_kg_hr)
     kp_value = None if element_capture is None else element_capture["kp"]
-    finite_dimer_channel = (
+    positive_kp = (
         kp_value is not None
-        and math.isfinite(float(kp_value))
         and float(kp_value) > 0.0
     )
     missing_kp_upper_bound = element_capture is not None and kp_value is None
     if (
-        (finite_dimer_channel or missing_kp_upper_bound)
+        (positive_kp or missing_kp_upper_bound)
         and gas_temperature_K is not None
         and P_local_pa is not None
         and P_compare_pa is not None
@@ -735,6 +745,7 @@ def wall_deposit_candidate_for_surface_kg(
             overhead_pressure_pa=overhead_pressure_pa,
             carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
             diameter_proxy=diameter_proxy,
+            formula_registry=getattr(model, "species_formula_registry", None),
         )
     carrier_gas = str(getattr(model, "carrier_gas", "N2") or "N2")
     knudsen_number = None if "zero_reason" in rate_diagnostic else _knudsen_number(

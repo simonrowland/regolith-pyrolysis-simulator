@@ -47,10 +47,12 @@ Key physics:
     single-exponential capture balance exactly.
     Na, K, and Mg do not use that monomer drive. d-378 amendment 2
     deposits the monomer and the dimer in parallel. Each form diffuses
-    through its own series conductance, and the element inventory
+    through its own series conductance, and the stage inventory
     integrates J_M + 2 J_M2. K_p -> inf leaves the dimer channel off
-    and uses the linear solver above. Amendment 1 still decides
-    supersaturation.
+    and uses the linear solver above. The wall does not integrate.
+    It takes min((J_M + 2 J_M2) * A, element supply) at the inlet
+    partial, and that same expression at K_p -> inf is the monomer
+    series flux. Amendment 1 still decides supersaturation.
     K_p is the JANAF primary table.
     Walls and stages remove vapor in physical order; every capture stays
     at its location and the remainder goes to terminal offgas.

@@ -1231,13 +1231,15 @@ def test_every_linear_inlet_skips_inactive_strips(order, case):
 def test_large_area_stops_at_half_the_element_inventory(
     monkeypatch, monomer, dimer, channel, arrival,
 ):
-    """Large area, p_elem = 6 Pa, K_p = 1 Pa, P_sat = 1 Pa, stops at 1/2.
+    """Large area, p_elem = 6 Pa, K_p = 1 Pa, P_sat = 1 Pa.
 
     p_M = (K_p/4) (sqrt(1 + 8*6) - 1) = 1.5 Pa and p_M2 = 2.25 Pa
     (1.5 + 2*2.25 = 6). At saturation p_M = p_M2 = 1, so p_elem,eq = 3
-    and the removable fraction is 1/2. The linear fraction
-    (1.5 - 1) / 1.5 = 1/3 is not the capture. min(rate, supply) would
-    remove the whole kilogram.
+    and the stage integral removes 1/2. The linear fraction
+    (1.5 - 1) / 1.5 = 1/3 is not that capture. The wall evaluates
+    J_M + 2 J_M2 at the inlet and caps at the supply, so this area
+    removes the whole kilogram. Stopping the wall on p_elem,sat is
+    the exponential drawdown, which is a separate correction.
     """
 
     _p_monomer, eta_element, eta_linear = _worked_equilibrium()
@@ -1296,9 +1298,9 @@ def test_large_area_stops_at_half_the_element_inventory(
         surface_area_m2=1.0e12,
         collection_species=monomer if species == dimer else None,
     )
-    assert deposited == pytest.approx(eta_element, abs=1.0e-9)
+    assert deposited == pytest.approx(1.0, abs=1.0e-12)
+    assert deposited != pytest.approx(eta_element)
     assert deposited != pytest.approx(eta_linear)
-    assert deposited != pytest.approx(1.0)
 
 
 def test_janaf_kp_at_313_K_is_in_band_and_replaces_the_cea_polynomial():
@@ -1438,17 +1440,18 @@ def test_monomer_only_potassium_flags_the_dimer_alpha_proxy():
 
 
 # Invariant. The monomer sticking coefficient used as alpha_M2 is
-# published as dimer_alpha_from_monomer_proxy. draw_element_partial_pa
-# is the only production integral of that channel: it records the
-# proxy, then integrates. Stage efficiency and wall capture both call
-# it. The grid is every contracted pair, every arrival (monomer only,
-# dimer only, both), and every surface (wall only, stage only, both).
-# Wall-only keeps the duct area and then sets every collector area to
-# 0, so the stage integral never runs. 250 C is cold enough that 10 Pa
-# of K, Na, and Mg are all supersaturated on that duct. 40 C, the
-# potassium trap, refuses Na's wall curve, so the shared grid does not
-# use it; the potassium counterexample below does. A 1500 C duct and a
-# species with no contracted dimer do not record the proxy.
+# published as dimer_alpha_from_monomer_proxy. The stage integral is
+# draw_element_partial_pa: it records the proxy, then integrates. The
+# wall uses the inlet cap and records the same proxy when K_p is
+# finite. The grid is every contracted pair, every arrival (monomer
+# only, dimer only, both), and every surface (wall only, stage only,
+# both). Wall-only keeps the duct area and then sets every collector
+# area to 0, so the stage integral never runs. 250 C is cold enough
+# that 10 Pa of K, Na, and Mg are all supersaturated on that duct.
+# 40 C, the potassium trap, refuses Na's wall curve, so the shared
+# grid does not use it; the potassium counterexample below does. A
+# 1500 C duct and a species with no contracted dimer do not record
+# the proxy.
 
 
 PROXY_ARRIVALS = ("monomer", "dimer", "both")
@@ -1559,6 +1562,63 @@ def _species_capture(route, species):
         "wall": route.wall_deposit_by_species.get(species, 0.0),
         "remaining": route.remaining_by_species[species],
     }
+
+
+def _potassium_wall_kg():
+    """Pure K on a 40 C wall. Area is small, so the inlet flux is the cap."""
+
+    from simulator.wall_deposition import wall_deposit_candidate_for_surface_kg
+
+    model = _model(partials=None)
+    model.wall_species_partial_pressures_pa = {"K": 100.0}
+    deposited = wall_deposit_candidate_for_surface_kg(
+        model,
+        species="K",
+        rate_kg_hr=1.0,
+        T_cond_C=250.0,
+        melt_temperature_C=1500.0,
+        wall_temperature_C=40.0,
+        surface_area_m2=1.0e-4,
+    )
+    return model, deposited
+
+
+def test_wall_inlet_form_is_continuous_in_kp(monkeypatch):
+    """One wall formula. K_p = 1e30 matches K_p = inf within 1e-12.
+
+    K_p -> inf is not a branch. The dimer drive is zero, so the result
+    is the monomer series flux capped by the supply, which is the wall
+    with the element pair removed.
+    """
+
+    holder = {"kp": math.inf}
+
+    def kp_of(_name, _temperature_K, vapor_pressure_data=None):
+        return holder["kp"]
+
+    monkeypatch.setattr(
+        "simulator.condensation.dimer_dissociation_kp_pa", kp_of,
+    )
+    inf_model, inf_kg = _potassium_wall_kg()
+    holder["kp"] = 1.0e30
+    finite_model, finite_kg = _potassium_wall_kg()
+    assert inf_kg > 0.0
+    assert finite_kg == pytest.approx(inf_kg, rel=1.0e-12, abs=1.0e-18)
+    assert inf_model._dimer_hk_alpha_proxy.get("K2") is None
+    assert inf_model._dimer_collision_diameter_proxy.get("K2") is None
+    assert finite_model._dimer_hk_alpha_proxy["K2"] == "K"
+    assert finite_model._dimer_collision_diameter_proxy["K2"] == (
+        DIMER_COLLISION_DIAMETER_PROXY_REASON
+    )
+
+    def no_pair(_name):
+        return None
+
+    monkeypatch.setattr(
+        "simulator.condensation_routing.element_collection_pair", no_pair,
+    )
+    _green_model, green_kg = _potassium_wall_kg()
+    assert inf_kg == pytest.approx(green_kg, rel=1.0e-12, abs=1.0e-18)
 
 
 @pytest.mark.parametrize("species", ("K", "Na", "Mg"))

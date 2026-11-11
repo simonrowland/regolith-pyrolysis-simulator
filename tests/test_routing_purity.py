@@ -27,6 +27,8 @@ from simulator.condensation_routing import (
     target_species_for_stage_number,
 )
 from simulator.physical_constants import (
+    AVOGADRO,
+    BOLTZMANN,
     CELSIUS_TO_KELVIN_OFFSET,
     GAS_CONSTANT,
 )
@@ -306,6 +308,10 @@ def _potassium_balance_inputs():
         'B': float(antoine['B']),
         'C': float(antoine['C']),
         'molar_mass_k': float(potassium['molar_mass_g_mol']),
+        'molar_mass_k2': float(
+            families['oxide_vapors_k2_cluster_family']['physical_properties']
+            ['species']['K2']['molar_mass_g_mol']
+        ),
         'alpha': float(sticking['species']['K']['value']),
         'k_rows': _printed_formation_gibbs('K-005'),
         'k2_rows': _printed_formation_gibbs('K-011'),
@@ -532,6 +538,125 @@ def _potassium_pipe_walls_undersaturated(model, inlet_partial_pa, inputs):
     return True
 
 
+def _oracle_gas_side_length_m(model, stage_number):
+    """Configured stage hydraulic diameter, else the throat.
+
+    The integer map is the train's area key. Stage 4 is alkali_stage4.
+    The potassium trap shares that stage number.
+    """
+
+    mapped = model.stage_hydraulic_diameter_m_by_stage
+    named = {
+        1: 'fe_stage1',
+        2: 'cr_stage2',
+        3: 'sio_stage3',
+        4: 'alkali_stage4',
+        7: 'terminal',
+    }.get(int(stage_number))
+    for key in (named, f'stage_{int(stage_number)}', str(int(stage_number))):
+        if key and key in mapped:
+            return float(mapped[key])
+    return float(model.pipe_diameter_m)
+
+
+def _oracle_series_coefficient_mol_m2_s_pa(
+    *,
+    molar_mass_g_mol,
+    sigma_angstrom,
+    epsilon_over_k_K,
+    mass_g_mol,
+    alpha,
+    length_m,
+    stir_factor,
+    radial_stir_factor,
+    regime_factor,
+    temperature_k,
+    pressure_pa,
+):
+    """G/A for one form, mol/(m² s Pa). Not a production helper.
+
+    Hertz-Knudsen at 1 Pa, molecules then moles:
+
+        m = (M / 1000) / N_A                         kg/molecule
+        k_HK = alpha / (sqrt(2 π m k_B T) N_A)      mol/(m² s Pa)
+
+    M is the vapour-catalogue molar mass. K is 39.0983 g/mol and K2 is
+    78.1966 g/mol.
+
+    Chapman-Enskog, Bird/Stewart/Lightfoot Eq. 17.3-10, reduced mass.
+    N2 is σ = 3.798 Å (3.798e-10 m), ε/k = 71.4 K, M = 28.014 g/mol.
+    K and the K2 proxy are the Svehla 1962 row σ = 3.987 Å,
+    ε/k = 1305 K. The proxy mass is 2 × 39.098 g/mol. K2 has no cited
+    collision diameter.
+
+        σ_AB = (σ + σ_N2) / 2
+        ε_AB = sqrt(ε ε_N2)
+        M_AB = 2 / (1/M + 1/M_N2)
+        Ω_D = 1.06036 / T*^0.1561
+              + 0.193 exp(-0.47635 T*)
+              + 1.03587 exp(-1.52996 T*)
+              + 1.76474 exp(-3.89411 T*)
+        T* = T / ε_AB
+        D_AB [cm²/s] = 0.0018583 √2  T^1.5
+                       / (P[atm] sqrt(M_AB) σ_AB² Ω_D)
+        D_AB [m²/s] = D_AB [cm²/s] × 1e-4
+        P[atm] = P[Pa] / 101325
+
+    Film. Sherwood is 3.66 times the square root of the radial stir,
+    or of the legacy stir when the radial axis is unset, floored at 1
+    and clamped to 10. Regime weight f = Kn/(Kn+0.01) drops the film
+    out as f -> 1. R is the SI gas constant, 8.31446261815324 J/(mol K).
+    R_melt is 0.
+
+        k_MT = Sh D_AB / (L R T)
+        G/A = 1 / (1/k_HK + (1 - f) / k_MT)
+    """
+
+    molecule_kg = (float(molar_mass_g_mol) / 1000.0) / AVOGADRO
+    k_hk = float(alpha) / (
+        math.sqrt(2.0 * math.pi * molecule_kg * BOLTZMANN * temperature_k)
+        * AVOGADRO
+    )
+    regime = max(0.0, min(1.0, float(regime_factor)))
+    film_weight = 1.0 - regime
+    if film_weight <= 0.0:
+        return k_hk
+    raw_stir = (
+        radial_stir_factor if radial_stir_factor is not None else stir_factor
+    )
+    if raw_stir is None:
+        stir = 1.0
+    else:
+        stir = max(0.0, min(10.0, float(raw_stir)))
+    sherwood = 3.66 * math.sqrt(max(1.0, stir))
+    sigma_n2 = 3.798
+    epsilon_n2 = 71.4
+    mass_n2 = 28.014
+    sigma_ab = 0.5 * (float(sigma_angstrom) + sigma_n2)
+    epsilon_ab = math.sqrt(float(epsilon_over_k_K) * epsilon_n2)
+    mass_ab = 2.0 / (1.0 / float(mass_g_mol) + 1.0 / mass_n2)
+    reduced_temperature = temperature_k / epsilon_ab
+    omega_d = (
+        1.06036 / (reduced_temperature ** 0.1561)
+        + 0.193 * math.exp(-0.47635 * reduced_temperature)
+        + 1.03587 * math.exp(-1.52996 * reduced_temperature)
+        + 1.76474 * math.exp(-3.89411 * reduced_temperature)
+    )
+    pressure_atm = float(pressure_pa) / 101325.0
+    diffusivity_m2_s = (
+        0.0018583 * math.sqrt(2.0) * (temperature_k ** 1.5)
+        / (
+            pressure_atm * math.sqrt(mass_ab) * (sigma_ab ** 2) * omega_d
+        )
+        * 1.0e-4
+    )
+    k_film = (
+        sherwood * diffusivity_m2_s
+        / (float(length_m) * GAS_CONSTANT * temperature_k)
+    )
+    return 1.0 / (1.0 / k_hk + film_weight / k_film)
+
+
 def _independent_potassium_capture_kg(model, *, inlet_partial_pa, supply_kg_hr):
     """Stage kilograms from this test's J_M + 2 J_M2 integral.
 
@@ -540,12 +665,11 @@ def _independent_potassium_capture_kg(model, *, inlet_partial_pa, supply_kg_hr):
     mass falls and the partial does not. q = p_K / N_K uses the arriving
     monomer's molar mass. T_gas is the model's gas temperature, which
     this pin leaves at the pipe default. P_sat and K_p use each wall
-    sample. Each form's coefficient is its series conductance. K2's
-    accommodation coefficient is the monomer alpha, and K2's
-    Chapman-Enskog diameter is the flagged monomer proxy.
+    sample. Each form's coefficient is re-derived in
+    ``_oracle_series_coefficient_mol_m2_s_pa``. K2's accommodation
+    coefficient is the monomer alpha, and K2's Chapman-Enskog diameter
+    is the monomer sigma with mass 2m.
     """
-
-    from simulator.condensation import _element_series_coefficients_mol_m2_s_pa
 
     inputs = _potassium_balance_inputs()
     gas_temperature_k = float(model.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
@@ -567,22 +691,32 @@ def _independent_potassium_capture_kg(model, *, inlet_partial_pa, supply_kg_hr):
             * _configured_stage_area_m2(model, stage)
             / sample_count
         )
-        k_monomer_per_pa, k_dimer_per_pa = (
-            _element_series_coefficients_mol_m2_s_pa(
-                monomer='K',
-                dimer='K2',
-                alpha_s=inputs['alpha'],
-                pipe_diameter_m=model._hydraulic_diameter_m_for_stage_number(
-                    stage.stage_number,
-                ),
-                stir_factor=model.stir_factor,
-                radial_stir_factor=model.radial_stir_factor,
-                regime_factor=model.regime_factor,
-                T_gas_K=gas_temperature_k,
-                overhead_pressure_pa=float(model.overhead_pressure_mbar) * 100.0,
-                carrier_gas=str(model.carrier_gas),
-                vapor_pressure_data=model.vapor_pressure_data,
-            )
+        length_m = _oracle_gas_side_length_m(model, stage.stage_number)
+        k_monomer_per_pa = _oracle_series_coefficient_mol_m2_s_pa(
+            molar_mass_g_mol=inputs['molar_mass_k'],
+            sigma_angstrom=3.987,
+            epsilon_over_k_K=1305.0,
+            mass_g_mol=39.098,
+            alpha=inputs['alpha'],
+            length_m=length_m,
+            stir_factor=model.stir_factor,
+            radial_stir_factor=model.radial_stir_factor,
+            regime_factor=model.regime_factor,
+            temperature_k=gas_temperature_k,
+            pressure_pa=float(model.overhead_pressure_mbar) * 100.0,
+        )
+        k_dimer_per_pa = _oracle_series_coefficient_mol_m2_s_pa(
+            molar_mass_g_mol=inputs['molar_mass_k2'],
+            sigma_angstrom=3.987,
+            epsilon_over_k_K=1305.0,
+            mass_g_mol=2.0 * 39.098,
+            alpha=inputs['alpha'],
+            length_m=length_m,
+            stir_factor=model.stir_factor,
+            radial_stir_factor=model.radial_stir_factor,
+            regime_factor=model.regime_factor,
+            temperature_k=gas_temperature_k,
+            pressure_pa=float(model.overhead_pressure_mbar) * 100.0,
         )
         k_monomer = area_scale * k_monomer_per_pa
         k_dimer = area_scale * k_dimer_per_pa

@@ -742,9 +742,11 @@ def final_element_partial_pa(
     """Element partial after residence under the parallel fluxes.
 
     ``strips`` is (k_M, k_M2, P_sat_Pa, K_p_Pa). See
-    ``_element_drawdown_rate_pa_s``. This is the only drawdown. Stage
-    efficiency and wall capture both call it. A fast strip stops on its
-    own p_elem,sat. A slow strip then barely moves. Nothing snaps an
+    ``_element_drawdown_rate_pa_s``. Stage efficiency calls this. The
+    wall's missing-K_p upper bound calls it too. A finite or infinite
+    K_p on the wall does not: that surface uses the inlet cap
+    min((J_M + 2 J_M2) * A, supply). A fast strip stops on its own
+    p_elem,sat. A slow strip then barely moves. Nothing snaps an
     oversized step to the coldest floor, and nothing caps the removal
     with min(rate, supply).
 
@@ -817,11 +819,12 @@ def draw_element_partial_pa(
     Invariant. Whenever a strip uses the monomer sticking coefficient
     as alpha_M2 (k_M2 > 0 and K_p finite), this records
     ``proxy_notice[dimer] = monomer`` and then integrates. Stage
-    efficiency and wall capture both call this and do not integrate
-    that channel anywhere else. A monomer-only feed is the same
-    channel as a dimer feed: the gas re-speciates, and a cold wall
-    with zero collector area still deposits K2 with alpha_K. K_p -> inf
-    records nothing, because the dimer drive is gone.
+    efficiency calls this. The wall uses the inlet cap and records
+    the same proxy itself when that cap applies a finite K_p; it does
+    not integrate here. A monomer-only feed is the same channel as a
+    dimer feed: the gas re-speciates, and a cold wall with zero
+    collector area still deposits K2 with alpha_K. K_p -> inf records
+    nothing, because the dimer drive is gone.
     """
 
     rows = tuple(strips)
