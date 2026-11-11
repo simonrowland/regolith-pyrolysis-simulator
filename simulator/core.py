@@ -2373,6 +2373,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         provider_candidates_by_species: dict | None = None,
         flux_activation_context: FluxActivationContext | None = None,
         liquid_feo_domain: Any = None,
+        evaporation_tick_area_m2: float | None = None,
+        evaporation_tick_duration_s: float | None = None,
     ):
         """Exact-key vapour batch via VR-6 request builder + refusal closure.
 
@@ -2439,6 +2441,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 melt_activity_engine_inputs or {}
             ),
             "liquid_feo_domain": liquid_feo_domain,
+            "evaporation_tick_area_m2": evaporation_tick_area_m2,
+            "evaporation_tick_duration_s": evaporation_tick_duration_s,
         }
         return self.vapour_rail_catalog.resolve_batch(
             ledger_snapshot,

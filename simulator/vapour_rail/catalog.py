@@ -42,6 +42,7 @@ from simulator.vapour_rail.batch import (
     FluxRefusal,
     PressureRefusal,
     PressureValue,
+    ZeroByPhysics,
 )
 from simulator.vapour_rail.channels import (
     CHANNEL_O2,
@@ -1606,6 +1607,188 @@ class CompiledSpecies:
     source_reaction_activity: ActivityInputDeclaration | None = None
 
 
+# Fe's missing a_FeO / pO2 bound. Same P_sat,Fe for both carriers: FeO(g)
+# has no activity-free saturation law, and the heavier mass only raises k_HK.
+_FE_UPPER_BOUND_REASON = "below_evaporation_upper_bound"
+_FE_UPPER_BOUND_CHANNELS = ("Fe", "FeO_gas")
+
+
+def _legacy_projection_species_row(
+    legacy_projection: Mapping[str, Any],
+    species_id: str,
+) -> Mapping[str, Any] | None:
+    for group in legacy_projection.values():
+        if not isinstance(group, Mapping):
+            continue
+        candidate = group.get(species_id)
+        if isinstance(candidate, Mapping) and "molar_mass_g_mol" in candidate:
+            return candidate
+    return None
+
+
+def _authorized_pure_metal_evaporation_zero(
+    legacy_projection: Mapping[str, Any],
+    answer: Any,
+    row: Mapping[str, Any],
+    temperature_K: float | None,
+    state: Any,
+) -> Any | None:
+    """Authorized Fe zero when the pure-metal tick mass is below closure.
+
+    ``a_Fe <= 1`` implies ``P_Fe <= P_sat,Fe(T)`` from the shipped pure
+    sidecar, with no Ellingham input. The tick mass is the max Hertz-Knudsen
+    flux of Fe and FeO(g) at activity 1 and alpha 1 (neither coefficient can
+    exceed 1; gas resistance would only lower the flux). Alpha on the Fe row
+    is not used: an upper bound that justified a zero with alpha < 1 would
+    be smaller than the physical ceiling.
+
+    The comparison is ``DEFAULT_BALANCE_TOLERANCE_KG`` over this tick's area
+    and duration. A missing tick cannot prove the mass is negligible. A
+    temperature outside ``construction_support_range_K`` is extrapolated,
+    not a refusal, when that mass is still below the tolerance. The 700 C
+    reference (~6.5e-10 kg/m^2/h) is the sublimation Clausius-Clapeyron
+    check; this function uses the shipped Antoine, whose cold-T pressure is
+    higher, so a zero authorized here is inside that check.
+    """
+
+    if (
+        temperature_K is None
+        or not math.isfinite(temperature_K)
+        or temperature_K <= 0.0
+        or state is None
+    ):
+        return None
+    try:
+        area_m2 = float(getattr(state, "evaporation_tick_area_m2", None))
+        duration_s = float(getattr(state, "evaporation_tick_duration_s", None))
+    except (TypeError, ValueError):
+        return None
+    if (
+        not math.isfinite(area_m2)
+        or area_m2 <= 0.0
+        or not math.isfinite(duration_s)
+        or duration_s <= 0.0
+    ):
+        return None
+    pure = row.get("pure_component_antoine")
+    if not isinstance(pure, Mapping):
+        return None
+    band = pure.get("construction_support_range_K")
+    if (
+        not isinstance(band, Sequence)
+        or isinstance(band, (str, bytes))
+        or len(band) != 2
+    ):
+        return None
+    try:
+        band_low = float(band[0])
+        band_high = float(band[1])
+    except (TypeError, ValueError):
+        return None
+    if (
+        not math.isfinite(band_low)
+        or not math.isfinite(band_high)
+        or band_high < band_low
+    ):
+        return None
+
+    from engines.antoine import (
+        _AntoineCoefficientRefusal,
+        _antoine_log10_pressure,
+        _read_antoine_coefficients,
+    )
+    from engines.builtin.vapor_pressure import (
+        COEFF_BLOCK_PURE_COMPONENT,
+        VaporPressureComputationError,
+        vapor_pressure_antoine_coefficients,
+    )
+    from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
+    from simulator.chemistry.langmuir_knudsen import (
+        hertz_knudsen_k_kg_s_m2_pa,
+    )
+
+    try:
+        antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+            row,
+            temperature_K=temperature_K,
+        )
+        if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
+            return None
+        if not isinstance(antoine, Mapping) or antoine.get("selection_refusal"):
+            return None
+        antoine_a, antoine_b, antoine_c = _read_antoine_coefficients(antoine)
+        pure_pa = 10.0 ** _antoine_log10_pressure(
+            antoine_a, antoine_b, antoine_c, temperature_K
+        )
+    except (
+        KeyError,
+        ValueError,
+        OverflowError,
+        _AntoineCoefficientRefusal,
+        VaporPressureComputationError,
+    ):
+        return None
+    if not math.isfinite(pure_pa) or pure_pa < 0.0:
+        return None
+
+    channel_flux_kg_s_m2: list[float] = []
+    for channel_id in _FE_UPPER_BOUND_CHANNELS:
+        channel_row = row if channel_id == "Fe" else _legacy_projection_species_row(
+            legacy_projection, channel_id
+        )
+        if channel_row is None:
+            return None
+        try:
+            molar_g = float(channel_row.get("molar_mass_g_mol"))
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(molar_g) or molar_g <= 0.0:
+            return None
+        flux_kg_s_m2 = hertz_knudsen_k_kg_s_m2_pa(
+            temperature_K, molar_g / 1000.0
+        ) * pure_pa
+        if not math.isfinite(flux_kg_s_m2) or flux_kg_s_m2 < 0.0:
+            return None
+        channel_flux_kg_s_m2.append(flux_kg_s_m2)
+    bound_kg = max(channel_flux_kg_s_m2) * area_m2 * duration_s
+    if not math.isfinite(bound_kg) or bound_kg < 0.0:
+        return None
+    if not bound_kg < DEFAULT_BALANCE_TOLERANCE_KG:
+        return None
+
+    authority = (
+        "certified"
+        if band_low <= temperature_K <= band_high
+        else "extrapolated"
+    )
+    extra = dict(answer.extra)
+    if isinstance(answer.pressure, PressureValue):
+        extra["dormant_catalog_pressure_pa"] = float(answer.pressure.pa)
+    extra[_FE_UPPER_BOUND_REASON] = {
+        "reason": _FE_UPPER_BOUND_REASON,
+        "bound_kg": bound_kg,
+        "authority": authority,
+        "band_K": [band_low, band_high],
+        "law": "pure_component_antoine",
+        "p_sat_pa": pure_pa,
+    }
+    zero = ZeroByPhysics(
+        evidence_ref=(
+            f"{_FE_UPPER_BOUND_REASON}"
+            f";bound_kg={bound_kg:.16e}"
+            f";authority={authority}"
+            f";band_K={band_low:.1f}:{band_high:.1f}"
+        )
+    )
+    return replace(
+        answer,
+        pressure=zero,
+        selected_runtime_pressure=zero,
+        refusal_code=None,
+        extra=MappingProxyType(extra),
+    )
+
+
 class VapourRailCatalog:
     """Compiled schema-v2 catalog plus its temporary legacy projection."""
 
@@ -1767,9 +1950,15 @@ class VapourRailCatalog:
         (``state.fO2_bar``). C0 argon headspace O2 is 0 mol, so that
         realized pO2 is the 1e-9 bar transport floor, the same floor the
         diagnostic uses. The 85x gap is this skipped term, not a second pO2.
-        A missing activity, pO2, or any other failure to evaluate that rail
-        is a typed refusal of the selected quantity. The dormant Antoine
-        stays on ``answer.pressure`` and is not flux-eligible.
+        A missing activity or pO2 is a typed refusal of the selected
+        quantity, except when the activity-free pure-metal Hertz-Knudsen
+        mass of Fe and FeO(g) over the tick is below the mass-balance
+        closure tolerance. That case is an authorized physical zero
+        (``below_evaporation_upper_bound``), not a refusal and not a
+        silent zero. Any other failure to evaluate the rail is a typed
+        refusal. The dormant Antoine stays on ``answer.pressure`` for a
+        refusal and is copied onto ``extra`` for the authorized zero. It
+        is not selected and it is not flux-eligible.
 
         Worked point, T = 1673.15 K, a_FeO = 0.2, pO2 = 1e-9 bar:
         dG = -330.157642 kJ/mol O2, K = 4.930535300796167e-11,
@@ -1834,6 +2023,7 @@ class VapourRailCatalog:
         channels = dict(batch.channels_by_species)
         changed = False
         refused_ids: set[str] = set()
+        authorized_zero_ids: set[str] = set()
         for species_id, answer in channels.items():
             if answer.source_label != "catalog":
                 continue
@@ -1947,7 +2137,29 @@ class VapourRailCatalog:
                 _AntoineCoefficientRefusal,
                 VaporPressureComputationError,
             ) as exc:
-                channels[species_id] = _refuse(answer, str(exc))
+                detail = str(exc)
+                authorized = None
+                if (
+                    species_id == "Fe"
+                    and isinstance(exc, ValueError)
+                    and (
+                        "missing oxide activity" in detail
+                        or "missing pO2" in detail
+                    )
+                ):
+                    authorized = _authorized_pure_metal_evaporation_zero(
+                        self._legacy_projection,
+                        answer,
+                        row,
+                        temperature_K,
+                        state,
+                    )
+                if authorized is not None:
+                    channels[species_id] = authorized
+                    authorized_zero_ids.add(species_id)
+                    changed = True
+                    continue
+                channels[species_id] = _refuse(answer, detail)
                 refused_ids.add(species_id)
                 changed = True
                 continue
@@ -1958,8 +2170,24 @@ class VapourRailCatalog:
             changed = True
         if not changed:
             return batch
+        dormant_count: int | None = None
+        if authorized_zero_ids:
+            active_after = frozenset(batch.flux_active_species_ids) - refused_ids
+            dormant_count = sum(
+                1
+                for species_id, channel in channels.items()
+                if channel.is_flux_active and species_id not in active_after
+            )
         if not refused_ids:
-            return replace(batch, channels_by_species=channels)
+            if dormant_count is None:
+                return replace(batch, channels_by_species=channels)
+            metadata = dict(batch.metadata)
+            metadata["n_flux_dormant_by_epoch"] = dormant_count
+            return replace(
+                batch,
+                channels_by_species=channels,
+                metadata=metadata,
+            )
         # Refusal is post-resolution. Counts and bundles were derived from
         # the pre-refusal channels, so a Fe-only batch would still report
         # Fe as active and keep it in its solve bundle.
@@ -1975,6 +2203,8 @@ class VapourRailCatalog:
         )
         metadata["n_flux_active"] = len(flux_active)
         metadata["n_solve_bundles"] = len(solve_bundles)
+        if dormant_count is not None:
+            metadata["n_flux_dormant_by_epoch"] = dormant_count
         return replace(
             batch,
             channels_by_species=channels,
@@ -2064,6 +2294,10 @@ class VapourRailCatalog:
                     state.get("melt_activity_engine_inputs") or {}
                 ),
                 liquid_feo_domain=state.get("liquid_feo_domain"),
+                evaporation_tick_area_m2=state.get("evaporation_tick_area_m2"),
+                evaporation_tick_duration_s=state.get(
+                    "evaporation_tick_duration_s"
+                ),
                 extras={
                     key: value
                     for key, value in state.items()
@@ -2091,6 +2325,8 @@ class VapourRailCatalog:
                         "imcc_activity_shadow_enabled",
                         "melt_activity_engine_inputs",
                         "liquid_feo_domain",
+                        "evaporation_tick_area_m2",
+                        "evaporation_tick_duration_s",
                     }
                 },
             )

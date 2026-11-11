@@ -312,6 +312,10 @@ class VapourResolveState:
     # Liquid-state fact for the FeO shadow. Not vapour request identity:
     # omitted from as_mapping so it cannot enter _state_fingerprint.
     liquid_feo_domain: Any = None
+    # Tick geometry for the activity-free Fe evaporation bound. Not request
+    # identity: omitted from as_mapping so it cannot enter _state_fingerprint.
+    evaporation_tick_area_m2: float | None = None
+    evaporation_tick_duration_s: float | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.melt_activity_shadow_enabled, bool):

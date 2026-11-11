@@ -3931,6 +3931,22 @@ class EvaporationMixin:
             liquid_feo_domain = (
                 domain_at(float(temperature_K)) if callable(domain_at) else None
             )
+            try:
+                tick_area_m2 = float(
+                    getattr(self.melt, "melt_surface_area_m2", None)
+                )
+            except (TypeError, ValueError):
+                tick_area_m2 = None
+            if (
+                tick_area_m2 is None
+                or not math.isfinite(tick_area_m2)
+                or tick_area_m2 <= 0.0
+            ):
+                tick_area_m2 = None
+            # One campaign hour. HourSnapshot.duration_h is 1, so the
+            # kilogram compared with the closure tolerance is this hour's
+            # Hertz-Knudsen mass, not a per-second flux.
+            tick_duration_s = 3600.0
             batch = builder(
                 temperature_K=float(temperature_K),
                 process_phase='hot_train',
@@ -3991,6 +4007,8 @@ class EvaporationMixin:
                     self, "_melt_activity_engine_inputs", {}
                 ),
                 liquid_feo_domain=liquid_feo_domain,
+                evaporation_tick_area_m2=tick_area_m2,
+                evaporation_tick_duration_s=tick_duration_s,
                 flux_activation_context=FluxActivationContext(
                     epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
                     effective_pressure_species_ids=effective_pressure_species_ids,

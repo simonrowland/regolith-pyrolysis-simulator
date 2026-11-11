@@ -1321,6 +1321,255 @@ def test_fe_900c_missing_ellingham_input_is_not_a_cold_physical_zero(
     assert reason == "vapour_batch_no_debiting_pressure_outcome"
 
 
+# CI C2B melt is 35-145 C. The campaign tick is one hour. 0.2 m^2 is
+# MeltState's crucible default; production passes the live area. At these
+# temperatures the shipped pure-Fe Antoine is far under 1e-12 kg either way.
+_CI_COLD_TICK_C = (35.0, 145.0)
+_CI_TICK_AREA_M2 = 0.2
+_CI_TICK_DURATION_S = 3600.0
+# Shipped Fe pure sidecar (data/vapor_pressures.yaml metals.Fe) and the
+# Fe / FeO(g) molar masses. Independent of the catalog helper.
+_FE_PURE_ANTOINE = (10.670336, 17759.430841, 0.0)
+_FE_CONSTRUCTION_BAND_K = (1809.0, 3134.0)
+_FE_CHANNEL_MOLAR_MASS_G = (("Fe", 55.845), ("FeO_gas", 71.8444))
+
+
+def _ci_tick_state(temperature_C: float, overrides: dict[str, Any]) -> dict[str, Any]:
+    state = {
+        "temperature_K": temperature_C + 273.15,
+        "process_phase": "hot_train",
+        "stage": "evaporation",
+        "evaporation_tick_area_m2": _CI_TICK_AREA_M2,
+        "evaporation_tick_duration_s": _CI_TICK_DURATION_S,
+    }
+    state.update(overrides)
+    return state
+
+
+def _pure_fe_tick_bound_kg(temperature_K: float) -> float:
+    from engines.antoine import _antoine_log10_pressure
+    from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+
+    antoine_a, antoine_b, antoine_c = _FE_PURE_ANTOINE
+    pure_pa = 10.0 ** _antoine_log10_pressure(
+        antoine_a, antoine_b, antoine_c, temperature_K
+    )
+    channel_flux = [
+        hertz_knudsen_k_kg_s_m2_pa(temperature_K, molar_g / 1000.0) * pure_pa
+        for _channel, molar_g in _FE_CHANNEL_MOLAR_MASS_G
+    ]
+    return max(channel_flux) * _CI_TICK_AREA_M2 * _CI_TICK_DURATION_S
+
+
+def _resolve_fe_cold(
+    temperature_C: float,
+    state_overrides: dict[str, Any],
+) -> Any:
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+    from simulator.vapour_rail.u0_manifest import load_u0_manifest
+
+    catalog = _fe_cold_catalog(compile_vapour_rail_catalog, load_u0_manifest)
+    return catalog.resolve_batch(
+        {"process.cleaned_melt": {"FeO": 1.0}},
+        _ci_tick_state(temperature_C, state_overrides),
+        flux_activation_context=FluxActivationContext(
+            epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+            effective_pressure_species_ids=frozenset(),
+        ),
+    )
+
+
+@pytest.mark.parametrize("temperature_C", _CI_COLD_TICK_C)
+@pytest.mark.parametrize(
+    ("omission_id", "state_overrides", "detail_needle"),
+    _FE_900C_ELLINGHAM_OMISSIONS,
+    ids=[item[0] for item in _FE_900C_ELLINGHAM_OMISSIONS],
+)
+def test_ci_cold_tick_fe_missing_ellingham_input_is_authorized_upper_bound_zero(
+    temperature_C: float,
+    omission_id: str,
+    state_overrides: dict[str, Any],
+    detail_needle: str,
+) -> None:
+    """CI cold tick: missing a_FeO or pO2 is an authorized physical zero.
+
+    Green books Fe dormant_by_epoch and does not add a partial-channel
+    silent_zero note. The Ellingham refusal moved that note (campaign
+    silent_zero 49 with refused_upstream 2, and n_flux_active/n_refused
+    16/1). The pure-metal tick mass is below the closure tolerance, so Fe
+    is zero_by_physics with the bound and the extrapolated P_sat band, not
+    a refusal and not another silent_zero note.
+    """
+
+    from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
+
+    batch = _resolve_fe_cold(temperature_C, state_overrides)
+    answer = batch.channel("Fe")
+    assert isinstance(answer.pressure, ZeroByPhysics)
+    assert isinstance(answer.selected_runtime_pressure, ZeroByPhysics)
+    assert answer.selected_runtime_pressure.evidence_ref.startswith(
+        "below_evaporation_upper_bound;"
+    )
+    assert "evaporation_tick" not in answer.state_fingerprint
+    record = answer.extra["below_evaporation_upper_bound"]
+    assert record["reason"] == "below_evaporation_upper_bound"
+    assert record["law"] == "pure_component_antoine"
+    assert record["authority"] == "extrapolated"
+    assert record["band_K"] == list(_FE_CONSTRUCTION_BAND_K)
+    expected_kg = _pure_fe_tick_bound_kg(temperature_C + 273.15)
+    assert expected_kg < DEFAULT_BALANCE_TOLERANCE_KG
+    assert record["bound_kg"] == pytest.approx(expected_kg, rel=1e-12)
+    assert math.isfinite(record["p_sat_pa"]) and record["p_sat_pa"] > 0.0
+    assert math.isfinite(answer.extra["dormant_catalog_pressure_pa"])
+    assert answer.is_refused is False
+    assert not isinstance(answer.flux, FluxRefusal)
+    assert answer.refusal_code is None
+    notes = list(answer.extra.get("silent_zero_notes") or [])
+    assert all(note.get("zero_because") != "refused_upstream" for note in notes)
+    assert all(int(note.get("doctrine_category", 0)) != 1 for note in notes)
+    assert "Fe" not in batch.flux_active_species_ids
+    _pressures, report = flux_pressures_from_batch(batch)
+    assert report["batch_channel_states"]["Fe"] == "dormant_by_epoch"
+    assert "Fe" not in _pressures
+    _assert_cold_fe_adds_no_partial_silent_zero(batch, temperature_C)
+    assert omission_id
+    assert detail_needle
+
+
+def _assert_cold_fe_adds_no_partial_silent_zero(
+    batch: VapourBatch,
+    temperature_C: float,
+) -> None:
+    """A debiting peer must not record a Fe partial-channel silent zero.
+
+    The note is written only for gate state ``refusal`` once some channel
+    debits and T >= 400 K. 145 C is that tick. 35 C is below 400 K, so the
+    same assertion still requires the Fe gate state to stay off ``refusal``.
+    """
+
+    peer = _channel_answer(
+        "Na",
+        pressure=PressureValue(pa=1.0),
+        selected=PressureValue(pa=1.0),
+        flux=FluxEligible(alpha_ref="alpha:Na"),
+    )
+    channels = dict(batch.channels_by_species)
+    channels["Na"] = peer
+    peered = replace(
+        batch,
+        requested_species_ids=frozenset(channels),
+        channels_by_species=channels,
+        flux_active_species_ids=frozenset(
+            set(batch.flux_active_species_ids) | {"Na"}
+        ),
+    )
+    pressures, report = flux_pressures_from_batch(peered)
+    assert "Na" in pressures
+    assert report["batch_channel_states"]["Fe"] != "refusal"
+    host = SimpleNamespace(
+        melt=SimpleNamespace(
+            temperature_C=temperature_C,
+            melt_surface_area_m2=_CI_TICK_AREA_M2,
+            p_total_mbar=0.0,
+            stir_state=SimpleNamespace(axial=1.0, radial=1.0),
+        ),
+        setpoints={},
+        vapor_pressures={},
+        overhead_model=SimpleNamespace(pipe_diameter_m=0.12),
+        overhead=SimpleNamespace(headspace_temperature_K=300.0),
+        _last_vapour_batch_resolve_error={},
+        _last_vapor_pressure_diagnostic={},
+        _resolve_evaporation_vapour_batch=(
+            lambda equilibrium, temperature_K, effective_pressure_source: peered
+        ),
+        _build_partial_melt_offgassing_diagnostic=(
+            lambda *args, **kwargs: {"reached_partial_loop": True}
+        ),
+        _evaporation_bulk_partial_pressure_pa=lambda species: 0.0,
+        _build_evaporation_aux_maps=(
+            lambda vapor_pressures: (
+                {species: 0.023 for species in vapor_pressures},
+                {species: {} for species in vapor_pressures},
+                {species: 1.0 for species in vapor_pressures},
+            )
+        ),
+        _dispatch_only=(
+            lambda *args, **kwargs: SimpleNamespace(
+                status="ok",
+                diagnostic={"evaporation_flux_kg_hr": {"Na": 1.0e-6}},
+            )
+        ),
+        _freeze_gate_enabled=lambda: False,
+    )
+    host._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        host,
+    )
+    equilibrium = SimpleNamespace(
+        temperature_C=temperature_C,
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={"Na": 1.0},
+        vapor_pressures_source={},
+        status="ok",
+        diagnostics={},
+    )
+    try:
+        EvaporationMixin._calculate_evaporation(host, equilibrium)
+    except EvaporationFluxRefusal:
+        pass
+    except Exception:
+        # The note is recorded before flux control inputs. A thin host
+        # stops on the next melt helper; that is after the note.
+        if temperature_C + 273.15 < 400.0:
+            raise
+    if temperature_C + 273.15 >= 400.0:
+        assert host._last_partial_melt_offgassing_diagnostic == {
+            "reached_partial_loop": True
+        }
+    fe_partial = [
+        note
+        for note in (getattr(host, "_silent_zero_notes", None) or [])
+        if note.get("site") == "evaporation.partial_channel_refusal"
+        and note.get("species") == "Fe"
+    ]
+    assert fe_partial == []
+
+
+@pytest.mark.parametrize("temperature_C", (700.0, 900.0))
+@pytest.mark.parametrize(
+    ("omission_id", "state_overrides", "detail_needle"),
+    _FE_900C_ELLINGHAM_OMISSIONS,
+    ids=[item[0] for item in _FE_900C_ELLINGHAM_OMISSIONS],
+)
+def test_fe_missing_ellingham_input_refuses_when_upper_bound_exceeds_tolerance(
+    temperature_C: float,
+    omission_id: str,
+    state_overrides: dict[str, Any],
+    detail_needle: str,
+) -> None:
+    """700 C and 900 C on the same tick are not below the closure tolerance.
+
+    700 C is the ruling's reference (~6.5e-10 kg/m^2/h on the sublimation
+    check). The shipped Antoine is higher. Missing a_FeO or pO2 stays a
+    category-1 refusal.
+    """
+
+    from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
+
+    assert _pure_fe_tick_bound_kg(temperature_C + 273.15) >= (
+        DEFAULT_BALANCE_TOLERANCE_KG
+    )
+    batch = _resolve_fe_cold(temperature_C, state_overrides)
+    answer = batch.channel("Fe")
+    assert isinstance(answer.pressure, PressureValue)
+    assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+    assert answer.selected_runtime_pressure.code == "missing_ellingham_input"
+    assert detail_needle in answer.selected_runtime_pressure.detail
+    assert isinstance(answer.flux, FluxRefusal)
+    assert "below_evaporation_upper_bound" not in answer.extra
+    assert omission_id
+
+
 _FE_COLD_CATALOG: dict[str, Any] = {}
 
 
