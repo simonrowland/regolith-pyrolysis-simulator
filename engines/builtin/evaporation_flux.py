@@ -53,7 +53,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from engines.builtin._common import (
@@ -788,6 +788,69 @@ def _add_amount(target: dict[str, float], species: str, amount: float) -> None:
     target[species] = target.get(species, 0.0) + amount
 
 
+def _solid_host_accepted_extents(
+    priced: Sequence[Mapping[str, Any]],
+    host_remaining: Mapping[str, float],
+    scale: float,
+) -> dict[str, float]:
+    """Debit each host by descending equilibrium driving force.
+
+    One channel takes min(scaled demand, host, extent bound). Channels
+    whose driving force compares equal run together, so the remaining
+    host is shared by demand:
+
+        accepted_i = want_i * H / sum(want_j * |nu_host,j|)
+
+    ``want`` already includes the pump scale and the extent bound.
+    Reaction id is not a rank.
+    """
+    by_host: dict[str, list[Mapping[str, Any]]] = {}
+    for row in priced:
+        by_host.setdefault(str(row["host_species"]), []).append(row)
+    accepted: dict[str, float] = {}
+    for host, rows in by_host.items():
+        ordered = sorted(rows, key=lambda row: -float(row["driving_pa"]))
+        remaining = float(host_remaining.get(host, 0.0))
+        index = 0
+        while index < len(ordered):
+            drive = float(ordered[index]["driving_pa"])
+            end = index + 1
+            while (
+                end < len(ordered)
+                and float(ordered[end]["driving_pa"]) == drive
+            ):
+                end += 1
+            tied = ordered[index:end]
+            index = end
+            wants: list[float] = []
+            for row in tied:
+                want = min(
+                    float(row["unconstrained"]) * scale,
+                    float(row["extent_bound"]),
+                )
+                if not math.isfinite(want):
+                    want = 0.0
+                wants.append(max(0.0, want))
+            demand = 0.0
+            for want, row in zip(wants, tied):
+                demand += want * float(row["host_nu_abs"])
+            if len(tied) > 1 and demand > remaining and remaining > 0.0:
+                fraction = remaining / demand
+                for want, row in zip(wants, tied):
+                    got = want * fraction
+                    accepted[str(row["reaction_id"])] = got
+                    remaining -= got * float(row["host_nu_abs"])
+                remaining = max(0.0, remaining)
+                continue
+            for want, row in zip(wants, tied):
+                nu = float(row["host_nu_abs"])
+                cap = remaining / nu if nu else 0.0
+                got = min(want, max(0.0, cap))
+                accepted[str(row["reaction_id"])] = got
+                remaining = max(0.0, remaining - got * nu)
+    return accepted
+
+
 def _solid_host_bakeout_result(
     *,
     controls: Mapping[str, Any],
@@ -988,6 +1051,9 @@ def _solid_host_bakeout_result(
             "host_species": host_species,
             "host_nu_abs": abs(host_term[2]),
             "unconstrained": max(0.0, unconstrained),
+            # p_eq - p_bulk is the Hertz-Knudsen driving force. A larger
+            # value is the more favoured equilibrium on a shared host.
+            "driving_pa": max(0.0, p_eq - p_bulk),
             "extent_bound": bound,
             "terms": terms,
         })
@@ -1005,17 +1071,6 @@ def _solid_host_bakeout_result(
             unavailable[0]["reason"] if unavailable else "no_reactions",
             unavailable_reactions=unavailable,
         )
-
-    competing_hosts = sorted(
-        host for host in host_remaining
-        if sum(row["host_species"] == host for row in priced) > 1
-    )
-    if competing_hosts:
-        return _done(
-            "refused", "competing_solid_host_channels",
-            competing_hosts=competing_hosts,
-        )
-    priced.sort(key=lambda row: row["reaction_id"])
 
     def _gas_kg_h(row: Mapping[str, Any], extent: float) -> float:
         total = 0.0
@@ -1040,17 +1095,8 @@ def _solid_host_bakeout_result(
     if combined_peak_kg_h > throughput:
         scale = throughput / combined_peak_kg_h
 
-    running = dict(host_remaining)
-    inventory_capped: dict[str, float] = {}
-    for row in priced:
-        host_left = running.get(row["host_species"], 0.0)
-        host_cap = host_left / row["host_nu_abs"] if row["host_nu_abs"] else 0.0
-        capped = min(row["unconstrained"], host_cap, row["extent_bound"])
-        capped = max(0.0, capped)
-        inventory_capped[row["reaction_id"]] = capped
-        running[row["host_species"]] = max(
-            0.0, host_left - capped * row["host_nu_abs"]
-        )
+    inventory_capped = _solid_host_accepted_extents(priced, host_remaining, 1.0)
+    accepted = _solid_host_accepted_extents(priced, host_remaining, scale)
 
     demand_mol: dict[str, float] = {}
     demand_mol_h: dict[str, float] = {}
@@ -1060,22 +1106,9 @@ def _solid_host_bakeout_result(
     released_mol: dict[str, float] = {}
     release_mol_h: dict[str, float] = {}
     released_kg_h: dict[str, float] = {}
-    accepted: dict[str, float] = {}
     unconstrained_by_reaction: dict[str, float] = {}
-    accepting = dict(host_remaining)
     for row in priced:
-        host_left = accepting.get(row["host_species"], 0.0)
-        host_cap = host_left / row["host_nu_abs"] if row["host_nu_abs"] else 0.0
-        accepted_extent = min(
-            row["unconstrained"] * scale,
-            host_cap,
-            row["extent_bound"],
-        )
-        accepted_extent = max(0.0, accepted_extent)
-        accepted[row["reaction_id"]] = accepted_extent
-        accepting[row["host_species"]] = max(
-            0.0, host_left - accepted_extent * row["host_nu_abs"]
-        )
+        accepted_extent = accepted[row["reaction_id"]]
         unconstrained_by_reaction[row["reaction_id"]] = row["unconstrained"]
         for species, phase, nu in row["terms"]:
             if phase != "gas" or nu <= 0.0:

@@ -35,6 +35,16 @@ points:
 # kems-010-richter-2007 keys no longer live. Parents are superseded;
 # Arrhenius replacements are model_output_not_measurement; ordering
 # replacements are qualitative bounds, not numeric comparables.
+#
+# 2026-11-10 b-253 / d-374: silicate-melt ordering no longer substitutes
+# lunar_mare_low_ti. hashimoto_1983_fcmas_qualitative_volatility_order is
+# scored on Table 1 row (1) Ave. (the paper's starting composition):
+# ordering-fail 24/27 residual -3.0, was 23/27 residual -4.0 on the mare
+# proxy. Violations at 2273.15 K are Fe>Mg, Fe>SiO, and Ca>Al. Not tuned.
+# hashimoto_1983_cao_al2o3_residue_enrichment was ordering-pass 6/6 on the
+# same mare proxy. That verdict was stable across mare and Table 1 (latent,
+# not a confirmed false finding). The residue row names no composition, so
+# it is now typed-refusal:missing_condition:melt_composition and is not pinned.
 
 - key: richter_2007_mg_cai_arrhenius_langmuir:T=1873
   case_id: richter-et-al-2007::richter_2007_mg_cai_arrhenius_langmuir
@@ -333,29 +343,18 @@ points:
   temperature_K: 3630.956
   residual: -70.806000188918
 # --- std2 fragment ---
-- key: hashimoto_1983_cao_al2o3_residue_enrichment:ordering
-  case_id: kems-015-hashimoto-1983::hashimoto_1983_cao_al2o3_residue_enrichment
-  source_id: kems-015-hashimoto-1983
-  observation_type: rate_series
-  species: Ca
-  residual_dex: 0.0
-  band_dex: 0.01
-  residual: 0.0
-  band_residual: 0.01
-  status: ordering-pass
-  note: 'Ordering pin: CaO+Al2O3 residue enrichment; 6/6 later-than-volatile constraints held.'
 - key: hashimoto_1983_fcmas_qualitative_volatility_order:ordering
   case_id: kems-015-hashimoto-1983::hashimoto_1983_fcmas_qualitative_volatility_order
   source_id: kems-015-hashimoto-1983
   observation_type: rate_series
   species: Fe
-  residual_dex: 0.06963592814139442
+  residual_dex: 0.05115252244738131
   band_dex: 0.01
-  residual: -4.0
+  residual: -3.0
   band_residual: 0.01
   status: ordering-fail
-  note: 'Ordering FINDING: Hashimoto Fe>(Mg|Si)>Ca>Al; engine held 23/27 pairwise constraints (residual
-    -4 pairs). Not tuned.'
+  note: 'Ordering FINDING (d-374): Hashimoto Fe>(Mg|Si)>Ca>Al on Table 1 Ave FCMAS; engine held 24/27 pairwise constraints (residual -3 pairs). Not tuned. The previous 23/27 pin was lunar_mare_low_ti, not this melt.'
+
 # 2026-08-27 d-006 binary-melt composition gate: ms2000-044 (Tsaplin/Zaitsev)
 # binary Na2O-SiO2 / K2O-SiO2 rows state one mole fraction; the second
 # component is 1-x by closure. The gate now completes such binary

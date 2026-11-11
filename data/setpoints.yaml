@@ -1046,8 +1046,11 @@ condensation_train:
     Ca:    780
     Mn:   1000
     Cr:   1280
-    Al:   1180
-    Ti:   1500
+    # Al and Ti are not condenser setpoints. Al leaves as metal via the
+    # C6 Mg-thermite path; Ti is non-volatile. Neither has a designated
+    # stage. A number here would read as a route that does not exist.
+    # Incidental Al/Ti/AlO/TiO vapour is still accounted (overhead, wall,
+    # or a colder stage via the in-source capture threshold), not dropped.
 
   condensation_temperature_sources:
     Fe: >-
@@ -1080,18 +1083,6 @@ condensation_train:
     Cr: >-
       Estimated/operator-routing override for Cr-bearing vapor capture; no
       source-backed 1 mbar condensation-temperature row is declared.
-    Al: >-
-      Estimated/operator-routing override for completeness; no source-backed
-      1 mbar condensation-temperature row is declared. VR-11 audit: Al/Ti
-      overrides are operator-routing only -- do not add further Al/Ti/trace
-      T_cond overrides without independent engineering policy approval
-      (DESIGN-REV5 section 7.2).
-    Ti: >-
-      Estimated/operator-routing override for completeness; no source-backed
-      1 mbar condensation-temperature row is declared. VR-11 audit: Al/Ti
-      overrides are operator-routing only -- do not add further Al/Ti/trace
-      T_cond overrides without independent engineering policy approval
-      (DESIGN-REV5 section 7.2).
 
   condensation_temperature_estimated:
     Fe: true
@@ -1103,8 +1094,6 @@ condensation_train:
     Ca: true
     Mn: true
     Cr: true
-    Al: true
-    Ti: true
 
   stages:
     - stage_number: 2

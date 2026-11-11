@@ -143,8 +143,10 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # bounds_digest and the empty recipe id below do not include the note.
     resolved_digest = hashlib.sha256(resolved).hexdigest()
     # d-388 changes the C4 acquisition cap and adds the outdoor alkali loss limit.
+    # Merging green f8baa3402 into that tree moves the resolved bytes again.
+    # This is the sha256 of the merged resolved setpoints, not a rerun golden.
     assert resolved_digest == (
-        "4e6747fd7e1b267e0dc5e7620f9ac3470040ee7db6c2643e75a3b83283ce3027"
+        "644b3aad38a7327533545b69386a320a8910910711811f825e3075c7d3f8f6a9"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.

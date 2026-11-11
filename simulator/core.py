@@ -1301,6 +1301,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapor_pressures_source: dict[str, str] = {}
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
+        self._stage0_carbon_allocation_notices: list[dict] = []
         self._stage0_carbonate_decomposition_specs: list[dict] = []
         self._stage0_perchlorate_cleanup_specs: list[dict] = []
         self._stage0_foulant_diagnostics: list[dict] = []
@@ -9703,6 +9704,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._sulfur_saturation_steps = steps
         steps.append(step)
 
+    def stage0_carbon_allocation_run_notice(self) -> Dict[str, Any] | None:
+        """Out-of-domain or refused stage-0 sulfate carbon ranking.
+
+        In-domain rankings stay off the report. An extrapolated ranking
+        is a flagged best estimate and must be visible. A scarce budget
+        with no reaction-specific dG is a typed refusal of that quantity.
+        """
+        notices = getattr(self, '_stage0_carbon_allocation_notices', None)
+        if not isinstance(notices, list) or not notices:
+            return None
+        notice = notices[0]
+        if not isinstance(notice, dict):
+            return None
+        payload = copy.deepcopy(notice)
+        claims = payload.get('claims') or []
+        out_of_domain = [
+            str(claim['species'])
+            for claim in claims
+            if isinstance(claim, dict)
+            and claim.get('confidence') == 'out_of_domain'
+        ]
+        payload['out_of_domain'] = bool(out_of_domain)
+        payload['out_of_domain_species'] = list(
+            payload.get('out_of_domain_species') or out_of_domain
+        )
+        if payload.get('reason') == (
+            'stage0_cation_sulfate_carbon_ranking_refused'
+        ):
+            return payload
+        if not payload['out_of_domain']:
+            return None
+        return payload
+
     def sulfur_saturation_run_notice(self) -> Dict[str, Any] | None:
         """Run-level SulfSat notice, or None when every step was in range."""
 
@@ -10847,6 +10881,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         additives_kg: Dict[str, float],
     ) -> None:
         self._stage0_bakeout_reserved_carbon_kg = 0.0
+        self._stage0_carbon_allocation_notices = []
         required_kg = max(0.0, float(
             self.inventory.carbon_reductant_required_kg))
         if required_kg <= 1e-12:
@@ -11033,85 +11068,173 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         return True, carbon_mol_remaining - carbon_mol
 
-    def _stage0_sulfate_carbon_order(
-        self, hosts: Mapping[str, float], *, to_sulfide: bool,
+    def _stage0_cation_sulfate_allocation_order(
+        self,
+        cation_feed: Mapping[str, float],
+        *,
+        to_sulfide: bool,
+        carbon_mol_remaining: float,
     ) -> list[str]:
-        from engines.builtin.foulant_disposition import _dg_source_confidence, _parse_dg_points
-        from simulator.chemistry.organics_pyrolysis import carbon_delta_g_co_kj_per_mol_o2
+        """Greedy carbon order: most negative dG per mol C, then species name.
 
-        temperature_K = float(self.inventory.stage0_temp_range_C[1]) + 273.15
+        Dict insertion follows ``_processable_stage0_components``, which is
+        a set, so insertion order is hash-seed dependent. Competing sulfates
+        share one carbon budget and must not.
+        """
+        active = [
+            (str(species), float(feed_kg))
+            for species, feed_kg in cation_feed.items()
+            if float(feed_kg) > 1e-12
+        ]
+        if len(active) <= 1:
+            return [species for species, _feed_kg in active]
+
+        from engines.builtin.foulant_disposition import (
+            FoulantCarbonRankingRefusal,
+            foulant_dg_kJ_per_mol_carbon,
+        )
+
+        temp_range = getattr(
+            getattr(self, 'inventory', None), 'stage0_temp_range_C', None
+        )
+        if not isinstance(temp_range, (tuple, list)) or len(temp_range) != 2:
+            raise AccountingError(
+                'stage0 cation-sulfate carbon ranking requires '
+                'stage0_temp_range_C'
+            )
+        try:
+            final_c = float(temp_range[1])
+        except (TypeError, ValueError) as exc:
+            raise AccountingError(
+                'stage0_temp_range_C final temperature must be a number'
+            ) from exc
+        if not math.isfinite(final_c):
+            raise AccountingError(
+                'stage0_temp_range_C final temperature must be finite'
+            )
+        temperature_K = final_c + 273.15
         registry = self._load_foulant_registry_cached()
-        scores: dict[str, float] = {}
-        rows: dict[str, str] = {}
-        sources: dict[str, dict[str, Any]] = {}
-        flags = ['sulfate_carbon_standard_state_gas_activities']
-        for host in sorted(hosts):
-            entry = registry.carriers.get(host)
-            pointer = entry.thermo.get('dG_row') if entry else None
-            row = registry.foulant_dG.get(str(pointer).split('.')[-1])
-            if to_sulfide or not row:
-                flags.append('sulfate_carbon_missing_dG_canonical_order')
+        stoich_table = (
+            STAGE0_CATION_SULFATE_SULFIDE_STOICH
+            if to_sulfide
+            else STAGE0_CATION_SULFATE_OXIDE_STOICH
+        )
+        claims: list[dict] = []
+        refused: list[dict] = []
+        carbon_mol_demand = 0.0
+        for species, feed_kg in active:
+            stoich = stoich_table.get(species)
+            if stoich is None:
+                kind = 'sulfide' if to_sulfide else 'oxide'
+                raise AccountingError(
+                    f'unsupported cation-sulfate {kind} stoich for {species!r}'
+                )
+            feed_coeff = float(stoich['feed'])
+            if feed_coeff <= 0.0:
+                raise AccountingError(
+                    f'cation-sulfate stoich feed for {species!r} must be positive'
+                )
+            c_per_mol = float(stoich['C']) / feed_coeff
+            feed_mol = feed_kg / resolve_species_formula(
+                species, self.species_formula_registry
+            ).molar_mass_kg_per_mol()
+            carbon_mol_demand += feed_mol * c_per_mol
+            entry = registry.carriers.get(species)
+            pointer = None if entry is None else entry.thermo.get('dG_row')
+            dg_key = str(pointer).split('.', 1)[-1] if pointer else ''
+            dg_row = registry.foulant_dG.get(dg_key) if dg_key else None
+            if dg_row is None:
+                raise AccountingError(
+                    f'cation sulfate {species!r} has no foulant dG row '
+                    'for carbon ranking'
+                )
+            reaction = str(dg_row.get('reaction') or '')
+            # Sulfide cleanup is not the oxide-decomposition table. Dividing
+            # that thermal dG by the sulfide carbon demand is not a ranking
+            # input, even when the oxygen couple happens to be false.
+            if to_sulfide:
+                refused.append({
+                    'species': species,
+                    'basis': dg_key,
+                    'reaction': reaction,
+                    'detail': (
+                        'sulfide cleanup has no reaction-specific dG; '
+                        'the oxide decomposition table is a different reaction'
+                    ),
+                })
                 continue
             try:
-                points = sorted(_parse_dg_points(row))
-            except (KeyError, ValueError, TypeError):
-                flags.append('sulfate_carbon_missing_dG_canonical_order')
+                dg_per_mol_c, confidence, oxygen_couple = (
+                    foulant_dg_kJ_per_mol_carbon(
+                        dg_row,
+                        temperature_K,
+                        species=species,
+                        carbon_per_mol_feed=c_per_mol,
+                    )
+                )
+            except FoulantCarbonRankingRefusal as exc:
+                refused.append({
+                    'species': species,
+                    'basis': dg_key,
+                    'reaction': exc.reaction,
+                    'detail': exc.detail,
+                })
                 continue
-            rows[host] = str(pointer)
-            extrapolated = _dg_source_confidence(
-                'partly_grounded', temperature_K, points,
-            ) == 'out_of_domain'
-            sources[host] = {
-                'source': row.get('source'),
-                'source_band_K': [points[0][0], points[-1][0]],
-                'authority_level': 'extrapolated' if extrapolated else 'bridge',
-            }
-            if extrapolated:
-                flags.append('sulfate_carbon_dG_extrapolated')
-            lower, upper = points[0], points[1]
-            for lower, upper in zip(points, points[1:]):
-                if temperature_K <= upper[0]:
-                    break
-            thermal_dg = lower[1] + (
-                (temperature_K - lower[0]) * (upper[1] - lower[1])
-                / (upper[0] - lower[0])
-            )
-            # Hess composition, using foulant_dG.{CaSO4,FeSO4,MgSO4}_thermal_decomp:
-            # Ca: CaSO4 -> CaO + SO2 + 1/2 O2; Fe: 2 FeSO4 -> Fe2O3
-            # + 2 SO2 + 1/2 O2. Add C + 1/2 O2 -> CO to either row.
-            # The carbon resolver is per mol O2 (2 C), hence divide by 2;
-            # divide the composed reaction by nu_C=1, NOT by host moles (Fe=2).
-            # Mg's row produces SO3: first add SO3 -> SO2 + 1/2 O2.
-            # REF-012 NIST WebBook gas Hf/S (Chase 1998, CAS 7446-11-9,
-            # 7446-09-5, 7782-44-7): dH=-296.84-(-395.77)=98.93 kJ/mol;
-            # dS=(248.21+205.15/2-256.77)/1000=0.094015 kJ/(mol K).
-            # This uses the registry's tier-2 dH-T*dS approximation (no Cp).
-            # Units: kJ/mol reaction / (mol C/mol reaction) = kJ/mol C.
-            # At 1323.15 K: Fe=-35-228.796763=-263.796763 kJ/mol C;
-            # Ca=85.75-228.796763=-143.046763. A zero carbon budget gives
-            # zero extent regardless of rank. No Stage-0 gas partial pressures
-            # are declared here: use unit gas activities and flag that premise.
-            if host == 'MgSO4':
-                thermal_dg += 98.93 - temperature_K * 0.094015
-            scores[host] = (
-                thermal_dg + carbon_delta_g_co_kj_per_mol_o2(temperature_K) / 2.0
-            ) / STAGE0_CATION_SULFATE_OXIDE_STOICH[host]['C']
-        if len(scores) != len(hosts):
-            order = sorted(hosts)
-        else:
-            order = sorted(hosts, key=lambda host: (scores[host], host))
-            if len(set(scores.values())) != len(scores):
-                flags.append('sulfate_carbon_tied_dG_canonical_order')
-        self._stage0_foulant_diagnostics.append({
-            'reaction_family': 'sulfate_carbon_allocation',
+            except (KeyError, ValueError) as exc:
+                raise AccountingError(
+                    f'cation sulfate {species!r} has no usable foulant '
+                    f'dG per mol C: {exc}'
+                ) from exc
+            claims.append({
+                'species': species,
+                'dG_kJ_per_mol_C': dg_per_mol_c,
+                'confidence': confidence,
+                'basis': dg_key,
+                'oxygen_couple': oxygen_couple,
+                'carbon_mol_demand': feed_mol * c_per_mol,
+            })
+        rationed = carbon_mol_demand > float(carbon_mol_remaining) + 1e-9
+        if refused:
+            if rationed:
+                self._stage0_carbon_allocation_notices = [{
+                    'reason': 'stage0_cation_sulfate_carbon_ranking_refused',
+                    'temperature_K': temperature_K,
+                    'refused': refused,
+                    'carbon_mol_demand': carbon_mol_demand,
+                    'carbon_mol_supplied': float(carbon_mol_remaining),
+                    'rationed': True,
+                }]
+                details = '; '.join(
+                    f"{item['species']}: {item['detail']}" for item in refused
+                )
+                raise AccountingError(
+                    'stage-0 cation-sulfate carbon ranking refused: '
+                    f'{details}'
+                )
+            # Carbon covers every stoichiometric claim, so the missing
+            # ranking input cannot change an extent. Do not sort on it.
+            return sorted(species for species, _feed_kg in active)
+        claims.sort(key=lambda claim: (
+            float(claim['dG_kJ_per_mol_C']),
+            str(claim['species']),
+        ))
+        out_of_domain_species = [
+            str(claim['species'])
+            for claim in claims
+            if claim['confidence'] == 'out_of_domain'
+        ]
+        self._stage0_carbon_allocation_notices = [{
+            'reason': 'stage0_cation_sulfate_carbon_ranked_by_dg',
             'temperature_K': temperature_K,
-            'dG_kJ_per_mol_C': scores,
-            'dG_rows': rows,
-            'dG_sources': sources,
-            'host_order': order,
-            'notice_flags': sorted(set(flags)),
-        })
-        return order
+            'order': [str(claim['species']) for claim in claims],
+            'claims': claims,
+            'carbon_mol_demand': carbon_mol_demand,
+            'carbon_mol_supplied': float(carbon_mol_remaining),
+            'rationed': rationed,
+            'out_of_domain': bool(out_of_domain_species),
+            'out_of_domain_species': out_of_domain_species,
+        }]
+        return [str(claim['species']) for claim in claims]
 
     def _apply_stage0_cation_sulfate_carbon_reactions(
         self,
@@ -11119,6 +11242,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         carbon_mol_remaining: float,
         specs: list[dict],
     ) -> float:
+        self._stage0_carbon_allocation_notices = []
         if carbon_mol_remaining <= 1e-12:
             return 0.0
         cleanup = feedstock.get('stage0_carbon_cleanup') or {}
@@ -11144,12 +11268,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ).molar_mass_kg_per_mol()
             for species in molar_species
         }
-        host_order = (
-            self._stage0_sulfate_carbon_order(cation_feed, to_sulfide=to_sulfide)
-            if len(cation_feed) > 1 else sorted(cation_feed)
-        )
-        for species in host_order:
-            feed_kg = cation_feed[species]
+        # One sulfate has no competitor, so feed order cannot change the extent.
+        active = [
+            species
+            for species, feed_kg in cation_feed.items()
+            if float(feed_kg) > 1e-12
+        ]
+        if len(active) > 1:
+            species_order = self._stage0_cation_sulfate_allocation_order(
+                cation_feed,
+                to_sulfide=to_sulfide,
+                carbon_mol_remaining=carbon_mol_remaining,
+            )
+        else:
+            species_order = active
+        for species in species_order:
+            feed_kg = float(cation_feed.get(species, 0.0))
             if feed_kg <= 1e-12:
                 continue
             feed_formula = resolve_species_formula(
