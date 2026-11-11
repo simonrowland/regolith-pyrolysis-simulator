@@ -142,6 +142,8 @@ def test_internal_analytical_low_temperature_result_ignores_prior_core_diagnosti
 def test_internal_analytical_battery_results_are_independent_of_request_order() -> None:
     """Every request keeps its full result across low-T, normal, and CO2 paths."""
     from copy import deepcopy
+    from types import SimpleNamespace
+
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _InternalAnalyticalBatteryBackend,
     )
@@ -204,6 +206,22 @@ def test_internal_analytical_battery_results_are_independent_of_request_order() 
                 ),
             )
             outputs[request_name] = deepcopy(vars(result))
+            if request_name == "normal":
+                hot_diagnostic = dict(
+                    backend._core._last_vapor_pressure_diagnostic
+                )
+                assert hot_diagnostic.get("activities")
+                with pytest.raises(RuntimeError, match="liquid_fraction_invalid"):
+                    backend._core._refresh_vapor_pressures_from_kernel(
+                        SimpleNamespace(
+                            vapor_pressures_Pa={},
+                            vapor_pressures_source={},
+                            liquid_fraction=float("nan"),
+                            warnings=[],
+                        ),
+                        observation_pO2_bar=1.0,
+                    )
+                assert backend._core._last_vapor_pressure_diagnostic == {}
         outputs_by_order.append(outputs)
 
     assert outputs_by_order[0] == outputs_by_order[1]
