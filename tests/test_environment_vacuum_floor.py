@@ -106,7 +106,7 @@ def test_resolve_transport_po2_accepts_lunar_nanotorr_floor() -> None:
     )
 
 
-def test_default_unknown_body_preserves_existing_1e_9_transport_floor() -> None:
+def test_default_unknown_body_keeps_log_guard_off_the_physical_partial() -> None:
     request = _request({"pO2_bar": DEFAULT_VACUUM_FLOOR_BAR})
 
     assert resolve_transport_pO2_bar(request) == pytest.approx(
@@ -118,7 +118,13 @@ def test_default_unknown_body_preserves_existing_1e_9_transport_floor() -> None:
 
     assert sim.melt.body == ""
     assert sim._vacuum_floor_bar() == pytest.approx(DEFAULT_VACUUM_FLOOR_BAR)
-    assert sim._commanded_pO2_bar() == pytest.approx(DEFAULT_VACUUM_FLOOR_BAR)
+    assert sim._oxygen_numerical_floor_bar() == pytest.approx(
+        DEFAULT_VACUUM_FLOOR_BAR
+    )
+    assert sim._oxygen_log_guard_bar() == pytest.approx(DEFAULT_VACUUM_FLOOR_BAR)
+    # Hard vacuum with no cover-gas oxygen has no physical partial. The
+    # 1e-9 bar value remains the log guard and is not returned as pO2.
+    assert sim._commanded_pO2_bar() == pytest.approx(0.0)
 
 
 def test_resolve_transport_po2_wraps_fo2_overflow_as_value_error() -> None:
@@ -154,10 +160,19 @@ def test_explicit_feedstock_body_sets_run_vacuum_floor() -> None:
 
     assert sim.melt.body == "moon"
     assert sim._vacuum_floor_bar() == pytest.approx(MOON_VACUUM_FLOOR_BAR)
-    assert sim._commanded_pO2_bar() == pytest.approx(MOON_VACUUM_FLOOR_BAR)
+    assert sim._oxygen_numerical_floor_bar() == pytest.approx(
+        MOON_VACUUM_FLOOR_BAR
+    )
+    unset = _sim()
+    unset.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    assert sim._oxygen_log_guard_bar() == pytest.approx(
+        unset._oxygen_log_guard_bar()
+    )
+    assert sim._commanded_pO2_bar() == pytest.approx(unset._commanded_pO2_bar())
+    assert sim._commanded_pO2_bar() == pytest.approx(0.0)
 
 
-def test_intrinsic_melt_fo2_clamp_lowers_to_vacuum_body_floor() -> None:
+def test_intrinsic_melt_fo2_clamp_uses_body_independent_log_guard() -> None:
     sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
 
@@ -166,8 +181,8 @@ def test_intrinsic_melt_fo2_clamp_lowers_to_vacuum_body_floor() -> None:
     lunar_clamped = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
 
     assert default_clamped == pytest.approx(math.log10(DEFAULT_VACUUM_FLOOR_BAR))
-    assert lunar_clamped == pytest.approx(math.log10(MOON_VACUUM_FLOOR_BAR))
-    assert lunar_clamped < default_clamped
+    assert lunar_clamped == pytest.approx(math.log10(DEFAULT_VACUUM_FLOOR_BAR))
+    assert lunar_clamped == pytest.approx(default_clamped)
 
 
 def _mars_sim():
@@ -202,9 +217,8 @@ def test_mars_total_pressure_is_not_oxygen_floor_or_intrinsic_seed():
         'pO2_bar': state.headspace_transport_pO2_bar,
     })) == state.headspace_transport_pO2_bar
     sim._get_equilibrium()
-    assert sim._last_vapor_pressure_diagnostic['pO2_bar'] == pytest.approx(
-        state.headspace_transport_pO2_bar
-    )
+    surface = sim._hour_interface_oxygen.surface_pO2_bar
+    assert sim._last_vapor_pressure_diagnostic['pO2_bar'] == pytest.approx(surface)
     assert sim._last_vapor_pressure_diagnostic['co2_dissociation']['notices']
 
 

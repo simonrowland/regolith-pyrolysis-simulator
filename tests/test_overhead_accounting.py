@@ -1147,6 +1147,11 @@ def test_internal_analytical_equilibrium_ok_paths_are_vapor_only_without_liquid_
     assert cold.phase_assemblage_available is False
 
     sim.melt.temperature_C = 1600.0
+    # The analytical law reads the hour's interface surface. A commanded
+    # zero is not a physical pO2, and the log guard is not substituted.
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    sim._ensure_hour_interface_oxygen()
+    assert sim._headspace_transport_pO2_bar() > 0.0
     hot = sim._internal_analytical_equilibrium()
     assert hot.status == "ok"
     assert hot.liquid_fraction is None
@@ -1299,16 +1304,16 @@ def test_equilibrium_does_not_emit_o2_vapor_species():
 
 def test_commanded_po2_has_no_synthetic_floor_in_hard_vacuum():
     """An uncontrolled hard-vacuum run must NOT get a synthetic setpoint
-    floor on pO₂ -- the setpoint only floors under active O₂ control. Under
-    HARD_VACUUM the commanded pO₂ is the numerical vacuum floor for the
-    whole campaign (the turbine-control feedback loop is not wired)."""
+    floor on pO₂ -- the setpoint only floors under active O₂ control. With
+    no physical oxygen present the commanded partial is zero. The numerical
+    vacuum floor stays a log guard and is not returned."""
     sim = _sio_o2_train_sim()
     sim.melt.atmosphere = Atmosphere.HARD_VACUUM
     sim.melt.pO2_mbar = 1.5  # stale/irrelevant setpoint under hard vacuum
     sim.overhead.composition = {"O2": 0.0}
 
-    # Only the numerical divide-by-zero guard applies, never the setpoint.
-    assert sim._commanded_pO2_bar() == pytest.approx(1e-9)
+    assert sim._commanded_pO2_bar() == pytest.approx(0.0)
+    assert sim._oxygen_log_guard_bar() == pytest.approx(1e-9)
 
     # Under active O₂ control the same setpoint DOES floor the value.
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
@@ -1422,19 +1427,17 @@ def test_commanded_po2_no_synthetic_floor_outside_o2_control(
 ):
     """Decision matrix complement — for each non-O₂-controlled
     atmosphere AND for BOTH headspace branches, the setpoint is NOT
-    applied as a floor. Effective pO₂ collapses to ``max(holdup-or-
-    gas-composition-O₂, 1e-9 bar)``. Codex chunk-review P2 fix:
-    exercises both branches; a stale ``pO2_mbar=1.5`` setpoint under
-    HARD_VACUUM / PN2_SWEEP / CO2_BACKPRESSURE is ignored regardless
-    of headspace toggle (turbine-control feedback loop not wired in
-    these modes)."""
+    applied as a floor. With no holdup oxygen the physical partial is
+    zero. The 1e-9 bar numerical guard is not returned. A stale
+    ``pO2_mbar=1.5`` setpoint under HARD_VACUUM / PN2_SWEEP /
+    CO2_BACKPRESSURE is ignored regardless of headspace toggle."""
     sim = _sio_o2_train_sim()
     sim.melt.atmosphere = atmosphere
     sim.melt.pO2_mbar = 1.5  # stale/irrelevant
     sim.overhead.composition = {"O2": 0.0}
     _force_headspace_branch(sim, enabled=headspace_enabled,
                             diagnostic_o2_bar=0.0)
-    assert sim._commanded_pO2_bar() == pytest.approx(1e-9)
+    assert sim._commanded_pO2_bar() == pytest.approx(0.0)
 
 
 def test_commanded_po2_uses_upstream_o2_when_above_setpoint():
@@ -1893,17 +1896,17 @@ def test_uncommitted_evaporation_transition_is_removed_from_tick_flux(
     )
 
 
-def test_commanded_po2_numerical_floor_when_all_inputs_zero():
+def test_commanded_po2_is_zero_when_all_inputs_zero():
     """All three inputs at zero: composition['O2']=0, melt.pO2_mbar=0,
-    atmosphere = O₂-controlled. The setpoint floor is 0 (no-op); only
-    the ``_PO2_VACUUM_FLOOR_BAR=1e-9`` numerical guard remains. This
-    is the divide-by-zero guard for the 1/√pO₂ SiO suppression and
-    the K/pO₂ Ellingham term — NOT a recipe synthetic floor."""
+    atmosphere = O₂-controlled. The setpoint floor is 0, and the
+    numerical 1e-9 bar guard is not returned as a physical partial.
+    Log guards inside 1/√pO₂ stay at the activity-pressure call."""
     sim = _sio_o2_train_sim()
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     sim.melt.pO2_mbar = 0.0
     sim.overhead.composition = {"O2": 0.0}
-    assert sim._commanded_pO2_bar() == pytest.approx(1e-9)
+    assert sim._commanded_pO2_bar() == pytest.approx(0.0)
+    assert sim._oxygen_log_guard_bar() == pytest.approx(1e-9)
 
 
 @pytest.mark.parametrize("atmosphere", _O2_FLOORED)

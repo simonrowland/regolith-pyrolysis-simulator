@@ -4361,14 +4361,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             / (GAS_CONSTANT * T_head_K)
         )
 
+    def _oxygen_log_guard_bar(self) -> float:
+        """Body-independent log guard. Never a returned physical pO2."""
+
+        return DEFAULT_VACUUM_FLOOR_BAR
+
     def _headspace_floor_o2_mol(self) -> float:
-        return self._headspace_o2_mol_for_pO2_bar(self._oxygen_numerical_floor_bar())
+        return self._headspace_o2_mol_for_pO2_bar(self._oxygen_log_guard_bar())
 
     def _effective_headspace_floor_o2_mol(self) -> float:
         return self._headspace_o2_mol_for_pO2_bar(
             max(
                 self._headspace_control_floor_pO2_bar(),
-                self._oxygen_numerical_floor_bar(),
+                self._oxygen_log_guard_bar(),
             )
         )
 
@@ -4379,8 +4384,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         findings.md "Design answer": inert-sweep requested pO2 is incoming
         sweep-gas composition, while O2 made this tick is a ledger product
         drained by the sweep. Transport therefore uses
-        max(vacuum_floor, incoming_sweep_pO2, post_sweep_residual_pO2),
-        not the pre-sweep closed-headspace ledger pO2.
+        max(incoming_sweep_pO2, post_sweep_residual_pO2),
+        not the pre-sweep closed-headspace ledger pO2 and not the oxygen
+        numerical log guard.
         """
         incoming_sweep_pO2 = max(0.0, float(self.melt.pO2_mbar) / 1000.0)
         residual_o2_mol = max(0.0, float(head_o2_mol))
@@ -4439,9 +4445,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         residual_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(
             residual_o2_mol
         )
-        return max(
-            self._headspace_equilibrated_pO2_bar(max(incoming_sweep_pO2, residual_pO2)),
-            self._oxygen_numerical_floor_bar(),
+        return self._headspace_equilibrated_pO2_bar(
+            max(incoming_sweep_pO2, residual_pO2)
         )
 
     def _pn2_sweep_transport_pO2_bar(self, head_o2_mol: float) -> float:
@@ -4462,12 +4467,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ledger_pO2_bar
                 )
             return self._inert_sweep_transport_pO2_bar(head_o2_mol)
-        return max(
-            self._headspace_equilibrated_pO2_bar(max(
-                float(ledger_pO2_bar), self._headspace_control_floor_pO2_bar(),
-            )),
-            self._oxygen_numerical_floor_bar(),
-        )
+        return self._headspace_equilibrated_pO2_bar(max(
+            float(ledger_pO2_bar), self._headspace_control_floor_pO2_bar(),
+        ))
 
     def _refresh_oxygen_reservoir_transport_pO2_for_vapor(
         self,
@@ -4505,6 +4507,540 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if store is not None and getattr(store, 'quantize_live_controls', False):
             return float(store.quantized_pO2_bar(self, pO2_bar=pO2_bar))
         return pO2_bar
+
+    def _vapor_intrinsic_fO2_log(self, result=None) -> float:
+        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+        intrinsic_fO2_log = getattr(reservoir, 'melt_intrinsic_fO2_log', None)
+        if intrinsic_fO2_log is None:
+            intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
+        if intrinsic_fO2_log is None:
+            current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
+            if callable(current_fO2):
+                intrinsic_fO2_log = current_fO2()
+            elif result is not None:
+                intrinsic_fO2_log = getattr(
+                    result,
+                    'fO2_log',
+                    getattr(self.melt, 'fO2_log', -9.0),
+                )
+            else:
+                intrinsic_fO2_log = getattr(self.melt, 'fO2_log', -9.0)
+        return float(intrinsic_fO2_log)
+
+    def _vapor_pressure_control_inputs(
+        self,
+        *,
+        pO2_bar: float,
+        temperature_C: float,
+        observation: bool = False,
+        simulation_hour: int | None = None,
+        result=None,
+    ) -> tuple[dict[str, Any], float]:
+        """Shared vapor-pressure oxygen inputs for the trial and the publish.
+
+        ``vacuum_floor_bar`` is the body-independent log guard. ``body`` is
+        omitted so a feedstock origin cannot select that guard. The activity
+        and transport partial is the caller's physical ``pO2_bar``.
+        """
+
+        intrinsic_fO2_log = self._vapor_intrinsic_fO2_log(result)
+        ambient_pressure_bar = (
+            float(getattr(self.melt, 'ambient_pressure_mbar', 0.0) or 0.0)
+            / 1000.0
+        )
+        campaign = getattr(self.melt, 'campaign', None)
+        campaign_name = str(getattr(campaign, 'name', '') or '')
+        process_phase = (
+            'stage0' if campaign_name in {'C0', 'C0B'} else 'hot_train'
+        )
+        high_t_control_inputs: dict[str, Any] = {}
+        from engines.builtin.vapor_pressure import openimcc_binding_selected_by_inputs
+
+        if openimcc_binding_selected_by_inputs(
+            temperature_K=float(temperature_C) + 273.15,
+            controls={},
+            quantity_class='activity',
+        ):
+            high_t_control_inputs = {
+                'high_t_melt_activity': getattr(
+                    self, '_high_t_melt_activity', 'openimcc'
+                ),
+                'high_t_melt_activity_previous_temperature_K': getattr(
+                    self, '_last_high_t_melt_activity_temperature_K', None
+                ),
+                'high_t_melt_activity_previous': getattr(
+                    self, '_last_high_t_melt_activity', {}
+                ),
+                'simulation_hour': simulation_hour,
+            }
+        control_inputs = {
+            'pO2_bar': float(pO2_bar),
+            **({'pO2_admission': 'observation'} if observation else {}),
+            'intrinsic_fO2_log': intrinsic_fO2_log,
+            'vacuum_floor_bar': self._oxygen_log_guard_bar(),
+            'process_phase': process_phase,
+            'ambient_pressure_bar': (
+                ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
+            ),
+            'liquid_feo_domain': self.liquid_feo_domain_at(
+                float(temperature_C) + 273.15
+            ),
+            **high_t_control_inputs,
+        }
+        return control_inputs, intrinsic_fO2_log
+
+    def _physical_overhead_pO2_bar(self) -> float:
+        """Hour-open overhead pO2. The numerical floor is not a substitute."""
+
+        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+        if reservoir is not None:
+            field = float(
+                getattr(reservoir, 'headspace_transport_pO2_bar', 0.0) or 0.0
+            )
+            if math.isfinite(field) and field > 0.0:
+                return field
+        commanded = float(self._commanded_pO2_bar())
+        if math.isfinite(commanded) and commanded > 0.0:
+            return commanded
+        return 0.0
+
+    def _clear_hour_interface_oxygen(self) -> None:
+        self._hour_interface_oxygen = None
+        self._hour_interface_oxygen_temperature_K = None
+        self._hour_interface_oxygen_capacity_mol_per_ln = None
+        self._hour_interface_oxygen_exchange_time_s = None
+        self._hour_interface_oxygen_reservoir_ln = None
+
+    def _ensure_hour_interface_oxygen(self) -> None:
+        """Solve ξ_s once per temperature. Effusion only (``R_gas = 0``)."""
+
+        if getattr(self, '_interface_oxygen_evaluating', False):
+            return
+        temperature_K = float(self.melt.temperature_C) + 273.15
+        if not math.isfinite(temperature_K) or temperature_K < 400.0:
+            self._clear_hour_interface_oxygen()
+            return
+        if (
+            getattr(self, '_hour_interface_oxygen', None) is not None
+            and getattr(self, '_hour_interface_oxygen_temperature_K', None)
+            == temperature_K
+        ):
+            return
+        self._clear_hour_interface_oxygen()
+        self._interface_oxygen_evaluating = True
+        try:
+            solution = self._solve_hour_interface_oxygen(temperature_K)
+        finally:
+            self._interface_oxygen_evaluating = False
+        self._hour_interface_oxygen = solution
+        self._hour_interface_oxygen_temperature_K = temperature_K
+
+    def _solve_hour_interface_oxygen(self, temperature_K: float):
+        from simulator.chemistry.oxygen_interface import (
+            InterfaceOxygenSolveError,
+            solve_interface_oxygen,
+        )
+
+        channels = self._interface_oxygen_channels(temperature_K)
+        reservoir_log = float(self.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
+        capacity = self._melt_redox_source_capacity_mol_per_ln_fO2(
+            fO2_log=reservoir_log,
+            T_K=temperature_K,
+        )
+        k_O, _k_source = self._oxygen_exchange_k_m_s(temperature_K)
+        depth_m = self._oxygen_exchange_effective_melt_depth_m()
+        # τ = h_eff / k_O. The existing exchange uses the same pair. Units:
+        # m / (m/s) = s. A zero depth is refused by the depth resolver.
+        exchange_time_s = depth_m / k_O
+        self._hour_interface_oxygen_capacity_mol_per_ln = capacity
+        self._hour_interface_oxygen_exchange_time_s = exchange_time_s
+        self._hour_interface_oxygen_reservoir_ln = reservoir_log * math.log(10.0)
+        requested = tuple(channel.species for channel in channels)
+
+        def pressure_model(log10_pO2_bar: float) -> dict[str, float]:
+            return self._interface_oxygen_pressures_pa(
+                log10_pO2_bar,
+                requested,
+            )
+
+        # Declared common-unity oxygen-gas alpha. The battery copy
+        # ``_OXYGEN_GAS_ALPHA`` in simulator/battery/oxygen_balance.py stays
+        # because this hour must not import simulator.battery. Absolute
+        # oxygen-gas alpha is not a measured coefficient.
+        overhead_bar = self._physical_overhead_pO2_bar()
+        # The solver bracket ends at 1 bar. A physical overhead above that
+        # bound cannot be undercut while oxygen is leaving: the signed film
+        # is outward only for p_s > p_h, and no trial inside [-30, 0] is
+        # above p_h. Predict at the physical partial. The film source is 0
+        # because p_s = p_h; evaporation's existing redox source keeps the
+        # surplus. Unit check: p_h is bar and log10(p_h/bar) is
+        # dimensionless. Limit: p_h -> 1 from above meets the bracket top;
+        # a larger p_h stays on the measured partial, not the 1 bar edge.
+        if math.isfinite(overhead_bar) and overhead_bar > 1.0:
+            from simulator.chemistry.oxygen_interface import (
+                InterfaceOxygenSolution,
+            )
+
+            return InterfaceOxygenSolution(
+                surface_pO2_bar=overhead_bar,
+                surface_log10_pO2_bar=math.log10(overhead_bar),
+                label='overhead_oxygen_floor',
+                capacity_label=None,
+                channel_pressures_pa={},
+                product_fluxes_mol_m2_s={},
+                atomic_oxygen_flux_mol_m2_s=0.0,
+                melt_source_mol_s=0.0,
+                evaporative_source_mol_s=0.0,
+                gas_source_mol_s=0.0,
+                residual_mol_s=0.0,
+            )
+        try:
+            return solve_interface_oxygen(
+                pressure_model,
+                channels,
+                reservoir_log10_fO2_bar=reservoir_log,
+                melt_capacity_mol_per_ln_fO2=capacity,
+                exchange_time_s=exchange_time_s,
+                overhead_pO2_bar=overhead_bar,
+                area_m2=float(
+                    getattr(self.melt, 'melt_surface_area_m2', 0.0) or 0.0
+                ),
+                temperature_K=temperature_K,
+                oxygen_alpha=1.0,
+                oxygen_r_gas_m_s=0.0,
+            )
+        except InterfaceOxygenSolveError as exc:
+            # The solver's upper edge is a typed refusal, not a 1 bar clamp.
+            # Keep the reason and attach the hour's frozen inputs.
+            campaign = getattr(self.melt, 'campaign', None)
+            raise InterfaceOxygenSolveError(
+                exc.reason,
+                (
+                    f'{exc}; hour={int(self.melt.hour)}; '
+                    f'campaign={getattr(campaign, "name", campaign)}; '
+                    f'T_C={float(self.melt.temperature_C):.2f}; '
+                    f'reservoir_log10_fO2={reservoir_log:.6g}; '
+                    f'overhead_pO2_bar={overhead_bar:.6g}; '
+                    f'capacity_mol_per_ln={capacity:.6g}'
+                ),
+            ) from exc
+
+    def _interface_oxygen_channels(self, temperature_K: float):
+        from simulator.chemistry.oxygen_interface import InterfaceOxygenChannel
+        from simulator.evaporation import (
+            _load_evaporation_alpha_by_species,
+            _measured_alpha_control_view,
+        )
+        from engines.builtin.evaporation_flux import _evaluate_alpha_control
+
+        legacy = getattr(self, 'vapor_pressures', None) or {}
+        measured = _measured_alpha_control_view(
+            _load_evaporation_alpha_by_species(dict(legacy))
+        )
+        channels: list[InterfaceOxygenChannel] = []
+        seen: set[str] = set()
+        for group_name in ('metals', 'oxide_vapors'):
+            group = legacy.get(group_name, {}) or {}
+            if not isinstance(group, Mapping):
+                continue
+            for species, row in group.items():
+                species_name = str(species)
+                if species_name in seen or not isinstance(row, Mapping):
+                    continue
+                if species_name in {OXYGEN_SPECIES, 'O2'}:
+                    continue
+                if species_name not in measured:
+                    continue
+                alpha, _evaluation = _evaluate_alpha_control(
+                    species_name,
+                    temperature_K,
+                    measured[species_name],
+                )
+                if not math.isfinite(alpha) or alpha <= 0.0:
+                    continue
+                channel = self._interface_oxygen_channel(
+                    species_name,
+                    row,
+                    alpha=alpha,
+                )
+                if channel is None:
+                    continue
+                seen.add(species_name)
+                channels.append(channel)
+        return tuple(channels)
+
+    def _interface_oxygen_channel(self, species: str, row: Mapping[str, Any], *, alpha: float):
+        from simulator.chemistry.oxygen_interface import InterfaceOxygenChannel
+
+        formula = resolve_species_formula(species, self.species_formula_registry)
+        atoms = dict(formula.elements)
+        non_oxygen = {
+            element: count
+            for element, count in atoms.items()
+            if element != 'O' and float(count) > 0.0
+        }
+        oxygen_atoms = float(atoms.get('O', 0.0) or 0.0)
+        raw_exponent = row.get('pO2_exponent')
+        catalog_exponent = None
+        if raw_exponent is not None:
+            try:
+                candidate = float(raw_exponent)
+            except (TypeError, ValueError):
+                candidate = float('nan')
+            if math.isfinite(candidate):
+                catalog_exponent = candidate
+        if species == 'O' or (not non_oxygen and oxygen_atoms == 1.0):
+            exponent = 0.5 if catalog_exponent is None else catalog_exponent
+            return InterfaceOxygenChannel(
+                species=species,
+                molar_mass_kg_per_mol=formula.molar_mass_kg_per_mol(),
+                oxygen_atoms=1.0,
+                parent_oxygen_demand=0.0,
+                pO2_exponent=exponent,
+                alpha=alpha,
+                r_gas_m_s=0.0,
+                kind='atomic_oxygen',
+            )
+        parent = str(row.get('parent_oxide') or '')
+        if not parent or not non_oxygen:
+            return None
+        parent_formula = resolve_species_formula(
+            parent,
+            self.species_formula_registry,
+        )
+        parent_atoms = dict(parent_formula.elements)
+        parent_metals = {
+            element: count
+            for element, count in parent_atoms.items()
+            if element != 'O' and float(count) > 0.0
+        }
+        if set(non_oxygen) != set(parent_metals):
+            return None
+        ratios = [
+            non_oxygen[element] / parent_metals[element]
+            for element in non_oxygen
+        ]
+        parent_moles = ratios[0]
+        if any(
+            not math.isclose(ratio, parent_moles, rel_tol=1.0e-12, abs_tol=1.0e-14)
+            for ratio in ratios[1:]
+        ):
+            return None
+        parent_oxygen_demand = parent_moles * float(parent_atoms.get('O', 0.0) or 0.0)
+        exponent = (
+            (oxygen_atoms - parent_oxygen_demand) / 2.0
+            if catalog_exponent is None
+            else catalog_exponent
+        )
+        if (
+            abs(parent_oxygen_demand - oxygen_atoms) <= 1.0e-12
+            and abs(exponent) <= 1.0e-12
+        ):
+            return None
+        return InterfaceOxygenChannel(
+            species=species,
+            molar_mass_kg_per_mol=formula.molar_mass_kg_per_mol(),
+            oxygen_atoms=oxygen_atoms,
+            parent_oxygen_demand=parent_oxygen_demand,
+            pO2_exponent=exponent,
+            alpha=alpha,
+            r_gas_m_s=0.0,
+        )
+
+    def _interface_oxygen_pressures_pa(
+        self,
+        log10_pO2_bar: float,
+        species: tuple[str, ...],
+    ) -> dict[str, float]:
+        trial_pO2_bar = 10.0 ** float(log10_pO2_bar)
+        control_inputs, intrinsic_fO2_log = self._vapor_pressure_control_inputs(
+            pO2_bar=trial_pO2_bar,
+            temperature_C=float(self.melt.temperature_C),
+        )
+        result = self._dispatch_only(
+            ChemistryIntent.VAPOR_PRESSURE,
+            control_inputs=control_inputs,
+            fO2_log=intrinsic_fO2_log,
+            include_diagnostic_shadows=False,
+        )
+        status = str(getattr(result, 'status', '') or '')
+        if status not in {'ok', 'non_authoritative'}:
+            raise ValueError(
+                f'interface oxygen pressure model status={status!r}'
+            )
+        diagnostic = dict(getattr(result, 'diagnostic', None) or {})
+        pressures = diagnostic.get('vapor_pressures_Pa') or {}
+        resolved: dict[str, float] = {}
+        for name in species:
+            try:
+                resolved[name] = float(pressures.get(name, 0.0) or 0.0)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f'interface oxygen pressure model returned invalid {name!r}'
+                ) from exc
+        return resolved
+
+    def _book_hour_interface_oxygen(self) -> None:
+        """Move the interface film's O2 and step the reservoir toward ξ_s.
+
+        Atoms: dn_desired = S_gas * 3600. Positive dn is clamped to the
+        buffer's O2 inventory; negative dn is clamped to overhead O2 above
+        the body-independent log-guard moles.
+
+        Potential: the melt leg is not that atom count. S_melt =
+        (C_solve / τ) (ξ_m - ξ_s), so the hour's reservoir step from the
+        solve-time state is Δln = -(ξ_m - ξ_s) * Δt / τ. Dividing the film
+        dn by a C_m that collapsed after the solve stored log10 fO2 of
+        about -1936. The redox mol passed to the integrator is that
+        bounded Δln times the capacity at booking, so the integrator
+        reconstructs Δln instead of S_gas / C_collapsed.
+
+        Unit check: Δln is dimensionless; Δln * C_now is mol O2. Limit:
+        ξ_s = ξ_m (pinned C_m) gives Δln = 0. Overhead above 1 bar is the
+        out-of-bracket prediction and does not step the reservoir.
+        """
+
+        solution = getattr(self, '_hour_interface_oxygen', None)
+        if solution is None:
+            self._hour_interface_oxygen_booking = None
+            return
+        dn_desired = float(solution.gas_source_mol_s) * 3600.0
+        if not math.isfinite(dn_desired):
+            raise AccountingError(
+                'interface oxygen gas source must be finite; '
+                f'got {solution.gas_source_mol_s!r}'
+            )
+        head_o2_mol = max(0.0, float(
+            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                OXYGEN_SPECIES,
+                0.0,
+            )
+        ))
+        buffer_o2_mol = max(0.0, float(
+            self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+                OXYGEN_SPECIES,
+                0.0,
+            )
+        ))
+        n_floor_mol = self._headspace_floor_o2_mol()
+        dn_ledger = dn_desired
+        if dn_desired > 0.0:
+            dn_ledger = min(dn_desired, buffer_o2_mol)
+        elif dn_desired < 0.0:
+            max_real_absorbable = max(0.0, head_o2_mol - n_floor_mol)
+            dn_ledger = max(dn_desired, -max_real_absorbable)
+        if abs(dn_ledger) < OXYGEN_RESERVOIR_NOOP_MOL:
+            dn_ledger = 0.0
+        if abs(dn_ledger) >= OXYGEN_RESERVOIR_NOOP_MOL:
+            direction = (
+                'melt_to_headspace' if dn_ledger > 0.0 else 'headspace_to_melt'
+            )
+            self._dispatch_and_commit(
+                ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
+                control_inputs={'dn_to_headspace_mol': dn_ledger},
+            )
+        elif abs(dn_desired) >= OXYGEN_RESERVOIR_NOOP_MOL:
+            direction = 'none:inventory_clamped'
+        else:
+            direction = 'none:below_threshold'
+        redox_mol = self._interface_oxygen_reservoir_redox_mol(solution)
+        if abs(redox_mol) >= OXYGEN_RESERVOIR_NOOP_MOL:
+            self._apply_oxygen_reservoir_redox_source_terms(
+                {'interface_oxygen_exchange': redox_mol},
+            )
+        self._hour_interface_oxygen_booking = {
+            'exchange_o2_mol': dn_ledger,
+            'exchange_unbacked_o2_mol': dn_desired - dn_ledger,
+            'exchange_direction': direction,
+        }
+
+    def _interface_oxygen_reservoir_redox_mol(self, solution) -> float:
+        """Mol that steps fO2 from its current value onto the melt leg.
+
+        Premise: Δln_target = -(ξ_m - ξ_s) * 3600 / τ, measured from the
+        solve-time reservoir. Evaporation may already have moved fO2, and
+        its positive tangent stops at the gas ceiling, so the booking
+        closes the gap that remains. Algebra: redox_mol = (target_ln -
+        current_ln) * C_now. The integrator divides by the same C_now and
+        recovers the gap. Limit: C_now at the noop floor returns 0, because
+        there is no tangent to integrate.
+        """
+
+        if getattr(solution, 'label', None) == 'overhead_oxygen_floor':
+            return 0.0
+        capacity_solve = float(
+            getattr(self, '_hour_interface_oxygen_capacity_mol_per_ln', 0.0)
+            or 0.0
+        )
+        exchange_time_s = float(
+            getattr(self, '_hour_interface_oxygen_exchange_time_s', 0.0) or 0.0
+        )
+        reservoir_ln = getattr(self, '_hour_interface_oxygen_reservoir_ln', None)
+        if (
+            capacity_solve <= OXYGEN_RESERVOIR_NOOP_MOL
+            or not math.isfinite(capacity_solve)
+            or not math.isfinite(exchange_time_s)
+            or exchange_time_s <= 0.0
+            or reservoir_ln is None
+            or not math.isfinite(float(reservoir_ln))
+        ):
+            return 0.0
+        surface_log = float(solution.surface_log10_pO2_bar)
+        if not math.isfinite(surface_log):
+            return 0.0
+        xi_m = float(reservoir_ln)
+        xi_s = surface_log * math.log(10.0)
+        # Δln = -(ξ_m - ξ_s) * Δt / τ. Dimensionless. ξ_s = ξ_m → 0.
+        # Do not floor this target. A stored dissociation-floor log is the
+        # numerical stand-in Stage C removes. Vanishing C_now returns 0
+        # below, so this path never divides a film inventory by C_m.
+        delta_ln = -(xi_m - xi_s) * (3600.0 / exchange_time_s)
+        if not math.isfinite(delta_ln):
+            return 0.0
+        target_log = (xi_m + delta_ln) / math.log(10.0)
+        current_log = self._current_melt_redox_fO2_log()
+        additional_ln = (target_log - current_log) * math.log(10.0)
+        if not math.isfinite(additional_ln):
+            return 0.0
+        temperature_K = float(self.melt.temperature_C) + 273.15
+        capacity_now = self._melt_redox_source_capacity_mol_per_ln_fO2(
+            fO2_log=current_log,
+            T_K=temperature_K,
+        )
+        if (
+            not math.isfinite(capacity_now)
+            or capacity_now <= OXYGEN_RESERVOIR_NOOP_MOL
+        ):
+            return 0.0
+        return additional_ln * capacity_now
+
+    def _interface_oxygen_snapshot_notice(self) -> dict[str, Any]:
+        solution = getattr(self, '_hour_interface_oxygen', None)
+        booking = dict(getattr(self, '_hour_interface_oxygen_booking', None) or {})
+        if solution is None:
+            return {
+                'solved': False,
+                'bracket_edge': False,
+                **booking,
+            }
+        surface_log10 = float(solution.surface_log10_pO2_bar)
+        return {
+            'solved': True,
+            'surface_pO2_bar': float(solution.surface_pO2_bar),
+            'surface_log10_pO2_bar': surface_log10,
+            'xi_s': surface_log10 * math.log(10.0),
+            'label': solution.label,
+            'capacity_label': solution.capacity_label,
+            'bracket_edge': solution.label == 'bracket_boundary=lower',
+            'melt_source_mol_s': float(solution.melt_source_mol_s),
+            'gas_source_mol_s': float(solution.gas_source_mol_s),
+            'evaporative_source_mol_s': float(solution.evaporative_source_mol_s),
+            'exchange_o2_mol': float(booking.get('exchange_o2_mol', 0.0) or 0.0),
+            'exchange_unbacked_o2_mol': float(
+                booking.get('exchange_unbacked_o2_mol', 0.0) or 0.0
+            ),
+            'exchange_direction': str(booking.get('exchange_direction', '') or ''),
+        }
 
     def _cleaned_melt_fe_atom_mol(self) -> float:
         total_fe_mol = 0.0
@@ -5998,6 +6534,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # Compare in mol BEFORE division: even a finite oxygen source
             # divided by a collapsing C_m can overflow. The finite Kress
             # ledger split below owns the actual uptake, not this tangent.
+            # The reducing side is not floored. Interface booking must not
+            # pass a film inventory into this division; it passes
+            # Δln(ξ_s) * C_now, or 0 when C_now is at the noop floor.
             if net_o2_equiv_mol >= C_m * delta_to_bound:
                 applied_delta_ln = delta_to_bound
                 candidate_fO2_log = upper_bound
@@ -7049,11 +7588,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         x_m = base_fO2_log * math.log(10.0)
         # Holdup nRT/V can exceed the controlled pressure before the bleed.
-        # The exchange target uses the same physical boundary as the source
-        # step; solve dn against that target so the ledger move and potential
-        # increment remain paired, rather than clipping fO2 after booking dn.
+        # The exchange target is the physical overhead partial. A non-positive
+        # partial is not replaced by the oxygen numerical log guard: there is
+        # no physical far node, so this leg does not move atoms.
+        if not math.isfinite(transport_pO2) or transport_pO2 <= 0.0:
+            reservoir.exchange_direction = 'none:no_physical_overhead_po2'
+            self.melt.oxygen_reservoir = reservoir
+            self._sync_oxygen_reservoir_mirror()
+            return reservoir
         effective_transport_pO2 = min(
-            max(transport_pO2, self._oxygen_numerical_floor_bar()),
+            transport_pO2,
             10.0 ** self._melt_redox_fO2_upper_bound_log(),
         )
         if not math.isfinite(effective_transport_pO2) or effective_transport_pO2 <= 0.0:
@@ -7147,6 +7691,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # fO₂ advances only with ledger-committed O₂ (dn_ledger), never with the
         # managed-floor / clamp remainder that has no atom backing.
+        # This leg already returned when C_m is at the noop floor, so the
+        # division is not a log of a vanishing capacity.
         x_m_after = x_m - dn_ledger_to_headspace / C_m
         candidate_fO2_log = x_m_after / math.log(10.0)
         reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
@@ -7672,7 +8218,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return intrinsic_melt_fO2(
             comp,
             T_K,
-            vacuum_floor_bar=self._oxygen_numerical_floor_bar(),
+            vacuum_floor_bar=self._oxygen_log_guard_bar(),
         )
 
     def _compute_fe_redox_split_diagnostic(
@@ -7706,7 +8252,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         log_iw = legacy_iw_log10_fO2_bar(
             T_K,
-            vacuum_floor_bar=self._oxygen_numerical_floor_bar(),
+            vacuum_floor_bar=self._oxygen_log_guard_bar(),
         )
         base = {
             'fO2_log': float(fO2_log),
@@ -9939,6 +10485,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             cached_result = store.cached_equilibrium(self)
             if cached_result is not None:
                 return cached_result
+        self._ensure_hour_interface_oxygen()
         if self.backend is None:
             if cache_write_through:
                 raise RuntimeError(
@@ -10455,73 +11002,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._vapor_pressure_dispatch_pO2_bar()
             if observation_pO2_bar is None else observation_pO2_bar
         )
-        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
-        intrinsic_fO2_log = getattr(
-            reservoir,
-            'melt_intrinsic_fO2_log',
-            None,
+        control_inputs, intrinsic_fO2_log = self._vapor_pressure_control_inputs(
+            pO2_bar=pO2_bar,
+            temperature_C=T_C,
+            observation=observation_pO2_bar is not None,
+            simulation_hour=simulation_hour,
+            result=result,
         )
-        if intrinsic_fO2_log is None:
-            intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
-        if intrinsic_fO2_log is None:
-            current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
-            if callable(current_fO2):
-                intrinsic_fO2_log = current_fO2()
-            else:
-                intrinsic_fO2_log = getattr(
-                    result,
-                    'fO2_log',
-                    getattr(self.melt, 'fO2_log', -9.0),
-                )
-        intrinsic_fO2_log = float(intrinsic_fO2_log)
-        vacuum_floor = (
-            float(self._oxygen_numerical_floor_bar())
-            if callable(getattr(self, '_oxygen_numerical_floor_bar', None))
-            else DEFAULT_VACUUM_FLOOR_BAR
-        )
-        ambient_pressure_bar = (
-            float(getattr(self.melt, 'ambient_pressure_mbar', 0.0) or 0.0)
-            / 1000.0
-        )
-        campaign = getattr(self.melt, 'campaign', None)
-        campaign_name = str(getattr(campaign, 'name', '') or '')
-        process_phase = (
-            'stage0' if campaign_name in {'C0', 'C0B'} else 'hot_train'
-        )
-        high_t_control_inputs: dict[str, Any] = {}
-        from engines.builtin.vapor_pressure import openimcc_binding_selected_by_inputs
-
-        if openimcc_binding_selected_by_inputs(
-            temperature_K=T_C + 273.15, controls={},
-            quantity_class="activity",
-        ):
-            high_t_control_inputs = {
-                'high_t_melt_activity': getattr(
-                    self, '_high_t_melt_activity', 'openimcc'
-                ),
-                'high_t_melt_activity_previous_temperature_K': getattr(
-                    self, '_last_high_t_melt_activity_temperature_K', None
-                ),
-                'high_t_melt_activity_previous': getattr(
-                    self, '_last_high_t_melt_activity', {}
-                ),
-                'simulation_hour': simulation_hour,
-            }
         dispatch_kwargs = {
-            'control_inputs': {
-                'pO2_bar': pO2_bar,
-                **({'pO2_admission': 'observation'}
-                   if observation_pO2_bar is not None else {}),
-                'intrinsic_fO2_log': intrinsic_fO2_log,
-                'vacuum_floor_bar': vacuum_floor,
-                'body': getattr(self.melt, 'body', ''),
-                'process_phase': process_phase,
-                'ambient_pressure_bar': (
-                    ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
-                ),
-                'liquid_feo_domain': self.liquid_feo_domain_at(T_C + 273.15),
-                **high_t_control_inputs,
-            },
+            'control_inputs': control_inputs,
             'fO2_log': intrinsic_fO2_log,
         }
         if not include_diagnostic_shadows:
@@ -15769,6 +16258,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._pending_shuttle_bakeout_cycle_increment = ''
         self._reset_redox_source_diagnostics_for_hour()
         self._reset_o2_bubbler_telemetry_for_hour()
+        self._hour_interface_oxygen = None
+        self._hour_interface_oxygen_temperature_K = None
+        self._hour_interface_oxygen_booking = None
+        self._hour_interface_oxygen_capacity_mol_per_ln = None
+        self._hour_interface_oxygen_exchange_time_s = None
+        self._hour_interface_oxygen_reservoir_ln = None
 
         # --- 1. Decision check ---
         self._restore_metal_phase_staging()
@@ -16018,6 +16513,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 6. Update melt composition ---
         # Subtract evaporated mass from the melt.
         self._update_melt_composition(evap_flux)
+        self._book_hour_interface_oxygen()
         self._settle_evaporative_redox_after_batch()
 
         # --- 7. Overhead gas (with cold-train capacity feedback) ---   [LOOP-2]
@@ -16766,6 +17262,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._stamp_redox_source_context_for_current_state()
         redox_source_breakdown = self._redox_source_breakdown_diagnostic()
         oxygen_reservoir_snapshot = dict(vars(self.melt.oxygen_reservoir))
+        oxygen_reservoir_snapshot['interface_oxygen'] = (
+            self._interface_oxygen_snapshot_notice()
+        )
         liquid_fraction_gate = {
             'provider': self._liquid_fraction_provider,
             'redox': copy.deepcopy(

@@ -29,11 +29,9 @@ from simulator.chemistry.melt_activity import (
     melt_oxide_activity,
     single_cation_mole_fractions,
 )
-from simulator.fe_redox import (
-    calphad_ferrous_feo_activity_diagnostic,
-    kress91_furnace_activity_pressure_bar,
-)
+from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
 from simulator.environment import (
+    DEFAULT_VACUUM_FLOOR_BAR,
     controlled_background_partial_pressure,
     cover_gas_partial_pressures,
     normalize_body_name,
@@ -188,13 +186,11 @@ class EquilibriumMixin:
             an explicit *floor*, and only when the atmosphere is an
             actively O₂-controlled mode (turbine + bleed holding the
             setpoint). Uncontrolled HARD_VACUUM / PN2_SWEEP runs do not
-            apply that setpoint. Effective pO₂ on those paths is
-            ``max(real_upstream_or_headspace_O2, vacuum_floor)``, so any
-            carried O₂ above the environmental floor still controls
-            equilibrium. It does not collapse to the vacuum floor for the
-            whole campaign.
-          - A hard numerical floor (``self._oxygen_numerical_floor_bar()``) guards the
-            1/√pO₂ and K/pO₂ divisions; it is not a setpoint.
+            apply that setpoint. Effective pO₂ on those paths is the
+            physical upstream or headspace partial, which is zero when no
+            oxygen is present. The oxygen numerical floor is not applied.
+          - The oxygen numerical floor is a log guard inside divisions. It is
+            not a physical partial and is not returned from this method.
 
         With finite headspace enabled, melt-offgas O₂ remains in
         ``process.overhead_gas`` until the OVERHEAD_BLEED provider moves it
@@ -216,12 +212,10 @@ class EquilibriumMixin:
             # Re-apply melt.pO2_mbar as a floor in actively-controlled
             # atmospheres so a recipe pO2 setpoint still gates SiO suppression
             # via 1/sqrt(pO2) above the SiO reference. Uncontrolled
-            # HARD_VACUUM / PN2_SWEEP runs get no setpoint floor; they
-            # still return max(real O2, vacuum floor), not the vacuum
-            # floor alone.
+            # HARD_VACUUM / PN2_SWEEP runs get no setpoint floor.
             if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
                 pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-            return max(self._headspace_equilibrated_pO2_bar(pO2_bar), self._oxygen_numerical_floor_bar())
+            return self._headspace_equilibrated_pO2_bar(pO2_bar)
 
         upstream_partials = getattr(
             self,
@@ -234,19 +228,30 @@ class EquilibriumMixin:
         )
         if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
             pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-        return max(self._headspace_equilibrated_pO2_bar(pO2_bar), self._oxygen_numerical_floor_bar())
+        return self._headspace_equilibrated_pO2_bar(pO2_bar)
 
     def _headspace_transport_pO2_bar(self) -> float:
-        """O2 transport reservoir pO2 consumed by SiO/vapor transport."""
+        """O2 partial consumed by SiO/vapor transport.
 
+        A solved interface surface is the hour's physical pO2. Otherwise the
+        overhead transport field or the commanded partial is returned. The
+        oxygen numerical floor is not a stand-in for either value.
+        """
+
+        solution = getattr(self, '_hour_interface_oxygen', None)
+        surface = getattr(solution, 'surface_pO2_bar', None)
+        if surface is not None:
+            surface_bar = float(surface)
+            if math.isfinite(surface_bar) and surface_bar > 0.0:
+                return surface_bar
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         if reservoir is not None:
             pO2_bar = float(
                 getattr(reservoir, 'headspace_transport_pO2_bar', 0.0)
                 or 0.0
             )
-            if pO2_bar > 0.0:
-                return max(pO2_bar, self._oxygen_numerical_floor_bar())
+            if math.isfinite(pO2_bar) and pO2_bar > 0.0:
+                return pO2_bar
         return self._commanded_pO2_bar()
 
     # --- Ellingham thermodynamic data for oxide equilibrium ---        [ELLI]
@@ -552,7 +557,9 @@ class EquilibriumMixin:
         # coupled but distinct channels: Fe redox reads the melt reservoir;
         # SiO suppression reads the headspace reservoir.
         pO2_bar = self._headspace_transport_pO2_bar()
-        vacuum_floor_bar = self._oxygen_numerical_floor_bar()
+        # Log guard for a non-positive activity pressure. The physical
+        # activity pressure is the transport/interface partial.
+        vacuum_floor_bar = DEFAULT_VACUUM_FLOOR_BAR
         reservoir = getattr(self.melt, "oxygen_reservoir", None)
         intrinsic_fO2_value = getattr(
             reservoir, "melt_intrinsic_fO2_log", None
@@ -578,8 +585,10 @@ class EquilibriumMixin:
                 f"fO2_log={intrinsic_fO2_log:.6g} "
                 f"pO2_bar={melt_dissociation_pO2_bar:g}"
             )
-        feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
-            floor_bar=vacuum_floor_bar,
+        feo_activity_pressure_bar = (
+            pO2_bar
+            if math.isfinite(pO2_bar) and pO2_bar > 0.0
+            else vacuum_floor_bar
         )
 
         # --- Melt composition for oxide activities ---
@@ -1306,6 +1315,20 @@ class EquilibriumMixin:
             # Thus non-FeO uses intrinsic melt fO2, while overhead pO2 remains
             # available to transport/backpressure. FeO already carries melt
             # redox through Kress91 activity and is intentionally unchanged.
+            # A non-positive dissociation pressure is a missing physical
+            # partial. The log guard is not substituted into the denominator.
+            if (
+                not math.isfinite(dissociation_pO2_bar)
+                or dissociation_pO2_bar <= 0.0
+            ):
+                from simulator.chemistry.ellingham_graph import (
+                    EllinghamPressureRefusal,
+                )
+
+                raise EllinghamPressureRefusal(
+                    'pO2_bar must be finite and positive; '
+                    f'got {dissociation_pO2_bar!r}'
+                )
             numerator = K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar
 
             if numerator <= 0:

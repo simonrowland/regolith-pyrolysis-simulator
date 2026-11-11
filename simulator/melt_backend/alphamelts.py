@@ -1156,8 +1156,8 @@ class _MELTSBackendSupport(MeltBackend):
             resolved_pO2 = resolve_transport_pO2_bar(request)
         except ValueError as exc:
             raise ValueError(
-                'vapor_transport_pO2_bar must be finite and > 0 and at least '
-                f'the active environment floor; {exc}'
+                'vapor_transport_pO2_bar must be finite and > 0; '
+                f'{exc}'
             ) from exc
         self._vapor_transport_pO2_bar = resolved_pO2
         self._vapor_transport_floor_bar = resolved_floor
@@ -1567,9 +1567,11 @@ class _MELTSBackendSupport(MeltBackend):
         Routes to the configured alphaMELTS transport.
         ``vapor_transport_pO2_bar`` overrides the configured gas environment
         for this call only; it does not change the intrinsic melt fO2.
-        ``vapor_transport_floor_bar`` carries the environment owner's floor.
+        An explicit positive partial is stored even when it lies below
+        ``vapor_transport_floor_bar``. That floor is the numerical log
+        guard kept beside the physical partial, not a clamp on it.
         ``vapor_transport_pO2_admission='observation'`` admits measured positive
-        gas oxygen independently of that floor, through the shared resolver.
+        gas oxygen through the same resolver.
         """
         self._set_vapor_transport_pO2_bar(
             self._configured_vapor_transport_pO2_bar

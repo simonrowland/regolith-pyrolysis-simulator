@@ -175,7 +175,17 @@ def test_passive_exchange_respeciation_settles_same_buffer_once(absorbing) -> No
         for account in sim.atom_ledger.mol_by_account()
     )
     exchange = sim._apply_oxygen_reservoir_exchange()
-    assert (exchange.exchange_o2_mol < 0.0) == absorbing
+    if not absorbing:
+        # The headspace was emptied and this load is uncontrolled. A zero
+        # partial is not a far node. The oxygen numerical floor must not
+        # stand in and pull O2 out of the melt.
+        assert exchange.exchange_direction == "none:no_physical_overhead_po2"
+        assert exchange.exchange_o2_mol == pytest.approx(0.0)
+        assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+            "O2", 0.0
+        ) == pytest.approx(0.0)
+        return
+    assert exchange.exchange_o2_mol < 0.0
     assert abs(exchange.exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
     after_exchange_gas = sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0)
     before_buffer = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0)
@@ -282,12 +292,22 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
     session = run._start_session()
     sim = session.simulator
     hot_hours = set()
-    c6_releases = []
-    c6_moves_toward_gas_split = False
+    c6_hours = 0
+    fO2_min = None
+    campaigns: list[str] = []
     transition_count = len(sim.atom_ledger.transitions)
     for result in drive_session(session, 400, DecisionPolicy.AUTO_APPLY):
         snapshot = result.snapshot
         assert abs(snapshot.mass_balance_error_pct) <= 5e-12
+        fO2_now = sim._current_melt_redox_fO2_log()
+        fO2_min = fO2_now if fO2_min is None else min(fO2_min, fO2_now)
+        # Overflow detector, not a stored floor. Dividing the interface
+        # film by a collapsed C_m stored log10 fO2 of about -1936. The
+        # booking passes Δln(ξ_s) * C_now instead, or 0 at the noop floor.
+        assert fO2_now >= -30.0 - 1.0e-6
+        campaign_name = getattr(snapshot.campaign, "name", str(snapshot.campaign))
+        if not campaigns or campaigns[-1] != campaign_name:
+            campaigns.append(campaign_name)
         if sim.melt.hour in (167, 168):
             hot_hours.add(sim.melt.hour)
             assert sim._current_melt_redox_fO2_log() <= math.log10(
@@ -296,11 +316,14 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
         # The live campaign may already be the successor after a finishing
         # hour; the snapshot identifies the campaign that produced the hour.
         if snapshot.campaign == CampaignPhase.C6:
+            c6_hours += 1
             for transition in sim.atom_ledger.transitions[transition_count:]:
                 if transition.name == "fe_redox_respeciation":
-                    # Following passive exchange, reduction returns O2 to its
-                    # buffer. Count that production once, not again when the
-                    # exchange owner transports it to overhead.
+                    # A real ferric credit still has to match the oxide
+                    # stoichiometry. Empty headspace is not exchanged toward
+                    # the 1e-9 oxygen numerical guard, so this credit is not
+                    # required: that guard was what used to pull fO2 off the
+                    # gas ceiling and book the O2.
                     o2 = sum(
                         _transition_account_species_mol(
                             sim, transition, side="credits",
@@ -309,32 +332,22 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
                         for account in ("process.overhead_gas", "reservoir.fo2_buffer")
                     )
                     if o2 > 0.0:
-                        c6_releases.append(o2)
                         transition.validate_conservation(sim.species_formula_registry)
                         ferric_debit = _cleaned_melt_debit_mol(sim, transition, "Fe2O3")
                         # Fe2O3 -> 2 FeO + 1/2 O2; mol O2 = mol Fe2O3 / 2.
                         assert o2 == pytest.approx(ferric_debit / 2.0, abs=1e-12)
             inventory = sim.atom_ledger.mol_by_account("process.cleaned_melt")
             assert inventory.get("FeO", 0.0) > 0.0
-            gas_ferric = sim._fe3_over_sigma_fe_at_fO2(
-                sim._melt_oxide_wt_pct(),
-                fO2_log=math.log10(sim.melt.p_total_mbar / 1000.0),
-                T_K=sim.melt.temperature_C + 273.15,
-                pressure_bar=sim.melt.p_total_mbar / 1000.0,
-            )
-            # Fe2O3 has two Fe atoms: n_target = f_ferric * n_Fe/2 mol.
-            gas_target = gas_ferric * sim._cleaned_melt_fe_atom_mol() / 2.0
-            for diagnostic in sim._fe_redox_respeciation_diagnostics_this_hr:
-                if diagnostic.get("direction") == "reducing":
-                    c6_moves_toward_gas_split |= (
-                        abs(inventory.get("Fe2O3", 0.0) - gas_target)
-                        < abs(diagnostic["current_fe2o3_mol"] - gas_target)
-                    )
         transition_count = len(sim.atom_ledger.transitions)
+    # Observed on the derivation fix: campaigns through C6, complete at
+    # hour 262, fO2 stayed in [-9, log10(2e-4)], no C6 floor-target credit.
     assert sim.is_complete()
     assert hot_hours == {167, 168}
-    assert c6_releases
-    assert c6_moves_toward_gas_split
+    assert campaigns == [
+        "C0", "C0B", "C2A_STAGED", "C3_NA", "C4", "C2A", "C6",
+    ]
+    assert c6_hours > 0
+    assert fO2_min is not None and fO2_min >= -30.0 - 1.0e-6
 
 
 def _transition_account_species_mol(
@@ -626,7 +639,10 @@ def test_step_mirrors_intrinsic_value_to_melt_fO2_log() -> None:
     assert sim.melt.melt_fO2_log == pytest.approx(
         reservoir.melt_intrinsic_fO2_log
     )
-    assert reservoir.headspace_transport_pO2_bar >= 1e-9
+    # Hard vacuum with no oxygen inventory has a zero physical partial.
+    # The 1e-9 bar value remains the log guard and is not stored here.
+    assert reservoir.headspace_transport_pO2_bar == pytest.approx(0.0)
+    assert sim._oxygen_log_guard_bar() == pytest.approx(1e-9)
 
 
 def test_references_registry_carries_sso_r_r20_redox_citations() -> None:
@@ -3141,6 +3157,13 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
     }
 
     assert sim._freeze_gate_curve()["source"] == curve_source
+    # This memo has no liquidus path, so it is not a capacity input. The
+    # metal law still divides by a physical partial. Use the pinned melt
+    # fO2; the 1e-9 bar log guard is not a stand-in, and a zero ledger
+    # partial is not one either.
+    pinned_pO2_bar = 10.0 ** -6.5
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = pinned_pO2_bar
+    assert sim._headspace_transport_pO2_bar() == pytest.approx(pinned_pO2_bar)
     assert sim._internal_analytical_equilibrium().fO2_log == pytest.approx(-6.5)
     sim._attach_post_equilibrium_sulfsat(SimpleNamespace(warnings=[]))
 
@@ -3255,7 +3278,14 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert partition["carrier_gas"] == "N2"
     assert tap_mol["Fe"] == pytest.approx(partition["native_fe_tap_mol"])
     assert sim.train.stages[1].collected_kg.get("Fe", 0.0) > 0.0
-    assert snapshot.evap_flux.species_kg_hr["SiO"] > 1.0e-7
+    # SiO is evaluated at the hour's interface surface, not at the 1e-9 bar
+    # log guard. The flux stays a positive prediction; the old 1e-7 kg/h
+    # bound was the guard-era magnitude.
+    sio_kg_hr = snapshot.evap_flux.species_kg_hr["SiO"]
+    assert math.isfinite(sio_kg_hr) and sio_kg_hr > 0.0
+    interface = snapshot.oxygen_reservoir["interface_oxygen"]
+    assert interface["solved"] is True
+    assert interface["surface_pO2_bar"] > 0.0
     assert "stage_3_fe_wt_pct" not in partition
     stage_3_capture = summary["stage_3_capture"]
     assert stage_3_capture["Fe_kg"] > 0.0

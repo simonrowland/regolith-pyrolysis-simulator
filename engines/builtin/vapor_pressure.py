@@ -3128,18 +3128,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         melt_account_mol = dict(
             request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
         )
-        feo_activity_pressure_bar = vacuum_floor_bar
+        # Physical transport/interface partial. vacuum_floor_bar stays the
+        # Kress log guard and is not the activity pressure.
+        feo_activity_pressure_bar = transport_pO2_bar
         if intrinsic_fO2_log is not None:
             from simulator.fe_redox import (
                 kress91_ferrous_feo_activity,
-                kress91_furnace_activity_pressure_bar,
                 liquid_feo_domain_from_controls,
             )
 
             liquid_domain = liquid_feo_domain_from_controls(controls)
-            feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
-                floor_bar=vacuum_floor_bar,
-            )
             below_cap_fe_activity = kress91_ferrous_feo_activity(
                 comp_wt=comp_wt,
                 fO2_log=intrinsic_fO2_log,
@@ -4521,12 +4519,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             #   P = P_ref * a_SiO2 * sqrt(p_ref / pO2)
             # applied once on BOTH sides of p_ref (boost below ref, suppress
             # above). Unit check: bar/bar is dimensionless. Sanity: at
-            # pO2=p_ref the factor is 1; at the legal lunar floor 1.3e-12 bar
-            # the factor is sqrt(1e-9/1.3e-12)≈27.735 — a silent clip to
-            # unity below p_ref was an under-extraction bug. Transport pO2
-            # is already fail-loud gated at the body/request vacuum floor
-            # (resolve_transport_pO2_bar); no additional silent pO2 floor
-            # belongs here. Body floors must not retune the SiO fit itself.
+            # pO2=p_ref the factor is 1. A silent clip to unity below
+            # p_ref was an under-extraction bug. Transport pO2
+            # is the physical partial. resolve_transport_pO2_bar refuses a
+            # non-positive value and does not replace a lower explicit
+            # partial with the numerical log guard. Body floors must not
+            # retune the SiO fit itself.
             if name == 'SiO' and not pO2_exponent:
                 sio_reference_bar = max(
                     1e-30,
@@ -4766,7 +4764,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if intrinsic_fO2_log_supplied
                 else None
             ),
-            "source_reaction_activity_pressure_bar": float(vacuum_floor_bar),
+            "source_reaction_activity_pressure_bar": float(
+                feo_activity_pressure_bar
+            ),
             "source_reaction_redox_model_id": "REF-001-kress-carmichael-1991",
             "source_reaction_composition_wt_pct": dict(comp_wt),
             "melt_dissociation_pO2_clamped_to_physical_envelope": (

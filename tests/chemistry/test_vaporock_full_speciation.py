@@ -48,7 +48,7 @@ def _vaporock_po2_request(pO2_bar):
     )
 
 
-@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0, 1e-12])
+@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0])
 def test_vaporock_provider_rejects_invalid_explicit_transport_po2(pO2_bar):
     request = _vaporock_po2_request(pO2_bar)
 
@@ -58,7 +58,14 @@ def test_vaporock_provider_rejects_invalid_explicit_transport_po2(pO2_bar):
         VapoRockProvider._resolve_fO2_log(request)
 
 
-def test_vaporock_provider_rejects_subfloor_request_level_fo2():
+def test_vaporock_provider_accepts_explicit_partial_below_log_guard():
+    request = _vaporock_po2_request(1e-12)
+
+    assert VapoRockProvider._resolve_pO2_bar(request) == pytest.approx(1e-12)
+    assert VapoRockProvider._resolve_fO2_log(request) == pytest.approx(-12.0)
+
+
+def test_vaporock_provider_accepts_request_level_fo2_below_log_guard():
     request = IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
         account_view=ProviderAccountView(
@@ -71,10 +78,8 @@ def test_vaporock_provider_rejects_subfloor_request_level_fo2():
         control_inputs={},
     )
 
-    with pytest.raises(ValueError, match="fO2_log=-20.*transport model floor"):
-        VapoRockProvider._resolve_pO2_bar(request)
-    with pytest.raises(ValueError, match="fO2_log=-20.*transport model floor"):
-        VapoRockProvider._resolve_fO2_log(request)
+    assert VapoRockProvider._resolve_pO2_bar(request) == pytest.approx(1e-20)
+    assert VapoRockProvider._resolve_fO2_log(request) == pytest.approx(-20.0)
 
 
 def test_adapter_attaches_unfiltered_full_speciation(monkeypatch):

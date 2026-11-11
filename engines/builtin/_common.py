@@ -371,12 +371,9 @@ def resolve_transport_pO2_bar(
             raise ValueError(
                 f"pO2_bar must be finite and > 0, got {raw_pO2!r}"
             )
-        if pO2_bar < floor_bar:
-            raise ValueError(
-                f"explicit pO2_bar={pO2_bar:g} below transport model floor "
-                f"{floor_bar:g}; request the floor explicitly by using "
-                f"pO2_bar={floor_bar:g}"
-            )
+        # An explicit positive partial is physical, including a solved
+        # interface pressure below the numerical log guard. The guard is
+        # the omit-path fallback below, not a clamp on a declared partial.
         return pO2_bar
 
     if request.fO2_log is not None:
@@ -401,13 +398,8 @@ def resolve_transport_pO2_bar(
             raise ValueError(
                 f"fO2_log resolved to invalid pO2_bar={pO2_bar!r}"
             )
-        if pO2_bar < floor_bar:
-            raise ValueError(
-                f"fO2_log={fO2_log:g} resolves to "
-                f"pO2_bar={pO2_bar:g} below transport model floor "
-                f"{floor_bar:g}; request the floor explicitly by using "
-                f"pO2_bar={floor_bar:g}"
-            )
+        # Same rule as an explicit pO2_bar: a finite positive resolution is
+        # the physical partial. floor_bar is not applied to it.
         return pO2_bar
 
     if observation:

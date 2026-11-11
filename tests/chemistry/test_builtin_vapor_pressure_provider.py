@@ -3132,7 +3132,7 @@ def test_default_in_range_builtin_provider_keeps_fe_and_adds_status_bearing_feo(
     )
 
 
-def test_request_level_fo2_below_transport_floor_is_rejected(
+def test_request_level_fo2_below_log_guard_is_the_physical_partial(
     vapor_pressure_data,
 ):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
@@ -3148,8 +3148,9 @@ def test_request_level_fo2_below_transport_floor_is_rejected(
         control_inputs={},
     )
 
-    with pytest.raises(ValueError, match="fO2_log=-20.*transport model floor"):
-        provider.dispatch(request)
+    result = provider.dispatch(request)
+
+    assert result.diagnostic["pO2_bar"] == pytest.approx(1.0e-20)
 
 
 def test_interval_required_foulant_vapor_row_is_not_certifying(
@@ -3292,8 +3293,8 @@ def test_al2o_provider_applies_single_cation_activity_square_once(
     )
 
 
-@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0, 1e-12])
-def test_explicit_transport_po2_rejects_invalid_or_subfloor_values(
+@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0])
+def test_explicit_transport_po2_rejects_nonpositive_values(
     vapor_pressure_data,
     pO2_bar,
 ):
@@ -3311,6 +3312,26 @@ def test_explicit_transport_po2_rejects_invalid_or_subfloor_values(
 
     with pytest.raises(ValueError, match="pO2_bar"):
         provider.dispatch(request)
+
+
+def test_explicit_transport_po2_below_log_guard_is_physical(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1.0e-12},
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.diagnostic["pO2_bar"] == pytest.approx(1.0e-12)
 
 
 def test_builtin_provider_marks_pure_component_range_extrapolation(
@@ -4040,11 +4061,16 @@ def test_provider_emits_no_ledger_transition(
             continue
         sim.step()
 
+    # Hard vacuum commands a real zero oxygen partial. The hour's physical
+    # surface is the transport value the vapour law evaluates; the numerical
+    # log guard is not a substitute partial.
+    surface_pO2_bar = sim._headspace_transport_pO2_bar()
+    assert surface_pO2_bar > 0.0
     result = sim._chem_kernel.dispatch(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
-        control_inputs={"pO2_bar": sim._commanded_pO2_bar()},
+        control_inputs={"pO2_bar": surface_pO2_bar},
     )
     assert result.transition is None, (
         "VAPOR_PRESSURE is diagnostic per binding spec §3 — provider must "
