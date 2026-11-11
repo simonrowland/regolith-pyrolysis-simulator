@@ -897,6 +897,12 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
     opener_settings = normalized_reads[-1]
     opener_projection = engine_cache_settings(engine, opener_settings)
     assert opener_settings.reads <= set(opener_settings)
+    if engine == "alphamelts":
+        assert {
+            "model_calc_mode",
+            "calc_mode_conflict",
+            "subprocess_model_error",
+        }.isdisjoint(opener_settings)
     for key in opener_settings.reads - set(neutral):
         changed = dict(opener_settings)
         value = changed[key]
@@ -941,6 +947,11 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
                         f"cannot mutate backend setting {engine}.{key}: {value!r}"
                     )
                 assert engine_cache_settings(engine, changed) != constructor_projection, key
+        if engine == "alphamelts":
+            constructor_settings = constructor_reads[-1].values
+            assert constructor_settings["model_calc_mode"] == "MELTS"
+            assert constructor_settings["calc_mode_conflict"] is False
+            assert constructor_settings["subprocess_model_error"] is None
     assert projected
 
 
