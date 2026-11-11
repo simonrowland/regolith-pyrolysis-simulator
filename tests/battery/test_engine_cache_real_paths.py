@@ -520,6 +520,7 @@ def test_engine_opener_and_cache_share_canonical_settings_projection(
             "calc_mode_conflict"
         ]
         backend._subprocess_model_error = backend_config["subprocess_model_error"]
+        backend._subprocess_calc_mode_configured = True
         return backend
 
     monkeypatch.setattr(backends, "resolve_backend", fake_resolve_backend)
@@ -601,14 +602,14 @@ def test_magemin_python_bridge_alias_is_normalized_before_open_and_key(
     assert engine_cache_settings("magemin", settings)["bridge"] == "julia"
 
 
-def test_default_alphamelts_open_uses_the_normalized_environment_snapshot(
+def test_default_alphamelts_open_uses_resolved_mode_without_parent_environment(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator import backends
     from simulator.diagnostic_helpers import binary_pot_battery
     from simulator.engine_cache import engine_cache_settings, normalize_engine_settings
 
-    captured: dict[str, str | None] = {}
+    captured: dict[str, Any] = {}
 
     def fake_resolve_backend(
         _name: str,
@@ -616,7 +617,7 @@ def test_default_alphamelts_open_uses_the_normalized_environment_snapshot(
         *,
         backend_config: dict[str, Any] | None = None,
     ) -> Any:
-        captured["ambient_calc_mode"] = os.environ.get("ALPHAMELTS_CALC_MODE")
+        captured.update(backend_config or {})
         return SimpleNamespace()
 
     monkeypatch.setattr(backends, "resolve_backend", fake_resolve_backend)
@@ -628,8 +629,11 @@ def test_default_alphamelts_open_uses_the_normalized_environment_snapshot(
         "alphamelts", normalized_settings=effective
     )
 
-    assert captured["ambient_calc_mode"] == "pMELTS"
-    assert engine_cache_settings("alphamelts", effective)["ambient_calc_mode"] == "pMELTS"
+    assert captured["effective_calc_mode"] == "MELTS"
+    assert os.environ["ALPHAMELTS_CALC_MODE"] == "MELTS"
+    assert engine_cache_settings("alphamelts", effective)[
+        "effective_calc_mode"
+    ] == "MELTS"
 
 
 def test_openimcc_unused_gas_pack_setting_is_not_a_cache_input() -> None:
@@ -769,6 +773,10 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
             "python_bridge": "constructor:python_bridge",
             "alphamelts": "constructor:alphamelts",
             "model": "raw_model_name",
+            "effective_calc_mode": "effective_calc_mode",
+            "model_calc_mode": "constructor:model_calc_mode",
+            "calc_mode_conflict": "constructor:calc_mode_conflict",
+            "subprocess_model_error": "constructor:subprocess_model_error",
             "fO2_buffer": "redox_buffer",
             "redox_buffer": "constructor:redox_buffer_fallback",
             "fO2_offset": "fO2_offset",
@@ -1013,8 +1021,16 @@ def test_each_real_backend_equilibrate_warm_pair_matches_cache_off(
         pot = BinaryPot(
             pot_id="alphamelts_cache_in_domain",
             kato_1993_table4_system=None,
-            why="Known liquid-forming sodium silicate composition.",
-            composition_wt_pct={"SiO2": 47.0, "Na2O": 53.0},
+            why="Known liquid-forming AlphaMELTS fixture composition.",
+            composition_wt_pct={
+                "SiO2": 49.0,
+                "Al2O3": 15.0,
+                "FeO": 10.0,
+                "Fe2O3": 1.0,
+                "MgO": 10.0,
+                "CaO": 10.0,
+                "Na2O": 5.0,
+            },
         )
     else:
         pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
@@ -1191,7 +1207,7 @@ def test_internal_analytical_equilibrate_bypasses_enabled_cache(
     ) == {}
 
 
-def test_openimcc_ferric_and_ferrous_requests_have_distinct_cache_entries(
+def test_openimcc_battery_adapter_does_not_add_an_outer_cache_entry(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1221,10 +1237,10 @@ def test_openimcc_ferric_and_ferrous_requests_have_distinct_cache_entries(
         )
 
     assert calls == [ferric, ferrous]
-    assert engine_cache.engine_cache_counters(reset=True)["openimcc"]["misses"] == 2
+    assert engine_cache.engine_cache_counters(reset=True).get("openimcc", {}) == {}
 
 
-def test_openimcc_unused_pressure_and_caller_timeout_do_not_replace_cached_cell(
+def test_openimcc_battery_adapter_does_not_cache_around_the_bridge(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1261,18 +1277,12 @@ def test_openimcc_unused_pressure_and_caller_timeout_do_not_replace_cached_cell(
             "pressure_bar": 40.0,
             "call_timeout_s": 0.01,
         },
-        lambda: pytest.fail("pressure/timeout-only change should hit cached cell"),
+        solve,
     )
 
     assert first.liquid_fraction == second.liquid_fraction == 0.625
-    assert calls == 1
-    assert engine_cache.engine_cache_counters(reset=True)["openimcc"] == {
-        "hits": 1,
-        "misses": 1,
-        "stores": 1,
-        "store_error": 0,
-        "read_error": 0,
-    }
+    assert calls == 2
+    assert engine_cache.engine_cache_counters(reset=True).get("openimcc", {}) == {}
 
 
 def test_isolated_backend_reconstruction_disables_nested_pools(
