@@ -16,8 +16,10 @@ import pytest
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.condensation import (
     CondensationModel,
+    DepositionInputRefusal,
     _CONFIG_BUNDLE,
     _try_antoine_psat_pa,
+    deposition_input_refusal_aborts_train,
     dimer_dissociation_kp_pa,
 )
 from simulator.condensation_routing import (
@@ -283,6 +285,82 @@ def test_missing_partial_on_every_dimer_refuses_that_species_only(dimer):
     else:
         assert reason != CONTRACT_REASON
     assert _mass_closure_kg(route, species_kg) == pytest.approx(0.0, abs=1.0e-12)
+
+
+# Invalid wall input aborts the train on every species and both capture
+# channels. A missing partial, or an unconfigured collector area, refuses
+# that species only. ``value is None`` is not what decides: a missing
+# Antoine coefficient and a missing wall temperature are also None.
+_ROUTE_SPECIES = (
+    "Fe", "Cr", "CrO2", "Mn", "SiO", "Na", "K", "Mg",
+    "Na2", "K2", "Mg2", "Al2", "Ca2",
+)
+_TERMINAL_WALL_INPUTS = (
+    ("missing_coefficient", "pure_component_antoine.B", None, "must be numeric"),
+    ("missing_wall_temperature", "T_wall_K", None, "holder_profile"),
+    ("illegal_alpha", "alpha_s", 1.5, "sticking coefficient must be within [0, 1]"),
+    ("nonfinite_partial", "P_local_pa", float("nan"), "must be finite"),
+)
+_SPECIES_LOCAL_WALL_INPUTS = (
+    ("missing_partial", "P_local_pa", None, "wall species partial pressure is unconfigured"),
+    ("missing_flowing_pressure", "flowing_pressure_pa", None, "must be numeric"),
+    ("missing_stage_area", "stage_area_m2", None, "collector area is required"),
+)
+
+
+def _refusal(spec):
+    _name, parameter, value, reason = spec
+    return DepositionInputRefusal(parameter, value, reason)
+
+
+@pytest.mark.parametrize("species", _ROUTE_SPECIES)
+@pytest.mark.parametrize("channel", ("wall", "stage"))
+@pytest.mark.parametrize("spec", _TERMINAL_WALL_INPUTS + _SPECIES_LOCAL_WALL_INPUTS)
+def test_invalid_wall_input_aborts_on_every_species_and_channel(
+    monkeypatch, species, channel, spec,
+):
+    """One chokepoint classifies every refusal the train can raise.
+
+    The wall handler and the stage handler both call
+    ``deposition_input_refusal_aborts_train``. This injects each input
+    class into each handler for every routed species.
+    """
+
+    refusal = _refusal(spec)
+    aborts = deposition_input_refusal_aborts_train(refusal)
+    terminal_names = {item[0] for item in _TERMINAL_WALL_INPUTS}
+    assert aborts is (spec[0] in terminal_names)
+    witness = "Na" if species != "Na" else "Fe"
+    partials = {species: 0.1, witness: 0.1}
+    model = _model(partials=partials)
+    model.lab_geometry = object()
+    original_wall = CondensationModel._wall_deposit_candidates_by_segment_kg
+    original_stage = CondensationModel._condensation_efficiency
+
+    def wall(self, **kwargs):
+        if channel == "wall" and kwargs.get("species") == species:
+            raise _refusal(spec)
+        return original_wall(self, **kwargs)
+
+    def stage(self, **kwargs):
+        if channel == "stage" and kwargs.get("species") == species:
+            raise _refusal(spec)
+        return original_stage(self, **kwargs)
+
+    monkeypatch.setattr(CondensationModel, "_wall_deposit_candidates_by_segment_kg", wall)
+    monkeypatch.setattr(CondensationModel, "_condensation_efficiency", stage)
+    flux = EvaporationFlux(
+        species_kg_hr={species: 1.0, witness: 1.0},
+        total_kg_hr=2.0,
+    )
+    if aborts:
+        with pytest.raises(DepositionInputRefusal) as caught:
+            model.route(flux, MeltState(temperature_C=1500.0))
+        assert caught.value.parameter == spec[1]
+        return
+    route = model.route(flux, MeltState(temperature_C=1500.0))
+    assert _deposited_kg(route, witness) > 0.0
+    assert route.remaining_by_species[species] >= 0.0
 
 
 def test_respeciated_monomer_partial_obeys_the_quadratic_and_both_limits():
@@ -1033,6 +1111,102 @@ def test_heterogeneous_linear_strips_stop_on_their_own_floor():
     )
     assert both == pytest.approx(slow_closed_form, abs=1.0e-6)
     assert both > 99.0
+
+
+def _closed_form_linear_partial(case: str) -> tuple[float, float, tuple, float]:
+    """Independent arithmetic for one linear-strip inlet. Not the solver.
+
+    While the strips with P_sat < p stay fixed,
+
+        C = sum k_i
+        p_eq = sum (k_i P_i) / C
+        p(t) = p_eq + (p0 - p_eq) exp(-C t).
+
+    A strip with P_sat >= p is absent from that sum. Reaching its floor
+    removes it and the colder strips continue for the time that remains.
+    """
+
+    if case == "inactive_hot":
+        # p0 = 75 Pa, residence 10 s, k = 1 at 100, 50 and 1 Pa.
+        # 75 < 100, so the hot strip is inactive.
+        # dp/dt = -(p - 50) - (p - 1) = -2p + 51 until p = 50.
+        # 25.5 + 49.5 exp(-2 t) = 50
+        # exp(-2 t) = 24.5 / 49.5 = 49/99
+        # t = ln(99/49) / 2
+        # Then only the 1 Pa strip acts:
+        # p(10) = 1 + 49 exp(-(10 - t))
+        p0, duration = 75.0, 10.0
+        rows = ((1.0, 100.0), (1.0, 50.0), (1.0, 1.0))
+        t_hit = math.log(99.0 / 49.0) / 2.0
+        expected = 1.0 + 49.0 * math.exp(-(duration - t_hit))
+    elif case == "below_every_floor":
+        p0, duration = 10.0, 10.0
+        rows = ((1.0, 100.0), (1.0, 50.0), (1.0, 40.0))
+        expected = p0
+    elif case == "only_cold_strip_active":
+        # 100 Pa and 50 Pa are inactive. p = 1 + 39 exp(-10).
+        p0, duration = 40.0, 10.0
+        rows = ((1.0, 100.0), (1.0, 50.0), (1.0, 1.0))
+        expected = 1.0 + (p0 - 1.0) * math.exp(-duration)
+    elif case == "single_strip":
+        p0, duration = 80.0, 2.0
+        rows = ((0.5, 20.0),)
+        expected = 20.0 + (p0 - 20.0) * math.exp(-0.5 * duration)
+    elif case == "active_set_holds":
+        # C = 0.2, p_eq = 25. p(0.5) = 25 + 75 exp(-0.1) stays above 40,
+        # so the hotter strip does not turn off.
+        p0, duration = 100.0, 0.5
+        rows = ((0.1, 40.0), (0.1, 10.0))
+        expected = 25.0 + 75.0 * math.exp(-0.2 * duration)
+        assert expected > 40.0
+    elif case == "cross_then_cold_only":
+        # C = 2, p_eq = 35. Hit 60 Pa at ln((100-35)/(60-35))/2
+        # = ln(13/5)/2. Then k = 1 at 10 Pa for the time left.
+        p0, duration = 100.0, 5.0
+        rows = ((1.0, 60.0), (1.0, 10.0))
+        t_hit = math.log(65.0 / 25.0) / 2.0
+        expected = 10.0 + 50.0 * math.exp(-(duration - t_hit))
+    elif case == "zero_residence":
+        p0, duration = 75.0, 0.0
+        rows = ((1.0, 100.0), (1.0, 50.0), (1.0, 1.0))
+        expected = p0
+    else:
+        raise AssertionError(case)
+    return p0, duration, rows, expected
+
+
+@pytest.mark.parametrize("order", ("hot_first", "cold_first"))
+@pytest.mark.parametrize(
+    "case",
+    (
+        "inactive_hot",
+        "below_every_floor",
+        "only_cold_strip_active",
+        "single_strip",
+        "active_set_holds",
+        "cross_then_cold_only",
+        "zero_residence",
+    ),
+)
+def test_every_linear_inlet_skips_inactive_strips(order, case):
+    """Enumerate inlet position and strip order against the closed form.
+
+    The oracle is the arithmetic in ``_closed_form_linear_partial``.
+    It does not call the production march.
+    """
+
+    from simulator.condensation_routing import final_element_partial_pa
+
+    p0, duration, rows, expected = _closed_form_linear_partial(case)
+    if order == "cold_first":
+        rows = tuple(reversed(rows))
+    strips = tuple((coefficient, 0.0, saturation, math.inf) for coefficient, saturation in rows)
+    got = final_element_partial_pa(
+        element_partial_initial_pa=p0,
+        residence_s=duration,
+        strips=strips,
+    )
+    assert got == pytest.approx(expected, rel=1.0e-12, abs=1.0e-12)
 
 
 @pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)

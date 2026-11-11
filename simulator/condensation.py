@@ -3340,11 +3340,11 @@ class CondensationModel:
                             collection_species=monomer,
                         )
                     except DepositionInputRefusal as exc:
-                        # A missing partial (value is None) refuses this
-                        # species only. That includes Al2 and Ca2, whose
-                        # monomer has no collection contract. A present
-                        # but illegal number still aborts the train.
-                        if exc.value is not None:
+                        # Same chokepoint as the stage handler. A missing
+                        # partial refuses this species only, including
+                        # Al2 and Ca2. A missing coefficient or wall
+                        # temperature still aborts the train.
+                        if deposition_input_refusal_aborts_train(exc):
                             raise
                         efficiency_outcomes_by_species.setdefault(species, []).append({
                             'status': 'refused',
@@ -3403,7 +3403,7 @@ class CondensationModel:
                         saturation_species=monomer,
                     )
                 except (WallSaturationPressureRefusal, DepositionInputRefusal) as exc:
-                    if isinstance(exc, DepositionInputRefusal) and exc.value is not None:
+                    if deposition_input_refusal_aborts_train(exc):
                         raise
                     # A missing capture input does not revoke the upstream
                     # evaporation authority or undo earlier measured capture.
@@ -6822,6 +6822,34 @@ class WallSaturationPressureRefusal(RuntimeError):
             f"species={self.species} temperature_K={self.temperature_K:.3f} "
             f"reason={self.reason}"
         )
+
+
+# Absent per-species capture inputs. The train keeps running and that
+# species stays in the stream with a typed refusal. Anything else with
+# value None is still invalid wall input (a missing Antoine coefficient,
+# a missing wall temperature) and aborts. ``value is None`` is not the test.
+_SPECIES_LOCAL_ABSENT_DEPOSITION_PARAMETERS = frozenset({
+    'P_local_pa',
+    'flowing_pressure_pa',
+    'stage_area_m2',
+})
+
+
+def deposition_input_refusal_aborts_train(exc: BaseException) -> bool:
+    """True when this refusal is invalid input for the whole train.
+
+    Wall capture and stage efficiency both call this. A missing species
+    partial, or an unconfigured collector area, refuses that species
+    only. A missing or non-numeric Antoine coefficient, a missing wall
+    temperature, and any present illegal number abort. A saturation-curve
+    refusal is not a ``DepositionInputRefusal`` and does not abort.
+    """
+
+    if not isinstance(exc, DepositionInputRefusal):
+        return False
+    if exc.value is not None:
+        return True
+    return exc.parameter not in _SPECIES_LOCAL_ABSENT_DEPOSITION_PARAMETERS
 
 
 class DepositionInputRefusal(ValueError):

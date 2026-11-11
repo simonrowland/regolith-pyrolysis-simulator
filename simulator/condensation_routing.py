@@ -486,9 +486,14 @@ def _final_linear_monomer_partial(
         return total_k, equilibrium, nxt
 
     # The coldest level is the last active equilibrium, not a crossing.
+    # An inactive floor (P_sat >= p) is skipped. It must not end the
+    # march: p0 = 75 Pa with floors (100, 50, 1) Pa is below the 100 Pa
+    # strip, crosses 50 Pa at ln(99/49)/2, and finishes on the 1 Pa strip.
     for threshold in reversed(levels[1:]):
-        if remaining <= 0.0 or pressure <= threshold:
+        if remaining <= 0.0:
             break
+        if pressure <= threshold:
+            continue
         solved = _segment(pressure, remaining)
         if solved is None:
             break
