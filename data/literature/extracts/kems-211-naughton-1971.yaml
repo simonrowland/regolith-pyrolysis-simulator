@@ -1,0 +1,853 @@
+schema_version: literature_extract.v1
+source_id: kems-211-naughton-1971
+source:
+  citation: Naughton, J. J., Derby, J. V. & Lewis, V. A. (1971), "Vaporization from heated lunar samples and the investigation of lunar erosion by volatilized alkalis", Proceedings of the Second Lunar Science Conference, Vol. 1, pp. 449–457, The M.I.T. Press.
+  year: 1971
+  ads_bibcode: 1971LPSC....2..449N
+  corpus_asset: kems-211-naughton-1971.pdf
+  corpus_sha256: d9f7381a0ddd1cf78835e16e3591806916ede90e6f399007b11ecde9d5070e8b
+extraction:
+  method: Manual image transcription; solfix-T rechecked all nine pages and every carried number, sign, exponent, unit and locator against fresh pdftoppm images at 220 dpi. The PDF is an ADS JBIG2 scan with no text layer. No tables or mathematical equations are printed; zero scored observations. Figures 1–4 remain undigitized; printed caption/prose numbers and bibliographic/administrative metadata are located context with distinct provenance. pdf_page_index is 0-based; printed page = pdf_page_index + 449.
+  date: '2026-10-05'
+  worker: regolith-empirical-seat37a
+review_status: draft
+fidelity_samples:
+- species: K
+  observation_id: naughton_1971_basaltic_fines_fragment_potassium
+  field: K_pct_as_printed
+  value: 0.66
+  locator:
+    published_page: 454
+    pdf_page_index: 5
+    section: Evidence of Alkali Condensation and Degradation in Lunar Samples
+- species: K
+  observation_id: naughton_1971_kems_calibration_and_scan
+  field: mass_range_amu
+  value: 0-100
+  locator:
+    published_page: 451
+    pdf_page_index: 2
+    section: Vaporization from Lunar Samples Heated in Vacuum
+benches:
+- id: naughton-1971-kems
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen cell-mass spectrometer unit
+    locator:
+      published_page: 450
+      pdf_page_index: 1
+      section: Vaporization from Lunar Samples Heated in Vacuum
+      note: The paper names the technique and cites Carlson (1967) for its theory and methodology; no instrument model is given.
+  method:
+    state:
+      tag: value
+      value: Knudsen cell-mass spectrometry with stepwise heating
+    locator:
+      published_page: 450
+      pdf_page_index: 1
+      section: Vaporization from Lunar Samples Heated in Vacuum
+  detector:
+    state:
+      tag: value
+      value: Mass spectrometer; mass spectral region 0 to 100 atomic mass units scanned
+    locator:
+      published_page: 451
+      pdf_page_index: 2
+      section: Vaporization from Lunar Samples Heated in Vacuum
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Samples heated in a platinum container within the cell; the Knudsen cell body material is not stated
+    locator:
+      published_page: 450
+      pdf_page_index: 1
+      section: Vaporization from Lunar Samples Heated in Vacuum
+      note: Printed "Samples were heated in a platinum container within the cell". cell_materials is not populated because the printed platinum item is the sample container, and the cell body itself is not described.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: No orifice diameter is printed anywhere in the paper.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: No orifice channel length is printed.
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 451
+        pdf_page_index: 2
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Electron energy is not stated.
+    cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 452
+        pdf_page_index: 3
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Absolute pressures were "calculated from these measurements" but no cross-sections or conversion relation are printed.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Temperature sensor and measurement method are not stated.
+  temperature_calibration:
+    calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Temperature calibration is not stated. The B2O3 standard (p. 451) is the intensity/pressure calibration, recorded on the experiment.
+- id: naughton-1971-cold-finger
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Simple cold finger collector above a small quartz crucible heated by an external furnace, inside an evacuated quartz tube
+    locator:
+      published_page: 452
+      pdf_page_index: 3
+      section: Vaporization from Lunar Samples Heated in Vacuum
+  method:
+    state:
+      tag: value
+      value: Stepwise vacuum heating with collection of sublimed material on a water-cooled cold finger, removed at intervals for qualitative and quantitative analysis
+    locator:
+      published_page: 452
+      pdf_page_index: 3
+      section: Vaporization from Lunar Samples Heated in Vacuum
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Small quartz crucible
+    locator:
+      published_page: 452
+      pdf_page_index: 3
+      section: Vaporization from Lunar Samples Heated in Vacuum
+      note: Open crucible, not a Knudsen cell; cell_materials is not populated.
+  heating_method:
+    state:
+      tag: value
+      value: External furnace
+    locator:
+      published_page: 452
+      pdf_page_index: 3
+      section: Vaporization from Lunar Samples Heated in Vacuum
+  detector:
+    state:
+      tag: value
+      value: Cold finger cooled internally by a rapid stream of circulating water; collected material analysed off-line
+    locator:
+      published_page: 452
+      pdf_page_index: 3
+      section: Vaporization from Lunar Samples Heated in Vacuum
+      note: The paper says this apparatus does not give information on specific vapor species. The analysis method for the collected potassium is not named in this passage.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 452
+        pdf_page_index: 3
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Temperature sensor is not stated.
+experiments:
+- experiment_id: kems-stepwise-lunar-samples
+  bench_id: naughton-1971-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 450
+    pdf_page_index: 1
+    section: Vaporization from Lunar Samples Heated in Vacuum
+    note: Stepwise-heating Knudsen cell-mass spectrometer runs on lunar samples and terrestrial rocks. Fig. 2 (p. 452) shows lunar rock 12022,47; per-sample run assignments are not printed.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Lunar samples and terrestrial rocks
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Lunar samples available to the authors are listed on p. 449 as 12002,140; 12002,144; 12022,47; 12052,34; 12070,64. Fig. 2 is for lunar rock 12022,47.
+    pretreatment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: No heating-sample preprocessing or preparation procedure is published; material identity, platinum container and thermal schedule are reported separately.
+    container:
+      state:
+        tag: value
+        value: Platinum container within the Knudsen cell
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: No bulk composition of the KEMS samples is printed.
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Sample mass is not stated.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '473.15'
+          interval_high: '1423.15'
+          approximate: true
+      as_published:
+        low: '200'
+        high: '1150'
+        units: C
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Printed "from about 200°C to incipient melting at about 1150°C"; unit conversion only. The Fig. 2 temperature axes are labelled T, °K with ticks from 500 to 1300; not digitized.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 450
+          pdf_page_index: 1
+          section: Vaporization from Lunar Samples Heated in Vacuum
+          note: No orifice diameter is printed.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 450
+          pdf_page_index: 1
+          section: Vaporization from Lunar Samples Heated in Vacuum
+          note: No orifice channel length is printed.
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Calibration was accomplished using B2O3 as a standard sample; background corrections were applied
+        locator:
+          published_page: 451
+          pdf_page_index: 2
+          section: Vaporization from Lunar Samples Heated in Vacuum
+      reference_substance:
+        state:
+          tag: value
+          value: B2O3
+        locator:
+          published_page: 451
+          pdf_page_index: 2
+          section: Vaporization from Lunar Samples Heated in Vacuum
+      conversion_relation:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 452
+          pdf_page_index: 3
+          section: Vaporization from Lunar Samples Heated in Vacuum
+          note: The paper says absolute vapor pressures were calculated but prints no intensity-to-pressure relation, sensitivity or cross-section.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.0001333223684210526315789473684'
+          interval_high: '0.001333223684210526315789473684'
+          approximate: true
+      as_published:
+        low: '1e-6'
+        high: '1e-5'
+        units: torr
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Printed "Vacuum in the heated furnace was in the 10^-5 to 10^-6 torr range"; unit conversion only. This is the furnace vacuum (chamber background), not a sample vapor pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Vacuum experiment; no carrier gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Stepwise heating at approximately 100 °C step intervals from about 200 °C to incipient melting at about 1150 °C; heating at each step maintained for one hour while repeated spectral scans were made
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Continues onto p. 451. The individual step temperatures are not listed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: The number of steps is not printed, so no total duration is stated. The 1 h per step hold is in the method text.
+- experiment_id: cold-finger-stepwise
+  bench_id: naughton-1971-cold-finger
+  method: vacuum_chamber_pyrolysis
+  locator:
+    published_page: 452
+    pdf_page_index: 3
+    section: Vaporization from Lunar Samples Heated in Vacuum
+    note: Cold finger collector furnace runs (Fig. 3) on terrestrial tholeiite basalt HK-123 (unreacted and K-degraded) and lunar samples 12002,44 (internal section), 12052,34 (surface section) and 12070,164 (fines). Method token is the closest vocabulary entry for open-crucible vacuum heating with condensate collection; the paper does not use the term pyrolysis.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Terrestrial tholeiite basalt HK-123 (unreacted and potassium-degraded) and lunar rock sections and fines
+      locator:
+        published_page: 453
+        pdf_page_index: 4
+        figure: '3'
+        note: Sample names as printed in the Fig. 3 panels and caption. Fig. 3 prints 12070,164 for the fines; the p. 449 sample list prints 12070,64. Both kept as printed.
+    pretreatment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 452
+        pdf_page_index: 3
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Detailed preprocessing of these heating samples is not published. The stated unreacted/potassium-degraded identities remain in sample.form; hand-picking/thin-section/filing preparations belong to separate composition/microprobe studies.
+    container:
+      state:
+        tag: value
+        value: Small quartz crucible
+      locator:
+        published_page: 452
+        pdf_page_index: 3
+        section: Vaporization from Lunar Samples Heated in Vacuum
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 453
+        pdf_page_index: 4
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: No bulk composition is printed for the cold finger samples.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 453
+        pdf_page_index: 4
+        figure: '3'
+        note: Heating was "in the same stepwise manner as in the Knudsen cell experiments". Fig. 3 axes span about 200–1000 °C; no step temperatures are printed and the figure was not digitized.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.0001333223684210526315789473684'
+          interval_high: '0.001333223684210526315789473684'
+          approximate: true
+      as_published:
+        low: '1e-6'
+        high: '1e-5'
+        units: torr
+      locator:
+        published_page: 452
+        pdf_page_index: 3
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Printed "evacuated (10^-5–10^-6 torr) quartz tube"; unit conversion only. Tube vacuum, not a sample vapor pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 452
+        pdf_page_index: 3
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Evacuated tube; no carrier gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Stepwise heating in the same manner as the Knudsen cell experiments, with one hour heating intervals; a steady-state (diffusion controlled) alkali release was quickly achieved
+      locator:
+        published_page: 453
+        pdf_page_index: 4
+        section: Vaporization from Lunar Samples Heated in Vacuum
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 453
+        pdf_page_index: 4
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Number of steps not printed.
+species:
+  K:
+    observations: []
+    context:
+    - observation_id: naughton_1971_kems_method_and_schedule
+      type: method
+      experiment: kems-stepwise-lunar-samples
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Quote runs from p. 450 onto p. 451.
+      units: verbatim method statement
+      values:
+        method_class: method_only
+        quantity: experiment_description
+        quote: >-
+          The nature of the vaporization process and of the species vaporized from lunar samples and from terrestrial rocks was investigated by the use of a Knudsen cell-mass spectrometer unit. The theory and methodology of this technique for measurement of equilibrium vapor pressures is well documented (Carlson, 1967). Samples were heated in a platinum container within the cell at approximately 100°C step intervals, from about 200°C to incipient melting at about 1150°C, thereby minimizing sample-crucible interaction. Vacuum in the heated furnace was in the 10^-5 to 10^-6 torr range. Heating at each step was maintained for one hour while repeated spectral scans were made.
+    - observation_id: naughton_1971_kems_calibration_and_scan
+      type: apparatus
+      experiment: kems-stepwise-lunar-samples
+      locator:
+        published_page: 451
+        pdf_page_index: 2
+        section: Vaporization from Lunar Samples Heated in Vacuum
+      units: verbatim calibration statement; mass range in atomic mass units as printed
+      values:
+        method_class: method_only
+        quantity: calibration_and_mass_range
+        mass_range_amu: 0-100
+        calibration_standard: B2O3
+        quote: >-
+          The mass spectral region from 0 to 100 atomic mass units was scanned. Background corrections were applied. Calibration was accomplished using B2O3 as a standard sample.
+    - observation_id: naughton_1971_kems_species_and_detection_limit
+      type: characterization
+      experiment: kems-stepwise-lunar-samples
+      locator:
+        published_page: 451
+        pdf_page_index: 2
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Quote runs from p. 451 onto p. 452.
+      units: verbatim species statement; detection limit in torr as printed
+      values:
+        method_class: measured_direct
+        quantity: detected_species_and_detection_limit
+        detection_limit_torr_as_printed: 10^-6
+        quote: >-
+          Aside from the peaks due to gases normally released from heated rocks, mainly water and carbon dioxide, the alkalis and their oxides were the chief species detected. One lunar sample (12022,47) showed a considerable release of sulfur gas species presumably due to the decomposition of troilite. If other volatiles were present their equilibrium vapor pressures were below 10^-6 torr, the limit of instrument detection. The relative concentrations of the vaporized species evolved at each incremental heating step are shown in Fig. 2. Bracketed species are indistinguishable by mass from the other species shown, but from comparative studies on other alkalis they are believed to be relatively low in concentration. Monatomic ions (Na+, K+), dimers (Na2+, K2+), and oxides (KO+, Na2O+, K2O+) were the distinct species recognized, with no measurable evidence of halides.
+    - observation_id: naughton_1971_kems_absolute_pressure_order
+      type: qualifying_statement_context
+      experiment: kems-stepwise-lunar-samples
+      locator:
+        published_page: 452
+        pdf_page_index: 3
+        section: Vaporization from Lunar Samples Heated in Vacuum
+      units: verbatim; pressure order of magnitude in torr as printed
+      values:
+        method_class: measured_reduced
+        quantity: partial_pressure_order_of_magnitude
+        pressure_order_torr_as_printed: 10^-4
+        quote: >-
+          Absolute vapor pressures were calculated from these measurements, which showed the main partial pressures to be contributed by K and Na, with pressures in the 10^-4 torr range.
+        note: Authors' reduction of their measured spectra; pressure relation, intensities, sensitivities/cross-sections and per-sample/per-temperature inputs are not published. Order of magnitude only, kept unscored without invented lineage.
+    - observation_id: naughton_1971_fig2_relative_intensities
+      type: figure_only
+      experiment: kems-stepwise-lunar-samples
+      locator:
+        published_page: 452
+        pdf_page_index: 3
+        figure: '2'
+      units: caption verbatim; figure not digitized
+      values:
+        method_class: figure_only
+        quantity: relative_ion_intensity_vs_temperature
+        sample_id: Lunar rock 12022,47
+        ions_plotted_as_printed: Na2O+(NaK+), Na+, Na2+, K+(NaO+), KO+, K2O+, K2+
+        caption: >-
+          Fig. 2. Relative intensities of alkali species emitted from a lunar sample during stepwise heating in a Knudsen cell-mass spectrometer system.
+    - observation_id: naughton_1971_cold_finger_apparatus
+      type: apparatus
+      experiment: cold-finger-stepwise
+      locator:
+        published_page: 452
+        pdf_page_index: 3
+        section: Vaporization from Lunar Samples Heated in Vacuum
+      units: verbatim apparatus statement
+      values:
+        method_class: method_only
+        quantity: apparatus_description
+        quote: >-
+          One of the most informative techniques was the use of a simple cold finger collector, inserted above the surface of the sample in a small quartz crucible heated by an external furnace. Cooling of the finger was by means of a rapid stream of water circulated internally. The assembly was held within an evacuated (10^-5–10^-6 torr) quartz tube, and the finger could be removed at intervals for qualitative and quantitative analysis of sublimed materials collected onto its surface. While not giving information on specific vapor species, this apparatus was easier to set up and use than the Knudsen cell equipment, and gave good quantitative results.
+    - observation_id: naughton_1971_cold_finger_release_peaks
+      type: qualifying_statement_context
+      experiment: cold-finger-stepwise
+      locator:
+        published_page: 453
+        pdf_page_index: 4
+        section: Vaporization from Lunar Samples Heated in Vacuum
+        note: Quote runs from p. 453 onto p. 454.
+      units: verbatim; peak temperatures in K as printed
+      values:
+        method_class: author_estimate
+        quantity: alkali_release_peak_temperatures
+        release_peak_temperatures_K_as_printed:
+        - 800
+        - 1050
+        - 1200
+        quote: >-
+          Again heating was conducted in the same stepwise manner as in the Knudsen cell experiments. Time studies of alkali evolution showed that a steady-state release (diffusion controlled) of alkalis was quickly achieved, so one hour heating intervals were used. Research with alkali degraded and un-degraded terrestrial basalts showed a pattern of high alkali release in three regions discernible as three peaks centering around 800°K, 1050°K, and 1200°K (Fig. 3). These have been attributed to release of alkali to the sample surfaces along three pathways—directly from the surfaces, through diffusion in microcracks and grain boundaries, and volume diffusion through crystal lattices and through the melt. Samples that have been exposed to alkali vapors have prominent low-temperature release peaks. For lunar samples (Fig. 3) a middle-temperature release peak (1050°K) was found for surface samples and for lunar fines, but not for samples from the interior of the rocks examined.
+        note: Peak temperatures are the authors' approximate centres ("centering around"); they are not measured setpoints.
+    - observation_id: naughton_1971_fig3_potassium_release
+      type: figure_only
+      experiment: cold-finger-stepwise
+      locator:
+        published_page: 453
+        pdf_page_index: 4
+        figure: '3'
+      units: caption verbatim; figure not digitized (axes printed as PERCENT POTASSIUM LOSS/HR. vs TEMPERATURE, °C)
+      values:
+        method_class: figure_only
+        quantity: potassium_loss_rate_vs_temperature
+        panels_as_printed: UNREACTED BASALT HK-123; K-DEGRADED BASALT HK-123; INTERNAL SECTION LUNAR ROCK 12002,44; SURFACE SECTION LUNAR ROCK 12052,34; LUNAR FINES 12070,164
+        caption: >-
+          Fig. 3. Potassium released during stepwise heating of an unreacted tholeiite basalt, and a similar sample after degradation by potassium vapor. Comparison is made with release from internal and external sections of lunar rocks, and with release from lunar fines. Collection of vaporized potassium was made onto a cold finger surface. Dashed lines show characteristic temperature where release occurs from potassium degraded samples.
+    - observation_id: naughton_1971_potassium_vapor_exposure
+      type: qualifying_statement_context
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+        section: Erosion of Rocks by Alkali Vapors
+        note: Fig. 1 (p. 451) caption repeats "Maximum potassium vapor pressure about 10^-4 torr". Fig. 1 is a photograph pair and is figure-only.
+      units: verbatim; pressure in torr as printed
+      values:
+        method_class: measured_direct
+        quantity: potassium_vapor_exposure_conditions
+        max_potassium_vapor_pressure_torr_as_printed: about 10^-4
+        quote: >-
+          "Before and after" sequential photographs of the action of potassium vapor on a fine-grained terrestrial basalt are shown in Fig. 1. This sample was exposed to potassium vapor with a maximum pressure of about 10^-4 torr, through the sequence of a lunar day. A small piece of lunar rock 12022,47 exposed in the same manner was completely disintegrated.
+        figure_1_caption_locator: {published_page: 451, pdf_page_index: 2, figure: '1'}
+        figure_1_caption: >-
+          Fig. 1. The comminuting action of potassium vapor on terrestrial tholeiite basalt when exposed through the heating cycle of one lunar day. Maximum potassium vapor pressure about 10^-4 torr. A. Before exposure. B. After exposure. The dimensions covered by the photographs are 90 × 120 mm.
+        photograph_dimensions_mm_as_printed: 90 × 120
+        note: The apparatus for this exposure test is not described. Photograph caption values are carried; no image or curve was digitized.
+    - observation_id: naughton_1971_evaporated_nonalkali_elements
+      type: characterization
+      locator:
+        published_page: 454
+        pdf_page_index: 5
+        section: Vaporization from Lunar Samples Heated in Vacuum
+      units: verbatim
+      values:
+        method_class: measured_direct
+        quantity: other_elements_detected_in_evaporate
+        threshold_temperature_C_as_printed: above 850
+        quote: >-
+          In addition to the alkalis, it was possible to detect iron, calcium, and chlorine in the material evaporated from lunar samples treated at temperatures above 850°C, using trace analyses by atomic absorption and spectrophotometric absorption techniques. Aluminum, magnesium, silicon, copper, and titanium also were detected in lower amounts by emission spectroscopy.
+    - observation_id: naughton_1971_basaltic_fines_fragment_potassium
+      type: composition
+      locator:
+        published_page: 454
+        pdf_page_index: 5
+        section: Evidence of Alkali Condensation and Degradation in Lunar Samples
+      units: '% as printed; percentage basis not published'
+      values:
+        method_class: measured_direct
+        quantity: potassium_content_of_basaltic_fragments_in_lunar_fines
+        K_pct_as_printed: 0.66
+        size_fraction_mm_as_printed: between 0.1 and 1 mm diameter
+        analysis_method: atomic absorption
+        quote: >-
+          In order to make a similar comparison basaltic fragments from the lunar fines between 0.1 and 1 mm diameter in size were separated by hand-picking from other particles in the same size range and analyzed separately for alkalis by atomic absorption. Rock type of particles was verified by mounting and identifying as thin sections. An analysis of the small amount of basaltic pieces available was carried out by atomic absorption. These had a potassium content of 0.66%, a concentration about three times greater than that of the assorted other fragments in this size range, and approximately ten times the concentration of this element found in the crystalline rock samples collected in the Apollo 12 area.
+        note: The paper prints "0.66%" without stating mass or element-vs-oxide basis explicitly; recorded as printed under K (element), with the field name taken from the printed word "potassium". The fines sample number is not given in this passage.
+    - observation_id: naughton_1971_microprobe_surface_potassium
+      type: characterization
+      locator:
+        published_page: 455
+        pdf_page_index: 6
+        section: Evidence of Alkali Condensation and Degradation in Lunar Samples
+        note: Quote runs from p. 455 onto p. 456.
+      units: verbatim
+      values:
+        method_class: measured_reduced
+        quantity: near_surface_potassium_enrichment
+        interior_comparison_beyond_microns_as_printed: 70
+        scan_locations_as_printed: over 200
+        surface_enrichment_within_first_microns_as_printed: seventy
+        scan_population: Various regions of different samples; separate from the approximately 200 ten-second point counts on rock 12002,144.
+        survey_quote: >-
+          Scans for over 200 locations on various regions of different samples were taken with the electron microprobe. At each location, pictures of sample topography and of alkali and silicon distribution were made. Visual, photographic, and statistical observations of the surface edges show a tendency for potassium to be concentrated within the first seventy microns from the surface edge. The regions of such concentration were noted on the edges of crystals at the grain boundaries, on the surfaces of crystals along natural cracks or fissures, and along the undisturbed surface edge of the section. An extreme example of this type of concentration is shown in Fig. 4. Some areas of high K concentration showed an anticorrelation with the silicon content (Fig. 4). The basaltic fragments in the fines showed a higher content of potassium than that found in rock pieces as qualitatively judged from the microprobe scans.
+        reduction_limitation: Author statistical comparison; no raw counts, t statistic, degrees of freedom or printed test equation are published. No scored observation or invented inputs.
+        confidence_level_pct_as_printed: 90
+        quote: >-
+          In order to evaluate these differences more quantitatively, point counts of ten-second duration were made of random sections of rock 12002,144 for potassium and sodium X-ray emission, going inward from the surface in about 10-micron steps. Approximately 200 such point counts were carried out. "T-test" comparisons were made on the ratemeter read-outs of the rock surface regions and related to those from internal regions (beyond 70 microns). The tests showed that for this sample the potassium content of the surface regions was significantly higher than that of the internal regions to the 90% level of confidence. Sodium showed no such difference, as would be expected from the exchange mechanism proposed.
+    - observation_id: naughton_1971_filed_layers_aa_detectability
+      type: characterization
+      locator:
+        published_page: 456
+        pdf_page_index: 7
+        section: Evidence of Alkali Condensation and Degradation in Lunar Samples
+      units: verbatim; relative change detectability in percent as printed
+      values:
+        method_class: measured_direct
+        quantity: atomic_absorption_detectability_and_null_result
+        detectable_change_pct_as_printed:
+          Na: 1
+          K: 5
+        quote: >-
+          Thin regions were carefully removed by filing from sample 12052,63 going inward from the surface, and were subjected to analysis for alkalis by atomic absorption. Changes of about 1% for sodium and 5% for potassium would be detectable by this means, for the element concentration in these rocks in the size of sample used. No difference between the surface and the interior could be detected.
+    - observation_id: naughton_1971_fig4_microprobe_scans
+      type: figure_only
+      locator:
+        published_page: 455
+        pdf_page_index: 6
+        figure: '4'
+      units: caption verbatim; images not digitized
+      values:
+        method_class: figure_only
+        quantity: electron_microprobe_images
+        caption: >-
+          Fig. 4. Electron microprobe scan pictures of sections made normal to original surfaces of lunar samples. A. Electron backscatter image of rock 12002,140. B. K X-ray scan showing example of potassium concentration near surface in this rock. C. Si X-ray scan, and D., K X-ray scan of rock 12052,34 showing anticorrelation of silicon with potassium. Dimensions covered by the photographs are approximately 280 × 300 μ.
+    - observation_id: naughton_1971_prior_thermal_cycling_1965
+      type: qualifying_statement_context
+      locator:
+        published_page: 449
+        pdf_page_index: 0
+      units: "°C as printed; earlier cited thermal cycling"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "prior_work_thermal_cycling"
+        attribution: "Naughton et al. (1965), as cited on p. 449; full citation on p. 457"
+        temperature_C_as_printed: 100
+        quote: "Previously we have described (Naughton et al., 1965) the volatilization of alkali metals from rocks of basaltic composition when melted under high vacuum, and have noted the erosion of polycrystalline rocks when exposed to these vapors, even under mild thermal cycling (100°C)."
+        note: "Cited earlier work; not the present KEMS 100°C increment."
+    - observation_id: naughton_1971_terrestrial_degradation_fines_potassium
+      type: qualifying_statement_context
+      locator:
+        published_page: 454
+        pdf_page_index: 5
+      units: "relative potassium content as printed"
+      values:
+        method_class: "measured_direct"
+        quantity: "terrestrial_fines_relative_potassium"
+        fold_increase_as_printed: "approximately a two-fold increase"
+        quote: "Fines that result from the potassium degradation of terrestrial basaltic rocks show approximately a two-fold increase in potassium content over that of the parent rock."
+        note: "Terrestrial degradation product; distinct from lunar fragments' three-/ten-times comparisons."
+    - observation_id: naughton_1971_argon40_potassium40_hypothesis
+      type: qualifying_statement_context
+      locator:
+        published_page: 456
+        pdf_page_index: 7
+      units: "isotope identifiers as printed; hypothesis, unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "tentative_condensate_decay_interpretation"
+        argon_isotope_as_printed: "argon-40"
+        potassium_isotope_as_printed: "potassium-40"
+        quote: "Also the anomaly of a high argon-40 content which has been found in the surface of lunar fines (Hanneman, 1970; Heymann and Yaniv, 1970; Hintenberger et al., 1970; Marti et al., 1970; Pepin et al., 1970) might be explained in part as an implantation from the decay of the potassium-40 in a surficial potassium condensate layer on these particles, with subsequent loss of the exposed potassium layer by evaporation or solar wind sputtering."
+        note: "Tentative author hypothesis; isotope labels are not measured decay yields or pressures."
+    - observation_id: naughton_1971_source_metadata
+      type: source_metadata
+      locator:
+        published_page: 449
+        pdf_page_index: 0
+      units: "dates, postal/contribution numbers, volume and pages; source metadata"
+      values:
+        method_class: "method_only"
+        quantity: "printed_bibliographic_administrative_metadata"
+        masthead: "Proceedings of the Second Lunar Science Conference, Vol. 1, pp. 449–457. The M.I.T. Press, 1971."
+        authors: "John J. Naughton, James V. Derby, and Virginia A. Lewis"
+        affiliation: "Chemistry Department and Hawaii Institute of Geophysics, University of Hawaii, Honolulu, Hawaii, 96822"
+        received_as_printed: "22 February 1971"
+        accepted_as_printed: "15 March 1971"
+        contribution_as_printed: "Hawaii Institute of Geophysics Contribution No. 394"
+        printed_credit: "© Lunar and Planetary Institute • Provided by the NASA Astrophysics Data System"
+        note: "Metadata/administrative identifiers, not scientific measurements; credit does not establish redistribution permission."
+    - observation_id: naughton_1971_abstract_evidence_enumeration
+      type: qualifying_statement_context
+      locator:
+        published_page: 449
+        pdf_page_index: 0
+      units: "printed source context; unscored"
+      values:
+        method_class: "measured_direct"
+        quantity: "abstract_evidence_enumeration"
+        evidence_as_printed: ["(1) A high content of K was found in the basaltic component of the lunar fines examined, when compared to the accompanying rock from which presumably they were derived.","(2) From electron microprobe studies, regions of significantly high K content were found on or near the original lunar surfaces, which in some cases showed an anticorrelation with Si.","(3) On heating in a vacuum a low-temperature release pattern was found for K from lunar surface rocks and fines relative to that found for the rock interiors, indicating the presence of surficial K."]
+        note: "Enumeration labels 1–3 identify observations; they are not measured counts. Condensation/erosion and surficial K are the authors' interpretation."
+    - observation_id: naughton_1971_inline_citations_449
+      type: source_metadata
+      locator:
+        published_page: 449
+        pdf_page_index: 0
+      units: "printed source context; unscored"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_inline_citations_and_mission_identifiers"
+        attribution: "Cited sources as printed on this page; full references on pp. 456–457"
+        citations_as_printed: ["Asunmaa et al., 1970","Crozaz et al., 1970","Naughton et al., 1965 (first Introduction paragraph)","LSPET, 1970","Naughton et al., 1965 (Previously we have described paragraph)","Keays et al., 1970","Ringwood and Essene, 1970","Agrell et al., 1970","Gast and Hubbard, 1970 (continues onto p. 450)"]
+        mission_identifiers_as_printed: ["Apollo 11"]
+        note: "Dates and mission identifiers are source context, not measurements imported from external references."
+    - observation_id: naughton_1971_inline_citations_450
+      type: source_metadata
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+      units: "printed source context; unscored"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_inline_citations_and_mission_identifiers"
+        attribution: "Cited sources as printed on this page; full references on pp. 456–457"
+        citations_as_printed: ["Gast and Hubbard, 1970 (continued)","O'Hara et al., 1970","Vinogradov, 1971","Asunmaa et al., 1970","Hapke et al., 1971","Carter and MacGregor, 1970","LSPET, 1970","Brewer, 1953","Carlson, 1967"]
+        mission_identifiers_as_printed: ["Apollos 11 and 12"]
+        note: "Dates and mission identifiers are source context, not measurements imported from external references."
+    - observation_id: naughton_1971_inline_citations_454
+      type: source_metadata
+      locator:
+        published_page: 454
+        pdf_page_index: 5
+      units: "printed source context; unscored"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_inline_citations_and_mission_identifiers"
+        attribution: "Cited sources as printed on this page; full references on pp. 456–457"
+        citations_as_printed: ["Frondel et al., 1970"]
+        mission_identifiers_as_printed: ["Apollo 12 (present fragments comparison)","Apollo 11 (cited Frondel fines comparison)"]
+        note: "Dates and mission identifiers are source context, not measurements imported from external references."
+    - observation_id: naughton_1971_inline_citations_456
+      type: source_metadata
+      locator:
+        published_page: 456
+        pdf_page_index: 7
+      units: "printed source context; unscored"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_inline_citations_and_mission_identifiers"
+        attribution: "Cited sources as printed on this page; full references on pp. 456–457"
+        citations_as_printed: ["Hapke et al., 1971","Keller and Huang, 1971","Hanneman, 1970","Heymann and Yaniv, 1970","Hintenberger et al., 1970","Marti et al., 1970","Pepin et al., 1970"]
+        mission_identifiers_as_printed: []
+        note: "Dates and mission identifiers are source context, not measurements imported from external references."
+    - observation_id: naughton_1971_grant_acknowledgment
+      type: source_metadata
+      locator:
+        published_page: 456
+        pdf_page_index: 7
+      units: "printed source context; unscored"
+      values:
+        method_class: "method_only"
+        quantity: "printed_funding_identifier"
+        grant_as_printed: "NGR 12-001-081"
+        agency: "National Aeronautics and Space Administration"
+        note: "Acknowledgments grant identifier; not a scientific scalar."
+    - observation_id: naughton_1971_references_456
+      type: source_metadata
+      locator:
+        published_page: 456
+        pdf_page_index: 7
+      units: "bibliographic identifiers as printed; no imported measurements"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_reference_list"
+        attribution: "Bibliography printed on this page; no reference was consulted for scientific data"
+        references_as_printed: ["Agrell S. O., Scoon J. H., Muir I. D., Long J. V. P., McConnell J. D. C., and Peckett A. (1970). Observations on the chemistry, mineralogy and petrology of some Apollo 11 lunar samples. Proc. Apollo 11 Lunar Sci. Conf., Geochim. Cosmochim. Acta Suppl. 1, Vol. 1, pp. 93–128. Pergamon.","Asunmaa S. K., Liang S. S., and Arrhenius G. (1970). Primordial accretion; inferences from the lunar surface. Proc. Apollo 11 Lunar Sci. Conf., Geochim. Cosmochim. Acta Suppl. 1, Vol. 3, pp. 1975–1985. Pergamon."]
+        note: "All printed years, mission/isotope/title identifiers, chapter/volume/supplement numbers and page spans retained as bibliographic context."
+    - observation_id: naughton_1971_references_457
+      type: source_metadata
+      locator:
+        published_page: 457
+        pdf_page_index: 8
+      units: "bibliographic identifiers as printed; no imported measurements"
+      values:
+        method_class: "quoted_attributed"
+        quantity: "printed_reference_list"
+        attribution: "Bibliography printed on this page; no reference was consulted for scientific data"
+        references_as_printed: ["Brewer L. (1953). The thermodynamic properties of the oxides and their vaporization processes. Chem. Reviews 52, 1–75.","Carlson K. D. (1967). The Knudsen effusion method. In The Characterization of High Temperature Vapors (editor J. L. Margrave), Chap. 5, pp. 115–129. Wiley.","Carter J. L. and MacGregor I. D. (1970). Mineralogy, petrology, and surface features of some Apollo 11 samples. Proc. Apollo 11 Lunar Sci. Conf., Geochim. Cosmochim. Acta Suppl. 1, Vol. 1, pp. 247–265. Pergamon.","Crozaz G., Haack U., Hair M., Maurette M., Walker R., and Woolum D. (1970). Nuclear track studies of ancient solar radiation and dynamic lunar surface processes. Proc. Apollo 11 Lunar Sci. Conf., Geochim. Cosmochim. Acta Suppl. 1, Vol. 3, pp. 2051–2080. Pergamon.","Frondel C., Klein C., Jr., Ito J., and Drake J. C. (1970). Mineralogical and chemical studies of Apollo 11 lunar fines and selected rocks. Proc. Apollo 11 Lunar Sci. Conf., Geochim. Cosmochim. Acta Suppl. 1, Vol. 1, pp. 445–474. Pergamon.","Gast P. W. and Hubbard N. J. (1970). Abundance of alkali metals, alkaline earths, and strontium-87/strontium-86 ratios in lunar samples. Science 167, 485–487.","Hanneman R. E. (1970). Thermal and gas evolution behavior of Apollo 11 samples. Proc. Apollo 11 Lunar Sci. Conf., Geochim. Cosmochim. Acta Suppl. 1, Vol. 2, pp. 1207–1211. Pergamon.","Hapke B. W., Cassidy W. A., and Wells E. N. (1971). The albedo of the moon: Evidence for vapor-phase deposition processes on the lunar surface. Second Lunar Science Conference (unpublished proceedings).","Heymann D. and Yaniv A. (1970). Ar^40 anomaly in lunar samples from Apollo 11. Proc. Apollo 11 Lunar Sci. Conf., Geochim. Cosmochim. Acta Suppl. 1, Vol. 2, pp. 1261–1267. Pergamon.","Hintenberger H., Weber H. W., Voshage H., Wänke H., Begemann F., and Wlotzka F. (1970). Concentrations and isotopic abundances of the rare gases, hydrogen and nitrogen in Apollo 11 lunar matter. Proc. Apollo 11 Lunar Sci. Conf., Geochim. Cosmochim. Acta Suppl. 1, Vol. 2, pp. 1269–1282. Pergamon.","Keays R. R., Ganapathy R., Laul J. C., Anders E., Herzog G. F., and Jeffrey P. M. (1970). Trace elements and radioactivity in lunar rocks: Implications for meteorite infall, solar-wind flux, and formation conditions of moon. Science 167, 490–493.","Keller W. D. and Huang W. H. (1971). Response of Apollo 12 lunar dust to reagents simulative of those in the weathering environment of the earth. Second Lunar Science Conference (unpublished proceedings).","LSPET (Lunar Sample Preliminary Examination Team) (1970). Preliminary examination of lunar samples from Apollo 12. Science 167, 1325–1339.","Marti K., Lugmair G. W., and Urey H. C. (1970). Solar wind gases, cosmic-ray spallation products and the irradiation history of Apollo 11 samples. Proc. Apollo 11 Lunar Sci. Conf., Geochim. Cosmochim. Acta Suppl. 1, Vol. 2, pp. 1357–1367. Pergamon.","Naughton J. J., Barnes I. L., and Hammond D. A. (1965). Rock degradation by alkali metals: A possible lunar erosion mechanism. Science 149, 630–632.","O'Hara M. J., Biggar G. M., and Richardson S. W. (1970). Experimental petrology of lunar materials: The nature of mascons, seas, and the lunar interior. Science 167, 605–607.","Pepin R. O., Nyquist L. E., Phinney D., and Black D. C. (1970). Rare gases in Apollo 11 lunar material. Proc. Apollo 11 Lunar Sci. Conf., Geochim. Cosmochim. Acta Suppl. 1, Vol. 2, pp. 1435–1454. Pergamon.","Ringwood A. E. and Essene E. (1970). Petrogenesis of lunar basalts and the internal constitution and origin of the moon. Science 167, 607–610.","Vinogradov A. P. (1971). Preliminary data on lunar ground brought back to earth by automatic probe “Luna 16.” Second Lunar Science Conference (unpublished proceedings)."]
+        note: "All printed years, mission/isotope/title identifiers, chapter/volume/supplement numbers and page spans retained as bibliographic context."
+    - observation_id: naughton_1971_erosion_and_release_qualifications
+      type: qualifying_statement_context
+      locator:
+        published_page: 450
+        pdf_page_index: 1
+      units: "printed source context; unscored"
+      values:
+        method_class: "author_estimate"
+        quantity: "observed_comparisons_and_tentative_mechanisms"
+        qualifications: [{"published_page":450,"pdf_page_index":1,"quote":"Of the abundant alkalis, sodium has been found to have a slight comminuting effect when tested on terrestrial basalts, but potassium is many times more active in this regard.","status":"Authors' qualitative observed comparison."},{"published_page":450,"pdf_page_index":1,"quote":"There is evidence that an exchange takes place between the potassium vapor and minerals containing sodium, with increased release of sodium vapor from rocks degraded by potassium.","status":"Evidence with proposed alkali-exchange interpretation."},{"published_page":450,"pdf_page_index":1,"quote":"It is noteworthy that glasses or glassy rocks are not attacked.","status":"Authors' observed material qualification; no numeric rate printed."},{"published_page":454,"pdf_page_index":5,"quote":"This suggests that potassium is present at accessible sites in an easily released form on the surface and dust samples, and that it could have been contributed by vapor deposition.","status":"Tentative interpretation of middle release peak, not a new measurement."},{"published_page":456,"pdf_page_index":7,"quote":"However, chemical leaching of the surface of samples of lunar fines as reported by Hapke et al. (1971) and by Keller and Huang (1971) showed potassium as a significant component.","status":"Quoted prior-work qualification of present AA null result."},{"published_page":456,"pdf_page_index":7,"quote":"Verification of these observations on additional samples from diverse areas of the moon would be desirable.","status":"Authors' conclusion limits the evidence."},{"published_page":450,"quote":"Also Russian investigators (Vinogradov, 1971) have noted the violent vaporization that would occur from lava erupted into the lunar vacuum. This latter type of loss is pertinent to the erosional process discussed here, since there would be concomitant condensation of the volatilized vapor in adjacent cooler areas.","status":"Cited prior work and author interpretation; not an independently measured rate.","pdf_page_index":1},{"published_page":450,"quote":"The pathway of vapor access to minerals is on exposed surfaces, but comminution is most likely to result from infiltration along microcracks and grain boundaries. It is probable that the greater specific volume of the exchanged mineral when confined between crystals results in stresses which lead to sundering.","status":"Tentative comminution mechanism.","pdf_page_index":1},{"published_page":450,"quote":"Polycrystalline rocks seem to break apart at grain boundaries, giving smaller pieces or individual crystals. The particles of rock powder are “sticky” and adhere to the larger pieces, with a striking resemblance to the lunar fines.","status":"Qualitative grain-boundary/material comparison.","pdf_page_index":1},{"published_page":450,"quote":"The importance of potassium as a vapor component is a consequence of the generally higher dissociation vapor pressure of potassium compounds (Brewer, 1953).","status":"Cited qualitative pressure comparison; no numeric external-reference pressure imported.","pdf_page_index":1},{"published_page":454,"quote":"Sodium showed little or no evidence of surface segregation, which would be expected if sodium exchange is involved as the mechanism of comminution.","status":"Observed sodium null comparison with tentative exchange interpretation.","pdf_page_index":5},{"published_page":454,"quote":"In the subsequent experiments, potassium-silicon correlations were studied to enable differentiation between potassium associated with regions of high silicon content, as in the mesostasis, and unassociated or anticorrelated potassium which might be ascribed to other concentrating mechanisms such as vapor condensation.","status":"Method/interpretation qualification; sentence continues onto p. 455.","pdf_page_index":5}]
+        note: "Qualitative observations and tentative mechanisms distinguished; no new pressure/activity value or reduction model."
+  Na:
+    observations: []
+    context:
+    - observation_id: naughton_1971_potassium_triggered_sodium_release
+      type: qualifying_statement_context
+      experiment: cold-finger-stepwise
+      locator:
+        published_page: 454
+        pdf_page_index: 5
+        section: Vaporization from Lunar Samples Heated in Vacuum
+      units: verbatim
+      values:
+        method_class: measured_direct
+        quantity: sodium_release_enhancement
+        quote: >-
+          Also it was noted that the ease of sodium release was increased for rock samples that have been partially eroded by exposure to potassium vapor, suggesting that alkali exchange is involved in the erosion mechanism. A similar pattern of anomalous potassium-triggered release of sodium was noted for lunar surface and fines samples, although not for interior samples, again suggestive of surficial potassium available for exchange.

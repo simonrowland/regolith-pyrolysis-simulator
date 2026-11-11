@@ -598,16 +598,18 @@ from simulator.fe_redox import (
     _non_absolute_redox_state_kwargs,
     _reanchor_redox_state,
     calphad_ferrous_feo_activity_diagnostic,
-    feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
     floor_vacuum_pressure_bar,
     intrinsic_melt_fO2,
-    legacy_iw_log10_fO2_bar,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_ln_fO2_temperature_delta,
     kress91_split,
     melt_mol_fractions_for_kress91,
     normalize_redox_state,
+)
+from simulator.oxygen_buffers import (
+    feo_iw_log10_fO2_bar,
+    legacy_iw_log10_fO2_bar,
 )
 from simulator.melt_regime import (
     MeltRegime,

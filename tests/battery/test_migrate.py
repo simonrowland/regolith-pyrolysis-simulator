@@ -86,6 +86,7 @@ from simulator.battery.migrate import (
     load_migrated_context,
     QUANTITY_SOURCE_FIELDS,
     map_phase,
+    _kelley_king_formula_phase_suffix,
     map_quantity,
     select_declared_source,
     parse_quantity_suffix,
@@ -7585,6 +7586,7 @@ def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
     assert mapped.is_unknown and why is not None
 
     for spelling in (
+        "c",
         "quenched_silicate_glass",
         "quenched silicate glass; recalculated",
     ):
@@ -9294,6 +9296,120 @@ def test_bencze_2016_reference_temperature_is_bound(tmp_path: Path) -> None:
     )
 
 
+def test_bencze_2016_table_s1_1273k_partial_pressure_is_the_printed_glyph(
+    tmp_path: Path,
+) -> None:
+    """Table S-I prints p(Na) as ``1.70·10-2`` Pa at the parent's 1273 K.
+
+    The sibling activity ``7.57·10-9`` is not this quantity. A caret power
+    and a printed ± on the mantissa stay unavailable. A and B are not gridded.
+    """
+
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/bencze-yazhenskikh-2016.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    na_rows = source["species"]["Na"]["observations"]
+    table_s1 = next(
+        row for row in na_rows if row["observation_id"] == "bencze_2016_table_s1_na_all_subsamples"
+    )
+    printed = table_s1["values"]["rows"][0]
+    assert printed["p_Na_at_1273_K_Pa"] == "1.70·10-2"
+    assert printed["a_Na2O_at_1273_K"] == "7.57·10-9"
+    assert printed["A"] == 45.439
+    assert printed["B"] == -63030
+
+    selected = select_declared_source(Quantity.P_PARTIAL, "Pa", printed)
+    assert selected.field_name == "p_Na_at_1273_K_Pa"
+    assert selected.value.kind is ValueKind.POINT
+    assert selected.amount == Decimal("1.70e-2")
+    assert selected.unit_trail == "identity:Pa"
+    # The printed cell, not exp(A + B/1273). That fit is about 0.01701 Pa.
+    fit_pa = Decimal(str(math.exp(45.439 + (-63030) / 1273)))
+    assert abs(selected.amount - fit_pa) > Decimal("1e-6")
+
+    activity_only = {
+        key: value for key, value in printed.items() if key != "p_Na_at_1273_K_Pa"
+    }
+    refused_activity = select_declared_source(Quantity.P_PARTIAL, "Pa", activity_only)
+    assert refused_activity.value.kind is ValueKind.UNAVAILABLE
+    assert "no mapped p_partial" in (refused_activity.reason or "")
+    assert refused_activity.amount != Decimal("7.57e-9")
+    activity_quantity = select_declared_source(Quantity.ACTIVITY, None, printed)
+    assert activity_quantity.value.kind is ValueKind.UNAVAILABLE
+    assert activity_quantity.amount != Decimal("7.57e-9")
+
+    caret = dict(printed)
+    caret["p_Na_at_1273_K_Pa"] = "1.70·10^-2"
+    caret_selection = select_declared_source(Quantity.P_PARTIAL, "Pa", caret)
+    assert caret_selection.value.kind is ValueKind.UNAVAILABLE
+
+    table_s2 = next(
+        row for row in na_rows if row["observation_id"] == "bencze_2016_table_s2_na_selected_means"
+    )
+    mean_row = table_s2["values"]["rows"][0]
+    assert mean_row["p_Na_at_1273_K_Pa"] == "(5.45±0.61)·10-2"
+    mean_selection = select_declared_source(Quantity.P_PARTIAL, "Pa", mean_row)
+    assert mean_selection.value.kind is ValueKind.UNAVAILABLE
+    assert "not numeric" in (mean_selection.reason or "")
+    assert "(5.45±0.61)·10-2" in (mean_selection.reason or "")
+    assert mean_selection.amount != Decimal("5.45e-2")
+
+    potassium = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/extracts/bencze-yazhenskikh-2016-table-s1-k.yaml"
+        ).read_text(encoding="utf-8")
+    )["rows"][0]
+    assert potassium["p_K_at_1273_K_Pa"] == "5.52·10-4"
+    assert potassium["a_K2O_at_1273_K"] == "1.13·10-14"
+    potassium_selection = select_declared_source(Quantity.P_PARTIAL, "Pa", potassium)
+    assert potassium_selection.field_name == "p_K_at_1273_K_Pa"
+    assert potassium_selection.amount == Decimal("5.52e-4")
+    assert potassium_selection.amount != Decimal("1.13e-14")
+
+    result = _migrate_real_extract(tmp_path, "bencze-yazhenskikh-2016.yaml")
+    assert len(result.observations) == 70
+    example = result.observations[
+        "bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples"
+        "::rows:row=1:h=db6e6e110926"
+    ]
+    assert example.value.kind is ValueKind.POINT
+    assert example.value.point == Decimal("1.70e-2")
+    assert example.identity.quantity.value is Quantity.P_PARTIAL
+    assert example.identity.temperature_K.value == Decimal("1273")
+    assert example.identity.species.formula == "Na"
+    assert example.value.point != Decimal("7.57e-9")
+
+    points = [
+        observation
+        for observation in result.observations.values()
+        if observation.value.kind is ValueKind.POINT
+    ]
+    unavailable = [
+        observation
+        for observation in result.observations.values()
+        if observation.value.kind is ValueKind.UNAVAILABLE
+    ]
+    assert len(points) == 61
+    assert {observation.value.point for observation in points} >= {Decimal("1.70e-2")}
+    assert Decimal("7.57e-9") not in {observation.value.point for observation in points}
+    assert len(unavailable) == 9
+    mean = result.observations[
+        "bencze-yazhenskikh-2016::bencze_2016_table_s2_na_selected_means"
+        "::rows:row=s1-1:h=1d0d1e2bbace"
+    ]
+    assert mean.value.kind is ValueKind.UNAVAILABLE
+    assert "(5.45±0.61)·10-2" in (mean.value.unavailable_reason or "")
+    potassium_shell = result.observations[
+        "bencze-yazhenskikh-2016::bencze_2016_table_s1_k_all_subsamples"
+    ]
+    assert potassium_shell.value.kind is ValueKind.UNAVAILABLE
+    assert "table_transcription" in (potassium_shell.value.unavailable_reason or "")
+    assert "no mapped p_partial" in (potassium_shell.value.unavailable_reason or "")
+
+
 @pytest.mark.parametrize(
     "extra, expected",
     [
@@ -9608,6 +9724,51 @@ def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = 
     row["units"] = units
     row["values"] = values
     return extract
+
+
+def test_prose_percent_fraction_conversion_keeps_basis_and_semicolon_units(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="S6+/ΣS as printed in percent",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "mass_loss_fraction": "74.5",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.745")
+
+    semicolon = select_declared_source(
+        Quantity.MASS_LOSS_FRACTION,
+        "experimental time in hours; evaporated fraction in percent",
+        {"mass_loss_fraction": "74.5"},
+    )
+    assert semicolon.value.point == Decimal("0.745")
+    assert semicolon.unit_trail == "percent_to_fraction"
+
+    wt_percent = select_declared_source(
+        Quantity.MASS_LOSS_FRACTION,
+        "wt%",
+        {"mass_loss_fraction": "74.5"},
+    )
+    assert wt_percent.value.point == Decimal("0.745")
+    assert wt_percent.unit_trail == "percent_to_fraction"
+
+    reduced_valence = select_declared_source(
+        Quantity.VALENCE_RATIO,
+        "% of total Mn",
+        {"value": "0.045", "value_as_published": "4.5"},
+    )
+    assert reduced_valence.value.point == Decimal("0.045")
+    assert reduced_valence.unit_trail != "percent_to_fraction"
 
 
 def test_partial_molar_enthalpy_value_field_migrates_as_numeric_point(
@@ -14167,6 +14328,55 @@ def test_g5_compilation_column_series_maps_pankratz_and_kelley() -> None:
     assert k_by_key["entropy_recommended"].value.point == as_decimal("111.21072")
 
 
+@pytest.mark.parametrize(
+    ("formula", "printed_phase", "expected_formula", "expected_phase"),
+    (
+        ("AlCl3(c)", "(c)", "AlCl3", Phase.CR),
+        ("Ni(g)", "(g)", "Ni", Phase.G),
+        ("Na(l)", "(l)", "Na", Phase.L),
+        ("H2O(aq)", "(aq)", "H2O(aq)", None),
+        ("AlCl3(c)", "(l)", "AlCl3(c)", None),
+    ),
+)
+def test_kelley_king_phase_suffix_is_separated_using_closed_map(
+    formula: str,
+    printed_phase: str,
+    expected_formula: str,
+    expected_phase: Phase | None,
+) -> None:
+    normalized, phase = _kelley_king_formula_phase_suffix(formula, printed_phase)
+    assert normalized == expected_formula
+    if expected_phase is None:
+        assert phase is None
+    else:
+        assert phase is not None and phase.is_value and phase.value is expected_phase
+
+
+def test_kelley_king_phase_suffix_reaches_migrated_species(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(
+        root, "kelley-king-1961-usbm-b592", "table-006-0007.json"
+    )
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if "table-006-0007" in observation.observation_id
+    ]
+    assert rows
+    assert {quantity_token(row.identity) for row in rows} == {
+        None,
+        Quantity.CP,
+        Quantity.S,
+    }
+    assert all(row.identity.species.formula == "AlCl3" for row in rows)
+    assert all(
+        row.identity.species.phase.is_value
+        and row.identity.species.phase.value is Phase.CR
+        for row in rows
+    )
+
+
 def test_pankratz_source_units_convert_and_missing_units_refuse() -> None:
     page = json.loads(
         (
@@ -14204,6 +14414,52 @@ def test_pankratz_source_units_convert_and_missing_units_refuse() -> None:
     assert selection.value.unavailable_reason == (
         "missing printed unit for cp; refusing ungrounded numeric value"
     )
+
+
+def test_pankratz_1987_crystal_columns_reach_separate_series(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(
+        root, "pankratz-1987-usbm-b689", "page-0005.json"
+    )
+    _copy_compilation_record(root, "nasa-glenn", "NG-1475.json")
+    _copy_compilation_record(root, "burcat", "BU-2430.json")
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "pankratz-1987-usbm-b689:page-0005"
+        )
+    ]
+    by_quantity = {
+        quantity_token(observation.identity): observation
+        for observation in rows
+        if quantity_token(observation.identity)
+        in {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    }
+    assert set(by_quantity) == {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    for observation in by_quantity.values():
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.CR
+        assert observation.value.kind is ValueKind.SERIES
+        assert len(observation.value.series or ()) == 14
+
+    for source_id, record_id in (
+        ("nasa-glenn", "NG-1475"),
+        ("burcat", "BU-2430"),
+    ):
+        record_prefix = f"{source_id}:{record_id}"
+        observations = [
+            observation
+            for observation in result.observations.values()
+            if observation.observation_id == record_prefix
+            or observation.observation_id.startswith(f"{record_prefix}:")
+        ]
+        assert observations
+        assert all(
+            observation.identity.species.phase.is_unknown
+            for observation in observations
+        )
 
 
 def test_g5_compilation_conversion_trail_mutation_proof(

@@ -6,6 +6,7 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as battery_migrate
+from simulator.battery.enums import NoticeKind
 from tests.helpers.literature_extract import find_context_row
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -57,6 +58,19 @@ TABLE2_GRID = [
     ("E30", "rim", 15, "Cr2O3-DiAn", "FMQ+2", "MgChr", ("3.11(2.05)", "D.L.", "D.L.", "2.72(33)", "19.31(48)", "0.15(11)", "73.35(3.5)", "D.L."), "98.64", "2.16"),
 ]
 TABLE2_COMPONENTS = ("Al2O3", "SiO2", "MnO", "FeO", "MgO", "TiO2", "Cr2O3", "V2O3")
+
+# Table 3 is 1440 °C = 1713.15 K at 1 atm = 1.01325 bar. That is above
+# O'Neill (1987) QFM's 900–1420 K EMF window, so a printed offset is
+# predicted and flagged. μ° = -587474 + 1584.427 T - 203.3164 T ln(T)
+# + 0.092710 T² J/mol, and log10(fO2/bar) = μ°/(R T ln 10) with
+# R = 8.31446261815324. At 1713.15 K the 1-bar value is -5.932654703.
+# Frost (1991) beta-quartz QFM adds C(P-1)/T = 0.110*(1.01325-1)/1713.15
+# = 8.508e-7 dex (K/bar * bar / K). Offset rows use that sum; bare FMQ
+# has no printed numeric offset and stays unconverted.
+_ZAGRTDENOV_QFM_LOG10_BAR = {
+    "FMQ-2": Decimal("-7.932653852"),
+    "FMQ+2": Decimal("-3.932653852"),
+}
 
 
 def _table1_grid(document):
@@ -228,7 +242,23 @@ def test_isolated_migration_scores_numeric_glass_components_and_preserves_condit
         assert row.point_conditions["fO2_control"].locator.page == 41
         assert row.point_conditions["total_pressure_Pa"].locator.page == 6
         assert "fO2_log" not in row.point_conditions
-        assert not row.notices
+        buffer = row.point_conditions["fO2_control"].state.value
+        expected_log = _ZAGRTDENOV_QFM_LOG10_BAR.get(buffer)
+        if expected_log is None:
+            assert not row.notices
+        else:
+            assert row.identity.fO2_Pa is not None and row.identity.fO2_Pa.is_value
+            assert abs(
+                row.identity.fO2_Pa.value.log10() - Decimal(5) - expected_log
+            ) < Decimal("5e-9")
+            band_notices = [
+                notice
+                for notice in row.notices
+                if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            ]
+            assert len(band_notices) == 1
+            assert "900" in (band_notices[0].band or "")
+            assert "1420" in (band_notices[0].band or "")
         if cell == "D.L.":
             assert row.value.kind.value == "unavailable"
             assert values["component_amount"]["tag"] == "unknown"

@@ -179,6 +179,8 @@ PATH_VALUE_KEYS = frozenset(
         "source_pdf",
         "source_pdf_path",
         "original_scan",  # Gibson & Hubbard anchor aliased into source_path
+        "csv",
+        "inventory_csv",
         "table_csv",  # 110 tables/... values
         "table_file",
         "table_path",

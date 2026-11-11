@@ -1065,6 +1065,22 @@ def test_zigo_equation_and_prose_locators_bind_to_their_physical_pages():
     assert re.search(r"\(\s*7\s*\)", page9) and "172.1" in page9
     assert re.search(r"\(\s*[8S]\s*\)", page9) and re.search(r"9\s*2\s*4", page9)
     assert "1857" in page10 and "1866" in page10
+    derivation_pins = (
+        ("zigo_1987_fusion_enthalpy_at_1863K", 9, 8, 179, "7"),
+        ("zigo_1987_fusion_entropy_at_1863K", 9, 8, 179, "8"),
+        ("zigo_1987_fusion_temperature_sensitivity", 10, 9, 180, None),
+    )
+    for observation_id, page, index, folio, equation in derivation_pins:
+        locator = observations[observation_id]["values"]["derivation"]["locator"]
+        assert (locator["page"], locator["pdf_page_index"], locator["published_page"]) == (
+            page,
+            index,
+            folio,
+        )
+        if equation is not None:
+            assert locator["equation"] == equation
+    assert re.search(r"\(1987\)\s+179", page9)
+    assert re.search(r"\(1987\)\s+180", page10)
 
 
 def test_figure_caption_regex_handles_spacing_and_japanese_suffix():

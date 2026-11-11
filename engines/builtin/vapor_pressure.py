@@ -752,6 +752,12 @@ def _k2o_authority_exclusion_for_pack_digest(
 # OpenIMCC above it pending investigation of OpenIMCC's 1700-1950 K SiO
 # under-prediction. This source-selection boundary is not a VapoRock band edge.
 BUILTIN_VAPOUR_CHANNEL_SWITCH_K = 1950.0
+# Same physical outcome as _internal_analytical_equilibrium's cold path.
+# simulator.evaporation accepts an empty pressure map below this limit only
+# when the equilibrium diagnostic carries this exact token. The subprocess
+# projection reads the token; it does not grow a second temperature check.
+BUILTIN_VAPOR_BELOW_400K_LIMIT_K = 400.0
+BUILTIN_VAPOR_BELOW_400K_ZERO_REASON = "internal_analytical_below_400K"
 
 
 def openimcc_binding_selected_by_inputs(
@@ -3076,10 +3082,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
         T_C = request.temperature_C
         T_K = T_C + 273.15
-        if T_K < 400:
+        if T_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             # Mirrors _internal_analytical_equilibrium: below 400 K, no significant
             # evaporation. Return an empty vapor-pressure dict with an
             # 'ok' status -- this is a converged outcome, not a failure.
+            # The reason and notice are the typed case. A status=ok empty map
+            # without them is still an unsourced payload.
             return IntentResult(
                 intent=ChemistryIntent.VAPOR_PRESSURE,
                 status="ok",
@@ -3089,6 +3097,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activities": {},
                     # Below 400 K nothing is evaluated, so the omission map is empty.
                     "below_reporting_threshold_omissions": {},
+                    "vapor_pressure_zero_reason": (
+                        BUILTIN_VAPOR_BELOW_400K_ZERO_REASON
+                    ),
+                    "vapor_pressure_authority_notice": {
+                        "kind": "vapor_pressure_authority_notice",
+                        "reason": BUILTIN_VAPOR_BELOW_400K_ZERO_REASON,
+                        "authority": self.name,
+                        "band": {
+                            "temperature_K": [
+                                0.0,
+                                BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
+                            ],
+                        },
+                    },
                 },
             )
 

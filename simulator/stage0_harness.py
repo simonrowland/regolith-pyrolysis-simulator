@@ -32,6 +32,7 @@ from simulator.core import (
     STAGE0_FOULANT_PHASE2_TEMP_C,
     PyrolysisSimulator,
 )
+from simulator.oxygen_buffers import cco_log10_fO2_bar
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.session import SimSession, SimSessionConfig, StepResult
@@ -624,6 +625,7 @@ def run_stage0_harness(
         engine=engine,
         timeline=tuple(timeline),
         T_in_C=T_in_C,
+        cco_reference_log10_fO2_bar=cco_log10_fO2_bar(T_in_C + 273.15, 1.0),
     )
     return Stage0HarnessResult(
         early_melt_reached=True,

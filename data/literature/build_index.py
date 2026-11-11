@@ -12,6 +12,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import yaml
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from simulator.corpus_paths import regolith_corpus_root
+
 SCHEMA = "literature_index.v1"
 STATUS_SCHEMA = "literature_source_status.v1"
 STORE_SUMMARY_SCHEMA = "literature_observation_store_summary.v1"
@@ -779,7 +784,7 @@ def build_alias_map(extracts, pdfs, measurements, presets):
 
 def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_json: Path | None = None, root_label: str = ".") -> dict:
     root = root.resolve()
-    corpus = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+    corpus = regolith_corpus_root()
     corpus_commit = None
     if (corpus / ".git").exists():
         try:
@@ -1414,8 +1419,7 @@ def build_source_status(root: Path, *, corpus: Path | None = None, now: datetime
                         root_label: str = ".") -> dict:
     """Derive one registry row per source_id from artefacts. Never read a stage field."""
     root = root.resolve()
-    corpus = Path(corpus) if corpus is not None else Path(
-        os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+    corpus = Path(corpus) if corpus is not None else regolith_corpus_root()
     now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         now = now.replace(tzinfo=timezone.utc)
@@ -1559,6 +1563,7 @@ def build_source_status(root: Path, *, corpus: Path | None = None, now: datetime
     by_stage = {name: 0 for name in STATUS_STAGES}
     for row in rows:
         by_stage[row["stage"]] = by_stage.get(row["stage"], 0) + 1
+    by_stage = {name: count for name, count in by_stage.items() if count}
     anti_loss = {
         "corpus_uncommitted": pack(uncommitted, uncommitted_why),
         "corpus_unpushed": pack(unpushed, unpushed_why),

@@ -84,6 +84,14 @@ def _scored(spec: EvalSpec, *, candidate_id: str) -> ScoredResult:
         failing_gates=(),
         run_reference=RunReference(
             status="ok",
+            trace={
+                "backend_name": "alphamelts",
+                "engine_version": "petthermotools 1.2.3",
+                "diagnostics": {
+                    "backend_name": "alphamelts",
+                    "engine_version": "petthermotools 1.2.3",
+                },
+            },
             backend_name="alphamelts",
             backend_status="ok",
             backend_authoritative=True,
@@ -202,6 +210,14 @@ def _seed_tier_fixture(client) -> tuple[list[str], dict[str, int]]:
             failing_gates=(),
             run_reference=RunReference(
                 status="ok",
+                trace={
+                    "backend_name": "alphamelts",
+                    "engine_version": "petthermotools 1.2.3",
+                    "diagnostics": {
+                        "backend_name": "alphamelts",
+                        "engine_version": "petthermotools 1.2.3",
+                    },
+                },
                 backend_name="alphamelts",
                 backend_status="ok",
                 backend_authoritative=True,

@@ -20,6 +20,10 @@ from types import MappingProxyType
 from typing import Any, Literal, Optional, Protocol, get_args
 
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
+from simulator.fidelity_vocabulary import (
+    NON_CERTIFYING_RUNTIME_STATUSES,
+    translate_legacy_token,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -534,20 +538,34 @@ def select_backend_status(statuses) -> str | None:
     """Reduce many per-probe statuses to one whole-run status.
 
     Returns the most severe member of :data:`BACKEND_STATUS_PRECEDENCE` present,
-    else the last status seen, else ``None`` for an empty input. Callers that
-    need "the latest" rather than "the most severe" want a different function —
-    this one deliberately does not preserve ordering information beyond the
-    fallback.
+    else the last degrading status, else the last status seen, else ``None``
+    for an empty input. Runtime-only caveats come from the fidelity vocabulary;
+    unknown tokens are rejected by that vocabulary so they cannot certify.
+    Callers that need "the latest" rather than "the most severe" want a
+    different function — this one deliberately does not preserve ordering
+    information beyond the fallback.
     """
     values = tuple(str(status) for status in statuses if status is not None)
+    runtime_degrading = {
+        status
+        for status in values
+        if translate_legacy_token("backend/status alias", status).runtime_status
+        in NON_CERTIFYING_RUNTIME_STATUSES
+    }
     for status in BACKEND_STATUS_PRECEDENCE:
         if status in values:
             return status
-    # An unranked DEGRADING token must not lose to a later flattering one.
+    # A recognized non-certifying token must not lose to a later flattering one.
     # Falling straight through to values[-1] made position decide, so a
     # per-probe `ok` recorded after a terminal `refused` won. See
-    # DEGRADING_INTENT_RESULT_STATUSES.
-    degrading = [value for value in values if value in DEGRADING_INTENT_RESULT_STATUSES]
+    # DEGRADING_INTENT_RESULT_STATUSES. Runtime-only tokens use the fidelity
+    # vocabulary's same certifying/non-certifying partition.
+    degrading = [
+        value
+        for value in values
+        if value in DEGRADING_INTENT_RESULT_STATUSES
+        or value in runtime_degrading
+    ]
     if degrading:
         return degrading[-1]
     return values[-1] if values else None

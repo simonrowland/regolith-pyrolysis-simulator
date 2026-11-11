@@ -15,7 +15,6 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     KRESS91_LN_FO2_COEFFICIENT,
     floor_vacuum_pressure_bar,
-    feo_iw_log10_fO2_bar,
     intrinsic_melt_fO2,
     kress91_fe3_over_sigma_fe,
     kress91_ferrous_feo_activity,
@@ -26,6 +25,7 @@ from simulator.fe_redox import (
     kress91_temperature_band_case,
     melt_mol_fractions_for_kress91,
 )
+from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 
 
 KRESS91_MOL_FRACTIONS = {

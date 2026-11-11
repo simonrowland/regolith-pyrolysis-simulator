@@ -68,6 +68,7 @@ from simulator.battery.score import (
     selected_lineage_level,
     score_store,
 )
+from simulator.battery.validate import validate_corpus
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -295,6 +296,19 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
         "SB-36": Decimal("0.0019"),
         "SB-41": Decimal("-0.0024"),
     }
+    # Independent arithmetic from O'Neill (1987), reaction (2), at 1323.15 K,
+    # plus Frost beta-quartz's printed pressure term
+    # 0.110 K/bar * (2000 - 1) bar / 1323.15 K = 0.166186751 dex, then each
+    # printed ΔFMQ offset. Values are log10(fO2/bar), rounded to nine places.
+    expected_log_by_control = {
+        "FMQ+2.7": Decimal("-7.491317884"),
+        "FMQ+1.8": Decimal("-8.391317884"),
+        "FMQ+1.6": Decimal("-8.591317884"),
+        "FMQ+1.3": Decimal("-8.891317884"),
+        "FMQ+0.9": Decimal("-9.291317884"),
+        "FMQ-0.1": Decimal("-10.291317884"),
+        "FMQ-1.4": Decimal("-11.591317884"),
+    }
     assert len(rows) == 7  # Table 4, PDF index 7 (published page 5933)
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows) == 0
     assert {row.value.point for row in rows} == set(expected.values())
@@ -343,8 +357,29 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
         assert row.identity.total_pressure_Pa.is_value
         assert row.identity.total_pressure_Pa.value == Decimal("200000000")
         assert row.identity.fO2_Pa is not None
-        assert row.identity.fO2_Pa.is_unknown
-        assert row.identity.fO2_Pa.reason.startswith("buffer-relative fO2 (")
+        assert row.identity.fO2_Pa.is_value
+        control = row.point_conditions["fO2_control"].state.value
+        expected_log = expected_log_by_control[control]
+        assert (
+            abs(row.identity.fO2_Pa.value.log10() - Decimal(5) - expected_log)
+            < Decimal("5e-9")
+        )
+        conversion_notices = [
+            notice.reason
+            for notice in row.notices
+            if notice.reason.startswith("buffer_relative_fO2_converted:")
+        ]
+        assert len(conversion_notices) == 1
+        assert (
+            "calibration=oneill_1987_ammin_72_reaction2_emf"
+            in conversion_notices[0]
+        )
+        assert "band=±0.125419 dex" in conversion_notices[0]
+        assert "pressure=2000 bar" in conversion_notices[0]
+        assert (
+            "pressure correction=Frost 1991 molar-volume ΔV term"
+            in conversion_notices[0]
+        )
         assert row.point_conditions["temperature_K"].state.value == Decimal("1323.15")
         assert row.point_conditions["temperature_K"].locator.pdf_page_index == 7
         assert row.point_conditions["pressure_MPa"].state.value == Decimal("200")
@@ -772,6 +807,7 @@ def test_out_of_range_fraction_valence_values_are_kept_with_notice(
     assert "range [0, 1]" in notices[0].reason
     assert f"by {excess}" in notices[0].reason
 
+
     score_observation = _quench_row(
         observation,
         observation_id=observation.observation_id,
@@ -802,6 +838,28 @@ def test_out_of_range_fraction_valence_values_are_kept_with_notice(
         assert residuals[0].refusal.detail["observed_value"] == value
     else:
         assert residuals[0].numeric is not None
+
+
+def test_validator_keeps_printed_out_of_range_fraction_valence_value(tmp_path: Path) -> None:
+    migrator, observation = _migrate_valence_fixture(
+        tmp_path, "Cr2plus_over_total_Cr", "1.01"
+    )
+    observations = dict(migrator.result.observations)
+    observations[observation.observation_id] = observation
+
+    report = validate_corpus(
+        migrator.result.works,
+        migrator.result.experiments,
+        observations,
+        benches=migrator.result.benches,
+    )
+
+    assert observation.value.point == Decimal("1.01")
+    assert not any(
+        issue.path == f"observation[{observation.observation_id}].value"
+        and issue.reason is RefusalReason.INVALID_SOURCE
+        for issue in report.hard_issues
+    )
 
 
 def test_average_oxidation_state_without_named_bounds_gets_no_range_notice(

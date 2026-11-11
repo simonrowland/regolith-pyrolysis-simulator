@@ -1,0 +1,2355 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2025-ca-al-inclusion-evaporation
+source:
+  citation: 'Shornikov, S. I., and Yakovlev, O. I. (2025). Evaporation Features of the Melts of Ca–Al–Inclusions
+    in Chondrites: Experimental Data and Their Implications. Geochemistry International, 63(7), 551–561.'
+  doi: 10.1134/S0016702925600178
+  year: 2025
+  corpus_asset: raw/shornikov-2025-ca-al-inclusion-evaporation/shornikov-2025-ca-al-inclusion-evaporation.pdf
+  corpus_sha256: d5ba248fdd6a6a0d4a117e93c41d54854d168f087f4c548a6bb970e668fe13e8
+extraction:
+  method: Manual Table 1 transcription checked against the rendered page image; all pages were rendered at 250 dpi
+    and visually reviewed. Figure curves are retained as figure_only and not digitized. Printed equations are retained
+    as located relations.
+  date: '2026-10-04'
+  worker: codex
+review_status: draft
+fidelity_samples:
+- species: CaO
+  observable: composition
+  observation_id: shornikov_2025_table1_a_grossman_2000
+  field: composition_values
+  value:
+    CaO:
+      range_as_printed: 34.9–48.1
+      range_low_mol_percent: 34.9
+      range_high_mol_percent: 48.1
+    MgO:
+      range_as_printed: 4.1–16.3
+      range_low_mol_percent: 4.1
+      range_high_mol_percent: 16.3
+    Al2O3:
+      range_as_printed: 14.5–31.2
+      range_low_mol_percent: 14.5
+      range_high_mol_percent: 31.2
+    SiO2:
+      range_as_printed: 17.6–33.5
+      range_low_mol_percent: 17.6
+      range_high_mol_percent: 33.5
+  locator:
+    page: 2
+    published_page: 552
+    pdf_page_index: 1
+    table: '1'
+    note: Type-A, Grossman et al. (2000), four oxide cells and ranges.
+- species: CaO
+  observable: figure
+  observation_id: shornikov_2025_figure4_figure_only
+  field: plot_scope_as_printed
+  value: Type-A and type-B Ca, Mg, Al, and SiO pressure curves over temperature; curves not digitized
+  locator:
+    page: 4
+    published_page: 554
+    pdf_page_index: 3
+    figure: '4'
+    note: Figure curves kept without digitization.
+benches:
+- id: shornikov-2025-tungsten-kems
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MS-1301 mass spectrometer and tungsten Knudsen effusion cell
+    locator:
+      page: 2
+      published_page: 552
+      pdf_page_index: 1
+      section: Experimental
+      figure: '1'
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      page: 2
+      published_page: 552
+      pdf_page_index: 1
+      section: Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Tungsten cylindrical effusion cell with a rhenium insert/liner
+    locator:
+      page: 2
+      published_page: 552
+      pdf_page_index: 1
+      section: Experimental
+      figure: '1'
+  cell_materials:
+  - state:
+      tag: value
+      value: W
+    locator:
+      page: 2
+      published_page: 552
+      pdf_page_index: 1
+      section: Experimental
+  - state:
+      tag: value
+      value: Re
+    locator:
+      page: 2
+      published_page: 552
+      pdf_page_index: 1
+      section: Experimental
+      note: Rhenium insert/liner
+  geometry:
+    cell_internal_dimensions:
+      diameter_mm:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '15'
+        locator:
+          page: 2
+          published_page: 552
+          pdf_page_index: 1
+          section: Experimental
+      height_mm:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '16'
+        locator:
+          page: 2
+          published_page: 552
+          pdf_page_index: 1
+          section: Experimental
+    orifice_to_sample_area_ratio:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0025'
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+        note: 'Printed ratio 1 : 400'
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+        note: The 15 mm cell diameter is not the orifice diameter
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+  ionization:
+    electron_impact_energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '28'
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        section: Experimental
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: EOP-66 optical pyrometer
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+    method:
+      state:
+        tag: value
+        value: Luminosity intensity of the orifice in the cell body base through a pyrometric window; absorption
+          taken into account
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+    stated_accuracy:
+      state:
+        tag: value
+        value: “accurate to 10 at 1800°C”; unit after 10 omitted in the English translation
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+  temperature_calibration:
+    pyrometer_calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+        note: EOP-66 named but no calibration procedure given
+  detector:
+    state:
+      tag: value
+      value: Open-entrance secondary-electron multiplier; coefficient 10^5 at 2.3 kV
+    locator:
+      page: 3
+      published_page: 553
+      pdf_page_index: 2
+      section: Experimental
+  other_facts:
+  - name: temperature_accuracy_as_printed
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+        note: Unit omitted after 10
+    unit: unit omitted
+  - name: temperature_reference
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1800'
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+    unit: °C
+  - name: accelerating_voltage
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3'
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+    unit: kV
+  - name: ion_source_entry_slit_width
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.12'
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+    unit: mm
+  - name: ion_energy_scatter
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: ≤
+          bound_value: '0.5'
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+    unit: eV
+  - name: secondary_multiplier_voltage
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.3'
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        section: Experimental
+    unit: kV
+  - name: secondary_multiplier_coefficient
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        section: Experimental
+    unit: dimensionless; printed 10^5
+  - name: sample_vapor_pressure_cap
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        section: Experimental
+        note: Sample vapor pressure
+        not chamber background pressure: null
+    unit: atm
+  - name: fragmentation_threshold
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '13'
+          interval_high: '15'
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        section: Experimental
+    unit: eV
+  - name: ion_current_duration
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        section: Experimental
+    unit: min per temperature step
+  - name: temperature_ramp_rate
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3'
+          approximate: true
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        section: Experimental
+    unit: °C/min; printed approximately
+experiments:
+- experiment_id: shornikov-2025-cai-kems-runs
+  bench_id: shornikov-2025-tungsten-kems
+  method: knudsen_effusion
+  locator:
+    page: 2
+    published_page: 552
+    pdf_page_index: 1
+    section: Experimental
+  conditions:
+    temperature_start_C:
+      state:
+        tag: value
+        value: 1000
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+    temperature_end_C:
+      state:
+        tag: value
+        value: 2400
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.000015'
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+        note: Printed 10–15 mg converted to kg
+    form:
+      state:
+        tag: value
+        value: powdered sample
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+    container:
+      state:
+        tag: value
+        value: rhenium liner in tungsten effusion cell
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+    composition_class:
+      state:
+        tag: value
+        value: type-A and type-B CAIs from Efremovka chondrite (CV3)
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+    characterization:
+      state:
+        tag: value
+        value: Samples supplied by Dr A. A. Ulyanov
+        Moscow State University: null
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+    initial_composition:
+      state:
+        tag: unknown
+        reason: specimen_specific_composition_not_reported
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+        note: Table 1 cites earlier CAI/chondrite compositions and does not identify the charge assay
+    pretreatment:
+      state:
+        tag: unknown
+        reason: not_reported_beyond_powdering_and_liner_placement
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Ion-current comparison using gold vapor pressure as standard
+        locator:
+          page: 3
+          published_page: 553
+          pdf_page_index: 2
+          section: Experimental
+          equation: '1'
+      reference_substance:
+        state:
+          tag: value
+          value: gold vapor
+        locator:
+          page: 3
+          published_page: 553
+          pdf_page_index: 2
+          section: Experimental
+      reference_vapor_pressure_data:
+        state:
+          tag: value
+          value: Thermodynamic data from Paule and Mandel (1972)
+        locator:
+          page: 3
+          published_page: 553
+          pdf_page_index: 2
+          section: Experimental
+      effective_ionization_cross_sections:
+        state:
+          tag: unknown
+          reason: numeric_values_not_reported
+        locator:
+          page: 3
+          published_page: 553
+          pdf_page_index: 2
+          section: Experimental
+          equation: '1'
+      ionization_cross_sections_source:
+        state:
+          tag: unknown
+          reason: source_or_method_not_reported
+        locator:
+          page: 3
+          published_page: 553
+          pdf_page_index: 2
+          section: Experimental
+          equation: '1'
+      isotope_partition_coefficients:
+        state:
+          tag: value
+          value: η_i coefficients occur in equation (1); numeric factors are not reported
+        locator:
+          page: 3
+          published_page: 553
+          pdf_page_index: 2
+          section: Experimental
+          equation: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: chamber_background_pressure_not_reported
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        section: Experimental
+        note: Sample vapor pressure is separately recorded; it is not chamber background
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_reported
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        section: Experimental
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow_regime_not_reported
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+        note: Near-equilibrium/stationary wording does not state a flow regime
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Stepwise temperature increase until complete sample evaporation
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        section: Experimental
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.05'
+        locator:
+          page: 3
+          published_page: 553
+          pdf_page_index: 2
+          section: Experimental
+          note: ~3°C/min converted to 0.05 K/s
+species:
+  CaO:
+    observations: []
+    context:
+    - observation_id: shornikov_2025_table1_a_nazarov_1984
+      type: composition
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        table: '1'
+        section: Table 1
+        note: type A CAIs; cited composition column.
+      units: mol % as printed
+      values:
+        quantity: CAI_bulk_oxide_composition_as_reported_in_Table_1
+        method_class: quoted_attributed
+        attribution: Nazarov et al. (1984)
+        table_number: 1
+        composition_group_as_printed: A
+        composition_group_description: type A CAIs
+        composition_basis: mol % as printed
+        composition_values:
+          CaO:
+            value_as_printed: '43.4'
+            value_mol_percent: 43.4
+          MgO:
+            value_as_printed: '8.4'
+            value_mol_percent: 8.4
+          Al2O3:
+            value_as_printed: '25.2'
+            value_mol_percent: 25.2
+          SiO2:
+            value_as_printed: '23.0'
+            value_mol_percent: 23.0
+    - observation_id: shornikov_2025_table1_a_grossman_2000
+      type: composition
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        table: '1'
+        section: Table 1
+        note: type A CAIs; cited composition column.
+      units: mol % as printed
+      values:
+        quantity: CAI_bulk_oxide_composition_as_reported_in_Table_1
+        method_class: quoted_attributed
+        attribution: Grossman et al. (2000)
+        table_number: 1
+        composition_group_as_printed: A
+        composition_group_description: type A CAIs
+        composition_basis: mol % as printed
+        composition_values:
+          CaO:
+            range_as_printed: 34.9–48.1
+            range_low_mol_percent: 34.9
+            range_high_mol_percent: 48.1
+          MgO:
+            range_as_printed: 4.1–16.3
+            range_low_mol_percent: 4.1
+            range_high_mol_percent: 16.3
+          Al2O3:
+            range_as_printed: 14.5–31.2
+            range_low_mol_percent: 14.5
+            range_high_mol_percent: 31.2
+          SiO2:
+            range_as_printed: 17.6–33.5
+            range_low_mol_percent: 17.6
+            range_high_mol_percent: 33.5
+    - observation_id: shornikov_2025_table1_a_ivanova_2023
+      type: composition
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        table: '1'
+        section: Table 1
+        note: type A CAIs; cited composition column.
+      units: mol % as printed
+      values:
+        quantity: CAI_bulk_oxide_composition_as_reported_in_Table_1
+        method_class: quoted_attributed
+        attribution: Ivanova (2023)
+        table_number: 1
+        composition_group_as_printed: A
+        composition_group_description: type A CAIs
+        composition_basis: mol % as printed
+        composition_values:
+          CaO:
+            range_as_printed: 39.5–44.7
+            range_low_mol_percent: 39.5
+            range_high_mol_percent: 44.7
+          MgO:
+            range_as_printed: 6.8–11.9
+            range_low_mol_percent: 6.8
+            range_high_mol_percent: 11.9
+          Al2O3:
+            range_as_printed: 23.8–25.4
+            range_low_mol_percent: 23.8
+            range_high_mol_percent: 25.4
+          SiO2:
+            range_as_printed: 22.3–25.7
+            range_low_mol_percent: 22.3
+            range_high_mol_percent: 25.7
+    - observation_id: shornikov_2025_table1_b_nazarov_1984
+      type: composition
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        table: '1'
+        section: Table 1
+        note: type B CAIs; cited composition column.
+      units: mol % as printed
+      values:
+        quantity: CAI_bulk_oxide_composition_as_reported_in_Table_1
+        method_class: quoted_attributed
+        attribution: Nazarov et al. (1984)
+        table_number: 1
+        composition_group_as_printed: B
+        composition_group_description: type B CAIs
+        composition_basis: mol % as printed
+        composition_values:
+          CaO:
+            value_as_printed: '31.4'
+            value_mol_percent: 31.4
+          MgO:
+            value_as_printed: '18.0'
+            value_mol_percent: 18.0
+          Al2O3:
+            value_as_printed: '20.2'
+            value_mol_percent: 20.2
+          SiO2:
+            value_as_printed: '30.4'
+            value_mol_percent: 30.4
+    - observation_id: shornikov_2025_table1_b_grossman_2000
+      type: composition
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        table: '1'
+        section: Table 1
+        note: type B CAIs; cited composition column.
+      units: mol % as printed
+      values:
+        quantity: CAI_bulk_oxide_composition_as_reported_in_Table_1
+        method_class: quoted_attributed
+        attribution: Grossman et al. (2000)
+        table_number: 1
+        composition_group_as_printed: B
+        composition_group_description: type B CAIs
+        composition_basis: mol % as printed
+        composition_values:
+          CaO:
+            range_as_printed: 22.3–37.7
+            range_low_mol_percent: 22.3
+            range_high_mol_percent: 37.7
+          MgO:
+            range_as_printed: 12.7–27.4
+            range_low_mol_percent: 12.7
+            range_high_mol_percent: 27.4
+          Al2O3:
+            range_as_printed: 14.0–25.4
+            range_low_mol_percent: 14.0
+            range_high_mol_percent: 25.4
+          SiO2:
+            range_as_printed: 21.6–37.9
+            range_low_mol_percent: 21.6
+            range_high_mol_percent: 37.9
+    - observation_id: shornikov_2025_table1_b_ivanova_2023
+      type: composition
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        table: '1'
+        section: Table 1
+        note: type B CAIs; cited composition column.
+      units: mol % as printed
+      values:
+        quantity: CAI_bulk_oxide_composition_as_reported_in_Table_1
+        method_class: quoted_attributed
+        attribution: Ivanova (2023)
+        table_number: 1
+        composition_group_as_printed: B
+        composition_group_description: type B CAIs
+        composition_basis: mol % as printed
+        composition_values:
+          CaO:
+            range_as_printed: 33.0–39.2
+            range_low_mol_percent: 33.0
+            range_high_mol_percent: 39.2
+          MgO:
+            range_as_printed: 10.4–17.0
+            range_low_mol_percent: 10.4
+            range_high_mol_percent: 17.0
+          Al2O3:
+            range_as_printed: 16.5–23.0
+            range_low_mol_percent: 16.5
+            range_high_mol_percent: 23.0
+          SiO2:
+            range_as_printed: 25.9–33.9
+            range_low_mol_percent: 25.9
+            range_high_mol_percent: 33.9
+    - observation_id: shornikov_2025_table1_m_dyakonova_1979
+      type: composition
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        table: '1'
+        section: Table 1
+        note: Murchison chondrite; cited composition column.
+      units: mol % as printed
+      values:
+        quantity: CAI_bulk_oxide_composition_as_reported_in_Table_1
+        method_class: quoted_attributed
+        attribution: Dyakonova et al. (1979)
+        table_number: 1
+        composition_group_as_printed: M
+        composition_group_description: Murchison chondrite
+        composition_basis: mol % as printed
+        composition_values:
+          CaO:
+            value_as_printed: '4.4'
+            value_mol_percent: 4.4
+          MgO:
+            value_as_printed: '47.2'
+            value_mol_percent: 47.2
+          Al2O3:
+            value_as_printed: '2.5'
+            value_mol_percent: 2.5
+          SiO2:
+            value_as_printed: '45.9'
+            value_mol_percent: 45.9
+    - observation_id: shornikov_2025_table1_fun1_mendybaev_2013
+      type: composition
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        table: '1'
+        section: Table 1
+        note: FUN1 CAIs; cited composition column.
+      units: mol % as printed
+      values:
+        quantity: CAI_bulk_oxide_composition_as_reported_in_Table_1
+        method_class: quoted_attributed
+        attribution: Mendybaev et al. (2013)
+        table_number: 1
+        composition_group_as_printed: FUN1
+        composition_group_description: FUN1 CAIs
+        composition_basis: mol % as printed
+        composition_values:
+          CaO:
+            value_as_printed: '2.0'
+            value_mol_percent: 2.0
+          MgO:
+            value_as_printed: '63.5'
+            value_mol_percent: 63.5
+          Al2O3:
+            value_as_printed: '1.4'
+            value_mol_percent: 1.4
+          SiO2:
+            value_as_printed: '33.1'
+            value_mol_percent: 33.1
+    - observation_id: shornikov_2025_equations_1_to_14_and_cell_reactions
+      type: thermodynamic_example
+      locator:
+        page: 7
+        published_page: 557
+        pdf_page_index: 6
+        section: Experimental results
+        equation: 2–8
+        note: Equations 2–8 are located on p. 557; every relation carries its own page and equation locator.
+      units: equations as printed
+      values:
+        quantity: printed_equations_and_reaction_relations
+        relations:
+        - equation_number: 1
+          printed_expression: p_i = (I_i T_i / I_s T_s) p_s (σ_s η_s / σ_i η_i) = K I_i T_i / (σ_i η_i)
+          relation:
+            left: p_i
+            operator: '='
+            right: (I_i T_i / I_s T_s) p_s (σ_s η_s / σ_i η_i) = K I_i T_i / (σ_i η_i)
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            equation: '1'
+          relation_chain:
+          - left: p_i
+            operator: '='
+            right: (I_i T_i / I_s T_s) p_s (σ_s η_s / σ_i η_i)
+          - left: (I_i T_i / I_s T_s) p_s (σ_s η_s / σ_i η_i)
+            operator: '='
+            right: K I_i T_i / (σ_i η_i)
+        - equation_number: 2
+          printed_expression: a_CaO^melt = p_CaO^melt / p_CaO° = p_Ca^melt p_O^melt / (p_Ca° p_O°)
+          relation:
+            left: a_CaO^melt
+            operator: '='
+            right: p_CaO^melt / p_CaO° = p_Ca^melt p_O^melt / (p_Ca° p_O°)
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            equation: '2'
+          relation_chain:
+          - left: a_CaO^melt
+            operator: '='
+            right: p_CaO^melt / p_CaO°
+          - left: p_CaO^melt / p_CaO°
+            operator: '='
+            right: p_Ca^melt p_O^melt / (p_Ca° p_O°)
+        - equation_number: 3
+          printed_expression: a_Al2O3^melt = p_Al2O3^melt / p_Al2O3° = (p_Al^melt)^2 (p_O^melt)^3 / ((p_Al°)^2 (p_O°)^3)
+            = (p_AlO^melt)^2 p_O^melt / ((p_AlO°)^2 p_O°)
+          relation:
+            left: a_Al2O3^melt
+            operator: '='
+            right: p_Al2O3^melt / p_Al2O3° = (p_Al^melt)^2 (p_O^melt)^3 / ((p_Al°)^2 (p_O°)^3) = (p_AlO^melt)^2
+              p_O^melt / ((p_AlO°)^2 p_O°)
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            equation: '3'
+          relation_chain:
+          - left: a_Al2O3^melt
+            operator: '='
+            right: p_Al2O3^melt / p_Al2O3°
+          - left: p_Al2O3^melt / p_Al2O3°
+            operator: '='
+            right: (p_Al^melt)^2 (p_O^melt)^3 / ((p_Al°)^2 (p_O°)^3)
+          - left: (p_Al^melt)^2 (p_O^melt)^3 / ((p_Al°)^2 (p_O°)^3)
+            operator: '='
+            right: (p_AlO^melt)^2 p_O^melt / ((p_AlO°)^2 p_O°)
+        - equation_number: 4
+          printed_expression: a_SiO2^melt = p_SiO2^melt / p_SiO2° = p_SiO^melt p_O^melt / (p_SiO° p_O°)
+          relation:
+            left: a_SiO2^melt
+            operator: '='
+            right: p_SiO2^melt / p_SiO2° = p_SiO^melt p_O^melt / (p_SiO° p_O°)
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            equation: '4'
+          relation_chain:
+          - left: a_SiO2^melt
+            operator: '='
+            right: p_SiO2^melt / p_SiO2°
+          - left: p_SiO2^melt / p_SiO2°
+            operator: '='
+            right: p_SiO^melt p_O^melt / (p_SiO° p_O°)
+        - equation_number: 5
+          printed_expression: a_Ca2Al2SiO7^melt = p_Ca2Al2SiO7^melt / p_Ca2Al2SiO7^gehl = ((a_CaO^melt)^2 a_Al2O3^melt
+            a_SiO2^melt) / ((a_CaO^gehl)^2 a_Al2O3^gehl a_SiO2^gehl)
+          relation:
+            left: a_Ca2Al2SiO7^melt
+            operator: '='
+            right: p_Ca2Al2SiO7^melt / p_Ca2Al2SiO7^gehl = ((a_CaO^melt)^2 a_Al2O3^melt a_SiO2^melt) / ((a_CaO^gehl)^2
+              a_Al2O3^gehl a_SiO2^gehl)
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            equation: '5'
+          relation_chain:
+          - left: a_Ca2Al2SiO7^melt
+            operator: '='
+            right: p_Ca2Al2SiO7^melt / p_Ca2Al2SiO7^gehl
+          - left: p_Ca2Al2SiO7^melt / p_Ca2Al2SiO7^gehl
+            operator: '='
+            right: ((a_CaO^melt)^2 a_Al2O3^melt a_SiO2^melt) / ((a_CaO^gehl)^2 a_Al2O3^gehl a_SiO2^gehl)
+        - equation_number: 6
+          printed_expression: a_CaAl2Si2O8^melt = p_CaAl2Si2O8^melt / p_CaAl2Si2O8^anor = a_CaO^melt a_Al2O3^melt
+            (a_SiO2^melt)^2 / (a_CaO^anor a_Al2O3^anor (a_SiO2^anor)^2)
+          relation:
+            left: a_CaAl2Si2O8^melt
+            operator: '='
+            right: p_CaAl2Si2O8^melt / p_CaAl2Si2O8^anor = a_CaO^melt a_Al2O3^melt (a_SiO2^melt)^2 / (a_CaO^anor
+              a_Al2O3^anor (a_SiO2^anor)^2)
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            equation: '6'
+          relation_chain:
+          - left: a_CaAl2Si2O8^melt
+            operator: '='
+            right: p_CaAl2Si2O8^melt / p_CaAl2Si2O8^anor
+          - left: p_CaAl2Si2O8^melt / p_CaAl2Si2O8^anor
+            operator: '='
+            right: a_CaO^melt a_Al2O3^melt (a_SiO2^melt)^2 / (a_CaO^anor a_Al2O3^anor (a_SiO2^anor)^2)
+        - equation_number: 7
+          printed_expression: a_MgAl2O4^melt = p_MgAl2O4^melt / p_MgAl2O4^spin = a_MgO^melt a_Al2O3^melt / (a_MgO^spin
+            a_Al2O3^spin)
+          relation:
+            left: a_MgAl2O4^melt
+            operator: '='
+            right: p_MgAl2O4^melt / p_MgAl2O4^spin = a_MgO^melt a_Al2O3^melt / (a_MgO^spin a_Al2O3^spin)
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            equation: '7'
+          relation_chain:
+          - left: a_MgAl2O4^melt
+            operator: '='
+            right: p_MgAl2O4^melt / p_MgAl2O4^spin
+          - left: p_MgAl2O4^melt / p_MgAl2O4^spin
+            operator: '='
+            right: a_MgO^melt a_Al2O3^melt / (a_MgO^spin a_Al2O3^spin)
+        - equation_number: 8
+          printed_expression: a_Ca2MgSi2O7^melt = p_Ca2MgSi2O7^melt / p_Ca2MgSi2O7^aker = (a_CaO^melt)^2 a_MgO^melt
+            (a_SiO2^melt)^2 / ((a_CaO^aker)^2 a_MgO^aker (a_SiO2^aker)^2)
+          relation:
+            left: a_Ca2MgSi2O7^melt
+            operator: '='
+            right: p_Ca2MgSi2O7^melt / p_Ca2MgSi2O7^aker = (a_CaO^melt)^2 a_MgO^melt (a_SiO2^melt)^2 / ((a_CaO^aker)^2
+              a_MgO^aker (a_SiO2^aker)^2)
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            equation: '8'
+          relation_chain:
+          - left: a_Ca2MgSi2O7^melt
+            operator: '='
+            right: p_Ca2MgSi2O7^melt / p_Ca2MgSi2O7^aker
+          - left: p_Ca2MgSi2O7^melt / p_Ca2MgSi2O7^aker
+            operator: '='
+            right: (a_CaO^melt)^2 a_MgO^melt (a_SiO2^melt)^2 / ((a_CaO^aker)^2 a_MgO^aker (a_SiO2^aker)^2)
+        - equation_number: 9
+          printed_expression: (WO2) + (O) = (WO3)
+          relation:
+            left: (WO2) + (O)
+            operator: '='
+            right: (WO3)
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            equation: '9'
+          relation_chain:
+          - left: (WO2) + (O)
+            operator: '='
+            right: (WO3)
+        - equation_number: 10
+          printed_expression: (Al) + (O) = (AlO)
+          relation:
+            left: (Al) + (O)
+            operator: '='
+            right: (AlO)
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            equation: '10'
+          relation_chain:
+          - left: (Al) + (O)
+            operator: '='
+            right: (AlO)
+        - equation_number: 11
+          printed_expression: 2(Al) + (O) = (Al2O)
+          relation:
+            left: 2(Al) + (O)
+            operator: '='
+            right: (Al2O)
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            equation: '11'
+          relation_chain:
+          - left: 2(Al) + (O)
+            operator: '='
+            right: (Al2O)
+        - equation_number: 12
+          printed_expression: (SiO) + (O) = (SiO2)
+          relation:
+            left: (SiO) + (O)
+            operator: '='
+            right: (SiO2)
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            equation: '12'
+          relation_chain:
+          - left: (SiO) + (O)
+            operator: '='
+            right: (SiO2)
+        - equation_number: 13
+          printed_expression: (TiO) + (O) = (TiO2)
+          relation:
+            left: (TiO) + (O)
+            operator: '='
+            right: (TiO2)
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            equation: '13'
+          relation_chain:
+          - left: (TiO) + (O)
+            operator: '='
+            right: (TiO2)
+        - equation_number: 14
+          printed_expression: (O2) = 2(O)
+          relation:
+            left: (O2)
+            operator: '='
+            right: 2(O)
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            equation: '14'
+          relation_chain:
+          - left: (O2)
+            operator: '='
+            right: 2(O)
+        - equation_number: un-numbered
+          printed_expression: '[W] + 2(O) = (WO2)'
+          relation:
+            left: '[W] + 2(O)'
+            operator: '='
+            right: (WO2)
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+            note: Printed cell/gas reaction relation.
+          relation_chain:
+          - left: '[W] + 2(O)'
+            operator: '='
+            right: (WO2)
+        - equation_number: un-numbered
+          printed_expression: '[W] + 3(O) = (WO3)'
+          relation:
+            left: '[W] + 3(O)'
+            operator: '='
+            right: (WO3)
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+            note: Printed cell/gas reaction relation.
+          relation_chain:
+          - left: '[W] + 3(O)'
+            operator: '='
+            right: (WO3)
+        - equation_number: un-numbered
+          printed_expression: (CaO) + (WO_i) = (CaWO_i+1)
+          relation:
+            left: (CaO) + (WO_i)
+            operator: '='
+            right: (CaWO_i+1)
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+            note: Printed cell/gas reaction relation.
+          relation_chain:
+          - left: (CaO) + (WO_i)
+            operator: '='
+            right: (CaWO_i+1)
+    - observation_id: shornikov_2025_activity_standard_states
+      type: thermodynamic_example
+      locator:
+        page: 7
+        published_page: 557
+        pdf_page_index: 6
+        section: Experimental results
+      units: reference state as printed
+      values:
+        quantity: activity_standard_states
+        oxide_activities:
+          CaO:
+            standard: pure CaO at the same temperature
+            phase: not specified
+            locator:
+              page: 7
+              published_page: 557
+              pdf_page_index: 6
+              equation: '2'
+            defining_spectral_ions:
+            - Ca+
+            oxygen_activity_input: atomic O partial pressure calculated from WO2/WO3 equilibrium
+            activity_value_source: Lewis relation (2); figure-only values
+          Al2O3:
+            standard: pure Al2O3 at the same temperature
+            phase: not specified
+            locator:
+              page: 7
+              published_page: 557
+              pdf_page_index: 6
+              equation: '3'
+            defining_spectral_ions:
+            - Al+
+            - AlO+
+            oxygen_activity_input: atomic O partial pressure calculated from WO2/WO3 equilibrium
+            activity_value_source: Lewis relation (3); figure-only values
+          SiO2:
+            standard: pure SiO2 at the same temperature
+            phase: not specified
+            locator:
+              page: 7
+              published_page: 557
+              pdf_page_index: 6
+              equation: '4'
+            defining_spectral_ions:
+            - SiO+
+            oxygen_activity_input: atomic O partial pressure calculated from WO2/WO3 equilibrium
+            activity_value_source: Lewis relation (4); figure-only values
+          MgO:
+            standard: pure MgO oxide in the spinel and akermanite relations
+            phase: not specified
+            note: Independent MgO activity equation not printed
+            locator:
+              page: 7
+              published_page: 557
+              pdf_page_index: 6
+              equation: 7–8
+            defining_spectral_ions:
+            - Mg+
+            activity_value_source: No independent MgO activity equation or numeric table is printed.
+          gehlenite_Ca2Al2SiO7:
+            standard: pure gehlenite melt at the same temperature
+            phase: melt stated
+            locator:
+              page: 7
+              published_page: 557
+              pdf_page_index: 6
+              equation: '5'
+            defining_spectral_ions: Not a direct single-ion activity; calculated from simple-oxide activities by
+              the located relation.
+          anorthite_CaAl2Si2O8:
+            standard: pure anorthite melt at the same temperature
+            phase: melt stated
+            locator:
+              page: 7
+              published_page: 557
+              pdf_page_index: 6
+              equation: '6'
+            defining_spectral_ions: Not a direct single-ion activity; calculated from simple-oxide activities by
+              the located relation.
+          spinel_MgAl2O4:
+            standard: pure spinel melt at the same temperature
+            phase: melt stated
+            locator:
+              page: 7
+              published_page: 557
+              pdf_page_index: 6
+              equation: '7'
+            defining_spectral_ions: Not a direct single-ion activity; calculated from simple-oxide activities by
+              the located relation.
+          akermanite_Ca2MgSi2O7:
+            standard: pure akermanite melt at the same temperature
+            phase: melt stated
+            locator:
+              page: 7
+              published_page: 557
+              pdf_page_index: 6
+              equation: '8'
+            defining_spectral_ions: Not a direct single-ion activity; calculated from simple-oxide activities by
+              the located relation.
+          atomic_oxygen:
+            standard: not given as an oxide activity standard
+            spectral_ion: O2+ measured; atomic O derived from WO2+/WO3+ and cross-checked by Al+, AlO+, Al2O+, SiO+,
+              TiO+, TiO2+ equilibria
+            locator:
+              page: 8
+              published_page: 558
+              pdf_page_index: 7
+              equation: 9–14
+        activities_reported_numerically_in_tables: false
+    - observation_id: shornikov_2025_specimen_identity_and_assay_absences
+      type: characterization
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+      units: as printed and typed absences
+      experiment: shornikov-2025-cai-kems-runs
+      values:
+        quantity: starting_material_and_assay
+        starting_material_as_printed: Type-A and type-B CAIs from Efremovka chondrite (CV3), supplied by Dr A. A.
+          Ulyanov, Moscow State University
+        sample_form_as_printed: powdered sample in a rhenium liner
+        specimen_specific_composition_as_prepared:
+          tag: unknown
+          reason: not_reported
+        purity:
+          tag: unknown
+          reason: not_reported
+        composition_after_runs:
+          tag: unknown
+          reason: not_reported_as_analyzed_composition
+        figure5_residue_composition:
+          status: model_derived
+          locator:
+            page: 5
+            published_page: 555
+            pdf_page_index: 4
+            figure: '5'
+          note: Calculated residual composition; not a post-run assay
+    - observation_id: shornikov_2025_internal_inconsistency_figure7b
+      type: figure
+      locator:
+        page: 7
+        published_page: 557
+        pdf_page_index: 6
+        figure: 7b
+        section: Discussion
+        note: Cross-check with Figure 7 caption/panel on p. 558
+      units: qualitative statement and figure-only evidence
+      values:
+        quantity: gehlenite_to_akermanite_ratio_direction
+        method_class: figure_only
+        reason: 'source_internally_inconsistent: text says the Figure 7b ratio decreases and calls it curve 1; caption
+          assigns Ca2Al2SiO7/Ca2MgSi2O7 to curve 5, which rises in the p. 558 image. Both claims retained; no curve
+          digitized.'
+        text_claim: Figure 7b also shows a decrease in the gehlenite to akermanite ratio in the melilite (curve
+          1)
+        caption_claim: (5) Ca2Al2SiO7/Ca2MgSi2O7
+        text_locator:
+          page: 7
+          published_page: 557
+          pdf_page_index: 6
+          section: Discussion
+        caption_locator:
+          page: 8
+          published_page: 558
+          pdf_page_index: 7
+          figure: '7'
+          section: Figure caption
+        panel_locator:
+          page: 8
+          published_page: 558
+          pdf_page_index: 7
+          figure: 7b
+    - observation_id: shornikov_2025_translation_notes
+      type: method
+      locator:
+        page: 7
+        published_page: 557
+        pdf_page_index: 6
+        section: Discussion
+      units: English translation as printed
+      values:
+        quantity: translation_ambiguities
+        garbled_activity_phrase: using the calculated of the activities
+        garbled_conclusion_phrase: was formed by of condensation
+        temperature_accuracy_phrase: Temperature was measured accurate to 10 at 1800°C.
+        temperature_unit_after_10:
+          tag: unknown
+          reason: omitted_in_printed_translation
+        table_heading_as_printed: FUN1 CAIs
+        prose_variant: FAN1 CAIs on p. 552; FAN CAIs on p. 554; Table 1 heading FUN1
+        prose_variant_locator:
+          page: 2
+          published_page: 552
+          pdf_page_index: 1
+          section: Experimental
+    - observation_id: shornikov_2025_figure2_figure_only
+      type: figure
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        figure: '2'
+      units: figure only; curves not digitized
+      values:
+        quantity: figure_2_temperature_schedules
+        method_class: figure_only
+        digitization:
+          tag: unknown
+          reason: not_digitized
+    - observation_id: shornikov_2025_figure3_figure_only
+      type: figure
+      locator:
+        page: 4
+        published_page: 554
+        pdf_page_index: 3
+        figure: '3'
+      units: figure only; curves not digitized
+      values:
+        quantity: figure_3_murchison_pressures_and_residue
+        method_class: figure_only
+        digitization:
+          tag: unknown
+          reason: not_digitized
+    - observation_id: shornikov_2025_figure4_figure_only
+      type: figure
+      locator:
+        page: 4
+        published_page: 554
+        pdf_page_index: 3
+        figure: '4'
+      units: figure only; curves not digitized
+      values:
+        quantity: figure_4_cai_partial_pressures
+        method_class: figure_only
+        plot_scope_as_printed: Type-A and type-B Ca, Mg, Al, and SiO pressure curves over temperature; curves not
+          digitized
+        digitization:
+          tag: unknown
+          reason: not_digitized
+    - observation_id: shornikov_2025_figure5_figure_only
+      type: figure
+      locator:
+        page: 5
+        published_page: 555
+        pdf_page_index: 4
+        figure: '5'
+      units: figure only; curves not digitized
+      values:
+        quantity: figure_5_calculated_residual_compositions
+        method_class: figure_only
+        digitization:
+          tag: unknown
+          reason: not_digitized
+    - observation_id: shornikov_2025_figure6_figure_only
+      type: figure
+      locator:
+        page: 7
+        published_page: 557
+        pdf_page_index: 6
+        figure: '6'
+      units: figure only; curves not digitized
+      values:
+        quantity: figure_6_type_a_endmember_activities
+        method_class: figure_only
+        digitization:
+          tag: unknown
+          reason: not_digitized
+    - observation_id: shornikov_2025_figure7_figure_only
+      type: figure
+      locator:
+        page: 8
+        published_page: 558
+        pdf_page_index: 7
+        figure: '7'
+      units: figure only; curves not digitized
+      values:
+        quantity: figure_7_type_b_endmember_activities_and_ratios
+        method_class: figure_only
+        digitization:
+          tag: unknown
+          reason: not_digitized
+    - observation_id: shornikov_2025_figure8_figure_only
+      type: figure
+      locator:
+        page: 8
+        published_page: 558
+        pdf_page_index: 7
+        figure: '8'
+      units: figure only; curves not digitized
+      values:
+        quantity: figure_8_oxygen_pressure_and_O2_O
+        method_class: figure_only
+        digitization:
+          tag: unknown
+          reason: not_digitized
+    - observation_id: shornikov_2025_directional_quotes
+      type: method
+      locator:
+        page: 1
+        published_page: 551
+        pdf_page_index: 0
+        section: Abstract through Conclusions
+      units: verbatim English translation; per-quote locators included
+      values:
+        quantity: directional_and_qualifying_statements
+        method_class: quoted_unattributed
+        claims:
+        - quote: The paper presents experimental results on the evaporation of the main types (A and B) of Ca–Al
+            inclusions of chondrites in a Knudsen tungsten cell in the temperature range of 1000–2400°C.
+          locator:
+            page: 1
+            published_page: 551
+            pdf_page_index: 0
+            section: Abstract
+        - quote: A peculiarity of the evaporation of the inclusions is that the silicon component is preserved in
+            the residual melt to high temperatures exceeding 2200°C.
+          locator:
+            page: 1
+            published_page: 551
+            pdf_page_index: 0
+            section: Abstract
+        - quote: At the same time, magnesium oxide completely evaporates from the melt, which leads to a decrease
+            in the spinel content and even its disappearance during the crystallization of the residual melt at
+            2000°C.
+          locator:
+            page: 1
+            published_page: 551
+            pdf_page_index: 0
+            section: Abstract
+        - quote: Magnesium evaporation leads, in turn, to an increase in the Al2O3 content in the melt and, accordingly,
+            to an increase in the content of gehlenite in melilite during its crystallization, as is observed in
+            the high-temperature rims of subtype B1 inclusions.
+          locator:
+            page: 1
+            published_page: 551
+            pdf_page_index: 0
+            section: Abstract
+        - quote: Experiments have also shown that the high-temperature evaporation of Ca–Al inclusions occurs in
+            an oxygen-rich atmosphere compared to carbonaceous chondrite matter.
+          locator:
+            page: 1
+            published_page: 551
+            pdf_page_index: 0
+            section: Abstract
+        - quote: In this regard, it is assumed that the condensation of the first mineral products of the inclusions
+            occurred in the oxygen-rich atmosphere of the star (O-rich AGB) outside the protosolar system.
+          locator:
+            page: 1
+            published_page: 551
+            pdf_page_index: 0
+            section: Abstract
+        - quote: CAIs represent the oldest material of the Solar System and were dated at 4.567 Ga.
+          locator:
+            page: 1
+            published_page: 551
+            pdf_page_index: 0
+            section: Introduction
+        - quote: Chemically, CAIs consist of low-volatility (Al2O3, CaO, and TiO2) and medium-volatility (MgO and
+            SiO2) oxides.
+          locator:
+            page: 1
+            published_page: 551
+            pdf_page_index: 0
+            section: Introduction
+        - quote: >-
+            CAIs are rich in ¹⁶O (Clayton et al., 1973) and daughter products of some short-lived isotopes.
+          locator:
+            page: 1
+            published_page: 551
+            pdf_page_index: 0
+            section: Introduction
+        - quote: CAIs show evidence of mass-dependent isotope fractionation of Mg, Si, and O and evidence of nonlinear
+            isotope anomalies of some elements of unknown nature.
+          locator:
+            page: 1
+            published_page: 551
+            pdf_page_index: 0
+            section: Introduction
+        - quote: A general consensus has been reached that CAIs formed at the condensation of solar-composition
+            gas during the earliest evolution of the Sun.
+          locator:
+            page: 1
+            published_page: 551
+            pdf_page_index: 0
+            section: Introduction
+        - quote: CAIs of type A consist of melilite (mineral of the series akermanite Ca2MgSi2O7–gehlenite Ca2Al2SiO7),
+            which commonly makes up ≥80 vol %, and magnesian spinel (MgAl2O4) in an amount of 5–15 vol %.
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Introduction
+        - quote: CAIs of type B are made up of melilite (60–70 vol %), Al,Ti-clinopyroxene Ca(Mg,Al,Ti+3,Ti+4)[(Al,Si)2O6]
+            (10–25 vol %), and spinel (~10 vol %).
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Introduction
+        - quote: Type B is poorer than type A in CaO and Al2O3 but notably richer in MgO and SiO2 (Table 1).
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Introduction
+        - quote: Subtype B2 is mineralogically analogous to the cores of subtype B1.
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Introduction
+        - quote: Another major type of CAIs is C.
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Introduction
+        - quote: Type C of CAIs are mineralogically analogous to subtype B2 but are richer in anorthite than melilite
+            and consist of anorthite (~50 vol %), melilite (~20 vol %), Ti–Al pyroxene (15–20 vol %), and spinel
+            (~5 vol %).
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Introduction
+        - quote: The evaporation experiments were carried out with the matter of CAIs of Types A and B, which were
+            extracted from the Efremovka chondrite (CV3) by Dr. A. A. Ulyanov (Moscow State University) and kindly
+            provided for our experiments.
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+        - quote: As seen in Table 1, the studied samples of type-A and B CAIs (Nazarov et al., 1984) corresponded
+            to the composition ranges of inclusions discussed in (Grossman et al., 2000; Ivanova, 2023).
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+        - quote: For illustrative purposes and comparison of evaporation features of CAIs of types A and B, we also
+            present earlier data on the evaporation of the well-known Murchison chondrite (CM2).
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+        - quote: >-
+            The compositions of the Murchison chondrite (Dyakonova et al., 1979) and FAN1 CAIs (Mendybaev et al.,
+            2013) are also listed in Table 1.
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+            note: FAN1 is as printed in prose; the table heading is FUN1.
+        - quote: The evaporation of melts of CAIs of Types A and B was experimentally studied using a Knudsen tungsten
+            cell in the temperature range of 1000–2400°C and a MS-1301 mass spectrometer.
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+        - quote: The experiments were carried out at an accelerating voltage of 3 kV, with an entry slit of ion
+            source 0.12 mm wide, with the energy scatter of the ions no more than 0.5 eV.
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+        - quote: Samples (4) 10–15 mg in mass were evaporated from a tungsten cylindrical effusion cell (d = 15
+            mm, h = 16 mm).
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+            note: (4) is the Figure 1 sample label, not a sample count.
+        - quote: >-
+            To preclude direct contact between the powdered sample and cell, the sample powder was placed into a
+            rhenium liner (3), thus preventing immediate interaction between the molten sample and the tungsten cell
+            material but not to preclude interaction between gas phase components over the melt (6) with the cell.
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+        - quote: No interactions between gas-phase components and the rhenium liner (3) were detected.
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+        - quote: 'The ratio of the surface area of the effusion orifice in the lid of the cell (2) to the evaporation
+            surface area in the cell was 1 : 400 and enabled melt evaporation under conditions close to equilibrium,
+            which are referred to as stationary evaporation conditions (Semenov et al., 1976).'
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+        - quote: >-
+            The temperature was measured by a EOP-66 optical pyrometer based on the luminosity intensity of the
+            orifice (5) in the body base of the tungsten effusion cell (1), through a pyrometric window, with regard
+            to light absorption in the window material.
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+        - quote: Temperature was measured accurate to 10 at 1800°C.
+          locator:
+            page: 2
+            published_page: 552
+            pdf_page_index: 1
+            section: Experimental
+            note: Unit after 10 omitted in the English translation.
+        - quote: Note that according to (Stolper, 1982; Stolper and Paque, 1986), the studied material of Type-A
+            and B CAIs placed into a Knudsen effusion cell was a homogeneous liquid at temperatures above ~1400°C.
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: The partial pressures of molecular species of gas phase (p_i) over the melts were calculated using
+            data on the partial pressure of standard substance (p_s) by the relation (Semenov et al., 1976).
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: The standards were thermodynamic data on the partial pressure of gold (Paule and Mandel, 1972).
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: >-
+            The following ions were identified in the mass spectra of vapor over the melts: Ca⁺, Mg⁺, Al⁺, AlO⁺,
+            Al₂O⁺, SiO⁺, SiO₂⁺, O₂⁺, K⁺, Na⁺, SO₂⁺, Fe⁺, Ni⁺, Cr⁺, TiO⁺, and TiO₂⁺.
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: >-
+            The detected WO₂⁺ and WO₃⁺ molecular ions corresponded to gaseous tungsten oxides, which were formed by
+            the interaction between the oxygen of the gas phase and the material of the tungsten effusion cell by the
+            reactions [W] + 2(O) = (WO₂) and [W] + 3(O) = (WO₃) (phases and square brackets are condensed and gaseous,
+            respectively).
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: >-
+            The occurrence of the CaWO₃⁺ and CaWO₄⁺ ions in the mass spectra of the vapor were formed by reactions
+            (CaO) + (WOᵢ) = (CaWOᵢ₊₁) in the gas phase.
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: >-
+            Note that calcium complex compounds forming in the gas phase start to fragment at ionizing electron
+            energies higher than 13–15 eV and form the CaO⁺ fragment ion (Drowart et al., 1964), which was taken into
+            account in our thermodynamic calculations.
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: The molecular flux from the effusion cell was ionized by electron impact at 28 eV ionizing electron
+            energy.
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: The detector was a secondary-electron multiplier with an open entrance and with a multiplication
+            coefficient of 10^5 at 2.3 kV.
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: The experiments were carried out at a stepwise increase in the temperature up to the complete evaporation
+            of the sample.
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: At each temperature step, the intensities of the ion currents were measured for 10 min.
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: The temperature was increased at a rate of ~3°C/min for all test compositions (Fig. 2).
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+        - quote: The temperature regime chosen for the heating of the Knudsen effusion cell did not allow the total
+            vapor pressure over the melts to increase above 10–4 atm, which warranted us to regard the gas phase
+            over the melt as an ideal one.
+          locator:
+            page: 3
+            published_page: 553
+            pdf_page_index: 2
+            section: Experimental
+            note: This total vapor pressure over the sample is not chamber background pressure.
+        - quote: At high temperatures, oxide components of the melts dissociate, and the vapor over these melts
+            contains mostly atomic and suboxide species, such as K, Na, Fe, Ni, Mn, Cr, Mg, Ca, Al, as well as PO,
+            PO2, SiO, TiO, TiO2, AlO, Al2O, and Al2O2.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: Oxygen occurs as atomic and molecular species.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: The temperature sequence of the origin of metalized and oxide–suboxide species over melts generally
+            coincides with the sequence of the pure oxide volatilities.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: 'For the major oxides of basalt and chondrite, this sequence (in descending order of the volatilities
+            of the oxides) in the form of gaseous species really occurring in the vapor is commonly as follows:
+            K → Na → Fe → SiO → Mg → Ca → TiO → Al.'
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: Note that the aforementioned sequence of the major oxides of CAIs arranged in descending order
+            of their volatility should not be considered universal.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: It has been demonstrated (Mendybaev et al., 2013, 2014) that Mg volatility is higher than that
+            of Si at the evaporation of high-Mg forsterite-bearing FAN CAIs melts, despite the fact that Mg oxide
+            is less volatile than Si oxide.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+            note: FAN as printed here; p. 552 prints FAN1 and Table 1 prints FUN1.
+        - quote: Obviously, the concentration of Mg oxide is very high compared to the compositions of CAIs of Types
+            A and B.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: >-
+            Results of experiments on the evaporation of CAIs of types A and B (Table 1) are presented in Fig. 4,
+            which displays the partial pressures of the dominant Mg, SiO, Ca, and Al gaseous species calculated by (1)
+            over the corresponding melts of CAIs of type A and B.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: >-
+            The maximum in the Mg partial pressure shifts to the right relative Si along the temperature axis at the
+            evaporation of type-B CAI melt, which is richer in Mg oxide.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: The Ca and Al partial pressures are higher at the evaporation of type-A CAIs.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: The initial type-A CAI melt is richer in Ca and Al oxides.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: 'In spite of the differences in the original compositions of CAIs of types A and B, the temperature
+            sequence of the evaporation of melt components are closely similar and equally unusual: Mg → (SiO ≈
+            Ca) → Al.'
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: As an example, Fig. 3a shows the temperature evaporation sequence of the oxides of interest (those
+            of Si, Mg, Ca, and Al) from melt of the Murchison (CM3) chondrite.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+            note: The same source calls the Murchison comparison CM2 on p. 552.
+        - quote: 'The temperature dependences of the partial pressures of the dominant species of the gas phase
+            over the melt make up the following evaporation sequence according to which the compounds of interest
+            for this study pass into a vapor state: SiO → Mg → Ca → Al.'
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: 'Note the evaporation of the silicon and magnesium oxides: the former completely evaporates from
+            the melt at 1870°C, whereas the latter still occurs in the melt (in an amount of 40 mol %) at this temperature
+            and completely escapes from it only at 1920°C.'
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+            note: The preceding sentence identifies silicon and magnesium oxides; “the latter” is magnesium.
+        - quote: Therewith only calcium and aluminum oxides still remain in the melt.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: The silicon partial pressure remains practically unchanging up to 2300°C, i.e., the temperature
+            of complete melt evaporation.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: Therewith practically no Mg is detected in the vapor starting at temperatures above 1900°C.
+          locator:
+            page: 4
+            published_page: 554
+            pdf_page_index: 3
+            section: Discussion of the experimental results
+        - quote: Figure 5 shows the results of calculations done based on experimental data on the composition of
+            residual melts of CAIs of type A and B in the process of their high-temperature evaporation.
+          locator:
+            page: 5
+            published_page: 555
+            pdf_page_index: 4
+            section: Discussion of the experimental results
+        - quote: It can be seen that the content of magnesium oxide in the residual melt decreases to zero due to
+            evaporation at 2000°C, whereas silica remains detectable, although in a very low content, up to 2300°C.
+          locator:
+            page: 5
+            published_page: 555
+            pdf_page_index: 4
+            section: Discussion of the experimental results
+        - quote: 'Subtype B1 typically shows clearly discernible zoning: these CAIs possess clearly discernible
+            almost monomineralic zones dominated by melilite (melilite mantle), whereas no such mantles are found
+            in subtype-B2 CAIs.'
+          locator:
+            page: 5
+            published_page: 555
+            pdf_page_index: 4
+            section: Zoning of subtype-B1 CAIs
+        - quote: The clearly seen outermost zone consists of melilite, and the outer rim of the mantle is depleted
+            in akermanite (Ca2MgSi2O7), because of which the melilite is dominated by the gehlenite (Ca2Al2SiO7)
+            end member.
+          locator:
+            page: 5
+            published_page: 555
+            pdf_page_index: 4
+            section: Zoning of subtype-B1 CAIs
+        - quote: A compositional profile for CAIs of subtype B1 (sample 5241) from the Allende chondrite shows that
+            melilite in the central parts of these CAIs contains ~50 wt % akermanite; the akermanite concentration
+            in the mantle zone decreases to ~20 wt %; and this concentration in the outermost zone is ~7 wt % (Kerekgyarto
+            et al., 2016).
+          locator:
+            page: 5
+            published_page: 555
+            pdf_page_index: 4
+            section: Zoning of subtype-B1 CAIs
+        - quote: The outermost zone of the inclusion is completely devoid of magnesian spinel (MgAl2O4), which is
+            found in the central portion of the inclusion.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Zoning of subtype-B1 CAIs
+        - quote: A melt droplet evaporated and lost its magnesium and silicon and simultaneously crystallized starting
+            with its marginal parts toward the center.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: The selective evaporation of magnesium resulted in that magnesium-bearing minerals (spinel and
+            Al,Ti-clinopyroxene) disappeared from the outer melted zone of the CAIs.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: The melt simultaneously enriched in low-volatility Al2O3 and CaO, and correspondingly, in gehlenite
+            in the melilite.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: >-
+            The occurrence of a melilite rim (mantle) in the material of subtype B1 CAIs and the absence of the mantle
+            from subtype B2 was controlled by the evaporation rates of magnesium and silicon compared to their
+            diffusion rates in the melt.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: If the diffusion rate is low and fails to maintain the chemical heterogeneity of the melt droplet,
+            the rapid evaporation of magnesium and silicon from the outer zone of a melt droplet should lead to
+            the crystallization of melilite enriched in gehlenite.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: This hypothesis has been experimentally tested in (Mendybaev et al., 2006) by studying the evaporation
+            of CAIs of type B within a broad temperature range (1150–1650°C) and at broadly varied melting time
+            (from hours to days), as well as various hydrogen pressure.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: >-
+            Subtype B1 might have formed at pH₂ > 10⁻⁴ atm, whereas subtype B2 was produced at pH₂ < 10⁻⁵ atm.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: These experiments have demonstrated that the relatively rapid evaporation of melts in a hydrogen
+            atmosphere is associated with a notable decrease in the magnesium concentration and a much less significant
+            silicon concentration.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: For example, experiments in (Mendybaev et al., 2006) showed very low evaporation losses of relatively
+            high-volatility silicon and, hence, its practically unvarying concentration in the melt, whereas magnesium
+            evaporated very actively, and thus, its concentration in the melt notably decreases.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: At the same time, results of our experiments on the evaporation of silicate melts and chondrites
+            (Yakovlev et al., 1984, 1987; Markova et al., 1986) definitely demonstrate that silicon (more specifically,
+            silica) is a more volatile component of the melt than magnesium oxide.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: It has been demonstrated (Yakovlev et al., 1984; Shornikov and Yakovlev, 2023) that experiments
+            with CAIs show complete Mg disappearance from the melt at the preservation of the silicon component.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: When magnesium completely evaporates from the melt of type-A CAI sample, the melt still contains
+            ~20 mol % silica, and when magnesium completely evaporates from the melt of type-B CAI sample, the melt
+            still contains ~16.5 mol % silica.
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: 'Inasmuch as MgO-bearing compounds occurring in the residual CAI melt completely evaporate from
+            it at temperatures below 2000°C, a source of the Si-bearing component of CAI melt at temperatures above
+            2100°C can, theoretically, be two compounds: gehlenite and akermanite.'
+          locator:
+            page: 6
+            published_page: 556
+            pdf_page_index: 5
+            section: Discussion
+        - quote: As evident from Fig. 6, the activity of anorthite at high temperatures is roughly 10^5 times lower
+            than the activity of gehlenite.
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            section: Discussion
+        - quote: This low activity value of the end member indicates that it is practically absent from this melt.
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            section: Discussion
+        - quote: This implies that the preservation of the silicon component in residual melts of CAIs of types
+            A and B at evaporation at temperatures above 2100°C can be explained by the presence of gehlenite, which
+            is highly stable in CAI melts.
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            section: Discussion
+        - quote: Silica retention in the outermost melt zone of CAIs of subtype B1 takes place at magnesium evaporation.
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            section: Discussion
+        - quote: During the subsequent crystallization of the melt, this leads to that spinel disappears and akermanite
+            in gehlenite reduce, that is observed in the zone of the melilite rim of the CAIs substance.
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            section: Discussion
+        - quote: Moreover, spinel decompositions and magnesium evaporation are associated with an increase in the
+            Al2O3 concentration (Mendybaev et al., 2006), which also leads to enrichment of the melilite in gehlenite.
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            section: Discussion
+            note: “Spinal” is transcribed as printed in the English translation where legible; the sentence concerns
+              spinel.
+        - quote: Figure 7a shows the calculated dependences of the end member activities on the concentration of
+            low-volatile Al2O3, which increases during the melt evaporation; the activities of spinel decreases
+            and that of gehlenite increases.
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            section: Discussion
+        - quote: Figure 7b also shows a decrease in the gehlenite to akermanite ratio in the melilite (curve 1),
+            as is actually seen in the compositional profiles across monomineralic melilite rims of the subtype-B1
+            CAIs.
+          locator:
+            page: 7
+            published_page: 557
+            pdf_page_index: 6
+            section: Discussion
+            note: Internally conflicts with Figure 7 caption/panel on p. 558.
+        - quote: 'Our experimental data uncover still another evaporation feature of CAI melts: they are rich in
+            oxygen, which is also seen from the high oxygen partial pressure during the final high-temperature evaporation
+            stage of the matter.'
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            section: Oxygen at CAI evaporation
+        - quote: >-
+            The partial pressure of molecular oxygen was determined experimentally, and the partial pressure of atomic
+            oxygen was calculated using the reaction (WO₂) + (O) = (WO₃).
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            section: Oxygen at CAI evaporation
+        - quote: The values of pO thus obtained are reasonably well consistent with those determined from analogous
+            reactions involving oxygen.
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            section: Oxygen at CAI evaporation
+        - quote: Figure 8 shows the total oxygen pressure depending on temperature during the evaporation of melts
+            of CAIs of type A and B.
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            section: Oxygen at CAI evaporation
+        - quote: The differences are obvious, particularly in the high-temperature evaporation region, where oxygen
+            partial pressure over CAI melts monotonously increases and reaches a maximum.
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            section: Oxygen at CAI evaporation
+        - quote: Figure 8b displays dependences of the ratios of concentrations of molecular to atomic oxygen on
+            melt temperature, which show the dominance of atomic species.
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            section: Oxygen at CAI evaporation
+        - quote: Arguments were presented (Sahijpal and Soni, 2006) that the explosion of a low-mass star (whose
+            mass was about 3 Sun masses) of the TP-AGB (Termally Pulsing Asymptotic Giant Branch) type occurred
+            at a distance of ∼30 light years from the protosolar gas–dust nebula.
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            section: Oxygen at CAI evaporation
+            note: Background astrophysical hypothesis cited by the authors.
+        - quote: The exploded star may have been of the O-rich AGB class, i.e., a star rich in oxygen, with a ratio
+            of C/O < 1 in the gas.
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            section: Oxygen at CAI evaporation
+        - quote: This gas could condense oxide and silicate phases.
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            section: Oxygen at CAI evaporation
+        - quote: The authors also argue that an oxygen-rich star of this type is a good candidate as a principal
+            “provider” of short-lived radionuclides like 26Al, 41Ca, 60Fe, and 107Pd.
+          locator:
+            page: 8
+            published_page: 558
+            pdf_page_index: 7
+            section: Oxygen at CAI evaporation
+        - quote: >-
+            Indeed, the experimental results indicate that the CAI evaporation at high temperatures (>1700°C) proceeds
+            at a relatively high pressure of oxygen (Fig. 8a), which occurs in the gas as atomic and molecular
+            species.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: >-
+            As a temperature increases within the range of 1800–2000°C, the O₂/O ratio decreases by one order of
+            magnitude, and the gas comes to be dominated by atomic oxygen.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: The experimental data indicate that the evaporation of chondrite terminates at ~1900°C, and the
+            gas ceases to be replenished with oxygen.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: However, the melts of CAIs of types A and B evaporate at temperatures above 1900°C and release
+            much oxygen.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: It is reasonable to suggest that the reverse process (condensation of carbonaceous chondrite and
+            CAIs) also took place at different temperatures and under different external oxygen pressures.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: The first mineral products of CAIs should have condensed in an oxygen-rich environment.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: Comparison of data on the evaporation of CAIs of type A and B within the temperature range of 1600–2300°C
+            reveal undoubted similarities, despite the differences in their compositions.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: It is demonstrated that the retention of the silicon component in the residual melts of CAIs of
+            type A and B during evaporation at temperatures above 2100°C is caused by gehlenite presence, which
+            is a mineral highly stable in CAI residual melts.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: The evaporation of CAI melts at temperatures above 2000°C is associated with the complete disappearance
+            of magnesium from the melt and the retention of the silicon component.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: In this situation, the residual melt crystallizes neither spinel nor any other Mg-bearing minerals,
+            as is the case with the CAIs of subtype B1 rims.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: Spinel decomposition in the residual melt and magnesium evaporation from it leads to alumina enrichment
+            in this melt, which in turn, leads to gehlenite enrichment in the melilite, as is actually seen in the
+            edges of the high-temperature zone of CAIs of subtype B1 rim.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: The evaporation of CAIs of type A and B is associated with the release of much oxygen from the
+            melt.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+        - quote: It can be hypothesized that the condensation of the first mineral products of CAIs also occurred
+            in an oxygen-rich environment.
+          locator:
+            page: 9
+            published_page: 559
+            pdf_page_index: 8
+            section: Conclusions
+    - observation_id: shornikov_2025_cell_interactions_and_spectral_qualifiers
+      type: laboratory_conditions
+      locator:
+        page: 3
+        published_page: 553
+        pdf_page_index: 2
+        section: Experimental
+      units: as printed
+      experiment: shornikov-2025-cai-kems-runs
+      values:
+        quantity: cell_reactions_sample_prep_and_mass_spectrum
+        direct_sample_to_tungsten_contact: prevented by rhenium insert/liner
+        rhenium_interaction: No interactions between gas-phase components and the rhenium liner were detected.
+        tungsten_reaction_relations:
+        - '[W] + 2(O) = (WO2)'
+        - '[W] + 3(O) = (WO3)'
+        gas_species_ions_as_printed:
+        - Ca+
+        - Mg+
+        - Al+
+        - AlO+
+        - Al2O+
+        - SiO+
+        - SiO2+
+        - O2+
+        - K+
+        - Na+
+        - SO2+
+        - Fe+
+        - Ni+
+        - Cr+
+        - TiO+
+        - TiO2+
+        cell_derived_ions:
+        - WO2+
+        - WO3+
+        calcium_tungsten_ions:
+        - CaWO3+
+        - CaWO4+
+        fragmentation_threshold_eV:
+          kind: interval
+          interval_low: 13
+          interval_high: 15
+        fragmentation_result: calcium complexes fragment to CaO+; included in thermodynamic calculations
+        m_z_56_CaO_plus_Fe_plus_interference:
+          tag: unknown
+          reason: not_explicitly_discussed
+    - observation_id: shornikov_2025_murchison_classification_inconsistency
+      type: characterization
+      locator:
+        page: 2
+        published_page: 552
+        pdf_page_index: 1
+        section: Experimental
+      units: source-internal naming qualification
+      values:
+        quantity: Murchison_chondrite_classification
+        reason: 'source_internally_inconsistent: the p. 552 Experimental text calls the comparison sample CM2; p.
+          554 calls the same Murchison chondrite CM3. Both labels are retained.'
+        classification_published_p552: CM2
+        classification_published_p554: CM3
+        p552_locator:
+          page: 2
+          published_page: 552
+          pdf_page_index: 1
+          section: Experimental
+        p554_locator:
+          page: 4
+          published_page: 554
+          pdf_page_index: 3
+          section: Discussion
