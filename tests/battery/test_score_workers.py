@@ -6,6 +6,8 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import subprocess
+import time
 
 from simulator.battery.enums import AdmissionStatus, Engine, EvidenceClass
 from simulator.battery.score import (
@@ -61,10 +63,13 @@ def _worker_test_predict(
     observation,
     *,
     crash_observation_id: str | None = None,
+    delay_seconds: float = 0.0,
     **_kwargs,
 ):
     if observation.observation_id == crash_observation_id:
         os._exit(17)
+    if delay_seconds:
+        time.sleep(delay_seconds)
     from simulator.battery.enums import Authority, ExecutionState, Quantity
     from simulator.battery.identity import quantity_token
     from simulator.battery.records import Execution
@@ -134,6 +139,131 @@ def test_parallel_scoring_matches_serial_rows_and_summary(tmp_path: Path) -> Non
     )
     assert parallel_rows == serial_rows
     assert parallel_summary == serial_summary
+
+
+def test_parallel_score_slow_shard_completes_without_wall_timeout(
+    tmp_path: Path, monkeypatch
+) -> None:
+    import simulator.battery.score as score_module
+
+    original_map = score_module.supervised_process_map
+    timeout_values = []
+
+    def record_timeout(*args, **kwargs):
+        timeout_values.append(kwargs.get("timeout_seconds"))
+        return original_map(*args, **kwargs)
+
+    monkeypatch.setattr(score_module, "supervised_process_map", record_timeout)
+    written, metadata = _score_store_to_jsonl(
+        _worker_fixture(experiment_count=1),
+        tmp_path / "slow-shard.jsonl",
+        engines=(Engine.VAPOROCK,),
+        predict=partial(_worker_test_predict, delay_seconds=0.2),
+        workers=2,
+    )
+
+    rows = [
+        json.loads(line)
+        for line in (tmp_path / "slow-shard.jsonl.partial")
+        .read_text(encoding="utf-8")
+        .splitlines()[1:]
+    ]
+    assert timeout_values == [None]
+    assert written == 2
+    assert all(row["execution"]["state"] == "produced" for row in rows)
+    assert metadata.shard_failures == ()
+
+
+def test_score_cli_publishes_partial_crash_run_with_success_exit(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    import simulator.battery.score as score_module
+    from scripts import battery_score
+
+    context = _worker_fixture(experiment_count=8)
+    chunks = _partition_score_refs(tuple(context.observations.values()), workers=2)
+    failed_chunk = next(chunk for chunk in chunks if len(chunk) >= 4)
+    failed_observation_id = failed_chunk[len(failed_chunk) // 2].observation_id
+    root = tmp_path / "cli-root"
+    battery_path = root / "data" / "battery"
+    battery_path.mkdir(parents=True)
+    (battery_path / "migration-report.md").write_text(
+        "rows in: 16\nrecords out (observations): 16\nworks: 1\n"
+        "experiments: 8\nqueue size: 0\nhard issues: 0\n",
+        encoding="utf-8",
+    )
+    subprocess.run(["git", "init", "--quiet", str(root)], check=True)
+    subprocess.run(["git", "-C", str(root), "add", "data"], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(root),
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.invalid",
+            "commit",
+            "--quiet",
+            "-m",
+            "fixture store",
+        ],
+        check=True,
+    )
+    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
+
+    def write_empty_comparisons(_context, path, **_kwargs):
+        Path(path).write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(
+        battery_score,
+        "_write_compilation_comparisons_jsonl",
+        write_empty_comparisons,
+    )
+    original_score = battery_score._score_store_to_jsonl
+
+    def score_with_crash(store_context, path, **kwargs):
+        return original_score(
+            store_context,
+            path,
+            predict=partial(
+                _worker_test_predict,
+                crash_observation_id=failed_observation_id,
+            ),
+            **kwargs,
+        )
+
+    monkeypatch.setattr(battery_score, "_score_store_to_jsonl", score_with_crash)
+    result = battery_score.main(
+        [
+            "--root",
+            str(root),
+            "--engines",
+            Engine.VAPOROCK.value,
+            "--workers",
+            "2",
+        ]
+    )
+
+    assert result == 0
+    assert "score run notice" in capsys.readouterr().err
+    residual_lines = (battery_path / "residuals.jsonl").read_text(
+        encoding="utf-8"
+    ).splitlines()
+    rows = [json.loads(line) for line in residual_lines[1:]]
+    assert len(rows) == 16
+    assert any(row["execution"]["state"] == "produced" for row in rows)
+    assert any(
+        row["execution"]["state"] == "attempted_unavailable"
+        and row["refusal"]["detail"]["reason"] == "score_shard_failed"
+        for row in rows
+    )
+    summary = json.loads(
+        (battery_path / "score-summary.json").read_text(encoding="utf-8")
+    )
+    assert len(summary["score_shard_failures"]) == 1
+    assert summary["engine_cache"]["by_engine"][Engine.VAPOROCK.value]["hits"] > 0
 
 
 def test_parallel_score_crash_preserves_completed_rows_and_publishes_failure(
