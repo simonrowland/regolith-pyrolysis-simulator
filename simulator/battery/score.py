@@ -9521,7 +9521,10 @@ def _predict_with_engine(
     if engine is Engine.NASA_CEA_9 and quantity is not None:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
-        if quantity not in _engine_thermo_quantities(engine) | {Quantity.P_SAT}:
+        if (
+            quantity is not Quantity.FE3_FE2_RATIO
+            and quantity not in _engine_thermo_quantities(engine) | {Quantity.P_SAT}
+        ):
             return EnginePrediction(
                 engine=engine,
                 channel=ENGINE_CHANNELS[engine],
