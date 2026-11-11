@@ -2742,7 +2742,6 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict(
 
     prediction_request_quantities = []
     lineage_checks = []
-    relation_checks = []
 
     def unsupported_rewritten_request(engine, observation, **_kwargs):
         prediction_request_quantities.append(quantity_token(observation.identity))
@@ -2760,19 +2759,16 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict(
             },
         )
 
-    def lineage_complete(sources, **_kwargs):
+    def candidate_lineage(sources, **_kwargs):
         lineage_checks.append(tuple(sources))
-        return False
-
-    def resolve_relation(_reference, sources, _complete, **_kwargs):
-        relation_checks.append(tuple(sources))
-        return SourceRelation.UNKNOWN
+        return False, None
 
     monkeypatch.setattr(
         score_mod, "_score_predict_with_engine", unsupported_rewritten_request
     )
-    monkeypatch.setattr(score_mod, "lineage_complete_for", lineage_complete)
-    monkeypatch.setattr(score_mod, "resolve_source_relation", resolve_relation)
+    monkeypatch.setattr(
+        score_mod, "_candidate_lineage_for_sources", candidate_lineage
+    )
     rewritten_residuals, _ = score_store(
         ctx,
         engines=(Engine.VAPOROCK,),
@@ -2781,7 +2777,6 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict(
 
     assert prediction_request_quantities == [Quantity.ACTIVITY_COEFFICIENT]
     assert ("rewritten-request-source",) in lineage_checks
-    assert relation_checks == [("rewritten-request-source",)]
     assert len(rewritten_residuals) == 1
     assert rewritten_residuals[0].source_relation is SourceRelation.UNKNOWN
 

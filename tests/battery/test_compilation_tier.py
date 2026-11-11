@@ -3538,6 +3538,18 @@ def _assert_vaporock_census_fixture_parity(
     memo_enabled: bool,
 ) -> dict[Engine, bytes]:
     residual_bytes_by_engine = {}
+    # Match the decision-band inputs that score_store derives for this point.
+    ratchet_entries, _, _ = score_module._read_decision_band_ratchet(context.root)
+    source_bands, _, source_band_reasons = score_module._source_band_catalog(
+        context, ratchet_entries
+    )
+    group_key = score_module._source_alignment_group_key(
+        reference, tier="compilation"
+    )
+    assert group_key is not None
+    group_token = score_module._group_token(group_key)
+    derived_band = source_bands.get(group_token)
+    derived_band_reason = source_band_reasons.get(group_token)
     for engine in score_module.SCORE_ENGINE_SET:
         predict = None if memo_enabled else fixture_predict
         scored, candidates = score_module.score_store(
@@ -3559,6 +3571,8 @@ def _assert_vaporock_census_fixture_parity(
             context=context,
             comparison_ids={reference.observation_id},
             predict=predict,
+            derived_band=derived_band,
+            derived_band_reason=derived_band_reason,
         )
         scored_bytes = score_module.dumps_residual_line(
             scored_residual, scored_candidate
