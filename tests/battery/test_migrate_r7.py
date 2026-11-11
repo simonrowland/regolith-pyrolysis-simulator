@@ -1070,6 +1070,11 @@ def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
     acanthite = _delta_fg_observations(result, source, "reference-p011-01")
     assert len(acanthite) == 1
     assert acanthite[0].value.kind is ValueKind.UNAVAILABLE
+    assert "no parsed numeric value" in (
+        acanthite[0].value.unavailable_reason or ""
+    )
+    assert "·39.7" in (acanthite[0].value.unavailable_reason or "")
+    assert "uncertainty" in (acanthite[0].value.unavailable_reason or "")
     assert _landed_formation_points(acanthite[0]) == []
 
 
@@ -1101,9 +1106,17 @@ def _b2131_formation_observation_serialization(tmp_path):
 
 
 def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
+    # The source generator keeps phase-window identities (including p274's
+    # two SrCO3 windows and p367's KAlSi3O8 window) where fallback IDs split
+    # differently. Against the old 928-row fallback: 864 generator IDs are
+    # added, 847 fallback IDs are removed, and the 81 shared IDs have no value
+    # changes. The new page-level rows are p069/p075/p085/p099/p102's two
+    # unavailable windows, p089/p115's one unavailable window, plus the
+    # restored p274/p367 formula rows; reference p005-05/p005-11/p006-05/
+    # p007-13 are typed unavailable. These are source-page grounded changes.
     assert _b2131_formation_observation_serialization(tmp_path) == (
-        928,
-        "345ae25f398e31f96f8b6bf2855cd7f580911cba925160ce418278fbd3e739b1",
+        945,
+        "13187d096dd3ffcc4079d147484c31edbfb8e432be9f2def01393a4cf1a2c2d7",
     )
 
 

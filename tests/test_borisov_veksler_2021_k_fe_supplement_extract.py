@@ -63,6 +63,16 @@ def migrated_extract():
     return document, migrator.result
 
 
+def test_locatorless_printed_kbar_migrates_to_identity_with_unit_trail(migrated_extract) -> None:
+    _document, result = migrated_extract
+    observation = result.observations[
+        f"{SOURCE_ID}::borisov_2021_included_row_4_sio2"
+    ]
+    assert observation.identity.total_pressure_Pa.value == Decimal("100000")
+    assert observation.derivation is not None
+    assert "kbar_to_Pa" in observation.derivation.relation
+
+
 @pytest.mark.skipif(not SOURCE_XLSX.is_file(), reason="regolith-corpus workbook is absent")
 def test_every_workbook_component_migrates_as_its_printed_point_or_refusal(migrated_extract) -> None:
     document, result = migrated_extract

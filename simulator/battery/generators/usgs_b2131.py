@@ -36,7 +36,11 @@ from simulator.battery.enums import (
 )
 from simulator.battery.generators.compilation_formula import aligned_raster_formula
 from simulator.battery.generators.usgs_b1544 import RecordGeneration
-from simulator.battery.generators.usgs_b2131_raster import FORMULA_RASTER, PHASE_SENTENCE
+from simulator.battery.generators.usgs_b2131_raster import (
+    FORMULA_RASTER,
+    PHASE_SENTENCE,
+    PRINTED_FORMULA_TRANSCRIPTIONS,
+)
 from simulator.battery.migrate import (
     _NO_ADMISSION_STATUS_REASON,
     _defaulted_admission,
@@ -111,18 +115,6 @@ _REFERENCE_RELATION = (
     "The next numeric line in a column is the printed uncertainty, not a "
     "second temperature."
 )
-# MinerU shows SrCO3 and KAlSi3O8. Same-length case / 0→O / 1→l cannot
-# insert the C, and it cannot turn the 9 into 8. Emitting the OCR token
-# would store a different stoichiometry, and the generic path would do the
-# same for log Kf, so these two records produce no observations.
-_OFF_NUMERIC_PATH = frozenset(
-    {
-        "high-temperature-p274",
-        "high-temperature-p367",
-    }
-)
-
-
 @dataclass(frozen=True)
 class _Window:
     index: int
@@ -136,7 +128,11 @@ def _decimal_cell(cell: object) -> tuple[Decimal, str, bool] | None:
         return None
     raw = cell.get("raw")
     suspect = bool(cell.get("ocr_suspect"))
-    if isinstance(raw, str) and _PLAIN_DECIMAL.fullmatch(raw.strip()):
+    if (
+        isinstance(raw, str)
+        and _PLAIN_DECIMAL.fullmatch(raw.strip())
+        and not (suspect and cell.get("value") is not None)
+    ):
         return Decimal(raw.strip()), raw.strip(), suspect
     value = cell.get("value")
     if value is None or isinstance(value, bool):
@@ -156,14 +152,26 @@ def _published_formula(doc: Mapping[str, Any]) -> str:
 
 
 def formula_for_record(doc: Mapping[str, Any]) -> tuple[str, str | None]:
-    """Stored formula, plus the raster quote when a correction is applied.
+    """Stored formula, plus source evidence when a correction is applied.
 
     The table is re-checked with the alignment rule. A row that is not an
-    allowed case or digit-to-element edit is ignored.
+    allowed case or digit-to-element edit is ignored. Two formulas whose OCR
+    token needs inserted characters are transcribed directly from the printed
+    source page instead.
     """
 
     published = _published_formula(doc)
-    row = FORMULA_RASTER.get(str(doc.get("record_id") or ""))
+    record_id = str(doc.get("record_id") or "")
+    transcription = PRINTED_FORMULA_TRANSCRIPTIONS.get(record_id)
+    if transcription is not None:
+        ocr_formula, printed_formula, pdf_page, printed_page = transcription
+        if published != ocr_formula:
+            return published, None
+        return (
+            printed_formula,
+            f"printed page {printed_page} (PDF page {pdf_page}): {printed_formula}",
+        )
+    row = FORMULA_RASTER.get(record_id)
     if row is None or row[0] != published:
         return published, None
     corrected = aligned_raster_formula(published, row[1])
@@ -379,11 +387,6 @@ def _ht_rows(
 def _generate_ht(doc: Mapping[str, Any]) -> RecordGeneration:
     record_id = str(doc["record_id"])
     source_path = f"{_PREFIX}/records/{record_id}.json"
-    if record_id in _OFF_NUMERIC_PATH:
-        return RecordGeneration(
-            observations=(),
-            report={"record_id": record_id, "skipped": "raster alignment cannot reach the printed formula"},
-        )
     published = _published_formula(doc)
     formula, quote = formula_for_record(doc)
     if not formula:
@@ -407,10 +410,35 @@ def _generate_ht(doc: Mapping[str, Any]) -> RecordGeneration:
             key_window = None
         for quantity, (amount, suspect) in values.items():
             buckets[(quantity, key_window)].append((temperature, amount, suspect))
+    unparsed_gibbs: list[str] = []
+    for row in doc.get("rows") or []:
+        if not isinstance(row, Mapping) or not isinstance(row.get("cells"), Mapping):
+            continue
+        cell = row["cells"].get("formation_gibbs")
+        if (
+            isinstance(cell, Mapping)
+            and cell.get("value") is None
+            and cell.get("ocr_suspect")
+            and str(cell.get("raw") or "").strip()
+        ):
+            unparsed_gibbs.append(str(cell["raw"]).strip())
+    if unparsed_gibbs and not any(
+        quantity is Quantity.DELTA_FG for quantity, _window in buckets
+    ):
+        window_indices = (
+            {window.index for window in assigned if window is not None}
+            if windows
+            else {None}
+        )
+        for window_index in window_indices:
+            buckets.setdefault((Quantity.DELTA_FG, window_index), [])
     observations: list[Observation] = []
     split = len(windows) > 1
     for (quantity, window_index), points in buckets.items():
-        if not points:
+        unavailable = (
+            quantity is Quantity.DELTA_FG and not points and bool(unparsed_gibbs)
+        )
+        if not points and not unavailable:
             continue
         if not windows:
             phase = map_phase(sentence)[0]
@@ -431,7 +459,11 @@ def _generate_ht(doc: Mapping[str, Any]) -> RecordGeneration:
                 else f"{window.lo} to {window.hi} K"
             )
             suffix = f"{_SUFFIX[quantity]}:w{window.index}" if split else _SUFFIX[quantity]
-        suspect_n = sum(1 for _t, _v, suspect in points if suspect)
+        suspect_n = (
+            len(unparsed_gibbs)
+            if unavailable
+            else sum(1 for _t, _v, suspect in points if suspect)
+        )
         note = "; ".join(
             part
             for part in (
@@ -441,10 +473,24 @@ def _generate_ht(doc: Mapping[str, Any]) -> RecordGeneration:
             )
             if part
         )
-        series = tuple((temperature, amount) for temperature, amount, _suspect in points)
         temperature_state = State.unknown(
             f"source prints a temperature grid ({_SUFFIX[quantity]}); "
             "series coordinate, not a single identity temperature_K"
+        )
+        value = (
+            Value(
+                ValueKind.SERIES,
+                series=tuple((temperature, amount) for temperature, amount, _ in points),
+            )
+            if points
+            else Value(
+                kind=ValueKind.UNAVAILABLE,
+                unavailable_reason=(
+                    f"no parsed numeric value for {_SUFFIX[quantity]}; "
+                    f"{len(unparsed_gibbs)} printed cells have unparsed OCR tokens "
+                    f"({', '.join(sorted(set(unparsed_gibbs)))})"
+                ),
+            )
         )
         observations.append(
             _one_observation(
@@ -452,7 +498,7 @@ def _generate_ht(doc: Mapping[str, Any]) -> RecordGeneration:
                 source_path=source_path,
                 formula=formula,
                 quantity=quantity,
-                value=Value(ValueKind.SERIES, series=series),
+                value=value,
                 phase=phase,
                 temperature_K=temperature_state,
                 suffix=suffix,
@@ -479,14 +525,48 @@ def _grid_temperature(doc: Mapping[str, Any]) -> Decimal | None:
 
 def _column_value_and_uncertainty(
     doc: Mapping[str, Any], column: str
-) -> tuple[tuple[Decimal, str, bool], tuple[Decimal, str, bool] | None] | None:
+) -> tuple[tuple[Decimal | None, str, bool], tuple[Decimal, str, bool] | None] | None:
+    rows = [
+        row
+        for row in doc.get("rows") or []
+        if isinstance(row, Mapping) and isinstance(row.get("cells"), Mapping)
+    ]
+    if rows:
+        first_cell = rows[0]["cells"].get(column)
+        if (
+            isinstance(first_cell, Mapping)
+            and first_cell.get("value") is None
+            and str(first_cell.get("raw") or "").strip()
+        ):
+            uncertainty = next(
+                (
+                    parsed
+                    for row in rows[1:]
+                    if (parsed := _decimal_cell(row["cells"].get(column))) is not None
+                ),
+                None,
+            )
+            if uncertainty is not None:
+                return (
+                    (
+                        None,
+                        str(first_cell["raw"]).strip(),
+                        bool(first_cell.get("ocr_suspect")),
+                    ),
+                    uncertainty,
+                )
+            if column == "formation_gibbs" and first_cell.get("ocr_suspect"):
+                return (
+                    (
+                        None,
+                        str(first_cell["raw"]).strip(),
+                        True,
+                    ),
+                    None,
+                )
     found: list[tuple[Decimal, str, bool]] = []
-    for row in doc.get("rows") or []:
-        if not isinstance(row, Mapping):
-            continue
-        cells = row.get("cells")
-        if not isinstance(cells, Mapping):
-            continue
+    for row in rows:
+        cells = row["cells"]
         parsed = _decimal_cell(cells.get(column))
         if parsed is None:
             continue
@@ -504,11 +584,6 @@ def _generate_reference(doc: Mapping[str, Any]) -> RecordGeneration:
     temperature = _grid_temperature(doc)
     if temperature is None:
         return RecordGeneration(observations=(), report={"record_id": record_id, "skipped": "no single grid temperature"})
-    if record_id in _OFF_NUMERIC_PATH:
-        return RecordGeneration(
-            observations=(),
-            report={"record_id": record_id, "skipped": "raster alignment cannot reach the printed formula"},
-        )
     published = _published_formula(doc)
     formula, quote = formula_for_record(doc)
     if not formula:
@@ -536,7 +611,17 @@ def _generate_reference(doc: Mapping[str, Any]) -> RecordGeneration:
             bits.append(f"printed uncertainty raw={uncertainty[1]}")
         if suspect:
             bits.append("ocr_suspect")
-        value = Value.point_of(amount)
+        value = (
+            Value.point_of(amount)
+            if amount is not None
+            else Value(
+                kind=ValueKind.UNAVAILABLE,
+                unavailable_reason=(
+                    f"no parsed numeric value for {column}; printed token "
+                    f"{token!r} is unparsed and the following numeric line is uncertainty"
+                ),
+            )
+        )
         uncertainty_obj = Uncertainty(kind=UncertaintyKind.NONE)
         if uncertainty is not None:
             uncertainty_obj = Uncertainty(
