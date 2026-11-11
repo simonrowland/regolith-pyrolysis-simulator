@@ -9,10 +9,8 @@ from typing import Any, Callable
 import pytest
 
 from simulator.battery.enums import Engine
-from simulator.battery.score import _equilibrate_phase_assemblage
 from simulator.diagnostic_helpers.binary_pot_battery import (
     close_battery_engine_handle,
-    open_battery_engine,
 )
 from simulator.melt_backend.base import EquilibriumResult
 from tests.battery.cache_test_support import CACHE_TEST_ENGINES
@@ -389,7 +387,7 @@ def test_worker_scheduling_config_does_not_change_prediction_settings(engine: st
 
 
 def test_engine_cache_settings_do_not_read_or_mutate_unprojected_backend_state() -> None:
-    from simulator.engine_cache import engine_cache_settings
+    from simulator.engine_cache import engine_cache_key, engine_cache_settings
 
     class LazyCore:
         touched = False
@@ -407,6 +405,23 @@ def test_engine_cache_settings_do_not_read_or_mutate_unprojected_backend_state()
 
     assert not core.touched
     assert {name: id(value) for name, value in vars(backend).items()} == before
+
+    class LazyOpenImcc:
+        _identity = {"pack": "published-core"}
+        _pack_name = "default"
+        _gas_pack_name = "default"
+
+        @property
+        def _effective_pack_name(self) -> str:
+            self.property_was_read = True
+            return self._identity["pack"]
+
+    openimcc = LazyOpenImcc()
+    settings = engine_cache_settings("openimcc", openimcc)
+    engine_cache_key("openimcc", 1, settings)
+
+    assert settings["melt_pack"] == "published-core"
+    assert "property_was_read" not in vars(openimcc)
 
 
 @pytest.mark.parametrize(
