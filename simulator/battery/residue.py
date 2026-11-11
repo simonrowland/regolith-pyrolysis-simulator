@@ -3323,30 +3323,40 @@ def _sossi_geometry_areas(sample_mass_kg: float) -> dict[str, float]:
     }
 
 
-def _sossi_project_element_ppm(
+def _inventory_bulk_and_element_masses_kg(
     inventory_mol: Mapping[str, float],
     buffer_oxygen_exchange_mol: float,
     elements: Sequence[str],
-) -> dict[str, float]:
+) -> tuple[float, dict[str, float]]:
+    """Return the integrated bulk mass and requested elemental masses."""
     total_mass_kg = math.fsum(
         float(amount) * _formula_terms(oxide)[1]
         for oxide, amount in inventory_mol.items()
     ) + min(0.0, buffer_oxygen_exchange_mol) * _formula_terms("O")[1]
     if not math.isfinite(total_mass_kg) or total_mass_kg <= 0.0:
         raise ResidueInventoryRefusal("sossi_residue_mass_invalid")
-    result: dict[str, float] = {}
+    element_mass_kg: dict[str, float] = {}
     for element in elements:
-        parent = _SOSSI_TRACE_PARENTS[element]
-        element_atoms = _formula_terms(element)[0]
-        parent_atoms = _formula_terms(parent)[0]
-        element_moles = (
-            float(inventory_mol.get(parent, 0.0))
-            * element_atoms.get(element, 0.0)
-            / parent_atoms.get(element, 0.0)
+        element_moles = math.fsum(
+            float(amount) * _formula_terms(oxide)[0].get(element, 0.0)
+            for oxide, amount in inventory_mol.items()
         )
-        element_mass_kg = element_moles * _formula_terms(element)[1]
-        result[element] = element_mass_kg / total_mass_kg * 1.0e6
-    return result
+        element_mass_kg[element] = element_moles * _formula_terms(element)[1]
+    return total_mass_kg, element_mass_kg
+
+
+def _sossi_project_element_ppm(
+    inventory_mol: Mapping[str, float],
+    buffer_oxygen_exchange_mol: float,
+    elements: Sequence[str],
+) -> dict[str, float]:
+    total_mass_kg, element_mass_kg = _inventory_bulk_and_element_masses_kg(
+        inventory_mol, buffer_oxygen_exchange_mol, elements
+    )
+    return {
+        element: element_mass_kg[element] / total_mass_kg * 1.0e6
+        for element in elements
+    }
 
 
 def _predict_sossi_residue_cohort(
