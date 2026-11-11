@@ -5,14 +5,13 @@ from __future__ import annotations
 import re
 import math
 
-from simulator.scalar_boundary import is_declared_real_scalar
-
 
 # Chase 1998 NIST-JANAF formation values at 298 K give the linear
 # Ellingham approximation for 2 C + O2 -> 2 CO, per mol O2:
 # ΔH = 2*(-110.527) = -221.054 kJ; ΔG = 2*(-137.163) = -274.326 kJ;
 # ΔS = (ΔH - ΔG)/T = 0.17877 kJ/K. The pure-CO limit is distinct from the
-# CCO buffer above, which includes the CO2 share through Boudouard equilibrium.
+# CCO buffer in simulator.oxygen_buffers, which includes the CO2 share
+# through Boudouard equilibrium.
 _C_TO_CO_DH_KJ_PER_MOL_O2 = -221.054
 _C_TO_CO_DS_KJ_PER_K_PER_MOL_O2 = 0.17877
 
