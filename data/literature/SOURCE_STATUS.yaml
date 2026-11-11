@@ -8,10 +8,10 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2318
+  sources: 2319
   by_stage:
     unknown: 317
-    in_progress: 256
+    in_progress: 257
     inbox: 1261
     ingested_complete: 130
     located: 209
@@ -5310,19 +5310,12 @@ sources:
   total_rows: 760
   inbox_exclusion_reason: null
 - source_id: chen-2020-ce2o3-cmas-activity-phase-equilibria
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/SOURCE.md
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/chen-2020-ce2o3-cmas-activity-phase-equilibria.pdf
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/chen2020-original--receipt.json
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/chen2020-qpdf-warning-categories.json
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/chen2020-qualification.md
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/chen2020-review--receipt.json
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/chen2020-three-root-dedup.json
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/independent-review.md
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/chen-2020-ce2o3-cmas-activity-phase-equilibria.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
