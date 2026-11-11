@@ -1023,7 +1023,7 @@ _EMPTY_FLUX_STATE_BY_SHAPE = {
     "refusal_beside_upper_bound_peer": "refusal",
     "dormant_eligible": "dormant_by_epoch",
     "upper_bound": "upper_bound",
-    "inactive_zero_by_physics": "dormant_by_epoch",
+    "inactive_zero_by_physics": "zero_by_physics",
 }
 _AUTHORIZING_PEER = "AuthorizingPeer"
 _EMPTY_FLUX_TEMPERATURES = (
@@ -1183,12 +1183,15 @@ def _authorizing_empty_flux_reason(
     temperature_C: float,
     *,
     kinetic_floor: bool,
-) -> str:
+) -> str | None:
     if kinetic_floor:
         return "internal_analytical_below_400K"
-    # Inactive zero-by-physics is reclassified dormant and has no catalog Pa,
-    # so the sub-1050 shortcut's coverage proof does not fire.
-    if shape == "inactive_zero_by_physics" or temperature_C >= 1050.0:
+    # A lone zero_by_physics channel has no catalog Pa, so the sub-1050 C
+    # shortcut does not fire. The publisher returns that empty flux without
+    # a second diagnostic reason unless a missing-alpha screen is present.
+    if shape == "inactive_zero_by_physics":
+        return None
+    if temperature_C >= 1050.0:
         return "vapour_batch_all_channels_non_debiting"
     return "pre_rg_backend_below_effective_pressure_threshold"
 
@@ -1263,26 +1266,33 @@ def test_empty_flux_keeps_authorizing_selected_outcomes(
 
 @pytest.mark.parametrize("species_id", _EMPTY_FLUX_SPECIES)
 @pytest.mark.parametrize("claimed", (False, True))
-def test_zero_by_physics_never_debits_zero_pa(
+@pytest.mark.parametrize("flux_dormant", (False, True))
+def test_zero_by_physics_is_never_dormant_or_a_zero_debit(
     species_id: str,
     claimed: bool,
+    flux_dormant: bool,
 ) -> None:
-    """INVARIANT: a typed physical zero is never a numeric flux debit.
+    """INVARIANT: a typed physical zero stays ``zero_by_physics`` on the flux path.
 
-    Every carrier, whether or not the pre-resolution active set claimed
-    it. ``zero_by_physics`` must not appear in the flux map, including as
-    0 Pa, and ``selected_runtime_pa_by_species`` must not record that 0.
-    An unclaimed channel stays dormant. A claimed channel stays
-    ``zero_by_physics`` and still does not debit.
+    Every carrier. Both relabel paths are enumerated: absence from
+    ``flux_active_species_ids``, and ``applicability_evidence.flux_dormant``.
+    Neither publishes ``dormant_by_epoch``. The species is absent from the
+    flux map, including as 0 Pa, and serialization does not mark the
+    channel epoch-dormant.
     """
 
     zero = ZeroByPhysics(evidence_ref="below_evaporation_upper_bound;test")
+    extra: dict[str, Any] = {}
+    if flux_dormant:
+        extra["applicability_evidence"] = {"flux_dormant": True}
     answer = _channel_answer(
         species_id,
         pressure=zero,
         selected=zero,
         flux=FluxEligible(alpha_ref=f"alpha:{species_id}"),
     )
+    if extra:
+        answer = replace(answer, extra=extra)
     batch = VapourBatch(
         requested_species_ids=frozenset({species_id}),
         channels_by_species={species_id: answer},
@@ -1293,15 +1303,17 @@ def test_zero_by_physics_never_debits_zero_pa(
     assert all(value != 0.0 for value in flux.values())
     assert species_id not in report["selected_runtime_pa_by_species"]
     assert 0.0 not in report["selected_runtime_pa_by_species"].values()
-    if claimed:
-        assert report["batch_channel_states"][species_id] == "zero_by_physics"
-        assert (
-            report["selected_pressure_source_by_species"][species_id]
-            == "zero_by_physics"
-        )
-        return
-    assert report["batch_channel_states"][species_id] == "dormant_by_epoch"
-    assert species_id not in report["selected_pressure_source_by_species"]
+    assert report["batch_channel_states"][species_id] == "zero_by_physics"
+    assert (
+        report["selected_pressure_source_by_species"][species_id]
+        == "zero_by_physics"
+    )
+    serialized = serialize_vapour_batch(batch)
+    assert serialized is not None
+    channel = serialized["channels_by_species"][species_id]
+    assert channel["is_flux_dormant_by_epoch"] is False
+    assert channel["selected_runtime_pressure"]["kind"] == "zero_by_physics"
+    assert channel["pressure"]["kind"] == "zero_by_physics"
 
 
 _FE_900C_ELLINGHAM_OMISSIONS = (
@@ -1558,7 +1570,9 @@ def test_ci_cold_tick_fe_missing_ellingham_input_is_authorized_upper_bound_zero(
     16/1). The sum of the two activity-1 channel masses is below the
     closure tolerance, so Fe is zero_by_physics with that bound and the
     extrapolated Fe P_sat band, not a refusal and not another silent_zero
-    note. FeO(g) carries its own congruent pressure, not P_sat,Fe.
+    note. The flux path publishes that zero_by_physics state. It does not
+    relabel the authorized zero as dormant_by_epoch. FeO(g) carries its
+    own congruent pressure, not P_sat,Fe.
     """
 
     from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
@@ -1621,9 +1635,18 @@ def test_ci_cold_tick_fe_missing_ellingham_input_is_authorized_upper_bound_zero(
     assert all(int(note.get("doctrine_category", 0)) != 1 for note in notes)
     assert "Fe" not in batch.flux_active_species_ids
     _pressures, report = flux_pressures_from_batch(batch)
-    assert report["batch_channel_states"]["Fe"] == "dormant_by_epoch"
+    assert report["batch_channel_states"]["Fe"] == "zero_by_physics"
+    assert (
+        report["selected_pressure_source_by_species"]["Fe"] == "zero_by_physics"
+    )
     assert "Fe" not in _pressures
     assert "Fe" not in report["selected_runtime_pa_by_species"]
+    serialized = serialize_vapour_batch(batch)
+    assert serialized is not None
+    assert (
+        serialized["channels_by_species"]["Fe"]["is_flux_dormant_by_epoch"]
+        is False
+    )
     _assert_cold_fe_adds_no_partial_silent_zero(batch, temperature_C)
     assert omission_id
     assert detail_needle
@@ -1676,7 +1699,10 @@ def test_claimed_cold_fe_authorized_zero_is_not_a_seam_debit(
     pressures, report = flux_pressures_from_batch(batch)
     assert "Fe" not in pressures
     assert "Fe" not in report["selected_runtime_pa_by_species"]
-    assert report["batch_channel_states"]["Fe"] == "dormant_by_epoch"
+    assert report["batch_channel_states"]["Fe"] == "zero_by_physics"
+    assert (
+        report["selected_pressure_source_by_species"]["Fe"] == "zero_by_physics"
+    )
     assert omission_id
     assert detail_needle
 

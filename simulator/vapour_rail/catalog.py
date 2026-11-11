@@ -2593,6 +2593,9 @@ class VapourRailCatalog:
         metadata["n_flux_active"] = len(flux_active)
         metadata["n_solve_bundles"] = len(solve_bundles)
         if authorized_zero_ids:
+            # ZeroByPhysics is not flux-active, so this recount does not
+            # call the authorized zero dormant_by_epoch. The flux path
+            # publishes zero_by_physics for that channel.
             metadata["n_flux_dormant_by_epoch"] = sum(
                 1
                 for species_id, channel in channels.items()

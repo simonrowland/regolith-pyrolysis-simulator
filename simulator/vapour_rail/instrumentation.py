@@ -734,10 +734,22 @@ def _pressures_equal(a: float, b: float) -> bool:
 
 
 def _channel_flux_gate_state(answer: VapourAnswer) -> str:
-    """Return the catalog-owned eligibility/refusal state for one channel."""
+    """Return the catalog-owned eligibility/refusal state for one channel.
+
+    INVARIANT: a complete ``ZeroByPhysics`` selection with an eligible flux
+    is ``zero_by_physics``. Epoch dormancy
+    (``applicability_evidence.flux_dormant``) must not relabel it, and the
+    flux consumer must not relabel it when the species is outside
+    ``flux_active_species_ids``. It is a typed non-debit, not a silent 0 Pa
+    and not ``dormant_by_epoch``. A flux refusal is not this case.
+    """
 
     pressure_outcomes = (answer.pressure, answer.selected_runtime_pressure)
     flux = answer.flux
+    if isinstance(flux, FluxEligible) and all(
+        isinstance(item, ZeroByPhysics) for item in pressure_outcomes
+    ):
+        return "zero_by_physics"
     if answer.extra.get("applicability_evidence", {}).get("flux_dormant") is True:
         return "dormant_by_epoch"
     if any(isinstance(item, PressureRefusal) for item in pressure_outcomes) or isinstance(
@@ -991,8 +1003,11 @@ def flux_pressures_from_batch(
             if math.isfinite(catalog_pa):
                 batch_pa_by_species[species_id] = catalog_pa
         gate_state = _channel_flux_gate_state(answer)
+        # Eligible and inactive is epoch dormancy. zero_by_physics is not:
+        # the authorized physical zero stays that state when the claim set
+        # dropped it to avoid a 0 Pa debit.
         if (
-            gate_state in {"eligible", "zero_by_physics"}
+            gate_state == "eligible"
             and species_id not in batch_active_species_ids
         ):
             channel_states[species_id] = "dormant_by_epoch"
