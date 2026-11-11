@@ -4694,18 +4694,16 @@ def _book_wall_deposits_at_vapour_supply(
 ) -> dict[str, Any]:
     """Book each refused species at its vapour-supply bound.
 
-    Invariant, for every refused species, at this chokepoint. Product
-    summary, furnace lifespan, and the tap-hour projection all read the
-    map this function returns. No other path prices a refused wall species.
+    Product summary, furnace lifespan, and the tap-hour projection all
+    read the map this function returns. No other path prices a refused
+    wall species. This function does not integrate.
 
-    - No computed vapour flux, a missing flux map, or a species-level flux
-      refusal on any positive-duration interval: that species is not
-      booked. A missing map is not a zero. An omitted rate whose carrier
-      authority records a refusal is not a zero. The partial sum of the
-      other snapshots is not a supply. The refusal keeps blocking that
-      species. A sibling with a complete integral is still booked. The
-      integral is ``_optimizer_refused_flux_bounds``; this function does
-      not integrate again.
+    - The interval invariant lives in ``_classify_wall_supply_interval``,
+      which ``_optimizer_refused_flux_bounds`` is the only caller of.
+      Each positive-duration interval is a computed rate, an evidenced
+      physical zero, or unavailable. A species absent from the returned
+      map has no finite bound: the refusal stays, and a partial sum is
+      not booked. A sibling that the integral did return is still booked.
     - Supply at or below the mass-balance ledger resolution: authorized
       physical zero (``below_wall_supply_upper_bound``), carrying the
       bound. Existing entries of that species are removed, so a

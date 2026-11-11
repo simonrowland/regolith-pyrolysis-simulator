@@ -24,12 +24,6 @@ from simulator.optimize.evaluate import (
     _optimizer_refused_flux_bounds,
     _run_reference,
 )
-from simulator.vapour_rail.instrumentation import (
-    VAPOUR_CARRIER_AUTHORITY_MISSING,
-    VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
-    VAPOUR_CARRIER_AUTHORITY_REFUSED,
-    vapour_carrier_authority_status,
-)
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
@@ -1643,19 +1637,19 @@ _WALL_BOUND_CASES = (
         "entries": ((("hot_wall", "SiO"), 1.0),),
         "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
     },
-    # A present map that omits SiO, and records no flux refusal, is the
-    # publisher dropping a carrier with no rate. The observed hour is the
-    # supply. A refusal on the omitted hour is the next case.
+    # Hour 1 publishes SiO at 1 kg/h. Hour 2's map names Mg and carries
+    # no SiO physical-zero record. That omission is not a zero hour, so
+    # the 1 kg partial sum is not the supply. The refusal stays.
     {
-        "deposit": (),
+        "deposit": ((("cold_wall", "SiO"), 0.1),),
         "flux_snapshots": (
             {"hour": 1, "duration_h": 1.0, "flux": (("SiO", 1.0),)},
             {"hour": 2, "duration_h": 1.0, "flux": (("Mg", 0.4),)},
         ),
         "refused": (("SiO", "hot_wall"),),
         "charge": 1000.0,
-        "entries": ((("hot_wall", "SiO"), 1.0),),
-        "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
+        "entries": ((("cold_wall", "SiO"), 0.1),),
+        "species": (("SiO", None, None, None),),
     },
     # Hour 1 publishes SiO at 1 kg/h. Hour 2 publishes Mg and records a
     # SiO transport refusal. The 1 kg partial sum is not SiO's supply.
@@ -1916,54 +1910,76 @@ def _oracle_transport_refusal(record: Mapping[str, object]) -> bool:
     )
 
 
-def _oracle_omitted_interval_withholds(flux: object, species: str) -> bool:
-    """Independent rule for a species absent from a present rate map.
+def _oracle_record_blocks_physical_zero(record: Mapping[str, object]) -> bool:
+    """Refusal shapes. Written from the interval rule, not the classifier."""
 
-    No carrier record, proven_zero, or an evaluated eligible channel is
-    a physical zero. The supply map keeps a computed rate at or below
-    1e-12 kg/h, so this rule is not that floor. A refusal, a missing
-    record body, a diagnostic upper bound, a refused runtime pressure,
-    or a transport-unavailable extra is not a zero.
+    if _oracle_payload_kind(record, "flux") in {
+        "diagnostic_upper_bound",
+        "refusal",
+    }:
+        return True
+    if _oracle_payload_kind(record, "pressure") == "refusal":
+        return True
+    if _oracle_payload_kind(record, "selected_runtime_pressure") == "refusal":
+        return True
+    if bool(record.get("is_refused", False)):
+        return True
+    return _oracle_transport_refusal(record)
+
+
+def _oracle_physical_zero_evidence(flux: object, species: str) -> str:
+    """Typed physical-zero evidence, or ``""``.
+
+    Authorized zero: ``pressure.kind == zero_by_physics`` and
+    ``flux.kind == eligible`` for this species, with no refusal on the
+    record. Below-bound zero: ``zero_because == proven_below_threshold``
+    and ``doctrine_category == 3`` for this species, with no refusal.
+    No record, and an eligible or authoritative channel, are neither.
     """
 
     channels = getattr(flux, "carrier_authority_by_species", None)
     if not isinstance(channels, Mapping) or species not in channels:
-        return False
+        return ""
     record = channels[species]
     if not isinstance(record, Mapping):
-        return True
-    if _oracle_payload_kind(record, "flux") == "diagnostic_upper_bound":
-        return True
-    if _oracle_payload_kind(record, "selected_runtime_pressure") == "refusal":
-        return True
-    if _oracle_transport_refusal(record):
-        return True
-    status = vapour_carrier_authority_status(record, expected_species_id=species)
-    if status == VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO:
-        return False
-    return status in {
-        VAPOUR_CARRIER_AUTHORITY_REFUSED,
-        VAPOUR_CARRIER_AUTHORITY_MISSING,
-    }
+        return ""
+    if _oracle_record_blocks_physical_zero(record):
+        return ""
+    named = str(record.get("species_id") or record.get("species") or "").strip()
+    if named != species:
+        return ""
+    pressure_kind = _oracle_payload_kind(record, "pressure")
+    flux_kind = _oracle_payload_kind(record, "flux")
+    if pressure_kind == "zero_by_physics" and flux_kind == "eligible":
+        return "authorized_zero"
+    if str(record.get("zero_because") or "") != "proven_below_threshold":
+        return ""
+    category = record.get("doctrine_category")
+    if isinstance(category, bool) or not isinstance(category, int | float):
+        return ""
+    if int(category) != 3:
+        return ""
+    return "below_bound_zero"
 
 
 def _oracle_complete_flux_supply_kg(
     snapshots: tuple[object, ...],
     species_names: tuple[str, ...],
 ) -> dict[str, float]:
-    """Independent supply oracle.
+    """Independent supply oracle, written from the interval rule.
 
-    A returned number sums a computed rate, or an evidenced physical zero,
-    over every positive-duration snapshot. A missing map clears the window.
-    An omitted key that records a flux refusal drops that species. The
-    partial sum of the other snapshots is not its supply. A species never
-    named, and never refused, is not a fabricated zero.
+    Each positive-duration interval contributes one of: the computed
+    rate (any non-negative magnitude, including a rate at or below
+    1e-12 kg/h), an evidenced physical zero, or unavailable. Unavailable
+    drops the species. The partial sum of the other intervals is not a
+    supply. A missing rate map is unavailable for every species. A
+    zero-duration interval adds nothing and is not a gap. A species that
+    never contributes is not a fabricated zero.
     """
 
     totals = {species: 0.0 for species in species_names}
     observed: set[str] = set()
     withheld: set[str] = set()
-    missing_interval = False
     for snapshot in snapshots:
         duration_h = float(getattr(snapshot, "duration_h", 1.0))
         flux = getattr(snapshot, "evap_flux", None)
@@ -1971,23 +1987,22 @@ def _oracle_complete_flux_supply_kg(
         rates = published if isinstance(published, Mapping) else getattr(
             flux, "species_kg_hr", None
         )
-        if not isinstance(rates, Mapping):
-            if duration_h > 0.0:
-                missing_interval = True
-            continue
         for species in species_names:
-            if species not in rates:
-                if duration_h > 0.0 and _oracle_omitted_interval_withholds(
-                    flux,
-                    species,
-                ):
-                    withheld.add(species)
+            if duration_h <= 0.0:
+                if isinstance(rates, Mapping) and species in rates:
+                    float(rates[species])
                 continue
-            totals[species] += float(rates[species]) * duration_h
-            if duration_h > 0.0:
+            if not isinstance(rates, Mapping):
+                withheld.add(species)
+                continue
+            if species in rates:
+                totals[species] += float(rates[species]) * duration_h
                 observed.add(species)
-    if missing_interval:
-        return {}
+                continue
+            if _oracle_physical_zero_evidence(flux, species):
+                observed.add(species)
+                continue
+            withheld.add(species)
     return {
         species: totals[species]
         for species in species_names
@@ -2342,17 +2357,18 @@ def _interval_flux_snapshot(
 # zero over every positive-duration hour. Each row is one interval class
 # for SiO on hour 2. Hour 1 publishes SiO at 1 kg/h and Mg at 0.5 kg/h.
 # Hour 2 publishes Mg at 0.4 kg/h unless the row says otherwise. None means
-# that species' bound is unavailable.
+# that species' bound is unavailable. An omitted SiO with no typed
+# physical-zero record is unavailable: the 1 kg hour is not the supply.
 _FLUX_INTERVAL_CASES = (
     ("computed_positive", "rate_positive", 1.25, 0.9),
     ("explicit_zero", "explicit_zero", 1.0, 0.9),
-    ("omitted_no_authority", "omitted", 1.0, 0.9),
+    ("omitted_no_authority", "omitted", None, 0.9),
     ("omitted_proven_zero", "proven_zero", 1.0, 0.9),
-    # Eligible or authoritative, and absent from the map: no computed
-    # rate. A computed rate at or below 1e-12 kg/h is not this row. The
-    # generative supply test keeps that rate.
-    ("omitted_eligible_no_computed_rate", "eligible", 1.0, 0.9),
-    ("omitted_authoritative_no_computed_rate", "authoritative", 1.0, 0.9),
+    # Eligible or authoritative, and absent from the map: not a typed
+    # authorized zero or below-bound zero. A computed rate at or below
+    # 1e-12 kg/h is not this row. The generative supply test keeps that rate.
+    ("omitted_eligible_no_computed_rate", "eligible", None, 0.9),
+    ("omitted_authoritative_no_computed_rate", "authoritative", None, 0.9),
     ("omitted_transport_refusal", "transport", None, 0.9),
     ("omitted_is_refused_flag", "is_refused_flag", None, 0.9),
     ("omitted_flux_kind_refusal", "flux_refusal", None, 0.9),
@@ -2507,13 +2523,14 @@ def test_vapour_supply_integral_classifies_every_flux_interval(
     expect_mg: float | None,
     species_order: tuple[str, str],
 ) -> None:
-    """d-367 at the supply chokepoint: no omitted refusal becomes a partial sum.
+    """d-367 at the supply chokepoint: no omitted interval becomes a partial sum.
 
     ``_optimizer_refused_flux_bounds`` is the only integral. Product
     summary, furnace lifespan, and the tap projection book whatever it
-    returns. A species with a typed refusal on any positive-duration hour
-    stays out, in either species order. Mg's complete integral is not
-    cleared by SiO's refusal, and a missing map clears both.
+    returns. A species with an unavailable hour stays out, in either
+    species order, unless that hour is a computed rate or a typed
+    physical zero. Mg's complete integral is not cleared by SiO's gap,
+    and a missing map clears both.
     """
 
     snapshots = _flux_interval_snapshots(kind)
@@ -2806,9 +2823,9 @@ def test_mixed_subthreshold_hours_book_the_full_integral() -> None:
     assert _wall_bound_refused_names(booked["availability_authority"]) == set()
     assert _wall_bound_refused_names(booked["notice_authority"]) == {"SiO"}
 
-    # Mutation: drop the sub-floor hour the way the debit map does.
-    # The integral falls to the above-floor hour and the assertion
-    # against the full oracle fails.
+    # Mutation: delete the sub-floor rate and leave no physical-zero
+    # record. The rejected reading keeps hour one's 2e-12 kg. That
+    # partial sum is not the supply. The bound is unavailable.
     mutated_snapshots = (
         snapshots[0],
         SimpleNamespace(
@@ -2825,8 +2842,10 @@ def test_mixed_subthreshold_hours_book_the_full_integral() -> None:
         ("SiO",),
         campaigns_elapsed=1.0,
     )
-    assert mutated["SiO"] == pytest.approx(2.0e-12)
-    assert mutated["SiO"] != oracle
+    rejected_partial_kg = 2.0e-12
+    assert "SiO" not in mutated
+    assert rejected_partial_kg != oracle
+    assert _oracle_complete_flux_supply_kg(mutated_snapshots, ("SiO",)) == {}
 
 
 @pytest.mark.parametrize("order", (("Mg", "SiO"), ("SiO", "Mg")))
@@ -2881,6 +2900,268 @@ def test_all_subthreshold_hours_still_return_a_supply_bound() -> None:
     )
     assert bounds["SiO"] == pytest.approx(1.0e-12)
     assert bounds["SiO"] > objective_module._mass_balance_ledger_resolution_kg(1.0)
+
+
+# Generative wall-supply intervals. The oracle reads snapshot bytes.
+# This table is the same rule applied to the kind names, so a shared
+# mistake in the snapshot builder cannot agree with itself.
+_WALL_SUPPLY_INTERVAL_KINDS = (
+    "computed_above_threshold",
+    "computed_below_threshold",
+    "authorized_zero",
+    "below_bound_zero",
+    "refused",
+    "absent_no_record",
+    "absent_flux_map",
+)
+_WALL_SUPPLY_ABOVE_KG_HR = 1.0
+_WALL_SUPPLY_BELOW_KG_HR = 5.0e-13
+_WALL_SUPPLY_SIBLING_KG_HR = 0.4
+_WALL_SUPPLY_WINDOWS = (
+    ("computed_above_threshold",),
+    ("computed_below_threshold",),
+    ("authorized_zero",),
+    ("below_bound_zero",),
+    ("refused",),
+    ("absent_no_record",),
+    ("absent_flux_map",),
+    ("computed_above_threshold", "absent_no_record"),
+    ("computed_above_threshold", "computed_below_threshold"),
+    ("computed_below_threshold", "authorized_zero"),
+    ("computed_below_threshold", "below_bound_zero"),
+    ("authorized_zero", "below_bound_zero"),
+    ("authorized_zero", "refused"),
+    ("below_bound_zero", "absent_flux_map"),
+    ("refused", "computed_above_threshold"),
+    ("absent_no_record", "computed_above_threshold"),
+    ("absent_flux_map", "computed_below_threshold"),
+    ("computed_above_threshold", "authorized_zero", "absent_no_record"),
+    ("computed_below_threshold", "below_bound_zero", "computed_above_threshold"),
+    ("absent_no_record", "authorized_zero", "computed_below_threshold"),
+    ("refused", "below_bound_zero", "computed_above_threshold"),
+)
+
+
+def _supply_sibling(species: str) -> str:
+    return "Mg" if species != "Mg" else "SiO"
+
+
+def _authorized_zero_record(species: str) -> dict[str, object]:
+    return {
+        "species_id": species,
+        "pressure": {"kind": "zero_by_physics", "evidence_ref": "no liquid"},
+        "flux": {
+            "kind": "eligible",
+            "alpha_ref": f"alpha:{species}",
+            "reaction_id": "test",
+        },
+    }
+
+
+def _below_bound_zero_record(species: str) -> dict[str, object]:
+    return {
+        "species_id": species,
+        "species": species,
+        "zero_because": "proven_below_threshold",
+        "doctrine_category": 3,
+        "field": "P_effective_Pa",
+    }
+
+
+def _supply_kind_snapshot(
+    hour: int,
+    species: str,
+    sibling: str,
+    kind: str,
+) -> SimpleNamespace:
+    if kind == "absent_flux_map":
+        return SimpleNamespace(hour=hour, duration_h=1.0, evap_flux=None)
+    rates: dict[str, float] = {sibling: _WALL_SUPPLY_SIBLING_KG_HR}
+    records: dict[str, object] = {}
+    if kind == "computed_above_threshold":
+        rates[species] = _WALL_SUPPLY_ABOVE_KG_HR
+    elif kind == "computed_below_threshold":
+        rates[species] = _WALL_SUPPLY_BELOW_KG_HR
+    elif kind == "explicit_zero":
+        rates[species] = 0.0
+    elif kind == "authorized_zero":
+        records[species] = _authorized_zero_record(species)
+    elif kind == "below_bound_zero":
+        records[species] = _below_bound_zero_record(species)
+    elif kind == "refused":
+        records[species] = _transport_refusal_channel(species)
+    elif kind == "absent_no_record":
+        pass
+    else:
+        raise AssertionError(kind)
+    return _interval_flux_snapshot(hour, 1.0, rates, records or None)
+
+
+def _supply_window_snapshots(
+    species: str,
+    sibling: str,
+    window: tuple[str, ...],
+) -> tuple[SimpleNamespace, ...]:
+    return tuple(
+        _supply_kind_snapshot(index, species, sibling, kind)
+        for index, kind in enumerate(window, start=1)
+    )
+
+
+def _kind_contribution_kg(kind: str) -> float | None:
+    """The rule, applied to a kind name. None means the species is unavailable."""
+
+    if kind == "computed_above_threshold":
+        return _WALL_SUPPLY_ABOVE_KG_HR
+    if kind == "computed_below_threshold":
+        return _WALL_SUPPLY_BELOW_KG_HR
+    if kind in {"authorized_zero", "below_bound_zero", "explicit_zero"}:
+        return 0.0
+    if kind in {"refused", "absent_no_record", "absent_flux_map"}:
+        return None
+    raise AssertionError(kind)
+
+
+def _window_species_supply_kg(window: tuple[str, ...]) -> float | None:
+    total = 0.0
+    for kind in window:
+        part = _kind_contribution_kg(kind)
+        if part is None:
+            return None
+        total += part
+    return total
+
+
+def _window_sibling_supply_kg(window: tuple[str, ...]) -> float | None:
+    if "absent_flux_map" in window:
+        return None
+    return _WALL_SUPPLY_SIBLING_KG_HR * len(window)
+
+
+def _assert_supply_map(
+    bounds: Mapping[str, float],
+    species: str,
+    sibling: str,
+    species_kg: float | None,
+    sibling_kg: float | None,
+) -> None:
+    expected = {
+        name: kg
+        for name, kg in ((species, species_kg), (sibling, sibling_kg))
+        if kg is not None
+    }
+    assert set(bounds) == set(expected)
+    for name, kg in expected.items():
+        assert bounds[name] == pytest.approx(kg)
+
+
+def _mutated_interval_kind(kind: str) -> str:
+    """The wrong class for this kind.
+
+    Computed rates and typed zeros become a bare omission. A refusal or
+    a bare omission becomes an authorized zero. A missing map becomes an
+    explicit computed 0. Each one changes the supply.
+    """
+
+    if kind in {
+        "computed_above_threshold",
+        "computed_below_threshold",
+        "authorized_zero",
+        "below_bound_zero",
+    }:
+        return "absent_no_record"
+    if kind in {"refused", "absent_no_record"}:
+        return "authorized_zero"
+    if kind == "absent_flux_map":
+        return "explicit_zero"
+    raise AssertionError(kind)
+
+
+def test_wall_supply_integral_uses_only_the_interval_classifier() -> None:
+    """The integral does not grow a second reader of the flux maps."""
+
+    source = inspect.getsource(_optimizer_refused_flux_bounds)
+    assert "_classify_wall_supply_interval(" in source
+    for token in (
+        "published_species_kg_hr",
+        "species_kg_hr",
+        "carrier_authority_by_species",
+        "zero_by_physics",
+        "proven_below_threshold",
+    ):
+        assert token not in source
+    covered = {kind for window in _WALL_SUPPLY_WINDOWS for kind in window}
+    assert covered == set(_WALL_SUPPLY_INTERVAL_KINDS)
+
+
+@pytest.mark.parametrize("species", _COMPUTED_SPECIES)
+@pytest.mark.parametrize(
+    "window",
+    _WALL_SUPPLY_WINDOWS,
+    ids=["+".join(window) for window in _WALL_SUPPLY_WINDOWS],
+)
+def test_wall_supply_interval_contributes_exactly_one_class(
+    species: str,
+    window: tuple[str, ...],
+) -> None:
+    """Every refused species and interval is a rate, a typed zero, or unavailable.
+
+    Absence from a flux map without an authorized-zero or below-bound
+    record is unavailable. The partial sum of the other intervals is not
+    the supply. A missing map withholds every species. Species order
+    does not change the values.
+    """
+
+    sibling = _supply_sibling(species)
+    snapshots = _supply_window_snapshots(species, sibling, window)
+    species_kg = _window_species_supply_kg(window)
+    sibling_kg = _window_sibling_supply_kg(window)
+    for order in ((species, sibling), (sibling, species)):
+        bounds = _optimizer_refused_flux_bounds(
+            snapshots,
+            order,
+            campaigns_elapsed=1.0,
+        )
+        _assert_supply_map(bounds, species, sibling, species_kg, sibling_kg)
+        oracle = _oracle_complete_flux_supply_kg(snapshots, order)
+        _assert_supply_map(oracle, species, sibling, species_kg, sibling_kg)
+    if window == ("computed_above_threshold", "absent_no_record"):
+        # Hour 1 at 1 kg/h plus an omitted hour is not a 1 kg supply.
+        assert species not in _optimizer_refused_flux_bounds(
+            snapshots,
+            (species,),
+            campaigns_elapsed=1.0,
+        )
+    if len(window) != 1:
+        return
+    kind = window[0]
+    mutated_kind = _mutated_interval_kind(kind)
+    mutated = _supply_window_snapshots(species, sibling, (mutated_kind,))
+    mutated_bounds = _optimizer_refused_flux_bounds(
+        mutated,
+        (species, sibling),
+        campaigns_elapsed=1.0,
+    )
+    mutated_species_kg = _window_species_supply_kg((mutated_kind,))
+    mutated_sibling_kg = _window_sibling_supply_kg((mutated_kind,))
+    _assert_supply_map(
+        mutated_bounds,
+        species,
+        sibling,
+        mutated_species_kg,
+        mutated_sibling_kg,
+    )
+    mutated_oracle = _oracle_complete_flux_supply_kg(mutated, (species, sibling))
+    _assert_supply_map(
+        mutated_oracle,
+        species,
+        sibling,
+        mutated_species_kg,
+        mutated_sibling_kg,
+    )
+    # The mutated class is a different supply. Keeping the unmutated
+    # number would fail this test.
+    assert mutated_species_kg != species_kg
 
 
 def test_fe_residual_cap_applies_to_supply_without_changing_the_record() -> None:
