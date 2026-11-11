@@ -768,7 +768,8 @@ def test_inherited_transition_composition_applies_to_unmarked_points(
 def test_profile_bound_transition_extracts_pass_migration_gate():
     extracts = Path(__file__).resolve().parents[2] / "data/literature/extracts"
     for source_id, expected_observations in (
-        ("rys-2007-alkali-oxide-thermodynamics", 1001),
+        # d-375 restores NaKAlSi_1 Table 10a row 8 to the migrated count.
+        ("rys-2007-alkali-oxide-thermodynamics", 1002),
         ("costa-2025-ree-cmas-glass-melt-thermochemistry", 28),
     ):
         path = extracts / f"{source_id}.yaml"

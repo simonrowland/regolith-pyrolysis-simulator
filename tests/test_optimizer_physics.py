@@ -7,6 +7,9 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.accounting.yield_disposition import (
+    YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION,
+)
 from simulator.optimize.physics import (
     CoatingFeasibilityReportError,
     GATE_ORDER,
@@ -20,6 +23,17 @@ from simulator.optimize.profiles import physics_constraints_from_profile
 from simulator.state import CampaignPhase, HourSnapshot
 from simulator.state import MOLAR_MASS
 from simulator.trace import PhysicsTrace
+
+
+_DEFAULT_YIELD_DISPOSITION_ROWS = (
+    {
+        "element": "Si",
+        "destination_mol_atoms": {
+            "product_condensed": 99.0,
+            "melt_retained": 1.0,
+        },
+    },
+)
 
 
 def _kn_snapshot(
@@ -117,6 +131,10 @@ def _trace(
     extraction_completeness_by_target: (
         dict[str, dict[str, object]] | None
     ) = None,
+    yield_disposition_fraction_table_rows: tuple[
+        dict[str, object], ...
+    ] | None = _DEFAULT_YIELD_DISPOSITION_ROWS,
+    yield_disposition_fraction_table_error: str = "",
     temperature_C: float = 1600.0,
     knudsen_number: float = 0.001,
     ) -> PhysicsTrace:
@@ -142,6 +160,12 @@ def _trace(
         extraction_completeness_by_target=(
             extraction_completeness_by_target or {}
         ),
+        yield_disposition_fraction_table_rows=(
+            yield_disposition_fraction_table_rows
+        ),
+        yield_disposition_fraction_table_error=(
+            yield_disposition_fraction_table_error
+        ),
     )
 
 
@@ -152,6 +176,9 @@ def _valid_trace_object(**overrides: object) -> SimpleNamespace:
         "terminal_rump_by_species_kg": {"SiO2": 1.0},
         "condensed_by_stage_species_delta": ({(3, "SiO"): 20.0},),
         "wall_deposit_by_segment_species_delta": ({},),
+        "yield_disposition_fraction_table_rows": (
+            _DEFAULT_YIELD_DISPOSITION_ROWS
+        ),
     }
     fields.update(overrides)
     return SimpleNamespace(**fields)
@@ -191,14 +218,49 @@ def _assert_insufficient_target_evidence_is_unknown(
         assert target[key] is None
 
 
-def test_rev5_same_stage_mixed_stream_recipe_is_infeasible_by_purity_only() -> None:
-    trace = _trace(condensed=({(3, "SiO"): 19.0, (3, "Fe"): 2.0},))
+def test_delivered_stream_purity_is_diagnostic_until_explicitly_enabled() -> None:
+    trace = _trace(
+        condensed=({(3, "SiO"): 19.0, (3, "Fe"): 2.0},),
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "Si",
+                "destination_mol_atoms": {
+                    "product_condensed": 99.0,
+                    "melt_retained": 1.0,
+                },
+            },
+        ),
+    )
 
     result = PhysicsConstraintSet().evaluate(trace)
+    enforced = PhysicsConstraintSet(
+        enforce_delivered_stream_purity=True,
+    ).evaluate(trace)
 
-    assert not result.feasible
-    assert result.failing_gates == ("delivered_stream_purity",)
-    assert result.margins["delivered_stream_purity"].margin < 0.0
+    diagnostic = result.margins["delivered_stream_purity"]
+    hard_gate = enforced.margins["delivered_stream_purity"]
+    assert result.feasible
+    assert not result.failing_gates
+    assert diagnostic.feasible
+    assert diagnostic.margin == pytest.approx(hard_gate.margin)
+    assert diagnostic.observed == pytest.approx(hard_gate.observed)
+    assert diagnostic.detail == hard_gate.detail
+    assert "stage 3 purity" in diagnostic.detail
+    assert "contaminants={'Fe': 2.0}" in diagnostic.detail
+    assert diagnostic.status == "warning"
+    assert diagnostic.authoritative is False
+    assert "provisional condenser capture" in diagnostic.detail
+    assert not enforced.feasible
+    assert enforced.failing_gates == ("delivered_stream_purity",)
+    assert not hard_gate.feasible
+    assert hard_gate.margin < 0.0
+    assert hard_gate.status == "available"
+    assert hard_gate.authoritative is True
+    assert physics_constraints_digest(PhysicsConstraintSet()) != (
+        physics_constraints_digest(PhysicsConstraintSet(
+            enforce_delivered_stream_purity=True,
+        ))
+    )
     for gate in (
         "coating",
         "extraction_completeness",
@@ -212,15 +274,169 @@ def test_rev5_same_stage_mixed_stream_recipe_is_infeasible_by_purity_only() -> N
 def test_delivered_stream_purity_zero_delivery_is_infeasible_not_nan() -> None:
     trace = _trace(condensed=({(3, "SiO"): 0.0},))
 
-    result = PhysicsConstraintSet().evaluate(trace)
-
-    assert not result.feasible
-    margin = result.margins["delivered_stream_purity"]
+    margin = PhysicsConstraintSet().delivered_stream_purity(trace)
     assert not margin.feasible
     assert margin.observed == pytest.approx(0.0)
     assert margin.margin == pytest.approx(-margin.threshold.value)
     assert math.isfinite(margin.observed)
     assert math.isfinite(margin.margin)
+
+
+def test_extraction_completeness_gate_reports_left_melt_and_captured_basis() -> None:
+    trace = _trace(
+        condensed=({(1, "Fe"): 0.2},),
+        products={"Fe": 0.2 * MOLAR_MASS["Fe"] / 1000.0},
+        rump={"FeO": 0.3 * MOLAR_MASS["FeO"] / 1000.0},
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "Fe",
+                "destination_mol_atoms": {
+                    "product_condensed": 0.2,
+                    "offgas_vented": 0.4,
+                    "wall_deposit": 0.1,
+                    "melt_retained": 0.3,
+                },
+            },
+        ),
+    )
+    constraints = PhysicsConstraintSet(
+        target_species=("Fe",),
+        residual_species_by_target={"Fe": ("FeO", "Fe")},
+        active_gates=("extraction_completeness",),
+    )
+
+    margin = constraints.extraction_completeness(trace)
+    report = extraction_completeness_report(trace, constraints)
+    target = report["targets"]["Fe"]
+
+    assert margin.observed == pytest.approx(0.7)
+    assert target["terminal_offgas_target_equiv_mol"] == pytest.approx(0.4)
+    assert target["wall_deposit_target_equiv_mol"] == pytest.approx(0.1)
+    assert target["left_melt_target_equiv_mol"] == pytest.approx(0.7)
+    assert target["captured_basis_completeness_fraction"] == pytest.approx(0.4)
+    assert target["denominator_account"] == (
+        "yield_disposition.fraction_table.destination_mol_atoms"
+    )
+    assert target["allowed_residual"]["bins"] == (
+        "melt_retained",
+        "metal_phase_retained",
+        "redox_buffer_retained",
+        "charge_unprocessed",
+    )
+    assert target["allowed_residual"]["fraction"] == pytest.approx(0.05)
+    assert target["denominator_basis"] == (
+        "target-equivalent amount in the melt at the start of the evaluated "
+        "span, partitioned into left and not-left yield-disposition bins; "
+        "cleanup-sequestered amount is reported separately"
+    )
+
+
+@pytest.mark.parametrize(
+    ("rows", "reason"),
+    (
+        (
+            ({"element": "Mg", "destination_mol_atoms": {}},),
+            "missing target element Fe",
+        ),
+        (
+            ({"element": "Fe", "destination_mol_atoms": {}},),
+            "empty left-plus-not-left denominator for Fe",
+        ),
+        (
+            (
+                {
+                    "element": "Fe",
+                    "destination_mol_atoms": {"offgas_vented": math.nan},
+                },
+            ),
+            "yield-disposition Fe.offgas_vented mol-atoms must be finite",
+        ),
+    ),
+)
+def test_undefined_melt_boundary_target_is_unavailable_without_nan(
+    rows: tuple[dict[str, object], ...],
+    reason: str,
+) -> None:
+    trace = _trace(
+        condensed=({(1, "Fe"): 0.0},),
+        products={"Fe": 0.2 * MOLAR_MASS["Fe"] / 1000.0},
+        rump={"FeO": 0.3 * MOLAR_MASS["FeO"] / 1000.0},
+        yield_disposition_fraction_table_rows=rows,
+    )
+    constraints = PhysicsConstraintSet(
+        target_species=("Fe",),
+        residual_species_by_target={"Fe": ("FeO", "Fe")},
+        active_gates=("extraction_completeness",),
+    )
+
+    margin = constraints.extraction_completeness(trace)
+    report = extraction_completeness_report(trace, constraints)
+    target = report["targets"]["Fe"]
+
+    assert not margin.feasible
+    assert margin.status == "unavailable"
+    assert margin.observed is None
+    assert margin.margin == -math.inf
+    assert reason in margin.detail
+    assert report["status"] == "insufficient-evidence"
+    assert target["status"] == "insufficient-evidence"
+    assert reason in target["reason"]
+    assert target["captured_basis_completeness_fraction"] == pytest.approx(0.4)
+    assert target["denominator_account"] == (
+        "yield_disposition.fraction_table.destination_mol_atoms"
+    )
+
+
+def test_unavailable_melt_boundary_keeps_captured_basis_diagnostic() -> None:
+    trace = _trace(
+        condensed=(),
+        products={"Fe": 0.2 * MOLAR_MASS["Fe"] / 1000.0},
+        rump={"FeO": 0.3 * MOLAR_MASS["FeO"] / 1000.0},
+        yield_disposition_fraction_table_rows=(),
+        yield_disposition_fraction_table_error="origin attribution unresolved",
+    )
+    constraints = PhysicsConstraintSet(
+        target_species=("Fe",),
+        residual_species_by_target={"Fe": ("FeO", "Fe")},
+        active_gates=("extraction_completeness",),
+    )
+
+    margin = constraints.extraction_completeness(trace)
+    report = extraction_completeness_report(trace, constraints)
+
+    assert margin.status == "unavailable"
+    assert margin.observed is None
+    assert report["targets"]["Fe"][
+        "captured_basis_completeness_fraction"
+    ] == pytest.approx(0.4)
+    assert report["targets"]["Fe"]["captured_basis_label"].startswith(
+        "provisional product-ledger recovery"
+    )
+
+
+def test_nonfinite_carried_completeness_is_unavailable_without_yield_table() -> None:
+    trace = _trace(
+        condensed=(),
+        extraction_completeness_by_target={
+            "Fe": {"completeness_fraction": math.nan},
+        },
+        yield_disposition_fraction_table_rows=None,
+    )
+    constraints = PhysicsConstraintSet(
+        target_species=("Fe",),
+        residual_species_by_target={"Fe": ("FeO", "Fe")},
+        active_gates=("extraction_completeness",),
+    )
+
+    margin = constraints.extraction_completeness(trace)
+    report = extraction_completeness_report(trace, constraints)
+
+    assert margin.status == "unavailable"
+    assert margin.observed is None
+    assert "yield-disposition fraction table is unavailable" in margin.detail
+    assert report["status"] == "insufficient-evidence"
+    assert "yield-disposition fraction table is unavailable" in report["reason"]
+    assert report["targets"]["Fe"]["completeness_fraction"] is None
 
 
 def test_clean_selective_recipe_trace_is_feasible_with_signed_margins() -> None:
@@ -251,6 +467,15 @@ def test_all_default_gates_are_computed_from_physics_trace() -> None:
     trace = _trace(
         condensed=({(3, "SiO"): 20.0},),
         wall=({("hot_wall", "SiO"): 0.05},),
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "Si",
+                "destination_mol_atoms": {
+                    "product_condensed": 99.0,
+                    "melt_retained": 1.0,
+                },
+            },
+        ),
     )
 
     result = constraints.evaluate(trace)
@@ -1435,7 +1660,11 @@ def test_non_authoritative_coating_readout_uses_declared_wall_zone_buckets(
         ),
         (
             "extraction_completeness",
-            _valid_trace_object(product_ledger_kg={}, terminal_rump_by_species_kg={}),
+            _valid_trace_object(
+                product_ledger_kg={},
+                terminal_rump_by_species_kg={},
+                yield_disposition_fraction_table_rows=None,
+            ),
         ),
         (
             "knudsen_viscous",
@@ -1465,13 +1694,14 @@ def test_missing_required_trace_data_fails_closed_for_all_gates(
     gate: str,
     trace: object,
 ) -> None:
-    result = PhysicsConstraintSet().evaluate(trace)
+    result = PhysicsConstraintSet(active_gates=(gate,)).evaluate(trace)
 
-    assert not result.feasible
-    assert not result.margins[gate].feasible
+    assert result.feasible is (gate == "delivered_stream_purity")
+    assert result.margins[gate].feasible is (gate == "delivered_stream_purity")
     assert result.margins[gate].margin < 0.0
     if gate == "extraction_completeness":
-        assert result.margins[gate].detail.startswith("not-applicable:")
+        assert result.margins[gate].status == "unavailable"
+        assert result.margins[gate].observed is None
     else:
         assert "fail-closed" in result.margins[gate].detail
 
@@ -1562,6 +1792,16 @@ def test_extraction_completeness_counts_cr2o3_as_two_cr_equivalent_mol() -> None
         condensed=({(1, "Cr"): 1.0},),
         products={"Cr": MOLAR_MASS["Cr"] / 1000.0},
         rump={"Cr2O3": MOLAR_MASS["Cr2O3"] / 1000.0},
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "Cr",
+                "destination_mol_atoms": {
+                    "product_condensed": 1.0,
+                    "melt_retained": 2.0,
+                    "cleanup_sequestered": 0.25,
+                },
+            },
+        ),
     )
 
     margin = constraints.extraction_completeness(trace)
@@ -1587,6 +1827,15 @@ def test_extraction_completeness_uses_per_species_minimum() -> None:
         condensed=({(1, "Fe"): 1.0},),
         products=products,
         rump=rump,
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "Fe",
+                "destination_mol_atoms": {
+                    "product_condensed": 0.86,
+                    "melt_retained": 0.14,
+                },
+            },
+        ),
     )
     loose = PhysicsConstraintSet(
         target_species=("Fe",),
@@ -1610,7 +1859,7 @@ def test_extraction_completeness_uses_per_species_minimum() -> None:
     assert tight_margin.threshold.value == pytest.approx(0.95)
 
 
-def test_extraction_completeness_gate_uses_provenance_trace_surface() -> None:
+def test_extraction_completeness_gate_uses_yield_disposition_over_provenance() -> None:
     constraints = PhysicsConstraintSet(
         target_species=("K",),
         residual_species_by_target={"K": ("K2O", "K")},
@@ -1621,35 +1870,37 @@ def test_extraction_completeness_gate_uses_provenance_trace_surface() -> None:
         rump={"K2O": MOLAR_MASS["K2O"] / 1000.0},
         extraction_completeness_by_target={
             "K": {
-                "completeness_fraction": None,
-                "product_target_equiv_mol": 0.0,
+                "completeness_fraction": 1.0,
+                "product_target_equiv_mol": 1.0,
                 "residual_target_equiv_mol": 0.0,
-                "denominator_target_equiv_mol": 0.0,
-                "reason": "no target-equivalent mol evidence",
-                "gross_product_target_equiv_mol": 1.0,
-                "credit_line_reagent_target_equiv_mol": 1.0,
-                "denominator_basis_source": (
-                    "feedstock_derived_product_residual_wall_excluding_"
-                    "credit_line_and_external_additives"
-                ),
+                "denominator_target_equiv_mol": 1.0,
+                "reason": "legacy carried value",
             },
         },
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "K",
+                "destination_mol_atoms": {
+                    "product_condensed": 3.0,
+                    "melt_retained": 1.0,
+                },
+            },
+        ),
     )
 
     margin = constraints.extraction_completeness(trace)
     report = extraction_completeness_report(trace, constraints)
 
     assert not margin.feasible
-    assert "no target-equivalent mol evidence" in margin.detail
+    assert margin.observed == pytest.approx(0.75)
+    assert "legacy carried value" not in margin.detail
     target = report["targets"]["K"]
-    assert target["gross_product_target_equiv_mol"] == pytest.approx(1.0)
-    assert target["product_target_equiv_mol"] is None
-    assert target["credit_line_reagent_target_equiv_mol"] is None
-    assert report["status"] == "insufficient-evidence"
+    assert target["completeness_fraction"] == pytest.approx(0.75)
+    assert target["left_melt_target_equiv_mol"] == pytest.approx(3.0)
+    assert report["status"] == "reported"
 
 
-def test_extraction_completeness_gate_rejects_provenance_contradicting_ledger() -> None:
-    """SC-22: finite carried completeness must agree with product/rump ledger."""
+def test_extraction_completeness_gate_ignores_conflicting_legacy_provenance() -> None:
     constraints = PhysicsConstraintSet(
         target_species=("Fe",),
         residual_species_by_target={"Fe": ("FeO", "Fe")},
@@ -1667,17 +1918,25 @@ def test_extraction_completeness_gate_rejects_provenance_contradicting_ledger() 
                 "reason": "self-certified",
             },
         },
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "Fe",
+                "destination_mol_atoms": {
+                    "product_condensed": 1.0,
+                    "melt_retained": 1.0,
+                },
+            },
+        ),
     )
 
     margin = constraints.extraction_completeness(trace)
 
     assert not margin.feasible
-    assert "contradicts ledger" in margin.detail
-    assert margin.observed != pytest.approx(1.0)
+    assert margin.observed == pytest.approx(0.5)
+    assert "contradicts ledger" not in margin.detail
 
 
-def test_extraction_completeness_gate_rejects_provenance_without_ledgers() -> None:
-    """SC-22/SC-44: carried completeness is not trusted without ledger checks."""
+def test_extraction_completeness_gate_uses_yield_disposition_without_product_ledgers() -> None:
     constraints = PhysicsConstraintSet(
         target_species=("Fe",),
         residual_species_by_target={"Fe": ("FeO", "Fe")},
@@ -1692,6 +1951,15 @@ def test_extraction_completeness_gate_rejects_provenance_without_ledgers() -> No
                 "reason": "self-certified",
             },
         },
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "Fe",
+                "destination_mol_atoms": {
+                    "offgas_vented": 0.95,
+                    "melt_retained": 0.05,
+                },
+            },
+        ),
     )
 
     margin = constraints.extraction_completeness(trace)
@@ -1699,16 +1967,13 @@ def test_extraction_completeness_gate_rejects_provenance_without_ledgers() -> No
 
     assert not hasattr(trace, "product_ledger_kg")
     assert not hasattr(trace, "terminal_rump_by_species_kg")
-    assert not margin.feasible
-    assert margin.margin == -math.inf
-    assert math.isnan(margin.observed)
-    assert (
-        "cannot be verified without product_ledger_kg and "
-        "terminal_rump_by_species_kg ledgers"
-    ) in margin.detail
-    assert "product_target_equiv_mol=1" not in margin.detail
-    assert report["status"] == "insufficient-evidence"
-    assert report["reason"] in margin.detail
+    assert margin.feasible
+    assert margin.margin == pytest.approx(0.0)
+    assert margin.observed == pytest.approx(0.95)
+    assert margin.status == "available"
+    assert report["completeness_fraction"] == pytest.approx(0.95)
+    assert report["status"] == "reported"
+    assert not report["reason"]
 
 
 def test_per_species_extraction_thresholds_must_cover_targets() -> None:
@@ -1736,6 +2001,16 @@ def test_extraction_completeness_reports_target_denominator_residual_and_product
         condensed=({(1, "Cr"): 1.0},),
         products={"Cr": MOLAR_MASS["Cr"] / 1000.0},
         rump={"Cr2O3": MOLAR_MASS["Cr2O3"] / 1000.0},
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "Cr",
+                "destination_mol_atoms": {
+                    "product_condensed": 1.0,
+                    "melt_retained": 2.0,
+                    "cleanup_sequestered": 0.25,
+                },
+            },
+        ),
     )
 
     report = extraction_completeness_report(trace, constraints)
@@ -1747,13 +2022,21 @@ def test_extraction_completeness_reports_target_denominator_residual_and_product
     assert report["completeness_fraction"] == pytest.approx(1.0 / 3.0)
     assert target["target_species"] == "Cr"
     assert target["status"] == "reported"
-    assert target["denominator_account"] == {
-        "product": "product_ledger_kg",
-        "residual": "terminal_rump_by_species_kg",
-    }
-    assert target["denominator_basis"] == "target_equivalent_mol"
-    assert target["allowed_residual"]["account"] == "terminal_rump_by_species_kg"
-    assert target["allowed_residual"]["species"] == ("Cr2O3", "Cr")
+    assert target["denominator_account"] == (
+        "yield_disposition.fraction_table.destination_mol_atoms"
+    )
+    assert target["denominator_basis"] == (
+        "target-equivalent amount in the melt at the start of the evaluated "
+        "span, partitioned into left and not-left yield-disposition bins; "
+        "cleanup-sequestered amount is reported separately"
+    )
+    assert target["completeness_basis"] == "material_that_left_the_melt"
+    assert target["allowed_residual"]["account"] == (
+        "yield_disposition.fraction_table.destination_mol_atoms"
+    )
+    assert target["allowed_residual"]["bins"] == (
+        YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION.not_left_melt
+    )
     assert target["allowed_residual"]["fraction"] == pytest.approx(0.05)
     assert target["allowed_residual"]["target_equiv_mol"] == pytest.approx(0.15)
     assert target["product_bin"] == "Cr"
@@ -1766,10 +2049,19 @@ def test_extraction_completeness_reports_target_denominator_residual_and_product
     )
     assert target["credit_line_reagent_target_equiv_mol"] == pytest.approx(0.0)
     assert target["external_additive_reagent_target_equiv_mol"] == pytest.approx(0.0)
-    assert target["denominator_basis_source"] == "product_plus_residual"
+    assert target["denominator_basis_source"] == (
+        "yield_disposition_left_plus_not_left_target_element_mol"
+    )
+    assert target["cleanup_sequestered_target_equiv_mol"] == pytest.approx(0.25)
+    assert target["captured_basis_completeness_fraction"] == pytest.approx(1.0 / 3.0)
 
     missing = extraction_completeness_report(
-        _trace(condensed=({(1, "Cr"): 1.0},), products={}, rump={}),
+        _trace(
+            condensed=({(1, "Cr"): 1.0},),
+            products={},
+            rump={},
+            yield_disposition_fraction_table_rows=None,
+        ),
         constraints,
     )
     missing_target = missing["targets"]["Cr"]
@@ -1777,7 +2069,9 @@ def test_extraction_completeness_reports_target_denominator_residual_and_product
     assert missing["conclusion"] == "inconclusive"
     assert missing["completeness_fraction"] is None
     _assert_insufficient_target_evidence_is_unknown(missing_target)
-    assert missing_target["reason"] == "not-applicable: zero input basis for Cr"
+    assert "yield-disposition fraction table is unavailable" in missing_target[
+        "reason"
+    ]
 
     sim = SimpleNamespace(
         train=SimpleNamespace(stages=()),
@@ -1796,18 +2090,14 @@ def test_extraction_completeness_reports_target_denominator_residual_and_product
 
 
 @pytest.mark.parametrize(
-    ("trace", "reason_fragment"),
+    "trace",
     (
-        (None, "trace missing product_ledger_kg"),
-        (
-            SimpleNamespace(product_ledger_kg={"Cr": MOLAR_MASS["Cr"] / 1000.0}),
-            "trace missing terminal_rump_by_species_kg",
-        ),
+        None,
+        SimpleNamespace(product_ledger_kg={"Cr": MOLAR_MASS["Cr"] / 1000.0}),
     ),
 )
-def test_extraction_completeness_report_missing_evidence_never_zero_fills(
+def test_extraction_completeness_report_missing_melt_boundary_never_zero_fills(
     trace: object,
-    reason_fragment: str,
 ) -> None:
     constraints = PhysicsConstraintSet(
         target_species=("Cr",),
@@ -1820,8 +2110,8 @@ def test_extraction_completeness_report_missing_evidence_never_zero_fills(
     assert report["status"] == "insufficient-evidence"
     assert report["conclusion"] == "inconclusive"
     assert report["completeness_fraction"] is None
-    assert reason_fragment in report["reason"]
-    assert reason_fragment in target["reason"]
+    assert "yield-disposition fraction table is unavailable" in report["reason"]
+    assert "yield-disposition fraction table is unavailable" in target["reason"]
     _assert_insufficient_target_evidence_is_unknown(target)
 
 
@@ -1834,6 +2124,7 @@ def test_extraction_completeness_report_unknown_residual_map_never_zero_fills() 
         condensed=({(1, "Cr"): 1.0},),
         products={"Cr": MOLAR_MASS["Cr"] / 1000.0},
         rump={"Cr2O3": MOLAR_MASS["Cr2O3"] / 1000.0},
+        yield_disposition_fraction_table_rows=None,
     )
 
     report = extraction_completeness_report(trace, constraints)
@@ -1841,8 +2132,8 @@ def test_extraction_completeness_report_unknown_residual_map_never_zero_fills() 
 
     assert report["status"] == "insufficient-evidence"
     assert report["conclusion"] == "inconclusive"
-    assert "no residual species map for target" in report["reason"]
-    assert "no residual species map for target" in target["reason"]
+    assert "no residual species map for Cr" in report["reason"]
+    assert "no residual species map for Cr" in target["reason"]
     _assert_insufficient_target_evidence_is_unknown(target)
 
 
@@ -1862,20 +2153,42 @@ def test_constraint_digest_changes_when_threshold_changes() -> None:
 
 
 def test_extraction_completeness_gate_margin_matches_7913470_golden() -> None:
-    """GateMargin byte-identity vs pre-refactor inline loop (7913470)."""
+    """GateMargin follows the melt-boundary rows, not provisional capture."""
+
+    # The old captured-ledger margins were +0.04233584 for SiO and
+    # +0.04176683 for the multi-target case. The rows below now own those
+    # values: SiO has 9.5 left / 0.5 not-left, so 9.5 / 10 - 0.95 = 0;
+    # K is the multi-target minimum at 98 / (98 + 2) - 0.95 = +0.03.
 
     constraints = PhysicsConstraintSet()
     threshold = constraints.extraction_min_fraction
 
     zero_denom = constraints.extraction_completeness(
-        _trace(condensed=({(3, "SiO"): 20.0},), products={}, rump={})
+        _trace(
+            condensed=({(3, "SiO"): 20.0},),
+            products={},
+            rump={},
+            yield_disposition_fraction_table_rows=(
+                {
+                    "element": "Si",
+                    "destination_mol_atoms": {
+                        "product_condensed": 0.0,
+                        "melt_retained": 0.0,
+                    },
+                },
+            ),
+        )
     )
     assert zero_denom.gate == "extraction_completeness"
     assert zero_denom.feasible is False
     assert zero_denom.margin == -math.inf
-    assert zero_denom.observed == math.inf
+    assert zero_denom.observed is None
+    assert zero_denom.status == "unavailable"
     assert zero_denom.threshold == threshold
-    assert zero_denom.detail == "not-applicable: zero input basis for SiO"
+    assert zero_denom.detail == (
+        "fail-closed: SiO: empty left-plus-not-left denominator "
+        "for SiO"
+    )
 
     cr_constraints = PhysicsConstraintSet(
         target_species=("Cr",),
@@ -1885,27 +2198,42 @@ def test_extraction_completeness_gate_margin_matches_7913470_golden() -> None:
         condensed=({(1, "Cr"): 1.0},),
         products={"Cr": MOLAR_MASS["Cr"] / 1000.0},
         rump={"Cr2O3": MOLAR_MASS["Cr2O3"] / 1000.0},
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "Cr",
+                "destination_mol_atoms": {
+                    "product_condensed": 1.0,
+                    "melt_retained": 2.0,
+                },
+            },
+        ),
     )
     cr_margin = cr_constraints.extraction_completeness(cr_trace)
     assert cr_margin.feasible is False
     assert cr_margin.margin == pytest.approx(-0.6166666666666667)
     assert cr_margin.observed == pytest.approx(1.0 / 3.0)
-    assert cr_margin.detail == (
-        "Cr: product_target_equiv_mol=1, residual_target_equiv_mol=2, "
-        "denominator_target_equiv_mol=3"
-    )
+    assert "left_melt_target_equiv_mol=1" in cr_margin.detail
+    assert "not_left_melt_target_equiv_mol=2" in cr_margin.detail
 
     sio_margin = constraints.extraction_completeness(
-        _trace(condensed=({(3, "SiO"): 20.0},))
+        _trace(
+            condensed=({(3, "SiO"): 20.0},),
+            yield_disposition_fraction_table_rows=(
+                {
+                    "element": "Si",
+                    "destination_mol_atoms": {
+                        "product_condensed": 9.5,
+                        "melt_retained": 0.5,
+                    },
+                },
+            ),
+        )
     )
     assert sio_margin.feasible is True
-    assert sio_margin.margin == pytest.approx(0.04233584186562911)
-    assert sio_margin.observed == pytest.approx(0.9923358418656291)
-    assert sio_margin.detail == (
-        "SiO: product_target_equiv_mol=2154.98, "
-        "residual_target_equiv_mol=16.6436, "
-        "denominator_target_equiv_mol=2171.62"
-    )
+    assert sio_margin.margin == pytest.approx(0.0)
+    assert sio_margin.observed == pytest.approx(0.95)
+    assert "left_melt_target_equiv_mol=9.5" in sio_margin.detail
+    assert "not_left_melt_target_equiv_mol=0.5" in sio_margin.detail
 
     multi_constraints = PhysicsConstraintSet(
         target_species=("Na", "K", "Fe", "SiO"),
@@ -1914,29 +2242,71 @@ def test_extraction_completeness_gate_margin_matches_7913470_golden() -> None:
         condensed=({(1, "Fe"): 5.0, (3, "SiO"): 20.0},),
         products={"SiO": 95.0, "Fe": 10.0, "Na": 1.0, "K": 1.0},
         rump={"SiO2": 0.1, "FeO": 0.1, "Na2O": 0.01, "K2O": 0.01},
+        yield_disposition_fraction_table_rows=(
+            {
+                "element": "Na",
+                "destination_mol_atoms": {
+                    "product_condensed": 99.0,
+                    "melt_retained": 1.0,
+                },
+            },
+            {
+                "element": "K",
+                "destination_mol_atoms": {
+                    "product_condensed": 98.0,
+                    "melt_retained": 2.0,
+                },
+            },
+            {
+                "element": "Fe",
+                "destination_mol_atoms": {
+                    "product_condensed": 99.0,
+                    "melt_retained": 1.0,
+                },
+            },
+            {
+                "element": "Si",
+                "destination_mol_atoms": {
+                    "product_condensed": 99.0,
+                    "melt_retained": 1.0,
+                },
+            },
+        ),
     )
     multi_margin = multi_constraints.extraction_completeness(multi_trace)
     assert multi_margin.feasible is True
-    assert multi_margin.margin == pytest.approx(0.04176683470705078)
-    assert multi_margin.observed == pytest.approx(0.9917668347070507)
-    assert multi_margin.detail == (
-        "K: product_target_equiv_mol=25.5766, residual_target_equiv_mol=0.212324, "
-        "denominator_target_equiv_mol=25.7889"
-    )
+    assert multi_margin.margin == pytest.approx(0.03)
+    assert multi_margin.observed == pytest.approx(0.98)
+    assert "not_left_melt_target_equiv_mol=2" in multi_margin.detail
 
     exc_constraints = PhysicsConstraintSet(
         target_species=("Fe",),
         residual_species_by_target={"Fe": ("NotARealFormula",)},
     )
     exc_margin = exc_constraints.extraction_completeness(
-        _trace(condensed=({(1, "Fe"): 1.0},), products={}, rump={"NotARealFormula": 1.0})
+        _trace(
+            condensed=({(1, "Fe"): 1.0},),
+            products={},
+            rump={"NotARealFormula": 1.0},
+            yield_disposition_fraction_table_rows=(
+                {
+                    "element": "Fe",
+                    "destination_mol_atoms": {
+                        "product_condensed": 90.0,
+                        "melt_retained": 10.0,
+                    },
+                },
+            ),
+        )
     )
+    # Previously the invalid captured residual formula made this unavailable
+    # (margin=-inf, observed=None). Its independent boundary row is 90 left /
+    # 10 not-left, so 90 / 100 - 0.95 = -0.05.
     assert exc_margin.feasible is False
-    assert exc_margin.margin == -math.inf
-    assert math.isnan(exc_margin.observed)
-    assert exc_margin.detail == (
-        "fail-closed: 'missing molar mass for NotARealFormula'"
-    )
+    assert exc_margin.margin == pytest.approx(-0.05)
+    assert exc_margin.observed == pytest.approx(0.9)
+    assert exc_margin.status == "available"
+    assert "captured_basis_completeness_fraction=unavailable" in exc_margin.detail
 
 
 def test_extraction_completeness_counts_cartridge_residue_with_the_vapor_contract() -> None:

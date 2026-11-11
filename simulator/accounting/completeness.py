@@ -28,6 +28,9 @@ from simulator.accounting.queries import (
     TERMINAL_RUMP_SILICATE_RESIDUAL,
     TERMINAL_RUMP_UNEXTRACTED_METALS,
 )
+from simulator.accounting.yield_disposition import (
+    YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION,
+)
 from simulator.state import MOLAR_MASS
 from simulator.vapour_rail.instrumentation import (
     VAPOUR_CARRIER_AUTHORITY_MISSING,
@@ -175,17 +178,45 @@ class TargetExtractionCompleteness:
     credit_line_reagent_target_equiv_mol: float = 0.0
     external_additive_reagent_target_equiv_mol: float = 0.0
     denominator_basis_source: str = "product_plus_residual"
+    terminal_offgas_target_equiv_mol: float = 0.0
+    left_melt_target_equiv_mol: float | None = None
+    not_left_melt_target_equiv_mol: float | None = None
+    cleanup_sequestered_target_equiv_mol: float = 0.0
+    captured_basis_completeness_fraction: float | None = None
 
     @property
     def detail(self) -> str:
         if self.completeness_fraction is None:
             return f"{self.target_species}: {self.reason}"
-        return (
-            f"{self.target_species}: "
-            f"product_target_equiv_mol={self.product_target_equiv_mol:.6g}, "
-            f"residual_target_equiv_mol={self.residual_target_equiv_mol:.6g}, "
-            f"denominator_target_equiv_mol={self.denominator_target_equiv_mol:.6g}"
-        )
+        fields = [
+            f"completeness_fraction={self.completeness_fraction:.6g}",
+            "captured_basis_completeness_fraction="
+            + (
+                f"{self.captured_basis_completeness_fraction:.6g}"
+                if self.captured_basis_completeness_fraction is not None
+                else "unavailable"
+            ),
+        ]
+        for name, value in (
+            ("product_target_equiv_mol", self.product_target_equiv_mol),
+            ("residual_target_equiv_mol", self.residual_target_equiv_mol),
+            ("left_melt_target_equiv_mol", self.left_melt_target_equiv_mol),
+            ("not_left_melt_target_equiv_mol", self.not_left_melt_target_equiv_mol),
+        ):
+            if value is not None:
+                fields.append(f"{name}={value:.6g}")
+        if self.left_melt_target_equiv_mol is not None:
+            fields.extend((
+                f"terminal_offgas_target_equiv_mol="
+                f"{self.terminal_offgas_target_equiv_mol:.6g}",
+                f"wall_deposit_target_equiv_mol="
+                f"{self.wall_deposit_target_equiv_mol:.6g}",
+                f"cleanup_sequestered_target_equiv_mol="
+                f"{self.cleanup_sequestered_target_equiv_mol:.6g}",
+                f"denominator_target_equiv_mol="
+                f"{self.denominator_target_equiv_mol:.6g}",
+            ))
+        return f"{self.target_species}: " + ", ".join(fields)
 
 
 @dataclass(frozen=True)
@@ -737,6 +768,7 @@ def extraction_completeness_by_target(
     terminal_rump_kg: Mapping[str, Any],
     *,
     process_inventory_residual_kg: Mapping[str, Any] | None = None,
+    yield_disposition_fraction_table_rows: tuple[Mapping[str, Any], ...] | None = None,
     require_residual_species: bool = False,
 ) -> dict[str, TargetExtractionCompleteness]:
     residual_map = {
@@ -751,17 +783,14 @@ def extraction_completeness_by_target(
     results: dict[str, TargetExtractionCompleteness] = {}
     for raw_target in target_species:
         target = str(raw_target)
-        if require_residual_species and target not in residual_map:
-            results[target] = TargetExtractionCompleteness(
-                target,
-                None,
-                0.0,
-                0.0,
-                0.0,
-                "unknown: no residual species map for target",
-            )
-            continue
+        product_mol = residual_mol = captured_denom = None
+        captured_fraction = None
+        left_melt_mol = not_left_melt_mol = None
+        offgas_mol = wall_mol = cleanup_sequestered_mol = 0.0
+        captured_error = ""
         try:
+            if require_residual_species and target not in residual_map:
+                raise ValueError(f"no residual species map for {target}")
             product_species = tuple(dict.fromkeys((
                 target,
                 _target_element(target),
@@ -782,7 +811,58 @@ def extraction_completeness_by_target(
                     residual,
                     rump.get(residual, 0.0),
                 )
-            denom = product_mol + residual_mol
+            captured_denom = _finite_number(
+                math.fsum((product_mol, residual_mol)),
+                f"{target} product-plus-residual denominator mol",
+            )
+            captured_fraction = (
+                product_mol / captured_denom
+                if captured_denom > _EPS
+                else None
+            )
+        except (
+            AccountingError,
+            KeyError,
+            OverflowError,
+            TypeError,
+            ValueError,
+        ) as exc:
+            captured_error = str(exc)
+            product_mol = residual_mol = captured_denom = None
+        if yield_disposition_fraction_table_rows is None:
+            results[target] = TargetExtractionCompleteness(
+                target,
+                captured_fraction,
+                product_mol,
+                residual_mol,
+                captured_denom,
+                (
+                    f"unavailable: {captured_error}"
+                    if captured_error
+                    else (
+                        "unavailable: empty product-plus-residual denominator "
+                        f"for {target}"
+                        if captured_fraction is None
+                        else ""
+                    )
+                ),
+                captured_basis_completeness_fraction=captured_fraction,
+                denominator_basis_source="product_plus_residual",
+            )
+            continue
+        try:
+            (
+                fraction,
+                left_melt_mol,
+                not_left_melt_mol,
+                denom,
+                offgas_mol,
+                wall_mol,
+                cleanup_sequestered_mol,
+            ) = _melt_boundary_fraction_table_metrics(
+                target,
+                yield_disposition_fraction_table_rows,
+            )
             if denom <= _EPS:
                 results[target] = TargetExtractionCompleteness(
                     target,
@@ -790,26 +870,104 @@ def extraction_completeness_by_target(
                     product_mol,
                     residual_mol,
                     denom,
-                    f"not-applicable: zero input basis for {target}",
+                    f"unavailable: empty left-plus-not-left denominator for {target}",
+                    wall_deposit_target_equiv_mol=wall_mol,
+                    terminal_offgas_target_equiv_mol=offgas_mol,
+                    left_melt_target_equiv_mol=left_melt_mol,
+                    not_left_melt_target_equiv_mol=not_left_melt_mol,
+                    cleanup_sequestered_target_equiv_mol=cleanup_sequestered_mol,
+                    captured_basis_completeness_fraction=captured_fraction,
+                    denominator_basis_source=(
+                        "yield_disposition_left_plus_not_left_target_element_mol"
+                    ),
                 )
                 continue
             results[target] = TargetExtractionCompleteness(
                 target,
-                product_mol / denom,
+                fraction,
                 product_mol,
                 residual_mol,
                 denom,
+                wall_deposit_target_equiv_mol=wall_mol,
+                terminal_offgas_target_equiv_mol=offgas_mol,
+                left_melt_target_equiv_mol=left_melt_mol,
+                not_left_melt_target_equiv_mol=not_left_melt_mol,
+                cleanup_sequestered_target_equiv_mol=cleanup_sequestered_mol,
+                captured_basis_completeness_fraction=captured_fraction,
+                denominator_basis_source=(
+                    "yield_disposition_left_plus_not_left_target_element_mol"
+                ),
             )
-        except (AccountingError, KeyError, TypeError, ValueError) as exc:
+        except (
+            AccountingError,
+            KeyError,
+            OverflowError,
+            TypeError,
+            ValueError,
+        ) as exc:
             results[target] = TargetExtractionCompleteness(
                 target,
                 None,
-                0.0,
-                0.0,
-                0.0,
-                f"unknown: {exc}",
+                product_mol,
+                residual_mol,
+                None,
+                f"unavailable: {exc}",
+                captured_basis_completeness_fraction=captured_fraction,
+                denominator_basis_source=(
+                    "yield_disposition_left_plus_not_left_target_element_mol"
+                ),
             )
     return results
+
+
+def _melt_boundary_fraction_table_metrics(
+    target: str,
+    rows: tuple[Mapping[str, Any], ...],
+) -> tuple[float | None, float, float, float, float, float, float]:
+    """Project the disposition owner's destination rows into the ruled bins."""
+    element = _target_element(target)
+    row = next(
+        (candidate for candidate in rows if str(candidate.get("element")) == element),
+        None,
+    )
+    if row is None:
+        raise ValueError(f"yield-disposition row missing target element {element}")
+    destinations = row.get("destination_mol_atoms")
+    if not isinstance(destinations, Mapping):
+        raise ValueError(f"yield-disposition destinations missing for {element}")
+
+    def amount_for(destination: str) -> float:
+        return _non_negative_number(
+            destinations.get(destination, 0.0),
+            f"yield-disposition {element}.{destination} mol-atoms",
+        )
+
+    left = math.fsum(
+        amount_for(name)
+        for name in YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION.left_melt
+    )
+    not_left = math.fsum(
+        amount_for(name)
+        for name in YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION.not_left_melt
+    )
+    cleanup = math.fsum(
+        amount_for(name)
+        for name in YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION.cleanup_sequestered
+    )
+    denominator = _finite_number(
+        math.fsum((left, not_left)),
+        f"yield-disposition {element}.left_plus_not_left mol-atoms",
+    )
+    fraction = left / denominator if denominator > _EPS else None
+    return (
+        fraction,
+        left,
+        not_left,
+        denominator,
+        amount_for("offgas_vented"),
+        amount_for("wall_deposit"),
+        cleanup,
+    )
 
 
 def target_species_yield_by_initial_cleaned_melt(
@@ -1214,12 +1372,26 @@ def vapor_contract_completeness(
     )
 
 
+def _account_species_formula(species: str):
+    """Parse an inventory key. A trailing ``_gas`` suffix counts as the oxide.
+
+    The shared formula parser does not strip ``_gas``. Stripping it there makes
+    thermal-train treat ``CaO_gas`` as a known species and adds its mass to the
+    hot-vapor total.
+    """
+    text = str(species)
+    suffix = "_gas"
+    if text.endswith(suffix) and text != suffix:
+        text = text[: -len(suffix)]
+    return parse_formula(text, species=species)
+
+
 def _target_equivalent_mol(target: str, species: str, kg: Any) -> float:
     species_mol = _species_mol(species, kg)
     if species_mol <= _EPS:
         return 0.0
     target_element = _target_element(target)
-    species_formula = parse_formula(species, species=species)
+    species_formula = _account_species_formula(species)
     element_count = species_formula.elements.get(target_element, 0.0)
     if element_count <= 0.0:
         raise ValueError(f"{species} contains no {target_element} for target {target}")
@@ -1243,7 +1415,7 @@ def _species_mol(species: str, kg: Any) -> float:
     molar_mass = MOLAR_MASS.get(species)
     if molar_mass is None:
         try:
-            formula = parse_formula(species, species=species)
+            formula = _account_species_formula(species)
         except (AccountingError, ValueError) as exc:
             raise KeyError(f"missing molar mass for {species}") from exc
         molar_mass = formula.molar_mass_g_mol
@@ -1723,7 +1895,7 @@ def _target_relevant_species_kg(
         amount = _non_negative_number(kg, f"{species_name} kg")
         if amount <= _EPS:
             continue
-        formula = parse_formula(species_name, species=species_name)
+        formula = _account_species_formula(species_name)
         if formula.elements.get(element, 0.0) <= 0.0:
             continue
         values[species_name] = values.get(species_name, 0.0) + amount
@@ -1976,7 +2148,7 @@ def _element_equivalent_mol(element: str, species: str, kg: Any) -> float:
     species_mol = _species_mol(species, kg)
     if species_mol <= _EPS:
         return 0.0
-    species_formula = parse_formula(species, species=species)
+    species_formula = _account_species_formula(species)
     element_count = species_formula.elements.get(element, 0.0)
     if element_count <= 0.0:
         raise ValueError(f"{species} contains no {element}")

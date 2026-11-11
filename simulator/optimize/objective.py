@@ -3808,7 +3808,11 @@ def _furnace_amortization_summary(
     ):
         return MappingProxyType({
             "furnace_amortization_status": "resinter_threshold_ungrounded",
-            "furnace_amortization_batch_cost_equivalents": 0.0,
+            "furnace_amortization_status_reason": (
+                "resinter_threshold_kg is not qualified"
+            ),
+            "furnace_amortization_cost_per_run_usd": None,
+            "furnace_amortization_batch_cost_equivalents": None,
             "campaigns_to_resinter": campaigns_to_resinter,
         })
     amortization = furnace_amortization_cost_per_run(
@@ -3841,6 +3845,10 @@ def _extraction_constraints_from_profile(profile: Mapping[str, Any]) -> PhysicsC
 
     base = PhysicsConstraintSet()
     updates: dict[str, Any] = {}
+    if "enforce_delivered_stream_purity" in raw_constraints:
+        updates["enforce_delivered_stream_purity"] = (
+            raw_constraints["enforce_delivered_stream_purity"]
+        )
     if "target_species" in raw_constraints:
         raw_targets = raw_constraints["target_species"]
         if not isinstance(raw_targets, (list, tuple)) or not raw_targets:

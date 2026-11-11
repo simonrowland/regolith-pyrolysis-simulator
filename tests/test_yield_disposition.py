@@ -18,6 +18,7 @@ from simulator.accounting.yield_disposition import (
     MELT_RETAINED_SUBDISPOSITIONS,
     OriginUnresolvedError,
     YIELD_DISPOSITION_BINS,
+    YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION,
     YieldDispositionError,
     build_yield_disposition,
     capture_ledger_snapshot,
@@ -35,6 +36,18 @@ def _row(payload: dict, element: str) -> dict:
         for row in payload["fraction_table"]["rows"]
         if row["element"] == element
     )
+
+
+def test_melt_boundary_partition_covers_disposition_bins_once() -> None:
+    partition = YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION
+    assigned = (
+        *partition.left_melt,
+        *partition.not_left_melt,
+        *partition.cleanup_sequestered,
+    )
+
+    assert len(assigned) == len(set(assigned))
+    assert set(assigned) == set(YIELD_DISPOSITION_BINS)
 
 
 def test_campaign_snapshot_captures_only_condensation_origin_state() -> None:

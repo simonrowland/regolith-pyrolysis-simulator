@@ -5141,9 +5141,15 @@ class EvaporationMixin:
             diagnostic=diagnostic,
             control_inputs=control_inputs,
         )
-        # The well-mixed headspace makes Na origins indistinguishable;
-        # the ledger attributes partial gas withdrawals pro rata.
+        # Branch: every evaporation credit declares the Na headspace
+        # well-mixed; partial gas withdrawals attribute pro rata.
         self._mark_overhead_na_origin_pool()
+        # Green: K and Mg are the same source-mixed overhead pool,
+        # declared when that cation is the credited species.
+        if species in ('K', 'Mg'):
+            self.atom_ledger.mark_amalgamated_pool(
+                'process.overhead_gas', (species,)
+            )
         if apply_evaporative_redox_source_terms:
             self._apply_evaporative_redox_source_terms(
                 transition,

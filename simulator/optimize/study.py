@@ -4318,9 +4318,28 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "neighbor_disagreement",
             "reduced_real_cache",
             "per_hour_summary",
+            "yield_disposition_fraction_table_rows",
+            "yield_disposition_fraction_table_error",
         ):
             if key in trace:
-                payload[key] = _jsonable_value(trace[key])
+                value = trace[key]
+                if key == "yield_disposition_fraction_table_rows" and isinstance(
+                    value,
+                    (tuple, list),
+                ):
+                    payload[key] = [
+                        {
+                            "element": _jsonable_value(row.get("element")),
+                            "destination_mol_atoms": _jsonable_value(
+                                row.get("destination_mol_atoms")
+                            ),
+                        }
+                        if isinstance(row, Mapping)
+                        else _jsonable_value(row)
+                        for row in value
+                    ]
+                else:
+                    payload[key] = _jsonable_value(value)
         authority_statuses = alpha_authority_statuses(trace)
         if authority_statuses:
             payload["alpha_authority_status_by_species"] = authority_statuses

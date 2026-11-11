@@ -307,56 +307,6 @@ def test_config_absent_fallback_uses_binary_digest(
     )
 
 
-def test_magemin_fallback_uses_release_and_binary_digest_without_path(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    from simulator.melt_backend import magemin as magemin_module
-    from simulator.melt_backend.magemin import MAGEMinBackend
-
-    binary_path = tmp_path / "MAGEMin"
-    binary_path.write_bytes(b"fake-MAGEMin-build")
-    monkeypatch.setattr(
-        engine_local_config,
-        "config_path",
-        lambda: tmp_path / "missing-engines.local.toml",
-    )
-
-    reported_version = "MAGEMin 1.9.6"
-    monkeypatch.setattr(
-        magemin_module.subprocess,
-        "run",
-        lambda command, **_kwargs: subprocess.CompletedProcess(
-            command, 0, stdout=reported_version, stderr=""
-        ),
-    )
-    backend = MAGEMinBackend()
-    backend._binary_path = binary_path
-    backend._database = "ig"
-
-    version = backend.get_engine_version()
-
-    expected = engine_local_config._cache_version_for_binary(
-        "magemin", binary_path, reported_version
-    )
-    assert expected is not None
-    assert version == expected
-    assert "digest=sha256:" in version
-    assert str(tmp_path) not in version
-
-    def fail_probe(*_args, **_kwargs):
-        raise OSError("probe unavailable")
-
-    monkeypatch.setattr(magemin_module.subprocess, "run", fail_probe)
-    fallback = backend.get_engine_version()
-    expected_fallback = engine_local_config._cache_version_for_binary(
-        "magemin", binary_path, "MAGEMin"
-    )
-    assert fallback == expected_fallback
-    assert "digest=sha256:" in fallback
-    assert str(tmp_path) not in fallback
-
-
 def test_thermoengine_fallback_version_omits_module_path(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

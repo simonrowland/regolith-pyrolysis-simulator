@@ -2315,6 +2315,9 @@ def _composition_from_plain(
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
     closure_result: _MassPercentClosureResult | None = None,
+    projection_notice_sink: list[Notice] | None = None,
+    projection_quantity: Quantity | None = None,
+    projection_origin: str | None = None,
 ) -> Composition:
     assert isinstance(payload, Mapping)
     components = payload.get("components") or ()
@@ -2357,10 +2360,33 @@ def _composition_from_plain(
                 "mass-percent composition is not usable: "
             )
             raise ValueError(detail)
-        return replace(
+        composition = replace(
             result.composition,
             **metadata,
         )
+        if projection_notice_sink is not None and result.dropped_components:
+            derivation = _mass_percent_composition_derivation(
+                _oxide_mass_percent_components(wt),
+                None,
+                closure_result=result,
+            )
+            notice = _composition_projection_notice(
+                Located(State.of(composition), inference=derivation),
+                quantity=projection_quantity,
+                origin=projection_origin or "",
+            )
+            if notice is None:
+                details = ", ".join(
+                    f"{name}={amount} wt%"
+                    for name, amount in result.dropped_components
+                )
+                raise ValueError(
+                    "mass-percent conversion dropped numeric component(s) but "
+                    f"could not attach a projection notice: {details}"
+                )
+            if notice not in projection_notice_sink:
+                projection_notice_sink.append(notice)
+        return composition
     elif amount_basis is AmountBasis.MOLE_PERCENT:
         mole_percent = _mole_percent_components(payload)
         if mole_percent is None:
@@ -2405,12 +2431,19 @@ def _composition_state_from_plain(
     payload: object,
     *,
     declared_component_map: Mapping[str, Any] | None,
+    projection_notice_sink: list[Notice] | None = None,
+    projection_quantity: Quantity | None = None,
+    projection_origin: str | None = None,
 ) -> State[Composition]:
     try:
         return _state_from_plain(
             payload,
             lambda value: _composition_from_plain(
-                value, declared_component_map=declared_component_map
+                value,
+                declared_component_map=declared_component_map,
+                projection_notice_sink=projection_notice_sink,
+                projection_quantity=projection_quantity,
+                projection_origin=projection_origin,
             ),
         )
     except (ArithmeticError, ValueError) as exc:
@@ -2534,10 +2567,16 @@ def _standard_state_from_extract_text(
     )
 
 
-def _identity_from_plain(payload: object) -> Identity:
+def _identity_from_plain(
+    payload: object,
+    *,
+    projection_notice_sink: list[Notice] | None = None,
+    projection_origin: str | None = None,
+) -> Identity:
     assert isinstance(payload, Mapping)
+    quantity = _state_from_plain(payload["quantity"], lambda v: Quantity(str(v)))
     kwargs: dict[str, Any] = {
-        "quantity": _state_from_plain(payload["quantity"], lambda v: Quantity(str(v))),
+        "quantity": quantity,
         "species": (
             None
             if payload.get("species") is None
@@ -2583,6 +2622,9 @@ def _identity_from_plain(payload: object) -> Identity:
             declared_component_map=_declared_printed_composition_map(
                 composition_payload
             ),
+            projection_notice_sink=projection_notice_sink,
+            projection_quantity=(quantity.value if quantity.is_value else None),
+            projection_origin=projection_origin,
         )
     if payload.get("fO2_Pa") is not None:
         kwargs["fO2_Pa"] = _state_from_plain(payload["fO2_Pa"], as_decimal)
@@ -3540,7 +3582,15 @@ def observation_from_plain(payload: object) -> Observation:
     assert isinstance(payload, Mapping)
     notices = tuple(_notice_from_plain(n) for n in (payload.get("notices") or ()))
     observation_id = str(payload["observation_id"])
-    identity = _identity_from_plain(payload["identity"])
+    projection_notices: list[Notice] = []
+    identity = _identity_from_plain(
+        payload["identity"],
+        projection_notice_sink=projection_notices,
+        projection_origin=observation_id,
+    )
+    notices += tuple(
+        notice for notice in projection_notices if notice not in notices
+    )
     value = _value_from_plain(payload["value"])
     admission = _admission_from_plain(payload["admission"], value=value)
     admission_notice = _admission_default_notice(
@@ -4520,7 +4570,7 @@ _PRINTED_COMPOSITION_MISSING_MARKERS = frozenset(
     {"-", "–", "—", "n.d.", "nd", "bdl", "--", "n/a", "not reported"}
 )
 # Accept kept mass from 95 through 105 wt%; totals above 102 are renormalized
-# to 100 wt%, and no more than 0.5 wt% of dropped traces are tolerated.
+# to 100 wt%, and up to 0.5 wt% of dropped components are projected with notice.
 _MASS_PERCENT_MINIMUM_KEPT_SUM = Decimal("95")
 _MASS_PERCENT_RENORMALIZE_ABOVE = Decimal("102")
 _MASS_PERCENT_MAXIMUM_KEPT_SUM = Decimal("105")
@@ -5024,7 +5074,7 @@ def _mass_percent_composition_derivation(
     dropped_mass = closure_result.dropped_mass
     if (
         dropped
-        and Decimal("0") < dropped_mass <= _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
+        and dropped_mass <= _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
     ):
         printed_total = closure_result.printed_analysis_total
         if printed_total is not None and printed_total > 0:
@@ -6007,20 +6057,28 @@ def _wt_percent_conversion_or_raise(
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
 ) -> Composition:
-    converted, refusal = _wt_percent_conversion_or_refusal(
+    result = _wt_percent_conversion_or_refusal(
         wt,
         closure_context=closure_context,
         declared_component_map=declared_component_map,
     )
-    if converted is None:
+    if result.composition is None:
         reason = (
-            refusal.reason
-            if refusal is not None
+            result.refusal.reason
+            if result.refusal is not None
             else "mass-percent composition is not usable"
         )
         detail = reason.removeprefix("mass-percent composition is not usable: ")
         raise ValueError(detail)
-    return converted
+    if result.dropped_components:
+        details = ", ".join(
+            f"{name}={amount} wt%" for name, amount in result.dropped_components
+        )
+        raise ValueError(
+            "mass-percent conversion dropped numeric component(s) without a "
+            f"notice channel: {details}"
+        )
+    return result.composition
 
 
 def _wt_percent_conversion_state(

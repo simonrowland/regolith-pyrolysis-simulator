@@ -210,6 +210,21 @@ def _setpoints_data() -> dict:
         return yaml.safe_load(handle)
 
 
+@lru_cache(maxsize=1)
+def _janaf_extract() -> dict:
+    """Module-safe: NIST-JANAF extract, independent of the Antoine coefficients."""
+    path = DATA_DIR / "literature" / "extracts" / "janaf-4th.yaml"
+    with path.open() as handle:
+        return yaml.safe_load(handle)
+
+
+def _janaf_normal_boiling_point(species: str) -> dict:
+    for observation in _janaf_extract()["species"][species]["observations"]:
+        if observation.get("observation_id") == f"{species}_normal_boiling_point":
+            return observation["values"]
+    raise KeyError(species)
+
+
 def _pure_component_antoine_pa(entry: dict, temperature_K: float) -> float:
     if entry.get("fit_target") == "standard_reaction_term":
         coeff = entry["pure_component_antoine"]
@@ -230,6 +245,34 @@ def _coefficient_pa(coeff: dict, temperature_K: float) -> float:
         float(coeff["A"])
         - float(coeff["B"]) / (float(temperature_K) + float(coeff.get("C", 0.0)))
     )
+
+
+# Published NBP disagreements in this catalog are tenths of a kelvin or
+# larger. A check temperature within this band of the fit's own 1 atm root
+# is the anchor identity: log10(P) = A - B/(T+C) returns 101325 Pa there
+# for any enthalpy that leaves A - B/T_anchor unchanged.
+_NBP_ANCHOR_IDENTITY_K = 0.05
+
+
+def _one_atm_anchor_temperature_K(coeff: dict) -> float:
+    """Temperature at which this Antoine block is exactly 1 atm by algebra.
+
+    Premise: log10(P/Pa) = A - B/(T+C). Set P = 101325 Pa.
+    Algebra: T = B / (A - log10(101325)) - C.
+    Unit check: A is log10(Pa), B and C are kelvin, T is kelvin.
+    Sanity: a block anchored at its own validation point returns that point.
+    """
+
+    A = float(coeff["A"])
+    B = float(coeff["B"])
+    C = float(coeff.get("C", 0.0))
+    denom = A - math.log10(PA_PER_ATM)
+    if denom == 0.0 or not math.isfinite(denom):
+        raise ValueError("antoine 1 atm root is undefined")
+    temperature_K = B / denom - C
+    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+        raise ValueError("antoine 1 atm root is nonphysical")
+    return temperature_K
 
 
 def _alcock_source_pa(species: str, phase: str, temperature_K: float) -> float:
@@ -376,11 +419,11 @@ def _require_certified_pure_component_antoine(entry: dict, temperature_K: float)
         # Mg now uses a CRC/Stull source-table fit; it remains within a few
         # percent of the NIST normal boiling point.
         ("Mg", 1363.15, 0.03),  # NIST SRD 69: 1363 K (1090 C), Honig and Kramer 1969.
-        ("Fe", 3135.15, 0.02),  # CRC/NIST element data: Fe normal boiling point 2862 C.
-        # CRC/CR2 / Alcock-Itkin-Horrigan and NIST-JANAF derived fits.
-        ("Ti", 3560.15, 1e-6),
-        ("Mn", 2334.526, 1e-9),
-        # JANAF Tb(1 atm); tolerance includes fit residual and 1 bar-to-atm offset.
+        # Chase 1998 NIST-JANAF Fe, 3134 K at 1 atm (janaf-4th.yaml
+        # Fe_normal_boiling_point). The CRC 2862 C = 3135.15 K point is the
+        # Clausius-Clapeyron construction anchor, so it is not this check.
+        ("Fe", 3134.0, 0.02),
+        # JANAF Tb; tolerance includes fit residual and the 1 bar-to-atm offset.
         ("Al", 2793.72, None),
         ("Si", 3508.12, None),
     ],
@@ -393,6 +436,12 @@ def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
     data = _vapor_pressure_data()["metals"][species]
 
     assert data["pure_component_antoine"]["source"]
+    coeff, block = vapor_pressure_antoine_coefficients(data, temperature_K)
+    assert block == "pure_component_antoine"
+    # b-252: a row on the fit's own 1 atm root cannot fail, so it is not
+    # ground truth. Ti and Mn anchors live in the round-trip test below.
+    anchor_K = _one_atm_anchor_temperature_K(coeff)
+    assert abs(temperature_K - anchor_K) > _NBP_ANCHOR_IDENTITY_K
     pressure_pa = _pure_component_antoine_pa(data, temperature_K)
     if rel_tol is None:
         residual = float(
@@ -404,6 +453,95 @@ def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
         )
     else:
         assert pressure_pa == pytest.approx(PA_PER_ATM, rel=rel_tol)
+    if species == "Fe":
+        janaf = _janaf_normal_boiling_point("Fe")
+        assert temperature_K == janaf["value_K"]
+        assert janaf["pressure_basis_Pa"] == PA_PER_ATM
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "rel_tol"),
+    [
+        # Forced normal-boiling anchor on the stored Antoine block. The
+        # Alcock liquid equation ends at 2400 K, so 3560.15 K is an
+        # extrapolation, not an independent boiling point.
+        ("Ti", 3560.15, 1e-6),
+        # Forced 101325 Pa anchor. The JANAF node is a 1-bar Shomate
+        # boundary; see test_mn_liquid_anchor_is_not_the_one_bar_shomate.
+        ("Mn", 2334.526, 1e-9),
+    ],
+)
+def test_pure_component_antoine_nbp_anchor_is_a_round_trip(
+    species: str,
+    temperature_K: float,
+    rel_tol: float,
+) -> None:
+    """Fit round-trip of a stored 1 atm anchor. Not a ground-truth NBP check.
+
+    b-252: P(T_anchor) = 101325 Pa is true for any enthalpy that preserves
+    the anchor, so this assertion must not sit in the ground-truth list.
+    """
+
+    data = _vapor_pressure_data()["metals"][species]
+    coeff, block = vapor_pressure_antoine_coefficients(data, temperature_K)
+    assert block == "pure_component_antoine"
+    assert float(coeff["normal_boiling_anchor_K"]) == temperature_K
+    anchor_K = _one_atm_anchor_temperature_K(coeff)
+    assert abs(temperature_K - anchor_K) <= _NBP_ANCHOR_IDENTITY_K
+    assert _pure_component_antoine_pa(data, temperature_K) == pytest.approx(
+        PA_PER_ATM,
+        rel=rel_tol,
+    )
+    if species == "Ti":
+        # Chase 1998 Ti-001 liquid/ideal-gas node. Independent of the
+        # 3560.15 K anchor, and outside the Alcock liquid range 1941-2400 K.
+        # The fit returns about 1.34 atm there. Coefficients stay put:
+        # moving the anchor would change computed Ti vapor pressure.
+        janaf_K = float(_janaf_normal_boiling_point("Ti")["value_K"])
+        assert janaf_K == pytest.approx(3630.956, abs=1e-3)
+        janaf_pa = _pure_component_antoine_pa(data, janaf_K)
+        assert janaf_pa == pytest.approx(135_598.4852, rel=1e-5)
+        assert abs(janaf_pa - PA_PER_ATM) / PA_PER_ATM > 0.2
+
+
+def test_mn_liquid_anchor_is_not_the_one_bar_shomate() -> None:
+    """Verdict (b-252): Mn's 1 atm anchor is not the 1-bar Shomate evaluation.
+
+    The liquid segment declares pressure_standard_Pa = 100000 and still
+    stores an exact [101325 Pa, 2334.526 K] validation point. The Shomate
+    evaluation at that node is 100260.57476 Pa.
+
+    Premise: P = P_std * exp(-ΔG_vap / RT), P_std = 1 bar, ΔG from the
+    Mn(l) and Mn(g) Shomate rows at T = 2334.526 K.
+    Algebra: 100260.57476 / 100000 - 1 = +0.2606% above 1 bar;
+    101325 / 100260.57476 - 1 = +1.0617% (forced 1 atm anchor above
+    the evaluation).
+    Unit check: both pressures are pascals.
+    Sanity: the gap is the standard-state mismatch, about 1%, not a
+    floating-point residue. The Antoine coefficients are not retuned.
+    """
+
+    data = _vapor_pressure_data()["metals"]["Mn"]
+    liquid = next(
+        segment
+        for segment in data["pure_component_antoine"]["segments"]
+        if segment["name"] == "liquid_nist_janaf_chase_1998"
+    )
+    shomate = liquid["nist_janaf_shomate"]
+    assert shomate["pressure_standard_Pa"] == 100_000
+    assert liquid["normal_boiling_anchor_K"] == 2334.526
+    assert liquid["source_validation_points_Pa_K"][-1] == [101325, 2334.526]
+    for phase in ("liquid", "gas"):
+        for key, value in shomate[phase].items():
+            assert NIST_JANAF_MN_SHOMATE[phase][key] == pytest.approx(value)
+
+    temperature_K = 2334.526
+    shomate_pa = _nist_janaf_mn_liquid_pa(temperature_K)
+    fit_pa = _pure_component_antoine_pa(data, temperature_K)
+    assert shomate_pa == pytest.approx(100_260.57476, rel=1e-9)
+    assert fit_pa == pytest.approx(PA_PER_ATM, rel=1e-9)
+    assert (fit_pa - shomate_pa) / shomate_pa == pytest.approx(0.01061659, rel=1e-4)
+
 
 @pytest.mark.parametrize(
     ("species", "temperature_K", "expected_pa", "rel_tol"),
