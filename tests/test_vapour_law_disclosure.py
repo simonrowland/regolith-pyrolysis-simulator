@@ -21,11 +21,14 @@ returned. Upper-case ``_CACHE`` stores are in that same inventory. The melt
 pressure cache, the KEMS surface cache, the residue pressure closures, and
 the Sossi, Hashimoto, and Knudsen rows of the residue-prediction cache are
 read only through that gate.
-Registration is the one
-``CompiledPressureEvaluator.evaluate`` call. A non-diagnostic law is registered
-when the evaluation leaves a certified domain: the temperature band, the
-oxygen evaluator band, or the oxygen mass-action floor. An in-domain
-non-diagnostic evaluation registers nothing. A hit does not execute the law; it
+Registration of a new row is ``register_executed_law``. Compiled laws call
+it from ``CompiledPressureEvaluator.evaluate``. A published Antoine
+continuation that never calls evaluate(), including out-of-band SiO, calls
+it once from the provider publication chokepoint. A non-diagnostic law is
+registered when the evaluation leaves a certified domain: the temperature
+band, the oxygen evaluator band, or the oxygen mass-action floor. An
+in-domain non-diagnostic evaluation registers nothing. A hit does not execute
+the law; it
 re-registers the disclosures stored with that computation, and evaluation
 counts add. An empty disclosure is a measured zero only when the computation
 recorded one. Attribution is per computation, never the ambient run registry.
@@ -214,6 +217,13 @@ def test_concurrent_scopes_do_not_share_disclosures() -> None:
 
 
 def test_register_executed_law_has_one_production_call() -> None:
+    """Two executions, one writer.
+
+    A compiled law registers inside evaluate(). A direct Antoine continuation
+    registers at the provider's publication of that pressure. A third call
+    site is a new execution path that has not been named.
+    """
+
     files = subprocess.check_output(
         ["git", "ls-files", "simulator", "engines", "tools", "scripts"],
         cwd=_ROOT,
@@ -233,9 +243,18 @@ def test_register_executed_law_has_one_production_call() -> None:
             if stripped.startswith("def "):
                 continue
             calls.append(f"{relative}:{lineno}:{stripped}")
-    assert len(calls) == 1
-    assert calls[0].startswith("simulator/vapour_rail/catalog.py:")
-    assert calls[0].endswith("register_executed_law(self, evaluation)")
+    assert len(calls) == 2
+    catalog_calls = [item for item in calls if item.startswith("simulator/vapour_rail/catalog.py:")]
+    provider_calls = [
+        item for item in calls if item.startswith("engines/builtin/vapor_pressure.py:")
+    ]
+    assert len(catalog_calls) == 1
+    assert catalog_calls[0].endswith("register_executed_law(self, evaluation)")
+    assert len(provider_calls) == 1
+    assert provider_calls[0].endswith("register_executed_law(evaluator, evaluation)")
+    provider = (_ROOT / "engines/builtin/vapor_pressure.py").read_text(encoding="utf-8")
+    assert provider.count("def _register_direct_flagged_continuations(") == 1
+    assert provider.count("_register_direct_flagged_continuations(") == 2
     evaluate = inspect.getsource(CompiledPressureEvaluator.evaluate)
     shadow = inspect.getsource(CompiledPressureEvaluator.evaluate_typed_shadow)
     assert evaluate.count("register_executed_law(") == 1
@@ -3354,8 +3373,21 @@ def _exercise_melt_psat(_tmp_path, monkeypatch) -> None:
         return dispatch(provider, request)
 
     monkeypatch.setattr(BuiltinVaporPressureProvider, "dispatch", counting)
+    def _assert_runtime_fe(runtime: dict) -> None:
+        published = _diagnostic_fe_rows(runtime["law_disclosures"])
+        assert published
+        assert {item["law_id"] for item in published} == {
+            item["law_id"] for item in fe_rows
+        }
+        for item in published:
+            _assert_fe_disclosure(
+                item,
+                law_id=item["law_id"],
+                count=item["evaluation_count"],
+            )
+
     with disclosure_scope(inherit=False) as run_a:
-        pressure_a, reason_a, _runtime_a = extract_reproduction._engine_melt_psat_pa(
+        pressure_a, reason_a, runtime_a = extract_reproduction._engine_melt_psat_pa(
             "Fe", 1750.0, 1.0e-9, vapor
         )
         assert reason_a is None
@@ -3371,17 +3403,19 @@ def _exercise_melt_psat(_tmp_path, monkeypatch) -> None:
                 law_id=item["law_id"],
                 count=item["evaluation_count"],
             )
+        _assert_runtime_fe(runtime_a)
         run_a_fe = _diagnostic_fe_rows(run_a.snapshot())
         assert {item["law_id"] for item in run_a_fe} == {
             item["law_id"] for item in fe_rows
         }
     with disclosure_scope(inherit=False) as run_b:
-        pressure_b, reason_b, _runtime_b = extract_reproduction._engine_melt_psat_pa(
+        pressure_b, reason_b, runtime_b = extract_reproduction._engine_melt_psat_pa(
             "Fe", 1750.0, 1.0e-9, vapor
         )
         assert reason_b is None
         assert pressure_b == pressure_a
         assert calls["n"] == 1
+        _assert_runtime_fe(runtime_b)
         replayed = _diagnostic_fe_rows(run_b.snapshot())
         assert {item["law_id"]: item["evaluation_count"] for item in replayed} == {
             item["law_id"]: item["evaluation_count"] for item in fe_rows
@@ -3395,13 +3429,87 @@ def _exercise_melt_psat(_tmp_path, monkeypatch) -> None:
     stored = next(iter(extract_reproduction._MELT_PSAT_CACHE.values()))
     stored.pop("law_disclosures")
     with disclosure_scope(inherit=False) as run_c:
-        pressure_c, reason_c, _runtime_c = extract_reproduction._engine_melt_psat_pa(
+        pressure_c, reason_c, runtime_c = extract_reproduction._engine_melt_psat_pa(
             "Fe", 1750.0, 1.0e-9, vapor
         )
         assert reason_c is None
         assert pressure_c == pressure_a
         assert calls["n"] == 2
+        assert _diagnostic_fe_rows(runtime_c["law_disclosures"])
         assert _diagnostic_fe_rows(run_c.snapshot())
+
+
+def test_standalone_melt_and_rank_publish_fe_without_a_run_scope(monkeypatch) -> None:
+    """The reproduction path has no session. The returned runtime is the disclosure.
+
+    An outer scope that is then ignored would hide this. The cold call, the
+    warm cache hit, and the ranking metric each publish the Fe law on their
+    own runtime. A later run replays the stored row.
+    """
+
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
+    import simulator.diagnostic_helpers.extract_reproduction as extract_reproduction
+
+    monkeypatch.setattr(extract_reproduction, "_MELT_PSAT_CACHE", {})
+    vapor = _live_vapor()
+    calls = {"n": 0}
+    dispatch = BuiltinVaporPressureProvider.dispatch
+
+    def counting(provider, request):
+        calls["n"] += 1
+        return dispatch(provider, request)
+
+    monkeypatch.setattr(BuiltinVaporPressureProvider, "dispatch", counting)
+    pressure, reason, runtime = extract_reproduction._engine_melt_psat_pa(
+        "Fe", 1750.0, 1.0e-9, vapor
+    )
+    assert reason is None
+    assert isinstance(pressure, float) and pressure > 0.0
+    assert calls["n"] == 1
+    assert active_snapshot() == ()
+    cold = _diagnostic_fe_rows(runtime["law_disclosures"])
+    assert cold
+    for item in cold:
+        _assert_fe_disclosure(
+            item,
+            law_id=item["law_id"],
+            count=item["evaluation_count"],
+        )
+
+    again, again_reason, again_runtime = extract_reproduction._engine_melt_psat_pa(
+        "Fe", 1750.0, 1.0e-9, vapor
+    )
+    assert again_reason is None
+    assert again == pressure
+    assert calls["n"] == 1
+    assert active_snapshot() == ()
+    warm = _diagnostic_fe_rows(again_runtime["law_disclosures"])
+    assert {item["law_id"]: item["evaluation_count"] for item in warm} == {
+        item["law_id"]: item["evaluation_count"] for item in cold
+    }
+
+    ranked, rank_refusal, rank_runtime = extract_reproduction._engine_species_rank_metric(
+        "Fe", 1750.0, 1.0e-9, vapor, None
+    )
+    assert rank_refusal is None
+    assert isinstance(ranked, float) and ranked > 0.0
+    assert calls["n"] == 1
+    ranked_fe = _diagnostic_fe_rows(rank_runtime["law_disclosures"])
+    assert {item["law_id"] for item in ranked_fe} == {item["law_id"] for item in cold}
+
+    with disclosure_scope(inherit=False) as run:
+        replayed, replay_reason, replay_runtime = extract_reproduction._engine_melt_psat_pa(
+            "Fe", 1750.0, 1.0e-9, vapor
+        )
+        assert replay_reason is None
+        assert replayed == pressure
+        assert calls["n"] == 1
+        assert _diagnostic_fe_rows(replay_runtime["law_disclosures"])
+        snapshot = _diagnostic_fe_rows(run.snapshot())
+        assert {item["law_id"]: item["evaluation_count"] for item in snapshot} == {
+            item["law_id"]: item["evaluation_count"] for item in cold
+        }
 
 
 def _hashimoto_score_context():
@@ -3667,29 +3775,34 @@ def _exercise_residue_prediction_cache(tmp_path, monkeypatch) -> None:
 
 
 # 2300 K is above the shared [1400.0, 2273.15] K band. The provider's SiO
-# pressure at that point is the Antoine continuation, which does not call
-# catalog evaluate(). The same dispatch does evaluate the compiled Si-family
-# laws, and those register with authority=extrapolated.
+# pressure at that point is the Antoine continuation
+# log10(P/Pa) = A - B/(T+C), which does not call catalog evaluate().
+# The published law is SiO:antoine. A compiled neighbour such as
+# SiO2_gas:nasa_cea_9 does not disclose that pressure.
 _SIO_OOB_K = 2300.0
-_SIO_COMPILED_LAW_ID = "SiO2_gas:nasa_cea_9"
+_SIO_PUBLISHED_LAW_ID = "SiO:antoine"
+_SIO_PUBLISHED_PROVENANCE = "oxide_vapor_pressure_out_of_validated_range"
+_SIO_CERTIFIED_BAND_K = [1400.0, 2273.15]
 
 
-def _compiled_extrapolated_rows(rows) -> list[dict]:
+def _published_sio_rows(rows) -> list[dict]:
     return [
         item
         for item in rows
-        if item.get("law_id") == _SIO_COMPILED_LAW_ID
+        if item.get("law_id") == _SIO_PUBLISHED_LAW_ID
         and item.get("authority") == "extrapolated"
     ]
 
 
-def _assert_compiled_extrapolated(row: dict) -> None:
-    assert row["law_id"] == _SIO_COMPILED_LAW_ID
+def _assert_published_sio(row: dict) -> None:
+    assert row["law_id"] == _SIO_PUBLISHED_LAW_ID
     assert row["authority"] == "extrapolated"
-    assert row["provenance"] == "out_of_range_conservative_continuation"
-    assert row["certified_band_K"] == [1400.0, 2273.15]
+    assert row["provenance"] == _SIO_PUBLISHED_PROVENANCE
+    assert row["certified_band_K"] == _SIO_CERTIFIED_BAND_K
+    assert row["closer"] == ""
     assert isinstance(row["evaluation_count"], int)
     assert row["evaluation_count"] >= 1
+    assert "SiO2_gas" not in row["law_id"]
 
 
 def _assert_sio_extrapolation_notice(runtime: dict) -> None:
@@ -3766,8 +3879,9 @@ def _exercise_kems_surface_cache(_tmp_path, monkeypatch) -> None:
 
     The program's two observations share one out-of-band SiO temperature.
     The first publication is the cold dispatch. The second is the cache hit.
-    Both carry the extrapolated SiO law. Run B reads the stored row and does
-    not dispatch again. A row with the disclosure field removed recomputes.
+    Both carry SiO:antoine, the Antoine continuation that produced the
+    published SiO pressure. Run B reads the stored row and does not dispatch
+    again. A row with the disclosure field removed recomputes.
     """
 
     from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
@@ -3788,10 +3902,10 @@ def _exercise_kems_surface_cache(_tmp_path, monkeypatch) -> None:
     def published_sio(run):
         found = []
         for runtime in run.runtime_rows:
-            match = _compiled_extrapolated_rows(runtime["law_disclosures"])
+            match = _published_sio_rows(runtime["law_disclosures"])
             assert match, runtime["law_disclosures"]
             for item in match:
-                _assert_compiled_extrapolated(item)
+                _assert_published_sio(item)
             found.append(match[0])
             _assert_sio_extrapolation_notice(runtime)
             assert runtime["vapor_pressures_Pa"]["SiO"] > 0.0
@@ -3804,10 +3918,10 @@ def _exercise_kems_surface_cache(_tmp_path, monkeypatch) -> None:
         assert len(published) == 2
         assert published[0]["law_id"] == published[1]["law_id"]
         stored = next(iter(adapter._surface_cache.values()))
-        stored_law = _compiled_extrapolated_rows(stored["law_disclosures"])
+        stored_law = _published_sio_rows(stored["law_disclosures"])
         assert stored_law
-        _assert_compiled_extrapolated(stored_law[0])
-        run_a_law = _compiled_extrapolated_rows(run_a.snapshot())
+        _assert_published_sio(stored_law[0])
+        run_a_law = _published_sio_rows(run_a.snapshot())
         assert run_a_law
         # The cold dispatch registers once. The repeated observation replays it.
         assert run_a_law[0]["evaluation_count"] == (
@@ -3818,11 +3932,11 @@ def _exercise_kems_surface_cache(_tmp_path, monkeypatch) -> None:
         second = adapter.evaluate(case, observations)
         assert calls["n"] == 1
         published_sio(second)
-        replayed = _compiled_extrapolated_rows(run_b.snapshot())
+        replayed = _published_sio_rows(run_b.snapshot())
         assert replayed[0]["evaluation_count"] == (
             2 * stored_law[0]["evaluation_count"]
         )
-        _assert_compiled_extrapolated(replayed[0])
+        _assert_published_sio(replayed[0])
         assert (
             second.runtime_rows[0]["vapor_pressures_Pa"]
             == first.runtime_rows[0]["vapor_pressures_Pa"]
@@ -3833,7 +3947,117 @@ def _exercise_kems_surface_cache(_tmp_path, monkeypatch) -> None:
         third = adapter.evaluate(case, observations)
         assert calls["n"] == 2
         published_sio(third)
-        assert _compiled_extrapolated_rows(run_c.snapshot())
+        assert _published_sio_rows(run_c.snapshot())
+
+
+def test_standalone_kems_publishes_the_sio_antoine_law() -> None:
+    """KEMS with no session still publishes the SiO continuation it ranked."""
+
+    from simulator.diagnostic_helpers.kems import KEMSAdapter
+
+    case, observations = _sio_oob_kems_inputs()
+    result = KEMSAdapter(_live_vapor()).evaluate(case, observations)
+    assert active_snapshot() == ()
+    assert result.runtime_rows
+    for runtime in result.runtime_rows:
+        match = _published_sio_rows(runtime["law_disclosures"])
+        assert match, runtime["law_disclosures"]
+        for item in match:
+            _assert_published_sio(item)
+        assert runtime["vapor_pressures_Pa"]["SiO"] > 0.0
+
+
+def test_every_published_extrapolation_is_disclosed() -> None:
+    """Every species pressure published with an extrapolation notice is disclosed.
+
+    The class is the provider's published set at 2300 K, not one neighbour
+    law. SiO is the Antoine continuation. Deleting the publication registrar
+    drops SiO and any other direct continuation while compiled neighbours
+    such as SiO2_gas can still be present.
+    """
+
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.chemistry.kernel.capabilities import ChemistryIntent
+    from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+    case, _observations = _sio_oob_kems_inputs()
+    oxide = str(case["oxide"]["formula"])
+    pO2_bar = float(case["provider_inputs"]["pO2_bar"])
+    exterior_pa = float(case["exterior_chamber_pressure"]["value_pa"])
+    provider = BuiltinVaporPressureProvider(_live_vapor())
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {oxide: 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=_SIO_OOB_K - 273.15,
+        pressure_bar=max(exterior_pa / 100000.0, 1e-30),
+        fO2_log=math.log10(pO2_bar),
+        control_inputs={"pO2_bar": pO2_bar, "pO2_admission": "observation"},
+    )
+    with disclosure_scope(inherit=False) as registry:
+        result = provider.dispatch(request)
+        snapshot = registry.snapshot()
+    assert result.status == "ok"
+    diagnostic = result.diagnostic or {}
+    pressures = diagnostic.get("vapor_pressures_Pa") or {}
+    extrapolations = diagnostic.get("extrapolated_beyond_valid_range_K") or {}
+    assert "SiO" in pressures
+    assert pressures["SiO"] > 0.0
+    assert "SiO" in extrapolations
+    published = [
+        species
+        for species, notice in extrapolations.items()
+        if species in pressures and isinstance(notice, dict)
+    ]
+    assert "SiO" in published
+    problems: list[str] = []
+    for species in published:
+        notice = extrapolations[species]
+        rows = [
+            item
+            for item in snapshot
+            if str(item.get("law_id") or "").split(":", 1)[0] == species
+        ]
+        if not rows:
+            problems.append(f"{species}: no disclosure")
+            continue
+        row = rows[0]
+        if species == "SiO":
+            chosen = next(
+                (item for item in rows if item.get("law_id") == _SIO_PUBLISHED_LAW_ID),
+                None,
+            )
+            if chosen is None:
+                problems.append(
+                    f"SiO laws {[item.get('law_id') for item in rows]}"
+                )
+                continue
+            row = chosen
+        if row.get("authority") != "extrapolated":
+            problems.append(f"{species}: authority {row.get('authority')}")
+        reason = str(notice.get("reason") or "")
+        provenance = str(row.get("provenance") or "")
+        # Direct Antoine continuations quote the published notice. Compiled
+        # laws quote evaluate()'s out-of-range status instead.
+        if str(row.get("law_id") or "").endswith(":antoine"):
+            if reason and reason not in provenance:
+                problems.append(
+                    f"{species}: provenance {provenance!r} lacks {reason!r}"
+                )
+        elif not provenance:
+            problems.append(f"{species}: empty provenance")
+        band = notice.get("valid_range_K")
+        if (
+            isinstance(band, (list, tuple))
+            and len(band) == 2
+            and row.get("certified_band_K") != [float(band[0]), float(band[1])]
+        ):
+            problems.append(f"{species}: band {row.get('certified_band_K')}")
+    assert problems == []
+    sio = next(item for item in snapshot if item["law_id"] == _SIO_PUBLISHED_LAW_ID)
+    _assert_published_sio(sio)
 
 
 _DISCLOSURE_EXERCISERS = {

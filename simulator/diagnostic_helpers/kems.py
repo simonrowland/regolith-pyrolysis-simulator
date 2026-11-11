@@ -662,9 +662,9 @@ class KEMSAdapter:
                     f"unsupported provider status: {provider_status!r}"
                 )
             diagnostic = dict(result.diagnostic or {})
-            # The provider's out-of-band SiO continuation is this notice.
-            # It does not pass through catalog evaluate(), so the registry
-            # delta above does not carry it. Keep the notice with the pressure.
+            # Per-quantity notice beside the pressure. The Antoine SiO
+            # continuation is also registered by the provider, so the
+            # disclosure delta above names that law (SiO:antoine).
             raw_extrapolations = diagnostic.get("extrapolated_beyond_valid_range_K") or {}
             extrapolations = {
                 str(species): dict(notice)

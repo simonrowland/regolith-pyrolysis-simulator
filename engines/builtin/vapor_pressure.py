@@ -44,7 +44,7 @@ from __future__ import annotations
 
 import math
 import warnings as runtime_warnings
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
@@ -334,6 +334,101 @@ def _attach_pO2_floor_inversion_notices(
         if source and token not in source.split(":"):
             vapor_pressure_sources[species] = f"{source}:{token}"
     return notices
+
+
+def _direct_continuation_band(
+    notice: Mapping[str, Any],
+) -> tuple[float, float] | None:
+    """Certified temperature band on a direct continuation notice, if it has one."""
+
+    raw = notice.get("valid_range_K")
+    if not (
+        isinstance(raw, (list, tuple))
+        and not isinstance(raw, (str, bytes))
+        and len(raw) == 2
+    ):
+        certified = notice.get("certified_band")
+        raw = certified.get("temperature_K") if isinstance(certified, Mapping) else None
+    if not (
+        isinstance(raw, (list, tuple))
+        and not isinstance(raw, (str, bytes))
+        and len(raw) == 2
+    ):
+        return None
+    try:
+        return (float(raw[0]), float(raw[1]))
+    except (TypeError, ValueError):
+        return None
+
+
+def _register_direct_flagged_continuations(
+    *,
+    vapor_pressures: Mapping[str, float],
+    vapor_pressure_provenance: Mapping[str, Mapping[str, Any]],
+    disclosure_before: Sequence[Mapping[str, Any]],
+) -> None:
+    """Register every published continuation that did not execute a compiled law.
+
+    Invariant: a vapour pressure that is published with an extrapolated
+    continuation notice is in the run disclosure under the law that produced
+    it. Compiled laws register inside ``CompiledPressureEvaluator.evaluate``.
+    The SiO pressure above its band is the Antoine expression in this
+    provider, which never calls that method. This is the one other call of
+    ``register_executed_law``. A species already registered by evaluate()
+    during this dispatch is not registered again.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.vapour_rail.instrumentation import public_carrier_notices
+    from simulator.vapour_rail.run_disclosure import (
+        active_snapshot,
+        disclosure_delta,
+        register_executed_law,
+    )
+
+    registered_species = {
+        str(item.get("law_id") or "").split(":", 1)[0]
+        for item in disclosure_delta(disclosure_before, active_snapshot())
+        if item.get("law_id")
+    }
+    for species in vapor_pressures:
+        if species in registered_species:
+            continue
+        provenance = vapor_pressure_provenance.get(species) or {}
+        extrapolated = [
+            notice
+            for items in public_carrier_notices(provenance).values()
+            for notice in items
+            if notice.get("authority_level") == "extrapolated"
+        ]
+        if not extrapolated:
+            continue
+        banded = [
+            notice
+            for notice in extrapolated
+            if _direct_continuation_band(notice) is not None
+        ]
+        chosen = banded[0] if banded else extrapolated[0]
+        reasons: list[str] = []
+        for notice in extrapolated:
+            reason = str(notice.get("reason") or "").strip()
+            if reason and reason not in reasons:
+                reasons.append(reason)
+        # The executed expression is log10(P/Pa) = A - B/(T+C). The family
+        # is antoine, not the compiled standard-reaction evaluator, which
+        # this dispatch did not call.
+        evaluator = SimpleNamespace(
+            species_id=str(species),
+            evaluator_family="antoine",
+            valid_temperature_K=_direct_continuation_band(chosen),
+            diagnostic_admission_notice=None,
+        )
+        evaluation = SimpleNamespace(
+            out_of_range=True,
+            status="; ".join(reasons) if reasons else "extrapolated",
+        )
+        register_executed_law(evaluator, evaluation)
 
 
 def _vapor_pressure_temperature_extrapolation_notice(
@@ -3094,6 +3189,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 },
             )
 
+        from simulator.vapour_rail.run_disclosure import active_snapshot
+
+        # Laws evaluate() registers during this dispatch. Direct Antoine
+        # continuations are registered against this snapshot at publication.
+        disclosure_before = active_snapshot()
+
         vacuum_floor_bar = resolve_request_vacuum_floor_bar(request)
         transport_pO2_bar = self._resolve_transport_pO2_bar(request)
         controls = request.control_inputs or {}
@@ -4884,6 +4985,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
         if feo_activity_diagnostic is not None:
             diagnostic["a_FeO_calphad"] = feo_activity_diagnostic
+
+        _register_direct_flagged_continuations(
+            vapor_pressures=vapor_pressures,
+            vapor_pressure_provenance=vapor_pressure_provenance,
+            disclosure_before=disclosure_before,
+        )
 
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,

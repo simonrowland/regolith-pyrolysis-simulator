@@ -12,7 +12,10 @@ A stored disclosure is known only when every public field is present and
 typed. One missing or ill-typed field makes the whole record unknown, never
 a measured row with empty authority.
 
-- The only registration site is ``CompiledPressureEvaluator.evaluate``.
+- New rows are written only by ``register_executed_law``. Compiled laws
+  call it from ``CompiledPressureEvaluator.evaluate``. A published
+  continuation that never calls evaluate() — the provider's direct Antoine
+  expression, including out-of-band SiO — calls it once at publication.
   A diagnostic admission registers from the evaluator notice. Any other
   continuation registers once when the evaluation is outside a certified
   domain: temperature ``out_of_range``, or a carrier notice whose
