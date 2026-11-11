@@ -4385,6 +4385,8 @@ def _refused_vapour_supply_kg(
     """Integral of each refused species' computed vapour flux over the run.
 
     Missing species stay missing. A flux that was not computed is not zero.
+    A species whose carrier authority refuses any positive-duration
+    interval stays missing too: the other hours are not its supply.
     ``snapshots`` is the integral window. The tap-hour projection passes
     the hours up to the tap so later vapour cannot raise that bound.
     """
@@ -4696,9 +4698,14 @@ def _book_wall_deposits_at_vapour_supply(
     summary, furnace lifespan, and the tap-hour projection all read the
     map this function returns. No other path prices a refused wall species.
 
-    - No computed vapour flux, or a window with a missing flux interval:
-      not booked. A missing map is not a zero, and the partial sum of the
-      other snapshots is not a supply. The refusal keeps blocking the figure.
+    - No computed vapour flux, a missing flux map, or a species-level flux
+      refusal on any positive-duration interval: that species is not
+      booked. A missing map is not a zero. An omitted rate whose carrier
+      authority records a refusal is not a zero. The partial sum of the
+      other snapshots is not a supply. The refusal keeps blocking that
+      species. A sibling with a complete integral is still booked. The
+      integral is ``_optimizer_refused_flux_bounds``; this function does
+      not integrate again.
     - Supply at or below the mass-balance ledger resolution: authorized
       physical zero (``below_wall_supply_upper_bound``), carrying the
       bound. Existing entries of that species are removed, so a

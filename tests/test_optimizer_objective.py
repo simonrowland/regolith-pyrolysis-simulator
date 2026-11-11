@@ -17,6 +17,12 @@ from simulator.optimize.evaluate import (
     _optimizer_refused_flux_bounds,
     _run_reference,
 )
+from simulator.vapour_rail.instrumentation import (
+    VAPOUR_CARRIER_AUTHORITY_MISSING,
+    VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+    VAPOUR_CARRIER_AUTHORITY_REFUSED,
+    vapour_carrier_authority_status,
+)
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
@@ -1630,8 +1636,9 @@ _WALL_BOUND_CASES = (
         "entries": ((("hot_wall", "SiO"), 1.0),),
         "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
     },
-    # A present map that omits SiO is not a missing interval. The published
-    # map drops a carrier with no rate. The observed hour is the supply.
+    # A present map that omits SiO, and records no flux refusal, is the
+    # publisher dropping a carrier with no rate. The observed hour is the
+    # supply. A refusal on the omitted hour is the next case.
     {
         "deposit": (),
         "flux_snapshots": (
@@ -1642,6 +1649,26 @@ _WALL_BOUND_CASES = (
         "charge": 1000.0,
         "entries": ((("hot_wall", "SiO"), 1.0),),
         "species": (("SiO", _WALL_BOUND_UPPER, 1.0, 1.0),),
+    },
+    # Hour 1 publishes SiO at 1 kg/h. Hour 2 publishes Mg and records a
+    # SiO transport refusal. The 1 kg partial sum is not SiO's supply.
+    # The measured kilogram stays, and the availability refusal stays.
+    {
+        "deposit": ((("cold_wall", "SiO"), 0.1),),
+        "flux_snapshots": (
+            {"hour": 1, "duration_h": 1.0, "flux": (("SiO", 1.0),)},
+            {
+                "hour": 2,
+                "duration_h": 1.0,
+                "flux": (),
+                "published_flux": (("Mg", 0.4),),
+                "carrier_refusals": ("SiO",),
+            },
+        ),
+        "refused": (("SiO", "hot_wall"),),
+        "charge": 1000.0,
+        "entries": ((("cold_wall", "SiO"), 0.1),),
+        "species": (("SiO", None, None, None),),
     },
     # Zero duration adds no mass, so a missing map there is not a gap.
     {
@@ -1684,6 +1711,35 @@ def _wall_bound_flux_windows(case: Mapping[str, object]) -> tuple[Mapping[str, o
     return tuple(raw)
 
 
+def _transport_refusal_channel(species: str) -> dict[str, object]:
+    """Channel ``_calculate_evaporation`` writes for one unavailable carrier.
+
+    The run stays up. The other species are still published. This species
+    has no rate, and the authority records the refusal.
+    """
+
+    reason = "transport input unavailable"
+    refusal_type = "EvaporationFluxConfigurationError"
+    return {
+        "species_id": species,
+        "flux": {
+            "kind": "refusal",
+            "code": refusal_type,
+            "detail": reason,
+        },
+        "refusal_code": refusal_type,
+        "is_refused": True,
+        "reason": reason,
+        "authority_level": "unavailable",
+        "extra": {
+            "status": "unavailable",
+            "refusal_type": refusal_type,
+            "policy": "fail_loud_missing_transport_parameters",
+            "reason": reason,
+        },
+    }
+
+
 def _wall_bound_evap_flux(window: Mapping[str, object]) -> SimpleNamespace | None:
     if window.get("unavailable"):
         return None
@@ -1692,18 +1748,18 @@ def _wall_bound_evap_flux(window: Mapping[str, object]) -> SimpleNamespace | Non
         for species, kg in window.get("flux", ())
     }
     published = window.get("published_flux")
-    return SimpleNamespace(
-        species_kg_hr=flux,
-        **(
-            {}
-            if published is None
-            else {
-                "published_species_kg_hr": {
-                    str(species): float(kg) for species, kg in published
-                }
-            }
-        ),
-    )
+    refused = tuple(window.get("carrier_refusals") or ())
+    fields: dict[str, object] = {"species_kg_hr": flux}
+    if published is not None:
+        fields["published_species_kg_hr"] = {
+            str(species): float(kg) for species, kg in published
+        }
+    if refused:
+        fields["carrier_authority_by_species"] = {
+            str(species): _transport_refusal_channel(str(species))
+            for species in refused
+        }
+    return SimpleNamespace(**fields)
 
 
 def _wall_bound_execution(case: Mapping[str, object]):
@@ -1824,20 +1880,77 @@ def _wall_bound_zone_species_kg(
     return totals
 
 
+def _oracle_payload_kind(record: Mapping[str, object], key: str) -> str:
+    payload = record.get(key)
+    if isinstance(payload, Mapping):
+        return str(payload.get("kind") or "")
+    return ""
+
+
+def _oracle_transport_refusal(record: Mapping[str, object]) -> bool:
+    extra = record.get("extra")
+    extra = extra if isinstance(extra, Mapping) else {}
+    policy = record.get("policy") or extra.get("policy")
+    status = record.get("status") or extra.get("status")
+    refusal_type = (
+        record.get("refusal_type")
+        or extra.get("refusal_type")
+        or record.get("refusal_code")
+        or extra.get("refusal_code")
+    )
+    return (
+        policy == "fail_loud_missing_transport_parameters"
+        and status == "unavailable"
+        and bool(refusal_type)
+    )
+
+
+def _oracle_omitted_interval_withholds(flux: object, species: str) -> bool:
+    """Independent rule for a species absent from a present rate map.
+
+    No carrier record, proven_zero, or an evaluated eligible channel is
+    a physical zero (the publisher drops rates at or below 1e-12 kg/h).
+    A refusal, a missing record body, a diagnostic upper bound, a refused
+    runtime pressure, or a transport-unavailable extra is not.
+    """
+
+    channels = getattr(flux, "carrier_authority_by_species", None)
+    if not isinstance(channels, Mapping) or species not in channels:
+        return False
+    record = channels[species]
+    if not isinstance(record, Mapping):
+        return True
+    if _oracle_payload_kind(record, "flux") == "diagnostic_upper_bound":
+        return True
+    if _oracle_payload_kind(record, "selected_runtime_pressure") == "refusal":
+        return True
+    if _oracle_transport_refusal(record):
+        return True
+    status = vapour_carrier_authority_status(record, expected_species_id=species)
+    if status == VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO:
+        return False
+    return status in {
+        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+        VAPOUR_CARRIER_AUTHORITY_MISSING,
+    }
+
+
 def _oracle_complete_flux_supply_kg(
     snapshots: tuple[object, ...],
     species_names: tuple[str, ...],
 ) -> dict[str, float]:
     """Independent supply oracle.
 
-    A positive-duration snapshot with no rate map is a missing interval and
-    the window has no supply. Otherwise the supply is the sum of numeric
-    rates on the snapshots that name the species. An omitted key on a
-    present map adds nothing. A species never named is not a supply.
+    A returned number sums a computed rate, or an evidenced physical zero,
+    over every positive-duration snapshot. A missing map clears the window.
+    An omitted key that records a flux refusal drops that species. The
+    partial sum of the other snapshots is not its supply. A species never
+    named, and never refused, is not a fabricated zero.
     """
 
     totals = {species: 0.0 for species in species_names}
     observed: set[str] = set()
+    withheld: set[str] = set()
     missing_interval = False
     for snapshot in snapshots:
         duration_h = float(getattr(snapshot, "duration_h", 1.0))
@@ -1852,6 +1965,11 @@ def _oracle_complete_flux_supply_kg(
             continue
         for species in species_names:
             if species not in rates:
+                if duration_h > 0.0 and _oracle_omitted_interval_withholds(
+                    flux,
+                    species,
+                ):
+                    withheld.add(species)
                 continue
             totals[species] += float(rates[species]) * duration_h
             if duration_h > 0.0:
@@ -1861,7 +1979,7 @@ def _oracle_complete_flux_supply_kg(
     return {
         species: totals[species]
         for species in species_names
-        if species in observed
+        if species in observed and species not in withheld
     }
 
 
@@ -1976,6 +2094,7 @@ def _wall_bound_species_totals(
     "missing_interval_blocks_every_species",
     "explicit_zero_rate_is_evidence",
     "omitted_key_on_present_map",
+    "two_hour_transport_refusal_is_not_partial_supply",
     "zero_duration_missing_map_is_not_a_gap",
     "supply_above_resolution_below_old_cutoff",
 ))
@@ -2063,6 +2182,375 @@ def test_refused_wall_deposit_aggregate_follows_the_supply_bound(
     if view["refused_species"] is not None:
         for species, _segment in case["refused"]:
             assert species in view["refused_species"]
+
+
+def _sio_interval_authority(kind: str) -> object:
+    """One carrier-authority shape for an omitted SiO interval."""
+
+    species = "SiO"
+    eligible_flux = {
+        "kind": "eligible",
+        "alpha_ref": "alpha:SiO",
+        "reaction_id": "cao",
+    }
+    if kind == "proven_zero":
+        return {
+            "species_id": species,
+            "pressure": {"kind": "zero_by_physics", "evidence_ref": "no liquid"},
+            "flux": eligible_flux,
+        }
+    if kind == "eligible":
+        return {
+            "species_id": species,
+            "pressure": {"kind": "value", "pa": 1.0},
+            "flux": eligible_flux,
+        }
+    if kind == "authoritative":
+        return {
+            "species_id": species,
+            "pressure": {"kind": "value", "pa": 1.0},
+            "flux": eligible_flux,
+            "verdict_status": "authoritative",
+            "certification_ceiling": "measured",
+            "validation_status": "validated",
+            "is_flux_active": True,
+        }
+    if kind == "transport":
+        return _transport_refusal_channel(species)
+    if kind == "is_refused_flag":
+        return {
+            "species_id": species,
+            "pressure": {"kind": "value", "pa": 1.0},
+            "flux": eligible_flux,
+            "is_refused": True,
+        }
+    if kind == "flux_refusal":
+        return {
+            "species_id": species,
+            "pressure": {"kind": "value", "pa": 1.0},
+            "flux": {"kind": "refusal", "code": "x", "detail": "flux refused"},
+            "is_refused": False,
+        }
+    if kind == "pressure_refusal":
+        return {
+            "species_id": species,
+            "pressure": {"kind": "refusal", "code": "x", "detail": "pressure refused"},
+            "flux": eligible_flux,
+        }
+    if kind == "runtime_refusal":
+        return {
+            "species_id": species,
+            "pressure": {"kind": "value", "pa": 1.0},
+            "selected_runtime_pressure": {
+                "kind": "refusal",
+                "code": "x",
+                "detail": "runtime pressure refused",
+            },
+            "flux": eligible_flux,
+        }
+    if kind == "transport_extra":
+        return {
+            "species_id": species,
+            "pressure": {"kind": "value", "pa": 1.0},
+            "flux": eligible_flux,
+            "extra": {
+                "policy": "fail_loud_missing_transport_parameters",
+                "status": "unavailable",
+                "refusal_type": "EvaporationFluxConfigurationError",
+            },
+        }
+    if kind == "authority_missing":
+        return {"species_id": species, "authority_status": "missing"}
+    if kind == "empty_record":
+        return {}
+    if kind == "non_mapping":
+        return "refused"
+    if kind == "species_mismatch":
+        return {
+            "species_id": "Mg",
+            "pressure": {"kind": "value", "pa": 1.0},
+            "flux": {
+                "kind": "eligible",
+                "alpha_ref": "alpha:Mg",
+                "reaction_id": "mgo",
+            },
+        }
+    if kind == "diagnostic":
+        return {
+            "species_id": species,
+            "pressure": {
+                "kind": "upper_bound",
+                "pa": 1.0,
+                "evidence_ref": "diagnostic alpha",
+            },
+            "flux": {
+                "kind": "diagnostic_upper_bound",
+                "alpha_ref": "alpha:SiO",
+                "reaction_id": "cao",
+            },
+        }
+    raise AssertionError(kind)
+
+
+def _interval_flux_snapshot(
+    hour: int,
+    duration_h: float,
+    rates: Mapping[str, float],
+    records: Mapping[str, object] | None = None,
+    *,
+    committed: Mapping[str, float] | None = None,
+    publish: bool = True,
+    unavailable: bool = False,
+) -> SimpleNamespace:
+    if unavailable:
+        return SimpleNamespace(hour=hour, duration_h=duration_h, evap_flux=None)
+    fields: dict[str, object] = {}
+    if publish:
+        fields["published_species_kg_hr"] = {
+            species: float(rate) for species, rate in rates.items()
+        }
+        source = rates if committed is None else committed
+        fields["species_kg_hr"] = {
+            species: float(rate) for species, rate in source.items()
+        }
+    else:
+        fields["species_kg_hr"] = {
+            species: float(rate) for species, rate in rates.items()
+        }
+    if records:
+        fields["carrier_authority_by_species"] = dict(records)
+    return SimpleNamespace(
+        hour=hour,
+        duration_h=duration_h,
+        evap_flux=SimpleNamespace(**fields),
+    )
+
+
+# Invariant: a priced supply sums a computed rate or an evidenced physical
+# zero over every positive-duration hour. Each row is one interval class
+# for SiO on hour 2. Hour 1 publishes SiO at 1 kg/h and Mg at 0.5 kg/h.
+# Hour 2 publishes Mg at 0.4 kg/h unless the row says otherwise. None means
+# that species' bound is unavailable.
+_FLUX_INTERVAL_CASES = (
+    ("computed_positive", "rate_positive", 1.25, 0.9),
+    ("explicit_zero", "explicit_zero", 1.0, 0.9),
+    ("omitted_no_authority", "omitted", 1.0, 0.9),
+    ("omitted_proven_zero", "proven_zero", 1.0, 0.9),
+    ("omitted_eligible_below_cutoff", "eligible", 1.0, 0.9),
+    ("omitted_authoritative_below_cutoff", "authoritative", 1.0, 0.9),
+    ("omitted_transport_refusal", "transport", None, 0.9),
+    ("omitted_is_refused_flag", "is_refused_flag", None, 0.9),
+    ("omitted_flux_kind_refusal", "flux_refusal", None, 0.9),
+    ("omitted_pressure_kind_refusal", "pressure_refusal", None, 0.9),
+    ("omitted_runtime_pressure_refusal", "runtime_refusal", None, 0.9),
+    ("omitted_transport_extra_only", "transport_extra", None, 0.9),
+    ("omitted_authority_missing", "authority_missing", None, 0.9),
+    ("omitted_empty_record", "empty_record", None, 0.9),
+    ("omitted_non_mapping_record", "non_mapping", None, 0.9),
+    ("omitted_species_id_mismatch", "species_mismatch", None, 0.9),
+    ("omitted_diagnostic_upper_bound", "diagnostic", None, 0.9),
+    ("published_rate_wins_over_colocated_refusal", "rate_and_refusal", 1.25, 0.9),
+    ("zero_duration_refusal_is_not_a_gap", "zero_duration_refusal", 1.0, 0.5),
+    ("missing_map_blocks_every_species", "missing_map", None, None),
+    ("committed_rate_under_published_refusal", "committed_hidden", None, 0.9),
+    ("fallback_map_transport_refusal", "fallback_refusal", None, 0.9),
+    ("opposite_hours_each_species_refused", "opposite", None, None),
+)
+
+
+def _flux_interval_snapshots(kind: str) -> tuple[SimpleNamespace, ...]:
+    hour_1 = _interval_flux_snapshot(1, 1.0, {"SiO": 1.0, "Mg": 0.5})
+    if kind == "rate_positive":
+        return (
+            hour_1,
+            _interval_flux_snapshot(2, 1.0, {"SiO": 0.25, "Mg": 0.4}),
+        )
+    if kind == "explicit_zero":
+        return (
+            hour_1,
+            _interval_flux_snapshot(2, 1.0, {"SiO": 0.0, "Mg": 0.4}),
+        )
+    if kind == "omitted":
+        return (hour_1, _interval_flux_snapshot(2, 1.0, {"Mg": 0.4}))
+    if kind == "rate_and_refusal":
+        return (
+            hour_1,
+            _interval_flux_snapshot(
+                2,
+                1.0,
+                {"SiO": 0.25, "Mg": 0.4},
+                {"SiO": _sio_interval_authority("transport")},
+            ),
+        )
+    if kind == "zero_duration_refusal":
+        return (
+            hour_1,
+            _interval_flux_snapshot(
+                2,
+                0.0,
+                {"Mg": 0.4},
+                {"SiO": _sio_interval_authority("transport")},
+            ),
+        )
+    if kind == "missing_map":
+        return (
+            hour_1,
+            _interval_flux_snapshot(2, 1.0, {}, unavailable=True),
+        )
+    if kind == "committed_hidden":
+        return (
+            hour_1,
+            _interval_flux_snapshot(
+                2,
+                1.0,
+                {"Mg": 0.4},
+                {"SiO": _sio_interval_authority("transport")},
+                committed={"SiO": 5.0, "Mg": 0.4},
+            ),
+        )
+    if kind == "fallback_refusal":
+        return (
+            hour_1,
+            _interval_flux_snapshot(
+                2,
+                1.0,
+                {"Mg": 0.4},
+                {"SiO": _sio_interval_authority("transport")},
+                publish=False,
+            ),
+        )
+    if kind == "opposite":
+        return (
+            _interval_flux_snapshot(
+                1,
+                1.0,
+                {"SiO": 1.0},
+                {"Mg": _transport_refusal_channel("Mg")},
+            ),
+            _interval_flux_snapshot(
+                2,
+                1.0,
+                {"Mg": 0.4},
+                {"SiO": _transport_refusal_channel("SiO")},
+            ),
+        )
+    return (
+        hour_1,
+        _interval_flux_snapshot(
+            2,
+            1.0,
+            {"Mg": 0.4},
+            {"SiO": _sio_interval_authority(kind)},
+        ),
+    )
+
+
+def _book_interval_window(snapshots: tuple[SimpleNamespace, ...]) -> dict[str, object]:
+    deposit = {("cold_wall", "SiO"): 0.1, ("cold_wall", "Mg"): 0.2}
+    authority = {
+        "wall_saturation_pressure_refusals_by_species": {
+            species: {
+                "hot_wall": {
+                    "status": "refused",
+                    "output_status": "status_bearing",
+                    "reason": f"antoine domain refused for {species}",
+                }
+            }
+            for species in ("SiO", "Mg")
+        }
+    }
+    sim = _FakeProductSim()
+    sim.record.batch_mass_kg = 1000.0
+    execution = SimpleNamespace(
+        simulator=sim,
+        snapshots=snapshots,
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg=dict(deposit),
+            wall_zone_by_segment={"cold_wall": "Cold", "hot_wall": "Hot"},
+            wall_deposit_sticking_authority=authority,
+            snapshots=snapshots,
+        ),
+    )
+    status = objective_module._coating_authority_status(deposit, execution)
+    return objective_module._book_wall_deposits_at_vapour_supply(
+        dict(deposit),
+        status,
+        execution,
+    )
+
+
+@pytest.mark.parametrize("species_order", (("SiO", "Mg"), ("Mg", "SiO")))
+@pytest.mark.parametrize(
+    ("case_id", "kind", "expect_sio", "expect_mg"),
+    _FLUX_INTERVAL_CASES,
+    ids=[case[0] for case in _FLUX_INTERVAL_CASES],
+)
+def test_vapour_supply_integral_classifies_every_flux_interval(
+    case_id: str,
+    kind: str,
+    expect_sio: float | None,
+    expect_mg: float | None,
+    species_order: tuple[str, str],
+) -> None:
+    """d-367 at the supply chokepoint: no omitted refusal becomes a partial sum.
+
+    ``_optimizer_refused_flux_bounds`` is the only integral. Product
+    summary, furnace lifespan, and the tap projection book whatever it
+    returns. A species with a typed refusal on any positive-duration hour
+    stays out, in either species order. Mg's complete integral is not
+    cleared by SiO's refusal, and a missing map clears both.
+    """
+
+    snapshots = _flux_interval_snapshots(kind)
+    bounds = _optimizer_refused_flux_bounds(
+        snapshots,
+        species_order,
+        campaigns_elapsed=1.0,
+    )
+    expected = {
+        species: supply
+        for species, supply in (("SiO", expect_sio), ("Mg", expect_mg))
+        if supply is not None
+    }
+    assert set(bounds) == set(expected), case_id
+    for species, supply in expected.items():
+        assert bounds[species] == pytest.approx(supply)
+    oracle = _oracle_complete_flux_supply_kg(snapshots, species_order)
+    assert set(oracle) == set(expected)
+    for species, supply in expected.items():
+        assert oracle[species] == pytest.approx(supply)
+
+    booked = _book_interval_window(snapshots)
+    bookings = {
+        item["species"]: item
+        for item in booked["bookings"]
+        if isinstance(item, Mapping)
+    }
+    deposit = booked["deposit"]
+    measured = {"SiO": 0.1, "Mg": 0.2}
+    availability = _wall_bound_refused_names(booked["availability_authority"])
+    notice = _wall_bound_refused_names(booked["notice_authority"])
+    assert notice == {"SiO", "Mg"}
+    for species, supply in (("SiO", expect_sio), ("Mg", expect_mg)):
+        if supply is None:
+            assert species not in bookings
+            assert deposit.get(("cold_wall", species)) == pytest.approx(
+                measured[species]
+            )
+            assert species in availability
+            continue
+        assert species not in availability
+        booking = bookings[species]
+        assert booking["reason"] == _WALL_BOUND_UPPER
+        assert booking["deposit_kg"] == pytest.approx(supply)
+        assert booking["supply_upper_bound_kg"] == pytest.approx(supply)
+        priced = sum(
+            float(kg)
+            for key, kg in deposit.items()
+            if isinstance(key, tuple) and len(key) == 2 and str(key[1]) == species
+        )
+        assert priced == pytest.approx(supply)
+        assert priced <= float(supply) + 1.0e-12
 
 
 def test_refused_supply_is_booked_on_the_segment_that_maximises_binding_load(

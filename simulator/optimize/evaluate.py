@@ -60,6 +60,12 @@ from simulator.core import (
     PoisonedHourError,
     read_high_t_melt_activity_fallback_notice,
 )
+from simulator.vapour_rail.instrumentation import (
+    VAPOUR_CARRIER_AUTHORITY_MISSING,
+    VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+    VAPOUR_CARRIER_AUTHORITY_REFUSED,
+    vapour_carrier_authority_status,
+)
 from simulator.cost_energy import unavailable_quantity
 from simulator.cost_ledger import run_pumping_input_cost
 from simulator.cost_parameters import default_cost_parameters_block
@@ -1922,9 +1928,10 @@ def _snapshot_refused_flux_rates(snapshot: Any) -> Any:
     The ledger-committed map omits a carrier that produced no evaporation
     transition. The wall supply is the published vapour rate condensation
     was shown (published_species_kg_hr). Fall back to species_kg_hr when
-    that map was not retained. A species absent from a present map is
-    unobserved on that snapshot, not an explicit zero. A missing map is
-    not the same thing: the interval has no flux evidence at all.
+    that map was not retained. Absence from a present map is not a number.
+    ``_optimizer_refused_flux_bounds`` classifies it. This function does
+    not turn it into zero. A missing map is a different gap: the interval
+    has no flux evidence at all.
     """
 
     flux = getattr(snapshot, "evap_flux", None)
@@ -1934,31 +1941,123 @@ def _snapshot_refused_flux_rates(snapshot: Any) -> Any:
     return getattr(flux, "species_kg_hr", None)
 
 
+def _carrier_mapping_kind(record: Mapping[str, Any], key: str) -> str:
+    payload = record.get(key)
+    if isinstance(payload, MappingABC):
+        return str(payload.get("kind") or "")
+    return ""
+
+
+def _carrier_records_transport_refusal(record: Mapping[str, Any]) -> bool:
+    """True for the local missing-transport channel ``_calculate_evaporation`` keeps.
+
+    That path leaves the rest of the run published. The refused species
+    has no rate. The refusal may sit on the channel or only on its extra.
+    """
+
+    extra = record.get("extra")
+    if not isinstance(extra, MappingABC):
+        extra = {}
+    policy = record.get("policy") or extra.get("policy")
+    status = record.get("status") or extra.get("status")
+    refusal_type = (
+        record.get("refusal_type")
+        or extra.get("refusal_type")
+        or record.get("refusal_code")
+        or extra.get("refusal_code")
+    )
+    return (
+        policy == "fail_loud_missing_transport_parameters"
+        and status == "unavailable"
+        and bool(refusal_type)
+    )
+
+
+def _omitted_species_flux_withholds_supply(flux: Any, species: str) -> bool:
+    """True when an omitted rate is not evidence of physical zero.
+
+    Called only for a species absent from a present rate map. No carrier
+    record means the publisher dropped a carrier with no rate. The gate
+    is ``gated_rate_kg_hr > 1e-12`` in ``_calculate_evaporation``, so that
+    omission contributes zero. ``proven_zero`` / ``zero_by_physics`` is the
+    same evidence. A typed refusal is not.
+
+    d-367: missing input stays a refusal. It does not become a zero hour
+    inside an otherwise numeric integral.
+    """
+
+    channels = getattr(flux, "carrier_authority_by_species", None)
+    if not isinstance(channels, MappingABC) or species not in channels:
+        return False
+    record = channels[species]
+    if not isinstance(record, MappingABC):
+        return True
+    # A diagnostic upper bound is not a kg/h and not zero-by-physics.
+    # Keeping the other hours would price this hour as zero.
+    if _carrier_mapping_kind(record, "flux") == "diagnostic_upper_bound":
+        return True
+    # The serialized runtime pressure can refuse while the channel
+    # pressure stays a value. The unpublished rate is then missing input.
+    if _carrier_mapping_kind(record, "selected_runtime_pressure") == "refusal":
+        return True
+    if _carrier_records_transport_refusal(record):
+        return True
+    status = vapour_carrier_authority_status(
+        record,
+        expected_species_id=species,
+    )
+    if status == VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO:
+        return False
+    if status in {
+        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+        VAPOUR_CARRIER_AUTHORITY_MISSING,
+    }:
+        return True
+    # Eligible or authoritative channel, no published rate: the 1e-12 kg/h
+    # gate dropped it. That is a physical zero for this interval.
+    return False
+
+
 def _optimizer_refused_flux_bounds(
     snapshots: Any,
     refused_species: tuple[str, ...],
     *,
     campaigns_elapsed: float = 1.0,
 ) -> dict[str, float]:
-    """Bound refused wall deposits by a complete vapour-flux integral.
+    """Integral of each species' computed vapour flux over the window.
 
-    Invariant: a returned number is the integral of that species over every
-    positive-duration snapshot in the window. It is not a partial sum.
+    Invariant (d-367), at this chokepoint. Product summary, furnace
+    lifespan, and the tap projection book only the map returned here.
+    No other path integrates a wall-supply flux.
 
-    A positive-duration snapshot with no flux map is a missing interval.
-    There is no separate explicit bound for that interval on the snapshot,
-    so the partial sum of the other snapshots is not a supply and this
-    function returns no bounds. Callers already treat an omitted species as
+    A returned number sums that species over every positive-duration
+    snapshot. Each of those intervals is a computed rate or an evidenced
+    physical zero. A typed flux refusal on any positive-duration interval
+    leaves that species out. The partial sum of the other intervals is
+    not a supply. A sibling with a complete integral is still returned.
+    Species order does not change the map.
+
+    A positive-duration snapshot with no flux map is a missing interval
+    for the whole window. There is no per-species evidence on it, so
+    this function returns no bounds. Callers treat an omitted species as
     having no finite bound: the wall refusal stays, and d-045 leaves the
     campaign upper bound unavailable instead of clearing it.
 
-    A present map that omits a species is not a missing interval. The
-    published map drops a carrier with no rate. A species absent from every
-    map stays unobserved, never a fabricated zero. An explicit 0 rate is
-    evidence and contributes nothing to the integral.
+    A present map that omits a species is a physical zero only when the
+    carrier authority does not record a refusal. The published map drops
+    a carrier at or below 1e-12 kg/h, and proven-zero authority is an
+    explicit zero. An explicit 0 rate in the map is that same evidence
+    and contributes nothing. A species absent from every map, and never
+    refused, stays unobserved. This function does not fabricate a zero
+    supply for it.
 
-    A zero-duration snapshot adds no mass. A missing map on that snapshot
-    is not a gap.
+    A published numeric rate is the computed interval even when a refusal
+    flag is also present. The refusal rule applies to an omitted key.
+    The published map wins over species_kg_hr, so a committed rate the
+    publisher did not show is not the supply.
+
+    A zero-duration snapshot adds no mass. A refusal or a missing map
+    on that snapshot is not a gap.
     """
 
     if not refused_species:
@@ -1970,6 +2069,7 @@ def _optimizer_refused_flux_bounds(
         )
     totals = {species: 0.0 for species in refused_species}
     observed: set[str] = set()
+    withheld: set[str] = set()
     missing_interval = False
     for snapshot in tuple(snapshots or ()):
         raw_duration = getattr(snapshot, "duration_h", 1.0)
@@ -1988,8 +2088,14 @@ def _optimizer_refused_flux_bounds(
             if duration_h > 0.0:
                 missing_interval = True
             continue
+        flux = getattr(snapshot, "evap_flux", None)
         for species in refused_species:
             if species not in rates:
+                if (
+                    duration_h > 0.0
+                    and _omitted_species_flux_withholds_supply(flux, species)
+                ):
+                    withheld.add(species)
                 continue
             raw_rate = rates[species]
             if isinstance(raw_rate, bool) or not isinstance(raw_rate, int | float):
@@ -2010,7 +2116,7 @@ def _optimizer_refused_flux_bounds(
     return {
         species: float(totals[species] / campaigns_elapsed)
         for species in refused_species
-        if species in observed
+        if species in observed and species not in withheld
     }
 
 
