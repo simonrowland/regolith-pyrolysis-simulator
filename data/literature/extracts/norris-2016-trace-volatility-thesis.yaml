@@ -9,7 +9,7 @@ extraction:
   date: '2026-11-11'
   worker: w1111xnor
   source_pdf: corpus/raw/norris-2016-trace-volatility-thesis/norris-2016-trace-volatility-thesis.pdf
-review_status: draft
+review_status: reviewed
 fidelity_samples:
 - species: Ag
   observation_id: norris_2016_table5_7_ag_logfo2_neg7
@@ -47,9 +47,9 @@ benches:
       tag: value
       value: Nickel crucible and nickel stirrer
     locator:
-      page: 231
-      pdf_page_index: 230
-      published_page: 201
+      page: 224
+      pdf_page_index: 223
+      published_page: 194
       table: '5.4'
       note: Wetted material listed as nickel
 experiments:
@@ -57,13 +57,14 @@ experiments:
   bench_id: stirred-gas-mixing-furnace
   method: quench_equilibration
   locator:
-    page: 231
-    pdf_page_index: 230
-    published_page: 201
+    page: 224
+    pdf_page_index: 223
+    published_page: 194
     table: '5.4'
     row: F008
   sample:
     name: EBT1
+    composition_role: initial_charge_only
     printed_composition:
       state:
         tag: value
@@ -89,9 +90,9 @@ experiments:
         tag: value
         value: '1300'
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F008
     duration_min:
@@ -104,6 +105,19 @@ experiments:
         published_page: 202
         table: '5.7'
         note: Table reports 60 minute experiments
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        note: Table 5.7 caption specifies 60 minute experiments; converted 60 min × 60 s/min.
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -122,9 +136,9 @@ experiments:
         tag: unknown
         reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F008
     regime:
@@ -140,9 +154,9 @@ experiments:
         tag: unknown
         reason: CO/CO2 gas mixture; ratio not printed alongside the run record
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F008
   apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
@@ -152,13 +166,14 @@ experiments:
   bench_id: stirred-gas-mixing-furnace
   method: quench_equilibration
   locator:
-    page: 231
-    pdf_page_index: 230
-    published_page: 201
+    page: 224
+    pdf_page_index: 223
+    published_page: 194
     table: '5.4'
     row: F014
   sample:
     name: EBT1
+    composition_role: initial_charge_only
     printed_composition:
       state:
         tag: value
@@ -175,9 +190,9 @@ experiments:
         tag: value
         value: '1300'
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F014
     duration_min:
@@ -190,6 +205,19 @@ experiments:
         published_page: 202
         table: '5.7'
         note: Table reports 60 minute experiments
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        note: Table 5.7 caption specifies 60 minute experiments; converted 60 min × 60 s/min.
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -208,9 +236,9 @@ experiments:
         tag: unknown
         reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F014
     regime:
@@ -226,9 +254,9 @@ experiments:
         tag: unknown
         reason: CO/CO2 gas mixture; ratio not printed alongside the run record
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F014
   apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
@@ -238,13 +266,14 @@ experiments:
   bench_id: stirred-gas-mixing-furnace
   method: quench_equilibration
   locator:
-    page: 231
-    pdf_page_index: 230
-    published_page: 201
+    page: 224
+    pdf_page_index: 223
+    published_page: 194
     table: '5.4'
     row: F018
   sample:
     name: EBT1
+    composition_role: initial_charge_only
     printed_composition:
       state:
         tag: value
@@ -261,9 +290,9 @@ experiments:
         tag: value
         value: '1300'
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F018
     duration_min:
@@ -276,6 +305,19 @@ experiments:
         published_page: 202
         table: '5.7'
         note: Table reports 60 minute experiments
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        note: Table 5.7 caption specifies 60 minute experiments; converted 60 min × 60 s/min.
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -294,9 +336,9 @@ experiments:
         tag: unknown
         reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F018
     regime:
@@ -312,9 +354,9 @@ experiments:
         tag: unknown
         reason: CO/CO2 gas mixture; ratio not printed alongside the run record
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F018
   apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
@@ -324,13 +366,14 @@ experiments:
   bench_id: stirred-gas-mixing-furnace
   method: quench_equilibration
   locator:
-    page: 231
-    pdf_page_index: 230
-    published_page: 201
+    page: 224
+    pdf_page_index: 223
+    published_page: 194
     table: '5.4'
     row: F019
   sample:
     name: EBT1
+    composition_role: initial_charge_only
     printed_composition:
       state:
         tag: value
@@ -347,9 +390,9 @@ experiments:
         tag: value
         value: '1300'
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F019
     duration_min:
@@ -362,6 +405,19 @@ experiments:
         published_page: 202
         table: '5.7'
         note: Table reports 60 minute experiments
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+      locator:
+        page: 232
+        pdf_page_index: 231
+        published_page: 202
+        table: '5.7'
+        note: Table 5.7 caption specifies 60 minute experiments; converted 60 min × 60 s/min.
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -380,9 +436,9 @@ experiments:
         tag: unknown
         reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F019
     regime:
@@ -398,9 +454,9 @@ experiments:
         tag: unknown
         reason: CO/CO2 gas mixture; ratio not printed alongside the run record
       locator:
-        page: 231
-        pdf_page_index: 230
-        published_page: 201
+        page: 224
+        pdf_page_index: 223
+        published_page: 194
         table: '5.4'
         row: F019
   apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
@@ -422,6 +478,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -429,9 +496,9 @@ species:
               kind: point
               point: '1300'
           locator: &id002
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -440,7 +507,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id002
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -498,6 +570,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -505,9 +588,9 @@ species:
               kind: point
               point: '1300'
           locator: &id003
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -516,7 +599,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id003
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -574,6 +662,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -581,9 +680,9 @@ species:
               kind: point
               point: '1300'
           locator: &id004
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -592,7 +691,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id004
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -650,6 +754,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -657,9 +772,9 @@ species:
               kind: point
               point: '1300'
           locator: &id005
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -668,7 +783,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id005
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -728,6 +848,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -735,9 +866,9 @@ species:
               kind: point
               point: '1300'
           locator: &id006
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -746,7 +877,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id006
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -804,6 +940,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -811,9 +958,9 @@ species:
               kind: point
               point: '1300'
           locator: &id007
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -822,7 +969,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id007
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -880,6 +1032,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -887,9 +1050,9 @@ species:
               kind: point
               point: '1300'
           locator: &id008
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -898,7 +1061,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id008
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -956,6 +1124,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -963,9 +1142,9 @@ species:
               kind: point
               point: '1300'
           locator: &id009
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -974,7 +1153,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id009
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -1034,6 +1218,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1041,9 +1236,9 @@ species:
               kind: point
               point: '1300'
           locator: &id010
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -1052,7 +1247,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id010
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -1110,6 +1310,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1117,9 +1328,9 @@ species:
               kind: point
               point: '1300'
           locator: &id011
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -1128,7 +1339,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id011
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -1186,6 +1402,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1193,9 +1420,9 @@ species:
               kind: point
               point: '1300'
           locator: &id012
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -1204,7 +1431,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id012
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -1262,6 +1494,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1269,9 +1512,9 @@ species:
               kind: point
               point: '1300'
           locator: &id013
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -1280,7 +1523,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id013
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -1340,6 +1588,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1347,9 +1606,9 @@ species:
               kind: point
               point: '1300'
           locator: &id014
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -1358,7 +1617,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id014
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -1416,6 +1680,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1423,9 +1698,9 @@ species:
               kind: point
               point: '1300'
           locator: &id015
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -1434,7 +1709,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id015
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -1492,6 +1772,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1499,9 +1790,9 @@ species:
               kind: point
               point: '1300'
           locator: &id016
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -1510,7 +1801,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id016
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -1568,6 +1864,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1575,9 +1882,9 @@ species:
               kind: point
               point: '1300'
           locator: &id017
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -1586,7 +1893,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id017
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -1646,6 +1958,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1653,9 +1976,9 @@ species:
               kind: point
               point: '1300'
           locator: &id018
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -1664,7 +1987,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id018
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -1722,6 +2050,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1729,9 +2068,9 @@ species:
               kind: point
               point: '1300'
           locator: &id019
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -1740,7 +2079,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id019
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -1798,6 +2142,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1805,9 +2160,9 @@ species:
               kind: point
               point: '1300'
           locator: &id020
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -1816,7 +2171,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id020
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -1874,6 +2234,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1881,9 +2252,9 @@ species:
               kind: point
               point: '1300'
           locator: &id021
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -1892,7 +2263,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id021
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -1952,6 +2328,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -1959,9 +2346,9 @@ species:
               kind: point
               point: '1300'
           locator: &id022
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -1970,7 +2357,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id022
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -2028,6 +2420,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2035,9 +2438,9 @@ species:
               kind: point
               point: '1300'
           locator: &id023
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -2046,7 +2449,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id023
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -2104,6 +2512,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2111,9 +2530,9 @@ species:
               kind: point
               point: '1300'
           locator: &id024
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -2122,7 +2541,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id024
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -2180,6 +2604,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2187,9 +2622,9 @@ species:
               kind: point
               point: '1300'
           locator: &id025
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -2198,7 +2633,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id025
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -2258,6 +2698,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2265,9 +2716,9 @@ species:
               kind: point
               point: '1300'
           locator: &id026
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -2276,7 +2727,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id026
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -2334,6 +2790,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2341,9 +2808,9 @@ species:
               kind: point
               point: '1300'
           locator: &id027
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -2352,7 +2819,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id027
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -2410,6 +2882,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2417,9 +2900,9 @@ species:
               kind: point
               point: '1300'
           locator: &id028
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -2428,7 +2911,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id028
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -2486,6 +2974,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2493,9 +2992,9 @@ species:
               kind: point
               point: '1300'
           locator: &id029
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -2504,7 +3003,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id029
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -2564,6 +3068,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2571,9 +3086,9 @@ species:
               kind: point
               point: '1300'
           locator: &id030
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -2582,7 +3097,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id030
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -2640,6 +3160,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2647,9 +3178,9 @@ species:
               kind: point
               point: '1300'
           locator: &id031
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -2658,7 +3189,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id031
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -2716,6 +3252,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2723,9 +3270,9 @@ species:
               kind: point
               point: '1300'
           locator: &id032
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -2734,7 +3281,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id032
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -2792,6 +3344,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2799,9 +3362,9 @@ species:
               kind: point
               point: '1300'
           locator: &id033
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -2810,7 +3373,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id033
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -2870,6 +3438,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2877,9 +3456,9 @@ species:
               kind: point
               point: '1300'
           locator: &id034
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -2888,7 +3467,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id034
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -2946,6 +3530,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -2953,9 +3548,9 @@ species:
               kind: point
               point: '1300'
           locator: &id035
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -2964,7 +3559,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id035
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -3022,6 +3622,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3029,9 +3640,9 @@ species:
               kind: point
               point: '1300'
           locator: &id036
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -3040,7 +3651,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id036
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -3098,6 +3714,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3105,9 +3732,9 @@ species:
               kind: point
               point: '1300'
           locator: &id037
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -3116,7 +3743,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id037
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -3176,6 +3808,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3183,9 +3826,9 @@ species:
               kind: point
               point: '1300'
           locator: &id038
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -3194,7 +3837,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id038
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -3252,6 +3900,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3259,9 +3918,9 @@ species:
               kind: point
               point: '1300'
           locator: &id039
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -3270,7 +3929,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id039
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -3328,6 +3992,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3335,9 +4010,9 @@ species:
               kind: point
               point: '1300'
           locator: &id040
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -3346,7 +4021,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id040
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -3404,6 +4084,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3411,9 +4102,9 @@ species:
               kind: point
               point: '1300'
           locator: &id041
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -3422,7 +4113,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id041
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -3482,6 +4178,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3489,9 +4196,9 @@ species:
               kind: point
               point: '1300'
           locator: &id042
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -3500,7 +4207,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id042
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -3558,6 +4270,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3565,9 +4288,9 @@ species:
               kind: point
               point: '1300'
           locator: &id043
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -3576,7 +4299,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id043
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -3634,6 +4362,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3641,9 +4380,9 @@ species:
               kind: point
               point: '1300'
           locator: &id044
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -3652,7 +4391,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id044
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -3710,6 +4454,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3717,9 +4472,9 @@ species:
               kind: point
               point: '1300'
           locator: &id045
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -3728,7 +4483,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id045
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -3788,6 +4548,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3795,9 +4566,9 @@ species:
               kind: point
               point: '1300'
           locator: &id046
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -3806,7 +4577,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id046
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -3864,6 +4640,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3871,9 +4658,9 @@ species:
               kind: point
               point: '1300'
           locator: &id047
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -3882,7 +4669,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id047
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -3940,6 +4732,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -3947,9 +4750,9 @@ species:
               kind: point
               point: '1300'
           locator: &id048
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -3958,7 +4761,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id048
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -4016,6 +4824,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4023,9 +4842,9 @@ species:
               kind: point
               point: '1300'
           locator: &id049
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -4034,7 +4853,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id049
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -4094,6 +4918,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4101,9 +4936,9 @@ species:
               kind: point
               point: '1300'
           locator: &id050
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -4112,7 +4947,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id050
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -4170,6 +5010,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4177,9 +5028,9 @@ species:
               kind: point
               point: '1300'
           locator: &id051
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -4188,7 +5039,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id051
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -4246,6 +5102,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4253,9 +5120,9 @@ species:
               kind: point
               point: '1300'
           locator: &id052
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -4264,7 +5131,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id052
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -4322,6 +5194,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4329,9 +5212,9 @@ species:
               kind: point
               point: '1300'
           locator: &id053
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -4340,7 +5223,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id053
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -4400,6 +5288,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4407,9 +5306,9 @@ species:
               kind: point
               point: '1300'
           locator: &id054
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -4418,7 +5317,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id054
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -4476,6 +5380,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4483,9 +5398,9 @@ species:
               kind: point
               point: '1300'
           locator: &id055
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -4494,7 +5409,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id055
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -4552,6 +5472,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4559,9 +5490,9 @@ species:
               kind: point
               point: '1300'
           locator: &id056
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -4570,7 +5501,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id056
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -4628,6 +5564,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4635,9 +5582,9 @@ species:
               kind: point
               point: '1300'
           locator: &id057
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -4646,7 +5593,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id057
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -4706,6 +5658,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4713,9 +5676,9 @@ species:
               kind: point
               point: '1300'
           locator: &id058
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -4724,7 +5687,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id058
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -4782,6 +5750,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4789,9 +5768,9 @@ species:
               kind: point
               point: '1300'
           locator: &id059
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -4800,7 +5779,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id059
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -4858,6 +5842,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4865,9 +5860,9 @@ species:
               kind: point
               point: '1300'
           locator: &id060
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -4876,7 +5871,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id060
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -4934,6 +5934,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -4941,9 +5952,9 @@ species:
               kind: point
               point: '1300'
           locator: &id061
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -4952,7 +5963,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id061
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
@@ -5012,6 +6028,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -5019,9 +6046,9 @@ species:
               kind: point
               point: '1300'
           locator: &id062
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F008
         fO2_log:
@@ -5030,7 +6057,12 @@ species:
             value:
               kind: point
               point: '-7'
-          locator: *id062
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-7'
         composition:
           state:
             tag: value
@@ -5088,6 +6120,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -5095,9 +6138,9 @@ species:
               kind: point
               point: '1300'
           locator: &id063
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F014
         fO2_log:
@@ -5106,7 +6149,12 @@ species:
             value:
               kind: point
               point: '-9'
-          locator: *id063
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-9'
         composition:
           state:
             tag: value
@@ -5164,6 +6212,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -5171,9 +6230,9 @@ species:
               kind: point
               point: '1300'
           locator: &id064
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F018
         fO2_log:
@@ -5182,7 +6241,12 @@ species:
             value:
               kind: point
               point: '-11'
-          locator: *id064
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-11'
         composition:
           state:
             tag: value
@@ -5240,6 +6304,17 @@ species:
       phase: l
       units: dimensionless
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 230
+            pdf_page_index: 229
+            published_page: 200
+            section: 5.4.1 Stirring Furnace Experiments
         T_C:
           state:
             tag: value
@@ -5247,9 +6322,9 @@ species:
               kind: point
               point: '1300'
           locator: &id065
-            page: 231
-            pdf_page_index: 230
-            published_page: 201
+            page: 224
+            pdf_page_index: 223
+            published_page: 194
             table: '5.4'
             row: F019
         fO2_log:
@@ -5258,7 +6333,12 @@ species:
             value:
               kind: point
               point: '-13'
-          locator: *id065
+          locator:
+            page: 232
+            pdf_page_index: 231
+            published_page: 202
+            table: '5.7'
+            row: '-13'
         composition:
           state:
             tag: value
