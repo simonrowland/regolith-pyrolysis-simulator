@@ -14784,16 +14784,16 @@ def _score_store_with_decisions(
                                 candidate,
                             )
                             candidate = None
+                        base_sort_order = (
+                            obs.observation_id,
+                            point_index,
+                            engine_order[engine],
+                            0,
+                        )
                         if _stream is None:
                             assert residuals is not None
                             residuals.append(residual)
                         else:
-                            base_sort_order = (
-                                obs.observation_id,
-                                point_index,
-                                engine_order[engine],
-                                0,
-                            )
                             if base_sort_order not in _skip_sort_orders:
                                 _stream.append(
                                     residual,
@@ -14804,8 +14804,12 @@ def _score_store_with_decisions(
                             residual.fo2_mode is Fo2Mode.SHARED_LADDER
                             and intrinsic_redox_activity
                             and (
-                                (prediction is None and predict is None)
-                                or _shard_failure_reason is not None
+                                prediction is None
+                                and predict is None
+                                and (
+                                    _stream is None
+                                    or base_sort_order not in _skip_sort_orders
+                                )
                             )
                         ):
                             total += 1
@@ -15077,6 +15081,7 @@ def _materialize_failed_score_shard(
     prepared: _PreparedScoreRun,
     *,
     expected_header: bytes,
+    predict: Callable[..., EnginePrediction] | None,
 ) -> _ScoreShardResult:
     if result.failure is None:
         return result
@@ -15142,6 +15147,7 @@ def _materialize_failed_score_shard(
             _engine_set=(task[1],),
             _refs=task[2],
             _stream=recovered_stream,
+            predict=predict,
             _shard_failure_reason=result.failure,
             _skip_sort_orders=frozenset(completed_orders),
         )
@@ -15276,6 +15282,7 @@ def _score_store_to_jsonl(
                                 shard_result,
                                 prepared,
                                 expected_header=header,
+                                predict=predict,
                             )
                             shard_failures.append(
                                 {

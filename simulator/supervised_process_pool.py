@@ -137,6 +137,7 @@ def supervised_process_map(
     max_inflight = max(1, worker_count * max_inflight_per_worker)
     pending_tasks = deque(enumerate(tasks))
     results: list[Any] = [None] * len(tasks)
+    recovery_indices: set[int] = set()
     executor: ProcessPoolExecutor | None = None
     futures: dict[Future[Any], tuple[int, Task]] = {}
     submitted_at: dict[Future[Any], float] = {}
@@ -167,7 +168,8 @@ def supervised_process_map(
 
     def submit_until_full() -> None:
         assert executor is not None
-        while len(futures) < max_inflight and pending_tasks:
+        inflight_limit = 1 if recovery_indices else max_inflight
+        while len(futures) < inflight_limit and pending_tasks:
             index, task = pending_tasks.popleft()
             if before_submit is not None:
                 before_submit(task)
@@ -282,21 +284,36 @@ def supervised_process_map(
                             (task, *(pending[1] for pending in futures.values())),
                         )
                         raise failure from exc
-                    results[index] = failure
                     if isinstance(exc, BrokenProcessPool):
-                        requeue = sorted(
-                            futures.values(),
-                            key=(
-                                (lambda item: requeue_key(item[1]))
-                                if requeue_key is not None
-                                else (lambda item: item[0])
-                            ),
+                        requeue = [
+                            (index, task),
+                            *futures.values(),
+                        ]
+                        if index in recovery_indices:
+                            # In the serial retry batch, this error belongs to
+                            # the only task in flight, so it is now safe to
+                            # classify as a task failure.
+                            results[index] = failure
+                            recovery_indices.discard(index)
+                        else:
+                            # A broken executor makes every in-flight future
+                            # suspect. Replay the whole affected batch one at
+                            # a time so a healthy sibling is never reported as
+                            # failed just because another worker crashed.
+                            requeue.sort(
+                                key=(
+                                    (lambda item: requeue_key(item[1]))
+                                    if requeue_key is not None
+                                    else (lambda item: item[0])
+                                )
+                            )
+                            recovery_indices.update(
+                                pending_index for pending_index, _ in requeue
+                            )
+                            pending_tasks.extendleft(reversed(requeue))
+                        affected = tuple(
+                            pending_task for _, pending_task in requeue
                         )
-                        pending_tasks.extendleft(
-                            (pending_index, pending_task)
-                            for pending_index, pending_task in reversed(requeue)
-                        )
-                        affected = tuple(pending_task for _, pending_task in requeue)
                         executor_closed = abort(exc, futures, affected)
                         futures.clear()
                         submitted_at.clear()
@@ -305,6 +322,8 @@ def supervised_process_map(
                         executor_closed = False
                         submit_until_full()
                         break
+                    results[index] = failure
+                    recovery_indices.discard(index)
                     submit_until_full()
                     continue
                 try:
@@ -322,6 +341,7 @@ def supervised_process_map(
                     )
                     raise
                 results[index] = result
+                recovery_indices.discard(index)
                 submit_until_full()
 
             wait_timeout, expired = deadlines()
