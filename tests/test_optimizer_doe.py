@@ -96,13 +96,13 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         }
         for item in batch
     ]
-    # The Stage-4 split bounds stage_4_to_stage_5 at the 250 C Na/Mg
-    # collector (the downstream K trap is 40 C), replacing the former 700 C
-    # search ceiling. That single knob bound changes the sampled stream digest;
-    # the 59/65 conditional subspace dimensions remain fixed.
+    # b-282 drops the upstream wall search floor from the SiO-quiescent
+    # 1400 C figure to the coldest downstream collector interface. That
+    # bound change moves the sampled stream digest. The 59/65 conditional
+    # subspace dimensions stay fixed.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "ca8aab1fcef51d118585f967f9bc589d54e70cfb22e06447e489e5b57ad83eea"
+    ).hexdigest() == "1e0450a94117cdb7562136f78c0d26170d5bf92a652ea2d537210118f112fc69"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -124,11 +124,11 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
         }
         for item in batch
     ]
-    # The same Stage-4 interface bound change moves the deterministic LHC
-    # samples; it leaves the C5-on/off subspace dimensions unchanged.
+    # The same upstream-wall floor change moves the deterministic LHC
+    # samples. It leaves the C5-on/off subspace dimensions unchanged.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "3f4dbcca0c21e68c142e83ac2c1e83bdb1fd2b27e07b55b53432c892bf933a03"
+    ).hexdigest() == "58941181badd4232ee5f597d7e5fd81425151ca752cd7137279a9078acfc6eaf"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():
