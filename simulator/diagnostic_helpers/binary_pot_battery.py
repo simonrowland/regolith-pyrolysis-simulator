@@ -305,7 +305,7 @@ def _call_cached_backend_equilibrate(
     *,
     cache: bool = True,
 ) -> Any:
-    if not cache:
+    if not cache or handle.name == "internal-analytical":
         return solve()
     from simulator.engine_cache import _configured_engine_cache_path
 
@@ -328,7 +328,7 @@ def _call_cached_backend_equilibrate(
     from simulator.engine_cache import (
         _is_refusal,
         cached_engine_call,
-        engine_cache_backend_settings,
+        engine_cache_settings,
     )
     from simulator.melt_backend.base import (
         EquilibriumResult,
@@ -348,7 +348,7 @@ def _call_cached_backend_equilibrate(
             return equilibrium_cache_value(result)
         return result
 
-    adapter_settings = engine_cache_backend_settings(handle.backend)
+    adapter_settings = engine_cache_settings(handle.name, handle.backend)
 
     payload = cached_engine_call(
         handle.name,
@@ -3843,54 +3843,20 @@ def internal_analytical_residue_vapor_pressure(
     include_diagnostic_shadows: bool,
 ) -> Any:
     """Run one direct internal-analytical residue pressure request."""
-    from simulator.engine_cache import (
-        _configured_engine_cache_path,
-        cached_engine_call,
-        engine_cache_backend_settings,
-        record_engine_open,
-    )
+    from simulator.engine_cache import record_engine_open
 
     record_engine_open("internal-analytical", core)
 
-    def solve_pressure_cache_value() -> Any:
-        return _internal_analytical_vapor_pressure_adapter(
-            core=core,
-            temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            composition_kg=composition_kg,
-            composition_mol=composition_mol,
-            fO2_log=fO2_log,
-            po2_request=po2_request,
-            include_diagnostic_shadows=include_diagnostic_shadows,
-        )
-
-    if _configured_engine_cache_path() is None:
-        return solve_pressure_cache_value()
-
-    request = {
-        "call": "residue_vapor_pressure",
-        "temperature_C": temperature_C,
-        "pressure_bar": pressure_bar,
-        "composition_kg": composition_kg,
-        "composition_mol": composition_mol,
-        "fO2_log": fO2_log,
-        "po2_request": po2_request.as_payload(),
-        "include_diagnostic_shadows": include_diagnostic_shadows,
-        "high_t_melt_activity_previous": getattr(
-            core, "_last_high_t_melt_activity", {}
-        ),
-        "high_t_melt_activity_previous_temperature_K": getattr(
-            core, "_last_high_t_melt_activity_temperature_K", None
-        ),
-        "engine_settings": engine_cache_backend_settings(core),
-    }
-
-    payload = cached_engine_call(
-        "internal-analytical",
-        request,
-        solve_pressure_cache_value,
+    return _internal_analytical_vapor_pressure_adapter(
+        core=core,
+        temperature_C=temperature_C,
+        pressure_bar=pressure_bar,
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        fO2_log=fO2_log,
+        po2_request=po2_request,
+        include_diagnostic_shadows=include_diagnostic_shadows,
     )
-    return payload
 
 
 class _InternalAnalyticalBatteryBackend:
@@ -4573,9 +4539,15 @@ class _IsolatedCellWorker:
                     return result
                 return EquilibrateCell.from_payload(result).to_engine_cache_value()
 
-        from simulator.engine_cache import cached_engine_call
+        if self.engine == "internal-analytical":
+            result = solve()
+        else:
+            from simulator.engine_cache import cached_engine_call, engine_cache_settings
 
-        result = cached_engine_call(self.engine, request, solve)
+            request["engine_settings"] = engine_cache_settings(
+                self.engine, request.get("engine_settings", {})
+            )
+            result = cached_engine_call(self.engine, request, solve)
         if isinstance(result, list):
             result = EquilibrateCell.from_engine_cache_value(result).as_payload()
         if not isinstance(result, dict):
