@@ -11,7 +11,6 @@ from engines.engine_commissioning import PUBLISHED_AUTHORITY_OUTSIDE
 from simulator.accounting.stage0_inventory import STAGE0_RELEASE_KINETICS
 from simulator.campaigns import (
     CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON,
-    CampaignC4EndpointRefusal,
     CampaignEndpointRefusal,
     CampaignHoldAcquisitionRefusal,
     CampaignHoldTargetRefusal,
@@ -236,7 +235,15 @@ def test_configured_campaign_endpoints_match_legacy_trip_points(
         low_current_hours=low_current_hours,
     )
 
-    assert manager.check_endpoint(melt, flux, CondensationTrain(), record) is expected
+    assert manager.check_endpoint(
+        melt,
+        flux,
+        CondensationTrain(),
+        record,
+        atom_ledger=(
+            _c4_ledger() if campaign == CampaignPhase.C4 else None
+        ),
+    ) is expected
 
 
 def _assert_computed_c0_exit_notice(notice: dict) -> None:
@@ -518,6 +525,56 @@ def _c4_snapshot(*, temperature_C: float, mg_rate: float) -> HourSnapshot:
     )
 
 
+def _c4_ledger(
+    *,
+    feedstock_na_atom_mol: float = 800.0,
+    additive_na_atom_mol: float = 200.0,
+    residual_na_atom_mol: float = 1.0,
+    residual_mg_atom_mol: float = 500.0,
+) -> SimpleNamespace:
+    return SimpleNamespace(
+        external_loads=(
+            SimpleNamespace(
+                account="process.raw_feedstock",
+                origin_atom_moles={"feedstock": {"Na": feedstock_na_atom_mol}},
+            ),
+            SimpleNamespace(
+                account="reservoir.reagent.Na",
+                origin_atom_moles={"reagent": {"Na": additive_na_atom_mol}},
+            ),
+        ),
+        atom_moles_by_account=lambda account: (
+            {"Na": residual_na_atom_mol, "Mg": residual_mg_atom_mol}
+            if account == "process.cleaned_melt"
+            else {}
+        ),
+    )
+
+
+def test_c4_na_endpoint_uses_005_percent_of_feedstock_and_additive_na() -> None:
+    setpoints = _setpoints()
+    manager = CampaignManager(setpoints)
+    ledger = _c4_ledger(residual_na_atom_mol=0.5)
+
+    assert setpoints["outdoor_alkali_loss_limit_fraction_of_feed"] == 0.0005
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 0, temperature_C=1220.0),
+        _flux(Mg=0.0),
+        CondensationTrain(),
+        BatchRecord(),
+        atom_ledger=ledger,
+    ) is True
+
+    termination = manager.last_c4_termination
+    assert termination["outcome"] == "endpoint_met"
+    assert termination["stop_reason"] == "endpoint_met"
+    assert termination["feed_na_atom_mol"] == pytest.approx(1000.0)
+    assert termination["na_endpoint_threshold_atom_mol"] == pytest.approx(0.5)
+    assert termination["residual_melt"]["Na_kg"] > 0.0
+    assert termination["residual_melt"]["Mg_kg"] > 0.0
+    assert termination["residual_melt"]["flag"] == "endpoint_met"
+
+
 def test_c4_acquired_low_rate_is_ineligible_until_signal_arms() -> None:
     manager = CampaignManager(_setpoints())
     record = BatchRecord(snapshots=[
@@ -530,6 +587,7 @@ def test_c4_acquired_low_rate_is_ineligible_until_signal_arms() -> None:
         _flux(Mg=0.019),
         CondensationTrain(),
         record,
+        atom_ledger=_c4_ledger(),
     ) is False
 
 
@@ -545,6 +603,7 @@ def test_c4_acquired_high_rate_arms_without_ending() -> None:
         _flux(Mg=0.021),
         CondensationTrain(),
         record,
+        atom_ledger=_c4_ledger(),
     ) is False
 
 
@@ -560,35 +619,38 @@ def test_c4_max_hold_without_signal_has_distinct_outcome() -> None:
         _flux(Mg=0.0),
         CondensationTrain(),
         record,
+        atom_ledger=_c4_ledger(),
     ) is True
-    assert manager.last_c4_termination == {
-        "outcome": "max_hold_no_signal",
-        "species": "Mg",
-        "rate_kg_hr": 0.0,
-        "threshold_kg_hr": 0.02,
-        "completed_window_hr": 20.0,
-        "process_elapsed_hr": 20.0,
-    }
+    assert manager.last_c4_termination["outcome"] == "max_hold_no_signal"
+    assert manager.last_c4_termination["stop_reason"] == "time_cap"
+    assert manager.last_c4_termination["residual_melt"]["flag"] == "time_cap"
 
 
-def test_c4_unreachable_window_is_typed_acquisition_refusal() -> None:
+def test_c4_acquisition_cap_advances_with_flagged_residual() -> None:
     setpoints = _setpoints()
-    setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 2.0
+    setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 1.0
     manager = CampaignManager(setpoints)
+    sim = object.__new__(PyrolysisSimulator)
+    sim.campaign_mgr = manager
+    sim.melt = _melt(CampaignPhase.C4, 1, temperature_C=1220.0)
+    sim.train = CondensationTrain()
+    sim.record = BatchRecord()
+    sim.atom_ledger = _c4_ledger()
+    sim.overhead = SimpleNamespace()
+    sim.pending_decision = None
+    sim.paused_for_decision = False
+    sim._last_c4_refusal_diagnostic = {}
+    sim._c4_campaign_refused = False
 
-    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
-        manager.check_endpoint(
-            _melt(CampaignPhase.C4, 1, temperature_C=1220.0),
-            _flux(Mg=0.0),
-            CondensationTrain(),
-            BatchRecord(),
-        )
-    assert refusal.value.reason == "c4_target_window_not_acquired"
-    assert refusal.value.diagnostic["requested_window_C"] == [1580.0, 1670.0]
-    assert refusal.value.diagnostic["temperature_C"] == 1220.0
-    assert refusal.value.diagnostic["elapsed_hours"] == 2.0
-    assert refusal.value.diagnostic["acquisition_limit_source"] == (
-        "setpoint:C4.max_target_acquisition_hr"
+    assert sim._check_campaign_endpoint(_flux(Mg=0.0)) is True
+    assert sim._c4_campaign_refused is False
+    assert sim.campaign_endpoint_refused() is False
+    assert manager.last_c4_termination["stop_reason"] == "time_cap"
+    assert manager.last_c4_termination["residual_melt"]["flag"] == "time_cap"
+    assert manager.last_c4_termination["residual_melt"]["Na_kg"] > 0.0
+    assert manager.last_c4_termination["residual_melt"]["Mg_kg"] > 0.0
+    assert manager.get_next_campaign(CampaignPhase.C4, sim.record) == (
+        CampaignPhase.C2A
     )
 
 
@@ -596,7 +658,7 @@ def test_c4_transport_hold_hours_do_not_burn_acquisition_budget() -> None:
     """Loop-3 full transport holds must not spend max_target_acquisition_hr.
 
     b-147 Pref_GF leaves ~17 kg C3 overhead holdup into C4; controlled_o2
-    pipe capacity ~0.35 kg/hr zeros the ramp for tens of hours. The 60 h
+    pipe capacity ~0.35 kg/hr zeros the ramp for tens of hours. The 120 h
     acquisition budget is preheat opportunity, not holdup-drain wall clock.
     """
     setpoints = _setpoints()
@@ -617,7 +679,7 @@ def test_c4_transport_hold_hours_do_not_burn_acquisition_budget() -> None:
         )
         for _ in range(3)
     ]
-    # Wall campaign hour 3 (completed=4) would refuse under wall-clock
+    # Wall campaign hour 3 (completed=4) would cap under wall-clock
     # semantics; opportunity hours are still 0 (all holds + current hold).
     assert manager.check_endpoint(
         _melt(CampaignPhase.C4, 3, temperature_C=1150.0),
@@ -634,10 +696,11 @@ def test_c4_transport_hold_hours_do_not_burn_acquisition_budget() -> None:
                 "saturated (5000%)"
             ),
         },
+        atom_ledger=_c4_ledger(),
     ) is False
 
     # Three prior heating hours (no throttle) + current heating hour at
-    # T still below window → opportunity=4 >= limit 3 → refuse.
+    # T still below window → opportunity=4 >= limit 3 → time cap.
     heat_snaps = [
         HourSnapshot(
             campaign=CampaignPhase.C4,
@@ -649,58 +712,27 @@ def test_c4_transport_hold_hours_do_not_burn_acquisition_budget() -> None:
         )
         for i in range(3)
     ]
-    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
-        manager.check_endpoint(
-            _melt(CampaignPhase.C4, 3, temperature_C=1230.0),
-            _flux(Mg=0.0),
-            CondensationTrain(),
-            BatchRecord(snapshots=heat_snaps),
-            transport_state={
-                "binding_cause": "controlled_o2_no_equipment",
-                "saturation_pct": 0.0,
-                "nominal_ramp_rate_C_hr": 10.0,
-                "actual_ramp_rate_C_hr": 10.0,
-                "throttle_reason": "",
-            },
-        )
-    assert refusal.value.reason == "c4_target_window_not_acquired"
-    assert refusal.value.diagnostic["acquisition_opportunity_hr"] == 4.0
-    assert refusal.value.diagnostic["completed_campaign_hour"] == 4.0
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 3, temperature_C=1230.0),
+        _flux(Mg=0.0),
+        CondensationTrain(),
+        BatchRecord(snapshots=heat_snaps),
+        transport_state={
+            "binding_cause": "controlled_o2_no_equipment",
+            "saturation_pct": 0.0,
+            "nominal_ramp_rate_C_hr": 10.0,
+            "actual_ramp_rate_C_hr": 10.0,
+            "throttle_reason": "",
+        },
+        atom_ledger=_c4_ledger(),
+    ) is True
+    assert manager.last_c4_termination["stop_reason"] == "time_cap"
+    assert manager.last_c4_termination["acquisition_opportunity_hr"] == 4.0
+    assert manager.last_c4_termination["completed_campaign_hour"] == 4.0
+    assert manager.last_c4_termination["residual_melt"]["flag"] == "time_cap"
 
 
-def test_c4_refusal_latches_is_complete() -> None:
-    """Bare step loops must terminate when C4 endpoint refuses."""
-    setpoints = _setpoints()
-    setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 1.0
-    sim = object.__new__(PyrolysisSimulator)
-    sim.campaign_mgr = CampaignManager(setpoints)
-    sim.melt = _melt(CampaignPhase.C4, 0, temperature_C=1220.0)
-    sim.train = CondensationTrain()
-    sim.record = BatchRecord()
-    sim.overhead = SimpleNamespace(
-        transport_binding_cause="controlled_o2_no_equipment",
-        transport_saturation_pct=0.0,
-        evap_exceeds_transport=False,
-        turbine_limited=False,
-    )
-    sim._last_nominal_ramp = 10.0
-    sim._last_actual_ramp = 10.0
-    sim._last_throttle_reason = ""
-    sim.pending_decision = object()
-    sim.paused_for_decision = True
-    sim._last_c4_refusal_diagnostic = {}
-    sim._c4_campaign_refused = False
-    sim._last_c6_refusal_diagnostic = {}
-    sim._c6_campaign_refused = False
-
-    assert sim.is_complete() is False
-    assert sim._check_campaign_endpoint(_flux(Mg=0.0)) is True
-    assert sim._c4_campaign_refused is True
-    assert sim.is_complete() is True
-    assert sim.campaign_endpoint_refused() is True
-
-
-def test_c4_post_acquisition_window_loss_is_typed_refusal() -> None:
+def test_c4_post_acquisition_process_wall_is_a_time_cap() -> None:
     setpoints = _setpoints()
     setpoints["campaigns"]["C4"]["max_process_wall_clock_hr"] = 3.0
     manager = CampaignManager(setpoints)
@@ -709,18 +741,19 @@ def test_c4_post_acquisition_window_loss_is_typed_refusal() -> None:
         _c4_snapshot(temperature_C=1570.0, mg_rate=0.0),
     ])
 
-    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
-        manager.check_endpoint(
-            _melt(CampaignPhase.C4, 2, temperature_C=1570.0),
-            _flux(Mg=0.0),
-            CondensationTrain(),
-            record,
-        )
-    assert refusal.value.reason == "c4_process_window_lost"
-    assert refusal.value.diagnostic["elapsed_hours"] == 3.0
-    assert refusal.value.diagnostic["completed_window_hr"] == 1.0
-    assert refusal.value.diagnostic["current_in_window"] is False
-    assert refusal.value.diagnostic["process_wall_clock_limit_source"] == (
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 2, temperature_C=1570.0),
+        _flux(Mg=0.0),
+        CondensationTrain(),
+        record,
+        atom_ledger=_c4_ledger(),
+    ) is True
+    assert manager.last_c4_termination["outcome"] == "c4_process_window_lost"
+    assert manager.last_c4_termination["stop_reason"] == "time_cap"
+    assert manager.last_c4_termination["elapsed_hours"] == 3.0
+    assert manager.last_c4_termination["completed_window_hr"] == 1.0
+    assert manager.last_c4_termination["current_in_window"] is False
+    assert manager.last_c4_termination["process_wall_clock_limit_source"] == (
         "setpoint:C4.max_process_wall_clock_hr"
     )
 
@@ -740,20 +773,24 @@ def test_c4_continuously_in_window_wall_clock_exhaustion_is_distinct() -> None:
         for _ in range(39)
     ])
 
-    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
-        manager.check_endpoint(
-            _melt(CampaignPhase.C4, 39, temperature_C=1580.0),
-            _flux(Mg=1.0),
-            CondensationTrain(),
-            record,
-        )
-    assert refusal.value.reason == "c4_process_wall_clock_exhausted"
-    assert refusal.value.diagnostic["elapsed_hours"] == 40.0
-    assert refusal.value.diagnostic["completed_window_hr"] == 40.0
-    assert refusal.value.diagnostic["current_in_window"] is True
-    assert refusal.value.diagnostic["operator_max_hold_hr"] == 100.0
-    assert refusal.value.diagnostic["process_wall_clock_limit_hr"] == 40.0
-    assert refusal.value.diagnostic["temperature_C"] == 1580.0
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 39, temperature_C=1580.0),
+        _flux(Mg=1.0),
+        CondensationTrain(),
+        record,
+        atom_ledger=_c4_ledger(),
+    ) is True
+    assert manager.last_c4_termination["outcome"] == (
+        "c4_process_wall_clock_exhausted"
+    )
+    assert manager.last_c4_termination["stop_reason"] == "time_cap"
+    assert manager.last_c4_termination["elapsed_hours"] == 40.0
+    assert manager.last_c4_termination["completed_window_hr"] == 40.0
+    assert manager.last_c4_termination["current_in_window"] is True
+    assert manager.last_c4_termination["operator_max_hold_hr"] == 100.0
+    assert manager.last_c4_termination["process_wall_clock_limit_hr"] == 40.0
+    assert manager.last_c4_termination["temperature_C"] == 1580.0
+    assert manager.last_c4_termination["residual_melt"]["flag"] == "time_cap"
 
 
 def test_c4_rise_then_decay_ends_after_in_window_minimum() -> None:
@@ -771,6 +808,7 @@ def test_c4_rise_then_decay_ends_after_in_window_minimum() -> None:
         _flux(Mg=0.019),
         CondensationTrain(),
         record,
+        atom_ledger=_c4_ledger(),
     ) is True
     assert manager.last_c4_termination["outcome"] == "mg_signal_depleted"
 
@@ -792,6 +830,7 @@ def test_c4_configured_acquisition_ceiling_requires_finite_positive_value(
             _flux(Mg=0.0),
             CondensationTrain(),
             BatchRecord(),
+            atom_ledger=_c4_ledger(),
         )
 
 
@@ -812,10 +851,11 @@ def test_c4_process_wall_clock_ceiling_requires_finite_positive_value(
             _flux(Mg=0.0),
             CondensationTrain(),
             BatchRecord(),
+            atom_ledger=_c4_ledger(),
         )
 
 
-def test_c4_refusal_plumbing_does_not_store_as_c6() -> None:
+def test_c4_missing_feed_na_ledger_remains_a_typed_refusal() -> None:
     setpoints = _setpoints()
     setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 1.0
     sim = object.__new__(PyrolysisSimulator)
@@ -823,6 +863,7 @@ def test_c4_refusal_plumbing_does_not_store_as_c6() -> None:
     sim.melt = _melt(CampaignPhase.C4, 0, temperature_C=1220.0)
     sim.train = CondensationTrain()
     sim.record = BatchRecord()
+    sim.atom_ledger = None
     sim.overhead = SimpleNamespace()
     sim.pending_decision = object()
     sim.paused_for_decision = True
@@ -840,7 +881,7 @@ def test_c4_refusal_plumbing_does_not_store_as_c6() -> None:
     assert sim.paused_for_decision is False
     assert sim._last_c4_refusal_diagnostic["campaign"] == "C4"
     assert sim._last_c4_refusal_diagnostic["diagnostic"]["reason_refused"] == (
-        "c4_target_window_not_acquired"
+        "c4_feed_na_ledger_missing"
     )
 
 
@@ -1373,12 +1414,12 @@ def test_sc109_mre_baseline_earlier_rung_arm_does_not_authorize_terminal_decay()
     ) is False
 
 
-def test_c4_permanent_transport_hold_trips_held_hours_wall() -> None:
-    """A permanent transport hold must refuse, not spin (b-147 review P1).
+def test_c4_permanent_transport_hold_ends_on_time_cap() -> None:
+    """A permanent transport hold must cap and advance, not spin.
 
     The opportunity clock excludes hold hours, so without a bound a
     zero-capacity / regenerating-holdup plant never terminates C4. The
-    held-hours wall refuses when wall − opportunity ≥ acquisition_limit +
+    held-hours wall caps when wall − opportunity ≥ acquisition_limit +
     process_limit (setpoint-sourced budgets; finite drains stay under it —
     the honest CI Pref_GF path holds ~50-90 h against a 100 h budget).
     """
@@ -1404,7 +1445,7 @@ def test_c4_permanent_transport_hold_trips_held_hours_wall() -> None:
         actual_ramp_rate_C_hr=0.0,
         throttle_reason=throttle["throttle_reason"],
     )
-    # Completed hour 4 (campaign hour 3) < 3+2 budget: no refusal yet
+    # Completed hour 4 (campaign hour 3) < 3+2 budget: no stop yet
     # (opportunity stays 0; held hours = completed hours here).
     assert manager.check_endpoint(
         _melt(CampaignPhase.C4, 3, temperature_C=1150.0),
@@ -1412,20 +1453,23 @@ def test_c4_permanent_transport_hold_trips_held_hours_wall() -> None:
         CondensationTrain(),
         BatchRecord(snapshots=[hold_snap] * 3),
         transport_state=throttle,
+        atom_ledger=_c4_ledger(),
     ) is False
-    # Completed hour 5 (campaign hour 4) >= 3+2: typed refusal.
-    with pytest.raises(CampaignC4EndpointRefusal) as excinfo:
-        manager.check_endpoint(
-            _melt(CampaignPhase.C4, 4, temperature_C=1150.0),
-            _flux(Mg=0.0),
-            CondensationTrain(),
-            BatchRecord(snapshots=[hold_snap] * 4),
-            transport_state=throttle,
-        )
-    assert excinfo.value.diagnostic["reason_refused"] == (
+    # Completed hour 5 (campaign hour 4) >= 3+2: time cap.
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 4, temperature_C=1150.0),
+        _flux(Mg=0.0),
+        CondensationTrain(),
+        BatchRecord(snapshots=[hold_snap] * 4),
+        transport_state=throttle,
+        atom_ledger=_c4_ledger(),
+    ) is True
+    assert manager.last_c4_termination["outcome"] == (
         "c4_preheat_wall_clock_exhausted"
     )
-    assert excinfo.value.diagnostic["acquisition_opportunity_hr"] == 0.0
+    assert manager.last_c4_termination["stop_reason"] == "time_cap"
+    assert manager.last_c4_termination["acquisition_opportunity_hr"] == 0.0
+    assert manager.last_c4_termination["residual_melt"]["flag"] == "time_cap"
 
 
 def test_c6_at_hold_target_none_is_not_at_hold() -> None:
@@ -1531,6 +1575,7 @@ def test_c4_armed_negative_mg_rate_is_typed_refusal_not_depletion() -> None:
             _flux(Mg=-1.0),
             CondensationTrain(),
             record,
+            atom_ledger=_c4_ledger(),
         )
     _assert_depletion_signal_refused(refusal.value, "C4.Mg_kg_hr")
 
@@ -1547,8 +1592,10 @@ def test_c4_armed_zero_mg_rate_still_depletes() -> None:
         _flux(Mg=0.0),
         CondensationTrain(),
         record,
+        atom_ledger=_c4_ledger(),
     ) is True
     assert manager.last_c4_termination["outcome"] == "mg_signal_depleted"
+    assert manager.last_c4_termination["stop_reason"] == "mg_signal_depleted"
 
 
 def test_c5_armed_negative_current_is_typed_refusal_not_depletion() -> None:

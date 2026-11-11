@@ -2645,6 +2645,7 @@ class CampaignManager:
                        record: BatchRecord,
                        *,
                        transport_state: Mapping[str, object] | None = None,
+                       atom_ledger: object | None = None,
                        ) -> bool:
         """
         Check if the current campaign has reached its endpoint.
@@ -2663,8 +2664,8 @@ class CampaignManager:
         - C2B: armed species kg/hr below configured threshold after min
           hold, else max_hold
         - C3_K / C3_NA: path-dependent duration
-        - C4: in-window armed species kg/hr below configured threshold
-          after min window hours, else max_hold or a typed window refusal
+        - C4: feed-scaled Na residual threshold, in-window armed Mg rate
+          below configured threshold, or a finite time cap
         - C5: ladder complete, or armed current below configured
           threshold_A for consecutive_hours on the final rung, else
           max_hold
@@ -3047,6 +3048,117 @@ class CampaignManager:
             if not species:
                 raise ValueError('C4.soft_endpoint.species is required')
             rate = evap_flux.species_kg_hr.get(species, 0.0)
+            raw_na_limit = self.setpoints.get(
+                'outdoor_alkali_loss_limit_fraction_of_feed'
+            )
+            if not is_declared_real_scalar(raw_na_limit):
+                raise CampaignC4EndpointRefusal({
+                    'reason_refused': 'c4_outdoor_alkali_limit_missing',
+                    'detail': (
+                        'outdoor_alkali_loss_limit_fraction_of_feed is required'
+                    ),
+                })
+            na_limit_fraction = float(raw_na_limit)
+            if (
+                not math.isfinite(na_limit_fraction)
+                or not 0.0 <= na_limit_fraction <= 1.0
+            ):
+                raise CampaignC4EndpointRefusal({
+                    'reason_refused': 'c4_outdoor_alkali_limit_invalid',
+                    'value': na_limit_fraction,
+                    'detail': (
+                        'outdoor_alkali_loss_limit_fraction_of_feed must be '
+                        'finite and between 0 and 1'
+                    ),
+                })
+            if atom_ledger is None:
+                raise CampaignC4EndpointRefusal({
+                    'reason_refused': 'c4_feed_na_ledger_missing',
+                    'required_accounts': [
+                        'process.cleaned_melt',
+                        'process.raw_feedstock',
+                        'reservoir.reagent.*',
+                    ],
+                })
+            try:
+                feed_na_atom_mol = sum(
+                    float(load.origin_atom_moles.get(origin, {}).get('Na', 0.0))
+                    for load in atom_ledger.external_loads
+                    for origin in ('feedstock', 'reagent')
+                )
+                melt_atoms = atom_ledger.atom_moles_by_account(
+                    'process.cleaned_melt'
+                )
+                residual_na_atom_mol = float(melt_atoms.get('Na', 0.0))
+                residual_mg_atom_mol = float(melt_atoms.get('Mg', 0.0))
+            except (AttributeError, KeyError, TypeError, ValueError) as exc:
+                raise CampaignC4EndpointRefusal({
+                    'reason_refused': 'c4_feed_na_ledger_invalid',
+                    'detail': str(exc),
+                }) from exc
+            if any(
+                not math.isfinite(amount) or amount < 0.0
+                for amount in (
+                    feed_na_atom_mol,
+                    residual_na_atom_mol,
+                    residual_mg_atom_mol,
+                )
+            ):
+                raise CampaignC4EndpointRefusal({
+                    'reason_refused': 'c4_feed_na_ledger_invalid',
+                    'feed_Na_atom_mol': feed_na_atom_mol,
+                    'residual_Na_atom_mol': residual_na_atom_mol,
+                    'residual_Mg_atom_mol': residual_mg_atom_mol,
+                })
+            if feed_na_atom_mol == 0.0 and residual_na_atom_mol > 0.0:
+                raise CampaignC4EndpointRefusal({
+                    'reason_refused': 'c4_feed_na_inventory_missing',
+                    'account': 'process.cleaned_melt',
+                    'residual_Na_atom_mol': residual_na_atom_mol,
+                })
+            na_molar_mass = _species_molar_mass_kg_per_mol('Na')
+            mg_molar_mass = _species_molar_mass_kg_per_mol('Mg')
+            if na_molar_mass is None or mg_molar_mass is None:
+                raise CampaignC4EndpointRefusal({
+                    'reason_refused': 'c4_residual_molar_mass_missing',
+                    'species': [
+                        name
+                        for name, value in (
+                            ('Na', na_molar_mass), ('Mg', mg_molar_mass)
+                        )
+                        if value is None
+                    ],
+                })
+
+            # Feed Na is all Na from external lots with feedstock or reagent
+            # origin, including the batch charge loaded to
+            # `process.raw_feedstock` and additives loaded to
+            # `reservoir.reagent.*`. Recycled transfers are not counted again.
+            # The numerator is Na atoms in `process.cleaned_melt`; both terms
+            # are mol-atoms, so the threshold is fraction × feed Na
+            # [mol-atoms]. At a zero fraction only zero residual qualifies.
+            na_limit_atom_mol = na_limit_fraction * feed_na_atom_mol
+
+            def residual_fields(flag: str) -> dict[str, object]:
+                return {
+                    'feed_na_atom_mol': feed_na_atom_mol,
+                    'na_endpoint_threshold_atom_mol': na_limit_atom_mol,
+                    'residual_melt': {
+                        'Na_kg': residual_na_atom_mol * na_molar_mass,
+                        'Mg_kg': residual_mg_atom_mol * mg_molar_mass,
+                        'flag': flag,
+                    },
+                }
+
+            if residual_na_atom_mol <= na_limit_atom_mol:
+                self.last_c4_termination = {
+                    'outcome': 'endpoint_met',
+                    'stop_reason': 'endpoint_met',
+                    'species': 'Na',
+                    'threshold_fraction_of_feed': na_limit_fraction,
+                    **residual_fields('endpoint_met'),
+                }
+                return True
             window_low_C, window_high_C = self._c4_temperature_window()
             requested_window_C = [window_low_C, window_high_C]
             acquisition_limit_hr, acquisition_limit_source = (
@@ -3084,23 +3196,21 @@ class CampaignManager:
                 # inverse of the liveness hole the clock fixed.
                 # Premise: held hours = wall hours − opportunity hours; a
                 # finite holdup drain contributes finitely, a permanent hold
-                # grows without bound. Algebra: refuse when held ≥
+                # grows without bound. Algebra: end C4 as a time cap when held ≥
                 # acquisition_limit + process_limit (both setpoint-sourced;
-                # a flat wall-hours cap is WRONG — the honest CI Pref_GF path
-                # acquires near wall hour 120-135 and would trip it).
+                # a flat wall-hours cap would trip the honest CI Pref_GF path
+                # before its acquisition window).
                 # Unit: hours. Sanity: CI path holds ~50-90 h (17 kg holdup
                 # at ~0.35 kg/hr) < 100 h budget, unaffected; a plant held
-                # 100+ hours with no ramp deserves the typed refusal (raise
-                # the setpoints if a feedstock legitimately needs longer).
+                # 100+ hours with no ramp ends C4 as a flagged time cap.
                 if (
                     completed_campaign_hour - acquisition_elapsed_hr
                 ) >= (
                     acquisition_limit_hr + process_limit_hr
                 ):
                     diagnostic = {
-                        'reason_refused': (
-                            C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON
-                        ),
+                        'outcome': C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON,
+                        'stop_reason': 'time_cap',
                         'requested_window_C': requested_window_C,
                         'temperature_C': float(melt.temperature_C),
                         'elapsed_hours': completed_campaign_hour,
@@ -3117,12 +3227,13 @@ class CampaignManager:
                         diagnostic['binding_transport_state'] = dict(
                             transport_state
                         )
-                    raise CampaignC4EndpointRefusal(diagnostic)
+                    diagnostic.update(residual_fields('time_cap'))
+                    self.last_c4_termination = diagnostic
+                    return True
                 if acquisition_elapsed_hr >= acquisition_limit_hr:
                     diagnostic = {
-                        'reason_refused': (
-                            C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON
-                        ),
+                        'outcome': C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON,
+                        'stop_reason': 'time_cap',
                         'requested_window_C': requested_window_C,
                         'temperature_C': float(melt.temperature_C),
                         'elapsed_hours': acquisition_elapsed_hr,
@@ -3135,7 +3246,9 @@ class CampaignManager:
                         diagnostic['binding_transport_state'] = dict(
                             transport_state
                         )
-                    raise CampaignC4EndpointRefusal(diagnostic)
+                    diagnostic.update(residual_fields('time_cap'))
+                    self.last_c4_termination = diagnostic
+                    return True
                 return False
 
             current_in_window = (
@@ -3188,11 +3301,13 @@ class CampaignManager:
                 if rate < threshold_kg_hr:
                     self.last_c4_termination = {
                         'outcome': 'mg_signal_depleted',
+                        'stop_reason': 'mg_signal_depleted',
                         'species': species,
                         'rate_kg_hr': float(rate),
                         'threshold_kg_hr': threshold_kg_hr,
                         'completed_window_hr': completed_window_hr,
                         'process_elapsed_hr': process_elapsed_hr,
+                        **residual_fields('mg_signal_depleted'),
                     }
                     return True
             if current_in_window and completed_window_hr >= max_hold_hr:
@@ -3202,27 +3317,30 @@ class CampaignManager:
                         if signal_armed
                         else 'max_hold_no_signal'
                     ),
+                    'stop_reason': 'time_cap',
                     'species': species,
                     'rate_kg_hr': float(rate),
                     'threshold_kg_hr': threshold_kg_hr,
                     'completed_window_hr': completed_window_hr,
                     'process_elapsed_hr': process_elapsed_hr,
+                    **residual_fields('time_cap'),
                 }
                 return True
 
             if process_elapsed_hr >= process_limit_hr:
-                # Truthful typed outcomes:
+                # Preserve the specific wall-clock outcome:
                 # - still in-window at the process ceiling → wall-clock
                 #   exhaustion (operator max_hold can exceed this ceiling via
                 #   max_hours override; the process wall is the hard cap)
                 # - acquired then left the window → process window lost
-                reason_refused = (
+                cap_outcome = (
                     C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON
                     if current_in_window
                     else C4_PROCESS_WINDOW_LOST_REFUSAL_REASON
                 )
-                diagnostic = {
-                    'reason_refused': reason_refused,
+                self.last_c4_termination = {
+                    'outcome': cap_outcome,
+                    'stop_reason': 'time_cap',
                     'requested_window_C': requested_window_C,
                     'temperature_C': float(melt.temperature_C),
                     'elapsed_hours': process_elapsed_hr,
@@ -3231,12 +3349,13 @@ class CampaignManager:
                     'process_wall_clock_limit_source': process_limit_source,
                     'operator_max_hold_hr': float(max_hold_hr),
                     'current_in_window': bool(current_in_window),
+                    **residual_fields('time_cap'),
                 }
                 if transport_state is not None:
-                    diagnostic['binding_transport_state'] = dict(
+                    self.last_c4_termination['binding_transport_state'] = dict(
                         transport_state
                     )
-                raise CampaignC4EndpointRefusal(diagnostic)
+                return True
 
         elif campaign == CampaignPhase.C5:
             endpoint = self._configured_endpoint(campaign, 'endpoint')

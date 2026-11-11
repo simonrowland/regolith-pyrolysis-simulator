@@ -3087,6 +3087,9 @@ def test_c6_ci_empty_window_records_binding_refusal_without_transitions(
 
     assert sim.is_complete()
     assert (DecisionType.C6_PROCEED, "yes") in sim.record.decisions
+    c4_termination = sim.campaign_mgr.last_c4_termination
+    assert c4_termination["stop_reason"] == "endpoint_met"
+    assert c4_termination["residual_melt"]["flag"] == "endpoint_met"
     fallback = sim._melt_redox_liquidus_gate_fallback_summary()
     assert fallback["engaged"] is True
     assert fallback["total_count"] > 0

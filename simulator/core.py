@@ -15573,6 +15573,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 evap_flux,
                 self.train,
                 self.record,
+                atom_ledger=getattr(self, 'atom_ledger', None),
                 transport_state={
                     'binding_cause': str(getattr(
                         self.overhead,

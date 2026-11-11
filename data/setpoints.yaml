@@ -33,6 +33,8 @@ furnace_material: zirconia_ysz
 # and never raises it, and an out-of-envelope or non-finite request is REFUSED
 # (not clamped) by CampaignManager.
 furnace_max_T_C: null
+# source_tag: "owner 2026-11-11 d-388: '0.05%, go ahead'"
+outdoor_alkali_loss_limit_fraction_of_feed: 0.0005
 # ============================================================================
 # 1. CAMPAIGNS
 # ============================================================================
@@ -451,7 +453,9 @@ campaigns:
     stage3_route: divert
     label: "Mg Selective Pyrolysis (Branch Two)"
     temp_range_C: [1580, 1670]
-    max_target_acquisition_hr: 60       # 42 h nominal preheat from 1160 C at 10 C/h, plus latent-cooling margin
+    # 120 opportunity hours cover the 100 h needed by the slower diagnosed
+    # fallback route to acquire 1580 C, with 20 h of margin.
+    max_target_acquisition_hr: 120
     max_process_wall_clock_hr: 40       # finite wall clock around the 20 in-window reaction ticks
     dT_dt_C_per_hr: null                 # IR-controlled
     atmosphere: "controlled_O2"
