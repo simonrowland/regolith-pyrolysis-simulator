@@ -88,6 +88,7 @@ _CONNECTION_ROOT: Path | None = None
 _CONNECTION_READONLY = False
 _COUNTERS: dict[str, dict[str, int]] = {}
 _COUNTER_NAMES = ("hits", "misses", "stores", "store_error", "read_error")
+_MISSING_SETTING = object()
 _MEMORY_CACHE_MAXSIZE = 4096
 _MEMORY_CACHE: OrderedDict[tuple[str, bytes, bool], Any] = OrderedDict()
 _MEMORY_CACHE_PID = os.getpid()
@@ -101,7 +102,17 @@ ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS = {
         "warm_worker": "The OpenIMCC battery adapter has no worker scheduling option."
     },
     "alphamelts": {
-        "warm_worker": "The opener fixes warm_worker=False; worker reuse changes scheduling only."
+        "warm_worker": "The opener fixes warm_worker=False; worker reuse changes scheduling only.",
+        "constructor:python_bridge": "The battery opener selects transport through canonical mode and does not forward the legacy alias.",
+        "constructor:alphamelts": "The battery opener supplies flat settings and does not forward nested legacy config.",
+        "constructor:redox_buffer_fallback": "The opener always supplies fO2_buffer, so the lower-priority redox_buffer fallback is unused.",
+        "constructor:fe3fet_ratio_fallback": "The opener always supplies Fe3Fet_Liq, so the lower-priority fe3fet_ratio fallback is unused.",
+        "constructor:petthermotools_warm_call_timeout_s": "The opener leaves this optional startup timeout at its fixed backend default.",
+        "constructor:timeout_s": "The opener leaves the backend subprocess timeout at its fixed default; request timeout is handled by the battery worker.",
+        "constructor:require_petthermotools": "The opener does not request this legacy flag; the canonical mode selects transport.",
+        "constructor:calc_mode_conflict": "This flag is derived from the projected model and effective calculation mode.",
+        "constructor:model_calc_mode": "This mode is derived from the projected model and is carried only to explain uncached conflicts.",
+        "constructor:subprocess_model_error": "This diagnostic is derived from the projected model and is used only for uncached refusals.",
     },
     "vaporock": {
         "warm_worker": "The opener fixes warm_worker=False; worker reuse changes scheduling only."
@@ -110,7 +121,14 @@ ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS = {
         "warm_worker": "The opener fixes warm_worker=False; worker reuse changes scheduling only."
     },
     "thermoengine": {
-        "warm_worker": "The ThermoEngine battery opener does not forward worker scheduling."
+        "warm_worker": "The ThermoEngine battery opener does not forward worker scheduling.",
+        "constructor:mode": "The battery opener selects ThermoEngine by backend name and uses the constructor's fixed thermoengine default mode.",
+        "constructor:alphamelts": "The battery opener supplies flat settings and does not forward nested AlphaMELTS config.",
+        "constructor:thermoengine": "The battery opener supplies flat settings and does not forward nested ThermoEngine config.",
+        "constructor:redox_buffer_fallback": "The opener always supplies fO2_buffer, so the lower-priority redox_buffer fallback is unused.",
+        "constructor:fe3fet_ratio_fallback": "The opener always supplies Fe3Fet_Liq, so the lower-priority fe3fet_ratio fallback is unused.",
+        "constructor:thermoengine_health_timeout_s": "The battery opener leaves the health timeout at its fixed operational default.",
+        "constructor:thermoengine_equilibrate_timeout_s": "The battery opener leaves the equilibrate timeout at its fixed operational default.",
     },
 }
 
@@ -142,10 +160,9 @@ def normalize_engine_settings(
 ) -> dict[str, Any]:
     """Normalize battery settings once for both backend opening and cache keys.
 
-    A missing settings mapping preserves the engine's default-open path. For
-    AlphaMELTS it also snapshots the inherited child environment at open time;
-    an explicitly supplied mapping with no ambient mode means the opener pops
-    that variable before resolving the backend.
+    A missing settings mapping preserves the engine's default-open path.
+    AlphaMELTS records the resolved model and child calculation mode without
+    consulting or changing the parent process environment.
     """
     fields: Mapping[str, Any] = settings or {}
     if engine_name == "internal-analytical":
@@ -155,15 +172,24 @@ def normalize_engine_settings(
 
         return {"pack": fields.get("pack") or DEFAULT_BACKEND_PACK_NAME}
     if engine_name == "alphamelts":
-        ambient = (
-            os.environ.get("ALPHAMELTS_CALC_MODE")
-            if settings is None
-            else fields.get("ambient_calc_mode")
+        from simulator.config import resolve_alphamelts_subprocess_settings
+
+        model_name = fields.get("raw_model_name")
+        ambient = fields.get("effective_calc_mode", _MISSING_SETTING)
+        if ambient is _MISSING_SETTING:
+            ambient = fields.get("ambient_calc_mode")
+        subprocess_settings = resolve_alphamelts_subprocess_settings(
+            model_name, ambient
         )
         return {
             "transport": fields.get("transport"),
-            "ambient_calc_mode": ambient,
-            "raw_model_name": fields.get("raw_model_name"),
+            "model_calc_mode": subprocess_settings["model_calc_mode"],
+            "effective_calc_mode": subprocess_settings["effective_calc_mode"],
+            "calc_mode_conflict": subprocess_settings["calc_mode_conflict"],
+            "subprocess_model_error": subprocess_settings[
+                "subprocess_model_error"
+            ],
+            "raw_model_name": subprocess_settings["model"],
             "redox_buffer": fields.get("redox_buffer"),
             "fO2_offset": fields.get("fO2_offset"),
             "Fe3Fet_ratio": fields.get("Fe3Fet_ratio"),
@@ -235,7 +261,7 @@ def engine_cache_settings(
                 api_model = list(api_model)
             return {
                 "transport_mode": fields["transport"],
-                "ambient_calc_mode": fields["ambient_calc_mode"],
+                "effective_calc_mode": fields["effective_calc_mode"],
                 "model": fields["raw_model_name"],
                 "python_api_model": api_model,
                 "redox_buffer": fields["redox_buffer"],
@@ -305,13 +331,13 @@ def engine_cache_settings(
         api_model = fields.get("_python_api_model")
         if isinstance(api_model, tuple):
             api_model = list(api_model)
-        effective = normalize_engine_settings(
-            engine_name, effective_settings or {}
-        )
+        effective = effective_settings or {}
         return {
             "transport_mode": fields.get("_mode"),
-            "ambient_calc_mode": effective["ambient_calc_mode"],
-            "model": fields.get("_model"),
+            "effective_calc_mode": effective.get("effective_calc_mode"),
+            "model": (
+                effective.get("raw_model_name", fields.get("_model"))
+            ),
             "python_api_model": api_model,
             "redox_buffer": fields.get("_redox_buffer"),
             "fo2_offset": fields.get("_fo2_offset"),
