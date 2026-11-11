@@ -422,6 +422,10 @@ class ResultStore:
             return None
         if row["corpus_version"] != current_corpus_version():
             return None
+        # Unknown disclosure is a miss. The caller re-evaluates. Do not rank
+        # the stored metrics as if no flagged law ran.
+        if _law_disclosures_from_row(row) is None:
+            return None
         return _row_to_scored_result(row)
 
     def query(
@@ -451,7 +455,12 @@ class ResultStore:
                 """,
                 (*params, current_corpus_version()),
             ).fetchall()
-        return [_row_to_scored_result(row) for row in rows]
+        loaded: list[ScoredResult] = []
+        for row in rows:
+            if _law_disclosures_from_row(row) is None:
+                continue
+            loaded.append(_row_to_scored_result(row))
+        return loaded
 
     def best(
         self,
@@ -517,6 +526,8 @@ class ResultStore:
                 (*params, current_corpus_version(), *metric_aliases),
             ).fetchall()
         for row in rows:
+            if _law_disclosures_from_row(row) is None:
+                continue
             scored = _row_to_scored_result(row)
             if scored.feasible:
                 return scored
@@ -638,7 +649,7 @@ class ResultStore:
                 run_reference TEXT NOT NULL,
                 eval_spec TEXT NOT NULL,
                 notes TEXT NOT NULL,
-                law_disclosures TEXT NOT NULL DEFAULT '[]',
+                law_disclosures TEXT,
                 created_at TEXT NOT NULL
             )
             """,
@@ -732,10 +743,11 @@ class ResultStore:
             )
             version = 5
         if version < 6:
+            # Nullable, with no default. Rows written before this column
+            # stay NULL. NULL is an unknown disclosure, not a measured [].
             if not _column_exists(conn, "results", "law_disclosures"):
                 conn.execute(
-                    "ALTER TABLE results ADD COLUMN law_disclosures "
-                    "TEXT NOT NULL DEFAULT '[]'"
+                    "ALTER TABLE results ADD COLUMN law_disclosures TEXT"
                 )
             conn.execute(
                 """
@@ -792,17 +804,15 @@ class ResultStore:
         raise last_error if last_error is not None else RuntimeError("write retry failed")
 
 
-def _law_disclosures_from_row(row: sqlite3.Row) -> tuple[dict[str, Any], ...]:
+def _law_disclosures_from_row(row: sqlite3.Row) -> tuple[dict[str, Any], ...] | None:
+    """Measured disclosures, or None when the column is absent or NULL."""
+
+    from simulator.vapour_rail.run_disclosure import parse_stored_disclosure_field
+
     keys = row.keys() if hasattr(row, "keys") else ()
     if "law_disclosures" not in keys:
-        return ()
-    raw = row["law_disclosures"]
-    if not raw:
-        return ()
-    parsed = _json_load(raw)
-    if not isinstance(parsed, list):
-        return ()
-    return tuple(dict(item) for item in parsed if isinstance(item, Mapping))
+        return None
+    return parse_stored_disclosure_field(row["law_disclosures"], present=True)
 
 
 def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:

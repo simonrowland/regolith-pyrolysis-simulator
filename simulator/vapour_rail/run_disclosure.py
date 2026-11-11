@@ -1,11 +1,18 @@
 """Run-scoped disclosure of an admitted diagnostic or extrapolated vapour law.
 
-Invariant: every execution of an admitted diagnostic or extrapolated vapour
-law is registered exactly once, at ``CompiledPressureEvaluator.evaluate``,
-into the active run-scoped disclosure. A cache hit does not execute the law;
-it re-registers the disclosure stored as metadata on the cached value. Typed
-carrier notices stay lists (exact duplicates dropped). Bare-float helpers do
-not carry notices.
+Invariant: a published, priced, or ranked quantity discloses every admitted
+diagnostic or extrapolated vapour law its own computation executed.
+
+- The only registration site is ``CompiledPressureEvaluator.evaluate``.
+- A cache hit does not execute the law. It re-registers the disclosure stored
+  with that computation. Counts from two computations add.
+- Disclosure is metadata on the cached row, not a cache-key dimension.
+- A row with no disclosure field is unknown. Callers treat that as a miss or
+  as unusable for ranking. Absence is never a measured "no flagged law".
+- A computation scope records only that computation, then merges its counts
+  into the parent run. Cache writes read the computation, never the whole run.
+- Typed carrier notices stay lists (exact duplicates dropped). Bare-float
+  helpers do not carry notices.
 
 The ContextVar default is ``None``. That slot is not a registry. Each
 ``disclosure_scope()`` creates a ``RunDisclosure`` that is returned with the
@@ -18,6 +25,7 @@ from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
+import json
 from typing import Any
 
 _ACTIVE: ContextVar[RunDisclosure | None] = ContextVar(
@@ -68,21 +76,28 @@ class LawDisclosure:
 @dataclass
 class RunDisclosure:
     entries: dict[str, LawDisclosure] = field(default_factory=dict)
+    # A computation registry records one cached computation. A run registry
+    # accumulates those computations. Cache metadata reads only the former.
+    computation: bool = False
 
     def snapshot(self) -> tuple[dict[str, Any], ...]:
         return tuple(self.entries[key].to_public() for key in sorted(self.entries))
 
-    def register_from_evaluator(self, evaluator: Any) -> None:
+    def register_from_evaluator(self, evaluator: Any, evaluation: Any = None) -> None:
         notice = getattr(evaluator, "diagnostic_admission_notice", None)
         if isinstance(notice, (list, tuple)) and not isinstance(notice, (str, bytes)):
             notices = [item for item in notice if isinstance(item, Mapping) and item]
         elif isinstance(notice, Mapping) and notice:
             notices = [notice]
         else:
+            notices = []
+        if notices:
+            # One row per law. A second notice on the same evaluator still
+            # counts as one execution of that law.
+            self._register_notice(evaluator, notices[0])
             return
-        # One row per law. A second notice on the same evaluator still counts
-        # as one execution of that law.
-        self._register_notice(evaluator, notices[0])
+        if evaluation is not None and bool(getattr(evaluation, "out_of_range", False)):
+            self._register_extrapolated(evaluator, evaluation)
 
     def _register_notice(self, evaluator: Any, notice: Mapping[str, Any]) -> None:
         species = str(
@@ -109,12 +124,46 @@ class RunDisclosure:
             evaluation_count=1,
         )
 
+    def _register_extrapolated(self, evaluator: Any, evaluation: Any) -> None:
+        """One out-of-band continuation. Authority is extrapolated, not diagnostic."""
+
+        species = str(getattr(evaluator, "species_id", "") or "")
+        family = str(getattr(evaluator, "evaluator_family", "") or "")
+        law_id = f"{species}:{family}" if family else species
+        if not law_id:
+            law_id = "extrapolated_law"
+        existing = self.entries.get(law_id)
+        if existing is not None:
+            existing.evaluation_count += 1
+            return
+        status = getattr(evaluation, "status", None)
+        self.entries[law_id] = LawDisclosure(
+            law_id=law_id,
+            provenance=str(status or "out_of_range"),
+            authority="extrapolated",
+            certified_band_K=_certified_band(evaluator),
+            anchor_gaps_dex={},
+            closer="",
+            certification_route=(),
+            evaluation_count=1,
+        )
+
     def reregister_public(self, disclosures: Sequence[Mapping[str, Any]]) -> None:
-        """Install cache metadata. Does not execute a law and does not add counts."""
+        """Install cache metadata. Does not execute a law. Counts add."""
 
         for item in disclosures:
             law_id = str(item.get("law_id") or "")
-            if not law_id or law_id in self.entries:
+            if not law_id:
+                continue
+            try:
+                count = int(item.get("evaluation_count") or 1)
+            except (TypeError, ValueError):
+                count = 1
+            if count < 1:
+                count = 1
+            existing = self.entries.get(law_id)
+            if existing is not None:
+                existing.evaluation_count += count
                 continue
             band = item.get("certified_band_K")
             certified: tuple[float, float] | None = None
@@ -137,10 +186,6 @@ class RunDisclosure:
                 if isinstance(route, (list, tuple)) and not isinstance(route, (str, bytes))
                 else ()
             )
-            try:
-                count = int(item.get("evaluation_count") or 1)
-            except (TypeError, ValueError):
-                count = 1
             self.entries[law_id] = LawDisclosure(
                 law_id=law_id,
                 provenance=str(item.get("provenance") or ""),
@@ -220,13 +265,75 @@ def disclosure_scope(*, inherit: bool = True) -> Iterator[RunDisclosure]:
         _ACTIVE.reset(token)
 
 
-def register_executed_law(evaluator: Any) -> None:
-    """Register one execution. No-op without an active scope or a diagnostic law."""
+def register_executed_law(evaluator: Any, evaluation: Any = None) -> None:
+    """Register one execution. No-op without an active scope or a flagged law."""
 
     current = _ACTIVE.get()
     if current is None:
         return
-    current.register_from_evaluator(evaluator)
+    current.register_from_evaluator(evaluator, evaluation)
+
+
+def active_computation_snapshot() -> tuple[dict[str, Any], ...]:
+    """Disclosures of the active computation only.
+
+    A run registry is not a computation. Callers that ask outside a
+    computation get a measured empty tuple, never the laws already accumulated
+    on the run.
+    """
+
+    current = _ACTIVE.get()
+    if current is None or not current.computation:
+        return ()
+    return current.snapshot()
+
+
+@contextmanager
+def computation_disclosure() -> Iterator[RunDisclosure]:
+    """Record one computation, then add its counts to the parent run."""
+
+    parent = _ACTIVE.get()
+    created = RunDisclosure(computation=True)
+    token = _ACTIVE.set(created)
+    try:
+        yield created
+    finally:
+        _ACTIVE.reset(token)
+        if parent is not None:
+            parent.reregister_public(created.snapshot())
+
+
+def parse_stored_disclosure_field(
+    raw: Any,
+    *,
+    present: bool,
+) -> tuple[dict[str, Any], ...] | None:
+    """Measured disclosures, or None when the field is absent or unreadable.
+
+    A present empty list is a measured zero. ``None`` means unknown: the
+    caller must miss or refuse to rank, and must not treat it as unflagged.
+    """
+
+    if not present or raw is None:
+        return None
+    if isinstance(raw, str):
+        if not raw:
+            return None
+        try:
+            raw = json.loads(raw)
+        except (TypeError, ValueError):
+            return None
+        if raw is None:
+            return None
+    if isinstance(raw, Mapping):
+        raw = (raw,)
+    if isinstance(raw, (str, bytes)) or not isinstance(raw, (list, tuple)):
+        return None
+    measured: list[dict[str, Any]] = []
+    for item in raw:
+        if isinstance(item, Mapping) and item.get("law_id"):
+            measured.append(dict(item))
+    return tuple(measured)
 
 
 def reregister_cached_disclosures(disclosures: Any) -> None:
@@ -246,6 +353,25 @@ def reregister_cached_disclosures(disclosures: Any) -> None:
     current.reregister_public(
         tuple(item for item in items if isinstance(item, Mapping))
     )
+
+
+def publish_stored_disclosures(
+    record: Mapping[str, Any] | None,
+) -> list[dict[str, Any]] | None:
+    """Re-register one memo hit. ``None`` when the memo never recorded a field.
+
+    A present empty list is a measured zero and is re-registered as such.
+    Absence stays unknown: the caller must not treat it as unflagged.
+    """
+
+    if not isinstance(record, Mapping) or "law_disclosures" not in record:
+        return None
+    raw = record.get("law_disclosures")
+    measured = parse_stored_disclosure_field(raw, present=raw is not None)
+    if measured is None:
+        return None
+    reregister_cached_disclosures(measured)
+    return [dict(item) for item in measured]
 
 
 def disclosure_metadata(disclosures: Any) -> tuple[dict[str, Any], ...]:

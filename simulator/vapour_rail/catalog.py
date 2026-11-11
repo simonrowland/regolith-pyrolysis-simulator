@@ -1209,8 +1209,12 @@ class CompiledPressureEvaluator:
             object.__setattr__(evaluation, notice_key, notice_attribute(items))
         for notice_key, items in public_carrier_notices(self).items():
             object.__setattr__(evaluation, notice_key, notice_attribute(items))
-        # Single registration site for an admitted diagnostic or extrapolated law.
-        register_executed_law(self)
+        # Single registration site. A diagnostic admission registers from the
+        # evaluator notice. An out-of-band continuation with no diagnostic
+        # notice registers from this evaluation's out_of_range state, with
+        # authority extrapolated and the certified band. One call, so one
+        # execution is not counted twice.
+        register_executed_law(self, evaluation)
         return evaluation
 
     def evaluate_typed_shadow(

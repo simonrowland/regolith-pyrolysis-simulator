@@ -2233,11 +2233,9 @@ def _scored_result_journal_payload(scored: ScoredResult) -> Mapping[str, Any]:
         "run_reference": _serialize_run_reference(scored.run_reference),
         "result_blob": _result_blob(scored),
         "notes": list(scored.notes),
+        # Always present. An omitted key is unknown, not a measured empty list.
+        "law_disclosures": [dict(item) for item in scored.law_disclosures],
     }
-    if scored.law_disclosures:
-        payload["law_disclosures"] = [
-            dict(item) for item in scored.law_disclosures
-        ]
     return payload
 
 
@@ -2283,16 +2281,34 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
             payload.get("result_blob"),
         ),
         notes=tuple(str(item) for item in payload.get("notes", ())),
-        law_disclosures=tuple(
-            dict(item)
-            for item in payload.get("law_disclosures", ())
-            if isinstance(item, Mapping)
-        ),
+        law_disclosures=_journal_law_disclosures(payload),
     )
     from simulator.vapour_rail.run_disclosure import reregister_cached_disclosures
 
     reregister_cached_disclosures(result.law_disclosures)
     return result
+
+
+def _journal_law_disclosures(payload: Mapping[str, Any]) -> tuple[dict[str, Any], ...]:
+    """Measured journal disclosures. A missing field is not an unflagged result."""
+
+    from simulator.vapour_rail.run_disclosure import parse_stored_disclosure_field
+
+    if "law_disclosures" not in payload:
+        raise StudyReplayError(
+            "journal scored_result has no law_disclosures; "
+            "absence is unknown, not an unflagged result"
+        )
+    measured = parse_stored_disclosure_field(
+        payload.get("law_disclosures"),
+        present=True,
+    )
+    if measured is None:
+        raise StudyReplayError(
+            "journal scored_result law_disclosures is unreadable; "
+            "absence is unknown, not an unflagged result"
+        )
+    return measured
 
 
 def _strategy_replay_state(strategy: Strategy, *staged_strategies: Strategy) -> Mapping[str, Any]:

@@ -320,49 +320,82 @@ def _melt_fO2_log_at_gate_key_reference_T(sim: Any, fO2_log: float) -> float:
     )
 
 
-def _active_law_disclosures() -> tuple[dict[str, Any], ...]:
-    from simulator.vapour_rail.run_disclosure import active_snapshot
+# Sentinel for "read the active computation, not an explicit payload".
+_FROM_COMPUTATION = object()
 
-    return tuple(dict(item) for item in active_snapshot())
+
+def _resolve_law_disclosures(
+    value: Any,
+) -> tuple[dict[str, Any], ...] | None:
+    """Measured disclosures for a cache write.
+
+    Outside a computation the active-run registry is not copied: the result is
+    a measured empty tuple. An explicit ``None`` stays unknown.
+    """
+
+    from simulator.vapour_rail.run_disclosure import (
+        active_computation_snapshot,
+        parse_stored_disclosure_field,
+    )
+
+    if value is _FROM_COMPUTATION:
+        return active_computation_snapshot()
+    if value is None:
+        return None
+    return parse_stored_disclosure_field(value, present=True)
 
 
 def _prefer_law_disclosures(
     existing: Any,
     incoming: Any,
-) -> tuple[dict[str, Any], ...]:
-    """Keep a stored disclosure. Fill an empty sidecar from the active run."""
+) -> tuple[dict[str, Any], ...] | None:
+    """Keep a measured disclosure, including a measured empty tuple.
 
-    def _plain(value: Any) -> tuple[dict[str, Any], ...]:
-        if isinstance(value, Mapping):
-            items = (value,)
-        elif isinstance(value, (list, tuple)) and not isinstance(value, (str, bytes)):
-            items = value
-        else:
-            return ()
-        return tuple(dict(item) for item in items if isinstance(item, Mapping) and item)
+    Unknown (None) yields to a measured incoming value. It never becomes [].
+    """
 
-    stored = _plain(existing)
-    if stored:
-        return stored
-    return _plain(incoming)
+    from simulator.vapour_rail.run_disclosure import parse_stored_disclosure_field
+
+    if existing is not None:
+        measured = parse_stored_disclosure_field(existing, present=True)
+        if measured is not None:
+            return measured
+    if incoming is None:
+        return None
+    return parse_stored_disclosure_field(incoming, present=True)
 
 
-def _law_disclosures_json(items: Any) -> str:
+def _law_disclosures_json(items: Any) -> str | None:
+    measured = _prefer_law_disclosures(None, items)
+    if measured is None:
+        return None
     return json.dumps(
-        list(_prefer_law_disclosures((), items)),
+        list(measured),
         sort_keys=True,
         separators=(",", ":"),
     )
 
 
-def _law_disclosures_from_json(raw: Any) -> tuple[dict[str, Any], ...]:
-    if not raw:
-        return ()
-    try:
-        parsed = json.loads(raw)
-    except (TypeError, ValueError):
-        return ()
-    return _prefer_law_disclosures((), parsed)
+def _law_disclosures_from_json(raw: Any) -> tuple[dict[str, Any], ...] | None:
+    from simulator.vapour_rail.run_disclosure import parse_stored_disclosure_field
+
+    if raw is None:
+        return None
+    return parse_stored_disclosure_field(raw, present=True)
+
+
+def _disclosures_known(entry: Mapping[str, Any]) -> bool:
+    """False when the row never recorded a disclosure. Empty is known."""
+
+    return "law_disclosures" in entry and entry["law_disclosures"] is not None
+
+
+def recorded_law_disclosures(record: Mapping[str, Any] | None) -> Any:
+    """Memo disclosures, or None when the memo never carried the field."""
+
+    if not isinstance(record, Mapping) or "law_disclosures" not in record:
+        return None
+    return record["law_disclosures"]
 
 
 class PT0DeterminismStore:
@@ -775,6 +808,7 @@ class PT0DeterminismStore:
         curve: Mapping[str, Any],
         repair_notices: Sequence[Mapping[str, Any]] | None = None,
         redox_state: RedoxState | None = None,
+        law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
         active_record = getattr(
             sim,
@@ -867,6 +901,7 @@ class PT0DeterminismStore:
                 provider_role=provider_role,
             ),
             repair_notices=_repair_notices_for_capture(sim, repair_notices),
+            law_disclosures=law_disclosures,
         )
         sim._last_reduced_real_cache_state = self.last_cache_state
 
@@ -1054,9 +1089,10 @@ class PT0DeterminismStore:
         *,
         engine_version_provenance: str | None = None,
         repair_notices: Sequence[Mapping[str, Any]] = (),
+        law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
-        incoming_disclosures = _active_law_disclosures()
+        incoming_disclosures = _resolve_law_disclosures(law_disclosures)
         key_bytes = canonical_json_bytes(key)
         payload_bytes = canonical_json_bytes(payload)
         repair_notices_json = encode_repair_notices_json(repair_notices)
@@ -1101,6 +1137,7 @@ class PT0DeterminismStore:
                 physics_bucket_key=physics_bucket_key,
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
+                law_disclosures=incoming_disclosures,
             )
             persisted = self.persistent_store.get(
                 artifact=artifact,
@@ -1177,6 +1214,8 @@ class PT0DeterminismStore:
                 entry.get("key", {}),
             ):
                 continue
+            if not _disclosures_known(entry):
+                continue
             self.replay_sequence.append(
                 {
                     "artifact": artifact,
@@ -1198,14 +1237,13 @@ class PT0DeterminismStore:
             self.hits += 1
             self.last_cache_state = "cached_exact"
             self._record_cache_event(artifact, "cached_exact")
-            self._reregister_cached_law_disclosures(entry)
             replay_notices = _emit_repair_notices(
                 sim,
                 (entry.get("repair_notices_json"),),
             )
             if artifact == "freeze_gate_curve" and sim is not None:
                 sim._last_reduced_real_replay_notices = replay_notices
-            return copy.deepcopy(entry["payload"])
+            return self._accept_cached_hit(entry)
 
         key, _key_bytes, key_hash = checked[0]
         self.replay_sequence.append(
@@ -1303,6 +1341,8 @@ class PT0DeterminismStore:
                 entry.get("key", {}),
             ):
                 entry = None
+            if entry is not None and not _disclosures_known(entry):
+                entry = None
             if entry is not None:
                 break
             if tier_ceiling == "cached_interpolated":
@@ -1342,7 +1382,6 @@ class PT0DeterminismStore:
         self.hits += 1
         self.last_cache_state = cache_state
         self._record_cache_event(artifact, cache_state)
-        self._reregister_cached_law_disclosures(entry)
         if cache_state == "cached_exact":
             _emit_repair_notices(sim, (entry.get("repair_notices_json"),))
         else:
@@ -1351,7 +1390,7 @@ class PT0DeterminismStore:
                 (entry.get("repair_notices_json"),),
                 approximation_cache_state=cache_state,
             )
-        return copy.deepcopy(entry["payload"])
+        return self._accept_cached_hit(entry)
 
     def _entry_for_key(
         self,
@@ -1399,10 +1438,46 @@ class PT0DeterminismStore:
                 )
         return entry
 
+    def _accept_cached_hit(self, entry: Mapping[str, Any]) -> dict[str, Any] | None:
+        """Return the payload after re-registering a measured disclosure.
+
+        Unknown disclosure is not a hit. Every cache-hit return goes through
+        this method: exact, physics-bucket, and interpolated.
+        """
+
+        if not _disclosures_known(entry):
+            return None
+        self._reregister_cached_law_disclosures(entry)
+        return copy.deepcopy(entry["payload"])
+
     def _reregister_cached_law_disclosures(self, entry: Mapping[str, Any]) -> None:
         from simulator.vapour_rail.run_disclosure import reregister_cached_disclosures
 
         reregister_cached_disclosures(entry.get("law_disclosures"))
+
+    def _merged_neighbor_disclosures(
+        self,
+        neighbors: Sequence[Mapping[str, Any]],
+    ) -> tuple[dict[str, Any], ...] | None:
+        """Additive disclosures of interpolation neighbors, or None if any is unknown."""
+
+        from simulator.vapour_rail.run_disclosure import (
+            RunDisclosure,
+            parse_stored_disclosure_field,
+        )
+
+        scratch = RunDisclosure()
+        for neighbor in neighbors:
+            if not _disclosures_known(neighbor):
+                return None
+            parsed = parse_stored_disclosure_field(
+                neighbor.get("law_disclosures"),
+                present=True,
+            )
+            if parsed is None:
+                return None
+            scratch.reregister_public(parsed)
+        return scratch.snapshot()
 
     def _record_cache_event(self, artifact: str, cache_state: str) -> None:
         self.cache_events.append(
@@ -1435,6 +1510,9 @@ class PT0DeterminismStore:
         attempt = attempt_cached_interpolation(key, candidates)
         if attempt is None:
             return None
+        merged = self._merged_neighbor_disclosures(attempt["neighbors"])
+        if merged is None:
+            return None
         replay_event = {
             "artifact": artifact,
             "key": copy.deepcopy(dict(key)),
@@ -1461,7 +1539,12 @@ class PT0DeterminismStore:
             ),
             approximation_cache_state="cached_interpolated",
         )
-        return copy.deepcopy(attempt["payload"])
+        return self._accept_cached_hit(
+            {
+                "payload": attempt["payload"],
+                "law_disclosures": merged,
+            }
+        )
 
     def _entry_for_physics_ladder_bucket(
         self,
@@ -1594,6 +1677,7 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_key: Mapping[str, Any] | None = None,
         physics_bucket_bytes: bytes | None = None,
         physics_bucket_hash: str | None = None,
+        law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         validate_repair_notices_json(repair_notices_json)
@@ -1611,7 +1695,7 @@ class PT1PersistentEquilibriumStore:
         if physics_bucket_hash is None:
             physics_bucket_hash = _sha256(physics_bucket_bytes)
         ladder_values = _physics_ladder_values_from_replay_key(key)
-        incoming_disclosures = _active_law_disclosures()
+        incoming_disclosures = _resolve_law_disclosures(law_disclosures)
         with self._connect() as conn:
             self._initialize(conn)
             existing = self._fetch(conn, key_hash)
@@ -1670,8 +1754,22 @@ class PT1PersistentEquilibriumStore:
                     )
                     return
                 if effective_notices_json == existing_notices_json:
-                    return
-                insert_source = existing
+                    # A read-only row with no disclosure field is not a usable
+                    # hit. Copy it locally once this computation measured one.
+                    base_disclosures = _law_disclosures_from_json(
+                        existing["law_disclosures_json"]
+                        if "law_disclosures_json" in existing.keys()
+                        else None
+                    )
+                    preferred = _prefer_law_disclosures(
+                        base_disclosures,
+                        incoming_disclosures,
+                    )
+                    if base_disclosures is not None or preferred is None:
+                        return
+                    insert_source = existing
+                else:
+                    insert_source = existing
             source = insert_source
             source_key_bytes = (
                 _sqlite_bytes(source["key_bytes"]) if source is not None else key_bytes
@@ -1799,10 +1897,14 @@ class PT1PersistentEquilibriumStore:
             conn, PT1_EQUILIBRIUM_TABLE, "law_disclosures_json"
         ):
             return
+        encoded = _law_disclosures_json(disclosures)
+        if encoded is None:
+            # Unknown stays NULL. Do not migrate an absent field to [].
+            return
         conn.execute(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
             "SET law_disclosures_json = ? WHERE key_hash = ?",
-            (_law_disclosures_json(disclosures), key_hash),
+            (encoded, key_hash),
         )
 
     def get(
@@ -1930,6 +2032,11 @@ class PT1PersistentEquilibriumStore:
                             "repair_notices_json": entry[
                                 "repair_notices_json"
                             ],
+                            "law_disclosures": (
+                                entry["law_disclosures"]
+                                if "law_disclosures" in entry
+                                else None
+                            ),
                         }
                     )
             return candidates
