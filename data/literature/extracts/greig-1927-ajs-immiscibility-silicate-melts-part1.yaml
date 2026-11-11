@@ -6,9 +6,9 @@ source:
   url: https://ajsonline.org/article/135931.pdf
   year: 1927
 extraction:
-  method: manual transcription from the 1200 dpi bitonal scan (no text layer); pages rendered at 200 and 300 dpi; tesseract OCR used only to locate content; every transcribed cell read from the 300 dpi page image
-  date: '2026-10-05'
-  worker: backlog30-greig1927
+  method: transcription from MinerU and Tesseract OCR; page renders checked where the machine reads disagreed or table QA flagged cells
+  date: '2026-11-08'
+  worker: w1108gr-gr27a
   provenance_path: tables/greig-1927-ajs-immiscibility-silicate-melts-part1/
 review_status: draft
 scope_assessment:
@@ -26,7 +26,7 @@ scope_assessment:
 fidelity_samples:
 - species: SiO2
   observation_id: greig1927_cristobalite_melting_point
-  field: T_C_as_printed
+  field: T_C
   value: 1713
   locator:
     page: 9
@@ -35,7 +35,7 @@ fidelity_samples:
     note: Melting point 1713° ± 5°
 - species: SiO2
   observation_id: greig1927_t3_cao_sio2_cristobalite_two_liquids_T
-  field: T_C_as_printed
+  field: T_C
   value: 1698
   locator:
     page: 14
@@ -44,7 +44,7 @@ fidelity_samples:
     note: Temperature of the equilibrium, CaO columns
 - species: SiO2
   observation_id: greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
-  field: T_C_as_printed
+  field: T_C
   value: 1695
   locator:
     page: 14
@@ -61,6 +61,50 @@ fidelity_samples:
     table: IV B
     note: 35 CaO / 65 SiO2 first quench
 - species: SiO2
+  observation_id: greig1927_t5_mgo_siliceous_glass
+  field: component_amount
+  value: '99.2'
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: Table V MgO-SiO2 SiO2 component at 1710°; rendered value 99.2 wt%.
+- species: MgO
+  observation_id: greig1927_t5_mgo_siliceous_glass_MgO
+  field: component_amount
+  value: '0.8'
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: Table V MgO-SiO2 MgO component at 1710°; rendered value 0.8 wt%.
+- species: SiO2
+  observation_id: greig1927_t5_cao_siliceous_glass
+  field: component_amount
+  value: '99.4'
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: Table V CaO-SiO2 SiO2 component at 1710°; rendered value 99.4 wt%.
+- species: CaO
+  observation_id: greig1927_t5_cao_siliceous_glass_CaO
+  field: component_amount
+  value: '0.6'
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: Table V CaO-SiO2 CaO component at 1710°; rendered value 0.6 wt%.
+- species: SiO2
+  observation_id: greig1927_cao_sio2_27p5_liquid_liquidus_text
+  field: composition_mass_percent_as_published
+  value: {CaO: about 27.5, SiO2: '72.5'}
+  locator:
+    page: 44
+    published_page: 44
+    note: 'Prose prints about 27.5CaO, 72.5SiO2 and liquidus 1698°.'
+- species: SiO2
   observation_id: greig1927_t7c_14cao_1al2o3_85sio2_q2
   field: run_products_as_published
   value: 2 glasses
@@ -69,17 +113,6 @@ fidelity_samples:
     published_page: 36
     table: VII C
     note: 14/1/85 at 1694 °C
-- species: SiO2
-  observation_id: greig1927_t5_cao_siliceous_glass
-  field: composition_mass_percent
-  value:
-    CaO: 0.6
-    SiO2: 99.4
-  locator:
-    page: 19
-    published_page: 19
-    table: V
-    note: CaO-SiO2 composition by interpolation
 benches:
 - id: greig-pt-rh-cascade-quench-furnace
   identity:
@@ -734,11 +767,8 @@ species:
         table: II A
         note: Summary line "Melting point 1713° ± 5°." printed under Table II A (p. 9) and again under Table II B (p. 10)
       regime: quench_equilibration
-      T_range_K:
-      - 1986.15
-      - 1986.15
-      phase: cristobalite
-      units: K (converted from printed °C)
+      phase: glass
+      units: °C
       values:
         property_kind: melting_point
         phase_from: cristobalite
@@ -746,13 +776,26 @@ species:
         method_class: measured_tabulated
         evidence_class: measured_tabulated
         measurement_note: 'Quench bracket: temperature at which cristobalite disappears / two liquids appear, read from the tabulated quenches'
-        T_C_as_printed: 1713
-        T_K: 1986.15
-        T_K_conversion: T_K = T_C + 273.15
+        T_C: 1713
         as_printed: Melting point 1713° ± 5°.
       uncertainty:
-        note: Printed ± 5° (°C); temperature held constant to better than ± 0.4° during each run (Table II A note).
-        T_C_plus_minus_as_printed: 5
+        value: '5'
+        units: °C
+        confidence_level: not_stated
+        note: Printed ± 5°; confidence level is not stated. Table II A separately says the run temperature was held constant to better than ± 0.4°.
+      point_conditions:
+        composition_wt_pct:
+          state: {tag: unknown, reason: The starting material is cristobalite; no melt composition is printed for this melting-point determination.}
+          locator: {page: 9, published_page: 9, table: II A}
+        fO2_Pa:
+          state: {tag: unknown, reason: not stated for the melting-point determination.}
+          locator: {page: 9, published_page: 9, table: II A}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not stated for the melting-point determination.}
+          locator: {page: 9, published_page: 9, table: II A}
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 9, published_page: 9, table: II A, note: Quenched melting-point determination; no preservation statement.}
     - observation_id: greig1927_t3_cao_sio2_cristobalite_two_liquids_T
       type: transition_point
       experiment: cristobalite-two-liquids-t3
@@ -762,11 +805,8 @@ species:
         table: III
         note: Row "Temperature of the equilibrium", CaO-SiO2 column(s) 15CaO, 85SiO2 / 5CaO, 95SiO2; restated in prose p. 30
       regime: quench_equilibration
-      T_range_K:
-      - 1971.15
-      - 1971.15
-      phase: cristobalite + two liquids
-      units: K (converted from printed °C)
+      phase: glass
+      units: °C
       values:
         property_kind: three_phase_equilibrium_temperature
         phase_assemblage_as_printed: cristobalite + two liquids
@@ -774,11 +814,20 @@ species:
         method_class: measured_tabulated
         evidence_class: measured_tabulated
         measurement_note: 'Quench bracket: temperature at which cristobalite disappears / two liquids appear, read from the tabulated quenches'
-        T_C_as_printed: 1698
-        T_K: 1971.15
-        T_K_conversion: T_K = T_C + 273.15
-      uncertainty:
-        note: No ± printed for this temperature in Table III; the working element was compared with the two standard elements after runs 6, 11 and 15.
+        T_C: 1698
+      point_conditions:
+        composition_wt_pct:
+          state: {tag: unknown, reason: Table III gives multiple charge compositions for one shared invariant temperature; no single composition applies to this row.}
+          locator: {page: 14, published_page: 14, table: III}
+        fO2_Pa:
+          state: {tag: unknown, reason: not stated for these quenching runs.}
+          locator: {page: 14, published_page: 14, table: III}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not stated for these quenching runs.}
+          locator: {page: 14, published_page: 14, table: III}
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 14, published_page: 14, table: III, note: Quench results are determined by microscopic examination; no preservation statement.}
     - observation_id: greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
       type: transition_point
       experiment: cristobalite-two-liquids-t3
@@ -788,11 +837,8 @@ species:
         table: III
         note: Row "Temperature of the equilibrium", MgO-SiO2 column(s) 15MgO, 85SiO2; restated in prose p. 30
       regime: quench_equilibration
-      T_range_K:
-      - 1968.15
-      - 1968.15
-      phase: cristobalite + two liquids
-      units: K (converted from printed °C)
+      phase: glass
+      units: °C
       values:
         property_kind: three_phase_equilibrium_temperature
         phase_assemblage_as_printed: cristobalite + two liquids
@@ -800,11 +846,131 @@ species:
         method_class: measured_tabulated
         evidence_class: measured_tabulated
         measurement_note: 'Quench bracket: temperature at which cristobalite disappears / two liquids appear, read from the tabulated quenches'
-        T_C_as_printed: 1695
-        T_K: 1968.15
-        T_K_conversion: T_K = T_C + 273.15
-      uncertainty:
-        note: No ± printed for this temperature in Table III; the working element was compared with the two standard elements after runs 6, 11 and 15.
+        T_C: 1695
+      point_conditions:
+        composition_wt_pct:
+          state: {tag: unknown, reason: Table III gives multiple charge compositions for one shared invariant temperature; no single composition applies to this row.}
+          locator: {page: 14, published_page: 14, table: III}
+        fO2_Pa:
+          state: {tag: unknown, reason: not stated for these quenching runs.}
+          locator: {page: 14, published_page: 14, table: III}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not stated for these quenching runs.}
+          locator: {page: 14, published_page: 14, table: III}
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 14, published_page: 14, table: III, note: Quench results are determined by microscopic examination; no preservation statement.}
+    - observation_id: greig1927_t5_mgo_siliceous_glass
+      type: equilibrium_phase_composition
+      experiment: critical-quenches-binary
+      regime: quench_equilibration
+      locator: {page: 19, published_page: 19, table: V, note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.}
+      phase: glass
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
+      uncertainty: {range: ['-0.5', '0.5'], units: wt%, confidence_level: not_stated, value_as_published: better than 0.5 per cent, note: Strict bound on composition error; confidence level is not stated.}
+      units: wt%
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components: [[MgO, '0.8'], [SiO2, '99.2']]
+          locator: {page: 19, published_page: 19, table: V}
+        fO2_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1710
+        component_amount: '99.2'
+        component_amount_as_published: 99.2 wt%
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        system: MgO-SiO2
+        temperature_C_as_printed: 1710
+        phase_as_measured: quenched glass
+        composition_wt_pct: {MgO: '0.8', SiO2: '99.2'}
+        refractive_index_sodium_light_as_printed: {'1710': '1.461', '1744': '1.462'}
+        reference_glass_refractive_index_as_printed: '1.580'
+        reference_glass_composition_wt_pct: {MgO: '40.15', SiO2: '59.85'}
+        reference_glass_attribution_as_printed: E. S. Larsen, 1909; glass composition 40.15MgO, 59.85SiO2.
+        silica_glass_refractive_index_as_printed: '1.4584'
+        derivation_as_printed: Composition by interpolation on the assumption that refractive index is a linear function of composition; page 18 says silica content is accurate to better than 0.5 per cent.
+        row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+        derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+        derivation:
+          relation: linear interpolation of refractive index with composition
+          inputs: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+          parameters: []
+          output_unit: wt%
+          locator: {page: 16, published_page: 16}
+      derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+    - observation_id: greig1927_t5_cao_siliceous_glass
+      type: equilibrium_phase_composition
+      experiment: critical-quenches-binary
+      regime: quench_equilibration
+      locator: {page: 19, published_page: 19, table: V, note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.}
+      phase: glass
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
+      uncertainty: {range: ['-0.5', '0.5'], units: wt%, confidence_level: not_stated, value_as_published: better than 0.5 per cent, note: Strict bound on composition error; confidence level is not stated.}
+      units: wt%
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components: [[CaO, '0.6'], [SiO2, '99.4']]
+          locator: {page: 19, published_page: 19, table: V}
+        fO2_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1710
+        component_amount: '99.4'
+        component_amount_as_published: 99.4 wt%
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        system: CaO-SiO2
+        temperature_C_as_printed: 1710
+        phase_as_measured: quenched glass
+        composition_wt_pct: {CaO: '0.6', SiO2: '99.4'}
+        refractive_index_sodium_light_as_printed: {'1710': '1.460+', '1744': '1.462−'}
+        reference_glass_refractive_index_as_printed: '1.589'
+        reference_glass_composition_wt_pct: {CaO: '37.0', SiO2: '63.0'}
+        reference_glass_attribution_as_printed: N. L. Bowen, unpublished data; glass composition 37.0CaO, 63.0SiO2.
+        silica_glass_refractive_index_as_printed: '1.4584'
+        table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica or from lime silica is the richer in silica.
+        derivation_as_printed: Composition by interpolation on the assumption that refractive index is a linear function of composition; page 18 says silica content is accurate to better than 0.5 per cent.
+        row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+        derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]
+        derivation:
+          relation: linear interpolation of refractive index with composition
+          inputs: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]
+          parameters: []
+          output_unit: wt%
+          locator: {page: 16, published_page: 16}
+      derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]
     context:
     - observation_id: greig1927_t2a_run9
       type: phase_equilibrium_run_products
@@ -1011,6 +1177,9 @@ species:
         duration_min_as_printed: 45
         run_products_as_published: Cristobalite and glass
     - observation_id: greig1927_t3_run2_15cao_85sio2
+      quench_statement: &greig_binary_run_quench_not_stated
+        preservation: not_stated
+        locator: {page: 4, published_page: 4, section: Methods and apparatus, note: Charges were quenched and examined microscopically; no preservation statement is made.}
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1031,6 +1200,7 @@ species:
         composition_as_printed: 15CaO, 85SiO2
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t3_run2_15mgo_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1051,6 +1221,7 @@ species:
         composition_as_printed: 15MgO, 85SiO2
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t3_run3_15cao_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1071,6 +1242,7 @@ species:
         composition_as_printed: 15CaO, 85SiO2
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t3_run3_15mgo_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1091,6 +1263,7 @@ species:
         composition_as_printed: 15MgO, 85SiO2
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t3_run4_15cao_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1111,6 +1284,7 @@ species:
         composition_as_printed: 15CaO, 85SiO2
         run_products_as_published: CaO—rich glass + cristobalite. Not well sintered together
     - observation_id: greig1927_t3_run4_15mgo_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1131,6 +1305,7 @@ species:
         composition_as_printed: 15MgO, 85SiO2
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t3_run5_15cao_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1151,6 +1326,7 @@ species:
         composition_as_printed: 15CaO, 85SiO2
         run_products_as_published: As in run 4
     - observation_id: greig1927_t3_run5_15mgo_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1171,6 +1347,7 @@ species:
         composition_as_printed: 15MgO, 85SiO2
         run_products_as_published: A good deal of cristobalite and 2 glasses
     - observation_id: greig1927_t3_run6_15cao_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1191,6 +1368,7 @@ species:
         composition_as_printed: 15CaO, 85SiO2
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t3_run7_5cao_95sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1211,6 +1389,7 @@ species:
         composition_as_printed: 5CaO, 95SiO2
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t3_run7_15mgo_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1231,6 +1410,7 @@ species:
         composition_as_printed: 15MgO, 85SiO2
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t3_run8_5cao_95sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1251,6 +1431,7 @@ species:
         composition_as_printed: 5CaO, 95SiO2
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t3_run8_15mgo_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1271,6 +1452,7 @@ species:
         composition_as_printed: 15MgO, 85SiO2
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t3_run12_15cao_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1291,6 +1473,7 @@ species:
         composition_as_printed: 15CaO, 85SiO2
         run_products_as_published: 2 glasses not well separated
     - observation_id: greig1927_t3_run12_15mgo_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1311,6 +1494,7 @@ species:
         composition_as_printed: 15MgO, 85SiO2
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t3_run13_15cao_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1331,6 +1515,7 @@ species:
         composition_as_printed: 15CaO, 85SiO2
         run_products_as_published: Not sintered. Cristobalite + CaO—rich glass
     - observation_id: greig1927_t3_run13_15mgo_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1351,6 +1536,7 @@ species:
         composition_as_printed: 15MgO, 85SiO2
         run_products_as_published: 2 glasses not well separated
     - observation_id: greig1927_t3_run14_15mgo_85sio2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: cristobalite-two-liquids-t3
       locator:
@@ -1371,6 +1557,7 @@ species:
         composition_as_printed: 15MgO, 85SiO2
         run_products_as_published: Cristobalite + MgO-rich glass
     - observation_id: greig1927_t4a_2mgo_98sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1390,6 +1577,7 @@ species:
         duration_min_as_printed: 30
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t4a_15mgo_85sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1409,6 +1597,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t4a_15mgo_85sio2_q2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1428,6 +1617,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: Cristobalite + glass
     - observation_id: greig1927_t4a_26mgo_74sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1447,6 +1637,7 @@ species:
         duration_min_as_printed: 30
         run_products_as_published: Cristobalite + glass
     - observation_id: greig1927_t4a_26mgo_74sio2_q2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1466,6 +1657,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t4a_30mgo_70sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1485,6 +1677,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t4a_31mgo_69sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1504,6 +1697,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: Cristobalite + glass
     - observation_id: greig1927_t4a_31mgo_69sio2_q2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1523,6 +1717,7 @@ species:
         duration_min_as_printed: 15
         run_products_as_published: 1 glass
     - observation_id: greig1927_t4a_32mgo_68sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1542,6 +1737,7 @@ species:
         duration_min_as_printed: 40
         run_products_as_published: Glass
     - observation_id: greig1927_t4a_32mgo_68sio2_q2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1561,6 +1757,7 @@ species:
         duration_min_as_printed: 40
         run_products_as_published: Cristobalite in fair amount + glass
     - observation_id: greig1927_t4b_2cao_98sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1580,6 +1777,7 @@ species:
         duration_min_as_printed: 30
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t4b_5cao_95sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1599,6 +1797,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t4b_10cao_90sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1618,6 +1817,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t4b_15cao_85sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1637,6 +1837,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: Cristobalite + glass
     - observation_id: greig1927_t4b_15cao_85sio2_q2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1656,6 +1857,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t4b_20cao_80sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1675,6 +1877,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: 2 glasses
     - observation_id: greig1927_t4b_26p5cao_73p5sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1695,6 +1898,7 @@ species:
         run_products_as_published: 2 glasses
         text_discrepancy_note: Page 18 prose says runs on 26.5CaO, 73.5SiO2 "show that at 1710° it forms two liquids but at 1740° it forms a single homogeneous liquid"; Table IV B prints 1700 (30 min) for the two-glass run. Both kept; not resolved.
     - observation_id: greig1927_t4b_26p5cao_73p5sio2_q2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1714,6 +1918,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: 1 glass
     - observation_id: greig1927_t4b_28cao_72sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1733,6 +1938,7 @@ species:
         duration_min_as_printed: 40
         run_products_as_published: Cristobalite + glass
     - observation_id: greig1927_t4b_28cao_72sio2_q2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1752,6 +1958,7 @@ species:
         duration_min_as_printed: 20
         run_products_as_published: 1 glass
     - observation_id: greig1927_t4b_31p8cao_68p2sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1771,6 +1978,7 @@ species:
         duration_min_as_printed: 30
         run_products_as_published: All glass
     - observation_id: greig1927_t4b_31p8cao_68p2sio2_q2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1790,6 +1998,7 @@ species:
         duration_min_as_printed: 30
         run_products_as_published: Rare crystals of cristobalite in glass
     - observation_id: greig1927_t4b_35cao_65sio2_q1
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1809,6 +2018,7 @@ species:
         duration_min_as_printed: 30
         run_products_as_published: Cristobalite + glass
     - observation_id: greig1927_t4b_35cao_65sio2_q2
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -1828,6 +2038,7 @@ species:
         duration_min_as_printed: 30
         run_products_as_published: Cristobalite + glass
     - observation_id: greig1927_t4b_35cao_65sio2_q3
+      quench_statement: *greig_binary_run_quench_not_stated
       type: phase_equilibrium_run_products
       experiment: critical-quenches-binary
       locator:
@@ -2610,65 +2821,11 @@ species:
         temperature_C_as_printed: 1533
         duration_min_as_printed: 20
         run_products_as_published: Considerable cristobalite + glass
-    - observation_id: greig1927_t5_mgo_siliceous_glass
-      type: composition
-      experiment: critical-quenches-binary
-      locator:
-        page: 19
-        published_page: 19
-        table: V
-        note: MgO-SiO2 row; footnote 1
-      units: composition wt% (by interpolation); refractive index sodium light; temperature °C
-      values:
-        quantity: conjugate_siliceous_liquid_composition
-        method_class: author_derived
-        evidence_class: author_derived
-        derivation_as_printed: Composition of siliceous glass by interpolation; page 16 states the composition was obtained on the assumption that the index of refraction is a linear function of the composition, and page 18 states the result gives the silica content to better than 0.5 per cent.
-        system: MgO-SiO2
-        temperature_C_as_printed: 1710
-        composition_mass_percent:
-          MgO: 0.8
-          SiO2: 99.2
-        refractive_index_sodium_light_as_printed:
-          '1710': '1.461'
-          '1744': '1.462'
-        reference_glass_refractive_index_as_printed: '1.580'
-        reference_glass_footnote_as_printed: E. S. Larsen. This Journal 28, 263-274. 1909. Glass of composition 40.15MgO 59.85SiO2.
-        silica_glass_refractive_index_as_printed: '1.4584'
-        table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica or from lime silica is the richer in silica.
-        row_alignment_note: The interpolated composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
-      uncertainty:
-        note: 'Page 18: silica content of the glass to better than 0.5 per cent.'
-    - observation_id: greig1927_t5_cao_siliceous_glass
-      type: composition
-      experiment: critical-quenches-binary
-      locator:
-        page: 19
-        published_page: 19
-        table: V
-        note: CaO-SiO2 row; footnote 2
-      units: composition wt% (by interpolation); refractive index sodium light; temperature °C
-      values:
-        quantity: conjugate_siliceous_liquid_composition
-        method_class: author_derived
-        evidence_class: author_derived
-        derivation_as_printed: Composition of siliceous glass by interpolation; page 16 states the composition was obtained on the assumption that the index of refraction is a linear function of the composition, and page 18 states the result gives the silica content to better than 0.5 per cent.
-        system: CaO-SiO2
-        temperature_C_as_printed: 1710
-        composition_mass_percent:
-          CaO: 0.6
-          SiO2: 99.4
-        refractive_index_sodium_light_as_printed:
-          '1710': 1.460+
-          '1744': 1.462—
-        reference_glass_refractive_index_as_printed: '1.589'
-        reference_glass_footnote_as_printed: N. L. Bowen. Unpublished data. Glass of composition 37.0CaO 63.0SiO2.
-        silica_glass_refractive_index_as_printed: '1.4584'
-        table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica or from lime silica is the richer in silica.
-        row_alignment_note: The interpolated composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
-      uncertainty:
-        note: 'Page 18: silica content of the glass to better than 0.5 per cent.'
     - observation_id: greig1927_cao_sio2_high_T_siliceous_glass_index
+      phase: glass
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 20, published_page: 20, note: Glass was measured after heating; no quench-preservation statement is printed.}
       type: characterization
       locator:
         page: 20
@@ -2685,23 +2842,6 @@ species:
         firing_temperature_C_high: 1850
         refractive_index_low: '1.470'
         refractive_index_high: '1.475'
-    - observation_id: greig1927_cao_sio2_27p5_liquid_liquidus_text
-      type: thermodynamic_example
-      locator:
-        page: 44
-        published_page: 44
-        note: Prose on a Pt-Rh ribbon melt (Fig. 12 discussion)
-      units: wt%; °C
-      values:
-        method_class: author_estimate
-        evidence_class: author_estimate
-        system: CaO-SiO2
-        statement_as_printed: The composition of the liquid in the case just cited is about 27.5CaO, 72.5SiO2, and the temperature of the liquidus 1698°.
-        composition_mass_percent_approximate:
-          CaO: 27.5
-          SiO2: 72.5
-        liquidus_temperature_C_as_printed: 1698
-        approximation_note: Composition printed with "about"; the ribbon was raised to "about 1725°".
     - observation_id: greig1927_less_siliceous_liquid_method
       type: method
       locator:
@@ -2718,6 +2858,19 @@ species:
             tag: unknown
             reason: not_numeric
         numeric_note: The locally described extrapolated coexistence compositions are not explicitly numerically tabulated on p. 16. Figs. 3 and 4 are not digitized. The approximate liquid example on p. 44 is carried separately and is not expressly identified as a measured conjugate composition.
+    - observation_id: greig1927_cao_mgo_siliceous_liquid_bounds
+      type: composition
+      locator: {page: 16, published_page: 16, section: The more siliceous liquid}
+      units: wt%
+      values:
+        method_class: author_statement
+        systems:
+          MgO-SiO2:
+            silica_mass_percent_as_printed: '> 98'
+          CaO-SiO2:
+            silica_mass_percent_as_printed: '> 98'
+        temperature_condition_as_printed: just above the temperature of appearance of the second liquid
+        printed_basis: These are bounds on the more siliceous liquid, not exact conjugate compositions.
     - observation_id: greig1927_ternary_monotectic_range_text
       type: thermodynamic_example
       locator:
@@ -3121,12 +3274,19 @@ species:
         derivation_as_printed: Index assumed linear in composition (p. 16); immersion measurements; silica content better than 0.5 per cent (p. 18). Measured indices and quoted reference glass are inputs to the interpolated composition.
         row_alignment_note: Reference index and interpolated composition cells blank on the 1744°C line; no new composition inferred.
     - observation_id: greig1927_ribbon_two_liquids
+      quench_statement:
+        preservation: asserted_altered
+        locator: {page: 26, published_page: 26, figure: 12, note: Figure caption says cristobalite formed during quenching.}
       type: characterization
       locator: {page: 20, published_page: 20, note: Fig. 12 experiment; further methods on p. 44 carried separately}
       units: wt%; text
       values:
         method_class: measured_text
         composition_mass_percent: {CaO: 5, SiO2: 95}
+        composition_role:
+          value: initial_charge_only
+          locator: {page: 20, published_page: 20, note: 'The composition is the mixture melted on the Pt-Rh ribbon, before formation of the resulting liquids.'}
+          quote: Small amount melted on a Pt-Rh ribbon heated by electric current.
         method: Small amount melted on Pt-Rh ribbon heated by electric current.
         result: Drop of resulting liquids photographed in Fig. 12; two liquids.
     - observation_id: greig1927_t6_r1
@@ -3493,3 +3653,181 @@ species:
         method_class: method_only
         procedure: Crystal-free baria-silica liquids easily quench clear even in large charges. Holding just below liquidus produces large cristobalite crystals; rapid cooling into a blast of air yields clear glass but higher-index glass film around crystals. Dropping charge under mercury usually removes that film.
         atmosphere_note: Blast of air is a cooling treatment; it does not specify furnace operating atmosphere.
+
+    - observation_id: greig1927_t5_mgo_siliceous_glass_raw_indices
+      phase: glass
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
+      type: characterization
+      locator: {page: 19, published_page: 19, table: V, note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.}
+      units: wt%; refractive index; °C
+      values:
+        method_class: measured_tabulated
+        system: MgO-SiO2
+        temperature_C_as_printed: 1710
+        phase_as_measured: quenched glass
+        refractive_index_sodium_light_as_printed: {'1710': '1.461', '1744': '1.462'}
+        reference_glass_refractive_index_as_printed: '1.580'
+        reference_glass_composition_wt_pct: {MgO: '40.15', SiO2: '59.85'}
+        reference_glass_attribution_as_printed: E. S. Larsen, 1909; glass composition 40.15MgO, 59.85SiO2.
+        silica_glass_refractive_index_as_printed: '1.4584'
+        row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+    - observation_id: greig1927_t5_cao_siliceous_glass_raw_indices
+      phase: glass
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
+      type: characterization
+      locator: {page: 19, published_page: 19, table: V, note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.}
+      units: wt%; refractive index; °C
+      values:
+        method_class: measured_tabulated
+        system: CaO-SiO2
+        temperature_C_as_printed: 1710
+        phase_as_measured: quenched glass
+        refractive_index_sodium_light_as_printed: {'1710': '1.460+', '1744': '1.462−'}
+        reference_glass_refractive_index_as_printed: '1.589'
+        reference_glass_composition_wt_pct: {CaO: '37.0', SiO2: '63.0'}
+        reference_glass_attribution_as_printed: N. L. Bowen, unpublished data; glass composition 37.0CaO, 63.0SiO2.
+        silica_glass_refractive_index_as_printed: '1.4584'
+        table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica or from lime silica is the richer in silica.
+        row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+    - observation_id: greig1927_cao_sio2_27p5_liquid_liquidus_text
+      phase: glass
+      quench_statement:
+        preservation: asserted_altered
+        locator: {page: 44, published_page: 44, note: The droplet was not perfectly quenched; cristobalite formed during chilling.}
+      type: phase_composition_reduction_lineage_refused
+      locator: {page: 44, published_page: 44, note: Prose prints the approximate liquid composition and its liquidus temperature.}
+      units: wt%; °C
+      values:
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        disposition: The approximate CaO-SiO2 liquid composition is reported in prose for an imperfectly quenched ribbon droplet; no reduction method is specified, and the value is not identified as a conjugate endpoint.
+        system: CaO-SiO2
+        phase_label: glass
+        phase_as_measured: Quenched glass droplet; the source describes its liquid-phase composition before imperfect quenching.
+        composition_mass_percent_as_published: {CaO: about 27.5, SiO2: '72.5'}
+        ribbon_temperature_C_as_printed: about 1725
+        liquidus_temperature_C_as_printed: 1698
+        composition_note: The prose describes the liquid in the cited Pt-Rh ribbon droplet; it does not identify this value as a conjugate endpoint.
+        quench_as_printed: Droplet explicitly not perfectly quenched; cristobalite formed during chilling (page 44).
+        uncertainty_note: "Composition is qualified as 'about'; no numeric width or confidence level is stated."
+
+  MgO:
+    observations:
+    - observation_id: greig1927_t5_mgo_siliceous_glass_MgO
+      type: equilibrium_phase_composition
+      experiment: critical-quenches-binary
+      regime: quench_equilibration
+      locator: {page: 19, published_page: 19, table: V, note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.}
+      phase: glass
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
+      uncertainty: {range: ['-0.5', '0.5'], units: wt%, confidence_level: not_stated, value_as_published: better than 0.5 per cent, note: Strict bound on composition error; confidence level is not stated.}
+      units: wt%
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components: [[MgO, '0.8'], [SiO2, '99.2']]
+          locator: {page: 19, published_page: 19, table: V}
+        fO2_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+      values:
+        quantity: equilibrium_phase_composition
+        formula: MgO
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1710
+        component_amount: '0.8'
+        component_amount_as_published: 0.8 wt%
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        system: MgO-SiO2
+        temperature_C_as_printed: 1710
+        phase_as_measured: quenched glass
+        composition_wt_pct: {MgO: '0.8', SiO2: '99.2'}
+        refractive_index_sodium_light_as_printed: {'1710': '1.461', '1744': '1.462'}
+        reference_glass_refractive_index_as_printed: '1.580'
+        reference_glass_composition_wt_pct: {MgO: '40.15', SiO2: '59.85'}
+        reference_glass_attribution_as_printed: E. S. Larsen, 1909; glass composition 40.15MgO, 59.85SiO2.
+        silica_glass_refractive_index_as_printed: '1.4584'
+        derivation_as_printed: Composition by interpolation on the assumption that refractive index is a linear function of composition; page 18 says silica content is accurate to better than 0.5 per cent.
+        row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+        derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+        derivation:
+          relation: linear interpolation of refractive index with composition
+          inputs: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+          parameters: []
+          output_unit: wt%
+          locator: {page: 16, published_page: 16}
+      derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices]
+
+  CaO:
+    observations:
+    - observation_id: greig1927_t5_cao_siliceous_glass_CaO
+      type: equilibrium_phase_composition
+      experiment: critical-quenches-binary
+      regime: quench_equilibration
+      locator: {page: 19, published_page: 19, table: V, note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.}
+      phase: glass
+      quench_statement:
+        preservation: not_stated
+        locator: {page: 16, published_page: 16, note: Glass was measured after heating; no quench-preservation statement is printed.}
+      uncertainty: {range: ['-0.5', '0.5'], units: wt%, confidence_level: not_stated, value_as_published: better than 0.5 per cent, note: Strict bound on composition error; confidence level is not stated.}
+      units: wt%
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components: [[CaO, '0.6'], [SiO2, '99.4']]
+          locator: {page: 19, published_page: 19, table: V}
+        fO2_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: Not stated for the Table V glass.}
+          locator: {page: 19, published_page: 19, table: V}
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CaO
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1710
+        component_amount: '0.6'
+        component_amount_as_published: 0.6 wt%
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        system: CaO-SiO2
+        temperature_C_as_printed: 1710
+        phase_as_measured: quenched glass
+        composition_wt_pct: {CaO: '0.6', SiO2: '99.4'}
+        refractive_index_sodium_light_as_printed: {'1710': '1.460+', '1744': '1.462−'}
+        reference_glass_refractive_index_as_printed: '1.589'
+        reference_glass_composition_wt_pct: {CaO: '37.0', SiO2: '63.0'}
+        reference_glass_attribution_as_printed: N. L. Bowen, unpublished data; glass composition 37.0CaO, 63.0SiO2.
+        silica_glass_refractive_index_as_printed: '1.4584'
+        table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica or from lime silica is the richer in silica.
+        derivation_as_printed: Composition by interpolation on the assumption that refractive index is a linear function of composition; page 18 says silica content is accurate to better than 0.5 per cent.
+        row_alignment_note: Composition is printed on the 1710 °C line; no composition is printed for the 1744 °C index.
+        derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]
+        derivation:
+          relation: linear interpolation of refractive index with composition
+          inputs: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]
+          parameters: []
+          output_unit: wt%
+          locator: {page: 16, published_page: 16}
+      derived_from: [greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices]
