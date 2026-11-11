@@ -247,10 +247,12 @@ derivation:
 
 When the source does not print raw inputs, omit `inputs` entirely. The paper
 is never an input, and no invented observation may stand in for the unprinted
-inputs. For `model_derived`, the derivation must also carry its method as a
-located `method` field whose value describes the printed calculation. Its
-locator identifies the printed equation and physical page, and `references`
-is a typed list naming at least one compiled reference used. For example:
+inputs. When printed parent observations resolve, name them in `inputs` and
+`derived_from`; `raw_inputs` is not needed. For `model_derived`, the derivation
+must also carry its method as a located `method` field whose value describes
+the printed calculation. Its locator identifies the printed equation and
+physical page, and `references` is a typed list naming at least one compiled
+reference used. For example:
 
 ```yaml
 derivation:
@@ -489,6 +491,16 @@ optional and records only a source-stated direction. For Cr glass valence
 fractions, an oxidising direction is reported as a notice and does not gate
 scoring.
 
+### Standard pressure declaration
+
+An observation may set `standard_pressure: not_printed` when the source does
+not print its standard pressure. This is a closed one-value enum; omit the key
+when the source does not declare this fact. During migration, gas-phase
+`delta_fG` rows with this declaration receive a notice for the 1 bar versus
+1 atm ambiguity and a derived absolute uncertainty width of `RT ln(1.01325)`
+at the row's printed temperature. The width is derived during migration and is
+never written into the extract.
+
 ### Uncertainty (first-class)
 
 Each observation **retains stated uncertainty verbatim** under `uncertainty`
@@ -646,7 +658,23 @@ are not measurements of a charge; retain their original evidence without
 pretending they are runs. Derived fits from this work can reference their
 underlying measurement series; their `model_derived` evidence class stays intact.
 
-The migrator defaults missing pressure evidence to unknown. When supplied,
+Missing pressure remains unknown unless the experiment has positive printed
+evidence of an open or flowing-gas furnace. Record that evidence once on the
+experiment, beside its apparatus and atmosphere fields:
+
+```yaml
+ambient_pressure_evidence:
+  evidence_class: gas_flow # gas_flow | gas_mixing | vented | atmospheric_pressure_statement
+  quote: "The sample was heated in a furnace with a continuous gas flow."
+  locator: {page: 3, section: Experimental method}
+```
+
+The quote is verbatim and the locator identifies its page, section, or table.
+This evidence lets the migrator use `total_pressure_Pa = 101325` with
+`derived_from_apparatus` authority when the observation requires total
+pressure and no printed point pressure is present. It does not override a
+printed pressure or apply to sealed, vacuum, Knudsen, or high-pressure
+apparatus. Without this field, missing pressure remains unknown. When supplied,
 `pressure_environment` requires `total_pressure_Pa` and `sweep_gas` as
 Located values, and `regime.regime_class` as a State. Do not confuse cell-side
 chamber pressure with sample vapour pressure. For `knudsen_effusion`, the experiment-level `total_pressure_Pa` is the chamber background consumed by the validity gates. It is not inherited into observation identity, engine-point system pressure, or sample oxygen-condition derivations used for prediction (including the vacuum total-pressure upper-bound route). There is no dedicated base-pressure

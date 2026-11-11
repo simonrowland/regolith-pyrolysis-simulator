@@ -9,14 +9,14 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 828
-  extracts: 826
+  sources: 845
+  extracts: 843
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 80
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 826
-  alias_groups_needing_resolution: 91
+  extracts_without_pdf: 843
+  alias_groups_needing_resolution: 93
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
@@ -107,6 +107,7 @@ gaps:
   - cacciatore-zajacz-2026-v-sc-oxybarometer
   - cacciatore-zajacz-2026-v-sc-oxybarometer-supplement
   - cardiff-2007-vacuum-pyrolysis-gsfc
+  - carrillo-sanchez-2020-phosphorus-ablation
   - centolanzi-1966-tektite-vapour-pressure
   - charles-1967-alkali-silicate-activities
   - charnoz-2023-hydrogen-magma-ocean
@@ -114,6 +115,7 @@ gaps:
   - chaudary-1997-v-redox-binary-silicate
   - chen-2019-sioch-cp-entropy-gibbs
   - chen-2022-mgo-sio2-tio2-phase-equilibria
+  - chen-2022-sio2-mno-slag-activities
   - cheng-2021-fe-ca-si-o-phase-equilibria
   - cho-suito-1994-cas-slag-activities
   - christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
@@ -131,6 +133,7 @@ gaps:
   - costa-jacobson-2015
   - cottrell-2009-iron-xanes
   - dachs-geiger-2006-pyrope-grossular
+  - dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
   - dans-loffler-1930-na-silicate-zirconia-phase-equilibria
   - darken-gurry-1946-iron-oxygen-ii
   - datz-1961-na2cl2
@@ -146,6 +149,7 @@ gaps:
   - di-donato-granati-2000
   - dikov-2009-luna16-condensate-iron
   - distin-1971-ferrous-silicate-melts
+  - dohmen-1998-olivine-fe-gas
   - dohmen-2003-coupled-kinetics
   - dong-2009-cr-v-slag-activities
   - doyle-1988-feo-activity-multicomponent-magma
@@ -168,6 +172,7 @@ gaps:
   - ferguson-nuth-2012-sio-vapor-pressure-mixture
   - ferkl-2026-waste-glass-thermal-redox
   - filiberto-lpsc2011-2064-volatiles
+  - filsinger-1990-silica-silicon-carbothermic-kinetics
   - fincham-1954-proc-roy-soc-a
   - florin-2025-cu-silicate-evaporation
   - folstad-2024-metals-cao-dissolution-cas
@@ -181,6 +186,7 @@ gaps:
   - fujisawa-1990-cao-al2o3-activities
   - fujisawa-1994-na-sn-carbonate-thermodynamics
   - fuyuki-2007-sio-recombination
+  - gail-2013-sio-nucleation-silicate-dust
   - gaillard-2003-hydrogen-iron-redox-rate
   - gaillard-2003-hydrous-silicic-melt-activity
   - gca-366-210-berry-2024
@@ -201,6 +207,7 @@ gaps:
   - habermann-daane-1964
   - hamuyuni-2016-copper-oxide-solubility-thesis-summary
   - hanson-jones-1998-am-cr-partitioning-olivine-liquid
+  - hashimoto-1990-forsterite-evaporation-kinetics
   - hashimoto-nakano-2021-bubbles-to-chondrites-ii
   - haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
   - hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry
@@ -235,6 +242,7 @@ gaps:
   - ivanova-2018-spinel-rich-cai-evaporation
   - ivtan-cro2-g
   - ivtan-mno-coo-thermo
+  - iwahashi-2021-cr-oxide-solid-activities
   - jackson-2005-ferrous-glass-multispectroscopy
   - jacobson-1989-metal-oxide-zirconia
   - jacquet-2026-alkali-recondensation
@@ -256,6 +264,7 @@ gaps:
   - kale-srikanth-2000-sodium-ferrite-gibbs
   - kambayashi-kato-1984-mgo-sio2-1973k
   - kang-2007-sio2-activity-cas-low-silica
+  - kassis-frischat-1981-mixed-alkali-vapor-pressures
   - kassis-frischat-1981-silicate-glass-vapour
   - kawashima-1984-soda-flux-chemical-sensors
   - kayahara-1981-liquid-cu-o
@@ -435,6 +444,7 @@ gaps:
   - mamiya-2000-sio-disproportionation
   - masuda-tanaka-1979-vacuum-condensates
   - mathieu-2009-sodium-solubility-thesis
+  - mathieu-2011-na2o-cms-solubility
   - matousek-1998-silicate-vaporization-reactions
   - matsumaru-1999-plasma-arc-silicate-evaporation
   - matsuzaki-1997-feo-tio2-sio2-activities
@@ -474,6 +484,7 @@ gaps:
   - mysen-virgo-1989-nas-redox
   - naess-2014-liquid-silicon-oxidation-fume-flux
   - nagabayashi-hino-banya-1989-phosphorus
+  - nagahara-1993-sio2-evaporation-equilibrium-vacuum
   - nagahara-2000-metsoc63-5166
   - nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   - nagahara-ozawa-1999-forsterite-surface-microstructures
@@ -599,6 +610,7 @@ gaps:
   - schreiber-1996-fe-mn-cr-redox-interactions
   - schreiber-haskin-1976-plsc7-chromium-in-basalts
   - schumm-1981-alkali-aluminosilicate-thermochemical-tables
+  - seetharaman-2013-cr-thin-film-volatilization
   - seki-2011-ca-o-solubility-fe-cao-al2o3
   - semkow-haskin-1984-redox-diopsidic-melt
   - senior-1991-solar-heating-jbis
@@ -610,6 +622,7 @@ gaps:
   - shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
   - shaw-2023-vacuum-thermal-sublimation-thesis
   - shi-2024-cr-activity-slag-polymerisation
+  - shi-2025-mno-activity-eaf-spinel
   - shilov-1998-sno-zno-p2o5-vaporization
   - shilov-2025-sro-al2o3-sio2-kems-supplement
   - shilov-2026-sro-la2o3-kems
@@ -802,6 +815,9 @@ gaps:
   - wang-2009-cr-slag-kems-original
   - wang-2017-cao-sio2-vox-tables-s1-s32
   - wang-2017-sodium-stannate-formation-emf
+  - wang-seetharaman-2010-cr-oxidation-original
+  - watne-1977-potassium-vapor-pressure-furnace
+  - wetzel-2012-heidelberg-thesis
   - wetzel-gail-2013-sio-arrhenius
   - wilkerson-2021-jsc1a-tga-ms-poster
   - wilkerson-2023-jsc1a-outgassing
@@ -841,6 +857,7 @@ gaps:
   - zaitsev-1999-na2o-sio2-pccp
   - zaitsev-2000-ms2000-045
   - zaitsev-2000-sodium-silicate-thermodynamics
+  - zaitsev-2006-magnesium-silicate-thermodynamics
   - zhang-2011-boron-sodium-f-free-evaporation
   - zhang-2021-acsesc-si
   - zhang-2024-alkali-evaporation-ti-thesis
@@ -1198,6 +1215,12 @@ gaps:
     - cacciatore-zajacz-2026-v-sc-oxybarometer-supplement
     resolution: owner/controller
   - type: source_id_alias
+    key: chen-2022
+    source_ids:
+    - chen-2022-mgo-sio2-tio2-phase-equilibria
+    - chen-2022-sio2-mno-slag-activities
+    resolution: owner/controller
+  - type: source_id_alias
     key: colson-1998
     source_ids:
     - colson-floden-1998-lpsc-co-nickel-activity
@@ -1289,6 +1312,12 @@ gaps:
     source_ids:
     - jeon-2025-metal-slag-refractory-thesis
     - jeon-lindberg-2025-mgo-refractory-slag-interface
+    resolution: owner/controller
+  - type: source_id_alias
+    key: kassis-1981
+    source_ids:
+    - kassis-frischat-1981-mixed-alkali-vapor-pressures
+    - kassis-frischat-1981-silicate-glass-vapour
     resolution: owner/controller
   - type: source_id_alias
     key: khedim-2010
@@ -1861,7 +1890,7 @@ sources:
     extract:
       path: extracts/abdul-2023-cao-sio2-calphad.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/abdul-2023-cao-sio2-calphad.yaml
       present: true
@@ -6712,6 +6741,65 @@ sources:
       last_stage: extracted
       date: '2026-09-12'
     commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: carrillo-sanchez-2020-phosphorus-ablation
+  aliases: []
+  citation: Carrillo-Sánchez, J. D., Bones, D. L., Douglas, K. M., Flynn, G. J., Wirick, S., Fegley, B.
+    Jr., Araki, T., Kaulich, B. & Plane, J. M. C. (2020), "Injection of meteoric phosphorus into planetary
+    atmospheres", Planetary and Space Science 187, 104926.
+  doi: 10.1016/j.pss.2020.104926
+  report_number: null
+  identifier: 10.1016/j.pss.2020.104926
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/carrillo-sanchez-2020-phosphorus-ablation.yaml
+    review_status: draft
+    rows: 13
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/carrillo-sanchez-2020-phosphorus-ablation/carrillo-sanchez-2020-phosphorus-ablation.pdf
+      present: true
+      sha256: 31dbfbfb907ecd606280cb6dceb89b496b8554b42185cd0e07bc677d00de6e2a
+      matches_simulator: null
+    sidecar:
+      path: raw/carrillo-sanchez-2020-phosphorus-ablation/sidecar.yaml
+      present: true
+    text:
+      path: text/carrillo-sanchez-2020-phosphorus-ablation
+      exists: true
+      file_count: 37
+    tables:
+      path: tables/carrillo-sanchez-2020-phosphorus-ablation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/carrillo-sanchez-2020-phosphorus-ablation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/carrillo-sanchez-2020-phosphorus-ablation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: centolanzi-1966-tektite-vapour-pressure
   aliases: []
   citation: Centolanzi, Frank J., and Dean R. Chapman (1966), "Vapor Pressure of Tektite Glass and Its
@@ -7117,6 +7205,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/chen-2022-mgo-sio2-tio2-phase-equilibria.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: chen-2022-sio2-mno-slag-activities
+  aliases: []
+  citation: Chen J.-B., Luan H.-Z., Huang H.-H., Zhao M.-H., Pan W.-B., Chen Z.-Y. (2022). Thermodynamic
+    activity of SiO2 in CaO-SiO2-Al2O3-MnO-MgO system molten slags. ISIJ International 62(7).
+  doi: 10.2355/isijinternational.ISIJINT-2022-018
+  report_number: null
+  identifier: 10.2355/isijinternational.ISIJINT-2022-018
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/chen-2022-sio2-mno-slag-activities.yaml
+    review_status: draft
+    rows: 222
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/chen-2022-sio2-mno-slag-activities/chen-2022-sio2-mno-slag-activities.pdf
+      present: true
+      sha256: d4a4f8b6c3d0eaa6135a551ce74923c40e50152f7328f748d0d8de7f92f186c8
+      matches_simulator: null
+    sidecar:
+      path: raw/chen-2022-sio2-mno-slag-activities/sidecar.yaml
+      present: true
+    text:
+      path: text/chen-2022-sio2-mno-slag-activities
+      exists: true
+      file_count: 41
+    tables:
+      path: tables/chen-2022-sio2-mno-slag-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/chen-2022-sio2-mno-slag-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/chen-2022-sio2-mno-slag-activities.yaml
       present: false
       error: null
       last_stage: null
@@ -8117,6 +8263,64 @@ sources:
       last_stage: null
       date: null
     commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+  aliases: []
+  citation: Dai, W., Seetharaman, S. & Staffansson, L.-I. (1984). A thermodynamic study of the system
+    Fe-Na-O. Scandinavian Journal of Metallurgy 13(1), 32-38.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry.yaml
+    review_status: draft
+    rows: 67
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry.pdf
+      present: true
+      sha256: b33b89dd8a837717816dac2dbe85b0e68e5c8c48dee326c2ebac8cf8029aeb55
+      matches_simulator: null
+    sidecar:
+      path: raw/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry/sidecar.yaml
+      present: true
+    text:
+      path: text/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+      exists: true
+      file_count: 73
+    tables:
+      path: tables/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria
   aliases: []
   citation: D’Ans, J. and Löffler, J. (1930). Untersuchungen im System Na2O-SiO2-ZrO2. Zeitschrift für
@@ -8994,6 +9198,65 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/distin-1971-ferrous-silicate-melts.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: dohmen-1998-olivine-fe-gas
+  aliases: []
+  citation: 'Dohmen, R., Chakraborty, S., Palme, H., and Rammensee, W. (1998), "Solid-solid reactions
+    mediated by a gas phase: An experimental study of reaction progress and the role of surfaces in the
+    system olivine+iron metal," American Mineralogist 83, 970-984.'
+  doi: 10.2138/am-1998-9-1005
+  report_number: null
+  identifier: 10.2138/am-1998-9-1005
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/dohmen-1998-olivine-fe-gas.yaml
+    review_status: draft
+    rows: 5
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/dohmen-1998-olivine-fe-gas/dohmen-1998-olivine-fe-gas.pdf
+      present: true
+      sha256: d99c7803f5940fb365c74fe0c13f824d2b5654de42ef6a92e70c279d6aa5e12b
+      matches_simulator: null
+    sidecar:
+      path: raw/dohmen-1998-olivine-fe-gas/sidecar.yaml
+      present: true
+    text:
+      path: text/dohmen-1998-olivine-fe-gas
+      exists: true
+      file_count: 44
+    tables:
+      path: tables/dohmen-1998-olivine-fe-gas
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/dohmen-1998-olivine-fe-gas.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/dohmen-1998-olivine-fe-gas.yaml
       present: false
       error: null
       last_stage: null
@@ -10280,6 +10543,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: filsinger-1990-silica-silicon-carbothermic-kinetics
+  aliases: []
+  citation: 'Filsinger, D. H. & Bourrie, D. B. (1990). Silica to Silicon: Key Carbothermic Reactions and
+    Kinetics. Journal of the American Ceramic Society, 73(6), 1726–1732.'
+  doi: 10.1111/j.1151-2916.1990.tb09820.x
+  report_number: null
+  identifier: 10.1111/j.1151-2916.1990.tb09820.x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/filsinger-1990-silica-silicon-carbothermic-kinetics.yaml
+    review_status: draft
+    rows: 19
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/filsinger-1990-silica-silicon-carbothermic-kinetics/filsinger-1990-silica-silicon-carbothermic-kinetics.pdf
+      present: true
+      sha256: e2c6012a2f35a6de17ecc406222006aac9af0c139a8ff60f4ec583e3525c4782
+      matches_simulator: null
+    sidecar:
+      path: raw/filsinger-1990-silica-silicon-carbothermic-kinetics/sidecar.yaml
+      present: true
+    text:
+      path: text/filsinger-1990-silica-silicon-carbothermic-kinetics
+      exists: true
+      file_count: 64
+    tables:
+      path: tables/filsinger-1990-silica-silicon-carbothermic-kinetics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/filsinger-1990-silica-silicon-carbothermic-kinetics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/filsinger-1990-silica-silicon-carbothermic-kinetics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: fincham-1954-proc-roy-soc-a
   aliases: []
   citation: C. J. B. Fincham and F. D. Richardson, "The behaviour of sulphur in silicate and aluminate
@@ -11037,6 +11358,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/fuyuki-2007-sio-recombination.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: gail-2013-sio-nucleation-silicate-dust
+  aliases: []
+  citation: Gail, H.-P., Wetzel, S., Pucci, A. & Tamanai, A. (2013). Seed particle formation for silicate
+    dust condensation by SiO nucleation. Astronomy & Astrophysics, 555, A119.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
+  extracts:
+  - path: data/literature/extracts/gail-2013-sio-nucleation-silicate-dust.yaml
+    review_status: draft
+    rows: 9
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/gail-2013-sio-nucleation-silicate-dust/gail-2013-sio-nucleation-silicate-dust.pdf
+      present: true
+      sha256: 519c014671e2297ec7a01de1cedf5983a5784ccadf36dfccd438b2367df5291e
+      matches_simulator: null
+    sidecar:
+      path: raw/gail-2013-sio-nucleation-silicate-dust/sidecar.yaml
+      present: true
+    text:
+      path: text/gail-2013-sio-nucleation-silicate-dust
+      exists: true
+      file_count: 48
+    tables:
+      path: tables/gail-2013-sio-nucleation-silicate-dust
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/gail-2013-sio-nucleation-silicate-dust.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/gail-2013-sio-nucleation-silicate-dust.yaml
       present: false
       error: null
       last_stage: null
@@ -12206,6 +12585,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/hanson-jones-1998-am-cr-partitioning-olivine-liquid.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  aliases: []
+  citation: Hashimoto, A. (1990). Evaporation kinetics of forsterite and implications for the early solar
+    nebula. Nature 347, 53–55.
+  doi: 10.1038/347053a0
+  report_number: null
+  identifier: 10.1038/347053a0
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/hashimoto-1990-forsterite-evaporation-kinetics.yaml
+    review_status: draft
+    rows: 16
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/hashimoto-1990-forsterite-evaporation-kinetics/hashimoto-1990-forsterite-evaporation-kinetics.pdf
+      present: true
+      sha256: 82ada3f8de262f0413bd4eaf661c1e90a80c8e51ff8836bc4e6b2b6095e636e5
+      matches_simulator: null
+    sidecar:
+      path: raw/hashimoto-1990-forsterite-evaporation-kinetics/sidecar.yaml
+      present: true
+    text:
+      path: text/hashimoto-1990-forsterite-evaporation-kinetics
+      exists: true
+      file_count: 15
+    tables:
+      path: tables/hashimoto-1990-forsterite-evaporation-kinetics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/hashimoto-1990-forsterite-evaporation-kinetics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/hashimoto-1990-forsterite-evaporation-kinetics.yaml
       present: false
       error: null
       last_stage: null
@@ -14197,6 +14634,64 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: iwahashi-2021-cr-oxide-solid-activities
+  aliases: []
+  citation: Iwahashi, K., Hashimoto, S., Yamauchi, R., Saito, K. & Hasegawa, M. (2021). Phase Relationship
+    and Activities of Components in CaO–SiO2–Cr2O3 Ternary System. ISIJ International, 61(5), 1404–1411.
+  doi: 10.2355/isijinternational.ISIJINT-2020-752
+  report_number: null
+  identifier: 10.2355/isijinternational.ISIJINT-2020-752
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/iwahashi-2021-cr-oxide-solid-activities.yaml
+    review_status: draft
+    rows: 52
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/iwahashi-2021-cr-oxide-solid-activities/iwahashi-2021-cr-oxide-solid-activities.pdf
+      present: true
+      sha256: 6d7380b00e79a73fa6ade46a3e7caa4e4090794b6318c5d63cd11a0163b410fc
+      matches_simulator: null
+    sidecar:
+      path: raw/iwahashi-2021-cr-oxide-solid-activities/sidecar.yaml
+      present: true
+    text:
+      path: text/iwahashi-2021-cr-oxide-solid-activities
+      exists: true
+      file_count: 80
+    tables:
+      path: tables/iwahashi-2021-cr-oxide-solid-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/iwahashi-2021-cr-oxide-solid-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/iwahashi-2021-cr-oxide-solid-activities.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: jackson-2005-ferrous-glass-multispectroscopy
   aliases: []
   citation: 'Jackson, W. E., Farges, F., Yeager, M., Mabrouk, P. A., Rossano, S., Waychunas, G. A., Solomon,
@@ -15433,6 +15928,64 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-04'
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: kassis-frischat-1981-mixed-alkali-vapor-pressures
+  aliases: []
+  citation: Kassis, N., and Frischat, G. H. (1981), Dampfdrucke von Glasschmelzen des Mischalkalisystems
+    Na2O-Rb2O-SiO2, Glastechnische Berichte, 54(4), 89-98.
+  doi: 10.34657/17394
+  report_number: null
+  identifier: 10.34657/17394
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kassis-frischat-1981-mixed-alkali-vapor-pressures.yaml
+    review_status: draft
+    rows: 4
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kassis-frischat-1981-mixed-alkali-vapor-pressures/kassis-frischat-1981-mixed-alkali-vapor-pressures.pdf
+      present: true
+      sha256: fe10e00552a543945d3108c9cca8a5721a69a374441675c2203e799e9e10a00b
+      matches_simulator: null
+    sidecar:
+      path: raw/kassis-frischat-1981-mixed-alkali-vapor-pressures/sidecar.yaml
+      present: true
+    text:
+      path: text/kassis-frischat-1981-mixed-alkali-vapor-pressures
+      exists: true
+      file_count: 50
+    tables:
+      path: tables/kassis-frischat-1981-mixed-alkali-vapor-pressures
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kassis-frischat-1981-mixed-alkali-vapor-pressures.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kassis-frischat-1981-mixed-alkali-vapor-pressures.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: kassis-frischat-1981-silicate-glass-vapour
   aliases: []
@@ -24725,7 +25278,7 @@ sources:
     text:
       path: text/lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
       exists: true
-      file_count: 1
+      file_count: 40
     tables:
       path: tables/lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
       exists: false
@@ -25788,6 +26341,64 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-05'
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: mathieu-2011-na2o-cms-solubility
+  aliases: []
+  citation: Mathieu, R., Libourel, G., Deloule, E., Tissandier, L., Rapin, C. & Podor, R. (2011). Na2O
+    solubility in CaO–MgO–SiO2 melts. Geochimica et Cosmochimica Acta, 75(2), 608–628.
+  doi: 10.1016/j.gca.2010.11.028
+  report_number: null
+  identifier: 10.1016/j.gca.2010.11.028
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/mathieu-2011-na2o-cms-solubility.yaml
+    review_status: draft
+    rows: 48
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/mathieu-2011-na2o-cms-solubility/mathieu-2011-na2o-cms-solubility.pdf
+      present: true
+      sha256: 27c7193e1b18de50118ba88dac4f7e74de6c08faea9f5d139fd0e531cda3c394
+      matches_simulator: null
+    sidecar:
+      path: raw/mathieu-2011-na2o-cms-solubility/sidecar.yaml
+      present: true
+    text:
+      path: text/mathieu-2011-na2o-cms-solubility
+      exists: true
+      file_count: 58
+    tables:
+      path: tables/mathieu-2011-na2o-cms-solubility
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/mathieu-2011-na2o-cms-solubility.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/mathieu-2011-na2o-cms-solubility.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: matousek-1998-silicate-vaporization-reactions
   aliases: []
@@ -28085,6 +28696,64 @@ sources:
       last_stage: acquired
       date: '2026-09-06'
     commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: nagahara-1993-sio2-evaporation-equilibrium-vacuum
+  aliases: []
+  citation: Nagahara, H. (1993). Evaporation in equilibrium, in vacuum, and in hydrogen gas. Lunar and
+    Planetary Science XXIV, 1045–1046.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/nagahara-1993-sio2-evaporation-equilibrium-vacuum.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/nagahara-1993-sio2-evaporation-equilibrium-vacuum.pdf
+      present: true
+      sha256: fc939bc42a5057c6581b26898d32ab8e2b9dc3f0c9881eccdb510d3fa6ccab31
+      matches_simulator: null
+    sidecar:
+      path: raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/sidecar.yaml
+      present: true
+    text:
+      path: text/nagahara-1993-sio2-evaporation-equilibrium-vacuum
+      exists: true
+      file_count: 10
+    tables:
+      path: tables/nagahara-1993-sio2-evaporation-equilibrium-vacuum
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/nagahara-1993-sio2-evaporation-equilibrium-vacuum.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/nagahara-1993-sio2-evaporation-equilibrium-vacuum.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: nagahara-2000-metsoc63-5166
   aliases: []
   citation: Nagahara, H. (2000). Chemical fractionation in the presence of ambient gas. 63rd Annual Meteoritical
@@ -30222,7 +30891,7 @@ sources:
   extracts:
   - path: data/literature/extracts/ozawa-2012-forsterite-vacuum-evaporation.yaml
     review_status: draft
-    rows: 5
+    rows: 90
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -35440,6 +36109,65 @@ sources:
       last_stage: null
       date: null
     commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: seetharaman-2013-cr-thin-film-volatilization
+  aliases: []
+  citation: Seetharaman, S., Albertsson, G. J., and Scheller, P. (2013), Studies of vaporization of chromium
+    from thin slag films at steelmaking temperatures in oxidizing atmosphere, Metallurgical and Materials
+    Transactions B.
+  doi: 10.1007/s11663-013-9904-y
+  report_number: null
+  identifier: 10.1007/s11663-013-9904-y
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/seetharaman-2013-cr-thin-film-volatilization.yaml
+    review_status: draft
+    rows: 7
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/seetharaman-2013-cr-thin-film-volatilization/seetharaman-2013-cr-thin-film-volatilization.pdf
+      present: true
+      sha256: 54af8cbe1976c92fb5f7d37e44dcd6be4d79ba77a6fb70d8a0c3b7550c67eae8
+      matches_simulator: null
+    sidecar:
+      path: raw/seetharaman-2013-cr-thin-film-volatilization/sidecar.yaml
+      present: true
+    text:
+      path: text/seetharaman-2013-cr-thin-film-volatilization
+      exists: true
+      file_count: 22
+    tables:
+      path: tables/seetharaman-2013-cr-thin-film-volatilization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/seetharaman-2013-cr-thin-film-volatilization.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/seetharaman-2013-cr-thin-film-volatilization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
   aliases: []
   citation: I. Seki, K. Nagata, T. Ashino, and J. Tanabe, Solubility of Calcium and Oxygen in Molten Iron
@@ -36083,6 +36811,65 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/shi-2024-cr-activity-slag-polymerisation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: shi-2025-mno-activity-eaf-spinel
+  aliases: []
+  citation: Shi, C., Liu, Y., Urata, K., Yasui, S., Abe, T. & Kobayashi, Y. (2025). Thermodynamic Investigation
+    of MnAl2O4 Spinel Precipitation Behavior in Manganese-Containing Slag Systems. ISIJ International
+    65(13), 2269–2274.
+  doi: 10.2355/isijinternational.ISIJINT-2025-334
+  report_number: null
+  identifier: 10.2355/isijinternational.ISIJINT-2025-334
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shi-2025-mno-activity-eaf-spinel.yaml
+    review_status: draft
+    rows: 42
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shi-2025-mno-activity-eaf-spinel/shi-2025-mno-activity-eaf-spinel.pdf
+      present: true
+      sha256: e3000261d0ae05c81124cef67a0f44c804905aca9d23eeb3455c256986121fdf
+      matches_simulator: null
+    sidecar:
+      path: raw/shi-2025-mno-activity-eaf-spinel/sidecar.yaml
+      present: true
+    text:
+      path: text/shi-2025-mno-activity-eaf-spinel
+      exists: true
+      file_count: 45
+    tables:
+      path: tables/shi-2025-mno-activity-eaf-spinel
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shi-2025-mno-activity-eaf-spinel.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shi-2025-mno-activity-eaf-spinel.yaml
       present: false
       error: null
       last_stage: null
@@ -41049,7 +41836,7 @@ sources:
     extract:
       path: extracts/shornikov-2025-ca-al-inclusion-evaporation.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/shornikov-2025-ca-al-inclusion-evaporation.yaml
       present: true
@@ -46316,7 +47103,7 @@ sources:
     extract:
       path: extracts/van-kooten-2020-lunar-outgassing.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/van-kooten-2020-lunar-outgassing.yaml
       present: true
@@ -47316,6 +48103,181 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/wang-2017-sodium-stannate-formation-emf.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: wang-seetharaman-2010-cr-oxidation-original
+  aliases: []
+  citation: Wang, L. and Seetharaman, S. (2010), Experimental studies on the oxidation states of chromium
+    oxides in slag systems, Metallurgical and Materials Transactions B 41, 946–954.
+  doi: 10.1007/s11663-010-9383-3
+  report_number: null
+  identifier: 10.1007/s11663-010-9383-3
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/wang-seetharaman-2010-cr-oxidation-original.yaml
+    review_status: draft
+    rows: 39
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/wang-seetharaman-2010-cr-oxidation-original/wang-seetharaman-2010-cr-oxidation-original.pdf
+      present: true
+      sha256: 1aadb4f173a5e735ccded48ee95301ef78701531d58a86d1166c867f390d6e28
+      matches_simulator: null
+    sidecar:
+      path: raw/wang-seetharaman-2010-cr-oxidation-original/sidecar.yaml
+      present: true
+    text:
+      path: text/wang-seetharaman-2010-cr-oxidation-original
+      exists: true
+      file_count: 35
+    tables:
+      path: tables/wang-seetharaman-2010-cr-oxidation-original
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/wang-seetharaman-2010-cr-oxidation-original.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/wang-seetharaman-2010-cr-oxidation-original.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: watne-1977-potassium-vapor-pressure-furnace
+  aliases: []
+  citation: Watne, Bruce Michael (December 1977). Development of a constant temperature, platinum, atomic
+    absorption furnace and its use in potassium vapor pressure measurements for MHD. PhD dissertation
+    in Chemistry, Montana State University.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/watne-1977-potassium-vapor-pressure-furnace.yaml
+    review_status: draft
+    rows: 96
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/watne-1977-potassium-vapor-pressure-furnace/watne-1977-potassium-vapor-pressure-furnace.pdf
+      present: true
+      sha256: 6489d93daa38794747a4fb04c3cb52e0bc044f819b79b44dfd99d1894ff7a572
+      matches_simulator: null
+    sidecar:
+      path: raw/watne-1977-potassium-vapor-pressure-furnace/sidecar.yaml
+      present: true
+    text:
+      path: text/watne-1977-potassium-vapor-pressure-furnace
+      exists: true
+      file_count: 84
+    tables:
+      path: tables/watne-1977-potassium-vapor-pressure-furnace
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/watne-1977-potassium-vapor-pressure-furnace.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/watne-1977-potassium-vapor-pressure-furnace.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: wetzel-2012-heidelberg-thesis
+  aliases: []
+  citation: Wetzel, S. (2012), Infrarotspektroskopische Untersuchung von Siliziumoxiden, Silikaten, deren
+    Wechselwirkung mit Metallinselfilmen sowie Dampfdruckmessungen an Siliziummonoxid, PhD thesis, Heidelberg.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/wetzel-2012-heidelberg-thesis.yaml
+    review_status: draft
+    rows: 4
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/wetzel-2012-heidelberg-thesis/wetzel-2012-heidelberg-thesis.pdf
+      present: true
+      sha256: 482b48bfc47c634ef3cf048418ea388f6a88d8aaa2e52f56513650864a7b37ff
+      matches_simulator: null
+    sidecar:
+      path: raw/wetzel-2012-heidelberg-thesis/sidecar.yaml
+      present: true
+    text:
+      path: text/wetzel-2012-heidelberg-thesis
+      exists: true
+      file_count: 23
+    tables:
+      path: tables/wetzel-2012-heidelberg-thesis
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/wetzel-2012-heidelberg-thesis.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/wetzel-2012-heidelberg-thesis.yaml
       present: false
       error: null
       last_stage: null
@@ -49655,6 +50617,65 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/zaitsev-2000-sodium-silicate-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
+- source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  aliases: []
+  citation: Zaitsev, A. I., Arutyunyan, N. A., Shaposhnikov, N. G., Zaitseva, N. E., and Burtsev, V. T.
+    (2006). Experimental Study and Modeling of the Thermodynamic Properties of Magnesium Silicates. Russian
+    Journal of Physical Chemistry, 80(3), 335–343.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
+    review_status: draft
+    rows: 25
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/zaitsev-2006-magnesium-silicate-thermodynamics/zaitsev-2006-magnesium-silicate-thermodynamics.pdf
+      present: true
+      sha256: 8d24682ff38e798c1e67ba24d6be297b4bfcd2433136af89a837d75824c54759
+      matches_simulator: null
+    sidecar:
+      path: raw/zaitsev-2006-magnesium-silicate-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/zaitsev-2006-magnesium-silicate-thermodynamics
+      exists: true
+      file_count: 42
+    tables:
+      path: tables/zaitsev-2006-magnesium-silicate-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
       present: false
       error: null
       last_stage: null

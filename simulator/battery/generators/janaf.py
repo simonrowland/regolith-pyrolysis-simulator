@@ -12,7 +12,7 @@ from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from fractions import Fraction
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -59,6 +59,7 @@ from simulator.battery.records import (
     State,
     Uncertainty,
     Value,
+    phase_token,
 )
 from simulator.reference_data.janaf import (
     COMPILATION_ROLE,
@@ -77,6 +78,8 @@ from simulator.reference_data.janaf import (
     _is_nist_typed_absent_enthalpy_cell,
     load_manifest,
     load_table_document,
+    table_delta_fh_298_uncertainty_for_table_id,
+    table_fusion_transition_for_table_id,
     table_printed_temperatures,
 )
 from tools.harvest_janaf_compilation import parse_table
@@ -335,6 +338,27 @@ class _FormationBasis:
             else:
                 parts.append(f"{table_id}-{lower_line}-{upper_line}")
         return "formation-ref-" + "-".join(parts)
+
+
+@dataclass(frozen=True)
+class JANAFLiquidElementReference:
+    """JANAF liquid-element ΔfG relative to its reference state at one T."""
+
+    species: Species
+    delta_fG_kJ_per_mol: Decimal
+    table_id: str
+    table_upper_K: Decimal
+    extrapolation_interval_K: tuple[Decimal, Decimal] | None = None
+
+
+@dataclass(frozen=True)
+class _CondensedElementFormationBasis:
+    reaction: State[Reaction]
+    formation_elements: State[tuple[tuple[str, Species], ...]]
+    locator_note: str
+    extrapolated_elements: tuple[
+        tuple[str, str, Decimal, Decimal], ...
+    ] = ()
 
 
 def _published_decimal(token: object) -> Decimal | None:
@@ -2596,10 +2620,18 @@ _FUSION_TABLES = {
     # High cristobalite is the high-temperature solid branch immediately
     # below the accepted SiO2 melting point; the quartz table is metastable.
     "SiO2": ("O-035", "O-038"),
+    # Cr-014 (cr) and Cr-015 (l). The printed CRYSTAL <--> LIQUID row is 2603 K.
+    "Cr2O3": ("Cr-014", "Cr-015"),
 }
 
 _JANAF_POLYMORPH_BY_TABLE = {
-    **{"Ca-027": Polymorph.LIME, "Mg-008": Polymorph.PERICLASE},
+    **{
+        "Ca-027": Polymorph.LIME,
+        "Mg-008": Polymorph.PERICLASE,
+        # Cr-014's title does not print a crystal qualifier, so the dictionary
+        # row that names hematite for Fe-030 does not exist for eskolaite.
+        "Cr-014": Polymorph.ESKOLAITE,
+    },
     **{
         table_id: JANAF_CRYSTAL_DICTIONARY[key]
         for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
@@ -2797,6 +2829,135 @@ def _janaf_stable_fusion_polymorph(
     )
 
 
+@dataclass(frozen=True)
+class JANAFSolidStabilityTransition:
+    """Temperature where the lowest-G JANAF crystal changes identity.
+
+    ``stable_below`` is the crystal selected just below the crossing and
+    ``stable_above`` the crystal selected just above it. A Gibbs crossing of
+    two crystals that are both above a third is not in this list. The
+    crystal/liquid melting crossing is not here either; fusion owns that
+    boundary.
+    """
+
+    temperature_K: Decimal
+    stable_below: JANAFCrystalGibbs
+    stable_above: JANAFCrystalGibbs
+
+
+def _crystal_gibbs_overlap(
+    left_points: tuple[tuple[Decimal, Decimal], ...],
+    right_points: tuple[tuple[Decimal, Decimal], ...],
+    left_missing: tuple[Decimal, ...],
+    right_missing: tuple[Decimal, ...],
+) -> tuple[Decimal, ...]:
+    overlap = sorted(
+        {t for t, _ in left_points if right_points[0][0] <= t <= right_points[-1][0]}
+        | {t for t, _ in right_points if left_points[0][0] <= t <= left_points[-1][0]}
+    )
+    return tuple(
+        temperature
+        for temperature in overlap
+        if _missing_node_for_interpolation(left_points, left_missing, temperature)
+        is None
+        and _missing_node_for_interpolation(right_points, right_missing, temperature)
+        is None
+    )
+
+
+def _stability_probe_width(
+    temperature_K: Decimal, crossings: Sequence[Decimal]
+) -> Decimal:
+    """Stay on one side of this crossing and short of the next one.
+
+    One kelvin is inside a JANAF linear segment (nodes are 100 K apart) and
+    is only a probe of tabulated G, not a physics margin. A closer neighbouring
+    crossing shrinks the probe so the two sides are not swapped.
+    """
+
+    gaps = [
+        abs(temperature_K - other)
+        for other in crossings
+        if other != temperature_K and abs(temperature_K - other) > 0
+    ]
+    if not gaps:
+        return Decimal(1)
+    return min(Decimal(1), min(gaps) / Decimal(10))
+
+
+@lru_cache(maxsize=None)
+def janaf_solid_stability_transitions(
+    oxide: str,
+) -> tuple[JANAFSolidStabilityTransition, ...]:
+    """Solid-solid temperatures where the stable JANAF crystal changes.
+
+    Pairwise formation-G crossings come from the crystal tables
+    ``_janaf_stable_crystal_set`` reads. A crossing is kept only when the
+    lowest-G polymorph on the two sides differs. Melting is a crystal/liquid
+    crossing and is not returned.
+    """
+
+    tables: list[tuple[str, Polymorph]] = []
+    for formula, table_id, polymorph in _janaf_pure_solid_table_index():
+        if formula != oxide or polymorph is None:
+            continue
+        tables.append((table_id, polymorph))
+    if len(tables) < 2:
+        return ()
+
+    loaded: list[
+        tuple[str, Polymorph, tuple[tuple[Decimal, Decimal], ...], tuple[Decimal, ...]]
+    ] = []
+    for table_id, polymorph in tables:
+        try:
+            points, _digest = _fusion_table_points(table_id)
+            missing = _fusion_missing_gibbs_temperatures(table_id)
+        except (KeyError, ValueError) as exc:
+            raise JANAFFusionPolymorphUnavailable(
+                f"{table_id}: stability data unavailable for {oxide}: {exc}"
+            ) from exc
+        loaded.append((table_id, polymorph, points, missing))
+
+    crossings: list[Decimal] = []
+    for index, (table_id, _polymorph, points, missing) in enumerate(loaded):
+        for other_id, _other_polymorph, other_points, other_missing in loaded[
+            index + 1 :
+        ]:
+            grid = _crystal_gibbs_overlap(points, other_points, missing, other_missing)
+            if len(grid) < 2:
+                continue
+
+            def difference(
+                temperature: Decimal,
+                left: tuple[tuple[Decimal, Decimal], ...] = points,
+                right: tuple[tuple[Decimal, Decimal], ...] = other_points,
+            ) -> Decimal:
+                return _interpolate_formation_gibbs(
+                    left, temperature
+                ) - _interpolate_formation_gibbs(right, temperature)
+
+            for root in _bracketed_signed_roots(difference, grid):
+                if root not in crossings:
+                    crossings.append(root)
+    crossings.sort()
+
+    transitions: list[JANAFSolidStabilityTransition] = []
+    for temperature_K in crossings:
+        probe = _stability_probe_width(temperature_K, crossings)
+        below = _janaf_stable_crystal_set(oxide, temperature_K - probe)
+        above = _janaf_stable_crystal_set(oxide, temperature_K + probe)
+        if below.selected.polymorph is above.selected.polymorph:
+            continue
+        transitions.append(
+            JANAFSolidStabilityTransition(
+                temperature_K=temperature_K,
+                stable_below=below.selected,
+                stable_above=above.selected,
+            )
+        )
+    return tuple(transitions)
+
+
 # The source hashes identify the JANAF text; pin the extracted temperature-node
 # sets too so a dropped compiled row cannot silently widen interpolation.
 _FUSION_NODE_SET_SHA256 = {
@@ -2811,12 +2972,17 @@ _FUSION_NODE_SET_SHA256 = {
     "Mg-009": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
     "O-035": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
     "O-038": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
+    # Cr-014 shares the 0–3000 K crystal node set; Cr-015 the 0–4500 K liquid set.
+    "Cr-014": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
+    "Cr-015": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
 }
 _ACCEPTED_MELTING_K = {
     "CaO": Decimal("2886"),
     "Al2O3": Decimal("2327"),
     "MgO": Decimal("3100"),
     "SiO2": Decimal("1986"),
+    # JANAF Cr-014/Cr-015 print CRYSTAL <--> LIQUID at 2603 K.
+    "Cr2O3": Decimal("2603"),
 }
 
 
@@ -3017,11 +3183,15 @@ def _fusion_missing_gibbs_temperatures(table_id: str) -> tuple[Decimal, ...]:
 
 
 def _interpolate_formation_gibbs(
-    points: tuple[tuple[Decimal, Decimal], ...], temperature_K: Decimal
+    points: tuple[tuple[Decimal, Decimal], ...],
+    temperature_K: Decimal,
+    missing_temperatures: tuple[Decimal, ...] = (),
 ) -> Decimal:
     if temperature_K < points[0][0] or temperature_K > points[-1][0]:
         raise ValueError(f"{temperature_K} K is outside the JANAF table range")
-    missing_node = _missing_node_for_interpolation(points, (), temperature_K)
+    missing_node = _missing_node_for_interpolation(
+        points, missing_temperatures, temperature_K
+    )
     if missing_node is not None:
         raise ValueError(
             f"JANAF formation Gibbs interpolation spans missing grid node "
@@ -3154,6 +3324,427 @@ def _janaf_gas_table_ids() -> dict[str, tuple[str, ...]]:
     return {formula: tuple(table_ids) for formula, table_ids in grouped.items()}
 
 
+@lru_cache(maxsize=1)
+def _janaf_liquid_element_table_ids() -> dict[str, tuple[str, ...]]:
+    """Neutral elemental liquid table ids keyed by element symbol."""
+
+    grouped: dict[str, list[str]] = {}
+    for entry in load_manifest().get("entries") or ():
+        if not isinstance(entry, Mapping) or entry.get("charge") not in (0, "0"):
+            continue
+        formula = str(entry.get("formula_normalised") or "")
+        table_id = str(entry.get("table_id") or "")
+        if (
+            formula
+            and table_id
+            and entry.get("phase") == "l"
+            and formula in ELEMENT_SYMBOLS
+        ):
+            grouped.setdefault(formula, []).append(table_id)
+    return {element: tuple(table_ids) for element, table_ids in grouped.items()}
+
+
+def _exact_janaf_property_value(
+    table_id: str, property_name: str, temperature_K: Decimal
+) -> Decimal:
+    points, _digest, missing = _fusion_property_points(table_id, property_name)
+    for temperature, value in points:
+        if temperature == temperature_K:
+            return value
+    if temperature_K in missing:
+        raise ValueError(
+            f"{table_id}: JANAF {property_name} is missing at {temperature_K} K"
+        )
+    raise ValueError(
+        f"{table_id}: JANAF {property_name} has no printed node at "
+        f"{temperature_K} K"
+    )
+
+
+@lru_cache(maxsize=None)
+def janaf_liquid_element_reference_at_temperature(
+    element: str, temperature_K: Decimal
+) -> JANAFLiquidElementReference:
+    """Return ``G(element,l) - G(element, JANAF ref)`` in kJ/mol.
+
+    Within the liquid table this is its printed formation-Gibbs series. If
+    the requested T is above that series, the reference schedule must be gas
+    at both the last liquid node and the requested T. The tail then integrates
+    the linear Cp(l)-Cp(g) slope measured over the last 100 K.
+    """
+
+    temperature_K = Decimal(temperature_K)
+    if temperature_K <= 0 or not temperature_K.is_finite():
+        raise ValueError("JANAF liquid-element reference requires positive finite T")
+    table_ids = _janaf_liquid_element_table_ids().get(element, ())
+    if not table_ids:
+        raise ValueError(f"no JANAF liquid-element table for {element}")
+    if len(table_ids) != 1:
+        raise ValueError(
+            f"ambiguous JANAF liquid-element tables for {element}: "
+            f"{', '.join(table_ids)}"
+        )
+    table_id = table_ids[0]
+    gibbs_points, _digest, gibbs_missing = _fusion_property_points(
+        table_id, "formation_gibbs_energy"
+    )
+    lower_K, upper_K = gibbs_points[0][0], gibbs_points[-1][0]
+    liquid_species = make_species(element, State.of(Phase.L))
+    if lower_K <= temperature_K <= upper_K:
+        delta_g = _interpolate_formation_gibbs(
+            gibbs_points, temperature_K, gibbs_missing
+        )
+        return JANAFLiquidElementReference(
+            species=liquid_species,
+            delta_fG_kJ_per_mol=delta_g,
+            table_id=table_id,
+            table_upper_K=upper_K,
+        )
+
+    if temperature_K < lower_K:
+        raise ValueError(
+            f"{temperature_K} K is below {table_id} liquid range "
+            f"{lower_K}–{upper_K} K"
+        )
+
+    reference_at_tail = _element_reference_state(element, upper_K)[0]
+    reference_at_temperature = _element_reference_state(element, temperature_K)[0]
+    if (
+        not reference_at_tail.is_value
+        or phase_token(reference_at_tail.value) is not Phase.G
+        or not reference_at_temperature.is_value
+        or phase_token(reference_at_temperature.value) is not Phase.G
+    ):
+        raise ValueError(
+            f"{element} JANAF reference is not a located gas at the liquid-table "
+            f"end {upper_K} K and requested {temperature_K} K"
+        )
+    gas_ids = _janaf_gas_table_ids().get(element, ())
+    if len(gas_ids) != 1:
+        raise ValueError(
+            f"expected one JANAF gas table for {element}, found {gas_ids}"
+        )
+    gas_table_id = gas_ids[0]
+    tail_start_K = upper_K - Decimal(100)
+    if tail_start_K < lower_K:
+        raise ValueError(
+            f"{table_id} has no complete final 100 K liquid Cp interval"
+        )
+
+    liquid_g0 = _interpolate_formation_gibbs(
+        gibbs_points, upper_K, gibbs_missing
+    )
+    gas_g_points, _digest, gas_g_missing = _fusion_property_points(
+        gas_table_id, "formation_gibbs_energy"
+    )
+    gas_g0 = _interpolate_formation_gibbs(
+        gas_g_points, upper_K, gas_g_missing
+    )
+    liquid_s0 = _exact_janaf_property_value(table_id, "entropy", upper_K)
+    gas_s0 = _exact_janaf_property_value(gas_table_id, "entropy", upper_K)
+    liquid_cp0 = _exact_janaf_property_value(table_id, "heat_capacity", upper_K)
+    gas_cp0 = _exact_janaf_property_value(gas_table_id, "heat_capacity", upper_K)
+    liquid_cp_start = _exact_janaf_property_value(
+        table_id, "heat_capacity", tail_start_K
+    )
+    gas_cp_start = _exact_janaf_property_value(
+        gas_table_id, "heat_capacity", tail_start_K
+    )
+
+    # Premise: after the liquid table ends, extrapolate only its Cp difference
+    # from the JANAF gas reference over the final printed 100 K. Algebra:
+    # ΔCp(T)=c0+m(T−T0), ΔH=∫ΔCp dT, ΔS=∫ΔCp/T dT, and
+    # ΔG(T)=ΔG0−ΔS0(T−T0)+ΔH−TΔS. Units: ΔG0[kJ/mol]×1000,
+    # Cp[J/(mol·K)], T[K], so the result is J/mol before ÷1000. Mg at
+    # 2173 K yields G(Mg,l)−G(Mg,g) ≈ 72.80 kJ/mol from Mg-003/Mg-005.
+    delta_t = temperature_K - upper_K
+    delta_cp0 = liquid_cp0 - gas_cp0
+    delta_cp_start = liquid_cp_start - gas_cp_start
+    cp_slope = (delta_cp0 - delta_cp_start) / Decimal(100)
+    delta_h = delta_cp0 * delta_t + cp_slope * delta_t**2 / Decimal(2)
+    log_t_ratio = (temperature_K / upper_K).ln()
+    delta_s = (
+        delta_cp0 * log_t_ratio
+        + cp_slope * (delta_t - upper_K * log_t_ratio)
+    )
+    delta_g0_j_per_mol = (liquid_g0 - gas_g0) * Decimal(1000)
+    delta_s0 = liquid_s0 - gas_s0
+    delta_g_j_per_mol = (
+        delta_g0_j_per_mol
+        - delta_s0 * delta_t
+        + delta_h
+        - temperature_K * delta_s
+    )
+    return JANAFLiquidElementReference(
+        species=liquid_species,
+        delta_fG_kJ_per_mol=delta_g_j_per_mol / Decimal(1000),
+        table_id=table_id,
+        table_upper_K=upper_K,
+        extrapolation_interval_K=(tail_start_K, upper_K),
+    )
+
+
+def _formation_basis_with_condensed_elements(
+    formula: str, product: Species, temperature_K: Decimal
+) -> _CondensedElementFormationBasis:
+    composition = formula_composition(formula)
+    if composition is None:
+        raise ValueError(f"JANAF formula {formula!r} has no parsed composition")
+    terms = [ReactionTerm(product, Fraction(1))]
+    formation_elements: list[tuple[str, Species]] = []
+    notes: list[str] = []
+    extrapolated: list[tuple[str, str, Decimal, Decimal]] = []
+    for element, amount in composition:
+        if element == "O":
+            state, atom_count, locator_key, locator_note, _convention = (
+                _element_reference_state(element, temperature_K)
+            )
+            if not state.is_value or atom_count is None:
+                raise ValueError(state.reason or locator_note)
+            reference_species = state.value
+            table_id = locator_key[1]
+            notes.append(f"{element}: {locator_note}")
+        else:
+            reference = janaf_liquid_element_reference_at_temperature(
+                element, temperature_K
+            )
+            reference_species = reference.species
+            atom_count = Fraction(1)
+            notes.append(
+                f"{element}: {reference.table_id} liquid ΔfG="
+                f"{reference.delta_fG_kJ_per_mol} kJ/mol"
+            )
+            if reference.extrapolation_interval_K is not None:
+                low_K, high_K = reference.extrapolation_interval_K
+                extrapolated.append((element, reference.table_id, low_K, high_K))
+                notes[-1] += (
+                    f"; Cp(l)-Cp(g) extrapolated from {low_K}–{high_K} K"
+                )
+        formation_elements.append((element, reference_species))
+        terms.append(
+            ReactionTerm(
+                reference_species,
+                -Fraction(str(amount)) / atom_count,
+            )
+        )
+    return _CondensedElementFormationBasis(
+        reaction=State.of(Reaction(tuple(terms))),
+        formation_elements=State.of(tuple(formation_elements)),
+        locator_note="JANAF condensed-element references: " + "; ".join(notes),
+        extrapolated_elements=tuple(extrapolated),
+    )
+
+
+def janaf_condensed_element_gas_delta_fG_kJ_per_mol(
+    element: str, temperature_K: Decimal
+) -> Decimal:
+    """JANAF gas-atom ΔfG on a liquid-element frame, in kJ/mol."""
+
+    composition = formula_composition(element)
+    if (
+        composition is None
+        or len(composition) != 1
+        or composition[0][0] != element
+        or composition[0][1] != 1
+        or element == "O2"
+    ):
+        raise ValueError(f"{element!r} is not a diagnostic gas-element formula")
+    gas_g = _janaf_gas_formation_gibbs_J_per_mol(element, temperature_K) / Decimal(1000)
+    liquid_reference = (
+        Decimal(0)
+        if element == "O"
+        else janaf_liquid_element_reference_at_temperature(
+            element, temperature_K
+        ).delta_fG_kJ_per_mol
+    )
+    return gas_g - liquid_reference
+
+
+def _janaf_second_difference_interpolation_bound(
+    points: tuple[tuple[Decimal, Decimal], ...], temperature_K: Decimal
+) -> Decimal | None:
+    """Bound chord interpolation from neighboring JANAF second differences."""
+
+    if any(temperature == temperature_K for temperature, _ in points):
+        return Decimal(0)
+    bracket_index = next(
+        (
+            index
+            for index, (left, right) in enumerate(zip(points, points[1:]))
+            if left[0] < temperature_K < right[0]
+        ),
+        None,
+    )
+    if bracket_index is None:
+        return None
+    left, right = points[bracket_index : bracket_index + 2]
+    bounds: list[Decimal] = []
+    for start in (bracket_index - 1, bracket_index):
+        triple = points[start : start + 3]
+        if len(triple) != 3:
+            continue
+        (x0, y0), (x1, y1), (x2, y2) = triple
+        # The local quadratic correction to the bracket chord is the second
+        # divided difference times (T−x_left)(T−x_right). Take the larger
+        # estimate from the adjacent triples that contain the bracket.
+        divided_second = (
+            (y2 - y1) / (x2 - x1) - (y1 - y0) / (x1 - x0)
+        ) / (x2 - x0)
+        bounds.append(
+            abs(divided_second * (temperature_K - left[0]) * (temperature_K - right[0]))
+        )
+    return max(bounds) if bounds else None
+
+
+def janaf_condensed_element_gas_diagnostic_uncertainty_terms(
+    element: str, temperature_K: Decimal
+) -> dict[str, Decimal | str | bool | None]:
+    """Return JANAF uncertainty components for a gas-atom frame diagnostic.
+
+    Every returned numeric term is in kJ/mol. Missing printed uncertainties
+    and unavailable interpolation bounds stay ``None`` so callers cannot
+    mistake unavailable evidence for a zero-width bound.
+    """
+
+    temperature_K = Decimal(temperature_K)
+    terms: dict[str, Decimal | str | bool | None] = {
+        "gas_delta_fH_kJ_per_mol": None,
+        "fusion_transition_kJ_per_mol": None,
+        "gas_interpolation_kJ_per_mol": None,
+        "liquid_interpolation_kJ_per_mol": None,
+        "liquid_extrapolation_kJ_per_mol": None,
+        "gas_table_id": None,
+        "liquid_table_id": None,
+        "extrapolated": False,
+        "unavailable_reason": None,
+    }
+    reasons: list[str] = []
+
+    gas_table_ids = _janaf_gas_table_ids().get(element, ())
+    if len(gas_table_ids) != 1:
+        reasons.append(
+            f"expected one JANAF gas table for {element}, found {len(gas_table_ids)}"
+        )
+        terms["unavailable_reason"] = "; ".join(reasons)
+        return terms
+    gas_table_id = gas_table_ids[0]
+    terms["gas_table_id"] = gas_table_id
+    gas_delta_fH = table_delta_fh_298_uncertainty_for_table_id(gas_table_id)
+    if gas_delta_fH is None:
+        reasons.append(f"{gas_table_id} has no printed ΔfH°(298.15 K) uncertainty")
+    else:
+        terms["gas_delta_fH_kJ_per_mol"] = gas_delta_fH
+
+    gas_points, _digest, gas_missing = _fusion_property_points(
+        gas_table_id, "formation_gibbs_energy"
+    )
+    if _missing_node_for_interpolation(gas_points, gas_missing, temperature_K):
+        reasons.append(f"{gas_table_id} interpolation spans a missing JANAF node")
+    else:
+        terms["gas_interpolation_kJ_per_mol"] = (
+            _janaf_second_difference_interpolation_bound(gas_points, temperature_K)
+        )
+        if terms["gas_interpolation_kJ_per_mol"] is None:
+            reasons.append(f"{gas_table_id} interpolation bound is unavailable")
+
+    if element == "O":
+        terms["fusion_transition_kJ_per_mol"] = Decimal(0)
+        terms["liquid_interpolation_kJ_per_mol"] = Decimal(0)
+        terms["liquid_extrapolation_kJ_per_mol"] = Decimal(0)
+    else:
+        liquid_table_ids = _janaf_liquid_element_table_ids().get(element, ())
+        if len(liquid_table_ids) != 1:
+            reasons.append(
+                f"expected one JANAF liquid table for {element}, "
+                f"found {len(liquid_table_ids)}"
+            )
+        else:
+            liquid_table_id = liquid_table_ids[0]
+            terms["liquid_table_id"] = liquid_table_id
+            liquid_points, _digest, liquid_missing = _fusion_property_points(
+                liquid_table_id, "formation_gibbs_energy"
+            )
+            liquid_upper_K = liquid_points[-1][0]
+            liquid_reference = janaf_liquid_element_reference_at_temperature(
+                element, temperature_K
+            )
+            if liquid_reference.extrapolation_interval_K is not None:
+                terms["extrapolated"] = True
+                terms["liquid_interpolation_kJ_per_mol"] = Decimal(0)
+                # Assume an unmodelled constant Cp(l) error of 10% at the last
+                # liquid node Te. Then dH=dCp(T−Te) and dS=dCp ln(T/Te), so
+                # |dG|=dCp[T ln(T/Te)−(T−Te)]. Cp is J mol^-1 K^-1 and T is K,
+                # giving J/mol; divide by 1000 for kJ/mol. At 2973 K the
+                # bound is about 0.14 kJ/mol for Ca from 2500 K and 0.7 kJ/mol
+                # for Mg from 2000 K, matching the d-351 sanity checks.
+                cp_liquid = _exact_janaf_property_value(
+                    liquid_table_id, "heat_capacity", liquid_upper_K
+                )
+                delta_t = temperature_K - liquid_upper_K
+                d_cp = cp_liquid * Decimal("0.10")
+                extrapolation_J = d_cp * (
+                    temperature_K * (temperature_K / liquid_upper_K).ln()
+                    - delta_t
+                )
+                terms["liquid_extrapolation_kJ_per_mol"] = (
+                    abs(extrapolation_J) / Decimal(1000)
+                )
+            else:
+                terms["liquid_extrapolation_kJ_per_mol"] = Decimal(0)
+                if _missing_node_for_interpolation(
+                    liquid_points, liquid_missing, temperature_K
+                ):
+                    reasons.append(
+                        f"{liquid_table_id} interpolation spans a missing JANAF node"
+                    )
+                else:
+                    terms["liquid_interpolation_kJ_per_mol"] = (
+                        _janaf_second_difference_interpolation_bound(
+                            liquid_points, temperature_K
+                        )
+                    )
+                    if terms["liquid_interpolation_kJ_per_mol"] is None:
+                        reasons.append(
+                            f"{liquid_table_id} interpolation bound is unavailable"
+                        )
+
+            reference_state = _element_reference_state(element, temperature_K)[0]
+            if not reference_state.is_value:
+                terms["fusion_transition_kJ_per_mol"] = None
+                reasons.append(
+                    f"{element} JANAF reference state is unavailable at "
+                    f"{temperature_K} K"
+                )
+            elif phase_token(reference_state.value) in {Phase.CR, Phase.G}:
+                transition = table_fusion_transition_for_table_id(liquid_table_id)
+                if transition is None:
+                    terms["fusion_transition_kJ_per_mol"] = None
+                    reasons.append(
+                        f"{liquid_table_id} has no printed fusion transition "
+                        "uncertainty"
+                    )
+                else:
+                    tfus = transition["temperature_K"]
+                    dtfus = transition["temperature_uncertainty_K"]
+                    dfus_h = transition["enthalpy_kJ_per_mol"]
+                    ddfus_h = transition["enthalpy_uncertainty_kJ_per_mol"]
+                    # First-order propagation of ΔfusG=ΔfusH(1−T/Tfus):
+                    # dG = |1−T/Tfus| dH + |ΔfusH*T/Tfus²| dTfus, with
+                    # both terms in kJ/mol. For a gas reference, the gas
+                    # table's printed ΔfH uncertainty above is also required
+                    # because G(l)−G(g) includes vaporisation.
+                    terms["fusion_transition_kJ_per_mol"] = (
+                        abs((Decimal(1) - temperature_K / tfus) * ddfus_h)
+                        + abs(dfus_h * temperature_K / (tfus**2) * dtfus)
+                    )
+            else:
+                terms["fusion_transition_kJ_per_mol"] = Decimal(0)
+
+    if reasons:
+        terms["unavailable_reason"] = "; ".join(reasons)
+    return terms
+
+
 @lru_cache(maxsize=None)
 def _cached_table_property_points(
     table_id: str, property_name: str
@@ -3238,6 +3829,52 @@ def janaf_tabulated_gas_thermo(
     )
 
 
+def _bracketed_signed_roots(
+    difference: Callable[[Decimal], Decimal],
+    grid: Sequence[Decimal],
+) -> tuple[Decimal, ...]:
+    """Linear roots of ``difference`` on a sorted grid, including endpoint zeros.
+
+    The same bracket the crystal/liquid fusion crossing uses: a sign change
+    is interpolated, and a grid node where the difference is already zero is
+    itself a root. This is table arithmetic, not a second stability rule.
+    """
+
+    roots: list[Decimal] = []
+    for left, right in zip(grid, grid[1:]):
+        d_left = difference(left)
+        d_right = difference(right)
+        if d_left == 0:
+            roots.append(left)
+        elif d_left * d_right < 0:
+            roots.append(left - d_left * (right - left) / (d_right - d_left))
+    if grid and difference(grid[-1]) == 0:
+        roots.append(grid[-1])
+    return tuple(roots)
+def _janaf_gas_formation_gibbs_J_per_mol(
+    formula: str, temperature_K: Decimal
+) -> Decimal:
+    """Hash-checked JANAF ΔfG°(T) for the unique neutral gas table."""
+
+    table_ids = _janaf_gas_table_ids().get(formula, ())
+    if not table_ids:
+        raise ValueError(f"no JANAF gas table for {formula}")
+    if len(table_ids) != 1:
+        raise ValueError(
+            f"ambiguous JANAF gas tables for {formula}: {', '.join(table_ids)}"
+        )
+    table_id = table_ids[0]
+    points, _digest, missing = _fusion_property_points(
+        table_id, "formation_gibbs_energy"
+    )
+    # JANAF cells are kJ/mol; convert the owning table result to J/mol for
+    # reaction ΔG/(R T) calculations. Missing nodes and out-of-range T refuse.
+    return (
+        _interpolate_formation_gibbs(points, Decimal(temperature_K), missing)
+        * 1000
+    )
+
+
 def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy:
     """Read ΔG_fus and its own cr/l table crossing from hash-checked JANAF rows."""
 
@@ -3290,15 +3927,7 @@ def _janaf_fusion_energy_for_pair(
             liquid, t
         ) - _interpolate_formation_gibbs(crystal, t)
 
-    crossings: list[Decimal] = []
-    for left, right in zip(overlap, overlap[1:]):
-        d_left, d_right = difference(left), difference(right)
-        if d_left == 0:
-            crossings.append(left)
-        elif d_left * d_right < 0:
-            crossings.append(left - d_left * (right - left) / (d_right - d_left))
-    if overlap and difference(overlap[-1]) == 0:
-        crossings.append(overlap[-1])
+    crossings = _bracketed_signed_roots(difference, overlap)
     if len(crossings) != 1:
         raise ValueError(f"{oxide}: expected one JANAF cr/l crossing, got {crossings}")
     tm = crossings[0]

@@ -6,7 +6,6 @@ import hashlib
 import importlib.util
 import subprocess
 import sys
-from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -408,14 +407,44 @@ def test_nasa_cea_private_locator_backlog():
 COMMITTED_STATUS = REPO_ROOT / "data" / "literature" / "SOURCE_STATUS.yaml"
 
 
-def test_committed_source_status_counts_match_rows():
-    status = builder.load_yaml(COMMITTED_STATUS)
-    rows = status["sources"]
-    row_counts = Counter(row["stage"] for row in rows)
-    by_stage = dict(row_counts)
+def test_repo_source_status_counts_match_rows() -> None:
+    status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
+    by_stage = {
+        stage: sum(row["stage"] == stage for row in status["sources"])
+        for stage in builder.STATUS_STAGES
+    }
+    assert status["counts"] == {
+        "sources": len(status["sources"]),
+        "by_stage": by_stage,
+    }
 
-    assert status["counts"]["sources"] == len(rows)
-    assert status["counts"]["by_stage"] == by_stage
+
+def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
+    index = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
+    counts = index["counts"]
+    # Index base is landing batch f3d5d78d5 (783/781/781/84), itself green
+    # 91061cdad (775/773/773/83) plus that batch's index delta. Stack-owned
+    # index deltas are unchanged.
+    assert counts["sources"] == 783 + 18  # landing 783 + stack delta 18
+    assert counts["extracts"] == 781 + 18  # landing 781 + stack delta 18
+    assert counts["extracts_without_pdf"] == 781 + 18  # landing 781 + stack delta 18
+    assert counts["alias_groups_needing_resolution"] == 84 + 2  # landing 84 + stack delta 2
+
+    status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
+    # Status rows are landing f3d5d78d5 (2318 sources, in_progress 256).
+    # Landing is green 91061cdad (2311 / in_progress 249) plus seven
+    # in_progress sources. Stack 4's header had counted only green plus its
+    # delta and left those seven rows uncounted.
+    assert status["counts"]["sources"] == 2318 + 16  # landing 2318 + stack delta 16
+    assert status["counts"]["by_stage"] == {
+        "located": 209 + 0,  # landing 209 + stack delta 0
+        "inbox": 1261 - 12,  # landing 1261 + stack delta -12
+        "in_progress": 256 + 2,  # landing 256 + stack delta 2
+        "ingested_partial": 145 + 10,  # landing 145 + stack delta 10
+        "ingested_complete": 130 + 6,  # landing 130 + stack delta 6
+        "wired": 0 + 0,  # neither side has a wired row
+        "unknown": 317 + 10,  # landing 317 + stack delta 10
+    }
 
 
 def _status_tree(tmp_path: Path, monkeypatch, *, git_corpus: bool = False) -> tuple[Path, Path]:

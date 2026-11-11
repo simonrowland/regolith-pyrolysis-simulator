@@ -17,7 +17,7 @@ Reductions (derivation in simulator/battery/migrate.py, b-686 block):
 from __future__ import annotations
 
 import copy
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +25,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import (
+    Authority,
     EvidenceClass,
     IdentityEqualKind,
     NoticeKind,
@@ -34,6 +35,8 @@ from simulator.battery.enums import (
 from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
+    _band_text,
+    _log_fO2_to_pa,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     fe3_fe2_ratio_reduction,
@@ -41,6 +44,7 @@ from simulator.battery.migrate import (
     oxide_molar_mass,
     select_declared_source,
 )
+from simulator.chemistry.fo2_buffers import evaluate_buffer
 from simulator.battery.records import Evidence, Locator, State
 from tests.battery.factories import migrate_one_extract
 
@@ -565,6 +569,29 @@ def test_valence_rows_stamp_printed_po2_and_absolute_log(tmp_path: Path) -> None
         and "1450" in (notice.band or "")
         for notice in delta_iw.notices
     )
+    pressure = delta_iw.identity.total_pressure_Pa
+    pressure_bar = (
+        pressure.value / Decimal("100000")
+        if pressure is not None and pressure.is_value and pressure.value > 0
+        else None
+    )
+    evaluation = evaluate_buffer("IW", Decimal("1523.15"), pressure_bar=pressure_bar)
+    assert delta_iw.identity.fO2_Pa.value == _log_fO2_to_pa(
+        evaluation.log10_fO2_bar + Decimal("-1")
+    )
+    converted = [
+        notice
+        for notice in delta_iw.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    ]
+    assert len(converted) == 1
+    assert converted[0].authority is Authority.EXTRAPOLATED
+    assert converted[0].band == _band_text(evaluation.band_dex)
+    assert "buffer=IW" in converted[0].reason
+    assert "offset=-1" in converted[0].reason
+    assert "calibration=oneill_1988_ammin_73_eq11" in converted[0].reason
+    assert "T_K=1523.15" in converted[0].reason
+    assert "authority=extrapolated" in converted[0].reason
     assert delta_iw.point_conditions["fO2_control"].state.value == "delta-IW"
 
 
@@ -786,6 +813,9 @@ def test_absolute_typed_row_log_overrides_series_oxygen(
 # stay unknown. A Decimal is the row's own absolute fO2_Pa. A log is
 # log10(fO2/bar) after converting the row's own buffer offset.
 _SERIES_FO2_PA = Decimal("0.01")
+# Unprinted IW at the fixture temperature, 1473 K, from the owner. The
+# series partial pressure is not the buffer pressure, so this is the 1 bar curve.
+_IW_1473_MINUS_2 = evaluate_buffer("IW", Decimal(1473)).log10_fO2_bar + Decimal("-2")
 
 
 @pytest.mark.parametrize(
@@ -826,11 +856,10 @@ _SERIES_FO2_PA = Decimal("0.01")
             None,
         ),
         (
-            # log10(IW) = -2 at 1523.15 K. Same O'Neill (1988) eq. 11 value
-            # as the valence row, -11.316814211, plus the printed -2.
+            # log10(IW) = -2 at the row temperature 1473 K, gate-8 O'Neill.
             {"log_fO2": {"value": -2, "units": "log10(IW)"}},
             None,
-            Decimal("-13.316814211"),
+            _IW_1473_MINUS_2,
         ),
         (
             # log10(Pa) is not an absolute frame this collector accepts, and
@@ -840,8 +869,7 @@ _SERIES_FO2_PA = Decimal("0.01")
             None,
         ),
         (
-            # Unitless -10.5 is inside IW±6 at 1523.15 K, so the 1 bar
-            # convention applies. 10^-10.5 × 10^5 Pa/bar, 28-digit decimal.
+            # Unitless -10.5 uses the 1 bar convention. 10^-10.5 × 10^5 Pa/bar.
             # The buffer name is not an offset, so the log is not shifted.
             {"log_fO2": -10.5, "oxygen_buffer_as_published": "IW"},
             Decimal("0.000003162277660168379331998893544"),
@@ -865,7 +893,7 @@ def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
             "admission_status": "admitted",
             "oxygen_partial_pressure": {"value": "1e-7", "units": "bar"},
             "series": [{
-                "T_C": 1250,
+                "T_K": 1473,
                 "Fe3_over_FeT": 0.5,
                 **row_fields,
             }],
@@ -877,6 +905,8 @@ def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
     ]
     assert len(rows) == 1
     oxygen = rows[0].identity.fO2_Pa
+    # The series point is 1e-7 bar = 0.01 Pa. A bound stays unknown. A printed
+    # log or a buffer offset keeps its own oxygen and does not inherit that point.
     if expected_pa is None and expected_log10_bar is None:
         assert oxygen.is_unknown
         return

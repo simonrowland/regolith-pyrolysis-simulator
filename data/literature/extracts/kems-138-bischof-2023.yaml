@@ -545,6 +545,23 @@ species:
       phase: vapor_over_solid_Ga2O3
       regime: thermochemical_equilibrium_model
       units: J mol-1 as printed
+      derivation:
+        relation: "The authors derive second-law enthalpies from van't Hoff regressions and report third-law comparison values using reference reaction Gibbs-energy functions."
+        method:
+          state:
+            tag: value
+            value: "Van't Hoff regression of equilibrium constants (Eq. (21)); second-law reference enthalpies (Eq. (29)) and third-law values from FACTSAGE Gibbs-energy functions (Eqs. (27), (28), and (30))."
+          locator:
+            page: 8
+            published_page: 8
+            section: "4.3.3. Enthalpy and entropy of reaction"
+            equation: "21, 27–30"
+        references:
+        - "Hultgren et al. [39]"
+        - "FACTSAGE database"
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 9, published_page: 9, figure: '7', note: "The underlying equilibrium-constant data are plotted, not tabulated."}
       values:
         quantity: second_law_and_FACTSAGE_enthalpies
         method_class: model_derived
@@ -622,6 +639,7 @@ species:
       values:
         quantity: ab_initio_enthalpy_of_formation
         method_class: quoted_attributed
+        attribution: "Petsalakis et al. [41] and FACTSG, as named by Table 10."
         semantics: bound_not_point_ordering
         model: Petsalakis et al. (2004) bonding energy 4.06 eV via FACTSAGE elements
         delta_f_H_J_mol: 129404
@@ -644,6 +662,7 @@ species:
       values:
         quantity: ab_initio_enthalpy_of_formation
         method_class: quoted_attributed
+        attribution: "Petsalakis et al. [41] and FACTSG, as named by Table 10."
         semantics: bound_not_point_ordering
         model: Petsalakis et al. (2004) bonding energy 4.06 eV via FACTSAGE elements
         delta_f_H_J_mol: 129404
@@ -738,9 +757,34 @@ species:
       phase: homogeneous_gas
       regime: thermochemical_equilibrium_model
       units: J mol-1 as printed
+      derivation:
+        relation: "Third-law enthalpy calculated with Eq. (30) using reaction Gibbs-energy functions estimated from FACTSAGE (Eqs. (27) and (28)) and HCM778 reference partial pressures."
+        method:
+          state:
+            tag: value
+            value: "Third-law method (Eq. (30)) based on reaction Gibbs-energy functions estimated from the FACTSAGE database (Eqs. (27) and (28))."
+          locator:
+            page: 8
+            published_page: 8
+            section: "4.3.3. Enthalpy and entropy of reaction"
+            equation: "27–30"
+        references:
+        - "Hultgren et al. [39]"
+        - "Chaplygin [37]"
+        - "Medvedev et al. [38]"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 18
+            pdf_page_index: 18
+            published_page: 17
+            table: "13"
+            note: HCM778 reference partial-pressure inputs are not tabulated here.
       values:
         quantity: second_law_and_FACTSAGE_enthalpies
-        method_class: quoted_attributed
+        method_class: model_derived
         semantics: bound_not_point_ordering
         model: van't Hoff 2nd-law plus FACTSAGE HCM778
         HCM778_delta_r_H_298_3rd_J_mol: 523647
@@ -918,6 +962,25 @@ species:
       phase: vapor_over_solid_In2O3
       regime: thermochemical_equilibrium_model
       units: J mol-1 as printed
+      derivation:
+        relation: "The authors derive second-law enthalpies from van't Hoff regressions and recalculate literature comparisons using reference Gibbs-energy functions."
+        method:
+          state:
+            tag: value
+            value: "Van't Hoff regression of equilibrium constants (Eq. (21)); second-law reference enthalpies (Eq. (29)) and third-law values from FACTSAGE Gibbs-energy functions (Eqs. (27), (28), and (30))."
+          locator:
+            page: 8
+            published_page: 8
+            section: "4.3.3. Enthalpy and entropy of reaction"
+            equation: "21, 27–30"
+        references:
+        - "Gomez et al. [9]"
+        - "Smirnov et al. [10]"
+        - "Hultgren et al. [39]"
+        - "FACTSAGE database"
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 9, published_page: 9, figure: '8', note: "The underlying equilibrium-constant data are plotted, not tabulated."}
       values:
         quantity: second_law_and_FACTSAGE_enthalpies
         method_class: model_derived

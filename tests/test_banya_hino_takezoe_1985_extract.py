@@ -109,6 +109,10 @@ def _assert_table_render_pins(document: dict) -> None:
         assert activity_values["a_FetO_as_printed"] == a_feto
         assert activity_values["activity"] == a_feto
         assert activity_values["a_FetO_as_printed"] == activity_values["activity"]
+        assert activity_values["method_class"] == "measured_reduced"
+        assert activity["derived_from"] == [redox["observation_id"]]
+        assert activity["derivation"]["inputs"] == [redox["observation_id"]]
+        assert activity["derivation"]["method"]["locator"]["equation"] == "2"
         assert redox["locator"]["page"] == activity["locator"]["page"] == 2
         assert redox["locator"]["table"] == activity["locator"]["table"] == "2"
 
@@ -194,6 +198,13 @@ def test_all_printed_rows_match_render_pins_and_fidelity_samples() -> None:
     ] = "0.999"
     with pytest.raises(AssertionError):
         _assert_table_render_pins(mutated_activity)
+
+    mutated_class = deepcopy(document)
+    mutated_class["species"]["Fe_tO"]["observations"][0]["values"][
+        "method_class"
+    ] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_table_render_pins(mutated_class)
 
     mutated_bound = deepcopy(document)
     mutated_bound["species"]["Na2O"]["observations"][0]["values"][
@@ -310,7 +321,7 @@ def test_isolated_migration_preserves_phase_conditions_and_identity() -> None:
     for observation in activity_points:
         assert observation.identity.species.formula == "Fe_tO"
         assert observation.identity.species.phase.value is Phase.L
-        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
 
     na2o_bound = migrated_by_id["banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound"]
     assert na2o_bound.identity.species.formula == "Na2O"

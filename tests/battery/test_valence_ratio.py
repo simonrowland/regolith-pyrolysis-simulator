@@ -37,7 +37,9 @@ from simulator.battery.identity import (
 )
 from simulator.battery.migrate import (
     Migrator,
+    _band_text,
     _identity_from_plain,
+    _log_fO2_to_pa,
     fe3_fe2_ratio_from_ferric_fraction,
     map_quantity,
     observation_from_plain,
@@ -45,6 +47,7 @@ from simulator.battery.migrate import (
     to_plain,
     wt_pct_to_mole_fraction,
 )
+from simulator.chemistry.fo2_buffers import evaluate_buffer
 from simulator.battery.records import (
     Composition,
     Execution,
@@ -250,6 +253,17 @@ def test_sulfur_valence_forms_are_recognized_and_migrated_as_printed(tmp_path: P
     )
 
 
+def _jugo_qfm_pa(control: str) -> Decimal:
+    # Table 4 prints FMQ+2.7 through FMQ-1.4. 200 MPa is 2000 bar.
+    offset = Decimal(str(control).replace("FMQ", ""))
+    evaluation = evaluate_buffer(
+        "QFM",
+        Decimal("1323.15"),
+        pressure_bar=Decimal(2000),
+    )
+    return _log_fO2_to_pa(evaluation.log10_fO2_bar + offset)
+
+
 def test_jugo_2010_table4_values_and_conditions_match_render():
     extract = yaml.safe_load(JUGO_S.read_text(encoding="utf-8"))
     table4 = next(
@@ -345,8 +359,9 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
             assert row.identity.composition.value == wt_pct_to_mole_fraction(printed)
             accepted_compositions += 1
         else:
-            # b-704 records each printed row map as a typed partial-analysis
-            # refusal when its kept oxide/volatile total is below 95 wt%.
+            # b-704 refuses the row composition when its kept mass-percent
+            # components do not close. The explicit buffer and pressure
+            # conditions remain independently located and convertible.
             assert row.identity.composition.is_unknown
             assert (
                 f"kept sum={kept_sum} wt% is below 95 wt%"
@@ -380,6 +395,7 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
             "pressure correction=Frost 1991 molar-volume ΔV term"
             in conversion_notices[0]
         )
+        assert row.identity.fO2_Pa.value == _jugo_qfm_pa(control)
         assert row.point_conditions["temperature_K"].state.value == Decimal("1323.15")
         assert row.point_conditions["temperature_K"].locator.pdf_page_index == 7
         assert row.point_conditions["pressure_MPa"].state.value == Decimal("200")
@@ -387,6 +403,27 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
         assert row.point_conditions["composition"].locator.published_page == 5928
     assert accepted_compositions == 1
     assert refused_compositions == 6
+    qfm = evaluate_buffer(
+        "QFM", Decimal("1323.15"), pressure_bar=Decimal(2000)
+    )
+    for row in rows:
+        converted = [
+            notice
+            for notice in row.notices
+            if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        ]
+        assert len(converted) == 1
+        assert converted[0].authority is Authority.CERTIFIED
+        assert converted[0].band == _band_text(qfm.band_dex)
+        assert "calibration=oneill_1987_ammin_72_reaction2_emf" in converted[0].reason
+        assert "P_bar=2000" in converted[0].reason
+        assert "pressure_coefficient_spread=yes" in converted[0].reason
+        assert "authority=certified" in converted[0].reason
+        assert not any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and notice.reason == converted[0].reason
+            for notice in row.notices
+        )
     fit = migrator.result.observations[
         "jugo-2010-sulfur-xanes::jugo_2010_eq10_sulfate_fraction_vs_delta_fmq_fit"
     ]
@@ -614,8 +651,8 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
     table4_rows = [*log_ratios, *slope_rows]
     assert len(table4_rows) == 12
     for row in table4_rows:
-        assert row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-        assert row.evidence.attribution == "Berry and O'Neill (2004), Table 4"
+        assert row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert row.evidence.attribution is None
         assert not row.derived_from
         pressure = row.identity.total_pressure_Pa
         if row in log_ratios:
@@ -1008,7 +1045,7 @@ def test_tranell_2002_table_i_rows_migrate_with_render_pinned_values_and_conditi
         assert row.identity.total_pressure_Pa is not None
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.total_pressure_Pa.reason == (
-            "no total_pressure_Pa mapped from source"
+            "Total pressure is not stated for the Table I runs."
         )
         assert conditions["temperature_K"].state.value == row.identity.temperature_K.value
         assert conditions["fO2_Pa"].state.value.kind is ValueKind.POINT
@@ -1113,6 +1150,7 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
             "FeOT": float(feot),
         }
         composition = migrated_row.identity.composition.value
+        # t-1649 inherits explicit parent phase-analysis evidence; bare glass is not that claim.
         assert composition == wt_pct_to_mole_fraction(closed)
         mole_amounts = {
             oxide: fraction * oxide_molar_mass(oxide)
@@ -1134,6 +1172,7 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
         for row in rows
         if "jayasuriya_2004_rt_1pct" in row.observation_id
     )
+    # t-1649 inherits explicit parent phase-analysis evidence; bare glass is not that claim.
     assert low_fe.identity.composition.value == wt_pct_to_mole_fraction(
         {
             "SiO2": Decimal("50.47"),
@@ -1150,7 +1189,8 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
     ]
     assert len(d60) == 2
     assert all(
-        row.identity.total_pressure_Pa.is_unknown
+        row.identity.total_pressure_Pa.is_value
+        and row.identity.total_pressure_Pa.value == Decimal("1100000000")
         and row.point_conditions["total_pressure_Pa"].state.value.point
         == Decimal("1100000000")
         for row in d60

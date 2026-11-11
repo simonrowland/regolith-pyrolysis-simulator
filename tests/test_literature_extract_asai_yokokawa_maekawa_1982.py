@@ -13,6 +13,10 @@ EXTRACT = (
     REPO_ROOT
     / "data/literature/extracts/asai-yokokawa-maekawa-1982-na-borate-activity.yaml"
 )
+ASAI_REFERENCE_STATE_DEFINITION = (
+    "ここに ΔG(Na₂O) などは Na₂O·2B₂O₃ 中の Na₂O を標準とした "
+    "Gibbs の自由エネルギーなどである。"
+)
 
 
 def _observations(document):
@@ -40,6 +44,33 @@ def _assert_rendered_table_2(document):
         assert row["locator"]["table"] == "2"
 
 
+def _assert_printed_reference_state(document):
+    observations = _observations(document)
+    assert len(observations) == 32
+
+    for row in observations:
+        assert row["standard_state_as_printed"] == ASAI_REFERENCE_STATE_DEFINITION
+        standard_state = row["standard_state"]
+        assert standard_state["state"]["tag"] == "unknown"
+        assert "composition-specific" in standard_state["state"]["reason"]
+        assert standard_state["inferred"] is False
+        assert standard_state["locator"]["published_page"] == 1006
+        assert "No independent standard Gibbs function" in standard_state["note"]
+        assert "Table 2" in standard_state["note"]
+
+
+def _assert_emf_reported_relative_gibbs(document):
+    observations = _observations(document)
+    assert len(observations) == 32
+
+    for row in observations:
+        values = row["values"]
+        assert values["method_class"] == "measured_tabulated"
+        assert "emf of concentration cell" in values["method_as_printed"]
+        assert values["method_locator"]["published_page"] == 1006
+        assert "no activity conversion is made" in values["note"]
+
+
 def test_asai_1982_table_2_pins_rendered_relative_gibbs_values_and_rows():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     _assert_rendered_table_2(document)
@@ -57,6 +88,16 @@ def test_asai_1982_render_pin_rejects_mutated_table_value():
     row["values"]["relative_delta_G_Na2O_kJ_mol"] = "-1.2"
     with pytest.raises(AssertionError):
         _assert_rendered_table_2(mutated)
+
+
+def test_asai_1982_printed_reference_state_is_located_and_not_inferred():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_printed_reference_state(document)
+
+
+def test_asai_1982_emf_results_are_measured_tabulated_not_model_derived():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_emf_reported_relative_gibbs(document)
 
 
 def test_asai_1982_isolated_migration_binds_printed_conditions_and_refuses_absolute_activity():
@@ -77,11 +118,19 @@ def test_asai_1982_isolated_migration_binds_printed_conditions_and_refuses_absol
         assert row.admission.reason == (
             "reference-melt absolute activity not printed"
         )
+        assert row.evidence.class_.value == "measured_tabulated"
         assert row.identity.quantity.value.value == "activity"
         assert row.identity.temperature_K.value == Decimal("1173")
         assert row.identity.composition.is_value
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa.is_unknown
+        conditions = row.point_conditions
+        temperature = conditions["temperature_K"]
+        assert temperature.state.value == Decimal("1173")
+        assert temperature.locator.published_page == 1008
+        composition = conditions["composition"]
+        assert composition.state.value == row.identity.composition.value
+        assert composition.locator.published_page == 1008
         assert "total_pressure_Pa" not in row.point_conditions or row.point_conditions[
             "total_pressure_Pa"
         ].state.is_unknown

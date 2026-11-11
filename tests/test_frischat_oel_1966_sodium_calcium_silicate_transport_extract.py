@@ -60,6 +60,18 @@ def _context(document: dict, observation_id: str) -> dict:
     return next(record for record in records if record["observation_id"] == observation_id)
 
 
+def _assert_sc456_relabels(document: dict) -> None:
+    conductivity = _context(document, "frischat_oel_1966_conductivity_arrhenius_fits")
+    assert conductivity["values"]["method_class"] == "measured_reduced"
+    assert conductivity["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert conductivity["derivation"]["raw_inputs"]["locator"]["figure"] == "7"
+
+    factor = _context(document, "frischat_oel_1966_abstract_correlation_factor")
+    assert factor["values"]["method_class"] == "measured_reduced"
+    assert factor["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert factor["derivation"]["raw_inputs"]["locator"]["figure"] == "10"
+
+
 def _assert_figure_source_pins(document: dict) -> None:
     for observation_id, figure_number in FIGURES_6_TO_8:
         locator = _context(document, observation_id)["locator"]
@@ -128,6 +140,7 @@ def _assert_rendered_tables(document: dict) -> None:
 def test_rendered_table_cells_and_context_only_migration() -> None:
     document = _document()
     assert validate_extract_file(EXTRACT) == []
+    _assert_sc456_relabels(document)
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
 
@@ -196,6 +209,20 @@ def test_rendered_table_cells_and_context_only_migration() -> None:
     assert conditions["composition"]["state"]["tag"] == "value"
     assert conditions["total_pressure_Pa"]["state"] == "unknown"
     assert conditions["fO2_Pa"]["state"] == "unknown"
+
+
+def test_sc456_relabel_pins_reject_quoted_class_mutation() -> None:
+    document = _document()
+    _assert_sc456_relabels(document)
+
+    for observation_id in (
+        "frischat_oel_1966_conductivity_arrhenius_fits",
+        "frischat_oel_1966_abstract_correlation_factor",
+    ):
+        mutated = deepcopy(document)
+        _context(mutated, observation_id)["values"]["method_class"] = "quoted_attributed"
+        with pytest.raises(AssertionError):
+            _assert_sc456_relabels(mutated)
 
 
 def test_mutating_a_rendered_value_is_detected() -> None:

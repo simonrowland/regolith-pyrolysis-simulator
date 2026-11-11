@@ -9,6 +9,7 @@ import pytest
 import yaml
 from openpyxl import load_workbook
 
+from simulator.battery.enums import NoticeKind
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -22,6 +23,22 @@ SOURCE_XLSX = (
     / SOURCE_ID
     / f"{SOURCE_ID}.xlsx"
 )
+# Component rows may carry only the buffer-conversion notices. An absolute
+# printed log adds none. CO-CO2 with no ratio is a refusal and adds none.
+_BUFFER_CONVERSION_NOTICES = frozenset(
+    {
+        NoticeKind.BUFFER_RELATIVE_FO2_CONVERTED,
+        NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+        NoticeKind.OUT_OF_CERTIFIED_BAND,
+        NoticeKind.BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS,
+    }
+)
+
+
+def _assert_component_notices(observation) -> None:
+    assert {notice.kind for notice in observation.notices} <= _BUFFER_CONVERSION_NOTICES
+
+
 def _displayed_cell(cell) -> str:
     value = cell.value
     if value is None:
@@ -87,7 +104,6 @@ def test_every_workbook_component_migrates_as_its_printed_point_or_refusal(migra
             assert values["admission_status"] == "admitted"
             assert observation.value.kind.value == "point"
             assert observation.value.point == expected
-            assert observation.notices == ()
             numeric += 1
         else:
             assert values["admission_status"] == "typed_refusal"
@@ -109,6 +125,8 @@ def test_every_workbook_component_migrates_as_its_printed_point_or_refusal(migra
             assert observation.identity.total_pressure_Pa.is_unknown
             assert observation.point_conditions["temperature_K"].state.is_unknown
             assert observation.point_conditions["total_pressure_Pa"].state.is_unknown
+            if observation.value.kind.value == "point":
+                _assert_component_notices(observation)
             continue
 
         temperature_col = headers["T, C"]
@@ -148,9 +166,11 @@ def test_every_workbook_component_migrates_as_its_printed_point_or_refusal(migra
                 log_condition = observation.point_conditions["fO2_log"]
                 assert log_condition.state.value == printed_log
                 assert log_condition.locator.record == oxygen_cell.coordinate
-                assert observation.identity.fO2_Pa.is_unknown
+                assert observation.identity.fO2_Pa.is_value
         else:
             assert not any(key in observation.point_conditions for key in ("fO2_log", "fO2_control", "atmosphere"))
+        if observation.value.kind.value == "point":
+            _assert_component_notices(observation)
 
     assert row_counts == Counter({
         "included experimental data": 4_656,

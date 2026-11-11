@@ -213,6 +213,26 @@ def test_mixture_rows_stay_context_with_source_composition_and_quantity(
     )
 
 
+def test_sc456_redox_comparison_rows_remain_external_context(
+    migrated: Migrator,
+) -> None:
+    redox = find_context_row(
+        _document(), "suga04_t5_fe_redox_reaction_thermochemistry"
+    )
+    rows = redox["values"]["rows"]
+    assert migrated.result.validation.hard_issues == ()
+    assert rows[0]["reference"] == "This study"
+    assert rows[0]["method_class"] == "model_derived"
+    expected_references = (
+        "Tangeman et al. (2001)",
+        "Lange and Carmichael (1989)",
+        "Kress and Carmichael (1989)",
+        "Kress and Carmichael (1991)",
+    )
+    assert tuple(row["reference"] for row in rows[1:]) == expected_references
+    assert all(row["method_class"] == "quoted_attributed" for row in rows[1:])
+
+
 def test_pure_heat_contents_migrate_with_conditions_and_printed_uncertainty(
     migrated: Migrator,
 ) -> None:

@@ -987,6 +987,27 @@ def _reactive_product_backstop_authorized(species: str) -> bool:
     return _sticking_reactivity_class(species) == 'reactive'
 
 
+def reactive_product_backstop_enabled(
+    species: str,
+    wall_temperature_C: float,
+    condensation_temperature_C: float,
+) -> bool:
+    """Whether a reactive product may materialize on this wall.
+
+    Premise: SiO disproportionation is the reactive class, and the wall
+    model materializes that product only at or below the declared
+    condensation temperature. A hotter wall stays on reversible p_sat.
+    Algebra: authorized and wall_C <= T_cond_C. Unit check: both
+    temperatures are Celsius. Sanity: a reactive species above T_cond
+    returns False, and a non-reactive species returns False at any T.
+    """
+
+    return (
+        _reactive_product_backstop_authorized(species)
+        and float(wall_temperature_C) <= float(condensation_temperature_C)
+    )
+
+
 def _stable_condensation_product_backstop_authorized(species: str) -> bool:
     return _sticking_wall_product_class(species) == 'stable_condensation_product'
 
@@ -4355,8 +4376,8 @@ class CondensationModel:
             diagnostic: dict[str, Any] = {}
             pressure_options = dict(
                 vapor_pressure_data=self.vapor_pressure_data,
-                reactive_product_backstop=(
-                    reactive_backstop_authorized and sample_T_C <= T_cond_C
+                reactive_product_backstop=reactive_product_backstop_enabled(
+                    species, sample_T_C, T_cond_C
                 ),
                 stable_condensation_product_backstop=(
                     stable_product_backstop_authorized

@@ -368,7 +368,12 @@ def test_unsupported_print_reports_refusal_not_single_species():
         mass_kg=experiment.sample.mass_kg,
         printed_composition=f.located({"MgO": D(50), "NotAnOxide": D(50)})))
     inputs = collect_consumer_inputs(experiment, bench, observation)
-    assert list(inputs.charges) == ["MgO"]
+    assert not inputs.charges
+    assert inputs.charges.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert inputs.charges.absence.missing == (
+        "experiment.sample.printed_composition.NotAnOxide",
+    )
+    assert inputs.charges.dropped == ("NotAnOxide",)
     assert inputs.waypoints["normalized_composition"].absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
     for result in engine_point_requests(inputs):
         assert result.payload is None
@@ -397,7 +402,7 @@ def test_charge_keeps_verbatim_mass_percent_component_keys():
     assert list(charge.by_species) == ["MgO"]
 
 
-def test_charge_keeps_routes_for_ambiguous_feot_and_feo_map():
+def test_charge_refuses_ambiguous_feot_and_feo_map():
     experiment, bench, _observation = case()
     experiment = replace(
         experiment,
@@ -413,9 +418,10 @@ def test_charge_keeps_routes_for_ambiguous_feot_and_feo_map():
 
     charge = charge_moles_by_species(experiment, bench)
 
-    assert set(charge.by_species) == {"SiO2", "FeO"}
-    assert charge["SiO2"].selected is not None
-    assert charge["FeO"].selected is not None
+    assert not charge.by_species
+    assert charge.absence is not None
+    assert charge.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert charge.absence.missing == ("experiment.sample.printed_composition",)
 
 
 def test_charge_renormalizes_104_wt_percent_map_and_refuses_above_105():

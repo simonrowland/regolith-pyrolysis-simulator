@@ -1,0 +1,264 @@
+schema_version: literature_extract.v1
+source_id: nagahara-1993-sio2-evaporation-equilibrium-vacuum
+source:
+  citation: 'Nagahara, H. (1993). Evaporation in equilibrium, in vacuum, and in hydrogen gas. Lunar and Planetary Science XXIV, 1045–1046.'
+  year: 1993
+  corpus_asset: raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/nagahara-1993-sio2-evaporation-equilibrium-vacuum.pdf
+extraction:
+  method: MinerU text checked against renders of both PDF pages; no table blocks were present and plotted point values were not digitized.
+  date: '2026-11-03'
+  worker: w1103cw4-ng93
+review_status: draft
+fidelity_samples:
+  - species: SiO2
+    observation_id: nagahara_1993_c_capsule_vs_mo_equilibrium_rate
+    field: rate_factor
+    value: 3.5
+    locator: {page: 1, published_page: 1045, pdf_page_index: 0, section: Results}
+  - species: SiO2
+    observation_id: nagahara_1993_vacuum_vs_equilibrium_rate
+    field: rate_factor
+    value: 0.02
+    locator: {page: 1, published_page: 1045, pdf_page_index: 0, section: Results}
+  - species: SiO2
+    observation_id: nagahara_1993_prior_vacuum_equilibrium_rate_ratio
+    field: rate_factor_range
+    value: ['0.011', '0.015']
+    locator: {page: 1, published_page: 1045, pdf_page_index: 0, section: Results, reference: '[6]'}
+  - species: SiO2
+    observation_id: nagahara_1993_h2_1e7_bar_rate_comparison
+    field: hydrogen_pressure_bar
+    value: 1.0e-7
+    locator: {page: 2, published_page: 1046, pdf_page_index: 1, section: Results}
+  - species: SiO2
+    observation_id: nagahara_1993_h2_1e5_bar_rate_comparison
+    field: rate_factor_range
+    value: ['3', '4']
+    locator: {page: 2, published_page: 1046, pdf_page_index: 1, section: Results}
+  - species: SiO2
+    observation_id: nagahara_1993_figure_1_figure_only
+    field: plotted_series_conditions_as_printed
+    value:
+      - 'solid circle: 1600°C equilibrium'
+      - 'cross: 1600°C equilibrium in C-capsule'
+      - 'diamond: 1600°C free evaporation'
+      - 'circle: 1600°C in 10^-7 bar hydrogen gas'
+      - 'square: 1600°C in 10^-5 bar hydrogen gas'
+      - 'plus: 1700°C equilibrium in C-capsule'
+      - 'triangle: 1700°C free evaporation'
+    locator: {page: 2, published_page: 1046, pdf_page_index: 1, figure: '1'}
+  - species: SiO2
+    observation_id: nagahara_1993_figure_2_figure_only
+    field: hydrogen_evaporation_log_log_slope_as_printed
+    value: '1/2'
+    locator: {page: 2, published_page: 1046, pdf_page_index: 1, figure: '2'}
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: nagahara_1993_experimental_conditions_and_sample
+        type: laboratory_conditions
+        locator:
+          page: 1
+          published_page: 1045
+          pdf_page_index: 0
+          section: Experimental procedure
+        units: as printed
+        values:
+          quantity: experimental_conditions_and_sample
+          method_class: method_only
+          starting_material_as_printed: The starting material is a single crystal of natural quartz.
+          sample_mass_as_printed: About 10mg of powdered sample was used for each experiment.
+          experimental_temperature_C: [1600, 1700]
+          experimental_temperature_as_printed: 1600°C and 1700°C
+          vacuum_chamber_base_pressure_bar_bounds_as_printed: ['10^-11', '10^-9']
+          pressure_scope: vacuum-chamber base pressure; not an assigned total pressure for equilibrium or hydrogen rows
+          capsule_materials_as_printed: Mo and graphite (C)
+          hydrogen_pressure_control_as_printed: hydrogen gas bled through a micro-valve
+          high_hydrogen_pressure_control_limit_as_printed: above 10^-5 bar was not finely controlled
+      - observation_id: nagahara_1993_c_capsule_vs_mo_equilibrium_rate
+        type: rate_comparison
+        locator:
+          page: 1
+          published_page: 1045
+          pdf_page_index: 0
+          section: Results
+        units: dimensionless rate factor as printed
+        attribution: Nagahara's prose summary of present-study measurements; underlying plotted points are excluded as figure-only data.
+        values:
+          quantity: relative_evaporation_rate_comparison
+          status: typed_refused_schema_gap
+          schema_gap: No exact quantity token represents a dimensionless comparison of evaporation rates. simulator/battery/enums.py::Quantity.EVAPORATION_RATE and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE have mass-per-time units, while simulator/battery/enums.py::Quantity.EVAPORATION_COEFFICIENT_ALPHA is a different physical quantity; simulator/battery/migrate.py::QUANTITY_ALIASES maps rate_series to MASS_LOSS_RATE and tools/validate_literature_extracts.py::OBSERVATION_TYPES is closed. The ratio inputs are only plotted in figures and are not stored.
+          evidence_class: quoted_attributed
+          rate_factor: 3.5
+          rate_factor_approximate: true
+          rate_factor_as_printed: about 3.5 times more rapid
+          faster_condition_as_printed: more reducing condition in a C-capsule
+          comparator_condition_as_printed: equilibrium in a Mo-capsule
+          temperature_scope_note: the study used 1600°C and 1700°C; the prose comparison does not identify one temperature
+          pressure_scope_note: no capsule pressure is stated for this comparison
+          sample_as_printed: The starting material is a single crystal of natural quartz. About 10mg of powdered sample was used for each experiment.
+      - observation_id: nagahara_1993_vacuum_vs_equilibrium_rate
+        type: rate_comparison
+        locator:
+          page: 1
+          published_page: 1045
+          pdf_page_index: 0
+          section: Results
+        units: dimensionless rate factor as printed
+        attribution: Nagahara's prose summary of present-study measurements; underlying plotted points are excluded as figure-only data.
+        values:
+          quantity: relative_evaporation_rate_comparison
+          status: typed_refused_schema_gap
+          schema_gap: No exact quantity token represents a dimensionless comparison of evaporation rates. simulator/battery/enums.py::Quantity.EVAPORATION_RATE and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE have mass-per-time units, while simulator/battery/enums.py::Quantity.EVAPORATION_COEFFICIENT_ALPHA is a different physical quantity; simulator/battery/migrate.py::QUANTITY_ALIASES maps rate_series to MASS_LOSS_RATE and tools/validate_literature_extracts.py::OBSERVATION_TYPES is closed. The ratio inputs are only plotted in figures and are not stored.
+          evidence_class: quoted_attributed
+          gas_system: vacuum
+          rate_factor: 0.02
+          rate_factor_approximate: true
+          rate_factor_as_printed: about 0.02
+          direction: smaller_than_equilibrium
+          abstract_comparison_as_printed: about two orders of magnitude smaller than equilibrium
+          vacuum_chamber_base_pressure_bar_as_printed: 10^-11 to 10^-9 bar
+          pressure_scope: chamber base pressure, not a per-run total pressure
+          temperature_scope_note: the study used 1600°C and 1700°C; the prose comparison does not identify one temperature
+          sample_as_printed: The starting material is a single crystal of natural quartz. About 10mg of powdered sample was used for each experiment.
+      - observation_id: nagahara_1993_prior_vacuum_equilibrium_rate_ratio
+        type: rate_comparison
+        locator:
+          page: 1
+          published_page: 1045
+          pdf_page_index: 0
+          section: Results
+          reference: '[6]'
+        units: dimensionless rate factor as printed
+        attribution: Hashimoto (1990), Nature 347, 53–55, cited as reference [6].
+        values:
+          quantity: relative_evaporation_rate_comparison
+          status: typed_refused_schema_gap
+          schema_gap: No exact quantity token represents a dimensionless comparison of evaporation rates; the citation is attributed rather than treated as a Nagahara measurement. See simulator/battery/enums.py::Quantity.EVAPORATION_RATE, simulator/battery/enums.py::Quantity.MASS_LOSS_RATE, simulator/battery/enums.py::Quantity.EVAPORATION_COEFFICIENT_ALPHA, simulator/battery/migrate.py::QUANTITY_ALIASES, and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+          evidence_class: quoted_attributed
+          rate_factor_range: ['0.011', '0.015']
+          rate_factor_range_as_printed: 0.011-0.015
+          temperature_C_range: ['1560', '1685']
+          temperature_range_as_printed: 1560-1685°C
+          relation_context: cited as prior data consistent with the vacuum-to-equilibrium rate comparison
+          sample_as_printed: not stated for the cited measurements in this passage
+          pressure_or_gas_as_printed: not specified for the cited measurements in this passage
+      - observation_id: nagahara_1993_h2_1e7_bar_rate_comparison
+        type: rate_comparison
+        locator:
+          page: 2
+          published_page: 1046
+          pdf_page_index: 1
+          section: Results
+        units: dimensionless rate comparison as printed
+        attribution: Nagahara's prose summary of present-study measurements; plotted values are excluded as figure-only data.
+        values:
+          quantity: relative_evaporation_rate_comparison
+          status: typed_refused_schema_gap
+          schema_gap: No exact quantity token represents a dimensionless comparison of evaporation rates. simulator/battery/enums.py::Quantity.EVAPORATION_RATE and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE have mass-per-time units, while simulator/battery/enums.py::Quantity.EVAPORATION_COEFFICIENT_ALPHA is a different physical quantity; simulator/battery/migrate.py::QUANTITY_ALIASES maps rate_series to MASS_LOSS_RATE and tools/validate_literature_extracts.py::OBSERVATION_TYPES is closed. The ratio inputs are only plotted in figures and are not stored.
+          evidence_class: quoted_attributed
+          gas_system: H2
+          hydrogen_pressure_bar: 1.0e-7
+          hydrogen_pressure_as_printed: 10^-7 bar
+          rate_relation_as_printed: nearly the same as the rate in vacuum
+          abstract_relation_as_printed: as small as free evaporation
+          comparator_gas_system: vacuum
+          temperature_C_from_figure_legend: 1600
+          temperature_locator:
+            page: 2
+            published_page: 1046
+            pdf_page_index: 1
+            figure: '1'
+          sample_as_printed: The starting material is a single crystal of natural quartz. About 10mg of powdered sample was used for each experiment.
+      - observation_id: nagahara_1993_h2_1e5_bar_rate_comparison
+        type: rate_comparison
+        locator:
+          page: 2
+          published_page: 1046
+          pdf_page_index: 1
+          section: Results
+        units: dimensionless rate comparison as printed
+        attribution: Nagahara's prose summary of present-study measurements; plotted values are excluded as figure-only data.
+        values:
+          quantity: relative_evaporation_rate_comparison
+          status: typed_refused_schema_gap
+          schema_gap: No exact quantity token represents a dimensionless comparison of evaporation rates. simulator/battery/enums.py::Quantity.EVAPORATION_RATE and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE have mass-per-time units, while simulator/battery/enums.py::Quantity.EVAPORATION_COEFFICIENT_ALPHA is a different physical quantity; simulator/battery/migrate.py::QUANTITY_ALIASES maps rate_series to MASS_LOSS_RATE and tools/validate_literature_extracts.py::OBSERVATION_TYPES is closed. The ratio inputs are only plotted in figures and are not stored.
+          evidence_class: quoted_attributed
+          gas_system: H2
+          hydrogen_pressure_bar: 1.0e-5
+          hydrogen_pressure_as_printed: 10^-5 bar
+          abstract_relation_as_printed: larger than the rate in equilibrium
+          rate_factor_range: ['3', '4']
+          rate_factor_range_as_printed: about 3-4 times larger
+          rate_factor_comparator_note: not named in the detailed sentence; no comparator assigned to the factor
+          temperature_C_from_figure_legend: 1600
+          temperature_locator:
+            page: 2
+            published_page: 1046
+            pdf_page_index: 1
+            figure: '1'
+          sample_as_printed: The starting material is a single crystal of natural quartz. About 10mg of powdered sample was used for each experiment.
+      - observation_id: nagahara_1993_h2_rate_time_behavior
+        type: rate_comparison
+        locator:
+          page: 2
+          published_page: 1046
+          pdf_page_index: 1
+          section: Results
+        units: qualitative relation as printed
+        attribution: Nagahara's prose description of present-study measurements; plotted values are excluded as figure-only data.
+        values:
+          quantity: qualitative_evaporation_rate_response_to_time_and_hydrogen_pressure
+          status: typed_refused_schema_gap
+          schema_gap: The extract schema has no exact scored quantity for this qualitative pressure- and time-dependent rate relation; simulator/battery/enums.py::Quantity.EVAPORATION_RATE and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE represent absolute rates, and simulator/battery/migrate.py::QUANTITY_ALIASES maps rate_series to MASS_LOSS_RATE. Absolute series values are not printed in text and figure points are excluded.
+          evidence_class: quoted_attributed
+          gas_system: H2
+          time_relation_as_printed: 'In hydrogen gas, the evaporated fraction is not a linear function of time. In hydrogen gas, evaporated fraction becomes smaller than that in equilibrium, and the difference from equilibrium value becomes larger with time.'
+          hydrogen_pressures_discussed_bar: ['10^-7', '10^-5']
+          hydrogen_vs_higher_total_pressure_statement_as_printed: 'Contrary to higher total pressure, vaporization is more effective in hydrogen gas.'
+          reaction_explanation_as_printed: 'This is because hydrogen is reactive with SiO2, and the possible reaction is SiO2(s)+H2(g)-->SiO(g)+H2O(g).'
+          overall_equilibrium_vacuum_hydrogen_comparison_as_printed: 'The present study suggests that evaporation rate of minerals in hydrogen gas is neither of that in equilibrium, that in vacuum, nor that in between them.'
+          hydrogen_pressure_dependence_as_printed: The evaporation rate depends on hydrogen gas pressure.
+          temperature_scope_note: the study used 1600°C and 1700°C; this paragraph does not isolate one temperature
+          sample_as_printed: The starting material is a single crystal of natural quartz. About 10mg of powdered sample was used for each experiment.
+      - observation_id: nagahara_1993_figure_1_figure_only
+        type: figure_record
+        locator:
+          page: 2
+          published_page: 1046
+          pdf_page_index: 1
+          figure: '1'
+        panel: whole_figure
+        attribution: Present-study figure; plotted points were not digitized.
+        units: evaporated fraction (%) versus time (min)
+        values:
+          quantity: figure_only_evaporated_fraction_series
+          evidence_class: figure_only
+          digitization: not performed; figure-read candidate for a later pass
+          plotted_series_conditions_as_printed:
+            - 'solid circle: 1600°C equilibrium'
+            - 'cross: 1600°C equilibrium in C-capsule'
+            - 'diamond: 1600°C free evaporation'
+            - 'circle: 1600°C in 10^-7 bar hydrogen gas'
+            - 'square: 1600°C in 10^-5 bar hydrogen gas'
+            - 'plus: 1700°C equilibrium in C-capsule'
+            - 'triangle: 1700°C free evaporation'
+          point_values: not transcribed
+      - observation_id: nagahara_1993_figure_2_figure_only
+        type: figure_record
+        locator:
+          page: 2
+          published_page: 1046
+          pdf_page_index: 1
+          figure: '2'
+        panel: whole_figure
+        attribution: Present-study figure; plotted points were not digitized.
+        units: weight loss (g/cm2) versus time (sec)
+        values:
+          quantity: figure_only_weight_loss_time_series
+          evidence_class: figure_only
+          digitization: not performed; figure-read candidate for a later pass
+          equilibrium_and_free_evaporation_log_log_slope_as_printed: '1'
+          hydrogen_evaporation_log_log_slope_as_printed: 1/2
+          point_values: not transcribed

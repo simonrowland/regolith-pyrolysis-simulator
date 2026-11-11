@@ -8,6 +8,7 @@ from typing import Literal
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.feedstock_composition import (
+    _TOTAL_IRON_AS_FEO_KEYS,
     feot_equivalent_wt_pct,
     iron_oxide_values,
 )
@@ -847,7 +848,14 @@ def kress91_dropped_components(
 ) -> tuple[tuple[str, ...], float | None]:
     """Report positive composition mass excluded by the KC91 oxide basis."""
 
-    supported = {*KRESS91_MOL_FRACTION_OXIDES, 'FeO', 'Fe2O3'}
+    # Total-iron keys are supported so a FeO_T-only map is not reported as
+    # dropped. iron_oxide_values reads them only when the split is absent.
+    supported = {
+        *KRESS91_MOL_FRACTION_OXIDES,
+        'FeO',
+        'Fe2O3',
+        *_TOTAL_IRON_AS_FEO_KEYS,
+    }
     values = {name: float(amount) for name, amount in comp_wt.items()}
     dropped = tuple(
         sorted(name for name, amount in values.items() if name not in supported and amount > 0.0)

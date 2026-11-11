@@ -47,9 +47,14 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
         "803a03d510720e9d63f7644f9e91546eee250b35d286fadaea69c48bfcd74a24"
     ),
 }
-_DISTIN_GREEN_RESIDUAL_SHA256 = (
-    "39e7f3aed9b19d1ea1b6e8c1559cb7736d6acfccb8cf65e3f34f6f68b9cf4bc0"
+# b217 pinned the N_Fe2+^0 multiply:
+# sha 3b1518942a5ca7524b6e4be8e2c98fd375db44c5835bd830a4acff0a54e32ce0
+# dex -0.013180332034779389
+# The offer frame is a_D * f from the Darken & Gurry factor.
+_DISTIN_1880_RESIDUAL_SHA256 = (
+    "a01d78d696bd20cdc1ff3105cb15f47144e92bd65326151104ea2b6acc6ee2c4"
 )
+_DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10057837869175247")
 
 
 def _openimcc_sources(
@@ -291,6 +296,7 @@ def test_distin_closed_redox_residual_line_matches_green_bytes(
 
     assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
+    assert residual.numeric.value == _DISTIN_1880_RESIDUAL_DEX
     assert candidate is not None
     assert (
         residual.numeric.operation.value,
@@ -316,8 +322,7 @@ def test_distin_closed_redox_residual_line_matches_green_bytes(
         }
     }
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
-    # The digest moved only for the added candidate observation provenance field.
-    assert sha256(serialized).hexdigest() == _DISTIN_GREEN_RESIDUAL_SHA256
+    assert sha256(serialized).hexdigest() == _DISTIN_1880_RESIDUAL_SHA256
 
 
 def test_nondefault_openimcc_profile_refuses_an_undeclared_feo_standard() -> None:
