@@ -211,6 +211,10 @@ def test_internal_analytical_battery_results_are_independent_of_request_order() 
                     backend._core._last_vapor_pressure_diagnostic
                 )
                 assert hot_diagnostic.get("activities")
+                backend._core._last_high_t_melt_activity = {
+                    "provider": "previous_call",
+                }
+                backend._core._last_high_t_melt_activity_temperature_K = 1400.0
                 with pytest.raises(RuntimeError, match="liquid_fraction_invalid"):
                     backend._core._refresh_vapor_pressures_from_kernel(
                         SimpleNamespace(
@@ -222,6 +226,8 @@ def test_internal_analytical_battery_results_are_independent_of_request_order() 
                         observation_pO2_bar=1.0,
                     )
                 assert backend._core._last_vapor_pressure_diagnostic == {}
+                assert backend._core._last_high_t_melt_activity == {}
+                assert backend._core._last_high_t_melt_activity_temperature_K is None
         outputs_by_order.append(outputs)
 
     assert outputs_by_order[0] == outputs_by_order[1]
