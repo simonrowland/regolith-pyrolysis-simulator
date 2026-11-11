@@ -25,7 +25,7 @@ from simulator.core import (
     PoisonedHourError,
     PyrolysisSimulator,
 )
-from simulator.electrolysis import MREElectrolysisRefusal
+from simulator.electrolysis import MREElectrolysisInvalidInput
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.melt_backend.melt_envelope import (
     MELT_EXTRAPOLATION_ENVELOPE_FIELDS,
@@ -57,7 +57,7 @@ _ALL_TYPED_PHYSICS_REFUSALS = (
     CampaignPressureSetpointRefusal,
     CampaignSetpointMissingRefusal,
     EvaporationFluxRefusal,
-    MREElectrolysisRefusal,
+    MREElectrolysisInvalidInput,
     *_TYPED_PHYSICS_REFUSALS,
 )
 
@@ -417,7 +417,7 @@ class RunExecutor:
             CampaignPressureSetpointRefusal,
             CampaignSetpointMissingRefusal,
             EvaporationFluxRefusal,
-            MREElectrolysisRefusal,
+            MREElectrolysisInvalidInput,
         ) as exc:
             failure_exc = exc
             status = "refused"

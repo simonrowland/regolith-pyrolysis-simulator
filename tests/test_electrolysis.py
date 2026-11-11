@@ -12,21 +12,24 @@ from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import (
     ElectrolysisModel,
-    MRECurrentPartitionRefusal,
+    FERRIC_TO_FERROUS_REFERENCE_STATUS,
+    FERRIC_TO_FERROUS_REFERENCE_V,
     MREElectrolysisInvalidInput,
     MREElectrolysisRefusal,
     MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+    MRE_INVALID_CONTROL_REFUSAL,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
     mre_selectivity_weight,
 )
+import simulator.mre_ladder as mre_ladder
 from simulator.run_executor import RunExecutor
 from simulator.runner import DATA_DIR
 from simulator.session import SimSessionConfig
 from simulator.state import MeltState
 
 
-def test_mre_baseline_multi_oxide_partition_is_typed_refusal_not_poisoned_hour(
+def test_mre_invalid_run_control_remains_terminal_and_not_poisoned_hour(
     monkeypatch: pytest.MonkeyPatch,
 ):
     material_state_before_refusal: dict[str, float] = {}
@@ -34,34 +37,25 @@ def test_mre_baseline_multi_oxide_partition_is_typed_refusal_not_poisoned_hour(
         "hour": 0,
         "campaign": "MRE_BASELINE",
         "diagnostic": {
-            "reason_refused": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
-            "current_partition_certified": False,
-            "certification_allowed": False,
-            "reducible_oxide_targets": ("Cr2O3", "SiO2"),
-            "mre_effective_voltage_margin_V_by_oxide": {
-                "Cr2O3": 0.1,
-                "SiO2": 0.2,
-            },
+            "reason_refused": MRE_INVALID_CONTROL_REFUSAL,
+            "invalid_controls": {"voltage_V": "missing"},
         },
     }
 
-    def _raise_partition_refusal(self: PyrolysisSimulator):
-        # Inject at the hourly transaction seam. Provider-level tests exercise
-        # the real multi-oxide detector; this end-to-end test owns typed
-        # refusal propagation and rollback without a mutable 130-hour recipe.
+    def _raise_invalid_input(self: PyrolysisSimulator):
         material_state_before_refusal.update(self.melt.composition_kg)
         first_oxide = next(iter(self.melt.composition_kg))
         self.melt.composition_kg[first_oxide] += 1.0
         self.melt.hour = 99
-        raise MRECurrentPartitionRefusal(
-            MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+        raise MREElectrolysisInvalidInput(
+            MRE_INVALID_CONTROL_REFUSAL,
             refusal_record,
         )
 
     monkeypatch.setattr(
         PyrolysisSimulator,
         "_step_one_hour",
-        _raise_partition_refusal,
+        _raise_invalid_input,
     )
     bundle = load_config_bundle(DATA_DIR)
     setpoints = deepcopy(bundle.setpoints)
@@ -86,9 +80,9 @@ def test_mre_baseline_multi_oxide_partition_is_typed_refusal_not_poisoned_hour(
     execution = RunExecutor().execute(config)
 
     assert execution.status == "refused"
-    assert execution.reason == MRE_MULTI_OXIDE_PARTITION_REFUSAL
+    assert execution.reason == MRE_INVALID_CONTROL_REFUSAL
     assert execution.simulator._poisoned_hour is None
-    assert execution.error_message == MRE_MULTI_OXIDE_PARTITION_REFUSAL
+    assert execution.error_message == MRE_INVALID_CONTROL_REFUSAL
     assert execution.simulator.melt.hour == 0
     assert len(execution.snapshots) == 0
     assert execution.simulator.melt.composition_kg == material_state_before_refusal
@@ -98,40 +92,94 @@ def test_mre_baseline_multi_oxide_partition_is_typed_refusal_not_poisoned_hour(
     assert refusal["hour"] == 0
     assert refusal["campaign"] == "MRE_BASELINE"
     diagnostic = refusal["diagnostic"]
-    assert diagnostic["reason_refused"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
-    assert diagnostic["current_partition_certified"] is False
-    assert diagnostic["certification_allowed"] is False
-    assert diagnostic["reducible_oxide_targets"] == ("Cr2O3", "SiO2")
-    assert diagnostic["mre_effective_voltage_margin_V_by_oxide"]["Cr2O3"] > 0.0
-    assert diagnostic["mre_effective_voltage_margin_V_by_oxide"]["SiO2"] > 0.0
+    assert diagnostic["reason_refused"] == MRE_INVALID_CONTROL_REFUSAL
+    assert diagnostic["invalid_controls"] == {"voltage_V": "missing"}
 
 
-@pytest.mark.parametrize(
-    "refusal_reason",
-    [
-        MRE_RAW_MARGIN_REFUSAL,
-        "invalid_electrolysis_control",
-        MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
-    ],
-)
-def test_sc109_mre_non_partition_refusal_propagates_typed_through_executor(
+def test_sc109_mre_raw_margin_veto_is_a_step_outcome_and_run_continues(
     monkeypatch: pytest.MonkeyPatch,
-    refusal_reason: str,
 ):
-    """SC-109 shape C: non-partition provider refusals must stay typed.
-
-    Fail-open input: any status='refused' reason other than multi-oxide
-    partition previously raised RuntimeError → run_executor status='failed'
-    with empty refusal_diagnostic. Must now status='refused' with diagnostic.
-    """
     original_dispatch = PyrolysisSimulator._dispatch_only
-    material_state_before_refusal: dict[str, float] = {}
 
-    def _dispatch_raw_margin_refusal(
+    def _dispatch_margin_veto(
         self: PyrolysisSimulator,
         intent,
         **kwargs,
     ):
+        if intent != ChemistryIntent.ELECTROLYSIS_STEP:
+            return original_dispatch(self, intent, **kwargs)
+        applied_voltage = kwargs["control_inputs"]["voltage_V"]
+        return SimpleNamespace(
+            status="refused",
+            transition=None,
+            diagnostic={
+                "reason_refused": MRE_RAW_MARGIN_REFUSAL,
+                "notices": [{
+                    "kind": "mre_raw_margin_veto",
+                    "reason": MRE_RAW_MARGIN_REFUSAL,
+                    "oxide": "SiO2",
+                    "temperature_C": self.melt.temperature_C,
+                    "applied_voltage_V": applied_voltage,
+                    "raw_requirement_V": applied_voltage + 0.25,
+                    "raw_margin_V": -0.25,
+                    "reference_status": "ellingham_extrapolation_refused",
+                }],
+            },
+        )
+
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "_dispatch_only",
+        _dispatch_margin_veto,
+    )
+    bundle = load_config_bundle(DATA_DIR)
+    setpoints = deepcopy(bundle.setpoints)
+    setpoints.setdefault("chemistry_kernel", {})[
+        "allow_unmeasured_alpha_fallback"
+    ] = True
+    config = SimSessionConfig(
+        feedstock_id="lunar_mare_low_ti",
+        feedstocks=bundle.feedstocks,
+        setpoints=setpoints,
+        vapor_pressures=bundle.vapor_pressures,
+        materials=bundle.materials,
+        mass_kg=1000.0,
+        hours=1,
+        campaign="C5",
+        track="pyrolysis",
+        c5_enabled=True,
+        mre_target_species="SiO2",
+        mre_max_voltage_V=1.45,
+    )
+
+    execution = RunExecutor().execute(config)
+
+    assert execution.status == "ok"
+    assert execution.simulator._poisoned_hour is None
+    assert execution.simulator.melt.hour == 1
+    assert len(execution.snapshots) == 1
+    assert execution.simulator.product_ledger().get("Si", 0.0) == pytest.approx(
+        0.0
+    )
+    execution.simulator.atom_ledger.assert_balanced()
+
+
+@pytest.mark.parametrize(
+    ("refusal_reason", "invalid_control"),
+    [
+        (MRE_INVALID_CONTROL_REFUSAL, "voltage_V"),
+        (MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL, "current_A"),
+    ],
+)
+def test_sc109_mre_invalid_run_controls_remain_terminal(
+    monkeypatch: pytest.MonkeyPatch,
+    refusal_reason: str,
+    invalid_control: str,
+):
+    original_dispatch = PyrolysisSimulator._dispatch_only
+    material_state_before_refusal: dict[str, float] = {}
+
+    def _dispatch_invalid_input(self, intent, **kwargs):
         if intent != ChemistryIntent.ELECTROLYSIS_STEP:
             return original_dispatch(self, intent, **kwargs)
         material_state_before_refusal.update(self.melt.composition_kg)
@@ -142,15 +190,11 @@ def test_sc109_mre_non_partition_refusal_propagates_typed_through_executor(
             transition=None,
             diagnostic={
                 "reason_refused": refusal_reason,
-                "current_partition_certified": False,
+                "invalid_controls": {invalid_control: "invalid test input"},
             },
         )
 
-    monkeypatch.setattr(
-        PyrolysisSimulator,
-        "_dispatch_only",
-        _dispatch_raw_margin_refusal,
-    )
+    monkeypatch.setattr(PyrolysisSimulator, "_dispatch_only", _dispatch_invalid_input)
     bundle = load_config_bundle(DATA_DIR)
     setpoints = deepcopy(bundle.setpoints)
     setpoints.setdefault("chemistry_kernel", {})[
@@ -299,6 +343,70 @@ def test_step_hour_valid_feo_still_reduces():
     assert result["energy_kWh"] == pytest.approx(0.3)
 
 
+def test_step_hour_missing_raw_reference_records_notice_without_changing_amount(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    def _raw_reference_unavailable(*_args, **_kwargs):
+        raise LookupError("test raw reference unavailable")
+
+    monkeypatch.setattr(
+        mre_ladder,
+        "ellingham_segment_for_temperature",
+        _raw_reference_unavailable,
+    )
+    result = _legacy_model().step_hour(
+        MeltState(composition_kg={"FeO": 1.0}),
+        voltage_V=3.0,
+        current_A=100.0,
+        T_C=1600.0,
+    )
+
+    assert result["mre_decomposition_voltage_authority_by_oxide"]["FeO"] == (
+        "ellingham_fallback"
+    )
+    assert result["oxides_reduced_mol"]["FeO"] > 0.0
+    # Binary64 output captured from the fallback path at a6308d063.
+    assert result["oxides_reduced_mol"]["FeO"].hex() == (
+        "0x1.14ec234378d20p+0"
+    )
+    assert result["oxides_reduced_kg"]["FeO"].hex() == (
+        "0x1.3e52cbc0c5859p-4"
+    )
+    notice = next(
+        notice
+        for notice in result.get("notices", ())
+        if notice.get("kind") == "mre_raw_margin_unassessed"
+    )
+    assert notice["oxide"] == "FeO"
+    assert notice["temperature_C"] == pytest.approx(1600.0)
+    assert notice["applied_voltage_V"] == pytest.approx(3.0)
+    assert notice["fallback_requirement_V"] == pytest.approx(
+        _legacy_model().nernst_voltage("FeO", 1600.0, 1.0)
+    )
+    assert notice["reason"] == "raw_graph_voltage_missing"
+    assert notice["authority"] == "fallback_heuristic"
+
+
+def test_step_hour_raw_reference_has_no_unassessed_notice():
+    reference = mre_ladder.mre_decomposition_voltage_reference(
+        "FeO", temperature_K=1600.0 + 273.15
+    )
+    assert reference is not None
+    assert reference.raw_graph_voltage_V is not None
+
+    result = _legacy_model().step_hour(
+        MeltState(composition_kg={"FeO": 1.0}),
+        voltage_V=3.0,
+        current_A=100.0,
+        T_C=1600.0,
+    )
+
+    assert not any(
+        notice.get("kind") == "mre_raw_margin_unassessed"
+        for notice in result.get("notices", ())
+    )
+
+
 def test_step_hour_counts_ferric_oxide_with_ferric_to_ferrous_stoichiometry():
     result = _legacy_model().step_hour(
         MeltState(composition_kg={"FeO": 1.0, "Fe2O3": 1.0}),
@@ -317,6 +425,18 @@ def test_step_hour_counts_ferric_oxide_with_ferric_to_ferrous_stoichiometry():
     assert result["O2_produced_mol"] - 0.5 * result[
         "oxides_reduced_mol"].get("FeO", 0.0
     ) == pytest.approx(0.5 * ferric_reduced_mol)
+    notice = next(
+        notice
+        for notice in result.get("notices", ())
+        if notice.get("kind") == "mre_raw_margin_unassessed"
+        and notice.get("oxide") == "Fe2O3"
+    )
+    assert notice["fallback_requirement_V"] > 0.0
+    assert notice["reason"] == FERRIC_TO_FERROUS_REFERENCE_STATUS
+    assert notice["authority"] == "fallback_heuristic"
+    assert notice["heuristic_reference_V"] == pytest.approx(
+        FERRIC_TO_FERROUS_REFERENCE_V
+    )
 
 
 def test_step_hour_zero_current_and_voltage_remain_idle():

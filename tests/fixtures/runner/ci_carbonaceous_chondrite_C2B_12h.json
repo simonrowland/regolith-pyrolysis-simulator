@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.9.0",
+  "schema_version": "1.10.0",
   "run_metadata": {
-    "schema_version": "1.9.0",
+    "schema_version": "1.10.0",
     "feedstock_id": "ci_carbonaceous_chondrite",
     "campaign": "C2B",
     "hours_requested": 12,
@@ -3384,6 +3384,7 @@
       }
     },
     "total_species": 18,
+    "activity_sources": {},
     "vapor_pressure_backend_status": "",
     "vapor_pressure_backend_status_summary": {},
     "vapor_pressure_backend_status_reason": "",
@@ -12886,7 +12887,6 @@
     "setpoints_t_cond_audit": {
       "schema": "setpoints_t_cond_audit.v1",
       "operator_override_species": [
-        "Al",
         "Ca",
         "Cr",
         "CrO2",
@@ -12895,10 +12895,9 @@
         "Mg",
         "Mn",
         "Na",
-        "SiO",
-        "Ti"
+        "SiO"
       ],
-      "al_ti_policy": "Al and Ti overrides are estimated/operator-routing only; no additional Al/Ti/trace T_cond overrides without independent engineering policy approval (DESIGN-REV5 \u00a77.2).",
+      "al_ti_policy": "Al and Ti are not operator condenser overrides and have no designated condenser stage. Al leaves as metal via C6 Mg-thermite; Ti is non-volatile. Any Al, Ti, AlO, or TiO vapour that does occur is accounted to an existing ledger account, not dropped. No additional Al/Ti/trace T_cond overrides without independent engineering policy approval (DESIGN-REV5 \u00a77.2).",
       "reaction_fixed_windows": "Reaction-fixed condensation windows remain non-operator settings."
     },
     "shadow_equal": false,

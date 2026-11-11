@@ -142,6 +142,68 @@ def test_genuinely_incomplete_compositions_still_refuse() -> None:
     assert error == "invalid_binary_mole_fraction_closure"
 
 
+def test_silicate_melt_ordering_without_composition_refuses() -> None:
+    """b-253: a silicate-melt ordering with no recipe must not score on mare.
+
+    The psat path already returns missing_condition:melt_composition. The
+    ordering path used to substitute lunar_mare_low_ti and publish that
+    score. Missing composition is a typed refusal of this quantity.
+    """
+
+    obs = AdoptedObservation(
+        species_id="Fe",
+        source_id="fixture-ordering",
+        observation_id="fcmas_order_without_composition",
+        obs_type="rate_series",
+        review_status="draft",
+        phase="silicate_melt",
+        regime="langmuir_free_evaporation",
+        standard_state=None,
+        T_range_K=(1873.15, 2273.15),
+        units="qualitative bound",
+        uncertainty=None,
+        locator={"note": "fixture"},
+        values={
+            "quantity": "qualitative_volatility_order",
+            "system_class": "silicate_melt",
+            "semantics": "bound_not_point_ordering",
+            "order_tiers": [["Fe"], ["Mg", "Si"], ["Ca"], ["Al"]],
+            "numeric_rate_status": "not_reported_do_not_infer",
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption=geometry_assumption_text(),
+        condensed_form={"state": "liquid_melt", "metastable": False},
+    )
+    captured: dict = {}
+    import simulator.diagnostic_helpers.extract_reproduction as er
+
+    real_compare = er._compare_point
+
+    def _capture(**kwargs):
+        captured.update(kwargs.get("runtime") or {})
+        return real_compare(**kwargs)
+
+    er._compare_point = _capture
+    try:
+        evaluation = evaluate_observation(
+            obs, vapor_pressure_data=load_vapor_pressure_data()
+        )
+    finally:
+        er._compare_point = real_compare
+    assert evaluation.skip_reason == (
+        "typed-refusal:missing_condition:melt_composition"
+    )
+    assert "typed-refusal:missing_condition:melt_composition" in evaluation.skip_reasons
+    assert not any(r.status in SCORING_STATUSES for r in evaluation.records)
+    assert captured.get("melt_recipe_source") != (
+        "data/feedstocks.yaml::lunar_mare_low_ti "
+        "(silicate-melt ordering evaluation composition)"
+    )
+    assert "lunar_mare_low_ti" not in str(captured.get("melt_recipe_source") or "")
+
+
 def test_under_specified_observation_keeps_typed_refusal() -> None:
     obs = _activity_obs(
         species_id="SiO2",

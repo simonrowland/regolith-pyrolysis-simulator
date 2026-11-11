@@ -457,8 +457,8 @@ def test_volovetskii_starting_glass_with_excess_chloride_is_refused() -> None:
     assert selected.printed_composition is not None
     assert selected.printed_composition.state.is_value
     source_map = observation["values"]["composition_wt_pct"]
-    # The source oxide cells sum to 95.68 wt%; printed Cl is 0.81 wt%, above
-    # the shared 0.5 wt% dropped-component limit.
+    # The source oxide cells sum to 95.68 wt%; printed Cl is above the
+    # 0.5 wt% dropped-component limit.
     assert as_decimal(source_map["Cl"]) == Decimal("0.81")
     assert as_decimal(selected.printed_composition.state.value["Cl"]) == Decimal(
         "0.81"
@@ -1176,7 +1176,11 @@ def test_scalar_reserved_metadata_in_explicit_map_is_malformed() -> None:
 def test_nested_printed_composition_walk_metadata_is_value_aware() -> None:
     rejected_context = {
         "point_conditions": {
-            "printed_composition": {"SiO2": "50", "MgO": "50", "note": "1"}
+            "printed_composition": {
+                "SiO2": "50",
+                "MgO": "50",
+                "note": "0.51",
+            }
         }
     }
     converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
@@ -1186,7 +1190,7 @@ def test_nested_printed_composition_walk_metadata_is_value_aware() -> None:
     # Green accepted the oxide map because it never read this nested note; m1 flags its >0.5 wt% contribution.
     assert converted is None
     assert refusal is not None and refusal.closure_refusal
-    assert "note=1 wt%" in refusal.reason
+    assert "note=0.51 wt%" in refusal.reason
 
     trace_context = {
         "point_conditions": {
@@ -1275,7 +1279,7 @@ def test_declared_flat_map_counts_bare_phosphorus() -> None:
         refusal_classification=classification,
         declared_map=True,
     ) is None
-    # Green accepted elemental P as a non-oxide; its 1 wt% excess is a flagged closure refusal (b).
+    # Green accepted elemental P as a non-oxide; its >0.5 wt% mass is a flagged closure refusal (b).
     assert refusal == [
         "partial analysis contains unsupported component(s) above 0.5 wt%: "
         "P=1 wt%"
@@ -1305,6 +1309,77 @@ def test_formula_unknown_trace_projects_with_notice() -> None:
     assert notice is not None
     assert notice.dropped == ("XxO",)
     assert "XxO=0.3 wt%" in notice.reason
+
+
+def test_unknown_formula_at_half_wt_percent_projects_with_notice() -> None:
+    printed = {
+        "SiO2": "49.75",
+        "MgO": "49.75",
+        "XxO": "0.5",
+        "sum_wt_pct": "100",
+    }
+    result, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("49.75"), "MgO": Decimal("49.75")},
+        closure_context={"composition_wt_pct": printed},
+        declared_component_map=printed,
+    )
+
+    assert result is not None and refusal is None
+    notice = _projection_notice_from_printed_map(
+        {"SiO2": Decimal("49.75"), "MgO": Decimal("49.75")},
+        closure_context={"composition_wt_pct": printed},
+        quantity=Quantity.ACTIVITY,
+        origin="fixture",
+        declared_component_map=printed,
+    )
+    assert notice is not None
+    assert notice.kind is NoticeKind.COMPOSITION_PROJECTED
+    assert notice.dropped == ("XxO",)
+    assert "XxO=0.5 wt%" in notice.reason
+    assert "sum_wt_pct" not in notice.reason
+
+
+def test_unknown_formula_just_above_half_wt_percent_refuses() -> None:
+    printed = {
+        "SiO2": "49.745",
+        "MgO": "49.745",
+        "XxO": "0.51",
+        "sum_wt_pct": "100",
+    }
+    result, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("49.745"), "MgO": Decimal("49.745")},
+        closure_context={"composition_wt_pct": printed},
+        declared_component_map=printed,
+    )
+
+    assert result is None and refusal is not None
+    assert "XxO=0.51 wt%" in refusal.reason
+    assert "sum_wt_pct" not in refusal.reason
+
+
+def test_bao_at_two_wt_percent_refuses_as_unsupported_print_form() -> None:
+    printed = {"SiO2": "49", "MgO": "49", "BaO": "2", "sum_wt_pct": "100"}
+    result, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("49"), "MgO": Decimal("49"), "BaO": Decimal("2")},
+        closure_context={"composition_wt_pct": printed},
+        declared_component_map=printed,
+    )
+
+    assert result is None and refusal is not None
+    assert isinstance(refusal, migrate_module._CompositionRefusal)
+    assert refusal.reason.startswith("mass-percent composition is not usable:")
+    assert "BaO=2 wt%" in refusal.reason
+
+
+def test_standalone_conversion_does_not_drop_without_notice_channel() -> None:
+    with pytest.raises(ValueError, match="XxO=0.3 wt%"):
+        wt_pct_to_mole_fraction(
+            {
+                "SiO2": Decimal("59.7"),
+                "MgO": Decimal("40"),
+                "XxO": Decimal("0.3"),
+            }
+        )
 
 
 @pytest.mark.parametrize("has_quantity", (False, True))
@@ -3042,7 +3117,7 @@ def test_refused_high_kept_total_has_no_projection_notice() -> None:
     printed = {
         "SiO2": Decimal("40"),
         "MgO": Decimal("64"),
-        "XxO": Decimal("1"),
+        "XxO": Decimal("1.0"),
     }
     converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
         printed,
@@ -3092,9 +3167,12 @@ def test_mass_closure_is_identical_through_plain_and_full_migration(
         }
     )
     assert plain.state.is_value
-    public = wt_pct_to_mole_fraction(
-        {name: Decimal(value) for name, value in components.items()}
-    )
+    public_components = {
+        name: Decimal(value)
+        for name, value in components.items()
+        if name != "unknown-component"
+    }
+    public = wt_pct_to_mole_fraction(public_components)
     assert plain.state.value == public
     if "unknown-component" in components:
         assert plain.inference is not None
@@ -4866,6 +4944,80 @@ def test_plain_mass_percent_trace_accepts_and_retains_dropped_name_provenance() 
     assert "omitted trace components: unknown-component" in composition.inference.inputs
 
 
+def test_observation_reader_projects_unknown_mass_percent_trace_with_notice(
+    tmp_path: Path,
+) -> None:
+    observation = next(
+        iter(migrate(_write_min_tree(tmp_path), write=False).observations.values())
+    )
+    payload = to_plain(observation)
+    payload["identity"]["quantity"] = {"tag": "value", "value": "activity"}
+    payload["identity"]["composition"] = {
+        "tag": "value",
+        "value": {
+            "basis": "printed_oxides",
+            "amount_basis": "mass_percent",
+            "components": [
+                ["SiO2", "49.85"],
+                ["MgO", "49.85"],
+                ["XxO", "0.3"],
+            ],
+        },
+    }
+    payload["point_conditions"] = None
+    payload["notices"] = []
+
+    loaded = migrate_module.observation_from_plain(payload)
+
+    assert loaded.identity.composition is not None
+    assert loaded.identity.composition.is_value
+    projected = [
+        notice
+        for notice in loaded.notices
+        if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+    ]
+    assert len(projected) == 1
+    assert projected[0].dropped == ("XxO",)
+    assert "XxO=0.3 wt%" in projected[0].reason
+
+
+def test_observation_reader_refuses_trace_when_quantity_cannot_be_noticed(
+    tmp_path: Path,
+) -> None:
+    observation = next(
+        iter(migrate(_write_min_tree(tmp_path), write=False).observations.values())
+    )
+    payload = to_plain(observation)
+    payload["identity"]["quantity"] = {
+        "tag": "unknown",
+        "reason": "quantity not reported",
+    }
+    payload["identity"]["composition"] = {
+        "tag": "value",
+        "value": {
+            "basis": "printed_oxides",
+            "amount_basis": "mass_percent",
+            "components": [
+                ["SiO2", "49.85"],
+                ["MgO", "49.85"],
+                ["XxO", "0.3"],
+            ],
+        },
+    }
+    payload["point_conditions"] = None
+    payload["notices"] = []
+
+    loaded = migrate_module.observation_from_plain(payload)
+
+    assert loaded.identity.composition is not None
+    assert loaded.identity.composition.is_unknown
+    assert "XxO=0.3 wt%" in loaded.identity.composition.reason
+    assert not any(
+        notice.kind is NoticeKind.COMPOSITION_PROJECTED
+        for notice in loaded.notices
+    )
+
+
 def test_plain_identity_with_recognized_oxide_composition_round_trips() -> None:
     payload = {
         "quantity": {"tag": "value", "value": "activity"},
@@ -6266,6 +6418,48 @@ def test_flat_point_projects_recognized_trace_with_notice_and_ignores_conditions
     assert projected[0].dropped_mass_fraction == Decimal("0.003")
 
 
+def test_flat_point_projects_unknown_formula_trace_with_notice(
+    tmp_path: Path,
+) -> None:
+    extract = _markova_vi_extract()
+    values = extract["species"]["SiO2"]["observations"][0]["values"]
+    values["points"] = [
+        {
+            "T_C": 0,
+            "mass_loss_pct": 0,
+            "SiO2": "49.85",
+            "MgO": "49.85",
+            "XxO": "0.3",
+            "p_atm": "0.2",
+            "delta_IW": "-1.0",
+            "run": 7,
+            "T_C_is_initial_composition": True,
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    point = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "fixture-source::markova_1984_table2_residual_melt_VI_lherzolite::"
+        )
+    )
+
+    assert point.identity.composition is not None
+    assert point.identity.composition.is_value
+    printed = point.point_conditions["printed_composition"]
+    assert printed.state.is_value and printed.state.value["XxO"] == "0.3"
+    projected = [
+        notice
+        for notice in point.notices
+        if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+    ]
+    assert len(projected) == 1
+    assert projected[0].dropped == ("XxO",)
+    assert "XxO=0.3 wt%" in projected[0].reason
+
+
 def test_migrate_lifts_markova_shaped_oxide_map(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path, _markova_vi_extract())
     result = migrate(root, write=False)
@@ -7222,7 +7416,7 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
         # (a) Green rejected an unknown formula token above the drop limit.
         pytest.param(
             "unknown-token",
-            {"SiO2": "60", "MgO": "39", "XxO": "1"},
+            {"SiO2": "60", "MgO": "39", "XxO": "1.0"},
             None,
             None,
             False,
@@ -7231,8 +7425,8 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
         # (a) Green read and refused in-map XxO; the nested duplicate cannot replace that source.
         pytest.param(
             "in-map-and-nested-unknown-token",
-            {"SiO2": "50", "MgO": "49", "XxO": "1"},
-            {"point_conditions": {"printed_composition": {"XxO": "1"}}},
+            {"SiO2": "50", "MgO": "49", "XxO": "1.0"},
+            {"point_conditions": {"printed_composition": {"XxO": "1.0"}}},
             None,
             False,
             id="green-unknown-token-source-wins-over-nested-copy",
@@ -7241,7 +7435,7 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
         pytest.param(
             "nested-unknown-token",
             {"SiO2": "50", "MgO": "50"},
-            {"point_conditions": {"printed_composition": {"XxO": "1"}}},
+            {"point_conditions": {"printed_composition": {"XxO": "1.0"}}},
             None,
             True,
             id="m1-nested-unknown-token",
@@ -7249,7 +7443,7 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
         # (a) Green read and rejected the numeric unsupported label in its map.
         pytest.param(
             "unknown-label",
-            {"SiO2": "50", "MgO": "49", "unknown-component": "1"},
+            {"SiO2": "50", "MgO": "49", "unknown-component": "1.0"},
             None,
             None,
             False,
@@ -7261,21 +7455,21 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             {"SiO2": "50", "MgO": "50"},
             {
                 "point_conditions": {
-                    "printed_composition": {"unknown-component": "1"}
+                    "printed_composition": {"unknown-component": "1.0"}
                 }
             },
             None,
             True,
             id="m1-nested-unknown-label-over-trace-limit",
         ),
-        # (a) The over-limit unsupported total includes a token Green rejected.
+        # The combined dropped mass stays within the inclusive 0.5 wt% limit.
         pytest.param(
             "formula-unknown-and-chloride-traces",
-            {"SiO2": "50", "MgO": "49.3", "XxO": "0.3", "Cl": "0.4"},
+            {"SiO2": "50", "MgO": "49.5", "XxO": "0.3", "Cl": "0.2"},
             None,
             None,
-            False,
-            id="green-unknown-token-makes-combined-traces-unflagged",
+            None,
+            id="combined-dropped-traces-project-with-notice",
         ),
         # (a) Green read XxO inside the map; nested Cl pushes dropped mass above 0.5.
         pytest.param(
@@ -7471,6 +7665,7 @@ def test_mass_closure_refusal_check_order(
         if case in {
             "formula-unknown-trace",
             "unknown-component-trace",
+            "formula-unknown-and-chloride-traces",
         }:
             notice = _projection_notice_from_printed_map(
                 wt,
@@ -7480,10 +7675,12 @@ def test_mass_closure_refusal_check_order(
                 declared_component_map=declared,
             )
             assert notice is not None, case
-            expected_dropped = (
-                "XxO" if case == "formula-unknown-trace" else "unknown-component"
-            )
-            assert notice.dropped == (expected_dropped,), case
+            expected_dropped = {
+                "formula-unknown-trace": ("XxO",),
+                "unknown-component-trace": ("unknown-component",),
+                "formula-unknown-and-chloride-traces": ("XxO", "Cl"),
+            }[case]
+            assert notice.dropped == expected_dropped, case
         return
 
     assert converted is None, case

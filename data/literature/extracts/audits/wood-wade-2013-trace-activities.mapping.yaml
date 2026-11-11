@@ -1,0 +1,122 @@
+source_id: wood-wade-2013-trace-activities
+input_order:
+  mineru_table: p008-t01
+  pdftotext_and_mineru_markdown: pages 8-9
+  render: physical PDF page 8, used to verify Table 1 row and column placement after the draft marked early body rows as headers
+tables:
+- printed_table: '1'
+  physical_pdf_page: 8
+  published_page: 918
+  pdf_page_index: 7
+  caption: Compositions of phases produced at 1.5 GPa/1,650 °C
+  table_row_count: 21
+  numeric_data_cell_count: 16
+  columns:
+  - printed_column: Identifier / Silicate / Metal row labels
+    use: Link the table to the single run identifier BW1102; distinguish the silicate and metal phase analyses.
+  - printed_column: numeric values
+    use: Retain every numeric cell in wood_wade_2013_bw1102_table1_partitioning_inputs; preserve parenthetical one-standard-deviation widths where printed.
+  row_mapping:
+    - printed_rows: '3-8'
+      printed_cells: SiO2, Al2O3, FeO, MgO, CaO, Total
+      stored_as: species.PbO.context[wood_wade_2013_bw1102_table1_partitioning_inputs].values.silicate_major_oxide_cells_as_printed and silicate_major_oxide_sum
+      use: analyzed silicate phase composition; unit and composition basis are absent from the table and remain unknown for engine identity.
+    - printed_row: '9'
+      printed_cell: gamma FeO, value 0.92, footnote a
+      stored_as: species.PbO.context[wood_wade_2013_bw1102_table1_partitioning_inputs].values.gamma_FeO_as_printed
+      use: calculated partitioning input, not a trace-oxide output.
+    - printed_rows: '11-14'
+      printed_cells: Cu, Ag, In, Pb under Trace (ppm), Silicate
+      stored_as: species.PbO.context[wood_wade_2013_bw1102_table1_partitioning_inputs].values.trace_concentrations.silicate
+      use: printed metal-silicate partitioning inputs.
+    - printed_row: '16'
+      printed_cell: Fe 99.7 (0.7), Metal
+      stored_as: species.PbO.context[wood_wade_2013_bw1102_table1_partitioning_inputs].values.trace_concentrations.metal.Fe
+      use: retain the printed cell; its unit is not stated.
+    - printed_rows: '18-21'
+      printed_cells: Cu, Ag, In, Pb under Trace (ppm), Metal
+      stored_as: species.PbO.context[wood_wade_2013_bw1102_table1_partitioning_inputs].values.trace_concentrations.metal
+      use: printed metal-silicate partitioning inputs.
+  non_target_rows:
+  - row: 10
+    label: Trace (ppm)
+    treatment: section label, not a numeric cell
+  - row: 15
+    label: Metal
+    treatment: phase label, not a numeric cell
+  - row: 17
+    label: Trace (ppm)
+    treatment: section label, not a numeric cell
+prose_observations:
+- species: PbO
+  observation_id: wood_wade_2013_pbo_activity_coefficient
+  quantity: activity_coefficient
+  species_component: PbO
+  phase: l
+  value: '0.22'
+  physical_pdf_page: 8
+  pdf_page_index: 7
+  published_page: 918
+  source_statement: Applying these results and using LogK_Pb above leads to an activity coefficient gamma_PbO in silicate melt of 0.22 at 1,923 K.
+- species: CuO0.5
+  observation_id: wood_wade_2013_cuo05_activity_coefficient
+  quantity: activity_coefficient
+  species_component: CuO0.5
+  phase: l
+  value: '3.5'
+  physical_pdf_page: 8
+  pdf_page_index: 7
+  published_page: 918
+  source_statement: Applying this activity coefficient for Cu in the metal leads to gamma_CuO0.5 of 3.5 in the silicate melt at 1,923 K.
+- species: InO1.5
+  observation_id: wood_wade_2013_ino15_activity_coefficient
+  quantity: activity_coefficient
+  species_component: InO1.5
+  phase: l
+  value: '0.02'
+  physical_pdf_page: 9
+  pdf_page_index: 8
+  published_page: 919
+  source_statement: Applying this to the In partitioning data leads to an activity coefficient of InO1.5 of 0.02 in the SiO2-rich liquid at 1,923 K.
+figure_only_candidates:
+- figure: '1'
+  physical_pdf_page: 3
+  published_page: 913
+  proof_string: Fig. 1 Activity coefficient
+  content: NiO and FeO activity coefficient contours
+  disposition: Not digitized; numeric data are figure-only.
+- figure: '2'
+  physical_pdf_page: 5
+  published_page: 915
+  proof_string: Fig. 2 Activity coefficient
+  content: NiO and FeO activity coefficient contours
+  disposition: Not digitized; numeric data are figure-only.
+- figure: '3'
+  physical_pdf_page: 6
+  published_page: 916
+  proof_string: Fig. 3 Activity coefficient
+  content: MoO2 activity coefficient contours
+  disposition: Not digitized; numeric data are figure-only.
+- figure: '4'
+  physical_pdf_page: 7
+  published_page: 917
+  proof_string: Fig. 4 Activity coefficient
+  content: WO3 activity coefficient contours
+  disposition: Not digitized; numeric data are figure-only.
+- figure: '5'
+  physical_pdf_page: 9
+  published_page: 919
+  content: Pi(gas)/Xi(melt) volatility curves for Pb, Cu and In at 1,600 K
+  disposition: Numerical volatility values are not tabulated; curves are not digitized.
+- cited_source: Holzheid and Lodders (2001)
+  source_page_in_this_paper: 8
+  pdf_page_index: 7
+  published_page: 918
+  proof_string: 4.2 at 1573 K
+  content: Comparison gamma_CuO0.5 values of approximately 4.2 at 1,573 K and 3.2 extrapolated to 1,923 K from Holzheid and Lodders (2001)
+  disposition: Cited figure-read comparator, not a printed value from this paper's metal-silicate experiment.
+additional_exclusions:
+- No activity value is numerically printed; do not calculate activity from the reported coefficients.
+- The liquid-Fe activity coefficients for Pb, Cu and In are partitioning inputs, not silicate-melt activity-coefficient rows.
+- Table 1 has no printed row for an Ag melt activity coefficient.
+- Table 1 major-oxide units and composition basis are not printed; do not assume wt% or convert the values to an engine composition.
