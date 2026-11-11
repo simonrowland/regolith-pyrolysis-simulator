@@ -1563,6 +1563,7 @@ def build_source_status(root: Path, *, corpus: Path | None = None, now: datetime
     by_stage = {name: 0 for name in STATUS_STAGES}
     for row in rows:
         by_stage[row["stage"]] = by_stage.get(row["stage"], 0) + 1
+    by_stage = {name: count for name, count in by_stage.items() if count}
     anti_loss = {
         "corpus_uncommitted": pack(uncommitted, uncommitted_why),
         "corpus_unpushed": pack(unpushed, unpushed_why),
