@@ -137,7 +137,14 @@ match, and the characters on either side must not extend it. An extending
 character is an ASCII letter or digit, a Unicode letter, µ, or °, or a
 dot or comma followed by a digit. So `1 K` is not `1 KPa`, and `1` is not
 `1,000`. The token must appear in the cited `line_range` when one is set,
-otherwise in the opened text. A page or table number alone is not an open.
+otherwise in the opened text. A CSV or TSV source is not searched that way:
+the complete table is parsed first, honouring quoted multi-line cells, and
+the locator then selects records that lie entirely inside the cited lines.
+A cell certifies a stored value only when the whole trimmed, unquoted cell
+is a spelling of that number or equals the stored string. A substring does
+not certify: a cell `1/2` is not `1`, and a cell `1,000` is not `1`. A
+`line_range` that cuts through a quoted cell is source-blind and is not
+re-parsed from the sliced lines. A page or table number alone is not an open.
 A PDF is not opened as text. Do not backfill reviewer fields from the
 extract's own value.
 

@@ -31,9 +31,13 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   exponent belong to the token, so 0.24 is not -0.24 or 0.24e-5, and
   1.0 is not 1. A sentence period does not extend that token, so 1
   matches "the value is 1." A CSV or TSV source, including a table
-  artifact with that suffix, is matched per cell: the delimiter is not
-  part of the token. Inside a cell the same boundary applies, so a cell
-  1,000 does not certify 1 and 1 K is not 1 KPa.
+  artifact with that suffix, is parsed completely before the locator is
+  applied. A cell certifies a stored value only when the whole trimmed,
+  unquoted cell is that value: a spelling of the number, or the stored
+  string. A substring does not certify, so a cell 1/2 is not 1 and a cell
+  1,000 is not 1. A line_range selects only records that lie entirely
+  inside it. A span that cuts through a quoted cell is source-blind and
+  is not re-parsed from the sliced lines. 1 K is not 1 KPa.
   A leading decimal is a number, so .24 is not a label
   and is not the token -0.24, 10.24, or 0.24. A float spelling is kept
   only when it parses back to the stored number, so
@@ -84,7 +88,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import io
 from copy import deepcopy
 from dataclasses import dataclass
 from functools import lru_cache
@@ -369,8 +372,8 @@ def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
     occupies ``[start, end)``, and neither neighbour extends that span.
     ``1 K`` is not ``1 KPa``. ``1`` is not ``1,000``. ``1,000`` is not
     ``1,000,000``. ``1`` is not ``-1`` or ``1µ``. ``1`` is ``the value is 1.``
-    This predicate does not know about table delimiters. A CSV or TSV
-    source passes one cell at a time, so a delimiter is never a neighbour.
+    This predicate is the prose boundary only. A CSV or TSV source does
+    not call it. The table is parsed first, and the whole cell is compared.
     """
     if not (0 <= start < end <= len(text)):
         return False
@@ -410,8 +413,9 @@ def _printed_value_carried(leaf: str, text: str) -> bool:
 
 
 # Certification opens these as tables. A companion ``literature_extract_table``
-# document stays an extract, not a source. The cell is the token: the
-# delimiter is not passed to the prose boundary predicate.
+# document stays an extract, not a source. The cell is the token. Prose
+# boundary matching is not applied inside a cell, and a delimiter is never
+# an extending character because the table is parsed before comparison.
 _TABULAR_SOURCE_DELIMITERS = {
     ".csv": ",",
     ".tsv": "\t",
@@ -423,23 +427,114 @@ def _tabular_delimiter(path: Path) -> str | None:
     return _TABULAR_SOURCE_DELIMITERS.get(path.suffix.lower())
 
 
-def _table_cell_texts(text: str, delimiter: str) -> list[str]:
-    """Cell strings. ``csv.Error`` means the table was not parsed.
+def _table_records(
+    text: str, delimiter: str
+) -> list[tuple[int, int, list[str]]]:
+    """Parse the complete table. Each row is ``(start_line, end_line, cells)``.
 
-    Callers refuse that parse. Searching the raw row would treat the
-    delimiter as digit grouping.
+    Lines are 1-based and inclusive, the same numbering as ``str.splitlines``.
+    A quoted cell that contains a newline occupies every physical line it
+    spans. ``csv.Error`` means the table was not parsed. Callers refuse
+    that and do not search the raw text or a sliced line.
     """
-    reader = csv.reader(io.StringIO(text, newline=""), delimiter=delimiter)
-    return [cell for row in reader for cell in row]
+    lines = text.splitlines(keepends=True)
+    index = 0
+
+    class _Lines:
+        def __iter__(self) -> _Lines:
+            return self
+
+        def __next__(self) -> str:
+            nonlocal index
+            if index >= len(lines):
+                raise StopIteration
+            line = lines[index]
+            index += 1
+            return line
+
+    reader = csv.reader(_Lines(), delimiter=delimiter)
+    records: list[tuple[int, int, list[str]]] = []
+    previous = 0
+    for row in reader:
+        if index <= previous:
+            raise csv.Error("table record did not consume a line")
+        records.append((previous + 1, index, list(row)))
+        previous = index
+    return records
+
+
+def _cited_table_cells(
+    text: str,
+    locator: Mapping[str, Any],
+    delimiter: str,
+) -> tuple[list[str] | None, str | None]:
+    """Cells the locator cites, after the complete table has been parsed.
+
+    Invariant: a table certifies from parsed cells only. ``line_range``
+    selects records that lie entirely inside it. A span that includes some
+    but not all lines of a record cuts through a quoted cell. That span is
+    source-blind, and the sliced lines are not parsed as their own table.
+    Without ``line_range`` every cell of the table is cited.
+    """
+    records = _table_records(text, delimiter)
+    if "line_range" not in locator or locator.get("line_range") is None:
+        return [cell for _start, _end, row in records for cell in row], None
+    span = _parse_line_range(locator.get("line_range"))
+    if span is None:
+        return None, "line_range is not a line number or start-end span"
+    start, end = span
+    line_count = len(text.splitlines())
+    if end > line_count:
+        return None, (
+            f"line_range {start}-{end} is outside the artifact "
+            f"({line_count} lines)"
+        )
+    for rec_start, rec_end, _row in records:
+        overlaps = not (end < rec_start or start > rec_end)
+        covers = start <= rec_start and rec_end <= end
+        if overlaps and not covers:
+            return None, (
+                f"line_range {start}-{end} cuts through a quoted table cell "
+                f"on lines {rec_start}-{rec_end}"
+            )
+    cells = [
+        cell
+        for rec_start, rec_end, row in records
+        if start <= rec_start and rec_end <= end
+        for cell in row
+    ]
+    return cells, None
+
+
+def _cell_certifies_leaf(leaf: Any, cell: str) -> bool:
+    """True when the whole trimmed, unquoted cell is ``leaf``.
+
+    Never a substring. ``1/2`` is not ``1``. ``1,000`` is not ``1``.
+    ``1 K`` is not ``1 KPa``. A string matches only that string. An int
+    matches only its decimal spelling. A float matches only a spelling
+    ``_numeric_spellings`` keeps, which parses back to that float.
+    """
+    folded = _fold_numeric_signs(cell.strip())
+    if isinstance(leaf, str):
+        return folded == _fold_numeric_signs(leaf)
+    if isinstance(leaf, bool):
+        return folded.lower() == ("true" if leaf else "false")
+    if isinstance(leaf, int):
+        return folded == str(leaf)
+    if isinstance(leaf, float):
+        if not math.isfinite(leaf):
+            return False
+        return folded in _numeric_spellings(leaf)
+    return False
 
 
 def _leaf_in_table(leaf: Any, cells: Sequence[str]) -> bool:
-    """True when one cell carries ``leaf`` under the prose boundary.
+    """True when one whole cell is ``leaf``.
 
-    The cell text is the whole source for that comparison, so a delimiter
-    cannot extend the token. A cell ``1,000`` does not certify ``1``.
+    Comparison is ``_cell_certifies_leaf`` only. The prose matcher is not
+    used, so a digit inside ``1/2`` or ``note 1`` is not that stored number.
     """
-    return any(_leaf_in_text(leaf, cell) for cell in cells)
+    return any(_cell_certifies_leaf(leaf, cell) for cell in cells)
 
 
 # Repository-relative roots that hold a paper, OCR, quotes, or a reference
@@ -2121,6 +2216,7 @@ def _read_artifact_text(path: Path) -> tuple[str | None, str | None]:
 def _cited_text(
     full: str, locator: Mapping[str, Any]
 ) -> tuple[str | None, str | None]:
+    """Prose span. A table does not use this; it is parsed whole first."""
     if "line_range" not in locator or locator.get("line_range") is None:
         return full, None
     span = _parse_line_range(locator.get("line_range"))
@@ -2353,20 +2449,24 @@ def _locator_source_blind_reason(
                 f"{path.name} is an extract document, not an independent source"
             )
             continue
-        cited, span_error = _cited_text(text, locator)
-        if cited is None:
-            reasons.append(span_error or "cited span was not opened")
-            continue
         delimiter = _tabular_delimiter(path)
         if delimiter is None:
+            cited, span_error = _cited_text(text, locator)
+            if cited is None:
+                reasons.append(span_error or "cited span was not opened")
+                continue
             missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
         else:
+            # Parse the complete table, then select. A sliced line is not a table.
             try:
-                cells = _table_cell_texts(cited, delimiter)
+                cells, span_error = _cited_table_cells(text, locator, delimiter)
             except csv.Error as exc:
                 reasons.append(
                     f"opened {path.name} but the table could not be parsed ({exc})"
                 )
+                continue
+            if cells is None:
+                reasons.append(span_error or "cited span was not opened")
                 continue
             missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
         if not missing:
@@ -2395,9 +2495,13 @@ def fidelity_source_warnings(
     an ASCII letter or digit, a Unicode letter, µ, or °, or a dot or comma
     followed by a digit. A sentence period does not extend the token, so
     ``1`` matches ``the value is 1.``. ``1 K`` is not ``1 KPa`` and ``1``
-    is not ``1,000``. A CSV or TSV source is matched per cell, so the
-    delimiter is not a neighbour. Inside a cell the same boundary applies:
-    a cell ``1,000`` is not ``1``, and ``1 K`` is not ``1 KPa``.
+    is not ``1,000``. A CSV or TSV source is parsed completely before the
+    locator is applied. A cell certifies a stored value only when the whole
+    trimmed, unquoted cell is that value. A substring does not certify, so
+    a cell ``1/2`` is not ``1`` and a cell ``1,000`` is not ``1``. A
+    ``line_range`` selects records that lie entirely inside it. A span that
+    cuts through a quoted cell is source-blind and is not re-parsed from
+    the sliced lines. ``1 K`` is not ``1 KPa``.
     A leading decimal is a numeric token.
     A spelling that rounds the stored float to a different number is not
     that token. The sample's own spelling is not a substitute: a ``rel_tol``
@@ -2662,9 +2766,12 @@ def certify_extract_source_fidelity(
     The whole value, including a spaced or attached unit, must match, and
     neither neighbour may extend the span. ``1 K`` is not ``1 KPa`` and
     ``1`` is not ``1,000``. A sentence period does not extend the span, so
-    ``1`` matches ``the value is 1.``. A CSV or TSV source is matched per
-    cell, so the delimiter is not a neighbour; inside a cell the same
-    boundary applies, and a cell ``1,000`` is not ``1``. A leading decimal
+    ``1`` matches ``the value is 1.``. A CSV or TSV source is parsed
+    completely before the locator is applied. A cell certifies a stored
+    value only when the whole trimmed, unquoted cell is that value, so a
+    cell ``1/2`` is not ``1`` and a cell ``1,000`` is not ``1``. A span
+    that cuts through a quoted cell is source-blind and is not re-parsed
+    from the sliced lines. A leading decimal
     is a numeric token. A spelling
     that rounds the stored float to a different number is not that token.
     The sample's own

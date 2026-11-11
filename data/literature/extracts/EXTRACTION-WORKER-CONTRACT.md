@@ -94,6 +94,10 @@ warning remains. Certification opens a source artifact at the locator
 requires each pinned number as a complete token, sign and exponent included.
 The whole stored value, including a spaced or attached unit, must match, and
 neither neighbour may extend it: `1 K` is not `1 KPa`, and `1` is not `1,000`.
+A CSV or TSV quotes file is parsed as a complete table first. A cell
+certifies a value only when the whole trimmed cell is that value, never a
+substring (`1/2` is not `1`, and `1,000` is not `1`). A line range that cuts
+through a quoted cell is source-blind and is not re-parsed from the fragment.
 A digit-bearing string the parser cannot read is uncovered unless that
 printed value occurs whole in the opened source.
 Do not stamp reviewers or copy pins to clear them.

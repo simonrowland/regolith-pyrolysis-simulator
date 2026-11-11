@@ -12,7 +12,9 @@ t-510 fidelity gate:
 from __future__ import annotations
 
 import copy
+import csv
 import hashlib
+import io
 import importlib.util
 import inspect
 import itertools
@@ -5114,6 +5116,12 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # A sentence period is not an extending character. No sample has
 # reviewed_by, so the source matcher still does not run, and this does
 # not move the ceilings or any extract's certification state.
+# Whole-cell table matching parses the complete CSV or TSV before the
+# locator and refuses a substring inside a cell. No sample has reviewed_by
+# and no extract is review_status reviewed, so the source matcher still
+# does not run. Ceilings do not move. Certification-state changes from
+# this rule: 0. ivtan-mno-coo-thermo and sf04-magma-companion-workbook
+# stay draft from the earlier demotion.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 48661
 _UNCOVERED_EXTRACTS_CEILING = 616
@@ -7885,17 +7893,23 @@ def test_source_artifact_provenance_is_required_at_every_promoter(
     assert accepts == (role in _ARTIFACT_ROLE_PASS)
 
 
-# Tabular sources. The expected result is the cell rule: a CSV or TSV row
-# is parsed, and each cell is its own token. ``0.91,0.92`` certifies 0.91
-# and 0.92. A quoted cell ``1,000`` does not certify 1, and neither does a
-# TSV cell ``1,000``. A cell ``1 KPa`` does not certify ``1 K``. The same
-# row in a prose artifact stays digit grouping; that case lives in
+# Tabular sources. The expected result is the whole-cell rule: a CSV or TSV
+# row is parsed, and a cell certifies a value only when the whole trimmed
+# cell is that value. ``0.91,0.92`` certifies 0.91 and 0.92. A cell ``1/2``
+# does not certify 1. A quoted cell ``1,000`` does not certify 1, and neither
+# does a TSV cell ``1,000``. A cell ``1 KPa`` does not certify ``1 K``. The
+# same row in a prose artifact stays digit grouping; that case lives in
 # ``_TOKEN_CASES``.
 _TABULAR_CELL_CASES = (
     ("csv_first_cell", "csv", "0.91,0.92\n", 0.91, True),
     ("csv_second_cell", "csv", "0.91,0.92\n", 0.92, True),
     ("csv_quoted_group_refuses_one", "csv", '"1,000"\n', 1, False),
     ("csv_quoted_group_whole", "csv", '"1,000"\n', "1,000", True),
+    ("csv_fraction_refuses_one", "csv", "1/2\n", 1, False),
+    ("csv_fraction_refuses_string_one", "csv", "1/2\n", "1", False),
+    ("csv_fraction_whole", "csv", "1/2\n", "1/2", True),
+    ("csv_fraction_neighbor_refuses_one", "csv", "1/2,0.91\n", 1, False),
+    ("csv_fraction_neighbor_certifies_other", "csv", "1/2,0.91\n", 0.91, True),
     ("csv_unit_exact", "csv", "1 K\n", "1 K", True),
     ("csv_unit_tail", "csv", "1 KPa\n", "1 K", False),
     ("csv_joined_row_is_not_a_cell", "csv", "0.91,0.92\n", "0.91,0.92", False),
@@ -7903,19 +7917,29 @@ _TABULAR_CELL_CASES = (
     ("tsv_second_cell", "tsv", "0.91\t0.92\n", 0.92, True),
     ("tsv_grouped_cell_refuses_one", "tsv", "1,000\n", 1, False),
     ("tsv_grouped_cell_whole", "tsv", "1,000\n", "1,000", True),
+    ("tsv_fraction_refuses_one", "tsv", "1/2\n", 1, False),
+    ("tsv_fraction_whole", "tsv", "1/2\n", "1/2", True),
     ("tsv_unit_exact", "tsv", "1 K\n", "1 K", True),
     ("tsv_unit_tail", "tsv", "1 KPa\n", "1 K", False),
 )
 
 
 def _tabular_source_document(
-    root: Path, pin: object, suffix: str, source_text: str
+    root: Path,
+    pin: object,
+    suffix: str,
+    source_text: str,
+    *,
+    line_range: str | None = None,
 ) -> dict:
     """One attested pin. ``source_text`` is the table literal, not derived from ``pin``."""
     relative = f"tables/t1.{suffix}"
     path = root / relative
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(source_text, encoding="utf-8")
+    locator: dict = {"quotes_path": relative, "page": 1}
+    if line_range is not None:
+        locator["line_range"] = line_range
     doc = _minimal_extract()
     _strip_scored_conditions(doc)
     doc["review_status"] = "reviewed"
@@ -7926,7 +7950,7 @@ def _tabular_source_document(
             "value": pin,
             "reviewed_by": "independent reviewer",
             "reviewed_on": "2026-11-10",
-            "locator": {"quotes_path": relative, "page": 1},
+            "locator": locator,
         }
     ]
     return doc
@@ -7948,12 +7972,13 @@ def test_tabular_source_matches_each_cell(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ):
-    """Invariant: a CSV or TSV delimiter is not digit grouping.
+    """Invariant: a table cell certifies a value only when the whole cell is that value.
 
     The row ``0.91,0.92`` certifies 0.91 and 0.92, each as its own cell.
-    A quoted cell ``1,000`` certifies that printed value and not 1. A TSV
-    cell ``1,000`` does the same. ``1 K`` is not ``1 KPa`` inside a cell.
-    Every promoter calls ``certify_extract_source_fidelity``.
+    A cell ``1/2`` does not certify 1. A quoted cell ``1,000`` certifies
+    that printed value and not 1. A TSV cell ``1,000`` does the same.
+    ``1 K`` is not ``1 KPa`` inside a cell. Every promoter calls
+    ``certify_extract_source_fidelity``.
     """
     doc = _tabular_source_document(tmp_path, pin, suffix, source_text)
     errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
@@ -7976,6 +8001,339 @@ def test_tabular_source_matches_each_cell(
         draft, label="draft", artifact_root=tmp_path
     )
     assert any(warning.kind == "source_blind_pin" for warning in warnings)
+
+
+# Locator against a parsed table. ``cuts`` is the rule that a line_range
+# overlapping a record without covering it is source-blind. Expected
+# acceptance of a covered cell is whole-cell equality, not a substring.
+# name, suffix, text, line_range, pin, accepts, cuts
+_TABLE_SPAN_CASES = (
+    ("csv_line2_refuses_one", "csv", '"note\n1,000"\n', "2", 1, False, True),
+    ("csv_line2_refuses_grouped_text", "csv", '"note\n1,000"\n', "2", "1,000", False, True),
+    ("csv_line2_refuses_whole_cell", "csv", '"note\n1,000"\n', "2", "note\n1,000", False, True),
+    ("csv_covered_span_whole_cell", "csv", '"note\n1,000"\n', "1-2", "note\n1,000", True, False),
+    ("csv_covered_span_refuses_one", "csv", '"note\n1,000"\n', "1-2", 1, False, False),
+    ("csv_covered_span_refuses_grouped", "csv", '"note\n1,000"\n', "1-2", "1,000", False, False),
+    ("csv_covered_note_one_refuses_one", "csv", '"note\n1"\n', "1-2", 1, False, False),
+    ("csv_covered_note_one_whole", "csv", '"note\n1"\n', "1-2", "note\n1", True, False),
+    ("tsv_line2_refuses_one", "tsv", '"note\n1,000"\n', "2", 1, False, True),
+    ("tsv_line2_refuses_whole_cell", "tsv", '"note\n1,000"\n', "2", "note\n1,000", False, True),
+    ("tsv_covered_span_whole_cell", "tsv", '"note\n1,000"\n', "1-2", "note\n1,000", True, False),
+    ("csv_cut_blocks_following_cell", "csv", '"note\n1,000"\n0.91\n', "2-3", 0.91, False, True),
+    ("tsv_cut_blocks_following_cell", "tsv", '"note\n1,000"\n0.91\n', "2-3", 0.91, False, True),
+    ("csv_following_line_certifies", "csv", '"note\n1,000"\n0.91\n', "3", 0.91, True, False),
+    ("csv_following_line_refuses_one", "csv", '"note\n1,000"\n0.91\n', "3", 1, False, False),
+    ("csv_covered_file_certifies_following", "csv", '"note\n1,000"\n0.91\n', "1-3", 0.91, True, False),
+    ("csv_second_row", "csv", "0.91,0.92\n1.5,2.5\n", "2", 1.5, True, False),
+    ("csv_second_row_misses_first", "csv", "0.91,0.92\n1.5,2.5\n", "2", 0.91, False, False),
+    ("tsv_second_row", "tsv", "0.91\t0.92\n1.5\t2.5\n", "2", 1.5, True, False),
+)
+
+
+@pytest.mark.parametrize(
+    ("case_name", "suffix", "source_text", "line_range", "pin", "accepts", "cuts"),
+    _TABLE_SPAN_CASES,
+    ids=[row[0] for row in _TABLE_SPAN_CASES],
+)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_table_locator_selects_parsed_cells(
+    case_name: str,
+    suffix: str,
+    source_text: str,
+    line_range: str,
+    pin: object,
+    accepts: bool,
+    cuts: bool,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Invariant: parse the complete table, then select cited records.
+
+    A locator on line 2 of ``\"note\\n1,000\"`` cuts through the quoted cell.
+    That span is source-blind. It is not re-parsed, so the fragment cell
+    ``1`` does not certify 1, and the whole cell is not cited either. The
+    span ``1-2`` cites the cell ``note\\n1,000`` and not the digit inside it.
+    A cell ``1/2`` is covered by the whole-cell cases above. Every promoter
+    calls ``certify_extract_source_fidelity``.
+    """
+    assert not (accepts and cuts)
+    doc = _tabular_source_document(
+        tmp_path, pin, suffix, source_text, line_range=line_range
+    )
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    if accepts:
+        assert errors == [], (case_name, entry, errors)
+        return
+    assert errors, (case_name, entry)
+    if entry != "certify":
+        return
+    joined = "\n".join(errors)
+    assert "source_blind_pin" in joined
+    if cuts:
+        assert "cuts through" in joined, (case_name, errors)
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (case_name, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    assert any(warning.kind == "source_blind_pin" for warning in warnings)
+
+
+# Embeddings that put a probe inside a larger cell. The expected boolean is
+# the oracle below, which does not call the gate. ``exact`` is the only
+# embedding that can certify the probe.
+_TABLE_CELL_PROBES = ("1", "0.91", "1,000", ".91", "1 K", "1/2")
+_TABLE_CELL_EMBEDDINGS = (
+    "exact",
+    "fraction",
+    "grouped",
+    "unit",
+    "prefix",
+    "slash_lead",
+    "doubled",
+)
+_TABLE_CELL_SUFFIXES = ("csv", "tsv")
+
+
+def _embedded_table_cell(probe: str, embedding: str) -> str:
+    """One cell built from ``probe``. Independent of the gate."""
+    if embedding == "exact":
+        return probe
+    if embedding == "fraction":
+        return f"{probe}/2"
+    if embedding == "grouped":
+        return f"{probe},000"
+    if embedding == "unit":
+        return f"{probe}Pa"
+    if embedding == "prefix":
+        return f"note {probe}"
+    if embedding == "slash_lead":
+        return f"1/{probe}"
+    if embedding == "doubled":
+        return f"{probe} {probe}"
+    raise AssertionError(embedding)
+
+
+def _one_cell_table(cell: str, suffix: str) -> str:
+    """A one-cell CSV or TSV whose parsed cell is ``cell``."""
+    delimiter = "," if suffix == "csv" else "\t"
+    buffer = io.StringIO(newline="")
+    csv.writer(buffer, delimiter=delimiter, lineterminator="\n").writerow([cell])
+    return buffer.getvalue()
+
+
+def _oracle_float_spellings(leaf: float) -> set[str]:
+    """Spellings that are this float. Not the gate's helper."""
+    spellings: set[str] = set()
+    for spelling in (str(leaf), format(leaf, ".16g")):
+        if "." not in spelling and "e" not in spelling.lower():
+            continue
+        try:
+            parsed = float(spelling)
+        except ValueError:
+            continue
+        if parsed == leaf and math.copysign(1.0, parsed) == math.copysign(1.0, leaf):
+            spellings.add(spelling)
+    return spellings
+
+
+def _oracle_whole_cell_certifies(leaf: object, cell: str) -> bool:
+    """The table rule, written here. It does not call the gate.
+
+    Trim the cell. A string certifies only when the cell equals it. An int
+    certifies only when the cell is the decimal spelling of that int. A
+    float certifies only when the cell is ``str(leaf)`` or
+    ``format(leaf, '.16g')``, that spelling parses back to the same float,
+    and it contains a decimal point or an exponent. A slash, a grouping
+    comma, a unit, or any other extra character refuses.
+    """
+    trimmed = cell.strip()
+    if isinstance(leaf, str):
+        return trimmed == leaf
+    if isinstance(leaf, bool):
+        return trimmed.lower() == ("true" if leaf else "false")
+    if isinstance(leaf, int):
+        return trimmed == str(leaf)
+    if isinstance(leaf, float):
+        if not math.isfinite(leaf):
+            return False
+        return trimmed in _oracle_float_spellings(leaf)
+    return False
+
+
+def _table_cell_leaves(probe: str, cell: str) -> list[object]:
+    """Leaves this cell is asked to certify. The oracle decides each one."""
+    leaves: list[object] = [probe, cell, 1, "1"]
+    if probe == "0.91":
+        leaves.append(0.91)
+    elif probe == ".91":
+        leaves.append(float(".91"))
+    unique: list[object] = []
+    for leaf in leaves:
+        if leaf not in unique:
+            unique.append(leaf)
+    return unique
+
+
+def _whole_cell_cases() -> list[tuple[str, str, str, str]]:
+    cases = []
+    for probe in _TABLE_CELL_PROBES:
+        for embedding in _TABLE_CELL_EMBEDDINGS:
+            for suffix in _TABLE_CELL_SUFFIXES:
+                ident = (
+                    f"{suffix}-{embedding}-"
+                    f"{probe.replace(' ', 'SP').replace(',', 'COMMA').replace('/', 'SLASH').replace('.', 'DOT')}"
+                )
+                cases.append((ident, suffix, probe, embedding))
+    return cases
+
+
+@pytest.mark.parametrize(
+    ("case_name", "suffix", "probe", "embedding"),
+    _whole_cell_cases(),
+    ids=[row[0] for row in _whole_cell_cases()],
+)
+def test_table_cell_certifies_only_the_whole_cell(
+    case_name: str,
+    suffix: str,
+    probe: str,
+    embedding: str,
+    tmp_path: Path,
+):
+    """Invariant: no substring of a table cell certifies.
+
+    The product is every probe (``1``, ``0.91``, ``1,000``, ``.91``,
+    ``1 K``, ``1/2``) embedded as the whole cell, a fraction, a grouped
+    continuation, a unit, a word prefix, a slash prefix, or a doubled
+    token, in both CSV and TSV. The expected boolean is
+    ``_oracle_whole_cell_certifies``. A cell ``1/2`` does not certify 1.
+    A cell ``1,000`` does not certify 1 and does certify the string
+    ``1,000``.
+    """
+    assert "vle." not in inspect.getsource(_oracle_whole_cell_certifies)
+    assert not _oracle_whole_cell_certifies(1, "1/2")
+    assert not _oracle_whole_cell_certifies(1, "1,000")
+    assert _oracle_whole_cell_certifies("1,000", "1,000")
+    assert _oracle_whole_cell_certifies(1, "1")
+    assert _oracle_whole_cell_certifies(0.91, "0.91")
+    assert not _oracle_whole_cell_certifies(0.91, ".91")
+    cell = _embedded_table_cell(probe, embedding)
+    text = _one_cell_table(cell, suffix)
+    delimiter = "," if suffix == "csv" else "\t"
+    parsed = list(csv.reader(io.StringIO(text, newline=""), delimiter=delimiter))
+    assert parsed == [[cell]], (case_name, parsed, text)
+    for leaf in _table_cell_leaves(probe, cell):
+        expected = _oracle_whole_cell_certifies(leaf, cell)
+        doc = _tabular_source_document(tmp_path, leaf, suffix, text)
+        errors = vle.certify_extract_source_fidelity(
+            doc, label="cell", artifact_root=tmp_path
+        )
+        if expected:
+            assert errors == [], (case_name, leaf, cell, errors)
+            continue
+        assert errors, (case_name, leaf, cell)
+        assert "source_blind_pin" in "\n".join(errors)
+
+
+_TABLE_CUT_INNERS = ("1,000", "1", "1/2", "0.91")
+_TABLE_CUT_MODES = ("cut_line2", "cut_line1", "cover")
+
+
+def _multiline_cell_table(inner: str, suffix: str) -> tuple[str, str]:
+    """A quoted cell ``note\\n<inner>``. Returns the file text and the cell."""
+    cell = "note\n" + inner
+    delimiter = "," if suffix == "csv" else "\t"
+    buffer = io.StringIO(newline="")
+    csv.writer(buffer, delimiter=delimiter, lineterminator="\n").writerow([cell])
+    return buffer.getvalue(), cell
+
+
+def _table_cut_cases() -> list[tuple[str, str, str, str]]:
+    cases = []
+    for inner in _TABLE_CUT_INNERS:
+        for suffix in _TABLE_CELL_SUFFIXES:
+            for mode in _TABLE_CUT_MODES:
+                label = inner.replace(",", "COMMA").replace("/", "SLASH").replace(".", "DOT")
+                cases.append((f"{suffix}-{mode}-{label}", suffix, inner, mode))
+    return cases
+
+
+@pytest.mark.parametrize(
+    ("case_name", "suffix", "inner", "mode"),
+    _table_cut_cases(),
+    ids=[row[0] for row in _table_cut_cases()],
+)
+def test_table_locator_that_cuts_a_cell_is_source_blind(
+    case_name: str,
+    suffix: str,
+    inner: str,
+    mode: str,
+    tmp_path: Path,
+):
+    """Invariant: a locator that cuts a quoted cell never certifies.
+
+    The table is one quoted cell ``note\\n<inner>``. Citing line 1 or line 2
+    cuts that cell, so every leaf refuses, including a leaf the sliced line
+    would certify. Citing lines 1-2 selects the whole cell, which certifies
+    only when ``_oracle_whole_cell_certifies`` says the cell is that leaf.
+    For inner ``1,000``, line 2 alone parses as a cell ``1``; the gate still
+    refuses 1.
+    """
+    text, cell = _multiline_cell_table(inner, suffix)
+    assert text.splitlines() == ['"note', inner + '"'], (case_name, text)
+    delimiter = "," if suffix == "csv" else "\t"
+    parsed = list(csv.reader(io.StringIO(text, newline=""), delimiter=delimiter))
+    assert parsed == [[cell]], (case_name, parsed)
+    if mode == "cut_line2" and inner == "1,000":
+        fragment = text.splitlines()[1]
+        fragment_rows = list(
+            csv.reader(io.StringIO(fragment + "\n", newline=""), delimiter=delimiter)
+        )
+        fragment_cells = [item for row in fragment_rows for item in row]
+        assert any(
+            _oracle_whole_cell_certifies(1, item) for item in fragment_cells
+        ), fragment_cells
+    if mode == "cover":
+        line_range = "1-2"
+    elif mode == "cut_line1":
+        line_range = "1"
+    elif mode == "cut_line2":
+        line_range = "2"
+    else:
+        raise AssertionError(mode)
+    leaves: list[object] = [1, "1", inner, cell]
+    if inner == "0.91":
+        leaves.append(0.91)
+    seen: list[object] = []
+    for leaf in leaves:
+        if leaf not in seen:
+            seen.append(leaf)
+    for leaf in seen:
+        if mode == "cover":
+            expected = _oracle_whole_cell_certifies(leaf, cell)
+        else:
+            expected = False
+        doc = _tabular_source_document(
+            tmp_path, leaf, suffix, text, line_range=line_range
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label="cut", artifact_root=tmp_path
+        )
+        if expected:
+            assert errors == [], (case_name, leaf, errors)
+            continue
+        assert errors, (case_name, leaf)
+        joined = "\n".join(errors)
+        assert "source_blind_pin" in joined
+        if mode != "cover":
+            assert "cuts through" in joined, (case_name, leaf, errors)
 
 
 # Stored value versus the sample spelling. ``within`` pairs satisfy
