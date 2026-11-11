@@ -13,6 +13,11 @@ typed. One missing or ill-typed field makes the whole record unknown, never
 a measured row with empty authority.
 
 - The only registration site is ``CompiledPressureEvaluator.evaluate``.
+  A diagnostic admission registers from the evaluator notice. Any other
+  continuation registers once when the evaluation is outside a certified
+  domain: temperature ``out_of_range``, or a carrier notice whose
+  ``authority_level`` is ``extrapolated`` (oxygen evaluator band and the
+  oxygen mass-action floor). Temperature alone does not define the domain.
 - A cache hit does not execute the law. It re-registers the disclosure stored
   with that computation. Counts from two computations add.
 - Disclosure is metadata on the cached row, not a cache-key dimension.
@@ -115,10 +120,11 @@ class RunDisclosure:
             notices = []
         if notices:
             # One row per law. A second notice on the same evaluator still
-            # counts as one execution of that law.
+            # counts as one execution of that law. Domain extrapolation does
+            # not add a second row for a law that is already diagnostic.
             self._register_notice(evaluator, notices[0])
             return
-        if evaluation is not None and bool(getattr(evaluation, "out_of_range", False)):
+        if evaluation is not None and _evaluation_is_extrapolated(evaluation):
             self._register_extrapolated(evaluator, evaluation)
 
     def _register_notice(self, evaluator: Any, notice: Mapping[str, Any]) -> None:
@@ -158,10 +164,9 @@ class RunDisclosure:
         if existing is not None:
             existing.evaluation_count += 1
             return
-        status = getattr(evaluation, "status", None)
         self.entries[law_id] = LawDisclosure(
             law_id=law_id,
-            provenance=str(status or "out_of_range"),
+            provenance=_extrapolated_provenance(evaluation),
             authority="extrapolated",
             certified_band_K=_certified_band(evaluator),
             anchor_gaps_dex={},
@@ -218,6 +223,50 @@ class RunDisclosure:
                 certification_route=route_t,
                 evaluation_count=count,
             )
+
+
+def _domain_extrapolation_notice(evaluation: Any) -> Mapping[str, Any] | None:
+    """First carrier notice that admits an extrapolated continuation.
+
+    Temperature ``out_of_range`` is only the thermal class. Oxygen-band and
+    mass-action-floor continuations arrive as notices with
+    ``authority_level == "extrapolated"``. Naming one notice key here would
+    drop the next domain.
+    """
+
+    from simulator.vapour_rail.instrumentation import public_carrier_notices
+
+    for items in public_carrier_notices(evaluation).values():
+        for item in items:
+            if item.get("authority_level") == "extrapolated":
+                return item
+    return None
+
+
+def _evaluation_is_extrapolated(evaluation: Any) -> bool:
+    if bool(getattr(evaluation, "out_of_range", False)):
+        return True
+    return _domain_extrapolation_notice(evaluation) is not None
+
+
+def _extrapolated_provenance(evaluation: Any) -> str:
+    """Thermal status and the domain reason, as one execution.
+
+    A temperature continuation keeps ``out_of_range_conservative_continuation``.
+    An in-temperature oxygen continuation keeps the notice reason
+    (``pO2_outside_evaluator_band`` or the mass-action floor). Both domains
+    on one evaluation stay one row: the thermal status, then the reason.
+    """
+
+    status = getattr(evaluation, "status", None)
+    status_text = str(status).strip() if status else ""
+    notice = _domain_extrapolation_notice(evaluation)
+    reason = ""
+    if isinstance(notice, Mapping):
+        reason = str(notice.get("reason") or "").strip()
+    if status_text and reason and reason not in status_text:
+        return f"{status_text}; {reason}"
+    return status_text or reason or "out_of_range"
 
 
 def _provenance_text(notice: Mapping[str, Any]) -> str:

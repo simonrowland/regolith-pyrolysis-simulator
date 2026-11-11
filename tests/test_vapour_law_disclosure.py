@@ -15,7 +15,10 @@ C0 forecast shares the parent's run registry, and ``_predict_c0_exit``
 publishes it onto the parent. Metadata overrides are applied before the
 measured disclosure is installed, on every run-metadata publisher. A cache or memo hit with no stored
 disclosure field is unknown and is a miss. Registration is the one
-``CompiledPressureEvaluator.evaluate`` call. A hit does not execute the law; it
+``CompiledPressureEvaluator.evaluate`` call. A non-diagnostic law is registered
+when the evaluation leaves a certified domain: the temperature band, the
+oxygen evaluator band, or the oxygen mass-action floor. An in-domain
+non-diagnostic evaluation registers nothing. A hit does not execute the law; it
 re-registers the disclosures stored with that computation, and evaluation
 counts add. An empty disclosure is a measured zero only when the computation
 recorded one. Attribution is per computation, never the ambient run registry.
@@ -33,12 +36,14 @@ rail is 0.6585350200427053 Pa (gap 1.1127636390496998 dex, 1.113 dex at
 from __future__ import annotations
 
 import csv
+import functools
 import hashlib
 import inspect
 import math
 import sqlite3
 import subprocess
 import threading
+import warnings
 from dataclasses import replace
 from pathlib import Path
 
@@ -584,6 +589,275 @@ def test_out_of_band_sio_registers_extrapolated_on_the_ranked_candidate() -> Non
     scored = replace(_scored(_base_spec()), law_disclosures=snapshot)
     record = _to_record(
         Candidate("sio-oob", RecipePatch({})),
+        scored,
+        cache_hit=False,
+    )
+    assert record.objectives["oxygen_kg"] == 10.0
+    assert _flagged_law_leaderboard_row(record) == {
+        "flagged_law_ids": "SiO:standard_reaction_term",
+        "flagged_law_authority": "extrapolated",
+    }
+
+
+# Domain classes for one oxygen-dependent law. Expectations come from the
+# inputs, not from reading the evaluation notice back.
+# in_band: midpoint temperature, pO2 = 1e-9 bar (inside 1e-30..100).
+# below / above: same temperature, pO2 outside that evaluator band.
+# floor: pO2 = 1e-30 bar. Negative exponents invert through the mass-action
+# floor; non-negative exponents stay inside the evaluator band and do not flag.
+# temperature: one kelvin above the certified band, pO2 inside the band.
+# temperature_and_below: both domains on one evaluation, one registration.
+_OOR_PROVENANCE = "out_of_range_conservative_continuation"
+_OXYGEN_BAND_REASON = "pO2_outside_evaluator_band"
+_OXYGEN_FLOOR_REASON = "melt_dissociation_pO2_floor_inverted_through_mass_action"
+_DOMAIN_PO2 = {
+    "in_band": 1.0e-9,
+    "below": 1.0e-31,
+    "above": 101.0,
+    "temperature": 1.0e-9,
+    "temperature_and_below": 1.0e-31,
+}
+# Hand product for the reviewer point. SiO exponent is -1/2 and p_ref is
+# 1e-9 bar, so pO2 = 1e-31 bar is 22 decades below the reference and +11 dex
+# on the pressure. The in-band value at 1873.15 K, a=0.35, pO2=1e-9 bar is
+# 0.9840768670106081 Pa. 0.9840768670106081 * 10**11 = 98407686701.06081 Pa.
+_SIO_IN_BAND_PA = 0.9840768670106081
+_SIO_OXYGEN_EXTRAPOLATED_PA = 98407686701.06081
+
+
+@functools.lru_cache(maxsize=1)
+def _compiled_catalog():
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
+    return BuiltinVaporPressureProvider(_live_vapor())._vapour_rail_catalog
+
+
+def _non_diagnostic_oxygen_laws() -> list:
+    laws = []
+    for species in _compiled_catalog().species.values():
+        evaluator = species.evaluator
+        if evaluator is None:
+            continue
+        if getattr(evaluator, "diagnostic_admission_notice", None):
+            continue
+        needs_oxygen = (
+            abs(float(evaluator.pO2_exponent)) > 0.0
+            or evaluator.o2_channel_term is not None
+        )
+        if needs_oxygen:
+            laws.append(evaluator)
+    return laws
+
+
+def _expected_domain_provenance(exponent: float, domain: str) -> str | None:
+    if domain in {"below", "above"}:
+        return _OXYGEN_BAND_REASON
+    if domain == "floor":
+        return _OXYGEN_FLOOR_REASON if exponent < 0.0 else None
+    if domain == "temperature":
+        return _OOR_PROVENANCE
+    if domain == "temperature_and_below":
+        return f"{_OOR_PROVENANCE}; {_OXYGEN_BAND_REASON}"
+    if domain == "in_band":
+        return None
+    raise AssertionError(domain)
+
+
+def _evaluate_oxygen(evaluator, temperature: float, pO2_bar: float, channel: str):
+    from simulator.vapour_rail.channels import (
+        CHANNEL_O2,
+        LEGACY_FO2_PLANE,
+        REACTION_PLANE_TRANSPORT_HEADSPACE,
+        ReactionThermoInputs,
+        o2_potential_from_pO2_bar,
+    )
+
+    kwargs: dict = {}
+    if evaluator.activity_exponent:
+        kwargs["source_activity"] = 0.35
+    if channel == "kwargs":
+        kwargs["pO2_bar"] = pO2_bar
+    elif channel == "typed":
+        plane = (
+            LEGACY_FO2_PLANE.get(evaluator.oxygen_fugacity_channel or "")
+            or REACTION_PLANE_TRANSPORT_HEADSPACE
+        )
+        potential = o2_potential_from_pO2_bar(
+            pO2_bar=pO2_bar,
+            temperature_K=temperature,
+            reaction_plane=plane,
+            pO2_reference_bar=evaluator.pO2_reference_bar or 1.0,
+        )
+        kwargs["reaction_inputs"] = ReactionThermoInputs(
+            reaction_id=None,
+            state_fingerprint=None,
+            channels={CHANNEL_O2: potential},
+        )
+    else:
+        raise AssertionError(channel)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        return evaluator.evaluate(temperature, **kwargs)
+
+
+@pytest.mark.parametrize("channel", ["kwargs", "typed"])
+@pytest.mark.parametrize(
+    "domain",
+    [
+        "in_band",
+        "below",
+        "above",
+        "floor",
+        "temperature",
+        "temperature_and_below",
+    ],
+)
+def test_every_oxygen_law_registers_its_domain_extrapolation(
+    domain: str,
+    channel: str,
+) -> None:
+    """Invariant: an extrapolated domain is disclosed once, on every channel.
+
+    The classes are the temperature band, the oxygen evaluator band, and the
+    oxygen mass-action floor. In-domain evaluations of a non-diagnostic law
+    register nothing. Deleting the extrapolated-notice arm leaves below, above,
+    and the negative-exponent floor unregistered, and drops the oxygen reason
+    from temperature_and_below.
+    """
+
+    from simulator.physical_constants import MELT_DISSOCIATION_PO2_MIN_BAR
+
+    laws = _non_diagnostic_oxygen_laws()
+    assert {evaluator.species_id for evaluator in laws} >= {"SiO", "Na", "AlO2"}
+    pO2_bar = (
+        MELT_DISSOCIATION_PO2_MIN_BAR
+        if domain == "floor"
+        else _DOMAIN_PO2[domain]
+    )
+    mismatches: list[str] = []
+    for evaluator in laws:
+        low, high = evaluator.valid_temperature_K
+        temperature = (
+            high + 1.0
+            if domain.startswith("temperature")
+            else (low + high) / 2.0
+        )
+        expected = _expected_domain_provenance(float(evaluator.pO2_exponent), domain)
+        with disclosure_scope(inherit=False) as registry:
+            evaluation = _evaluate_oxygen(evaluator, temperature, pO2_bar, channel)
+            snapshot = registry.snapshot()
+        if not math.isfinite(evaluation.pressure_pa) or evaluation.pressure_pa <= 0.0:
+            mismatches.append(
+                f"{evaluator.species_id}: non-positive pressure {evaluation.pressure_pa}"
+            )
+            continue
+        if expected is None:
+            if snapshot:
+                mismatches.append(
+                    f"{evaluator.species_id}: expected no disclosure, got {snapshot}"
+                )
+            continue
+        if len(snapshot) != 1:
+            mismatches.append(
+                f"{evaluator.species_id}: expected one row, got {snapshot!r}"
+            )
+            continue
+        row = snapshot[0]
+        law_id = f"{evaluator.species_id}:{evaluator.evaluator_family}"
+        problems = []
+        if row["law_id"] != law_id:
+            problems.append(f"law_id {row['law_id']}")
+        if row["authority"] != "extrapolated":
+            problems.append(f"authority {row['authority']}")
+        if row["provenance"] != expected:
+            problems.append(f"provenance {row['provenance']!r} != {expected!r}")
+        if row["evaluation_count"] != 1:
+            problems.append(f"count {row['evaluation_count']}")
+        if row["certified_band_K"] != [float(low), float(high)]:
+            problems.append(f"band {row['certified_band_K']}")
+        if row["closer"] != "":
+            problems.append(f"closer {row['closer']}")
+        if problems:
+            mismatches.append(f"{evaluator.species_id}: {', '.join(problems)}")
+    assert mismatches == []
+
+
+def test_diagnostic_admission_stays_one_row_when_oxygen_is_outside_the_band() -> None:
+    evaluator = _compiled_catalog().species["FeO_association_gas"].evaluator
+    assert evaluator is not None
+    assert getattr(evaluator, "diagnostic_admission_notice", None)
+    with disclosure_scope(inherit=False) as registry:
+        evaluation = _evaluate_oxygen(evaluator, 1800.0, 1.0e-31, "kwargs")
+        assert math.isfinite(evaluation.pressure_pa)
+        assert evaluation.pressure_pa > 0.0
+        snapshot = registry.snapshot()
+    assert len(snapshot) == 1
+    _assert_fe_disclosure(snapshot[0], law_id=_FE_ASSOCIATION_LAW_ID, count=1)
+
+
+def test_sio_oxygen_extrapolation_survives_cache_hit_and_ranking() -> None:
+    """Reviewer point: 1873.15 K, a=0.35, pO2=1e-31 bar. Cold and warm match."""
+
+    evaluator = _compiled_catalog().species["SiO"].evaluator
+    assert evaluator is not None
+    assert evaluator.pO2_exponent == -0.5
+    assert evaluator.pO2_reference_bar == 1.0e-9
+    low, high = evaluator.valid_temperature_K
+    assert low <= 1873.15 <= high
+
+    def evaluate(pO2_bar: float):
+        return _evaluate_oxygen(evaluator, 1873.15, pO2_bar, "kwargs")
+
+    memory = PT0DeterminismStore("capture")
+    key_a, payload_a = _tagged_curve("sio-oxygen-a")
+    key_b, payload_b = _tagged_curve("sio-oxygen-b")
+    key_clean, payload_clean = _tagged_curve("sio-oxygen-clean")
+    with disclosure_scope(inherit=False) as cold:
+        with computation_disclosure() as first:
+            evaluation = evaluate(1.0e-31)
+            assert evaluation.out_of_range is False
+            assert evaluation.pressure_pa == pytest.approx(
+                _SIO_OXYGEN_EXTRAPOLATED_PA, rel=0, abs=1e-2
+            )
+            notice = evaluation.extrapolation_notice
+            assert isinstance(notice, dict)
+            assert notice["reason"] == _OXYGEN_BAND_REASON
+            assert notice["authority_level"] == "extrapolated"
+            memory._store("freeze_gate_curve", key_a, payload_a)
+            one = first.snapshot()
+        with computation_disclosure() as second:
+            evaluate(1.0e-31)
+            memory._store("freeze_gate_curve", key_b, payload_b)
+            assert second.snapshot()[0]["evaluation_count"] == 1
+        with computation_disclosure() as clean:
+            in_band = evaluate(1.0e-9)
+            assert in_band.out_of_range is False
+            assert in_band.pressure_pa == pytest.approx(_SIO_IN_BAND_PA, rel=0, abs=1e-12)
+            assert getattr(in_band, "extrapolation_notice", None) is None
+            memory._store("freeze_gate_curve", key_clean, payload_clean)
+            assert clean.snapshot() == ()
+        cold_snapshot = cold.snapshot()
+    assert one[0]["evaluation_count"] == 1
+    assert one[0]["law_id"] == "SiO:standard_reaction_term"
+    assert one[0]["authority"] == "extrapolated"
+    assert one[0]["provenance"] == _OXYGEN_BAND_REASON
+    assert one[0]["certified_band_K"] == [1400.0, 2273.15]
+    assert cold_snapshot == (
+        {**one[0], "evaluation_count": 2},
+    )
+    stored = memory.entries[_key_hash(key_a)]["law_disclosures"]
+    assert stored[0]["provenance"] == _OXYGEN_BAND_REASON
+    assert stored[0]["evaluation_count"] == 1
+    assert memory.entries[_key_hash(key_clean)]["law_disclosures"] == ()
+    with disclosure_scope(inherit=False) as warm:
+        memory._lookup("freeze_gate_curve", key_a)
+        memory._lookup("freeze_gate_curve", key_b)
+        assert warm.snapshot() == cold_snapshot
+        memory._lookup("freeze_gate_curve", key_clean)
+        assert warm.snapshot() == cold_snapshot
+    scored = replace(_scored(_base_spec()), law_disclosures=one)
+    record = _to_record(
+        Candidate("sio-oxygen", RecipePatch({})),
         scored,
         cache_hit=False,
     )
