@@ -2974,6 +2974,123 @@ def _require_finite_vapor_value(
     return checked
 
 
+class _EllinghamNumeratorOmission(Exception):
+    """The Ellingham numerator is not a positive pressure. Omit this species."""
+
+
+def ellingham_metal_equilibrium_pressure_Pa(
+    *,
+    species: str,
+    temperature_K: float,
+    oxide_activity: float,
+    n_metal: float,
+    n_oxide: float,
+    pO2_bar: float,
+    metal_phase_kind: str,
+    pure_pressure_Pa: float | None,
+) -> tuple[float, float, float, str]:
+    """Return ``(P_Pa, activity_factor, activity_root, pressure_rail)``.
+
+    This is the kernel Ellingham rail. A missing or non-positive oxide
+    activity or pO2 raises ``ValueError``. A non-positive numerator raises
+    ``_EllinghamNumeratorOmission``. Neither path returns a dormant
+    pseudo-Antoine.
+
+    Premise: the JANAF row is per mol O2, so
+    ``root = (K * a**n_ox / pO2_bar)**(1/n_M)``. Condensed metal (below
+    the boil) is ``P = min(root, 1) * P_pure``. Gas-standard metal is
+    ``P = root * p0``. ``K = exp(dG_kJ * 1000 / (R * T))``. ``R`` is
+    ``simulator.state.GAS_CONSTANT`` (8.31446 J/mol/K), the binding the
+    kernel dispatch uses. The CODATA value on ``physical_constants``
+    differs at 3e-7 relative and would move this pressure. ``dG`` is
+    ``ellingham_delta_g_kj_per_mol_o2``. Unit check: ``K``, activity, and
+    the fugacity ratio are dimensionless; the selected rail supplies Pa.
+    Worked point, T = 1673.15 K, a_FeO = 0.2, pO2 = 1e-9 bar, pure
+    sidecar 1.1375418658242942 Pa: ``P_Fe = 0.05051779907237128 Pa``.
+    """
+
+    if (
+        not math.isfinite(temperature_K)
+        or temperature_K <= 0.0
+        or not math.isfinite(oxide_activity)
+        or oxide_activity <= 0.0
+    ):
+        raise ValueError(
+            f"{species}: missing oxide activity for the Ellingham pressure"
+        )
+    if not math.isfinite(pO2_bar) or pO2_bar <= 0.0:
+        raise ValueError(
+            f"{species}: missing pO2 for the Ellingham pressure"
+        )
+    if not math.isfinite(n_metal) or n_metal <= 0.0:
+        raise ValueError(
+            f"{species}: Ellingham metal stoichiometry is not positive"
+        )
+    dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, temperature_K)
+    # Kernel dispatch binds this R locally from simulator.state. Importing
+    # it here keeps the same value; the module-level physical_constants
+    # GAS_CONSTANT is not the one this rail was pinned against.
+    from simulator.state import GAS_CONSTANT as state_gas_constant
+
+    # K_decomp = exp(dG_f * 1000 / (R * T))
+    try:
+        k_decomp = math.exp(
+            dG_f_kJ * 1000.0 / (state_gas_constant * temperature_K)
+        )
+    except OverflowError as exc:
+        raise VaporPressureComputationError(
+            "vapor_pressure_nonfinite: "
+            f"species={species} field=K_decomp value=overflow"
+        ) from exc
+    k_decomp = _require_finite_vapor_value(
+        k_decomp,
+        species=species,
+        field="K_decomp",
+    )
+    numerator = _require_finite_vapor_value(
+        k_decomp * (oxide_activity ** n_oxide) / pO2_bar,
+        species=species,
+        field="metal_activity_numerator",
+    )
+    if numerator <= 0.0:
+        raise _EllinghamNumeratorOmission(species)
+    activity_root = numerator ** (1.0 / n_metal)
+    activity_root = _require_finite_vapor_value(
+        activity_root,
+        species=species,
+        field="metal_activity",
+    )
+    if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
+        # Gas-standard rows solve for f_M/p0, so P_M = root * p0.
+        # Pairing this root with condensed Antoine P_sat would count
+        # vaporization twice: P_wrong/P_right = P_sat/p0.
+        activity_factor = activity_root
+        pressure_pa = activity_factor * ELLINGHAM_STANDARD_PRESSURE_PA
+        pressure_rail = "gas_fugacity"
+    else:
+        # Condensed-standard rows solve a Raoultian metal activity.
+        # Only this rail is capped at pure condensed metal and paired
+        # with Antoine P_sat: P_M = min(root, 1) * P_sat.
+        if (
+            pure_pressure_Pa is None
+            or not math.isfinite(pure_pressure_Pa)
+            or pure_pressure_Pa <= 0.0
+        ):
+            raise ValueError(
+                f"{species}: missing pure-component pressure for the "
+                "Ellingham rail"
+            )
+        activity_factor = min(activity_root, 1.0)
+        pressure_pa = activity_factor * pure_pressure_Pa
+        pressure_rail = "condensed_raoult_psat"
+    pressure_pa = _require_finite_vapor_value(
+        pressure_pa,
+        species=species,
+        field="P_eq_Pa",
+    )
+    return pressure_pa, activity_factor, activity_root, pressure_rail
+
+
 def _ellingham_authority_limit(
     temperature_K: float,
     *,
@@ -3976,21 +4093,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 a_oxide if oxide_activity is None else oxide_activity.activity
             )
 
-            # Ellingham: dG_f(T) = dH_f - T * dS_f (kJ/mol O2)
-            dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, T_K)
-            # K_decomp = exp(dG_f * 1000 / (R * T))
-            try:
-                K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
-            except OverflowError as exc:
-                raise VaporPressureComputationError(
-                    "vapor_pressure_nonfinite: "
-                    f"species={species} field=K_decomp value=overflow"
-                ) from exc
-            K_decomp = _require_finite_vapor_value(
-                K_decomp,
-                species=species,
-                field="K_decomp",
-            )
             dissociation_pO2_bar = (
                 transport_pO2_bar
                 if parent_oxide == 'FeO'
@@ -4010,54 +4112,33 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ).legacy_pO2_bar
             # Premise: this value is the melt-supported metal source pressure,
             # not the later surface-flux boundary condition. For MgO(l) ->
-            # Mg(g) + 1/2 O2, K1=(f_Mg/p0)*(fO2/p0)^1/2/a_MgO. The JANAF row
-            # is normalized per mol O2, so K2=K1**2 and
-            # K2=(f_Mg/p0)**2*(fO2/p0)/a_MgO**2. Therefore the generic solve is
-            # root=(K2*a_oxide**n_ox/fO2_bar)**(1/n_M), n_ox=n_M=2.
-            # Unit check: K, activities, and fugacity/standard-pressure ratios
-            # are dimensionless; the selected rail supplies Pa only afterward.
-            # Sanity/limit: lowering melt fO2 raises Mg as fO2**-1/2, while
-            # fO2 -> infinity suppresses release. The separately dispatched
-            # evaporation flux still subtracts overhead metal backpressure,
-            # preserving the surface metal-transport path. Pure-MgO congruent
-            # co-evolution is a separate reaction-basis validation, not a
-            # runtime boundary condition solved by that subtraction.
-            # FeO already carries melt redox through its Kress91 activity and
-            # intentionally retains the legacy transport denominator here.
-            numerator = _require_finite_vapor_value(
-                K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar,
-                species=species,
-                field="metal_activity_numerator",
-            )
-            if numerator <= 0:
+            # Mg(g) + 1/2 O2 the JANAF row is per mol O2, so
+            # root=(K*a_oxide**n_ox/fO2_bar)**(1/n_M). FeO keeps the transport
+            # denominator selected above; the arithmetic is
+            # ellingham_metal_equilibrium_pressure_Pa. A non-positive numerator
+            # omits this species. So does a ValueError from this call (missing
+            # pure-component pressure when the Antoine sidecar underflows, or
+            # any other per-species input the rail will not invent). One
+            # carrier is omitted. It is not a provider abort and it is not a
+            # dormant pseudo-Antoine.
+            try:
+                (
+                    P_eq_Pa,
+                    activity_factor,
+                    metal_activity_root,
+                    pressure_rail,
+                ) = ellingham_metal_equilibrium_pressure_Pa(
+                    species=species,
+                    temperature_K=T_K,
+                    oxide_activity=a_oxide,
+                    n_metal=n_M,
+                    n_oxide=n_ox,
+                    pO2_bar=dissociation_pO2_bar,
+                    metal_phase_kind=metal_phase_kind,
+                    pure_pressure_Pa=P_reference_Pa,
+                )
+            except (_EllinghamNumeratorOmission, ValueError):
                 continue
-
-            metal_activity_root = numerator ** (1.0 / n_M)
-            metal_activity_root = _require_finite_vapor_value(
-                metal_activity_root,
-                species=species,
-                field="metal_activity",
-            )
-            if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
-                # Gas-standard rows solve for f_M/p0, so P_M = root * p0.
-                # Pairing this root with condensed Antoine P_sat would count
-                # vaporization twice: P_wrong/P_right = P_sat/p0.
-                activity_factor = metal_activity_root
-                pressure_reference_Pa = ELLINGHAM_STANDARD_PRESSURE_PA
-                pressure_rail = "gas_fugacity"
-            else:
-                # Condensed-standard rows solve a Raoultian metal activity.
-                # Only this rail is capped at pure condensed metal and paired
-                # with Antoine P_sat: P_M = min(root, 1) * P_sat.
-                activity_factor = min(metal_activity_root, 1.0)
-                assert P_reference_Pa is not None
-                pressure_reference_Pa = P_reference_Pa
-                pressure_rail = "condensed_raoult_psat"
-            P_eq_Pa = _require_finite_vapor_value(
-                activity_factor * pressure_reference_Pa,
-                species=species,
-                field="P_eq_Pa",
-            )
             if _publishes_vapor_pressure(
                 P_eq_Pa,
                 retain_subthreshold=retain_high_t_openimcc_carriers,

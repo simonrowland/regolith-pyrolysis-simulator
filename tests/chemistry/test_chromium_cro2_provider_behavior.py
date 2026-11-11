@@ -146,11 +146,9 @@ def _total_chromium_mol(sim: PyrolysisSimulator) -> float:
     )
 
 
-def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
+def test_lunar_mare_c2a_keeps_cro2_flux_active_with_flagged_alpha_fallback():
     setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
-    # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
-    setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"] = True
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -188,11 +186,12 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
 
     assert "CrO2" not in sim._last_vapour_batch_report["refusals_by_species"]
     assert "CrO2" in sim._last_vapour_batch_report["flux_active_species_ids"]
+    assert "CrO2" in sim._unmeasured_alpha_fallback_species_engaged
     assert any(
         transition.reason == "evaporate_CrO2"
         for transition in sim.atom_ledger.transitions
     )
-    # Stage 2 now materializes the declared stable CrO2 -> Cr2O3 + O2 route;
+    # Stage 2 materializes the declared stable CrO2 -> Cr2O3 + O2 route;
     # the terminal cartridge mirrors that product without duplicating atoms.
     assert terminal_chromia.get("Cr2O3", 0.0) > 0.0
     assert "Cr2O3" not in train

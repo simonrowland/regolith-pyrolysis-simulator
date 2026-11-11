@@ -395,6 +395,33 @@ def _evaluate(species_id: str, temperature_K: float, *, activity: float = 0.37,
     )
 
 
+def _pseudo_psat_ellingham_row(species_id: str) -> bool:
+    """True for the dormant pseudo-psat row the Ellingham post-pass rewrites.
+
+    That post-pass reads ``source_reaction_activities`` even though the
+    evaluator activity exponent is 0. The fixture supplies the same positive
+    0.37 the exponent-bearing rows use. It does not derive activity from the
+    ledger.
+    """
+
+    evaluator = CATALOG.evaluator_for(species_id)
+    if float(evaluator.activity_exponent or 0.0) != 0.0:
+        return False
+    if float(evaluator.pO2_exponent or 0.0) != 0.0:
+        return False
+    if evaluator.oxygen_fugacity_channel is not None:
+        return False
+    legacy = CATALOG.legacy_view()
+    for group_name in ("metals", "oxide_vapors"):
+        row = (legacy.get(group_name) or {}).get(species_id)
+        if isinstance(row, dict):
+            return (
+                str(row.get("fit_target") or "").strip()
+                == "pseudo_psat_backsolved_from_vaporock"
+            )
+    return False
+
+
 def _resolve_one(species_id: str, temperature_K: float):
     rule = CATALOG_RULES[species_id]
     ledger = {rule.source_account: {parent: 1.0 for parent in rule.parent_species_ids}}
@@ -405,7 +432,8 @@ def _resolve_one(species_id: str, temperature_K: float):
         "fO2_bar": 1.0e-9,
         "source_reaction_fO2_bar": 1.0e-9,
     }
-    if CATALOG.evaluator_for(species_id).activity_exponent:
+    evaluator = CATALOG.evaluator_for(species_id)
+    if evaluator.activity_exponent:
         activity_declaration = CATALOG.species[species_id].source_reaction_activity
         assert activity_declaration is not None
         state_kwargs.update(
@@ -418,6 +446,8 @@ def _resolve_one(species_id: str, temperature_K: float):
                 species_id: activity_declaration.standard_state
             },
         )
+    elif _pseudo_psat_ellingham_row(species_id):
+        state_kwargs["source_reaction_activities"] = {species_id: 0.37}
     batch = CATALOG.resolve_batch(
         ledger,
         VapourResolveState(**state_kwargs),
@@ -611,6 +641,16 @@ def stage0_committed_carriers(conformance_sim) -> set[str]:
     return committed
 
 
+def _shipped_alpha_fallback_species() -> frozenset[str]:
+    """Species the shipped policy keeps flux-active on the flagged alpha=1 fallback."""
+
+    kernel = _load_yaml("setpoints.yaml").get("chemistry_kernel") or {}
+    if kernel.get("allow_unmeasured_alpha_fallback") is not True:
+        return frozenset()
+    raw = kernel.get("unmeasured_alpha_fallback_species") or ()
+    return frozenset(str(species_id) for species_id in raw)
+
+
 def _covered_pairs(stage0_committed_carriers: set[str]) -> set[tuple[str, str]]:
     covered = set(LIVE_BY_KEY)
     covered.update(STATUS_ONLY_BY_KEY)
@@ -619,6 +659,14 @@ def _covered_pairs(stage0_committed_carriers: set[str]) -> set[tuple[str, str]]:
         for key, species_id in STRUCTURAL_BY_KEY.items()
         if species_id in stage0_committed_carriers
     )
+    # These carriers have no intrinsic alpha, so they stay out of
+    # STRUCTURAL_BY_KEY. The shipped fallback still debits them. A gap entry
+    # would call an executing carrier unmodelled.
+    fallback = _shipped_alpha_fallback_species()
+    for key, row in DEMAND_BY_KEY.items():
+        species_ids = row.get("catalog_species_ids") or []
+        if any(str(species_id) in fallback for species_id in species_ids):
+            covered.add(key)
     return covered
 
 
@@ -1518,8 +1566,20 @@ def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> Non
         assert split.escaped_frac > 0.0 and split.warning
     else:
         evaluator = CATALOG.evaluator_for(species_id)
-        out_of_range_temperature_K = evaluator.valid_temperature_K[1] + 1.0
-        batch, answer = _resolve_one(species_id, out_of_range_temperature_K)
+        catalog_high_K = float(evaluator.valid_temperature_K[1])
+        # Species whose selected law is this evaluator are out of domain
+        # one kelvin above its band. A replacement law publishes its own
+        # band (Fe's pure-Fe sidecar is 1809–3134 K, so 1901 K is inside
+        # it). Step to that published upper bound when the catalog edge
+        # still sits in the selected band.
+        temperature_K = catalog_high_K + 1.0
+        batch, answer = _resolve_one(species_id, temperature_K)
+        selected_law = answer.extra.get("selected_law")
+        if isinstance(selected_law, dict) and selected_law.get("band_K"):
+            law_high_K = float(selected_law["band_K"][1])
+            if temperature_K <= law_high_K:
+                temperature_K = law_high_K + 1.0
+                batch, answer = _resolve_one(species_id, temperature_K)
         typed_refusal = (
             CATALOG.species[species_id].code_metadata.raw.get(
                 "out_of_domain_disposition"
@@ -1544,6 +1604,12 @@ def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> Non
             assert answer.extra["status"]
             assert answer.extra["acquisition_flag"]
             assert answer.pressure.pa > 0.0
+            selected_law = answer.extra.get("selected_law")
+            if isinstance(selected_law, dict):
+                assert selected_law["out_of_range"] is True
+                assert selected_law["authority"] == "extrapolated"
+                low_K, high_K = selected_law["band_K"]
+                assert not (float(low_K) <= temperature_K <= float(high_K))
 
 
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)

@@ -855,6 +855,16 @@ def _load_engines_config(path: Optional[Path]) -> dict:
     return {str(intent): str(provider) for intent, provider in engines.items()}
 
 
+def _store_true_or_inherit(enabled: bool) -> bool | None:
+    """Map a store_true CLI flag onto the alpha-fallback tri-state.
+
+    Absence inherits the shipped yaml. The flag writes True. Explicit
+    False is a Python-caller opt-out on ``PyrolysisRun``, not a CLI state.
+    """
+
+    return True if enabled else None
+
+
 def _deep_merge_setpoints(
     base: Mapping[str, Any],
     patch: Mapping[str, Any],
@@ -1015,7 +1025,9 @@ class PyrolysisRun:
     mre_target_species: str = ""
     mre_max_voltage_V: float = 0.0
     allow_fallback_vapor: bool = False
-    allow_unmeasured_alpha_fallback: bool = False
+    # None inherits data/setpoints.yaml. False writes an explicit opt-out
+    # over the shipped true default. True writes the opt-in.
+    allow_unmeasured_alpha_fallback: bool | None = None
     unmeasured_alpha_fallback_species: tuple[str, ...] = ()
     chemistry_kernel: Mapping[str, Any] | None = None
     force_builtin_vapor_pressure: bool = False
@@ -1240,18 +1252,21 @@ class PyrolysisRun:
                 setpoints,
                 {"chemistry_kernel": diagnostic_kernel_config},
             )
+        explicit_alpha_fallback = self.allow_unmeasured_alpha_fallback
         if (
             self.allow_fallback_vapor
             or self.force_builtin_vapor_pressure
-            or self.allow_unmeasured_alpha_fallback
+            or explicit_alpha_fallback is not None
             or self.unmeasured_alpha_fallback_species
         ):
             setpoints = dict(setpoints)
             kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
             if self.allow_fallback_vapor or self.force_builtin_vapor_pressure:
                 kernel_config["allow_fallback_vapor"] = True
-            if self.allow_unmeasured_alpha_fallback:
-                kernel_config["allow_unmeasured_alpha_fallback"] = True
+            if explicit_alpha_fallback is not None:
+                kernel_config["allow_unmeasured_alpha_fallback"] = bool(
+                    explicit_alpha_fallback
+                )
             if self.unmeasured_alpha_fallback_species:
                 kernel_config["unmeasured_alpha_fallback_species"] = list(
                     self.unmeasured_alpha_fallback_species
@@ -4510,7 +4525,7 @@ def build_sio_yield_report(
     ramp_c_per_hr: float | None = None,
     liner_temperature_c: float | None = None,
     pO2_mbar: float | None = None,
-    allow_unmeasured_alpha_fallback: bool = False,
+    allow_unmeasured_alpha_fallback: bool | None = None,
 ) -> dict[str, Any] | tuple[dict[str, Any], dict[str, Any]]:
     """Run the C2A SiO yield slice and return the golden-file report."""
 
@@ -5153,7 +5168,7 @@ def run_sio_tsweep(
     campaign: str = SIO_YIELD_CAMPAIGN,
     hours: int = 24,
     mass_kg: float = 1000.0,
-    allow_unmeasured_alpha_fallback: bool = False,
+    allow_unmeasured_alpha_fallback: bool | None = None,
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, Any]] = []
@@ -5499,7 +5514,7 @@ def run_sio_wall_sweep(
     campaign: str = SIO_YIELD_CAMPAIGN,
     hours: int = 24,
     mass_kg: float = 1000.0,
-    allow_unmeasured_alpha_fallback: bool = False,
+    allow_unmeasured_alpha_fallback: bool | None = None,
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, Any]] = []
@@ -6364,8 +6379,8 @@ def main(argv: Optional[list[str]] = None) -> int:
                 lab_schedule=lab_schedule,
                 track=args.track,
                 allow_fallback_vapor=bool(args.allow_fallback_vapor),
-                allow_unmeasured_alpha_fallback=bool(
-                    args.allow_unmeasured_alpha_fallback
+                allow_unmeasured_alpha_fallback=_store_true_or_inherit(
+                    bool(args.allow_unmeasured_alpha_fallback)
                 ),
                 force_builtin_vapor_pressure=bool(args.force_builtin_vapor_pressure),
                 sio_start_temperature_c=args.sio_start_temperature_c,
@@ -6581,8 +6596,8 @@ def main_sio_yield(argv: Optional[list[str]] = None) -> int:
             include_lab_oxygen_diagnostics=bool(
                 args.lab_oxygen_diagnostics_output
             ),
-            allow_unmeasured_alpha_fallback=(
-                args.allow_unmeasured_alpha_fallback
+            allow_unmeasured_alpha_fallback=_store_true_or_inherit(
+                bool(args.allow_unmeasured_alpha_fallback)
             ),
         )
     except RunnerError:
@@ -6722,8 +6737,8 @@ def main_sio_tsweep(argv: Optional[list[str]] = None) -> int:
             t_hold_grid_c=t_hold_grid_c,
             ramp_grid_c_per_hr=ramp_grid_c_per_hr,
             output_dir=Path(args.output_dir),
-            allow_unmeasured_alpha_fallback=(
-                args.allow_unmeasured_alpha_fallback
+            allow_unmeasured_alpha_fallback=_store_true_or_inherit(
+                bool(args.allow_unmeasured_alpha_fallback)
             ),
         )
     except RunnerError:
@@ -6855,8 +6870,8 @@ def main_sio_wall_sweep(argv: Optional[list[str]] = None) -> int:
             wall_t_grid_c=wall_t_grid_c,
             pO2_modes=pO2_modes,
             output_dir=Path(args.output_dir),
-            allow_unmeasured_alpha_fallback=(
-                args.allow_unmeasured_alpha_fallback
+            allow_unmeasured_alpha_fallback=_store_true_or_inherit(
+                bool(args.allow_unmeasured_alpha_fallback)
             ),
         )
     except RunnerError:

@@ -46,11 +46,18 @@ class FluxActivationContext:
 
     epoch: str
     effective_pressure_species_ids: frozenset[str] = frozenset()
+    # Flagged alpha=1 admission. None with the flag set means every species
+    # (the provider's missing-allowlist meaning). A set admits only those ids.
+    # Pressure values still never enter this context.
+    allow_unmeasured_alpha_fallback: bool = False
+    unmeasured_alpha_fallback_species: frozenset[str] | None = None
 
     def __post_init__(self) -> None:
         epoch = str(self.epoch)
         if epoch not in _FLUX_ACTIVATION_EPOCHS:
             raise ValueError(f"unknown flux activation epoch: {epoch!r}")
+        if not isinstance(self.allow_unmeasured_alpha_fallback, bool):
+            raise TypeError("allow_unmeasured_alpha_fallback must be bool")
         effective_species = frozenset(
             str(species_id) for species_id in self.effective_pressure_species_ids
         )
@@ -59,11 +66,19 @@ class FluxActivationContext:
                 "rg_manifest_union activation may not carry pre-RG effective "
                 "pressure species"
             )
+        raw_allowlist = self.unmeasured_alpha_fallback_species
+        if raw_allowlist is not None:
+            raw_allowlist = frozenset(str(species_id) for species_id in raw_allowlist)
         object.__setattr__(self, "epoch", epoch)
         object.__setattr__(
             self,
             "effective_pressure_species_ids",
             effective_species,
+        )
+        object.__setattr__(
+            self,
+            "unmeasured_alpha_fallback_species",
+            raw_allowlist,
         )
 
 
@@ -153,8 +168,8 @@ CERTIFICATION_CEILING_NEVER = "never"
 class VapourAnswer:
     """One exact-key channel answer for a requested gas species.
 
-    ``selected_runtime_pressure`` remains catalog-side serialized metadata;
-    pre-RG flux values come from the separately typed effective-pressure seam.
+    ``selected_runtime_pressure`` is the selected value consumed by the flux
+    path after this answer's pressure and flux outcomes authorize a debit.
     """
 
     species_id: str
@@ -187,6 +202,30 @@ class VapourAnswer:
         return isinstance(self.flux, FluxEligible) and isinstance(
             self.pressure, PressureValue
         )
+
+
+def recount_published_refusal_metadata(
+    metadata: Mapping[str, Any],
+    channels: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Return ``metadata`` with ``n_refused`` counted from ``channels``.
+
+    INVARIANT: ``n_refused`` is the number of channels whose ``is_refused``
+    is true, on the batch and on every publisher that copies this metadata.
+    Request resolution snapshots the count. A later rewrite that turns a
+    refusal into an authorized physical zero must publish this recount, or
+    the runner reports the corrected serialization count beside the old
+    one. Other keys are request facts and are copied unchanged.
+    ``n_flux_active``, ``n_solve_bundles``, and ``n_flux_dormant_by_epoch``
+    are not functions of ``is_refused`` alone. The caller updates those
+    only when it also changes those sets.
+    """
+
+    recounted = dict(metadata)
+    recounted["n_refused"] = sum(
+        1 for answer in channels.values() if answer.is_refused
+    )
+    return recounted
 
 
 def _freeze_channels(
