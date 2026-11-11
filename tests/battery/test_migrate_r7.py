@@ -1069,6 +1069,11 @@ def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
     acanthite = _delta_fg_observations(result, source, "reference-p011-01")
     assert len(acanthite) == 1
     assert acanthite[0].value.kind is ValueKind.UNAVAILABLE
+    assert "no parsed numeric value" in (
+        acanthite[0].value.unavailable_reason or ""
+    )
+    assert "·39.7" in (acanthite[0].value.unavailable_reason or "")
+    assert "uncertainty" in (acanthite[0].value.unavailable_reason or "")
     assert _landed_formation_points(acanthite[0]) == []
 
 

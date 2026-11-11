@@ -136,7 +136,11 @@ def _decimal_cell(cell: object) -> tuple[Decimal, str, bool] | None:
         return None
     raw = cell.get("raw")
     suspect = bool(cell.get("ocr_suspect"))
-    if isinstance(raw, str) and _PLAIN_DECIMAL.fullmatch(raw.strip()):
+    if (
+        isinstance(raw, str)
+        and _PLAIN_DECIMAL.fullmatch(raw.strip())
+        and not (suspect and cell.get("value") is not None)
+    ):
         return Decimal(raw.strip()), raw.strip(), suspect
     value = cell.get("value")
     if value is None or isinstance(value, bool):
@@ -479,14 +483,39 @@ def _grid_temperature(doc: Mapping[str, Any]) -> Decimal | None:
 
 def _column_value_and_uncertainty(
     doc: Mapping[str, Any], column: str
-) -> tuple[tuple[Decimal, str, bool], tuple[Decimal, str, bool] | None] | None:
+) -> tuple[tuple[Decimal | None, str, bool], tuple[Decimal, str, bool] | None] | None:
+    rows = [
+        row
+        for row in doc.get("rows") or []
+        if isinstance(row, Mapping) and isinstance(row.get("cells"), Mapping)
+    ]
+    if rows:
+        first_cell = rows[0]["cells"].get(column)
+        if (
+            isinstance(first_cell, Mapping)
+            and first_cell.get("value") is None
+            and str(first_cell.get("raw") or "").strip()
+        ):
+            uncertainty = next(
+                (
+                    parsed
+                    for row in rows[1:]
+                    if (parsed := _decimal_cell(row["cells"].get(column))) is not None
+                ),
+                None,
+            )
+            if uncertainty is not None:
+                return (
+                    (
+                        None,
+                        str(first_cell["raw"]).strip(),
+                        bool(first_cell.get("ocr_suspect")),
+                    ),
+                    uncertainty,
+                )
     found: list[tuple[Decimal, str, bool]] = []
-    for row in doc.get("rows") or []:
-        if not isinstance(row, Mapping):
-            continue
-        cells = row.get("cells")
-        if not isinstance(cells, Mapping):
-            continue
+    for row in rows:
+        cells = row["cells"]
         parsed = _decimal_cell(cells.get(column))
         if parsed is None:
             continue
@@ -536,7 +565,17 @@ def _generate_reference(doc: Mapping[str, Any]) -> RecordGeneration:
             bits.append(f"printed uncertainty raw={uncertainty[1]}")
         if suspect:
             bits.append("ocr_suspect")
-        value = Value.point_of(amount)
+        value = (
+            Value.point_of(amount)
+            if amount is not None
+            else Value(
+                kind=ValueKind.UNAVAILABLE,
+                unavailable_reason=(
+                    f"no parsed numeric value for {column}; printed token "
+                    f"{token!r} is unparsed and the following numeric line is uncertainty"
+                ),
+            )
+        )
         uncertainty_obj = Uncertainty(kind=UncertaintyKind.NONE)
         if uncertainty is not None:
             uncertainty_obj = Uncertainty(

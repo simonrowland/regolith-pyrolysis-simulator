@@ -154,6 +154,24 @@ def test_calcium_windows_do_not_span_a_printed_bound() -> None:
     )
 
 
+def test_high_temperature_rows_use_raster_corrected_temperature() -> None:
+    printed_points = {
+        "high-temperature-p189": (Decimal("1200"), Decimal("-81.2")),
+        "high-temperature-p205": (Decimal("1800"), Decimal("146.4")),
+        "high-temperature-p217": (Decimal("1800"), Decimal("-512.4")),
+        "high-temperature-p223": (Decimal("500"), Decimal("-846.0")),
+    }
+    for record_id, printed_point in printed_points.items():
+        document = _load(f"records/{record_id}.json")
+        gibbs = [
+            observation
+            for observation in generate_record(document).observations
+            if quantity_token(observation.identity) is Quantity.DELTA_FG
+        ]
+        assert len(gibbs) == 1
+        assert printed_point in gibbs[0].value.series
+
+
 def test_reference_state_second_line_is_the_printed_uncertainty() -> None:
     silver = generate_record(_load("summary/reference-p005-02.json"))
     gibbs = [
