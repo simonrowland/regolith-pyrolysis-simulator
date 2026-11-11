@@ -224,7 +224,13 @@ def test_missing_declared_engine_refuses_before_first_hour(
     before = sim.atom_ledger.mol_by_account()
     with pytest.raises(EvaporationFluxRefusal) as error:
         sim.start_campaign(CampaignPhase.C2A_STAGED)
-    assert error.value.diagnostic['reason'] == 'missing_input'
+    assert error.value.reason == 'liquid_fraction_provider_missing_input'
+    assert error.value.diagnostic == {
+        'reason': 'missing_input',
+        'input': 'liquid_fraction_provider',
+        'provider': 'magemin',
+        'status': 'unavailable',
+    }
     assert error.value.diagnostic['provider'] == 'magemin'
     assert sim.melt.hour == 0
     assert sim.atom_ledger.mol_by_account() == before
@@ -305,7 +311,13 @@ def test_binary_absence_keeps_campaign_and_direct_gate_refusals(
     )
     with pytest.raises(EvaporationFluxRefusal) as campaign_error:
         campaign_sim.start_campaign(CampaignPhase.C2A_STAGED)
-    assert campaign_error.value.diagnostic['reason'] == 'missing_input'
+    assert campaign_error.value.reason == 'liquid_fraction_provider_missing_input'
+    assert campaign_error.value.diagnostic == {
+        'reason': 'missing_input',
+        'input': 'liquid_fraction_provider',
+        'provider': 'magemin',
+        'status': 'unavailable',
+    }
     assert campaign_error.value.diagnostic['provider'] == 'magemin'
 
     gate_sim = _sim(
@@ -432,7 +444,12 @@ def test_runner_reports_typed_startup_missing_input(monkeypatch):
     assert artifact['timesteps'] == []
     metadata = artifact['terminal']['run_metadata']
     assert metadata['liquid_fraction_provider'] == 'magemin'
-    assert metadata['refusal_diagnostic']['reason'] == 'missing_input'
+    assert metadata['refusal_diagnostic'] == {
+        'reason': 'missing_input',
+        'input': 'liquid_fraction_provider',
+        'provider': 'magemin',
+        'status': 'unavailable',
+    }
 
 
 @pytest.mark.parametrize('reason', ['engine_not_converged', 'engine_worker_timeout'])
