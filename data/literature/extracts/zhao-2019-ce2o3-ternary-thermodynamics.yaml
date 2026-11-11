@@ -46,11 +46,12 @@ fidelity_samples:
 experiments:
 - experiment_id: zhao_2019_ce2o3_activity_runs
   locator:
-    page: 8
-    published_page: 402
-    pdf_page_index: 7
-    table: IV
-  method: chemical equilibrium method; 24 h equilibration with liquid Sn; ICP-AES Ce assay
+    page: 3
+    published_page: 397
+    pdf_page_index: 2
+    section: Experimental
+    note: '24 h equilibration with liquid Sn, quench into the water-cooled chamber, ICP-AES Ce assay.'
+  method: quench_equilibration
   conditions:
     temperature_K:
       state:
@@ -77,6 +78,7 @@ species:
   Ce2O3:
     observations:
     - observation_id: zhao_2019_table_iv_sample_301_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -190,6 +192,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_302_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -303,6 +306,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_303_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -416,6 +420,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_304_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -529,6 +534,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_305_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -642,6 +648,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_306_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -755,6 +762,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_307_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -868,6 +876,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_308_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -981,6 +990,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_309_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -1094,6 +1104,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_310_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -1207,6 +1218,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_311_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -1320,6 +1332,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_312_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -1433,6 +1446,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_313_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
@@ -1546,6 +1560,7 @@ species:
       uncertainty:
         note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
     - observation_id: zhao_2019_table_iv_sample_314_ce2o3_activity
+      experiment: zhao_2019_ce2o3_activity_runs
       type: activity_coefficient
       locator:
         page: 8
