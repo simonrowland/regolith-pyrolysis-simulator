@@ -36,22 +36,27 @@ def _sim(feedstocks):
     )
 
 
-def _limiting_carbon_probe(carbon_mol=1.0):
+def _limiting_carbon_probe(carbon_mol=1.0, *, include_boudouard=False):
     from tests.test_subsolidus_bakeout import _molar
 
     host_kg = {"CaSO4": _molar("CaSO4"), "FeSO4": 2 * _molar("FeSO4")}
+    reactions = ["sulfate_so3_to_so2_co"]
+    if include_boudouard:
+        reactions.append("co2_boudouard_to_co")
     feed = {
         "stage0_profile": "mars_carbon_cleanup",
         "stage0_carbon_cleanup": {
             "carbon_reductant_kg_per_tonne": carbon_mol * _molar("C"),
             "cation_sulfate_product": "oxide",
-            "reactions": ["sulfate_so3_to_so2_co"],
+            "reactions": reactions,
         },
         "composition_wt_pct": {
             "SiO2": 100 - sum(host_kg.values()) / 10,
             **{species: kg / 10 for species, kg in host_kg.items()},
         },
     }
+    if include_boudouard:
+        feed["environment"] = {"atmosphere": "96% CO2"}
     sim = _sim({"feed": feed})
     sim.load_batch(
         "feed", mass_kg=1000, additives_kg={"C": carbon_mol * _molar("C")}
@@ -257,6 +262,41 @@ def test_full_carbon_sulfate_routing_is_unchanged():
     assert ledger["process.cleaned_melt"]["Fe2O3"] == pytest.approx(1.0)
     assert ledger["terminal.offgas"]["SO2"] == pytest.approx(2.0)
     assert result["reserved"] == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize("carbon_mol", [0.25, 1.0, 1.5, 2.0])
+def test_sulfate_carbon_claims_share_one_budget(carbon_mol):
+    result = _limiting_carbon_probe(carbon_mol, include_boudouard=True)
+
+    assert result["reserved"] + result["consumed"] <= carbon_mol + 1e-12
+    assert result["reserved"] + result["consumed"] == pytest.approx(carbon_mol)
+
+
+def test_bakeout_reservation_cannot_overclaim_remaining_carbon():
+    from tests.test_subsolidus_bakeout import _molar
+
+    sim = _sim({})
+    reserved, remaining = sim._reserve_stage0_bakeout_sulfate_carbon(
+        "CaSO4", 2.0, 1.0, _molar("C"), 1.0,
+    )
+    assert reserved
+    assert remaining == 0.0
+    assert sim._stage0_bakeout_reserved_carbon_kg == _molar("C")
+
+
+def test_carbon_admission_guard_rejects_summed_overclaims(monkeypatch):
+    original = PyrolysisSimulator._apply_stage0_cation_sulfate_carbon_reactions
+
+    def overclaim(sim, feedstock, carbon_mol, specs):
+        remaining = original(sim, feedstock, carbon_mol, specs)
+        specs.append({"debits": (("process.reagent_inventory", {"C": 1.0}, "reagent"),)})
+        return remaining
+
+    monkeypatch.setattr(
+        PyrolysisSimulator, "_apply_stage0_cation_sulfate_carbon_reactions", overclaim,
+    )
+    with pytest.raises(AccountingError, match="claims exceed the admitted C budget"):
+        _limiting_carbon_probe()
 
 
 @pytest.fixture
