@@ -45,6 +45,7 @@ from simulator.battery.pins import (  # noqa: E402
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
     _append_nasa9_fit_comparison_stratum,
+    _score_shard_failure_report_lines,
     _render_score_report_from_payloads_legacy,
     _ResidualJsonlRows,
     _count_residuals_jsonl,
@@ -162,6 +163,10 @@ def _measured_report(payload: Mapping[str, object]) -> str:
                 f"{(metric.get('flagged') or {}).get('median_abs') or '—'} | {refusal} |"
             )
     lines.append("")
+    failures = payload.get("score_shard_failures") or ()
+    if failures:
+        lines.extend(_score_shard_failure_report_lines(failures))
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -258,6 +263,10 @@ def _run_measured_headline(
                 local_runtime_identities=metadata.engine_cache_runtime_identities,
             ),
         }
+        if metadata.shard_failures:
+            payload["score_shard_failures"] = [
+                dict(failure) for failure in metadata.shard_failures
+            ]
         summary_path = battery / "score-summary.json"
         summary_partial = summary_path.with_name(summary_path.name + ".partial")
         report_path = battery / "score-report.md"
@@ -768,6 +777,7 @@ def main(argv: list[str] | None = None) -> int:
             studio_hostname=studio_hostname,
             store_stamp=recorded,
             _aggregate=report_aggregate,
+            shard_failures=metadata.shard_failures,
         )
         report = _append_nasa9_fit_comparison_stratum(
             report,
@@ -777,6 +787,7 @@ def main(argv: list[str] | None = None) -> int:
             report_aggregate,
             summary_partial_path,
             store_stamp=recorded,
+            shard_failures=metadata.shard_failures,
         )
         _attach_engine_cache_summary(
             summary_partial_path,
