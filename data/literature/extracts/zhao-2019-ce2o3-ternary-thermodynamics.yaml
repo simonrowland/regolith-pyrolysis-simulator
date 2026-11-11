@@ -13,9 +13,8 @@ extraction:
   date: '2026-11-10'
   worker: w1110xzhao
   provenance_path: raw/zhao-2019-ce2o3-ternary-thermodynamics/zhao-2019-ce2o3-ternary-thermodynamics.pdf
-  note: All tables I–IV and AI–AXX retained. Table AV in the paper labels its third oxide V2O3; the publisher appendix
-    labels the same column Ce2O3. The paper extract preserves the paper label and treats those cells as an unresolved
-    literal-source conflict. Public appendix adds no distinct numeric rows, so it is not separately extracted. Figures
+  note: All tables I–IV and AI–AXX retained. Both the paper and publisher appendix HTML label Table AV's third oxide V2O3.
+    Public appendix adds no distinct numeric rows, so it is not separately extracted. Figures
     are inventoried; displayed numerical content is either qualitative or repeated from tables/equations, and no
     uncalibrated curve readings are presented.
 review_status: draft
@@ -91,36 +90,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '3.29'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '3.29e-07'
+        activity: '3.29e-07'
         Ce_in_Sn_ppm_as_published: '13.76'
         sample_id_as_published: '301'
         initial_composition_wt_pct_as_published:
           CaO: '45'
           SiO2: '50'
           Ce2O3: '5'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '45'
+          SiO2: '50'
+          Ce2O3: '5'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -143,16 +168,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -188,36 +203,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '1.72'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '1.72e-07'
+        activity: '1.72e-07'
         Ce_in_Sn_ppm_as_published: '9.95'
         sample_id_as_published: '302'
         initial_composition_wt_pct_as_published:
           CaO: '41'
           SiO2: '54'
           Ce2O3: '5'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '41'
+          SiO2: '54'
+          Ce2O3: '5'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -240,16 +281,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -285,36 +316,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '0.86'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '8.6e-08'
+        activity: '8.6e-08'
         Ce_in_Sn_ppm_as_published: '7.04'
         sample_id_as_published: '303'
         initial_composition_wt_pct_as_published:
           CaO: '37'
           SiO2: '58'
           Ce2O3: '5'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '37'
+          SiO2: '58'
+          Ce2O3: '5'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -337,16 +394,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -382,36 +429,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '2.81'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '2.81e-07'
+        activity: '2.81e-07'
         Ce_in_Sn_ppm_as_published: '12.71'
         sample_id_as_published: '304'
         initial_composition_wt_pct_as_published:
           CaO: '35'
           SiO2: '55'
           Ce2O3: '10'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '35'
+          SiO2: '55'
+          Ce2O3: '10'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -434,16 +507,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -479,36 +542,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '3.64'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '3.64e-07'
+        activity: '3.64e-07'
         Ce_in_Sn_ppm_as_published: '14.47'
         sample_id_as_published: '305'
         initial_composition_wt_pct_as_published:
           CaO: '38'
           SiO2: '52'
           Ce2O3: '10'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '38'
+          SiO2: '52'
+          Ce2O3: '10'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -531,16 +620,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -576,36 +655,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '7.94'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '7.94e-07'
+        activity: '7.94e-07'
         Ce_in_Sn_ppm_as_published: '21.38'
         sample_id_as_published: '306'
         initial_composition_wt_pct_as_published:
           CaO: '35'
           SiO2: '50'
           Ce2O3: '15'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '35'
+          SiO2: '50'
+          Ce2O3: '15'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -628,16 +733,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -673,36 +768,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '5.03'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '5.03e-07'
+        activity: '5.03e-07'
         Ce_in_Sn_ppm_as_published: '17.02'
         sample_id_as_published: '307'
         initial_composition_wt_pct_as_published:
           CaO: '32.5'
           SiO2: '52.5'
           Ce2O3: '15'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '32.5'
+          SiO2: '52.5'
+          Ce2O3: '15'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -725,16 +846,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -770,36 +881,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '16.22'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '1.622e-06'
+        activity: '1.622e-06'
         Ce_in_Sn_ppm_as_published: '30.55'
         sample_id_as_published: '308'
         initial_composition_wt_pct_as_published:
           CaO: '32.5'
           SiO2: '47.5'
           Ce2O3: '20'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '32.5'
+          SiO2: '47.5'
+          Ce2O3: '20'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -822,16 +959,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -867,36 +994,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '8.97'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '8.97e-07'
+        activity: '8.97e-07'
         Ce_in_Sn_ppm_as_published: '22.72'
         sample_id_as_published: '309'
         initial_composition_wt_pct_as_published:
           CaO: '30'
           SiO2: '50'
           Ce2O3: '20'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '30'
+          SiO2: '50'
+          Ce2O3: '20'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -919,16 +1072,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -964,36 +1107,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '15.80'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '1.58e-06'
+        activity: '1.58e-06'
         Ce_in_Sn_ppm_as_published: '30.15'
         sample_id_as_published: '310'
         initial_composition_wt_pct_as_published:
           CaO: '27.5'
           SiO2: '47.5'
           Ce2O3: '25'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '27.5'
+          SiO2: '47.5'
+          Ce2O3: '25'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -1016,16 +1185,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -1061,36 +1220,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '9.02'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '9.02e-07'
+        activity: '9.02e-07'
         Ce_in_Sn_ppm_as_published: '22.78'
         sample_id_as_published: '311'
         initial_composition_wt_pct_as_published:
           CaO: '25'
           SiO2: '50'
           Ce2O3: '25'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '25'
+          SiO2: '50'
+          Ce2O3: '25'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -1113,16 +1298,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -1158,36 +1333,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '19.06'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '1.906e-06'
+        activity: '1.906e-06'
         Ce_in_Sn_ppm_as_published: '33.12'
         sample_id_as_published: '312'
         initial_composition_wt_pct_as_published:
           CaO: '23.75'
           SiO2: '46.25'
           Ce2O3: '30'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '23.75'
+          SiO2: '46.25'
+          Ce2O3: '30'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -1210,16 +1411,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -1255,36 +1446,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '9.03'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '9.03e-07'
+        activity: '9.03e-07'
         Ce_in_Sn_ppm_as_published: '22.79'
         sample_id_as_published: '313'
         initial_composition_wt_pct_as_published:
           CaO: '21.25'
           SiO2: '48.75'
           Ce2O3: '30'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '21.25'
+          SiO2: '48.75'
+          Ce2O3: '30'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -1307,16 +1524,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -1352,36 +1559,62 @@ species:
         state:
           tag: value
           value:
-            convention: pure_solid
+            convention: raoultian_pure_endmember
             endmember:
               formula: Ce2O3
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: source does not state polymorph
             component_basis: Ce2O3
         inferred: false
         note: The paper states pure solid Ce2O3 as the standard state for the oxide in Eq. [1]–[3].
         locator:
+          page: 2
+          published_page: 396
+          pdf_page_index: 1
+          equation: '2'
+      derived_from: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+      derivation:
+        relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+        inputs: [pdf:zhao-2019-ce2o3-ternary-thermodynamics]
+        output_unit: dimensionless activity
+        locator:
           page: 3
           published_page: 397
           pdf_page_index: 2
-          equation: '2'
+          equation: '3-4'
       T_C: '1599.85'
       values:
         quantity: activity
-        method_class: measured_indirect
+        method_class: measured_reduced
         activity_as_published: '18.20'
         printed_activity_scale: 10^-7
-        activity_dimensionless: '1.82e-06'
+        activity: '1.82e-06'
         Ce_in_Sn_ppm_as_published: '32.36'
         sample_id_as_published: '314'
         initial_composition_wt_pct_as_published:
           CaO: '18.75'
           SiO2: '46.25'
           Ce2O3: '35'
-        method: chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
-          Eqs. [3] and [4]
+        composition_wt_pct:
+          CaO: '18.75'
+          SiO2: '46.25'
+          Ce2O3: '35'
+        note: Chemical equilibrium with liquid Sn; Ce concentration measured by ICP-AES; activity calculated using
+          Eqs. [3] and [4].
         activity_derivation: a_Ce2O3 = printed Table IV cell × 10^-7; the printed column heading supplies the scale
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            page: 3
+            published_page: 397
+            pdf_page_index: 2
+            table: section
+          note: Calculated from C/CO equilibrium at 1 atm CO; not directly measured.
       point_conditions:
         T_C:
           state:
@@ -1404,16 +1637,6 @@ species:
             pdf_page_index: 2
             table: method
           as_printed: pure CO controlled at 1 atm
-        pO2_atm:
-          state:
-            tag: value
-            value: '4.76e-16'
-          locator:
-            page: 5
-            published_page: 399
-            pdf_page_index: 4
-            table: section
-          as_printed: calculated from C/CO equilibrium at 1 atm CO; not directly measured
         initial_melt_composition:
           state:
             tag: value
@@ -2393,10 +2616,11 @@ species:
     - observation_id: zhao_2019_equations_2_to_6
       type: printed_equations_and_model
       locator:
-        page: 3
-        published_page: 397
-        pdf_page_index: 2
-        equation: 2-3
+        page: 2
+        published_page: 396
+        pdf_page_index: 1
+        equation: 2-6
+        note: Equation rows carry their individual physical-page locators; this record begins with Eq. [2].
       units: as printed; equations include J/mol, activity and dimensionless coefficients
       values:
         rows:
@@ -2405,9 +2629,9 @@ species:
           quantity: standard Gibbs energy change for reaction [1]
           value_as_printed: ΔG° = -1,455,822.8 + 554.1 T (J/mol)
           locator:
-            page: 3
-            published_page: 397
-            pdf_page_index: 2
+            page: 2
+            published_page: 396
+            pdf_page_index: 1
             table: equation
             row: '2'
         - id: eq3_activity_relation
@@ -5418,6 +5642,7 @@ species:
           legend values; contour coordinates are not tabulated.
         digitisation: 'not digitized: numeric data are repeated from tables/equations or figure contains qualitative
           image/schematic; no new point values are asserted.'
+        contour_labels_status: unchecked against figure image
         contour_labels_as_printed:
         - 2.0 x 10^-7
         - 1.0 x 10^-7
@@ -5430,6 +5655,3 @@ species:
         - '60'
         - '80'
         - '100'
-  Ce:
-    observations: []
-    context: []
