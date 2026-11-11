@@ -21,6 +21,14 @@ CACHEABLE_TEST_ENGINES = tuple(
     if engine is not Engine.INTERNAL_ANALYTICAL
 )
 
+_ENGINE_CONFIG_NON_PREDICTION_REASONS = {
+    "openimcc": {},
+    "alphamelts": {"warm_worker": "Worker reuse changes scheduling, not chemistry."},
+    "vaporock": {"warm_worker": "Worker reuse changes scheduling, not chemistry."},
+    "magemin": {"warm_worker": "Worker reuse changes scheduling, not chemistry."},
+    "thermoengine": {},
+}
+
 
 @dataclass(frozen=True)
 class _SettingCase:
@@ -372,18 +380,85 @@ def test_isolated_engine_config_prediction_settings_change_the_key(
 
 
 @pytest.mark.parametrize(
+    ("engine", "configuration", "field", "changed"),
+    (
+        ("openimcc", {"pack": "core"}, "pack", "extended"),
+        ("openimcc", {"gas_pack": "default"}, "gas_pack", "published-gas"),
+        ("alphamelts", {"transport": "subprocess"}, "transport", "python_api"),
+        ("alphamelts", {"ambient_calc_mode": "MELTS"}, "ambient_calc_mode", "pMELTS"),
+        ("alphamelts", {"raw_model_name": "MELTS-v1.0"}, "raw_model_name", "rhyolite-MELTS"),
+        ("alphamelts", {"redox_buffer": "QFM"}, "redox_buffer", "NNO"),
+        ("alphamelts", {"fO2_offset": 0.0}, "fO2_offset", 0.5),
+        ("alphamelts", {"Fe3Fet_ratio": 0.1}, "Fe3Fet_ratio", 0.3),
+        ("alphamelts", {"python_api_model": ["MELTS", 1]}, "python_api_model", ["pMELTS", 1]),
+        (
+            "alphamelts",
+            {"configured_vapor_transport_pO2_bar": 1.0e-8},
+            "configured_vapor_transport_pO2_bar",
+            1.0e-3,
+        ),
+        (
+            "alphamelts",
+            {"configured_vapor_transport_floor_bar": 1.0e-9},
+            "configured_vapor_transport_floor_bar",
+            1.0e-6,
+        ),
+        ("vaporock", {"temperature_units": "C"}, "temperature_units", "K"),
+        ("vaporock", {"pressure_units": "bar"}, "pressure_units", "Pa"),
+        ("vaporock", {"vapor_pressure_units": "bar"}, "vapor_pressure_units", "Pa"),
+        ("magemin", {"database": "ig"}, "database", "mp"),
+        ("magemin", {"bridge": "subprocess"}, "bridge", "julia"),
+        ("magemin", {"python_bridge": "subprocess"}, "python_bridge", "julia"),
+        ("magemin", {"fO2_buffer": "qfm"}, "fO2_buffer", "nno"),
+        ("thermoengine", {"model": "MELTS-v1.0"}, "model", "rhyolite-MELTS"),
+        (
+            "thermoengine",
+            {"configured_vapor_transport_pO2_bar": 1.0e-8},
+            "configured_vapor_transport_pO2_bar",
+            1.0e-3,
+        ),
+        (
+            "thermoengine",
+            {"configured_vapor_transport_floor_bar": 1.0e-9},
+            "configured_vapor_transport_floor_bar",
+            1.0e-6,
+        ),
+    ),
+)
+def test_isolated_public_engine_config_fields_change_the_projection(
+    engine: str,
+    configuration: dict[str, Any],
+    field: str,
+    changed: Any,
+) -> None:
+    from simulator.engine_cache import engine_cache_settings
+
+    before = engine_cache_settings(engine, configuration)
+    configuration[field] = changed
+
+    assert engine_cache_settings(engine, configuration) != before, field
+
+
+@pytest.mark.parametrize(
     "engine",
     ("openimcc", "alphamelts", "vaporock", "magemin", "thermoengine"),
 )
 def test_worker_scheduling_config_does_not_change_prediction_settings(engine: str) -> None:
     from simulator.engine_cache import engine_cache_settings
 
+    reason = _ENGINE_CONFIG_NON_PREDICTION_REASONS[engine]["warm_worker"]
     configuration = {"warm_worker": False}
     before = engine_cache_settings(engine, configuration)
     configuration["warm_worker"] = True
 
-    # warm_worker selects process scheduling, not the prediction.
+    assert reason
     assert engine_cache_settings(engine, configuration) == before
+
+
+def test_internal_analytical_projection_does_not_inspect_uncacheable_backend() -> None:
+    from simulator.engine_cache import engine_cache_settings
+
+    assert engine_cache_settings("internal-analytical", object()) == {}
 
 
 def test_engine_cache_settings_do_not_read_or_mutate_unprojected_backend_state() -> None:
