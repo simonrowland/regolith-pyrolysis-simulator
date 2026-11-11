@@ -45,6 +45,7 @@ from simulator.battery.enums import (
     Phase,
     Polymorph,
     Quantity,
+    Rail,
     RefusalReason,
     MetricOperation,
     ResidualStatus,
@@ -3535,8 +3536,13 @@ def _write_compilation_comparisons_jsonl(
     *,
     engines: Sequence[Engine],
     invoke_pure_phase: bool,
+    work_id: str | None = None,
+    rail: Rail | None = None,
+    observation_filter: Callable[[Observation], bool] | None = None,
 ) -> int:
     """Write comparison rows for the selected engine execution policy."""
+
+    from simulator.battery.score import _observation_matches_run_filters
 
     from simulator.diagnostic_helpers.species_rail_differential import (
         COMPILATION_JANAF,
@@ -3565,6 +3571,14 @@ def _write_compilation_comparisons_jsonl(
                     continue
 
                 for point in _iter_compilation_series_cells(observation, origin):
+                    if not _observation_matches_run_filters(
+                        context,
+                        point,
+                        work_id=work_id,
+                        rail=rail,
+                        observation_filter=observation_filter,
+                    ):
+                        continue
                     identity = point.identity
                     if not isinstance(identity, Identity):
                         continue
@@ -3652,6 +3666,9 @@ def _write_compilation_comparisons_jsonl(
                 context,
                 engines=engines,
                 invoke_pure_phase=invoke_pure_phase,
+                work_id=work_id,
+                rail=rail,
+                observation_filter=observation_filter,
             ):
                 residual = comparison.residual
                 numeric = residual.numeric
@@ -3782,19 +3799,36 @@ def _nasa9_fit_comparisons(
     engines: Sequence[Engine],
     invoke_pure_phase: bool,
     fit_records: Sequence[Mapping[str, object]] | None = None,
+    work_id: str | None = None,
+    rail: Rail | None = None,
+    observation_filter: Callable[[Observation], bool] | None = None,
+    _validation_indexes=None,
 ) -> list[_Nasa9FitComparison]:
     """Score NASA-9 cells with one lineage index for this store snapshot."""
 
-    from simulator.battery.validate import bound_work_inputs
+    from simulator.battery.validate import (
+        _bound_work_inputs,
+        _build_validation_indexes,
+    )
 
-    with bound_work_inputs(
+    indexes = _validation_indexes or _build_validation_indexes(
         context.works, context.observations, context.experiments
+    )
+    with _bound_work_inputs(
+        context.works,
+        context.observations,
+        context.experiments,
+        _indexes=indexes,
     ):
         return _nasa9_fit_comparisons_with_bound_lineage(
             context,
             engines=engines,
             invoke_pure_phase=invoke_pure_phase,
             fit_records=fit_records,
+            work_id=work_id,
+            rail=rail,
+            observation_filter=observation_filter,
+            _validation_indexes=indexes,
         )
 
 
@@ -3804,6 +3838,10 @@ def _nasa9_fit_comparisons_with_bound_lineage(
     engines: Sequence[Engine],
     invoke_pure_phase: bool,
     fit_records: Sequence[Mapping[str, object]] | None = None,
+    work_id: str | None = None,
+    rail: Rail | None = None,
+    observation_filter: Callable[[Observation], bool] | None = None,
+    _validation_indexes=None,
 ) -> list[_Nasa9FitComparison]:
     """Score precision-qualified NASA-9 grid points with the shared residual owner."""
 
@@ -3812,7 +3850,10 @@ def _nasa9_fit_comparisons_with_bound_lineage(
         load_sidecar,
         sidecar_element_reference_curves,
     )
-    from simulator.battery.score import compile_residual
+    from simulator.battery.score import (
+        _compile_residual_with_lineage,
+        _observation_matches_run_filters,
+    )
 
     records = list(load_sidecar() if fit_records is None else fit_records)
     reference_curves = sidecar_element_reference_curves(records)
@@ -3832,6 +3873,14 @@ def _nasa9_fit_comparisons_with_bound_lineage(
         if not table_id:
             continue
         for point in _iter_compilation_series_cells(observation, origin):
+            if not _observation_matches_run_filters(
+                context,
+                point,
+                work_id=work_id,
+                rail=rail,
+                observation_filter=observation_filter,
+            ):
+                continue
             identity = point.identity
             if not isinstance(identity, Identity):
                 continue
@@ -4007,13 +4056,14 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                     prediction = _prediction_from_attempt(
                         engine, fit_reference, attempt
                     )
-                    residual, _candidate = compile_residual(
+                    residual, _candidate = _compile_residual_with_lineage(
                         fit_reference,
                         engine,
                         context=context,
                         prediction=prediction,
                         comparison_ids={source_observation.observation_id},
                         lineage_observation_id=source_observation.observation_id,
+                        _validation_indexes=_validation_indexes,
                     )
                     comparisons.append(
                         _Nasa9FitComparison(

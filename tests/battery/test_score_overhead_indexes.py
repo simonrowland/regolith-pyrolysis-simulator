@@ -11,7 +11,7 @@ from tests.battery import factories as F
 def test_validation_indexes_reuse_store_sets_aliases_tables_and_lineage(
     monkeypatch,
 ) -> None:
-    build_indexes = getattr(validate, "build_validation_indexes", None)
+    build_indexes = getattr(validate, "_build_validation_indexes", None)
     assert callable(build_indexes), "validation index builder is missing"
 
     work = F.work("overhead-index-work")

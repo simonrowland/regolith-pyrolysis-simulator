@@ -126,7 +126,7 @@ from simulator.battery.enums import (
     ValencePrintedForm,
     ValenceValueForm,
 )
-from simulator.yaml_cache import YAML12SafeLoader
+from simulator.yaml_cache import YAML12SafeLoader, load_cached_safe_yaml
 from simulator.battery.identity import (
     Exposure,
     Identity,
@@ -3897,8 +3897,14 @@ def resolve_equipment_context(
 _YAML_LOADER = YAML12SafeLoader
 
 
+def _load_yaml_text(payload: str | bytes) -> object:
+    """Parse battery YAML through the shared loader and exact-type cache."""
+
+    return load_cached_safe_yaml(payload)
+
+
 def load_yaml(path: Path) -> object:
-    return yaml.load(path.read_text(encoding="utf-8"), Loader=_YAML_LOADER)
+    return _load_yaml_text(path.read_bytes())
 
 
 def load_json(path: Path) -> object:
