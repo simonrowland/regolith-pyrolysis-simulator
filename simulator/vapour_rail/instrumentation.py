@@ -615,7 +615,7 @@ class CompatibilityPressureMapReadTripwire(Mapping[str, float]):
 
 
 class EffectivePressureSource:
-    """Typed value handoff consumed only after VapourBatch channel gating."""
+    """Typed pre-RG source for activation membership and shadow reporting."""
 
     __slots__ = (
         "source_id",
@@ -736,49 +736,42 @@ def _pressures_equal(a: float, b: float) -> bool:
 def _channel_flux_gate_state(answer: VapourAnswer) -> str:
     """Return the catalog-owned eligibility/refusal state for one channel."""
 
-    pressure = answer.pressure
+    pressure_outcomes = (answer.pressure, answer.selected_runtime_pressure)
     flux = answer.flux
     if answer.extra.get("applicability_evidence", {}).get("flux_dormant") is True:
         return "dormant_by_epoch"
-    if isinstance(pressure, PressureRefusal) or isinstance(flux, FluxRefusal):
+    if any(isinstance(item, PressureRefusal) for item in pressure_outcomes) or isinstance(
+        flux, FluxRefusal
+    ):
         return "refusal"
-    if isinstance(flux, FluxDiagnosticUpperBound) or isinstance(
-        pressure, PressureUpperBound
+    if isinstance(flux, FluxDiagnosticUpperBound) or any(
+        isinstance(item, PressureUpperBound) for item in pressure_outcomes
     ):
         return "upper_bound"
-    if isinstance(pressure, ZeroByPhysics):
+    if any(isinstance(item, ZeroByPhysics) for item in pressure_outcomes):
+        if not all(isinstance(item, ZeroByPhysics) for item in pressure_outcomes):
+            return "incomplete_channel"
         return "zero_by_physics"
-    if isinstance(pressure, PressureValue) and isinstance(flux, FluxEligible):
+    if all(isinstance(item, PressureValue) for item in pressure_outcomes) and isinstance(
+        flux, FluxEligible
+    ):
         return "eligible"
     return "incomplete_channel"
 
 
-def _channel_flux_pressure_pa(
-    answer: VapourAnswer,
-    *,
-    effective_pressure_source: EffectivePressureSource,
-) -> tuple[float | None, str]:
-    """Apply channel authority, then read one value through the typed seam.
-
-    Returns ``(pa_or_None, state)`` where ``pa`` is only set for inventory-
-    debiting HKL (PressureValue + FluxEligible). Batch outcomes decide whether
-    the pre-RG source may be read. The catalog point answer is a fallback only
-    when an eligible channel has no seam value.
-    """
+def _channel_flux_pressure_pa(answer: VapourAnswer) -> tuple[float | None, str]:
+    """Return the selected answer value only after its batch gates pass."""
 
     state = _channel_flux_gate_state(answer)
     if state == "zero_by_physics":
         return 0.0, "zero_by_physics"
     if state != "eligible":
         return None, state
-    pa = effective_pressure_source.pressure_pa(answer.species_id)
-    if pa is not None:
-        return pa, "eligible"
-    pressure = answer.pressure
+    pressure = answer.selected_runtime_pressure
     assert isinstance(pressure, PressureValue)
     pa = float(pressure.pa)
     if not math.isfinite(pa) or pa < 0.0:
-        return None, "invalid_catalog_pressure"
+        return None, "invalid_selected_runtime_pressure"
     return pa, "eligible"
 
 
@@ -939,19 +932,15 @@ def compare_legacy_vs_batch_flux_paths(
 def flux_pressures_from_batch(
     batch: VapourBatch | None,
     *,
-    effective_pressure_source: EffectivePressureSource,
     resolution_error: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, float], dict[str, Any]]:
-    """Build flux Pa after batch channel/set gates using one typed value seam.
+    """Build flux Pa from selected VapourAnswer values after batch gates.
 
     Active path: require batch, iterate ``requested_species_ids``, branch on
-    catalog pressure/flux unions, enforce the batch-active set, then read values
-    from ``effective_pressure_source``. An eligible point answer supplies a
-    catalog fallback only when that seam has no value.
-    Refusal/upper-bound/zero are typed non-debit states. Before RG-1 the source
-    is the equilibrium backend; the batch remains channel/refusal/set authority.
-    Extrapolated point estimates are named explicitly for status/degraded
-    accounting regardless of which numeric source supplies their flux value.
+    pressure/flux unions, enforce the batch-active set, then consume
+    ``selected_runtime_pressure`` from each answer. Refusal/upper-bound/zero
+    remain typed non-debit states. Extrapolated point estimates are named
+    explicitly for status/degraded accounting.
     Absent batch or resolve error → empty flux map + typed failure report;
     this consumer accepts no anonymous compatibility mapping.
     """
@@ -963,15 +952,7 @@ def flux_pressures_from_batch(
         "n_extrapolated_flux_species": 0,
         "extrapolated_flux_species": [],
         "batch_channel_states": {},
-        "note": (
-            "VapourBatch owns channel refusal, eligibility, and the active set; "
-            "values cross the typed pre-RG seam when present; eligible point "
-            "answers supply the catalog value only as a missing-seam fallback."
-        ),
-        "effective_pressure_source": effective_pressure_source.source_id,
-        "effective_pressure_zero_reason": (
-            effective_pressure_source.physical_zero_reason
-        ),
+        "note": "VapourBatch owns channel gates, active set, and selected runtime values.",
     }
 
     if resolution_error:
@@ -984,43 +965,7 @@ def flux_pressures_from_batch(
         return {}, report
 
     batch_active_species_ids = batch.flux_active_species_ids
-    source_species_ids = effective_pressure_source.species_ids
-    missing_source_species_ids = batch_active_species_ids - source_species_ids
-    out_of_range_active_species_ids = frozenset(
-        species_id
-        for species_id in batch_active_species_ids
-        if (
-            (answer := batch.channels_by_species.get(species_id)) is not None
-            and bool(dict(answer.extra).get("out_of_range", False))
-        )
-    )
-    catalog_continuation_fallback_species_ids = (
-        missing_source_species_ids & out_of_range_active_species_ids
-    )
-    missing_source_species = sorted(missing_source_species_ids)
-    unresolved_missing_source_species = sorted(
-        missing_source_species_ids - catalog_continuation_fallback_species_ids
-    )
-    extra_source_species = sorted(source_species_ids - batch_active_species_ids)
-    report["missing_effective_pressure_species"] = missing_source_species
-    report["catalog_continuation_flux_species"] = sorted(
-        catalog_continuation_fallback_species_ids
-    )
-    report["effective_pressure_species_not_batch_active"] = extra_source_species
-    # Only OOD point answers may bridge a genuine seam absence with their
-    # catalog continuation. An in-domain seam gap remains a typed failure:
-    # accepting its catalog point would be an implicit RG-1 value cutover.
-    if unresolved_missing_source_species:
-        report["selection_source"] = (
-            "typed_failure_effective_pressure_species_set_mismatch"
-        )
-        return {}, report
-    # Source extras that the batch marks as genuine upper bounds are expected
-    # and must not empty the whole flux map.
-    if extra_source_species:
-        report["demoted_effective_pressure_species"] = list(extra_source_species)
-
-    report["selection_source"] = effective_pressure_source.source_id
+    report["selection_source"] = "vapour_batch_selected_runtime_pressure"
     flux_pressures: dict[str, float] = {}
     batch_pa_by_species: dict[str, float] = {}
     selected_runtime_pa_by_species: dict[str, float] = {}
@@ -1047,24 +992,16 @@ def flux_pressures_from_batch(
         ):
             channel_states[species_id] = "dormant_by_epoch"
             continue
-        selected_pa, state = _channel_flux_pressure_pa(
-            answer,
-            effective_pressure_source=effective_pressure_source,
-        )
+        selected_pa, state = _channel_flux_pressure_pa(answer)
         channel_states[species_id] = state
         if state == "eligible" and selected_pa is not None:
             selected_runtime_pa_by_species[species_id] = float(selected_pa)
             flux_pressures[species_id] = float(selected_pa)
             if bool(dict(answer.extra).get("out_of_range", False)):
                 extrapolated_flux_species.append(species_id)
-            if species_id not in catalog_continuation_fallback_species_ids:
-                selected_pressure_source_by_species[species_id] = (
-                    effective_pressure_source.source_id
-                )
-            else:
-                selected_pressure_source_by_species[species_id] = (
-                    "vapour_batch_catalog_continuation"
-                )
+            selected_pressure_source_by_species[species_id] = (
+                "vapour_batch_selected_runtime_pressure"
+            )
         elif state == "zero_by_physics":
             selected_runtime_pa_by_species[species_id] = 0.0
             flux_pressures[species_id] = 0.0
@@ -1095,8 +1032,8 @@ def compare_live_shadow_to_batch_flux(
     """Compare an independently computed legacy map with batch-driven flux.
 
     This shadow surface accepts an independently captured compatibility map.
-    It never selects or returns flux-driving pressures; the distinct typed seam
-    supplies pre-RG values only after batch gating.
+    It never selects or returns flux-driving pressures; selected batch answers
+    supply the values after their channel gates pass.
     """
 
     if live_pressures_Pa is None:
@@ -1149,9 +1086,9 @@ def compare_live_shadow_to_batch_flux(
                 demoted_upper_bound.add(species_id)
             if (
                 species_id in batch.flux_active_species_ids
-                and isinstance(answer.pressure, PressureValue)
+                and isinstance(answer.selected_runtime_pressure, PressureValue)
             ):
-                catalog_pa = float(answer.pressure.pa)
+                catalog_pa = float(answer.selected_runtime_pressure.pa)
                 if math.isfinite(catalog_pa):
                     catalog_pa_by_species[species_id] = catalog_pa
 
@@ -1250,6 +1187,7 @@ FLUX_CONSUMER_RELPATHS: tuple[str, ...] = (
     "simulator/evaporation.py",
     "simulator/vapour_rail/instrumentation.py",
     "simulator/vapour_rail/request.py",
+    "scripts/vapour_head_pressure_table.py",
 )
 
 # Kernel path: any legacy-key read is a fail.
@@ -1366,7 +1304,11 @@ def _batch_flux_consumer_live_argument_hits(
         live_arguments = [
             argument.arg
             for argument in arguments
-            if "live" in argument.arg.lower() and "pressure" in argument.arg.lower()
+            if argument.arg == "effective_pressure_source"
+            or (
+                "live" in argument.arg.lower()
+                and "pressure" in argument.arg.lower()
+            )
         ]
         if live_arguments:
             hits.append(
@@ -1410,7 +1352,7 @@ def flux_consumer_compatibility_map_iterations(
 def assert_no_flux_consumer_iterates_compatibility_maps(
     sources: Mapping[str, str],
 ) -> None:
-    """Hard-fail when a compatibility mapping bypasses the typed value seam."""
+    """Hard-fail when flux consumers accept compatibility pressure inputs."""
 
     all_hits: list[str] = []
     supplied_production_paths = set(sources) & set(FLUX_CONSUMER_RELPATHS)
@@ -1429,8 +1371,7 @@ def assert_no_flux_consumer_iterates_compatibility_maps(
         joined = "\n".join(all_hits)
         raise AssertionError(
             "flux consumers must not iterate compatibility pressure maps "
-            "outside the "
-            "typed effective-pressure seam "
+            "or accept the pre-RG pressure source as a debit operand "
             f"(VR-11 / DESIGN-REV5 §7.4):\n{joined}"
         )
 

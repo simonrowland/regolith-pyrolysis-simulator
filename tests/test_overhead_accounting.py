@@ -1277,7 +1277,7 @@ def test_evaporation_flux_does_not_reapply_commanded_po2():
     assert not calls, "_calculate_evaporation must not reapply gas pO2"
     assert equilibrium.vapor_pressures_Pa
     assert sim._last_vapour_batch_flux_overlay["selection_source"] == (
-        evaporation_module.PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID
+        "vapour_batch_selected_runtime_pressure"
     )
 
 

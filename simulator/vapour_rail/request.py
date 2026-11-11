@@ -319,6 +319,10 @@ class VapourResolveState:
     # Liquid-state fact for the FeO shadow. Not vapour request identity:
     # omitted from as_mapping so it cannot enter _state_fingerprint.
     liquid_feo_domain: Any = None
+    # Tick geometry for the activity-free Fe evaporation bound. Not request
+    # identity: omitted from as_mapping so it cannot enter _state_fingerprint.
+    evaporation_tick_area_m2: float | None = None
+    evaporation_tick_duration_s: float | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.melt_activity_shadow_enabled, bool):
@@ -535,8 +539,18 @@ def _formula_elements(formula: str | None) -> frozenset[str]:
 
 
 def _alpha_contract_available(alpha: Any) -> bool:
-    """True only when the shared parser proves an executable alpha value."""
+    """True only when an intrinsic executable alpha value is available.
 
+    A numerically populated broad proxy is still policy/no-data for inventory
+    flux admission: its value is not an intrinsic coefficient for this carrier.
+    """
+
+    if (
+        isinstance(alpha, Mapping)
+        and str(alpha.get("tag") or "").strip().lower()
+        == "broad_proxy_not_intrinsic"
+    ):
+        return False
     try:
         return parse_alpha_contract(alpha) is not None
     except AlphaSpecError:
@@ -994,6 +1008,45 @@ def _applicability_evidence(
     }
 
 
+_CONTRACT_MISSING_PREFIX = "channel contract incomplete: missing "
+
+
+def _missing_contract_fields(answer: VapourAnswer) -> frozenset[str] | None:
+    """Parse a missing-contract refusal into field names.
+
+    Demotion keys off this set. Matching the whole detail sentence misses a
+    broad-proxy carrier that is also missing another contract field and aborts
+    the batch.
+    """
+
+    if answer.refusal_code != REFUSAL_MISSING_CHANNEL_CONTRACT:
+        return None
+    detail = answer.extra.get("detail")
+    if not isinstance(detail, str) or not detail.startswith(_CONTRACT_MISSING_PREFIX):
+        return None
+    return frozenset(
+        part.strip()
+        for part in detail[len(_CONTRACT_MISSING_PREFIX):].split(",")
+        if part.strip()
+    )
+
+
+def _fallback_admits_unmeasured_alpha(
+    species_id: str,
+    context: FluxActivationContext | None,
+) -> bool:
+    """True when the flagged alpha=1 policy may keep this carrier flux-active.
+
+    A broad-proxy tag is still not a measured alpha. The policy only admits
+    the species the provider will mark as an upper-bound fallback.
+    """
+
+    if context is None or not context.allow_unmeasured_alpha_fallback:
+        return False
+    allowlist = context.unmeasured_alpha_fallback_species
+    return allowlist is None or species_id in allowlist
+
+
 def _executable_contract_refusal(rule: RequestRule) -> str | None:
     """Provider-independent missing-contract check (step 2).
 
@@ -1196,6 +1249,7 @@ def refusal_closure(
     | None = None,
     catalog_species: Mapping[str, Any] | None = None,
     activity_provider: CondensedPhaseActivityProvider | None = None,
+    flux_activation_context: FluxActivationContext | None = None,
 ) -> RefusalClosureResult:
     """Monotone refusal closure to a fixed point (DESIGN-REV5 §4.2 step 2).
 
@@ -1809,9 +1863,28 @@ def refusal_closure(
                 changed = True
                 continue
 
-            # 3) Channel contract (formula/evaluator/alpha/route)
+            # 3) Channel contract (formula/evaluator/alpha/route).
+            # A sole missing alpha is not a refusal when the flagged alpha=1
+            # policy admits this species. The provider then marks the
+            # upper-bound fallback. Any other missing field still refuses.
             contract_detail = _channel_contract_refusal(rule)
-            if contract_detail is not None:
+            missing_fields = (
+                frozenset(
+                    part.strip()
+                    for part in contract_detail[len(_CONTRACT_MISSING_PREFIX):].split(",")
+                    if part.strip()
+                )
+                if isinstance(contract_detail, str)
+                and contract_detail.startswith(_CONTRACT_MISSING_PREFIX)
+                else None
+            )
+            alpha_fallback_admits = (
+                missing_fields == frozenset({"alpha"})
+                and _fallback_admits_unmeasured_alpha(
+                    species_id, flux_activation_context
+                )
+            )
+            if contract_detail is not None and not alpha_fallback_admits:
                 answers[species_id] = _make_refusal(
                     rule, REFUSAL_MISSING_CHANNEL_CONTRACT, contract_detail
                 )
@@ -2620,6 +2693,7 @@ def resolve_vapour_batch(
         provider_candidates_by_species=provider_candidates_by_species,
         catalog_species=catalog_species,
         activity_provider=activity_provider,
+        flux_activation_context=flux_activation_context,
     )
     answers = dict(closure.answers)
 
@@ -2637,12 +2711,13 @@ def resolve_vapour_batch(
         if answer.is_flux_active
     )
     # Answerability is not activation authority. Pre-RG keeps the species set
-    # supplied by the typed effective-pressure seam, but only after refusal
+    # supplied by the typed effective-pressure source, but only after refusal
     # closure proves every *remaining debit claim* is catalog-eligible.
-    # Typed non-debiting answers (genuine PressureUpperBound /
-    # FluxDiagnosticUpperBound, ZeroByPhysics) demote the seam claim rather
-    # than hard-fail the batch.
-    # True refusals among claimed species still hard-fail construction.
+    # Typed non-debiting answers and a missing-contract refusal that lists
+    # alpha demote that species from the debit set while preserving its
+    # channel outcome. The field set, not the exact detail sentence, decides.
+    # A carrier also missing formula or route must not abort the whole batch.
+    # Refusals that do not list alpha still hard-fail construction.
     # RG-1 may activate the full manifest/catalog union after its
     # activity-corrected value path lands.
     if flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_PRE_RG:
@@ -2651,8 +2726,19 @@ def resolve_vapour_batch(
             species_id
             for species_id in claimed
             if species_id in answers
-            and not answers[species_id].is_refused
-            and not answers[species_id].is_flux_active
+            and (
+                (
+                    not answers[species_id].is_refused
+                    and not answers[species_id].is_flux_active
+                )
+                or (
+                    "alpha"
+                    in (
+                        _missing_contract_fields(answers[species_id])
+                        or frozenset()
+                    )
+                )
+            )
         )
         required_debit_claims = claimed - demoted_non_debiting
         missing_effective = required_debit_claims - union_eligible

@@ -311,6 +311,7 @@ def test_fallback_path_marks_proxy_species_when_explicitly_enabled():
             "stir_factor": 1.0,
             "alpha": alpha_by_species,
             "allow_unmeasured_alpha_fallback": True,
+            "unmeasured_alpha_fallback_species": ["CrO2"],
         },
     )
 

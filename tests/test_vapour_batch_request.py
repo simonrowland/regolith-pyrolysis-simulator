@@ -77,6 +77,7 @@ from simulator.vapour_rail.request import (
     refusal_closure,
     resolve_vapour_batch,
 )
+from simulator.evaporation import _retain_kernel_seam_debit
 from simulator.vapour_rail.instrumentation import (
     EffectivePressureSource,
     flux_pressures_from_batch,
@@ -1327,37 +1328,18 @@ def test_out_of_domain_k_at_1650c_is_flux_eligible_but_non_authoritative() -> No
     assert answer.verdict_status == "status_bearing_non_authoritative"
     assert answer.certification_ceiling == "never"
 
-    seam_pa = float(answer.pressure.pa) / 10.0
-    flux_pressures, overlay = flux_pressures_from_batch(
-        batch,
-        effective_pressure_source=EffectivePressureSource(
-            "populated_pre_rg_seam",
-            {"K": seam_pa},
-        ),
-    )
-    assert overlay["missing_effective_pressure_species"] == []
-    assert flux_pressures["K"] == pytest.approx(seam_pa, rel=0.0, abs=0.0)
+    selected_pa = float(answer.selected_runtime_pressure.pa)
+    flux_pressures, overlay = flux_pressures_from_batch(batch)
+    assert flux_pressures["K"] == pytest.approx(selected_pa, rel=0.0, abs=0.0)
     assert (
         overlay["selected_pressure_source_by_species"]["K"]
-        == "populated_pre_rg_seam"
+        == "vapour_batch_selected_runtime_pressure"
     )
-    assert overlay["catalog_continuation_flux_species"] == []
     assert overlay["extrapolated_flux_species"] == ["K"]
 
-    fallback_flux_pressures, fallback_overlay = flux_pressures_from_batch(
-        batch,
-        effective_pressure_source=EffectivePressureSource(
-            "empty_pre_rg_seam",
-            {},
-        ),
+    assert overlay["selected_runtime_pa_by_species"]["K"] == pytest.approx(
+        selected_pa
     )
-    assert fallback_overlay["missing_effective_pressure_species"] == ["K"]
-    assert fallback_flux_pressures["K"] == pytest.approx(answer.pressure.pa)
-    assert (
-        fallback_overlay["selected_pressure_source_by_species"]["K"]
-        == "vapour_batch_catalog_continuation"
-    )
-    assert fallback_overlay["catalog_continuation_flux_species"] == ["K"]
 
     pre_rg = catalog.resolve_batch(
         ledger,
@@ -4464,3 +4446,1041 @@ def test_legacy_view_production_warm_hit_budget() -> None:
     assert proj_loop < 0.005, (
         f"projected re-entry loop too slow: {proj_loop*1000:.2f} ms"
     )
+
+
+def test_fe_selected_runtime_pressure_is_ellingham_not_dormant_antoine() -> None:
+    """Fe's selected pressure is K*a/sqrt(pO2) on the pure sidecar.
+
+    Independent literals, not derived from the helper under test.
+    T = 1673.15 K, a_FeO = 0.2, pO2 = 1e-9 bar, R = simulator.state
+    GAS_CONSTANT, dG from ellingham_delta_g_kj_per_mol_o2, pure Antoine
+    A=10.670336 B=17759.430841 C=0. Condensed rail:
+    P_Fe = 0.05051779907237128 Pa. The dormant pseudo Antoine stays on
+    answer.pressure at 4.871162269407267 Pa.
+    """
+
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"),
+        u0_manifest=load_u0_manifest(),
+    )
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"FeO": 1.0}},
+        {
+            "temperature_K": 1673.15,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "fO2_bar": 1.0e-9,
+            "source_reaction_activities": {"Fe": 0.2},
+        },
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel("Fe")
+    assert isinstance(answer.selected_runtime_pressure, PressureValue)
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.selected_runtime_pressure.pa == pytest.approx(
+        0.05051779907237128, rel=1e-12, abs=0.0
+    )
+    assert answer.pressure.pa == pytest.approx(
+        4.871162269407267, rel=1e-12, abs=0.0
+    )
+    # 1673.15 K is inside the dormant 1400–1900 K fit and outside the
+    # pure sidecar's 1809–3134 K construction band. The selected answer
+    # flags that sidecar, not the dormant in-band fit.
+    assert answer.source_label == (
+        "ellingham_rail:condensed_raoult_psat:extrapolated"
+    )
+    assert answer.extra["out_of_range"] is True
+    selected_law = answer.extra["selected_law"]
+    assert selected_law["authority"] == "extrapolated"
+    assert selected_law["band_K"] == [1809.0, 3134.0]
+    assert selected_law["out_of_range"] is True
+
+
+_PSEUDO_PSAT_FIT_TARGET = "pseudo_psat_backsolved_from_vaporock"
+
+
+def _pseudo_psat_species_rows() -> dict[str, dict[str, Any]]:
+    """Every shipped species whose dormant fit is the pseudo-psat target."""
+
+    payload = _yaml("vapor_pressures.yaml")
+    families = payload.get("families")
+    if not isinstance(families, dict):
+        raise AssertionError("vapor_pressures.yaml has no families mapping")
+    found: dict[str, dict[str, Any]] = {}
+    for family in families.values():
+        if not isinstance(family, dict):
+            continue
+        physical = family.get("physical_properties")
+        if not isinstance(physical, dict):
+            continue
+        species_map = physical.get("species")
+        if not isinstance(species_map, dict):
+            continue
+        for species_id, row in species_map.items():
+            if not isinstance(row, dict):
+                continue
+            models = row.get("pressure_models") or []
+            if any(
+                isinstance(model, dict)
+                and model.get("fit_target") == _PSEUDO_PSAT_FIT_TARGET
+                for model in models
+            ):
+                found[str(species_id)] = row
+    if not found:
+        raise AssertionError(
+            "vapor_pressures.yaml has no "
+            f"{_PSEUDO_PSAT_FIT_TARGET} species"
+        )
+    return found
+
+
+def _selected_law_domain_cases() -> list[dict[str, Any]]:
+    """Temperature classes where the dormant fit and the selected laws differ.
+
+    Bands come from the shipped row and the Ellingham fit, not from the
+    publisher. Each named class has to land on the relation in its name,
+    so a yaml edit cannot silently drop a disagreement.
+    """
+
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_authority_limit,
+        ellingham_fit_range_K,
+    )
+
+    cases: list[dict[str, Any]] = []
+    for species_id, row in _pseudo_psat_species_rows().items():
+        pure = row["pure_component_antoine"]["construction_support_range_K"]
+        plow, phigh = float(pure[0]), float(pure[1])
+        model = next(
+            item
+            for item in row["pressure_models"]
+            if isinstance(item, dict)
+            and item.get("fit_target") == _PSEUDO_PSAT_FIT_TARGET
+        )
+        eval_low, eval_high = (
+            float(item) for item in model["valid_domain"]["temperature_K"]
+        )
+        fit_low, fit_high = ellingham_fit_range_K(species_id)
+        overlap_low = max(plow, fit_low)
+        overlap_high = min(phigh, fit_high)
+        if overlap_high < overlap_low:
+            raise AssertionError(
+                f"{species_id}: pure sidecar and Ellingham fit do not overlap"
+            )
+        points = (
+            ("below_sidecar_inside_ellingham", plow - 1.0, None),
+            ("inside_both_laws", (overlap_low + overlap_high) / 2.0, None),
+            ("ellingham_out_sidecar_in", fit_high + 1.0, None),
+            ("above_both", max(phigh, fit_high) + 50.0, None),
+            ("below_both", min(plow, fit_low) - 50.0, None),
+        )
+        if species_id == "Fe":
+            points = (
+                *points,
+                ("review_1673K", 1673.15, 0.05051779907237128),
+            )
+        aimed = {
+            "below_sidecar_inside_ellingham": (True, False),
+            "inside_both_laws": (False, False),
+            "ellingham_out_sidecar_in": (False, True),
+            "above_both": (True, True),
+            "below_both": (True, True),
+            "review_1673K": (True, False),
+        }
+        for name, temperature_K, pressure_pa in points:
+            pure_out = not (plow <= temperature_K <= phigh)
+            ell_out = (
+                ellingham_authority_limit(
+                    temperature_K,
+                    species=species_id,
+                    consumer="selected-law-domain-cases",
+                )
+                is not None
+            )
+            if aimed[name] != (pure_out, ell_out):
+                raise AssertionError(
+                    f"{species_id}:{name} at {temperature_K} K is "
+                    f"pure_out={pure_out} ell_out={ell_out}, "
+                    f"wanted {aimed[name]}"
+                )
+            cases.append(
+                {
+                    "id": f"{species_id}:{name}",
+                    "name": name,
+                    "species_id": species_id,
+                    "parent_oxide": str(row.get("parent_oxide") or ""),
+                    "temperature_K": temperature_K,
+                    "pure_band": [plow, phigh],
+                    "eval_domain": [eval_low, eval_high],
+                    "pressure_pa": pressure_pa,
+                }
+            )
+    return cases
+
+
+def _expected_selected_law_domain(case: dict[str, Any]) -> dict[str, Any]:
+    """Domain the selected rail must publish, read from yaml and thermo.
+
+    This does not call the catalog publisher. Pure-out is T against the
+    sidecar construction band. Ellingham-out is an authority limit.
+    The published band is the first constituent that excludes T.
+    """
+
+    from simulator.chemistry.ellingham_thermo import (
+        ELLINGHAM_METAL_PHASE_GAS,
+        ellingham_authority_limit,
+        ellingham_fit_range_K,
+        ellingham_metal_phase_kind,
+        ellingham_segment_for_temperature,
+    )
+
+    temperature_K = float(case["temperature_K"])
+    species_id = str(case["species_id"])
+    plow, phigh = (float(item) for item in case["pure_band"])
+    eval_low, eval_high = (float(item) for item in case["eval_domain"])
+    pure_out = not (plow <= temperature_K <= phigh)
+    evaluator_oor = temperature_K < eval_low or temperature_K > eval_high
+    limit = ellingham_authority_limit(
+        temperature_K,
+        species=species_id,
+        consumer="selected-law-domain-test",
+    )
+    if limit is None:
+        segment = ellingham_segment_for_temperature(species_id, temperature_K)
+        ell_band = [float(segment.range_K[0]), float(segment.range_K[1])]
+        ell_out = False
+    else:
+        ell_out = True
+        fit = limit.get("fit_range_K")
+        if isinstance(fit, tuple) and len(fit) == 2:
+            ell_band = [float(fit[0]), float(fit[1])]
+        else:
+            fit_low, fit_high = ellingham_fit_range_K(species_id)
+            ell_band = [float(fit_low), float(fit_high)]
+    phase = ellingham_metal_phase_kind(species_id, temperature_K)
+    rail = (
+        "gas_fugacity"
+        if phase == ELLINGHAM_METAL_PHASE_GAS
+        else "condensed_raoult_psat"
+    )
+    constituents = [
+        {
+            "law": "ellingham_fit",
+            "authority": "extrapolated" if ell_out else "certified",
+            "band_K": ell_band,
+            "out_of_range": ell_out,
+        }
+    ]
+    if rail != "gas_fugacity":
+        constituents.append(
+            {
+                "law": "pure_component_antoine",
+                "authority": "extrapolated" if pure_out else "certified",
+                "band_K": [plow, phigh],
+                "out_of_range": pure_out,
+            }
+        )
+    expected_oor = any(item["out_of_range"] for item in constituents)
+    failing = next(
+        (
+            item
+            for item in constituents
+            if item["out_of_range"] and item["band_K"]
+        ),
+        None,
+    )
+    if failing is not None:
+        band_K = list(failing["band_K"])
+    else:
+        band_K = list(constituents[-1]["band_K"])
+    return {
+        "evaluator_oor": evaluator_oor,
+        "expected_oor": expected_oor,
+        "rail": rail,
+        "authority": "extrapolated" if expected_oor else "certified",
+        "band_K": band_K,
+        "constituents": constituents,
+    }
+
+
+_SELECTED_LAW_DOMAIN_CASES = _selected_law_domain_cases()
+
+
+@pytest.fixture(scope="module")
+def _production_vapour_catalog():
+    return compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"),
+        u0_manifest=load_u0_manifest(),
+    )
+
+
+@pytest.mark.parametrize(
+    "case",
+    _SELECTED_LAW_DOMAIN_CASES,
+    ids=[case["id"] for case in _SELECTED_LAW_DOMAIN_CASES],
+)
+def test_selected_runtime_pressure_publishes_its_law_domain(
+    case: dict[str, Any],
+    _production_vapour_catalog: Any,
+) -> None:
+    """INVARIANT: a numeric selected pressure carries its producing law.
+
+    The dormant catalog fit's in-band flag is not reused. Authority is
+    extrapolated when the pure sidecar or the Ellingham fit excludes T,
+    and certified only when every constituent contains T. The published
+    band is the first excluding constituent, else the last constituent.
+    An out-of-band law is a flagged estimate (d-367), not a refusal and
+    not an unflagged extrapolation. The pascal value stays on the rail.
+    """
+
+    expected = _expected_selected_law_domain(case)
+    species_id = case["species_id"]
+    temperature_K = float(case["temperature_K"])
+    batch = _production_vapour_catalog.resolve_batch(
+        {"process.cleaned_melt": {case["parent_oxide"]: 1.0}},
+        {
+            "temperature_K": temperature_K,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "fO2_bar": 1.0e-9,
+            "source_reaction_fO2_bar": 1.0e-9,
+            "source_reaction_activities": {species_id: 0.2},
+        },
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel(species_id)
+    assert isinstance(answer.selected_runtime_pressure, PressureValue)
+    assert isinstance(answer.pressure, PressureValue)
+    assert math.isfinite(answer.selected_runtime_pressure.pa)
+    assert answer.selected_runtime_pressure.pa > 0.0
+    if case["pressure_pa"] is not None:
+        assert answer.selected_runtime_pressure.pa == pytest.approx(
+            case["pressure_pa"], rel=1e-12, abs=0.0
+        )
+    authority = expected["authority"]
+    assert answer.source_label == (
+        f"ellingham_rail:{expected['rail']}:{authority}"
+    )
+    assert answer.source_label != "catalog"
+    assert answer.extra["out_of_range"] is expected["expected_oor"]
+    selected_law = answer.extra["selected_law"]
+    assert selected_law["law"] == f"ellingham_rail:{expected['rail']}"
+    assert selected_law["authority"] == authority
+    assert selected_law["out_of_range"] is expected["expected_oor"]
+    assert selected_law["pressure_rail"] == expected["rail"]
+    assert selected_law["band_K"] == expected["band_K"]
+    assert selected_law["constituents"] == expected["constituents"]
+    if expected["expected_oor"] and selected_law["band_K"]:
+        low, high = selected_law["band_K"]
+        assert not (low <= temperature_K <= high)
+    if not expected["expected_oor"] and selected_law["band_K"]:
+        low, high = selected_law["band_K"]
+        assert low <= temperature_K <= high
+    if expected["evaluator_oor"] != expected["expected_oor"]:
+        assert answer.extra["out_of_range"] is not expected["evaluator_oor"]
+        assert selected_law["band_K"] != [float(item) for item in case["eval_domain"]]
+    extra = dict(answer.extra)
+    if expected["expected_oor"]:
+        assert extra.get("status") == OUT_OF_RANGE_STATUS
+        assert extra.get("acquisition_flag") == (
+            f"vapour_pressure_out_of_range:{species_id}"
+        )
+        notice = extra["extrapolation_notice"]
+        assert notice["reason"] == "selected_law_out_of_band"
+        assert notice["authority_level"] == "extrapolated"
+        assert notice["valid_range_K"] == selected_law["band_K"]
+        assert notice["temperature_K"] == temperature_K
+    else:
+        assert extra.get("status") != OUT_OF_RANGE_STATUS
+        flag = extra.get("acquisition_flag")
+        assert not (
+            isinstance(flag, str)
+            and flag.startswith("vapour_pressure_out_of_range:")
+        )
+        notice = extra.get("extrapolation_notice")
+        if isinstance(notice, dict):
+            assert notice.get("reason") not in {
+                "metal_vapor_pressure_out_of_validated_range",
+                "selected_law_out_of_band",
+            }
+    payload = serialize_vapour_answer(answer)
+    assert payload["out_of_range"] is expected["expected_oor"]
+    assert payload["source_label"] == answer.source_label
+    for other_id, other in batch.channels_by_species.items():
+        if other_id == species_id:
+            continue
+        assert "selected_law" not in dict(other.extra)
+    _pressures, report = flux_pressures_from_batch(batch)
+    listed = species_id in report["extrapolated_flux_species"]
+    if species_id in batch.flux_active_species_ids:
+        assert listed is expected["expected_oor"]
+    else:
+        assert listed is False
+
+
+def test_pseudo_psat_domain_cases_cover_both_disagreements() -> None:
+    """The generated set includes both dormant-flag disagreements.
+
+    One class is inside the dormant fit and outside a selected law.
+    The other is outside the dormant fit and inside every selected law.
+    """
+
+    pairs = {
+        (
+            _expected_selected_law_domain(case)["evaluator_oor"],
+            _expected_selected_law_domain(case)["expected_oor"],
+        )
+        for case in _SELECTED_LAW_DOMAIN_CASES
+    }
+    assert (False, True) in pairs
+    assert (True, False) in pairs
+    assert {case["species_id"] for case in _SELECTED_LAW_DOMAIN_CASES}
+
+
+def test_gas_rail_domain_does_not_inherit_the_pure_sidecar_band() -> None:
+    """A gas-standard rail has no condensed sidecar constituent.
+
+    Shipped pseudo-psat rows are condensed, so resolve never takes this
+    branch. The domain helper still has it: the standard-pressure rail
+    must not publish the sidecar construction band.
+    """
+
+    from simulator.vapour_rail.catalog import _ellingham_selected_law_domain
+
+    row = _pseudo_psat_species_rows()["Fe"]
+    domain = _ellingham_selected_law_domain(
+        species_id="Fe",
+        temperature_K=1673.15,
+        row=row,
+        pressure_rail="gas_fugacity",
+    )
+    assert domain["pressure_rail"] == "gas_fugacity"
+    assert [item["law"] for item in domain["constituents"]] == ["ellingham_fit"]
+    assert domain["out_of_range"] is False
+    assert domain["authority"] == "certified"
+    assert domain["source_label"] == "ellingham_rail:gas_fugacity:certified"
+    low, high = domain["band_K"]
+    assert low <= 1673.15 <= high
+    assert domain["band_K"] != [1809.0, 3134.0]
+
+
+def test_numeric_selected_pressure_has_one_catalog_publisher() -> None:
+    """One catalog writer attaches a numeric selected pressure.
+
+    A second ``PressureValue`` assignment would publish a number with
+    the dormant law's in-band flag. Refusals and authorized zeros are
+    not that writer.
+    """
+
+    source = (
+        DATA_DIR.parent / "simulator" / "vapour_rail" / "catalog.py"
+    ).read_text()
+    assert source.count("def _publish_selected_pressure(") == 1
+    assert source.count("_publish_selected_pressure(") == 2
+    assert "selected_runtime_pressure=PressureValue(" not in source
+    assert "selected_runtime_pressure=pressure," in source
+
+
+def test_fe_missing_ellingham_input_refuses_instead_of_dormant_antoine() -> None:
+    """Missing Fe activity or pO2 refuses that quantity.
+
+    The dormant pseudo Antoine at 1673.15 K is 4.871162269407267 Pa. It may
+    stay on answer.pressure as the catalog reference. It must not be selected
+    or flux-eligible. Fails while a missing input keeps that Antoine as the debit.
+    """
+
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"),
+        u0_manifest=load_u0_manifest(),
+    )
+
+    def _resolve(state: dict) -> VapourBatch:
+        return catalog.resolve_batch(
+            {"process.cleaned_melt": {"FeO": 1.0}},
+            state,
+            flux_activation_context=_rg_activation_context(),
+        )
+
+    missing_activity = _resolve(
+        {
+            "temperature_K": 1673.15,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "fO2_bar": 1.0e-9,
+        }
+    )
+    answer = missing_activity.channel("Fe")
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
+    assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+    assert answer.selected_runtime_pressure.code == "missing_ellingham_input"
+    assert "activity" in answer.selected_runtime_pressure.detail
+    assert isinstance(answer.flux, FluxRefusal)
+    assert answer.flux.code == "missing_ellingham_input"
+    assert "Fe" not in missing_activity.flux_active_species_ids
+    _assert_ellingham_refusal_bookkeeping(missing_activity)
+    pressures, _report = flux_pressures_from_batch(missing_activity)
+    assert "Fe" not in pressures
+
+    missing_pO2 = _resolve(
+        {
+            "temperature_K": 1673.15,
+            "process_phase": "hot_train",
+            "stage": "evaporation",
+            "source_reaction_activities": {"Fe": 0.2},
+        }
+    )
+    answer = missing_pO2.channel("Fe")
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
+    assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+    assert answer.selected_runtime_pressure.code == "missing_ellingham_input"
+    assert "pO2" in answer.selected_runtime_pressure.detail
+    assert isinstance(answer.flux, FluxRefusal)
+    assert "Fe" not in missing_pO2.flux_active_species_ids
+    _assert_ellingham_refusal_bookkeeping(missing_pO2)
+
+
+def _assert_ellingham_refusal_bookkeeping(batch: VapourBatch) -> None:
+    """Post-resolution Fe refusal updates every derived batch field.
+
+    flux-active membership, solve bundles, and the metadata counts are one
+    bookkeeping record. A refusal that updates only the channel leaves Fe
+    counted as active.
+    """
+
+    assert "Fe" not in batch.flux_active_species_ids
+    assert all(
+        "Fe" not in members for members in batch.solve_bundle_ids.values()
+    )
+    assert batch.metadata["n_flux_active"] == len(batch.flux_active_species_ids)
+    assert batch.metadata["n_solve_bundles"] == len(batch.solve_bundle_ids)
+    assert batch.metadata["n_refused"] == sum(
+        1 for answer in batch.channels_by_species.values() if answer.is_refused
+    )
+    assert batch.channel("Fe").is_refused
+
+
+_FE_ELLINGHAM_OMISSIONS = (
+    ("missing_activity", {"fO2_bar": 1.0e-9}),
+    ("missing_activity_key", {
+        "fO2_bar": 1.0e-9,
+        "source_reaction_activities": {},
+    }),
+    ("activity_none", {
+        "fO2_bar": 1.0e-9,
+        "source_reaction_activities": {"Fe": None},
+    }),
+    ("missing_pO2", {"source_reaction_activities": {"Fe": 0.2}}),
+    ("pO2_none", {
+        "fO2_bar": None,
+        "source_reaction_activities": {"Fe": 0.2},
+    }),
+)
+
+
+@pytest.mark.parametrize(
+    "omission_id,state_overrides",
+    _FE_ELLINGHAM_OMISSIONS,
+    ids=[item[0] for item in _FE_ELLINGHAM_OMISSIONS],
+)
+def test_fe_ellingham_omission_reconciles_batch_bookkeeping(
+    omission_id: str,
+    state_overrides: dict,
+) -> None:
+    """Every missing Ellingham input refuses Fe and fixes derived fields."""
+
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"),
+        u0_manifest=load_u0_manifest(),
+    )
+    state = {
+        "temperature_K": 1673.15,
+        "process_phase": "hot_train",
+        "stage": "evaporation",
+    }
+    state.update(state_overrides)
+    batch = catalog.resolve_batch(
+        {"process.cleaned_melt": {"FeO": 1.0}},
+        state,
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel("Fe")
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
+    assert isinstance(answer.selected_runtime_pressure, PressureRefusal)
+    assert answer.selected_runtime_pressure.code == "missing_ellingham_input"
+    assert isinstance(answer.flux, FluxRefusal)
+    assert answer.flux.code == "missing_ellingham_input"
+    _assert_ellingham_refusal_bookkeeping(batch)
+    pressures, _report = flux_pressures_from_batch(batch)
+    assert "Fe" not in pressures
+    assert omission_id
+
+
+# C4 Si pair. The catalog activity correction at pO2 = 2e-4 bar against the
+# 1e-9 bar reference is the kernel pressure / 2e5. Debiting that catalog
+# number drops Si under the report floor. The same cutover is the default
+# for every carrier except Fe's Ellingham row (d-380).
+_C4_SI_CATALOG_PA = 4.149230182792238e-12
+_C4_SI_KERNEL_PA = 8.298460365584479e-07
+_KERNEL_SEAM_SPECIES = (
+    "Na", "K", "Ca", "Mg", "Ti", "Si",
+    "Al", "SiO", "TiO", "TiO2_gas",
+    "Al2", "Al2O", "Al2O2", "Al2O3_gas", "AlO", "AlO2", "CrO", "CrO2",
+)
+_FE_ELLINGHAM_PA = 0.05731853761717197
+_FE_DIVERGENT_KERNEL_PA = 1.25
+_KERNEL_PROVENANCE_BRANCHES = (
+    "label_present",
+    "label_missing",
+    "label_empty",
+    "label_blank",
+    "label_non_string",
+    "pressure_absent",
+    "pressure_zero_unlabeled",
+)
+
+
+@pytest.mark.parametrize("species_id", _KERNEL_SEAM_SPECIES)
+@pytest.mark.parametrize("branch", _KERNEL_PROVENANCE_BRANCHES)
+def test_kernel_seam_finite_pressure_is_not_a_provenance_cutover(
+    species_id: str,
+    branch: str,
+) -> None:
+    """Finite kernel pressure is the debit for every carrier except Fe.
+
+    Missing, empty, blank, or non-string provenance must not select the
+    catalog number. No kernel pressure leaves the incoming selection in
+    place and does not invent a zero. One species' branch does not rewrite
+    the others. Fe keeps the Ellingham selection even when the seam value
+    differs. The eight flagged alpha=1 carriers debit the seam.
+    """
+
+    channels = {}
+    pressures: dict[str, float] = {}
+    sources: dict[str, object] = {}
+    for sid in _KERNEL_SEAM_SPECIES:
+        channels[sid] = _seam_debit_answer(
+            sid,
+            selected_pa=_C4_SI_CATALOG_PA,
+            catalog_pa=_C4_SI_CATALOG_PA,
+            source_label="catalog_activity_corrected",
+        )
+        subject = sid == species_id
+        if subject and branch == "pressure_absent":
+            continue
+        if subject and branch == "pressure_zero_unlabeled":
+            pressures[sid] = 0.0
+            continue
+        pressures[sid] = _C4_SI_KERNEL_PA
+        if subject and branch == "label_present":
+            sources[sid] = "builtin_authoritative:standard_reaction_term"
+        elif subject and branch in {"label_missing", "pressure_absent"}:
+            continue
+        elif subject and branch == "label_empty":
+            sources[sid] = ""
+        elif subject and branch == "label_blank":
+            sources[sid] = "   "
+        elif subject and branch == "label_non_string":
+            sources[sid] = 12
+        else:
+            sources[sid] = f"builtin_authoritative:standard_reaction_term:{sid}"
+    channels["Fe"] = _seam_debit_answer(
+        "Fe",
+        selected_pa=_FE_ELLINGHAM_PA,
+        catalog_pa=4.871162269407267,
+        source_label="catalog",
+    )
+    pressures["Fe"] = _FE_DIVERGENT_KERNEL_PA
+    batch = VapourBatch(
+        requested_species_ids=frozenset(channels),
+        channels_by_species=channels,
+        flux_active_species_ids=frozenset(channels),
+    )
+    equilibrium = SimpleNamespace(vapor_pressures_source=sources)
+    retained = _retain_kernel_seam_debit(
+        batch,
+        equilibrium,
+        EffectivePressureSource("kernel-seam-invariant", pressures),
+    )
+    debit, _report = flux_pressures_from_batch(retained)
+
+    for sid in _KERNEL_SEAM_SPECIES:
+        answer = retained.channel(sid)
+        assert answer.pressure.pa == pytest.approx(
+            _C4_SI_CATALOG_PA, rel=0.0, abs=0.0
+        )
+        subject = sid == species_id
+        if subject and branch == "pressure_absent":
+            assert answer.selected_runtime_pressure.pa == pytest.approx(
+                _C4_SI_CATALOG_PA, rel=0.0, abs=0.0
+            )
+            assert answer.extra.get("kernel_seam_provenance_missing") is not True
+            assert debit[sid] == pytest.approx(_C4_SI_CATALOG_PA, rel=0.0, abs=0.0)
+            assert debit[sid] != 0.0
+            continue
+        expected = (
+            0.0
+            if subject and branch == "pressure_zero_unlabeled"
+            else _C4_SI_KERNEL_PA
+        )
+        assert answer.selected_runtime_pressure.pa == pytest.approx(
+            expected, rel=0.0, abs=0.0
+        )
+        assert debit[sid] == pytest.approx(expected, rel=0.0, abs=0.0)
+        if subject and branch == "label_present":
+            assert answer.source_label == (
+                "builtin_authoritative:standard_reaction_term"
+            )
+            assert answer.extra.get("kernel_seam_provenance_missing") is not True
+        elif subject and branch in {
+            "label_missing",
+            "label_empty",
+            "label_blank",
+            "label_non_string",
+            "pressure_zero_unlabeled",
+        }:
+            assert answer.source_label == "catalog_activity_corrected"
+            assert answer.extra.get("kernel_seam_provenance_missing") is True
+        else:
+            assert answer.source_label == (
+                f"builtin_authoritative:standard_reaction_term:{sid}"
+            )
+            assert answer.extra.get("kernel_seam_provenance_missing") is not True
+
+    iron = retained.channel("Fe")
+    assert iron.selected_runtime_pressure.pa == pytest.approx(
+        _FE_ELLINGHAM_PA, rel=0.0, abs=0.0
+    )
+    assert iron.source_label == "catalog"
+    assert iron.pressure.pa == pytest.approx(4.871162269407267, rel=0.0, abs=0.0)
+    assert debit["Fe"] == pytest.approx(_FE_ELLINGHAM_PA, rel=0.0, abs=0.0)
+    assert debit["Fe"] != pytest.approx(_FE_DIVERGENT_KERNEL_PA)
+
+
+def _missing_contract_rule(
+    species_id: str,
+    *,
+    has_alpha: bool,
+    has_formula: bool,
+) -> RequestRule:
+    return RequestRule(
+        species_id=species_id,
+        source_account="process.cleaned_melt",
+        parent_species_ids=frozenset({"P"}),
+        required_source_atoms=frozenset({"P"}),
+        solve_group_id=f"bundle-{species_id}",
+        applicability_predicate="applicable",
+        request_rule_kind="source_inventory_present",
+        origin="catalog",
+        formula_id=species_id,
+        validation_status="pending_validation",
+        has_pressure_evaluator=True,
+        has_alpha=has_alpha,
+        has_route=True,
+        has_formula=has_formula,
+    )
+
+
+def test_missing_alpha_plus_another_field_demotes_instead_of_aborting() -> None:
+    """A broad-proxy carrier missing alpha and formula must not abort the batch."""
+
+    batch = resolve_vapour_batch(
+        rules=(
+            _missing_contract_rule("K", has_alpha=True, has_formula=True),
+            _missing_contract_rule("CrO2", has_alpha=False, has_formula=False),
+        ),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1800.0),
+        catalog_species={
+            **_stub_catalog_species("K"),
+            **_stub_catalog_species("CrO2"),
+        },
+        flux_activation_context=_pre_rg_activation_context("K", "CrO2"),
+    )
+    assert "K" in batch.flux_active_species_ids
+    cro2 = batch.channel("CrO2")
+    assert cro2.refusal_code == "missing_channel_contract"
+    detail = cro2.extra.get("detail") or ""
+    assert "alpha" in detail
+    assert "formula" in detail
+    assert "CrO2" not in batch.flux_active_species_ids
+
+
+def test_missing_formula_without_alpha_still_aborts_the_batch() -> None:
+    with pytest.raises(VapourRequestConstructionError, match="not flux-eligible"):
+        resolve_vapour_batch(
+            rules=(
+                _missing_contract_rule("CrO2", has_alpha=True, has_formula=False),
+            ),
+            ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+            state=VapourResolveState(temperature_K=1800.0),
+            catalog_species=_stub_catalog_species("CrO2"),
+            flux_activation_context=_pre_rg_activation_context("CrO2"),
+        )
+
+
+def test_sole_missing_alpha_stays_flux_active_when_fallback_admits() -> None:
+    context = FluxActivationContext(
+        epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+        effective_pressure_species_ids=frozenset({"CrO2"}),
+        allow_unmeasured_alpha_fallback=True,
+        unmeasured_alpha_fallback_species=frozenset({"CrO2"}),
+    )
+    batch = resolve_vapour_batch(
+        rules=(_missing_contract_rule("CrO2", has_alpha=False, has_formula=True),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1800.0),
+        catalog_species=_stub_catalog_species("CrO2"),
+        flux_activation_context=context,
+    )
+    answer = batch.channel("CrO2")
+    assert isinstance(answer.pressure, PressureValue)
+    assert isinstance(answer.selected_runtime_pressure, PressureValue)
+    assert answer.is_flux_active
+    assert "CrO2" in batch.flux_active_species_ids
+
+
+def _seam_debit_answer(
+    species_id: str,
+    *,
+    selected_pa: float,
+    catalog_pa: float,
+    source_label: str,
+    active: bool = True,
+) -> VapourAnswer:
+    return VapourAnswer(
+        species_id=species_id,
+        pressure=PressureValue(pa=catalog_pa),
+        selected_runtime_pressure=PressureValue(pa=selected_pa),
+        flux=(
+            FluxEligible(alpha_ref="test")
+            if active
+            else FluxRefusal(code="missing_channel_contract", detail="missing alpha")
+        ),
+        source_label=source_label,
+        formula_id=species_id,
+        source_account="process.cleaned_melt",
+        solve_group_id="g",
+        state_fingerprint="fp",
+        validation_status="pending_validation",
+    )
+
+
+def test_alkali_refractory_selected_pressure_stays_on_kernel_seam() -> None:
+    """Every carrier except Fe debits the kernel seam. Fe stays on Ellingham.
+
+    Ca, Mg, and Ti are the 1400 C C0 step. Si is the C4 1670 C in-domain
+    point: pO2 is 0.2 mbar (2e-4 bar) against the catalog reference
+    1e-9 bar and exponent -1, so the activity-corrected catalog pressure
+    is the kernel pressure / 2e5 (4.149230182792238e-12 Pa versus
+    8.298460365584479e-07 Pa). Al, SiO, TiO, TiO2_gas, and CrO2 are the
+    carriers a six-species whitelist left on the catalog continuation.
+    Fails when any of those selected pressures stay on that continuation.
+    """
+
+    # Synthetic catalog/kernel pairs. Distinct on purpose so a whitelist
+    # that leaves these carriers on the catalog continuation fails.
+    catalog_movers = {
+        "Al": (1.4e-8, 9.0e-8),
+        "SiO": (3.0e-4, 1.1e-3),
+        "TiO": (2.0e-6, 4.0e-5),
+        "TiO2_gas": (5.0e-7, 7.0e-6),
+        "CrO2": (8.0e-5, 2.0e-4),
+    }
+    batch = VapourBatch(
+        requested_species_ids=frozenset(
+            {"Na", "K", "Ca", "Mg", "Ti", "Si", "Fe", *catalog_movers}
+        ),
+        channels_by_species={
+            "Na": _seam_debit_answer(
+                "Na",
+                selected_pa=2.7071606671395836,
+                catalog_pa=2.7071606671395836,
+                source_label="catalog_activity_corrected",
+            ),
+            "K": _seam_debit_answer(
+                "K",
+                selected_pa=0.12738062946763712,
+                catalog_pa=0.12738062946763712,
+                source_label="catalog_activity_corrected",
+            ),
+            "Ca": _seam_debit_answer(
+                "Ca",
+                selected_pa=1.3897762374690034e-08,
+                catalog_pa=1.3897762374690034e-08,
+                source_label="catalog_activity_corrected",
+            ),
+            "Mg": _seam_debit_answer(
+                "Mg",
+                selected_pa=0.00034222949385749943,
+                catalog_pa=0.00034222949385749943,
+                source_label="catalog_activity_corrected",
+            ),
+            "Ti": _seam_debit_answer(
+                "Ti",
+                selected_pa=1.1566690667153255e-15,
+                catalog_pa=1.1566690667153255e-15,
+                source_label="catalog_activity_corrected",
+            ),
+            "Si": _seam_debit_answer(
+                "Si",
+                selected_pa=4.149230182792238e-12,
+                catalog_pa=4.149230182792238e-12,
+                source_label="catalog_activity_corrected",
+            ),
+            "Fe": _seam_debit_answer(
+                "Fe",
+                selected_pa=0.05731853761717197,
+                catalog_pa=4.871162269407267,
+                source_label="catalog",
+            ),
+            **{
+                species_id: _seam_debit_answer(
+                    species_id,
+                    selected_pa=catalog_pa,
+                    catalog_pa=catalog_pa,
+                    source_label="catalog_activity_corrected",
+                )
+                for species_id, (catalog_pa, _kernel_pa) in catalog_movers.items()
+            },
+        },
+        flux_active_species_ids=frozenset(
+            {"Na", "K", "Ca", "Mg", "Ti", "Si", "Fe", *catalog_movers}
+        ),
+    )
+    equilibrium = SimpleNamespace(
+        vapor_pressures_source={
+            "Na": (
+                "builtin_authoritative:standard_reaction_term:"
+                "extrapolated_beyond_valid_range_K:out_of_gamma_domain"
+            ),
+            "K": (
+                "builtin_authoritative:standard_reaction_term:"
+                "extrapolated_beyond_valid_range_K:out_of_gamma_domain"
+            ),
+            "Ca": "builtin_authoritative:standard_reaction_term",
+            "Mg": "builtin_authoritative:standard_reaction_term",
+            "Ti": "builtin_authoritative:standard_reaction_term",
+            "Si": "builtin_authoritative:standard_reaction_term",
+            "Fe": "builtin_authoritative:pure_component_derived_from_evaluation",
+            **{
+                species_id: (
+                    f"builtin_authoritative:standard_reaction_term:{species_id}"
+                )
+                for species_id in catalog_movers
+            },
+        }
+    )
+    source = EffectivePressureSource(
+        "equilibrium_backend_effective_pressure_pre_rg",
+        {
+            "Na": 2.694467309265198,
+            "K": 0.12704107980939044,
+            "Ca": 1.8984315256420538e-08,
+            "Mg": 0.00034222649537030153,
+            "Ti": 1.0732438025337687e-15,
+            "Si": 8.298460365584479e-07,
+            "Fe": 0.05731853761717197,
+            **{
+                species_id: kernel_pa
+                for species_id, (_catalog_pa, kernel_pa) in catalog_movers.items()
+            },
+        },
+    )
+    retained = _retain_kernel_seam_debit(batch, equilibrium, source)
+    expected_kernel = {
+        "Na": 2.694467309265198,
+        "K": 0.12704107980939044,
+        "Ca": 1.8984315256420538e-08,
+        "Mg": 0.00034222649537030153,
+        "Ti": 1.0732438025337687e-15,
+        "Si": 8.298460365584479e-07,
+        **{
+            species_id: kernel_pa
+            for species_id, (_catalog_pa, kernel_pa) in catalog_movers.items()
+        },
+    }
+    expected_catalog = {
+        "Na": 2.7071606671395836,
+        "K": 0.12738062946763712,
+        "Ca": 1.3897762374690034e-08,
+        "Mg": 0.00034222949385749943,
+        "Ti": 1.1566690667153255e-15,
+        "Si": 4.149230182792238e-12,
+        **{
+            species_id: catalog_pa
+            for species_id, (catalog_pa, _kernel_pa) in catalog_movers.items()
+        },
+    }
+    for species_id, kernel_pa in expected_kernel.items():
+        answer = retained.channel(species_id)
+        assert answer.selected_runtime_pressure.pa == pytest.approx(
+            kernel_pa, rel=0.0, abs=0.0
+        )
+        assert answer.pressure.pa == pytest.approx(
+            expected_catalog[species_id], rel=0.0, abs=0.0
+        )
+        assert answer.source_label == equilibrium.vapor_pressures_source[species_id]
+    fe = retained.channel("Fe")
+    assert fe.selected_runtime_pressure.pa == pytest.approx(
+        0.05731853761717197, rel=0.0, abs=0.0
+    )
+    assert fe.pressure.pa == pytest.approx(4.871162269407267, rel=0.0, abs=0.0)
+    assert fe.source_label == "catalog"
+    pressures, _report = flux_pressures_from_batch(retained)
+    for species_id, kernel_pa in expected_kernel.items():
+        assert pressures[species_id] == pytest.approx(kernel_pa, rel=0.0, abs=0.0)
+    assert pressures["Fe"] == pytest.approx(0.05731853761717197, rel=0.0, abs=0.0)
+
+
+def test_shipped_fallback_key_admits_alo_and_refuses_unlisted() -> None:
+    """The rail reads the shipped allowlist. AlO is on it; Ghost is not."""
+
+    kernel = yaml.safe_load(
+        Path("data/setpoints.yaml").read_text()
+    )["chemistry_kernel"]
+    allowlist = frozenset(kernel["unmeasured_alpha_fallback_species"])
+    context = FluxActivationContext(
+        epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+        effective_pressure_species_ids=frozenset({"AlO", "Ghost"}),
+        allow_unmeasured_alpha_fallback=bool(
+            kernel["allow_unmeasured_alpha_fallback"]
+        ),
+        unmeasured_alpha_fallback_species=allowlist,
+    )
+    batch = resolve_vapour_batch(
+        rules=(
+            _missing_contract_rule("AlO", has_alpha=False, has_formula=True),
+            _missing_contract_rule("Ghost", has_alpha=False, has_formula=True),
+        ),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1800.0),
+        catalog_species={
+            **_stub_catalog_species("AlO"),
+            **_stub_catalog_species("Ghost"),
+        },
+        flux_activation_context=context,
+    )
+    assert batch.channel("AlO").is_flux_active
+    assert "AlO" in batch.flux_active_species_ids
+    ghost = batch.channel("Ghost")
+    assert ghost.refusal_code == "missing_channel_contract"
+    assert "alpha" in (ghost.extra.get("detail") or "")
+    assert "Ghost" not in batch.flux_active_species_ids
+
+
+def test_sole_missing_alpha_stays_refused_when_fallback_is_off() -> None:
+    batch = resolve_vapour_batch(
+        rules=(_missing_contract_rule("CrO2", has_alpha=False, has_formula=True),),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1800.0),
+        catalog_species=_stub_catalog_species("CrO2"),
+        flux_activation_context=_pre_rg_activation_context("CrO2"),
+    )
+    answer = batch.channel("CrO2")
+    assert answer.refusal_code == "missing_channel_contract"
+    assert "alpha" in (answer.extra.get("detail") or "")
+    assert not answer.is_flux_active
+    assert "CrO2" not in batch.flux_active_species_ids

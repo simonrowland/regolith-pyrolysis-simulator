@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from collections import OrderedDict
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 import hashlib
 import json
@@ -37,7 +37,13 @@ from simulator.vapour_rail.activity import (
     SourceReactionActivity,
     StandardStateIdentity,
 )
-from simulator.vapour_rail.batch import FluxActivationContext
+from simulator.vapour_rail.batch import (
+    FluxActivationContext,
+    FluxRefusal,
+    PressureRefusal,
+    PressureValue,
+    ZeroByPhysics,
+)
 from simulator.vapour_rail.channels import (
     CHANNEL_O2,
     LEGACY_FO2_PLANE,
@@ -1601,6 +1607,558 @@ class CompiledSpecies:
     source_reaction_activity: ActivityInputDeclaration | None = None
 
 
+# Fe's missing a_FeO / pO2 bound. Each carrier has its own activity-1
+# saturation pressure. FeO(g) is not P_sat,Fe with a heavier molar mass.
+_FE_UPPER_BOUND_REASON = "below_evaporation_upper_bound"
+_FE_UPPER_BOUND_CHANNELS = ("Fe", "FeO_gas")
+# JANAF Fe-020 crystal ↔ liquid, the same 1650 K boundary as
+# ellingham_thermo._ELLINGHAM_PHASE_INTERVALS["FeO"].
+_FEO_CONGRUENT_MELT_K = 1650.0
+_FEO_GAS_JANAF_TABLE = "Fe-021"
+_FEO_CRYSTAL_JANAF_TABLE = "Fe-018"
+_FEO_LIQUID_JANAF_TABLE = "Fe-019"
+# Printed JANAF standard pressure is 0.1 MPa.
+_JANAF_STANDARD_PRESSURE_PA = 100_000.0
+_JANAF_GIBBS_POINTS: dict[str, tuple[tuple[float, float], ...]] = {}
+
+
+def _legacy_projection_species_row(
+    legacy_projection: Mapping[str, Any],
+    species_id: str,
+) -> Mapping[str, Any] | None:
+    for group in legacy_projection.values():
+        if not isinstance(group, Mapping):
+            continue
+        candidate = group.get(species_id)
+        if isinstance(candidate, Mapping) and "molar_mass_g_mol" in candidate:
+            return candidate
+    return None
+
+
+def _janaf_formation_gibbs_points(
+    table_id: str,
+) -> tuple[tuple[float, float], ...] | None:
+    """Printed (T/K, ΔfG°/kJ/mol) nodes. None when the table cannot be read."""
+
+    cached = _JANAF_GIBBS_POINTS.get(table_id)
+    if cached is not None:
+        return cached
+    try:
+        from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+        document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+        table = document.get("table")
+        rows = table.get("values") if isinstance(table, Mapping) else None
+        if not isinstance(rows, list):
+            return None
+        points: list[tuple[float, float]] = []
+        for row in rows:
+            if not isinstance(row, Mapping):
+                continue
+            temperature = row.get("temperature")
+            gibbs = row.get("formation_gibbs_energy")
+            if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
+                continue
+            t_value = temperature.get("value")
+            g_value = gibbs.get("value")
+            if t_value is None or g_value is None:
+                continue
+            t_node = float(t_value)
+            g_node = float(g_value)
+            if math.isfinite(t_node) and math.isfinite(g_node):
+                points.append((t_node, g_node))
+    except (OSError, ValueError, TypeError, KeyError, yaml.YAMLError):
+        return None
+    if len(points) < 2:
+        return None
+    points.sort()
+    frozen = tuple(points)
+    _JANAF_GIBBS_POINTS[table_id] = frozen
+    return frozen
+
+
+def _interpolate_printed_gibbs_kJ(
+    points: tuple[tuple[float, float], ...],
+    temperature_K: float,
+) -> float | None:
+    """Linear ΔfG between the printed nodes that bracket T.
+
+    Outside the printed grid this returns None. These tables have no
+    extrapolation grant, so a temperature past either end is not a bound.
+    """
+
+    if temperature_K < points[0][0] or temperature_K > points[-1][0]:
+        return None
+    for (left_T, left_G), (right_T, right_G) in zip(points, points[1:]):
+        if left_T <= temperature_K <= right_T:
+            if right_T == left_T:
+                return left_G
+            span = right_T - left_T
+            return left_G + (right_G - left_G) * ((temperature_K - left_T) / span)
+    return None
+
+
+def _feo_congruent_saturation_pa(temperature_K: float) -> dict[str, Any] | None:
+    """P(FeO(g)) over pure condensed FeO at a_FeO = 1.
+
+    Congruent sublimation FeO(s/l) -> FeO(g). The stoichiometry has no O2,
+    so the pressure does not depend on pO2. Gas thermo is JANAF Fe-021.
+    The stable condensed phase is the crystal (Fe-018) below 1650 K and
+    the liquid (Fe-019) at and above that point.
+
+    Premise: both formation reactions use the JANAF element reference, so
+    ΔG_sub = ΔfG(gas) − ΔfG(condensed).
+    Algebra: K = P/P° = exp(−ΔG_sub/(R T)), with ΔfG in kJ/mol and
+    P° = 1e5 Pa, so
+        P/Pa = 1e5 * exp(−(ΔfG_gas − ΔfG_cond) * 1000 / (R T)).
+    Units: exp argument dimensionless, result Pa.
+    Sanity: at 1800 K this is about 0.9 Pa, below P_sat,Fe; at 308 K it
+    is about 1e-75 Pa. A temperature outside either printed grid has no
+    extrapolation authority and returns None.
+    """
+
+    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+        return None
+    condensed_id = (
+        _FEO_CRYSTAL_JANAF_TABLE
+        if temperature_K < _FEO_CONGRUENT_MELT_K
+        else _FEO_LIQUID_JANAF_TABLE
+    )
+    phase = "crystal" if condensed_id == _FEO_CRYSTAL_JANAF_TABLE else "liquid"
+    gas_points = _janaf_formation_gibbs_points(_FEO_GAS_JANAF_TABLE)
+    condensed_points = _janaf_formation_gibbs_points(condensed_id)
+    if gas_points is None or condensed_points is None:
+        return None
+    g_gas = _interpolate_printed_gibbs_kJ(gas_points, temperature_K)
+    g_condensed = _interpolate_printed_gibbs_kJ(condensed_points, temperature_K)
+    if g_gas is None or g_condensed is None:
+        return None
+    from simulator.physical_constants import GAS_CONSTANT
+
+    # kJ/mol to J/mol, then ΔG/(R T).
+    exponent = -((g_gas - g_condensed) * 1000.0) / (GAS_CONSTANT * temperature_K)
+    try:
+        pressure_pa = math.exp(exponent) * _JANAF_STANDARD_PRESSURE_PA
+    except OverflowError:
+        return None
+    if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+        return None
+    return {
+        "pressure_pa": pressure_pa,
+        "law": "janaf_congruent_sublimation",
+        "authority": "certified",
+        "band_K": [
+            max(gas_points[0][0], condensed_points[0][0]),
+            min(gas_points[-1][0], condensed_points[-1][0]),
+        ],
+        "phase": phase,
+        "tables": [_FEO_GAS_JANAF_TABLE, condensed_id],
+    }
+
+
+def _authorized_pure_metal_evaporation_zero(
+    legacy_projection: Mapping[str, Any],
+    answer: Any,
+    row: Mapping[str, Any],
+    temperature_K: float | None,
+    state: Any,
+) -> Any | None:
+    """Authorized Fe zero when every channel's own tick mass sums under closure.
+
+    INVARIANT: a missing Ellingham input becomes ``zero_by_physics`` only
+    when every Fe carrier channel has its own activity-1 saturation
+    pressure and the sum of the alpha=1 Hertz-Knudsen masses over this
+    tick is strictly below ``DEFAULT_BALANCE_TOLERANCE_KG``. One channel's
+    pressure is never reused as another's. A channel with no evaluable
+    law (no thermo, or outside its grid with no extrapolation authority)
+    returns None, and the caller keeps the typed ``missing_ellingham_input``
+    refusal.
+
+    Fe: ``a_Fe <= 1`` implies ``P_Fe <= P_sat,Fe(T)`` from the shipped pure
+    sidecar. Outside ``construction_support_range_K`` that sidecar is the
+    shipped continuation, recorded as extrapolated, not a refusal.
+    FeO(g): ``P_FeO <= P`` of congruent FeO(s/l) -> FeO(g) at a_FeO = 1.
+    That reaction has no pO2 term. Alpha is not used on either channel:
+    an upper bound that justified a zero with alpha < 1 would sit below
+    the physical ceiling. Gas resistance would only lower the flux.
+
+    The 700 C reference (~6.5e-10 kg/m^2/h) is the sublimation
+    Clausius-Clapeyron check. This function uses the shipped Antoine for
+    Fe, whose cold-T pressure is higher, so a zero authorized here is
+    inside that check only when the FeO channel's own bound is also below
+    the same tolerance.
+    """
+
+    if (
+        temperature_K is None
+        or not math.isfinite(temperature_K)
+        or temperature_K <= 0.0
+        or state is None
+    ):
+        return None
+    try:
+        area_m2 = float(getattr(state, "evaporation_tick_area_m2", None))
+        duration_s = float(getattr(state, "evaporation_tick_duration_s", None))
+    except (TypeError, ValueError):
+        return None
+    if (
+        not math.isfinite(area_m2)
+        or area_m2 <= 0.0
+        or not math.isfinite(duration_s)
+        or duration_s <= 0.0
+    ):
+        return None
+    pure = row.get("pure_component_antoine")
+    if not isinstance(pure, Mapping):
+        return None
+    band = pure.get("construction_support_range_K")
+    if (
+        not isinstance(band, Sequence)
+        or isinstance(band, (str, bytes))
+        or len(band) != 2
+    ):
+        return None
+    try:
+        band_low = float(band[0])
+        band_high = float(band[1])
+    except (TypeError, ValueError):
+        return None
+    if (
+        not math.isfinite(band_low)
+        or not math.isfinite(band_high)
+        or band_high < band_low
+    ):
+        return None
+
+    from engines.antoine import (
+        _AntoineCoefficientRefusal,
+        _antoine_log10_pressure,
+        _read_antoine_coefficients,
+    )
+    from engines.builtin.vapor_pressure import (
+        COEFF_BLOCK_PURE_COMPONENT,
+        VaporPressureComputationError,
+        vapor_pressure_antoine_coefficients,
+    )
+    from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
+    from simulator.chemistry.langmuir_knudsen import (
+        hertz_knudsen_k_kg_s_m2_pa,
+    )
+
+    try:
+        antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+            row,
+            temperature_K=temperature_K,
+        )
+        if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
+            return None
+        if not isinstance(antoine, Mapping) or antoine.get("selection_refusal"):
+            return None
+        antoine_a, antoine_b, antoine_c = _read_antoine_coefficients(antoine)
+        pure_pa = 10.0 ** _antoine_log10_pressure(
+            antoine_a, antoine_b, antoine_c, temperature_K
+        )
+    except (
+        KeyError,
+        ValueError,
+        OverflowError,
+        _AntoineCoefficientRefusal,
+        VaporPressureComputationError,
+    ):
+        return None
+    if not math.isfinite(pure_pa) or pure_pa < 0.0:
+        return None
+    # FeO(g) has its own saturation law. Unavailable proof keeps the refusal.
+    feo = _feo_congruent_saturation_pa(temperature_K)
+    if not isinstance(feo, Mapping):
+        return None
+    try:
+        feo_pa = float(feo["pressure_pa"])
+    except (KeyError, TypeError, ValueError):
+        return None
+    if not math.isfinite(feo_pa) or feo_pa < 0.0:
+        return None
+
+    fe_authority = (
+        "certified"
+        if band_low <= temperature_K <= band_high
+        else "extrapolated"
+    )
+    channel_pressure_pa = {"Fe": pure_pa, "FeO_gas": feo_pa}
+    channel_laws: dict[str, dict[str, Any]] = {
+        "Fe": {
+            "law": "pure_component_antoine",
+            "authority": fe_authority,
+            "band_K": [band_low, band_high],
+        },
+        "FeO_gas": {
+            "law": feo.get("law"),
+            "authority": feo.get("authority"),
+            "band_K": list(feo.get("band_K") or []),
+            "phase": feo.get("phase"),
+            "tables": list(feo.get("tables") or []),
+        },
+    }
+    channel_records: dict[str, dict[str, Any]] = {}
+    bound_kg = 0.0
+    for channel_id in _FE_UPPER_BOUND_CHANNELS:
+        channel_row = row if channel_id == "Fe" else _legacy_projection_species_row(
+            legacy_projection, channel_id
+        )
+        if channel_row is None:
+            return None
+        try:
+            molar_g = float(channel_row.get("molar_mass_g_mol"))
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(molar_g) or molar_g <= 0.0:
+            return None
+        pressure_pa = channel_pressure_pa[channel_id]
+        flux_kg_s_m2 = hertz_knudsen_k_kg_s_m2_pa(
+            temperature_K, molar_g / 1000.0
+        ) * pressure_pa
+        if not math.isfinite(flux_kg_s_m2) or flux_kg_s_m2 < 0.0:
+            return None
+        mass_kg = flux_kg_s_m2 * area_m2 * duration_s
+        if not math.isfinite(mass_kg) or mass_kg < 0.0:
+            return None
+        bound_kg += mass_kg
+        channel_records[channel_id] = {
+            "pressure_pa": pressure_pa,
+            "molar_mass_g_mol": molar_g,
+            "mass_kg": mass_kg,
+            **channel_laws[channel_id],
+        }
+    if not math.isfinite(bound_kg) or bound_kg < 0.0:
+        return None
+    if not bound_kg < DEFAULT_BALANCE_TOLERANCE_KG:
+        return None
+
+    authority = (
+        "extrapolated"
+        if "extrapolated" in (
+            fe_authority,
+            channel_laws["FeO_gas"].get("authority"),
+        )
+        else fe_authority
+    )
+    extra = dict(answer.extra)
+    if isinstance(answer.pressure, PressureValue):
+        extra["dormant_catalog_pressure_pa"] = float(answer.pressure.pa)
+    extra[_FE_UPPER_BOUND_REASON] = {
+        "reason": _FE_UPPER_BOUND_REASON,
+        "bound_kg": bound_kg,
+        "authority": authority,
+        "band_K": [band_low, band_high],
+        "law": "per_channel_activity_one_saturation",
+        "p_sat_pa": pure_pa,
+        "channels": channel_records,
+    }
+    zero = ZeroByPhysics(
+        evidence_ref=(
+            f"{_FE_UPPER_BOUND_REASON}"
+            f";bound_kg={bound_kg:.16e}"
+            f";authority={authority}"
+            f";band_K={band_low:.1f}:{band_high:.1f}"
+        )
+    )
+    return replace(
+        answer,
+        pressure=zero,
+        selected_runtime_pressure=zero,
+        refusal_code=None,
+        extra=MappingProxyType(extra),
+    )
+
+
+def _ellingham_selected_law_domain(
+    *,
+    species_id: str,
+    temperature_K: float,
+    row: Mapping[str, Any],
+    pressure_rail: str,
+) -> dict[str, Any]:
+    """Domain of the Ellingham rail that replaced a dormant pseudo-psat.
+
+    The condensed rail multiplies the activity root by the pure-component
+    sidecar. The gas rail uses the standard pressure and does not. Each
+    constituent is certified only inside its own band. The published band
+    is the first constituent that does not contain T, or the last
+    constituent's band when every constituent does. Authority is
+    extrapolated when any constituent is outside its band.
+    """
+
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_authority_limit,
+        ellingham_fit_range_K,
+        ellingham_segment_for_temperature,
+    )
+
+    limit = ellingham_authority_limit(
+        temperature_K,
+        species=species_id,
+        consumer="vapour-rail-selected-pressure",
+    )
+    if limit is None:
+        segment = ellingham_segment_for_temperature(species_id, temperature_K)
+        ell_band = [float(segment.range_K[0]), float(segment.range_K[1])]
+        ell_out = False
+    else:
+        fit = limit.get("fit_range_K")
+        if (
+            isinstance(fit, tuple)
+            and len(fit) == 2
+        ):
+            ell_band = [float(fit[0]), float(fit[1])]
+        else:
+            fit_low, fit_high = ellingham_fit_range_K(species_id)
+            ell_band = [float(fit_low), float(fit_high)]
+        ell_out = True
+    constituents: list[dict[str, Any]] = [
+        {
+            "law": "ellingham_fit",
+            "authority": "extrapolated" if ell_out else "certified",
+            "band_K": ell_band,
+            "out_of_range": ell_out,
+        }
+    ]
+    rail = (
+        "gas_fugacity"
+        if pressure_rail == "gas_fugacity"
+        else "condensed_raoult_psat"
+    )
+    if rail != "gas_fugacity":
+        pure = row.get("pure_component_antoine")
+        band = (
+            pure.get("construction_support_range_K")
+            if isinstance(pure, Mapping)
+            else None
+        )
+        pure_band: list[float] = []
+        pure_out = True
+        if (
+            isinstance(band, Sequence)
+            and not isinstance(band, (str, bytes))
+            and len(band) == 2
+        ):
+            try:
+                low = float(band[0])
+                high = float(band[1])
+            except (TypeError, ValueError):
+                low = high = float("nan")
+            if (
+                math.isfinite(low)
+                and math.isfinite(high)
+                and high >= low
+            ):
+                pure_band = [low, high]
+                pure_out = not (low <= temperature_K <= high)
+        constituents.append(
+            {
+                "law": "pure_component_antoine",
+                "authority": "extrapolated" if pure_out else "certified",
+                "band_K": pure_band,
+                "out_of_range": pure_out,
+            }
+        )
+    out = any(item["out_of_range"] for item in constituents)
+    failing = next(
+        (item for item in constituents if item["out_of_range"] and item["band_K"]),
+        None,
+    )
+    if failing is not None:
+        band_K = list(failing["band_K"])
+    else:
+        band_K = list(constituents[-1]["band_K"] or constituents[0]["band_K"])
+    authority = "extrapolated" if out else "certified"
+    law = f"ellingham_rail:{rail}"
+    notice = None
+    if out and band_K:
+        notice = {
+            "temperature_K": float(temperature_K),
+            "valid_range_K": list(band_K),
+            "authority_level": "extrapolated",
+            "certified_band": {"temperature_K": list(band_K)},
+            "reason": "selected_law_out_of_band",
+        }
+    return {
+        "law": law,
+        "authority": authority,
+        "band_K": band_K,
+        "out_of_range": out,
+        "pressure_rail": rail,
+        "source_label": f"{law}:{authority}",
+        "constituents": constituents,
+        "extrapolation_notice": notice,
+        "acquisition_flag": (
+            f"vapour_pressure_out_of_range:{species_id}" if out else None
+        ),
+    }
+
+
+def _publish_selected_pressure(
+    answer: Any,
+    pressure: PressureValue,
+    domain: Mapping[str, Any],
+) -> Any:
+    """Attach a numeric selected pressure and the law that produced it.
+
+    INVARIANT: every numeric selected runtime pressure published here
+    carries that law's authority, validity band, and extrapolation
+    status. The dormant evaluator's in-band flag is not reused. An
+    out-of-band law stays a flagged estimate (d-367). This is the only
+    catalog writer of a numeric ``selected_runtime_pressure``.
+    """
+
+    extra = dict(answer.extra)
+    out_of_range = bool(domain["out_of_range"])
+    record = {
+        "law": domain["law"],
+        "authority": domain["authority"],
+        "band_K": list(domain["band_K"]),
+        "out_of_range": out_of_range,
+        "pressure_rail": domain["pressure_rail"],
+        "constituents": [dict(item) for item in domain["constituents"]],
+    }
+    extra["selected_law"] = record
+    extra["out_of_range"] = out_of_range
+    if out_of_range:
+        extra["status"] = OUT_OF_RANGE_STATUS
+        extra["acquisition_flag"] = (
+            domain.get("acquisition_flag")
+            or f"vapour_pressure_out_of_range:{answer.species_id}"
+        )
+        notice = domain.get("extrapolation_notice")
+        if isinstance(notice, Mapping):
+            extra["extrapolation_notice"] = dict(notice)
+    else:
+        # The dormant fit may have been outside its own band. That flag
+        # does not describe the selected law.
+        if extra.get("status") == OUT_OF_RANGE_STATUS:
+            extra.pop("status", None)
+        flag = extra.get("acquisition_flag")
+        if isinstance(flag, str) and flag.startswith(
+            "vapour_pressure_out_of_range:"
+        ):
+            extra.pop("acquisition_flag", None)
+        notice = extra.get("extrapolation_notice")
+        if (
+            isinstance(notice, Mapping)
+            and notice.get("reason")
+            in {
+                "metal_vapor_pressure_out_of_validated_range",
+                "selected_law_out_of_band",
+            }
+        ):
+            extra.pop("extrapolation_notice", None)
+    return replace(
+        answer,
+        selected_runtime_pressure=pressure,
+        source_label=str(domain["source_label"]),
+        extra=MappingProxyType(extra),
+    )
+
+
 class VapourRailCatalog:
     """Compiled schema-v2 catalog plus its temporary legacy projection."""
 
@@ -1740,6 +2298,309 @@ class VapourRailCatalog:
             caller_species_filter=caller_species_filter,
         )
 
+    def _apply_pseudo_psat_ellingham_selected_pressure(
+        self,
+        batch: Any,
+        state: Any,
+    ) -> Any:
+        """Replace a dormant pseudo-psat selection with the Ellingham pressure.
+
+        Fe's catalog row is ``fit_target: pseudo_psat_backsolved_from_vaporock``
+        with activity and pO2 exponents of 0 and no oxygen channel, so
+        ``CompiledPressureEvaluator.evaluate`` returns the dormant pseudo
+        Antoine and ignores melt activity and pO2. That fit is not the
+        runtime metal pressure. The kernel publishes
+
+            root = (K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M)
+            P = min(root, 1) * P_pure     condensed metal (below the boil)
+            P = root * p0                  gas-standard metal
+
+        The arithmetic is ``ellingham_metal_equilibrium_pressure_Pa`` (the
+        kernel rail). FeO uses the realized transport pO2
+        (``state.fO2_bar``). C0 argon headspace O2 is 0 mol, so that
+        realized pO2 is the 1e-9 bar transport floor, the same floor the
+        diagnostic uses. The 85x gap is this skipped term, not a second pO2.
+        A missing activity or pO2 is a typed refusal of the selected
+        quantity, except when every Fe carrier channel has its own
+        activity-1 saturation pressure and the sum of those alpha=1
+        Hertz-Knudsen masses over the tick is below the mass-balance
+        closure tolerance. Fe uses the pure-metal Antoine. FeO(g) uses
+        congruent FeO(s/l) -> FeO(g), which needs no pO2. A channel whose
+        bound cannot be evaluated leaves the typed refusal in place.
+        That authorized case is ``below_evaporation_upper_bound``, not a
+        refusal and not a silent zero. Any other failure to evaluate the
+        rail is a typed refusal. The dormant Antoine stays on
+        ``answer.pressure`` for a refusal and is copied onto ``extra``
+        for the authorized zero. It is not selected and it is not
+        flux-eligible.
+
+        Worked point, T = 1673.15 K, a_FeO = 0.2, pO2 = 1e-9 bar:
+        dG = -330.157642 kJ/mol O2, K = 4.930535300796167e-11,
+        pure sidecar A = 10.670336, B = 17759.430841, C = 0,
+        P_pure = 1.1375418658242942 Pa, n_M = n_ox = 2,
+        root = 0.0444096174304448,
+        P_Fe = 0.05051779907237128 Pa.
+        The dormant pseudo Antoine (A = 9.408547, B = 23312.312336,
+        C = 1000) is 4.871162269407267 Pa and matches neither this value
+        nor the diagnostic. ``answer.pressure`` stays that catalog reference.
+
+        The dormant fit's 1400–1900 K band contains 1673.15 K. The pure
+        sidecar's construction band is 1809–3134 K, so it does not. The
+        selected answer takes the sidecar and Ellingham bands
+        (``_publish_selected_pressure``), not the dormant in-band flag.
+        """
+
+        if batch is None:
+            return batch
+        temperature_K = getattr(state, "temperature_K", None) if state is not None else None
+        try:
+            temperature_K = float(temperature_K)
+        except (TypeError, ValueError):
+            temperature_K = None
+        activities = (
+            getattr(state, "source_reaction_activities", None)
+            if state is not None
+            else None
+        ) or {}
+        if not isinstance(activities, Mapping):
+            activities = {}
+
+        from engines.antoine import (
+            _AntoineCoefficientRefusal,
+            _antoine_log10_pressure,
+            _read_antoine_coefficients,
+        )
+        from engines.builtin.vapor_pressure import (
+            COEFF_BLOCK_PURE_COMPONENT,
+            FIT_TARGET_PSEUDO_VAPOROCK,
+            VaporPressureComputationError,
+            _EllinghamNumeratorOmission,
+            ellingham_metal_equilibrium_pressure_Pa,
+            vapor_pressure_antoine_coefficients,
+        )
+        from simulator.chemistry.ellingham_thermo import (
+            ellingham_metal_phase_kind,
+            ellingham_stoichiometry,
+        )
+
+        def _refuse(answer: Any, detail: str) -> Any:
+            code = "missing_ellingham_input"
+            extra = dict(answer.extra)
+            extra["detail"] = detail
+            if isinstance(answer.pressure, PressureValue):
+                extra["dormant_catalog_pressure_pa"] = float(answer.pressure.pa)
+            return replace(
+                answer,
+                selected_runtime_pressure=PressureRefusal(
+                    code=code, detail=detail
+                ),
+                flux=FluxRefusal(code=code, detail=detail),
+                refusal_code=code,
+                extra=MappingProxyType(extra),
+            )
+
+        channels = dict(batch.channels_by_species)
+        changed = False
+        refused_ids: set[str] = set()
+        authorized_zero_ids: set[str] = set()
+        for species_id, answer in channels.items():
+            if answer.source_label != "catalog":
+                continue
+            if not isinstance(answer.pressure, PressureValue):
+                continue
+            if not isinstance(answer.selected_runtime_pressure, PressureValue):
+                continue
+            compiled = self._species.get(species_id)
+            evaluator = None if compiled is None else compiled.evaluator
+            if evaluator is None:
+                continue
+            if float(evaluator.activity_exponent or 0.0) != 0.0:
+                continue
+            if float(evaluator.pO2_exponent or 0.0) != 0.0:
+                continue
+            if evaluator.oxygen_fugacity_channel is not None:
+                continue
+            row = None
+            for group_name in ("metals", "oxide_vapors"):
+                group = self._legacy_projection.get(group_name) or {}
+                candidate = group.get(species_id)
+                if isinstance(candidate, Mapping):
+                    row = candidate
+                    break
+            if row is None:
+                continue
+            if str(row.get("fit_target") or "").strip() != FIT_TARGET_PSEUDO_VAPOROCK:
+                continue
+            try:
+                if (
+                    temperature_K is None
+                    or not math.isfinite(temperature_K)
+                    or temperature_K <= 0.0
+                ):
+                    raise ValueError(
+                        f"{species_id}: missing temperature for the "
+                        "Ellingham pressure"
+                    )
+                try:
+                    activity = float(activities[species_id])
+                except (KeyError, TypeError, ValueError) as exc:
+                    raise ValueError(
+                        f"{species_id}: missing oxide activity for the "
+                        "Ellingham pressure"
+                    ) from exc
+                parent_oxide = str(row.get("parent_oxide") or "")
+                raw_pO2 = (
+                    getattr(state, "fO2_bar", None)
+                    if parent_oxide == "FeO"
+                    else getattr(state, "source_reaction_fO2_bar", None)
+                )
+                try:
+                    pO2_bar = float(raw_pO2)
+                except (TypeError, ValueError) as exc:
+                    raise ValueError(
+                        f"{species_id}: missing pO2 for the Ellingham "
+                        "pressure"
+                    ) from exc
+                antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+                    row,
+                    temperature_K=temperature_K,
+                )
+                if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
+                    raise ValueError(
+                        f"{species_id}: missing pure-component pressure "
+                        "for the Ellingham rail"
+                    )
+                if (
+                    not isinstance(antoine, Mapping)
+                    or antoine.get("selection_refusal")
+                ):
+                    raise ValueError(
+                        f"{species_id}: missing pure-component pressure "
+                        "for the Ellingham rail"
+                    )
+                antoine_a, antoine_b, antoine_c = _read_antoine_coefficients(
+                    antoine
+                )
+                pure_pa = 10.0 ** _antoine_log10_pressure(
+                    antoine_a, antoine_b, antoine_c, temperature_K
+                )
+                n_metal, n_oxide = ellingham_stoichiometry(species_id)
+                phase_kind = ellingham_metal_phase_kind(
+                    species_id, temperature_K
+                )
+                selected_pa, _factor, _root, pressure_rail = (
+                    ellingham_metal_equilibrium_pressure_Pa(
+                        species=species_id,
+                        temperature_K=temperature_K,
+                        oxide_activity=activity,
+                        n_metal=n_metal,
+                        n_oxide=n_oxide,
+                        pO2_bar=pO2_bar,
+                        metal_phase_kind=phase_kind,
+                        pure_pressure_Pa=pure_pa,
+                    )
+                )
+            except _EllinghamNumeratorOmission:
+                channels[species_id] = _refuse(
+                    answer,
+                    f"{species_id}: Ellingham numerator is not a positive "
+                    "pressure",
+                )
+                refused_ids.add(species_id)
+                changed = True
+                continue
+            except (
+                KeyError,
+                ValueError,
+                OverflowError,
+                _AntoineCoefficientRefusal,
+                VaporPressureComputationError,
+            ) as exc:
+                detail = str(exc)
+                authorized = None
+                if (
+                    species_id == "Fe"
+                    and isinstance(exc, ValueError)
+                    and (
+                        "missing oxide activity" in detail
+                        or "missing pO2" in detail
+                    )
+                ):
+                    authorized = _authorized_pure_metal_evaporation_zero(
+                        self._legacy_projection,
+                        answer,
+                        row,
+                        temperature_K,
+                        state,
+                    )
+                if authorized is not None:
+                    channels[species_id] = authorized
+                    authorized_zero_ids.add(species_id)
+                    changed = True
+                    continue
+                channels[species_id] = _refuse(answer, detail)
+                refused_ids.add(species_id)
+                changed = True
+                continue
+            # INVARIANT: this numeric selection is published only through
+            # _publish_selected_pressure, which attaches the producing
+            # law's authority, band, and extrapolation status.
+            channels[species_id] = _publish_selected_pressure(
+                answer,
+                PressureValue(pa=float(selected_pa)),
+                _ellingham_selected_law_domain(
+                    species_id=species_id,
+                    temperature_K=temperature_K,
+                    row=row,
+                    pressure_rail=pressure_rail,
+                ),
+            )
+            changed = True
+        if not changed:
+            return batch
+        dormant_count: int | None = None
+        if authorized_zero_ids:
+            active_after = frozenset(batch.flux_active_species_ids) - refused_ids
+            dormant_count = sum(
+                1
+                for species_id, channel in channels.items()
+                if channel.is_flux_active and species_id not in active_after
+            )
+        if not refused_ids:
+            if dormant_count is None:
+                return replace(batch, channels_by_species=channels)
+            metadata = dict(batch.metadata)
+            metadata["n_flux_dormant_by_epoch"] = dormant_count
+            return replace(
+                batch,
+                channels_by_species=channels,
+                metadata=metadata,
+            )
+        # Refusal is post-resolution. Counts and bundles were derived from
+        # the pre-refusal channels, so a Fe-only batch would still report
+        # Fe as active and keep it in its solve bundle.
+        flux_active = frozenset(batch.flux_active_species_ids) - refused_ids
+        solve_bundles: dict[str, frozenset[str]] = {}
+        for bundle_id, members in batch.solve_bundle_ids.items():
+            remaining = frozenset(members) - refused_ids
+            if remaining:
+                solve_bundles[bundle_id] = remaining
+        metadata = dict(batch.metadata)
+        metadata["n_refused"] = sum(
+            1 for answer in channels.values() if answer.is_refused
+        )
+        metadata["n_flux_active"] = len(flux_active)
+        metadata["n_solve_bundles"] = len(solve_bundles)
+        if dormant_count is not None:
+            metadata["n_flux_dormant_by_epoch"] = dormant_count
+        return replace(
+            batch,
+            channels_by_species=channels,
+            flux_active_species_ids=flux_active,
+            solve_bundle_ids=solve_bundles,
+            metadata=metadata,
+        )
+
     def resolve_batch(
         self,
         ledger_snapshot: Mapping[str, Any] | Any,
@@ -1766,7 +2627,7 @@ class VapourRailCatalog:
             if "selected_runtime_pressures_Pa" in state:
                 raise ValueError(
                     "selected_runtime_pressures_Pa is not catalog resolve state; "
-                    "pre-RG values cross only the typed flux seam"
+                    "selected runtime values are produced by batch evaluation"
                 )
             resolve_state = VapourResolveState(
                 temperature_K=state.get("temperature_K"),
@@ -1821,6 +2682,10 @@ class VapourRailCatalog:
                     state.get("melt_activity_engine_inputs") or {}
                 ),
                 liquid_feo_domain=state.get("liquid_feo_domain"),
+                evaporation_tick_area_m2=state.get("evaporation_tick_area_m2"),
+                evaporation_tick_duration_s=state.get(
+                    "evaporation_tick_duration_s"
+                ),
                 extras={
                     key: value
                     for key, value in state.items()
@@ -1848,6 +2713,8 @@ class VapourRailCatalog:
                         "imcc_activity_shadow_enabled",
                         "melt_activity_engine_inputs",
                         "liquid_feo_domain",
+                        "evaporation_tick_area_m2",
+                        "evaporation_tick_duration_s",
                     }
                 },
             )
@@ -1858,7 +2725,7 @@ class VapourRailCatalog:
                 stage=getattr(state, "stage", None),
             )
 
-        return resolve_vapour_batch(
+        batch = resolve_vapour_batch(
             rules=self._request_rules,
             ledger_snapshot=ledger_snapshot,
             state=resolve_state,
@@ -1867,6 +2734,10 @@ class VapourRailCatalog:
             catalog_species=self._species,
             caller_species_filter=caller_species_filter,
             flux_activation_context=flux_activation_context,
+        )
+        return self._apply_pseudo_psat_ellingham_selected_pressure(
+            batch,
+            resolve_state,
         )
 
 

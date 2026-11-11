@@ -1294,9 +1294,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else vapor_pressures
         )
         # VR-6/VR-11: compile request rules with the U0 manifest. Evaporation
-        # consumes VapourBatch for channel/refusal/set authority; the typed
-        # pre-RG seam supplies equilibrium-backend effective pressure values
-        # until t-499's activity-corrected catalog evaluator lands.
+        # consumes VapourBatch answers for channel/refusal/set authority and
+        # selected runtime pressure values; the typed pre-RG source supplies
+        # activation membership until the RG-1 set cutover is authorized.
         self.vapour_rail_catalog = (
             compile_vapour_rail_catalog(self.vapor_pressure_catalog_data)
             if self.vapor_pressure_catalog_data.get("schema_version") == 2
@@ -2373,6 +2373,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         provider_candidates_by_species: dict | None = None,
         flux_activation_context: FluxActivationContext | None = None,
         liquid_feo_domain: Any = None,
+        evaporation_tick_area_m2: float | None = None,
+        evaporation_tick_duration_s: float | None = None,
     ):
         """Exact-key vapour batch via VR-6 request builder + refusal closure.
 
@@ -2439,6 +2441,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 melt_activity_engine_inputs or {}
             ),
             "liquid_feo_domain": liquid_feo_domain,
+            "evaporation_tick_area_m2": evaporation_tick_area_m2,
+            "evaporation_tick_duration_s": evaporation_tick_duration_s,
         }
         return self.vapour_rail_catalog.resolve_batch(
             ledger_snapshot,

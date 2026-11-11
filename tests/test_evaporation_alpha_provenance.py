@@ -597,10 +597,33 @@ def test_ca_ti_alpha_ceiling_survives_grounded_report_consumer(species):
     )
 
 
-def test_default_setpoints_refuse_unmeasured_alpha_fallback():
-    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text()) or {}
+# Shipped flagged α=1 fallback. Same list as the broad-proxy carriers
+# stripped from the measured-alpha map (deb31f152). Order is the setpoints
+# key, not a sort.
+SHIPPED_UNMEASURED_ALPHA_FALLBACK_SPECIES = [
+    "Al2",
+    "Al2O",
+    "Al2O2",
+    "Al2O3_gas",
+    "AlO",
+    "AlO2",
+    "CrO",
+    "CrO2",
+]
 
-    assert (
-        setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
-        is False
+
+def test_default_setpoints_allow_flagged_broad_proxy_alpha_fallback():
+    """The shipped policy key admits every stripped broad-proxy carrier.
+
+    A CrO2-only list leaves the other seven as typed missing-alpha refusals
+    while the flux-provider review enables all eight. This assertion fails
+    when the key is absent or lists only CrO2.
+    """
+
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text()) or {}
+    kernel = setpoints["chemistry_kernel"]
+
+    assert kernel["allow_unmeasured_alpha_fallback"] is True
+    assert kernel["unmeasured_alpha_fallback_species"] == (
+        SHIPPED_UNMEASURED_ALPHA_FALLBACK_SPECIES
     )

@@ -6,7 +6,9 @@ import copy
 import math
 from collections import defaultdict
 from collections.abc import Mapping
+from dataclasses import replace
 from numbers import Real
+from types import MappingProxyType
 from typing import Any, NamedTuple
 
 from simulator.alpha_kinetics import parse_alpha_contract
@@ -49,6 +51,7 @@ from simulator.state import (
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
     FluxActivationContext,
+    PressureValue,
 )
 from simulator.vapour_rail.activity import StandardStateIdentity
 from simulator.vapour_rail.instrumentation import (
@@ -76,6 +79,53 @@ PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C = 1050.0
 _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
     'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10',
 })
+# d-380 (2026-11-10): the kernel seam is the debit for every carrier.
+# answer.pressure stays the catalog reference (b-1169). A finite kernel
+# pressure is copied onto the selected debit. A missing seam value is
+# not a zero and does not replace a typed refusal.
+#
+# Si shows why the catalog continuation is not the debit. At the C4
+# in-domain point (1670 C, p_total 10.2 mbar, pO2 0.2 mbar = 2e-4 bar)
+# the catalog row's pO2 reference is 1e-9 bar and the exponent is -1, so
+# the activity-corrected catalog pressure is the kernel pressure times
+# (2e-4/1e-9)^-1 = 1/2e5. Measured pair: catalog
+# 4.149230182792238e-12 Pa, kernel 8.298460365584479e-07 Pa. The catalog
+# debit falls under the 1e-12 kg/hr report floor and Si vanishes. Green
+# debits the kernel. At C0 the realized pO2 is that 1e-9 bar floor, so
+# the ratio is 1 (1 ulp). A missing source label is not that cutover.
+#
+# Named exceptions, and no others:
+# - Fe: the Ellingham rail already written on selected_runtime_pressure.
+#   Copying the seam would replace that ruling.
+# - Al2, Al2O, Al2O2, Al2O3_gas, AlO, AlO2, CrO, CrO2: the flagged
+#   alpha=1 fallback changes admission only. Their debit stays the seam.
+_D380_ELLINGHAM_RAIL = 'ellingham_rail'
+_D380_FLAGGED_ALPHA_FALLBACK = 'flagged_alpha_fallback_admission'
+_D380_DEBIT_EXCEPTIONS: Mapping[str, str] = MappingProxyType({
+    'Fe': _D380_ELLINGHAM_RAIL,
+    'Al2': _D380_FLAGGED_ALPHA_FALLBACK,
+    'Al2O': _D380_FLAGGED_ALPHA_FALLBACK,
+    'Al2O2': _D380_FLAGGED_ALPHA_FALLBACK,
+    'Al2O3_gas': _D380_FLAGGED_ALPHA_FALLBACK,
+    'AlO': _D380_FLAGGED_ALPHA_FALLBACK,
+    'AlO2': _D380_FLAGGED_ALPHA_FALLBACK,
+    'CrO': _D380_FLAGGED_ALPHA_FALLBACK,
+    'CrO2': _D380_FLAGGED_ALPHA_FALLBACK,
+})
+
+
+def _uses_kernel_seam_debit(species_id: str) -> bool:
+    """Return whether this carrier debits the kernel seam.
+
+    d-380: the seam is the default. False only for the Fe Ellingham row.
+    The eight flagged alpha=1 carriers are named in
+    ``_D380_DEBIT_EXCEPTIONS`` and still return True.
+    """
+
+    return (
+        _D380_DEBIT_EXCEPTIONS.get(str(species_id))
+        != _D380_ELLINGHAM_RAIL
+    )
 
 
 class EvaporationFluxRefusal(ProviderUnavailableError):
@@ -698,17 +748,18 @@ def _pre_rg_effective_pressure_source(
     vapor_pressure_data: dict,
     equilibrium: Any,
 ) -> EffectivePressureSource:
-    """Return the sole typed pre-RG handoff for flux-driving pressure values.
+    """Return the typed pre-RG source for flux activation membership.
 
     The catalog can now evaluate activity-corrected ``P_eff`` for melt species,
-    but VR-13/RG-1 has not authorized a flux-value cutover. The verifier's
-    1873.15 K baseline exposed the former pure/reference-vs-effective gap:
+    and VapourBatch answers carry the pressure consumed by the flux path. This
+    source retains the pre-RG active species set and legacy shadow evidence.
+    The verifier's 1873.15 K baseline exposed the former pure/reference-vs-effective gap:
     Ca 8.35e5/4.6e-9 Pa, Mg 6.87e5/7.3e-3 Pa, K 4.51e6/0.469 Pa, and
     Al 110.2/1.4e-8 Pa. This factory therefore remains the sole pre-RG handoff
-    and continues to return equilibrium-backend effective pressures.
+    for deriving the active set from equilibrium-backend effective pressures.
 
-    TODO(VR-13 / RG-1): switch this one factory only after owner authorization
-    and the remaining DESIGN-REV5 §7.4 cutover preconditions are green.
+    TODO(VR-13 / RG-1): remove this compatibility projection after the
+    remaining DESIGN-REV5 §7.4 cutover preconditions are green.
     """
 
     effective_pressures = _legacy_evaporation_shadow_pressure_map(
@@ -755,6 +806,147 @@ def _load_evaporation_alpha_envelope_by_species(
                 float(envelope[1]),
             )
     return envelope_by_species
+
+
+def _kernel_seam_provenance_label(
+    kernel_sources: Mapping[Any, Any],
+    species_id: str,
+) -> str:
+    """Return the published source string, or empty when provenance is absent."""
+
+    raw = kernel_sources.get(species_id)
+    if not isinstance(raw, str):
+        return ""
+    return raw.strip()
+
+
+def _retain_kernel_seam_debit(
+    batch: Any,
+    equilibrium: Any,
+    effective_pressure_source: EffectivePressureSource,
+) -> Any:
+    """Copy the kernel seam onto every flux-active debit except Fe.
+
+    Invariant: every flux-active carrier debits a finite kernel pressure
+    when the seam has one. ``answer.pressure`` stays the catalog value.
+    Fe keeps the Ellingham selection already on the answer (d-380). The
+    eight flagged alpha=1 carriers are not a second pressure source.
+    A missing, blank, or non-string source label is missing provenance.
+    It does not select the catalog number and it does not invent a zero.
+    Genuine absence of a kernel pressure, or a selected refusal, leaves
+    the incoming selection unchanged.
+    """
+
+    if batch is None:
+        return batch
+    kernel_sources = getattr(equilibrium, 'vapor_pressures_source', None) or {}
+    if not isinstance(kernel_sources, Mapping):
+        kernel_sources = {}
+    channels = dict(batch.channels_by_species)
+    changed = False
+    for species_id, answer in channels.items():
+        if not _uses_kernel_seam_debit(species_id):
+            continue
+        if answer is None or not answer.is_flux_active:
+            continue
+        if not isinstance(answer.selected_runtime_pressure, PressureValue):
+            continue
+        kernel_pa = effective_pressure_source.pressure_pa(species_id)
+        if kernel_pa is None:
+            continue
+        kernel_pa = float(kernel_pa)
+        if not math.isfinite(kernel_pa) or kernel_pa < 0.0:
+            continue
+        label = _kernel_seam_provenance_label(kernel_sources, species_id)
+        updates: dict[str, Any] = {
+            "selected_runtime_pressure": PressureValue(pa=kernel_pa),
+        }
+        if label:
+            updates["source_label"] = label
+        else:
+            extra = dict(answer.extra)
+            extra["kernel_seam_provenance_missing"] = True
+            updates["extra"] = MappingProxyType(extra)
+        channels[species_id] = replace(answer, **updates)
+        changed = True
+    if not changed:
+        return batch
+    return replace(batch, channels_by_species=channels)
+
+
+# Selected outcomes that authorize an empty species flux. Anything else
+# (refusal, incomplete, missing, invalid, still-eligible) is not a physical
+# zero. A numeric catalog pressure is not in this set.
+_EMPTY_FLUX_AUTHORIZING_STATES = frozenset({
+    'zero_by_physics',
+    'upper_bound',
+    'dormant_by_epoch',
+})
+_EMPTY_FLUX_KINETIC_FLOOR = 'internal_analytical_below_400K'
+_EMPTY_FLUX_ZERO_BY_PHYSICS = 'zero_by_physics'
+_EMPTY_FLUX_TYPED_NON_DEBIT = 'vapour_batch_all_channels_non_debiting'
+_EMPTY_FLUX_PARTIAL = 'partial_authorized'
+
+
+def _authorize_empty_species_flux(
+    channel_states: Mapping[str, str],
+    *,
+    kinetic_floor: bool,
+    physical_zero_reason: str | None,
+    catalog_pressure_present: bool,
+) -> tuple[str, str] | None:
+    """Return ``(kind, reason)`` or None when the empty flux must be refused.
+
+    Invariant: no requested species is a silent 0.0, and a typed refusal
+    is never covered by the sub-1050 C physical zero. Every channel is a
+    computed debit, a typed non-debit, or a typed refusal of that channel
+    alone. The below-400 K kinetic floor is a legitimate empty flux. The
+    kernel did not evaluate on that tick, so a catalog refusal there is
+    not a debit and must not abort the run. A refused, incomplete,
+    missing, or invalid channel refuses only that channel. Peers that are
+    dormant, an upper bound, or zero-by-physics still authorize their own
+    zero. The sub-1050 C physical zero applies only when no channel is a
+    non-answer. A refusal beside a dormant or upper-bound channel does
+    not take that zero merely because the peer has a catalog pressure.
+    Fe missing Ellingham inputs stays a refusal of Fe; the other carriers
+    continue. The batch is refused only when every selected channel is
+    unable to answer. No species present does not block; one of the typed
+    proofs below is still required.
+
+    ``partial_authorized`` means at least one channel authorizes a zero and
+    at least one does not. The caller must let a later kernel or freeze-gate
+    refusal surface before accepting the empty flux.
+
+    This is the only authorization for an empty species flux. Callers must
+    not return that flux on a second predicate.
+    """
+
+    if kinetic_floor:
+        return ('kinetic_floor', _EMPTY_FLUX_KINETIC_FLOOR)
+    blocking = [
+        state
+        for state in channel_states.values()
+        if state not in _EMPTY_FLUX_AUTHORIZING_STATES
+    ]
+    # Every selected channel is a non-answer. Do not cover that with the
+    # sub-1050 C seam proof or a dormant catalog pressure.
+    if blocking and len(blocking) == len(channel_states):
+        return None
+    # A refusal beside a dormant or upper-bound peer is that channel's
+    # typed refusal. The peer's catalog pressure is not the cold zero.
+    if blocking:
+        return (_EMPTY_FLUX_PARTIAL, _EMPTY_FLUX_TYPED_NON_DEBIT)
+    if physical_zero_reason and catalog_pressure_present:
+        return ('physical_zero', str(physical_zero_reason))
+    if channel_states and all(
+        state == 'zero_by_physics' for state in channel_states.values()
+    ):
+        return ('zero_by_physics', _EMPTY_FLUX_ZERO_BY_PHYSICS)
+    if channel_states and not blocking:
+        return ('typed_non_debit', _EMPTY_FLUX_TYPED_NON_DEBIT)
+    if channel_states:
+        return (_EMPTY_FLUX_PARTIAL, _EMPTY_FLUX_TYPED_NON_DEBIT)
+    return None
 
 
 class EvaporationMixin:
@@ -808,7 +1000,6 @@ class EvaporationMixin:
         )
         vapor_pressures, flux_overlay_report = flux_pressures_from_batch(
             vapour_batch,
-            effective_pressure_source=effective_pressure_source,
             resolution_error=resolve_error or None,
         )
         flux_overlay_report.update(
@@ -924,8 +1115,8 @@ class EvaporationMixin:
             self._last_imcc_activity_shadow = {}
             return flux
 
-        # VR-11: batch owns channel refusal, eligibility, and active membership.
-        # Pre-RG effective values cross only the named typed seam below.
+        # VR-11: batch owns channel refusal, eligibility, active membership,
+        # and selected runtime values. The pre-RG source sets active membership.
         (
             vapor_pressures,
             flux_overlay_report,
@@ -948,6 +1139,13 @@ class EvaporationMixin:
                 }
         self._last_vapour_batch = vapour_batch
         self._last_vapour_batch_report = batch_report
+        # d-367: a below-threshold empty seam is a typed zero, not a silent one.
+        # The reason used to ride the flux consumer's source argument. Stamp it
+        # here, where the typed source still exists, before the overlay is stored.
+        zero_reason = effective_pressure_source.physical_zero_reason
+        if zero_reason is not None:
+            flux_overlay_report = dict(flux_overlay_report)
+            flux_overlay_report['effective_pressure_zero_reason'] = zero_reason
         self._last_vapour_batch_flux_overlay = flux_overlay_report
         imcc_shadow = None
         batch_shadow = getattr(vapour_batch, "melt_activity_shadow", None)
@@ -1045,36 +1243,52 @@ class EvaporationMixin:
             return flux
 
         if not vapor_pressures:
-            if (
-                0.0 < T_K < 400.0
-                and getattr(equilibrium, 'status', None) == 'ok'
-                and (getattr(equilibrium, 'diagnostics', {}) or {}).get(
-                    'vapor_pressure_zero_reason'
-                ) == 'internal_analytical_below_400K'
-            ):
+            # One chokepoint. The kinetic floor authorizes before channel
+            # states are read: a cold tick has no kernel debit. A refused
+            # channel does not veto a peer that can debit or authorize a
+            # zero. The batch is refused only when no channel can answer.
+            # partial_authorized still reaches the kernel so a freeze-gate
+            # or missing-data refusal is raised instead of this token.
+            channel_states = dict(
+                flux_overlay_report.get('batch_channel_states', {}) or {}
+            )
+            equilibrium_diagnostic = dict(
+                getattr(equilibrium, 'diagnostics', {}) or {}
+            )
+            authorization = _authorize_empty_species_flux(
+                channel_states,
+                kinetic_floor=(
+                    0.0 < T_K < 400.0
+                    and getattr(equilibrium, 'status', None) == 'ok'
+                    and equilibrium_diagnostic.get('vapor_pressure_zero_reason')
+                    == _EMPTY_FLUX_KINETIC_FLOOR
+                ),
+                physical_zero_reason=(
+                    effective_pressure_source.physical_zero_reason
+                ),
+                catalog_pressure_present=bool(
+                    flux_overlay_report.get('batch_pa_by_species')
+                ),
+            )
+            if authorization is not None and authorization[0] == 'kinetic_floor':
                 # The guarded producer explicitly skipped pressure evaluation
                 # under its existing kinetic floor; absent Pa alone is no proof.
                 self._last_evaporation_flux_diagnostic = {
-                    'reason': 'internal_analytical_below_400K',
+                    'reason': authorization[1],
                     'evaporation_flux_kg_hr': {},
                     'vapour_batch_flux_overlay': flux_overlay_report,
                     'vapour_batch': batch_report,
                 }
                 return flux
-            if (
-                effective_pressure_source.physical_zero_reason is not None
-                and flux_overlay_report.get('batch_pa_by_species')
-            ):
-                # The typed pre-RG seam proves its own below-threshold zero,
-                # while the batch proves catalog pressure coverage. A refused
-                # or missing catalog channel still reaches fail-closed handling
-                # below (kernel_ok_empty split remains intact).
+            if authorization is not None and authorization[0] == 'physical_zero':
+                self._last_evaporation_flux_diagnostic = {
+                    'reason': authorization[1],
+                    'evaporation_flux_kg_hr': {},
+                    'vapour_batch_flux_overlay': flux_overlay_report,
+                }
                 return flux
             vapor_pressure_diagnostic = dict(
                 getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
-            )
-            equilibrium_diagnostic = dict(
-                getattr(equilibrium, 'diagnostics', {}) or {}
             )
             zero_reason = (
                 vapor_pressure_diagnostic.get('vapor_pressure_zero_reason')
@@ -1103,36 +1317,30 @@ class EvaporationMixin:
                     pass
             if regime_diagnostic:
                 self._last_evaporation_flux_diagnostic = regime_diagnostic
-            channel_states = dict(
-                flux_overlay_report.get('batch_channel_states', {}) or {}
-            )
-            if channel_states and all(
-                state == 'zero_by_physics' for state in channel_states.values()
-            ):
+            if authorization is not None and authorization[0] == 'zero_by_physics':
                 return flux
-            # When every channel is a typed non-debit outcome (genuine bound,
-            # zero, dormant) and none is refused / eligible / missing-seam,
-            # empty flux is authorized, not an empty-provider false zero.
-            _typed_non_debit = frozenset(
-                {
-                    'zero_by_physics',
-                    'upper_bound',
-                    'dormant_by_epoch',
-                }
+            # Every channel is a typed non-debit, or a refusal sits beside one
+            # and this host has no kernel to ask. Empty flux is authorized.
+            # A partial authorization on a host that can dispatch falls
+            # through, so a kernel missing-data refusal or the freeze gate's
+            # own typed refusal is raised instead of the batch token.
+            partial_reaches_kernel = (
+                authorization is not None
+                and authorization[0] == _EMPTY_FLUX_PARTIAL
+                and T_K >= 400.0
+                and callable(getattr(self, '_dispatch_only', None))
             )
-            if (
-                channel_states
-                and all(
-                    state in _typed_non_debit for state in channel_states.values()
-                )
-            ):
+            if authorization is not None and authorization[0] in (
+                'typed_non_debit',
+                _EMPTY_FLUX_PARTIAL,
+            ) and not partial_reaches_kernel:
                 self._last_evaporation_flux_diagnostic = {
                     **regime_diagnostic,
                     'reason': 'vapour_batch_all_channels_non_debiting',
                     'detail': (
-                        'every requested vapour channel is a typed non-debit '
-                        'outcome (upper_bound / zero / dormant); '
-                        'empty flux is authorized'
+                        'requested vapour channels are typed non-debit '
+                        'outcomes (upper_bound / zero / dormant); a refused '
+                        'channel refuses only itself'
                     ),
                     'batch_channel_states': channel_states,
                     'evaporation_flux_kg_hr': {},
@@ -1140,25 +1348,26 @@ class EvaporationMixin:
                     'vapour_batch': batch_report,
                 }
                 return flux
-            reason = 'vapour_batch_no_debiting_pressure_outcome'
-            diagnostic = {
-                **regime_diagnostic,
-                'reason': reason,
-                'detail': (
-                    'non-empty vapour request has no batch-authorized debiting '
-                    'effective pressure; empty provider output is not '
-                    'physical-zero proof'
-                ),
-                'provider_zero_reason': zero_reason,
-                'evaporation_flux_kg_hr': {},
-                'vapour_batch_flux_overlay': flux_overlay_report,
-                'vapour_batch': batch_report,
-            }
-            self._last_evaporation_flux_diagnostic = diagnostic
-            raise EvaporationFluxRefusal(
-                reason,
-                diagnostic,
-            )
+            if not partial_reaches_kernel:
+                reason = 'vapour_batch_no_debiting_pressure_outcome'
+                diagnostic = {
+                    **regime_diagnostic,
+                    'reason': reason,
+                    'detail': (
+                        'non-empty vapour request has no batch-authorized debiting '
+                        'effective pressure; empty provider output is not '
+                        'physical-zero proof'
+                    ),
+                    'provider_zero_reason': zero_reason,
+                    'evaporation_flux_kg_hr': {},
+                    'vapour_batch_flux_overlay': flux_overlay_report,
+                    'vapour_batch': batch_report,
+                }
+                self._last_evaporation_flux_diagnostic = diagnostic
+                raise EvaporationFluxRefusal(
+                    reason,
+                    diagnostic,
+                )
         if T_K < 400:  # Catalog pressure exists; thermal physical zero.
             return flux
         # b-149 instance 4: partial channel refusals. When some channels debit
@@ -3673,6 +3882,25 @@ class EvaporationMixin:
             }
             campaign = getattr(self.melt, 'campaign', None)
             campaign_name = str(getattr(campaign, 'name', '') or '')
+            kernel_config = dict(
+                getattr(self, 'setpoints', {}).get('chemistry_kernel', {}) or {}
+            )
+            allow_unmeasured_alpha_fallback = bool(
+                kernel_config.get('allow_unmeasured_alpha_fallback', False)
+            )
+            if 'unmeasured_alpha_fallback_species' in kernel_config:
+                # Key present, including an empty list: only those species.
+                # Key absent: None, which admits every species, matching the
+                # flux provider.
+                unmeasured_alpha_fallback_species = frozenset(
+                    str(species_id)
+                    for species_id in (
+                        kernel_config.get('unmeasured_alpha_fallback_species')
+                        or ()
+                    )
+                )
+            else:
+                unmeasured_alpha_fallback_species = None
             # Keep the global request phase on the legacy hot-train contract.
             # C0 does not select stage0_p_carriers: phosphorus stays condensed
             # through C0. C0B still selects c0b_p_cleanup. Flipping the whole
@@ -3703,6 +3931,22 @@ class EvaporationMixin:
             liquid_feo_domain = (
                 domain_at(float(temperature_K)) if callable(domain_at) else None
             )
+            try:
+                tick_area_m2 = float(
+                    getattr(self.melt, "melt_surface_area_m2", None)
+                )
+            except (TypeError, ValueError):
+                tick_area_m2 = None
+            if (
+                tick_area_m2 is None
+                or not math.isfinite(tick_area_m2)
+                or tick_area_m2 <= 0.0
+            ):
+                tick_area_m2 = None
+            # One campaign hour. HourSnapshot.duration_h is 1, so the
+            # kilogram compared with the closure tolerance is this hour's
+            # Hertz-Knudsen mass, not a per-second flux.
+            tick_duration_s = 3600.0
             batch = builder(
                 temperature_K=float(temperature_K),
                 process_phase='hot_train',
@@ -3763,9 +4007,17 @@ class EvaporationMixin:
                     self, "_melt_activity_engine_inputs", {}
                 ),
                 liquid_feo_domain=liquid_feo_domain,
+                evaporation_tick_area_m2=tick_area_m2,
+                evaporation_tick_duration_s=tick_duration_s,
                 flux_activation_context=FluxActivationContext(
                     epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
                     effective_pressure_species_ids=effective_pressure_species_ids,
+                    allow_unmeasured_alpha_fallback=(
+                        allow_unmeasured_alpha_fallback
+                    ),
+                    unmeasured_alpha_fallback_species=(
+                        unmeasured_alpha_fallback_species
+                    ),
                 ),
             )
         except Exception as exc:  # noqa: BLE001 — typed failure, not live fallback
@@ -3781,6 +4033,10 @@ class EvaporationMixin:
                 'reason': 'vapour_batch_unavailable',
                 'detail': 'build_vapour_batch returned None without a typed error',
             }
+        if batch is not None:
+            batch = _retain_kernel_seam_debit(
+                batch, equilibrium, effective_pressure_source,
+            )
         return batch
 
     def _evaporation_flux_control_inputs(
@@ -3832,7 +4088,7 @@ class EvaporationMixin:
         carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
         carrier_gas = carrier_resolver() if callable(carrier_resolver) else 'N2'
         controls: dict[str, Any] = {
-            # Batch-gated flux map; pre-RG values came through the typed seam.
+            # Batch-gated flux map from each answer's selected runtime value.
             CONTROL_FLUX_PRESSURES_KEY: vapor_pressures,
             # Reporting / shadow projection only — kernel must NOT read this
             # for flux (source guard). Distinct from the batch flux map so a
