@@ -6873,7 +6873,14 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    assert rows[0]["lifespan_cost_status"] == "wall_deposit_unavailable"
+    # d-376 amendment 1. lifespan_cost_status is wall_deposit_unavailable only
+    # while the wall figure is refused (has_positive_qualified_fouling is
+    # None). This 1-hour C0 smoke has no melt redox capacity, so the congruent
+    # surface balance republishes the vapour carriers the wall-sticking
+    # authority is built from, and that refusal is gone. resinter_threshold_kg
+    # is still null, so the status is threshold_unavailable and the consumed
+    # fraction stays empty. The fd4a97-alone gate still writes the winner.
+    assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(

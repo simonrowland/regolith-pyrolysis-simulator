@@ -1782,7 +1782,20 @@ class EvaporationMixin:
         if isinstance(langmuir_notice, dict) and langmuir_notice.get("warning"):
             equilibrium_warnings = getattr(equilibrium, "warnings", None)
             if isinstance(equilibrium_warnings, list):
-                equilibrium_warnings.append(str(langmuir_notice["warning"]))
+                # One surface-balance notice per equilibrium. The pO2 and
+                # residual text change every call; replace the previous
+                # notice instead of appending a new string each hour.
+                from simulator.langmuir_surface_oxygen import (
+                    LANGMUIR_SURFACE_PO2_REASON,
+                )
+
+                warning = str(langmuir_notice["warning"])
+                equilibrium_warnings[:] = [
+                    item
+                    for item in equilibrium_warnings
+                    if LANGMUIR_SURFACE_PO2_REASON not in str(item)
+                ]
+                equilibrium_warnings.append(warning)
         overhead_partials_Pa, overhead_pressure_Pa = (
             EvaporationMixin._evaporation_publisher_film(
                 self,

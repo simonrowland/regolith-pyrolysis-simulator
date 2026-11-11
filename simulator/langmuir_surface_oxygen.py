@@ -1034,7 +1034,7 @@ def _solve_net_surface_balance(
 
     from scipy.optimize import brentq
 
-    from simulator.battery.oxygen_balance import (
+    from simulator.vacuum_oxygen_balance import (
         OxygenBalanceBracketBoundary,
         _VacuumOxygenBalance,
     )
@@ -1146,7 +1146,7 @@ def _solve_or_refuse(
     alphas = _measured_alpha_control_view(
         _load_evaporation_alpha_by_species(dict(legacy_catalog or {}))
     )
-    from simulator.battery.oxygen_balance import (
+    from simulator.vacuum_oxygen_balance import (
         _OXYGEN_GAS_ALPHA,
         _OXYGEN_GAS_ALPHA_SOURCE,
         _VacuumOxygenChannel,
