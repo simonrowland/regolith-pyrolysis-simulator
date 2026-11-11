@@ -390,7 +390,7 @@ def test_openimcc_chemistry_version_change_with_same_pack_name_is_a_miss(
     assert calls == 2
 
 
-def test_alphamelts_calc_mode_is_part_of_the_adapter_request_key(
+def test_alphamelts_parent_environment_does_not_change_adapter_request_key(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -401,9 +401,19 @@ def test_alphamelts_calc_mode_is_part_of_the_adapter_request_key(
     )
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    settings = engine_cache.normalize_engine_settings(
+        "alphamelts",
+        {
+            "transport": "subprocess",
+            "raw_model_name": "MELTSv1.0.2",
+            "ambient_calc_mode": "MELTS",
+        },
+    )
     monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "MELTS")
     engine_cache.engine_cache_counters(reset=True)
-    handle = SimpleNamespace(name="alphamelts", backend=SimpleNamespace())
+    handle = SimpleNamespace(
+        name="alphamelts", backend=SimpleNamespace(), engine_settings=settings
+    )
     calls = 0
 
     def solve() -> EquilibriumResult:
@@ -420,7 +430,7 @@ def test_alphamelts_calc_mode_is_part_of_the_adapter_request_key(
     )
 
     assert first.liquid_fraction == second.liquid_fraction == 0.5
-    assert calls == 2
+    assert calls == 1
 
 
 def test_every_chemistry_version_has_changelog_and_runtime_identity() -> None:
