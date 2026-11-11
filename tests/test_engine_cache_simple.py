@@ -88,19 +88,27 @@ def test_disabled_cache_calls_solver_without_creating_store(
     assert list(tmp_path.iterdir()) == []
 
 
-def test_internal_analytical_scope_bypasses_nested_engine_cache(
+def test_internal_analytical_backend_bypasses_nested_engine_cache(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _call_cached_backend_equilibrate,
+    )
+
     database = tmp_path / "engine-cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
     _engine_cache_counters(reset=True)
 
-    with engine_cache._without_engine_cache():
-        assert _cached_engine_call()(
+    handle = SimpleNamespace(name="internal-analytical")
+    assert _call_cached_backend_equilibrate(
+        handle,
+        {},
+        lambda: _cached_engine_call()(
             "openimcc", {"request": "nested-internal-analytical"},
             lambda: {"answer": 7},
-        ) == {"answer": 7}
+        ),
+    ) == {"answer": 7}
 
     assert _engine_cache_counters(reset=True) == {}
     assert not database.exists()
@@ -1200,7 +1208,9 @@ def test_engine_notice_emitters_use_registered_codes() -> None:
     )
     from simulator.melt_backend.base import (
         decode_engine_notice_codes,
+        decode_engine_warning_codes,
         encode_engine_notice_codes,
+        encode_engine_warning_codes,
     )
 
     openimcc_notices = [
@@ -1285,6 +1295,12 @@ def test_engine_notice_emitters_use_registered_codes() -> None:
     }
 
     for engine_id, results in emitted.items():
+        warning_codes, warning_values = encode_engine_warning_codes(
+            engine_id, [f"{engine_id} warning"]
+        )
+        assert decode_engine_warning_codes(
+            engine_id, warning_codes, warning_values
+        ) == [f"{engine_id} warning"]
         for result in results:
             notices, _authority, _band = engine_flags_from_result(result)
             codes, values = encode_engine_notice_codes(engine_id, notices)
