@@ -271,6 +271,73 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
                 )
                 assert row.point_conditions["temperature_K"].locator.page == expected_page
 
+    # Table S1's 1_low gamma row carries the same printed ΔIW condition as
+    # the matching psat row. Check the migrated identities, not a synthetic
+    # citation passed directly to the resolver.
+    migrated_137 = migrated["kems-137-bischof-2023"]
+    gamma_parent_ids = {
+        "bischof_2023_gao15_gamma_s1_1low_polytherm",
+        "bischof_2023_gao15_gamma_s3_2low_polytherm",
+        "bischof_2023_ino15_gamma_s1_1low_polytherm",
+        "bischof_2023_ino15_gamma_s3_2low_polytherm",
+    }
+    expected_calibration = "oneill_pownceby_1993_iw_fe_feo"
+    gamma_rows = [
+        row
+        for row in migrated_137.observations.values()
+        if row.observation_id.split("::")[-2] in gamma_parent_ids
+    ]
+    assert len(gamma_rows) == 76
+    for gamma_row in gamma_rows:
+        assert gamma_row.identity.temperature_K is not None
+        assert gamma_row.identity.temperature_K.is_value
+        assert gamma_row.point_conditions["temperature_K"].state.is_value
+        assert gamma_row.identity.fO2_Pa is not None
+        assert gamma_row.identity.fO2_Pa.is_value
+        assert any(
+            expected_calibration in notice.reason
+            for notice in gamma_row.notices
+        )
+    gamma_at_1586 = [
+        row
+        for row in migrated_137.observations.values()
+        if row.observation_id.split("::")[-2] in gamma_parent_ids
+        and row.identity.temperature_K is not None
+        and row.identity.temperature_K.is_value
+        and row.identity.temperature_K.value == Decimal("1586.4")
+    ]
+    psat_at_1586 = [
+        row
+        for row in migrated_137.observations.values()
+        if row.observation_id.split("::")[-2]
+        in {
+            "bischof_2023_ga_psat_s1_1low_polytherm",
+            "bischof_2023_in_psat_s1_1low_polytherm",
+        }
+        and row.identity.temperature_K is not None
+        and row.identity.temperature_K.is_value
+        and row.identity.temperature_K.value == Decimal("1586.4")
+    ]
+    assert len(gamma_at_1586) == 2
+    assert len(psat_at_1586) == 2
+    for gamma_row in gamma_at_1586:
+        assert gamma_row.identity.fO2_Pa is not None
+        assert gamma_row.identity.fO2_Pa.is_value
+        assert any(
+            expected_calibration in notice.reason
+            for notice in gamma_row.notices
+        )
+        matching_psat = next(
+            row
+            for row in psat_at_1586
+            if row.identity.species.formula == gamma_row.identity.species.formula
+        )
+        assert matching_psat.identity.fO2_Pa == gamma_row.identity.fO2_Pa
+        assert any(
+            expected_calibration in notice.reason
+            for notice in matching_psat.notices
+        )
+
     bare_iw = printed_oxygen_decision(
         PrintedOxygenFacts(),
         raw_item={"oxygen_buffer_as_published": "ΔIW"},
