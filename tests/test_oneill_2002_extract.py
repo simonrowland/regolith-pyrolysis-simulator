@@ -183,7 +183,13 @@ def test_phase_parent_pressure_inference_survives_in_observation_provenance():
     ]
     assert len(parents) == 230
     for observation in parents:
-        assert observation.identity.total_pressure_Pa.value == Decimal("101325")
+        assert observation.identity.total_pressure_Pa.is_unknown
+        assert "inferred" in observation.identity.total_pressure_Pa.reason
+        point_pressure = observation.point_conditions["total_pressure_Pa"]
+        assert point_pressure.state.value == Decimal("101325")
+        assert point_pressure.inference is not None
+        assert point_pressure.inference.relation == "extract_inference"
+        assert "inferred=true" in point_pressure.inference.inputs
         assert observation.provenance is not None
         pressure = observation.provenance["identity"]["total_pressure_Pa"]
         assert pressure["state"]["value"] == "101325"

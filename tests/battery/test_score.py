@@ -183,8 +183,7 @@ def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
     assert "resolve_backend" not in src
     assert "Call" not in src
     assert engines_from_names(["nasa_cea_9"]) == (Engine.NASA_CEA_9,)
-    with pytest.raises(ValueError, match="explicit SCORE_ENGINE_SET"):
-        engines_from_names(["catalog_evaluator"])
+    assert engines_from_names(["catalog_evaluator"]) == (Engine.CATALOG_EVALUATOR,)
 
 
 @pytest.mark.parametrize("name", ("imcc_sf04", "imcc_sf04_ext"))

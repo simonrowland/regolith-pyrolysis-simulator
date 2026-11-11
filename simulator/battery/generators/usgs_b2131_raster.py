@@ -8,6 +8,14 @@ those printed bounds. The alignment rule lives in compilation_formula.py.
 
 from __future__ import annotations
 
+# record_id -> (OCR formula, printed formula, PDF page, printed page).
+# These formulas were transcribed from the legible source pages because the
+# OCR errors require character insertions that the raster alignment rule rejects.
+PRINTED_FORMULA_TRANSCRIPTIONS: dict[str, tuple[str, str, int, int]] = {
+    'high-temperature-p274': ('Sr003', 'SrCO3', 280, 274),
+    'high-temperature-p367': ('KAlSi309', 'KAlSi3O8', 373, 367),
+}
+
 # record_id -> (formula_as_published, raster formula, MinerU quote, pdf page, printed page)
 FORMULA_RASTER: dict[str, tuple[str, str, str, int, int]] = {
     'high-temperature-p078': ('ca', 'Ca', 'Ca: $\\alpha$ -crystals (face-centered cubic) 298.15 to 716 K. $\\beta$ -crystals (body-centered cubic) 716 to melting point 1115 K. Liquid 1115 to boiling point 1755 K. Ideal monatomic gas, P = 1 bar, 1774 to 1800 K.', 84, 78),
