@@ -9927,33 +9927,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         A forecast can disable the post-equilibrium SulfSat hook because its
         candidate temperatures are not realized run steps.
+
+        Replay, write-through, and the live solve share one bind. A hit that
+        returns before the bind drops its stored disclosure: re-registration
+        has no registry, and the owner's snapshot is published on the way out.
         """
-        store = _pt0_determinism_store_for(self)
-        if store is not None and getattr(store, 'replay_enabled', False):
-            return store.replay_equilibrium(self)
-        cache_write_through = (
-            store is not None
-            and getattr(store, 'write_through_enabled', False)
-        )
-        if cache_write_through:
-            cached_result = store.cached_equilibrium(self)
-            if cached_result is not None:
-                return cached_result
         from simulator.vapour_rail.run_disclosure import (
             bind_simulation_run,
             open_computation,
         )
 
-        # The live solve is one computation. Its cache row stores only the
-        # laws this solve executes. A bound session receives those counts.
-        # With no session, the simulator registry keeps them: open_computation
-        # raises rather than discard a parentless solve.
-        with bind_simulation_run(self), open_computation():
-            return self._get_equilibrium_live(
-                store,
-                cache_write_through=cache_write_through,
-                run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
+        with bind_simulation_run(self):
+            store = _pt0_determinism_store_for(self)
+            if store is not None and getattr(store, 'replay_enabled', False):
+                return store.replay_equilibrium(self)
+            cache_write_through = (
+                store is not None
+                and getattr(store, 'write_through_enabled', False)
             )
+            if cache_write_through:
+                cached_result = store.cached_equilibrium(self)
+                if cached_result is not None:
+                    return cached_result
+            # The live solve is one computation. Its cache row stores only the
+            # laws this solve executes. A bound session receives those counts.
+            # With no session, the simulator registry keeps them.
+            with open_computation():
+                return self._get_equilibrium_live(
+                    store,
+                    cache_write_through=cache_write_through,
+                    run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
+                )
 
     def _get_equilibrium_live(
         self,

@@ -1249,7 +1249,7 @@ class PT0DeterminismStore:
             )
             if artifact == "freeze_gate_curve" and sim is not None:
                 sim._last_reduced_real_replay_notices = replay_notices
-            return self._accept_cached_hit(entry)
+            return self._accept_cached_hit(entry, owner=sim)
 
         key, _key_bytes, key_hash = checked[0]
         self.replay_sequence.append(
@@ -1396,7 +1396,7 @@ class PT0DeterminismStore:
                 (entry.get("repair_notices_json"),),
                 approximation_cache_state=cache_state,
             )
-        return self._accept_cached_hit(entry)
+        return self._accept_cached_hit(entry, owner=sim)
 
     def _entry_for_key(
         self,
@@ -1444,22 +1444,33 @@ class PT0DeterminismStore:
                 )
         return entry
 
-    def _accept_cached_hit(self, entry: Mapping[str, Any]) -> dict[str, Any] | None:
+    def _accept_cached_hit(
+        self,
+        entry: Mapping[str, Any],
+        *,
+        owner: Any = None,
+    ) -> dict[str, Any] | None:
         """Return the payload after re-registering a measured disclosure.
 
         Unknown disclosure is not a hit. Every cache-hit return goes through
-        this method: exact, physics-bucket, and interpolated.
+        this method: exact, physics-bucket, and interpolated. ``owner`` is
+        the run that publishes the disclosure when no registry is active.
         """
 
         if not _disclosures_known(entry):
             return None
-        self._reregister_cached_law_disclosures(entry)
+        self._reregister_cached_law_disclosures(entry, owner=owner)
         return copy.deepcopy(entry["payload"])
 
-    def _reregister_cached_law_disclosures(self, entry: Mapping[str, Any]) -> None:
+    def _reregister_cached_law_disclosures(
+        self,
+        entry: Mapping[str, Any],
+        *,
+        owner: Any = None,
+    ) -> None:
         from simulator.vapour_rail.run_disclosure import reregister_cached_disclosures
 
-        reregister_cached_disclosures(entry.get("law_disclosures"))
+        reregister_cached_disclosures(entry.get("law_disclosures"), owner=owner)
 
     def _merged_neighbor_disclosures(
         self,
@@ -1549,7 +1560,8 @@ class PT0DeterminismStore:
             {
                 "payload": attempt["payload"],
                 "law_disclosures": merged,
-            }
+            },
+            owner=sim,
         )
 
     def _entry_for_physics_ladder_bucket(

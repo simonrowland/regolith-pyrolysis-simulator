@@ -1,11 +1,16 @@
 """Run-scoped disclosure of an admitted diagnostic or extrapolated vapour law.
 
-Invariant: a vapour-law computation is never detached. ``open_computation``
-raises before the solve unless a durable run registry is already bound. The
-session owns that registry. A simulator that is itself the run keeps one on
-the instance via ``bind_simulation_run``; the snapshot is merged into it and
-published on ``law_disclosures``. A stored disclosure with any malformed entry
-is unknown, never a measured empty.
+Invariant: a known stored disclosure is re-registered into the owning run
+registry on every physics cache hit, and an incomplete disclosure record is
+unknown. ``open_computation`` raises before the solve unless a durable run
+registry is already bound. The session owns that registry. A simulator that
+is itself the run keeps one on the instance via ``bind_simulation_run``; the
+snapshot is merged into it and published on ``law_disclosures``. Hit and miss
+share that bind. Re-registration of a known disclosure binds the owner when
+no registry is active, so a hit cannot return the value and drop the flag.
+A stored disclosure is known only when every public field is present and
+typed. One missing or ill-typed field makes the whole record unknown, never
+a measured row with empty authority.
 
 - The only registration site is ``CompiledPressureEvaluator.evaluate``.
 - A cache hit does not execute the law. It re-registers the disclosure stored
@@ -30,6 +35,7 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 import json
+import math
 from typing import Any
 
 _ACTIVE: ContextVar[RunDisclosure | None] = ContextVar(
@@ -41,6 +47,18 @@ _ACTIVE: ContextVar[RunDisclosure | None] = ContextVar(
 # notice: d-383 replaces the constant-dH sidecar and d-381 unifies Fe/FeO(g).
 _T1723_CERTIFICATION_ROUTE = ("d-383", "d-381")
 _GAP_KEYS = ("gap_dex_law_vs_rail", "gap_dex_law_vs_vaporock")
+# Public shape of LawDisclosure.to_public. A stored row that omits any of
+# these is unknown: re-registration must not fill the gap with "".
+_DISCLOSURE_FIELDS = (
+    "law_id",
+    "provenance",
+    "authority",
+    "certified_band_K",
+    "anchor_gaps_dex",
+    "closer",
+    "certification_route",
+    "evaluation_count",
+)
 
 
 @dataclass
@@ -472,29 +490,130 @@ def parse_stored_disclosure_field(
     return tuple(measured)
 
 
+def _finite_number(value: Any) -> float | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number):
+        return None
+    return number
+
+
 def _well_formed_disclosure(item: Any) -> dict[str, Any] | None:
-    """A disclosure row with a law id, or None when the row is malformed."""
+    """A complete disclosure row, or None when any required field is missing.
+
+    Required fields are the public registry record: law id, provenance,
+    authority, certified band, anchor gaps, closer, certification route, and
+    evaluation count. Authority and provenance must be non-empty text.
+    Closer, the gap map, and the certification route may be empty. The band
+    may be null. A law id alone is not a known disclosure: re-registration
+    would publish an empty authority.
+    """
 
     if not isinstance(item, Mapping) or isinstance(item, (str, bytes)):
         return None
-    law_id = item.get("law_id")
-    if not isinstance(law_id, str) or not law_id:
+    if any(key not in item for key in _DISCLOSURE_FIELDS):
         return None
-    return dict(item)
+    law_id = item.get("law_id")
+    provenance = item.get("provenance")
+    authority = item.get("authority")
+    closer = item.get("closer")
+    if (
+        not isinstance(law_id, str)
+        or not law_id
+        or not isinstance(provenance, str)
+        or not provenance
+        or not isinstance(authority, str)
+        or not authority
+        or not isinstance(closer, str)
+    ):
+        return None
+    band = item.get("certified_band_K")
+    certified: list[float] | None
+    if band is None:
+        certified = None
+    elif (
+        isinstance(band, (list, tuple))
+        and not isinstance(band, (str, bytes))
+        and len(band) == 2
+    ):
+        lo = _finite_number(band[0])
+        hi = _finite_number(band[1])
+        if lo is None or hi is None:
+            return None
+        certified = [lo, hi]
+    else:
+        return None
+    raw_gaps = item.get("anchor_gaps_dex")
+    if not isinstance(raw_gaps, Mapping) or isinstance(raw_gaps, (str, bytes)):
+        return None
+    gaps: dict[str, float] = {}
+    for key, value in raw_gaps.items():
+        if not isinstance(key, str) or not key:
+            return None
+        gap = _finite_number(value)
+        if gap is None:
+            return None
+        gaps[key] = gap
+    route = item.get("certification_route")
+    if isinstance(route, (str, bytes)) or not isinstance(route, (list, tuple)):
+        return None
+    if not all(isinstance(part, str) for part in route):
+        return None
+    count = item.get("evaluation_count")
+    if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+        return None
+    return {
+        "law_id": law_id,
+        "provenance": provenance,
+        "authority": authority,
+        "certified_band_K": certified,
+        "anchor_gaps_dex": gaps,
+        "closer": closer,
+        "certification_route": list(route),
+        "evaluation_count": count,
+    }
 
 
-def reregister_cached_disclosures(disclosures: Any) -> None:
+def reregister_cached_disclosures(
+    disclosures: Any,
+    *,
+    owner: Any = None,
+) -> None:
     """Re-register disclosures stored beside a cached value. Does not execute.
 
-    Malformed rows are not registered. The caller must have treated them as
-    a miss; registering the well-formed subset would hide the bad entry.
+    A known disclosure is never dropped. An active run registry receives the
+    counts. With no registry, ``owner`` is bound for this hit and the snapshot
+    is published on ``owner.law_disclosures``. Malformed rows are not
+    registered. The caller must have treated them as a miss; registering the
+    well-formed subset would hide the bad entry.
+
+    Result-object carriers (an optimizer row, a journal payload) omit
+    ``owner``. Their disclosure stays on the object. There is no run to
+    publish onto, so a missing registry is not a dropped simulator flag.
     """
 
-    current = _ACTIVE.get()
-    if current is None or disclosures is None:
+    if disclosures is None:
         return
     measured = parse_stored_disclosure_field(disclosures, present=True)
     if not measured:
+        if measured is not None and owner is not None and _ACTIVE.get() is None:
+            # Measured zero. Publish it on the owner so this hit does not
+            # leave the durable disclosure unset.
+            with bind_simulation_run(owner):
+                return
+        return
+    current = _ACTIVE.get()
+    if current is None and owner is not None:
+        with bind_simulation_run(owner):
+            bound = _ACTIVE.get()
+            if bound is not None:
+                bound.reregister_public(measured)
+        return
+    if current is None:
         return
     current.reregister_public(measured)
 
@@ -515,11 +634,15 @@ def stored_disclosures_known(record: Mapping[str, Any] | None) -> bool:
 
 def publish_stored_disclosures(
     record: Mapping[str, Any] | None,
+    *,
+    owner: Any = None,
 ) -> list[dict[str, Any]] | None:
     """Re-register one memo hit. ``None`` when the memo never recorded a field.
 
     A present empty list is a measured zero and is re-registered as such.
     Absence stays unknown: the caller must not treat it as unflagged.
+    ``owner`` is the run that must publish the disclosure when no registry
+    is already active.
     """
 
     if not isinstance(record, Mapping) or "law_disclosures" not in record:
@@ -528,7 +651,7 @@ def publish_stored_disclosures(
     measured = parse_stored_disclosure_field(raw, present=raw is not None)
     if measured is None:
         return None
-    reregister_cached_disclosures(measured)
+    reregister_cached_disclosures(measured, owner=owner)
     return [dict(item) for item in measured]
 
 

@@ -4,8 +4,11 @@ Invariant: a vapour-law computation is never detached. ``open_computation``
 raises before the law runs unless a durable run registry is already bound.
 The session owns that registry. A simulator that is itself the run keeps one
 via ``bind_simulation_run``, and the snapshot is published on that owner.
-A stored disclosure with any malformed entry is unknown, never a measured
-empty. A new ``SimSession.start`` owns a fresh registry. Projection after a
+A stored disclosure with any malformed or incomplete entry is unknown, never
+a measured empty and never an empty authority. A physics cache hit binds the
+owning run before it returns, so a known disclosure is re-registered even
+when no session was already active. A new ``SimSession.start`` owns a fresh
+registry. Projection after a
 committed step poisons the session. A cache or memo hit with no stored
 disclosure field is unknown and is a miss. Registration is the one
 ``CompiledPressureEvaluator.evaluate`` call. A hit does not execute the law; it
@@ -73,6 +76,7 @@ from simulator.vapour_rail.run_disclosure import (
     disclosure_scope,
     open_computation,
     publish_stored_disclosures,
+    reregister_cached_disclosures,
     stored_disclosures_known,
 )
 from tests.test_optimizer_results_store import _base_spec, _scored
@@ -598,11 +602,13 @@ def test_cache_publication_paths_use_the_disclosure_chokepoint() -> None:
     head = core.split("    def _get_equilibrium(", 1)[1].split(
         "    def _get_equilibrium_live(", 1
     )[0]
-    live_open = "with bind_simulation_run(self), open_computation()"
+    bind = "with bind_simulation_run(self):"
+    live_open = "with open_computation():"
+    assert bind in head
     assert live_open in head
-    assert "with open_computation()" not in head
     assert "computation_disclosure()" not in head
-    assert head.index("replay_enabled") < head.index(live_open)
+    assert head.index(bind) < head.index("replay_enabled")
+    assert head.index("replay_enabled") < head.index("cached_equilibrium")
     assert head.index("cached_equilibrium") < head.index(live_open)
     assert "capture_equilibrium" not in head
 
@@ -610,24 +616,39 @@ def test_cache_publication_paths_use_the_disclosure_chokepoint() -> None:
     body = evaporation.split("    def _freeze_gate_curve_record(", 1)[1].split(
         "    def _freeze_gate_liquidus_fO2_log(", 1
     )[0]
+    live_open = "with bind_simulation_run(self), open_computation()"
+    assert body.index(bind) < body.index("replay_gate_curve(")
+    assert body.index(bind) < body.index("publish_stored_disclosures(cache, owner=self)")
+    assert body.index(bind) < body.index(
+        "publish_stored_disclosures(process_cached, owner=self)"
+    )
     assert body.index("recorded_law_disclosures(cache)") < body.index(live_open)
     assert body.index("recorded_law_disclosures(process_cached)") < body.index(
         live_open
     )
     assert body.count("publish_stored_disclosures(") == 2
     assert body.index("stored_disclosures_known(cache)") < body.index(
-        "publish_stored_disclosures(cache)"
+        "publish_stored_disclosures(cache, owner=self)"
     )
     assert body.index("stored_disclosures_known(process_cached)") < body.index(
-        "publish_stored_disclosures(process_cached)"
+        "publish_stored_disclosures(process_cached, owner=self)"
     )
-    assert body.index("publish_stored_disclosures(cache)") < body.index(live_open)
-    assert body.index("publish_stored_disclosures(process_cached)") < body.index(
+    assert body.index("publish_stored_disclosures(cache, owner=self)") < body.index(
         live_open
     )
+    assert body.index(
+        "publish_stored_disclosures(process_cached, owner=self)"
+    ) < body.index(live_open)
     assert body.index(live_open) < body.rindex("store.capture_gate_curve(")
     assert "with open_computation()" not in body
     assert "with computation_disclosure()" not in body
+    hit_calls: list[str] = []
+    reduced_lines = reduced.splitlines()
+    for index, line in enumerate(reduced_lines):
+        if "_accept_cached_hit(" in line and "def " not in line:
+            hit_calls.append("\n".join(reduced_lines[index:index + 8]))
+    assert len(hit_calls) == 3
+    assert all("owner=sim" in call for call in hit_calls)
 
     results = (_ROOT / "simulator/optimize/results_store.py").read_text(encoding="utf-8")
     assert "law_disclosures TEXT NOT NULL" not in results
@@ -1081,6 +1102,64 @@ def test_every_production_open_computation_binds_a_durable_run() -> None:
     assert offenders == []
 
 
+def _complete_disclosure_row() -> dict:
+    """One public Fe disclosure. Every required field is present."""
+
+    return {
+        "law_id": _FE_ASSOCIATION_LAW_ID,
+        "provenance": (
+            "diagnostic_only: backsolved from VapoRock, no coefficients fitted"
+        ),
+        "authority": "diagnostic/extrapolated",
+        "certified_band_K": [1400.0, 2500.0],
+        "anchor_gaps_dex": {
+            "gap_dex_law_vs_rail": _RAIL_GAP,
+            "gap_dex_law_vs_vaporock": _VAPOROCK_GAP,
+        },
+        "closer": "t-1723",
+        "certification_route": ["d-383", "d-381"],
+        "evaluation_count": 1,
+    }
+
+
+_REQUIRED_DISCLOSURE_FIELDS = (
+    "law_id",
+    "provenance",
+    "authority",
+    "certified_band_K",
+    "anchor_gaps_dex",
+    "closer",
+    "certification_route",
+    "evaluation_count",
+)
+
+
+def _incomplete_disclosure_rows() -> list:
+    """Each arm drops or breaks one required field, plus the law-id-only row."""
+
+    rows: list = [
+        [{"law_id": "Fe:nasa_cea_9", "evaluation_count": 1}],
+        '[{"law_id": "Fe:nasa_cea_9", "evaluation_count": 1}]',
+    ]
+    complete = _complete_disclosure_row()
+    for field in _REQUIRED_DISCLOSURE_FIELDS:
+        rows.append([{key: value for key, value in complete.items() if key != field}])
+    for field, value in (
+        ("authority", ""),
+        ("provenance", ""),
+        ("certified_band_K", [1400.0]),
+        ("anchor_gaps_dex", {"gap_dex_law_vs_rail": "nope"}),
+        ("closer", None),
+        ("certification_route", "d-383"),
+        ("evaluation_count", 0),
+        ("evaluation_count", True),
+    ):
+        broken = dict(complete)
+        broken[field] = value
+        rows.append([broken])
+    return rows
+
+
 _MALFORMED_DISCLOSURES = (
     None,
     [None],
@@ -1094,6 +1173,7 @@ _MALFORMED_DISCLOSURES = (
     "[{}]",
     1,
     "not-json",
+    *_incomplete_disclosure_rows(),
 )
 
 
@@ -1120,7 +1200,7 @@ def test_malformed_stored_disclosure_is_unknown(raw) -> None:
     [
         [],
         "[]",
-        [{"law_id": "Fe:nasa_cea_9", "evaluation_count": 1}],
+        [_complete_disclosure_row()],
     ],
 )
 def test_well_formed_stored_disclosure_stays_measured(raw) -> None:
@@ -1137,7 +1217,12 @@ def test_well_formed_stored_disclosure_stays_measured(raw) -> None:
         published = publish_stored_disclosures(record)
         assert published is not None
         if published:
-            assert registry.snapshot()[0]["law_id"] == "Fe:nasa_cea_9"
+            _assert_fe_disclosure(
+                registry.snapshot()[0],
+                law_id=_FE_ASSOCIATION_LAW_ID,
+                count=1,
+            )
+            assert published[0]["authority"] == "diagnostic/extrapolated"
         else:
             assert registry.snapshot() == ()
 
@@ -1593,6 +1678,183 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
         law_id=_FE_ASSOCIATION_LAW_ID,
         count=1,
     )
+
+
+_STANDALONE_HIT_CLASSES = (
+    "equilibrium_replay",
+    "equilibrium_write_through",
+    "gate_replay",
+    "local_memo",
+    "shared_memo",
+    "store_exact",
+)
+
+
+class _DisclosureHitStore:
+    """Stand-in store. Re-registration uses the production chokepoint."""
+
+    def __init__(self, *, replay: bool, write_through: bool, disclosures) -> None:
+        self.replay_enabled = replay
+        self.write_through_enabled = write_through
+        self.capture_enabled = False
+        self.disclosures = disclosures
+        self.calls: list[str] = []
+
+    def replay_equilibrium(self, _sim):
+        self.calls.append("replay_equilibrium")
+        reregister_cached_disclosures(self.disclosures)
+        return {"status": "replayed"}
+
+    def cached_equilibrium(self, _sim):
+        self.calls.append("cached_equilibrium")
+        reregister_cached_disclosures(self.disclosures)
+        return {"status": "cached"}
+
+    def replay_gate_curve(self, _sim, **_kwargs):
+        self.calls.append("replay_gate_curve")
+        reregister_cached_disclosures(self.disclosures)
+        return {"status": "in_range", "tag": "replayed"}
+
+
+def _patch_gate_memo_live(monkeypatch) -> None:
+    import simulator.engine_binding_admission as admission
+    import simulator.reduced_real_determinism as determinism
+
+    monkeypatch.setattr(
+        determinism, "gate_curve_memo_is_cacheable", lambda *_a, **_k: True
+    )
+    monkeypatch.setattr(
+        admission, "gate_curve_memo_origin_matches", lambda *_a, **_k: True
+    )
+    monkeypatch.setattr(admission, "gate_curve_memo_evidence", lambda *_a, **_k: {})
+    monkeypatch.setattr(
+        admission,
+        "write_gate_curve_memo_record",
+        lambda _self, curve, notices, **kwargs: {
+            "curve": dict(curve),
+            "origin": {"producer_pid": 1},
+            "repair_notices": list(notices),
+            "disposition": "live",
+            "provider_outcome": kwargs.get("provider_outcome"),
+        },
+    )
+
+
+def _fe_disclosure_rows() -> tuple[dict, ...]:
+    with disclosure_scope(inherit=False) as cold:
+        _fe_pressure("FeO_association_gas")
+        return tuple(dict(item) for item in cold.snapshot())
+
+
+def _standalone_hit(kind: str, disclosures, monkeypatch):
+    """One production hit with no session registry already bound."""
+
+    from types import SimpleNamespace
+
+    from simulator.core import PyrolysisSimulator
+    from simulator.evaporation import EvaporationMixin
+    from simulator.reduced_real_determinism import PT0DeterminismStore
+
+    assert active_snapshot() == ()
+    if kind in {"gate_replay", "local_memo", "shared_memo"}:
+        _patch_gate_memo_live(monkeypatch)
+    if kind == "equilibrium_replay":
+        store = _DisclosureHitStore(
+            replay=True, write_through=False, disclosures=disclosures
+        )
+        owner = SimpleNamespace(_pt0_store=lambda: store)
+        return owner, store.calls, PyrolysisSimulator._get_equilibrium(owner)
+    if kind == "equilibrium_write_through":
+        store = _DisclosureHitStore(
+            replay=False, write_through=True, disclosures=disclosures
+        )
+        owner = SimpleNamespace(_pt0_store=lambda: store)
+        return owner, store.calls, PyrolysisSimulator._get_equilibrium(owner)
+    if kind == "gate_replay":
+        store = _DisclosureHitStore(
+            replay=True, write_through=False, disclosures=disclosures
+        )
+        calls: list[str] = []
+        host = _memo_host(calls)
+        host._pt0_store = lambda: store
+        return host, store.calls, EvaporationMixin._freeze_gate_curve_record(host)
+    if kind == "local_memo":
+        calls = []
+        host = _memo_host(calls)
+        host._freeze_gate_liquid_fraction_cache = _memo_record(
+            disclosures=disclosures
+        )
+        return host, calls, EvaporationMixin._freeze_gate_curve_record(host)
+    if kind == "shared_memo":
+        calls = []
+        host = _memo_host(calls)
+        host._freeze_gate_liquid_fraction_cache = None
+        host._freeze_gate_shared_curve_cache = {
+            "memo-key": _memo_record(disclosures=disclosures),
+        }
+        return host, calls, EvaporationMixin._freeze_gate_curve_record(host)
+    store = PT0DeterminismStore("capture")
+    owner = SimpleNamespace()
+    payload = store._accept_cached_hit(
+        {"payload": {"tag": "stored"}, "law_disclosures": disclosures},
+        owner=owner,
+    )
+    return owner, [], payload
+
+
+@pytest.mark.parametrize("kind", _STANDALONE_HIT_CLASSES)
+def test_standalone_hit_publishes_a_known_disclosure(kind: str, monkeypatch) -> None:
+    """Every physics hit class publishes the stored Fe law on its own owner.
+
+    No session registry is active before the call. A hit must not return the
+    value and leave the owner's disclosure empty.
+    """
+
+    stored = _fe_disclosure_rows()
+    owner, calls, payload = _standalone_hit(kind, stored, monkeypatch)
+    assert payload is not None
+    if kind in {"local_memo", "shared_memo"}:
+        assert calls == []
+        assert payload["curve"]["tag"] == "cached"
+    elif kind == "gate_replay":
+        assert calls == ["replay_gate_curve"]
+    elif kind == "equilibrium_replay":
+        assert calls == ["replay_equilibrium"]
+        assert payload["status"] == "replayed"
+    elif kind == "equilibrium_write_through":
+        assert calls == ["cached_equilibrium"]
+        assert payload["status"] == "cached"
+    else:
+        assert payload["tag"] == "stored"
+    assert active_snapshot() == ()
+    _assert_fe_disclosure(
+        owner.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+    other, _, other_payload = _standalone_hit("store_exact", (), monkeypatch)
+    assert other_payload is not None
+    assert tuple(getattr(other, "law_disclosures", ()) or ()) == ()
+    assert owner.law_disclosures[0]["law_id"] == _FE_ASSOCIATION_LAW_ID
+    assert active_snapshot() == ()
+
+
+@pytest.mark.parametrize("kind", _STANDALONE_HIT_CLASSES)
+def test_standalone_hit_leaves_an_incomplete_disclosure_unknown(
+    kind: str, monkeypatch
+) -> None:
+    """A law id and a count are not a known disclosure on any hit class."""
+
+    incomplete = [{"law_id": "Fe:nasa_cea_9", "evaluation_count": 1}]
+    owner, calls, payload = _standalone_hit(kind, incomplete, monkeypatch)
+    published = tuple(getattr(owner, "law_disclosures", ()) or ())
+    assert published == ()
+    assert active_snapshot() == ()
+    if kind in {"local_memo", "shared_memo"}:
+        assert calls == ["recompute"]
+        assert payload["curve"]["tag"] == "recomputed"
+    elif kind == "store_exact":
+        assert payload is None
 
 
 def test_receipt_and_evaluator_diagnostic_notices_both_survive() -> None:
