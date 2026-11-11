@@ -109,6 +109,7 @@ gaps:
   - chatain-2021-nacro2-thermodynamics
   - chaudary-1997-v-redox-binary-silicate
   - chen-2019-sioch-cp-entropy-gibbs
+  - chen-2020-ce2o3-cmas-activity-phase-equilibria
   - chen-2022-mgo-sio2-tio2-phase-equilibria
   - cheng-2021-fe-ca-si-o-phase-equilibria
   - cho-suito-1994-cas-slag-activities
@@ -6735,6 +6736,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: chen-2020-ce2o3-cmas-activity-phase-equilibria
+  aliases: []
+  citation: 'Chen, X.; Deng, T.; Zhao, Z.; Yan, B. (2020). Thermodynamic Study on CaO-SiO2-Al2O3-5%MgO-10%Ce2O3
+    Slag System: Liquide Lines and Distribution Behavior of Cerium at 1873 K. ISIJ International 60(8):1602–1609.'
+  doi: 10.2355/isijinternational.ISIJINT-2019-683
+  report_number: null
+  identifier: 10.2355/isijinternational.ISIJINT-2019-683
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/chen-2020-ce2o3-cmas-activity-phase-equilibria.yaml
+    review_status: draft
+    rows: 259
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/chen-2020-ce2o3-cmas-activity-phase-equilibria.pdf
+      present: true
+      sha256: 2b85713ca35a54a13dd69e29dcc8ce086468692e48c43dcec3f5a6535d827128
+      matches_simulator: null
+    sidecar:
+      path: raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/sidecar.yaml
+      present: true
+    text:
+      path: text/chen-2020-ce2o3-cmas-activity-phase-equilibria
+      exists: true
+      file_count: 1
+    tables:
+      path: tables/chen-2020-ce2o3-cmas-activity-phase-equilibria
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/chen-2020-ce2o3-cmas-activity-phase-equilibria.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/chen-2020-ce2o3-cmas-activity-phase-equilibria.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: chen-2022-mgo-sio2-tio2-phase-equilibria
   aliases: []
   citation: Chen, Min, Wan, Xingbang, Shi, Junjie, Taskinen, Pekka, and Jokilaakso, Ari (2022). Experimental

@@ -8,11 +8,11 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2319
+  sources: 2318
   by_stage:
     unknown: 317
     in_progress: 257
-    inbox: 1261
+    inbox: 1260
     ingested_complete: 130
     located: 209
     ingested_partial: 145
@@ -96,6 +96,7 @@ anti_loss:
       - cacciatore-zajacz-2026-v-sc-oxybarometer-supplement
       - chaudary-1997-v-redox-binary-silicate
       - chen-2019-sioch-cp-entropy-gibbs
+      - chen-2020-ce2o3-cmas-activity-phase-equilibria
       - chen-2022-mgo-sio2-tio2-phase-equilibria
       - cheng-2021-fe-ca-si-o-phase-equilibria
       - colson-colson-1995-chromium-dimer-lpsc
@@ -370,7 +371,6 @@ anti_loss:
       - zhang-2011-boron-sodium-f-free-evaporation
       - zhang-2021-acsesc-si
       - zhang-2024-alkali-evaporation-ti-thesis
-      - zhao-2019-ce2o3-ternary-thermodynamics
       - zhinkina-2024-ce-gd-kems-poster
     corpus_only:
       count: 62
@@ -5311,19 +5311,12 @@ sources:
   total_rows: 760
   inbox_exclusion_reason: null
 - source_id: chen-2020-ce2o3-cmas-activity-phase-equilibria
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/SOURCE.md
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/chen-2020-ce2o3-cmas-activity-phase-equilibria.pdf
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/chen2020-original--receipt.json
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/chen2020-qpdf-warning-categories.json
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/chen2020-qualification.md
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/chen2020-review--receipt.json
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/chen2020-three-root-dedup.json
-    - raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/provenance/independent-review.md
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/chen-2020-ce2o3-cmas-activity-phase-equilibria.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -38263,16 +38256,6 @@ sources:
     artefacts:
     - raw/zhinkina-2026-ce-al-kems-si
     reason: source folder exists in the corpus, but no document
-  usable_rows: 0
-  total_rows: 0
-  inbox_exclusion_reason: null
-- source_id: zhao-2019-ce2o3-ternary-thermodynamics
-  stage: in_progress
-  evidence:
-    decided_by: in_progress
-    artefacts:
-    - data/literature/extracts/zhao-2019-ce2o3-ternary-thermodynamics.yaml
-    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
