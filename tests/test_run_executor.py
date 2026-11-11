@@ -378,7 +378,8 @@ def test_pyrolysis_run_emits_binding_c6_refusal_diagnostic():
     )
 
 
-def test_run_executor_promotes_c4_acquisition_timeout_without_c6_mislabel() -> None:
+def test_run_executor_advances_after_c4_acquisition_time_cap_without_c6_mislabel(
+) -> None:
     config = _run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C4",
@@ -389,29 +390,37 @@ def test_run_executor_promotes_c4_acquisition_timeout_without_c6_mislabel() -> N
     backend.initialize({})
     session = SimSession()
     session.start(config, backend=backend)
+    session.simulator.record.branch = "two"
     session.simulator.campaign_mgr.campaigns["C4"][
         "max_target_acquisition_hr"
     ] = 1.0
 
     execution = RunExecutor().execute_session(session, hours=1)
+    sim = session.simulator
 
-    assert execution.status == "refused"
-    assert execution.reason == "c4_target_window_not_acquired"
-    assert execution.error_message == execution.reason
-    assert execution.refusal_diagnostic["campaign"] == "C4"
-    assert execution.refusal_diagnostic["reaction_family"] == (
-        "c4_mg_selective_pyrolysis"
+    assert execution.status == "ok"
+    assert execution.reason == ""
+    assert execution.error_message == ""
+    assert execution.refusal_diagnostic == {}
+    assert sim.campaign_mgr.last_c4_termination["stop_reason"] == "time_cap"
+    assert sim.campaign_mgr.last_c4_termination["residual_melt"]["flag"] == (
+        "time_cap"
     )
-    assert execution.refusal_diagnostic["diagnostic"]["reason_refused"] == (
-        execution.reason
-    )
-    assert session.simulator._last_c6_refusal_diagnostic == {}
+    residual = sim.campaign_mgr.last_c4_termination["residual_melt"]
+    assert residual["Na_kg"] > 0.0
+    assert residual["Mg_kg"] > 0.0
+    assert sim._c4_campaign_refused is False
+    assert sim.campaign_endpoint_refused() is False
+    assert sim.melt.campaign == CampaignPhase.C2A
+    assert sim._last_c6_refusal_diagnostic == {}
 
 
 def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:
-    """After a typed C4 endpoint refusal, core/session must not expose or
-    apply a next campaign decision. AUTO_APPLY and decide('yes') must not
-    start C6 (review construction: terminality fail-open)."""
+    """A missing Na limit is a typed refusal and remains non-resumable.
+
+    AUTO_APPLY and decide('yes') must not start the successor after this
+    genuine invalid-input refusal (review construction: terminality fail-open).
+    """
     config = _run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C4",
@@ -424,14 +433,17 @@ def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:
     session.start(config, backend=backend)
     # Branch two is the C4→C6 decision path under default-off C5.
     session.simulator.record.branch = "two"
-    session.simulator.campaign_mgr.campaigns["C4"][
-        "max_target_acquisition_hr"
-    ] = 1.0
+    session.simulator.campaign_mgr.setpoints.pop(
+        "outdoor_alkali_loss_limit_fraction_of_feed"
+    )
 
     execution = RunExecutor().execute_session(session, hours=1)
     assert execution.status == "refused"
-    assert execution.reason == "c4_target_window_not_acquired"
+    assert execution.reason == "c4_outdoor_alkali_limit_missing"
     sim = session.simulator
+    assert sim._last_c4_refusal_diagnostic["diagnostic"]["reason_refused"] == (
+        "c4_outdoor_alkali_limit_missing"
+    )
     assert sim._c4_campaign_refused is True
     assert sim.campaign_endpoint_refused() is True
     assert sim.melt.campaign == CampaignPhase.C4

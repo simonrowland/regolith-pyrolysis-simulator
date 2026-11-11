@@ -570,6 +570,7 @@ def test_c4_na_endpoint_uses_005_percent_of_feedstock_and_additive_na() -> None:
     assert termination["stop_reason"] == "endpoint_met"
     assert termination["feed_na_atom_mol"] == pytest.approx(1000.0)
     assert termination["na_endpoint_threshold_atom_mol"] == pytest.approx(0.5)
+    assert termination["completed_window_hr"] == 0.0
     assert termination["residual_melt"]["Na_kg"] > 0.0
     assert termination["residual_melt"]["Mg_kg"] > 0.0
     assert termination["residual_melt"]["flag"] == "endpoint_met"
@@ -646,6 +647,7 @@ def test_c4_acquisition_cap_advances_with_flagged_residual() -> None:
     assert sim._c4_campaign_refused is False
     assert sim.campaign_endpoint_refused() is False
     assert manager.last_c4_termination["stop_reason"] == "time_cap"
+    assert manager.last_c4_termination["completed_window_hr"] == 0.0
     assert manager.last_c4_termination["residual_melt"]["flag"] == "time_cap"
     assert manager.last_c4_termination["residual_melt"]["Na_kg"] > 0.0
     assert manager.last_c4_termination["residual_melt"]["Mg_kg"] > 0.0

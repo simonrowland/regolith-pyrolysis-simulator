@@ -3151,11 +3151,20 @@ class CampaignManager:
                 }
 
             if residual_na_atom_mol <= na_limit_atom_mol:
+                window_low_C, window_high_C = self._c4_temperature_window()
+                completed_window_hr = float(sum(
+                    snapshot.campaign == CampaignPhase.C4
+                    and window_low_C <= float(snapshot.temperature_C) <= window_high_C
+                    for snapshot in record.snapshots
+                ) + int(
+                    window_low_C <= float(melt.temperature_C) <= window_high_C
+                ))
                 self.last_c4_termination = {
                     'outcome': 'endpoint_met',
                     'stop_reason': 'endpoint_met',
                     'species': 'Na',
                     'threshold_fraction_of_feed': na_limit_fraction,
+                    'completed_window_hr': completed_window_hr,
                     **residual_fields('endpoint_met'),
                 }
                 return True
@@ -3216,6 +3225,7 @@ class CampaignManager:
                         'elapsed_hours': completed_campaign_hour,
                         'completed_campaign_hour': completed_campaign_hour,
                         'acquisition_opportunity_hr': acquisition_elapsed_hr,
+                        'completed_window_hr': 0.0,
                         'acquisition_limit_hr': acquisition_limit_hr,
                         'acquisition_limit_source': acquisition_limit_source,
                         'process_wall_clock_limit_hr': process_limit_hr,
@@ -3239,6 +3249,7 @@ class CampaignManager:
                         'elapsed_hours': acquisition_elapsed_hr,
                         'completed_campaign_hour': completed_campaign_hour,
                         'acquisition_opportunity_hr': acquisition_elapsed_hr,
+                        'completed_window_hr': 0.0,
                         'acquisition_limit_hr': acquisition_limit_hr,
                         'acquisition_limit_source': acquisition_limit_source,
                     }

@@ -361,15 +361,22 @@ def _assert_staged_route_extent(sim, post_mg_c2a_hold_limit: dict) -> None:
     process_limit_hr, _ = campaign_mgr._c4_process_wall_clock_limit()
 
     if c4_end_reason == "c4_preheat_wall_clock_exhausted":
-        assert sim.campaign_endpoint_refused()
-        assert c4_refusal["status"] == "refused"
-        assert c4_refusal["campaign"] == CampaignPhase.C4.name
-        assert staged_route == fixed_route
+        assert not sim.campaign_endpoint_refused()
+        assert not c4_refusal
+        assert c4_termination["stop_reason"] == "time_cap"
+        assert c4_termination["residual_melt"]["flag"] == "time_cap"
+        assert c4_termination["completed_window_hr"] == 0.0
+        assert sim.is_complete()
+        assert staged_route == [
+            *fixed_route,
+            CampaignPhase.C2A,
+            CampaignPhase.C6,
+        ]
         c4_hours = campaign_hours[CampaignPhase.C4]
-        assert c4_hours == c4_diagnostic["completed_campaign_hour"]
-        assert c4_hours - c4_diagnostic["acquisition_opportunity_hr"] == pytest.approx(
-            acquisition_limit_hr + process_limit_hr
-        )
+        assert c4_hours == c4_termination["completed_campaign_hour"]
+        assert c4_hours - c4_termination[
+            "acquisition_opportunity_hr"
+        ] == pytest.approx(acquisition_limit_hr + process_limit_hr)
         return
 
     assert not sim.campaign_endpoint_refused()
