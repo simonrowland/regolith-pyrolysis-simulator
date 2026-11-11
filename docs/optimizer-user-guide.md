@@ -235,7 +235,7 @@ winner, it also writes `winner.recipe.yaml`.
 Seed reruns are only a determinism check or a way to extend a study, not the
 save/replay mechanism.
 
-Winner selection is deterministic: choose the feasible Pareto point with the best primary profile objective, then compare remaining objectives in declared order, then `cache_key`, then `candidate_id`.
+Winner selection is deterministic: choose the feasible Pareto point with the best primary profile objective, then compare remaining objectives in declared order, then the ask ordinal (journal `ask_seq`, stored on the record as `ask_ordinal`). Exact ties do not follow `trial_number`, `candidate_id`, `cache_key`, or completion order. Returned Pareto lists, replay Pareto, and `pareto.json` rows are that same ask order. Records that predate `ask_ordinal` still break ties by `trial_number` when the strategy stored one, otherwise by `candidate_id`. The winner stays the rank-key choice when a later sample has the better objective.
 
 ### EvalSpec
 
