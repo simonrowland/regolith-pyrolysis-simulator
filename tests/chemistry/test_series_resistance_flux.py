@@ -25,8 +25,16 @@ import pytest
 
 from simulator.condensation import (
     DepositionInputRefusal,
+    _CONFIG_BUNDLE,
+    _LENNARD_JONES_PARAMS,
+    _dimer_chapman_enskog_proxy,
+    _element_series_coefficients_mol_m2_s_pa,
+    _series_resistance_coefficient_mol_m2_s_pa,
     _series_resistance_deposition_flux_mol_m2_s,
     _stirring_enhanced_sherwood,
+)
+from simulator.condensation_routing import (
+    DIMER_COLLISION_DIAMETER_PROXY_REASON,
 )
 from simulator.state import MAX_STIR_FACTOR, clamp_stir_factor
 
@@ -417,3 +425,76 @@ def test_series_flux_zero_radial_with_high_axial_still_floors_at_laminar():
     )
     # halt-radial flux equals no-stir baseline (Sh physics floor).
     assert flux == pytest.approx(flux_baseline, rel=1e-12)
+
+
+def test_series_coefficient_matches_flux_over_drive():
+    """The element conductance is the series law's flux/drive.
+
+    Same arithmetic, so the product matches the flux bit for bit.
+    A 1e-12 relative tolerance would apply only if the division
+    order had to differ.
+    """
+
+    diagnostic: dict = {}
+    flux = _call(
+        regime_factor=0.0,
+        stir_factor=1.0,
+        radial_stir_factor=1.0,
+        diagnostic_out=diagnostic,
+    )
+    saturation = diagnostic["wall_saturation_pressure_pa"]
+    drive = _SiO_DEFAULT_KWARGS["P_local_pa"] - saturation
+    assert drive > 0.0
+    coefficient = _series_resistance_coefficient_mol_m2_s_pa(
+        "SiO",
+        _SiO_DEFAULT_KWARGS["alpha_s"],
+        pipe_diameter_m=_SiO_DEFAULT_KWARGS["pipe_diameter_m"],
+        stir_factor=1.0,
+        radial_stir_factor=1.0,
+        regime_factor=0.0,
+        T_gas_K=_SiO_DEFAULT_KWARGS["T_gas_K"],
+        overhead_pressure_pa=_SiO_DEFAULT_KWARGS["overhead_pressure_pa"],
+        carrier_gas="N2",
+    )
+    assert coefficient * drive == flux
+
+
+def test_dimer_film_uses_the_flagged_monomer_collision_diameter():
+    """K2, Na2, and Mg2 have no cited Lennard-Jones sigma.
+
+    The dimer Chapman-Enskog row is the monomer sigma and epsilon
+    with mass 2m. That is not the undocumented default diffusivity.
+    """
+
+    vapor = _CONFIG_BUNDLE.vapor_pressures
+    for monomer in ("K", "Na", "Mg"):
+        dimer = f"{monomer}2"
+        params, reason = _dimer_chapman_enskog_proxy(dimer, monomer)
+        sigma, epsilon, mass = _LENNARD_JONES_PARAMS[monomer]
+        assert params == (sigma, epsilon, 2.0 * mass)
+        assert reason == DIMER_COLLISION_DIAMETER_PROXY_REASON
+        shared = dict(
+            pipe_diameter_m=0.02,
+            stir_factor=1.0,
+            radial_stir_factor=1.0,
+            regime_factor=0.0,
+            T_gas_K=1800.0,
+            overhead_pressure_pa=100.0,
+            carrier_gas="N2",
+            vapor_pressure_data=vapor,
+        )
+        proxy = {}
+        k_monomer, k_dimer = _element_series_coefficients_mol_m2_s_pa(
+            monomer=monomer,
+            dimer=dimer,
+            alpha_s=1.0,
+            diameter_proxy=proxy,
+            **shared,
+        )
+        fallback = _series_resistance_coefficient_mol_m2_s_pa(
+            dimer, 1.0, **shared,
+        )
+        assert k_monomer > 0.0
+        assert k_dimer > 0.0
+        assert k_dimer != fallback
+        assert proxy[dimer] == DIMER_COLLISION_DIAMETER_PROXY_REASON

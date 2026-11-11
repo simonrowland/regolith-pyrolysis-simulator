@@ -2,6 +2,7 @@
 
 import json
 import hashlib
+import math
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -196,3 +197,93 @@ def test_green_runner_capture_pin(staged, route_totals, tmp_path):
     result = run.run()
     assert result["status"] == "ok"
     assert_pin("c2a_staged" if staged else "lunar_24h", route_totals, tmp_path, result)
+
+
+def _assert_alkali_matches_green(name, actual):
+    """Na, K, and Mg against the stored green pin.
+
+    K_p -> inf leaves those three on the shared series solver. The
+    pin is a stored JSON measurement, not a second call of that
+    function, so the tolerance is 1e-12 relative rather than ``==``.
+    The default-route test compares the two live paths bit for bit.
+    Fe, Cr, and SiO are not on the dimer channel.
+    """
+
+    expected = json.loads(PINS.read_text())[name]
+    mismatches = {}
+    for species in ("Na", "K", "Mg"):
+        if actual[species] != pytest.approx(
+            expected[species], rel=1e-12, abs=1e-18,
+        ):
+            mismatches[species] = {
+                "actual": actual[species],
+                "expected": expected[species],
+            }
+    assert not mismatches, mismatches
+
+
+def _patch_kp_inf(monkeypatch):
+    """Test-only probe. Not a production setting."""
+
+    monkeypatch.setattr(
+        "simulator.condensation.dimer_dissociation_kp_pa",
+        lambda *_args, **_kwargs: math.inf,
+    )
+
+
+@pytest.mark.nightly
+@pytest.mark.xdist_group("magemin_fullrun_c")
+@pytest.mark.timeout(5400)
+def test_kp_inf_reproduces_green_alkali_on_full_lunar(
+    route_totals, monkeypatch, tmp_path,
+):
+    """full_lunar with the dimer channel forced off.
+
+    Long scenario. The controller runs this on rpp. It is not a
+    laptop re-run: lunar full runs diverge between hosts.
+    """
+
+    del tmp_path
+    _patch_kp_inf(monkeypatch)
+    _, _, sim = full_builtin_provider_run.__wrapped__(
+        SimpleNamespace(param=("lunar_mare_low_ti", None))
+    )
+    assert sim.is_complete()
+    _assert_alkali_matches_green("full_lunar", route_totals)
+
+
+@pytest.mark.parametrize(
+    "staged", [False, True], ids=["lunar_24h", "c2a_staged"],
+)
+def test_kp_inf_reproduces_green_alkali_on_runner_pins(
+    staged, route_totals, monkeypatch, tmp_path,
+):
+    """lunar_24h and c2a_staged with the dimer channel forced off.
+
+    Long scenario. The controller runs this on rpp. It is not a
+    laptop re-run.
+    """
+
+    del tmp_path
+    _patch_kp_inf(monkeypatch)
+    patch = (
+        load_recipe_patch(Path("data/recipes/c2a_staged_temperature_ladder.yaml"))
+        if staged else {}
+    )
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A_staged" if staged else "C0",
+        hours=9 if staged else 24,
+        setpoints_patch=patch,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-15T00:00:00Z",
+            "kernel_commit_sha": "t1217-green",
+        },
+    )
+    result = run.run()
+    assert result["status"] == "ok"
+    _assert_alkali_matches_green(
+        "c2a_staged" if staged else "lunar_24h", route_totals,
+    )

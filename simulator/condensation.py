@@ -46,9 +46,11 @@ Key physics:
     an hourly mass. Equal strip saturation pressures reduce to the former
     single-exponential capture balance exactly.
     Na, K, and Mg do not use that monomer drive. d-378 amendment 2
-    deposits the monomer and the dimer in parallel, each by its own
-    Hertz-Knudsen flux, and integrates J_M + 2 J_M2 on the conserved
-    element inventory. Amendment 1 still decides supersaturation.
+    deposits the monomer and the dimer in parallel. Each form diffuses
+    through its own series conductance, and the element inventory
+    integrates J_M + 2 J_M2. K_p -> inf leaves the dimer channel off
+    and uses the linear solver above. Amendment 1 still decides
+    supersaturation.
     K_p is the JANAF primary table.
     Walls and stages remove vapor in physical order; every capture stays
     at its location and the remainder goes to terminal offgas.
@@ -138,6 +140,8 @@ from simulator.lab_geometry import (
 from simulator.condensation_routing import (
     DESIGNATED_STAGE,
     DIMER_ALPHA_FROM_MONOMER_PROXY,
+    DIMER_COLLISION_DIAMETER_FROM_MONOMER_PROXY,
+    DIMER_COLLISION_DIAMETER_PROXY_REASON,
     DIMER_SATURATION_UPPER_BOUND_NO_KP,
     K_TRAP_STAGE_KEY,
     METAL_DIMER_SPECIES,
@@ -3111,6 +3115,7 @@ class CondensationModel:
         # d-378 amendment 2. The dimer channel uses the monomer alpha even
         # when the feed itself is only the monomer.
         self._dimer_hk_alpha_proxy = {}
+        self._dimer_collision_diameter_proxy = {}
         transport_parameter_notice_by_species: dict[str, Any] = {}
         condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
         from simulator.vapour_rail.instrumentation import (
@@ -3724,6 +3729,18 @@ class CondensationModel:
             sticking_notice[DIMER_ALPHA_FROM_MONOMER_PROXY] = dict(
                 sorted(dimer_alpha_proxy_by_species.items())
             )
+        diameter_proxy = getattr(self, '_dimer_collision_diameter_proxy', None)
+        if isinstance(diameter_proxy, dict) and diameter_proxy:
+            # The dimer film has no cited collision diameter. The
+            # monomer sigma is a flagged proxy, not a measured M2 row.
+            sticking_notice = dict(sticking_notice)
+            sticking_notice['severity'] = 'warning'
+            sticking_notice['authoritative_for_deposit_mass'] = False
+            sticking_notice['deposit_output_status'] = 'status_bearing'
+            sticking_notice[DIMER_COLLISION_DIAMETER_FROM_MONOMER_PROXY] = {
+                str(dimer_species): str(reason)
+                for dimer_species, reason in sorted(diameter_proxy.items())
+            }
         saturation_bounds = getattr(
             self, '_dimer_saturation_upper_bound_by_species', None,
         )
@@ -4728,12 +4745,18 @@ class CondensationModel:
                 if element_pair is not None:
                     if sample_kp is None:
                         element_supersaturated_without_kp = True
-                    else:
+                    elif (
+                        math.isfinite(float(sample_kp))
+                        and float(sample_kp) > 0.0
+                    ):
                         element_hk_rows.append((
                             float(sample_alpha_s),
                             float(saturation_pressure),
                             float(sample_kp),
                         ))
+                    # K_p -> inf: the dimer channel is gone. This sample
+                    # stays on the series-resistance strips. The linear
+                    # solver below is the green path.
                 if flux > 0.0:
                     conductance = flux / sample_driving_pressure
                     if conductance > 0.0:
@@ -4746,10 +4769,11 @@ class CondensationModel:
                 'above_reactive_product_condensation_temperature',
                 stage_temperature_band_C=[lo_C, hi_C],
             )
-        # d-378 amendment 2. A contracted element with K_p at every
-        # supersaturated sample deposits by parallel Hertz-Knudsen
-        # fluxes. Strips that all lack K_p stay on the linear solver
-        # below: that path already compares p_elem with P_sat.
+        # d-378 amendment 2 plus d-209 am.1. A contracted element with
+        # a finite K_p at every supersaturated sample deposits by
+        # parallel series conductances, one per form. K_p -> inf never
+        # fills element_hk_rows, so the linear solver below is the
+        # shared green path. Strips that lack K_p stay there too.
         if (
             element_pair is not None
             and element_hk_rows
@@ -4776,23 +4800,41 @@ class CondensationModel:
             # alpha_M2 is this sample's monomer alpha (flagged proxy).
             pressure_scale_pa_per_mol = p_in / inventory_mol
             area_scale = pressure_scale_pa_per_mol * area / sample_count
-            hk_monomer = _hkl_impingement_flux_mol_m2_s(
-                monomer_name, 1.0, T_gas_K,
-                vapor_pressure_data=self.vapor_pressure_data,
+            # Independent parallel film diffusion is an approximation.
+            # Each form diffuses through its own series conductance and
+            # the bulk gas is the equilibrium re-speciation of p_elem.
+            # There is no speciation relaxation inside the film.
+            # Flagged. Exact at K_p -> inf (this branch is not taken)
+            # and at K_p -> 0 (the element sits in the dimer).
+            diameter_proxy = getattr(
+                self, '_dimer_collision_diameter_proxy', None,
             )
-            hk_dimer = _hkl_impingement_flux_mol_m2_s(
-                dimer_name, 1.0, T_gas_K,
-                vapor_pressure_data=self.vapor_pressure_data,
-            )
-            element_strips = tuple(
-                (
-                    area_scale * sample_alpha * hk_monomer,
-                    area_scale * sample_alpha * hk_dimer,
+            if not isinstance(diameter_proxy, dict):
+                diameter_proxy = {}
+                self._dimer_collision_diameter_proxy = diameter_proxy
+            element_strips_list: list[tuple[float, float, float, float]] = []
+            for sample_alpha, saturation, kp in element_hk_rows:
+                k_monomer, k_dimer = _element_series_coefficients_mol_m2_s_pa(
+                    monomer=monomer_name,
+                    dimer=dimer_name,
+                    alpha_s=sample_alpha,
+                    pipe_diameter_m=gas_side_length_m,
+                    stir_factor=self.stir_factor,
+                    radial_stir_factor=self.radial_stir_factor,
+                    regime_factor=self.regime_factor,
+                    T_gas_K=T_gas_K,
+                    overhead_pressure_pa=overhead_pressure_pa,
+                    carrier_gas=str(self.carrier_gas),
+                    vapor_pressure_data=self.vapor_pressure_data,
+                    diameter_proxy=diameter_proxy,
+                )
+                element_strips_list.append((
+                    area_scale * k_monomer,
+                    area_scale * k_dimer,
                     saturation,
                     kp,
-                )
-                for sample_alpha, saturation, kp in element_hk_rows
-            )
+                ))
+            element_strips = tuple(element_strips_list)
             if species == element_dimer:
                 p_elem = element_partial_pa(
                     float(coexisting_monomer_partial_pa or 0.0), p_in,
@@ -7398,6 +7440,186 @@ def _hkl_surface_deposition_flux_mol_m2_s(
 # described in the 0.5.2 CHANGELOG entry + the docstring of
 # ``_series_resistance_deposition_flux_mol_m2_s`` if a future
 # investigator needs to reproduce the pre-Phase-B fluxes.
+
+
+def _series_resistance_coefficient_mol_m2_s_pa(
+    species: str,
+    alpha_s: float,
+    *,
+    pipe_diameter_m: float,
+    stir_factor: float,
+    radial_stir_factor: float | None,
+    regime_factor: float,
+    T_gas_K: float,
+    overhead_pressure_pa: float | None,
+    carrier_gas: str,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    lennard_jones_params: tuple[float, float, float] | None = None,
+) -> float:
+    """Series conductance per area, mol/(m² s Pa).
+
+    G/A = 1 / (1/(alpha k_HK) + R_gas(Kn) + R_melt). R_melt is 0 until
+    a melt-transfer input exists; evaporation uses that same zero.
+    R_gas is the regime-weighted Sherwood resistance. At one gas
+    temperature, one total pressure, and one length this does not
+    depend on the condensing partial, so a strip is linear in p.
+
+    The arithmetic is the coefficient inside
+    ``_series_resistance_deposition_flux_mol_m2_s``. A monomer call
+    with no Lennard-Jones override matches flux/drive from that
+    function. ``lennard_jones_params`` is the dimer film's Chapman-
+    Enskog row when the shared table has no M2 sigma.
+    """
+
+    if alpha_s == 0.0:
+        return 0.0
+    pipe_diameter_m = _deposition_finite_scalar(
+        "pipe_diameter_m", pipe_diameter_m,
+    )
+    if pipe_diameter_m <= 0.0:
+        raise DepositionInputRefusal(
+            "pipe_diameter_m",
+            pipe_diameter_m,
+            "must be > 0; a zero-diameter pipe is not a pipe",
+        )
+    effective_T_gas_K = _deposition_finite_scalar("T_gas_K", T_gas_K)
+    if effective_T_gas_K <= 0.0:
+        raise DepositionInputRefusal(
+            "T_gas_K", T_gas_K, "must be above absolute zero",
+        )
+    collision_coefficient_per_pa = _hkl_impingement_flux_mol_m2_s(
+        species,
+        1.0,
+        effective_T_gas_K,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    k_hkl_per_pa = alpha_s * collision_coefficient_per_pa
+    if not math.isfinite(k_hkl_per_pa) or k_hkl_per_pa <= 0.0:
+        return 0.0
+    regime = _deposition_finite_scalar("regime_factor", regime_factor)
+    regime = max(0.0, min(1.0, regime))
+    mt_weight = 1.0 - regime
+    if mt_weight <= 0.0:
+        return k_hkl_per_pa
+    sherwood_eff = _stirring_enhanced_sherwood(
+        stir_factor,
+        radial_stir_factor=radial_stir_factor,
+    )
+    if (
+        overhead_pressure_pa is not None
+        and math.isfinite(overhead_pressure_pa)
+        and overhead_pressure_pa > 0.0
+    ):
+        d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
+            species,
+            effective_T_gas_K,
+            float(overhead_pressure_pa),
+            carrier=carrier_gas,
+            species_params=lennard_jones_params,
+        )
+        if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
+            d_ab_m2_s = DEFAULT_BINARY_DIFFUSION_M2_S
+    else:
+        d_ab_m2_s = DEFAULT_BINARY_DIFFUSION_M2_S
+    if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
+        return 0.0
+    k_mt_per_pa = (
+        sherwood_eff * d_ab_m2_s
+        / (pipe_diameter_m * GAS_CONSTANT_J_MOL_K * effective_T_gas_K)
+    )
+    if not math.isfinite(k_mt_per_pa) or k_mt_per_pa <= 0.0:
+        return 0.0
+    inv_k_total = 1.0 / k_hkl_per_pa + mt_weight / k_mt_per_pa
+    if not math.isfinite(inv_k_total) or inv_k_total <= 0.0:
+        return 0.0
+    return 1.0 / inv_k_total
+
+
+def _dimer_chapman_enskog_proxy(
+    dimer: str,
+    monomer: str,
+) -> tuple[tuple[float, float, float] | None, str | None]:
+    """Dimer Lennard-Jones row, or the flagged monomer proxy.
+
+    A cited M2 row would be used as itself and would not be flagged.
+    K2, Na2, and Mg2 have no row in ``_LENNARD_JONES_PARAMS``. The
+    proxy keeps the monomer collision diameter and epsilon/k and
+    doubles the monomer mass. k_HK still uses the dimer's catalog
+    molar mass, which is also 2m.
+    """
+
+    if dimer in _LENNARD_JONES_PARAMS:
+        return None, None
+    monomer_params = _LENNARD_JONES_PARAMS.get(monomer)
+    if monomer_params is None:
+        return None, None
+    sigma_angstrom, epsilon_K, mass_g_mol = monomer_params
+    return (
+        (sigma_angstrom, epsilon_K, 2.0 * mass_g_mol),
+        DIMER_COLLISION_DIAMETER_PROXY_REASON,
+    )
+
+
+def _element_series_coefficients_mol_m2_s_pa(
+    *,
+    monomer: str,
+    dimer: str,
+    alpha_s: float,
+    pipe_diameter_m: float,
+    stir_factor: float,
+    radial_stir_factor: float | None,
+    regime_factor: float,
+    T_gas_K: float,
+    overhead_pressure_pa: float | None,
+    carrier_gas: str,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    diameter_proxy: MutableMapping[str, str] | None = None,
+) -> tuple[float, float]:
+    """G_M/A and G_M2/A for one contracted element.
+
+    Independent parallel film diffusion is an approximation. Each form
+    diffuses through its own series conductance, and the bulk gas is
+    the equilibrium re-speciation of p_elem. There is no speciation
+    relaxation inside the film. Flagged. Exact at K_p -> inf, where
+    the dimer channel is absent and the caller uses the linear series
+    solver instead, and at K_p -> 0, where the element sits in the dimer.
+
+    G_M = 1 / (1/(alpha_M k_HK,M) + R_gas,M(Kn) + R_melt)
+    G_M2 = 1 / (1/(alpha_M2 k_HK,M2) + R_gas,M2(Kn))
+
+    R_melt is 0. The dimer formula omits it. alpha_M2 is alpha_M.
+    The Knudsen weight is the caller's carrier regime factor, the same
+    one the monomer series law uses. The species enters through k_HK
+    and through Chapman-Enskog D_AB. R_gas,M2 uses mass 2m and the
+    dimer's collision diameter, or the flagged monomer proxy.
+    """
+
+    shared = dict(
+        pipe_diameter_m=pipe_diameter_m,
+        stir_factor=stir_factor,
+        radial_stir_factor=radial_stir_factor,
+        regime_factor=regime_factor,
+        T_gas_K=T_gas_K,
+        overhead_pressure_pa=overhead_pressure_pa,
+        carrier_gas=carrier_gas,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    k_monomer = _series_resistance_coefficient_mol_m2_s_pa(
+        monomer, alpha_s, **shared,
+    )
+    proxy_params, proxy_reason = _dimer_chapman_enskog_proxy(dimer, monomer)
+    k_dimer = _series_resistance_coefficient_mol_m2_s_pa(
+        dimer,
+        alpha_s,
+        lennard_jones_params=proxy_params,
+        **shared,
+    )
+    if (
+        proxy_reason is not None
+        and isinstance(diameter_proxy, MutableMapping)
+    ):
+        diameter_proxy.setdefault(str(dimer), str(proxy_reason))
+    return k_monomer, k_dimer
 
 
 def _series_resistance_deposition_flux_mol_m2_s(

@@ -25,12 +25,15 @@ from simulator.condensation import (
 from simulator.condensation_routing import (
     DESIGNATED_STAGE,
     DIMER_ALPHA_FROM_MONOMER_PROXY,
+    DIMER_COLLISION_DIAMETER_FROM_MONOMER_PROXY,
+    DIMER_COLLISION_DIAMETER_PROXY_REASON,
     DIMER_SATURATION_UPPER_BOUND_NO_KP,
     K_TRAP_STAGE_KEY,
     METAL_DIMER_SPECIES,
     MISSING_COLLECTION_PRODUCT_CONTRACT_SPECIES,
     NA_COLLECTOR_STAGE_KEY,
     dimer_collection_monomer,
+    element_collection_pair,
     element_partial_pa,
     respeciated_monomer_partial_pa,
 )
@@ -627,7 +630,7 @@ def test_every_contracted_arrival_uses_the_element_capture_fraction(
         )
         assert calls, species
         assert calls[0] == pytest.approx(_p_monomer)
-        k_monomer, k_dimer = _stage_hk_coefficients(
+        k_monomer, k_dimer = _stage_series_coefficients(
             model, _alkali_stage(model), species, monomer, dimer,
             dimer_partial if species == dimer else monomer_partial,
             1.0, 5.0, 0.5,
@@ -721,16 +724,20 @@ def _rk4_element_partial(p_elem, kp, psat, k_monomer, k_dimer, duration, steps=2
     return pressure
 
 
-def _stage_hk_coefficients(
+def _stage_series_coefficients(
     model, stage, species, monomer, dimer, flowing, available_kg, residence_s, alpha,
 ):
-    """q * (A/n) * alpha * J(1 Pa) for the monomer and the dimer."""
+    """q * (A/n) * G/A for the monomer and the dimer.
+
+    G is the series conductance. Alpha sits inside G. The stand-in
+    flux monkeypatch supplies P_sat and does not set this rate.
+    """
 
     from simulator.condensation import (
         AVOGADRO_MOL,
         CELSIUS_TO_KELVIN_OFFSET,
         HKL_BAND_SAMPLES,
-        _hkl_impingement_flux_mol_m2_s,
+        _element_series_coefficients_mol_m2_s_pa,
         _molecular_mass_kg_per_molecule,
     )
 
@@ -741,18 +748,24 @@ def _stage_hk_coefficients(
     width = stage.temp_range_C[1] - stage.temp_range_C[0]
     sample_count = 1 if width == 0.0 else HKL_BAND_SAMPLES
     area = model._stage_area_m2_for_stage(stage)
-    scale = (flowing / inventory_mol) * area / sample_count * alpha
+    scale = (flowing / inventory_mol) * area / sample_count
     temperature_K = model.gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET
-    return (
-        scale * _hkl_impingement_flux_mol_m2_s(
-            monomer, 1.0, temperature_K,
-            vapor_pressure_data=model.vapor_pressure_data,
+    k_monomer, k_dimer = _element_series_coefficients_mol_m2_s_pa(
+        monomer=monomer,
+        dimer=dimer,
+        alpha_s=alpha,
+        pipe_diameter_m=model._hydraulic_diameter_m_for_stage_number(
+            stage.stage_number,
         ),
-        scale * _hkl_impingement_flux_mol_m2_s(
-            dimer, 1.0, temperature_K,
-            vapor_pressure_data=model.vapor_pressure_data,
-        ),
+        stir_factor=model.stir_factor,
+        radial_stir_factor=model.radial_stir_factor,
+        regime_factor=model.regime_factor,
+        T_gas_K=temperature_K,
+        overhead_pressure_pa=float(model.overhead_pressure_mbar) * 100.0,
+        carrier_gas=str(model.carrier_gas),
+        vapor_pressure_data=model.vapor_pressure_data,
     )
+    return scale * k_monomer, scale * k_dimer
 
 
 @pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
@@ -762,8 +775,9 @@ def test_stage_drawdown_follows_the_element_inventory_ode(
 ):
     """Finite residence follows J_M + 2 J_M2, not a jump to p_elem,sat.
 
-    The series-resistance monkeypatch still supplies P_sat. It does not
-    set the rate: a monomer-only drive fails this integral.
+    The series-resistance monkeypatch supplies P_sat. The rate is each
+    form's series conductance, not that stand-in flux. A monomer-only
+    drive fails this integral.
     """
 
     from tests.test_condensation_input_refusals import _configured_model
@@ -805,7 +819,7 @@ def test_stage_drawdown_follows_the_element_inventory_ode(
         ),
         saturation_species=monomer if species == dimer else None,
     )
-    k_monomer, k_dimer = _stage_hk_coefficients(
+    k_monomer, k_dimer = _stage_series_coefficients(
         model, stage, species, monomer, dimer, flowing,
         available_kg, residence_s, 0.5,
     )
@@ -1499,6 +1513,9 @@ def test_dimer_alpha_proxy_is_published_whenever_the_channel_runs(
     route = _proxy_route(monomer, dimer, arrival, surface)
     notice = route.sticking_alpha_provenance_notice
     assert notice[DIMER_ALPHA_FROM_MONOMER_PROXY][dimer] == monomer
+    assert notice[DIMER_COLLISION_DIAMETER_FROM_MONOMER_PROXY][dimer] == (
+        DIMER_COLLISION_DIAMETER_PROXY_REASON
+    )
     assert notice["authoritative_for_deposit_mass"] is False
     deposited = _deposited_kg(route, monomer)
     assert deposited > 0.0
@@ -1521,6 +1538,9 @@ def test_monomer_only_potassium_on_a_40c_wall_flags_the_proxy():
     route = _proxy_route("K", "K2", "monomer", "wall_only", wall_c=40.0)
     notice = route.sticking_alpha_provenance_notice
     assert notice[DIMER_ALPHA_FROM_MONOMER_PROXY]["K2"] == "K"
+    assert notice[DIMER_COLLISION_DIAMETER_FROM_MONOMER_PROXY]["K2"] == (
+        DIMER_COLLISION_DIAMETER_PROXY_REASON
+    )
     assert notice["authoritative_for_deposit_mass"] is False
     assert route.wall_deposit_by_species.get("K", 0.0) > 0.0
     staged = sum(
@@ -1530,12 +1550,73 @@ def test_monomer_only_potassium_on_a_40c_wall_flags_the_proxy():
     assert staged == pytest.approx(0.0, abs=0.0)
 
 
+def _species_capture(route, species):
+    return {
+        "stages": {
+            stage_key: by_species.get(species, 0.0)
+            for stage_key, by_species in route.condensed_by_stage_species.items()
+        },
+        "wall": route.wall_deposit_by_species.get(species, 0.0),
+        "remaining": route.remaining_by_species[species],
+    }
+
+
+@pytest.mark.parametrize("species", ("K", "Na", "Mg"))
+def test_infinite_kp_matches_the_shared_series_solver(monkeypatch, species):
+    """K_p -> +inf is a test probe, not a production knob.
+
+    The dimer channel is off, so capture is the series-resistance
+    linear solver. A species with no element pair uses that same
+    function, which is the green path. The two routes share the code,
+    so the masses match bit for bit. The 1e-12 relative allowance
+    would apply only if the arithmetic order had to differ. It does
+    not, on these default routes.
+    """
+
+    dimer = f"{species}2"
+
+    def kp_inf(name, temperature_K, vapor_pressure_data=None):
+        if name == dimer:
+            return math.inf
+        return dimer_dissociation_kp_pa(
+            name, temperature_K, vapor_pressure_data,
+        )
+
+    monkeypatch.setattr(
+        "simulator.condensation.dimer_dissociation_kp_pa", kp_inf,
+    )
+    inf_route = _route({species: 1.0}, partials={species: 1.0})
+    notice = inf_route.sticking_alpha_provenance_notice
+    assert DIMER_ALPHA_FROM_MONOMER_PROXY not in notice
+    assert DIMER_COLLISION_DIAMETER_FROM_MONOMER_PROXY not in notice
+
+    def no_pair(name):
+        if name in (species, dimer):
+            return None
+        return element_collection_pair(name)
+
+    monkeypatch.setattr(
+        "simulator.condensation.element_collection_pair", no_pair,
+    )
+    monkeypatch.setattr(
+        "simulator.condensation_routing.element_collection_pair", no_pair,
+    )
+    plain_route = _route({species: 1.0}, partials={species: 1.0})
+    assert _species_capture(inf_route, species) == _species_capture(
+        plain_route, species,
+    )
+
+
 def test_hot_wall_with_zero_collector_does_not_invent_the_proxy():
     """1500 C is undersaturated for 10 Pa of K, so the dimer channel stays off."""
 
     route = _proxy_route("K", "K2", "monomer", "wall_only", wall_c=1500.0)
     assert route.wall_deposit_by_species.get("K", 0.0) == pytest.approx(0.0, abs=0.0)
     assert DIMER_ALPHA_FROM_MONOMER_PROXY not in route.sticking_alpha_provenance_notice
+    assert (
+        DIMER_COLLISION_DIAMETER_FROM_MONOMER_PROXY
+        not in route.sticking_alpha_provenance_notice
+    )
 
 
 @pytest.mark.parametrize(
@@ -1548,6 +1629,9 @@ def test_uncontracted_species_do_not_publish_a_dimer_alpha_proxy(species):
     proxy = notice.get(DIMER_ALPHA_FROM_MONOMER_PROXY, {})
     assert species not in proxy
     assert f"{species}2" not in proxy
+    diameters = notice.get(DIMER_COLLISION_DIAMETER_FROM_MONOMER_PROXY, {})
+    assert species not in diameters
+    assert f"{species}2" not in diameters
 
 
 @pytest.mark.parametrize(

@@ -129,6 +129,15 @@ METAL_DIMER_SPECIES: frozenset[str] = frozenset({
     'Na2',
 })
 DIMER_ALPHA_FROM_MONOMER_PROXY = 'dimer_alpha_from_monomer_proxy'
+# No cited Lennard-Jones sigma for K2, Na2, or Mg2. Chapman-Enskog
+# for the dimer film uses the monomer sigma and epsilon/k with mass 2m.
+DIMER_COLLISION_DIAMETER_FROM_MONOMER_PROXY = (
+    'dimer_collision_diameter_from_monomer_proxy'
+)
+DIMER_COLLISION_DIAMETER_PROXY_REASON = (
+    'no cited Lennard-Jones collision diameter for M2; '
+    'Chapman-Enskog uses the monomer sigma and epsilon/k with mass 2m'
+)
 # d-378 amendment 1. No dissociation constant: compare the element
 # partial with P_sat,M and say so. This is an upper bound on capture,
 # not a measured equilibrium partial.
@@ -353,7 +362,8 @@ def _element_drawdown_rate_pa_s(
         J_M2 = k_M2 * max(p_M2 - P_sat,M^2 / K_p, 0)
         dp_elem/dt = -(J_M + 2 J_M2)
 
-    k_M and k_M2 already include the accommodation coefficient, the
+    k_M and k_M2 already include accommodation, the series conductance
+    (1/(alpha k_HK) + R_gas(Kn) + R_melt, with R_melt = 0), the
     ideal-gas scale q = RT/V, and the strip area. Amendment 1
     re-speciates the gas as p_elem falls, so p_M2 = p_M^2 / K_p and
     the dimer overpressure is
@@ -403,8 +413,11 @@ def _strips_are_linear(
     """True when dp/dt = -sum k_i max(p - P_sat,i, 0).
 
     Fully dissociated strips (K_p -> inf) have p_M = p_elem and no dimer
-    channel, so the drive is linear in the element partial. A finite K_p
-    makes p_M nonlinear in p_elem even if the dimer coefficient is zero.
+    channel, so the drive is linear in the element partial. Series
+    conductance at one temperature, one total pressure, and one length
+    does not depend on p, so that linear closed form is exact. A finite
+    K_p makes p_M nonlinear in p_elem even if the dimer coefficient is
+    zero, and that strip stays on the adaptive solve.
     """
 
     if not strips:

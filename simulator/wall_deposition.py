@@ -202,31 +202,42 @@ def _element_wall_capture_kg_hr(
     gas_temperature_K: float,
     vapor_pressure_data: Mapping[str, Any] | None,
     proxy_notice: MutableMapping[str, str] | None = None,
+    pipe_diameter_m: float | None = None,
+    stir_factor: float = 1.0,
+    radial_stir_factor: float | None = None,
+    regime_factor: float = 0.0,
+    overhead_pressure_pa: float | None = None,
+    carrier_gas: str = "N2",
+    diameter_proxy: MutableMapping[str, str] | None = None,
 ) -> float:
     """kg/hr of this gas species removed by the element drawdown.
 
-    d-378 amendment 2. The series-resistance call is only the saturation
+    d-378 amendment 2. The series-resistance call is the saturation
     gate (p_M against P_sat,M). The mass is not that flux and it is not
-    min(supply, flux * area). Each species deposits by its own
-    Hertz-Knudsen drive, and the conserved element is integrated:
+    min(supply, flux * area). Each form diffuses through its own series
+    conductance, and the conserved element is integrated:
 
-        J_M = alpha (p_M - P_sat,M) / sqrt(2 pi m_M k T)
-        J_M2 = alpha (p_M2 - P_sat,M^2 / K_p) / sqrt(2 pi m_M2 k T)
+        G_M = A / (1/(alpha_M k_HK,M) + R_gas,M(Kn) + R_melt)
+        G_M2 = A / (1/(alpha_M2 k_HK,M2) + R_gas,M2(Kn))
+        J_M = (G_M / A) (p_M - P_sat,M)
+        J_M2 = (G_M2 / A) (p_M2 - P_sat,M^2 / K_p)
 
     with p_M2 = p_M^2 / K_p and p_M from re-speciation of p_elem.
-    N = n_dot * τ and q = p / N, so k τ = (p / n_dot) * A * alpha * J(1 Pa).
-    One second with that k τ is the same ODE as residence τ. A large area
-    reaches p_elem,sat and stops. Worked check: p_elem = 6 Pa, K_p = 1 Pa
-    gives p_M = 1.5 Pa and p_M2 = 2.25 Pa. At P_sat = 1 Pa, p_M = p_M2 = 1,
-    p_elem,sat = 3 Pa, and the removable fraction is 1/2.
+    R_melt is 0. N = n_dot * τ and q = p / N, so
+    k τ = (p / n_dot) * A * (G/A). One second with that k τ is the
+    same ODE as residence τ. A large area reaches p_elem,sat and stops.
+    Worked check: p_elem = 6 Pa, K_p = 1 Pa gives p_M = 1.5 Pa and
+    p_M2 = 2.25 Pa. At P_sat = 1 Pa, p_M = p_M2 = 1, p_elem,sat = 3 Pa,
+    and the removable fraction is 1/2.
 
     No K_p: the flagged upper bound integrates p_elem toward P_sat with
-    the series-resistance conductance. It does not invent a dimer drive.
+    the arriving species' series-resistance conductance. It does not
+    invent a dimer drive. K_p -> inf does not call this function.
     """
 
     from simulator.condensation import (
         AVOGADRO_MOL,
-        _hkl_impingement_flux_mol_m2_s,
+        _element_series_coefficients_mol_m2_s_pa,
         _molecular_mass_kg_per_molecule,
     )
     from simulator.condensation_routing import (
@@ -266,30 +277,40 @@ def _element_wall_capture_kg_hr(
             strips=((k_tau, 0.0, saturation_pa, math.inf),),
         )
     else:
-        scale = (p_species_pa / n_dot) * surface_area_m2 * alpha_s
-        hk_monomer = _hkl_impingement_flux_mol_m2_s(
-            monomer, 1.0, gas_temperature_K,
-            vapor_pressure_data=vapor_pressure_data,
-        )
-        hk_dimer = _hkl_impingement_flux_mol_m2_s(
-            dimer, 1.0, gas_temperature_K,
-            vapor_pressure_data=vapor_pressure_data,
-        )
+        if pipe_diameter_m is None or pipe_diameter_m <= 0.0:
+            raise ValueError(
+                "dimer series wall channel requires the gas-side length"
+            )
         # Same chokepoint as the stage band. A monomer-only feed still
         # re-speciates M2 and deposits it with the monomer alpha, so the
         # proxy notice is recorded here rather than only when the arriving
         # gas species is the dimer.
         if not isinstance(proxy_notice, MutableMapping):
             raise ValueError(
-                "dimer Hertz-Knudsen wall channel requires the "
+                "dimer series wall channel requires the "
                 "monomer-alpha proxy notice"
             )
+        k_monomer, k_dimer = _element_series_coefficients_mol_m2_s_pa(
+            monomer=monomer,
+            dimer=dimer,
+            alpha_s=alpha_s,
+            pipe_diameter_m=pipe_diameter_m,
+            stir_factor=stir_factor,
+            radial_stir_factor=radial_stir_factor,
+            regime_factor=regime_factor,
+            T_gas_K=gas_temperature_K,
+            overhead_pressure_pa=overhead_pressure_pa,
+            carrier_gas=carrier_gas,
+            vapor_pressure_data=vapor_pressure_data,
+            diameter_proxy=diameter_proxy,
+        )
+        scale = (p_species_pa / n_dot) * surface_area_m2
         final = draw_element_partial_pa(
             element_partial_initial_pa=p_elem_pa,
             residence_s=1.0,
             strips=((
-                scale * hk_monomer,
-                scale * hk_dimer,
+                scale * k_monomer,
+                scale * k_dimer,
                 saturation_pa,
                 float(kp_pa),
             ),),
@@ -659,13 +680,21 @@ def wall_deposit_candidate_for_surface_kg(
         formula_registry=getattr(model, "species_formula_registry", None),
     )
     # The series-resistance flux is the saturation gate. For a contracted
-    # element the captured mass is the parallel Hertz-Knudsen drawdown of
-    # p_elem, stopped on this surface's own p_elem,sat. It is not
-    # min(supply, flux * area): a large area removes half of p_elem = 6 Pa
-    # when K_p = P_sat = 1 Pa, not the whole supply.
+    # element with a finite K_p the captured mass is the parallel series
+    # drawdown of p_elem, stopped on this surface's own p_elem,sat. It is
+    # not min(supply, flux * area): a large area removes half of
+    # p_elem = 6 Pa when K_p = P_sat = 1 Pa, not the whole supply.
+    # K_p -> inf leaves this budget in place. That is the green wall.
     captured_kg_hr = min(rate_kg_hr, budget_kg_hr)
+    kp_value = None if element_capture is None else element_capture["kp"]
+    finite_dimer_channel = (
+        kp_value is not None
+        and math.isfinite(float(kp_value))
+        and float(kp_value) > 0.0
+    )
+    missing_kp_upper_bound = element_capture is not None and kp_value is None
     if (
-        element_capture is not None
+        (finite_dimer_channel or missing_kp_upper_bound)
         and gas_temperature_K is not None
         and P_local_pa is not None
         and P_compare_pa is not None
@@ -679,6 +708,10 @@ def wall_deposit_candidate_for_surface_kg(
         if not isinstance(proxy_notice, dict):
             proxy_notice = {}
             model._dimer_hk_alpha_proxy = proxy_notice
+        diameter_proxy = getattr(model, "_dimer_collision_diameter_proxy", None)
+        if not isinstance(diameter_proxy, dict):
+            diameter_proxy = {}
+            model._dimer_collision_diameter_proxy = diameter_proxy
         captured_kg_hr = _element_wall_capture_kg_hr(
             species=species,
             rate_kg_hr=rate_kg_hr,
@@ -688,13 +721,20 @@ def wall_deposit_candidate_for_surface_kg(
             p_elem_pa=float(element_capture["p_elem"]),
             p_compare_pa=float(P_compare_pa),
             saturation_pa=float(wall_saturation_pressure_pa),
-            kp_pa=element_capture["kp"],
+            kp_pa=kp_value,
             monomer=str(element_capture["monomer"]),
             dimer=str(element_capture["dimer"]),
             flux_mol_m2_s=float(flux),
             gas_temperature_K=float(gas_temperature_K),
             vapor_pressure_data=vapor_pressure_data,
             proxy_notice=proxy_notice,
+            pipe_diameter_m=applied_pipe_diameter_m,
+            stir_factor=model.stir_factor,
+            radial_stir_factor=model.radial_stir_factor,
+            regime_factor=applied_regime_factor,
+            overhead_pressure_pa=overhead_pressure_pa,
+            carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
+            diameter_proxy=diameter_proxy,
         )
     carrier_gas = str(getattr(model, "carrier_gas", "N2") or "N2")
     knudsen_number = None if "zero_reason" in rate_diagnostic else _knudsen_number(
