@@ -1370,6 +1370,12 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
                     "no fixed-T/fO2/composition ferric output without "
                     "phase-equilibrium execution"
                 )
+        elif engine == "catalog_evaluator":
+            # Gate 9's catalog evaluator answers vapour pressures only.
+            # Fe3+/Fe2+ stays a quantity refusal, not a ferric-split refusal.
+            assert residual.numeric is None
+            assert residual.refusal is not None
+            assert residual.refusal.reason is RefusalReason.UNSUPPORTED
         else:
             assert residual.numeric is None
             assert residual.refusal is not None
@@ -1729,7 +1735,7 @@ def test_engines_without_a_ferric_split_do_not_equilibrate(monkeypatch):
         "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
         _boom,
     )
-    for engine in (Engine.MAGEMIN, Engine.VAPOROCK):
+    for engine in (Engine.MAGEMIN, Engine.VAPOROCK, Engine.NASA_CEA_9):
         prediction = predict_with_engine(engine, row4)
         assert prediction.value is None
         assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
