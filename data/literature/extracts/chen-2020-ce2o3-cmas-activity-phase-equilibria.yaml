@@ -16,9 +16,9 @@ extraction:
   date: '2026-11-10'
   worker: w1110xchen
   note: Table 1 initial cerium is printed as CeO2 while measured phase cerium is Ce2O3; these labels are preserved.
-    Table 2 activity is retained as printed and scaled by its printed ×10^-7 multiplier. The absolute activity standard-state
-    calibration is not reproduced; standard_state remains unknown. No activity coefficient is inferred. Table 2
-    sample numbers 101–117 are distinct from Table 1 sample numbers.
+    Table 2 activity is retained as printed and scaled by its printed ×10^-7 multiplier. The paper adopts the Zhao
+    et al. (2019) activity calibration; its standard is represented as pure crystalline Ce2O3. No activity coefficient
+    is inferred. Table 2 sample numbers 101–117 are distinct from Table 1 sample numbers.
 review_status: draft
 fidelity_samples:
 - species: CaO
@@ -27549,11 +27549,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -27647,11 +27654,25 @@ species:
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
-        activity: 2.3999999999999997e-08
-        activity_as_printed: '0.24'
+        activity: 2.4e-08
+        activity_as_published: '0.24'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '22.5'
+          SiO2: '57.5'
+          Al2O3: '5'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 101
         Ce_in_Sn_ppm_as_printed: '3.72'
         lg_L_Ce_as_printed: '4.36'
         composition_as_printed_mass_percent:
@@ -27674,11 +27695,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -27773,10 +27801,24 @@ species:
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 4.2e-08
-        activity_as_printed: '0.42'
+        activity_as_published: '0.42'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '27.5'
+          SiO2: '52.5'
+          Al2O3: '5'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 102
         Ce_in_Sn_ppm_as_printed: '4.94'
         lg_L_Ce_as_printed: '4.24'
         composition_as_printed_mass_percent:
@@ -27799,11 +27841,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -27898,10 +27947,24 @@ species:
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 1.1e-07
-        activity_as_printed: '1.1'
+        activity_as_published: '1.1'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '32.5'
+          SiO2: '47.5'
+          Al2O3: '5'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 103
         Ce_in_Sn_ppm_as_printed: '7.97'
         lg_L_Ce_as_printed: '4.03'
         composition_as_printed_mass_percent:
@@ -27924,11 +27987,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28023,10 +28093,24 @@ species:
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 1.8e-08
-        activity_as_printed: '0.18'
+        activity_as_published: '0.18'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '10'
+          SiO2: '60'
+          Al2O3: '15'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 104
         Ce_in_Sn_ppm_as_printed: '3.21'
         lg_L_Ce_as_printed: '4.42'
         composition_as_printed_mass_percent:
@@ -28049,11 +28133,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28147,11 +28238,25 @@ species:
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
-        activity: 2.8000000000000003e-08
-        activity_as_printed: '0.28'
+        activity: 2.8e-08
+        activity_as_published: '0.28'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '15'
+          SiO2: '55'
+          Al2O3: '15'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 105
         Ce_in_Sn_ppm_as_printed: '4'
         lg_L_Ce_as_printed: '4.33'
         composition_as_printed_mass_percent:
@@ -28174,11 +28279,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28273,10 +28385,24 @@ species:
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 7.8e-08
-        activity_as_printed: '0.78'
+        activity_as_published: '0.78'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '20'
+          SiO2: '50'
+          Al2O3: '15'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 106
         Ce_in_Sn_ppm_as_printed: '6.7'
         lg_L_Ce_as_printed: '4.11'
         composition_as_printed_mass_percent:
@@ -28299,11 +28425,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28397,11 +28530,25 @@ species:
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
-        activity: 1.1699999999999999e-07
-        activity_as_printed: '1.17'
+        activity: 1.17e-07
+        activity_as_published: '1.17'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '25'
+          SiO2: '45'
+          Al2O3: '15'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 107
         Ce_in_Sn_ppm_as_printed: '8.2'
         lg_L_Ce_as_printed: '4.02'
         composition_as_printed_mass_percent:
@@ -28424,11 +28571,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28523,10 +28677,24 @@ species:
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 2.1e-07
-        activity_as_printed: '2.1'
+        activity_as_published: '2.1'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '27.5'
+          SiO2: '42.5'
+          Al2O3: '15'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 108
         Ce_in_Sn_ppm_as_printed: '11'
         lg_L_Ce_as_printed: '3.89'
         composition_as_printed_mass_percent:
@@ -28549,11 +28717,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28648,10 +28823,24 @@ species:
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 1.7e-08
-        activity_as_printed: '0.17'
+        activity_as_published: '0.17'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '5'
+          SiO2: '57.5'
+          Al2O3: '22.5'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 109
         Ce_in_Sn_ppm_as_printed: '3.1'
         lg_L_Ce_as_printed: '4.44'
         composition_as_printed_mass_percent:
@@ -28674,11 +28863,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28772,11 +28968,25 @@ species:
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
-        activity: 9.599999999999999e-08
-        activity_as_printed: '0.96'
+        activity: 9.6e-08
+        activity_as_published: '0.96'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '15'
+          SiO2: '47.5'
+          Al2O3: '22.5'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 110
         Ce_in_Sn_ppm_as_printed: '7.45'
         lg_L_Ce_as_printed: '4.06'
         composition_as_printed_mass_percent:
@@ -28799,11 +29009,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28898,10 +29115,24 @@ species:
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 2.12e-07
-        activity_as_printed: '2.12'
+        activity_as_published: '2.12'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '25'
+          SiO2: '37.5'
+          Al2O3: '22.5'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 111
         Ce_in_Sn_ppm_as_printed: '11.06'
         lg_L_Ce_as_printed: '3.89'
         composition_as_printed_mass_percent:
@@ -28924,11 +29155,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29022,11 +29260,25 @@ species:
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
-        activity: 1.6749999999999998e-06
-        activity_as_printed: '16.75'
+        activity: 1.675e-06
+        activity_as_published: '16.75'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '32.5'
+          SiO2: '30'
+          Al2O3: '22.5'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 112
         Ce_in_Sn_ppm_as_printed: '31.08'
         lg_L_Ce_as_printed: '3.44'
         composition_as_printed_mass_percent:
@@ -29049,11 +29301,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29148,10 +29407,24 @@ species:
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 6.8e-08
-        activity_as_printed: '0.68'
+        activity_as_published: '0.68'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '5'
+          SiO2: '50'
+          Al2O3: '30'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 113
         Ce_in_Sn_ppm_as_printed: '6.28'
         lg_L_Ce_as_printed: '4.13'
         composition_as_printed_mass_percent:
@@ -29174,11 +29447,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29272,11 +29552,25 @@ species:
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
-        activity: 1.4099999999999998e-07
-        activity_as_printed: '1.41'
+        activity: 1.41e-07
+        activity_as_published: '1.41'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '12.5'
+          SiO2: '42.5'
+          Al2O3: '30'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 114
         Ce_in_Sn_ppm_as_printed: '9.02'
         lg_L_Ce_as_printed: '3.98'
         composition_as_printed_mass_percent:
@@ -29299,11 +29593,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29397,11 +29698,25 @@ species:
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
-        activity: 6.879999999999999e-07
-        activity_as_printed: '6.88'
+        activity: 6.88e-07
+        activity_as_published: '6.88'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '20'
+          SiO2: '35'
+          Al2O3: '30'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 115
         Ce_in_Sn_ppm_as_printed: '19.92'
         lg_L_Ce_as_printed: '3.63'
         composition_as_printed_mass_percent:
@@ -29424,11 +29739,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29523,10 +29845,24 @@ species:
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 2.728e-06
-        activity_as_printed: '27.28'
+        activity_as_published: '27.28'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '27.5'
+          SiO2: '27.5'
+          Al2O3: '30'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 116
         Ce_in_Sn_ppm_as_printed: '39.66'
         lg_L_Ce_as_printed: '3.33'
         composition_as_printed_mass_percent:
@@ -29549,11 +29885,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29647,11 +29990,25 @@ species:
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
-        activity: 7.599999999999999e-08
-        activity_as_printed: '0.76'
+        activity: 7.6e-08
+        activity_as_published: '0.76'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '7.5'
+          SiO2: '42.5'
+          Al2O3: '35'
+          MgO: '5'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: sample 117
         Ce_in_Sn_ppm_as_printed: '6.63'
         lg_L_Ce_as_printed: '4.11'
         composition_as_printed_mass_percent:
@@ -29674,11 +30031,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29773,10 +30137,24 @@ species:
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 2.81e-07
-        activity_as_printed: '2.81'
+        activity_as_published: '2.81'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '35'
+          SiO2: '55'
+          Al2O3: '0'
+          MgO: '0'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: starred comparison row 1 (*)
         Ce_in_Sn_ppm_as_printed: '12.71'
         composition_as_printed_mass_percent:
           CaO: '35'
@@ -29798,11 +30176,18 @@ species:
       units: dimensionless activity
       standard_state:
         state:
-          tag: unknown
-          reason: The paper adopts the Zhao et al. (2019) calibration, but does not reproduce its complete activity
-            standard-state and Ce-in-Sn interaction calibration.
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Ce2O3
+              phase:
+                tag: value
+                value: cr
+            component_basis: Ce2O3
         inferred: false
-        note: Printed activity retained; no standard state inferred.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
+          crystalline Ce2O3.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29897,10 +30282,24 @@ species:
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 3.64e-07
-        activity_as_printed: '3.64'
+        activity_as_published: '3.64'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
+        composition_wt_pct:
+          CaO: '38'
+          SiO2: '52'
+          Al2O3: '0'
+          MgO: '0'
+          Ce2O3: '10'
+        oxygen_partial_pressure:
+          value: '4.76e-16'
+          units: atm
+          locator:
+            published_page: 1607
+            pdf_page_index: 5
+            table: '2'
+            row: starred comparison row 2 (*)
         Ce_in_Sn_ppm_as_printed: '14.47'
         composition_as_printed_mass_percent:
           CaO: '38'
