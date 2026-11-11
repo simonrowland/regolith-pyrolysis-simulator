@@ -4816,13 +4816,21 @@ def _open_resolved_backend(
             )
         return backend
     if name == "alphamelts":
+        from simulator.config import resolve_alphamelts_subprocess_settings
+
+        subprocess_settings = resolve_alphamelts_subprocess_settings(
+            settings.get("raw_model_name"),
+            settings.get("effective_calc_mode"),
+        )
         backend_config = {
             "mode": settings.get("transport"),
             "model": settings.get("raw_model_name"),
             "effective_calc_mode": settings["effective_calc_mode"],
-            "model_calc_mode": settings["model_calc_mode"],
-            "calc_mode_conflict": settings["calc_mode_conflict"],
-            "subprocess_model_error": settings["subprocess_model_error"],
+            "model_calc_mode": subprocess_settings["model_calc_mode"],
+            "calc_mode_conflict": subprocess_settings["calc_mode_conflict"],
+            "subprocess_model_error": subprocess_settings[
+                "subprocess_model_error"
+            ],
             "fO2_buffer": settings.get("redox_buffer"),
             "fO2_offset": settings.get("fO2_offset"),
             "Fe3Fet_Liq": settings.get("Fe3Fet_ratio"),

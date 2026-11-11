@@ -183,12 +183,7 @@ def normalize_engine_settings(
         )
         return {
             "transport": fields.get("transport"),
-            "model_calc_mode": subprocess_settings["model_calc_mode"],
             "effective_calc_mode": subprocess_settings["effective_calc_mode"],
-            "calc_mode_conflict": subprocess_settings["calc_mode_conflict"],
-            "subprocess_model_error": subprocess_settings[
-                "subprocess_model_error"
-            ],
             "raw_model_name": subprocess_settings["model"],
             "redox_buffer": fields.get("redox_buffer"),
             "fO2_offset": fields.get("fO2_offset"),
