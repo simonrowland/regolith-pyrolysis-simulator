@@ -254,10 +254,8 @@ def test_unprinted_pressure_guard_uses_source_provenance() -> None:
     assert parsed_unlocated.inference is None
     assert _without_unprinted_total_pressure(
         {"total_pressure_Pa": parsed_unlocated}
-    ) == {"total_pressure_Pa": parsed_unlocated}
-    assert _without_unprinted_total_pressure({"total_pressure_Pa": unlocated}) == {
-        "total_pressure_Pa": unlocated
-    }
+    ) is None
+    assert _without_unprinted_total_pressure({"total_pressure_Pa": unlocated}) is None
 
 
 def test_pressure_locator_note_negation_is_not_an_inference() -> None:
