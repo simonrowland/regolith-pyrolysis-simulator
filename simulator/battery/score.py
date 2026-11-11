@@ -3947,6 +3947,90 @@ def _source_relation_from_lineages(
     return SourceRelation.INDEPENDENT
 
 
+class _ScoringLineageResolver:
+    """Reuse resolved ancestry and relations within one scoring run."""
+
+    def __init__(self, context: ScoreContext) -> None:
+        self.context = context
+        self.table_ids = _table_ids(context.works)
+        self.asset_ids = _asset_ids(context.works)
+        self._candidate_lineages: dict[
+            tuple[str, ...], tuple[bool, Ancestry | None]
+        ] = {}
+        self._reference_lineages: dict[str, Ancestry] = {}
+        self._source_relations: dict[
+            tuple[tuple[str, ...], tuple[str, ...]], SourceRelation
+        ] = {}
+
+    def _candidate_lineage(
+        self, sources: Sequence[str]
+    ) -> tuple[bool, Ancestry | None]:
+        source_key = tuple(sources)
+        cached = self._candidate_lineages.get(source_key)
+        if cached is not None:
+            return cached
+
+        lineage_sources = coefficient_lineage_sources(source_key)
+        complete = bool(lineage_sources) and not any(
+            source in _ENGINE_SOURCE_ALIASES
+            and source not in COEFFICIENT_SOURCE_STORE_IDS
+            for source in lineage_sources
+        )
+        candidate_lineage = None
+        if complete:
+            candidate_lineage = _resolve_coefficient_sources(
+                expand_coefficient_sources(lineage_sources),
+                self.context.observations,
+                self.context.works,
+                self.context.experiments,
+            )
+            complete = candidate_lineage.complete
+        result = (complete, candidate_lineage)
+        self._candidate_lineages[source_key] = result
+        return result
+
+    def lineage_complete_for(self, sources: Sequence[str]) -> bool:
+        return self._candidate_lineage(sources)[0]
+
+    def for_reference(
+        self, reference: Observation, sources: Sequence[str]
+    ) -> tuple[bool, SourceRelation]:
+        complete, candidate_lineage = self._candidate_lineage(sources)
+        if not complete or candidate_lineage is None:
+            return complete, SourceRelation.UNKNOWN
+
+        reference_lineage = self._reference_lineages.get(
+            reference.observation_id
+        )
+        if reference_lineage is None:
+            reference_lineage = _observation_lineage(
+                reference.observation_id,
+                self.context.observations,
+                self.table_ids,
+                asset_ids=self.asset_ids,
+            )
+            self._reference_lineages[reference.observation_id] = reference_lineage
+
+        if (
+            not reference_lineage.complete
+            or reference_lineage.ids is None
+            or candidate_lineage.ids is None
+        ):
+            return complete, SourceRelation.UNKNOWN
+
+        relation_key = (
+            tuple(sorted(reference_lineage.ids)),
+            tuple(sorted(candidate_lineage.ids)),
+        )
+        relation = self._source_relations.get(relation_key)
+        if relation is None:
+            relation = _source_relation_from_lineages(
+                reference_lineage, candidate_lineage
+            )
+            self._source_relations[relation_key] = relation
+        return complete, relation
+
+
 KC91_CALIBRATION_SOURCES = {
     "citation": "Kress & Carmichael (1991); Partzsch et al. (2004), p. 566",
     "attributions": (
@@ -12583,7 +12667,7 @@ def _compile_residual_with_lineage(
     ratchet_missing: bool = False,
     point_observations: Sequence[Observation] | None = None,
     fo2_mode: Fo2Mode | None = None,
-    _static_lineage_complete: bool | None = None,
+    _source_relation_resolver: _ScoringLineageResolver | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     precomputed_prediction = prediction is not None
@@ -12597,7 +12681,6 @@ def _compile_residual_with_lineage(
     # conversion is a melt comparison, and this row is not one.
     if sample_phase_detail is None:
         reference = fusion_comparison_reference(reference, engine=engine)
-    lineage_reference_unchanged = reference is source_reference
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     formula = (
@@ -13175,24 +13258,18 @@ def _compile_residual_with_lineage(
             notices,
             (_pressure_independent_comparison_notice(quantity, prediction),),
         )
-    expanded_sources = expand_coefficient_sources(prediction.coefficient_sources)
-    if (
-        _static_lineage_complete is not None
-        and tuple(prediction.coefficient_sources)
-        == ENGINE_COEFFICIENT_SOURCES[engine]
-        and lineage_reference_unchanged
-        and implied_alpha_reference is None
-        and prediction.refusal_reason is RefusalReason.UNSUPPORTED
-        and prediction.refusal_detail.get("reason") == "quantity_not_predicted"
-    ):
-        lineage_complete = _static_lineage_complete
-    else:
-        lineage_complete = lineage_complete_for(
-            prediction.coefficient_sources,
+    prediction_sources = tuple(prediction.coefficient_sources)
+    expanded_sources = expand_coefficient_sources(prediction_sources)
+    lineage_complete = (
+        lineage_complete_for(
+            prediction_sources,
             works=context.works,
             observations=context.observations,
             experiments=context.experiments,
         )
+        if _source_relation_resolver is None
+        else _source_relation_resolver.lineage_complete_for(prediction_sources)
+    )
     prediction = replace(
         prediction,
         coefficient_sources=expanded_sources,
@@ -13219,14 +13296,19 @@ def _compile_residual_with_lineage(
     relation_reference = reference
     if lineage_observation_id and lineage_observation_id != reference.observation_id:
         relation_reference = replace(reference, observation_id=lineage_observation_id)
-    source_relation = resolve_source_relation(
-        relation_reference,
-        prediction.coefficient_sources,
-        prediction.lineage_complete,
-        works=context.works,
-        observations=context.observations,
-        experiments=context.experiments,
-    )
+    if _source_relation_resolver is None:
+        source_relation = resolve_source_relation(
+            relation_reference,
+            prediction.coefficient_sources,
+            prediction.lineage_complete,
+            works=context.works,
+            observations=context.observations,
+            experiments=context.experiments,
+        )
+    else:
+        _complete, source_relation = _source_relation_resolver.for_reference(
+            relation_reference, prediction_sources
+        )
     if (
         rail is Rail.REDOX
         and engine is Engine.INTERNAL_ANALYTICAL
@@ -14240,15 +14322,7 @@ def _score_store_with_decisions(
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
         observations.values()
     )
-    engine_lineage_completeness = {
-        engine: lineage_complete_for(
-            ENGINE_COEFFICIENT_SOURCES[engine],
-            works=context.works,
-            observations=observations,
-            experiments=context.experiments,
-        )
-        for engine in engine_set
-    }
+    lineage_resolver = _ScoringLineageResolver(live_context)
     empirical_ids = comparison_ids
     started = time.monotonic()
     last_progress = started
@@ -14402,19 +14476,6 @@ def _score_store_with_decisions(
                             prediction = _knudsen_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
                             )
-                        static_lineage_complete = None
-                        if (
-                            predict is None
-                            and not diagnostic_prediction
-                            and prediction is None
-                            and _engine_quantity_not_predicted_detail(
-                                engine, point.identity
-                            )
-                            is not None
-                        ):
-                            static_lineage_complete = engine_lineage_completeness[
-                                engine
-                            ]
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(
                             engine, point
                         )
@@ -14439,7 +14500,7 @@ def _score_store_with_decisions(
                                 if intrinsic_redox_activity
                                 else None
                             ),
-                            _static_lineage_complete=static_lineage_complete,
+                            _source_relation_resolver=lineage_resolver,
                         )
                         if _stream is None:
                             assert residuals is not None
