@@ -9824,6 +9824,7 @@ def _catalog_psat_block_reason(row: _CatalogScoreRow) -> str | None:
     total = observable is PressureObservable.TOTAL_MIXTURE_PRESSURE
     if not pure and not total:
         return "catalog_observable_not_saturation"
+    # b-189-exempt: PSat eligibility checks declared activity and O2 channels.
     evaluator = species.evaluator
     if evaluator is None:
         return None
@@ -9842,6 +9843,7 @@ def _catalog_reference_block_reason(row: _CatalogScoreRow) -> str | None:
         return "catalog_observable_not_reference"
     if species.source_reaction_activity is None:
         return "catalog_reference_component_undeclared"
+    # b-189-exempt: Reference eligibility checks the declared activity channel.
     evaluator = species.evaluator
     if evaluator is not None and evaluator.activity_exponent == 0.0:
         return "catalog_pressure_independent_of_endmember_activity"
@@ -9852,6 +9854,7 @@ def _catalog_partial_block_reason(row: _CatalogScoreRow) -> str | None:
     species = row.species
     if not _catalog_partial_observable(species.pressure_observable):
         return "catalog_observable_not_partial"
+    # b-189-exempt: Partial eligibility checks the declared activity channel.
     evaluator = species.evaluator
     if evaluator is not None and evaluator.activity_exponent == 0.0:
         return "catalog_pressure_independent_of_mixture_activity"
@@ -9972,6 +9975,7 @@ def _catalog_evaluated_prediction(
     *,
     source_activity: float | None,
 ) -> EnginePrediction:
+    # b-189-exempt: Evaluation applies declared activity and oxygen channels.
     evaluator = row.species.evaluator
     if evaluator is None:
         return _catalog_refuse(
