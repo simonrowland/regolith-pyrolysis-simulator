@@ -29,6 +29,9 @@ notes:
   and norris_2017_figure3_volatility_factors_neg13. That separate extract is unchanged.
 - The values above 1 for Cr, Ga, V, W, and other cells are retained exactly as printed; the thesis discusses these
   as within-error constancy or contamination rather than physical negative loss.
+- FM is element retention X_final/X_initial; no battery quantity for per-element retention exists yet (separate schema task).
+- Table 5.7 run preparation prints 3 g charge mass and a 1 cm diameter pressed pellet; pellet thickness is not stated.
+- The furnace used a CO–CO2 mixture and 300 mL/min total flow, but this thesis does not give the per-run gas ratio or component flows; fO2-control ratios are referred to Deines et al. (1976).
 benches:
 - id: stirred-gas-mixing-furnace
   identity:
@@ -52,6 +55,22 @@ benches:
       published_page: 194
       table: '5.4'
       note: Wetted material listed as nickel
+  other_facts:
+  - name: crucible_height_mm
+    value:
+      state: {tag: value, value: {kind: point, point: '20'}}
+      locator: {page: 203, pdf_page_index: 202, published_page: 173, section: 5.2.5 Crucible, note: Printed 20 mm.}
+    unit: mm
+  - name: crucible_outside_diameter_mm
+    value:
+      state: {tag: value, value: {kind: point, point: '19'}}
+      locator: {page: 203, pdf_page_index: 202, published_page: 173, section: 5.2.5 Crucible, note: Printed 19 mm outside diameter; internal diameter not inferred.}
+    unit: mm
+  - name: crucible_wall_thickness_mm
+    value:
+      state: {tag: value, value: {kind: point, point: '1'}}
+      locator: {page: 203, pdf_page_index: 202, published_page: 173, section: 5.2.5 Crucible, note: Printed 1 mm.}
+    unit: mm
 experiments:
 - experiment_id: volatile-loss-logfo2-neg7
   bench_id: stirred-gas-mixing-furnace
@@ -64,6 +83,27 @@ experiments:
     row: F008
   sample:
     name: EBT1
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.003'
+      locator:
+        page: 221
+        pdf_page_index: 220
+        published_page: 191
+        section: 5.4.2 Experiment Preparation
+        note: Printed 3 g charge; converted to 0.003 kg.
+    form:
+      state:
+        tag: value
+        value: 3 g EBT1 pressed into a 1 cm diameter pellet; pellet thickness not stated
+      locator:
+        page: 221
+        pdf_page_index: 220
+        published_page: 191
+        section: 5.4.2 Experiment Preparation
     composition_role: initial_charge_only
     printed_composition:
       state:
@@ -85,6 +125,18 @@ experiments:
         table: '5.2'
         row: EBT1
   conditions:
+    total_gas_flow_mL_min:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '300'
+      locator:
+        page: 230
+        pdf_page_index: 229
+        published_page: 200
+        section: 5.5.5 Time Series Results
+        note: Printed total CO + CO2 flow; component flows are not stated per run.
     T_C:
       state:
         tag: value
@@ -134,7 +186,7 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
+        reason: CO and CO2 components are identified; this record does not publish their run-specific proportions or individual flows
       locator:
         page: 224
         pdf_page_index: 223
@@ -152,13 +204,12 @@ experiments:
     buffer:
       state:
         tag: unknown
-        reason: CO/CO2 gas mixture; ratio not printed alongside the run record
+        reason: CO-CO2 gas mixture is stated; numerical ratio is referred to Deines et al. (1976) but not reproduced in this thesis
       locator:
-        page: 224
-        pdf_page_index: 223
-        published_page: 194
-        table: '5.4'
-        row: F008
+        page: 222
+        pdf_page_index: 221
+        published_page: 192
+        section: 5.4.4 Oxygen Fugacity
   apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
   crucible_as_printed: nickel
   log_fO2_as_published: '-7'
@@ -173,6 +224,27 @@ experiments:
     row: F014
   sample:
     name: EBT1
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.003'
+      locator:
+        page: 221
+        pdf_page_index: 220
+        published_page: 191
+        section: 5.4.2 Experiment Preparation
+        note: Printed 3 g charge; converted to 0.003 kg.
+    form:
+      state:
+        tag: value
+        value: 3 g EBT1 pressed into a 1 cm diameter pellet; pellet thickness not stated
+      locator:
+        page: 221
+        pdf_page_index: 220
+        published_page: 191
+        section: 5.4.2 Experiment Preparation
     composition_role: initial_charge_only
     printed_composition:
       state:
@@ -185,6 +257,18 @@ experiments:
         table: '5.2'
         row: EBT1
   conditions:
+    total_gas_flow_mL_min:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '300'
+      locator:
+        page: 230
+        pdf_page_index: 229
+        published_page: 200
+        section: 5.5.5 Time Series Results
+        note: Printed total CO + CO2 flow; component flows are not stated per run.
     T_C:
       state:
         tag: value
@@ -234,7 +318,7 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
+        reason: CO and CO2 components are identified; this record does not publish their run-specific proportions or individual flows
       locator:
         page: 224
         pdf_page_index: 223
@@ -252,13 +336,12 @@ experiments:
     buffer:
       state:
         tag: unknown
-        reason: CO/CO2 gas mixture; ratio not printed alongside the run record
+        reason: CO-CO2 gas mixture is stated; numerical ratio is referred to Deines et al. (1976) but not reproduced in this thesis
       locator:
-        page: 224
-        pdf_page_index: 223
-        published_page: 194
-        table: '5.4'
-        row: F014
+        page: 222
+        pdf_page_index: 221
+        published_page: 192
+        section: 5.4.4 Oxygen Fugacity
   apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
   crucible_as_printed: nickel
   log_fO2_as_published: '-9'
@@ -273,6 +356,27 @@ experiments:
     row: F018
   sample:
     name: EBT1
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.003'
+      locator:
+        page: 221
+        pdf_page_index: 220
+        published_page: 191
+        section: 5.4.2 Experiment Preparation
+        note: Printed 3 g charge; converted to 0.003 kg.
+    form:
+      state:
+        tag: value
+        value: 3 g EBT1 pressed into a 1 cm diameter pellet; pellet thickness not stated
+      locator:
+        page: 221
+        pdf_page_index: 220
+        published_page: 191
+        section: 5.4.2 Experiment Preparation
     composition_role: initial_charge_only
     printed_composition:
       state:
@@ -285,6 +389,18 @@ experiments:
         table: '5.2'
         row: EBT1
   conditions:
+    total_gas_flow_mL_min:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '300'
+      locator:
+        page: 230
+        pdf_page_index: 229
+        published_page: 200
+        section: 5.5.5 Time Series Results
+        note: Printed total CO + CO2 flow; component flows are not stated per run.
     T_C:
       state:
         tag: value
@@ -334,7 +450,7 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
+        reason: CO and CO2 components are identified; this record does not publish their run-specific proportions or individual flows
       locator:
         page: 224
         pdf_page_index: 223
@@ -352,13 +468,12 @@ experiments:
     buffer:
       state:
         tag: unknown
-        reason: CO/CO2 gas mixture; ratio not printed alongside the run record
+        reason: CO-CO2 gas mixture is stated; numerical ratio is referred to Deines et al. (1976) but not reproduced in this thesis
       locator:
-        page: 224
-        pdf_page_index: 223
-        published_page: 194
-        table: '5.4'
-        row: F018
+        page: 222
+        pdf_page_index: 221
+        published_page: 192
+        section: 5.4.4 Oxygen Fugacity
   apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
   crucible_as_printed: nickel
   log_fO2_as_published: '-11'
@@ -373,6 +488,27 @@ experiments:
     row: F019
   sample:
     name: EBT1
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.003'
+      locator:
+        page: 221
+        pdf_page_index: 220
+        published_page: 191
+        section: 5.4.2 Experiment Preparation
+        note: Printed 3 g charge; converted to 0.003 kg.
+    form:
+      state:
+        tag: value
+        value: 3 g EBT1 pressed into a 1 cm diameter pellet; pellet thickness not stated
+      locator:
+        page: 221
+        pdf_page_index: 220
+        published_page: 191
+        section: 5.4.2 Experiment Preparation
     composition_role: initial_charge_only
     printed_composition:
       state:
@@ -385,6 +521,18 @@ experiments:
         table: '5.2'
         row: EBT1
   conditions:
+    total_gas_flow_mL_min:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '300'
+      locator:
+        page: 230
+        pdf_page_index: 229
+        published_page: 200
+        section: 5.5.5 Time Series Results
+        note: Printed total CO + CO2 flow; component flows are not stated per run.
     T_C:
       state:
         tag: value
@@ -434,7 +582,7 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: CO/CO2 mixture; the individual component flow rates are not included in the 60 minute run table
+        reason: CO and CO2 components are identified; this record does not publish their run-specific proportions or individual flows
       locator:
         page: 224
         pdf_page_index: 223
@@ -452,13 +600,12 @@ experiments:
     buffer:
       state:
         tag: unknown
-        reason: CO/CO2 gas mixture; ratio not printed alongside the run record
+        reason: CO-CO2 gas mixture is stated; numerical ratio is referred to Deines et al. (1976) but not reproduced in this thesis
       locator:
-        page: 224
-        pdf_page_index: 223
-        published_page: 194
-        table: '5.4'
-        row: F019
+        page: 222
+        pdf_page_index: 221
+        published_page: 192
+        section: 5.4.4 Oxygen Fugacity
   apparatus_as_printed: stirred gas-mixing furnace; nickel-wetted crucible
   crucible_as_printed: nickel
   log_fO2_as_published: '-13'
@@ -467,7 +614,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_ag_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -533,7 +680,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -542,7 +688,18 @@ species:
           locator: *id002
         FM: 0.646
         FM_as_published: '0.646'
-        mass_loss_fraction: 0.646
+        initial_concentration:
+          oxide_as_published: Ag2O
+          value_as_published: '353'
+          units_as_published: µg.g−1
+          sigma_as_published: '11'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Ag2O
+            column: Composition
         sigma_as_published: '0.117'
         sigma: 0.117
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -559,7 +716,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_ag_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -625,7 +782,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -634,7 +790,18 @@ species:
           locator: *id003
         FM: 0.198
         FM_as_published: '0.198'
-        mass_loss_fraction: 0.198
+        initial_concentration:
+          oxide_as_published: Ag2O
+          value_as_published: '353'
+          units_as_published: µg.g−1
+          sigma_as_published: '11'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Ag2O
+            column: Composition
         sigma_as_published: '0.017'
         sigma: 0.017
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -651,7 +818,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_ag_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -717,7 +884,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -726,7 +892,18 @@ species:
           locator: *id004
         FM: 0.127
         FM_as_published: '0.127'
-        mass_loss_fraction: 0.127
+        initial_concentration:
+          oxide_as_published: Ag2O
+          value_as_published: '353'
+          units_as_published: µg.g−1
+          sigma_as_published: '11'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Ag2O
+            column: Composition
         sigma_as_published: '0.007'
         sigma: 0.007
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -743,7 +920,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_ag_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -809,7 +986,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -818,7 +994,18 @@ species:
           locator: *id005
         FM: 0.022
         FM_as_published: '0.022'
-        mass_loss_fraction: 0.022
+        initial_concentration:
+          oxide_as_published: Ag2O
+          value_as_published: '353'
+          units_as_published: µg.g−1
+          sigma_as_published: '11'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Ag2O
+            column: Composition
         sigma_as_published: '0.019'
         sigma: 0.019
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -837,7 +1024,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_bi_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -903,7 +1090,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -912,7 +1098,18 @@ species:
           locator: *id006
         FM: 0.227
         FM_as_published: '0.227'
-        mass_loss_fraction: 0.227
+        initial_concentration:
+          oxide_as_published: Bi2O3
+          value_as_published: '226'
+          units_as_published: µg.g−1
+          sigma_as_published: '19'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Bi2O3
+            column: Composition
         sigma_as_published: '0.080'
         sigma: 0.08
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -929,7 +1126,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_bi_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -995,7 +1192,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -1004,7 +1200,18 @@ species:
           locator: *id007
         FM: 0.17
         FM_as_published: '0.170'
-        mass_loss_fraction: 0.17
+        initial_concentration:
+          oxide_as_published: Bi2O3
+          value_as_published: '226'
+          units_as_published: µg.g−1
+          sigma_as_published: '19'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Bi2O3
+            column: Composition
         sigma_as_published: '0.078'
         sigma: 0.078
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -1021,7 +1228,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_bi_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -1087,7 +1294,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -1096,7 +1302,18 @@ species:
           locator: *id008
         FM: 0.074
         FM_as_published: '0.074'
-        mass_loss_fraction: 0.074
+        initial_concentration:
+          oxide_as_published: Bi2O3
+          value_as_published: '226'
+          units_as_published: µg.g−1
+          sigma_as_published: '19'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Bi2O3
+            column: Composition
         sigma_as_published: '0.007'
         sigma: 0.007
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -1113,7 +1330,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_bi_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -1179,7 +1396,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -1188,7 +1404,18 @@ species:
           locator: *id009
         FM: 0.008
         FM_as_published: '0.008'
-        mass_loss_fraction: 0.008
+        initial_concentration:
+          oxide_as_published: Bi2O3
+          value_as_published: '226'
+          units_as_published: µg.g−1
+          sigma_as_published: '19'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Bi2O3
+            column: Composition
         sigma_as_published: '0.007'
         sigma: 0.007
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -1207,7 +1434,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_cd_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -1273,7 +1500,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -1282,7 +1508,18 @@ species:
           locator: *id010
         FM: 0.228
         FM_as_published: '0.228'
-        mass_loss_fraction: 0.228
+        initial_concentration:
+          oxide_as_published: CdO
+          value_as_published: '405'
+          units_as_published: µg.g−1
+          sigma_as_published: '50'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: CdO
+            column: Composition
         sigma_as_published: '0.057'
         sigma: 0.057
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -1299,7 +1536,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_cd_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -1365,7 +1602,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -1374,7 +1610,18 @@ species:
           locator: *id011
         FM: 0.071
         FM_as_published: '0.071'
-        mass_loss_fraction: 0.071
+        initial_concentration:
+          oxide_as_published: CdO
+          value_as_published: '405'
+          units_as_published: µg.g−1
+          sigma_as_published: '50'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: CdO
+            column: Composition
         sigma_as_published: '0.014'
         sigma: 0.014
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -1391,7 +1638,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_cd_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -1457,7 +1704,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -1466,7 +1712,18 @@ species:
           locator: *id012
         FM: 0.019
         FM_as_published: '0.019'
-        mass_loss_fraction: 0.019
+        initial_concentration:
+          oxide_as_published: CdO
+          value_as_published: '405'
+          units_as_published: µg.g−1
+          sigma_as_published: '50'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: CdO
+            column: Composition
         sigma_as_published: '0.003'
         sigma: 0.003
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -1483,7 +1740,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_cd_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -1549,7 +1806,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -1558,7 +1814,18 @@ species:
           locator: *id013
         FM: 0.019
         FM_as_published: '0.019'
-        mass_loss_fraction: 0.019
+        initial_concentration:
+          oxide_as_published: CdO
+          value_as_published: '405'
+          units_as_published: µg.g−1
+          sigma_as_published: '50'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: CdO
+            column: Composition
         sigma_as_published: '0.009'
         sigma: 0.009
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -1577,7 +1844,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_cr_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -1643,7 +1910,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -1652,7 +1918,18 @@ species:
           locator: *id014
         FM: 1.021
         FM_as_published: '1.021'
-        mass_loss_fraction: 1.021
+        initial_concentration:
+          oxide_as_published: Cr2O3
+          value_as_published: '878'
+          units_as_published: µg.g−1
+          sigma_as_published: '129'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Cr2O3
+            column: Composition
         sigma_as_published: '0.179'
         sigma: 0.179
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -1669,7 +1946,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_cr_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -1735,7 +2012,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -1744,7 +2020,18 @@ species:
           locator: *id015
         FM: 1.192
         FM_as_published: '1.192'
-        mass_loss_fraction: 1.192
+        initial_concentration:
+          oxide_as_published: Cr2O3
+          value_as_published: '878'
+          units_as_published: µg.g−1
+          sigma_as_published: '129'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Cr2O3
+            column: Composition
         sigma_as_published: '0.179'
         sigma: 0.179
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -1761,7 +2048,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_cr_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -1827,7 +2114,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -1836,7 +2122,18 @@ species:
           locator: *id016
         FM: 0.998
         FM_as_published: '0.998'
-        mass_loss_fraction: 0.998
+        initial_concentration:
+          oxide_as_published: Cr2O3
+          value_as_published: '878'
+          units_as_published: µg.g−1
+          sigma_as_published: '129'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Cr2O3
+            column: Composition
         sigma_as_published: '0.150'
         sigma: 0.15
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -1853,7 +2150,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_cr_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -1919,7 +2216,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -1928,7 +2224,18 @@ species:
           locator: *id017
         FM: 1.171
         FM_as_published: '1.171'
-        mass_loss_fraction: 1.171
+        initial_concentration:
+          oxide_as_published: Cr2O3
+          value_as_published: '878'
+          units_as_published: µg.g−1
+          sigma_as_published: '129'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Cr2O3
+            column: Composition
         sigma_as_published: '0.265'
         sigma: 0.265
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -1947,7 +2254,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_cu_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -2013,7 +2320,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -2022,7 +2328,18 @@ species:
           locator: *id018
         FM: 0.618
         FM_as_published: '0.618'
-        mass_loss_fraction: 0.618
+        initial_concentration:
+          oxide_as_published: Cu2O
+          value_as_published: '349'
+          units_as_published: µg.g−1
+          sigma_as_published: '26'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Cu2O
+            column: Composition
         sigma_as_published: '0.072'
         sigma: 0.072
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -2039,7 +2356,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_cu_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -2105,7 +2422,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -2114,7 +2430,18 @@ species:
           locator: *id019
         FM: 0.331
         FM_as_published: '0.331'
-        mass_loss_fraction: 0.331
+        initial_concentration:
+          oxide_as_published: Cu2O
+          value_as_published: '349'
+          units_as_published: µg.g−1
+          sigma_as_published: '26'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Cu2O
+            column: Composition
         sigma_as_published: '0.030'
         sigma: 0.03
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -2131,7 +2458,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_cu_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -2197,7 +2524,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -2206,7 +2532,18 @@ species:
           locator: *id020
         FM: 0.367
         FM_as_published: '0.367'
-        mass_loss_fraction: 0.367
+        initial_concentration:
+          oxide_as_published: Cu2O
+          value_as_published: '349'
+          units_as_published: µg.g−1
+          sigma_as_published: '26'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Cu2O
+            column: Composition
         sigma_as_published: '0.030'
         sigma: 0.03
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -2223,7 +2560,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_cu_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -2289,7 +2626,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -2298,7 +2634,18 @@ species:
           locator: *id021
         FM: 0.176
         FM_as_published: '0.176'
-        mass_loss_fraction: 0.176
+        initial_concentration:
+          oxide_as_published: Cu2O
+          value_as_published: '349'
+          units_as_published: µg.g−1
+          sigma_as_published: '26'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Cu2O
+            column: Composition
         sigma_as_published: '0.138'
         sigma: 0.138
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -2317,7 +2664,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_ga_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -2383,7 +2730,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -2392,7 +2738,18 @@ species:
           locator: *id022
         FM: 1.454
         FM_as_published: '1.454'
-        mass_loss_fraction: 1.454
+        initial_concentration:
+          oxide_as_published: Ga2O3
+          value_as_published: '424'
+          units_as_published: µg.g−1
+          sigma_as_published: '125'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Ga2O3
+            column: Composition
         sigma_as_published: '0.432'
         sigma: 0.432
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -2409,7 +2766,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_ga_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -2475,7 +2832,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -2484,7 +2840,18 @@ species:
           locator: *id023
         FM: 1.217
         FM_as_published: '1.217'
-        mass_loss_fraction: 1.217
+        initial_concentration:
+          oxide_as_published: Ga2O3
+          value_as_published: '424'
+          units_as_published: µg.g−1
+          sigma_as_published: '125'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Ga2O3
+            column: Composition
         sigma_as_published: '0.361'
         sigma: 0.361
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -2501,7 +2868,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_ga_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -2567,7 +2934,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -2576,7 +2942,18 @@ species:
           locator: *id024
         FM: 1.314
         FM_as_published: '1.314'
-        mass_loss_fraction: 1.314
+        initial_concentration:
+          oxide_as_published: Ga2O3
+          value_as_published: '424'
+          units_as_published: µg.g−1
+          sigma_as_published: '125'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Ga2O3
+            column: Composition
         sigma_as_published: '0.388'
         sigma: 0.388
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -2593,7 +2970,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_ga_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -2659,7 +3036,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -2668,7 +3044,18 @@ species:
           locator: *id025
         FM: 0.669
         FM_as_published: '0.669'
-        mass_loss_fraction: 0.669
+        initial_concentration:
+          oxide_as_published: Ga2O3
+          value_as_published: '424'
+          units_as_published: µg.g−1
+          sigma_as_published: '125'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Ga2O3
+            column: Composition
         sigma_as_published: '0.380'
         sigma: 0.38
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -2687,7 +3074,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_ge_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -2753,7 +3140,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -2762,7 +3148,18 @@ species:
           locator: *id026
         FM: 0.315
         FM_as_published: '0.315'
-        mass_loss_fraction: 0.315
+        initial_concentration:
+          oxide_as_published: GeO2
+          value_as_published: '643'
+          units_as_published: µg.g−1
+          sigma_as_published: '176'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: GeO2
+            column: Composition
         sigma_as_published: '0.090'
         sigma: 0.09
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -2779,7 +3176,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_ge_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -2845,7 +3242,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -2854,7 +3250,18 @@ species:
           locator: *id027
         FM: 0.168
         FM_as_published: '0.168'
-        mass_loss_fraction: 0.168
+        initial_concentration:
+          oxide_as_published: GeO2
+          value_as_published: '643'
+          units_as_published: µg.g−1
+          sigma_as_published: '176'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: GeO2
+            column: Composition
         sigma_as_published: '0.050'
         sigma: 0.05
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -2871,7 +3278,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_ge_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -2937,7 +3344,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -2946,7 +3352,18 @@ species:
           locator: *id028
         FM: 0.045
         FM_as_published: '0.045'
-        mass_loss_fraction: 0.045
+        initial_concentration:
+          oxide_as_published: GeO2
+          value_as_published: '643'
+          units_as_published: µg.g−1
+          sigma_as_published: '176'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: GeO2
+            column: Composition
         sigma_as_published: '0.013'
         sigma: 0.013
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -2963,7 +3380,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_ge_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -3029,7 +3446,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -3038,7 +3454,18 @@ species:
           locator: *id029
         FM: 0.014
         FM_as_published: '0.014'
-        mass_loss_fraction: 0.014
+        initial_concentration:
+          oxide_as_published: GeO2
+          value_as_published: '643'
+          units_as_published: µg.g−1
+          sigma_as_published: '176'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: GeO2
+            column: Composition
         sigma_as_published: '0.005'
         sigma: 0.005
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -3057,7 +3484,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_in_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -3123,7 +3550,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -3132,7 +3558,18 @@ species:
           locator: *id030
         FM: 0.816
         FM_as_published: '0.816'
-        mass_loss_fraction: 0.816
+        initial_concentration:
+          oxide_as_published: In2O3
+          value_as_published: '457'
+          units_as_published: µg.g−1
+          sigma_as_published: '48'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: In2O3
+            column: Composition
         sigma_as_published: '0.095'
         sigma: 0.095
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -3149,7 +3586,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_in_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -3215,7 +3652,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -3224,7 +3660,18 @@ species:
           locator: *id031
         FM: 0.622
         FM_as_published: '0.622'
-        mass_loss_fraction: 0.622
+        initial_concentration:
+          oxide_as_published: In2O3
+          value_as_published: '457'
+          units_as_published: µg.g−1
+          sigma_as_published: '48'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: In2O3
+            column: Composition
         sigma_as_published: '0.074'
         sigma: 0.074
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -3241,7 +3688,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_in_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -3307,7 +3754,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -3316,7 +3762,18 @@ species:
           locator: *id032
         FM: 0.621
         FM_as_published: '0.621'
-        mass_loss_fraction: 0.621
+        initial_concentration:
+          oxide_as_published: In2O3
+          value_as_published: '457'
+          units_as_published: µg.g−1
+          sigma_as_published: '48'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: In2O3
+            column: Composition
         sigma_as_published: '0.068'
         sigma: 0.068
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -3333,7 +3790,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_in_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -3399,7 +3856,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -3408,7 +3864,18 @@ species:
           locator: *id033
         FM: 0.192
         FM_as_published: '0.192'
-        mass_loss_fraction: 0.192
+        initial_concentration:
+          oxide_as_published: In2O3
+          value_as_published: '457'
+          units_as_published: µg.g−1
+          sigma_as_published: '48'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: In2O3
+            column: Composition
         sigma_as_published: '0.142'
         sigma: 0.142
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -3427,7 +3894,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_mo_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -3493,7 +3960,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -3502,7 +3968,18 @@ species:
           locator: *id034
         FM: 1.26
         FM_as_published: '1.260'
-        mass_loss_fraction: 1.26
+        initial_concentration:
+          oxide_as_published: MoO2
+          value_as_published: '526'
+          units_as_published: µg.g−1
+          sigma_as_published: '54'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: MoO2
+            column: Composition
         sigma_as_published: '0.144'
         sigma: 0.144
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -3519,7 +3996,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_mo_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -3585,7 +4062,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -3594,7 +4070,18 @@ species:
           locator: *id035
         FM: 1.168
         FM_as_published: '1.168'
-        mass_loss_fraction: 1.168
+        initial_concentration:
+          oxide_as_published: MoO2
+          value_as_published: '526'
+          units_as_published: µg.g−1
+          sigma_as_published: '54'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: MoO2
+            column: Composition
         sigma_as_published: '0.125'
         sigma: 0.125
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -3611,7 +4098,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_mo_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -3677,7 +4164,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -3686,7 +4172,18 @@ species:
           locator: *id036
         FM: 1.13
         FM_as_published: '1.130'
-        mass_loss_fraction: 1.13
+        initial_concentration:
+          oxide_as_published: MoO2
+          value_as_published: '526'
+          units_as_published: µg.g−1
+          sigma_as_published: '54'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: MoO2
+            column: Composition
         sigma_as_published: '0.120'
         sigma: 0.12
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -3703,7 +4200,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_mo_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -3769,7 +4266,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -3778,7 +4274,18 @@ species:
           locator: *id037
         FM: 0.624
         FM_as_published: '0.624'
-        mass_loss_fraction: 0.624
+        initial_concentration:
+          oxide_as_published: MoO2
+          value_as_published: '526'
+          units_as_published: µg.g−1
+          sigma_as_published: '54'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: MoO2
+            column: Composition
         sigma_as_published: '0.349'
         sigma: 0.349
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -3797,7 +4304,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_pb_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -3863,7 +4370,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -3872,7 +4378,18 @@ species:
           locator: *id038
         FM: 1.03
         FM_as_published: '1.030'
-        mass_loss_fraction: 1.03
+        initial_concentration:
+          oxide_as_published: PbO
+          value_as_published: '489'
+          units_as_published: µg.g−1
+          sigma_as_published: '22'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: PbO
+            column: Composition
         sigma_as_published: '0.087'
         sigma: 0.087
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -3889,7 +4406,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_pb_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -3955,7 +4472,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -3964,7 +4480,18 @@ species:
           locator: *id039
         FM: 0.646
         FM_as_published: '0.646'
-        mass_loss_fraction: 0.646
+        initial_concentration:
+          oxide_as_published: PbO
+          value_as_published: '489'
+          units_as_published: µg.g−1
+          sigma_as_published: '22'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: PbO
+            column: Composition
         sigma_as_published: '0.069'
         sigma: 0.069
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -3981,7 +4508,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_pb_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -4047,7 +4574,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -4056,7 +4582,18 @@ species:
           locator: *id040
         FM: 0.365
         FM_as_published: '0.365'
-        mass_loss_fraction: 0.365
+        initial_concentration:
+          oxide_as_published: PbO
+          value_as_published: '489'
+          units_as_published: µg.g−1
+          sigma_as_published: '22'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: PbO
+            column: Composition
         sigma_as_published: '0.022'
         sigma: 0.022
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -4073,7 +4610,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_pb_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -4139,7 +4676,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -4148,7 +4684,18 @@ species:
           locator: *id041
         FM: 0.116
         FM_as_published: '0.116'
-        mass_loss_fraction: 0.116
+        initial_concentration:
+          oxide_as_published: PbO
+          value_as_published: '489'
+          units_as_published: µg.g−1
+          sigma_as_published: '22'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: PbO
+            column: Composition
         sigma_as_published: '0.099'
         sigma: 0.099
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -4167,7 +4714,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_sb_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -4233,7 +4780,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -4242,7 +4788,18 @@ species:
           locator: *id042
         FM: 0.457
         FM_as_published: '0.457'
-        mass_loss_fraction: 0.457
+        initial_concentration:
+          oxide_as_published: Sb2O3
+          value_as_published: '578'
+          units_as_published: µg.g−1
+          sigma_as_published: '21'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Sb2O3
+            column: Composition
         sigma_as_published: '0.084'
         sigma: 0.084
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -4259,7 +4816,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_sb_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -4325,7 +4882,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -4334,7 +4890,18 @@ species:
           locator: *id043
         FM: 0.21
         FM_as_published: '0.210'
-        mass_loss_fraction: 0.21
+        initial_concentration:
+          oxide_as_published: Sb2O3
+          value_as_published: '578'
+          units_as_published: µg.g−1
+          sigma_as_published: '21'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Sb2O3
+            column: Composition
         sigma_as_published: '0.071'
         sigma: 0.071
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -4351,7 +4918,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_sb_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -4417,7 +4984,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -4426,7 +4992,18 @@ species:
           locator: *id044
         FM: 0.012
         FM_as_published: '0.012'
-        mass_loss_fraction: 0.012
+        initial_concentration:
+          oxide_as_published: Sb2O3
+          value_as_published: '578'
+          units_as_published: µg.g−1
+          sigma_as_published: '21'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Sb2O3
+            column: Composition
         sigma_as_published: '0.001'
         sigma: 0.001
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -4443,7 +5020,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_sb_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -4509,7 +5086,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -4518,7 +5094,18 @@ species:
           locator: *id045
         FM: 0.002
         FM_as_published: '0.002'
-        mass_loss_fraction: 0.002
+        initial_concentration:
+          oxide_as_published: Sb2O3
+          value_as_published: '578'
+          units_as_published: µg.g−1
+          sigma_as_published: '21'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Sb2O3
+            column: Composition
         sigma_as_published: '0.001'
         sigma: 0.001
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -4537,7 +5124,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_sn_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -4603,7 +5190,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -4612,7 +5198,18 @@ species:
           locator: *id046
         FM: 0.471
         FM_as_published: '0.471'
-        mass_loss_fraction: 0.471
+        initial_concentration:
+          oxide_as_published: SnO2
+          value_as_published: '424'
+          units_as_published: µg.g−1
+          sigma_as_published: '8'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: SnO2
+            column: Composition
         sigma_as_published: '0.031'
         sigma: 0.031
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -4629,7 +5226,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_sn_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -4695,7 +5292,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -4704,7 +5300,18 @@ species:
           locator: *id047
         FM: 0.194
         FM_as_published: '0.194'
-        mass_loss_fraction: 0.194
+        initial_concentration:
+          oxide_as_published: SnO2
+          value_as_published: '424'
+          units_as_published: µg.g−1
+          sigma_as_published: '8'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: SnO2
+            column: Composition
         sigma_as_published: '0.017'
         sigma: 0.017
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -4721,7 +5328,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_sn_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -4787,7 +5394,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -4796,7 +5402,18 @@ species:
           locator: *id048
         FM: 0.201
         FM_as_published: '0.201'
-        mass_loss_fraction: 0.201
+        initial_concentration:
+          oxide_as_published: SnO2
+          value_as_published: '424'
+          units_as_published: µg.g−1
+          sigma_as_published: '8'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: SnO2
+            column: Composition
         sigma_as_published: '0.009'
         sigma: 0.009
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -4813,7 +5430,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_sn_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -4879,7 +5496,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -4888,7 +5504,18 @@ species:
           locator: *id049
         FM: 0.038
         FM_as_published: '0.038'
-        mass_loss_fraction: 0.038
+        initial_concentration:
+          oxide_as_published: SnO2
+          value_as_published: '424'
+          units_as_published: µg.g−1
+          sigma_as_published: '8'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: SnO2
+            column: Composition
         sigma_as_published: '0.035'
         sigma: 0.035
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -4907,7 +5534,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_tl_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -4973,7 +5600,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -4982,7 +5608,18 @@ species:
           locator: *id050
         FM: 0.525
         FM_as_published: '0.525'
-        mass_loss_fraction: 0.525
+        initial_concentration:
+          oxide_as_published: Tl2O
+          value_as_published: '430'
+          units_as_published: µg.g−1
+          sigma_as_published: '14'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Tl2O
+            column: Composition
         sigma_as_published: '0.052'
         sigma: 0.052
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -4999,7 +5636,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_tl_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -5065,7 +5702,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -5074,7 +5710,18 @@ species:
           locator: *id051
         FM: 0.397
         FM_as_published: '0.397'
-        mass_loss_fraction: 0.397
+        initial_concentration:
+          oxide_as_published: Tl2O
+          value_as_published: '430'
+          units_as_published: µg.g−1
+          sigma_as_published: '14'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Tl2O
+            column: Composition
         sigma_as_published: '0.040'
         sigma: 0.04
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -5091,7 +5738,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_tl_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -5157,7 +5804,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -5166,7 +5812,18 @@ species:
           locator: *id052
         FM: 0.125
         FM_as_published: '0.125'
-        mass_loss_fraction: 0.125
+        initial_concentration:
+          oxide_as_published: Tl2O
+          value_as_published: '430'
+          units_as_published: µg.g−1
+          sigma_as_published: '14'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Tl2O
+            column: Composition
         sigma_as_published: '0.007'
         sigma: 0.007
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -5183,7 +5840,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_tl_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -5249,7 +5906,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -5258,7 +5914,18 @@ species:
           locator: *id053
         FM: 0.069
         FM_as_published: '0.069'
-        mass_loss_fraction: 0.069
+        initial_concentration:
+          oxide_as_published: Tl2O
+          value_as_published: '430'
+          units_as_published: µg.g−1
+          sigma_as_published: '14'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: Tl2O
+            column: Composition
         sigma_as_published: '0.057'
         sigma: 0.057
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -5277,7 +5944,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_v_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -5343,7 +6010,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -5352,7 +6018,18 @@ species:
           locator: *id054
         FM: 1.219
         FM_as_published: '1.219'
-        mass_loss_fraction: 1.219
+        initial_concentration:
+          oxide_as_published: V2O3
+          value_as_published: '1019'
+          units_as_published: µg.g−1
+          sigma_as_published: '113'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: V2O3
+            column: Composition
         sigma_as_published: '0.141'
         sigma: 0.141
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -5369,7 +6046,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_v_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -5435,7 +6112,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -5444,7 +6120,18 @@ species:
           locator: *id055
         FM: 1.226
         FM_as_published: '1.226'
-        mass_loss_fraction: 1.226
+        initial_concentration:
+          oxide_as_published: V2O3
+          value_as_published: '1019'
+          units_as_published: µg.g−1
+          sigma_as_published: '113'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: V2O3
+            column: Composition
         sigma_as_published: '0.139'
         sigma: 0.139
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -5461,7 +6148,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_v_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -5527,7 +6214,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -5536,7 +6222,18 @@ species:
           locator: *id056
         FM: 1.179
         FM_as_published: '1.179'
-        mass_loss_fraction: 1.179
+        initial_concentration:
+          oxide_as_published: V2O3
+          value_as_published: '1019'
+          units_as_published: µg.g−1
+          sigma_as_published: '113'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: V2O3
+            column: Composition
         sigma_as_published: '0.134'
         sigma: 0.134
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -5553,7 +6250,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_v_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -5619,7 +6316,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -5628,7 +6324,18 @@ species:
           locator: *id057
         FM: 1.112
         FM_as_published: '1.112'
-        mass_loss_fraction: 1.112
+        initial_concentration:
+          oxide_as_published: V2O3
+          value_as_published: '1019'
+          units_as_published: µg.g−1
+          sigma_as_published: '113'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: V2O3
+            column: Composition
         sigma_as_published: '0.125'
         sigma: 0.125
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -5647,7 +6354,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_w_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -5713,7 +6420,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -5722,7 +6428,18 @@ species:
           locator: *id058
         FM: 2.508
         FM_as_published: '2.508'
-        mass_loss_fraction: 2.508
+        initial_concentration:
+          oxide_as_published: WO3
+          value_as_published: '406'
+          units_as_published: µg.g−1
+          sigma_as_published: '65'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: WO3
+            column: Composition
         sigma_as_published: '0.416'
         sigma: 0.416
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -5739,7 +6456,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_w_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -5805,7 +6522,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -5814,7 +6530,18 @@ species:
           locator: *id059
         FM: 2.347
         FM_as_published: '2.347'
-        mass_loss_fraction: 2.347
+        initial_concentration:
+          oxide_as_published: WO3
+          value_as_published: '406'
+          units_as_published: µg.g−1
+          sigma_as_published: '65'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: WO3
+            column: Composition
         sigma_as_published: '0.383'
         sigma: 0.383
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -5831,7 +6558,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_w_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -5897,7 +6624,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -5906,7 +6632,18 @@ species:
           locator: *id060
         FM: 2.223
         FM_as_published: '2.223'
-        mass_loss_fraction: 2.223
+        initial_concentration:
+          oxide_as_published: WO3
+          value_as_published: '406'
+          units_as_published: µg.g−1
+          sigma_as_published: '65'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: WO3
+            column: Composition
         sigma_as_published: '0.365'
         sigma: 0.365
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -5923,7 +6660,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_w_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -5989,7 +6726,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -5998,7 +6734,18 @@ species:
           locator: *id061
         FM: 1.975
         FM_as_published: '1.975'
-        mass_loss_fraction: 1.975
+        initial_concentration:
+          oxide_as_published: WO3
+          value_as_published: '406'
+          units_as_published: µg.g−1
+          sigma_as_published: '65'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: WO3
+            column: Composition
         sigma_as_published: '0.405'
         sigma: 0.405
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -6017,7 +6764,7 @@ species:
     observations:
     - observation_id: norris_2016_table5_7_zn_logfo2_neg7
       experiment: volatile-loss-logfo2-neg7
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -6083,7 +6830,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -6092,7 +6838,18 @@ species:
           locator: *id062
         FM: 1.038
         FM_as_published: '1.038'
-        mass_loss_fraction: 1.038
+        initial_concentration:
+          oxide_as_published: ZnO
+          value_as_published: '666'
+          units_as_published: µg.g−1
+          sigma_as_published: '16'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: ZnO
+            column: Composition
         sigma_as_published: '0.069'
         sigma: 0.069
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -6109,7 +6866,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_zn_logfo2_neg9
       experiment: volatile-loss-logfo2-neg9
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -6175,7 +6932,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -6184,7 +6940,18 @@ species:
           locator: *id063
         FM: 0.617
         FM_as_published: '0.617'
-        mass_loss_fraction: 0.617
+        initial_concentration:
+          oxide_as_published: ZnO
+          value_as_published: '666'
+          units_as_published: µg.g−1
+          sigma_as_published: '16'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: ZnO
+            column: Composition
         sigma_as_published: '0.053'
         sigma: 0.053
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -6201,7 +6968,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_zn_logfo2_neg11
       experiment: volatile-loss-logfo2-neg11
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -6267,7 +7034,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -6276,7 +7042,18 @@ species:
           locator: *id064
         FM: 0.488
         FM_as_published: '0.488'
-        mass_loss_fraction: 0.488
+        initial_concentration:
+          oxide_as_published: ZnO
+          value_as_published: '666'
+          units_as_published: µg.g−1
+          sigma_as_published: '16'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: ZnO
+            column: Composition
         sigma_as_published: '0.021'
         sigma: 0.021
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
@@ -6293,7 +7070,7 @@ species:
         basis: Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.
     - observation_id: norris_2016_table5_7_zn_logfo2_neg13
       experiment: volatile-loss-logfo2-neg13
-      type: mass_loss
+      type: concentration_series
       locator:
         page: 232
         pdf_page_index: 231
@@ -6359,7 +7136,6 @@ species:
             table: '5.2'
             row: EBT1
       values:
-        quantity: mass_loss_fraction
         method_class: measured_tabulated
         T_C: 1300
         log_fO2:
@@ -6368,7 +7144,18 @@ species:
           locator: *id065
         FM: 0.13
         FM_as_published: '0.130'
-        mass_loss_fraction: 0.13
+        initial_concentration:
+          oxide_as_published: ZnO
+          value_as_published: '666'
+          units_as_published: µg.g−1
+          sigma_as_published: '16'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            published_page: 190
+            table: '5.2'
+            row: ZnO
+            column: Composition
         sigma_as_published: '0.087'
         sigma: 0.087
         formula_as_published: FM = X_final / X_initial, on the single-cation oxide mole-fraction basis
