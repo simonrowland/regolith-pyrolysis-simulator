@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sqlite3
@@ -25,6 +26,66 @@ from simulator.melt_backend.base import (
     equilibrium_cache_value,
 )
 from simulator.engine_pool import EngineWorkerPool, WarmEngineWorker
+
+
+# Fingerprint the explicit prediction path for every cached backend: its
+# backend/parser, shared result normalization, and cache request projection.
+# liquidus.py is included for AlphaMELTS and MAGEMin because both use its
+# prediction helpers. Internal-analytical is deliberately uncached.
+_CACHED_ENGINE_SOURCE_PINS = {
+    "openimcc": (
+        1,
+        "ffa5d62a1fefb95d91bf9a7e5f502c52242f4f3a2d4507a680c357cd0dc41dc5",
+        (
+            "simulator/melt_backend/openimcc_bridge.py",
+            "simulator/melt_backend/base.py",
+            "simulator/engine_cache.py",
+            "simulator/diagnostic_helpers/binary_pot_battery.py",
+        ),
+    ),
+    "alphamelts": (
+        1,
+        "c258ef9b92a3324299b1f1b45c280f1f4f73e46cc60bbc157fe17b46e4d1da65",
+        (
+            "simulator/melt_backend/alphamelts.py",
+            "simulator/melt_backend/liquidus.py",
+            "simulator/melt_backend/base.py",
+            "simulator/engine_cache.py",
+            "simulator/diagnostic_helpers/binary_pot_battery.py",
+        ),
+    ),
+    "thermoengine": (
+        1,
+        "851311691c4ae1831c98d71eb98686bc1860bbbc28134afbc0d06c8231b76333",
+        (
+            "simulator/melt_backend/thermoengine.py",
+            "simulator/melt_backend/base.py",
+            "simulator/engine_cache.py",
+            "simulator/diagnostic_helpers/binary_pot_battery.py",
+        ),
+    ),
+    "vaporock": (
+        1,
+        "7717d7cb170405555fe87f7425ebd0bb57c833940a961e7e65c20dd63d66ed3f",
+        (
+            "simulator/melt_backend/vaporock.py",
+            "simulator/melt_backend/base.py",
+            "simulator/engine_cache.py",
+            "simulator/diagnostic_helpers/binary_pot_battery.py",
+        ),
+    ),
+    "magemin": (
+        1,
+        "d0c526c7924e145669c882f117723e728f1cc050c19d23068c69a5bdddbe9198",
+        (
+            "simulator/melt_backend/magemin.py",
+            "simulator/melt_backend/liquidus.py",
+            "simulator/melt_backend/base.py",
+            "simulator/engine_cache.py",
+            "simulator/diagnostic_helpers/binary_pot_battery.py",
+        ),
+    ),
+}
 
 
 def _cached_engine_call():
@@ -485,6 +546,39 @@ def test_every_chemistry_version_has_changelog_and_runtime_identity() -> None:
     assert all(
         "stat" in engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT[engine]
         for engine in ("alphamelts", "magemin")
+    )
+
+
+def test_cached_engine_source_fingerprints_match_chemistry_versions() -> None:
+    root = Path(engine_cache.__file__).resolve().parents[1]
+    cached_engines = set(engine_cache.ENGINE_CHEMISTRY_VERSION) - {
+        "internal-analytical"
+    }
+    assert set(_CACHED_ENGINE_SOURCE_PINS) == cached_engines
+
+    mismatches = []
+    for engine, (pinned_version, pinned_digest, source_files) in (
+        _CACHED_ENGINE_SOURCE_PINS.items()
+    ):
+        digest = hashlib.sha256()
+        for relative_path in source_files:
+            digest.update(relative_path.encode("utf-8"))
+            digest.update(b"\0")
+            digest.update((root / relative_path).read_bytes())
+            digest.update(b"\0")
+        actual_digest = digest.hexdigest()
+        actual_version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine]
+        if actual_version != pinned_version or actual_digest != pinned_digest:
+            mismatches.append(
+                f"{engine}: version {actual_version} (pinned {pinned_version}), "
+                f"SHA-256 {actual_digest} (pinned {pinned_digest})"
+            )
+
+    assert not mismatches, (
+        "Cached engine source changed without a matching chemistry-version and "
+        "fingerprint pin. Bump ENGINE_CHEMISTRY_VERSION for an output-affecting "
+        "change; for a non-output change, re-pin the SHA-256 with a one-line "
+        "reason next to that engine's pin:\n" + "\n".join(mismatches)
     )
 
 
