@@ -71,16 +71,18 @@ def campaign_evolves_terminal_oxygen(campaign_id: str) -> bool:
 
     Evaporation campaigns credit the oxide-reduction O2 coproduct, and
     OVERHEAD_BLEED moves it into the melt-offgas terminal bins. C5 and
-    MRE baseline credit anode O2 to ``terminal.oxygen_mre_anode_stored``.
-    Phase membership is ``TERMINAL_OXYGEN_ROUTE_PHASES``, the same sets
-    ``core._step_one_hour`` runs, resolved by
-    ``CampaignManager._campaign_phases_for_override_key``. C6 thermite and
-    C7 aluminothermy keep the oxygen in the oxide product and return false.
+    every MRE spelling credit anode O2 to
+    ``terminal.oxygen_mre_anode_stored``. Phase membership is
+    ``TERMINAL_OXYGEN_ROUTE_PHASES``, the same sets ``core._step_one_hour``
+    runs. Identity is ``CampaignManager.campaign_phases_for_id``: a phase
+    name, a setpoint key, an override key, and the ``MRE`` routing label
+    of one route share that answer. C6 thermite and C7 aluminothermy keep
+    the oxygen in the oxide product and return false.
     """
 
     if not isinstance(campaign_id, str) or not campaign_id.strip():
         return False
-    phases = CampaignManager._campaign_phases_for_override_key(campaign_id.strip())
+    phases = CampaignManager.campaign_phases_for_id(campaign_id)
     return any(phase in TERMINAL_OXYGEN_ROUTE_PHASES for phase in phases)
 
 
@@ -549,6 +551,16 @@ class CampaignManager:
     _EXTRA_OVERRIDE_KEY_PHASES = {
         'C0b': (CampaignPhase.C0B,),
     }
+    # Execution labels that are not a phase name, a setpoint key, or an
+    # override key. Bare ``MRE`` is the electrolysis routing campaign
+    # (condensation PRODUCT_DESTINATIONS and the extraction metal credit).
+    # The hour step that earns it is MRE_BASELINE, which stores anode O2 at
+    # terminal.oxygen_mre_anode_stored; the setpoint row is mre_baseline.
+    # This is not an override key: accepting ``MRE`` there would validate a
+    # store ``_campaign_overrides`` never reads.
+    _ROUTE_LABEL_PHASES = {
+        'MRE': (CampaignPhase.MRE_BASELINE,),
+    }
     _OVERRIDE_CONSUMER_NAMES = frozenset({
         'campaign_overrides',
         'override',
@@ -692,6 +704,43 @@ class CampaignManager:
             if phase not in unique:
                 unique.append(phase)
         return tuple(unique)
+
+    @classmethod
+    def campaign_phases_for_id(cls, campaign_id: str) -> Tuple[CampaignPhase, ...]:
+        """Phases whose hour-step route this campaign id executes.
+
+        One resolver for every spelling execution uses: a ``CampaignPhase``
+        name, a setpoint config key, an extra override key, and a route
+        label in ``_ROUTE_LABEL_PHASES``. Unknown ids return no phases.
+        Product claims and the terminal-oxygen predicate both read this
+        and do not keep a second alias table.
+        """
+
+        token = str(campaign_id).strip()
+        if not token:
+            return ()
+        phases = cls._campaign_phases_for_override_key(token)
+        if phases:
+            return phases
+        return cls._ROUTE_LABEL_PHASES.get(token, ())
+
+    @classmethod
+    def setpoint_keys_for_campaign_id(cls, campaign_id: str) -> Tuple[str, ...]:
+        """Setpoint rows ``_campaign_config_key`` loads for this id.
+
+        A phase is rewritten through ``_CONFIG_KEY_BY_PHASE`` before the
+        products map is read, the same rewrite the hour step uses.
+        ``C0B``, ``C0b``, and ``C0b_p_cleanup`` all load
+        ``C0b_p_cleanup``. ``MRE``, ``MRE_BASELINE``, and ``mre_baseline``
+        all load ``mre_baseline``.
+        """
+
+        keys: list[str] = []
+        for phase in cls.campaign_phases_for_id(campaign_id):
+            key = cls._CONFIG_KEY_BY_PHASE.get(phase, phase.name)
+            if key not in keys:
+                keys.append(key)
+        return tuple(keys)
 
     @classmethod
     def known_override_fields(cls, campaign_name: str) -> Tuple[str, ...]:

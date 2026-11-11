@@ -11,7 +11,10 @@ It is named in a notice with its weight, the reason
 never entered as 0.0. Retained weights are not renormalized. Description text
 is not an eligibility input. An absent, blank, or unknown campaign claims
 nothing. A missing run campaign executes as ``C0``, which claims oxygen and
-does not claim glass, metals, or ceramic. A composition target is eligible
+does not claim glass, metals, or ceramic. Every spelling of one route
+(phase name, setpoint key, override key, and the ``MRE`` anode label)
+claims that route's setpoint products, plus oxygen iff the route credits
+a terminal oxygen account. C6 and C7 do not. A composition target is eligible
 only for its own pool product. ``captured_products`` requires every extracted
 species. A dynamic ``{species}_kg`` row is that ledger species. It is
 claimed only when ``species`` itself is a products key: ``native_Fe`` does
@@ -34,7 +37,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
-from simulator.campaigns import campaign_evolves_terminal_oxygen
+from simulator.campaigns import CampaignManager, campaign_evolves_terminal_oxygen
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.optimize.objective import (
     COMPOSITION_TARGET_METRIC_PREFIX,
@@ -47,7 +50,6 @@ from simulator.optimize.objective import (
     _METAL_PRODUCT_CLAIM_KEYS,
     _OBJECTIVE_PRODUCT_CLAIM_KEYS,
     _POOL_PRODUCT_CLAIM_KEYS,
-    _SETPOINT_CAMPAIGN_ALIASES,
     _energy_per_product_metric,
     campaign_claims_product_objective,
     campaign_product_claim_keys,
@@ -60,6 +62,7 @@ from simulator.optimize.objective import (
     unclaimed_product_withheld_weight_fraction,
     unrenormalized_study_scalar_weights,
 )
+from simulator.state import CampaignPhase, TERMINAL_OXYGEN_ROUTE_PHASES
 from simulator.optimize.profiles import (
     VALID_FIDELITIES,
     ProfileValidationError,
@@ -115,27 +118,12 @@ _LITERAL_EXTRACT_KEYS = {
     "Al": frozenset(),
     "Ca": frozenset(),
 }
-_LITERAL_ALIASES = {
-    "C2A": "C2A_continuous",
-    "C2A_staged": "C2A_staged",
-    "C3_K": "C3",
-    "C3_NA": "C3",
-}
-# Setpoint ids whose hour-step route credits terminal O2. The products map
-# omits that by-product except on C2A_continuous. C6 thermite and C7
-# aluminothermy keep the oxygen in the oxide and are the complement.
-_TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS = frozenset({
-    "C0",
-    "C0b_p_cleanup",
-    "C2A_continuous",
-    "C2A_staged",
-    "C2B",
-    "C3",
-    "C4",
-    "C5",
-    "mre_baseline",
+# Process phases that keep oxygen in the oxide. Every other process phase
+# credits terminal O2. IDLE and COMPLETE are not process routes.
+_OXYGEN_FREE_PROCESS_PHASES = frozenset({
+    CampaignPhase.C6,
+    CampaignPhase.C7_CA_ALUMINOTHERMIC,
 })
-_NO_TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS = frozenset({"C6", "C7"})
 _OXYGEN_OBJECTIVE_METRICS = frozenset({
     "O2_kg",
     "o2_kg",
@@ -236,7 +224,6 @@ def test_claim_table_matches_the_literal_product_map() -> None:
     assert dict(_EXTRACT_SPECIES_CLAIM_KEYS) == _LITERAL_EXTRACT_KEYS
     assert set(SUPPORTED_COMPOSITION_POOLS) == set(_LITERAL_POOL_KEYS) | {"captured_products"}
     assert COMPOSITION_VECTOR_SPECIES == frozenset(_LITERAL_EXTRACT_KEYS)
-    assert dict(_SETPOINT_CAMPAIGN_ALIASES) == _LITERAL_ALIASES
     assert "metals_plus_o2_kg" not in _OBJECTIVE_PRODUCT_CLAIM_KEYS
     assert "captured_products" not in _POOL_PRODUCT_CLAIM_KEYS
     assert "Mg_kg" not in _OBJECTIVE_PRODUCT_CLAIM_KEYS
@@ -264,71 +251,123 @@ def _setpoints_product_keys() -> dict[str, frozenset[str]]:
     return claims
 
 
-def _route_claim_keys() -> dict[str, frozenset[str]]:
-    """YAML product keys, plus ``O2`` for campaigns whose route evolves it.
+def _execution_campaign_spellings() -> tuple[str, ...]:
+    """Every id execution can hand the claim gate for one route.
 
-    The oxygen id set is a literal. It must equal the setpoint campaigns
-    whose phases ``campaign_evolves_terminal_oxygen`` accepts, so a second
-    hand list in production cannot drift from the hour-step route.
+    Phase names, setpoint keys, override keys, and route labels. Built from
+    CampaignManager's maps and the setpoint file, not from the last
+    counterexample.
     """
 
+    names = {phase.name for phase in CampaignPhase}
+    names.update(CampaignManager._CONFIG_KEY_BY_PHASE.values())
+    names.update(CampaignManager._EXTRA_OVERRIDE_KEY_PHASES)
+    names.update(CampaignManager._ROUTE_LABEL_PHASES)
+    names.update(_setpoints_product_keys())
+    return tuple(sorted(names))
+
+
+def _oracle_phases(campaign_id: str) -> tuple[CampaignPhase, ...]:
+    """Independent copy of ``campaign_phases_for_id``.
+
+    Reads the execution maps. It does not call the production resolver, so
+    a resolver that skips a map cannot agree with itself.
+    """
+
+    token = campaign_id.strip()
+    phases = CampaignManager._campaign_phases_for_override_key(token)
+    if phases:
+        return phases
+    return CampaignManager._ROUTE_LABEL_PHASES.get(token, ())
+
+
+def _oracle_setpoint_keys(campaign_id: str) -> tuple[str, ...]:
+    keys: list[str] = []
+    for phase in _oracle_phases(campaign_id):
+        key = CampaignManager._CONFIG_KEY_BY_PHASE.get(phase, phase.name)
+        if key not in keys:
+            keys.append(key)
+    return tuple(keys)
+
+
+def _oracle_claims(campaign_id: str | None) -> frozenset[str]:
+    """YAML products of the route's setpoint row, plus O2 when the route evolves it."""
+
+    if not isinstance(campaign_id, str) or not campaign_id.strip():
+        return frozenset()
+    token = campaign_id.strip()
     yaml_keys = _setpoints_product_keys()
-    assert set(yaml_keys) == (
-        _TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS | _NO_TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS
-    )
-    claims: dict[str, frozenset[str]] = {}
-    for name, keys in yaml_keys.items():
-        evolves = campaign_evolves_terminal_oxygen(name)
-        if name in _TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS:
-            assert evolves, name
-            claims[name] = keys | frozenset({"O2"})
+    products: frozenset[str] = frozenset()
+    for key in _oracle_setpoint_keys(token):
+        row = yaml_keys.get(key)
+        if row is not None:
+            products |= row
+    if any(phase in TERMINAL_OXYGEN_ROUTE_PHASES for phase in _oracle_phases(token)):
+        products |= frozenset({"O2"})
+    return products
+
+
+def test_every_campaign_spelling_claims_its_route() -> None:
+    """INVARIANT: one executed route, one claim set.
+
+    Every spelling execution accepts resolves through CampaignManager's
+    phase map. The claim set is that route's setpoint ``products`` keys,
+    plus ``O2`` iff a resolved phase credits terminal oxygen. Spellings of
+    one setpoint row share that set. The only process phases outside the
+    oxygen routes are C6 (Mg thermite) and C7 (metallothermic Ca). IDLE,
+    COMPLETE, blank, and unknown ids claim nothing.
+    """
+
+    process = {
+        phase
+        for phase in CampaignPhase
+        if phase not in (CampaignPhase.IDLE, CampaignPhase.COMPLETE)
+    }
+    assert process - set(TERMINAL_OXYGEN_ROUTE_PHASES) == _OXYGEN_FREE_PROCESS_PHASES
+    assert set(TERMINAL_OXYGEN_ROUTE_PHASES).isdisjoint(_OXYGEN_FREE_PROCESS_PHASES)
+
+    yaml_keys = _setpoints_product_keys()
+    assert yaml_keys, "setpoints campaigns block was not read"
+    by_setpoint: dict[tuple[str, ...], set[str]] = {}
+    for spelling in _execution_campaign_spellings():
+        phases = _oracle_phases(spelling)
+        claims = _oracle_claims(spelling)
+        assert campaign_product_claim_keys(spelling) == claims, spelling
+        evolves = any(phase in TERMINAL_OXYGEN_ROUTE_PHASES for phase in phases)
+        assert campaign_evolves_terminal_oxygen(spelling) is evolves, spelling
+        if evolves:
+            assert "O2" in claims, spelling
         else:
-            assert not evolves, name
-            assert "O2" not in keys, name
-            claims[name] = keys
-    return claims
+            assert "O2" not in claims, spelling
+        if phases and set(phases) <= _OXYGEN_FREE_PROCESS_PHASES:
+            assert "O2" not in claims, spelling
+        keys = _oracle_setpoint_keys(spelling)
+        if keys:
+            by_setpoint.setdefault(keys, set()).add(spelling)
 
+    for keys, spellings in by_setpoint.items():
+        claim_sets = {campaign_product_claim_keys(name) for name in spellings}
+        assert len(claim_sets) == 1, (keys, spellings, claim_sets)
 
-def test_campaign_product_claims_match_setpoints_yaml() -> None:
-    oracle = _route_claim_keys()
-    assert oracle, "setpoints campaigns block was not read"
-    for campaign_id, keys in oracle.items():
-        assert campaign_product_claim_keys(campaign_id) == keys
-    for alias, target in _LITERAL_ALIASES.items():
-        assert campaign_product_claim_keys(alias) == oracle[target]
-    # Phase names and the short C0b override are not setpoint ids. They claim
-    # oxygen only when that phase's route credits a terminal account. Bare
-    # "MRE" is not a phase and claims nothing. C0b does not inherit the
-    # phosphorus key, which lives on C0b_p_cleanup.
-    for phase_name in ("MRE_BASELINE", "C0B", "C0b", "C2A_STAGED"):
-        assert campaign_evolves_terminal_oxygen(phase_name)
-        assert campaign_product_claim_keys(phase_name) == frozenset({"O2"})
-    assert campaign_product_claim_keys("MRE") == frozenset()
-    assert campaign_evolves_terminal_oxygen("MRE") is False
-    assert campaign_evolves_terminal_oxygen("C7_CA_ALUMINOTHERMIC") is False
+    c0b = campaign_product_claim_keys("C0B")
+    assert c0b == campaign_product_claim_keys("C0b") == campaign_product_claim_keys(
+        "C0b_p_cleanup"
+    )
+    assert "phosphorus_carrier_offgas" in c0b
+    assert "O2" in c0b
+    assert campaign_product_claim_keys("MRE") == campaign_product_claim_keys(
+        "mre_baseline"
+    ) == campaign_product_claim_keys("MRE_BASELINE") == frozenset({"O2"})
+    assert campaign_evolves_terminal_oxygen("MRE") is True
+    assert "O2" not in campaign_product_claim_keys("C6")
+    assert "O2" not in campaign_product_claim_keys("C7")
+    assert "O2" not in campaign_product_claim_keys("C7_CA_ALUMINOTHERMIC")
     assert campaign_product_claim_keys(None) == frozenset()
     assert campaign_product_claim_keys("") == frozenset()
     assert campaign_product_claim_keys("   ") == frozenset()
     assert campaign_product_claim_keys("not-a-campaign") == frozenset()
-
-
-def _oracle_claims(campaign_id: str | None) -> frozenset[str]:
-    if not isinstance(campaign_id, str) or not campaign_id.strip():
-        return frozenset()
-    token = campaign_id.strip()
-    key = _LITERAL_ALIASES.get(token, token)
-    yaml_keys = _setpoints_product_keys()
-    found = yaml_keys.get(key)
-    if found is not None:
-        if key in _TERMINAL_OXYGEN_SETPOINT_CAMPAIGNS:
-            return found | frozenset({"O2"})
-        return found
-    oxygen = frozenset()
-    if campaign_evolves_terminal_oxygen(token):
-        oxygen = frozenset({"O2"})
-    if key != token and campaign_evolves_terminal_oxygen(key):
-        oxygen = oxygen | frozenset({"O2"})
-    return oxygen
+    assert campaign_evolves_terminal_oxygen("not-a-campaign") is False
+    assert campaign_evolves_terminal_oxygen("") is False
 
 
 def _oracle_pool_claimed(
@@ -646,10 +685,8 @@ def _assert_study_scalar(
 
 
 def _campaign_ids() -> tuple[str | None, ...]:
-    oracle = _setpoints_product_keys()
     return (
-        *tuple(sorted(oracle)),
-        *tuple(sorted(_LITERAL_ALIASES)),
+        *_execution_campaign_spellings(),
         "not-a-campaign",
         None,
     )

@@ -98,14 +98,18 @@ _MASS_OBJECTIVE_METRICS = frozenset(
     }
 )
 # INVARIANT: a product objective is scored only when the executed campaign
-# claims THAT objective's product. Claim keys are the setpoints ``products``
-# keys plus ``O2`` when the campaign's hour-step routes credit O2 to a
-# terminal account (evaporation coproduct or MRE anode). The products map
-# alone is a hand list and omits that by-product. The executed campaign is
-# the fidelity overlay on ``profile.run`` (the same value EvalSpec.campaign
-# stores). Otherwise the objective is withheld from every scoring path
-# (objective definitions, compute_objectives, strategy metrics, and the study
-# scalar). It is never entered as 0.0. Retained weights stay declared.
+# claims THAT objective's product. The campaign id is canonicalized through
+# ``CampaignManager.campaign_phases_for_id`` before the products map is read,
+# so every spelling of one route (phase name, setpoint key, override key,
+# and the ``MRE`` anode label) shares one claim set. Claim keys are that
+# route's setpoints ``products`` keys plus ``O2`` when its hour-step routes
+# credit O2 to a terminal account (evaporation coproduct or electrolysis
+# anode). The products map alone is a hand list and omits that by-product.
+# The executed campaign is the fidelity overlay on ``profile.run`` (the same
+# value EvalSpec.campaign stores). Otherwise the objective is withheld from
+# every scoring path (objective definitions, compute_objectives, strategy
+# metrics, and the study scalar). It is never entered as 0.0. Retained
+# weights stay declared.
 # The notice names each withheld objective, its weight, the reason
 # campaign_does_not_claim_product, and the withheld weight fraction.
 # Eligibility is those product-claim keys, never description text.
@@ -138,14 +142,6 @@ _FINAL_PRODUCT_OBJECTIVE_METRICS = frozenset(
     _MASS_OBJECTIVE_METRICS | {SSO2_OWNER_RECIPE_ID}
 )
 _C0_WITHHOLD_REASON = "campaign_does_not_claim_product"
-# Same keys as profiles._SETPOINT_CAMPAIGN_ALIASES. Duplicated because that
-# module imports this one.
-_SETPOINT_CAMPAIGN_ALIASES = MappingProxyType({
-    "C2A": "C2A_continuous",
-    "C2A_staged": "C2A_staged",
-    "C3_K": "C3",
-    "C3_NA": "C3",
-})
 _METAL_PRODUCT_CLAIM_KEYS = frozenset({"Fe", "Mg", "Ti"})
 _OBJECTIVE_PRODUCT_CLAIM_KEYS = MappingProxyType({
     "pure_silica_glass_kg": frozenset({"SiO2_glass"}),
@@ -1532,23 +1528,36 @@ def _terminal_oxygen_claim(campaign_id: str) -> frozenset[str]:
 def campaign_product_claim_keys(campaign_id: str | None) -> frozenset[str]:
     """Product keys the executed campaign claims.
 
-    Setpoint ``products`` keys, plus ``O2`` when the campaign's routes credit
-    a terminal oxygen account. An absent, blank, or unknown campaign claims
-    nothing. A phase name that is not a setpoint key still claims ``O2`` when
-    that phase's route does. Description text is not consulted.
+    The id is canonicalized through ``CampaignManager`` before the products
+    map is read. Phase name, setpoint key, override key, and the ``MRE``
+    anode label of one route load the same setpoint row the hour step loads
+    and therefore claim the same products. ``O2`` is included when that
+    route credits a terminal oxygen account. An absent, blank, or unknown
+    campaign claims nothing. Description text is not consulted.
+
+    Pre-fix objective vectors miss only after a VERSION bump. evalspec.py
+    scopes EvalSpec keys by the repo VERSION file. This function does not
+    add a cache-key dimension, and corpus_version stays at the green tag.
     """
 
     if not isinstance(campaign_id, str) or not campaign_id.strip():
         return frozenset()
+    from simulator.campaigns import CampaignManager
+
     token = campaign_id.strip()
-    key = _SETPOINT_CAMPAIGN_ALIASES.get(token, token)
-    found = _campaign_product_claims_by_id().get(key)
-    if found is not None:
+    table = _campaign_product_claims_by_id()
+    found: frozenset[str] = frozenset()
+    matched = False
+    for key in CampaignManager.setpoint_keys_for_campaign_id(token):
+        row = table.get(key)
+        if row is not None:
+            matched = True
+            found |= row
+    if matched:
         return found
-    oxygen = _terminal_oxygen_claim(token)
-    if key != token:
-        oxygen = oxygen | _terminal_oxygen_claim(key)
-    return oxygen
+    # IDLE, COMPLETE, and any phase with no setpoint row. O2 still follows
+    # the route. An unknown id has no route and claims nothing.
+    return _terminal_oxygen_claim(token)
 
 
 def _profile_product_claim_keys(profile: Mapping[str, Any]) -> frozenset[str]:
