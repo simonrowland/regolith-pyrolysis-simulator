@@ -208,6 +208,7 @@ SCORE_ENGINE_SET: tuple[Engine, ...] = (
     Engine.OPENIMCC,
     Engine.INTERNAL_ANALYTICAL,
     Engine.NASA_CEA_9,
+    Engine.CATALOG_EVALUATOR,
 )
 MELTS_ENGINES: frozenset[Engine] = frozenset(
     {Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.MAGEMIN}
@@ -222,6 +223,11 @@ SINGLE_LIQUID_ENGINES: frozenset[Engine] = frozenset(
 _ENGINE_CELL_PREDICTED_QUANTITIES = frozenset(
     _VAPOUR_EQUILIBRIUM
     | {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+)
+# Pressures the vapour-rail catalog evaluator can answer. Every other
+# quantity, including activity, is a typed refusal from this engine.
+_CATALOG_PREDICTED_QUANTITIES = frozenset(
+    {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}
 )
 # Equilibrium partial pressures from these two predictors are independent of
 # total pressure. The evaluation proof is in test_score's pressure-axis test.
@@ -447,6 +453,7 @@ ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.INTERNAL_ANALYTICAL: "internal-analytical",
     Engine.NASA_CEA_9: "nasa_cea_9",
     Engine.PROPRIETARY_REMOTE: "proprietary-remote",
+    Engine.CATALOG_EVALUATOR: "catalog_evaluator",
 }
 ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.VAPOROCK: ("vaporock",),
@@ -457,6 +464,10 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
     Engine.NASA_CEA_9: ("nasa-glenn",),
     Engine.PROPRIETARY_REMOTE: (),
+    # Empty: a catalog row is not an Antoine or Ellingham coefficient source.
+    # lineage_complete stays false, so the numeric residual is not labelled
+    # independent of the catalogue it was read from.
+    Engine.CATALOG_EVALUATOR: (),
 }
 
 
@@ -9503,6 +9514,680 @@ def _score_predict_with_engine(
     return predictor(engine, observation, **kwargs)
 
 
+_CATALOG_CONDENSED_PHASE: dict[str, Phase] = {
+    "condensed_solid": Phase.CR,
+    "solid": Phase.CR,
+    "crystal": Phase.CR,
+    "crystalline": Phase.CR,
+    "cr": Phase.CR,
+    "s": Phase.CR,
+    "condensed_liquid": Phase.L,
+    "liquid": Phase.L,
+    "melt": Phase.L,
+    "l": Phase.L,
+    "liq": Phase.L,
+}
+_CATALOG_INCOMPLETE_REASONS = frozenset(
+    {
+        "catalog_temperature_missing",
+        "catalog_temperature_not_positive",
+        "catalog_reservoir_not_pure_condensed",
+        "catalog_condensed_phase_undeclared",
+        "catalog_condensed_phase_unknown",
+        "catalog_oxygen_not_supplied",
+        "catalog_oxygen_not_positive",
+        "catalog_reaction_missing",
+        "catalog_reaction_unreadable",
+        "catalog_reference_state_missing",
+        "catalog_species_missing",
+    }
+)
+_CATALOG_MISMATCH_REASONS = frozenset(
+    {
+        "catalog_reservoir_phase_mismatch",
+        "catalog_reference_component_mismatch",
+        "catalog_reference_phase_mismatch",
+        "catalog_reference_convention_mismatch",
+        "catalog_reaction_mismatch",
+        "catalog_stated_phase_mismatch",
+    }
+)
+_CATALOG_UNAVAILABLE_REASONS = frozenset(
+    {
+        "catalog_evaluator_unavailable",
+        "catalog_compile_error",
+        "catalog_pressure_invalid",
+    }
+)
+
+
+@dataclass(frozen=True)
+class _CatalogScoreRow:
+    species_id: str
+    formula: str
+    species: object
+    pure_phase_token: str | None
+    source_reaction: Mapping[str, Any] | None
+    duplicate: bool
+
+
+def _catalog_prediction(
+    identity: Identity | None,
+    *,
+    execution: ExecutionState,
+    refusal: RefusalReason | None = None,
+    detail: Mapping[str, object] | None = None,
+    value: Decimal | None = None,
+    unit: str | None = None,
+    authority: Authority | None = None,
+    notices: tuple[Notice, ...] = (),
+    certified_band: Mapping[str, tuple[Decimal, Decimal]] | None = None,
+    call_evidence: str | None = None,
+    version: str | None = None,
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=Engine.CATALOG_EVALUATOR,
+        channel=ENGINE_CHANNELS[Engine.CATALOG_EVALUATOR],
+        execution=Execution(state=execution, call_evidence=call_evidence),
+        value=value,
+        unit=unit,
+        authority=authority,
+        notices=notices,
+        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[Engine.CATALOG_EVALUATOR],
+        lineage_complete=False,
+        certified_band=certified_band,
+        refusal_reason=refusal,
+        refusal_detail=dict(detail or {}),
+        identity=identity,
+        version=version,
+    )
+
+
+def _catalog_refuse(
+    identity: Identity | None,
+    reason: str,
+    **extra: object,
+) -> EnginePrediction:
+    if reason == "catalog_species_absent":
+        refusal = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+        state = ExecutionState.UNSUPPORTED
+    elif reason in _CATALOG_UNAVAILABLE_REASONS:
+        refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
+        state = ExecutionState.ATTEMPTED_UNAVAILABLE
+    elif reason in _CATALOG_MISMATCH_REASONS:
+        refusal = RefusalReason.IDENTITY_MISMATCH
+        state = ExecutionState.NOT_PROBED
+    elif reason in _CATALOG_INCOMPLETE_REASONS:
+        refusal = RefusalReason.IDENTITY_INCOMPLETE
+        state = ExecutionState.NOT_PROBED
+    else:
+        refusal = RefusalReason.UNSUPPORTED
+        state = ExecutionState.UNSUPPORTED
+    detail: dict[str, object] = {"reason": reason}
+    detail.update(extra)
+    return _catalog_prediction(
+        identity,
+        execution=state,
+        refusal=refusal,
+        detail=detail,
+    )
+
+
+def _catalog_bare_formula(formula: str) -> str:
+    from simulator.vapour_rail.catalog import _strip_phase_suffix
+
+    return _strip_phase_suffix(formula)
+
+
+def _catalog_formulas_equal(left: str, right: str) -> bool:
+    return _catalog_bare_formula(left) == _catalog_bare_formula(right)
+
+
+def _catalog_condensed_phase(token: object) -> tuple[Phase | None, str | None]:
+    if token is None or str(token).strip() == "":
+        return None, "catalog_condensed_phase_undeclared"
+    phase = _CATALOG_CONDENSED_PHASE.get(str(token).strip().lower())
+    if phase is None:
+        return None, "catalog_condensed_phase_unknown"
+    return phase, None
+
+
+def _catalog_payload_annotations(
+    payload: Mapping[str, Any],
+) -> dict[str, tuple[str | None, Mapping[str, Any] | None, bool]]:
+    found: dict[str, tuple[str | None, Mapping[str, Any] | None, bool]] = {}
+    families = payload.get("families")
+    if not isinstance(families, Mapping):
+        return found
+    for family in families.values():
+        if not isinstance(family, Mapping):
+            continue
+        physical = family.get("physical_properties")
+        if not isinstance(physical, Mapping):
+            continue
+        species_map = physical.get("species")
+        if not isinstance(species_map, Mapping):
+            continue
+        for species_id, row in species_map.items():
+            sid = str(species_id)
+            if sid in found:
+                phase, reaction, _duplicate = found[sid]
+                found[sid] = (phase, reaction, True)
+                continue
+            if not isinstance(row, Mapping):
+                found[sid] = (None, None, False)
+                continue
+            models = row.get("pressure_models")
+            model = (
+                models[0]
+                if isinstance(models, list)
+                and models
+                and isinstance(models[0], Mapping)
+                else {}
+            )
+            identity = (
+                model.get("pure_condensed_phase_identity")
+                if isinstance(model, Mapping)
+                else None
+            )
+            phase = identity.get("phase") if isinstance(identity, Mapping) else None
+            reaction_id = (
+                model.get("source_reaction_id") if isinstance(model, Mapping) else None
+            )
+            matched: Mapping[str, Any] | None = None
+            reactions = row.get("source_reactions")
+            if isinstance(reactions, list) and reaction_id is not None:
+                for reaction in reactions:
+                    if (
+                        isinstance(reaction, Mapping)
+                        and reaction.get("id") == reaction_id
+                    ):
+                        matched = reaction
+                        break
+            found[sid] = (
+                None if phase is None else str(phase),
+                matched,
+                False,
+            )
+    return found
+
+
+@lru_cache(maxsize=1)
+def _catalog_score_rows() -> tuple[tuple[_CatalogScoreRow, ...], str | None]:
+    """One compiled catalog and the phase/reaction index the scorer translates."""
+
+    from simulator.vapour_rail.catalog import (
+        CatalogCompileError,
+        compiled_catalog_for,
+    )
+
+    try:
+        payload = load_yaml(REPO_ROOT / "data" / "vapor_pressures.yaml")
+        catalog = compiled_catalog_for(payload, emit_u0_request_rules=False)
+    except (CatalogCompileError, OSError, yaml.YAMLError) as exc:
+        return (), str(exc)
+    annotations = _catalog_payload_annotations(payload)
+    rows: list[_CatalogScoreRow] = []
+    for species in catalog.species.values():
+        phase, reaction, duplicate = annotations.get(
+            species.species_id, (None, None, False)
+        )
+        rows.append(
+            _CatalogScoreRow(
+                species_id=species.species_id,
+                formula=species.formula,
+                species=species,
+                pure_phase_token=phase,
+                source_reaction=reaction,
+                duplicate=duplicate,
+            )
+        )
+    return tuple(rows), None
+
+
+def _catalog_names_match(row: _CatalogScoreRow, formula: str) -> bool:
+    return _catalog_formulas_equal(row.formula, formula) or _catalog_formulas_equal(
+        row.species_id, formula
+    )
+
+
+def _catalog_positive_fraction(raw: object) -> Fraction | None:
+    try:
+        value = Fraction(str(raw))
+    except (TypeError, ValueError, ZeroDivisionError):
+        return None
+    if value <= 0:
+        return None
+    return value
+
+
+def _catalog_observation_terms(reaction: object) -> dict[str, Fraction] | None:
+    terms = getattr(reaction, "terms", None)
+    if not terms:
+        return None
+    signed: dict[str, Fraction] = {}
+    for term in terms:
+        species = getattr(term, "species", None)
+        formula = getattr(species, "formula", None)
+        coefficient = getattr(term, "coefficient", None)
+        if not formula or coefficient is None:
+            return None
+        try:
+            value = Fraction(coefficient)
+        except (TypeError, ValueError, ZeroDivisionError):
+            return None
+        if value == 0:
+            return None
+        key = _catalog_bare_formula(str(formula))
+        signed[key] = signed.get(key, Fraction(0)) + value
+    return {key: value for key, value in signed.items() if value != 0} or None
+
+
+def _catalog_reaction_reason(
+    row: _CatalogScoreRow,
+    identity: Identity,
+    *,
+    required: bool,
+) -> str | None:
+    state = identity.reaction
+    present = state is not None and state.is_value and state.value is not None
+    if not present:
+        return "catalog_reaction_missing" if required else None
+    if row.source_reaction is None:
+        return "catalog_source_reaction_undeclared"
+    observed = _catalog_observation_terms(state.value)
+    from simulator.vapour_rail.catalog import source_reaction_terms
+
+    catalog = source_reaction_terms(row.source_reaction)
+    if observed is None or catalog is None:
+        return "catalog_reaction_unreadable"
+    if observed != catalog:
+        return "catalog_reaction_mismatch"
+    return None
+
+
+def _catalog_partial_observable(observable: object) -> bool:
+    from simulator.vapour_rail.catalog import PressureObservable
+
+    return observable in {
+        PressureObservable.EQUILIBRIUM_PARTIAL_PRESSURE,
+        PressureObservable.ASSOCIATION_PARTIAL_PRESSURE,
+    }
+
+
+def _catalog_psat_block_reason(row: _CatalogScoreRow) -> str | None:
+    from simulator.vapour_rail.catalog import PressureObservable
+
+    species = row.species
+    observable = species.pressure_observable
+    pure = observable is PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE
+    total = observable is PressureObservable.TOTAL_MIXTURE_PRESSURE
+    if not pure and not total:
+        return "catalog_observable_not_saturation"
+    evaluator = species.evaluator
+    if evaluator is None:
+        return None
+    needs_activity = evaluator.activity_exponent != 0.0
+    needs_oxygen = (
+        evaluator.pO2_exponent != 0.0 or evaluator.o2_channel_term is not None
+    )
+    if needs_activity or needs_oxygen:
+        return "catalog_psat_requires_activity_or_oxygen"
+    return None
+
+
+def _catalog_reference_block_reason(row: _CatalogScoreRow) -> str | None:
+    species = row.species
+    if not _catalog_partial_observable(species.pressure_observable):
+        return "catalog_observable_not_reference"
+    if species.source_reaction_activity is None:
+        return "catalog_reference_component_undeclared"
+    evaluator = species.evaluator
+    if evaluator is not None and evaluator.activity_exponent == 0.0:
+        return "catalog_pressure_independent_of_endmember_activity"
+    return None
+
+
+def _catalog_partial_block_reason(row: _CatalogScoreRow) -> str | None:
+    species = row.species
+    if not _catalog_partial_observable(species.pressure_observable):
+        return "catalog_observable_not_partial"
+    evaluator = species.evaluator
+    if evaluator is not None and evaluator.activity_exponent == 0.0:
+        return "catalog_pressure_independent_of_mixture_activity"
+    if species.source_reaction_activity is None:
+        return "catalog_reference_component_undeclared"
+    return None
+
+
+def _catalog_reference_identity_reason(
+    row: _CatalogScoreRow, identity: Identity
+) -> str | None:
+    declaration = row.species.source_reaction_activity
+    phase, phase_reason = _catalog_condensed_phase(declaration.standard_state.phase)
+    if phase_reason is not None:
+        return phase_reason
+    state = identity.reference_state
+    if state is None or not state.is_value or not isinstance(state.value, StandardState):
+        return "catalog_reference_state_missing"
+    standard = state.value
+    if standard.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER:
+        return "catalog_reference_convention_mismatch"
+    if not _catalog_formulas_equal(standard.endmember.formula, declaration.component_id):
+        return "catalog_reference_component_mismatch"
+    if phase_token(standard.endmember) is not phase:
+        return "catalog_reference_phase_mismatch"
+    return _catalog_reaction_reason(row, identity, required=True)
+
+
+def _catalog_stated_phase_disagrees(identity: Identity, phase: Phase) -> bool:
+    state = identity.reference_state
+    if state is not None and state.is_value and isinstance(state.value, StandardState):
+        token = phase_token(state.value.endmember)
+        if token is not None and token is not phase:
+            return True
+    reservoir = identity.reservoir
+    if reservoir is not None and reservoir.is_value and reservoir.value is not None:
+        token = phase_token(reservoir.value)
+        if token in CONDENSED_PHASES and token is not phase:
+            return True
+    return False
+
+
+def _catalog_partial_identity_reason(
+    row: _CatalogScoreRow, identity: Identity
+) -> str | None:
+    declaration = row.species.source_reaction_activity
+    phase, phase_reason = _catalog_condensed_phase(declaration.standard_state.phase)
+    if phase_reason is not None:
+        return phase_reason
+    state = identity.composition
+    if state is None or not state.is_value or not isinstance(state.value, Composition):
+        return "catalog_source_activity_not_supplied"
+    composition = state.value
+    if (
+        composition.amount_basis is not AmountBasis.MOLE_FRACTION
+        or len(composition.components) != 1
+    ):
+        return "catalog_source_activity_not_supplied"
+    component, amount = composition.components[0]
+    if amount != 1 or not _catalog_formulas_equal(component, declaration.component_id):
+        return "catalog_source_activity_not_supplied"
+    if _catalog_stated_phase_disagrees(identity, phase):
+        return "catalog_stated_phase_mismatch"
+    return _catalog_reaction_reason(row, identity, required=False)
+
+
+def _catalog_choose_row(
+    matched: tuple[_CatalogScoreRow, ...] | list[_CatalogScoreRow],
+    identity: Identity,
+    *,
+    block_reason,
+    identity_reason,
+) -> tuple[_CatalogScoreRow | None, str | None]:
+    unblocked = [row for row in matched if block_reason(row) is None]
+    if not unblocked:
+        reasons = {block_reason(row) for row in matched}
+        reason = reasons.pop() if len(reasons) == 1 else "catalog_species_ambiguous"
+        return None, reason
+    kept = [row for row in unblocked if identity_reason(row, identity) is None]
+    if len(kept) == 1:
+        return kept[0], None
+    if len(kept) > 1:
+        return None, "catalog_species_ambiguous"
+    reasons = {identity_reason(row, identity) for row in unblocked}
+    reason = reasons.pop() if len(reasons) == 1 else "catalog_species_ambiguous"
+    return None, reason
+
+
+def _catalog_oxygen_bar(
+    identity: Identity, evaluator: object
+) -> tuple[float | None, str | None]:
+    needs_oxygen = (
+        abs(evaluator.pO2_exponent) > 0.0 or evaluator.o2_channel_term is not None
+    )
+    if not needs_oxygen:
+        return None, None
+    # Printed fO2 is the transport value. The request owner forbids using it
+    # as the melt-interface oxygen a catalog row declares.
+    if evaluator.oxygen_fugacity_channel == "intrinsic_melt":
+        return None, "catalog_intrinsic_melt_oxygen_not_supplied"
+    fo2 = identity.fO2_Pa
+    if fo2 is None or not fo2.is_value or fo2.value is None:
+        return None, "catalog_oxygen_not_supplied"
+    try:
+        bar = as_decimal(fo2.value) / PA_PER_BAR_DEC
+    except (InvalidOperation, TypeError, ValueError, ArithmeticError):
+        return None, "catalog_oxygen_not_positive"
+    if not bar.is_finite() or bar <= 0:
+        return None, "catalog_oxygen_not_positive"
+    return float(bar), None
+
+
+def _catalog_evaluated_prediction(
+    observation: Observation,
+    identity: Identity,
+    quantity: Quantity,
+    row: _CatalogScoreRow,
+    *,
+    source_activity: float | None,
+) -> EnginePrediction:
+    evaluator = row.species.evaluator
+    if evaluator is None:
+        return _catalog_refuse(
+            identity,
+            "catalog_evaluator_unavailable",
+            formula=_catalog_bare_formula(identity.species.formula),
+            species_id=row.species_id,
+        )
+    temperature = temperature_of(identity)
+    assert temperature is not None
+    pO2_bar, oxygen_reason = _catalog_oxygen_bar(identity, evaluator)
+    if oxygen_reason is not None:
+        return _catalog_refuse(
+            identity,
+            oxygen_reason,
+            formula=_catalog_bare_formula(identity.species.formula),
+            species_id=row.species_id,
+        )
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
+    try:
+        evaluation = evaluator.evaluate(
+            float(temperature),
+            source_activity=source_activity,
+            pO2_bar=pO2_bar,
+        )
+        value = Decimal(str(evaluation.pressure_pa))
+    except (CatalogCompileError, InvalidOperation, OverflowError, ValueError) as exc:
+        return _catalog_refuse(
+            identity,
+            "catalog_compile_error",
+            formula=_catalog_bare_formula(identity.species.formula),
+            species_id=row.species_id,
+            detail=str(exc),
+        )
+    if not value.is_finite() or value <= 0:
+        return _catalog_refuse(
+            identity,
+            "catalog_pressure_invalid",
+            formula=_catalog_bare_formula(identity.species.formula),
+            species_id=row.species_id,
+        )
+    low, high = evaluator.valid_temperature_K
+    certified_band = {
+        "temperature_K": (Decimal(str(low)), Decimal(str(high)))
+    }
+    authority = Authority.BRIDGE
+    notices: tuple[Notice, ...] = ()
+    if evaluation.out_of_range:
+        authority = Authority.EXTRAPOLATED
+        notices = (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason="catalog_temperature_extrapolated",
+                origin=observation.observation_id or "catalog_evaluator",
+                band=f"[{low:g}, {high:g}] K",
+                authority=Authority.EXTRAPOLATED,
+            ),
+        )
+    elif evaluation.status:
+        notices = (
+            Notice(
+                kind=NoticeKind.FALLBACK,
+                affected_quantities=(quantity,),
+                reason=str(evaluation.status),
+                origin=observation.observation_id or "catalog_evaluator",
+                source="catalog_evaluator",
+                destination=str(evaluation.status),
+            ),
+        )
+    return _catalog_prediction(
+        identity,
+        execution=ExecutionState.PRODUCED,
+        value=value,
+        unit=QUANTITY_UNITS[quantity],
+        authority=authority,
+        notices=notices,
+        certified_band=certified_band,
+        call_evidence=f"catalog_evaluator:{row.species_id}",
+        version=evaluator.evaluator_family or None,
+    )
+
+
+def _predict_catalog_evaluator(observation: Observation) -> EnginePrediction:
+    """Translate one identity onto ``catalog.evaluate``. No melt activity."""
+
+    identity = observation.identity
+    if not isinstance(identity, Identity):
+        return _catalog_prediction(
+            None,
+            execution=ExecutionState.NOT_PROBED,
+            refusal=RefusalReason.IDENTITY_UNKNOWN,
+            detail={"reason": "quantity_unknown"},
+        )
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return _catalog_prediction(
+            identity,
+            execution=ExecutionState.NOT_PROBED,
+            refusal=RefusalReason.IDENTITY_UNKNOWN,
+            detail={"reason": "quantity_unknown"},
+        )
+    if quantity not in _CATALOG_PREDICTED_QUANTITIES:
+        return _catalog_prediction(
+            identity,
+            execution=ExecutionState.UNSUPPORTED,
+            refusal=RefusalReason.UNSUPPORTED,
+            detail=_quantity_not_predicted_detail(quantity),
+        )
+    species = identity.species
+    if species is None or not species.formula:
+        return _catalog_refuse(identity, "catalog_species_missing")
+    temperature = temperature_of(identity)
+    if temperature is None:
+        return _catalog_refuse(
+            identity,
+            "catalog_temperature_missing",
+            formula=_catalog_bare_formula(species.formula),
+        )
+    if temperature <= 0:
+        return _catalog_refuse(
+            identity,
+            "catalog_temperature_not_positive",
+            formula=_catalog_bare_formula(species.formula),
+        )
+    rows, error = _catalog_score_rows()
+    formula = species.formula
+    if error is not None:
+        return _catalog_refuse(
+            identity,
+            "catalog_compile_error",
+            formula=_catalog_bare_formula(formula),
+            detail=error,
+        )
+    matched = [row for row in rows if _catalog_names_match(row, formula)]
+    if not matched:
+        return _catalog_refuse(
+            identity,
+            "catalog_species_absent",
+            formula=_catalog_bare_formula(formula),
+        )
+    if any(row.duplicate for row in matched):
+        return _catalog_refuse(
+            identity,
+            "catalog_species_ambiguous",
+            formula=_catalog_bare_formula(formula),
+        )
+    if quantity is Quantity.P_SAT:
+        reservoir = stated_pure_substance_reservoir(identity)
+        if reservoir is None:
+            return _catalog_refuse(
+                identity,
+                "catalog_reservoir_not_pure_condensed",
+                formula=_catalog_bare_formula(formula),
+            )
+        reservoir_phase = Phase(reservoir[1])
+
+        def _psat_identity_reason(row: _CatalogScoreRow, _identity: Identity) -> str | None:
+            phase, phase_reason = _catalog_condensed_phase(row.pure_phase_token)
+            if phase_reason is not None:
+                return phase_reason
+            if phase is not reservoir_phase:
+                return "catalog_reservoir_phase_mismatch"
+            return None
+
+        chosen, reason = _catalog_choose_row(
+            matched,
+            identity,
+            block_reason=_catalog_psat_block_reason,
+            identity_reason=_psat_identity_reason,
+        )
+        if chosen is None:
+            return _catalog_refuse(
+                identity,
+                reason or "catalog_species_ambiguous",
+                formula=_catalog_bare_formula(formula),
+            )
+        return _catalog_evaluated_prediction(
+            observation,
+            identity,
+            quantity,
+            chosen,
+            source_activity=None,
+        )
+    if quantity is Quantity.P_REFERENCE:
+        chosen, reason = _catalog_choose_row(
+            matched,
+            identity,
+            block_reason=_catalog_reference_block_reason,
+            identity_reason=_catalog_reference_identity_reason,
+        )
+    else:
+        # A mixture partial needs the catalog's declared source activity.
+        # This translator does not compute one from a melt composition.
+        chosen, reason = _catalog_choose_row(
+            matched,
+            identity,
+            block_reason=_catalog_partial_block_reason,
+            identity_reason=_catalog_partial_identity_reason,
+        )
+    if chosen is None:
+        return _catalog_refuse(
+            identity,
+            reason or "catalog_species_ambiguous",
+            formula=_catalog_bare_formula(formula),
+        )
+    return _catalog_evaluated_prediction(
+        observation,
+        identity,
+        quantity,
+        chosen,
+        source_activity=1.0,
+    )
+
+
 def _predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -9516,6 +10201,8 @@ def _predict_with_engine(
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
     _require_score_engine(engine)
+    if engine is Engine.CATALOG_EVALUATOR:
+        return _predict_catalog_evaluator(observation)
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     if engine is Engine.NASA_CEA_9 and quantity is not None:
