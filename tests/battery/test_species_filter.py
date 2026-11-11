@@ -294,6 +294,77 @@ def test_filtered_cli_keeps_published_artifacts_and_labels_subset(
     assert (subset / "compilation-comparisons.jsonl").is_file()
 
 
+def test_unfiltered_cli_preserves_summary_bytes_and_completion_line(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    context = _context_with_species()
+    battery = tmp_path / "data" / "battery"
+    battery.mkdir(parents=True)
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    payload = {"records": [{"citation": "Münter 1972"}], "store_stamp": stamp}
+    expected_summary = (
+        json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n"
+    ).encode("utf-8")
+    monkeypatch.setattr(score_mod, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(
+        battery_score, "emit_store_stamp_mismatch_warning", lambda *_args: None
+    )
+    monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
+
+    def fake_score(_context, path, **_kwargs):
+        score_mod.write_residuals_jsonl(
+            (), {}, path.with_name(path.name + ".partial")
+        )
+        aggregate = SimpleNamespace(
+            scored_count=0, summary_payload=lambda _store_stamp: payload
+        )
+        metadata = SimpleNamespace(
+            family_band_values={},
+            headline_band_values={},
+            tier_band_values={},
+            aggregate=aggregate,
+            static_refusals=(),
+            selected_reference_count=0,
+        )
+        return 0, metadata
+
+    def fake_compilation(_context, path, **_kwargs):
+        assert "observation_filter" not in _kwargs
+        path.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(battery_score, "_score_store_to_jsonl", fake_score)
+    monkeypatch.setattr(
+        battery_score, "_write_compilation_comparisons_jsonl", fake_compilation
+    )
+    monkeypatch.setattr(
+        battery_score,
+        "_render_score_report_from_payloads_legacy",
+        lambda *_args, **_kwargs: "# Battery score report\n",
+    )
+    monkeypatch.setattr(
+        battery_score, "_append_nasa9_fit_comparison_stratum", lambda report, _rows: report
+    )
+
+    assert battery_score.main(["--root", str(tmp_path)]) == 0
+
+    assert (battery / "score-summary.json").read_bytes() == expected_summary
+    assert capsys.readouterr().out == (
+        "residuals=0 scored=0 pin_failures=0 host=test\n"
+    )
+
+
+def test_cli_help_explains_filtered_artifact_location(capsys) -> None:
+    with pytest.raises(SystemExit) as raised:
+        battery_score.main(["--help"])
+
+    assert raised.value.code == 0
+    help_text = capsys.readouterr().out
+    assert "data/battery/subsets/<filter-hash>/" in help_text
+    assert "run an unfiltered score to refresh the published headline" in help_text.lower()
+
+
 def test_compilation_comparison_writer_filters_observations(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

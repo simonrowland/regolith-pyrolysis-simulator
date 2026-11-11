@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict
+from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -199,3 +200,171 @@ def test_sossi_selected_experiments_match_full_rows_and_integrate_only_selected(
     assert _encode(asdict(selected[0])) == _encode(asdict(full_target))
     assert integrated_experiments
     assert set(integrated_experiments) == {target_id}
+
+
+def test_residue_cohort_caches_are_scoped_by_selected_experiments(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery import score
+    from simulator.battery.enums import Engine, EvidenceClass, ExecutionState, Phase, Quantity
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import Species
+    from . import factories as F
+
+    hashimoto_source = score._HASHIMOTO_SOURCE_ID
+    sossi_source = score._SOSSI_SOURCE_ID
+    hashimoto_experiments = {
+        f"{hashimoto_source}::experiment::run-{index:02d}": F.tabulation_experiment(
+            experiment_id=f"{hashimoto_source}::experiment::run-{index:02d}"
+        )
+        for index in range(24)
+    }
+    hashimoto_observations = {
+        f"{hashimoto_source}::residue::run-{index:02d}": F.observation(
+            f"{hashimoto_source}::residue::run-{index:02d}",
+            experiment_id,
+            Identity(
+                Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                Species("FeO", Phase.L),
+            ),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=hashimoto_source,
+        )
+        for index, experiment_id in enumerate(hashimoto_experiments)
+    }
+    hashimoto_context = score.ScoreContext(
+        works={},
+        experiments=hashimoto_experiments,
+        observations=hashimoto_observations,
+        hostname="test",
+    )
+    sossi_short_ids = tuple(f"run-{index:02d}" for index in range(43))
+    sossi_experiments = [
+        {"experiment_id": short_id} for short_id in sossi_short_ids
+    ]
+    sossi_observations = {
+        f"{sossi_source}::residue::{short_id}": F.observation(
+            f"{sossi_source}::residue::{short_id}",
+            f"{sossi_source}::experiment::{short_id}",
+            Identity(
+                Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                Species("Mn", Phase.L),
+            ),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=sossi_source,
+        )
+        for short_id in sossi_short_ids
+    }
+    sossi_context = score.ScoreContext(
+        works={}, experiments={}, observations=sossi_observations, hostname="test"
+    )
+
+    def load_yaml(path):
+        if hashimoto_source in str(path):
+            return {
+                "metadata": [
+                    {
+                        "observation_id": "hashimoto_1983_fe_fcmas_free_evap_geometry_quoted",
+                        "values": {"starting_preform_mm": {"diameter": 1.0}},
+                    }
+                ]
+            }
+        if sossi_source in str(path):
+            return {"experiments": sossi_experiments}
+        return {}
+
+    monkeypatch.setattr(score, "load_yaml", load_yaml)
+    monkeypatch.setattr(
+        score.subprocess,
+        "run",
+        lambda *_args, **_kwargs: SimpleNamespace(stdout="test-revision\n"),
+    )
+    monkeypatch.setattr(score, "openimcc_pack_coefficient_sources", lambda *_args: ())
+    monkeypatch.setattr(score, "openimcc_engine_identity_sources", lambda *_args: ())
+
+    hashimoto_calls: list[frozenset[str] | None] = []
+
+    def hashimoto_cohort(
+        experiments, _catalog, *, selected_experiment_ids=None, **_kwargs
+    ):
+        hashimoto_calls.append(selected_experiment_ids)
+        experiment_ids = (
+            selected_experiment_ids
+            if selected_experiment_ids is not None
+            else {experiment["experiment_id"] for experiment in experiments}
+        )
+        return tuple(
+            SimpleNamespace(
+                experiment_id=experiment_id,
+                alpha_arm=alpha_arm,
+                primary_geometry_policy_id="sphere_shrinking",
+                primary_oxide_wt_pct={"FeO": 1.0},
+                geometry_oxide_wt_pct={"sphere_shrinking": {"FeO": 1.0}},
+                sensitivity_band_wt_pct={"FeO": (1.0, 1.0)},
+                provenance={"code_revision": "test-revision", "integration": {}},
+            )
+            for experiment_id in experiment_ids
+            for alpha_arm in (
+                "alpha_common_unity_sensitivity",
+                "alpha_runtime_catalog",
+            )
+        )
+
+    monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", hashimoto_cohort)
+    hashimoto_cache = {}
+    hashimoto_ids = tuple(hashimoto_experiments)
+    for experiment_id in hashimoto_ids[:2]:
+        prediction = score._hashimoto_residue_prediction(
+            hashimoto_context,
+            next(
+                observation
+                for observation in hashimoto_observations.values()
+                if observation.experiment_id == experiment_id
+            ),
+            Engine.INTERNAL_ANALYTICAL,
+            hashimoto_cache,
+            selected_experiment_ids=frozenset({experiment_id}),
+        )
+        assert prediction.execution.state is ExecutionState.PRODUCED, prediction.refusal_detail
+    assert hashimoto_calls == [
+        frozenset({hashimoto_ids[0]}),
+        frozenset({hashimoto_ids[1]}),
+    ]
+
+    sossi_calls: list[frozenset[str] | None] = []
+
+    def sossi_cohort(
+        experiments, _catalog, *, selected_experiment_ids=None, **_kwargs
+    ):
+        sossi_calls.append(selected_experiment_ids)
+        return tuple(
+            SimpleNamespace(
+                experiment_id=experiment["experiment_id"],
+                primary_element_ppm={"Mn": 10.0},
+                geometry_element_ppm={"Mn": {"sphere_constant": 10.0}},
+                sensitivity_band_ppm={"Mn": (9.0, 11.0)},
+                channel_missing_elements=(),
+                provenance={},
+            )
+            for experiment in experiments
+            if selected_experiment_ids is None
+            or experiment["experiment_id"] in selected_experiment_ids
+        )
+
+    monkeypatch.setattr(residue, "_predict_sossi_residue_cohort", sossi_cohort)
+    sossi_cache = {}
+    for short_id in sossi_short_ids[:2]:
+        prediction = score._sossi_residue_prediction(
+            sossi_context,
+            sossi_observations[f"{sossi_source}::residue::{short_id}"],
+            Engine.INTERNAL_ANALYTICAL,
+            sossi_cache,
+            selected_experiment_ids=frozenset({short_id}),
+        )
+        assert prediction.execution.state is ExecutionState.PRODUCED
+    assert sossi_calls == [
+        frozenset({sossi_short_ids[0]}),
+        frozenset({sossi_short_ids[1]}),
+    ]
