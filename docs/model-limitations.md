@@ -301,7 +301,7 @@ the individual factors, which is what KEMS activity data and evaporation-coeffic
 The reproduction battery replays every in-scope literature observation (vapour-pressure and
 rate series, activity coefficients, evaporation coefficients, Gibbs tables and transition
 points) through the engines and reports the residuals. At this release it evaluates **2085
-observations, 21 of them comparable**; the rest carry typed skip reasons. Mismatches are reported
+observations, 20 of them comparable**; the rest carry typed skip reasons. Mismatches are reported
 as findings, and tolerances are never widened to pass. The full generated residual tables, coverage
 breakdowns and findings are on [Validation battery rollup](validation-battery-rollup.md).
 The cross-engine scoring behind these residuals is described in
