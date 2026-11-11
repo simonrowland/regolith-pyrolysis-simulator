@@ -885,7 +885,7 @@ def _p253_gibbs_at_298(result):
         ([], None, False),
     ],
 )
-def test_h1_compilation_units_preserve_every_printed_shape(tmp_path, units):
+def test_h1_compilation_units_preserve_every_printed_shape(tmp_path, units, expected, mapped):
     root = _write_min_tree(tmp_path)
     path = _copy_compilation_record(
         root,
