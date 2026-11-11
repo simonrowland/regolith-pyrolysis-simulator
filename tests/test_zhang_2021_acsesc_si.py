@@ -87,7 +87,9 @@ def test_zhang_si_migrates_percent_and_keeps_unprinted_fo2_unknown() -> None:
         identity = rows[key].identity
         assert identity.temperature_K.is_value
         assert identity.composition.is_value
-        assert identity.total_pressure_Pa.is_unknown
+        # The reviewed SI audit records the methods vacuum as approximately 1e-4 Pa.
+        assert identity.total_pressure_Pa.is_value
+        assert identity.total_pressure_Pa.value == Decimal("0.0001")
         assert identity.fO2_Pa.is_unknown
 
     residue = rows["zhang_2021_table1_bas1400c60m_residue_composition"]

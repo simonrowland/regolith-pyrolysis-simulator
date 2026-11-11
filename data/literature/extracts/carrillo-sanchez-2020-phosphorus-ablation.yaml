@@ -1,0 +1,1443 @@
+schema_version: literature_extract.v1
+source_id: carrillo-sanchez-2020-phosphorus-ablation
+source:
+  citation: Carrillo-Sánchez, J. D., Bones, D. L., Douglas, K. M., Flynn, G. J., Wirick, S., Fegley, B. Jr., Araki, T., Kaulich,
+    B. & Plane, J. M. C. (2020), "Injection of meteoric phosphorus into planetary atmospheres", Planetary and Space Science
+    187, 104926.
+  doi: 10.1016/j.pss.2020.104926
+  url: https://doi.org/10.1016/j.pss.2020.104926
+  year: 2020
+extraction:
+  method: Manual transcription from MinerU table HTML and machine text. Table 3 row and column assignments were checked against
+    the rendered PDF page. PDF renders were checked for the prose measurement summary on page 9 and MASI conditions on page
+    3. No plotted curve points were digitized.
+  date: '2026-11-03'
+  worker: w1103cw3-cs20
+  provenance_path: raw/carrillo-sanchez-2020-phosphorus-ablation/carrillo-sanchez-2020-phosphorus-ablation.pdf
+review_status: draft
+evidence_policy:
+  classification: mixed
+  measurement_claim: MASI measured normalized PO and Ca laser-induced fluorescence profiles. The only numerical MASI release
+    result stated in text is the PO peak-temperature interval for Allende particles with radius above 19 μm. No numerical
+    MASI mass-loss series or post-ablation residue P content is tabulated in the article; the profile data are plotted and
+    were not digitized.
+  model_generator: >-
+    Table 3 reports CABMOD-ZoDy global phosphorus fluxes and planetary ablation efficiencies. The 48 P/PO/PO2
+    flux cells remain quoted_attributed typed refusals under d-110 because model inputs are not stored. The twelve
+    parenthetical phosphorus-ablation efficiencies and six total cosmic-dust mass rates are model_derived context;
+    they are not furnace pyrolysis yields or elemental-P influx comparison points.
+  missing_values: The article gives a linear temperature-ramp form but no numerical heating rate. It states about 15 Pa in
+    N2 for MASI, but gives no experimental fO2. Table 3 does not print an experimental temperature, total pressure, fO2, or
+    per-row composition for its integrated planetary model outputs.
+  figure_policy: Figures 3 and 6 contain normalized PO and Ca LIF curves; Figures 4 and 5 contain measured MASI points mixed
+    with model predictions. None were digitized. The curve and point series remain figure-read candidates.
+  scope_note: Table 1 is XANES phosphorus speciation, not ablation release data. Table 2 contains thermodynamic/model inputs.
+    Neither supplies measured MASI mass loss or residue P content. Supporting Information containing individual MASI profiles
+    was not present in the available corpus or supporting-source tree.
+fidelity_samples:
+- path: species.P.observations[carrillo_sanchez_2020_table3_earth_p_mass_influx].values.points[0].value
+  value: '0.000028'
+  locator:
+    page: 13
+    pdf_page_index: 12
+    table: '3'
+    row: 2
+    column: 3
+- path: species.P.observations[carrillo_sanchez_2020_table3_mars_total_p_mass_influx].values.points[3].value
+  value: '0.0012'
+  locator:
+    page: 13
+    pdf_page_index: 12
+    table: '3'
+    row: 10
+    column: 6
+- path: species.P.observations[carrillo_sanchez_2020_table3_venus_total_p_mass_influx].values.points[3].value
+  value: '0.024'
+  locator:
+    page: 13
+    pdf_page_index: 12
+    table: '3'
+    row: 15
+    column: 6
+- path: species.PO.observations[carrillo_sanchez_2020_allende_po_ablation_peak_temperature_radius_gt19um].values.T_K
+  value:
+    kind: interval
+    interval_low: '2100'
+    interval_high: '2200'
+  locator:
+    page: 9
+    pdf_page_index: 8
+    section: 3.2.1
+species:
+  P:
+    observations:
+    - observation_id: carrillo_sanchez_2020_table3_earth_p_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Earth P
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token. mass_loss_rate and evaporation_rate are
+          not planetary atmospheric influx.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Earth
+        row_species_as_printed: P
+        table_row_number: 2
+        points:
+        - value: '0.000028'
+          value_as_printed: 2.8 × 10^-5
+          column_as_printed: JFC
+          table_row_number: 2
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Earth P
+        - value: '0.00000016'
+          value_as_printed: 1.6 × 10^-7
+          column_as_printed: AST
+          table_row_number: 2
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Earth P
+        - value: '0.000032'
+          value_as_printed: 3.2 × 10^-5
+          column_as_printed: HTC
+          table_row_number: 2
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Earth P
+        - value: '0.000061'
+          value_as_printed: 6.1 × 10^-5
+          column_as_printed: Total P
+          table_row_number: 2
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Earth P
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth P
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth P
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth P
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth P
+    - observation_id: carrillo_sanchez_2020_table3_earth_total_p_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Earth Total
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Earth
+        row_species_as_printed: Total
+        aggregate_species_as_printed: P + PO + PO2
+        table_row_number: 5
+        points:
+        - value: '0.0071'
+          value_as_printed: 7.1 × 10^-3
+          column_as_printed: JFC
+          table_row_number: 5
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Earth Total
+        - value: '0.0022'
+          value_as_printed: 2.2 × 10^-3
+          column_as_printed: AST
+          table_row_number: 5
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Earth Total
+        - value: '0.008'
+          value_as_printed: 8.0 × 10^-3
+          column_as_printed: HTC
+          table_row_number: 5
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Earth Total
+        - value: '0.017'
+          value_as_printed: 0.017 (41%)
+          column_as_printed: Total P
+          table_row_number: 5
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Earth Total
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth Total
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth Total
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth Total
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth Total
+    - observation_id: carrillo_sanchez_2020_table3_mars_p_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Mars P
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Mars
+        row_species_as_printed: P
+        table_row_number: 7
+        points:
+        - value: '0.0000011'
+          value_as_printed: 1.1 × 10^-6
+          column_as_printed: JFC
+          table_row_number: 7
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Mars P
+        - value: '0.0000000006'
+          value_as_printed: 6.0 × 10^-10
+          column_as_printed: AST
+          table_row_number: 7
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Mars P
+        - value: '0.0000067'
+          value_as_printed: 6.7 × 10^-6
+          column_as_printed: HTC
+          table_row_number: 7
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Mars P
+        - value: '0.0000078'
+          value_as_printed: 7.8 × 10^-6
+          column_as_printed: Total P
+          table_row_number: 7
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Mars P
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars P
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars P
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars P
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars P
+    - observation_id: carrillo_sanchez_2020_table3_mars_total_p_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Mars Total
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Mars
+        row_species_as_printed: Total
+        aggregate_species_as_printed: P + PO + PO2
+        table_row_number: 10
+        points:
+        - value: '0.00017'
+          value_as_printed: 1.7 × 10^-4
+          column_as_printed: JFC
+          table_row_number: 10
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Mars Total
+        - value: '0.000013'
+          value_as_printed: 1.3 × 10^-5
+          column_as_printed: AST
+          table_row_number: 10
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Mars Total
+        - value: '0.00096'
+          value_as_printed: 9.6 × 10^-4
+          column_as_printed: HTC
+          table_row_number: 10
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Mars Total
+        - value: '0.0012'
+          value_as_printed: 1.2 × 10^-3
+          column_as_printed: Total P
+          table_row_number: 10
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Mars Total
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars Total
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars Total
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars Total
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars Total
+    - observation_id: carrillo_sanchez_2020_table3_venus_p_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Venus P
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Venus
+        row_species_as_printed: P
+        table_row_number: 12
+        points:
+        - value: '0.000034'
+          value_as_printed: 3.4 × 10^-5
+          column_as_printed: JFC
+          table_row_number: 12
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Venus P
+        - value: '0.0000002'
+          value_as_printed: 2.0 × 10^-7
+          column_as_printed: AST
+          table_row_number: 12
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Venus P
+        - value: '0.000054'
+          value_as_printed: 5.4 × 10^-5
+          column_as_printed: HTC
+          table_row_number: 12
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Venus P
+        - value: '0.000089'
+          value_as_printed: 8.9 × 10^-5
+          column_as_printed: Total P
+          table_row_number: 12
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Venus P
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus P
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus P
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus P
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus P
+    - observation_id: carrillo_sanchez_2020_table3_venus_total_p_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Venus Total
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Venus
+        row_species_as_printed: Total
+        aggregate_species_as_printed: P + PO + PO2
+        table_row_number: 15
+        points:
+        - value: '0.011'
+          value_as_printed: 0.011 (36%)
+          column_as_printed: JFC
+          table_row_number: 15
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Venus Total
+        - value: '0.0019'
+          value_as_printed: 1.9 × 10^-3
+          column_as_printed: AST
+          table_row_number: 15
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Venus Total
+        - value: '0.011'
+          value_as_printed: 0.011 (98%)
+          column_as_printed: HTC
+          table_row_number: 15
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Venus Total
+        - value: '0.024'
+          value_as_printed: 0.024 (53%)
+          column_as_printed: Total P
+          table_row_number: 15
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Venus Total
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus Total
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus Total
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus Total
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus Total
+    context:
+    - observation_id: carrillo_sanchez_2020_table3_phosphorus_ablation_efficiencies
+      type: model_result_record
+      locator: {page: 13, table: '3'}
+      units: '%'
+      values:
+        quantity_as_printed: fraction of phosphorus that ablates from each dust source
+        method_class: model_derived
+        evidence_class: model_derived
+        method:
+          name: CABMOD-ZoDy
+          method_locator:
+            page: 11
+            section: 3.4
+            section_as_printed: Determining the phosphorus mass influx at Earth, Mars and Venus
+          result_locator: {page: 13, table: '3'}
+        admission_status: context_only
+        reason: >-
+          A planetary model ablation efficiency is not a furnace pyrolysis yield and is not a
+          comparison point.
+        percentages:
+        - planet_as_printed: Earth
+          dust_source_as_printed: JFC-Planck
+          value_as_printed: '(25%)'
+          table_row_number: 6
+          table_column_number: 3
+          locator: {page: 13, table: '3', row: 'Earth continuation', column: 3}
+        - planet_as_printed: Earth
+          dust_source_as_printed: AST
+          value_as_printed: '(57%)'
+          table_row_number: 6
+          table_column_number: 4
+          locator: {page: 13, table: '3', row: 'Earth continuation', column: 4}
+        - planet_as_printed: Earth
+          dust_source_as_printed: HTC
+          value_as_printed: '(96%)'
+          table_row_number: 6
+          table_column_number: 5
+          locator: {page: 13, table: '3', row: 'Earth continuation', column: 5}
+        - planet_as_printed: Earth
+          dust_source_as_printed: Total P
+          value_as_printed: '(41%)'
+          table_row_number: 5
+          table_column_number: 6
+          locator: {page: 13, table: '3', row: 'Earth Total', column: 6}
+        - planet_as_printed: Mars
+          dust_source_as_printed: JFC-Planck
+          value_as_printed: '(11%)'
+          table_row_number: 11
+          table_column_number: 3
+          locator: {page: 13, table: '3', row: 'Mars continuation', column: 3}
+        - planet_as_printed: Mars
+          dust_source_as_printed: AST
+          value_as_printed: '(3%)'
+          table_row_number: 11
+          table_column_number: 4
+          locator: {page: 13, table: '3', row: 'Mars continuation', column: 4}
+        - planet_as_printed: Mars
+          dust_source_as_printed: HTC
+          value_as_printed: '(93%)'
+          table_row_number: 11
+          table_column_number: 5
+          locator: {page: 13, table: '3', row: 'Mars continuation', column: 5}
+        - planet_as_printed: Mars
+          dust_source_as_printed: Total P
+          value_as_printed: '(38%)'
+          table_row_number: 11
+          table_column_number: 6
+          locator: {page: 13, table: '3', row: 'Mars continuation', column: 6}
+        - planet_as_printed: Venus
+          dust_source_as_printed: JFC-Planck
+          value_as_printed: '(36%)'
+          table_row_number: 15
+          table_column_number: 3
+          locator: {page: 13, table: '3', row: 'Venus Total', column: 3}
+        - planet_as_printed: Venus
+          dust_source_as_printed: AST
+          value_as_printed: '(67%)'
+          table_row_number: 16
+          table_column_number: 4
+          locator: {page: 13, table: '3', row: 'Venus continuation', column: 4}
+        - planet_as_printed: Venus
+          dust_source_as_printed: HTC
+          value_as_printed: '(98%)'
+          table_row_number: 15
+          table_column_number: 5
+          locator: {page: 13, table: '3', row: 'Venus Total', column: 5}
+        - planet_as_printed: Venus
+          dust_source_as_printed: Total P
+          value_as_printed: '(53%)'
+          table_row_number: 15
+          table_column_number: 6
+          locator: {page: 13, table: '3', row: 'Venus Total', column: 6}
+    - observation_id: carrillo_sanchez_2020_table3_bulk_cosmic_dust_mass_rates
+      type: model_result_record
+      locator: {page: 13, table: '3'}
+      units: t d-1
+      values:
+        quantity_as_printed: total cosmic-dust mass ablated and total cosmic-dust mass influx
+        species_as_printed: bulk cosmic dust, not elemental phosphorus
+        method_class: model_derived
+        evidence_class: model_derived
+        method:
+          name: CABMOD-ZoDy
+          method_locator:
+            page: 11
+            section: 3.4
+            section_as_printed: Determining the phosphorus mass influx at Earth, Mars and Venus
+          result_locator: {page: 13, table: '3'}
+        reason: These are bulk cosmic-dust mass rates, not elemental phosphorus influx.
+        rates:
+        - planet_as_printed: Earth
+          table_row_number: 2
+          total_ablated:
+            value_as_printed: '8.2'
+            table_column_number: 7
+            locator: {page: 13, table: '3', row: 'Earth P', column: 7}
+          total_influx:
+            value_as_printed: '28.0 ± 8.1'
+            uncertainty_as_printed: '± 8.1'
+            confidence_level: not stated
+            table_column_number: 8
+            locator: {page: 13, table: '3', row: 'Earth P', column: 8}
+        - planet_as_printed: Mars
+          table_row_number: 7
+          total_ablated:
+            value_as_printed: '0.65'
+            table_column_number: 7
+            locator: {page: 13, table: '3', row: 'Mars P', column: 7}
+          total_influx:
+            value_as_printed: '2.1 ± 1.2'
+            uncertainty_as_printed: '± 1.2'
+            confidence_level: not stated
+            table_column_number: 8
+            locator: {page: 13, table: '3', row: 'Mars P', column: 8}
+        - planet_as_printed: Venus
+          table_row_number: 12
+          total_ablated:
+            value_as_printed: '12.7'
+            table_column_number: 7
+            locator: {page: 13, table: '3', row: 'Venus P', column: 7}
+          total_influx:
+            value_as_printed: '31.0 ± 17.7'
+            uncertainty_as_printed: '± 17.7'
+            confidence_level: not stated
+            table_column_number: 8
+            locator: {page: 13, table: '3', row: 'Venus P', column: 8}
+  PO:
+    observations:
+    - observation_id: carrillo_sanchez_2020_allende_po_ablation_peak_temperature_radius_gt19um
+      type: transition_point
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: 3.2.1
+      phase: gas
+      units: K
+      values:
+        quantity: PO_ablation_peak_temperature
+        method_class: measured_direct
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The reported temperature is the peak of a measured PO LIF ablation profile, not a thermodynamic transition;
+          no exact battery quantity represents an ablation-signal peak temperature.
+        schema_gap: No exact quantity token for a PO ablation-signal peak temperature; transition_temperature is a distinct
+          thermodynamic transition quantity.
+        value_as_printed: between 2100 K and 2200 K
+        T_K:
+          kind: interval
+          interval_low: '2100'
+          interval_high: '2200'
+        signal_as_printed: PO laser-induced fluorescence ablation peak
+        sample_as_printed: Allende meteorite particles
+        particle_radius_as_printed: '>19 μm'
+        heating_ramp_as_printed: linear temperature ramp, T = c1 + c2 t
+        heating_rate_as_printed: numeric c2 not stated
+        instrument_as_printed: Meteoric Ablation Simulator (MASI), time-resolved LIF
+        wavelength_nm_as_printed: '246.27'
+        points:
+        - value:
+            kind: interval
+            interval_low: '2100'
+            interval_high: '2200'
+          value_as_printed: between 2100 K and 2200 K
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: interval
+                  interval_low: '2100'
+                  interval_high: '2200'
+              locator:
+                page: 9
+                section: 3.2.1
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '15'
+                  approximate: true
+              locator:
+                page: 3
+                section: 2.1
+                note: Printed as about 15 Pa (in N2); approximate pressure retained.
+            atmosphere:
+              state:
+                tag: value
+                value: N2
+              locator:
+                page: 3
+                section: 2.1
+            fO2_control:
+              state:
+                tag: unknown
+                reason: No numeric fO2 or gas ratio is stated for the N2 MASI experiments.
+              locator:
+                page: 3
+                section: 2.1
+            heating_rate_K_s:
+              state:
+                tag: unknown
+                reason: The ramp is linear but no numeric slope is stated.
+              locator:
+                page: 7
+                figure: '3'
+                note: The caption prints T = c1 + c2 t without a numeric c2.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2100'
+              interval_high: '2200'
+          locator:
+            page: 9
+            section: 3.2.1
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '15'
+              approximate: true
+          locator:
+            page: 3
+            section: 2.1
+            note: Printed as about 15 Pa (in N2); approximate pressure retained.
+        atmosphere:
+          state:
+            tag: value
+            value: N2
+          locator:
+            page: 3
+            section: 2.1
+        fO2_control:
+          state:
+            tag: unknown
+            reason: No numeric fO2 or gas ratio is stated for the N2 MASI experiments.
+          locator:
+            page: 3
+            section: 2.1
+        heating_rate_K_s:
+          state:
+            tag: unknown
+            reason: The ramp is linear but no numeric slope is stated.
+          locator:
+            page: 7
+            figure: '3'
+            note: The caption prints T = c1 + c2 t without a numeric c2.
+    - observation_id: carrillo_sanchez_2020_table3_earth_po_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Earth PO
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Earth
+        row_species_as_printed: PO
+        table_row_number: 3
+        points:
+        - value: '0.0011'
+          value_as_printed: 1.1 × 10^-3
+          column_as_printed: JFC
+          table_row_number: 3
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO
+        - value: '0.00027'
+          value_as_printed: 2.7 × 10^-4
+          column_as_printed: AST
+          table_row_number: 3
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO
+        - value: '0.0012'
+          value_as_printed: 1.2 × 10^-3
+          column_as_printed: HTC
+          table_row_number: 3
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO
+        - value: '0.0025'
+          value_as_printed: 2.5 × 10^-3
+          column_as_printed: Total P
+          table_row_number: 3
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO
+    - observation_id: carrillo_sanchez_2020_table3_mars_po_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Mars PO
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Mars
+        row_species_as_printed: PO
+        table_row_number: 8
+        points:
+        - value: '0.000018'
+          value_as_printed: 1.8 × 10^-5
+          column_as_printed: JFC
+          table_row_number: 8
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO
+        - value: '0.0000013'
+          value_as_printed: 1.3 × 10^-6
+          column_as_printed: AST
+          table_row_number: 8
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO
+        - value: '0.00013'
+          value_as_printed: 1.3 × 10^-4
+          column_as_printed: HTC
+          table_row_number: 8
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO
+        - value: '0.00015'
+          value_as_printed: 1.5 × 10^-4
+          column_as_printed: Total P
+          table_row_number: 8
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO
+    - observation_id: carrillo_sanchez_2020_table3_venus_po_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Venus PO
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Venus
+        row_species_as_printed: PO
+        table_row_number: 13
+        points:
+        - value: '0.0013'
+          value_as_printed: 1.3 × 10^-3
+          column_as_printed: JFC
+          table_row_number: 13
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO
+        - value: '0.00025'
+          value_as_printed: 2.5 × 10^-4
+          column_as_printed: AST
+          table_row_number: 13
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO
+        - value: '0.0018'
+          value_as_printed: 1.8 × 10^-3
+          column_as_printed: HTC
+          table_row_number: 13
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO
+        - value: '0.0033'
+          value_as_printed: 3.3 × 10^-3
+          column_as_printed: Total P
+          table_row_number: 13
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO
+  PO2:
+    observations:
+    - observation_id: carrillo_sanchez_2020_table3_earth_po2_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Earth PO2
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Earth
+        row_species_as_printed: PO2
+        table_row_number: 4
+        points:
+        - value: '0.006'
+          value_as_printed: 6.0 × 10^-3
+          column_as_printed: JFC
+          table_row_number: 4
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO2
+        - value: '0.0019'
+          value_as_printed: 1.9 × 10^-3
+          column_as_printed: AST
+          table_row_number: 4
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO2
+        - value: '0.0068'
+          value_as_printed: 6.8 × 10^-3
+          column_as_printed: HTC
+          table_row_number: 4
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO2
+        - value: '0.015'
+          value_as_printed: '0.015'
+          column_as_printed: Total P
+          table_row_number: 4
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO2
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO2
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO2
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Earth PO2
+    - observation_id: carrillo_sanchez_2020_table3_mars_po2_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Mars PO2
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Mars
+        row_species_as_printed: PO2
+        table_row_number: 9
+        points:
+        - value: '0.00015'
+          value_as_printed: 1.5 × 10^-4
+          column_as_printed: JFC
+          table_row_number: 9
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO2
+        - value: '0.000012'
+          value_as_printed: 1.2 × 10^-5
+          column_as_printed: AST
+          table_row_number: 9
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO2
+        - value: '0.00082'
+          value_as_printed: 8.2 × 10^-4
+          column_as_printed: HTC
+          table_row_number: 9
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO2
+        - value: '0.00098'
+          value_as_printed: 9.8 × 10^-4
+          column_as_printed: Total P
+          table_row_number: 9
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO2
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO2
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO2
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Mars PO2
+    - observation_id: carrillo_sanchez_2020_table3_venus_po2_mass_influx
+      type: gas_speciation
+      locator:
+        page: 13
+        table: '3'
+        row: Venus PO2
+      phase: gas
+      units: t d-1
+      values:
+        quantity: planetary_phosphorus_mass_influx_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for
+          this result.
+        schema_gap: No exact global planetary phosphorus influx-rate quantity token.
+        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+        planet_as_printed: Venus
+        row_species_as_printed: PO2
+        table_row_number: 14
+        points:
+        - value: '0.0097'
+          value_as_printed: 9.7 × 10^-3
+          column_as_printed: JFC
+          table_row_number: 14
+          table_column_number: 3
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO2
+        - value: '0.0016'
+          value_as_printed: 1.6 × 10^-3
+          column_as_printed: AST
+          table_row_number: 14
+          table_column_number: 4
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO2
+        - value: '0.0091'
+          value_as_printed: 9.1 × 10^-3
+          column_as_printed: HTC
+          table_row_number: 14
+          table_column_number: 5
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO2
+        - value: '0.020'
+          value_as_printed: '0.020'
+          column_as_printed: Total P
+          table_row_number: 14
+          table_column_number: 6
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO2
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No experimental temperature is printed for this integrated planetary model output.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experiment total pressure or planetary pressure is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO2
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No numeric fO2 is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO2
+        composition:
+          state:
+            tag: unknown
+            reason: No numeric dust composition is printed in this table row.
+          locator:
+            page: 13
+            table: '3'
+            row: Venus PO2

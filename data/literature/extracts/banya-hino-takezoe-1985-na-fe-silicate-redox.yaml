@@ -2657,6 +2657,18 @@ species:
   Fe_tO:
     observations:
     - observation_id: banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c07]
+        method: &banya_hino_t2_activity_method
+          state: {tag: value, value: Eq. (2) activity reduction using P_H2O/P_H2 and K1}
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1767
+            section: '3.2'
+            equation: '2'
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id027
@@ -2727,7 +2739,7 @@ species:
           locator: *id027
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.452'
         a_FetO_as_printed: '0.452'
@@ -2761,6 +2773,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_2_p002_t02_r04_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_2_p002_t02_r04_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_2_p002_t02_r04_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id028
@@ -2831,7 +2848,7 @@ species:
           locator: *id028
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.450'
         a_FetO_as_printed: '0.450'
@@ -2865,6 +2882,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_3_p002_t02_r05_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_3_p002_t02_r05_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_3_p002_t02_r05_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id029
@@ -2935,7 +2957,7 @@ species:
           locator: *id029
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.449'
         a_FetO_as_printed: '0.449'
@@ -2969,6 +2991,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_24_p002_t02_r06_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_24_p002_t02_r06_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_24_p002_t02_r06_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id030
@@ -3039,7 +3066,7 @@ species:
           locator: *id030
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.450'
         a_FetO_as_printed: '0.450'
@@ -3073,6 +3100,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_25_p002_t02_r07_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_25_p002_t02_r07_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_25_p002_t02_r07_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id031
@@ -3143,7 +3175,7 @@ species:
           locator: *id031
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.448'
         a_FetO_as_printed: '0.448'
@@ -3177,6 +3209,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_5_p002_t02_r08_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_5_p002_t02_r08_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_5_p002_t02_r08_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id032
@@ -3247,7 +3284,7 @@ species:
           locator: *id032
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.551'
         a_FetO_as_printed: '0.551'
@@ -3281,6 +3318,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_6_p002_t02_r09_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_6_p002_t02_r09_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_6_p002_t02_r09_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id033
@@ -3351,7 +3393,7 @@ species:
           locator: *id033
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.550'
         a_FetO_as_printed: '0.550'
@@ -3385,6 +3427,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_7_p002_t02_r10_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_7_p002_t02_r10_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_7_p002_t02_r10_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id034
@@ -3455,7 +3502,7 @@ species:
           locator: *id034
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.551'
         a_FetO_as_printed: '0.551'
@@ -3489,6 +3536,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_8_p002_t02_r11_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_8_p002_t02_r11_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_8_p002_t02_r11_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id035
@@ -3559,7 +3611,7 @@ species:
           locator: *id035
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.550'
         a_FetO_as_printed: '0.550'
@@ -3593,6 +3645,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_18_p002_t02_r12_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_18_p002_t02_r12_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_18_p002_t02_r12_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id036
@@ -3663,7 +3720,7 @@ species:
           locator: *id036
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.551'
         a_FetO_as_printed: '0.551'
@@ -3697,6 +3754,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_9_p002_t02_r13_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_9_p002_t02_r13_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_9_p002_t02_r13_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id037
@@ -3767,7 +3829,7 @@ species:
           locator: *id037
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.653'
         a_FetO_as_printed: '0.653'
@@ -3801,6 +3863,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_10_p002_t02_r14_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_10_p002_t02_r14_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_10_p002_t02_r14_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id038
@@ -3871,7 +3938,7 @@ species:
           locator: *id038
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.654'
         a_FetO_as_printed: '0.654'
@@ -3905,6 +3972,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_11_p002_t02_r15_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_11_p002_t02_r15_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_11_p002_t02_r15_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id039
@@ -3975,7 +4047,7 @@ species:
           locator: *id039
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.650'
         a_FetO_as_printed: '0.650'
@@ -4009,6 +4081,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_12_p002_t02_r16_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_12_p002_t02_r16_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_12_p002_t02_r16_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id040
@@ -4079,7 +4156,7 @@ species:
           locator: *id040
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.649'
         a_FetO_as_printed: '0.649'
@@ -4113,6 +4190,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_17_p002_t02_r17_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_17_p002_t02_r17_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_17_p002_t02_r17_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id041
@@ -4183,7 +4265,7 @@ species:
           locator: *id041
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.647'
         a_FetO_as_printed: '0.647'
@@ -4217,6 +4299,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_20_p002_t02_r18_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_20_p002_t02_r18_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_20_p002_t02_r18_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id042
@@ -4287,7 +4374,7 @@ species:
           locator: *id042
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.648'
         a_FetO_as_printed: '0.648'
@@ -4321,6 +4408,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_13_p002_t02_r19_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_13_p002_t02_r19_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_13_p002_t02_r19_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id043
@@ -4391,7 +4483,7 @@ species:
           locator: *id043
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.702'
         a_FetO_as_printed: '0.702'
@@ -4425,6 +4517,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_15_p002_t02_r20_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_15_p002_t02_r20_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_15_p002_t02_r20_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id044
@@ -4495,7 +4592,7 @@ species:
           locator: *id044
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.698'
         a_FetO_as_printed: '0.698'
@@ -4529,6 +4626,11 @@ species:
         iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
         activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
     - observation_id: banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c08
+      derived_from: [banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c07]
+      derivation:
+        relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+        inputs: [banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c07]
+        method: *banya_hino_t2_activity_method
       experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
       type: activity_coefficient
       locator: &id045
@@ -4599,7 +4701,7 @@ species:
           locator: *id045
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         component: FetO
         activity: '0.696'
         a_FetO_as_printed: '0.696'

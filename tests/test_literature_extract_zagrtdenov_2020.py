@@ -6,7 +6,7 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as battery_migrate
-from simulator.battery.enums import NoticeKind
+from simulator.battery.enums import Authority, NoticeKind
 from tests.helpers.literature_extract import find_context_row
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -60,15 +60,16 @@ TABLE2_GRID = [
 TABLE2_COMPONENTS = ("Al2O3", "SiO2", "MnO", "FeO", "MgO", "TiO2", "Cr2O3", "V2O3")
 
 # Table 3 is 1440 °C = 1713.15 K at 1 atm = 1.01325 bar. That is above
-# O'Neill (1987) QFM's 900–1420 K EMF window, so a printed offset is
-# predicted and flagged. μ° = -587474 + 1584.427 T - 203.3164 T ln(T)
+# O'Neill (1987) QFM's 900–1420 K EMF window, so every printed buffer
+# is predicted and flagged. μ° = -587474 + 1584.427 T - 203.3164 T ln(T)
 # + 0.092710 T² J/mol, and log10(fO2/bar) = μ°/(R T ln 10) with
 # R = 8.31446261815324. At 1713.15 K the 1-bar value is -5.932654703.
 # Frost (1991) beta-quartz QFM adds C(P-1)/T = 0.110*(1.01325-1)/1713.15
-# = 8.508e-7 dex (K/bar * bar / K). Offset rows use that sum; bare FMQ
-# has no printed numeric offset and stays unconverted.
+# = 8.508e-7 dex (K/bar * bar / K). The buffer parser treats a bare
+# buffer name as offset 0, so FMQ uses that sum and FMQ±2 add the offset.
 _ZAGRTDENOV_QFM_LOG10_BAR = {
     "FMQ-2": Decimal("-7.932653852"),
+    "FMQ": Decimal("-5.932653852"),
     "FMQ+2": Decimal("-3.932653852"),
 }
 
@@ -242,23 +243,35 @@ def test_isolated_migration_scores_numeric_glass_components_and_preserves_condit
         assert row.point_conditions["fO2_control"].locator.page == 41
         assert row.point_conditions["total_pressure_Pa"].locator.page == 6
         assert "fO2_log" not in row.point_conditions
+        # Both notice channels land. The gate-8 sentence carries the
+        # 900–1420 K window. The stack-4 pair records the survey band.
         buffer = row.point_conditions["fO2_control"].state.value
-        expected_log = _ZAGRTDENOV_QFM_LOG10_BAR.get(buffer)
-        if expected_log is None:
-            assert not row.notices
-        else:
-            assert row.identity.fO2_Pa is not None and row.identity.fO2_Pa.is_value
-            assert abs(
-                row.identity.fO2_Pa.value.log10() - Decimal(5) - expected_log
-            ) < Decimal("5e-9")
-            band_notices = [
-                notice
-                for notice in row.notices
-                if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-            ]
-            assert len(band_notices) == 1
-            assert "900" in (band_notices[0].band or "")
-            assert "1420" in (band_notices[0].band or "")
+        expected_log = _ZAGRTDENOV_QFM_LOG10_BAR[buffer]
+        assert row.identity.fO2_Pa is not None and row.identity.fO2_Pa.is_value
+        assert abs(
+            row.identity.fO2_Pa.value.log10() - Decimal(5) - expected_log
+        ) < Decimal("5e-9")
+        assert any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and "900" in (notice.band or "")
+            and "1420" in (notice.band or "")
+            for notice in row.notices
+        )
+        assert {
+            (
+                NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+                Authority.EXTRAPOLATED,
+                "0.2544",
+            ),
+            (
+                NoticeKind.OUT_OF_CERTIFIED_BAND,
+                Authority.EXTRAPOLATED,
+                "0.2544",
+            ),
+        } <= {
+            (notice.kind, notice.authority, notice.band)
+            for notice in row.notices
+        }
         if cell == "D.L.":
             assert row.value.kind.value == "unavailable"
             assert values["component_amount"]["tag"] == "unknown"
@@ -315,6 +328,27 @@ def test_context_preserves_starting_crystal_tables_auxiliary_columns_and_model_f
     model = find_context_row(document, "zagrtdenov_2020_model_eq19b_fit")
     assert model["values"]["coefficient_values_with_uncertainty_as_printed"]["a"] == "-7.01 ± 2.10"
     assert model["values"]["fit_comparison_as_printed"]["R_squared"] == "0.94"
+
+
+def test_intro_saturation_bundle_marks_the_uncited_example_unattributed():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    row = find_context_row(document, "zagrtdenov_2020_intro_literature_cr_saturation_values")
+    assert row["values"]["method_class"] == "quoted_unattributed"
+    assert "names no source for the ~1220 ppm" in row["values"]["attribution_note"]
+    assert row["values"]["values_as_printed"][2]["attribution"] == (
+        "No source is named for this example in the paper."
+    )
+    assert row["values"]["values_as_printed"][0]["attribution"] == "Forsythe & Fisk (1994)"
+    assert row["values"]["values_as_printed"][1]["attribution"] == "Roeder & Reynolds (1991)"
+    assert row["values"]["values_as_printed"][3]["attribution"] == "Gale et al. (2013)"
+
+    mutated = deepcopy(document)
+    changed = find_context_row(
+        mutated, "zagrtdenov_2020_intro_literature_cr_saturation_values"
+    )
+    changed["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        assert changed["values"]["method_class"] == "quoted_unattributed"
 
 
 def test_source_test_needs_no_external_corpus_files():

@@ -41,6 +41,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections import Counter
 from contextlib import contextmanager, nullcontext
 from dataclasses import dataclass, fields, is_dataclass
 from decimal import Decimal, InvalidOperation
@@ -123,6 +124,15 @@ class ValidationIssue:
     detail: str
 
 
+@dataclass(frozen=True)
+class ValidationNotice:
+    """A counted, non-failing validation item attributed to one source."""
+
+    code: str
+    source_id: str
+    count: int
+
+
 _ADVISORY_REASONS = frozenset({RefusalReason.IDENTITY_INCOMPLETE})
 _DERIVATION_EVIDENCE_CLASSES = frozenset(
     {EvidenceClass.MODEL_DERIVED, EvidenceClass.MEASURED_REDUCED}
@@ -150,6 +160,7 @@ _CERTIFICATION_DOWNGRADE_NOTICES = frozenset(
 @dataclass(frozen=True)
 class ValidationReport:
     issues: tuple[ValidationIssue, ...]
+    notices: tuple[ValidationNotice, ...] = ()
 
     @property
     def ok(self) -> bool:
@@ -1114,6 +1125,22 @@ def validate_observation(
     )
 
 
+def _model_derived_provenance_is_backlogged(observation: Observation) -> bool:
+    evidence = observation.evidence.class_
+    if not (
+        evidence.is_value
+        and evidence.value is EvidenceClass.MODEL_DERIVED
+        and _value_has_numeric_value(observation.value)
+    ):
+        return False
+    derivation = observation.derivation
+    return (
+        derivation is None
+        or not derivation.has_located_method
+        or not derivation.has_named_references
+    )
+
+
 def _validate_observation(
     observation: Observation,
     experiments: Mapping[str, Experiment],
@@ -1234,6 +1261,15 @@ def _validate_observation(
     ev = observation.evidence.class_
     derivation = observation.derivation
     raw_inputs = derivation.raw_inputs if derivation is not None else None
+    model_derived_backlogged = _model_derived_provenance_is_backlogged(observation)
+    method_located = derivation is not None and derivation.has_located_method
+    model_references_declared = (
+        derivation is not None and derivation.has_named_references
+    )
+    has_resolved_lineage = any(
+        parent in observations or parent in asset_ids or parent in context_ids
+        for parent in observation.derived_from or ()
+    )
     declares_printed_unresolved = (
         derivation is not None and derivation.declares_unresolved_printed_inputs
     )
@@ -1277,8 +1313,8 @@ def _validate_observation(
             derivation is not None
             and derivation.has_located_unprinted_raw_inputs
             and not derivation.inputs
-            and derivation.has_located_method
-            and derivation.has_named_references
+            and method_located
+            and model_references_declared
         )
     ):
         issues.append(
@@ -1332,6 +1368,28 @@ def _validate_observation(
         declares_unprinted_raw_inputs = (
             derivation is not None and derivation.declares_unprinted_raw_inputs
         )
+        if (
+            ev.value is EvidenceClass.MODEL_DERIVED
+            and _value_has_numeric_value(observation.value)
+            and not declares_unprinted_raw_inputs
+            and not model_derived_backlogged
+        ):
+            if not method_located:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.method",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived requires a nonempty method with a physical page and paragraph/section or equation locator",
+                    )
+                )
+            if not model_references_declared:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.references",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived requires named references",
+                    )
+                )
         if raw_inputs is not None:
             if (
                 not declares_unprinted_raw_inputs
@@ -1367,6 +1425,7 @@ def _validate_observation(
         if (
             ev.value is EvidenceClass.MODEL_DERIVED
             and declares_unprinted_raw_inputs
+            and not model_derived_backlogged
         ):
             if derivation is None or derivation.method is None:
                 issues.append(
@@ -1389,7 +1448,7 @@ def _validate_observation(
                     _issue(
                         f"{path}.derivation.method",
                         RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
+                        "model_derived raw_inputs method requires a nonempty value and a physical page with paragraph/section or equation locator",
                     )
                 )
             if derivation is not None and not derivation.has_named_references:
@@ -1397,13 +1456,9 @@ def _validate_observation(
                     _issue(
                         f"{path}.derivation.references",
                         RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived raw_inputs method requires named compiled references",
+                        "model_derived raw_inputs method requires named references",
                     )
                 )
-        has_resolved_lineage = any(
-            parent in observations or parent in asset_ids or parent in context_ids
-            for parent in observation.derived_from or ()
-        )
         raw_inputs_supply_lineage = (
             derivation is not None
             and derivation.has_located_unprinted_raw_inputs
@@ -1412,11 +1467,20 @@ def _validate_observation(
                 or (
                     ev.value is EvidenceClass.MODEL_DERIVED
                     and derivation.has_located_method
-                    and derivation.has_named_references
+                    and model_references_declared
                 )
             )
         )
-        if not figure_only_without_value:
+        model_derived_unavailable = (
+            ev.value is EvidenceClass.MODEL_DERIVED
+            and observation.value.kind is ValueKind.UNAVAILABLE
+        )
+        model_derived_without_derivation = (
+            model_derived_backlogged and derivation is None
+        )
+        if not figure_only_without_value and not (
+            model_derived_without_derivation or model_derived_unavailable
+        ):
             # printed_unresolved is not complete lineage. A located
             # not_printed declaration excuses a missing derived_from for
             # measured_reduced, and for model_derived only with a located
@@ -2489,6 +2553,11 @@ def validate_corpus(
         )
     source_owners = _source_owners(work_map)
     context_ids = frozenset(context_map or ())
+    provenance_notices_by_source: Counter[str] = Counter(
+        observation.source_id or "(no source_id)"
+        for observation in obs_map.values()
+        if _model_derived_provenance_is_backlogged(observation)
+    )
     for observation in obs_map.values():
         issues.extend(
             _validate_observation(
@@ -2557,4 +2626,12 @@ def validate_corpus(
                     ),
                 )
             )
-    return ValidationReport(tuple(issues))
+    notices = tuple(
+        ValidationNotice(
+            code="model_derived_provenance_unrecorded",
+            source_id=source_id,
+            count=count,
+        )
+        for source_id, count in sorted(provenance_notices_by_source.items())
+    )
+    return ValidationReport(tuple(issues), notices)

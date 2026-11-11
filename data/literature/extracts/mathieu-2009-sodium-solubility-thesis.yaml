@@ -439,7 +439,7 @@ experiments:
         tag: unknown
         reason: sealed_ampoule_equilibration_not_a_gas_flow_regime
 fidelity_samples:
-- species: Na2O_melt
+- species: Na2O
   observation_id: mathieu_2009_t1_acms13_cms8_gamma_na2o
   field: gamma
   value: 2.87e-07
@@ -448,7 +448,7 @@ fidelity_samples:
     published_page: 122
     table: III.1
     row: ACMS13 CMS8
-- species: Na2O_melt
+- species: Na2O
   observation_id: mathieu_2009_t38_acmas5_as1_na2o_analysed
   field: Na2O_wt_pct
   value: 21.07
@@ -463,7 +463,7 @@ fidelity_samples:
     - 138
     table: IV.1
     row: ACMAS5 AS1
-- species: Na2O_melt
+- species: Na2O
   observation_id: mathieu_2009_t38_acma5s26_cma5s1_na2o_analysed
   field: Na2O_wt_pct
   value: 6.91
@@ -478,7 +478,7 @@ fidelity_samples:
     - 138
     table: IV.1
     row: ACMA5S26 CMA5S1
-- species: Na2O_melt
+- species: Na2O
   observation_id: mathieu_2009_t44_acmas5_na1_na2o_analysed
   field: Na2O_wt_pct
   value: 16.61
@@ -491,7 +491,7 @@ fidelity_samples:
     - 159
     table: IV.7
     row: ACMAS5 Na1
-- species: Na2O_melt
+- species: Na2O
   observation_id: mathieu_2009_t41_acmas31_cma9s2_gamma_na2o
   field: gamma_as_printed
   value: 1.72 (0.03)
@@ -500,7 +500,7 @@ fidelity_samples:
     published_page: 153
     table: IV.4
     row: ACMAS31 CMA9S2
-- species: Na2O_melt
+- species: Na2O
   observation_id: mathieu_2009_t42_apedian14_cms36_gamma_na2o
   field: Na2O_mol_pct_corrected
   value: 21.73
@@ -509,7 +509,7 @@ fidelity_samples:
     published_page: 156
     table: IV.5
     row: APEDiAn14 CMS36
-- species: Na2O_melt
+- species: Na2O
   observation_id: mathieu_2009_t40_acma5s22_cma5s2_gamma_na2o
   field: gamma
   value: 1.74e-06
@@ -518,7 +518,7 @@ fidelity_samples:
     published_page: 150
     table: IV.3
     row: ACMA5S22 CMA5S2
-- species: Na2O_melt
+- species: Na2O
   observation_id: mathieu_2009_t46_acmas51_cai_ms2_na2o_analysed
   field: Na2O_wt_pct
   value: 2.28
@@ -531,7 +531,7 @@ fidelity_samples:
     - 161
     table: IV.9 (caption IV.19)
     row: ACMAS51 CAI-MS2
-- species: Na2O_melt
+- species: Na2O
   observation_id: mathieu_2009_prose_p148_gamma_cms15
   field: gamma_as_printed
   value: 5.8*10-07
@@ -540,7 +540,7 @@ fidelity_samples:
     published_page: 125
     section: III.1.2
     note: first listed value in reported iso-activity-coefficient range; CMS15
-- species: Na2O_melt
+- species: Na2O
   observation_id: mathieu_2009_prose_p152_gamma_cms8
   field: gamma_as_printed
   value: 5.21*10-07
@@ -549,7 +549,7 @@ fidelity_samples:
     published_page: 129
     section: III.2
     note: first listed value in reported iso-activity-coefficient range; CMS8
-- species: Na2O_melt
+- species: Na2O
   observation_id: mathieu_2009_prose_p163_gamma_cas_lower
   field: gamma_as_printed
   value: 7*10-07
@@ -559,7 +559,7 @@ fidelity_samples:
     section: IV.1.3
     note: endpoint of reported iso-activity-coefficient range; endpoint composition not stated
 species:
-  Na2O_melt:
+  Na2O:
     observations:
     - observation_id: mathieu_2009_t1_acms13_cms8_na2o_analysed
       experiment: sealed_ampoule_glass_equilibration
@@ -716,7 +716,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms13_cms8_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 4.5
@@ -902,7 +901,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms14_cms11_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 3.1
@@ -1088,7 +1086,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms14_cms12_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 6.52
@@ -1274,7 +1271,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms14_cms13_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 9.94
@@ -1460,7 +1456,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms14_cms15_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 2.48
@@ -1646,7 +1641,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms14_cms16_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 5.0
@@ -1832,7 +1826,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms15_cms17_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 8.12
@@ -2018,7 +2011,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms15_cms20_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 6.56
@@ -2204,7 +2196,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms15_cms21_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 9.88
@@ -2390,7 +2381,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms20_acms23_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 7.08
@@ -2576,7 +2566,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms20_acms24_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 10.16
@@ -2762,7 +2751,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms20_acms26_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 11.78
@@ -2948,7 +2936,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms20_cms10_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 10.85
@@ -3134,7 +3121,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms22_cmsp2_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 8.52
@@ -3320,7 +3306,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms22_cmsp3_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 12.16
@@ -3506,7 +3491,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms22_cms9_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 6.93
@@ -3692,7 +3676,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms22_cms22_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 11.04
@@ -3880,7 +3863,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t1_acms22_cmsp4_na2o_analysed
-          - mathieu_2009_t1_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 14.42
@@ -4282,7 +4264,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms29_cm3_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -4472,7 +4453,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms29_cms4_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -4660,7 +4640,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms30_cms8_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -4848,7 +4827,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms30_cms9_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -5036,7 +5014,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms30_cms10_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -5226,7 +5203,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms30_cms11_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -5414,7 +5390,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms30_cms12_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -5602,7 +5577,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms31_cms13_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -5792,7 +5766,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms31_cms15_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -5982,7 +5955,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms31_cms16_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -6172,7 +6144,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms31_cms17_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -6360,7 +6331,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms31_cms18_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -6550,7 +6520,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms32_cms19_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -6740,7 +6709,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms32_cms20_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -6930,7 +6898,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms32_cms21_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -7186,7 +7153,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms32_cms23_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -7374,7 +7340,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms33_cms24_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -7562,7 +7527,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms33_cms25_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -7750,7 +7714,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms33_cms26_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -7940,7 +7903,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms34_cms31_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -8128,7 +8090,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms34_cms32_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -8316,7 +8277,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t2_acms34_cms33_na2o_analysed
-          - mathieu_2009_t2_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
           introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
@@ -8470,7 +8430,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas5_as1_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -8612,7 +8571,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas5_as2_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -8754,7 +8712,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas6_cms27_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -8896,7 +8853,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas8_cms1_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -9038,7 +8994,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas8_cas1_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -9180,7 +9135,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas8_cas2_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -9322,7 +9276,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas8_cas3_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -9464,7 +9417,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas9_cm1_0_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -9606,7 +9558,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas10_cm2_0_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -9748,7 +9699,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas11_cm3_0_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -9890,7 +9840,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas13_acs_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -10032,7 +9981,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas16_cms22_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -10174,7 +10122,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas16_n2as10_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -10316,7 +10263,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas17_ncs3_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -10458,7 +10404,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas17_ncs4_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -10600,7 +10545,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas17_ncs7_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -10742,7 +10686,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas17_n2as4_5_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -10884,7 +10827,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas17_n2as6_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -11026,7 +10968,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas18_cma25s1_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -11168,7 +11109,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas18_cma25s3_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -11310,7 +11250,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas20_nas4_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -11452,7 +11391,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas20_nas3_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 27.78 mol% Na2O, gamma = a/x = 7.6e-07, but the printed gamma 0.85 under the heading x10^-6 is 8.5e-07
@@ -11597,7 +11535,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas32_cas28_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -11739,7 +11676,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas32_cas13_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -11881,7 +11817,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas32_cas29_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -12023,7 +11958,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas34_cas16_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -12165,7 +12099,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas34_ncas4_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -12309,7 +12242,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas34_ca1_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -12451,7 +12383,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas35_ncas5_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -12593,7 +12524,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas35_cas26_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -12737,7 +12667,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas35_ncas3_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 13.25 mol% Na2O, gamma = a/x = 1.59e-06, but the printed gamma 1.30 under the heading x10^-6 is
@@ -12885,7 +12814,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas35_ncas1_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -13029,7 +12957,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas35_ca2_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -13171,7 +13098,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas37_cas25_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -13313,7 +13239,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas37_cas4_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -13457,7 +13382,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas37_cas8_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -13599,7 +13523,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas38_ncas6_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -13741,7 +13664,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas38_cas7_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -13885,7 +13807,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas39_cas9_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -14029,7 +13950,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas39_ncas7_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -14171,7 +14091,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas40_cms35_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -14313,7 +14232,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas40_cmas19_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -14455,7 +14373,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas40_cmas20_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -14597,7 +14514,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas40_cmas21_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -14739,7 +14655,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acmas40_cmas22_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -14881,7 +14796,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acma5s22_cma5s2_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -15023,7 +14937,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t38_acma5s26_cma5s1_na2o_analysed
-          - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -15153,7 +15066,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas5_as1_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -15283,7 +15195,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas5_as2_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -15415,7 +15326,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas16_cms28_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -15545,7 +15455,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas16_n2as10_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -15675,7 +15584,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas17_n2as4_5_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -15805,7 +15713,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas17_n2as6_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -15935,7 +15842,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas18_cma25s1_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -16065,7 +15971,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas18_cma25s2_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -16195,7 +16100,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas20_nas3_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 27.78 mol% Na2O, gamma = a/x = 7.6e-07, but the printed gamma 0.85 under the heading x10^-6 is 8.5e-07
@@ -16330,7 +16234,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas29_mas11_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -16460,7 +16363,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas29_nmas4_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -16590,7 +16492,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas29_mas6_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -16720,7 +16621,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas29_mas1_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -16852,7 +16752,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas30_mas5_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -16982,7 +16881,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas30_mas8_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -17112,7 +17010,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas30_mas2_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -17242,7 +17139,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas32_mas13_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -17374,7 +17270,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas36_mas17_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -17506,7 +17401,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas36_mas12_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -17636,7 +17530,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas36_nmas3_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -17766,7 +17659,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas37_nmas1_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -17896,7 +17788,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas39_mas3_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -18026,7 +17917,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas39_nmas2_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -18158,7 +18048,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t39_acmas39_mas10_na2o_analysed
-          - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -18288,7 +18177,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acmas40_cmas19_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -18418,7 +18306,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s22_cma5s2_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -18548,7 +18435,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s22_cma5s6_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -18678,7 +18564,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s22_cma5s7_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -18808,7 +18693,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s22_cma5s10_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -18938,7 +18822,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s22_cma5s12_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -19068,7 +18951,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s22_cma5s27_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -19198,7 +19080,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s22_cma5s33_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -19328,7 +19209,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s24_cma5s13_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -19458,7 +19338,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s26_cma5s1_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -19588,7 +19467,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s26_cma5s8_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -19718,7 +19596,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s26_cma5s9_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -19848,7 +19725,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s26_cma5s11_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -19978,7 +19854,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s29_cma5s14_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -20108,7 +19983,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s29_cma5s15_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -20238,7 +20112,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s29_cma5s16_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -20368,7 +20241,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t40_acma5s29_cma5s31_na2o_analysed
-          - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -20498,7 +20370,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t41_acmas31_cma9s15_na2o_analysed
-          - mathieu_2009_t41_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -20667,7 +20538,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t41_acmas31_cma9s2_na2o_analysed
-          - mathieu_2009_t41_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 8.05
@@ -20853,7 +20723,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t41_acmas31_cma9s6_na2o_analysed
-          - mathieu_2009_t41_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 3.86
@@ -21039,7 +20908,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t41_acmas31_cma9s7_na2o_analysed
-          - mathieu_2009_t41_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 7.35
@@ -21225,7 +21093,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t41_acmas31_cma9s8_na2o_analysed
-          - mathieu_2009_t41_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 3.39
@@ -21411,7 +21278,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t41_acmas32_cma9s10_na2o_analysed
-          - mathieu_2009_t41_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 10.18
@@ -21597,7 +21463,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t41_acmas32_cma9s11_na2o_analysed
-          - mathieu_2009_t41_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 2.04
@@ -21783,7 +21648,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t41_acmas32_cma9s12_na2o_analysed
-          - mathieu_2009_t41_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 4.73
@@ -21969,7 +21833,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t41_acmas32_cma9s13_na2o_analysed
-          - mathieu_2009_t41_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 7.84
@@ -22155,7 +22018,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t41_acmas32_cma9s14_na2o_analysed
-          - mathieu_2009_t41_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 11.16
@@ -22341,7 +22203,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t42_apedian14_cms36_na2o_analysed
-          - mathieu_2009_t42_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 25.5
@@ -22527,7 +22388,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t42_apedian14_cmas23_na2o_analysed
-          - mathieu_2009_t42_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 24.34
@@ -22713,7 +22573,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t42_apedian14_cmas24_na2o_analysed
-          - mathieu_2009_t42_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 22.32
@@ -22899,7 +22758,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t42_apedian14_cmas25_na2o_analysed
-          - mathieu_2009_t42_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 22.62
@@ -23085,7 +22943,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t42_apedian14_cmas26_na2o_analysed
-          - mathieu_2009_t42_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 23.4
@@ -23271,7 +23128,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t42_apedian14_cmas27_na2o_analysed
-          - mathieu_2009_t42_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 23.74
@@ -23457,7 +23313,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t42_acmas16s34_cma16s1_na2o_analysed
-          - mathieu_2009_t42_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 28.92
@@ -23643,7 +23498,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t42_acma16s34_cma16s2_na2o_analysed
-          - mathieu_2009_t42_run_conditions
           output_unit: dimensionless
         composition_wt_pct:
           Na2O: 15.17
@@ -23822,7 +23676,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t43_acma16s67_cma16s1_na2o_analysed
-          - mathieu_2009_t43_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=4.07*10-08 and the printed
           corrected 12.73 mol% Na2O, gamma = a/x = 3.2e-07, but the printed gamma 2.54 under the heading x10^-5 is 2.54e-05
@@ -23993,7 +23846,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t43_acma16s67_cma16s2_na2o_analysed
-          - mathieu_2009_t43_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=4.07*10-08 and the printed
           corrected 11.31 mol% Na2O, gamma = a/x = 3.6e-07, but the printed gamma 3.20 under the heading x10^-5 is 3.2e-05
@@ -24138,7 +23990,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas5_na1_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 18.83 mol% Na2O, gamma = a/x = 1.12e-06, but the printed gamma 1.12 under the heading x10^-7 is
@@ -24280,7 +24131,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas5_na2_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 18.06 mol% Na2O, gamma = a/x = 1.17e-06, but the printed gamma 1.17 under the heading x10^-7 is
@@ -24422,7 +24272,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas5_na3_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 17.29 mol% Na2O, gamma = a/x = 1.22e-06, but the printed gamma 1.22 under the heading x10^-7 is
@@ -24566,7 +24415,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas7_ms4_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 12.12 mol% Na2O, gamma = a/x = 1.74e-06, but the printed gamma 1.74 under the heading x10^-7 is
@@ -24708,7 +24556,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas7_ms3_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 11.68 mol% Na2O, gamma = a/x = 1.81e-06, but the printed gamma 1.81 under the heading x10^-7 is
@@ -24850,7 +24697,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas7_pop_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 18.14 mol% Na2O, gamma = a/x = 1.16e-06, but the printed gamma 1.16 under the heading x10^-7 is
@@ -24992,7 +24838,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas7_cmas5_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: Tableau IV.7 prints corrected Na2O 0.00 mol% with gamma 1.27 x10^-7;
           gamma = a/x cannot hold with x = 0. Values carried as printed; not admitted.'
@@ -25132,7 +24977,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas7_cmas6_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 22.82 mol% Na2O, gamma = a/x = 9.25e-07, but the printed gamma 0.92 under the heading x10^-7 is
@@ -25274,7 +25118,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas9_cm1_1_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 14.90 mol% Na2O, gamma = a/x = 1.42e-06, but the printed gamma 1.42 under the heading x10^-7 is
@@ -25416,7 +25259,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas9_cm1_2_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 15.28 mol% Na2O, gamma = a/x = 1.38e-06, but the printed gamma 1.38 under the heading x10^-7 is
@@ -25558,7 +25400,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas9_cm1_4_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 15.93 mol% Na2O, gamma = a/x = 1.32e-06, but the printed gamma 1.32 under the heading x10^-7 is
@@ -25700,7 +25541,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas9_cm1_5_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 16.35 mol% Na2O, gamma = a/x = 1.29e-06, but the printed gamma 1.29 under the heading x10^-7 is
@@ -25842,7 +25682,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas10_cm2_1_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 14.21 mol% Na2O, gamma = a/x = 1.48e-06, but the printed gamma 1.48 under the heading x10^-7 is
@@ -25984,7 +25823,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas10_cm2_2_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 14.62 mol% Na2O, gamma = a/x = 1.44e-06, but the printed gamma 1.44 under the heading x10^-7 is
@@ -26126,7 +25964,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas10_cm2_4_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 15.55 mol% Na2O, gamma = a/x = 1.36e-06, but the printed gamma 1.36 under the heading x10^-7 is
@@ -26268,7 +26105,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas10_cm2_5_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 15.69 mol% Na2O, gamma = a/x = 1.34e-06, but the printed gamma 1.34 under the heading x10^-7 is
@@ -26410,7 +26246,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas11_cm3_1_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 13.84 mol% Na2O, gamma = a/x = 1.52e-06, but the printed gamma 1.52 under the heading x10^-7 is
@@ -26552,7 +26387,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas11_cm3_2_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 14.53 mol% Na2O, gamma = a/x = 1.45e-06, but the printed gamma 1.45 under the heading x10^-7 is
@@ -26694,7 +26528,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas11_cm3_4_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 15.68 mol% Na2O, gamma = a/x = 1.35e-06, but the printed gamma 1.34 under the heading x10^-7 is
@@ -26836,7 +26669,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas11_cm3_5_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 15.94 mol% Na2O, gamma = a/x = 1.32e-06, but the printed gamma 1.32 under the heading x10^-7 is
@@ -26978,7 +26810,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas12_cmas3_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 14.42 mol% Na2O, gamma = a/x = 1.46e-06, but the printed gamma 1.46 under the heading x10^-7 is
@@ -27120,7 +26951,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas12_khc1_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 1.93 mol% Na2O, gamma = a/x = 1.09e-05, but the printed gamma 10.94 under the heading x10^-7 is
@@ -27262,7 +27092,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas12_khc2_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 8.69 mol% Na2O, gamma = a/x = 2.43e-06, but the printed gamma 2.43 under the heading x10^-7 is 2.43e-07
@@ -27403,7 +27232,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas12_khc3_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 15.70 mol% Na2O, gamma = a/x = 1.34e-06, but the printed gamma 1.34 under the heading x10^-7 is
@@ -27547,7 +27375,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas12_khc4_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 21.16 mol% Na2O, gamma = a/x = 9.97e-07, but the printed gamma 1.00 under the heading x10^-7 is
@@ -27691,7 +27518,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas13_po_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 14.92 mol% Na2O, gamma = a/x = 1.41e-06, but the printed gamma 1.41 under the heading x10^-7 is
@@ -27835,7 +27661,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas13_spm_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 1.10 mol% Na2O, gamma = a/x = 1.92e-05, but the printed gamma 19.09 under the heading x10^-7 is
@@ -27977,7 +27802,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas13_mpf_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 8.91 mol% Na2O, gamma = a/x = 2.37e-06, but the printed gamma 2.37 under the heading x10^-7 is 2.37e-07
@@ -28118,7 +27942,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas13_cai_ms2_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 7.32 mol% Na2O, gamma = a/x = 2.88e-06, but the printed gamma 2.88 under the heading x10^-7 is 2.88e-07
@@ -28260,7 +28083,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas18_cma25s1_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 21.14 mol% Na2O, gamma = a/x = 9.98e-07, but the printed gamma 1.00 under the heading x10^-7 is
@@ -28402,7 +28224,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas18_cma25s4_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 10.74 mol% Na2O, gamma = a/x = 1.96e-06, but the printed gamma 1.96 under the heading x10^-7 is
@@ -28546,7 +28367,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas18_cma25s5_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 8.76 mol% Na2O, gamma = a/x = 2.41e-06, but the printed gamma 2.41 under the heading x10^-7 is 2.41e-07
@@ -28689,7 +28509,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas19_cma25s7_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 2.86 mol% Na2O, gamma = a/x = 7.38e-06, but the printed gamma 7.38 under the heading x10^-7 is 7.38e-07
@@ -28832,7 +28651,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas19_cma25s8_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 2.20 mol% Na2O, gamma = a/x = 9.59e-06, but the printed gamma 9.59 under the heading x10^-7 is 9.59e-07
@@ -28975,7 +28793,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas19_cma25s10_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 0.35 mol% Na2O, gamma = a/x = 6.03e-05, but the printed gamma 60.40 under the heading x10^-7 is
@@ -29117,7 +28934,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas19_cmas4_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 0.50 mol% Na2O, gamma = a/x = 4.22e-05, but the printed gamma 42.42 under the heading x10^-7 is
@@ -29259,7 +29075,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas20_cam1_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 0.29 mol% Na2O, gamma = a/x = 7.28e-05, but the printed gamma 60.70 under the heading x10^-7 is
@@ -29401,7 +29216,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas41_cmas7_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 13.02 mol% Na2O, gamma = a/x = 1.62e-06, but the printed gamma 1.62 under the heading x10^-7 is
@@ -29543,7 +29357,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas41_cmas8_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 12.62 mol% Na2O, gamma = a/x = 1.67e-06, but the printed gamma 1.67 under the heading x10^-7 is
@@ -29685,7 +29498,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas41_cmas9_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 13.45 mol% Na2O, gamma = a/x = 1.57e-06, but the printed gamma 1.57 under the heading x10^-7 is
@@ -29827,7 +29639,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas41_cmas10_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 15.00 mol% Na2O, gamma = a/x = 1.41e-06, but the printed gamma 1.41 under the heading x10^-7 is
@@ -29969,7 +29780,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas43_cmas15_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 4.93 mol% Na2O, gamma = a/x = 4.28e-06, but the printed gamma 4.28 under the heading x10^-7 is 4.28e-07
@@ -30110,7 +29920,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas43_cmas16_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 5.28 mol% Na2O, gamma = a/x = 4e-06, but the printed gamma 4.00 under the heading x10^-7 is 4e-07
@@ -30251,7 +30060,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas43_cmas17_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 6.82 mol% Na2O, gamma = a/x = 3.09e-06, but the printed gamma 3.09 under the heading x10^-7 is 3.09e-07
@@ -30393,7 +30201,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas43_cmas18_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 8.67 mol% Na2O, gamma = a/x = 2.43e-06, but the printed gamma 2.43 under the heading x10^-7 is 2.43e-07
@@ -30535,7 +30342,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas44_cmas23_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 13.09 mol% Na2O, gamma = a/x = 1.61e-06, but the printed gamma 1.61 under the heading x10^-7 is
@@ -30677,7 +30483,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas44_cmas24_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 12.70 mol% Na2O, gamma = a/x = 1.66e-06, but the printed gamma 0.66 under the heading x10^-7 is
@@ -30819,7 +30624,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas44_cmas25_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 13.22 mol% Na2O, gamma = a/x = 1.6e-06, but the printed gamma 1.60 under the heading x10^-7 is 1.6e-07
@@ -30960,7 +30764,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas44_cmas26_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 13.01 mol% Na2O, gamma = a/x = 1.62e-06, but the printed gamma 1.62 under the heading x10^-7 is
@@ -31102,7 +30905,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acmas44_cmas27_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 13.53 mol% Na2O, gamma = a/x = 1.56e-06, but the printed gamma 1.56 under the heading x10^-7 is
@@ -31244,7 +31046,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acma16s24_cma16s1_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 19.77 mol% Na2O, gamma = a/x = 1.07e-06, but the printed gamma 1.07 under the heading x10^-7 is
@@ -31386,7 +31187,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t44_acma16s24_cma16s2_na2o_analysed
-          - mathieu_2009_t44_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 5.35 mol% Na2O, gamma = a/x = 3.94e-06, but the printed gamma 3.97 under the heading x10^-7 is 3.97e-07
@@ -31519,7 +31319,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t45_acma16s48_cma16s1_na2o_analysed
-          - mathieu_2009_t45_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -31651,7 +31450,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t45_acma16s48_cma16s2_na2o_analysed
-          - mathieu_2009_t45_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -31819,7 +31617,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t46_acmas21_cma16s1_na2o_analysed
-          - mathieu_2009_t46_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.34*10-09 and the printed
           corrected 10.38 mol% Na2O, gamma = a/x = 2.25e-08, but the printed gamma 0.07 under the heading x10^-6 is
@@ -32008,7 +31805,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t46_acmas21_cma16s2_na2o_analysed
-          - mathieu_2009_t46_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.34*10-09 and the printed
           corrected 1.50 mol% Na2O, gamma = a/x = 1.56e-07, but the printed gamma 0.49 under the heading x10^-6 is 4.9e-07
@@ -32198,7 +31994,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t46_acmas21_spm_na2o_analysed
-          - mathieu_2009_t46_run_conditions
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.34*10-09 and the printed
           corrected 0.15 mol% Na2O, gamma = a/x = 1.56e-06, but the printed gamma 4.83 under the heading x10^-6 is 4.83e-06
@@ -32349,7 +32144,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t46_acmas51_po_na2o_analysed
-          - mathieu_2009_t46_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -32480,7 +32274,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t46_acmas51_pop_na2o_analysed
-          - mathieu_2009_t46_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -32611,7 +32404,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t46_acmas51_pp_na2o_analysed
-          - mathieu_2009_t46_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
@@ -32742,7 +32534,6 @@ species:
             liquid Na2O, Na2O(l) = 2 Na(g) + 1/2 O2(g). Uncertainty propagates corrected mol% and source activity (caption).
           inputs:
           - mathieu_2009_t46_acmas51_cai_ms2_na2o_analysed
-          - mathieu_2009_t46_run_conditions
           output_unit: dimensionless
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only

@@ -206,10 +206,11 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
         for observation in observations
         if observation.identity.composition.is_unknown
     ]
-    # b-704 refusals remain for partial/non-oxide assays; b-1128 admits the
-    # four 102.35 wt% kept-oxide maps after renormalization.
-    assert len(accepted_compositions) == 35
-    assert len(refused_compositions) == 106
+    # Table 5 row 401 prints T.Fe=0.435 wt% with CaO=39.9 and Al2O3=59.6;
+    # row 407 prints T.Fe=0.0524 wt%. Recognized metallic Fe is retained by
+    # the printed-phase rule, so those cells are not unsupported traces.
+    assert len(accepted_compositions) == 103
+    assert len(refused_compositions) == 38
     assert all(
         "mass-percent composition is not usable:" in item.identity.composition.reason
         and (
@@ -229,44 +230,35 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
             ("Fe" if name == "T.Fe" else name): Decimal(amount)
             for name, amount in printed_map.items()
         }
-        # b-704 projects only the printed Fe/T.Fe component at or below the
-        # 0.5 wt% dropped-component threshold from an otherwise closed assay.
-        dropped_iron = expected.get("Fe", Decimal("0"))
-        if dropped_iron <= Decimal("0.5"):
-            expected.pop("Fe", None)
         kept_total = sum(expected.values(), Decimal("0"))
-        printed_oxides = dict(expected)
+        printed_components = dict(expected)
         if Decimal("102") < kept_total <= Decimal("105"):
             scale = Decimal("100") / kept_total
             expected = {name: amount * scale for name, amount in expected.items()}
         if observation.identity.composition.is_value:
             assert observation.identity.composition.value.amount_basis.value == "mass_percent"
             assert observation.identity.composition.value.as_map() == expected
-            if Decimal("0") < dropped_iron <= Decimal("0.5"):
-                projection_notices = [
-                    notice
-                    for notice in observation.notices
-                    if notice.kind is NoticeKind.COMPOSITION_PROJECTED
-                ]
-                assert len(projection_notices) == 1
-                assert projection_notices[0].dropped == ("Fe",)
-                assert f"Fe={dropped_iron} wt%" in projection_notices[0].reason
             if kept_total > Decimal("102"):
                 renormalized_rows += 1
-                expected_moles = wt_pct_to_mole_fraction(printed_oxides)
-                actual_moles = wt_pct_to_mole_fraction(
+                # The full mass-percent vector above pins retained Fe. Compare
+                # the oxide subsystem's proportions separately; this converter
+                # intentionally does not apply elemental phase vocabulary.
+                expected_oxide_moles = wt_pct_to_mole_fraction(printed_components)
+                actual_oxide_moles = wt_pct_to_mole_fraction(
                     observation.identity.composition.value.as_map()
                 )
-                assert set(actual_moles.as_map()) == set(expected_moles.as_map())
-                for species, expected_fraction in expected_moles.as_map().items():
+                assert set(actual_oxide_moles.as_map()) == set(
+                    expected_oxide_moles.as_map()
+                )
+                for species, expected_fraction in expected_oxide_moles.as_map().items():
                     assert abs(
-                        actual_moles.as_map()[species] - expected_fraction
+                        actual_oxide_moles.as_map()[species] - expected_fraction
                     ) < Decimal("1e-26")
                 notice = next(
                     notice
                     for notice in observation.notices
                     if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-                    and notice.band == "95-102 wt% kept oxide total"
+                    and notice.band == "95-102 wt% printed phase total"
                 )
                 assert notice.original == kept_total
                 assert "renormalized to 100 wt%" in notice.reason
@@ -279,7 +271,8 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
             assert iron is not None
             assert f"Fe={iron} wt%" in observation.identity.composition.reason
     assert renormalized_rows == 4
-    # Sample 406 has S=102.35 after its 0.102 wt% Fe trace is dropped.
+    # Table 5 row 406 prints T.Fe=0.102, CaO=38.5, Al2O3=57.5, and CaF2=6.35;
+    # all four recognized components contribute to its 102.452 wt% phase total.
     printed = {
         "Fe": Decimal("0.102"),
         "CaO": Decimal("38.5"),
@@ -287,28 +280,22 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
         "CaF2": Decimal("6.35"),
     }
     normalized_state = _mass_percent_composition_state(
-        printed, basis="printed_oxides", closure_context=printed
+        printed,
+        basis="printed_phase_composition",
+        closure_context=printed,
+        declared_component_map=printed,
+        component_vocabulary="elemental",
     )
     assert normalized_state.is_value
     normalized = normalized_state.value.as_map()
-    assert normalized == {
-        "CaO": Decimal("37.61602344894968246213971666"),
-        "Al2O3": Decimal("56.17977528089887640449438202"),
-        "CaF2": Decimal("6.204201270151441133365901319"),
+    phase_total = sum(printed.values(), Decimal("0"))
+    assert phase_total == Decimal("102.452")
+    expected_normalized = {
+        name: amount * Decimal("100") / phase_total
+        for name, amount in printed.items()
     }
-    molar_masses = {
-        "CaO": Decimal("56.077000000000005"),
-        "Al2O3": Decimal("101.960077"),
-        "CaF2": Decimal("78.074806326"),
-    }
-    moles = {name: amount / molar_masses[name] for name, amount in normalized.items()}
-    total_moles = sum(moles.values(), Decimal("0"))
-    independent_mole_fractions = {
-        name: amount / total_moles for name, amount in moles.items()
-    }
-    actual_mole_fractions = wt_pct_to_mole_fraction(normalized).as_map()
-    assert set(actual_mole_fractions) == set(independent_mole_fractions)
+    assert set(normalized) == set(printed)
     assert all(
-        abs(actual_mole_fractions[name] - expected) < Decimal("1e-12")
-        for name, expected in independent_mole_fractions.items()
+        abs(normalized[name] - expected_normalized[name]) <= Decimal("1e-25")
+        for name in printed
     )

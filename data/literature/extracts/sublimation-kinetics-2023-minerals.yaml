@@ -755,6 +755,20 @@ species:
       regime: engine_evaluation
       units: atm as printed
       values:
+        derivation:
+          relation: "atm_to_Pa"
+          inputs:
+          - "pdf:sublimation-kinetics-2023-minerals"
+          output_unit: "Pa"
+          method:
+            state:
+              tag: value
+              value: "The source-reported Table 2 pressure was converted from atm to Pa."
+            locator:
+              page: 8
+              table: "2"
+          references:
+          - "Shaw, M. G., Humbert, M. S., Brooks, G. A., Rhamdhani, M. A., Duffy, A. R. & Pownceby, M. I. (2023), \"Metal and Oxide Sublimation from Lunar Regolith: A Kinetics Study\", Minerals 13, 79, DOI 10.3390/min13010079"
         quantity: p_sat
         method_class: model_derived
         admission_status: model_output_not_measurement
@@ -950,6 +964,20 @@ species:
       regime: engine_evaluation
       units: atm as printed
       values:
+        derivation:
+          relation: "atm_to_Pa"
+          inputs:
+          - "pdf:sublimation-kinetics-2023-minerals"
+          output_unit: "Pa"
+          method:
+            state:
+              tag: value
+              value: "The source-reported Table 2 pressure was converted from atm to Pa."
+            locator:
+              page: 8
+              table: "2"
+          references:
+          - "Shaw, M. G., Humbert, M. S., Brooks, G. A., Rhamdhani, M. A., Duffy, A. R. & Pownceby, M. I. (2023), \"Metal and Oxide Sublimation from Lunar Regolith: A Kinetics Study\", Minerals 13, 79, DOI 10.3390/min13010079"
         quantity: p_sat
         method_class: model_derived
         admission_status: model_output_not_measurement
@@ -1085,6 +1113,20 @@ species:
       regime: engine_evaluation
       units: atm as printed
       values:
+        derivation:
+          relation: "atm_to_Pa"
+          inputs:
+          - "pdf:sublimation-kinetics-2023-minerals"
+          output_unit: "Pa"
+          method:
+            state:
+              tag: value
+              value: "The source-reported Table 2 pressure was converted from atm to Pa."
+            locator:
+              page: 8
+              table: "2"
+          references:
+          - "Shaw, M. G., Humbert, M. S., Brooks, G. A., Rhamdhani, M. A., Duffy, A. R. & Pownceby, M. I. (2023), \"Metal and Oxide Sublimation from Lunar Regolith: A Kinetics Study\", Minerals 13, 79, DOI 10.3390/min13010079"
         quantity: p_sat
         method_class: model_derived
         admission_status: model_output_not_measurement

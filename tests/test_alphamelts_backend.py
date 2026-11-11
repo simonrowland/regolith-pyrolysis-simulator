@@ -6337,6 +6337,42 @@ def test_normalize_measured_split_reads_both_iron_oxides_through_owner():
     assert normalized["Fe2O3"] == pytest.approx(5.0)
 
 
+def test_normalize_literal_feot_under_qfm_counts_total_iron_once():
+    """A literal FeOt key under QFM is total iron once, then scaled to 100%.
+
+    SiO2 80 and FeOt 10 have no other iron spelling. The single iron mass is
+    10, the oxide sum is 90, and the MELTS basis is 100 * those masses / 90.
+    Counting FeOt again would leave FeO at 20 and SiO2 at 80.
+    """
+
+    backend = AlphaMELTSBackend()
+    backend._redox_buffer = "QFM"
+
+    comp = backend._normalize_composition_to_melts_basis({
+        "SiO2": 80.0,
+        "FeOt": 10.0,
+    })
+
+    assert comp["FeO"] == pytest.approx(100.0 * 10.0 / 90.0)
+    assert comp["SiO2"] == pytest.approx(100.0 * 80.0 / 90.0)
+    assert comp["Fe2O3"] == pytest.approx(0.0)
+    assert sum(comp.values()) == pytest.approx(100.0)
+    assert any(
+        "FeO_total treated as FeOt with QFM" in warning
+        for warning in backend._last_normalization_warnings
+    )
+
+
+def test_normalize_literal_feot_without_policy_still_refuses():
+    backend = AlphaMELTSBackend()
+
+    with pytest.raises(ValueError, match="FeO_total requires explicit redox policy"):
+        backend._normalize_composition_to_melts_basis({
+            "SiO2": 80.0,
+            "FeOt": 10.0,
+        })
+
+
 def test_normalize_composition_refuses_feo_total_without_policy():
     backend = AlphaMELTSBackend()
 
@@ -6360,6 +6396,40 @@ def test_normalize_composition_splits_feo_total_with_explicit_ratio():
 
     assert pytest.approx(sum(comp.values())) == 100.0
     assert comp['FeO'] > comp['Fe2O3'] > 0.0
+
+
+@pytest.mark.parametrize("alias", ("FeO_T", "FeOT", "FeOt", "FeO*"))
+def test_normalize_total_iron_aliases_split_with_explicit_ratio(alias):
+    backend = AlphaMELTSBackend()
+    backend._fe3fet_ratio = 0.2
+
+    normalized = backend._normalize_composition_to_melts_basis({
+        "SiO2": 50.0,
+        alias: 10.0,
+    })
+    canonical = backend._normalize_composition_to_melts_basis({
+        "SiO2": 50.0,
+        "FeO_total": 10.0,
+    })
+
+    assert normalized == pytest.approx(canonical)
+    assert normalized["Fe2O3"] > 0.0
+    assert backend._last_normalization_warnings == []
+
+
+def test_total_iron_alias_consumers_share_feedstock_owner_tuple():
+    from simulator import feedstock_composition, fe_redox
+    from simulator.battery import input_provenance
+    from simulator.melt_backend import alphamelts
+
+    owner = feedstock_composition._TOTAL_IRON_AS_FEO_KEYS
+    assert input_provenance._TOTAL_IRON_AS_FEO_KEYS is owner
+    assert fe_redox._TOTAL_IRON_AS_FEO_KEYS is owner
+    assert alphamelts._TOTAL_IRON_AS_FEO_KEYS is owner
+    assert all(
+        alphamelts.MELTS_OXIDE_ALIASES[alias.lower()] == "FeO_total"
+        for alias in owner
+    )
 
 
 
