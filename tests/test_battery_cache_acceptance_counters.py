@@ -174,11 +174,11 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
                 }
             )
             results.append(
-                (
-                    str(shard),
-                    0,
-                    counters,
-                    {},
+                score._ScoreShardResult(
+                    partial_path=str(shard),
+                    row_count=0,
+                    counters=counters,
+                    runtime_identities={},
                 )
             )
         assert len(results) == 2 * len(SCORE_ENGINE_SET)
