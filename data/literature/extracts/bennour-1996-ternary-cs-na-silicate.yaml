@@ -14,10 +14,13 @@ extraction:
     calculations retain model/derived status.
   date: '2026-11-10'
   worker: codex-resume-22915-1791907429
-  note: Figure 7 activity standard state is not printed; pure-liquid Cs2O is not assumed. The figure-only total x(Cs2O)=0.015
-    point on XSiO2=0.85 is retained as digitized, while Table I starts at 0.045. Temperature conversion to T_C uses T_C =
-    T_K - 273.15; printed 1573 K is retained. Table I and Figure 7 composition coordinates use the printed quasi-binary path
-    relation, with derivation noted.
+  note: >-
+    Published p. 238 states: Our results on the mixing of ((1 - X1 - X2) SiO2, X2Cs2O, X3Na2O) are calculated by assuming
+    the second reference state that means that the oxide activities are related to the square of the ionic intensities.
+    Figure 7 uses the silicate dimer end member for each section; its closed reference-state convention remains unknown.
+    The figure-only total x(Cs2O)=0.015 point on XSiO2=0.85 is retained as digitized, while Table I starts at 0.045.
+    Temperature conversion to T_C uses T_C = T_K - 273.15; printed 1573 K is retained. Table I and Figure 7 composition
+    coordinates use the printed quasi-binary path relation, with derivation noted.
 review_status: draft
 fidelity_samples:
 - path: species.Cs2O.observations[bennour_1996_table_i_x_sio2_0p5_log_ion_ratio].values.points[0].ln_ionic_intensity_ratio_as_published
@@ -130,18 +133,10 @@ fidelity_samples:
     pdf_page_index: 13
     figure: '7'
     row: 2
-- path: species.Cs2O.observations[bennour_1996_fig7_cs2o_x_sio2_0p85].values.points[1].a_Cs2O_as_digitized
-  value: '0.01171'
-  locator:
-    page: 14
-    published_page: 241
-    pdf_page_index: 13
-    figure: '7'
-    row: 2
 - path: species.Cs2O.context[bennour_1996_table_iii].values.rows[5].minus_G_QB_kJ_mol
   value: '6.74'
   locator:
-    page: 14
+    page: 15
     published_page: 242
     pdf_page_index: 14
     table: III
@@ -806,7 +801,7 @@ species:
       composition_derivation: 'Total oxide mole fractions are derived from the printed quasi-binary path: X_Cs2O=(1-X_SiO2)*x_Cs2O
         and X_Na2O=(1-X_SiO2)*(1-x_Cs2O).'
     - observation_id: bennour_1996_fig7_cs2o_x_sio2_0p5
-      type: activity_coefficient
+      type: activity
       locator:
         page: 14
         published_page: 241
@@ -814,16 +809,29 @@ species:
         figure: '7'
         note: X_SiO2 = 0.50; digitized Cs2O activity curve
       T_C: '1299.85'
+      T_K: 1573
       T_range_K:
       - 1573
       - 1573
-      phase: silicate_melt
-      standard_state: not printed; pure-liquid Cs2O is not assumed
+      phase: l
+      standard_state: 'Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of ((1 - X1 - X2) SiO2, X2Cs2O, X3Na2O) are calculated by assuming the second reference state that means that the oxide activities are related to the square of the ionic intensities.'
       regime: kems_effusion
       units: dimensionless activity; mole-fraction composition
       values:
-        quantity: Cs2O_activity
+        quantity: activity
         method_class: model_derived
+        admission_status: figure_only
+        caption: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+        section_as_published: '- - - X = 0.5'
+        axes_as_published:
+          x: mole fraction xCs2O
+          y: 'activity of aCs2O; dimensionless'
+        component_as_published: aCs2O
+        note: Digitized read of the smooth unmarked curve; point values retain read uncertainty.
+        derivation:
+          relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity ratios and the matching Table II fit.
+          inputs: [bennour_1996_table_i_x_sio2_0p5_log_ion_ratio, bennour_1996_table_ii_x_sio2_0p5_fit]
+          output_unit: dimensionless activity
         method: digitized
         axis_calibration: &id001
           source: CS.md, printed p. 241 Figure 7; linear axes calibrated from tick centers
@@ -848,6 +856,14 @@ species:
         - x_path_Cs2O_as_published: '0.00'
           x_Cs2O_formula_unit_as_derived: '0.00000'
           a_Cs2O_as_digitized: '0.00000'
+          activity: '0.00000'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.50000'
+            Cs2O: '0.00000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '76'
@@ -883,6 +899,14 @@ species:
         - x_path_Cs2O_as_published: '0.10'
           x_Cs2O_formula_unit_as_derived: '0.05000'
           a_Cs2O_as_digitized: '0.02023'
+          activity: '0.02023'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.45000'
+            Cs2O: '0.05000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.010'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '282'
@@ -918,6 +942,14 @@ species:
         - x_path_Cs2O_as_published: '0.20'
           x_Cs2O_formula_unit_as_derived: '0.10000'
           a_Cs2O_as_digitized: '0.05283'
+          activity: '0.05283'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.40000'
+            Cs2O: '0.10000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '487'
@@ -953,6 +985,14 @@ species:
         - x_path_Cs2O_as_published: '0.30'
           x_Cs2O_formula_unit_as_derived: '0.15000'
           a_Cs2O_as_digitized: '0.10850'
+          activity: '0.10850'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.35000'
+            Cs2O: '0.15000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '693'
@@ -988,6 +1028,14 @@ species:
         - x_path_Cs2O_as_published: '0.40'
           x_Cs2O_formula_unit_as_derived: '0.20000'
           a_Cs2O_as_digitized: '0.18723'
+          activity: '0.18723'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.30000'
+            Cs2O: '0.20000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '898'
@@ -1023,6 +1071,14 @@ species:
         - x_path_Cs2O_as_published: '0.45'
           x_Cs2O_formula_unit_as_derived: '0.22500'
           a_Cs2O_as_digitized: '0.23939'
+          activity: '0.23939'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.27500'
+            Cs2O: '0.22500'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1001'
@@ -1058,6 +1114,14 @@ species:
         - x_path_Cs2O_as_published: '0.55'
           x_Cs2O_formula_unit_as_derived: '0.27500'
           a_Cs2O_as_digitized: '0.36276'
+          activity: '0.36276'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.22500'
+            Cs2O: '0.27500'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1207'
@@ -1093,6 +1157,14 @@ species:
         - x_path_Cs2O_as_published: '0.60'
           x_Cs2O_formula_unit_as_derived: '0.30000'
           a_Cs2O_as_digitized: '0.43246'
+          activity: '0.43246'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.20000'
+            Cs2O: '0.30000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1310'
@@ -1128,6 +1200,14 @@ species:
         - x_path_Cs2O_as_published: '0.70'
           x_Cs2O_formula_unit_as_derived: '0.35000'
           a_Cs2O_as_digitized: '0.57740'
+          activity: '0.57740'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.15000'
+            Cs2O: '0.35000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1515'
@@ -1163,6 +1243,14 @@ species:
         - x_path_Cs2O_as_published: '0.80'
           x_Cs2O_formula_unit_as_derived: '0.40000'
           a_Cs2O_as_digitized: '0.73086'
+          activity: '0.73086'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.10000'
+            Cs2O: '0.40000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1721'
@@ -1198,6 +1286,14 @@ species:
         - x_path_Cs2O_as_published: '0.85'
           x_Cs2O_formula_unit_as_derived: '0.42500'
           a_Cs2O_as_digitized: '0.81260'
+          activity: '0.81260'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.07500'
+            Cs2O: '0.42500'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1823'
@@ -1233,6 +1329,14 @@ species:
         - x_path_Cs2O_as_published: '0.90'
           x_Cs2O_formula_unit_as_derived: '0.45000'
           a_Cs2O_as_digitized: '0.87178'
+          activity: '0.87178'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.05000'
+            Cs2O: '0.45000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.010'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1926'
@@ -1268,6 +1372,14 @@ species:
         - x_path_Cs2O_as_published: '1.00'
           x_Cs2O_formula_unit_as_derived: '0.50000'
           a_Cs2O_as_digitized: '1.00000'
+          activity: '1.00000'
+          composition_mole_fraction:
+            SiO2: '0.50'
+            Na2O: '0.00000'
+            Cs2O: '0.50000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p5_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '2131'
@@ -1303,7 +1415,7 @@ species:
       temperature_derivation: T_C = T_K - 273.15; printed T_K = 1573 K.
       composition_derivation: Total X_Cs2O=(1-X_SiO2)*x_path; X_Na2O=(1-X_SiO2)*(1-x_path).
     - observation_id: bennour_1996_fig7_cs2o_x_sio2_0p85
-      type: activity_coefficient
+      type: activity
       locator:
         page: 14
         published_page: 241
@@ -1311,16 +1423,29 @@ species:
         figure: '7'
         note: X_SiO2 = 0.85; digitized Cs2O activity curve
       T_C: '1299.85'
+      T_K: 1573
       T_range_K:
       - 1573
       - 1573
-      phase: silicate_melt
-      standard_state: not printed; pure-liquid Cs2O is not assumed
+      phase: l
+      standard_state: 'Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of ((1 - X1 - X2) SiO2, X2Cs2O, X3Na2O) are calculated by assuming the second reference state that means that the oxide activities are related to the square of the ionic intensities.'
       regime: kems_effusion
       units: dimensionless activity; mole-fraction composition
       values:
-        quantity: Cs2O_activity
+        quantity: activity
         method_class: model_derived
+        admission_status: figure_only
+        caption: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+        section_as_published: '------ X = 0.85'
+        axes_as_published:
+          x: mole fraction xCs2O
+          y: 'activity of aCs2O; dimensionless'
+        component_as_published: aCs2O
+        note: Digitized read of the smooth unmarked curve; point values retain read uncertainty.
+        derivation:
+          relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity ratios and the matching Table II fit.
+          inputs: [bennour_1996_table_i_x_sio2_0p85_log_ion_ratio, bennour_1996_table_ii_x_sio2_0p85_fit]
+          output_unit: dimensionless activity
         method: digitized
         axis_calibration: *id001
         read_uncertainty: ±0.005 activity and ±0.005 x_path; at x_path 0.10 activity ±0.01; near 0.90 branch assignment less
@@ -1330,6 +1455,14 @@ species:
         - x_path_Cs2O_as_published: '0.00'
           x_Cs2O_formula_unit_as_derived: '0.00000'
           a_Cs2O_as_digitized: '0.00000'
+          activity: '0.00000'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.15000'
+            Cs2O: '0.00000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '76'
@@ -1365,6 +1498,14 @@ species:
         - x_path_Cs2O_as_published: '0.10'
           x_Cs2O_formula_unit_as_derived: '0.01500'
           a_Cs2O_as_digitized: '0.01171'
+          activity: '0.01171'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.13500'
+            Cs2O: '0.01500'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.010'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '282'
@@ -1400,6 +1541,14 @@ species:
         - x_path_Cs2O_as_published: '0.20'
           x_Cs2O_formula_unit_as_derived: '0.03000'
           a_Cs2O_as_digitized: '0.03427'
+          activity: '0.03427'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.12000'
+            Cs2O: '0.03000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '487'
@@ -1435,6 +1584,14 @@ species:
         - x_path_Cs2O_as_published: '0.30'
           x_Cs2O_formula_unit_as_derived: '0.04500'
           a_Cs2O_as_digitized: '0.07439'
+          activity: '0.07439'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.10500'
+            Cs2O: '0.04500'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '693'
@@ -1470,6 +1627,14 @@ species:
         - x_path_Cs2O_as_published: '0.40'
           x_Cs2O_formula_unit_as_derived: '0.06000'
           a_Cs2O_as_digitized: '0.14410'
+          activity: '0.14410'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.09000'
+            Cs2O: '0.06000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '898'
@@ -1505,6 +1670,14 @@ species:
         - x_path_Cs2O_as_published: '0.45'
           x_Cs2O_formula_unit_as_derived: '0.06750'
           a_Cs2O_as_digitized: '0.19375'
+          activity: '0.19375'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.08250'
+            Cs2O: '0.06750'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1001'
@@ -1540,6 +1713,14 @@ species:
         - x_path_Cs2O_as_published: '0.55'
           x_Cs2O_formula_unit_as_derived: '0.08250'
           a_Cs2O_as_digitized: '0.31461'
+          activity: '0.31461'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.06750'
+            Cs2O: '0.08250'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1207'
@@ -1575,6 +1756,14 @@ species:
         - x_path_Cs2O_as_published: '0.60'
           x_Cs2O_formula_unit_as_derived: '0.09000'
           a_Cs2O_as_digitized: '0.38181'
+          activity: '0.38181'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.06000'
+            Cs2O: '0.09000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1310'
@@ -1610,6 +1799,14 @@ species:
         - x_path_Cs2O_as_published: '0.70'
           x_Cs2O_formula_unit_as_derived: '0.10500'
           a_Cs2O_as_digitized: '0.53979'
+          activity: '0.53979'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.04500'
+            Cs2O: '0.10500'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1515'
@@ -1645,6 +1842,14 @@ species:
         - x_path_Cs2O_as_published: '0.80'
           x_Cs2O_formula_unit_as_derived: '0.12000'
           a_Cs2O_as_digitized: '0.71130'
+          activity: '0.71130'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.03000'
+            Cs2O: '0.12000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1721'
@@ -1680,6 +1885,14 @@ species:
         - x_path_Cs2O_as_published: '0.85'
           x_Cs2O_formula_unit_as_derived: '0.12750'
           a_Cs2O_as_digitized: '0.78953'
+          activity: '0.78953'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.02250'
+            Cs2O: '0.12750'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1823'
@@ -1715,6 +1928,14 @@ species:
         - x_path_Cs2O_as_published: '0.90'
           x_Cs2O_formula_unit_as_derived: '0.13500'
           a_Cs2O_as_digitized: '0.85523'
+          activity: '0.85523'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.01500'
+            Cs2O: '0.13500'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.010'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '1926'
@@ -1750,6 +1971,14 @@ species:
         - x_path_Cs2O_as_published: '1.00'
           x_Cs2O_formula_unit_as_derived: '0.15000'
           a_Cs2O_as_digitized: '1.00000'
+          activity: '1.00000'
+          composition_mole_fraction:
+            SiO2: '0.85'
+            Na2O: '0.00000'
+            Cs2O: '0.15000'
+          derived_from:
+          - bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+          - bennour_1996_table_ii_x_sio2_0p85_fit
           estimated_read_error_a: '0.005'
           estimated_read_error_x_path: '0.005'
           pixel_x_crop: '2131'
@@ -1965,7 +2194,7 @@ species:
         - section: Gibbs_binary
           row: Na2O-SiO2
           quantity: XSiO2=0.85
-          values_as_published: '-33.3'
+          values_as_published: '(-33.3)'
           units: ' kJ mol-1 (model [12])'
           method: manual
         - section: Gibbs_binary
@@ -1989,13 +2218,13 @@ species:
         - section: Gibbs_binary
           row: Cs2O-SiO2
           quantity: XSiO2=0.75
-          values_as_published: '-59.6'
+          values_as_published: '(-59.6)'
           units: kJ mol-1 (model [12])
           method: manual
         - section: Gibbs_binary
           row: Cs2O-SiO2
           quantity: XSiO2=0.85
-          values_as_published: '-36'
+          values_as_published: '(-36)'
           units: kJ mol-1 (model [12])
           method: manual
     - observation_id: bennour_1996_enthalpy_slope_fit
@@ -3196,6 +3425,25 @@ species:
                   - - Na2O
                     - '0'
               locator: *id034
+          T_K_as_published: '1573'
+          temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+        - x_Cs2O_as_published: '1.0'
+          X2_as_published: '0.15'
+          X3_as_published: '0'
+          minus_G_QB_kJ_mol: '0'
+          minus_delta_G_excess_kJ_mol: '0'
+          minus_delta_G_ternary_kJ_mol: '36.00'
+          row: 12
+          section: c
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 12
+            section: c
+          note: Printed trailing row under XSiO2=0.75; the fractions do not close and its 36.00 cell repeats section (d)'s endpoint, so it is not a normal section-(c) endpoint.
+          T_C: '1299.85'
           T_K_as_published: '1573'
           temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
         - x_Cs2O_as_published: '0'
@@ -4675,10 +4923,23 @@ species:
         page: 14
         published_page: 241
         pdf_page_index: 13
-        note: X_SiO2 = 0.85 curve; caption as published
+        note: X_SiO2 = 0.85 curve; printed Figure 7 caption
       units: activity dimensionless as plotted
+      standard_state: 'Second reference state (dimer hypothesis): Na2Si_nO_(2n+1) silicate end member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of ((1 - X1 - X2) SiO2, X2Cs2O, X3Na2O) are calculated by assuming the second reference state that means that the oxide activities are related to the square of the ionic intensities.'
+      T_K: 1573
+      phase: l
+      regime: kems_effusion
       values:
         quantity_as_published: Na2O activity curve in Figure 7
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        note: 'Not digitised; smooth, unmarked curve. Qualitative activity variation only.'
+        caption: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+        section_as_published: '------ X = 0.85'
+        axes_as_published:
+          x: mole fraction xCs2O
+          y: 'activity of aNa2O; dimensionless'
+        component_as_published: aNa2O
         method_class: figure_only
         digitisation_status: not digitized
         reason: The OpenIMCC starting aid and calibration request cover the two Cs2O curves used by the species-calibration
@@ -4690,10 +4951,23 @@ species:
         page: 14
         published_page: 241
         pdf_page_index: 13
-        note: X_SiO2 = 0.5 curve; caption as published
+        note: X_SiO2 = 0.50 curve; printed Figure 7 caption
       units: activity dimensionless as plotted
+      standard_state: 'Second reference state (dimer hypothesis): Na2Si_nO_(2n+1) silicate end member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of ((1 - X1 - X2) SiO2, X2Cs2O, X3Na2O) are calculated by assuming the second reference state that means that the oxide activities are related to the square of the ionic intensities.'
+      T_K: 1573
+      phase: l
+      regime: kems_effusion
       values:
         quantity_as_published: Na2O activity curve in Figure 7
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        note: 'Not digitised; smooth, unmarked curve. Qualitative activity variation only.'
+        caption: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+        section_as_published: '- - - X = 0.5'
+        axes_as_published:
+          x: mole fraction xCs2O
+          y: 'activity of aNa2O; dimensionless'
+        component_as_published: aNa2O
         method_class: figure_only
         digitisation_status: not digitized
         reason: The OpenIMCC starting aid and calibration request cover the two Cs2O curves used by the species-calibration
