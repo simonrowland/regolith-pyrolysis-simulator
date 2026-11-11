@@ -162,6 +162,26 @@ def _nonnegative_finite(value: Any) -> float | None:
     return number
 
 
+class SoleMissingAlphaScreen(NamedTuple):
+    """Partition of sole-missing-alpha carriers the flux map does not debit.
+
+    INVARIANT: every such carrier is in exactly one map. ``refusals`` is
+    the typed ``fail_loud_missing_alpha`` record. ``authorized_zeros`` is
+    ``below_evaporation_upper_bound`` with the proved tick mass. A carrier
+    in neither map was not a sole-missing-alpha channel (already debiting,
+    or missing some other contract field). Nothing in the class is dropped.
+    """
+
+    refusals: dict[str, dict[str, float | str]]
+    authorized_zeros: dict[str, dict[str, float | str]]
+
+    def __bool__(self) -> bool:
+        return bool(self.refusals or self.authorized_zeros)
+
+
+_EMPTY_ALPHA_SCREEN = SoleMissingAlphaScreen({}, {})
+
+
 def screened_missing_alpha_records(
     batch: Any,
     *,
@@ -172,19 +192,26 @@ def screened_missing_alpha_records(
     area_m2: float | None,
     duration_s: float,
     balance_tolerance_kg: float | None,
-) -> dict[str, dict[str, float | str]]:
-    """Stamp sole-missing-alpha refusals the flux map never shows the kernel.
+) -> SoleMissingAlphaScreen:
+    """Classify every sole-missing-alpha carrier the flux map omits.
 
     A broad-proxy carrier with no intrinsic alpha is a typed
     ``missing_channel_contract`` and ``flux_pressures_from_batch`` omits
     it. The kernel records ``missing_alpha`` only for species inside that
-    map, so the refusal used to disappear. Omit the record only when this
-    carrier's own alpha=1 Hertz-Knudsen tick mass, from the kernel-seam
-    pressure, is strictly below the ledger closure tolerance. Alpha is 1
-    because the bound is the ceiling. Bulk pressure is not subtracted:
-    gas resistance would only lower the flux. If the seam pressure, molar
-    mass, area, duration, temperature, or tolerance cannot be evaluated,
-    the proof is unavailable and the typed refusal is stamped.
+    map, so the refusal used to disappear. Alpha is 1 because that is the
+    Hertz-Knudsen ceiling. The tick mass is
+
+        m = k_HK(T, M) * P_seam * A * t
+
+    with ``k_HK = sqrt(M / (2 * pi * R * T))`` and no bulk-pressure
+    subtraction: gas resistance would only lower the flux. When that mass
+    is finite and strictly below the ledger closure tolerance, the carrier
+    is an authorized physical zero (``below_evaporation_upper_bound``)
+    carrying ``bound_kg``. The authority is the kernel seam pressure, not
+    a second saturation law. When the mass is not proved below the
+    tolerance, including when the seam pressure, molar mass, area,
+    duration, temperature, or tolerance cannot be evaluated, the typed
+    ``fail_loud_missing_alpha`` refusal is stamped.
 
     The species is not added to the flux map. A seam pressure placed
     there would let the kernel execute its default alpha when the rate
@@ -197,16 +224,17 @@ def screened_missing_alpha_records(
     from simulator.vapour_rail.request import _missing_contract_fields
 
     if batch is None:
-        return {}
+        return _EMPTY_ALPHA_SCREEN
     channels = getattr(batch, "channels_by_species", None)
     if not isinstance(channels, Mapping):
-        return {}
+        return _EMPTY_ALPHA_SCREEN
     already_debiting = {str(species) for species in flux_pressures_Pa}
     tolerance = _positive_finite(balance_tolerance_kg)
     temperature = _positive_finite(temperature_K)
     area = _positive_finite(area_m2)
     duration = _positive_finite(duration_s)
-    records: dict[str, dict[str, float | str]] = {}
+    refusals: dict[str, dict[str, float | str]] = {}
+    authorized_zeros: dict[str, dict[str, float | str]] = {}
     for species_id, answer in channels.items():
         species = str(species_id)
         if species in already_debiting:
@@ -241,8 +269,21 @@ def screened_missing_alpha_records(
         if (
             mass_kg is not None
             and tolerance is not None
+            and pressure is not None
+            and duration is not None
             and mass_kg < tolerance
         ):
+            # kg/hr. On a one-hour tick this equals the tick mass.
+            authorized_zeros[species] = {
+                "reason": "below_evaporation_upper_bound",
+                "bound_kg": mass_kg,
+                "pressure_pa": pressure,
+                "law": "alpha_1_hertz_knudsen_on_kernel_seam",
+                "authority": "kernel_seam",
+                "baseline_alpha_1_rate_kg_hr": (
+                    mass_kg * (_EVAPORATION_TICK_S / duration)
+                ),
+            }
             continue
         record: dict[str, float | str] = {
             "policy": _MISSING_ALPHA_POLICY,
@@ -251,36 +292,63 @@ def screened_missing_alpha_records(
         if mass_kg is not None and pressure is not None and duration is not None:
             record["P_eq_Pa"] = pressure
             record["P_bulk_Pa"] = 0.0
-            # kg/hr. On a one-hour tick this equals the tick mass.
             record["baseline_alpha_1_rate_kg_hr"] = (
                 mass_kg * (_EVAPORATION_TICK_S / duration)
             )
         else:
             record["bound"] = "unavailable"
-        records[species] = record
-    return records
+        refusals[species] = record
+    if not refusals and not authorized_zeros:
+        return _EMPTY_ALPHA_SCREEN
+    return SoleMissingAlphaScreen(refusals, authorized_zeros)
 
 
 def _merge_screened_missing_alpha(
     diagnostic: Mapping[str, Any],
-    records: Mapping[str, Mapping[str, Any]] | None,
+    screen: SoleMissingAlphaScreen | Mapping[str, Any] | None,
 ) -> dict[str, Any]:
-    """Keep a kernel ``missing_alpha`` record; fill species it never saw."""
+    """Publish the sole-missing-alpha partition onto the flux diagnostic.
+
+    A kernel ``missing_alpha`` record wins for that species. Authorized
+    zeros are not refusals and are not folded into ``missing_alpha``.
+    """
 
     merged = dict(diagnostic)
-    if not records:
+    if isinstance(screen, SoleMissingAlphaScreen):
+        refusals: Mapping[str, Any] = screen.refusals
+        authorized = screen.authorized_zeros
+    elif isinstance(screen, Mapping):
+        refusals = screen
+        authorized = {}
+    else:
         return merged
-    existing = {
-        str(species): dict(record)
-        for species, record in dict(merged.get("missing_alpha") or {}).items()
-        if isinstance(record, Mapping)
-    }
-    for species, record in records.items():
-        if not isinstance(record, Mapping):
-            continue
-        existing.setdefault(str(species), dict(record))
-    if existing:
-        merged["missing_alpha"] = existing
+    if refusals:
+        existing = {
+            str(species): dict(record)
+            for species, record in dict(merged.get("missing_alpha") or {}).items()
+            if isinstance(record, Mapping)
+        }
+        for species, record in refusals.items():
+            if not isinstance(record, Mapping):
+                continue
+            existing.setdefault(str(species), dict(record))
+        if existing:
+            merged["missing_alpha"] = existing
+    if authorized:
+        raw_zeros = merged.get("below_evaporation_upper_bound")
+        existing_zeros = {
+            str(species): dict(record)
+            for species, record in (
+                raw_zeros.items() if isinstance(raw_zeros, Mapping) else ()
+            )
+            if isinstance(record, Mapping)
+        }
+        for species, record in authorized.items():
+            if not isinstance(record, Mapping):
+                continue
+            existing_zeros.setdefault(str(species), dict(record))
+        if existing_zeros:
+            merged["below_evaporation_upper_bound"] = existing_zeros
     return merged
 
 
@@ -1105,6 +1173,68 @@ def _authorize_empty_species_flux(
     return None
 
 
+def _screen_sole_missing_alpha(
+    batch: Any,
+    flux_pressures: Mapping[str, float],
+    effective_pressure_source: Any,
+    temperature_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+    melt_surface_area_m2: Any,
+) -> SoleMissingAlphaScreen:
+    """Screen from explicit inputs so a duck-typed host still classifies.
+
+    The evaporation path is bound onto hosts that are not
+    ``EvaporationMixin`` instances. Looking up a method on that host
+    drops the screen. Molar mass and area are arguments, not attributes
+    discovered on ``self``.
+    """
+
+    from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
+
+    channels = getattr(batch, "channels_by_species", None) or {}
+    if not isinstance(channels, Mapping):
+        channels = {}
+    vapor = vapor_pressure_data if isinstance(vapor_pressure_data, Mapping) else {}
+    metals = vapor.get("metals", {}) or {}
+    oxides = vapor.get("oxide_vapors", {}) or {}
+    molar: dict[str, float] = {}
+    seam: dict[str, float] = {}
+    for species in channels:
+        species_id = str(species)
+        row = metals.get(species_id) or oxides.get(species_id) or {}
+        if not isinstance(row, Mapping):
+            row = {}
+        raw_molar = row.get("molar_mass_g_mol")
+        if raw_molar is None:
+            raw_molar = MOLAR_MASS.get(species_id)
+        parsed_molar = _positive_finite(raw_molar)
+        if parsed_molar is not None:
+            molar[species_id] = parsed_molar
+        if effective_pressure_source is None:
+            continue
+        pressure = effective_pressure_source.pressure_pa(species_id)
+        if pressure is None:
+            continue
+        parsed_pressure = _nonnegative_finite(pressure)
+        if parsed_pressure is not None:
+            seam[species_id] = parsed_pressure
+    try:
+        area = float(melt_surface_area_m2)
+    except (TypeError, ValueError):
+        area = None
+    return screened_missing_alpha_records(
+        batch,
+        flux_pressures_Pa=flux_pressures,
+        seam_pressure_pa=seam,
+        molar_mass_g_mol=molar,
+        temperature_K=temperature_K,
+        area_m2=area,
+        duration_s=_EVAPORATION_TICK_S,
+        balance_tolerance_kg=DEFAULT_BALANCE_TOLERANCE_KG,
+    )
+
+
 class EvaporationMixin:
     def _publish_evaporation_flux_diagnostic(
         self, diagnostic: Mapping[str, Any]
@@ -1115,55 +1245,6 @@ class EvaporationMixin:
         )
         self._last_evaporation_flux_diagnostic = stamped
         return stamped
-
-    def _screen_refused_missing_alpha(
-        self,
-        batch: Any,
-        flux_pressures: Mapping[str, float],
-        effective_pressure_source: Any,
-        temperature_K: float,
-    ) -> dict[str, dict[str, float | str]]:
-        from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
-
-        channels = getattr(batch, "channels_by_species", None) or {}
-        if not isinstance(channels, Mapping):
-            channels = {}
-        vapor = getattr(self, "vapor_pressures", None) or {}
-        metals = vapor.get("metals", {}) or {}
-        oxides = vapor.get("oxide_vapors", {}) or {}
-        molar: dict[str, float] = {}
-        seam: dict[str, float] = {}
-        for species in channels:
-            species_id = str(species)
-            row = metals.get(species_id) or oxides.get(species_id) or {}
-            raw_molar = row.get("molar_mass_g_mol")
-            if raw_molar is None:
-                raw_molar = MOLAR_MASS.get(species_id)
-            parsed_molar = _positive_finite(raw_molar)
-            if parsed_molar is not None:
-                molar[species_id] = parsed_molar
-            if effective_pressure_source is None:
-                continue
-            pressure = effective_pressure_source.pressure_pa(species_id)
-            if pressure is None:
-                continue
-            parsed_pressure = _nonnegative_finite(pressure)
-            if parsed_pressure is not None:
-                seam[species_id] = parsed_pressure
-        try:
-            area = float(getattr(self.melt, "melt_surface_area_m2", None))
-        except (TypeError, ValueError):
-            area = None
-        return screened_missing_alpha_records(
-            batch,
-            flux_pressures_Pa=flux_pressures,
-            seam_pressure_pa=seam,
-            molar_mass_g_mol=molar,
-            temperature_K=temperature_K,
-            area_m2=area,
-            duration_s=_EVAPORATION_TICK_S,
-            balance_tolerance_kg=DEFAULT_BALANCE_TOLERANCE_KG,
-        )
 
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
@@ -1225,13 +1306,14 @@ class EvaporationMixin:
                 resolution_error=resolve_error or None,
             )
         )
-        self._screened_missing_alpha_records = (
-            self._screen_refused_missing_alpha(
-                vapour_batch,
-                vapor_pressures,
-                effective_pressure_source,
-                temperature_K,
-            )
+        melt = getattr(self, "melt", None)
+        self._screened_missing_alpha_records = _screen_sole_missing_alpha(
+            vapour_batch,
+            vapor_pressures,
+            effective_pressure_source,
+            temperature_K,
+            vapor_pressure_data=getattr(self, "vapor_pressures", None),
+            melt_surface_area_m2=getattr(melt, "melt_surface_area_m2", None),
         )
         return (
             vapor_pressures,

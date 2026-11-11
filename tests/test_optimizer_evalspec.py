@@ -267,6 +267,13 @@ print(json.dumps({
 
 
 def test_alpha_fallback_default_preserves_legacy_evalspec_identity() -> None:
+    """Absent keeps the pinned cache identity. Explicit false does not.
+
+    The shipped yaml default is now true, so an omitted flag inherits
+    that default. An explicit false opt-out has to hash as its own
+    evalspec or a cached inherited run would be reused for the opt-out.
+    """
+
     default_spec = _base_spec()
     kernel = dict(default_spec.chemistry_kernel)
     explicit_false_spec = _base_spec(
@@ -284,9 +291,13 @@ def test_alpha_fallback_default_preserves_legacy_evalspec_identity() -> None:
 
     default_bytes = canonical_evalspec_json(default_spec)
     assert default_bytes == PINNED_EVALSPEC_JSON
-    assert canonical_evalspec_json(explicit_false_spec) == PINNED_EVALSPEC_JSON
-    assert cache_key(explicit_false_spec) == cache_key(default_spec)
+    # Absent still inherits the shipped yaml and keeps the pinned identity.
+    # Explicit false is the opt-out, so it is a different cache key.
+    false_bytes = canonical_evalspec_json(explicit_false_spec)
+    assert false_bytes != PINNED_EVALSPEC_JSON
+    assert cache_key(explicit_false_spec) != cache_key(default_spec)
     assert b'"allow_unmeasured_alpha_fallback"' not in default_bytes
+    assert b'"allow_unmeasured_alpha_fallback":false' in false_bytes
     assert b'"allow_unmeasured_alpha_fallback":true' in canonical_evalspec_json(
         enabled_spec
     )

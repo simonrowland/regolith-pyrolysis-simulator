@@ -343,6 +343,8 @@ def test_screened_missing_alpha_omits_only_a_proved_sub_tolerance_bound():
     """A sole missing alpha never enters the flux map, so the kernel cannot
     record it. Stamp the refusal unless that carrier's own alpha=1
     Hertz-Knudsen tick mass is strictly below the closure tolerance.
+    The proved-below case is an authorized zero with the bound recorded,
+    not an empty result.
 
     Hot arithmetic, T = 1800 K, M = 0.084 kg/mol, P = 1 Pa, A = 1 m^2,
     t = 3600 s, R = 8.314462618 J/mol/K:
@@ -367,9 +369,12 @@ def test_screened_missing_alpha_omits_only_a_proved_sub_tolerance_bound():
         seam_pressure_pa={"CrO2": 1.0},
         **common,
     )
-    assert set(hot) == {"CrO2"}
-    assert hot["CrO2"]["policy"] == "fail_loud_missing_alpha"
-    assert hot["CrO2"]["baseline_alpha_1_rate_kg_hr"] > DEFAULT_BALANCE_TOLERANCE_KG
+    assert set(hot.refusals) == {"CrO2"}
+    assert hot.authorized_zeros == {}
+    assert hot.refusals["CrO2"]["policy"] == "fail_loud_missing_alpha"
+    assert hot.refusals["CrO2"]["baseline_alpha_1_rate_kg_hr"] > (
+        DEFAULT_BALANCE_TOLERANCE_KG
+    )
 
     cold = screened_missing_alpha_records(
         _sole_alpha_refusal(),
@@ -377,7 +382,20 @@ def test_screened_missing_alpha_omits_only_a_proved_sub_tolerance_bound():
         seam_pressure_pa={"CrO2": 1.0e-40},
         **common,
     )
-    assert cold == {}
+    assert cold.refusals == {}
+    record = cold.authorized_zeros["CrO2"]
+    assert record["reason"] == "below_evaporation_upper_bound"
+    assert record["law"] == "alpha_1_hertz_knudsen_on_kernel_seam"
+    assert record["authority"] == "kernel_seam"
+    assert record["pressure_pa"] == 1.0e-40
+    from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+
+    # Same product as the hot line, scaled by P = 1e-40.
+    cold_mass_kg = (
+        hertz_knudsen_k_kg_s_m2_pa(1800.0, 0.084) * 1.0e-40 * 1.0 * 3600.0
+    )
+    assert record["bound_kg"] == pytest.approx(cold_mass_kg, rel=1e-12, abs=0.0)
+    assert record["bound_kg"] < DEFAULT_BALANCE_TOLERANCE_KG
 
     unavailable = screened_missing_alpha_records(
         _sole_alpha_refusal(),
@@ -385,8 +403,9 @@ def test_screened_missing_alpha_omits_only_a_proved_sub_tolerance_bound():
         seam_pressure_pa={},
         **common,
     )
-    assert unavailable["CrO2"]["policy"] == "fail_loud_missing_alpha"
-    assert unavailable["CrO2"]["bound"] == "unavailable"
+    assert unavailable.authorized_zeros == {}
+    assert unavailable.refusals["CrO2"]["policy"] == "fail_loud_missing_alpha"
+    assert unavailable.refusals["CrO2"]["bound"] == "unavailable"
 
     already_debiting = screened_missing_alpha_records(
         _sole_alpha_refusal(),
@@ -394,7 +413,8 @@ def test_screened_missing_alpha_omits_only_a_proved_sub_tolerance_bound():
         seam_pressure_pa={"CrO2": 1.0},
         **common,
     )
-    assert already_debiting == {}
+    assert already_debiting.refusals == {}
+    assert already_debiting.authorized_zeros == {}
 
     other_field = screened_missing_alpha_records(
         _sole_alpha_refusal(
@@ -404,4 +424,125 @@ def test_screened_missing_alpha_omits_only_a_proved_sub_tolerance_bound():
         seam_pressure_pa={"CrO2": 1.0},
         **common,
     )
-    assert other_field == {}
+    assert other_field.refusals == {}
+    assert other_field.authorized_zeros == {}
+
+
+# Every sole-missing-alpha input class. The species set is the shipped
+# broad-proxy carriers plus the carbon carriers whose coverage gap is the
+# same missing-alpha class. Each one is a refusal or an authorized zero.
+_SOLE_MISSING_ALPHA_SPECIES = tuple(sorted(
+    BROAD_PROXY_SPECIES | {"CH4", "CO", "CO2"}
+))
+_SOLE_MISSING_ALPHA_BRANCHES = (
+    "above_tolerance",
+    "below_tolerance",
+    "zero_pressure",
+    "missing_pressure",
+    "negative_pressure",
+    "missing_molar_mass",
+    "missing_area",
+    "missing_duration",
+    "missing_tolerance",
+    "already_debiting",
+    "other_missing_field",
+)
+
+
+def _screen_branch(species: str, branch: str):
+    from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+
+    temperature_K = 1800.0
+    molar_g = 84.0
+    area_m2 = 1.0
+    duration_s = 3600.0
+    # k * P * A * t compared with 1e-12. P is chosen from that product,
+    # not from the screen's own recorded mass.
+    k_hk = hertz_knudsen_k_kg_s_m2_pa(temperature_K, molar_g / 1000.0)
+    scale = k_hk * area_m2 * duration_s
+    pressure = (DEFAULT_BALANCE_TOLERANCE_KG * 2.0) / scale
+    if branch == "below_tolerance":
+        pressure = (DEFAULT_BALANCE_TOLERANCE_KG * 0.5) / scale
+    elif branch == "zero_pressure":
+        pressure = 0.0
+    elif branch == "negative_pressure":
+        pressure = -1.0
+    seam = {} if branch == "missing_pressure" else {species: pressure}
+    molar = {} if branch == "missing_molar_mass" else {species: molar_g}
+    detail = "channel contract incomplete: missing alpha"
+    if branch == "other_missing_field":
+        detail = "channel contract incomplete: missing formula"
+    from types import SimpleNamespace
+
+    batch = SimpleNamespace(
+        channels_by_species={
+            species: SimpleNamespace(
+                refusal_code="missing_channel_contract",
+                extra={"detail": detail},
+            )
+        }
+    )
+    flux = {species: pressure} if branch == "already_debiting" else {}
+    screen = screened_missing_alpha_records(
+        batch,
+        flux_pressures_Pa=flux,
+        seam_pressure_pa=seam,
+        molar_mass_g_mol=molar,
+        temperature_K=temperature_K,
+        area_m2=None if branch == "missing_area" else area_m2,
+        duration_s=None if branch == "missing_duration" else duration_s,
+        balance_tolerance_kg=(
+            None if branch == "missing_tolerance" else DEFAULT_BALANCE_TOLERANCE_KG
+        ),
+    )
+    expected_mass = None
+    if branch in {"above_tolerance", "below_tolerance", "zero_pressure"}:
+        expected_mass = k_hk * pressure * area_m2 * duration_s
+    return screen, expected_mass
+
+
+@pytest.mark.parametrize("species", _SOLE_MISSING_ALPHA_SPECIES)
+@pytest.mark.parametrize("branch", _SOLE_MISSING_ALPHA_BRANCHES)
+def test_sole_missing_alpha_is_refusal_or_authorized_zero(
+    species: str,
+    branch: str,
+) -> None:
+    """INVARIANT: a sole missing alpha is never a silent zero.
+
+    Already-debiting and non-alpha contract misses are outside this
+    class. Every other branch is exactly one of a typed
+    ``fail_loud_missing_alpha`` refusal or an authorized
+    ``below_evaporation_upper_bound`` zero whose bound is the alpha=1
+    Hertz-Knudsen tick mass.
+    """
+
+    screen, expected_mass = _screen_branch(species, branch)
+    in_refusal = species in screen.refusals
+    in_zero = species in screen.authorized_zeros
+    assert not (in_refusal and in_zero)
+    if branch in {"already_debiting", "other_missing_field"}:
+        assert screen.refusals == {}
+        assert screen.authorized_zeros == {}
+        return
+    if branch in {"below_tolerance", "zero_pressure"}:
+        assert in_zero and not in_refusal
+        record = screen.authorized_zeros[species]
+        assert record["reason"] == "below_evaporation_upper_bound"
+        assert record["authority"] == "kernel_seam"
+        assert record["law"] == "alpha_1_hertz_knudsen_on_kernel_seam"
+        assert expected_mass is not None
+        assert record["bound_kg"] == pytest.approx(expected_mass, rel=1e-12, abs=0.0)
+        assert record["bound_kg"] < DEFAULT_BALANCE_TOLERANCE_KG
+        assert "policy" not in record
+        return
+    assert in_refusal and not in_zero
+    refusal = screen.refusals[species]
+    assert refusal["policy"] == "fail_loud_missing_alpha"
+    if branch == "above_tolerance":
+        assert expected_mass is not None
+        assert expected_mass >= DEFAULT_BALANCE_TOLERANCE_KG
+        assert refusal["baseline_alpha_1_rate_kg_hr"] == pytest.approx(
+            expected_mass, rel=1e-12, abs=0.0
+        )
+    else:
+        assert refusal["bound"] == "unavailable"

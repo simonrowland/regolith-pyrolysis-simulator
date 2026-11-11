@@ -2160,17 +2160,57 @@ def test_sso2_owner_recipe_patch_is_named_allowlisted_fe_then_sio() -> None:
     ) == pytest.approx(SSO2_CERTIFIED_PN2_MBAR)
 
 
+def test_explicit_alpha_fallback_opt_out_reaches_shipped_setpoints() -> None:
+    """Omitted inherits yaml true. Explicit false is written through.
+
+    ``PyrolysisRun(..., allow_unmeasured_alpha_fallback=False)`` is the
+    production opt-out. ``_deep_merge_setpoints`` still rejects the key
+    inside a setpoints patch, so this flag is the path that overrides
+    ``data/setpoints.yaml``.
+    """
+
+    from simulator.runner import PyrolysisRun
+
+    inherited = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+        mass_kg=1000.0,
+    )
+    opted_out = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+        mass_kg=1000.0,
+        allow_unmeasured_alpha_fallback=False,
+    )
+    opted_in = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+        mass_kg=1000.0,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    assert inherited.allow_unmeasured_alpha_fallback is None
+    inherited_kernel = inherited._session_config().setpoints["chemistry_kernel"]
+    opted_out_kernel = opted_out._session_config().setpoints["chemistry_kernel"]
+    opted_in_kernel = opted_in._session_config().setpoints["chemistry_kernel"]
+    assert inherited_kernel["allow_unmeasured_alpha_fallback"] is True
+    assert opted_out_kernel["allow_unmeasured_alpha_fallback"] is False
+    assert opted_in_kernel["allow_unmeasured_alpha_fallback"] is True
+
+
 def _sso2_sim_alpha_fallback_disabled(*, hours: int = 3):
     """SSO-2 owner recipe with the shipped alpha=1 fallback forced off.
 
     ``data/setpoints.yaml`` ships ``allow_unmeasured_alpha_fallback: true``
-    for the eight flagged carriers. ``PyrolysisRun`` does not override that
-    yaml when the flag is false, and ``_deep_merge_setpoints`` rejects the
-    key. Evaporation reads the live simulator setpoints each tick, so this
-    leg clears the flag after start and before the hour loop. Steps hour by
-    hour and collects each hour's missing-alpha refusal records, because the
-    last-diagnostic slot is volatile and a species only appears in an hour
-    where its pressure is positive."""
+    for the eight flagged carriers. The production opt-out is
+    ``PyrolysisRun(allow_unmeasured_alpha_fallback=False)``, which writes
+    the kernel flag before the session starts. ``_deep_merge_setpoints``
+    rejects the key, so the flag is not patched onto the live setpoints
+    after start. Steps hour by hour and collects each hour's missing-alpha
+    refusal records, because the last-diagnostic slot is volatile and a
+    species only appears in an hour where its pressure is positive."""
     from simulator.optimize import sso2_evidence as _sso2
     from simulator.runner import PyrolysisRun
     from simulator.session import SimSession
@@ -2189,13 +2229,12 @@ def _sso2_sim_alpha_fallback_disabled(*, hours: int = 3):
         backend_name=_sso2.ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
         additives_kg={_sso2.SSO2_CERTIFIED_DOSE_SPECIES: dose_kg},
         setpoints_patch=patch,
+        allow_unmeasured_alpha_fallback=False,
     )
     session = SimSession().start(run._session_config())
     _sso2._apply_certified_na_dose(session.simulator)
     sim = session.simulator
-    sim.setpoints.setdefault("chemistry_kernel", {})[
-        "allow_unmeasured_alpha_fallback"
-    ] = False
+    assert sim.setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"] is False
     missing_alpha_by_hour = []
     for _ in range(int(hours)):
         sim.step()

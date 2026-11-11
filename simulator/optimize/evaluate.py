@@ -3000,12 +3000,17 @@ def _build_eval_inputs_impl(
             **run_options["chemistry_kernel"],
         }
     )
-    allow_unmeasured_alpha_fallback = bool(
-        run_options["allow_unmeasured_alpha_fallback"]
+    raw_alpha_fallback = run_options["allow_unmeasured_alpha_fallback"]
+    # None inherits the shipped yaml. Explicit false is an opt-out and
+    # stays on the evalspec so the cache key does not alias it to inherit.
+    allow_unmeasured_alpha_fallback = (
+        None if raw_alpha_fallback is None else bool(raw_alpha_fallback)
     )
     evalspec_chemistry_kernel = dict(kernel_run_inputs)
-    if allow_unmeasured_alpha_fallback:
-        evalspec_chemistry_kernel["allow_unmeasured_alpha_fallback"] = True
+    if allow_unmeasured_alpha_fallback is not None:
+        evalspec_chemistry_kernel["allow_unmeasured_alpha_fallback"] = (
+            allow_unmeasured_alpha_fallback
+        )
     force_builtin_vapor_pressure = bool(run_options["force_builtin_vapor_pressure"])
     allow_fallback_vapor = (
         bool(run_options["allow_fallback_vapor"]) or force_builtin_vapor_pressure
@@ -3500,8 +3505,10 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
         ),
         "lab_schedule": merged.get("lab_schedule"),
         "chemistry_kernel": dict(merged.get("chemistry_kernel", {}) or {}),
-        "allow_unmeasured_alpha_fallback": bool(
-            merged.get("allow_unmeasured_alpha_fallback", False)
+        "allow_unmeasured_alpha_fallback": (
+            bool(merged["allow_unmeasured_alpha_fallback"])
+            if "allow_unmeasured_alpha_fallback" in merged
+            else None
         ),
         "lab_overlay_scope": lab_overlay_scope,
         "allow_fallback_vapor": bool(merged.get("allow_fallback_vapor", False)),

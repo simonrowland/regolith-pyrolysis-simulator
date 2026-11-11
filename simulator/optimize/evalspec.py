@@ -647,8 +647,9 @@ def _chemistry_kernel_key_payload(kernel: Mapping[str, Any]) -> Mapping[str, Any
     )
     payload.pop("allow_fallback_vapor", None)
     payload.pop("force_builtin_vapor_pressure", None)
-    if payload.get("allow_unmeasured_alpha_fallback") is False:
-        payload.pop("allow_unmeasured_alpha_fallback")
+    # Absent inherits the shipped yaml default. Explicit false is the
+    # opt-out and must remain in the cache key; dropping it aliased that
+    # run to the inherited default.
     return payload
 
 
