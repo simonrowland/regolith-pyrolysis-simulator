@@ -82,6 +82,7 @@ def _context_with_species():
 def test_species_queries_resolve_exact_formula_phase_and_case() -> None:
     context = _context_with_species()
 
+    assert context.observations["mn-gas"].identity.species.phase.value is Phase.G
     assert score_mod.normalize_species_filters(context, [" Mn "]) == ("Mn",)
     assert score_mod.normalize_species_filters(context, ["mno"]) == ("MnO",)
     assert score_mod.normalize_species_filters(context, ["CO"]) == ("CO",)
@@ -99,8 +100,11 @@ def test_species_scoring_keeps_full_context_and_emits_identical_rows(
 ) -> None:
     context = _context_with_species()
     original_ids = set(context.observations)
+    engine_calls: list[str] = []
 
     def compile_stub(reference, engine, **_kwargs):
+        engine_calls.append(reference.observation_id)
+        assert set(_kwargs["context"].observations) == original_ids
         formula = reference.identity.species.formula
         residual = Residual(
             key=f"fixture::{reference.observation_id}::{engine.value}",
@@ -128,6 +132,8 @@ def test_species_scoring_keeps_full_context_and_emits_identical_rows(
         engines=(Engine.INTERNAL_ANALYTICAL,),
         include_diagnostics=False,
     )
+    assert set(engine_calls) == original_ids
+    engine_calls.clear()
     formulas = score_mod.normalize_species_filters(context, ["Mn"])
     selected_count, metadata = score_mod._score_store_to_jsonl(
         context,
@@ -137,16 +143,34 @@ def test_species_scoring_keeps_full_context_and_emits_identical_rows(
         species_formulas=formulas,
         include_diagnostics=False,
     )
+    assert set(engine_calls) == {"mn-gas", "mn-solid"}
+    engine_calls.clear()
+    combined_path = tmp_path / "combined.jsonl"
+    combined_count, combined_metadata = score_mod._score_store_to_jsonl(
+        context,
+        combined_path,
+        root=score_mod.REPO_ROOT,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.VAPOUR,
+        species_formulas=formulas,
+        work_id="work-1",
+        limit=1,
+        include_diagnostics=False,
+    )
+    assert engine_calls == ["mn-gas"]
 
     def row_bytes(path: Path) -> dict[str, bytes]:
         return {
             str(row["reference"]): line
-            for line in path.with_name(path.name + ".partial").read_bytes().splitlines()[1:]
+            for line in path.with_name(path.name + ".partial").read_bytes().splitlines(
+                keepends=True
+            )[1:]
             if (row := json.loads(line))
         }
 
     all_rows = row_bytes(all_path)
     selected_rows = row_bytes(species_path)
+    combined_rows = row_bytes(combined_path)
     expected_ids = {
         observation.observation_id
         for observation in context.observations.values()
@@ -156,8 +180,11 @@ def test_species_scoring_keeps_full_context_and_emits_identical_rows(
     assert set(all_rows) == original_ids
     assert set(selected_rows) == expected_ids == {"mn-gas", "mn-solid"}
     assert {key: all_rows[key] for key in expected_ids} == selected_rows
+    assert set(combined_rows) == {"mn-gas"}
+    assert combined_rows["mn-gas"] == all_rows["mn-gas"]
     assert all_count == len(original_ids)
     assert selected_count == metadata.selected_reference_count == len(expected_ids)
+    assert combined_count == combined_metadata.selected_reference_count == 1
     assert set(context.observations) == original_ids
 
 
@@ -198,6 +225,13 @@ def test_filtered_cli_keeps_published_artifacts_and_labels_subset(
         return 0, metadata
 
     def fake_compilation(_context, path, **_kwargs):
+        observation_filter = _kwargs.get("observation_filter")
+        assert callable(observation_filter)
+        assert {
+            observation.observation_id
+            for observation in _context.observations.values()
+            if observation_filter(observation)
+        } == {"mn-gas", "mn-solid"}
         path.write_text("", encoding="utf-8")
 
     def fake_summary(_aggregate, path, *, store_stamp):
@@ -258,3 +292,50 @@ def test_filtered_cli_keeps_published_artifacts_and_labels_subset(
     )
     assert (subset / "residuals.jsonl").is_file()
     assert (subset / "compilation-comparisons.jsonl").is_file()
+
+
+def test_compilation_comparison_writer_filters_observations(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery import compilation_tier
+
+    context = _context_with_species()
+    visited: list[str] = []
+    filters: list[object] = []
+
+    monkeypatch.setattr(
+        compilation_tier,
+        "_is_janaf_compilation_observation",
+        lambda *_args: True,
+    )
+
+    def series_cells(observation, _origin):
+        visited.append(observation.observation_id)
+        return ()
+
+    def nasa9_comparisons(
+        _context, *, engines, invoke_pure_phase, observation_filter=None
+    ):
+        assert engines == ()
+        assert invoke_pure_phase is False
+        filters.append(observation_filter)
+        return []
+
+    monkeypatch.setattr(compilation_tier, "_iter_compilation_series_cells", series_cells)
+    monkeypatch.setattr(
+        compilation_tier, "_nasa9_fit_comparisons", nasa9_comparisons
+    )
+
+    formulas = score_mod.normalize_species_filters(context, ["Mn"])
+    observation_filter = lambda observation: score_mod._observation_matches_species_filter(
+        observation, formulas
+    )
+    assert compilation_tier._write_compilation_comparisons_jsonl(
+        context,
+        tmp_path / "comparisons.jsonl",
+        engines=(),
+        invoke_pure_phase=False,
+        observation_filter=observation_filter,
+    ) == 0
+    assert visited == ["mn-gas", "mn-solid"]
+    assert filters == [observation_filter]
