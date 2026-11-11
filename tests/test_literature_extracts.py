@@ -5147,6 +5147,11 @@ _AMBIGUOUS_OBSERVATION_IDS_CEILING = 0
 # Counting them here is what stops certification from omitting them when
 # schema validation is skipped.
 _MISSING_OBSERVATION_IDS_CEILING = 0
+# Non-finite measured values (NaN, +Inf, -Inf) refuse certification.
+# Scored evidence in this corpus has none, and no extract is
+# review_status reviewed. Certification-state changes from this refusal: 0.
+# The ceiling may only fall.
+_NON_FINITE_EVIDENCE_CEILING = 0
 
 
 def test_fidelity_source_warning_ratchet():
@@ -5164,6 +5169,7 @@ def test_fidelity_source_warning_ratchet():
     source_blind_pins = 0
     ambiguous_ids = 0
     missing_ids = 0
+    non_finite = 0
     for path in vle.discover_extracts():
         doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         if not isinstance(doc, dict):
@@ -5180,6 +5186,7 @@ def test_fidelity_source_warning_ratchet():
         source_blind_pins += by_kind.get("source_blind_pin", 0)
         ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
         missing_ids += by_kind.get("missing_observation_id", 0)
+        non_finite += by_kind.get("non_finite_evidence", 0)
         pilot = by_kind.get("auto_migrated_pilot_pin", 0)
         pilot_pins += pilot
         if pilot:
@@ -5192,6 +5199,7 @@ def test_fidelity_source_warning_ratchet():
     assert source_blind_pins <= _SOURCE_BLIND_PINS_CEILING, source_blind_pins
     assert ambiguous_ids <= _AMBIGUOUS_OBSERVATION_IDS_CEILING, ambiguous_ids
     assert missing_ids <= _MISSING_OBSERVATION_IDS_CEILING, missing_ids
+    assert non_finite <= _NON_FINITE_EVIDENCE_CEILING, non_finite
 
 
 def test_auto_migrated_pilot_pin_counts_each_sample():
@@ -7907,10 +7915,11 @@ def test_source_artifact_provenance_is_required_at_every_promoter(
 # and does certify itself. A cell ``1/2`` does not certify 1. A quoted
 # cell ``1,000`` does not certify 1 or 1000, and neither does a TSV cell
 # ``1,000``. A cell ``1 KPa`` does not certify ``1 K``. NaN, Infinity, and
-# an exponent Decimal rejects do not certify a number. The same row in a
-# prose artifact stays digit grouping; that case lives in ``_TOKEN_CASES``.
-# Twenty nines is past the Decimal exponent limit, so the constructor
-# raises InvalidOperation. The grammar still matches the text.
+# an exponent Decimal rejects do not certify a number. ``91.`` certifies
+# 91 because the cell is parsed with Decimal, not the prose grammar.
+# The same row in a prose artifact stays digit grouping; that case lives
+# in ``_TOKEN_CASES``. Twenty nines is past the Decimal exponent limit,
+# so the constructor raises InvalidOperation.
 _CELL_INVALID_EXPONENT = "1e" + ("9" * 20)
 _TABULAR_CELL_CASES = (
     ("csv_first_cell", "csv", "0.91,0.92\n", 0.91, True),
@@ -7924,7 +7933,7 @@ _TABULAR_CELL_CASES = (
     ("csv_leading_decimal", "csv", ".91\n", 0.91, True),
     ("csv_decimal_certifies_int", "csv", "1.0\n", 1, True),
     ("csv_int_text_certifies_float_one", "csv", "1\n", 1.0, True),
-    ("csv_trailing_dot_refuses", "csv", "91.\n", 91.0, False),
+    ("csv_trailing_dot", "csv", "91.\n", 91.0, True),
     ("csv_fraction_refuses_one", "csv", "1/2\n", 1, False),
     ("csv_fraction_refuses_string_one", "csv", "1/2\n", "1", False),
     ("csv_fraction_whole", "csv", "1/2\n", "1/2", True),
@@ -7940,7 +7949,7 @@ _TABULAR_CELL_CASES = (
     ("tsv_grouped_cell_whole", "tsv", "1,000\n", "1,000", True),
     ("tsv_trailing_zeros", "tsv", "0.9100\n", 0.91, True),
     ("tsv_leading_decimal", "tsv", ".91\n", 0.91, True),
-    ("tsv_trailing_dot_refuses", "tsv", "91.\n", 91.0, False),
+    ("tsv_trailing_dot", "tsv", "91.\n", 91.0, True),
     ("tsv_fraction_refuses_one", "tsv", "1/2\n", 1, False),
     ("tsv_fraction_whole", "tsv", "1/2\n", "1/2", True),
     ("tsv_unit_exact", "tsv", "1 K\n", "1 K", True),
@@ -8015,7 +8024,7 @@ def test_tabular_source_matches_each_cell(
     ``9007199254740993`` does not certify ``9007199254740992``. A cell
     ``1/2`` does not certify 1. A quoted cell ``1,000`` certifies that
     printed value and not 1 or 1000. A TSV cell ``1,000`` does the same.
-    ``91.`` does not parse, so it does not certify 91. ``1 K`` is not
+    ``91.`` certifies 91. ``1 K`` is not
     ``1 KPa`` inside a cell. NaN, Infinity, and an exponent Decimal
     rejects do not certify 0. Every promoter calls
     ``certify_extract_source_fidelity``.
@@ -8169,16 +8178,6 @@ def _one_cell_table(cell: str, suffix: str) -> str:
     return buffer.getvalue()
 
 
-# Whole-cell number, written here. Optional sign, digits or a leading
-# decimal, optional fraction digits, optional exponent. The pattern has
-# to consume the cell. A grouping comma, a slash, a trailing dot, and a
-# unit do not match. This is not a spelling list and it does not call
-# the gate. Value comparison is Decimal, not a binary float.
-_ORACLE_CELL_NUMBER_RE = re.compile(
-    r"[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?"
-)
-
-
 def _oracle_finite_decimal(text: str) -> Decimal | None:
     """One finite Decimal, or None. Independent of the gate."""
     try:
@@ -8191,15 +8190,14 @@ def _oracle_finite_decimal(text: str) -> Decimal | None:
 
 
 def _oracle_parse_whole_cell(cell: str) -> Decimal | None:
-    """Parse the whole trimmed cell as one Decimal. Not the gate's grammar.
+    """Parse the whole trimmed cell with Decimal. Not the gate's grammar.
 
+    The cell is the token. A trailing dot parses: ``91.`` is 91.
     ``1e-999`` stays that Decimal. ``9007199254740993`` stays that
-    integer. NaN, Infinity, and InvalidOperation are refusals.
+    integer. NaN, Infinity, and InvalidOperation are refusals. A slash,
+    a grouping comma, and a unit do not parse.
     """
-    text = cell.strip()
-    if _ORACLE_CELL_NUMBER_RE.fullmatch(text) is None:
-        return None
-    return _oracle_finite_decimal(text)
+    return _oracle_finite_decimal(cell.strip())
 
 
 def _oracle_stored_decimal(leaf: int | float) -> Decimal | None:
@@ -8224,9 +8222,9 @@ def _oracle_whole_cell_certifies(leaf: object, cell: str) -> bool:
     Trim the cell. A string certifies only when the cell equals it. A
     number certifies only when ``Decimal`` of the whole cell equals
     ``Decimal`` of the stored spelling: ``0.9100`` and ``.91`` are 0.91,
-    ``1.0`` is 1, ``1e-999`` is not 0, and ``9007199254740993`` is not
-    ``9007199254740992``. A slash, a grouping comma, a trailing dot, a
-    unit, NaN, Infinity, or InvalidOperation refuses. The sign of zero
+    ``1.0`` is 1, ``91.`` is 91, ``1e-999`` is not 0, and
+    ``9007199254740993`` is not ``9007199254740992``. A slash, a grouping
+    comma, a unit, NaN, Infinity, or InvalidOperation refuses. The sign of zero
     is part of the value. ``Decimal`` equality drops that sign, so the
     sign bits are compared when the value is zero.
     """
@@ -8350,6 +8348,9 @@ def test_table_cell_certifies_only_the_whole_cell(
     assert "_numeric_spellings" not in inspect.getsource(_oracle_whole_cell_certifies)
     assert "_numeric_spellings" not in inspect.getsource(vle._cell_certifies_leaf)
     assert "_numeric_spellings" not in inspect.getsource(vle._whole_cell_number)
+    assert "_NUMERIC_TOKEN_RE" not in inspect.getsource(vle._whole_cell_number)
+    assert "_NUMERIC_TOKEN_RE" not in inspect.getsource(_oracle_parse_whole_cell)
+    assert "_ORACLE_CELL_NUMBER_RE" not in inspect.getsource(_oracle_parse_whole_cell)
     for function in (
         _oracle_finite_decimal,
         _oracle_parse_whole_cell,
@@ -8374,7 +8375,9 @@ def test_table_cell_certifies_only_the_whole_cell(
     assert _oracle_whole_cell_certifies(1, "1.0")
     assert _oracle_whole_cell_certifies(1.0, "1")
     assert not _oracle_whole_cell_certifies("0.91", "0.9100")
-    assert not _oracle_whole_cell_certifies(91.0, "91.")
+    assert _oracle_whole_cell_certifies(91.0, "91.")
+    assert _oracle_whole_cell_certifies(1.0, "1.")
+    assert _oracle_whole_cell_certifies(1, "1.")
     cell = _embedded_table_cell(probe, embedding)
     text = _one_cell_table(cell, suffix)
     delimiter = "," if suffix == "csv" else "\t"
@@ -8475,7 +8478,7 @@ def test_numeric_table_cell_certifies_only_when_the_whole_cell_parses_equal(
     ``0.9100`` certifies 0.91. ``1e-999`` does not certify 0.
     ``9007199254740993`` does not certify ``9007199254740992``. ``1/2``
     does not certify 1. ``1,000`` does not certify 1 or 1000. A string
-    certifies only the same string. ``91.`` does not parse.
+    certifies only the same string. ``91.`` certifies 91.0. ``1.`` certifies 1.
     """
     literal_pins = (
         (0.91, "0.9100", True),
@@ -8492,6 +8495,9 @@ def test_numeric_table_cell_certifies_only_when_the_whole_cell_parses_equal(
         (0.0, "-0e-999", False),
         (0.0, "-0.0", False),
         (-0.0, "-0.0", True),
+        (91.0, "91.", True),
+        (1.0, "1.", True),
+        (1, "1.", True),
     )
     for leaf, cell, expected in literal_pins:
         assert _oracle_whole_cell_certifies(leaf, cell) is expected, (leaf, cell)
@@ -8506,7 +8512,9 @@ def test_numeric_table_cell_certifies_only_when_the_whole_cell_parses_equal(
     assert not _oracle_whole_cell_certifies(1, "1/2")
     assert not _oracle_whole_cell_certifies(1, "1,000")
     assert not _oracle_whole_cell_certifies(1000, "1,000")
-    assert not _oracle_whole_cell_certifies(91.0, "91.")
+    assert _oracle_whole_cell_certifies(91.0, "91.")
+    assert _oracle_whole_cell_certifies(1.0, "1.")
+    assert _oracle_whole_cell_certifies(1, "1.")
     assert not _oracle_whole_cell_certifies(0.91, "0.911")
     assert not _oracle_whole_cell_certifies("0.91", "0.9100")
     assert _oracle_whole_cell_certifies("1,000", "1,000")
@@ -9141,6 +9149,358 @@ def test_context_row_without_id_is_outside_scored_coverage(
         assert errors == [], errors
     if entry == "validate":
         assert any("observation_id is required" in error for error in errors)
+
+
+def _non_finite_float(kind: str) -> float:
+    """The three non-finite floats. Independent of the gate."""
+    if kind == "nan":
+        return float("nan")
+    if kind == "inf":
+        return float("inf")
+    if kind == "-inf":
+        return float("-inf")
+    raise AssertionError(kind)
+
+
+def _rule_classify_measured(
+    value: object,
+    prefix: tuple[object, ...] = (),
+    skip: frozenset[str] = frozenset(),
+) -> tuple[list[tuple[object, ...]], list[tuple[object, ...]]]:
+    """Coverable addresses and non-finite addresses. Does not call the gate.
+
+    A non-finite float is the second list. It is never omitted. A finite
+    number and a digit-bearing string are coverable. A label is neither.
+    """
+    if isinstance(value, bool):
+        return [], []
+    if isinstance(value, int):
+        return [prefix], []
+    if isinstance(value, float):
+        if math.isfinite(value):
+            return [prefix], []
+        return [], [prefix]
+    if isinstance(value, str):
+        if any(ch in "0123456789" for ch in value):
+            return [prefix], []
+        return [], []
+    if isinstance(value, dict):
+        coverable: list[tuple[object, ...]] = []
+        non_finite: list[tuple[object, ...]] = []
+        for key, child in value.items():
+            if key in skip:
+                continue
+            child_coverable, child_non_finite = _rule_classify_measured(
+                child, prefix + (key,), skip
+            )
+            coverable.extend(child_coverable)
+            non_finite.extend(child_non_finite)
+        return coverable, non_finite
+    if isinstance(value, list):
+        coverable = []
+        non_finite = []
+        for index, child in enumerate(value):
+            child_coverable, child_non_finite = _rule_classify_measured(
+                child, prefix + (index,), skip
+            )
+            coverable.extend(child_coverable)
+            non_finite.extend(child_non_finite)
+        return coverable, non_finite
+    return [], []
+
+
+_NON_FINITE_KINDS = ("nan", "inf", "-inf")
+# Every scored container the coverage walk reads, plus the nestings that
+# used to drop a non-finite sibling. ``direct_pin`` attests the non-finite
+# value itself. ``values_only_label`` is the empty-address hole.
+_NON_FINITE_PLACEMENTS = (
+    "values_sibling",
+    "values_sibling_structured",
+    "values_nested",
+    "values_list",
+    "values_only_label",
+    "direct_pin",
+    "T_range_K",
+    "T_K",
+    "T_C",
+    "temperature_C",
+    "temp_C",
+    "point_conditions",
+    "point_conditions_beside_locator",
+    "values_unpinned_sibling",
+)
+# The finite sibling is fully pinned and the source matches, so the only
+# refusal is the non-finite value.
+_NON_FINITE_CLEAN_PLACEMENTS = frozenset(
+    {
+        "values_sibling",
+        "values_sibling_structured",
+        "values_nested",
+        "values_list",
+        "values_only_label",
+        "T_range_K",
+        "T_K",
+        "T_C",
+        "temperature_C",
+        "temp_C",
+        "point_conditions",
+        "point_conditions_beside_locator",
+    }
+)
+
+
+def _non_finite_payloads(bad: float) -> list[tuple[str, object, frozenset[str]]]:
+    """Structures the walker must classify. The skip set is part of the case."""
+    locator = frozenset({"locator"})
+    return [
+        ("sibling", {"alpha": 0.91, "beta": bad}, frozenset()),
+        ("nested", {"alpha": 0.91, "pair": {"beta": bad}}, frozenset()),
+        ("list", {"series": [0.91, bad]}, frozenset()),
+        ("label", {"quantity": "alpha", "beta": bad}, frozenset()),
+        ("scalar", bad, frozenset()),
+        ("bare_list", [0.91, bad], frozenset()),
+        (
+            "beside_locator",
+            {"temperature_K": bad, "locator": {"page": 4}},
+            locator,
+        ),
+        ("locator_kept", {"temperature_K": bad, "locator": {"page": 4}}, frozenset()),
+        ("finite_only", {"alpha": 0.91, "quantity": "alpha"}, frozenset()),
+    ]
+
+
+def test_non_finite_float_is_classified_and_never_omitted():
+    """Invariant: a non-finite float is a refusal address, not an empty walk.
+
+    The product is NaN, +Inf, and -Inf in a sibling, a nested mapping, a
+    list, a label payload, a scalar, and beside a locator. The expected
+    addresses are ``_rule_classify_measured``. The gate's coverable list
+    is that same walk, so it cannot drop the non-finite half.
+    """
+    assert "_classify_measured_leaves" in inspect.getsource(vle._measured_leaf_addresses)
+    assert "_classify_measured_leaves" in inspect.getsource(vle._scored_evidence_leaves)
+    assert "_scored_evidence_leaves" in inspect.getsource(vle.fidelity_source_warnings)
+    failures: list[str] = []
+    for kind in _NON_FINITE_KINDS:
+        bad = _non_finite_float(kind)
+        assert not math.isfinite(bad)
+        for name, payload, skip in _non_finite_payloads(bad):
+            expected_coverable, expected_non_finite = _rule_classify_measured(
+                payload, skip=skip
+            )
+            got_coverable, got_non_finite = vle._classify_measured_leaves(
+                payload, skip_keys=skip
+            )
+            got_public = vle._measured_leaf_addresses(payload, skip_keys=skip)
+            if list(got_coverable) != expected_coverable or got_public != expected_coverable:
+                failures.append(
+                    f"{kind} {name} coverable gate={got_coverable} "
+                    f"public={got_public} rule={expected_coverable}"
+                )
+            if list(got_non_finite) != expected_non_finite:
+                failures.append(
+                    f"{kind} {name} non_finite gate={got_non_finite} "
+                    f"rule={expected_non_finite}"
+                )
+            if name == "finite_only":
+                if expected_non_finite:
+                    failures.append(f"{kind} finite_only rule kept a non-finite")
+            elif name != "locator_kept" and not expected_non_finite:
+                failures.append(f"{kind} {name} rule omitted the non-finite value")
+    assert failures == []
+
+
+def _non_finite_document(root: Path, kind: str, placement: str) -> dict:
+    """Attested finite sibling, with ``kind`` stored beside it.
+
+    The source text cites the finite value only, except ``values_only_label``,
+    which cites the label. ``direct_pin`` also pins the non-finite value.
+    """
+    bad = _non_finite_float(kind)
+    alpha_line = "alpha 0.91 measured"
+    if placement in {
+        "values_sibling",
+        "values_sibling_structured",
+        "values_nested",
+        "direct_pin",
+    }:
+        values: object = {"alpha": 0.91, "beta": bad}
+        if placement == "values_nested":
+            values = {"alpha": 0.91, "pair": {"beta": bad}}
+        pins: list[tuple[str | None, object]] = [("alpha", 0.91)]
+        if placement == "direct_pin":
+            pins.append(("beta", bad))
+        return _values_pin_document(
+            root,
+            values=values,
+            pins=pins,
+            source_text=alpha_line + "\n",
+            structured=placement == "values_sibling_structured",
+        )
+    if placement == "values_list":
+        return _values_pin_document(
+            root,
+            values={"series": [0.91, bad]},
+            pins=[("series[0]", 0.91)],
+            source_text="0.91\n",
+            structured=False,
+        )
+    if placement == "values_only_label":
+        return _values_pin_document(
+            root,
+            values={"quantity": "alpha", "beta": bad},
+            pins=[("quantity", "alpha")],
+            source_text="alpha\n",
+            structured=False,
+        )
+    if placement == "values_unpinned_sibling":
+        return _values_pin_document(
+            root,
+            values={"alpha": 0.91, "gamma": 0.5, "beta": bad},
+            pins=[("alpha", 0.91)],
+            source_text=alpha_line + "\n",
+            structured=False,
+        )
+    alpha_pin = (
+        "path",
+        "species.Fe.observations[fe_alpha_1].values.alpha",
+        0.91,
+    )
+    if placement == "point_conditions_beside_locator":
+        condition_key = "point_conditions"
+        condition_value = {
+            "temperature_K": bad,
+            "locator": {"page": 4, "table": "1"},
+        }
+    elif placement == "T_range_K":
+        # Schema requires a two-element range. Both bounds are non-finite,
+        # so the range adds no coverable leaf.
+        condition_key = placement
+        condition_value = [bad, bad]
+    elif placement in vle._SCORED_NUMERIC_CONDITIONS:
+        condition_key = placement
+        condition_value = bad
+    else:
+        raise AssertionError(placement)
+    return _scored_condition_document(
+        root,
+        condition_key=condition_key,
+        condition_value=condition_value,
+        values={"alpha": 0.91},
+        pins=[alpha_pin],
+        source_lines=(alpha_line,),
+    )
+
+
+@pytest.mark.parametrize("kind", _NON_FINITE_KINDS)
+@pytest.mark.parametrize("placement", _NON_FINITE_PLACEMENTS)
+def test_non_finite_measured_value_refuses_certification(
+    kind: str, placement: str, tmp_path: Path
+):
+    """Invariant: NaN and ±Inf refuse that observation at every container.
+
+    ``values: {alpha: 0.91, beta: .nan}`` with only alpha attested refuses.
+    The same holds for +Inf and -Inf, for a nested value, a list element,
+    a label-only payload, each scored condition, and a direct pin of the
+    non-finite value. A finite sibling pin is not coverage of the hole.
+    """
+    doc = _non_finite_document(tmp_path, kind, placement)
+    errors = vle.certify_extract_source_fidelity(
+        doc, label=placement, artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    assert "non_finite_evidence" in joined, (kind, placement, errors)
+    if placement in _NON_FINITE_CLEAN_PLACEMENTS:
+        assert "uncovered_observation" not in joined, (kind, placement, errors)
+        assert "source_blind_pin" not in joined, (kind, placement, errors)
+    if placement == "values_unpinned_sibling":
+        assert "uncovered_observation" in joined, (kind, placement, errors)
+        assert "source_blind_pin" not in joined, (kind, placement, errors)
+    draft = copy.deepcopy(doc)
+    draft["review_status"] = "draft"
+    draft_errors = vle.validate_extract_document(
+        draft,
+        expected_source_id="fixture-source",
+        artifact_root=tmp_path,
+    )
+    assert draft_errors == [], (kind, placement, draft_errors)
+    warnings = vle.fidelity_source_warnings(
+        draft, label="draft", artifact_root=tmp_path
+    )
+    found = next(warning for warning in warnings if warning.kind == "non_finite_evidence")
+    assert found.count == 1
+    assert "non_finite_evidence" in found.render()
+
+
+@pytest.mark.parametrize("kind", _NON_FINITE_KINDS)
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_non_finite_sibling_refuses_every_promoter(
+    kind: str,
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Every promoter refuses ``{alpha: 0.91, beta: non-finite}`` with alpha attested."""
+    doc = _non_finite_document(tmp_path, kind, "values_sibling")
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    joined = "\n".join(errors)
+    assert "non_finite_evidence" in joined, (kind, entry, errors)
+    if entry == "certify":
+        assert "uncovered_observation" not in joined
+        assert "source_blind_pin" not in joined
+
+
+def test_two_non_finite_observations_are_two_refusals(tmp_path: Path):
+    """Each observation with a non-finite value is its own count."""
+    doc = _non_finite_document(tmp_path, "nan", "values_sibling")
+    doc["species"]["Mg"] = copy.deepcopy(doc["species"]["Fe"])
+    doc["species"]["Mg"]["observations"][0]["observation_id"] = "mg_alpha_1"
+    doc["species"]["Mg"]["observations"][0]["values"] = {
+        "alpha": 0.91,
+        "beta": float("inf"),
+    }
+    doc["fidelity_samples"].append(
+        {
+            "path": "species.Mg.observations[mg_alpha_1].values.alpha",
+            "value": 0.91,
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-10",
+            "locator": dict(doc["fidelity_samples"][0]["locator"]),
+        }
+    )
+    warnings = vle.fidelity_source_warnings(
+        doc, label="two-non-finite", artifact_root=tmp_path
+    )
+    found = next(warning for warning in warnings if warning.kind == "non_finite_evidence")
+    assert found.count == 2
+    refusals = vle.certify_extract_source_fidelity(
+        doc, label="two-non-finite", artifact_root=tmp_path
+    )
+    assert any("non_finite_evidence count=2" in line for line in refusals)
+
+
+@pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
+def test_context_non_finite_is_outside_scored_coverage(
+    entry: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Context is unscored. A non-finite value there is not ``non_finite_evidence``."""
+    doc = _literal_source_document(tmp_path, 0.91, "alpha 0.91 measured\n")
+    doc["species"]["Fe"]["context"] = [
+        {
+            "observation_id": "fe_bench_note",
+            "type": "apparatus",
+            "locator": {"page": 4, "section": "setup"},
+            "units": "as printed",
+            "values": {"setpoint": float("nan")},
+        }
+    ]
+    errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
+    joined = "\n".join(errors)
+    assert "non_finite_evidence" not in joined, (entry, errors)
+    if entry == "certify":
+        assert errors == [], errors
 
 
 def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(tmp_path):

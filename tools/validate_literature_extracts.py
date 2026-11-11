@@ -22,7 +22,8 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
 * source fidelity is a typed, counted warning at this chokepoint
   (``uncovered_observation`` / ``unattested_sample`` /
   ``auto_migrated_pilot_pin`` / ``source_blind_pin`` /
-  ``ambiguous_observation_id`` / ``missing_observation_id``). A draft
+  ``ambiguous_observation_id`` / ``missing_observation_id`` /
+  ``non_finite_evidence``). A draft
   corpus is not rejected for those warnings. Promoting the extract
   (``review_status: reviewed``, graduation, load, emit, or the index)
   refuses while any remain. Certification opens a source artifact
@@ -34,10 +35,14 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   artifact with that suffix, is parsed completely before the locator is
   applied. A cell certifies a stored value only when the whole trimmed,
   unquoted cell parses to that number, or equals the stored string.
-  The comparison is decimal.Decimal of that whole cell against repr of a
-  stored float or str of a stored int, so 0.9100 is 0.91, 1e-999 is not 0,
-  and 9007199254740993 is not 9007199254740992. NaN, Infinity, and
-  InvalidOperation do not certify. A substring does not certify, so a cell 1/2 is
+  The comparison is decimal.Decimal of the trimmed, unquoted cell against
+  repr of a stored float or str of a stored int. The prose numeric grammar
+  is not a gate on a cell, so 91. is 91, 0.9100 is 0.91, 1e-999 is not 0,
+  and 9007199254740993 is not 9007199254740992. A cell NaN, Infinity, or
+  InvalidOperation does not certify a number. A non-finite measured value
+  (NaN or ±Inf stored as a float) is ``non_finite_evidence``: it refuses
+  certification of that observation, is never omitted, and is not cleared
+  by attesting a finite sibling. A substring does not certify, so a cell 1/2 is
   not 1 and a cell 1,000 is not 1. A line_range selects only records that lie entirely
   inside it. A span that cuts through a quoted cell is source-blind and
   is not re-parsed from the sliced lines. 1 K is not 1 KPa.
@@ -60,8 +65,10 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   numeric condition the temperature payload copies beside it
   (``T_range_K``, ``T_K``, ``T_C``, ``temperature_C``, ``temp_C``,
   ``point_conditions``). A locator inside a condition is provenance, not
-  a leaf. A measured leaf is a finite int or float (not a boolean), or a
-  string that contains any digit [0-9]. A quantity name, a unit on its
+  a leaf. A coverable measured leaf is a finite int or float (not a
+  boolean), or a string that contains any digit [0-9]. A non-finite float
+  is not coverable and is not dropped: it is ``non_finite_evidence``.
+  A quantity name, a unit on its
   own, or another label with no digit is not a leaf and may be attested
   as text. A string the numeric parser cannot read, such as ``0.91Pa``
   or ``0.0614K``, is still a leaf: it is uncovered unless the opened
@@ -528,16 +535,16 @@ def _finite_decimal(text: str) -> Decimal | None:
 def _whole_cell_number(cell: str) -> Decimal | None:
     """Parse the entire trimmed cell as one finite Decimal, or return None.
 
-    The numeric token grammar has to consume the whole cell. Value
-    comparison is ``Decimal``, never a float conversion: ``0.9100`` is
-    ``0.91``, ``1e-999`` is not ``0``, and ``9007199254740993`` is not
-    ``9007199254740992``. ``1/2``, ``1,000``, ``91.``, and ``0.91Pa`` do
-    not parse. NaN, Infinity, and an exponent Decimal rejects are
-    refusals. This is not a list of spellings of a stored leaf.
+    The cell is the token. ``Decimal`` parses it after trim and the
+    table reader's unquote. The prose numeric grammar is not a gate, so
+    a trailing dot is the number: ``91.`` is ``91``. Value comparison is
+    ``Decimal``, never a float conversion: ``0.9100`` is ``0.91``,
+    ``1e-999`` is not ``0``, and ``9007199254740993`` is not
+    ``9007199254740992``. ``1/2``, ``1,000``, and ``0.91Pa`` do not parse.
+    NaN, Infinity, and an exponent Decimal rejects are refusals. This is
+    not a list of spellings of a stored leaf.
     """
     folded = _fold_numeric_signs(cell.strip())
-    if _NUMERIC_TOKEN_RE.fullmatch(folded) is None:
-        return None
     return _finite_decimal(folded)
 
 
@@ -565,9 +572,10 @@ def _cell_certifies_leaf(leaf: Any, cell: str) -> bool:
     Invariant: every numeric table cell is decided here. The whole cell
     certifies a stored number only when ``Decimal`` of that cell equals
     ``Decimal`` of the stored spelling (``repr`` of a float, ``str`` of an
-    int), including the sign of zero. ``0.9100`` is ``0.91``. ``1.0`` is
-    ``1``. ``1e-999`` is not ``0``. ``9007199254740993`` is not
-    ``9007199254740992``. ``1/2`` is not ``1``. ``1,000`` is not ``1``.
+    int), including the sign of zero. ``0.9100`` is ``0.91``. ``91.`` is
+    ``91``. ``1.0`` is ``1``. ``1e-999`` is not ``0``.
+    ``9007199254740993`` is not ``9007199254740992``. ``1/2`` is not ``1``.
+    ``1,000`` is not ``1``.
     A cell that is not one finite number does not certify. A string
     matches only that string. Spellings are not enumerated. ``Decimal``
     equality treats negative zero as zero, so the sign bit is compared
@@ -1718,6 +1726,7 @@ _FIDELITY_WARNING_KINDS = (
     "source_blind_pin",
     "ambiguous_observation_id",
     "missing_observation_id",
+    "non_finite_evidence",
 )
 _ARTIFACT_PATH_KEYS = ("source_path", "quotes_path")
 _FIDELITY_DETAIL_CAP = 3
@@ -1826,29 +1835,66 @@ def _scored_observations(
     return unique, ambiguous, missing
 
 
+def _scored_evidence_leaves(
+    observation: Mapping[str, Any],
+) -> tuple[list[tuple[Any, ...]], list[tuple[Any, ...]]]:
+    """Coverable leaves and non-finite leaves of one scored observation.
+
+    One walk. ``values`` and each scored numeric condition are the evidence.
+    A ``locator`` inside a condition is provenance. The first list is what
+    a pin can cover. The second list is NaN and ±Inf. Those addresses are
+    never omitted and are never coverable.
+    """
+    coverable: list[tuple[Any, ...]] = []
+    non_finite: list[tuple[Any, ...]] = []
+
+    def take(value: Any, prefix: tuple[Any, ...], skip_keys: frozenset[str]) -> None:
+        child_coverable, child_non_finite = _classify_measured_leaves(
+            value, prefix, skip_keys=skip_keys
+        )
+        coverable.extend(child_coverable)
+        non_finite.extend(child_non_finite)
+
+    if "values" in observation:
+        take(observation.get("values"), ("values",), frozenset())
+    for key in _SCORED_NUMERIC_CONDITIONS:
+        if key not in observation or observation.get(key) is None:
+            continue
+        take(
+            observation.get(key),
+            (key,),
+            _CONDITION_PROVENANCE_KEYS,
+        )
+    return coverable, non_finite
+
+
 def _scored_measured_leaves(observation: Mapping[str, Any]) -> list[tuple[Any, ...]]:
-    """Measured leaves of ``values`` and of each scored numeric condition.
+    """Coverable measured leaves of ``values`` and each scored condition.
 
     Addresses sit in one evidence tree. ``("values", "alpha")`` and
     ``("T_range_K", 0)`` are different leaves even when the numbers are
     equal. A ``locator`` inside a condition is provenance and is not a
-    leaf. Locator keys inside ``values`` stay leaves; that container is
-    unchanged.
+    leaf. Locator keys inside ``values`` stay leaves. Non-finite floats
+    are not in this list; ``_scored_evidence_leaves`` records them.
     """
-    leaves: list[tuple[Any, ...]] = []
-    if "values" in observation:
-        leaves.extend(_measured_leaf_addresses(observation.get("values"), ("values",)))
-    for key in _SCORED_NUMERIC_CONDITIONS:
-        if key not in observation or observation.get(key) is None:
-            continue
-        leaves.extend(
-            _measured_leaf_addresses(
-                observation.get(key),
-                (key,),
-                skip_keys=_CONDITION_PROVENANCE_KEYS,
-            )
-        )
-    return leaves
+    coverable, _non_finite = _scored_evidence_leaves(observation)
+    return coverable
+
+
+def _coverable_leaves_are_pinned(
+    needed: Sequence[tuple[Any, ...]],
+    covered: AbstractSet[tuple[Any, ...]],
+    observation: Mapping[str, Any],
+) -> bool:
+    """True when every coverable leaf is pinned, or there is no coverable leaf.
+
+    An empty leaf list is pinned only when the evidence also has no digit.
+    A non-finite quantity is not a coverable leaf. Callers refuse it on
+    its own; this predicate does not certify the observation.
+    """
+    if not needed:
+        return not _observation_has_digit_bearing_string(observation)
+    return set(needed) <= set(covered)
 
 
 def _observation_has_digit_bearing_string(observation: Mapping[str, Any]) -> bool:
@@ -1957,53 +2003,78 @@ def _sample_addresses_scored_evidence(sample: Mapping[str, Any]) -> bool:
 _ADDRESS_MISS = object()
 
 
+def _classify_measured_leaves(
+    value: Any,
+    prefix: tuple[Any, ...] = (),
+    *,
+    skip_keys: frozenset[str] = frozenset(),
+) -> tuple[list[tuple[Any, ...]], list[tuple[Any, ...]]]:
+    """Split measured leaves into coverable addresses and non-finite addresses.
+
+    Invariant: every float is accounted for. A finite int or float (not a
+    boolean) and a string that contains any digit [0-9] are coverable. A
+    non-finite float (NaN, +Inf, -Inf) is the second list. It is never
+    omitted and never coverable. A label with no digit is neither. The
+    address is the path of mapping keys and list indexes from ``value``.
+    A container is not a leaf. ``()`` is a measured scalar payload.
+    Membership of a string does not consult the numeric grammar:
+    ``0.91Pa`` is coverable because it contains digits. ``skip_keys``
+    drops a provenance mapping (a condition ``locator``) and does not
+    apply when walking ``values``.
+    """
+    if isinstance(value, bool):
+        return [], []
+    if isinstance(value, int):
+        return [prefix], []
+    if isinstance(value, float):
+        if math.isfinite(value):
+            return [prefix], []
+        return [], [prefix]
+    if isinstance(value, str):
+        if _string_has_ascii_digit(value):
+            return [prefix], []
+        return [], []
+    if isinstance(value, Mapping):
+        coverable: list[tuple[Any, ...]] = []
+        non_finite: list[tuple[Any, ...]] = []
+        for key, child in value.items():
+            if key in skip_keys:
+                continue
+            child_coverable, child_non_finite = _classify_measured_leaves(
+                child, prefix + (key,), skip_keys=skip_keys
+            )
+            coverable.extend(child_coverable)
+            non_finite.extend(child_non_finite)
+        return coverable, non_finite
+    if isinstance(value, (list, tuple)):
+        coverable = []
+        non_finite = []
+        for index, child in enumerate(value):
+            child_coverable, child_non_finite = _classify_measured_leaves(
+                child, prefix + (index,), skip_keys=skip_keys
+            )
+            coverable.extend(child_coverable)
+            non_finite.extend(child_non_finite)
+        return coverable, non_finite
+    return [], []
+
+
 def _measured_leaf_addresses(
     value: Any,
     prefix: tuple[Any, ...] = (),
     *,
     skip_keys: frozenset[str] = frozenset(),
 ) -> list[tuple[Any, ...]]:
-    """Addresses of measured leaves under ``value``.
+    """Coverable measured leaves under ``value``.
 
-    A measured leaf is a finite int or float (not a boolean), or a string
-    that contains any digit [0-9]. The address is the path of mapping keys
-    and list indexes from ``value``. A container is not a leaf. A label
-    with no digit is not a leaf. ``()`` is a measured scalar payload.
-    Membership does not consult the numeric grammar: ``0.91Pa`` is a leaf
-    because it contains digits. ``skip_keys`` drops a provenance mapping
-    (a condition ``locator``) and does not apply when walking ``values``.
+    This is the coverable half of ``_classify_measured_leaves``. A
+    non-finite float is not returned here and is not dropped: the same
+    walk records it, and certification refuses it.
     """
-    if isinstance(value, bool):
-        return []
-    if isinstance(value, int):
-        return [prefix]
-    if isinstance(value, float):
-        return [prefix] if math.isfinite(value) else []
-    if isinstance(value, str):
-        if _string_has_ascii_digit(value):
-            return [prefix]
-        return []
-    if isinstance(value, Mapping):
-        found: list[tuple[Any, ...]] = []
-        for key, child in value.items():
-            if key in skip_keys:
-                continue
-            found.extend(
-                _measured_leaf_addresses(
-                    child, prefix + (key,), skip_keys=skip_keys
-                )
-            )
-        return found
-    if isinstance(value, (list, tuple)):
-        found = []
-        for index, child in enumerate(value):
-            found.extend(
-                _measured_leaf_addresses(
-                    child, prefix + (index,), skip_keys=skip_keys
-                )
-            )
-        return found
-    return []
+    coverable, _non_finite = _classify_measured_leaves(
+        value, prefix, skip_keys=skip_keys
+    )
+    return coverable
 
 
 def _step_bracket(cur: Any, bracket: str, address: list[Any]) -> Any:
@@ -2567,9 +2638,11 @@ def fidelity_source_warnings(
     trimmed, unquoted cell parses to that number, or equals the stored
     string. ``0.9100`` is ``0.91``. The numbers are ``Decimal`` values,
     so ``1e-999`` is not ``0`` and ``9007199254740993`` is not
-    ``9007199254740992``. NaN, Infinity, and InvalidOperation do not
-    certify. A substring does not certify, so
-    a cell ``1/2`` is not ``1`` and a cell ``1,000`` is not ``1``. A
+    ``9007199254740992``. A trailing dot is the number, so ``91.`` is
+    ``91``. The prose numeric grammar is not a gate on a cell. NaN,
+    Infinity, and InvalidOperation do not certify. A substring does not
+    certify, so a cell ``1/2`` is not ``1`` and a cell ``1,000`` is not
+    ``1``. A
     ``line_range`` selects records that lie entirely inside it. A span that
     cuts through a quoted cell is source-blind and is not re-parsed from
     the sliced lines. ``1 K`` is not ``1 KPa``.
@@ -2590,7 +2663,11 @@ def fidelity_source_warnings(
     of one address does not cover a sibling, even when the numbers are
     equal, and a ``values`` pin does not cover a sibling condition. A
     measured leaf is a finite int or float (not a boolean), or a string
-    that contains any digit [0-9]. A descriptive label with no digit is
+    that contains any digit [0-9]. A non-finite float (NaN, +Inf, -Inf)
+    is ``non_finite_evidence``. It is never omitted and never contributes
+    "no required address": a pin of a finite sibling does not certify
+    the observation, and a pin of the non-finite value does not either.
+    A descriptive label with no digit is
     not a leaf and does not cover a sibling measurement. A string the
     numeric parser cannot read is uncovered unless the opened source
     carries that printed value; it is never skipped. Several samples may
@@ -2626,10 +2703,12 @@ def fidelity_source_warnings(
     # write: a pin adds an address only when its own address is that leaf or
     # an ancestor. Value equality does not transfer coverage to a sibling,
     # and a values pin does not transfer coverage to a condition.
-    needed_addresses = {
-        key: _scored_measured_leaves(observation)
+    evidence = {
+        key: _scored_evidence_leaves(observation)
         for key, observation in observation_map.items()
     }
+    needed_addresses = {key: evidence[key][0] for key in evidence}
+    non_finite_addresses = {key: evidence[key][1] for key in evidence}
     covered_addresses: dict[tuple[str, str], set[tuple[Any, ...]]] = {
         key: set() for key in required
     }
@@ -2710,6 +2789,10 @@ def fidelity_source_warnings(
     # not a pass.
     covered: set[tuple[str, str]] = set()
     for key in observation_map:
+        # A non-finite quantity is not covered by any pin, including a pin
+        # of that value. The empty-leaf pass must not see it as "no address".
+        if non_finite_addresses[key]:
+            continue
         needed = needed_addresses[key]
         if not needed:
             if key in addressed and not _observation_has_digit_bearing_string(
@@ -2722,14 +2805,24 @@ def fidelity_source_warnings(
 
     uncovered_reasons: list[str] = []
     uncovered_extra = [0]
+    uncovered_keys: list[tuple[str, str]] = []
     for species_id, observation_id in sorted(required - covered):
+        key = (species_id, observation_id)
+        if non_finite_addresses[key] and _coverable_leaves_are_pinned(
+            needed_addresses[key],
+            covered_addresses[key],
+            observation_map[key],
+        ):
+            continue
+        uncovered_keys.append(key)
+    for species_id, observation_id in uncovered_keys:
         _note_reason(
             uncovered_reasons,
             uncovered_extra,
             f"{label}: fidelity sample coverage missing for observation "
             f"species.{species_id}.observations[{observation_id}]",
         )
-    uncovered = len(required - covered)
+    uncovered = len(uncovered_keys)
 
     warnings: list[FidelityWarning] = []
     if uncovered:
@@ -2805,6 +2898,30 @@ def fidelity_source_warnings(
                 _finish_detail(missing_reasons, missing_extra[0]),
             )
         )
+    non_finite_keys = sorted(
+        key for key, leaves in non_finite_addresses.items() if leaves
+    )
+    if non_finite_keys:
+        non_finite_reasons: list[str] = []
+        non_finite_extra = [0]
+        for species_id, observation_id in non_finite_keys:
+            leaf_count = len(non_finite_addresses[(species_id, observation_id)])
+            value_word = "value" if leaf_count == 1 else "values"
+            _note_reason(
+                non_finite_reasons,
+                non_finite_extra,
+                f"{label}: non-finite measured value refuses certification of "
+                f"species.{species_id}.observations[{observation_id}] "
+                f"({leaf_count} {value_word})",
+            )
+        warnings.append(
+            FidelityWarning(
+                "non_finite_evidence",
+                len(non_finite_keys),
+                label,
+                _finish_detail(non_finite_reasons, non_finite_extra[0]),
+            )
+        )
     return warnings
 
 
@@ -2842,8 +2959,10 @@ def certify_extract_source_fidelity(
     value only when the whole trimmed, unquoted cell parses to that
     number, or equals the stored string. ``0.9100`` is ``0.91``. The
     numbers are ``Decimal`` values, so ``1e-999`` is not ``0`` and
-    ``9007199254740993`` is not ``9007199254740992``. NaN, Infinity, and
-    InvalidOperation do not certify. A
+    ``9007199254740993`` is not ``9007199254740992``. A trailing dot is
+    the number, so ``91.`` is ``91``. The prose numeric grammar is not a
+    gate on a cell. NaN, Infinity, and InvalidOperation do not certify.
+    A non-finite measured value refuses that observation. A
     substring does not certify, so a cell ``1/2`` is not ``1`` and a cell
     ``1,000`` is not ``1``. A span
     that cuts through a quoted cell is source-blind and is not re-parsed
@@ -2853,7 +2972,9 @@ def certify_extract_source_fidelity(
     The sample's own
     spelling is not a substitute: a ``rel_tol`` match of a different number
     does not certify the stored leaf. A scored row with no usable
-    observation id refuses; the row is not omitted. Every measured leaf of
+    observation id refuses; the row is not omitted. A non-finite measured
+    value (NaN, +Inf, -Inf) refuses that observation. It is not omitted
+    and a finite sibling pin does not clear it. Every measured leaf of
     a scored observation's evidence (``values`` and each scored numeric
     condition) must be covered by a matching, non-pilot, attested sample
     whose address is that leaf or an ancestor, and whose source artifact
