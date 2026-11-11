@@ -37,6 +37,12 @@ extraction:
   provenance_path: raw/kems-138-bischof-2023/kems-138-bischof-2023.pdf
 review_status: draft
 fidelity_samples:
+  - path: species.Ga.observations[bischof_2023_psat_ga_1752k].values.points[0].P_Pa
+    value: 0.11
+    locator: {page: 8, paragraph: 'results pressure statement', note: 'Rendered p(Ga) statement'}
+  - path: species.In2O.observations[bischof_2023_table12_in2o_psat_this_work].values.points[1].P_Pa
+    value: 0.327
+    locator: {page: 17, table: '12', note: 'Rendered Table 12, this work Oct. 2019'}
   - species: Ga
     observable: rate_series
     observation_id: bischof_2023_table7_ga_isotherm_intensities
@@ -53,7 +59,7 @@ fidelity_samples:
     field: p_Pa_1550
     value: 0.072
     locator:
-      pdf_page_index: 17
+      pdf_page_index: 16
       published_page: 16
       table: "12"
       note: "Table 12 p(In) [Pa] this work Oct. 2019 at 1550 K = 0.072"
@@ -172,8 +178,9 @@ experiments:
       state: {tag: value, value: Pure greater-than-99.9-percent alpha-Ga2O3 fine powder}
       locator: *b138_apparatus
     form:
-      state: {tag: value, value: Fine powder}
-      locator: *b138_apparatus
+      state: {tag: value, value: condensed_solid}
+      locator: {page: 3, published_page: 2, section: '2.1 Sample preparation', note: 'Source identifies alpha-Ga2O3 as a fine powder; crystalline solid sample phase'}
+    morphology_as_published: fine powder
     characterization:
       state: {tag: value, value: XRD before and after KEMS using NIST Si metal standard for peak calibration}
       locator: {page: 3, published_page: 3, section: '2.2 X-ray diffraction'}
@@ -220,8 +227,9 @@ experiments:
       state: {tag: value, value: Pure greater-than-99.9-percent alpha-In2O3 fine powder}
       locator: *b138_apparatus
     form:
-      state: {tag: value, value: Fine powder}
-      locator: *b138_apparatus
+      state: {tag: value, value: condensed_solid}
+      locator: {page: 3, published_page: 2, section: '2.1 Sample preparation', note: 'Source identifies alpha-In2O3 as a fine powder; crystalline solid sample phase'}
+    morphology_as_published: fine powder
   apparatus:
     geometry:
       orifice_diameter_m:
@@ -442,7 +450,8 @@ species:
       experiment: ga2o3-series
       type: psat_series
       locator:
-        pdf_page_index: 8
+        page: 8
+        pdf_page_index: 7
         published_page: 7
         paragraph: results_polytherm
         quote: "followed by Ga, whose partial pressure is lower by a factor of 7 (0.11 ± 0.016 Pa at 1752 K)"
@@ -457,8 +466,26 @@ species:
         points:
           - T_K: 1752.0
             P_Pa: 0.11
+            point_conditions:
+              temperature_K:
+                state: {tag: value, value: {kind: point, point: '1752.0'}}
+                locator: {page: 8, paragraph: 'results pressure statement'}
+              total_pressure_Pa:
+                state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+                locator: {page: 3, section: '2.2 KEMS'}
+              fO2_Pa:
+                state: {tag: unknown, reason: not_published}
+                locator: {page: 3, section: '2.2 KEMS'}
+              composition:
+                state: {tag: unknown, reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent}
+                locator: {page: 3, section: '2.1 Sample preparation'}
+            run_link:
+              state: {tag: unknown, reason: not_published}
+              locator: {page: 8, paragraph: 'results pressure statement'}
             quote: "0.11 ± 0.016 Pa at 1752 K"
       uncertainty:
+        confidence_level: not_stated
+        note: Printed ± width; source does not state its confidence convention.
         P_Pa: 0.016
         as_printed: "0.11 ± 0.016 Pa"
     - observation_id: bischof_2023_fig5_ga_psat_figure_only
@@ -582,7 +609,8 @@ species:
       experiment: ga2o3-series
       type: psat_series
       locator:
-        pdf_page_index: 8
+        page: 8
+        pdf_page_index: 7
         published_page: 7
         paragraph: results_polytherm
         quote: "The partial pressures of GaO (0.007 ± 0.002 Pa) are several orders of magnitude lower again at the same temperature."
@@ -597,8 +625,26 @@ species:
         points:
           - T_K: 1752.0
             P_Pa: 0.007
+            point_conditions:
+              temperature_K:
+                state: {tag: value, value: {kind: point, point: '1752.0'}}
+                locator: {page: 8, paragraph: 'results pressure statement'}
+              total_pressure_Pa:
+                state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+                locator: {page: 3, section: '2.2 KEMS'}
+              fO2_Pa:
+                state: {tag: unknown, reason: not_published}
+                locator: {page: 3, section: '2.2 KEMS'}
+              composition:
+                state: {tag: unknown, reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent}
+                locator: {page: 3, section: '2.1 Sample preparation'}
+            run_link:
+              state: {tag: unknown, reason: not_published}
+              locator: {page: 8, paragraph: 'results pressure statement'}
             quote: "0.007 ± 0.002 Pa"
       uncertainty:
+        confidence_level: not_stated
+        note: Printed ± width; source does not state its confidence convention.
         P_Pa: 0.002
         as_printed: "0.007 ± 0.002 Pa"
     - observation_id: bischof_2023_table10_gao_delta_f_3rd_recommended
@@ -680,7 +726,8 @@ species:
       experiment: ga2o3-series
       type: psat_series
       locator:
-        pdf_page_index: 8
+        page: 8
+        pdf_page_index: 7
         published_page: 7
         paragraph: results_polytherm
         quote: "Ga2O exhibits by far the highest partial pressures (0.79 ± 0.3 Pa at 1752 K)"
@@ -695,8 +742,26 @@ species:
         points:
           - T_K: 1752.0
             P_Pa: 0.79
+            point_conditions:
+              temperature_K:
+                state: {tag: value, value: {kind: point, point: '1752.0'}}
+                locator: {page: 8, paragraph: 'results pressure statement'}
+              total_pressure_Pa:
+                state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+                locator: {page: 3, section: '2.2 KEMS'}
+              fO2_Pa:
+                state: {tag: unknown, reason: not_published}
+                locator: {page: 3, section: '2.2 KEMS'}
+              composition:
+                state: {tag: unknown, reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent}
+                locator: {page: 3, section: '2.1 Sample preparation'}
+            run_link:
+              state: {tag: unknown, reason: not_published}
+              locator: {page: 8, paragraph: 'results pressure statement'}
             quote: "0.79 ± 0.3 Pa at 1752 K"
       uncertainty:
+        confidence_level: not_stated
+        note: Printed ± width; source does not state its confidence convention.
         P_Pa: 0.3
         as_printed: "0.79 ± 0.3 Pa"
     - observation_id: bischof_2023_table10_ga2o_delta_f_3rd_recommended
@@ -836,7 +901,8 @@ species:
       experiment: in2o3-series
       type: psat_series
       locator:
-        pdf_page_index: 17
+        page: 17
+        pdf_page_index: 16
         published_page: 16
         table: "12"
         quote: "p(In) [Pa] 0.003 0.072"
@@ -852,10 +918,38 @@ species:
         p_Pa_1550: 0.072
         points:
           - T_K: 1425.0
+            run: Oct2019
             P_Pa: 0.003
+            point_conditions:
+              temperature_K:
+                state: {tag: value, value: {kind: point, point: '1425.0'}}
+                locator: {page: 17, table: '12', row: 'In'}
+              total_pressure_Pa:
+                state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+                locator: {page: 3, section: '2.2 KEMS'}
+              fO2_Pa:
+                state: {tag: unknown, reason: not_published}
+                locator: {page: 3, section: '2.2 KEMS'}
+              composition:
+                state: {tag: unknown, reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent}
+                locator: {page: 3, section: '2.1 Sample preparation'}
             quote: "p(In) [Pa] this work Oct. 2019 at 1425 K = 0.003"
           - T_K: 1550.0
+            run: Oct2019
             P_Pa: 0.072
+            point_conditions:
+              temperature_K:
+                state: {tag: value, value: {kind: point, point: '1550.0'}}
+                locator: {page: 17, table: '12', row: 'In'}
+              total_pressure_Pa:
+                state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+                locator: {page: 3, section: '2.2 KEMS'}
+              fO2_Pa:
+                state: {tag: unknown, reason: not_published}
+                locator: {page: 3, section: '2.2 KEMS'}
+              composition:
+                state: {tag: unknown, reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent}
+                locator: {page: 3, section: '2.1 Sample preparation'}
             quote: "p(In) [Pa] this work Oct. 2019 at 1550 K = 0.072"
         table_csv: tables/kems-138-bischof-2023/t12.csv
       uncertainty:
@@ -864,7 +958,8 @@ species:
       experiment: in2o3-series
       type: psat_series
       locator:
-        pdf_page_index: 9
+        page: 9
+        pdf_page_index: 8
         published_page: 8
         paragraph: results_In
         quote: "then In (0.30 ± 0.05 Pa) to InO (0.0036 ± 0.001 Pa)"
@@ -879,8 +974,26 @@ species:
         points:
           - T_K: 1611.0
             P_Pa: 0.30
+            point_conditions:
+              temperature_K:
+                state: {tag: value, value: {kind: point, point: '1611.0'}}
+                locator: {page: 9, paragraph: 'results pressure statement'}
+              total_pressure_Pa:
+                state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+                locator: {page: 3, section: '2.2 KEMS'}
+              fO2_Pa:
+                state: {tag: unknown, reason: not_published}
+                locator: {page: 3, section: '2.2 KEMS'}
+              composition:
+                state: {tag: unknown, reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent}
+                locator: {page: 3, section: '2.1 Sample preparation'}
+            run_link:
+              state: {tag: unknown, reason: not_published}
+              locator: {page: 9, paragraph: 'results pressure statement'}
             quote: "In (0.30 ± 0.05 Pa)"
       uncertainty:
+        confidence_level: not_stated
+        note: Printed ± width; source does not state its confidence convention.
         P_Pa: 0.05
         as_printed: "0.30 ± 0.05 Pa"
     - observation_id: bischof_2023_fig6_in_psat_figure_only
@@ -995,7 +1108,8 @@ species:
       experiment: in2o3-series
       type: psat_series
       locator:
-        pdf_page_index: 9
+        page: 9
+        pdf_page_index: 8
         published_page: 8
         paragraph: results_In
         quote: "InO (0.0036 ± 0.001 Pa)"
@@ -1010,8 +1124,26 @@ species:
         points:
           - T_K: 1611.0
             P_Pa: 0.0036
+            point_conditions:
+              temperature_K:
+                state: {tag: value, value: {kind: point, point: '1611.0'}}
+                locator: {page: 9, paragraph: 'results pressure statement'}
+              total_pressure_Pa:
+                state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+                locator: {page: 3, section: '2.2 KEMS'}
+              fO2_Pa:
+                state: {tag: unknown, reason: not_published}
+                locator: {page: 3, section: '2.2 KEMS'}
+              composition:
+                state: {tag: unknown, reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent}
+                locator: {page: 3, section: '2.1 Sample preparation'}
+            run_link:
+              state: {tag: unknown, reason: not_published}
+              locator: {page: 9, paragraph: 'results pressure statement'}
             quote: "InO (0.0036 ± 0.001 Pa)"
       uncertainty:
+        confidence_level: not_stated
+        note: Printed ± width; source does not state its confidence convention.
         P_Pa: 0.001
         as_printed: "0.0036 ± 0.001 Pa"
     - observation_id: bischof_2023_table11_ino_delta_f_3rd_recommended
@@ -1043,7 +1175,8 @@ species:
       experiment: in2o3-series
       type: psat_series
       locator:
-        pdf_page_index: 17
+        page: 17
+        pdf_page_index: 16
         published_page: 16
         table: "12"
         quote: "p(In2O) [Pa] 0.014 0.327"
@@ -1058,10 +1191,38 @@ species:
         run: Oct2019
         points:
           - T_K: 1425.0
+            run: Oct2019
             P_Pa: 0.014
+            point_conditions:
+              temperature_K:
+                state: {tag: value, value: {kind: point, point: '1425.0'}}
+                locator: {page: 17, table: '12', row: 'In2O'}
+              total_pressure_Pa:
+                state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+                locator: {page: 3, section: '2.2 KEMS'}
+              fO2_Pa:
+                state: {tag: unknown, reason: not_published}
+                locator: {page: 3, section: '2.2 KEMS'}
+              composition:
+                state: {tag: unknown, reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent}
+                locator: {page: 3, section: '2.1 Sample preparation'}
             quote: "p(In2O) [Pa] this work Oct. 2019 at 1425 K = 0.014"
           - T_K: 1550.0
+            run: Oct2019
             P_Pa: 0.327
+            point_conditions:
+              temperature_K:
+                state: {tag: value, value: {kind: point, point: '1550.0'}}
+                locator: {page: 17, table: '12', row: 'In2O'}
+              total_pressure_Pa:
+                state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+                locator: {page: 3, section: '2.2 KEMS'}
+              fO2_Pa:
+                state: {tag: unknown, reason: not_published}
+                locator: {page: 3, section: '2.2 KEMS'}
+              composition:
+                state: {tag: unknown, reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent}
+                locator: {page: 3, section: '2.1 Sample preparation'}
             quote: "p(In2O) [Pa] this work Oct. 2019 at 1550 K = 0.327"
         table_csv: tables/kems-138-bischof-2023/t12.csv
       uncertainty:
@@ -1070,7 +1231,8 @@ species:
       experiment: in2o3-series
       type: psat_series
       locator:
-        pdf_page_index: 9
+        page: 9
+        pdf_page_index: 8
         published_page: 8
         paragraph: results_In
         quote: "from In2O (1.41 ± 0.52 Pa at 1611 K)"
@@ -1085,8 +1247,26 @@ species:
         points:
           - T_K: 1611.0
             P_Pa: 1.41
+            point_conditions:
+              temperature_K:
+                state: {tag: value, value: {kind: point, point: '1611.0'}}
+                locator: {page: 9, paragraph: 'results pressure statement'}
+              total_pressure_Pa:
+                state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+                locator: {page: 3, section: '2.2 KEMS'}
+              fO2_Pa:
+                state: {tag: unknown, reason: not_published}
+                locator: {page: 3, section: '2.2 KEMS'}
+              composition:
+                state: {tag: unknown, reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent}
+                locator: {page: 3, section: '2.1 Sample preparation'}
+            run_link:
+              state: {tag: unknown, reason: not_published}
+              locator: {page: 9, paragraph: 'results pressure statement'}
             quote: "In2O (1.41 ± 0.52 Pa at 1611 K)"
       uncertainty:
+        confidence_level: not_stated
+        note: Printed ± width; source does not state its confidence convention.
         P_Pa: 0.52
         as_printed: "1.41 ± 0.52 Pa"
     - observation_id: bischof_2023_table11_in2o_delta_f_3rd_recommended

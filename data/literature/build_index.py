@@ -1560,7 +1560,7 @@ def build_source_status(root: Path, *, corpus: Path | None = None, now: datetime
             body["could_not_derive"] = extra_reason
         return body
 
-    by_stage = {name: 0 for name in STATUS_STAGES}
+    by_stage = {}
     for row in rows:
         by_stage[row["stage"]] = by_stage.get(row["stage"], 0) + 1
     by_stage = {name: count for name, count in by_stage.items() if count}

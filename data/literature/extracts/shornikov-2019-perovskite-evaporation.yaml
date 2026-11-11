@@ -240,13 +240,21 @@ experiments:
           section: Introduction
       initial_composition:
         state:
-          tag: unknown
-          reason: not_published
+          tag: value
+          value:
+            basis: printed_formula_stoichiometry
+            components:
+            - - CaO
+              - '1'
+            - - TiO2
+              - '1'
+            amount_basis: mol_inventory
+            proxy_flag: initial_charge_only
         locator:
-          published_page: 257
-          pdf_page_index: 4
-          section: Experimental
-          note: 'The CaCO3:TiO2 batch ratio and analyzed starting composition are not reported.'
+          published_page: 253
+          pdf_page_index: 0
+          section: Introduction
+          note: Calcium titanate CaTiO3 (perovskite) is the starting charge formula.
       characterization:
         state:
           tag: value
@@ -288,6 +296,69 @@ species:
         phase: gas
         experiment: shornikov_2019_mo_cell_kems
         regime: knudsen_effusion
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                components:
+                - - CaO
+                  - '1'
+                - - TiO2
+                  - '1'
+                amount_basis: mol_inventory
+                proxy_flag: initial_charge_only
+            locator:
+              published_page: 253
+              pdf_page_index: 0
+              section: Introduction
+              note: Calcium titanate CaTiO3 (perovskite).
+          measurement_state_composition:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: The batch ratio and analysed composition are not reported.
+          run_order_index:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No run sequence or per-row run-order index is stated.
+          depletion_evidence:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No conversion, mass loss or fractional loss of a parent component is reported for these rows.
+          vaporization_mode:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No congruent or incongruent perovskite-vaporization statement is reported.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No controlled oxygen fugacity or oxygen buffer is stated.
         units: atm
         uncertainty: 'The author reports error not exceeding 8% for the partial-pressure values calculated using equations (22) and (23); no per-cell uncertainty is printed.'
         values:
@@ -347,6 +418,69 @@ species:
         phase: gas
         experiment: shornikov_2019_mo_cell_kems
         regime: knudsen_effusion
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                components:
+                - - CaO
+                  - '1'
+                - - TiO2
+                  - '1'
+                amount_basis: mol_inventory
+                proxy_flag: initial_charge_only
+            locator:
+              published_page: 253
+              pdf_page_index: 0
+              section: Introduction
+              note: Calcium titanate CaTiO3 (perovskite).
+          measurement_state_composition:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: The batch ratio and analysed composition are not reported.
+          run_order_index:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No run sequence or per-row run-order index is stated.
+          depletion_evidence:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No conversion, mass loss or fractional loss of a parent component is reported for these rows.
+          vaporization_mode:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No congruent or incongruent perovskite-vaporization statement is reported.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No controlled oxygen fugacity or oxygen buffer is stated.
         units: atm
         uncertainty: 'The author reports error not exceeding 8% for the partial-pressure values calculated using equations (22) and (23); no per-cell uncertainty is printed.'
         values:
@@ -397,6 +531,69 @@ species:
         phase: gas
         experiment: shornikov_2019_mo_cell_kems
         regime: knudsen_effusion
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                components:
+                - - CaO
+                  - '1'
+                - - TiO2
+                  - '1'
+                amount_basis: mol_inventory
+                proxy_flag: initial_charge_only
+            locator:
+              published_page: 253
+              pdf_page_index: 0
+              section: Introduction
+              note: Calcium titanate CaTiO3 (perovskite).
+          measurement_state_composition:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: The batch ratio and analysed composition are not reported.
+          run_order_index:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No run sequence or per-row run-order index is stated.
+          depletion_evidence:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No conversion, mass loss or fractional loss of a parent component is reported for these rows.
+          vaporization_mode:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No congruent or incongruent perovskite-vaporization statement is reported.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No controlled oxygen fugacity or oxygen buffer is stated.
         units: atm
         uncertainty: 'The author reports error not exceeding 8% for the partial-pressure values calculated using equations (22) and (23); no per-cell uncertainty is printed.'
         values:
@@ -441,6 +638,69 @@ species:
         phase: gas
         experiment: shornikov_2019_mo_cell_kems
         regime: knudsen_effusion
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                components:
+                - - CaO
+                  - '1'
+                - - TiO2
+                  - '1'
+                amount_basis: mol_inventory
+                proxy_flag: initial_charge_only
+            locator:
+              published_page: 253
+              pdf_page_index: 0
+              section: Introduction
+              note: Calcium titanate CaTiO3 (perovskite).
+          measurement_state_composition:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: The batch ratio and analysed composition are not reported.
+          run_order_index:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No run sequence or per-row run-order index is stated.
+          depletion_evidence:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No conversion, mass loss or fractional loss of a parent component is reported for these rows.
+          vaporization_mode:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No congruent or incongruent perovskite-vaporization statement is reported.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No controlled oxygen fugacity or oxygen buffer is stated.
         units: atm
         uncertainty: 'The author reports error not exceeding 8% for the partial-pressure values calculated using equations (22) and (23); no per-cell uncertainty is printed.'
         values:
@@ -500,6 +760,69 @@ species:
         phase: gas
         experiment: shornikov_2019_mo_cell_kems
         regime: knudsen_effusion
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                components:
+                - - CaO
+                  - '1'
+                - - TiO2
+                  - '1'
+                amount_basis: mol_inventory
+                proxy_flag: initial_charge_only
+            locator:
+              published_page: 253
+              pdf_page_index: 0
+              section: Introduction
+              note: Calcium titanate CaTiO3 (perovskite).
+          measurement_state_composition:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: The batch ratio and analysed composition are not reported.
+          run_order_index:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No run sequence or per-row run-order index is stated.
+          depletion_evidence:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No conversion, mass loss or fractional loss of a parent component is reported for these rows.
+          vaporization_mode:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No congruent or incongruent perovskite-vaporization statement is reported.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No controlled oxygen fugacity or oxygen buffer is stated.
         units: atm
         uncertainty: 'The author reports error not exceeding 8% for the partial-pressure values calculated using equations (22) and (23); no per-cell uncertainty is printed.'
         values:
@@ -559,6 +882,69 @@ species:
         phase: gas
         experiment: shornikov_2019_mo_cell_kems
         regime: knudsen_effusion
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                components:
+                - - CaO
+                  - '1'
+                - - TiO2
+                  - '1'
+                amount_basis: mol_inventory
+                proxy_flag: initial_charge_only
+            locator:
+              published_page: 253
+              pdf_page_index: 0
+              section: Introduction
+              note: Calcium titanate CaTiO3 (perovskite).
+          measurement_state_composition:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: The batch ratio and analysed composition are not reported.
+          run_order_index:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No run sequence or per-row run-order index is stated.
+          depletion_evidence:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No conversion, mass loss or fractional loss of a parent component is reported for these rows.
+          vaporization_mode:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No congruent or incongruent perovskite-vaporization statement is reported.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No controlled oxygen fugacity or oxygen buffer is stated.
         units: atm
         uncertainty: 'The author reports error not exceeding 8% for the partial-pressure values calculated using equations (22) and (23); no per-cell uncertainty is printed.'
         values:
@@ -612,6 +998,69 @@ species:
         phase: gas
         experiment: shornikov_2019_mo_cell_kems
         regime: knudsen_effusion
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_formula_stoichiometry
+                components:
+                - - CaO
+                  - '1'
+                - - TiO2
+                  - '1'
+                amount_basis: mol_inventory
+                proxy_flag: initial_charge_only
+            locator:
+              published_page: 253
+              pdf_page_index: 0
+              section: Introduction
+              note: Calcium titanate CaTiO3 (perovskite).
+          measurement_state_composition:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: The batch ratio and analysed composition are not reported.
+          run_order_index:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No run sequence or per-row run-order index is stated.
+          depletion_evidence:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No conversion, mass loss or fractional loss of a parent component is reported for these rows.
+          vaporization_mode:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No congruent or incongruent perovskite-vaporization statement is reported.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              published_page: 257
+              pdf_page_index: 4
+              section: Experimental
+              note: No controlled oxygen fugacity or oxygen buffer is stated.
         units: atm
         uncertainty: 'The author reports error not exceeding 8% for the partial-pressure values calculated using equations (22) and (23); no per-cell uncertainty is printed.'
         values:
