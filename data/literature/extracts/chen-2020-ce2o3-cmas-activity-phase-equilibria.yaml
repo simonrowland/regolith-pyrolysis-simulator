@@ -17,8 +17,9 @@ extraction:
   worker: w1110xchen
   note: Table 1 initial cerium is printed as CeO2 while measured phase cerium is Ce2O3; these labels are preserved.
     Table 2 activity is retained as printed and scaled by its printed ×10^-7 multiplier. The paper adopts the Zhao
-    et al. (2019) activity calibration; its standard is represented as pure crystalline Ce2O3. No activity coefficient
-    is inferred. Table 2 sample numbers 101–117 are distinct from Table 1 sample numbers.
+    et al. (2019) activity calibration; it does not print a Ce2O3 standard-state polymorph. No activity coefficient
+    is inferred. Table 2 sample numbers 101–117 are distinct from Table 1 sample numbers. The starred observation
+    IDs retain Zhao 2019 sample numbers only as a crosswalk; Chen prints an asterisk for those rows.
 review_status: draft
 fidelity_samples:
 - species: CaO
@@ -101,7 +102,7 @@ fidelity_samples:
 experiments:
 - experiment_id: chen20_t1_101
   series: Table 1 sample 101
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -132,7 +133,7 @@ experiments:
         row: '101'
 - experiment_id: chen20_t1_102
   series: Table 1 sample 102
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -163,7 +164,7 @@ experiments:
         row: '102'
 - experiment_id: chen20_t1_103
   series: Table 1 sample 103
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -194,7 +195,7 @@ experiments:
         row: '103'
 - experiment_id: chen20_t1_104
   series: Table 1 sample 104
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -225,7 +226,7 @@ experiments:
         row: '104'
 - experiment_id: chen20_t1_105
   series: Table 1 sample 105
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -256,7 +257,7 @@ experiments:
         row: '105'
 - experiment_id: chen20_t1_106
   series: Table 1 sample 106
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -287,7 +288,7 @@ experiments:
         row: '106'
 - experiment_id: chen20_t1_107
   series: Table 1 sample 107
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -318,7 +319,7 @@ experiments:
         row: '107'
 - experiment_id: chen20_t1_108
   series: Table 1 sample 108
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -349,7 +350,7 @@ experiments:
         row: '108'
 - experiment_id: chen20_t1_109
   series: Table 1 sample 109
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -380,7 +381,7 @@ experiments:
         row: '109'
 - experiment_id: chen20_t1_110
   series: Table 1 sample 110
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -411,7 +412,7 @@ experiments:
         row: '110'
 - experiment_id: chen20_t1_111
   series: Table 1 sample 111
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -442,7 +443,7 @@ experiments:
         row: '111'
 - experiment_id: chen20_t1_112
   series: Table 1 sample 112
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -473,7 +474,7 @@ experiments:
         row: '112'
 - experiment_id: chen20_t1_113
   series: Table 1 sample 113
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -504,7 +505,7 @@ experiments:
         row: '113'
 - experiment_id: chen20_t1_114
   series: Table 1 sample 114
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -535,7 +536,7 @@ experiments:
         row: '114'
 - experiment_id: chen20_t1_115
   series: Table 1 sample 115
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -566,7 +567,7 @@ experiments:
         row: '115'
 - experiment_id: chen20_t1_116
   series: Table 1 sample 116
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -597,7 +598,7 @@ experiments:
         row: '116'
 - experiment_id: chen20_t1_117
   series: Table 1 sample 117
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -628,7 +629,7 @@ experiments:
         row: '117'
 - experiment_id: chen20_t1_118
   series: Table 1 sample 118
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -659,7 +660,7 @@ experiments:
         row: '118'
 - experiment_id: chen20_t1_119
   series: Table 1 sample 119
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -690,7 +691,7 @@ experiments:
         row: '119'
 - experiment_id: chen20_t1_120
   series: Table 1 sample 120
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -721,7 +722,7 @@ experiments:
         row: '120'
 - experiment_id: chen20_t1_121
   series: Table 1 sample 121
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -752,7 +753,7 @@ experiments:
         row: '121'
 - experiment_id: chen20_t1_122
   series: Table 1 sample 122
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -783,7 +784,7 @@ experiments:
         row: '122'
 - experiment_id: chen20_t1_123
   series: Table 1 sample 123
-  method: equilibration_and_quench
+  method: quench_equilibration
   locator:
     published_page: 1606
     pdf_page_index: 4
@@ -814,7 +815,7 @@ experiments:
         row: '123'
 - experiment_id: chen20_t2_101
   series: Table 2 sample 101
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -845,7 +846,7 @@ experiments:
         row: sample 101
 - experiment_id: chen20_t2_102
   series: Table 2 sample 102
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -876,7 +877,7 @@ experiments:
         row: sample 102
 - experiment_id: chen20_t2_103
   series: Table 2 sample 103
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -907,7 +908,7 @@ experiments:
         row: sample 103
 - experiment_id: chen20_t2_104
   series: Table 2 sample 104
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -938,7 +939,7 @@ experiments:
         row: sample 104
 - experiment_id: chen20_t2_105
   series: Table 2 sample 105
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -969,7 +970,7 @@ experiments:
         row: sample 105
 - experiment_id: chen20_t2_106
   series: Table 2 sample 106
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1000,7 +1001,7 @@ experiments:
         row: sample 106
 - experiment_id: chen20_t2_107
   series: Table 2 sample 107
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1031,7 +1032,7 @@ experiments:
         row: sample 107
 - experiment_id: chen20_t2_108
   series: Table 2 sample 108
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1062,7 +1063,7 @@ experiments:
         row: sample 108
 - experiment_id: chen20_t2_109
   series: Table 2 sample 109
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1093,7 +1094,7 @@ experiments:
         row: sample 109
 - experiment_id: chen20_t2_110
   series: Table 2 sample 110
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1124,7 +1125,7 @@ experiments:
         row: sample 110
 - experiment_id: chen20_t2_111
   series: Table 2 sample 111
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1155,7 +1156,7 @@ experiments:
         row: sample 111
 - experiment_id: chen20_t2_112
   series: Table 2 sample 112
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1186,7 +1187,7 @@ experiments:
         row: sample 112
 - experiment_id: chen20_t2_113
   series: Table 2 sample 113
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1217,7 +1218,7 @@ experiments:
         row: sample 113
 - experiment_id: chen20_t2_114
   series: Table 2 sample 114
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1248,7 +1249,7 @@ experiments:
         row: sample 114
 - experiment_id: chen20_t2_115
   series: Table 2 sample 115
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1279,7 +1280,7 @@ experiments:
         row: sample 115
 - experiment_id: chen20_t2_116
   series: Table 2 sample 116
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1310,7 +1311,7 @@ experiments:
         row: sample 116
 - experiment_id: chen20_t2_117
   series: Table 2 sample 117
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1341,7 +1342,7 @@ experiments:
         row: sample 117
 - experiment_id: chen20_t2_star_304
   series: Table 2 starred comparison row 1 (*)
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -1372,7 +1373,7 @@ experiments:
         row: starred comparison row 1 (*)
 - experiment_id: chen20_t2_star_305
   series: Table 2 starred comparison row 2 (*)
-  method: slag_liquid_tin_equilibrium
+  method: quench_equilibration
   locator:
     published_page: 1607
     pdf_page_index: 5
@@ -27557,10 +27558,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -27651,6 +27655,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 101
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -27703,10 +27720,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -27797,6 +27817,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 102
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -27849,10 +27882,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -27943,11 +27979,24 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 103
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 1.1e-07
-        activity_as_published: '1.1'
+        activity_as_published: '1.10'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
@@ -27995,10 +28044,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28089,6 +28141,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 104
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -28141,10 +28206,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28235,6 +28303,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 105
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -28287,10 +28368,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28381,6 +28465,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 106
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -28433,10 +28530,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28527,6 +28627,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 107
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -28579,10 +28692,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28673,11 +28789,24 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 108
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
         activity: 2.1e-07
-        activity_as_published: '2.1'
+        activity_as_published: '2.10'
         activity_multiplier_as_printed: × 10^-7
         activity_conversion_note: Numeric activity equals the printed coefficient multiplied by 10^-7; no further
           calibration or conversion applied.
@@ -28725,10 +28854,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28819,6 +28951,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 109
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -28871,10 +29016,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -28965,6 +29113,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 110
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -29017,10 +29178,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29111,6 +29275,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 111
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -29163,10 +29340,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29257,6 +29437,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 112
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -29309,10 +29502,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29403,6 +29599,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 113
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -29455,10 +29664,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29549,6 +29761,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 114
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -29601,10 +29826,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29695,6 +29923,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 115
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -29747,10 +29988,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29841,6 +30085,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 116
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -29893,10 +30150,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -29987,6 +30247,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: sample 117
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -30039,10 +30312,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -30133,6 +30409,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: starred comparison row 1 (*)
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
@@ -30184,10 +30473,13 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: unknown
+                reason: not_printed
             component_basis: Ce2O3
         inferred: false
-        note: The paper adopts the Zhao et al. (2019) activity calibration; its standard is represented as pure
-          crystalline Ce2O3.
+        note: The paper adopts the Zhao et al. (2019) activity calibration; it does not print a Ce2O3
+          standard-state polymorph.
         locator:
           published_page: 1607
           pdf_page_index: 5
@@ -30278,6 +30570,19 @@ species:
       values:
         quantity: activity
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            No row-specific derivation of the Table 2 activity from the reported Ce-in-Sn concentration and
+            oxygen pressure is printed.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              row: starred comparison row 2 (*)
+              note: The row-specific reduction calculation and any additional numerical inputs are not printed.
+          output_unit: dimensionless activity
         T_C: 1599.85
         T_C_conversion_note: 1873 K as printed − 273.15; no measured temperature uncertainty was reported.
         T_K_as_published: 1873
