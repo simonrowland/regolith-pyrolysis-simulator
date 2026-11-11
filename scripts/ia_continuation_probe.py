@@ -141,11 +141,6 @@ def _measure(label: str, consumer: Callable[[], Any]) -> dict[str, Any]:
         def traced_dispatch(core, intent, *args, **kwargs):
             result = dispatch(core, intent, *args, **kwargs)
             if intent is ChemistryIntent.VAPOR_PRESSURE:
-                controls = kwargs.get("control_inputs") or {}
-                previous = controls.get("high_t_melt_activity_previous") or {}
-                previous_certificates = previous.get(
-                    "certified_effective_gamma_by_parent"
-                ) or {}
                 diagnostic = (getattr(result, "diagnostic", None) or {}).get(
                     "high_t_melt_activity", {}
                 )
@@ -164,16 +159,15 @@ def _measure(label: str, consumer: Callable[[], Any]) -> dict[str, Any]:
                 current_certificates = diagnostic.get(
                     "certified_effective_gamma_by_parent", {}
                 )
-                if previous_certificates and any(
+                if any(
                     "gamma_prev" in record
                     for record in current_certificates.values()
                 ):
                     counts["path_a_later_success"] += 1
                 held = diagnostic.get("held_effective_gamma_by_parent", {})
-                if previous_certificates and any(
+                if any(
                     row.get("method") in {
                         "extrapolated_first_order_ln_gamma",
-                        "hold_last_certified_effective_gamma",
                         "extrapolation_capped_frozen",
                     }
                     for row in held.values()
@@ -183,7 +177,6 @@ def _measure(label: str, consumer: Callable[[], Any]) -> dict[str, Any]:
 
         def cold_refresh(core, result, *args, **kwargs):
             core._last_high_t_melt_activity = {}
-            core._last_high_t_melt_activity_temperature_K = None
             return refresh(core, result, *args, **kwargs)
 
         PyrolysisSimulator._dispatch_only = traced_dispatch

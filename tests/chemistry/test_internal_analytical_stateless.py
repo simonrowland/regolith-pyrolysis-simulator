@@ -60,8 +60,15 @@ def test_refusal_does_not_depend_on_previous_call_on_a_reused_core(monkeypatch):
     warm = _call(warm_core)
     cold = _call(_new_internal_analytical_core())
 
+    assert warm.status == cold.status
     assert warm.vapor_pressures_Pa == cold.vapor_pressures_Pa
+    assert warm.vapor_pressures_source == cold.vapor_pressures_source
     assert warm.activity_coefficients == cold.activity_coefficients
-    assert warm.diagnostics["vapor_pressure_diagnostic"][
+    warm_authority = warm.diagnostics["vapor_pressure_diagnostic"][
         "high_t_melt_activity"
-    ]["provider"] == "constant_gamma"
+    ]
+    cold_authority = cold.diagnostics["vapor_pressure_diagnostic"][
+        "high_t_melt_activity"
+    ]
+    assert warm_authority == cold_authority
+    assert warm_authority["provider"] == "constant_gamma"
