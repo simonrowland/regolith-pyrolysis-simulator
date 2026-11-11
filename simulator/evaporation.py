@@ -5583,6 +5583,12 @@ class EvaporationMixin:
             diagnostic=diagnostic,
             control_inputs=control_inputs,
         )
+        if species in ('Na', 'K', 'Mg'):
+            # These source-mixed cations share one well-mixed overhead-gas pool.
+            # The ledger attributes partial withdrawals pro rata to live origins.
+            self.atom_ledger.mark_amalgamated_pool(
+                'process.overhead_gas', (species,)
+            )
         if apply_evaporative_redox_source_terms:
             self._apply_evaporative_redox_source_terms(
                 transition,

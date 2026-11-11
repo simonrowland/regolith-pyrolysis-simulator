@@ -95,6 +95,19 @@ def test_c_to_co_ellingham_line_falls_with_temperature() -> None:
     )
 
 
+def test_c_to_co_ellingham_bit_patterns_are_stable() -> None:
+    # Golden pins for moving this shared thermodynamic function to its owner.
+    assert carbon_delta_g_co_kj_per_mol_o2(1000.0).hex() == (
+        "-0x1.8fd2f1a9fbe77p+8"
+    )
+    assert carbon_delta_g_co_kj_per_mol_o2(1573.15).hex() == (
+        "-0x1.f64938f798528p+8"
+    )
+    assert carbon_delta_g_co_kj_per_mol_o2(1673.15).hex() == (
+        "-0x1.0414de0503750p+9"
+    )
+
+
 def test_voropaev_co2_organic_population_is_half_at_500c() -> None:
     raw = voropaev_release_fraction("CO2", 500.0)
     assert raw["fraction"] == pytest.approx(0.532, abs=0.001)

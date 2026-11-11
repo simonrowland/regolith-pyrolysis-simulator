@@ -1,0 +1,58 @@
+{
+  "run_metadata": {
+    "feedstock_id": "lunar_mare_low_ti",
+    "backend": "internal-analytical"
+  },
+  "yield_disposition": {
+    "fraction_table": {
+      "rows": [
+        {
+          "element": "Fe",
+          "destination_fractions": {
+            "product_tapped": 0.4,
+            "wall_deposit": 0.15,
+            "charge_unprocessed": 0.2,
+            "melt_retained": 0.25,
+            "cleanup_sequestered": 0.0
+          }
+        },
+        {
+          "element": "Si",
+          "destination_fractions": {
+            "overhead_terminal_inventory": 0.55,
+            "melt_retained": 0.4,
+            "cleanup_sequestered": 0.05
+          }
+        }
+      ]
+    },
+    "terminal_species_streams": [
+      {
+        "account": "terminal.oxygen_melt_offgas_stored",
+        "species": "O2",
+        "terminal_kg": 0.165
+      },
+      {
+        "account": "terminal.oxygen_melt_offgas_vented_to_vacuum",
+        "species": "O2",
+        "terminal_kg": 0.035
+      },
+      {
+        "account": "reservoir.fo2_buffer",
+        "species": "O2",
+        "terminal_kg": 10.0
+      }
+    ]
+  },
+  "product_classification": {
+    "classification": {
+      "refractory_ceramic_rump": {
+        "rump_total_kg": 0.348,
+        "rump_kg_by_species": {
+          "Al2O3": 0.2,
+          "CaO": 0.148
+        }
+      }
+    }
+  }
+}

@@ -103,7 +103,9 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
+import threading
 import time
 import warnings
 from dataclasses import dataclass
@@ -175,52 +177,78 @@ _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS = 48
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_VALUE_CHARS = 64
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS = 128
 _MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
-    tempfile.gettempdir(),
+    # TMPDIR differs between dispatches and xdist workers; slots must not.
+    '/tmp',
     'regolith-pyrolysis-simulator',
 )
 _MAGEMIN_SUBPROCESS_LOCK = _MAGEMIN_SUBPROCESS_LOCK_DIR / (
     f'magemin-subprocess-{os.getuid()}.lock'
 )
+_MAGEMIN_ENGINE_VERSION_CACHE: Dict[Tuple[str, int, int, int], str] = {}
+_MAGEMIN_ENGINE_VERSION_CACHE_LOCK = threading.Lock()
 
 
 def _magemin_subprocess_slot_count() -> int:
-    """Bounded machine-wide MAGEMin binary concurrency (K slots).
-
-    Each MAGEMin CLI call runs in a private TemporaryDirectory — there is
-    no shared mutable state between invocations, so the old exclusive lock
-    (K=1) was a CPU-contention bound, not a correctness requirement (t-385
-    lock audit, 2026-07-22). K>1 lets independent heavy tests overlap
-    instead of paying each other's wall-clock. Determinism under bounded K
-    is verified by the split_path concurrent A/B against sequential pins
-    (rel=1e-12). Override with REGOLITH_MAGEMIN_SLOTS; K=1 restores strict
-    serialization.
-    """
-    raw = os.environ.get('REGOLITH_MAGEMIN_SLOTS', '')
+    """Host-wide launch limit; retain the existing SLOTS override as an alias."""
+    raw = os.environ.get(
+        'REGOLITH_MAGEMIN_MAX_CONCURRENCY',
+        os.environ.get('REGOLITH_MAGEMIN_SLOTS', ''),
+    )
     try:
         value = int(raw)
     except (TypeError, ValueError):
         value = 0
     if value >= 1:
         return value
-    cores = os.cpu_count() or 4
-    return max(1, min(3, cores // 6))
+    return 2
+
+
+def _magemin_subprocess_env() -> Dict[str, str]:
+    """Single-rank CLI policy: no TCP BTL or GPU/GUI topology discovery."""
+    env = os.environ.copy()
+    loopback = 'lo0' if sys.platform == 'darwin' else 'lo'
+    env.update({
+        # Open MPI 5: self suffices for one rank; ob1 owns BTL selection.
+        'OMPI_MCA_btl': 'self',
+        'OMPI_MCA_pml': 'ob1',
+        # Runtime control traffic is separate from the MPI data BTL.
+        'PMIX_MCA_ptl_base_if_include': loopback,
+        'PRTE_MCA_prte_if_include': loopback,
+        # The installed hwloc 2.13 build offers opencl, but no other GPU plugin.
+        'HWLOC_COMPONENTS': '-opencl',
+        'MPLBACKEND': 'Agg',
+    })
+    env.pop('DISPLAY', None)
+    return env
 
 
 @contextmanager
 def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
     """Acquire one of K machine-wide MAGEMin launch slots (see above)."""
     deadline = time.monotonic() + max(0.001, float(timeout_s))
-    _MAGEMIN_SUBPROCESS_LOCK_DIR.mkdir(parents=True, exist_ok=True)
-    slots = _magemin_subprocess_slot_count()
     lock_files = []
     acquired_index = -1
     try:
-        for index in range(slots):
-            path = (
-                _MAGEMIN_SUBPROCESS_LOCK if index == 0
-                else _MAGEMIN_SUBPROCESS_LOCK.with_suffix(f'.slot{index}')
-            )
-            lock_files.append(path.open('a+b'))
+        try:
+            _MAGEMIN_SUBPROCESS_LOCK_DIR.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            raise _MAGEMinEngineLifecycleError(
+                'MAGEMinSubprocessSlotUnavailable',
+                f'MAGEMin subprocess slot is unavailable: {exc}',
+            ) from exc
+        slots = _magemin_subprocess_slot_count()
+        try:
+            for index in range(slots):
+                path = (
+                    _MAGEMIN_SUBPROCESS_LOCK if index == 0
+                    else _MAGEMIN_SUBPROCESS_LOCK.with_suffix(f'.slot{index}')
+                )
+                lock_files.append(path.open('a+b'))
+        except OSError as exc:
+            raise _MAGEMinEngineLifecycleError(
+                'MAGEMinSubprocessSlotUnavailable',
+                f'MAGEMin subprocess slot is unavailable: {exc}',
+            ) from exc
         while True:
             for index, lock_file in enumerate(lock_files):
                 try:
@@ -231,13 +259,19 @@ def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
                     break
                 except BlockingIOError:
                     continue
+                except OSError as exc:
+                    raise _MAGEMinEngineLifecycleError(
+                        'MAGEMinSubprocessSlotUnavailable',
+                        f'MAGEMin subprocess slot is unavailable: {exc}',
+                    ) from exc
             if acquired_index >= 0:
                 break
             remaining = deadline - time.monotonic()
             if remaining <= 0.0:
                 raise _MAGEMinEngineLifecycleError(
                     'MAGEMinSubprocessSlotTimeout',
-                    f'MAGEMin subprocess slot timed out after {timeout_s:g}s',
+                    f'MAGEMin subprocess slot timed out after '
+                    f'{timeout_s:g}s',
                 )
             time.sleep(min(0.01, remaining))
         yield
@@ -2154,26 +2188,54 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             return 'unavailable'
         resolved_binary_path = binary_path.resolve()
         try:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                result = subprocess.run(
-                    [
-                        str(resolved_binary_path),
-                        '--version',
-                        '--db',
-                        self._database,
-                    ],
-                    cwd=tmpdir,
-                    capture_output=True,
-                    text=True,
-                    timeout=5,
-                )
-            lines = (result.stdout or result.stderr).strip().splitlines()
-            if result.returncode == 0 and lines:
-                legacy = lines[0].strip()
-            else:
-                legacy = f'MAGEMin subprocess ({resolved_binary_path})'
-        except (OSError, subprocess.TimeoutExpired):
-            legacy = f'MAGEMin subprocess ({resolved_binary_path})'
+            binary_stat = resolved_binary_path.stat()
+        except OSError:
+            version_key = None
+        else:
+            version_key = (
+                str(resolved_binary_path),
+                binary_stat.st_ino,
+                binary_stat.st_size,
+                binary_stat.st_mtime_ns,
+            )
+        with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
+            legacy = (
+                _MAGEMIN_ENGINE_VERSION_CACHE.get(version_key)
+                if version_key is not None
+                else None
+            )
+            if legacy is None:
+                try:
+                    with (
+                        _magemin_subprocess_slot(5),
+                        tempfile.TemporaryDirectory() as tmpdir,
+                    ):
+                        result = subprocess.run(
+                            [
+                                str(resolved_binary_path),
+                                '--version',
+                                '--db',
+                                self._database,
+                            ],
+                            cwd=tmpdir,
+                            capture_output=True,
+                            text=True,
+                            timeout=5,
+                            env=_magemin_subprocess_env(),
+                        )
+                    lines = (result.stdout or result.stderr).strip().splitlines()
+                    if result.returncode == 0 and lines:
+                        legacy = lines[0].strip()
+                        if version_key is not None:
+                            _MAGEMIN_ENGINE_VERSION_CACHE[version_key] = legacy
+                    else:
+                        legacy = f'MAGEMin subprocess ({resolved_binary_path})'
+                except (
+                    _MAGEMinEngineLifecycleError,
+                    OSError,
+                    subprocess.TimeoutExpired,
+                ):
+                    legacy = f'MAGEMin subprocess ({resolved_binary_path})'
         warn_legacy_once(
             'magemin',
             'engines.local.toml absent; using legacy MAGEMin '
@@ -3122,6 +3184,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         text=True,
                         timeout=remaining_timeout_s,
                         check=False,
+                        env=_magemin_subprocess_env(),
                     )
                 except subprocess.TimeoutExpired as exc:
                     raise _MAGEMinEngineCallError(
@@ -3715,6 +3778,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         text=True,
                         timeout=timeout_s,
                         check=False,
+                        env=_magemin_subprocess_env(),
                     )
                     matlab_path = (
                         Path(tmpdir) / 'output' / '_matlab_output.txt'
