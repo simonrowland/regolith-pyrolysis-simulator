@@ -106,8 +106,10 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # Studio-3 actual for this Mars C2A 2 h payload (pins2 log, tree
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
     # the laptop and studio-3, so this digest is not a laptop re-run.
+    # b-1174 (studio-3 regen): the payload digest moves with the derived
+    # per-species wall-report key set; the ledger digest is unchanged.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "c5307738f0477e343923a509311bf9d0ba94673996ae622dfd31fbb13327e731"
+        "5482dd373a4434c468ef80fdecc6ac7282983861e2e7a9d289bcfeb07942d156"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
