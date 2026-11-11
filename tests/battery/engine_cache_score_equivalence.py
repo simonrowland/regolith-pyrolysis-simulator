@@ -64,6 +64,7 @@ def assert_residue_score_cache_equivalence(
 
     assert off
     assert len(off.splitlines()) <= 12
+    assert b'"status":"refused"' in off
     _assert_runs_match_off(
         off,
         {
