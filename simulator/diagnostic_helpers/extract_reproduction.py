@@ -1596,7 +1596,11 @@ def _engine_pure_psat_pa(
 
 
 _VP_PROVIDER_CACHE: dict[int, BuiltinVaporPressureProvider] = {}
-_MELT_PSAT_CACHE: dict[tuple[Any, ...], tuple[float | None, str | None, dict[str, Any]]] = {}
+# Melt provider surfaces. A hit is a skipped law execution, so the disclosure
+# measured during the dispatch is stored on the row. The only read is
+# _read_melt_psat_cache. The key is the request (T, pO2, account), never the
+# disclosure.
+_MELT_PSAT_CACHE: dict[tuple[Any, ...], dict[str, Any]] = {}
 
 
 def _builtin_vp_provider(
@@ -1608,6 +1612,53 @@ def _builtin_vp_provider(
         provider = BuiltinVaporPressureProvider(vapor_pressure_data)
         _VP_PROVIDER_CACHE[ident] = provider
     return provider
+
+
+def _read_melt_psat_cache(cache_key: tuple[Any, ...]) -> Mapping[str, Any] | None:
+    """Only read of ``_MELT_PSAT_CACHE``.
+
+    No readable ``law_disclosures`` is a miss. The caller recomputes. A known
+    row, including a measured empty disclosure, has already been re-registered
+    on the active run.
+    """
+
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+    record = _MELT_PSAT_CACHE.get(cache_key)
+    if not isinstance(record, Mapping):
+        return None
+    if accept_stored_memo(record) is None:
+        return None
+    return record
+
+
+def _store_melt_psat_cache(
+    cache_key: tuple[Any, ...],
+    *,
+    status: str | None,
+    reason: str | None,
+    diagnostic: Mapping[str, Any],
+    surface: Mapping[str, Any],
+    warnings: Sequence[Any],
+    before: Sequence[Mapping[str, Any]],
+) -> None:
+    """Store one dispatch with the disclosure that dispatch measured."""
+
+    from simulator.vapour_rail.run_disclosure import (
+        active_snapshot,
+        disclosure_delta,
+    )
+
+    _MELT_PSAT_CACHE[cache_key] = {
+        "status": status,
+        "reason": reason,
+        "diagnostic": dict(diagnostic),
+        "surface": dict(surface),
+        "warnings": list(warnings),
+        "law_disclosures": [
+            dict(item) for item in disclosure_delta(before, active_snapshot())
+        ],
+    }
 
 
 def _engine_melt_psat_pa(
@@ -1634,8 +1685,14 @@ def _engine_melt_psat_pa(
         float(pO2_bar),
         tuple(sorted((str(k), round(float(v), 12)) for k, v in account.items())),
     )
-    cached_surface = _MELT_PSAT_CACHE.get(cache_key)
+    cached_surface = _read_melt_psat_cache(cache_key)
     if cached_surface is None:
+        from simulator.vapour_rail.run_disclosure import (
+            active_registry,
+            active_snapshot,
+            disclosure_scope,
+        )
+
         provider = _builtin_vp_provider(vapor_pressure_data)
         request = IntentRequest(
             intent=ChemistryIntent.VAPOR_PRESSURE,
@@ -1650,36 +1707,58 @@ def _engine_melt_psat_pa(
                 "pO2_bar": float(pO2_bar), "pO2_admission": "observation",
             },
         )
-        try:
-            result = provider.dispatch(request)
-        except Exception as exc:  # noqa: BLE001
-            packed = (
-                None,
-                f"provider_exception:{type(exc).__name__}:{exc}",
-                {},
-                {},
+
+        def _dispatch() -> tuple[Any, ...]:
+            before = active_snapshot()
+            try:
+                result = provider.dispatch(request)
+            except Exception as exc:  # noqa: BLE001
+                reason = f"provider_exception:{type(exc).__name__}:{exc}"
+                _store_melt_psat_cache(
+                    cache_key,
+                    status=None,
+                    reason=reason,
+                    diagnostic={},
+                    surface={},
+                    warnings=[],
+                    before=before,
+                )
+                return ("exception", reason)
+            status = str(result.status)
+            diagnostic = dict(result.diagnostic or {})
+            surface = dict(diagnostic.get("vapor_pressures_Pa") or {})
+            warnings = list(result.warnings or ())
+            _store_melt_psat_cache(
+                cache_key,
+                status=status,
+                reason=None,
+                diagnostic=diagnostic,
+                surface=surface,
+                warnings=warnings,
+                before=before,
             )
-            _MELT_PSAT_CACHE[cache_key] = packed
-            return packed[0], packed[1], {}
-        status = str(result.status)
-        diagnostic = dict(result.diagnostic or {})
-        surface = dict(diagnostic.get("vapor_pressures_Pa") or {})
-        packed = (
-            status,
-            dict(diagnostic),
-            surface,
-            list(result.warnings or ()),
-        )
-        _MELT_PSAT_CACHE[cache_key] = packed
-        warnings = list(packed[3])
+            return ("ok", status, diagnostic, surface, warnings)
+
+        # A caller with no run still measured the laws this dispatch executed.
+        # The temporary scope exists only so the cache row records that
+        # measurement. It is not a second registry the caller publishes.
+        if active_registry() is None:
+            with disclosure_scope(inherit=False):
+                dispatched = _dispatch()
+        else:
+            dispatched = _dispatch()
+        if dispatched[0] == "exception":
+            return None, dispatched[1], {}
+        _status_tag, status, diagnostic, surface, warnings = dispatched
     else:
-        packed = cached_surface
-        if packed[0] is None:
-            return packed[0], packed[1], dict(packed[2])
-        status, diagnostic, surface, warnings = packed
-        diagnostic = dict(diagnostic)
-        surface = dict(surface)
-        warnings = list(warnings)
+        if cached_surface["status"] is None:
+            return cached_surface["status"], cached_surface["reason"], dict(
+                cached_surface["surface"]
+            )
+        status = cached_surface["status"]
+        diagnostic = dict(cached_surface["diagnostic"])
+        surface = dict(cached_surface["surface"])
+        warnings = list(cached_surface["warnings"])
     runtime = {
         "provider_id": "builtin-vapor-pressure",
         "provider_status": status,

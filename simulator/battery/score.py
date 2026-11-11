@@ -12066,6 +12066,45 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
         )
 
 
+def _accept_cached_sossi_row(row: object) -> object | None:
+    """Re-register one cached Sossi row, or refuse it as unknown."""
+
+    provenance = getattr(row, "provenance", None)
+    if not isinstance(provenance, Mapping):
+        return None
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+    if accept_stored_memo(provenance) is None:
+        return None
+    return row
+
+
+def _cached_sossi_prediction(
+    cache: dict[tuple[str, Engine], Mapping[str, object]],
+    cache_key: tuple[str, Engine],
+    short_id: str,
+) -> object | None:
+    """Only read of a cached Sossi cohort row.
+
+    ``None`` means the caller computes, or the row is absent. A row whose
+    provenance has no readable ``law_disclosures`` is unknown: the cohort is
+    dropped so the caller recomputes it. A cohort error marker stays in the
+    cache for the caller to raise. Copying provenance onto an
+    ``EnginePrediction`` is not registration.
+    """
+
+    cohort = cache.get(cache_key)
+    if not isinstance(cohort, Mapping) or "__cohort_error__" in cohort:
+        return None
+    row = cohort.get(short_id)
+    if row is None:
+        return None
+    if _accept_cached_sossi_row(row) is None:
+        cache.pop(cache_key, None)
+        return None
+    return row
+
+
 def _sossi_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -12100,6 +12139,8 @@ def _sossi_residue_prediction(
 
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("sossi_engine_unsupported")
+        short_id = reference.experiment_id.rsplit("::", 1)[-1]
+        prediction = _cached_sossi_prediction(cache, cache_key, short_id)
         if cache_key not in cache:
             live_rows = [
                 row
@@ -12166,8 +12207,8 @@ def _sossi_residue_prediction(
             }
         if "__cohort_error__" in cache[cache_key]:
             raise ValueError(str(cache[cache_key]["__cohort_error__"]))
-        short_id = reference.experiment_id.rsplit("::", 1)[-1]
-        prediction = cache[cache_key].get(short_id)
+        if prediction is None:
+            prediction = _cached_sossi_prediction(cache, cache_key, short_id)
         if prediction is None:
             raise ValueError("sossi_prediction_row_missing")
         run_refusal = prediction.provenance.get("run_refusal")

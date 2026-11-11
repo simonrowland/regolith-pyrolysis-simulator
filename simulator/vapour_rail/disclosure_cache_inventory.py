@@ -30,6 +30,7 @@ DISCLOSURE_CARRYING = frozenset({
     "store:simulator/battery/residue.py:pressure_cache",
     "store:simulator/battery/residue.py:pressure_state_cache",
     "store:simulator/battery/score.py:residue_prediction_cache",
+    "store:simulator/diagnostic_helpers/extract_reproduction.py:_MELT_PSAT_CACHE",
 })
 
 
@@ -44,10 +45,18 @@ def _decorator_name(node: ast.AST) -> str | None:
 
 
 def _store_name(name: str) -> bool:
+    """True for a memo dict, including an upper-case ``_CACHE`` / ``_MEMO`` name.
+
+    The production melt-pressure store is ``_MELT_PSAT_CACHE``. A
+    case-sensitive ``_cache`` suffix hid it from the inventory and from the
+    meta-test.
+    """
+
+    lowered = name.lower()
     return (
-        name.endswith("_cache")
-        or name.endswith("_memo")
-        or name.endswith("_entries")
+        lowered.endswith("_cache")
+        or lowered.endswith("_memo")
+        or lowered.endswith("_entries")
         or name in {
             "_entries",
             "pressure_cache",
@@ -56,7 +65,7 @@ def _store_name(name: str) -> bool:
             "prefix_replay_cache",
             "physics_bucket_entries",
         }
-        or "held_curve" in name
+        or "held_curve" in lowered
     )
 
 
@@ -132,7 +141,11 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
                         label = target.id
                     if label and _store_name(label):
                         add(f"store:{rel}:{label}", rel, node.lineno, "store", label)
-            elif isinstance(node, ast.Constant) and node.value == "_freeze_gate_shared_curve_cache":
+            elif (
+                isinstance(node, ast.Constant)
+                and node.value == "_freeze_gate_shared_curve_cache"
+                and not rel.endswith("disclosure_cache_inventory.py")
+            ):
                 add(
                     f"attr:{rel}:_freeze_gate_shared_curve_cache",
                     rel,
@@ -353,7 +366,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_e15_binding_log10_k': {
         "path": 'simulator/battery/score.py',
-        "line": 15202,
+        "line": 15243,
         "kind": 'lru',
         "name": '_e15_binding_log10_k',
         "carries_disclosure": False,
@@ -663,6 +676,14 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'AlphaMELTS process-health flag and TTL. Not a vapour-law result.',
     },
+    'store:engines/builtin/foulant_disposition.py:_VAPOR_PAYLOAD_CACHE': {
+        "path": 'engines/builtin/foulant_disposition.py',
+        "line": 162,
+        "kind": 'store',
+        "name": '_VAPOR_PAYLOAD_CACHE',
+        "carries_disclosure": False,
+        "how": 'Parsed vapor_pressures.yaml document. A pure loader. It never evaluates a vapour law.',
+    },
     'store:simulator/battery/generators/janaf.py:formation_basis_cache': {
         "path": 'simulator/battery/generators/janaf.py',
         "line": 2171,
@@ -670,6 +691,22 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "name": 'formation_basis_cache',
         "carries_disclosure": False,
         "how": 'Local scratch for rates, equilibrium constants, metadata, or validation. It does not store a vapour-law disclosure.',
+    },
+    'store:simulator/battery/migrate.py:_DEST_CACHE': {
+        "path": 'simulator/battery/migrate.py',
+        "line": 15311,
+        "kind": 'store',
+        "name": '_DEST_CACHE',
+        "carries_disclosure": False,
+        "how": 'Lab-field destination lookup. Not a vapour-law result.',
+    },
+    'store:simulator/battery/migrate.py:_VOCAB_CACHE': {
+        "path": 'simulator/battery/migrate.py',
+        "line": 15155,
+        "kind": 'store',
+        "name": '_VOCAB_CACHE',
+        "carries_disclosure": False,
+        "how": 'Parsed lab-parameter vocabulary. A pure loader. It never evaluates a vapour law.',
     },
     'store:simulator/battery/migrate.py:equality_fallback_entries': {
         "path": 'simulator/battery/migrate.py',
@@ -697,7 +734,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 3611,
+        "line": 3615,
         "kind": 'store',
         "name": 'pressure_cache',
         "carries_disclosure": True,
@@ -705,7 +742,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_state_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 1429,
+        "line": 1433,
         "kind": 'store',
         "name": 'pressure_state_cache',
         "carries_disclosure": True,
@@ -713,7 +750,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:_row_metadata_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 19815,
+        "line": 19856,
         "kind": 'store',
         "name": '_row_metadata_cache',
         "carries_disclosure": False,
@@ -721,11 +758,11 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:residue_prediction_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 14083,
+        "line": 14124,
         "kind": 'store',
         "name": 'residue_prediction_cache',
         "carries_disclosure": True,
-        "how": 'Caches the Sossi row object. law_disclosures is on row.provenance and is copied into EnginePrediction.refusal_detail.',
+        "how": 'Sossi cohort rows carry law_disclosures. _cached_sossi_prediction is the only read of those rows and calls accept_stored_memo. A Sossi row with no field is dropped and recomputed. Hashimoto and Knudsen entries in this dict are result objects with no law_disclosures field.',
     },
     'store:simulator/battery/validate.py:_cache': {
         "path": 'simulator/battery/validate.py',
@@ -791,6 +828,30 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Local scratch for rates, equilibrium constants, metadata, or validation. It does not store a vapour-law disclosure.',
     },
+    'store:simulator/diagnostic_helpers/extract_reproduction.py:_LEGACY_VIEW_CACHE': {
+        "path": 'simulator/diagnostic_helpers/extract_reproduction.py',
+        "line": 1916,
+        "kind": 'store',
+        "name": '_LEGACY_VIEW_CACHE',
+        "carries_disclosure": False,
+        "how": 'Schema-v1 projection of the vapour catalog. Dispatch still evaluates the law.',
+    },
+    'store:simulator/diagnostic_helpers/extract_reproduction.py:_MELT_PSAT_CACHE': {
+        "path": 'simulator/diagnostic_helpers/extract_reproduction.py',
+        "line": 1603,
+        "kind": 'store',
+        "name": '_MELT_PSAT_CACHE',
+        "carries_disclosure": True,
+        "how": 'Melt provider surface. _read_melt_psat_cache is the only read and calls accept_stored_memo. A row with no law_disclosures is a miss.',
+    },
+    'store:simulator/diagnostic_helpers/extract_reproduction.py:_VP_PROVIDER_CACHE': {
+        "path": 'simulator/diagnostic_helpers/extract_reproduction.py',
+        "line": 1598,
+        "kind": 'store',
+        "name": '_VP_PROVIDER_CACHE',
+        "carries_disclosure": False,
+        "how": 'Compiled provider object. Dispatch still evaluates the law, so the cached object is not a flagged pressure.',
+    },
     'store:simulator/diagnostic_helpers/kems.py:surface_cache': {
         "path": 'simulator/diagnostic_helpers/kems.py',
         "line": 653,
@@ -847,6 +908,30 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Local scratch for rates, equilibrium constants, metadata, or validation. It does not store a vapour-law disclosure.',
     },
+    'store:simulator/melt_backend/vaporock.py:_SESSION_BACKEND_CACHE': {
+        "path": 'simulator/melt_backend/vaporock.py',
+        "line": 1270,
+        "kind": 'store',
+        "name": '_SESSION_BACKEND_CACHE',
+        "carries_disclosure": False,
+        "how": 'Warm VapoRock worker. Equilibrate results are not cached; each call still runs.',
+    },
+    'store:simulator/melt_backend/vaporock.py:_VAPOROCK_RUNTIME_AVAILABLE_CACHE': {
+        "path": 'simulator/melt_backend/vaporock.py',
+        "line": 1207,
+        "kind": 'store',
+        "name": '_VAPOROCK_RUNTIME_AVAILABLE_CACHE',
+        "carries_disclosure": False,
+        "how": 'Boolean availability flag. Not a vapour-law result.',
+    },
+    'store:simulator/optimize/evaluate.py:_VAPOROCK_AVAILABLE_CACHE': {
+        "path": 'simulator/optimize/evaluate.py',
+        "line": 3569,
+        "kind": 'store',
+        "name": '_VAPOROCK_AVAILABLE_CACHE',
+        "carries_disclosure": False,
+        "how": 'Boolean availability flag. Not a vapour-law result.',
+    },
     'store:simulator/optimize/evaluate.py:per_hour_cache': {
         "path": 'simulator/optimize/evaluate.py',
         "line": 6320,
@@ -902,6 +987,46 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "name": 'reduced_real_cache',
         "carries_disclosure": False,
         "how": 'Configuration handle for the determinism store, not a cached physics row.',
+    },
+    'store:simulator/subsolidus_bakeout.py:_CATALOG_DOMAIN_CACHE': {
+        "path": 'simulator/subsolidus_bakeout.py',
+        "line": 54,
+        "kind": 'store',
+        "name": '_CATALOG_DOMAIN_CACHE',
+        "carries_disclosure": False,
+        "how": 'S2/SO2 temperature-domain bounds from the species catalog. Not an evaluated pressure.',
+    },
+    'store:simulator/vapour_rail/catalog.py:_COMPILE_CACHE': {
+        "path": 'simulator/vapour_rail/catalog.py',
+        "line": 411,
+        "kind": 'store',
+        "name": '_COMPILE_CACHE',
+        "carries_disclosure": False,
+        "how": 'Compiled catalog object. A hit does not skip evaluate(), which is where a flagged law registers.',
+    },
+    'store:simulator/vapour_rail/catalog.py:_THERMO_EXTRACT_PARSE_CACHE': {
+        "path": 'simulator/vapour_rail/catalog.py',
+        "line": 97,
+        "kind": 'store',
+        "name": '_THERMO_EXTRACT_PARSE_CACHE',
+        "carries_disclosure": False,
+        "how": 'Parsed thermo extract. A pure loader. It never evaluates a vapour law.',
+    },
+    'store:simulator/vapour_rail/catalog.py:_THERMO_OBSERVATION_CACHE': {
+        "path": 'simulator/vapour_rail/catalog.py',
+        "line": 100,
+        "kind": 'store',
+        "name": '_THERMO_OBSERVATION_CACHE',
+        "carries_disclosure": False,
+        "how": 'Thermo observation rows used at compile time. Not an evaluated pressure.',
+    },
+    'store:simulator/vapour_rail/u0_manifest.py:_U0_MANIFEST_CACHE': {
+        "path": 'simulator/vapour_rail/u0_manifest.py',
+        "line": 1025,
+        "kind": 'store',
+        "name": '_U0_MANIFEST_CACHE',
+        "carries_disclosure": False,
+        "how": 'Parsed U0 manifest fixture. A pure loader. It never evaluates a vapour law.',
     },
 }
 

@@ -17,7 +17,9 @@ measured disclosure is installed, on every run-metadata publisher. A cache or me
 disclosure field is unknown and is a miss. The held curve, the local slot,
 and the shared slot are one gate, ``accept_stored_memo``: unknown
 recomputes, and a known disclosure is re-registered before the record is
-returned. Registration is the one
+returned. Upper-case ``_CACHE`` stores are in that same inventory. The melt
+pressure cache and the Sossi cohort cache are read only through that gate.
+Registration is the one
 ``CompiledPressureEvaluator.evaluate`` call. A non-diagnostic law is registered
 when the evaluation leaves a certified domain: the temperature band, the
 oxygen evaluator band, or the oxygen mass-action floor. An in-domain
@@ -2870,6 +2872,24 @@ def test_cache_inventory_matches_the_production_scan() -> None:
     score = (_ROOT / "simulator/battery/score.py").read_text(encoding="utf-8")
     assert "row.experiment_id: row for row in rows" in score
     assert "refusal_detail=provenance" in score
+    sossi = score.split("def _sossi_residue_prediction(", 1)[1].split("\ndef ", 1)[0]
+    assert sossi.count("_cached_sossi_prediction(") == 2
+    assert "cache[cache_key].get(" not in sossi
+    sossi_read = score.split("def _cached_sossi_prediction(", 1)[1].split("\ndef ", 1)[0]
+    assert "_accept_cached_sossi_row(" in sossi_read
+    assert "accept_stored_memo(" in score.split("def _accept_cached_sossi_row(", 1)[1].split(
+        "\ndef ", 1
+    )[0]
+    melt = (_ROOT / "simulator/diagnostic_helpers/extract_reproduction.py").read_text(
+        encoding="utf-8"
+    )
+    assert melt.count("_MELT_PSAT_CACHE.get(") == 1
+    assert melt.count("_MELT_PSAT_CACHE[") == 1
+    melt_read = melt.split("def _read_melt_psat_cache(", 1)[1].split("\ndef ", 1)[0]
+    assert "_MELT_PSAT_CACHE.get(" in melt_read
+    assert "accept_stored_memo(" in melt_read
+    melt_body = melt.split("def _engine_melt_psat_pa(", 1)[1].split("\ndef ", 1)[0]
+    assert "_MELT_PSAT_CACHE" not in melt_body
 
 
 def _assert_replayed_fe(snapshot) -> None:
@@ -3061,15 +3081,144 @@ def _one_internal_analytical_sossi_row(monkeypatch):
     )[0]
 
 
+def _sossi_reference(experiment_id: str):
+    from types import SimpleNamespace
+
+    return SimpleNamespace(
+        experiment_id=experiment_id,
+        observation_id="b119-sossi-disclosure",
+        source_id="kems-012-sossi-2019",
+        locator={"table": "1"},
+        read_from="b119-sossi-disclosure",
+        identity=SimpleNamespace(species=SimpleNamespace(formula="Mn")),
+    )
+
+
 def _exercise_sossi_row(_tmp_path, monkeypatch) -> None:
+    """Warm the scorer cache in run A and read it through the production scorer."""
+
+    from simulator.battery.enums import Engine, ExecutionState
+    from simulator.battery.score import _SOSSI_SOURCE_ID, _sossi_residue_prediction
+
     row = _one_internal_analytical_sossi_row(monkeypatch)
     assert "run_refusal" not in row.provenance
     raw = row.provenance["law_disclosures"]
     assert isinstance(raw, list) and raw
+    cache = {
+        (_SOSSI_SOURCE_ID, Engine.INTERNAL_ANALYTICAL): {row.experiment_id: row}
+    }
+    reference = _sossi_reference(row.experiment_id)
     with disclosure_scope(inherit=False) as run_b:
-        published = accept_stored_memo({"law_disclosures": raw})
-        assert published is not None
+        prediction = _sossi_residue_prediction(
+            None, reference, Engine.INTERNAL_ANALYTICAL, cache
+        )
+        assert prediction.execution.state is ExecutionState.PRODUCED
+        assert float(prediction.value) > 0.0
         _assert_replayed_fe(run_b.snapshot())
+        assert prediction.refusal_detail["law_disclosures"]
+    # A cached row with no disclosure field is unknown. The scorer must not
+    # publish it. Recompute refuses immediately: this context has no cohort.
+    from types import SimpleNamespace
+
+    stripped = replace(
+        row,
+        provenance={
+            key: value
+            for key, value in row.provenance.items()
+            if key != "law_disclosures"
+        },
+    )
+    unknown_cache = {
+        (_SOSSI_SOURCE_ID, Engine.INTERNAL_ANALYTICAL): {
+            row.experiment_id: stripped
+        }
+    }
+    with disclosure_scope(inherit=False) as run_unknown:
+        refused = _sossi_residue_prediction(
+            SimpleNamespace(observations={}),
+            reference,
+            Engine.INTERNAL_ANALYTICAL,
+            unknown_cache,
+        )
+        assert refused.execution.state is not ExecutionState.PRODUCED
+        assert run_unknown.snapshot() == ()
+
+
+def _diagnostic_fe_rows(snapshot) -> list[dict]:
+    return [
+        item
+        for item in snapshot
+        if str(item.get("law_id") or "").startswith("Fe:")
+        and item.get("provenance")
+        == "diagnostic_only: backsolved from VapoRock, no coefficients fitted"
+    ]
+
+
+def _exercise_melt_psat(_tmp_path, monkeypatch) -> None:
+    """Warm the melt-pressure cache with flagged Fe, then read it in run B."""
+
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
+    import simulator.diagnostic_helpers.extract_reproduction as extract_reproduction
+
+    monkeypatch.setattr(extract_reproduction, "_MELT_PSAT_CACHE", {})
+    vapor = _live_vapor()
+    calls = {"n": 0}
+    dispatch = BuiltinVaporPressureProvider.dispatch
+
+    def counting(provider, request):
+        calls["n"] += 1
+        return dispatch(provider, request)
+
+    monkeypatch.setattr(BuiltinVaporPressureProvider, "dispatch", counting)
+    with disclosure_scope(inherit=False) as run_a:
+        pressure_a, reason_a, _runtime_a = extract_reproduction._engine_melt_psat_pa(
+            "Fe", 1750.0, 1.0e-9, vapor
+        )
+        assert reason_a is None
+        assert isinstance(pressure_a, float) and math.isfinite(pressure_a)
+        assert pressure_a > 0.0
+        assert calls["n"] == 1
+        stored = next(iter(extract_reproduction._MELT_PSAT_CACHE.values()))
+        fe_rows = _diagnostic_fe_rows(stored["law_disclosures"])
+        assert fe_rows
+        for item in fe_rows:
+            _assert_fe_disclosure(
+                item,
+                law_id=item["law_id"],
+                count=item["evaluation_count"],
+            )
+        run_a_fe = _diagnostic_fe_rows(run_a.snapshot())
+        assert {item["law_id"] for item in run_a_fe} == {
+            item["law_id"] for item in fe_rows
+        }
+    with disclosure_scope(inherit=False) as run_b:
+        pressure_b, reason_b, _runtime_b = extract_reproduction._engine_melt_psat_pa(
+            "Fe", 1750.0, 1.0e-9, vapor
+        )
+        assert reason_b is None
+        assert pressure_b == pressure_a
+        assert calls["n"] == 1
+        replayed = _diagnostic_fe_rows(run_b.snapshot())
+        assert {item["law_id"]: item["evaluation_count"] for item in replayed} == {
+            item["law_id"]: item["evaluation_count"] for item in fe_rows
+        }
+        for item in replayed:
+            _assert_fe_disclosure(
+                item,
+                law_id=item["law_id"],
+                count=item["evaluation_count"],
+            )
+    stored = next(iter(extract_reproduction._MELT_PSAT_CACHE.values()))
+    stored.pop("law_disclosures")
+    with disclosure_scope(inherit=False) as run_c:
+        pressure_c, reason_c, _runtime_c = extract_reproduction._engine_melt_psat_pa(
+            "Fe", 1750.0, 1.0e-9, vapor
+        )
+        assert reason_c is None
+        assert pressure_c == pressure_a
+        assert calls["n"] == 2
+        assert _diagnostic_fe_rows(run_c.snapshot())
 
 
 _DISCLOSURE_EXERCISERS = {
@@ -3086,6 +3235,9 @@ _DISCLOSURE_EXERCISERS = {
     "store:simulator/battery/residue.py:pressure_cache": _exercise_pressure_cache,
     "store:simulator/battery/residue.py:pressure_state_cache": _exercise_pressure_cache,
     "store:simulator/battery/score.py:residue_prediction_cache": _exercise_sossi_row,
+    "store:simulator/diagnostic_helpers/extract_reproduction.py:_MELT_PSAT_CACHE": (
+        _exercise_melt_psat
+    ),
 }
 
 

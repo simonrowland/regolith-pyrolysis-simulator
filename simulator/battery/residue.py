@@ -115,14 +115,18 @@ def _sossi_prediction(
     channel_missing_elements: tuple[str, ...],
     provenance: Mapping[str, object],
 ) -> "_SossiResiduePrediction":
-    """One Sossi row. A non-empty run disclosure is part of its provenance."""
+    """One Sossi row. The active run's disclosure is part of its provenance.
 
-    from simulator.vapour_rail.run_disclosure import active_snapshot
+    An empty snapshot is a measured zero and is stored as ``[]``. Omitting
+    the field would make a later cache hit unknown and force a recompute,
+    or, worse, publish the row as if no law had been flagged.
+    """
+
+    from simulator.vapour_rail.run_disclosure import active_registry, active_snapshot
 
     published = dict(provenance)
-    snapshot = active_snapshot()
-    if snapshot:
-        published["law_disclosures"] = [dict(item) for item in snapshot]
+    if active_registry() is not None:
+        published["law_disclosures"] = [dict(item) for item in active_snapshot()]
     return _SossiResiduePrediction(
         experiment_id=experiment_id,
         primary_element_ppm=primary_element_ppm,
