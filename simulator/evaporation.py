@@ -51,7 +51,9 @@ from simulator.state import (
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
     FluxActivationContext,
+    FluxEligible,
     PressureValue,
+    ZeroByPhysics,
 )
 from simulator.vapour_rail.activity import StandardStateIdentity
 from simulator.vapour_rail.instrumentation import (
@@ -303,27 +305,85 @@ def screened_missing_alpha_records(
     return SoleMissingAlphaScreen(refusals, authorized_zeros)
 
 
-def _feed_authorized_zeros_into_channel_states(
-    flux_overlay_report: dict[str, Any],
-    screen: SoleMissingAlphaScreen,
-) -> None:
-    """Publish a proved missing-alpha zero on ``batch_channel_states``.
+def _authorized_missing_alpha_zero_answer(
+    answer: Any,
+    record: Mapping[str, Any],
+) -> Any:
+    """Return the answer classified as the proved zero, or the original.
 
-    Screening stores ``authorized_zeros`` and leaves the catalog refusal
-    in the channel-state map. The empty-flux authorization and the
-    partial-channel note both read that map. At >= 400 K a sole proved
-    zero still raises ``EvaporationFluxRefusal``, and the same carrier
-    beside a debiting peer receives a category-1 ``REFUSED_UPSTREAM``
-    note. The proved zero is ``zero_by_physics``.
+    Both pressure slots become ``ZeroByPhysics`` and the flux refusal is
+    replaced by an eligible flux whose pressure is not a ``PressureValue``,
+    so ``is_flux_active`` stays false and the gate state is
+    ``zero_by_physics``. Leaving the flux as ``FluxRefusal`` keeps
+    ``is_refused`` true: the gate returns ``refusal`` before it reads a
+    zero pressure. ``refusal_code`` is cleared so serialization cannot
+    keep ``missing_channel_contract``.
     """
 
-    if not screen.authorized_zeros:
-        return
-    raw_states = flux_overlay_report.get("batch_channel_states")
-    states = dict(raw_states) if isinstance(raw_states, Mapping) else {}
-    for species in screen.authorized_zeros:
-        states[str(species)] = "zero_by_physics"
-    flux_overlay_report["batch_channel_states"] = states
+    bound = _nonnegative_finite(record.get("bound_kg"))
+    pressure = _nonnegative_finite(record.get("pressure_pa"))
+    if bound is None or pressure is None:
+        return answer
+    evidence = (
+        "below_evaporation_upper_bound"
+        f";bound_kg={bound:.16e}"
+        f";authority=kernel_seam"
+        f";pressure_pa={pressure:.16e}"
+    )
+    extra = dict(answer.extra) if isinstance(answer.extra, Mapping) else {}
+    detail = extra.get("detail")
+    if (
+        isinstance(detail, str)
+        and detail.startswith("channel contract incomplete:")
+    ):
+        extra.pop("detail", None)
+    extra["below_evaporation_upper_bound"] = {
+        str(key): value for key, value in record.items()
+    }
+    return replace(
+        answer,
+        pressure=ZeroByPhysics(evidence_ref=evidence),
+        selected_runtime_pressure=ZeroByPhysics(evidence_ref=evidence),
+        flux=FluxEligible(alpha_ref="alpha_1_hertz_knudsen_on_kernel_seam"),
+        refusal_code=None,
+        extra=MappingProxyType(extra),
+    )
+
+
+def _apply_authorized_missing_alpha_zeros(
+    batch: Any,
+    screen: SoleMissingAlphaScreen,
+) -> Any:
+    """Rewrite each proved missing-alpha zero onto the batch answer.
+
+    INVARIANT: that carrier is ``zero_by_physics`` on every surface that
+    reads the answer, and it is not also a refusal. Those surfaces are
+    the channel gate, ``is_refused``, ``refusal_code``, serialized
+    pressure and flux kinds, ``refusals_by_species``, ``n_refused``, and
+    carrier authority. A string written only onto
+    ``batch_channel_states`` leaves serialization on the catalog
+    refusal. A carrier whose bound is not proved is absent from
+    ``authorized_zeros`` and keeps the typed
+    ``fail_loud_missing_alpha`` refusal. The species stays out of the
+    flux map: ``ZeroByPhysics`` is not a debit.
+    """
+
+    if batch is None or not screen.authorized_zeros:
+        return batch
+    channels = dict(batch.channels_by_species)
+    changed = False
+    for species, record in screen.authorized_zeros.items():
+        species_id = str(species)
+        answer = channels.get(species_id)
+        if answer is None or not isinstance(record, Mapping):
+            continue
+        rewritten = _authorized_missing_alpha_zero_answer(answer, record)
+        if rewritten is not answer:
+            channels[species_id] = rewritten
+            changed = True
+    if not changed:
+        return batch
+    return replace(batch, channels_by_species=channels)
 
 
 def _publish_evaporation_flux_diagnostic(
@@ -1351,7 +1411,25 @@ class EvaporationMixin:
             melt_surface_area_m2=getattr(melt, "melt_surface_area_m2", None),
         )
         self._screened_missing_alpha_records = screen
-        _feed_authorized_zeros_into_channel_states(flux_overlay_report, screen)
+        if screen.authorized_zeros:
+            # One classification. The overlay, the shadow, and every later
+            # serializer read this batch. Do not assign the gate string.
+            vapour_batch = _apply_authorized_missing_alpha_zeros(
+                vapour_batch,
+                screen,
+            )
+            vapor_pressures, flux_overlay_report = flux_pressures_from_batch(
+                vapour_batch,
+                resolution_error=resolve_error or None,
+            )
+            flux_overlay_report.update(
+                compare_live_shadow_to_batch_flux(
+                    batch=vapour_batch,
+                    live_pressures_Pa=live_vapor_pressures,
+                    batch_flux_pressures_Pa=vapor_pressures,
+                    resolution_error=resolve_error or None,
+                )
+            )
         return (
             vapor_pressures,
             flux_overlay_report,

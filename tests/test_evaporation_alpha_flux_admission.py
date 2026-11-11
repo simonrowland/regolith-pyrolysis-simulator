@@ -449,15 +449,19 @@ _SOLE_MISSING_ALPHA_BRANCHES = (
 )
 
 
-def _screen_branch(species: str, branch: str):
+def _branch_numbers(species: str, branch: str) -> dict:
+    """Inputs for one sole-missing-alpha class.
+
+    ``P`` is chosen from ``k_HK * P * A * t`` against the ledger
+    tolerance. The screen's recorded mass is not an input.
+    """
+
     from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
 
     temperature_K = 1800.0
     molar_g = 84.0
     area_m2 = 1.0
     duration_s = 3600.0
-    # k * P * A * t compared with 1e-12. P is chosen from that product,
-    # not from the screen's own recorded mass.
     k_hk = hertz_knudsen_k_kg_s_m2_pa(temperature_K, molar_g / 1000.0)
     scale = k_hk * area_m2 * duration_s
     pressure = (DEFAULT_BALANCE_TOLERANCE_KG * 2.0) / scale
@@ -467,38 +471,53 @@ def _screen_branch(species: str, branch: str):
         pressure = 0.0
     elif branch == "negative_pressure":
         pressure = -1.0
-    seam = {} if branch == "missing_pressure" else {species: pressure}
-    molar = {} if branch == "missing_molar_mass" else {species: molar_g}
     detail = "channel contract incomplete: missing alpha"
     if branch == "other_missing_field":
         detail = "channel contract incomplete: missing formula"
+    expected_mass = None
+    if branch in {"above_tolerance", "below_tolerance", "zero_pressure"}:
+        expected_mass = k_hk * pressure * area_m2 * duration_s
+    return {
+        "temperature_K": temperature_K,
+        "pressure": pressure,
+        "seam": {} if branch == "missing_pressure" else {species: pressure},
+        "molar": {} if branch == "missing_molar_mass" else {species: molar_g},
+        "area_m2": None if branch == "missing_area" else area_m2,
+        "duration_s": None if branch == "missing_duration" else duration_s,
+        "tolerance": (
+            None if branch == "missing_tolerance" else DEFAULT_BALANCE_TOLERANCE_KG
+        ),
+        "detail": detail,
+        "expected_mass": expected_mass,
+    }
+
+
+def _screen_branch(species: str, branch: str):
     from types import SimpleNamespace
 
+    numbers = _branch_numbers(species, branch)
     batch = SimpleNamespace(
         channels_by_species={
             species: SimpleNamespace(
                 refusal_code="missing_channel_contract",
-                extra={"detail": detail},
+                extra={"detail": numbers["detail"]},
             )
         }
     )
-    flux = {species: pressure} if branch == "already_debiting" else {}
+    flux = (
+        {species: numbers["pressure"]} if branch == "already_debiting" else {}
+    )
     screen = screened_missing_alpha_records(
         batch,
         flux_pressures_Pa=flux,
-        seam_pressure_pa=seam,
-        molar_mass_g_mol=molar,
-        temperature_K=temperature_K,
-        area_m2=None if branch == "missing_area" else area_m2,
-        duration_s=None if branch == "missing_duration" else duration_s,
-        balance_tolerance_kg=(
-            None if branch == "missing_tolerance" else DEFAULT_BALANCE_TOLERANCE_KG
-        ),
+        seam_pressure_pa=numbers["seam"],
+        molar_mass_g_mol=numbers["molar"],
+        temperature_K=numbers["temperature_K"],
+        area_m2=numbers["area_m2"],
+        duration_s=numbers["duration_s"],
+        balance_tolerance_kg=numbers["tolerance"],
     )
-    expected_mass = None
-    if branch in {"above_tolerance", "below_tolerance", "zero_pressure"}:
-        expected_mass = k_hk * pressure * area_m2 * duration_s
-    return screen, expected_mass
+    return screen, numbers["expected_mass"]
 
 
 @pytest.mark.parametrize("species", _SOLE_MISSING_ALPHA_SPECIES)
@@ -580,7 +599,10 @@ def _path_tick_mass_kg() -> float:
     )
 
 
-def _missing_alpha_answer(species_id: str):
+def _missing_alpha_answer(
+    species_id: str,
+    detail: str = "channel contract incomplete: missing alpha",
+):
     from types import MappingProxyType
 
     from simulator.vapour_rail.batch import (
@@ -589,8 +611,6 @@ def _missing_alpha_answer(species_id: str):
         VapourAnswer,
     )
     from simulator.vapour_rail.request import REFUSAL_MISSING_CHANNEL_CONTRACT
-
-    detail = "channel contract incomplete: missing alpha"
     refusal = PressureRefusal(
         code=REFUSAL_MISSING_CHANNEL_CONTRACT,
         detail=detail,
@@ -634,10 +654,10 @@ def _debiting_answer(species_id: str, pressure_pa: float):
     )
 
 
-def _path_batch(peer: bool):
+def _path_batch(peer: bool, species: str = _PATH_CARRIER):
     from simulator.vapour_rail.batch import VapourBatch
 
-    channels = {_PATH_CARRIER: _missing_alpha_answer(_PATH_CARRIER)}
+    channels = {species: _missing_alpha_answer(species)}
     active: frozenset[str] = frozenset()
     if peer:
         channels["Na"] = _debiting_answer("Na", 1.5)
@@ -649,7 +669,19 @@ def _path_batch(peer: bool):
     )
 
 
-def _path_host(batch, dispatch):
+def _path_alpha_row() -> dict:
+    return {
+        "molar_mass_g_mol": _PATH_MOLAR_G_MOL,
+        "evaporation_alpha": {
+            "value": 0.9,
+            "source": "synthetic test proxy",
+            "tag": "broad_proxy_not_intrinsic",
+            "tier": 2,
+        },
+    }
+
+
+def _path_host(batch, dispatch, species: str = _PATH_CARRIER):
     from types import MethodType, SimpleNamespace
 
     from simulator.evaporation import EvaporationMixin
@@ -660,19 +692,7 @@ def _path_host(batch, dispatch):
             melt_surface_area_m2=_PATH_AREA_M2,
         ),
         setpoints={},
-        vapor_pressures={
-            "metals": {
-                _PATH_CARRIER: {
-                    "molar_mass_g_mol": _PATH_MOLAR_G_MOL,
-                    "evaporation_alpha": {
-                        "value": 0.9,
-                        "source": "synthetic test proxy",
-                        "tag": "broad_proxy_not_intrinsic",
-                        "tier": 2,
-                    },
-                }
-            }
-        },
+        vapor_pressures={"metals": {species: _path_alpha_row()}},
         _last_vapor_pressure_diagnostic={},
         _last_vapour_batch_resolve_error={},
         _silent_zero_notes=[],
@@ -694,20 +714,95 @@ def _path_host(batch, dispatch):
     return host
 
 
-def _path_equilibrium():
+def _path_equilibrium(
+    species: str = _PATH_CARRIER,
+    pressure_pa: float = _PATH_PRESSURE_PA,
+):
     from types import SimpleNamespace
 
     return SimpleNamespace(
         liquid_fraction=1.0,
         temperature_C=_PATH_TEMPERATURE_C,
-        vapor_pressures_Pa={_PATH_CARRIER: _PATH_PRESSURE_PA},
+        vapor_pressures_Pa={species: pressure_pa},
         vapor_pressures_source={},
         status="ok",
         diagnostics={},
     )
 
 
-def _assert_authorized_carrier(host, expected_mass_kg: float) -> None:
+# Surfaces that read the batch answer. An authorized zero is one
+# classification across all of them. A refusal is the other.
+_PUBLISHED_ZERO_SURFACES = (
+    "answer.is_refused",
+    "answer.refusal_code",
+    "answer.pressure",
+    "answer.flux",
+    "overlay.batch_channel_states",
+    "overlay.selected_pressure_source_by_species",
+    "overlay.flux_map",
+    "serialized.pressure.kind",
+    "serialized.selected_runtime_pressure.kind",
+    "serialized.flux.kind",
+    "serialized.is_refused",
+    "serialized.refusal_code",
+    "serialized.refusals_by_species",
+    "serialized.n_refused",
+    "carrier_authority.is_refused",
+    "carrier_authority.refusal_code",
+    "carrier_authority.status",
+)
+
+
+def _assert_published_authorized_zero(
+    species: str,
+    *,
+    answer,
+    overlay: dict,
+    report: dict,
+    authority: dict,
+) -> None:
+    """Every publisher of ``species`` says ``zero_by_physics``, not a refusal."""
+
+    from simulator.vapour_rail.batch import FluxEligible, ZeroByPhysics
+    from simulator.vapour_rail.instrumentation import (
+        VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+        vapour_carrier_authority_status,
+    )
+
+    assert isinstance(answer.pressure, ZeroByPhysics)
+    assert isinstance(answer.selected_runtime_pressure, ZeroByPhysics)
+    assert isinstance(answer.flux, FluxEligible)
+    assert answer.is_refused is False
+    assert answer.refusal_code is None
+    assert answer.is_flux_active is False
+    assert overlay["batch_channel_states"][species] == "zero_by_physics"
+    assert overlay["selected_pressure_source_by_species"][species] == (
+        "zero_by_physics"
+    )
+    assert species not in overlay.get("selected_runtime_pa_by_species", {})
+    channel = report["channels_by_species"][species]
+    assert channel["pressure"]["kind"] == "zero_by_physics"
+    assert channel["selected_runtime_pressure"]["kind"] == "zero_by_physics"
+    assert channel["flux"]["kind"] == "eligible"
+    assert channel["is_refused"] is False
+    assert channel["refusal_code"] is None
+    assert "missing_channel_contract" not in channel["pressure"]
+    assert "missing_channel_contract" not in channel["flux"]
+    assert species not in report["refusals_by_species"]
+    assert report["n_refused"] == len(report["refusals_by_species"])
+    assert authority[species] == channel
+    assert authority[species]["is_refused"] is False
+    assert authority[species]["refusal_code"] is None
+    assert (
+        vapour_carrier_authority_status(
+            authority[species],
+            expected_species_id=species,
+        )
+        == VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO
+    )
+
+
+def _assert_authorized_carrier(host, flux, expected_mass_kg: float) -> None:
     from simulator.silent_zero import CATEGORY_REFUSE, ZeroBecause
 
     diagnostic = host._last_evaporation_flux_diagnostic
@@ -721,8 +816,13 @@ def _assert_authorized_carrier(host, expected_mass_kg: float) -> None:
         expected_mass_kg, rel=1e-12, abs=0.0
     )
     assert 0.0 < record["bound_kg"] < DEFAULT_BALANCE_TOLERANCE_KG
-    overlay = host._last_vapour_batch_flux_overlay
-    assert overlay["batch_channel_states"][_PATH_CARRIER] == "zero_by_physics"
+    _assert_published_authorized_zero(
+        _PATH_CARRIER,
+        answer=host._last_vapour_batch.channel(_PATH_CARRIER),
+        overlay=host._last_vapour_batch_flux_overlay,
+        report=host._last_vapour_batch_report,
+        authority=flux.carrier_authority_by_species,
+    )
     notes = list(diagnostic.get("silent_zero_notes") or [])
     notes.extend(host._silent_zero_notes or [])
     refused = [
@@ -738,10 +838,9 @@ def _assert_authorized_carrier(host, expected_mass_kg: float) -> None:
 def test_sole_subtolerance_missing_alpha_authorizes_on_evaporation_path() -> None:
     """A sole missing-alpha carrier below tolerance is an authorized zero.
 
-    The screen classifies it, but the evaporation path used to leave the
-    channel state as ``refusal``. At 1873.15 K that sole refusal raises
-    ``EvaporationFluxRefusal``. Dropping the authorized-zero feed into
-    ``batch_channel_states`` makes this raise again.
+    The screen classifies it. The batch answer has to carry that
+    classification: a channel-state string alone leaves serialization,
+    ``is_refused``, and ``refusals_by_species`` on the catalog refusal.
     """
 
     from simulator.evaporation import EvaporationFluxRefusal, EvaporationMixin
@@ -763,7 +862,7 @@ def test_sole_subtolerance_missing_alpha_authorizes_on_evaporation_path() -> Non
     assert host._last_evaporation_flux_diagnostic.get("reason") == (
         "zero_by_physics"
     )
-    _assert_authorized_carrier(host, expected_mass_kg)
+    _assert_authorized_carrier(host, flux, expected_mass_kg)
 
 
 def test_subtolerance_missing_alpha_with_debiting_peer_is_not_refused_upstream(
@@ -772,8 +871,8 @@ def test_subtolerance_missing_alpha_with_debiting_peer_is_not_refused_upstream(
     """A proved missing-alpha zero beside a debit is not category-1.
 
     The peer still debits. The authorized carrier is omitted from the
-    flux map and must not receive ``REFUSED_UPSTREAM``. Dropping the
-    authorized-zero feed into ``batch_channel_states`` records that note.
+    flux map, is absent from ``refusals_by_species``, and must not
+    receive ``REFUSED_UPSTREAM``.
     """
 
     from types import SimpleNamespace
@@ -804,7 +903,13 @@ def test_subtolerance_missing_alpha_with_debiting_peer_is_not_refused_upstream(
     }
     states = host._last_vapour_batch_flux_overlay["batch_channel_states"]
     assert states["Na"] == "eligible"
-    _assert_authorized_carrier(host, expected_mass_kg)
+    _assert_authorized_carrier(host, flux, expected_mass_kg)
+    report = host._last_vapour_batch_report
+    assert "Na" not in report["refusals_by_species"]
+    assert report["n_refused"] == 0
+    na_authority = flux.carrier_authority_by_species["Na"]
+    assert na_authority["is_refused"] is False
+    assert na_authority["pressure"]["kind"] == "value"
     peer_notes = [
         note
         for note in (host._silent_zero_notes or [])
@@ -813,3 +918,281 @@ def test_subtolerance_missing_alpha_with_debiting_peer_is_not_refused_upstream(
         and note.get("doctrine_category") == CATEGORY_REFUSE
     ]
     assert peer_notes == []
+
+
+def _published_classification(species: str, answer, overlay, report, authority):
+    """Read every publisher. Callers compare this map; they do not re-derive it."""
+
+    from simulator.vapour_rail.instrumentation import vapour_carrier_authority_status
+
+    channel = report["channels_by_species"][species]
+    auth = authority[species]
+    found = {
+        "answer.is_refused": bool(answer.is_refused),
+        "answer.refusal_code": answer.refusal_code,
+        "answer.pressure": type(answer.pressure).__name__,
+        "answer.flux": type(answer.flux).__name__,
+        "overlay.batch_channel_states": overlay["batch_channel_states"][species],
+        "overlay.selected_pressure_source_by_species": (
+            overlay.get("selected_pressure_source_by_species") or {}
+        ).get(species),
+        "overlay.flux_map": species in (
+            overlay.get("selected_runtime_pa_by_species") or {}
+        ),
+        "serialized.pressure.kind": channel["pressure"]["kind"],
+        "serialized.selected_runtime_pressure.kind": (
+            channel["selected_runtime_pressure"]["kind"]
+        ),
+        "serialized.flux.kind": channel["flux"]["kind"],
+        "serialized.is_refused": bool(channel["is_refused"]),
+        "serialized.refusal_code": channel["refusal_code"],
+        "serialized.refusals_by_species": species in report["refusals_by_species"],
+        "serialized.n_refused": report["n_refused"],
+        "carrier_authority.is_refused": bool(auth["is_refused"]),
+        "carrier_authority.refusal_code": auth["refusal_code"],
+        "carrier_authority.status": vapour_carrier_authority_status(
+            auth,
+            expected_species_id=species,
+        ),
+    }
+    assert set(found) == set(_PUBLISHED_ZERO_SURFACES)
+    assert report["n_refused"] == len(report["refusals_by_species"])
+    assert auth == channel
+    return found
+
+
+def _expected_published_classification(branch: str) -> dict:
+    if branch in {"below_tolerance", "zero_pressure"}:
+        return {
+            "answer.is_refused": False,
+            "answer.refusal_code": None,
+            "answer.pressure": "ZeroByPhysics",
+            "answer.flux": "FluxEligible",
+            "overlay.batch_channel_states": "zero_by_physics",
+            "overlay.selected_pressure_source_by_species": "zero_by_physics",
+            "overlay.flux_map": False,
+            "serialized.pressure.kind": "zero_by_physics",
+            "serialized.selected_runtime_pressure.kind": "zero_by_physics",
+            "serialized.flux.kind": "eligible",
+            "serialized.is_refused": False,
+            "serialized.refusal_code": None,
+            "serialized.refusals_by_species": False,
+            "serialized.n_refused": 0,
+            "carrier_authority.is_refused": False,
+            "carrier_authority.refusal_code": None,
+            "carrier_authority.status": "proven_zero",
+        }
+    if branch == "already_debiting":
+        return {
+            "answer.is_refused": False,
+            "answer.refusal_code": None,
+            "answer.pressure": "PressureValue",
+            "answer.flux": "FluxEligible",
+            "overlay.batch_channel_states": "eligible",
+            "overlay.selected_pressure_source_by_species": (
+                "vapour_batch_selected_runtime_pressure"
+            ),
+            "overlay.flux_map": True,
+            "serialized.pressure.kind": "value",
+            "serialized.selected_runtime_pressure.kind": "value",
+            "serialized.flux.kind": "eligible",
+            "serialized.is_refused": False,
+            "serialized.refusal_code": None,
+            "serialized.refusals_by_species": False,
+            "serialized.n_refused": 0,
+            "carrier_authority.is_refused": False,
+            "carrier_authority.refusal_code": None,
+            "carrier_authority.status": "status_bearing",
+        }
+    return {
+        "answer.is_refused": True,
+        "answer.refusal_code": "missing_channel_contract",
+        "answer.pressure": "PressureRefusal",
+        "answer.flux": "FluxRefusal",
+        "overlay.batch_channel_states": "refusal",
+        "overlay.selected_pressure_source_by_species": None,
+        "overlay.flux_map": False,
+        "serialized.pressure.kind": "refusal",
+        "serialized.selected_runtime_pressure.kind": "refusal",
+        "serialized.flux.kind": "refusal",
+        "serialized.is_refused": True,
+        "serialized.refusal_code": "missing_channel_contract",
+        "serialized.refusals_by_species": True,
+        "serialized.n_refused": 1,
+        "carrier_authority.is_refused": True,
+        "carrier_authority.refusal_code": "missing_channel_contract",
+        "carrier_authority.status": "refused",
+    }
+
+
+def _classify_branch_through_batch(species: str, branch: str):
+    """Screen, rewrite, then read the publishers production reads."""
+
+    from simulator.evaporation import _apply_authorized_missing_alpha_zeros
+    from simulator.vapour_rail.batch import VapourBatch
+    from simulator.vapour_rail.instrumentation import (
+        flux_pressures_from_batch,
+        serialize_vapour_batch,
+    )
+
+    numbers = _branch_numbers(species, branch)
+    if branch == "already_debiting":
+        answer = _debiting_answer(species, numbers["pressure"])
+        active = frozenset({species})
+    else:
+        answer = _missing_alpha_answer(species, detail=numbers["detail"])
+        active = frozenset()
+    batch = VapourBatch(
+        requested_species_ids=frozenset({species}),
+        channels_by_species={species: answer},
+        flux_active_species_ids=active,
+    )
+    pressures, _overlay = flux_pressures_from_batch(batch)
+    screen = screened_missing_alpha_records(
+        batch,
+        flux_pressures_Pa=pressures,
+        seam_pressure_pa=numbers["seam"],
+        molar_mass_g_mol=numbers["molar"],
+        temperature_K=numbers["temperature_K"],
+        area_m2=numbers["area_m2"],
+        duration_s=numbers["duration_s"],
+        balance_tolerance_kg=numbers["tolerance"],
+    )
+    rewritten = _apply_authorized_missing_alpha_zeros(batch, screen)
+    debit_pressures, overlay = flux_pressures_from_batch(rewritten)
+    report = serialize_vapour_batch(rewritten)
+    authority = {
+        str(sid): dict(channel)
+        for sid, channel in report["channels_by_species"].items()
+    }
+    return screen, pressures, debit_pressures, rewritten, overlay, report, authority
+
+
+@pytest.mark.parametrize("species", _SOLE_MISSING_ALPHA_SPECIES)
+@pytest.mark.parametrize("branch", _SOLE_MISSING_ALPHA_BRANCHES)
+def test_published_surfaces_share_one_missing_alpha_classification(
+    species: str,
+    branch: str,
+) -> None:
+    """INVARIANT: one answer classifies every published surface.
+
+    A proved below-tolerance missing alpha is ``zero_by_physics`` on
+    the gate, the serialized channel, ``refusals_by_species``, and
+    carrier authority, and it is not in the flux map. Every other
+    branch stays a typed refusal or a real debit. No branch is a
+    silent 0 Pa.
+    """
+
+    (
+        screen,
+        pressures,
+        debit_pressures,
+        rewritten,
+        overlay,
+        report,
+        authority,
+    ) = _classify_branch_through_batch(species, branch)
+    assert set(debit_pressures) == set(pressures)
+    if branch in {"below_tolerance", "zero_pressure"}:
+        assert species in screen.authorized_zeros
+        assert species not in screen.refusals
+        assert species not in debit_pressures
+    elif branch in {"already_debiting", "other_missing_field"}:
+        assert screen.authorized_zeros == {}
+        assert screen.refusals == {}
+    else:
+        assert species in screen.refusals
+        assert species not in screen.authorized_zeros
+        assert species not in debit_pressures
+    found = _published_classification(
+        species,
+        rewritten.channel(species),
+        overlay,
+        report,
+        authority,
+    )
+    assert found == _expected_published_classification(branch)
+
+
+@pytest.mark.parametrize("species", _SOLE_MISSING_ALPHA_SPECIES)
+def test_evaporation_path_publishes_the_authorized_zero_for_every_carrier(
+    species: str,
+) -> None:
+    """The evaporation path's returned authority matches the batch answer."""
+
+    from simulator.evaporation import EvaporationFluxRefusal, EvaporationMixin
+
+    def _kernel_must_not_run(*args, **kwargs):
+        raise AssertionError("sole authorized zero must not reach the kernel")
+
+    expected_mass_kg = _path_tick_mass_kg()
+    assert expected_mass_kg < DEFAULT_BALANCE_TOLERANCE_KG
+    host = _path_host(
+        _path_batch(peer=False, species=species),
+        dispatch=_kernel_must_not_run,
+        species=species,
+    )
+    try:
+        flux = EvaporationMixin._calculate_evaporation(
+            host,
+            _path_equilibrium(species),
+        )
+    except EvaporationFluxRefusal as exc:
+        raise AssertionError(f"{species} authorized zero raised {exc.reason}") from exc
+    assert flux.species_kg_hr == {}
+    record = host._last_evaporation_flux_diagnostic[
+        "below_evaporation_upper_bound"
+    ][species]
+    assert record["bound_kg"] == pytest.approx(expected_mass_kg, rel=1e-12, abs=0.0)
+    assert species not in (
+        host._last_evaporation_flux_diagnostic.get("missing_alpha") or {}
+    )
+    _assert_published_authorized_zero(
+        species,
+        answer=host._last_vapour_batch.channel(species),
+        overlay=host._last_vapour_batch_flux_overlay,
+        report=host._last_vapour_batch_report,
+        authority=flux.carrier_authority_by_species,
+    )
+
+
+@pytest.mark.parametrize("species", _SOLE_MISSING_ALPHA_SPECIES)
+def test_evaporation_path_keeps_an_above_tolerance_missing_alpha_refusal(
+    species: str,
+) -> None:
+    """A bound that is not negligible stays a refusal on every surface.
+
+    The authorized-zero rewrite must not swallow this carrier.
+    """
+
+    from simulator.evaporation import EvaporationFluxRefusal, EvaporationMixin
+    from simulator.vapour_rail.batch import FluxRefusal, PressureRefusal
+
+    def _kernel_must_not_run(*args, **kwargs):
+        raise AssertionError("sole refusal must not reach the kernel")
+
+    host = _path_host(
+        _path_batch(peer=False, species=species),
+        dispatch=_kernel_must_not_run,
+        species=species,
+    )
+    with pytest.raises(EvaporationFluxRefusal) as raised:
+        EvaporationMixin._calculate_evaporation(
+            host,
+            _path_equilibrium(species, pressure_pa=1.0),
+        )
+    answer = host._last_vapour_batch.channel(species)
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+    assert answer.refusal_code == "missing_channel_contract"
+    report = host._last_vapour_batch_report
+    assert species in report["refusals_by_species"]
+    assert report["channels_by_species"][species]["is_refused"] is True
+    assert report["n_refused"] == 1
+    overlay = host._last_vapour_batch_flux_overlay
+    assert overlay["batch_channel_states"][species] == "refusal"
+    diagnostic = raised.value.diagnostic
+    assert species in (diagnostic.get("missing_alpha") or {})
+    assert species not in (diagnostic.get("below_evaporation_upper_bound") or {})
+    batch_in_diagnostic = diagnostic.get("vapour_batch") or {}
+    assert species in (batch_in_diagnostic.get("refusals_by_species") or {})
