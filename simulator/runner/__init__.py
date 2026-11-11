@@ -1427,11 +1427,9 @@ class PyrolysisRun:
             "liquid_fraction_provider": sim.record.liquid_fraction_provider,
             "kernel_commit_sha": kernel_commit_sha,
         }
-        law_disclosures = tuple(getattr(sim, "law_disclosures", ()) or ())
-        if not law_disclosures:
-            from simulator.vapour_rail.run_disclosure import active_snapshot
+        from simulator.vapour_rail.run_disclosure import published_run_disclosures
 
-            law_disclosures = active_snapshot()
+        law_disclosures = published_run_disclosures(execution)
         if law_disclosures:
             run_metadata["law_disclosures"] = [
                 dict(item) for item in law_disclosures
@@ -5851,6 +5849,13 @@ def _runner_failure_result(
     }
     for key, value in overrides.items():
         run_metadata[str(key)] = _json_safe(value)
+    from simulator.vapour_rail.run_disclosure import published_run_disclosures
+
+    law_disclosures = published_run_disclosures(execution)
+    if law_disclosures:
+        run_metadata["law_disclosures"] = [
+            dict(item) for item in law_disclosures
+        ]
     run_metadata["campaigns_elapsed"] = _safe_failure_value(
         lambda: _json_safe(
             float(

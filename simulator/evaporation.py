@@ -2271,7 +2271,11 @@ class EvaporationMixin:
             record_repair_notice,
             recorded_law_disclosures,
         )
-        from simulator.vapour_rail.run_disclosure import publish_stored_disclosures
+        from simulator.vapour_rail.run_disclosure import (
+            open_computation,
+            publish_stored_disclosures,
+            stored_disclosures_known,
+        )
 
         if self._liquid_fraction_provider == 'analytical':
             curve = self._freeze_gate_kress_floor_curve(None, [])
@@ -2333,7 +2337,8 @@ class EvaporationMixin:
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         cached_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
         if (
-            cache
+            stored_disclosures_known(cache)
+            and cache
             and cache.get('key') == key
             and cache.get('disposition') in {'live', 'memo-hit'}
             and gate_curve_memo_is_cacheable(
@@ -2406,7 +2411,8 @@ class EvaporationMixin:
                 shared_origin = None
                 shared_notices = None
             if (
-                isinstance(process_cached, Mapping)
+                stored_disclosures_known(process_cached)
+                and isinstance(process_cached, Mapping)
                 and process_cached.get('disposition') in {'live', 'memo-hit'}
                 and gate_curve_memo_is_cacheable(
                     self,
@@ -2484,11 +2490,11 @@ class EvaporationMixin:
             None,
         )
         self._invalid_projected_liquidus_notice = None
-        from simulator.vapour_rail.run_disclosure import computation_disclosure
-
         # The live curve is one computation. Its memo and PT-0 row store
         # only the laws this solve executes. A later hit re-registers them.
-        with computation_disclosure() as gate_computation:
+        # open_computation merges into the session when one is bound and
+        # keeps a detached computation when this solve has no run.
+        with open_computation() as gate_computation:
             try:
                 reasons: list[str] = []
                 repair_notices: list[dict[str, Any]] = []

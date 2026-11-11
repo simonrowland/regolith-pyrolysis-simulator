@@ -200,23 +200,27 @@ def _campaigns_elapsed_from_session_history(
     return float(fallback)
 
 
-def _bind_run_law_disclosure(method):
-    """Share one run registry across the session and keep it on the simulator."""
+def _publish_session_law_disclosure(method):
+    """Copy the session-owned disclosure onto the simulator after the run.
+
+    The registry is created by SimSession. Opening another scope here would
+    miss every advance that does not go through execute_session, and a
+    per-call snapshot would drop hours already recorded on the session.
+    """
 
     def wrapper(self, *args, **kwargs):
-        from simulator.vapour_rail.run_disclosure import (
-            active_snapshot,
-            disclosure_scope,
-        )
-
-        with disclosure_scope(inherit=True):
-            execution = method(self, *args, **kwargs)
-            snap = active_snapshot()
-            if snap and execution is not None:
-                sim = getattr(execution, "simulator", None)
-                if sim is not None:
-                    sim.law_disclosures = snap
+        execution = method(self, *args, **kwargs)
+        if execution is None:
             return execution
+        session = getattr(execution, "session", None)
+        sim = getattr(execution, "simulator", None)
+        if (
+            session is not None
+            and sim is not None
+            and hasattr(session, "law_disclosures")
+        ):
+            sim.law_disclosures = tuple(session.law_disclosures or ())
+        return execution
 
     return wrapper
 
@@ -252,7 +256,7 @@ class RunExecutor:
             kwargs["stop_at_stage0_exit"] = True
         return self.execute_session(session, **kwargs)
 
-    @_bind_run_law_disclosure
+    @_publish_session_law_disclosure
     def execute_session(
         self,
         session: SimSession,

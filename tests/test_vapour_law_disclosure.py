@@ -1,11 +1,12 @@
 """Run-scoped disclosure of an admitted diagnostic or extrapolated vapour law.
 
-Invariant: every published, priced, or ranked quantity discloses every admitted
-diagnostic or extrapolated vapour law its own computation executed. Registration
-is the one ``CompiledPressureEvaluator.evaluate`` call. A cache hit does not
-execute the law; it re-registers the disclosures stored with that computation,
-and evaluation counts add. A stored row with no disclosure field is unknown and
-is not a hit. An empty disclosure is a measured zero only when the computation
+Invariant: the run registry is owned by the SimSession. Every advance binds it,
+and every publisher reads that session registry. A computation merges into the
+parent; opening one with no parent raises. A cache or memo hit with no stored
+disclosure field is unknown and is a miss. Registration is the one
+``CompiledPressureEvaluator.evaluate`` call. A hit does not execute the law; it
+re-registers the disclosures stored with that computation, and evaluation
+counts add. An empty disclosure is a measured zero only when the computation
 recorded one. Attribution is per computation, never the ambient run registry.
 Typed-carrier notices stay a list: distinct notices are kept, exact duplicates
 are dropped. Bare-float helpers do not carry notices.
@@ -588,9 +589,10 @@ def test_cache_publication_paths_use_the_disclosure_chokepoint() -> None:
     head = core.split("    def _get_equilibrium(", 1)[1].split(
         "    def _get_equilibrium_live(", 1
     )[0]
-    assert "with computation_disclosure()" in head
-    assert head.index("replay_enabled") < head.index("with computation_disclosure()")
-    assert head.index("cached_equilibrium") < head.index("with computation_disclosure()")
+    assert "with open_computation()" in head
+    assert "computation_disclosure()" not in head
+    assert head.index("replay_enabled") < head.index("with open_computation()")
+    assert head.index("cached_equilibrium") < head.index("with open_computation()")
     assert "capture_equilibrium" not in head
 
     evaporation = (_ROOT / "simulator/evaporation.py").read_text(encoding="utf-8")
@@ -598,21 +600,28 @@ def test_cache_publication_paths_use_the_disclosure_chokepoint() -> None:
         "    def _freeze_gate_liquidus_fO2_log(", 1
     )[0]
     assert body.index("recorded_law_disclosures(cache)") < body.index(
-        "with computation_disclosure()"
+        "with open_computation()"
     )
     assert body.index("recorded_law_disclosures(process_cached)") < body.index(
-        "with computation_disclosure()"
+        "with open_computation()"
     )
     assert body.count("publish_stored_disclosures(") == 2
+    assert body.index("stored_disclosures_known(cache)") < body.index(
+        "publish_stored_disclosures(cache)"
+    )
+    assert body.index("stored_disclosures_known(process_cached)") < body.index(
+        "publish_stored_disclosures(process_cached)"
+    )
     assert body.index("publish_stored_disclosures(cache)") < body.index(
-        "with computation_disclosure()"
+        "with open_computation()"
     )
     assert body.index("publish_stored_disclosures(process_cached)") < body.index(
-        "with computation_disclosure()"
+        "with open_computation()"
     )
-    assert body.index("with computation_disclosure()") < body.rindex(
+    assert body.index("with open_computation()") < body.rindex(
         "store.capture_gate_curve("
     )
+    assert "with computation_disclosure()" not in body
 
     results = (_ROOT / "simulator/optimize/results_store.py").read_text(encoding="utf-8")
     assert "law_disclosures TEXT NOT NULL" not in results
@@ -972,3 +981,507 @@ def test_published_cache_classes_obey_disclosure_invariant(kind: str, tmp_path: 
     unreadable["law_disclosures"] = None
     with pytest.raises(StudyReplayError, match="unreadable"):
         _scored_result_from_journal_payload(unreadable)
+
+
+def test_computation_without_a_parent_raises() -> None:
+    from simulator.vapour_rail.run_disclosure import (
+        LawDisclosureParentError,
+        open_computation,
+    )
+
+    with pytest.raises(LawDisclosureParentError):
+        with computation_disclosure():
+            pass
+    with open_computation() as child:
+        _fe_pressure("FeO_association_gas")
+        snapshot = child.snapshot()
+    assert active_snapshot() == ()
+    assert len(snapshot) == 1
+    _assert_fe_disclosure(snapshot[0], law_id=_FE_ASSOCIATION_LAW_ID, count=1)
+
+
+def _probe_simulator(*, use_fe: bool):
+    from types import SimpleNamespace
+
+    class _Ledger:
+        pass
+
+    sim = SimpleNamespace(
+        atom_ledger=_Ledger(),
+        melt=SimpleNamespace(hour=1),
+        record=SimpleNamespace(snapshots=()),
+        _condensation_model=None,
+        paused_for_decision=False,
+        pending_decision=None,
+        _last_campaign_summary=None,
+        _last_backend_error="",
+        _last_c6_refusal_diagnostic={},
+    )
+
+    def step():
+        if use_fe:
+            _fe_pressure("FeO_association_gas")
+        return SimpleNamespace(
+            o2_bubbler_diagnostic={
+                "status": "refused",
+                "reason": "disclosure-probe",
+            }
+        )
+
+    sim.is_complete = lambda: False
+    sim.step = step
+    return sim
+
+
+def _probe_session(*, use_fe: bool):
+    from simulator.session import SimSession
+
+    session = SimSession()
+    session._sim = _probe_simulator(use_fe=use_fe)
+    return session
+
+
+def test_session_registry_reaches_every_publisher(monkeypatch) -> None:
+    """Fe through the bare-float helper shows on every public output.
+
+    The law is executed only by ``effective_equilibrium_pressure_Pa``. Each
+    arm calls a real entry point. A session that does not execute the law
+    publishes no disclosure.
+    """
+
+    import json
+    import sys
+    import types
+    from types import SimpleNamespace
+
+    from simulator.run_executor import RunExecutor
+    from simulator.runner import RunnerError, _runner_failure_result
+    from simulator.session import SimSession
+    from simulator.session_cli import SessionScriptRunner
+
+    monkeypatch.setattr(
+        SimSession,
+        "_build_per_hour_summary",
+        staticmethod(lambda sim, snapshot: {"hour": 1}),
+    )
+
+    clean = _probe_session(use_fe=False)
+    clean_step = clean.advance()
+    assert clean.law_disclosures == ()
+    assert "law_disclosures" not in clean_step.per_hour_summary
+
+    session_run = _probe_session(use_fe=True)
+    execution = RunExecutor().execute_session(session_run, hours=1)
+    assert len(execution.per_hour) == 1
+    _assert_fe_disclosure(
+        execution.session.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+    _assert_fe_disclosure(
+        execution.per_hour[0]["law_disclosures"][0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+    assert execution.simulator.law_disclosures == execution.session.law_disclosures
+
+    cli = SessionScriptRunner()
+    cli.session = _probe_session(use_fe=True)
+    cli.started = True
+    frame = cli._advance(["1"])
+    _assert_fe_disclosure(
+        frame["law_disclosures"][0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+    _assert_fe_disclosure(
+        frame["step"]["law_disclosures"][0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+
+    failed = _probe_session(use_fe=True)
+    failed_step = failed.advance()
+    payload = _runner_failure_result(
+        error=RunnerError("disclosure probe"),
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        mass_kg=1.0,
+        additives_kg={},
+        track="pyrolysis",
+        backend_name="internal-analytical",
+        engines={},
+        metadata_overrides={"law_disclosures": []},
+        execution=SimpleNamespace(
+            session=failed,
+            simulator=None,
+            per_hour=(failed_step.per_hour_summary,),
+            backend_status="failed",
+            backend_authoritative=False,
+            refusal_diagnostic={},
+            campaigns_elapsed=1.0,
+            shadow_trace=(),
+        ),
+    )
+    _assert_fe_disclosure(
+        payload["run_metadata"]["law_disclosures"][0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+    _assert_fe_disclosure(
+        payload["per_hour_summary"][0]["law_disclosures"][0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+
+    from simulator.optimize.evaluate import evaluate
+    from simulator.optimize.recipe import RecipePatch as OptimizerRecipePatch
+    from tests.test_optimizer_evaluate import PROFILE, _execution
+
+    class _FeExecutor:
+        def execute(self, config):
+            self.session = _probe_session(use_fe=True)
+            self.session.advance()
+            return _execution()
+
+    executor = _FeExecutor()
+    ranked = evaluate(
+        OptimizerRecipePatch(
+            {("campaigns", "C0", "temp_range_C"): [20.0, 950.0]}
+        ),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=executor,
+    )
+    assert ranked.feasible
+    _assert_fe_disclosure(
+        dict(ranked.law_disclosures[0]),
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+    _assert_fe_disclosure(
+        executor.session.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+
+    from simulator.battery.residue import predict_mass_loss_fraction
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    def _point(number: float):
+        return SimpleNamespace(
+            state=SimpleNamespace(
+                is_value=True,
+                value=SimpleNamespace(
+                    kind=SimpleNamespace(value="point"),
+                    point=number,
+                ),
+            )
+        )
+
+    experiment = SimpleNamespace(
+        experiment_id="disclosure-probe",
+        sample=SimpleNamespace(
+            mass_kg=_point(0.001),
+            initial_composition=SimpleNamespace(
+                state=SimpleNamespace(
+                    is_value=True,
+                    value=SimpleNamespace(
+                        components={"SiO2": 1.0},
+                        amount_basis="mole_fraction",
+                    ),
+                )
+            ),
+        ),
+        thermal_schedule=SimpleNamespace(total_duration_s=_point(3600.0)),
+        apparatus=SimpleNamespace(
+            geometry=SimpleNamespace(exposed_area_m2=_point(1.0e-4))
+        ),
+        method=SimpleNamespace(
+            is_value=True,
+            value="langmuir_free_evaporation",
+        ),
+        pressure_environment=SimpleNamespace(total_pressure_Pa=_point(0.0)),
+    )
+    observation = SimpleNamespace(
+        uncertainty=SimpleNamespace(kind=SimpleNamespace(value="none"))
+    )
+    fake_openimcc = types.ModuleType("openimcc")
+    fake_openimcc.load_gas_datapack = lambda: object()
+    monkeypatch.setitem(sys.modules, "openimcc", fake_openimcc)
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_openimcc_gas_channels_and_omission_notices",
+        lambda *_args, **_kwargs: (
+            (
+                ("SiO", ("SiO2", 1.0, -0.5)),
+                ("O2", (None, 0.0, 1.0)),
+            ),
+            (),
+        ),
+    )
+    import simulator.battery.residue as residue
+
+    monkeypatch.setattr(residue, "_mass_loss_sourced_alphas", lambda *_a, **_k: {})
+    monkeypatch.setattr(
+        residue,
+        "_mass_loss_area_inputs",
+        lambda *_a, **_k: (1.0e-4, 1.0e-4, 0.0),
+    )
+    monkeypatch.setattr(
+        residue,
+        "_mass_loss_thermal_segments",
+        lambda *_a, **_k: (300.0, 1.0, ((1800.0, 60.0),)),
+    )
+    monkeypatch.setattr(
+        residue,
+        "_make_residue_pressure_model",
+        lambda *_a, **_k: (lambda _inventory, _logp: {}),
+    )
+    evaluations = {"n": 0}
+
+    def _integrate(inventory, *_args, **_kwargs):
+        evaluations["n"] += 1
+        _fe_pressure("FeO_association_gas")
+        return SimpleNamespace(
+            refusal=None,
+            evaporated_mol={},
+            inventory_mol=dict(inventory),
+        )
+
+    monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", _integrate)
+    prediction = predict_mass_loss_fraction(
+        "internal-analytical",
+        experiment,
+        temperature_K=1800.0,
+        observation=observation,
+    )
+    assert evaluations["n"] >= 1
+    assert prediction.mass_loss_fraction == 0.0
+    battery_rows = json.loads(prediction.engine_metadata["law_disclosures"])
+    _assert_fe_disclosure(
+        battery_rows[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=evaluations["n"],
+    )
+
+
+def _memo_host(calls: list[str]):
+    from types import SimpleNamespace
+
+    from simulator.evaporation import EvaporationMixin
+
+    host = object.__new__(EvaporationMixin)
+    host._liquid_fraction_provider = "declared"
+    host._freeze_gate_held_curve_record = None
+    host._pt0_store = None
+    host.melt = SimpleNamespace(hour=1, p_total_mbar=1000.0)
+    host._current_melt_redox_fO2_log = lambda: -8.0
+    host._freeze_gate_redox_key_fO2_log = lambda **_kwargs: _kwargs["fO2_log"]
+    host._freeze_gate_cache_key = lambda **_kwargs: "memo-key"
+    host._freeze_gate_curve_in_progress = False
+    host._invalid_projected_liquidus_notice = None
+    host._freeze_gate_last_good_curve = None
+    host._freeze_gate_provider_outcome = None
+    host._record_composition_projected_liquidus_notice_from_curve = (
+        lambda _curve: None
+    )
+    host._freeze_gate_shared_curve_cache = None
+
+    def dispatch(_reasons, **_kwargs):
+        calls.append("recompute")
+        host._freeze_gate_provider_outcome = "produced"
+        return {"tag": "recomputed", "status": "in_range", "source": "stub"}
+
+    host._freeze_gate_curve_from_gate_dispatch = dispatch
+    return host
+
+
+def _memo_record(*, disclosures):
+    record = {
+        "key": "memo-key",
+        "curve": {"tag": "cached", "status": "in_range"},
+        "repair_notices": [],
+        "disposition": "live",
+        "provider_outcome": "produced",
+        "origin": {"producer_pid": 1},
+    }
+    if disclosures is not None:
+        record["law_disclosures"] = disclosures
+    return record
+
+
+def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
+    monkeypatch,
+) -> None:
+    import simulator.engine_binding_admission as admission
+    import simulator.reduced_real_determinism as determinism
+    from simulator.evaporation import EvaporationMixin
+    from simulator.session import SimSession
+    from simulator.vapour_rail.run_disclosure import bind_run_registry
+
+    monkeypatch.setattr(
+        determinism, "gate_curve_memo_is_cacheable", lambda *_a, **_k: True
+    )
+    monkeypatch.setattr(
+        admission, "gate_curve_memo_origin_matches", lambda *_a, **_k: True
+    )
+    monkeypatch.setattr(admission, "gate_curve_memo_evidence", lambda *_a, **_k: {})
+    monkeypatch.setattr(
+        admission,
+        "write_gate_curve_memo_record",
+        lambda _self, curve, notices, **kwargs: {
+            "curve": dict(curve),
+            "origin": {"producer_pid": 1},
+            "repair_notices": list(notices),
+            "disposition": "live",
+            "provider_outcome": kwargs.get("provider_outcome"),
+        },
+    )
+    with disclosure_scope(inherit=False) as cold:
+        _fe_pressure("FeO_association_gas")
+        stored = [dict(item) for item in cold.snapshot()]
+    calls: list[str] = []
+    host = _memo_host(calls)
+
+    def _call():
+        session = SimSession()
+        with bind_run_registry(session._law_disclosure):
+            record = EvaporationMixin._freeze_gate_curve_record(host)
+        return session, record
+
+    host._freeze_gate_liquid_fraction_cache = _memo_record(disclosures=None)
+    missed, missed_record = _call()
+    assert calls == ["recompute"]
+    assert missed_record["curve"]["tag"] == "recomputed"
+    assert missed.law_disclosures == ()
+
+    calls.clear()
+    host = _memo_host(calls)
+    host._freeze_gate_liquid_fraction_cache = _memo_record(disclosures=stored)
+    hit, hit_record = _call()
+    assert calls == []
+    assert hit_record["curve"]["tag"] == "cached"
+    _assert_fe_disclosure(
+        hit.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+
+    calls.clear()
+    host = _memo_host(calls)
+    host._freeze_gate_liquid_fraction_cache = _memo_record(disclosures=[])
+    zero, zero_record = _call()
+    assert calls == []
+    assert zero_record["curve"]["tag"] == "cached"
+    assert zero.law_disclosures == ()
+
+    calls.clear()
+    host = _memo_host(calls)
+    host._freeze_gate_liquid_fraction_cache = None
+    host._freeze_gate_shared_curve_cache = {
+        "memo-key": _memo_record(disclosures=None),
+    }
+    shared_miss, shared_miss_record = _call()
+    assert calls == ["recompute"]
+    assert shared_miss_record["curve"]["tag"] == "recomputed"
+    assert shared_miss.law_disclosures == ()
+
+    calls.clear()
+    host = _memo_host(calls)
+    host._freeze_gate_liquid_fraction_cache = None
+    host._freeze_gate_shared_curve_cache = {
+        "memo-key": _memo_record(disclosures=stored),
+    }
+    shared_hit, shared_hit_record = _call()
+    assert calls == []
+    assert shared_hit_record["curve"]["tag"] == "cached"
+    _assert_fe_disclosure(
+        shared_hit.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+
+
+def test_receipt_and_evaluator_diagnostic_notices_both_survive() -> None:
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.vapour_rail.channels import (
+        CHANNEL_O2,
+        LEGACY_FO2_PLANE,
+        REACTION_PLANE_TRANSPORT_HEADSPACE,
+        ReactionThermoInputs,
+        o2_potential_from_pO2_bar,
+    )
+
+    provider = BuiltinVaporPressureProvider(_live_vapor())
+    evaluator = provider._vapour_rail_catalog.evaluator_for_hot_train(
+        "FeO_association_gas"
+    )
+    plane = (
+        LEGACY_FO2_PLANE.get(evaluator.oxygen_fugacity_channel or "")
+        or REACTION_PLANE_TRANSPORT_HEADSPACE
+    )
+    potential = o2_potential_from_pO2_bar(
+        pO2_bar=1.0e-9,
+        temperature_K=1800.0,
+        reaction_plane=plane,
+        pO2_reference_bar=evaluator.pO2_reference_bar or 1.0,
+    )
+    receipt_notice = {
+        "authority": "diagnostic/extrapolated",
+        "reason": "oxygen receipt marker",
+        "marker": "oxygen-receipt",
+        "closes_with": "t-1723",
+        "executed_species_id": "Fe",
+        "law_provenance": "receipt marker, not the executed pseudo law",
+        "provenance_status": "diagnostic_only",
+        "comparators": {
+            "gap_dex_law_vs_rail": 4.0,
+            "gap_dex_law_vs_vaporock": 5.0,
+        },
+    }
+    potential = replace(
+        potential,
+        observation_or_setpoint_receipt={
+            "diagnostic_admission_notice": receipt_notice,
+        },
+    )
+    evaluation = evaluator.evaluate(
+        1800.0,
+        source_activity=1.0,
+        reaction_inputs=ReactionThermoInputs(
+            reaction_id=None,
+            state_fingerprint=None,
+            channels={CHANNEL_O2: potential},
+        ),
+    )
+    assert math.isfinite(evaluation.pressure_pa)
+    assert evaluation.pressure_pa > 0.0
+    published = evaluation.diagnostic_admission_notice
+    assert isinstance(published, list)
+    assert len(published) == 2
+    by_marker = {item.get("marker"): item for item in published}
+    assert "oxygen-receipt" in by_marker
+    executed = next(item for item in published if item.get("marker") != "oxygen-receipt")
+    assert executed.get("closes_with") == "t-1723"
+    duplicate = replace(
+        potential,
+        observation_or_setpoint_receipt={
+            "diagnostic_admission_notice": dict(executed),
+        },
+    )
+    collapsed = evaluator.evaluate(
+        1800.0,
+        source_activity=1.0,
+        reaction_inputs=ReactionThermoInputs(
+            reaction_id=None,
+            state_fingerprint=None,
+            channels={CHANNEL_O2: duplicate},
+        ),
+    )
+    notice = collapsed.diagnostic_admission_notice
+    assert isinstance(notice, dict)
+    assert notice.get("closes_with") == "t-1723"
+    assert notice.get("marker") is None

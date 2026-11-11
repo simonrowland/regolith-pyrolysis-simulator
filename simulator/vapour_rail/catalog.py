@@ -1203,11 +1203,36 @@ class CompiledPressureEvaluator:
                 was_clamped=False,
             ),
         )
+        # Receipt notices and evaluator notices share a key. Assigning the
+        # evaluator last used to drop a distinct notice on the oxygen receipt.
+        # Merge each key, then exact-dedupe. extrapolation_notice was set
+        # above (receipt items, or the floor notice) and is merged in too.
+        merged_notices: dict[str, list[Mapping[str, Any]]] = {}
         for notice_key, items in receipt_notices.items():
             if notice_key == "extrapolation_notice":
                 continue
-            object.__setattr__(evaluation, notice_key, notice_attribute(items))
+            merged_notices.setdefault(notice_key, []).extend(items)
         for notice_key, items in public_carrier_notices(self).items():
+            merged_notices.setdefault(notice_key, []).extend(items)
+        extrapolation_items = list(merged_notices.pop("extrapolation_notice", ()))
+        if extrapolation_items:
+            existing = getattr(evaluation, "extrapolation_notice", None)
+            if isinstance(existing, Mapping):
+                existing_items: list[Mapping[str, Any]] = [existing]
+            elif isinstance(existing, (list, tuple)) and not isinstance(
+                existing, (str, bytes)
+            ):
+                existing_items = [
+                    item for item in existing if isinstance(item, Mapping)
+                ]
+            else:
+                existing_items = []
+            object.__setattr__(
+                evaluation,
+                "extrapolation_notice",
+                notice_attribute([*existing_items, *extrapolation_items]),
+            )
+        for notice_key, items in merged_notices.items():
             object.__setattr__(evaluation, notice_key, notice_attribute(items))
         # Single registration site. A diagnostic admission registers from the
         # evaluator notice. An out-of-band continuation with no diagnostic

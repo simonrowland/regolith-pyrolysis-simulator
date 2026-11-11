@@ -1,7 +1,11 @@
 """Run-scoped disclosure of an admitted diagnostic or extrapolated vapour law.
 
-Invariant: a published, priced, or ranked quantity discloses every admitted
-diagnostic or extrapolated vapour law its own computation executed.
+Invariant: the run registry is owned by the SimSession. Every advance binds
+that registry, and every publisher reads it from the session. A computation
+merges into that parent. Opening a computation with no parent raises.
+``open_computation`` is the production hot path: with a parent it merges, and
+with none it keeps a detached computation so a cache row can store the laws
+that solve executed. It does not publish a run.
 
 - The only registration site is ``CompiledPressureEvaluator.evaluate``.
 - A cache hit does not execute the law. It re-registers the disclosure stored
@@ -9,14 +13,14 @@ diagnostic or extrapolated vapour law its own computation executed.
 - Disclosure is metadata on the cached row, not a cache-key dimension.
 - A row with no disclosure field is unknown. Callers treat that as a miss or
   as unusable for ranking. Absence is never a measured "no flagged law".
-- A computation scope records only that computation, then merges its counts
-  into the parent run. Cache writes read the computation, never the whole run.
+- A computation scope records only that computation, then adds its counts to
+  the parent. Cache writes read the computation, never the whole run.
 - Typed carrier notices stay lists (exact duplicates dropped). Bare-float
   helpers do not carry notices.
 
-The ContextVar default is ``None``. That slot is not a registry. Each
-``disclosure_scope()`` creates a ``RunDisclosure`` that is returned with the
-result. There is no module-level singleton.
+The ContextVar default is ``None``. That slot is not a registry. ``SimSession``
+creates the ``RunDisclosure`` that is returned with the run. There is no
+module-level singleton.
 """
 
 from __future__ import annotations
@@ -242,6 +246,16 @@ def _certification_route(notice: Mapping[str, Any]) -> tuple[str, ...]:
     return ()
 
 
+class LawDisclosureParentError(RuntimeError):
+    """A computation was opened with no session-owned run registry."""
+
+
+def active_registry() -> RunDisclosure | None:
+    """The registry bound for this context, or None when no run is bound."""
+
+    return _ACTIVE.get()
+
+
 def active_snapshot() -> tuple[dict[str, Any], ...]:
     current = _ACTIVE.get()
     if current is None:
@@ -263,6 +277,58 @@ def disclosure_scope(*, inherit: bool = True) -> Iterator[RunDisclosure]:
         yield created
     finally:
         _ACTIVE.reset(token)
+
+
+@contextmanager
+def bind_run_registry(registry: RunDisclosure) -> Iterator[RunDisclosure]:
+    """Bind a session-owned registry. A nested bind of the same object is a no-op."""
+
+    current = _ACTIVE.get()
+    if current is registry:
+        yield registry
+        return
+    token = _ACTIVE.set(registry)
+    try:
+        yield registry
+    finally:
+        _ACTIVE.reset(token)
+
+
+def disclosure_delta(
+    before: Sequence[Mapping[str, Any]],
+    after: Sequence[Mapping[str, Any]],
+) -> tuple[dict[str, Any], ...]:
+    """Counts added between two snapshots of one registry.
+
+    Merging this delta into an outer registry adds each law once. Merging the
+    whole snapshot on every hour would count the same execution again.
+    """
+
+    before_counts: dict[str, int] = {}
+    for item in before:
+        law_id = str(item.get("law_id") or "")
+        if not law_id:
+            continue
+        try:
+            before_counts[law_id] = int(item.get("evaluation_count") or 0)
+        except (TypeError, ValueError):
+            before_counts[law_id] = 0
+    added: list[dict[str, Any]] = []
+    for item in after:
+        law_id = str(item.get("law_id") or "")
+        if not law_id:
+            continue
+        try:
+            after_count = int(item.get("evaluation_count") or 0)
+        except (TypeError, ValueError):
+            continue
+        extra = after_count - before_counts.get(law_id, 0)
+        if extra < 1:
+            continue
+        copied = dict(item)
+        copied["evaluation_count"] = extra
+        added.append(copied)
+    return tuple(added)
 
 
 def register_executed_law(evaluator: Any, evaluation: Any = None) -> None:
@@ -290,17 +356,45 @@ def active_computation_snapshot() -> tuple[dict[str, Any], ...]:
 
 @contextmanager
 def computation_disclosure() -> Iterator[RunDisclosure]:
-    """Record one computation, then add its counts to the parent run."""
+    """Record one computation, then add its counts to the parent run.
+
+    A computation with no parent is a programming error. The snapshot is never
+    discarded for want of a parent: the call raises before the solve.
+    """
 
     parent = _ACTIVE.get()
+    if parent is None:
+        raise LawDisclosureParentError(
+            "computation disclosure requires the session-owned run registry"
+        )
     created = RunDisclosure(computation=True)
     token = _ACTIVE.set(created)
     try:
         yield created
     finally:
         _ACTIVE.reset(token)
-        if parent is not None:
-            parent.reregister_public(created.snapshot())
+        parent.reregister_public(created.snapshot())
+
+
+@contextmanager
+def open_computation() -> Iterator[RunDisclosure]:
+    """One production computation.
+
+    A bound run receives the counts. A solve with no run keeps a detached
+    computation so the cache row stores that solve's laws, and publishes
+    nothing. Direct ``computation_disclosure()`` with no parent still raises.
+    """
+
+    if _ACTIVE.get() is None:
+        created = RunDisclosure(computation=True)
+        token = _ACTIVE.set(created)
+        try:
+            yield created
+        finally:
+            _ACTIVE.reset(token)
+        return
+    with computation_disclosure() as created:
+        yield created
 
 
 def parse_stored_disclosure_field(
@@ -355,6 +449,19 @@ def reregister_cached_disclosures(disclosures: Any) -> None:
     )
 
 
+def stored_disclosures_known(record: Mapping[str, Any] | None) -> bool:
+    """True when the row recorded a disclosure field that parses.
+
+    An empty list is known (a measured zero). Absence and unreadable values
+    are unknown. A hit path must miss on unknown before it returns the row.
+    """
+
+    if not isinstance(record, Mapping) or "law_disclosures" not in record:
+        return False
+    raw = record.get("law_disclosures")
+    return parse_stored_disclosure_field(raw, present=raw is not None) is not None
+
+
 def publish_stored_disclosures(
     record: Mapping[str, Any] | None,
 ) -> list[dict[str, Any]] | None:
@@ -372,6 +479,28 @@ def publish_stored_disclosures(
         return None
     reregister_cached_disclosures(measured)
     return [dict(item) for item in measured]
+
+
+def published_run_disclosures(execution: Any) -> tuple[dict[str, Any], ...]:
+    """Disclosures of the run that produced ``execution``.
+
+    The session registry is the source. An empty session snapshot is a
+    measured zero and is not replaced by a simulator attribute or by whatever
+    registry happens to be active. A result with no session falls back to the
+    simulator mirror, then to the active registry.
+    """
+
+    if execution is None:
+        return ()
+    session = getattr(execution, "session", None)
+    if session is not None and hasattr(session, "law_disclosures"):
+        raw = getattr(session, "law_disclosures", ()) or ()
+        return tuple(dict(item) for item in raw if isinstance(item, Mapping))
+    sim = getattr(execution, "simulator", None)
+    raw = getattr(sim, "law_disclosures", ()) if sim is not None else ()
+    if raw:
+        return tuple(dict(item) for item in raw if isinstance(item, Mapping))
+    return tuple(dict(item) for item in active_snapshot())
 
 
 def disclosure_metadata(disclosures: Any) -> tuple[dict[str, Any], ...]:
