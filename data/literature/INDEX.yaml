@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 783
-  extracts: 781
+  sources: 784
+  extracts: 782
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 80
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 781
+  extracts_without_pdf: 782
   alias_groups_needing_resolution: 84
 gaps:
   pdfs_without_extract: []
@@ -799,6 +799,7 @@ gaps:
   - zhang-2011-boron-sodium-f-free-evaporation
   - zhang-2021-acsesc-si
   - zhang-2024-alkali-evaporation-ti-thesis
+  - zhao-2019-ce2o3-ternary-thermodynamics
   - zhinkina-2024-ce-gd-kems-poster
   - zigo-1987-gehlenite-fusion
   untracked_files: []
@@ -47105,6 +47106,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  aliases: []
+  citation: Zhao, Z.; Chen, X.; Glaser, B.; Yan, B. (2019). Experimental Study on the Thermodynamics of
+    the CaO-SiO2-Ce2O3 System at 1873 K. Metallurgical and Materials Transactions B 50:395–406.
+  doi: 10.1007/s11663-018-1471-9
+  report_number: null
+  identifier: 10.1007/s11663-018-1471-9
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/zhao-2019-ce2o3-ternary-thermodynamics.yaml
+    review_status: draft
+    rows: 14
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/zhao-2019-ce2o3-ternary-thermodynamics/zhao-2019-ce2o3-ternary-thermodynamics.pdf
+      present: true
+      sha256: b72c2e527639f5772cf9998efc91c505d4f6cd253ffa93f4e4ffaa2e59a390d9
+      matches_simulator: null
+    sidecar:
+      path: raw/zhao-2019-ce2o3-ternary-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/zhao-2019-ce2o3-ternary-thermodynamics
+      exists: true
+      file_count: 17
+    tables:
+      path: tables/zhao-2019-ce2o3-ternary-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/zhao-2019-ce2o3-ternary-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/zhao-2019-ce2o3-ternary-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 5bf8de2b700eb527a884ab69bc15acf30ba80ed6
 - source_id: zhinkina-2024-ce-gd-kems-poster
   aliases: []
   citation: Zhinkina, O. A., Shugurov, S. M., Balabanova, E. A., Repin, D. A. & Lopatin, S. I. (2024).

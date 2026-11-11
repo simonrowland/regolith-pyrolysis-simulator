@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 783
-- Extracts (`literature_extract.v1`): 781
+- Sources: 784
+- Extracts (`literature_extract.v1`): 782
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 781
+- Extracts with no PDF: 782
 - Alias groups needing owner/controller resolution: 84
 - Extracts with private/non-public row locators: 80
 
@@ -809,6 +809,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `zhang-2011-boron-sodium-f-free-evaporation` | Zhang, Zuo Tai; Sridhar, Seetharaman; Cho, Jung Wook (2011). An Investigation of the Evaporation of B2O3 and Na2O in F-Free Mold Slags. ISIJ International 51(1), 80–87. | 10.2355/isijinternational.51.80 | ABSENT, `` | `raw/zhang-2011-boron-sodium-f-free-evaporation/zhang-2011-boron-sodium-f-free-evaporation.pdf` (present, 40aa1a81); `text/zhang-2011-boron-sodium-f-free-evaporation/` (28 files, exists); `tables/zhang-2011-boron-sodium-f-free-evaporation/` (0 files, ABSENT) | `data/literature/extracts/zhang-2011-boron-sodium-f-free-evaporation.yaml` (9 rows, draft) | `ledger/zhang-2011-boron-sodium-f-free-evaporation.yaml`: — (—) |
 | `zhang-2021-acsesc-si` | Zhang, Z., Nie, N. X., Mendybaev, R. A., Liu, M.-C., Hu, J. J., Hopp, T., Alp, E. E., Lavina, B., Bullock, E. S., McKeegan, K. D. & Dauphas, N. (2021), Supporting Information for “Loss and isotopic fractionation of alkali elements during diffusion-limited evaporation from molten silicate: theory and experiments”, ACS Earth and Space Chemistry 5, 755–784. |  | ABSENT, `` | `raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf` (present, c0499ea7); `text/zhang-2021-acsesc-si/` (26 files, exists); `tables/zhang-2021-acsesc-si/` (0 files, ABSENT) | `data/literature/extracts/zhang-2021-acsesc-si.yaml` (25 rows, draft) | `ledger/zhang-2021-acsesc-si.yaml`: acquired (2026-10-04) |
 | `zhang-2024-alkali-evaporation-ti-thesis` | Zhang, Zhe (2024), Experimental Study of Alkali Evaporation and Titanium Isotope Variations: Tracing Moderately Volatile Elements Loss and Magma Differentiation in Planetary Bodies, PhD dissertation, University of Chicago. | 10.6082/uchicago.12651 | ABSENT, `` | `raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf` (present, c77267dd); `text/zhang-2024-alkali-evaporation-ti-thesis/` (289 files, exists); `tables/zhang-2024-alkali-evaporation-ti-thesis/` (0 files, ABSENT) | `data/literature/extracts/zhang-2024-alkali-evaporation-ti-thesis.yaml` (23 rows, draft, private_path) | `ledger/zhang-2024-alkali-evaporation-ti-thesis.yaml`: — (—) |
+| `zhao-2019-ce2o3-ternary-thermodynamics` | Zhao, Z.; Chen, X.; Glaser, B.; Yan, B. (2019). Experimental Study on the Thermodynamics of the CaO-SiO2-Ce2O3 System at 1873 K. Metallurgical and Materials Transactions B 50:395–406. | 10.1007/s11663-018-1471-9 | ABSENT, `` | `raw/zhao-2019-ce2o3-ternary-thermodynamics/zhao-2019-ce2o3-ternary-thermodynamics.pdf` (present, b72c2e52); `text/zhao-2019-ce2o3-ternary-thermodynamics/` (17 files, exists); `tables/zhao-2019-ce2o3-ternary-thermodynamics/` (0 files, ABSENT) | `data/literature/extracts/zhao-2019-ce2o3-ternary-thermodynamics.yaml` (14 rows, draft) | `ledger/zhao-2019-ce2o3-ternary-thermodynamics.yaml`: — (—) |
 | `zhinkina-2024-ce-gd-kems-poster` | Zhinkina, O. A., Shugurov, S. M., Balabanova, E. A., Repin, D. A. & Lopatin, S. I. (2024). Thermodynamic Properties of the CeO2–Gd2O3 System. XXIV International Conference on Chemical Thermodynamics in Russia (RCCT-2024), Ivanovo, 1–5 July 2024, conference poster. |  | ABSENT, `` | `raw/zhinkina-2024-ce-gd-kems-poster/zhinkina-2024-ce-gd-kems-poster.pdf` (present, f5a1b9d6); `text/zhinkina-2024-ce-gd-kems-poster/` (34 files, exists); `tables/zhinkina-2024-ce-gd-kems-poster/` (0 files, ABSENT) | `data/literature/extracts/zhinkina-2024-ce-gd-kems-poster.yaml` (0 rows, draft) | `ledger/zhinkina-2024-ce-gd-kems-poster.yaml`: — (—) |
 | `zigo-1987-gehlenite-fusion` | Žigo, O., Adamkovičová, K., Kosa, L., Nerád, I. & Proks, I. (1987), "Determination of the heat of fusion of 2CaO·Al2O3·SiO2 (gehlenite)", Chemical Papers 41(2), 171–181 |  | ABSENT, `` | `raw/zigo-1987-gehlenite-fusion/zigo-1987-gehlenite-fusion.pdf` (present, 3a97f79a); `text/zigo-1987-gehlenite-fusion/` (27 files, exists); `tables/zigo-1987-gehlenite-fusion/` (8 files, exists) | `data/literature/extracts/zigo-1987-gehlenite-fusion.yaml` (13 rows, draft) | `ledger/zigo-1987-gehlenite-fusion.yaml`: extracted (2026-10-03) |
 
@@ -1597,6 +1598,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `zhang-2011-boron-sodium-f-free-evaporation`
 - `zhang-2021-acsesc-si`
 - `zhang-2024-alkali-evaporation-ti-thesis`
+- `zhao-2019-ce2o3-ternary-thermodynamics`
 - `zhinkina-2024-ce-gd-kems-poster`
 - `zigo-1987-gehlenite-fusion`
 
