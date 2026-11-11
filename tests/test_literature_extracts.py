@@ -5097,8 +5097,13 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
             assert condition["locator"]["pdf_page_index"] == 12
 
     context = {row["observation_id"]: row for row in cs["context"]}
-    fits = [key for key in context if "table_ii" in key]
-    assert len(fits) == 4
+    fits = {
+        "bennour_1996_table_ii_x_sio2_0p5_fit",
+        "bennour_1996_table_ii_x_sio2_0p667_fit",
+        "bennour_1996_table_ii_x_sio2_0p75_fit",
+        "bennour_1996_table_ii_x_sio2_0p85_fit",
+    }
+    assert {key for key in context if key in fits} == fits
     assert all(context[key]["type"] == "thermodynamic_example" for key in fits)
     assert all(context[key]["locator"]["pdf_page_index"] == 12 for key in fits)
     assert all(
@@ -5107,13 +5112,52 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
         for key in fits
     )
 
-    figures = [row for rows in (cs["observations"], doc["species"]["Na2O"]["observations"])
-               for row in rows if row["observation_id"].startswith("bennour_1996_fig7_")]
-    assert len(figures) == 4
+    figure_caption = (
+        "FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) "
+        "[(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: "
+        "------ X = 0.85; - - - X = 0.5."
+    )
+    figures = [
+        row for row in cs["observations"]
+        if row["observation_id"].startswith("bennour_1996_fig7_cs2o_")
+    ]
+    assert len(figures) == 2
+    assert {row["type"] for row in figures} == {"activity_coefficient"}
     assert all(row["locator"]["pdf_page_index"] == 13 for row in figures)
-    assert {
-        row["values"]["section_as_published"] for row in figures
-    } == {"X = 0.85 (short-dashed curve)", "X = 0.5 (long-dashed curve)"}
+    assert all(row["values"]["quantity"] == "activity" for row in figures)
+    assert {row["values"]["section_as_published"] for row in figures} == {
+        "------ X = 0.85", "- - - X = 0.5"
+    }
+    for row in figures:
+        values = row["values"]
+        assert values["caption"] == figure_caption
+        assert values["component_as_published"] == "aCs2O"
+        section = "0p5" if "0p5" in row["observation_id"] else "0p85"
+        assert row["derived_from"] == [
+            f"bennour_1996_table_i_x_sio2_{section}_log_ion_ratio"
+        ]
+        assert len(values["points"]) == 13
+        for point in values["points"]:
+            assert point["activity"] == point["a_Cs2O_as_digitized"]
+            assert sum(Decimal(str(x)) for x in point["composition_mole_fraction"].values()) == 1
+            section = "0p5" if "0p5" in row["observation_id"] else "0p85"
+            assert point["derived_from"] == [
+                f"bennour_1996_table_i_x_sio2_{section}_log_ion_ratio"
+            ]
+        section = "0p5" if "0p5" in row["observation_id"] else "0p85"
+        assert f"bennour_1996_table_ii_x_sio2_{section}_fit" in values["note"]
+
+    na_figures = {
+        row["observation_id"]: row
+        for row in doc["species"]["Na2O"]["context"]
+        if row["observation_id"].startswith("bennour_1996_fig7_na2o_")
+    }
+    assert len(na_figures) == 2
+    assert not doc["species"]["Na2O"]["observations"]
+    assert all(row["values"]["caption"] == figure_caption for row in na_figures.values())
+    assert all(row["values"]["method_class"] == "figure_only" for row in na_figures.values())
+    assert all("second reference state" in row["standard_state"] for row in figures)
+    assert all("second reference state" in row["standard_state"] for row in na_figures.values())
 
     assert context["bennour_1996_experimental_apparatus"]["locator"]["pdf_page_index"] == 2
     assert context["bennour_1996_experimental_method"]["locator"]["pdf_page_index"] == 3
@@ -5158,6 +5202,33 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
         and row.point_conditions["composition"].state.is_value
         for row in migrated
     )
+    fig7 = [
+        row for row in migrator.result.observations.values()
+        if "bennour_1996_fig7_cs2o_" in row.observation_id
+    ]
+    assert len(fig7) == 26
+    assert all(row.identity.quantity.is_value for row in fig7)
+    assert all(row.identity.quantity.value.value == "activity" for row in fig7)
+    assert all(row.value.kind.value == "point" for row in fig7)
+    assert all(
+        row.identity.composition is not None and row.identity.composition.is_value
+        for row in fig7
+    )
+    assert all(
+        row.identity.reference_state is not None
+        and row.identity.reference_state.is_unknown
+        for row in fig7
+    )
+    assert all(
+        row.identity.species.phase.is_value
+        and row.identity.species.phase.value.value == "l"
+        for row in fig7
+    )
+    assert all(
+        row.point_conditions["temperature_K"].state.value == Decimal("1573.00")
+        and row.point_conditions["composition"].state.is_value
+        for row in fig7
+    )
     # Table I gives no per-row uncertainty column, so the migration must not
     # manufacture an uncertainty width or turn the printed logarithm linear.
     assert all(row.uncertainty.kind.value == "none" for row in migrated)
@@ -5178,6 +5249,7 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
         and "bennour_1996_table_i_" in issue.path
         for issue in reverted.result.validation.hard_issues
     )
+    assert not migrator.result.validation.hard_issues
 
 def test_richet_bottinga_1986_review_fixes_migrate_and_pin_table4() -> None:
     """Keep the reviewed provenance, pressure, widths, and context in migration."""
