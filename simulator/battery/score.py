@@ -3877,6 +3877,28 @@ def expand_coefficient_sources(sources: Sequence[str]) -> tuple[str, ...]:
     return tuple(out)
 
 
+def _candidate_lineage_for_sources(
+    sources: Sequence[str],
+    *,
+    works: Mapping[str, Work] | None = None,
+    observations: Mapping[str, Observation] | None = None,
+    experiments: Mapping[str, Experiment] | None = None,
+) -> tuple[bool, Ancestry | None]:
+    lineage_sources = coefficient_lineage_sources(sources)
+    if not lineage_sources:
+        return False, None
+    for src in lineage_sources:
+        if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
+            return False, None
+    expanded = expand_coefficient_sources(lineage_sources)
+    if works is None or observations is None:
+        return True, None
+    candidate_lineage = _resolve_coefficient_sources(
+        expanded, observations, works, experiments
+    )
+    return candidate_lineage.complete, candidate_lineage
+
+
 def lineage_complete_for(
     sources: Sequence[str],
     *,
@@ -3891,18 +3913,13 @@ def lineage_complete_for(
     complete ancestry. An incomplete result is not independence.
     """
 
-    lineage_sources = coefficient_lineage_sources(sources)
-    if not lineage_sources:
-        return False
-    for src in lineage_sources:
-        if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
-            return False
-    expanded = expand_coefficient_sources(lineage_sources)
-    if works is None or observations is None:
-        return True
-    return _resolve_coefficient_sources(
-        expanded, observations, works, experiments
-    ).complete
+    complete, _candidate_lineage = _candidate_lineage_for_sources(
+        sources,
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    )
+    return complete
 
 
 def resolve_source_relation(
@@ -3923,12 +3940,14 @@ def resolve_source_relation(
         table_ids,
         asset_ids=_asset_ids(works),
     )
-    candidate_lineage = _resolve_coefficient_sources(
-        coefficient_lineage_sources(coefficient_sources),
-        observations,
-        works,
-        experiments,
+    candidate_complete, candidate_lineage = _candidate_lineage_for_sources(
+        coefficient_sources,
+        works=works,
+        observations=observations,
+        experiments=experiments,
     )
+    if not candidate_complete or candidate_lineage is None:
+        return SourceRelation.UNKNOWN
     return _source_relation_from_lineages(reference_lineage, candidate_lineage)
 
 
@@ -3970,22 +3989,12 @@ class _ScoringLineageResolver:
         if cached is not None:
             return cached
 
-        lineage_sources = coefficient_lineage_sources(source_key)
-        complete = bool(lineage_sources) and not any(
-            source in _ENGINE_SOURCE_ALIASES
-            and source not in COEFFICIENT_SOURCE_STORE_IDS
-            for source in lineage_sources
+        result = _candidate_lineage_for_sources(
+            source_key,
+            works=self.context.works,
+            observations=self.context.observations,
+            experiments=self.context.experiments,
         )
-        candidate_lineage = None
-        if complete:
-            candidate_lineage = _resolve_coefficient_sources(
-                expand_coefficient_sources(lineage_sources),
-                self.context.observations,
-                self.context.works,
-                self.context.experiments,
-            )
-            complete = candidate_lineage.complete
-        result = (complete, candidate_lineage)
         self._candidate_lineages[source_key] = result
         return result
 
