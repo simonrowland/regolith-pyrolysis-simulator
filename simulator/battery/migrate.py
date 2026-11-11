@@ -12239,24 +12239,24 @@ def _source_point_condition_total_pressure_pa(
     for raw in (obs.get("point_conditions"), values.get("point_conditions")):
         if not isinstance(raw, Mapping) or "total_pressure_Pa" not in raw:
             continue
+        raw_pressure = raw["total_pressure_Pa"]
         located = _point_condition_from_plain(
-            raw["total_pressure_Pa"], key="total_pressure_Pa"
+            raw_pressure, key="total_pressure_Pa"
         )
-        amount = _as_dec_or_none(located.state.value)
+        amount = _point_condition_decimal(raw_pressure)
         if located.state.is_value and amount is not None and amount > 0:
-            return located
+            return replace(located, state=State.of(amount))
     return None
 
 
 def _printed_source_point_condition_pressure(
     located: Located[Any] | None,
 ) -> Decimal | None:
-    """Return a condition pressure only when its source prints the set point."""
+    """Return a condition pressure unless its provenance marks it unprinted."""
 
     if (
         located is None
         or not located.state.is_value
-        or located.locator is None
         or _located_pressure_is_unprinted(located)
     ):
         return None
@@ -12278,12 +12278,11 @@ def _keeps_phase_composition_unknown_total(observation: Observation) -> bool:
 def _without_unprinted_total_pressure(
     point_conditions: Mapping[str, Located[Any]] | None,
 ) -> Mapping[str, Located[Any]] | None:
-    """Keep printed pressure and inferred pressure with explicit provenance.
+    """Drop total pressure only when source provenance marks it unprinted.
 
-    An unlocated numeric value with no derivation is unclassified and is
-    dropped. Inferred pressure stays in point conditions with its derivation,
-    while identity pressure remains unknown. The value is never promoted from
-    a partial-pressure sum.
+    An explicit value without a locator is still printed source data. Inferred
+    pressure stays in point conditions with its derivation, while identity
+    pressure remains unknown. The value is never promoted from a partial sum.
     """
 
     if not point_conditions or "total_pressure_Pa" not in point_conditions:
@@ -12292,10 +12291,7 @@ def _without_unprinted_total_pressure(
     if (
         isinstance(located, Located)
         and located.state.is_value
-        and (
-            located.locator is not None
-            or _pressure_inference_is_unprinted(located.inference)
-        )
+        and not _located_pressure_is_unprinted(located)
     ):
         return point_conditions
     kept = {
