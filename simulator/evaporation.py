@@ -37,6 +37,7 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
     melt_regime,
 )
+from simulator.physical_constants import PA_PER_BAR
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -116,6 +117,287 @@ def evaporation_flux_refusal_from_configuration_error(
             "detail": detail,
             "evaporation_flux_kg_hr": {},
         },
+    )
+
+
+# Melt debit, ledger totals, and ``species_kg_hr`` omit a vapour rate at or
+# below this floor. The publisher's ``_NONTRIVIAL_FLUX_KG_HR`` is the same
+# number. Wall-supply accounting does not use it: the integral keeps the
+# computed rate, and booking applies ledger resolution.
+_VAPOUR_DEBIT_FLOOR_KG_HR = 1e-12
+
+
+class ProjectedVapourRates(NamedTuple):
+    """Debit map, supply map, and the Fe residual-cap record.
+
+    ``debit_kg_hr`` is the publication-gated melt debit. ``supply_kg_hr``
+    is every finite non-negative gated rate, including rates the debit
+    floor dropped and rates the publisher stored only under
+    ``below_threshold_evaporation_flux``.
+    """
+
+    debit_kg_hr: dict[str, float]
+    supply_kg_hr: dict[str, float]
+    fe_allocation: dict[str, Any] | None
+
+
+def project_publisher_vapour_rates(
+    diagnostic: Mapping[str, Any] | None,
+    *,
+    liquid_fraction_factor: float = 1.0,
+    fe_residual_kg_hr: float | None = None,
+) -> ProjectedVapourRates:
+    """Split one publisher diagnostic into the melt debit and the supply.
+
+    Invariant: a finite non-negative rate the publisher computed is in
+    ``supply_kg_hr`` after the liquid-fraction factor and, for Fe, the
+    residual cap. The debit floor does not remove it. A species present
+    in ``evaporation_flux_kg_hr`` is not also taken from
+    ``below_threshold_evaporation_flux``, so the two buckets cannot
+    double-count. Only the published bucket can enter the debit, and
+    only above the floor, which is the pre-existing melt-debit rule.
+
+    ``zero_net_evaporation_flux`` is a computed drive of zero
+    (``P_eq <= P_bulk``, or a series flux of zero). Those species enter
+    the supply at 0 and stay out of the debit. A positive number in
+    that bucket is not a rate. A species already stored from a
+    published or below-threshold bucket is left as that rate.
+    """
+
+    payload = diagnostic if isinstance(diagnostic, Mapping) else {}
+    published = payload.get("evaporation_flux_kg_hr") or {}
+    if not isinstance(published, Mapping):
+        published = {}
+    below_payload = payload.get("below_threshold_evaporation_flux")
+    below: Mapping[str, Any] = {}
+    if isinstance(below_payload, Mapping):
+        raw_below = below_payload.get("fluxes_kg_hr")
+        if isinstance(raw_below, Mapping):
+            below = raw_below
+    factor = float(liquid_fraction_factor)
+    published_names = {str(species) for species in published}
+    debit: dict[str, float] = {}
+    supply: dict[str, float] = {}
+    fe_allocation: dict[str, Any] | None = None
+
+    def _store(species: str, gated: float, *, debit_eligible: bool) -> None:
+        if math.isfinite(gated) and gated >= 0.0:
+            supply[species] = gated
+        if debit_eligible and gated > _VAPOUR_DEBIT_FLOOR_KG_HR:
+            debit[species] = gated
+
+    def _cap_fe(species: str, gated: float, *, record: bool) -> float:
+        nonlocal fe_allocation
+        if species != "Fe" or fe_residual_kg_hr is None:
+            return gated
+        original = gated
+        capped = min(gated, float(fe_residual_kg_hr))
+        if record:
+            # Same record the debit loop wrote before this split. It is
+            # the capped rate, including a rate the debit floor then drops.
+            fe_allocation = {
+                "rule": "pool_first_residual",
+                "native_pool_activity_argument": (
+                    "not modeled; allocation is an explicit pool-first "
+                    "scheduling policy"
+                ),
+                "melt_fe_raw_kg_hr": float(original),
+                "melt_fe_residual_capacity_kg_hr": float(fe_residual_kg_hr),
+                "melt_fe_applied_kg_hr": float(capped),
+            }
+        return capped
+
+    for species, raw in published.items():
+        name = str(species)
+        gated = _cap_fe(name, float(raw) * factor, record=True)
+        _store(name, gated, debit_eligible=True)
+    for species, raw in below.items():
+        name = str(species)
+        if name in published_names:
+            continue
+        gated = _cap_fe(name, float(raw) * factor, record=False)
+        _store(name, gated, debit_eligible=False)
+    zero_net = payload.get("zero_net_evaporation_flux")
+    if isinstance(zero_net, Mapping):
+        for species, raw in zero_net.items():
+            name = str(species)
+            if name in supply:
+                continue
+            if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+                continue
+            rate = float(raw)
+            # Exact zero only. A positive value here would be a second
+            # publisher, and a negative value is not a computed supply.
+            if math.isfinite(rate) and rate == 0.0:
+                supply[name] = 0.0
+    return ProjectedVapourRates(debit, supply, fe_allocation)
+
+
+def wall_supply_rates_kg_hr(
+    *layers: Mapping[str, Any] | None,
+) -> dict[str, float]:
+    """Union of computed vapour rates. A later layer overwrites a species.
+
+    This is the wall-supply integrand. Every finite rate >= 0 that a
+    layer computed is retained. The melt-debit floor is not applied.
+    A missing layer adds nothing and is not a zero. Non-finite and
+    negative rates are not a computed supply. Ledger resolution is
+    applied at booking, not here.
+    """
+
+    merged: dict[str, float] = {}
+    for layer in layers:
+        if not isinstance(layer, Mapping):
+            continue
+        for species, raw in layer.items():
+            if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+                continue
+            rate = float(raw)
+            if not math.isfinite(rate) or rate < 0.0:
+                continue
+            merged[str(species)] = rate
+    return merged
+
+
+def publish_wall_supply_on_flux(
+    flux: Any,
+    computed: Mapping[str, Any] | None,
+    *,
+    debit_kg_hr: Mapping[str, Any] | None = None,
+    phase_scale: float | None = 1.0,
+) -> dict[str, float]:
+    """Write the wall-supply integrand onto ``flux.published_species_kg_hr``.
+
+    This is the only writer of that map. ``species_kg_hr`` stays the
+    melt debit: a carrier at or below the debit floor, or one whose
+    evaporation transition was not committed, may be absent there. The
+    supply map still carries every computed rate.
+
+    An existing published map is already the phase-scaled debit plus any
+    computed rates merged earlier, so a second call does not scale it
+    again. Otherwise the debit layer is ``debit_kg_hr``, or
+    ``flux.species_kg_hr`` when that argument is omitted, multiplied by
+    ``phase_scale`` (None means 1). Computed rates the debit layer
+    omitted are added from ``computed``. Where both name a species, the
+    debit layer wins, so a post-depletion rate is not replaced by the
+    pre-depletion publisher rate.
+    """
+
+    existing = getattr(flux, "published_species_kg_hr", None)
+    if isinstance(existing, Mapping):
+        debit_layer: Mapping[str, Any] = existing
+    else:
+        source = (
+            debit_kg_hr
+            if debit_kg_hr is not None
+            else getattr(flux, "species_kg_hr", None)
+        )
+        scale = 1.0 if phase_scale is None else float(phase_scale)
+        scaled: dict[str, float] = {}
+        if isinstance(source, Mapping):
+            for species, raw in source.items():
+                if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+                    continue
+                rate = float(raw) * scale
+                if math.isfinite(rate) and rate >= 0.0:
+                    scaled[str(species)] = rate
+        debit_layer = scaled
+    published = wall_supply_rates_kg_hr(computed, debit_layer)
+    flux.published_species_kg_hr = published
+    return published
+
+
+# Dynamic attribute, not an EvaporationFlux field. Condensation keys off
+# species_kg_hr and carrier_authority_by_species; this evidence is read
+# only by the wall-supply interval classifier.
+WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR = "wall_supply_interval_physical_zero"
+WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE = "authorized_zero"
+# Whole-interval physical zeros. A zero-net carrier is not in this set:
+# that species' computed rate is 0 on the supply map, and a sibling the
+# publisher did not compute stays an omission. The pre-RG empty
+# effective-pressure map below 1050 C is not in this set either: a
+# PressureValue can sit on a FluxRefusal or an upper bound, and that
+# channel is not a physical zero (d-367).
+WALL_SUPPLY_INTERVAL_ZERO_REASONS = frozenset({
+    "zero_liquid",
+    "non_evaporation_campaign",
+    "frozen_before_evaporation",
+    "below_400K",
+    "proven_empty_inventory",
+})
+
+
+def note_wall_supply_interval_physical_zero(
+    flux: Any,
+    *,
+    reason: str,
+    host: Any | None = None,
+) -> None:
+    """Record that this interval evaporates no species.
+
+    The snapshot writer copies the host record onto whatever flux
+    object is stored, including a condensation replacement. The
+    classifier then treats a species absent from that interval's rate
+    map as this physical zero, unless that species' channel is a
+    refusal or an upper bound. Those stay unavailable: the certificate
+    does not price the other hours. A computed rate on the same
+    interval is unchanged. Callers are the known non-evaporating
+    returns only. An unexplained omission must not call this.
+    """
+
+    token = str(reason).strip()
+    if token not in WALL_SUPPLY_INTERVAL_ZERO_REASONS:
+        raise ValueError(
+            "unknown wall-supply interval physical-zero reason "
+            f"{reason!r}"
+        )
+    record = {
+        "reason": token,
+        "evidence": WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE,
+    }
+    setattr(flux, WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR, dict(record))
+    if host is not None:
+        host._wall_supply_interval_physical_zero = dict(record)
+
+
+def evaporation_flux_for_campaign_hour(
+    *,
+    evaporation_campaign: bool,
+    host: Any | None = None,
+) -> EvaporationFlux:
+    """Flux object for one hour.
+
+    C5, MRE, C6, and C7 do not evaporate. The empty rate map is a
+    physical zero for every species, not a missing flux.
+    """
+
+    flux = EvaporationFlux()
+    if not evaporation_campaign:
+        note_wall_supply_interval_physical_zero(
+            flux,
+            reason="non_evaporation_campaign",
+            host=host,
+        )
+    return flux
+
+
+def attach_wall_supply_interval_physical_zero(flux: Any, host: Any) -> None:
+    """Copy the hour's interval zero onto the flux the snapshot keeps."""
+
+    record = getattr(host, "_wall_supply_interval_physical_zero", None)
+    if not isinstance(record, Mapping):
+        return
+    reason = str(record.get("reason") or "").strip()
+    evidence = str(record.get("evidence") or "")
+    if (
+        reason not in WALL_SUPPLY_INTERVAL_ZERO_REASONS
+        or evidence != WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE
+    ):
+        return
+    setattr(
+        flux,
+        WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR,
+        {"reason": reason, "evidence": evidence},
     )
 
 
@@ -765,11 +1047,382 @@ class EvaporationMixin:
             self, '_melt_headspace_composition_mbar', {}) or {}
         return float(melt_headspace_partials_mbar.get(species, 0.0)) * 100.0
 
+    def _langmuir_headspace_partials_Pa(
+        self,
+        species_ids: Mapping[str, Any] | Any,
+    ) -> dict[str, float]:
+        """Every positive headspace partial the film may sum, in Pa.
+
+        The persisted composition is the vector. ``species_ids`` (the
+        vapor map) is not an allowlist: a carrier absent from it, such
+        as N2, still sets the realized total. Those keys are extra
+        reader queries, so a reader that does not store partials on the
+        composition map still answers for them. O2 is queried too, so a
+        reader that stores the overhead bound outside that map still
+        supplies it. A missing reader is an empty headspace, not a zero
+        substituted for a measurement the caller withheld.
+
+        d-376 round 6. Kn and diffusivity use one pressure,
+        ``max(sum of this vector, commanded melt pressure)``.
+        Intersecting with the vapor map and then adding O2 left a
+        commanded total of 0 on vacuum transport under 1000 Pa of
+        persisted N2.
+        """
+
+        reader = getattr(self, "_evaporation_bulk_partial_pressure_pa", None)
+        if not callable(reader):
+            return {}
+        composition = getattr(self, "_melt_headspace_composition_mbar", None) or {}
+        names: list[Any] = []
+        if isinstance(composition, Mapping):
+            names.extend(composition)
+        # Extra queries, not a filter. Dropping any name that is absent
+        # from this list was the vacuum-transport hole.
+        names.extend(species_ids)
+        if not any(str(species) == "O2" for species in names):
+            names.append("O2")
+        partials: dict[str, float] = {}
+        seen: set[str] = set()
+        for species in names:
+            label = str(species)
+            if label in seen:
+                continue
+            seen.add(label)
+            try:
+                value = float(reader(species))
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(value) and value > 0.0:
+                partials[label] = value
+        return partials
+
+    def _langmuir_film(
+        self,
+        partials_Pa: Mapping[str, float] | None,
+    ) -> tuple[dict[str, float], float]:
+        """The one partial vector and transport pressure for an evaluation.
+
+        Positive finite partials only. A non-positive entry is not a
+        bulk and does not enter the sum. This method does not intersect
+        the vector with the vapor map: every positive key, including a
+        non-vapor carrier, is in the sum. The transport pressure is the
+        flux provider's ``max(partial sum, commanded melt pressure)``
+        when that reader exists, and the partial sum when it does not.
+        That one pressure is what Kn and diffusivity use. The surface
+        root and the flux kernel both consume this pair. Neither sums
+        a second vector.
+        """
+
+        cleaned: dict[str, float] = {}
+        for species, value in dict(partials_Pa or {}).items():
+            try:
+                number = float(value)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(number) and number > 0.0:
+                cleaned[str(species)] = number
+        reader = getattr(self, "_evaporation_overhead_total_pressure_Pa", None)
+        if callable(reader):
+            pressure = float(reader(cleaned))
+        else:
+            pressure = sum(cleaned.values())
+        return cleaned, pressure
+
+    def _langmuir_transport(
+        self,
+        partials_Pa: Mapping[str, float],
+        temperature_K: float,
+        overhead_pressure_Pa: float,
+    ) -> Any:
+        """Series-resistance knobs for one already-filmed pressure.
+
+        ``overhead_pressure_Pa`` is the value ``_langmuir_film`` returned
+        for these partials. This method does not sum them again.
+        """
+
+        from engines.builtin.evaporation_flux import (
+            resolve_gas_resistance_enabled,
+        )
+        from simulator.condensation import _knudsen_number
+        from simulator.langmuir_surface_oxygen import LangmuirTransport
+        from simulator.transport_regime import continuum_validity_refuses
+
+        kernel_config = dict(
+            (getattr(self, "setpoints", {}) or {}).get("chemistry_kernel", {})
+            or {}
+        )
+        series_config = dict(
+            kernel_config.get("evaporation_series_resistance", {}) or {}
+        )
+        # Green's publisher film policy, the same parent the flux
+        # controls will have. Nested ``evaporation_series_resistance``
+        # wins; otherwise the film is on. The top-level kernel flag is
+        # not that parent and is not copied onto the controls: a
+        # buffered in-band melt keeps green's film. b-906 round 7.
+        gas_resistance_enabled = resolve_gas_resistance_enabled(
+            series_config, {}
+        )
+        overhead_model = getattr(self, "overhead_model", None)
+        try:
+            pipe_diameter_m = float(
+                getattr(overhead_model, "pipe_diameter_m", 0.12) or 0.12
+            )
+        except (TypeError, ValueError):
+            pipe_diameter_m = 0.12
+        overhead = getattr(self, "overhead", None)
+        try:
+            gas_temperature_K = float(
+                getattr(overhead, "headspace_temperature_K", 0.0) or 0.0
+            )
+        except (TypeError, ValueError):
+            gas_temperature_K = 0.0
+        if not math.isfinite(gas_temperature_K) or gas_temperature_K <= 0.0:
+            gas_temperature_K = float(temperature_K)
+        stir = getattr(getattr(self, "melt", None), "stir_state", None)
+        try:
+            axial = clamp_stir_factor(float(getattr(stir, "axial", 0.0) or 0.0))
+        except (TypeError, ValueError):
+            axial = 0.0
+        try:
+            radial_source = getattr(stir, "radial", 1.0) if stir is not None else 1.0
+            radial = clamp_stir_factor(float(radial_source or 0.0))
+        except (TypeError, ValueError):
+            radial = 1.0
+        try:
+            overhead_pressure_Pa = float(overhead_pressure_Pa)
+        except (TypeError, ValueError):
+            overhead_pressure_Pa = math.nan
+        if not math.isfinite(overhead_pressure_Pa) or overhead_pressure_Pa < 0.0:
+            overhead_pressure_Pa = 0.0
+        carrier_resolver = getattr(self, "_resolve_condensation_carrier_gas", None)
+        carrier_gas = carrier_resolver() if callable(carrier_resolver) else "N2"
+        campaign = getattr(
+            getattr(getattr(self, "melt", None), "campaign", None),
+            "name",
+            None,
+        )
+        if not isinstance(campaign, str) or not campaign.strip():
+            campaign = None
+        else:
+            campaign = campaign.strip()
+        catalog = getattr(self, "vapor_pressures", None)
+        hkl = frozenset(
+            _load_hkl_upper_bound_transport_species(
+                catalog if isinstance(catalog, dict) else {}
+            )
+        )
+        extrapolate = False
+        if gas_resistance_enabled and overhead_pressure_Pa > 0.0 and pipe_diameter_m > 0.0:
+            knudsen = _knudsen_number(
+                overhead_pressure_Pa,
+                max(gas_temperature_K, 1.0),
+                pipe_diameter_m,
+                carrier_gas=str(carrier_gas),
+            )
+            commanded_pressure_Pa = max(
+                0.0,
+                float(
+                    getattr(getattr(self, "melt", None), "p_total_mbar", 0.0)
+                    or 0.0
+                )
+                * 100.0,
+            )
+            diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
+                knudsen_number=knudsen,
+                overhead_pressure_pa=overhead_pressure_Pa,
+                commanded_pressure_pa=commanded_pressure_Pa,
+                pipe_diameter_m=pipe_diameter_m,
+                gas_temperature_K=gas_temperature_K,
+                carrier_gas=str(carrier_gas),
+                campaign_name=campaign,
+                asking_site="simulator.langmuir_surface_oxygen",
+            )
+            extrapolate = bool(
+                diagnostic
+                and continuum_validity_refuses(diagnostic)
+                and diagnostic.get("reason") == "viscous_p_bulk_transport_out_of_domain"
+            )
+        return LangmuirTransport(
+            temperature_K=float(temperature_K),
+            pipe_diameter_m=pipe_diameter_m,
+            gas_temperature_K=gas_temperature_K,
+            carrier_gas=str(carrier_gas or "N2"),
+            axial_stir_factor=axial,
+            radial_stir_factor=radial,
+            overhead_pressure_Pa=overhead_pressure_Pa,
+            gas_resistance_enabled=gas_resistance_enabled,
+            hkl_upper_bound_species=hkl,
+            extrapolate_continuum=extrapolate,
+            campaign_name=campaign,
+        )
+
+    def _closed_langmuir_pressures_for_partials(
+        self,
+        publication_Pa: Mapping[str, float],
+        *,
+        temperature_K: float,
+        overhead_partials_Pa: Mapping[str, float] | None,
+        provenance_by_species: Mapping[str, Mapping[str, Any]] | None,
+        source_reaction_fO2_bar: float | None,
+        transport_pO2_bar: float | None,
+        melt_redox_capacity_mol_per_ln_fO2: float | None,
+        overhead_pressure_Pa: float | None = None,
+    ) -> Any:
+        """Close the flux map on one partial vector. The only writer call."""
+
+        from engines.builtin.evaporation_flux import (
+            alpha_policy_controls,
+            publisher_alpha_policy,
+        )
+        from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
+
+        kernel_config = dict(
+            (getattr(self, "setpoints", {}) or {}).get("chemistry_kernel", {})
+            or {}
+        )
+        allow_fallback, fallback_species = publisher_alpha_policy(
+            alpha_policy_controls(kernel_config)
+        )
+        if overhead_pressure_Pa is None:
+            partials, overhead_pressure_Pa = EvaporationMixin._langmuir_film(
+                self, overhead_partials_Pa
+            )
+        else:
+            partials = dict(overhead_partials_Pa or {})
+        return apply_langmuir_surface_oxygen(
+            publication_Pa,
+            temperature_K=temperature_K,
+            provenance_by_species=provenance_by_species,
+            source_reaction_fO2_bar=source_reaction_fO2_bar,
+            transport_pO2_bar=transport_pO2_bar,
+            legacy_catalog=getattr(self, "vapor_pressures", None),
+            compiled_catalog=getattr(self, "vapour_rail_catalog", None),
+            melt_redox_capacity_mol_per_ln_fO2=(
+                melt_redox_capacity_mol_per_ln_fO2
+            ),
+            overhead_partials_Pa=partials,
+            transport=EvaporationMixin._langmuir_transport(
+                self,
+                partials,
+                temperature_K,
+                overhead_pressure_Pa,
+            ),
+            allow_unmeasured_alpha_fallback=allow_fallback,
+            unmeasured_alpha_fallback_species_allowlist=fallback_species,
+        )
+
+    def _reclose_langmuir_pressures(
+        self,
+        overhead_partials_Pa: Mapping[str, float],
+    ) -> Any | None:
+        """Re-enter the closure for a later partial vector on this step.
+
+        Finite-capacity iterations must not keep the map closed on the
+        partials from the start of the step. A missing context means this
+        step did not publish a flux map.
+        """
+
+        context = getattr(self, "_langmuir_flux_closure_context", None)
+        if not isinstance(context, Mapping):
+            return None
+        return EvaporationMixin._closed_langmuir_pressures_for_partials(
+            self,
+            context["publication_Pa"],
+            temperature_K=float(context["temperature_K"]),
+            overhead_partials_Pa=overhead_partials_Pa,
+            provenance_by_species=context.get("provenance_by_species"),
+            source_reaction_fO2_bar=context.get("source_reaction_fO2_bar"),
+            transport_pO2_bar=context.get("transport_pO2_bar"),
+            melt_redox_capacity_mol_per_ln_fO2=context.get(
+                "melt_redox_capacity_mol_per_ln_fO2"
+            ),
+        )
+
+    def _langmuir_overhead_pO2_bar(self) -> float | None:
+        """Upstream headspace O2 partial, in bar.
+
+        The evaporation backpressure reader returns Pa. Dividing by
+        ``PA_PER_BAR`` (1e5 Pa/bar) is the same partial the overhead
+        lower bound compares with the congruent surface. No O2 in the
+        headspace is not a bound.
+        """
+
+        try:
+            partial_pa = float(self._evaporation_bulk_partial_pressure_pa("O2"))
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(partial_pa) or partial_pa <= 0.0:
+            return None
+        return partial_pa / PA_PER_BAR
+
+    def _langmuir_melt_redox_capacity_mol_per_ln_fO2(
+        self,
+        *,
+        temperature_K: float,
+        eval_pO2_bar: float | None,
+    ) -> float | None:
+        """Reservoir source capacity for the surface-pO2 gate.
+
+        The no-buffer test is ``_melt_redox_source_capacity_mol_per_ln_fO2
+        <= OXYGEN_RESERVOIR_NOOP_MOL`` (``no_melt_redox_capacity``). That
+        source capacity is ``C_m_full`` times the reservoir liquid-fraction
+        factor, not ``equilibrium.liquid_fraction``. A missing method or a
+        non-finite result is not a buffer measurement. The liquid-fraction
+        factor's ``unavailable`` status returns 0 as a sentinel; that
+        sentinel is not ``C_m ~ 0`` unless ``C_m_full`` itself is already
+        at the noop floor (no Fe). Pure CaO has ``n_Fe = 0``, so the full
+        term is 0 and this returns 0.
+        """
+
+        method = getattr(
+            self, "_melt_redox_source_capacity_mol_per_ln_fO2", None
+        )
+        if (
+            not callable(method)
+            or eval_pO2_bar is None
+            or not math.isfinite(eval_pO2_bar)
+            or eval_pO2_bar <= 0.0
+        ):
+            return None
+        try:
+            capacity = float(method(
+                fO2_log=math.log10(float(eval_pO2_bar)),
+                T_K=float(temperature_K),
+            ))
+        except (TypeError, ValueError, OverflowError):
+            return None
+        if not math.isfinite(capacity):
+            return None
+        diagnostic = getattr(
+            self, "_last_melt_redox_liquid_fraction_diagnostic", None
+        )
+        if (
+            isinstance(diagnostic, Mapping)
+            and diagnostic.get("status") == "unavailable"
+        ):
+            full_method = getattr(
+                self, "_melt_redox_capacity_mol_per_ln_fO2", None
+            )
+            if not callable(full_method):
+                return None
+            try:
+                full = float(full_method(
+                    fO2_log=math.log10(float(eval_pO2_bar)),
+                    T_K=float(temperature_K),
+                ))
+            except (TypeError, ValueError, OverflowError):
+                return None
+            if not math.isfinite(full) or full > 0.0:
+                return None
+            return full
+        return capacity
+
     def _resolve_evaporation_batch_flux_state(
         self,
         equilibrium: Any,
         *,
         temperature_K: float,
+        overhead_partials_Pa: Mapping[str, float] | None = None,
     ) -> tuple[
         dict[str, float],
         dict[str, Any],
@@ -786,6 +1439,23 @@ class EvaporationMixin:
         flux at another partial-pressure vector (the finite cold-train
         shadow) must pass this map so a flagged transitional species is
         priced with its flag instead of dropped from the solved set.
+
+        The returned map is that shared input after the d-376 amendment 1
+        surface closure. The congruent balance runs only when the
+        evaluated pO2 is at the physical floor or the reservoir
+        no-buffer test is true (source capacity <= the noop floor, not
+        ``equilibrium.liquid_fraction`` times ``C_m_full``). Transport-
+        headspace pressures, including SiO, stay published. The root is
+        the publisher net-flux balance at ``overhead_partials_Pa`` (the
+        persisted headspace when the caller passes none). It is not a
+        vacuum root clamped to the overhead partial. Everywhere else the
+        map stays the reservoir / mass-action publication. Finite
+        cold-train capacity re-enters through
+        ``_reclose_langmuir_pressures`` on each partial vector, starting
+        from the publication stored here, so a later headspace does not
+        keep the first vector's pressures. ``equilibrium`` vapor
+        pressures stay the mass-action law; the shadow comparison above
+        the closure still checks that provider seam.
         """
         vapor_pressure_diagnostic = dict(
             getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
@@ -819,6 +1489,105 @@ class EvaporationMixin:
                 resolution_error=resolve_error or None,
             )
         )
+        # Shadow equality is the unadjusted provider seam. The surface
+        # balance below is the flux boundary both consumers must share.
+        if hasattr(self, "_last_langmuir_surface_oxygen"):
+            del self._last_langmuir_surface_oxygen
+
+        source_reaction_fO2_bar = vapor_pressure_diagnostic.get(
+            "source_reaction_fO2_bar"
+        )
+        try:
+            eval_pO2_bar = float(source_reaction_fO2_bar)
+        except (TypeError, ValueError):
+            eval_pO2_bar = None
+        else:
+            if not math.isfinite(eval_pO2_bar) or eval_pO2_bar <= 0.0:
+                eval_pO2_bar = None
+        # Namespace fakes bind this resolver without the mixin helpers.
+        # A missing reader is not a measurement: capacity stays unknown
+        # (not ``C_m ~ 0``) and there is no headspace partial.
+        capacity_reader = getattr(
+            self, "_langmuir_melt_redox_capacity_mol_per_ln_fO2", None
+        )
+        capacity = (
+            capacity_reader(
+                temperature_K=temperature_K,
+                eval_pO2_bar=eval_pO2_bar,
+            )
+            if callable(capacity_reader)
+            else None
+        )
+        if overhead_partials_Pa is None:
+            # Call the mixin directly. A namespace host binds the
+            # resolver without copying every helper onto itself; the
+            # helper then uses whatever bulk reader that host has.
+            # ``vapor_pressures`` is not a filter: the helper returns
+            # every positive persisted partial, and the film sums it.
+            partials = EvaporationMixin._langmuir_headspace_partials_Pa(
+                self, vapor_pressures
+            )
+        else:
+            # This evaluation's vector, including explicit zeros. Do not
+            # fill gaps from the persisted headspace: a same-step
+            # accumulation that omitted a species has no bulk for it.
+            partials = {}
+            for species, value in overhead_partials_Pa.items():
+                try:
+                    number = float(value)
+                except (TypeError, ValueError):
+                    continue
+                if math.isfinite(number):
+                    partials[str(species)] = number
+        provenance = (
+            vapor_pressure_diagnostic.get(
+                "vapor_pressure_numerator_provenance"
+            )
+            or {}
+        )
+        transport_pO2_bar = vapor_pressure_diagnostic.get("pO2_bar")
+        # One film. The publisher reads these two fields. It does not
+        # rebuild the vector from the vapor-map keys.
+        partials, film_pressure = EvaporationMixin._langmuir_film(
+            self, partials
+        )
+        # Pre-close publication. Capacity iterations re-enter from this
+        # map; closing the already-adjusted map would apply the power
+        # law twice. Only this resolver stores the diagnostic.
+        self._langmuir_flux_closure_context = {
+            "publication_Pa": dict(vapor_pressures),
+            "temperature_K": float(temperature_K),
+            "provenance_by_species": provenance,
+            "source_reaction_fO2_bar": source_reaction_fO2_bar,
+            "transport_pO2_bar": transport_pO2_bar,
+            "melt_redox_capacity_mol_per_ln_fO2": capacity,
+            "film_partials_Pa": partials,
+            "film_pressure_Pa": film_pressure,
+            "root_closed": False,
+        }
+        langmuir_surface = (
+            EvaporationMixin._closed_langmuir_pressures_for_partials(
+                self,
+                vapor_pressures,
+                temperature_K=temperature_K,
+                overhead_partials_Pa=partials,
+                provenance_by_species=provenance,
+                source_reaction_fO2_bar=source_reaction_fO2_bar,
+                transport_pO2_bar=transport_pO2_bar,
+                melt_redox_capacity_mol_per_ln_fO2=capacity,
+                overhead_pressure_Pa=film_pressure,
+            )
+        )
+        self._langmuir_flux_closure_context["root_closed"] = bool(
+            langmuir_surface.applied
+            and langmuir_surface.surface_pO2_bar is not None
+        )
+        if langmuir_surface.applied:
+            vapor_pressures = dict(langmuir_surface.pressures_Pa)
+            diagnostic = langmuir_surface.as_diagnostic()
+            diagnostic["overhead_partials_Pa"] = dict(partials)
+            diagnostic["overhead_pressure_Pa"] = film_pressure
+            self._last_langmuir_surface_oxygen = diagnostic
         return (
             vapor_pressures,
             flux_overlay_report,
@@ -827,6 +1596,65 @@ class EvaporationMixin:
             vapor_pressure_diagnostic,
             effective_pressure_source,
         )
+
+    def _evaporation_publisher_film(
+        self,
+        vapor_pressures: Mapping[str, float],
+        overhead_partials_override_Pa: Mapping[str, float] | None,
+    ) -> tuple[dict[str, float], float]:
+        """Partial vector and transport pressure the flux kernel emits.
+
+        Invariant: when this step closed a surface root, the kernel
+        receives that root's film (``_langmuir_film`` stored it). The
+        publisher does not rebuild the vector from the vapor-map keys.
+        Rebuilding drops synthetic O2, so a commanded pressure below the
+        overhead partial sum publishes a vacuum film under a root that
+        used the O2 gas film.
+
+        An explicit override is that evaluation's vector; the resolver
+        already filmed it. A step that did not close a root and has no
+        explicit vector keeps the vapor-map backpressure, zeros included.
+        d-376 amendment 1 leaves that buffered in-band flux on green:
+        the root did not run, and adopting its unused film would change
+        the gas resistance of pressures the gate kept. The stored film
+        still holds the complete persisted vector, non-vapor carriers
+        included; this branch does not rebuild that vector from the
+        vapor-map keys.
+        """
+
+        context = getattr(self, "_langmuir_flux_closure_context", None)
+        root_closed = (
+            isinstance(context, Mapping) and bool(context.get("root_closed"))
+        )
+        if root_closed or overhead_partials_override_Pa is not None:
+            if (
+                not isinstance(context, Mapping)
+                or "film_partials_Pa" not in context
+                or "film_pressure_Pa" not in context
+            ):
+                raise EvaporationFluxRefusal(
+                    "langmuir_film_missing",
+                    {
+                        "reason": "langmuir_film_missing",
+                        "detail": (
+                            "evaporation flux requires the film stored by "
+                            "the surface evaluation"
+                        ),
+                        "evaporation_flux_kg_hr": {},
+                    },
+                )
+            partials = dict(context["film_partials_Pa"])
+            for species in vapor_pressures:
+                partials.setdefault(species, 0.0)
+            return partials, float(context["film_pressure_Pa"])
+        partials = {
+            species: self._evaporation_bulk_partial_pressure_pa(species)
+            for species in vapor_pressures
+        }
+        for species in vapor_pressures:
+            partials.setdefault(species, 0.0)
+        _cleaned, pressure = EvaporationMixin._langmuir_film(self, partials)
+        return partials, pressure
 
     def _calculate_evaporation(
         self,
@@ -879,7 +1707,14 @@ class EvaporationMixin:
         """
         T_K = self.melt.temperature_C + 273.15
         flux = EvaporationFlux()
+        # A previous hour's computed rates must not leak into a tick that
+        # returns before the publisher projection. The interval-zero
+        # record is the same: a later real flux must not inherit it.
+        self._wall_supply_computed_kg_hr = {}
+        self._wall_supply_interval_physical_zero = None
         self._last_partial_melt_offgassing_diagnostic = {}
+        if hasattr(self, "_last_langmuir_surface_oxygen"):
+            del self._last_langmuir_surface_oxygen
 
         # Hostile uncertified melt model must refuse even below the 400 K
         # kinetic floor so cold early hours cannot mask the config as ok.
@@ -922,6 +1757,11 @@ class EvaporationMixin:
             self._last_vapour_batch_flux_overlay = {}
             self._last_vapour_batch_resolve_error = {}
             self._last_imcc_activity_shadow = {}
+            note_wall_supply_interval_physical_zero(
+                flux,
+                reason="zero_liquid",
+                host=self,
+            )
             return flux
 
         # VR-11: batch owns channel refusal, eligibility, and active membership.
@@ -936,6 +1776,7 @@ class EvaporationMixin:
         ) = self._resolve_evaporation_batch_flux_state(
             equilibrium,
             temperature_K=T_K,
+            overhead_partials_Pa=overhead_partials_override_Pa,
         )
         batch_report = serialize_vapour_batch(vapour_batch)
         if isinstance(batch_report, Mapping):
@@ -1042,6 +1883,11 @@ class EvaporationMixin:
                 doctrine_category=CATEGORY_PROVEN_ZERO,
             )
             self._last_evaporation_flux_diagnostic = diagnostic
+            note_wall_supply_interval_physical_zero(
+                flux,
+                reason="proven_empty_inventory",
+                host=self,
+            )
             return flux
 
         if not vapor_pressures:
@@ -1060,15 +1906,28 @@ class EvaporationMixin:
                     'vapour_batch_flux_overlay': flux_overlay_report,
                     'vapour_batch': batch_report,
                 }
+                note_wall_supply_interval_physical_zero(
+                    flux,
+                    reason="below_400K",
+                    host=self,
+                )
                 return flux
             if (
                 effective_pressure_source.physical_zero_reason is not None
                 and flux_overlay_report.get('batch_pa_by_species')
             ):
-                # The typed pre-RG seam proves its own below-threshold zero,
-                # while the batch proves catalog pressure coverage. A refused
-                # or missing catalog channel still reaches fail-closed handling
-                # below (kernel_ok_empty split remains intact).
+                # Evaporation cheap zero only. Below 1050 C an empty
+                # effective-pressure map plus any finite catalog
+                # PressureValue returns no flux. That PressureValue is
+                # not physical-zero evidence: it is written for a
+                # FluxRefusal and for a diagnostic upper bound as well
+                # as for a dormant eligible channel. A whole-interval
+                # certificate would cover every absent species, including
+                # those channels and any wall species this hour did not
+                # answer, and the other hours' partial sum would be
+                # booked (d-367). Species with their own zero record
+                # stay covered at the classifier. This return does not
+                # stamp one.
                 return flux
             vapor_pressure_diagnostic = dict(
                 getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
@@ -1160,6 +2019,11 @@ class EvaporationMixin:
                 diagnostic,
             )
         if T_K < 400:  # Catalog pressure exists; thermal physical zero.
+            note_wall_supply_interval_physical_zero(
+                flux,
+                reason="below_400K",
+                host=self,
+            )
             return flux
         # b-149 instance 4: partial channel refusals. When some channels debit
         # and others are typed refusals, refused species drop out of
@@ -1218,21 +2082,41 @@ class EvaporationMixin:
         # Uses the previous hour's upstream melt-headspace/duct partials as
         # backpressure. ``overhead.composition`` is the physically distinct
         # post-condensation report, so near-total capture must not erase P_bulk
-        # above the melt. Gas pO2 has already been applied once upstream in
-        # the equilibrium vapor pressures consumed here.
-        overhead_partials_Pa = (
-            {
-                str(species): max(0.0, float(value))
-                for species, value in overhead_partials_override_Pa.items()
-            }
-            if overhead_partials_override_Pa is not None
-            else {
-                species: self._evaporation_bulk_partial_pressure_pa(species)
-                for species in vapor_pressures
-            }
+        # above the melt. The flux map was already closed on the film stored
+        # by ``_resolve_evaporation_batch_flux_state`` (the override when the
+        # capacity shadow supplies one). The kernel receives that film from
+        # ``_evaporation_publisher_film``. Do not rebuild it from the vapor
+        # map: that drops synthetic O2. Do not solve again here: a second
+        # pass would scale the adjusted pressures as if they were still the
+        # persisted melt-fO2 publication. A different partial vector
+        # re-enters from the stored publication via
+        # ``_reclose_langmuir_pressures``. equilibrium vapor pressures
+        # stay the melt-supported law.
+        langmuir_notice = getattr(self, "_last_langmuir_surface_oxygen", None)
+        if isinstance(langmuir_notice, dict) and langmuir_notice.get("warning"):
+            equilibrium_warnings = getattr(equilibrium, "warnings", None)
+            if isinstance(equilibrium_warnings, list):
+                # One surface-balance notice per equilibrium. The pO2 and
+                # residual text change every call; replace the previous
+                # notice instead of appending a new string each hour.
+                from simulator.langmuir_surface_oxygen import (
+                    LANGMUIR_SURFACE_PO2_REASON,
+                )
+
+                warning = str(langmuir_notice["warning"])
+                equilibrium_warnings[:] = [
+                    item
+                    for item in equilibrium_warnings
+                    if LANGMUIR_SURFACE_PO2_REASON not in str(item)
+                ]
+                equilibrium_warnings.append(warning)
+        overhead_partials_Pa, overhead_pressure_Pa = (
+            EvaporationMixin._evaporation_publisher_film(
+                self,
+                vapor_pressures,
+                overhead_partials_override_Pa,
+            )
         )
-        for species in vapor_pressures:
-            overhead_partials_Pa.setdefault(species, 0.0)
 
         # F-B1: EVAPORATION_FLUX is read-only -- no commit_batch follows.
         # The dispatch-only helper centralises melt-derived T/P plumbing
@@ -1243,12 +2127,7 @@ class EvaporationMixin:
                 self,
                 equilibrium,
                 overhead_partials_Pa=overhead_partials_Pa,
-                overhead_pressure_pa=(
-                    EvaporationMixin._evaporation_overhead_total_pressure_Pa(
-                        self,
-                        overhead_partials_Pa,
-                    )
-                ),
+                overhead_pressure_pa=overhead_pressure_Pa,
                 vapour_batch_flux_pressures_Pa=vapor_pressures,
                 vapour_batch_report=batch_report,
                 vapour_batch_flux_overlay=flux_overlay_report,
@@ -1278,6 +2157,9 @@ class EvaporationMixin:
             from simulator.silent_zero import merge_notes_into_mapping
 
             merge_notes_into_mapping(diagnostic, _partial_sz_notes)
+        langmuir_notice = getattr(self, "_last_langmuir_surface_oxygen", None)
+        if isinstance(langmuir_notice, dict):
+            diagnostic["langmuir_surface_oxygen"] = langmuir_notice
         self._last_evaporation_flux_diagnostic = diagnostic
         missing_transport = diagnostic.get('missing_transport_parameters', {})
         if isinstance(missing_transport, Mapping):
@@ -1414,50 +2296,72 @@ class EvaporationMixin:
                 melt_regime(liquid_fraction=liquid_fraction_factor)
                 == MeltRegime.FROZEN
             ):
+                # Frozen melt: this early return is the pre-existing gate.
+                # It runs only when the published bucket is non-empty, so a
+                # below-only hour is still projected below. Expanding the
+                # gate to that hour would ask for a liquid-fraction curve
+                # the published bucket never needed. Default setpoint: off.
+                # The published rates are not the supply: the melt is
+                # frozen, so this hour evaporates nothing. The empty map
+                # needs the interval record or the wall integral withholds
+                # every species for the whole run.
+                note_wall_supply_interval_physical_zero(
+                    flux,
+                    reason="frozen_before_evaporation",
+                    host=self,
+                )
                 flux.update_totals()
                 return flux
-        for species, rate_kg_hr in flux_kg_hr.items():
-            gated_rate_kg_hr = float(rate_kg_hr) * liquid_fraction_factor
-            if species == 'Fe':
-                residual_capacity_mol = getattr(
-                    self,
-                    '_native_fe_vapor_residual_capacity_mol_this_hr',
-                    None,
+        below_fluxes: Mapping[str, Any] = {}
+        below_payload = diagnostic.get('below_threshold_evaporation_flux')
+        if isinstance(below_payload, Mapping):
+            raw_below = below_payload.get('fluxes_kg_hr')
+            if isinstance(raw_below, Mapping):
+                below_fluxes = raw_below
+        # Fe in either publisher bucket shares the residual cap. The
+        # allocation record stays on the published bucket only, which is
+        # what project_publisher_vapour_rates records.
+        fe_in_publisher = (
+            (isinstance(flux_kg_hr, Mapping) and 'Fe' in flux_kg_hr)
+            or 'Fe' in below_fluxes
+        )
+        fe_residual_kg_hr = None
+        if fe_in_publisher:
+            residual_capacity_mol = getattr(
+                self,
+                '_native_fe_vapor_residual_capacity_mol_this_hr',
+                None,
+            )
+            if residual_capacity_mol is not None:
+                fe_molar_mass = float(molar_masses_kg_mol.get('Fe', 0.0) or 0.0)
+                # Explicit scheduling policy, not an activity calculation:
+                # native-pool Fe claims the shared transport capacity first,
+                # then melt-derived Fe is capped at the residual molar
+                # capacity times M_Fe [kg/mol], yielding kg/h. No pool or
+                # melt activity is an operand here. Limiting cases: zero
+                # residual gives zero melt-derived Fe; residual >= raw
+                # rate/M_Fe leaves the raw melt-derived rate unchanged.
+                fe_residual_kg_hr = (
+                    max(0.0, float(residual_capacity_mol)) * fe_molar_mass
                 )
-                if residual_capacity_mol is not None:
-                    fe_molar_mass = float(molar_masses_kg_mol.get('Fe', 0.0) or 0.0)
-                    residual_capacity_kg_hr = max(
-                        0.0,
-                        float(residual_capacity_mol),
-                    ) * fe_molar_mass
-                    # Explicit scheduling policy, not an activity calculation:
-                    # native-pool Fe claims the shared transport capacity first,
-                    # then melt-derived Fe is capped at the residual molar
-                    # capacity times M_Fe [kg/mol], yielding kg/h. No pool or
-                    # melt activity is an operand here. Limiting cases: zero
-                    # residual gives zero melt-derived Fe; residual >= raw
-                    # rate/M_Fe leaves the raw melt-derived rate unchanged.
-                    original_gated_rate = gated_rate_kg_hr
-                    gated_rate_kg_hr = min(gated_rate_kg_hr, residual_capacity_kg_hr)
-                    diagnostic['native_fe_capacity_allocation'] = {
-                        'rule': 'pool_first_residual',
-                        'native_pool_activity_argument': (
-                            'not modeled; allocation is an explicit pool-first '
-                            'scheduling policy'
-                        ),
-                        'melt_fe_raw_kg_hr': float(original_gated_rate),
-                        'melt_fe_residual_capacity_kg_hr': float(
-                            residual_capacity_kg_hr
-                        ),
-                        'melt_fe_applied_kg_hr': float(gated_rate_kg_hr),
-                    }
-            if gated_rate_kg_hr > 1e-12:
-                flux.species_kg_hr[species] = gated_rate_kg_hr
-                alpha_authority_status = alpha_authority_statuses.get(species)
-                if alpha_authority_status is not None:
-                    flux.alpha_authority_status_by_species[species] = str(
-                        alpha_authority_status
-                    )
+        projected = project_publisher_vapour_rates(
+            diagnostic,
+            liquid_fraction_factor=liquid_fraction_factor,
+            fe_residual_kg_hr=fe_residual_kg_hr,
+        )
+        if projected.fe_allocation is not None:
+            diagnostic['native_fe_capacity_allocation'] = projected.fe_allocation
+        for species, gated_rate_kg_hr in projected.debit_kg_hr.items():
+            flux.species_kg_hr[species] = gated_rate_kg_hr
+            alpha_authority_status = alpha_authority_statuses.get(species)
+            if alpha_authority_status is not None:
+                flux.alpha_authority_status_by_species[species] = str(
+                    alpha_authority_status
+                )
+        # Supply keeps the sub-floor rates the debit map just dropped.
+        # Depletion and the C0 scales update this map in place; the
+        # snapshot writer is publish_wall_supply_on_flux.
+        self._wall_supply_computed_kg_hr = dict(projected.supply_kg_hr)
 
         flux.update_totals()
         return flux
@@ -3831,6 +4735,17 @@ class EvaporationMixin:
         )
         carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
         carrier_gas = carrier_resolver() if callable(carrier_resolver) else 'N2'
+        # d-376 amendment 1 O2 lower bound. The publisher subtracts
+        # overhead O2 on a disabled film or an HKL upper bound only
+        # when this step closed a surface root. ``root_closed`` is that
+        # predicate (applied and a solved surface). A missing context,
+        # and a closed gate, leave the key false: every species,
+        # including O2, keeps green's film rule. Round 7.
+        closure_context = getattr(self, "_langmuir_flux_closure_context", None)
+        surface_oxygen_bound = bool(
+            isinstance(closure_context, Mapping)
+            and closure_context.get("root_closed")
+        )
         controls: dict[str, Any] = {
             # Batch-gated flux map; pre-RG values came through the typed seam.
             CONTROL_FLUX_PRESSURES_KEY: vapor_pressures,
@@ -3879,6 +4794,10 @@ class EvaporationMixin:
             'evaporation_series_resistance': dict(
                 kernel_config.get('evaporation_series_resistance', {}) or {}
             ),
+            # Do not copy chemistry_kernel['gas_resistance_enabled'].
+            # Green's publisher never read that top-level key: the film
+            # stays on unless the nested series override says otherwise.
+            # Copying it changed buffered in-band rates. b-906 round 7.
             'alpha': _measured_alpha_control_view(
                 _load_evaporation_alpha_by_species(self.vapor_pressures)
             ),
@@ -3888,9 +4807,6 @@ class EvaporationMixin:
             'hkl_upper_bound_transport_species': (
                 _load_hkl_upper_bound_transport_species(self.vapor_pressures)
             ),
-            'allow_unmeasured_alpha_fallback': kernel_config.get(
-                'allow_unmeasured_alpha_fallback', False
-            ),
             'campaign_name': str(
                 getattr(
                     getattr(getattr(self, 'melt', None), 'campaign', None),
@@ -3899,6 +4815,7 @@ class EvaporationMixin:
                 )
                 or ''
             ),
+            'surface_oxygen_bound': surface_oxygen_bound,
         }
         if vapour_batch_report is not None:
             controls[CONTROL_BATCH_REPORT_KEY] = dict(vapour_batch_report)
@@ -3912,10 +4829,9 @@ class EvaporationMixin:
                 controls['vapour_batch_flux_shadow_outcome'] = (
                     vapour_batch_flux_overlay['shadow_outcome']
                 )
-        if 'unmeasured_alpha_fallback_species' in kernel_config:
-            controls['unmeasured_alpha_fallback_species'] = tuple(
-                kernel_config['unmeasured_alpha_fallback_species'] or ()
-            )
+        from engines.builtin.evaporation_flux import alpha_policy_controls
+
+        controls.update(alpha_policy_controls(kernel_config))
         return controls, molar_masses_kg_mol
 
     def _project_evaporation_overhead_source_mol_hr(
@@ -3970,6 +4886,52 @@ class EvaporationMixin:
                 )
         return source_mol_hr
 
+    def _scale_wall_supply_computed(self, scale: float) -> None:
+        """Apply one physical scale to every computed supply rate.
+
+        The melt debit may drop a product at or below its reporting
+        floor. This scale does not. A non-positive result is kept when
+        it is exactly zero so the hour stays an evidenced zero.
+        """
+
+        computed = getattr(self, "_wall_supply_computed_kg_hr", None)
+        if not isinstance(computed, Mapping):
+            return
+        factor = float(scale)
+        scaled: dict[str, float] = {}
+        for species, raw in computed.items():
+            if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+                continue
+            rate = float(raw) * factor
+            if math.isfinite(rate) and rate >= 0.0:
+                scaled[str(species)] = rate
+        self._wall_supply_computed_kg_hr = scaled
+
+    def _overlay_depleted_wall_supply(
+        self,
+        supply_out: Mapping[str, float],
+        *,
+        phase_scale: float | None,
+    ) -> None:
+        """Fold post-depletion rates into the computed supply map.
+
+        Subthreshold rates never enter the debit, so depletion does not
+        see them. They take the same phase scale the debit rates took.
+        ``supply_out`` is already phase-scaled and overwrites those
+        species, including a positive rate the debit floor then dropped
+        and an explicit zero where the parent or oxygen inventory is gone.
+        """
+
+        scale = 1.0 if phase_scale is None else float(phase_scale)
+        if scale != 1.0:
+            self._scale_wall_supply_computed(scale)
+        computed = dict(getattr(self, "_wall_supply_computed_kg_hr", {}) or {})
+        for species, raw in supply_out.items():
+            rate = float(raw)
+            if math.isfinite(rate) and rate >= 0.0:
+                computed[str(species)] = rate
+        self._wall_supply_computed_kg_hr = computed
+
     def _apply_analytic_evaporation_depletion(
         self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,
     ) -> EvaporationFlux:
@@ -3979,6 +4941,7 @@ class EvaporationMixin:
 
         phase_scalar = self._record_phase_context_diagnostic(
             'evaporation_depletion', scalar_liquid_fraction=1.0)
+        supply_out: dict[str, float] = {}
         effective_rates = self._analytic_evaporation_depletion_rates(
             evap_flux.species_kg_hr,
             dt_hr=dt_hr,
@@ -3991,6 +4954,11 @@ class EvaporationMixin:
                     'O2', 0.0
                 )
             ),
+            supply_out=supply_out,
+        )
+        self._overlay_depleted_wall_supply(
+            supply_out,
+            phase_scale=phase_scalar,
         )
         smoothed = EvaporationFlux(
             species_kg_hr=effective_rates,
@@ -4018,13 +4986,31 @@ class EvaporationMixin:
         phase_scalar: float,
         cleaned_melt_kg: Mapping[str, float],
         available_o2_kg: float,
+        supply_out: dict[str, float] | None = None,
     ) -> dict[str, float]:
-        """Pure frozen-inventory transform from raw HK rates to actual rates."""
+        """Pure frozen-inventory transform from raw HK rates to actual rates.
+
+        ``supply_out``, when passed, receives every input species' computed
+        post-depletion rate, including a positive rate at or below the
+        debit floor and a zero where parent or oxygen inventory is gone.
+        It does not change the debit map this function returns.
+        """
+
+        def _note(species: object, rate: float) -> None:
+            if supply_out is None:
+                return
+            value = float(rate)
+            if math.isfinite(value) and value >= 0.0:
+                supply_out[str(species)] = value
+
         if dt_hr <= 0.0 or not raw_rates_kg_hr:
-            return {
+            kept = {
                 str(species): max(0.0, float(rate))
                 for species, rate in raw_rates_kg_hr.items()
             }
+            for species, rate in kept.items():
+                _note(species, rate)
+            return kept
 
         metals_data = self.vapor_pressures.get('metals', {}) or {}
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
@@ -4036,6 +5022,8 @@ class EvaporationMixin:
                 * phase_scalar
             )
             if raw_rate_kg_hr <= 1e-12:
+                # Debit floor. The computed rate is still the supply.
+                _note(species, raw_rate_kg_hr if raw_rate_kg_hr > 0.0 else 0.0)
                 continue
             sp_data = metals_data.get(species, {})
             if not sp_data:
@@ -4045,6 +5033,7 @@ class EvaporationMixin:
             oxide_per_product_kg = float(stoich['oxide_per_product_kg'])
             parent_draw_kg_hr = raw_rate_kg_hr * oxide_per_product_kg
             if parent_draw_kg_hr <= 1e-12:
+                _note(species, raw_rate_kg_hr)
                 continue
             parent_groups[parent_oxide].append({
                 'species': species,
@@ -4061,8 +5050,18 @@ class EvaporationMixin:
             available_parent_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
             total_parent_draw_kg_hr = sum(
                 entry['parent_draw_kg_hr'] for entry in entries)
-            if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= 1e-12:
+            # Empty inventory has no draw. A positive mass uses one
+            # first-order draw. The debit still requires the group and
+            # the product to clear 1e-12 kg; a smaller positive product
+            # is the supply and is not a debit.
+            if available_parent_kg <= 0.0 or total_parent_draw_kg_hr <= 0.0:
+                for entry in entries:
+                    _note(entry['species'], 0.0)
                 continue
+            group_clears_debit_floor = (
+                available_parent_kg > 1e-12
+                and total_parent_draw_kg_hr > 1e-12
+            )
             k_hr = total_parent_draw_kg_hr / available_parent_kg
             depletion_fraction = -math.expm1(-k_hr * dt_hr)
             depletion_fraction = max(
@@ -4075,8 +5074,13 @@ class EvaporationMixin:
                     * share
                     / float(entry['stoich']['oxide_per_product_kg'])
                 )
-                if product_kg > 1e-12:
-                    effective_rates[entry['species']] = product_kg / dt_hr
+                product_rate = product_kg / dt_hr
+                if group_clears_debit_floor and product_kg > 1e-12:
+                    effective_rates[entry['species']] = product_rate
+                _note(
+                    entry['species'],
+                    product_rate if product_kg > 0.0 else 0.0,
+                )
 
         o2_draws: list[tuple[str, float]] = []
         for parent_oxide in sorted(parent_groups):
@@ -4095,6 +5099,7 @@ class EvaporationMixin:
         if available_o2_kg <= 1e-12:
             for species, _draw in o2_draws:
                 effective_rates.pop(species, None)
+                _note(species, 0.0)
             return effective_rates
 
         max_fraction = math.nextafter(1.0, 0.0)
@@ -4116,8 +5121,11 @@ class EvaporationMixin:
                 allowed_draw_kg / by_species_draw[species])
             if allowed_rate <= 1e-12:
                 effective_rates.pop(species, None)
+                _note(species, allowed_rate if allowed_rate > 0.0 else 0.0)
             else:
-                effective_rates[species] = min(current_rate, allowed_rate)
+                applied = min(current_rate, allowed_rate)
+                effective_rates[species] = applied
+                _note(species, applied)
         return effective_rates
 
     def _route_to_condensation(
@@ -4334,6 +5342,21 @@ class EvaporationMixin:
             ),
         )
         committed_flux.update_totals()
+        # d-376 amendment 1 wall-deposit ruling: the supply bound is the
+        # vapour the publisher computed, not only the ledger debit.
+        # species_kg_hr stays the committed subset, so a carrier with no
+        # evaporation transition does not change the melt debit. The supply
+        # map keeps that shown debit, phase-scaled, and every computed rate
+        # the debit floor dropped (including below_threshold_evaporation_flux).
+        # publish_wall_supply_on_flux is the only writer. Not a dataclass
+        # field: melt, ledger, and snapshot totals keep reading species_kg_hr.
+        phase_scale = 1.0 if phase_scalar is None else float(phase_scalar)
+        publish_wall_supply_on_flux(
+            committed_flux,
+            getattr(self, "_wall_supply_computed_kg_hr", None),
+            debit_kg_hr=evap_flux.species_kg_hr,
+            phase_scale=phase_scale,
+        )
         self._ledger_committed_evap_flux_this_tick = committed_flux
 
         residual_flux = EvaporationFlux(

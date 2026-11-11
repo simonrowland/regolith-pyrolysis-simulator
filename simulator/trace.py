@@ -299,6 +299,21 @@ def bucket_wall_segments_by_temperature(
     return zones
 
 
+def _priced_wall_deposit_kg(amount: float) -> float | None:
+    """Positive wall kilograms that scoring must keep.
+
+    Ledger resolution is applied once, when a refused vapour supply is
+    classified. A positive kilogram already on the deposit map is that
+    classification, or a measured deposit. Replacing it with zero because
+    it is at or below 1e-12 kg reports a booked supply as no mass and an
+    infinite lifetime. Zero and negative amounts are not positive deposits.
+    """
+
+    if amount <= 0.0:
+        return None
+    return float(amount)
+
+
 def wall_deposit_kg_by_zone_species(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
     zone_by_segment: Mapping[str, str],
@@ -315,11 +330,11 @@ def wall_deposit_kg_by_zone_species(
         zone = str(zone_by_segment[segment])
         if zone not in zone_totals:
             raise ValueError(f"unknown wall zone {zone!r} for segment {segment}")
-        amount = float(kg)
-        if amount <= 1e-12:
+        priced = _priced_wall_deposit_kg(float(kg))
+        if priced is None:
             continue
         species_totals = zone_totals[zone]
-        species_totals[species] = species_totals.get(species, 0.0) + amount
+        species_totals[species] = species_totals.get(species, 0.0) + priced
     return {
         zone: dict(sorted(species_totals.items()))
         for zone, species_totals in zone_totals.items()

@@ -144,6 +144,24 @@ def test_present_null_gas_resistance_keeps_default_on():
     assert flux_false > flux_absent * 5.0
 
 
+@pytest.mark.parametrize("parent", (False, "false", 0))
+@pytest.mark.parametrize("series_flag", ("absent", False, True, None))
+def test_parent_false_gas_resistance_raises_audited_default(parent, series_flag):
+    """Green passes the parent flag as bool_feature_flag's default.
+
+    A parent False is rejected before the series map is read, including
+    when the nested key is set. Returning False and calculating a flux
+    is the out-of-scope change b-906 round 7 put back.
+    """
+
+    series = {} if series_flag == "absent" else {"gas_resistance_enabled": series_flag}
+    with pytest.raises(ValueError, match="audited conservative setting True"):
+        _provider_gas_resistance(
+            series,
+            extra_controls={"gas_resistance_enabled": parent},
+        )
+
+
 def test_gas_resistance_lookups_route_through_helper():
     """Site 1 has three production lookups; all must share the helper."""
 

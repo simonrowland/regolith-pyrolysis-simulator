@@ -60,6 +60,15 @@ from simulator.core import (
     PoisonedHourError,
     read_high_t_melt_activity_fallback_notice,
 )
+from simulator.evaporation import (
+    WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR,
+    WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE,
+)
+from simulator.silent_zero import CATEGORY_PROVEN_ZERO, ZeroBecause
+from simulator.vapour_rail.instrumentation import (
+    VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+    vapour_carrier_authority_status,
+)
 from simulator.cost_energy import unavailable_quantity
 from simulator.cost_ledger import run_pumping_input_cost
 from simulator.cost_parameters import default_cost_parameters_block
@@ -2005,18 +2014,320 @@ def _optimizer_feedstock_charge_mass(
     return mass
 
 
+def _snapshot_refused_flux_rates(snapshot: Any) -> Any:
+    """Rate map for one snapshot, or None when evaporation flux is unavailable.
+
+    The ledger-committed map omits a carrier that produced no evaporation
+    transition. The wall supply is the published vapour rate condensation
+    was shown (published_species_kg_hr). Fall back to species_kg_hr when
+    that map was not retained. Absence from a present map is not a number.
+    ``_classify_wall_supply_interval`` classifies it. This function does
+    not turn it into zero. A missing map is a different gap: the interval
+    has no flux evidence at all.
+    """
+
+    flux = getattr(snapshot, "evap_flux", None)
+    published = getattr(flux, "published_species_kg_hr", None)
+    if isinstance(published, MappingABC):
+        return published
+    return getattr(flux, "species_kg_hr", None)
+
+
+def _carrier_mapping_kind(record: Mapping[str, Any], key: str) -> str:
+    payload = record.get(key)
+    if isinstance(payload, MappingABC):
+        return str(payload.get("kind") or "")
+    return ""
+
+
+def _carrier_records_transport_refusal(record: Mapping[str, Any]) -> bool:
+    """True for the local missing-transport channel ``_calculate_evaporation`` keeps.
+
+    That path leaves the rest of the run published. The refused species
+    has no rate. The refusal may sit on the channel or only on its extra.
+    """
+
+    extra = record.get("extra")
+    if not isinstance(extra, MappingABC):
+        extra = {}
+    policy = record.get("policy") or extra.get("policy")
+    status = record.get("status") or extra.get("status")
+    refusal_type = (
+        record.get("refusal_type")
+        or extra.get("refusal_type")
+        or record.get("refusal_code")
+        or extra.get("refusal_code")
+    )
+    return (
+        policy == "fail_loud_missing_transport_parameters"
+        and status == "unavailable"
+        and bool(refusal_type)
+    )
+
+
+# One interval of one refused-wall species. ``outside_window`` is a
+# non-positive duration: it is not part of the integral, so it is not
+# one of the three contributions below.
+_WALL_SUPPLY_COMPUTED = "computed"
+_WALL_SUPPLY_PHYSICAL_ZERO = "physical_zero"
+_WALL_SUPPLY_UNAVAILABLE = "unavailable"
+_WALL_SUPPLY_OUTSIDE = "outside_window"
+
+
+@dataclass(frozen=True)
+class _WallSupplyInterval:
+    """The contribution of one (species, interval) to the wall-supply integral."""
+
+    kind: str
+    rate_kg_hr: float | None = None
+    evidence: str = ""
+
+
+def _snapshot_duration_h(snapshot: Any) -> float:
+    raw_duration = getattr(snapshot, "duration_h", 1.0)
+    if isinstance(raw_duration, bool) or not isinstance(raw_duration, int | float):
+        raise CoatingFeasibilityReportError(
+            "snapshot duration_h must be numeric for refused flux bounds"
+        )
+    duration_h = float(raw_duration)
+    if not math.isfinite(duration_h) or duration_h < 0.0:
+        raise CoatingFeasibilityReportError(
+            "snapshot duration_h must be finite and non-negative for "
+            "refused flux bounds"
+        )
+    return duration_h
+
+
+def _require_vapour_supply_rate(raw_rate: Any, species: str) -> float:
+    if isinstance(raw_rate, bool) or not isinstance(raw_rate, int | float):
+        raise CoatingFeasibilityReportError(
+            f"vapour flux for refused species {species!r} must be numeric"
+        )
+    rate = float(raw_rate)
+    if not math.isfinite(rate) or rate < 0.0:
+        raise CoatingFeasibilityReportError(
+            f"vapour flux for refused species {species!r} must be finite "
+            "and non-negative"
+        )
+    return rate
+
+
+def _carrier_record_blocks_physical_zero(record: Mapping[str, Any]) -> bool:
+    """True when this record is a refusal or an upper bound, not a zero.
+
+    A diagnostic upper bound is not a kg/h. A pressure upper bound is
+    the same class. A refused runtime pressure, a transport-unavailable
+    extra, or a pressure/flux refusal is missing input. None of those
+    is a zero hour, and a whole-interval certificate does not make
+    them one.
+    """
+
+    if _carrier_mapping_kind(record, "flux") in {
+        "diagnostic_upper_bound",
+        "refusal",
+    }:
+        return True
+    if _carrier_mapping_kind(record, "pressure") in {"refusal", "upper_bound"}:
+        return True
+    if _carrier_mapping_kind(record, "selected_runtime_pressure") == "refusal":
+        return True
+    if bool(record.get("is_refused", False)):
+        return True
+    return _carrier_records_transport_refusal(record)
+
+
+def _carrier_record_is_authorized_zero(record: Any, species: str) -> bool:
+    """Typed authorized zero: ZeroByPhysics for this species, and not a refusal."""
+
+    if not isinstance(record, MappingABC):
+        return False
+    if _carrier_record_blocks_physical_zero(record):
+        return False
+    return (
+        vapour_carrier_authority_status(record, expected_species_id=species)
+        == VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO
+    )
+
+
+def _carrier_record_is_below_bound_zero(record: Any, species: str) -> bool:
+    """Typed below-bound zero for this species.
+
+    ``zero_because=proven_below_threshold`` with doctrine category 3
+    (proven zero). A refusal on the same record is not this evidence.
+    Ledger resolution is not this record: that comparison happens at
+    booking, after the integral.
+    """
+
+    if not isinstance(record, MappingABC):
+        return False
+    named = str(record.get("species_id") or record.get("species") or "").strip()
+    if named != str(species):
+        return False
+    reason = str(record.get("zero_because") or "")
+    if reason != ZeroBecause.PROVEN_BELOW_THRESHOLD.value:
+        return False
+    category = record.get("doctrine_category")
+    if isinstance(category, bool) or not isinstance(category, int | float):
+        return False
+    if int(category) != CATEGORY_PROVEN_ZERO:
+        return False
+    return not _carrier_record_blocks_physical_zero(record)
+
+
+def _interval_physical_zero_reason(flux: Any) -> str:
+    """Whole-interval physical zero, or ``""``.
+
+    Producers set this only when the hour evaporates no species: no
+    liquid, a non-evaporation campaign, a frozen melt, the sub-400 K
+    floor, or empty vapour inventory. The pre-RG empty map below
+    1050 C is not this record. A zero-net carrier is a computed 0 on
+    the rate map, not this record.
+    """
+
+    record = getattr(flux, WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR, None)
+    if not isinstance(record, MappingABC):
+        return ""
+    if str(record.get("evidence") or "") != WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE:
+        return ""
+    return str(record.get("reason") or "").strip()
+
+
+def _physical_zero_evidence(flux: Any, species: str) -> str:
+    """``authorized_zero`` or ``below_bound_zero``, or ``""`` when neither is on record.
+
+    Called only when ``species`` is absent from a present rate map.
+    An eligible or authoritative channel, and a missing carrier record,
+    are not this evidence.
+    """
+
+    channels = getattr(flux, "carrier_authority_by_species", None)
+    if not isinstance(channels, MappingABC) or species not in channels:
+        return ""
+    record = channels[species]
+    if _carrier_record_is_authorized_zero(record, species):
+        return "authorized_zero"
+    if _carrier_record_is_below_bound_zero(record, species):
+        return "below_bound_zero"
+    return ""
+
+
+def _interval_certificate_leaves_species_uncovered(
+    flux: Any,
+    species: str,
+) -> bool:
+    """True when a refusal or upper bound on ``species`` blocks the certificate.
+
+    No channel, or an eligible channel whose rate the freeze or campaign
+    gate discarded, returns False: the certificate covers that species.
+    A refusal or an upper bound returns True. The supply integral then
+    withholds the species instead of booking the other hours (d-367).
+    """
+
+    channels = getattr(flux, "carrier_authority_by_species", None)
+    if not isinstance(channels, MappingABC) or species not in channels:
+        return False
+    record = channels[species]
+    if not isinstance(record, MappingABC):
+        return False
+    return _carrier_record_blocks_physical_zero(record)
+
+
+def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyInterval:
+    """Classify one refused-wall species on one interval.
+
+    Invariant (d-367). This is the only classifier the supply integral
+    uses. A positive-duration interval contributes exactly one of:
+
+    - ``computed``: the rate map names this species. Any finite
+      non-negative magnitude counts, including 0 and a rate at or below
+      the 1e-12 kg/h melt-debit floor. Ledger resolution is not applied
+      here. A numeric rate wins over a refusal on the same interval.
+      A zero-net carrier (``P_eq <= P_bulk``) is this class at rate 0.
+    - ``physical_zero``: the species is absent from that map and typed
+      evidence covers this species. A whole-interval certificate
+      (``wall_supply_interval_physical_zero``, evidence
+      ``authorized_zero``) covers an absent species and a stale eligible
+      channel whose rate the freeze or campaign gate discarded. It does
+      not cover a refusal or an upper bound on that species. A
+      species-specific authorized zero (``pressure.kind``
+      ``zero_by_physics`` with an eligible flux) or below-bound zero
+      (``proven_below_threshold``, doctrine category 3) covers that
+      species when the certificate does not.
+    - ``unavailable``: every other positive-duration interval. A
+      refusal, an upper bound, a missing flux map, or absence from a
+      present map without a covering record is unavailable, never zero.
+      One unavailable interval drops the species. The partial sum of
+      the other intervals is not a supply.
+
+    A non-positive duration is ``outside_window``. It adds no mass and
+    is not a gap.
+    """
+
+    duration_h = _snapshot_duration_h(snapshot)
+    rates = _snapshot_refused_flux_rates(snapshot)
+    if duration_h == 0.0:
+        if isinstance(rates, MappingABC) and species in rates:
+            _require_vapour_supply_rate(rates[species], species)
+        return _WallSupplyInterval(_WALL_SUPPLY_OUTSIDE)
+    if not isinstance(rates, MappingABC):
+        return _WallSupplyInterval(
+            _WALL_SUPPLY_UNAVAILABLE,
+            evidence="absent_flux_map",
+        )
+    if species in rates:
+        return _WallSupplyInterval(
+            _WALL_SUPPLY_COMPUTED,
+            rate_kg_hr=_require_vapour_supply_rate(rates[species], species),
+            evidence="computed_rate",
+        )
+    flux = getattr(snapshot, "evap_flux", None)
+    # A refusal or upper bound outranks the certificate. An eligible
+    # channel copied and then discarded by the freeze or campaign gate
+    # does not: that species is absent from the rate map and the
+    # certificate covers it.
+    if _interval_certificate_leaves_species_uncovered(flux, species):
+        return _WallSupplyInterval(_WALL_SUPPLY_UNAVAILABLE, evidence="refused")
+    interval_reason = _interval_physical_zero_reason(flux)
+    if interval_reason:
+        return _WallSupplyInterval(
+            _WALL_SUPPLY_PHYSICAL_ZERO,
+            evidence=f"interval_physical_zero:{interval_reason}",
+        )
+    evidence = _physical_zero_evidence(flux, species)
+    if evidence:
+        return _WallSupplyInterval(_WALL_SUPPLY_PHYSICAL_ZERO, evidence=evidence)
+    channels = getattr(flux, "carrier_authority_by_species", None)
+    omitted_evidence = (
+        "refused"
+        if isinstance(channels, MappingABC) and species in channels
+        else "absent_no_record"
+    )
+    return _WallSupplyInterval(_WALL_SUPPLY_UNAVAILABLE, evidence=omitted_evidence)
+
+
 def _optimizer_refused_flux_bounds(
     snapshots: Any,
     refused_species: tuple[str, ...],
     *,
     campaigns_elapsed: float = 1.0,
 ) -> dict[str, float]:
-    """Bound refused wall deposits by all observed vapour flux in the campaign.
+    """Integral of each species' computed vapour flux over the window.
 
-    A wall deposit is downstream of the source vapour. Summing each refused
-    species' non-negative kg/hr flux over snapshot duration therefore gives an
-    upper bound for every segment, even when the wall saturation quantity was
-    refused. Missing species/rate evidence remains missing, never zero.
+    Product summary, furnace lifespan, and the tap projection book only
+    the map returned here. No other path integrates a wall-supply flux.
+    Each positive-duration interval is classified by
+    ``_classify_wall_supply_interval`` and is not re-read here.
+
+    A returned number sums computed rates. An evidenced physical zero
+    adds nothing and keeps the species observed. One unavailable
+    interval drops that species: the partial sum of the other intervals
+    is not a supply, and the wall refusal stays. A sibling with a
+    complete integral is still returned. Species order does not change
+    the values.
+
+    A species absent from every contributing interval is not given a
+    fabricated zero. Ledger resolution is not applied here. Booking
+    applies it.
     """
 
     if not refused_species:
@@ -2028,42 +2339,30 @@ def _optimizer_refused_flux_bounds(
         )
     totals = {species: 0.0 for species in refused_species}
     observed: set[str] = set()
+    withheld: set[str] = set()
     for snapshot in tuple(snapshots or ()):
-        flux = getattr(snapshot, "evap_flux", None)
-        rates = getattr(flux, "species_kg_hr", None)
-        if not isinstance(rates, MappingABC):
-            continue
-        raw_duration = getattr(snapshot, "duration_h", 1.0)
-        if isinstance(raw_duration, bool) or not isinstance(raw_duration, int | float):
-            raise CoatingFeasibilityReportError(
-                "snapshot duration_h must be numeric for refused flux bounds"
-            )
-        duration_h = float(raw_duration)
-        if not math.isfinite(duration_h) or duration_h < 0.0:
-            raise CoatingFeasibilityReportError(
-                "snapshot duration_h must be finite and non-negative for "
-                "refused flux bounds"
-            )
         for species in refused_species:
-            if species not in rates:
+            contribution = _classify_wall_supply_interval(snapshot, species)
+            if contribution.kind == _WALL_SUPPLY_OUTSIDE:
                 continue
-            raw_rate = rates[species]
-            if isinstance(raw_rate, bool) or not isinstance(raw_rate, int | float):
+            if contribution.kind == _WALL_SUPPLY_UNAVAILABLE:
+                withheld.add(species)
+                continue
+            if contribution.kind == _WALL_SUPPLY_PHYSICAL_ZERO:
+                observed.add(species)
+                continue
+            if contribution.kind != _WALL_SUPPLY_COMPUTED:
                 raise CoatingFeasibilityReportError(
-                    f"vapour flux for refused species {species!r} must be numeric"
+                    "wall-supply interval classifier returned "
+                    f"{contribution.kind!r} for {species!r}"
                 )
-            rate = float(raw_rate)
-            if not math.isfinite(rate) or rate < 0.0:
-                raise CoatingFeasibilityReportError(
-                    f"vapour flux for refused species {species!r} must be finite "
-                    "and non-negative"
-                )
-            totals[species] += rate * duration_h
+            duration_h = _snapshot_duration_h(snapshot)
+            totals[species] += float(contribution.rate_kg_hr) * duration_h
             observed.add(species)
     return {
         species: float(totals[species] / campaigns_elapsed)
         for species in refused_species
-        if species in observed
+        if species in observed and species not in withheld
     }
 
 

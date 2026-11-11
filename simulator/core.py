@@ -671,6 +671,9 @@ from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+    attach_wall_supply_interval_physical_zero,
+    evaporation_flux_for_campaign_hour,
+    publish_wall_supply_on_flux,
 )
 from simulator.extraction import ExtractionMixin
 from simulator.melt_backend.base import (
@@ -7382,6 +7385,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._degraded_path_engagement = degraded_before
 
     def _compute_capacity_coupling_shadow_impl(self, equilibrium):
+        # Drop the previous hour's publication. A skipped resolve must
+        # not re-close this hour on that map.
+        self._langmuir_flux_closure_context = None
         from engines.builtin.evaporation_flux import (
             BuiltinEvaporationFluxProvider,
         )
@@ -7487,6 +7493,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             iteration_controls['overhead_pressure_pa'] = (
                 self._evaporation_overhead_total_pressure_Pa(partials_Pa)
             )
+            # The map in ``controls`` was closed on the partials at the
+            # start of this shadow. Each trial vector re-enters the same
+            # closure from the stored publication. Do not write the
+            # diagnostic here: the resolver owns it, and the live
+            # evaporation call closes on the solved vector afterwards.
+            reclosed = self._reclose_langmuir_pressures(partials_Pa)
+            # The trial's map and its O2 drive bound are one state.
+            # ``root_closed`` is applied and a solved surface. A trial
+            # that did not close a root keeps green's drive, including
+            # O2 on a disabled film or an HKL upper bound. The controls
+            # copied above were closed on the partials at the start of
+            # the shadow; this trial must not keep that flag.
+            owns_oxygen_drive = False
+            if reclosed is not None:
+                iteration_controls['vapour_batch_flux_pressures_Pa'] = dict(
+                    reclosed.pressures_Pa
+                )
+                owns_oxygen_drive = bool(
+                    reclosed.applied and reclosed.surface_pO2_bar is not None
+                )
+            iteration_controls['surface_oxygen_bound'] = owns_oxygen_drive
             request = IntentRequest(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
                 account_view=account_view,
@@ -7501,6 +7528,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     str(diagnostic.get('reason') or result.status),
                     diagnostic,
                 )
+            # Debit vector only. Rates at or below the 1e-12 kg/h floor
+            # stay out of this solve so the partials stay on the published
+            # flux closure. Wall supply reads the live publisher diagnostic
+            # after this solve, which keeps those rates.
             rates = {
                 species: float(rate) * liquid_fraction_factor
                 for species, rate in dict(
@@ -15016,6 +15047,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if rate * scale > 1.0e-15
         }
         evap_flux.update_totals()
+        # Same scale on the supply map, without the 1e-15 debit floor.
+        self._scale_wall_supply_computed(scale)
         pending = getattr(self, "_subsolidus_pending_release", None)
         if scale <= 0.0 or not pending:
             self._subsolidus_pending_release = None
@@ -15866,7 +15899,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Hertz-Knudsen-Langmuir: how fast each species leaves the melt.
         # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
         # Not during MRE (C5) — electrolysis produces O₂ at the anode.
-        evap_flux = EvaporationFlux()
+        # Drop the previous hour before this hour's publisher runs. A
+        # non-evaporation campaign leaves the rate map empty and stamps
+        # the interval physical zero, so the empty map is not a gap.
+        self._wall_supply_computed_kg_hr = {}
+        self._wall_supply_interval_physical_zero = None
+        evap_flux = evaporation_flux_for_campaign_hour(
+            evaporation_campaign=evaporation_campaign,
+            host=self,
+        )
         capacity_result = None
         if evaporation_campaign:
             if (
@@ -15966,6 +16007,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if rate * joint_scale > 1.0e-15
                 }
                 evap_flux.update_totals()
+                self._scale_wall_supply_computed(joint_scale)
         # Ruling A: C0 joint release (ordinary gas plus solid-host gas)
         # is capped this step. Outside C0 this leaves the flux alone.
         evap_flux = self._cap_c0_joint_release_to_pipe_capacity(evap_flux)
@@ -16220,6 +16262,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             snapshot.imcc_activity_shadow = self._imcc_activity_shadow_for_hour(
                 snapshot
             )
+        # Routing writes the supply map when it runs. This call is the
+        # same writer: it covers a skipped route and does not scale an
+        # already published map a second time. The interval zero is
+        # copied here, after condensation may have replaced the flux
+        # object, so a known non-evaporating hour still carries it.
+        attach_wall_supply_interval_physical_zero(evap_flux, self)
+        publish_wall_supply_on_flux(
+            evap_flux,
+            getattr(self, "_wall_supply_computed_kg_hr", None),
+        )
         snapshot.evap_flux = evap_flux
         snapshot.melt_headspace_composition_mbar = dict(
             self._melt_headspace_composition_mbar

@@ -1190,13 +1190,23 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
 
     rates = []
     factors = []
+    interval_zeros = []
     for temperature_C in (950.0, 1150.0, 1400.0):
         sim.melt.temperature_C = temperature_C
         flux = sim._calculate_evaporation(_equilibrium())
         rates.append(flux.species_kg_hr.get('Na', 0.0))
         factors.append(sim._last_freeze_gate_diagnostic['liquid_fraction'])
+        interval_zeros.append(
+            getattr(flux, 'wall_supply_interval_physical_zero', None)
+        )
 
     assert rates == pytest.approx([0.0, 5.0, 10.0])
+    assert interval_zeros[0] == {
+        'reason': 'frozen_before_evaporation',
+        'evidence': 'authorized_zero',
+    }
+    assert interval_zeros[1] is None
+    assert interval_zeros[2] is None
     assert factors == pytest.approx([0.0, 0.5, 1.0])
     assert rates == sorted(rates)
     assert gate_calls == 1

@@ -4,14 +4,28 @@ from __future__ import annotations
 
 import math
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
-from typing import Literal
 
 from scipy.optimize import brentq
 
 from simulator.battery.enums import CellMaterial, Engine, NoticeKind
 from simulator.battery.records import Located, Notice
 from simulator.physical_constants import GAS_CONSTANT
+from simulator.vacuum_oxygen_balance import (
+    OxygenBalanceBracketBoundary,
+    _OXYGEN_GAS_ALPHA,
+    _OXYGEN_GAS_ALPHA_SOURCE,
+    _VacuumOxygenBalance,
+    _VacuumOxygenChannel,
+)
+
+# Battery callers still import the shared channel types from this module.
+__all__ = [
+    "OxygenBalanceBracketBoundary",
+    "_OXYGEN_GAS_ALPHA",
+    "_OXYGEN_GAS_ALPHA_SOURCE",
+    "_VacuumOxygenBalance",
+    "_VacuumOxygenChannel",
+]
 
 IMCC_ENGINES: frozenset[Engine] = frozenset({Engine.OPENIMCC})
 OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
@@ -23,12 +37,6 @@ OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
     }
 )
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
-OxygenBalanceBracketBoundary = Literal["lower", "upper"]
-_OXYGEN_GAS_ALPHA = 1.0
-_OXYGEN_GAS_ALPHA_SOURCE = (
-    "declared common-unity sensitivity alpha=1.0 for O/O2 free-molecular gas escape; "
-    "absolute oxygen-gas alpha is not measured"
-)
 _MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
 
 
@@ -93,32 +101,6 @@ def _cell_oxygen_class(
         else None
     )
     return material_class, modelled
-
-
-@dataclass(frozen=True)
-class _VacuumOxygenChannel:
-    """One active gas channel participating in a vacuum oxygen balance."""
-
-    species: str
-    molar_mass_kg_per_mol: float
-    oxygen_atoms: float
-    parent_oxygen_demand: float
-    pO2_exponent: float
-    alpha: float
-    alpha_source: str
-    active: bool = True
-
-
-@dataclass(frozen=True)
-class _VacuumOxygenBalance:
-    pO2_bar: float
-    bracket_boundary: OxygenBalanceBracketBoundary | None
-    pressures_Pa: Mapping[str, float]
-    channel_fluxes_mol_m2_s: Mapping[str, float]
-    oxygen_atom_flux_mol_m2_s: float
-    parent_oxygen_demand_flux_mol_m2_s: float
-    relative_residual: float
-    alpha_sources: Mapping[str, str]
 
 
 def _net_evaporation_pressure_Pa(pressure_Pa: float, background_pressure_Pa: float) -> float:

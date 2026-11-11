@@ -817,6 +817,71 @@ def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
 
 
 @pytest.mark.xdist_group("serial")
+def test_provider_publishes_zero_net_flux_without_debiting_it():
+    """P_eq <= P_bulk is a computed 0. A missing molar mass stays omitted.
+
+    The debit map does not gain the zero. A positive sibling is unchanged.
+    """
+
+    zero_only = _w3_result_with_controls(
+        1.0,
+        vapour_batch_flux_pressures_Pa={'Na': 0.0, 'Unobtainium': 0.0},
+        molar_mass_kg_mol={'Na': 0.023},
+        stoich_by_species={
+            'Na': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.347,
+                'O2_per_product_kg': 0.347,
+            },
+            'Unobtainium': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.0,
+                'O2_per_product_kg': 0.0,
+            },
+        },
+        available_oxide_kg={'Na': 10.0, 'Unobtainium': 10.0},
+    )
+    assert zero_only.status == 'ok'
+    assert zero_only.diagnostic['evaporation_flux_kg_hr'] == {}
+    assert zero_only.diagnostic['zero_net_evaporation_flux'] == {'Na': 0.0}
+    assert 'Unobtainium' not in zero_only.diagnostic['zero_net_evaporation_flux']
+    assert 'missing_molar_mass' not in zero_only.diagnostic
+
+    baseline = _w3_result_with_controls(1.0)
+    mixed = _w3_result_with_controls(
+        1.0,
+        vapour_batch_flux_pressures_Pa={'Na': 100.0, 'SiO': 10.0},
+        overhead_partials_Pa={'SiO': 50.0},
+        molar_mass_kg_mol={'Na': 0.023, 'SiO': 0.044085},
+        stoich_by_species={
+            'Na': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.347,
+                'O2_per_product_kg': 0.347,
+            },
+            'SiO': {
+                'parent_oxide': 'SiO2',
+                'oxide_per_product_kg': 1.0,
+                'O2_per_product_kg': 0.0,
+            },
+        },
+        available_oxide_kg={'Na': 10.0, 'SiO': 10.0},
+        evaporation_series_resistance={
+            'gas_resistance_enabled': True,
+            'melt_resistance_enabled': False,
+        },
+    )
+    assert mixed.status == 'ok'
+    assert 'SiO' not in mixed.diagnostic['evaporation_flux_kg_hr']
+    assert mixed.diagnostic['zero_net_evaporation_flux']['SiO'] == 0.0
+    assert mixed.diagnostic['evaporation_flux_kg_hr']['Na'] == pytest.approx(
+        baseline.diagnostic['evaporation_flux_kg_hr']['Na'],
+        rel=0,
+        abs=0,
+    )
+
+
+@pytest.mark.xdist_group("serial")
 def test_provider_traces_subthreshold_flux_without_adding_it_to_flux_map():
     species = "K2O_gas"
     request = IntentRequest(
