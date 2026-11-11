@@ -111,7 +111,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert expected_mno_activity is not None
     evaluated_compositions: list[dict[str, float]] = []
     gas_activity_inputs: list[dict[str, float]] = []
-    original_melt_evaluate = openimcc_bridge.evaluate
+    original_melt_evaluate = openimcc_bridge._evaluate_uncached
     original_gas_evaluate = openimcc.evaluate_gas
 
     def capture_melt_evaluate(**kwargs):
@@ -127,7 +127,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
         "_evaluate_openimcc_isolated",
         lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
     )
-    monkeypatch.setattr(openimcc_bridge, "evaluate", capture_melt_evaluate)
+    monkeypatch.setattr(openimcc_bridge, "_evaluate_uncached", capture_melt_evaluate)
     monkeypatch.setattr(openimcc, "evaluate_gas", capture_gas_evaluate)
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     prediction = residue._predict_sossi_residue_cohort(

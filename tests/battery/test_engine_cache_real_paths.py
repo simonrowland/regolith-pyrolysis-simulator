@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import signal
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -302,6 +303,7 @@ def test_each_projected_engine_setting_changes_the_key(case: _SettingCase) -> No
             "AlphaMELTS model",
             {
                 "transport_mode",
+                "effective_calc_mode",
                 "model",
                 "python_api_model",
                 "redox_buffer",
@@ -324,7 +326,14 @@ def test_each_projected_engine_setting_changes_the_key(case: _SettingCase) -> No
         (
             Engine.THERMOENGINE,
             "ThermoEngine transport model",
-            {"model", "vapor_transport_pO2_bar", "vapor_transport_floor_bar"},
+            {
+                "model",
+                "vapor_transport_pO2_bar",
+                "vapor_transport_floor_bar",
+                "redox_buffer",
+                "fo2_offset",
+                "fe3fet_ratio",
+            },
         ),
     ),
 )
@@ -376,7 +385,6 @@ def test_isolated_engine_config_prediction_settings_change_the_key(
     ("engine", "configuration", "field", "changed"),
     (
         ("openimcc", {"pack": "core"}, "pack", "extended"),
-        ("openimcc", {"gas_pack": "default"}, "gas_pack", "published-gas"),
         ("alphamelts", {"transport": "subprocess"}, "transport", "python_api"),
         ("alphamelts", {"ambient_calc_mode": "MELTS"}, "ambient_calc_mode", "pMELTS"),
         ("alphamelts", {"raw_model_name": "MELTS-v1.0"}, "raw_model_name", "rhyolite-MELTS"),
@@ -467,7 +475,6 @@ def test_engine_opener_and_cache_share_canonical_settings_projection(
         AlphaMELTSSubprocessContractError,
         AlphaMELTSSubprocessRunMode,
     )
-    import signal
 
     parent_mode = "parent-process-sentinel"
     monkeypatch.setenv("ALPHAMELTS_CALC_MODE", parent_mode)
@@ -549,6 +556,9 @@ def test_engine_opener_and_cache_share_canonical_settings_projection(
         ]
         assert p_melts_handle.engine_settings["effective_calc_mode"] == "pMELTS"
         assert melts_handle.engine_settings["effective_calc_mode"] == "MELTS"
+        assert projection_key(p_melts_handle.engine_settings) != projection_key(
+            melts_handle.engine_settings
+        )
         call = {
             "temperature_C": 1400.0,
             "comp_wt": {
@@ -682,7 +692,7 @@ def test_melts_redox_projection_covers_shared_normalizer_inputs(engine: str) -> 
 @pytest.mark.parametrize(
     "engine,configuration",
     (
-        ("openimcc", {"pack": "openimcc-v1.0.2", "gas_pack": "ignored"}),
+        ("openimcc", {"pack": "published-core", "gas_pack": "ignored"}),
         (
             "alphamelts",
             {
@@ -1334,17 +1344,22 @@ def test_isolated_backend_reconstruction_disables_nested_pools(
     assert set(configs["alphamelts"]) == {
         "mode",
         "model",
+        "effective_calc_mode",
+        "model_calc_mode",
+        "calc_mode_conflict",
+        "subprocess_model_error",
         "fO2_buffer",
         "fO2_offset",
         "Fe3Fet_Liq",
         "warm_worker",
-        "vapor_transport_pO2_bar",
-        "vapor_transport_floor_bar",
     }
     assert set(configs["thermoengine"]) == {
         "model",
         "vapor_transport_pO2_bar",
         "vapor_transport_floor_bar",
+        "fO2_buffer",
+        "fO2_offset",
+        "Fe3Fet_Liq",
     }
     # warm_worker is a scheduling option, so it is deliberately not projected.
     assert all(
@@ -1510,14 +1525,17 @@ def test_runtime_identity_is_captured_once_when_each_engine_opens(
         return f"identity:{engine}"
 
     monkeypatch.setattr(engine_cache, "_compute_runtime_identity", compute)
-    monkeypatch.setattr(
-        battery,
-        "_open_resolved_backend",
-        lambda _name, _settings=None: SimpleNamespace(
+    def fake_open_resolved_backend(
+        _name: str,
+        _settings: Any = None,
+        **_kwargs: Any,
+    ) -> Any:
+        return SimpleNamespace(
             equilibrate=lambda **_kwargs: None,
             supports_intrinsic_fO2=False,
-        ),
-    )
+        )
+
+    monkeypatch.setattr(battery, "_open_resolved_backend", fake_open_resolved_backend)
     engines = tuple(engine_cache.ENGINE_CHEMISTRY_VERSION)
     for engine in engines:
         for _ in range(3):

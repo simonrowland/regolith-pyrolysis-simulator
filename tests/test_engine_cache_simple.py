@@ -614,8 +614,8 @@ def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
     assert cold.phase_compositions == {}
     assert warm.phase_compositions == {}
     assert warm.activity_coefficients == expected.activity_coefficients
-    assert cold.diagnostics == {}
-    assert warm.diagnostics == {}
+    assert cold.diagnostics == {"backend_status_reason": "fixture-code"}
+    assert warm.diagnostics == {"backend_status_reason": "fixture-code"}
     assert calls == 1
     assert _engine_cache_counters(reset=True)["thermoengine"] == {
         "hits": 1,
@@ -672,7 +672,9 @@ def test_mapping_equilibrium_result_uses_compact_projection(
         ).fetchone()[0]
     assert isinstance(json.loads(zlib.decompress(stored)), list)
     assert cold.activity_coefficients == warm.activity_coefficients == {"FeO": 0.75}
-    assert cold.diagnostics == warm.diagnostics == {}
+    assert cold.diagnostics == warm.diagnostics == {
+        "backend_status_reason": "unused diagnostic prose"
+    }
     assert cold.phase_compositions == warm.phase_compositions == {}
     assert calls == 1
 

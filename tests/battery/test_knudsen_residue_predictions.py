@@ -626,6 +626,7 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     }
     response = internal_analytical_residue_vapor_pressure(**residue_request)
     database = tmp_path / "markova-engine-cache.sqlite"
+    database.unlink(missing_ok=True)
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
     engine_cache.engine_cache_counters(reset=True)
     cold = internal_analytical_residue_vapor_pressure(**residue_request)
