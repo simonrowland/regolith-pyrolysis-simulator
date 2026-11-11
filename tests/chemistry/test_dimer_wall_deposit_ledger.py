@@ -229,3 +229,138 @@ def test_mixed_feed_wall_ledger_books_one_element_budget(
         .molar_mass_kg_per_mol()
     )
     assert monomer_mol == pytest.approx(vapor_mol, rel=0.0, abs=1e-12)
+
+
+def test_mg2_dust_sio2_subfloor_rollback_books_monomer(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """Above-floor Mg2 on dust SiO2 rolls back to Mg, never the gas.
+
+    The silica split's Si credit sits in (0, 1e-12] kg while the Mg2
+    parcel is above the floor. The rollback used to replace the monomer
+    plan with the arriving gas, so the wall account booked Mg2. It now
+    keeps the monomer element. The dust SiO2 stays, and no account holds
+    a dimer product.
+    """
+
+    from simulator.accounting.lots import EMPTY_KG_TOLERANCE
+    from simulator.chemistry.kernel import ChemistryIntent
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    registry = sim.species_formula_registry
+    wall = "process.wall_deposit"
+
+    def molar_mass(name: str) -> float:
+        return resolve_species_formula(name, registry).molar_mass_kg_per_mol()
+
+    m_si = molar_mass("Si")
+    m_sio2 = molar_mass("SiO2")
+    m_mg2 = molar_mass("Mg2")
+    floor = EMPTY_KG_TOLERANCE
+    # Si credit kg = dust_kg * M_Si / M_SiO2 when the dust limits the
+    # reaction. The dust inventory itself stays above the floor.
+    max_dust_kg = floor * m_sio2 / m_si
+    dust_kg = 0.5 * (floor + max_dust_kg)
+    sio2_mol = dust_kg / m_sio2
+    si_credit_kg = sio2_mol * m_si
+    assert floor < dust_kg < max_dust_kg
+    assert 0.0 < si_credit_kg <= floor
+
+    arrival_kg = 1.0e-6
+    arrival_mol = arrival_kg / m_mg2
+    sim.atom_ledger.load_external_mol(
+        wall,
+        {"SiO2": sio2_mol},
+        source="b-325 dust SiO2",
+        material_origin="feedstock",
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Mg2": arrival_mol},
+        source="b-325 Mg2 wall arrival",
+        material_origin="feedstock",
+    )
+    watched = (
+        "process.overhead_gas",
+        wall,
+        "process.condensation_train",
+        "process.condensation_retained_holdup",
+    )
+
+    def element_mol(element: str) -> float:
+        return sum(
+            sim.atom_ledger.atom_moles_by_account(account).get(element, 0.0)
+            for account in watched
+        )
+
+    mg_before = element_mol("Mg")
+    si_before = element_mol("Si")
+    o_before = element_mol("O")
+
+    result = sim._chem_kernel.dispatch(
+        ChemistryIntent.CONDENSATION_ROUTE,
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Mg2",
+            "condensed_kg": arrival_kg,
+            "sp_data": {
+                "condensation_products_mol_per_mol_vapor": {"Mg": 2.0},
+            },
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {wall: 1.0},
+            "dt_hr": 1.0,
+        },
+    )
+    assert result.status == "ok"
+    assert result.transition is not None
+    diagnostic = result.diagnostic["wall_reaction_diagnostics_by_account"][wall]
+    assert diagnostic["materialization_adjustment"] == (
+        "rollback_coupled_reaction_to_unchanged_arrival"
+    )
+    pre_si_mol = float(diagnostic["pre_adjustment_products_mol"]["Si"])
+    assert 0.0 < pre_si_mol * m_si <= floor
+    assert set(result.transition.credits[wall]) == {"Mg"}
+    assert result.transition.credits[wall]["Mg"] == pytest.approx(
+        2.0 * arrival_mol, rel=0.0, abs=0.0
+    )
+    for species_mol in result.transition.credits.values():
+        assert "Mg2" not in species_mol
+        assert "Na2" not in species_mol
+        assert "K2" not in species_mol
+    assert result.transition.debits["process.overhead_gas"]["Mg2"] == pytest.approx(
+        arrival_mol, rel=0.0, abs=0.0
+    )
+    assert wall not in result.transition.debits
+
+    committed = sim._chem_kernel.commit_batch(
+        ChemistryIntent.CONDENSATION_ROUTE, result.transition
+    )
+    assert committed.debit_mass_kg(registry) == pytest.approx(
+        arrival_kg, rel=0.0, abs=1e-18
+    )
+    assert committed.credit_mass_kg(registry) == pytest.approx(
+        arrival_kg, rel=0.0, abs=1e-18
+    )
+
+    by_account = sim.atom_ledger.kg_by_account()
+    for species_kg in by_account.values():
+        assert species_kg.get("Mg2", 0.0) == 0.0
+        assert species_kg.get("Na2", 0.0) == 0.0
+        assert species_kg.get("K2", 0.0) == 0.0
+    wall_kg = by_account[wall]
+    assert wall_kg["Mg"] == pytest.approx(arrival_kg, rel=0.0, abs=0.0)
+    assert wall_kg["SiO2"] == pytest.approx(dust_kg, rel=0.0, abs=0.0)
+    assert wall_kg.get("MgO", 0.0) == 0.0
+    assert wall_kg.get("Si", 0.0) == 0.0
+    assert element_mol("Mg") == pytest.approx(mg_before, rel=0.0, abs=1e-12)
+    assert element_mol("Si") == pytest.approx(si_before, rel=0.0, abs=1e-18)
+    assert element_mol("O") == pytest.approx(o_before, rel=0.0, abs=1e-18)
+    assert mg_before == pytest.approx(2.0 * arrival_mol, rel=0.0, abs=1e-12)

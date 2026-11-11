@@ -265,13 +265,14 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
 
         # MaterialLot applies its floor independently to every account/species
         # component on both sides.  Roll back only wall parcels whose coupled
-        # reaction cannot materialize exactly; the arriving vapor then lands
-        # unchanged on that same wall account and the substrate stays put.
-        # This preserves the exact invariant, per species/form and therefore
-        # per element: sum(debits) == sum(credits).  Removing a coupled
-        # reaction removes all of its substrate debits and product credits,
-        # while replacing the parcel's vapor debit with an equal-mol credit of
-        # the unchanged vapor species.
+        # reaction cannot materialize exactly; the substrate stays put.
+        # This preserves the exact invariant, per element: sum(debits) ==
+        # sum(credits).  Removing a coupled reaction removes all of its
+        # substrate debits and product credits.  A contracted dimer (d-378)
+        # credits n mol of the monomer element, never the arriving gas:
+        # homonuclear n = 2 and M_M2 = 2 M_M, so the credited mass equals
+        # the vapor mass.  Every other species keeps an equal-mol credit of
+        # the unchanged arrival.
         wall_plan, retained_wall_mol_by_account = (
             self._materialization_safe_wall_plan(
                 species,
@@ -888,6 +889,27 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         vapor_molar_mass = resolve_species_formula(
             species, registry
         ).molar_mass_kg_per_mol()
+        # d-378: the rollback product is the monomer element, not M2(g).
+        # The wall plan already rewrote the arrival into that element;
+        # putting the gas species back here is what booked Mg2 on a
+        # dust-SiO2 account when the Si or MgO credit was sub-floor.
+        from simulator.condensation_routing import dimer_collection_monomer
+
+        monomer = dimer_collection_monomer(species)
+        credit_species = species
+        moles_per_arrival = 1.0
+        if monomer is not None:
+            atom_count = float(
+                resolve_species_formula(species, registry).elements.get(
+                    monomer, 0.0
+                )
+            )
+            if atom_count <= 0.0:
+                raise ValueError(
+                    f"{species} has no {monomer} atoms to credit"
+                )
+            credit_species = monomer
+            moles_per_arrival = atom_count
         for account, arrival_mol in arrival_mol_by_account.items():
             products = products_by_account.get(account, {})
             debits = debits_by_account.get(account, {})
@@ -912,7 +934,9 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             else:
                 alkali_state_by_account.pop(account, None)
             if float(arrival_mol) * vapor_molar_mass > floor_kg:
-                products_by_account[account] = {species: float(arrival_mol)}
+                products_by_account[account] = {
+                    credit_species: float(arrival_mol) * moles_per_arrival
+                }
             else:
                 products_by_account.pop(account, None)
                 retained_by_account[account] = float(arrival_mol)

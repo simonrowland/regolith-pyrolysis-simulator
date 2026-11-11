@@ -48,10 +48,12 @@ Key physics:
     Na, K, and Mg do not use that monomer drive. d-378 amendment 2
     deposits the monomer and the dimer in parallel. Each form diffuses
     through its own series conductance, and the stage inventory
-    integrates J_M + 2 J_M2. K_p -> inf leaves the dimer channel off.
-    The linear solver then sees the arrival's own partial, the same
-    input as a species with no dimer, not p_elem. The wall does not
-    integrate.
+    integrates J_M + 2 J_M2. The gas is carried as one element partial
+    p_elem = p_M + 2 p_M2. Speciation relaxes fast relative to the
+    residence (d-378), so each stage re-speciates that total at its own
+    T with respeciated_monomer_partial_pa. There is no separate monomer
+    or dimer arrival, and K_p -> inf is the same root: p_M = p_elem,
+    dimer drive zero, linear closed form. The wall does not integrate.
     It takes min((J_M + 2 J_M2) * A, element supply) once per wall.
     The monomer and dimer supplies split that one budget. The same
     expression at K_p -> inf is the monomer series flux. Amendment 1
@@ -3385,12 +3387,23 @@ class CondensationModel:
                     flowing_rates[species] = max(0.0, flowing_rates[species] - deposit)
 
             stage_key = f'stage_{stage.stage_number}'
+            # d-378: gas-phase speciation relaxes fast relative to the
+            # residence. The carried state between stages is the element
+            # partial p_elem = p_M + 2 p_M2 (Dalton of the two remaining
+            # flows). This stage re-speciates that total at its own T
+            # inside _condensation_efficiency, through one helper. The two
+            # forms are not separate arrivals, and K_p -> inf is not a
+            # second solver.
             partials = _segment_species_partial_pressures_pa(
                 self.wall_species_partial_pressures_pa,
                 self.overhead_pressure_mbar * 100.0,
                 inlet_rates, {stage_key: flowing_rates},
             )[stage_key]
             stage_removed: dict[str, float] = {}
+            # eta per gas species that passed the input gate. A contracted
+            # pair then shares one of those values, so the stage debits
+            # the element once.
+            evaluated_eta: dict[str, float] = {}
             for species, route in stage_route_by_species.items():
                 monomer = dimer_collection_monomer(species)
                 physics = monomer or species
@@ -3398,8 +3411,8 @@ class CondensationModel:
                 if supply <= 1e-15 or _stage_isolation_blocks(stage, physics):
                     continue
                 alpha_record = route['stage_alpha_records_by_stage'][alpha_surface]
-                # Monomer and dimer arrivals of one element see both partials.
-                # A missing partner key is zero coexistence.
+                # Both forms see p_elem. A missing partner key is zero
+                # coexistence, not a second arrival channel.
                 element_pair = element_collection_pair(species)
                 coexisting_dimer_partial = None
                 if element_pair is not None and monomer is None:
@@ -3445,6 +3458,23 @@ class CondensationModel:
                         **({'parameter': exc.parameter} if isinstance(exc, DepositionInputRefusal) else {}),
                     })
                     continue
+                evaluated_eta[species] = eta
+            # One drawdown per element. The monomer evaluation is that
+            # drawdown when it ran; a dimer-only feed keeps the dimer
+            # evaluation. Both supplies then lose the same fraction, so
+            # the element mass that leaves this stage is one eta.
+            shared_eta: dict[str, float] = {}
+            for species, eta in evaluated_eta.items():
+                pair = element_collection_pair(species)
+                if pair is not None and pair[0] in evaluated_eta:
+                    shared_eta[species] = evaluated_eta[pair[0]]
+                else:
+                    shared_eta[species] = eta
+            for species, eta in shared_eta.items():
+                route = stage_route_by_species[species]
+                monomer = dimer_collection_monomer(species)
+                physics = monomer or species
+                supply = flowing_rates.get(species, 0.0)
                 deposit = supply * eta
                 if deposit > 1e-15:
                     stage_key = stage_key_for_stage(
@@ -4547,11 +4577,15 @@ class CondensationModel:
         ``saturation_species`` selects the wall saturation curve when it is
         not the gas molecule. d-378 uses the monomer curve for a metal dimer.
         Molar mass stays on ``species``. A contracted monomer and its dimer
-        share one element criterion: p_elem = p_M + 2 p_M2 is re-speciated
-        at the wall (amendment 1). When K_p is known, amendment 2 draws
-        that inventory down by J_M + 2 J_M2. ``coexisting_monomer_partial_pa``
-        and ``coexisting_dimer_partial_pa`` are the partner's share. A
-        missing partner is zero coexistence.
+        share one element criterion. The carried partial is
+        p_elem = p_M + 2 p_M2. Speciation relaxes fast relative to the
+        residence, so this stage re-speciates that total at its own
+        temperature with ``respeciated_monomer_partial_pa`` and draws the
+        element down once by J_M + 2 J_M2. K_p -> inf is that same root
+        (p_M = p_elem, no dimer drive), not a second solver.
+        ``coexisting_monomer_partial_pa`` and
+        ``coexisting_dimer_partial_pa`` are the partner's share of p_elem.
+        A missing partner is zero coexistence.
         """
         def _mint_zero(reason: str, **detail: Any) -> float:
             if efficiency_outcomes is not None:
@@ -4698,22 +4732,10 @@ class CondensationModel:
                         vapor_pressure_data=self.vapor_pressure_data,
                     )
                 )
-                if (
-                    sample_kp is not None
-                    and math.isinf(float(sample_kp))
-                    and float(sample_kp) > 0.0
-                ):
-                    # K_p -> +inf is the no-dimer limit, and this solver
-                    # is green's. Green feeds the arrival's own flowing
-                    # partial. p_elem = p_M + 2 p_M2 is the dimer channel:
-                    # with both forms present it moved lunar_24h Na stage
-                    # 4 by +1.08e-5 relative while the condenser inlet
-                    # still matched. A dimer arrival is not collected.
-                    # Green had no dimer contract; collecting it here
-                    # would credit that mass onto the monomer stage.
-                    if species == element_dimer:
-                        continue
-                    p_sample = p_in
+                # p_sample is the re-speciated monomer partial, including
+                # at K_p -> inf where the helper returns p_elem. There is
+                # no branch that restores this arrival's own partial or
+                # discards the dimer.
             comparison_pressures.append(p_sample)
 
             diagnostic: dict[str, Any] = {}
@@ -4777,18 +4799,20 @@ class CondensationModel:
                 if element_pair is not None:
                     if sample_kp is None:
                         element_supersaturated_without_kp = True
-                    elif (
-                        math.isfinite(float(sample_kp))
-                        and float(sample_kp) > 0.0
-                    ):
-                        element_hk_rows.append((
-                            float(sample_alpha_s),
-                            float(saturation_pressure),
-                            float(sample_kp),
-                        ))
-                    # K_p -> inf: the dimer channel is gone. p_sample was
-                    # restored to this arrival's own partial above, so
-                    # these strips and the linear solver are green's.
+                    else:
+                        sample_kp_value = float(sample_kp)
+                        # +inf is the dissociated limit of the same root,
+                        # not a missing K_p. The drawdown below treats it
+                        # as a linear strip (dimer drive zero).
+                        if sample_kp_value > 0.0 and (
+                            math.isfinite(sample_kp_value)
+                            or math.isinf(sample_kp_value)
+                        ):
+                            element_hk_rows.append((
+                                float(sample_alpha_s),
+                                float(saturation_pressure),
+                                sample_kp_value,
+                            ))
                 if flux > 0.0:
                     conductance = flux / sample_driving_pressure
                     if conductance > 0.0:
@@ -4801,11 +4825,12 @@ class CondensationModel:
                 'above_reactive_product_condensation_temperature',
                 stage_temperature_band_C=[lo_C, hi_C],
             )
-        # d-378 amendment 2 plus d-209 am.1. A contracted element with
-        # a finite K_p at every supersaturated sample deposits by
-        # parallel series conductances, one per form. K_p -> inf never
-        # fills element_hk_rows, so the linear solver below is the
-        # shared green path. Strips that lack K_p stay there too.
+        # d-378 amendment 2 plus d-209 am.1. A contracted element deposits
+        # by parallel series conductances, one per form, at every
+        # supersaturated sample whose K_p is positive. K_p -> inf is in
+        # that set: the dimer drive is zero and the strips are linear,
+        # so the closed form is the same integral, not a second solver.
+        # Strips that lack K_p stay on the linear solver below.
         if (
             element_pair is not None
             and element_hk_rows
@@ -4836,8 +4861,10 @@ class CondensationModel:
             # Each form diffuses through its own series conductance and
             # the bulk gas is the equilibrium re-speciation of p_elem.
             # There is no speciation relaxation inside the film.
-            # Flagged. Exact at K_p -> inf (this branch is not taken)
-            # and at K_p -> 0 (the element sits in the dimer).
+            # Flagged. Exact at K_p -> inf (dimer drive is zero and the
+            # strips are the linear closed form) and at K_p -> 0 (the
+            # element sits in the dimer). K_p -> inf does not publish the
+            # monomer-sigma proxy: that coefficient is not applied.
             diameter_proxy = getattr(
                 self, '_dimer_collision_diameter_proxy', None,
             )
@@ -4846,6 +4873,9 @@ class CondensationModel:
                 self._dimer_collision_diameter_proxy = diameter_proxy
             element_strips_list: list[tuple[float, float, float, float]] = []
             for sample_alpha, saturation, kp in element_hk_rows:
+                # A dissociated strip has no dimer film, so it must not
+                # record the monomer collision diameter as if it were used.
+                record_diameter = math.isfinite(kp) and kp > 0.0
                 k_monomer, k_dimer = _element_series_coefficients_mol_m2_s_pa(
                     monomer=monomer_name,
                     dimer=dimer_name,
@@ -4858,7 +4888,7 @@ class CondensationModel:
                     overhead_pressure_pa=overhead_pressure_pa,
                     carrier_gas=str(self.carrier_gas),
                     vapor_pressure_data=self.vapor_pressure_data,
-                    diameter_proxy=diameter_proxy,
+                    diameter_proxy=diameter_proxy if record_diameter else None,
                 )
                 element_strips_list.append((
                     area_scale * k_monomer,
@@ -7613,8 +7643,8 @@ def _element_series_coefficients_mol_m2_s_pa(
     diffuses through its own series conductance, and the bulk gas is
     the equilibrium re-speciation of p_elem. There is no speciation
     relaxation inside the film. Flagged. Exact at K_p -> inf, where
-    the dimer channel is absent and the caller uses the linear series
-    solver instead, and at K_p -> 0, where the element sits in the dimer.
+    the dimer channel is absent and the strip is the linear closed
+    form, and at K_p -> 0, where the element sits in the dimer.
 
     G_M = 1 / (1/(alpha_M k_HK,M) + R_gas,M(Kn) + R_melt)
     G_M2 = 1 / (1/(alpha_M2 k_HK,M2) + R_gas,M2(Kn))

@@ -383,6 +383,55 @@ def test_invalid_wall_input_aborts_on_every_species_and_channel(
     assert route.remaining_by_species[species] >= 0.0
 
 
+def test_respeciated_root_is_the_rationalised_quadratic():
+    """One root from K_p = 1e-6 through 1e30 and inf.
+
+    The evaluated form is the conjugate identity
+
+        p_M = 2 p_elem / (1 + sqrt(1 + 8 p_elem / K_p))
+
+    which is algebraically the non-negative quadratic root and does not
+    cancel when K_p is large. p_M2 = p_M^2 / K_p, and that quotient is
+    0 at K_p = inf, where the root returns p_M = p_elem with no series
+    branch. The large-K_p check is the expansion
+
+        p_M ~ p_elem - 2 p_elem^2 / K_p
+
+    not a second formula in the solver.
+    """
+
+    p_elem = 2.5  # p_M = 0.5 Pa and p_M2 = 1 Pa
+    kps = [10.0 ** exponent for exponent in range(-6, 31, 2)]
+    assert kps[0] == 1.0e-6
+    assert kps[-1] == 1.0e30
+    partials = [
+        respeciated_monomer_partial_pa(p_elem, kp) for kp in kps
+    ]
+    partials.append(respeciated_monomer_partial_pa(p_elem, math.inf))
+    kps.append(math.inf)
+    for earlier, later in zip(partials, partials[1:]):
+        assert later >= earlier
+    # Continuity at the dissociated limit. The step from 1e30 to inf is
+    # the series term 2 p_elem^2 / K_p, far under 1e-12 relative.
+    assert partials[-2] == pytest.approx(partials[-1], rel=1.0e-12, abs=0.0)
+    assert partials[-1] == p_elem
+    for kp, partial in zip(kps, partials):
+        if math.isinf(kp):
+            dimer_partial = 0.0
+        else:
+            dimer_partial = partial * partial / kp
+        assert partial + 2.0 * dimer_partial == pytest.approx(
+            p_elem, rel=1.0e-15, abs=0.0,
+        )
+    kp_check = 1.0e8
+    # p_M ~ p_elem - 2 p_elem^2 / K_p. The next term is +8 p_elem^3 / K_p^2.
+    series = p_elem - 2.0 * p_elem * p_elem / kp_check
+    next_term = 8.0 * p_elem ** 3 / kp_check ** 2
+    assert abs(
+        respeciated_monomer_partial_pa(p_elem, kp_check) - series
+    ) <= 2.0 * next_term
+
+
 def test_respeciated_monomer_partial_obeys_the_quadratic_and_both_limits():
     """d-378 amendment 1 closed form. K_p -> inf is p_elem; K_p -> 0 is 0."""
 
@@ -1642,12 +1691,13 @@ def test_wall_inlet_form_is_continuous_in_kp(monkeypatch):
 def test_infinite_kp_matches_the_shared_series_solver(monkeypatch, species):
     """K_p -> +inf is a test probe, not a production knob.
 
-    The dimer channel is off, so capture is the series-resistance
-    linear solver. A species with no element pair uses that same
-    function, which is the green path. The two routes share the code,
-    so the masses match bit for bit. The 1e-12 relative allowance
-    would apply only if the arithmetic order had to differ. It does
-    not, on these default routes.
+    Monomer-only: no M2 arrives, so p_elem is that monomer's partial.
+    The dissociated strip is the linear closed form. A species with the
+    element pair removed uses the series solver on the same partial.
+    These default routes match bit for bit, which is inside the 1e-12
+    relative bar. The 7.7e-11 Mg figure is not this comparison: it is
+    a mixed-feed residual, the dimer credit green dropped, and it is
+    an owner-card move rather than a second arithmetic order here.
     """
 
     dimer = f"{species}2"
@@ -1684,75 +1734,115 @@ def test_infinite_kp_matches_the_shared_series_solver(monkeypatch, species):
     )
 
 
-@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
-def test_infinite_kp_mixture_keeps_each_arrival_on_its_own_partial(
-    monkeypatch, monomer, dimer,
-):
-    """K_p -> inf in a mixture uses the green partial, not p_elem.
+def _assert_same_capture(left, right, monomer, dimer):
+    """Stage and wall kilograms at two K_p values, per gas species."""
 
-    lunar_24h with the probe on failed Na stage 4 by +1.08e-5 relative
-    while the condenser inlet matched. The stage solver was fed
-    p_elem = p_M + 2 p_M2, and the dimer arrival was collected onto the
-    monomer. Green does neither. The wall form is a different expression
-    and is not this assertion: these ducts are the hot defaults, so the
-    wall does not deposit.
+    for species in (monomer, dimer):
+        if species not in left.remaining_by_species:
+            continue
+        for label, value_of in (
+            (
+                "stage",
+                lambda route, name: sum(
+                    by_species.get(name, 0.0)
+                    for by_species in route.condensed_by_stage_species.values()
+                ),
+            ),
+            (
+                "wall",
+                lambda route, name: route.wall_deposit_by_species.get(name, 0.0),
+            ),
+            (
+                "remaining",
+                lambda route, name: route.remaining_by_species[name],
+            ),
+        ):
+            actual = value_of(left, species)
+            expected = value_of(right, species)
+            assert actual == pytest.approx(
+                expected, rel=1.0e-12, abs=1.0e-18,
+            ), (species, label, actual, expected)
 
-    The oracle is the series-flux pressure, not the route's captured
-    mass. A second route with the dimer removed would change the mole
-    fractions, so it is not green's mixture.
-    """
 
-    from simulator.condensation import (
-        _series_resistance_deposition_flux_mol_m2_s,
-    )
+def _route_at_kp(monkeypatch, monomer, dimer, inlet, partials_pa, kp):
+    """One route. Partials are pascals. The cold alkali duct is on."""
 
-    def kp_inf(name, temperature_K, vapor_pressure_data=None):
+    def kp_of(name, temperature_K, vapor_pressure_data=None):
         if name == dimer:
-            return math.inf
+            return kp
         return dimer_dissociation_kp_pa(
             name, temperature_K, vapor_pressure_data,
         )
 
     monkeypatch.setattr(
-        "simulator.condensation.dimer_dissociation_kp_pa", kp_inf,
+        "simulator.condensation.dimer_dissociation_kp_pa", kp_of,
     )
-    # (species, partial passed to the series flux, this arrival's inlet).
-    stage_calls: list[tuple[str, float, float]] = []
-    in_stage = {"on": False}
-    current_inlet = {"pa": None}
-    original_efficiency = CondensationModel._condensation_efficiency
-    original_flux = _series_resistance_deposition_flux_mol_m2_s
-
-    def efficiency(self, **kwargs):
-        current_inlet["pa"] = float(kwargs["inlet_partial_pressure_pa"])
-        in_stage["on"] = True
-        try:
-            return original_efficiency(self, **kwargs)
-        finally:
-            in_stage["on"] = False
-
-    def flux(species, partial_pa, *args, **kwargs):
-        if in_stage["on"]:
-            stage_calls.append((
-                str(species), float(partial_pa), float(current_inlet["pa"]),
-            ))
-        return original_flux(species, partial_pa, *args, **kwargs)
-
-    monkeypatch.setattr(CondensationModel, "_condensation_efficiency", efficiency)
-    monkeypatch.setattr(
-        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
-        flux,
+    partials_mbar = {
+        species: pascals / 100.0 for species, pascals in partials_pa.items()
+    }
+    model = _model(partials=None)
+    cold = "stage_3_to_stage_4"
+    temperatures = {
+        segment.name: 1500.0 for segment in model.pipe_segments
+    }
+    temperatures[cold] = 400.0
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=max(1.0, 2.0 * sum(partials_mbar.values()) + 0.1),
+        species_partial_pressures_mbar=partials_mbar,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0e-4
+            for stage in model.train.stages
+        },
+        pipe_segment_temperatures_C=temperatures,
     )
-    inlet = {monomer: 1.0, dimer: 0.25}
-    route = _route(inlet, partials={monomer: 0.2, dimer: 0.05})
-    assert route.remaining_by_species[dimer] == inlet[dimer]
-    assert _deposited_kg(route, dimer) == 0.0
-    monomer_calls = [row for row in stage_calls if row[0] == monomer]
-    assert monomer_calls
-    assert [row for row in stage_calls if row[0] == dimer] == []
-    for _species, passed, own in monomer_calls:
-        # p_elem would be own + 2 * p_dimer. The flux must see own.
-        assert passed == own
+    return model.route(
+        EvaporationFlux(
+            species_kg_hr=dict(inlet),
+            total_kg_hr=float(sum(inlet.values())),
+        ),
+        MeltState(temperature_C=1500.0),
+    )
+
+
+@pytest.mark.parametrize("monomer,dimer", CONTRACTED_PAIRS)
+@pytest.mark.parametrize(
+    "feed",
+    ("monomer", "dimer", "mixed", "sol"),
+)
+def test_stage_and_wall_are_continuous_in_kp(monkeypatch, monomer, dimer, feed):
+    """K_p = 1e30 and K_p = inf are one result, for every feed.
+
+    Sol's mixture is p_M = 0.5 Pa and p_M2 = 1 Pa, so p_elem = 2.5 Pa.
+    The cold duct and the collector both have to agree. A monomer-only
+    feed has no arriving dimer; green's domain is that feed, checked
+    against the no-pair solver separately. A mixed feed is allowed to
+    differ from green by the dimer credit.
+    """
+
+    if feed == "monomer":
+        inlet = {monomer: 1.0}
+        partials = {monomer: 1.0}
+    elif feed == "dimer":
+        inlet = {dimer: 1.0}
+        partials = {dimer: 1.0}
+    elif feed == "mixed":
+        inlet = {monomer: 1.0, dimer: 0.25}
+        partials = {monomer: 0.2, dimer: 0.05}
+    else:
+        inlet = {monomer: 1.0, dimer: 1.0}
+        partials = {monomer: 0.5, dimer: 1.0}
+    finite = _route_at_kp(
+        monkeypatch, monomer, dimer, inlet, partials, 1.0e30,
+    )
+    infinite = _route_at_kp(
+        monkeypatch, monomer, dimer, inlet, partials, math.inf,
+    )
+    _assert_same_capture(finite, infinite, monomer, dimer)
+    if feed == "sol":
+        captured = (
+            _deposited_kg(infinite, monomer) + _deposited_kg(infinite, dimer)
+        )
+        assert captured > 0.0
 
 
 def test_hot_wall_with_zero_collector_does_not_invent_the_proxy():

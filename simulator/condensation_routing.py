@@ -407,6 +407,45 @@ def _element_saturation_floor_pa(
     return floor
 
 
+def _dimer_term_is_negligible(
+    partial: float,
+    strips: tuple[tuple[float, float, float, float], ...],
+) -> bool:
+    """True when the dimer drive cannot move p_elem by 1e-12 relative.
+
+    The ratio of the dimer term to the monomer term at this partial is
+    2 (k_M2 / k_M) (p_M + P_sat) / K_p. Below 1e-14 that term is under
+    the continuity bar after a residence, so the strip is the linear
+    closed form. K_p = 1e30 and K_p = inf both land here. A production
+    K_p does not: the dimer term is kept on the adaptive solve.
+    """
+
+    for k_monomer, k_dimer, saturation, kp_pa in strips:
+        kp = float(kp_pa)
+        if math.isinf(kp) and kp > 0.0:
+            continue
+        if float(k_dimer) <= 0.0:
+            continue
+        if not math.isfinite(kp) or kp <= 0.0:
+            return False
+        if float(k_monomer) <= 0.0:
+            return False
+        monomer_partial = respeciated_monomer_partial_pa(partial, kp)
+        drive = monomer_partial - float(saturation)
+        if drive <= 0.0:
+            continue
+        ratio = (
+            2.0
+            * float(k_dimer)
+            * (monomer_partial + float(saturation))
+            / kp
+            / float(k_monomer)
+        )
+        if ratio > 1.0e-14:
+            return False
+    return True
+
+
 def _strips_are_linear(
     strips: tuple[tuple[float, float, float, float], ...],
 ) -> bool:
@@ -417,7 +456,9 @@ def _strips_are_linear(
     conductance at one temperature, one total pressure, and one length
     does not depend on p, so that linear closed form is exact. A finite
     K_p makes p_M nonlinear in p_elem even if the dimer coefficient is
-    zero, and that strip stays on the adaptive solve.
+    zero, and that strip stays on the adaptive solve unless
+    ``_dimer_term_is_negligible`` says the nonlinear term is below the
+    continuity bar.
     """
 
     if not strips:
@@ -771,7 +812,7 @@ def final_element_partial_pa(
         return partial
     if _element_drawdown_rate_pa_s(partial, rows) == 0.0:
         return partial
-    if _strips_are_linear(rows):
+    if _strips_are_linear(rows) or _dimer_term_is_negligible(partial, rows):
         updated = _final_linear_monomer_partial(partial, duration, rows)
     else:
         updated = _adaptive_nonlinear_partial(partial, duration, rows)
