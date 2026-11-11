@@ -14,7 +14,10 @@ the simulator binds that registry, including adjust and decide. A detached
 C0 forecast shares the parent's run registry, and ``_predict_c0_exit``
 publishes it onto the parent. Metadata overrides are applied before the
 measured disclosure is installed, on every run-metadata publisher. A cache or memo hit with no stored
-disclosure field is unknown and is a miss. Registration is the one
+disclosure field is unknown and is a miss. The held curve, the local slot,
+and the shared slot are one gate, ``accept_stored_memo``: unknown
+recomputes, and a known disclosure is re-registered before the record is
+returned. Registration is the one
 ``CompiledPressureEvaluator.evaluate`` call. A non-diagnostic law is registered
 when the evaluation leaves a certified domain: the temperature band, the
 oxygen evaluator band, or the oxygen mass-action floor. An in-domain
@@ -895,31 +898,31 @@ def test_cache_publication_paths_use_the_disclosure_chokepoint() -> None:
         "    def _freeze_gate_liquidus_fO2_log(", 1
     )[0]
     live_open = "with bind_simulation_run(self), open_computation()"
+    # Held, local, and shared are the stored-memo returns. Each goes through
+    # accept_stored_memo. A raw deepcopy of the hold is the bypass this pins.
+    assert "return copy.deepcopy(held" not in body
+    assert "publish_stored_disclosures(" not in body
+    assert "stored_disclosures_known(" not in body
+    assert "recorded_law_disclosures(" not in body
+    assert body.count("accept_stored_memo(") == 3
+    held_accept = body.index("accept_stored_memo(")
+    local_accept = body.index("accept_stored_memo(", held_accept + 1)
+    shared_accept = body.index("accept_stored_memo(", local_accept + 1)
+    assert held_accept < body.index("replay_gate_curve(")
     assert body.index(bind) < body.index("replay_gate_curve(")
-    assert body.index(bind) < body.index("publish_stored_disclosures(cache, owner=self)")
-    assert body.index(bind) < body.index(
-        "publish_stored_disclosures(process_cached, owner=self)"
-    )
-    assert body.index("recorded_law_disclosures(cache)") < body.index(live_open)
-    assert body.index("recorded_law_disclosures(process_cached)") < body.index(
-        live_open
-    )
-    assert body.count("publish_stored_disclosures(") == 2
-    assert body.index("stored_disclosures_known(cache)") < body.index(
-        "publish_stored_disclosures(cache, owner=self)"
-    )
-    assert body.index("stored_disclosures_known(process_cached)") < body.index(
-        "publish_stored_disclosures(process_cached, owner=self)"
-    )
-    assert body.index("publish_stored_disclosures(cache, owner=self)") < body.index(
-        live_open
-    )
-    assert body.index(
-        "publish_stored_disclosures(process_cached, owner=self)"
-    ) < body.index(live_open)
+    assert body.index("replay_gate_curve(") < local_accept < shared_accept
+    assert shared_accept < body.index(live_open)
     assert body.index(live_open) < body.rindex("store.capture_gate_curve(")
     assert "with open_computation()" not in body
     assert "with computation_disclosure()" not in body
+    disclosure = (_ROOT / "simulator/vapour_rail/run_disclosure.py").read_text(
+        encoding="utf-8"
+    )
+    gate = disclosure.split("def accept_stored_memo(", 1)[1].split("\ndef ", 1)[0]
+    assert gate.index("stored_disclosures_known(") < gate.index(
+        "publish_stored_disclosures("
+    )
+    assert gate.count("def accept_stored_memo(") == 0
     hit_calls: list[str] = []
     reduced_lines = reduced.splitlines()
     for index, line in enumerate(reduced_lines):
@@ -1957,11 +1960,54 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
         count=1,
     )
 
+    calls.clear()
+    host = _memo_host(calls)
+    host._freeze_gate_held_curve_record = {
+        "hour": 1,
+        "provider": "declared",
+        "record": _memo_record(disclosures=None),
+    }
+    held_miss, held_miss_record = _call()
+    assert calls == ["recompute"]
+    assert held_miss_record["curve"]["tag"] == "recomputed"
+    assert held_miss.law_disclosures == ()
+    assert host._freeze_gate_held_curve_record is None
+
+    calls.clear()
+    host = _memo_host(calls)
+    host._freeze_gate_held_curve_record = {
+        "hour": 1,
+        "provider": "declared",
+        "record": _memo_record(disclosures=stored),
+    }
+    held_hit, held_hit_record = _call()
+    assert calls == []
+    assert held_hit_record["curve"]["tag"] == "cached"
+    _assert_fe_disclosure(
+        held_hit.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+    assert host._freeze_gate_held_curve_record is not None
+
+    calls.clear()
+    host = _memo_host(calls)
+    host._freeze_gate_held_curve_record = {
+        "hour": 1,
+        "provider": "declared",
+        "record": _memo_record(disclosures=[]),
+    }
+    held_zero, held_zero_record = _call()
+    assert calls == []
+    assert held_zero_record["curve"]["tag"] == "cached"
+    assert held_zero.law_disclosures == ()
+
 
 _STANDALONE_HIT_CLASSES = (
     "equilibrium_replay",
     "equilibrium_write_through",
     "gate_replay",
+    "held_memo",
     "local_memo",
     "shared_memo",
     "store_exact",
@@ -2034,7 +2080,7 @@ def _standalone_hit(kind: str, disclosures, monkeypatch):
     from simulator.reduced_real_determinism import PT0DeterminismStore
 
     assert active_snapshot() == ()
-    if kind in {"gate_replay", "local_memo", "shared_memo"}:
+    if kind in {"gate_replay", "held_memo", "local_memo", "shared_memo"}:
         _patch_gate_memo_live(monkeypatch)
     if kind == "equilibrium_replay":
         store = _DisclosureHitStore(
@@ -2056,6 +2102,15 @@ def _standalone_hit(kind: str, disclosures, monkeypatch):
         host = _memo_host(calls)
         host._pt0_store = lambda: store
         return host, store.calls, EvaporationMixin._freeze_gate_curve_record(host)
+    if kind == "held_memo":
+        calls = []
+        host = _memo_host(calls)
+        host._freeze_gate_held_curve_record = {
+            "hour": 1,
+            "provider": "declared",
+            "record": _memo_record(disclosures=disclosures),
+        }
+        return host, calls, EvaporationMixin._freeze_gate_curve_record(host)
     if kind == "local_memo":
         calls = []
         host = _memo_host(calls)
@@ -2091,7 +2146,7 @@ def test_standalone_hit_publishes_a_known_disclosure(kind: str, monkeypatch) -> 
     stored = _fe_disclosure_rows()
     owner, calls, payload = _standalone_hit(kind, stored, monkeypatch)
     assert payload is not None
-    if kind in {"local_memo", "shared_memo"}:
+    if kind in {"held_memo", "local_memo", "shared_memo"}:
         assert calls == []
         assert payload["curve"]["tag"] == "cached"
     elif kind == "gate_replay":
@@ -2128,7 +2183,7 @@ def test_standalone_hit_leaves_an_incomplete_disclosure_unknown(
     published = tuple(getattr(owner, "law_disclosures", ()) or ())
     assert published == ()
     assert active_snapshot() == ()
-    if kind in {"local_memo", "shared_memo"}:
+    if kind in {"held_memo", "local_memo", "shared_memo"}:
         assert calls == ["recompute"]
         assert payload["curve"]["tag"] == "recomputed"
     elif kind == "store_exact":

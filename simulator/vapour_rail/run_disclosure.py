@@ -23,6 +23,9 @@ a measured row with empty authority.
 - Disclosure is metadata on the cached row, not a cache-key dimension.
 - A row with no disclosure field is unknown. Callers treat that as a miss or
   as unusable for ranking. Absence is never a measured "no flagged law".
+- Every stored freeze-gate memo return goes through ``accept_stored_memo``:
+  the same-hour held curve, the local slot, and the shared slot. That
+  function is the miss-or-replay gate. A new return that skips it is a bug.
 - A computation scope records only that computation, then adds its counts to
   the parent. Cache writes read the computation, never the whole run.
 - Typed carrier notices stay lists (exact duplicates dropped). Bare-float
@@ -702,6 +705,26 @@ def publish_stored_disclosures(
         return None
     reregister_cached_disclosures(measured, owner=owner)
     return [dict(item) for item in measured]
+
+
+def accept_stored_memo(
+    record: Mapping[str, Any] | None,
+    *,
+    owner: Any = None,
+) -> list[dict[str, Any]] | None:
+    """Re-register one stored memo, or refuse it as unknown.
+
+    This is the only gate a freeze-gate memo return may use. The same-hour
+    held curve, the local slot, and the shared slot all call it, and a hit
+    is the list it returns. ``None`` means the row never recorded a readable
+    disclosure: the caller misses and recomputes. A list, including ``[]``,
+    is a known measurement and has already been re-registered onto the
+    active run or ``owner``. Absence is never an empty disclosure.
+    """
+
+    if not stored_disclosures_known(record):
+        return None
+    return publish_stored_disclosures(record, owner=owner)
 
 
 def published_run_disclosures(execution: Any) -> tuple[dict[str, Any], ...]:

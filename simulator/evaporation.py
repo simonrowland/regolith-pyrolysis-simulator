@@ -2269,13 +2269,11 @@ class EvaporationMixin:
             gate_curve_memo_is_cacheable,
             gate_curve_memo_record,
             record_repair_notice,
-            recorded_law_disclosures,
         )
         from simulator.vapour_rail.run_disclosure import (
+            accept_stored_memo,
             bind_simulation_run,
             open_computation,
-            publish_stored_disclosures,
-            stored_disclosures_known,
         )
 
         if self._liquid_fraction_provider == 'analytical':
@@ -2287,13 +2285,22 @@ class EvaporationMixin:
                 )
             return gate_curve_memo_record(curve, None, (), 'live')
 
+        # Same gate as the local and shared slots. A hold with no readable
+        # disclosure is unknown, not "no flagged law", so it is not returned.
+        # Dropping it lets this hour recompute; a known disclosure is
+        # re-registered before the copy is returned.
         held = self._freeze_gate_held_curve_record
         if (
-            held is not None
-            and held['hour'] == int(self.melt.hour)
-            and held['provider'] == self._liquid_fraction_provider
+            isinstance(held, Mapping)
+            and held.get('hour') == int(self.melt.hour)
+            and held.get('provider') == self._liquid_fraction_provider
         ):
-            return copy.deepcopy(held['record'])
+            published = accept_stored_memo(held.get('record'), owner=self)
+            if published is not None:
+                record = copy.deepcopy(held['record'])
+                record['law_disclosures'] = published
+                return record
+            self._freeze_gate_held_curve_record = None
 
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None
@@ -2341,8 +2348,7 @@ class EvaporationMixin:
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         cached_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
         if (
-            stored_disclosures_known(cache)
-            and cache
+            cache
             and cache.get('key') == key
             and cache.get('disposition') in {'live', 'memo-hit'}
             and gate_curve_memo_is_cacheable(
@@ -2362,40 +2368,38 @@ class EvaporationMixin:
             )
         ):
             with bind_simulation_run(self):
-                curve = dict(cached_curve)
-                for notice in cached_notices:
-                    record_repair_notice(self, notice)
-                self._record_composition_projected_liquidus_notice_from_curve(curve)
-                published = publish_stored_disclosures(cache, owner=self)
-                hit = gate_curve_memo_record(
-                    curve,
-                    cache.get('origin'),
-                    cached_notices,
-                    'memo-hit',
-                    provider_outcome=cache.get('provider_outcome'),
-                )
+                published = accept_stored_memo(cache, owner=self)
                 if published is not None:
-                    hit["law_disclosures"] = published
-                if store is not None and getattr(store, 'capture_enabled', False):
-                    if gate_curve_memo_is_cacheable(
-                        self,
+                    curve = dict(cached_curve)
+                    for notice in cached_notices:
+                        record_repair_notice(self, notice)
+                    self._record_composition_projected_liquidus_notice_from_curve(
+                        curve
+                    )
+                    hit = gate_curve_memo_record(
                         curve,
-                        cache.get('provider_outcome'),
-                        disposition=cache.get('disposition', 'live'),
-                    ):
-                        store.capture_gate_curve(
+                        cache.get('origin'),
+                        cached_notices,
+                        'memo-hit',
+                        provider_outcome=cache.get('provider_outcome'),
+                    )
+                    hit["law_disclosures"] = published
+                    if store is not None and getattr(store, 'capture_enabled', False):
+                        if gate_curve_memo_is_cacheable(
                             self,
-                            fO2_log=fO2_log,
-                            curve=curve,
-                            repair_notices=cached_notices,
-                            law_disclosures=(
-                                published
-                                if published is not None
-                                else recorded_law_disclosures(cache)
-                            ),
-                            **redox_state_kwargs,
-                        )
-                return hit
+                            curve,
+                            cache.get('provider_outcome'),
+                            disposition=cache.get('disposition', 'live'),
+                        ):
+                            store.capture_gate_curve(
+                                self,
+                                fO2_log=fO2_log,
+                                curve=curve,
+                                repair_notices=cached_notices,
+                                law_disclosures=published,
+                                **redox_state_kwargs,
+                            )
+                    return hit
 
         # Opt-in caller-owned memo for workflows that build fresh simulator
         # instances for equivalent rows. Reuse is based on the quantized
@@ -2416,8 +2420,7 @@ class EvaporationMixin:
                 shared_origin = None
                 shared_notices = None
             if (
-                stored_disclosures_known(process_cached)
-                and isinstance(process_cached, Mapping)
+                isinstance(process_cached, Mapping)
                 and process_cached.get('disposition') in {'live', 'memo-hit'}
                 and gate_curve_memo_is_cacheable(
                     self,
@@ -2436,49 +2439,45 @@ class EvaporationMixin:
                 )
             ):
                 with bind_simulation_run(self):
-                    curve = shared_value
-                    for notice in shared_notices:
-                        record_repair_notice(self, notice)
-                    self._record_composition_projected_liquidus_notice_from_curve(
-                        curve
-                    )
-                    record = gate_curve_memo_record(
-                        curve,
-                        shared_origin,
-                        shared_notices,
-                        'memo-hit',
-                        provider_outcome=process_cached.get('provider_outcome'),
-                    )
-                    published = publish_stored_disclosures(process_cached, owner=self)
+                    published = accept_stored_memo(process_cached, owner=self)
                     if published is not None:
-                        record["law_disclosures"] = published
-                    self._freeze_gate_liquid_fraction_cache = {
-                        **record,
-                        'key': key,
-                    }
-                    if (
-                        store is not None
-                        and getattr(store, 'capture_enabled', False)
-                        and gate_curve_memo_is_cacheable(
-                            self,
+                        curve = shared_value
+                        for notice in shared_notices:
+                            record_repair_notice(self, notice)
+                        self._record_composition_projected_liquidus_notice_from_curve(
+                            curve
+                        )
+                        record = gate_curve_memo_record(
                             curve,
-                            record.get('provider_outcome'),
-                            disposition=record.get('disposition', 'live'),
+                            shared_origin,
+                            shared_notices,
+                            'memo-hit',
+                            provider_outcome=process_cached.get('provider_outcome'),
                         )
-                    ):
-                        store.capture_gate_curve(
-                            self,
-                            fO2_log=fO2_log,
-                            curve=curve,
-                            repair_notices=shared_notices,
-                            law_disclosures=(
-                                published
-                                if published is not None
-                                else recorded_law_disclosures(process_cached)
-                            ),
-                            **redox_state_kwargs,
-                        )
-                    return record
+                        record["law_disclosures"] = published
+                        self._freeze_gate_liquid_fraction_cache = {
+                            **record,
+                            'key': key,
+                        }
+                        if (
+                            store is not None
+                            and getattr(store, 'capture_enabled', False)
+                            and gate_curve_memo_is_cacheable(
+                                self,
+                                curve,
+                                record.get('provider_outcome'),
+                                disposition=record.get('disposition', 'live'),
+                            )
+                        ):
+                            store.capture_gate_curve(
+                                self,
+                                fO2_log=fO2_log,
+                                curve=curve,
+                                repair_notices=shared_notices,
+                                law_disclosures=published,
+                                **redox_state_kwargs,
+                            )
+                        return record
 
         previous_in_progress = bool(
             getattr(self, '_freeze_gate_curve_in_progress', False)
