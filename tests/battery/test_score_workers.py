@@ -4,6 +4,7 @@ from decimal import Decimal
 from functools import partial
 import hashlib
 import json
+import os
 from pathlib import Path
 import time
 
@@ -63,8 +64,11 @@ def _worker_test_predict(
     delay_seconds: float = 0.0,
     hang_observation_id: str | None = None,
     hang_seconds: float = 0.0,
+    crash_observation_id: str | None = None,
     **_kwargs,
 ):
+    if observation.observation_id == crash_observation_id:
+        os._exit(17)
     if observation.observation_id == hang_observation_id:
         time.sleep(hang_seconds)
     elif delay_seconds:
@@ -145,19 +149,19 @@ def test_parallel_score_shards_use_progress_instead_of_total_wall_deadline(
     import simulator.battery.score as score_module
 
     monkeypatch.setattr(
-        score_module, "SCORE_SHARD_IDLE_TIMEOUT_SECONDS", 0.15, raising=False
+        score_module, "_SCORE_SHARD_IDLE_TIMEOUT_SECONDS", 3.0, raising=False
     )
-    context = _worker_fixture(experiment_count=8)
+    context = _worker_fixture(experiment_count=16)
     started = time.monotonic()
     written, metadata = _score_store_to_jsonl(
         context,
         tmp_path / "slow-but-progressing.jsonl",
         engines=(Engine.VAPOROCK,),
-        predict=partial(_worker_test_predict, delay_seconds=0.05),
+        predict=partial(_worker_test_predict, delay_seconds=0.25),
         workers=2,
     )
 
-    assert time.monotonic() - started > 0.15
+    assert time.monotonic() - started > 3.0
     assert written > 0
     assert metadata.shard_failures == ()
 
@@ -168,7 +172,7 @@ def test_parallel_score_hung_shard_becomes_refusals_and_keeps_other_shards(
     import simulator.battery.score as score_module
 
     monkeypatch.setattr(
-        score_module, "SCORE_SHARD_IDLE_TIMEOUT_SECONDS", 0.2, raising=False
+        score_module, "_SCORE_SHARD_IDLE_TIMEOUT_SECONDS", 3.0, raising=False
     )
     context = _worker_fixture(experiment_count=8)
     chunks = _partition_score_refs(tuple(context.observations.values()), workers=2)
@@ -205,6 +209,51 @@ def test_parallel_score_hung_shard_becomes_refusals_and_keeps_other_shards(
     assert all(
         row["execution"]["state"] == "attempted_unavailable"
         and row["refusal"]["reason"] == "attempted_unavailable"
+        and row["refusal"]["detail"]["reason"] == "score_shard_failed"
+        for row in failed_rows
+    )
+    assert any(row["execution"]["state"] == "produced" for row in healthy_rows)
+    assert metadata.shard_failures
+    assert metadata.engine_cache_counters[Engine.VAPOROCK.value]["hits"] > 0
+    assert "score run notice" in capsys.readouterr().err
+
+
+def test_parallel_score_crashed_shard_becomes_refusals_and_keeps_other_shards(
+    tmp_path: Path, capsys
+) -> None:
+    context = _worker_fixture(experiment_count=8)
+    chunks = _partition_score_refs(tuple(context.observations.values()), workers=2)
+    failed_chunk_index = next(index for index, chunk in enumerate(chunks) if chunk)
+    failed_observation = chunks[failed_chunk_index][0].observation_id
+    healthy_chunk = chunks[1 - failed_chunk_index]
+    assert healthy_chunk
+    written, metadata = _score_store_to_jsonl(
+        context,
+        tmp_path / "crashed-shard.jsonl",
+        engines=(Engine.VAPOROCK,),
+        predict=partial(
+            _worker_test_predict,
+            crash_observation_id=failed_observation,
+        ),
+        workers=2,
+    )
+
+    rows = [
+        json.loads(line)
+        for line in (tmp_path / "crashed-shard.jsonl.partial")
+        .read_text(encoding="utf-8")
+        .splitlines()[1:]
+    ]
+    failed_ids = {
+        observation.observation_id for observation in chunks[failed_chunk_index]
+    }
+    healthy_ids = {observation.observation_id for observation in healthy_chunk}
+    failed_rows = [row for row in rows if row["reference"] in failed_ids]
+    healthy_rows = [row for row in rows if row["reference"] in healthy_ids]
+    assert written == len(rows)
+    assert failed_rows and healthy_rows
+    assert all(
+        row["execution"]["state"] == "attempted_unavailable"
         and row["refusal"]["detail"]["reason"] == "score_shard_failed"
         for row in failed_rows
     )

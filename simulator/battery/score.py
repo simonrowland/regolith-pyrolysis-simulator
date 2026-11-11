@@ -26,7 +26,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from fractions import Fraction
-from functools import lru_cache
+from functools import lru_cache, partial
 from pathlib import Path
 from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Sequence, TextIO
 
@@ -34,7 +34,6 @@ import yaml
 
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.supervised_process_pool import (
-    DEFAULT_PROCESS_TASK_TIMEOUT_SECONDS,
     supervised_process_map,
 )
 from simulator.battery.enums import (
@@ -14151,6 +14150,8 @@ def _score_store_with_decisions(
     _engine_set: Sequence[Engine] | None = None,
     _refs: Sequence[Observation] | None = None,
     _stream: _ResidualJsonlStream | None = None,
+    _progress_callback: Callable[[], None] | None = None,
+    _shard_failure_reason: str | None = None,
 ) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
     prepared = _prepared or _prepare_score_run(
         context,
@@ -14261,6 +14262,14 @@ def _score_store_with_decisions(
                         derived_band_reason = None
                     for engine in engine_set:
                         prediction = None
+                        scoring_predict = (
+                            partial(
+                                _score_failed_shard_prediction,
+                                failure_reason=_shard_failure_reason,
+                            )
+                            if _shard_failure_reason is not None
+                            else predict
+                        )
                         if (
                             diagnostic
                             and point.observation_id not in fusion_diagnostic_ids
@@ -14278,7 +14287,8 @@ def _score_store_with_decisions(
                                 identity=point.identity if isinstance(point.identity, Identity) else None,
                             )
                         if (
-                            predict is None
+                            _shard_failure_reason is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
                             and point.source_id == _HASHIMOTO_SOURCE_ID
@@ -14292,7 +14302,8 @@ def _score_store_with_decisions(
                                 test_experiment_ids=prepared.test_experiment_ids,
                             )
                         if (
-                            predict is None
+                            _shard_failure_reason is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
                             and point.source_id == _SOSSI_SOURCE_ID
@@ -14306,7 +14317,8 @@ def _score_store_with_decisions(
                                 test_experiment_ids=prepared.test_experiment_ids,
                             )
                         if (
-                            predict is None
+                            _shard_failure_reason is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
                             and experiment is not None and experiment.method.is_value
@@ -14324,7 +14336,7 @@ def _score_store_with_decisions(
                             context=live_context,
                             prediction=prediction,
                             comparison_ids=comparison_ids,
-                            predict=predict,
+                            predict=scoring_predict,
                             handles=resolved_handles,
                             lineage_observation_id=(
                                 obs.observation_id
@@ -14344,6 +14356,15 @@ def _score_store_with_decisions(
                                 else None
                             ),
                         )
+                        if _shard_failure_reason is not None:
+                            residual = _score_failed_shard_residual(
+                                residual,
+                                engine,
+                                _shard_failure_reason,
+                                point,
+                                candidate,
+                            )
+                            candidate = None
                         if _stream is None:
                             assert residuals is not None
                             residuals.append(residual)
@@ -14361,8 +14382,10 @@ def _score_store_with_decisions(
                         if (
                             residual.fo2_mode is Fo2Mode.SHARED_LADDER
                             and intrinsic_redox_activity
-                            and prediction is None
-                            and predict is None
+                            and (
+                                (prediction is None and predict is None)
+                                or _shard_failure_reason is not None
+                            )
                         ):
                             total += 1
                             intrinsic_residual, intrinsic_candidate = compile_residual(
@@ -14383,8 +14406,18 @@ def _score_store_with_decisions(
                                 point_observations=point_observations_by_experiment.get(
                                     point.experiment_id, ()
                                 ),
+                                predict=scoring_predict,
                                 fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
                             )
+                            if _shard_failure_reason is not None:
+                                intrinsic_residual = _score_failed_shard_residual(
+                                    intrinsic_residual,
+                                    engine,
+                                    _shard_failure_reason,
+                                    point,
+                                    intrinsic_candidate,
+                                )
+                                intrinsic_candidate = None
                             if _stream is None:
                                 assert residuals is not None
                                 residuals.append(intrinsic_residual)
@@ -14405,6 +14438,8 @@ def _score_store_with_decisions(
                                 )
                         if candidate is not None and _stream is None:
                             candidates[candidate.observation_id] = candidate
+                        if _progress_callback is not None:
+                            _progress_callback()
                         done += 1
                         now = time.monotonic()
                         if now - last_progress >= 60:
@@ -14456,6 +14491,18 @@ _SCORE_WORKER_SETUP: (
     ]
 ) | None = None
 
+# This is a no-progress watchdog; engine calls keep their own per-cell timeouts.
+_SCORE_SHARD_IDLE_TIMEOUT_SECONDS = 5 * 60
+
+
+@dataclass(frozen=True)
+class _ScoreShardResult:
+    partial_path: str | None = None
+    row_count: int = 0
+    counters: Mapping[str, Mapping[str, object]] | None = None
+    runtime_identities: Mapping[str, str] | None = None
+    failure: str | None = None
+
 
 def _sum_engine_cache_counters(
     total: dict[str, dict[str, object]] | None,
@@ -14469,6 +14516,112 @@ def _sum_engine_cache_counters(
             if isinstance(value, int):
                 accumulated[name] = int(accumulated.get(name, 0)) + value
     return total
+
+
+def _score_failed_shard_prediction(
+    engine: Engine,
+    observation: Observation,
+    *,
+    failure_reason: str,
+    **_kwargs: object,
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        execution=Execution(
+            state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            call_evidence=f"score_shard:{engine.value}",
+        ),
+        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+        refusal_detail={
+            "reason": "score_shard_failed",
+            "detail": failure_reason,
+        },
+        identity=(
+            observation.identity
+            if isinstance(observation.identity, Identity)
+            else None
+        ),
+    )
+
+
+def _score_failed_shard_residual(
+    residual: Residual,
+    engine: Engine,
+    failure_reason: str,
+    observation: Observation,
+    candidate: Observation | None,
+) -> Residual:
+    detail: dict[str, object] = {
+        "reason": "score_shard_failed",
+        "engine": engine.value,
+        "detail": failure_reason,
+    }
+    check_refs: tuple[str, ...] = ()
+    if residual.refusal is not None:
+        detail["prior_refusal"] = {
+            "reason": residual.refusal.reason.value,
+            "detail": dict(residual.refusal.detail),
+        }
+        check_refs = residual.refusal.check_refs
+    request = residual.candidate_request
+    if request is None and candidate is not None:
+        candidate_quantity = quantity_token(candidate.identity)
+        if candidate_quantity is not None:
+            request = CandidateRequest(
+                candidate.experiment_id,
+                candidate_quantity,
+                engine,
+                ENGINE_CHANNELS[engine],
+            )
+    if request is None and isinstance(observation.identity, Identity):
+        observed_quantity = quantity_token(observation.identity)
+        if observed_quantity is not None:
+            request = CandidateRequest(
+                observation.experiment_id,
+                observed_quantity,
+                engine,
+                ENGINE_CHANNELS[engine],
+            )
+    return replace(
+        residual,
+        execution=Execution(
+            state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            call_evidence=f"score_shard:{engine.value}",
+        ),
+        status=ResidualStatus.REFUSED,
+        score_eligible=False,
+        candidate=None,
+        candidate_request=request,
+        numeric=None,
+        refusal=ResidualRefusal(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            detail,
+            check_refs=check_refs,
+        ),
+    )
+
+
+def _score_shard_worker_error_result(
+    _task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
+    error: BaseException,
+) -> _ScoreShardResult:
+    return _ScoreShardResult(
+        failure=f"{type(error).__name__}: {error}",
+    )
+
+
+def _score_shard_timeout_result(
+    _task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
+    elapsed_seconds: float,
+) -> _ScoreShardResult:
+    return _ScoreShardResult(
+        failure=(
+            "score shard made no progress for "
+            f"{elapsed_seconds:.3f}s"
+        ),
+    )
 
 
 def _initialize_score_worker(
@@ -14485,15 +14638,23 @@ def _score_shard_start_marker_path(
     return Path(f"{task[3]}.started")
 
 
+def _score_shard_progress_marker_path(
+    task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
+) -> Path:
+    return Path(f"{task[3]}.progress")
+
+
 def _clear_score_shard_start_marker(
     task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
 ) -> None:
-    try:
-        _score_shard_start_marker_path(task).unlink()
-    except FileNotFoundError:
-        return
-    except OSError:
-        return
+    for marker in (
+        _score_shard_start_marker_path(task),
+        _score_shard_progress_marker_path(task),
+    ):
+        try:
+            marker.unlink()
+        except (FileNotFoundError, OSError):
+            continue
 
 
 def _score_shard_has_started(
@@ -14502,14 +14663,18 @@ def _score_shard_has_started(
     return _score_shard_start_marker_path(task).is_file()
 
 
+def _score_shard_progress_time(
+    task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
+) -> int | None:
+    try:
+        return _score_shard_progress_marker_path(task).stat().st_mtime_ns
+    except OSError:
+        return None
+
+
 def _score_group_shard(
     task: tuple[int, Engine, tuple[Observation, ...], str, str | None]
-) -> tuple[
-    str,
-    int,
-    Mapping[str, Mapping[str, object]] | None,
-    Mapping[str, str] | None,
-]:
+) -> _ScoreShardResult:
     prepared, predict = _SCORE_WORKER_SETUP or (None, None)
     if prepared is None:
         raise RuntimeError("battery score worker was not initialized")
@@ -14518,6 +14683,8 @@ def _score_group_shard(
     start_marker = _score_shard_start_marker_path(task)
     start_marker.parent.mkdir(parents=True, exist_ok=True)
     start_marker.write_text(f"{os.getpid()}\n", encoding="utf-8")
+    progress_marker = _score_shard_progress_marker_path(task)
+    progress_marker.touch()
     stream = _ResidualJsonlStream(
         Path(path_text),
         root=None if root_text is None else Path(root_text),
@@ -14537,10 +14704,16 @@ def _score_group_shard(
             _engine_set=(engine,),
             _refs=refs,
             _stream=stream,
+            _progress_callback=progress_marker.touch,
         )
         counters = engine_cache_counters(reset=True)
         runtime_identities = engine_cache_runtime_identities()
-        return str(stream.partial_path), stream.count, counters, runtime_identities
+        return _ScoreShardResult(
+            partial_path=str(stream.partial_path),
+            row_count=stream.count,
+            counters=counters,
+            runtime_identities=runtime_identities,
+        )
     finally:
         stream.close()
         _clear_score_shard_start_marker(task)
@@ -14549,6 +14722,41 @@ def _score_group_shard(
         )
 
         _close_isolated_cell_workers()
+
+
+def _materialize_failed_score_shard(
+    task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
+    result: _ScoreShardResult,
+    prepared: _PreparedScoreRun,
+) -> _ScoreShardResult:
+    if result.failure is None:
+        return result
+    path = Path(task[3])
+    partial_path = path.with_name(path.name + ".partial")
+    order_path = partial_path.with_name(partial_path.name + ".order")
+    partial_path.unlink(missing_ok=True)
+    order_path.unlink(missing_ok=True)
+    failure_stream = _ResidualJsonlStream(
+        path,
+        root=None if task[4] is None else Path(task[4]),
+        sort_on_finalize=False,
+    )
+    try:
+        _score_store_with_decisions(
+            prepared.context,
+            _prepared=prepared,
+            _engine_set=(task[1],),
+            _refs=task[2],
+            _stream=failure_stream,
+            _shard_failure_reason=result.failure,
+        )
+        return replace(
+            result,
+            partial_path=str(failure_stream.partial_path),
+            row_count=failure_stream.count,
+        )
+    finally:
+        failure_stream.close()
 
 
 def _score_store_to_jsonl(
@@ -14581,6 +14789,7 @@ def _score_store_to_jsonl(
 
     cache_counters: dict[str, dict[str, object]] | None = None
     cache_runtime_identities: dict[str, str] | None = None
+    shard_failures: list[str] = []
     try:
         if workers == 1:
             engine_cache_counters(reset=True)
@@ -14640,6 +14849,7 @@ def _score_store_to_jsonl(
                             tasks.append(
                                 (index, engine, chunk, str(shard_path), root_text)
                             )
+                    engine_cache_counters(reset=True)
                     shard_results = supervised_process_map(
                         tasks,
                         _score_group_shard,
@@ -14650,25 +14860,43 @@ def _score_store_to_jsonl(
                             predict,
                         ),
                         mp_context=mp.get_context("spawn"),
-                        timeout_seconds=DEFAULT_PROCESS_TASK_TIMEOUT_SECONDS,
+                        timeout_seconds=_SCORE_SHARD_IDLE_TIMEOUT_SECONDS,
                         has_started=_score_shard_has_started,
+                        progress_time=_score_shard_progress_time,
                         before_submit=_clear_score_shard_start_marker,
+                        handle_timeout=_score_shard_timeout_result,
+                        handle_worker_error=_score_shard_worker_error_result,
                     )
                     with stream.partial_path.open("rb") as output:
                         header = output.readline()
                     shard_count = 0
+                    cache_counters = {}
                     cache_runtime_identities = {}
-                    for shard_path_text, row_count, counters, identities in shard_results:
-                        shard_count += row_count
-                        if counters is not None:
-                            cache_counters = _sum_engine_cache_counters(
-                                cache_counters, counters
+                    for task, shard_result in zip(tasks, shard_results):
+                        if shard_result.failure is not None:
+                            shard_result = _materialize_failed_score_shard(
+                                task,
+                                shard_result,
+                                prepared,
                             )
-                        if identities is not None:
-                            cache_runtime_identities.update(identities)
-                        order_path = Path(f"{shard_path_text}.order")
+                            shard_failures.append(
+                                f"chunk={task[0]} engine={task[1].value}: "
+                                f"{shard_result.failure}"
+                            )
+                        if shard_result.partial_path is None:
+                            raise RuntimeError("score shard returned no residual file")
+                        shard_count += shard_result.row_count
+                        if shard_result.counters is not None:
+                            cache_counters = _sum_engine_cache_counters(
+                                cache_counters, shard_result.counters
+                            )
+                        if shard_result.runtime_identities is not None:
+                            cache_runtime_identities.update(
+                                shard_result.runtime_identities
+                            )
+                        order_path = Path(f"{shard_result.partial_path}.order")
                         with (
-                            Path(shard_path_text).open("rb") as shard,
+                            Path(shard_result.partial_path).open("rb") as shard,
                             order_path.open("r", encoding="utf-8") as order_file,
                         ):
                             if shard.readline() != header:
@@ -14713,6 +14941,14 @@ def _score_store_to_jsonl(
                             "score shard row count does not match merged output"
                         )
                 stream.finalize(context=context, engines=prepared.engine_set)
+        if shard_failures:
+            print(
+                "score run notice: failed score shards were written as "
+                "ATTEMPTED_UNAVAILABLE rows: "
+                + "; ".join(shard_failures),
+                file=sys.stderr,
+                flush=True,
+            )
         return stream.count, _ResidualReportMetadata(
             family_band_values=dict(stream.band_values),
             headline_band_values=dict(stream.headline_band_values),
@@ -14720,6 +14956,7 @@ def _score_store_to_jsonl(
             aggregate=stream.report_aggregate,
             engine_cache_counters=cache_counters,
             engine_cache_runtime_identities=cache_runtime_identities,
+            shard_failures=tuple(shard_failures),
         )
     finally:
         stream.close()
@@ -14982,6 +15219,7 @@ class _ResidualReportMetadata:
     aggregate: _ScorePayloadAccumulator | None = None
     engine_cache_counters: Mapping[str, Mapping[str, object]] | None = None
     engine_cache_runtime_identities: Mapping[str, str] | None = None
+    shard_failures: tuple[str, ...] = ()
 
 
 class _ResidualJsonlRows:

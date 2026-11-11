@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import deque
 from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, wait
+from concurrent.futures.process import BrokenProcessPool
 from functools import partial
 import os
 import signal
@@ -98,10 +99,14 @@ def supervised_process_map(
     max_inflight_per_worker: int = 1,
     timeout_seconds: float | None = None,
     has_started: Callable[[Task], bool] | None = None,
+    progress_time: Callable[[Task], int | float | None] | None = None,
     before_submit: Callable[[Task], None] | None = None,
     handle_result: Callable[[Task, Result], Any] | None = None,
     handle_timeout: Callable[[Task, float], Any] | None = None,
-    handle_worker_error: Callable[[Task, BaseException], BaseException] | None = None,
+    handle_worker_error: Callable[
+        [Task, BaseException], BaseException | Result
+    ]
+    | None = None,
     task_label: Callable[[Task], str] = repr,
     requeue_key: Callable[[Task], Any] | None = None,
     executor_factory: Callable[
@@ -118,9 +123,11 @@ def supervised_process_map(
     """Run tasks in an ordered, supervised ``ProcessPoolExecutor``.
 
     ``has_started`` lets callers identify the worker's actual task-start
-    marker, so execution time excludes executor startup. Timed-out tasks may
+    marker, so execution time excludes executor startup. If ``progress_time``
+    is set, a change in its value resets the task deadline. Timed-out tasks may
     be converted by ``handle_timeout``; remaining in-flight tasks are requeued
-    in input order after their worker processes are stopped.
+    in input order after their worker processes are stopped. A worker error
+    handler may return a result to fail one task while the map continues.
     """
     if not tasks:
         return ()
@@ -136,6 +143,7 @@ def supervised_process_map(
     futures: dict[Future[Any], tuple[int, Task]] = {}
     submitted_at: dict[Future[Any], float] = {}
     started_at: dict[Future[Any], float] = {}
+    progress_values: dict[Future[Any], int | float] = {}
     executor_closed = True
     pending_abort: BaseException | None = None
 
@@ -234,6 +242,16 @@ def supervised_process_map(
                     pass
             elif future not in started_at:
                 started_at[future] = submitted_at[future]
+            if future in started_at and progress_time is not None:
+                try:
+                    progress = progress_time(task)
+                except OSError:
+                    progress = None
+                if progress is not None:
+                    previous = progress_values.get(future)
+                    if previous is not None and progress != previous:
+                        started_at[future] = now
+                    progress_values[future] = progress
         return (
             pool_wait_timeout(futures, submitted_at, started_at, timeout_seconds),
             expired_futures(futures, submitted_at, started_at, timeout_seconds),
@@ -259,23 +277,51 @@ def supervised_process_map(
                 index, task = futures.pop(future)
                 submitted_at.pop(future, None)
                 started_at.pop(future, None)
+                progress_values.pop(future, None)
                 try:
                     raw_result = future.result()
                 except BaseException as exc:
-                    error = (
+                    failure = (
                         handle_worker_error(task, exc)
                         if handle_worker_error is not None
                         else RuntimeError(
                             f"process-pool task failed for {task_label(task)}"
                         )
                     )
-                    pending_abort = error
-                    executor_closed = abort(
-                        error,
-                        futures,
-                        (task, *(pending[1] for pending in futures.values())),
-                    )
-                    raise error from exc
+                    if isinstance(failure, BaseException):
+                        pending_abort = failure
+                        executor_closed = abort(
+                            failure,
+                            futures,
+                            (task, *(pending[1] for pending in futures.values())),
+                        )
+                        raise failure from exc
+                    results[index] = failure
+                    if isinstance(exc, BrokenProcessPool):
+                        requeue = sorted(
+                            futures.values(),
+                            key=(
+                                (lambda item: requeue_key(item[1]))
+                                if requeue_key is not None
+                                else (lambda item: item[0])
+                            ),
+                        )
+                        pending_tasks.extendleft(
+                            (pending_index, pending_task)
+                            for pending_index, pending_task in reversed(requeue)
+                        )
+                        affected = tuple(pending_task for _, pending_task in requeue)
+                        executor_closed = abort(exc, futures, affected)
+                        futures.clear()
+                        submitted_at.clear()
+                        started_at.clear()
+                        progress_values.clear()
+                        executor = create_executor()
+                        executor_closed = False
+                        submit_until_full()
+                        break
+                    submit_until_full()
+                    continue
                 try:
                     result = (
                         handle_result(task, raw_result)
@@ -300,6 +346,7 @@ def supervised_process_map(
                     task_index, task = futures.pop(future)
                     start = started_at.pop(future, None)
                     submitted = submitted_at.pop(future, time.monotonic())
+                    progress_values.pop(future, None)
                     origin = start if start is not None else submitted
                     elapsed = max(0.0, time.monotonic() - origin)
                     expired_tasks.append((task_index, task))
@@ -336,6 +383,7 @@ def supervised_process_map(
                 futures.clear()
                 submitted_at.clear()
                 started_at.clear()
+                progress_values.clear()
                 timeout_error = RuntimeError("process-pool worker timed out")
                 executor_closed = abort(timeout_error, {}, affected)
                 executor = create_executor()
