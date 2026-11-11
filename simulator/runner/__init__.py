@@ -1427,13 +1427,6 @@ class PyrolysisRun:
             "liquid_fraction_provider": sim.record.liquid_fraction_provider,
             "kernel_commit_sha": kernel_commit_sha,
         }
-        from simulator.vapour_rail.run_disclosure import published_run_disclosures
-
-        law_disclosures = published_run_disclosures(execution)
-        if law_disclosures:
-            run_metadata["law_disclosures"] = [
-                dict(item) for item in law_disclosures
-            ]
         c3_credit_dose_kg = _c3_alkali_dosing_kg_by_species(
             session_config.setpoints
         )
@@ -1501,6 +1494,8 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
+        # Measured disclosures replace an override of the same key.
+        _install_measured_law_disclosures(run_metadata, execution)
         run_metadata["campaigns_elapsed"] = _safe_failure_value(
             lambda: float(execution.campaigns_elapsed),
             section="run_metadata.campaigns_elapsed",
@@ -5792,6 +5787,36 @@ def _execution_pO2_enforcement_by_hour(
     return _json_safe(rows)
 
 
+def _install_measured_law_disclosures(
+    run_metadata: dict[str, Any],
+    execution: Any = None,
+    *,
+    prior: Any = None,
+) -> None:
+    """Write the measured disclosure after metadata overrides.
+
+    A non-empty measurement replaces any override of ``law_disclosures``.
+    Callers that have no execution pass ``prior``, the disclosure the
+    document held before the override was applied. An empty measurement
+    leaves an override in place.
+    """
+
+    if execution is not None:
+        from simulator.vapour_rail.run_disclosure import published_run_disclosures
+
+        law_disclosures = published_run_disclosures(execution)
+        if law_disclosures:
+            run_metadata["law_disclosures"] = [
+                dict(item) for item in law_disclosures
+            ]
+        return
+    if isinstance(prior, (list, tuple)) and prior:
+        run_metadata["law_disclosures"] = [
+            dict(item) if isinstance(item, Mapping) else item
+            for item in prior
+        ]
+
+
 def _runner_failure_result(
     *,
     error: RunnerError,
@@ -5849,13 +5874,7 @@ def _runner_failure_result(
     }
     for key, value in overrides.items():
         run_metadata[str(key)] = _json_safe(value)
-    from simulator.vapour_rail.run_disclosure import published_run_disclosures
-
-    law_disclosures = published_run_disclosures(execution)
-    if law_disclosures:
-        run_metadata["law_disclosures"] = [
-            dict(item) for item in law_disclosures
-        ]
+    _install_measured_law_disclosures(run_metadata, execution)
     run_metadata["campaigns_elapsed"] = _safe_failure_value(
         lambda: _json_safe(
             float(
@@ -6395,7 +6414,12 @@ def main(argv: Optional[list[str]] = None) -> int:
                 materials=bundle.materials,
                 backend_name=args.backend,
             )
+            measured_disclosures = result["run_metadata"].get("law_disclosures")
             result["run_metadata"].update(metadata_overrides)
+            _install_measured_law_disclosures(
+                result["run_metadata"],
+                prior=measured_disclosures,
+            )
         else:
             run = PyrolysisRun(
                 feedstock_id=feedstock_id,

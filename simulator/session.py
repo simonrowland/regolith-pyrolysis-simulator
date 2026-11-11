@@ -646,7 +646,10 @@ class SimSession:
                 choice,
                 valid_choices,
             )
-        sim.apply_decision(decision.decision_type, choice)
+        # A campaign change forecasts vapour laws on a detached copy.
+        # Bind first so those evaluations land on this session.
+        with self._bound_law_disclosure():
+            sim.apply_decision(decision.decision_type, choice)
 
     def pending_decision(self) -> DecisionPoint | None:
         return self._require_sim().pending_decision
@@ -848,7 +851,10 @@ class SimSession:
         else:
             raise ValueError(f"unsupported session adjustment {param!r}")
         if adjusted_c0_forecast_field is not None:
-            sim._handle_c0_forecast_adjustment(adjusted_c0_forecast_field)
+            # The forecast deep-copies the simulator and returns only the
+            # prediction. Bind first so its computations register here.
+            with self._bound_law_disclosure():
+                sim._handle_c0_forecast_adjustment(adjusted_c0_forecast_field)
         sim.melt.validate_melt_pressures()
 
     def pause(self) -> None:

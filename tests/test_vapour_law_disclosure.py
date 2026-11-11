@@ -9,7 +9,11 @@ a measured empty and never an empty authority. A physics cache hit binds the
 owning run before it returns, so a known disclosure is re-registered even
 when no session was already active. A new ``SimSession.start`` owns a fresh
 registry. Projection after a
-committed step poisons the session. A cache or memo hit with no stored
+committed step poisons the session. Every public session verb that runs
+the simulator binds that registry, including adjust and decide. A detached
+C0 forecast shares the parent's run registry, and ``_predict_c0_exit``
+publishes it onto the parent. Metadata overrides are applied before the
+measured disclosure is installed, on every run-metadata publisher. A cache or memo hit with no stored
 disclosure field is unknown and is a miss. Registration is the one
 ``CompiledPressureEvaluator.evaluate`` call. A hit does not execute the law; it
 re-registers the disclosures stored with that computation, and evaluation
@@ -1937,3 +1941,355 @@ def test_receipt_and_evaluator_diagnostic_notices_both_survive() -> None:
     assert isinstance(notice, dict)
     assert notice.get("closes_with") == "t-1723"
     assert notice.get("marker") is None
+
+
+# Session verbs that execute the simulator. A new public verb must be added
+# here or to the read-only set. Executing verbs bind the session registry.
+_SESSION_VERBS_THAT_EXECUTE = frozenset({"start", "advance", "decide", "adjust"})
+_SESSION_VERBS_THAT_ONLY_READ = frozenset({
+    "law_disclosures",
+    "simulator",
+    "pause",
+    "resume",
+    "is_complete",
+    "snapshot",
+    "pending_decision",
+    "result_document",
+    "per_hour_summaries",
+    "operator_decisions",
+})
+
+
+def test_every_public_session_verb_binds_or_is_read_only() -> None:
+    """Every session entry is classified. Executing verbs bind the registry."""
+
+    import ast
+
+    from simulator.session import SimSession
+
+    source = inspect.getsource(SimSession)
+    tree = ast.parse(source)
+    class_node = tree.body[0]
+    public: set[str] = set()
+    binders: set[str] = set()
+    for node in class_node.body:
+        if not isinstance(node, ast.FunctionDef) or node.name.startswith("_"):
+            continue
+        public.add(node.name)
+        for child in ast.walk(node):
+            if not isinstance(child, ast.With):
+                continue
+            for item in child.items:
+                expr = item.context_expr
+                func = expr.func if isinstance(expr, ast.Call) else expr
+                if isinstance(func, ast.Attribute) and func.attr == "_bound_law_disclosure":
+                    binders.add(node.name)
+    assert public == _SESSION_VERBS_THAT_EXECUTE | _SESSION_VERBS_THAT_ONLY_READ
+    assert binders == _SESSION_VERBS_THAT_EXECUTE
+
+
+def _evaluate_fe_on_private_registry() -> None:
+    """The forecast pattern: a detached owner with its own registry."""
+
+    from types import SimpleNamespace
+
+    from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+    private = RunDisclosure()
+    context = SimpleNamespace(
+        _law_disclosure_registry=private,
+        law_disclosures=(),
+    )
+    with bind_simulation_run(context):
+        _fe_pressure("FeO_association_gas")
+
+
+def _session_for_detached_verb():
+    from types import SimpleNamespace
+
+    from simulator.core import CampaignPhase
+    from simulator.session import SimSession
+    from simulator.state import DecisionPoint, DecisionType
+
+    session = SimSession()
+    calls: list[str] = []
+
+    def forecast(field: str) -> None:
+        calls.append(field)
+        _evaluate_fe_on_private_registry()
+
+    melt = SimpleNamespace(
+        campaign=CampaignPhase.C0,
+        pO2_mbar=0.0,
+        p_total_mbar=1.0,
+        atmosphere=None,
+        validate_melt_pressures=lambda: None,
+    )
+    sim = SimpleNamespace(
+        melt=melt,
+        campaign_mgr=SimpleNamespace(
+            overrides={},
+            _refuse_unknown_override_fields=lambda *_a, **_k: None,
+            runtime_po2_ceiling_mbar=lambda *_a, **_k: 10.0,
+            _validate_runtime_pressure_overrides=lambda *_a, **_k: None,
+        ),
+        _handle_c0_forecast_adjustment=forecast,
+        campaign_endpoint_refused=lambda: False,
+        pending_decision=DecisionPoint(
+            decision_type=DecisionType.TI_RETENTION,
+            options=["keep"],
+        ),
+        apply_decision=lambda *_a, **_k: forecast("decide"),
+    )
+    session._sim = sim
+    return session, calls
+
+
+@pytest.mark.parametrize(
+    "verb",
+    ["adjust_pO2", "adjust_campaign_override", "decide"],
+)
+def test_detached_session_verb_registers_on_the_session(verb: str) -> None:
+    """A law evaluated on a private registry still reaches the session.
+
+    adjust and decide are the session verbs that run a forecast outside
+    advance. Each arm executes Fe only inside ``bind_simulation_run`` on a
+    detached owner. Deleting ``_bound_law_disclosure`` around that verb
+    leaves the session snapshot empty.
+    """
+
+    session, calls = _session_for_detached_verb()
+    if verb == "adjust_pO2":
+        session.adjust("pO2_mbar", 0.1)
+        assert calls == ["C0.pO2_mbar"]
+    elif verb == "adjust_campaign_override":
+        session.adjust(
+            "campaign_override",
+            0.2,
+            campaign="C0",
+            field="pO2_mbar",
+        )
+        assert calls == ["C0.pO2_mbar"]
+    else:
+        session.decide("keep")
+        assert calls == ["decide"]
+    assert len(session.law_disclosures) == 1
+    _assert_fe_disclosure(
+        session.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+    assert session.simulator.law_disclosures == session.law_disclosures
+
+
+def test_c0_forecast_context_shares_the_parent_registry(monkeypatch) -> None:
+    """The detached forecast writes the parent's registry, not a copy.
+
+    Deleting the share in ``_build_c0_forecast_context`` leaves the parent
+    snapshot empty after the context evaluates Fe.
+    """
+
+    from simulator.chemistry.kernel.registry import ProviderRegistry
+    from simulator.core import PyrolysisSimulator
+    from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+    monkeypatch.setattr(
+        "simulator.core.snapshot_atom_ledger",
+        lambda ledger: ledger,
+    )
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    registry = RunDisclosure()
+    sim._law_disclosure_registry = registry
+    sim.law_disclosures = ()
+    sim.backend = None
+    sim._c0_forecast_backend_factory = None
+    sim._pt0_determinism_store = None
+    sim.atom_ledger = object()
+    sim._chem_registry = ProviderRegistry()
+    sim._chem_kernel = None
+    sim._build_chemistry_kernel = lambda: None
+
+    context, status = sim._build_c0_forecast_context()
+    assert status == ""
+    assert context is not None
+    assert context is not sim
+    assert context._law_disclosure_registry is registry
+    with bind_simulation_run(context):
+        _fe_pressure("FeO_association_gas")
+    assert len(registry.snapshot()) == 1
+    _assert_fe_disclosure(
+        registry.snapshot()[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+
+
+def test_predict_c0_exit_publishes_the_parent_registry() -> None:
+    """Dropping the forecast context does not drop its disclosures.
+
+    Deleting the publish at the end of ``_predict_c0_exit`` leaves
+    ``sim.law_disclosures`` empty while the registry holds Fe.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.core import PyrolysisSimulator
+    from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    registry = RunDisclosure()
+    sim._law_disclosure_registry = registry
+    sim.law_disclosures = ()
+    context = SimpleNamespace(_law_disclosure_registry=registry)
+
+    def evaluate(**_kwargs):
+        with bind_simulation_run(context):
+            _fe_pressure("FeO_association_gas")
+        return {"prediction_status": "ok"}
+
+    context._evaluate_c0_exit_forecast = evaluate
+    sim._build_c0_forecast_context = lambda: (context, "")
+    prediction = sim._predict_c0_exit()
+    assert prediction["prediction_status"] == "ok"
+    _assert_fe_disclosure(
+        registry.snapshot()[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+    _assert_fe_disclosure(
+        sim.law_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )
+
+
+def test_every_metadata_override_installs_the_measured_disclosure() -> None:
+    """Each override writer installs the measurement after the override."""
+
+    import ast
+
+    path = _ROOT / "simulator" / "runner" / "__init__.py"
+    source = path.read_text(encoding="utf-8")
+    lines = source.splitlines()
+    tree = ast.parse(source)
+    override_markers = (
+        "metadata_overrides.items()",
+        "overrides.items()",
+        ".update(metadata_overrides)",
+    )
+    offenders: list[str] = []
+    writers: list[str] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.FunctionDef):
+            continue
+        if node.name == "_install_measured_law_disclosures":
+            continue
+        start = node.lineno
+        end = node.end_lineno or start
+        body = lines[start - 1:end]
+        hits = [
+            start + offset
+            for offset, line in enumerate(body)
+            if any(marker in line for marker in override_markers)
+        ]
+        if not hits:
+            continue
+        writers.append(node.name)
+        installs = [
+            start + offset
+            for offset, line in enumerate(body)
+            if "_install_measured_law_disclosures" in line
+        ]
+        if not any(install > hits[0] for install in installs):
+            offenders.append(node.name)
+    assert set(writers) == {
+        "_build_output_detail",
+        "_runner_failure_result",
+        "main",
+    }
+    assert len(writers) == 3
+    assert offenders == []
+
+
+@pytest.mark.parametrize("publisher", ["detail", "failure"])
+def test_publishers_keep_measured_disclosures_over_overrides(
+    publisher: str,
+) -> None:
+    """An override of law_disclosures cannot erase Fe.
+
+    ``detail`` calls ``PyrolysisRun._build_output_detail``. ``failure`` calls
+    ``_runner_failure_result``. Deleting the installer in either function
+    leaves that arm's run_metadata disclosure empty.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.runner import PyrolysisRun, RunnerError, _runner_failure_result
+    from simulator.session import SimSession
+
+    session = SimSession()
+    session._sim = SimpleNamespace(
+        record=SimpleNamespace(
+            liquid_fraction_provider="analytical",
+            snapshots=(),
+        ),
+        melt=SimpleNamespace(hour=1),
+    )
+    with session._bound_law_disclosure():
+        _fe_pressure("FeO_association_gas")
+    execution = SimpleNamespace(
+        session=session,
+        simulator=session.simulator,
+        per_hour=(),
+        snapshots=(),
+        backend_status="unavailable",
+        backend_authoritative=False,
+        refusal_diagnostic={},
+        campaigns_elapsed=1.0,
+        shadow_trace=(),
+        status="failed",
+        reason="",
+        error_message="",
+        reduced_real_cache={},
+        envelope_detail_unavailable="",
+    )
+    if publisher == "failure":
+        payload = _runner_failure_result(
+            error=RunnerError("disclosure probe"),
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C0",
+            hours=1,
+            mass_kg=1.0,
+            additives_kg={},
+            track="pyrolysis",
+            backend_name="internal-analytical",
+            engines={},
+            metadata_overrides={"law_disclosures": []},
+            execution=execution,
+        )
+    else:
+        run = PyrolysisRun(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C0",
+            hours=1,
+            run_metadata_overrides={
+                "started_at_utc": "2026-01-01T00:00:00Z",
+                "kernel_commit_sha": "disclosure-fixture",
+                "law_disclosures": [],
+            },
+        )
+        execution.session._config = SimpleNamespace(
+            additives_kg={},
+            setpoints={},
+        )
+        execution.simulator.record = SimpleNamespace(
+            liquid_fraction_provider="analytical",
+            snapshots=(),
+        )
+        execution.simulator.melt = SimpleNamespace(hour=1)
+        payload = run._build_output_detail(execution)
+    _assert_fe_disclosure(
+        payload["run_metadata"]["law_disclosures"][0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=1,
+    )

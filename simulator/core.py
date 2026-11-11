@@ -14327,15 +14327,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     else {}
                 ),
             }
-        prediction = context._evaluate_c0_exit_forecast(
-            alkali_retention_budget_fraction=(
-                alkali_retention_budget_fraction
-            ),
-            p_total_mbar=p_total_mbar,
-            pO2_mbar=pO2_mbar,
-            remaining_hold_budget_hr=remaining_hold_budget_hr,
-            preferred_exit_temperature_C=preferred_exit_temperature_C,
-        )
+        try:
+            prediction = context._evaluate_c0_exit_forecast(
+                alkali_retention_budget_fraction=(
+                    alkali_retention_budget_fraction
+                ),
+                p_total_mbar=p_total_mbar,
+                pO2_mbar=pO2_mbar,
+                remaining_hold_budget_hr=remaining_hold_budget_hr,
+                preferred_exit_temperature_C=preferred_exit_temperature_C,
+            )
+        finally:
+            # The context is dropped with the prediction. Publish the
+            # parent registry, which the forecast shares, onto this simulator.
+            from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+            parent_registry = getattr(self, '_law_disclosure_registry', None)
+            if (
+                isinstance(parent_registry, RunDisclosure)
+                and not parent_registry.computation
+            ):
+                self.law_disclosures = parent_registry.snapshot()
         forecast_engine = getattr(context, '_c0_forecast_engine', None)
         if forecast_engine is not None:
             prediction['forecast_engine'] = forecast_engine
@@ -14415,6 +14427,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         try:
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
+            # A copied registry would record forecast evaluations on an
+            # object this method drops. Share the parent's run registry.
+            from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+            parent_registry = getattr(self, '_law_disclosure_registry', None)
+            if (
+                isinstance(parent_registry, RunDisclosure)
+                and not parent_registry.computation
+            ):
+                memo[id(parent_registry)] = parent_registry
             if self.backend is not None:
                 memo[id(self.backend)] = forecast_backend
             if live_store is not None:
@@ -14429,6 +14451,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             context.__dict__.update(
                 _deepcopy_refusal_state(forecast_state, memo)
             )
+            if (
+                isinstance(parent_registry, RunDisclosure)
+                and not parent_registry.computation
+            ):
+                context._law_disclosure_registry = parent_registry
             context._c0_forecast_context = True
             context._c0_forecast_engine = forecast_engine
             context._c0_forecast_backend_factory = None
