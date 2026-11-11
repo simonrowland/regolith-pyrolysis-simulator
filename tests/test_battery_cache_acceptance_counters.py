@@ -178,6 +178,7 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
                     str(shard),
                     0,
                     counters,
+                    {},
                 )
             )
         assert len(results) == 2 * len(SCORE_ENGINE_SET)

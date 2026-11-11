@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,18 +21,6 @@ CACHEABLE_TEST_ENGINES = tuple(
     for engine in CACHE_TEST_ENGINES
     if engine is not Engine.INTERNAL_ANALYTICAL
 )
-
-_ENGINE_CONFIG_NON_PREDICTION_REASONS = {
-    "openimcc": {
-        "warm_worker": "The battery opener does not forward worker scheduling to OpenIMCC."
-    },
-    "alphamelts": {"warm_worker": "Worker reuse changes scheduling, not chemistry."},
-    "vaporock": {"warm_worker": "Worker reuse changes scheduling, not chemistry."},
-    "magemin": {"warm_worker": "Worker reuse changes scheduling, not chemistry."},
-    "thermoengine": {
-        "warm_worker": "The battery opener does not forward worker scheduling to ThermoEngine."
-    },
-}
 
 
 @dataclass(frozen=True)
@@ -448,9 +437,12 @@ def test_isolated_public_engine_config_fields_change_the_projection(
     ("openimcc", "alphamelts", "vaporock", "magemin", "thermoengine"),
 )
 def test_worker_scheduling_config_does_not_change_prediction_settings(engine: str) -> None:
-    from simulator.engine_cache import engine_cache_settings
+    from simulator.engine_cache import (
+        ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS,
+        engine_cache_settings,
+    )
 
-    reason = _ENGINE_CONFIG_NON_PREDICTION_REASONS[engine]["warm_worker"]
+    reason = ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS[engine]["warm_worker"]
     configuration = {"warm_worker": False}
     before = engine_cache_settings(engine, configuration)
     configuration["warm_worker"] = True
@@ -462,6 +454,8 @@ def test_worker_scheduling_config_does_not_change_prediction_settings(engine: st
 def test_engine_opener_and_cache_share_canonical_settings_projection(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from simulator import backends
+    from simulator.diagnostic_helpers import binary_pot_battery
     from simulator.engine_cache import (
         engine_cache_settings,
         normalize_engine_settings,
@@ -479,19 +473,44 @@ def test_engine_opener_and_cache_share_canonical_settings_projection(
             "Fe3Fet_ratio": 0.3,
         },
     )
+    captured: dict[str, Any] = {}
+
+    def fake_resolve_backend(
+        _name: str, _policy: Any, *, backend_config: dict[str, Any]
+    ) -> Any:
+        captured.update(backend_config)
+        return SimpleNamespace()
+
+    monkeypatch.setattr(backends, "resolve_backend", fake_resolve_backend)
+    binary_pot_battery._open_resolved_backend(
+        "alphamelts",
+        {
+            "transport": "subprocess",
+            "ambient_calc_mode": "pMELTS",
+            "raw_model_name": "rhyolite-MELTS",
+            "redox_buffer": "QFM",
+            "fO2_offset": 0.5,
+            "Fe3Fet_ratio": 0.3,
+        },
+    )
 
     assert alpha["transport"] == "subprocess"
     assert alpha["ambient_calc_mode"] == "pMELTS"
-    assert alpha["model"] == "rhyolite-MELTS"
+    assert alpha["raw_model_name"] == "rhyolite-MELTS"
     assert (
         engine_cache_settings("alphamelts", alpha)["ambient_calc_mode"]
         == "pMELTS"
     )
+    assert captured["mode"] == alpha["transport"]
+    assert captured["model"] == alpha["raw_model_name"]
+    assert os.environ["ALPHAMELTS_CALC_MODE"] == alpha["ambient_calc_mode"]
 
     # Explicit absence means the opener removes the inherited parent value.
     absent = {"transport": "subprocess"}
     monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "pMELTS")
     projected_with_parent = engine_cache_settings("alphamelts", absent)
+    binary_pot_battery._open_resolved_backend("alphamelts", absent)
+    assert "ALPHAMELTS_CALC_MODE" not in os.environ
     monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "MELTS")
     assert engine_cache_settings("alphamelts", absent) == projected_with_parent
     assert projected_with_parent["ambient_calc_mode"] is None
@@ -600,6 +619,7 @@ def test_melts_redox_projection_covers_shared_normalizer_inputs(engine: str) -> 
             "magemin",
             {
                 "database": "ig",
+                "bridge": None,
                 "python_bridge": "subprocess",
                 "fO2_buffer": "QFM",
                 "warm_worker": False,
@@ -620,11 +640,22 @@ def test_melts_redox_projection_covers_shared_normalizer_inputs(engine: str) -> 
     ),
 )
 def test_opener_settings_reads_are_projected_or_declared_neutral(
-    engine: str, configuration: dict[str, Any]
+    engine: str,
+    configuration: dict[str, Any],
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from collections.abc import Iterator, Mapping
 
+    from simulator import engine_cache
+    from simulator.backends import BackendUnavailableError
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.magemin import MAGEMinBackend
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+    from simulator.melt_backend.vaporock import VapoRockBackend
+
     from simulator.engine_cache import (
+        ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS,
         engine_cache_settings,
         normalize_engine_settings,
     )
@@ -644,14 +675,110 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
         def __len__(self) -> int:
             return len(self.values)
 
+    backend_config_sources = {
+        "alphamelts": {
+            "mode": "transport",
+            "model": "raw_model_name",
+            "fO2_buffer": "redox_buffer",
+            "fO2_offset": "fO2_offset",
+            "Fe3Fet_Liq": "Fe3Fet_ratio",
+            "warm_worker": "warm_worker",
+            "vapor_transport_pO2_bar": "configured_vapor_transport_pO2_bar",
+            "vapor_transport_floor_bar": "configured_vapor_transport_floor_bar",
+        },
+        "vaporock": {
+            "temperature_units": "temperature_units",
+            "pressure_units": "pressure_units",
+            "vapor_pressure_units": "vapor_pressure_units",
+            "warm_worker": "warm_worker",
+        },
+        "magemin": {
+            "database": "database",
+            "fO2_buffer": "fO2_buffer",
+            "python_bridge": "bridge",
+            "warm_worker": "warm_worker",
+        },
+        "thermoengine": {
+            "model": "model",
+            "vapor_transport_pO2_bar": "configured_vapor_transport_pO2_bar",
+            "vapor_transport_floor_bar": "configured_vapor_transport_floor_bar",
+            "fO2_buffer": "redox_buffer",
+            "fO2_offset": "fO2_offset",
+            "Fe3Fet_Liq": "Fe3Fet_ratio",
+        },
+    }
+
     raw = RecordingMapping(configuration)
     normalized = normalize_engine_settings(engine, raw)
     projected = engine_cache_settings(engine, normalized)
-    neutral = _ENGINE_CONFIG_NON_PREDICTION_REASONS[engine]
+    neutral = ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS[engine]
 
-    assert raw.reads <= set(configuration) | set(neutral)
     for key in raw.reads - set(neutral):
         changed = dict(configuration)
+        value = changed.get(key)
+        if isinstance(value, bool):
+            changed[key] = not value
+        elif isinstance(value, (int, float)):
+            changed[key] = value + 1
+        elif isinstance(value, str):
+            changed[key] = value + "-changed"
+        elif isinstance(value, tuple):
+            changed[key] = (*value, 2)
+        elif value is None:
+            changed[key] = "changed"
+        else:
+            pytest.fail(f"cannot mutate recorded setting {engine}.{key}: {value!r}")
+        assert engine_cache_settings(engine, changed) != projected, key
+
+    normalized_reads: list[RecordingMapping] = []
+    constructor_reads: list[RecordingMapping] = []
+    original_normalize = engine_cache.normalize_engine_settings
+
+    def record_normalized_mapping(
+        name: str, settings: Mapping[str, Any] | None
+    ) -> RecordingMapping:
+        result = RecordingMapping(original_normalize(name, settings))
+        normalized_reads.append(result)
+        return result
+
+    monkeypatch.setattr(
+        engine_cache, "normalize_engine_settings", record_normalized_mapping
+    )
+
+    def record_initializer(backend_class: type) -> None:
+        original_initialize = backend_class.initialize
+
+        def initialize(self: Any, settings: Mapping[str, Any]) -> Any:
+            recorded = RecordingMapping(dict(settings))
+            constructor_reads.append(recorded)
+            return original_initialize(self, recorded)
+
+        monkeypatch.setattr(backend_class, "initialize", initialize)
+
+    if engine == "alphamelts":
+        record_initializer(AlphaMELTSBackend)
+    elif engine == "vaporock":
+        record_initializer(VapoRockBackend)
+    elif engine == "magemin":
+        record_initializer(MAGEMinBackend)
+    elif engine == "thermoengine":
+        record_initializer(ThermoEngineBackend)
+
+    opened_backend = None
+    try:
+        opened_backend = binary_pot_battery._open_resolved_backend(engine, raw)
+    except BackendUnavailableError:
+        pass
+    finally:
+        if opened_backend is not None:
+            close_battery_engine_handle(
+                SimpleNamespace(backend=opened_backend)
+            )
+    opener_settings = normalized_reads[-1]
+    opener_projection = engine_cache_settings(engine, opener_settings)
+    assert opener_settings.reads <= set(opener_settings)
+    for key in opener_settings.reads - set(neutral):
+        changed = dict(opener_settings)
         value = changed[key]
         if isinstance(value, bool):
             changed[key] = not value
@@ -661,9 +788,36 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
             changed[key] = value + "-changed"
         elif isinstance(value, tuple):
             changed[key] = (*value, 2)
+        elif value is None:
+            changed[key] = "changed"
         else:
-            pytest.fail(f"cannot mutate recorded setting {engine}.{key}: {value!r}")
-        assert engine_cache_settings(engine, changed) != projected, key
+            pytest.fail(f"cannot mutate opened setting {engine}.{key}: {value!r}")
+        assert engine_cache_settings(engine, changed) != opener_projection, key
+    if engine != "openimcc":
+        assert constructor_reads
+        sources = backend_config_sources[engine]
+        constructor_projection = engine_cache_settings(engine, opener_settings)
+        for recorded in constructor_reads:
+            for key in recorded.reads:
+                source = sources[key]
+                if source in neutral:
+                    continue
+                assert source in opener_settings
+                changed = dict(opener_settings)
+                value = changed[source]
+                if isinstance(value, bool):
+                    changed[source] = not value
+                elif isinstance(value, (int, float)):
+                    changed[source] = value + 1
+                elif isinstance(value, str):
+                    changed[source] = value + "-changed"
+                elif isinstance(value, tuple):
+                    changed[source] = (*value, 2)
+                else:
+                    pytest.fail(
+                        f"cannot mutate backend setting {engine}.{key}: {value!r}"
+                    )
+                assert engine_cache_settings(engine, changed) != constructor_projection, key
     assert projected
 
 
@@ -1071,7 +1225,7 @@ def test_runtime_identity_is_outside_engine_settings(case: _SettingCase) -> None
 
     backend = case.backend_factory()
     first = engine_cache_settings(case.engine.value, backend)
-    backend.engine_version = "runtime sha256:" + "a" * 64
+    backend._engine_version = "runtime sha256:" + "a" * 64
     backend.runtime_identity = {
         "commit": "b" * 64,
         "absolute_path": "/engine/runtime",

@@ -73,6 +73,7 @@ def test_sossi_geometry_is_declared_from_bead_mass_without_residue_inputs() -> N
 
 def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -> None:
     pytest.importorskip("openimcc")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     import openimcc
 
     import simulator.battery.residue as residue

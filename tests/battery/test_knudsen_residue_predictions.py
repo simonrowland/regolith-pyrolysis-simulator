@@ -406,10 +406,6 @@ def _read_markova_residue_cache_in_fresh_process(
         internal_analytical_residue_vapor_pressure,
     )
 
-    def unexpected_adapter_call(**_kwargs):
-        raise AssertionError("fresh-process SQLite hit called the residue adapter")
-
-    battery._internal_analytical_vapor_pressure_adapter = unexpected_adapter_call
     result = internal_analytical_residue_vapor_pressure(
         core=battery._new_internal_analytical_core(),
         temperature_C=temperature_K - 273.15,
@@ -603,7 +599,7 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     tmp_path,
     monkeypatch,
 ):
-    """A recorded below-threshold Al pressure is zero, and the notice cites that proof."""
+    """An uncached IA recomputation retains the recorded below-threshold proof."""
     from simulator.accounting.formulas import parse_formula
     from simulator.battery.enums import NoticeKind
     from simulator import engine_cache
@@ -633,6 +629,10 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
     engine_cache.engine_cache_counters(reset=True)
     cold = internal_analytical_residue_vapor_pressure(**residue_request)
+    assert engine_cache.engine_cache_counters(reset=True).get(
+        "internal-analytical", {}
+    ) == {}
+    assert not database.exists()
 
     result_path = tmp_path / "markova-warm-result.pkl"
     context = multiprocessing.get_context("spawn")

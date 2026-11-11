@@ -211,6 +211,7 @@ def test_raw_key_hot_json_cold_compression_and_exact_round_trip(
 ) -> None:
     database = tmp_path / "engine-cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    monkeypatch.setattr(engine_cache, "_RUNTIME_IDENTITIES", {})
     _engine_cache_counters(reset=True)
     hot = {"status": "ok", "activity": 0.12345678901234566}
     cold = {"diagnostic": "not read on the hot path", "values": [1, 2, 3]}
@@ -314,11 +315,11 @@ def test_recursive_simple_namespace_hot_value_round_trips_without_projection(
     )
 
     cold = engine_cache.cached_engine_call(
-        "internal-analytical", {"call": "residue"}, lambda: expected
+        "openimcc", {"call": "generic namespace"}, lambda: expected
     )
     warm = engine_cache.cached_engine_call(
-        "internal-analytical",
-        {"call": "residue"},
+        "openimcc",
+        {"call": "generic namespace"},
         lambda: pytest.fail("expected recursive namespace cache hit"),
     )
 
@@ -326,13 +327,39 @@ def test_recursive_simple_namespace_hot_value_round_trips_without_projection(
     assert warm == expected
     assert isinstance(warm, SimpleNamespace)
     assert isinstance(warm.diagnostics, SimpleNamespace)
-    assert _engine_cache_counters(reset=True)["internal-analytical"] == {
+    assert _engine_cache_counters(reset=True)["openimcc"] == {
         "hits": 1,
         "misses": 1,
         "stores": 1,
         "store_error": 0,
         "read_error": 0,
     }
+
+
+def test_internal_analytical_cache_call_always_solves_without_a_store(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    _engine_cache_counters(reset=True)
+    calls = 0
+
+    def solve() -> dict[str, int]:
+        nonlocal calls
+        calls += 1
+        return {"answer": 42}
+
+    request = {"call": "stateful residue"}
+    assert engine_cache.cached_engine_call("internal-analytical", request, solve) == {
+        "answer": 42
+    }
+    assert engine_cache.cached_engine_call("internal-analytical", request, solve) == {
+        "answer": 42
+    }
+    assert calls == 2
+    assert _engine_cache_counters(reset=True).get("internal-analytical", {}) == {}
+    assert not database.exists()
 
 
 def test_openimcc_chemistry_version_change_with_same_pack_name_is_a_miss(
@@ -749,25 +776,24 @@ def test_equilibrium_hot_value_contains_only_scoring_inputs() -> None:
         }
     }
     result.vaporock_full_speciation_Pa = {"CO": 42.0}
-    result.imcc_notices = [{"kind": "fixture_flag"}]
+    result.imcc_notices = [{"kind": "openimcc_flag", "reason": "fixture"}]
     result.imcc_model_id = "fixture-model"
     result.liquid_composition_wt_pct = {"FeO": 10.0}
     result.fe_redox_split = {"FeO": 0.2}
 
-    value = result.to_engine_cache_value()
+    value = result.to_engine_cache_value(engine_id="openimcc")
 
     assert isinstance(value.hot, list)
     assert "phase_masses_kg" in value.cold
     assert "temperature_C" in value.cold
     assert "diagnostics" in value.cold
-    assert value.cold["diagnostics"] == {
-        "backend_status_reason": "fixture-code",
-        "unused": "large",
-    }
-    assert "warnings" in value.cold
-    assert "imcc_notices" in value.cold
-    assert "imcc_model_id" in value.cold
-    restored = EquilibriumResult.from_engine_cache_value(value.hot)
+    assert value.cold["diagnostics"] == {"unused": "large"}
+    assert "warnings" not in value.cold
+    assert "imcc_notices" not in value.cold
+    assert "imcc_model_id" not in value.cold
+    restored = EquilibriumResult.from_engine_cache_value(
+        value.hot, engine_id="openimcc"
+    )
     assert restored.activity_coefficients == result.activity_coefficients
     assert restored.vapor_pressures_Pa == result.vapor_pressures_Pa
     assert restored.vapor_pressures_source == {}
@@ -787,7 +813,11 @@ def test_equilibrium_hot_value_contains_only_scoring_inputs() -> None:
     assert restored.vaporock_full_speciation_Pa == {"CO": 42.0}
     assert restored.liquid_composition_wt_pct == {"FeO": 10.0}
     assert restored.fe_redox_split == {"FeO": 0.2}
-    assert restored.diagnostics == {}
+    assert restored.diagnostics == {"backend_status_reason": "fixture-code"}
+    assert restored.warnings == ["AlphaMELTS model notice"]
+    assert restored.imcc_notices == [
+        {"kind": "openimcc_flag", "reason": "fixture"}
+    ]
     assert restored.phase_masses_kg == {}
 
 
@@ -1114,6 +1144,17 @@ def test_engine_notice_codes_round_trip_with_typed_values() -> None:
     assert codes == tuple(sorted(codes))
     assert all(type(code) is int and 0 < code < 256 for code in codes)
     assert decode_engine_notice_codes("openimcc", codes, values) == notices
+    commissioning = {
+        "kind": "out_of_certified_band",
+        "authority": "extrapolated",
+        "certified_band": {"temperature_K": [1400.0, 1950.0]},
+    }
+    commissioning_codes, commissioning_values = encode_engine_notice_codes(
+        "thermoengine", [commissioning]
+    )
+    assert decode_engine_notice_codes(
+        "thermoengine", commissioning_codes, commissioning_values
+    ) == [commissioning]
     assert len({(engine, number) for engine, number, _code, _description in ENGINE_CACHE_NOTICE_CODE_TABLE}) == len(
         ENGINE_CACHE_NOTICE_CODE_TABLE
     )
@@ -1190,8 +1231,13 @@ def test_equilibrate_cell_hot_reuses_cell_certified_band_for_notices() -> None:
     hot = cell.to_engine_cache_value().hot
 
     assert hot[11][6] == band
-    assert hot[11][7] == [
-        ["openimcc_temperature_extrapolated", "extrapolated", True]
-    ]
+    assert hot[11][7]["codes"] == (3,)
+    assert hot[11][7]["values"] == (
+        {
+            "position": 0,
+            "authority": "extrapolated",
+            "certified_band": band,
+        },
+    )
     restored = EquilibrateCell.from_engine_cache_value(hot)
     assert restored.notices[0]["certified_band"] == band
