@@ -13251,8 +13251,15 @@ def test_battery_failed_rerun_preserves_published_output_set(
     if failure_stage == "summary":
         original_write_summary = battery_score._write_headline_summary_from_accumulator_json
 
-        def write_then_fail(aggregate, path, *, store_stamp):
-            original_write_summary(aggregate, path, store_stamp=store_stamp)
+        def write_then_fail(
+            aggregate, path, *, store_stamp, shard_failures=()
+        ):
+            original_write_summary(
+                aggregate,
+                path,
+                store_stamp=store_stamp,
+                shard_failures=shard_failures,
+            )
             raise RuntimeError("injected summary stop")
 
         monkeypatch.setattr(
