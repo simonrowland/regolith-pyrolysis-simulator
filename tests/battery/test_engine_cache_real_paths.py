@@ -544,6 +544,37 @@ def test_magemin_python_bridge_alias_is_normalized_before_open_and_key(
     assert engine_cache_settings("magemin", settings)["bridge"] == "julia"
 
 
+def test_default_alphamelts_open_uses_the_normalized_environment_snapshot(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import backends
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.engine_cache import engine_cache_settings, normalize_engine_settings
+
+    captured: dict[str, str | None] = {}
+
+    def fake_resolve_backend(
+        _name: str,
+        _policy: Any,
+        *,
+        backend_config: dict[str, Any] | None = None,
+    ) -> Any:
+        captured["ambient_calc_mode"] = os.environ.get("ALPHAMELTS_CALC_MODE")
+        return SimpleNamespace()
+
+    monkeypatch.setattr(backends, "resolve_backend", fake_resolve_backend)
+    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "pMELTS")
+    effective = normalize_engine_settings("alphamelts", None)
+    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "MELTS")
+
+    binary_pot_battery._open_resolved_backend(
+        "alphamelts", normalized_settings=effective
+    )
+
+    assert captured["ambient_calc_mode"] == "pMELTS"
+    assert engine_cache_settings("alphamelts", effective)["ambient_calc_mode"] == "pMELTS"
+
+
 def test_openimcc_unused_gas_pack_setting_is_not_a_cache_input() -> None:
     from simulator.engine_cache import engine_cache_settings
 
