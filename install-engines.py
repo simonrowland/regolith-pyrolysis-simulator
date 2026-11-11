@@ -219,6 +219,41 @@ def brew_deps() -> None:
         _record(f"{formula}: installed")
 
 
+def _apply_magemin_patches(src: Path, patch_names: tuple[str, ...]) -> None:
+    patch_dir = ROOT / "patches" / "magemin"
+    for patch_name in patch_names:
+        if not patch_name or Path(patch_name).name != patch_name:
+            raise ValueError(f"invalid MAGEMin patch name: {patch_name!r}")
+        patch_file = patch_dir / f"{patch_name}.patch"
+        if not patch_file.is_file():
+            raise FileNotFoundError(f"locked MAGEMin patch is missing: {patch_file}")
+
+        command = ["git", "-C", str(src), "apply", "--check", str(patch_file)]
+        forward = subprocess.run(command, capture_output=True, text=True, check=False)
+        if forward.returncode == 0:
+            _run(["git", "-C", str(src), "apply", str(patch_file)])
+            _record(f"MAGEMin: applied {patch_file.name}")
+            continue
+
+        reverse = subprocess.run(
+            ["git", "-C", str(src), "apply", "--reverse", "--check", str(patch_file)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if reverse.returncode == 0:
+            _record(f"MAGEMin: {patch_file.name} already applied")
+            continue
+        detail = (
+            forward.stderr.strip()
+            or reverse.stderr.strip()
+            or "patch does not apply"
+        )
+        raise RuntimeError(
+            f"cannot apply locked MAGEMin patch {patch_file.name}: {detail}"
+        )
+
+
 def build_magemin(lock: EngineLock, root: Path) -> None:
     _hdr("Compiling MAGEMin (C library + executable)")
     pin = lock.engines["magemin"]
@@ -226,6 +261,7 @@ def build_magemin(lock: EngineLock, root: Path) -> None:
     if not checkout_matches_pin(pin, src):
         _record(f"MAGEMin: SKIPPED - source is not at locked commit {pin.pin}")
         return
+    _apply_magemin_patches(src, pin.patches)
     try:
         for command in pin.build_commands:
             _run(list(command), cwd=src, extra_env=dict(pin.build_env))

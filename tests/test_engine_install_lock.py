@@ -53,6 +53,13 @@ def test_engine_lock_contains_the_reviewed_studio_source_pins(
     lock = load_engine_lock(LOCK_PATH)
 
     assert lock.engines["magemin"].pin == "40ed109d07d4246001cab59382596d33fed79086"
+    assert lock.engines["magemin"].patches == (
+        "0002-lp-iteration-cap-terminates-without-pc-recheck",
+        "0004-headless-singleton-mpi-defaults",
+    )
+    assert lock.engines["magemin"].reference_sha256 == (
+        "d7ce588f5b617ec6ea64ca11d020d5c9a159d9bc78c944ec06463627bf214cbe"
+    )
     assert lock.engines["thermoengine"].pin == "df7a5f4609116a83bf40a5a352a19e3826a822d9"
     assert lock.engines["vaporock"].pin == "0159678a8eefb51dfe3f12bb646dc38507a07230"
     assert lock.engines["pysulfsat"].pin == "ed7c4a03e2e03b327e962d83f7f07ebf418c7bb7"
@@ -77,6 +84,75 @@ def test_engine_lock_contains_the_reviewed_studio_source_pins(
         assert engine_install_path(
             lock, canonical_root, "alphamelts", platform_key=platform_key
         ) == canonical_root / alpha_pin.directory / asset.pin
+
+
+def test_build_magemin_applies_locked_patches_before_build_and_is_idempotent(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import difflib
+    from dataclasses import replace
+
+    installer_path = LOCK_PATH.parents[1] / "install-engines.py"
+    spec = importlib.util.spec_from_file_location(
+        "install_engines_magemin_test", installer_path
+    )
+    assert spec is not None and spec.loader is not None
+    installer = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(installer)
+
+    lock = load_engine_lock(LOCK_PATH)
+    pin = lock.engines["magemin"]
+    root = tmp_path / "engine-bin"
+    source = engine_install_path(lock, root, "magemin")
+    (source / "src").mkdir(parents=True)
+    patch_dir = tmp_path / "repo" / "patches" / "magemin"
+    patch_dir.mkdir(parents=True)
+
+    changes = (
+        ("src/PGE_function.c", "legacy LP loop\n", "capped LP loop\n"),
+        ("src/MAGEMin.c", "clean singleton\n", "headless singleton\n"),
+    )
+    for patch_name, (relative_path, before, after) in zip(
+        pin.patches, changes, strict=True
+    ):
+        target = source / relative_path
+        target.write_text(before, encoding="utf-8")
+        patch = "".join(
+            difflib.unified_diff(
+                before.splitlines(keepends=True),
+                after.splitlines(keepends=True),
+                fromfile=f"a/{relative_path}",
+                tofile=f"b/{relative_path}",
+            )
+        )
+        (patch_dir / f"{patch_name}.patch").write_text(patch, encoding="utf-8")
+
+    monkeypatch.setattr(installer, "ROOT", tmp_path / "repo")
+    monkeypatch.setattr(installer, "checkout_matches_pin", lambda _pin, _source: True)
+    build_check = (
+        "from pathlib import Path; "
+        "assert Path('src/PGE_function.c').read_text() == 'capped LP loop\\n'; "
+        "assert Path('src/MAGEMin.c').read_text() == 'headless singleton\\n'; "
+        "Path('build.ok').touch()"
+    )
+    lock = EngineLock(
+        engines={
+            **lock.engines,
+            "magemin": replace(
+                pin,
+                build_commands=((sys.executable, "-c", build_check),),
+                artifacts=(),
+            ),
+        }
+    )
+
+    installer.build_magemin(lock, root)
+    installer.build_magemin(lock, root)
+
+    assert (source / "src/PGE_function.c").read_text() == "capped LP loop\n"
+    assert (source / "src/MAGEMin.c").read_text() == "headless singleton\n"
+    assert (source / "build.ok").is_file()
 
 
 def test_engine_lock_rejects_short_git_commits(tmp_path: Path) -> None:

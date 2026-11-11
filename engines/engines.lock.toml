@@ -61,7 +61,11 @@ build_commands = [["make", "clean"], ["make", "all"], ["make", "lib"]]
 artifacts = ["MAGEMin", "libMAGEMin.dylib"]
 runtime_artifact = "MAGEMin"
 identity_extra = { db = "ig" }
-reference_sha256 = "7c96be571e4ea8cfc8e0ec0293a34d4be2d18f7c0d048700c0ec7b846764c4e9"
+patches = [
+    "0002-lp-iteration-cap-terminates-without-pc-recheck",
+    "0004-headless-singleton-mpi-defaults",
+]
+reference_sha256 = "d7ce588f5b617ec6ea64ca11d020d5c9a159d9bc78c944ec06463627bf214cbe"
 reference_sha256_source = "MAGEMin"
 
 [engines.petthermotools]
