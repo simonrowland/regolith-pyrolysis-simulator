@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from concurrent.futures import Future, ProcessPoolExecutor
+from concurrent.futures.process import BrokenProcessPool
 from dataclasses import replace
 import json
 import os
@@ -40,6 +41,7 @@ from simulator.optimize.pool import (
 from simulator.optimize.profiles import load_profile
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
+from simulator.supervised_process_pool import supervised_process_map
 
 # Pool tests encode a synthetic integer signal on a real allowlist-v12 knob so
 # RecipePatch.recipe_id / resolve_conditional_patch validate (post-t-155).
@@ -79,6 +81,62 @@ def test_eval_timeout_rejects_bool_before_numeric_conversion(value: bool) -> Non
 @pytest.mark.parametrize("value", [1, 1.0, "1.0"])
 def test_eval_timeout_accepts_positive_numeric_values(value: int | float | str) -> None:
     assert resolve_eval_timeout_seconds(value) == 1.0
+
+
+def test_supervised_pool_retries_broken_pool_inflight_tasks_before_failing_one() -> None:
+    tasks = ("healthy", "crashing")
+    executors: list[object] = []
+    submitted: list[tuple[int, str]] = []
+
+    class FakeExecutor:
+        def __init__(self, generation: int) -> None:
+            self.generation = generation
+
+        def submit(self, _worker, task, *_args):
+            submitted.append((self.generation, task))
+            future = Future()
+            future.generation = self.generation
+            future.task = task
+            if self.generation:
+                if task == "crashing":
+                    future.set_exception(BrokenProcessPool("task worker exited"))
+                else:
+                    future.set_result(f"ok:{task}")
+            return future
+
+        def shutdown(self, *, wait, cancel_futures):
+            del wait, cancel_futures
+
+    def make_executor(_workers, _initializer, _context):
+        executor = FakeExecutor(len(executors))
+        executors.append(executor)
+        return executor
+
+    def wait_fn(futures, *, timeout, return_when):
+        del timeout, return_when
+        ordered = sorted(futures, key=lambda future: future.task != "healthy")
+        if ordered and ordered[0].generation == 0:
+            for future in ordered:
+                future.set_exception(BrokenProcessPool("one worker exited"))
+        return ordered, ()
+
+    results = supervised_process_map(
+        tasks,
+        lambda task: f"ok:{task}",
+        max_workers=2,
+        wait_fn=wait_fn,
+        executor_factory=make_executor,
+        abort_executor=lambda *_args: True,
+        handle_worker_error=lambda task, _error: f"failed:{task}",
+    )
+
+    assert results == ("ok:healthy", "failed:crashing")
+    assert submitted == [
+        (0, "healthy"),
+        (0, "crashing"),
+        (1, "healthy"),
+        (1, "crashing"),
+    ]
 
 
 def test_eval_timeout_rejects_numpy_bool_scalars() -> None:
