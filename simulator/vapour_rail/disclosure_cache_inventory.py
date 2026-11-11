@@ -11,9 +11,18 @@ this table names it.
 from __future__ import annotations
 
 import ast
+import re
 import subprocess
 from pathlib import Path
 from typing import Any
+
+# The controller's cache sweep. ``(`` is escaped so ``ResultStore(`` is literal.
+# ``cache = {}`` allows the spaces the production assignments use.
+CONTROLLER_CACHE_REGEX = re.compile(
+    r"lru_cache|functools\.cache|@cache|_CACHE|_cache\s*[:=]|_memo\s*[:=]|_MEMO|"
+    r"cache\s*=\s*\{\}|cache:\s*dict|prediction_cache|held_curve|frozen_curve|"
+    r"ResultStore\("
+)
 
 # Sites whose cached value can be a flagged vapour-law result.
 DISCLOSURE_CARRYING = frozenset({
@@ -762,7 +771,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "kind": 'store',
         "name": 'residue_prediction_cache',
         "carries_disclosure": True,
-        "how": 'Sossi cohort rows carry law_disclosures. _cached_sossi_prediction is the only read of those rows and calls accept_stored_memo. A Sossi row with no field is dropped and recomputed. Hashimoto and Knudsen entries in this dict are result objects with no law_disclosures field.',
+        "how": 'Hashimoto cohorts, Knudsen results, and Sossi rows carry law_disclosures. _cached_hashimoto_cohort, _cached_knudsen_result, and _cached_sossi_prediction are the only reads and each calls accept_stored_memo. A physics entry with no field is dropped and recomputed.',
     },
     'store:simulator/battery/validate.py:_cache': {
         "path": 'simulator/battery/validate.py',
@@ -1029,4 +1038,262 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "how": 'Parsed U0 manifest fixture. A pure loader. It never evaluates a vapour law.',
     },
 }
+
+
+def _site_tables() -> tuple[
+    dict[tuple[str, str], str],
+    dict[str, list[tuple[str, str]]],
+]:
+    """(path, function) -> lru site, and path -> [(name, site)] longest first."""
+
+    by_function: dict[tuple[str, str], str] = {}
+    by_path: dict[str, list[tuple[str, str]]] = {}
+    for site_id, row in CACHE_SITES.items():
+        path = str(row["path"])
+        name = str(row["name"])
+        by_path.setdefault(path, []).append((name, site_id))
+        if row["kind"] == "lru":
+            by_function[(path, name)] = site_id
+    for names in by_path.values():
+        names.sort(key=lambda item: len(item[0]), reverse=True)
+    return by_function, by_path
+
+
+def _classification_of(site_id: str) -> tuple[str, str, str | None]:
+    row = CACHE_SITES[site_id]
+    if row["carries_disclosure"]:
+        return "carrying", str(row["how"]), site_id
+    return "inert", str(row["how"]), None
+
+
+def _def_after(lines: list[str], index: int) -> str | None:
+    for row in lines[index:index + 6]:
+        match = re.match(r"\s*(?:async\s+)?def\s+(\w+)\s*\(", row)
+        if match:
+            return match.group(1)
+    return None
+
+
+def _token_present(name: str, text: str) -> bool:
+    return re.search(
+        rf"(?<![A-Za-z0-9]){re.escape(name)}(?![A-Za-z0-9])",
+        text,
+    ) is not None
+
+
+def scan_controller_cache_lines(
+    root: Path | None = None,
+) -> list[tuple[str, int, str]]:
+    """Every production line the controller cache regex matches."""
+
+    repo = root or _repo_root()
+    found: list[tuple[str, int, str]] = []
+    for path in _production_python_files(repo):
+        rel = str(path.relative_to(repo))
+        for lineno, row in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if CONTROLLER_CACHE_REGEX.search(row):
+                found.append((rel, lineno, row))
+    return found
+
+
+def _extra_cache_line(
+    path: str, stripped: str
+) -> tuple[str, str, str | None] | None:
+    """Regex hits whose text does not name a CACHE_SITES store.
+
+    Each arm is a line the controller regex matches and that cannot carry a
+    flagged law, except the shared-curve getattr, which is the carrying read.
+    A line that matches none of these stays unclassified.
+    """
+
+    if path == "simulator/evaporation.py" and stripped.startswith(
+        "shared_curve_cache = getattr("
+    ):
+        return _classification_of(
+            "attr:simulator/evaporation.py:_freeze_gate_shared_curve_cache"
+        )
+    if path == "simulator/accounting/queries.py" and stripped == "cache = {}":
+        return (
+            "inert",
+            "Accounting prefix totals on a ledger record. Not a vapour-law result.",
+            None,
+        )
+    if path == "simulator/battery/compilation_tier.py" and stripped == "cache = {}":
+        return (
+            "inert",
+            "Shomate enthalpy-form label keyed by the coefficient row. Not a vapour pressure.",
+            None,
+        )
+    if path == "simulator/liner_life.py" and stripped.startswith("cache: dict[float, float]"):
+        return (
+            "inert",
+            "Recession-rate scratch for one liner-life call. Not a vapour-law result.",
+            None,
+        )
+    if path == "simulator/core.py" and "published_memo = accept_stored_memo(" in stripped:
+        return (
+            "inert",
+            "Local name for the list accept_stored_memo just returned. Not a store.",
+            None,
+        )
+    if path == "simulator/evaporation.py" and stripped == "previous_cache = cache":
+        return (
+            "inert",
+            "Saved previous freeze-gate slot so a failed solve can restore it. The published hit is the carrying cache.",
+            None,
+        )
+    if path == "simulator/reduced_real_determinism.py" and (
+        '"_freeze_gate_held_curve_record"' in stripped
+    ):
+        return (
+            "inert",
+            "Presence check that a held curve exists. The curve value is read through accept_stored_memo.",
+            None,
+        )
+    if path == "simulator/vapour_rail/catalog.py" and "_legacy_view_cache" in stripped:
+        return (
+            "inert",
+            "Schema-v1 projection of a compiled catalog. A hit does not skip evaluate().",
+            None,
+        )
+    if path == "simulator/vapour_rail/catalog.py" and "_CATALOG_COMPILE_CACHE_MAX" in stripped:
+        return (
+            "inert",
+            "Integer LRU bound. Not a cached vapour pressure.",
+            None,
+        )
+    if path == "simulator/yaml_cache.py":
+        return (
+            "inert",
+            "Parsed YAML document cache. A pure loader. It never evaluates a vapour law.",
+            None,
+        )
+    if path == "simulator/engine_binding_admission.py" and (
+        "GATE_CURVE_MEMO" in stripped or "CROSS_PROCESS_CACHE_ONLY" in stripped
+    ):
+        return (
+            "inert",
+            "Binding-admission scope name. Not a memo of a vapour-law result.",
+            None,
+        )
+    if path == "simulator/runner/__init__.py" and "_WALL_DEPOSIT_CUMULATIVE_CACHE" in stripped:
+        return (
+            "inert",
+            "Running sum of snapshot wall-deposit deltas. It does not evaluate a vapour law.",
+            None,
+        )
+    if path == "simulator/runner/__init__.py" and stripped.startswith("cache: dict[str, list[Any]]"):
+        return (
+            "inert",
+            "Parameter of the per-hour summary scratch. It does not store a vapour-law disclosure.",
+            None,
+        )
+    if "reduced_real_cache" in stripped or "REDUCED_REAL_CACHE" in stripped:
+        return (
+            "inert",
+            "Configuration handle or cache-tier label for the determinism store. The physics rows live on _entries.",
+            None,
+        )
+    if any(
+        token in stripped
+        for token in (
+            "CACHE_TIER",
+            "cache_tier_ceiling",
+            "CACHED_INTERPOLATED",
+            "CERTIFIED_CACHE",
+            "CACHEABLE_",
+            "persistent_cache",
+            "SOURCE_CACHE_",
+            "DEFAULT_GRIND_CACHE",
+            "REGOLITH_DATA_CACHE",
+            "inherited_cache",
+            "allow_internal_analytical_cache",
+            "approximate_cache",
+        )
+    ):
+        return (
+            "inert",
+            "Cache-tier name, filesystem path, or status allowlist. Not an evaluated vapour pressure.",
+            None,
+        )
+    return None
+
+
+def classify_controller_cache_line(
+    path: str,
+    lineno: int,
+    text: str,
+    *,
+    lines: list[str] | None = None,
+) -> tuple[str, str, str | None] | None:
+    """Classify one regex hit.
+
+    ``carrying`` lines name a ``DISCLOSURE_CARRYING`` site whose reader calls
+    ``accept_stored_memo``. ``inert`` lines say why they cannot carry a flagged
+    value. ``None`` means the meta-test must fail.
+    """
+
+    if path.endswith("disclosure_cache_inventory.py"):
+        return (
+            "inert",
+            "Classification table. Not a runtime cache.",
+            None,
+        )
+    stripped = text.strip()
+    if stripped.startswith("#"):
+        return ("inert", "Comment. Not a runtime cache.", None)
+    if re.search(r"\bimport\b", stripped) and "lru_cache" in stripped:
+        return ("inert", "Import of the cache decorator. Not a store.", None)
+
+    by_function, by_path = _site_tables()
+    if re.search(r"@\s*(?:functools\.)?(?:lru_cache|cache)\b", stripped):
+        if lines is None:
+            source = (_repo_root() / path).read_text(encoding="utf-8").splitlines()
+        else:
+            source = lines
+        function = _def_after(source, lineno)
+        site_id = by_function.get((path, function or ""))
+        if site_id is None:
+            return None
+        return _classification_of(site_id)
+    if "ResultStore(" in text:
+        return _classification_of("class:simulator/optimize/results_store.py:ResultStore")
+
+    matches: list[tuple[str, str]] = []
+    for name, site_id in by_path.get(path, ()):
+        if _token_present(name, text):
+            matches.append((name, site_id))
+    # A shared helper's parameter is the pressure-cache gate even though the
+    # line does not repeat the store's name.
+    if path == "simulator/battery/score.py" and re.search(r"\bcache\s*:\s*dict\b", text):
+        return _classification_of("store:simulator/battery/score.py:residue_prediction_cache")
+    if path == "simulator/battery/residue.py" and re.search(r"\bcache\s*:\s*dict\b", text):
+        return _classification_of("store:simulator/battery/residue.py:pressure_cache")
+    if not matches:
+        return _extra_cache_line(path, stripped)
+    carrying = [
+        site_id
+        for _name, site_id in matches
+        if CACHE_SITES[site_id]["carries_disclosure"]
+    ]
+    if carrying:
+        return _classification_of(carrying[0])
+    return _classification_of(matches[0][1])
+
+
+def unclassified_controller_cache_lines(
+    root: Path | None = None,
+) -> list[str]:
+    """Regex hits that are neither disclosure-carrying nor explicitly inert."""
+
+    repo = root or _repo_root()
+    missing: list[str] = []
+    by_file: dict[str, list[str]] = {}
+    for path, _lineno, text in scan_controller_cache_lines(repo):
+        by_file.setdefault(path, (_repo_root() / path).read_text(encoding="utf-8").splitlines())
+        if classify_controller_cache_line(
+            path, _lineno, text, lines=by_file[path]
+        ) is None:
+            missing.append(f"{path}:{_lineno}:{text.strip()}")
+    return missing
 

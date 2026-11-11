@@ -18,7 +18,8 @@ disclosure field is unknown and is a miss. The held curve, the local slot,
 and the shared slot are one gate, ``accept_stored_memo``: unknown
 recomputes, and a known disclosure is re-registered before the record is
 returned. Upper-case ``_CACHE`` stores are in that same inventory. The melt
-pressure cache and the Sossi cohort cache are read only through that gate.
+pressure cache, the residue pressure closures, and the Sossi, Hashimoto, and
+Knudsen rows of the residue-prediction cache are read only through that gate.
 Registration is the one
 ``CompiledPressureEvaluator.evaluate`` call. A non-diagnostic law is registered
 when the evaluation leaves a certified domain: the temperature band, the
@@ -2890,6 +2891,38 @@ def test_cache_inventory_matches_the_production_scan() -> None:
     assert "accept_stored_memo(" in melt_read
     melt_body = melt.split("def _engine_melt_psat_pa(", 1)[1].split("\ndef ", 1)[0]
     assert "_MELT_PSAT_CACHE" not in melt_body
+    hashimoto = score.split("def _hashimoto_residue_prediction(", 1)[1].split(
+        "\ndef ", 1
+    )[0]
+    assert "rows_by_key = cache[cache_key]" not in hashimoto
+    assert hashimoto.count("_cached_hashimoto_cohort(") == 2
+    knudsen = score.split("def _knudsen_residue_prediction(", 1)[1].split(
+        "\ndef ", 1
+    )[0]
+    assert "result = cache[cache_key]" not in knudsen
+    assert "_cached_knudsen_result(" in knudsen
+    for reader in ("_cached_hashimoto_cohort", "_cached_knudsen_result"):
+        body = score.split(f"def {reader}(", 1)[1].split("\ndef ", 1)[0]
+        assert "accept_stored_memo(" in body
+        assert ".pop(" in body
+    from simulator.vapour_rail.disclosure_cache_inventory import (
+        classify_controller_cache_line,
+        scan_controller_cache_lines,
+        unclassified_controller_cache_lines,
+    )
+
+    assert unclassified_controller_cache_lines(_ROOT) == []
+    for path, lineno, text in scan_controller_cache_lines(_ROOT):
+        classified = classify_controller_cache_line(path, lineno, text)
+        assert classified is not None, f"{path}:{lineno}:{text.strip()}"
+        kind, reason, site_id = classified
+        assert reason
+        if kind == "carrying":
+            assert site_id in DISCLOSURE_CARRYING
+            assert site_id in _DISCLOSURE_EXERCISERS
+        else:
+            assert kind == "inert"
+            assert site_id is None
 
 
 def _assert_replayed_fe(snapshot) -> None:
@@ -3020,25 +3053,159 @@ def _exercise_core_memo(_tmp_path, monkeypatch) -> None:
     _exercise_core_slot(monkeypatch, memo=True)
 
 
-def _exercise_pressure_cache(_tmp_path, _monkeypatch) -> None:
-    from simulator.battery.residue import (
-        _cached_pressure_hit,
-        _remember_cached_pressures,
+def _openimcc_activity_state() -> object:
+    from types import SimpleNamespace
+
+    return SimpleNamespace(
+        parent_oxide_activities={"FeO": 1.0},
+        parent_oxides=("FeO",),
+        flags=(),
+        extrapolated=False,
+        pack_model_id="b119-disclosure",
+        pack_version="b119-disclosure",
+        pack_digest="b119-disclosure",
+        openimcc_version="b119-disclosure",
     )
 
-    cache: dict = {}
-    with disclosure_scope(inherit=False) as run_a:
-        before = run_a.snapshot()
+
+def _counting_openimcc_eval(monkeypatch, calls: dict[str, int]):
+    """Replace the worker-pool eval so the production closure stays in-process."""
+
+    import simulator.battery.residue as residue
+
+    def fake_evaluate(_evaluate, *, timeout_s, **_kwargs):
+        del timeout_s
+        calls["n"] += 1
         _fe_pressure("FeO_association_gas")
-        _remember_cached_pressures(
-            cache, ("FeO",), {"Fe": 8.537731922030234}, before
-        )
-    assert "law_disclosures" in cache[("FeO",)]
+        return _openimcc_activity_state()
+
+    monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", fake_evaluate)
+
+
+def _stored_pressure_record(cache: dict) -> dict:
+    record = next(iter(cache.values()))
+    assert isinstance(record, dict)
+    assert "law_disclosures" in record
+    assert "pressures" in record
+    return record
+
+
+def _replay_pressure_closure(model, composition, cache, calls) -> None:
+    """Cold run A stores the disclosure. Fresh run B replays it. A stripped row recomputes."""
+
+    with disclosure_scope(inherit=False) as run_a:
+        first = model(composition, -10.0)
+        assert isinstance(first, dict) and first
+        assert calls["n"] == 1
+        _assert_replayed_fe(run_a.snapshot())
+    stored = _stored_pressure_record(cache)
     with disclosure_scope(inherit=False) as run_b:
-        hit = _cached_pressure_hit(cache, ("FeO",))
-        assert hit is not None
-        assert hit["Fe"] == 8.537731922030234
+        second = model(composition, -10.0)
+        assert second == first
+        assert calls["n"] == 1
         _assert_replayed_fe(run_b.snapshot())
+    stored.pop("law_disclosures")
+    with disclosure_scope(inherit=False) as run_c:
+        third = model(composition, -10.0)
+        assert third == first
+        assert calls["n"] == 2
+        _assert_replayed_fe(run_c.snapshot())
+
+
+def _pressure_cache_dict(model) -> dict:
+    """The production closure's private pressure store, not a test-owned dict."""
+
+    for cell in model.__closure__ or ():
+        value = cell.cell_contents
+        if not isinstance(value, dict) or not value:
+            continue
+        sample = next(iter(value.values()))
+        if isinstance(sample, dict) and "pressures" in sample:
+            return value
+    raise AssertionError("production pressure closure did not store a disclosure")
+
+
+def _exercise_pressure_cache(_tmp_path, monkeypatch) -> None:
+    """Warm ``pressure_cache`` through the Sossi OpenIMCC production closure."""
+
+    from types import SimpleNamespace
+
+    from simulator.battery.residue import _sossi_openimcc_pressure_model
+
+    calls = {"n": 0}
+    _counting_openimcc_eval(monkeypatch, calls)
+    cache: dict = {}
+    bridge = SimpleNamespace(
+        _cleaned_melt_policy=lambda composition: (dict(composition), {"policy": "test"}),
+        evaluate=lambda **_kwargs: None,
+    )
+    model = _sossi_openimcc_pressure_model(
+        cache,
+        temperature_K=1750.0,
+        gas_channels=(("Fe", "FeO", 1.0, 0.5),),
+        gas_pack=object(),
+        pO2_exponents={"Fe": -0.5},
+        mno_channel_active=False,
+        melt_pack_identity={},
+        melt_activity_input_policy={},
+        melt_activity_extensions={},
+        openimcc_bridge=bridge,
+        evaluate_gas=lambda *_args, **_kwargs: {"Fe": 1.0},
+        nonconvergence_error=RuntimeError,
+    )
+    _replay_pressure_closure(model, {"FeO": 1.0}, cache, calls)
+
+
+def _exercise_pressure_state_cache(_tmp_path, monkeypatch) -> None:
+    """Warm ``pressure_state_cache`` through ``_make_residue_pressure_model``."""
+
+    import sys
+    from types import SimpleNamespace
+
+    import simulator.battery.residue as residue
+
+    calls = {"n": 0}
+    _counting_openimcc_eval(monkeypatch, calls)
+    monkeypatch.setitem(
+        sys.modules,
+        "openimcc",
+        SimpleNamespace(evaluate_gas=lambda *_args, **_kwargs: {"Fe": 1.0}),
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "openimcc.kernel",
+        SimpleNamespace(ImccNonconvergenceError=RuntimeError),
+    )
+    model = residue._make_residue_pressure_model(
+        "openimcc",
+        (("Fe", ("FeO", 1.0, 0.5)),),
+        object(),
+        temperature_K=1750.0,
+        total_pressure_Pa=0.0,
+        engine_metadata={},
+        engine_flags=set(),
+        missing_channels_reason="residue_pressure_channels_missing",
+        caller="Knudsen residue prediction",
+    )
+    cache = _pressure_cache_dict  # bound after the cold call fills it
+    composition = {"FeO": 1.0}
+    with disclosure_scope(inherit=False) as run_a:
+        first = model(composition, -10.0)
+        assert isinstance(first, dict) and math.isfinite(first["Fe"])
+        assert calls["n"] == 1
+        _assert_replayed_fe(run_a.snapshot())
+    store = cache(model)
+    with disclosure_scope(inherit=False) as run_b:
+        second = model(composition, -10.0)
+        assert second == first
+        assert calls["n"] == 1
+        _assert_replayed_fe(run_b.snapshot())
+    _stored_pressure_record(store).pop("law_disclosures")
+    with disclosure_scope(inherit=False) as run_c:
+        third = model(composition, -10.0)
+        assert third == first
+        assert calls["n"] == 2
+        _assert_replayed_fe(run_c.snapshot())
 
 
 def _one_internal_analytical_sossi_row(monkeypatch):
@@ -3221,6 +3388,268 @@ def _exercise_melt_psat(_tmp_path, monkeypatch) -> None:
         assert _diagnostic_fe_rows(run_c.snapshot())
 
 
+def _hashimoto_score_context():
+    from decimal import Decimal
+
+    from simulator.battery.enums import EvidenceClass, Phase, Quantity
+    from simulator.battery.records import Species, State
+    from simulator.battery.score import ScoreContext
+    from tests.battery import factories as factories
+
+    identity = replace(
+        factories.psat_identity("FeO"),
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        species=Species("FeO", Phase.L),
+        subtype=State.of("oxide_wt_percent"),
+    )
+    source = "kems-015-hashimoto-1983"
+    experiments = {}
+    observations = {}
+    for index in range(24):
+        experiment_id = f"h-{index:02d}"
+        experiments[experiment_id] = {"experiment_id": experiment_id}
+        observation_id = f"{source}::{experiment_id}"
+        observations[observation_id] = factories.observation(
+            observation_id,
+            experiment_id,
+            identity,
+            Decimal("10"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=source,
+        )
+    return ScoreContext({}, experiments, observations), observations[f"{source}::h-00"]
+
+
+def _hashimoto_cohort_rows(experiments, code_revision, engine):
+    from types import SimpleNamespace
+
+    experiment_id = str(experiments[0]["experiment_id"])
+    values = {"FeO": 11.0, "MgO": 20.0}
+    band = {name: (value - 1.0, value + 1.0) for name, value in values.items()}
+    geometry = {"sphere_shrinking": dict(values)}
+    base = {
+        "code_revision": code_revision,
+        "engine": engine,
+        "geometry_refusal_by_geometry": {},
+    }
+
+    def row(arm: str, oxides: dict[str, float]):
+        return SimpleNamespace(
+            experiment_id=experiment_id,
+            alpha_arm=arm,
+            primary_geometry_policy_id="sphere_shrinking",
+            primary_oxide_wt_pct=dict(oxides),
+            geometry_oxide_wt_pct=geometry,
+            sensitivity_band_wt_pct=band,
+            provenance=dict(base),
+        )
+
+    return (
+        row("alpha_common_unity_sensitivity", values),
+        row("alpha_runtime_catalog", {**values, "FeO": 12.0}),
+    )
+
+
+def _exercise_hashimoto_cohort(_tmp_path, monkeypatch) -> None:
+    """Warm the Hashimoto cohort through ``_hashimoto_residue_prediction``."""
+
+    import simulator.battery.residue as residue
+    from simulator.battery.enums import Engine, ExecutionState
+    from simulator.battery.score import _hashimoto_residue_prediction
+
+    calls = {"n": 0}
+
+    def fake_cohort(experiments, _catalog, *, preform_dimensions_mm, code_revision, engine):
+        del preform_dimensions_mm
+        calls["n"] += 1
+        _fe_pressure("FeO_association_gas")
+        return _hashimoto_cohort_rows(experiments, code_revision, engine)
+
+    monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", fake_cohort)
+    context, reference = _hashimoto_score_context()
+    engine = Engine.INTERNAL_ANALYTICAL
+    cache: dict = {}
+    with disclosure_scope(inherit=False) as run_a:
+        prediction = _hashimoto_residue_prediction(context, reference, engine, cache)
+        assert prediction.execution.state is ExecutionState.PRODUCED, prediction.refusal_detail
+        assert calls["n"] == 1
+        assert prediction.refusal_detail["law_disclosures"]
+        _assert_replayed_fe(run_a.snapshot())
+    with disclosure_scope(inherit=False) as run_b:
+        again = _hashimoto_residue_prediction(context, reference, engine, cache)
+        assert again.execution.state is ExecutionState.PRODUCED, again.refusal_detail
+        assert calls["n"] == 1
+        assert again.refusal_detail["law_disclosures"]
+        _assert_replayed_fe(run_b.snapshot())
+    for row in next(iter(cache.values())).values():
+        row.provenance.pop("law_disclosures")
+    with disclosure_scope(inherit=False) as run_c:
+        recomputed = _hashimoto_residue_prediction(context, reference, engine, cache)
+        assert recomputed.execution.state is ExecutionState.PRODUCED, recomputed.refusal_detail
+        assert calls["n"] == 2
+        _assert_replayed_fe(run_c.snapshot())
+
+
+def _knudsen_extent_inputs():
+    from decimal import Decimal
+
+    from simulator.battery.enums import (
+        AdmissionStatus,
+        AmountBasis,
+        EvidenceClass,
+        ExperimentKind,
+        MethodToken,
+        Phase,
+        Quantity,
+        UncertaintyKind,
+    )
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import (
+        Admission,
+        Composition,
+        Evidence,
+        Experiment,
+        FlowRegime,
+        Located,
+        Locator,
+        Observation,
+        PressureEnvironment,
+        Sample,
+        Species,
+        State,
+        ThermalSchedule,
+        Uncertainty,
+        Value,
+    )
+    from simulator.battery.score import ScoreContext
+
+    composition = Composition(
+        "synthetic",
+        (("FeO", Decimal("0.5")), ("MgO", Decimal("0.5"))),
+        AmountBasis.MOLE_FRACTION,
+    )
+    locator = Locator(table="2", published_page=510)
+    reference = Observation(
+        "residue",
+        "experiment",
+        Identity(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            Species("FeO", Phase.L),
+            subtype=State.of("oxide_wt_percent"),
+            temperature_K=State.of(Decimal(2100)),
+            composition=State.of(composition),
+        ),
+        Value.point_of(99),
+        Uncertainty(UncertaintyKind.NONE),
+        Evidence(State.of(EvidenceClass.MEASURED_DIRECT)),
+        Admission(AdmissionStatus.ADMITTED, "synthetic anchor"),
+        (),
+        source_id="synthetic",
+        locator=locator,
+    )
+    rows = tuple(
+        replace(
+            reference,
+            observation_id=f"mass-{temperature}",
+            identity=replace(
+                reference.identity,
+                quantity=Quantity.MASS_LOSS_FRACTION,
+                temperature_K=State.of(Decimal(temperature)),
+            ),
+            value=Value.point_of(loss),
+        )
+        for temperature, loss in ((2000, "0.1"), (2100, "0.2"))
+    )
+    experiment = Experiment(
+        "experiment",
+        ExperimentKind.LITERATURE,
+        State.of(MethodToken.KNUDSEN_EFFUSION),
+        Sample(initial_composition=Located(State.of(composition), locator)),
+        {
+            "temperature_K": Located(
+                State.unknown("point temperatures are printed per row"), locator
+            )
+        },
+        PressureEnvironment(
+            Located(State.unknown("not published")),
+            Located(State.unknown("no sweep")),
+            FlowRegime(State.unknown("not published")),
+        ),
+        thermal_schedule=ThermalSchedule(
+            method=Located(State.of("70 K steps, 15 minutes each"), locator)
+        ),
+    )
+    observations = {reference.observation_id: reference}
+    observations.update({row.observation_id: row for row in rows})
+    context = ScoreContext({}, {experiment.experiment_id: experiment}, observations)
+    return context, reference
+
+
+def _exercise_knudsen_result(_tmp_path, monkeypatch) -> None:
+    """Warm the Knudsen result through ``_knudsen_residue_prediction``."""
+
+    import sys
+    from types import SimpleNamespace
+
+    import simulator.battery.residue as residue
+    from simulator.battery.enums import Engine, ExecutionState
+    from simulator.battery.score import _knudsen_residue_prediction
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    calls = {"predict": 0, "fe": 0}
+    real = residue.predict_knudsen_residue_composition
+
+    def counting(*args, **kwargs):
+        calls["predict"] += 1
+        return real(*args, **kwargs)
+
+    def pressure(_inventory, logp):
+        if calls["fe"] < calls["predict"]:
+            _fe_pressure("FeO_association_gas")
+            calls["fe"] += 1
+        return {"Fe": 1e-8 * 10 ** (-logp / 2), "O2": 1e5 * 10**logp}
+
+    monkeypatch.setattr(residue, "predict_knudsen_residue_composition", counting)
+    monkeypatch.setattr(residue, "_make_residue_pressure_model", lambda *_a, **_k: pressure)
+    monkeypatch.setitem(
+        sys.modules, "openimcc", SimpleNamespace(load_gas_datapack=lambda: object())
+    )
+    monkeypatch.setattr(
+        battery,
+        "_openimcc_gas_channels_and_omission_notices",
+        lambda *_args: ([("Fe", ("FeO", 1, 0.5)), ("O2", (None, 1, -1))], ()),
+    )
+    context, reference = _knudsen_extent_inputs()
+    engine = Engine.INTERNAL_ANALYTICAL
+    cache: dict = {}
+    with disclosure_scope(inherit=False) as run_a:
+        prediction = _knudsen_residue_prediction(context, reference, engine, cache)
+        assert prediction.execution.state is ExecutionState.PRODUCED, prediction.refusal_detail
+        assert calls["predict"] == 1
+        assert prediction.refusal_detail["law_disclosures"]
+        _assert_replayed_fe(run_a.snapshot())
+    with disclosure_scope(inherit=False) as run_b:
+        again = _knudsen_residue_prediction(context, reference, engine, cache)
+        assert again.execution.state is ExecutionState.PRODUCED, again.refusal_detail
+        assert calls["predict"] == 1
+        assert again.refusal_detail["law_disclosures"]
+        _assert_replayed_fe(run_b.snapshot())
+    next(iter(cache.values())).pop("law_disclosures")
+    with disclosure_scope(inherit=False) as run_c:
+        recomputed = _knudsen_residue_prediction(context, reference, engine, cache)
+        assert recomputed.execution.state is ExecutionState.PRODUCED, recomputed.refusal_detail
+        assert calls["predict"] == 2
+        _assert_replayed_fe(run_c.snapshot())
+
+
+def _exercise_residue_prediction_cache(tmp_path, monkeypatch) -> None:
+    """Every production reader of ``residue_prediction_cache`` replays its disclosure."""
+
+    _exercise_sossi_row(tmp_path, monkeypatch)
+    _exercise_hashimoto_cohort(tmp_path, monkeypatch)
+    _exercise_knudsen_result(tmp_path, monkeypatch)
+
+
 _DISCLOSURE_EXERCISERS = {
     "store:simulator/reduced_real_determinism.py:_entries": _exercise_pt0_memory,
     "class:simulator/reduced_real_determinism.py:PT1PersistentEquilibriumStore": _exercise_pt1,
@@ -3233,8 +3662,8 @@ _DISCLOSURE_EXERCISERS = {
     "store:simulator/evaporation.py:_freeze_gate_held_curve_record": _exercise_held,
     "attr:simulator/evaporation.py:_freeze_gate_shared_curve_cache": _exercise_shared,
     "store:simulator/battery/residue.py:pressure_cache": _exercise_pressure_cache,
-    "store:simulator/battery/residue.py:pressure_state_cache": _exercise_pressure_cache,
-    "store:simulator/battery/score.py:residue_prediction_cache": _exercise_sossi_row,
+    "store:simulator/battery/residue.py:pressure_state_cache": _exercise_pressure_state_cache,
+    "store:simulator/battery/score.py:residue_prediction_cache": _exercise_residue_prediction_cache,
     "store:simulator/diagnostic_helpers/extract_reproduction.py:_MELT_PSAT_CACHE": (
         _exercise_melt_psat
     ),
