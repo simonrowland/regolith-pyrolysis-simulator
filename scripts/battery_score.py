@@ -556,6 +556,8 @@ def main(argv: list[str] | None = None) -> int:
             compilation_comparisons_partial_path,
             engines=engines,
             invoke_pure_phase=not studio_routed,
+            work_id=args.work,
+            rail=rail,
         )
         if studio_comparisons_path is not None:
             try:
