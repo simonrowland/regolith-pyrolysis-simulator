@@ -1762,16 +1762,19 @@ def _authorized_pure_metal_evaporation_zero(
     row: Mapping[str, Any],
     temperature_K: float | None,
     state: Any,
+    balance_tolerance_kg: float | None = None,
 ) -> Any | None:
     """Authorized Fe zero when every channel's own tick mass sums under closure.
 
     INVARIANT: a missing Ellingham input becomes ``zero_by_physics`` only
     when every Fe carrier channel has its own activity-1 saturation
     pressure and the sum of the alpha=1 Hertz-Knudsen masses over this
-    tick is strictly below ``DEFAULT_BALANCE_TOLERANCE_KG``. One channel's
-    pressure is never reused as another's. A channel with no evaluable
-    law (no thermo, or outside its grid with no extrapolation authority)
-    returns None, and the caller keeps the typed ``missing_ellingham_input``
+    tick is strictly below the caller-supplied closure tolerance. The
+    catalog does not import the ledger. A missing or non-positive
+    tolerance leaves the typed refusal in place. One channel's pressure
+    is never reused as another's. A channel with no evaluable law (no
+    thermo, or outside its grid with no extrapolation authority) returns
+    None, and the caller keeps the typed ``missing_ellingham_input``
     refusal.
 
     Fe: ``a_Fe <= 1`` implies ``P_Fe <= P_sat,Fe(T)`` from the shipped pure
@@ -1840,10 +1843,17 @@ def _authorized_pure_metal_evaporation_zero(
         VaporPressureComputationError,
         vapor_pressure_antoine_coefficients,
     )
-    from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
     from simulator.chemistry.langmuir_knudsen import (
         hertz_knudsen_k_kg_s_m2_pa,
     )
+    if isinstance(balance_tolerance_kg, bool):
+        return None
+    try:
+        tolerance_kg = float(balance_tolerance_kg)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(tolerance_kg) or tolerance_kg <= 0.0:
+        return None
 
     try:
         antoine, coefficient_block = vapor_pressure_antoine_coefficients(
@@ -1931,7 +1941,7 @@ def _authorized_pure_metal_evaporation_zero(
         }
     if not math.isfinite(bound_kg) or bound_kg < 0.0:
         return None
-    if not bound_kg < DEFAULT_BALANCE_TOLERANCE_KG:
+    if not bound_kg < tolerance_kg:
         return None
 
     authority = (
@@ -2302,6 +2312,8 @@ class VapourRailCatalog:
         self,
         batch: Any,
         state: Any,
+        *,
+        balance_tolerance_kg: float | None = None,
     ) -> Any:
         """Replace a dormant pseudo-psat selection with the Ellingham pressure.
 
@@ -2532,6 +2544,7 @@ class VapourRailCatalog:
                         row,
                         temperature_K,
                         state,
+                        balance_tolerance_kg,
                     )
                 if authorized is not None:
                     channels[species_id] = authorized
@@ -2610,6 +2623,7 @@ class VapourRailCatalog:
         activity_provider: CondensedPhaseActivityProvider | None = None,
         caller_species_filter: Sequence[str] | None = None,
         flux_activation_context: FluxActivationContext,
+        balance_tolerance_kg: float | None = None,
     ) -> Any:
         """Request → refusal closure → solve bundles → exact-key VapourBatch."""
 
@@ -2738,6 +2752,7 @@ class VapourRailCatalog:
         return self._apply_pseudo_psat_ellingham_selected_pressure(
             batch,
             resolve_state,
+            balance_tolerance_kg=balance_tolerance_kg,
         )
 
 

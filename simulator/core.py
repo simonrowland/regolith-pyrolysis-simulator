@@ -2444,11 +2444,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             "evaporation_tick_area_m2": evaporation_tick_area_m2,
             "evaporation_tick_duration_s": evaporation_tick_duration_s,
         }
+        from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
+
         return self.vapour_rail_catalog.resolve_batch(
             ledger_snapshot,
             state,
             provider_candidates_by_species=provider_candidates_by_species,
             flux_activation_context=flux_activation_context,
+            balance_tolerance_kg=DEFAULT_BALANCE_TOLERANCE_KG,
         )
 
     def _register_alphamelts_provider_if_available(self) -> None:

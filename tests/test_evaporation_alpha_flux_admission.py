@@ -31,10 +31,12 @@ import yaml
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
 from simulator.evaporation import (
     _legacy_evaporation_shadow_pressure_map,
     _load_evaporation_alpha_by_species,
     _measured_alpha_control_view,
+    screened_missing_alpha_records,
 )
 from simulator.evaporation_classes import (
     BROAD_PROXY_NOT_INTRINSIC_TAG,
@@ -322,3 +324,84 @@ def test_fallback_path_marks_proxy_species_when_explicitly_enabled():
     assert result.diagnostic["evaporation_flux_kg_hr"]["CrO2"] > 0.0
     assert result.diagnostic["unmeasured_alpha_fallback_species"] == ["CrO2"]
     assert result.diagnostic["alpha_used_by_species"]["CrO2"] == 1.0
+
+
+def _sole_alpha_refusal(detail: str = "channel contract incomplete: missing alpha"):
+    from types import SimpleNamespace
+
+    return SimpleNamespace(
+        channels_by_species={
+            "CrO2": SimpleNamespace(
+                refusal_code="missing_channel_contract",
+                extra={"detail": detail},
+            )
+        }
+    )
+
+
+def test_screened_missing_alpha_omits_only_a_proved_sub_tolerance_bound():
+    """A sole missing alpha never enters the flux map, so the kernel cannot
+    record it. Stamp the refusal unless that carrier's own alpha=1
+    Hertz-Knudsen tick mass is strictly below the closure tolerance.
+
+    Hot arithmetic, T = 1800 K, M = 0.084 kg/mol, P = 1 Pa, A = 1 m^2,
+    t = 3600 s, R = 8.314462618 J/mol/K:
+        k = sqrt(M / (2 * pi * R * T))
+          = sqrt(0.084 / (2 * pi * 8.314462618 * 1800))
+          = 9.451404790080771e-4 kg/(m^2*Pa*s)
+        mass = k * P * A * t = 3.4025057244290777 kg
+    which is not below 1e-12. The negligible case is the same product at
+    P = 1e-40 Pa, about 3.4e-40 kg. A missing seam pressure is not that proof.
+    """
+
+    common = dict(
+        molar_mass_g_mol={"CrO2": 84.0},
+        temperature_K=1800.0,
+        area_m2=1.0,
+        duration_s=3600.0,
+        balance_tolerance_kg=DEFAULT_BALANCE_TOLERANCE_KG,
+    )
+    hot = screened_missing_alpha_records(
+        _sole_alpha_refusal(),
+        flux_pressures_Pa={},
+        seam_pressure_pa={"CrO2": 1.0},
+        **common,
+    )
+    assert set(hot) == {"CrO2"}
+    assert hot["CrO2"]["policy"] == "fail_loud_missing_alpha"
+    assert hot["CrO2"]["baseline_alpha_1_rate_kg_hr"] > DEFAULT_BALANCE_TOLERANCE_KG
+
+    cold = screened_missing_alpha_records(
+        _sole_alpha_refusal(),
+        flux_pressures_Pa={},
+        seam_pressure_pa={"CrO2": 1.0e-40},
+        **common,
+    )
+    assert cold == {}
+
+    unavailable = screened_missing_alpha_records(
+        _sole_alpha_refusal(),
+        flux_pressures_Pa={},
+        seam_pressure_pa={},
+        **common,
+    )
+    assert unavailable["CrO2"]["policy"] == "fail_loud_missing_alpha"
+    assert unavailable["CrO2"]["bound"] == "unavailable"
+
+    already_debiting = screened_missing_alpha_records(
+        _sole_alpha_refusal(),
+        flux_pressures_Pa={"CrO2": 1.0},
+        seam_pressure_pa={"CrO2": 1.0},
+        **common,
+    )
+    assert already_debiting == {}
+
+    other_field = screened_missing_alpha_records(
+        _sole_alpha_refusal(
+            "channel contract incomplete: missing formula"
+        ),
+        flux_pressures_Pa={},
+        seam_pressure_pa={"CrO2": 1.0},
+        **common,
+    )
+    assert other_field == {}

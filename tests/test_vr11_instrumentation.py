@@ -1479,6 +1479,7 @@ def _resolve_fe_cold(
     temperature_C: float,
     state_overrides: dict[str, Any],
 ) -> Any:
+    from simulator.accounting.ledger import DEFAULT_BALANCE_TOLERANCE_KG
     from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
     from simulator.vapour_rail.u0_manifest import load_u0_manifest
 
@@ -1490,6 +1491,7 @@ def _resolve_fe_cold(
             epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
             effective_pressure_species_ids=frozenset(),
         ),
+        balance_tolerance_kg=DEFAULT_BALANCE_TOLERANCE_KG,
     )
 
 
