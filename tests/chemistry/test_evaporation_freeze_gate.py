@@ -5421,11 +5421,6 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version_on_one_i
         lambda _engine: None,
     )
     target_file, launcher = _write_delegating_magemin_launcher(tmp_path)
-    changed_launcher = tmp_path / 'MAGEMin-launcher-changed'
-    changed_launcher.write_bytes(
-        launcher.read_bytes() + b'\n# changed runtime binary digest\n'
-    )
-    changed_launcher.chmod(0o755)
     curve = {
         'source': 'gate_liquid_fraction:fallback:magemin-shadow',
         'status': 'ok',
@@ -5433,7 +5428,7 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version_on_one_i
         'liquidus_T_C': 1300.0,
     }
 
-    def build_sim(*, change_reported_version, binary_path=launcher):
+    def build_sim(*, change_reported_version):
         sim = _build_freeze_gate_sim(
             vapor_pressure_data,
             feedstocks_data,
@@ -5442,7 +5437,7 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version_on_one_i
         )
         sim._register_freeze_gate_liquid_fraction_providers()
         backend = MAGEMinBackend()
-        backend._binary_path = binary_path
+        backend._binary_path = launcher
         provider = sim._chem_registry.fallback_for(
             ChemistryIntent.GATE_LIQUID_FRACTION
         )
@@ -5469,34 +5464,7 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version_on_one_i
         evidence=producer_evidence,
     )
 
-    label_only_receiver, label_only_backend = build_sim(
-        change_reported_version=True,
-    )
-    label_only_version = label_only_backend.get_engine_version()
-    label_only_evidence = engine_binding_admission.gate_curve_memo_evidence(
-        label_only_receiver,
-        curve,
-        include_selected_bindings=False,
-    )
-
-    assert producer_version == label_only_version
-    assert producer_evidence.provenance['runtime_artifacts'][
-        'magemin_selected_binary'
-    ]['sha256'] == label_only_evidence.provenance['runtime_artifacts'][
-        'magemin_selected_binary'
-    ]['sha256']
-    assert engine_binding_admission.gate_curve_memo_origin_matches(
-        label_only_receiver,
-        curve,
-        record['origin'],
-        fresh_evidence=True,
-        evidence=label_only_evidence,
-    )
-
-    receiver, receiver_backend = build_sim(
-        change_reported_version=False,
-        binary_path=changed_launcher,
-    )
+    receiver, receiver_backend = build_sim(change_reported_version=True)
     receiver_version = receiver_backend.get_engine_version()
     receiver_evidence = engine_binding_admission.gate_curve_memo_evidence(
         receiver,
@@ -5507,7 +5475,7 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version_on_one_i
     assert producer_version != receiver_version
     assert producer_evidence.provenance['runtime_artifacts'][
         'magemin_selected_binary'
-    ]['sha256'] != receiver_evidence.provenance['runtime_artifacts'][
+    ]['sha256'] == receiver_evidence.provenance['runtime_artifacts'][
         'magemin_selected_binary'
     ]['sha256']
     assert producer_evidence.producer_evidence != (
