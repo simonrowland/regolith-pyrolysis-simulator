@@ -2548,27 +2548,43 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if backend is None or not backend.is_available():
             import multiprocessing
 
-            if multiprocessing.current_process().daemon:
+            daemon_context = multiprocessing.current_process().daemon
+            initialization_error = getattr(
+                provider, '_backend_initialization_error', None
+            )
+            child_start_refusal = (
+                daemon_context
+                and isinstance(initialization_error, AssertionError)
+                and str(initialization_error)
+                == 'daemonic processes are not allowed to have children'
+            )
+            if child_start_refusal:
                 reason = (
                     "liquid_fraction_provider_unavailable_daemonic_process_"
                     "cannot_start_child_workers"
                 )
-                detail = (
-                    "the MAGEMin liquid-fraction provider is unavailable, and "
-                    "a daemonic process cannot start child worker processes"
-                )
-            else:
-                reason = "liquid_fraction_provider_missing_input"
-                detail = reason
-            raise EvaporationFluxRefusal(
-                reason,
-                {
+                diagnostic = {
                     'reason': reason,
                     'input': 'liquid_fraction_provider',
                     'provider': self._liquid_fraction_provider,
                     'status': 'unavailable',
-                    'detail': detail,
-                },
+                    'detail': (
+                        'a daemonic process cannot start child worker processes'
+                    ),
+                }
+            else:
+                diagnostic = {
+                    'reason': 'missing_input',
+                    'input': 'liquid_fraction_provider',
+                    'provider': self._liquid_fraction_provider,
+                    'status': 'unavailable',
+                }
+                if daemon_context:
+                    diagnostic['daemon_context'] = True
+                reason = 'liquid_fraction_provider_missing_input'
+            raise EvaporationFluxRefusal(
+                reason,
+                diagnostic,
             )
 
     def _register_magemin_shadow_if_available(self) -> None:
