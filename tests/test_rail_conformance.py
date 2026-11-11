@@ -1566,8 +1566,20 @@ def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> Non
         assert split.escaped_frac > 0.0 and split.warning
     else:
         evaluator = CATALOG.evaluator_for(species_id)
-        out_of_range_temperature_K = evaluator.valid_temperature_K[1] + 1.0
-        batch, answer = _resolve_one(species_id, out_of_range_temperature_K)
+        catalog_high_K = float(evaluator.valid_temperature_K[1])
+        # Species whose selected law is this evaluator are out of domain
+        # one kelvin above its band. A replacement law publishes its own
+        # band (Fe's pure-Fe sidecar is 1809–3134 K, so 1901 K is inside
+        # it). Step to that published upper bound when the catalog edge
+        # still sits in the selected band.
+        temperature_K = catalog_high_K + 1.0
+        batch, answer = _resolve_one(species_id, temperature_K)
+        selected_law = answer.extra.get("selected_law")
+        if isinstance(selected_law, dict) and selected_law.get("band_K"):
+            law_high_K = float(selected_law["band_K"][1])
+            if temperature_K <= law_high_K:
+                temperature_K = law_high_K + 1.0
+                batch, answer = _resolve_one(species_id, temperature_K)
         typed_refusal = (
             CATALOG.species[species_id].code_metadata.raw.get(
                 "out_of_domain_disposition"
@@ -1592,6 +1604,12 @@ def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> Non
             assert answer.extra["status"]
             assert answer.extra["acquisition_flag"]
             assert answer.pressure.pa > 0.0
+            selected_law = answer.extra.get("selected_law")
+            if isinstance(selected_law, dict):
+                assert selected_law["out_of_range"] is True
+                assert selected_law["authority"] == "extrapolated"
+                low_K, high_K = selected_law["band_K"]
+                assert not (float(low_K) <= temperature_K <= float(high_K))
 
 
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)
