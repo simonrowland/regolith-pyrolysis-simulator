@@ -12052,14 +12052,16 @@ def _hashimoto_residue_prediction(
     context: ScoreContext,
     reference: Observation,
     engine: Engine,
-    cache: dict[tuple[str, Engine], Mapping[str, object]],
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ],
     *,
     selected_experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
-    cache_key = (_HASHIMOTO_SOURCE_ID, engine)
+    cache_key = (_HASHIMOTO_SOURCE_ID, engine, selected_experiment_ids)
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
@@ -12321,7 +12323,14 @@ def _hashimoto_residue_prediction(
 _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 
 
-def _knudsen_residue_prediction(context, reference, engine, cache=None) -> EnginePrediction:
+def _knudsen_residue_prediction(
+    context,
+    reference,
+    engine,
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ] | None = None,
+) -> EnginePrediction:
     """Translate the residue owner's extent result to the scoring contract."""
     from simulator.battery.residue import (
         ResidueEngineNonconvergence, ResidueInventoryRefusal,
@@ -12330,7 +12339,11 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
 
     experiment = context.experiments.get(reference.experiment_id)
     try:
-        cache_key = (f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:{printed_source_pressure(reference)}", engine)
+        cache_key = (
+            f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:{printed_source_pressure(reference)}",
+            engine,
+            None,
+        )
         if cache is not None and cache_key in cache:
             result = cache[cache_key]
         else:
@@ -12367,7 +12380,9 @@ def _sossi_residue_prediction(
     context: ScoreContext,
     reference: Observation,
     engine: Engine,
-    cache: dict[tuple[str, Engine], Mapping[str, object]],
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ],
     *,
     selected_experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
@@ -12390,7 +12405,7 @@ def _sossi_residue_prediction(
             },
             identity=reference.identity,
         )
-    cache_key = (_SOSSI_SOURCE_ID, engine)
+    cache_key = (_SOSSI_SOURCE_ID, engine, selected_experiment_ids)
     try:
         from simulator.battery.residue import (
             ResidueInventoryRefusal,
@@ -14531,7 +14546,9 @@ def _score_store_with_decisions(
     kems_partial_pressure_band = derive_kems_partial_pressure_band(
         observations, context.experiments, benches=context.benches
     )
-    residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
+    residue_prediction_cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ] = {}
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
             for obs in refs:
@@ -20931,10 +20948,23 @@ def _write_headline_summary_from_accumulator_json(
     path: Path,
     *,
     store_stamp: Mapping[str, object] | None,
+    filters: Mapping[str, object] | None = None,
+    selected_references: int | None = None,
+    subset: bool = False,
 ) -> None:
-    _write_headline_summary_payload_json(
-        aggregate.summary_payload(store_stamp), path
-    )
+    payload = aggregate.summary_payload(store_stamp)
+    if subset:
+        if filters is None or selected_references is None:
+            raise ValueError("subset summaries require filters and reference count")
+        payload = dict(payload)
+        payload["filters"] = dict(filters)
+        payload["subset"] = True
+        payload["selected_references"] = selected_references
+        payload["headline_aggregate_scope"] = "subset"
+        for record in payload.get("records", []):
+            if isinstance(record, dict):
+                record["aggregate_scope"] = "subset"
+    _write_headline_summary_payload_json(payload, path)
 
 
 def _write_headline_summary_payload_json(

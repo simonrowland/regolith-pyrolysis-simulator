@@ -79,9 +79,10 @@ includes gas-phase Mn (`Mn(g)`) and excludes `MnO`. Queries are trimmed, matched
 formulas exactly when possible, and otherwise matched case-insensitively only when that spelling
 is unique. Filtered runs combine the species, rail, work, limit and engine restrictions; they keep
 the full scoring context and write labelled subset artifacts under `data/battery/subsets/`
-instead of replacing the published headline files. Hashimoto and Sossi source checks still see
-all 24 and 43 extracted runs, while residue integration runs only for experiments represented by
-selected references.
+instead of replacing the published headline files. In particular, `--work` and `--rail` no longer
+refresh the published headline artifacts; run an unfiltered score to refresh those files.
+Hashimoto and Sossi source checks still see all 24 and 43 extracted runs, while residue integration
+runs only for experiments represented by selected references.
 
 For quick diagnostics, `scripts/battery_residuals_report.py funnel` counts a residuals file by
 status, rail, engine and refusal reason, and `rowdiff BASE TIP` lists the rows that moved.

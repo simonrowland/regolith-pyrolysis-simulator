@@ -110,26 +110,12 @@ def _scoring_output_directory(
     return battery / "subsets" / fingerprint
 
 
-def _label_scoring_outputs(
-    summary_path: Path,
+def _label_subset_report(
     report: str,
     *,
     filters: Mapping[str, object],
     subset: bool,
-    selected_references: int,
 ) -> str:
-    scope = "subset" if subset else "full_store"
-    summary = json.loads(summary_path.read_text(encoding="utf-8"))
-    summary["filters"] = dict(filters)
-    summary["subset"] = subset
-    summary["selected_references"] = selected_references
-    summary["headline_aggregate_scope"] = scope
-    for record in summary.get("records", []):
-        if isinstance(record, dict):
-            record["aggregate_scope"] = scope
-    summary_path.write_text(
-        json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
     if subset:
         heading, _separator, body = report.partition("\n")
         label = (
@@ -454,7 +440,14 @@ def _run_studio(
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        epilog=(
+            "Filtered --work/--rail/--species/--limit/--engines runs write under "
+            "data/battery/subsets/<filter-hash>/ and do not refresh the published "
+            "headline files. Run an unfiltered score to refresh the published headline."
+        ),
+    )
     parser.add_argument(
         "--engines",
         default=",".join(e.value for e in SCORE_ENGINE_SET),
@@ -753,17 +746,25 @@ def main(argv: list[str] | None = None) -> int:
             report,
             iter_compilation_comparisons_jsonl(compilation_comparisons_partial_path),
         )
+        summary_options = (
+            {
+                "filters": filters,
+                "selected_references": metadata.selected_reference_count,
+                "subset": True,
+            }
+            if subset
+            else {}
+        )
         _write_headline_summary_from_accumulator_json(
             report_aggregate,
             summary_partial_path,
             store_stamp=recorded,
+            **summary_options,
         )
-        report = _label_scoring_outputs(
-            summary_partial_path,
+        report = _label_subset_report(
             report,
             filters=filters,
             subset=subset,
-            selected_references=metadata.selected_reference_count,
         )
         report_partial_path.write_text(report, encoding="utf-8")
         os.replace(summary_partial_path, summary_path)
@@ -772,14 +773,20 @@ def main(argv: list[str] | None = None) -> int:
         os.replace(compilation_comparisons_partial_path, compilation_comparisons_path)
     finally:
         compilation_comparisons_partial_path.unlink(missing_ok=True)
-    print(
-        f"residuals={written} scored={scored} "
-        f"references={metadata.selected_reference_count} "
-        f"wall_seconds={time.perf_counter() - run_started_wall:.3f} "
-        f"process_cpu_seconds={time.process_time() - run_started_cpu:.3f} "
-        f"subset={str(subset).lower()} output={output_directory} "
-        f"pin_failures={len(failures)} host={context.hostname}"
-    )
+    if subset:
+        print(
+            f"residuals={written} scored={scored} "
+            f"references={metadata.selected_reference_count} "
+            f"wall_seconds={time.perf_counter() - run_started_wall:.3f} "
+            f"process_cpu_seconds={time.process_time() - run_started_cpu:.3f} "
+            f"subset=true output={output_directory} "
+            f"pin_failures={len(failures)} host={context.hostname}"
+        )
+    else:
+        print(
+            f"residuals={written} scored={scored} "
+            f"pin_failures={len(failures)} host={context.hostname}"
+        )
     return 0
 
 
