@@ -1211,8 +1211,8 @@ def test_refused_wall_evidence_is_unavailable_not_zero_cost() -> None:
         )
 
 
-def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> None:
-    run_execution = _refused_empty_wall_deposit_execution()
+def test_non_authoritative_empty_wall_deposit_is_priced_and_ranked() -> None:
+    run_execution = _non_authoritative_empty_wall_deposit_execution()
     reference = _run_reference(
         run_execution,
         {},
@@ -1220,23 +1220,25 @@ def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> 
     )
     summary = reference.product_summary
 
-    assert summary["campaigns_to_resinter"] is None
-    assert summary["aggregate_campaigns_to_resinter"] is None
-    assert summary["campaigns_to_resinter_worst_segment"] is None
-    assert summary["has_positive_qualified_fouling"] is None
-    assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
-    assert "furnace_amortization_cost_per_run_usd" not in summary
-    assert summary["furnace_amortization_batch_cost_equivalents"] is None
-    with pytest.raises(ObjectiveComputationError, match="batch_cost_unavailable"):
-        cost_adjusted_objective_scores(
-            {"oxygen_kg": 10.0, "energy_kWh": 1.0},
-            DEFINITIONS,
-            product_summary=summary,
-        )
+    assert summary["campaigns_to_resinter"] == "infinite"
+    assert summary["aggregate_campaigns_to_resinter"] == "infinite"
+    assert summary["campaigns_to_resinter_worst_segment"] == "infinite"
+    assert summary["has_positive_qualified_fouling"] is False
+    assert summary["furnace_amortization_status"] == "available"
+    assert summary["furnace_amortization_cost_per_run_usd"] == 0.0
+    assert summary["wall_deposit_authority_non_authoritative"] == (
+        "wall_deposit_vapour_carrier_non_authoritative"
+    )
+    scores = cost_adjusted_objective_scores(
+        {"oxygen_kg": 10.0, "energy_kWh": 1.0},
+        DEFINITIONS,
+        product_summary=summary,
+    )
+    assert scores == (10.0, -1.0)
 
-    refused_record = SimpleNamespace(
-        candidate_id="refused",
-        cache_key="refused",
+    empty_record = SimpleNamespace(
+        candidate_id="empty-wall",
+        cache_key="empty-wall",
         objectives={"oxygen_kg": 10.0, "energy_kWh": 1.0},
         product_summary=summary,
     )
@@ -1246,14 +1248,20 @@ def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> 
         objectives={"oxygen_kg": 1.0, "energy_kWh": 1.0},
         product_summary=_available_furnace_summary(0.0),
     )
-    assert study._record_objective_scores(refused_record, DEFINITIONS) == (
-        None,
-        None,
-    )
-    assert study._rank_key(refused_record, DEFINITIONS) > study._rank_key(
+    assert study._record_objective_scores(empty_record, DEFINITIONS) == scores
+    assert study._rank_key(empty_record, DEFINITIONS) < study._rank_key(
         clean_record,
         DEFINITIONS,
     )
+    front = pareto_front(
+        (empty_record, clean_record),
+        DEFINITIONS,
+        objective_getter=lambda item: item.objectives,
+        score_getter=lambda item: study._record_objective_scores(
+            item, DEFINITIONS
+        ),
+    )
+    assert [item.candidate_id for item in front] == ["empty-wall"]
 
 
 def test_finite_threshold_null_coating_rate_stays_unavailable_in_run_reference() -> None:
@@ -1277,7 +1285,7 @@ def test_finite_threshold_null_coating_rate_stays_unavailable_in_run_reference()
     )
 
 
-def test_uncertified_empty_deposit_is_not_a_measured_lifespan_load(
+def test_uncertified_empty_deposit_books_zero_lifespan_load(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: None)
@@ -1304,9 +1312,9 @@ def test_uncertified_empty_deposit_is_not_a_measured_lifespan_load(
         ),
     )
     summary = objective_module._furnace_lifespan_cost_summary(empty, empty.simulator)
-    assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
-    assert summary["wall_deposit_total_kg"] is None
-    assert summary["wall_deposit_kg_by_species"] is None
+    assert summary["lifespan_cost_status"] == "threshold_unavailable"
+    assert summary["wall_deposit_total_kg"] == pytest.approx(0.0)
+    assert dict(summary["wall_deposit_kg_by_species"]) == {}
 
     positive = SimpleNamespace(
         simulator=SimpleNamespace(),
@@ -2092,6 +2100,36 @@ def _refused_empty_wall_deposit_execution() -> SimpleNamespace:
                         }
                     }
                 }
+            },
+        ),
+    )
+
+
+def _non_authoritative_empty_wall_deposit_execution() -> SimpleNamespace:
+    sim = _FakeProductSim()
+    sim.record.cost_rollup = {
+        "run_input_cost": {"owner_ratify_money_projection": 20.0}
+    }
+    return SimpleNamespace(
+        simulator=sim,
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg={},
+            wall_zone_by_segment={},
+            wall_deposit_sticking_authority={
+                "authoritative_for_deposit_mass": False,
+                "code": "wall_deposit_vapour_carrier_non_authoritative",
+                "message": (
+                    "zero wall deposition cannot be certified from that evidence"
+                ),
+                "deposited_species": [],
+                "vapour_carrier_authority_by_species": {
+                    "Cr2O3_gas": {
+                        "species_id": "Cr2O3_gas",
+                        "is_refused": True,
+                        "pressure": {"kind": "refusal"},
+                        "flux": {"kind": "refusal"},
+                    }
+                },
             },
         ),
     )
