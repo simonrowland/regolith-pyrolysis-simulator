@@ -96,6 +96,120 @@ def test_internal_analytical_cell_reports_activity_not_gamma() -> None:
     assert cell.activities_standard_state == benchmark_standard_state
 
 
+def _markova_first_interval_moles() -> dict[str, float]:
+    # Markova 1984 first-interval residual-melt composition used by the
+    # residue prediction regressions.
+    markova_wt_pct = {
+        "SiO2": 44.02,
+        "Al2O3": 4.56,
+        "FeO": 8.04,
+        "MgO": 36.44,
+        "CaO": 6.95,
+    }
+    return composition_kg_and_mol(markova_wt_pct)[1]
+
+
+def test_internal_analytical_low_temperature_result_ignores_prior_core_diagnostic() -> None:
+    """A 100 C Markova request cannot publish a prior call's activity map."""
+    from copy import deepcopy
+
+    stale_diagnostic = {
+        "activities": {"SiO2": 0.25},
+        "vapor_pressure_authority": {"status": "authoritative"},
+    }
+    outputs = []
+    for prior_diagnostic in (stale_diagnostic, {}):
+        core = _new_internal_analytical_core()
+        core._last_vapor_pressure_diagnostic = deepcopy(prior_diagnostic)
+        output = _internal_analytical_vapor_pressure_adapter(
+            core=core,
+            temperature_C=100.0,
+            pressure_bar=0.0,
+            composition_kg=None,
+            composition_mol=_markova_first_interval_moles(),
+            fO2_log=0.0,
+            po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0),
+        )
+        outputs.append(vars(output))
+
+    assert outputs[0] == outputs[1]
+    assert outputs[0]["activity_coefficients"] == {}
+    assert "SiO2" not in outputs[0]["diagnostics"]["vapor_pressure_diagnostic"].get(
+        "activities", {}
+    )
+
+
+def test_internal_analytical_battery_results_are_independent_of_request_order() -> None:
+    """Every request keeps its full result across low-T, normal, and CO2 paths."""
+    from copy import deepcopy
+    from simulator.state import Atmosphere
+
+    composition_mol = _markova_first_interval_moles()
+    request_specs = {
+        "low_temperature": {
+            "temperature_C": 100.0,
+            "pressure_bar": 0.0,
+            "fO2_log": 0.0,
+            "po2_bar": 1.0,
+            "co2_background": False,
+        },
+        "normal": {
+            "temperature_C": 1200.0,
+            "pressure_bar": 0.0,
+            "fO2_log": 0.0,
+            "po2_bar": 1.0,
+            "co2_background": False,
+        },
+        "co2_notice": {
+            "temperature_C": 1000.0,
+            "pressure_bar": 1.0,
+            "fO2_log": math.log10(0.5),
+            "po2_bar": 0.5,
+            "co2_background": True,
+        },
+    }
+    orders = (
+        ("normal", "co2_notice", "low_temperature"),
+        ("low_temperature", "co2_notice", "normal"),
+    )
+    outputs_by_order: list[dict[str, dict[str, object]]] = []
+    for order in orders:
+        core = _new_internal_analytical_core()
+        outputs: dict[str, dict[str, object]] = {}
+        for request_name in order:
+            spec = request_specs[request_name]
+            if spec["co2_background"]:
+                core.melt.atmosphere = Atmosphere.CONTROLLED_O2
+                core.melt.temperature_C = float(spec["temperature_C"])
+                core.melt.p_total_mbar = float(spec["pressure_bar"]) * 1000.0
+                core.melt.pO2_mbar = float(spec["po2_bar"]) * 1000.0
+                core.melt.background_gas_species = "CO2"
+                core.melt.background_gas_mole_fraction = 1.0
+                core._headspace_equilibrated_pO2_bar(0.0)
+                assert core._headspace_co2_dissociation_diagnostic["notices"]
+            else:
+                core._headspace_co2_dissociation_diagnostic = {}
+            result = _internal_analytical_vapor_pressure_adapter(
+                core=core,
+                temperature_C=float(spec["temperature_C"]),
+                pressure_bar=float(spec["pressure_bar"]),
+                composition_kg=None,
+                composition_mol=composition_mol,
+                fO2_log=float(spec["fO2_log"]),
+                po2_request=Po2Request(
+                    mode=PO2_COMMANDED,
+                    po2_bar=float(spec["po2_bar"]),
+                ),
+            )
+            outputs[request_name] = deepcopy(vars(result))
+        outputs_by_order.append(outputs)
+
+    assert outputs_by_order[0] == outputs_by_order[1]
+    assert outputs_by_order[0]["co2_notice"]["diagnostics"][
+        "vapor_pressure_diagnostic"
+    ]["co2_dissociation"]["notices"]
+
+
 def test_internal_analytical_scores_multi_cation_parent_activity(monkeypatch) -> None:
     monkeypatch.setattr(
         "simulator.diagnostic_helpers.binary_pot_battery._call_with_hard_timeout",
