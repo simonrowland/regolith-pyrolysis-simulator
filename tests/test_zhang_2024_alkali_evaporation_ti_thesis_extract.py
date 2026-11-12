@@ -102,9 +102,32 @@ def test_zhang_thesis_residues_migrate_with_species_temperature_and_conditions()
     ]
     assert len(vacuum_residues) == 120
     assert all(
-        observation.identity.total_pressure_Pa.is_value
-        and observation.identity.total_pressure_Pa.value == Decimal("0.0001")
+        observation.identity.total_pressure_Pa.is_unknown
+        and observation.identity.total_pressure_Pa.reason
+        == "source has no located total pressure for this run"
         for observation in vacuum_residues
+    )
+
+    exact_bar = []
+    for observation in source_observations:
+        if not (
+            observation.identity.quantity.is_value
+            and observation.identity.quantity.value
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        ):
+            continue
+        located = (observation.point_conditions or {}).get("total_pressure_Pa")
+        if (
+            located is not None
+            and located.state.is_value
+            and located.state.value == Decimal("100000")
+        ):
+            exact_bar.append(observation)
+    assert len(exact_bar) == 90
+    assert all(
+        observation.identity.total_pressure_Pa.is_value
+        and observation.identity.total_pressure_Pa.value == Decimal("100000")
+        for observation in exact_bar
     )
 
     for formula, container in document["species"].items():
