@@ -747,6 +747,26 @@ def test_crossover_temperature_preserves_numeric_golden_outputs():
         assert crossover_C.hex() == expected_hex
 
 
+def test_crossover_temperature_delegates_to_chemistry_owner(monkeypatch):
+    calls = []
+
+    def chemistry_resolver(reductant, target_metal):
+        calls.append((reductant, target_metal))
+        return 1234.5
+
+    monkeypatch.setattr(
+        metallothermic_step_module,
+        "crossover_temperature_C",
+        chemistry_resolver,
+        raising=False,
+    )
+
+    assert BuiltinMetallothermicStepProvider._crossover_temperature_C(
+        "K", "Fe"
+    ) == 1234.5
+    assert calls == [("K", "Fe")]
+
+
 def test_refused_result_has_policy_refusal_shape():
     provider = BuiltinMetallothermicStepProvider()
 
