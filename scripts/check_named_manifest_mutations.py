@@ -207,6 +207,25 @@ def _check_case(case: ManifestCase) -> bool:
             _write(case, payload, entries)
             # Adding an expected identity simulates a missing source row.
             ok &= _run_test(case, identity, "remove source row")
+
+            if case.name == "ATcT source records":
+                shutil.copy2(backup, case.path)
+                records_dir = case.path.parent / "records"
+                extra_stem = "__mutation_extra_record_file__"
+                extra_path = records_dir / f"{extra_stem}.json"
+                suffix = 1
+                while extra_path.exists():
+                    extra_stem = f"__mutation_extra_record_file_{suffix}__"
+                    extra_path = records_dir / f"{extra_stem}.json"
+                    suffix += 1
+                try:
+                    extra_path.write_text("{}\n", encoding="utf-8")
+                    extra_identity = extra_path.relative_to(
+                        case.path.parent
+                    ).as_posix()
+                    ok &= _run_test(case, extra_identity, "add record file")
+                finally:
+                    extra_path.unlink(missing_ok=True)
         except Exception as exc:
             print(f"  FAIL {case.name}: {type(exc).__name__}: {exc}")
             ok = False

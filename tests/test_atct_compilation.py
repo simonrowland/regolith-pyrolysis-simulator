@@ -38,11 +38,19 @@ def test_every_source_row_round_trips(corpus):
         {record_id: None for record_id in expected_ids},
         label="ATcT source record IDs",
     )
+    record_paths_on_disk = {
+        path.relative_to(ATCT_ROOT).as_posix()
+        for path in (ATCT_ROOT / "records").glob("*.json")
+    }
+    assert_named_rows(
+        {path: None for path in record_paths_on_disk},
+        {entry["path"]: None for entry in manifest["entries"]},
+        label="ATcT record paths",
+    )
     records = list(load_records())
     # Count the value cells independently of the harvester's row selector.
     assert original.count('<td class="bkgDHf298">') == len(records)
     assert len(manifest["entries"]) == len(records)
-    assert len(list((ATCT_ROOT / "records").glob("*.json"))) == len(records)
     assert records == parsed_records
     for entry, record in zip(manifest["entries"], records, strict=True):
         locator = record["source_locator"]
