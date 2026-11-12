@@ -31,6 +31,7 @@ from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Protocol
 
 import yaml
 
+from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -1705,13 +1706,6 @@ def _fo2_mode_from_notices(notices: Sequence[Notice]) -> Fo2Mode | None:
         (notice.fo2_mode for notice in notices if notice.fo2_mode is not None),
         None,
     )
-
-
-def _dec_token(value: Decimal) -> str:
-    text = format(value, "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    return text or "0"
 
 
 def _residual_key_parts(key: object) -> tuple[str, str, str, str] | None:
