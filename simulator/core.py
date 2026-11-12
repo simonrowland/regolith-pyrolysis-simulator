@@ -608,6 +608,7 @@ from simulator.fe_redox import (
     normalize_redox_state,
 )
 from simulator.oxygen_buffers import (
+    delta_iw_log10,
     feo_iw_log10_fO2_bar,
     legacy_iw_log10_fO2_bar,
 )
@@ -7938,7 +7939,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # FeO(l) = Fe(metal) + 1/2 O2; Holzheid et al. 1997
         # doi:10.1016/S0009-2541(97)00030-2 grounds FeO(l) DeltaG in
         # feo_iw_log10_fO2_bar(), so a_FeO,sat = 10^((log fO2 - IW)/2).
-        saturation_log10 = (float(fO2_log) - pure_feo_iw) / 2.0
+        saturation_log10 = delta_iw_log10(float(fO2_log), pure_feo_iw) / 2.0
         if saturation_log10 > 300.0:
             a_feo_saturation = float('inf')
         elif saturation_log10 < -300.0:

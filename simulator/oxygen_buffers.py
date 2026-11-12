@@ -467,6 +467,23 @@ def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
     return ln_fO2 / math.log(10.0)
 
 
+def delta_iw_log10(fO2_log: float, iw_log: float) -> float:
+    """log10(fO2/bar) minus the caller's IW log10(fO2/bar).
+
+    Premise: ΔIW compares two fugacities already written as log10 of bar.
+    This function does not choose the IW line. Legacy IW, Holzheid liquid
+    FeO, and O'Neill IW are different numbers; the caller passes the one
+    it means.
+    Algebra: float(fO2_log) - float(iw_log).
+    Unit check: both arguments are log10(bar), so the difference is
+    dimensionless dex.
+    Sanity: -10.0 - -12.5 is 2.5, hex 0x1.4p+1. The Decimal battery-hero
+    ΔIW is a different subtraction and is not this function.
+    """
+
+    return float(fO2_log) - float(iw_log)
+
+
 # This identifier follows the coded line's wustite-liquid standard. Holzheid
 # et al. (1997), Eq. 9, constructed it from O'Neill and Pownceby (1993) and
 # Barin (1989); the paper states no uncertainty for the line, and this code
