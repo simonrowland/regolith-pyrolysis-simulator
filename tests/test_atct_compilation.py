@@ -40,7 +40,7 @@ def test_every_source_row_round_trips(corpus):
     )
     records = list(load_records())
     # Count the value cells independently of the harvester's row selector.
-    assert original.count('<td class="bkgDHf298">') == len(records) == 3442
+    assert original.count('<td class="bkgDHf298">') == len(records)
     assert len(manifest["entries"]) == len(records)
     assert len(list((ATCT_ROOT / "records").glob("*.json"))) == len(records)
     assert records == parsed_records

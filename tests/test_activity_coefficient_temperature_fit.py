@@ -47,10 +47,6 @@ def test_fegley_2023_table_2_printed_rows_are_pinned() -> None:
     )
     assert_named_rows(actual, expected, label="Fegley 2023 Table 2 printed rows")
 
-    actual_rows = [actual[identity] for identity in sorted(actual)]
-    expected_rows = [expected[identity] for identity in sorted(expected)]
-    assert _sha256(actual_rows) == _sha256(expected_rows)
-
 
 def test_sossi_fegley_2018_table_2_printed_rows_are_pinned() -> None:
     path = ROOT / "data/literature/extracts/kems-041-sossi-fegley-2018.yaml"

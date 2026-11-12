@@ -145,11 +145,18 @@ def _run_test(
         return False
 
     output = result.stdout + result.stderr
+    if mutation.startswith("add"):
+        expected_rows = f"added rows: ['{identity}']"
+    elif mutation.startswith("remove"):
+        expected_rows = f"removed rows: ['{identity}']"
+    else:
+        print(f"  FAIL {mutation}: unsupported mutation kind")
+        return False
     named_failure = (
         result.returncode != 0
         and identity in output
         and "differs from its named manifest" in output
-        and ("added rows:" in output or "removed rows:" in output)
+        and expected_rows in output
     )
     if named_failure:
         print(f"  PASS {mutation}: failure named {identity}")
@@ -180,7 +187,8 @@ def _check_case(case: ManifestCase) -> bool:
             removed = entries.pop(len(entries) // 2)
             removed_identity = removed[case.identity_key]
             _write(case, payload, entries)
-            ok &= _run_test(case, removed_identity, "remove row")
+            # Removing an expected identity simulates an extra source row.
+            ok &= _run_test(case, removed_identity, "add source row")
 
             shutil.copy2(backup, case.path)
             payload, entries = _read(case)
@@ -197,7 +205,8 @@ def _check_case(case: ManifestCase) -> bool:
                 fake[case.identity_key] = identity
             entries.append(fake)
             _write(case, payload, entries)
-            ok &= _run_test(case, identity, "add row")
+            # Adding an expected identity simulates a missing source row.
+            ok &= _run_test(case, identity, "remove source row")
         except Exception as exc:
             print(f"  FAIL {case.name}: {type(exc).__name__}: {exc}")
             ok = False

@@ -926,8 +926,8 @@ def test_every_manifest_entry_carries_formula_as_published() -> None:
     assert not duplicate_ids, f"JANAF manifest has duplicate table IDs: {duplicate_ids}"
     paths = list(iter_table_paths())
     assert_named_rows(
-        {table_id: None for table_id in table_ids},
         {path.stem: None for path in paths},
+        {table_id: None for table_id in table_ids},
         label="JANAF manifest table IDs",
     )
     for entry in entries:
