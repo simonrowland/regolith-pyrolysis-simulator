@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from collections import Counter
 from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
 from simulator.battery.enums import Quantity
-from tests.battery.test_migrate import _migrate_real_extract
+from tests.battery.test_migrate import _migrate_real_extract, to_plain
+from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,8 +65,6 @@ def test_table3_cells_and_migration_match_page9_render(tmp_path):
             ("1.00", "0.50"),
         )
     }
-    assert sum(len(observation["values"]["points"]) for observation in observations) == 137
-
     cells_by_column = {
         observation["values"]["activity_column_as_printed"]: {
             (point["x_A_over_x_C_as_printed"], point["x_S_as_printed"]): point[
@@ -90,10 +88,18 @@ def test_table3_cells_and_migration_match_page9_render(tmp_path):
         for row in migrated.observations.values()
         if "::stolyarova_1996_table3_" in row.observation_id
     ]
-    assert len(table3_rows) == 137
-    assert Counter(row.identity.quantity.value for row in table3_rows) == {
-        Quantity.ACTIVITY: 137
-    }
+    expected = load_named_manifest(
+        ROOT / "tests" / "manifests" / "stolyarova_table3_reference_states.jsonl"
+    )
+    assert_named_rows(
+        {
+            row.observation_id: to_plain(row.identity.reference_state)
+            for row in table3_rows
+        },
+        expected,
+        label="Stolyarova 1996 Table 3 migrated rows",
+    )
+    assert all(row.identity.quantity.value is Quantity.ACTIVITY for row in table3_rows)
     assert all(row.identity.temperature_K.is_value for row in table3_rows)
     assert all(row.identity.temperature_K.value == 1933 for row in table3_rows)
     assert all(row.identity.composition.is_value for row in table3_rows)

@@ -20,6 +20,7 @@ from simulator.battery.generators import janaf as generator
 from simulator.battery.migrate import iter_observation_store_paths
 from tests.battery import compilation_shard_observation_count
 from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.named_manifests import assert_named_rows
 from simulator.battery.identity import (
     Identity,
     identity_equal,
@@ -39,6 +40,7 @@ from simulator.reference_data.janaf import (
     TRAILING_EMPTY_LAYOUT_REASON,
     formula_composition,
     iter_table_paths,
+    load_manifest,
     load_table_document,
     parse_janaf_txt,
     table_printed_temperatures,
@@ -1643,7 +1645,12 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     restored_whitespace_tails = 0
     unresolved_whitespace_tails = 0
     paths = list(iter_table_paths())
-    assert len(paths) == 1655
+    expected_table_ids = {entry["table_id"] for entry in load_manifest()["entries"]}
+    assert_named_rows(
+        {path.stem: None for path in paths},
+        {table_id: None for table_id in expected_table_ids},
+        label="JANAF generator table paths",
+    )
     for index, path in enumerate(paths, start=1):
         document = load_table_document(path)
         restored_whitespace_tails += sum(
@@ -1886,7 +1893,7 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         )
         if index % 100 == 0:
             print(
-                f"JANAF test audit: {index}/1655 tables in "
+                f"JANAF test audit: {index}/{len(paths)} tables in "
                 f"{time.monotonic() - started:.1f}s",
                 flush=True,
             )

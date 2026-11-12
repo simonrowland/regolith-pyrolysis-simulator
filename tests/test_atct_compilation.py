@@ -12,12 +12,13 @@ from tools.harvest_atct_compilation import (
     ATCT_ROOT, ROLE, SOURCE_NAME, feedstock_coverage, load_records, numeric_token,
     parse_source,
 )
+from tests.helpers.named_manifests import assert_named_rows
 
 
 @pytest.fixture(scope="module")
 def corpus():
     manifest = yaml.safe_load((ATCT_ROOT / "manifest.yaml").read_text())
-    return manifest, list(load_records()), (ATCT_ROOT / "source" / SOURCE_NAME).read_bytes()
+    return manifest, (ATCT_ROOT / "source" / SOURCE_NAME).read_bytes()
 
 
 def published(fragment):
@@ -25,13 +26,32 @@ def published(fragment):
 
 
 def test_every_source_row_round_trips(corpus):
-    manifest, records, payload = corpus
+    manifest, payload = corpus
     original = payload.decode("utf-8")
+    parsed_records = parse_source(payload)
+    actual_ids = [record["record_id"] for record in parsed_records]
+    expected_ids = [entry["record_id"] for entry in manifest["entries"]]
+    assert len(actual_ids) == len(set(actual_ids)), "ATcT source has duplicate record IDs"
+    assert len(expected_ids) == len(set(expected_ids)), "ATcT manifest has duplicate record IDs"
+    assert_named_rows(
+        {record_id: None for record_id in actual_ids},
+        {record_id: None for record_id in expected_ids},
+        label="ATcT source record IDs",
+    )
+    record_paths_on_disk = {
+        path.relative_to(ATCT_ROOT).as_posix()
+        for path in (ATCT_ROOT / "records").glob("*.json")
+    }
+    assert_named_rows(
+        {path: None for path in record_paths_on_disk},
+        {entry["path"]: None for entry in manifest["entries"]},
+        label="ATcT record paths",
+    )
+    records = list(load_records())
     # Count the value cells independently of the harvester's row selector.
-    assert original.count('<td class="bkgDHf298">') == len(records) == 3442
+    assert original.count('<td class="bkgDHf298">') == len(records)
     assert len(manifest["entries"]) == len(records)
-    assert len(list((ATCT_ROOT / "records").glob("*.json"))) == len(records)
-    assert records == parse_source(payload)
+    assert records == parsed_records
     for entry, record in zip(manifest["entries"], records, strict=True):
         locator = record["source_locator"]
         row = payload[locator["byte_start"]:locator["byte_end"]].decode("utf-8")
@@ -64,17 +84,43 @@ def test_every_source_row_round_trips(corpus):
         assert record["compilation_role"] == ROLE
     for source in manifest["source_files"]:
         assert hashlib.sha256((ATCT_ROOT / source["path"]).read_bytes()).hexdigest() == source["sha256"]
-    assert hashlib.sha256(payload).hexdigest() == "9f6f7d9197b2fb35f178fb231aa71e23e99d88a1c75623e94bb0ab80b6248731"
 
 
 def test_source_gaps_and_native_states_are_explicit(corpus):
-    manifest, records, _ = corpus
+    manifest, _ = corpus
+    records = list(load_records())
     assert manifest["corpus_status"]["claimed_species_count"] == 3444
-    assert manifest["corpus_status"]["ambiguities"] == [
-        "page claims 3444 species; supplied HTML contains 3442 species rows"
-    ]
-    assert sum(r["formation_enthalpy_0_K_as_published"] == "" for r in records) == 590
-    assert sum(r["units_as_published"] == "" for r in records) == 20
+    assert any(
+        "page claims 3444 species" in ambiguity
+        and "supplied HTML contains" in ambiguity
+        for ambiguity in manifest["corpus_status"]["ambiguities"]
+    )
+    manifest_records = {entry["record_id"]: entry for entry in manifest["entries"]}
+    for field, ambiguity, label in (
+        (
+            "formation_enthalpy_0_K_as_published",
+            "DHf0_blank_as_published; not inferred",
+            "ATcT blank DHf0 rows",
+        ),
+        (
+            "units_as_published",
+            "Units_blank_as_published; not inferred",
+            "ATcT blank unit rows",
+        ),
+    ):
+        assert_named_rows(
+            {
+                record["record_id"]: None
+                for record in records
+                if record[field] == ""
+            },
+            {
+                record_id: None
+                for record_id, record in manifest_records.items()
+                if ambiguity in record["ambiguities"]
+            },
+            label=label,
+        )
     for record in records:
         assert "malformed_formula_cell_attribute; button text retained verbatim" in record["ambiguities"]
         if not record["formation_enthalpy_0_K_as_published"]:
@@ -91,7 +137,8 @@ def test_source_gaps_and_native_states_are_explicit(corpus):
 
 
 def test_feedstock_element_coverage(corpus):
-    manifest, records, _ = corpus
+    manifest, _ = corpus
+    records = list(load_records())
     coverage = feedstock_coverage(records)
     assert set(coverage) == set("Ag Al As Au B Ba Bi Br C Ca Cd Ce Cl Co Cr Cs Cu Dy Er Eu F Fe Ga Gd Ge H Hf Ho I In Ir K La Li Lu Mg Mn Mo N Na Nb Nd Ni O Os P Pb Pr Pt Rb S Sb Sc Se Si Sm Sn Sr Tb Te Th Ti Tm U V W Y Yb Zn Zr".split())
     assert {element for element, count in coverage.items() if count} == set("B Br C Cl F H I N O Pt S Si".split())

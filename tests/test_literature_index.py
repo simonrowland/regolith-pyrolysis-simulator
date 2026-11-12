@@ -14,6 +14,8 @@ import re
 import yaml
 import pytest
 from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.named_manifests import assert_named_rows
+from simulator.reference_data.janaf import load_manifest as load_janaf_manifest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BUILDER = REPO_ROOT / "data" / "literature" / "build_index.py"
@@ -876,9 +878,20 @@ def test_nist_janaf_index_asset_is_the_corpus_txt_download() -> None:
     rows = {row["source_id"]: row for row in index["sources"]}
     row = rows["nist-janaf-4th"]
     tables = row["corpus"]["tables"]
+    corpus_root = Path(index["scan"]["corpus_root"])
+    txt_dir = corpus_root / "raw" / "janaf-nist-txt"
+    expected_table_ids = {
+        entry["table_id"] for entry in load_janaf_manifest()["entries"]
+    }
+    actual_table_ids = {path.stem for path in txt_dir.glob("*.txt")}
+    assert_named_rows(
+        {table_id: None for table_id in actual_table_ids},
+        {table_id: None for table_id in expected_table_ids},
+        label="NIST-JANAF raw table file paths",
+    )
+
     assert tables["path"] == "raw/janaf-nist-txt"
     assert tables["exists"] is True
-    assert tables["file_count"] == 1655
     assert row["pdf_status"] == "ABSENT"
     assert row["pdf_path"] is None
     assert row["extracts"] == []
@@ -887,9 +900,8 @@ def test_nist_janaf_index_asset_is_the_corpus_txt_download() -> None:
     legacy = rows["janaf-4th"]
     assert legacy["corpus"]["tables"]["path"] != "raw/janaf-nist-txt"
     assert "nist-janaf-4th" not in legacy["aliases"]
-
-    corpus_root = Path(index["scan"]["corpus_root"])
-    txt = corpus_root / "raw" / "janaf-nist-txt" / "K-001.txt"
+    assert tables["file_count"] == len(expected_table_ids)
+    txt = txt_dir / "K-001.txt"
     header = (REPO_ROOT / "data/literature/compilations/janaf/tables/K-001.yaml").read_text(
         encoding="utf-8", errors="replace"
     )[:2000]

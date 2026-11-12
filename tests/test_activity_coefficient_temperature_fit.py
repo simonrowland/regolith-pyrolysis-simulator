@@ -21,6 +21,7 @@ from simulator.battery.identity import profile_for
 from simulator.battery.records import Value
 from simulator.battery.validate import _validate_activity_coefficient_temperature_fit
 from tests.battery.factories import migrate_one_extract
+from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,9 +38,14 @@ def test_fegley_2023_table_2_printed_rows_are_pinned() -> None:
     path = ROOT / "data/literature/extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml"
     doc = yaml.safe_load(path.read_text())
     rows = doc["species"]["BSE"]["observations"][0]["values"]["rows_as_printed"]
-
-    assert len(rows) == 82
-    assert _sha256(rows) == "76e809f15c6338a5db8afb761ab8d683e627c95b85601e7ca4ece62c635af3e4"
+    actual = {
+        f"{index:04d}:{row['oxide']}": row
+        for index, row in enumerate(rows, start=1)
+    }
+    expected = load_named_manifest(
+        ROOT / "tests" / "manifests" / "fegley_2023_table_2_printed_rows.jsonl"
+    )
+    assert_named_rows(actual, expected, label="Fegley 2023 Table 2 printed rows")
 
 
 def test_sossi_fegley_2018_table_2_printed_rows_are_pinned() -> None:
@@ -121,11 +127,51 @@ def test_fegley_2023_table_2_migrates_all_numeric_fit_rows() -> None:
         if _quantity(observation) is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
     ]
 
+    expected = load_named_manifest(
+        ROOT / "tests" / "manifests" / "fegley_2023_table_2_printed_rows.jsonl"
+    )
+
+    def printed_decimal(value: object) -> Decimal:
+        return Decimal(str(value).replace("−", "-").replace(",", ""))
+
+    expected_id_by_signature = {
+        (
+            "".join(row["oxide"].split()),
+            printed_decimal(row["A_printed"]),
+            printed_decimal(row["B_printed"]),
+            row["notes_printed"],
+        ): identity
+        for identity, row in expected.items()
+    }
+    if len(expected_id_by_signature) != len(expected):
+        raise AssertionError("Fegley Table 2 manifest rows have ambiguous values")
+    actual = {}
+    for observation in observations:
+        parameters = dict(observation.value.expression_parameters or ())
+        try:
+            domain = json.loads(observation.value.expression_domain)
+        except (TypeError, json.JSONDecodeError):
+            domain = {}
+        signature = (
+            "".join(observation.identity.species.formula.split()),
+            parameters.get("A"),
+            parameters.get("B"),
+            domain.get("notes_as_printed"),
+        )
+        identity = expected_id_by_signature.get(signature)
+        if identity is None or identity in actual:
+            identity = f"unmanifested:{observation.observation_id}"
+            actual[identity] = signature
+        else:
+            actual[identity] = expected[identity]
+    assert_named_rows(
+        actual, expected, label="Fegley 2023 Table 2 migrated fit rows"
+    )
+
     assert QUANTITY_UNITS[Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT] == "dimensionless"
     fit_profile = profile_for(observations[0].identity)
     assert fit_profile.required == frozenset({"per", "reference_state"})
     assert Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT not in MELT_ACTIVITY_QUANTITIES
-    assert len(observations) == 82
     assert not [
         issue
         for issue in result.validation.hard_issues

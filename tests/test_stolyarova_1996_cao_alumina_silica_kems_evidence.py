@@ -13,6 +13,7 @@ from simulator.battery.score import (
     _reference_has_measured_evidence,
 )
 from tests.battery.test_migrate import _migrate_real_extract, to_plain
+from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -294,7 +295,17 @@ def test_table3_reductions_declare_unprinted_inputs_without_changing_values(tmp_
         if observation.evidence.class_.is_value
         and observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
     }
-    assert len(before) == len(baseline_reduced) == 137
+    assert len(before) == len(baseline_reduced)
+    assert_named_rows(
+        {
+            observation_id: to_plain(observation.identity.reference_state)
+            for observation_id, observation in baseline_reduced.items()
+        },
+        load_named_manifest(
+            ROOT / "tests" / "manifests" / "stolyarova_table3_reference_states.jsonl"
+        ),
+        label="Stolyarova 1996 Table 3 baseline reduced rows",
+    )
     assert all(
         issue.reason is RefusalReason.CONDITIONAL_FIELD
         and issue.detail == "derived observation requires derived_from"
