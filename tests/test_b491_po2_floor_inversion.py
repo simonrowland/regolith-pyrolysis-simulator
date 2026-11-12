@@ -286,8 +286,8 @@ def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
         MELT_DISSOCIATION_PO2_MAX_BAR,
     )
 
-    # One floor notice is a dict. A distinct sibling on the same key stays
-    # in a list. Pareto still publishes a list under its own field name.
+    # The typed carrier stores the floor notice as a list, including when
+    # it is the only notice. Pareto publishes that list under its own field.
     copied_floor = dict(
         next(
             item

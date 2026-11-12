@@ -276,7 +276,9 @@ def _physics_metadata_payload(
             notice = record.get("extrapolation_notice")
             if isinstance(notice, dict):
                 bodies = [notice]
-            elif isinstance(notice, (list, tuple)):
+            elif isinstance(notice, (list, tuple)) and not isinstance(
+                notice, (str, bytes)
+            ):
                 bodies = [item for item in notice if isinstance(item, dict)]
             else:
                 continue
@@ -284,6 +286,12 @@ def _physics_metadata_payload(
                 if not {"temperature_K", "valid_range_K"} <= body.keys():
                     continue
                 body.pop("certified_band", None)
+            # Typed publication stores every notice as a list. The green
+            # digest hashed one extrapolation notice as a dict. Project
+            # that singleton here, and only here, so the pin stays the
+            # legacy metadata shape.
+            if len(bodies) == 1:
+                record["extrapolation_notice"] = bodies[0]
     return (
         dict(diagnostic["vapor_pressures_source"]),
         provenance,

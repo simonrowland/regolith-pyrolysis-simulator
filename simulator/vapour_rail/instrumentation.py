@@ -547,11 +547,11 @@ def public_carrier_notices(carrier: Any) -> dict[str, tuple[dict[str, Any], ...]
 def notice_attribute(
     items: Sequence[Mapping[str, Any]] | None,
 ) -> dict[str, Any] | list[dict[str, Any]] | None:
-    """One dict when a carrier has one notice, otherwise the distinct list.
+    """Legacy attribute shape: one dict, or a list when there are several.
 
-    Evaluation attributes keep the single-notice dict so existing readers of
-    that slot stay valid. Publication of ``extrapolation_notice`` uses the
-    same rule. Every other notice key stays a list.
+    Evaluation attributes and the physics-metadata digest use this.
+    Typed publication does not. ``merge_public_notice`` always stores a list,
+    including a lone ``extrapolation_notice``.
     """
 
     copied = _dedupe_notices(tuple(items or ()))
@@ -567,13 +567,13 @@ def merge_public_notice(
     key: str,
     notice: Mapping[str, Any],
 ) -> None:
-    """Append one disclosure. An exact duplicate is dropped; a distinct one is kept.
+    """Append one disclosure onto a typed publication surface.
 
-    A lone ``extrapolation_notice`` stays a dict. That is the green provenance
-    shape: a list moves the physics metadata digest and makes a golden
-    comparator try to hash a dict. Two or more distinct notices on that key
-    stay a list. Every other notice key stays a list even when it holds one
-    notice.
+    The value is always a list. One notice and two notices have the same
+    type. An exact duplicate is dropped; a distinct one is kept. Legacy
+    readers that still expect one ``extrapolation_notice`` dict use
+    ``notice_attribute`` on the way into an evaluation attribute or a
+    physics-metadata digest. They do not write the typed surface.
     """
 
     if not isinstance(notice, Mapping) or not notice:
@@ -581,18 +581,15 @@ def merge_public_notice(
     existing = target.get(key)
     current = list(_iter_notice_mappings(existing))
     merged = _dedupe_notices((*current, notice))
-    if key == "extrapolation_notice" and len(merged) == 1:
-        target[key] = merged[0]
-        return
     target[key] = list(merged)
 
 
 def apply_public_carrier_notices(target: dict[str, Any], carrier: Any) -> None:
-    """Copy every carrier notice onto ``target``.
+    """Copy every carrier notice onto ``target`` as a list.
 
-    A lone ``extrapolation_notice`` is a dict. Every other key is a list.
     Distinct disclosures under one key are both kept. Exact duplicates
-    collapse. Nothing is dropped by ``setdefault``.
+    collapse. Nothing is dropped by ``setdefault``. A lone notice stays a
+    one-element list.
     """
 
     for key, notices in public_carrier_notices(carrier).items():

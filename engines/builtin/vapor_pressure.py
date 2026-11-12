@@ -304,7 +304,10 @@ def _attach_pO2_floor_inversion_notices(
 ) -> dict[str, dict[str, Any]]:
     """Single choke: flag published metal P that used the pO2 floor."""
 
-    from simulator.vapour_rail.instrumentation import public_carrier_notices
+    from simulator.vapour_rail.instrumentation import (
+        merge_public_notice,
+        public_carrier_notices,
+    )
 
     notices: dict[str, dict[str, Any]] = {}
     token = MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
@@ -328,8 +331,9 @@ def _attach_pO2_floor_inversion_notices(
         # existing field. Do not replace a temperature-range notice the
         # collector already sees on that key.
         if "extrapolation_notice" not in public_carrier_notices(provenance):
-            # One floor notice. A list would move the green provenance digest.
-            provenance["extrapolation_notice"] = dict(notice)
+            # Typed provenance stores a list. The physics digest projects a
+            # one-element list back to the legacy dict before it hashes.
+            merge_public_notice(provenance, "extrapolation_notice", notice)
         vapor_pressure_provenance[str(species)] = provenance
         source = str(vapor_pressure_sources.get(species) or "")
         if source and token not in source.split(":"):

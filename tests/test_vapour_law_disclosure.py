@@ -40,10 +40,12 @@ the law; it
 re-registers the disclosures stored with that computation, and evaluation
 counts add. An empty disclosure is a measured zero only when the computation
 recorded one. Attribution is per computation, never the ambient run registry.
-A lone published extrapolation_notice is a dict, the green provenance
-shape. Every other notice key on a typed carrier stays a list. Distinct
-notices are kept; exact duplicates are dropped. Bare-float helpers do not
-carry notices.
+A typed publication of any ``*_notice`` is a list, including one
+``extrapolation_notice``. The count does not change the type. Evaluation
+attributes and the physics-metadata digest still use the legacy singleton
+dict via ``notice_attribute``. A measured empty disclosure removes a
+metadata override of ``law_disclosures``. Distinct notices are kept; exact
+duplicates are dropped. Bare-float helpers do not carry notices.
 
 The Fe pseudo law is ``log10(P/Pa) = A - B / (T + C)`` with
 A=9.408547, B=23312.312336, C=1000. At the 1750 K anchor, T+C=2750 and
@@ -2850,12 +2852,117 @@ def test_publishers_keep_measured_disclosures_over_overrides(
     )
 
 
+_FOREIGN_DISCLOSURE = {
+    "law_id": "Fe:foreign-override",
+    "authority": "diagnostic/extrapolated",
+    "evaluation_count": 9,
+}
+
+
+@pytest.mark.parametrize("publisher", ["detail", "failure", "prior", "prior_missing"])
+def test_empty_measurement_removes_foreign_disclosure(publisher: str) -> None:
+    """A measured empty replaces another run's supplied disclosure.
+
+    ``detail`` and ``failure`` are the execution publishers. ``prior`` is
+    the document captured before the override, including an empty list.
+    ``prior_missing`` is a document that had no key. Leaving the
+    ``if measured`` pop out keeps ``Fe:foreign-override`` on every arm.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.runner import PyrolysisRun, RunnerError, _runner_failure_result
+    from simulator.runner import _install_measured_law_disclosures
+    from simulator.session import SimSession
+
+    if publisher in {"prior", "prior_missing"}:
+        metadata = {"law_disclosures": [dict(_FOREIGN_DISCLOSURE)]}
+        _install_measured_law_disclosures(
+            metadata,
+            prior=() if publisher == "prior" else None,
+        )
+        assert "law_disclosures" not in metadata
+        kept = {"law_disclosures": [dict(_FOREIGN_DISCLOSURE)]}
+        _install_measured_law_disclosures(
+            kept,
+            prior=({"law_id": "Fe:measured", "evaluation_count": 1},),
+        )
+        assert kept["law_disclosures"] == [
+            {"law_id": "Fe:measured", "evaluation_count": 1}
+        ]
+        return
+
+    session = SimSession()
+    session._sim = SimpleNamespace(
+        record=SimpleNamespace(
+            liquid_fraction_provider="analytical",
+            snapshots=(),
+        ),
+        melt=SimpleNamespace(hour=1),
+    )
+    execution = SimpleNamespace(
+        session=session,
+        simulator=session.simulator,
+        per_hour=(),
+        snapshots=(),
+        backend_status="unavailable",
+        backend_authoritative=False,
+        refusal_diagnostic={},
+        campaigns_elapsed=1.0,
+        shadow_trace=(),
+        status="failed",
+        reason="",
+        error_message="",
+        reduced_real_cache={},
+        envelope_detail_unavailable="",
+    )
+    override = [dict(_FOREIGN_DISCLOSURE)]
+    if publisher == "failure":
+        payload = _runner_failure_result(
+            error=RunnerError("empty disclosure probe"),
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C0",
+            hours=1,
+            mass_kg=1.0,
+            additives_kg={},
+            track="pyrolysis",
+            backend_name="internal-analytical",
+            engines={},
+            metadata_overrides={"law_disclosures": override},
+            execution=execution,
+        )
+    else:
+        run = PyrolysisRun(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C0",
+            hours=1,
+            run_metadata_overrides={
+                "started_at_utc": "2026-01-01T00:00:00Z",
+                "kernel_commit_sha": "disclosure-fixture",
+                "law_disclosures": override,
+            },
+        )
+        execution.session._config = SimpleNamespace(
+            additives_kg={},
+            setpoints={},
+        )
+        execution.simulator.record = SimpleNamespace(
+            liquid_fraction_provider="analytical",
+            snapshots=(),
+        )
+        execution.simulator.melt = SimpleNamespace(hour=1)
+        payload = run._build_output_detail(execution)
+    assert "law_disclosures" not in payload["run_metadata"]
+    assert "Fe:foreign-override" not in str(payload["run_metadata"])
+
+
 def test_public_notice_copy_pickles_nested_mapping_proxy() -> None:
-    """A frozen notice is plain data, and one extrapolation notice is a dict.
+    """A frozen notice is plain data, and publication is always a list.
 
     The gate pickled a MappingProxyType inside certified_band and inside
-    comparators. A list of one extrapolation notice also moves the green
-    provenance digest. Other notice keys stay a list.
+    comparators. Restoring ``target[key] = merged[0]`` makes this arm's
+    lone extrapolation notice a dict. The legacy digest shape is
+    ``notice_attribute``, not the typed surface.
     """
 
     import copy
@@ -2864,6 +2971,7 @@ def test_public_notice_copy_pickles_nested_mapping_proxy() -> None:
 
     from simulator.vapour_rail.instrumentation import (
         merge_public_notice,
+        notice_attribute,
         public_carrier_notices,
     )
 
@@ -2882,15 +2990,18 @@ def test_public_notice_copy_pickles_nested_mapping_proxy() -> None:
     target: dict = {}
     merge_public_notice(target, "extrapolation_notice", notice)
     published = target["extrapolation_notice"]
-    assert isinstance(published, dict)
-    assert published["certified_band"]["pO2_bar"] == (1e-12, 100.0)
-    assert isinstance(published["certified_band"]["pO2_bar"], tuple)
-    assert isinstance(published["comparators"], dict)
-    assert not isinstance(published["comparators"], MappingProxyType)
+    assert isinstance(published, list)
+    assert len(published) == 1
+    body = published[0]
+    assert body["certified_band"]["pO2_bar"] == (1e-12, 100.0)
+    assert isinstance(body["certified_band"]["pO2_bar"], tuple)
+    assert isinstance(body["comparators"], dict)
+    assert not isinstance(body["comparators"], MappingProxyType)
     copy.deepcopy(published)
     pickle.dumps(published)
-    merge_public_notice(target, "extrapolation_notice", dict(published))
-    assert isinstance(target["extrapolation_notice"], dict)
+    merge_public_notice(target, "extrapolation_notice", dict(body))
+    assert isinstance(target["extrapolation_notice"], list)
+    assert len(target["extrapolation_notice"]) == 1
     merge_public_notice(
         target,
         "extrapolation_notice",
@@ -2898,21 +3009,97 @@ def test_public_notice_copy_pickles_nested_mapping_proxy() -> None:
     )
     assert isinstance(target["extrapolation_notice"], list)
     assert len(target["extrapolation_notice"]) == 2
+    legacy = notice_attribute(target["extrapolation_notice"][:1])
+    assert isinstance(legacy, dict)
+    assert legacy["reason"] == "pO2_outside_evaluator_band"
 
-    other: dict = {}
-    merge_public_notice(
-        other,
-        "diagnostic_admission_notice",
-        {"reason": "only"},
-    )
-    assert isinstance(other["diagnostic_admission_notice"], list)
     collected = public_carrier_notices(
         {"extra": {"extrapolation_notice": notice}}
     )
-    body = collected["extrapolation_notice"][0]
-    assert body["certified_band"]["pO2_bar"] == (1e-12, 100.0)
-    copy.deepcopy(body)
-    pickle.dumps(body)
+    collected_body = collected["extrapolation_notice"][0]
+    assert collected_body["certified_band"]["pO2_bar"] == (1e-12, 100.0)
+    copy.deepcopy(collected_body)
+    pickle.dumps(collected_body)
+
+
+_TYPED_NOTICE_KEYS = (
+    "extrapolation_notice",
+    "diagnostic_admission_notice",
+    "future_carrier_notice",
+)
+
+
+@pytest.mark.parametrize("key", _TYPED_NOTICE_KEYS)
+@pytest.mark.parametrize("count", [1, 2])
+def test_typed_publication_notice_is_always_a_list(key: str, count: int) -> None:
+    """Every typed surface publishes a list, for one notice and for two.
+
+    Restoring the singleton-dict collapse in ``merge_public_notice`` fails
+    the count=1 arm of every key. The oxide, request, and coating arms
+    call the production collector those surfaces use.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.coating_lifespan import _distinct_public_notices
+    from simulator.vapour_rail.instrumentation import (
+        apply_public_carrier_notices,
+        merge_public_notice,
+    )
+
+    notices = [
+        {"reason": f"{key}-{index}", "authority": "diagnostic/extrapolated"}
+        for index in range(count)
+    ]
+    published: dict = {}
+    for notice in notices:
+        merge_public_notice(published, key, notice)
+    assert isinstance(published[key], list)
+    assert len(published[key]) == count
+
+    carrier = SimpleNamespace(**{key: notices[0]})
+    request_extra: dict = {}
+    apply_public_carrier_notices(request_extra, carrier)
+    for notice in notices[1:]:
+        merge_public_notice(request_extra, key, notice)
+    assert isinstance(request_extra[key], list)
+    assert [item["reason"] for item in request_extra[key]] == [
+        item["reason"] for item in notices
+    ]
+
+    coating = _distinct_public_notices(
+        ({"extra": {key: notice}} for notice in notices)
+    )
+    assert isinstance(coating[key], list)
+    assert len(coating[key]) == count
+
+
+def test_publication_helper_does_not_collapse_a_lone_notice() -> None:
+    """The typed writer has no singleton-dict assignment.
+
+    ``notice_attribute`` is the legacy projector. A new ``merged[0]`` write
+    in ``merge_public_notice`` fails this arm.
+    """
+
+    import ast
+
+    path = _ROOT / "simulator" / "vapour_rail" / "instrumentation.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    merge = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "merge_public_notice"
+    )
+    source = ast.get_source_segment(path.read_text(encoding="utf-8"), merge) or ""
+    assert "merged[0]" not in source
+    request = (
+        _ROOT / "simulator" / "vapour_rail" / "request.py"
+    ).read_text(encoding="utf-8")
+    assert 'evaluation_extra["extrapolation_notice"] = published_floor' not in request
+    oxide = (
+        _ROOT / "engines" / "builtin" / "vapor_pressure.py"
+    ).read_text(encoding="utf-8")
+    assert 'provenance["extrapolation_notice"] = dict(notice)' not in oxide
 
 
 def test_pt0_entries_are_private() -> None:

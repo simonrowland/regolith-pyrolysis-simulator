@@ -5837,26 +5837,29 @@ def _install_measured_law_disclosures(
 ) -> None:
     """Write the measured disclosure after metadata overrides.
 
-    A non-empty measurement replaces any override of ``law_disclosures``.
-    Callers that have no execution pass ``prior``, the disclosure the
-    document held before the override was applied. An empty measurement
-    leaves an override in place.
+    The measurement is the execution's registry, or ``prior`` captured
+    before the override was applied. A non-empty measurement replaces the
+    override. A measured empty, and a document that had no disclosure
+    before the override, remove the key. An empty measurement must not
+    keep another run's supplied disclosure. The schema leaves the key
+    absent when the run executed no flagged law.
     """
 
     if execution is not None:
         from simulator.vapour_rail.run_disclosure import published_run_disclosures
 
-        law_disclosures = published_run_disclosures(execution)
-        if law_disclosures:
-            run_metadata["law_disclosures"] = [
-                dict(item) for item in law_disclosures
-            ]
-        return
-    if isinstance(prior, (list, tuple)) and prior:
+        measured = published_run_disclosures(execution)
+    elif isinstance(prior, (list, tuple)):
+        measured = prior
+    else:
+        measured = ()
+    if measured:
         run_metadata["law_disclosures"] = [
             dict(item) if isinstance(item, Mapping) else item
-            for item in prior
+            for item in measured
         ]
+        return
+    run_metadata.pop("law_disclosures", None)
 
 
 def _runner_failure_result(

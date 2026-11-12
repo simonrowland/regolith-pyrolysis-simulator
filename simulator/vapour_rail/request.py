@@ -1517,28 +1517,32 @@ def refusal_closure(
                 # is left in place.
                 from simulator.vapour_rail.instrumentation import (
                     apply_public_carrier_notices,
-                    notice_attribute,
+                    merge_public_notice,
                 )
 
                 apply_public_carrier_notices(evaluation_extra, provenance)
+                # Floor inversion keeps its public alias on the typed extra.
+                # The alias is a list, including when it is the only notice.
+                # A notice already published on extrapolation_notice stays.
                 if (
                     "extrapolation_notice" not in evaluation_extra
                     and "floor_inversion_notice" in evaluation_extra
                 ):
                     floor = evaluation_extra["floor_inversion_notice"]
                     if isinstance(floor, Mapping):
-                        floor_items = [dict(floor)]
+                        floor_items = [floor]
                     elif isinstance(floor, (list, tuple)):
                         floor_items = [
-                            dict(item)
-                            for item in floor
-                            if isinstance(item, Mapping)
+                            item for item in floor if isinstance(item, Mapping)
                         ]
                     else:
                         floor_items = []
-                    published_floor = notice_attribute(floor_items)
-                    if published_floor is not None:
-                        evaluation_extra["extrapolation_notice"] = published_floor
+                    for item in floor_items:
+                        merge_public_notice(
+                            evaluation_extra,
+                            "extrapolation_notice",
+                            item,
+                        )
                 apply_public_carrier_notices(evaluation_extra, evaluation)
                 if _unit_activity_note is not None:
                     from simulator.silent_zero import merge_notes_into_mapping
