@@ -268,6 +268,54 @@ def approximate_pressure_from_printed_point(value: object) -> ApproxPressure:
     )
 
 
+# A stored band names every field. ``kind`` has a dataclass default so a
+# Python caller can omit it. The codec must not: filling that default
+# would turn an unmarked mapping into a band.
+_APPROXIMATE_PRESSURE_FIELDS = frozenset(
+    {"kind", "point", "low", "high", "band_basis"}
+)
+
+
+def approx_pressure_from_mapping(payload: object) -> ApproxPressure:
+    """Reload a stored band. A decimal string is not this function's input.
+
+    A missing ``kind`` refuses. The dataclass default would mark a pressure
+    the store never called approximate, and decimal equality would become
+    illegal for it. A point-condition mapping is a different type.
+    """
+
+    if not isinstance(payload, Mapping):
+        raise ApproxPressureRefusal(
+            "not_a_mapping",
+            f"an approximate pressure mapping is required, not {type(payload)!r}",
+        )
+    if "kind" in payload and payload["kind"] != _APPROXIMATE_PRESSURE_KIND:
+        raise ApproxPressureRefusal(
+            "not_approximate_pressure",
+            "kind must be "
+            f"{_APPROXIMATE_PRESSURE_KIND!r}, not {payload['kind']!r}",
+        )
+    extra = sorted(set(payload) - _APPROXIMATE_PRESSURE_FIELDS)
+    if extra:
+        raise ApproxPressureRefusal(
+            "unknown_field",
+            f"unknown approximate-pressure fields: {extra}",
+        )
+    missing = sorted(_APPROXIMATE_PRESSURE_FIELDS - set(payload))
+    if missing:
+        raise ApproxPressureRefusal(
+            "missing_field",
+            f"approximate pressure requires {missing}",
+        )
+    return ApproxPressure(
+        point=payload["point"],
+        low=payload["low"],
+        high=payload["high"],
+        band_basis=payload["band_basis"],
+        kind=payload["kind"],
+    )
+
+
 def as_fraction(value: object) -> Fraction:
     if isinstance(value, bool):
         raise TypeError("bool is not a rational coefficient")

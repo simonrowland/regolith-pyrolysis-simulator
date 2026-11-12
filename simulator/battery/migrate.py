@@ -202,6 +202,7 @@ from simulator.battery.records import (
     Annotations,
     Apparatus,
     ApparatusGeometry,
+    ApproxPressure,
     Bench,
     BenchFact,
     BenchIdentity,
@@ -239,6 +240,7 @@ from simulator.battery.records import (
     _bound_operator_semantics,
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
+    approx_pressure_from_mapping,
     as_decimal,
     phase_token,
 )
@@ -3112,6 +3114,19 @@ def _standard_state_from_extract_text(
     )
 
 
+def _identity_total_pressure_from_plain(value: object) -> Decimal | ApproxPressure:
+    """This axis only. A decimal stays a decimal. A band mapping reloads as a band.
+
+    Every other identity axis still uses ``as_decimal``. A mapping that is
+    not an approximate pressure refuses, so a point condition cannot land
+    on the identity as a bare point.
+    """
+
+    if isinstance(value, Mapping):
+        return approx_pressure_from_mapping(value)
+    return as_decimal(value)
+
+
 def _identity_from_plain(
     payload: object,
     *,
@@ -3175,7 +3190,7 @@ def _identity_from_plain(
         kwargs["fO2_Pa"] = _state_from_plain(payload["fO2_Pa"], as_decimal)
     if payload.get("total_pressure_Pa") is not None:
         kwargs["total_pressure_Pa"] = _state_from_plain(
-            payload["total_pressure_Pa"], as_decimal
+            payload["total_pressure_Pa"], _identity_total_pressure_from_plain
         )
     if payload.get("sweep_gas") is not None:
         kwargs["sweep_gas"] = _state_from_plain(
