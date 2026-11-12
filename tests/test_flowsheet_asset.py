@@ -750,6 +750,38 @@ def test_ellingham_import_failure_omits_facts_and_marks_c6_unavailable(
     ) in lint.warnings
 
 
+def test_ellingham_element_lookup_failure_marks_c6_unavailable(
+    renderer,
+    monkeypatch,
+):
+    from simulator.chemistry import ellingham_graph
+
+    calculate = ellingham_graph._metallothermic_reductant_for_oxide
+
+    def fail_manganese_lookup(element: str, temperature_K: float):
+        if element == "Mn":
+            raise LookupError("forced reducibility lookup failure")
+        return calculate(element, temperature_K)
+
+    monkeypatch.setattr(
+        ellingham_graph,
+        "_metallothermic_reductant_for_oxide",
+        fail_manganese_lookup,
+    )
+    unavailable_blocks: dict[str, str] = {}
+    facts = renderer.build_live_major_facts(
+        unavailable_blocks=unavailable_blocks,
+    )
+
+    assert "Mn" not in facts
+    assert unavailable_blocks == {
+        "c6_magnesiothermic": (
+            "Ellingham calculation unavailable: Mn: LookupError: "
+            "forced reducibility lookup failure"
+        )
+    }
+
+
 def test_deliberate_admission_contradiction_fails(renderer, flowsheet):
     """Fixture: place Fe (siderophile) under rump not_reducible → FAIL fires."""
     import copy

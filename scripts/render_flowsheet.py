@@ -752,6 +752,18 @@ def _reductant_to_reducibility(reductant_class: str) -> str:
     return mapping.get(rc, rc)
 
 
+def _ellingham_unavailable_message(
+    exc: Exception,
+    *,
+    element: str | None = None,
+) -> str:
+    element_context = f"{element}: " if element is not None else ""
+    return (
+        "Ellingham calculation unavailable: "
+        f"{element_context}{type(exc).__name__}: {exc}"
+    )
+
+
 def build_live_major_facts(
     *,
     unavailable_blocks: dict[str, str] | None = None,
@@ -823,7 +835,11 @@ def build_live_major_facts(
                 continue
             try:
                 reductant = _metallothermic_reductant_for_oxide(el, t_k)
-            except Exception:
+            except Exception as exc:
+                if unavailable_blocks is not None:
+                    unavailable_blocks["c6_magnesiothermic"] = (
+                        _ellingham_unavailable_message(exc, element=el)
+                    )
                 continue
             reductant_class = {
                 "Mg": "Mg-C6",
@@ -838,7 +854,7 @@ def build_live_major_facts(
     except Exception as exc:  # pragma: no cover
         if unavailable_blocks is not None:
             unavailable_blocks["c6_magnesiothermic"] = (
-                f"Ellingham calculation unavailable: {type(exc).__name__}: {exc}"
+                _ellingham_unavailable_message(exc)
             )
 
     # Process-map C6 / calciothermic / crown anchors OVERRIDE pure Ellingham rank
