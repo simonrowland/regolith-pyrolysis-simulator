@@ -681,7 +681,7 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     activity_compositions: list[tuple[tuple[str, float], ...]] = []
-    original_evaluate = openimcc_bridge.evaluate
+    original_evaluate = openimcc_bridge._evaluate_uncached
 
     def track_activities(*, composition_mol, **kwargs):
         activity_compositions.append(tuple(sorted(composition_mol.items())))
@@ -692,7 +692,7 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
         "_evaluate_openimcc_isolated",
         lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
     )
-    monkeypatch.setattr(openimcc_bridge, "evaluate", track_activities)
+    monkeypatch.setattr(openimcc_bridge, "_evaluate_uncached", track_activities)
     predictions = _predict_hashimoto_residue_cohort(
         experiments[:1],
         catalog,
@@ -883,7 +883,9 @@ def test_hashimoto_openimcc_timeout_is_typed_and_cohort_continues(
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     monkeypatch.setitem(binary_pot_battery._ENGINE_OUTER_TIMEOUT_S, "openimcc", 0.02)
 
-    monkeypatch.setattr(openimcc_bridge, "evaluate", _hanging_openimcc_engine)
+    monkeypatch.setattr(
+        openimcc_bridge, "_evaluate_uncached", _hanging_openimcc_engine
+    )
 
     def integrate_with_engine_call(
         inventory,
