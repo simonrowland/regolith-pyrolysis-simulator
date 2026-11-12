@@ -40,6 +40,7 @@ from simulator.battery.records import (
     ThermalSchedule,
     Value,
     as_decimal,
+    nominal_pressure_pa,
 )
 from simulator.lab_schedule import LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
 from simulator.physical_constants import BAR_PA_DECIMAL, GAS_CONSTANT_DECIMAL
@@ -1943,15 +1944,17 @@ def oxygen_condition(
                     # T and P_CO (or total P when CO is the stated gas); the
                     # Jakobsson & Oskarsson 1994 CCO calibration is in
                     # simulator.oxygen_buffers.
-                    P_bar = pressure_value.point / BAR_PA_DECIMAL
-                    log_fo2 = log10_fo2_c_co_bar(float(T), float(P_bar))
-                    routes.append(Waypoint(
-                        "oxygen_condition",
-                        Value.point_of(log_fo2),
-                        "graphite_c_co_buffer",
-                        WaypointAuthority.DERIVED,
-                        ("experiment.fO2_control.buffer", *thermal.inputs, *pressure_inputs),
-                    ))
+                    nominal_pa = nominal_pressure_pa(pressure_value)
+                    if nominal_pa is not None:
+                        P_bar = nominal_pa / BAR_PA_DECIMAL
+                        log_fo2 = log10_fo2_c_co_bar(float(T), float(P_bar))
+                        routes.append(Waypoint(
+                            "oxygen_condition",
+                            Value.point_of(log_fo2),
+                            "graphite_c_co_buffer",
+                            WaypointAuthority.DERIVED,
+                            ("experiment.fO2_control.buffer", *thermal.inputs, *pressure_inputs),
+                        ))
         else:
             buffer = PUBLISHED_BUFFERS.get(buffer_token.upper())
             pressure = _prediction_pressure_waypoint(
@@ -1964,20 +1967,22 @@ def oxygen_condition(
                 if (temperature.kind is ValueKind.POINT and pressure.value.kind is ValueKind.POINT
                         and buffer.T_min_K <= temperature.point <= buffer.T_max_K):
                     T = temperature.point
-                    P = pressure.value.point / BAR_PA_DECIMAL
-                    # Premise: Frost (1991) Table 1's condensed buffer line is
-                    # within its published T domain; its equation is in
-                    # simulator.oxygen_buffers.
-                    value = frost_condensed_buffer_log10_fO2_bar(
-                        as_decimal(buffer.A_K),
-                        as_decimal(buffer.B),
-                        as_decimal(buffer.pressure_coefficient_K_per_bar),
-                        T,
-                        P,
-                    )
-                    routes.append(Waypoint("oxygen_condition", Value.point_of(value),
-                        "buffer_relation", WaypointAuthority.DERIVED,
-                        ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
+                    nominal_pa = nominal_pressure_pa(pressure.value)
+                    if nominal_pa is not None:
+                        P = nominal_pa / BAR_PA_DECIMAL
+                        # Premise: Frost (1991) Table 1's condensed buffer line is
+                        # within its published T domain; its equation is in
+                        # simulator.oxygen_buffers.
+                        value = frost_condensed_buffer_log10_fO2_bar(
+                            as_decimal(buffer.A_K),
+                            as_decimal(buffer.B),
+                            as_decimal(buffer.pressure_coefficient_K_per_bar),
+                            T,
+                            P,
+                        )
+                        routes.append(Waypoint("oxygen_condition", Value.point_of(value),
+                            "buffer_relation", WaypointAuthority.DERIVED,
+                            ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
     # Dalton's law gives pO2 <= P_total. A printed vacuum/total-pressure upper
     # bound is therefore a usable engine point only at its bound, with an
     # extrapolation notice. The bound is method_class calculated, never printed:
@@ -2012,7 +2017,7 @@ def oxygen_condition(
         )
         upper_pa: Decimal | None = None
         if pressure.kind is ValueKind.POINT:
-            upper_pa = pressure.point
+            upper_pa = nominal_pressure_pa(pressure)
         elif (pressure.kind is ValueKind.BOUND
               and pressure.bound_operator in {"<", "<=", "≤"}):
             upper_pa = pressure.bound_value

@@ -179,6 +179,7 @@ from simulator.battery.records import (
     Work,
     _is_source_internally_inconsistent,
     as_decimal,
+    nominal_pressure_pa,
     charge_value,
     phase_token,
     polymorph_token,
@@ -9282,8 +9283,8 @@ def total_pressure_bar_for_score(
 
     state = identity.total_pressure_Pa
     if state is not None and state.is_value and state.value is not None:
-        pa = state.value if isinstance(state.value, Decimal) else as_decimal(state.value)
-        if not pa.is_finite() or pa < 0:
+        pa = nominal_pressure_pa(state)
+        if pa is None or not pa.is_finite() or pa < 0:
             return 0.0, None, "total_pressure_invalid"
         return float(pa) / PA_PER_BAR, None, None
     detail = "observation does not carry total_pressure_Pa"
@@ -10463,23 +10464,14 @@ def _printed_total_pressure_bar(
     identity: Identity, observation: Observation
 ) -> Decimal | None:
     state = identity.total_pressure_Pa
-    raw: object = None
     if state is not None and state.is_value and state.value is not None:
-        raw = state.value
+        pa = nominal_pressure_pa(state)
     else:
         located = (observation.point_conditions or {}).get("total_pressure_Pa")
         if located is None or located.inference is not None or not located.state.is_value:
             return None
-        raw = located.state.value
-        if isinstance(raw, Value):
-            raw = raw.point
-    if raw is None:
-        return None
-    try:
-        pa = as_decimal(raw)
-    except (TypeError, ValueError, ArithmeticError):
-        return None
-    if not pa.is_finite() or pa <= 0:
+        pa = nominal_pressure_pa(located)
+    if pa is None or not pa.is_finite() or pa <= 0:
         return None
     return pa / PA_PER_BAR_DEC
 

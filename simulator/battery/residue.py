@@ -23,6 +23,7 @@ from simulator.battery.oxygen_balance import (
     _net_evaporation_pressure_Pa,
     _solve_vacuum_oxygen_balance,
 )
+from simulator.battery.records import nominal_pressure_pa
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.physical_constants import PA_PER_BAR
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -1188,11 +1189,14 @@ def _hashimoto_point_value(record: Mapping[str, Any]) -> float:
     state = record.get("state")
     if not isinstance(state, Mapping) or state.get("tag") != "value":
         raise ResidueInventoryRefusal("hashimoto_printed_input_missing")
-    value = state.get("value")
-    if isinstance(value, Mapping):
-        value = value.get("point")
+    # The same serialized point is a temperature, a mass, or a pressure.
+    # The nominal reader is the one pressure identity uses, so a band's
+    # point is the call pressure and a bare decimal stays a bare decimal.
+    point = nominal_pressure_pa(state)
+    if point is None:
+        raise ResidueInventoryRefusal("hashimoto_printed_input_invalid")
     try:
-        numeric = float(value)
+        numeric = float(point)
     except (TypeError, ValueError, OverflowError) as exc:
         raise ResidueInventoryRefusal("hashimoto_printed_input_invalid") from exc
     if not math.isfinite(numeric):
