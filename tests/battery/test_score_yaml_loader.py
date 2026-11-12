@@ -76,47 +76,91 @@ def _assert_type_exact_equal(left: object, right: object, seen=None) -> None:
     assert left == right
 
 
+def _pure_python_sample(paths: set[Path]) -> set[Path]:
+    sizes = {path: path.stat().st_size for path in paths}
+    largest = set(
+        sorted(paths, key=lambda path: (-sizes[path], str(path)))[:10]
+    )
+    largest_by_parent: dict[Path, Path] = {}
+    for path in paths:
+        current = largest_by_parent.get(path.parent)
+        if current is None or (sizes[path], str(path)) > (
+            sizes[current], str(current)
+        ):
+            largest_by_parent[path.parent] = path
+    return largest | set(largest_by_parent.values())
+
+
 def test_score_store_yaml_cache_matches_both_loaders_for_every_loaded_file(
     monkeypatch, tmp_path: Path
 ) -> None:
-    """Cold/warm cache values equal fresh C and pure-Python parses, type exactly."""
+    """Every cached value matches C; a representative sample matches Python too.
+
+    The scorer uses the C-backed loader, so every loaded store file is checked
+    against a fresh C parse. The slower pure-Python parser gets the ten largest
+    files and the largest file in each loaded directory. A special-type fixture
+    covers bool/int/float/date/null, ``!!pairs``, and duplicate-key behavior.
+    """
 
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "yaml-cache"))
     monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
     loaded_paths: set[Path] = set()
+    checked_paths: set[Path] = set()
     migrate_load_yaml = migrate.load_yaml
     score_load_yaml = score.load_yaml
 
+    def check_loaded_value(path: Path, value: object) -> object:
+        resolved = path.resolve()
+        loaded_paths.add(resolved)
+        if resolved not in checked_paths:
+            # The test-local cache starts empty, so ``value`` came from a fresh
+            # C-backed parse; re-read the persisted cache value for comparison.
+            cached = load_cached_safe_yaml(resolved.read_bytes())
+            _assert_type_exact_equal(value, cached)
+            checked_paths.add(resolved)
+        return value
+
     def track_migrate_load(path: Path):
-        loaded_paths.add(path.resolve())
-        return migrate_load_yaml(path)
+        return check_loaded_value(path, migrate_load_yaml(path))
 
     def track_score_load(path: Path):
-        loaded_paths.add(path.resolve())
-        return score_load_yaml(path)
+        return check_loaded_value(path, score_load_yaml(path))
 
     monkeypatch.setattr(migrate, "load_yaml", track_migrate_load)
     monkeypatch.setattr(score, "load_yaml", track_score_load)
     context = load_score_context()
     assert context.observations
     assert loaded_paths
+    assert checked_paths == loaded_paths
+    assert yaml.CSafeLoader in YAML12SafeLoader.__mro__
 
-    for path in sorted(loaded_paths):
+    python_sample = _pure_python_sample(loaded_paths)
+    assert python_sample
+    assert {path.parent for path in python_sample} == {
+        path.parent for path in loaded_paths
+    }
+    largest_ten = set(
+        sorted(loaded_paths, key=lambda path: (-path.stat().st_size, str(path)))[:10]
+    )
+    assert largest_ten <= python_sample
+
+    for path in sorted(python_sample):
         raw = path.read_bytes()
-        cold_or_warm = load_cached_safe_yaml(raw)
-        cached = load_cached_safe_yaml(raw)
         c_value = yaml.load(raw, Loader=YAML12SafeLoader)
         python_value = yaml.load(raw, Loader=_PythonYAML12SafeLoader)
-        _assert_type_exact_equal(cold_or_warm, cached)
-        _assert_type_exact_equal(cached, c_value)
         _assert_type_exact_equal(c_value, python_value)
 
     # These types have surprising equality or are often lost by JSON caches.
-    probe = load_cached_safe_yaml(
+    special_types = (
         b"integer: 1\nfloat: 1.0\ndate: 2026-11-11\n"
         b"none: null\nboolean: false\npairs: !!pairs [alpha: 1]\n"
         b"duplicate: old\nduplicate: new\n"
     )
+    probe = load_cached_safe_yaml(special_types)
+    c_probe = yaml.load(special_types, Loader=YAML12SafeLoader)
+    python_probe = yaml.load(special_types, Loader=_PythonYAML12SafeLoader)
+    _assert_type_exact_equal(probe, c_probe)
+    _assert_type_exact_equal(c_probe, python_probe)
     assert type(probe["integer"]) is int
     assert type(probe["float"]) is float
     assert type(probe["date"]) is date

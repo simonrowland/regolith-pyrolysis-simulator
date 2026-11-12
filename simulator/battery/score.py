@@ -179,6 +179,7 @@ from simulator.battery.validate import (
     Ancestry,
     _ValidationIndexes,
     ValidationIssue,
+    _BOUND_WORK_INPUTS,
     _asset_ids,
     _observation_lineage,
     observation_issue_location,
@@ -12072,6 +12073,24 @@ def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
     return str(reason).startswith(("engine_timeout:", "engine_transport_error:"))
 
 
+def _residue_prediction_cache_entry(
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ],
+    source_id: str,
+    engine: Engine,
+    selected_experiment_ids: frozenset[str] | None = None,
+    *,
+    value: Mapping[str, object] | None = None,
+) -> Mapping[str, object] | None:
+    """Read or store the residue cache entry for one selection scope."""
+
+    key = (source_id, engine, selected_experiment_ids)
+    if value is not None:
+        cache[key] = value
+    return cache.get(key)
+
+
 def _hashimoto_engine_floor_inversion_notices(
     engine: Engine, diagnostics: object
 ) -> tuple[Notice, ...]:
@@ -12111,11 +12130,13 @@ def _hashimoto_residue_prediction(
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
-    cache_key = (_HASHIMOTO_SOURCE_ID, engine, selected_experiment_ids)
+    rows_by_key = _residue_prediction_cache_entry(
+        cache, _HASHIMOTO_SOURCE_ID, engine, selected_experiment_ids
+    )
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
-        if cache_key not in cache:
+        if rows_by_key is None:
             from simulator.battery.residue import (
                 ResidueInventoryRefusal,
                 _predict_hashimoto_residue_cohort,
@@ -12170,10 +12191,16 @@ def _hashimoto_residue_prediction(
                 engine=engine.value,
                 selected_experiment_ids=selected_experiment_ids,
             )
-            cache[cache_key] = {
+            rows_by_key = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
             }
-        rows_by_key = cache[cache_key]
+            _residue_prediction_cache_entry(
+                cache,
+                _HASHIMOTO_SOURCE_ID,
+                engine,
+                selected_experiment_ids,
+                value=rows_by_key,
+            )
         if "__cohort_error__" in rows_by_key:
             raise ValueError(str(rows_by_key["__cohort_error__"]))
         primary_key = (
@@ -12323,8 +12350,20 @@ def _hashimoto_residue_prediction(
     except Exception as exc:  # the scorer records typed per-cell refusal and continues
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
         infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
-        if cache_key not in cache and not infrastructure_failure:
-            cache[cache_key] = {"__cohort_error__": str(reason)}
+        if (
+            _residue_prediction_cache_entry(
+                cache, _HASHIMOTO_SOURCE_ID, engine, selected_experiment_ids
+            )
+            is None
+            and not infrastructure_failure
+        ):
+            _residue_prediction_cache_entry(
+                cache,
+                _HASHIMOTO_SOURCE_ID,
+                engine,
+                selected_experiment_ids,
+                value={"__cohort_error__": str(reason)},
+            )
         detail: dict[str, object] = {
             "reason": str(reason),
             "engine": engine.value,
@@ -12389,20 +12428,26 @@ def _knudsen_residue_prediction(
 
     experiment = context.experiments.get(reference.experiment_id)
     try:
-        cache_key = (
-            f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:{printed_source_pressure(reference)}",
-            engine,
-            None,
+        cache_source_id = (
+            f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:"
+            f"{printed_source_pressure(reference)}"
         )
-        if cache is not None and cache_key in cache:
-            result = cache[cache_key]
+        cached_result = (
+            None
+            if cache is None
+            else _residue_prediction_cache_entry(cache, cache_source_id, engine)
+        )
+        if cached_result is not None:
+            result = cached_result
         else:
             result = predict_knudsen_residue_composition(
                 engine.value, reference, experiment, context.observations.values(),
                 _bench_for_score(experiment, context.benches) if experiment is not None else None,
             )
             if cache is not None:
-                cache[cache_key] = result
+                _residue_prediction_cache_entry(
+                    cache, cache_source_id, engine, value=result
+                )
         provenance = {k: v for k, v in result.items() if k != "notices"}
         value = result["composition_wt_pct"].get(reference.identity.species.formula)
         if value is None:
@@ -12455,7 +12500,9 @@ def _sossi_residue_prediction(
             },
             identity=reference.identity,
         )
-    cache_key = (_SOSSI_SOURCE_ID, engine, selected_experiment_ids)
+    cohort = _residue_prediction_cache_entry(
+        cache, _SOSSI_SOURCE_ID, engine, selected_experiment_ids
+    )
     try:
         from simulator.battery.residue import (
             ResidueInventoryRefusal,
@@ -12464,7 +12511,7 @@ def _sossi_residue_prediction(
 
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("sossi_engine_unsupported")
-        if cache_key not in cache:
+        if cohort is None:
             live_rows = [
                 row
                 for row in context.observations.values()
@@ -12526,13 +12573,20 @@ def _sossi_residue_prediction(
                 engine=engine.value,
                 selected_experiment_ids=selected_experiment_ids,
             )
-            cache[cache_key] = {
+            cohort = {
                 row.experiment_id: row for row in rows
             }
-        if "__cohort_error__" in cache[cache_key]:
-            raise ValueError(str(cache[cache_key]["__cohort_error__"]))
+            _residue_prediction_cache_entry(
+                cache,
+                _SOSSI_SOURCE_ID,
+                engine,
+                selected_experiment_ids,
+                value=cohort,
+            )
+        if "__cohort_error__" in cohort:
+            raise ValueError(str(cohort["__cohort_error__"]))
         short_id = reference.experiment_id.rsplit("::", 1)[-1]
-        prediction = cache[cache_key].get(short_id)
+        prediction = cohort.get(short_id)
         if prediction is None:
             raise ValueError("sossi_prediction_row_missing")
         run_refusal = prediction.provenance.get("run_refusal")
@@ -12651,8 +12705,20 @@ def _sossi_residue_prediction(
     except Exception as exc:  # preserve a typed per-cell absence and keep scoring
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
         infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
-        if cache_key not in cache and not infrastructure_failure:
-            cache[cache_key] = {"__cohort_error__": str(reason)}
+        if (
+            _residue_prediction_cache_entry(
+                cache, _SOSSI_SOURCE_ID, engine, selected_experiment_ids
+            )
+            is None
+            and not infrastructure_failure
+        ):
+            _residue_prediction_cache_entry(
+                cache,
+                _SOSSI_SOURCE_ID,
+                engine,
+                selected_experiment_ids,
+                value={"__cohort_error__": str(reason)},
+            )
         if infrastructure_failure:
             refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
         elif reason == "oxygen_condition_missing":
@@ -12875,6 +12941,10 @@ def _compile_residual_with_lineage(
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     validation_indexes = _validation_indexes
+    if validation_indexes is None:
+        validation_indexes = _BOUND_WORK_INPUTS.get(
+            (id(context.observations), id(context.experiments))
+        )
     if validation_indexes is None or not validation_indexes.matches(
         context.works, context.observations, context.experiments
     ):
