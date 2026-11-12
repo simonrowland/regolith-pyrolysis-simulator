@@ -1917,6 +1917,10 @@ def _solve_cell_oxygen_balance(
             str(exc),
         ) from exc
 
+    from simulator.chemistry.langmuir_knudsen import (
+        knudsen_effusion_relative_weight,
+    )
+
     buffer_pinned = (
         buffer_log10_bar is not None
         and math.log10(float(pO2_bar)) > buffer_log10_bar
@@ -1926,11 +1930,17 @@ def _solve_cell_oxygen_balance(
         pO2_bar = 10.0**buffer_log10_bar
         pressures = combined_pressure_model(buffer_log10_bar)
         oxygen_flux = math.fsum(
-            row.oxygen_atoms * pressures[name] / math.sqrt(row.molar_mass)
+            knudsen_effusion_relative_weight(
+                pressures[name], row.molar_mass, coefficient=row.oxygen_atoms
+            )
             for name, row in all_metadata.items()
         )
         parent_flux = math.fsum(
-            row.parent_oxygen_demand * pressures[name] / math.sqrt(row.molar_mass)
+            knudsen_effusion_relative_weight(
+                pressures[name],
+                row.molar_mass,
+                coefficient=row.parent_oxygen_demand,
+            )
             for name, row in all_metadata.items()
         )
         # Pinned-branch residual = oxygen retained as condensed wall oxide.
@@ -1952,7 +1962,14 @@ def _solve_cell_oxygen_balance(
             "bracket": list(balance["bracket"]),
             "dominant_O_carriers": sorted(
                 (
-                    (name, row.oxygen_atoms * pressures[name] / math.sqrt(row.molar_mass))
+                    (
+                        name,
+                        knudsen_effusion_relative_weight(
+                            pressures[name],
+                            row.molar_mass,
+                            coefficient=row.oxygen_atoms,
+                        ),
+                    )
                     for name, row in all_metadata.items()
                     if row.oxygen_atoms > 0
                 ),
@@ -1961,7 +1978,14 @@ def _solve_cell_oxygen_balance(
             )[:5],
             "dominant_metal_carriers": sorted(
                 (
-                    (name, row.parent_oxygen_demand * pressures[name] / math.sqrt(row.molar_mass))
+                    (
+                        name,
+                        knudsen_effusion_relative_weight(
+                            pressures[name],
+                            row.molar_mass,
+                            coefficient=row.parent_oxygen_demand,
+                        ),
+                    )
                     for name, row in all_metadata.items()
                     if row.parent_oxygen_demand > 0
                 ),
@@ -1971,13 +1995,17 @@ def _solve_cell_oxygen_balance(
         }
 
     total_oxygen_flux = math.fsum(
-        row.oxygen_atoms * pressures[name] / math.sqrt(row.molar_mass)
+        knudsen_effusion_relative_weight(
+            pressures[name], row.molar_mass, coefficient=row.oxygen_atoms
+        )
         for name, row in all_metadata.items()
     )
     cell_oxygen_flux = math.fsum(
-        cell_metadata[name].oxygen_atoms
-        * pressures[name]
-        / math.sqrt(cell_metadata[name].molar_mass)
+        knudsen_effusion_relative_weight(
+            pressures[name],
+            cell_metadata[name].molar_mass,
+            coefficient=cell_metadata[name].oxygen_atoms,
+        )
         for name in cell_metadata
     )
     fraction = cell_oxygen_flux / total_oxygen_flux if total_oxygen_flux else 0.0
