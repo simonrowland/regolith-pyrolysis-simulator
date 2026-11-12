@@ -10492,14 +10492,10 @@ def _point_pressure_for_identity(
     state = located.state
     if not state.is_value:
         return state
-    value = state.value
-    if isinstance(value, Value):
-        if value.kind is not ValueKind.POINT:
-            return None
-        value = value.point
-    if not isinstance(value, Decimal):
+    pressure_pa = _printed_source_point_condition_pressure(located)
+    if pressure_pa is None:
         return None
-    return State.of(value)
+    return State.of(pressure_pa)
 
 
 def _located_explicit_point_composition(
@@ -14466,7 +14462,12 @@ def _printed_source_point_condition_pressure(
         or _located_pressure_is_unprinted(located)
     ):
         return None
-    amount = _as_dec_or_none(located.state.value)
+    raw = located.state.value
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None or raw.approximate:
+            return None
+        raw = raw.point
+    amount = _as_dec_or_none(raw)
     return amount if amount is not None and amount > 0 else None
 
 
