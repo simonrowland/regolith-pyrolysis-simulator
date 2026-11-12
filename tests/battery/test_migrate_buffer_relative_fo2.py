@@ -137,7 +137,10 @@ def test_ideal_ratio_definition_gets_the_named_notice() -> None:
 
 def test_kems_delta_iw_is_a_printed_buffer_reference_not_an_ideal_ratio() -> None:
     decision = _decision(
-        {"delta_IW": "+1.0"},
+        {
+            "delta_IW": "+1.0",
+            "oxygen_buffer_as_published": "O’Neill and Pownceby, 1993",
+        },
         source_id="kems-137-bischof-2023",
     )
 
@@ -145,6 +148,13 @@ def test_kems_delta_iw_is_a_printed_buffer_reference_not_an_ideal_ratio() -> Non
     assert "delta_iw_reference=iron_wustite_buffer" in decision.notice_reason
     assert "IW = iron-wüstite buffer" in decision.notice_reason
     assert "delta_iw_from_ideal_feo_fe_ratio" not in decision.notice_reason
+
+    without_calibration = _decision(
+        {"delta_IW": "+1.0"},
+        source_id="kems-137-bischof-2023",
+    )
+    assert without_calibration is not None and without_calibration.state.is_unknown
+    assert "no cited buffer calibration" in without_calibration.state.reason
 
 
 def test_mavrogenes_activity_correction_names_the_holzheid_gamma_model() -> None:
