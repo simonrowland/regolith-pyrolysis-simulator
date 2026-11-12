@@ -506,6 +506,14 @@ def test_alphamelts_parent_environment_does_not_change_adapter_request_key(
     assert calls == 1
 
 
+def test_alphamelts_rejects_invalid_raw_python_model_before_cache_projection() -> None:
+    with pytest.raises(ValueError, match="not verified"):
+        engine_cache.normalize_engine_settings(
+            "alphamelts",
+            {"transport": "python_api", "raw_model_name": " pMELTS "},
+        )
+
+
 def test_legacy_battery_payload_is_a_miss_after_layout_key_change(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
