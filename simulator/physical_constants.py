@@ -1,9 +1,9 @@
 """Dependency-free physical and unit constants.
 
-This leaf follows ``simulator/transport_constants.py``: constants are
-RELOCATED verbatim -> golden-neutral by construction. This pass only imports
-the exact Celsius offset and carrier collision diameters elsewhere; fundamental
-constants are parked here for future consolidation.
+One owner for SI constants and exact unit conversions. Shorter spellings
+that are not bit-identical to the CODATA values live here under explicit
+names. Do not alias a truncation back to the full constant: the relative
+gaps are pinned in tests/test_physical_constant_ownership.py.
 """
 
 from __future__ import annotations
@@ -19,6 +19,17 @@ STEFAN_BOLTZMANN = 5.670374419e-8  # W/(m2 K4); exact-derived.
 PLANCK = 6.62607015e-34  # J s; exact by SI definition.
 ELEMENTARY_CHARGE = 1.602176634e-19  # C; exact by SI definition.
 STANDARD_GRAVITY = 9.80665  # m/s2; exact defined standard gravity.
+
+# Spellings that are not bit-identical to the values above. Each relative
+# gap is (spelling - full) / full.
+# GAS_CONSTANT_6SIG: -3.149e-7. state, ellingham_graph, organics_pyrolysis.
+# GAS_CONSTANT_10SIG: -1.843e-11. condensation, NASA-CEA, pumping, foulants.
+# FARADAY_10SIG: -2.073e-10. state.FARADAY, used by electrolysis.
+# STEFAN_BOLTZMANN_7SIG: -7.389e-8. state and equipment radiative power.
+GAS_CONSTANT_6SIG = 8.31446
+GAS_CONSTANT_10SIG = 8.314462618
+FARADAY_10SIG = 96485.3321
+STEFAN_BOLTZMANN_7SIG = 5.670374e-8
 
 # Unit conversions (exact by definition unless noted).
 CELSIUS_TO_KELVIN_OFFSET = 273.15  # T/K = t/deg C + 273.15.
@@ -62,7 +73,10 @@ __all__ = (
     "CELSIUS_TO_KELVIN_OFFSET",
     "ELEMENTARY_CHARGE",
     "FARADAY",
+    "FARADAY_10SIG",
     "GAS_CONSTANT",
+    "GAS_CONSTANT_10SIG",
+    "GAS_CONSTANT_6SIG",
     "J_PER_KJ",
     "M2_PER_CM2",
     "MBAR_PER_BAR",
@@ -74,5 +88,6 @@ __all__ = (
     "STANDARD_ATMOSPHERE_PA",
     "STANDARD_GRAVITY",
     "STEFAN_BOLTZMANN",
+    "STEFAN_BOLTZMANN_7SIG",
     "TABLE_SELF_CHECK_FINDING_DEX",
 )
