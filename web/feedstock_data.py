@@ -7,8 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from simulator.feedstock_guard import loadable_feedstocks
-from simulator.yaml_cache import load_cached_safe_yaml
-from simulator.config import _load_setpoints_file
+from web.yaml_data import load_yaml as _load_web_yaml
 
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
@@ -31,13 +30,7 @@ def debug_feedstocks_enabled() -> bool:
 
 
 def load_yaml(filename: str) -> dict[str, Any]:
-    path = DATA_DIR / filename
-    if filename == 'setpoints.yaml':
-        return _load_setpoints_file(path)
-    if not path.exists():
-        return {}
-    with open(path) as f:
-        return load_cached_safe_yaml(f.read()) or {}
+    return _load_web_yaml(filename, DATA_DIR)
 
 
 def load_feedstock_groups(

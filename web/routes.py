@@ -77,7 +77,7 @@ from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.job_runner import _version_badge
 from simulator.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
-from simulator.optimize.honesty import optimizer_tier_label
+from simulator.optimize.honesty import _optional_bool, optimizer_tier_label
 from simulator.optimize.import_bundle import (
     BUNDLE_CAP_BYTES,
     ImportBundleError,
@@ -637,25 +637,6 @@ def _latest_backend_status(carrier: Any) -> str | None:
     evidence is enough.
     """
     return select_backend_status(_backend_status_candidates(carrier))
-
-
-def _optional_bool(value: Any) -> bool | None:
-    if value is None:
-        return None
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, int) and not isinstance(value, bool):
-        if value in (0, 1):
-            return bool(value)
-        return False
-    if isinstance(value, str):
-        normalized = value.strip().lower()
-        if normalized in {'true', '1'}:
-            return True
-        if normalized in {'false', '0'}:
-            return False
-        return False
-    return False
 
 
 def _optimizer_tier_label(

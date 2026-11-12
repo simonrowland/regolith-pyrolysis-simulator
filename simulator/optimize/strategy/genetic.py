@@ -10,8 +10,6 @@ from typing import TYPE_CHECKING, Any, Mapping, Sequence
 from simulator.optimize.objective import ObjectiveDefinition, objective_definitions
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.strategy.bayesian import (
-    _CANDIDATE_ID_ATTR,
-    _CONSTRAINT_VALUES_ATTR,
     _couple_suggested_pressure_defaults,
     _constraints_for_trial,
     _objective_values_for_definitions,
