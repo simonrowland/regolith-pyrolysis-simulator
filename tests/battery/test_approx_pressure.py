@@ -30,7 +30,11 @@ from simulator.battery.identity import (
     identity_equal,
     profile_for,
 )
-from simulator.battery.migrate import _identity_from_plain, to_plain
+from simulator.battery.migrate import (
+    _identity_from_plain,
+    _pressure_total_from_extract,
+    to_plain,
+)
 from simulator.battery.records import (
     ApproxPressure,
     ApproxPressureRefusal,
@@ -40,9 +44,13 @@ from simulator.battery.records import (
     State,
     Value,
     approx_pressure_from_mapping,
+    approximate_derived_total_reason,
     approximate_pressure_from_printed_point,
     as_decimal,
+    identity_pressure_from_converted_point,
+    nominal_pressure_pa,
 )
+from simulator.battery.score import total_pressure_bar_for_score
 from tests.battery.factories import activity_identity
 
 # 50 significant figures of √10. Independent of the constructor.
@@ -498,6 +506,65 @@ def test_band_mapping_round_trips_and_a_bad_mapping_refuses() -> None:
     with pytest.raises(ApproxPressureRefusal) as wrong_kind:
         _identity_from_plain(_viscosity_pressure(point_condition))
     assert wrong_kind.value.reason == "not_approximate_pressure"
+
+
+def test_nominal_pressure_is_the_point_and_exact_stays_exact() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(_HASHIMOTO_PA, approximate=True)
+    )
+    assert nominal_pressure_pa(band) == _HASHIMOTO_PA
+    assert nominal_pressure_pa(State.of(band)) == _HASHIMOTO_PA
+    assert nominal_pressure_pa(Decimal("101325")) == Decimal("101325")
+    assert nominal_pressure_pa(
+        {"tag": "value", "value": {"kind": "point", "point": "101325"}}
+    ) == Decimal("101325")
+    assert nominal_pressure_pa(
+        {"tag": "value", "value": {"kind": "bound", "bound_value": "1"}}
+    ) is None
+
+    exact = identity_pressure_from_converted_point(
+        Decimal("101325"), approximate=False
+    )
+    assert exact.is_value and type(exact.value) is Decimal
+    assert exact.value == Decimal("101325")
+    built = identity_pressure_from_converted_point(_HASHIMOTO_PA, approximate=True)
+    assert isinstance(built.value, ApproxPressure)
+    assert built.value.point == _HASHIMOTO_PA
+    assert built.value == band
+
+
+def test_call_pressure_uses_the_nominal_point() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(Decimal("100000"), approximate=True)
+    )
+    identity = Identity(
+        quantity=Quantity.VISCOSITY,
+        species=None,
+        total_pressure_Pa=State.of(band),
+    )
+    bar, notice, invalid = total_pressure_bar_for_score(
+        identity, Quantity.VISCOSITY
+    )
+    assert notice is None
+    assert invalid is None
+    assert bar == float(Decimal("100000") / Decimal("100000"))
+
+
+def test_approximate_partial_sum_is_not_an_exact_total() -> None:
+    total, provenance = _pressure_total_from_extract(
+        {},
+        {
+            "partial_pressures": {
+                "Na": {"value": "1", "approximate": True},
+                "O2": {"value": "2"},
+            }
+        },
+        gas_formula=None,
+        source_text="",
+    )
+    assert total is not None and total.is_unknown
+    assert total.reason == approximate_derived_total_reason()
+    assert provenance is None
 
 
 def test_band_mapping_on_temperature_is_still_the_decimal_cast() -> None:

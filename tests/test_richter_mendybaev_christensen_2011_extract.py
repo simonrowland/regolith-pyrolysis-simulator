@@ -11,6 +11,7 @@ import yaml
 
 from simulator.battery.migrate import Migrator, REPO_ROOT
 from simulator.battery.enums import ValueKind
+from simulator.battery.records import ApproxPressure, BandBasis
 
 
 SID = "richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation"
@@ -339,6 +340,10 @@ def test_isolated_migration_binds_conditions_and_exact_schema_gaps() -> None:
         assert migrated.identity.temperature_K.is_value
         assert migrated.identity.composition.is_value
     assert vacuum.identity.total_pressure_Pa.is_value
+    vacuum_pressure = vacuum.identity.total_pressure_Pa.value
+    assert isinstance(vacuum_pressure, ApproxPressure)
+    assert vacuum_pressure.point == Decimal("0.0001333223684210526315789473684")
+    assert vacuum_pressure.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
     assert vacuum.identity.fO2_Pa.is_unknown
     assert flowing.identity.total_pressure_Pa.is_value
     assert flowing.identity.fO2_Pa.is_unknown

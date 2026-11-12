@@ -316,6 +316,112 @@ def approx_pressure_from_mapping(payload: object) -> ApproxPressure:
     )
 
 
+def nominal_pressure_pa(value: object) -> Decimal | None:
+    """The call pressure. This is the point, not the band and not an equality.
+
+    Accepts a ``State``, a ``Located``, an ``ApproxPressure``, a ``Value``
+    point, a decimal-like scalar, and the serialized mapping
+    ``{tag: value, value: ...}`` or ``{kind: point, point: ...}``.
+    Returns ``None`` when the pressure is absent or is not a point.
+    Callers keep their own sign and finiteness filters.
+    """
+
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, Located):
+        return nominal_pressure_pa(value.state)
+    if isinstance(value, State):
+        if not value.is_value:
+            return None
+        return nominal_pressure_pa(value.value)
+    if isinstance(value, ApproxPressure):
+        return value.point if value.point.is_finite() else None
+    if isinstance(value, Value):
+        if value.kind is not ValueKind.POINT or value.point is None:
+            return None
+        return value.point if value.point.is_finite() else None
+    if isinstance(value, Mapping):
+        tag = value.get("tag")
+        if tag is not None and tag != "value":
+            return None
+        if "value" in value:
+            return nominal_pressure_pa(value.get("value"))
+        if "state" in value and tag is None:
+            return nominal_pressure_pa(value.get("state"))
+        if value.get("kind") not in (None, "point"):
+            return None
+        if "point" in value:
+            return nominal_pressure_pa(value.get("point"))
+        return None
+    try:
+        amount = _decimal_from_scalar(value)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not amount.is_finite():
+        return None
+    return amount
+
+
+def identity_pressure_from_converted_point(
+    point: object,
+    *,
+    approximate: bool,
+) -> State[Decimal | ApproxPressure]:
+    """Identity axis from a pressure already converted to pascals.
+
+    An exact point stays a decimal. An approximate point becomes the band.
+    ``State.of(point)`` is the strip this replaces: it cannot carry the flag.
+    """
+
+    if type(approximate) is not bool:
+        raise ApproxPressureRefusal(
+            "approximate_flag_not_bool",
+            f"approximate must be a bool, not {approximate!r}",
+        )
+    amount = point if isinstance(point, Decimal) else _decimal_from_scalar(point)
+    if not approximate:
+        return State.of(amount)
+    return State.of(
+        approximate_pressure_from_printed_point(
+            Value(ValueKind.POINT, point=amount, approximate=True)
+        )
+    )
+
+
+def identity_pressure_state(value: object) -> State[Decimal | ApproxPressure] | None:
+    """Identity pressure from a printed point, or ``None`` when it is not one.
+
+    A bound or an interval stays out of the axis. The caller writes its own
+    unknown reason. An approximate point becomes the band.
+    """
+
+    if isinstance(value, ApproxPressure):
+        return State.of(value)
+    if isinstance(value, Value):
+        if value.kind is not ValueKind.POINT or value.point is None:
+            return None
+        return identity_pressure_from_converted_point(
+            value.point, approximate=value.approximate
+        )
+    if isinstance(value, State):
+        if not value.is_value:
+            return None
+        return identity_pressure_state(value.value)
+    try:
+        amount = _decimal_from_scalar(value)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not amount.is_finite():
+        return None
+    return State.of(amount)
+
+
+def approximate_derived_total_reason() -> str:
+    """A sum or congruent total is derived. An approximate term is not exact."""
+
+    return "approximate_term_in_derived_total"
+
+
 def as_fraction(value: object) -> Fraction:
     if isinstance(value, bool):
         raise TypeError("bool is not a rational coefficient")
