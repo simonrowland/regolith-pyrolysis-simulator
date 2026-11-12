@@ -1,0 +1,246 @@
+schema_version: literature_extract.v1
+source_id: kems-219-sheldon-1979
+source:
+  citation: >-
+    Sheldon, R. I., and Gilles, P. W. (1979). The High Temperature
+    Vaporization and Thermodynamics of the Titanium Oxides. XIV.
+    Relative Ionization Cross-Sections of Ti, TiO, and TiO2, in
+    Hastie, J. W. (ed.), Characterization of High Temperature Vapors
+    and Gases, NBS Special Publication 561, Vol. 1, pp. 231-236,
+    National Bureau of Standards, Washington, DC. Proceedings of the
+    10th Materials Research Symposium, Gaithersburg, Maryland,
+    September 18-22, 1978. Issued October 1979.
+  doi: 10.6028/NBS.SP.561v1
+  doi_scope: volume; this extract is the Sheldon and Gilles chapter only (printed pp. 231-236)
+  url: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication561v1.pdf
+  year: 1979
+  corpus_asset: raw/hastie-1979-characterization-of-high-temperature/hastie-1979-characterization-of-high-temperature.pdf
+  corpus_sha256: 5d49070831fdc68ca308fa85c9ea96203e6d717ac72ad65cd280ed2f562d44a2
+extraction:
+  method: >-
+    Manual transcription from the NBS SP 561 Vol. I scan already on the
+    box. Printed pages 231-236 are PDF pages 255-260 (pdf_page_index
+    254-259; PDF page = printed page + 24). Pages were rendered at 200
+    and 400 dpi and read as images; pdftotext was used only as a
+    cross-check. Table 1 was read cell-by-cell from a 400 dpi crop.
+    Relative ionization cross-sections have no closed scored observation
+    type in literature_extract.v1, so Table 1 and the measured
+    multiplier gains are stored as context, not scored. Printed page 236
+    is blank in this scan (recto bleed only). The right margin of printed
+    page 234 is cropped by the binding; words at the line ends, including
+    the electron energy of the TiO2+ measurements, are not fully
+    printed and were not invented. Distinct from sheldon-gilles-1976-tio-vaporization-coo-1140-219
+    and from kems-042-plante-1979 in the same volume.
+  date: '2026-11-12'
+  worker: empirical-b15-2026-11-12
+  provenance_path: raw/hastie-1979-characterization-of-high-temperature/
+review_status: draft
+species:
+  titanium_oxides:
+    observations: []
+    context:
+    - observation_id: sheldon_1979_experimental_method
+      type: method
+      locator:
+        published_page: 231
+        pdf_page_index: 254
+        section: Introduction and experimental
+      units: as printed
+      values:
+        quantity: experimental_method
+        method_class: kems
+        evidence_class: method_only
+        purpose_as_printed: >-
+          The purpose of the present work was to measure these relative
+          cross-sections for Ti and TiO which are the principal species
+          over the titanium oxides less rich in oxygen than Ti2O3.
+        instrument_as_printed: Nuclide mass spectrometer
+        cell_as_printed: tungsten Knudsen cell
+        energy_calibration_as_printed: The mass spectrometer was calibrated from the appearance potential of Hg+.
+        electron_energies_eV_as_printed: ['9.7', '11.7', '13.7', '21.7', '31.7', '41.7', '71.7']
+        ti_ag_experiment_as_printed: >-
+          In the first experiment 1.25 mg of silver and 1.30 mg of
+          titanium were loaded together in a tungsten Knudsen cell and
+          were successively vaporized in a Nuclide mass spectrometer.
+          The silver was vaporized first at temperatures ranging from
+          1346 K to 1772 K, and then the titanium was vaporized at
+          temperatures ranging from 1776 K to 2368 K.
+        ti3o5_ag_experiment_as_printed: >-
+          In the second experiment 1.79 mg of silver and 0.70 mg Ti3O5
+          were vaporized in the mass spectrometer at temperatures ranging
+          from 1319 K to 1402 K and 1953 K to 2009 K, respectively.
+        titanium_sample_as_printed: Laboratory designation Ti-6
+        ti3o5_sample_as_printed: >-
+          The Ti3O5 sample, designated PJH-7, whose composition was
+          Ti3O5.015 as determined by oxygen combustion analysis.
+        congruent_assumption_as_printed: >-
+          stoichiometric Ti3O5 vaporizes congruently to give two
+          molecules of TiO2(g) and one of TiO(g)
+        previous_work_1806K_as_printed: >-
+          In recent work [1] the authors reported values for equilibrium
+          pressures of Ti(g) and TiO(g) over stoichiometric titanium
+          monoxide at 1806 K. ... In the first experiment 0.57 mg of a
+          10.24-mg sample of stoichiometric titanium monoxide was
+          vaporized in vacuum from a tungsten Knudsen cell.
+        previous_pressures_reprinted: false
+        note: >-
+          The 1806 K equilibrium pressures of [1] are not reprinted in
+          this chapter and were not invented. Sample designations and
+          loaded masses are as printed.
+    - observation_id: sheldon_1979_table1_relative_cross_sections
+      type: textual_fact
+      locator:
+        published_page: 233
+        pdf_page_index: 256
+        table: '1'
+      units: dimensionless (relative electron impact cross-sections, as printed)
+      values:
+        quantity: relative_electron_impact_cross_sections
+        method_class: kems
+        evidence_class: measured_tabulated
+        caption_as_printed: Relative electron impact cross-sections of Ti and TiO.
+        column_notes_as_printed: >-
+          The measured products of electron multiplier gain and ionization
+          cross-section of Ti(g) and TiO(g) relative to silver are given
+          in the second and fourth columns in table 1. The uncertainties
+          in these results based on uncertainties in the masses,
+          multiplier gains, and A-values, are estimated to be about 10
+          percent. The relative ionization cross-sections shown in the
+          third and fifth columns of table 1 have been calculated from
+          the results and the measured electron multiplier gains.
+        final_column_as_printed: >-
+          The relative ionization cross-section σ_TiO/σ_Ti in the final
+          column is obtained by division. The value at 13.7 eV of 1.17
+          is insignificantly different from the ratio 1.15 used
+          previously [1]; hence, changes in the pressures are
+          insignificant.
+        rows:
+          - electron_energy_eV: '9.7'
+            sigma_Ti_gamma_Ti_over_sigma_Ag_gamma_Ag: '2.32'
+            sigma_Ti_over_sigma_Ag: '1.45'
+            sigma_TiO_gamma_TiO_over_sigma_Ag_gamma_Ag: '2.29'
+            sigma_TiO_over_sigma_Ag: '1.41'
+            sigma_TiO_over_sigma_Ti: '0.97'
+          - electron_energy_eV: '11.7'
+            sigma_Ti_gamma_Ti_over_sigma_Ag_gamma_Ag: '2.09'
+            sigma_Ti_over_sigma_Ag: '1.30'
+            sigma_TiO_gamma_TiO_over_sigma_Ag_gamma_Ag: '2.20'
+            sigma_TiO_over_sigma_Ag: '1.36'
+            sigma_TiO_over_sigma_Ti: '1.05'
+          - electron_energy_eV: '13.7'
+            sigma_Ti_gamma_Ti_over_sigma_Ag_gamma_Ag: '2.00'
+            sigma_Ti_over_sigma_Ag: '1.25'
+            sigma_TiO_gamma_TiO_over_sigma_Ag_gamma_Ag: '2.37'
+            sigma_TiO_over_sigma_Ag: '1.46'
+            sigma_TiO_over_sigma_Ti: '1.17'
+          - electron_energy_eV: '21.7'
+            sigma_Ti_gamma_Ti_over_sigma_Ag_gamma_Ag: '1.58'
+            sigma_Ti_over_sigma_Ag: '0.98'
+            sigma_TiO_gamma_TiO_over_sigma_Ag_gamma_Ag: '2.41'
+            sigma_TiO_over_sigma_Ag: '1.49'
+            sigma_TiO_over_sigma_Ti: '1.52'
+          - electron_energy_eV: '31.7'
+            sigma_Ti_gamma_Ti_over_sigma_Ag_gamma_Ag: '1.30'
+            sigma_Ti_over_sigma_Ag: '0.81'
+            sigma_TiO_gamma_TiO_over_sigma_Ag_gamma_Ag: '2.18'
+            sigma_TiO_over_sigma_Ag: '1.35'
+            sigma_TiO_over_sigma_Ti: '1.67'
+          - electron_energy_eV: '41.7'
+            sigma_Ti_gamma_Ti_over_sigma_Ag_gamma_Ag: '1.19'
+            sigma_Ti_over_sigma_Ag: '0.74'
+            sigma_TiO_gamma_TiO_over_sigma_Ag_gamma_Ag: '2.15'
+            sigma_TiO_over_sigma_Ag: '1.33'
+            sigma_TiO_over_sigma_Ti: '1.80'
+          - electron_energy_eV: '71.7'
+            sigma_Ti_gamma_Ti_over_sigma_Ag_gamma_Ag: '0.86'
+            sigma_Ti_over_sigma_Ag: '0.54'
+            sigma_TiO_gamma_TiO_over_sigma_Ag_gamma_Ag: '2.05'
+            sigma_TiO_over_sigma_Ag: '1.27'
+            sigma_TiO_over_sigma_Ti: '2.35'
+        systematic_error_note_as_printed: >-
+          The results in table 1 are subject to systematic errors, both
+          for Ti and TiO. Uncertainty about possible interaction with
+          the tungsten crucible leads to an uncertainty in the Ti
+          result, and uncertainty about the exact composition of the
+          Ti3O5 congruently vaporizing solution leads to uncertainty in
+          the TiO result.
+    - observation_id: sheldon_1979_multiplier_gains
+      type: textual_fact
+      locator:
+        published_page: 232
+        pdf_page_index: 255
+        section: calculation of relative ionization cross-sections
+      units: as printed (× 10^4)
+      values:
+        quantity: electron_multiplier_gains
+        method_class: kems
+        evidence_class: measured_direct
+        gamma_Ti_as_printed: (4.30 ± 0.08) × 10^4
+        gamma_TiO_as_printed: (4.34 ± 0.05) × 10^4
+        gamma_TiO2_as_printed: (4.77 ± 0.16) × 10^4
+        gamma_Ag_as_printed: (2.68 ± 0.02) × 10^4
+    - observation_id: sheldon_1979_titanium_vaporization_time_and_systematic_error
+      type: textual_fact
+      locator:
+        published_page: 233
+        pdf_page_index: 256
+      units: as printed
+      values:
+        quantity: run_history_and_author_error_estimates
+        method_class: kems
+        evidence_class: author_estimate
+        first_period_as_printed: For the first 265 minutes of the vaporization of titanium the temperature was 1776 K followed by a 379-minute period at 1810 K.
+        intensity_as_printed: >-
+          Over the first constant temperature period the titanium
+          intensity was fairly constant, decreasing slowly by 10 percent.
+          Over the second constant temperature period the titanium
+          intensity remained constant for about 100 minutes then dropped
+          by a factor of about five.
+        calculated_fraction_vaporized_as_printed: The calculation indicates 56 percent of the titanium vaporized.
+        integral_contribution_as_printed: this initial 365 minute period represents about 80 percent of the contribution to the integral (A_Ti)_sf
+        systematic_error_bound_as_printed: the effect of this systematic error is not more than about 24 percent
+        tio_composition_shift_as_printed: >-
+          indicating a possible slight shift to a higher oxygen-to-titanium
+          ratio than the initial TiO1.672. If the shift were as large as
+          to give TiO1.68, the error in the cross-section would be about
+          four percent
+        tio_shift_locator:
+          published_page: 234
+          pdf_page_index: 257
+        note: The 56 percent, 80 percent, 24 percent, and four percent figures are author calculations or estimates, not independent tabulated measurements.
+    - observation_id: sheldon_1979_tio2_measurements
+      type: textual_fact
+      locator:
+        published_page: 234
+        pdf_page_index: 257
+      units: as printed
+      values:
+        quantity: tio2_cross_section_ratio_comment
+        method_class: kems
+        evidence_class: quoted_attributed
+        few_measurements_as_printed: Only a few measurements of TiO2+ in the experiment with Ti3O5 were made because the main thrust of the effort was directed toward the Ti+ measurements.
+        ratio_from_reference_4_as_printed: a cross-section ratio for TiO2/TiO given previously [4] as 1/2.2
+        uncertainty_estimate_as_printed: We estimate this ratio to be uncertain by about 50 percent.
+        scan_crop_as_printed: not_printed
+        scan_crop_note: >-
+          The right margin of printed page 234 is cropped in this volume
+          scan. The electron energy at which the TiO2+ measurements were
+          made is not fully visible (the sentence ends "...The TiO2+
+          measurements at" and the next line begins "eV are not
+          inconsistent..."). That energy was not invented.
+    - observation_id: sheldon_1979_discussion_fragmentation
+      type: textual_fact
+      locator:
+        published_page: 234
+        pdf_page_index: 257
+        section: Discussion
+      units: as printed
+      values:
+        quantity: discussion_fragmentation_comment
+        method_class: method_only
+        evidence_class: quoted_attributed
+        gilles_response_as_printed: >-
+          We have some earlier evidence obtained, I believe, by Bruce
+          Kotter. He found that TiO2 undergoes insignificant
+          fragmentation in the mass spectrometer, even at 70 eV.
+        note: Discussion remarks, not a new measured table. Printed page 235 continues the Berkowitz comment; printed page 236 is blank in this scan.
