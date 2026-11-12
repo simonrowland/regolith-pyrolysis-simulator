@@ -366,14 +366,25 @@ def test_isolated_engine_config_prediction_settings_change_the_key(
     setting: str,
     changed: str,
 ) -> None:
-    from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, engine_cache_key, engine_cache_settings
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
+    from simulator.engine_cache import (
+        ENGINE_CHEMISTRY_VERSION,
+        engine_cache_key,
+        engine_cache_settings,
+    )
 
-    first = engine_cache_settings(engine, configuration)
+    first = engine_cache_settings(
+        engine, normalize_engine_settings(engine, configuration)
+    )
     first_key = engine_cache_key(
         engine, ENGINE_CHEMISTRY_VERSION[engine], {"settings": first}
     )
     configuration[setting] = changed
-    second = engine_cache_settings(engine, configuration)
+    second = engine_cache_settings(
+        engine, normalize_engine_settings(engine, configuration)
+    )
     second_key = engine_cache_key(
         engine, ENGINE_CHEMISTRY_VERSION[engine], {"settings": second}
     )
@@ -387,7 +398,12 @@ def test_isolated_engine_config_prediction_settings_change_the_key(
         ("openimcc", {"pack": "core"}, "pack", "extended"),
         ("alphamelts", {"transport": "subprocess"}, "transport", "python_api"),
         ("alphamelts", {"ambient_calc_mode": "MELTS"}, "ambient_calc_mode", "pMELTS"),
-        ("alphamelts", {"raw_model_name": "MELTS-v1.0"}, "raw_model_name", "rhyolite-MELTS"),
+        (
+            "alphamelts",
+            {"raw_model_name": "MELTSv1.2.0"},
+            "raw_model_name",
+            "MELTSv1.1.0",
+        ),
         ("alphamelts", {"redox_buffer": "QFM"}, "redox_buffer", "NNO"),
         ("alphamelts", {"fO2_offset": 0.0}, "fO2_offset", 0.5),
         ("alphamelts", {"Fe3Fet_ratio": 0.1}, "Fe3Fet_ratio", 0.3),
@@ -432,12 +448,19 @@ def test_isolated_public_engine_config_fields_change_the_projection(
     field: str,
     changed: Any,
 ) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
     from simulator.engine_cache import engine_cache_settings
 
-    before = engine_cache_settings(engine, configuration)
+    before = engine_cache_settings(
+        engine, normalize_engine_settings(engine, configuration)
+    )
     configuration[field] = changed
 
-    assert engine_cache_settings(engine, configuration) != before, field
+    assert engine_cache_settings(
+        engine, normalize_engine_settings(engine, configuration)
+    ) != before, field
 
 
 @pytest.mark.parametrize(
@@ -445,6 +468,9 @@ def test_isolated_public_engine_config_fields_change_the_projection(
     ("openimcc", "alphamelts", "vaporock", "magemin", "thermoengine"),
 )
 def test_worker_scheduling_config_does_not_change_prediction_settings(engine: str) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
     from simulator.engine_cache import (
         ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS,
         engine_cache_settings,
@@ -452,11 +478,15 @@ def test_worker_scheduling_config_does_not_change_prediction_settings(engine: st
 
     reason = ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS[engine]["warm_worker"]
     configuration = {"warm_worker": False}
-    before = engine_cache_settings(engine, configuration)
+    before = engine_cache_settings(
+        engine, normalize_engine_settings(engine, configuration)
+    )
     configuration["warm_worker"] = True
 
     assert reason
-    assert engine_cache_settings(engine, configuration) == before
+    assert engine_cache_settings(
+        engine, normalize_engine_settings(engine, configuration)
+    ) == before
 
 
 def test_engine_opener_and_cache_share_canonical_settings_projection(
@@ -468,7 +498,6 @@ def test_engine_opener_and_cache_share_canonical_settings_projection(
         ENGINE_CHEMISTRY_VERSION,
         engine_cache_key,
         engine_cache_settings,
-        normalize_engine_settings,
     )
     from simulator.melt_backend.alphamelts import (
         AlphaMELTSBackend,
@@ -476,6 +505,7 @@ def test_engine_opener_and_cache_share_canonical_settings_projection(
         AlphaMELTSSubprocessRunMode,
     )
 
+    normalize_engine_settings = binary_pot_battery.normalize_engine_settings
     parent_mode = "parent-process-sentinel"
     monkeypatch.setenv("ALPHAMELTS_CALC_MODE", parent_mode)
     common = {
@@ -587,12 +617,10 @@ def test_engine_opener_and_cache_share_canonical_settings_projection(
 def test_magemin_python_bridge_alias_is_normalized_before_open_and_key(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from simulator.engine_cache import (
-        engine_cache_settings,
-        normalize_engine_settings,
-    )
+    from simulator.engine_cache import engine_cache_settings
     from simulator import backends
     from simulator.diagnostic_helpers import binary_pot_battery
+    normalize_engine_settings = binary_pot_battery.normalize_engine_settings
 
     captured: dict[str, Any] = {}
 
@@ -617,7 +645,8 @@ def test_default_alphamelts_open_uses_resolved_mode_without_parent_environment(
 ) -> None:
     from simulator import backends
     from simulator.diagnostic_helpers import binary_pot_battery
-    from simulator.engine_cache import engine_cache_settings, normalize_engine_settings
+    from simulator.engine_cache import engine_cache_settings
+    normalize_engine_settings = binary_pot_battery.normalize_engine_settings
 
     captured: dict[str, Any] = {}
 
@@ -658,6 +687,9 @@ def test_openimcc_unused_gas_pack_setting_is_not_a_cache_input() -> None:
 
 @pytest.mark.parametrize("engine", ("alphamelts", "thermoengine"))
 def test_melts_redox_projection_covers_shared_normalizer_inputs(engine: str) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
     from simulator.engine_cache import engine_cache_settings
 
     if engine == "alphamelts":
@@ -683,7 +715,9 @@ def test_melts_redox_projection_covers_shared_normalizer_inputs(engine: str) -> 
             "fe3fet_ratio": 0.35,
         }
 
-    projected = engine_cache_settings(engine, settings)
+    projected = engine_cache_settings(
+        engine, normalize_engine_settings(engine, settings)
+    )
 
     for name, value in expected.items():
         assert projected[name] == value
@@ -759,8 +793,9 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
     from simulator.engine_cache import (
         ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS,
         engine_cache_settings,
-        normalize_engine_settings,
     )
+
+    normalize_engine_settings = binary_pot_battery.normalize_engine_settings
 
     class RecordingMapping(Mapping[str, Any]):
         def __init__(self, values: dict[str, Any]) -> None:
@@ -848,11 +883,13 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
             changed[key] = "changed"
         else:
             pytest.fail(f"cannot mutate recorded setting {engine}.{key}: {value!r}")
-        assert engine_cache_settings(engine, changed) != projected, key
+        assert engine_cache_settings(
+            engine, normalize_engine_settings(engine, changed)
+        ) != projected, key
 
     normalized_reads: list[RecordingMapping] = []
     constructor_reads: list[RecordingMapping] = []
-    original_normalize = engine_cache.normalize_engine_settings
+    original_normalize = binary_pot_battery.normalize_engine_settings
 
     def record_normalized_mapping(
         name: str, settings: Mapping[str, Any] | None
@@ -862,7 +899,7 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
         return result
 
     monkeypatch.setattr(
-        engine_cache, "normalize_engine_settings", record_normalized_mapping
+        binary_pot_battery, "normalize_engine_settings", record_normalized_mapping
     )
 
     def record_initializer(backend_class: type) -> None:

@@ -472,10 +472,11 @@ def test_alphamelts_parent_environment_does_not_change_adapter_request_key(
 
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _call_cached_backend_equilibrate,
+        normalize_engine_settings,
     )
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
-    settings = engine_cache.normalize_engine_settings(
+    settings = normalize_engine_settings(
         "alphamelts",
         {
             "transport": "subprocess",
@@ -508,8 +509,12 @@ def test_alphamelts_parent_environment_does_not_change_adapter_request_key(
 
 
 def test_alphamelts_rejects_invalid_raw_python_model_before_cache_projection() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
+
     with pytest.raises(ValueError, match="not verified"):
-        engine_cache.normalize_engine_settings(
+        normalize_engine_settings(
             "alphamelts",
             {"transport": "python_api", "raw_model_name": " pMELTS "},
         )
