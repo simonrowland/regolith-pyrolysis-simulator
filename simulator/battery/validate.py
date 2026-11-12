@@ -91,11 +91,13 @@ from simulator.battery.records import (
     State,
     SweepGas,
     SweepGasComponent,
+    ApproxPressure,
     Value,
     Work,
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
     as_decimal,
+    nominal_pressure_pa,
     phase_token,
     union_notices,
 )
@@ -260,10 +262,15 @@ def _reconcile_identity_axis(
     source_value = _located_decimal_value(source)
     if source_value is None:
         return
-    try:
-        ident_value = as_decimal(identity_state.value)
-    except TypeError:
-        ident_value = identity_state.value
+    if isinstance(identity_state.value, ApproxPressure):
+        # Reconciliation compares the printed point. The band is not a
+        # second number, and as_decimal refuses it.
+        ident_value = nominal_pressure_pa(identity_state.value)
+    else:
+        try:
+            ident_value = as_decimal(identity_state.value)
+        except TypeError:
+            ident_value = identity_state.value
     if isinstance(ident_value, Decimal) and not ident_value.is_finite():
         issues.append(
             _issue(
