@@ -12942,6 +12942,9 @@ def _compile_residual_with_lineage(
     _require_score_engine(engine)
     validation_indexes = _validation_indexes
     if validation_indexes is None:
+        # ``compile_residual`` callers do not pass the scorer's private index.
+        # During a bound score snapshot, reuse its matching index instead of
+        # rebuilding the printed-thermo and lineage indexes for every cell.
         validation_indexes = _BOUND_WORK_INPUTS.get(
             (id(context.observations), id(context.experiments))
         )

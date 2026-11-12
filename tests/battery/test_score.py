@@ -10879,8 +10879,9 @@ def _count_work_input_lookups(
 def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A scoring snapshot reuses a shared parent without changing decisions."""
+    """One bound snapshot serves four resolutions and preserves residual bytes."""
 
+    import simulator.battery.score as score_module
     from simulator.battery.records import Derivation
     from simulator.battery.validate import (
         _resolve_coefficient_sources,
@@ -10939,6 +10940,7 @@ def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
         (work.work_id,), observations, works, experiments
     )
     assert baseline.complete and baseline.ids is not None
+    single_resolution_lookups = observations.lineage_lookups
     for _ in range(3):
         assert (
             _resolve_coefficient_sources(
@@ -10947,6 +10949,11 @@ def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
             == baseline
         )
     uncached_lookups = observations.lineage_lookups
+    assert single_resolution_lookups > 0
+    # Each unbound call builds its own validation index and walks the four-row
+    # derivation chain. No index is shared between these calls, so all four
+    # repeats pay one full resolution each.
+    assert uncached_lookups == 4 * single_resolution_lookups
 
     observations.lineage_lookups = 0
     context = replace(
@@ -10970,6 +10977,16 @@ def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
         residual_without_cache, candidate_without_cache
     )
 
+    score_index_builds = [0]
+    original_build_validation_indexes = score_module._build_validation_indexes
+
+    def count_score_index_builds(*args, **kwargs):
+        score_index_builds[0] += 1
+        return original_build_validation_indexes(*args, **kwargs)
+
+    monkeypatch.setattr(
+        score_module, "_build_validation_indexes", count_score_index_builds
+    )
     work_expansions, registered_lookup_walks = _count_work_input_lookups(monkeypatch)
     observations.lineage_lookups = 0
     with bound_work_inputs(works, observations, experiments):
@@ -10980,6 +10997,7 @@ def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
             for _ in range(4)
         ]
         index_lookups = observations.lineage_lookups
+        score_index_builds_before_compile = score_index_builds[0]
         assert work_expansions[0] == 1
         registered_lookup_walks.clear()
         residual_with_cache, candidate_with_cache = compile_residual(
@@ -10989,17 +11007,22 @@ def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
             prediction=prediction,
             comparison_ids={reference.observation_id},
         )
+        score_index_builds_after_compile = score_index_builds[0]
         work_expansions_after_compile = work_expansions[0]
-        cached_lookups = observations.lineage_lookups
 
     assert cached_results == [baseline] * 4
-    assert 0 < index_lookups < uncached_lookups
+    # Binding eagerly builds the same one-work snapshot index used by one
+    # unbound resolution. Its source-lineage memo makes the next three calls
+    # free, so the bound four-pack costs exactly one resolution.
+    assert index_lookups == single_resolution_lookups
     assert work_expansions_after_compile == 1
-    assert not registered_lookup_walks
-    assert all(
-        walks == 0 and complete for walks, complete in registered_lookup_walks
-    )
-    assert cached_lookups >= index_lookups
+    # The compiled residual reuses that already complete source lineage. It
+    # does not repeat a registered-input walk or rebuild the scorer index.
+    assert registered_lookup_walks == []
+    assert score_index_builds_before_compile == 0
+    assert score_index_builds_after_compile == 0
+    assert residual_without_cache.source_relation is SourceRelation.SAME_INPUT
+    assert residual_with_cache.source_relation is SourceRelation.SAME_INPUT
     assert dumps_residual_line(
         residual_with_cache, candidate_with_cache
     ) == residual_line_without_cache
@@ -11132,13 +11155,16 @@ def test_nasa9_comparisons_reuse_one_work_lineage_index(
         for item in comparisons
     )
     assert work_expansions[0] == 1
-    assert 0 < len(registered_lookup_walks) < 2 * len(comparisons)
+    # The first comparison resolves the work's registered inputs; the shared
+    # snapshot memo serves the second comparison without another registered
+    # lookup. Two references still each get their own ancestry classification.
+    assert len(registered_lookup_walks) == 1
     assert all(
         walks == 0 and complete for walks, complete in registered_lookup_walks
     )
-    # One snapshot index covers both comparisons; lineage lookups stay bounded
-    # by the uncached source-root and per-comparison walks.
-    assert observations.lineage_lookups <= 2 * len(comparisons)
+    # Building that index reads each of the two fixture observations once;
+    # both comparison lookups then hit its memoized lineages.
+    assert observations.lineage_lookups == len(rows)
 
 
 def _alias_fixture(prefix: str):

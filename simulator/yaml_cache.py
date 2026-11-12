@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+import math
 import os
 from hashlib import sha256
 from pathlib import Path
@@ -52,6 +54,65 @@ def _yaml12_safe_loader(base_loader: type) -> type:
 
 
 YAML12SafeLoader = _yaml12_safe_loader(_YAML_BASE_LOADER)
+
+
+def _assert_type_exact_equal(left: object, right: object, seen=None) -> None:
+    """Assert that two parsed YAML values have identical types and contents."""
+
+    assert type(left) is type(right)
+    visited = seen if seen is not None else set()
+    pair = (id(left), id(right))
+    if pair in visited:
+        return
+    visited.add(pair)
+
+    if isinstance(left, Mapping):
+        assert isinstance(right, Mapping)
+        assert len(left) == len(right)
+        unmatched = list(right.items())
+        for left_key, left_value in left.items():
+            match = next(
+                (
+                    index
+                    for index, (right_key, _right_value) in enumerate(unmatched)
+                    if type(left_key) is type(right_key) and left_key == right_key
+                ),
+                None,
+            )
+            assert match is not None, f"mapping key differs: {left_key!r}"
+            right_key, right_value = unmatched.pop(match)
+            _assert_type_exact_equal(left_key, right_key, visited)
+            _assert_type_exact_equal(left_value, right_value, visited)
+        return
+
+    if isinstance(left, (list, tuple)):
+        assert isinstance(right, type(left))
+        assert len(left) == len(right)
+        for left_item, right_item in zip(left, right, strict=True):
+            _assert_type_exact_equal(left_item, right_item, visited)
+        return
+
+    if isinstance(left, (set, frozenset)):
+        assert isinstance(right, type(left))
+        assert len(left) == len(right)
+        unmatched = list(right)
+        for left_item in left:
+            match = next(
+                (
+                    index
+                    for index, right_item in enumerate(unmatched)
+                    if type(left_item) is type(right_item) and left_item == right_item
+                ),
+                None,
+            )
+            assert match is not None, f"set value differs: {left_item!r}"
+            _assert_type_exact_equal(left_item, unmatched.pop(match), visited)
+        return
+
+    if isinstance(left, float) and math.isnan(left):
+        assert math.isnan(right)
+        return
+    assert left == right
 
 
 def _format_yaml_source_path(path: tuple[object, ...]) -> str:
