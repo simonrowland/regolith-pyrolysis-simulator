@@ -1,0 +1,296 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2022-saratov-chondrule-evaporation
+source:
+  citation: >-
+    Shornikov, S. I., Yakovlev, O. I., Minaeva, M. S. and Minaev, V. S. (2022).
+    Thermodynamics of evaporation of chondrule melts of Saratov chondrite.
+    53rd Lunar and Planetary Science Conference, abstract 1250.
+  year: 2022
+  conference: 53rd Lunar and Planetary Science Conference
+  url: https://www.hou.usra.edu/meetings/lpsc2022/pdf/1250.pdf
+  corpus_asset: raw/shornikov-2022-saratov-chondrule-evaporation/shornikov-2022-saratov-chondrule-evaporation.pdf
+  corpus_sha256: f5c249e8d31939b1a6b980ebac3ab722d6d63672272df88af8f537a5bafa43f6
+extraction:
+  method: >-
+    Manual review of the two-page LPSC 2022 abstract. Pages were rendered at
+    200 dpi and read as images; the born-digital pdftotext -layout layer was
+    used as a cross-check. The abstract has no tables. Figures 1–3 are
+    context-only figure records with no digitised points. Printed numeric
+    statements (starting composition, temperature ranges, approximate alkali
+    mass loss, calculated activity-coefficient range, and discussion residuals)
+    are retained in context. The mass-spectrometric experiment is attributed
+    to Yakovlev et al. 1987 [3]; this abstract reports a thermodynamic
+    calculation compared with that experiment. No new measured table is printed.
+  date: '2026-11-12'
+  worker: empirical-b15-2026-11-12
+  provenance_path: raw/shornikov-2022-saratov-chondrule-evaporation/
+review_status: draft
+species:
+  Saratov_chondrule_melt:
+    observations: []
+    context:
+    - observation_id: shornikov_2022_starting_chondrule_composition
+      type: starting_composition
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: '1250.pdf'
+        section: body
+        note: 'The chondrules of Saratov chondrite belong to type IIB and are an oxide material (wt %): ...'
+      units: wt%
+      values:
+        quantity: starting_bulk_composition
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        sample_label: type IIB pyroxene chondrules of Saratov chondrite
+        attribution: >-
+          Composition is printed in this abstract as the oxide material of the
+          chondrules. The evaporation experiment itself is cited as a single
+          mass spectrometric experiment [3] (Yakovlev et al., 1987, Meteoritika
+          46, 104–118). Experimental details are cited to Yakovlev et al. [4]
+          (1984, Meteoritika 43, 126–132).
+        SiO2: '54.44'
+        TiO2: '0.13'
+        Al2O3: '3.20'
+        FeO: '13.17'
+        MgO: '24.98'
+        CaO: '2.24'
+        Na2O: '1.44'
+        K2O: '0.40'
+        note: >-
+          Eight oxides are printed. The printed values sum to 100.00 wt%.
+          No other oxide (MnO, Cr2O3, P2O5, NiO) is printed in this abstract.
+    - observation_id: shornikov_2022_experiment_cited_from_yakovlev_1987
+      type: method
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: '1250.pdf'
+        section: body
+      units: as printed
+      values:
+        quantity: cited_knudsen_evaporation_experiment
+        method_class: method_only
+        evidence_class: quoted_attributed
+        attribution: 'Yakovlev et al. [3] (1987); details [4] (1984)'
+        apparatus_as_printed: tungsten cell (according to Knudsen)
+        temperature_range_K_as_printed: 1300–2400
+        sample_as_printed: pyroxene chondrules of Saratov chondrite
+        residue_calculation_as_printed: >-
+          The composition of the residual melt (Figs. 1a and 2) was calculated
+          from the partial pressures (p) of the vapor species over the
+          chondrule melt vs. the temperature and evaporation time [3].
+        this_work_as_printed: >-
+          Theoretical calculations of thermodynamic properties of the chondrule
+          melt of Saratov chondrite at 1300–2400 K were performed using a
+          semi-empirical model designed to calculate activity coefficients in
+          the CaO–MgO–Al2O3–FeO–TiO2–SiO2 melts [5], supplemented with
+          thermodynamic data for K2O–SiO2 [6], Na2O–SiO2 [7], and
+          K2O–Na2O–SiO2 melts [8].
+    - observation_id: shornikov_2022_two_stage_evaporation_text
+      type: textual_fact
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: '1250.pdf'
+        section: body
+      units: as printed
+      values:
+        quantity: evaporation_stages_as_printed
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Stated as following from Fig. 1a and 2, which show results of [3] as symbols and calculated lines from this work.
+        stage_1:
+          T_range_K_as_printed: 1300–1600
+          process_as_printed: evaporation of K2O and Na2O from the melt with an almost unchanged content of the remaining oxides (Fig. 1a)
+          mass_loss_as_printed: the melt loses approximately 2 wt % during evaporation, which corresponds to the total amount of evaporated alkaline oxides
+        stage_2:
+          T_range_K_as_printed: 1600–2400
+          volatility_order_as_printed: 'FeO, SiO2, MgO, TiO2, CaO and Al2O3 (Fig. 2)'
+          inversion_as_printed: an inversion occurs in the MgO / SiO2 content ratio in the chondrule melt
+          residual_refractory_as_printed: >-
+            a symbatic increase in the TiO2, CaO and Al2O3 content up to 5 wt %
+            of residual melt. Then the melt successively loses TiO2 and CaO.
+        alkali_volatility_as_printed: >-
+          the symbateness of the change in the K2O and Na2O contents during
+          evaporation indicates an approximate equality of their volatility.
+        note: >-
+          The phrases "approximately 2 wt %" and "up to 5 wt % of residual
+          melt" are carried verbatim. No figure points were digitised, and
+          the 2 wt % statement was not recomputed from the printed Na2O+K2O
+          contents.
+    - observation_id: shornikov_2022_calculated_alkali_activity_coefficients
+      type: textual_fact
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: '1250.pdf'
+        figure: '1b'
+        section: body
+      units: dimensionless
+      values:
+        quantity: activity_coefficient
+        method_class: model_derived
+        evidence_class: model_derived
+        quantity_token: activity_coefficient
+        species_as_printed:
+        - K2O
+        - Na2O
+        range_as_printed: '10−12–10−8'
+        dependence_as_printed: symbatic linear logarithmic dependences of their activity coefficients (Fig. 1b)
+        simultaneous_end_as_printed: the evaporation of these oxides ends almost simultaneously (Fig. 1c)
+        k_vs_na_pressure_as_printed: >-
+          Despite the K2O high individual volatility, its partial pressure is
+          lower than the Na2O partial pressure due to its low content in the
+          melt.
+        acidity_as_printed: >-
+          The chondrules of Saratov chondrite contain a significant amount of
+          SiO2 (54.44 wt %), which provides a high acidity of the melt, which
+          does not allow K2O to exhibit high volatility during evaporation.
+        note: >-
+          The activity-coefficient range is a calculated result from this
+          work, shown as a figure curve. The range is stored as printed;
+          individual γ(T) points were not digitised.
+    - observation_id: shornikov_2022_discussion_residuals
+      type: textual_fact
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: '1250.pdf'
+        section: body
+      units: wt%
+      values:
+        quantity: calculated_vs_experimental_residuals
+        method_class: model_derived
+        evidence_class: model_derived
+        correspondence_as_printed: >-
+          the calculated composition of the chondrule residual melts of
+          Saratov chondrite during evaporation corresponds to the experimental
+          data [3]
+        deviations_as_printed: slight deviations in the Na2O (Fig. 1a), as well as FeO and MgO (Fig. 2) content
+        possible_causes_as_printed:
+        - low content of Na2O in the residual melt (0.1 wt %)
+        - an increase in experimental errors at the noticeable decrease in the residual melt amount (up to 10 wt %)
+        note: >-
+          0.1 wt % Na2O and 10 wt % residual melt are printed as possible
+          explanations of deviations, not as a tabulated residue analysis
+          from this abstract.
+    - observation_id: shornikov_2022_figure1
+      type: figure_record
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: '1250.pdf'
+        figure: '1'
+      units: as printed
+      values:
+        quantity: residual_melt_composition_activity_coefficients_and_alkali_pressures
+        method_class: figure_only
+        evidence_class: figure_only
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        temperature_as_printed: residual melt composition during evaporation at 1406–1569 K (a); K and Na partial pressures over the melt at 1450 K (c)
+        caption: >-
+          Fig. 1. The chondrule residual melt composition of Saratov chondrite
+          during evaporation at 1406–1569 K (a), the K2O and Na2O activity
+          coefficients (b) and the K and Na partial pressures over the melt
+          at 1450 K (c).
+        panels:
+          a:
+            y_as_printed: 'xi, wt %'
+            symbols_from_3: 'K2O (1), Na2O (2), CaO (3), MgO (4), Al2O3 (5), FeO (6), TiO2 (7), SiO2 (8)'
+            lines: calculated results
+            y_scale: logarithmic (labelled 0.1, 1, 10)
+          b:
+            y_as_printed: lg(γ K2O, γ Na2O)
+            series: calculated K2O (1) and Na2O (2) activity coefficients
+            y_ticks_visible: from about -11.2 to -8.6 as labelled
+          c:
+            y_as_printed: lg(pK, pNa), atm
+            x_as_printed: 'Wt loss, %'
+            series: calculated K (1) and Na (2) partial pressures
+            x_range_labelled: 0 to 2
+        note: Axes, caption, and series only; no values were read from the curves.
+    - observation_id: shornikov_2022_figure2
+      type: figure_record
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: '1250.pdf'
+        figure: '2'
+      units: as printed
+      values:
+        quantity: residual_melt_composition
+        method_class: figure_only
+        evidence_class: figure_only
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        temperature_as_printed: 1569–2147 K
+        caption: >-
+          Fig. 2 The chondrule residual melt composition of Saratov chondrite
+          during evaporation at 1569–2147 K. The results of [3] shows symbols:
+          CaO (1), MgO (2), Al2O3 (3), FeO (4), TiO2 (5), SiO2 (6); the lines
+          correspond to the calculated results.
+        axes_as_printed:
+          x: 'Wt loss, %'
+          y: 'xi, wt %'
+        x_range_labelled: 0 to 100
+        y_scale: logarithmic (labelled 0.1, 1, 10)
+        note: Axes, caption, and series only; no values were read from the curves.
+    - observation_id: shornikov_2022_figure3
+      type: figure_record
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: '1250.pdf'
+        figure: '3'
+      units: as printed
+      values:
+        quantity: activity_coefficients_and_oxygen_speciation_vs_alumina
+        method_class: figure_only
+        evidence_class: figure_only
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        temperature_as_printed: 2000 K
+        caption: >-
+          Fig. 3. The CaO (1) and SiO2 (2) activity coefficients (a) and the
+          atomic (1) and molecular (2) oxygen content (b) in the gas phase
+          over the chondrule residual melts of Saratov chondrite vs. the Al2O3
+          content in the melt at 2000 K.
+        panels:
+          a:
+            y_as_printed: lg γi
+            series: CaO (1), SiO2 (2)
+          b:
+            y_as_printed: 'xi, xj , mol %'
+            x_as_printed: 'Al2O3, wt %'
+            series: atomic oxygen (1), molecular oxygen (2)
+            x_range_labelled: 10 to 70
+        related_text_as_printed: >-
+          An interesting feature of the chondrule melt evaporation is the
+          correlation of the CaO and SiO2 contents in the melt and the atomic
+          and molecular oxygen content in the gas phase over the melt. Fig. 3
+          shows that the main source of atomic oxygen is CaO, which represents
+          the melt basicity, and the main source of molecular oxygen is SiO2,
+          which characterizes the melt acidity.
+        note: Axes, caption, and series only; no values were read from the curves.
+    - observation_id: shornikov_2022_references
+      type: method
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: '1250.pdf'
+        section: References
+      units: as printed
+      values:
+        quantity: cited_sources
+        method_class: method_only
+        references_as_printed:
+        - '[1] Ebel D. et al. (2018) Chondrules. Records of protoplanetary disk processes, 151–174.'
+        - '[2] Yakovlev et al. (1972) Dokl. AN SSSR, 206, 970–973'
+        - '[3] Yakovlev et al. (1987) Meteoritika, 46, 104–118.'
+        - '[4] Yakovlev et al. (1984) Meteoritika, 43, 126–132.'
+        - '[5] Shornikov S. I. (2019) Geochem. Int., 57, 865–872.'
+        - '[6] Shornikov S. I. (2013) Experiment in Geosciences, 19, 108–111.'
+        - '[7] Shornikov S. I. (2014) Ibid, 20, 48–51.'
+        - '[8] Shornikov S. I. and Yakovlev O. I. (2020) Physico-chemical and petrophysical research in Earth sciences, 22, 293–296.'
