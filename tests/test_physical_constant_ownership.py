@@ -141,3 +141,24 @@ def test_full_precision_gas_constant_has_one_owner() -> None:
     assert _CELL_GAS_CONSTANT_J_MOL_K is GAS_CONSTANT
     assert R_KJ_PER_MOL_K.hex() == "0x1.1072c483af26dp-7"
     assert R_KJ_PER_MOL_K == GAS_CONSTANT / J_PER_KJ
+
+
+def test_ten_sig_gas_constant_has_one_owner() -> None:
+    """The 10-significant-figure spelling is one object. It is not the leaf."""
+
+    from engines.builtin.foulant_disposition import (
+        GAS_CONSTANT_J_PER_MOL_K as foulant_r,
+    )
+    from simulator.condensation import GAS_CONSTANT_J_MOL_K as condensation_r
+    from simulator.melt_backend.melt_envelope import R_J_MOL_K as envelope_r
+    from simulator.physical_constants import GAS_CONSTANT_10SIG
+    from simulator.pumping_cost import _R_J_PER_MOL_K as pumping_r
+    from simulator.vapour_rail.nasa_cea import R_J_PER_MOL_K as cea_r
+
+    assert GAS_CONSTANT_10SIG.hex() == "0x1.0a1013e883fc4p+3"
+    assert foulant_r is GAS_CONSTANT_10SIG
+    assert condensation_r is GAS_CONSTANT_10SIG
+    assert envelope_r is GAS_CONSTANT_10SIG
+    assert pumping_r is GAS_CONSTANT_10SIG
+    assert cea_r is GAS_CONSTANT_10SIG
+    assert GAS_CONSTANT_10SIG is not GAS_CONSTANT

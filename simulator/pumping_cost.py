@@ -30,6 +30,7 @@ import math
 from typing import Any
 
 from simulator.cost_energy import json_safe_number, unavailable_quantity
+from simulator.physical_constants import GAS_CONSTANT_10SIG
 from simulator.environment import (
     ASTEROID_VACUUM_FLOOR_BAR,
     MARS_DATUM_PRESSURE_BAR,
@@ -38,8 +39,8 @@ from simulator.environment import (
     normalize_body_name,
 )
 
-# Universal gas constant, J/(mol*K). CODATA 2018.
-_R_J_PER_MOL_K = 8.314462618
+# 10-significant-figure R, J/(mol·K). Not the full CODATA leaf.
+_R_J_PER_MOL_K = GAS_CONSTANT_10SIG
 _PA_PER_BAR = 100_000.0
 _PA_PER_MBAR = 100.0
 _SECONDS_PER_HOUR = 3600.0

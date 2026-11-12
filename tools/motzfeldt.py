@@ -127,14 +127,15 @@ if str(ROOT) not in sys.path:
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
+from simulator.physical_constants import GAS_CONSTANT_10SIG  # noqa: E402
 from validate_literature_extracts import (  # noqa: E402
     EXTRACTS_DIR as _VLE_EXTRACTS,
     discover_extracts,
     validate_extract_document,
 )
 
-# Gas constant J/(mol·K) — matches simulator.condensation.GAS_CONSTANT_J_MOL_K.
-R_GAS = 8.314462618
+# Same object as condensation.GAS_CONSTANT_J_MOL_K. Not the full CODATA leaf.
+R_GAS = GAS_CONSTANT_10SIG
 
 
 # ---------------------------------------------------------------------------
