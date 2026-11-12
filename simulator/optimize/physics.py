@@ -556,27 +556,10 @@ class PhysicsConstraintSet:
             if isinstance(report, Mapping):
                 runtime_diagnostics = _coating_runtime_diagnostics(trace)
                 report_diagnostics = report.get("coating_diagnostics")
-                merged_diagnostics = dict(
-                    report_diagnostics
-                    if isinstance(report_diagnostics, Mapping)
-                    else {}
+                merged_diagnostics = _merge_coating_diagnostic_lists(
+                    report_diagnostics,
+                    runtime_diagnostics,
                 )
-                for key in (
-                    "upstream_hot_wall_findings",
-                    "silica_exposed_to_alkali_findings",
-                ):
-                    merged_diagnostics[key] = [
-                        *(
-                            report_diagnostics.get(key, ())
-                            if isinstance(report_diagnostics, Mapping)
-                            and isinstance(
-                                report_diagnostics.get(key, ()),
-                                (tuple, list),
-                            )
-                            else ()
-                        ),
-                        *runtime_diagnostics[key],
-                    ]
                 report = {
                     **report,
                     "coating_diagnostics": merged_diagnostics,
@@ -837,10 +820,7 @@ class PhysicsConstraintSet:
         diagnostics = _coating_runtime_diagnostics(report)
         report_diagnostics = report.get("coating_diagnostics")
         if isinstance(report_diagnostics, Mapping):
-            for key in (
-                "upstream_hot_wall_findings",
-                "silica_exposed_to_alkali_findings",
-            ):
+            for key in _COATING_DIAGNOSTIC_LIST_KEYS:
                 diagnostics[key].extend(
                     _plain_value(report_diagnostics.get(key, ()))
                     if isinstance(report_diagnostics.get(key, ()), (tuple, list))
@@ -1925,10 +1905,61 @@ def _coating_authority_status(
     )
 
 
+# One list. Every coating path merges and reads these keys. Adding a
+# hot-wall qualification to only one call site is how refusals and
+# extrapolation records were dropped (b-282).
+_HOT_WALL_DIAGNOSTIC_KEYS = (
+    "upstream_hot_wall_judgements",
+    "upstream_hot_wall_findings",
+    "upstream_hot_wall_refusals",
+    "upstream_hot_wall_extrapolations",
+)
+_COATING_DIAGNOSTIC_LIST_KEYS = (
+    *_HOT_WALL_DIAGNOSTIC_KEYS,
+    "silica_exposed_to_alkali_findings",
+)
+
+
+def _hot_wall_identity(record: Mapping[str, Any]) -> tuple[Any, ...]:
+    return (
+        record.get("segment"),
+        record.get("species"),
+        record.get("wall_temperature_C"),
+    )
+
+
+def _merge_coating_diagnostic_lists(
+    report_diagnostics: Any,
+    runtime_diagnostics: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Overlay every runtime diagnostic list onto a fouling report.
+
+    The report copy keeps keys the runtime collector does not own.
+    Hot-wall judgements, refusals, and extrapolations travel with the
+    findings; a handwritten subset of keys is what dropped them.
+    """
+
+    merged = dict(
+        report_diagnostics
+        if isinstance(report_diagnostics, Mapping)
+        else {}
+    )
+    for key, runtime_values in runtime_diagnostics.items():
+        if not isinstance(runtime_values, (tuple, list)):
+            continue
+        existing = merged.get(key, ())
+        if not isinstance(existing, (tuple, list)):
+            existing = ()
+        merged[key] = [*existing, *runtime_values]
+    return merged
+
+
 def _coating_runtime_diagnostics(value: Any) -> dict[str, Any]:
     """Collect upstream coating findings without changing PhysicsTrace shape."""
 
-    upstream_hot_wall_findings: list[Mapping[str, Any]] = []
+    hot_wall: dict[str, list[Mapping[str, Any]]] = {
+        key: [] for key in _HOT_WALL_DIAGNOSTIC_KEYS
+    }
     silica_exposed_to_alkali_findings: list[Mapping[str, Any]] = []
     sources: list[Any] = []
     seen: set[int] = set()
@@ -1968,12 +1999,17 @@ def _coating_runtime_diagnostics(value: Any) -> dict[str, Any]:
                 if isinstance(item, Mapping)
             )
 
-    for source in sources:
+    def take_hot_wall(source: Any) -> None:
         if isinstance(source, Mapping):
-            append_findings(
-                upstream_hot_wall_findings,
-                source.get("upstream_hot_wall_findings"),
-            )
+            for key in _HOT_WALL_DIAGNOSTIC_KEYS:
+                append_findings(hot_wall[key], source.get(key))
+        elif isinstance(source, (tuple, list)):
+            for item in source:
+                take_hot_wall(item)
+
+    for source in sources:
+        take_hot_wall(source)
+        if isinstance(source, Mapping):
             append_findings(
                 silica_exposed_to_alkali_findings,
                 source.get("silica_exposed_to_alkali_findings"),
@@ -2014,10 +2050,6 @@ def _coating_runtime_diagnostics(value: Any) -> dict[str, Any]:
         elif isinstance(source, (tuple, list)):
             for item in source:
                 if isinstance(item, Mapping):
-                    append_findings(
-                        upstream_hot_wall_findings,
-                        item.get("upstream_hot_wall_findings"),
-                    )
                     if item.get("key") == "silica_exposed_to_alkali":
                         silica_exposed_to_alkali_findings.append(dict(item))
                     if item.get("stage3_route_diagnostic"):
@@ -2035,12 +2067,13 @@ def _coating_runtime_diagnostics(value: Any) -> dict[str, Any]:
             result.append(plain)
         return result
 
-    return {
-        "upstream_hot_wall_findings": unique(upstream_hot_wall_findings),
-        "silica_exposed_to_alkali_findings": unique(
-            silica_exposed_to_alkali_findings
-        ),
+    collected = {
+        key: unique(hot_wall[key]) for key in _HOT_WALL_DIAGNOSTIC_KEYS
     }
+    collected["silica_exposed_to_alkali_findings"] = unique(
+        silica_exposed_to_alkali_findings
+    )
+    return collected
 
 
 def _coating_authority_flags(authority: Mapping[str, Any]) -> dict[str, Any]:
@@ -2635,23 +2668,138 @@ def _unique_coating_records(
     return unique
 
 
+def _coating_extrapolated_wall_flag(
+    source: Mapping[str, Any],
+    extrapolations: Any,
+    authority: Mapping[str, Any],
+) -> dict[str, Any]:
+    return _coating_reason_record(
+        "upstream_hot_wall_extrapolated",
+        authority=authority,
+        species=source.get("species"),
+        segment=source.get("segment"),
+        wall_temperature_C=source.get("wall_temperature_C"),
+        partial_pressure_pa=source.get("partial_pressure_pa"),
+        saturation_pressure_pa=source.get("saturation_pressure_pa"),
+        extrapolations=_plain_value(extrapolations),
+    )
+
+
 def _coating_dew_point_warnings(
     diagnostics: Mapping[str, Any] | None,
     authority: Mapping[str, Any],
 ) -> list[dict[str, Any]]:
-    """b-282 dew point is a warning on every coating path, not a veto."""
+    """Publish every hot-wall judgement on every coating path.
 
-    findings = (diagnostics or {}).get("upstream_hot_wall_findings", ())
-    if not isinstance(findings, (tuple, list)):
-        return []
-    return _unique_coating_records([
-        _coating_reason_record(
-            "upstream_hot_wall_supersaturation",
-            authority=authority,
-            finding=_plain_value(finding),
+    A supersaturation finding stays a warning, not a veto. A typed
+    refusal and an out-of-domain best estimate are the same kind of
+    visible qualification: they reach this gate and they do not reprice
+    deposit mass. Judgements are the chokepoint. Findings, refusals,
+    and extrapolation lists are the projections of those judgements,
+    kept so a payload that only has one of them is not dropped.
+    """
+
+    diagnostics = diagnostics or {}
+    records: list[dict[str, Any]] = []
+    covered: set[tuple[Any, ...]] = set()
+
+    def _records(key: str) -> tuple[Any, ...] | list[Any]:
+        raw = diagnostics.get(key, ())
+        if isinstance(raw, (tuple, list)):
+            return raw
+        return ()
+
+    def _extrapolations_of(source: Mapping[str, Any]) -> Any:
+        raw = source.get("extrapolations")
+        if raw is None:
+            raw = source.get("records")
+        return raw if isinstance(raw, (tuple, list)) else ()
+
+    for judgement in _records("upstream_hot_wall_judgements"):
+        if not isinstance(judgement, Mapping):
+            continue
+        covered.add(_hot_wall_identity(judgement))
+        status = judgement.get("status")
+        plain = _plain_value(judgement)
+        if status == "violation":
+            records.append(
+                _coating_reason_record(
+                    "upstream_hot_wall_supersaturation",
+                    authority=authority,
+                    finding=plain,
+                )
+            )
+        elif status == "refused":
+            records.append(
+                _coating_reason_record(
+                    "upstream_hot_wall_refused",
+                    authority=authority,
+                    finding=plain,
+                )
+            )
+        extrapolations = _extrapolations_of(judgement)
+        if extrapolations:
+            records.append(
+                _coating_extrapolated_wall_flag(
+                    judgement,
+                    extrapolations,
+                    authority,
+                )
+            )
+
+    for finding in _records("upstream_hot_wall_findings"):
+        if not isinstance(finding, Mapping):
+            continue
+        if _hot_wall_identity(finding) in covered:
+            continue
+        covered.add(_hot_wall_identity(finding))
+        records.append(
+            _coating_reason_record(
+                "upstream_hot_wall_supersaturation",
+                authority=authority,
+                finding=_plain_value(finding),
+            )
         )
-        for finding in findings
-    ])
+        extrapolations = _extrapolations_of(finding)
+        if extrapolations:
+            records.append(
+                _coating_extrapolated_wall_flag(
+                    finding,
+                    extrapolations,
+                    authority,
+                )
+            )
+
+    for refusal in _records("upstream_hot_wall_refusals"):
+        if not isinstance(refusal, Mapping):
+            continue
+        if _hot_wall_identity(refusal) in covered:
+            continue
+        covered.add(_hot_wall_identity(refusal))
+        records.append(
+            _coating_reason_record(
+                "upstream_hot_wall_refused",
+                authority=authority,
+                finding=_plain_value(refusal),
+            )
+        )
+
+    for publication in _records("upstream_hot_wall_extrapolations"):
+        if not isinstance(publication, Mapping):
+            continue
+        if _hot_wall_identity(publication) in covered:
+            continue
+        extrapolations = _extrapolations_of(publication)
+        if not extrapolations:
+            continue
+        records.append(
+            _coating_extrapolated_wall_flag(
+                publication,
+                extrapolations,
+                authority,
+            )
+        )
+    return _unique_coating_records(records)
 
 
 def _coating_violation_reasons(

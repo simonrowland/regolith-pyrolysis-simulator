@@ -109,7 +109,18 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
     hot_duct = metals_train["stage_0_hot_duct"]
     c2a_continuous = setpoints["campaigns"]["C2A_continuous"]
 
-    assert hot_duct["temp_range_C"][0] == OVERHEAD_HOT_WALL_MIN_C
+    # The stage-0 band is the hardware schedule, not the search floor. b-282
+    # stops copying [1400, 1600] into a uniform violation threshold. Alkali
+    # and Mg walls (500 C / 600 C) sit below that band and must be searchable.
+    # Fe millibar bake-off is 1775 C (CLAUDE.md §4). The ceiling is the furnace
+    # catalog max, which includes 1775 C. Doloma's wall_materials cap is 1700 C
+    # and is not this ceiling (b-329 removed the old 1750 C Doloma-REE duct
+    # cap). A ceiling below 1775 C would be a typed material refusal, not a
+    # silent clip; the current catalog reaches the Fe cell.
+    assert hot_duct["temp_range_C"][0] == 1400
+    assert OVERHEAD_HOT_WALL_MIN_C <= 500.0
+    assert OVERHEAD_HOT_WALL_MIN_C <= 600.0
+    assert OVERHEAD_HOT_WALL_MIN_C < hot_duct["temp_range_C"][0]
     # SINGLE SOURCE OF TRUTH: the duct is built of the furnace material, so its
     # service ceiling is that material's rating and the YAML row must NOT restate
     # it. The row used to carry `max_service_T_C: 1750` (Doloma-REE) and this test
@@ -120,13 +131,15 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
     # the second copy from coming back.
     assert "max_service_T_C" not in hot_duct
     assert OVERHEAD_HOT_WALL_MAX_C == FURNACE_MAX_T_BOUNDS_C[1]
+    assert OVERHEAD_HOT_WALL_MAX_C >= 1775.0
     # Offset floor is derived against the FURNACE ceiling, not C2A_continuous's
     # own declared range. A knob bound must admit the worst case the optimizer can
     # command, and campaigns.py caps every run at the furnace ceiling -- so the
-    # liner must be able to reach its 1400 C floor even from the hottest melt the
-    # hardware allows. Widening the floor cannot breach a safety limit: the liner
-    # minimum is enforced on the absolute liner knob (asserted below), and a
-    # COOLER-than-reachable gas was already permissible at every melt temperature.
+    # liner must be able to reach the upstream-wall search floor even from the
+    # hottest melt the hardware allows. Widening the floor cannot breach a safety
+    # limit: the liner minimum is enforced on the absolute liner knob (asserted
+    # below), and a COOLER-than-reachable gas was already permissible at every
+    # melt temperature.
     assert (
         OVERHEAD_HEADSPACE_OFFSET_MIN_K
         == OVERHEAD_HOT_WALL_MIN_C - OVERHEAD_HOT_WALL_MAX_C
