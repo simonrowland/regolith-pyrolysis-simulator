@@ -2266,8 +2266,12 @@ def _diagnostic_only_carrier_notice() -> dict:
 
 
 def _assert_published_diagnostic_notice(notice: object) -> None:
+    from collections.abc import Mapping
+
     assert isinstance(notice, (list, tuple)), type(notice)
-    items = [item for item in notice if isinstance(item, dict)]
+    # Coating merge freezes the snapshot, so a notice body may be a
+    # mapping proxy rather than a dict. The fields are the publication.
+    items = [item for item in notice if isinstance(item, Mapping)]
     assert items
     canonical = [
         item

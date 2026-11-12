@@ -1185,8 +1185,7 @@ class CompiledPressureEvaluator:
             else {}
         )
         # The attribute stays one dict when the carrier has one notice.
-        # A lone published extrapolation_notice is also a dict. Other
-        # notice keys stay lists on the request and provider surfaces.
+        # Publication lists are applied by the request/provider surfaces.
         extrapolation_items = receipt_notices.get("extrapolation_notice") or ()
         object.__setattr__(
             evaluation,

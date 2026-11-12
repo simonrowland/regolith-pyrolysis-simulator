@@ -35,6 +35,16 @@ def _nbytes(obj) -> int:
     return len(json.dumps(obj, default=str))
 
 
+def _without_socket_law_disclosures(row: dict) -> dict:
+    if "law_disclosures" not in row:
+        return row
+    return {
+        key: value
+        for key, value in row.items()
+        if key != "law_disclosures"
+    }
+
+
 def _client_tick_result(
     ticks: list[dict[str, object]],
     history_response: dict[str, object] | None = None,
@@ -567,7 +577,12 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             for history_entry in history["per_hour_summary"]
         )
         deltas = [tick["per_hour_summary_delta"] for tick in tick_payloads]
-        assert deltas == history["per_hour_summary"]
+        # The socket tick omits law_disclosures, including inside the
+        # delta. The stored row and the per_hour_summary event keep it.
+        assert deltas == [
+            _without_socket_law_disclosures(row)
+            for row in history["per_hour_summary"]
+        ]
         client_result = _client_tick_result(tick_payloads, history)
         assert client_result["simulationPerHourSummaryHistoryBeforeFetch"] == (
             deltas
@@ -586,9 +601,10 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             race_snapshot,
             tick_payloads[1],
         )
-        assert race_client_result["simulationPerHourSummaryHistory"] == (
-            history["per_hour_summary"][:2]
-        )
+        assert race_client_result["simulationPerHourSummaryHistory"] == [
+            history["per_hour_summary"][0],
+            tick_payloads[1]["per_hour_summary_delta"],
+        ]
         mismatched_snapshot = dict(history)
         mismatched_snapshot["run_id"] = "another-run"
         mismatch_client_result = _client_tick_result(
@@ -596,9 +612,10 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             mismatched_snapshot,
             tick_payloads[1],
         )
-        assert mismatch_client_result["simulationPerHourSummaryHistory"] == (
-            history["per_hour_summary"][:2]
-        )
+        assert mismatch_client_result["simulationPerHourSummaryHistory"] == [
+            tick_payloads[0]["per_hour_summary_delta"],
+            tick_payloads[1]["per_hour_summary_delta"],
+        ]
         assert [
             call["url"] for call in client_result["simulationHistoryFetches"]
         ] == ["/api/simulation-history"]
