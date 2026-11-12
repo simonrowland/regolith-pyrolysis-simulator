@@ -2264,66 +2264,49 @@ def _open_source_artifact(
     *,
     repository_root: Path,
     corpus_root: Path | None,
-    repository_root_explicit: bool,
     expected_sha256: Any,
 ) -> tuple[Path | None, bytes | None, str | None, str | None]:
     """Resolve and open one source artifact, returning path, bytes, hash, refusal.
 
     Corpus artifacts are relative to ``REGOLITH_CORPUS_ROOT`` and must match
-    the digest recorded on the attesting locator. ``docs/references/`` stays
-    repository-relative. A non-default ``artifact_root`` remains the local
-    repository override used by existing source-opening fixtures.
+    the digest recorded on the attesting locator. Existing files under any
+    allowed prefix in ``artifact_root`` remain repository-local; the root is
+    only a lookup location and never disables corpus resolution.
     """
     text = raw.strip()
     candidate = Path(text)
-    normalized = candidate.as_posix()
-    while normalized.startswith("./"):
-        normalized = normalized[2:]
-    is_repository_reference = (
-        normalized.startswith("docs/references/") and ".." not in candidate.parts
-    )
-    is_corpus = not is_repository_reference and not repository_root_explicit
     if not text or "://" in text or _ABS_PATH_RE.match(text):
-        outside_reason = (
-            "corpus_path_outside_root" if is_corpus else "artifact_path_outside_root"
-        )
-        return None, None, None, outside_reason
-    if (
-        is_corpus
-        and corpus_root is None
-        and not any(
-            normalized.startswith(prefix) for prefix in _SOURCE_ARTIFACT_PREFIXES
-        )
-    ):
-        return None, None, None, "artifact_not_source"
-    if is_repository_reference or repository_root_explicit:
-        root = repository_root
-    elif corpus_root is not None:
-        root = corpus_root
-    else:
-        return None, None, None, "corpus_root_unset"
-
-    outside_reason = (
-        "corpus_path_outside_root" if is_corpus else "artifact_path_outside_root"
-    )
+        return None, None, None, "corpus_path_outside_root"
     if candidate.is_absolute():
-        return None, None, None, outside_reason
+        return None, None, None, "corpus_path_outside_root"
 
-    root_resolved = root.expanduser().resolve()
-    resolved = (root_resolved / candidate).resolve()
-    if not resolved.is_relative_to(root_resolved):
-        return None, None, None, outside_reason
-    relative = resolved.relative_to(root_resolved).as_posix()
+    repository_root_resolved = repository_root.expanduser().resolve()
+    repository_path = (repository_root_resolved / candidate).resolve()
+    if not repository_path.is_relative_to(repository_root_resolved):
+        return None, None, None, "corpus_path_outside_root"
+    relative = repository_path.relative_to(repository_root_resolved).as_posix()
     if not any(relative.startswith(prefix) for prefix in _SOURCE_ARTIFACT_PREFIXES):
         return None, None, None, "artifact_not_source"
-    if resolved.suffix.lower() in _PROGRAM_SOURCE_SUFFIXES:
+    if repository_path.suffix.lower() in _PROGRAM_SOURCE_SUFFIXES:
         return None, None, None, "artifact_not_source"
     # Quotes live under tables/. Other YAML is pipeline metadata or an extract
     # copy parked on a source root.
-    if resolved.suffix.lower() in {".yaml", ".yml"} and not relative.startswith(
+    if repository_path.suffix.lower() in {".yaml", ".yml"} and not relative.startswith(
         "tables/"
     ):
         return None, None, None, "artifact_not_source"
+
+    is_corpus = False
+    resolved = repository_path
+    if not repository_path.is_file():
+        if corpus_root is None:
+            return None, None, None, "corpus_root_unset"
+        corpus_root_resolved = corpus_root.expanduser().resolve()
+        corpus_path = (corpus_root_resolved / relative).resolve()
+        if not corpus_path.is_relative_to(corpus_root_resolved):
+            return None, None, None, "corpus_path_outside_root"
+        resolved = corpus_path
+        is_corpus = True
     if not resolved.is_file():
         return (
             None,
@@ -2580,7 +2563,6 @@ def _locator_source_blind_reason(
     *,
     artifact_root: Path,
     corpus_root: Path | None,
-    artifact_root_explicit: bool,
     doc: Mapping[str, Any] | None = None,
 ) -> str | None:
     """None only when the locator was opened and the certified leaves are in it.
@@ -2607,7 +2589,6 @@ def _locator_source_blind_reason(
             raw,
             repository_root=artifact_root,
             corpus_root=corpus_root,
-            repository_root_explicit=artifact_root_explicit,
             expected_sha256=locator.get("source_sha256"),
         )
         if open_refusal:
@@ -2772,10 +2753,6 @@ def fidelity_source_warnings(
     corpus_root = (
         Path(configured_corpus_root).expanduser() if configured_corpus_root else None
     )
-    artifact_root_explicit = (
-        artifact_root is not None and artifact_root.resolve() != ROOT.resolve()
-    )
-
     for index, sample in enumerate(samples):
         sample_label = f"{label}:fidelity_samples[{index}]"
         if not isinstance(sample, Mapping):
@@ -2810,7 +2787,6 @@ def fidelity_source_warnings(
                 sample,
                 artifact_root=root,
                 corpus_root=corpus_root,
-                artifact_root_explicit=artifact_root_explicit,
                 doc=doc,
             )
             if blind:

@@ -5420,6 +5420,72 @@ def test_corpus_artifact_digest_mismatch_is_typed(tmp_path, monkeypatch):
     assert "artifact_digest_mismatch" in _source_blind_warning(doc).detail
 
 
+def test_repository_override_missing_artifact_refuses_without_corpus_root(
+    tmp_path, monkeypatch
+):
+    corpus_root = tmp_path / "corpus"
+    doc = _corpus_pin_document(corpus_root)
+    digest = hashlib.sha256(
+        (corpus_root / "text" / "paper.txt").read_bytes()
+    ).hexdigest()
+    doc["fidelity_samples"][0]["locator"]["source_sha256"] = digest
+    repository_root = tmp_path / "repository"
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    errors = _promotion_errors("index", doc, repository_root, monkeypatch)
+
+    assert errors
+    assert "corpus_root_unset" in "\n".join(errors)
+
+
+def test_existing_repository_quotes_path_opens_without_corpus_root(
+    tmp_path, monkeypatch
+):
+    doc = _opened_payload_document(tmp_path, structured=False)
+    quotes = tmp_path / "tables" / "quotes.txt"
+    quotes.parent.mkdir(parents=True, exist_ok=True)
+    quotes.write_text("alpha 0.24 measured\n", encoding="utf-8")
+    doc["fidelity_samples"][0]["locator"] = {
+        "quotes_path": "tables/quotes.txt",
+        "page": 2,
+    }
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    assert vle.fidelity_source_warnings(doc, label="repo-quotes", artifact_root=tmp_path) == []
+    assert vle.certify_extract_source_fidelity(
+        doc, label="repo-quotes", artifact_root=tmp_path
+    ) == []
+
+
+@pytest.mark.parametrize(
+    ("locator_key", "relative_path"),
+    [("quotes_path", "tables/quotes.txt"), ("record", "text/paper.txt")],
+)
+def test_non_source_path_locators_resolve_from_mounted_corpus(
+    locator_key, relative_path, tmp_path, monkeypatch
+):
+    corpus_root = tmp_path / "corpus"
+    repository_root = tmp_path / "repository"
+    doc = _opened_payload_document(corpus_root, structured=False)
+    artifact = corpus_root / relative_path
+    if locator_key == "quotes_path":
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("alpha 0.24 measured\n", encoding="utf-8")
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator[locator_key] = relative_path
+    locator["page"] = 2
+    locator["source_sha256"] = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    assert vle.fidelity_source_warnings(
+        doc, label=f"corpus-{locator_key}", artifact_root=repository_root
+    ) == []
+    assert vle.certify_extract_source_fidelity(
+        doc, label=f"corpus-{locator_key}", artifact_root=repository_root
+    ) == []
+
+
 @pytest.mark.parametrize("digest", ["A" * 64, "a" * 63, "g" * 64, 123])
 def test_source_sha256_locator_requires_lowercase_64_digit_hex(digest):
     assert not vle._locator_ok(
