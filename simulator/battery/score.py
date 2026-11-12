@@ -11754,31 +11754,18 @@ def _hashimoto_engine_floor_inversion_notices(
     return tuple(notices)
 
 
-def _with_law_disclosures(row: object, disclosures: object) -> object:
-    """Copy ``row`` so its provenance records this computation's disclosure."""
-
-    import copy
-    from dataclasses import is_dataclass
-
-    provenance = dict(getattr(row, "provenance", {}) or {})
-    provenance["law_disclosures"] = [dict(item) for item in disclosures]
-    if is_dataclass(row) and not isinstance(row, type):
-        return replace(row, provenance=provenance)
-    copied = copy.copy(row)
-    copied.provenance = provenance
-    return copied
-
-
 def _cached_hashimoto_cohort(
     cache: dict[tuple[str, Engine], Mapping[str, object]],
     cache_key: tuple[str, Engine],
+    *selected_keys: str,
 ) -> Mapping[str, object] | None:
     """Only read of a cached Hashimoto cohort.
 
     A cohort-error marker is returned as stored. Every physics row must carry
-    a measured ``law_disclosures`` list. One computation is accepted once per
-    distinct payload. A row with no field drops the cohort so the caller
-    recomputes it.
+    a measured ``law_disclosures`` list, the laws that arm executed. A row
+    with no field drops the cohort so the caller recomputes it. Only
+    ``selected_keys`` are re-registered. The other experiments stay in the
+    cohort and do not join this prediction.
     """
 
     cohort = cache.get(cache_key)
@@ -11788,19 +11775,20 @@ def _cached_hashimoto_cohort(
         return cohort
     from simulator.vapour_rail.run_disclosure import accept_stored_memo
 
-    seen: list[object] = []
     for row in cohort.values():
         provenance = getattr(row, "provenance", None)
         if not isinstance(provenance, Mapping) or "law_disclosures" not in provenance:
             cache.pop(cache_key, None)
             return None
-        payload = provenance.get("law_disclosures")
-        if any(payload == previous for previous in seen):
-            continue
-        if accept_stored_memo(provenance) is None:
+    if not selected_keys:
+        cache.pop(cache_key, None)
+        return None
+    for key in selected_keys:
+        row = cohort.get(key)
+        provenance = getattr(row, "provenance", None)
+        if row is None or accept_stored_memo(provenance) is None:
             cache.pop(cache_key, None)
             return None
-        seen.append(payload)
     return cohort
 
 
@@ -11838,8 +11826,14 @@ def _hashimoto_residue_prediction(
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
+        primary_key = (
+            reference.experiment_id + "::alpha_common_unity_sensitivity"
+        )
+        production_key = reference.experiment_id + "::alpha_runtime_catalog"
         rows_by_key = (
-            _cached_hashimoto_cohort(cache, cache_key)
+            _cached_hashimoto_cohort(
+                cache, cache_key, primary_key, production_key
+            )
             if cache_key in cache
             else None
         )
@@ -11890,32 +11884,25 @@ def _hashimoto_residue_prediction(
                 capture_output=True,
                 text=True,
             ).stdout.strip()
-            from simulator.vapour_rail.run_disclosure import disclosure_scope
-
-            with disclosure_scope(inherit=False) as cohort_disclosure:
-                rows = _predict_hashimoto_residue_cohort(
-                    experiments,
-                    load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
-                    preform_dimensions_mm=geometry,
-                    code_revision=revision,
-                    engine=engine.value,
-                )
-                disclosures = cohort_disclosure.snapshot()
+            rows = _predict_hashimoto_residue_cohort(
+                experiments,
+                load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
+                preform_dimensions_mm=geometry,
+                code_revision=revision,
+                engine=engine.value,
+            )
+            # Each row already carries the disclosure of its own arm.
             cache[cache_key] = {
-                row.experiment_id + "::" + row.alpha_arm: _with_law_disclosures(
-                    row, disclosures
-                )
+                row.experiment_id + "::" + row.alpha_arm: row
                 for row in rows
             }
-            rows_by_key = _cached_hashimoto_cohort(cache, cache_key)
+            rows_by_key = _cached_hashimoto_cohort(
+                cache, cache_key, primary_key, production_key
+            )
             if rows_by_key is None:
                 raise ValueError("hashimoto_disclosure_unmeasured")
         if "__cohort_error__" in rows_by_key:
             raise ValueError(str(rows_by_key["__cohort_error__"]))
-        primary_key = (
-            reference.experiment_id + "::alpha_common_unity_sensitivity"
-        )
-        production_key = reference.experiment_id + "::alpha_runtime_catalog"
         primary = rows_by_key.get(primary_key)
         production = rows_by_key.get(production_key)
         if primary is None or production is None:

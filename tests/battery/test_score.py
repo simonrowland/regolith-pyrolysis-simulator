@@ -9663,6 +9663,7 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
                     if experiment_id == refused_experiment
                     else {"sphere_shrinking": None}
                 ),
+                "law_disclosures": [],
             }
             values = {"FeO": float(index + 10), "MgO": 20.0, "SiO2": 30.0, "CaO": 4.0, "Al2O3": 5.0}
             rows.extend(
@@ -9682,7 +9683,11 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
                         primary_oxide_wt_pct={**values, "FeO": values["FeO"] + 100.0},
                         geometry_oxide_wt_pct={"sphere_shrinking": values},
                         sensitivity_band_wt_pct={name: (value - 2.0, value + 2.0) for name, value in values.items()},
-                        provenance={"engine": engine, "alpha_arm": "alpha_runtime_catalog"},
+                        provenance={
+                            "engine": engine,
+                            "alpha_arm": "alpha_runtime_catalog",
+                            "law_disclosures": [],
+                        },
                     ),
                 )
             )

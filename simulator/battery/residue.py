@@ -2854,6 +2854,10 @@ def _predict_hashimoto_residue_cohort(
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
     from simulator.evaporation import _load_evaporation_alpha_by_species
     from simulator.condensation import alpha_s
+    from simulator.vapour_rail.run_disclosure import (
+        active_snapshot,
+        disclosure_scope,
+    )
 
     gas_pack = load_gas_datapack()
     legacy_catalog = vapor_pressure_legacy_view(runtime_catalog)
@@ -3098,280 +3102,286 @@ def _predict_hashimoto_residue_cohort(
             ("alpha_runtime_catalog", runtime_channels, runtime_alpha_records, "runtime"),
         )
         for alpha_arm, channels, alpha_records, row_key in arm_channels:
-            geometry_predictions: dict[str, dict[str, float]] = {}
-            pO2_ranges: dict[str, list[float] | None] = {}
-            pO2_balance_floor_by_geometry: dict[
-                str, dict[str, float | int | None]
-            ] = {}
-            geometry_exhaustions: dict[str, tuple[dict[str, float | int | str], ...]] = {}
-            geometry_refusals: dict[str, dict[str, object] | None] = {}
-            geometry_atom_closure: dict[str, dict[str, float]] = {}
-            refinement_steps_by_geometry: dict[str, tuple[int, ...]] = {}
-            refinement_differences_by_geometry: dict[str, tuple[dict[str, float | int], ...]] = {}
-            refinement_status_by_geometry: dict[str, str] = {}
-            refinement_cpu_seconds_by_geometry: dict[str, float] = {}
-            refinement_accepted_steps_by_geometry: dict[str, int] = {}
-            refinement_notices: list[dict[str, str]] = []
-            for geometry in _HASHIMOTO_GEOMETRIES:
-                steps = initial_steps
-                tried_steps: list[int] = []
-                level_differences: list[dict[str, float | int]] = []
-                cpu_seconds = 0.0
-                previous_values: dict[str, float] | None = None
-                values: dict[str, float] = {}
-                pO2_steps: tuple[float, ...] = ()
-                exhaustions: tuple[dict[str, float | int | str], ...] = ()
-                refusal: ResidueEngineNonconvergence | None = None
-                atom_closure: dict[str, float] = {}
-                pO2_balance_floor: dict[str, float | int | None] = {}
-                refinement_status = "unconverged_at_cap"
-                while True:
-                    started_cpu = time.process_time()
-                    (
-                        values,
-                        pO2_steps,
-                        exhaustions,
-                        refusal,
-                        atom_closure,
-                        pO2_balance_floor,
-                    ) = _hashimoto_integrate_geometry(
-                        run_initial_mol,
-                        channels,
-                        pressure_model,
-                        temperature_K=temperature_K,
-                        duration_s=duration_s,
-                        steps=steps,
-                        geometry_policy_id=geometry,
-                        initial_area_m2=geometry_areas[geometry],
-                    )
-                    cpu_seconds += time.process_time() - started_cpu
-                    tried_steps.append(steps)
-                    if refusal is not None:
-                        refinement_status = "engine_nonconvergence"
-                        break
-                    if previous_values is not None:
-                        max_difference = max(
-                            abs(values[oxide] - previous_values[oxide])
-                            for oxide in run_initial_mol
+            # One registry per arm. A cohort snapshot would give every
+            # experiment the laws the others executed.
+            with disclosure_scope(inherit=False):
+                geometry_predictions: dict[str, dict[str, float]] = {}
+                pO2_ranges: dict[str, list[float] | None] = {}
+                pO2_balance_floor_by_geometry: dict[
+                    str, dict[str, float | int | None]
+                ] = {}
+                geometry_exhaustions: dict[str, tuple[dict[str, float | int | str], ...]] = {}
+                geometry_refusals: dict[str, dict[str, object] | None] = {}
+                geometry_atom_closure: dict[str, dict[str, float]] = {}
+                refinement_steps_by_geometry: dict[str, tuple[int, ...]] = {}
+                refinement_differences_by_geometry: dict[str, tuple[dict[str, float | int], ...]] = {}
+                refinement_status_by_geometry: dict[str, str] = {}
+                refinement_cpu_seconds_by_geometry: dict[str, float] = {}
+                refinement_accepted_steps_by_geometry: dict[str, int] = {}
+                refinement_notices: list[dict[str, str]] = []
+                for geometry in _HASHIMOTO_GEOMETRIES:
+                    steps = initial_steps
+                    tried_steps: list[int] = []
+                    level_differences: list[dict[str, float | int]] = []
+                    cpu_seconds = 0.0
+                    previous_values: dict[str, float] | None = None
+                    values: dict[str, float] = {}
+                    pO2_steps: tuple[float, ...] = ()
+                    exhaustions: tuple[dict[str, float | int | str], ...] = ()
+                    refusal: ResidueEngineNonconvergence | None = None
+                    atom_closure: dict[str, float] = {}
+                    pO2_balance_floor: dict[str, float | int | None] = {}
+                    refinement_status = "unconverged_at_cap"
+                    while True:
+                        started_cpu = time.process_time()
+                        (
+                            values,
+                            pO2_steps,
+                            exhaustions,
+                            refusal,
+                            atom_closure,
+                            pO2_balance_floor,
+                        ) = _hashimoto_integrate_geometry(
+                            run_initial_mol,
+                            channels,
+                            pressure_model,
+                            temperature_K=temperature_K,
+                            duration_s=duration_s,
+                            steps=steps,
+                            geometry_policy_id=geometry,
+                            initial_area_m2=geometry_areas[geometry],
                         )
-                        level_differences.append(
-                            {
-                                "coarse_steps": tried_steps[-2],
-                                "fine_steps": steps,
-                                "max_abs_difference_wt_pct": max_difference,
-                            }
-                        )
-                        if max_difference < _HASHIMOTO_REFINEMENT_TOLERANCE_WT_PCT:
-                            refinement_status = "converged"
+                        cpu_seconds += time.process_time() - started_cpu
+                        tried_steps.append(steps)
+                        if refusal is not None:
+                            refinement_status = "engine_nonconvergence"
                             break
-                    if steps >= _HASHIMOTO_N_CAP:
-                        refinement_status = "unconverged_at_cap"
-                        refinement_notices.append(
-                            {
-                                "reason": "residue_time_refinement_unconverged",
-                                "geometry_policy_id": geometry,
-                            }
-                        )
-                        break
-                    previous_values = values
-                    steps = min(_HASHIMOTO_N_CAP, 2 * steps)
-                refinement_steps_by_geometry[geometry] = tuple(tried_steps)
-                refinement_differences_by_geometry[geometry] = tuple(level_differences)
-                refinement_status_by_geometry[geometry] = refinement_status
-                refinement_cpu_seconds_by_geometry[geometry] = cpu_seconds
-                refinement_accepted_steps_by_geometry[geometry] = tried_steps[-1]
-                geometry_predictions[geometry] = values
-                geometry_exhaustions[geometry] = exhaustions
-                pO2_balance_floor_by_geometry[geometry] = pO2_balance_floor
-                geometry_refusals[geometry] = (
-                    {
-                        **refusal.as_record(),
-                        "geometry_policy_id": geometry,
-                    }
-                    if refusal is not None
-                    else None
-                )
-                geometry_atom_closure[geometry] = atom_closure
-                pO2_ranges[geometry] = (
-                    [min(pO2_steps), max(pO2_steps)] if pO2_steps else None
-                )
-            for notice in getattr(pressure_model, "below_threshold_omission_notices", ()):
-                row = {"reason": notice.reason, "kind": str(notice.kind.value)}
-                if row not in refinement_notices:
-                    refinement_notices.append(row)
-            band = {
-                oxide: (
-                    min(values[oxide] for values in geometry_predictions.values()),
-                    max(values[oxide] for values in geometry_predictions.values()),
-                )
-                for oxide in run_initial_mol
-            }
-            primary_area = geometry_areas[primary_geometry]
-            geometry_provenance = {
-                "sphere_constant": {
-                    "area_m2_initial": geometry_areas["sphere_constant"],
-                    "area_evolution": "constant equal-volume sphere area",
-                    "flag": "area_assumed_sphere_constant",
-                },
-                "sphere_shrinking": {
-                    "area_m2_initial": geometry_areas["sphere_shrinking"],
-                    "area_evolution": "A(t)=A0*(remaining_oxide_mass/initial_mass)^(2/3), updated each step",
-                    "flag": "area_assumed_sphere_shrinking",
-                },
-                "disk_4mm_constant": {
-                    "area_m2_initial": geometry_areas["disk_4mm_constant"],
-                    "area_evolution": "constant 4 mm diameter disk; hole not subtracted",
-                    "flag": "area_assumed_disk_4mm_constant",
-                },
-            }
-            extrapolated_liquids = [
-                row
-                for row in active_liquid_rows[row_key]
-                if row.get("liquid_row")
-                and row["liquid_row"].get("extrapolated_below_floor")
-            ]
-            assumption_flags = {
-                "alpha_assumed_unity_ratio_not_measured_alpha": (
-                    alpha_arm == "alpha_common_unity_sensitivity"
-                ),
-                "alpha_assumed_common_unity_sensitivity": (
-                    alpha_arm == "alpha_common_unity_sensitivity"
-                ),
-                "alpha_assumed_runtime_catalog_system_mismatch": (
-                    alpha_arm == "alpha_runtime_catalog"
-                ),
-                "alpha_assumed_oxygen_gas_unity": True,
-                "area_assumed_sphere_constant": True,
-                "area_assumed_sphere_shrinking": True,
-                "area_assumed_disk_4mm_constant": True,
-                "density_fallback_2700_kg_m3": True,
-                "oxygen_unbuffered_vacuum": True,
-                "pressure_on_throw_ignored_for_bc": True,
-                "feo_melt_redox_stack2_pending": True,
-                "d060_pending": True,
-                "openimcc_liquid_row_extrapolated": bool(extrapolated_liquids),
-            }
-            provenance = {
-                "experiment_id": experiment_id,
-                "source_id": "kems-015-hashimoto-1983",
-                "run_locator": dict(experiment.get("locator") or {}),
-                "temperature_K": temperature_K,
-                "duration_s": duration_s,
-                "sample_mass_kg": sample_mass_kg,
-                "starting_composition_wt_pct": dict(run_wt_pct),
-                "starting_preform_mm": dict(preform_dimensions_mm),
-                "sample_surface_area_status": "not_tabulated",
-                "primary_geometry_policy_id": primary_geometry,
-                "geometry_primary_argument": (
-                    "A freely receding melt is represented as a fixed-density sphere, "
-                    "so area scales with remaining melt mass^(2/3); the cold preform "
-                    "and quenched spherule do not establish the molten area. This choice "
-                    "was declared without using residue observations."
-                ),
-                "geometry_policies": geometry_provenance,
-                "geometry_policy_id": primary_geometry,
-                "area_m2_initial": primary_area,
-                "area_evolution": geometry_provenance[primary_geometry]["area_evolution"],
-                "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
-                "density_source": _HASHIMOTO_DENSITY_SOURCE,
-                "alpha_arm": alpha_arm,
-                "alpha_source": (
-                    "declared_common_unity_sensitivity"
-                    if alpha_arm == "alpha_common_unity_sensitivity"
-                    else "runtime_catalog_alpha_values"
-                ),
-                "author_alpha_assumption": {
-                    "extract_assumption": "assumed_unity_ratio_not_measured_alpha",
-                    "assumed_ratio": "alpha_i/alpha_j=1",
-                    "absolute_alpha_established": False,
-                    "active_for_this_arm": alpha_arm == "alpha_common_unity_sensitivity",
-                },
-                "alpha_by_channel": tuple(alpha_records),
-                "runtime_catalog_omissions": tuple(runtime_omissions)
-                if alpha_arm == "alpha_runtime_catalog"
-                else (),
-                "oxygen_model": (
-                    f"R1a engine-consistent alpha-weighted congruent vacuum oxygen balance ({engine})"
-                ),
-                "engine": engine,
-                "oxygen_boundary": "unbuffered vacuum; fO2 control none",
-                "total_pressure_Pa": total_pressure_Pa,
-                "surface_pO2_bar_range_by_geometry": pO2_ranges,
-                "surface_pO2_balance_floor": pO2_balance_floor_by_geometry[
-                    primary_geometry
-                ],
-                "surface_pO2_balance_floor_by_geometry": (
-                    pO2_balance_floor_by_geometry
-                ),
-                "engine_floor_inversion_diagnostics": tuple(
-                    engine_floor_inversion_diagnostics.values()
-                ),
-                "liquid_rows_used": tuple(active_liquid_rows[row_key]),
-                "d060_pending": True,
-                "openimcc_version": str(getattr(openimcc, "__version__", "unknown")),
-                "datapack_version": melt_pack_identity.get("datapack_version"),
-                "openimcc_model_id": melt_pack_identity.get("model_id"),
-                "pack_digest": {
-                    "melt_datapack": melt_pack_identity.get("pack_digest", ""),
-                },
-                **(
-                    {"engine_binding_identity": engine_binding_identity}
-                    if engine_binding_identity is not None
-                    else {}
-                ),
-                "openimcc_pin": openimcc_bridge.OPENIMCC_RECORDED_PIN,
-                "code_revision": code_revision,
-                "integration": {
-                    "steps": refinement_accepted_steps_by_geometry[primary_geometry],
-                    "steps_tried_by_geometry": refinement_steps_by_geometry,
-                    "max_difference_wt_pct_by_geometry": refinement_differences_by_geometry,
-                    "accepted_steps_by_geometry": refinement_accepted_steps_by_geometry,
-                    "refinement_status_by_geometry": refinement_status_by_geometry,
-                    "refinement_status": refinement_status_by_geometry[primary_geometry],
-                    "process_cpu_seconds_by_geometry": refinement_cpu_seconds_by_geometry,
-                    "process_cpu_seconds": math.fsum(refinement_cpu_seconds_by_geometry.values()),
-                    "refinement_notices": tuple(refinement_notices),
-                    "substep_duration_s": duration_s
-                    / refinement_accepted_steps_by_geometry[primary_geometry],
-                    "component_exhaustion_rule": (
-                        "remaining component moles below sqrt(binary64 epsilon) "
-                        "times initial sample oxide moles, floored at 16 ULPs; "
-                        "the rounded remainder is retained in atom-closure accounting"
+                        if previous_values is not None:
+                            max_difference = max(
+                                abs(values[oxide] - previous_values[oxide])
+                                for oxide in run_initial_mol
+                            )
+                            level_differences.append(
+                                {
+                                    "coarse_steps": tried_steps[-2],
+                                    "fine_steps": steps,
+                                    "max_abs_difference_wt_pct": max_difference,
+                                }
+                            )
+                            if max_difference < _HASHIMOTO_REFINEMENT_TOLERANCE_WT_PCT:
+                                refinement_status = "converged"
+                                break
+                        if steps >= _HASHIMOTO_N_CAP:
+                            refinement_status = "unconverged_at_cap"
+                            refinement_notices.append(
+                                {
+                                    "reason": "residue_time_refinement_unconverged",
+                                    "geometry_policy_id": geometry,
+                                }
+                            )
+                            break
+                        previous_values = values
+                        steps = min(_HASHIMOTO_N_CAP, 2 * steps)
+                    refinement_steps_by_geometry[geometry] = tuple(tried_steps)
+                    refinement_differences_by_geometry[geometry] = tuple(level_differences)
+                    refinement_status_by_geometry[geometry] = refinement_status
+                    refinement_cpu_seconds_by_geometry[geometry] = cpu_seconds
+                    refinement_accepted_steps_by_geometry[geometry] = tried_steps[-1]
+                    geometry_predictions[geometry] = values
+                    geometry_exhaustions[geometry] = exhaustions
+                    pO2_balance_floor_by_geometry[geometry] = pO2_balance_floor
+                    geometry_refusals[geometry] = (
+                        {
+                            **refusal.as_record(),
+                            "geometry_policy_id": geometry,
+                        }
+                        if refusal is not None
+                        else None
+                    )
+                    geometry_atom_closure[geometry] = atom_closure
+                    pO2_ranges[geometry] = (
+                        [min(pO2_steps), max(pO2_steps)] if pO2_steps else None
+                    )
+                for notice in getattr(pressure_model, "below_threshold_omission_notices", ()):
+                    row = {"reason": notice.reason, "kind": str(notice.kind.value)}
+                    if row not in refinement_notices:
+                        refinement_notices.append(row)
+                band = {
+                    oxide: (
+                        min(values[oxide] for values in geometry_predictions.values()),
+                        max(values[oxide] for values in geometry_predictions.values()),
+                    )
+                    for oxide in run_initial_mol
+                }
+                primary_area = geometry_areas[primary_geometry]
+                geometry_provenance = {
+                    "sphere_constant": {
+                        "area_m2_initial": geometry_areas["sphere_constant"],
+                        "area_evolution": "constant equal-volume sphere area",
+                        "flag": "area_assumed_sphere_constant",
+                    },
+                    "sphere_shrinking": {
+                        "area_m2_initial": geometry_areas["sphere_shrinking"],
+                        "area_evolution": "A(t)=A0*(remaining_oxide_mass/initial_mass)^(2/3), updated each step",
+                        "flag": "area_assumed_sphere_shrinking",
+                    },
+                    "disk_4mm_constant": {
+                        "area_m2_initial": geometry_areas["disk_4mm_constant"],
+                        "area_evolution": "constant 4 mm diameter disk; hole not subtracted",
+                        "flag": "area_assumed_disk_4mm_constant",
+                    },
+                }
+                extrapolated_liquids = [
+                    row
+                    for row in active_liquid_rows[row_key]
+                    if row.get("liquid_row")
+                    and row["liquid_row"].get("extrapolated_below_floor")
+                ]
+                assumption_flags = {
+                    "alpha_assumed_unity_ratio_not_measured_alpha": (
+                        alpha_arm == "alpha_common_unity_sensitivity"
                     ),
-                    "component_exhaustion_floor_mol": _component_exhaustion_floor_mol(
-                        math.fsum(run_initial_mol.values())
+                    "alpha_assumed_common_unity_sensitivity": (
+                        alpha_arm == "alpha_common_unity_sensitivity"
                     ),
-                    "engine_nonconvergence_retry": (
-                        "retry the failed interval as two half steps; a second "
-                        "failure stops this geometry run with a partial diagnostic"
+                    "alpha_assumed_runtime_catalog_system_mismatch": (
+                        alpha_arm == "alpha_runtime_catalog"
                     ),
-                },
-                "notices": tuple(refinement_notices),
-                "component_exhausted_by_geometry": geometry_exhaustions,
-                "atom_closure_mol_by_geometry": geometry_atom_closure,
-                "geometry_refusal_by_geometry": geometry_refusals,
-                "run_refusal": geometry_refusals[primary_geometry] or next(
-                    (refusal for refusal in geometry_refusals.values() if refusal),
-                    None,
-                ),
-                "prediction_status": (
-                    "partial_diagnostic"
-                    if any(geometry_refusals.values())
-                    else "complete"
-                ),
-                "assumption_flags": assumption_flags,
-            }
-            prediction_rows.append(
-                _HashimotoResiduePrediction(
-                    experiment_id=experiment_id,
-                    alpha_arm=alpha_arm,
-                    primary_geometry_policy_id=primary_geometry,
-                    primary_oxide_wt_pct=dict(geometry_predictions[primary_geometry]),
-                    geometry_oxide_wt_pct=geometry_predictions,
-                    sensitivity_band_wt_pct=band,
-                    provenance=provenance,
+                    "alpha_assumed_oxygen_gas_unity": True,
+                    "area_assumed_sphere_constant": True,
+                    "area_assumed_sphere_shrinking": True,
+                    "area_assumed_disk_4mm_constant": True,
+                    "density_fallback_2700_kg_m3": True,
+                    "oxygen_unbuffered_vacuum": True,
+                    "pressure_on_throw_ignored_for_bc": True,
+                    "feo_melt_redox_stack2_pending": True,
+                    "d060_pending": True,
+                    "openimcc_liquid_row_extrapolated": bool(extrapolated_liquids),
+                }
+                provenance = {
+                    "experiment_id": experiment_id,
+                    "source_id": "kems-015-hashimoto-1983",
+                    "run_locator": dict(experiment.get("locator") or {}),
+                    "temperature_K": temperature_K,
+                    "duration_s": duration_s,
+                    "sample_mass_kg": sample_mass_kg,
+                    "starting_composition_wt_pct": dict(run_wt_pct),
+                    "starting_preform_mm": dict(preform_dimensions_mm),
+                    "sample_surface_area_status": "not_tabulated",
+                    "primary_geometry_policy_id": primary_geometry,
+                    "geometry_primary_argument": (
+                        "A freely receding melt is represented as a fixed-density sphere, "
+                        "so area scales with remaining melt mass^(2/3); the cold preform "
+                        "and quenched spherule do not establish the molten area. This choice "
+                        "was declared without using residue observations."
+                    ),
+                    "geometry_policies": geometry_provenance,
+                    "geometry_policy_id": primary_geometry,
+                    "area_m2_initial": primary_area,
+                    "area_evolution": geometry_provenance[primary_geometry]["area_evolution"],
+                    "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
+                    "density_source": _HASHIMOTO_DENSITY_SOURCE,
+                    "alpha_arm": alpha_arm,
+                    "alpha_source": (
+                        "declared_common_unity_sensitivity"
+                        if alpha_arm == "alpha_common_unity_sensitivity"
+                        else "runtime_catalog_alpha_values"
+                    ),
+                    "author_alpha_assumption": {
+                        "extract_assumption": "assumed_unity_ratio_not_measured_alpha",
+                        "assumed_ratio": "alpha_i/alpha_j=1",
+                        "absolute_alpha_established": False,
+                        "active_for_this_arm": alpha_arm == "alpha_common_unity_sensitivity",
+                    },
+                    "alpha_by_channel": tuple(alpha_records),
+                    "runtime_catalog_omissions": tuple(runtime_omissions)
+                    if alpha_arm == "alpha_runtime_catalog"
+                    else (),
+                    "oxygen_model": (
+                        f"R1a engine-consistent alpha-weighted congruent vacuum oxygen balance ({engine})"
+                    ),
+                    "engine": engine,
+                    "oxygen_boundary": "unbuffered vacuum; fO2 control none",
+                    "total_pressure_Pa": total_pressure_Pa,
+                    "surface_pO2_bar_range_by_geometry": pO2_ranges,
+                    "surface_pO2_balance_floor": pO2_balance_floor_by_geometry[
+                        primary_geometry
+                    ],
+                    "surface_pO2_balance_floor_by_geometry": (
+                        pO2_balance_floor_by_geometry
+                    ),
+                    "engine_floor_inversion_diagnostics": tuple(
+                        engine_floor_inversion_diagnostics.values()
+                    ),
+                    "liquid_rows_used": tuple(active_liquid_rows[row_key]),
+                    "d060_pending": True,
+                    "openimcc_version": str(getattr(openimcc, "__version__", "unknown")),
+                    "datapack_version": melt_pack_identity.get("datapack_version"),
+                    "openimcc_model_id": melt_pack_identity.get("model_id"),
+                    "pack_digest": {
+                        "melt_datapack": melt_pack_identity.get("pack_digest", ""),
+                    },
+                    **(
+                        {"engine_binding_identity": engine_binding_identity}
+                        if engine_binding_identity is not None
+                        else {}
+                    ),
+                    "openimcc_pin": openimcc_bridge.OPENIMCC_RECORDED_PIN,
+                    "code_revision": code_revision,
+                    "integration": {
+                        "steps": refinement_accepted_steps_by_geometry[primary_geometry],
+                        "steps_tried_by_geometry": refinement_steps_by_geometry,
+                        "max_difference_wt_pct_by_geometry": refinement_differences_by_geometry,
+                        "accepted_steps_by_geometry": refinement_accepted_steps_by_geometry,
+                        "refinement_status_by_geometry": refinement_status_by_geometry,
+                        "refinement_status": refinement_status_by_geometry[primary_geometry],
+                        "process_cpu_seconds_by_geometry": refinement_cpu_seconds_by_geometry,
+                        "process_cpu_seconds": math.fsum(refinement_cpu_seconds_by_geometry.values()),
+                        "refinement_notices": tuple(refinement_notices),
+                        "substep_duration_s": duration_s
+                        / refinement_accepted_steps_by_geometry[primary_geometry],
+                        "component_exhaustion_rule": (
+                            "remaining component moles below sqrt(binary64 epsilon) "
+                            "times initial sample oxide moles, floored at 16 ULPs; "
+                            "the rounded remainder is retained in atom-closure accounting"
+                        ),
+                        "component_exhaustion_floor_mol": _component_exhaustion_floor_mol(
+                            math.fsum(run_initial_mol.values())
+                        ),
+                        "engine_nonconvergence_retry": (
+                            "retry the failed interval as two half steps; a second "
+                            "failure stops this geometry run with a partial diagnostic"
+                        ),
+                    },
+                    "notices": tuple(refinement_notices),
+                    "component_exhausted_by_geometry": geometry_exhaustions,
+                    "atom_closure_mol_by_geometry": geometry_atom_closure,
+                    "geometry_refusal_by_geometry": geometry_refusals,
+                    "run_refusal": geometry_refusals[primary_geometry] or next(
+                        (refusal for refusal in geometry_refusals.values() if refusal),
+                        None,
+                    ),
+                    "prediction_status": (
+                        "partial_diagnostic"
+                        if any(geometry_refusals.values())
+                        else "complete"
+                    ),
+                    "assumption_flags": assumption_flags,
+                    "law_disclosures": [
+                        dict(item) for item in active_snapshot()
+                    ],
+                }
+                prediction_rows.append(
+                    _HashimotoResiduePrediction(
+                        experiment_id=experiment_id,
+                        alpha_arm=alpha_arm,
+                        primary_geometry_policy_id=primary_geometry,
+                        primary_oxide_wt_pct=dict(geometry_predictions[primary_geometry]),
+                        geometry_oxide_wt_pct=geometry_predictions,
+                        sensitivity_band_wt_pct=band,
+                        provenance=provenance,
+                    )
                 )
-            )
 
     # Keep the predeclared primary first; selection is independent of measured rows.
     prediction_rows.sort(

@@ -41,6 +41,9 @@ a measured row with empty authority.
 - A publisher reads the owning run via ``owning_run_disclosures``. The
   bound registry is another run or a computation sub-registry and does not
   replace that owner's snapshot, including a measured empty.
+  ``published_run_disclosures`` is that same read for an execution: the
+  session, or else the simulator. It does not fall through to the bound
+  registry when the owner's measurement is empty.
 
 The ContextVar default is ``None``. That slot is not a registry. ``SimSession``
 creates the ``RunDisclosure`` that is returned with the run. There is no
@@ -764,26 +767,41 @@ def owning_run_disclosures(owner: Any) -> tuple[dict[str, Any], ...]:
     return tuple(dict(item) for item in raw if isinstance(item, Mapping))
 
 
+def _owner_recorded_disclosure(owner: Any) -> bool:
+    """True when ``owner`` has a durable registry or a disclosure attribute.
+
+    Absence of both means this object is not the run. An empty attribute is
+    a measurement, so it still counts.
+    """
+
+    if owner is None:
+        return False
+    for attr in ("_law_disclosure_registry", "_law_disclosure"):
+        registry = getattr(owner, attr, None)
+        if isinstance(registry, RunDisclosure) and not registry.computation:
+            return True
+    return hasattr(owner, "law_disclosures")
+
+
 def published_run_disclosures(execution: Any) -> tuple[dict[str, Any], ...]:
     """Disclosures of the run that produced ``execution``.
 
-    The session registry is the source. An empty session snapshot is a
-    measured zero and is not replaced by a simulator attribute or by whatever
-    registry happens to be active. A result with no session falls back to the
-    simulator mirror, then to the active registry.
+    The session is the owner when it recorded a disclosure. Otherwise the
+    simulator is. ``owning_run_disclosures`` reads that owner's durable
+    registry, then its measured attribute, including a measured empty. The
+    registry bound on the context is another run and is not a substitute.
+    An execution with neither owner publishes nothing.
     """
 
     if execution is None:
         return ()
-    session = getattr(execution, "session", None)
-    if session is not None and hasattr(session, "law_disclosures"):
-        raw = getattr(session, "law_disclosures", ()) or ()
-        return tuple(dict(item) for item in raw if isinstance(item, Mapping))
-    sim = getattr(execution, "simulator", None)
-    raw = getattr(sim, "law_disclosures", ()) if sim is not None else ()
-    if raw:
-        return tuple(dict(item) for item in raw if isinstance(item, Mapping))
-    return tuple(dict(item) for item in active_snapshot())
+    for owner in (
+        getattr(execution, "session", None),
+        getattr(execution, "simulator", None),
+    ):
+        if _owner_recorded_disclosure(owner):
+            return owning_run_disclosures(owner)
+    return ()
 
 
 def disclosure_metadata(

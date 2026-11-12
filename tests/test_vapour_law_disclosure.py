@@ -31,8 +31,11 @@ law. A non-diagnostic law is registered when the evaluation leaves a
 certified domain: the temperature band, the Ellingham fit, the oxygen
 evaluator band, or the oxygen mass-action floor. An in-domain
 non-diagnostic evaluation registers nothing. A publisher of a run reads
-that run's registry via ``owning_run_disclosures``. The bound registry is
-not a substitute, and a measured empty stays empty. A hit does not execute
+that run's registry via ``owning_run_disclosures``. ``published_run_disclosures``
+uses that read for the session or the simulator. The bound registry is
+not a substitute, and a measured empty stays empty. A Hashimoto cohort
+stores each arm's own disclosure and replays only the arms the prediction
+consumes. A hit does not execute
 the law; it
 re-registers the disclosures stored with that computation, and evaluation
 counts add. An empty disclosure is a measured zero only when the computation
@@ -104,6 +107,7 @@ from simulator.vapour_rail.run_disclosure import (
     disclosure_scope,
     open_computation,
     publish_stored_disclosures,
+    published_run_disclosures,
     stored_disclosures_known,
 )
 from tests.test_optimizer_results_store import _base_spec, _scored
@@ -2939,6 +2943,23 @@ def test_cache_inventory_matches_the_production_scan() -> None:
     )[0]
     assert "rows_by_key = cache[cache_key]" not in hashimoto
     assert hashimoto.count("_cached_hashimoto_cohort(") == 2
+    assert "cohort_disclosure" not in hashimoto
+    assert "_with_law_disclosures" not in hashimoto
+    assert "primary_key, production_key" in hashimoto
+    hashimoto_read = score.split("def _cached_hashimoto_cohort(", 1)[1].split(
+        "\ndef ", 1
+    )[0]
+    assert "selected_keys" in hashimoto_read
+    assert hashimoto_read.count("accept_stored_memo(") == 1
+    assert hashimoto_read.index("for row in cohort.values()") < hashimoto_read.index(
+        "for key in selected_keys"
+    )
+    arm = residue.split(
+        "for alpha_arm, channels, alpha_records, row_key in arm_channels:", 1
+    )[1].split("prediction_rows.sort", 1)[0]
+    assert arm.count("with disclosure_scope(inherit=False):") == 1
+    assert '"law_disclosures"' in arm
+    assert "active_snapshot()" in arm
     knudsen = score.split("def _knudsen_residue_prediction(", 1)[1].split(
         "\ndef ", 1
     )[0]
@@ -3552,50 +3573,81 @@ def _hashimoto_score_context():
     return ScoreContext({}, experiments, observations), observations[f"{source}::h-00"]
 
 
-def _hashimoto_cohort_rows(experiments, code_revision, engine):
+def _hashimoto_arm_row(experiment_id, arm, oxides, disclosures):
     from types import SimpleNamespace
 
-    experiment_id = str(experiments[0]["experiment_id"])
-    values = {"FeO": 11.0, "MgO": 20.0}
-    band = {name: (value - 1.0, value + 1.0) for name, value in values.items()}
-    geometry = {"sphere_shrinking": dict(values)}
-    base = {
-        "code_revision": code_revision,
-        "engine": engine,
-        "geometry_refusal_by_geometry": {},
-    }
-
-    def row(arm: str, oxides: dict[str, float]):
-        return SimpleNamespace(
-            experiment_id=experiment_id,
-            alpha_arm=arm,
-            primary_geometry_policy_id="sphere_shrinking",
-            primary_oxide_wt_pct=dict(oxides),
-            geometry_oxide_wt_pct=geometry,
-            sensitivity_band_wt_pct=band,
-            provenance=dict(base),
-        )
-
-    return (
-        row("alpha_common_unity_sensitivity", values),
-        row("alpha_runtime_catalog", {**values, "FeO": 12.0}),
+    band = {name: (value - 1.0, value + 1.0) for name, value in oxides.items()}
+    return SimpleNamespace(
+        experiment_id=experiment_id,
+        alpha_arm=arm,
+        primary_geometry_policy_id="sphere_shrinking",
+        primary_oxide_wt_pct=dict(oxides),
+        geometry_oxide_wt_pct={"sphere_shrinking": dict(oxides)},
+        sensitivity_band_wt_pct=band,
+        provenance={
+            "geometry_refusal_by_geometry": {},
+            "law_disclosures": [dict(item) for item in disclosures],
+        },
     )
 
 
+def _assert_selected_hashimoto_disclosure(run, prediction) -> None:
+    """The scored experiment's two arms, and not the other experiment's law."""
+
+    counts = {
+        item["law_id"]: item["evaluation_count"] for item in run.snapshot()
+    }
+    assert counts == {_FE_ASSOCIATION_LAW_ID: 2}
+    _assert_replayed_fe(run.snapshot())
+    detail = prediction.refusal_detail["law_disclosures"]
+    assert [item["law_id"] for item in detail] == [_FE_ASSOCIATION_LAW_ID]
+    assert detail[0]["evaluation_count"] == 1
+    nested = prediction.refusal_detail["production_alpha_arm"]["provenance"]
+    assert [item["law_id"] for item in nested["law_disclosures"]] == [
+        _FE_ASSOCIATION_LAW_ID
+    ]
+
+
 def _exercise_hashimoto_cohort(_tmp_path, monkeypatch) -> None:
-    """Warm the Hashimoto cohort through ``_hashimoto_residue_prediction``."""
+    """Warm a 24-experiment Hashimoto cohort and score only h-00.
+
+    h-00's two arms each execute the Fe law once. h-01's primary arm records
+    an unrelated SiO extrapolation with count 3. The other arms record a
+    measured empty. Scoring h-00 replays Fe with count 2 and leaves SiO on
+    h-01's stored row. A one-experiment cohort, or one snapshot copied onto
+    every row, cannot see this.
+    """
 
     import simulator.battery.residue as residue
     from simulator.battery.enums import Engine, ExecutionState
     from simulator.battery.score import _hashimoto_residue_prediction
 
     calls = {"n": 0}
+    arms = ("alpha_common_unity_sensitivity", "alpha_runtime_catalog")
 
     def fake_cohort(experiments, _catalog, *, preform_dimensions_mm, code_revision, engine):
-        del preform_dimensions_mm
+        del preform_dimensions_mm, code_revision, engine
         calls["n"] += 1
-        _fe_pressure("FeO_association_gas")
-        return _hashimoto_cohort_rows(experiments, code_revision, engine)
+        rows = []
+        for experiment in experiments:
+            experiment_id = str(experiment["experiment_id"])
+            for arm in arms:
+                if experiment_id == "h-00":
+                    with disclosure_scope(inherit=False) as arm_registry:
+                        _fe_pressure("FeO_association_gas")
+                        disclosures = arm_registry.snapshot()
+                elif (
+                    experiment_id == "h-01"
+                    and arm == "alpha_common_unity_sensitivity"
+                ):
+                    disclosures = (_owner_law("SiO:antoine", count=3),)
+                else:
+                    disclosures = ()
+                oxides = {"FeO": 12.0 if arm == "alpha_runtime_catalog" else 11.0, "MgO": 20.0}
+                rows.append(
+                    _hashimoto_arm_row(experiment_id, arm, oxides, disclosures)
+                )
+        return tuple(rows)
 
     monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", fake_cohort)
     context, reference = _hashimoto_score_context()
@@ -3605,21 +3657,25 @@ def _exercise_hashimoto_cohort(_tmp_path, monkeypatch) -> None:
         prediction = _hashimoto_residue_prediction(context, reference, engine, cache)
         assert prediction.execution.state is ExecutionState.PRODUCED, prediction.refusal_detail
         assert calls["n"] == 1
-        assert prediction.refusal_detail["law_disclosures"]
-        _assert_replayed_fe(run_a.snapshot())
+        _assert_selected_hashimoto_disclosure(run_a, prediction)
+        stored = next(iter(cache.values()))
+        other = stored["h-01::alpha_common_unity_sensitivity"].provenance[
+            "law_disclosures"
+        ]
+        assert other[0]["law_id"] == "SiO:antoine"
+        assert other[0]["evaluation_count"] == 3
     with disclosure_scope(inherit=False) as run_b:
         again = _hashimoto_residue_prediction(context, reference, engine, cache)
         assert again.execution.state is ExecutionState.PRODUCED, again.refusal_detail
         assert calls["n"] == 1
-        assert again.refusal_detail["law_disclosures"]
-        _assert_replayed_fe(run_b.snapshot())
+        _assert_selected_hashimoto_disclosure(run_b, again)
     for row in next(iter(cache.values())).values():
         row.provenance.pop("law_disclosures")
     with disclosure_scope(inherit=False) as run_c:
         recomputed = _hashimoto_residue_prediction(context, reference, engine, cache)
         assert recomputed.execution.state is ExecutionState.PRODUCED, recomputed.refusal_detail
         assert calls["n"] == 2
-        _assert_replayed_fe(run_c.snapshot())
+        _assert_selected_hashimoto_disclosure(run_c, recomputed)
 
 
 def _knudsen_extent_inputs():
@@ -4224,15 +4280,60 @@ def _published_owner_disclosures(publisher: str, owner) -> tuple[dict, ...]:
         assert rows
         raw = rows[-1].get("law_disclosures") or ()
         return tuple(raw)
+    if publisher == "runner_failure":
+        from types import SimpleNamespace
+
+        from simulator.runner import RunnerError, _runner_failure_result
+
+        execution = SimpleNamespace(
+            session=None,
+            simulator=owner,
+            per_hour=(),
+            snapshots=(),
+            backend_status="unavailable",
+            backend_authoritative=False,
+            refusal_diagnostic={},
+            campaigns_elapsed=1.0,
+            shadow_trace=(),
+            status="failed",
+            reason="",
+            error_message="",
+            reduced_real_cache={},
+        )
+        measured = published_run_disclosures(execution)
+        payload = _runner_failure_result(
+            error=RunnerError("disclosure probe"),
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C0",
+            hours=1,
+            mass_kg=1.0,
+            additives_kg={},
+            track="pyrolysis",
+            backend_name="internal-analytical",
+            engines={},
+            metadata_overrides={},
+            execution=execution,
+        )
+        installed = tuple(
+            item
+            for item in payload["run_metadata"].get("law_disclosures") or ()
+            if isinstance(item, dict)
+        )
+        if measured:
+            assert installed == measured
+        else:
+            assert installed == ()
+        return measured
     raise AssertionError(publisher)
 
 
-_OWNER_PUBLISHERS = ("ledger_api", "yield_disposition")
+_OWNER_PUBLISHERS = ("ledger_api", "yield_disposition", "runner_failure")
 _OWNER_SCENARIOS = (
     "other_run_bound",
     "computation_partial",
     "measured_empty",
     "attribute_measured_empty",
+    "registry_over_empty_attribute",
 )
 
 
@@ -4246,8 +4347,11 @@ def test_publisher_reads_the_owning_run_disclosure(
 
     The bound registry in these arms is a different run or a computation
     sub-registry. Reading ``active_snapshot`` would publish that partial
-    or foreign disclosure. Deleting ``owning_run_disclosures`` from either
-    publisher makes that publisher's arms fail.
+    or foreign disclosure. The runner arm has no session: an empty
+    simulator attribute must stay empty, and a durable registry on that
+    simulator wins over the empty attribute. Deleting
+    ``owning_run_disclosures`` from a publisher makes that publisher's arms
+    fail.
     """
 
     owner_law = _owner_law("Fe:ellingham", count=2)
@@ -4293,6 +4397,22 @@ def test_publisher_reads_the_owning_run_disclosure(
             foreign.reregister_public((foreign_law,))
             published = _published_owner_disclosures(publisher, owner)
         assert published == ()
+        return
+    if scenario == "registry_over_empty_attribute":
+        owner = _disclosure_owner((), registry=False)
+        owner.law_disclosures = ()
+        registry = RunDisclosure()
+        registry.reregister_public((owner_law,))
+        owner._law_disclosure_registry = registry
+        with disclosure_scope(inherit=False) as foreign:
+            foreign.reregister_public((foreign_law,))
+            assert any(
+                item["law_id"] == "SiO:antoine" for item in active_snapshot()
+            )
+            published = _published_owner_disclosures(publisher, owner)
+        ids = {item["law_id"] for item in published}
+        assert ids == {"Fe:ellingham"}
+        assert published[0]["evaluation_count"] == 2
         return
     raise AssertionError(scenario)
 
