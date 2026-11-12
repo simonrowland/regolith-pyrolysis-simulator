@@ -1613,6 +1613,7 @@ def test_thermoengine_fe_redox_reaches_equilibrate_cell_with_cache_enabled(
         "stores": 1,
         "store_error": 0,
         "read_error": 0,
+        "conflicts": 0,
     }
 
 

@@ -81,4 +81,5 @@ def test_isolated_cell_qualification_decoration_is_omitted_from_cache_key(
         "stores": 1,
         "store_error": 0,
         "read_error": 0,
+        "conflicts": 0,
     }

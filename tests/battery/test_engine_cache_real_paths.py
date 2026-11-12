@@ -1092,6 +1092,7 @@ def test_each_real_backend_equilibrate_warm_pair_matches_cache_off(
             "stores": 1,
             "store_error": 0,
             "read_error": 0,
+            "conflicts": 0,
         }
     finally:
         close_battery_engine_handle(handle)
@@ -1514,6 +1515,7 @@ def test_openimcc_gas_cache_key_tracks_pack_selection_only(
         "stores": 2,
         "store_error": 0,
         "read_error": 0,
+        "conflicts": 0,
     }
 
 
