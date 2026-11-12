@@ -346,18 +346,22 @@ def test_screened_missing_alpha_omits_only_a_proved_sub_tolerance_bound():
     The proved-below case is an authorized zero with the bound recorded,
     not an empty result.
 
-    Hot arithmetic, T = 1800 K, M = 0.084 kg/mol, P = 1 Pa, A = 1 m^2,
+    Hot arithmetic uses the formula owner's CrO2 molar mass,
+    resolve_species_formula("CrO2").molar_mass_g_per_mol() = 83.9941 g/mol
+    (M = 0.0839941 kg/mol), at T = 1800 K, P = 1 Pa, A = 1 m^2,
     t = 3600 s, R = 8.314462618 J/mol/K:
         k = sqrt(M / (2 * pi * R * T))
-          = sqrt(0.084 / (2 * pi * 8.314462618 * 1800))
-          = 9.451404790080771e-4 kg/(m^2*Pa*s)
-        mass = k * P * A * t = 3.4025057244290777 kg
+          = 9.451072859917244e-4 kg/(m^2*Pa*s)
+        mass = k * P * A * t = 3.4023862295702076 kg
     which is not below 1e-12. The negligible case is the same product at
     P = 1e-40 Pa, about 3.4e-40 kg. A missing seam pressure is not that proof.
     """
 
+    from simulator.accounting.formulas import resolve_species_formula
+
+    cro2_molar_g_mol = resolve_species_formula("CrO2").molar_mass_g_per_mol()
     common = dict(
-        molar_mass_g_mol={"CrO2": 84.0},
+        molar_mass_g_mol={"CrO2": cro2_molar_g_mol},
         temperature_K=1800.0,
         area_m2=1.0,
         duration_s=3600.0,
@@ -392,7 +396,10 @@ def test_screened_missing_alpha_omits_only_a_proved_sub_tolerance_bound():
 
     # Same product as the hot line, scaled by P = 1e-40.
     cold_mass_kg = (
-        hertz_knudsen_k_kg_s_m2_pa(1800.0, 0.084) * 1.0e-40 * 1.0 * 3600.0
+        hertz_knudsen_k_kg_s_m2_pa(1800.0, cro2_molar_g_mol / 1000.0)
+        * 1.0e-40
+        * 1.0
+        * 3600.0
     )
     assert record["bound_kg"] == pytest.approx(cold_mass_kg, rel=1e-12, abs=0.0)
     assert record["bound_kg"] < DEFAULT_BALANCE_TOLERANCE_KG
