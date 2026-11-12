@@ -56,6 +56,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.physical_constants import GAS_CONSTANT
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -119,7 +120,7 @@ ONEILL_IW_TEMPERATURE_RANGES_K = (
     (1184.0, 1450.0),
 )
 ONEILL_IW_UNCERTAINTY_J_MOL = 100.0
-_ONEILL_IW_R = 8.31446261815324
+_ONEILL_IW_R = GAS_CONSTANT
 _ONEILL_IW_LN10 = math.log(10.0)
 
 
@@ -427,10 +428,9 @@ def holzheid_feo_liquid_delta_g_j_mol(T_K: float) -> float:
 def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
     """Return the Holzheid activity-bearing IW relation for a_FeO input."""
     activity = max(float(a_feo), 1.0e-300)
-    R = 8.31446261815324
     ln_fO2 = 2.0 * (
         math.log(activity)
-        + holzheid_feo_liquid_delta_g_j_mol(T_K) / (R * float(T_K))
+        + holzheid_feo_liquid_delta_g_j_mol(T_K) / (GAS_CONSTANT * float(T_K))
     )
     return ln_fO2 / math.log(10.0)
 

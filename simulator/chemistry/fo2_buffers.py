@@ -65,6 +65,8 @@ from simulator.oxygen_buffers import (
     oneill_1987_qfm_log10_fO2_bar,
     oneill_iw_log10_fO2_bar,
 )
+from simulator.physical_constants import GAS_CONSTANT_DECIMAL
+
 # 1 atm = 1.01325 bar. log10(fO2/bar) = log10(fO2/atm) + log10(1.01325).
 _ATM_BAR = Decimal("1.01325")
 _LOG10_ATM_TO_BAR = _ATM_BAR.log10()
@@ -409,9 +411,8 @@ def _log_nno_charette(temperature_K: Decimal, pressure_bar: Decimal | None) -> D
 #   ΔrG = ΔfG(MoO2) − ΔfG(Mo). JANAF Mo-009 and Mo-002.
 #   This is the formation reaction, so log10(fO2/bar) = −log10(Kf) when
 #   ΔfG(Mo) is 0. Unit check against the MoO2 log-Kf column (3 d.p., the
-#   table's precision), CODATA R = 8.31446261815324 J K^-1 mol^-1
-#   (simulator.physical_constants.GAS_CONSTANT, those digits stored here
-#   as Decimal so the float's binary expansion is not re-parsed):
+#   table's precision). CODATA R is GAS_CONSTANT_DECIMAL
+#   (Decimal(str(GAS_CONSTANT)), so the float is not re-parsed):
 #   1000 K −21.1754
 #   rounds to the printed −21.176; 1400 K −12.5887 rounds to −12.589.
 #   A second factor of 2 would land near −25 at 1400 K. O'Neill's fit
@@ -431,7 +432,7 @@ def _log_nno_charette(temperature_K: Decimal, pressure_bar: Decimal | None) -> D
 # O'Neill 1986 −11.6492; JANAF MH −2.5237 against Haas Table 10.9
 # −2.7641; JANAF MW −9.8320 against Haas Table 10.7 −9.1649.
 # O'Neill μ fits keep R = 8.31441. The JANAF route uses the CODATA R.
-_R_CODATA = Decimal("8.31446261815324")
+_R_CODATA = GAS_CONSTANT_DECIMAL
 # Region 3. The token is NoticeKind.BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS.
 UNSIZED_BAND_NOTICE = "buffer_band_unsized_beyond_all_calibrations"
 _MW_DIVERGENCE_NOTE = (

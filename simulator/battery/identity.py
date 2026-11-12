@@ -121,7 +121,7 @@ from simulator.battery.records import (
 )
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
-    GAS_CONSTANT,
+    GAS_CONSTANT_DECIMAL,
     PA_PER_BAR,
     STANDARD_ATMOSPHERE_PA,
 )
@@ -156,7 +156,7 @@ PA_PER_ATM_DEC = Decimal(str(int(STANDARD_ATMOSPHERE_PA)))
 CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 
 # R as used for ΔfG ↔ log10 Kf in *cross-source* identity. CODATA / SI 2019
-# R = N_A k_B = 8.314462618… J/(mol·K) from physical_constants.GAS_CONSTANT.
+# R = N_A k_B from physical_constants.GAS_CONSTANT_DECIMAL.
 # Source-era transcription constants (JANAF 8.31441, B1544 8.3143,
 # B1259 1.98717 cal/(mol·K)) stay on their generators; see this
 # module's Gas-constant policy docstring.
@@ -167,7 +167,7 @@ CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 # Unit check: kJ/mol divided by [kJ/(mol·K)]·K is dimensionless (dex).
 # B1544's ±1.320 kJ/mol at 298.15 K gives 1.320/(R·T·ln 10) = 0.231 dex.
 LN10 = Decimal(str(math.log(10.0)))
-R_J_PER_MOL_K = Decimal(str(GAS_CONSTANT))
+R_J_PER_MOL_K = GAS_CONSTANT_DECIMAL
 R_KJ_PER_MOL_K = R_J_PER_MOL_K / Decimal("1000")
 
 # Fixed-valence domain for condensed oxide-activity comparison. Roy &

@@ -18,6 +18,7 @@ from simulator.oxygen_buffers import (
     feo_iw_log10_fO2_bar,
     legacy_iw_log10_fO2_bar,
 )
+from simulator.physical_constants import GAS_CONSTANT
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -766,8 +767,7 @@ def ban_ya_quadratic_gamma_feo(
                 alpha_fe_a + alpha_fe_b - alpha_ab
             ) * candidate[cation_a] * candidate[cation_b]
 
-    R = 8.31446261815324
-    ln_gamma = rt_ln_gamma / (R * float(T_K))
+    ln_gamma = rt_ln_gamma / (GAS_CONSTANT * float(T_K))
     gamma = math.exp(max(-745.0, min(709.0, ln_gamma)))
     return {
         'status': 'ok' if not missing else 'ok_with_ocr_gaps',
