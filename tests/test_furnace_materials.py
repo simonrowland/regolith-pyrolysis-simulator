@@ -4,9 +4,11 @@ import pytest
 import yaml
 
 from simulator.core import CampaignPhase
+from simulator import furnace_materials
 from simulator.furnace_materials import (
     ALLOWED_FURNACE_GROUNDING_TIERS,
     CERTIFIED_WALL_ANCHORED_FURNACE_MATERIALS,
+    FurnaceMaterialCatalogLoadError,
     load_furnace_materials,
     resolve_furnace_max_T_C,
     resolve_furnace_temperature_caps,
@@ -59,6 +61,20 @@ _ENABLED_FINITE_FURNACE_MATERIALS = sorted(
 def _load_yaml(path):
     with path.open() as handle:
         return yaml.safe_load(handle)
+
+
+def test_runtime_envelope_refuses_catalog_load_failure_with_cause(monkeypatch):
+    load_error = OSError("catalog read failed")
+
+    def fail_load():
+        raise load_error
+
+    monkeypatch.setattr(furnace_materials, "load_furnace_materials", fail_load)
+    with pytest.raises(FurnaceMaterialCatalogLoadError) as refused:
+        furnace_materials._catalog_max_service_T_C()
+
+    assert refused.value.load_error is load_error
+    assert refused.value.__cause__ is load_error
 
 
 def test_catalog_loads_grounded_enabled_materials():
