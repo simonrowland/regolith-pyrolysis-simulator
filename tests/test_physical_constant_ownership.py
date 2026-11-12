@@ -13,10 +13,13 @@ import math
 from simulator.physical_constants import (
     BOLTZMANN,
     FARADAY,
+    FARADAY_10SIG,
     GAS_CONSTANT,
+    GAS_CONSTANT_6SIG,
     PA_PER_BAR,
     STANDARD_ATMOSPHERE_PA,
     STEFAN_BOLTZMANN,
+    STEFAN_BOLTZMANN_7SIG,
 )
 from simulator.state import (
     BOLTZMANN as STATE_BOLTZMANN,
@@ -54,6 +57,24 @@ def test_state_truncations_stay_distinct_from_the_leaf() -> None:
     assert STATE_GAS_CONSTANT != GAS_CONSTANT
     assert STATE_FARADAY != FARADAY
     assert STATE_STEFAN_BOLTZMANN != STEFAN_BOLTZMANN
+    assert STATE_GAS_CONSTANT is GAS_CONSTANT_6SIG
+    assert STATE_FARADAY is FARADAY_10SIG
+    assert STATE_BOLTZMANN is BOLTZMANN
+    assert STATE_STEFAN_BOLTZMANN is STEFAN_BOLTZMANN_7SIG
+
+
+def test_six_sig_callers_use_the_owner_object() -> None:
+    from simulator.chemistry.ellingham_graph import (
+        GAS_CONSTANT_J_PER_MOL_K as ellingham_r,
+    )
+    from simulator.chemistry.organics_pyrolysis import (
+        GAS_CONSTANT_J_PER_MOL_K as organics_r,
+    )
+    from simulator.equipment import STEFAN_BOLTZMANN as equipment_stefan
+
+    assert ellingham_r is GAS_CONSTANT_6SIG
+    assert organics_r is GAS_CONSTANT_6SIG
+    assert equipment_stefan is STEFAN_BOLTZMANN_7SIG
 
 
 def test_ten_significant_figure_gas_constant_is_not_the_leaf() -> None:
