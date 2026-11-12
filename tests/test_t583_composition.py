@@ -125,10 +125,15 @@ def test_coverage_composition_verdicts_match_green_snapshot() -> None:
         records.append((row["element"], row["carrier"], verdict))
 
     encoded = json.dumps(records, sort_keys=True, separators=(",", ":")).encode()
-    assert len(entries) == 1592
+    # b-114 opened the C1 alpha contract for broad-proxy carriers outside the
+    # shipped eight-species alpha=1 allowlist. These ten element/carrier pairs
+    # were not already on the ledger: C/CH4, C/CO, C/CO2, Cl/KCl, Cl/NaCl,
+    # H/CH4, H/NH3, K/KCl, N/NH3, Na/NaCl. typed_refusal is unchanged for every
+    # pre-existing row, so the refusal count stays 878.
+    assert len(entries) == 1602
     assert refusal_count == 878
     assert hashlib.sha256(encoded).hexdigest() == (
-        "53b7f0ba141bfd4b840f3a6df25b23a1b4635b352303f48211115bcb43b2439b"
+        "e257936870e2017cbaced86172e97849ff986f2ee656b60625ea32cedb260851"
     )
 
 

@@ -47,10 +47,7 @@ def _active_pressure_rows(temperature_C: float) -> list[dict[str, object]]:
     )
     if batch is None:
         raise RuntimeError("vapour batch resolution returned no batch")
-    selected_pressures, overlay = flux_pressures_from_batch(
-        batch,
-        effective_pressure_source=effective_source,
-    )
+    selected_pressures, overlay = flux_pressures_from_batch(batch)
 
     rows: list[dict[str, object]] = []
     for species_id in sorted(batch.flux_active_species_ids):

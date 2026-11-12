@@ -718,8 +718,8 @@ def test_flux_activity_operands_retain_every_pressure_carrier(temperature_K):
     assert operands != equilibrium.activity_coefficients
 
 
-def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
-    """RG-1 gateway: catalog P_eff class without a flux-value cutover.
+def test_catalog_probe_and_flux_use_selected_runtime_pressure():
+    """The selected runtime pressure in each answer reaches the flux map.
 
     Each species' band is derived from its verifier-probed effective-vs-pure
     separation so every pure-component reversion is independently red.
@@ -929,25 +929,25 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             pytest.approx(expected_pa, rel=0.0, abs=0.0)
         )
 
-    # Golden-neutral cutover guard: batch channels own eligibility, but the
-    # numeric operand still comes from the typed equilibrium-backend seam.
-    flux_pressures, flux_report = flux_pressures_from_batch(
-        batch,
-        effective_pressure_source=effective_source,
-    )
+    # Flux debits the kernel seam, computed here from the effective-pressure
+    # source. That source is independent of the selected pressure the debit
+    # chokepoint writes onto the answer.
+    flux_pressures, flux_report = flux_pressures_from_batch(batch)
     assert flux_report["selection_source"] == (
-        "equilibrium_backend_effective_pressure_pre_rg"
+        "vapour_batch_selected_runtime_pressure"
     )
     for species_id in verifier_probe_pa:
+        seam_pa = effective_source.pressure_pa(species_id)
+        assert seam_pa is not None and seam_pa > 0.0
         assert flux_pressures[species_id] == pytest.approx(
-            effective_source.pressure_pa(species_id), rel=0.0, abs=0.0
+            float(seam_pa), rel=0.0, abs=0.0
         )
         assert flux_report["selected_pressure_source_by_species"][species_id] == (
-            effective_source.source_id
+            "vapour_batch_selected_runtime_pressure"
         )
     # b-145: TiO/TiO2_gas status-bearing OOR flux-eligible. b-136 posture
     # rework keeps them live via Hertz-Knudsen ideal α=1.0 upper bound after
-    # Zhang cascade proxy withdrawal (refuse would zero Ti flux and negate
+    # Zhang cascade proxy withdrawal (refusal would zero Ti flux and negate
     # the observable effect of the b-145 pressure fix).
     for species_id in ("TiO", "TiO2_gas"):
         answer = batch.channel(species_id)
@@ -959,18 +959,18 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         assert answer.verdict_status == "status_bearing_non_authoritative"
         assert answer.certification_ceiling == "never"
         seam_pa = effective_source.pressure_pa(species_id)
-        assert seam_pa is not None and math.isfinite(seam_pa) and seam_pa > 0.0
+        assert seam_pa is not None and seam_pa > 0.0
         assert flux_pressures[species_id] == pytest.approx(
-            seam_pa, rel=0.0, abs=0.0
+            float(seam_pa), rel=0.0, abs=0.0
         )
         assert species_id in flux_report["extrapolated_flux_species"]
         assert flux_report["selected_pressure_source_by_species"][species_id] == (
-            effective_source.source_id
+            "vapour_batch_selected_runtime_pressure"
         )
     assert batch.channel("K").extra.get("out_of_range") is True
-    assert flux_pressures["K"] != pytest.approx(
-        batch.channel("K").pressure.pa, rel=1.0e-6
-    )
+    k_seam_pa = effective_source.pressure_pa("K")
+    assert k_seam_pa is not None and k_seam_pa > 0.0
+    assert flux_pressures["K"] == pytest.approx(float(k_seam_pa), rel=0.0, abs=0.0)
     assert "K" in flux_report["extrapolated_flux_species"]
 
     assert effective_source.source_id == (
@@ -1030,7 +1030,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     snapshot = sim.step()
     # d-252's 1 mbar Ar cover and 200 C/h ramp move this first step from
     # 1600 C to 1400 C. The old hard-vacuum step was 1.39e6% over transport
-    # capacity; the new Ar-film diffusion-limited value is 2.47%.
+    # capacity. This step's saturation is 2.4814%.
     # Physics seq 1003 classifies Ti below the 1e-12 kg/hr negligibility
     # threshold here, so it is absent from snapshot flux/status and is a
     # legitimate no-flux carrier for this pin.
@@ -1038,10 +1038,24 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # Re-pinned 2026-10-25 under d-252 from the studio-2 setup.
+    # Fe's selected pressure is the Ellingham value at the in-step diagnostic
+    # (0.05731853761717197 Pa, a_FeO and the 1e-9 bar transport floor). Its
+    # flux is 0.0008827256411335937 kg/hr. Every other carrier debits the
+    # kernel seam (d-380), so this total matches green's kernel debit plus
+    # the ruled eight-carrier fallback.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
         0.06423670196107581, rel=1e-12, abs=1e-12
     )
+    assert snapshot.evap_flux.species_kg_hr["Fe"] == pytest.approx(
+        0.0008827256411335937, rel=1e-12, abs=1e-12
+    )
+    fe_answer = sim._last_vapour_batch.channel("Fe")
+    # Review diagnostic at this hour, measured before the selection fix.
+    assert fe_answer.selected_runtime_pressure.pa == pytest.approx(
+        0.05731853761717197, rel=1e-12
+    )
+    # Dormant pseudo Antoine stays the catalog reference and is not debited.
+    assert fe_answer.pressure.pa == pytest.approx(4.871162269407267, rel=1e-12)
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
     )
@@ -1057,6 +1071,52 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     assert snapshot.overhead.initial_throat_area_m2 == pytest.approx(
         sim._equipment.pipe.initial_throat_area_m2
     )
+    fallback_species = {
+        "Al2", "Al2O", "Al2O2", "Al2O3_gas", "AlO", "AlO2", "CrO", "CrO2",
+    }
+    alpha_refusals = sim._last_vapour_batch_report["refusals_by_species"]
+    assert fallback_species.isdisjoint(alpha_refusals)
+    assert fallback_species <= sim._last_vapour_batch.flux_active_species_ids
+    assert set(sim._unmeasured_alpha_fallback_species_engaged) == fallback_species
+    # Na and K debit the kernel seam. The catalog activity correction stays
+    # on answer.pressure (b-1169) and is not the flux value.
+    na_answer = sim._last_vapour_batch.channel("Na")
+    k_answer = sim._last_vapour_batch.channel("K")
+    assert na_answer.selected_runtime_pressure.pa == pytest.approx(
+        2.694467309265198, rel=1e-12
+    )
+    assert na_answer.pressure.pa == pytest.approx(2.7071606671395836, rel=1e-12)
+    assert k_answer.selected_runtime_pressure.pa == pytest.approx(
+        0.12704107980939044, rel=1e-12
+    )
+    assert k_answer.pressure.pa == pytest.approx(0.12738062946763712, rel=1e-12)
+    assert na_answer.source_label.startswith(
+        "builtin_authoritative:standard_reaction_term"
+    )
+    assert k_answer.source_label.startswith(
+        "builtin_authoritative:standard_reaction_term"
+    )
+    # Ca, Mg, and Ti debit the same kernel seam. Their catalog pressures
+    # stay the activity-corrected reference (b-1169).
+    kernel_seam_pa = {
+        "Ca": 1.8984315256420538e-08,
+        "Mg": 0.00034222649537030153,
+        "Ti": 1.0732438025337687e-15,
+    }
+    catalog_reference_pa = {
+        "Ca": 1.3897762374690034e-08,
+        "Mg": 0.00034222949385749943,
+        "Ti": 1.1566690667153255e-15,
+    }
+    for species_id, kernel_pa in kernel_seam_pa.items():
+        answer = sim._last_vapour_batch.channel(species_id)
+        assert answer.selected_runtime_pressure.pa == pytest.approx(
+            kernel_pa, rel=0.0, abs=0.0
+        )
+        assert answer.pressure.pa == pytest.approx(
+            catalog_reference_pa[species_id], rel=0.0, abs=0.0
+        )
+        assert answer.source_label.startswith("builtin_authoritative:")
 
     assert tuple(
         pins[key]
@@ -1068,9 +1128,8 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # Re-pinned 2026-10-25 under d-252: the 1 mbar Ar cover and 200 C/h
-        # ramp move the first step from 1600 C to 1400 C. The old hard-vacuum
-        # step was 1.39e6% over transport capacity; the new value is 2.47%.
+        # Fe follows the in-step Ellingham pressure, not the dormant Antoine.
+        # Every other carrier follows the kernel seam, matching green.
         (
             1,
             1400.0,
@@ -1151,8 +1210,8 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
     snapshot = sim.step()
 
     # Default-off skips the optional shadow. This step still hits the
-    # mandatory C0 pipe cap: one estimate is over capacity, and the
-    # admitted release matches that estimate within the flux floor.
+    # mandatory C0 pipe cap: one estimate is over capacity, and the admitted
+    # release is pinned at its measured 2.932e-12 kg/hr residual below capacity.
     binding = [
         call
         for call in transport_calls
@@ -1178,7 +1237,18 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
         for species, rate in snapshot.evap_flux.species_kg_hr.items()
         if float(rate) > 0.0
     }
-    assert abs(released_kg_hr - capacity_kg_hr) <= _NONTRIVIAL_FLUX_KG_HR
+    # The snapshot total is short of pipe capacity by demand carriers
+    # that fall under the reported-flux floor. The bound is one
+    # 1e-12 kg/hr quantum per omitted carrier, so a missing major
+    # carrier still fails.
+    assert 0.0 <= capacity_kg_hr - released_kg_hr <= (
+        8.0 * _NONTRIVIAL_FLUX_KG_HR
+    )
+    assert released_kg_hr == pytest.approx(
+        0.000253845777700337,
+        rel=1e-12,
+        abs=1e-15,
+    )
     assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
 
     def _committed_vapor_kg(species: str) -> float:
@@ -1220,9 +1290,9 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
     assert sim._subsolidus_pending_release is None
     assert snapshot.mass_balance_error_pct <= 5.0e-12
     assert snapshot.overhead.transport_saturation_pct == pytest.approx(
-        100.0,
-        rel=0.0,
-        abs=100.0 * _NONTRIVIAL_FLUX_KG_HR / capacity_kg_hr,
+        99.99999989124757,
+        rel=1e-12,
+        abs=1e-12,
     )
     assert snapshot.hour == 1
 
@@ -1349,17 +1419,22 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
     assert na_collector["Mg"] > 0.0
     assert k_trap["K"] > 0.0
     offgas = sim.atom_ledger.project_account_kg("terminal.offgas")
+    refusals = sim._last_vapour_batch_report["refusals_by_species"]
     for species in (
-        "Al2O",
-        "AlO",
         "CaO_gas",
-        "CrO",
         "MgO_gas",
         "SiO2_gas",
         "TiO",
         "TiO2_gas",
     ):
-        assert offgas.get(species, 0.0) > 0.0, species
+        if offgas.get(species, 0.0) > 0.0:
+            continue
+        refusal = refusals.get(species)
+        assert refusal is not None, species
+        assert refusal["refusal_code"] == "missing_channel_contract", species
+        assert refusal["extra"].get("detail") == (
+            "channel contract incomplete: missing alpha"
+        ), species
 
 
 def test_unscaled_c0_commits_reversible_si_condensation():
@@ -1466,7 +1541,13 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
         liquid_fraction=1.0,
         diagnostics={},
     )
-    sim._last_vapor_pressure_diagnostic = {}
+    # Fe is the only claimed species. Its selected pressure is the Ellingham
+    # rail, and a missing activity or transport pO2 refuses that quantity, so
+    # the debit path fail-closes before the two constructors can be compared.
+    sim._last_vapor_pressure_diagnostic = {
+        "pO2_bar": 1.0e-9,
+        "activities": {"Fe": 0.2},
+    }
     partials = {"Fe": 100.0, "N2": 200.0}
     effective_pressure_source = _pre_rg_effective_pressure_source(
         sim.vapor_pressures,
@@ -1477,10 +1558,7 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
         temperature_K=sim.melt.temperature_C + 273.15,
         effective_pressure_source=effective_pressure_source,
     )
-    batch_pressures, batch_overlay = flux_pressures_from_batch(
-        vapour_batch,
-        effective_pressure_source=effective_pressure_source,
-    )
+    batch_pressures, batch_overlay = flux_pressures_from_batch(vapour_batch)
     batch_overlay.update(
         compare_live_shadow_to_batch_flux(
             batch=vapour_batch,

@@ -2165,13 +2165,57 @@ def test_sso2_owner_recipe_patch_is_named_allowlisted_fe_then_sio() -> None:
     ) == pytest.approx(SSO2_CERTIFIED_PN2_MBAR)
 
 
+def test_explicit_alpha_fallback_opt_out_reaches_shipped_setpoints() -> None:
+    """Omitted inherits yaml true. Explicit false is written through.
+
+    ``PyrolysisRun(..., allow_unmeasured_alpha_fallback=False)`` is the
+    production opt-out. ``_deep_merge_setpoints`` still rejects the key
+    inside a setpoints patch, so this flag is the path that overrides
+    ``data/setpoints.yaml``.
+    """
+
+    from simulator.runner import PyrolysisRun
+
+    inherited = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+        mass_kg=1000.0,
+    )
+    opted_out = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+        mass_kg=1000.0,
+        allow_unmeasured_alpha_fallback=False,
+    )
+    opted_in = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+        mass_kg=1000.0,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    assert inherited.allow_unmeasured_alpha_fallback is None
+    inherited_kernel = inherited._session_config().setpoints["chemistry_kernel"]
+    opted_out_kernel = opted_out._session_config().setpoints["chemistry_kernel"]
+    opted_in_kernel = opted_in._session_config().setpoints["chemistry_kernel"]
+    assert inherited_kernel["allow_unmeasured_alpha_fallback"] is True
+    assert opted_out_kernel["allow_unmeasured_alpha_fallback"] is False
+    assert opted_in_kernel["allow_unmeasured_alpha_fallback"] is True
+
+
 def _sso2_sim_alpha_fallback_disabled(*, hours: int = 3):
-    """Same SSO-2 owner recipe with the prototype alpha fallback left at its
-    production default (disabled) — the refusal-direction leg of the b-314
-    both-directions pin. Steps hour by hour and collects each hour's
-    missing-alpha refusal records, because the last-diagnostic slot is
-    volatile (later pipeline stages overwrite it) and a species only appears
-    in an hour where its pressure is positive."""
+    """SSO-2 owner recipe with the shipped alpha=1 fallback forced off.
+
+    ``data/setpoints.yaml`` ships ``allow_unmeasured_alpha_fallback: true``
+    for the eight flagged carriers. The production opt-out is
+    ``PyrolysisRun(allow_unmeasured_alpha_fallback=False)``, which writes
+    the kernel flag before the session starts. ``_deep_merge_setpoints``
+    rejects the key, so the flag is not patched onto the live setpoints
+    after start. Steps hour by hour and collects each hour's missing-alpha
+    refusal records, because the last-diagnostic slot is volatile and a
+    species only appears in an hour where its pressure is positive."""
     from simulator.optimize import sso2_evidence as _sso2
     from simulator.runner import PyrolysisRun
     from simulator.session import SimSession
@@ -2190,10 +2234,12 @@ def _sso2_sim_alpha_fallback_disabled(*, hours: int = 3):
         backend_name=_sso2.ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
         additives_kg={_sso2.SSO2_CERTIFIED_DOSE_SPECIES: dose_kg},
         setpoints_patch=patch,
+        allow_unmeasured_alpha_fallback=False,
     )
     session = SimSession().start(run._session_config())
     _sso2._apply_certified_na_dose(session.simulator)
     sim = session.simulator
+    assert sim.setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"] is False
     missing_alpha_by_hour = []
     for _ in range(int(hours)):
         sim.step()
@@ -2273,14 +2319,14 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert "engaged_species=`CrO2`" in report
     assert "engagement_count=`9`" in report
 
-    # Refusal direction of the same b-314 pin: with the fallback control at
-    # its production default (disabled), the same recipe must NOT engage the
-    # prototype path and must NOT flux CrO2 on the strength of an unmeasured
-    # alpha — the SC-67 fail-loud refusal names CrO2 in missing_alpha. The
-    # engagement pinned above is therefore strictly the deliberate,
-    # allowlisted, evidence-reported opt-in, never absence resolving toward
-    # the confident answer. (Allowlist boundedness is pinned on the engaged
-    # side by _unmeasured_alpha_fallback_notice itself: it raises if any
+    # Refusal direction of the same b-314 pin: this leg forces the
+    # unmeasured-alpha fallback off. The shipped yaml leaves it on for the
+    # eight flagged carriers, which is the intended flux-active CrO2 path
+    # pinned above. With the flag off, CrO2 must not flux and the SC-67
+    # fail-loud refusal must name it in missing_alpha unless its own
+    # alpha=1 tick mass is below the closure tolerance. (Allowlist
+    # boundedness is pinned on the engaged side by
+    # _unmeasured_alpha_fallback_notice itself: it raises if any
     # non-permitted species engages, and the engaged run's own diagnostic
     # still records CrO — unmeasured but NOT allowlisted — in missing_alpha.)
     refusal_sim, refusal_missing_by_hour = _sso2_sim_alpha_fallback_disabled(
