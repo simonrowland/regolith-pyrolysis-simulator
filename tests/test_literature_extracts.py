@@ -2557,7 +2557,7 @@ def test_corpus_fidelity_gate_rejects_copied_unattested_values():
     doc["fidelity_samples"][0]["value"] = 0.9
     doc["species"]["Fe"]["observations"][0]["values"]["alpha"] = 0.9
 
-    errors = vle._check_fidelity_gate(doc, label="copied-pin")
+    errors = vle.certify_extract_source_fidelity(doc, label="copied-pin")
 
     assert any("reviewed_by is required" in error for error in errors), errors
 
@@ -2628,7 +2628,7 @@ def test_corpus_fidelity_gate_rejects_observation_id_as_evidence():
         }
     ]
 
-    errors = vle._check_fidelity_gate(doc, label="metadata-pin")
+    errors = vle.certify_extract_source_fidelity(doc, label="metadata-pin")
 
     assert any("fidelity sample coverage missing" in error for error in errors), errors
 

@@ -4949,13 +4949,18 @@ def test_composition_cell_classifier_matches_green_numeric_reader_union() -> Non
     )
 
     for label, raw, strict_amount, printed_amount, located_amount in cases:
-        assert migrate_module._as_dec_or_none(raw) == strict_amount, label
+        strict_amount_read = migrate_module._as_dec_or_none(raw)
+        assert strict_amount_read == strict_amount, label
         assert migrate_module._printed_composition_amount(raw) == printed_amount, label
         try:
             located = migrate_module._point_condition_from_plain(
                 raw, key="H2O_EMPA"
             )
-        except (TypeError, ValueError, ArithmeticError):
+        except (
+            TypeError,
+            ValueError,
+            ArithmeticError,
+        ):
             located_amount_read = None
         else:
             located_amount_read = (
