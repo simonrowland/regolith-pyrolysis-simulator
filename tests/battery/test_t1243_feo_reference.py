@@ -743,7 +743,17 @@ def test_distin_closed_solver_refuses_off_fe_metal_segment(migration, monkeypatc
         redox,
         "evaluate_redox",
         lambda *_args, **_kwargs: SimpleNamespace(
-            metal_buffered=False, flags=("not_on_fe_metal_segment",)
+            temperature_K=float(observation.identity.temperature_K.value),
+            mode="closed",
+            lambda_ln_f_o2=0.0,
+            parent_activity={"FeO": 1.0},
+            ferric_fe_mol=0.0,
+            ferrous_fe_mol=1.0,
+            metal_buffered=False,
+            flags=("not_on_fe_metal_segment",),
+            extrapolated_redox_rows=(),
+            active_row_band_intersection_K=(),
+            redox_pack_digest="test-redox-pack",
         ),
     )
 
