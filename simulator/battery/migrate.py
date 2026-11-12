@@ -77,6 +77,7 @@ import yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
+from simulator.battery.source_declarations import SOURCE_DECLARATIONS
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.polymorph_dictionary import (
     POLYMORPH_ALIASES,
@@ -29815,19 +29816,16 @@ class Migrator:
             subtype = _residue_component_subtype(value_sel.field_name)
             if subtype is not None:
                 ident_kwargs["subtype"] = State.of(subtype)
-        if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
-            if source_id == "kems-015-hashimoto-1983":
-                # Hashimoto Table 3 (p. 116) is the recovered spherule's bulk composition;
-                # the source describes a silicate melt and says the single spherule appears
-                # after quenching (p. 113, Experimental device). Preserve the run-end liquid
-                # phase: the modeled and measured objects are the same bulk oxide inventory.
-                species = make_species(species.formula, Phase.L, charge=species.charge)
-            elif source_id == "kems-012-sossi-2019":
-                # Sossi Table 2 (OCR §4.0, lines 202-203) measures residue ppm in quenched
-                # glass; its extract locator likewise identifies LA-ICP-MS on quenched glass.
-                species = make_species(
-                    species.formula, Phase.GLASS, charge=species.charge
-                )
+        residue_phase = SOURCE_DECLARATIONS.get(source_id, {}).get(
+            "residue_component_phase"
+        )
+        if (
+            q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and residue_phase is not None
+        ):
+            species = make_species(
+                species.formula, residue_phase.value, charge=species.charge
+            )
         if printed_phase_kind == "liquid":
             species = make_species(species.formula, Phase.L, charge=species.charge)
         elif printed_phase_kind == "two_phase":
