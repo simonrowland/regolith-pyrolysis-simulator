@@ -4160,6 +4160,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         *,
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,
+        p_upstream_bar: Optional[float] = None,
     ) -> Any:
         configured = self._overhead_headspace_config.get('conductance_kg_s')
         if configured is None:
@@ -4177,10 +4178,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return value
         if species_kg_for_M_avg is None:
             species_kg_for_M_avg = self._overhead_holdup_species_kg()
-        p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
-        # This is the upstream-to-vacuum carrying limit C0. Controlled-pO2
-        # runtime passes it through the provider-owned flow-capacity result;
-        # pressure-bound modes retain the provider's finite-P2 derate.
+        if p_upstream_bar is None:
+            # Setpoint carrying limit. Callers that then derate with the
+            # inventory pressure must pass that pressure instead: capacity
+            # against vacuum scales as P_up^2.
+            p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
+        else:
+            # Premise: the bleed fraction treats this return as the vacuum
+            # capacity at the same P1 it derates. Algebra:
+            # C(P)/C(P_set) = (P/P_set)^2. Unit check: bar * 1e5 Pa/bar
+            # = Pa. Limit: P = 0 removes nothing; P = P_set matches the
+            # setpoint branch when that branch is not sitting on its 1 Pa floor.
+            try:
+                upstream_bar = float(p_upstream_bar)
+            except (TypeError, ValueError):
+                return p_upstream_bar
+            if not math.isfinite(upstream_bar) or upstream_bar < 0.0:
+                return p_upstream_bar
+            p_mean_Pa = upstream_bar * 1.0e5
+        # Upstream-to-vacuum carrying limit. Controlled-pO2 runtime passes
+        # it through the provider-owned flow-capacity result; pressure-bound
+        # modes retain the provider's finite-P2 derate.
         return max(
             0.0,
             float(self.overhead_model._pipe_conductance(
@@ -7758,6 +7776,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         force_drain_all: bool = False,
         capacity_result=None,
         effective_transport_capacity=None,
+        conductance_kg_s: Optional[float] = None,
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
@@ -7770,8 +7789,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'bleed_conductance_kg_s': (
                 effective_transport_capacity.pipe_capacity_kg_hr / 3600.0
                 if effective_transport_capacity is not None
-                else self._headspace_bleed_conductance_kg_s(
-                    species_kg_for_M_avg=species_kg_for_M_avg,
+                else (
+                    conductance_kg_s
+                    if conductance_kg_s is not None
+                    else self._headspace_bleed_conductance_kg_s(
+                        species_kg_for_M_avg=species_kg_for_M_avg,
+                    )
                 )
             ),
             'p_total_bar': diagnostic.get('p_total_bar'),
@@ -16244,9 +16267,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         inventory_kg = math.fsum(species_kg.values())
         inventory_mol = math.fsum(float(mol) for mol in holdup.values())
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
-        conductance = self._headspace_bleed_conductance_kg_s(
-            species_kg_for_M_avg=species_kg,
-        )
+        # The fraction's P1 is the inventory total, not the campaign
+        # setpoint. Conductance has to be the vacuum capacity at that
+        # same pressure or the pipe is small by (P_inventory/P_set)^2
+        # and the surface still reads nRT/V of the unbled excess.
+        try:
+            inventory_upstream_bar = float(diagnostic.get('p_total_bar') or 0.0)
+        except (TypeError, ValueError):
+            inventory_upstream_bar = None
+        if (
+            inventory_upstream_bar is None
+            or not math.isfinite(inventory_upstream_bar)
+        ):
+            conductance = self._headspace_bleed_conductance_kg_s(
+                species_kg_for_M_avg=species_kg,
+            )
+        else:
+            conductance = self._headspace_bleed_conductance_kg_s(
+                species_kg_for_M_avg=species_kg,
+                p_upstream_bar=inventory_upstream_bar,
+            )
         try:
             conductance_kg_s = float(conductance)
         except (TypeError, ValueError):
@@ -16289,7 +16329,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         notices = []
                         self._capacity_violation_notices = notices
                     notices.append(dict(stamped))
-        self._dispatch_overhead_bleed()
+        self._dispatch_overhead_bleed(
+            conductance_kg_s=(
+                conductance_kg_s
+                if (
+                    conductance_kg_s is not None
+                    and math.isfinite(conductance_kg_s)
+                    and conductance_kg_s >= 0.0
+                )
+                else None
+            ),
+        )
 
     def _step_one_hour(self) -> HourSnapshot:
         """

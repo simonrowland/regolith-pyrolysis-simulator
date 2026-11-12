@@ -49,6 +49,31 @@ def test_capacity_violation_reports_both_rates_and_does_not_clamp():
     assert notice["production_mol_s"] > notice["removal_mol_s"]
 
 
+def test_explicit_upstream_conductance_scales_with_pressure_square(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    # Vacuum Poiseuille capacity is proportional to P_up^2. Doubling the
+    # inventory pressure the drain passes must quadruple conductance.
+    # The 1 Pa setpoint floor is not this path.
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    species_kg = {"O2": 1.0}
+    low = sim._headspace_bleed_conductance_kg_s(
+        species_kg_for_M_avg=species_kg,
+        p_upstream_bar=0.01,
+    )
+    high = sim._headspace_bleed_conductance_kg_s(
+        species_kg_for_M_avg=species_kg,
+        p_upstream_bar=0.02,
+    )
+    assert low > 0.0
+    assert high == pytest.approx(4.0 * low, rel=1.0e-12, abs=0.0)
+
+
 def test_provider_declares_overhead_bleed_authority():
     provider = BuiltinOverheadBleedProvider()
     profile = provider.capability_profile()
