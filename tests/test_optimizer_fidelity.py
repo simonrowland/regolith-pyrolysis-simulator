@@ -335,6 +335,7 @@ def test_fidelity_timeout_drains_large_multiprocessing_result_before_join_watchd
             }
 
         fidelity._evaluate_fidelity_task = large_drop
+        fidelity._start_method = lambda: "fork"
         task = _FidelityTask(
             index=0,
             tier="high",
@@ -353,7 +354,6 @@ def test_fidelity_timeout_drains_large_multiprocessing_result_before_join_watchd
     )
     env = {
         **os.environ,
-        "PYTEST_CURRENT_TEST": "fidelity-large-queue-watchdog",
         WARM_WORKERS_ENV: "0",
     }
     process = subprocess.Popen(
