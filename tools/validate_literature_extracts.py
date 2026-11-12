@@ -68,8 +68,9 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   a leaf. A coverable measured leaf is a finite int or float (not a
   boolean), or a string that contains any digit [0-9] unless that string
   is an admitted annotation: a direct child of ``values``, or
-  ``point_conditions.*.state.reason``. A nested ``locator.note`` stays a
-  leaf. A non-finite float
+  ``point_conditions.<cond>.state.reason`` directly under the observation.
+  The same path nested under ``values``, and a nested ``locator.note``,
+  stay leaves. A non-finite float
   is not coverable and is not dropped: it is ``non_finite_evidence``.
   A quantity name, a unit on its
   own, or another label with no digit is not a leaf and may be attested
@@ -1852,8 +1853,9 @@ def _is_annotation_string(
     """True for an extractor annotation string on an admitted path.
 
     Admitted paths are a direct child of ``values`` (``values.note``) and
-    ``point_conditions.*.state.reason``. A nested ``locator.note`` inside
-    ``values`` is printed evidence. Numbers stay leaves.
+    ``point_conditions.<cond>.state.reason`` directly under the observation.
+    The same reason string nested under ``values`` stays printed evidence.
+    Numbers stay leaves.
     """
     if not isinstance(value, str) or key not in ANNOTATION_KEYS:
         return False
@@ -1861,9 +1863,9 @@ def _is_annotation_string(
         return True
     return (
         key == "reason"
-        and len(prefix) >= 3
-        and prefix[-3] == "point_conditions"
-        and prefix[-1] == "state"
+        and len(prefix) == 3
+        and prefix[0] == "point_conditions"
+        and prefix[2] == "state"
     )
 
 
@@ -1962,8 +1964,9 @@ def _scored_measured_leaves(observation: Mapping[str, Any]) -> list[tuple[Any, .
     ``("T_range_K", 0)`` are different leaves even when the numbers are
     equal. A ``locator`` inside a condition is provenance and is not a
     leaf. An annotation string is skipped only as a direct child of
-    ``values`` or at ``point_conditions.*.state.reason``. A nested
-    ``locator.note`` remains a leaf, and so does a number under an
+    ``values`` or at ``point_conditions.<cond>.state.reason`` directly
+    under the observation. A nested ``locator.note``, and that reason
+    path under ``values``, remain leaves, as does a number under an
     annotation key. Non-finite floats are not in this list;
     ``_scored_evidence_leaves`` records them.
     """
@@ -2131,8 +2134,9 @@ def _classify_measured_leaves(
     Invariant: every float is accounted for. A finite int or float (not a
     boolean) and a string that contains any digit [0-9] are coverable unless
     the string is an admitted annotation: a direct child of ``values``, or
-    ``point_conditions.*.state.reason``. A nested ``locator.note`` stays a
-    leaf. Numbers under annotation keys remain leaves. A
+    ``point_conditions.<cond>.state.reason`` directly under the observation.
+    The same path nested under ``values``, and a nested ``locator.note``,
+    stay leaves. Numbers under annotation keys remain leaves. A
     non-finite float (NaN, +Inf, -Inf) is the second list. It is never
     omitted and never coverable. A label with no digit is neither. The
     address is the path of mapping keys and list indexes from ``value``.
@@ -2909,9 +2913,10 @@ def fidelity_source_warnings(
     fields the scored temperature payload copies beside ``values``. A
     locator inside a condition is provenance, not a leaf. Digit-bearing
     strings are extractor-authored annotation, and not evidence, only as a
-    direct child of ``values`` or at ``point_conditions.*.state.reason``.
-    A nested ``locator.note`` stays evidence. Numbers under annotation keys
-    remain leaves. Repeating a pin
+    direct child of ``values`` or at ``point_conditions.<cond>.state.reason``
+    directly under the observation. That reason path nested under ``values``
+    stays evidence, as does a nested ``locator.note``. Numbers under
+    annotation keys remain leaves. Repeating a pin
     of one address does not cover a sibling, even when the numbers are
     equal, and a ``values`` pin does not cover a sibling condition. A
     measured leaf is a finite int or float (not a boolean), or a string

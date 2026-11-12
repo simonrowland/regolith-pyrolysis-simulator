@@ -5177,7 +5177,8 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # admission: uncovered observations 48664 -> 48630 and extracts 617 -> 615;
 # unattested 3131, pilots 57, and source-blind 0 stayed unchanged.
 # A nested locator.note inside values stays a leaf. Direct values children
-# and point_conditions.*.state.reason stay annotation. Recount held at
+# and observation-root point_conditions.<cond>.state.reason stay annotation.
+# The same reason path nested under values stays a leaf. Recount held at
 # 48630 / 615, unattested 3131, pilots 57, and source-blind 0.
 # Both coverage ceilings may only fall.
 # Each ceiling may only fall.
@@ -5531,6 +5532,32 @@ def test_nested_locator_note_inside_values_stays_a_measured_leaf():
                 }
             }
         }
+    )
+
+
+def test_values_point_conditions_state_reason_stays_a_measured_leaf():
+    """A reason nested under values is not the observation-root annotation path.
+
+    Pinning the other value leaf must not cover this string.
+    """
+    printed = "printed O2 at 37.91 mol %"
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["values"]["point_conditions"] = {
+        "composition": {"state": {"reason": printed}},
+    }
+    leaves = set(vle._scored_measured_leaves(observation))
+    assert (
+        "values",
+        "point_conditions",
+        "composition",
+        "state",
+        "reason",
+    ) in leaves
+    assert _uncovered_observation_count(doc) == 1
+    assert vle._observation_has_digit_bearing_string(
+        {"values": {"point_conditions": {"composition": {"state": {"reason": printed}}}}}
     )
 
 
