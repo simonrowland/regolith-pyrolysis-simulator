@@ -1,0 +1,240 @@
+schema_version: literature_extract.v1
+source_id: sf10-accretion-2010
+source:
+  citation: >-
+    Schaefer, L. and Fegley, B., Jr. (2010). Chemistry of atmospheres formed
+    during accretion of the Earth and other terrestrial planets. Icarus 208,
+    438–448.
+  doi: 10.1016/j.icarus.2010.01.026
+  year: 2010
+  corpus_asset: raw/sf10-accretion-2010/sf10-accretion-2010.pdf
+  corpus_sha256: b1fe339f3780967dfe165c79b6d7a228ac06e374815978edb7520a6b8307a023
+extraction:
+  method: >-
+    Manual transcription of the 11-page Icarus PDF. Pages were rendered at
+    200 dpi and Table 1 was read from a cropped page-4 image and checked
+    against pdftotext -layout. All Table 1 cells are stored as printed
+    (including the × 10^n forms). Figures 1–6 are context-only figure
+    records; no curves were digitised. The paper is a chemical-equilibrium
+    (and kinetic) model of impact-generated atmospheres, not a laboratory
+    vaporization experiment. Table 1 and the printed HCl abundances are
+    author calculations and are retained in context. Overlap check: this
+    paper is distinct from schaefer-and-fegley-2007-icarus-outgassing-of-oc,
+    schaefer-fegley-2009-silicate-atmospheres, schaefer-fegley-2011-vaporization-earth,
+    and 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.
+  date: '2026-11-12'
+  worker: empirical-b15-2026-11-12
+  provenance_path: raw/sf10-accretion-2010/
+review_status: draft
+species:
+  impact_generated_atmosphere:
+    observations: []
+    context:
+    - observation_id: sf10_2010_methods_and_nominal_conditions
+      type: method
+      locator:
+        page: 439
+        pdf_page_index: 1
+        published_page: '439'
+        section: '2. Methods'
+      units: as printed
+      values:
+        quantity: chemical_equilibrium_model_scope
+        method_class: method_only
+        evidence_class: model_derived
+        calculation_as_printed: thermochemical equilibrium calculations that were done with a Gibbs energy minimization code of the type described by Van Zeggern and Storey (1970)
+        database_as_printed: We used the same database as in Schaefer and Fegley (2007)
+        abe_matsui_composition_as_printed: their estimate of pressure and temperature depends on the atmospheric composition, which they took as H2O plus CO2
+        species_count_as_printed: thermodynamic data for ~930 condensed and gaseous compounds of 20 major rock-forming and volatile elements (Al, C, Ca, Cl, Co, Cr, F, Fe, H, K, Mg, Mn, N, Na, Ni, O, P, S, Si, Ti)
+        T_range_K_as_printed: 300–2500
+        P_range_as_printed: log10 P of −4 to +4 bars
+        nominal_T_K: 1500
+        nominal_P_bar: 100
+        nominal_basis_as_printed: based on the work of Abe and Matsui (1987)
+        chondrite_types_as_printed: [CI, CM, CV, H, L, LL, EH, EL]
+        composition_sources_as_printed:
+          CI: Orgueil – Lodders (2003)
+          H_L_LL: average H, L, and LL chondrites – Schaefer and Fegley (2007)
+          CM: Murchison – METBASE (Koblitz, 2005)
+          CV: Allende – METBASE (Koblitz, 2005)
+          EH_EL: average EH and EL chondrites – METBASE (Koblitz, 2005)
+        note: >-
+          The Methods text names "a Gibbs energy minimization code of the
+          type described by Van Zeggern and Storey (1970)" but does not
+          print a program name. No name was invented.
+    - observation_id: sf10_2010_table1_major_gas_compositions
+      type: textual_fact
+      locator:
+        page: 441
+        pdf_page_index: 3
+        published_page: '441'
+        table: '1'
+      units: vol.%
+      values:
+        quantity: gas_speciation
+        method_class: model_derived
+        evidence_class: model_derived
+        conditions_as_printed: 1500 K and 100 bars
+        caption_as_printed: Major gas compositions of impact generated atmospheres from chondritic planetesimals at 1500 K and 100 bars.
+        other_footnote_as_printed: Other includes gases of the rock-forming elements Cl, F, K, Na, P, and S. See text.
+        columns: [CI, CM, CV, H, L, LL, EH, EL]
+        composition_vol_percent:
+          H2:
+            CI: '4.36'
+            CM: '2.72'
+            CV: '0.24'
+            H: '48.49'
+            L: '42.99'
+            LL: '42.97'
+            EH: '43.83'
+            EL: '14.87'
+          H2O:
+            CI: '69.47'
+            CM: '73.38'
+            CV: '17.72'
+            H: '18.61'
+            L: '17.43'
+            LL: '23.59'
+            EH: '16.82'
+            EL: '5.71'
+          CH4:
+            CI: 2 × 10−7
+            CM: 2 × 10−8
+            CV: 8 × 10−11
+            H: '0.74'
+            L: '0.66'
+            LL: '0.39'
+            EH: '0.71'
+            EL: '0.17'
+          CO2:
+            CI: '19.39'
+            CM: '18.66'
+            CV: '70.54'
+            H: '3.98'
+            L: '5.08'
+            LL: '5.51'
+            EH: '4.66'
+            EL: '9.91'
+          CO:
+            CI: '3.15'
+            CM: '1.79'
+            CV: '2.45'
+            H: '26.87'
+            L: '32.51'
+            LL: '26.06'
+            EH: '31.47'
+            EL: '67.00'
+          N2:
+            CI: '0.82'
+            CM: '0.57'
+            CV: '0.01'
+            H: '0.37'
+            L: '0.33'
+            LL: '0.29'
+            EH: '1.31'
+            EL: '1.85'
+          NH3:
+            CI: 5 × 10−6
+            CM: 2 × 10−6
+            CV: 8 × 10−9
+            H: '0.01'
+            L: '0.01'
+            LL: 9 × 10−5
+            EH: '0.02'
+            EL: 5 × 10−5
+          H2S:
+            CI: '2.47'
+            CM: '2.32'
+            CV: '0.56'
+            H: '0.59'
+            L: '0.61'
+            LL: '0.74'
+            EH: '0.53'
+            EL: '0.18'
+          SO2:
+            CI: '0.08'
+            CM: '0.35'
+            CV: '7.41'
+            H: 1 × 10−8
+            L: 1 × 10−8
+            LL: 3 × 10−8
+            EH: 1 × 10−8
+            EL: 1 × 10−8
+          Other:
+            CI: '0.25'
+            CM: '0.17'
+            CV: '1.02'
+            H: '0.33'
+            L: '0.35'
+            LL: '0.41'
+            EH: '0.64'
+            EL: '0.29'
+          Total:
+            CI: '99.99'
+            CM: '99.96'
+            CV: '99.95'
+            H: '99.99'
+            L: '99.97'
+            LL: '99.96'
+            EH: '99.99'
+            EL: '99.98'
+        note: >-
+          Author-calculated equilibrium compositions, not measured
+          laboratory analyses. Several cells in each row are printed in
+          bold (the row maximum or the ordinary/enstatite H2 group); all
+          cells are stored, not only the bold ones. Scientific-notation
+          cells are stored in the printed "2 × 10−7" form.
+    - observation_id: sf10_2010_printed_hcl_and_mixing_model
+      type: textual_fact
+      locator:
+        page: 446
+        pdf_page_index: 8
+        published_page: '446'
+        section: '4. Discussion'
+      units: as printed
+      values:
+        quantity: calculated_minor_gas_and_mixing_model_statements
+        method_class: model_derived
+        evidence_class: model_derived
+        HCl_as_printed: The HCl abundance varies from 0.44% (EH) to 0.06% (CM) and averages 0.20%.
+        oxygen_isotope_mixing_model_as_printed: the oxygen isotope mixing model predicts that Earth incorporated 70% EH, 21% H, 5% CV, and 4% CI chondritic material (Lodders, 2000)
+        mixing_model_locator: {pdf_page_index: 1, published_page: '439', section: '2. Methods'}
+        note: HCl percentages and the 70/21/5/4 mixing proportions are printed statements, not re-derived here.
+    - observation_id: sf10_2010_figure1
+      type: figure_record
+      locator: {page: 440, pdf_page_index: 2, published_page: '440', figure: '1'}
+      units: as printed
+      values:
+        quantity: calculated_major_gas_composition_vs_temperature
+        method_class: figure_only
+        evidence_class: figure_only
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        caption: >-
+          Fig. 1. Major gas compositions produced by impact outgassing of
+          different types of chondritic planetesimals at the nominal pressure
+          of 100 bars as a function of temperature from 300 to 2500 K. The
+          panels show outgassing of: (a) CI, (b) CV, (c) H, (d) EH, and (e)
+          EL chondritic material.
+        axes_as_printed: {x: 'Temperature (K)', y: 'gas mole fraction (log scale, as plotted)'}
+        note: CM, L, and LL are not shown as Fig. 1 panels; the caption lists CI, CV, H, EH, and EL.
+    - observation_id: sf10_2010_figures_2_to_6
+      type: figure_record
+      locator: {page: 442, pdf_page_index: 4, published_page: '442', figure: '2–6'}
+      units: as printed
+      values:
+        quantity: calculated_P_T_speciation_diagrams
+        method_class: figure_only
+        evidence_class: figure_only
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        figures_as_printed:
+        - {id: '2', topic: 'C-bearing gases vs P and T for carbonaceous chondritic material'}
+        - {id: '3', topic: 'C-bearing gases vs P and T for ordinary and enstatite chondritic material'}
+        - {id: '4', topic: 'H-bearing gases vs P and T for carbonaceous chondritic material'}
+        - {id: '5', topic: 'H-bearing gases vs P and T for ordinary and enstatite chondritic material'}
+        - {id: '6', topic: 'N-bearing gases / related P–T diagrams, as captioned'}
+        note: >-
+          Figure-only calculated P–T fields. No points were digitised.
+          Individual panel captions remain on the printed pages and were
+          not rewritten here.
