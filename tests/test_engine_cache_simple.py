@@ -1354,7 +1354,7 @@ def test_malformed_hot_value_is_a_counted_conflict_and_not_replaced(
     call = _cached_engine_call()
     assert call("openimcc", request, lambda: {"answer": 1}) == {"answer": 1}
 
-    connection = engine_cache._connect(database, root=database, readonly=False)
+    connection = engine_cache._connect(database, readonly=False)
     assert connection is not None
     digest = engine_cache_key("openimcc", 1, request)
     connection.execute(

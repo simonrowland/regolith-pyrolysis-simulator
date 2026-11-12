@@ -76,7 +76,7 @@ _TIMEOUT_MS = 60_000
 _LOCK = threading.RLock()
 _CONNECTIONS: dict[tuple[str, bool], sqlite3.Connection] = {}
 _CONNECTION_PID: int | None = None
-_CONNECTION_ROOT: Path | None = None
+_CONNECTION_PATH: Path | None = None
 _CONNECTION_READONLY = False
 _COUNTERS: dict[str, dict[str, int]] = {}
 _COUNTER_NAMES = (
@@ -409,7 +409,7 @@ def _decode_hot(value: Any) -> Any:
 
 
 def _close_connections() -> None:
-    global _CONNECTION_PID, _CONNECTION_ROOT
+    global _CONNECTION_PID, _CONNECTION_PATH
     for connection in _CONNECTIONS.values():
         try:
             connection.close()
@@ -417,7 +417,7 @@ def _close_connections() -> None:
             pass
     _CONNECTIONS.clear()
     _CONNECTION_PID = os.getpid()
-    _CONNECTION_ROOT = None
+    _CONNECTION_PATH = None
 
 
 def _prepare_memory_cache() -> None:
@@ -435,19 +435,19 @@ def _remember_memory_value(key: tuple[str, bytes, bool], value: Any) -> None:
         _MEMORY_CACHE.popitem(last=False)
 
 
-def _connect(path: Path, *, root: Path, readonly: bool) -> sqlite3.Connection | None:
-    global _CONNECTION_PID, _CONNECTION_ROOT, _CONNECTION_READONLY
+def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
+    global _CONNECTION_PID, _CONNECTION_PATH, _CONNECTION_READONLY
     pid = os.getpid()
     if _CONNECTION_PID != pid:
         _close_connections()
-    if _CONNECTION_ROOT is not None and _CONNECTION_ROOT != root:
+    if _CONNECTION_PATH is not None and _CONNECTION_PATH != path:
         _close_connections()
-    if _CONNECTION_ROOT is None:
-        _CONNECTION_ROOT = root
+    if _CONNECTION_PATH is None:
+        _CONNECTION_PATH = path
         _CONNECTION_READONLY = readonly
     elif _CONNECTION_READONLY != readonly:
         _close_connections()
-        _CONNECTION_ROOT = root
+        _CONNECTION_PATH = path
         _CONNECTION_READONLY = readonly
     key = (str(path), readonly)
     if key in _CONNECTIONS:
@@ -604,7 +604,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             counts["hits"] += 1
             return result
 
-    connection = _connect(path, root=path, readonly=readonly)
+    connection = _connect(path, readonly=readonly)
     with _LOCK:
         row = None if connection is None else connection.execute(
             f"SELECT value FROM {_TABLE} WHERE key=?", (cache_key,)
@@ -680,7 +680,7 @@ def load_cache_rows(
     rows: Iterable[tuple[bytes, Any, str, str | int, str, int]],
 ) -> int:
     database = Path(path).expanduser()
-    connection = _connect(database, root=database, readonly=False)
+    connection = _connect(database, readonly=False)
     assert connection is not None
     values = []
     for digest, hot, engine, version, source_box, row_seq in rows:
@@ -731,11 +731,11 @@ def load_cache_rows(
 
 
 def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
-    path_value = os.environ.get("REGOLITH_ENGINE_CACHE")
+    path_value = _configured_engine_cache_path()
     if not path_value:
         return 0
     path = Path(path_value).expanduser()
-    connection = _connect(path, root=path, readonly=False)
+    connection = _connect(path, readonly=False)
     assert connection is not None
     cursor = connection.execute(
         f"DELETE FROM {_TABLE} WHERE engine=? AND chem_version=?",
