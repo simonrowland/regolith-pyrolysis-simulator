@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 783
-- Extracts (`literature_extract.v1`): 781
+- Sources: 784
+- Extracts (`literature_extract.v1`): 782
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 781
+- Extracts with no PDF: 782
 - Alias groups needing owner/controller resolution: 84
 - Extracts with private/non-public row locators: 80
 
@@ -118,6 +118,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `chaudary-1997-v-redox-binary-silicate` | Chaudary, H., Miller, D. M., Brungs, M. P. and Belton, G. R. (1997). Redox chemistry of vanadium in molten binary silicates and slags. Molten Slags, Fluxes and Salts '97 Conference, 493–499. |  | ABSENT, `` | `raw/chaudary-1997-v-redox-binary-silicate/chaudary-1997-v-redox-binary-silicate.pdf` (present, 0ac1605f); `text/chaudary-1997-v-redox-binary-silicate/` (29 files, exists); `tables/chaudary-1997-v-redox-binary-silicate/` (0 files, ABSENT) | `data/literature/extracts/chaudary-1997-v-redox-binary-silicate.yaml` (0 rows, draft) | `ledger/chaudary-1997-v-redox-binary-silicate.yaml`: — (—) |
 | `chen-2019-sioch-cp-entropy-gibbs` | Chen, J., Li, L., Li, J., Sun, J., Zhang, H. & Li, X. (2019), “Heat capacities, entropies, and Gibbs free energies of formation of low-k amorphous Si(O)CH dielectric films and implications for stability during processing”, Journal of Chemical Thermodynamics 128, 320–335. | 10.1016/j.jct.2018.08.026 | ABSENT, `` | `raw/chen-2019-sioch-cp-entropy-gibbs/chen-2019-sioch-cp-entropy-gibbs.pdf` (present, baba5fa2); `text/chen-2019-sioch-cp-entropy-gibbs/` (54 files, exists); `tables/chen-2019-sioch-cp-entropy-gibbs/` (0 files, ABSENT) | `data/literature/extracts/chen-2019-sioch-cp-entropy-gibbs.yaml` (33 rows, draft) | `ledger/chen-2019-sioch-cp-entropy-gibbs.yaml`: — (—) |
 | `chen-2022-mgo-sio2-tio2-phase-equilibria` | Chen, Min, Wan, Xingbang, Shi, Junjie, Taskinen, Pekka, and Jokilaakso, Ari (2022). Experimental Study on the Phase Relations of the SiO2-MgO-TiO2 System in Air at 1500 C. JOM 74(2), 676–688. | 10.1007/s11837-021-04870-0 | ABSENT, `` | `raw/chen-2022-mgo-sio2-tio2-phase-equilibria/chen-2022-mgo-sio2-tio2-phase-equilibria.pdf` (present, 41452738); `text/chen-2022-mgo-sio2-tio2-phase-equilibria/` (15 files, exists); `tables/chen-2022-mgo-sio2-tio2-phase-equilibria/` (0 files, ABSENT) | `data/literature/extracts/chen-2022-mgo-sio2-tio2-phase-equilibria.yaml` (198 rows, draft) | `ledger/chen-2022-mgo-sio2-tio2-phase-equilibria.yaml`: — (—) |
+| `chen-presnall-1975-mg2sio4-sio2` | Chen C.-H. & Presnall D.C. (1975), “The system Mg2SiO4-SiO2 at pressures up to 25 kilobars”, American Mineralogist 60, 398–406. |  | ABSENT, `` | `raw/chen-presnall-1975-mg2sio4-sio2/chen-presnall-1975-mg2sio4-sio2.pdf` (present, b739cb4a); `text/chen-presnall-1975-mg2sio4-sio2/` (21 files, exists); `tables/chen-presnall-1975-mg2sio4-sio2/` (1 files, exists) | `data/literature/extracts/chen-presnall-1975-mg2sio4-sio2.yaml` (0 rows, draft) | `ledger/chen-presnall-1975-mg2sio4-sio2.yaml`: — (—) |
 | `cheng-2021-fe-ca-si-o-phase-equilibria` | S. Cheng, M. Shevchenko, P. C. Hayes, E. Jak (2021), "Experimental Phase Equilibria Studies in the FeO-Fe2O3-CaO-SiO2 System and the Subsystems CaO-SiO2, FeO-Fe2O3-SiO2 in Air", Metallurgical and Materials Transactions B 52(3), 1891-1914. | 10.1007/s11663-021-02159-w | ABSENT, `` | `raw/cheng-2021-fe-ca-si-o-phase-equilibria/cheng-2021-fe-ca-si-o-phase-equilibria.pdf` (present, a16a9287); `text/cheng-2021-fe-ca-si-o-phase-equilibria/` (11 files, exists); `tables/cheng-2021-fe-ca-si-o-phase-equilibria/` (0 files, ABSENT) | `data/literature/extracts/cheng-2021-fe-ca-si-o-phase-equilibria.yaml` (990 rows, draft) | `ledger/cheng-2021-fe-ca-si-o-phase-equilibria.yaml`: — (—) |
 | `cho-suito-1994-cas-slag-activities` | Cho, S.-W. and Suito, H. (1994), "Assessment of Aluminum-Oxygen Equilibrium in Liquid Iron and Activities in CaO-Al2O3-SiO2 Slags," ISIJ International 34(2), 177-185. |  | ABSENT, `` | `raw/cho-suito-1994-cas-slag-activities/cho-suito-1994-cas-slag-activities.pdf` (present, 4444502c); `text/cho-suito-1994-cas-slag-activities/` (63 files, exists); `tables/cho-suito-1994-cas-slag-activities/` (10 files, exists) | `data/literature/extracts/cho-suito-1994-cas-slag-activities.yaml` (48 rows, draft) | `ledger/cho-suito-1994-cas-slag-activities.yaml`: extracted (2026-10-04) |
 | `christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal` | Christensen, A. U., Conway, J. B., and Kelley, K. K. (1960). High-temperature heat contents and entropies of aluminates and ferrites of lithium and sodium. U.S. Bureau of Mines Report of Investigations 5565. |  | ABSENT, `` | `raw/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal.pdf` (present, 41edf14e); `text/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal/` (49 files, exists); `tables/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal/` (0 files, ABSENT) | `data/literature/extracts/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal.yaml` (19 rows, draft) | `ledger/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal.yaml`: — (—) |
@@ -908,6 +909,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `chaudary-1997-v-redox-binary-silicate`
 - `chen-2019-sioch-cp-entropy-gibbs`
 - `chen-2022-mgo-sio2-tio2-phase-equilibria`
+- `chen-presnall-1975-mg2sio4-sio2`
 - `cheng-2021-fe-ca-si-o-phase-equilibria`
 - `cho-suito-1994-cas-slag-activities`
 - `christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal`

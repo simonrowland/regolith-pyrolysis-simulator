@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 783
-  extracts: 781
+  sources: 784
+  extracts: 782
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 80
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 781
+  extracts_without_pdf: 782
   alias_groups_needing_resolution: 84
 gaps:
   pdfs_without_extract: []
@@ -110,6 +110,7 @@ gaps:
   - chaudary-1997-v-redox-binary-silicate
   - chen-2019-sioch-cp-entropy-gibbs
   - chen-2022-mgo-sio2-tio2-phase-equilibria
+  - chen-presnall-1975-mg2sio4-sio2
   - cheng-2021-fe-ca-si-o-phase-equilibria
   - cho-suito-1994-cas-slag-activities
   - christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
@@ -6792,6 +6793,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: chen-presnall-1975-mg2sio4-sio2
+  aliases: []
+  citation: Chen C.-H. & Presnall D.C. (1975), “The system Mg2SiO4-SiO2 at pressures up to 25 kilobars”,
+    American Mineralogist 60, 398–406.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/chen-presnall-1975-mg2sio4-sio2.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/chen-presnall-1975-mg2sio4-sio2/chen-presnall-1975-mg2sio4-sio2.pdf
+      present: true
+      sha256: b739cb4ae93d1a8890e98412ccdcea7927a844ff619c6716ce1b2d1bc40dc7a4
+      matches_simulator: null
+    sidecar:
+      path: raw/chen-presnall-1975-mg2sio4-sio2/sidecar.yaml
+      present: true
+    text:
+      path: text/chen-presnall-1975-mg2sio4-sio2
+      exists: true
+      file_count: 21
+    tables:
+      path: tables/chen-presnall-1975-mg2sio4-sio2
+      exists: true
+      file_count: 1
+    extract:
+      path: extracts/chen-presnall-1975-mg2sio4-sio2.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/chen-presnall-1975-mg2sio4-sio2.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 292bed994e8acb7f877eca60d5fedac2c8ec0f0b
 - source_id: cheng-2021-fe-ca-si-o-phase-equilibria
   aliases: []
   citation: S. Cheng, M. Shevchenko, P. C. Hayes, E. Jak (2021), "Experimental Phase Equilibria Studies
