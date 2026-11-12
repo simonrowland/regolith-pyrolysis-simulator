@@ -107,12 +107,16 @@ Coverage is by leaf address. A measured leaf is a finite int or float
 (not a boolean), or a string that contains any digit [0-9]. String values
 under the closed `ANNOTATION_KEYS` set (`attribution`, `note`, `reason`,
 `schema_gap`, `composition_derivation`, `parents_not_printed`) are excluded
-only as a direct child of `values` (`values.note`, `values.attribution`, and
-the other keys in that set) or at `point_conditions.<cond>.state.reason`
-directly under the observation. Those strings are the extractor's paraphrase,
+as a direct child of `values` (`values.note`, `values.attribution`, and
+the other keys in that set) except `reason`. A `reason` string is excluded
+only when its parent is a condition-state mapping, at any depth, whose `tag`
+is a non-value `StateTag` (`unknown` or `not_applicable`; the set is
+`StateTag` other than `value`). A `reason` beside `tag: value`, or in a
+mapping with no state tag, stays a leaf at the observation root and nested
+under `values`. A nested `locator.note` stays a leaf. Numbers under those
+keys remain leaves. Those excluded strings are the extractor's paraphrase,
 provenance, reasoning, schema notes, or refusal reasons, not printed evidence.
-The same path nested under `values` stays a leaf, as does a nested
-`locator.note`. Numbers under those keys remain leaves. A key stays outside the set when its sampled values
+A key stays outside the set when its sampled values
 transcribe a printed citation, cell, label, id, caption, or standard state.
 `citation` and `standard_state` stay outside for that reason. A quantity
 name, a unit on its own, or another label with no digit is not a leaf.

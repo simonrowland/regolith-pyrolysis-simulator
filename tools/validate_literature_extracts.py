@@ -67,10 +67,11 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   ``point_conditions``). A locator inside a condition is provenance, not
   a leaf. A coverable measured leaf is a finite int or float (not a
   boolean), or a string that contains any digit [0-9] unless that string
-  is an admitted annotation: a direct child of ``values``, or
-  ``point_conditions.<cond>.state.reason`` directly under the observation.
-  The same path nested under ``values``, and a nested ``locator.note``,
-  stay leaves. A non-finite float
+  is an admitted annotation: a direct child of ``values`` other than
+  ``reason``, or a ``reason`` whose parent condition state has a non-value
+  ``StateTag``, at any depth. A ``reason`` beside ``tag: value``, or in a
+  mapping with no state tag, stays a leaf at the observation root and
+  nested under ``values``. A nested ``locator.note`` stays a leaf. A non-finite float
   is not coverable and is not dropped: it is ``non_finite_evidence``.
   A quantity name, a unit on its
   own, or another label with no digit is not a leaf and may be attested
@@ -132,6 +133,7 @@ from simulator.battery.extract_context import (
     SUPPORTED_EXTRACT_CONTEXT_PATH,
     iter_unsupported_context_container_paths,
 )
+from simulator.state_types import StateTag
 
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 SCHEMA_VERSION = "literature_extract.v1"
@@ -1845,28 +1847,41 @@ ANNOTATION_KEYS = frozenset(
         "parents_not_printed",
     }
 )
+# Condition-state refusal tags. StateTag is the schema owner. ``value`` is
+# the printed-evidence case and is not in this set.
+_NON_VALUE_STATE_TAGS = frozenset(
+    member.value for member in StateTag if member is not StateTag.VALUE
+)
 
 
 def _is_annotation_string(
-    prefix: tuple[Any, ...], key: Any, value: Any
+    prefix: tuple[Any, ...],
+    key: Any,
+    value: Any,
+    parent: Mapping[str, Any],
 ) -> bool:
-    """True for an extractor annotation string on an admitted path.
+    """True for an extractor annotation string the evidence walk skips.
 
-    Admitted paths are a direct child of ``values`` (``values.note``) and
-    ``point_conditions.<cond>.state.reason`` directly under the observation.
-    The same reason string nested under ``values`` stays printed evidence.
-    Numbers stay leaves.
+    A string under an annotation key other than ``reason`` is annotation
+    only as a direct child of ``values``. A ``reason`` string is annotation
+    only when ``parent`` is a condition state whose ``tag`` is a non-value
+    ``StateTag``, at any depth. ``tag: value`` and a mapping with no state
+    tag stay leaves, at the observation root and nested under ``values``.
+    Numbers stay leaves. A nested ``locator.note`` is not a direct child
+    of ``values``, so it stays a leaf.
     """
     if not isinstance(value, str) or key not in ANNOTATION_KEYS:
         return False
-    if prefix == ("values",):
-        return True
-    return (
-        key == "reason"
-        and len(prefix) == 3
-        and prefix[0] == "point_conditions"
-        and prefix[2] == "state"
-    )
+    if key != "reason":
+        return prefix == ("values",)
+    tag = parent.get("tag")
+    if isinstance(tag, StateTag):
+        token = tag.value
+    elif isinstance(tag, str):
+        token = tag
+    else:
+        return False
+    return token in _NON_VALUE_STATE_TAGS
 
 
 def _scored_observations(
@@ -1963,11 +1978,13 @@ def _scored_measured_leaves(observation: Mapping[str, Any]) -> list[tuple[Any, .
     Addresses sit in one evidence tree. ``("values", "alpha")`` and
     ``("T_range_K", 0)`` are different leaves even when the numbers are
     equal. A ``locator`` inside a condition is provenance and is not a
-    leaf. An annotation string is skipped only as a direct child of
-    ``values`` or at ``point_conditions.<cond>.state.reason`` directly
-    under the observation. A nested ``locator.note``, and that reason
-    path under ``values``, remain leaves, as does a number under an
-    annotation key. Non-finite floats are not in this list;
+    leaf. An annotation string other than ``reason`` is skipped only as a
+    direct child of ``values``. A ``reason`` is skipped only when its
+    parent condition state has a non-value ``StateTag``, at any depth.
+    ``tag: value`` and a mapping with no state tag stay leaves, at the
+    observation root and nested under ``values``. A nested ``locator.note``
+    stays a leaf, as does a number under an annotation key. Non-finite
+    floats are not in this list;
     ``_scored_evidence_leaves`` records them.
     """
     coverable, _non_finite = _scored_evidence_leaves(observation)
@@ -1997,8 +2014,9 @@ def _observation_has_digit_bearing_string(observation: Mapping[str, Any]) -> boo
     The walk is the same evidence the measured-leaf walker uses. A locator
     inside a condition is provenance. This is the backstop for a recognizer
     that returns no leaves: the coverage decision refuses that block. A
-    string on an admitted annotation path is not evidence. A nested
-    ``locator.note`` is evidence.
+    ``reason`` in a non-value condition state is not evidence. A nested
+    ``locator.note``, a ``tag: value`` reason, and a reason in a mapping
+    with no state tag are evidence.
     """
 
     def contains(
@@ -2011,7 +2029,7 @@ def _observation_has_digit_bearing_string(observation: Mapping[str, Any]) -> boo
                 contains(child, prefix + (key,), skip_keys)
                 for key, child in value.items()
                 if key not in skip_keys
-                and not _is_annotation_string(prefix, key, child)
+                and not _is_annotation_string(prefix, key, child, value)
             )
         if isinstance(value, (list, tuple)):
             return any(
@@ -2133,10 +2151,12 @@ def _classify_measured_leaves(
 
     Invariant: every float is accounted for. A finite int or float (not a
     boolean) and a string that contains any digit [0-9] are coverable unless
-    the string is an admitted annotation: a direct child of ``values``, or
-    ``point_conditions.<cond>.state.reason`` directly under the observation.
-    The same path nested under ``values``, and a nested ``locator.note``,
-    stay leaves. Numbers under annotation keys remain leaves. A
+    the string is an admitted annotation: a direct child of ``values``
+    other than ``reason``, or a ``reason`` whose parent condition state
+    has a non-value ``StateTag``, at any depth. ``tag: value`` and a
+    mapping with no state tag stay leaves, at the observation root and
+    nested under ``values``. A nested ``locator.note`` stays a leaf.
+    Numbers under annotation keys remain leaves. A
     non-finite float (NaN, +Inf, -Inf) is the second list. It is never
     omitted and never coverable. A label with no digit is neither. The
     address is the path of mapping keys and list indexes from ``value``.
@@ -2162,7 +2182,9 @@ def _classify_measured_leaves(
         coverable: list[tuple[Any, ...]] = []
         non_finite: list[tuple[Any, ...]] = []
         for key, child in value.items():
-            if key in skip_keys or _is_annotation_string(prefix, key, child):
+            if key in skip_keys or _is_annotation_string(
+                prefix, key, child, value
+            ):
                 continue
             child_coverable, child_non_finite = _classify_measured_leaves(
                 child, prefix + (key,), skip_keys=skip_keys
@@ -2913,9 +2935,11 @@ def fidelity_source_warnings(
     fields the scored temperature payload copies beside ``values``. A
     locator inside a condition is provenance, not a leaf. Digit-bearing
     strings are extractor-authored annotation, and not evidence, only as a
-    direct child of ``values`` or at ``point_conditions.<cond>.state.reason``
-    directly under the observation. That reason path nested under ``values``
-    stays evidence, as does a nested ``locator.note``. Numbers under
+    direct child of ``values`` other than ``reason``, or as a ``reason``
+    whose parent condition state has a non-value ``StateTag``, at any
+    depth. A ``reason`` beside ``tag: value``, or in a mapping with no
+    state tag, stays evidence at the observation root and nested under
+    ``values``. A nested ``locator.note`` stays evidence. Numbers under
     annotation keys remain leaves. Repeating a pin
     of one address does not cover a sibling, even when the numbers are
     equal, and a ``values`` pin does not cover a sibling condition. A

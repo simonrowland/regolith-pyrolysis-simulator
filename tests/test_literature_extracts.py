@@ -30,6 +30,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.state_types import StateTag
 from simulator.yaml_cache import load_cached_safe_yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -5176,10 +5177,11 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # that set. Recounted with tools/validate_literature_extracts.py after that
 # admission: uncovered observations 48664 -> 48630 and extracts 617 -> 615;
 # unattested 3131, pilots 57, and source-blind 0 stayed unchanged.
-# A nested locator.note inside values stays a leaf. Direct values children
-# and observation-root point_conditions.<cond>.state.reason stay annotation.
-# The same reason path nested under values stays a leaf. Recount held at
-# 48630 / 615, unattested 3131, pilots 57, and source-blind 0.
+# A nested locator.note inside values stays a leaf. A reason is annotation
+# only in a condition state whose tag is a non-value StateTag, at any depth.
+# tag:value and a missing tag stay leaves at the observation root and under
+# values. Recount held at 48630 / 615, unattested 3131, pilots 57, and
+# source-blind 0.
 # Both coverage ceilings may only fall.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 48630
@@ -5464,13 +5466,18 @@ def test_fidelity_annotation_keys_are_the_reviewed_closed_set():
     assert vle.ANNOTATION_KEYS == frozenset(_ADMITTED_ANNOTATION_KEYS)
 
 
-@pytest.mark.parametrize("annotation_key", _ADMITTED_ANNOTATION_KEYS)
+@pytest.mark.parametrize(
+    "annotation_key",
+    tuple(key for key in _ADMITTED_ANNOTATION_KEYS if key != "reason"),
+)
 def test_fidelity_annotation_string_is_covered_by_value_leaves_alone(annotation_key):
     """Pin value leaves alone. The annotation string is not another leaf.
 
-    The temperature range on the minimal extract is removed first. An
-    unpinned scored condition would make every assertion uncovered and
-    would hide a float that the walker had stopped treating as a leaf.
+    ``reason`` is absent here. A direct ``values.reason`` has no state tag,
+    so it stays a leaf; the shape test covers that. The temperature range
+    on the minimal extract is removed first. An unpinned scored condition
+    would make every assertion uncovered and would hide a float that the
+    walker had stopped treating as a leaf.
     """
     annotation = "Extractor note: based on the 1978 source table."
 
@@ -5497,10 +5504,11 @@ def test_fidelity_annotation_string_is_covered_by_value_leaves_alone(annotation_
 def test_nested_locator_note_inside_values_stays_a_measured_leaf():
     """A locator note nested under values is printed evidence.
 
-    Annotation strings are skipped only as a direct child of values, or at
-    point_conditions.*.state.reason. The alpha pin does not cover the note.
+    A direct values.note is annotation. A state reason with no tag is a
+    leaf. The alpha pin does not cover the note.
     """
     note = "printed O2 partial pressure at xTiO2=37.91 mol %"
+    bare_reason = "The 30A run is absent from Table 5."
     doc = _minimal_extract()
     _strip_scored_conditions(doc)
     observation = doc["species"]["Fe"]["observations"][0]
@@ -5509,14 +5517,12 @@ def test_nested_locator_note_inside_values_stays_a_measured_leaf():
         "locator": {"note": note},
     }
     observation["point_conditions"] = {
-        "composition": {
-            "state": {"reason": "The 30A run is absent from Table 5."},
-        }
+        "composition": {"state": {"reason": bare_reason}},
     }
     leaves = set(vle._scored_measured_leaves(observation))
     assert ("values", "oxygen_partial_pressure", "locator", "note") in leaves
     assert ("values", "note") not in leaves
-    assert ("point_conditions", "composition", "state", "reason") not in leaves
+    assert ("point_conditions", "composition", "state", "reason") in leaves
     assert _uncovered_observation_count(doc) == 1
     assert vle._observation_has_digit_bearing_string(
         {"values": {"oxygen_partial_pressure": {"locator": {"note": note}}}}
@@ -5524,40 +5530,141 @@ def test_nested_locator_note_inside_values_stays_a_measured_leaf():
     assert not vle._observation_has_digit_bearing_string(
         {"values": {"note": "Extractor note from the 1978 table."}}
     )
-    assert not vle._observation_has_digit_bearing_string(
+    assert vle._observation_has_digit_bearing_string(
         {
             "point_conditions": {
-                "composition": {
-                    "state": {"reason": "The 30A run is absent from Table 5."},
-                }
+                "composition": {"state": {"reason": bare_reason}},
             }
         }
     )
 
 
-def test_values_point_conditions_state_reason_stays_a_measured_leaf():
-    """A reason nested under values is not the observation-root annotation path.
+def test_state_reason_follows_tag_shape_at_any_depth():
+    """A reason is annotation only in a non-value condition state.
 
-    Pinning the other value leaf must not cover this string.
+    A nested tag:unknown reason is skipped. A nested tag:value reason
+    stays a leaf. The observation root gives the same answer for the
+    same shape. A mapping with no state tag, including values.reason,
+    stays a leaf.
     """
+    refusal = "Table 3 does not state the cited experiment temperature."
     printed = "printed O2 at 37.91 mol %"
-    doc = _minimal_extract()
-    _strip_scored_conditions(doc)
-    observation = doc["species"]["Fe"]["observations"][0]
-    observation["values"]["point_conditions"] = {
-        "composition": {"state": {"reason": printed}},
-    }
-    leaves = set(vle._scored_measured_leaves(observation))
-    assert (
-        "values",
-        "point_conditions",
-        "composition",
-        "state",
-        "reason",
-    ) in leaves
-    assert _uncovered_observation_count(doc) == 1
+    non_value_tags = [
+        member.value for member in StateTag if member is not StateTag.VALUE
+    ]
+    assert StateTag.UNKNOWN.value in non_value_tags
+    assert StateTag.VALUE.value not in non_value_tags
+    assert vle._NON_VALUE_STATE_TAGS == frozenset(non_value_tags)
+
+    def classify(nested: bool, state: dict) -> tuple[tuple, bool, int]:
+        doc = _minimal_extract()
+        _strip_scored_conditions(doc)
+        observation = doc["species"]["Fe"]["observations"][0]
+        body = {"temperature_K": {"state": state}}
+        if nested:
+            observation["values"]["points"] = [{"point_conditions": body}]
+            address = (
+                "values",
+                "points",
+                0,
+                "point_conditions",
+                "temperature_K",
+                "state",
+                "reason",
+            )
+        else:
+            observation["point_conditions"] = body
+            address = ("point_conditions", "temperature_K", "state", "reason")
+        leaves = set(vle._scored_measured_leaves(observation))
+        return address, address in leaves, _uncovered_observation_count(doc)
+
+    for tag in non_value_tags:
+        for nested in (False, True):
+            _address, is_leaf, uncovered = classify(
+                nested, {"tag": tag, "reason": refusal}
+            )
+            assert is_leaf is False
+            assert uncovered == 0
+
+    for nested in (False, True):
+        _address, is_leaf, uncovered = classify(
+            nested, {"tag": StateTag.VALUE.value, "reason": printed}
+        )
+        assert is_leaf is True
+        assert uncovered == 1
+        _address, is_leaf, uncovered = classify(nested, {"reason": printed})
+        assert is_leaf is True
+        assert uncovered == 1
+
+    bare = _minimal_extract()
+    _strip_scored_conditions(bare)
+    observation = bare["species"]["Fe"]["observations"][0]
+    observation["values"]["reason"] = printed
+    assert ("values", "reason") in set(vle._scored_measured_leaves(observation))
+    assert _uncovered_observation_count(bare) == 1
+    numbered = _minimal_extract()
+    _strip_scored_conditions(numbered)
+    numbered["species"]["Fe"]["observations"][0]["values"]["reason"] = 1978.0
+    assert _uncovered_observation_count(numbered) == 1
+    assert not vle._observation_has_digit_bearing_string(
+        {
+            "values": {
+                "points": [
+                    {
+                        "point_conditions": {
+                            "temperature_K": {
+                                "state": {
+                                    "tag": StateTag.UNKNOWN.value,
+                                    "reason": refusal,
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    )
     assert vle._observation_has_digit_bearing_string(
-        {"values": {"point_conditions": {"composition": {"state": {"reason": printed}}}}}
+        {
+            "values": {
+                "points": [
+                    {
+                        "point_conditions": {
+                            "temperature_K": {
+                                "state": {
+                                    "tag": StateTag.VALUE.value,
+                                    "reason": printed,
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    )
+    assert not vle._observation_has_digit_bearing_string(
+        {
+            "point_conditions": {
+                "temperature_K": {
+                    "state": {
+                        "tag": StateTag.UNKNOWN.value,
+                        "reason": refusal,
+                    }
+                }
+            }
+        }
+    )
+    assert vle._observation_has_digit_bearing_string(
+        {
+            "point_conditions": {
+                "temperature_K": {
+                    "state": {
+                        "tag": StateTag.VALUE.value,
+                        "reason": printed,
+                    }
+                }
+            }
+        }
     )
 
 
