@@ -5391,15 +5391,19 @@ _TYPED_LOCATOR_REFUSALS = (
 )
 _PER_KEY_OUTCOMES = (
     "matched",
+    "repository_transcription",
     *_TYPED_LOCATOR_REFUSALS,
     "token_absent",
     "digest_valid_token_absent",
+    "corpus_valid_token_present",
 )
 _CORPUS_FILE_OUTCOMES = {
     "artifact_digest_missing",
     "artifact_digest_mismatch",
     "digest_valid_token_absent",
+    "corpus_valid_token_present",
     "record_alternate_open",
+    "record_alternate_token_absent",
 }
 _LOCATOR_OUTCOME_CASES = []
 for _keys in _LOCATOR_KEY_SETS:
@@ -5407,6 +5411,7 @@ for _keys in _LOCATOR_KEY_SETS:
         (
             *_PER_KEY_OUTCOMES,
             "record_alternate_open",
+            "record_alternate_token_absent",
             "first_open_token_absent",
         )
         if key == "record"
@@ -5451,17 +5456,34 @@ for _keys in _LOCATOR_KEY_SETS:
                     ):
                         _realizable = False
                     elif (
-                        _outcome == "record_alternate_open"
+                        _outcome == "corpus_valid_token_present"
                         and _digest_token != "0.24"
                     ):
                         _realizable = False
                     elif (
-                        _outcome in {"matched", "record_alternate_open"}
+                        _outcome == "record_alternate_token_absent"
+                        and _digest_token != "0.25"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome
+                        in {"record_alternate_open", "corpus_valid_token_present"}
+                        and _digest_token != "0.24"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "matched"
                         and _digest_token not in {None, "0.24"}
                     ):
                         _realizable = False
                     elif (
-                        _outcome in {"token_absent", "first_open_token_absent"}
+                        _outcome
+                        in {
+                            "token_absent",
+                            "first_open_token_absent",
+                            "digest_valid_token_absent",
+                            "record_alternate_token_absent",
+                        }
                         and _digest_token not in {None, "0.25"}
                     ):
                         _realizable = False
@@ -5478,7 +5500,13 @@ for _keys, _outcomes, _corpus_mounted, _digest_token in _LOCATOR_OUTCOME_CASES:
     _expected_source_blind_reason = (
         "source_blind_pin"
         if not all(
-            outcome in {"matched", "record_alternate_open"}
+            outcome
+            in {
+                "matched",
+                "repository_transcription",
+                "corpus_valid_token_present",
+                "record_alternate_open",
+            }
             for outcome in _outcomes
         )
         else None
@@ -5538,6 +5566,14 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
         artifact.write_text(artifact_text(token), encoding="utf-8")
         return artifact
 
+    def write_repository_transcription(path: str) -> Path:
+        artifact = repository_root / path
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text(
+            "repository transcription\nalpha 0.24 measured\n", encoding="utf-8"
+        )
+        return artifact
+
     for key, outcome in zip(declared_keys, outcomes):
         relative = relative_paths[key]
         if outcome == "corpus_path_outside_root":
@@ -5548,12 +5584,16 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
 
         if outcome == "matched":
             write_artifact(repository_root, path, "0.24")
+        elif outcome == "repository_transcription":
+            write_repository_transcription(path)
         elif outcome == "token_absent":
             write_artifact(repository_root, path, "0.25")
         elif outcome == "artifact_digest_missing":
             write_artifact(corpus_root, path, "0.25")
         elif outcome == "digest_valid_token_absent":
             write_artifact(corpus_root, path, "0.25")
+        elif outcome == "corpus_valid_token_present":
+            write_artifact(corpus_root, path, "0.24")
         elif outcome == "artifact_digest_mismatch":
             mismatch_token = "0.25" if digest_token == "0.24" else "0.24"
             write_artifact(corpus_root, path, mismatch_token)
@@ -5566,6 +5606,9 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
         elif outcome == "record_alternate_open":
             filename = relative.split()[0]
             write_artifact(corpus_root, filename, "0.24")
+        elif outcome == "record_alternate_token_absent":
+            filename = relative.split()[0]
+            write_artifact(corpus_root, filename, "0.25")
         elif outcome == "first_open_token_absent":
             write_artifact(repository_root, relative, "0.25")
             write_artifact(repository_root, relative.split()[0], "0.24")
@@ -5588,19 +5631,27 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
     )
     assert (source_blind.kind if source_blind else None) == expected_source_blind_reason
     if source_blind:
+        expected_reason_codes = set(outcomes) & set(_TYPED_LOCATOR_REFUSALS)
+        actual_reason_codes = {
+            reason
+            for reason in _TYPED_LOCATOR_REFUSALS
+            if reason in source_blind.detail
+        }
+        assert actual_reason_codes == expected_reason_codes
         for key, outcome in zip(declared_keys, outcomes):
             if outcome in _TYPED_LOCATOR_REFUSALS:
                 assert f"{outcome} ({locator[key]})" in source_blind.detail
-        if any(
+        token_absent = any(
             outcome
             in {
                 "token_absent",
                 "digest_valid_token_absent",
+                "record_alternate_token_absent",
                 "first_open_token_absent",
             }
             for outcome in outcomes
-        ):
-            assert "not in the cited text" in source_blind.detail
+        )
+        assert ("not in the cited text" in source_blind.detail) == token_absent
 
     _assert_refused_sample_still_covers_addressed_observation(
         doc, artifact_root=repository_root
@@ -5616,11 +5667,6 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
             doc, label="locator-key-matrix", artifact_root=repository_root
         )
         assert any("corpus_root_unset" in refusal for refusal in refusals)
-    if "first_open_token_absent" in outcomes:
-        assert source_blind is not None
-        assert "not in the cited text" in source_blind.detail
-
-
 def test_multiple_corpus_artifacts_refuse_and_keep_address_coverage(
     tmp_path, monkeypatch
 ):

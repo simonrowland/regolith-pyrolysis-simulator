@@ -133,8 +133,8 @@ Certification opens every declared locator artifact (`source_path`,
 `quotes_path`, and file-valued `record`) independently. For any allowed source
 prefix, it first looks for the path under the repository artifact root (the
 simulator checkout or an explicit `--root`); an existing repository artifact
-is opened there, with `source_sha256` optional but verified when supplied. If
-it is absent there, the path resolves under the offline corpus mount set by
+is opened there, and `source_sha256` is not applied to repository artifacts.
+If a path is absent there, it resolves under the offline corpus mount set by
 `REGOLITH_CORPUS_ROOT` (for example, `~/Repos/regolith-corpus`). The root is a
 lookup location, not a policy switch. An unset root refuses with
 `corpus_root_unset`; a missing file refuses with `corpus_artifact_missing`,

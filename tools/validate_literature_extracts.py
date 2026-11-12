@@ -2351,9 +2351,9 @@ def _open_source_artifact(
             "corpus_artifact_unreadable" if is_corpus else "artifact_unreadable",
         )
     digest = hashlib.sha256(blob).hexdigest()
-    if is_corpus and expected_sha256 is None:
-        return resolved, blob, digest, "artifact_digest_missing"
-    if expected_sha256 is not None:
+    if is_corpus:
+        if expected_sha256 is None:
+            return resolved, blob, digest, "artifact_digest_missing"
         if not _valid_source_sha256(expected_sha256):
             return resolved, blob, digest, "artifact_digest_invalid"
         if digest != expected_sha256:
@@ -2629,6 +2629,10 @@ def _locator_source_blind_reason(
                 corpus_root=corpus_root,
                 expected_sha256=locator.get("source_sha256"),
             )
+            if path is not None and blob is not None:
+                # The first opened record candidate decides this key. Discard
+                # refusals from candidates that did not open.
+                candidate_reasons.clear()
             if (
                 path is not None
                 and blob is not None
