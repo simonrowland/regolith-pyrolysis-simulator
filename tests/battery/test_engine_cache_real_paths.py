@@ -418,6 +418,7 @@ def test_normalized_engine_defaults_match_backend_defaults(
         normalize_engine_settings,
     )
     from simulator.melt_backend import openimcc_bridge
+    from simulator.melt_backend import alphamelts as alphamelts_module
     from simulator.melt_backend.alphamelts import AlphaMELTSBackend
     from simulator.melt_backend.magemin import MAGEMinBackend
     from simulator.melt_backend.thermoengine import ThermoEngineBackend
@@ -433,12 +434,44 @@ def test_normalized_engine_defaults_match_backend_defaults(
         for engine in (
             "internal-analytical",
             "openimcc",
-            "alphamelts",
             "thermoengine",
             "vaporock",
             "magemin",
         )
     }
+
+    # Omitted transport is discovery. Exercise both outcomes through the
+    # backend resolver and require the cache normalizer to use that result.
+    monkeypatch.setattr(
+        "simulator.engine_local_config.find_alphamelts_binary",
+        lambda _root: None,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        alphamelts_module,
+        "_run_alphamelts_subprocess",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
+    )
+    for binary_available, expected_transport in (
+        (False, "python_api"),
+        (True, "subprocess"),
+    ):
+        binary_path = Path("/test/alphamelts2") if binary_available else None
+        monkeypatch.setattr(
+            AlphaMELTSBackend,
+            "_find_project_binary",
+            lambda _backend, _root, result=binary_path: result,
+        )
+        alpha = AlphaMELTSBackend()
+        resolved_transport = alphamelts_module.resolve_alphamelts_transport_mode(
+            None, backend=alpha
+        )
+        alpha_settings = normalize_engine_settings("alphamelts", None)
+        assert resolved_transport == expected_transport
+        assert alpha_settings["transport"] == resolved_transport
+        assert alpha._normalize_mode(None) is None
+        if not binary_available:
+            normalized["alphamelts"] = alpha_settings
 
     internal = _InternalAnalyticalBatteryBackend()
     assert normalized["internal-analytical"]["oxygen_balance_backend"] == {
@@ -475,7 +508,10 @@ def test_normalized_engine_defaults_match_backend_defaults(
     alpha = AlphaMELTSBackend()
     alpha._configure_subprocess_calc_mode(None)
     alpha._initialize_vapor_transport({})
-    assert normalized["alphamelts"]["transport"] == alpha._normalize_mode(None)
+    alpha._python_api_model = alphamelts_module.resolve_alphamelts_python_api_model(
+        alpha._raw_model_name
+    )
+    assert normalized["alphamelts"]["transport"] == "python_api"
     assert normalized["alphamelts"]["raw_model_name"] == alpha._raw_model_name
     assert normalized["alphamelts"]["effective_calc_mode"] == (
         alpha._effective_subprocess_calc_mode
@@ -533,6 +569,8 @@ def test_normalized_engine_defaults_match_backend_defaults(
 def test_default_and_test_configuration_cache_keys_are_byte_stable(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from simulator.melt_backend import alphamelts as alphamelts_module
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
     from simulator import environment
     from simulator.diagnostic_helpers.binary_pot_battery import (
         normalize_engine_settings,
@@ -548,6 +586,21 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         "vacuum_floor_bar_for_environment",
         lambda: environment.DEFAULT_VACUUM_FLOOR_BAR,
     )
+    monkeypatch.setattr(
+        "simulator.engine_local_config.find_alphamelts_binary",
+        lambda _root: None,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        AlphaMELTSBackend,
+        "_find_project_binary",
+        lambda _backend, _root: None,
+    )
+    monkeypatch.setattr(
+        alphamelts_module,
+        "_run_alphamelts_subprocess",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
+    )
     snapshots = (
         (
             "openimcc default",
@@ -559,7 +612,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
             "AlphaMELTS default",
             "alphamelts",
             None,
-            "86f02e00df6c7ba3f970b3f3bddaded6b60432a2441578a8a430b70b61d7f252",
+            "bc6e37a3acac7c543ac5b2487ee01442f52ba4405aa1edab44990c8c60d54bf4",
         ),
         (
             "AlphaMELTS Python API default model",
