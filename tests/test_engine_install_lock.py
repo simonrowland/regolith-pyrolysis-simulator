@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -56,44 +58,51 @@ def _load_install_engines_module():
     return installer
 
 
-def _patch_hunk_source(patch_file: Path) -> tuple[Path, bytes, bytes]:
+def _patch_hunks(patch_file: Path) -> tuple[tuple[Path, int, bytes, bytes], ...]:
     lines = patch_file.read_bytes().splitlines(keepends=True)
     target: Path | None = None
-    before = bytearray()
-    after = bytearray()
-    in_hunk = False
-    hunk_count = 0
-    old_remaining = 0
-    new_remaining = 0
-    for line in lines:
+    hunks: list[tuple[Path, int, bytes, bytes]] = []
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        index += 1
         if line.startswith(b"+++ b/"):
             target = Path(line[len(b"+++ b/") :].rstrip(b"\r\n").decode())
         elif line.startswith(b"@@ "):
             old_spec, new_spec = line.split(b"@@", 2)[1].split()[:2]
-            old_remaining = int(old_spec.rsplit(b",", 1)[-1])
-            new_remaining = int(new_spec.rsplit(b",", 1)[-1])
-            hunk_count += 1
-            in_hunk = True
-        elif in_hunk:
-            if line.startswith(b" "):
-                before.extend(line[1:])
-                after.extend(line[1:])
-                old_remaining -= 1
-                new_remaining -= 1
-            elif line.startswith(b"-"):
-                before.extend(line[1:])
-                old_remaining -= 1
-            elif line.startswith(b"+"):
-                after.extend(line[1:])
-                new_remaining -= 1
-            elif line.startswith(b"\\"):
-                continue
-            else:
-                in_hunk = False
-            if old_remaining == 0 and new_remaining == 0:
-                in_hunk = False
-    assert target is not None and hunk_count == 1
-    return target, bytes(before), bytes(after)
+            old_range = old_spec[1:].split(b",", 1)
+            new_range = new_spec[1:].split(b",", 1)
+            old_start = int(old_range[0])
+            old_count = int(old_range[1]) if len(old_range) == 2 else 1
+            new_count = int(new_range[1]) if len(new_range) == 2 else 1
+            old_remaining = old_count
+            new_remaining = new_count
+            before = bytearray()
+            after = bytearray()
+            while old_remaining or new_remaining:
+                line = lines[index]
+                index += 1
+                if line.startswith(b" "):
+                    before.extend(line[1:])
+                    after.extend(line[1:])
+                    old_remaining -= 1
+                    new_remaining -= 1
+                elif line.startswith(b"-"):
+                    before.extend(line[1:])
+                    old_remaining -= 1
+                elif line.startswith(b"+"):
+                    after.extend(line[1:])
+                    new_remaining -= 1
+                elif line.startswith(b"\\"):
+                    continue
+                else:
+                    raise AssertionError(f"invalid hunk line in {patch_file}: {line!r}")
+            assert target is not None
+            assert len(before.splitlines(keepends=True)) == old_count
+            assert len(after.splitlines(keepends=True)) == new_count
+            hunks.append((target, old_start, bytes(before), bytes(after)))
+    assert hunks
+    return tuple(hunks)
 
 
 def test_engine_lock_contains_the_reviewed_studio_source_pins(
@@ -103,11 +112,13 @@ def test_engine_lock_contains_the_reviewed_studio_source_pins(
 
     assert lock.engines["magemin"].pin == "40ed109d07d4246001cab59382596d33fed79086"
     assert lock.engines["magemin"].patches == (
+        "0001-thermocalc-amgo-periclase-reference",
         "0002-lp-iteration-cap-terminates-without-pc-recheck",
+        "0003-sb-feo-activity-keeps-four-cation-scaling",
         "0004-headless-singleton-mpi-defaults",
     )
     assert lock.engines["magemin"].reference_sha256 == (
-        "e30b733cfb020440d39465effd78fed7a4c30cf91b264db61925af4198b564b9"
+        "52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1"
     )
     assert lock.engines["thermoengine"].pin == "df7a5f4609116a83bf40a5a352a19e3826a822d9"
     assert lock.engines["vaporock"].pin == "0159678a8eefb51dfe3f12bb646dc38507a07230"
@@ -144,43 +155,141 @@ def test_build_magemin_applies_locked_patches_before_build_and_is_idempotent(
     installer = _load_install_engines_module()
     lock = load_engine_lock(LOCK_PATH)
     pin = lock.engines["magemin"]
-    root = tmp_path / "engine-bin"
-    source = engine_install_path(lock, root, "magemin")
     patch_root = LOCK_PATH.parents[1] / "patches" / "magemin"
-    expected: dict[Path, bytes] = {}
-    for patch_name in pin.patches:
-        patch_file = patch_root / f"{patch_name}.patch"
-        relative_path, before, after = _patch_hunk_source(patch_file)
-        assert b"\r\n" in before and b"\n" not in before.replace(b"\r\n", b"")
-        assert b"\r\n" in after and b"\n" not in after.replace(b"\r\n", b"")
-        target = source / relative_path
+    patch_hunks = tuple(
+        _patch_hunks(patch_root / f"{patch_name}.patch")
+        for patch_name in pin.patches
+    )
+    source_lines: dict[Path, list[bytes]] = {}
+    line_delta: dict[Path, int] = {}
+    padding = b"/* fixture padding */\r\n"
+    for hunks in patch_hunks:
+        for relative_path, old_start, before, after in hunks:
+            old_lines = before.splitlines(keepends=True)
+            for patch_bytes in (before, after):
+                assert b"\r\n" in patch_bytes
+                assert b"\n" not in patch_bytes.replace(b"\r\n", b"")
+            initial_start = old_start - 1 - line_delta.get(relative_path, 0)
+            assert initial_start >= 0
+            fixture = source_lines.setdefault(relative_path, [])
+            required_length = initial_start + len(old_lines)
+            if len(fixture) < required_length:
+                fixture.extend([padding] * (required_length - len(fixture)))
+            assert fixture[initial_start:required_length] == [padding] * len(old_lines)
+            fixture[initial_start:required_length] = old_lines
+        for relative_path in {hunk[0] for hunk in hunks}:
+            line_delta[relative_path] = line_delta.get(relative_path, 0) + sum(
+                len(after.splitlines(keepends=True)) - len(before.splitlines(keepends=True))
+                for path, _old_start, before, after in hunks
+                if path == relative_path
+            )
+
+    expected_lines = {
+        relative_path: list(lines)
+        for relative_path, lines in source_lines.items()
+    }
+    for hunks in patch_hunks:
+        for relative_path in {hunk[0] for hunk in hunks}:
+            target = expected_lines[relative_path]
+            for _path, old_start, before, after in sorted(
+                (hunk for hunk in hunks if hunk[0] == relative_path),
+                key=lambda hunk: hunk[1],
+                reverse=True,
+            ):
+                old_lines = before.splitlines(keepends=True)
+                start = old_start - 1
+                assert target[start : start + len(old_lines)] == old_lines
+                target[start : start + len(old_lines)] = after.splitlines(keepends=True)
+    expected = {
+        relative_path: b"".join(lines)
+        for relative_path, lines in expected_lines.items()
+    }
+
+    fixture_repo = tmp_path / "magemin-source-fixture"
+    for relative_path, lines in source_lines.items():
+        target = fixture_repo / relative_path
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(before)
-        expected[relative_path] = after
+        target.write_bytes(b"".join(lines))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", os.devnull)
+    git_env = os.environ.copy()
+    git_env.update(
+        {
+            "GIT_AUTHOR_NAME": "Engine installer test",
+            "GIT_AUTHOR_EMAIL": "engine-test@example.invalid",
+            "GIT_COMMITTER_NAME": "Engine installer test",
+            "GIT_COMMITTER_EMAIL": "engine-test@example.invalid",
+        }
+    )
+    subprocess.run(
+        ["git", "-C", str(fixture_repo), "init", "--quiet"],
+        check=True,
+        env=git_env,
+    )
+    subprocess.run(
+        ["git", "-C", str(fixture_repo), "add", "--all"],
+        check=True,
+        env=git_env,
+    )
+    subprocess.run(
+        [
+            "git", "-C", str(fixture_repo), "commit", "--quiet", "-m",
+            "MAGEMin patch fixture",
+        ],
+        check=True,
+        env=git_env,
+    )
+    fixture_pin = subprocess.check_output(
+        ["git", "-C", str(fixture_repo), "rev-parse", "HEAD"],
+        text=True,
+        env=git_env,
+    ).strip()
 
     monkeypatch.setattr(installer, "ROOT", LOCK_PATH.parents[1])
-    monkeypatch.setattr(installer, "checkout_matches_pin", lambda _pin, _source: True)
-    build_check = "from pathlib import Path; " + "; ".join(
-        f"assert Path({str(path)!r}).read_bytes() == bytes.fromhex({data.hex()!r})"
+    build_count = tmp_path / "build-invocations"
+    build_check = "import hashlib; from pathlib import Path; " + "; ".join(
+        f"assert hashlib.sha256(Path({str(path)!r}).read_bytes()).hexdigest() == {hashlib.sha256(data).hexdigest()!r}"
         for path, data in expected.items()
-    ) + "; Path('build.ok').touch()"
+    ) + (
+        f"; counter = Path({str(build_count)!r}); "
+        "counter.write_text(str(int(counter.read_text()) + 1) if counter.exists() else '1'); "
+        "Path('build.ok').touch()"
+    )
     lock = EngineLock(
         engines={
             **lock.engines,
             "magemin": replace(
                 pin,
+                pin=fixture_pin,
                 build_commands=((sys.executable, "-c", build_check),),
                 artifacts=(),
             ),
         }
     )
+    root = tmp_path / "engine-bin"
+    source = engine_install_path(lock, root, "magemin")
+    source.parent.mkdir(parents=True)
+    fixture_repo.rename(source)
+    root.mkdir(exist_ok=True)
+    outside_marker = root / "outside-magemin-source"
+    outside_marker.write_bytes(b"must survive MAGEMin clean")
 
     installer.build_magemin(lock, root)
+    first_build = {
+        path: (source / path).read_bytes()
+        for path in expected
+    }
     installer.build_magemin(lock, root)
+    second_build = {
+        path: (source / path).read_bytes()
+        for path in expected
+    }
 
-    for path, data in expected.items():
-        assert (source / path).read_bytes() == data
+    assert first_build == expected
+    assert second_build == first_build
+    assert build_count.read_text() == "2"
     assert (source / "build.ok").is_file()
+    assert outside_marker.read_bytes() == b"must survive MAGEMin clean"
 
 
 @pytest.mark.parametrize("patch_name", ("../x", "/abs", "a/b"))

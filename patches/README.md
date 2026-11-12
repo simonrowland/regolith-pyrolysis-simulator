@@ -170,8 +170,11 @@ pull-request description in `patches/magemin/UPSTREAM-PR.md`; `0004` has its own
 The patch files keep MAGEMin's CRLF line endings: apply them with `git am --keep-cr` (or `git apply`),
 and edit them byte-safely. `enginepatch.sh` maps
 `magemin` to `../MAGEMin` (override with `MAGEMIN_CHECKOUT`); `STATUS` describes that sibling
-checkout. Studio runtime builds use the engine lock and `install-engines.py`, which apply patches
-0002 and 0004. The remaining MAGEMin patches are not part of the studio build.
+checkout. Studio runtime build C uses the engine lock and `install-engines.py` to apply patches
+0001–0004 in order. C adds 0001 and 0003 to B. Physics d-392 found C production-neutral: empty
+golden regen, byte-identical `sio_yield`, and zero scored battery rows move. It changes only
+native MAGEMin `aMgO` (Kume305: 1.287e-21 -> 0.466, measured 0.327), which only the battery
+scorer reads.
 
 ### alphamelts — bundled 2.3.1 arm64 artifact / upstream `957b8f5`
 

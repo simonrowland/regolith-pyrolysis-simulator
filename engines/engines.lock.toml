@@ -62,14 +62,18 @@ artifacts = ["MAGEMin", "libMAGEMin.dylib"]
 runtime_artifact = "MAGEMin"
 identity_extra = { db = "ig" }
 patches = [
+    "0001-thermocalc-amgo-periclase-reference",
     "0002-lp-iteration-cap-terminates-without-pc-recheck",
+    "0003-sb-feo-activity-keeps-four-cation-scaling",
     "0004-headless-singleton-mpi-defaults",
 ]
-# Studio SoC only (s1/s2/s3, measured on studio-3); matches install-engines.py
-# only when built at ~/repos/engine-bin/MAGEMin/<commit>/MAGEMin. rpp's M4 and
-# other build dirs can drift; check_engine_install reports git-engine
-# artifact_sha256_drift as an expected warning.
-reference_sha256 = "e30b733cfb020440d39465effd78fed7a4c30cf91b264db61925af4198b564b9"
+# Studio SoC only (s1/s2/s3, measured on studio-3); matches this lock at
+# ~/repos/engine-bin/MAGEMin/<commit>/MAGEMin after make clean, make all, make lib.
+# Build C = B + 0001 + 0003. Physics d-392: production-neutral (empty golden
+# regen, byte-identical sio_yield, zero scored battery rows move). Only native
+# MAGEMin aMgO changes (Kume305: 1.287e-21 -> 0.466, measured 0.327); only the
+# battery scorer reads it. Other build dirs can report artifact_sha256_drift.
+reference_sha256 = "52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1"
 reference_sha256_source = "MAGEMin"
 
 [engines.petthermotools]
