@@ -1,0 +1,383 @@
+schema_version: literature_extract.v1
+source_id: mckay-1991-simulated-lunar-glass-reduction
+source:
+  citation: >-
+    McKay, D. S., Morris, R. V. and Jurewicz, A. J. (1991). Experimental
+    reduction of simulated lunar glass by carbon and hydrogen and implications
+    for lunar base oxygen production. Lunar and Planetary Science XXII,
+    Press Abstracts, pp. 49–52. NASA accession N91-20009.
+  year: 1991
+  corpus_asset: raw/mckay-1991-simulated-lunar-glass-reduction/mckay-1991-simulated-lunar-glass-reduction.pdf
+  corpus_sha256: 8c9cfcdb7742380be9e0eb874d07ced2f4cb8dedcd7f49b8feb2c6b4f7f0315c
+extraction:
+  method: >-
+    Manual transcription from the four-page LPSC XXII press-abstract PDF.
+    Pages were rendered at 200 dpi and read as images; the born-digital
+    pdftotext -layout layer was used only as a cross-check. Table 1 cells
+    were read from the page-4 image. No figures are present. No values were
+    estimated or digitised. Temperatures are stored as printed in C.
+    The 24.5 kg O2/t, 2 kg/t, and 100 kg/t oxygen figures are author
+    estimates, not measured oxygen yields; the authors state they did not
+    directly measure oxygen production.
+  date: '2026-11-12'
+  worker: empirical-b15-2026-11-12
+  provenance_path: raw/mckay-1991-simulated-lunar-glass-reduction/
+review_status: draft
+benches:
+- id: jsc-gas-mixing-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: controlled atmosphere gas mixing furnace with flowing gas}
+    locator: &exp_loc {page: 50, pdf_page_index: 1, published_page: '50', section: Experimental}
+  heating_method:
+    state: {tag: value, value: gas mixing furnace; temperatures from 950 C (glass still solid powder) to 1200 C (glass partially melted and behaved as a fluid)}
+    locator: *exp_loc
+  detector:
+    state: {tag: value, value: Mossbauer spectroscopy of the cooled solid after the run, to determine the relative amount of metallic iron produced}
+    locator: *exp_loc
+  atmosphere:
+    state: {tag: value, value: flowing gases including carbon monoxide, carbon dioxide, and hydrogen; very low oxygen partial pressure in the flowing gas (numeric pO2 not printed); some experiments also mixed the sample with carbon}
+    locator: *exp_loc
+experiments:
+- experiment_id: carbon-reduction-1000C
+  bench_id: jsc-gas-mixing-furnace
+  method: elemental_carbon_reduction_of_synthetic_lunar_glass
+  locator: {page: 50, pdf_page_index: 1, published_page: '50', section: 'Results and discussion'}
+  conditions:
+    temperature_C:
+      state: {tag: value, value: {kind: point, point: '1000'}}
+      locator: {page: 50, pdf_page_index: 1, published_page: '50', section: 'Results and discussion', note: '1000 C carbon run as printed'}
+- experiment_id: hydrogen-reduction-1000C
+  bench_id: jsc-gas-mixing-furnace
+  method: hydrogen_gas_reduction_of_synthetic_lunar_glass
+  locator: {page: 50, pdf_page_index: 1, published_page: '50', section: 'Results and discussion'}
+  conditions:
+    temperature_C:
+      state: {tag: value, value: {kind: point, point: '1000'}}
+      locator: {page: 50, pdf_page_index: 1, published_page: '50', section: 'Results and discussion', note: '1000 C hydrogen run as printed'}
+    duration_h:
+      state: {tag: value, value: {kind: point, point: '24'}}
+      locator: {page: 50, pdf_page_index: 1, published_page: '50', section: 'Results and discussion', note: '24 hours is printed only for the hydrogen-reacted maximum-conversion sample'}
+- experiment_id: carbon-monoxide-reduction
+  bench_id: jsc-gas-mixing-furnace
+  method: carbon_monoxide_carbon_dioxide_reduction_of_synthetic_lunar_glass
+  locator: {page: 50, pdf_page_index: 1, published_page: '50', section: 'Results and discussion'}
+fidelity_samples:
+- species: Fe
+  observable: composition_series
+  observation_id: mckay_1991_fe_conversion_1000C_carbon
+  field: mass_yield_percent
+  value: 11
+  locator:
+    page: 50
+    pdf_page_index: 1
+    published_page: '50'
+    section: Results and discussion
+    note: 'The proportion of iron in the glass which was converted to metal ... 11% in the 1000 C carbon run'
+- species: Fe
+  observable: composition_series
+  observation_id: mckay_1991_fe_conversion_1000C_carbon
+  field: T_C
+  value: 1000
+  locator:
+    page: 50
+    pdf_page_index: 1
+    published_page: '50'
+    section: Results and discussion
+    note: 1000 C carbon run
+- species: Fe
+  observable: composition_series
+  observation_id: mckay_1991_fe_conversion_1000C_hydrogen
+  field: mass_yield_percent
+  value: 53
+  locator:
+    page: 50
+    pdf_page_index: 1
+    published_page: '50'
+    section: Results and discussion
+    note: 'The proportion of iron in the glass which was converted to metal ... 53% in the 1000 C hydrogen run'
+- species: Fe
+  observable: composition_series
+  observation_id: mckay_1991_fe_conversion_1000C_hydrogen
+  field: T_C
+  value: 1000
+  locator:
+    page: 50
+    pdf_page_index: 1
+    published_page: '50'
+    section: Results and discussion
+    note: 1000 C hydrogen run
+- species: Fe
+  observable: composition_series
+  observation_id: mckay_1991_fe_conversion_1000C_hydrogen
+  field: duration_h
+  value: 24
+  locator:
+    page: 50
+    pdf_page_index: 1
+    published_page: '50'
+    section: Results and discussion
+    note: 'in 24 hours, slightly more than half of the total iron was converted to metallic iron'
+species:
+  Fe:
+    observations:
+    - observation_id: mckay_1991_fe_conversion_1000C_carbon
+      experiment: carbon-reduction-1000C
+      type: composition_series
+      locator:
+        page: 50
+        pdf_page_index: 1
+        published_page: '50'
+        section: Results and discussion
+        note: >-
+          The proportion of iron in the glass which was converted to metal in
+          the experimental runs ranged from none in the carbon monoxide runs
+          to 11% in the 1000 C carbon run to 53% in the 1000 C hydrogen run.
+      phase: synthetic_lunar_glass_after_reduction
+      regime: gas_mixing_furnace_reduction
+      units: percent of total iron converted to metal, as printed
+      values:
+        quantity: yield_fraction
+        method_class: measured_direct
+        evidence_class: measured_direct
+        mass_yield_percent: 11
+        T_C: 1000
+        reductant_as_printed: elemental carbon
+        assay_as_printed: Mossbauer spectroscopy of the cooled solid after the run
+        oxygen_not_measured_as_printed: >-
+          While we did not directly measure the production of oxygen from the
+          simulated lunar glass, we measured the metallic iron produced in the
+          sample after the run.
+      uncertainty:
+        note: No uncertainty width or confidence level is printed for the 11% conversion.
+    - observation_id: mckay_1991_fe_conversion_1000C_hydrogen
+      experiment: hydrogen-reduction-1000C
+      type: composition_series
+      locator:
+        page: 50
+        pdf_page_index: 1
+        published_page: '50'
+        section: Results and discussion
+        note: >-
+          53% in the 1000 C hydrogen run. The following sentence states that
+          the maximum conversion occurred for the hydrogen-reacted sample;
+          in 24 hours, slightly more than half of the total iron was converted
+          to metallic iron.
+      phase: synthetic_lunar_glass_after_reduction
+      regime: gas_mixing_furnace_reduction
+      units: percent of total iron converted to metal, as printed
+      values:
+        quantity: yield_fraction
+        method_class: measured_direct
+        evidence_class: measured_direct
+        mass_yield_percent: 53
+        T_C: 1000
+        duration_h: 24
+        reductant_as_printed: hydrogen gas
+        assay_as_printed: Mossbauer spectroscopy of the cooled solid after the run
+        qualitative_max_as_printed: slightly more than half of the total iron
+        oxygen_not_measured_as_printed: >-
+          While we did not directly measure the production of oxygen from the
+          simulated lunar glass, we measured the metallic iron produced in the
+          sample after the run.
+      uncertainty:
+        note: No uncertainty width or confidence level is printed for the 53% conversion.
+    context:
+    - observation_id: mckay_1991_co_reduction_no_measurable_metal
+      type: textual_fact
+      experiment: carbon-monoxide-reduction
+      locator:
+        page: 50
+        pdf_page_index: 1
+        published_page: '50'
+        section: Results and discussion
+      units: as printed
+      values:
+        quantity: yield_fraction
+        method_class: measured_direct
+        evidence_class: measured_direct
+        semantics: bound_not_point
+        value_as_printed: none
+        additional_statement_page_51: No measurable reduction occurred when the carbon monoxide/carbon dioxide mixture was used.
+        reductant_as_printed: carbon monoxide; carbon monoxide/carbon dioxide mixture
+        note: >-
+          The printed result is the word "none" (p. 50) and the sentence
+          "No measurable reduction occurred" (p. 51). A numeric zero was not
+          invented.
+    - observation_id: mckay_1991_experimental_method
+      type: method
+      locator: *exp_loc
+      units: as printed
+      values:
+        quantity: reduction_experiment_conditions
+        method_class: method_only
+        sample_form_as_printed: powdered synthetic lunar glass
+        temperature_range_C_as_printed: from 950 C at which the glass was still solid and remained as a powder to 1200 C at which the glass partially melted and behaved as a fluid
+        reductants_as_printed:
+        - carbon monoxide
+        - elemental carbon
+        - hydrogen gas
+        flowing_gases_as_printed:
+        - carbon monoxide
+        - carbon dioxide
+        - hydrogen
+        oxygen_fugacity_as_printed: very low oxygen partial pressure in the flowing gas
+        numeric_pO2_printed: false
+        gas_ratios_printed: false
+        sample_mass_printed: false
+        run_durations_printed: only the 24 hour hydrogen maximum-conversion statement
+    - observation_id: mckay_1991_carbon_forms_cementite
+      type: characterization
+      experiment: carbon-reduction-1000C
+      locator:
+        page: 51
+        pdf_page_index: 2
+        published_page: '51'
+        section: Summary and Conclusions
+      units: as printed
+      values:
+        quantity: reduction_product_phase
+        method_class: method_only
+        product_as_printed: cementite (Fe3C)
+        note: >-
+          When carbon was used, it formed cementite (Fe3C) in the experiments;
+          the authors state this would tie up the carbon and prevent easy recycling.
+  synthetic_lunar_glass:
+    observations: []
+    context:
+    - observation_id: mckay_1991_table1_synthetic_lunar_glass
+      type: starting_composition
+      locator:
+        page: 52
+        pdf_page_index: 3
+        published_page: '52'
+        table: '1'
+      units: wt%
+      values:
+        quantity: starting_bulk_composition
+        method_class: measured_tabulated
+        sample_label: Synthetic lunar glass
+        SiO2: '44.65'
+        TiO2: '6.59'
+        Al2O3: '13.42'
+        Cr2O3: '0.14'
+        Fe2O3: '0.00'
+        FeO: '13.95'
+        MnO: '0.14'
+        MgO: '7.38'
+        CaO: '12.25'
+        Na2O: '0.50'
+        K2O: '0.02'
+        P2O5: '0.02'
+        Total: '99.06'
+        note: >-
+          Percent signs are printed on the SiO2 row (44.65%, 41.0%, 38.57%)
+          and on the Total row (99.06%, 99.96%, 99.40%). Other oxide cells
+          are printed without a repeated percent sign. The table title is
+          "Table 1. Composition of synthetic starting material and comparison
+          with lunar materials".
+    - observation_id: mckay_1991_table1_apollo11_soil_10084
+      type: starting_composition
+      locator:
+        page: 52
+        pdf_page_index: 3
+        published_page: '52'
+        table: '1'
+      units: wt%
+      values:
+        quantity: comparison_bulk_composition
+        method_class: quoted_unattributed
+        sample_label: Apollo 11 soil 10084
+        SiO2: '41.0'
+        TiO2: '7.3'
+        Al2O3: '12.8'
+        Cr2O3: '0.31'
+        Fe2O3: '0.0'
+        FeO: '16.2'
+        MnO: '0.22'
+        MgO: '9.2'
+        CaO: '12.4'
+        Na2O: '0.38'
+        K2O: '0.15'
+        P2O5:
+          state: not_printed
+        Total: '99.96'
+        note: >-
+          The P2O5 cell for Apollo 11 soil 10084 is blank in Table 1. No
+          value was invented. The compilation source of the comparison
+          columns is not printed.
+    - observation_id: mckay_1991_table1_apollo17_orange_glass
+      type: starting_composition
+      locator:
+        page: 52
+        pdf_page_index: 3
+        published_page: '52'
+        table: '1'
+      units: wt%
+      values:
+        quantity: comparison_bulk_composition
+        method_class: quoted_unattributed
+        sample_label: Apollo 17 orange glass
+        SiO2: '38.57'
+        TiO2: '8.81'
+        Al2O3: '6.32'
+        Cr2O3: '0.75'
+        Fe2O3: '0.0'
+        FeO: '22.04'
+        MnO: '0.30'
+        MgO: '14.44'
+        CaO: '7.68'
+        Na2O: '0.36'
+        K2O: '0.09'
+        P2O5: '0.04'
+        Total: '99.40'
+        note: The compilation source of the comparison columns is not printed.
+    - observation_id: mckay_1991_author_estimate_o2_yields
+      type: textual_fact
+      locator:
+        page: 51
+        pdf_page_index: 2
+        published_page: '51'
+        section: Summary and Conclusions
+      units: as printed
+      values:
+        quantity: o2_yield
+        method_class: author_estimate
+        evidence_class: author_estimate
+        orange_glass_conditional_yield:
+          value_as_printed: 24.5 kg of oxygen for each metric ton of lunar pyroclastic glass mined and processed
+          condition_as_printed: >-
+            If this process behaves similarly with Apollo 17 pyroclastic orange
+            glass composition, (Table 1) and were 50% efficient at reducing the
+            iron to metal (as demonstrated in our experiments for the 24 hour run)
+          evidence_class: author_estimate
+        unconcentrated_ilmenite_comparator:
+          free_ilmenite_as_printed: only about 2% free ilmenite grains
+          feedstock_as_printed: unconcentrated high-titanium typical mature lunar soil
+          value_as_printed: about 2 kg of oxygen per metric ton of mined soil
+          condition_as_printed: concentrated and extracted with hydrogen at 100% efficiency
+          evidence_class: author_estimate
+        concentrated_ilmenite_comparator:
+          value_as_printed: about 100 kg of oxygen per metric ton of processed ilmenite
+          mining_requirement_as_printed: 50 tons of soil would have to be mined to provide the ilmenite
+          condition_as_printed: If all of the ilmenite were concentrated by a magnetic or electrostatic process before chemical processing
+          evidence_class: author_estimate
+        note: >-
+          These oxygen masses are not measured in this work. The authors
+          state on p. 50 that they did not directly measure oxygen production.
+          The arithmetic that produces 24.5 kg/t from Table 1 FeO is not
+          printed and was not reconstructed here.
+    - observation_id: mckay_1991_introductory_oxygen_abundance
+      type: textual_fact
+      locator:
+        page: 49
+        pdf_page_index: 0
+        published_page: '49'
+        section: Introduction
+      units: wt%
+      values:
+        quantity: typical_lunar_sample_oxygen_abundance
+        method_class: quoted_unattributed
+        evidence_class: quoted_unattributed
+        value_as_printed: approximately 45% by weight of typical lunar samples returned during the Apollo missions
+        patent_as_printed: 'ilmenite hydrogen-reduction patent number 4,948,477; August 14,1990, Gibson and Knudsen, Carbotek, Inc.'
