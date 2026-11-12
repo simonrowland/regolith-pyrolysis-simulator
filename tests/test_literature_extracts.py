@@ -10669,24 +10669,18 @@ _FORMULA_COMPOUNDS = (
     ("Fe2(SO4)3", ("SO4",)),
     ("CaO\u00b7SiO2", ("SiO2",)),
 )
-# A superscript immediately after a run is the charge, not the bare label.
-# The bare side refuses. The charged side certifies for every wrapper.
-_SUPERSCRIPT_SUFFIX_PAIRS = (
-    ("Fe", "Fe^{2+}"),
-    ("SiO2", "SiO2^{2+}"),
-    ("O2", "O^{2-}"),
-)
-_SUPERSCRIPT_SUFFIX_WRAPPERS = (
-    "plain",
-    "dollar",
-    "mathrm",
-    "nested",
-    "unicode",
-    "sup",
-)
-_SUPERSCRIPT_CHARGE_MARK = str.maketrans(
-    "0123456789+-",
-    "\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079\u207a\u207b",
+# Charged species are unsupported. Each source is one raw token. Fe, Fe2,
+# and Fe^{2+} all refuse. A separate neutral Fe in the same text still
+# certifies Fe. The mathrm form closes the brace before the charge.
+_CHARGED_SPECIES_LABELS = ("Fe", "Fe2", "Fe^{2+}")
+_CHARGED_SPECIES_SOURCES = (
+    ("dollar", "$Fe^{2+}$"),
+    ("mathrm", "$\\mathrm{Fe}^{2+}$"),
+    ("nested", "${\\mathrm{{Fe}}^{2+}}$"),
+    ("sup", "Fe<sup>2+</sup>"),
+    ("unicode-plus", "Fe\u207a"),
+    ("unicode-two", "Fe\u00b2\u207a"),
+    ("caret", "Fe^{2+}"),
 )
 _FORMULA_UNICODE_DIGITS = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 
@@ -10728,23 +10722,6 @@ def _formula_pair_text(left: str, right: str, kind: str, layout: str) -> str:
     )
 
 
-def _superscript_suffix_source(charged: str, kind: str) -> str:
-    """Wrap a charged formula. The charge is ``^``, Unicode, or ``<sup>``."""
-    if kind == "unicode":
-        return re.sub(
-            r"\^\{([^{}]*)\}",
-            lambda match: match.group(1).translate(_SUPERSCRIPT_CHARGE_MARK),
-            charged,
-        )
-    if kind == "sup":
-        return re.sub(
-            r"\^\{([^{}]*)\}",
-            lambda match: "<sup>" + match.group(1) + "</sup>",
-            charged,
-        )
-    return _formula_wrap_body(charged, kind)
-
-
 def _formula_citation(token: str) -> tuple[str, object]:
     """Formula key for a formula. A plain number certifies as a number."""
     if re.fullmatch(r"\d+", token):
@@ -10767,10 +10744,11 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     digit inside a formula token does not certify as a number, for every
     wrapper. A separate number token still certifies. A sub-formula inside
     a compound is not the compound: ``SO4`` is not ``Fe2(SO4)3``, and
-    ``SiO2`` is not ``CaO·SiO2``. A run immediately followed by a
-    superscript is a charged species. ``Fe`` is not ``Fe^{2+}``,
-    ``SiO2`` is not ``SiO2^{2+}``, and ``O2`` is not ``O^{2-}``. The
-    charged label certifies for every wrapper.
+    ``SiO2`` is not ``CaO·SiO2``. A raw token with a caret, ``<sup>``,
+    a Unicode superscript, or a trailing charge is unsupported.
+    ``Fe``, ``Fe2``, and ``Fe^{2+}`` refuse with
+    ``charged_species_unsupported``. A neutral ``Fe`` elsewhere still
+    certifies.
     """
     assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
     assert (
@@ -10895,35 +10873,75 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                 joined = "\n".join(errors)
                 if not errors or "source_blind_pin" not in joined:
                     failures.append(f"compound refuse {part!r} {where}: {errors}")
-    assert vle._formula_label_in_text("SiO2", "$SiO2^{2+}$") is False
-    assert vle._formula_label_in_text("Fe", "$Fe^{2+}$") is False
-    assert vle._formula_label_in_text("O2", "$O^{2-}$") is False
-    assert vle._formula_label_in_text("Fe^{2+}", "$Fe^{2+}$") is True
-    assert vle._formula_label_in_text("SiO2^{2+}", "$SiO2^{2+}$") is True
-    assert vle._formula_label_in_text("O^{2-}", "$O^{2-}$") is True
-    for kind in _SUPERSCRIPT_SUFFIX_WRAPPERS:
-        for bare, charged in _SUPERSCRIPT_SUFFIX_PAIRS:
-            source = _superscript_suffix_source(charged, kind)
-            where = f"suffix {kind} {source!r}"
+    assert vle._formula_label_in_text("Fe", r"$\mathrm{Fe}^{2+}$") is False
+    assert vle._formula_label_in_text("Fe2", r"$\mathrm{Fe}^{2+}$") is False
+    assert vle._formula_label_in_text("Fe^{2+}", r"$\mathrm{Fe}^{2+}$") is False
+    assert vle._formula_label_in_text("Fe", r"Fe $\mathrm{Fe}^{2+}$") is True
+    assert vle._formula_label_in_text("Fe^{2+}", "$Fe^{2+}$") is False
+    assert vle._html_cell_is_charged_species("Fe2+", ((2, 4),)) is True
+    assert vle._html_cell_is_charged_species("103", ((2, 3),)) is False
+    assert vle._html_cell_is_charged_species("1.5x103", ((6, 7),)) is False
+    for kind, source in _CHARGED_SPECIES_SOURCES:
+        for key in ("formula", "species"):
+            for label in _CHARGED_SPECIES_LABELS:
+                doc = _html_source_document(
+                    tmp_path, label, source + "\n", key=key
+                )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"charged-{key}-{kind}-{label}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if (
+                    "charged_species_unsupported" not in joined
+                    or "source_blind_pin" not in joined
+                ):
+                    failures.append(
+                        f"charged refuse {key} {label!r} {kind} {source!r}: {errors}"
+                    )
+        neighbour = f"Fe {source}\n"
+        doc = _html_source_document(
+            tmp_path, "Fe", neighbour, key="formula"
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"charged-neutral-{kind}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"neutral Fe {kind} {source!r}: {errors}")
+        for label in ("Fe2", "Fe^{2+}"):
             doc = _html_source_document(
-                tmp_path, bare, source + "\n", key="formula"
-            )
-            errors = vle.certify_extract_source_fidelity(
-                doc, label=f"suffix-bare-{kind}-{bare}", artifact_root=tmp_path
-            )
-            joined = "\n".join(errors)
-            if not errors or "source_blind_pin" not in joined:
-                failures.append(f"suffix refuse {bare!r} {where}: {errors}")
-            doc = _html_source_document(
-                tmp_path, charged, source + "\n", key="formula"
+                tmp_path, label, neighbour, key="formula"
             )
             errors = vle.certify_extract_source_fidelity(
                 doc,
-                label=f"suffix-charged-{kind}-{charged}",
+                label=f"charged-neighbour-{kind}-{label}",
                 artifact_root=tmp_path,
             )
-            if errors:
-                failures.append(f"suffix accept {charged!r} {where}: {errors}")
+            joined = "\n".join(errors)
+            if "charged_species_unsupported" not in joined:
+                failures.append(
+                    f"charged neighbour {label!r} {kind}: {errors}"
+                )
+    cell = "<table><tr><td>Fe<sup>2+</sup></td></tr></table>\n"
+    for key in ("formula", "species"):
+        for label in _CHARGED_SPECIES_LABELS:
+            doc = _html_source_document(
+                tmp_path,
+                label,
+                cell,
+                key=key,
+                locator_extra={"table_row": 1, "table_column": 1},
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"charged-cell-{key}-{label}", artifact_root=tmp_path
+            )
+            joined = "\n".join(errors)
+            if (
+                "charged_species_unsupported" not in joined
+                or "superscript_in_cell" in joined
+            ):
+                failures.append(f"charged cell {key} {label!r}: {errors}")
     assert failures == []
 
 

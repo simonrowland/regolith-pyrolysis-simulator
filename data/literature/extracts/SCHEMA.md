@@ -245,11 +245,17 @@ does not certify `H2O2`, and `$SiO_{2} 100$` certifies `SiO2` and does
 not certify `SiO2100`. A caret is a superscript. A whitespace token that
 contains `^` does not certify as a plain formula or a plain number, so
 `$O^{2-}$` does not certify `O2`, `$Fe^{2+}$` does not certify `Fe2`,
-and `$SiO^{2}$` does not certify `SiO2`. A formula run immediately
-followed by `^`, `<sup>`, or a Unicode superscript is a charged or
-powered species. It certifies only a stored label that includes that
-same charge or power, so `Fe` does not certify `Fe^{2+}`, `SiO2` does
-not certify `SiO2^{2+}`, and `O2` does not certify `O^{2-}`. A subscript digit inside a
+and `$SiO^{2}$` does not certify `SiO2`. Charged or powered species
+labels are unsupported. Before any wrapper is removed, a raw token that
+carries `^`, `<sup>`, a Unicode superscript, or a trailing charge sign
+on a formula is charged. That token, and an HTML cell that contains it,
+certifies no formula or species label, neither the neutral prefix nor a
+charged label, and certifies no number. The refusal is
+`charged_species_unsupported`. `Fe`, `Fe2`, and `Fe^{2+}` all refuse
+`$\mathrm{Fe}^{2+}$`, `$Fe^{2+}$`, `Fe<sup>2+</sup>`, `Fe⁺`, and `Fe²⁺`.
+A neutral `Fe` elsewhere in the same text still certifies `Fe`. A plain
+numeric cell with no element symbol stays on the power path, so
+`10<sup>3</sup>` still certifies `1e3`. A subscript digit inside a
 formula token is not a number. `SiO_{2}` and `SiO₂` do not certify 2.
 `Fe_{2}O_{3}` does not certify 2 or 3. A neighbouring measurement still
 certifies, so `SiO_{2} 100` certifies 100 and `6.98 Fe_{2}O_{3}`

@@ -73,9 +73,11 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   A caret is a superscript. A token that contains ``^`` is not unwrapped
   and does not certify as a plain formula or a plain number, so
   ``$O^{2-}$`` is not ``O2`` and ``$SiO^{2}$`` is not ``SiO2``.
-  A run immediately followed by ``^``, ``<sup>``, or a Unicode
-  superscript certifies only a label that includes that same charge, so
-  ``Fe`` is not ``Fe^{2+}``.
+  A raw token that carries ``^``, ``<sup>``, a Unicode superscript, or a
+  trailing charge sign is a charged species. It certifies no formula or
+  species label and no number. The refusal is
+  ``charged_species_unsupported``. ``Fe`` is not ``$\\mathrm{Fe}^{2+}$``.
+  A plain numeric cell with no element symbol is still a power.
   A subscript digit inside a formula token is not a number: ``SiO_{2}``
   and ``SiO₂`` do not certify 2, and ``Fe_{2}O_{3}`` does not certify 2.
   ``SiO_{2} 100`` still certifies 100. A formula label matches one whole
@@ -591,7 +593,9 @@ def _token_holds_superscript(text: str, start: int, end: int) -> bool:
     limit = len(text)
     while right < limit and not text[right].isspace():
         right += 1
-    return "^" in text[left:right]
+    token = text[left:right]
+    # A caret, or a charged species token, is not a plain number.
+    return "^" in token or _raw_token_is_charged_species(token)
 
 
 def _printed_value_carried(leaf: str, text: str) -> bool:
@@ -3341,6 +3345,8 @@ def _formula_cell_matches(leaf: str, cell: str) -> bool:
     """
     if _string_is_plain_number(leaf):
         return False
+    if _label_is_charged_species(leaf) or _html_cell_is_charged_species(cell, ()):
+        return False
     left = _normalize_formula_label(_strip_wrapping_math(cell))
     right = _normalize_formula_label(_strip_wrapping_math(leaf))
     return bool(right) and left == right
@@ -3357,68 +3363,105 @@ def _formula_run_char(ch: str) -> bool:
     return (ch.isascii() and ch.isalnum()) or ch in _FORMULA_RUN_MARKS
 
 
-# Superscript digits and signs. A run followed by one of these, by ``^``,
-# or by ``<sup>`` is a charged or powered species, not the bare formula.
+# Superscript digits and signs. A raw token that carries one of these, a
+# caret, or ``<sup>`` is a charged species before any wrapper is removed.
 _UNICODE_SUPERSCRIPTS = (
     "\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079\u207a\u207b"
 )
-_UNICODE_SUPERSCRIPT_FOLD = str.maketrans(
-    _UNICODE_SUPERSCRIPTS, "0123456789+-"
-)
+_SUP_TAG_RE = re.compile(r"</?\s*sup\b[^>]*>", re.IGNORECASE)
+# The numeric times sign in ``1.5x10``. It is not an element symbol.
+_TIMES_X_RE = re.compile(r"(?<=\d)\s*[xX]\s*(?=10)")
+# A trailing + or - on a formula, optionally inside a closing ``$``.
+_TRAILING_FORMULA_CHARGE_RE = re.compile(r"[A-Za-z)\]]\d*\s*[+\-]\s*\$?\s*$")
 
 
-def _superscript_suffix_at(text: str, index: int) -> tuple[str, int] | None:
-    """Canonical ``^{body}`` and the index after it, or None.
+def _raw_has_element_symbol(text: str) -> bool:
+    """True when ``text`` has an element letter, not a numeric times sign."""
+    stripped = _TIMES_X_RE.sub("", _SUP_TAG_RE.sub("", text))
+    return re.search(r"[A-Za-z]", stripped) is not None
 
-    The marker is ``^``, a ``<sup>`` element, or a Unicode superscript.
-    ``^{2+}``, ``<sup>2+</sup>``, and ``²⁺`` share one body. The bare run
-    in front of the marker is not the label.
+
+def _raw_token_is_charged_species(token: str) -> bool:
+    """True before wrapper removal when this raw token is a charged species.
+
+    A caret, a ``<sup>``, a Unicode superscript, or a trailing ``+`` or
+    ``-`` on a formula. A closing brace between ``Fe`` and ``^{2+}`` does
+    not make ``Fe`` a neutral label. ``10<sup>3</sup>`` and
+    ``1.5x10<sup>3</sup>`` have no element symbol, so they are not this.
     """
-    if index >= len(text):
-        return None
-    if text[index] == "^":
-        if index + 1 < len(text) and text[index + 1] == "{":
-            close = text.find("}", index + 2)
-            if close < 0:
-                return "^{", index + 2
-            body = text[index + 2 : close].translate(_UNICODE_SUPERSCRIPT_FOLD)
-            return "^{" + body + "}", close + 1
-        return "^{", index + 1
-    if text[index] == "<" and text[index : index + 5].lower() == "<sup>":
-        tail = text[index:]
-        close = tail.lower().find("</sup>")
-        if close < 0:
-            return "^{", index + 5
-        body = tail[5:close].translate(_UNICODE_SUPERSCRIPT_FOLD)
-        return "^{" + body + "}", index + close + 6
-    if text[index] in _UNICODE_SUPERSCRIPTS:
-        end = index + 1
-        while end < len(text) and text[end] in _UNICODE_SUPERSCRIPTS:
-            end += 1
-        body = text[index:end].translate(_UNICODE_SUPERSCRIPT_FOLD)
-        return "^{" + body + "}", end
-    return None
+    raw = token.strip()
+    if not raw or not _raw_has_element_symbol(raw):
+        return False
+    if "^" in raw or "<sup" in raw.lower():
+        return True
+    if any(ch in _UNICODE_SUPERSCRIPTS for ch in raw):
+        return True
+    return _TRAILING_FORMULA_CHARGE_RE.search(raw) is not None
 
 
-def _canonical_formula_unit(text: str) -> str:
-    """One run plus its superscript suffix, or ``text`` when it is not one.
+def _label_is_charged_species(label: str) -> bool:
+    """True when the stored label is itself a charged species."""
+    if _raw_token_is_charged_species(label):
+        return True
+    return any(
+        _raw_token_is_charged_species(token) for token in re.findall(r"\S+", label)
+    )
 
-    ``Fe^{2+}``, ``Fe<sup>2+</sup>``, and ``Fe²⁺`` are ``Fe^{2+}``. A
-    compound with no superscript is unchanged.
-    """
-    if not text or not _formula_run_char(text[0]):
+
+def _text_outside_superscript_spans(
+    text: str, spans: tuple[tuple[int, int], ...]
+) -> str:
+    """Cell text with superscript slices removed."""
+    if not spans:
         return text
-    end = 1
-    limit = len(text)
-    while end < limit and _formula_run_char(text[end]):
-        end += 1
-    suffix = _superscript_suffix_at(text, end)
-    if suffix is None:
-        return text
-    canonical, suffix_end = suffix
-    if suffix_end != limit:
-        return text
-    return text[:end] + canonical
+    pieces: list[str] = []
+    cursor = 0
+    for start, end in sorted(spans):
+        if start > cursor:
+            pieces.append(text[cursor:start])
+        cursor = max(cursor, end)
+    pieces.append(text[cursor:])
+    return "".join(pieces)
+
+
+def _html_cell_is_charged_species(
+    cell: str, spans: tuple[tuple[int, int], ...]
+) -> bool:
+    """True when the cell holds a charged formula, not a numeric power."""
+    if spans and _raw_has_element_symbol(
+        _text_outside_superscript_spans(cell, spans)
+    ):
+        return True
+    return _raw_token_is_charged_species(cell)
+
+
+def _formula_text_without_charged_tokens(text: str) -> str:
+    """Replace each charged raw token with a newline before folding."""
+    pieces: list[str] = []
+    cursor = 0
+    for match in re.finditer(r"\S+", text):
+        pieces.append(text[cursor : match.start()])
+        token = match.group(0)
+        pieces.append("\n" if _raw_token_is_charged_species(token) else token)
+        cursor = match.end()
+    pieces.append(text[cursor:])
+    return "".join(pieces)
+
+
+def _charged_formula_miss(missing: Sequence[_PinnedLeaf], text: str) -> bool:
+    """True when a formula miss is the unsupported charged-species refusal."""
+    formula_miss = [
+        leaf
+        for leaf in missing
+        if leaf.formula_label and isinstance(leaf.value, str)
+    ]
+    if not formula_miss:
+        return False
+    if any(_label_is_charged_species(leaf.value) for leaf in formula_miss):
+        return True
+    return any(
+        _raw_token_is_charged_species(token) for token in re.findall(r"\S+", text)
+    )
 
 
 def _formula_label_in_text(leaf: str, text: str) -> bool:
@@ -3428,21 +3471,21 @@ def _formula_label_in_text(leaf: str, text: str) -> bool:
     square brackets, and the charge marks ·, +, and -. Whitespace, either
     end of the text, or any other character delimits it. The stored label
     matches only that whole run. ``SO4`` is not ``Fe2(SO4)3``. ``SiO2``
-    is not ``CaO·SiO2``. ``CO`` is not ``CO2``. A run immediately followed
-    by ``^``, ``<sup>``, or a Unicode superscript is a charged or powered
-    species. It certifies only a label that includes that same charge or
-    power, so ``Fe`` is not ``Fe^{2+}``, ``SiO2`` is not ``SiO2^{2+}``,
-    and ``O2`` is not ``O^{2-}``. A numeric string does not match here.
-    This path does not fold digit groups, so ``SiO2 100`` is ``SiO2``
-    and is not ``SiO2100``.
+    is not ``CaO·SiO2``. ``CO`` is not ``CO2``. A raw token that carries
+    ``^``, ``<sup>``, a Unicode superscript, or a trailing charge sign is
+    a charged species. It is dropped before this scan, so it certifies
+    no formula, and a charged label never matches. A numeric string does
+    not match here. This path does not fold digit groups, so ``SiO2 100``
+    is ``SiO2`` and is not ``SiO2100``.
     """
     if _string_is_plain_number(leaf):
+        return False
+    if _label_is_charged_species(leaf):
         return False
     normalized = _normalize_formula_label(leaf)
     if not normalized.strip():
         return False
-    label_unit = _canonical_formula_unit(normalized)
-    folded = _normalize_formula_label(text)
+    folded = _normalize_formula_label(_formula_text_without_charged_tokens(text))
     start = 0
     limit = len(folded)
     while start < limit:
@@ -3452,14 +3495,7 @@ def _formula_label_in_text(leaf: str, text: str) -> bool:
         end = start + 1
         while end < limit and _formula_run_char(folded[end]):
             end += 1
-        suffix = _superscript_suffix_at(folded, end)
-        if suffix is not None:
-            canonical, suffix_end = suffix
-            if folded[start:end] + canonical == label_unit:
-                return True
-            start = suffix_end
-            continue
-        if folded[start:end] == label_unit:
+        if folded[start:end] == normalized:
             return True
         start = end
     return False
@@ -3646,6 +3682,7 @@ def _locator_source_blind_reason(
                 candidate_reason_codes.add("artifact_is_extract_document")
                 break
             delimiter = _tabular_delimiter(path)
+            charge_text = ""
             if delimiter is None and _locator_has_html_cell_address(locator):
                 # One parsed cell. A miss is source-blind, not a prose search
                 # of the same line.
@@ -3659,6 +3696,18 @@ def _locator_source_blind_reason(
                     candidate_reason_codes.add(
                         _html_blind_code(span_error or "cited span was not opened")
                     )
+                    break
+                charge_text = cell
+                if _html_cell_is_charged_species(cell, superscript_spans):
+                    rendered = ", ".join(
+                        repr(leaf.value) for leaf in leaves[:3]
+                    )
+                    candidate_reasons.append(
+                        "charged_species_unsupported: a charged or powered "
+                        "species certifies no formula, species, or number "
+                        f"({rendered})"
+                    )
+                    candidate_reason_codes.add("charged_species_unsupported")
                     break
                 if superscript_spans:
                     missing = [
@@ -3715,6 +3764,7 @@ def _locator_source_blind_reason(
                         break
                     key_matched = True
                     break
+                charge_text = cited
                 missing = [
                     leaf
                     for leaf in leaves
@@ -3736,6 +3786,7 @@ def _locator_source_blind_reason(
                     )
                     candidate_reason_codes.add("cited_span_missing")
                     break
+                charge_text = "\n".join(cells)
                 missing = [
                     leaf
                     for leaf in leaves
@@ -3745,11 +3796,18 @@ def _locator_source_blind_reason(
                 key_matched = True
                 break
             rendered = ", ".join(repr(leaf.value) for leaf in missing[:3])
-            candidate_reasons.append(
-                f"opened {path.name} but the resolved extract value is not in the "
-                f"cited text ({rendered})"
-            )
-            candidate_reason_codes.add("cited_token_absent")
+            if _charged_formula_miss(missing, charge_text):
+                candidate_reasons.append(
+                    "charged_species_unsupported: a charged or powered species "
+                    f"certifies no formula or species label ({rendered})"
+                )
+                candidate_reason_codes.add("charged_species_unsupported")
+            else:
+                candidate_reasons.append(
+                    f"opened {path.name} but the resolved extract value is not in the "
+                    f"cited text ({rendered})"
+                )
+                candidate_reason_codes.add("cited_token_absent")
             break
         if resolved_to_corpus:
             corpus_artifact_keys += 1
@@ -3813,9 +3871,10 @@ def fidelity_source_warnings(
     and species labels fold markup inside each whitespace token. A space
     inside ``$...$`` stays a separator, so ``$H_{2} O_{2}$`` is not
     ``H2O2``. A token that contains ``^`` holds a superscript and does
-    not certify as a plain formula or a plain number. A run immediately
-    followed by ``^``, ``<sup>``, or a Unicode superscript certifies
-    only a label with that same charge.
+    not certify as a plain formula or a plain number. A raw token that
+    carries ``^``, ``<sup>``, a Unicode superscript, or a trailing charge
+    sign is unsupported. It certifies no formula or species label. The
+    refusal is ``charged_species_unsupported``.
     A subscript digit inside a formula token is not a number, so
     ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring
     measurement still does. A formula label equals one whole run of
