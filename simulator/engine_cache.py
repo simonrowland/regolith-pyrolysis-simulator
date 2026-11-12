@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import hashlib
 import importlib.metadata
+import inspect
 import json
 import logging
 import os
-import shutil
 import sqlite3
-import sys
 import threading
 import time
 import zlib
@@ -22,8 +21,6 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 from urllib.parse import quote
-
-from simulator.canonical import canonical_json_dumps
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
@@ -90,7 +87,6 @@ _COUNTER_NAMES = (
     "read_error",
     "conflicts",
 )
-_MISSING_SETTING = object()
 _MEMORY_CACHE_MAXSIZE = 4096
 _MEMORY_CACHE: OrderedDict[tuple[str, bytes, bool], Any] = OrderedDict()
 _MEMORY_CACHE_PID = os.getpid()
@@ -163,96 +159,15 @@ def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> b
     if isinstance(version, str) and version.isdecimal():
         version = int(version)
     try:
-        payload = canonical_json_dumps([engine_id, version, request]).encode("utf-8")
+        payload = json.dumps(
+            [engine_id, version, request],
+            allow_nan=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
     except (TypeError, ValueError) as exc:
         raise ValueError("engine request must be finite, canonical JSON data") from exc
     return hashlib.sha256(payload).digest()
-
-
-def normalize_engine_settings(
-    engine_name: str,
-    settings: Mapping[str, Any] | None,
-) -> dict[str, Any]:
-    """Normalize battery settings once for both backend opening and cache keys.
-
-    A missing settings mapping preserves the engine's default-open path.
-    AlphaMELTS records the resolved model and child calculation mode without
-    consulting or changing the parent process environment.
-    """
-    fields: Mapping[str, Any] = settings or {}
-    if engine_name == "internal-analytical":
-        return {"oxygen_balance_backend": fields.get("oxygen_balance_backend")}
-    if engine_name == "openimcc":
-        from simulator.melt_backend.openimcc_bridge import DEFAULT_BACKEND_PACK_NAME
-
-        return {"pack": fields.get("pack") or DEFAULT_BACKEND_PACK_NAME}
-    if engine_name == "alphamelts":
-        from simulator.config import (
-            resolve_alphamelts_python_api_model,
-            resolve_alphamelts_subprocess_settings,
-        )
-
-        model_name = fields.get("raw_model_name")
-        transport = fields.get("transport")
-        if transport is None or str(transport).strip().lower() not in {
-            "subprocess",
-            "binary",
-        }:
-            # Validate the raw Python API model before the normalized key can
-            # alias it to a valid model and return a cached result.
-            resolve_alphamelts_python_api_model(model_name)
-        ambient = fields.get("effective_calc_mode", _MISSING_SETTING)
-        if ambient is _MISSING_SETTING:
-            ambient = fields.get("ambient_calc_mode")
-        subprocess_settings = resolve_alphamelts_subprocess_settings(
-            model_name, ambient
-        )
-        return {
-            "transport": fields.get("transport"),
-            "effective_calc_mode": subprocess_settings["effective_calc_mode"],
-            "raw_model_name": subprocess_settings["model"],
-            "redox_buffer": fields.get("redox_buffer"),
-            "fO2_offset": fields.get("fO2_offset"),
-            "Fe3Fet_ratio": fields.get("Fe3Fet_ratio"),
-            "python_api_model": fields.get("python_api_model"),
-            "configured_vapor_transport_pO2_bar": fields.get(
-                "configured_vapor_transport_pO2_bar"
-            ),
-            "configured_vapor_transport_floor_bar": fields.get(
-                "configured_vapor_transport_floor_bar"
-            ),
-            "warm_worker": False,
-        }
-    if engine_name == "vaporock":
-        return {
-            "temperature_units": fields.get("temperature_units", "C"),
-            "pressure_units": fields.get("pressure_units", "bar"),
-            "vapor_pressure_units": fields.get("vapor_pressure_units", "bar"),
-            "warm_worker": False,
-        }
-    if engine_name == "magemin":
-        bridge = fields.get("bridge") or fields.get("python_bridge")
-        return {
-            "database": fields.get("database"),
-            "bridge": bridge,
-            "fO2_buffer": fields.get("fO2_buffer"),
-            "warm_worker": False,
-        }
-    if engine_name == "thermoengine":
-        return {
-            "model": fields.get("model"),
-            "configured_vapor_transport_pO2_bar": fields.get(
-                "configured_vapor_transport_pO2_bar"
-            ),
-            "configured_vapor_transport_floor_bar": fields.get(
-                "configured_vapor_transport_floor_bar"
-            ),
-            "redox_buffer": fields.get("redox_buffer"),
-            "fO2_offset": fields.get("fO2_offset"),
-            "Fe3Fet_ratio": fields.get("Fe3Fet_ratio"),
-            "warm_worker": False,
-        }
-    raise ValueError(f"unknown engine {engine_name!r}")
 
 
 def engine_cache_settings(
@@ -261,13 +176,13 @@ def engine_cache_settings(
     *,
     effective_settings: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Project named prediction inputs from normalized opener settings/backend."""
+    """Project prediction inputs from normalized opener settings or a backend."""
     if engine_name == "internal-analytical":
         # Residue calls consume prior-call state and are deliberately uncached.
         return {}
 
     if isinstance(backend, Mapping):
-        fields = normalize_engine_settings(engine_name, backend)
+        fields = backend
         if engine_name == "openimcc":
             # Reads _pack_name via _effective_pack_name for the melt call and
             # _gas for vapor calls (binary_pot_battery.py:3080-3111, 3209-3304).
@@ -441,22 +356,6 @@ def _distribution_identity(names: tuple[str, ...]) -> str:
 def _native_binary_identity(engine_id: str) -> str:
     backend = _RUNTIME_BACKENDS.get(engine_id)
     binary = getattr(backend, "_binary_path", None)
-    if binary is None and engine_id == "alphamelts":
-        try:
-            from simulator.engine_local_config import find_alphamelts_binary
-
-            binary = find_alphamelts_binary()
-        except Exception:
-            binary = None
-    elif binary is None and engine_id == "magemin":
-        try:
-            from simulator.engine_local_config import configured_magemin_binary_path
-
-            binary = configured_magemin_binary_path()
-            if binary is None:
-                binary = shutil.which("MAGEMin") or shutil.which("magemin")
-        except Exception:
-            binary = None
     if binary is None:
         return "unavailable"
     path = Path(binary)
@@ -486,9 +385,12 @@ def _openimcc_dist_identity() -> str:
 def _internal_analytical_identity() -> str:
     backend = _RUNTIME_BACKENDS.get("internal-analytical")
     core = getattr(backend, "_core", backend)
-    module_name = type(core).__module__ if core is not None else ""
-    module = sys.modules.get(module_name) if module_name else None
-    module_file = getattr(module, "__file__", None)
+    if core is None:
+        return "unavailable"
+    try:
+        module_file = inspect.getsourcefile(type(core))
+    except (OSError, TypeError):
+        return "unavailable"
     if not module_file:
         return "unavailable"
     path = Path(module_file)

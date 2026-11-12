@@ -64,7 +64,11 @@ from simulator.engine_pool import (
     WarmEngineWorker,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
-from simulator.config import _load_setpoints_file
+from simulator.config import (
+    _load_setpoints_file,
+    resolve_alphamelts_python_api_model,
+    resolve_alphamelts_subprocess_settings,
+)
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
 
@@ -4519,7 +4523,8 @@ class _IsolatedCellWorker:
             if payload.get("simulate_crash") is not None:
                 request["simulate_crash"] = payload["simulate_crash"]
             request["engine_settings"] = engine_cache_settings(
-                self.engine, self.engine_settings
+                self.engine,
+                normalize_engine_settings(self.engine, self.engine_settings),
             )
             result = cached_engine_call(self.engine, request, solve)
         if isinstance(result, list):
@@ -4710,6 +4715,82 @@ def _engine_identities_from_toml() -> dict[str, dict[str, str]]:
     return payload
 
 
+def normalize_engine_settings(
+    engine_name: str,
+    settings: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Normalize opener settings once for backend construction and cache keys."""
+    fields: Mapping[str, Any] = settings or {}
+    if engine_name == "internal-analytical":
+        return {"oxygen_balance_backend": fields.get("oxygen_balance_backend")}
+    if engine_name == "openimcc":
+        from simulator.melt_backend.openimcc_bridge import DEFAULT_BACKEND_PACK_NAME
+
+        return {"pack": fields.get("pack") or DEFAULT_BACKEND_PACK_NAME}
+    if engine_name == "alphamelts":
+        model_name = fields.get("raw_model_name")
+        transport = fields.get("transport")
+        if transport is None or str(transport).strip().lower() not in {
+            "subprocess",
+            "binary",
+        }:
+            # Validate before projection so a cache hit cannot hide a rejected
+            # raw Python API model.
+            resolve_alphamelts_python_api_model(model_name)
+        missing = object()
+        ambient = fields.get("effective_calc_mode", missing)
+        if ambient is missing:
+            ambient = fields.get("ambient_calc_mode")
+        subprocess_settings = resolve_alphamelts_subprocess_settings(
+            model_name, ambient
+        )
+        return {
+            "transport": fields.get("transport"),
+            "effective_calc_mode": subprocess_settings["effective_calc_mode"],
+            "raw_model_name": subprocess_settings["model"],
+            "redox_buffer": fields.get("redox_buffer"),
+            "fO2_offset": fields.get("fO2_offset"),
+            "Fe3Fet_ratio": fields.get("Fe3Fet_ratio"),
+            "python_api_model": fields.get("python_api_model"),
+            "configured_vapor_transport_pO2_bar": fields.get(
+                "configured_vapor_transport_pO2_bar"
+            ),
+            "configured_vapor_transport_floor_bar": fields.get(
+                "configured_vapor_transport_floor_bar"
+            ),
+            "warm_worker": False,
+        }
+    if engine_name == "vaporock":
+        return {
+            "temperature_units": fields.get("temperature_units", "C"),
+            "pressure_units": fields.get("pressure_units", "bar"),
+            "vapor_pressure_units": fields.get("vapor_pressure_units", "bar"),
+            "warm_worker": False,
+        }
+    if engine_name == "magemin":
+        return {
+            "database": fields.get("database"),
+            "bridge": fields.get("bridge") or fields.get("python_bridge"),
+            "fO2_buffer": fields.get("fO2_buffer"),
+            "warm_worker": False,
+        }
+    if engine_name == "thermoengine":
+        return {
+            "model": fields.get("model"),
+            "configured_vapor_transport_pO2_bar": fields.get(
+                "configured_vapor_transport_pO2_bar"
+            ),
+            "configured_vapor_transport_floor_bar": fields.get(
+                "configured_vapor_transport_floor_bar"
+            ),
+            "redox_buffer": fields.get("redox_buffer"),
+            "fO2_offset": fields.get("fO2_offset"),
+            "Fe3Fet_ratio": fields.get("Fe3Fet_ratio"),
+            "warm_worker": False,
+        }
+    raise ValueError(f"unknown engine {engine_name!r}")
+
+
 def _equilibrate_takes_fo2(backend: Any) -> bool:
     try:
         signature = inspect.signature(backend.equilibrate)
@@ -4731,7 +4812,6 @@ def _open_resolved_backend(
         resolve_backend,
     )
     from simulator.melt_backend.magemin import MAGEMinBackend
-    from simulator.engine_cache import normalize_engine_settings
 
     settings = (
         normalized_settings
@@ -4791,8 +4871,6 @@ def _open_resolved_backend(
             )
         return backend
     if name == "alphamelts":
-        from simulator.config import resolve_alphamelts_subprocess_settings
-
         subprocess_settings = resolve_alphamelts_subprocess_settings(
             settings.get("raw_model_name"),
             settings.get("effective_calc_mode"),
@@ -4856,7 +4934,6 @@ def _open_battery_engine_with_settings(
     """Resolve one battery engine. Unavailable is a typed handle, not a crash."""
 
     from simulator.backends import BackendUnavailableError
-    from simulator.engine_cache import normalize_engine_settings
 
     identity_block = _engine_identities_from_toml().get(name, {})
     normalized_settings = normalize_engine_settings(name, engine_settings)
