@@ -1534,7 +1534,8 @@ def test_known_species_ids_parse_failure_is_typed_validation_error(
         validator.load_known_species_ids()
 
     assert "failed to load" in exc.value.errors[0]
-    assert str(manifest) in exc.value.errors[0]
+    assert manifest.name in exc.value.errors[0]
+    assert str(manifest) not in exc.value.errors[0]
 
 
 def test_known_species_ids_rejects_non_mapping_manifest(
@@ -1547,6 +1548,7 @@ def test_known_species_ids_rejects_non_mapping_manifest(
     with pytest.raises(validator.ExtractValidationError) as exc:
         validator.load_known_species_ids()
     assert "expected a mapping" in exc.value.errors[0]
+    assert str(manifest) not in exc.value.errors[0]
 
 
 def test_known_species_ids_io_failure_is_typed_validation_error(
@@ -1567,7 +1569,8 @@ def test_known_species_ids_io_failure_is_typed_validation_error(
     with pytest.raises(validator.ExtractValidationError) as exc:
         validator.load_known_species_ids()
 
-    assert "injected manifest read failure" in exc.value.errors[0]
+    assert "OSError" in exc.value.errors[0]
+    assert str(manifest) not in exc.value.errors[0]
 
 
 def test_validate_all_reports_manifest_load_failure(
