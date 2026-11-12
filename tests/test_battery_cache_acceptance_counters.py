@@ -125,7 +125,7 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
     tmp_path: Path,
     monkeypatch: Any,
 ) -> None:
-    class _Stream:
+    class _Stream(score._ResidualJsonlStream):
         def __init__(self, path: Path, **_kwargs: Any) -> None:
             self.partial_path = path.with_name(path.name + ".partial")
             self.partial_path.write_bytes(b'{"store_stamp":true}\n')
@@ -134,6 +134,7 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
             self.headline_band_values: dict = {}
             self.tier_band_values: dict = {}
             self.report_aggregate = None
+            self.static_refusal_counts: dict = {}
 
         def append_payload_line(self, *_args: Any, **_kwargs: Any) -> None:
             self.count += 1
