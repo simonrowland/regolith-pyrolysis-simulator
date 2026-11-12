@@ -2709,7 +2709,6 @@ def _predict_hashimoto_residue_cohort(
     preform_dimensions_mm: Mapping[str, float],
     code_revision: str,
     engine: str = "openimcc",
-    _allow_partial_cohort_for_test: bool = False,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
     """Produce both alpha arms and geometry bands, without reading residues."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -2720,7 +2719,7 @@ def _predict_hashimoto_residue_cohort(
     if (
         not experiments
         or len(experiment_ids) != len(experiments)
-        or (len(experiments) != 24 and not _allow_partial_cohort_for_test)
+        or len(experiments) != 24
     ):
         raise ResidueInventoryRefusal(
             "hashimoto_cohort_invalid", "R2 requires 24 distinct physical runs"

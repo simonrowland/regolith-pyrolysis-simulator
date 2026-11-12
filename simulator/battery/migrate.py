@@ -15204,61 +15204,6 @@ class SourceSelection:
         return self.value.kind is not ValueKind.UNAVAILABLE
 
 
-_BOUNDARY_SERVED: list[tuple[str, int, str]] = []
-_BOUNDARY_WRAPPERS = {
-    "select_declared_source",
-    "_record_boundary_caller",
-    "empty_value_from_payload",
-    "_series_point_value",
-    "_selection_from_named_field",
-    "_condition_ranges_from_payload",
-    "_numeric_field",
-    "_unavailable_selection",
-    "_point_selection",
-    "_interval_selection",
-    "_series_selection_from_items",
-}
-
-# Ingestion functions allowed to call select_declared_source. Wrappers above
-# are excluded from the served-caller record; everything else must be here.
-BOUNDARY_INGEST_CALLERS = frozenset(
-    {
-        "_migrate_extract_observation",
-        "_emit_exploded_point",
-        "_migrate_kems",
-        "_migrate_mre",
-        "_migrate_langmuir",
-        "_migrate_refractory",
-        "_migrate_vacuum_pyrolysis",
-        "_migrate_ledger",
-        "_migrate_compilation_file",
-    }
-)
-
-
-def reset_boundary_served() -> None:
-    _BOUNDARY_SERVED.clear()
-
-
-def boundary_served_callers() -> tuple[tuple[str, int, str], ...]:
-    return tuple(_BOUNDARY_SERVED)
-
-
-def _record_boundary_caller() -> None:
-    frame = inspect.currentframe()
-    while frame is not None:
-        frame = frame.f_back
-        if frame is None:
-            break
-        name = frame.f_code.co_name
-        if name in _BOUNDARY_WRAPPERS:
-            continue
-        _BOUNDARY_SERVED.append(
-            (Path(frame.f_code.co_filename).name, frame.f_lineno, name)
-        )
-        break
-
-
 def _quantity_token(declared: Quantity | State[Quantity] | str | None) -> Quantity | None:
     if isinstance(declared, Quantity):
         return declared
@@ -17542,7 +17487,6 @@ def select_declared_source(
     Refuses to return a number the declared token did not name.
     """
 
-    _record_boundary_caller()
     if not isinstance(payload, Mapping):
         return _unavailable_selection("empty values")
     condition_ranges = _condition_ranges_from_payload(payload)

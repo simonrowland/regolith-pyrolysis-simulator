@@ -1145,10 +1145,7 @@ def test_cached_real_python_api_replay_key_hashes_include_provider_input_identit
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(None)
     sim.backend = CachedRealBackend(config=config)
-    sim._chem_registry.replace_for_test(
-        ChemistryIntent.SILICATE_EQUILIBRIUM,
-        None,
-    )
+    sim._chem_registry._authoritative.pop(ChemistryIntent.SILICATE_EQUILIBRIUM)
 
     key = store._equilibrium_key(sim)
     actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
