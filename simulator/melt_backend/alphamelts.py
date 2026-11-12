@@ -125,6 +125,9 @@ from simulator.yaml_cache import load_cached_safe_yaml
 logger = logging.getLogger(__name__)
 
 
+DEFAULT_ALPHAMELTS_TRANSPORT_MODE = 'subprocess'
+
+
 # Liquidus seed is a search start, not a domain gate.
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
 # t-894: public alias of data/engine_commissioning.yaml
@@ -1408,7 +1411,9 @@ class _MELTSBackendSupport(MeltBackend):
         return dict(config)
 
     def _normalize_mode(self, value) -> Optional[str]:
-        if value is None or value == '' or str(value).lower() == 'auto':
+        if value is None or value == '':
+            return DEFAULT_ALPHAMELTS_TRANSPORT_MODE
+        if str(value).lower() == 'auto':
             return None
         mode = str(value).strip().lower()
         aliases = {

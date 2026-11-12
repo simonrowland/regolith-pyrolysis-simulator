@@ -2973,6 +2973,7 @@ class _OpenImccBatteryBackend:
     """
 
     supports_intrinsic_fO2 = False
+    _DEFAULT_GAS_PACK_NAME = 'default'
 
     def __init__(self, engine_name: str, *, pack_name: str | None = None) -> None:
         if engine_name not in OPENIMCC_ENGINE_NAMES:
@@ -2985,7 +2986,7 @@ class _OpenImccBatteryBackend:
         self._pack_name = str(pack_name or openimcc_bridge.DEFAULT_BACKEND_PACK_NAME)
         self._pack = openimcc_bridge._load_pack(self._pack_name)
         # The gas loader selects its packaged default; keep that selector in the key.
-        self._gas_pack_name = "default"
+        self._gas_pack_name = self._DEFAULT_GAS_PACK_NAME
         self.model_id = str(getattr(self._pack, "model_id", "openimcc"))
         self._gas: Any = None
         self._gas_error: str | None = None
@@ -4722,12 +4723,26 @@ def normalize_engine_settings(
     """Normalize opener settings once for backend construction and cache keys."""
     fields: Mapping[str, Any] = settings or {}
     if engine_name == "internal-analytical":
-        return {"oxygen_balance_backend": fields.get("oxygen_balance_backend")}
+        oxygen_backend = fields.get("oxygen_balance_backend")
+        if oxygen_backend is None:
+            from simulator.melt_backend.openimcc_bridge import (
+                DEFAULT_BACKEND_PACK_NAME,
+            )
+
+            oxygen_backend = {"pack": DEFAULT_BACKEND_PACK_NAME}
+        return {"oxygen_balance_backend": oxygen_backend}
     if engine_name == "openimcc":
         from simulator.melt_backend.openimcc_bridge import DEFAULT_BACKEND_PACK_NAME
 
-        return {"pack": fields.get("pack") or DEFAULT_BACKEND_PACK_NAME}
+        return {
+            "pack": fields.get("pack") or DEFAULT_BACKEND_PACK_NAME,
+            "gas_pack": _OpenImccBatteryBackend._DEFAULT_GAS_PACK_NAME,
+        }
     if engine_name == "alphamelts":
+        from simulator.melt_backend.alphamelts import (
+            DEFAULT_ALPHAMELTS_TRANSPORT_MODE,
+        )
+
         model_name = fields.get("raw_model_name")
         requested_transport = fields.get("transport")
         transport_token = (
@@ -4747,7 +4762,7 @@ def normalize_engine_settings(
             model_name, ambient
         )
         transport = (
-            "subprocess"
+            DEFAULT_ALPHAMELTS_TRANSPORT_MODE
             if transport_token in {None, ""}
             else requested_transport
         )
@@ -4778,15 +4793,21 @@ def normalize_engine_settings(
             "warm_worker": False,
         }
     if engine_name == "vaporock":
+        from simulator.melt_backend.vaporock import (
+            VAPOROCK_DEFAULT_PRESSURE_UNITS,
+            VAPOROCK_DEFAULT_TEMPERATURE_UNITS,
+            VAPOROCK_DEFAULT_VAPOR_PRESSURE_UNITS,
+        )
+
         temperature_units = fields.get("temperature_units")
         if temperature_units is None or temperature_units == "":
-            temperature_units = "C"
+            temperature_units = VAPOROCK_DEFAULT_TEMPERATURE_UNITS
         pressure_units = fields.get("pressure_units")
         if pressure_units is None or pressure_units == "":
-            pressure_units = "bar"
+            pressure_units = VAPOROCK_DEFAULT_PRESSURE_UNITS
         vapor_pressure_units = fields.get("vapor_pressure_units")
         if vapor_pressure_units is None or vapor_pressure_units == "":
-            vapor_pressure_units = "bar"
+            vapor_pressure_units = VAPOROCK_DEFAULT_VAPOR_PRESSURE_UNITS
         return {
             "temperature_units": temperature_units,
             "pressure_units": pressure_units,
@@ -4794,13 +4815,19 @@ def normalize_engine_settings(
             "warm_worker": False,
         }
     if engine_name == "magemin":
-        database = fields.get("database") or "ig"
+        from simulator.melt_backend.magemin import (
+            DEFAULT_MAGEMIN_BRIDGE,
+            DEFAULT_MAGEMIN_DATABASE,
+            DEFAULT_MAGEMIN_FO2_BUFFER,
+        )
+
+        database = fields.get("database") or DEFAULT_MAGEMIN_DATABASE
         bridge = fields.get("bridge") or fields.get("python_bridge")
         if bridge is None or not str(bridge).strip():
-            bridge = "subprocess"
+            bridge = DEFAULT_MAGEMIN_BRIDGE
         fO2_buffer = fields.get("fO2_buffer")
         if fO2_buffer is None:
-            fO2_buffer = "qfm"
+            fO2_buffer = DEFAULT_MAGEMIN_FO2_BUFFER
         return {
             "database": database,
             "bridge": bridge,
@@ -4884,11 +4911,9 @@ def _open_resolved_backend(
         backend = VapoRockBackend()
         if not backend.initialize(
             {
-                "temperature_units": settings.get("temperature_units", "C"),
-                "pressure_units": settings.get("pressure_units", "bar"),
-                "vapor_pressure_units": settings.get(
-                    "vapor_pressure_units", "bar"
-                ),
+                "temperature_units": settings["temperature_units"],
+                "pressure_units": settings["pressure_units"],
+                "vapor_pressure_units": settings["vapor_pressure_units"],
                 "warm_worker": settings["warm_worker"],
             }
         ):

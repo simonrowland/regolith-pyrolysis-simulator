@@ -351,6 +351,9 @@ def _dropped_account_species(
 # VapoRock's `input_composition_projected` reason token.
 COMPOSITION_PROJECTED = 'composition_projected'
 MAGEMIN_MODE_VECTOR_MASS_DEFICIT = 'magemin_mode_vector_mass_deficit'
+DEFAULT_MAGEMIN_DATABASE = 'ig'
+DEFAULT_MAGEMIN_BRIDGE = 'subprocess'
+DEFAULT_MAGEMIN_FO2_BUFFER = 'qfm'
 
 
 class _MAGEMinModeVectorMassDeficit(RuntimeError):
@@ -1523,7 +1526,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     """
 
     real_backend_family = RealBackendFamily.MAGEMIN
-    _DEFAULT_DATABASE = 'ig'
+    _DEFAULT_DATABASE = DEFAULT_MAGEMIN_DATABASE
 
     name = 'magemin'
 
@@ -1682,9 +1685,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     def _effective_fO2_buffer(self) -> str:
         configured = self._effective_worker_configuration()[1].get('fO2_buffer')
         if configured is None:
-            return 'qfm'
+            return DEFAULT_MAGEMIN_FO2_BUFFER
         name = str(configured).lower().strip()
-        return name if name in self._BUFFER_CHOICES else 'qfm'
+        return name if name in self._BUFFER_CHOICES else DEFAULT_MAGEMIN_FO2_BUFFER
 
     def get_vapor_species(self) -> List[str]:
         # MAGEMin does not compute vapor speciation.  Returning an empty
@@ -2546,7 +2549,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                       if requested is not None else None)
 
         if normalised is None and self._binary_path is not None:
-            return 'subprocess', None
+            return DEFAULT_MAGEMIN_BRIDGE, None
 
         if normalised == 'pymagemin':
             try:
@@ -2631,7 +2634,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         # itself the bridge.  This is the supported default — MAGEMin
         # ships no PyPI package, so a built binary must always be usable.
         if normalised == 'subprocess' and self._binary_path is not None:
-            return 'subprocess', None
+            return DEFAULT_MAGEMIN_BRIDGE, None
 
         warnings.warn(
             'MAGEMin not available; silicate-melt shadow backend disabled',
@@ -3736,8 +3739,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'MAGEMin: unknown fO2_buffer {configured!r}; '
                     'falling back to qfm with offset translation'
                 )
-                name = 'qfm'
-            if name == 'qfm':
+                name = DEFAULT_MAGEMIN_FO2_BUFFER
+            if name == DEFAULT_MAGEMIN_FO2_BUFFER:
                 # An explicit qfm config still benefits from offset
                 # translation against the caller's fO2_log.
                 buffer_n = float(fO2_log) - self._qfm_logfo2_oneill(temperature_C)
@@ -3747,7 +3750,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'--buffer_n={buffer_n:.4f} '
                     "(O'Neill 1987 QFM calibration)"
                 )
-                return 'qfm', buffer_n, warnings_out
+                return DEFAULT_MAGEMIN_FO2_BUFFER, buffer_n, warnings_out
             warnings_out.append(
                 f'MAGEMin: configured fO2_buffer={name!r} has no offset '
                 f'calibration in this adapter; passing --buffer={name} '
@@ -3760,11 +3763,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         buffer_n = float(fO2_log) - self._qfm_logfo2_oneill(temperature_C)
         warnings_out.append(
             f'MAGEMin: translated absolute fO2_log={fO2_log:.4f} at '
-            f'{temperature_C:.2f} C to --buffer=qfm '
+            f'{temperature_C:.2f} C to --buffer={DEFAULT_MAGEMIN_FO2_BUFFER} '
             f'--buffer_n={buffer_n:.4f} '
             "(O'Neill 1987 QFM calibration)"
         )
-        return 'qfm', buffer_n, warnings_out
+        return DEFAULT_MAGEMIN_FO2_BUFFER, buffer_n, warnings_out
 
     @staticmethod
     def _parse_subprocess_stdout(
