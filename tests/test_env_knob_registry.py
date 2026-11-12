@@ -4,7 +4,10 @@ The AST scanner resolves the environment-key forms used by production. Exotic
 forms such as ``getattr(os.environ, "get")`` and ``dict(os.environ)["KEY"]``
 are deliberately left to the ``environ``/``getenv`` token ceiling backstop
 below. That token count catches newly added occurrences but cannot see a later
-`.get()` on an alias created by ``dict(os.environ)`` without another token.
+`.get()` on a copied mapping passed as a function argument, or on an alias
+created by ``dict(os.environ)``, without another token. Direct and assigned
+``os.environ.copy()`` mappings are scanned; ``dict(os.environ)`` mappings and
+copied mappings passed as arguments remain outside the key scanner.
 """
 
 from __future__ import annotations
