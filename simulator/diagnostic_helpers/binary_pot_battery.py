@@ -808,7 +808,7 @@ class EquilibrateCell:
             raw_notices.get("values", ()),
         )
         values = {
-            "status": base.get("status") or "ok",
+            "status": base.get("status") or "unknown",
             "engine_status": engine_status,
             "engine_reason": activity_phase,
             "melt_activities": base.get("activity_coefficients") or {},
