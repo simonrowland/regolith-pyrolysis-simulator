@@ -329,7 +329,6 @@ def _call_cached_backend_equilibrate(
     from types import SimpleNamespace
 
     from simulator.engine_cache import (
-        BATTERY_ENGINE_CACHE_SCHEMA,
         _is_refusal,
         cached_engine_call,
         engine_cache_settings,
@@ -361,7 +360,6 @@ def _call_cached_backend_equilibrate(
     payload = cached_engine_call(
         handle.name,
         {
-            "battery_cache_schema": BATTERY_ENGINE_CACHE_SCHEMA,
             "kwargs": request_kwargs,
             "engine_settings": adapter_settings,
         },
@@ -4502,7 +4500,6 @@ class _IsolatedCellWorker:
             result = solve()
         else:
             from simulator.engine_cache import (
-                BATTERY_ENGINE_CACHE_SCHEMA,
                 cached_engine_call,
                 engine_cache_settings,
             )
@@ -4524,7 +4521,6 @@ class _IsolatedCellWorker:
             request["engine_settings"] = engine_cache_settings(
                 self.engine, self.engine_settings
             )
-            request["battery_cache_schema"] = BATTERY_ENGINE_CACHE_SCHEMA
             result = cached_engine_call(self.engine, request, solve)
         if isinstance(result, list):
             result = EquilibrateCell.from_engine_cache_value(result).as_payload()

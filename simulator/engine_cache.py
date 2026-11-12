@@ -34,10 +34,6 @@ ENGINE_CHEMISTRY_VERSION = {
     "thermoengine": 2,
 }
 
-# Request-key discriminator for the battery HOT payload layout; removed in
-# the dedicated chemistry-version key migration.
-BATTERY_ENGINE_CACHE_SCHEMA = 2
-
 # Bump only when an engine change can alter predictions. Runtime identity is
 # diagnostic and never participates in the cache key.
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 Darwin arm64 binary - initial cache version
