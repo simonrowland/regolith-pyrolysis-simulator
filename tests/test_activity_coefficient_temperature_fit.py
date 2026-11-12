@@ -127,11 +127,51 @@ def test_fegley_2023_table_2_migrates_all_numeric_fit_rows() -> None:
         if _quantity(observation) is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
     ]
 
+    expected = load_named_manifest(
+        ROOT / "tests" / "manifests" / "fegley_2023_table_2_printed_rows.jsonl"
+    )
+
+    def printed_decimal(value: object) -> Decimal:
+        return Decimal(str(value).replace("−", "-").replace(",", ""))
+
+    expected_id_by_signature = {
+        (
+            "".join(row["oxide"].split()),
+            printed_decimal(row["A_printed"]),
+            printed_decimal(row["B_printed"]),
+            row["notes_printed"],
+        ): identity
+        for identity, row in expected.items()
+    }
+    if len(expected_id_by_signature) != len(expected):
+        raise AssertionError("Fegley Table 2 manifest rows have ambiguous values")
+    actual = {}
+    for observation in observations:
+        parameters = dict(observation.value.expression_parameters or ())
+        try:
+            domain = json.loads(observation.value.expression_domain)
+        except (TypeError, json.JSONDecodeError):
+            domain = {}
+        signature = (
+            "".join(observation.identity.species.formula.split()),
+            parameters.get("A"),
+            parameters.get("B"),
+            domain.get("notes_as_printed"),
+        )
+        identity = expected_id_by_signature.get(signature)
+        if identity is None or identity in actual:
+            identity = f"unmanifested:{observation.observation_id}"
+            actual[identity] = signature
+        else:
+            actual[identity] = expected[identity]
+    assert_named_rows(
+        actual, expected, label="Fegley 2023 Table 2 migrated fit rows"
+    )
+
     assert QUANTITY_UNITS[Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT] == "dimensionless"
     fit_profile = profile_for(observations[0].identity)
     assert fit_profile.required == frozenset({"per", "reference_state"})
     assert Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT not in MELT_ACTIVITY_QUANTITIES
-    assert len(observations) == 82
     assert not [
         issue
         for issue in result.validation.hard_issues

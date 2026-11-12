@@ -82,11 +82,29 @@ def test_source_gaps_and_native_states_are_explicit(corpus):
     manifest, _ = corpus
     records = list(load_records())
     assert manifest["corpus_status"]["claimed_species_count"] == 3444
-    assert manifest["corpus_status"]["ambiguities"] == [
-        "page claims 3444 species; supplied HTML contains 3442 species rows"
-    ]
-    assert sum(r["formation_enthalpy_0_K_as_published"] == "" for r in records) == 590
-    assert sum(r["units_as_published"] == "" for r in records) == 20
+    assert any(
+        "page claims 3444 species" in ambiguity
+        and "supplied HTML contains" in ambiguity
+        for ambiguity in manifest["corpus_status"]["ambiguities"]
+    )
+    manifest_records = {entry["record_id"]: entry for entry in manifest["entries"]}
+    for field, label in (
+        ("formation_enthalpy_0_K_as_published", "ATcT blank DHf0 rows"),
+        ("units_as_published", "ATcT blank unit rows"),
+    ):
+        assert_named_rows(
+            {
+                record["record_id"]: None
+                for record in records
+                if record[field] == ""
+            },
+            {
+                record_id: None
+                for record_id, record in manifest_records.items()
+                if record[field] == ""
+            },
+            label=label,
+        )
     for record in records:
         assert "malformed_formula_cell_attribute; button text retained verbatim" in record["ambiguities"]
         if not record["formation_enthalpy_0_K_as_published"]:

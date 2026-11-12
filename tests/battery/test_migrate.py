@@ -12242,10 +12242,29 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         if "stolyarova_1996_fig2_" in obs.observation_id
         and "_digitized" in obs.observation_id
     ]
+    table3_candidates = [
+        obs
+        for obs in table_candidates
+        if "stolyarova_1996_table3_" in obs.observation_id
+    ]
+    table3_manifest = load_named_manifest(
+        REPO_ROOT
+        / "tests"
+        / "manifests"
+        / "stolyarova_table3_reference_states.jsonl"
+    )
+    assert_named_rows(
+        {
+            obs.observation_id: to_plain(obs.identity.reference_state)
+            for obs in table3_candidates
+        },
+        table3_manifest,
+        label="Stolyarova 1996 Table 3 comparison candidates",
+    )
     assert _rail_counter(table_candidates) == {
         "None": 6,
         "SiO_evolution": 45,
-        "melt_activity": 137,
+        "melt_activity": len(table3_manifest),
         "vapour": 118,
     }
     assert _rail_counter(figure_candidates) == {"melt_activity": 277}
