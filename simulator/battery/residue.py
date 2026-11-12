@@ -1068,6 +1068,9 @@ def integrate_knudsen_residue_inventory(
     if any(term.source.alpha != 1.0 for term in terms):
         raise ResidueInventoryRefusal("knudsen_equilibrium_channels_required")
     from scipy.integrate import solve_ivp
+    from simulator.chemistry.langmuir_knudsen import (
+        knudsen_effusion_relative_weight,
+    )
 
     parents = tuple(inventory)
     gases = tuple(term.source.species for term in terms)
@@ -1119,7 +1122,9 @@ def integrate_knudsen_residue_inventory(
                 pressure = float(pressures[species])
                 if not math.isfinite(pressure) or pressure < 0.0:
                     raise ResidueInventoryRefusal("residue_pressure_invalid", species)
-                rates[species] = pressure / math.sqrt(term.molar_mass_kg_mol)
+                rates[species] = knudsen_effusion_relative_weight(
+                    pressure, term.molar_mass_kg_mol
+                )
             denominator = math.fsum(term.molar_mass_kg_mol * rates[term.source.species] for term in terms)
             if not math.isfinite(denominator) or denominator <= 0.0:
                 raise ResidueInventoryRefusal("knudsen_extent_unreachable")

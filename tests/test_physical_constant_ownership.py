@@ -96,10 +96,18 @@ def test_cell_oxide_buffer_expression_bits() -> None:
 
 
 def test_knudsen_relative_weight_bits() -> None:
-    """Pin p/sqrt(M) before the cancelled effusion weight moves."""
+    """The effusion owner keeps the pre-move hex, including a count of 2."""
 
-    weight = 2.5e-4 / math.sqrt(0.055845)
+    from simulator.chemistry.langmuir_knudsen import (
+        knudsen_effusion_relative_weight,
+    )
+
+    weight = knudsen_effusion_relative_weight(2.5e-4, 0.055845)
+    counted = knudsen_effusion_relative_weight(
+        2.5e-4, 0.055845, coefficient=2.0
+    )
     assert weight.hex() == "0x1.1552ff5ce3623p-10"
+    assert counted.hex() == "0x1.1552ff5ce3623p-9"
 
 
 def test_vant_hoff_antoine_and_clausius_bits() -> None:
