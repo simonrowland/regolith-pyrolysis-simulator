@@ -23126,7 +23126,11 @@ class _ConditionHull:
         )
         if pressure_amount is not None:
             self.n_p += 1
-            self.p = self._widen(self.p, pressure_amount)
+            if isinstance(pressure.value, ApproxPressure):
+                self.p = self._widen(self.p, pressure.value.low)
+                self.p = self._widen(self.p, pressure.value.high)
+            else:
+                self.p = self._widen(self.p, pressure_amount)
         state = identity.composition
         if state is None or not state.is_value or state.value is None:
             state, _notice = _printed_point_composition(observation)

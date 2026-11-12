@@ -60,6 +60,7 @@ from simulator.battery.score import (
     FLAGGED_STRATUM_APPROXIMATE_PRESSURE,
     FLAGGED_STRATUM_APPROXIMATE_VALUE,
     _approximate_pressure_notice,
+    _ConditionHull,
     flagged_strata,
     total_pressure_bar_for_score,
 )
@@ -71,7 +72,7 @@ from simulator.transport_regime import (
     high_edge_knudsen_clause,
     single_species_mean_free_path_m,
 )
-from tests.battery.factories import activity_identity
+from tests.battery.factories import activity_identity, observation
 
 # 50 significant figures of √10. Independent of the constructor.
 _PUBLISHED_SQRT10_50 = Decimal(
@@ -563,6 +564,21 @@ def test_nominal_pressure_reads_serialized_bands() -> None:
     invalid = {**serialized, "low": "0"}
     with pytest.raises(ApproxPressureRefusal):
         nominal_pressure_pa(invalid)
+
+
+def test_headline_pressure_span_uses_band_edges() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(_HASHIMOTO_PA, approximate=True)
+    )
+    identity = replace(activity_identity(), total_pressure_Pa=State.of(band))
+    hull = _ConditionHull()
+    hull.add("banded", observation("banded", "experiment", identity, Decimal("0.2")))
+    assert hull.p == (band.low, band.high)
+    assert hull.n_p == 1
+    exact = replace(identity, total_pressure_Pa=State.of(Decimal("101325")))
+    hull.add("exact", observation("exact", "experiment", exact, Decimal("0.2")))
+    assert hull.p == (band.low, Decimal("101325"))
+    assert hull.n_p == 2
 
 
 def test_call_pressure_uses_the_nominal_point() -> None:
