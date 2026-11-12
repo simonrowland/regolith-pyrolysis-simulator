@@ -164,8 +164,12 @@ def test_sc388_allowlist_only_shrinks() -> None:
         body = _function_source(path, function)
         if all(fragment in body for fragment in fragments):
             live_fallbacks.add((path, function))
-    assert entries == live_fallbacks, (
-        "SC-388 allow-list must match the handlers whose ordinary fallback "
-        "behavior is still present; remove a fixed entry or name the live "
-        f"handler. Listed={sorted(entries)} live={sorted(live_fallbacks)}"
+    stale = entries - live_fallbacks
+    assert not stale, "stale allow-list entry: remove it: " + "; ".join(
+        f"{path}:{function}" for path, function in sorted(stale)
+    )
+    unlisted = live_fallbacks - entries
+    assert not unlisted, (
+        "new live SC-388 fallback missing from allow-list: "
+        + "; ".join(f"{path}:{function}" for path, function in sorted(unlisted))
     )
