@@ -150,6 +150,9 @@ Repository files under `raw/`, `corpus/`, `text/`, `tables/`,
 `supporting/`, and `docs/references/` use this same repository-first lookup.
 The extract document and program source are not source artifacts, including
 a copy parked on a source root.
+CI without a corpus mount verifies coverage and source-attestation shape;
+token fidelity for corpus-resolved pins is verified in jobs that mount the
+corpus.
 A numeric pin matches only a complete token: the sign and the exponent
 belong to the token, so `0.24` is not `-0.24` or `0.24e-5`, and `1.0` is
 not `1`. The whole stored value, including a spaced or attached unit, must

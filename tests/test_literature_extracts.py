@@ -5196,7 +5196,51 @@ _MISSING_OBSERVATION_IDS_CEILING = 0
 _NON_FINITE_EVIDENCE_CEILING = 0
 
 
-def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path):
+def _fidelity_extract_documents():
+    for path in vle.discover_extracts():
+        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+        if isinstance(doc, dict) and doc.get("schema_version") == vle.SCHEMA_VERSION:
+            yield path.stem, doc
+
+
+def _fidelity_warning_totals(documents):
+    totals = Counter()
+    extract_counts = Counter()
+    mount_dependent_pins = 0
+    details = []
+    for label, doc in documents:
+        warnings = vle.fidelity_source_warnings(doc, label=label)
+        for warning in warnings:
+            totals[warning.kind] += warning.count
+            extract_counts[warning.kind] += 1
+            if warning.kind == "source_blind_pin":
+                assert len(warning.reason_codes_by_pin) == warning.count
+                mount_dependent_pins += sum(
+                    reason_codes == frozenset({"corpus_root_unset"})
+                    for reason_codes in warning.reason_codes_by_pin
+                )
+                details.append(warning.render())
+    return totals, extract_counts, mount_dependent_pins, details
+
+
+def _require_fidelity_corpus_root(root: str | None, mount_dependent_pins: int) -> Path:
+    corpus_root = Path(root).expanduser() if root else None
+    if corpus_root is None or not corpus_root.is_dir():
+        pytest.skip(
+            "REGOLITH_CORPUS_ROOT is not an existing directory; "
+            f"{mount_dependent_pins} mount-dependent pins could not be verified"
+        )
+    return corpus_root
+
+
+def _assert_corpus_pins_open(documents):
+    totals, _extract_counts, _mount_dependent_pins, details = (
+        _fidelity_warning_totals(documents)
+    )
+    assert totals["source_blind_pin"] == 0, "\n".join(details)
+
+
+def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property):
     """Source-fidelity holes are an upper bound, not a green bill of health.
 
     ``auto_migrated_pilot_pin`` is the number of pilot samples. Counting
@@ -5204,74 +5248,57 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path):
     already has one.
     """
 
-    def counts():
-        uncovered_obs = 0
-        uncovered_extracts = 0
-        unattested_samples = 0
-        pilot_extracts = 0
-        pilot_pins = 0
-        source_blind_pins = 0
-        ambiguous_ids = 0
-        missing_ids = 0
-        non_finite = 0
-        for path in vle.discover_extracts():
-            doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
-            if not isinstance(doc, dict):
-                continue
-            if doc.get("schema_version") != vle.SCHEMA_VERSION:
-                continue
-            warnings = vle.fidelity_source_warnings(doc, label=path.stem)
-            by_kind = {warning.kind: warning.count for warning in warnings}
-            uncovered = by_kind.get("uncovered_observation", 0)
-            if uncovered:
-                uncovered_extracts += 1
-                uncovered_obs += uncovered
-            unattested_samples += by_kind.get("unattested_sample", 0)
-            source_blind_pins += by_kind.get("source_blind_pin", 0)
-            ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
-            missing_ids += by_kind.get("missing_observation_id", 0)
-            non_finite += by_kind.get("non_finite_evidence", 0)
-            pilot = by_kind.get("auto_migrated_pilot_pin", 0)
-            pilot_pins += pilot
-            if pilot:
-                pilot_extracts += 1
-        return (
-            uncovered_obs,
-            uncovered_extracts,
-            unattested_samples,
-            pilot_pins,
-            pilot_extracts,
-            source_blind_pins,
-            ambiguous_ids,
-            missing_ids,
-            non_finite,
-        )
-
+    documents = list(_fidelity_extract_documents())
     monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
-    unmounted = counts()
+    unmounted, unmounted_extract_counts, mount_dependent_pins, _details = (
+        _fidelity_warning_totals(documents)
+    )
     monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
-    mounted = counts()
-    assert mounted == unmounted
-    (
-        uncovered_obs,
-        uncovered_extracts,
-        unattested_samples,
-        pilot_pins,
-        pilot_extracts,
-        source_blind_pins,
-        ambiguous_ids,
-        missing_ids,
-        non_finite,
-    ) = unmounted
+    mounted, mounted_extract_counts, _mounted_dependent_pins, _details = (
+        _fidelity_warning_totals(documents)
+    )
+    assert (
+        mounted["uncovered_observation"],
+        mounted_extract_counts["uncovered_observation"],
+    ) == (
+        unmounted["uncovered_observation"],
+        unmounted_extract_counts["uncovered_observation"],
+    )
+    uncovered_obs = unmounted["uncovered_observation"]
+    uncovered_extracts = unmounted_extract_counts["uncovered_observation"]
+    unattested_samples = unmounted["unattested_sample"]
+    pilot_pins = unmounted["auto_migrated_pilot_pin"]
+    pilot_extracts = unmounted_extract_counts["auto_migrated_pilot_pin"]
+    source_blind_pins = unmounted["source_blind_pin"]
+    ambiguous_ids = unmounted["ambiguous_observation_id"]
+    missing_ids = unmounted["missing_observation_id"]
+    non_finite = unmounted["non_finite_evidence"]
+    record_property("mount_dependent_pins", mount_dependent_pins)
+    assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
     assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
     assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, unattested_samples
     assert pilot_pins <= _PILOT_PINS_CEILING, pilot_pins
     assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
-    assert source_blind_pins <= _SOURCE_BLIND_PINS_CEILING, source_blind_pins
+    non_mount_dependent_source_blind = source_blind_pins - mount_dependent_pins
+    assert (
+        non_mount_dependent_source_blind <= _SOURCE_BLIND_PINS_CEILING
+    ), f"source_blind_pin={source_blind_pins}; mount_dependent_pins={mount_dependent_pins}"
     assert ambiguous_ids <= _AMBIGUOUS_OBSERVATION_IDS_CEILING, ambiguous_ids
     assert missing_ids <= _MISSING_OBSERVATION_IDS_CEILING, missing_ids
     assert non_finite <= _NON_FINITE_EVIDENCE_CEILING, non_finite
+
+
+def test_fidelity_corpus_pins_open(monkeypatch):
+    root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
+    if not root or not Path(root).expanduser().is_dir():
+        monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+        _totals, _extract_counts, mount_dependent_pins, _details = (
+            _fidelity_warning_totals(list(_fidelity_extract_documents()))
+        )
+        _require_fidelity_corpus_root(root or None, mount_dependent_pins)
+    _require_fidelity_corpus_root(root, 0)
+    _assert_corpus_pins_open(list(_fidelity_extract_documents()))
 
 
 def test_auto_migrated_pilot_pin_counts_each_sample():
@@ -5632,11 +5659,7 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
     assert (source_blind.kind if source_blind else None) == expected_source_blind_reason
     if source_blind:
         expected_reason_codes = set(outcomes) & set(_TYPED_LOCATOR_REFUSALS)
-        actual_reason_codes = {
-            reason
-            for reason in _TYPED_LOCATOR_REFUSALS
-            if reason in source_blind.detail
-        }
+        actual_reason_codes = set().union(*source_blind.reason_codes_by_pin)
         assert actual_reason_codes == expected_reason_codes
         for key, outcome in zip(declared_keys, outcomes):
             if outcome in _TYPED_LOCATOR_REFUSALS:
@@ -5773,6 +5796,7 @@ def test_unset_corpus_root_is_typed_and_keeps_source_blind_count(
 
     warning = _source_blind_warning(doc)
     assert warning.count == 1
+    assert warning.reason_codes_by_pin == (frozenset({"corpus_root_unset"}),)
     assert "corpus_root_unset" in warning.detail
     _assert_refused_sample_still_covers_addressed_observation(doc)
     refusals = vle.certify_extract_source_fidelity(doc, label="corpus-pin")
@@ -5858,6 +5882,32 @@ def test_corpus_artifact_digest_mismatch_is_typed(tmp_path, monkeypatch):
 
     assert "artifact_digest_mismatch" in _source_blind_warning(doc).detail
     _assert_refused_sample_still_covers_addressed_observation(doc)
+
+
+def test_fidelity_corpus_pin_ratchets_only_when_mounted(tmp_path, monkeypatch):
+    corpus_root = tmp_path / "corpus"
+    doc = _corpus_pin_document(corpus_root)
+    artifact = corpus_root / "text" / "paper.txt"
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator["source_sha256"] = digest
+    documents = [("fixture-corpus-pin", doc)]
+
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+    totals, _extract_counts, mount_dependent_pins, _details = (
+        _fidelity_warning_totals(documents)
+    )
+    assert totals["source_blind_pin"] - mount_dependent_pins == 0
+    assert mount_dependent_pins == 1
+    with pytest.raises(pytest.skip.Exception, match="1 mount-dependent pins"):
+        _require_fidelity_corpus_root(None, mount_dependent_pins)
+
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+    _assert_corpus_pins_open(documents)
+
+    locator["source_sha256"] = "0" * 64
+    with pytest.raises(AssertionError, match="artifact_digest_mismatch"):
+        _assert_corpus_pins_open(documents)
 
 
 def test_repository_override_missing_artifact_refuses_without_corpus_root(

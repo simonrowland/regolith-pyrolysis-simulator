@@ -1755,12 +1755,19 @@ class FidelityWarning:
     count: int
     label: str
     detail: str = ""
+    reason_codes_by_pin: tuple[frozenset[str], ...] = ()
 
     def render(self) -> str:
         text = f"{self.label}: fidelity warning {self.kind} count={self.count}"
         if self.detail:
             text = f"{text}: {self.detail}"
         return text
+
+
+@dataclass(frozen=True)
+class _LocatorSourceBlindReason:
+    detail: str
+    reason_codes: frozenset[str] = frozenset()
 
 
 def _note_reason(reasons: list[str], extra: list[int], text: str) -> None:
@@ -2574,7 +2581,7 @@ def _locator_source_blind_reason(
     artifact_root: Path,
     corpus_root: Path | None,
     doc: Mapping[str, Any] | None = None,
-) -> str | None:
+) -> _LocatorSourceBlindReason | None:
     """Return a source-blind reason when the locator evidence is inadequate.
 
     No source-blind reason means a candidate was opened and contained the
@@ -2586,13 +2593,16 @@ def _locator_source_blind_reason(
     """
     keys = [key for key in ("locator", "source_locator") if key in sample]
     if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
-        return "locator was not opened: attestation locator is missing"
+        return _LocatorSourceBlindReason(
+            "locator was not opened: attestation locator is missing"
+        )
     locator = sample[keys[0]]
     malformed_keys = _malformed_locator_artifact_keys(locator)
     if malformed_keys:
-        return (
+        return _LocatorSourceBlindReason(
             "locator source-blind: locator_key_malformed "
-            f"({', '.join(malformed_keys)} must be non-empty strings)"
+            f"({', '.join(malformed_keys)} must be non-empty strings)",
+            frozenset({"locator_key_malformed"}),
         )
     candidate_groups = [
         (key, [raw.strip()])
@@ -2606,20 +2616,22 @@ def _locator_source_blind_reason(
         candidates = [text] if token == text else [text, token]
         candidate_groups.append(("record", candidates))
     if not candidate_groups:
-        return (
+        return _LocatorSourceBlindReason(
             "locator was not opened: no source_path, quotes_path, or file record "
             "points at a text artifact"
         )
     leaves, leaf_error = _certification_scalar_leaves(sample, doc)
     if leaf_error:
-        return leaf_error
+        return _LocatorSourceBlindReason(leaf_error)
     reasons: list[str] = []
+    reason_codes: set[str] = set()
     resolved_corpus_root = (
         corpus_root.expanduser().resolve() if corpus_root is not None else None
     )
     corpus_artifact_keys = 0
     for _key, candidates in candidate_groups:
         candidate_reasons: list[str] = []
+        candidate_reason_codes: set[str] = set()
         key_matched = False
         resolved_to_corpus = False
         for raw in candidates:
@@ -2633,6 +2645,7 @@ def _locator_source_blind_reason(
                 # The first opened record candidate decides this key. Discard
                 # refusals from candidates that did not open.
                 candidate_reasons.clear()
+                candidate_reason_codes.clear()
             if (
                 path is not None
                 and blob is not None
@@ -2644,6 +2657,7 @@ def _locator_source_blind_reason(
                 candidate_reasons.append(
                     f"locator was not opened: {open_refusal} ({raw})"
                 )
+                candidate_reason_codes.add(open_refusal)
                 if path is not None and blob is not None:
                     break
                 continue
@@ -2651,6 +2665,7 @@ def _locator_source_blind_reason(
                 candidate_reasons.append(
                     f"locator was not opened: artifact_not_opened ({raw})"
                 )
+                candidate_reason_codes.add("artifact_not_opened")
                 continue
             if path.suffix.lower() == ".pdf" or blob.startswith(b"%PDF"):
                 candidate_reasons.append(
@@ -2704,11 +2719,18 @@ def _locator_source_blind_reason(
         if resolved_to_corpus:
             corpus_artifact_keys += 1
             if corpus_artifact_keys > 1:
-                return "locator source-blind: multiple_corpus_artifacts"
+                return _LocatorSourceBlindReason(
+                    "locator source-blind: multiple_corpus_artifacts",
+                    frozenset({"multiple_corpus_artifacts"}),
+                )
         if not key_matched:
             reasons.extend(candidate_reasons)
+            reason_codes.update(candidate_reason_codes)
     if reasons:
-        return "locator source-blind: " + "; ".join(reasons)
+        return _LocatorSourceBlindReason(
+            "locator source-blind: " + "; ".join(reasons),
+            frozenset(reason_codes),
+        )
     return None
 
 
@@ -2817,6 +2839,7 @@ def fidelity_source_warnings(
     source_blind = 0
     source_blind_reasons: list[str] = []
     source_blind_extra = [0]
+    source_blind_reason_codes: list[frozenset[str]] = []
     root = artifact_root if artifact_root is not None else ROOT
     configured_corpus_root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
     corpus_root = (
@@ -2860,10 +2883,11 @@ def fidelity_source_warnings(
             )
             if blind:
                 source_blind += 1
+                source_blind_reason_codes.append(blind.reason_codes)
                 _note_reason(
                     source_blind_reasons,
                     source_blind_extra,
-                    f"{sample_label}: {blind}",
+                    f"{sample_label}: {blind.detail}",
                 )
         match_errors = check_fidelity_sample_matches(doc, sample, label=sample_label)
         observation_key = _fidelity_sample_observation_key(doc, sample)
@@ -2960,6 +2984,7 @@ def fidelity_source_warnings(
                 source_blind,
                 label,
                 _finish_detail(source_blind_reasons, source_blind_extra[0]),
+                tuple(source_blind_reason_codes),
             )
         )
     if ambiguous_ids:
