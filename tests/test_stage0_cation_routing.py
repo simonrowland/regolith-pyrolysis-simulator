@@ -36,6 +36,48 @@ def _sim(feedstocks):
     )
 
 
+def _limiting_carbon_probe(carbon_mol=1.0, *, include_boudouard=False):
+    from tests.test_subsolidus_bakeout import _molar
+
+    host_kg = {"CaSO4": _molar("CaSO4"), "FeSO4": 2 * _molar("FeSO4")}
+    reactions = ["sulfate_so3_to_so2_co"]
+    if include_boudouard:
+        reactions.append("co2_boudouard_to_co")
+    feed = {
+        "stage0_profile": "mars_carbon_cleanup",
+        "stage0_carbon_cleanup": {
+            "carbon_reductant_kg_per_tonne": carbon_mol * _molar("C"),
+            "cation_sulfate_product": "oxide",
+            "reactions": reactions,
+        },
+        "composition_wt_pct": {
+            "SiO2": 100 - sum(host_kg.values()) / 10,
+            **{species: kg / 10 for species, kg in host_kg.items()},
+        },
+    }
+    if include_boudouard:
+        feed["environment"] = {"atmosphere": "96% CO2"}
+    sim = _sim({"feed": feed})
+    sim.load_batch(
+        "feed", mass_kg=1000, additives_kg={"C": carbon_mol * _molar("C")}
+    )
+    sim.atom_ledger.assert_balanced()
+    consumed = sum(
+        amounts.get("C", 0.0) / _molar("C")
+        for spec in sim._stage0_carbon_cleanup_specs
+        for account, amounts, _origin in spec["debits"]
+        if account == "process.reagent_inventory"
+    )
+    snapshot = sim._make_snapshot()
+    return {
+        "ledger": sim.atom_ledger.mol_by_account(),
+        "reserved": sim._stage0_bakeout_reserved_carbon_kg / _molar("C"),
+        "consumed": consumed,
+        "mass_in_kg": snapshot.mass_in_kg,
+        "mass_out_kg": snapshot.mass_out_kg,
+    }
+
+
 def _carbonate_decomposition_extent(
     species: str,
     species_mol: float,
@@ -200,6 +242,61 @@ def _expected_feso4_sulfide_carbon_cleanup(feed_kg: float, registry):
         "C": 4.0 * extent_mol * molar["C"],
         "extent_mol": extent_mol,
     }
+
+
+def test_unreacted_feso4_remainder_is_ledgered_and_mass_closes():
+    result = _limiting_carbon_probe(0.25)
+
+    assert result["mass_in_kg"] == pytest.approx(result["mass_out_kg"], abs=1e-9)
+    assert result["ledger"]["process.stage0_salt_feed"]["FeSO4"] == pytest.approx(
+        1.5, abs=1e-12
+    )
+
+
+def test_full_carbon_sulfate_routing_is_unchanged():
+    result = _limiting_carbon_probe(1.0)
+    ledger = result["ledger"]
+
+    assert ledger["process.stage0_salt_feed"]["CaSO4"] == pytest.approx(1.0)
+    assert ledger["process.stage0_salt_feed"].get("FeSO4", 0.0) == pytest.approx(0.0)
+    assert ledger["process.cleaned_melt"]["Fe2O3"] == pytest.approx(1.0)
+    assert ledger["terminal.offgas"]["SO2"] == pytest.approx(2.0)
+    assert result["reserved"] == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize("carbon_mol", [0.25, 1.0, 1.5, 2.0])
+def test_sulfate_carbon_claims_share_one_budget(carbon_mol):
+    result = _limiting_carbon_probe(carbon_mol, include_boudouard=True)
+
+    assert result["reserved"] + result["consumed"] <= carbon_mol + 1e-12
+    assert result["reserved"] + result["consumed"] == pytest.approx(carbon_mol)
+
+
+def test_bakeout_reservation_cannot_overclaim_remaining_carbon():
+    from tests.test_subsolidus_bakeout import _molar
+
+    sim = _sim({})
+    reserved, remaining = sim._reserve_stage0_bakeout_sulfate_carbon(
+        "CaSO4", 2.0, 1.0, _molar("C"), 1.0,
+    )
+    assert reserved
+    assert remaining == 0.0
+    assert sim._stage0_bakeout_reserved_carbon_kg == _molar("C")
+
+
+def test_carbon_admission_guard_rejects_summed_overclaims(monkeypatch):
+    original = PyrolysisSimulator._apply_stage0_cation_sulfate_carbon_reactions
+
+    def overclaim(sim, feedstock, carbon_mol, specs):
+        remaining = original(sim, feedstock, carbon_mol, specs)
+        specs.append({"debits": (("process.reagent_inventory", {"C": 1.0}, "reagent"),)})
+        return remaining
+
+    monkeypatch.setattr(
+        PyrolysisSimulator, "_apply_stage0_cation_sulfate_carbon_reactions", overclaim,
+    )
+    with pytest.raises(AccountingError, match="claims exceed the admitted C budget"):
+        _limiting_carbon_probe()
 
 
 @pytest.fixture

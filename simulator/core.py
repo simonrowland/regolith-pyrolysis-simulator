@@ -9012,26 +9012,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             context=f'{label} Stage 0 sulfide matte products',
         )
         from simulator.subsolidus_bakeout import (
-            BAKEOUT_SULFATE_HOSTS,
             BAKEOUT_SULFIDE_HOSTS,
             SALT_FEED_ACCOUNT,
         )
 
-        # Exact hosts stay in the inventory denominator fields. Live moles
-        # move to the mutable salt account; the terminal load must not
-        # keep a second copy.
-        retained_bakeout_hosts_kg: Dict[str, float] = {}
+        # Retained Stage 0 salts stay in inventory denominator fields and
+        # move to the mutable salt account; the terminal load must not keep
+        # a second copy.
+        retained_salt_feed_kg: Dict[str, float] = {}
         for species in sorted(BAKEOUT_SULFIDE_HOSTS):
             kg = float(terminal_sulfide_external.pop(species, 0.0) or 0.0)
             if kg > 1e-12:
-                retained_bakeout_hosts_kg[species] = kg
-        for species in sorted(BAKEOUT_SULFATE_HOSTS):
+                retained_salt_feed_kg[species] = kg
+        for species in sorted(self.inventory.cation_sulfate_feed_kg):
             kg = float(
                 self.inventory.cation_sulfate_feed_kg.get(species, 0.0) or 0.0
             )
             if kg > 1e-12:
-                retained_bakeout_hosts_kg[species] = (
-                    retained_bakeout_hosts_kg.get(species, 0.0) + kg
+                retained_salt_feed_kg[species] = (
+                    retained_salt_feed_kg.get(species, 0.0) + kg
                 )
 
         self._load_ledger_account(
@@ -9075,8 +9074,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._load_ledger_account(
             SALT_FEED_ACCOUNT,
-            retained_bakeout_hosts_kg,
-            source=f'{label} subsolidus bakeout hosts',
+            retained_salt_feed_kg,
+            source=f'{label} Stage 0 retained salt feed',
         )
         self._load_ledger_account(
             'terminal.drain_tap_material',
