@@ -2973,8 +2973,6 @@ class _OpenImccBatteryBackend:
     """
 
     supports_intrinsic_fO2 = False
-    _DEFAULT_GAS_PACK_NAME = 'default'
-
     def __init__(self, engine_name: str, *, pack_name: str | None = None) -> None:
         if engine_name not in OPENIMCC_ENGINE_NAMES:
             raise BinaryPotBatteryError(f"unknown openimcc engine {engine_name!r}")
@@ -2986,7 +2984,7 @@ class _OpenImccBatteryBackend:
         self._pack_name = str(pack_name or openimcc_bridge.DEFAULT_BACKEND_PACK_NAME)
         self._pack = openimcc_bridge._load_pack(self._pack_name)
         # The gas loader selects its packaged default; keep that selector in the key.
-        self._gas_pack_name = self._DEFAULT_GAS_PACK_NAME
+        self._gas_pack_name = openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
         self.model_id = str(getattr(self._pack, "model_id", "openimcc"))
         self._gas: Any = None
         self._gas_error: str | None = None
@@ -4732,11 +4730,14 @@ def normalize_engine_settings(
             oxygen_backend = {"pack": DEFAULT_BACKEND_PACK_NAME}
         return {"oxygen_balance_backend": oxygen_backend}
     if engine_name == "openimcc":
-        from simulator.melt_backend.openimcc_bridge import DEFAULT_BACKEND_PACK_NAME
+        from simulator.melt_backend.openimcc_bridge import (
+            DEFAULT_BACKEND_PACK_NAME,
+            DEFAULT_GAS_PACK_SELECTION,
+        )
 
         return {
             "pack": fields.get("pack") or DEFAULT_BACKEND_PACK_NAME,
-            "gas_pack": _OpenImccBatteryBackend._DEFAULT_GAS_PACK_NAME,
+            "gas_pack": DEFAULT_GAS_PACK_SELECTION,
         }
     if engine_name == "alphamelts":
         from simulator.melt_backend.alphamelts import (

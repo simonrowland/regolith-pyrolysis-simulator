@@ -466,7 +466,11 @@ def test_normalized_engine_defaults_match_backend_defaults(
     )
     openimcc = _OpenImccBatteryBackend("openimcc")
     assert normalized["openimcc"]["pack"] == openimcc._pack_name == bridge_pack
-    assert normalized["openimcc"]["gas_pack"] == openimcc._gas_pack_name
+    assert (
+        normalized["openimcc"]["gas_pack"]
+        == openimcc._gas_pack_name
+        == openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
+    )
 
     alpha = AlphaMELTSBackend()
     alpha._configure_subprocess_calc_mode(None)
