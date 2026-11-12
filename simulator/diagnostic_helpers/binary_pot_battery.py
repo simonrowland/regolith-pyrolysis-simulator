@@ -66,10 +66,10 @@ from simulator.engine_pool import (
 )
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.config import (
-    DEFAULT_ALPHAMELTS_MODEL,
     _load_setpoints_file,
     resolve_alphamelts_python_api_model,
     resolve_alphamelts_subprocess_settings,
+    resolve_grid_engine_model,
 )
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
@@ -3084,10 +3084,8 @@ class _OpenImccBatteryBackend:
                 bridge_kwargs["composition_kg"] = composition_kg
         else:
             bridge_kwargs["composition_mol"] = composition_mol
-        result = self._bridge._evaluate_with_timeout(
-            solve_timeout_s=call_timeout_s,
-            **bridge_kwargs,
-        )
+        with self._bridge._with_solve_timeout(call_timeout_s):
+            result = self._bridge.evaluate(**bridge_kwargs)
         self.model_id = result.pack_model_id
         self._identity["model_id"] = self.model_id
         self._identity["name"] = self.model_id
@@ -4533,7 +4531,7 @@ class _IsolatedCellWorker:
                 request["simulate_crash"] = payload["simulate_crash"]
             request["engine_settings"] = engine_cache_settings(
                 self.engine,
-                self.engine_settings,
+                normalize_engine_settings(self.engine, self.engine_settings),
             )
             result = cached_engine_call(self.engine, request, solve)
         if isinstance(result, list):
@@ -4847,9 +4845,7 @@ def normalize_engine_settings(
             vacuum_floor_bar_for_environment,
         )
 
-        model = fields.get("model")
-        if not model:
-            model = DEFAULT_ALPHAMELTS_MODEL
+        model = resolve_grid_engine_model(fields.get("model"), "thermoengine")
         configured_po2 = fields.get("configured_vapor_transport_pO2_bar")
         if configured_po2 is None:
             configured_po2 = DEFAULT_VACUUM_FLOOR_BAR
