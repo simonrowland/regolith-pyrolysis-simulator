@@ -27,7 +27,9 @@ Invariant, enforced only inside ``apply_langmuir_surface_oxygen``:
 every caller enters with the partials of that evaluation, and every
 species is the published pressure (closure closed, or not a
 melt-surface carrier), the one shared surface-pO2 law, or a typed
-refusal. The published surface is the root of
+refusal. A required solve that does not close refuses every
+melt-surface participant. An in-band carrier above the certified
+minimum is not left at the persisted pressure. The published surface is the root of
 ``sum (nO - dO) J = 0`` with ``J = k * max(0, P - P_bulk)`` using the
 publisher conductance (ideal Hertz-Knudsen when the film is off).
 Inside that root, overhead O2 is ``P_bulk`` on every branch: a
@@ -1075,6 +1077,212 @@ def test_unsolvable_surface_refuses_inverted_carriers_without_silent_zero() -> N
         assert resolved[species] > 0.0
     for pressure in resolved.values():
         assert pressure > 0.0
+
+
+# Certified mass-action minimum. Below this, a carrier is below-band.
+# The in-band failure is the mutation: this set is empty, and a
+# chokepoint that refuses only that set publishes the unclosed pressure.
+_CERTIFIED_MIN_BAR = 1.0e-12
+# 1000 mbar = 1 bar = the top of the log10 pO2 bracket [-30, 0].
+_BRACKET_TOP_OVERHEAD_MBAR = 1000.0
+
+
+def _oracle_melt_surface_participants(compiled, diagnostic, published) -> dict[str, float]:
+    """Melt-surface participants from the catalog. Not the production classifier.
+
+    A participant has a positive published pressure, a negative catalog
+    exponent, and a reference pO2. An intrinsic-melt channel uses the
+    source-reaction fO2, which is the pO2 the mass-action law solved
+    at. Transport-headspace and SiO are not participants. A
+    non-negative exponent (CaO_gas is 0) is not a participant.
+    """
+
+    source = diagnostic.get("source_reaction_fO2_bar")
+    provenance = diagnostic.get("vapor_pressure_numerator_provenance") or {}
+    participants: dict[str, float] = {}
+    for species, pressure in published.items():
+        try:
+            pressure_value = float(pressure)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(pressure_value) or pressure_value <= 0.0:
+            continue
+        evaluator = compiled.evaluator_for(str(species))
+        if evaluator is None:
+            continue
+        channel = getattr(evaluator, "oxygen_fugacity_channel", None)
+        if channel == "transport_headspace" or species == "SiO":
+            continue
+        try:
+            exponent = float(getattr(evaluator, "pO2_exponent", None))
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(exponent) or exponent >= 0.0:
+            continue
+        if channel == "intrinsic_melt":
+            reference = source
+        else:
+            reference = (provenance.get(species) or {}).get("pO2_bar")
+        try:
+            reference_value = float(reference)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(reference_value) or reference_value <= 0.0:
+            continue
+        participants[str(species)] = reference_value
+    return participants
+
+
+def _overhead_blocks_the_bracket(overhead_mbar: float) -> bool:
+    """True when O2 drive is identically zero inside the declared bracket.
+
+    Drive is ``max(0, P_O2 - P_overhead)``. Headspace mbar converts at
+    100 Pa/mbar. The solver bracket is ``log10(pO2/bar)`` on
+    ``[-30, 0]``, so the highest pressure it can try is 1 bar. This
+    does not call the balance.
+    """
+
+    overhead_pa = float(overhead_mbar) * 100.0
+    return overhead_pa >= 1.0 * PA_PER_BAR
+
+
+def _assert_kernel_omits(host, equilibrium, omitted: set[str], kept: dict[str, float]) -> None:
+    captured: dict = {}
+
+    def _dispatch_only(intent, *args, **kwargs):
+        del args
+        captured["intent"] = intent
+        captured["controls"] = kwargs["control_inputs"]
+        return SimpleNamespace(
+            status="ok",
+            diagnostic={"evaporation_flux_kg_hr": {}},
+        )
+
+    host._dispatch_only = _dispatch_only
+    EvaporationMixin._calculate_evaporation(host, equilibrium)
+    assert captured["intent"] is ChemistryIntent.EVAPORATION_FLUX
+    live_map = captured["controls"][CONTROL_FLUX_PRESSURES_KEY]
+    for species in omitted:
+        assert species not in live_map
+    for species, pressure in kept.items():
+        assert live_map[species] == pytest.approx(pressure, rel=1.0e-12)
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "open-inband-overhead",
+        "open-inband-nan-temperature",
+        "open-floor-nan-temperature",
+        "open-floor-overhead",
+        "closed-inband-overhead",
+        "closed-inband-nan-temperature",
+        "open-inband-vacuum",
+    ],
+)
+def test_failed_open_gate_refuses_every_melt_surface_carrier(case: str) -> None:
+    """An open gate that does not close refuses every melt-surface carrier.
+
+    The pure-CaO map is Ca, Ca2, and CaO_gas. Ca and Ca2 have negative
+    exponents. CaO_gas is exponent 0 and stays published. The
+    open-inband-overhead row is the mutation probe: both references
+    are 1e-9 bar, above 1e-12, so a chokepoint that refuses only
+    below-band carriers leaves Ca at 825.3377 Pa.
+    """
+
+    specs = {
+        "open-inband-overhead": (-9.0, 0.0, _BRACKET_TOP_OVERHEAD_MBAR, False, "refuse"),
+        "open-inband-nan-temperature": (-9.0, 0.0, None, True, "refuse"),
+        "open-floor-nan-temperature": (-40.0, 1.0, None, True, "refuse"),
+        "open-floor-overhead": (-40.0, 1.0, _BRACKET_TOP_OVERHEAD_MBAR, False, "refuse"),
+        "closed-inband-overhead": (-9.0, 1.0, _BRACKET_TOP_OVERHEAD_MBAR, False, "published"),
+        "closed-inband-nan-temperature": (-9.0, 1.0, None, True, "published"),
+        "open-inband-vacuum": (-9.0, 0.0, None, False, "closed"),
+    }
+    f_o2, capacity, overhead_mbar, non_finite_temperature, expect = specs[case]
+    compiled, legacy = _catalog()
+    answer = _cao_answer(f_o2)
+    diagnostic = answer.diagnostic
+    published, published_ca, p_ref_bar = _published_ca(diagnostic)
+    assert set(published) == {"Ca", "Ca2", "CaO_gas"}
+    participants = _oracle_melt_surface_participants(compiled, diagnostic, published)
+    assert "Ca" in participants
+    assert "CaO_gas" not in participants
+    assert participants["Ca"] == pytest.approx(p_ref_bar)
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=capacity,
+        headspace_o2_mbar=overhead_mbar,
+        chemistry_kernel=(
+            None
+            if overhead_mbar is None
+            else {
+                "evaporation_series_resistance": {
+                    "gas_resistance_enabled": False,
+                },
+            }
+        ),
+    )
+    resolved = _resolve(
+        host,
+        equilibrium,
+        temperature_K=float("nan") if non_finite_temperature else _T_K,
+    )
+    for pressure in resolved.values():
+        assert pressure > 0.0
+        assert math.isfinite(pressure)
+
+    if expect == "published":
+        assert resolved == published
+        assert not hasattr(host, "_last_langmuir_surface_oxygen")
+        return
+
+    if expect == "closed":
+        surface_pO2_bar, pressure_pa, _flux = _congruent_cao_surface(
+            published_ca, p_ref_bar
+        )
+        assert resolved["Ca"] == pytest.approx(pressure_pa, rel=1.0e-6)
+        assert resolved["Ca"] != pytest.approx(published_ca, rel=1.0e-3)
+        assert resolved["CaO_gas"] == published["CaO_gas"]
+        notice = host._last_langmuir_surface_oxygen
+        assert notice["applied"] is True
+        assert notice["surface_pO2_bar"] == pytest.approx(surface_pO2_bar, rel=1.0e-6)
+        assert "Ca" not in notice["refused_species"]
+        return
+
+    below_band = {
+        species
+        for species, reference in participants.items()
+        if reference < _CERTIFIED_MIN_BAR
+    }
+    if case == "open-inband-overhead":
+        assert _overhead_blocks_the_bracket(overhead_mbar)
+        assert below_band == set()
+        assert published_ca == pytest.approx(825.3377299577454, rel=1.0e-12)
+    if case == "open-floor-overhead":
+        assert _overhead_blocks_the_bracket(overhead_mbar)
+        assert "Ca" in below_band
+    notice = host._last_langmuir_surface_oxygen
+    assert notice["applied"] is True
+    assert notice["surface_pO2_bar"] is None
+    assert set(notice["refused_species"]) == set(participants)
+    for species in participants:
+        assert species not in resolved
+        reason = notice["refused_species"][species]
+        assert reason
+        assert "0.0" not in reason
+    kept = {
+        species: pressure
+        for species, pressure in published.items()
+        if species not in participants
+    }
+    for species, pressure in kept.items():
+        assert resolved[species] == pressure
+    if not non_finite_temperature:
+        _assert_kernel_omits(host, equilibrium, set(participants), kept)
 
 
 def _catalog_alpha(legacy, species: str, temperature_K: float) -> float:

@@ -3745,13 +3745,13 @@ def test_parallel_composition_target_stub_study_completes(
     payload = json.loads(pareto_path.read_text())
     # d-367, as applied by the pre-RG withhold (6d24ba1c1): SiO is the only
     # wall-saturation refusal, and at least one interval has no computed
-    # vapour rate. The supply integral therefore returns no bound. This is
-    # not wall_deposit_upper_bound_used. d-045
-    # (test_d045_refused_species_without_flux_bound_is_unavailable) keeps
-    # the coating gate unavailable. Certain upstream deposit is 0 kg, under
-    # the 0.5 kg limit on a 1000 kg charge. The study record stores that
-    # missing bound as the string "-inf" (_json_number), so the Morris
-    # screen has no feasible winner.
+    # vapour rate and no physical-zero record. The supply integral returns
+    # no bound. That is not wall_deposit_upper_bound_used, and the other
+    # hours are not booked as a partial sum. d-045 keeps the coating gate
+    # unavailable, so the screen has no feasible winner. Certain upstream
+    # deposit is 0 kg, under the 0.5 kg limit on a 1000 kg charge. The
+    # margin is that certain-deposit slack (5e-4), not "-inf": a missing
+    # bound is not an infinite coating cost.
     assert result.status == "completed-no-feasible-winner"
     assert result.winner is None
     assert result.pareto == ()
@@ -3766,7 +3766,8 @@ def test_parallel_composition_target_stub_study_completes(
         assert list(candidate.failing_gates) == ["coating"]
         coating = candidate.feasibility_margins["coating"]
         assert coating["status"] == "unavailable"
-        assert coating["margin"] == "-inf"
+        assert coating["margin"] == pytest.approx(5.0e-4)
+        assert math.isfinite(float(coating["margin"]))
         payload_margin = coating["status_payload"]
         assert payload_margin["certain_upstream_deposit_kg_per_campaign"] == 0.0
         assert payload_margin[

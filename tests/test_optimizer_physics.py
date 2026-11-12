@@ -830,6 +830,9 @@ def test_d045_two_refused_species_bounds_are_summed_before_limit_check() -> None
     assert coating.status_payload[
         "upstream_wall_deposit_upper_bound_kg_per_campaign"
     ] == pytest.approx(6.0e-4)
+    # The bound is known and already over the limit, so this branch
+    # keeps the non-finite margin. The missing-bound branch does not.
+    assert coating.margin == -math.inf
 
 
 def test_d045_certain_deposit_equal_to_limit_is_clear_without_refused_species() -> None:
@@ -886,6 +889,10 @@ def test_d045_refused_species_without_flux_bound_is_unavailable() -> None:
     assert coating.status == "unavailable"
     assert coating.observed is None
     assert "upper bound unavailable" in coating.status_reason
+    # Certain deposit is 0 on a 1 kg charge. The fraction limit is 5e-4.
+    # The missing bound stays unavailable. It is not stored as -inf.
+    assert coating.margin == pytest.approx(5.0e-4)
+    assert math.isfinite(coating.margin)
 
 
 def test_d045_inapplicable_carrier_is_excluded_and_feasible() -> None:

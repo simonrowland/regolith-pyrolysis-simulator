@@ -2370,10 +2370,27 @@ def _coating_fraction_unavailable_margin(
         }
         for species in refused_species
     ]
+    # A missing flux bound is not an infinite coating cost. d-045 keeps
+    # the gate unavailable (feasible stays false, observed stays null)
+    # and the refusal stays named. The margin is the certain-deposit
+    # slack against the fraction limit, (limit - certain) / charge,
+    # which is finite while the certain deposit is inside the limit.
+    # -inf is the 1e30 constraint penalty (_constraint_violation_from_margin)
+    # and is reserved for a known upper bound that already exceeds the
+    # limit: that case has no slack. Booking a partial sum of the other
+    # hours is not this margin (d-367).
+    if (
+        upper_bound_kg is None
+        and certain_deposit_kg <= limit_kg
+        and charge_mass_kg > 0.0
+    ):
+        margin = threshold.value - (certain_deposit_kg / charge_mass_kg)
+    else:
+        margin = -math.inf
     return GateMargin(
         gate="coating",
         feasible=False,
-        margin=-math.inf,
+        margin=margin,
         threshold=threshold,
         observed=None,
         detail=f"coating unavailable: {reason}",

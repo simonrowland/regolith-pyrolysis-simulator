@@ -35,8 +35,10 @@ of a root that owns the drive. Free-molecular
 The exit check compares the solved surface with the caller's partial,
 not with a bulk a branch already discarded.
 
-A failed root drops only below-band carriers. An in-band failure keeps
-the published pressures and names the warning.
+A failed root refuses every melt-surface participant. Below-band and
+in-band carriers are the same defect once the gate is open: the
+persisted evaluation pressure was not a closed balance. Transport
+and neutral carriers stay published. Nothing is written as 0.
 
 Invariant. ``apply_langmuir_surface_oxygen`` is the only writer of the
 flux map, and every caller (live evaporation and each finite-capacity
@@ -53,7 +55,10 @@ bulk only when it is emitting this root. A closed gate does not.
 Every species is then one of
 three outcomes: the published pressure (closure closed,
 transport-headspace channel, or no melt-surface law), the single
-surface-pO2 law below, or a typed refusal. The published surface is
+surface-pO2 law below, or a typed refusal. A required solve that
+does not close is the refusal, including an in-band carrier whose
+reference pO2 is above the certified minimum. Refusing only the
+below-band set would publish that unclosed pressure. The published surface is
 the root of ``sum (nO_i - dO_i) J_i = 0`` where ``J_i`` is that
 species' publisher net flux at those partials, and the reported
 residual is that root's residual. The alpha in ``J_i`` and the
@@ -352,8 +357,10 @@ def apply_langmuir_surface_oxygen(
     The root already includes overhead backpressure and the publisher
     gas resistance, so the surface is not clamped to the overhead
     partial afterwards. While O2 is net-leaving that root is not below
-    the overhead pO2. A failed root drops only the below-band carriers
-    and names the reason. Neither path writes a silent 0.
+    the overhead pO2. A failed root refuses every melt-surface
+    participant, below-band and in-band, and names the reason.
+    Transport and neutral carriers stay published. Neither path
+    writes a silent 0.
     """
 
     provenance_by_species = provenance_by_species or {}
@@ -411,9 +418,9 @@ def apply_langmuir_surface_oxygen(
     except (TypeError, ValueError):
         temperature = math.nan
     if not math.isfinite(temperature) or temperature <= 0.0:
-        return _refuse_inverted(
+        return _refuse_unclosed_surface(
             pressures_Pa,
-            inverted,
+            carriers,
             persisted,
             detail="temperature_K is not finite and positive",
             capacity_negligible=capacity_negligible,
@@ -1228,9 +1235,9 @@ def _solve_or_refuse(
         coupled.append(carrier)
 
     if not any(channel.pO2_exponent < 0.0 for channel in channels):
-        return _refuse_inverted(
+        return _refuse_unclosed_surface(
             pressures_Pa,
-            inverted,
+            carriers,
             persisted,
             detail="no oxygen-coupled carrier could enter the balance",
             extra_refused=refused,
@@ -1287,9 +1294,9 @@ def _solve_or_refuse(
             law=law,
         )
     except ValueError as exc:
-        return _refuse_inverted(
+        return _refuse_unclosed_surface(
             pressures_Pa,
-            inverted,
+            carriers,
             persisted,
             detail=str(exc),
             extra_refused=refused,
@@ -1304,9 +1311,9 @@ def _solve_or_refuse(
     if pinned or residual > _RESIDUAL_CLOSE_MAX or not math.isfinite(
         balance.pO2_bar
     ) or balance.pO2_bar <= 0.0:
-        return _refuse_inverted(
+        return _refuse_unclosed_surface(
             pressures_Pa,
-            inverted,
+            carriers,
             persisted,
             detail=(
                 "oxygen balance did not close "
@@ -1328,9 +1335,9 @@ def _solve_or_refuse(
     # flux therefore means the solved surface is above that partial.
     overhead_bounded = physical_o2_Pa > 0.0 and o2_flux > 0.0
     if overhead_bounded and surface_pO2_bar * PA_PER_BAR < physical_o2_Pa:
-        return _refuse_inverted(
+        return _refuse_unclosed_surface(
             pressures_Pa,
-            inverted,
+            carriers,
             persisted,
             detail=(
                 "solved surface pO2 is below the overhead partial "
@@ -1373,9 +1380,9 @@ def _solve_or_refuse(
     )
 
 
-def _refuse_inverted(
+def _refuse_unclosed_surface(
     pressures_Pa: Mapping[str, float],
-    inverted: list[_Carrier],
+    carriers: list[_Carrier],
     persisted: Mapping[str, float],
     *,
     detail: str,
@@ -1383,12 +1390,28 @@ def _refuse_inverted(
     capacity_negligible: bool = False,
     eval_pO2_below_physical_floor: bool = False,
 ) -> LangmuirSurfaceOxygen:
+    """Refuse every melt-surface carrier when the required solve fails.
+
+    d-376 amendment 1 has already opened the gate (physical floor or
+    ``C_m ~ 0``). The persisted evaluation pressure is not a closed
+    surface balance until the root exists. Below-band carriers
+    (reference pO2 under the certified minimum) and in-band carriers
+    are that same defect. Pure CaO at 1e-9 bar is in-band, so the
+    below-band set is empty, and a 1 bar overhead O2 makes the O2
+    drive identically zero on the log-p bracket ``[-30, 0]`` while Ca
+    demand stays positive. The bracket then has no root. Refusing only
+    the below-band set would return the unclosed Ca pressure.
+    Transport and neutral (exponent >= 0) carriers stay published.
+    Nothing is written as 0.
+    """
+
     refused = {
         carrier.species: (
-            "langmuir surface pO2 unavailable; inverted pressure omitted: "
+            "langmuir surface pO2 unavailable; unclosed surface pressure omitted: "
             + detail
         )
-        for carrier in inverted
+        for carrier in carriers
+        if carrier.inverted or _needs_surface_balance(carrier)
     }
     if extra_refused:
         refused.update(dict(extra_refused))
