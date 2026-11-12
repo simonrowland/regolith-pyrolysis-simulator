@@ -95,19 +95,28 @@ def test_internal_analytical_backend_bypasses_nested_engine_cache(
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _call_cached_backend_equilibrate,
     )
+    from simulator.melt_backend.base import _call_with_hard_timeout
 
     database = tmp_path / "engine-cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
     _engine_cache_counters(reset=True)
 
     handle = SimpleNamespace(name="internal-analytical")
+
+    def solve() -> dict[str, int]:
+        return _call_with_hard_timeout(
+            lambda: _cached_engine_call()(
+                "openimcc", {"request": "nested-internal-analytical"},
+                lambda: {"answer": 7},
+            ),
+            timeout_s=1.0,
+        )
+
     assert _call_cached_backend_equilibrate(
         handle,
         {},
-        lambda: _cached_engine_call()(
-            "openimcc", {"request": "nested-internal-analytical"},
-            lambda: {"answer": 7},
-        ),
+        solve,
     ) == {"answer": 7}
 
     assert _engine_cache_counters(reset=True) == {}
