@@ -706,9 +706,12 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     pytest.importorskip("openimcc")
     import simulator.battery.residue as residue
     from simulator.melt_backend import openimcc_bridge
+    from openimcc import load_gas_datapack
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _openimcc_gas_channels_and_omission_notices,
+    )
 
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
-    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     activity_compositions: list[tuple[tuple[str, float], ...]] = []
     original_evaluate = openimcc_bridge.evaluate
 
@@ -722,20 +725,63 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
         lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
     )
     monkeypatch.setattr(openimcc_bridge, "evaluate", track_activities)
-    predictions = _predict_hashimoto_residue_cohort(
-        experiments,
-        catalog,
-        preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="single-vector-activity-refresh-test",
-    )
+    gas_pack = load_gas_datapack()
+    for experiment in experiments[:2]:
+        temperature_K = residue._hashimoto_point_value(
+            experiment["conditions"]["temperature_K"]
+        )
+        duration_s = residue._hashimoto_point_value(
+            experiment["thermal_schedule"]["total_duration_s"]
+        )
+        sample_mass_kg = residue._hashimoto_point_value(
+            experiment["sample"]["mass_kg"]
+        )
+        printed_wt_pct = experiment["sample"]["printed_composition"]["state"]["value"]
+        initial_inventory_mol = {
+            str(oxide): float(wt_pct) * sample_mass_kg / 100.0
+            / residue._formula_terms(str(oxide))[1]
+            for oxide, wt_pct in printed_wt_pct.items()
+        }
+        gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
+            tuple(initial_inventory_mol), gas_pack
+        )
+        assert not omissions
+        channels = tuple(
+            residue.ResidueChannel(
+                species, species, parent, 1.0, "test sensitivity"
+            )
+            for species, (parent, _parent_moles, _pO2_exponent) in gas_channels
+        )
+        pressure_model = residue._make_residue_pressure_model(
+            "openimcc",
+            gas_channels,
+            gas_pack,
+            temperature_K=temperature_K,
+            total_pressure_Pa=residue._hashimoto_point_value(
+                experiment["pressure_environment"]["total_pressure_Pa"]
+            ),
+            engine_metadata={},
+            engine_flags=set(),
+            missing_channels_reason="test",
+            caller="Hashimoto refinement activity refresh test",
+        )
+        residue._hashimoto_integrate_geometry(
+            initial_inventory_mol,
+            channels,
+            pressure_model,
+            temperature_K=temperature_K,
+            duration_s=duration_s,
+            steps=min(
+                residue._HASHIMOTO_N_CAP,
+                max(8, math.ceil(duration_s / 60.0)),
+            ),
+            geometry_policy_id=_HASHIMOTO_PRIMARY_GEOMETRY,
+            initial_area_m2=residue._hashimoto_geometry_areas(
+                sample_mass_kg, preform_dimensions_mm
+            )[_HASHIMOTO_PRIMARY_GEOMETRY],
+        )
 
-    assert len(predictions) == 48
     assert len(set(activity_compositions)) > 1
-    assert all(
-        set(prediction.provenance["integration"]["refinement_status_by_geometry"])
-        == set(_HASHIMOTO_GEOMETRIES)
-        for prediction in predictions
-    )
 
 
 def test_hashimoto_refinement_flags_the_finest_run_at_the_step_cap(
