@@ -120,6 +120,25 @@ def _solve_hour(**kwargs):
     return sim, calls
 
 
+def test_bulk_partial_bar_to_pa_conversion_matches_golden_bits(monkeypatch) -> None:
+    from simulator.overhead import OverheadGasModel
+
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim._overhead_headspace_enabled = lambda: True
+    sim._headspace_volume_m3 = lambda: 1.0
+    sim._headspace_temperature_K = lambda: 300.0
+    monkeypatch.setattr(
+        OverheadGasModel,
+        "_compute_partial_pressures",
+        staticmethod(lambda *_args: {"Na": 0.125, "K": 2.5}),
+    )
+
+    assert sim._bulk_partials_pa_from_holdup({"Na": 1.0}) == {
+        "Na": 12_500.0,
+        "K": 250_000.0,
+    }
+
+
 def test_buffered_hour_requests_vapour_at_reservoir_fo2() -> None:
     reservoir_log = -2.0
     sim, calls = _solve_hour(
