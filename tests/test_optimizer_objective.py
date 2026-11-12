@@ -1234,17 +1234,22 @@ def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> 
             product_summary=summary,
         )
 
+    # StudyRecord.search_provenance is a dataclass field. __post_init__ always
+    # materializes it, and _to_record always sets it. _rank_key reads that
+    # attribute. These stand-ins are StudyRecord substitutes, so they carry it.
     refused_record = SimpleNamespace(
         candidate_id="refused",
         cache_key="refused",
         objectives={"oxygen_kg": 10.0, "energy_kWh": 1.0},
         product_summary=summary,
+        search_provenance={},
     )
     clean_record = SimpleNamespace(
         candidate_id="clean",
         cache_key="clean",
         objectives={"oxygen_kg": 1.0, "energy_kWh": 1.0},
         product_summary=_available_furnace_summary(0.0),
+        search_provenance={},
     )
     assert study._record_objective_scores(refused_record, DEFINITIONS) == (
         None,

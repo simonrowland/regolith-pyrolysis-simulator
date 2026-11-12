@@ -634,7 +634,8 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
         # b-244: Al/Ti operator T_cond overrides removed (report-only); 14 text/audit leaves, 0 numeric; Al crossing authority -> capture_threshold_fallback.
-        "9a459986698c9ece498d9eb491eb2c1bc6a6b05a972d051ebea09a33c4c0be37"
+        # b-1174: wall-report species = positive vapour supply; +20 zero-valued species keys, 0 changed/numeric leaves (train leaf diff).
+        "3d0aa7260205121b501ca95d66ce010bd7817c71cf34a52fe664dc8afdc5efee"
     )
 
 

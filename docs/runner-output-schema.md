@@ -473,7 +473,12 @@ omit it.
 ```
 
 * `wall_deposit_by_species_kg` is the aggregate kg projection used by
-  existing SiO report surfaces.
+  existing SiO report surfaces. It includes every species with positive
+  evaporated supply in the run, using the committed wall-account mass for that
+  species (zero when the model booked no wall deposit); a positive amount is a
+  deposited outcome. Per-hour `condensation_refusals_by_species` retains the
+  condensation model's outcome labels and reasons, including pass-through and
+  wall-pressure refusals.
 * `deposit_by_surface_species_kg` is the final wall deposit projection
   by interstage segment/species, sourced from the same snapshot/trace
   wall-deposit data exported per hour.

@@ -129,8 +129,10 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
+    # b-282: upstream wall search floor leaves the SiO-quiescent 1400 C
+    # figure and becomes the coldest downstream collector interface (20 C).
     assert schema.bounds_digest == (
-        "e02d77339d524d397ba5850d386a62427f70dcad9a7efc270bc93fc61bd1ab0c"
+        "924bcffff0ce77444cfd851929faefa132f8441929df26d5196704b996941b04"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -139,7 +141,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
     # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
     assert empty.recipe_id(schema) == (
-        "17f2abb0d76c5234e709641b2f5a6b666b031dd7f94b287832f4daad9d2e1786"
+        "0df7598273ce6b4f9a8e436eb93bcb6371b0ab49a1b5f7112f297929f110521f"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -152,7 +154,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "d40d619c3228beccd37ca6b683c5213a7894edcbe07ffc105a2ef58ff2c6ec55"
+        "8744ed2c41d68c6cde9722d7d45cc9963c4861e6d0ea5b2dd4424658b108d069"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -1747,9 +1749,12 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # difference between two moving numbers, written down as a constant, goes
     # stale every time either moves. It is now evaluated, not pinned. Recomputed
     # 2026-09-29 for C2 loader-scalar pressure coupling.
+    # b-282: the upstream-wall search floor moved from the uniform 1400 C
+    # figure to the coldest downstream collector interface, so bounds_digest
+    # and this versioned recipe id move with it.
     assert (
         first.recipe_id()
-                == "a22450a415301779be6d918590944b3e5c7050b72970a03602d457d9b9e6f4bc"
+                == "6b9e45a34fdc8bf972cc3488bdb170538c4f807d45ceec2012d0fd12fe921937"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
