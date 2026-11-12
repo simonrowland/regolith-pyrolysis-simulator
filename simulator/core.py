@@ -5031,10 +5031,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.evaporation import _evaporation_molar_mass_kg_mol
 
         formula = resolve_species_formula(species, self.species_formula_registry)
-        molar_mass_kg_per_mol = _evaporation_molar_mass_kg_mol(
-            species,
-            row,
-        )
+        campaign = getattr(self.melt, 'campaign', None)
+        campaign_name = str(getattr(campaign, 'name', '') or '')
+        molar_mass_kg_per_mol = formula.molar_mass_kg_per_mol()
+        if campaign_name == 'C0B':
+            molar_mass_kg_per_mol = _evaporation_molar_mass_kg_mol(
+                species,
+                row,
+            )
         atoms = dict(formula.elements)
         non_oxygen = {
             element: count
@@ -5088,8 +5092,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ):
             return None
         parent_oxygen_demand = parent_moles * float(parent_atoms.get('O', 0.0) or 0.0)
-        campaign = getattr(self.melt, 'campaign', None)
-        campaign_name = str(getattr(campaign, 'name', '') or '')
         if campaign_name == 'C0B':
             stoich = self._evaporation_stoich(species, dict(row))
             molar_o2_kg_mol = resolve_species_formula(

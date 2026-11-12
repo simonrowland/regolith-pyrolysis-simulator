@@ -936,26 +936,26 @@ def _run_identity_hours(execute, extra_identity=None):
         hour = int(snapshot.hour)
         solution = getattr(self, "_hour_interface_oxygen", None)
         try:
-            if extra_identity is not None:
-                campaign_after_step = self.melt.campaign
-                try:
-                    self.melt.campaign = snapshot.campaign
+            campaign_after_step = self.melt.campaign
+            try:
+                self.melt.campaign = snapshot.campaign
+                if extra_identity is not None:
                     extra_identity(self, snapshot)
-                finally:
-                    self.melt.campaign = campaign_after_step
-            elif solution is None:
-                failures.append(f"hour {hour}: no interface solution")
-                return snapshot
-            if solution is None:
-                return snapshot
-            if not solution.product_fluxes_mol_m2_s:
-                oxygen = solution.evaporative_oxygen_mol_s
-                assert not any(abs(float(value)) > 0.0 for value in oxygen.values()), (
-                    "evaporative oxygen with no product flux",
-                    oxygen,
-                )
-            elif extra_identity is None:
-                _assert_series_identity(self)
+                elif solution is None:
+                    failures.append(f"hour {hour}: no interface solution")
+                    return snapshot
+                if solution is None:
+                    return snapshot
+                if not solution.product_fluxes_mol_m2_s:
+                    oxygen = solution.evaporative_oxygen_mol_s
+                    assert not any(abs(float(value)) > 0.0 for value in oxygen.values()), (
+                        "evaporative oxygen with no product flux",
+                        oxygen,
+                    )
+                elif extra_identity is None:
+                    _assert_series_identity(self)
+            finally:
+                self.melt.campaign = campaign_after_step
         except AssertionError as exc:
             failures.append(f"hour {hour}: {exc}")
         return snapshot
