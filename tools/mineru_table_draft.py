@@ -2460,6 +2460,20 @@ def emit_extract(
     }
     if fidelity is not None:
         document["fidelity_samples"] = copy.deepcopy(fidelity)
+    # Emitting review_status=reviewed is a source-review promotion. Drafts
+    # stay writable; the corpus is not rejected for fidelity warnings.
+    if review_status == "reviewed":
+        root = str(Path(__file__).resolve().parents[1])
+        if root not in sys.path:
+            sys.path.insert(0, root)
+        from tools.validate_literature_extracts import certify_extract_source_fidelity
+
+        refusals = certify_extract_source_fidelity(document, label=source_id)
+        if refusals:
+            raise ValueError(
+                "source certification refused for review_status 'reviewed':\n"
+                + "\n".join(refusals)
+            )
     out_path = Path(out).expanduser()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(_dump_fragment(document), encoding="utf-8")

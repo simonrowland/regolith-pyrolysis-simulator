@@ -404,9 +404,26 @@ def load_extracts(root: Path) -> dict[str, dict]:
             continue
         doc = load_yaml(path)
         if isinstance(doc, dict) and doc.get("schema_version") == "literature_extract.v1":
+            review_status = doc.get("review_status") or "unknown"
+            if review_status == "reviewed":
+                repo = Path(__file__).resolve().parents[2]
+                if str(repo) not in sys.path:
+                    sys.path.insert(0, str(repo))
+                from tools.validate_literature_extracts import (
+                    certify_extract_source_fidelity,
+                )
+
+                refusals = certify_extract_source_fidelity(
+                    doc, label=path.stem, artifact_root=root
+                )
+                if refusals:
+                    raise ValueError(
+                        "index refuses review_status reviewed without source "
+                        "certification:\n" + "\n".join(refusals)
+                    )
             extracts[path.stem] = {
                 "doc": doc,
-                "files": [{"path": posix(path.relative_to(root)), "review_status": doc.get("review_status") or "unknown",
+                "files": [{"path": posix(path.relative_to(root)), "review_status": review_status,
                            "rows": sum(len(body.get("observations") or []) for body in (doc.get("species") or {}).values())}],
             }
             locators = [row.get("locator") or {} for body in (doc.get("species") or {}).values()

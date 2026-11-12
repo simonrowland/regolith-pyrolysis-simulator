@@ -125,6 +125,7 @@ class Quantity(StrEnum):
     ION_INTENSITY = "ion_intensity"
     INTERACTION_PARAMETER = "interaction_parameter"
     RESIDUE_COMPONENT_COMPOSITION = "residue_component_composition"
+    ELEMENT_RETENTION_RATIO = "element_retention_ratio"
     EQUILIBRIUM_PHASE_COMPOSITION = "equilibrium_phase_composition"
     DISTRIBUTION_RATIO = "distribution_ratio"
     SULFIDE_CAPACITY = "sulfide_capacity"
@@ -747,6 +748,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.ION_INTENSITY: "subtype_defined",
     Quantity.INTERACTION_PARAMETER: "subtype_defined",
     Quantity.RESIDUE_COMPONENT_COMPOSITION: "subtype_defined",
+    Quantity.ELEMENT_RETENTION_RATIO: "dimensionless",
     Quantity.EQUILIBRIUM_PHASE_COMPOSITION: "subtype_defined",
     Quantity.DISTRIBUTION_RATIO: "dimensionless",
     Quantity.SULFIDE_CAPACITY: "dimensionless",
