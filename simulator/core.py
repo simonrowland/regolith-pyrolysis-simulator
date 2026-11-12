@@ -671,9 +671,11 @@ from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+    attach_evaluated_transport_pO2,
     attach_wall_supply_interval_physical_zero,
     evaporation_flux_for_campaign_hour,
     publish_wall_supply_on_flux,
+    remember_evaluated_transport_pO2,
 )
 from simulator.extraction import ExtractionMixin
 from simulator.melt_backend.base import (
@@ -1421,6 +1423,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._poisoned_hour: PoisonedHourState | None = None
         self._last_overhead_gas_equilibrium: Dict[str, Any] = {}
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
+        # Transport pO2 the latest vapour evaluation consumed. The
+        # snapshot reservoir is refreshed after the bleed and is not
+        # this value (d-401).
+        self._evaluated_transport_pO2_bar: float | None = None
+        self._evaluated_transport_pO2_recorded: bool = False
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._last_partial_melt_offgassing_diagnostic: Dict[str, Any] = {}
         # b-149 silent-zero class: typed zero_because notes (diagnostic only).
@@ -10385,6 +10392,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             explicitly forbidden by the goal spec.
         """
 
+        # This hour's evaluation has not consumed a transport pO2 yet.
+        # Early exits (sub-400 K, frozen melt) leave that absence. A
+        # previous hour's pressure must not survive them. The success
+        # path below overwrites it with the pressure the dispatch used.
+        remember_evaluated_transport_pO2(self, None)
+        consumed_transport_pO2_bar: float | None = None
+
         backend_diagnostics = dict(
             getattr(self, '_last_backend_diagnostics', {}) or {}
         )
@@ -10486,6 +10500,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._vapor_pressure_dispatch_pO2_bar()
             if observation_pO2_bar is None else observation_pO2_bar
         )
+        consumed_transport_pO2_bar = pO2_bar
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         intrinsic_fO2_log = getattr(
             reservoir,
@@ -10754,6 +10769,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         co2_diagnostic = getattr(self, '_headspace_co2_dissociation_diagnostic', {})
         if co2_diagnostic:
             diagnostic['co2_dissociation'] = dict(co2_diagnostic)
+        # d-401. The provider's recorded transport pO2 is the pressure
+        # this evaluation consumed. The dispatch value is that pressure
+        # only when the diagnostic omits it. The reservoir is refreshed
+        # again after the bleed and is not this value.
+        recorded_pO2 = diagnostic.get("pO2_bar")
+        remember_evaluated_transport_pO2(
+            self,
+            consumed_transport_pO2_bar if recorded_pO2 is None else recorded_pO2,
+        )
         self._last_vapor_pressure_diagnostic = diagnostic
         note_high_t_fallback = getattr(
             self, '_note_high_t_melt_activity_fallback', None
@@ -15794,6 +15818,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._last_partial_melt_offgassing_diagnostic = {}
         self._silent_zero_notes = []
+        # Drop the previous hour before this hour's vapour evaluation.
+        # A path that snapshots without evaluating must not reuse it.
+        self._evaluated_transport_pO2_bar = None
+        self._evaluated_transport_pO2_recorded = False
         self._last_extraction_completeness_diagnostic = {}
         self._last_target_inventory_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
@@ -16268,6 +16296,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # copied here, after condensation may have replaced the flux
         # object, so a known non-evaporating hour still carries it.
         attach_wall_supply_interval_physical_zero(evap_flux, self)
+        # After the bleed refresh. The reservoir on the snapshot is the
+        # later oxygen state; this copies the pressure vapour evaluation
+        # consumed.
+        attach_evaluated_transport_pO2(evap_flux, self)
         publish_wall_supply_on_flux(
             evap_flux,
             getattr(self, "_wall_supply_computed_kg_hr", None),

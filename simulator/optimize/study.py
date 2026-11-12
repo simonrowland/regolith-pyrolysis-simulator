@@ -4912,22 +4912,15 @@ def _record_objective_scores(
     record: StudyRecord,
     definitions: Sequence[ObjectiveDefinition],
 ) -> tuple[float | None, ...]:
-    """Physical scores, with the furnace penalty when that penalty exists.
+    """Rank on physical scores, with the furnace penalty when it exists.
 
-    ``resinter_threshold_ungrounded`` means the liner threshold is null,
-    so a positive deposit cannot be turned into a campaign count. That
-    is a typed gap in the furnace penalty. The physical objectives are
-    still scores. Replacing them with None drops a feasible candidate
-    off the Pareto for want of that one price. The ungrounded status
-    stays on the product summary. No campaign count is invented.
+    ``cost_adjusted_objective_scores`` owns the ungrounded-threshold
+    case: a null liner threshold leaves the physical scores in place
+    and invents no campaign count. Any other missing furnace price is
+    unscoreable.
     """
 
-    summary = record.product_summary or {}
     try:
-        if summary.get("furnace_amortization_status") == (
-            "resinter_threshold_ungrounded"
-        ):
-            return objective_scores(record.objectives, definitions)
         return cost_adjusted_objective_scores(
             record.objectives,
             definitions,

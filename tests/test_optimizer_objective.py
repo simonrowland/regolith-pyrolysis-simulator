@@ -17,12 +17,16 @@ from simulator.cost_parameters import CostParameters
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import (
     EvaporationMixin,
+    attach_evaluated_transport_pO2,
     attach_wall_supply_interval_physical_zero,
     evaporation_flux_for_campaign_hour,
     note_wall_supply_interval_physical_zero,
     project_publisher_vapour_rates,
     publish_wall_supply_on_flux,
+    remember_evaluated_transport_pO2,
 )
+from simulator.optimize.strategy import bayesian as bayesian_strategy
+from simulator.optimize.strategy import staged as staged_strategy
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.vapour_rail.batch import (
     FluxDiagnosticUpperBound,
@@ -45,6 +49,7 @@ from simulator.optimize.evaluate import (
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    FURNACE_AMORTIZATION_STATUS_UNGROUNDED,
     LEGACY_ENERGY_KWH_METRIC,
     ObjectiveComputationError,
     ObjectiveDefinition,
@@ -2046,8 +2051,24 @@ def _oracle_positive_bar(raw: object) -> float | None:
 
 
 def _oracle_transport_pO2_bar(snapshot: object) -> float | None:
-    """Hour transport pO2, written from d-401. Not melt fO2 and not p_ref."""
+    """The pO2 vapour evaluation consumed, written from d-401.
 
+    A record on the flux named ``evaluated_transport_pO2`` with evidence
+    ``vapour_evaluation`` is that pressure, including a recorded absence.
+    The snapshot oxygen reservoir is a later state and is not read when
+    that record is present. A fixture with no record may still name the
+    pressure on the reservoir or on ``transport_pO2_bar``,
+    ``overhead_pO2_bar``, or ``interval_pO2_bar``. Not melt fO2 and not
+    ``p_ref``.
+    """
+
+    flux = getattr(snapshot, "evap_flux", None)
+    record = getattr(flux, "evaluated_transport_pO2", None)
+    if (
+        isinstance(record, Mapping)
+        and str(record.get("evidence") or "") == "vapour_evaluation"
+    ):
+        return _oracle_positive_bar(record.get("pressure_bar"))
     reservoir = getattr(snapshot, "oxygen_reservoir", None)
     if isinstance(reservoir, Mapping) and "headspace_transport_pO2_bar" in reservoir:
         recorded = _oracle_positive_bar(reservoir.get("headspace_transport_pO2_bar"))
@@ -4201,6 +4222,381 @@ def test_no_recorded_po2_withholds_only_oxygen_dependent_laws() -> None:
     assert cro_interval.evidence == "no_flux_law_and_no_psat"
 
 
+def _provenance_hour(
+    *,
+    record: object = None,
+    reservoir_bar: float | None = None,
+    transport_bar: float | None = None,
+    overhead_bar: float | None = None,
+    interval_bar: float | None = None,
+) -> SimpleNamespace:
+    """One interval. ``record is None`` means vapour evaluation did not run."""
+
+    flux_fields: dict[str, object] = {}
+    if record is not None:
+        flux_fields["evaluated_transport_pO2"] = record
+    fields: dict[str, object] = {"evap_flux": SimpleNamespace(**flux_fields)}
+    if reservoir_bar is not None:
+        fields["oxygen_reservoir"] = {
+            "headspace_transport_pO2_bar": reservoir_bar
+        }
+    if transport_bar is not None:
+        fields["transport_pO2_bar"] = transport_bar
+    if overhead_bar is not None:
+        fields["overhead_pO2_bar"] = overhead_bar
+    if interval_bar is not None:
+        fields["interval_pO2_bar"] = interval_bar
+    return SimpleNamespace(**fields)
+
+
+# Independent expected pressures. The evaluation record wins, including
+# a recorded absence. Fixture fields apply only when that record is absent.
+_PO2_PROVENANCE_CASES = (
+    (
+        "evaluated_beats_later_reservoir",
+        {
+            "record": {"pressure_bar": 1.0e-2, "evidence": "vapour_evaluation"},
+            "reservoir_bar": 1.0e-3,
+        },
+        1.0e-2,
+    ),
+    (
+        "recorded_absence_is_not_the_reservoir",
+        {
+            "record": {"pressure_bar": None, "evidence": "vapour_evaluation"},
+            "reservoir_bar": 1.0e-3,
+        },
+        None,
+    ),
+    (
+        "nonpositive_record_is_absence",
+        {
+            "record": {"pressure_bar": 0.0, "evidence": "vapour_evaluation"},
+            "reservoir_bar": 1.0e-3,
+        },
+        None,
+    ),
+    (
+        "wrong_evidence_is_not_an_evaluation",
+        {
+            "record": {"pressure_bar": 1.0e-2, "evidence": "reservoir"},
+            "reservoir_bar": 1.0e-3,
+        },
+        1.0e-3,
+    ),
+    (
+        "fixture_reservoir",
+        {"reservoir_bar": 1.0e-3},
+        1.0e-3,
+    ),
+    (
+        "fixture_transport",
+        {"transport_bar": 2.0e-3},
+        2.0e-3,
+    ),
+    (
+        "fixture_overhead",
+        {"overhead_bar": 4.0e-3},
+        4.0e-3,
+    ),
+    (
+        "fixture_interval",
+        {"interval_bar": 5.0e-3},
+        5.0e-3,
+    ),
+    (
+        "nothing_recorded",
+        {},
+        None,
+    ),
+    (
+        "evaluated_without_a_reservoir",
+        {"record": {"pressure_bar": 1.0e-2, "evidence": "vapour_evaluation"}},
+        1.0e-2,
+    ),
+)
+
+
+@pytest.mark.parametrize(
+    ("_name", "fields", "expected_bar"),
+    _PO2_PROVENANCE_CASES,
+    ids=[case[0] for case in _PO2_PROVENANCE_CASES],
+)
+def test_ceiling_hour_po2_is_the_evaluated_pressure(
+    _name: str,
+    fields: dict[str, object],
+    expected_bar: float | None,
+) -> None:
+    """Every oxygen-state class resolves to the pressure the flux used.
+
+    The expected bar is written here. The reader and the oracle must
+    both match it. A record with evidence ``vapour_evaluation`` is that
+    pressure, and a recorded absence stays absent. Fixture fields are
+    the author's pressure only when vapour evaluation left no record.
+    """
+
+    snapshot = _provenance_hour(**fields)
+    assert evaluate_module._snapshot_transport_pO2_bar(snapshot) == expected_bar
+    assert _oracle_transport_pO2_bar(snapshot) == expected_bar
+
+
+def _reservoir_first_pO2_bar(snapshot: object) -> float | None:
+    """The pre-fix reader: the post-bleed reservoir wins over the stamp."""
+
+    reservoir = getattr(snapshot, "oxygen_reservoir", None)
+    if isinstance(reservoir, Mapping) and "headspace_transport_pO2_bar" in reservoir:
+        recorded = _oracle_positive_bar(reservoir.get("headspace_transport_pO2_bar"))
+        if recorded is not None:
+            return recorded
+    for name in ("transport_pO2_bar", "overhead_pO2_bar", "interval_pO2_bar"):
+        recorded = _oracle_positive_bar(getattr(snapshot, name, None))
+        if recorded is not None:
+            return recorded
+    return None
+
+
+@pytest.mark.parametrize(
+    ("_name", "fields", "expected_bar"),
+    [
+        case
+        for case in _PO2_PROVENANCE_CASES
+        if case[2] != _reservoir_first_pO2_bar(_provenance_hour(**case[1]))
+    ],
+    ids=[
+        case[0]
+        for case in _PO2_PROVENANCE_CASES
+        if case[2] != _reservoir_first_pO2_bar(_provenance_hour(**case[1]))
+    ],
+)
+def test_reservoir_first_reader_fails_when_the_states_differ(
+    _name: str,
+    fields: dict[str, object],
+    expected_bar: float | None,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Reading the reservoir after the bleed is not the evaluated pO2."""
+
+    snapshot = _provenance_hour(**fields)
+    legacy = _reservoir_first_pO2_bar(snapshot)
+    assert legacy != expected_bar
+    assert evaluate_module._snapshot_transport_pO2_bar(snapshot) == expected_bar
+    monkeypatch.setattr(
+        evaluate_module,
+        "_snapshot_transport_pO2_bar",
+        _reservoir_first_pO2_bar,
+    )
+    assert evaluate_module._snapshot_transport_pO2_bar(snapshot) == legacy
+    assert evaluate_module._snapshot_transport_pO2_bar(snapshot) != expected_bar
+
+
+def _m025_catalog() -> _CeilingCatalog:
+    return _CeilingCatalog(
+        {
+            "M025": _CeilingLaw(
+                activity_exponent=0.0,
+                pO2_exponent=0.25,
+                pO2_reference_bar=1.0,
+                p_unit_pa=1.0,
+            )
+        },
+        {"M025": 70.0},
+    )
+
+
+def _m025_refused_hour(flux: object, reservoir_bar: float) -> SimpleNamespace:
+    return SimpleNamespace(
+        hour=1,
+        duration_h=1.0,
+        temperature_C=_CEILING_T_C,
+        oxygen_reservoir={"headspace_transport_pO2_bar": reservoir_bar},
+        vapour_catalog=_m025_catalog(),
+        evap_flux=flux,
+    )
+
+
+def _m025_hk_at(pO2_bar: float) -> float:
+    """Handwritten ceiling. P = 1 Pa * (pO2 / 1 bar)^0.25, activity exponent 0."""
+
+    pressure_pa = 1.0 * (pO2_bar ** 0.25)
+    return _literal_hk_kg_hr(pressure_pa, 0.070)
+
+
+def test_post_bleed_reservoir_does_not_shrink_the_activity_one_ceiling(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """m=+0.25 evaluated at 1e-2 bar, snapshotted after bleeding at 1e-3.
+
+    (1e-3 / 1e-2)^0.25 = 0.1^0.25 is about 0.562 of the required
+    pressure bound. The ceiling keeps the pressure vapour evaluation
+    consumed. A reader that uses the later reservoir books the smaller
+    literal, and this test rejects that rate.
+    """
+
+    evaluated_bar = 1.0e-2
+    bled_bar = 1.0e-3
+    correct = _m025_hk_at(evaluated_bar)
+    wrong = _m025_hk_at(bled_bar)
+    assert wrong / correct == pytest.approx(0.1 ** 0.25)
+    host = SimpleNamespace()
+    remember_evaluated_transport_pO2(host, evaluated_bar)
+    flux = SimpleNamespace(
+        published_species_kg_hr={},
+        species_kg_hr={},
+        melt_surface_area_m2=_CEILING_AREA_M2,
+        carrier_authority_by_species={"M025": _transport_refusal_channel("M025")},
+    )
+    attach_evaluated_transport_pO2(flux, host)
+    snapshot = _m025_refused_hour(flux, bled_bar)
+    bounds = _optimizer_refused_flux_bounds(
+        (snapshot,),
+        ("M025",),
+        campaigns_elapsed=1.0,
+    )
+    assert bounds["M025"] == _approx_kg(correct)
+    assert bounds["M025"] != _approx_kg(wrong)
+
+    monkeypatch.setattr(
+        evaluate_module,
+        "_snapshot_transport_pO2_bar",
+        _reservoir_first_pO2_bar,
+    )
+    mutated = _optimizer_refused_flux_bounds(
+        (snapshot,),
+        ("M025",),
+        campaigns_elapsed=1.0,
+    )
+    assert mutated["M025"] == _approx_kg(wrong)
+    assert mutated["M025"] != _approx_kg(correct)
+
+
+def _kernel_vapour_host(
+    diagnostic: dict[str, object],
+    dispatch_bar: float,
+    *,
+    temperature_C: float,
+) -> tuple[SimpleNamespace, list[object]]:
+    """The real refresh, with the kernel replaced by this diagnostic."""
+
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.chemistry.kernel.dto import IntentResult
+
+    calls: list[object] = []
+
+    def _dispatch_only(intent: object, **kwargs: object) -> IntentResult:
+        calls.append((intent, kwargs))
+        return IntentResult(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            status="ok",
+            diagnostic=dict(diagnostic),
+            warnings=(),
+        )
+
+    host = SimpleNamespace(
+        melt=SimpleNamespace(temperature_C=temperature_C),
+        liquid_feo_domain_at=lambda _T_K: None,
+        _allow_fallback_vapor=False,
+        _last_backend_diagnostics={},
+        _vapor_pressure_dispatch_pO2_bar=lambda: dispatch_bar,
+        _dispatch_only=_dispatch_only,
+        _kernel_vapor_pressure_source=(
+            PyrolysisSimulator._kernel_vapor_pressure_source
+        ),
+        _vapor_pressure_values_agree=(
+            PyrolysisSimulator._vapor_pressure_values_agree
+        ),
+        _evaluated_transport_pO2_bar=None,
+        _evaluated_transport_pO2_recorded=False,
+    )
+    return host, calls
+
+
+def test_kernel_refresh_keeps_the_evaluated_po2_after_the_reservoir_changes() -> None:
+    """The stamp is written by vapour evaluation, then the reservoir moves.
+
+    The provider's ``pO2_bar`` wins over the dispatch argument. A
+    diagnostic that omits it uses the dispatch argument. A sub-400 K
+    hour clears a stale stamp and does not dispatch.
+    """
+
+    from simulator.chemistry.kernel import ChemistryIntent
+
+    evaluated_bar = 1.0e-2
+    dispatch_bar = 1.0e-3
+    host, calls = _kernel_vapour_host(
+        {
+            "vapor_pressures_Pa": {"M025": 1.0},
+            "vapor_pressures_source": {"M025": "builtin_authoritative"},
+            "pO2_bar": evaluated_bar,
+        },
+        dispatch_bar,
+        temperature_C=1600.0,
+    )
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={},
+    )
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(host, result)
+    assert [call[0] for call in calls] == [ChemistryIntent.VAPOR_PRESSURE]
+    assert host._evaluated_transport_pO2_bar == evaluated_bar
+    dispatched = calls[0][1]["control_inputs"]["pO2_bar"]
+    assert dispatched == dispatch_bar
+    flux = SimpleNamespace(
+        published_species_kg_hr={},
+        species_kg_hr={},
+        melt_surface_area_m2=_CEILING_AREA_M2,
+        carrier_authority_by_species={"M025": _transport_refusal_channel("M025")},
+    )
+    attach_evaluated_transport_pO2(flux, host)
+    bled = _m025_refused_hour(flux, dispatch_bar)
+    interval = _classify_wall_supply_interval(bled, "M025")
+    assert interval.kind == "supply_interval_upper_bound"
+    assert interval.rate_kg_hr == _approx_kg(_m025_hk_at(evaluated_bar))
+    assert interval.rate_kg_hr != _approx_kg(_m025_hk_at(dispatch_bar))
+
+    omitted, omitted_calls = _kernel_vapour_host(
+        {
+            "vapor_pressures_Pa": {"M025": 1.0},
+            "vapor_pressures_source": {"M025": "builtin_authoritative"},
+        },
+        2.0e-2,
+        temperature_C=1600.0,
+    )
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(
+        omitted,
+        EquilibriumResult(
+            temperature_C=1600.0,
+            pressure_bar=1e-6,
+            liquid_fraction=1.0,
+            vapor_pressures_Pa={},
+        ),
+    )
+    assert omitted_calls
+    assert omitted._evaluated_transport_pO2_recorded is True
+    assert omitted._evaluated_transport_pO2_bar == 2.0e-2
+
+    cold, cold_calls = _kernel_vapour_host(
+        {"pO2_bar": 1.0e-2},
+        1.0e-2,
+        temperature_C=25.0,
+    )
+    cold._evaluated_transport_pO2_bar = 1.0e-2
+    cold._evaluated_transport_pO2_recorded = True
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(
+        cold,
+        EquilibriumResult(
+            temperature_C=25.0,
+            pressure_bar=1e-6,
+            liquid_fraction=1.0,
+            vapor_pressures_Pa={},
+        ),
+    )
+    assert cold_calls == []
+    assert cold._evaluated_transport_pO2_recorded is True
+    assert cold._evaluated_transport_pO2_bar is None
+
+
 def test_snapshot_temperature_uses_the_celsius_offset_constant() -> None:
     """The kelvin conversion is the owned offset, not a second 273.15."""
 
@@ -4250,6 +4646,174 @@ def test_ungrounded_resinter_threshold_keeps_physical_scores_on_the_pareto() -> 
         product_summary=ungrounded,
     )
     assert study._record_objective_scores(missing, DEFINITIONS) == (None, None)
+
+
+_RANKER_NAMES = ("study", "bayesian", "staged")
+_FURNACE_STATUSES = (
+    FURNACE_AMORTIZATION_STATUS_UNGROUNDED,
+    "available",
+    "batch_cost_unavailable",
+    "unavailable",
+)
+_SCORE_OXYGEN_KG = 10.0
+_SCORE_ENERGY_KWH = 1.0
+_SCORE_PENALTY = 1.0
+
+
+def _ranker_scored(feasible: bool, summary: dict[str, object]) -> SimpleNamespace:
+    values = {
+        "oxygen_kg": _SCORE_OXYGEN_KG,
+        "energy_kWh": _SCORE_ENERGY_KWH,
+    }
+    return SimpleNamespace(
+        feasible=feasible,
+        candidate_id="case",
+        cache_key="case",
+        objectives=SimpleNamespace(as_mapping=lambda: dict(values)),
+        product_summary=summary,
+        run_reference=SimpleNamespace(product_summary=summary),
+    )
+
+
+def _furnace_summary(status: str) -> dict[str, object]:
+    summary: dict[str, object] = {"furnace_amortization_status": status}
+    if status == "available":
+        summary["furnace_amortization_batch_cost_equivalents"] = _SCORE_PENALTY
+    return summary
+
+
+def _call_ranker(
+    ranker: str,
+    scored: SimpleNamespace,
+) -> tuple[float, ...] | tuple[None, ...] | None:
+    if ranker == "study":
+        return study._record_objective_scores(scored, DEFINITIONS)
+    if ranker == "bayesian":
+        return bayesian_strategy._objective_values_for_definitions(
+            scored,
+            DEFINITIONS,
+        )
+    if ranker == "staged":
+        return staged_strategy._scored_objective_scores(scored, DEFINITIONS)
+    raise AssertionError(ranker)
+
+
+def _oracle_ranker_scores(
+    ranker: str,
+    status: str,
+    feasible: bool,
+) -> tuple[float, ...] | tuple[None, ...] | None:
+    """Independent scores. Does not call the objective helpers.
+
+    Physical maximize-native scores are oxygen 10 and energy -1.
+    Available furnace evidence with penalty 1 divides a maximize score
+    by 2 and multiplies a minimize score by 2. A null resinter
+    threshold keeps the physical scores and invents no campaign count.
+    Any other non-available status is unscoreable for a feasible
+    result. Study has no feasible bit, so that status is unscoreable
+    there either way. Staged and Bayesian keep the physical scores for
+    an infeasible result. Bayesian then flips the minimize sign again,
+    because the sampler minimises.
+    """
+
+    oxygen = _SCORE_OXYGEN_KG
+    energy = _SCORE_ENERGY_KWH
+    physical = (oxygen, -energy)
+    if status == "available":
+        factor = 1.0 + _SCORE_PENALTY
+        native: tuple[float, ...] | None = (oxygen / factor, -energy * factor)
+    elif status == FURNACE_AMORTIZATION_STATUS_UNGROUNDED:
+        native = physical
+    elif ranker == "study" or (ranker == "staged" and feasible) or (
+        ranker == "bayesian" and feasible
+    ):
+        return (None, None) if ranker != "bayesian" else None
+    else:
+        native = physical
+    assert native is not None
+    if ranker == "bayesian":
+        return (native[0], -native[1])
+    return native
+
+
+@pytest.mark.parametrize("ranker", _RANKER_NAMES)
+@pytest.mark.parametrize("status", _FURNACE_STATUSES)
+@pytest.mark.parametrize("feasible", (True, False))
+def test_ungrounded_threshold_scores_are_the_same_for_every_ranker(
+    ranker: str,
+    status: str,
+    feasible: bool,
+) -> None:
+    """The furnace-status policy lives in the scoring owner.
+
+    Study, Bayesian, and staged all ask that owner. A feasible
+    ungrounded result is physical scores on every ranker. Other
+    non-available statuses stay unscoreable when the result is feasible.
+    """
+
+    scored = _ranker_scored(feasible, _furnace_summary(status))
+    expected = _oracle_ranker_scores(ranker, status, feasible)
+    assert _call_ranker(ranker, scored) == expected
+
+
+@pytest.mark.parametrize("ranker", _RANKER_NAMES)
+def test_ranker_that_skips_the_owner_drops_the_ungrounded_score(
+    ranker: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Patching the owner's binding must change the ungrounded result.
+
+    A ranker that still special-cases the status and never calls
+    ``cost_adjusted_objective_scores`` keeps the physical scores, and
+    this assertion fails.
+    """
+
+    def refuse(*_args: object, **_kwargs: object) -> tuple[float, ...]:
+        raise ObjectiveComputationError("mutated owner")
+
+    if ranker == "study":
+        monkeypatch.setattr(study, "cost_adjusted_objective_scores", refuse)
+    elif ranker == "bayesian":
+        monkeypatch.setattr(
+            bayesian_strategy,
+            "cost_adjusted_objective_scores",
+            refuse,
+        )
+    else:
+        monkeypatch.setattr(
+            staged_strategy,
+            "cost_adjusted_objective_scores",
+            refuse,
+        )
+    scored = _ranker_scored(
+        True,
+        _furnace_summary(FURNACE_AMORTIZATION_STATUS_UNGROUNDED),
+    )
+    expected = _oracle_ranker_scores(
+        ranker,
+        FURNACE_AMORTIZATION_STATUS_UNGROUNDED,
+        True,
+    )
+    mutated = _call_ranker(ranker, scored)
+    assert mutated != expected
+    if ranker == "bayesian":
+        assert mutated is None
+    else:
+        assert mutated == (None, None)
+
+
+def test_bayesian_available_malformed_penalty_still_propagates() -> None:
+    """Once status is available, a missing penalty is not swallowed."""
+
+    summary = {"furnace_amortization_status": "available"}
+    scored = _ranker_scored(True, summary)
+    with pytest.raises(ObjectiveComputationError, match="penalty is missing"):
+        bayesian_strategy._objective_values_for_definitions(scored, DEFINITIONS)
+    assert study._record_objective_scores(scored, DEFINITIONS) == (None, None)
+    assert staged_strategy._scored_objective_scores(scored, DEFINITIONS) == (
+        None,
+        None,
+    )
 
 
 @pytest.mark.parametrize("kind", _WALL_SUPPLY_INTERVAL_KINDS)

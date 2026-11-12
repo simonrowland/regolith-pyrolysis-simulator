@@ -449,6 +449,63 @@ def attach_wall_supply_interval_physical_zero(flux: Any, host: Any) -> None:
     )
 
 
+# Dynamic attribute, not an EvaporationFlux field. The supply ceiling
+# reads it. The snapshot oxygen reservoir is a later state.
+EVALUATED_TRANSPORT_PO2_ATTR = "evaluated_transport_pO2"
+EVALUATED_TRANSPORT_PO2_EVIDENCE = "vapour_evaluation"
+
+
+def _positive_transport_pO2_bar(raw: Any) -> float | None:
+    if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+        return None
+    pressure = float(raw)
+    if not math.isfinite(pressure) or pressure <= 0.0:
+        return None
+    return pressure
+
+
+def remember_evaluated_transport_pO2(host: Any, pressure_bar: Any) -> None:
+    """Record the transport pO2 this vapour evaluation consumed.
+
+    d-401. The activity-1 ceiling needs the oxygen potential the hour's
+    flux evaluation used. ``_refresh_vapor_pressures_from_kernel`` is
+    the only vapour evaluation. It records absence on entry, so a
+    sub-400 K or frozen hour that did not dispatch keeps that absence,
+    and overwrites it when the dispatch consumed a pressure. A positive
+    finite pressure is kept. Anything else is a recorded absence, not a
+    later reservoir value and not ``p_ref``.
+    """
+
+    host._evaluated_transport_pO2_bar = _positive_transport_pO2_bar(pressure_bar)
+    host._evaluated_transport_pO2_recorded = True
+
+
+def attach_evaluated_transport_pO2(flux: Any, host: Any) -> None:
+    """Copy this hour's evaluated transport pO2 onto the interval.
+
+    Both headspace branches refresh the oxygen reservoir after the
+    bleed, and the snapshot copies that later reservoir. The ceiling
+    must not read it as the pressure the flux used. When this hour did
+    not evaluate, the attribute stays unset so a fixture can still name
+    its own recorded pressure. A production hour that evaluated writes
+    the record even when the pressure is absent.
+    """
+
+    if not getattr(host, "_evaluated_transport_pO2_recorded", False):
+        return
+    pressure = getattr(host, "_evaluated_transport_pO2_bar", None)
+    if pressure is not None and _positive_transport_pO2_bar(pressure) is None:
+        pressure = None
+    setattr(
+        flux,
+        EVALUATED_TRANSPORT_PO2_ATTR,
+        {
+            "pressure_bar": pressure,
+            "evidence": EVALUATED_TRANSPORT_PO2_EVIDENCE,
+        },
+    )
+
+
 def viscous_p_bulk_out_of_domain_diagnostic(
     *,
     knudsen_number: float,

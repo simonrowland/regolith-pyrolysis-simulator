@@ -62,6 +62,8 @@ from simulator.core import (
     read_high_t_melt_activity_fallback_notice,
 )
 from simulator.evaporation import (
+    EVALUATED_TRANSPORT_PO2_ATTR,
+    EVALUATED_TRANSPORT_PO2_EVIDENCE,
     WALL_SUPPLY_INTERVAL_PHYSICAL_ZERO_ATTR,
     WALL_SUPPLY_INTERVAL_ZERO_EVIDENCE,
 )
@@ -2318,16 +2320,28 @@ def _positive_pressure_bar(raw: Any) -> float | None:
 
 
 def _snapshot_transport_pO2_bar(snapshot: Any) -> float | None:
-    """Transport/overhead pO2 this hour's flux used, in bar.
+    """Transport pO2 this hour's vapour evaluation consumed, in bar.
 
-    On a production hour that value is
-    ``oxygen_reservoir['headspace_transport_pO2_bar']``, the pressure
-    the vapour evaluation read. A fixture with no reservoir may set
-    ``transport_pO2_bar`` or ``overhead_pO2_bar``. Melt fO2 and the
-    catalog reference pressure are not this value. A missing key is
-    not the 1e-9 guard and not the 1e-30 envelope (d-401).
+    The interval carries that pressure on
+    ``evap_flux.evaluated_transport_pO2`` when vapour evaluation ran.
+    The snapshot oxygen reservoir is copied after the headspace bleed
+    and is a later state (d-401). A recorded absence does not fall
+    through to that reservoir, to melt fO2, or to ``p_ref``.
+
+    A fixture interval with no evaluation record may still name the
+    pressure on the reservoir or on ``transport_pO2_bar``,
+    ``overhead_pO2_bar``, or ``interval_pO2_bar``. Those are the
+    author's recorded pressure, not a post-bleed substitute.
     """
 
+    flux = getattr(snapshot, "evap_flux", None)
+    record = getattr(flux, EVALUATED_TRANSPORT_PO2_ATTR, None)
+    if (
+        isinstance(record, MappingABC)
+        and str(record.get("evidence") or "")
+        == EVALUATED_TRANSPORT_PO2_EVIDENCE
+    ):
+        return _positive_pressure_bar(record.get("pressure_bar"))
     reservoir = getattr(snapshot, "oxygen_reservoir", None)
     if isinstance(reservoir, MappingABC) and (
         "headspace_transport_pO2_bar" in reservoir
@@ -2675,10 +2689,13 @@ def _classify_wall_supply_interval(
       covering zero, and an activity-1 ceiling can be formed. The rate
       is the Hertz-Knudsen flux at that ceiling. The ceiling is an
       explicit ``activity_one_psat_pa`` or the run catalog at activity
-      1. An oxygen-dependent law uses this hour's transport pO2, or,
-      when this hour recorded none, the run pO2 that maximises P
-      (d-401). A missing rate map and an absent carrier record still
-      reach this class. One such interval does not drop the species.
+      1. An oxygen-dependent law uses the transport pO2 this hour's
+      vapour evaluation consumed, preserved on the interval. The
+      snapshot reservoir is a later state and is not that pressure.
+      When this hour recorded none, the run pO2 that maximises P is
+      used (d-401). A missing rate map and an absent carrier record
+      still reach this class. One such interval does not drop the
+      species.
     - ``unavailable``: no flux law and no ceiling, or an operand of
       that ceiling is missing (temperature, area, molar mass, or any
       recorded transport pO2 for an oxygen-dependent law). The evidence

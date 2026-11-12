@@ -62,6 +62,9 @@ FURNACE_INSTANT_DEATH_FACTOR = 10.0
 # operational lifetime observation (one completed campaign). The model's
 # EPSILON_KG is mass-space and cannot dimensionally define a campaign floor.
 FURNACE_MIN_MEANINGFUL_LIFETIME_CAMPAIGNS = 1.0e-6
+# A null liner threshold cannot become a campaign count. Physical
+# objectives stay scores. ``cost_adjusted_objective_scores`` owns this.
+FURNACE_AMORTIZATION_STATUS_UNGROUNDED = "resinter_threshold_ungrounded"
 VALID_OBJECTIVE_SENSES = {"minimize", "maximize"}
 COMPOSITION_TARGET_TYPE = "composition_target"
 COMPOSITION_TARGET_METRIC_PREFIX = "composition_target:"
@@ -3528,6 +3531,13 @@ def cost_adjusted_objective_scores(
     scores = objective_scores(objectives, definitions)
     summary = product_summary or {}
     status = summary.get("furnace_amortization_status")
+    if status == FURNACE_AMORTIZATION_STATUS_UNGROUNDED:
+        # The liner threshold is null, so a positive deposit cannot
+        # become a campaign count. That is a typed gap in the furnace
+        # penalty, not a missing objective. Physical scores stay. No
+        # campaign count is invented. The status stays on the product
+        # summary. Other non-available statuses still refuse below.
+        return scores
     if status != "available":
         raise ObjectiveComputationError(
             f"furnace amortization unavailable: {status}"
@@ -3827,7 +3837,7 @@ def _furnace_amortization_summary(
         and campaigns_to_resinter.startswith("resinter_threshold_kg / ")
     ):
         return MappingProxyType({
-            "furnace_amortization_status": "resinter_threshold_ungrounded",
+            "furnace_amortization_status": FURNACE_AMORTIZATION_STATUS_UNGROUNDED,
             "furnace_amortization_batch_cost_equivalents": 0.0,
             "campaigns_to_resinter": campaigns_to_resinter,
         })

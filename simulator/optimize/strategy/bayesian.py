@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
 from simulator.optimize.doe import _condition_pressure_pair_values
 from simulator.optimize.objective import (
+    ObjectiveComputationError,
     ObjectiveDefinition,
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
@@ -558,22 +559,25 @@ def _objective_values_for_definitions(
         return None
     reference = getattr(scored, "run_reference", None)
     product_summary = getattr(reference, "product_summary", {}) if reference else {}
-    if product_summary.get("furnace_amortization_status") != "available":
-        if feasible:
-            # Production results carry available furnace evidence. Direct/replayed
-            # or degraded feasible results stay unscoreable, not ranked as if
-            # capital were free. Once evidence claims to be available, malformed
-            # values must propagate from the scorer instead of failing a trial.
-            return None
-        # An infeasible run can still guide the sampler with measured objectives;
-        # keep those raw because missing furnace evidence cannot support a cost.
-        scores = objective_scores(objectives, definitions)
-    else:
+    status = product_summary.get("furnace_amortization_status")
+    try:
         scores = cost_adjusted_objective_scores(
             mapping,
             definitions,
             product_summary=product_summary,
         )
+    except ObjectiveComputationError:
+        # Feasible results without available furnace evidence stay
+        # unscoreable, not ranked as if capital were free. Once status
+        # claims to be available, malformed values must propagate.
+        # An infeasible run can still guide the sampler with measured
+        # objectives. A null resinter threshold does not raise: the
+        # scoring owner returns the physical scores.
+        if status == "available":
+            raise
+        if feasible:
+            return None
+        scores = objective_scores(objectives, definitions)
     if any(score is None for score in scores):
         return None
     return tuple(
