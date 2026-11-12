@@ -10492,7 +10492,11 @@ def _point_pressure_for_identity(
     state = located.state
     if not state.is_value:
         return state
-    pressure_pa = _printed_source_point_condition_pressure(located)
+    # An approximate print is still the printed point. The exact-only reader
+    # is for calibration pressure, where an approximate flag is not a setpoint.
+    pressure_pa = _printed_source_point_condition_pressure(
+        located, include_approximate=True
+    )
     if pressure_pa is None:
         return None
     return State.of(pressure_pa)
@@ -14452,8 +14456,16 @@ def _source_point_condition_total_pressure_pa(
 
 def _printed_source_point_condition_pressure(
     located: Located[Any] | None,
+    *,
+    include_approximate: bool = False,
 ) -> Decimal | None:
-    """Return only an exact point backed by a printed source locator."""
+    """Return a located printed point.
+
+    The default refuses an approximate print, so a calibration pressure is
+    not taken from a qualified number. Identity passes ``include_approximate``
+    because that print is still the source pressure. Inferred, unprinted,
+    locatorless, and non-point values stay absent either way.
+    """
 
     if (
         located is None
@@ -14464,7 +14476,9 @@ def _printed_source_point_condition_pressure(
         return None
     raw = located.state.value
     if isinstance(raw, Value):
-        if raw.kind is not ValueKind.POINT or raw.point is None or raw.approximate:
+        if raw.kind is not ValueKind.POINT or raw.point is None:
+            return None
+        if raw.approximate and not include_approximate:
             return None
         raw = raw.point
     amount = _as_dec_or_none(raw)
@@ -14492,7 +14506,7 @@ def _without_unprinted_total_pressure(
 
     locator | evidence             | series | explicit | point | printed identity
     yes     | inferred             | keep   | keep     | keep  | no
-    yes     | printed/unclassified | keep   | keep     | keep  | exact point only
+    yes     | printed/unclassified | keep   | keep     | keep  | printed point
     no      | inferred             | keep   | keep     | keep  | no
     no      | unclassified point   | drop   | drop     | drop  | no
     no      | unclassified interval| keep   | keep     | keep  | no
@@ -14501,9 +14515,11 @@ def _without_unprinted_total_pressure(
     A locator with no inferred marker supplies print location, so located
     unclassified data follows the printed row. A locatorless interval remains
     a condition boundary but is not an identity point. Identity requires a
-    located exact point with no inferred or unprinted marker. Locatorless
-    point values stay in conditions only when their inference is explicit. A
-    partial-pressure sum is never promoted to total pressure.
+    located printed point, including an approximate print, with no inferred
+    or unprinted marker. A bound is not that point. Locatorless point values
+    stay in conditions only when their inference is explicit. A
+    partial-pressure sum is never promoted to total pressure. Absence stays
+    unknown and is never filled with a default.
     """
 
     if not point_conditions or "total_pressure_Pa" not in point_conditions:
@@ -21520,6 +21536,12 @@ def _decision_for_buffer(
         notice_reason=notice_reason,
         notice_kind=notice_kind or NoticeKind.INPUT_OMITTED,
         notice_band=notice_band,
+        # The primary notice is the conversion notice only when gate-8 did
+        # not supply its own text. Notice.authority is the scoring authority
+        # of that converted value. Leaving it unset lets _oxygen_conversion_notice
+        # store a same-(kind, reason) copy, and the dedup then drops the
+        # PrintedOxygenNotice that carried the authority.
+        notice_authority=None if gate_notice is not None else authority,
         notices=tuple(notices),
         buffer_request=request,
         pressure_pa_used=total_pressure_pa,
