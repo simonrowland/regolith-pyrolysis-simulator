@@ -169,53 +169,38 @@ def _db_rows(path: Path) -> int:
 def _cache_storage_report(path: Path) -> list[str]:
     if not path.exists():
         return []
-    cold_path = path.with_name(path.name + ".cold")
-    cold_rows: dict[bytes, int] = {}
-    if cold_path.exists():
-        with sqlite3.connect(cold_path) as connection:
-            cold_rows = dict(
-                connection.execute(
-                    "SELECT key, length(value) FROM engine_outputs_cold"
-                ).fetchall()
-            )
     with sqlite3.connect(path) as connection:
         rows = connection.execute(
-            "SELECT engine, key, length(value) FROM engine_outputs"
+            "SELECT engine, length(value) FROM engine_outputs"
         ).fetchall()
 
-    sizes: dict[str, list[tuple[int, int]]] = {}
-    for engine, key, hot_bytes in rows:
-        sizes.setdefault(str(engine), []).append(
-            (int(hot_bytes), int(cold_rows.get(key, 0)))
-        )
+    sizes: dict[str, list[int]] = {}
+    for engine, hot_bytes in rows:
+        sizes.setdefault(str(engine), []).append(int(hot_bytes))
     report = []
     for engine in ENGINE_ORDER:
         values = sizes.get(engine.value, [])
         if not values:
             report.append(f"cache-size {engine.value}=rows:0")
             continue
-        hot = sorted(value[0] for value in values)
-        cold = sorted(value[1] for value in values)
+        hot = sorted(values)
         p95_index = (95 * len(values) + 99) // 100 - 1
         report.append(
             f"cache-size {engine.value}=rows:{len(values)}"
             f"/hot_value_mean_B:{sum(hot) / len(hot):.1f}"
             f"/hot_value_p95_B:{hot[p95_index]}"
-            f"/cold_value_mean_B:{sum(cold) / len(cold):.1f}"
-            f"/cold_value_p95_B:{cold[p95_index]}"
         )
     file_bytes = sum(
         candidate.stat().st_size
-        for base in (path, cold_path)
         for candidate in (
-            base,
-            base.with_name(base.name + "-wal"),
-            base.with_name(base.name + "-shm"),
+            path,
+            path.with_name(path.name + "-wal"),
+            path.with_name(path.name + "-shm"),
         )
         if candidate.exists()
     )
     if rows:
-        mean_hot_row = sum(int(row[2]) + 32 for row in rows) / len(rows)
+        mean_hot_row = sum(int(row[1]) + 32 for row in rows) / len(rows)
         report.append(
             f"cache-size observed_hot_payload_projection_B="
             f"1M:{mean_hot_row * 1_000_000:.0f}"

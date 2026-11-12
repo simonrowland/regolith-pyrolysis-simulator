@@ -1063,7 +1063,7 @@ def test_each_real_backend_equilibrate_warm_pair_matches_cache_off(
     }
 
     def stable(cell: Any) -> Any:
-        return cell.to_engine_cache_value().hot
+        return cell.to_engine_cache_value()
 
     def consumer_flags(cell: Any) -> Any:
         return (

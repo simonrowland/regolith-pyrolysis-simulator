@@ -725,8 +725,7 @@ class EquilibrateCell:
         )
 
     def to_engine_cache_value(self) -> Any:
-        """Return consumed engine fields in HOT and remaining cell fields in COLD."""
-        from simulator.engine_cache import CacheValue
+        """Return the compact scorer-consumed cell payload."""
         from simulator.melt_backend.base import equilibrium_cache_value
 
         projection = equilibrium_cache_value(
@@ -772,33 +771,7 @@ class EquilibrateCell:
             list(self.invalid_gas_partial_pressure_components),
             self.backend_failure_disposition,
         ]
-        payload = self.as_payload()
-        cold_fields = {
-            "pot_id",
-            "engine",
-            "temperature_K",
-            "po2",
-            "refusal_reason",
-            "engine_reason",
-            "engine_annotation",
-            "wall_s",
-            "cpu_s",
-            "hostname",
-            "vapor_pressures_source",
-            "vapor_pressure_backend_status",
-            "vapor_pressure_backend_status_reason",
-            "arm",
-            "notices",
-            "exit_signal",
-            "exit_code",
-            "melt_activities",
-            "melt_activity_coefficients",
-            "melt_activity_coefficient_details",
-            "gas_partial_pressures_Pa",
-            "activities_standard_state",
-        }
-        cold = {name: payload[name] for name in cold_fields if name in payload}
-        return CacheValue([*projection.hot, flags], cold)
+        return [*projection, flags]
 
     @classmethod
     def from_engine_cache_value(cls, payload: Any) -> "EquilibrateCell":

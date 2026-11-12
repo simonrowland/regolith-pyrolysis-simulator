@@ -38,19 +38,6 @@ DEFAULT_BACKEND_CAPABILITIES = {
 REDOX_MODE_NOT_AN_INPUT = 'not_an_input'
 
 ANTOINE_FALLBACK_SOURCE_PREFIX = 'antoine_fallback_from_vaporock'
-_EQUILIBRIUM_CACHE_HOT_FIELDS = frozenset({
-    'activity_coefficients',
-    'reported_activity_coefficients',
-    'activity_coefficient_details',
-    'vapor_pressures_Pa',
-    'vapor_pressures_source',
-    'vaporock_full_speciation_Pa',
-    'liquid_fraction',
-    'phase_assemblage_available',
-    'status',
-    'liquid_composition_wt_pct',
-    'fe_redox_split',
-})
 _EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS = frozenset({
     'authority',
     'authoritative_for_requested_vapor_pressure',
@@ -468,9 +455,7 @@ def equilibrium_cache_value(
     *,
     engine_id: str | None = None,
 ) -> Any:
-    """Split the scorer-consumed equilibrium projection from COLD fields."""
-    from simulator.engine_cache import CacheValue
-
+    """Project the scorer-consumed equilibrium fields into a compact payload."""
     sources = values.get('vapor_pressures_source')
     compact_sources = []
     if isinstance(sources, Mapping):
@@ -504,37 +489,7 @@ def equilibrium_cache_value(
     metadata = _equilibrium_cache_consumer_metadata(values, engine_id=engine_id)
     if metadata:
         hot.append(metadata)
-    cold: dict[str, Any] = {}
-    for name, value in values.items():
-        if name not in _EQUILIBRIUM_CACHE_HOT_FIELDS:
-            if name == 'diagnostics' and isinstance(value, Mapping):
-                remaining = {
-                    key: item
-                    for key, item in value.items()
-                    if key not in _EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS
-                    and key not in {
-                        'commissioning_notice',
-                        'imcc_notices',
-                        'fo2_gas_only',
-                    }
-                }
-                if remaining:
-                    cold[name] = remaining
-            elif name in {'warnings', 'imcc_notices', 'imcc_model_id'}:
-                if name not in metadata and not (
-                    name == 'warnings' and metadata.get('warning_codes')
-                ) and not (
-                    name == 'imcc_notices' and metadata.get('notice_codes')
-                ):
-                    cold[name] = value
-            else:
-                cold[name] = value
-    # Keep the original provenance and detail maps in COLD; HOT carries only
-    # authority codes and the exact coefficient basis the scorer reads.
-    for name in ('vapor_pressures_source', 'activity_coefficient_details'):
-        if name in values:
-            cold[name] = values[name]
-    return CacheValue(hot, cold)
+    return hot
 
 # More than one oxidation state in silicate melts over the fO2 range these
 # engines are asked to run. The melt-backend contract owns this eligibility
@@ -1306,7 +1261,7 @@ class EquilibriumResult:
     printed_fO2_echo_log: Optional[float] = None
 
     def to_engine_cache_value(self, *, engine_id: str | None = None) -> Any:
-        """Split scorer-consumed fields into HOT and the remaining fields into COLD."""
+        """Return the compact scorer-consumed equilibrium payload."""
         return equilibrium_cache_value(vars(self), engine_id=engine_id)
 
     @classmethod
