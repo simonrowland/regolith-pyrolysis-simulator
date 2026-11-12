@@ -230,6 +230,7 @@ from simulator.battery.validate import (
     validate_corpus,
 )
 from simulator.battery.validity import (
+    GateCheck,
     GateOutcome,
     _calibration_grounded,
     _partial_pressure_observations_by_experiment,
@@ -2092,34 +2093,43 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
     )
 
 
+def _require_gate_check(check: object) -> GateCheck:
+    if not isinstance(check, GateCheck) or not isinstance(
+        getattr(check, "passed", None), bool
+    ):
+        raise TypeError("invalid gate check: expected GateCheck with boolean passed")
+    return check
+
+
 def _missing_apparatus_fact(
-    check: object,
+    check: GateCheck,
     *,
     allow_calibration: bool,
     allow_unknown_method: bool,
 ) -> str | None:
-    name = str(getattr(check, "name", ""))
-    detail = getattr(check, "detail", {})
+    check = _require_gate_check(check)
+    name = check.name
+    detail = check.detail
     if not isinstance(detail, Mapping):
         detail = {}
     if (
         name == "method"
-        and not getattr(check, "passed", True)
+        and not check.passed
         and allow_unknown_method
     ):
         return "method_unknown"
-    if name == "background_pressure_stated" and not getattr(check, "passed", True):
+    if name == "background_pressure_stated" and not check.passed:
         return "background_pressure"
-    if name == "orifice_knudsen" and not getattr(check, "passed", True):
+    if name == "orifice_knudsen" and not check.passed:
         reason = str(detail.get("reason") or "").casefold()
         if "unknown" in reason or "not published" in reason or "missing" in reason:
             return "orifice_knudsen"
         return None
-    if name == "background_pressure" and not getattr(check, "passed", True):
+    if name == "background_pressure" and not check.passed:
         # A stated high or straddling background is an explicit invalid input,
         # not an unverified apparatus fact.
         return None
-    if name == "in_cell_partial_pressure_sum" and not getattr(check, "passed", True):
+    if name == "in_cell_partial_pressure_sum" and not check.passed:
         if detail.get("printed_partial_pressure_sum_Pa") is None:
             return "in_cell_partial_pressure_sum"
         return None
@@ -2130,15 +2140,17 @@ def _missing_apparatus_fact(
     return None
 
 
-def _has_calibration_not_grounded(checks: Iterable[object]) -> bool:
-    return any(
-        getattr(check, "passed", True)
-        and str(getattr(check, "name", ""))
-        in {"kems_calibration", "in_cell_partial_pressure_sum"}
-        and isinstance(getattr(check, "detail", {}), Mapping)
-        and check.detail.get("flag") == "calibration_not_grounded"
-        for check in checks
-    )
+def _has_calibration_not_grounded(checks: Iterable[GateCheck]) -> bool:
+    for candidate in checks:
+        check = _require_gate_check(candidate)
+        if (
+            check.passed
+            and check.name in {"kems_calibration", "in_cell_partial_pressure_sum"}
+            and isinstance(check.detail, Mapping)
+            and check.detail.get("flag") == "calibration_not_grounded"
+        ):
+            return True
+    return False
 
 
 def _unverified_apparatus_notices(
@@ -2242,11 +2254,12 @@ def _unverified_apparatus_notices(
     missing: dict[str, Mapping] = {}
     calibration_notice = None
     calibration_reason = None
-    for check in gates.checks:
-        detail = getattr(check, "detail", {})
+    for candidate in gates.checks:
+        check = _require_gate_check(candidate)
+        detail = check.detail
         if not isinstance(detail, Mapping):
             detail = {}
-        if getattr(check, "passed", True):
+        if check.passed:
             if (
                 (allow_calibration or calibration_flagged_partial_pressure)
                 and _has_calibration_not_grounded((check,))
