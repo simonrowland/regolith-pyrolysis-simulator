@@ -85,6 +85,9 @@ BASELINES_PATH = (
 )
 # Escape hatch: write the committed rollup section (off by default).
 REGEN_ENV = "RPS_T512_REGEN_ROLLUP"
+_COLLECTED_ADOPTED_OBSERVATIONS: tuple[AdoptedObservation, ...] | None = None
+_COLLECTED_ADOPTED_OBSERVATIONS_ERROR: SystemExit | None = None
+_BATTERY_EVALUATION_BUILD_COUNT = 0
 
 
 def test_melt_observation_oxygen_admission_and_exact_cache(vapor_pressure_data, monkeypatch):
@@ -120,14 +123,46 @@ def _baseline_pin_key(point: dict) -> tuple[str, str]:
     return (str(point["case_id"]), str(point["key"]))
 
 
+def _evaluation_for_observation_id(
+    evaluations: tuple[ObservationEvaluation, ...], observation_id: str
+) -> ObservationEvaluation:
+    matches = [
+        evaluation
+        for evaluation in evaluations
+        if evaluation.observation.observation_id == observation_id
+    ]
+    assert len(matches) == 1, (
+        f"expected one battery evaluation for {observation_id}, got {len(matches)}"
+    )
+    return matches[0]
+
+
 @pytest.fixture(scope="module")
 def vapor_pressure_data() -> dict:
     return load_vapor_pressure_data()
 
 
 @pytest.fixture(scope="module")
-def adopted_observations() -> list[AdoptedObservation]:
-    return load_adopted_observations()
+def _adopted_observations_cache() -> tuple[AdoptedObservation, ...]:
+    if _COLLECTED_ADOPTED_OBSERVATIONS_ERROR is not None:
+        raise _COLLECTED_ADOPTED_OBSERVATIONS_ERROR
+    assert _COLLECTED_ADOPTED_OBSERVATIONS is not None
+    return _COLLECTED_ADOPTED_OBSERVATIONS
+
+
+@pytest.fixture(scope="module")
+def _adopted_observations_copy_factory(_adopted_observations_cache):
+    def copy_observations() -> tuple[AdoptedObservation, ...]:
+        return deepcopy(_adopted_observations_cache)
+
+    return copy_observations
+
+
+@pytest.fixture
+def adopted_observations(
+    _adopted_observations_copy_factory,
+) -> tuple[AdoptedObservation, ...]:
+    return _adopted_observations_copy_factory()
 
 
 def test_legacy_table_species_scalar_is_ignored_by_raw_observation_index(monkeypatch) -> None:
@@ -142,11 +177,31 @@ def test_legacy_table_species_scalar_is_ignored_by_raw_observation_index(monkeyp
 
 
 @pytest.fixture(scope="module")
-def battery_evaluations(adopted_observations, vapor_pressure_data):
-    return [
+def _battery_evaluations_copy_factory(vapor_pressure_data):
+    global _BATTERY_EVALUATION_BUILD_COUNT
+    _BATTERY_EVALUATION_BUILD_COUNT += 1
+    assert _BATTERY_EVALUATION_BUILD_COUNT == 1, (
+        "battery evaluations were rebuilt in one worker"
+    )
+    if _COLLECTED_ADOPTED_OBSERVATIONS_ERROR is not None:
+        raise _COLLECTED_ADOPTED_OBSERVATIONS_ERROR
+    assert _COLLECTED_ADOPTED_OBSERVATIONS is not None
+    cached_evaluations = tuple(
         evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
-        for obs in adopted_observations
-    ]
+        for obs in _COLLECTED_ADOPTED_OBSERVATIONS
+    )
+
+    def copy_evaluations() -> tuple[ObservationEvaluation, ...]:
+        return deepcopy(cached_evaluations)
+
+    return copy_evaluations
+
+
+@pytest.fixture
+def battery_evaluations(
+    _battery_evaluations_copy_factory,
+) -> tuple[ObservationEvaluation, ...]:
+    return _battery_evaluations_copy_factory()
 
 
 @pytest.fixture(scope="module")
@@ -162,11 +217,16 @@ def residual_baselines() -> dict:
 
 
 def test_store_yields_adopted_target_type_observations(
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
+    _adopted_observations_copy_factory,
 ) -> None:
     """Battery includes every family and all KEMS sources before precedence."""
 
     assert adopted_observations, "extract store produced zero ADOPTED observations"
+    next_consumer = _adopted_observations_copy_factory()
+    assert next_consumer[0].observation_id == adopted_observations[0].observation_id
+    adopted_observations[0].values["__isolation_probe__"] = "changed"
+    assert "__isolation_probe__" not in next_consumer[0].values
     types = {obs.obs_type for obs in adopted_observations}
     assert types == TARGET_TYPES
     # Superseded rows are retained provenance, not adopted data points.
@@ -829,16 +889,12 @@ def test_coverage_primary_prefers_typed_refusal_over_point_drop() -> None:
     assert coverage["skip_reasons"] == {evaluation.skip_reason: 1}
 
 
-def test_wetzel_stale_duplicate_hits_system_class_and_form_gate() -> None:
-    observation = next(
-        row
-        for row in load_adopted_observations()
-        if row.source_id == "wetzel-gail-2013-sio-arrhenius"
-        and row.observation_id == "wetzel_gail_2013_sio_arrhenius"
-    )
-    evaluation = evaluate_observation(
-        observation,
-        vapor_pressure_data=load_vapor_pressure_data(),
+@pytest.mark.xdist_group("extract-battery-evaluations")
+def test_wetzel_stale_duplicate_hits_system_class_and_form_gate(
+    battery_evaluations: tuple[ObservationEvaluation, ...],
+) -> None:
+    evaluation = _evaluation_for_observation_id(
+        battery_evaluations, "wetzel_gail_2013_sio_arrhenius"
     )
     assert not any(
         record.status in {"match", "mismatch"} for record in evaluation.records
@@ -1185,23 +1241,29 @@ def test_point_level_drops_emit_gap_records_not_silent() -> None:
 
 
 def _observation_params() -> list[pytest.ParameterSet]:
+    global _COLLECTED_ADOPTED_OBSERVATIONS, _COLLECTED_ADOPTED_OBSERVATIONS_ERROR
     try:
-        observations = load_adopted_observations()
+        _COLLECTED_ADOPTED_OBSERVATIONS = tuple(load_adopted_observations())
     except SystemExit as exc:
+        _COLLECTED_ADOPTED_OBSERVATIONS = ()
+        _COLLECTED_ADOPTED_OBSERVATIONS_ERROR = exc
         return [
             pytest.param(
                 None,
                 id=f"store-load-failed:{exc}",
             )
         ]
-    if not observations:
+    if not _COLLECTED_ADOPTED_OBSERVATIONS:
         return [
             pytest.param(
                 None,
                 id="empty-store",
             )
         ]
-    return [pytest.param(obs, id=obs.param_id()) for obs in observations]
+    return [
+        pytest.param(obs, id=obs.param_id())
+        for obs in _COLLECTED_ADOPTED_OBSERVATIONS
+    ]
 
 
 @pytest.mark.parametrize("obs", _observation_params())
@@ -1340,32 +1402,62 @@ def test_adopted_observation_reproduction(
     assert evaluation.skip_reasons
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_pinned_residuals_cover_all_live_comparable_points(
     battery_evaluations,
     residual_baselines,
+    _battery_evaluations_copy_factory,
 ) -> None:
     """Baseline file and live battery must agree on the comparable set."""
 
-    live_keys = {
-        _record_pin_key(r)
-        for ev in battery_evaluations
-        for r in ev.records
-        if r.status in SCORING_STATUSES
-    }
-    assert len(live_keys) == sum(
-        r.status in SCORING_STATUSES
-        for ev in battery_evaluations
-        for r in ev.records
-    ), "duplicate live residual identity"
-    pin_keys = set(residual_baselines["by_key"])
-    assert live_keys == pin_keys, (
-        f"baseline/live comparable-key mismatch: "
-        f"live_only={sorted(live_keys - pin_keys)} "
-        f"pin_only={sorted(pin_keys - live_keys)}"
+    assert isinstance(battery_evaluations, tuple)
+    assert _BATTERY_EVALUATION_BUILD_COUNT == 1
+
+    first_consumer = _battery_evaluations_copy_factory()
+    next_consumer = _battery_evaluations_copy_factory()
+    assert first_consumer and next_consumer
+    original_record_count = len(next_consumer[0].records)
+    first_consumer[0].records.append(None)
+    assert len(next_consumer[0].records) == original_record_count
+
+    def assert_residual_coverage(evaluations) -> None:
+        live_keys = {
+            _record_pin_key(r)
+            for ev in evaluations
+            for r in ev.records
+            if r.status in SCORING_STATUSES
+        }
+        assert len(live_keys) == sum(
+            r.status in SCORING_STATUSES
+            for ev in evaluations
+            for r in ev.records
+        ), "duplicate live residual identity"
+        pin_keys = set(residual_baselines["by_key"])
+        assert live_keys == pin_keys, (
+            f"baseline/live comparable-key mismatch: "
+            f"live_only={sorted(live_keys - pin_keys)} "
+            f"pin_only={sorted(pin_keys - live_keys)}"
+        )
+
+    assert_residual_coverage(battery_evaluations)
+    mutated_evaluations = list(battery_evaluations)
+    omitted = next(
+        (
+            index
+            for index, evaluation in enumerate(mutated_evaluations)
+            if any(record.status in SCORING_STATUSES for record in evaluation.records)
+        ),
+        None,
     )
+    assert omitted is not None, "no scoring evaluation available for mutation proof"
+    del mutated_evaluations[omitted]
+    with pytest.raises(AssertionError, match="baseline/live comparable-key mismatch"):
+        assert_residual_coverage(mutated_evaluations)
 
 
-def test_measured_rate_series_executes_hkl(monkeypatch) -> None:
+def test_measured_rate_series_executes_hkl(
+    monkeypatch, adopted_observations: tuple[AdoptedObservation, ...]
+) -> None:
     import simulator.diagnostic_helpers.extract_reproduction as er
 
     real_hkl = er.langmuir_molar_flux
@@ -1384,7 +1476,7 @@ def test_measured_rate_series_executes_hkl(monkeypatch) -> None:
     monkeypatch.setattr(er, "langmuir_molar_flux", _spy)
     obs = next(
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.observation_id == "richter_2007_mg_rate_series_geometry"
     )
     evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
@@ -1400,7 +1492,9 @@ def test_measured_rate_series_executes_hkl(monkeypatch) -> None:
     assert all(r.observable_id.endswith(":rate") for r in evaluation.records)
 
 
-def test_numeric_activity_executes_melt_activity_model(monkeypatch) -> None:
+def test_numeric_activity_executes_melt_activity_model(
+    monkeypatch, adopted_observations: tuple[AdoptedObservation, ...]
+) -> None:
     import simulator.diagnostic_helpers.extract_reproduction as er
 
     real_activity = er.melt_oxide_activity
@@ -1413,7 +1507,7 @@ def test_numeric_activity_executes_melt_activity_model(monkeypatch) -> None:
     monkeypatch.setattr(er, "melt_oxide_activity", _spy)
     obs = next(
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.observation_id == "demaria_1971_fe_lunar_basalt_kems_main_cell"
     )
     evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
@@ -1490,6 +1584,7 @@ def test_psat_standard_state_selects_one_compatible_vapor_rail(monkeypatch) -> N
 def test_engine_value_mutation_moves_residual_outside_band_goes_red(
     residual_baselines,
     monkeypatch,
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     """P1 proof: 10× grounded_alpha mutation must trip the residual pin (RED).
 
@@ -1517,7 +1612,7 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
     # the live Richter Mg alpha series, which still has three measured pins.
     observations = [
         o
-        for o in load_adopted_observations()
+        for o in adopted_observations
         if o.source_id == "richter-et-al-2007"
         and o.observation_id == "richter_2007_mg_cai_arrhenius_langmuir"
         and o.obs_type == "alpha"
@@ -1567,7 +1662,9 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
 
 
 def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
-    monkeypatch, residual_baselines
+    monkeypatch,
+    residual_baselines,
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     import simulator.diagnostic_helpers.extract_reproduction as er
 
@@ -1579,7 +1676,7 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
     monkeypatch.setattr(er, "langmuir_molar_flux", _ten_x)
     obs = next(
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.observation_id == "richter_2007_mg_rate_series_geometry"
     )
     evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
@@ -1591,6 +1688,7 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
     assert evaluation.skip_reasons
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 @pytest.mark.parametrize(
     ("observation_id", "skip_reason"),
     (
@@ -1607,22 +1705,19 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
 def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
     observation_id: str,
     skip_reason: str,
+    battery_evaluations: tuple[ObservationEvaluation, ...],
 ) -> None:
-    observation = next(
-        row
-        for row in load_adopted_observations()
-        if row.observation_id == observation_id
-    )
-    evaluation = evaluate_observation(
-        observation,
-        vapor_pressure_data=load_vapor_pressure_data(),
-    )
+    evaluation = _evaluation_for_observation_id(battery_evaluations, observation_id)
     assert not any(r.status in SCORING_STATUSES for r in evaluation.records)
     assert evaluation.skip_reason == skip_reason
     assert evaluation.skip_reasons == [skip_reason]
 
 
-def test_wetzel_model_tables_refuse_as_model_output() -> None:
+@pytest.mark.xdist_group("extract-battery-evaluations")
+def test_wetzel_model_tables_refuse_as_model_output(
+    adopted_observations: tuple[AdoptedObservation, ...],
+    battery_evaluations: tuple[ObservationEvaluation, ...],
+) -> None:
     # PARENT RULE (b-483): the six quoted-model parents stay byte-identical
     # rate_series containers and are superseded; the retype lives on the
     # terminal ``*_gibbs`` children, which are the rows the store adopts.
@@ -1632,7 +1727,7 @@ def test_wetzel_model_tables_refuse_as_model_output() -> None:
     observation_ids = {f"{parent}_gibbs" for parent in parent_ids}
     wetzel = [
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.source_id == "kems-011-wetzel-gail-2013"
     ]
     parents = [row for row in wetzel if row.observation_id in parent_ids]
@@ -1649,9 +1744,8 @@ def test_wetzel_model_tables_refuse_as_model_output() -> None:
             observation.values["admission_status"]
             == "model_output_not_measurement"
         )
-        evaluation = evaluate_observation(
-            observation,
-            vapor_pressure_data=load_vapor_pressure_data(),
+        evaluation = _evaluation_for_observation_id(
+            battery_evaluations, observation.observation_id
         )
         assert evaluation.records
         assert not any(r.status in SCORING_STATUSES for r in evaluation.records)
@@ -1660,7 +1754,7 @@ def test_wetzel_model_tables_refuse_as_model_output() -> None:
 
 
 def test_transition_point_is_an_adopted_target_type(
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     assert "transition_point" in TARGET_TYPES
     rows = [obs for obs in adopted_observations if obs.obs_type == "transition_point"
@@ -1681,30 +1775,26 @@ def test_transition_point_is_an_adopted_target_type(
     assert "melting_point" in kinds
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_melting_point_is_typed_refusal_not_a_fabricated_psat(
-    vapor_pressure_data,
+    battery_evaluations: tuple[ObservationEvaluation, ...],
 ) -> None:
-    obs = next(
-        row
-        for row in load_adopted_observations()
-        if row.observation_id == "Na_melting_point"
+    evaluation = _evaluation_for_observation_id(
+        battery_evaluations, "Na_melting_point"
     )
-    evaluation = evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
     assert evaluation.skip_reason == "typed-refusal:no_engine_melting_point_model"
     assert evaluation.records
     assert all(r.status != "match" for r in evaluation.records)
     assert all(r.actual_value is None for r in evaluation.records)
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_normal_boiling_point_inverts_antoine_in_kelvin(
-    vapor_pressure_data,
+    battery_evaluations: tuple[ObservationEvaluation, ...],
 ) -> None:
-    obs = next(
-        row
-        for row in load_adopted_observations()
-        if row.observation_id == "Na_normal_boiling_point"
+    evaluation = _evaluation_for_observation_id(
+        battery_evaluations, "Na_normal_boiling_point"
     )
-    evaluation = evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
     comparable = [r for r in evaluation.records if r.status in {"match", "mismatch"}]
     assert comparable, evaluation.skip_reason
     record = comparable[0]
@@ -1753,9 +1843,10 @@ def test_silicate_melt_class_does_not_pin_a_pure_component_nbp(
     assert all(r.status not in {"match", "mismatch"} for r in evaluation.records)
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_battery_rollup_matches_committed_model_limitations(
     battery_evaluations,
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
     tmp_path,
 ) -> None:
     """Rollup must NOT self-heal the committed doc.
@@ -1876,7 +1967,7 @@ def test_battery_rollup_matches_committed_model_limitations(
 
 
 def test_evaluate_all_covers_every_adopted_observation(
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
     vapor_pressure_data,
 ) -> None:
     evaluations = evaluate_all(
@@ -1891,9 +1982,10 @@ def test_evaluate_all_covers_every_adopted_observation(
         assert ev.records or ev.skip_reason
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_coverage_ledger_is_observation_first_and_exact(
     battery_evaluations,
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     coverage = coverage_summary(battery_evaluations)
     # o19fix4 attribution (old pin -> current): KEMS is 1133 -> 1900 (+767;
@@ -2295,7 +2387,7 @@ _LIVE_QUALITATIVE_SKIP_BY_ID = {
 
 
 def test_live_qualitative_catch_all_is_split_by_payload_class(
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     by_id = {obs.observation_id: obs for obs in adopted_observations}
     missing = sorted(set(_LIVE_QUALITATIVE_SKIP_BY_ID) - set(by_id))
