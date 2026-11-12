@@ -379,6 +379,37 @@ def test_cache_uses_canonical_request_and_wal_sqlite(
         assert "WITHOUT ROWID" in schema.upper()
 
 
+def test_schema_mismatch_refuses_without_deleting_rows(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    with sqlite3.connect(database) as connection:
+        connection.execute(
+            "CREATE TABLE engine_outputs "
+            "(key BLOB PRIMARY KEY, value BLOB NOT NULL, unexpected TEXT NOT NULL) "
+            "WITHOUT ROWID"
+        )
+        connection.execute(
+            "INSERT INTO engine_outputs VALUES (?, ?, ?)",
+            (b"existing-key", b"existing-value", "keep-me"),
+        )
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+
+    with pytest.raises(engine_cache.EngineCacheSchemaMismatch, match="unexpected"):
+        _cached_engine_call()(
+            "openimcc", {"call": "schema-mismatch"}, lambda: {"answer": 42}
+        )
+
+    with sqlite3.connect(database) as connection:
+        columns = [
+            row[1] for row in connection.execute("PRAGMA table_info(engine_outputs)")
+        ]
+        rows = connection.execute("SELECT key, value FROM engine_outputs").fetchall()
+    assert columns == ["key", "value", "unexpected"]
+    assert rows == [(b"existing-key", b"existing-value")]
+
+
 def test_engine_cache_key_preserves_exact_float_values() -> None:
     assert engine_cache_key(
         "openimcc", 1, {"temperature_K": 1700.0}
