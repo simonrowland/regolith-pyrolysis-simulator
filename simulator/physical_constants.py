@@ -12,6 +12,9 @@ from decimal import Decimal
 
 # Fundamental constants (SI 2019 / CODATA exact-derived).
 GAS_CONSTANT = 8.31446261815324  # J/(mol K); R = N_A k_B.
+# Decimal of that float via str(), so a second digit spelling cannot drift.
+# Equal to Decimal("8.31446261815324"). Not the 6-sig or 10-sig floats.
+GAS_CONSTANT_DECIMAL = Decimal(str(GAS_CONSTANT))
 FARADAY = 96485.33212  # C/mol; F = N_A e.
 AVOGADRO = 6.02214076e23  # 1/mol; exact by SI definition.
 BOLTZMANN = 1.380649e-23  # J/K; exact by SI definition.
@@ -77,6 +80,7 @@ __all__ = (
     "GAS_CONSTANT",
     "GAS_CONSTANT_10SIG",
     "GAS_CONSTANT_6SIG",
+    "GAS_CONSTANT_DECIMAL",
     "J_PER_KJ",
     "M2_PER_CM2",
     "MBAR_PER_BAR",

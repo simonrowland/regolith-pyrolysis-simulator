@@ -115,3 +115,29 @@ def test_vant_hoff_antoine_and_clausius_bits() -> None:
     assert antoine_a.hex() == "0x1.9ab8ac22ada95p+3"
     assert antoine_b.hex() == "0x1.4675cacd27747p+14"
     assert pressure.hex() == "0x1.36fb264ef0908p-2"
+
+
+def test_full_precision_gas_constant_has_one_owner() -> None:
+    """CODATA R, its Decimal, and the kJ float are the leaf objects."""
+
+    from decimal import Decimal
+
+    from simulator.battery.identity import R_J_PER_MOL_K
+    from simulator.battery.waypoints import _R as waypoint_r
+    from simulator.chemistry.fo2_buffers import _R_CODATA
+    from simulator.chemistry.melt_activity import R_KJ_PER_MOL_K
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _CELL_GAS_CONSTANT_J_MOL_K,
+    )
+    from simulator.oxygen_buffers import _ONEILL_IW_R
+    from simulator.physical_constants import GAS_CONSTANT_DECIMAL, J_PER_KJ
+
+    assert GAS_CONSTANT_DECIMAL == Decimal("8.31446261815324")
+    assert GAS_CONSTANT_DECIMAL == Decimal(str(GAS_CONSTANT))
+    assert R_J_PER_MOL_K is GAS_CONSTANT_DECIMAL
+    assert waypoint_r is GAS_CONSTANT_DECIMAL
+    assert _R_CODATA is GAS_CONSTANT_DECIMAL
+    assert _ONEILL_IW_R is GAS_CONSTANT
+    assert _CELL_GAS_CONSTANT_J_MOL_K is GAS_CONSTANT
+    assert R_KJ_PER_MOL_K.hex() == "0x1.1072c483af26dp-7"
+    assert R_KJ_PER_MOL_K == GAS_CONSTANT / J_PER_KJ

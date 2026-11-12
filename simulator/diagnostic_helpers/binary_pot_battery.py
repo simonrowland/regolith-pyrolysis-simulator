@@ -41,6 +41,7 @@ from simulator.scalar_boundary import finite_float
 from simulator.physical_constants import (
     CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
     CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT,
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
@@ -1702,7 +1703,7 @@ _CELL_OXIDE_BUFFER_TABLES: dict[str, tuple[tuple[str, str], ...]] = {
     "W": (("WO2", "O-047"), ("WO3", "O-065")),
     "Mo": (("MoO2", "Mo-009"),),
 }
-_CELL_GAS_CONSTANT_J_MOL_K = 8.31446261815324
+_CELL_GAS_CONSTANT_J_MOL_K = GAS_CONSTANT
 _CELL_ATOMIC_MASS_G_MOL = {"O": 15.999, "W": 183.84, "Mo": 95.95}
 
 
