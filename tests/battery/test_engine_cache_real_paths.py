@@ -350,6 +350,40 @@ def test_engine_cache_settings_are_the_named_prediction_projection(
     assert set(settings) == expected_fields
 
 
+def test_default_alphamelts_projection_matches_resolved_opener_settings() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
+    from simulator.engine_cache import (
+        ENGINE_CHEMISTRY_VERSION,
+        engine_cache_key,
+        engine_cache_settings,
+    )
+
+    handle = open_battery_engine(Engine.ALPHAMELTS.value)
+    if not handle.available or handle.backend is None:
+        pytest.skip("default AlphaMELTS backend is unavailable")
+    try:
+        resolved_projection = engine_cache_settings(
+            handle.name,
+            handle.backend,
+            effective_settings=handle.engine_settings,
+        )
+        normalized_projection = engine_cache_settings(
+            handle.name, handle.engine_settings
+        )
+
+        assert engine_cache_key(
+            handle.name,
+            ENGINE_CHEMISTRY_VERSION[handle.name],
+            {"engine_settings": resolved_projection},
+        ) == engine_cache_key(
+            handle.name,
+            ENGINE_CHEMISTRY_VERSION[handle.name],
+            {"engine_settings": normalized_projection},
+        )
+    finally:
+        close_battery_engine_handle(handle)
+
+
 @pytest.mark.parametrize(
     ("engine", "configuration", "setting", "changed"),
     (
