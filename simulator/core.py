@@ -4947,12 +4947,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.evaporation import (
             _load_evaporation_alpha_by_species,
             _measured_alpha_control_view,
+            _stage0_evaporation_species_ids,
         )
         from engines.builtin.evaporation_flux import _evaluate_alpha_control
 
         legacy = getattr(self, 'vapor_pressures', None) or {}
         measured = _measured_alpha_control_view(
             _load_evaporation_alpha_by_species(dict(legacy))
+        )
+        campaign = getattr(self.melt, 'campaign', None)
+        campaign_name = str(getattr(campaign, 'name', '') or '')
+        selected_species = _stage0_evaporation_species_ids(
+            measured,
+            campaign_name,
         )
         channels: list[InterfaceOxygenChannel] = []
         seen: set[str] = set()
@@ -4966,7 +4973,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     continue
                 if species_name in {OXYGEN_SPECIES, 'O2'}:
                     continue
-                if species_name not in measured:
+                if species_name not in selected_species:
                     continue
                 alpha, _evaluation = _evaluate_alpha_control(
                     species_name,
@@ -5011,8 +5018,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _interface_oxygen_channel(self, species: str, row: Mapping[str, Any], *, alpha: float):
         from simulator.chemistry.oxygen_interface import InterfaceOxygenChannel
+        from simulator.evaporation import _evaporation_molar_mass_kg_mol
 
         formula = resolve_species_formula(species, self.species_formula_registry)
+        molar_mass_kg_per_mol = _evaporation_molar_mass_kg_mol(
+            species,
+            row,
+        )
         atoms = dict(formula.elements)
         non_oxygen = {
             element: count
@@ -5033,7 +5045,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             exponent = 0.5 if catalog_exponent is None else catalog_exponent
             return InterfaceOxygenChannel(
                 species=species,
-                molar_mass_kg_per_mol=formula.molar_mass_kg_per_mol(),
+                molar_mass_kg_per_mol=molar_mass_kg_per_mol,
                 oxygen_atoms=1.0,
                 parent_oxygen_demand=0.0,
                 pO2_exponent=exponent,
@@ -5066,6 +5078,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ):
             return None
         parent_oxygen_demand = parent_moles * float(parent_atoms.get('O', 0.0) or 0.0)
+        campaign = getattr(self.melt, 'campaign', None)
+        campaign_name = str(getattr(campaign, 'name', '') or '')
+        if campaign_name == 'C0B':
+            stoich = self._evaporation_stoich(species, dict(row))
+            molar_o2_kg_mol = resolve_species_formula(
+                OXYGEN_SPECIES,
+                self.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            # Premise: the C0B ledger books the owner's kg O2/kg vapour
+            # coefficient. Algebra: ν(O2)/ν(vapour) = (kg O2/kg vapour) *
+            # (kg vapour/mol vapour) / (kg O2/mol O2); the atom difference
+            # is 2ν(O2)/ν(vapour). Units cancel to mol/mol. At zero O2
+            # coproduct the demand equals the vapour's oxygen atoms.
+            o2_mol_per_product = (
+                float(stoich['O2_per_product_kg'])
+                * molar_mass_kg_per_mol
+                / molar_o2_kg_mol
+            )
+            parent_oxygen_demand = oxygen_atoms + 2.0 * o2_mol_per_product
         exponent = (
             (oxygen_atoms - parent_oxygen_demand) / 2.0
             if catalog_exponent is None
@@ -5075,10 +5106,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             abs(parent_oxygen_demand - oxygen_atoms) <= 1.0e-12
             and abs(exponent) <= 1.0e-12
         ):
-            return None
+            campaign = getattr(self.melt, 'campaign', None)
+            if str(getattr(campaign, 'name', '') or '') != 'C0B':
+                return None
         return InterfaceOxygenChannel(
             species=species,
-            molar_mass_kg_per_mol=formula.molar_mass_kg_per_mol(),
+            molar_mass_kg_per_mol=molar_mass_kg_per_mol,
             oxygen_atoms=oxygen_atoms,
             parent_oxygen_demand=parent_oxygen_demand,
             pO2_exponent=exponent,

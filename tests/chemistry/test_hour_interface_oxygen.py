@@ -912,7 +912,7 @@ def test_lunar_c0_hot_hour_evaporative_oxygen_matches_the_series_helper() -> Non
     _assert_series_identity(sim)
 
 
-def _run_identity_hours(execute):
+def _run_identity_hours(execute, extra_identity=None):
     """Run a campaign and check the series identity on every hour.
 
     ``_assert_series_identity`` is the review identity: interface
@@ -935,18 +935,27 @@ def _run_identity_hours(execute):
         checked["n"] += 1
         hour = int(snapshot.hour)
         solution = getattr(self, "_hour_interface_oxygen", None)
-        if solution is None:
-            failures.append(f"hour {hour}: no interface solution")
-            return snapshot
-        if not solution.product_fluxes_mol_m2_s:
-            oxygen = solution.evaporative_oxygen_mol_s
-            if any(abs(float(value)) > 0.0 for value in oxygen.values()):
-                failures.append(
-                    f"hour {hour}: evaporative oxygen with no product flux"
-                )
-            return snapshot
         try:
-            _assert_series_identity(self)
+            if extra_identity is not None:
+                campaign_after_step = self.melt.campaign
+                try:
+                    self.melt.campaign = snapshot.campaign
+                    extra_identity(self, snapshot)
+                finally:
+                    self.melt.campaign = campaign_after_step
+            elif solution is None:
+                failures.append(f"hour {hour}: no interface solution")
+                return snapshot
+            if solution is None:
+                return snapshot
+            if not solution.product_fluxes_mol_m2_s:
+                oxygen = solution.evaporative_oxygen_mol_s
+                assert not any(abs(float(value)) > 0.0 for value in oxygen.values()), (
+                    "evaporative oxygen with no product flux",
+                    oxygen,
+                )
+            elif extra_identity is None:
+                _assert_series_identity(self)
         except AssertionError as exc:
             failures.append(f"hour {hour}: {exc}")
         return snapshot
@@ -957,6 +966,69 @@ def _run_identity_hours(execute):
     finally:
         PyrolysisSimulator.step = original_step
     return execution, checked["n"], failures
+
+
+def _assert_c0b_species_identity(sim, snapshot) -> None:
+    campaign_name = str(getattr(snapshot.campaign, "name", "") or "")
+    if campaign_name != "C0B":
+        return
+    solution = sim._hour_interface_oxygen
+    report = sim._last_vapour_batch_report
+    assert isinstance(report, dict)
+    debit_species = set(report["flux_active_species_ids"])
+    if solution is None:
+        assert not debit_species, (snapshot.hour, debit_species)
+        return
+    interface_species = set(solution.channel_pressures_pa)
+    assert interface_species == debit_species, (
+        interface_species,
+        debit_species,
+        solution.surface_log10_pO2_bar,
+    )
+    assert set(solution.evaporative_oxygen_mol_s) == debit_species
+
+    # The provider records sub-threshold rates separately; the booking floor
+    # is downstream of this per-species kinetic identity.
+    diagnostic = sim._last_evaporation_flux_diagnostic
+    below_threshold = dict(
+        (diagnostic.get("below_threshold_evaporation_flux", {}) or {}).get(
+            "fluxes_kg_hr", {}
+        )
+        or {}
+    )
+    provider_rates_kg_hr = {
+        **below_threshold,
+        **snapshot.evap_flux.species_kg_hr,
+    }
+    for species in sorted(debit_species):
+        row = (
+            (sim.vapor_pressures.get("metals", {}) or {}).get(species)
+            or (sim.vapor_pressures.get("oxide_vapors", {}) or {}).get(species)
+        )
+        stoich = sim._evaporation_stoich(species, row)
+        ledger_source = sim._project_evaporation_overhead_source_mol_hr(
+            {species: float(provider_rates_kg_hr.get(species, 0.0))},
+            {species: stoich},
+        )
+        assert solution.evaporative_oxygen_mol_s[species] * 3600.0 == pytest.approx(
+            float(ledger_source.get("O2", 0.0)),
+            rel=1.0e-9,
+            abs=1.0e-18,
+        ), species
+
+
+def test_lunar_c0b_interface_prices_the_debit_species_and_oxygen() -> None:
+    from types import SimpleNamespace
+
+    sim = _campaign_interface(
+        "C0B", p_total_mbar=1.0, temperature_C=950.0,
+    )
+    debit_flux = sim._calculate_evaporation(sim._get_equilibrium())
+    snapshot = SimpleNamespace(
+        campaign=SimpleNamespace(name="C0B"),
+        evap_flux=debit_flux,
+    )
+    _assert_c0b_species_identity(sim, snapshot)
 
 
 def test_sso2_constant_1250_window_does_not_alternate() -> None:
@@ -1018,4 +1090,46 @@ def test_lunar_c0_every_hour_interface_oxygen_matches_the_ledger() -> None:
     assert execution.status == "ok", execution.error_message
     assert len(execution.snapshots) == 24
     assert n_checked == 24
+    assert not failures, failures
+
+
+def test_lunar_c0b_every_hour_interface_oxygen_matches_the_ledger() -> None:
+    from simulator.runner import PyrolysisRun
+    from simulator.session import SimSession
+    from simulator.stage0_harness import run_stage0_harness
+
+    def _execute():
+        run = PyrolysisRun(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C0",
+            hours=24,
+            additives_kg={},
+            allow_fallback_vapor=True,
+            allow_unmeasured_alpha_fallback=True,
+        )
+        session = SimSession().start(run._session_config())
+        return run_stage0_harness(session)
+
+    c0b_hours = []
+    c0b_active_hours = []
+
+    def _check_c0b(sim, snapshot):
+        if snapshot.campaign.name == "C0B":
+            c0b_hours.append(snapshot.hour)
+            if (
+                sim._hour_interface_oxygen is not None
+                and sim._hour_interface_oxygen.channel_pressures_pa
+            ):
+                c0b_active_hours.append(snapshot.hour)
+        _assert_c0b_species_identity(sim, snapshot)
+
+    execution, n_checked, failures = _run_identity_hours(
+        _execute,
+        _check_c0b,
+    )
+    assert execution.early_melt_reached is True
+    assert execution.stop_reason == "c0b_path_ab_pause"
+    assert n_checked == execution.total_hours
+    assert c0b_hours
+    assert c0b_active_hours
     assert not failures, failures

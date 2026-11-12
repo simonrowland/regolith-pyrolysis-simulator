@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import math
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from numbers import Real
 from typing import Any, NamedTuple
 
@@ -77,6 +77,37 @@ PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C = 1050.0
 _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
     'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10',
 })
+
+
+def _stage0_evaporation_species_ids(
+    species_ids: Iterable[str],
+    campaign_name: str,
+) -> frozenset[str]:
+    """Apply the C0/C0B species claim shared by the interface and debit."""
+
+    selected = frozenset(species_ids)
+    if campaign_name == 'C0B':
+        return selected & _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
+    if campaign_name == 'C0':
+        return selected - _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
+    return selected
+
+
+def _evaporation_molar_mass_kg_mol(
+    species: str,
+    species_data: Mapping[str, Any],
+) -> float:
+    """Resolve the molar mass shared by interface and debit fluxes."""
+
+    molar_mass_g_mol = species_data.get('molar_mass_g_mol')
+    if molar_mass_g_mol is None:
+        molar_mass_g_mol = MOLAR_MASS.get(species)
+    if molar_mass_g_mol is None:
+        raise AccountingError(
+            f"vapor species {species!r} requires molar_mass_g_mol metadata "
+            "before evaporation flux can be emitted"
+        )
+    return molar_mass_g_mol / 1000.0
 
 
 PROCESS_OVERHEAD_GAS_ACCOUNT = "process.overhead_gas"
@@ -3610,16 +3641,10 @@ class EvaporationMixin:
             if not sp_data:
                 sp_data = oxide_vapors_data.get(species, {})
 
-            M_g_mol = sp_data.get('molar_mass_g_mol')
-            if M_g_mol is None:
-                M_g_mol = MOLAR_MASS.get(species)
-            if M_g_mol is None:
-                raise AccountingError(
-                    f"vapor species {species!r} requires "
-                    "molar_mass_g_mol metadata before evaporation flux "
-                    "can be emitted"
-                )
-            molar_masses_kg_mol[species] = M_g_mol / 1000.0
+            molar_masses_kg_mol[species] = _evaporation_molar_mass_kg_mol(
+                species,
+                sp_data,
+            )
 
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
@@ -3844,23 +3869,12 @@ class EvaporationMixin:
                 if campaign_name == 'C0B'
                 else 'evaporation'
             )
-            effective_pressure_species_ids = effective_pressure_source.species_ids
-            if campaign_name == 'C0B':
-                effective_pressure_species_ids = frozenset(
-                    species_id
-                    for species_id in effective_pressure_species_ids
-                    if species_id in _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
-                )
-            elif campaign_name == 'C0':
-                # Drop the carriers from the claim. Leaving them claimed on
-                # stage evaporation fail-closes the batch: their stage0_only
-                # predicate does not wake, and the pre-RG guard refuses any
-                # claimed channel that is not flux-eligible.
-                effective_pressure_species_ids = frozenset(
-                    species_id
-                    for species_id in effective_pressure_species_ids
-                    if species_id not in _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
-                )
+            # C0 leaves the P carriers condensed; C0B claims only their
+            # cleanup vapours. The interface uses the same owner selection.
+            effective_pressure_species_ids = _stage0_evaporation_species_ids(
+                effective_pressure_source.species_ids,
+                campaign_name,
+            )
             domain_at = getattr(self, "liquid_feo_domain_at", None)
             liquid_feo_domain = (
                 domain_at(float(temperature_K)) if callable(domain_at) else None
