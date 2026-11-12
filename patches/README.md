@@ -149,8 +149,8 @@ Clean. No local patches.
 ### magemin — v1.9.6 / upstream `40ed109`
 
 Four fixes held as patches pending upstream (not yet filed): `0001`-`0003` share the draft
-pull-request description in `patches/magemin/UPSTREAM-PR.md`; `0004` has its own draft in the
-regolith-main combined offer:
+pull-request description in `patches/magemin/UPSTREAM-PR.md`; `0004` has its own draft in
+`patches/magemin/UPSTREAM-SUBMISSION.md`:
 
 - `0001` THERMOCALC `aMgO`: the `tc` branch of `compute_activities()` never stored the periclase
   `gbase`, so `aMgO` printed `exp(Gamma_MgO/RT)` (~1e-21). Until the adapter-side recompute
@@ -164,8 +164,8 @@ regolith-main combined offer:
   (printed aFeO ~5.6e25 for a basaltic sb21 bulk; 0.473 after). sb24 has no `FeO` oxide; its
   `aFeO` comes from the later Fe+O block, which already divides by 4 and is not touched.
 - `0004` headless singleton MPI defaults: exclude hwloc's unused OpenCL probe and set local
-  transport defaults for standalone MPI launches. Its draft issue and PR text are in the
-  regolith-main combined offer.
+  transport defaults for standalone MPI launches. Draft issue and PR text are in
+  `patches/magemin/UPSTREAM-SUBMISSION.md`.
 
 The patch files keep MAGEMin's CRLF line endings: apply them with `git am --keep-cr` (or `git apply`),
 and edit them byte-safely. `enginepatch.sh` maps
