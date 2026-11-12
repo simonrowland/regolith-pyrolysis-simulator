@@ -19972,7 +19972,13 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         assert identity.temperature_K.value == conditions["temperature_K"].state.value
         assert identity.sample_mass_kg.value == Decimal("0.0001")
         assert identity.exposure.value.duration_s.value == conditions["time_min"].state.value * Decimal("60")
-        assert identity.total_pressure_Pa.value == experiment.pressure_environment.total_pressure_Pa.state.value.point
+        from simulator.battery.records import ApproxPressure, BandBasis
+
+        pressure_band = identity.total_pressure_Pa.value
+        assert isinstance(pressure_band, ApproxPressure)
+        assert pressure_band.point == experiment.pressure_environment.total_pressure_Pa.state.value.point
+        assert pressure_band.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
+        assert pressure_band.low < pressure_band.point < pressure_band.high
         assert identity.fO2_Pa.is_not_applicable
         assert identity.fO2_Pa.reason == "oxygen_unbuffered_vacuum"
         assert run_id == obs.experiment_id.split("::experiment::")[-1]
