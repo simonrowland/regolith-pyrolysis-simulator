@@ -50,12 +50,13 @@ from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader imp
     ROLE,
     SOURCE_ID,
 )
+from simulator.physical_constants import BAR_PA_DECIMAL
 
 RECORDS_DIR = COMPILATION_ROOT / "records"
 SOURCE_PATH_PREFIX = (
     "data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records"
 )
-STANDARD_PRESSURE_PA = Decimal("100000")
+STANDARD_PRESSURE_PA = BAR_PA_DECIMAL
 B1544_R_J_PER_MOL_K = Decimal("8.3143")
 B1544_R_SOURCE = (
     "B1544 does not print a gas constant. R = 8.3143 J/(mol K) is inherited from "

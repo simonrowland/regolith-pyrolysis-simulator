@@ -72,7 +72,10 @@ from engines.builtin.overhead_bleed import (
     EffectiveTransportCapacity,
     controlled_flow_capacity,
 )
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET  # K — Celsius-to-Kelvin offset
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,  # K — Celsius-to-Kelvin offset
+    PA_PER_BAR,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0  # kg/mol — O2 molar mass; g/mol -> kg/mol
@@ -787,9 +790,9 @@ class OverheadGasModel:
             _required_finite_nonnegative_float(
                 effective_transport_capacity.downstream_pressure_bar,
                 'effective_transport_capacity.downstream_pressure_bar',
-            ) * 1.0e5
+            ) * PA_PER_BAR
             if controlled_flow
-            else self._resolve_downstream_pressure(melt, p_downstream_bar) * 1.0e5
+            else self._resolve_downstream_pressure(melt, p_downstream_bar) * PA_PER_BAR
         )  # Pa — derived or explicit downstream/reference pressure; bar -> Pa
         # Preserve the existing gas-transport path: Poiseuille conductance has
         # historically used melt/gas temperature. The liner trajectory controls
@@ -820,7 +823,7 @@ class OverheadGasModel:
             vapor_pressure_mbar = self._vapor_pressure_mbar_from_flux(  # mbar — steady-state throughput pressure, sqrt(Poiseuille balance)
                 total_evap_kg_hr / 3600.0,  # kg/s — evaporation mass flow
                 conductance_temperature_C,
-                p_downstream_bar=downstream_pressure_Pa / 1.0e5,
+                p_downstream_bar=downstream_pressure_Pa / PA_PER_BAR,
                 species_kg_for_M_avg=evap_flux.species_kg_hr,
             )
         elif not controlled_flow:
@@ -876,7 +879,7 @@ class OverheadGasModel:
             'pipe_capacity_used_pct': pipe_capacity_used_pct,  # percent — capacity used
             'vapor_pressure_mbar': vapor_pressure_mbar,  # mbar — steady-state vapor partial pressure
             'pressure_mbar': pressure_mbar,  # mbar — reported total overhead pressure
-            'p_downstream_bar': downstream_pressure_Pa / 1.0e5,
+            'p_downstream_bar': downstream_pressure_Pa / PA_PER_BAR,
             'transport_binding_cause': (
                 effective_transport_capacity.binding_cause
                 if controlled_flow
@@ -932,7 +935,7 @@ class OverheadGasModel:
             retained_holdup_kg=retained_holdup_kg,
             dt_hr=dt_hr,
             equipment_capacity_required=equipment_capacity_required,
-            upstream_pressure_bar=allowed_pressure_Pa / 1.0e5,
+            upstream_pressure_bar=allowed_pressure_Pa / PA_PER_BAR,
         )
 
     def _resolve_liner_temperature_value(
@@ -1419,7 +1422,7 @@ class OverheadGasModel:
                                    temperature_K: float) -> dict[str, float]:  # K — gas temperature
         if volume_m3 <= 0.0 or temperature_K <= 0.0:
             return {}
-        scale = GAS_CONSTANT * temperature_K / (volume_m3 * 1.0e5)  # bar/mol — ideal-gas pressure factor; Pa -> bar
+        scale = GAS_CONSTANT * temperature_K / (volume_m3 * PA_PER_BAR)  # bar/mol — ideal-gas pressure factor; Pa -> bar
         return {
             str(species): max(0.0, float(mol)) * scale  # bar — species partial pressure
             for species, mol in dict(holdup_mol or {}).items()  # mol — species gas holdup
@@ -1661,7 +1664,7 @@ class OverheadGasModel:
         denominator = math.pi * M_avg * d**4
         if denominator <= 0.0:
             return 0.0
-        p_downstream_Pa = max(0.0, p_downstream_bar) * 1.0e5  # Pa — bar -> Pa
+        p_downstream_Pa = max(0.0, p_downstream_bar) * PA_PER_BAR  # Pa — bar -> Pa
         # F-112 inverse derivation:
         # premise: F = C * (P_up^2 - P_down^2).
         # algebra: P_up = sqrt(F / C + P_down^2).

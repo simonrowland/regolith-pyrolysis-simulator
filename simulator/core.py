@@ -701,6 +701,7 @@ from simulator.chemistry.kernel import (
     normalize_chemistry_kernel_config,
     normalize_oxygen_sink_channel_mode,
 )
+from simulator.physical_constants import PA_PER_BAR
 from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
 # BuiltinVaporPressureProvider is imported lazily inside
 # _build_chemistry_kernel: simulator/__init__.py -> simulator.core ->
@@ -4349,7 +4350,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if volume_m3 <= 0.0 or T_head_K <= 0.0:
             return 0.0
         return o2 * GAS_CONSTANT * T_head_K / (
-            volume_m3 * 1.0e5
+            volume_m3 * PA_PER_BAR
         )
 
     def _headspace_o2_mol_for_pO2_bar(self, pO2_bar: float) -> float:
@@ -4359,7 +4360,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 0.0
         return (
             max(0.0, float(pO2_bar))
-            * 1.0e5
+            * PA_PER_BAR
             * volume_m3
             / (GAS_CONSTANT * T_head_K)
         )
@@ -4413,7 +4414,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if volume_m3 > 0.0 and T_head_K > 0.0:
                     p_total_bar = (
                         total_mol * GAS_CONSTANT * T_head_K
-                        / (volume_m3 * 1.0e5)
+                        / (volume_m3 * PA_PER_BAR)
                     )
                 from engines.builtin.overhead_bleed import (
                     compressible_pressure_capacity_fraction,
@@ -7274,7 +7275,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if capacity_result is not None
                 else self._headspace_ledger_pO2_bar_from_o2_mol(
                     self._overhead_holdup_mol().get(OXYGEN_SPECIES, 0.0)
-                ) * 100000.0
+                ) * PA_PER_BAR
             )
             controls.update({
                 'cold_train_capacity': capacity,
@@ -7300,7 +7301,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if capacity_result is not None:
                 controls['p_total_bar'] = sum(
                     capacity_result.partial_pressures_Pa.values()
-                ) / 100000.0
+                ) / PA_PER_BAR
         result = self._dispatch_and_commit(
             ChemistryIntent.OVERHEAD_BLEED,
             control_inputs=controls,
@@ -7562,7 +7563,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ),
                 ),
                 downstream_pressure_Pa=(
-                    self._headspace_downstream_pressure_bar() * 100000.0
+                    self._headspace_downstream_pressure_bar() * PA_PER_BAR
                 ),
                 k_relief_kg_hr_Pa=cold_train.relief['k_relief_kg_hr_Pa'],
                 p_open_Pa=cold_train.relief['p_open_Pa'],

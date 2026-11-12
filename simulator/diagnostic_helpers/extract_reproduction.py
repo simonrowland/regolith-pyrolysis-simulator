@@ -57,7 +57,7 @@ from simulator.chemistry.melt_activity import (
     melt_oxide_activity,
     melt_oxide_activity_coefficient,
 )
-from simulator.physical_constants import GAS_CONSTANT_10SIG
+from simulator.physical_constants import GAS_CONSTANT_10SIG, PA_PER_BAR
 from simulator.state import MOLAR_MASS
 from simulator.diagnostic_helpers.qualitative_skip import qualitative_payload_skip_reason
 from simulator.diagnostic_helpers.reproduction_compare import (
@@ -92,7 +92,7 @@ KEMS_SOURCE_PREFIX = "kems-"
 # Dual of tests/test_physics_ground_truth.py: P_sat(T_b) = 101325 Pa.
 STANDARD_ATMOSPHERE_PA = 101325.0
 # JANAF construction boiling temperatures are 1-bar (fugacity = 1), not 1 atm.
-STANDARD_BAR_PA = 100000.0
+STANDARD_BAR_PA = PA_PER_BAR
 
 # Documented defaults when an observation carries no usable numeric uncertainty.
 # These are stated per-observation on the comparison record (defaulted=true).
@@ -736,7 +736,7 @@ def resolve_chamber_pressure_pa(obs: AdoptedObservation) -> tuple[float | None, 
         "pascal": 1.0,
         "mbar": 100.0,
         "millibar": 100.0,
-        "bar": 1.0e5,
+        "bar": PA_PER_BAR,
         "torr": 133.322368,
         "mmhg": 133.322368,
     }
@@ -847,7 +847,7 @@ def _antoine_fallback_pressure_scale_pa(source_form: str) -> float | None:
     if "mmhg" in tokens or {"mm", "hg"} <= tokens or "mm" in tokens:
         return 133.322368
     if "bar" in tokens:
-        return 1.0e5
+        return PA_PER_BAR
     return None
 
 
@@ -884,8 +884,8 @@ def _literature_pressure_points(
                 ("p_Pa", 1.0, "Pa"),
                 ("P_Pa", 1.0, "Pa"),
                 ("pressure_Pa", 1.0, "Pa"),
-                ("p_bar", 1.0e5, "Pa"),
-                ("P_bar", 1.0e5, "Pa"),
+                ("p_bar", PA_PER_BAR, "Pa"),
+                ("P_bar", PA_PER_BAR, "Pa"),
                 ("p_mmHg", 133.322368, "Pa"),
                 ("P_mmHg", 133.322368, "Pa"),
                 ("p_torr", 133.322368, "Pa"),
@@ -1063,7 +1063,7 @@ def _literature_pressure_points(
             if use_pa or "A_Pa" in coefficient_values:
                 P = 10.0**log10_p
             elif use_bar:
-                P = (10.0**log10_p) * 1.0e5
+                P = (10.0**log10_p) * PA_PER_BAR
             elif use_mmhg:
                 P = (10.0**log10_p) * 133.322368
             else:
@@ -1074,7 +1074,7 @@ def _literature_pressure_points(
                     P = (10.0**log10_p) * scale_pa
                 else:
                     # Prefer Pa-like A magnitude (A~10) vs bar (A~4-6) heuristic.
-                    P = 10.0**log10_p if A >= 7.0 else (10.0**log10_p) * 1.0e5
+                    P = 10.0**log10_p if A >= 7.0 else (10.0**log10_p) * PA_PER_BAR
             if not (math.isfinite(P) and P > 0.0):
                 drops.append(
                     {

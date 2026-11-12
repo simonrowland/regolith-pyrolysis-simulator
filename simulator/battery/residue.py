@@ -24,6 +24,7 @@ from simulator.battery.oxygen_balance import (
     _solve_vacuum_oxygen_balance,
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
+from simulator.physical_constants import PA_PER_BAR
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
 
@@ -632,7 +633,7 @@ def _finite_step_fluxes(
             species_formula_registry={},
         ),
         temperature_C=temperature_K - 273.15,
-        pressure_bar=background_pressure_Pa / 100_000.0,
+        pressure_bar=background_pressure_Pa / PA_PER_BAR,
         control_inputs={
             "vapour_batch_flux_pressures_Pa": {
                 term.source.species: _net_evaporation_pressure_Pa(
@@ -1382,7 +1383,7 @@ def _make_residue_pressure_model(
                 str(species): (
                     float(base_pressure_bar.get(species, 0.0))
                     * pO2_bar ** pressure_exponents[str(species)]
-                    * 100_000.0
+                    * PA_PER_BAR
                 )
                 for species, _reaction in gas_channels
             }
@@ -1400,7 +1401,6 @@ def _make_residue_pressure_model(
             _new_internal_analytical_core,
         )
         from simulator.chemistry.offgas_fo2 import OffgasFO2Unavailable, _oxygen_atom_partial_pressure_bar
-        from simulator.physical_constants import PA_PER_BAR
         from simulator.vapour_rail.nasa_cea import NasaCeaError
 
         analytical_core = _new_internal_analytical_core()
@@ -1427,7 +1427,7 @@ def _make_residue_pressure_model(
                 response = _internal_analytical_vapor_pressure_adapter(
                     core=analytical_core,
                     temperature_C=temperature_K - 273.15,
-                    pressure_bar=total_pressure_Pa / 100_000.0,
+                    pressure_bar=total_pressure_Pa / PA_PER_BAR,
                     composition_kg=None,
                     composition_mol=inventory,
                     fO2_log=log10_pO2_bar,
@@ -1976,7 +1976,7 @@ def predict_knudsen_residue_composition(
                 notice = replace(notice, reason=notice.reason + "; SC-360: d-142 is about 3 dex (W) / 2.5 dex (Mo) above measured cell pO2; pO2 sets relative volatility via P_i proportional to pO2^-nu")
                 if notice not in notices:
                     notices.append(notice)
-        source_logs.append(None if pressure is None else math.log10(float(pressure) / 100000.0))
+        source_logs.append(None if pressure is None else math.log10(float(pressure) / PA_PER_BAR))
         oxygen_sources.append({"mass_loss_fraction": x, "temperature_K": t, "source": source, "used_observations": used})
     provenance = {
         "measured_mass_loss_fraction": target, "temperature_path": path,
@@ -3753,7 +3753,7 @@ def _predict_sossi_residue_cohort(
                 return {
                     species: float(base.get(species, 0.0))
                     * pO2_bar ** pO2_exponents[species]
-                    * 100_000.0
+                    * PA_PER_BAR
                     for species, _parent, _n, _o2 in gas_channels
                     if species in pO2_exponents
                 }
@@ -3773,7 +3773,7 @@ def _predict_sossi_residue_cohort(
                 response = _internal_analytical_vapor_pressure_adapter(
                     core=analytical_core,
                     temperature_C=temperature_K - 273.15,
-                    pressure_bar=total_pressure_Pa / 100_000.0,
+                    pressure_bar=total_pressure_Pa / PA_PER_BAR,
                     composition_kg=None,
                     composition_mol=composition,
                     fO2_log=log10_pO2_bar,

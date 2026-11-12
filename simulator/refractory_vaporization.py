@@ -10,10 +10,11 @@ from scipy.optimize import brentq
 
 from simulator.accounting.formulas import parse_formula
 from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+from simulator.physical_constants import PA_PER_BAR
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
-STANDARD_PRESSURE_PA = 100_000.0
+STANDARD_PRESSURE_PA = PA_PER_BAR
 _DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "refractory_vapor_species.yaml"
 _LOG10_ACTIVITY_MIN = -80.0
 _LOG10_ACTIVITY_MAX = 10.0

@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from engines.antoine import _read_antoine_coefficients  # noqa: E402
-from simulator.physical_constants import GAS_CONSTANT  # noqa: E402
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR  # noqa: E402
 from simulator.vapour_rail.catalog import compile_vapour_rail_catalog  # noqa: E402
 from simulator.vapour_rail.channels import (  # noqa: E402
     ChannelCompositionRefusal,
@@ -668,7 +668,7 @@ def _catalog_self_row(
             points.append(
                 {
                     "temperature_K": temperature,
-                    "pressure_Pa": math.exp(ln_p_bar) * 1.0e5,
+                    "pressure_Pa": math.exp(ln_p_bar) * PA_PER_BAR,
                 }
             )
         model = {
@@ -809,7 +809,7 @@ def _catalog_self_row(
         enthalpy, entropy = (float(match.group(1)), float(match.group(2)))
         gas_constant = 1.98720425864083 if "cal_mol" in source_form else GAS_CONSTANT
         standard_pressure = str(correlation.get("standard_pressure") or "1 bar").lower()
-        pressure_standard_pa = 101325.0 if "atm" in standard_pressure else 100000.0
+        pressure_standard_pa = 101325.0 if "atm" in standard_pressure else PA_PER_BAR
         reference_coefficients = {
             "A": math.log10(pressure_standard_pa)
             + entropy / (gas_constant * math.log(10.0)),

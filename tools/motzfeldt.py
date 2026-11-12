@@ -127,7 +127,7 @@ if str(ROOT) not in sys.path:
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-from simulator.physical_constants import GAS_CONSTANT_10SIG  # noqa: E402
+from simulator.physical_constants import GAS_CONSTANT_10SIG, PA_PER_BAR  # noqa: E402
 from validate_literature_extracts import (  # noqa: E402
     EXTRACTS_DIR as _VLE_EXTRACTS,
     discover_extracts,
@@ -188,7 +188,7 @@ PRESSURE_TO_PA: dict[str, float] = {
     "pascals": 1.0,
     "kpa": 1.0e3,
     "mpa": 1.0e6,
-    "bar": 1.0e5,
+    "bar": PA_PER_BAR,
     "mbar": 1.0e2,
     "atm": 101325.0,
     "torr": 133.322368421,

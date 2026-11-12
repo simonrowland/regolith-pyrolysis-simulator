@@ -18,7 +18,7 @@ from simulator.oxygen_buffers import (
     feo_iw_log10_fO2_bar,
     legacy_iw_log10_fO2_bar,
 )
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -227,7 +227,7 @@ def _kress91_temperature_pressure_term(
             'Kress91 invalid control pressure_bar: expected finite positive '
             f'value or None, got {pressure_bar!r}'
         )
-    p_pa = max(p_bar, 1.0e-9) * 100000.0
+    p_pa = max(p_bar, 1.0e-9) * PA_PER_BAR
     return (
         term
         + KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / float(T_K))
@@ -890,7 +890,7 @@ def _kress91_ln_ratio(
         # math.log(0.0) raises (BUG-159). This product is the canonical term.
         fo2_term = KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
     x = mol_fractions
-    p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
+    p_pa = max(float(pressure_bar), 1.0e-9) * PA_PER_BAR
     return (
         fo2_term
         + KRESS91_INV_T_COEFFICIENT_K / float(T_K)
