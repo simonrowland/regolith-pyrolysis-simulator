@@ -11,8 +11,10 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Phase, PhaseRole, Quantity, ValueKind
+from simulator.battery.identity import Identity
 from simulator.battery.migrate import (
     _point_condition_from_plain,
+    _point_pressure_for_identity,
     _pressure_locator_is_unprinted,
     _printed_source_point_condition_pressure,
     _without_unprinted_total_pressure,
@@ -260,6 +262,104 @@ def test_unprinted_pressure_guard_uses_source_provenance() -> None:
     ) is None
     assert _printed_source_point_condition_pressure(unlocated) is None
     assert _without_unprinted_total_pressure({"total_pressure_Pa": unlocated}) is None
+
+
+def test_located_approximate_print_stays_off_identity_and_calibration() -> None:
+    """A located approximate print stays off identity.
+
+    Identity.total_pressure_Pa cannot carry the approximate flag, so the
+    axis is absent. Calibration readers refuse the same print. Inferred,
+    locatorless, and bound pressures stay off identity. Absence is not
+    replaced by a default. An exact located point still maps.
+    """
+
+    approximate = _point_condition_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "point",
+                    "point": "0.0001",
+                    "approximate": True,
+                },
+            },
+            "locator": {"page": 8, "note": "About 10^-6 mbar"},
+        },
+        key="total_pressure_Pa",
+    )
+    identity = Identity(quantity=State.of(Quantity.VISCOSITY), species=None)
+    assert (
+        _point_pressure_for_identity(identity, {"total_pressure_Pa": approximate})
+        is None
+    )
+    assert _printed_source_point_condition_pressure(approximate) is None
+
+    exact = _point_condition_from_plain(
+        {
+            "state": {"tag": "value", "value": "101325"},
+            "locator": {"page": 8, "note": "1 atm"},
+        },
+        key="total_pressure_Pa",
+    )
+    mapped = _point_pressure_for_identity(identity, {"total_pressure_Pa": exact})
+    assert mapped is not None and mapped.is_value
+    assert mapped.value == Decimal("101325")
+
+    inferred = _point_condition_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "point",
+                    "point": "0.0001",
+                    "approximate": True,
+                },
+            },
+            "locator": {"page": 8},
+            "inferred": True,
+            "inference": "assumed vacuum",
+        },
+        key="total_pressure_Pa",
+    )
+    assert (
+        _point_pressure_for_identity(identity, {"total_pressure_Pa": inferred})
+        is None
+    )
+
+    bound = _point_condition_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "bound",
+                    "bound_operator": "<",
+                    "bound_value": "0.0001",
+                },
+            },
+            "locator": {"page": 74},
+        },
+        key="total_pressure_Pa",
+    )
+    assert _point_pressure_for_identity(identity, {"total_pressure_Pa": bound}) is None
+
+    locatorless = _point_condition_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "point",
+                    "point": "0.0001",
+                    "approximate": True,
+                },
+            },
+        },
+        key="total_pressure_Pa",
+    )
+    assert (
+        _point_pressure_for_identity(identity, {"total_pressure_Pa": locatorless})
+        is None
+    )
+    assert _point_pressure_for_identity(identity, {}) is None
 
 
 def test_pressure_locator_note_negation_is_not_an_inference() -> None:
