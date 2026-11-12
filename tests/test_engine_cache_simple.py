@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import os
 import sqlite3
-import pickle
 import subprocess
 import sys
 import threading
@@ -17,7 +16,7 @@ from typing import Any
 import pytest
 
 from simulator import engine_cache
-from simulator.engine_cache import CacheValue, drop_chemistry_version, engine_cache_key, load_cache_rows
+from simulator.engine_cache import drop_chemistry_version, engine_cache_key, load_cache_rows
 from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell, Po2Request
 from simulator.melt_backend.base import (
     EquilibriumResult,
@@ -283,7 +282,7 @@ def test_engine_cache_key_preserves_exact_float_values() -> None:
     )
 
 
-def test_raw_key_hot_json_cold_compression_and_exact_round_trip(
+def test_raw_key_hot_json_compression_and_exact_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -292,19 +291,18 @@ def test_raw_key_hot_json_cold_compression_and_exact_round_trip(
     monkeypatch.setattr(engine_cache, "_RUNTIME_IDENTITIES", {})
     _engine_cache_counters(reset=True)
     hot = {"status": "ok", "activity": 0.12345678901234566}
-    cold = {"diagnostic": "not read on the hot path", "values": [1, 2, 3]}
     request = {"temperature_K": 1700.0}
     digest = engine_cache_key("openimcc", "1", request)
 
     assert isinstance(digest, bytes) and len(digest) == 32
     assert engine_cache.cached_engine_call(
-        "openimcc", request, lambda: CacheValue(hot, cold)
+        "openimcc", request, lambda: hot
     ) == hot
     assert engine_cache.cached_engine_call(
         "openimcc", request, lambda: pytest.fail("expected hot hit")
     ) == hot
 
-    cold_database = database.with_name(database.name + ".cold")
+    assert not database.with_name(database.name + ".cold").exists()
     with sqlite3.connect(database) as connection:
         row = connection.execute(
             "SELECT key, value, engine, chem_version, source_box, row_seq "
@@ -316,11 +314,6 @@ def test_raw_key_hot_json_cold_compression_and_exact_round_trip(
         "status": "ok",
     }
     assert row[2:4] == ("openimcc", "1")
-    with sqlite3.connect(cold_database) as connection:
-        cold_value = connection.execute(
-            "SELECT value FROM engine_outputs_cold WHERE key=?", (digest,)
-        ).fetchone()[0]
-    assert pickle.loads(zlib.decompress(cold_value)) == cold
 
 
 def test_sqlite_hit_populates_bounded_memory_cache_and_next_hit_skips_sqlite(
@@ -593,15 +586,6 @@ def test_stale_runtime_warns_once_without_changing_hits_or_results(
         "store_error": 0,
         "read_error": 0,
     }
-    with sqlite3.connect(database.with_name(database.name + ".cold")) as connection:
-        cold_value = pickle.loads(
-            zlib.decompress(
-                connection.execute(
-                    "SELECT value FROM engine_outputs_cold"
-                ).fetchone()[0]
-            )
-        )
-    assert cold_value["_engine_runtime_identity"] == "old"
 
 
 def test_runtime_identity_is_computed_once_per_engine(
@@ -837,7 +821,7 @@ def test_isolated_cell_cache_stores_only_compact_hot_fields(
     assert isolated._worker.calls == 1
 
 
-def test_equilibrium_hot_value_contains_only_scoring_inputs() -> None:
+def test_equilibrium_cache_value_contains_only_scoring_inputs() -> None:
     result = EquilibriumResult(
         temperature_C=1000.0,
         pressure_bar=1.0,
@@ -873,16 +857,9 @@ def test_equilibrium_hot_value_contains_only_scoring_inputs() -> None:
 
     value = result.to_engine_cache_value(engine_id="openimcc")
 
-    assert isinstance(value.hot, list)
-    assert "phase_masses_kg" in value.cold
-    assert "temperature_C" in value.cold
-    assert "diagnostics" in value.cold
-    assert value.cold["diagnostics"] == {"unused": "large"}
-    assert "warnings" not in value.cold
-    assert "imcc_notices" not in value.cold
-    assert "imcc_model_id" not in value.cold
+    assert isinstance(value, list)
     restored = EquilibriumResult.from_engine_cache_value(
-        value.hot, engine_id="openimcc"
+        value, engine_id="openimcc"
     )
     assert restored.activity_coefficients == result.activity_coefficients
     assert restored.vapor_pressures_Pa == result.vapor_pressures_Pa
@@ -964,7 +941,7 @@ def test_openimcc_hot_json_compresses_to_400_bytes() -> None:
         for name, value in result.reported_activity_coefficients.items()
     }
 
-    hot = result.to_engine_cache_value().hot
+    hot = result.to_engine_cache_value()
     raw = json.dumps(hot, separators=(",", ":"), ensure_ascii=True).encode("ascii")
 
     assert len(zlib.compress(raw, level=6)) <= 400
@@ -1108,7 +1085,7 @@ def test_corrupt_hot_json_is_a_miss_and_is_replaced(
 
     assert call("alphamelts", request, solve) == "result"
     with sqlite3.connect(database) as connection:
-        connection.execute("UPDATE engine_outputs SET value = ?", (b"not a pickle",))
+        connection.execute("UPDATE engine_outputs SET value = ?", (b"not compressed JSON",))
     engine_cache._MEMORY_CACHE.clear()
     assert call("alphamelts", request, solve) == "result"
     assert call("alphamelts", request, solve) == "result"
@@ -1134,7 +1111,7 @@ def test_store_encoding_failure_returns_live_value_and_counts_error(
     result = _cached_engine_call()(
         "openimcc",
         {"temperature_K": 1700.0},
-        lambda: CacheValue(hot, {"unused": "cold"}),
+        lambda: hot,
     )
 
     assert result is hot
@@ -1160,7 +1137,7 @@ def test_malformed_hot_value_is_a_counted_miss_and_replaced(
     call = _cached_engine_call()
     assert call("openimcc", request, lambda: {"answer": 1}) == {"answer": 1}
 
-    connection = engine_cache._connect(database, root=database, readonly=False, cold=False)
+    connection = engine_cache._connect(database, root=database, readonly=False)
     assert connection is not None
     digest = engine_cache_key("openimcc", 1, request)
     connection.execute(
@@ -1194,13 +1171,13 @@ def test_equilibrium_cache_maps_use_compact_canonical_json_objects() -> None:
         }
     )
 
-    assert isinstance(result.hot[3], dict)
-    assert isinstance(result.hot[4], dict)
-    assert isinstance(result.hot[6], dict)
-    assert isinstance(result.hot[7], dict)
-    assert isinstance(result.hot[9], dict)
-    assert isinstance(result.hot[10], dict)
-    restored = equilibrium_cache_from_value(result.hot)
+    assert isinstance(result[3], dict)
+    assert isinstance(result[4], dict)
+    assert isinstance(result[6], dict)
+    assert isinstance(result[7], dict)
+    assert isinstance(result[9], dict)
+    assert isinstance(result[10], dict)
+    restored = equilibrium_cache_from_value(result)
     assert restored["activity_coefficients"] == {"FeO": 0.91}
     assert restored["reported_activity_coefficients"] == {"FeO": 0.89}
     assert restored["vapor_pressures_Pa"] == {"SiO": 12.5}
@@ -1386,11 +1363,11 @@ def test_equilibrium_hot_uses_notice_and_warning_codes_with_parameters() -> None
         engine_id="openimcc",
     )
 
-    metadata = value.hot[11]
+    metadata = value[11]
     assert metadata["notice_codes"] == tuple(sorted(metadata["notice_codes"]))
     assert metadata["warning_codes"] == tuple(sorted(metadata["warning_codes"]))
     assert all(type(code) is int for code in metadata["notice_codes"])
-    restored = equilibrium_cache_from_value(value.hot, engine_id="openimcc")
+    restored = equilibrium_cache_from_value(value, engine_id="openimcc")
     assert restored["diagnostics"]["imcc_notices"] == [notice]
     assert restored["warnings"] == ["OpenIMCC emitted a diagnostic warning"]
 
@@ -1423,7 +1400,7 @@ def test_equilibrate_cell_hot_reuses_cell_certified_band_for_notices() -> None:
         ],
     )
 
-    hot = cell.to_engine_cache_value().hot
+    hot = cell.to_engine_cache_value()
 
     assert hot[11][6] == band
     assert hot[11][7]["codes"] == (3,)

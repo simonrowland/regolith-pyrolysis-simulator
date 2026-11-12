@@ -8,7 +8,7 @@ absent.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import metadata
 from importlib import resources
@@ -263,16 +263,6 @@ class OpenImccBindingDigestUnavailableError(RuntimeError):
             f"{OPENIMCC_RECORDED_PIN}"
         )
         super().__init__(self.backend_status_reason)
-
-
-def _plain_cache_data(value: Any) -> Any:
-    if isinstance(value, Mapping):
-        return {key: _plain_cache_data(item) for key, item in value.items()}
-    if isinstance(value, tuple):
-        return tuple(_plain_cache_data(item) for item in value)
-    if isinstance(value, list):
-        return [_plain_cache_data(item) for item in value]
-    return value
 
 
 @dataclass(frozen=True)
@@ -1249,7 +1239,7 @@ def evaluate_redox(
     entry: str = "openimcc.evaluate_redox",
 ) -> Any:
     import openimcc
-    from simulator.engine_cache import CacheValue, cached_engine_call, record_engine_open
+    from simulator.engine_cache import cached_engine_call, record_engine_open
 
     record_engine_open("openimcc")
 
@@ -1261,7 +1251,7 @@ def evaluate_redox(
         "lambda_imposed": lambda_imposed,
     }
 
-    def solve() -> CacheValue:
+    def solve() -> Any:
         if entry == "openimcc.redox.evaluate_redox":
             import openimcc.redox as openimcc_redox
 
@@ -1271,13 +1261,7 @@ def evaluate_redox(
                 inventory, temperature_K, mode, lambda_imposed=lambda_imposed
             )
         lean = OpenImccRedoxResult.from_engine_result(result)
-        consumed = set(lean.lean())
-        cold = {
-            item.name: _plain_cache_data(getattr(result, item.name))
-            for item in fields(result)
-            if item.name not in consumed
-        }
-        return CacheValue(lean.lean(), cold)
+        return lean.lean()
 
     payload = cached_engine_call("openimcc", request, solve)
     return OpenImccRedoxResult.from_lean(payload)

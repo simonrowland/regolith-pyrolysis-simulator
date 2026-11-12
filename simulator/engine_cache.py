@@ -1,4 +1,4 @@
-"""One process-local HOT/COLD SQLite cache for engine outputs."""
+"""One process-local HOT SQLite cache for engine outputs."""
 
 from __future__ import annotations
 
@@ -7,7 +7,6 @@ import importlib.metadata
 import json
 import logging
 import os
-import pickle
 import shutil
 import socket
 import sqlite3
@@ -18,7 +17,6 @@ from collections import OrderedDict
 from collections.abc import Iterable, Mapping
 from contextlib import contextmanager
 from contextvars import ContextVar
-from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
@@ -36,9 +34,8 @@ ENGINE_CHEMISTRY_VERSION = {
     "thermoengine": 2,
 }
 
-# Request-key discriminator for the battery HOT payload layout. Change it when
-# a reader starts requiring fields absent from entries written by the prior
-# layout; chemistry versions remain reserved for prediction changes.
+# Request-key discriminator for the battery HOT payload layout; removed in
+# the dedicated chemistry-version key migration.
 BATTERY_ENGINE_CACHE_SCHEMA = 2
 
 # Bump only when an engine change can alter predictions. Runtime identity is
@@ -84,10 +81,9 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
 OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406dff8b1d7c3e3002fa69d"
 
 _TABLE = "engine_outputs"
-_COLD_TABLE = "engine_outputs_cold"
 _TIMEOUT_MS = 60_000
 _LOCK = threading.RLock()
-_CONNECTIONS: dict[tuple[str, bool, bool], sqlite3.Connection] = {}
+_CONNECTIONS: dict[tuple[str, bool], sqlite3.Connection] = {}
 _CONNECTION_PID: int | None = None
 _CONNECTION_ROOT: Path | None = None
 _CONNECTION_READONLY = False
@@ -139,14 +135,6 @@ ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS = {
         "constructor:thermoengine_equilibrate_timeout_s": "The battery opener leaves the equilibrate timeout at its fixed operational default.",
     },
 }
-
-
-@dataclass(frozen=True)
-class CacheValue:
-    """Engine output split into the consumed HOT fields and unused COLD fields."""
-
-    hot: Any
-    cold: Any = None
 
 
 class EngineCacheSchemaMismatch(RuntimeError):
@@ -607,15 +595,6 @@ def _decode_hot(value: Any) -> Any:
     return value
 
 
-def _cold_with_runtime_identity(engine_id: str, cold: Any) -> Any:
-    identity = _RUNTIME_IDENTITIES.get(engine_id)
-    if identity is None:
-        return cold
-    if isinstance(cold, Mapping):
-        return {**cold, "_engine_runtime_identity": identity}
-    return {"_engine_runtime_identity": identity, "payload": cold}
-
-
 def _close_connections() -> None:
     global _CONNECTION_PID, _CONNECTION_ROOT
     for connection in _CONNECTIONS.values():
@@ -643,9 +622,7 @@ def _remember_memory_value(key: tuple[str, bytes, bool], value: Any) -> None:
         _MEMORY_CACHE.popitem(last=False)
 
 
-def _connect(
-    path: Path, *, root: Path, readonly: bool, cold: bool
-) -> sqlite3.Connection | None:
+def _connect(path: Path, *, root: Path, readonly: bool) -> sqlite3.Connection | None:
     global _CONNECTION_PID, _CONNECTION_ROOT, _CONNECTION_READONLY
     pid = os.getpid()
     if _CONNECTION_PID != pid:
@@ -659,7 +636,7 @@ def _connect(
         _close_connections()
         _CONNECTION_ROOT = root
         _CONNECTION_READONLY = readonly
-    key = (str(path), readonly, cold)
+    key = (str(path), readonly)
     if key in _CONNECTIONS:
         return _CONNECTIONS[key]
     if readonly:
@@ -688,34 +665,24 @@ def _connect(
                     connection.close()
                     raise
                 time.sleep(0.01)
-    table = _COLD_TABLE if cold else _TABLE
-    expected = (
-        ["key", "value"]
-        if cold
-        else ["key", "value", "engine", "chem_version", "source_box", "row_seq"]
-    )
+    table = _TABLE
+    expected = ["key", "value", "engine", "chem_version", "source_box", "row_seq"]
     columns = connection.execute(f"PRAGMA table_info({table})").fetchall()
     found = [row[1] for row in columns]
     if columns and found != expected:
         connection.close()
         raise EngineCacheSchemaMismatch(table, expected, found)
     if not readonly:
-        if cold:
-            connection.execute(
-                f"CREATE TABLE IF NOT EXISTS {table} "
-                "(key BLOB PRIMARY KEY, value BLOB NOT NULL) WITHOUT ROWID"
-            )
-        else:
-            connection.execute(
-                f"CREATE TABLE IF NOT EXISTS {table} "
-                "(key BLOB PRIMARY KEY, value BLOB NOT NULL, engine TEXT NOT NULL, "
-                "chem_version TEXT NOT NULL, source_box TEXT NOT NULL, "
-                "row_seq INTEGER NOT NULL) WITHOUT ROWID"
-            )
-            connection.execute(
-                "CREATE INDEX IF NOT EXISTS engine_outputs_engine_version "
-                "ON engine_outputs(engine, chem_version)"
-            )
+        connection.execute(
+            f"CREATE TABLE IF NOT EXISTS {table} "
+            "(key BLOB PRIMARY KEY, value BLOB NOT NULL, engine TEXT NOT NULL, "
+            "chem_version TEXT NOT NULL, source_box TEXT NOT NULL, "
+            "row_seq INTEGER NOT NULL) WITHOUT ROWID"
+        )
+        connection.execute(
+            "CREATE INDEX IF NOT EXISTS engine_outputs_engine_version "
+            "ON engine_outputs(engine, chem_version)"
+        )
         connection.commit()
     _CONNECTIONS[key] = connection
     return connection
@@ -744,14 +711,8 @@ def _record_engine_cache_counters(
                 target[name] += int(value)
 
 
-def _hot_and_cold(result: Any) -> tuple[Any, Any]:
-    if isinstance(result, CacheValue):
-        return result.hot, result.cold
-    return result, None
-
-
 def _is_refusal(result: Any) -> bool:
-    value = result.hot if isinstance(result, CacheValue) else result
+    value = result
     status = value.get("status") if isinstance(value, Mapping) else getattr(value, "status", None)
     refusal = (
         value.get("refusal_reason")
@@ -780,12 +741,12 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     if engine_id == "internal-analytical":
         # The backend's core carries state across residue requests, so even a
         # direct cache-helper caller must execute the live solve.
-        return _hot_and_cold(solve())[0]
+        return solve()
     if _CACHE_BYPASSED.get():
-        return _hot_and_cold(solve())[0]
+        return solve()
     path_value = _configured_engine_cache_path()
     if not path_value:
-        return _hot_and_cold(solve())[0]
+        return solve()
     mode = os.environ.get("REGOLITH_ENGINE_CACHE_MODE", "").lower()
     if mode not in {"", "readonly"}:
         raise ValueError(f"unknown engine cache mode {mode!r}")
@@ -803,7 +764,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             counts["hits"] += 1
             return result
 
-    connection = _connect(path, root=path, readonly=readonly, cold=False)
+    connection = _connect(path, root=path, readonly=readonly)
     with _LOCK:
         row = None if connection is None else connection.execute(
             f"SELECT value FROM {_TABLE} WHERE key=?", (cache_key,)
@@ -826,13 +787,11 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 return result
         counts["misses"] += 1
 
-    result = solve()
-    hot, cold = _hot_and_cold(result)
-    if _is_refusal(result) or readonly or connection is None:
+    hot = solve()
+    if _is_refusal(hot) or readonly or connection is None:
         return hot
     try:
         stored_hot = _encode_hot(hot)
-        stored_cold = _cold_with_runtime_identity(engine_id, cold)
         hot_value = zlib.compress(
             json.dumps(
                 stored_hot,
@@ -841,28 +800,15 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 ensure_ascii=True,
                 allow_nan=False,
             ).encode("ascii"),
-            level=9,
+            level=6,
         )
-        cold_value = zlib.compress(pickle.dumps(stored_cold, protocol=5), level=6)
     except Exception:
         with _LOCK:
             _counter_bucket(engine_id)["store_error"] += 1
         return hot
     source_box = _source_box()
-    cold_path = path.with_name(path.name + ".cold")
-    cold_connection: sqlite3.Connection | None = None
     try:
         with _LOCK:
-            cold_connection = _connect(
-                cold_path, root=path, readonly=False, cold=True
-            )
-            assert cold_connection is not None
-            cold_connection.execute("BEGIN IMMEDIATE")
-            cold_connection.execute(
-                f"INSERT OR REPLACE INTO {_COLD_TABLE} (key, value) VALUES (?, ?)",
-                (cache_key, sqlite3.Binary(cold_value)),
-            )
-            cold_connection.commit()
             connection.execute("BEGIN IMMEDIATE")
             row_seq = _next_row_sequence(connection, source_box)
             connection.execute(
@@ -882,21 +828,10 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             _counter_bucket(engine_id)["stores"] += 1
     except Exception:
         with _LOCK:
-            for failed_connection in (connection, cold_connection):
-                if failed_connection is None:
-                    continue
-                try:
-                    failed_connection.rollback()
-                except sqlite3.Error:
-                    pass
-            if cold_connection is not None:
-                try:
-                    cold_connection.execute(
-                        f"DELETE FROM {_COLD_TABLE} WHERE key=?", (cache_key,)
-                    )
-                    cold_connection.commit()
-                except sqlite3.Error:
-                    pass
+            try:
+                connection.rollback()
+            except sqlite3.Error:
+                pass
             _counter_bucket(engine_id)["store_error"] += 1
     with _LOCK:
         _prepare_memory_cache()
@@ -919,7 +854,7 @@ def load_cache_rows(
     rows: Iterable[tuple[bytes, Any, str, str | int, str, int]],
 ) -> int:
     database = Path(path).expanduser()
-    connection = _connect(database, root=database, readonly=False, cold=False)
+    connection = _connect(database, root=database, readonly=False)
     assert connection is not None
     values = []
     for digest, hot, engine, version, source_box, row_seq in rows:
@@ -963,7 +898,7 @@ def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
     if not path_value:
         return 0
     path = Path(path_value).expanduser()
-    connection = _connect(path, root=path, readonly=False, cold=False)
+    connection = _connect(path, root=path, readonly=False)
     assert connection is not None
     cursor = connection.execute(
         f"DELETE FROM {_TABLE} WHERE engine=? AND chem_version=?",
