@@ -452,7 +452,9 @@ class _TableCellParser(HTMLParser):
             self._cell = None
 
 
-def _numeric_table_cells(table_body: object) -> int:
+def _numeric_table_cells(table_body: object) -> int | None:
+    if table_body is None:
+        return None
     if not isinstance(table_body, str):
         raise ExtractTableParseError("table body must be text")
     parser = _TableCellParser()
@@ -521,8 +523,11 @@ def _mineru_roots(corpus: Path, source_id: str) -> list[Path]:
     ]
 
 
-def _mineru_table_cells(corpus: Path, source_id: str) -> dict[str, int]:
+def _mineru_table_cells(
+    corpus: Path, source_id: str
+) -> tuple[dict[str, int], list[str]]:
     cells: dict[str, int] = defaultdict(int)
+    errors: list[str] = []
     for root in _mineru_roots(corpus, source_id):
         if not root.is_dir():
             continue
@@ -536,16 +541,24 @@ def _mineru_table_cells(corpus: Path, source_id: str) -> dict[str, int]:
                 continue
             if not isinstance(content, list):
                 continue
-            for item in content:
+            for item_index, item in enumerate(content, start=1):
                 if not isinstance(item, Mapping) or item.get("type") != "table":
                     continue
                 caption = _caption_text(item.get("table_caption"))
                 key = _table_key(caption)
                 if key is None:
                     continue
-                cells[key] += _numeric_table_cells(item.get("table_body"))
+                if "table_body" not in item or item.get("table_body") is None:
+                    continue
+                try:
+                    numeric_cells = _numeric_table_cells(item["table_body"])
+                except ExtractTableParseError as exc:
+                    errors.append(f"{key} (item {item_index}): {exc}")
+                    continue
+                if numeric_cells is not None:
+                    cells[key] += numeric_cells
         break
-    return dict(cells)
+    return dict(cells), errors
 
 
 def _numeric_point_value_count(node: object) -> int:
@@ -611,16 +624,21 @@ def _extract_table_values(doc: object) -> dict[str, int]:
     return counts
 
 
-def _capture_report(doc: object, corpus: Path) -> list[TableCoverage]:
+def _capture_report(
+    doc: object, corpus: Path
+) -> tuple[list[TableCoverage], list[str]]:
     source_id = str(doc.get("source_id") or "") if isinstance(doc, Mapping) else ""
     if not source_id:
-        return []
-    cells = _mineru_table_cells(corpus, source_id)
+        return [], []
+    cells, errors = _mineru_table_cells(corpus, source_id)
     values = _extract_table_values(doc)
-    return [
-        TableCoverage(table, count, values.get(table, 0))
-        for table, count in sorted(cells.items())
-    ]
+    return (
+        [
+            TableCoverage(table, count, values.get(table, 0))
+            for table, count in sorted(cells.items())
+        ],
+        errors,
+    )
 
 
 def _has_numeric_points(node: object) -> bool:
@@ -1233,7 +1251,8 @@ def evaluate_extract(
     )
     _add(report, "zero-uncertainty", "HARD", _uncertainty_issues(doc))
 
-    report.tables = _capture_report(doc, corpus)
+    report.tables, table_errors = _capture_report(doc, corpus)
+    _add(report, "mineru-table", "HARD", table_errors)
     low_coverage = [
         f"{table.table} {table.percent:.1f}% "
         f"({table.extract_values}/{table.numeric_cells} numeric cells)"
