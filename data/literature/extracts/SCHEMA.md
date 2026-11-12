@@ -180,7 +180,12 @@ not `1`. The whole stored value, including a spaced or attached unit, must
 match, and the characters on either side must not extend it. An extending
 character is an ASCII letter or digit, a Unicode letter, µ, or °, or a
 dot or comma followed by a digit. So `1 K` is not `1 KPa`, and `1` is not
-`1,000`. The token must appear in the cited `line_range` when one is set,
+`1,000`. A space, thin space, or narrow no-break space between the digit
+groups of one number is typography. The first group may be any length and
+each group after it is exactly three digits, so `1 550` is 1550. `12 34`
+is not 1234. A comma is not this separator, so a cell `1,000` is not 1000.
+The same grouped spelling in a numeric cell is that number. The token must
+appear in the cited `line_range` when one is set,
 otherwise in the opened text. A CSV or TSV source is not searched that way:
 the complete table is parsed first, honouring quoted multi-line cells, and
 the locator then selects records that lie entirely inside the cited lines.
@@ -200,15 +205,19 @@ missing table, more than one table in the cited span, a span that cuts a
 table, an index that is not a positive integer, or a cell outside the
 grid is source-blind. `line_range` still chooses which complete table is
 cited.
-Formula-bearing label keys are `formula` and `species` only. Before the
-token comparison, `_{n}`, a bare `_` followed by digits, and Unicode
-subscript digits become plain digits, and a layout space between a letter
-and a digit, or between a digit and an element symbol, is removed. The
-space before the next word stays. In a cell, the whole
-trimmed cell after that fold, and after removing one wrapping `$...$`
-pair, must equal the folded label. In running text the folded label must
-be one complete token. Numbers, numeric strings, and every other key keep
-the un-folded comparison. A page or table number alone is not an open.
+Formula-bearing label keys are `formula` and `species` only. The label is
+normalized before every comparison, including a label with no ASCII digit.
+`_{n}`, a bare `_` followed by digits, Unicode subscript digits, and a `$`
+or `\mathrm{}` wrapped around a subscript become plain digits. A layout
+space is removed only inside the formula token: between an element chain
+and its count, or between that count and the next element symbol. A
+preceding number is not joined, so `6.98 Fe_{2}O_{3}` certifies `Fe2O3`
+and certifies 6.98. In a cell, the whole trimmed cell after that fold, and
+after removing one wrapping `$...$` pair, must equal the folded label. In
+running text the folded label must be one complete token, so `CO` does not
+certify text that contains only `CO₂`, and `SiO₂` does not certify `SiO₂₂`.
+Numbers, numeric strings, and every other key keep the un-folded formula
+comparison. A page or table number alone is not an open.
 A PDF is not opened as text. Do not backfill reviewer fields from the
 extract's own value.
 

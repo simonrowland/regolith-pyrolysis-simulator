@@ -51,11 +51,16 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   ``table_row_number`` and ``table_column_number``) select one cell after
   the HTML table is parsed, rowspan and colspan included. The stored
   number must be that whole trimmed cell. A value in another row does
-  not certify. Formula and species labels are normalized before the
-  token comparison: ``_{n}``, a bare ``_`` digit, and Unicode subscript
-  digits become plain digits, and a layout space inside the formula is
-  removed. Numbers are not normalized. A numeric leaf does not
-  match a formula by that path.
+  not certify. Formula and species labels are normalized before every
+  comparison, including a label with no ASCII digit. ``_{n}``, a bare
+  ``_`` digit, Unicode subscript digits, and a ``$`` or ``\\mathrm{}``
+  that touches a subscript become plain digits. A layout space is removed
+  only inside the formula token, so a preceding number stays separate.
+  ``CO`` is not ``CO₂`` and ``SiO₂`` is not ``SiO₂₂``. A space, thin space,
+  or narrow no-break space between digit groups of one number is
+  typography when each group after the first has exactly three digits:
+  ``1 550`` is ``1550`` and ``12 34`` is not ``1234``. A comma is not that
+  separator. A numeric leaf does not match a formula by the formula fold.
   A leading decimal is a number, so .24 is not a label
   and is not the token -0.24, 10.24, or 0.24. A float spelling is kept
   only when it parses back to the stored number, so
@@ -300,7 +305,8 @@ _TOKEN_LOOKBEHIND_CLASS = "A-Za-z0-9_." + "+" + _DISTINCT_NUMERIC_SIGNS + "-"
 # decimal: ".24" is a number. Without that alternative the string ".91"
 # is not a measured leaf, and the non-numeric substring path treats ".24"
 # as text inside "-.24". Callers scan text only through
-# ``_citation_token_matches``, which folds Unicode signs first and drops
+# ``_citation_token_matches``, which folds Unicode signs and digit-group
+# spaces first and drops
 # any span ``_span_is_complete_printed_value`` rejects. The grammar is not
 # the boundary: a comma is not a hard edge here, and a yielded match is
 # still not a token of ``1,000``. A period is not a hard edge either.
@@ -329,17 +335,47 @@ def _fold_numeric_signs(text: str) -> str:
     return text.translate(_NUMERIC_SIGN_FOLD)
 
 
+# Ordinary space, thin space, and narrow no-break space. One separator
+# between groups. A comma is not this separator: ``1,000`` stays ``1,000``.
+_DIGIT_GROUP_SEPARATORS = " \u2009\u202f"
+_DIGIT_GROUP_RE = re.compile(
+    "(?<![0-9.])"
+    r"(\d+(?:[" + _DIGIT_GROUP_SEPARATORS + r"]\d{3})+)"
+    "(?![0-9])"
+)
+
+
+def _fold_digit_groups(text: str) -> str:
+    """Join digit groups of one integer. A second call keeps the same spans.
+
+    The first group is any length. Each following group is exactly three
+    digits. ``1 550`` and ``12 345`` are ``1550`` and ``12345``. ``12 34``,
+    ``1 55``, and ``6.98 100`` stay apart: the tail is not three digits, or
+    the digits are the fraction of another number.
+    """
+
+    def join(match: re.Match[str]) -> str:
+        grouped = match.group(0)
+        for separator in _DIGIT_GROUP_SEPARATORS:
+            grouped = grouped.replace(separator, "")
+        return grouped
+
+    return _DIGIT_GROUP_RE.sub(join, text)
+
+
 def _citation_token_matches(text: str) -> list[re.Match[str]]:
-    """Numeric tokens after Unicode signs are folded.
+    """Numeric tokens after signs and digit groups are folded.
 
     Spelling equality and string alignment read this list. A sign cannot
     be dropped on one of those paths and kept on another. A match whose
     span fails ``_span_is_complete_printed_value`` is not a token, so
-    ``1`` is not a token of ``1,000``. This grammar is not the coverage
-    membership test: a string that contains a digit is a measured leaf
-    even when this list is empty.
+    ``1`` is not a token of ``1,000``. Digit groups of one number are
+    joined first, so ``1 550`` is the token ``1550`` and ``12 34`` is
+    two tokens. A second fold does not move those spans. This grammar is
+    not the coverage membership test: a string that contains a digit is
+    a measured leaf even when this list is empty.
     """
-    folded = _fold_numeric_signs(text)
+    folded = _fold_digit_groups(_fold_numeric_signs(text))
     return [
         match
         for match in _NUMERIC_TOKEN_RE.finditer(folded)
@@ -371,7 +407,7 @@ def _parser_reads_every_digit(text: str) -> bool:
     The numeric grammar still compares values it can read. A digit that
     sits outside every token, as in ``0.91Pa`` or ``91.``, is not read.
     """
-    folded = _fold_numeric_signs(text)
+    folded = _fold_digit_groups(_fold_numeric_signs(text))
     if not _string_has_ascii_digit(folded):
         return False
     covered = [False] * len(folded)
@@ -433,14 +469,16 @@ def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
 
 
 def _printed_value_carried(leaf: str, text: str) -> bool:
-    """True when sign-folded ``leaf`` occurs in sign-folded ``text`` whole.
+    """True when the folded ``leaf`` occurs in the folded ``text`` whole.
 
-    Acceptance is ``_span_is_complete_printed_value`` on that span.
-    ``0.91Pa`` is not ``10.91Pa`` or ``0.91Pascal``, ``91.`` is not
-    ``91.0``, ``1 K`` is not ``1 KPa``, and ``1,000`` is not ``1,000,000``.
+    Signs and digit groups are folded on both sides. Acceptance is
+    ``_span_is_complete_printed_value`` on that span. ``0.91Pa`` is not
+    ``10.91Pa`` or ``0.91Pascal``, ``91.`` is not ``91.0``, ``1 K`` is not
+    ``1 KPa``, ``1,000`` is not ``1,000,000``, and ``12 34`` is not ``1234``.
+    ``1 550`` is ``1550``.
     """
-    leaf = _fold_numeric_signs(leaf)
-    text = _fold_numeric_signs(text)
+    leaf = _fold_digit_groups(_fold_numeric_signs(leaf))
+    text = _fold_digit_groups(_fold_numeric_signs(text))
     if not leaf:
         return False
     start = 0
@@ -571,10 +609,11 @@ def _whole_cell_number(cell: str) -> Decimal | None:
     ``Decimal``, never a float conversion: ``0.9100`` is ``0.91``,
     ``1e-999`` is not ``0``, and ``9007199254740993`` is not
     ``9007199254740992``. ``1/2``, ``1,000``, and ``0.91Pa`` do not parse.
-    NaN, Infinity, and an exponent Decimal rejects are refusals. This is
-    not a list of spellings of a stored leaf.
+    A digit-group space does: ``1 550`` is ``1550``, and ``12 34`` is not
+    ``1234``. NaN, Infinity, and an exponent Decimal rejects are refusals.
+    This is not a list of spellings of a stored leaf.
     """
-    folded = _fold_numeric_signs(cell.strip())
+    folded = _fold_digit_groups(_fold_numeric_signs(cell.strip()))
     return _finite_decimal(folded)
 
 
@@ -657,11 +696,23 @@ _FORMULA_LABEL_KEYS = frozenset({"formula", "species"})
 _SUBSCRIPT_DIGIT_FOLD = str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789")
 _FORMULA_BRACE_SUBSCRIPT_RE = re.compile(r"_\{(\d+)\}")
 _FORMULA_BARE_SUBSCRIPT_RE = re.compile(r"_(\d+)")
-_FORMULA_LAYOUT_SPACE_RE = re.compile(r"(?<=[A-Za-z])\s+(?=\d)")
-# A space before the next word stays. Only an element symbol (one uppercase
-# letter and an optional lowercase letter) is part of the formula.
-_FORMULA_DIGIT_LETTER_SPACE_RE = re.compile(
-    r"(?<=\d)\s+(?=[A-Z][a-z]?(?![A-Za-z]))"
+# Math that wraps only the subscript. The letters stay outside the dollars.
+_FORMULA_MATHRM_RE = re.compile(r"\\mathrm\{([^{}]*)\}")
+_FORMULA_MATH_BRACE_SUBSCRIPT_RE = re.compile(r"\$\s*_\{(\d+)\}\s*\$")
+_FORMULA_MATH_BARE_SUBSCRIPT_RE = re.compile(r"\$\s*_(\d+)\s*\$")
+# Spaces inside one formula token. A newline is not one of them, and a
+# preceding measurement (``6.98 Fe``) is not an element chain.
+_FORMULA_INTERNAL_SPACES = " \u00a0\u2009\u202f"
+_FORMULA_ELEMENT_COUNT_SPACE_RE = re.compile(
+    "(?<![A-Za-z])"
+    "((?:[A-Z][a-z]?)+)"
+    "[" + _FORMULA_INTERNAL_SPACES + "]+"
+    r"(?=\d{1,3}(?!\d))"
+)
+_FORMULA_COUNT_ELEMENT_SPACE_RE = re.compile(
+    r"(?<=[A-Za-z])(\d{1,3})"
+    "[" + _FORMULA_INTERNAL_SPACES + "]+"
+    r"(?=[A-Z][a-z]?(?![A-Za-z]))"
 )
 
 
@@ -2914,7 +2965,7 @@ def _spelling_is_complete_token(spelling: str, text: str) -> bool:
     The span has to pass ``_span_is_complete_printed_value`` and equal a
     citation token. ``1`` is not a token of ``1,000``.
     """
-    folded = _fold_numeric_signs(spelling)
+    folded = _fold_digit_groups(_fold_numeric_signs(spelling))
     if not _printed_value_carried(folded, text):
         return False
     return any(match.group(0) == folded for match in _citation_token_matches(text))
@@ -2933,8 +2984,8 @@ def _string_leaf_in_text(leaf: str, text: str) -> bool:
     or ``10.24``. Unicode signs are folded before either string is
     searched, so ``−0.24`` is ``-0.24``.
     """
-    leaf = _fold_numeric_signs(leaf)
-    text = _fold_numeric_signs(text)
+    leaf = _fold_digit_groups(_fold_numeric_signs(leaf))
+    text = _fold_digit_groups(_fold_numeric_signs(text))
     if not _string_has_ascii_digit(leaf):
         return leaf in text
     if not _printed_value_carried(leaf, text):
@@ -2999,21 +3050,25 @@ def _leaf_in_text(leaf: Any, text: str) -> bool:
 
 
 def _normalize_formula_label(text: str) -> str:
-    """Fold formula markup onto plain digits.
+    """Fold formula markup onto plain digits, inside the formula token.
 
-    ``_{n}`` and a bare ``_`` digit become those digits. Unicode subscript
-    digits become ASCII digits. A layout space between a letter and a
-    digit is removed, as is a space between a digit and an element
-    symbol. The space before the next word stays.
+    ``\\mathrm{}`` and a ``$...$`` pair are removed only when they wrap a
+    subscript. ``_{n}``, a bare ``_`` digit, and Unicode subscript digits
+    become plain digits. A space is removed only between an element chain
+    and its count, or between that count and the next element symbol.
+    ``6.98 Fe_{2}O_{3}`` stays ``6.98 Fe2O3``. ``page 2`` stays ``page 2``.
     """
-    normalized = _FORMULA_BRACE_SUBSCRIPT_RE.sub(r"\1", text)
+    normalized = _FORMULA_MATHRM_RE.sub(r"\1", text)
+    normalized = _FORMULA_MATH_BRACE_SUBSCRIPT_RE.sub(r"\1", normalized)
+    normalized = _FORMULA_MATH_BARE_SUBSCRIPT_RE.sub(r"\1", normalized)
+    normalized = _FORMULA_BRACE_SUBSCRIPT_RE.sub(r"\1", normalized)
     normalized = _FORMULA_BARE_SUBSCRIPT_RE.sub(r"\1", normalized)
     normalized = normalized.translate(_SUBSCRIPT_DIGIT_FOLD)
     previous = None
     while previous != normalized:
         previous = normalized
-        normalized = _FORMULA_LAYOUT_SPACE_RE.sub("", normalized)
-        normalized = _FORMULA_DIGIT_LETTER_SPACE_RE.sub("", normalized)
+        normalized = _FORMULA_ELEMENT_COUNT_SPACE_RE.sub(r"\1", normalized)
+        normalized = _FORMULA_COUNT_ELEMENT_SPACE_RE.sub(r"\1", normalized)
     return normalized
 
 
@@ -3041,24 +3096,27 @@ def _formula_cell_matches(leaf: str, cell: str) -> bool:
 def _formula_label_in_text(leaf: str, text: str) -> bool:
     """True when the folded label is one complete token of the folded text.
 
-    A numeric string does not match here. The ordinary token matcher runs
-    first; this is only the markup spelling of a formula or species label.
+    A numeric string does not match here. Digitless labels use the same
+    complete-token boundary as a digit-bearing label, so ``CO`` is not a
+    token of ``CO2``.
     """
     if _string_is_plain_number(leaf):
         return False
     normalized = _normalize_formula_label(leaf)
     if not normalized.strip():
         return False
-    return _string_leaf_in_text(normalized, _normalize_formula_label(text))
+    return _printed_value_carried(normalized, _normalize_formula_label(text))
 
 
 def _pinned_leaf_in_text(leaf: _PinnedLeaf, text: str) -> bool:
-    """Ordinary token match, then a formula fold only for a formula label."""
-    if _leaf_in_text(leaf.value, text):
-        return True
+    """Formula labels compare only after the formula fold.
+
+    A raw substring would accept CO inside CO₂. Other leaves keep the
+    ordinary token match.
+    """
     if leaf.formula_label and isinstance(leaf.value, str):
         return _formula_label_in_text(leaf.value, text)
-    return False
+    return _leaf_in_text(leaf.value, text)
 
 
 def _pinned_leaf_in_cells(leaf: _PinnedLeaf, cells: Sequence[str]) -> bool:
@@ -3348,10 +3406,14 @@ def fidelity_source_warnings(
     (the same indexes as ``table_row_number`` and ``table_column_number``).
     The stored value must be that whole trimmed cell after rowspan and
     colspan expansion. A value in another row is source-blind. Formula
-    and species labels fold ``_{n}``, a bare ``_`` digit, Unicode
-    subscript digits, and a layout space inside the formula, before the
-    token comparison. Numbers keep the un-normalized
-    comparison. ``1 K`` is not ``1 KPa``.
+    and species labels fold subscript markup, a ``$`` or ``\\mathrm{}``
+    that touches a subscript, and a layout space only inside the formula
+    token, before every comparison. A digitless label is a complete
+    token, and a preceding number is not joined to the formula. Digit
+    groups of one number, separated by a space, thin space, or narrow
+    no-break space, with exactly three digits in each group after the
+    first, are that number: ``1 550`` is ``1550`` and ``12 34`` is not
+    ``1234``. A comma is not that separator. ``1 K`` is not ``1 KPa``.
     A leading decimal is a numeric token.
     A spelling that rounds the stored float to a different number is not
     that token. The sample's own spelling is not a substitute: a ``rel_tol``

@@ -5189,6 +5189,12 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # label spellings and leaves numeric comparison unchanged. Recount held:
 # uncovered observations 48630, extracts 615, unattested 3131, pilots 57,
 # source-blind 0.
+# t-1753a3 review: formula labels match only after that fold, including a
+# digitless label, and a space inside the formula is not a preceding
+# measurement. Digit-group spaces with exactly three digits after the first
+# group are one number. No extract is review_status reviewed and no sample
+# has reviewed_by, so the source matcher does not run. Recount held at the
+# same ceilings.
 # Both coverage ceilings may only fall.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 48630
@@ -8178,6 +8184,16 @@ _TOKEN_CASES = (
     # certify per cell; here the comma is not a delimiter.
     ("prose_adjacent_decimals", 0.91, "0.91,0.92\n", False),
     ("prose_adjacent_decimals_second", 0.92, "0.91,0.92\n", False),
+    # Digit groups of one number. The first group is any length. Each
+    # group after it is exactly three digits. A comma is not this separator.
+    ("digit_group_space", 1550, "from 1 550 °C to\n", True),
+    ("digit_group_thin", 1550, "from 1\u2009550 °C to\n", True),
+    ("digit_group_narrow", 1550, "from 1\u202f550 °C to\n", True),
+    ("digit_group_longer_head", 12345, "12 345\n", True),
+    ("digit_group_not_two_numbers", 1234, "12 34\n", False),
+    ("digit_group_short_tail", 155, "1 55\n", False),
+    ("digit_group_not_the_head", 1, "from 1 550 °C to\n", False),
+    ("digit_group_decimal_stays", 6.98, "6.98 100\n", True),
 )
 
 
@@ -10368,6 +10384,145 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
     )
     if not errors or "source_blind_pin" not in "\n".join(errors):
         failures.append(f"csv formula cell refuses 2: {errors}")
+    folded = {
+        "SiO $_{2}$": "SiO2",
+        "SiO $_2$": "SiO2",
+        "CaO/SiO $_{2}$ ratio": "CaO/SiO2 ratio",
+        "\\mathrm{SiO}_{2}": "SiO2",
+        "6.98 Fe_{2}O_{3}": "6.98 Fe2O3",
+        "10 Al_{2}O_{3}": "10 Al2O3",
+        "0.5 H_{2}O": "0.5 H2O",
+        "page 2 stays": "page 2 stays",
+        "Table 2 stays": "Table 2 stays",
+    }
+    for raw, expected in folded.items():
+        got = vle._normalize_formula_label(raw)
+        if got != expected:
+            failures.append(f"fold {raw!r}: {got!r} != {expected!r}")
+    prose_pins = (
+        ("formula", "SiO2", "SiO $_{2}$", True),
+        ("formula", "SiO2", "SiO $_2$", True),
+        ("formula", "SiO2", "CaO/SiO $_{2}$ ratio", True),
+        ("formula", "SiO2", "\\mathrm{SiO}_{2}", True),
+        ("formula", "Fe2O3", "6.98 Fe_{2}O_{3}", True),
+        ("alpha", 6.98, "6.98 Fe_{2}O_{3}", True),
+        ("formula", "Al2O3", "10 Al_{2}O_{3}", True),
+        ("alpha", 10, "10 Al_{2}O_{3}", True),
+        ("formula", "H2O", "0.5 H_{2}O", True),
+        ("alpha", 0.5, "0.5 H_{2}O", True),
+        ("species", "CO", "oxide CO₂ only\n", False),
+        ("species", "CO", "the gas CO end\n", True),
+        ("formula", "SiO₂", "oxide SiO₂₂ end\n", False),
+        ("formula", "SiO₂", "oxide SiO₂ end\n", True),
+    )
+    for key, pin, source, accepts in prose_pins:
+        doc = _html_source_document(tmp_path, pin, source + "\n", key=key)
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"review-{key}-{pin!r}", artifact_root=tmp_path
+        )
+        if accepts and errors:
+            failures.append(f"accept {key} {pin!r} ~ {source!r}: {errors}")
+        if not accepts and (
+            not errors or "source_blind_pin" not in "\n".join(errors)
+        ):
+            failures.append(f"refuse {key} {pin!r} ~ {source!r}: {errors}")
+    cell_pins = (
+        ("formula", "SiO2", "SiO $_{2}$", True),
+        ("formula", "SiO2", "SiO $_2$", True),
+        ("formula", "SiO2", "\\mathrm{SiO}_{2}", True),
+        ("species", "CO", "CO₂", False),
+        ("formula", "SiO₂", "SiO₂₂", False),
+        ("formula", "SiO2", "SiO₂₂", False),
+    )
+    for key, pin, cell_text, accepts in cell_pins:
+        cell = f"<table><tr><td>{cell_text}</td></tr></table>\n"
+        doc = _html_source_document(
+            tmp_path,
+            pin,
+            cell,
+            key=key,
+            locator_extra={"table_row": 1, "table_column": 1},
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"review-cell-{key}-{pin!r}", artifact_root=tmp_path
+        )
+        if accepts and errors:
+            failures.append(f"cell accept {key} {pin!r} ~ {cell_text!r}: {errors}")
+        if not accepts and (
+            not errors or "source_blind_pin" not in "\n".join(errors)
+        ):
+            failures.append(f"cell refuse {key} {pin!r} ~ {cell_text!r}: {errors}")
+    assert failures == []
+
+
+def test_digit_group_spacing_is_one_number(tmp_path: Path):
+    """A grouped spelling of one number certifies that number.
+
+    ``1 550`` is 1550 in prose and in a numeric cell. ``12 34`` is not
+    1234. Thin space and narrow no-break space are the same separator.
+    ``1,000`` stays a comma group.
+    """
+    assert vle._fold_digit_groups("1 550") == "1550"
+    assert vle._fold_digit_groups("1\u2009550") == "1550"
+    assert vle._fold_digit_groups("1\u202f550") == "1550"
+    assert vle._fold_digit_groups("12 345") == "12345"
+    assert vle._fold_digit_groups("12 34") == "12 34"
+    assert vle._fold_digit_groups("1 55") == "1 55"
+    assert vle._fold_digit_groups("6.98 100") == "6.98 100"
+    assert vle._fold_digit_groups("1,000") == "1,000"
+    assert vle._fold_digit_groups("1 550") == vle._fold_digit_groups(
+        vle._fold_digit_groups("1 550")
+    )
+    failures: list[str] = []
+    prose = (
+        (1550, "from 1 550 °C to\n", True),
+        (1550, "from 1\u2009550 °C to\n", True),
+        (1550, "from 1\u202f550 °C to\n", True),
+        (12345, "12 345\n", True),
+        (1234, "12 34\n", False),
+        (155, "1 55\n", False),
+        (1, "from 1 550 °C to\n", False),
+        ("1550", "from 1 550 °C to\n", True),
+    )
+    for pin, source, accepts in prose:
+        doc = _literal_source_document(tmp_path, pin, source)
+        errors = vle.certify_extract_source_fidelity(
+            doc, label="digit-group", artifact_root=tmp_path
+        )
+        if accepts and errors:
+            failures.append(f"prose {pin!r} ~ {source!r}: {errors}")
+        if not accepts and (
+            not errors or "source_blind_pin" not in "\n".join(errors)
+        ):
+            failures.append(f"prose refuse {pin!r} ~ {source!r}: {errors}")
+    cells = (
+        ("csv", "1 550\n", 1550, True),
+        ("csv", "1\u2009550\n", 1550, True),
+        ("csv", "12 34\n", 1234, False),
+        ("csv", '"1,000"\n', 1000, False),
+        ("html", "1 550", 1550, True),
+        ("html", "1\u202f550", 1550, True),
+        ("html", "12 34", 1234, False),
+    )
+    for kind, source, pin, accepts in cells:
+        if kind == "csv":
+            doc = _tabular_source_document(tmp_path, pin, "csv", source)
+        else:
+            doc = _html_source_document(
+                tmp_path,
+                pin,
+                f"<table><tr><td>{source}</td></tr></table>\n",
+                locator_extra={"table_row": 1, "table_column": 1},
+            )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"digit-group-{kind}", artifact_root=tmp_path
+        )
+        if accepts and errors:
+            failures.append(f"{kind} {pin!r} ~ {source!r}: {errors}")
+        if not accepts and (
+            not errors or "source_blind_pin" not in "\n".join(errors)
+        ):
+            failures.append(f"{kind} refuse {pin!r} ~ {source!r}: {errors}")
     assert failures == []
 
 
