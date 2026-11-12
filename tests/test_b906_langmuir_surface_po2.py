@@ -5236,3 +5236,37 @@ def test_emitted_flux_residual_uses_catalog_molar_mass() -> None:
     scale = max(abs(emitted_mol), abs(2.0 * j_o2), 1.0e-300)
     assert abs(2.0 * j_o2 - emitted_mol) / scale < 1.0e-6
     assert abs(2.0 * j_o2 - formula_mol) / scale > 1.0e-6
+
+
+def test_surface_balance_bracket_follows_melt_dissociation_floor(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The root's lower edge is the gate's floor, not a copied -30.
+
+    Margin is 0: ``low`` is ``log10`` of the owned constant. Patching
+    that constant must move the bracket. The shipped endpoint is on
+    the floor ``_pO2_is_melt_dissociation_floor`` classifies.
+    """
+
+    import simulator.physical_constants as physical_constants
+    from engines.builtin import vapor_pressure as vapor_pressure
+    from simulator.langmuir_surface_oxygen import _surface_balance_log10_bracket
+
+    floor = physical_constants.MELT_DISSOCIATION_PO2_MIN_BAR
+    low, high = _surface_balance_log10_bracket()
+    assert high == 0.0
+    assert low == math.log10(floor)
+    assert low == math.log10(vapor_pressure.MELT_DISSOCIATION_PO2_MIN_BAR)
+    assert _pO2_is_melt_dissociation_floor(10.0 ** low)
+    assert not _pO2_is_melt_dissociation_floor(floor * 10.0)
+
+    patched = 1.0e-18
+    monkeypatch.setattr(
+        physical_constants,
+        "MELT_DISSOCIATION_PO2_MIN_BAR",
+        patched,
+    )
+    patched_low, patched_high = _surface_balance_log10_bracket()
+    assert patched_high == 0.0
+    assert patched_low == math.log10(patched)
+    assert patched_low != low

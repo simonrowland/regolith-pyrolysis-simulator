@@ -137,7 +137,9 @@ The signed weight ``(nO - dO)`` equals ``2*n`` from the reaction, not
 from the local slope. Off the cap the slope in ``log10(p)`` has the
 sign of ``n^2`` and does not fold; on the cap the metal term is flat
 and O2 still lifts the residual. The independent variable is
-``log10(p/bar)`` on ``(-30, 0]``.
+``log10(p/bar)``. The lower edge is
+``log10(MELT_DISSOCIATION_PO2_MIN_BAR)`` with margin 0, and the
+upper edge is 0.
 
 Transport. A ``transport_headspace`` carrier, including SiO, is priced
 at the headspace oxygen potential. It is not a function of the melt
@@ -1116,6 +1118,25 @@ def _publisher_net_law_with_transport(
     return conductance, drive_bulk
 
 
+def _surface_balance_log10_bracket() -> tuple[float, float]:
+    """log10(p/bar) domain shared with the melt-dissociation floor.
+
+    Margin is 0. The lower edge is ``log10`` of
+    ``MELT_DISSOCIATION_PO2_MIN_BAR``, read from that module at call
+    time. ``_pO2_is_melt_dissociation_floor`` is true for
+    ``pO2 <=`` that same bar constant, and brentq includes this
+    endpoint, so the root search starts on the floor the gate owns.
+    No extra decade is subtracted, and the search does not stop short
+    of the floor. The upper edge stays 0, which is ``log10(1 bar)``.
+    ``MELT_DISSOCIATION_PO2_MAX_BAR`` (100 bar) is the mass-action
+    envelope cap, not this vacuum root's domain.
+    """
+
+    import simulator.physical_constants as physical_constants
+
+    return math.log10(physical_constants.MELT_DISSOCIATION_PO2_MIN_BAR), 0.0
+
+
 def _solve_net_surface_balance(
     coupled: list[_Carrier],
     channels: list[Any],
@@ -1153,7 +1174,7 @@ def _solve_net_surface_balance(
     from simulator.physical_constants import PA_PER_BAR
 
     by_species = {carrier.species: carrier for carrier in coupled}
-    low, high = -30.0, 0.0
+    low, high = _surface_balance_log10_bracket()
 
     def parts(
         logp: float,
