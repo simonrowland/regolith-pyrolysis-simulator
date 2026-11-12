@@ -180,6 +180,10 @@ def test_purity_no_ledger_provider_or_melt_imports() -> None:
         "math",
         "simulator.environment",
         "simulator.environment.DEFAULT_VACUUM_FLOOR_BAR",
+        # The dependency-free constants owner (t-1748): stdlib-only, so it
+        # cannot pull ledger, provider, inventory or melt code into the buffer.
+        "simulator.physical_constants",
+        "simulator.physical_constants.GAS_CONSTANT",
         "simulator.scalar_boundary",
         "simulator.scalar_boundary.is_declared_real_scalar",
     }
