@@ -884,15 +884,32 @@ def _dec_str(value: Decimal) -> str:
     return text or "0"
 
 
+class _InvalidDecimalValue(Exception):
+    """A present source value that cannot be parsed as a decimal."""
+
+
 def _as_dec_or_none(value: object) -> Decimal | None:
-    if value is None or value == "":
-        return None
-    if isinstance(value, bool):
+    """Return a decimal only when a mixed-map value is numeric."""
+
+    if value is None or value == "" or isinstance(value, bool):
         return None
     try:
         return as_decimal(value)
     except (TypeError, ValueError, ArithmeticError):
         return None
+
+
+def _parse_declared_decimal(value: object) -> Decimal:
+    """Parse a declared numeric value, refusing present non-numeric text."""
+
+    if value is None or value == "":
+        raise _InvalidDecimalValue(f"invalid numeric value: {value!r}")
+    if isinstance(value, bool):
+        raise _InvalidDecimalValue(f"invalid numeric value: {value!r}")
+    try:
+        return as_decimal(value)
+    except (TypeError, ValueError, ArithmeticError) as exc:
+        raise _InvalidDecimalValue(f"invalid numeric value: {value!r}") from exc
 
 
 def _classify_composition_cell(value: object) -> tuple[str, Decimal | None]:
@@ -989,15 +1006,15 @@ def _mass_percent_component_key(name: str) -> tuple[str, bool]:
 def parse_declared_amount(value: object) -> Decimal:
     """Single owner for source-declared numeric amounts.
 
-    Soft optional fields keep ``_as_dec_or_none``. A declared amount that is
-    absent, boolean, or unparseable is a typed refusal — never a silent drop.
+    A declared amount that is absent, boolean, or unparseable is a typed
+    refusal — never a silent drop.
     """
 
     if value is None or value == "" or isinstance(value, bool):
         raise ValueError(f"malformed declared amount: {value!r}")
     try:
-        return as_decimal(value)
-    except (TypeError, ValueError, ArithmeticError) as exc:
+        return _parse_declared_decimal(value)
+    except _InvalidDecimalValue as exc:
         raise ValueError(f"malformed declared amount: {value!r}") from exc
 
 
@@ -24483,7 +24500,26 @@ class Migrator:
 
     def migrate_extracts(self, directory: Path | None = None) -> None:
         for path in discover_extracts(directory or self.extracts_dir):
-            self._migrate_extract(path)
+            rel = (
+                path.relative_to(self.root).as_posix()
+                if path.is_relative_to(self.root)
+                else str(path)
+            )
+            try:
+                self._migrate_extract(path)
+            except _InvalidDecimalValue as exc:
+                self._record_invalid_decimal_source(f"extract[{rel}].numeric", exc)
+
+    def _record_invalid_decimal_source(
+        self, path: str, error: _InvalidDecimalValue
+    ) -> None:
+        self.result.registry_issues.append(
+            ValidationIssue(
+                path=path,
+                reason=RefusalReason.INVALID_SOURCE,
+                detail=str(error),
+            )
+        )
 
     @staticmethod
     def _qualify_registry_id(work_id: str, kind: str, raw: object) -> str:
@@ -25184,6 +25220,11 @@ class Migrator:
                     source_context=source_context,
                     provenance=extract_provenance,
                     fusion_transition_rows=fusion_transition_rows,
+                )
+            except _InvalidDecimalValue as exc:
+                self._record_invalid_decimal_source(
+                    f"observation[{source_id}::{obs['observation_id']}].values",
+                    exc,
                 )
             except (TypeError, ValueError) as exc:
                 error = str(exc)
@@ -27289,7 +27330,12 @@ class Migrator:
                 else State.unknown("no fO2_Pa mapped from source")
             )
             residue_conditions = dict(point_conditions or {})
-            starting_ppm = _as_dec_or_none(values.get("starting_measured_ppm"))
+            raw_starting_ppm = values.get("starting_measured_ppm")
+            starting_ppm = (
+                None
+                if raw_starting_ppm is None or raw_starting_ppm == ""
+                else _parse_declared_decimal(raw_starting_ppm)
+            )
             raw_uncertainty = obs.get("uncertainty")
             starting_locator = (
                 _locator_from_plain(raw_uncertainty.get("locator"))
