@@ -37,7 +37,7 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
     melt_regime,
 )
-from simulator.physical_constants import PA_PER_BAR
+from simulator.physical_constants import PA_PER_BAR, PA_PER_MBAR
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -1236,7 +1236,7 @@ class EvaporationMixin:
                     getattr(getattr(self, "melt", None), "p_total_mbar", 0.0)
                     or 0.0
                 )
-                * 100.0,
+                * PA_PER_MBAR,
             )
             diagnostic = viscous_p_bulk_out_of_domain_diagnostic(
                 knudsen_number=knudsen,

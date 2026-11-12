@@ -72,8 +72,11 @@ is green's
 ``tuple(raw or ())``. A string splits into characters (b-1170, not
 fixed here), so ``"Al2"`` does not permit Al2. A measured row, a
 ``*`` wildcard, and a permitted unmeasured fallback are in the
-residual at that alpha. A carrier the policy refuses is not emitted
-and keeps its published pressure.
+residual at that alpha. An open gate omits an ``n != 0`` carrier
+the policy does not emit: the persisted pressure is not left for
+the publisher to emit as unflagged alpha 1 below its parent-mass
+or baseline thresholds. A measured alpha of 0 is the surface law.
+A closed gate keeps every published pressure.
 
 Persisted headspace. The partial vector the film sums is every
 positive finite entry of the persisted composition. The vapor map is
@@ -2852,10 +2855,12 @@ def test_every_species_uses_the_publisher_alpha_policy(
     names nobody here, a present-null allowlist (nobody), and a ``*``
     wildcard. ``alpha_policy_controls`` stores ``tuple(raw or ())``.
     ``tuple("Al2")`` is the characters, so Al2 stays refused (b-1170).
-    A parent mass is present, so a refused species is a typed
-    missing-alpha and not a flux. The open gate rescales an emitted
-    carrier. The buffered in-band gate leaves every pressure on the
-    publication, and the same eligibility decides the flux.
+    A parent mass is present. On the buffered gate a non-emitting
+    species stays on the publication and the publisher records
+    missing-alpha. On the open gate an ``n != 0`` carrier the policy
+    does not emit is omitted, so the publisher never sees it and
+    cannot emit unflagged alpha 1. An emitted carrier is rescaled.
+    ``n == 0`` stays on the publication on both gates.
     """
 
     from engines.builtin.evaporation_flux import (
@@ -2979,11 +2984,31 @@ def test_every_species_uses_the_publisher_alpha_policy(
                 )
                 assert closed[species] != pytest.approx(published_pa, rel=1.0e-3)
         else:
-            assert species in missing, species
             assert species not in flux
             assert species not in alpha_used
-            assert closed[species] == pytest.approx(published_pa)
             assert species not in fallback_rows
+            # Open gate: n != 0 is omitted. The publisher's missing-alpha
+            # record is the buffered-gate path, where the root did not run.
+            if gate == "open" and exponent not in (None, 0.0):
+                assert species not in closed
+                assert species in notice["refused_species"]
+                assert notice["refused_species"][species]
+                assert species not in missing
+            else:
+                assert species in missing, species
+                assert closed[species] == pytest.approx(published_pa)
+
+    def _assert_policy_refused(species: str) -> None:
+        assert species not in flux
+        assert species not in alpha_used
+        if gate == "open":
+            assert species not in closed
+            assert species in notice["refused_species"]
+            assert species not in missing
+        else:
+            assert species in missing
+            assert closed[species] == pytest.approx(published[species])
+
     if policy == "on":
         assert emitted_proxy
     if policy == "wildcard":
@@ -2994,17 +3019,17 @@ def test_every_species_uses_the_publisher_alpha_policy(
     if policy in ("allow-Al2", "allow-tuple"):
         assert "Al2" in alpha_used
         assert alpha_used["Al2"] == pytest.approx(1.0)
-        assert "Zr" in missing
-        assert "Al2O" in missing
+        _assert_policy_refused("Zr")
+        _assert_policy_refused("Al2O")
     if policy == "allow-string":
         # Characters, not the species. Buffered and open gates both refuse.
-        assert "Al2" in missing
+        _assert_policy_refused("Al2")
         assert "Al2" not in alpha_used
         assert "Al2" not in flux
-        assert "Zr" in missing
-        assert "Al2O" in missing
+        _assert_policy_refused("Zr")
+        _assert_policy_refused("Al2O")
     if policy in ("allow-bytes", "allow-empty", "allow-other", "allow-null"):
-        assert "Al2" in missing
+        _assert_policy_refused("Al2")
         assert "Al2" not in flux
 
 
@@ -4209,3 +4234,342 @@ def test_hertz_knudsen_sqrt_has_one_owner() -> None:
         * hertz_knudsen_k_kg_s_m2_pa(temperature_K, molar_mass)
         / molar_mass
     )
+
+
+# Open-gate carriers the fallback-on matrix never builds. Ca is the only
+# residual entrant (measured alpha 1). Zr and AlO2 have no alpha row.
+# CrO2 is a measured alpha of 0. TiO2_gas is n = 0. SiO is transport.
+# The dust floor and the nontrivial-flux threshold are both 1e-12, the
+# publisher's two gates. This oracle writes those numbers; it does not
+# call the publisher's refusal helper.
+_DUST_PARENT_KG = 1.0e-12
+_FLUX_THRESHOLD_KG_HR = 1.0e-12
+_UNMEASURED_ROWS = (
+    ("Ca", "measured", 1000.0, -0.5, 1.0e-9, "Ca"),
+    ("Zr", "unmeasured", 800.0, -0.5, 1.0e-9, "Zr"),
+    ("AlO2", "unmeasured", 100.0, 0.25, 1.0e-9, "AlO2"),
+    ("CrO2", "zero_alpha", 80.0, 0.25, 1.0e-9, "CrO2"),
+    ("TiO2_gas", "neutral", 50.0, 0.0, 1.0e-9, "TiO2"),
+    ("SiO", "transport", 25.0, -0.5, 1.0e-6, "SiO"),
+)
+_UNMEASURED_BY_SPECIES = {row[0]: row for row in _UNMEASURED_ROWS}
+
+
+def _unmeasured_catalog() -> dict:
+    metals: dict[str, dict] = {}
+    oxides: dict[str, dict] = {}
+    for species, role, _pressure, _exponent, _pref, formula in _UNMEASURED_ROWS:
+        row: dict = {"formula": formula}
+        if role == "measured":
+            row["evaporation_alpha"] = {"value": 1.0}
+        elif role == "zero_alpha":
+            row["evaporation_alpha"] = {"value": 0.0}
+        bucket = metals if species in ("Ca", "Zr") else oxides
+        bucket[species] = row
+    return {"metals": metals, "oxide_vapors": oxides}
+
+
+def _unmeasured_provenance(role: str, exponent: float, p_ref: float) -> dict:
+    if role == "transport":
+        return {
+            "oxygen_fugacity_channel": "transport_headspace",
+            "pO2_bar": p_ref,
+            "pO2_exponent": exponent,
+        }
+    return {"pO2_bar": p_ref, "pO2_exponent": exponent}
+
+
+def _oracle_ca_only_surface() -> tuple[float, dict[str, float]]:
+    """Root of ``sum 2*n*J = 0`` with only Ca and synthetic O2.
+
+    J = P (k = 1, bulk = 0). Zr, AlO2 and CrO2 are not entrants: the
+    first two have no emitting alpha, and CrO2 has alpha 0 so its flux
+    is identically zero. Written from that oxygen weight. It does not
+    call the surface solver.
+    """
+
+    from scipy.optimize import brentq
+
+    pref = 1.0e-9
+    published_ca = 1000.0
+
+    def residual(logp: float) -> float:
+        surface = 10.0 ** logp
+        calcium = published_ca * (surface / pref) ** (-0.5)
+        return -calcium + 2.0 * surface * PA_PER_BAR
+
+    assert residual(-30.0) < 0.0
+    assert residual(0.0) > 0.0
+    log_root = float(brentq(residual, -30.0, 0.0, xtol=1.0e-12, rtol=1.0e-12))
+    surface = 10.0 ** log_root
+    pressures = {
+        "Ca": published_ca * (surface / pref) ** (-0.5),
+        "CrO2": 80.0 * (surface / pref) ** 0.25,
+    }
+    return surface, pressures
+
+
+def _emit_rule(role: str, published: float, closed: float | None) -> tuple:
+    """Successful open gate. Not the production classifier.
+
+    An emitting n != 0 carrier is the surface law. An n != 0 carrier
+    with no emitting alpha is refused. A measured alpha of 0 is the
+    surface law and not a residual term. n == 0 and transport stay
+    published.
+    """
+
+    if role in ("neutral", "transport"):
+        return ("published", published)
+    if role == "unmeasured":
+        return ("refused", None)
+    assert closed is not None
+    return ("pressure", closed)
+
+
+def _emit_bug(role: str, published: float, closed: float | None) -> tuple:
+    """The defect: a non-emitting n != 0 carrier keeps the persisted pressure."""
+
+    if role in ("unmeasured", "zero_alpha"):
+        return ("published", published)
+    return _emit_rule(role, published, closed)
+
+
+@functools.lru_cache(maxsize=1)
+def _unmeasured_surface():
+    from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
+
+    pressures = {}
+    provenance = {}
+    for species, role, pressure, exponent, p_ref, _formula in _UNMEASURED_ROWS:
+        pressures[species] = pressure
+        provenance[species] = _unmeasured_provenance(role, exponent, p_ref)
+    return apply_langmuir_surface_oxygen(
+        pressures,
+        temperature_K=_T_K,
+        provenance_by_species=provenance,
+        source_reaction_fO2_bar=1.0e-9,
+        legacy_catalog=_unmeasured_catalog(),
+        compiled_catalog=None,
+        melt_redox_capacity_mol_per_ln_fO2=0.0,
+        conductance_mol_s_m2_Pa={"Ca": 1.0, "O2": 1.0},
+        allow_unmeasured_alpha_fallback=False,
+    )
+
+
+@pytest.mark.parametrize("species", [row[0] for row in _UNMEASURED_ROWS])
+def test_open_gate_refuses_unmeasured_and_closes_zero_alpha(species: str) -> None:
+    """n != 0 with no emitting alpha is refused. Alpha 0 is the surface law.
+
+    The fallback-on matrix never builds an unmeasured carrier. This one
+    does, with the fallback off. The mutation keeps those carriers at
+    the persisted pressure. Unmeasured and zero-alpha rows disagree
+    with it. Measured, neutral and transport agree with it.
+    """
+
+    _species, role, published, _exponent, _pref, _formula = _UNMEASURED_BY_SPECIES[
+        species
+    ]
+    result = _unmeasured_surface()
+    surface, closed_pressures = _oracle_ca_only_surface()
+    closed = closed_pressures.get(species)
+    outcome = _emit_rule(role, published, closed)
+    bug = _emit_bug(role, published, closed)
+    assert result.applied is True
+    assert result.surface_pO2_bar == pytest.approx(surface, rel=1.0e-8)
+    assert result.relative_residual is not None
+    assert result.relative_residual < 1.0e-6
+    if outcome[0] == "published":
+        assert result.pressures_Pa[species] == published
+        assert species not in result.refused_species
+    elif outcome[0] == "refused":
+        assert species not in result.pressures_Pa
+        reason = result.refused_species[species]
+        assert "surface pressure omitted" in reason
+        assert "alpha" in reason
+    else:
+        assert closed is not None
+        assert result.pressures_Pa[species] == pytest.approx(closed, rel=1.0e-8)
+        assert result.pressures_Pa[species] != pytest.approx(published, rel=1.0e-3)
+        assert species not in result.refused_species
+    if role in ("unmeasured", "zero_alpha"):
+        assert outcome != bug
+    else:
+        assert outcome == bug
+
+
+def _spec_unmeasured_publisher(parent_kg: float, baseline_kg_hr: float) -> str:
+    """Publisher outcome for an unmeasured species, fallback off, no domain refusal.
+
+    Written from the two thresholds. It does not call the flux provider.
+    Parent mass above 1e-12 kg and a baseline above 1e-12 kg/h is
+    missing-alpha. Every other combination emits alpha 1 with no
+    fallback flag. That includes parent mass at or below 1e-12 kg.
+    """
+
+    if (
+        parent_kg > _DUST_PARENT_KG
+        and baseline_kg_hr > _FLUX_THRESHOLD_KG_HR
+    ):
+        return "missing_alpha"
+    return "unflagged_alpha_one"
+
+
+def _hk_baseline_kg_hr(species: str, pressure_pa: float) -> float:
+    molar = parse_formula(species).molar_mass_kg_per_mol()
+    return (
+        pressure_pa
+        * hertz_knudsen_k_kg_s_m2_pa(_T_K, molar)
+        * 3600.0
+    )
+
+
+def _dispatch_alpha_map(
+    pressures: Mapping[str, float],
+    parent_kg: float,
+    *,
+    alpha: Mapping[str, float] | None = None,
+):
+    from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+
+    masses = {
+        species: parse_formula(
+            "TiO2" if species == "TiO2_gas" else species
+        ).molar_mass_kg_per_mol()
+        for species in pressures
+    }
+    stoich = {
+        species: {"oxide_per_product_kg": 1.0, "parent_oxide": "CaO"}
+        for species in pressures
+    }
+    available = {species: parent_kg for species in pressures}
+    provider = BuiltinEvaporationFluxProvider()
+    return provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.EVAPORATION_FLUX,
+            account_view=ProviderAccountView(
+                accounts={},
+                species_formula_registry={},
+            ),
+            temperature_C=_T_C,
+            pressure_bar=0.0,
+            control_inputs={
+                "vapour_batch_flux_pressures_Pa": dict(pressures),
+                "overhead_partials_Pa": {},
+                "overhead_pressure_pa": 0.0,
+                "commanded_pressure_pa": 0.0,
+                "molar_mass_kg_mol": masses,
+                "stoich_by_species": stoich,
+                "available_oxide_kg": available,
+                "melt_surface_area_m2": 1.0,
+                "alpha": dict(alpha or {}),
+                "pipe_diameter_m": 0.12,
+                "gas_temperature_K": _T_K,
+                "carrier_gas": "N2",
+                "evaporation_series_resistance": {
+                    "gas_resistance_enabled": False,
+                },
+            },
+        )
+    )
+
+
+def _publisher_buckets(diagnostic: Mapping) -> dict:
+    below = diagnostic.get("below_threshold_evaporation_flux") or {}
+    return {
+        "flux": dict(diagnostic.get("evaporation_flux_kg_hr") or {}),
+        "alpha": dict(diagnostic.get("alpha_used_by_species") or {}),
+        "below": dict(below.get("fluxes_kg_hr") or {}),
+        "missing": dict(diagnostic.get("missing_alpha") or {}),
+        "fallback": list(
+            diagnostic.get("unmeasured_alpha_fallback_species") or []
+        ),
+    }
+
+
+@pytest.mark.parametrize("species", ["Zr", "AlO2"])
+@pytest.mark.parametrize("parent_kg", [0.0, 1.0e-12, 1.0])
+@pytest.mark.parametrize("pressure_pa", [1.0e-20, 1000.0])
+def test_unmeasured_open_gate_pressure_is_not_emitted_as_alpha_one(
+    species: str, parent_kg: float, pressure_pa: float
+) -> None:
+    """The surface omits the carrier, so the publisher cannot emit alpha 1.
+
+    Invariant, both consumers: an open gate does not publish an n != 0
+    carrier that has no emitting alpha, at any positive pressure. The
+    real publisher, given that omitted map, has no flux, no alpha, and
+    no missing-alpha row for it. Given the persisted pressure instead
+    (the mutation), vacuum overhead leaves the domain diagnostic unset
+    and the publisher emits unflagged alpha 1 whenever the parent is at
+    or below 1e-12 kg or the alpha-1 baseline is at or below 1e-12 kg/h.
+    Both species and both pressures hit that emission for a dust parent.
+    """
+
+    from engines.builtin.evaporation_flux import _NONTRIVIAL_FLUX_KG_HR
+
+    assert _NONTRIVIAL_FLUX_KG_HR == _FLUX_THRESHOLD_KG_HR
+    result = _unmeasured_surface()
+    # The cached surface uses the row pressures, not this parameter.
+    # Rebuild when the published pressure is the case under test so a
+    # subthreshold row is actually what the chokepoint saw.
+    if pressure_pa != _UNMEASURED_BY_SPECIES[species][2]:
+        from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
+
+        pressures = {
+            row_species: pressure
+            for row_species, _role, pressure, _exponent, _pref, _formula in (
+                _UNMEASURED_ROWS
+            )
+        }
+        provenance = {
+            row_species: _unmeasured_provenance(role, exponent, pref)
+            for row_species, role, _pressure, exponent, pref, _formula in (
+                _UNMEASURED_ROWS
+            )
+        }
+        pressures[species] = pressure_pa
+        result = apply_langmuir_surface_oxygen(
+            pressures,
+            temperature_K=_T_K,
+            provenance_by_species=provenance,
+            source_reaction_fO2_bar=1.0e-9,
+            legacy_catalog=_unmeasured_catalog(),
+            compiled_catalog=None,
+            melt_redox_capacity_mol_per_ln_fO2=0.0,
+            conductance_mol_s_m2_Pa={"Ca": 1.0, "O2": 1.0},
+            allow_unmeasured_alpha_fallback=False,
+        )
+    assert species not in result.pressures_Pa
+    assert species in result.refused_species
+    closed = _dispatch_alpha_map(
+        result.pressures_Pa,
+        parent_kg,
+        alpha={"Ca": 1.0, "CrO2": 0.0},
+    )
+    assert str(closed.status) == "ok", closed.diagnostic
+    closed_buckets = _publisher_buckets(closed.diagnostic or {})
+    assert species not in closed_buckets["flux"]
+    assert species not in closed_buckets["alpha"]
+    assert species not in closed_buckets["below"]
+    assert species not in closed_buckets["missing"]
+    assert species not in closed_buckets["fallback"]
+    baseline = _hk_baseline_kg_hr(species, pressure_pa)
+    expected = _spec_unmeasured_publisher(parent_kg, baseline)
+    if parent_kg <= _DUST_PARENT_KG or baseline <= _FLUX_THRESHOLD_KG_HR:
+        assert expected == "unflagged_alpha_one"
+    bug = _dispatch_alpha_map({species: pressure_pa}, parent_kg)
+    assert str(bug.status) == "ok", bug.diagnostic
+    bug_buckets = _publisher_buckets(bug.diagnostic or {})
+    if expected == "missing_alpha":
+        assert species in bug_buckets["missing"]
+        assert species not in bug_buckets["flux"]
+        assert species not in bug_buckets["alpha"]
+        assert species not in bug_buckets["fallback"]
+    else:
+        assert bug_buckets["alpha"][species] == pytest.approx(1.0)
+        assert species not in bug_buckets["fallback"]
+        assert species not in bug_buckets["missing"]
+        assert species in bug_buckets["flux"] or species in bug_buckets["below"]
+        assert (
+            bug_buckets["flux"].get(species, 0.0)
+            + bug_buckets["below"].get(species, 0.0)
+        ) > 0.0

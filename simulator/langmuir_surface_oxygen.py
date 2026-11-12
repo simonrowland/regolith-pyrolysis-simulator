@@ -69,7 +69,14 @@ gas-film flag are the publisher's, from ``publisher_effective_alpha``
 and ``resolve_gas_resistance_enabled``: a measured row, a ``*``
 wildcard, or a permitted unmeasured fallback (broad-proxy rows are
 stripped, then alpha = 1 when the fallback allows that species). A
-carrier that policy refuses is not in the residual. Nothing writes
+carrier the policy does not emit is not in the residual. On a
+successful root an ``n != 0`` carrier in that set is a typed refusal
+and is absent from the flux map: the publisher emits unflagged
+alpha 1 for an unmeasured species when the parent mass is at or
+below 1e-12 kg or the alpha-1 baseline is at or below the
+nontrivial-flux threshold, so the persisted pressure would be that
+emission. A measured alpha of 0 emits no flux, so it is not a
+residual term, and its pressure is still the surface law. Nothing writes
 ``0.0`` in place of a published pressure. Nothing drops a
 participating carrier's reaction oxygen demand because a cap zeroed
 the local slope. A condensed-metal rail never publishes above
@@ -796,9 +803,13 @@ def _flux_alpha(
     ``publisher_effective_alpha`` is the kernel's order: species row,
     ``*`` wildcard, else the permitted fallback of 1. A broad-proxy row
     has already been stripped, so the fallback is what publishes Al2.
-    A zero alpha emits no flux and stays out of the sum without a
-    refusal. An unmeasured species the fallback does not permit is
-    omitted; the publisher refuses it when a parent mass is present.
+    A zero alpha emits no flux and stays out of the sum. The caller
+    still rewrites that pressure onto the solved surface. An unmeasured
+    species the fallback does not permit returns None. The caller
+    refuses that carrier. The publisher's missing-alpha check is not
+    that refusal: it fires only when the parent mass and the alpha-1
+    baseline are both above their thresholds, and otherwise emits
+    alpha 1 with no fallback flag.
     """
 
     from engines.builtin.evaporation_flux import publisher_effective_alpha
@@ -1215,6 +1226,9 @@ def _solve_or_refuse(
     refused: dict[str, str] = {}
     channels: list[Any] = []
     coupled: list[_Carrier] = []
+    # Measured alpha of 0. Not a residual term (J = 0). Still an n != 0
+    # pressure, rewritten onto the solved surface after the root.
+    zero_alpha: list[_Carrier] = []
     for carrier in carriers:
         # Transport and n == 0 stay at the published pressure. They are
         # not in this residual. Every other carrier is a term in the
@@ -1245,11 +1259,22 @@ def _solve_or_refuse(
             ),
         )
         if alpha is None:
-            # The publisher refuses an unmeasured alpha when a parent
-            # mass is present. Keep the published pressure so that
-            # refusal still fires. The carrier is not in the sum.
+            # Not in the sum: there is no emitting coefficient to weight.
+            # Do not keep the persisted pressure. The flux publisher
+            # refuses an unmeasured alpha only when the parent mass is
+            # above 1e-12 kg AND the alpha-1 baseline exceeds the
+            # nontrivial-flux threshold. Below either threshold, and
+            # whenever the viscous-domain diagnostic is unset (vacuum
+            # overhead), it emits that alpha of 1 with no fallback flag.
+            # A subthreshold or dust-parent carrier would then reach
+            # wall-supply accounting at this unclosed pO2.
+            refused[carrier.species] = (
+                "evaporation alpha does not enter the balance; "
+                "surface pressure omitted"
+            )
             continue
         if alpha == 0.0:
+            zero_alpha.append(carrier)
             continue
         oxygen_atoms = float(formula.elements.get("O", 0.0))
         # Reaction exponent, never the capped local slope. A pure-metal
@@ -1398,6 +1423,18 @@ def _solve_or_refuse(
         if solved is None:
             continue
         adjusted[carrier.species] = float(solved)
+    for carrier in zero_alpha:
+        if carrier.species in refused:
+            continue
+        try:
+            adjusted[carrier.species] = _pressure_at_surface(
+                carrier, surface_pO2_bar
+            )
+        except ValueError as exc:
+            refused[carrier.species] = (
+                "surface pressure omitted: " + str(exc)
+            )
+            adjusted.pop(carrier.species, None)
     warning = (
         f"{LANGMUIR_SURFACE_PO2_REASON}: "
         f"surface_pO2_bar={surface_pO2_bar:.6e} "
