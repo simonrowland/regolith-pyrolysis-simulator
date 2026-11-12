@@ -42,6 +42,7 @@ from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
     MeltBackend,
+    _call_with_hard_timeout,
     split_cleaned_melt_account,
 )
 
@@ -1158,7 +1159,7 @@ def _evaluate_request_vector(
     }
 
 
-def evaluate(
+def _evaluate_with_timeout(
     composition_mol: Mapping[str, float] | None = None,
     temperature_K: float | None = None,
     *,
@@ -1166,6 +1167,7 @@ def evaluate(
     pack: str | None = None,
     allow_extrapolation: bool = False,
     allow_out_of_envelope: bool = False,
+    solve_timeout_s: float | None = None,
 ) -> OpenImccBridgeResult:
     from simulator.engine_cache import cached_engine_call, record_engine_open
 
@@ -1179,19 +1181,45 @@ def evaluate(
         allow_extrapolation=allow_extrapolation,
         allow_out_of_envelope=allow_out_of_envelope,
     )
-    payload = cached_engine_call(
-        "openimcc",
-        request,
-        lambda: _evaluate_uncached(
+    def solve() -> dict[str, Any]:
+        return _evaluate_uncached(
             composition_mol=composition_mol,
             temperature_K=temperature_K,
             composition_kg=composition_kg,
             pack=pack,
             allow_extrapolation=allow_extrapolation,
             allow_out_of_envelope=allow_out_of_envelope,
-        ).to_transport(),
+        ).to_transport()
+
+    payload = cached_engine_call(
+        "openimcc",
+        request,
+        (
+            solve
+            if solve_timeout_s is None
+            else lambda: _call_with_hard_timeout(solve, solve_timeout_s)
+        ),
     )
     return OpenImccBridgeResult.from_transport(payload)
+
+
+def evaluate(
+    composition_mol: Mapping[str, float] | None = None,
+    temperature_K: float | None = None,
+    *,
+    composition_kg: Mapping[str, float] | None = None,
+    pack: str | None = None,
+    allow_extrapolation: bool = False,
+    allow_out_of_envelope: bool = False,
+) -> OpenImccBridgeResult:
+    return _evaluate_with_timeout(
+        composition_mol=composition_mol,
+        temperature_K=temperature_K,
+        composition_kg=composition_kg,
+        pack=pack,
+        allow_extrapolation=allow_extrapolation,
+        allow_out_of_envelope=allow_out_of_envelope,
+    )
 
 
 def evaluate_gas(

@@ -1986,6 +1986,138 @@ def test_openimcc_battery_adapter_does_not_cache_around_the_bridge(
     assert engine_cache.engine_cache_counters(reset=True).get("openimcc", {}) == {}
 
 
+def test_openimcc_cache_store_time_is_outside_the_hard_timeout(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import sqlite3
+    import threading
+    import time
+
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        BinaryPot,
+        Po2Request,
+        close_battery_engine_handle,
+        equilibrate_cell,
+    )
+    from tests.battery.cache_test_support import open_available_engine
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "slow-store.sqlite"))
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    store_finished = threading.Event()
+
+    def slow_failing_insert(*args: Any, **kwargs: Any) -> tuple[bool, bool]:
+        try:
+            time.sleep(1.1)
+            raise sqlite3.OperationalError("simulated slow cache store failure")
+        finally:
+            store_finished.set()
+
+    monkeypatch.setattr(
+        engine_cache, "_insert_cache_row_if_absent", slow_failing_insert
+    )
+    handle = open_available_engine(
+        Engine.OPENIMCC, nodeid="OpenIMCC slow store timeout boundary"
+    )
+    pot = BinaryPot(
+        pot_id="openimcc-slow-store-timeout",
+        kato_1993_table4_system=None,
+        why="OpenIMCC cache store timeout boundary",
+        composition_wt_pct={"MgO": 40.0, "SiO2": 60.0},
+    )
+    try:
+        cell = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1700.0,
+            po2=Po2Request(mode="engine_default", po2_bar=None),
+            timeout_s=1.0,
+            isolated=False,
+        )
+        assert store_finished.wait(timeout=5.0)
+        assert cell.status == "ok", cell.engine_reason
+        counters = engine_cache.engine_cache_counters(reset=True)["openimcc"]
+        assert counters["stores"] + counters["store_error"] == 1
+        assert counters["store_error"] == 1
+
+        hit = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1700.0,
+            po2=Po2Request(mode="engine_default", po2_bar=None),
+            timeout_s=0.001,
+            isolated=False,
+        )
+        assert hit.status == "ok", hit.engine_reason
+        hit_counters = engine_cache.engine_cache_counters(reset=True)["openimcc"]
+        assert hit_counters["hits"] == 1
+        assert hit_counters["misses"] == 0
+        assert hit_counters["stores"] == hit_counters["store_error"] == 0
+    finally:
+        close_battery_engine_handle(handle)
+
+
+def test_openimcc_slow_solve_still_hits_the_hard_timeout(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import threading
+    import time
+
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        BinaryPot,
+        Po2Request,
+        close_battery_engine_handle,
+        equilibrate_cell,
+    )
+    from simulator.melt_backend import openimcc_bridge
+    from tests.battery.cache_test_support import open_available_engine
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "slow-solve.sqlite"))
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    solve_finished = threading.Event()
+    original_solve = openimcc_bridge._evaluate_uncached
+
+    def slow_solve(**kwargs: Any) -> Any:
+        try:
+            time.sleep(0.1)
+            return original_solve(**kwargs)
+        finally:
+            solve_finished.set()
+
+    monkeypatch.setattr(openimcc_bridge, "_evaluate_uncached", slow_solve)
+    handle = open_available_engine(
+        Engine.OPENIMCC, nodeid="OpenIMCC slow solve timeout boundary"
+    )
+    pot = BinaryPot(
+        pot_id="openimcc-slow-solve-timeout",
+        kato_1993_table4_system=None,
+        why="OpenIMCC solve timeout boundary",
+        composition_wt_pct={"MgO": 40.0, "SiO2": 60.0},
+    )
+    try:
+        cell = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1700.0,
+            po2=Po2Request(mode="engine_default", po2_bar=None),
+            timeout_s=0.02,
+            isolated=False,
+        )
+        assert cell.status == "refusal"
+        assert cell.refusal_reason == "engine_timeout"
+        assert solve_finished.wait(timeout=5.0)
+        assert engine_cache.engine_cache_counters(reset=True)["openimcc"]["stores"] == 0
+    finally:
+        close_battery_engine_handle(handle)
+
+
 def test_isolated_backend_reconstruction_disables_nested_pools(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

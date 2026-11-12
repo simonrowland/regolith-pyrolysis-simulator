@@ -50,6 +50,7 @@ from simulator.physical_constants import (
 from simulator.melt_backend.base import (
     ANTOINE_FALLBACK_SOURCE_PREFIX,
     REDOX_MODE_NOT_AN_INPUT,
+    _call_with_hard_timeout,
     vapor_pressure_source_code,
 )
 from simulator.melt_regime import (
@@ -316,6 +317,11 @@ def _call_cached_backend_equilibrate(
         with _without_engine_cache():
             return solve()
     if not cache:
+        if handle.name == "openimcc":
+            from simulator.engine_cache import _without_engine_cache
+
+            with _without_engine_cache():
+                return solve()
         return solve()
     if handle.name == "openimcc":
         # The OpenIMCC bridge owns the engine cache seam for this path.
@@ -3040,6 +3046,7 @@ class _OpenImccBatteryBackend:
         *,
         composition_mol: Mapping[str, float] | None = None,
         po2_request: Po2Request | None = None,
+        call_timeout_s: float | None = None,
         **_unused: object,
     ) -> Any:
         from types import SimpleNamespace
@@ -3077,7 +3084,10 @@ class _OpenImccBatteryBackend:
                 bridge_kwargs["composition_kg"] = composition_kg
         else:
             bridge_kwargs["composition_mol"] = composition_mol
-        result = self._bridge.evaluate(**bridge_kwargs)
+        result = self._bridge._evaluate_with_timeout(
+            solve_timeout_s=call_timeout_s,
+            **bridge_kwargs,
+        )
         self.model_id = result.pack_model_id
         self._identity["model_id"] = self.model_id
         self._identity["name"] = self.model_id
@@ -5069,27 +5079,6 @@ def probe_battery_engines(
 # ---------------------------------------------------------------------------
 
 
-def _call_with_hard_timeout(fn: Callable[[], Any], timeout_s: float) -> Any:
-    box: dict[str, Any] = {}
-
-    def target() -> None:
-        try:
-            box["result"] = fn()
-        except BaseException as exc:  # noqa: BLE001 - forwarded to caller
-            box["exc"] = exc
-
-    thread = threading.Thread(target=target, daemon=True)
-    thread.start()
-    thread.join(float(timeout_s))
-    if thread.is_alive():
-        raise TimeoutError(
-            f"equilibrate exceeded hard timeout of {timeout_s:g}s"
-        )
-    if "exc" in box:
-        raise box["exc"]
-    return box.get("result")
-
-
 def _fo2_log_for_request(handle: EngineHandle, request: Po2Request) -> float | None:
     if request.mode == PO2_COMMANDED:
         assert request.po2_bar is not None
@@ -5308,6 +5297,9 @@ def _equilibrate_cell_uncached(
 
     try:
         def solve_backend() -> Any:
+            if handle.name == "openimcc" and "call_timeout_s" in parameters:
+                # The bridge owns the cache seam; it times only its uncached solve.
+                return handle.backend.equilibrate(**kwargs)
             return _call_with_hard_timeout(
                 lambda: handle.backend.equilibrate(**kwargs), timeout
             )

@@ -11,11 +11,13 @@ InternalAnalyticalBackend.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from contextvars import copy_context
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
 import math
-from typing import Any, ClassVar, Dict, List, Mapping, Optional, Sequence
+import threading
+from typing import Any, Callable, ClassVar, Dict, List, Mapping, Optional, Sequence
 
 from engines.domain_reason import OutOfDomainReason
 from simulator.melt_regime import liquid_fraction_invalidity
@@ -741,6 +743,26 @@ class RealBackendAuthority(ABC):
     """Marker for adapters trusted to assert a real-engine family."""
 
     real_backend_family: ClassVar[RealBackendFamily]
+
+
+def _call_with_hard_timeout(fn: Callable[[], Any], timeout_s: float) -> Any:
+    box: dict[str, Any] = {}
+
+    def target() -> None:
+        try:
+            box["result"] = fn()
+        except BaseException as exc:  # noqa: BLE001 - forwarded to caller
+            box["exc"] = exc
+
+    context = copy_context()
+    thread = threading.Thread(target=context.run, args=(target,), daemon=True)
+    thread.start()
+    thread.join(float(timeout_s))
+    if thread.is_alive():
+        raise TimeoutError(f"equilibrate exceeded hard timeout of {timeout_s:g}s")
+    if "exc" in box:
+        raise box["exc"]
+    return box.get("result")
 
 
 class MeltBackendError(RuntimeError):

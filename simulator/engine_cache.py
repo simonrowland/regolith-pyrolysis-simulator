@@ -1,4 +1,10 @@
-"""One process-local HOT SQLite cache for engine outputs."""
+"""One process-local HOT SQLite cache for engine outputs.
+
+When an engine or adapter change can alter predictions, increment that
+engine's ``ENGINE_CHEMISTRY_VERSION`` entry by hand and append a dated
+history entry below the version map. Runtime identity is diagnostic metadata
+only; it never changes or expires cache keys.
+"""
 
 from __future__ import annotations
 
@@ -329,7 +335,6 @@ def _compute_runtime_identity(engine_id: str) -> str:
             return _distribution_identity(("VapoRock", "vaporock"))
     except Exception:
         return "unavailable"
-    return "unavailable"
 
 
 @lru_cache(maxsize=None)

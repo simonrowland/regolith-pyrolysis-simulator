@@ -187,7 +187,11 @@ def test_openimcc_isolated_cell_cache_hits_in_parent_without_worker_round_trip(
             stored = connection.execute(
                 "SELECT COUNT(*) FROM engine_outputs WHERE key=?", (request_key,)
             ).fetchone()[0]
+            total_stored = connection.execute(
+                "SELECT COUNT(*) FROM engine_outputs"
+            ).fetchone()[0]
         assert stored == 1
+        assert total_stored == 1
 
         engine_cache._MEMORY_CACHE.clear()
         engine_cache.engine_cache_counters(reset=True)
