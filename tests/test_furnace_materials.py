@@ -77,6 +77,30 @@ def test_runtime_envelope_refuses_catalog_load_failure_with_cause(monkeypatch):
     assert refused.value.__cause__ is load_error
 
 
+def test_runtime_envelope_refuses_catalog_without_enabled_service_rating(
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        furnace_materials,
+        "load_furnace_materials",
+        lambda: {
+            "disabled_material": {
+                "enabled": False,
+                "max_service_T_C": 2200,
+            }
+        },
+    )
+
+    with pytest.raises(FurnaceMaterialCatalogLoadError) as refused:
+        furnace_materials._catalog_max_service_T_C()
+
+    assert isinstance(refused.value.load_error, ValueError)
+    assert str(refused.value.load_error) == (
+        "furnace material catalog has no enabled numeric max_service_T_C rating"
+    )
+    assert refused.value.__cause__ is refused.value.load_error
+
+
 def test_catalog_loads_grounded_enabled_materials():
     catalog = load_furnace_materials()
 
