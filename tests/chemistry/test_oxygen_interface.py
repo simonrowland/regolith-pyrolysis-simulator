@@ -275,3 +275,57 @@ def test_brent_failure_is_typed_and_does_not_fall_back_to_midpoint(
         _solve()
 
     assert caught.value.reason == "brent_failure"
+
+
+def test_stage_c_film_notice_ratio_is_ledger_over_effusion() -> None:
+    # Independent of the production divider: the series law at one
+    # (P_eq - P_bulk) gives J_ledger / J_effusion = R_i / (R_i + R_g + R_m).
+    r_interface = 1.0
+    r_gas = 307.0
+    r_melt = 0.0
+    effusion_mol_h = 4.0
+    ledger_mol_h = effusion_mol_h * r_interface / (r_interface + r_gas + r_melt)
+
+    notice = oxygen_interface.stage_c_film_mismatch_notice(
+        ledger_mol_h={"SiO": ledger_mol_h, "Na": 0.0},
+        interface_effusion_mol_h={"SiO": effusion_mol_h, "Fe": 2.0},
+    )
+
+    assert notice is not None
+    assert notice["kind"] == oxygen_interface.STAGE_C_FILM_MISMATCH_KIND
+    assert notice["ratios"]["SiO"] == pytest.approx(
+        1.0 / (1.0 + (r_gas + r_melt) / r_interface)
+    )
+    assert notice["ratios"]["Fe"] == pytest.approx(0.0)
+    assert notice["ledger_mol_h"]["Fe"] == 0.0
+    assert "Na" not in notice["ratios"]
+
+
+def test_stage_c_film_notice_keeps_a_debit_with_no_effusion() -> None:
+    notice = oxygen_interface.stage_c_film_mismatch_notice(
+        ledger_mol_h={"Si": 1.5},
+        interface_effusion_mol_h={"Si": 0.0},
+    )
+
+    assert notice is not None
+    assert notice["ratios"]["Si"] is None
+    assert notice["ledger_mol_h"]["Si"] == 1.5
+    assert notice["interface_effusion_mol_h"]["Si"] == 0.0
+
+
+def test_stage_c_film_notice_is_absent_when_nothing_moves() -> None:
+    assert (
+        oxygen_interface.stage_c_film_mismatch_notice(
+            ledger_mol_h={"SiO": 0.0},
+            interface_effusion_mol_h={},
+        )
+        is None
+    )
+
+
+def test_stage_c_film_notice_refuses_a_non_finite_rate() -> None:
+    with pytest.raises(ValueError, match="SiO"):
+        oxygen_interface.stage_c_film_mismatch_notice(
+            ledger_mol_h={"SiO": math.nan},
+            interface_effusion_mol_h={"SiO": 1.0},
+        )

@@ -527,3 +527,79 @@ def solve_interface_oxygen(
         gas_source_mol_s=accepted["gas_source"],
         residual_mol_s=accepted["residual"],
     )
+
+
+STAGE_C_FILM_MISMATCH_KIND = (
+    "stage_c_interface_effusion_vs_ledger_film_mismatch"
+)
+
+
+def stage_c_film_mismatch_notice(
+    *,
+    ledger_mol_h: Mapping[str, float],
+    interface_effusion_mol_h: Mapping[str, float],
+) -> dict[str, object] | None:
+    """Flag the Stage D gap between the booked film and interface effusion.
+
+    Stage C solves the interface with ``R_gas = 0`` and still books the
+    bulk debit on the series film. The two rates are not required to
+    match. The notice carries the ratio so the gap is predicted and
+    flagged (d-367), not clamped away.
+
+    ``ratio = n_ledger / n_effusion``, both in mol/h, so the ratio is
+    dimensionless. For one shared ``(P_eq - P_bulk)`` and no extra gate,
+
+    ``J_ledger = (P_eq - P_bulk) / ((R_i + R_g + R_m) M)``
+
+    ``J_effusion = (P_eq - P_bulk) / (R_i M)``
+
+    ``ratio = R_i / (R_i + R_g + R_m) = 1 / (1 + (R_g + R_m) / R_i)``.
+
+    That is about ``1 / (1 + R_g / R_i)`` when melt resistance is
+    negligible. ``R_g = R_m = 0`` gives 1. A pipe cap or a liquid-fraction
+    gate is inside ``n_ledger`` and moves the reported ratio off that
+    value; this function does not remove it.
+
+    A species with effusion of 0 keeps both rates and a null ratio.
+    Dividing would hide the debit. No positive rate on either side is
+    not a gap, so the notice is absent. A non-finite rate is refused.
+    """
+
+    def rates(source: Mapping[str, float], label: str) -> dict[str, float]:
+        resolved: dict[str, float] = {}
+        for species, raw in source.items():
+            try:
+                rate = float(raw)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"{label} rate for {species!r} must be numeric"
+                ) from exc
+            if not math.isfinite(rate) or rate < 0.0:
+                raise ValueError(
+                    f"{label} rate for {species!r} must be finite and "
+                    f"non-negative; got {raw!r}"
+                )
+            if rate > 0.0:
+                resolved[str(species)] = rate
+        return resolved
+
+    ledger = rates(ledger_mol_h, "ledger")
+    effusion = rates(interface_effusion_mol_h, "interface effusion")
+    species_names = sorted(set(ledger) | set(effusion))
+    if not species_names:
+        return None
+    ratios: dict[str, float | None] = {}
+    for species in species_names:
+        effusion_rate = effusion.get(species, 0.0)
+        if effusion_rate > 0.0:
+            ratios[species] = ledger.get(species, 0.0) / effusion_rate
+        else:
+            ratios[species] = None
+    return {
+        "kind": STAGE_C_FILM_MISMATCH_KIND,
+        "ratios": ratios,
+        "ledger_mol_h": {species: ledger.get(species, 0.0) for species in species_names},
+        "interface_effusion_mol_h": {
+            species: effusion.get(species, 0.0) for species in species_names
+        },
+    }

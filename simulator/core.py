@@ -5052,7 +5052,60 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         if violation:
             payload['capacity_violation'] = dict(violation)
+        mismatch = getattr(self, '_hour_stage_c_film_mismatch_notice', None)
+        if mismatch:
+            payload['stage_c_interface_effusion_vs_ledger_film_mismatch'] = dict(
+                mismatch
+            )
         return payload
+
+    def _record_stage_c_film_mismatch(self, evap_flux: EvaporationFlux) -> None:
+        """Wire the booked film rate to the interface effusion rate.
+
+        The ratio itself lives in ``oxygen_interface``. Mol/h on the
+        effusion side is ``J * A * 3600``: J is mol/(m² s), A is m², and
+        3600 s/h converts the hour's booked ledger mol/h.
+        """
+
+        from simulator.chemistry.oxygen_interface import (
+            stage_c_film_mismatch_notice,
+        )
+
+        solution = getattr(self, '_hour_interface_oxygen', None)
+        if solution is None:
+            self._hour_stage_c_film_mismatch_notice = None
+            return
+        area_m2 = float(getattr(self.melt, 'melt_surface_area_m2', 0.0) or 0.0)
+        if not math.isfinite(area_m2) or area_m2 < 0.0:
+            raise AccountingError(
+                'stage C film comparison requires a finite non-negative '
+                f'melt area; got {area_m2!r}'
+            )
+        effusion_mol_h = {
+            str(species): float(flux) * area_m2 * 3600.0
+            for species, flux in (
+                getattr(solution, 'product_fluxes_mol_m2_s', {}) or {}
+            ).items()
+        }
+        ledger_mol_h: dict[str, float] = {}
+        for species, rate_kg_h in (
+            getattr(evap_flux, 'species_kg_hr', {}) or {}
+        ).items():
+            formula = resolve_species_formula(
+                str(species),
+                self.species_formula_registry,
+            )
+            molar_mass = formula.molar_mass_kg_per_mol()
+            if not math.isfinite(molar_mass) or molar_mass <= 0.0:
+                raise AccountingError(
+                    'stage C film comparison requires a positive molar '
+                    f'mass for {species!r}; got {molar_mass!r}'
+                )
+            ledger_mol_h[str(species)] = float(rate_kg_h) / molar_mass
+        self._hour_stage_c_film_mismatch_notice = stage_c_film_mismatch_notice(
+            ledger_mol_h=ledger_mol_h,
+            interface_effusion_mol_h=effusion_mol_h,
+        )
 
     def _cleaned_melt_fe_atom_mol(self) -> float:
         total_fe_mol = 0.0
@@ -16405,6 +16458,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._hour_interface_oxygen = None
         self._hour_interface_oxygen_temperature_K = None
         self._hour_interface_oxygen_booking = None
+        self._hour_stage_c_film_mismatch_notice = None
         self._hour_interface_oxygen_capacity_mol_per_ln = None
         self._hour_interface_oxygen_exchange_time_s = None
         self._hour_interface_oxygen_reservoir_ln = None
@@ -16659,7 +16713,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._pending_knudsen_zero_overhead_flow_marker = None
 
         # --- 6. Update melt composition ---
-        # Subtract evaporated mass from the melt.
+        # Subtract evaporated mass from the melt. The film-gap notice
+        # reads this committed rate against the pre-update area.
+        self._record_stage_c_film_mismatch(evap_flux)
         self._update_melt_composition(evap_flux)
         self._book_hour_interface_oxygen()
         self._settle_evaporative_redox_after_batch()
