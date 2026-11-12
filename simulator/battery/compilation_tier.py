@@ -31,6 +31,7 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Callable, Iterable, Mapping, Sequence
 
+from simulator.battery.decimal_tokens import decimal_token
 from simulator.battery.enums import (
     EQUILIBRIUM_FIT_QUANTITIES,
     FORMATION_QUANTITIES,
@@ -250,10 +251,8 @@ class _Nasa9FitComparison:
 
 
 def _decimal_token(value: Decimal) -> str:
-    text = format(value, "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    if text in {"", "-", "-0"}:
+    text = decimal_token(value)
+    if text == "-0":
         return "0"
     return text
 

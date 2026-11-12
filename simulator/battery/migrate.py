@@ -76,6 +76,7 @@ from typing import (
 import yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.polymorph_dictionary import (
     POLYMORPH_ALIASES,
@@ -875,13 +876,6 @@ def work_filename(work_id: str) -> str:
     """Filesystem-safe name. DOI slash → underscore; work_id inside YAML is exact."""
 
     return work_id.replace("/", "_") + ".yaml"
-
-
-def _dec_str(value: Decimal) -> str:
-    text = format(value, "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    return text or "0"
 
 
 class _InvalidDecimalValue(Exception):
