@@ -29,6 +29,9 @@ from pathlib import Path
 
 import pytest
 
+from simulator.battery.enums import Quantity, Rail
+from simulator.battery.identity import State
+from simulator.battery.records import CandidateRequest, Value
 import simulator.battery.score as score_mod
 from tests.battery.test_score import _streaming_score_fixture
 
@@ -1864,15 +1867,33 @@ No mapped outcome changes.
 All mapped legacy keys have a v2.1 comparison slot.
 """
 
-def _rendering_source() -> str:
-    """Renderer text, before or after the score_report.py move."""
+PIN_ELEMENT_RETENTION_SECTION = """\
+## Element retention diagnostics
 
-    root = Path(score_mod.__file__).resolve().parent
-    parts = [(root / "score.py").read_text(encoding="utf-8")]
-    report = root / "score_report.py"
-    if report.is_file():
-        parts.append(report.read_text(encoding="utf-8"))
-    return "\n".join(parts)
+Observed loss is 1 − FM; printed uncertainty is shown without rescaling.
+Loss bins are reporting diagnostics and do not affect residual weights.
+
+| observation | engine | status | FM observed | observed loss | printed uncertainty | residual (dex) |
+|---|---|---|---:|---:|---|---:|
+| fixture-element-retention | internal-analytical | match | 0.995 | 0.005 | not printed | 0.5 |
+
+### Observed loss bins
+
+| observed loss | n rows |
+|---|---:|
+| negative (FM > 1) | 0 |
+| 0–1% | 1 |
+| >1–10% | 0 |
+| >10–50% | 0 |
+| >50% | 0 |
+"""
+
+EMPTY_LEDGER_SENTENCES = (
+    "No engine residuals were regenerated for this store revision.",
+    "Pins were not compared; no residuals ledger was regenerated for this store revision.",
+    "status_diff was not run; no residuals ledger was regenerated for this store revision.",
+)
+PIN_FAILURE_TRUNCATION_ROW = "| … | 1 more | | | |"
 
 
 def _score_outputs(
@@ -1880,8 +1901,40 @@ def _score_outputs(
     monkeypatch: pytest.MonkeyPatch,
     *,
     residual_delta: Decimal | None = None,
+    include_retention: bool = False,
+    pin_failures: tuple[dict[str, str], ...] = (),
 ) -> dict[str, str]:
     context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
+    if include_retention:
+        reference = context.observations["fixture-measured-vapour"]
+        retention_id = "fixture-element-retention"
+        retention = replace(
+            reference,
+            observation_id=retention_id,
+            identity=replace(
+                reference.identity,
+                quantity=Quantity.ELEMENT_RETENTION_RATIO,
+                subtype=State.of("concentration_retention"),
+            ),
+            value=Value.point_of(Decimal("0.995")),
+        )
+        context = replace(
+            context,
+            observations={**context.observations, retention_id: retention},
+        )
+        fixture_residuals[retention_id] = replace(
+            fixture_residuals["fixture-measured-vapour"],
+            key=f"fixture::{retention_id}::{engine.value}",
+            reference=retention_id,
+            rail=Rail.VAPOUR,
+            candidate=None,
+            candidate_request=CandidateRequest(
+                retention.experiment_id,
+                Quantity.ELEMENT_RETENTION_RATIO,
+                engine,
+                engine.value,
+            ),
+        )
     if residual_delta is not None:
         key = "fixture-measured-vapour"
         row = fixture_residuals[key]
@@ -1920,12 +1973,17 @@ def _score_outputs(
         metadata.aggregate, streamed_summary, store_stamp=stamp
     )
     direct_report = score_mod.render_score_report(
-        residuals, context=context, engines=engines, root=root
+        residuals,
+        context=context,
+        engines=engines,
+        pin_failures=pin_failures,
+        root=root,
     )
     streamed_report = score_mod._render_score_report_from_payloads_legacy(
         score_mod._ResidualJsonlRows(partial, metadata=metadata),
         context=context,
         engines=engines,
+        pin_failures=pin_failures,
         store_stamp=stamp,
         _aggregate=metadata.aggregate,
     )
@@ -1943,6 +2001,7 @@ def _score_outputs(
         payload_rows,
         engines=engines,
         hostname=context.hostname,
+        pin_failures=pin_failures,
         store_stamp=stamp,
         observations=context.observations,
         origins=context.origins,
@@ -1990,18 +2049,58 @@ def test_changed_residual_value_misses_the_output_pins(
     assert got["payload_report"] != PIN_PAYLOAD_REPORT
 
 
-def test_one_changed_report_heading_character_misses_the_report_pins() -> None:
-    """The pinned Markdown starts with the heading the renderer source emits.
+def test_element_retention_report_aggregation_is_byte_pinned(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    got = _score_outputs(tmp_path, monkeypatch, include_retention=True)
+    direct = got["direct_report"].split("## Element retention diagnostics", 1)[1]
+    payload = got["payload_report"].split("## Element retention diagnostics", 1)[1]
+    expected = PIN_ELEMENT_RETENTION_SECTION.split(
+        "## Element retention diagnostics", 1
+    )[1]
+    assert direct == payload == expected
 
-    ``v2.1`` to ``v2.2`` is one character. That variant is not the pin.
-    """
 
-    source = _rendering_source()
-    assert HEADING in source
-    assert PIN_REPORT.startswith(HEADING + "\n")
-    assert PIN_PAYLOAD_REPORT.startswith(HEADING + "\n")
-    mutated = HEADING.replace("2.1", "2.2", 1)
-    assert mutated != HEADING
-    assert sum(left != right for left, right in zip(HEADING, mutated)) == 1
-    assert PIN_REPORT.replace(HEADING, mutated, 1) != PIN_REPORT
-    assert PIN_PAYLOAD_REPORT.replace(HEADING, mutated, 1) != PIN_PAYLOAD_REPORT
+def test_empty_ledger_sentences_are_pinned_on_live_and_streamed_reports(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    context, engine, _fixture_residuals, _fixture_candidates = _streaming_score_fixture()
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    direct = score_mod.render_score_report(
+        (), context=context, engines=(engine,), root=score_mod.REPO_ROOT
+    )
+    streamed = score_mod._render_score_report_from_payloads_legacy(
+        (), context=context, engines=(engine,), store_stamp=stamp
+    )
+    assert direct == streamed
+    assert all(sentence in direct for sentence in EMPTY_LEDGER_SENTENCES)
+
+
+def test_pin_failure_truncation_row_is_pinned_on_all_report_paths(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    failures = tuple(
+        {
+            "key": f"fixture-pin-{index:02d}",
+            "reason": "outside_pin_band",
+            "live": "1",
+            "centre": "0",
+            "pin_band": "0.1",
+        }
+        for index in range(51)
+    )
+    got = _score_outputs(tmp_path, monkeypatch, pin_failures=failures)
+    for key in ("direct_report", "streamed_report", "payload_report"):
+        assert PIN_FAILURE_TRUNCATION_ROW in got[key]
+
+
+def test_changed_report_heading_misses_the_output_pins(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score_report as report_mod
+
+    monkeypatch.setattr(report_mod, "REPORT_HEADING", HEADING + " changed")
+    got = _score_outputs(tmp_path, monkeypatch)
+    assert got["direct_report"] != PIN_REPORT
+    assert got["streamed_report"] != PIN_REPORT
+    assert got["payload_report"] != PIN_PAYLOAD_REPORT
