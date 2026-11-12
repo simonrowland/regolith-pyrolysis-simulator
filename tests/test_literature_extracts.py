@@ -5182,6 +5182,13 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # tag:value and a missing tag stay leaves at the observation root and under
 # values. Recount held at 48630 / 615, unattested 3131, pilots 57, and
 # source-blind 0.
+# t-1753a3: a MinerU HTML cell address selects one parsed cell, and formula
+# or species labels fold subscript markup. No extract is review_status
+# reviewed and no sample has reviewed_by, so the source matcher does not
+# run on the corpus. Cell addressing is opt-in. The formula fold adds
+# label spellings and leaves numeric comparison unchanged. Recount held:
+# uncovered observations 48630, extracts 615, unattested 3131, pilots 57,
+# source-blind 0.
 # Both coverage ceilings may only fall.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 48630
@@ -9810,6 +9817,558 @@ def test_table_locator_that_cuts_a_cell_is_source_blind(
         assert "source_blind_pin" in joined
         if mode != "cover":
             assert "cuts through" in joined, (case_name, leaf, errors)
+
+
+# One MinerU line. 6.98 is in two cells, and 16.98 contains those digits.
+_HTML_CROSS_ROW = (
+    "<table>"
+    "<tr><td>SiO2</td><td>6.98</td><td>16.98</td></tr>"
+    "<tr><td>MgO</td><td>1.10</td><td>6.98</td></tr>"
+    "</table>\n"
+)
+_HTML_CROSS_ROW_GRID = (
+    ("SiO2", "6.98", "16.98"),
+    ("MgO", "1.10", "6.98"),
+)
+_HTML_ROWSPAN = (
+    '<table><tr><td rowspan="2">1650</td><td>257</td><td>6.98</td></tr>'
+    "<tr><td>265</td><td>1.10</td></tr></table>\n"
+)
+_HTML_ROWSPAN_GRID = (
+    ("1650", "257", "6.98"),
+    ("1650", "265", "1.10"),
+)
+_HTML_COLSPAN = '<table><tr><td colspan="2">6.98</td><td>1</td></tr></table>\n'
+_HTML_COLSPAN_GRID = (("6.98", "6.98", "1"),)
+_FORMULA_MARKUPS = (
+    ("SiO2", "SiO_{2}"),
+    ("SiO2", "SiO₂"),
+    ("SiO2", "SiO 2"),
+    ("Fe2O3", "Fe_{2}O_{3}"),
+    ("Al2O3", "Al_2O_3"),
+    ("Fe2O3", "Fe₂O₃"),
+    ("Fe2O3", "Fe 2 O 3"),
+    ("SiO2", "$SiO_{2}$"),
+    ("SiO2", " $SiO_{2}$ "),
+)
+_SUBSCRIPT_DIGITS = "₀₁₂₃₄₅₆₇₈₉"
+
+
+def _html_source_document(
+    root: Path,
+    pin: object,
+    source_text: str,
+    *,
+    key: str = "alpha",
+    relative: str = "text/paper.md",
+    locator_extra: dict | None = None,
+    addressing: str = "path",
+) -> dict:
+    """One attested pin. ``source_text`` is the artifact, not derived from ``pin``."""
+    path = root / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(source_text, encoding="utf-8")
+    locator: dict = {"source_path": relative, "page": 1}
+    if locator_extra:
+        locator.update(locator_extra)
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["review_status"] = "reviewed"
+    doc["species"]["Fe"]["observations"][0]["values"] = {key: pin}
+    sample: dict = {
+        "value": pin,
+        "reviewed_by": "independent reviewer",
+        "reviewed_on": "2026-11-10",
+        "locator": locator,
+    }
+    if addressing == "path":
+        sample["path"] = f"species.Fe.observations[fe_alpha_1].values.{key}"
+    elif addressing == "field":
+        sample["species"] = "Fe"
+        sample["observable"] = "alpha"
+        sample["observation_id"] = "fe_alpha_1"
+        sample["field"] = key
+    elif addressing == "value_key":
+        sample["species"] = "Fe"
+        sample["observable"] = "alpha"
+        sample["observation_id"] = "fe_alpha_1"
+        sample["value_key"] = key
+    else:
+        raise AssertionError(addressing)
+    doc["fidelity_samples"] = [sample]
+    return doc
+
+
+def _assert_cell_certification(
+    root: Path,
+    source_text: str,
+    grid: tuple[tuple[str, ...], ...],
+    *,
+    failures: list[str],
+    label: str,
+) -> None:
+    """Each cell certifies its own text, and 6.98 only when that cell is 6.98."""
+    for row_index, row in enumerate(grid, start=1):
+        for column_index, cell in enumerate(row, start=1):
+            for pin in (cell, 6.98):
+                expected = _oracle_whole_cell_certifies(pin, cell)
+                doc = _html_source_document(
+                    root,
+                    pin,
+                    source_text,
+                    locator_extra={
+                        "table_row": row_index,
+                        "table_column": column_index,
+                    },
+                )
+                errors = vle.certify_extract_source_fidelity(
+                    doc, label=label, artifact_root=root
+                )
+                where = f"{label} r{row_index}c{column_index} {cell!r} pin {pin!r}"
+                if expected:
+                    if errors:
+                        failures.append(f"accept {where}: {errors}")
+                elif not errors or "source_blind_pin" not in "\n".join(errors):
+                    failures.append(f"refuse {where}: {errors}")
+
+
+def test_html_cell_refuses_a_value_from_another_row(tmp_path: Path):
+    """A token in another cell of the same ``<table>`` line does not certify.
+
+    The grid is independent of the parser. 6.98 occupies row 1 column 2 and
+    row 2 column 3. 16.98 contains those digits and still refuses 6.98.
+    ``table_row_number`` and ``table_column_number`` are the same indexes.
+    """
+    assert "vle." not in inspect.getsource(_oracle_whole_cell_certifies)
+    failures: list[str] = []
+    _assert_cell_certification(
+        tmp_path,
+        _HTML_CROSS_ROW,
+        _HTML_CROSS_ROW_GRID,
+        failures=failures,
+        label="cross-row",
+    )
+    doc = _html_source_document(
+        tmp_path,
+        6.98,
+        _HTML_CROSS_ROW,
+        locator_extra={"table_row_number": 1, "table_column_number": 2},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        doc, label="alias", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"alias row 1 column 2: {errors}")
+    doc = _html_source_document(
+        tmp_path,
+        6.98,
+        _HTML_CROSS_ROW,
+        locator_extra={
+            "table_row": "2",
+            "table_column": "3",
+            "table_row_number": 2,
+            "table_column_number": 3,
+        },
+    )
+    errors = vle.certify_extract_source_fidelity(
+        doc, label="agree", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"agreeing indexes: {errors}")
+    doc = _html_source_document(
+        tmp_path,
+        6.98,
+        _HTML_CROSS_ROW,
+        locator_extra={"table_row": 1, "table_column": 1},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        doc, label="other-row", artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    if "source_blind_pin" not in joined:
+        failures.append(f"SiO2 cell must refuse 6.98: {errors}")
+    assert failures == []
+
+
+def test_html_cell_expands_rowspan_and_colspan(tmp_path: Path):
+    """A spanned slot keeps the origin cell. The neighbour's value stays there."""
+    assert "vle." not in inspect.getsource(_oracle_whole_cell_certifies)
+    failures: list[str] = []
+    _assert_cell_certification(
+        tmp_path,
+        _HTML_ROWSPAN,
+        _HTML_ROWSPAN_GRID,
+        failures=failures,
+        label="rowspan",
+    )
+    _assert_cell_certification(
+        tmp_path,
+        _HTML_COLSPAN,
+        _HTML_COLSPAN_GRID,
+        failures=failures,
+        label="colspan",
+    )
+    covered = _html_source_document(
+        tmp_path,
+        1650,
+        _HTML_ROWSPAN,
+        locator_extra={"table_row": 2, "table_column": 1},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        covered, label="rowspan-origin", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"row 2 column 1 is 1650: {errors}")
+    neighbour = _html_source_document(
+        tmp_path,
+        6.98,
+        _HTML_ROWSPAN,
+        locator_extra={"table_row": 2, "table_column": 3},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        neighbour, label="rowspan-neighbour", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"row 2 column 3 refuses 6.98: {errors}")
+    spanned = _html_source_document(
+        tmp_path,
+        6.98,
+        _HTML_COLSPAN,
+        locator_extra={"table_row": 1, "table_column": 2},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        spanned, label="colspan-span", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"column 2 keeps 6.98: {errors}")
+    edge = _html_source_document(
+        tmp_path,
+        1,
+        _HTML_COLSPAN,
+        locator_extra={"table_row": 1, "table_column": 2},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        edge, label="colspan-edge", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"column 2 refuses 1: {errors}")
+    assert failures == []
+
+
+def test_html_cell_address_is_a_typed_refusal(tmp_path: Path):
+    """An address that does not select one cell refuses, including when the
+    digits sit in the file.
+    """
+    prose = "the oxide is 6.98 percent\n"
+    two_tables = (
+        "<table><tr><td>1.10</td></tr></table>\n"
+        "<table><tr><td>6.98</td></tr></table>\n"
+    )
+    cut_table = "<table>\n<tr><td>6.98</td></tr></table>\n"
+    bad_span = '<table><tr><td rowspan="0">6.98</td></tr></table>\n'
+    cases = (
+        ("absent", prose, {"table_row": 1, "table_column": 1}, "html_table_absent"),
+        ("row-only", _HTML_CROSS_ROW, {"table_row": 1}, "html_cell_address_incomplete"),
+        (
+            "column-only",
+            _HTML_CROSS_ROW,
+            {"table_column": 1},
+            "html_cell_address_incomplete",
+        ),
+        (
+            "zero",
+            _HTML_CROSS_ROW,
+            {"table_row": 0, "table_column": 1},
+            "html_cell_address_invalid",
+        ),
+        (
+            "bool",
+            _HTML_CROSS_ROW,
+            {"table_row": True, "table_column": 1},
+            "html_cell_address_invalid",
+        ),
+        (
+            "float",
+            _HTML_CROSS_ROW,
+            {"table_row": 1.0, "table_column": 1},
+            "html_cell_address_invalid",
+        ),
+        (
+            "dotted",
+            _HTML_CROSS_ROW,
+            {"table_row": "2.0", "table_column": "1"},
+            "html_cell_address_invalid",
+        ),
+        (
+            "disagree",
+            _HTML_CROSS_ROW,
+            {"table_row": 1, "table_row_number": 2, "table_column": 2},
+            "html_cell_address_invalid",
+        ),
+        ("ambiguous", two_tables, {"table_row": 1, "table_column": 1}, "html_table_ambiguous"),
+        (
+            "both-covered",
+            two_tables,
+            {"table_row": 1, "table_column": 1, "line_range": "1-2"},
+            "html_table_ambiguous",
+        ),
+        (
+            "outside",
+            _HTML_CROSS_ROW,
+            {"table_row": 9, "table_column": 1},
+            "html_cell_outside_table",
+        ),
+        (
+            "bad-span",
+            bad_span,
+            {"table_row": 1, "table_column": 1},
+            "html_table_span_invalid",
+        ),
+        (
+            "cut-first",
+            cut_table,
+            {"table_row": 1, "table_column": 1, "line_range": "1"},
+            "cuts through",
+        ),
+        (
+            "cut-second",
+            cut_table,
+            {"table_row": 1, "table_column": 1, "line_range": "2"},
+            "cuts through",
+        ),
+    )
+    failures: list[str] = []
+    for name, source, extra, needle in cases:
+        doc = _html_source_document(
+            tmp_path, 6.98, source, locator_extra=extra
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=name, artifact_root=tmp_path
+        )
+        joined = "\n".join(errors)
+        if "source_blind_pin" not in joined or needle not in joined:
+            failures.append(f"{name}: {errors}")
+    selected = _html_source_document(
+        tmp_path,
+        6.98,
+        two_tables,
+        locator_extra={"table_row": 1, "table_column": 1, "line_range": "2"},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        selected, label="second-table", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"line 2 selects 6.98: {errors}")
+    other = _html_source_document(
+        tmp_path,
+        1.10,
+        two_tables,
+        locator_extra={"table_row": 1, "table_column": 1, "line_range": "2"},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        other, label="second-table-other", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"line 2 refuses 1.10: {errors}")
+    covered = _html_source_document(
+        tmp_path,
+        6.98,
+        cut_table,
+        locator_extra={"table_row": 1, "table_column": 1, "line_range": "1-2"},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        covered, label="cut-covered", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"covering span accepts 6.98: {errors}")
+    unaddressed = _html_source_document(tmp_path, 6.98, prose)
+    errors = vle.certify_extract_source_fidelity(
+        unaddressed, label="prose", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"prose without a cell address accepts 6.98: {errors}")
+    assert failures == []
+
+
+def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
+    """Formula and species labels fold subscript markup. Numbers do not.
+
+    The product is each printed markup against ``formula`` and ``species``,
+    in running text and as one HTML cell. A value key, a longer formula,
+    and a numeric leaf against Unicode-only digits or a formula cell refuse.
+    """
+    assert "_normalize_formula_label" not in inspect.getsource(vle._leaf_in_text)
+    assert "_normalize_formula_label" not in inspect.getsource(vle._cell_certifies_leaf)
+    text_source = inspect.getsource(vle._pinned_leaf_in_text)
+    cell_source = inspect.getsource(vle._pinned_leaf_in_cells)
+    assert text_source.index("formula_label") < text_source.index("_formula_label_in_text")
+    assert cell_source.index("_cell_certifies_leaf") < cell_source.index("formula_label")
+    for numeric in ("2", "2.0", "6.98", "1e-999"):
+        assert vle._formula_label_in_text(numeric, "SiO_{2}") is False
+        assert vle._formula_label_in_text(numeric, "SiO₂") is False
+        assert vle._formula_cell_matches(numeric, " $SiO_{2}$ ") is False
+        assert vle._formula_cell_matches(numeric, "₂") is False
+        assert vle._formula_cell_matches(numeric, "_{2}") is False
+    failures: list[str] = []
+    for label, markup in _FORMULA_MARKUPS:
+        for key in ("formula", "species"):
+            prose = _html_source_document(
+                tmp_path,
+                label,
+                f"oxide {markup} end\n",
+                key=key,
+            )
+            errors = vle.certify_extract_source_fidelity(
+                prose, label=f"prose-{key}", artifact_root=tmp_path
+            )
+            if errors:
+                failures.append(f"prose {key} {label} ~ {markup!r}: {errors}")
+            cell = (
+                "<table><tr>"
+                f"<td>{markup}</td>"
+                "</tr></table>\n"
+            )
+            cited = _html_source_document(
+                tmp_path,
+                label,
+                cell,
+                key=key,
+                locator_extra={"table_row": 1, "table_column": 1},
+            )
+            errors = vle.certify_extract_source_fidelity(
+                cited, label=f"cell-{key}", artifact_root=tmp_path
+            )
+            if errors:
+                failures.append(f"cell {key} {label} ~ {markup!r}: {errors}")
+    for addressing in ("field", "value_key"):
+        doc = _html_source_document(
+            tmp_path,
+            "SiO2",
+            "oxide SiO_{2} end\n",
+            key="formula",
+            addressing=addressing,
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=addressing, artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"{addressing}: {errors}")
+    alpha = _html_source_document(
+        tmp_path,
+        "SiO2",
+        "oxide SiO_{2} end\n",
+        key="alpha",
+    )
+    errors = vle.certify_extract_source_fidelity(
+        alpha, label="alpha-key", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"alpha key refuses SiO_{{2}}: {errors}")
+    longer = _html_source_document(
+        tmp_path,
+        "SiO2",
+        "oxide SiO_{22} end\n",
+        key="formula",
+    )
+    errors = vle.certify_extract_source_fidelity(
+        longer, label="longer", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"SiO_{{22}} refuses SiO2: {errors}")
+    extra = _html_source_document(
+        tmp_path,
+        "SiO2",
+        "<table><tr><td>SiO_{2} extra</td></tr></table>\n",
+        key="formula",
+        locator_extra={"table_row": 1, "table_column": 1},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        extra, label="extra", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"longer cell refuses SiO2: {errors}")
+    numeric_leaves = (2, 2.0, 3, "2", 6.98)
+    unicode_sources = {
+        2: "oxide SiO₂ end\n",
+        2.0: "oxide SiO₂ end\n",
+        3: "oxide Fe₂O₃ end\n",
+        "2": "standalone ₂\n",
+        6.98: "oxide SiO₂ end\n",
+    }
+    for pin in numeric_leaves:
+        doc = _html_source_document(
+            tmp_path,
+            pin,
+            unicode_sources[pin],
+            key="formula",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"unicode-{pin!r}", artifact_root=tmp_path
+        )
+        if not errors or "source_blind_pin" not in "\n".join(errors):
+            failures.append(f"unicode numeric {pin!r}: {errors}")
+        for markup in (" $SiO_{2}$ ", "_{2}", "₂"):
+            cell = f"<table><tr><td>{markup}</td></tr></table>\n"
+            doc = _html_source_document(
+                tmp_path,
+                pin,
+                cell,
+                key="formula",
+                locator_extra={"table_row": 1, "table_column": 1},
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"formula-cell-{pin!r}", artifact_root=tmp_path
+            )
+            if not errors or "source_blind_pin" not in "\n".join(errors):
+                failures.append(f"formula cell {markup!r} numeric {pin!r}: {errors}")
+    for index, subscript in enumerate(_SUBSCRIPT_DIGITS):
+        prose = _html_source_document(
+            tmp_path,
+            index,
+            f"label SiO{subscript} end\n",
+            key="formula",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            prose, label=f"digit-{index}", artifact_root=tmp_path
+        )
+        if not errors or "source_blind_pin" not in "\n".join(errors):
+            failures.append(f"subscript {subscript} refuses {index}: {errors}")
+        label = _html_source_document(
+            tmp_path,
+            f"SiO{index}",
+            f"label SiO{subscript} end\n",
+            key="formula",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            label, label=f"formula-digit-{index}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"SiO{index} accepts SiO{subscript}: {errors}")
+    csv_doc = _html_source_document(
+        tmp_path,
+        "SiO2",
+        "SiO_{2}\n",
+        key="formula",
+        relative="tables/formula.csv",
+    )
+    errors = vle.certify_extract_source_fidelity(
+        csv_doc, label="csv-formula", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"csv formula cell: {errors}")
+    csv_number = _html_source_document(
+        tmp_path,
+        2,
+        "SiO_{2}\n",
+        key="formula",
+        relative="tables/formula.csv",
+    )
+    errors = vle.certify_extract_source_fidelity(
+        csv_number, label="csv-number", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"csv formula cell refuses 2: {errors}")
+    assert failures == []
 
 
 # Stored value versus the sample spelling. ``within`` pairs satisfy

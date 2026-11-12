@@ -46,6 +46,16 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   not 1 and a cell 1,000 is not 1. A line_range selects only records that lie entirely
   inside it. A span that cuts through a quoted cell is source-blind and
   is not re-parsed from the sliced lines. 1 K is not 1 KPa.
+  A MinerU markdown table is one ``<table>`` line, so a line_range cannot
+  isolate a row. ``table_row`` and ``table_column`` (the same indexes as
+  ``table_row_number`` and ``table_column_number``) select one cell after
+  the HTML table is parsed, rowspan and colspan included. The stored
+  number must be that whole trimmed cell. A value in another row does
+  not certify. Formula and species labels are normalized before the
+  token comparison: ``_{n}``, a bare ``_`` digit, and Unicode subscript
+  digits become plain digits, and a layout space inside the formula is
+  removed. Numbers are not normalized. A numeric leaf does not
+  match a formula by that path.
   A leading decimal is a number, so .24 is not a label
   and is not the token -0.24, 10.24, or 0.24. A float spelling is kept
   only when it parses back to the stored number, so
@@ -109,6 +119,7 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from decimal import Decimal, DecimalException
 from functools import lru_cache
+from html.parser import HTMLParser
 import math
 import os
 import re
@@ -629,6 +640,273 @@ def _leaf_in_table(leaf: Any, cells: Sequence[str]) -> bool:
     ``note 1`` is not that stored number.
     """
     return any(_cell_certifies_leaf(leaf, cell) for cell in cells)
+
+
+# One MinerU table is a single ``<table>...</table>`` line. Nested tables
+# are not a MinerU shape this matcher reads.
+_HTML_TABLE_RE = re.compile(
+    r"<table\b[^>]*>.*?</table>", re.IGNORECASE | re.DOTALL
+)
+# 1-based grid coordinates, header rows included. The longer names are the
+# cell keys already written on locators; they are the same indexes.
+_HTML_ROW_KEYS = ("table_row", "table_row_number")
+_HTML_COLUMN_KEYS = ("table_column", "table_column_number")
+# Formula-bearing label keys only. Every other key, and every number, keeps
+# the ordinary token or whole-cell comparison.
+_FORMULA_LABEL_KEYS = frozenset({"formula", "species"})
+_SUBSCRIPT_DIGIT_FOLD = str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789")
+_FORMULA_BRACE_SUBSCRIPT_RE = re.compile(r"_\{(\d+)\}")
+_FORMULA_BARE_SUBSCRIPT_RE = re.compile(r"_(\d+)")
+_FORMULA_LAYOUT_SPACE_RE = re.compile(r"(?<=[A-Za-z])\s+(?=\d)")
+# A space before the next word stays. Only an element symbol (one uppercase
+# letter and an optional lowercase letter) is part of the formula.
+_FORMULA_DIGIT_LETTER_SPACE_RE = re.compile(
+    r"(?<=\d)\s+(?=[A-Z][a-z]?(?![A-Za-z]))"
+)
+
+
+class _HtmlTableGeometryError(Exception):
+    """A rowspan or colspan that does not land on an empty grid slot."""
+
+
+class _HtmlCellParser(HTMLParser):
+    """Rows of ``(text, rowspan, colspan)`` from one ``<table>`` element."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.rows: list[list[tuple[str, int, int]]] = []
+        self.error: str | None = None
+        self._row: list[tuple[str, int, int]] | None = None
+        self._parts: list[str] | None = None
+        self._rowspan = 1
+        self._colspan = 1
+
+    def _span(self, value: str | None, name: str) -> int:
+        if value is None or str(value).strip() == "":
+            return 1
+        text = str(value).strip()
+        if not re.fullmatch(r"[0-9]+", text) or int(text) < 1:
+            self.error = (
+                f"html_table_span_invalid: {name} is not a positive integer"
+            )
+            return 1
+        return int(text)
+
+    def handle_starttag(
+        self, tag: str, attrs: list[tuple[str, str | None]]
+    ) -> None:
+        name = tag.lower()
+        if name == "tr":
+            self._row = []
+            return
+        if name in {"td", "th"}:
+            if self._row is None:
+                self._row = []
+            attributes = {key.lower(): value for key, value in attrs}
+            self._rowspan = self._span(attributes.get("rowspan"), "rowspan")
+            self._colspan = self._span(attributes.get("colspan"), "colspan")
+            self._parts = []
+            return
+        if name == "br" and self._parts is not None:
+            self._parts.append("\n")
+
+    def handle_endtag(self, tag: str) -> None:
+        name = tag.lower()
+        if name in {"td", "th"} and self._row is not None and self._parts is not None:
+            self._row.append(("".join(self._parts), self._rowspan, self._colspan))
+            self._parts = None
+            return
+        if name == "tr" and self._row is not None:
+            self.rows.append(self._row)
+            self._row = None
+
+    def handle_data(self, data: str) -> None:
+        if self._parts is not None:
+            self._parts.append(data)
+
+
+def _html_table_grid(table_html: str) -> tuple[list[list[str]] | None, str | None]:
+    """Expand one table. Each covered rowspan or colspan slot keeps the cell text.
+
+    Overlapping spans and a span that never finds an empty slot are refusals.
+    A missing slot in a ragged row is an empty cell, not a neighbour's text.
+    """
+    parser = _HtmlCellParser()
+    try:
+        parser.feed(table_html)
+        parser.close()
+    except Exception:
+        return None, "html_table_unparsed: HTML table could not be parsed"
+    if parser.error:
+        return None, parser.error
+    if not parser.rows:
+        return None, "html_table_unparsed: HTML table has no rows"
+    placed: dict[tuple[int, int], str] = {}
+    row_count = len(parser.rows)
+    try:
+        for row_index, source_row in enumerate(parser.rows):
+            column_index = 0
+            for text, rowspan, colspan in source_row:
+                steps = 0
+                limit = len(placed) + colspan + 1
+                while any(
+                    (row_index, column_index + offset) in placed
+                    for offset in range(colspan)
+                ):
+                    column_index += 1
+                    steps += 1
+                    if steps > limit:
+                        raise _HtmlTableGeometryError(
+                            "html_table_span_invalid: cell span does not fit"
+                        )
+                for row_offset in range(rowspan):
+                    for column_offset in range(colspan):
+                        key = (row_index + row_offset, column_index + column_offset)
+                        if key in placed:
+                            raise _HtmlTableGeometryError(
+                                "html_table_span_invalid: overlapping cells"
+                            )
+                        placed[key] = text
+                row_count = max(row_count, row_index + rowspan)
+                column_index += colspan
+    except _HtmlTableGeometryError as exc:
+        return None, str(exc)
+    width = max((column + 1 for _row, column in placed), default=0)
+    grid = [
+        [placed.get((row_index, column_index), "") for column_index in range(width)]
+        for row_index in range(row_count)
+    ]
+    return grid, None
+
+
+def _parse_positive_index(raw: Any) -> int | None:
+    """1-based index. Bool, float, zero, and a non-digit string are refusals."""
+    if isinstance(raw, bool) or raw is None:
+        return None
+    if isinstance(raw, int):
+        return raw if raw >= 1 else None
+    if isinstance(raw, str) and re.fullmatch(r"[0-9]+", raw.strip()):
+        number = int(raw.strip())
+        return number if number >= 1 else None
+    return None
+
+
+def _locator_has_html_cell_address(locator: Mapping[str, Any]) -> bool:
+    return any(key in locator for key in (*_HTML_ROW_KEYS, *_HTML_COLUMN_KEYS))
+
+
+def _one_html_index(
+    locator: Mapping[str, Any], keys: tuple[str, ...], label: str
+) -> tuple[int | None, str | None]:
+    """The shared index, or an error. ``(None, None)`` means the keys are absent."""
+    present = [key for key in keys if key in locator]
+    if not present:
+        return None, None
+    parsed: list[int] = []
+    for key in present:
+        value = _parse_positive_index(locator.get(key))
+        if value is None:
+            return None, (
+                f"html_cell_address_invalid: {key} is not a 1-based cell index"
+            )
+        parsed.append(value)
+    if any(item != parsed[0] for item in parsed):
+        return None, f"html_cell_address_invalid: {label} keys disagree"
+    return parsed[0], None
+
+
+def _html_cell_address(
+    locator: Mapping[str, Any],
+) -> tuple[tuple[int, int] | None, str | None]:
+    """``(row, column)`` when the locator cites one HTML cell."""
+    if not _locator_has_html_cell_address(locator):
+        return None, None
+    row, row_error = _one_html_index(locator, _HTML_ROW_KEYS, "table row")
+    if row_error:
+        return None, row_error
+    column, column_error = _one_html_index(
+        locator, _HTML_COLUMN_KEYS, "table column"
+    )
+    if column_error:
+        return None, column_error
+    if row is None or column is None:
+        return None, (
+            "html_cell_address_incomplete: table_row and table_column "
+            "are both required"
+        )
+    return (row, column), None
+
+
+def _cited_html_cell(
+    text: str, locator: Mapping[str, Any]
+) -> tuple[str | None, str | None]:
+    """The one cited cell, after the complete table is parsed.
+
+    ``line_range`` selects tables that lie entirely inside it. A span that
+    cuts a table is source-blind. More than one table in the cited span is
+    source-blind. The sliced line is not searched as prose.
+    """
+    address, address_error = _html_cell_address(locator)
+    if address_error:
+        return None, address_error
+    if address is None:
+        return None, (
+            "html_cell_address_incomplete: table_row and table_column "
+            "are both required"
+        )
+    row, column = address
+    span: tuple[int, int] | None = None
+    if "line_range" in locator and locator.get("line_range") is not None:
+        span = _parse_line_range(locator.get("line_range"))
+        if span is None:
+            return None, "line_range is not a line number or start-end span"
+        start, end = span
+        line_count = len(text.splitlines())
+        if end > line_count:
+            return None, (
+                f"line_range {start}-{end} is outside the artifact "
+                f"({line_count} lines)"
+            )
+    chosen: list[str] = []
+    for match in _HTML_TABLE_RE.finditer(text):
+        start_line = text.count("\n", 0, match.start()) + 1
+        end_line = text.count("\n", 0, max(match.start(), match.end() - 1)) + 1
+        if span is None:
+            chosen.append(match.group(0))
+            continue
+        range_start, range_end = span
+        overlaps = not (range_end < start_line or range_start > end_line)
+        covers = range_start <= start_line and end_line <= range_end
+        if overlaps and not covers:
+            return None, (
+                f"line_range {range_start}-{range_end} cuts through an HTML "
+                f"table on lines {start_line}-{end_line}"
+            )
+        if covers:
+            chosen.append(match.group(0))
+    if not chosen:
+        return None, "html_table_absent: cited span has no HTML table"
+    if len(chosen) > 1:
+        return None, (
+            f"html_table_ambiguous: cited span has {len(chosen)} HTML tables"
+        )
+    grid, grid_error = _html_table_grid(chosen[0])
+    if grid_error or not grid:
+        return None, grid_error or "html_table_unparsed: HTML table has no rows"
+    width = len(grid[row - 1]) if row <= len(grid) else 0
+    if row > len(grid) or column > width:
+        return None, (
+            f"html_cell_outside_table: table_row {row} table_column {column} "
+            f"is outside the table ({len(grid)} rows, {width} columns)"
+        )
+    return grid[row - 1][column - 1], None
+
+
+def _html_blind_code(message: str) -> str:
+    head = message.split(":", 1)[0].strip()
+    if head.startswith("html_"):
+        return head
+    return "cited_span_missing"
 
 
 # Corpus-relative roots that hold a paper, OCR, or quotes. Reference
@@ -2533,20 +2811,67 @@ def _cited_text(
     return "\n".join(lines[start - 1 : end]), None
 
 
-def _scalar_leaves(value: Any) -> list[Any]:
+@dataclass(frozen=True)
+class _PinnedLeaf:
+    """One scalar the opened source must contain."""
+
+    value: Any
+    formula_label: bool
+
+
+def _string_is_plain_number(text: str) -> bool:
+    """True when the whole trimmed string is one finite number.
+
+    A formula key that stores a number stays on the numeric comparison.
+    ``SiO2`` is not a number. ``2`` and ``6.98`` are.
+    """
+    return _finite_decimal(_fold_numeric_signs(text.strip())) is not None
+
+
+def _sample_root_is_formula_label(sample: Mapping[str, Any]) -> bool:
+    """True when the addressed value itself is a formula or species label."""
+    path_keys, _structured = _sample_addressing_keys(sample)
+    if path_keys:
+        raw = sample.get(path_keys[0])
+        if not isinstance(raw, str):
+            return False
+        match = _PATH_SEGMENT_RE.match(raw.split(".")[-1])
+        return bool(match) and match.group(1) in _FORMULA_LABEL_KEYS
+    for key in ("field", "value_key"):
+        name = sample.get(key)
+        if isinstance(name, str) and name in _FORMULA_LABEL_KEYS:
+            return True
+    return False
+
+
+def _pinned_leaves(value: Any, *, formula_label: bool) -> list[_PinnedLeaf]:
+    """Scalar leaves. A mapping key named formula or species marks that child.
+
+    The flag does not pass into a child mapping. A list keeps the flag of
+    the value that contains it. A number, including a numeric string, is
+    never a formula label.
+    """
     if isinstance(value, str):
-        return [value] if value.strip() else []
+        if not value.strip():
+            return []
+        return [
+            _PinnedLeaf(
+                value,
+                formula_label and not _string_is_plain_number(value),
+            )
+        ]
     if isinstance(value, bool) or isinstance(value, (int, float)):
-        return [value]
+        return [_PinnedLeaf(value, False)]
     if isinstance(value, Mapping):
-        leaves: list[Any] = []
-        for child in value.values():
-            leaves.extend(_scalar_leaves(child))
+        leaves: list[_PinnedLeaf] = []
+        for key, child in value.items():
+            child_label = isinstance(key, str) and key in _FORMULA_LABEL_KEYS
+            leaves.extend(_pinned_leaves(child, formula_label=child_label))
         return leaves
     if isinstance(value, (list, tuple)):
         leaves = []
         for child in value:
-            leaves.extend(_scalar_leaves(child))
+            leaves.extend(_pinned_leaves(child, formula_label=formula_label))
         return leaves
     return []
 
@@ -2673,28 +2998,102 @@ def _leaf_in_text(leaf: Any, text: str) -> bool:
     return False
 
 
+def _normalize_formula_label(text: str) -> str:
+    """Fold formula markup onto plain digits.
+
+    ``_{n}`` and a bare ``_`` digit become those digits. Unicode subscript
+    digits become ASCII digits. A layout space between a letter and a
+    digit is removed, as is a space between a digit and an element
+    symbol. The space before the next word stays.
+    """
+    normalized = _FORMULA_BRACE_SUBSCRIPT_RE.sub(r"\1", text)
+    normalized = _FORMULA_BARE_SUBSCRIPT_RE.sub(r"\1", normalized)
+    normalized = normalized.translate(_SUBSCRIPT_DIGIT_FOLD)
+    previous = None
+    while previous != normalized:
+        previous = normalized
+        normalized = _FORMULA_LAYOUT_SPACE_RE.sub("", normalized)
+        normalized = _FORMULA_DIGIT_LETTER_SPACE_RE.sub("", normalized)
+    return normalized
+
+
+def _strip_wrapping_math(text: str) -> str:
+    """Remove one ``$...$`` pair that wraps the whole trimmed cell."""
+    stripped = text.strip()
+    if len(stripped) >= 2 and stripped.startswith("$") and stripped.endswith("$"):
+        return stripped[1:-1].strip()
+    return stripped
+
+
+def _formula_cell_matches(leaf: str, cell: str) -> bool:
+    """True when the whole cell is this formula label after markup is folded.
+
+    A numeric string does not match here. A longer cell that merely
+    contains the label does not match.
+    """
+    if _string_is_plain_number(leaf):
+        return False
+    left = _normalize_formula_label(_strip_wrapping_math(cell))
+    right = _normalize_formula_label(_strip_wrapping_math(leaf))
+    return bool(right) and left == right
+
+
+def _formula_label_in_text(leaf: str, text: str) -> bool:
+    """True when the folded label is one complete token of the folded text.
+
+    A numeric string does not match here. The ordinary token matcher runs
+    first; this is only the markup spelling of a formula or species label.
+    """
+    if _string_is_plain_number(leaf):
+        return False
+    normalized = _normalize_formula_label(leaf)
+    if not normalized.strip():
+        return False
+    return _string_leaf_in_text(normalized, _normalize_formula_label(text))
+
+
+def _pinned_leaf_in_text(leaf: _PinnedLeaf, text: str) -> bool:
+    """Ordinary token match, then a formula fold only for a formula label."""
+    if _leaf_in_text(leaf.value, text):
+        return True
+    if leaf.formula_label and isinstance(leaf.value, str):
+        return _formula_label_in_text(leaf.value, text)
+    return False
+
+
+def _pinned_leaf_in_cells(leaf: _PinnedLeaf, cells: Sequence[str]) -> bool:
+    """Whole-cell match, then a formula fold only for a formula label."""
+    if any(_cell_certifies_leaf(leaf.value, cell) for cell in cells):
+        return True
+    if leaf.formula_label and isinstance(leaf.value, str):
+        return any(_formula_cell_matches(leaf.value, cell) for cell in cells)
+    return False
+
+
 def _certification_scalar_leaves(
     sample: Mapping[str, Any],
     doc: Mapping[str, Any] | None,
-) -> tuple[list[Any], str | None]:
+) -> tuple[list[_PinnedLeaf], str | None]:
     """Scalar leaves the opened source must contain.
 
     The sample spelling and the resolved extract value are both required.
     ``rel_tol`` can make those numbers differ. Dropping the resolved leaf
     would certify a stored number the source was never searched for.
+    ``formula`` and ``species`` strings carry the formula-label mark.
     """
     try:
         expected = _sample_expected_value(sample)
     except KeyError as exc:
         return [], f"locator was not opened: {exc}"
-    leaves = _scalar_leaves(expected)
+    formula_label = _sample_root_is_formula_label(sample)
+    leaves = _pinned_leaves(expected, formula_label=formula_label)
     if doc is not None:
         try:
             resolved = resolve_fidelity_sample(doc, sample)
         except KeyError:
             resolved = None
         if resolved is not None:
-            leaves.extend(_scalar_leaves(resolved))
+            leaves.extend(_pinned_leaves(resolved, formula_label=formula_label))
     if not leaves:
         return [], "locator was not opened: pinned value has no scalar leaf to find"
     return leaves, None
@@ -2832,7 +3231,24 @@ def _locator_source_blind_reason(
                 candidate_reason_codes.add("artifact_is_extract_document")
                 break
             delimiter = _tabular_delimiter(path)
-            if delimiter is None:
+            if delimiter is None and _locator_has_html_cell_address(locator):
+                # One parsed cell. A miss is source-blind, not a prose search
+                # of the same line.
+                cell, span_error = _cited_html_cell(text, locator)
+                if cell is None:
+                    candidate_reasons.append(
+                        span_error or "cited span was not opened"
+                    )
+                    candidate_reason_codes.add(
+                        _html_blind_code(span_error or "cited span was not opened")
+                    )
+                    break
+                missing = [
+                    leaf
+                    for leaf in leaves
+                    if not _pinned_leaf_in_cells(leaf, (cell,))
+                ]
+            elif delimiter is None:
                 cited, span_error = _cited_text(text, locator)
                 if cited is None:
                     candidate_reasons.append(
@@ -2840,7 +3256,11 @@ def _locator_source_blind_reason(
                     )
                     candidate_reason_codes.add("cited_span_missing")
                     break
-                missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
+                missing = [
+                    leaf
+                    for leaf in leaves
+                    if not _pinned_leaf_in_text(leaf, cited)
+                ]
             else:
                 # Parse the complete table, then select. A sliced line is not a table.
                 try:
@@ -2857,11 +3277,15 @@ def _locator_source_blind_reason(
                     )
                     candidate_reason_codes.add("cited_span_missing")
                     break
-                missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
+                missing = [
+                    leaf
+                    for leaf in leaves
+                    if not _pinned_leaf_in_cells(leaf, cells)
+                ]
             if not missing:
                 key_matched = True
                 break
-            rendered = ", ".join(repr(leaf) for leaf in missing[:3])
+            rendered = ", ".join(repr(leaf.value) for leaf in missing[:3])
             candidate_reasons.append(
                 f"opened {path.name} but the resolved extract value is not in the "
                 f"cited text ({rendered})"
@@ -2919,7 +3343,15 @@ def fidelity_source_warnings(
     ``1``. A
     ``line_range`` selects records that lie entirely inside it. A span that
     cuts through a quoted cell is source-blind and is not re-parsed from
-    the sliced lines. ``1 K`` is not ``1 KPa``.
+    the sliced lines. A MinerU ``<table>`` on a text artifact is parsed
+    whole when the locator carries ``table_row`` and ``table_column``
+    (the same indexes as ``table_row_number`` and ``table_column_number``).
+    The stored value must be that whole trimmed cell after rowspan and
+    colspan expansion. A value in another row is source-blind. Formula
+    and species labels fold ``_{n}``, a bare ``_`` digit, Unicode
+    subscript digits, and a layout space inside the formula, before the
+    token comparison. Numbers keep the un-normalized
+    comparison. ``1 K`` is not ``1 KPa``.
     A leading decimal is a numeric token.
     A spelling that rounds the stored float to a different number is not
     that token. The sample's own spelling is not a substitute: a ``rel_tol``
@@ -3257,7 +3689,9 @@ def certify_extract_source_fidelity(
     gate on a cell. NaN, Infinity, and InvalidOperation do not certify.
     A non-finite measured value refuses that observation. A
     substring does not certify, so a cell ``1/2`` is not ``1`` and a cell
-    ``1,000`` is not ``1``. A span
+    ``1,000`` is not ``1``. A MinerU HTML cell address and a formula or
+    species label follow the same whole-cell and complete-token rules,
+    after the folds described on ``fidelity_source_warnings``. A span
     that cuts through a quoted cell is source-blind and is not re-parsed
     from the sliced lines. A leading decimal
     is a numeric token. A spelling

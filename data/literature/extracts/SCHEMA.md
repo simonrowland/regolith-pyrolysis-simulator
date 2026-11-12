@@ -188,7 +188,27 @@ A cell certifies a stored value only when the whole trimmed, unquoted cell
 is a spelling of that number or equals the stored string. A substring does
 not certify: a cell `1/2` is not `1`, and a cell `1,000` is not `1`. A
 `line_range` that cuts through a quoted cell is source-blind and is not
-re-parsed from the sliced lines. A page or table number alone is not an open.
+re-parsed from the sliced lines. A MinerU markdown table is one
+`<table>...</table>` line, so a `line_range` cannot isolate a row. On a
+text artifact, `table_row` and `table_column` are the 1-based grid
+position of one cell, header rows included. `table_row_number` and
+`table_column_number` are the same indexes. Both axes are required. The
+validator parses that complete table, expanding `rowspan` and `colspan`,
+and the stored number or ordinary string must be that whole trimmed cell.
+A value printed in another row of the same line does not certify. A
+missing table, more than one table in the cited span, a span that cuts a
+table, an index that is not a positive integer, or a cell outside the
+grid is source-blind. `line_range` still chooses which complete table is
+cited.
+Formula-bearing label keys are `formula` and `species` only. Before the
+token comparison, `_{n}`, a bare `_` followed by digits, and Unicode
+subscript digits become plain digits, and a layout space between a letter
+and a digit, or between a digit and an element symbol, is removed. The
+space before the next word stays. In a cell, the whole
+trimmed cell after that fold, and after removing one wrapping `$...$`
+pair, must equal the folded label. In running text the folded label must
+be one complete token. Numbers, numeric strings, and every other key keep
+the un-folded comparison. A page or table number alone is not an open.
 A PDF is not opened as text. Do not backfill reviewer fields from the
 extract's own value.
 
@@ -626,6 +646,12 @@ A locator is a mapping with at least one non-empty location key among:
 - `line_range` (e.g. thermo.inp line range)
 - `note` (prose locator when the above do not apply — allowed, but prefer structured keys)
 - `source_path`, `quotes_path`, `record`
+
+`table_row` and `table_column`, and the same indexes under
+`table_row_number` and `table_column_number`, select one cell of an
+opened text artifact. They are cell selectors, not location keys. The
+locator still needs `source_path`, `quotes_path`, `record`, or another
+location key above.
 
 `page` is the one-based physical page in the PDF. `pdf_page_index` is the
 zero-based PDF page index (the first PDF page is 0). `published_page` is the
