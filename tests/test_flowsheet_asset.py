@@ -715,6 +715,41 @@ def test_live_major_facts_use_ellingham_graph_calculator(renderer, monkeypatch):
     assert {"Mg", "Ca", "Si", "Mn", "Cr"} <= seen
 
 
+def test_ellingham_import_failure_omits_facts_and_marks_c6_unavailable(
+    renderer,
+    flowsheet,
+    monkeypatch,
+):
+    import builtins
+
+    original_import = builtins.__import__
+
+    def fail_ellingham_import(name, globals=None, locals=None, fromlist=(), level=0):
+        if name == "simulator.chemistry.ellingham_graph":
+            raise ImportError("forced Ellingham import failure")
+        return original_import(name, globals, locals, fromlist, level)
+
+    monkeypatch.setattr(builtins, "__import__", fail_ellingham_import)
+    unavailable_blocks: dict[str, str] = {}
+    facts = renderer.build_live_major_facts(
+        unavailable_blocks=unavailable_blocks,
+    )
+
+    assert not {"Si", "Mn", "Cr"}.intersection(facts)
+    assert unavailable_blocks == {
+        "c6_magnesiothermic": (
+            "Ellingham calculation unavailable: ImportError: "
+            "forced Ellingham import failure"
+        )
+    }
+    lint = renderer.lint_against_trace_elements(flowsheet)
+    assert (
+        "block c6_magnesiothermic unavailable: "
+        "Ellingham calculation unavailable: ImportError: "
+        "forced Ellingham import failure"
+    ) in lint.warnings
+
+
 def test_deliberate_admission_contradiction_fails(renderer, flowsheet):
     """Fixture: place Fe (siderophile) under rump not_reducible → FAIL fires."""
     import copy

@@ -752,7 +752,10 @@ def _reductant_to_reducibility(reductant_class: str) -> str:
     return mapping.get(rc, rc)
 
 
-def build_live_major_facts() -> dict[str, dict[str, Any]]:
+def build_live_major_facts(
+    *,
+    unavailable_blocks: dict[str, str] | None = None,
+) -> dict[str, dict[str, Any]]:
     """Fact rows for majors that can be checked WITHOUT trace_elements.yaml.
 
     Sources:
@@ -832,16 +835,10 @@ def build_live_major_facts() -> dict[str, dict[str, Any]]:
                 "reducibility": _reductant_to_reducibility(reductant_class),
                 "reductant_class": reductant_class,
             }
-    except Exception:  # pragma: no cover
-        # Simulator import unavailable — still pin C6/calciothermic process anchors
-        for el in ("Al", "Ti", "Si", "Mn", "Cr"):
-            facts.setdefault(
-                el,
-                {
-                    "element": el,
-                    "reducibility": "mg_reducible",
-                    "reductant_class": "Mg-C6",
-                },
+    except Exception as exc:  # pragma: no cover
+        if unavailable_blocks is not None:
+            unavailable_blocks["c6_magnesiothermic"] = (
+                f"Ellingham calculation unavailable: {type(exc).__name__}: {exc}"
             )
 
     # Process-map C6 / calciothermic / crown anchors OVERRIDE pure Ellingham rank
@@ -902,11 +899,14 @@ def load_fact_table(
     trace_path: Path = TRACE_ELEMENTS_YAML,
     *,
     include_live_majors: bool = True,
+    unavailable_blocks: dict[str, str] | None = None,
 ) -> dict[str, dict[str, Any]]:
     """Merged fact table: live majors first, trace_elements overlays (wins)."""
     table: dict[str, dict[str, Any]] = {}
     if include_live_majors:
-        table.update(build_live_major_facts())
+        table.update(
+            build_live_major_facts(unavailable_blocks=unavailable_blocks)
+        )
     for sym, row in load_trace_element_facts(trace_path).items():
         base = dict(table.get(sym) or {})
         base.update(row)
@@ -1126,7 +1126,15 @@ def lint_against_trace_elements(
 
     # --- Admission gate (always runs; degrades to UNKNOWN without facts) ---
     if fact_table is None:
-        fact_table = load_fact_table(trace_path)
+        unavailable_blocks: dict[str, str] = {}
+        fact_table = load_fact_table(
+            trace_path,
+            unavailable_blocks=unavailable_blocks,
+        )
+        warnings.extend(
+            f"block {block_id} unavailable: {reason}"
+            for block_id, reason in unavailable_blocks.items()
+        )
     admission_results = evaluate_all_admissions(data, fact_table)
     n_pass = sum(1 for r in admission_results if r.outcome == OUTCOME_PASS)
     n_fail = sum(1 for r in admission_results if r.outcome == OUTCOME_FAIL)
