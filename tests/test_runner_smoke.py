@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import hashlib
 from collections import defaultdict
+from copy import deepcopy
 from dataclasses import replace
 import json
 import math
@@ -372,8 +373,18 @@ def test_failure_payload_builds_per_hour_projection_once(monkeypatch):
     assert per_hour_projection_calls == [execution]
 
 
-def test_default_lunar_c0_product_story_is_numeric_with_si_channel():
-    payload = _run_scenario(SCENARIOS[0])
+@pytest.mark.xdist_group("lunar_c0_shared")
+def test_default_lunar_c0_product_story_is_numeric_with_si_channel(
+    lunar_c0_scenario_result, _lunar_c0_scenario_result_copy_factory
+):
+    assert _LUNAR_C0_RESULT_BUILD_COUNT == 1
+    next_consumer = _lunar_c0_scenario_result_copy_factory()
+    original_temperature = next_consumer["per_hour_summary"][0]["T_C"]
+    lunar_c0_scenario_result["per_hour_summary"][0]["T_C"] = (
+        original_temperature + 1.0
+    )
+    assert next_consumer["per_hour_summary"][0]["T_C"] == original_temperature
+    payload = lunar_c0_scenario_result
 
     assert payload["status"] == "ok"
     classification = payload["product_classification"]["classification"]
@@ -1171,6 +1182,29 @@ def _run_scenario(scenario: dict, *, capture: bool = False):
         "final_state": payload["final_state"],
     }
     return payload, {"flux_maps": flux_maps, "ledger_output": ledger_output}
+
+
+_LUNAR_C0_RESULT_BUILD_COUNT = 0
+
+
+@pytest.fixture(scope="module")
+def _lunar_c0_scenario_result_copy_factory():
+    global _LUNAR_C0_RESULT_BUILD_COUNT
+    _LUNAR_C0_RESULT_BUILD_COUNT += 1
+    assert _LUNAR_C0_RESULT_BUILD_COUNT == 1, (
+        "the lunar C0 scenario was rebuilt in one worker"
+    )
+    cached_result = _run_scenario(SCENARIOS[0])
+
+    def copy_result():
+        return deepcopy(cached_result)
+
+    return copy_result
+
+
+@pytest.fixture
+def lunar_c0_scenario_result(_lunar_c0_scenario_result_copy_factory):
+    return _lunar_c0_scenario_result_copy_factory()
 
 
 def _flux_ledger_pins(capture: dict) -> dict[str, str]:
@@ -1976,12 +2010,45 @@ def _run_c2a_trace_export():
     return payload, execution
 
 
+_VPR_P6A_RESULT_BUILD_COUNT = 0
+
+
+@pytest.fixture(scope="module")
+def _vpr_p6a_trace_result_copy_factory():
+    global _VPR_P6A_RESULT_BUILD_COUNT
+    _VPR_P6A_RESULT_BUILD_COUNT += 1
+    assert _VPR_P6A_RESULT_BUILD_COUNT == 1, (
+        "the VPR P6A trace was rebuilt in one worker"
+    )
+    cached_result = _run_c2a_trace_export()
+
+    def copy_result():
+        payload, execution = cached_result
+        return (
+            deepcopy(payload),
+            SimpleNamespace(
+                trace=deepcopy(execution.trace),
+                per_hour=deepcopy(execution.per_hour),
+            ),
+        )
+
+    return copy_result
+
+
+@pytest.fixture
+def vpr_p6a_trace_result(_vpr_p6a_trace_result_copy_factory):
+    return _vpr_p6a_trace_result_copy_factory()
+
+
 @pytest.mark.serial  # spawns CLI subprocess; flakes under xdist co-scheduling
 @pytest.mark.xdist_group("serial")
-def test_vpr_p6a_cli_artifact_matches_in_process_trace(tmp_path):
+def test_vpr_p6a_cli_artifact_matches_in_process_trace(
+    tmp_path, vpr_p6a_trace_result
+):
     """Design Section 9 R9.2/R9.5: CLI P6a exports match PhysicsTrace data."""
 
-    _payload, execution = _run_c2a_trace_export()
+    assert _VPR_P6A_RESULT_BUILD_COUNT == 1
+    _payload, execution = vpr_p6a_trace_result
     output = tmp_path / "vpr-p6a-cli.json"
     repo_root = Path(__file__).resolve().parent.parent
     result = subprocess.run(
@@ -2022,10 +2089,23 @@ def test_vpr_p6a_cli_artifact_matches_in_process_trace(tmp_path):
     _assert_p6a_payload_matches_trace(cli_payload, execution.trace)
 
 
-def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels():
+@pytest.mark.xdist_group("serial")
+def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels(
+    vpr_p6a_trace_result, _vpr_p6a_trace_result_copy_factory,
+):
     """Design Section 9 R9.2/R9.3/R9.5: P6b-only fields are explicit P0 sentinels."""
 
-    payload, _execution = _run_c2a_trace_export()
+    assert _VPR_P6A_RESULT_BUILD_COUNT == 1
+    payload, execution = vpr_p6a_trace_result
+    next_payload, next_execution = _vpr_p6a_trace_result_copy_factory()
+    original_temperature = next_payload["per_hour_summary"][0]["T_C"]
+    payload["per_hour_summary"][0]["T_C"] = original_temperature + 1.0
+    assert next_payload["per_hour_summary"][0]["T_C"] == original_temperature
+    assert execution.per_hour and next_execution.per_hour
+    execution_key = next(iter(next_execution.per_hour[0]))
+    original_execution_value = next_execution.per_hour[0][execution_key]
+    execution.per_hour[0][execution_key] = object()
+    assert next_execution.per_hour[0][execution_key] == original_execution_value
     assert (
         payload["final"]["pump_outlet_by_species_kg"]
         == NOT_APPLICABLE_UNTIL_P0
@@ -3405,7 +3485,10 @@ def test_runner_engines_yaml_optional_load(tmp_path):
     }
 
 
-def test_per_hour_summary_includes_pressure_and_mass_balance():
+@pytest.mark.xdist_group("lunar_c0_shared")
+def test_per_hour_summary_includes_pressure_and_mass_balance(
+    lunar_c0_scenario_result,
+):
     """Regression: each per-hour entry must include the four numeric
     fields the goal text specified.
 
@@ -3416,7 +3499,8 @@ def test_per_hour_summary_includes_pressure_and_mass_balance():
     value None" regression is caught.
     """
 
-    payload = _run_scenario(SCENARIOS[0])
+    assert _LUNAR_C0_RESULT_BUILD_COUNT == 1
+    payload = lunar_c0_scenario_result
     for entry in payload["per_hour_summary"]:
         assert isinstance(entry["T_C"], (int, float))
         assert isinstance(entry["P_total_bar"], (int, float))
@@ -3538,7 +3622,8 @@ def test_session_per_hour_summary_event_uses_runner_builder():
     )
 
 
-def test_runner_final_state_is_mol_keyed_not_kg():
+@pytest.mark.xdist_group("lunar_c0_shared")
+def test_runner_final_state_is_mol_keyed_not_kg(lunar_c0_scenario_result):
     """Regression: ``final_state`` reports moles, not kilograms.
 
     AGENTS.md invariant #1 names the AtomLedger as mol-native -- kg
@@ -3555,7 +3640,8 @@ def test_runner_final_state_is_mol_keyed_not_kg():
     7400000 (which would be grams) and NOT 445 (which would be kg).
     """
 
-    payload = _run_scenario(SCENARIOS[0])
+    assert _LUNAR_C0_RESULT_BUILD_COUNT == 1
+    payload = lunar_c0_scenario_result
     cleaned_melt = payload["final_state"].get("process.cleaned_melt", {})
     sio2_mol = cleaned_melt.get("SiO2")
     assert sio2_mol is not None, (
