@@ -50,17 +50,23 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   isolate a row. ``table_row`` and ``table_column`` (the same indexes as
   ``table_row_number`` and ``table_column_number``) select one cell after
   the HTML table is parsed, rowspan and colspan included. The stored
-  number must be that whole trimmed cell. A value in another row does
-  not certify. Formula and species labels are normalized before every
+  number must be that whole trimmed cell. A cell whose text contains a
+  superscript never certifies a plain number: it certifies only an
+  explicit power (``1e3``, ``10^3``, ``1×10^3``) equal to that power,
+  and any other value is ``superscript_in_cell``. A value in another row
+  does not certify. Formula and species labels are normalized before every
   comparison, including a label with no ASCII digit. ``_{n}``, a bare
   ``_`` digit, Unicode subscript digits, and a ``$`` or ``\\mathrm{}``
   that touches a subscript become plain digits. A layout space is removed
-  only inside one formula, so a preceding number stays separate and
-  ``SiO2 Al2O3`` stays two tokens. ``CO`` is not ``CO₂`` and ``SiO₂`` is
+  only between an element symbol or a closing parenthesis and the digit
+  count that follows it. ``SiO 2`` is ``SiO2``. A space after a count
+  stays, so ``H2 O2``, ``SiO2 Al2O3``, and ``Fe 2 O 3`` (folded to
+  ``Fe2 O3``) stay separate tokens. ``CO`` is not ``CO₂`` and ``SiO₂`` is
   not ``SiO₂₂``. A space, thin space, or narrow no-break space in an
   unsigned digit run is typography: the first group is one to three
   digits and each group after it is exactly three. ``1 550`` is ``1550``.
-  ``1e0 001``, ``12 34``, and ``1.5 000`` are not one number. A comma is
+  ``1e0 001``, ``12 34``, ``1.5 000``, and ``1 550e3`` are not one number.
+  A comma is
   not that separator. A numeric leaf does not match a formula by the
   formula fold.
   A leading decimal is a number, so .24 is not a label
@@ -151,7 +157,7 @@ from simulator.battery.extract_context import (
     iter_unsupported_context_container_paths,
 )
 from simulator.state_types import StateTag
-from tools.mineru_table_draft import TableGeometryError, parse_table_html
+from tools.mineru_table_draft import Cell, TableGeometryError, parse_table_html
 
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 SCHEMA_VERSION = "literature_extract.v1"
@@ -343,7 +349,7 @@ _DIGIT_GROUP_SEPARATORS = " \u2009\u202f"
 _DIGIT_GROUP_RE = re.compile(
     r"(?<![0-9.eE+\-])"
     r"(\d{1,3}(?:[" + _DIGIT_GROUP_SEPARATORS + r"]\d{3})+)"
-    r"(?![0-9])"
+    r"(?![0-9eE])"
 )
 
 
@@ -353,7 +359,7 @@ def _fold_digit_groups(text: str) -> str:
     The first group is one to three digits. Each following group is exactly
     three. A decimal point may follow the run, so ``1 550.25`` is
     ``1550.25``. ``1 550`` is ``1550``. ``12 345`` is ``12345``. ``12 34``,
-    ``1e0 001``, ``1.5 000``, and a signed run stay apart.
+    ``1e0 001``, ``1.5 000``, ``1 550e3``, and a signed run stay apart.
     """
 
     def join(match: re.Match[str]) -> str:
@@ -704,6 +710,10 @@ _FORMULA_MATH_BRACE_SUBSCRIPT_RE = re.compile(r"\$\s*_\{(\d+)\}\s*\$")
 _FORMULA_MATH_BARE_SUBSCRIPT_RE = re.compile(r"\$\s*_(\d+)\s*\$")
 # Spaces inside one formula token. A newline is not one of them, and a
 # preceding measurement (``6.98 Fe``) is not an element chain.
+# A space joins only an element symbol, or a closing parenthesis, to the
+# digit count that follows. ``SiO 2`` becomes ``SiO2``. ``(OH) 2`` becomes
+# ``(OH)2``. A space after a count is never joined: ``H2 O2`` and
+# ``Fe 2 O 3`` (which becomes ``Fe2 O3``) stay separate tokens.
 _FORMULA_INTERNAL_SPACES = " \u00a0\u2009\u202f"
 _FORMULA_ELEMENT_COUNT_SPACE_RE = re.compile(
     "(?<![A-Za-z])"
@@ -711,22 +721,20 @@ _FORMULA_ELEMENT_COUNT_SPACE_RE = re.compile(
     "[" + _FORMULA_INTERNAL_SPACES + "]+"
     r"(?=\d{1,3}(?!\d))"
 )
-# A count joins the next piece only when that piece is one element and its
-# count, and that count is not followed by another letter. ``Fe2 O3`` becomes
-# ``Fe2O3``. ``SiO2 Al2O3`` stays two tokens, and a following word
-# (``SiO2 end``, ``SiO2 ratio``) stays outside the formula.
-_FORMULA_COUNT_ELEMENT_SPACE_RE = re.compile(
-    r"(?<=[A-Za-z])(\d{1,3})"
+_FORMULA_PAREN_COUNT_SPACE_RE = re.compile(
+    r"(\))"
     "[" + _FORMULA_INTERNAL_SPACES + "]+"
-    r"(?=[A-Z][a-z]?\d+(?![A-Za-z]))"
+    r"(?=\d{1,3}(?!\d))"
 )
 
 
-def _html_table_grid(table_html: str) -> tuple[list[list[str]] | None, str | None]:
+def _html_table_grid(
+    table_html: str,
+) -> tuple[list[list[Cell]] | None, str | None]:
     """One table from ``parse_table_html``, which owns rowspan and colspan.
 
-    Certification reads ``Cell.text``. That text keeps superscript characters
-    and formula markup. The draft's split numeric value is not used.
+    Certification reads ``Cell.text`` and ``Cell.superscript_spans``. The
+    text keeps formula markup. The draft's split numeric value is not used.
     """
     try:
         grid = parse_table_html(table_html)
@@ -736,7 +744,107 @@ def _html_table_grid(table_html: str) -> tuple[list[list[str]] | None, str | Non
         return None, "html_table_unparsed: HTML table could not be parsed"
     if not grid:
         return None, "html_table_unparsed: HTML table has no rows"
-    return [[cell.text for cell in row] for row in grid], None
+    return grid, None
+
+
+_EXPLICIT_SCIENCE_RE = re.compile(
+    r"([+\-]?(?:\d+(?:\.\d+)?|\.\d+))[eE]([+\-]?\d+)"
+)
+_EXPLICIT_CARET_RE = re.compile(
+    r"([+\-]?(?:\d+(?:\.\d+)?|\.\d+))\s*\^\s*([+\-]?\d+)"
+)
+_EXPLICIT_TIMES_RE = re.compile(
+    r"([+\-]?(?:\d+(?:\.\d+)?|\.\d+))\s*×\s*10\s*\^\s*([+\-]?\d+)"
+)
+
+
+def _power_product(base: Decimal, exponent: int) -> Decimal | None:
+    try:
+        value = base ** exponent
+    except (ArithmeticError, DecimalException):
+        return None
+    if not value.is_finite():
+        return None
+    return value
+
+
+def _explicit_power_decimal(text: str) -> Decimal | None:
+    """Value of one explicit power spelling, or None.
+
+    ``1e3``, ``10^3``, and ``1×10^3`` are powers. ``1000`` and ``103``
+    are plain numbers.
+    """
+    token = _fold_numeric_signs(text.strip())
+    scientific = _EXPLICIT_SCIENCE_RE.fullmatch(token)
+    if scientific:
+        return _finite_decimal(f"{scientific.group(1)}e{scientific.group(2)}")
+    caret = _EXPLICIT_CARET_RE.fullmatch(token)
+    if caret:
+        base = _finite_decimal(caret.group(1))
+        if base is None:
+            return None
+        return _power_product(base, int(caret.group(2)))
+    times = _EXPLICIT_TIMES_RE.fullmatch(token)
+    if times:
+        mantissa = _finite_decimal(times.group(1))
+        if mantissa is None:
+            return None
+        factor = _power_product(Decimal(10), int(times.group(2)))
+        if factor is None:
+            return None
+        try:
+            value = mantissa * factor
+        except (ArithmeticError, DecimalException):
+            return None
+        if not value.is_finite():
+            return None
+        return value
+    return None
+
+
+def _superscript_power_decimal(
+    text: str, spans: tuple[tuple[int, int], ...]
+) -> Decimal | None:
+    """``base ** exponent`` for one numeric superscript span.
+
+    ``10<sup>3</sup>`` is ``10**3``, which is ``1e3``. A missing span, more
+    than one span, or a non-numeric piece is not a power.
+    """
+    if len(spans) != 1:
+        return None
+    start, end = spans[0]
+    if not (0 <= start < end <= len(text)):
+        return None
+    exponent = _fold_numeric_signs(text[start:end].strip())
+    base_text = _fold_numeric_signs((text[:start] + text[end:]).strip())
+    if not re.fullmatch(r"[+\-]?\d+", exponent):
+        return None
+    base = _finite_decimal(base_text)
+    if base is None:
+        return None
+    return _power_product(base, int(exponent))
+
+
+def _superscript_leaf_certifies(
+    leaf: Any, text: str, spans: tuple[tuple[int, int], ...]
+) -> bool:
+    """True when ``leaf`` spells the cell's power and equals it.
+
+    An int is a plain number, so ``103`` and ``1000`` do not certify.
+    A float certifies when it is that power, so ``1e3`` certifies
+    ``10<sup>3</sup>``. A string certifies only as ``1e3``, ``10^3``,
+    or ``1×10^3`` (the same value).
+    """
+    power = _superscript_power_decimal(text, spans)
+    if power is None:
+        return False
+    if isinstance(leaf, str):
+        spelled = _explicit_power_decimal(leaf)
+        return spelled is not None and spelled == power
+    if isinstance(leaf, bool) or not isinstance(leaf, float):
+        return False
+    stored = _stored_number_decimal(leaf)
+    return stored is not None and stored == power
 
 
 def _parse_positive_index(raw: Any) -> int | None:
@@ -799,18 +907,19 @@ def _html_cell_address(
 
 def _cited_html_cell(
     text: str, locator: Mapping[str, Any]
-) -> tuple[str | None, str | None]:
+) -> tuple[str | None, tuple[tuple[int, int], ...], str | None]:
     """The one cited cell, after the complete table is parsed.
 
-    ``line_range`` selects tables that lie entirely inside it. A span that
-    cuts a table is source-blind. More than one table in the cited span is
-    source-blind. The sliced line is not searched as prose.
+    The second item is the cell's superscript spans. ``line_range`` selects
+    tables that lie entirely inside it. A span that cuts a table is
+    source-blind. More than one table in the cited span is source-blind.
+    The sliced line is not searched as prose.
     """
     address, address_error = _html_cell_address(locator)
     if address_error:
-        return None, address_error
+        return None, (), address_error
     if address is None:
-        return None, (
+        return None, (), (
             "html_cell_address_incomplete: table_row and table_column "
             "are both required"
         )
@@ -819,11 +928,11 @@ def _cited_html_cell(
     if "line_range" in locator and locator.get("line_range") is not None:
         span = _parse_line_range(locator.get("line_range"))
         if span is None:
-            return None, "line_range is not a line number or start-end span"
+            return None, (), "line_range is not a line number or start-end span"
         start, end = span
         line_count = len(text.splitlines())
         if end > line_count:
-            return None, (
+            return None, (), (
                 f"line_range {start}-{end} is outside the artifact "
                 f"({line_count} lines)"
             )
@@ -838,28 +947,29 @@ def _cited_html_cell(
         overlaps = not (range_end < start_line or range_start > end_line)
         covers = range_start <= start_line and end_line <= range_end
         if overlaps and not covers:
-            return None, (
+            return None, (), (
                 f"line_range {range_start}-{range_end} cuts through an HTML "
                 f"table on lines {start_line}-{end_line}"
             )
         if covers:
             chosen.append(match.group(0))
     if not chosen:
-        return None, "html_table_absent: cited span has no HTML table"
+        return None, (), "html_table_absent: cited span has no HTML table"
     if len(chosen) > 1:
-        return None, (
+        return None, (), (
             f"html_table_ambiguous: cited span has {len(chosen)} HTML tables"
         )
     grid, grid_error = _html_table_grid(chosen[0])
     if grid_error or not grid:
-        return None, grid_error or "html_table_unparsed: HTML table has no rows"
+        return None, (), grid_error or "html_table_unparsed: HTML table has no rows"
     width = len(grid[row - 1]) if row <= len(grid) else 0
     if row > len(grid) or column > width:
-        return None, (
+        return None, (), (
             f"html_cell_outside_table: table_row {row} table_column {column} "
             f"is outside the table ({len(grid)} rows, {width} columns)"
         )
-    return grid[row - 1][column - 1], None
+    cited = grid[row - 1][column - 1]
+    return cited.text, cited.superscript_spans, None
 
 
 def _html_blind_code(message: str) -> str:
@@ -2963,11 +3073,12 @@ def _normalize_formula_label(text: str) -> str:
 
     ``\\mathrm{}`` and a ``$...$`` pair are removed only when they wrap a
     subscript. ``_{n}``, a bare ``_`` digit, and Unicode subscript digits
-    become plain digits. A space is removed only inside one formula: between
-    an element chain and its count, or between that count and one following
-    element plus its count. ``Fe2 O3`` becomes ``Fe2O3``. ``SiO2 Al2O3``
-    stays two tokens. A following word stays outside the formula.
-    ``6.98 Fe_{2}O_{3}`` stays ``6.98 Fe2O3``. ``page 2`` stays ``page 2``.
+    become plain digits. A space is removed only between an element symbol
+    or a closing parenthesis and the digit count that follows it.
+    ``SiO 2`` becomes ``SiO2``. ``(OH) 2`` becomes ``(OH)2``. A space after
+    a count stays, so ``Fe 2 O 3`` becomes ``Fe2 O3``, and ``H2 O2`` and
+    ``SiO2 Al2O3`` stay two tokens. ``6.98 Fe_{2}O_{3}`` stays
+    ``6.98 Fe2O3``. ``page 2`` stays ``page 2``.
     """
     normalized = _FORMULA_MATHRM_RE.sub(r"\1", text)
     normalized = _FORMULA_MATH_BRACE_SUBSCRIPT_RE.sub(r"\1", normalized)
@@ -2979,7 +3090,7 @@ def _normalize_formula_label(text: str) -> str:
     while previous != normalized:
         previous = normalized
         normalized = _FORMULA_ELEMENT_COUNT_SPACE_RE.sub(r"\1", normalized)
-        normalized = _FORMULA_COUNT_ELEMENT_SPACE_RE.sub(r"\1", normalized)
+        normalized = _FORMULA_PAREN_COUNT_SPACE_RE.sub(r"\1", normalized)
     return normalized
 
 
@@ -3203,7 +3314,9 @@ def _locator_source_blind_reason(
             if delimiter is None and _locator_has_html_cell_address(locator):
                 # One parsed cell. A miss is source-blind, not a prose search
                 # of the same line.
-                cell, span_error = _cited_html_cell(text, locator)
+                cell, superscript_spans, span_error = _cited_html_cell(
+                    text, locator
+                )
                 if cell is None:
                     candidate_reasons.append(
                         span_error or "cited span was not opened"
@@ -3211,6 +3324,26 @@ def _locator_source_blind_reason(
                     candidate_reason_codes.add(
                         _html_blind_code(span_error or "cited span was not opened")
                     )
+                    break
+                if superscript_spans:
+                    missing = [
+                        leaf
+                        for leaf in leaves
+                        if not _superscript_leaf_certifies(
+                            leaf.value, cell, superscript_spans
+                        )
+                    ]
+                    if missing:
+                        rendered = ", ".join(
+                            repr(leaf.value) for leaf in missing[:3]
+                        )
+                        candidate_reasons.append(
+                            "superscript_in_cell: a superscript cell certifies "
+                            f"only an explicit power ({rendered})"
+                        )
+                        candidate_reason_codes.add("superscript_in_cell")
+                        break
+                    key_matched = True
                     break
                 missing = [
                     leaf
@@ -3318,12 +3451,17 @@ def fidelity_source_warnings(
     The stored value must be that whole trimmed cell after rowspan and
     colspan expansion. A value in another row is source-blind. Formula
     and species labels fold subscript markup, a ``$`` or ``\\mathrm{}``
-    that touches a subscript, and a layout space only inside the formula
-    token, before every comparison. A digitless label is a complete
-    token, a preceding number is not joined, and two formulas stay two
-    tokens. An unsigned digit run whose first group is one to three
+    that touches a subscript, and a layout space only between an element
+    or a closing parenthesis and the count that follows it, before every
+    comparison. ``SiO 2`` is ``SiO2``. A space after a count stays, so
+    ``Fe 2 O 3`` is ``Fe2 O3`` and does not certify ``Fe2O3``. A digitless
+    label is a complete token, a preceding number is not joined, and two
+    formulas stay two tokens. A superscript cell certifies only an explicit
+    power equal to that power (``1e3``, ``10^3``, ``1×10^3``); a plain
+    number is ``superscript_in_cell``. An unsigned digit run whose first
+    group is one to three
     digits, then groups of three, is that number: ``1 550`` is ``1550``.
-    ``1e0 001``, ``12 34``, and ``1.5 000`` are not. A comma is not that
+    ``1e0 001``, ``12 34``, ``1.5 000``, and ``1 550e3`` are not. A comma is not that
     separator. ``1 K`` is not ``1 KPa``.
     A leading decimal is a numeric token.
     A spelling that rounds the stored float to a different number is not

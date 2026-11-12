@@ -183,8 +183,8 @@ dot or comma followed by a digit. So `1 K` is not `1 KPa`, and `1` is not
 `1,000`. A space, thin space, or narrow no-break space in an unsigned
 digit run is typography. The first group is one to three digits and each
 group after it is exactly three, so `1 550` is 1550. The run is not an
-exponent, a sign, or a decimal fraction, so `1e0 001`, `12 34`, and
-`1.5 000` are not one number. A comma is not this separator, so a cell
+exponent, a sign, or a decimal fraction, so `1e0 001`, `12 34`,
+`1.5 000`, and `1 550e3` are not one number. A comma is not this separator, so a cell
 `1,000` is not 1000.
 The same grouped spelling in a numeric cell is that number. The token must
 appear in the cited `line_range` when one is set,
@@ -202,7 +202,11 @@ position of one cell, header rows included. `table_row_number` and
 `table_column_number` are the same indexes. Both axes are required. The
 validator parses that complete table, expanding `rowspan` and `colspan`,
 and the stored number or ordinary string must be that whole trimmed cell.
-A value printed in another row of the same line does not certify. A
+A cell that contains a superscript does not certify a plain number. It
+certifies a float equal to that power, so `10<sup>3</sup>` certifies
+`1e3`, and a string that spells the same power (`1e3`, `10^3`,
+`1×10^3`). `103` and `1000` are `superscript_in_cell`. A value printed
+in another row of the same line does not certify. A
 missing table, more than one table in the cited span, a span that cuts a
 table, an index that is not a positive integer, or a cell outside the
 grid is source-blind. `line_range` still chooses which complete table is
@@ -211,10 +215,12 @@ Formula-bearing label keys are `formula` and `species` only. The label is
 normalized before every comparison, including a label with no ASCII digit.
 `_{n}`, a bare `_` followed by digits, Unicode subscript digits, and a `$`
 or `\mathrm{}` wrapped around a subscript become plain digits. A layout
-space is removed only inside one formula: between an element chain and
-its count, or between that count and the next element of the same token.
-`Fe2 O3` is `Fe2O3`. `SiO2 Al2O3` stays two tokens and certifies each of
-them; `SiO2Al2O3` certifies neither. A
+space is removed only between an element symbol or a closing parenthesis
+and the digit count that follows it. `SiO 2` is `SiO2`. `(OH) 2` is
+`(OH)2`. A space after a count is not removed, so `H2 O2` does not
+certify `H2O2` and certifies `H2` and `O2` separately, `Fe 2 O 3` folds
+to `Fe2 O3` and does not certify `Fe2O3`, and `SiO2 Al2O3` stays two
+tokens and certifies each of them. `SiO2Al2O3` certifies neither. A
 preceding number is not joined, so `6.98 Fe_{2}O_{3}` certifies `Fe2O3`
 and certifies 6.98. In a cell, the whole trimmed cell after that fold, and
 after removing one wrapping `$...$` pair, must equal the folded label. In

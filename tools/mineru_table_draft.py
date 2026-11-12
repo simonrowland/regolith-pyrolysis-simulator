@@ -198,6 +198,7 @@ _DEFAULT_CORPUS_ROOT = Path.home() / "Repos" / "regolith-corpus" / "raw"
 class _RawCell:
     text_parts: list[str] = field(default_factory=list)
     superscript_parts: list[str] = field(default_factory=list)
+    superscript_spans: list[tuple[int, int]] = field(default_factory=list)
     rowspan: int = 1
     colspan: int = 1
     is_header: bool = False
@@ -222,6 +223,9 @@ class Cell:
     merged: bool = False
     is_header: bool = False
     superscript_text: str = ""
+    # Character spans of ``<sup>`` text inside ``text``. Certification uses
+    # these so a power is not the concatenated digits.
+    superscript_spans: tuple[tuple[int, int], ...] = ()
     value_text: str = ""
     mark: str = ""
     numeric_value: float | None = None
@@ -264,9 +268,11 @@ class _TableParser(HTMLParser):
 
     def handle_data(self, data: str) -> None:
         if self.cell is not None:
+            start = len(self.cell.text)
             self.cell.text_parts.append(data)
             if self.cell.superscript_depth:
                 self.cell.superscript_parts.append(data)
+                self.cell.superscript_spans.append((start, start + len(data)))
 
 
 class TableGeometryError(Exception):
@@ -410,6 +416,7 @@ def parse_table_html(table_body: str) -> list[list[Cell]]:
                         merged=raw_cell.rowspan > 1 or raw_cell.colspan > 1,
                         is_header=raw_cell.is_header,
                         superscript_text=raw_cell.superscript_text,
+                        superscript_spans=tuple(raw_cell.superscript_spans),
                     )
             row_count = max(row_count, row_index + raw_cell.rowspan)
             column_index += raw_cell.colspan

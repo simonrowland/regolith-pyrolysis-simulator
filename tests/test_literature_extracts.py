@@ -8196,6 +8196,7 @@ _TOKEN_CASES = (
     ("digit_group_decimal_stays", 6.98, "6.98 100\n", True),
     ("digit_group_exponent", 10, "1e0 001\n", False),
     ("digit_group_fraction", 15000, "1.5 000\n", False),
+    ("digit_group_trailing_exponent", 1550000, "1 550e3\n", False),
 )
 
 
@@ -9865,7 +9866,6 @@ _FORMULA_MARKUPS = (
     ("Fe2O3", "Fe_{2}O_{3}"),
     ("Al2O3", "Al_2O_3"),
     ("Fe2O3", "Fe₂O₃"),
-    ("Fe2O3", "Fe 2 O 3"),
     ("SiO2", "$SiO_{2}$"),
     ("SiO2", " $SiO_{2}$ "),
 )
@@ -10070,6 +10070,14 @@ def test_html_cell_expands_rowspan_and_colspan(tmp_path: Path):
     )
     if not errors or "source_blind_pin" not in "\n".join(errors):
         failures.append(f"column 2 refuses 1: {errors}")
+    # Cell addressing is opt-in. Without table_row and table_column the
+    # one-line table is prose, so 6.98 certifies even beside 265.
+    unaddressed = _html_source_document(tmp_path, 6.98, _HTML_ROWSPAN)
+    errors = vle.certify_extract_source_fidelity(
+        unaddressed, label="rowspan-prose", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"unaddressed rowspan line accepts 6.98: {errors}")
     assert failures == []
 
 
@@ -10205,6 +10213,32 @@ def test_html_cell_address_is_a_typed_refusal(tmp_path: Path):
     )
     if errors:
         failures.append(f"prose without a cell address accepts 6.98: {errors}")
+    power_cell = "<table><tr><td>10<sup>3</sup></td></tr></table>\n"
+    power_pins = (
+        (103, False),
+        (1000, False),
+        (1e3, True),
+        ("1e3", True),
+        ("10^3", True),
+        ("1×10^3", True),
+    )
+    for pin, accepts in power_pins:
+        doc = _html_source_document(
+            tmp_path,
+            pin,
+            power_cell,
+            locator_extra={"table_row": 1, "table_column": 1},
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"power-{pin!r}", artifact_root=tmp_path
+        )
+        joined = "\n".join(errors)
+        if accepts and errors:
+            failures.append(f"power accept {pin!r}: {errors}")
+        if not accepts and (
+            "source_blind_pin" not in joined or "superscript_in_cell" not in joined
+        ):
+            failures.append(f"power refuse {pin!r}: {errors}")
     assert failures == []
 
 
@@ -10396,8 +10430,13 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         "0.5 H_{2}O": "0.5 H2O",
         "page 2 stays": "page 2 stays",
         "Table 2 stays": "Table 2 stays",
-        "Fe 2 O 3": "Fe2O3",
-        "Fe2 O3": "Fe2O3",
+        "Fe 2 O 3": "Fe2 O3",
+        "Fe2 O3": "Fe2 O3",
+        "H2 O2": "H2 O2",
+        "oxide SiO 2 N2 end": "oxide SiO2 N2 end",
+        "CO2 N2": "CO2 N2",
+        "SiO 2": "SiO2",
+        "(OH) 2": "(OH)2",
         "SiO2 Al2O3": "SiO2 Al2O3",
         "SiO2Al2O3": "SiO2Al2O3",
     }
@@ -10424,6 +10463,17 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         ("formula", "Al2O3", "SiO2 Al2O3", True),
         ("formula", "SiO2", "SiO2Al2O3", False),
         ("formula", "Al2O3", "SiO2Al2O3", False),
+        ("formula", "H2O2", "H2 O2", False),
+        ("formula", "H2", "H2 O2", True),
+        ("formula", "O2", "H2 O2", True),
+        ("formula", "Fe2O3", "Fe 2 O 3", False),
+        ("formula", "SiO2", "SiO 2", True),
+        ("formula", "Ca(OH)2", "Ca(OH) 2", True),
+        ("formula", "SiO2", "oxide SiO 2 N2 end", True),
+        ("formula", "SiO2N2", "oxide SiO 2 N2 end", False),
+        ("formula", "CO2N2", "CO2 N2", False),
+        ("formula", "CO2", "CO2 N2", True),
+        ("formula", "N2", "CO2 N2", True),
     )
     for key, pin, source, accepts in prose_pins:
         doc = _html_source_document(tmp_path, pin, source + "\n", key=key)
@@ -10443,6 +10493,9 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         ("species", "CO", "CO₂", False),
         ("formula", "SiO₂", "SiO₂₂", False),
         ("formula", "SiO2", "SiO₂₂", False),
+        ("formula", "H2O2", "H2 O2", False),
+        ("formula", "CO2N2", "CO2 N2", False),
+        ("formula", "SiO2N2", "SiO 2 N2", False),
     )
     for key, pin, cell_text, accepts in cell_pins:
         cell = f"<table><tr><td>{cell_text}</td></tr></table>\n"
@@ -10484,6 +10537,8 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
     assert vle._fold_digit_groups("1.5 000") == "1.5 000"
     assert vle._fold_digit_groups("-1 550") == "-1 550"
     assert vle._fold_digit_groups("1 550.25") == "1550.25"
+    assert vle._fold_digit_groups("1 550e3") == "1 550e3"
+    assert vle._fold_digit_groups("1 550E3") == "1 550E3"
     assert vle._fold_digit_groups("1 550") == vle._fold_digit_groups(
         vle._fold_digit_groups("1 550")
     )
@@ -10500,6 +10555,8 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
         (15000, "1.5 000\n", False),
         (1.5, "1.5 000\n", True),
         ("1550", "from 1 550 °C to\n", True),
+        (1550000, "1 550e3\n", False),
+        (1550, "1 550e3\n", False),
     )
     for pin, source, accepts in prose:
         doc = _literal_source_document(tmp_path, pin, source)
@@ -10525,6 +10582,8 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
         ("html", "12 34", 1234, False),
         ("html", "1e0 001", 10, False),
         ("html", "1.5 000", 1.5, False),
+        ("html", "1 550e3", 1550000, False),
+        ("html", "1 550e3", 1550, False),
     )
     for kind, source, pin, accepts in cells:
         if kind == "csv":
