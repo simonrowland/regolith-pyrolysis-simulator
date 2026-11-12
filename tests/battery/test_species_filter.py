@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
@@ -93,6 +94,66 @@ def test_species_queries_resolve_exact_formula_phase_and_case() -> None:
         score_mod.normalize_species_filters(context, ["Mnn"])
     assert "Mn" in unknown.value.near_matches
     assert "near matches" in str(unknown.value)
+
+
+def test_species_filter_keeps_element_retention_row_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    context = _context_with_species()
+    mn = context.observations["mn-gas"]
+    retention = replace(
+        mn,
+        observation_id="mn-retention",
+        identity=replace(
+            mn.identity,
+            quantity=Quantity.ELEMENT_RETENTION_RATIO,
+        ),
+    )
+    context = replace(
+        context,
+        observations={**context.observations, retention.observation_id: retention},
+    )
+    calls: list[str] = []
+
+    def compile_stub(reference, engine, **_kwargs):
+        calls.append(reference.observation_id)
+        formula = reference.identity.species.formula
+        residual = Residual(
+            key=f"fixture::{reference.observation_id}::{engine.value}",
+            reference=reference.observation_id,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            rail=score_mod.rail_for_quantity(
+                score_mod.quantity_token(reference.identity), species_formula=formula
+            ),
+            status=ResidualStatus.NO_BAND,
+            source_relation=SourceRelation.UNKNOWN,
+            score_eligible=False,
+            exclusions=(),
+            notices=(),
+        )
+        return residual, None
+
+    monkeypatch.setattr(score_mod, "_compile_residual_with_lineage", compile_stub)
+    formulas = score_mod.normalize_species_filters(context, ["Mn"])
+    assert formulas == ("Mn",)
+    assert (
+        score_mod.rail_for_quantity(
+            Quantity.ELEMENT_RETENTION_RATIO, species_formula="Mn"
+        )
+        is Rail.RESIDUE_COMPOSITION
+    )
+    count, metadata = score_mod._score_store_to_jsonl(
+        context,
+        tmp_path / "retention.jsonl",
+        root=score_mod.REPO_ROOT,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.RESIDUE_COMPOSITION,
+        species_formulas=formulas,
+        include_diagnostics=False,
+    )
+
+    assert calls == ["mn-retention"]
+    assert count == metadata.selected_reference_count == 1
 
 
 def test_species_scoring_keeps_full_context_and_emits_identical_rows(
