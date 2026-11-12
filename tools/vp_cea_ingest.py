@@ -45,7 +45,7 @@ from simulator.vapour_rail.nasa_cea import (  # noqa: E402
     NasaCeaSegmentError,
     StandardState,
 )
-from simulator.physical_constants import PA_PER_BAR  # noqa: E402
+from simulator.physical_constants import ATM_PA, PA_PER_BAR  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # thermo.inp parsing (NASA-9 / Glenn fixed free-text records)
@@ -573,7 +573,7 @@ class IngestResult:
 # NASA/TP-2002-211556 mixed standard-state pressures (report p. 2):
 # ideal gases at 1 bar; pure condensed reference substances at 1 atm.
 _CEA_GAS_REF_PRESSURE_PA = PA_PER_BAR
-_CEA_CONDENSED_REF_PRESSURE_PA = 101_325.0
+_CEA_CONDENSED_REF_PRESSURE_PA = ATM_PA
 _CEA_GAS_REF_CONVENTION = "CEA_JANAF_1_bar"
 _CEA_CONDENSED_REF_CONVENTION = "CEA_condensed_1_atm"
 

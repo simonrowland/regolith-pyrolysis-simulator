@@ -190,3 +190,28 @@ def test_bar_to_pascal_has_one_owner() -> None:
     assert ELLINGHAM_STANDARD_PRESSURE_PA is PA_PER_BAR
     assert _PA_PER_BAR is PA_PER_BAR
     assert _PA_PER_MBAR is PA_PER_MBAR
+
+
+def test_standard_atmosphere_has_one_owner() -> None:
+    """1 atm is 101325 Pa. The float and the decimal each have one object."""
+
+    from decimal import Decimal
+
+    from simulator.battery.identity import PA_PER_ATM_DEC
+    from simulator.physical_constants import (
+        ATM_PA,
+        ATM_PA_DECIMAL,
+        STANDARD_ATMOSPHERE_PA,
+    )
+    from simulator.thermal_train import (
+        MMHG_TO_PA,
+        OXYGEN_NORMAL_BOILING_PRESSURE_PA,
+    )
+
+    assert ATM_PA is STANDARD_ATMOSPHERE_PA
+    assert STANDARD_ATMOSPHERE_PA == 101325.0
+    assert ATM_PA_DECIMAL == Decimal(101325)
+    assert ATM_PA_DECIMAL == Decimal("101325.0")
+    assert PA_PER_ATM_DEC is ATM_PA_DECIMAL
+    assert OXYGEN_NORMAL_BOILING_PRESSURE_PA is STANDARD_ATMOSPHERE_PA
+    assert MMHG_TO_PA == STANDARD_ATMOSPHERE_PA / 760.0
