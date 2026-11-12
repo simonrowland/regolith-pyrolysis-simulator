@@ -156,6 +156,19 @@ class EngineCacheSchemaMismatch(RuntimeError):
         )
 
 
+class EngineCacheSettingsError(ValueError):
+    """Engine cache settings do not contain the normalized projection inputs."""
+
+    def __init__(self, engine_name: str, missing_fields: Iterable[str]) -> None:
+        self.engine_name = engine_name
+        self.missing_fields = tuple(missing_fields)
+        super().__init__(
+            f"engine cache settings for {engine_name!r} are missing normalized "
+            f"fields {self.missing_fields!r}; pass normalize_engine_settings(...) "
+            "output"
+        )
+
+
 def _canonical_json_dumps(value: Any) -> str:
     return json.dumps(
         value,
@@ -189,11 +202,29 @@ def engine_cache_settings(
 
     fields = normalized_settings
     if engine_name == "openimcc":
+        _require_normalized_engine_settings(
+            engine_name, fields, ("pack", "gas_pack")
+        )
         return {
             "melt_pack": fields["pack"],
             "gas_pack": fields["gas_pack"],
         }
     if engine_name == "alphamelts":
+        _require_normalized_engine_settings(
+            engine_name,
+            fields,
+            (
+                "python_api_model",
+                "transport",
+                "effective_calc_mode",
+                "raw_model_name",
+                "redox_buffer",
+                "fO2_offset",
+                "Fe3Fet_ratio",
+                "configured_vapor_transport_pO2_bar",
+                "configured_vapor_transport_floor_bar",
+            ),
+        )
         # Opener fields map to the transport, model, redox, and vapor settings
         # read by AlphaMELTSBackend.initialize() and equilibrate().
         api_model = fields["python_api_model"]
@@ -215,6 +246,11 @@ def engine_cache_settings(
             ],
         }
     if engine_name == "vaporock":
+        _require_normalized_engine_settings(
+            engine_name,
+            fields,
+            ("temperature_units", "pressure_units", "vapor_pressure_units"),
+        )
         return {
             name: fields[name]
             for name in (
@@ -224,12 +260,27 @@ def engine_cache_settings(
             )
         }
     if engine_name == "magemin":
+        _require_normalized_engine_settings(
+            engine_name, fields, ("database", "bridge", "fO2_buffer")
+        )
         return {
             "database": fields["database"],
             "bridge": fields["bridge"],
             "fO2_buffer": fields["fO2_buffer"],
         }
     if engine_name == "thermoengine":
+        _require_normalized_engine_settings(
+            engine_name,
+            fields,
+            (
+                "model",
+                "configured_vapor_transport_pO2_bar",
+                "configured_vapor_transport_floor_bar",
+                "redox_buffer",
+                "fO2_offset",
+                "Fe3Fet_ratio",
+            ),
+        )
         return {
             "model": fields["model"],
             "vapor_transport_pO2_bar": fields[
@@ -243,6 +294,21 @@ def engine_cache_settings(
             "fe3fet_ratio": fields["Fe3Fet_ratio"],
         }
     raise ValueError(f"unknown engine {engine_name!r}")
+
+
+def _require_normalized_engine_settings(
+    engine_name: str,
+    settings: Mapping[str, Any],
+    required_fields: Iterable[str],
+) -> None:
+    required = tuple(required_fields)
+    missing = (
+        required
+        if not isinstance(settings, Mapping)
+        else tuple(name for name in required if name not in settings)
+    )
+    if missing:
+        raise EngineCacheSettingsError(engine_name, missing)
 
 
 def _configured_engine_cache_path() -> str | None:
