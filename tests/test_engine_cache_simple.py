@@ -224,6 +224,26 @@ def test_cache_uses_canonical_request_and_wal_sqlite(
         assert "WITHOUT ROWID" in schema.upper()
 
 
+def test_engine_cache_writes_only_the_hot_database(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+
+    assert _cached_engine_call()(
+        "openimcc", {"call": "hot-only-storage"}, lambda: {"answer": 42}
+    ) == {"answer": 42}
+
+    assert database.is_file()
+    assert not database.with_name(database.name + ".cold").exists()
+    with sqlite3.connect(database) as connection:
+        tables = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'"
+        ).fetchall()
+    assert tables == [("engine_outputs",)]
+
+
 def test_schema_mismatch_refuses_without_deleting_rows(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
