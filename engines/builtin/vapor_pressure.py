@@ -126,6 +126,7 @@ from simulator.physical_constants import (  # noqa: E402
     GAS_CONSTANT,
     MELT_DISSOCIATION_PO2_MAX_BAR,
     MELT_DISSOCIATION_PO2_MIN_BAR,
+    PA_PER_BAR,
 )
 
 
@@ -387,7 +388,7 @@ VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG = (
 )
 VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_STATUS = "reconstructed_limited"
 PSEUDO_VAPOROCK_CURVE_FIT_SOURCE = "vaporock_backsolved_curve_fit"
-ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
+ELLINGHAM_STANDARD_PRESSURE_PA = PA_PER_BAR
 # A computed partial pressure at or below this floor is left out of
 # vapor_pressures_Pa. The omission record is the proof; absence alone is not.
 VAPOR_PRESSURE_REPORTING_THRESHOLD_PA = 1e-15

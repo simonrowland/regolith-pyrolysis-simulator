@@ -31,12 +31,15 @@ from simulator.chemistry.ellingham_thermo import (
 from simulator.chemistry.gas_rail_authority import (
     _gas_rail_block_is_authoritative,
 )
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT_6SIG as GAS_CONSTANT_J_PER_MOL_K,
+    PA_PER_BAR,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
-# Match simulator.state.GAS_CONSTANT without importing simulator.state here.
-GAS_CONSTANT_J_PER_MOL_K = 8.31446
-CELSIUS_TO_KELVIN_OFFSET = 273.15
-ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
+# Six-significant-figure R, same object as simulator.state.GAS_CONSTANT.
+ELLINGHAM_STANDARD_PRESSURE_PA = PA_PER_BAR
 logger = logging.getLogger(__name__)
 
 # Same evaporation floor used by BuiltinVaporPressureProvider.

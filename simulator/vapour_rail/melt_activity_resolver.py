@@ -20,7 +20,7 @@ from typing import Any, Final
 
 from simulator.yaml_cache import load_cached_safe_yaml
 
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_CATIONS_PER_FORMULA,
     melt_oxide_activity,
@@ -2782,7 +2782,7 @@ def build_shadow_for_vapour_batch(
     resolver = MeltActivityResolver(registry)
     independent_inputs = dict(engine_inputs_by_component or {})
     temperature_K = float(getattr(state, "temperature_K", 0.0) or 0.0)
-    pressure_bar = float(getattr(state, "total_pressure_Pa", 0.0) or 0.0) / 1.0e5
+    pressure_bar = float(getattr(state, "total_pressure_Pa", 0.0) or 0.0) / PA_PER_BAR
     intrinsic_log = getattr(state, "source_reaction_fO2_log10", None)
     redox_pressure_bar = getattr(
         state, "source_reaction_activity_pressure_bar", None

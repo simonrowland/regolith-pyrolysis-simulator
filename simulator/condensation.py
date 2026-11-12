@@ -110,6 +110,8 @@ from simulator.physical_constants import (
     AVOGADRO,
     BOLTZMANN,
     CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT_10SIG,
+    STANDARD_ATMOSPHERE_PA,
 )
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
@@ -220,7 +222,8 @@ DEFAULT_SHERWOOD_LAMINAR = 3.66
 # when pressure is absent/invalid or that computation fails, anchored to the
 # historical SiO/N2 operating point at 10 mbar and 1700 C.
 DEFAULT_BINARY_DIFFUSION_M2_S = 1.0e-2
-GAS_CONSTANT_J_MOL_K = 8.314462618
+# 10-significant-figure R. Not the full CODATA leaf (relative −1.843e-11).
+GAS_CONSTANT_J_MOL_K = GAS_CONSTANT_10SIG
 
 
 def _finite_nonnegative_value(value: Any, *, label: str) -> float:
@@ -1855,7 +1858,7 @@ def _chapman_enskog_d_ab_m2_s(
     M_ab_reduced = 2.0 / (1.0 / M_a + 1.0 / M_b)    # g/mol
     T_star = T_K / eps_ab
     omega_d = _neufeld_collision_integral_omega_d(T_star)
-    pressure_atm = pressure_pa / 101325.0
+    pressure_atm = pressure_pa / STANDARD_ATMOSPHERE_PA
     if pressure_atm <= 0.0:
         return 0.0
     # cm²/s by the reduced-mass BSL form, then convert to m²/s (1 cm² = 1e-4 m²)
@@ -2412,7 +2415,7 @@ class CondensationModel:
             ):
                 raise ValueError(f'{label} must be numeric')
             value = float(raw_temperature)
-            if not math.isfinite(value) or value <= -273.15:
+            if not math.isfinite(value) or value <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError(
                     f'{label} must be finite and above absolute zero'
                 )
@@ -2492,7 +2495,7 @@ class CondensationModel:
                 raw_temperature = float(raw_temperature)
                 if (
                     not math.isfinite(raw_temperature)
-                    or raw_temperature <= -273.15
+                    or raw_temperature <= -CELSIUS_TO_KELVIN_OFFSET
                 ):
                     raise ValueError(
                         f'{segment.name} wall temperature must be finite '
@@ -2501,7 +2504,7 @@ class CondensationModel:
 
         if wall_temperature_C is not None:
             wall_temperature = float(wall_temperature_C)
-            if not math.isfinite(wall_temperature) or wall_temperature <= -273.15:
+            if not math.isfinite(wall_temperature) or wall_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError('wall_temperature_C must be finite and above absolute zero')
             self.wall_temperature_C = wall_temperature
         if pipe_diameter_m is not None:
@@ -2513,7 +2516,7 @@ class CondensationModel:
             ]
         if gas_temperature_C is not None:
             gas_temperature = float(gas_temperature_C)
-            if not math.isfinite(gas_temperature) or gas_temperature <= -273.15:
+            if not math.isfinite(gas_temperature) or gas_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError('gas_temperature_C must be finite and above absolute zero')
             self.gas_temperature_C = gas_temperature
         elif wall_temperature_C is not None:
@@ -2975,7 +2978,7 @@ class CondensationModel:
             raw_temperature = float(temperatures_C.get(
                 segment.name, self.wall_temperature_C)
             )
-            if not math.isfinite(raw_temperature) or raw_temperature <= -273.15:
+            if not math.isfinite(raw_temperature) or raw_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError(
                     f'{segment.name} wall temperature must be finite and above absolute zero'
                 )

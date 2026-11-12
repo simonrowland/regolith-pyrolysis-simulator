@@ -123,7 +123,7 @@ from simulator.battery.input_provenance import (
     printed_single_melt_evidence,
     single_phase_printed_bulk_policy,
 )
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import ATM_PA_DECIMAL, GAS_CONSTANT, PA_PER_BAR
 from simulator.battery.migrate import (
     REPO_ROOT,
     _COMPOSITION_COMPONENTS,
@@ -2580,7 +2580,6 @@ _ONE_CATION_OXIDE_DIMER = {
     "CrO1.5": "Cr2O3",
     "FeO1.5": "Fe2O3",
 }
-_JANAF_BAR_PA = Decimal(100000)
 _QUENCH_OR_METASTABLE_WORD = re.compile(
     r"\b(?:quench(?:ed|ing)?|metastable)\b",
     re.IGNORECASE,
@@ -2667,7 +2666,7 @@ def _hematite_magnetite_equilibrium_fO2_Pa(temperature_K: Decimal) -> Decimal:
         - 6 * _janaf_formation_gibbs_J("Fe-030", temperature_K)
     )
     fO2_bar = (-delta_g_J / (JANAF_R_J_PER_MOL_K * temperature_K)).exp()
-    return fO2_bar * _JANAF_BAR_PA
+    return fO2_bar * PA_PER_BAR_DEC
 
 
 def _feo1_5_hematite_field_refusal(
@@ -3271,7 +3270,7 @@ def _resolve_condensed_element_reference(
     if derived_pressure:
         identity = replace(
             identity,
-            standard_pressure_Pa=State.of(Decimal("100000")),
+            standard_pressure_Pa=State.of(PA_PER_BAR_DEC),
         )
         derived_by["standard_pressure_Pa"] = "d351_nominal_p0"
     if identity.reaction is None or identity.reaction.is_unknown:
@@ -8040,7 +8039,7 @@ def _comparison_identity(
     ):
         po2_bar = _solved_effusion_po2_bar(prediction)
         if po2_bar is not None:
-            updates["fO2_Pa"] = State.of(Decimal(str(po2_bar)) * Decimal("1e5"))
+            updates["fO2_Pa"] = State.of(Decimal(str(po2_bar)) * PA_PER_BAR_DEC)
     if pressure_independent and (
         identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value
     ):
@@ -8048,7 +8047,7 @@ def _comparison_identity(
         if quantity is not None:
             bar, _notice, invalid = total_pressure_bar_for_score(identity, quantity)
             if invalid is None:
-                updates["total_pressure_Pa"] = State.of(Decimal(str(bar)) * Decimal("1e5"))
+                updates["total_pressure_Pa"] = State.of(Decimal(str(bar)) * PA_PER_BAR_DEC)
     if not updates:
         return identity
     return replace(identity, **updates)
@@ -8088,7 +8087,7 @@ def _selected_shared_ladder_oxygen(
         ):
             po2_bar = _solved_effusion_po2_bar(prediction)
             if po2_bar is not None:
-                value_pa = Decimal(str(po2_bar)) * Decimal("1e5")
+                value_pa = Decimal(str(po2_bar)) * PA_PER_BAR_DEC
         if value_pa is None and isinstance(prediction.identity, Identity):
             state = prediction.identity.fO2_Pa
             if state is not None and state.is_value and state.value is not None:
@@ -8450,7 +8449,7 @@ def _printed_fe_redox_fo2_log(
         ):
             oxygen_value = float(oxygen_pa.value)
             if oxygen_value > 0.0 and math.isfinite(oxygen_value):
-                fo2_log = Decimal(str(math.log10(oxygen_value / 100000.0)))
+                fo2_log = Decimal(str(math.log10(oxygen_value / PA_PER_BAR)))
     if fo2_log is None or not fo2_log.is_finite():
         return None
     return fo2_log
@@ -8471,11 +8470,11 @@ def _fe_redox_pressure(
         and pressure_pa.is_value
         and pressure_pa.value is not None
     ):
-        pressure_bar = float(pressure_pa.value) / 100000.0
+        pressure_bar = float(pressure_pa.value) / PA_PER_BAR
     elif observation.source_id == "borisov-2018-compilation":
         # The cited compilation is explicitly a 1-atm dataset.
         pressure_bar = 1.01325
-        pressure_pa = State.of(Decimal("101325"))
+        pressure_pa = State.of(ATM_PA_DECIMAL)
     else:
         return _FeRedoxRefusal(
             RefusalReason.IDENTITY_INCOMPLETE,
@@ -9273,7 +9272,7 @@ def total_pressure_bar_for_score(
         pa = state.value if isinstance(state.value, Decimal) else as_decimal(state.value)
         if not pa.is_finite() or pa < 0:
             return 0.0, None, "total_pressure_invalid"
-        return float(pa) / 1.0e5, None, None
+        return float(pa) / PA_PER_BAR, None, None
     detail = "observation does not carry total_pressure_Pa"
     if state is not None and state.reason:
         detail = f"{detail} ({state.tag.value}: {state.reason})"
@@ -9549,7 +9548,7 @@ def _oxygen_input_request(
         ):
             return Po2Request(
                 mode=PO2_COMMANDED,
-                po2_bar=float(fo2_state.value) / 1.0e5,
+                po2_bar=float(fo2_state.value) / PA_PER_BAR,
             )
         return _input_refusal(
             engine=engine,
@@ -9576,7 +9575,7 @@ def _oxygen_input_request(
     if _has_printed_fo2(observation, identity):
         fo2_state = identity.fO2_Pa
         if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
-            po2_bar = float(fo2_state.value) / 1.0e5
+            po2_bar = float(fo2_state.value) / PA_PER_BAR
             if math.isfinite(po2_bar) and po2_bar > 0.0:
                 input_notices.append(
                     fo2_tier_notice(
@@ -10469,7 +10468,7 @@ def _printed_total_pressure_bar(
         return None
     if not pa.is_finite() or pa <= 0:
         return None
-    return pa / Decimal("1e5")
+    return pa / PA_PER_BAR_DEC
 
 
 def _printed_fo2_log10_bar(identity: Identity) -> float | None:
@@ -10482,7 +10481,7 @@ def _printed_fo2_log10_bar(identity: Identity) -> float | None:
         return None
     if not pa.is_finite() or pa <= 0:
         return None
-    return float(pa.log10() - Decimal("1e5").log10())
+    return float(pa.log10() - PA_PER_BAR_DEC.log10())
 
 
 def _select_phase_composition(
@@ -11452,7 +11451,7 @@ def _predict_phase_row(
     try:
         call_kwargs: dict[str, object] = {}
         if solute is not None and anion_pa is not None:
-            call_kwargs["solute_fugacity_bar"] = float(anion_pa / Decimal("1e5"))
+            call_kwargs["solute_fugacity_bar"] = float(anion_pa / PA_PER_BAR_DEC)
             call_kwargs["solute_fugacity_parameter"] = solute.fugacity_parameter
         if handles is not None:
             call_kwargs["handles"] = handles
@@ -13999,7 +13998,7 @@ def _predict_with_engine(
     shared_oxygen = knudsen_vapour and not _has_printed_fo2(observation, identity)
     linked_pressure = linked_source_pressure(observation) if shared_oxygen else None
     source_oxygen_bar = (
-        None if linked_pressure is None else float(linked_pressure) / 1.0e5
+        None if linked_pressure is None else float(linked_pressure) / PA_PER_BAR
     )
 
     def oxygen_decision():
@@ -14689,7 +14688,7 @@ def _predict_with_engine(
                 requested_composition=requested,
                 version=engine_version,
             )
-        pressure_bar = total_pressure_pa / 1.0e5
+        pressure_bar = total_pressure_pa / PA_PER_BAR
         if solve_oxygen_balance_at_current_pressure is not None:
             # This callback closes over pressure_bar, so after the one-pass
             # P_total update the same balance runs with the derived pressure.

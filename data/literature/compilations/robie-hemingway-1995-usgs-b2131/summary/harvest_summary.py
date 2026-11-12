@@ -10,6 +10,7 @@ from pathlib import Path
 import re
 import subprocess
 from simulator.corpus_paths import regolith_corpus_ctl_root
+from simulator.physical_constants import GAS_CONSTANT
 
 ROOT = Path(__file__).resolve().parent
 
@@ -257,7 +258,7 @@ def harvest(page, raster_text):
             dg=numeric_first.get('formation_gibbs',{})
             logk=numeric_first.get('log_kf',{})
             if dg.get('value') is not None and logk.get('value') is not None:
-                factor=8.31446261815324*temperature_cell['value']*math.log(10)/1000
+                factor=GAS_CONSTANT*temperature_cell['value']*math.log(10)/1000
                 def half_step(raw):
                     return 0.5*10**(-len(raw.split('.')[1])) if '.' in raw else 0.5
                 tolerance=half_step(dg['raw'])+factor*half_step(logk['raw'])+0.01

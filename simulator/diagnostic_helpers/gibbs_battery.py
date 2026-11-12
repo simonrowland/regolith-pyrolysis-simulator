@@ -63,6 +63,7 @@ from simulator.vapour_rail.nasa_cea import (
     NasaCeaDomainError,
     NasaCeaPolynomial,
 )
+from simulator.physical_constants import PA_PER_BAR
 from simulator.yaml_cache import load_cached_safe_yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -613,7 +614,7 @@ def _polynomial_from_cea_observation(
             if values.get("source_ref_code") is not None
             else None
         ),
-        reference_pressure_Pa=float(values.get("reference_pressure_Pa", 100_000.0)),
+        reference_pressure_Pa=float(values.get("reference_pressure_Pa", PA_PER_BAR)),
     )
 
 
