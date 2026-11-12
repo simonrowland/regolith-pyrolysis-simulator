@@ -7688,10 +7688,7 @@ def _predict_fe_redox(
         physical_pressure_bar=pressure_bar,
     )
     name = str(getattr(handle, "name", engine.value))
-    call_evidence = (
-        f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
-        f":exit={getattr(cell, 'exit_code', None)}"
-    )
+    call_evidence = f"equilibrate_cell:{name}:exit={getattr(cell, 'exit_code', None)}"
     model_id = getattr(cell, "model_id", None)
     version = None if model_id is None else (str(model_id) or None)
     status = getattr(cell, "status", None)
@@ -10745,8 +10742,8 @@ def _predict_with_engine(
     # MAGEMin's existing warm-worker hard wall is 15 s; the scorer's 20 s
     # cell timeout remains a secondary bound. call_timeout_s carries the
     # remaining cell budget into the worker, whose 15 s pool limit kills the
-    # observed >50 s non-finite Gamma loop. Expiry maps below to
-    # engine_not_converged with this cell's elapsed wall time.
+    # observed >50 s non-finite Gamma loop. Expiry maps below to the typed
+    # engine_not_converged refusal without adding runtime timing to the row.
     native_activity_formula = (
         formula
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY
@@ -11012,10 +11009,7 @@ def _predict_with_engine(
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
     refusal = getattr(cell, "refusal_reason", None)
     status = getattr(cell, "status", None)
-    call_evidence = (
-        f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
-        f":exit={getattr(cell, 'exit_code', None)}"
-    )
+    call_evidence = f"equilibrate_cell:{name}:exit={getattr(cell, 'exit_code', None)}"
     if engine is Engine.INTERNAL_ANALYTICAL:
         engine_version = (
             getattr(cell, "vapor_pressure_backend_status_reason", None)
@@ -11057,7 +11051,6 @@ def _predict_with_engine(
                 refusal_reason=refusal_reason,
                 refusal_detail={
                     "reason": typed_reason,
-                    "elapsed_s": float(getattr(cell, "wall_s", 0.0) or 0.0),
                     "cell_refusal_reason": typed,
                     "engine_status": cell_status,
                     "engine_reason": engine_side_reason,
@@ -11466,10 +11459,7 @@ def _predict_with_engine(
             origin=_KNUDSEN_TOTAL_PRESSURE_NOTICE_ORIGIN,
         )
         notices = union_notices(notices, (pressure_notice,))
-        call_evidence = (
-            f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
-            f":exit={getattr(cell, 'exit_code', None)}"
-        )
+        call_evidence = f"equilibrate_cell:{name}:exit={getattr(cell, 'exit_code', None)}"
         activities = dict(getattr(cell, "melt_activities", None) or {})
         pressures = updated_pressures
         identity = replace(
@@ -12057,18 +12047,10 @@ def _hashimoto_residue_prediction(
                 to_plain(experiments_by_id[experiment_id])
                 for experiment_id in sorted(experiments_by_id)
             ]
-            revision = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                cwd=REPO_ROOT,
-                check=True,
-                capture_output=True,
-                text=True,
-            ).stdout.strip()
             rows = _predict_hashimoto_residue_cohort(
                 experiments,
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
                 preform_dimensions_mm=geometry,
-                code_revision=revision,
                 engine=engine.value,
                 _allow_partial_cohort_for_test=test_experiment_ids is not None,
             )
@@ -12219,7 +12201,6 @@ def _hashimoto_residue_prediction(
             # The source-resolved Phase.L identity denotes the modeled run-end
             # liquid's bulk oxide inventory; quenching preserves that inventory.
             identity=reference.identity,
-            version=str(primary.provenance.get("code_revision") or "unknown"),
             refusal_detail=primary_provenance,
         )
     except Exception as exc:  # the scorer records typed per-cell refusal and continues
@@ -12423,19 +12404,11 @@ def _sossi_residue_prediction(
                     "sossi_experiment_missing_from_extract", ",".join(sorted(missing_runs))
                 )
             experiments = [source_experiments[key] for key in sorted(experiments_by_run)]
-            revision = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                cwd=REPO_ROOT,
-                check=True,
-                capture_output=True,
-                text=True,
-            ).stdout.strip()
             rows = _predict_sossi_residue_cohort(
                 experiments,
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
                 starting_trace_ppm_by_experiment=trace_ppm_by_experiment,
                 buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
-                code_revision=revision,
                 engine=engine.value,
             )
             cache[cache_key] = {
@@ -12557,7 +12530,6 @@ def _sossi_residue_prediction(
             lineage_complete=False,
             notices=tuple(notices),
             identity=reference.identity,
-            version=str(provenance.get("code_revision") or "unknown"),
             refusal_detail=provenance,
         )
     except Exception as exc:  # preserve a typed per-cell absence and keep scoring

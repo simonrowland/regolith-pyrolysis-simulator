@@ -6,7 +6,6 @@ import atexit
 import json
 import math
 import multiprocessing
-import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
@@ -2707,7 +2706,6 @@ def _predict_hashimoto_residue_cohort(
     runtime_catalog: Mapping[str, Any],
     *,
     preform_dimensions_mm: Mapping[str, float],
-    code_revision: str,
     engine: str = "openimcc",
     _allow_partial_cohort_for_test: bool = False,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
@@ -2725,9 +2723,6 @@ def _predict_hashimoto_residue_cohort(
         raise ResidueInventoryRefusal(
             "hashimoto_cohort_invalid", "R2 requires 24 distinct physical runs"
         )
-    if not code_revision.strip():
-        raise ResidueInventoryRefusal("hashimoto_code_revision_missing")
-
     try:
         import openimcc
         from openimcc import load_gas_datapack
@@ -3000,14 +2995,12 @@ def _predict_hashimoto_residue_cohort(
             refinement_steps_by_geometry: dict[str, tuple[int, ...]] = {}
             refinement_differences_by_geometry: dict[str, tuple[dict[str, float | int], ...]] = {}
             refinement_status_by_geometry: dict[str, str] = {}
-            refinement_cpu_seconds_by_geometry: dict[str, float] = {}
             refinement_accepted_steps_by_geometry: dict[str, int] = {}
             refinement_notices: list[dict[str, str]] = []
             for geometry in _HASHIMOTO_GEOMETRIES:
                 steps = initial_steps
                 tried_steps: list[int] = []
                 level_differences: list[dict[str, float | int]] = []
-                cpu_seconds = 0.0
                 previous_values: dict[str, float] | None = None
                 values: dict[str, float] = {}
                 pO2_steps: tuple[float, ...] = ()
@@ -3017,7 +3010,6 @@ def _predict_hashimoto_residue_cohort(
                 pO2_balance_floor: dict[str, float | int | None] = {}
                 refinement_status = "unconverged_at_cap"
                 while True:
-                    started_cpu = time.process_time()
                     (
                         values,
                         pO2_steps,
@@ -3035,7 +3027,6 @@ def _predict_hashimoto_residue_cohort(
                         geometry_policy_id=geometry,
                         initial_area_m2=geometry_areas[geometry],
                     )
-                    cpu_seconds += time.process_time() - started_cpu
                     tried_steps.append(steps)
                     if refusal is not None:
                         refinement_status = "engine_nonconvergence"
@@ -3069,7 +3060,6 @@ def _predict_hashimoto_residue_cohort(
                 refinement_steps_by_geometry[geometry] = tuple(tried_steps)
                 refinement_differences_by_geometry[geometry] = tuple(level_differences)
                 refinement_status_by_geometry[geometry] = refinement_status
-                refinement_cpu_seconds_by_geometry[geometry] = cpu_seconds
                 refinement_accepted_steps_by_geometry[geometry] = tried_steps[-1]
                 geometry_predictions[geometry] = values
                 geometry_exhaustions[geometry] = exhaustions
@@ -3211,7 +3201,6 @@ def _predict_hashimoto_residue_cohort(
                     else {}
                 ),
                 "openimcc_pin": openimcc_bridge.OPENIMCC_RECORDED_PIN,
-                "code_revision": code_revision,
                 "integration": {
                     "steps": refinement_accepted_steps_by_geometry[primary_geometry],
                     "steps_tried_by_geometry": refinement_steps_by_geometry,
@@ -3219,8 +3208,6 @@ def _predict_hashimoto_residue_cohort(
                     "accepted_steps_by_geometry": refinement_accepted_steps_by_geometry,
                     "refinement_status_by_geometry": refinement_status_by_geometry,
                     "refinement_status": refinement_status_by_geometry[primary_geometry],
-                    "process_cpu_seconds_by_geometry": refinement_cpu_seconds_by_geometry,
-                    "process_cpu_seconds": math.fsum(refinement_cpu_seconds_by_geometry.values()),
                     "refinement_notices": tuple(refinement_notices),
                     "substep_duration_s": duration_s
                     / refinement_accepted_steps_by_geometry[primary_geometry],
@@ -3371,7 +3358,6 @@ def _predict_sossi_residue_cohort(
     *,
     starting_trace_ppm_by_experiment: Mapping[str, Mapping[str, float]],
     buffered_fO2_log_by_experiment: Mapping[str, float],
-    code_revision: str,
     engine: str,
 ) -> tuple[_SossiResiduePrediction, ...]:
     """Predict Sossi Mn/Ti with the shared buffered inventory integrator."""
@@ -3846,7 +3832,6 @@ def _predict_sossi_residue_cohort(
                     "source_id": _SOSSI_SOURCE_ID,
                     "experiment_id": experiment_id,
                     "engine": engine,
-                    "code_revision": code_revision,
                     "sample_mass_kg": sample_mass_kg,
                     "total_pressure_Pa": total_pressure_Pa,
                     "buffered_fO2_log": buffered_logp,
