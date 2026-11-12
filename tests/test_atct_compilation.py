@@ -88,9 +88,17 @@ def test_source_gaps_and_native_states_are_explicit(corpus):
         for ambiguity in manifest["corpus_status"]["ambiguities"]
     )
     manifest_records = {entry["record_id"]: entry for entry in manifest["entries"]}
-    for field, label in (
-        ("formation_enthalpy_0_K_as_published", "ATcT blank DHf0 rows"),
-        ("units_as_published", "ATcT blank unit rows"),
+    for field, ambiguity, label in (
+        (
+            "formation_enthalpy_0_K_as_published",
+            "DHf0_blank_as_published; not inferred",
+            "ATcT blank DHf0 rows",
+        ),
+        (
+            "units_as_published",
+            "Units_blank_as_published; not inferred",
+            "ATcT blank unit rows",
+        ),
     ):
         assert_named_rows(
             {
@@ -101,7 +109,7 @@ def test_source_gaps_and_native_states_are_explicit(corpus):
             {
                 record_id: None
                 for record_id, record in manifest_records.items()
-                if record[field] == ""
+                if ambiguity in record["ambiguities"]
             },
             label=label,
         )
