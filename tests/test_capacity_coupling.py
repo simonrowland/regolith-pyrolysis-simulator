@@ -16,6 +16,7 @@ from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
     OXYGEN_SPECIES,
     compressible_pressure_capacity_fraction,
+    remaining_hour_removal_capacity_kg,
 )
 from simulator.accounting import resolve_species_formula
 from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
@@ -508,21 +509,57 @@ def test_real_finite_capacity_result_drives_live_short_session_once(monkeypatch)
 
     shadow_results = []
     real_shadow = active._compute_capacity_coupling_shadow
+    end_window_remainder = []
+    real_dispatch = active._dispatch_overhead_bleed
 
     def observed_shadow(equilibrium):
         result = real_shadow(equilibrium)
         shadow_results.append(result)
         return result
 
+    def observed_dispatch(*args, **kwargs):
+        if "remaining_removal_capacity_kg" in kwargs:
+            end_window_remainder.append(
+                kwargs["remaining_removal_capacity_kg"]
+            )
+        return real_dispatch(*args, **kwargs)
+
     active._compute_capacity_coupling_shadow = observed_shadow
+    active._dispatch_overhead_bleed = observed_dispatch
     active.step()
 
     assert len(shadow_results) == 1
     assert isinstance(shadow_results[0], CapacityShadowResult)
-    assert sum(
-        transition.reason == "overhead_bleed"
+    removed_kg = math.fsum(
+        float(kg)
         for transition in active.atom_ledger.transitions
-    ) == 1
+        if transition.reason == "overhead_bleed"
+        for lot in transition.debits
+        for kg in lot.species_kg.values()
+    )
+    hour_capacity_kg = active._presolve_hour_capacity_kg
+    assert hour_capacity_kg is not None and hour_capacity_kg > 0.0
+    # Two bleed records are the two windows. Their mass shares one hour.
+    assert removed_kg <= hour_capacity_kg
+    assert end_window_remainder == [
+        pytest.approx(
+            remaining_hour_removal_capacity_kg(
+                hour_capacity_kg=hour_capacity_kg,
+                already_removed_kg=active._presolve_removed_kg,
+            )
+        )
+    ]
+    # Mutation: another full hour on top of a spent hour exceeds the offer.
+    # The shared remainder of a spent hour is zero, so the sum stays inside it.
+    assert hour_capacity_kg + hour_capacity_kg > hour_capacity_kg
+    assert (
+        hour_capacity_kg
+        + remaining_hour_removal_capacity_kg(
+            hour_capacity_kg=hour_capacity_kg,
+            already_removed_kg=hour_capacity_kg,
+        )
+        == pytest.approx(hour_capacity_kg)
+    )
     assert shadow_results[0].mass_closure_error_pct <= 5.0e-12
 
 

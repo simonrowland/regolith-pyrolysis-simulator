@@ -11,6 +11,7 @@ from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
     capacity_violation_notice,
     headspace_removal_capacity_kg,
+    remaining_hour_removal_capacity_kg,
 )
 from simulator.accounting import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent
@@ -170,6 +171,115 @@ def test_explicit_no_cold_train_uses_provider_storage_partition(
     ).get("O2", 0.0) == pytest.approx(0.0)
 
 
+def test_second_window_cannot_take_another_pipe_hour(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    # Conductance 1 kg/s against vacuum removes 3600 kg in one hour.
+    # Inventory is three such hours. The first window takes one. A second
+    # window with no remainder would take another. The shared remainder
+    # of a spent hour takes none, and a full drain still ignores that cap.
+    hour_kg = headspace_removal_capacity_kg(
+        conductance_kg_s=1.0,
+        p_upstream_bar=1.0,
+        p_downstream_bar=0.0,
+        dt_hr=1.0,
+    )
+    assert hour_kg == pytest.approx(3600.0)
+    assert remaining_hour_removal_capacity_kg(
+        hour_capacity_kg=hour_kg,
+        already_removed_kg=0.0,
+    ) == pytest.approx(hour_kg)
+    assert remaining_hour_removal_capacity_kg(
+        hour_capacity_kg=hour_kg,
+        already_removed_kg=hour_kg,
+    ) == pytest.approx(0.0)
+    with pytest.raises(ValueError, match="finite non-negative"):
+        remaining_hour_removal_capacity_kg(
+            hour_capacity_kg=float("nan"),
+            already_removed_kg=0.0,
+        )
+    with pytest.raises(ValueError, match="finite non-negative"):
+        remaining_hour_removal_capacity_kg(
+            hour_capacity_kg=-1.0,
+            already_removed_kg=0.0,
+        )
+
+    def _window(sim, **extra):
+        return sim._dispatch_and_commit(
+            ChemistryIntent.OVERHEAD_BLEED,
+            control_inputs={
+                "p_total_bar": 1.0,
+                "p_downstream_bar": 0.0,
+                "bleed_conductance_kg_s": 1.0,
+                "dt_hr": 1.0,
+                "force_drain_all": False,
+                **extra,
+            },
+        )
+
+    shared = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    shared.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 3.0 * hour_kg},
+        source="shared pipe hour",
+        material_origin="feedstock",
+    )
+    first = _window(shared)
+    second = _window(shared, remaining_removal_capacity_kg=0.0)
+    assert dict(first.diagnostic or {})["bled_o2_kg"] == pytest.approx(hour_kg)
+    assert dict(second.diagnostic or {}).get("bled_o2_kg", 0.0) == pytest.approx(
+        0.0
+    )
+    assert second.transition is None
+    assert shared.atom_ledger.kg_by_account("process.overhead_gas")[
+        "O2"
+    ] == pytest.approx(2.0 * hour_kg)
+
+    unshared = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    unshared.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 2.0 * hour_kg},
+        source="unshared second window",
+        material_origin="feedstock",
+    )
+    counterfactual = _window(unshared)
+    counterfactual_kg = dict(counterfactual.diagnostic or {})["bled_o2_kg"]
+    assert counterfactual_kg == pytest.approx(hour_kg)
+    assert hour_kg + counterfactual_kg > hour_kg
+
+    forced = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    forced.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 1.0},
+        source="force drain ignores remainder",
+        material_origin="feedstock",
+    )
+    drained = forced._dispatch_and_commit(
+        ChemistryIntent.OVERHEAD_BLEED,
+        control_inputs={
+            "force_drain_all": True,
+            "remaining_removal_capacity_kg": 0.0,
+            "cold_train_capacity": NoColdTrain(),
+        },
+    )
+    assert dict(drained.diagnostic or {})["bled_o2_kg"] == pytest.approx(1.0)
+
+
 def test_bleed_conductance_caps_partial_drain(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -314,6 +424,8 @@ def test_bleed_rate_tends_continuously_to_zero_with_pressure_delta():
         ("o2_vented_kg", None),
         ("max_o2_flow_kg_hr", -1.0),
         ("external_o2_in_overhead_mol", float("inf")),
+        ("remaining_removal_capacity_kg", float("nan")),
+        ("remaining_removal_capacity_kg", -1.0),
     ],
 )
 def test_destructive_bleed_controls_fail_closed_without_ledger_mutation(

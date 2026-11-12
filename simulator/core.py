@@ -7851,6 +7851,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         effective_transport_capacity=None,
         conductance_kg_s: Optional[float] = None,
         commit: bool = True,
+        remaining_removal_capacity_kg: Optional[float] = None,
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
@@ -7935,6 +7936,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 controls['p_total_bar'] = sum(
                     capacity_result.partial_pressures_Pa.values()
                 ) / 100000.0
+        if remaining_removal_capacity_kg is not None:
+            # End-of-hour window only. The pre-solve call leaves this unset,
+            # so it can spend the hour; this window gets what remains.
+            controls['remaining_removal_capacity_kg'] = (
+                remaining_removal_capacity_kg
+            )
         if not commit:
             # Same controls the accept path commits. The ledger is unchanged
             # until the capacity shadow accepts.
@@ -16365,6 +16372,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._presolve_bleed_pending = None
         self._presolve_remaining_holdup_mol = None
         self._presolve_reservoir_restore = None
+        self._presolve_hour_capacity_kg = None
+        self._presolve_removed_kg = None
         if not self._overhead_headspace_enabled():
             return False
         holdup = self._overhead_holdup_mol()
@@ -16424,6 +16433,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     p_downstream_bar=downstream_bar,
                     dt_hr=1.0,
                 )
+                # C_pipe(P_inventory) * 1 h. The end-of-hour window spends
+                # only what this offer does not.
+                self._presolve_hour_capacity_kg = removal_kg
                 notice = capacity_violation_notice(
                     inventory_kg=inventory_kg,
                     inventory_mol=inventory_mol,
@@ -16463,9 +16475,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             self._stage_provisional_presolve_bleed(preview)
             return True
-        self._dispatch_overhead_bleed(
+        committed = self._dispatch_overhead_bleed(
             conductance_kg_s=conductance_for_bleed,
         )
+        self._record_presolve_removal(committed)
         return False
 
     def _stage_provisional_presolve_bleed(self, preview) -> None:
@@ -16500,7 +16513,48 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._presolve_reservoir_restore = None
         if not controls:
             return
-        self._commit_overhead_bleed_controls(controls)
+        committed = self._commit_overhead_bleed_controls(controls)
+        self._record_presolve_removal(committed)
+
+    def _record_presolve_removal(self, result) -> None:
+        """Remember the mass the pre-solve window actually took."""
+
+        diagnostic = dict(getattr(result, 'diagnostic', None) or {})
+        raw = diagnostic.get('bled_total_kg', 0.0)
+        if isinstance(raw, bool):
+            self._presolve_removed_kg = None
+            return
+        try:
+            removed = float(0.0 if raw is None else raw)
+        except (TypeError, ValueError):
+            self._presolve_removed_kg = None
+            return
+        if not math.isfinite(removed) or removed < 0.0:
+            self._presolve_removed_kg = None
+            return
+        self._presolve_removed_kg = removed
+
+    def _remaining_presolve_removal_capacity_kg(self) -> Optional[float]:
+        """Pipe mass left in this hour after the pre-solve drain.
+
+        A drain that computed no capacity and removed nothing did not spend
+        the hour. Passing 0 there would stop the end window.
+        """
+
+        hour = getattr(self, '_presolve_hour_capacity_kg', None)
+        removed = getattr(self, '_presolve_removed_kg', None)
+        if hour is None or removed is None:
+            return None
+        if float(hour) == 0.0 and float(removed) == 0.0:
+            return None
+        from engines.builtin.overhead_bleed import (
+            remaining_hour_removal_capacity_kg,
+        )
+
+        return remaining_hour_removal_capacity_kg(
+            hour_capacity_kg=hour,
+            already_removed_kg=removed,
+        )
 
     def _discard_deferred_presolve_bleed(self) -> None:
         """Drop a staged bleed. The refusal leaves the ledger unbled."""
@@ -16862,10 +16916,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         configured_capacity, _cold_train = self._cold_train_capacity_policy()
         bleed_result = None
         if finite_headspace_enabled:
-            bleed_result = self._dispatch_overhead_bleed(
-                capacity_result=capacity_result,
-                effective_transport_capacity=effective_transport_capacity,
+            bleed_kwargs: Dict[str, Any] = {
+                'capacity_result': capacity_result,
+                'effective_transport_capacity': effective_transport_capacity,
+            }
+            remaining_removal_kg = (
+                self._remaining_presolve_removal_capacity_kg()
             )
+            if remaining_removal_kg is not None:
+                bleed_kwargs['remaining_removal_capacity_kg'] = (
+                    remaining_removal_kg
+                )
+            bleed_result = self._dispatch_overhead_bleed(**bleed_kwargs)
             self._attribute_o2_bubbler_vented_from_bleed(bleed_result)
             self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
             bleed_diag = dict(bleed_result.diagnostic or {})

@@ -220,6 +220,50 @@ def headspace_removal_capacity_kg(
     return conductance * fraction * duration_hr * 3600.0
 
 
+def remaining_hour_removal_capacity_kg(
+    *,
+    hour_capacity_kg: float,
+    already_removed_kg: float,
+) -> float:
+    """Mass the pipe may still remove after an earlier window of this hour.
+
+    Premise: the pre-solve drain and the end-of-hour bleed are two windows
+    of one hour. Removal over that hour is one offer,
+    ``C_pipe(P_inventory) * 1 h``, not one offer per window.
+
+    Algebra: ``R = max(0, C - M)``, where ``C`` is that hour's removal and
+    ``M`` is the mass the earlier window already took.
+    Unit check: kg - kg = kg.
+    Limits: ``M = 0`` leaves ``C``; ``M >= C`` leaves 0. A negative or
+    non-finite mass is not a remainder; it refuses instead of opening a
+    second hour.
+    """
+
+    if isinstance(hour_capacity_kg, bool) or isinstance(
+        already_removed_kg, bool
+    ):
+        raise ValueError(
+            "hour removal capacity requires finite non-negative kg"
+        )
+    try:
+        capacity = float(hour_capacity_kg)
+        removed = float(already_removed_kg)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            "hour removal capacity requires finite non-negative kg"
+        ) from exc
+    if (
+        not math.isfinite(capacity)
+        or capacity < 0.0
+        or not math.isfinite(removed)
+        or removed < 0.0
+    ):
+        raise ValueError(
+            "hour removal capacity requires finite non-negative kg"
+        )
+    return max(0.0, capacity - removed)
+
+
 def capacity_violation_notice(
     *,
     inventory_kg: float,
@@ -609,6 +653,13 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             bleed_kg = (
                 conductance * pressure_square_fraction * dt_hr * 3600.0
             )
+        # The second window of this hour. ``remaining_hour_removal_capacity_kg``
+        # is the kg still inside ``C_pipe(P_inventory) * 1 h``.
+        if "remaining_removal_capacity_kg" in controls:
+            bleed_kg = min(
+                bleed_kg,
+                float(controls["remaining_removal_capacity_kg"]),
+            )
         if bleed_kg <= 0.0:
             return {}
         bleed_kg = min(total_kg, bleed_kg)
@@ -673,6 +724,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             ("p_ref_Pa", 0.0),
             ("vessel_rating_Pa", 0.0),
             ("cavern_capacity_kg", 0.0),
+            ("remaining_removal_capacity_kg", 0.0),
         ):
             if name not in controls:
                 continue
