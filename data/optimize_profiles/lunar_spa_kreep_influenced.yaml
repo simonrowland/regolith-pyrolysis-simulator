@@ -1,9 +1,9 @@
 profile_id: lunar-spa-kreep-influenced-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: lunar_spa_kreep_influenced
-description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Mild KREEP mafic/noritic material; prefer metal/O2 with cleanup guardrails."
+description: Mild KREEP mafic/noritic material; prefer metal/O2 with cleanup guardrails.
 north_star_rationale: SPA KREEP has more Fe/Mg than PKT average, so keep metal weight high after P/alkali cleanup.
-objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Metal-forward KREEP profile."
+objective_emphasis: Metal-forward KREEP profile.
 objectives:
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.32, rationale: Fe/Mg metal potential}
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.28, rationale: O2 product}

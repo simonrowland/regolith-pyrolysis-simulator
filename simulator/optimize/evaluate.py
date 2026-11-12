@@ -1148,6 +1148,21 @@ def evaluate(
         key=key,
     )
 
+    if _c6_hold_target_priced_unavailable(run_execution):
+        # C6's hold-target refusal is campaign-scoped inside the engine, so
+        # the executor does not mark the batch refused. The price is still
+        # unavailable: do not score a numeric zero for the Mg/Al ledger.
+        return _physics_refused_result(
+            candidate_id,
+            spec,
+            key,
+            reason="c6_hold_target_not_acquired",
+            error_message="priced_unavailable:c6_hold_target_not_acquired",
+            run_execution=run_execution,
+            profile=profile,
+            diagnostic=getattr(run_execution, "refusal_diagnostic", None),
+        )
+
     snapshots = getattr(run_execution, "snapshots", None)
     if status != "refused" or snapshots is None or snapshots:
         _abort_on_mass_balance_breach(
@@ -3045,6 +3060,59 @@ def _build_prefix_eval_inputs(
     )
 
 
+def _c0_pyrolysis_continues_through_later_steps(
+    run_options: Mapping[str, Any],
+    *,
+    stop_at_stage0_exit: bool,
+) -> bool:
+    """True when this evaluation drives the C0 AUTO_APPLY sequence.
+
+    A thermal window or lab schedule may rewrite the first step's hour
+    count. That bakeout is not the whole evaluation: later steps still
+    run under campaigns.py. Stage-0 exit stops at the PATH_AB decision.
+    Any other campaign stays on its own route. EvalSpec.hours is not a
+    key dimension. The VERSION bump is the cache lever.
+    """
+
+    if stop_at_stage0_exit:
+        return False
+    if str(run_options.get("track") or "pyrolysis") != "pyrolysis":
+        return False
+    from simulator.campaigns import CampaignManager
+    from simulator.state import CampaignPhase
+
+    phases = CampaignManager.campaign_phases_for_id(
+        str(run_options.get("campaign") or "")
+    )
+    return phases == (CampaignPhase.C0,)
+
+
+def _c6_hold_target_priced_unavailable(run_execution: Any) -> bool:
+    """True when C6 ended on ``c6_hold_target_not_acquired``.
+
+    That typed refusal is priced unavailable. It is not a numeric zero.
+    """
+
+    from simulator.campaigns import C6_HOLD_ACQUISITION_REFUSAL_REASON
+
+    blobs: list[Any] = []
+    diagnostic = getattr(run_execution, "refusal_diagnostic", None)
+    if isinstance(diagnostic, MappingABC):
+        blobs.append(diagnostic)
+    simulator = getattr(run_execution, "simulator", None)
+    live = getattr(simulator, "_last_c6_refusal_diagnostic", None)
+    if isinstance(live, MappingABC):
+        blobs.append(live)
+    for blob in blobs:
+        reason = blob.get("reason_refused") or blob.get("reason")
+        nested = blob.get("diagnostic")
+        if isinstance(nested, MappingABC):
+            reason = nested.get("reason_refused") or reason
+        if str(reason or "") == C6_HOLD_ACQUISITION_REFUSAL_REASON:
+            return True
+    return False
+
+
 def _build_eval_inputs_impl(
     patch: RecipePatch,
     feedstock_id: str,
@@ -3070,8 +3138,9 @@ def _build_eval_inputs_impl(
         schema=schema,
         scoring_fidelity=fidelity,
     )
+    base_run_options = _run_options(profile, fidelity)
     run_options = _thermal_scheduled_run_options(
-        _run_options(profile, fidelity),
+        base_run_options,
         profile=profile,
         recipe_patch=patch,
         constraints=constraints,
@@ -3189,6 +3258,10 @@ def _build_eval_inputs_impl(
         allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
         allow_fallback_vapor=bool(run_options["allow_fallback_vapor"]),
         force_builtin_vapor_pressure=force_builtin_vapor_pressure,
+        until_campaign_complete=_c0_pyrolysis_continues_through_later_steps(
+            run_options,
+            stop_at_stage0_exit=stop_at_stage0_exit,
+        ),
     )._session_config()
     if stop_at_stage0_exit:
         run_config = replace(run_config, stop_at_stage0_exit=True)

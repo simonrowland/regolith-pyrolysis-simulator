@@ -4,6 +4,19 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
+## [0.6.6] — 2026-11-11
+
+- Optimizer evaluations that start at C0 on the pyrolysis track drive the
+  campaign controller through the AUTO_APPLY sequence. A C0 thermal window
+  may rewrite the first step's hour count and does not stop that sequence.
+  Each later step ends by `campaigns.py` `check_endpoint` and the caps that
+  module already reads from setpoints. C4 and C6 stay end-criterion phases. Glass, metals, and
+  O2 are scored when a step of that sequence claims them. A product no step
+  claims stays withheld with `campaign_does_not_claim_product`, with no
+  renormalisation and no zero in place of a withheld objective. A C6
+  `c6_hold_target_not_acquired` refusal is priced unavailable. EvalSpec keys
+  follow this VERSION bump. `data/corpus_version.yaml` is unchanged.
+
 ## [0.6.5] — 2026-11-08
 
 About 8,400 commits since v0.6.4 (2026-08-28).

@@ -6,9 +6,9 @@
 profile_id: lunar-mls-1a-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: lunar_mls_1a
-description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. MLS-1A Ti-rich mare simulant; bias toward metal recovery while keeping O2 and glass useful."
+description: MLS-1A Ti-rich mare simulant; bias toward metal recovery while keeping O2 and glass useful.
 north_star_rationale: MLS-1A is a source-captured high-Ti mare simulant, so reuse the high-Ti mare search shape while preserving its paper-simulant and unreported-balance caveats.
-objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Metal-heavy mare profile for source-captured MLS-1A."
+objective_emphasis: Metal-heavy mare profile for source-captured MLS-1A.
 objectives:
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.36, rationale: Fe/Ti-bearing metal proxy}
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.26, rationale: oxidizer output}

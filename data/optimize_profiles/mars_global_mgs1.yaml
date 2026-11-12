@@ -7,9 +7,9 @@
 profile_id: mars-global-mgs1-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: mars_global_mgs1
-description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. MGS-1 Mars global base simulant; oxide-only Fe/O2/glass search from the LMS-1 basaltic simulant analog."
+description: MGS-1 Mars global base simulant; oxide-only Fe/O2/glass search from the LMS-1 basaltic simulant analog.
 north_star_rationale: MGS-1 is a source-captured dry oxide Mars base simulant, so reuse the no-cleanup basaltic simulant objective shape while keeping lot-variant volatile chemistry out of this profile.
-objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Balanced O2/metals/glass profile for source-captured MGS-1 base simulant."
+objective_emphasis: Balanced O2/metals/glass profile for source-captured MGS-1 base simulant.
 objectives:
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.34, rationale: main oxidizer product}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.28, rationale: Fe/Mg ingot proxy}

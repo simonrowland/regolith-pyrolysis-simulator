@@ -1,9 +1,9 @@
 profile_id: m-type-metallic-phase-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: m_type_metallic_phase
-description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Metallic asteroid phase; direct metal tapping proxy."
+description: Metallic asteroid phase; direct metal tapping proxy.
 north_star_rationale: M-type metal is already ingot feed; objective is maximum metal with minimum heat/time, not O2 or glass.
-objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Direct metal production."
+objective_emphasis: Direct metal production.
 objectives:
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.70, rationale: direct Fe-Ni-Co metal phase}
   - {metric: energy_electrical_plus_evaporation_kWh, sense: minimize, units: kWh, weight: 0.20, rationale: tapping energy}

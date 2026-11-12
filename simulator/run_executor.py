@@ -269,11 +269,14 @@ class RunExecutor:
             session,
             fallback=0.0,
         )
+        config = getattr(session, "_config", None)
         if stop_at_stage0_exit is None:
-            config = getattr(session, "_config", None)
             stop_at_stage0_exit = bool(
                 getattr(config, "stop_at_stage0_exit", False)
             )
+        until_campaign_complete = bool(
+            getattr(config, "until_campaign_complete", False)
+        )
 
         try:
             if initial_refusal is not None:
@@ -284,6 +287,7 @@ class RunExecutor:
                 DecisionPolicy.AUTO_APPLY,
                 operator_decisions=operator_decisions,
                 stop_at_stage0_exit=bool(stop_at_stage0_exit),
+                until_campaign_complete=until_campaign_complete,
             ))
             while True:
                 # A typed refusal is an infeasible point, not a partially
@@ -409,6 +413,15 @@ class RunExecutor:
                 elif pending_decision is not None:
                     status = "partial"
                     reason = "pending_decision"
+                elif until_campaign_complete:
+                    # Authored hours are not the stop. A finished campaign
+                    # is ok even when melt.hour is under that budget. Still
+                    # in a phase means the controller did not end it.
+                    if not sim.is_complete():
+                        status = "partial"
+                        phase = getattr(sim.melt, "campaign", None)
+                        phase_name = getattr(phase, "name", None) or str(phase)
+                        reason = f"campaign_did_not_end:{phase_name}"
                 elif sim.melt.hour < hours:
                     status = "partial"
         except (

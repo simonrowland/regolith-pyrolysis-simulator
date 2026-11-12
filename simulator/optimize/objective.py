@@ -134,16 +134,18 @@ _MASS_OBJECTIVE_METRICS = frozenset(
 # with the same notice. It is never a silent 0.0.
 # This changes the objective vector an evaluation returns. EvalSpec keys are
 # VERSION-scoped (evalspec.py: behaviour-changing code edits require a
-# VERSION bump). corpus_version is the data-corpus lever only and stays at
-# the green tag: a corpus bump would expire the real-backend engine cache
-# for a non-chemistry change. Do not add a key dimension or a version
-# integer. VERSION is train-owned. The landing offer asks the train to bump
-# VERSION, or to carry b-080 in the next release, so pre-fix objective
-# vectors miss. ``_scoring_objective_rows`` does not change the cache key.
-# C0's products map is volatiles and native_Fe. native_Fe is nanophase
-# magnetic separation, not the pyrolysis metal product, so it authorizes no
-# named metal metric and no energy-per-product intensity here. C0 still
-# claims ``O2``: its hour step runs the evaporation route, which credits the
+# VERSION bump). This branch bumps VERSION so pre-fix vectors miss. Do not
+# add a cache-key dimension or a version integer. corpus_version is the
+# data-corpus lever only and stays at the green tag: a corpus bump would
+# expire the real-backend engine cache for a non-chemistry change.
+# ``_scoring_objective_rows`` does not change the cache key.
+# A pyrolysis start at C0 is scored on the AUTO_APPLY sequence the campaign
+# controller will execute, not on C0's products map alone. That map is
+# volatiles and native_Fe. native_Fe is nanophase magnetic separation, not
+# the pyrolysis metal product, so C0 alone authorizes no named metal metric
+# and no energy-per-product intensity. Later steps in the sequence do when
+# their own products maps name the metal or the glass. C0 still claims
+# ``O2``: its hour step runs the evaporation route, which credits the
 # oxide-reduction coproduct and OVERHEAD_BLEED stores it at the terminal.
 # File load is not an evaluation. The remaining-weight refusal runs only
 # once a fidelity has selected the executed campaign.
@@ -1608,9 +1610,10 @@ def campaign_product_claim_keys(campaign_id: str | None) -> frozenset[str]:
     route credits a terminal oxygen account. An absent, blank, or unknown
     campaign claims nothing. Description text is not consulted.
 
-    Pre-fix objective vectors miss only after a VERSION bump. evalspec.py
-    scopes EvalSpec keys by the repo VERSION file. This function does not
-    add a cache-key dimension, and corpus_version stays at the green tag.
+    Pre-fix objective vectors miss because this branch bumps VERSION.
+    evalspec.py scopes EvalSpec keys by the repo VERSION file. This
+    function does not add a cache-key dimension, and corpus_version stays
+    at the green tag.
     """
 
     if not isinstance(campaign_id, str) or not campaign_id.strip():
@@ -1633,11 +1636,53 @@ def campaign_product_claim_keys(campaign_id: str | None) -> frozenset[str]:
     return _terminal_oxygen_claim(token)
 
 
+@lru_cache(maxsize=4)
+def _c0_auto_apply_phase_names(c5_enabled: bool) -> tuple[str, ...]:
+    """Phase names ``auto_apply_sequence`` returns for a C0 pyrolysis start.
+
+    The walk is the campaign controller. Caps are not copied here.
+    """
+
+    from simulator.campaigns import CampaignManager
+    from simulator.state import BatchRecord, CampaignPhase
+
+    loaded = _load_setpoints_file(DEFAULT_DATA_DIR / "setpoints.yaml")
+    manager = CampaignManager(dict(loaded))
+    manager.c5_enabled = bool(c5_enabled)
+    record = BatchRecord(track="pyrolysis")
+    return tuple(
+        phase.name
+        for phase in manager.auto_apply_sequence(CampaignPhase.C0, record)
+    )
+
+
 def _profile_product_claim_keys(profile: Mapping[str, Any]) -> frozenset[str]:
     # No fidelity argument: the caller stamps the executed campaign onto
     # ``profile.run`` first. A direct call uses the authored run, or C0 when
-    # that run names no campaign.
-    return campaign_product_claim_keys(executed_campaign_id(profile))
+    # that run names no campaign. A C0 pyrolysis start unions the claims of
+    # every phase the AUTO_APPLY controller will enter. Any other start
+    # stays that one campaign. This changes the objective vector, so the
+    # VERSION bump on this branch is what expires pre-fix EvalSpec keys.
+    # corpus_version stays at the green tag. No new cache-key dimension.
+    from simulator.campaigns import CampaignManager
+    from simulator.state import CampaignPhase
+
+    campaign_id = executed_campaign_id(profile)
+    run = profile.get("run")
+    merged = run if isinstance(run, Mapping) else {}
+    track = str(merged.get("track") or "pyrolysis")
+    if (
+        track == "pyrolysis"
+        and CampaignManager.campaign_phases_for_id(campaign_id)
+        == (CampaignPhase.C0,)
+    ):
+        keys: set[str] = set()
+        for phase_name in _c0_auto_apply_phase_names(
+            bool(merged.get("c5_enabled", False)),
+        ):
+            keys |= campaign_product_claim_keys(phase_name)
+        return frozenset(keys)
+    return campaign_product_claim_keys(campaign_id)
 
 
 def _ledger_species_objective(metric: str) -> str | None:
@@ -1893,10 +1938,11 @@ def _scoring_objective_rows(profile: Mapping[str, Any]) -> Any:
     judged by their own target product. There is no flag that puts one back,
     and description text is not read.
 
-    Pre-fix objective vectors miss only after a VERSION bump. evalspec.py
-    scopes EvalSpec keys by the repo VERSION file: behaviour-changing code
-    edits require a VERSION bump. corpus_version stays at the green tag.
-    This function does not add a cache-key dimension.
+    Pre-fix objective vectors miss because this branch bumps VERSION.
+    evalspec.py scopes EvalSpec keys by the repo VERSION file:
+    behaviour-changing code edits require a VERSION bump. corpus_version
+    stays at the green tag. This function does not add a cache-key
+    dimension.
     """
 
     raw_objectives = profile.get("objectives")

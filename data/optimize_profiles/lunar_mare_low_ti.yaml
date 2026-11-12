@@ -1,9 +1,9 @@
 profile_id: lunar-mare-low-ti-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: lunar_mare_low_ti
-description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Canonical lunar happy path; full-yield continuous pyrolysis ramp with alkali shuttle, Mg recovery, and no MRE."
+description: Canonical lunar happy path; full-yield continuous pyrolysis ramp with alkali shuttle, Mg recovery, and no MRE.
 north_star_rationale: Clean mare basalt is the baseline pot-of-dirt case, so demonstrate pressure plus a catalog-limited thermal ramp extracting multiple products before any MRE electrolysis load.
-objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Pyrolysis-only Fe/SiO/alkali/Mg yield under the alumina furnace ceiling."
+objective_emphasis: Pyrolysis-only Fe/SiO/alkali/Mg yield under the alumina furnace ceiling.
 objectives:
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.168, rationale: main stored oxidizer product}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.168, rationale: Fe/Mg ingot proxy}

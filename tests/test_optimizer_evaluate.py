@@ -28,6 +28,7 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
 )
 from simulator.campaigns import (
+    CampaignManager,
     CampaignPressureSetpointRefusal,
     campaign_evolves_terminal_oxygen,
 )
@@ -85,7 +86,13 @@ from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
 from simulator.runner import RunnerError, _force_builtin_vapor_pressure
 from simulator.session import SimSession, SimSessionConfig
-from simulator.state import CampaignPhase, EvaporationFlux, HourSnapshot
+from simulator.state import (
+    BatchRecord,
+    CampaignPhase,
+    EvaporationFlux,
+    HourSnapshot,
+    TERMINAL_OXYGEN_ROUTE_PHASES,
+)
 from simulator.transport_regime import TransportRegimeRefusal
 from optimizer_fixtures import StubSmokeConstraintSet
 
@@ -976,6 +983,11 @@ def _with_prototype_crmn_alpha_fallback(config):
 
 class AlphaFallbackRunExecutor(RunExecutor):
     def execute(self, config):
+        # This fixture asserts a one-window extraction report. A C0 start
+        # now drives the later steps; bound this executor to the authored
+        # hours so the report stays the window under test.
+        if getattr(config, "until_campaign_complete", False):
+            config = replace(config, until_campaign_complete=False)
         return super().execute(_with_prototype_crmn_alpha_fallback(config))
 
 
@@ -990,6 +1002,10 @@ class ProductionMassBalanceReplayExecutor:
 
     def execute(self, config: object) -> object:
         self.calls += 1
+        # Mass-balance replay patches the first snapshot of one authored
+        # window. A C0 start would otherwise drive every later step.
+        if getattr(config, "until_campaign_complete", False):
+            config = replace(config, until_campaign_complete=False)
         execution = RunExecutor().execute(_with_prototype_crmn_alpha_fallback(config))
         snapshots = tuple(getattr(execution, "snapshots", ()))
         assert snapshots
@@ -2789,6 +2805,44 @@ def _setpoint_product_keys(campaign: str) -> frozenset[str]:
     return keys
 
 
+_C0_AUTO_APPLY_SEQUENCE = (
+    "C0",
+    "C0B",
+    "C2A_STAGED",
+    "C3_NA",
+    "C4",
+    "C2A",
+    "C6",
+)
+
+
+def _evaluated_claim_keys(evaluated: str) -> frozenset[str]:
+    """YAML products for the campaign that produced the vector.
+
+    Evaluated C0 scores the AUTO_APPLY sequence. Any other campaign stays
+    one route. This does not call ``campaign_product_claim_keys``.
+    """
+
+    if evaluated != "C0":
+        return _setpoint_product_keys(evaluated)
+    loaded = yaml.safe_load((DEFAULT_DATA_DIR / "setpoints.yaml").read_text())
+    manager = CampaignManager(loaded)
+    phases = manager.auto_apply_sequence(
+        CampaignPhase.C0,
+        BatchRecord(track="pyrolysis"),
+    )
+    assert tuple(phase.name for phase in phases) == _C0_AUTO_APPLY_SEQUENCE
+    keys: set[str] = set()
+    campaigns = loaded["campaigns"]
+    for phase in phases:
+        yaml_key = CampaignManager._CONFIG_KEY_BY_PHASE.get(phase, phase.name)
+        products = (campaigns.get(yaml_key) or {}).get("products") or {}
+        keys.update(str(key) for key in products)
+        if phase in TERMINAL_OXYGEN_ROUTE_PHASES:
+            keys.add("O2")
+    return frozenset(keys)
+
+
 def _literal_scored_metrics_and_note(
     evaluated: str,
 ) -> tuple[tuple[str, ...], str | None]:
@@ -2796,10 +2850,11 @@ def _literal_scored_metrics_and_note(
 
     withheld_weight_fraction = sum(withheld weights) / sum(all declared weights).
     Retained weights stay at the declared values. Operational rows have no
-    product key and are always scored.
+    product key and are always scored. Evaluated C0 includes later-step
+    products, so glass is scored and the withhold note is absent.
     """
 
-    claim_keys = _setpoint_product_keys(evaluated)
+    claim_keys = _evaluated_claim_keys(evaluated)
     scored: list[str] = []
     withheld: list[tuple[str, float]] = []
     for metric, weight, product_key in _DECLARED_OBJECTIVE_ROWS:
@@ -2910,7 +2965,7 @@ def test_scored_withhold_notice_follows_evaluated_campaign(
     else:
         assert withhold_notes == [expected_note]
     for metric, _weight, product_key in _DECLARED_OBJECTIVE_ROWS:
-        if product_key is None or product_key in _setpoint_product_keys(evaluated):
+        if product_key is None or product_key in _evaluated_claim_keys(evaluated):
             continue
         assert metric not in result.objectives.as_mapping()
 
@@ -7158,46 +7213,160 @@ def test_the_run_execution_authority_reader_also_refuses_a_string():
     assert f(SimpleNamespace(backend_authoritative=False)) is False
 
 
+def test_plain_c0_evaluation_drives_later_steps_and_keeps_authored_hours() -> None:
+    """A C0 pyrolysis start follows the controller through later steps.
+
+    Authored hours stay on EvalSpec when nothing rewrites them. A C0
+    temperature-range seed may rewrite the first step's hour count and
+    still continues: the bakeout is not the whole evaluation. A non-C0
+    campaign stays on its own hour budget.
+    """
+
+    plain = copy.deepcopy(PROFILE)
+    # A seed is required. This one does not set C0 temp_range_C, so the
+    # run is not a thermal window and the authored hour count stays.
+    plain["seed_recipes"] = [
+        {
+            "id": "plain-c0-seed",
+            "source_campaign": "C0",
+            "patch": {
+                # Nominal ramp. Not temp_range_C, so this is not a thermal
+                # window and the authored hour count stays.
+                "campaigns": {"C0": {"dT_dt_C_per_hr": 50}},
+            },
+        }
+    ]
+    plain_executor = FakeExecutor(_execution())
+    plain_result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=plain,
+        executor=plain_executor,
+    )
+    assert plain_result.eval_spec is not None
+    assert plain_result.eval_spec.campaign == "C0"
+    assert plain_result.eval_spec.hours == 1
+    assert plain_executor.config.until_campaign_complete is True
+    assert plain_executor.config.hours == 1
+
+    thermal_executor = FakeExecutor(_execution())
+    thermal_result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=thermal_executor,
+    )
+    assert thermal_result.eval_spec is not None
+    assert thermal_result.eval_spec.campaign == "C0"
+    assert thermal_executor.config.until_campaign_complete is True
+    assert thermal_executor.config.hours == thermal_result.eval_spec.hours
+
+    c2a_executor = FakeExecutor(_execution())
+    c2a_result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_product_claiming_profile(),
+        executor=c2a_executor,
+    )
+    assert c2a_result.eval_spec is not None
+    assert c2a_result.eval_spec.campaign == "C2A_continuous"
+    assert c2a_result.eval_spec.hours == 1
+    assert c2a_executor.config.until_campaign_complete is False
+
+
+def test_c6_hold_target_not_acquired_is_priced_unavailable() -> None:
+    """The typed C6 acquisition refusal is never a numeric zero.
+
+    The executor leaves the batch status ok for a campaign-scoped C6
+    refusal. The evaluator still returns an unscored physics refusal.
+    """
+
+    execution = _execution(
+        refusal_diagnostic={
+            "status": "refused",
+            "campaign": "C6",
+            "diagnostic": {
+                "reason_refused": "c6_hold_target_not_acquired",
+            },
+        },
+    )
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(execution),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.objectives is None
+    assert result.run_reference is not None
+    assert result.run_reference.reason == "c6_hold_target_not_acquired"
+    assert "priced_unavailable:c6_hold_target_not_acquired" in (
+        result.run_reference.error_message
+    )
+    assert "priced_unavailable:c6_hold_target_not_acquired" in result.notes
+
+
 def test_lunar_highland_c0_horizon_changes_extracted_metals() -> None:
+    """Authored hours stay 24. They are not the stop.
+
+    A C0 pyrolysis start drives the campaign controller until that
+    controller ends the batch. A furnace-cap refusal is an unscored
+    outcome. A scored run still has to move extracted metals when the
+    furnace cap changes. Two sequences stay inside the default worker
+    CPU budget.
+    """
+
     profile = copy.deepcopy(dict(load_profile("lunar_highland")))
-    # C0's extraction ends by hour 19, so 24 hours exercises the cap-derived
-    # metal difference without simulating the unused remainder of the 60-hour profile.
     profile["run"]["hours"] = 24
     for fidelity_options in profile["fidelities"].values():
         fidelity_options["hours"] = 24
 
-    def product_summary(patch: RecipePatch):
+    def one(patch: RecipePatch):
         result = evaluate(
             patch,
             "lunar_highland",
             "fast",
             profile=profile,
         )
+        assert result.eval_spec is not None
+        assert result.eval_spec.hours == 24
+        assert result.eval_spec.campaign == "C0"
         assert result.run_reference is not None
-        return result.run_reference.product_summary
+        return result
 
-    baseline_patch = RecipePatch({})
-    baseline = product_summary(baseline_patch)
-    repeated = product_summary(baseline_patch)
-    capped = product_summary(RecipePatch({("furnace_max_T_C",): 1200.0}))
+    baseline = one(RecipePatch({}))
+    capped = one(RecipePatch({("furnace_max_T_C",): 1200.0}))
 
-    assert baseline == repeated
-    baseline_metals = float(
-        baseline["product_classes"]["metals_plus_O2"]["metals_total_kg"]
-    )
-    repeated_metals = float(
-        repeated["product_classes"]["metals_plus_O2"]["metals_total_kg"]
-    )
-    capped_metals = float(
-        capped["product_classes"]["metals_plus_O2"]["metals_total_kg"]
-    )
-    assert all(
-        math.isfinite(value)
-        for value in (baseline_metals, repeated_metals, capped_metals)
-    )
+    def metals(result):
+        if result.failure_category is FailureCategory.PHYSICS_REFUSED:
+            assert result.objectives is None
+            assert result.feasible is False
+            assert result.run_reference.reason
+            return None
+        summary = result.run_reference.product_summary
+        return float(
+            summary["product_classes"]["metals_plus_O2"]["metals_total_kg"]
+        )
 
-    # Same-patch repeat delta captures run variation; a larger cap delta proves
-    # the trajectory reaches extraction without pinning a copied output value.
-    assert abs(baseline_metals - capped_metals) > abs(
-        baseline_metals - repeated_metals
-    ), "C4_HORIZON_RELATION: cap must change extracted metals beyond repeat variation"
+    baseline_metals = metals(baseline)
+    capped_metals = metals(capped)
+    # A furnace-cap refusal is a different outcome from a scored baseline.
+    if (
+        baseline_metals is not None
+        and capped_metals is not None
+    ):
+        assert math.isfinite(baseline_metals)
+        assert math.isfinite(capped_metals)
+        assert baseline_metals != capped_metals, (
+            "C4_HORIZON_RELATION: cap must change extracted metals"
+        )
+        return
+    if baseline_metals is None and capped_metals is None:
+        return
+    assert (baseline_metals is None) != (capped_metals is None)

@@ -1,9 +1,9 @@
 profile_id: lunar-pkt-kreep-average-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: lunar_pkt_kreep_average
-description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Average PKT KREEP; add P cleanup before balanced mare-style extraction."
+description: Average PKT KREEP; add P cleanup before balanced mare-style extraction.
 north_star_rationale: KREEP needs Stage-0 P cleanup before it behaves like clean mare basalt for O2, metals, glass, and refractory rump.
-objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Cleanup-biased balanced O2/metals/glass profile."
+objective_emphasis: Cleanup-biased balanced O2/metals/glass profile.
 objectives:
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.30, rationale: oxidizer after cleanup}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.24, rationale: metal ingot proxy}

@@ -16562,54 +16562,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f"invalid {decision_type.name} choice {choice!r}; "
                 f"valid choices: {', '.join(valid_choices)}"
             )
-        record_updates: dict[str, str] = {}
-        next_campaign: CampaignPhase | None = None
-        complete = False
+        from simulator.campaigns import decision_successor
 
-        if decision_type == DecisionType.ROOT_BRANCH:
-            if choice == 'mre_baseline':
-                record_updates['track'] = 'mre_baseline'
-                next_campaign = CampaignPhase.MRE_BASELINE
-            else:
-                record_updates['track'] = 'pyrolysis'
-                next_campaign = CampaignPhase.C0
-
-        elif decision_type == DecisionType.PATH_AB:
-            record_updates['path'] = choice  # 'A', 'A_staged', or 'B'
-            if choice == 'A':
-                next_campaign = CampaignPhase.C2A
-            elif choice == 'A_staged':
-                next_campaign = CampaignPhase.C2A_STAGED
-            else:
-                next_campaign = CampaignPhase.C2B
-
-        elif decision_type == DecisionType.BRANCH_ONE_TWO:
-            record_updates['branch'] = choice  # 'one' or 'two'
-            if choice == 'two':
-                next_campaign = CampaignPhase.C4
-            elif self.melt.c5_enabled:
-                next_campaign = CampaignPhase.C5
-            else:
-                complete = True
-
-        elif decision_type == DecisionType.TI_RETENTION:
-            # Handled within C5 campaign logic
-            pass
-
-        elif decision_type == DecisionType.C6_PROCEED:
-            if choice == 'yes':
-                next_campaign = CampaignPhase.C6
-            else:
-                complete = True
-
-        elif decision_type == DecisionType.C7_PROCEED:
-            if choice == 'yes':
-                next_campaign = CampaignPhase.C7_CA_ALUMINOTHERMIC
-            else:
-                complete = True
-
-        else:
-            raise ValueError(f"unsupported decision type {decision_type.name}")
+        next_campaign, record_updates, complete = decision_successor(
+            decision_type,
+            choice,
+            c5_enabled=bool(self.melt.c5_enabled),
+        )
 
         if next_campaign is not None:
             self.start_campaign(next_campaign)

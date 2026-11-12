@@ -1,9 +1,9 @@
 profile_id: ci-carbonaceous-chondrite-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: ci_carbonaceous_chondrite
-description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. CI carbonaceous chondrite; volatile cleanup before metal/O2/glass search."
+description: CI carbonaceous chondrite; volatile cleanup before metal/O2/glass search.
 north_star_rationale: CI's high water and organics make Stage-0 cleanup mandatory before the silicate extraction objective makes sense.
-objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Cleanup-heavy carbonaceous profile; water is outside objective vocabulary."
+objective_emphasis: Cleanup-heavy carbonaceous profile; water is outside objective vocabulary.
 objectives:
   - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.30, rationale: stored O2 after volatile cleanup}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.26, rationale: Fe-Ni alloy proxy}

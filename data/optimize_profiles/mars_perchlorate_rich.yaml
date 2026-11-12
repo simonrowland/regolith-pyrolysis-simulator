@@ -1,9 +1,9 @@
 profile_id: mars-perchlorate-rich-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: mars_perchlorate_rich
-description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Perchlorate-rich Mars soil; early O2 and halide cleanup."
+description: Perchlorate-rich Mars soil; early O2 and halide cleanup.
 north_star_rationale: Perchlorate feed can produce early O2 but must keep halide cleanup from poisoning the furnace and condenser train.
-objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. O2-heavy perchlorate cleanup profile."
+objective_emphasis: O2-heavy perchlorate cleanup profile.
 objectives:
   - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.44, rationale: early perchlorate-derived O2 potential}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.18, rationale: metal product proxy}

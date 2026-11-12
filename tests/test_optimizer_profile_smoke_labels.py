@@ -10,8 +10,11 @@ It is named in a notice with its weight, the reason
 ``campaign_does_not_claim_product``, and the withheld weight fraction. It is
 never entered as 0.0. Retained weights are not renormalized. Description text
 is not an eligibility input. An absent, blank, or unknown campaign claims
-nothing. A missing run campaign executes as ``C0``, which claims oxygen and
-does not claim glass, metals, or ceramic. Every spelling of one route
+nothing. A missing run campaign executes as ``C0``. A pyrolysis C0 start is
+scored on the AUTO_APPLY sequence, so glass, metals, and oxygen are claimed
+when a later step claims them. A product no step claims stays withheld.
+Direct ``campaign_product_claim_keys`` stays one route: C0 alone claims
+oxygen and does not claim glass. Every spelling of one route
 (phase name, setpoint key, override key, and the ``MRE`` anode label)
 claims that route's setpoint products, plus oxygen iff the route credits
 a terminal oxygen account. C6 and C7 do not. A composition target is eligible
@@ -34,6 +37,7 @@ from __future__ import annotations
 import copy
 import math
 from collections.abc import Mapping
+from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -73,7 +77,7 @@ from simulator.optimize.objective import (
     unrenormalized_study_scalar_weights,
 )
 from simulator.optimize.physics import PhysicsConstraintSet
-from simulator.state import CampaignPhase, TERMINAL_OXYGEN_ROUTE_PHASES
+from simulator.state import BatchRecord, CampaignPhase, TERMINAL_OXYGEN_ROUTE_PHASES
 from simulator.optimize.profiles import (
     VALID_FIDELITIES,
     ProfileValidationError,
@@ -204,27 +208,25 @@ _PROSE_VARIANTS = (
 )
 
 
-def test_c0_profiles_with_product_objectives_are_labeled_smoke() -> None:
-    unlabeled = []
+def test_shipped_profiles_are_not_labeled_smoke() -> None:
+    """A 1 h C0 bakeout is a real first step. Shipped profiles are not smoke labels."""
+
+    labeled = []
     for path in sorted(PROFILE_DIR.glob("*.yaml")):
         profile = yaml.safe_load(path.read_text())
-        run = profile.get("run", {})
-        metrics = {objective.get("metric") for objective in profile.get("objectives", [])}
-        if run.get("campaign") != "C0" or not metrics.intersection(PRODUCT_OBJECTIVES):
-            continue
         labels = (
             profile.get("description", ""),
             profile.get("objective_emphasis", ""),
         )
         if any(
-            not isinstance(label, str) or not label.startswith("C0 SMOKE ONLY:")
+            isinstance(label, str) and label.startswith("C0 SMOKE ONLY:")
             for label in labels
         ):
-            unlabeled.append(path.name)
+            labeled.append(path.name)
 
-    assert not unlabeled, (
-        "C0 does not realize these final product objectives; label the profile "
-        f"as a screening smoke run: {', '.join(unlabeled)}"
+    assert not labeled, (
+        "shipped profiles must not be labeled C0 SMOKE ONLY: "
+        f"{', '.join(labeled)}"
     )
 
 
@@ -316,6 +318,80 @@ def _oracle_claims(campaign_id: str | None) -> frozenset[str]:
     if any(phase in TERMINAL_OXYGEN_ROUTE_PHASES for phase in _oracle_phases(token)):
         products |= frozenset({"O2"})
     return products
+
+
+# Locked to the campaign controller. c5 off is the shipped pyrolysis path.
+# c5 on replaces post-mg C2A with C5. Caps are not copied here.
+_C0_AUTO_APPLY_SEQUENCE = (
+    "C0",
+    "C0B",
+    "C2A_STAGED",
+    "C3_NA",
+    "C4",
+    "C2A",
+    "C6",
+)
+_C5_AUTO_APPLY_SEQUENCE = (
+    "C0",
+    "C0B",
+    "C2A_STAGED",
+    "C3_NA",
+    "C4",
+    "C5",
+    "C6",
+)
+
+
+def _walked_auto_apply_phase_names(c5_enabled: bool) -> tuple[str, ...]:
+    """Phase names ``auto_apply_sequence`` walks from C0. Not a second sequence."""
+
+    loaded = yaml.safe_load((DEFAULT_DATA_DIR / "setpoints.yaml").read_text())
+    manager = CampaignManager(loaded)
+    manager.c5_enabled = bool(c5_enabled)
+    record = BatchRecord(track="pyrolysis")
+    names = tuple(
+        phase.name
+        for phase in manager.auto_apply_sequence(CampaignPhase.C0, record)
+    )
+    expected = _C5_AUTO_APPLY_SEQUENCE if c5_enabled else _C0_AUTO_APPLY_SEQUENCE
+    assert names == expected
+    return names
+
+
+@lru_cache(maxsize=2)
+def _c0_sequence_claim_keys(c5_enabled: bool = False) -> frozenset[str]:
+    """Union of the single-route oracle over the walked sequence.
+
+    Does not call ``campaign_product_claim_keys``.
+    """
+
+    keys: set[str] = set()
+    for name in _walked_auto_apply_phase_names(bool(c5_enabled)):
+        keys |= _oracle_claims(name)
+    return frozenset(keys)
+
+
+def _scoring_claim_keys(
+    campaign_id: str | None,
+    profile: Mapping[str, Any] | None = None,
+) -> frozenset[str]:
+    """Profile-scoring claims. A pyrolysis C0 start uses the sequence.
+
+    Any other campaign stays ``_oracle_claims`` for that one route.
+    """
+
+    run: Mapping[str, Any] = {}
+    if profile is not None:
+        raw_run = profile.get("run")
+        if isinstance(raw_run, Mapping):
+            run = raw_run
+    if str(run.get("track") or "pyrolysis") != "pyrolysis":
+        return _oracle_claims(campaign_id)
+    if not isinstance(campaign_id, str) or not campaign_id.strip():
+        return _oracle_claims(campaign_id)
+    if _oracle_phases(campaign_id.strip()) != (CampaignPhase.C0,):
+        return _oracle_claims(campaign_id)
+    return _c0_sequence_claim_keys(bool(run.get("c5_enabled", False)))
 
 
 def test_every_campaign_spelling_claims_its_route() -> None:
@@ -588,10 +664,11 @@ def _stub_execution(
 ) -> SimpleNamespace:
     """Run surface whose final-product readers are zero or missing.
 
-    A scored oxygen or Stage-3 silica objective becomes 0.0 here. The
-    invariant says that 0.0 never enters the objective vector. ``ledger``
-    supplies product-ledger species masses so a retained ``Mg_kg`` would
-    score that mass instead of being absent.
+    Oxygen and metals class masses are 0 kg. Pure silica glass is None:
+    this stub has no ``pure_silica_glass.class_total_kg``. That None is
+    unavailable, not a priced zero, and it stays out of a withheld vector.
+    ``ledger`` supplies product-ledger species masses so a retained
+    ``Mg_kg`` would score that mass instead of being absent.
     """
 
     masses = dict(ledger or {})
@@ -662,9 +739,9 @@ def _assert_withheld(
 def _assert_study_scalar(
     profile: dict,
     *,
-    metrics: dict[str, float],
+    metrics: dict[str, float | None],
     weights: tuple[float, ...],
-    scalar: float,
+    scalar: float | None,
     execution: SimpleNamespace | None = None,
 ) -> None:
     """Production study scalar from literal metrics, weights, and the stub."""
@@ -690,6 +767,13 @@ def _assert_study_scalar(
         },
     )
     got_scalar, signature = _study_progress((record,), definitions, weights)
+    if any(value is None for value in metrics.values()):
+        # A None product quantity is unavailable. The study does not price it
+        # as zero, and it does not scalarize the record.
+        assert got_scalar is None
+        assert signature == frozenset()
+        return
+    assert scalar is not None
     assert got_scalar == pytest.approx(scalar)
     # Penalty 0 does not move the negated minimize scores.
     assert signature == frozenset({tuple(-value for value in metrics.values())})
@@ -730,7 +814,7 @@ def test_product_objective_membership_follows_campaign_claims(
 
     The helper is asked about the raw id, so an absent campaign claims
     nothing. Scoring uses the executed campaign: a missing run campaign is
-    C0, which claims oxygen.
+    C0, which scores the AUTO_APPLY sequence.
     """
 
     direct_keys = _oracle_claims(campaign)
@@ -738,7 +822,7 @@ def test_product_objective_membership_follows_campaign_claims(
         _oracle_claims_metric(metric, direct_keys)
     )
     profile = _profile(_product_row(metric), campaign=campaign, prose=prose)
-    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    executed_keys = _scoring_claim_keys(executed_campaign_id(profile), profile)
     claimed = _oracle_claims_metric(metric, executed_keys)
     scored = {definition.metric for definition in objective_definitions(profile)}
     if claimed:
@@ -759,9 +843,9 @@ _TERMINAL_METRIC = f"{COMPOSITION_TARGET_METRIC_PREFIX}ceramic"
 def test_c0_prose_does_not_change_claim_membership(metric: str, prose: str) -> None:
     """Copy lunar_highland's C0 run and edit either prose field.
 
-    C0 claims oxygen, so the oxygen metrics stay. ``Fe_kg`` and ``Mg_kg`` are
-    ledger species. C0's ``native_Fe`` claim does not keep them, and the
-    prose fields are not eligibility. Glass and ceramic stay withheld.
+    A pyrolysis C0 start scores the AUTO_APPLY sequence. Glass, metals,
+    oxygen, ``Fe_kg``, and ``Mg_kg`` stay. Ceramic stays withheld. Prose
+    fields are not eligibility.
     """
 
     if metric == _TERMINAL_METRIC:
@@ -776,7 +860,7 @@ def test_c0_prose_does_not_change_claim_membership(metric: str, prose: str) -> N
     target = row.get("target")
     claimed = _oracle_claims_metric(
         metric,
-        _oracle_claims("C0"),
+        _scoring_claim_keys("C0", profile),
         target=target if isinstance(target, Mapping) else None,
     )
     if claimed:
@@ -806,7 +890,7 @@ def _shipped_profiles() -> list[tuple[str, dict]]:
 
 
 def _declared_retained(profile: dict) -> list[tuple[str, float]]:
-    claim_keys = _oracle_claims((profile.get("run") or {}).get("campaign"))
+    claim_keys = _scoring_claim_keys(executed_campaign_id(profile), profile)
     retained = []
     for objective in profile["objectives"]:
         metric = str(objective["metric"])
@@ -833,20 +917,31 @@ def test_shipped_profiles_withhold_unclaimed_products_for_every_prose(prose: str
         if (profile.get("run") or {}).get("campaign") != "C0":
             continue
         declared = [str(objective["metric"]) for objective in profile["objectives"]]
-        claim_keys = _oracle_claims("C0")
+        claim_keys = _scoring_claim_keys("C0", profile)
         withheld = {
             metric
             for metric in declared
             if metric in set(FINAL_PRODUCT_METRICS)
             and not _oracle_claims_metric(metric, claim_keys)
         }
-        # C0 claims oxygen. Every other declared final product stays withheld,
-        # and that set is non-empty on every shipped profile.
+        # The sequence claims glass, metals, oxygen, SSO2, and metals-plus-O2.
+        # Industrial mixed glass and refractory ceramic stay unclaimed.
+        # A profile that declares only claimed products has an empty withhold.
         for metric in declared:
-            if metric in _OXYGEN_OBJECTIVE_METRICS:
+            if metric in _OXYGEN_OBJECTIVE_METRICS | {
+                "pure_silica_glass_kg",
+                "metals_total_kg",
+                "metals_plus_o2_kg",
+                SSO2_OWNER_RECIPE_ID,
+            }:
                 assert metric not in withheld, f"{name}:{metric}"
-        assert withheld, name
-        _assert_withheld(profile, withheld, label=f"{name}:{prose}")
+            if metric in {"industrial_mixed_glass_kg", "refractory_ceramic_rump_kg"}:
+                assert metric in withheld, f"{name}:{metric}"
+        if withheld:
+            _assert_withheld(profile, withheld, label=f"{name}:{prose}")
+        else:
+            assert unclaimed_product_withheld_objective_note(profile) is None
+            assert unclaimed_product_withheld_weight_fraction(profile) is None
         retained = _declared_retained(raw)
         assert [metric for metric, _weight in retained] == [
             metric for metric in declared if metric not in withheld
@@ -858,12 +953,13 @@ def test_shipped_profiles_withhold_unclaimed_products_for_every_prose(prose: str
 
 
 def test_synthetic_study_scalar_uses_stub_energy_and_duration() -> None:
-    """Literal metrics, weights, and scalar through ``_study_progress``.
+    """Literal metrics and weights through ``_study_progress``.
 
-    C0 claims oxygen and withholds glass and metals. The stub reports 0 kg
-    of oxygen, energy 10.0 kWh, and duration 4.0 h. Oxygen is maximize, so
-    its term is 0.24 * 0. Energy and duration are minimize and the furnace
-    penalty is 0, so the scalar stays 0.10 * -10 + 0.06 * -4 = -1.24.
+    A C0 start scores the sequence, so glass, metals, and oxygen stay in
+    the vector. Metals and oxygen are 0 kg on the stub. Pure silica has no
+    ``class_total_kg``, so that objective is None rather than a priced 0.
+    A None score is not scalarized. Energy 10 kWh and duration 4 h would be
+    ``0.10 * -10 + 0.06 * -4 = -1.24`` if every product term were numeric.
     """
 
     profile = _profile(
@@ -879,12 +975,20 @@ def test_synthetic_study_scalar_uses_stub_energy_and_duration() -> None:
     _assert_study_scalar(
         profile,
         metrics={
+            "pure_silica_glass_kg": None,
+            "metals_total_kg": 0.0,
             "oxygen_kg": 0.0,
             ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: _STUB_ENERGY_KWH,
             "duration_h": _STUB_DURATION_H,
         },
-        weights=(0.24, _RETAINED_ENERGY_WEIGHT, _RETAINED_DURATION_WEIGHT),
-        scalar=_SYNTHETIC_SCALAR,
+        weights=(
+            0.32,
+            0.28,
+            0.24,
+            _RETAINED_ENERGY_WEIGHT,
+            _RETAINED_DURATION_WEIGHT,
+        ),
+        scalar=None,
     )
 
 
@@ -895,29 +999,33 @@ def test_shipped_study_scalars_use_declared_retained_weights() -> None:
         profile = _apply_prose(raw, "description-edited")
         retained = _declared_retained(raw)
         weights = tuple(weight for _metric, weight in retained)
-        # C0 keeps declared oxygen metrics. The stub's terminal oxygen is 0 kg.
-        # Other final products stay withheld. Energy and duration are minimized.
-        declared = [str(objective["metric"]) for objective in raw["objectives"]]
-        oxygen_kept = [
-            metric for metric in declared if metric in _OXYGEN_OBJECTIVE_METRICS
-        ]
-        assert [metric for metric, _weight in retained] == [
-            *oxygen_kept,
+        # Metals and oxygen are 0 kg on the stub. Pure silica is None: the
+        # stub has no class_total_kg, and that is not priced as zero.
+        # Energy and duration are minimized. Industrial mixed glass and
+        # ceramic stay withheld.
+        minimized = {
             ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
             "duration_h",
-        ]
-        metrics = {
-            metric: 0.0 for metric in oxygen_kept
         }
-        metrics[ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC] = _STUB_ENERGY_KWH
-        metrics["duration_h"] = _STUB_DURATION_H
-        # yaml weights, not the helper's return value used as its own expectation
-        scalar = math.fsum(
-            weight * (value if metric in _OXYGEN_OBJECTIVE_METRICS else -value)
-            for (metric, _declared_weight), weight, value in zip(
-                retained, weights, metrics.values(), strict=True
+        metrics: dict[str, float | None] = {}
+        for metric, _weight in retained:
+            if metric == ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC:
+                metrics[metric] = _STUB_ENERGY_KWH
+            elif metric == "duration_h":
+                metrics[metric] = _STUB_DURATION_H
+            elif metric == "pure_silica_glass_kg":
+                metrics[metric] = None
+            else:
+                metrics[metric] = 0.0
+        if any(value is None for value in metrics.values()):
+            scalar = None
+        else:
+            scalar = math.fsum(
+                weight * (value if metric not in minimized else -value)
+                for (metric, _declared_weight), weight, value in zip(
+                    retained, weights, metrics.values(), strict=True
+                )
             )
-        )
         _assert_study_scalar(profile, metrics=metrics, weights=weights, scalar=scalar)
         assert name
 
@@ -952,8 +1060,16 @@ def test_scoring_strategies_use_the_claim_chokepoint() -> None:
             prose="description-edited",
         )
         expected = tuple(definition.metric for definition in objective_definitions(profile))
-        # C0 claims oxygen. Every other product class stays withheld.
-        if metric in _OXYGEN_OBJECTIVE_METRICS:
+        # The sequence claims oxygen, glass, metals, intensities, and Mg_kg.
+        # Ceramic composition and industrial mixed glass stay withheld.
+        sequence_keys = _c0_sequence_claim_keys(False)
+        target = row.get("target")
+        claimed_metric = _oracle_claims_metric(
+            metric,
+            sequence_keys,
+            target=target if isinstance(target, Mapping) else None,
+        )
+        if claimed_metric:
             assert metric in expected
         else:
             assert metric not in expected
@@ -964,7 +1080,7 @@ def test_scoring_strategies_use_the_claim_chokepoint() -> None:
             else:
                 got = tuple(strategy.objective_metrics)
             assert got == expected, f"{strategy_cls.__name__} {metric}"
-            if metric in _OXYGEN_OBJECTIVE_METRICS:
+            if claimed_metric:
                 assert metric in got
             else:
                 assert metric not in got
@@ -998,7 +1114,7 @@ def test_scoring_strategies_use_the_claim_chokepoint() -> None:
     expected = tuple(
         definition.metric for definition in objective_definitions(fidelity_stamped)
     )
-    assert "pure_silica_glass_kg" not in expected
+    assert "pure_silica_glass_kg" in expected
     ceramic = _profile(
         _composition_target_row(
             "terminal_rump_earned",
@@ -1023,7 +1139,7 @@ def test_scoring_strategies_use_the_claim_chokepoint() -> None:
     assert f"{COMPOSITION_TARGET_METRIC_PREFIX}melt" in melt_expected
     c0_mg = _profile(_product_row("Mg_kg"), campaign="C0", prose="description-edited")
     c0_mg_expected = tuple(definition.metric for definition in objective_definitions(c0_mg))
-    assert "Mg_kg" not in c0_mg_expected
+    assert "Mg_kg" in c0_mg_expected
     c4_mg = _profile(_product_row("Mg_kg"), campaign="C4", prose="description-edited")
     c4_mg_expected = tuple(definition.metric for definition in objective_definitions(c4_mg))
     assert "Mg_kg" in c4_mg_expected
@@ -1113,7 +1229,7 @@ def test_composition_target_follows_its_own_product(campaign: str | None, pool: 
         target=row["target"],
     ) is named_claimed
     profile = _profile(row, campaign=campaign, prose="description-edited")
-    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    executed_keys = _scoring_claim_keys(executed_campaign_id(profile), profile)
     _assert_membership(
         profile,
         row["metric"],
@@ -1152,7 +1268,7 @@ def test_both_composition_pools_must_be_claimed(
         target=row["target"],
     ) is claimed
     profile = _profile(row, campaign=campaign, prose="description-edited")
-    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    executed_keys = _scoring_claim_keys(executed_campaign_id(profile), profile)
     _assert_membership(
         profile,
         row["metric"],
@@ -1190,7 +1306,7 @@ def test_captured_products_follow_extracted_species(
         target=row["target"],
     ) is claimed
     profile = _profile(row, campaign=campaign, prose="description-edited")
-    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    executed_keys = _scoring_claim_keys(executed_campaign_id(profile), profile)
     _assert_membership(
         profile,
         row["metric"],
@@ -1225,7 +1341,7 @@ def test_captured_products_require_every_extracted_species(
         target=row["target"],
     ) is claimed
     profile = _profile(row, campaign=campaign, prose="description-edited")
-    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    executed_keys = _scoring_claim_keys(executed_campaign_id(profile), profile)
     _assert_membership(
         profile,
         row["metric"],
@@ -1328,7 +1444,7 @@ def test_fidelity_overlay_is_the_executed_campaign(
     )
     assert via_spec["run"]["campaign"] == executed
     assert profile["run"].get("campaign") == authored_campaign
-    claim_keys = _oracle_claims(executed)
+    claim_keys = _scoring_claim_keys(executed, stamped)
     claimed = _oracle_claims_metric(metric, claim_keys, target=target)
     assert campaign_claims_product_objective(
         metric,
@@ -1408,7 +1524,7 @@ def test_ledger_species_objective_follows_the_executed_campaign(
         campaign=campaign,
         prose="description-edited",
     )
-    executed_keys = _oracle_claims(executed_campaign_id(profile))
+    executed_keys = _scoring_claim_keys(executed_campaign_id(profile), profile)
     claimed = species in executed_keys
     assert campaign_claims_product_objective(metric, executed_keys) is claimed
     ledger = {species: _LEDGER_KG}
@@ -1528,16 +1644,16 @@ def test_energy_per_product_intensity_follows_denominator_claim(
     assert _oracle_ledger_species(metric) is None
     assert _energy_per_product_metric(metric) is not None
     direct_keys = _oracle_claims(campaign)
-    claimed = _oracle_claims_metric(metric, direct_keys)
-    assert campaign_claims_product_objective(metric, direct_keys) is claimed
+    direct_claimed = _oracle_claims_metric(metric, direct_keys)
+    assert campaign_claims_product_objective(metric, direct_keys) is direct_claimed
     assert campaign_claims_product_objective(metric, frozenset()) is False
     profile = _profile(
         _intensity_row(metric),
         campaign=campaign,
         prose="description-edited",
     )
-    executed_keys = _oracle_claims(executed_campaign_id(profile))
-    assert _oracle_claims_metric(metric, executed_keys) is claimed
+    executed_keys = _scoring_claim_keys(executed_campaign_id(profile), profile)
+    claimed = _oracle_claims_metric(metric, executed_keys)
     if not claimed:
         _assert_withheld(
             profile,
@@ -1636,7 +1752,7 @@ def test_file_load_waits_for_the_executed_campaign(
     assert via_study["run"]["campaign"] == "C0"
     claimed = _oracle_claims_metric(
         "pure_silica_glass_kg",
-        _oracle_claims(campaign),
+        _scoring_claim_keys(campaign),
     )
     if not claimed:
         with pytest.raises(ProfileValidationError, match="no remaining objective weight"):
@@ -1762,7 +1878,7 @@ def test_unclaimed_composition_objective_imposes_no_gate(
 
     row = _gate_objective(gate)
     profile = _profile(row, campaign=campaign, prose="description-edited")
-    claim_keys = _oracle_claims(executed_campaign_id(profile))
+    claim_keys = _scoring_claim_keys(executed_campaign_id(profile), profile)
     claimed = _oracle_composition_claimed(row["target"], claim_keys)
     specs = composition_target_specs(profile)
     metrics = {str(spec["metric"]) for spec in specs}

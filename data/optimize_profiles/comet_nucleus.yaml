@@ -1,9 +1,9 @@
 profile_id: comet-nucleus-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: comet_nucleus
-description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Jupiter-family comet nucleus; extreme volatile cleanup before silicate extraction."
+description: Jupiter-family comet nucleus; extreme volatile cleanup before silicate extraction.
 north_star_rationale: Comet profiles must heavily penalize energy/time while preserving O2 and metal/glass proxies after supervolatile cleanup.
-objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Extreme Stage-0 volatile cleanup profile."
+objective_emphasis: Extreme Stage-0 volatile cleanup profile.
 objectives:
   - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.28, rationale: stored oxidizer after cleanup}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.22, rationale: CI-like metal proxy}

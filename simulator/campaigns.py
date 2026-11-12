@@ -158,6 +158,22 @@ class CampaignPressureSetpointRefusal(ValueError):
         )
 
 
+class CampaignEndCapMissing(ValueError):
+    """A phase has neither an endpoint nor a setpoint cap.
+
+    The optimizer must not invent an hour budget for that phase. The
+    message names the phase so a physics ruling can supply the missing
+    end criterion.
+    """
+
+    def __init__(self, phase_name: str):
+        self.phase_name = str(phase_name)
+        super().__init__(
+            f"campaign {self.phase_name} has neither an end criterion "
+            "nor a cap; refusing to invent a duration"
+        )
+
+
 class CampaignSetpointMissingRefusal(ValueError):
     """Typed refusal when a campaign is missing a required setpoint row."""
 
@@ -172,6 +188,63 @@ class CampaignSetpointMissingRefusal(ValueError):
         super().__init__(
             f'{self.reason}: {detail}' if detail else self.reason
         )
+
+
+def decision_successor(
+    decision_type: DecisionType,
+    choice: str,
+    *,
+    c5_enabled: bool,
+) -> tuple[Optional[CampaignPhase], dict[str, str], bool]:
+    """Next phase, record-field updates, and completion for one decision.
+
+    ``PyrolysisSimulator.apply_decision`` and the AUTO_APPLY claim walk
+    both use this table. Hour caps are not part of it: ``check_endpoint``
+    ends each phase.
+    """
+
+    choice = str(choice)
+    record_updates: dict[str, str] = {}
+    next_campaign: Optional[CampaignPhase] = None
+    complete = False
+    if decision_type == DecisionType.ROOT_BRANCH:
+        if choice == 'mre_baseline':
+            record_updates['track'] = 'mre_baseline'
+            next_campaign = CampaignPhase.MRE_BASELINE
+        else:
+            record_updates['track'] = 'pyrolysis'
+            next_campaign = CampaignPhase.C0
+    elif decision_type == DecisionType.PATH_AB:
+        record_updates['path'] = choice
+        if choice == 'A':
+            next_campaign = CampaignPhase.C2A
+        elif choice == 'A_staged':
+            next_campaign = CampaignPhase.C2A_STAGED
+        else:
+            next_campaign = CampaignPhase.C2B
+    elif decision_type == DecisionType.BRANCH_ONE_TWO:
+        record_updates['branch'] = choice
+        if choice == 'two':
+            next_campaign = CampaignPhase.C4
+        elif c5_enabled:
+            next_campaign = CampaignPhase.C5
+        else:
+            complete = True
+    elif decision_type == DecisionType.TI_RETENTION:
+        pass
+    elif decision_type == DecisionType.C6_PROCEED:
+        if choice == 'yes':
+            next_campaign = CampaignPhase.C6
+        else:
+            complete = True
+    elif decision_type == DecisionType.C7_PROCEED:
+        if choice == 'yes':
+            next_campaign = CampaignPhase.C7_CA_ALUMINOTHERMIC
+        else:
+            complete = True
+    else:
+        raise ValueError(f"unsupported decision type {decision_type.name}")
+    return next_campaign, record_updates, complete
 
 
 def _runtime_pressure_override_refusal(
@@ -561,6 +634,29 @@ class CampaignManager:
     _ROUTE_LABEL_PHASES = {
         'MRE': (CampaignPhase.MRE_BASELINE,),
     }
+    # Phases whose ``check_endpoint`` can return True or raise a typed
+    # refusal. C4 and C6 are in this set because that endpoint ends them.
+    # They do not take an optimizer hour budget.
+    _ENDPOINT_OWNED_PHASES = frozenset({
+        CampaignPhase.C0,
+        CampaignPhase.C0B,
+        CampaignPhase.C2A,
+        CampaignPhase.C2A_STAGED,
+        CampaignPhase.C2B,
+        CampaignPhase.C3_K,
+        CampaignPhase.C3_NA,
+        CampaignPhase.C4,
+        CampaignPhase.C5,
+        CampaignPhase.C6,
+        CampaignPhase.C7_CA_ALUMINOTHERMIC,
+        CampaignPhase.MRE_BASELINE,
+    })
+
+    @classmethod
+    def endpoint_can_end(cls, phase: CampaignPhase) -> bool:
+        """True when ``check_endpoint`` owns termination for ``phase``."""
+
+        return phase in cls._ENDPOINT_OWNED_PHASES
     _OVERRIDE_CONSUMER_NAMES = frozenset({
         'campaign_overrides',
         'override',
@@ -3637,3 +3733,45 @@ class CampaignManager:
             recommendation='pyrolysis',
             context='Select processing track.',
         )
+
+    def auto_apply_sequence(
+        self,
+        start: CampaignPhase,
+        record: BatchRecord,
+    ) -> tuple[CampaignPhase, ...]:
+        """Phases AUTO_APPLY will enter, using this manager's transitions.
+
+        The walk calls ``get_next_campaign``, ``get_decision``, and
+        ``decision_successor``. It does not copy caps or end criteria.
+        A real evaluation drives ``check_endpoint`` through the session.
+        """
+
+        phases: list[CampaignPhase] = []
+        current: Optional[CampaignPhase] = start
+        seen: set[CampaignPhase] = set()
+        for _ in range(len(CampaignPhase) + 1):
+            if current is None or current == CampaignPhase.COMPLETE:
+                break
+            if current in seen:
+                break
+            seen.add(current)
+            phases.append(current)
+            nxt = self.get_next_campaign(current, record)
+            if nxt is None:
+                decision = self.get_decision(current, record)
+                choice = decision.recommendation or (
+                    decision.options[0] if decision.options else ''
+                )
+                nxt, updates, complete = decision_successor(
+                    decision.decision_type,
+                    choice,
+                    c5_enabled=bool(self.c5_enabled),
+                )
+                for field_name, field_value in updates.items():
+                    setattr(record, field_name, field_value)
+                if complete or nxt is None or nxt == CampaignPhase.COMPLETE:
+                    break
+            elif nxt == CampaignPhase.COMPLETE:
+                break
+            current = nxt
+        return tuple(phases)

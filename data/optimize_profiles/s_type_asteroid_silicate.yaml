@@ -1,9 +1,9 @@
 profile_id: s-type-asteroid-silicate-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: s_type_asteroid_silicate
-description: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Mg-rich S-type silicate; bootstrap Mg shuttle stock plus O2/glass."
+description: Mg-rich S-type silicate; bootstrap Mg shuttle stock plus O2/glass.
 north_star_rationale: S-type material is Mg-rich, so metal recovery is weighted above glass while keeping O2 and coating gates.
-objective_emphasis: "C0 SMOKE ONLY: product objectives are screening proxies, not realized products. Mg/metal-forward asteroid silicate profile."
+objective_emphasis: Mg/metal-forward asteroid silicate profile.
 objectives:
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.38, rationale: Mg-dominant metal proxy}
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.24, rationale: oxidizer product}
