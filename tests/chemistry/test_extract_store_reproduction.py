@@ -143,11 +143,26 @@ def vapor_pressure_data() -> dict:
 
 
 @pytest.fixture(scope="module")
-def adopted_observations() -> tuple[AdoptedObservation, ...]:
+def _adopted_observations_cache() -> tuple[AdoptedObservation, ...]:
     if _COLLECTED_ADOPTED_OBSERVATIONS_ERROR is not None:
         raise _COLLECTED_ADOPTED_OBSERVATIONS_ERROR
     assert _COLLECTED_ADOPTED_OBSERVATIONS is not None
-    return deepcopy(_COLLECTED_ADOPTED_OBSERVATIONS)
+    return _COLLECTED_ADOPTED_OBSERVATIONS
+
+
+@pytest.fixture(scope="module")
+def _adopted_observations_copy_factory(_adopted_observations_cache):
+    def copy_observations() -> tuple[AdoptedObservation, ...]:
+        return deepcopy(_adopted_observations_cache)
+
+    return copy_observations
+
+
+@pytest.fixture
+def adopted_observations(
+    _adopted_observations_copy_factory,
+) -> tuple[AdoptedObservation, ...]:
+    return _adopted_observations_copy_factory()
 
 
 def test_legacy_table_species_scalar_is_ignored_by_raw_observation_index(monkeypatch) -> None:
@@ -162,18 +177,31 @@ def test_legacy_table_species_scalar_is_ignored_by_raw_observation_index(monkeyp
 
 
 @pytest.fixture(scope="module")
-def battery_evaluations(
-    adopted_observations: tuple[AdoptedObservation, ...], vapor_pressure_data
-) -> tuple[ObservationEvaluation, ...]:
+def _battery_evaluations_copy_factory(vapor_pressure_data):
     global _BATTERY_EVALUATION_BUILD_COUNT
     _BATTERY_EVALUATION_BUILD_COUNT += 1
     assert _BATTERY_EVALUATION_BUILD_COUNT == 1, (
         "battery evaluations were rebuilt in one worker"
     )
-    return tuple(
+    if _COLLECTED_ADOPTED_OBSERVATIONS_ERROR is not None:
+        raise _COLLECTED_ADOPTED_OBSERVATIONS_ERROR
+    assert _COLLECTED_ADOPTED_OBSERVATIONS is not None
+    cached_evaluations = tuple(
         evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
-        for obs in adopted_observations
+        for obs in _COLLECTED_ADOPTED_OBSERVATIONS
     )
+
+    def copy_evaluations() -> tuple[ObservationEvaluation, ...]:
+        return deepcopy(cached_evaluations)
+
+    return copy_evaluations
+
+
+@pytest.fixture
+def battery_evaluations(
+    _battery_evaluations_copy_factory,
+) -> tuple[ObservationEvaluation, ...]:
+    return _battery_evaluations_copy_factory()
 
 
 @pytest.fixture(scope="module")
@@ -190,10 +218,15 @@ def residual_baselines() -> dict:
 
 def test_store_yields_adopted_target_type_observations(
     adopted_observations: tuple[AdoptedObservation, ...],
+    _adopted_observations_copy_factory,
 ) -> None:
     """Battery includes every family and all KEMS sources before precedence."""
 
     assert adopted_observations, "extract store produced zero ADOPTED observations"
+    next_consumer = _adopted_observations_copy_factory()
+    assert next_consumer[0].observation_id == adopted_observations[0].observation_id
+    adopted_observations[0].values["__isolation_probe__"] = "changed"
+    assert "__isolation_probe__" not in next_consumer[0].values
     types = {obs.obs_type for obs in adopted_observations}
     assert types == TARGET_TYPES
     # Superseded rows are retained provenance, not adopted data points.
@@ -856,6 +889,7 @@ def test_coverage_primary_prefers_typed_refusal_over_point_drop() -> None:
     assert coverage["skip_reasons"] == {evaluation.skip_reason: 1}
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_wetzel_stale_duplicate_hits_system_class_and_form_gate(
     battery_evaluations: tuple[ObservationEvaluation, ...],
 ) -> None:
@@ -1368,14 +1402,23 @@ def test_adopted_observation_reproduction(
     assert evaluation.skip_reasons
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_pinned_residuals_cover_all_live_comparable_points(
     battery_evaluations,
     residual_baselines,
+    _battery_evaluations_copy_factory,
 ) -> None:
     """Baseline file and live battery must agree on the comparable set."""
 
     assert isinstance(battery_evaluations, tuple)
     assert _BATTERY_EVALUATION_BUILD_COUNT == 1
+
+    first_consumer = _battery_evaluations_copy_factory()
+    next_consumer = _battery_evaluations_copy_factory()
+    assert first_consumer and next_consumer
+    original_record_count = len(next_consumer[0].records)
+    first_consumer[0].records.append(None)
+    assert len(next_consumer[0].records) == original_record_count
 
     def assert_residual_coverage(evaluations) -> None:
         live_keys = {
@@ -1645,6 +1688,7 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
     assert evaluation.skip_reasons
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 @pytest.mark.parametrize(
     ("observation_id", "skip_reason"),
     (
@@ -1669,6 +1713,7 @@ def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
     assert evaluation.skip_reasons == [skip_reason]
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_wetzel_model_tables_refuse_as_model_output(
     adopted_observations: tuple[AdoptedObservation, ...],
     battery_evaluations: tuple[ObservationEvaluation, ...],
@@ -1730,6 +1775,7 @@ def test_transition_point_is_an_adopted_target_type(
     assert "melting_point" in kinds
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_melting_point_is_typed_refusal_not_a_fabricated_psat(
     battery_evaluations: tuple[ObservationEvaluation, ...],
 ) -> None:
@@ -1742,6 +1788,7 @@ def test_melting_point_is_typed_refusal_not_a_fabricated_psat(
     assert all(r.actual_value is None for r in evaluation.records)
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_normal_boiling_point_inverts_antoine_in_kelvin(
     battery_evaluations: tuple[ObservationEvaluation, ...],
 ) -> None:
@@ -1796,6 +1843,7 @@ def test_silicate_melt_class_does_not_pin_a_pure_component_nbp(
     assert all(r.status not in {"match", "mismatch"} for r in evaluation.records)
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_battery_rollup_matches_committed_model_limitations(
     battery_evaluations,
     adopted_observations: tuple[AdoptedObservation, ...],
@@ -1934,6 +1982,7 @@ def test_evaluate_all_covers_every_adopted_observation(
         assert ev.records or ev.skip_reason
 
 
+@pytest.mark.xdist_group("extract-battery-evaluations")
 def test_coverage_ledger_is_observation_first_and_exact(
     battery_evaluations,
     adopted_observations: tuple[AdoptedObservation, ...],

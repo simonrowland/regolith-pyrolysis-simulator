@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import hashlib
 from collections import defaultdict
+from copy import deepcopy
 from dataclasses import replace
 import json
 import math
@@ -372,10 +373,17 @@ def test_failure_payload_builds_per_hour_projection_once(monkeypatch):
     assert per_hour_projection_calls == [execution]
 
 
+@pytest.mark.xdist_group("lunar_c0_shared")
 def test_default_lunar_c0_product_story_is_numeric_with_si_channel(
-    lunar_c0_scenario_result,
+    lunar_c0_scenario_result, _lunar_c0_scenario_result_copy_factory
 ):
     assert _LUNAR_C0_RESULT_BUILD_COUNT == 1
+    next_consumer = _lunar_c0_scenario_result_copy_factory()
+    original_temperature = next_consumer["per_hour_summary"][0]["T_C"]
+    lunar_c0_scenario_result["per_hour_summary"][0]["T_C"] = (
+        original_temperature + 1.0
+    )
+    assert next_consumer["per_hour_summary"][0]["T_C"] == original_temperature
     payload = lunar_c0_scenario_result
 
     assert payload["status"] == "ok"
@@ -1180,13 +1188,23 @@ _LUNAR_C0_RESULT_BUILD_COUNT = 0
 
 
 @pytest.fixture(scope="module")
-def lunar_c0_scenario_result():
+def _lunar_c0_scenario_result_copy_factory():
     global _LUNAR_C0_RESULT_BUILD_COUNT
     _LUNAR_C0_RESULT_BUILD_COUNT += 1
     assert _LUNAR_C0_RESULT_BUILD_COUNT == 1, (
         "the lunar C0 scenario was rebuilt in one worker"
     )
-    return MappingProxyType(_run_scenario(SCENARIOS[0]))
+    cached_result = _run_scenario(SCENARIOS[0])
+
+    def copy_result():
+        return deepcopy(cached_result)
+
+    return copy_result
+
+
+@pytest.fixture
+def lunar_c0_scenario_result(_lunar_c0_scenario_result_copy_factory):
+    return _lunar_c0_scenario_result_copy_factory()
 
 
 def _flux_ledger_pins(capture: dict) -> dict[str, str]:
@@ -1996,14 +2014,23 @@ _VPR_P6A_RESULT_BUILD_COUNT = 0
 
 
 @pytest.fixture(scope="module")
-def vpr_p6a_trace_result():
+def _vpr_p6a_trace_result_copy_factory():
     global _VPR_P6A_RESULT_BUILD_COUNT
     _VPR_P6A_RESULT_BUILD_COUNT += 1
     assert _VPR_P6A_RESULT_BUILD_COUNT == 1, (
         "the VPR P6A trace was rebuilt in one worker"
     )
-    payload, execution = _run_c2a_trace_export()
-    return MappingProxyType(payload), execution
+    cached_result = _run_c2a_trace_export()
+
+    def copy_result():
+        return deepcopy(cached_result)
+
+    return copy_result
+
+
+@pytest.fixture
+def vpr_p6a_trace_result(_vpr_p6a_trace_result_copy_factory):
+    return _vpr_p6a_trace_result_copy_factory()
 
 
 @pytest.mark.serial  # spawns CLI subprocess; flakes under xdist co-scheduling
@@ -2055,13 +2082,23 @@ def test_vpr_p6a_cli_artifact_matches_in_process_trace(
     _assert_p6a_payload_matches_trace(cli_payload, execution.trace)
 
 
+@pytest.mark.xdist_group("serial")
 def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels(
-    vpr_p6a_trace_result,
+    vpr_p6a_trace_result, _vpr_p6a_trace_result_copy_factory,
 ):
     """Design Section 9 R9.2/R9.3/R9.5: P6b-only fields are explicit P0 sentinels."""
 
     assert _VPR_P6A_RESULT_BUILD_COUNT == 1
-    payload, _execution = vpr_p6a_trace_result
+    payload, execution = vpr_p6a_trace_result
+    next_payload, next_execution = _vpr_p6a_trace_result_copy_factory()
+    original_temperature = next_payload["per_hour_summary"][0]["T_C"]
+    payload["per_hour_summary"][0]["T_C"] = original_temperature + 1.0
+    assert next_payload["per_hour_summary"][0]["T_C"] == original_temperature
+    assert execution.per_hour and next_execution.per_hour
+    execution_key = next(iter(next_execution.per_hour[0]))
+    original_execution_value = next_execution.per_hour[0][execution_key]
+    execution.per_hour[0][execution_key] = object()
+    assert next_execution.per_hour[0][execution_key] == original_execution_value
     assert (
         payload["final"]["pump_outlet_by_species_kg"]
         == NOT_APPLICABLE_UNTIL_P0
@@ -3441,6 +3478,7 @@ def test_runner_engines_yaml_optional_load(tmp_path):
     }
 
 
+@pytest.mark.xdist_group("lunar_c0_shared")
 def test_per_hour_summary_includes_pressure_and_mass_balance(
     lunar_c0_scenario_result,
 ):
@@ -3577,6 +3615,7 @@ def test_session_per_hour_summary_event_uses_runner_builder():
     )
 
 
+@pytest.mark.xdist_group("lunar_c0_shared")
 def test_runner_final_state_is_mol_keyed_not_kg(lunar_c0_scenario_result):
     """Regression: ``final_state`` reports moles, not kilograms.
 
