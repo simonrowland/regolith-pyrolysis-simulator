@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import copy
+import hashlib
 import json
 import math
 from decimal import Decimal
@@ -34,7 +36,33 @@ def _no_pO2_balance_floor() -> dict[str, float | int | None]:
     }
 
 
+def _hashimoto_prediction_tuple_digest(predictions) -> str:
+    records = []
+    for prediction in predictions:
+        record = copy.deepcopy(vars(prediction))
+        integration = record["provenance"]["integration"]
+        integration.pop("process_cpu_seconds", None)
+        integration.pop("process_cpu_seconds_by_geometry", None)
+        records.append(record)
+    encoded = json.dumps(records, sort_keys=True, separators=(",", ":"), default=str)
+    return hashlib.sha256(encoded.encode()).hexdigest()
+
+
 pytestmark = pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
+
+
+@pytest.fixture(scope="module")
+def _hashimoto_real_openimcc_cohort():
+    pytest.importorskip("openimcc")
+    experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    return _predict_hashimoto_residue_cohort(
+        experiments,
+        catalog,
+        preform_dimensions_mm=preform_dimensions_mm,
+        code_revision="pre-mass-loss-pin",
+        engine="openimcc",
+    )
 
 
 def _hanging_openimcc_engine(**_kwargs):
@@ -280,17 +308,13 @@ def _source_data():
     )
 
 
-def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
-    pytest.importorskip("openimcc")
-    experiments, _measured_rows, preform_dimensions_mm = _source_data()
-    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
-
-    predictions = _predict_hashimoto_residue_cohort(
-        experiments,
-        catalog,
-        preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="pre-mass-loss-pin",
-        engine="openimcc",
+@pytest.mark.xdist_group("hashimoto_real_cohort")
+def test_hashimoto_openimcc_primary_numeric_output_is_pinned(
+    _hashimoto_real_openimcc_cohort,
+) -> None:
+    predictions = copy.deepcopy(_hashimoto_real_openimcc_cohort)
+    assert _hashimoto_prediction_tuple_digest(predictions) == (
+        "32160db87343d79931fef2a3a862ddc570aacc770faf38cec6b2a5f5dbfbd635"
     )
     primary = next(
         row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM
