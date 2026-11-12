@@ -3743,15 +3743,14 @@ def test_parallel_composition_target_stub_study_completes(
     pareto_path = tmp_path / "study" / "pareto.json"
     assert pareto_path.exists()
     payload = json.loads(pareto_path.read_text())
-    # d-367, as applied by the pre-RG withhold (6d24ba1c1): SiO is the only
-    # wall-saturation refusal, and at least one interval has no computed
-    # vapour rate and no physical-zero record. The supply integral returns
-    # no bound. That is not wall_deposit_upper_bound_used, and the other
-    # hours are not booked as a partial sum. d-045 keeps the coating gate
-    # unavailable, so the screen has no feasible winner. Certain upstream
-    # deposit is 0 kg, under the 0.5 kg limit on a 1000 kg charge. The
-    # margin is that certain-deposit slack (5e-4), not "-inf": a missing
-    # bound is not an infinite coating cost.
+    # Each Morris point books SiO at the activity-1 supply bound. The
+    # coating gate is feasible: the certain deposit is 0 kg and the flagged
+    # bound is far under the 0.5 kg limit. resinter_threshold_kg is null, so
+    # a positive deposit cannot be turned into a campaign count. Furnace
+    # amortization stays resinter_threshold_ungrounded, cost-adjusted scores
+    # are absent, and the screen therefore has no priced winner. The 3736262ed
+    # winner was a measured-zero deposit, which amortized at zero. This run
+    # does not restore that winner.
     assert result.status == "completed-no-feasible-winner"
     assert result.winner is None
     assert result.pareto == ()
@@ -3760,12 +3759,12 @@ def test_parallel_composition_target_stub_study_completes(
     assert payload["pareto"] == []
     assert result.records
     assert result.leaderboard
-    assert not any(record.feasible for record in result.records)
+    assert all(record.feasible for record in result.records)
     definitions = objective_definitions(profile)
     for candidate in result.records:
-        assert list(candidate.failing_gates) == ["coating"]
+        assert list(candidate.failing_gates) == []
         coating = candidate.feasibility_margins["coating"]
-        assert coating["status"] == "unavailable"
+        assert coating["status"] == "warning"
         assert coating["margin"] == pytest.approx(5.0e-4)
         assert math.isfinite(float(coating["margin"]))
         payload_margin = coating["status_payload"]
@@ -3776,21 +3775,35 @@ def test_parallel_composition_target_stub_study_completes(
         assert list(
             payload_margin["wall_saturation_pressure_refused_species"]
         ) == ["SiO"]
-        assert (
-            payload_margin[
-                "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
-            ]
-            == {}
-        )
+        bounds = payload_margin[
+            "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+        ]
+        assert set(bounds) == {"SiO"}
+        assert bounds["SiO"] > 0.0
+        assert bounds["SiO"] < 0.5
         scores = study._record_objective_scores(candidate, definitions)
         assert scores
+        assert all(score is None for score in scores)
         summary = candidate.product_summary
-        assert summary["coating_unavailable_reason"] == (
-            "wall saturation pressure refused for SiO; "
-            "vapour flux upper bound unavailable"
+        assert "coating_unavailable_reason" not in summary
+        assert summary["coating_status"] == "warning"
+        assert summary["furnace_amortization_status"] == (
+            "resinter_threshold_ungrounded"
         )
-        assert summary.get("wall_deposit_refusal")
-        assert not summary.get("wall_supply_bound_bookings")
+        assert summary["wall_deposit_upper_bound_used"] is True
+        assert summary["wall_deposit_total_kg"] == pytest.approx(bounds["SiO"])
+        assert summary["supply_interval_upper_bound_used"]["SiO"] > 0
+        bookings = summary["wall_supply_bound_bookings"]
+        assert len(bookings) == 1
+        assert bookings[0]["species"] == "SiO"
+        assert bookings[0]["flag"] == "wall_deposit_upper_bound_used"
+        assert bookings[0]["deposit_kg"] == pytest.approx(
+            bookings[0]["supply_upper_bound_kg"]
+        )
+        assert bookings[0]["deposit_kg"] > 0.0
+        assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
+            bookings[0]["deposit_kg"]
+        )
         wall_authority = summary["wall_deposit_sticking_authority"]
         refused = wall_authority.get("wall_saturation_pressure_refused_species") or []
         assert "SiO" in list(refused)

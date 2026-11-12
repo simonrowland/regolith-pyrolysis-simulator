@@ -16272,6 +16272,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             evap_flux,
             getattr(self, "_wall_supply_computed_kg_hr", None),
         )
+        # HourSnapshot does not carry melt area. A refused interval's
+        # supply bound converts the activity-1 flux density to kg/h with
+        # the area this hour's kernel integrated over.
+        raw_area = getattr(self.melt, "melt_surface_area_m2", None)
+        if not isinstance(raw_area, bool) and isinstance(raw_area, (int, float)):
+            area_m2 = float(raw_area)
+            if math.isfinite(area_m2) and area_m2 > 0.0:
+                evap_flux.melt_surface_area_m2 = area_m2
         snapshot.evap_flux = evap_flux
         snapshot.melt_headspace_composition_mbar = dict(
             self._melt_headspace_composition_mbar

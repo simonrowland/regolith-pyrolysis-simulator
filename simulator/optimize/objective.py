@@ -4382,11 +4382,13 @@ def _refused_vapour_supply_kg(
     refused_species: tuple[str, ...],
     snapshots: Sequence[Any] | None = None,
 ) -> dict[str, float]:
-    """Integral of each refused species' computed vapour flux over the run.
+    """Integral of each refused species' vapour supply over the run.
 
-    Missing species stay missing. A flux that was not computed is not zero.
-    A species whose carrier authority refuses any positive-duration
-    interval stays missing too: the other hours are not its supply.
+    Missing species stay missing. A flux that was not computed is not
+    zero. A refused interval is the activity-1 Hertz-Knudsen bound when
+    saturation pressure exists, and the count of those intervals rides
+    on the map. An interval with no flux law and no saturation pressure
+    leaves the species missing: the other hours are not its supply.
     ``snapshots`` is the integral window. The tap-hour projection passes
     the hours up to the tap so later vapour cannot raise that bound.
     """
@@ -4443,6 +4445,8 @@ def _wall_supply_booking_fields(booked: Mapping[str, Any]) -> dict[str, Any]:
     bookings = booked.get("bookings") or ()
     if not bookings:
         return {}
+    from simulator.optimize.evaluate import SUPPLY_INTERVAL_UPPER_BOUND_USED
+
     fields: dict[str, Any] = {"wall_supply_bound_bookings": bookings}
     if any(
         isinstance(item, Mapping)
@@ -4450,6 +4454,24 @@ def _wall_supply_booking_fields(booked: Mapping[str, Any]) -> dict[str, Any]:
         for item in bookings
     ):
         fields["wall_deposit_upper_bound_used"] = True
+    # Only a booking that actually used the activity-1 bound grows this
+    # key. A computed supply does not.
+    counts: dict[str, int] = {}
+    for item in bookings:
+        if not isinstance(item, Mapping):
+            continue
+        raw_count = item.get(SUPPLY_INTERVAL_UPPER_BOUND_USED)
+        species = item.get("species")
+        if (
+            isinstance(raw_count, bool)
+            or not isinstance(raw_count, int)
+            or raw_count <= 0
+            or not species
+        ):
+            continue
+        counts[str(species)] = int(raw_count)
+    if counts:
+        fields[SUPPLY_INTERVAL_UPPER_BOUND_USED] = counts
     return fields
 
 
@@ -4701,9 +4723,13 @@ def _book_wall_deposits_at_vapour_supply(
     - The interval invariant lives in ``_classify_wall_supply_interval``,
       which ``_optimizer_refused_flux_bounds`` is the only caller of.
       Each positive-duration interval is a computed rate, an evidenced
-      physical zero, or unavailable. A species absent from the returned
-      map has no finite bound: the refusal stays, and a partial sum is
-      not booked. A sibling that the integral did return is still booked.
+      physical zero, an activity-1 supply bound, or unavailable. A
+      species absent from the returned map has no finite bound: one
+      interval had no flux law and no saturation pressure, and a partial
+      sum is not booked. A refused interval with a saturation pressure
+      is in the map at that bound and is flagged
+      ``supply_interval_upper_bound_used``. A sibling that the integral
+      did return is still booked.
     - Supply at or below the mass-balance ledger resolution: authorized
       physical zero (``below_wall_supply_upper_bound``), carrying the
       bound. Existing entries of that species are removed, so a
@@ -4752,6 +4778,8 @@ def _book_wall_deposits_at_vapour_supply(
             "notice_authority": notice_authority,
             "bookings": (),
         }
+    from simulator.optimize.evaluate import SUPPLY_INTERVAL_UPPER_BOUND_USED
+
     resolution_kg = _mass_balance_ledger_resolution_kg(charge_kg)
     notice_authority[
         "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
@@ -4759,6 +4787,20 @@ def _book_wall_deposits_at_vapour_supply(
         species: float(bound)
         for species, bound in sorted(supply_kg.items())
     }
+    raw_counts = getattr(supply_kg, SUPPLY_INTERVAL_UPPER_BOUND_USED, {})
+    bound_counts = raw_counts if isinstance(raw_counts, Mapping) else {}
+    interval_counts = {
+        str(species): int(bound_counts[species])
+        for species in supply_kg
+        if (
+            species in bound_counts
+            and isinstance(bound_counts[species], int)
+            and not isinstance(bound_counts[species], bool)
+            and bound_counts[species] > 0
+        )
+    }
+    if interval_counts:
+        notice_authority[SUPPLY_INTERVAL_UPPER_BOUND_USED] = interval_counts
     booked_deposit = dict(wall_deposit)
     bookings: list[dict[str, Any]] = []
     booked_species: set[str] = set()
@@ -4838,6 +4880,15 @@ def _book_wall_deposits_at_vapour_supply(
             "flag": WALL_DEPOSIT_UPPER_BOUND_USED,
         })
         booked_species.add(species)
+    for booking in bookings:
+        species = str(booking["species"])
+        interval_count = bound_counts.get(species, 0)
+        if (
+            isinstance(interval_count, int)
+            and not isinstance(interval_count, bool)
+            and interval_count > 0
+        ):
+            booking[SUPPLY_INTERVAL_UPPER_BOUND_USED] = int(interval_count)
     booked = {
         "deposit": booked_deposit,
         "availability_authority": _authority_without_booked_refusals(

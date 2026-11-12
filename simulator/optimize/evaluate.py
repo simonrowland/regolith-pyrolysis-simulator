@@ -1872,9 +1872,25 @@ def _trace_with_optimizer_coating_report(
             ),
         )
     if refused_species:
+        # The kilogram map is a plain dict. The interval count is an
+        # attribute of the integral, so it has to be stored beside the map
+        # or a JSON copy of the dict drops it.
         report[
             "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
-        ] = refused_flux_bounds
+        ] = {
+            str(species): float(kg)
+            for species, kg in refused_flux_bounds.items()
+        }
+        bound_counts = getattr(
+            refused_flux_bounds,
+            SUPPLY_INTERVAL_UPPER_BOUND_USED,
+            None,
+        )
+        if bound_counts:
+            report[SUPPLY_INTERVAL_UPPER_BOUND_USED] = {
+                str(species): int(count)
+                for species, count in bound_counts.items()
+            }
     if threshold_parametric:
         raw_rate = runner_report.get("wall_deposit_kg_per_campaign", 0.0)
         if raw_rate is None:
@@ -1977,12 +1993,15 @@ def _carrier_records_transport_refusal(record: Mapping[str, Any]) -> bool:
 
 
 # One interval of one refused-wall species. ``outside_window`` is a
-# non-positive duration: it is not part of the integral, so it is not
-# one of the three contributions below.
+# non-positive duration: it is not part of the integral.
 _WALL_SUPPLY_COMPUTED = "computed"
 _WALL_SUPPLY_PHYSICAL_ZERO = "physical_zero"
 _WALL_SUPPLY_UNAVAILABLE = "unavailable"
 _WALL_SUPPLY_OUTSIDE = "outside_window"
+# One refused interval bounded by the activity-1 Hertz-Knudsen flux.
+# The evidence string is the flag the booking copies, with the count.
+_WALL_SUPPLY_UPPER_BOUND = "supply_interval_upper_bound"
+SUPPLY_INTERVAL_UPPER_BOUND_USED = "supply_interval_upper_bound_used"
 
 
 @dataclass(frozen=True)
@@ -1992,6 +2011,26 @@ class _WallSupplyInterval:
     kind: str
     rate_kg_hr: float | None = None
     evidence: str = ""
+
+
+class _WallSupplyIntegral(dict):
+    """Species kilogram map plus how many refused intervals used the bound.
+
+    Dict equality ignores the count. Callers that persist the map copy
+    the kilograms into a plain dict and the count beside it.
+    """
+
+    def __init__(
+        self,
+        masses: Mapping[str, float],
+        counts: Mapping[str, int] | None = None,
+    ) -> None:
+        super().__init__(masses)
+        self.supply_interval_upper_bound_used = {
+            str(species): int(count)
+            for species, count in (counts or {}).items()
+            if int(count) > 0 and str(species) in self
+        }
 
 
 def _snapshot_duration_h(snapshot: Any) -> float:
@@ -2130,8 +2169,11 @@ def _interval_certificate_leaves_species_uncovered(
 
     No channel, or an eligible channel whose rate the freeze or campaign
     gate discarded, returns False: the certificate covers that species.
-    A refusal or an upper bound returns True. The supply integral then
-    withholds the species instead of booking the other hours (d-367).
+    A refusal or an upper bound returns True. That interval is not a
+    physical zero. The supply integral bounds it by the activity-1
+    Hertz-Knudsen flux when saturation pressure exists, and withholds
+    the species only when the interval has no flux law and no saturation
+    pressure.
     """
 
     channels = getattr(flux, "carrier_authority_by_species", None)
@@ -2143,11 +2185,304 @@ def _interval_certificate_leaves_species_uncovered(
     return _carrier_record_blocks_physical_zero(record)
 
 
+def _snapshot_temperature_K(snapshot: Any) -> float | None:
+    raw = getattr(snapshot, "temperature_C", None)
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        return None
+    kelvin = float(raw) + 273.15
+    if not math.isfinite(kelvin) or kelvin <= 0.0:
+        return None
+    return kelvin
+
+
+def _snapshot_melt_area_m2(snapshot: Any) -> float | None:
+    """Melt area this interval's flux was integrated over, in m^2.
+
+    ``HourSnapshot`` does not store it. The hour writer copies
+    ``melt.melt_surface_area_m2`` onto the flux. A positive finite
+    number on the snapshot itself is the same input for a fixture.
+    """
+
+    flux = getattr(snapshot, "evap_flux", None)
+    for raw in (
+        getattr(flux, "melt_surface_area_m2", None),
+        getattr(snapshot, "melt_surface_area_m2", None),
+    ):
+        if isinstance(raw, bool) or not isinstance(raw, int | float):
+            continue
+        area = float(raw)
+        if math.isfinite(area) and area > 0.0:
+            return area
+    return None
+
+
+def _carrier_channel(snapshot: Any, species: str) -> Mapping[str, Any] | None:
+    flux = getattr(snapshot, "evap_flux", None)
+    channels = getattr(flux, "carrier_authority_by_species", None)
+    if not isinstance(channels, MappingABC) or species not in channels:
+        return None
+    record = channels[species]
+    if not isinstance(record, MappingABC):
+        return None
+    return record
+
+
+def _cited_evaporation_alpha(record: Mapping[str, Any] | None) -> float:
+    """``1`` unless this channel carries a cited evaporation coefficient.
+
+    A cited alpha is a numeric ``cited_alpha`` on the carrier record in
+    ``(0, 1]``. ``flux.alpha_ref`` is a label, not a coefficient. A
+    catalog proxy or the analytical alpha=1 ceiling is not a citation,
+    so the bound stays the kinetic ceiling.
+    """
+
+    if record is None or "cited_alpha" not in record:
+        return 1.0
+    raw = record.get("cited_alpha")
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        raise CoatingFeasibilityReportError(
+            "cited evaporation alpha must be numeric"
+        )
+    alpha = float(raw)
+    if not math.isfinite(alpha) or alpha <= 0.0 or alpha > 1.0:
+        raise CoatingFeasibilityReportError(
+            "cited evaporation alpha must be finite and in (0, 1]"
+        )
+    return alpha
+
+
+def _explicit_activity_one_psat_pa(
+    record: Mapping[str, Any] | None,
+) -> float | None:
+    """Carrier-stated activity-1 pressure, or None when the key is absent.
+
+    ``None`` stored under the key is an explicit absence: do not replace
+    it with a catalog lookup. ``pressure.pa`` is equilibrium pressure,
+    not this value.
+    """
+
+    if record is None or "activity_one_psat_pa" not in record:
+        return None
+    raw = record.get("activity_one_psat_pa")
+    if raw is None:
+        return None
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        raise CoatingFeasibilityReportError(
+            "activity-one saturation pressure must be numeric"
+        )
+    pressure_pa = float(raw)
+    if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
+        raise CoatingFeasibilityReportError(
+            "activity-one saturation pressure must be finite and non-negative"
+        )
+    return pressure_pa
+
+
+@lru_cache(maxsize=1)
+def _activity_one_vapour_catalog() -> Any:
+    """Compiled vapour catalog for the activity-1 saturation lookup.
+
+    ``emit_u0_request_rules`` stays off: this probe needs evaluators,
+    not request rules. The compile is memoized inside the catalog as well.
+    """
+
+    from simulator.config import DEFAULT_DATA_DIR
+    from simulator.vapour_rail.catalog import compiled_catalog_for
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    payload = load_cached_safe_yaml(
+        (DEFAULT_DATA_DIR / "vapor_pressures.yaml").read_bytes()
+    )
+    return compiled_catalog_for(payload, emit_u0_request_rules=False)
+
+
+def _catalog_activity_one_psat_pa(
+    species: str,
+    temperature_K: float,
+) -> float | None:
+    """Activity-1 reference-state saturation pressure, or None when no law exists.
+
+    The oxygen and activity factors are identically one: ``source_activity``
+    is 1 and ``pO2`` is the evaluator's reference pressure. A missing row,
+    an inapplicable hot-train row, or a refused evaluation is no P_sat.
+    """
+
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
+    try:
+        catalog = _activity_one_vapour_catalog()
+        evaluator = catalog.evaluator_for_hot_train(species)
+        evaluation = evaluator.evaluate(
+            temperature_K,
+            source_activity=1.0,
+            pO2_bar=float(evaluator.pO2_reference_bar),
+        )
+    except (
+        CatalogCompileError,
+        VaporPressureNumericalOverflowError,
+        VaporPressureRangeError,
+        OverflowError,
+        ValueError,
+    ):
+        return None
+    raw = getattr(evaluation, "pressure_pa", None)
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        return None
+    pressure_pa = float(raw)
+    if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
+        return None
+    return pressure_pa
+
+
+def _explicit_molar_mass_kg_per_mol(
+    record: Mapping[str, Any] | None,
+) -> float | None:
+    if record is None or "molar_mass_kg_per_mol" not in record:
+        return None
+    raw = record.get("molar_mass_kg_per_mol")
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        raise CoatingFeasibilityReportError(
+            "vapour molar mass must be numeric"
+        )
+    mass = float(raw)
+    if not math.isfinite(mass) or mass <= 0.0:
+        raise CoatingFeasibilityReportError(
+            "vapour molar mass must be finite and positive"
+        )
+    return mass
+
+
+def _catalog_molar_mass_kg_per_mol(species: str) -> float | None:
+    """Publisher molar mass. A missing operand is not a guessed formula mass."""
+
+    from simulator.evaporation import production_vapor_molar_mass_g_per_mol
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
+    try:
+        legacy = _activity_one_vapour_catalog().legacy_view()
+    except CatalogCompileError:
+        return None
+    grams = production_vapor_molar_mass_g_per_mol(legacy, species)
+    if isinstance(grams, bool) or not isinstance(grams, int | float):
+        return None
+    mass_g = float(grams)
+    if not math.isfinite(mass_g) or mass_g <= 0.0:
+        return None
+    return mass_g / 1000.0
+
+
+def _activity_one_bound_rate_kg_hr(
+    *,
+    temperature_K: float,
+    pressure_pa: float,
+    molar_mass_kg_per_mol: float,
+    area_m2: float,
+    alpha: float,
+) -> float:
+    """Activity-1 Hertz-Knudsen mass rate for one refused interval.
+
+    Premise. Activity ``a <= 1`` implies ``P_eq = a^n P_sat <= P_sat``
+    when the activity exponent is positive, so the vacuum evaporation
+    rate is at most the activity-1 rate. The oxygen factor is taken at
+    the reference pressure, which is 1, so this ``P_sat`` is ``P_sat(T)``
+    and not a live melt ``P_eq``. ``alpha_ub`` is 1 unless a cited alpha
+    is on the channel. Deposit still cannot exceed this supply; this
+    function does not price the wall.
+
+    Algebra. The kinetic coefficient is the publisher's
+    ``hertz_knudsen_k_kg_s_m2_pa``,
+
+        k_HK = sqrt(M / (2 * pi * R * T))
+
+    and the interval rate matches the evaporation kernel's kg/h conversion,
+
+        J_max_kg_hr = alpha_ub * P_sat * k_HK * area_m2 * 3600.
+
+    Unit check. ``k_HK`` is kg/(m^2 Pa s) because Pa = kg/(m s^2).
+    Times Pa * m^2 * s/h gives kg/h.
+
+    Sanity value, not a lunar fit. At 1500 K, M = 0.068 kg/mol,
+    P_sat = 1e-3 Pa, alpha = 1, area = 0.2 m^2, and R = 8.314462618
+    J/(mol K): k_HK = 9.315e-4 kg/(m^2 Pa s) and J_max = 6.707e-4 kg/h.
+    """
+
+    from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+
+    coefficient = hertz_knudsen_k_kg_s_m2_pa(
+        temperature_K,
+        molar_mass_kg_per_mol,
+    )
+    rate_kg_hr = (
+        alpha * pressure_pa * coefficient * area_m2 * 3600.0
+    )
+    if not math.isfinite(rate_kg_hr) or rate_kg_hr < 0.0:
+        raise CoatingFeasibilityReportError(
+            "activity-one supply bound must be finite and non-negative"
+        )
+    return rate_kg_hr
+
+
+def _activity_one_refused_supply_interval(
+    snapshot: Any,
+    species: str,
+) -> _WallSupplyInterval:
+    """Bound one refused interval, or type the missing input.
+
+    Unavailable only when this interval has no flux law and no
+    activity-1 saturation pressure, or when a required operand of that
+    bound is absent. The reason is the evidence string.
+    """
+
+    record = _carrier_channel(snapshot, species)
+    temperature_K = _snapshot_temperature_K(snapshot)
+    if temperature_K is None:
+        return _WallSupplyInterval(
+            _WALL_SUPPLY_UNAVAILABLE,
+            evidence="missing_temperature",
+        )
+    area_m2 = _snapshot_melt_area_m2(snapshot)
+    if area_m2 is None:
+        return _WallSupplyInterval(
+            _WALL_SUPPLY_UNAVAILABLE,
+            evidence="missing_melt_surface_area",
+        )
+    if record is not None and "activity_one_psat_pa" in record:
+        pressure_pa = _explicit_activity_one_psat_pa(record)
+    else:
+        pressure_pa = _catalog_activity_one_psat_pa(species, temperature_K)
+    if pressure_pa is None:
+        return _WallSupplyInterval(
+            _WALL_SUPPLY_UNAVAILABLE,
+            evidence="no_flux_law_and_no_psat",
+        )
+    if record is not None and "molar_mass_kg_per_mol" in record:
+        molar_mass = _explicit_molar_mass_kg_per_mol(record)
+    else:
+        molar_mass = _catalog_molar_mass_kg_per_mol(species)
+    if molar_mass is None:
+        return _WallSupplyInterval(
+            _WALL_SUPPLY_UNAVAILABLE,
+            evidence="missing_molar_mass",
+        )
+    rate_kg_hr = _activity_one_bound_rate_kg_hr(
+        temperature_K=temperature_K,
+        pressure_pa=pressure_pa,
+        molar_mass_kg_per_mol=molar_mass,
+        area_m2=area_m2,
+        alpha=_cited_evaporation_alpha(record),
+    )
+    return _WallSupplyInterval(
+        _WALL_SUPPLY_UPPER_BOUND,
+        rate_kg_hr=rate_kg_hr,
+        evidence=SUPPLY_INTERVAL_UPPER_BOUND_USED,
+    )
+
+
 def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyInterval:
     """Classify one refused-wall species on one interval.
 
-    Invariant (d-367). This is the only classifier the supply integral
-    uses. A positive-duration interval contributes exactly one of:
+    This is the only classifier the supply integral uses. A
+    positive-duration interval contributes exactly one of:
 
     - ``computed``: the rate map names this species. Any finite
       non-negative magnitude counts, including 0 and a rate at or below
@@ -2164,9 +2499,15 @@ def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyIn
       ``zero_by_physics`` with an eligible flux) or below-bound zero
       (``proven_below_threshold``, doctrine category 3) covers that
       species when the certificate does not.
-    - ``unavailable``: every other positive-duration interval. A
-      refusal, an upper bound, a missing flux map, or absence from a
-      present map without a covering record is unavailable, never zero.
+    - ``supply_interval_upper_bound``: the interval is refused, or the
+      species is on the carrier map without a rate and without a
+      covering zero, and the activity-1 saturation pressure can be
+      evaluated. The rate is the Hertz-Knudsen upper bound. One such
+      interval does not drop the species. Withholding the other hours
+      would book an implicit zero.
+    - ``unavailable``: no flux law and no saturation pressure, or an
+      operand of that bound is missing. The evidence names which.
+      A missing flux map and an absent carrier record are this class.
       One unavailable interval drops the species. The partial sum of
       the other intervals is not a supply.
 
@@ -2197,7 +2538,10 @@ def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyIn
     # does not: that species is absent from the rate map and the
     # certificate covers it.
     if _interval_certificate_leaves_species_uncovered(flux, species):
-        return _WallSupplyInterval(_WALL_SUPPLY_UNAVAILABLE, evidence="refused")
+        # A refusal is not a physical zero and not an implicit zero.
+        # Bound the hour when saturation pressure exists. Withholding
+        # the species would drop the other hours.
+        return _activity_one_refused_supply_interval(snapshot, species)
     interval_reason = _interval_physical_zero_reason(flux)
     if interval_reason:
         return _WallSupplyInterval(
@@ -2208,12 +2552,12 @@ def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyIn
     if evidence:
         return _WallSupplyInterval(_WALL_SUPPLY_PHYSICAL_ZERO, evidence=evidence)
     channels = getattr(flux, "carrier_authority_by_species", None)
-    omitted_evidence = (
-        "refused"
-        if isinstance(channels, MappingABC) and species in channels
-        else "absent_no_record"
+    if isinstance(channels, MappingABC) and species in channels:
+        return _activity_one_refused_supply_interval(snapshot, species)
+    return _WallSupplyInterval(
+        _WALL_SUPPLY_UNAVAILABLE,
+        evidence="absent_no_record",
     )
-    return _WallSupplyInterval(_WALL_SUPPLY_UNAVAILABLE, evidence=omitted_evidence)
 
 
 def _optimizer_refused_flux_bounds(
@@ -2222,19 +2566,21 @@ def _optimizer_refused_flux_bounds(
     *,
     campaigns_elapsed: float = 1.0,
 ) -> dict[str, float]:
-    """Integral of each species' computed vapour flux over the window.
+    """Integral of each species' vapour supply over the window.
 
     Product summary, furnace lifespan, and the tap projection book only
     the map returned here. No other path integrates a wall-supply flux.
     Each positive-duration interval is classified by
     ``_classify_wall_supply_interval`` and is not re-read here.
 
-    A returned number sums computed rates. An evidenced physical zero
-    adds nothing and keeps the species observed. One unavailable
-    interval drops that species: the partial sum of the other intervals
-    is not a supply, and the wall refusal stays. A sibling with a
-    complete integral is still returned. Species order does not change
-    the values.
+    A returned number sums computed rates and activity-1 supply bounds.
+    ``supply_interval_upper_bound_used`` counts the bounded refused
+    intervals. That count is not divided by ``campaigns_elapsed``. An
+    evidenced physical zero adds nothing and keeps the species observed.
+    One unavailable interval drops that species: the partial sum of the
+    other intervals is not a supply, and the wall refusal stays. A
+    sibling with a complete integral is still returned. Species order
+    does not change the values.
 
     A species absent from every contributing interval is not given a
     fabricated zero. Ledger resolution is not applied here. Booking
@@ -2251,6 +2597,7 @@ def _optimizer_refused_flux_bounds(
     totals = {species: 0.0 for species in refused_species}
     observed: set[str] = set()
     withheld: set[str] = set()
+    bound_counts = {species: 0 for species in refused_species}
     for snapshot in tuple(snapshots or ()):
         for species in refused_species:
             contribution = _classify_wall_supply_interval(snapshot, species)
@@ -2262,7 +2609,10 @@ def _optimizer_refused_flux_bounds(
             if contribution.kind == _WALL_SUPPLY_PHYSICAL_ZERO:
                 observed.add(species)
                 continue
-            if contribution.kind != _WALL_SUPPLY_COMPUTED:
+            if contribution.kind not in (
+                _WALL_SUPPLY_COMPUTED,
+                _WALL_SUPPLY_UPPER_BOUND,
+            ):
                 raise CoatingFeasibilityReportError(
                     "wall-supply interval classifier returned "
                     f"{contribution.kind!r} for {species!r}"
@@ -2270,11 +2620,14 @@ def _optimizer_refused_flux_bounds(
             duration_h = _snapshot_duration_h(snapshot)
             totals[species] += float(contribution.rate_kg_hr) * duration_h
             observed.add(species)
-    return {
+            if contribution.kind == _WALL_SUPPLY_UPPER_BOUND:
+                bound_counts[species] += 1
+    masses = {
         species: float(totals[species] / campaigns_elapsed)
         for species in refused_species
         if species in observed and species not in withheld
     }
+    return _WallSupplyIntegral(masses, bound_counts)
 
 
 def _knudsen_summary_from_eval_inputs(

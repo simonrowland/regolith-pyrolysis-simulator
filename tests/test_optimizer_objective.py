@@ -9,6 +9,7 @@ from typing import Mapping
 import pytest
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
 from simulator.optimize import study
 import simulator.optimize.objective as objective_module
 from scripts import sso_r_validation_map as validation_map
@@ -33,6 +34,7 @@ from simulator.vapour_rail.batch import (
 )
 import simulator.optimize.evaluate as evaluate_module
 from simulator.optimize.evaluate import (
+    SUPPLY_INTERVAL_UPPER_BOUND_USED,
     RunReference,
     ScoredResult,
     _WallSupplyInterval,
@@ -3349,6 +3351,340 @@ def test_wall_supply_interval_contributes_exactly_one_class(
             (species,),
             campaigns_elapsed=1.0,
         )
+
+
+# Activity-1 Hertz-Knudsen pin. 1500 K, 1e-3 Pa, 0.068 kg/mol, 0.2 m^2.
+# The expected kilogram rate is alpha * P_sat * k_HK * area * 3600, with
+# k_HK from the publisher. It is not a copied lunar magnitude.
+_ACTIVITY_ONE_T_K = 1500.0
+_ACTIVITY_ONE_T_C = _ACTIVITY_ONE_T_K - 273.15
+_ACTIVITY_ONE_AREA_M2 = 0.2
+_ACTIVITY_ONE_MASS_KG_PER_MOL = 0.068
+_ACTIVITY_ONE_PSAT_PA = 1.0e-3
+
+
+def _activity_one_j_max_kg_hr(
+    *,
+    temperature_K: float = _ACTIVITY_ONE_T_K,
+    pressure_pa: float = _ACTIVITY_ONE_PSAT_PA,
+    molar_mass_kg_per_mol: float = _ACTIVITY_ONE_MASS_KG_PER_MOL,
+    area_m2: float = _ACTIVITY_ONE_AREA_M2,
+    alpha: float = 1.0,
+) -> float:
+    coefficient = hertz_knudsen_k_kg_s_m2_pa(
+        temperature_K,
+        molar_mass_kg_per_mol,
+    )
+    return alpha * pressure_pa * coefficient * area_m2 * 3600.0
+
+
+def _activity_one_refusal_snapshot(
+    species: str,
+    *,
+    hour: int,
+    duration_h: float = 1.0,
+    temperature_C: float | None = _ACTIVITY_ONE_T_C,
+    area_m2: float | None = _ACTIVITY_ONE_AREA_M2,
+    pressure_pa: float | None = _ACTIVITY_ONE_PSAT_PA,
+    molar_mass_kg_per_mol: float | None = _ACTIVITY_ONE_MASS_KG_PER_MOL,
+    cited_alpha: float | None = None,
+    omit_psat: bool = False,
+    omit_molar_mass: bool = False,
+    rates: Mapping[str, float] | None = None,
+) -> SimpleNamespace:
+    """One refused carrier hour. ``pressure.pa`` is not the saturation pressure."""
+
+    record = _transport_refusal_channel(species)
+    if not omit_psat:
+        record["activity_one_psat_pa"] = pressure_pa
+    if not omit_molar_mass and molar_mass_kg_per_mol is not None:
+        record["molar_mass_kg_per_mol"] = molar_mass_kg_per_mol
+    if cited_alpha is not None:
+        record["cited_alpha"] = cited_alpha
+    fields: dict[str, object] = {
+        "published_species_kg_hr": dict(rates or {}),
+        "species_kg_hr": dict(rates or {}),
+        "carrier_authority_by_species": {species: record},
+    }
+    if area_m2 is not None:
+        fields["melt_surface_area_m2"] = area_m2
+    snapshot_fields: dict[str, object] = {
+        "hour": hour,
+        "duration_h": duration_h,
+        "evap_flux": SimpleNamespace(**fields),
+    }
+    if temperature_C is not None:
+        snapshot_fields["temperature_C"] = temperature_C
+    return SimpleNamespace(**snapshot_fields)
+
+
+def _refused_supply_execution(
+    snapshots: tuple[object, ...],
+    refused: tuple[tuple[str, str], ...],
+    *,
+    charge_kg: float = 1000.0,
+) -> SimpleNamespace:
+    refused_by_species: dict[str, list[str]] = {}
+    for species, segment in refused:
+        segments = refused_by_species.setdefault(species, [])
+        if segment not in segments:
+            segments.append(segment)
+    authority = {
+        "wall_saturation_pressure_refusals_by_species": {
+            species: {
+                segment: {
+                    "status": "refused",
+                    "output_status": "status_bearing",
+                    "reason": f"antoine domain refused for {species}",
+                }
+                for segment in segments
+            }
+            for species, segments in refused_by_species.items()
+        }
+    }
+    zones = {
+        segment: "Hot"
+        for segments in refused_by_species.values()
+        for segment in segments
+    }
+    sim = _FakeProductSim()
+    sim.record.batch_mass_kg = charge_kg
+    return SimpleNamespace(
+        simulator=sim,
+        snapshots=snapshots,
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg={},
+            wall_zone_by_segment=zones,
+            wall_deposit_sticking_authority=authority,
+        ),
+    )
+
+
+def test_refused_interval_contributes_the_activity_one_bound() -> None:
+    """A refused hour adds exactly J_max and is flagged.
+
+    J_max = alpha_ub * P_sat * k_HK * area * 3600. alpha_ub is 1 unless
+    the channel carries a cited alpha. P_sat of 0 is a bound of 0, still
+    flagged, not an unavailable species. The interval count is not
+    divided when the kilogram map is reported per campaign.
+    """
+
+    species = "SiO"
+    expected = _activity_one_j_max_kg_hr()
+    snapshot = _activity_one_refusal_snapshot(species, hour=1)
+    interval = _classify_wall_supply_interval(snapshot, species)
+    assert interval.kind == "supply_interval_upper_bound"
+    assert interval.evidence == SUPPLY_INTERVAL_UPPER_BOUND_USED
+    assert interval.rate_kg_hr == _approx_kg(expected)
+    bounds = _optimizer_refused_flux_bounds(
+        (snapshot,),
+        (species,),
+        campaigns_elapsed=1.0,
+    )
+    assert bounds[species] == _approx_kg(expected)
+    assert bounds.supply_interval_upper_bound_used == {species: 1}
+    per_campaign = _optimizer_refused_flux_bounds(
+        (snapshot,),
+        (species,),
+        campaigns_elapsed=2.0,
+    )
+    assert per_campaign[species] == _approx_kg(expected / 2.0)
+    assert per_campaign.supply_interval_upper_bound_used == {species: 1}
+
+    cited = _activity_one_refusal_snapshot(species, hour=1, cited_alpha=0.5)
+    cited_interval = _classify_wall_supply_interval(cited, species)
+    assert cited_interval.rate_kg_hr == _approx_kg(
+        _activity_one_j_max_kg_hr(alpha=0.5)
+    )
+
+    zero = _activity_one_refusal_snapshot(species, hour=1, pressure_pa=0.0)
+    zero_interval = _classify_wall_supply_interval(zero, species)
+    assert zero_interval.kind == "supply_interval_upper_bound"
+    assert zero_interval.rate_kg_hr == 0.0
+    zero_bounds = _optimizer_refused_flux_bounds(
+        (zero,),
+        (species,),
+        campaigns_elapsed=1.0,
+    )
+    assert zero_bounds[species] == 0.0
+    assert zero_bounds.supply_interval_upper_bound_used == {species: 1}
+
+
+def test_one_refused_interval_among_computed_hours_is_booked() -> None:
+    """One bounded refusal does not drop the computed hours."""
+
+    species = "SiO"
+    sibling = "Mg"
+    expected_bound = _activity_one_j_max_kg_hr()
+    snapshots = (
+        _interval_flux_snapshot(1, 1.0, {species: 1.0, sibling: 0.5}),
+        _activity_one_refusal_snapshot(
+            species,
+            hour=2,
+            rates={sibling: 0.4},
+        ),
+    )
+    bounds = _optimizer_refused_flux_bounds(
+        snapshots,
+        (species, sibling),
+        campaigns_elapsed=1.0,
+    )
+    assert bounds[species] == _approx_kg(1.0 + expected_bound)
+    assert bounds[sibling] == _approx_kg(0.9)
+    assert bounds.supply_interval_upper_bound_used == {species: 1}
+
+    execution = _refused_supply_execution(
+        snapshots,
+        ((species, "hot_wall"),),
+    )
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        {},
+        execution.trace.wall_deposit_sticking_authority,
+        execution,
+    )
+    booking = {item["species"]: item for item in booked["bookings"]}[species]
+    assert booking["reason"] == _WALL_BOUND_UPPER
+    assert booking["flag"] == _WALL_BOUND_UPPER
+    assert booking["deposit_kg"] == _approx_kg(bounds[species])
+    assert booking[SUPPLY_INTERVAL_UPPER_BOUND_USED] == 1
+    assert booked["deposit"][("hot_wall", species)] == _approx_kg(bounds[species])
+
+
+def test_sio_refused_wall_psat_books_a_flagged_coating_lifetime() -> None:
+    """SiO's refused wall saturation pressure books the supply.
+
+    The deposit is the supply, flagged wall_deposit_upper_bound_used.
+    resinter_threshold_kg is null, so the campaign count stays the
+    ungrounded ratio and the priced lifetime load is wall_deposit_total_kg.
+    """
+
+    species = "SiO"
+    snapshot = _activity_one_refusal_snapshot(species, hour=1)
+    supply = _activity_one_j_max_kg_hr()
+    execution = _refused_supply_execution(
+        (snapshot,),
+        ((species, "hot_wall"),),
+    )
+    summary = objective_module._coating_product_summary(execution)
+    assert summary["lifespan_cost_status"] == "threshold_unavailable"
+    assert summary["wall_deposit_total_kg"] == _approx_kg(supply)
+    assert summary["wall_deposit_upper_bound_used"] is True
+    assert summary[SUPPLY_INTERVAL_UPPER_BOUND_USED] == {species: 1}
+    assert str(summary["campaigns_to_resinter"]).startswith(
+        "resinter_threshold_kg / "
+    )
+    # The refusal stays on the notice, so the readout is non-authoritative.
+    # The quantity itself is the flagged supply, not an unavailable wall.
+    assert summary["coating_status"] == "warning"
+    booking = summary["wall_supply_bound_bookings"][0]
+    assert booking["species"] == species
+    assert booking["deposit_kg"] == _approx_kg(supply)
+    assert booking["flag"] == _WALL_BOUND_UPPER
+    lifespan = objective_module._furnace_lifespan_cost_summary(
+        execution,
+        execution.simulator,
+    )
+    assert lifespan["lifespan_cost_status"] == "threshold_unavailable"
+    assert lifespan["wall_deposit_total_kg"] == _approx_kg(supply)
+    assert lifespan["wall_deposit_upper_bound_used"] is True
+    assert lifespan[SUPPLY_INTERVAL_UPPER_BOUND_USED] == {species: 1}
+
+
+def test_unavailable_supply_is_only_no_flux_law_and_no_psat() -> None:
+    """A typed gap is no flux law and no saturation pressure.
+
+    An explicit absent activity-1 pressure does not fall through to the
+    catalog. One such hour withholds the species, including a computed
+    hour beside it. A refused hour that does have P_sat is not that gap.
+    """
+
+    species = "SiO"
+    gap = _activity_one_refusal_snapshot(species, hour=2, pressure_pa=None)
+    interval = _classify_wall_supply_interval(gap, species)
+    assert interval.kind == "unavailable"
+    assert interval.evidence == "no_flux_law_and_no_psat"
+    snapshots = (
+        _interval_flux_snapshot(1, 1.0, {species: 1.0}),
+        gap,
+    )
+    bounds = _optimizer_refused_flux_bounds(
+        snapshots,
+        (species,),
+        campaigns_elapsed=1.0,
+    )
+    assert species not in bounds
+    execution = _refused_supply_execution(
+        snapshots,
+        ((species, "hot_wall"),),
+    )
+    summary = objective_module._coating_product_summary(execution)
+    assert summary["coating_unavailable_reason"] == (
+        "wall saturation pressure refused for SiO; "
+        "vapour flux upper bound unavailable"
+    )
+    assert not summary.get("wall_supply_bound_bookings")
+
+    bounded = _activity_one_refusal_snapshot(species, hour=1)
+    bounded_interval = _classify_wall_supply_interval(bounded, species)
+    assert bounded_interval.kind == "supply_interval_upper_bound"
+    assert bounded_interval.evidence == SUPPLY_INTERVAL_UPPER_BOUND_USED
+
+
+def test_refused_cro_interval_uses_catalog_activity_one_psat() -> None:
+    """CrO with no explicit pressure uses the catalog activity-1 law.
+
+    The expected rate calls the publisher coefficient and the catalog
+    evaluator on their own. 1800 K is inside the CrO fit.
+    """
+
+    from simulator.config import DEFAULT_DATA_DIR
+    from simulator.evaporation import production_vapor_molar_mass_g_per_mol
+    from simulator.vapour_rail.catalog import compiled_catalog_for
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    species = "CrO"
+    temperature_K = 1800.0
+    area_m2 = 0.2
+    payload = load_cached_safe_yaml(
+        (DEFAULT_DATA_DIR / "vapor_pressures.yaml").read_bytes()
+    )
+    catalog = compiled_catalog_for(payload, emit_u0_request_rules=False)
+    evaluator = catalog.evaluator_for_hot_train(species)
+    evaluation = evaluator.evaluate(
+        temperature_K,
+        source_activity=1.0,
+        pO2_bar=float(evaluator.pO2_reference_bar),
+    )
+    pressure_pa = float(evaluation.pressure_pa)
+    reference_pa = 10.0 ** evaluator.reference_model.log10_pressure(temperature_K)
+    assert pressure_pa == pytest.approx(reference_pa)
+    grams = production_vapor_molar_mass_g_per_mol(catalog.legacy_view(), species)
+    assert grams is not None
+    expected = _activity_one_j_max_kg_hr(
+        temperature_K=temperature_K,
+        pressure_pa=pressure_pa,
+        molar_mass_kg_per_mol=float(grams) / 1000.0,
+        area_m2=area_m2,
+    )
+    snapshot = _activity_one_refusal_snapshot(
+        species,
+        hour=1,
+        temperature_C=temperature_K - 273.15,
+        area_m2=area_m2,
+        omit_psat=True,
+        omit_molar_mass=True,
+    )
+    interval = _classify_wall_supply_interval(snapshot, species)
+    assert interval.kind == "supply_interval_upper_bound"
+    assert interval.evidence == SUPPLY_INTERVAL_UPPER_BOUND_USED
+    assert interval.rate_kg_hr == _approx_kg(expected)
+    bounds = _optimizer_refused_flux_bounds(
+        (snapshot,),
+        (species,),
+        campaigns_elapsed=1.0,
+    )
+    assert bounds[species] == _approx_kg(expected)
+    assert bounds.supply_interval_upper_bound_used == {species: 1}
 
 
 @pytest.mark.parametrize("kind", _WALL_SUPPLY_INTERVAL_KINDS)
