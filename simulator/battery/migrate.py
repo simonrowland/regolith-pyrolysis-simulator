@@ -14550,7 +14550,9 @@ def _partial_pressure_point_condition(
     stored = total.value
     if isinstance(stored, ApproxPressure):
         # Point conditions stay printed points. The band lives on the identity.
-        stored = Value(ValueKind.POINT, point=stored.point, approximate=True)
+        stored = _value_from_plain(
+            {"kind": "point", "point": stored.point, "approximate": True}
+        )
     return located_value(stored, locator)
 
 
