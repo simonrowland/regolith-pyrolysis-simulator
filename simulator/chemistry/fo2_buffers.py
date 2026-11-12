@@ -444,7 +444,7 @@ _WUSTITE_Y = Decimal("0.053")
 _WUSTITE_DENOM = 1 - 4 * _WUSTITE_Y
 _NU_WUSTITE = Decimal(6) / _WUSTITE_DENOM
 _NU_MAGNETITE = (Decimal(2) - 2 * _WUSTITE_Y) / _WUSTITE_DENOM
-_JANAF_TABLES = Path(__file__).resolve().parents[1] / (
+_JANAF_TABLES = Path(__file__).resolve().parents[2] / (
     "data/literature/compilations/janaf/tables"
 )
 _JANAF_ROWS: dict[str, tuple[tuple[Decimal, Decimal], ...]] = {}
