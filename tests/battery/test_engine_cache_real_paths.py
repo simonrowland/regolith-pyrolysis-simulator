@@ -31,6 +31,9 @@ class _SettingCase:
     backend_factory: Callable[[], Any]
     mutate: Callable[[Any], None]
     output: Callable[[Any], float]
+    configuration: dict[str, Any]
+    setting: str
+    changed_value: Any
 
 
 def _setting_cases() -> tuple[_SettingCase, ...]:
@@ -92,15 +95,21 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             lambda backend: {"subprocess": 0.25, "python_api": 0.75}[
                 backend._mode
             ],
+            {"transport": "subprocess"},
+            "transport",
+            "python_api",
         ),
         _SettingCase(
             "AlphaMELTS model",
             Engine.ALPHAMELTS,
             alpha_backend,
-            lambda backend: setattr(backend, "_model", "rhyolite-MELTS"),
-            lambda backend: {"MELTS-v1.0": 0.25, "rhyolite-MELTS": 0.75}[
+            lambda backend: setattr(backend, "_model", "pMELTS"),
+            lambda backend: {"MELTS-v1.0": 0.25, "pMELTS": 0.75}[
                 backend._model
             ],
+            {"raw_model_name": "MELTSv1.0.2"},
+            "raw_model_name",
+            "pMELTS",
         ),
         _SettingCase(
             "AlphaMELTS Python API model",
@@ -111,6 +120,12 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 None: 0.25,
                 ("pMELTS", 1): 0.75,
             }[backend._python_api_model],
+            {
+                "transport": "python_api",
+                "python_api_model": ("MELTSv1.0.2", 1),
+            },
+            "python_api_model",
+            ["pMELTS", 1],
         ),
         _SettingCase(
             "AlphaMELTS redox buffer",
@@ -118,6 +133,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             alpha_backend,
             lambda backend: setattr(backend, "_redox_buffer", "NNO"),
             lambda backend: {"QFM": 0.25, "NNO": 0.75}[backend._redox_buffer],
+            {"redox_buffer": "QFM"},
+            "redox_buffer",
+            "NNO",
         ),
         _SettingCase(
             "AlphaMELTS fO2 offset",
@@ -125,6 +143,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             alpha_backend,
             lambda backend: setattr(backend, "_fo2_offset", 0.5),
             lambda backend: {0.0: 0.25, 0.5: 0.75}[backend._fo2_offset],
+            {"fO2_offset": 0.0},
+            "fO2_offset",
+            0.5,
         ),
         _SettingCase(
             "AlphaMELTS Fe3+/Fet ratio",
@@ -132,6 +153,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             alpha_backend,
             lambda backend: setattr(backend, "_fe3fet_ratio", 0.3),
             lambda backend: {None: 0.25, 0.3: 0.75}[backend._fe3fet_ratio],
+            {"Fe3Fet_ratio": None},
+            "Fe3Fet_ratio",
+            0.3,
         ),
         _SettingCase(
             "AlphaMELTS configured vapor pO2",
@@ -144,6 +168,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 1.0e-8: 0.25,
                 1.0e-3: 0.75,
             }[backend._configured_vapor_transport_pO2_bar],
+            {"configured_vapor_transport_pO2_bar": 1.0e-8},
+            "configured_vapor_transport_pO2_bar",
+            1.0e-3,
         ),
         _SettingCase(
             "AlphaMELTS configured vapor floor",
@@ -156,6 +183,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 1.0e-9: 0.25,
                 1.0e-6: 0.75,
             }[backend._configured_vapor_transport_floor_bar],
+            {"configured_vapor_transport_floor_bar": 1.0e-9},
+            "configured_vapor_transport_floor_bar",
+            1.0e-6,
         ),
         _SettingCase(
             "MAGEMin database",
@@ -163,6 +193,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             magemin_backend,
             lambda backend: setattr(backend, "_database", "mp"),
             lambda backend: {"ig": 0.25, "mp": 0.75}[backend._database],
+            {"database": "ig"},
+            "database",
+            "mp",
         ),
         _SettingCase(
             "MAGEMin worker fO2 buffer",
@@ -172,6 +205,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             lambda backend: {"qfm": 0.25, "nno": 0.75}[
                 backend._config["fO2_buffer"]
             ],
+            {"fO2_buffer": "qfm"},
+            "fO2_buffer",
+            "nno",
         ),
         _SettingCase(
             "MAGEMin bridge selection",
@@ -179,6 +215,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             magemin_backend,
             lambda backend: setattr(backend, "_bridge", "julia"),
             lambda backend: {"subprocess": 0.25, "julia": 0.75}[backend._bridge],
+            {"bridge": "subprocess"},
+            "bridge",
+            "julia",
         ),
         _SettingCase(
             "ThermoEngine transport model",
@@ -189,6 +228,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 "MELTS-v1.0": 0.25,
                 "rhyolite-MELTS": 0.75,
             }[backend._model],
+            {"model": "MELTSv1.0.2"},
+            "model",
+            "rhyolite-MELTS",
         ),
         _SettingCase(
             "ThermoEngine vapor transport pO2",
@@ -201,6 +243,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 None: 0.25,
                 1.0e-3: 0.75,
             }[backend._configured_vapor_transport_pO2_bar],
+            {"configured_vapor_transport_pO2_bar": 1.0e-9},
+            "configured_vapor_transport_pO2_bar",
+            1.0e-3,
         ),
         _SettingCase(
             "ThermoEngine vapor transport floor",
@@ -213,6 +258,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 None: 0.25,
                 1.0e-6: 0.75,
             }[backend._configured_vapor_transport_floor_bar],
+            {"configured_vapor_transport_floor_bar": 1.0e-9},
+            "configured_vapor_transport_floor_bar",
+            1.0e-6,
         ),
         _SettingCase(
             "OpenIMCC loaded cell pack",
@@ -226,16 +274,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 "openimcc-v1.0.2": 0.25,
                 "openimcc-v1.0.3-ext-v1": 0.75,
             }[backend._effective_pack_name],
-        ),
-        _SettingCase(
-            "OpenIMCC gas pack",
-            Engine.OPENIMCC,
-            openimcc_backend,
-            lambda backend: setattr(backend, "_gas_pack_name", "published-gas-ext"),
-            lambda backend: {
-                "default": 0.25,
-                "published-gas-ext": 0.75,
-            }[backend._gas_pack_name],
+            {"pack": "openimcc-v1.0.2"},
+            "pack",
+            "openimcc-v1.0.3-ext-v1",
         ),
         _SettingCase(
             "VapoRock temperature units",
@@ -243,6 +284,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             vaporock_backend,
             lambda backend: setattr(backend, "_temperature_units", "K"),
             lambda backend: {"C": 0.25, "K": 0.75}[backend._temperature_units],
+            {"temperature_units": "C"},
+            "temperature_units",
+            "K",
         ),
         _SettingCase(
             "VapoRock pressure units",
@@ -250,6 +294,9 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             vaporock_backend,
             lambda backend: setattr(backend, "_pressure_units", "Pa"),
             lambda backend: {"bar": 0.25, "Pa": 0.75}[backend._pressure_units],
+            {"pressure_units": "bar"},
+            "pressure_units",
+            "Pa",
         ),
         _SettingCase(
             "VapoRock vapor pressure units",
@@ -260,12 +307,18 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 "bar": 0.25,
                 "Pa": 0.75,
             }[backend._vapor_pressure_units],
+            {"vapor_pressure_units": "bar"},
+            "vapor_pressure_units",
+            "Pa",
         ),
     )
 
 
 @pytest.mark.parametrize("case", _setting_cases(), ids=lambda case: case.label)
 def test_each_projected_engine_setting_changes_the_key(case: _SettingCase) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
     from simulator.engine_cache import (
         ENGINE_CHEMISTRY_VERSION,
         engine_cache_key,
@@ -273,7 +326,10 @@ def test_each_projected_engine_setting_changes_the_key(case: _SettingCase) -> No
     )
 
     backend = case.backend_factory()
-    before_settings = engine_cache_settings(case.engine.value, backend)
+    configuration = dict(case.configuration)
+    before_settings = engine_cache_settings(
+        case.engine.value, normalize_engine_settings(case.engine.value, configuration)
+    )
     before_key = engine_cache_key(
         case.engine.value,
         ENGINE_CHEMISTRY_VERSION[case.engine.value],
@@ -282,7 +338,10 @@ def test_each_projected_engine_setting_changes_the_key(case: _SettingCase) -> No
     assert case.output(backend) == 0.25
 
     case.mutate(backend)
-    after_settings = engine_cache_settings(case.engine.value, backend)
+    configuration[case.setting] = case.changed_value
+    after_settings = engine_cache_settings(
+        case.engine.value, normalize_engine_settings(case.engine.value, configuration)
+    )
     after_key = engine_cache_key(
         case.engine.value,
         ENGINE_CHEMISTRY_VERSION[case.engine.value],
@@ -295,12 +354,11 @@ def test_each_projected_engine_setting_changes_the_key(case: _SettingCase) -> No
 
 
 @pytest.mark.parametrize(
-    ("engine", "case_label", "expected_fields"),
+    ("engine", "expected_fields"),
     (
-        (Engine.OPENIMCC, "OpenIMCC loaded cell pack", {"melt_pack", "gas_pack"}),
+        (Engine.OPENIMCC, {"melt_pack", "gas_pack"}),
         (
             Engine.ALPHAMELTS,
-            "AlphaMELTS model",
             {
                 "transport_mode",
                 "effective_calc_mode",
@@ -315,17 +373,14 @@ def test_each_projected_engine_setting_changes_the_key(case: _SettingCase) -> No
         ),
         (
             Engine.VAPOROCK,
-            "VapoRock temperature units",
             {"temperature_units", "pressure_units", "vapor_pressure_units"},
         ),
         (
             Engine.MAGEMIN,
-            "MAGEMin database",
             {"database", "bridge", "fO2_buffer"},
         ),
         (
             Engine.THERMOENGINE,
-            "ThermoEngine transport model",
             {
                 "model",
                 "vapor_transport_pO2_bar",
@@ -339,18 +394,23 @@ def test_each_projected_engine_setting_changes_the_key(case: _SettingCase) -> No
 )
 def test_engine_cache_settings_are_the_named_prediction_projection(
     engine: Engine,
-    case_label: str,
     expected_fields: set[str],
 ) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
     from simulator.engine_cache import engine_cache_settings
 
-    case = next(case for case in _setting_cases() if case.label == case_label)
-    settings = engine_cache_settings(engine.value, case.backend_factory())
+    settings = engine_cache_settings(
+        engine.value, normalize_engine_settings(engine.value, None)
+    )
 
     assert set(settings) == expected_fields
 
 
-def test_default_alphamelts_projection_matches_resolved_opener_settings() -> None:
+def test_default_alphamelts_projection_matches_resolved_opener_settings(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
     from simulator.engine_cache import (
         ENGINE_CHEMISTRY_VERSION,
@@ -362,24 +422,25 @@ def test_default_alphamelts_projection_matches_resolved_opener_settings() -> Non
     if not handle.available or handle.backend is None:
         pytest.skip("default AlphaMELTS backend is unavailable")
     try:
-        resolved_projection = engine_cache_settings(
+        normalized_projection = engine_cache_settings(handle.name, handle.engine_settings)
+        requests, projection_inputs = _capture_engine_cache_settings_paths(
             handle.name,
+            handle.engine_settings,
             handle.backend,
-            effective_settings=handle.engine_settings,
+            monkeypatch,
         )
-        normalized_projection = engine_cache_settings(
-            handle.name, handle.engine_settings
-        )
-
-        assert engine_cache_key(
-            handle.name,
-            ENGINE_CHEMISTRY_VERSION[handle.name],
-            {"engine_settings": resolved_projection},
-        ) == engine_cache_key(
-            handle.name,
-            ENGINE_CHEMISTRY_VERSION[handle.name],
-            {"engine_settings": normalized_projection},
-        )
+        assert len(requests) == 2
+        assert projection_inputs[0] is handle.engine_settings
+        for request in requests:
+            assert engine_cache_key(
+                handle.name,
+                ENGINE_CHEMISTRY_VERSION[handle.name],
+                {"engine_settings": request["engine_settings"]},
+            ) == engine_cache_key(
+                handle.name,
+                ENGINE_CHEMISTRY_VERSION[handle.name],
+                {"engine_settings": normalized_projection},
+            )
     finally:
         close_battery_engine_handle(handle)
 
@@ -886,7 +947,22 @@ def test_melts_redox_projection_covers_shared_normalizer_inputs(engine: str) -> 
 @pytest.mark.parametrize(
     "engine,configuration",
     (
+        ("openimcc", {}),
+        ("alphamelts", {}),
+        ("vaporock", {}),
+        ("magemin", {}),
+        ("thermoengine", {}),
         ("openimcc", {"pack": "published-core", "gas_pack": "ignored"}),
+        (
+            "alphamelts",
+            {
+                "transport": None,
+                "raw_model_name": None,
+                "configured_vapor_transport_pO2_bar": None,
+                "configured_vapor_transport_floor_bar": None,
+            },
+        ),
+        ("alphamelts", {"transport": "python_api"}),
         (
             "alphamelts",
             {
@@ -905,10 +981,27 @@ def test_melts_redox_projection_covers_shared_normalizer_inputs(engine: str) -> 
         (
             "vaporock",
             {
+                "temperature_units": None,
+                "pressure_units": None,
+                "vapor_pressure_units": None,
+            },
+        ),
+        (
+            "vaporock",
+            {
                 "temperature_units": "C",
                 "pressure_units": "bar",
                 "vapor_pressure_units": "bar",
                 "warm_worker": False,
+            },
+        ),
+        (
+            "magemin",
+            {
+                "database": None,
+                "bridge": None,
+                "python_bridge": None,
+                "fO2_buffer": None,
             },
         ),
         (
@@ -919,6 +1012,14 @@ def test_melts_redox_projection_covers_shared_normalizer_inputs(engine: str) -> 
                 "python_bridge": "subprocess",
                 "fO2_buffer": "QFM",
                 "warm_worker": False,
+            },
+        ),
+        (
+            "thermoengine",
+            {
+                "model": None,
+                "configured_vapor_transport_pO2_bar": None,
+                "configured_vapor_transport_floor_bar": None,
             },
         ),
         (
@@ -1033,7 +1134,9 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
     for key in raw.reads - set(neutral):
         changed = dict(configuration)
         value = changed.get(key)
-        if isinstance(value, bool):
+        if engine == "alphamelts" and key == "raw_model_name":
+            changed[key] = "pMELTS"
+        elif isinstance(value, bool):
             changed[key] = not value
         elif isinstance(value, (int, float)):
             changed[key] = value + 1
@@ -1088,6 +1191,9 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
         opened_backend = binary_pot_battery._open_resolved_backend(engine, raw)
     except BackendUnavailableError:
         pass
+    except RuntimeError as exc:
+        if engine != "thermoengine" or "No module named 'thermoengine'" not in str(exc):
+            raise
     finally:
         if opened_backend is not None:
             close_battery_engine_handle(
@@ -1167,6 +1273,8 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
                     changed[source] = value + "-changed"
                 elif isinstance(value, tuple):
                     changed[source] = (*value, 2)
+                elif value is None:
+                    changed[source] = "changed"
                 else:
                     pytest.fail(
                         f"cannot mutate backend setting {engine}.{key}: {value!r}"
@@ -1186,44 +1294,6 @@ def test_internal_analytical_projection_does_not_inspect_uncacheable_backend() -
     assert engine_cache_settings("internal-analytical", object()) == {}
 
 
-def test_engine_cache_settings_do_not_read_or_mutate_unprojected_backend_state() -> None:
-    from simulator.engine_cache import engine_cache_key, engine_cache_settings
-
-    class LazyCore:
-        touched = False
-
-        @property
-        def condensation_model(self) -> object:
-            self.touched = True
-            return object()
-
-    core = LazyCore()
-    backend = SimpleNamespace(_core=core, _mode="openimcc")
-    before = {name: id(value) for name, value in vars(backend).items()}
-
-    engine_cache_settings("internal-analytical", backend)
-
-    assert not core.touched
-    assert {name: id(value) for name, value in vars(backend).items()} == before
-
-    class LazyOpenImcc:
-        _identity = {"pack": "published-core"}
-        _pack_name = "default"
-        _gas_pack_name = "default"
-
-        @property
-        def _effective_pack_name(self) -> str:
-            self.property_was_read = True
-            return self._identity["pack"]
-
-    openimcc = LazyOpenImcc()
-    settings = engine_cache_settings("openimcc", openimcc)
-    engine_cache_key("openimcc", 1, settings)
-
-    assert settings["melt_pack"] == "published-core"
-    assert "property_was_read" not in vars(openimcc)
-
-
 @pytest.mark.parametrize(
     "case",
     tuple(case for case in _setting_cases() if case.engine is Engine.ALPHAMELTS),
@@ -1232,14 +1302,18 @@ def test_engine_cache_settings_do_not_read_or_mutate_unprojected_backend_state()
 def test_alphamelts_runtime_metadata_is_outside_the_prediction_projection(
     case: _SettingCase,
 ) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
     from simulator.engine_cache import engine_cache_settings
 
     backend = case.backend_factory()
-    before = engine_cache_settings(case.engine.value, backend)
+    settings = normalize_engine_settings(case.engine.value, case.configuration)
+    before = engine_cache_settings(case.engine.value, settings)
     backend._binary_path = Path("/runtime/first")
     backend._engine_path = Path("/runtime/first")
     backend._engine_version = "runtime-v1"
-    after = engine_cache_settings(case.engine.value, backend)
+    after = engine_cache_settings(case.engine.value, settings)
 
     assert after == before
 
@@ -1589,6 +1663,8 @@ def test_isolated_backend_reconstruction_disables_nested_pools(
         "fO2_offset",
         "Fe3Fet_Liq",
         "warm_worker",
+        "vapor_transport_pO2_bar",
+        "vapor_transport_floor_bar",
     }
     assert set(configs["thermoengine"]) == {
         "model",
@@ -1607,85 +1683,61 @@ def test_isolated_backend_reconstruction_disables_nested_pools(
     assert "warm_worker" not in configs["thermoengine"]
 
 
-def test_cache_settings_exclude_warm_pool_runtime_state() -> None:
-    from simulator.engine_cache import engine_cache_settings
-
-    backend = SimpleNamespace(
-        _temperature_units="C",
-        _pressure_units="bar",
-        _vapor_pressure_units="bar",
-        _config={"warm_worker": True, "warm_pool_size": 4},
-        _warm_pool=SimpleNamespace(call_count=0),
-        _warm_worker_enabled=True,
-        _warm_pool_size=1,
-        _startup_failure_disposition=None,
-    )
-    first = engine_cache_settings("vaporock", backend)
-    backend._warm_pool.call_count = 1
-    backend._startup_failure_disposition = "worker_died"
-    backend._warm_pool_size = 8
-    second = engine_cache_settings("vaporock", backend)
-
-    assert first == second == {
-        "temperature_units": "C",
-        "pressure_units": "bar",
-        "vapor_pressure_units": "bar",
-    }
-
-
 @pytest.mark.parametrize("case", _setting_cases(), ids=lambda case: case.label)
-def test_runtime_identity_is_outside_engine_settings(case: _SettingCase) -> None:
+def test_runtime_identity_is_outside_normalized_engine_settings(case: _SettingCase) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
     from simulator.engine_cache import engine_cache_settings
 
-    backend = case.backend_factory()
-    first = engine_cache_settings(case.engine.value, backend)
-    backend._engine_version = "runtime sha256:" + "a" * 64
-    backend.runtime_identity = {
+    configuration = dict(case.configuration)
+    first = engine_cache_settings(
+        case.engine.value, normalize_engine_settings(case.engine.value, configuration)
+    )
+    configuration["runtime_identity"] = {
         "commit": "b" * 64,
         "absolute_path": "/engine/runtime",
         "hostname": "runtime-host",
     }
-    backend.runtime_worker = SimpleNamespace(
-        ready_payload={"engine_version": "runtime-v2", "identity": "worker"}
-    )
-    if case.engine is Engine.THERMOENGINE:
-        backend._thermoengine_transport.engine_version = "runtime-v3"
 
-    assert engine_cache_settings(case.engine.value, backend) == first
+    assert engine_cache_settings(
+        case.engine.value, normalize_engine_settings(case.engine.value, configuration)
+    ) == first
 
 
 def test_magemin_bridge_selection_is_a_cache_setting() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
     from simulator.engine_cache import engine_cache_key, engine_cache_settings
 
-    case = next(case for case in _setting_cases() if case.label == "MAGEMin bridge selection")
-    backend = case.backend_factory()
-    first = engine_cache_settings("magemin", backend)
-    backend._bridge = "julia"
-    second = engine_cache_settings("magemin", backend)
+    first = engine_cache_settings(
+        "magemin", normalize_engine_settings("magemin", {"bridge": "subprocess"})
+    )
+    second = engine_cache_settings(
+        "magemin", normalize_engine_settings("magemin", {"bridge": "julia"})
+    )
 
     assert first["bridge"] == "subprocess"
     assert second["bridge"] == "julia"
     assert engine_cache_key("magemin", 1, first) != engine_cache_key("magemin", 1, second)
 
 
-def test_openimcc_cache_settings_use_selected_loaded_packs() -> None:
+def test_openimcc_cache_settings_use_selected_opener_pack() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
     from simulator.engine_cache import engine_cache_key, engine_cache_settings
-    from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
 
-    backend = object.__new__(_OpenImccBatteryBackend)
-    backend._pack_name = "default"
-    backend._gas_pack_name = "default"
-    backend._identity = {"pack": "published-core"}
+    first = engine_cache_settings(
+        "openimcc", normalize_engine_settings("openimcc", {"pack": "default"})
+    )
+    second = engine_cache_settings(
+        "openimcc", normalize_engine_settings("openimcc", {"pack": "published-ext"})
+    )
 
-    first = engine_cache_settings("openimcc", backend)
-    backend._identity["pack"] = "published-ext"
-    second = engine_cache_settings("openimcc", backend)
-    backend._gas_pack_name = "published-gas-ext"
-    third = engine_cache_settings("openimcc", backend)
-
-    assert first == {"melt_pack": "published-core", "gas_pack": "default"}
-    assert second["melt_pack"] == "published-ext"
-    assert third["gas_pack"] == "published-gas-ext"
+    assert first == {"melt_pack": "default", "gas_pack": "default"}
+    assert second == {"melt_pack": "published-ext", "gas_pack": "default"}
     assert engine_cache_key("openimcc", 1, first) != engine_cache_key(
         "openimcc", 1, second
     )
