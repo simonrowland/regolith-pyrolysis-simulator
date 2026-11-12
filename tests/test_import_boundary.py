@@ -361,6 +361,36 @@ def test_import_boundary_baseline_is_shrink_only() -> None:
     assert not errors, "\n".join(errors)
 
 
+def test_engine_cache_is_a_standard_library_leaf() -> None:
+    path = ROOT / "simulator" / "engine_cache.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    forbidden = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            forbidden.extend(
+                alias.name
+                for alias in node.names
+                if alias.name == "simulator"
+                or alias.name.startswith("simulator.")
+                or alias.name == "engines"
+                or alias.name.startswith("engines.")
+            )
+        elif isinstance(node, ast.ImportFrom):
+            module = node.module or ""
+            if node.level:
+                module = "simulator" if node.level == 1 else "simulator." * node.level
+                if node.module:
+                    module += node.module
+            if (
+                module == "simulator"
+                or module.startswith("simulator.")
+                or module == "engines"
+                or module.startswith("engines.")
+            ):
+                forbidden.append(module)
+    assert not forbidden, f"engine_cache imports non-stdlib modules: {forbidden}"
+
+
 def test_new_upward_edge_fails_with_caller_remediation(tmp_path: Path) -> None:
     path = tmp_path / "simulator" / "low.py"
     path.parent.mkdir()
