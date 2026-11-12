@@ -1389,7 +1389,9 @@ def _make_residue_pressure_model(
                     gas_pack,
                     parent_oxides=state.parent_oxides,
                     allow_extrapolation=True,
-                    gas_pack_selection="default",
+                    gas_pack_selection=(
+                        openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
+                    ),
                 )
                 pressure_state_cache[key] = base_pressure_bar
             pO2_bar = 10.0**float(log10_pO2_bar)
@@ -3756,7 +3758,9 @@ def _predict_sossi_residue_cohort(
                         gas_pack,
                         parent_oxides=gas_parent_oxides,
                         allow_extrapolation=True,
-                        gas_pack_selection="default",
+                        gas_pack_selection=(
+                            openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
+                        ),
                     )
                     melt_pack_identity.update(
                         {

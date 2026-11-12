@@ -4,8 +4,9 @@ AlphaMELTS Backend
 
 Wraps alphaMELTS for thermodynamic equilibrium calculations via:
 
-1. Subprocess transport (default): write .melts files, run binary, parse stdout/tables
-2. Python API fallback: petthermotools -> alphaMELTS for Python
+1. Subprocess transport when available: write .melts files, run binary, parse
+   stdout/tables
+2. PetThermoTools Python API discovery fallback
 
 PetThermoTools 0.4.5 schema verified from installed source:
 
@@ -123,9 +124,6 @@ from simulator.yaml_cache import load_cached_safe_yaml
 
 
 logger = logging.getLogger(__name__)
-
-
-DEFAULT_ALPHAMELTS_TRANSPORT_MODE = 'subprocess'
 
 
 # Liquidus seed is a search start, not a domain gate.
@@ -1255,6 +1253,11 @@ class _MELTSBackendSupport(MeltBackend):
             config.get('timeout_s', ALPHAMELTS_DEFAULT_TIMEOUT_S)
         )
         self._initialize_vapor_transport(config)
+        resolved_mode = (
+            resolve_alphamelts_transport_mode(config.get('mode'), backend=self)
+            if requested_mode == 'python_api'
+            else None
+        )
         require_petthermotools = bool(
             config.get('require_petthermotools')
             or requested_mode == 'python_api'
@@ -1300,36 +1303,19 @@ class _MELTSBackendSupport(MeltBackend):
                 stacklevel=2,
             )
 
-        # Try binary
-        if self._mode is None and requested_mode in (None, 'subprocess'):
-            from simulator.engine_local_config import find_alphamelts_binary
-
-            project_root = Path(__file__).parent.parent.parent
-            engine_root = project_root / 'engines' / 'alphamelts'
-            engine_path = engine_root / 'run_alphamelts.command'
-            binary_path = find_alphamelts_binary(engine_root)
-            if binary_path is None:
-                binary_path = self._find_project_binary(engine_root)
-            if engine_path.exists() or binary_path is not None:
-                self._engine_path = engine_path if engine_path.exists() else binary_path
-                self._binary_path = binary_path
+        # Resolve discovery after the optional PetThermoTools pin has had its
+        # existing first chance, then use that same result for cache settings.
+        if resolved_mode is None:
+            resolved_mode = resolve_alphamelts_transport_mode(
+                config.get('mode'), backend=self
+            )
+        if self._mode is None and resolved_mode == 'subprocess':
+            if self._engine_path is not None:
                 self._mode = 'subprocess'
-            else:
-                # Check system PATH
-                try:
-                    result = _run_alphamelts_subprocess(
-                        ['alphamelts', '--version'],
-                        capture_output=True, text=True, timeout=5)
-                    if result.returncode == 0:
-                        self._engine_path = Path('alphamelts')
-                        self._binary_path = Path('alphamelts')
-                        self._mode = 'subprocess'
-                except (FileNotFoundError, subprocess.TimeoutExpired):
-                    pass
-            if self._mode is None and require_subprocess:
+            elif require_subprocess:
                 raise ImportError('AlphaMELTS subprocess transport unavailable')
 
-        if self._mode is None and requested_mode in (None, 'python_api'):
+        if self._mode is None and resolved_mode == 'python_api':
             self._initialize_petthermotools(
                 require_petthermotools=require_petthermotools
             )
@@ -1412,7 +1398,7 @@ class _MELTSBackendSupport(MeltBackend):
 
     def _normalize_mode(self, value) -> Optional[str]:
         if value is None or value == '':
-            return DEFAULT_ALPHAMELTS_TRANSPORT_MODE
+            return None
         if str(value).lower() == 'auto':
             return None
         mode = str(value).strip().lower()
@@ -1510,6 +1496,37 @@ class _MELTSBackendSupport(MeltBackend):
                 if candidate.exists():
                     return candidate
         return None
+
+    def _discover_subprocess_transport(
+        self,
+    ) -> tuple[Optional[Path], Optional[Path]]:
+        from simulator.engine_local_config import find_alphamelts_binary
+
+        project_root = Path(__file__).parent.parent.parent
+        engine_root = project_root / 'engines' / 'alphamelts'
+        engine_path = engine_root / 'run_alphamelts.command'
+        binary_path = find_alphamelts_binary(engine_root)
+        if binary_path is None:
+            binary_path = self._find_project_binary(engine_root)
+        if engine_path.exists() or binary_path is not None:
+            return (
+                engine_path if engine_path.exists() else binary_path,
+                binary_path,
+            )
+
+        try:
+            result = _run_alphamelts_subprocess(
+                ['alphamelts', '--version'],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            if result.returncode == 0:
+                path = Path('alphamelts')
+                return path, path
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            pass
+        return None, None
 
     def is_available(self) -> bool:
         return self._mode is not None
@@ -6840,3 +6857,22 @@ class AlphaMELTSBackend(_MELTSBackendSupport, RealBackendAuthority):
 
     backend_name = 'alphamelts'
     real_backend_family = RealBackendFamily.ALPHAMELTS
+
+
+def resolve_alphamelts_transport_mode(
+    value: object = None,
+    *,
+    backend: _MELTSBackendSupport | None = None,
+) -> str:
+    """Resolve a requested transport or discovery default to its active mode."""
+    backend = backend or AlphaMELTSBackend()
+    requested_mode = backend._normalize_mode(value)
+    if requested_mode == 'python_api':
+        return requested_mode
+
+    engine_path, binary_path = backend._discover_subprocess_transport()
+    backend._engine_path = engine_path
+    backend._binary_path = binary_path
+    if requested_mode == 'subprocess' or engine_path is not None:
+        return 'subprocess'
+    return 'python_api'
