@@ -39,6 +39,40 @@ def resolve_alphamelts_subprocess_model(
     return model, "MELTS"
 
 
+def resolve_alphamelts_subprocess_settings(
+    model_name: str | None,
+    ambient_calc_mode: object | None,
+) -> dict[str, Any]:
+    """Resolve the selected model and its effective child calculation mode."""
+    requested_model = str(model_name or "").strip() or DEFAULT_ALPHAMELTS_MODEL
+    ambient = (
+        None if ambient_calc_mode is None else str(ambient_calc_mode)
+    )
+    try:
+        model, model_calc_mode = resolve_alphamelts_subprocess_model(
+            requested_model
+        )
+    except ValueError as exc:
+        return {
+            "model": requested_model,
+            "model_calc_mode": None,
+            "effective_calc_mode": ambient,
+            "calc_mode_conflict": False,
+            "subprocess_model_error": str(exc),
+        }
+    return {
+        "model": model,
+        "model_calc_mode": model_calc_mode,
+        "effective_calc_mode": (
+            model_calc_mode if ambient is None else ambient
+        ),
+        "calc_mode_conflict": (
+            ambient is not None and ambient != model_calc_mode
+        ),
+        "subprocess_model_error": None,
+    }
+
+
 def resolve_alphamelts_python_api_model(
     model_name: str | None,
 ) -> tuple[str, int]:

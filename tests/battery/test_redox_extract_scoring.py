@@ -1557,6 +1557,66 @@ def test_standalone_melts_fe_redox_prediction_closes_its_engine_handle(monkeypat
     assert opened[0].backend.close_calls == 1
 
 
+def test_thermoengine_fe_redox_reaches_equilibrate_cell_with_cache_enabled(
+    tmp_path, monkeypatch
+):
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    engine_cache.engine_cache_counters(reset=True)
+    row4 = _borisov_row4()
+
+    class FakeBackend:
+        calls = 0
+
+        def equilibrate(self, **_kwargs):
+            self.calls += 1
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={},
+                warnings=[],
+                liquid_fraction=0.5,
+                phase_assemblage_available=True,
+                activity_coefficients={},
+                vapor_pressures_Pa={},
+                vapor_pressures_source={},
+                liquid_composition_wt_pct={"FeO": 9.0, "Fe2O3": 1.0},
+                fe_redox_split={"FeO_wt_pct": 9.0, "Fe2O3_wt_pct": 1.0},
+            )
+
+    backend = FakeBackend()
+    handle = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    handles = {Engine.THERMOENGINE.value: handle}
+
+    first = predict_with_engine(
+        Engine.THERMOENGINE, row4, handles=handles, isolated=False
+    )
+    second = predict_with_engine(
+        Engine.THERMOENGINE, row4, handles=handles, isolated=False
+    )
+
+    assert first.value == second.value == fe3_fe2_ratio_from_oxide_wt_pct(
+        Decimal("1.0"), Decimal("9.0")
+    )
+    assert backend.calls == 1
+    assert engine_cache.engine_cache_counters(reset=True)["thermoengine"] == {
+        "hits": 1,
+        "misses": 1,
+        "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
+        "conflicts": 0,
+    }
+
+
 def test_melts_fe_redox_nonpositive_weights_do_not_fall_through(monkeypatch):
     row4 = _borisov_row4()
     _patch_melts_cell(

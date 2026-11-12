@@ -73,6 +73,7 @@ def test_sossi_geometry_is_declared_from_bead_mass_without_residue_inputs() -> N
 
 def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -> None:
     pytest.importorskip("openimcc")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     import openimcc
 
     import simulator.battery.residue as residue
@@ -110,7 +111,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert expected_mno_activity is not None
     evaluated_compositions: list[dict[str, float]] = []
     gas_activity_inputs: list[dict[str, float]] = []
-    original_melt_evaluate = openimcc_bridge.evaluate
+    original_melt_evaluate = openimcc_bridge._evaluate_uncached
     original_gas_evaluate = openimcc.evaluate_gas
 
     def capture_melt_evaluate(**kwargs):
@@ -126,7 +127,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
         "_evaluate_openimcc_isolated",
         lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
     )
-    monkeypatch.setattr(openimcc_bridge, "evaluate", capture_melt_evaluate)
+    monkeypatch.setattr(openimcc_bridge, "_evaluate_uncached", capture_melt_evaluate)
     monkeypatch.setattr(openimcc, "evaluate_gas", capture_gas_evaluate)
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     prediction = residue._predict_sossi_residue_cohort(
@@ -134,7 +135,6 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
         catalog,
         starting_trace_ppm_by_experiment={experiment_id: starting_trace},
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
-        code_revision="pack-digest-pin-test",
         engine="openimcc",
     )[0]
 
@@ -162,6 +162,84 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert mno_extension["authority_level"] == expected_mno_activity.evidence_tier
     assert mno_extension["certified_band_K"] is None
     assert mno_extension["activity_provenance"] == expected_mno_activity.provenance()
+
+
+def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
+    openimcc = pytest.importorskip("openimcc")
+
+    import simulator.battery.residue as residue
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
+
+    source = yaml.safe_load(SOURCE.read_text())
+    experiment = source["experiments"][0]
+    experiment_id = experiment["experiment_id"]
+    starting_trace = {
+        element: source["species"][element]["observations"][0]["values"][
+            "starting_measured_ppm"
+        ]
+        for element in ("Mn", "Ti")
+    }
+    original_channels = battery._openimcc_gas_channels_and_omission_notices
+    selected: list[str] = []
+
+    def ti_channels(parents, gas_pack):
+        channels, omissions = original_channels(parents, gas_pack)
+        result = [row for row in channels if str(row[1][0]) == "TiO2"]
+        assert result
+        selected.extend(str(row[0]) for row in result)
+        return result, omissions
+
+    state = SimpleNamespace(
+        parent_oxide_activities={"SiO2": 0.2, "FeO": 0.1, "TiO2": 0.01},
+        parent_oxides=("SiO2", "FeO", "TiO2"),
+        pack_model_id="fixture-model",
+        pack_version="fixture-version",
+        pack_digest="fixture-digest",
+        openimcc_version="fixture-openimcc",
+        flags=(),
+        extrapolated=False,
+    )
+    gas_calls: list[dict[str, object]] = []
+
+    def evaluate_gas(*_args, **kwargs):
+        gas_calls.append(kwargs)
+        return {species: 1.0e-6 for species in selected}
+
+    def isolated(_evaluate, **_kwargs):
+        return SimpleNamespace(to_transport=lambda: {"fixture": True})
+
+    def no_evaporation(inventory, *_args, **_kwargs):
+        return SimpleNamespace(
+            residue_mol=dict(inventory), buffer_oxygen_exchange_mol=0.0
+        )
+
+    monkeypatch.setattr(
+        battery, "_openimcc_gas_channels_and_omission_notices", ti_channels
+    )
+    monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", isolated)
+    monkeypatch.setattr(openimcc, "evaluate_gas", evaluate_gas)
+    monkeypatch.setattr(
+        OpenImccBridgeResult,
+        "from_transport",
+        classmethod(lambda _cls, _payload: state),
+    )
+    monkeypatch.setattr(residue, "integrate_residue_inventory", no_evaporation)
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+
+    prediction = residue._predict_sossi_residue_cohort(
+        [experiment],
+        catalog,
+        starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+        buffered_fO2_log_by_experiment={experiment_id: -10.0},
+        engine="openimcc",
+    )[0]
+
+    assert gas_calls
+    assert prediction.provenance.get("run_refusal") is None
+    assert "Mn" in prediction.channel_missing_elements
+    assert prediction.primary_element_ppm["Ti"] > 0.0
 
 
 def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
@@ -195,7 +273,6 @@ def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
             experiment_id: starting_trace for experiment_id in experiment_ids
         },
         buffered_fO2_log_by_experiment={experiment_id: -10.0 for experiment_id in experiment_ids},
-        code_revision="sossi-timeout-fixture",
         engine="openimcc",
     )
 
@@ -240,7 +317,6 @@ def test_sossi_worker_start_failure_after_residue_scoring_worker(
         yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text()),
         starting_trace_ppm_by_experiment={experiment_id: starting_trace},
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
-        code_revision="sossi-worker-start-failure-order-test",
         engine="openimcc",
     )
 
@@ -306,7 +382,6 @@ def _assert_sossi_worker_start_failure_recorded(
         yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text()),
         starting_trace_ppm_by_experiment={experiment_id: starting_trace},
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
-        code_revision="sossi-worker-start-failure-test",
         engine="openimcc",
     )[0]
 
@@ -331,9 +406,15 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
         metric_operation_for_identity,
         point_magnitude,
     )
+    import simulator.battery.score as score_module
     import simulator.battery.residue as residue
 
     context = load_score_context(sources=("kems-012-sossi-2019",))
+    monkeypatch.setattr(
+        score_module.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("residue scoring must not require git"),
+    )
     rows = [
         row
         for row in context.observations.values()
@@ -355,7 +436,6 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
                 channel_missing_elements=(),
                 provenance={
                     "integration": {"primary": {"status": "converged"}},
-                    "code_revision": "fixture-revision",
                     "melt_activity_extensions": {
                         "MnO": {
                             "reason": "MnO is outside the IMCC-SF04 melt-activity domain",
@@ -381,6 +461,8 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     assert prediction.execution.state.value == "produced"
     assert prediction.value == 900.0
     assert prediction.identity == manganese.identity
+    assert prediction.version is None
+    assert "code_revision" not in prediction.refusal_detail
     assert any(
         notice.reason == "bc_open_furnace_langmuir_limit_diagnostic"
         for notice in prediction.notices
@@ -443,7 +525,6 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
                         provenance={
                             "geometry_refusal_by_geometry": {},
                             "integration": {"refinement_status": "converged"},
-                            "code_revision": "fixture-revision",
                         },
                     )
                 )
@@ -458,7 +539,6 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
                 channel_missing_elements=(),
                 provenance={
                     "integration": {"primary": {"status": "converged"}},
-                    "code_revision": "fixture-revision",
                 },
             )
             for experiment in experiments
@@ -569,7 +649,6 @@ def test_sossi_below_liquid_floor_reaches_the_scored_notice(
                     channel_missing_elements=(),
                     provenance={
                         "integration": {"primary": {"status": "converged"}},
-                        "code_revision": "fixture-revision",
                         "liquid_rows_used": (
                             _liquid_row(
                                 "MnO(l)", certified_band, below_floor=below
@@ -712,7 +791,6 @@ def test_hashimoto_below_liquid_floor_reaches_the_scored_notice(
                 "engine": engine,
                 "integration": {"refinement_status": "converged"},
                 "geometry_refusal_by_geometry": {},
-                "code_revision": "fixture-revision",
                 "liquid_rows_used": (
                     liquid_record(
                         "Fe",

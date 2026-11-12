@@ -14,6 +14,7 @@ import time
 from functools import partial
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any, Mapping
 
 import pytest
 
@@ -327,7 +328,7 @@ def test_run_isolated_cell_worker_closes_acquired_handle(
             raise RuntimeError("fake cell failure")
         return SimpleNamespace(as_payload=lambda: {"status": "ok"})
 
-    monkeypatch.setattr(battery, "equilibrate_cell", equilibrate)
+    monkeypatch.setattr(battery, "_equilibrate_cell_uncached", equilibrate)
     payload = {
         "pot_id": "isolated-worker-test",
         "composition_wt_pct": {"SiO2": 100.0},
@@ -368,7 +369,7 @@ def test_run_isolated_cell_worker_leaves_supplied_handle_to_owner(
     )
     monkeypatch.setattr(
         battery,
-        "equilibrate_cell",
+        "_equilibrate_cell_uncached",
         lambda *_args, **_kwargs: SimpleNamespace(
             as_payload=lambda: {"status": "ok"}
         ),
@@ -2287,6 +2288,7 @@ def test_equilibrate_cell_payload_shape_includes_activity_metadata() -> None:
         "model_id",
         "liquid_composition_wt_pct",
         "fe_redox_split",
+        "backend_failure_disposition",
     }
 
 
@@ -2566,7 +2568,10 @@ def test_simulated_crash_yields_engine_crash() -> None:
 
 
 def _fake_isolated_cell_bootstrap(
-    _engine: str, *, initialization_delay_s: float = 0.0
+    _engine: str,
+    _engine_settings: Mapping[str, Any] | None = None,
+    *,
+    initialization_delay_s: float = 0.0,
 ):
     time.sleep(initialization_delay_s)
     return None, "fake-ready"
@@ -2646,7 +2651,12 @@ class _InternalAnalyticalBudgetBackend:
 
 
 def _internal_analytical_budget_bootstrap(
-    _engine: str, *, mode: str, cpu_budget_s: float | None
+    _engine: str,
+    engine_settings: Mapping[str, Any] | None = None,
+    _effective_settings: Mapping[str, Any] | None = None,
+    *,
+    mode: str,
+    cpu_budget_s: float | None,
 ):
     import simulator.diagnostic_helpers.binary_pot_battery as battery
 
@@ -2660,7 +2670,10 @@ def _internal_analytical_budget_bootstrap(
         takes_fo2=False,
         supports_intrinsic_fo2=False,
     )
-    return battery._IsolatedCellEngine(handle), "internal-analytical-budget-test"
+    return (
+        battery._IsolatedCellEngine(handle, engine_settings),
+        "internal-analytical-budget-test",
+    )
 
 
 def _install_internal_analytical_budget_worker(
@@ -2830,6 +2843,7 @@ class _NestedWarmHangBackend:
 
 def _nested_warm_hang_bootstrap(
     engine: str,
+    _engine_settings: Mapping[str, Any] | None = None,
     *,
     budget_path: str,
     pid_path: str,

@@ -18,6 +18,7 @@ backend (``INELIGIBLE_ACTIVE_BACKENDS``).
 from __future__ import annotations
 
 import atexit
+import importlib
 import inspect
 import json
 import math
@@ -25,14 +26,16 @@ import os
 import re
 import signal
 import socket
+import struct
 import subprocess
 import sys
 import threading
 import time
 from collections import Counter, defaultdict
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field, fields, is_dataclass, replace
 from datetime import datetime, timezone
 from decimal import Decimal
+from enum import Enum
 from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
@@ -44,7 +47,11 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
-from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
+from simulator.melt_backend.base import (
+    ANTOINE_FALLBACK_SOURCE_PREFIX,
+    REDOX_MODE_NOT_AN_INPUT,
+    vapor_pressure_source_code,
+)
 from simulator.melt_regime import (
     legacy_raw_liquid_fraction_is_zero,
     liquid_fraction_invalidity,
@@ -57,7 +64,11 @@ from simulator.engine_pool import (
     WarmEngineWorker,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
-from simulator.config import _load_setpoints_file
+from simulator.config import (
+    _load_setpoints_file,
+    resolve_alphamelts_python_api_model,
+    resolve_alphamelts_subprocess_settings,
+)
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
 
@@ -81,6 +92,25 @@ BATTERY_ENGINE_NAMES: tuple[str, ...] = (
 OPENIMCC_ENGINE_NAMES: tuple[str, ...] = ("openimcc",)
 IMCC_ENGINE_NAMES: tuple[str, ...] = OPENIMCC_ENGINE_NAMES
 MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
+
+
+def _hostname() -> str:
+    env_name = os.environ.get("GOALFLIGHT_HOSTNAME") or os.environ.get("HOSTNAME")
+    if env_name:
+        return str(env_name)
+    try:
+        probed = subprocess.run(
+            ["hostname"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        ).stdout.strip()
+        if probed:
+            return probed
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return socket.gethostname()
 
 
 def _openimcc_gas_channels_and_omission_notices(
@@ -135,7 +165,6 @@ _FLOOR_INVERSION_REASON = "melt_dissociation_pO2_floor_inverted_through_mass_act
 FINDING_CLASS_FALLBACK_VS_SPECIATION = "fallback_vs_speciation"
 AUTHORITY_FALLBACK = "fallback"
 AUTHORITY_SPECIATION = "speciation"
-_ANTOINE_FALLBACK_PREFIX = "antoine_fallback_from_vaporock"
 
 _MAJOR_SUM_TOKENS = frozenset(
     {"major_sum", "sum_below_95_wt_pct", "major oxide sum"}
@@ -270,6 +299,85 @@ class EngineHandle:
     takes_fo2: bool
     supports_intrinsic_fo2: bool
     identity: Mapping[str, Any] = field(default_factory=dict)
+    engine_settings: Mapping[str, Any] = field(default_factory=dict)
+
+
+def _call_cached_backend_equilibrate(
+    handle: EngineHandle,
+    kwargs: Mapping[str, Any],
+    solve: Callable[[], Any],
+    *,
+    cache: bool = True,
+) -> Any:
+    if handle.name == "internal-analytical":
+        from simulator.engine_cache import _without_engine_cache
+
+        with _without_engine_cache():
+            return solve()
+    if not cache:
+        return solve()
+    if handle.name == "openimcc":
+        # The OpenIMCC bridge owns the engine cache seam for this path.
+        return solve()
+    from simulator.engine_cache import _configured_engine_cache_path
+
+    if _configured_engine_cache_path() is None:
+        return solve()
+    request_kwargs = dict(kwargs)
+    request_kwargs.pop("call_timeout_s", None)
+    # The resolved handle owns AlphaMELTS's effective child calculation mode.
+    # Never reread the parent environment while building a request key.
+    po2_request = request_kwargs.get("po2_request")
+    if isinstance(po2_request, Po2Request):
+        request_kwargs["po2_request"] = po2_request.as_payload()
+    from types import SimpleNamespace
+
+    from simulator.engine_cache import (
+        _is_refusal,
+        cached_engine_call,
+        engine_cache_settings,
+    )
+    from simulator.melt_backend.base import (
+        EquilibriumResult,
+        equilibrium_cache_from_value,
+        equilibrium_cache_value,
+    )
+
+    def solve_cache_value() -> Any:
+        result = solve()
+        if _is_refusal(result):
+            return result
+        if isinstance(result, EquilibriumResult):
+            return result.to_engine_cache_value(engine_id=handle.name)
+        if isinstance(result, SimpleNamespace):
+            return equilibrium_cache_value(vars(result), engine_id=handle.name)
+        if isinstance(result, Mapping):
+            return equilibrium_cache_value(result, engine_id=handle.name)
+        return result
+
+    adapter_settings = engine_cache_settings(
+        handle.name,
+        handle.backend,
+        effective_settings=getattr(handle, "engine_settings", None),
+    )
+
+    payload = cached_engine_call(
+        handle.name,
+        {
+            "kwargs": request_kwargs,
+            "engine_settings": adapter_settings,
+        },
+        solve_cache_value,
+    )
+    if isinstance(payload, list):
+        payload = equilibrium_cache_from_value(payload, engine_id=handle.name)
+    if isinstance(payload, Mapping):
+        if handle.name == "internal-analytical":
+            return SimpleNamespace(**payload)
+        return EquilibriumResult.from_engine_cache_value(
+            payload, engine_id=handle.name
+        )
+    return payload
 
 
 def close_battery_engine_handle(handle: object) -> None:
@@ -348,6 +456,8 @@ def retire_battery_engine_handle(handle: object) -> None:
 def open_cached_battery_engine_handle(
     engine_name: str,
     handles: Mapping[str, object] | None,
+    *,
+    engine_settings: Mapping[str, Any] | None = None,
 ) -> tuple[object, bool]:
     """Return a live cached engine or open one, with ownership for replacements."""
 
@@ -361,7 +471,11 @@ def open_cached_battery_engine_handle(
 
     owned_handle = True
     if handle is None:
-        handle = open_battery_engine(engine_name)
+        handle = (
+            open_battery_engine(engine_name)
+            if engine_settings is None
+            else _open_battery_engine_with_settings(engine_name, engine_settings)
+        )
         if (
             isinstance(handle_map, dict)
             and battery_engine_handle_is_live(handle)
@@ -381,6 +495,15 @@ def _handle_model_id(handle: EngineHandle) -> str | None:
         return None
     model_id = getattr(backend, "model_id", None)
     return None if model_id is None else str(model_id)
+
+
+def _activity_reference_phase(text: str | None) -> str | None:
+    blob = str(text or "").lower()
+    if "(s)" in blob or "solid" in blob:
+        return "solid"
+    if "(l)" in blob or "liquid" in blob:
+        return "liquid"
+    return None
 
 
 @dataclass
@@ -422,6 +545,20 @@ class EquilibrateCell:
     # Copied from the equilibrium result. The scorer owns the battery ratio.
     liquid_composition_wt_pct: dict[str, float] = field(default_factory=dict)
     fe_redox_split: dict[str, float] = field(default_factory=dict)
+    backend_failure_disposition: str | None = None
+
+    def to_cache_payload(self) -> str:
+        """Serialize the cell without losing its Python value types."""
+        return _to_equilibrate_cell_cache_payload(self)
+
+    @classmethod
+    def from_cache_payload(cls, payload: str) -> "EquilibrateCell":
+        value = _from_equilibrate_cell_cache_payload(payload)
+        if type(value) is not cls:
+            raise TypeError(
+                f"cache payload contains {type(value).__name__}, expected {cls.__name__}"
+            )
+        return value
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -472,6 +609,7 @@ class EquilibrateCell:
             "model_id": self.model_id,
             "liquid_composition_wt_pct": dict(self.liquid_composition_wt_pct),
             "fe_redox_split": dict(self.fe_redox_split),
+            "backend_failure_disposition": self.backend_failure_disposition,
         }
 
     @classmethod
@@ -581,7 +719,267 @@ class EquilibrateCell:
                 payload.get("liquid_composition_wt_pct")
             ),
             fe_redox_split=_finite_component_map(payload.get("fe_redox_split")),
+            backend_failure_disposition=(
+                None
+                if payload.get("backend_failure_disposition") is None
+                else str(payload.get("backend_failure_disposition"))
+            ),
         )
+
+    def to_engine_cache_value(self) -> Any:
+        """Return the compact scorer-consumed cell payload."""
+        from simulator.melt_backend.base import equilibrium_cache_value
+
+        projection = equilibrium_cache_value(
+            {
+                "status": self.status,
+                "liquid_fraction": self.liquid_fraction,
+                "phase_assemblage_available": True,
+                "activity_coefficients": self.melt_activities,
+                "reported_activity_coefficients": self.melt_activity_coefficients,
+                "activity_coefficient_details": self.melt_activity_coefficient_details,
+                "vapor_pressures_Pa": self.gas_partial_pressures_Pa,
+                "vapor_pressures_source": self.vapor_pressures_source,
+                "liquid_composition_wt_pct": self.liquid_composition_wt_pct,
+                "fe_redox_split": self.fe_redox_split,
+            },
+            engine_id=self.engine,
+        )
+        from simulator.melt_backend.base import encode_engine_notice_codes
+
+        code_numbers, code_values = encode_engine_notice_codes(
+            self.engine,
+            [
+                notice
+                for notice in self.notices
+                if isinstance(notice, Mapping)
+            ],
+        )
+        compact_notices = {
+            "engine": self.engine,
+            "codes": code_numbers,
+            "values": code_values,
+        }
+        flags = [
+            self.engine_status,
+            _activity_reference_phase(self.engine_reason),
+            vapor_pressure_source_code(self.vapor_pressure_backend_status),
+            vapor_pressure_source_code(self.vapor_pressure_backend_status_reason),
+            self.authoritative_for_requested_vapor_pressure,
+            self.authority,
+            self.certified_band,
+            compact_notices,
+            self.model_id,
+            list(self.invalid_gas_partial_pressure_components),
+            self.backend_failure_disposition,
+        ]
+        return [*projection, flags]
+
+    @classmethod
+    def from_engine_cache_value(cls, payload: Any) -> "EquilibrateCell":
+        """Restore the scorer-visible fields from the compact HOT cache value."""
+        from simulator.melt_backend.base import equilibrium_cache_from_value
+
+        if not isinstance(payload, list) or len(payload) != 12:
+            raise ValueError("invalid compact EquilibrateCell cache value")
+        base = equilibrium_cache_from_value(payload[:11])
+        flags = payload[11]
+        if not isinstance(flags, list) or len(flags) != 11:
+            raise ValueError("invalid compact EquilibrateCell flags")
+        (
+            engine_status,
+            activity_phase,
+            vapor_status,
+            vapor_status_reason,
+            authoritative,
+            authority,
+            certified_band,
+            raw_notices,
+            model_id,
+            invalid_components,
+            failure_disposition,
+        ) = flags
+        if not isinstance(raw_notices, Mapping) or not isinstance(invalid_components, list):
+            raise ValueError("invalid compact EquilibrateCell notices or components")
+        from simulator.melt_backend.base import decode_engine_notice_codes
+
+        notice_engine = raw_notices.get("engine")
+        if not isinstance(notice_engine, str):
+            raise ValueError("invalid compact EquilibrateCell notice engine")
+        notices = decode_engine_notice_codes(
+            notice_engine,
+            raw_notices.get("codes", ()),
+            raw_notices.get("values", ()),
+        )
+        values = {
+            "status": base.get("status") or "unknown",
+            "engine_status": engine_status,
+            "engine_reason": activity_phase,
+            "melt_activities": base.get("activity_coefficients") or {},
+            "melt_activity_coefficients": base.get("reported_activity_coefficients") or {},
+            "melt_activity_coefficient_details": base.get("activity_coefficient_details") or {},
+            "gas_partial_pressures_Pa": base.get("vapor_pressures_Pa") or {},
+            "liquid_fraction": base.get("liquid_fraction"),
+            "vapor_pressures_source": base.get("vapor_pressures_source") or {},
+            "vapor_pressure_backend_status": vapor_status,
+            "vapor_pressure_backend_status_reason": vapor_status_reason,
+            "authoritative_for_requested_vapor_pressure": authoritative,
+            "notices": notices,
+            "authority": authority,
+            "certified_band": certified_band,
+            "model_id": model_id,
+            "invalid_gas_partial_pressure_components": invalid_components,
+            "liquid_composition_wt_pct": base.get("liquid_composition_wt_pct") or {},
+            "fe_redox_split": base.get("fe_redox_split") or {},
+            "backend_failure_disposition": failure_disposition,
+        }
+        return cls.from_payload(values)
+
+
+def _cache_payload_sort_key(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _encode_cell_cache_value(value: Any) -> list[Any]:
+    if value is None:
+        return ["none"]
+    if isinstance(value, bool):
+        return ["bool", value]
+    if isinstance(value, Enum):
+        value_type = type(value)
+        return ["enum", value_type.__module__, value_type.__qualname__, value.name]
+    if isinstance(value, Decimal):
+        return ["decimal", str(value)]
+    if isinstance(value, float):
+        return ["float64", struct.pack(">d", value).hex()]
+    if isinstance(value, int):
+        return ["int", str(value)]
+    if isinstance(value, str):
+        return ["str", value]
+    if isinstance(value, tuple):
+        return ["tuple", [_encode_cell_cache_value(item) for item in value]]
+    if isinstance(value, list):
+        return ["list", [_encode_cell_cache_value(item) for item in value]]
+    if isinstance(value, Mapping):
+        items = [
+            [_encode_cell_cache_value(key), _encode_cell_cache_value(item)]
+            for key, item in value.items()
+        ]
+        items.sort(key=lambda pair: _cache_payload_sort_key(pair[0]))
+        return ["dict", items]
+    if is_dataclass(value) and not isinstance(value, type):
+        value_type = type(value)
+        if value_type not in {Po2Request, EquilibrateCell}:
+            raise TypeError(f"unsupported cell cache payload type: {value_type.__name__}")
+        return [
+            "dataclass",
+            value_type.__module__,
+            value_type.__qualname__,
+            [
+                [item.name, _encode_cell_cache_value(getattr(value, item.name))]
+                for item in fields(value)
+            ],
+        ]
+    raise TypeError(
+        f"unsupported cell cache payload value type: {type(value).__module__}."
+        f"{type(value).__qualname__}"
+    )
+
+
+def _decode_cell_cache_value(value: Any) -> Any:
+    if not isinstance(value, list) or not value or not isinstance(value[0], str):
+        raise ValueError("invalid tagged cell cache payload value")
+    tag, *items = value
+    if tag == "none" and not items:
+        return None
+    if tag == "bool" and len(items) == 1 and type(items[0]) is bool:
+        return items[0]
+    if tag == "enum" and len(items) == 3 and all(
+        isinstance(item, str) for item in items
+    ):
+        if items[:2] != [NoticeKind.__module__, NoticeKind.__qualname__]:
+            raise ValueError("unsupported enum in cell cache payload")
+        try:
+            return NoticeKind.__members__[items[2]]
+        except KeyError as exc:
+            raise ValueError(f"unknown NoticeKind member {items[2]!r}") from exc
+    if tag == "decimal" and len(items) == 1 and isinstance(items[0], str):
+        return Decimal(items[0])
+    if tag == "float64" and len(items) == 1 and isinstance(items[0], str):
+        try:
+            raw = bytes.fromhex(items[0])
+        except ValueError as exc:
+            raise ValueError("invalid float64 cell cache payload") from exc
+        if len(raw) != 8:
+            raise ValueError("invalid float64 cell cache payload length")
+        return struct.unpack(">d", raw)[0]
+    if tag == "int" and len(items) == 1 and isinstance(items[0], str):
+        return int(items[0])
+    if tag == "str" and len(items) == 1 and isinstance(items[0], str):
+        return items[0]
+    if tag in {"tuple", "list"} and len(items) == 1 and isinstance(items[0], list):
+        decoded = [_decode_cell_cache_value(item) for item in items[0]]
+        return tuple(decoded) if tag == "tuple" else decoded
+    if tag == "dict" and len(items) == 1 and isinstance(items[0], list):
+        result: dict[Any, Any] = {}
+        for pair in items[0]:
+            if not isinstance(pair, list) or len(pair) != 2:
+                raise ValueError("invalid dict entry in cell cache payload")
+            key = _decode_cell_cache_value(pair[0])
+            if key in result:
+                raise ValueError("duplicate dict key in cell cache payload")
+            result[key] = _decode_cell_cache_value(pair[1])
+        return result
+    if tag == "dataclass" and len(items) == 3:
+        module_name, qualname, raw_fields = items
+        if module_name != __name__ or not isinstance(raw_fields, list):
+            raise ValueError("unsupported dataclass in cell cache payload")
+        if qualname == "Po2Request":
+            value_type = Po2Request
+        elif qualname == "EquilibrateCell":
+            value_type = EquilibrateCell
+        else:
+            raise ValueError(f"unsupported cell cache payload type: {qualname}")
+        decoded_fields: dict[str, Any] = {}
+        for pair in raw_fields:
+            if (
+                not isinstance(pair, list)
+                or len(pair) != 2
+                or not isinstance(pair[0], str)
+                or pair[0] in decoded_fields
+            ):
+                raise ValueError("invalid dataclass field in cell cache payload")
+            decoded_fields[pair[0]] = _decode_cell_cache_value(pair[1])
+        known_fields = {item.name for item in fields(value_type)}
+        if decoded_fields.keys() - known_fields:
+            raise ValueError(f"unknown field in {qualname} cache payload")
+        return value_type(**decoded_fields)
+    raise ValueError(f"invalid {tag!r} tagged cell cache payload value")
+
+
+def _to_equilibrate_cell_cache_payload(cell: EquilibrateCell) -> str:
+    if type(cell) is not EquilibrateCell:
+        raise TypeError("cache payloads support EquilibrateCell values only")
+    return json.dumps(
+        {"value": _encode_cell_cache_value(cell)},
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+
+
+def _from_equilibrate_cell_cache_payload(payload: str) -> EquilibrateCell:
+    try:
+        decoded = json.loads(payload)
+    except (TypeError, json.JSONDecodeError) as exc:
+        raise ValueError("invalid EquilibrateCell cache JSON") from exc
+    if not isinstance(decoded, dict) or set(decoded) != {"value"}:
+        raise ValueError("unsupported EquilibrateCell cache payload")
+    result = _decode_cell_cache_value(decoded["value"])
+    if type(result) is not EquilibrateCell:
+        raise ValueError("EquilibrateCell cache payload did not contain a cell")
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -810,7 +1208,8 @@ def _reported_value_has_floor_provenance(
     if not blob:
         return False
     return (
-        _FLOOR_INVERSION_REASON in blob
+        source_label == "floor"
+        or _FLOOR_INVERSION_REASON in blob
         or REFUSAL_VALUE_IS_FLOOR in blob
     )
 
@@ -1308,10 +1707,11 @@ def vapor_authority_kind(
     if quantity != QUANTITY_PRESSURE:
         return None
     source = _source_label_for_species(payload, species)
+    source_code = vapor_pressure_source_code(source)
     status = str(payload.get("vapor_pressure_backend_status") or "")
-    if status == "fallback" or source.startswith(_ANTOINE_FALLBACK_PREFIX):
+    if status == "fallback" or source_code == "fallback":
         return AUTHORITY_FALLBACK
-    if source == "vaporock" or source.startswith("vaporock"):
+    if source_code == "speciation":
         return AUTHORITY_SPECIATION
     # Standalone VapoRock keeps live speciation off vapor_pressures_Pa.
     if str(payload.get("engine") or "") == "vaporock":
@@ -1518,6 +1918,11 @@ def classify_equilibrate_outcome(
             "openimcc_oxygen_balance_unavailable",
         } or reason_code.startswith("imcc_gas_"):
             return "refusal", reason_code, engine_reason
+        typed_cause = getattr(error, "cause", None)
+        typed_cause_code = getattr(typed_cause, "value", typed_cause)
+        if category in {"out_of_domain", "refused"} and typed_cause_code:
+            cause_code = str(typed_cause_code)
+            return "refusal", cause_code, f"{cause_code}: {message}"
         bucket = _bucket_from_text(haystack) or REFUSAL_UNAVAILABLE
         return "refusal", bucket, engine_reason
 
@@ -2569,7 +2974,7 @@ class _OpenImccBatteryBackend:
 
     supports_intrinsic_fO2 = False
 
-    def __init__(self, engine_name: str) -> None:
+    def __init__(self, engine_name: str, *, pack_name: str | None = None) -> None:
         if engine_name not in OPENIMCC_ENGINE_NAMES:
             raise BinaryPotBatteryError(f"unknown openimcc engine {engine_name!r}")
         self.engine_name = engine_name
@@ -2577,8 +2982,10 @@ class _OpenImccBatteryBackend:
 
         self._bridge = openimcc_bridge
         self._package = openimcc_bridge._require_openimcc()
-        self._pack_name = openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+        self._pack_name = str(pack_name or openimcc_bridge.DEFAULT_BACKEND_PACK_NAME)
         self._pack = openimcc_bridge._load_pack(self._pack_name)
+        # The gas loader selects its packaged default; keep that selector in the key.
+        self._gas_pack_name = "default"
         self.model_id = str(getattr(self._pack, "model_id", "openimcc"))
         self._gas: Any = None
         self._gas_error: str | None = None
@@ -2603,6 +3010,11 @@ class _OpenImccBatteryBackend:
             else None
         )
         self._load_gas()
+
+    @property
+    def _effective_pack_name(self) -> str:
+        """Return the pack identity captured with the loaded datapack."""
+        return str(self._identity["pack"])
 
     def _load_gas(self) -> None:
         try:
@@ -2637,7 +3049,7 @@ class _OpenImccBatteryBackend:
         temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         bridge_kwargs: dict[str, Any] = {
             "temperature_K": temperature_K,
-            "pack": self._pack_name,
+            "pack": self._effective_pack_name,
             "allow_extrapolation": True,
             "allow_out_of_envelope": True,
         }
@@ -3393,14 +3805,59 @@ def _internal_analytical_vapor_pressure_adapter(
     )
 
 
+def internal_analytical_residue_vapor_pressure(
+    *,
+    core: Any,
+    temperature_C: float,
+    pressure_bar: float,
+    composition_kg: Mapping[str, float] | None,
+    composition_mol: Mapping[str, float] | None,
+    fO2_log: float | None,
+    po2_request: Po2Request,
+    include_diagnostic_shadows: bool,
+) -> Any:
+    """Run one direct internal-analytical residue pressure request."""
+    from simulator.engine_cache import _without_engine_cache, record_engine_open
+
+    record_engine_open("internal-analytical", core)
+
+    with _without_engine_cache():
+        return _internal_analytical_vapor_pressure_adapter(
+            core=core,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            composition_kg=composition_kg,
+            composition_mol=composition_mol,
+            fO2_log=fO2_log,
+            po2_request=po2_request,
+            include_diagnostic_shadows=include_diagnostic_shadows,
+        )
+
+
 class _InternalAnalyticalBatteryBackend:
     """Battery adapter for the simulator core's own analytical vapor path."""
 
     supports_intrinsic_fo2 = True
 
-    def __init__(self) -> None:
+    def __init__(self, *, oxygen_balance_pack: str | None = None) -> None:
+        from simulator.melt_backend import openimcc_bridge
+
         self._core = _new_internal_analytical_core()
         self._oxygen_balance_backend: Any | None = None
+        self._oxygen_balance_pack = str(
+            oxygen_balance_pack or openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+        )
+
+    def _oxygen_balance_backend_for(self, request: Po2Request | None) -> Any | None:
+        if (
+            request is not None
+            and request.mode == PO2_OXYGEN_BALANCE_EFFUSION
+            and self._oxygen_balance_backend is None
+        ):
+            self._oxygen_balance_backend = _OpenImccBatteryBackend(
+                "openimcc", pack_name=self._oxygen_balance_pack
+            )
+        return self._oxygen_balance_backend
 
     def equilibrate(
         self,
@@ -3426,12 +3883,6 @@ class _InternalAnalyticalBatteryBackend:
         core._last_high_t_melt_activity_temperature_K = None
         core._high_t_melt_activity_fallback_steps = []
         core._last_vapor_pressure_diagnostic = {}
-        if (
-            po2_request is not None
-            and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
-            and self._oxygen_balance_backend is None
-        ):
-            self._oxygen_balance_backend = _OpenImccBatteryBackend("openimcc")
         return _internal_analytical_vapor_pressure_adapter(
             core=self._core,
             temperature_C=temperature_C,
@@ -3440,7 +3891,7 @@ class _InternalAnalyticalBatteryBackend:
             composition_mol=composition_mol,
             fO2_log=fO2_log,
             po2_request=po2_request,
-            oxygen_balance_backend=self._oxygen_balance_backend,
+            oxygen_balance_backend=self._oxygen_balance_backend_for(po2_request),
         )
 
 
@@ -3589,6 +4040,43 @@ def qualification_notice(gate: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _decorate_qualification_outcome(
+    cell: EquilibrateCell,
+    pot: BinaryPot,
+    temperature_K: float,
+) -> EquilibrateCell:
+    """Apply the MELTS qualification notice to an undecorated engine result."""
+
+    gate = assess_qualification_gate(pot.composition_wt_pct, temperature_K)
+    refusal_reason = cell.refusal_reason
+    engine_reason = cell.engine_reason
+    engine_annotation = cell.engine_annotation
+    if cell.status == "refusal" and refusal_reason not in {
+        REFUSAL_TIMEOUT,
+        REFUSAL_ENGINE_CRASH,
+    }:
+        engine_reason = cell.engine_reason or refusal_reason
+        refusal_reason = REFUSAL_GATE_REFUSED_IN_ADAPTER
+        engine_annotation = None
+    notices = [
+        qualification_notice(gate),
+        *(
+            dict(notice)
+            for notice in cell.notices
+            if notice.get("kind") != "melts_domain_gate"
+        ),
+    ]
+    return replace(
+        cell,
+        refusal_reason=refusal_reason,
+        engine_reason=engine_reason,
+        engine_annotation=engine_annotation,
+        notices=notices,
+        authority=cell.authority or AUTHORITY_EXTRAPOLATED,
+        certified_band=cell.certified_band or dict(gate["certified_band"]),
+    )
+
+
 def scale_feo_mgo_for_sio2(
     sio2_wt_pct: float,
     source: Mapping[str, float],
@@ -3718,7 +4206,12 @@ def run_isolated_cell_worker(
     engine_name = str(payload["engine"])
     owns_handle = handle is None or handle.name != engine_name
     if handle is None or handle.name != engine_name:
-        handle = open_battery_engine(engine_name)
+        engine_settings = payload.get("engine_settings")
+        handle = (
+            open_battery_engine(engine_name)
+            if not engine_settings
+            else _open_battery_engine_with_settings(engine_name, engine_settings)
+        )
     try:
         if handle.name == "alphamelts" and handle.backend is not None:
             # A fresh per-cell backend used to start with an empty warning set.
@@ -3728,7 +4221,7 @@ def run_isolated_cell_worker(
             )
             if isinstance(warning_seen, set):
                 warning_seen.clear()
-        cell = equilibrate_cell(
+        cell = _equilibrate_cell_uncached(
             handle,
             pot,
             temperature_K=float(payload["temperature_K"]),
@@ -3742,6 +4235,10 @@ def run_isolated_cell_worker(
             qualification=bool(payload.get("qualification")),
             isolated=False,
             arm=str(payload.get("arm") or ARM_HEADLINE),
+            _defer_qualification_decoration=bool(
+                payload.get("_defer_qualification_decoration")
+            ),
+            _cache_engine_call=False,
         )
         return cell.as_payload()
     finally:
@@ -3847,16 +4344,26 @@ class _IsolatedCellWorkerFailure(RuntimeError):
 class _IsolatedCellEngine:
     """EngineHandle resource closed by the shared warm-worker lifecycle."""
 
-    def __init__(self, handle: EngineHandle) -> None:
+    def __init__(
+        self,
+        handle: EngineHandle,
+        engine_settings: Mapping[str, Any] | None = None,
+    ) -> None:
         self.handle = handle
+        self.engine_settings = dict(engine_settings or {})
 
     def close(self) -> None:
         close_battery_engine_handle(self.handle)
 
 
-def _bootstrap_isolated_cell_engine(engine: str) -> tuple[_IsolatedCellEngine, str]:
+def _bootstrap_isolated_cell_engine(
+    engine: str,
+    engine_settings: Mapping[str, Any] | None = None,
+) -> tuple[_IsolatedCellEngine, str]:
     """Resolve the battery engine before WarmEngineWorker signals ready."""
-    return _IsolatedCellEngine(open_battery_engine(engine)), engine
+    settings = dict(engine_settings or {})
+    handle = _open_battery_engine_with_settings(engine, settings or None)
+    return _IsolatedCellEngine(handle, settings), engine
 
 
 def _handle_isolated_cell_request(
@@ -3867,7 +4374,9 @@ def _handle_isolated_cell_request(
     def run_request() -> dict[str, Any]:
         handles = {resource.handle.name: resource.handle}
         resource.handle, _owns_handle = open_cached_battery_engine_handle(
-            resource.handle.name, handles
+            resource.handle.name,
+            handles,
+            engine_settings=resource.engine_settings or None,
         )
         return run_isolated_cell_worker(payload, handle=resource.handle)
 
@@ -3909,14 +4418,23 @@ def _run_internal_analytical_with_cpu_budget(
 class _IsolatedCellWorker:
     """Battery requests on the shared worker's startup/call deadline split."""
 
-    def __init__(self, engine: str) -> None:
+    def __init__(
+        self,
+        engine: str,
+        engine_settings: Mapping[str, Any] | None = None,
+    ) -> None:
         self.engine = str(engine)
+        self.engine_settings = dict(engine_settings or {})
         self._lock = threading.Lock()
+        bootstrap_args = (
+            self.engine,
+            self.engine_settings or None,
+        )
         self._worker = WarmEngineWorker(
             name=f"{self.engine} battery cell",
             bootstrap=_bootstrap_isolated_cell_engine,
             handler=_handle_isolated_cell_request,
-            bootstrap_args=(self.engine,),
+            bootstrap_args=bootstrap_args,
             startup_timeout_s=(
                 60.0 if self.engine == "thermoengine" else 30.0
             ),
@@ -3942,51 +4460,116 @@ class _IsolatedCellWorker:
     def request(
         self, payload: Mapping[str, Any], *, timeout_s: float
     ) -> dict[str, Any]:
-        with self._lock:
-            try:
-                result = self._worker.call(payload, timeout_s=timeout_s)
-            except EngineWorkerTimeout as exc:
-                raise _IsolatedCellWorkerFailure(
-                    timed_out=True,
-                    detail=str(exc),
-                ) from exc
-            except EngineWorkerDied as exc:
-                cpu_signal = getattr(signal, "SIGPROF", None)
-                cpu_budget_fired = (
-                    self.engine == "internal-analytical"
-                    and cpu_signal is not None
-                    and exc.returncode == -int(cpu_signal)
+        started_wall, started_cpu = time.perf_counter(), time.process_time()
+        def solve() -> Any:
+            with self._lock:
+                try:
+                    result = self._worker.call(payload, timeout_s=timeout_s)
+                except EngineWorkerTimeout as exc:
+                    raise _IsolatedCellWorkerFailure(
+                        timed_out=True,
+                        detail=str(exc),
+                    ) from exc
+                except EngineWorkerDied as exc:
+                    cpu_signal = getattr(signal, "SIGPROF", None)
+                    cpu_budget_fired = (
+                        self.engine == "internal-analytical"
+                        and cpu_signal is not None
+                        and exc.returncode == -int(cpu_signal)
+                    )
+                    raise _IsolatedCellWorkerFailure(
+                        timed_out=cpu_budget_fired,
+                        returncode=exc.returncode,
+                        detail=exc.detail,
+                        timeout_reason=(
+                            "equilibrate exceeded hard CPU budget of "
+                            f"{_INTERNAL_ANALYTICAL_CPU_BUDGET_S:g}s"
+                            if cpu_budget_fired
+                            else None
+                        ),
+                    ) from exc
+                except EngineWorkerRemoteError as exc:
+                    raise _IsolatedCellWorkerFailure(detail=str(exc)) from exc
+                if not isinstance(result, dict):
+                    raise _IsolatedCellWorkerFailure(
+                        detail="isolated worker response was not an object"
+                    )
+                if result.get("status") == "refusal":
+                    return result
+            if self.engine == "internal-analytical":
+                return result
+            return EquilibrateCell.from_payload(result).to_engine_cache_value()
+
+        if self.engine in {"internal-analytical", "openimcc"}:
+            result = solve()
+        else:
+            from simulator.engine_cache import (
+                cached_engine_call,
+                engine_cache_settings,
+            )
+
+            request = {
+                key: payload[key]
+                for key in (
+                    "composition_wt_pct",
+                    "temperature_K",
+                    "physical_pressure_bar",
+                    "po2",
+                    "engine_settings",
+                    "native_activity_formula",
                 )
-                raise _IsolatedCellWorkerFailure(
-                    timed_out=cpu_budget_fired,
-                    returncode=exc.returncode,
-                    detail=exc.detail,
-                    timeout_reason=(
-                        "equilibrate exceeded hard CPU budget of "
-                        f"{_INTERNAL_ANALYTICAL_CPU_BUDGET_S:g}s"
-                        if cpu_budget_fired
-                        else None
-                    ),
-                ) from exc
-            except EngineWorkerRemoteError as exc:
-                raise _IsolatedCellWorkerFailure(detail=str(exc)) from exc
-            if not isinstance(result, dict):
-                raise _IsolatedCellWorkerFailure(
-                    detail="isolated worker response was not an object"
-                )
-            return result
+                if key in payload
+            }
+            if payload.get("simulate_crash") is not None:
+                request["simulate_crash"] = payload["simulate_crash"]
+            request["engine_settings"] = engine_cache_settings(
+                self.engine,
+                normalize_engine_settings(self.engine, self.engine_settings),
+            )
+            result = cached_engine_call(self.engine, request, solve)
+        if isinstance(result, list):
+            result = EquilibrateCell.from_engine_cache_value(result).as_payload()
+        if not isinstance(result, dict):
+            raise _IsolatedCellWorkerFailure(
+                detail="isolated worker response was not an object"
+            )
+        result = dict(result)
+        result.update(
+            pot_id=payload.get("pot_id"),
+            engine=self.engine,
+            temperature_K=payload.get("temperature_K"),
+            po2=payload.get("po2"),
+            arm=payload.get("arm"),
+            wall_s=time.perf_counter() - started_wall,
+            cpu_s=time.process_time() - started_cpu,
+            hostname=_hostname(),
+        )
+        return result
 
 
-_ISOLATED_CELL_WORKERS: dict[str, _IsolatedCellWorker] = {}
+_ISOLATED_CELL_WORKERS: dict[str | tuple[str, str], _IsolatedCellWorker] = {}
 _ISOLATED_CELL_WORKERS_LOCK = threading.Lock()
 
 
-def _isolated_cell_worker(engine: str) -> _IsolatedCellWorker:
+def _isolated_cell_worker(
+    engine: str,
+    engine_settings: Mapping[str, Any] | None = None,
+) -> _IsolatedCellWorker:
+    settings_json = (
+        None
+        if engine_settings is None
+        else json.dumps(
+            dict(engine_settings), sort_keys=True, separators=(",", ":")
+        )
+    )
+    worker_key: str | tuple[str, str] = (
+        str(engine) if settings_json is None else (str(engine), settings_json)
+    )
     with _ISOLATED_CELL_WORKERS_LOCK:
-        worker = _ISOLATED_CELL_WORKERS.get(engine)
+        worker = _ISOLATED_CELL_WORKERS.get(worker_key)
         if worker is None:
-            worker = _IsolatedCellWorker(engine)
-            _ISOLATED_CELL_WORKERS[engine] = worker
+            worker = _IsolatedCellWorker(engine, engine_settings)
+            _ISOLATED_CELL_WORKERS[worker_key] = worker
         return worker
 
 
@@ -4018,6 +4601,8 @@ def _run_cell_in_subprocess(
     certified_band: Mapping[str, Any] | None,
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
+    defer_qualification_decoration: bool = False,
+    engine_settings: Mapping[str, Any] | None = None,
 ) -> EquilibrateCell:
     hostname = _hostname()
     wall0 = time.perf_counter()
@@ -4034,10 +4619,12 @@ def _run_cell_in_subprocess(
         "qualification": bool(qualification),
         "arm": arm,
         "simulate_crash": simulate_crash,
+        "_defer_qualification_decoration": defer_qualification_decoration,
+        "engine_settings": dict(engine_settings or {}),
     }
     if physical_pressure_bar is not None:
         payload["physical_pressure_bar"] = float(physical_pressure_bar)
-    worker = _isolated_cell_worker(handle.name)
+    worker = _isolated_cell_worker(handle.name, engine_settings)
     try:
         raw = worker.request(
             payload,
@@ -4128,6 +4715,82 @@ def _engine_identities_from_toml() -> dict[str, dict[str, str]]:
     return payload
 
 
+def normalize_engine_settings(
+    engine_name: str,
+    settings: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Normalize opener settings once for backend construction and cache keys."""
+    fields: Mapping[str, Any] = settings or {}
+    if engine_name == "internal-analytical":
+        return {"oxygen_balance_backend": fields.get("oxygen_balance_backend")}
+    if engine_name == "openimcc":
+        from simulator.melt_backend.openimcc_bridge import DEFAULT_BACKEND_PACK_NAME
+
+        return {"pack": fields.get("pack") or DEFAULT_BACKEND_PACK_NAME}
+    if engine_name == "alphamelts":
+        model_name = fields.get("raw_model_name")
+        transport = fields.get("transport")
+        if transport is None or str(transport).strip().lower() not in {
+            "subprocess",
+            "binary",
+        }:
+            # Validate before projection so a cache hit cannot hide a rejected
+            # raw Python API model.
+            resolve_alphamelts_python_api_model(model_name)
+        missing = object()
+        ambient = fields.get("effective_calc_mode", missing)
+        if ambient is missing:
+            ambient = fields.get("ambient_calc_mode")
+        subprocess_settings = resolve_alphamelts_subprocess_settings(
+            model_name, ambient
+        )
+        return {
+            "transport": fields.get("transport"),
+            "effective_calc_mode": subprocess_settings["effective_calc_mode"],
+            "raw_model_name": subprocess_settings["model"],
+            "redox_buffer": fields.get("redox_buffer"),
+            "fO2_offset": fields.get("fO2_offset"),
+            "Fe3Fet_ratio": fields.get("Fe3Fet_ratio"),
+            "python_api_model": fields.get("python_api_model"),
+            "configured_vapor_transport_pO2_bar": fields.get(
+                "configured_vapor_transport_pO2_bar"
+            ),
+            "configured_vapor_transport_floor_bar": fields.get(
+                "configured_vapor_transport_floor_bar"
+            ),
+            "warm_worker": False,
+        }
+    if engine_name == "vaporock":
+        return {
+            "temperature_units": fields.get("temperature_units", "C"),
+            "pressure_units": fields.get("pressure_units", "bar"),
+            "vapor_pressure_units": fields.get("vapor_pressure_units", "bar"),
+            "warm_worker": False,
+        }
+    if engine_name == "magemin":
+        return {
+            "database": fields.get("database"),
+            "bridge": fields.get("bridge") or fields.get("python_bridge"),
+            "fO2_buffer": fields.get("fO2_buffer"),
+            "warm_worker": False,
+        }
+    if engine_name == "thermoengine":
+        return {
+            "model": fields.get("model"),
+            "configured_vapor_transport_pO2_bar": fields.get(
+                "configured_vapor_transport_pO2_bar"
+            ),
+            "configured_vapor_transport_floor_bar": fields.get(
+                "configured_vapor_transport_floor_bar"
+            ),
+            "redox_buffer": fields.get("redox_buffer"),
+            "fO2_offset": fields.get("fO2_offset"),
+            "Fe3Fet_ratio": fields.get("Fe3Fet_ratio"),
+            "warm_worker": False,
+        }
+    raise ValueError(f"unknown engine {engine_name!r}")
+
+
 def _equilibrate_takes_fo2(backend: Any) -> bool:
     try:
         signature = inspect.signature(backend.equilibrate)
@@ -4136,7 +4799,12 @@ def _equilibrate_takes_fo2(backend: Any) -> bool:
     return "fO2_log" in signature.parameters
 
 
-def _open_resolved_backend(name: str) -> Any:
+def _open_resolved_backend(
+    name: str,
+    engine_settings: Mapping[str, Any] | None = None,
+    *,
+    normalized_settings: Mapping[str, Any] | None = None,
+) -> Any:
     from simulator.backends import (
         BackendSelectionPolicy,
         BackendUnavailableError,
@@ -4144,32 +4812,140 @@ def _open_resolved_backend(name: str) -> Any:
         resolve_backend,
     )
     from simulator.melt_backend.magemin import MAGEMinBackend
-    from simulator.vapour_rail.calibration import open_warm_vaporock_backend
+
+    settings = (
+        normalized_settings
+        if normalized_settings is not None
+        else normalize_engine_settings(name, engine_settings)
+    )
 
     if name in OPENIMCC_ENGINE_NAMES:
-        return _OpenImccBatteryBackend(name)
+        return _OpenImccBatteryBackend(name, pack_name=settings.get("pack"))
     if name == "internal-analytical":
-        return _InternalAnalyticalBatteryBackend()
+        oxygen_settings = settings.get("oxygen_balance_backend") or {}
+        return _InternalAnalyticalBatteryBackend(
+            oxygen_balance_pack=(
+                str(oxygen_settings["pack"])
+                if isinstance(oxygen_settings, Mapping)
+                and oxygen_settings.get("pack") is not None
+                else None
+            )
+        )
     if name == "vaporock":
-        return open_warm_vaporock_backend(warm_pool_size=1)
+        from simulator.melt_backend.vaporock import VapoRockBackend
+
+        if engine_settings is None:
+            from simulator.vapour_rail.calibration import open_warm_vaporock_backend
+
+            return open_warm_vaporock_backend(warm_pool_size=1)
+        backend = VapoRockBackend()
+        if not backend.initialize(
+            {
+                "temperature_units": settings.get("temperature_units", "C"),
+                "pressure_units": settings.get("pressure_units", "bar"),
+                "vapor_pressure_units": settings.get(
+                    "vapor_pressure_units", "bar"
+                ),
+                "warm_worker": settings["warm_worker"],
+            }
+        ):
+            raise BackendUnavailableError(
+                f"VapoRock unavailable: {backend._last_error}"
+            )
+        return backend
     if name == "magemin":
-        backend = _try_backend(MAGEMinBackend, {})
+        backend_config = (
+            {}
+            if engine_settings is None
+            else {
+                "database": settings.get("database"),
+                "fO2_buffer": settings.get("fO2_buffer"),
+                "python_bridge": settings.get("bridge"),
+                "warm_worker": settings["warm_worker"],
+            }
+        )
+        backend = _try_backend(MAGEMinBackend, backend_config)
         if backend is None:
             raise BackendUnavailableError(
                 "MAGEMin unavailable; binary missing or initialize() failed"
             )
         return backend
+    if name == "alphamelts":
+        subprocess_settings = resolve_alphamelts_subprocess_settings(
+            settings.get("raw_model_name"),
+            settings.get("effective_calc_mode"),
+        )
+        backend_config = {
+            "mode": settings.get("transport"),
+            "model": settings.get("raw_model_name"),
+            "effective_calc_mode": settings["effective_calc_mode"],
+            "model_calc_mode": subprocess_settings["model_calc_mode"],
+            "calc_mode_conflict": subprocess_settings["calc_mode_conflict"],
+            "subprocess_model_error": subprocess_settings[
+                "subprocess_model_error"
+            ],
+            "fO2_buffer": settings.get("redox_buffer"),
+            "fO2_offset": settings.get("fO2_offset"),
+            "Fe3Fet_Liq": settings.get("Fe3Fet_ratio"),
+            "warm_worker": settings["warm_worker"],
+        }
+        if settings["configured_vapor_transport_pO2_bar"] is not None:
+            backend_config["vapor_transport_pO2_bar"] = settings[
+                "configured_vapor_transport_pO2_bar"
+            ]
+        if settings["configured_vapor_transport_floor_bar"] is not None:
+            backend_config["vapor_transport_floor_bar"] = settings[
+                "configured_vapor_transport_floor_bar"
+            ]
+        backend = resolve_backend(
+            name,
+            BackendSelectionPolicy.RUNNER_STRICT,
+            backend_config=backend_config,
+        )
+        python_api_model = settings.get("python_api_model")
+        if python_api_model is not None and hasattr(backend, "_python_api_model"):
+            backend._python_api_model = tuple(python_api_model)
+        return backend
+    if engine_settings is not None and name == "thermoengine":
+        backend_config = {
+            "model": settings.get("model"),
+            "vapor_transport_pO2_bar": settings[
+                "configured_vapor_transport_pO2_bar"
+            ],
+            "vapor_transport_floor_bar": settings[
+                "configured_vapor_transport_floor_bar"
+            ],
+            "fO2_buffer": settings["redox_buffer"],
+            "fO2_offset": settings["fO2_offset"],
+            "Fe3Fet_Liq": settings["Fe3Fet_ratio"],
+        }
+        return resolve_backend(
+            name,
+            BackendSelectionPolicy.RUNNER_STRICT,
+            backend_config=backend_config,
+        )
     return resolve_backend(name, BackendSelectionPolicy.RUNNER_STRICT)
 
 
-def open_battery_engine(name: str) -> EngineHandle:
+def _open_battery_engine_with_settings(
+    name: str,
+    engine_settings: Mapping[str, Any] | None = None,
+) -> EngineHandle:
     """Resolve one battery engine. Unavailable is a typed handle, not a crash."""
 
     from simulator.backends import BackendUnavailableError
 
     identity_block = _engine_identities_from_toml().get(name, {})
+    normalized_settings = normalize_engine_settings(name, engine_settings)
     try:
-        backend = _open_resolved_backend(name)
+        backend = _open_resolved_backend(
+            name,
+            engine_settings,
+            normalized_settings=normalized_settings,
+        )
+        from simulator.engine_cache import record_engine_open
+
+        record_engine_open(name, backend)
         if name in IMCC_ENGINE_NAMES and hasattr(backend, "_identity"):
             identity_block = {**identity_block, **dict(backend._identity)}
     except BackendUnavailableError as exc:
@@ -4181,6 +4957,7 @@ def open_battery_engine(name: str) -> EngineHandle:
             takes_fo2=False,
             supports_intrinsic_fo2=False,
             identity=identity_block,
+            engine_settings=normalized_settings,
         )
     except Exception as exc:  # noqa: BLE001 - probe must not crash the battery
         return EngineHandle(
@@ -4191,6 +4968,7 @@ def open_battery_engine(name: str) -> EngineHandle:
             takes_fo2=False,
             supports_intrinsic_fo2=False,
             identity=identity_block,
+            engine_settings=normalized_settings,
         )
 
     # A resolved backend object is called even when is_available() is False
@@ -4207,7 +4985,12 @@ def open_battery_engine(name: str) -> EngineHandle:
             getattr(backend, "supports_intrinsic_fO2", False)
         ),
         identity=identity_block,
+        engine_settings=normalized_settings,
     )
+
+
+def open_battery_engine(name: str) -> EngineHandle:
+    return _open_battery_engine_with_settings(name)
 
 
 def probe_battery_engines(
@@ -4255,25 +5038,6 @@ def _fo2_log_for_request(handle: EngineHandle, request: Po2Request) -> float | N
     return _DEFAULT_FO2_LOG
 
 
-def _hostname() -> str:
-    env_name = os.environ.get("GOALFLIGHT_HOSTNAME") or os.environ.get("HOSTNAME")
-    if env_name:
-        return str(env_name)
-    try:
-        probed = subprocess.run(
-            ["hostname"],
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=5,
-        ).stdout.strip()
-        if probed:
-            return probed
-    except (OSError, subprocess.SubprocessError):
-        pass
-    return socket.gethostname()
-
-
 def equilibrate_cell(
     handle: EngineHandle,
     pot: BinaryPot,
@@ -4287,8 +5051,63 @@ def equilibrate_cell(
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
     native_activity_formula: str | None = None,
+    _defer_qualification_decoration: bool = False,
+) -> EquilibrateCell:
+    return _equilibrate_cell_uncached(
+        handle,
+        pot,
+        temperature_K=temperature_K,
+        po2=po2,
+        timeout_s=timeout_s,
+        qualification=qualification,
+        isolated=isolated,
+        arm=arm,
+        simulate_crash=simulate_crash,
+        physical_pressure_bar=physical_pressure_bar,
+        native_activity_formula=native_activity_formula,
+        _defer_qualification_decoration=_defer_qualification_decoration,
+    )
+
+
+def _equilibrate_cell_uncached(
+    handle: EngineHandle,
+    pot: BinaryPot,
+    *,
+    temperature_K: float,
+    po2: Po2Request,
+    timeout_s: float | None = None,
+    qualification: bool = False,
+    isolated: bool | None = None,
+    arm: str | None = None,
+    simulate_crash: str | None = None,
+    physical_pressure_bar: float | None = None,
+    native_activity_formula: str | None = None,
+    _defer_qualification_decoration: bool = False,
+    _cache_engine_call: bool = True,
 ) -> EquilibrateCell:
     """One pot × engine × T × pO2 call. Refusals are rows, never exceptions."""
+
+    timeout = float(timeout_s or _ENGINE_OUTER_TIMEOUT_S.get(handle.name, 30.0))
+    use_isolated = isolated
+    if use_isolated is None:
+        use_isolated = bool(
+            simulate_crash
+            or (qualification and handle.name in MELTS_FAMILY_ENGINES)
+        )
+    # MAGEMin's native-activity fields are carried by its existing bounded
+    # binary call. Keep that request on this process so it does not need a
+    # second private-worker payload shape.
+    if handle.name == "magemin" and native_activity_formula is not None:
+        use_isolated = False
+
+    def _finish(cell: EquilibrateCell) -> EquilibrateCell:
+        if (
+            qualification
+            and handle.name in MELTS_FAMILY_ENGINES
+            and not _defer_qualification_decoration
+        ):
+            return _decorate_qualification_outcome(cell, pot, temperature_K)
+        return cell
 
     hostname = _hostname()
     wall0 = time.perf_counter()
@@ -4297,15 +5116,10 @@ def equilibrate_cell(
     notices: list[dict[str, Any]] = []
     authority: str | None = None
     certified_band: dict[str, Any] | None = None
-    if qualification and handle.name in MELTS_FAMILY_ENGINES:
-        gate = assess_qualification_gate(pot.composition_wt_pct, temperature_K)
-        notices.append(qualification_notice(gate))
-        authority = AUTHORITY_EXTRAPOLATED
-        certified_band = dict(gate["certified_band"])
 
     def _done(**kwargs: Any) -> EquilibrateCell:
         extra_notices = list(kwargs.pop("notices", None) or [])
-        return EquilibrateCell(
+        return _finish(EquilibrateCell(
             pot_id=pot.pot_id,
             engine=handle.name,
             temperature_K=float(temperature_K),
@@ -4319,7 +5133,7 @@ def equilibrate_cell(
             certified_band=kwargs.pop("certified_band", None) or certified_band,
             model_id=kwargs.pop("model_id", None) or _handle_model_id(handle),
             **kwargs,
-        )
+        ))
 
     if (
         po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
@@ -4338,20 +5152,8 @@ def equilibrate_cell(
             liquid_fraction=None,
         )
 
-    timeout = float(timeout_s or _ENGINE_OUTER_TIMEOUT_S.get(handle.name, 30.0))
-    use_isolated = isolated
-    if use_isolated is None:
-        use_isolated = bool(
-            simulate_crash
-            or (qualification and handle.name in MELTS_FAMILY_ENGINES)
-        )
-    # MAGEMin's native-activity fields are carried by its existing bounded
-    # binary call. Keep that request on this process so it does not need a
-    # second private-worker payload shape.
-    if handle.name == "magemin" and native_activity_formula is not None:
-        use_isolated = False
     if use_isolated:
-        return _run_cell_in_subprocess(
+        return _finish(_run_cell_in_subprocess(
             handle,
             pot,
             temperature_K=temperature_K,
@@ -4364,7 +5166,9 @@ def equilibrate_cell(
             certified_band=certified_band,
             simulate_crash=simulate_crash,
             physical_pressure_bar=physical_pressure_bar,
-        )
+            defer_qualification_decoration=True,
+            engine_settings=handle.engine_settings or None,
+        ))
 
     if not handle.available or handle.backend is None:
         return _done(
@@ -4438,27 +5242,17 @@ def equilibrate_cell(
     kwargs.update(isothermal_run_kwargs(handle.name, parameters))
 
     try:
-        result = _call_with_hard_timeout(
-            lambda: handle.backend.equilibrate(**kwargs),
-            timeout,
+        def solve_backend() -> Any:
+            return _call_with_hard_timeout(
+                lambda: handle.backend.equilibrate(**kwargs), timeout
+            )
+
+        result = _call_cached_backend_equilibrate(
+            handle, kwargs, solve_backend, cache=_cache_engine_call
         )
         status, refusal, engine_reason = classify_equilibrate_outcome(result)
         diagnostics = dict(getattr(result, "diagnostics", None) or {})
         engine_annotation = crash_floor_engine_annotation(diagnostics)
-        if (
-            qualification
-            and status == "refusal"
-            and refusal not in {REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH}
-        ):
-            gate_name = (
-                diagnostics.get("backend_failure_reason_code")
-                or diagnostics.get("backend_status_reason")
-                or engine_reason
-                or refusal
-            )
-            refusal = REFUSAL_GATE_REFUSED_IN_ADAPTER
-            engine_reason = f"{gate_name}"
-            engine_annotation = None
         activities, pressures, invalid_pressure_components = (
             extract_reported_quantities(result)
         )
@@ -4482,7 +5276,7 @@ def equilibrate_cell(
         exit_signal = None
         if exit_code is not None and exit_code < 0:
             exit_signal = -exit_code
-        return _done(
+        cell = _done(
             status=status,
             refusal_reason=refusal,
             engine_status=str(getattr(result, "status", None) or status),
@@ -4517,7 +5311,13 @@ def equilibrate_cell(
             fe_redox_split=_finite_component_map(
                 getattr(result, "fe_redox_split", None)
             ),
+            backend_failure_disposition=(
+                None
+                if diagnostics.get("backend_failure_disposition") is None
+                else str(diagnostics.get("backend_failure_disposition"))
+            ),
         )
+        return cell
     except Exception as exc:  # noqa: BLE001 - typed refusal, never a hang/crash
         status, refusal, engine_reason = classify_equilibrate_outcome(error=exc)
         # A domain refusal is a row. Closing the handle would stamp every
@@ -4531,7 +5331,7 @@ def equilibrate_cell(
         if is_timeout or not battery_engine_handle_is_live(handle):
             retire_battery_engine_handle(handle)
             handle.unavailable_reason = engine_reason
-        return _done(
+        cell = _done(
             status=status,
             refusal_reason=refusal,
             engine_status=type(exc).__name__,
@@ -4539,7 +5339,13 @@ def equilibrate_cell(
             melt_activities={},
             gas_partial_pressures_Pa={},
             liquid_fraction=None,
+            backend_failure_disposition=(
+                None
+                if getattr(exc, "failure_disposition", None) is None
+                else str(getattr(exc, "failure_disposition"))
+            ),
         )
+        return cell
 
 
 @dataclass(frozen=True)
@@ -5465,7 +6271,7 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
                 "and are excluded from residuals. "
                 f"`{FINDING_CLASS_FALLBACK_VS_SPECIATION}` marks a pair where "
                 "one engine reported an Antoine fallback authority "
-                f"(`{_ANTOINE_FALLBACK_PREFIX}` / "
+            f"(`{ANTOINE_FALLBACK_SOURCE_PREFIX}` / "
                 "`vapor_pressure_backend_status=fallback`) and the other a "
                 "speciation result. The Pa number itself is indistinguishable "
                 "from a speciation value; the harness now copies the engine "

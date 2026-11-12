@@ -49,7 +49,7 @@ from simulator.optimize.evaluate import (
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
-from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore, ResultStoreWriteRejected
 from simulator.optimize.worker_runtime import (
     clear_worker_runtime,
@@ -63,22 +63,28 @@ from simulator.engine_pool import (
     INHERIT_PROCESS_GROUP_ENV,
     WarmEngineWorker,
 )
+from simulator.supervised_process_pool import (
+    DEFAULT_PROCESS_TASK_TIMEOUT_SECONDS,
+    SupervisedProcessPoolUnavailable,
+    expired_futures as _expired_futures,
+    startup_timeout_seconds as _startup_timeout_seconds,
+    supervised_process_map,
+)
 
 _WORKER_OUTPUT_ENV = "REGOLITH_OPTIMIZER_WORKER_OUTPUT_DIR"
 EVAL_TIMEOUT_ENV = "REGOLITH_OPTIMIZER_EVAL_TIMEOUT_SECONDS"
 _CHILD_PID_LOG_ENV = "REGOLITH_OPTIMIZER_CHILD_PID_LOG"
 # Grounded on repo notes: live AlphaMELTS high eval ~=7 min, prior 900 s
 # cap could be tight for precompute; 45 min is >6x observed and configurable.
-DEFAULT_EVAL_TIMEOUT_SECONDS = 45 * 60
+DEFAULT_EVAL_TIMEOUT_SECONDS = DEFAULT_PROCESS_TASK_TIMEOUT_SECONDS
 # Must stay 1: submit occupies a worker slot, so time-to-start is spawn rather
 # than queue wait behind another eval. Execution timeout starts at the worker's
 # start marker, not at submit. A never-started occupying slot is bounded by
-# _startup_timeout_seconds (same shape as EngineWorkerPool). Raising this would
+# the shared supervisor's startup deadline. Raising this would
 # queue futures whose start marker never appears until a slot frees; charging
 # startup-from-submit would again kill unstarted work.
 _INFLIGHT_PER_WORKER = 1
 _EVAL_STARTED_MARKER = ".eval-started"
-_POOL_POLL_SECONDS = 0.1
 _WORKER_TERMINATE_GRACE_SECONDS = 5.0
 _DESCENDANT_SNAPSHOT_SECONDS = 0.25
 _DESCENDANT_PGREP_TIMEOUT_SECONDS = 1.0
@@ -361,150 +367,59 @@ def _evaluate_tasks_in_pool(
             per_eval_timeout_seconds=per_eval_timeout_seconds,
             warm_runtime_spec=warm_runtime_spec,
         )
-    results: list[ScoredResult | None] = [None] * len(tasks)
-    worker_count = max_workers or (os.cpu_count() or 1)
-    max_inflight = max(1, worker_count * _INFLIGHT_PER_WORKER)
-    task_queue = deque(tasks)
     initializer = partial(_initialize_worker, warm_runtime_spec)
-    executor = _create_executor(max_workers, initializer)
-    futures: dict[Future[Any], _PoolTask] = {}
-    submitted_at: dict[Future[Any], float] = {}
-    started_at: dict[Future[Any], float] = {}
-    pending_abort: BaseException | None = None
-    executor_closed = False
-    try:
-        _submit_until_full(
+
+    def handle_result(task: _PoolTask, outcome: Mapping[str, Any]) -> ScoredResult:
+        if outcome["kind"] == "abort":
+            abort_payload = dict(outcome["abort"])
+            abort_payload.setdefault("candidate_id", task.candidate_id)
+            raise _rebuild_abort(abort_payload)
+        return outcome["result"]
+
+    def abort_executor(
+        executor: ProcessPoolExecutor,
+        futures: Mapping[Future[Any], _PoolTask],
+        abort: BaseException,
+        affected_tasks: Sequence[_PoolTask],
+    ) -> bool:
+        return _best_effort_abort_executor(
             executor,
             futures,
-            submitted_at,
-            started_at,
-            task_queue,
-            evaluate_fn,
-            max_inflight,
+            abort,
+            extra_pids=_tracked_child_pids_for_tasks(affected_tasks),
         )
-        while futures or task_queue:
-            if not futures:
-                executor = _create_executor(max_workers, initializer)
-                executor_closed = False
-                _submit_until_full(
-                    executor,
-                    futures,
-                    submitted_at,
-                    started_at,
-                    task_queue,
-                    evaluate_fn,
-                    max_inflight,
-                )
-                continue
-            _refresh_execution_start(futures, started_at)
-            wait_timeout = _pool_wait_timeout(
-                futures,
-                submitted_at,
-                started_at,
-                per_eval_timeout_seconds,
-            )
-            done, _ = wait(futures, timeout=wait_timeout, return_when=FIRST_COMPLETED)
-            for future in done:
-                task = futures.pop(future)
-                submitted_at.pop(future, None)
-                started_at.pop(future, None)
-                try:
-                    outcome = future.result()
-                except BaseException as exc:
-                    abort = RuntimeError(
-                        f"process-pool evaluation failed for {_task_label(task)}"
-                    )
-                    pending_abort = abort
-                    executor_closed = _best_effort_abort_executor(
-                        executor,
-                        futures,
-                        abort,
-                        extra_pids=_tracked_child_pids_for_tasks(
-                            (task, *tuple(futures.values()))
-                        ),
-                    )
-                    raise abort from exc
-                if outcome["kind"] == "abort":
-                    abort_payload = dict(outcome["abort"])
-                    abort_payload.setdefault("candidate_id", task.candidate_id)
-                    abort = _rebuild_abort(abort_payload)
-                    pending_abort = abort
-                    executor_closed = _best_effort_abort_executor(
-                        executor,
-                        futures,
-                        abort,
-                        extra_pids=_tracked_child_pids_for_tasks(
-                            (task, *tuple(futures.values()))
-                        ),
-                    )
-                    raise abort
-                results[int(outcome["index"])] = outcome["result"]
-                _submit_until_full(
-                    executor,
-                    futures,
-                    submitted_at,
-                    started_at,
-                    task_queue,
-                    evaluate_fn,
-                    max_inflight,
-                )
-            _refresh_execution_start(futures, started_at)
-            expired = _expired_futures(
-                futures,
-                submitted_at,
-                started_at,
-                per_eval_timeout_seconds,
-            )
-            if expired:
-                expired_tasks = [futures.pop(future) for future in expired]
-                for future, task in zip(expired, expired_tasks):
-                    start = started_at.pop(future, None)
-                    submitted = submitted_at.pop(future, start or time.monotonic())
-                    origin = start if start is not None else submitted
-                    results[task.index] = _timeout_result(
-                        task,
-                        timeout_seconds=per_eval_timeout_seconds or 0.0,
-                        elapsed_seconds=max(0.0, time.monotonic() - origin),
-                    )
-                requeue = sorted(
-                    (task for future, task in futures.items() if future not in expired),
-                    key=lambda item: item.index,
-                )
-                abort_tasks = (*expired_tasks, *tuple(requeue))
-                task_queue.extendleft(reversed(requeue))
-                futures.clear()
-                submitted_at.clear()
-                started_at.clear()
-                executor_closed = _best_effort_abort_executor(
-                    executor,
-                    {},
-                    RuntimeError("process-pool worker timed out"),
-                    extra_pids=_tracked_child_pids_for_tasks(abort_tasks),
-                )
-                executor = _create_executor(max_workers, initializer)
-                executor_closed = False
-                _submit_until_full(
-                    executor,
-                    futures,
-                    submitted_at,
-                    started_at,
-                    task_queue,
-                    evaluate_fn,
-                    max_inflight,
-                )
-    finally:
-        if not executor_closed:
-            try:
-                executor.shutdown(wait=False, cancel_futures=True)
-            except BaseException as exc:
-                if pending_abort is None:
-                    raise
-                _attach_teardown_error(pending_abort, exc)
 
-    completed = tuple(result for result in results if result is not None)
-    if len(completed) != len(tasks):
-        raise RuntimeError("process-pool evaluation ended without all results")
-    return completed
+    try:
+        return supervised_process_map(
+            tasks,
+            _evaluate_pool_task,
+            max_workers=max_workers,
+            initializer=initializer,
+            worker_args=(evaluate_fn,),
+            wait_fn=wait,
+            max_inflight_per_worker=_INFLIGHT_PER_WORKER,
+            timeout_seconds=per_eval_timeout_seconds,
+            has_started=_optimizer_task_has_started,
+            before_submit=_clear_eval_started_marker,
+            handle_result=handle_result,
+            handle_timeout=lambda task, elapsed: _timeout_result(
+                task,
+                timeout_seconds=per_eval_timeout_seconds or 0.0,
+                elapsed_seconds=elapsed,
+            ),
+            handle_worker_error=lambda task, exc: RuntimeError(
+                f"process-pool evaluation failed for {_task_label(task)}"
+            ),
+            task_label=_task_label,
+            requeue_key=lambda task: task.index,
+            abort_executor=abort_executor,
+            is_unavailable=_is_pool_unavailable,
+            executor_factory=lambda worker_count, worker_initializer, _context: (
+                _create_executor(worker_count, worker_initializer)
+            ),
+        )
+    except SupervisedProcessPoolUnavailable as exc:
+        raise _PoolUnavailableError(str(exc)) from exc
 
 
 def _bootstrap_optimizer_engine_worker(
@@ -785,32 +700,6 @@ def _supervised_pool_task_main(
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("wb") as handle:
         pickle.dump(outcome, handle)
-
-
-def _submit_until_full(
-    executor: ProcessPoolExecutor,
-    futures: dict[Future[Any], _PoolTask],
-    submitted_at: dict[Future[Any], float],
-    started_at: dict[Future[Any], float],
-    task_queue: deque[_PoolTask],
-    evaluate_fn: Callable[..., ScoredResult],
-    max_inflight: int,
-) -> None:
-    while len(futures) < max_inflight:
-        try:
-            task = task_queue.popleft()
-        except IndexError:
-            return
-        _clear_eval_started_marker(task)
-        try:
-            future = executor.submit(_evaluate_pool_task, task, evaluate_fn)
-        except BaseException as exc:
-            if _is_pool_unavailable(exc):
-                raise _PoolUnavailableError("could not submit process-pool task") from exc
-            raise
-        futures[future] = task
-        submitted_at[future] = time.monotonic()
-        started_at.pop(future, None)
 
 
 def _initialize_worker(warm_runtime: _WarmRuntimeSpec | str | None = None) -> None:
@@ -1272,29 +1161,6 @@ def resolve_eval_timeout_seconds(value: float | int | str | None = None) -> floa
     return seconds
 
 
-def _create_executor(
-    max_workers: int | None,
-    initializer: Any,
-) -> ProcessPoolExecutor:
-    try:
-        return ProcessPoolExecutor(max_workers=max_workers, initializer=initializer)
-    except BaseException as exc:
-        if _is_pool_unavailable(exc):
-            raise _PoolUnavailableError("could not create process pool") from exc
-        raise
-
-
-def _startup_timeout_seconds(eval_timeout_seconds: float) -> float:
-    """Bound submit → worker-entered-_evaluate_pool_task, not execution.
-
-    Same shape as EngineWorkerPool.startup_timeout_s:
-    30 s is spawn + initializer headroom (cold import under load);
-    300 s caps a wedged pool. Execution still uses eval_timeout_seconds
-    once the start marker is observed.
-    """
-    return min(300.0, max(30.0, float(eval_timeout_seconds)))
-
-
 def _eval_started_marker_path(task: _PoolTask) -> Path:
     return Path(task.output_dir) / _EVAL_STARTED_MARKER
 
@@ -1314,6 +1180,18 @@ def _clear_eval_started_marker(task: _PoolTask) -> None:
         return
 
 
+def _optimizer_task_has_started(task: _PoolTask) -> bool:
+    try:
+        text = _eval_started_marker_path(task).read_text(encoding="utf-8").strip()
+    except OSError:
+        return False
+    try:
+        pid = int(text.split()[0])
+    except (ValueError, IndexError):
+        return True
+    return _process_is_alive(pid)
+
+
 def _process_is_alive(pid: int) -> bool:
     try:
         os.kill(int(pid), 0)
@@ -1322,76 +1200,6 @@ def _process_is_alive(pid: int) -> bool:
     except OSError:
         return False
     return True
-
-
-def _refresh_execution_start(
-    futures: Mapping[Future[Any], _PoolTask],
-    started_at: dict[Future[Any], float],
-) -> None:
-    now = time.monotonic()
-    for future, task in futures.items():
-        if future in started_at:
-            continue
-        try:
-            text = _eval_started_marker_path(task).read_text(encoding="utf-8").strip()
-        except FileNotFoundError:
-            continue
-        except OSError:
-            continue
-        try:
-            pid = int(text.split()[0])
-        except (ValueError, IndexError):
-            pid = None
-        if pid is not None and not _process_is_alive(pid):
-            # Stale marker from a reaped worker of a previous attempt.
-            continue
-        started_at[future] = now
-
-
-def _pool_wait_timeout(
-    futures: Mapping[Future[Any], _PoolTask],
-    submitted_at: Mapping[Future[Any], float],
-    started_at: Mapping[Future[Any], float],
-    timeout_seconds: float | None,
-) -> float | None:
-    if timeout_seconds is None:
-        return None
-    if not futures:
-        return _POOL_POLL_SECONDS
-    now = time.monotonic()
-    startup_timeout = _startup_timeout_seconds(timeout_seconds)
-    remaining: list[float] = []
-    for future in futures:
-        start = started_at.get(future)
-        if start is not None:
-            remaining.append(max(0.0, timeout_seconds - (now - start)))
-        else:
-            submitted = submitted_at.get(future, now)
-            remaining.append(max(0.0, startup_timeout - (now - submitted)))
-    return min(_POOL_POLL_SECONDS, min(remaining, default=_POOL_POLL_SECONDS))
-
-
-def _expired_futures(
-    futures: Mapping[Future[Any], _PoolTask],
-    submitted_at: Mapping[Future[Any], float],
-    started_at: Mapping[Future[Any], float],
-    timeout_seconds: float | None,
-) -> tuple[Future[Any], ...]:
-    if timeout_seconds is None:
-        return ()
-    now = time.monotonic()
-    startup_timeout = _startup_timeout_seconds(timeout_seconds)
-    expired: list[Future[Any]] = []
-    for future in futures:
-        start = started_at.get(future)
-        if start is not None:
-            if now - start >= timeout_seconds:
-                expired.append(future)
-            continue
-        submitted = submitted_at.get(future, now)
-        if now - submitted >= startup_timeout:
-            expired.append(future)
-    return tuple(expired)
 
 
 def _timeout_result(
@@ -1782,6 +1590,13 @@ def _is_pool_unavailable(exc: BaseException) -> bool:
     if isinstance(exc, PermissionError):
         return True
     return isinstance(exc, OSError) and exc.errno in _POOL_UNAVAILABLE_ERRNOS
+
+
+def _create_executor(
+    max_workers: int | None,
+    initializer: Any,
+) -> ProcessPoolExecutor:
+    return ProcessPoolExecutor(max_workers=max_workers, initializer=initializer)
 
 
 def _serial_fallback_env_names() -> tuple[str, ...]:

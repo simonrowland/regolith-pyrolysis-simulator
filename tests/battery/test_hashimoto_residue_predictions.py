@@ -289,7 +289,6 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         (experiments[0],),
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="pre-mass-loss-pin",
         engine="openimcc",
         _allow_partial_cohort_for_test=True,
     )
@@ -363,7 +362,6 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         experiments,
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="test-revision",
     )
 
     assert len(predictions) == 48
@@ -435,7 +433,6 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         "d060_pending",
         "datapack_version",
         "pack_digest",
-        "code_revision",
         "integration",
         "component_exhausted_by_geometry",
         "atom_closure_mol_by_geometry",
@@ -462,7 +459,7 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         assert provenance["density_kg_m3"] == 2700.0
         assert provenance["density_source"]
         assert provenance["d060_pending"] is True
-        assert provenance["code_revision"] == "test-revision"
+        assert "code_revision" not in provenance
         integration = provenance["integration"]
         assert integration["refinement_status"] == "converged"
         assert set(integration["refinement_status_by_geometry"]) == set(
@@ -474,9 +471,8 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         assert set(integration["max_difference_wt_pct_by_geometry"]) == set(
             _HASHIMOTO_GEOMETRIES
         )
-        assert set(integration["process_cpu_seconds_by_geometry"]) == set(
-            _HASHIMOTO_GEOMETRIES
-        )
+        assert "process_cpu_seconds_by_geometry" not in integration
+        assert "process_cpu_seconds" not in integration
         assert all(
             steps and steps[-1] == integration["accepted_steps_by_geometry"][geometry]
             and steps[-1] <= 256
@@ -488,7 +484,6 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
             == len(steps) - 1
             for geometry, steps in integration["steps_tried_by_geometry"].items()
         )
-        assert all(value >= 0 for value in integration["process_cpu_seconds_by_geometry"].values())
         assert provenance["notices"] == integration["refinement_notices"]
         assert "sqrt(binary64 epsilon)" in provenance["integration"][
             "component_exhaustion_rule"
@@ -614,7 +609,6 @@ def test_hashimoto_without_melt_pack_identity_has_no_sf04_fallback(
         [experiments[0]],
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="test-revision",
         engine="internal-analytical",
         _allow_partial_cohort_for_test=True,
     )
@@ -666,7 +660,6 @@ def test_hashimoto_internal_probe_diagnostic_does_not_survive_channel_refusal(
             experiments[:1],
             catalog,
             preform_dimensions_mm=preform_dimensions_mm,
-            code_revision="floor-diagnostic-test",
             engine="internal-analytical",
             _allow_partial_cohort_for_test=True,
         )
@@ -688,7 +681,7 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     activity_compositions: list[tuple[tuple[str, float], ...]] = []
-    original_evaluate = openimcc_bridge.evaluate
+    original_evaluate = openimcc_bridge._evaluate_uncached
 
     def track_activities(*, composition_mol, **kwargs):
         activity_compositions.append(tuple(sorted(composition_mol.items())))
@@ -699,12 +692,11 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
         "_evaluate_openimcc_isolated",
         lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
     )
-    monkeypatch.setattr(openimcc_bridge, "evaluate", track_activities)
+    monkeypatch.setattr(openimcc_bridge, "_evaluate_uncached", track_activities)
     predictions = _predict_hashimoto_residue_cohort(
         experiments[:1],
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="single-vector-activity-refresh-test",
         _allow_partial_cohort_for_test=True,
     )
 
@@ -761,7 +753,6 @@ def test_hashimoto_refinement_flags_the_finest_run_at_the_step_cap(
         capped_experiments,
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="injected-cap-refinement-test",
     )
 
     assert len(predictions) == 48
@@ -830,7 +821,6 @@ def test_hashimoto_engine_refusal_flags_one_run_and_keeps_cohort_moving(
         experiments,
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="injected-nonconvergence-test",
     )
 
     assert len(predictions) == 48
@@ -893,7 +883,9 @@ def test_hashimoto_openimcc_timeout_is_typed_and_cohort_continues(
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     monkeypatch.setitem(binary_pot_battery._ENGINE_OUTER_TIMEOUT_S, "openimcc", 0.02)
 
-    monkeypatch.setattr(openimcc_bridge, "evaluate", _hanging_openimcc_engine)
+    monkeypatch.setattr(
+        openimcc_bridge, "_evaluate_uncached", _hanging_openimcc_engine
+    )
 
     def integrate_with_engine_call(
         inventory,
@@ -928,7 +920,6 @@ def test_hashimoto_openimcc_timeout_is_typed_and_cohort_continues(
         (experiment,),
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="timeout-fixture",
         _allow_partial_cohort_for_test=True,
     )
 

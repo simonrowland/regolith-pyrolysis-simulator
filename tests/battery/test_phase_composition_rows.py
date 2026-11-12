@@ -1065,6 +1065,7 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_in_score_loop(
     from concurrent.futures import Future
     from functools import wraps
     from pathlib import Path
+    from types import SimpleNamespace
 
     from simulator.diagnostic_helpers import binary_pot_battery
     from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
@@ -1090,6 +1091,14 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_in_score_loop(
     backend._available = True
     backend._bridge = "subprocess"
     backend._binary_path = Path("/fake/MAGEMin")
+    pool.workers = (SimpleNamespace(
+        name="MAGEMin subprocess pool slot 0",
+        _bootstrap_args=(
+            str(backend._binary_path.resolve()),
+            backend._database,
+            dict(backend._config),
+        ),
+    ),)
     backend._subprocess_pool = pool
     results: list[EquilibriumResult] = []
     equilibrate = backend.equilibrate
