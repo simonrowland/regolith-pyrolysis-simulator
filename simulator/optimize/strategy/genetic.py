@@ -11,32 +11,19 @@ from simulator.optimize.objective import ObjectiveDefinition, objective_definiti
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.strategy.bayesian import (
     _CANDIDATE_ID_ATTR,
-    _CONSTRAINT_NAMES_ATTR,
     _CONSTRAINT_VALUES_ATTR,
-    _INFEASIBLE_ATTR,
-    _UNSCOREABLE_OBJECTIVES_ATTR,
-    _constraint_values,
-    _constraints_for_trial,
     _couple_suggested_pressure_defaults,
-    _failed_trial_state,
+    _constraints_for_trial,
     _objective_values_for_definitions,
     _optuna_params_from_seed,
     _suggest_value,
     _sync_conditioned_trial_params,
+    _tell_optuna_strategy,
 )
 from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
 
 if TYPE_CHECKING:
     from simulator.optimize.evaluate import ScoredResult
-
-TellBatchRow = tuple[
-    Candidate,
-    "ScoredResult",
-    Any,
-    tuple[float, ...] | None,
-    tuple[float, ...],
-    tuple[str, ...],
-]
 
 OPTUNA_NSGA2_REQUIRED_MESSAGE = (
     "optuna is required for OptunaNSGA2Strategy; install the [optimize] extra"
@@ -209,80 +196,7 @@ class OptunaNSGA2Strategy:
         return candidates
 
     def tell(self, results: Sequence[tuple[Candidate, "ScoredResult"]]) -> None:
-        batch: list[TellBatchRow] = []
-        seen: set[str] = set()
-        scored_result_type: Any | None = None
-
-        for pair in results:
-            if not isinstance(pair, tuple) or len(pair) != 2:
-                raise ValueError(
-                    "tell results must contain (Candidate, ScoredResult) 2-tuples"
-                )
-            candidate, scored = pair
-            if not isinstance(candidate, Candidate):
-                raise ValueError("tell result candidate must be a Candidate")
-            if scored_result_type is None:
-                from simulator.optimize.evaluate import ScoredResult as _ScoredResult
-
-                scored_result_type = _ScoredResult
-            if not isinstance(scored, scored_result_type):
-                raise ValueError("tell result scored value must be a ScoredResult")
-            scored_candidate_id = getattr(scored, "candidate_id", None)
-            if scored_candidate_id != candidate.id:
-                raise ValueError(
-                    "ScoredResult.candidate_id must match Candidate.id "
-                    f"({scored_candidate_id!r} != {candidate.id!r})"
-                )
-            if candidate.id not in self._planned_by_id:
-                raise ValueError(f"candidate_id was not planned: {candidate.id!r}")
-            planned = self._planned_by_id[candidate.id]
-            if planned.patch.canonical_json() != candidate.patch.canonical_json():
-                raise ValueError(
-                    f"candidate patch does not match plan: {candidate.id!r}"
-                )
-            if dict(planned.metadata) != dict(candidate.metadata):
-                raise ValueError(
-                    f"candidate metadata does not match plan: {candidate.id!r}"
-                )
-            if candidate.id in seen:
-                raise ValueError(
-                    f"duplicate candidate_id in tell batch: {candidate.id!r}"
-                )
-            if candidate.id in self._result_by_id:
-                raise ValueError(f"candidate_id already recorded: {candidate.id!r}")
-            trial = self._trial_by_candidate_id.get(candidate.id)
-            if trial is None:
-                raise ValueError(f"candidate trial is unknown: {candidate.id!r}")
-            objective_values = self._objective_values(scored)
-            constraint_names, constraint_values = _constraint_values(scored)
-            seen.add(candidate.id)
-            batch.append(
-                (
-                    candidate,
-                    scored,
-                    trial,
-                    objective_values,
-                    constraint_values,
-                    constraint_names,
-                )
-            )
-
-        for candidate, scored, trial, values, constraints, constraint_names in batch:
-            trial.set_user_attr(_CANDIDATE_ID_ATTR, candidate.id)
-            trial.set_user_attr(_CONSTRAINT_NAMES_ATTR, constraint_names)
-            trial.set_user_attr(_CONSTRAINT_VALUES_ATTR, constraints)
-            trial.set_user_attr(
-                _INFEASIBLE_ATTR,
-                not bool(getattr(scored, "feasible", False)),
-            )
-            if values is None:
-                trial.set_user_attr(_UNSCOREABLE_OBJECTIVES_ATTR, True)
-                self._study.tell(trial, state=_failed_trial_state())
-            else:
-                self._study.tell(trial, values=values)
-            self._result_by_id[candidate.id] = scored
-            self._results.append((candidate, scored))
-            self._tell_count += 1
+        _tell_optuna_strategy(self, results)
 
     def _objective_values(self, scored: "ScoredResult") -> tuple[float, ...] | None:
         return _objective_values_for_definitions(scored, self._objective_definitions)
