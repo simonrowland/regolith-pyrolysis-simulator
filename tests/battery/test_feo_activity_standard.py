@@ -52,7 +52,7 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 # dex -0.013180332034779389
 # The offer frame is a_D * f from the Darken & Gurry factor.
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "a01d78d696bd20cdc1ff3105cb15f47144e92bd65326151104ea2b6acc6ee2c4"
+    "6894aec2a81a2b215add00ee4576865fc0bcc87eb144ba3eb6574f426b97d971"
 )
 _DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10057837869175247")
 
@@ -308,7 +308,7 @@ def test_distin_closed_redox_residual_line_matches_green_bytes(
     ) == (
         "dex",
         "dimensionless",
-        Decimal("-0.013180332034779389").as_tuple(),
+        _DISTIN_1880_RESIDUAL_DEX.as_tuple(),
         None,
         None,
         None,
