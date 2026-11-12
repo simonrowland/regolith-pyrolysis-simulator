@@ -66,7 +66,8 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   (``T_range_K``, ``T_K``, ``T_C``, ``temperature_C``, ``temp_C``,
   ``point_conditions``). A locator inside a condition is provenance, not
   a leaf. A coverable measured leaf is a finite int or float (not a
-  boolean), or a string that contains any digit [0-9]. A non-finite float
+  boolean), or a string that contains any digit [0-9] unless it is an
+  annotation string under ``ANNOTATION_KEYS``. A non-finite float
   is not coverable and is not dropped: it is ``non_finite_evidence``.
   A quantity name, a unit on its
   own, or another label with no digit is not a leaf and may be attested
@@ -1798,6 +1799,24 @@ _SCORED_NUMERIC_CONDITIONS = (
 )
 # A locator cites a condition. Its page numbers are not measured leaves.
 _CONDITION_PROVENANCE_KEYS = frozenset({"locator"})
+# Closed keys whose string values are extractor-authored annotation, not
+# transcriptions. Numeric values under these keys remain measured leaves.
+ANNOTATION_KEYS = frozenset(
+    {
+        "attribution",
+        "note",
+        "reason",
+        "schema_gap",
+        "composition_derivation",
+        "parents_not_printed",
+        "standard_state",
+    }
+)
+
+
+def _is_annotation_string(key: Any, value: Any) -> bool:
+    """True for extract-authored annotation strings, never numeric values."""
+    return isinstance(value, str) and key in ANNOTATION_KEYS
 
 
 def _scored_observations(
@@ -1894,8 +1913,9 @@ def _scored_measured_leaves(observation: Mapping[str, Any]) -> list[tuple[Any, .
     Addresses sit in one evidence tree. ``("values", "alpha")`` and
     ``("T_range_K", 0)`` are different leaves even when the numbers are
     equal. A ``locator`` inside a condition is provenance and is not a
-    leaf. Locator keys inside ``values`` stay leaves. Non-finite floats
-    are not in this list; ``_scored_evidence_leaves`` records them.
+    leaf. Numeric values under annotation keys remain leaves, while their
+    string values do not. Non-finite floats are not in this list;
+    ``_scored_evidence_leaves`` records them.
     """
     coverable, _non_finite = _scored_evidence_leaves(observation)
     return coverable
@@ -1908,7 +1928,8 @@ def _coverable_leaves_are_pinned(
 ) -> bool:
     """True when every coverable leaf is pinned, or there is no coverable leaf.
 
-    An empty leaf list is pinned only when the evidence also has no digit.
+    An empty leaf list is pinned only when the evidence has no digit-bearing
+    string outside ``ANNOTATION_KEYS``.
     A non-finite quantity is not a coverable leaf. Callers refuse it on
     its own; this predicate does not certify the observation.
     """
@@ -1918,11 +1939,12 @@ def _coverable_leaves_are_pinned(
 
 
 def _observation_has_digit_bearing_string(observation: Mapping[str, Any]) -> bool:
-    """True when scored evidence contains a string with a digit [0-9].
+    """True when scored evidence contains a non-annotation string with a digit.
 
     The walk is the same evidence the measured-leaf walker uses. A locator
     inside a condition is provenance. This is the backstop for a recognizer
-    that returns no leaves: the coverage decision refuses that block.
+    that returns no leaves: the coverage decision refuses that block. A
+    string under an ``ANNOTATION_KEYS`` key is not evidence.
     """
 
     def contains(value: Any, skip_keys: frozenset[str]) -> bool:
@@ -1932,7 +1954,7 @@ def _observation_has_digit_bearing_string(observation: Mapping[str, Any]) -> boo
             return any(
                 contains(child, skip_keys)
                 for key, child in value.items()
-                if key not in skip_keys
+                if key not in skip_keys and not _is_annotation_string(key, child)
             )
         if isinstance(value, (list, tuple)):
             return any(contains(child, skip_keys) for child in value)
@@ -2048,7 +2070,9 @@ def _classify_measured_leaves(
     """Split measured leaves into coverable addresses and non-finite addresses.
 
     Invariant: every float is accounted for. A finite int or float (not a
-    boolean) and a string that contains any digit [0-9] are coverable. A
+    boolean) and a string that contains any digit [0-9] are coverable unless
+    the string value is under a key in ``ANNOTATION_KEYS``. Numbers under
+    those keys remain leaves. A
     non-finite float (NaN, +Inf, -Inf) is the second list. It is never
     omitted and never coverable. A label with no digit is neither. The
     address is the path of mapping keys and list indexes from ``value``.
@@ -2074,7 +2098,7 @@ def _classify_measured_leaves(
         coverable: list[tuple[Any, ...]] = []
         non_finite: list[tuple[Any, ...]] = []
         for key, child in value.items():
-            if key in skip_keys:
+            if key in skip_keys or _is_annotation_string(key, child):
                 continue
             child_coverable, child_non_finite = _classify_measured_leaves(
                 child, prefix + (key,), skip_keys=skip_keys
@@ -2776,23 +2800,27 @@ def fidelity_source_warnings(
     that leaf or an ancestor of it. Evidence is ``values`` plus each
     present scored numeric condition (``_SCORED_NUMERIC_CONDITIONS``): the
     fields the scored temperature payload copies beside ``values``. A
-    locator inside a condition is provenance, not a leaf. Repeating a pin
+    locator inside a condition is provenance, not a leaf. Digit-bearing
+    strings under ``ANNOTATION_KEYS`` are extractor-authored annotation and
+    are not evidence; numbers under those keys remain leaves. Repeating a pin
     of one address does not cover a sibling, even when the numbers are
     equal, and a ``values`` pin does not cover a sibling condition. A
     measured leaf is a finite int or float (not a boolean), or a string
-    that contains any digit [0-9]. A non-finite float (NaN, +Inf, -Inf)
+    that contains any digit [0-9] outside ``ANNOTATION_KEYS``. A non-finite
+    float (NaN, +Inf, -Inf)
     is ``non_finite_evidence``. It is never omitted and never contributes
     "no required address": a pin of a finite sibling does not certify
     the observation, and a pin of the non-finite value does not either.
     A descriptive label with no digit is
     not a leaf and does not cover a sibling measurement. A string the
     numeric parser cannot read is uncovered unless the opened source
-    carries that printed value; it is never skipped. Several samples may
+    carries that printed value; annotation strings are the only skipped
+    strings. Several samples may
     each pin part of the evidence. Equipment pins and a numeric
     observation index do not contribute. Evidence with no measured leaf
     is covered by any matching evidence pin only when that evidence also
-    contains no digit. Zero recognised leaves in a digit-bearing block
-    is a refusal. A pilot pin or an
+    contains no non-annotation digit-bearing string. Zero recognised leaves
+    in a block with such a string is a refusal. A pilot pin or an
     unattested sample can still supply addresses toward
     ``uncovered_observation``; attestation is its own count. Certification
     refuses while any of these counts is non-zero: a pilot pin or an
@@ -3105,10 +3133,11 @@ def certify_extract_source_fidelity(
     condition) must be covered by a matching, non-pilot, attested sample
     whose address is that leaf or an ancestor, and whose source artifact
     was opened and contains each resolved number. A measured string is
-    every leaf that contains a digit [0-9]. A label with no digit is not
-    a leaf. A digit-bearing string the numeric parser cannot read is
-    uncovered unless the opened source carries that printed value, and
-    zero recognised leaves in a digit-bearing block refuses. A
+    every non-annotation string that contains a digit [0-9]. A label with
+    no digit is not a leaf. A digit-bearing string outside
+    ``ANNOTATION_KEYS`` that the numeric parser cannot read is uncovered
+    unless the opened source carries that printed value, and zero recognised
+    leaves in a block with such a string refuses. A
     Unicode minus is a minus. An observation id that names more than one
     scored row refuses; the rows are not one coverage entry.
     Repeating a pin of one address does not cover a sibling, even when the

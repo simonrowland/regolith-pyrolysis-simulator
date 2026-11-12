@@ -5130,11 +5130,12 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # Leading-decimal strings such as ".19" are measured leaves. Remeasured
 # on this corpus they sit in observations that were already uncovered, so
 # these ceilings did not move.
-# Every string that contains a digit [0-9] is a measured leaf, including
+# Before annotation classification, every string that contains a digit [0-9]
+# counted as a leaf, including
 # printed measurements the numeric grammar does not read. Remeasured on
 # this corpus: 48,631 -> 48,661 observations. The 30 newly uncovered
 # observations are in 13 extracts that were already uncovered, so the
-# extract ceiling did not move and no extract changed certify pass/fail.
+# extract ceiling did not move and no extract changed certify pass/fail then.
 # None of those extracts were review_status reviewed. The ids are
 # barin-1995, filiberto-lpsc2011-2064-volatiles,
 # hertl-1967-solid-sio-disproportionation-vaporization,
@@ -5170,9 +5171,13 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # samples (re-derived with vle.fidelity_source_warnings over every extract; no other extract moved).
 # So uncovered observations 48661 -> 48664, uncovered extracts 616 -> 617, unattested 3128 -> 3131.
 # Not a fidelity regression.
+# t-1753a2: digit-bearing strings under ``ANNOTATION_KEYS`` are extractor
+# annotation, not measured evidence. Recounted with the validator: uncovered
+# observations 48664 -> 48630 and extracts 617 -> 615; all other warning
+# totals stayed unchanged. Both coverage ceilings may only fall.
 # Each ceiling may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 48664
-_UNCOVERED_EXTRACTS_CEILING = 617
+_UNCOVERED_OBSERVATIONS_CEILING = 48630
+_UNCOVERED_EXTRACTS_CEILING = 615
 _UNATTESTED_SAMPLES_CEILING = 3131
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
@@ -5399,6 +5404,65 @@ def _assert_refused_sample_still_covers_addressed_observation(
     assert _uncovered_observation_count(
         doc, artifact_root=artifact_root
     ) == max(0, unaddressed - 1)
+
+
+def test_fidelity_annotation_keys_are_the_reviewed_closed_set():
+    assert vle.ANNOTATION_KEYS == frozenset(
+        {
+            "attribution",
+            "note",
+            "reason",
+            "schema_gap",
+            "composition_derivation",
+            "parents_not_printed",
+            "standard_state",
+        }
+    )
+
+
+@pytest.mark.parametrize(
+    "annotation_key",
+    [
+        "attribution",
+        "note",
+        "reason",
+        "schema_gap",
+        "composition_derivation",
+        "parents_not_printed",
+        "standard_state",
+    ],
+)
+def test_fidelity_annotation_strings_are_not_measured_leaves(annotation_key):
+    annotation = "Extractor note: based on the 1978 source table."
+
+    with_numeric_value = _minimal_extract()
+    with_numeric_value["species"]["Fe"]["observations"][0]["values"][
+        annotation_key
+    ] = annotation
+    assert _uncovered_observation_count(with_numeric_value) == 0
+
+    with_text_value = _minimal_extract()
+    observation = with_text_value["species"]["Fe"]["observations"][0]
+    observation["values"] = {"quantity": "alpha", annotation_key: annotation}
+    sample = with_text_value["fidelity_samples"][0]
+    sample["path"] = "species.Fe.observations[fe_alpha_1].values.quantity"
+    sample["value"] = "alpha"
+    assert _uncovered_observation_count(with_text_value) == 0
+
+    with_numeric_annotation = _minimal_extract()
+    with_numeric_annotation["species"]["Fe"]["observations"][0]["values"][
+        annotation_key
+    ] = 1978.0
+    assert _uncovered_observation_count(with_numeric_annotation) == 1
+
+
+@pytest.mark.parametrize("printed_key", ["caption", "citation"])
+def test_fidelity_non_annotation_string_stays_a_measured_leaf(printed_key):
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"][printed_key] = (
+        "Printed text from the 1978 source table."
+    )
+    assert _uncovered_observation_count(doc) == 1
 
 
 _LOCATOR_KEY_SETS = (

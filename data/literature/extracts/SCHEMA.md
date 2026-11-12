@@ -104,8 +104,15 @@ the extract gate, and the literature index all call
 `certify_extract_source_fidelity` and refuse while any count is non-zero.
 
 Coverage is by leaf address. A measured leaf is a finite int or float
-(not a boolean), or a string that contains any digit [0-9]. A quantity
-name, a unit on its own, or another label with no digit is not a leaf.
+(not a boolean), or a string that contains any digit [0-9]. String values
+under the closed `ANNOTATION_KEYS` set (`attribution`, `note`, `reason`,
+`schema_gap`, `composition_derivation`, `parents_not_printed`,
+`standard_state`) are excluded only because sampled corpus examples show the
+extractor's paraphrase, provenance, or reasoning rather than printed evidence;
+numbers under those keys remain leaves. Keys stay outside the set when their
+values transcribe printed citations, cells, labels, ids, or captions. A
+quantity name, a unit on its own, or another label with no digit is not a
+leaf.
 The evidence tree is the observation's `values` plus each scored numeric
 condition the temperature payload copies beside it: `T_range_K`, `T_K`,
 `T_C`, `temperature_C`, `temp_C`, and `point_conditions`. A `locator`
