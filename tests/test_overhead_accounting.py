@@ -1829,9 +1829,14 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     assert sim.record.snapshots[-1].melt_headspace_composition_mbar == pytest.approx(
         sim._melt_headspace_composition_mbar
     )
+    # The projection stays a report. The film backpressure is the frozen
+    # post-drain holdup, so rewriting the projection cannot change it.
+    frozen_fe_pa = sim._evaporation_bulk_partial_pressure_pa("Fe")
+    sim._melt_headspace_composition_mbar = {"Fe": 12345.0}
     assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
-        upstream_transport["vapor_pressure_mbar"] * 100.0
+        frozen_fe_pa
     )
+    assert frozen_fe_pa != pytest.approx(12345.0 * 100.0)
 
     seen = {}
 
@@ -1853,11 +1858,94 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     )
     evaporation_module.EvaporationMixin._calculate_evaporation(sim, equilibrium)
 
-    assert seen["overhead_partials_Pa"]["Fe"] == pytest.approx(
+    assert seen["overhead_partials_Pa"]["Fe"] == pytest.approx(frozen_fe_pa)
+    assert seen["overhead_partials_Pa"]["Fe"] != pytest.approx(
         upstream_transport["vapor_pressure_mbar"] * 100.0
     )
-    assert seen["overhead_partials_Pa"]["Fe"] > 0.0
     assert seen["vapour_batch_flux_pressures_Pa"] == {"Fe": 100.0}
+
+
+def test_film_backpressure_is_frozen_post_drain_holdup_not_the_projection():
+    """One P_bulk per species: n R T / V of the post-drain holdup.
+
+    The flux-projected map is a report. Freezing the partial keeps it
+    out of the trial dependence of F. A staged remainder is the drained
+    gas while the ledger is still full. Headspace off, or an empty
+    holdup, is 0 Pa and does not ask for a volume.
+    """
+    from types import MethodType, SimpleNamespace
+
+    from simulator.state import GAS_CONSTANT
+
+    sim = _gas_train_sim()
+    sim._overhead_headspace_config["enabled"] = True
+    sim._overhead_headspace_config["volume_m3"] = 1.5
+    sim._overhead_headspace_config["temperature_model"] = "melt"
+    sim.melt.temperature_C = 1250.0
+    fe_mol = 0.02
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Fe": fe_mol},
+        source="test film holdup",
+        material_origin="feedstock",
+    )
+    # P = n R T / V. mol * J/(mol·K) * K / m³ = Pa. n = 0 is 0 Pa.
+    temperature_K = 1250.0 + 273.15
+    expected_pa = fe_mol * GAS_CONSTANT * temperature_K / 1.5
+    sim._melt_headspace_composition_mbar = {"Fe": 50.0}
+    assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
+        expected_pa
+    )
+    assert sim._evaporation_bulk_partial_pressure_pa("Na") == pytest.approx(0.0)
+    assert sim._evaporation_bulk_partial_pressure_pa("Fe") != pytest.approx(
+        50.0 * 100.0
+    )
+
+    staged_mol = 0.001
+    sim._presolve_remaining_holdup_mol = {"Fe": staged_mol}
+    assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
+        staged_mol * GAS_CONSTANT * temperature_K / 1.5
+    )
+    sim._freeze_hour_bulk_partials_pa()
+    sim._presolve_remaining_holdup_mol = None
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Fe": 1.0},
+        source="test post-freeze credit",
+        material_origin="feedstock",
+    )
+    sim._melt_headspace_composition_mbar = {"Fe": 12345.0}
+    assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
+        staged_mol * GAS_CONSTANT * temperature_K / 1.5
+    )
+
+    empty = _gas_train_sim()
+    empty._overhead_headspace_config["enabled"] = True
+    empty._overhead_headspace_config["volume_m3"] = None
+    empty._melt_headspace_composition_mbar = {"Fe": 50.0}
+    assert empty._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(0.0)
+
+    disabled = _gas_train_sim()
+    disabled._overhead_headspace_config["enabled"] = False
+    disabled.melt.temperature_C = 1250.0
+    disabled.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Fe": fe_mol},
+        source="test disabled headspace holdup",
+        material_origin="feedstock",
+    )
+    disabled._melt_headspace_composition_mbar = {"Fe": 50.0}
+    disabled._freeze_hour_bulk_partials_pa()
+    assert disabled._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
+        0.0
+    )
+
+    standin = SimpleNamespace()
+    standin._evaporation_bulk_partial_pressure_pa = MethodType(
+        evaporation_module.EvaporationMixin._evaporation_bulk_partial_pressure_pa,
+        standin,
+    )
+    assert standin._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(0.0)
 
 
 def test_uncommitted_evaporation_transition_is_removed_from_tick_flux(

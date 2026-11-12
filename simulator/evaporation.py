@@ -809,12 +809,119 @@ def _load_evaporation_alpha_envelope_by_species(
 
 
 class EvaporationMixin:
-    def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
-        """Return upstream melt-headspace backpressure for evaporation."""
+    def _flux_path_holdup_mol(self) -> dict[str, float]:
+        """Post-drain ``process.overhead_gas`` moles, or the staged remainder.
 
-        melt_headspace_partials_mbar = getattr(
-            self, '_melt_headspace_composition_mbar', {}) or {}
-        return float(melt_headspace_partials_mbar.get(species, 0.0)) * 100.0
+        The finite-capacity bleed stays uncommitted until the shadow
+        accepts, so the ledger can still hold the pre-drain inventory
+        while ``_presolve_remaining_holdup_mol`` is the drained gas.
+        A missing ledger is an empty holdup, not the reporting map.
+        """
+
+        staged = getattr(self, '_presolve_remaining_holdup_mol', None)
+        if isinstance(staged, Mapping):
+            holdup = staged
+        else:
+            ledger = getattr(self, 'atom_ledger', None)
+            if ledger is None or not callable(
+                getattr(ledger, 'mol_by_account', None)
+            ):
+                return {}
+            holdup = self._overhead_holdup_mol()
+        positive: dict[str, float] = {}
+        for species, raw in dict(holdup or {}).items():
+            try:
+                moles = float(raw)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(moles) and moles > 0.0:
+                positive[str(species)] = moles
+        return positive
+
+    def _bulk_partials_pa_from_holdup(
+        self,
+        holdup_mol: Mapping[str, float],
+    ) -> dict[str, float]:
+        """Ideal-gas partials of a holdup, Pa.
+
+        Owner of the conversion is
+        ``OverheadGasModel._compute_partial_pressures`` (bar). Pa is
+        that bar value times 1e5. The 1e5 cancels the owner's
+        ``R T / (V * 1e5)`` scale, leaving ``n R T / V``.
+
+        Unit check: mol * J/(mol·K) * K / m³ = Pa. Limit: empty holdup,
+        headspace off, or ``V <= 0`` gives no partials. An empty holdup
+        does not query the volume, so a zero inventory cannot force
+        equipment design.
+        """
+
+        if not holdup_mol:
+            return {}
+        enabled = getattr(self, '_overhead_headspace_enabled', None)
+        if not callable(enabled) or not enabled():
+            return {}
+        from simulator.overhead import OverheadGasModel
+
+        partials_bar = OverheadGasModel._compute_partial_pressures(
+            holdup_mol,
+            self._headspace_volume_m3(),
+            self._headspace_temperature_K(),
+        )
+        partials_pa: dict[str, float] = {}
+        for species, raw_bar in partials_bar.items():
+            try:
+                pressure_pa = float(raw_bar) * 1.0e5
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(pressure_pa) and pressure_pa > 0.0:
+                partials_pa[str(species)] = pressure_pa
+        return partials_pa
+
+    def _freeze_hour_bulk_partials_pa(self) -> None:
+        """Snapshot one ``P_bulk`` map for this hour's residual and debit.
+
+        Called after ``_drain_headspace_before_interface``. The trial
+        oxygen potential is not an input, so ``F(ξ)`` stays monotone.
+        """
+
+        self._hour_frozen_bulk_partial_pa = self._bulk_partials_pa_from_holdup(
+            self._flux_path_holdup_mol()
+        )
+
+    def _evaporation_bulk_partials_pa(self) -> dict[str, float]:
+        """The hour's frozen ``P_bulk`` map, or the live holdup before a freeze."""
+
+        frozen = getattr(self, '_hour_frozen_bulk_partial_pa', None)
+        if isinstance(frozen, Mapping):
+            partials: dict[str, float] = {}
+            for species, raw in frozen.items():
+                try:
+                    pressure_pa = float(raw)
+                except (TypeError, ValueError):
+                    continue
+                if math.isfinite(pressure_pa) and pressure_pa > 0.0:
+                    partials[str(species)] = pressure_pa
+            return partials
+        return self._bulk_partials_pa_from_holdup(self._flux_path_holdup_mol())
+
+    def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
+        """Post-drain headspace partial of one species, Pa.
+
+        ``P_i = n_i R T / V`` of ``process.overhead_gas`` after
+        ``_drain_headspace_before_interface``, frozen for the hour and
+        shared by the interface residual and the ledger debit. The
+        flux-projected ``_melt_headspace_composition_mbar`` map
+        (``y_i P_vapor``) is a reporting projection, not this
+        backpressure. A species missing from the holdup is 0 Pa.
+
+        A stand-in that binds only this method has no holdup snapshot
+        and no ledger, so its backpressure is 0 Pa.
+        """
+
+        reader = getattr(type(self), '_evaporation_bulk_partials_pa', None)
+        if not callable(reader):
+            return 0.0
+        return float(reader(self).get(species, 0.0))
 
     def _resolve_evaporation_batch_flux_state(
         self,
@@ -1270,11 +1377,10 @@ class EvaporationMixin:
         )
 
         # Overhead backpressure (Pa)                       [LOOP-1]
-        # Uses the previous hour's upstream melt-headspace/duct partials as
-        # backpressure. ``overhead.composition`` is the physically distinct
-        # post-condensation report, so near-total capture must not erase P_bulk
-        # above the melt. Gas pO2 has already been applied once upstream in
-        # the equilibrium vapor pressures consumed here.
+        # The hour's frozen post-drain holdup, n_i R T / V, not the previous
+        # hour's flux projection and not the post-condensation report.
+        # Gas pO2 has already been applied once upstream in the equilibrium
+        # vapor pressures consumed here.
         overhead_partials_Pa = (
             {
                 str(species): max(0.0, float(value))

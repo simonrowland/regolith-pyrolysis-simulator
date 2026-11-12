@@ -1489,6 +1489,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.train = CondensationTrain.create_default(self.setpoints)
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar: Dict[str, float] = {}
+        # None until this hour's post-drain freeze. An empty dict is a
+        # frozen empty holdup, not "fall through to the live ledger".
+        self._hour_frozen_bulk_partial_pa: Dict[str, float] | None = None
 
         # --- Batch record ---
         self.record = BatchRecord()
@@ -1808,6 +1811,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._condensation_model.train = self.train
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar = {}
+        self._hour_frozen_bulk_partial_pa = None
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
         self._headspace_co2_dissociation_diagnostic = {}
@@ -4671,12 +4675,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pipe_diameter_m = float(
             getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
         )
-        partials_pa = {
-            str(species): max(0.0, float(value)) * 100.0
-            for species, value in (
-                getattr(self, '_melt_headspace_composition_mbar', {}) or {}
-            ).items()
-        }
+        # Kn's overhead total uses the same frozen holdup partials as
+        # P_bulk. The reporting projection is not a headspace pressure.
+        partials_pa = self._evaporation_bulk_partials_pa()
         overhead_pressure_pa = float(
             self._evaporation_overhead_total_pressure_Pa(partials_pa)
         )
@@ -16553,13 +16554,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._hour_capacity_violation_notice = None
         self._presolve_bleed_pending = None
         self._presolve_remaining_holdup_mol = None
+        # Drop the previous hour's snapshot before this drain publishes
+        # the holdup the residual and the debit will share.
+        self._hour_frozen_bulk_partial_pa = None
         self._presolve_reservoir_restore = None
         self._presolve_hour_capacity_kg = None
         self._presolve_removed_kg = None
         if not self._overhead_headspace_enabled():
+            self._freeze_hour_bulk_partials_pa()
             return False
         holdup = self._overhead_holdup_mol()
         if not holdup:
+            self._freeze_hour_bulk_partials_pa()
             return False
         from engines.builtin.overhead_bleed import (
             capacity_violation_notice,
@@ -16656,11 +16662,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 commit=False,
             )
             self._stage_provisional_presolve_bleed(preview)
+            self._freeze_hour_bulk_partials_pa()
             return True
         committed = self._dispatch_overhead_bleed(
             conductance_kg_s=conductance_for_bleed,
         )
         self._record_presolve_removal(committed)
+        self._freeze_hour_bulk_partials_pa()
         return False
 
     def _stage_provisional_presolve_bleed(self, preview) -> None:

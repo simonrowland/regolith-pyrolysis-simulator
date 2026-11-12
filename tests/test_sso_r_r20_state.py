@@ -3314,19 +3314,48 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert abs(snapshot.mass_balance_error_pct) <= 5e-12
 
 
-def test_native_fe_partition_uses_upstream_headspace_not_downstream_residual() -> None:
+def test_native_fe_partition_uses_post_drain_holdup_not_the_projection() -> None:
+    """P_bulk is n R T / V of the overhead-gas holdup, not the flux map.
+
+    The reporting projection and the downstream composition are both
+    the wrong gas. A species absent from the holdup is 0 Pa.
+    """
+    from simulator.state import GAS_CONSTANT
+
     sim = _make_sim()
     sim.melt.temperature_C = 1700.0
     sim.melt.p_total_mbar = 10.0
+    sim._overhead_headspace_config["enabled"] = True
+    sim._overhead_headspace_config["volume_m3"] = 1.0
+    sim._overhead_headspace_config["temperature_model"] = "melt"
+    fe_mol = 0.01
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Fe": fe_mol},
+        source="test post-drain Fe holdup",
+        material_origin="feedstock",
+    )
+    # Premise: ideal gas, one species. Algebra: P = n R T / V.
+    # Unit check: mol * J/(mol·K) * K / m³ = Pa.
+    # Limit: n = 0 is 0 Pa, which the empty-Fe case below checks.
+    temperature_K = 1700.0 + 273.15
+    expected_pa = fe_mol * GAS_CONSTANT * temperature_K / 1.0
     sim._melt_headspace_composition_mbar = {"Fe": 4.0}
     sim.overhead.composition = {"Fe": 0.001}
 
     diagnostic = sim._native_fe_partition_diagnostic(1.0)
 
-    assert diagnostic["P_bulk_Pa"] == pytest.approx(400.0)
+    assert diagnostic["P_bulk_Pa"] == pytest.approx(expected_pa)
+    assert diagnostic["P_bulk_Pa"] != pytest.approx(400.0)
 
-    sim._melt_headspace_composition_mbar = {"O2": 10.0}
-    diagnostic = sim._native_fe_partition_diagnostic(1.0)
+    empty = _make_sim()
+    empty.melt.temperature_C = 1700.0
+    empty.melt.p_total_mbar = 10.0
+    empty._overhead_headspace_config["enabled"] = True
+    empty._overhead_headspace_config["volume_m3"] = 1.0
+    empty._melt_headspace_composition_mbar = {"Fe": 4.0}
+    empty.overhead.composition = {"Fe": 0.001}
+    diagnostic = empty._native_fe_partition_diagnostic(1.0)
     assert diagnostic["P_bulk_Pa"] == pytest.approx(0.0)
 
 
@@ -3397,6 +3426,21 @@ def test_c7_transport_uses_upstream_headspace_not_downstream_residual() -> None:
         ca_route_surface_area_m2=0.2,
         hold_time_h=1.0,
     )
+    from simulator.state import GAS_CONSTANT
+
+    sim._overhead_headspace_config["enabled"] = True
+    sim._overhead_headspace_config["volume_m3"] = 2.0
+    sim._overhead_headspace_config["temperature_model"] = "melt"
+    ca_mol = 0.02
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Ca": ca_mol},
+        source="test post-drain Ca holdup",
+        material_origin="feedstock",
+    )
+    temperature_K = float(sim.melt.temperature_C) + 273.15
+    # P = n R T / V. mol * J/(mol·K) * K / m³ = Pa. n = 0 would be 0 Pa.
+    expected_pa = ca_mol * GAS_CONSTANT * temperature_K / 2.0
     sim._melt_headspace_composition_mbar = {"Ca": 3.0}
     sim.overhead.composition = {"Ca": 0.001}
 
@@ -3405,7 +3449,8 @@ def test_c7_transport_uses_upstream_headspace_not_downstream_residual() -> None:
         ca_per_extent=3.0,
     )
 
-    assert diagnostic["c7_ca_p_bulk_pa"] == pytest.approx(300.0)
+    assert diagnostic["c7_ca_p_bulk_pa"] == pytest.approx(expected_pa)
+    assert diagnostic["c7_ca_p_bulk_pa"] != pytest.approx(300.0)
 
 
 def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> None:

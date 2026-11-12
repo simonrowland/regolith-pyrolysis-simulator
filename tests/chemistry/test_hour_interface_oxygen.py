@@ -891,3 +891,112 @@ def test_lunar_c0_hot_hour_evaporative_oxygen_matches_the_series_helper() -> Non
         100.0
     )
     _assert_series_identity(sim)
+
+
+def _run_identity_hours(execute):
+    """Run a campaign and check the series identity on every hour.
+
+    ``_assert_series_identity`` is the review identity: interface
+    evaporative oxygen against ``_project_evaporation_overhead_source_mol_hr``
+    of the series-helper flux of that same channel, within 1e-9. The
+    kernel debit is a different row. Its catalogue molar mass and its
+    published-vapour set are not this identity. Booked Na on the
+    constant-1250 window is pinned by the oscillation test.
+
+    The executor swallows an assertion inside ``step`` and marks the
+    run failed, so the failure text is kept here and checked after.
+    """
+
+    failures: list[str] = []
+    checked = {"n": 0}
+    original_step = PyrolysisSimulator.step
+
+    def _step(self, *args, **kwargs):
+        snapshot = original_step(self, *args, **kwargs)
+        checked["n"] += 1
+        hour = int(snapshot.hour)
+        solution = getattr(self, "_hour_interface_oxygen", None)
+        if solution is None:
+            failures.append(f"hour {hour}: no interface solution")
+            return snapshot
+        if not solution.product_fluxes_mol_m2_s:
+            oxygen = solution.evaporative_oxygen_mol_s
+            if any(abs(float(value)) > 0.0 for value in oxygen.values()):
+                failures.append(
+                    f"hour {hour}: evaporative oxygen with no product flux"
+                )
+            return snapshot
+        try:
+            _assert_series_identity(self)
+        except AssertionError as exc:
+            failures.append(f"hour {hour}: {exc}")
+        return snapshot
+
+    PyrolysisSimulator.step = _step
+    try:
+        execution = execute()
+    finally:
+        PyrolysisSimulator.step = original_step
+    return execution, checked["n"], failures
+
+
+def test_sso2_constant_1250_window_does_not_alternate() -> None:
+    """Hours 1-4 stay on one root. The lagged flux map made them alternate.
+
+    Bound is the brief's: |Δ log10 ξ_s| < 0.1 between consecutive hours
+    at constant 1250 °C, and booked Na is not present/absent/present/absent.
+    """
+
+    from simulator.optimize.sso2_evidence import build_sso2_owner_recipe_execution
+
+    execution = build_sso2_owner_recipe_execution(hours=4)
+    assert execution.status == "ok", execution.error_message
+    snapshots = list(execution.snapshots)
+    assert len(snapshots) == 4
+    logs = []
+    booked_na = []
+    for snapshot in snapshots:
+        assert snapshot.temperature_C == pytest.approx(1250.0, abs=1.0)
+        notice = snapshot.oxygen_reservoir["interface_oxygen"]
+        assert notice["solved"] is True
+        logs.append(float(notice["surface_log10_pO2_bar"]))
+        booked_na.append(float(snapshot.evap_flux.species_kg_hr.get("Na", 0.0)))
+    for previous, nxt in zip(logs, logs[1:]):
+        assert abs(nxt - previous) < 0.1, (logs, booked_na)
+    real = [rate >= 1.0e-6 for rate in booked_na]
+    dust = [rate < 1.0e-12 for rate in booked_na]
+    assert not (any(real) and any(dust)), booked_na
+
+
+def test_sso2_every_hour_interface_oxygen_matches_the_ledger() -> None:
+    from simulator.optimize.sso2_evidence import build_sso2_owner_recipe_execution
+
+    execution, n_checked, failures = _run_identity_hours(
+        lambda: build_sso2_owner_recipe_execution(hours=9)
+    )
+    assert execution.status == "ok", execution.error_message
+    assert len(execution.snapshots) == 9
+    assert n_checked == 9
+    assert not failures, failures
+
+
+def test_lunar_c0_every_hour_interface_oxygen_matches_the_ledger() -> None:
+    from simulator.run_executor import RunExecutor
+    from simulator.runner import PyrolysisRun
+
+    def _execute():
+        run = PyrolysisRun(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C0",
+            hours=24,
+            additives_kg={},
+            allow_fallback_vapor=True,
+            allow_unmeasured_alpha_fallback=True,
+        )
+        return RunExecutor().execute(run._session_config())
+
+    execution, n_checked, failures = _run_identity_hours(_execute)
+    assert execution.status == "ok", execution.error_message
+    assert len(execution.snapshots) == 24
+    assert n_checked == 24
+    assert not failures, failures
