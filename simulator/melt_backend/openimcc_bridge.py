@@ -68,6 +68,7 @@ OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
     "@66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"
 )
+DEFAULT_GAS_PACK_SELECTION = "default"
 
 
 def imported_openimcc_commit() -> str | None:
@@ -1201,7 +1202,7 @@ def evaluate_gas(
     *,
     parent_oxides: Sequence[str] | None = None,
     allow_extrapolation: bool = False,
-    gas_pack_selection: str = "default",
+    gas_pack_selection: str = DEFAULT_GAS_PACK_SELECTION,
 ) -> dict[str, float]:
     from openimcc import evaluate_gas as openimcc_evaluate_gas
     from simulator.engine_cache import cached_engine_call, record_engine_open
