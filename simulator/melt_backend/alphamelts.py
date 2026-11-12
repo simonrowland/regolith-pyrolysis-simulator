@@ -1176,7 +1176,6 @@ class _MELTSBackendSupport(MeltBackend):
             self._model, ambient_calc_mode
         )
         self._model = settings["model"]
-        self._raw_model_name = settings["model"]
         self._model_calc_mode = settings["model_calc_mode"]
         self._effective_subprocess_calc_mode = settings["effective_calc_mode"]
         self._subprocess_calc_mode_conflict = settings["calc_mode_conflict"]

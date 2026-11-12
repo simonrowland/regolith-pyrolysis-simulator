@@ -9,6 +9,7 @@ import logging
 import os
 import shutil
 import sqlite3
+import sys
 import threading
 import time
 import zlib
@@ -186,9 +187,20 @@ def normalize_engine_settings(
 
         return {"pack": fields.get("pack") or DEFAULT_BACKEND_PACK_NAME}
     if engine_name == "alphamelts":
-        from simulator.config import resolve_alphamelts_subprocess_settings
+        from simulator.config import (
+            resolve_alphamelts_python_api_model,
+            resolve_alphamelts_subprocess_settings,
+        )
 
         model_name = fields.get("raw_model_name")
+        transport = fields.get("transport")
+        if transport is None or str(transport).strip().lower() not in {
+            "subprocess",
+            "binary",
+        }:
+            # Validate the raw Python API model before the normalized key can
+            # alias it to a valid model and return a cached result.
+            resolve_alphamelts_python_api_model(model_name)
         ambient = fields.get("effective_calc_mode", _MISSING_SETTING)
         if ambient is _MISSING_SETTING:
             ambient = fields.get("ambient_calc_mode")
@@ -475,7 +487,7 @@ def _internal_analytical_identity() -> str:
     backend = _RUNTIME_BACKENDS.get("internal-analytical")
     core = getattr(backend, "_core", backend)
     module_name = type(core).__module__ if core is not None else ""
-    module = __import__(module_name, fromlist=["__file__"]) if module_name else None
+    module = sys.modules.get(module_name) if module_name else None
     module_file = getattr(module, "__file__", None)
     if not module_file:
         return "unavailable"
