@@ -23,9 +23,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+import simulator.optimize.evaluate as evaluate_mod  # noqa: E402
 from simulator.condensation import CondensationModel  # noqa: E402
 from simulator.condensation_routing import stage_key_for_stage  # noqa: E402
-from simulator.optimize import evaluate as evaluate_mod  # noqa: E402
 from simulator.optimize import objective as objective_mod  # noqa: E402
 from simulator.optimize import physics as physics_mod  # noqa: E402
 from simulator.recipe_io import load_recipe_patch  # noqa: E402
@@ -61,7 +61,15 @@ def _leaf(value: object, reason: str | None = None) -> dict[str, object]:
 
 
 def _fail(exc: BaseException) -> dict[str, object]:
-    return _leaf(None, f"{type(exc).__name__}: {exc}")
+    return _leaf(None, _exc_reason(exc))
+
+
+def _exc_reason(exc: BaseException) -> str:
+    # The package exports evaluate as a function. Reading a module attribute
+    # off that function is not a green gap; name the missing attribute.
+    if isinstance(exc, AttributeError):
+        return f"required attribute is absent at this tree: {exc}"
+    return f"{type(exc).__name__}: {exc}"
 
 
 def _plain(value: object) -> object:
@@ -256,7 +264,11 @@ def _resolution_kg(charge_kg: float | None) -> dict[str, object]:
 
 
 def _supply_kg(execution: object) -> tuple[dict[str, float], dict[str, str]]:
-    bounds = evaluate_mod._optimizer_refused_flux_bounds(
+    integral = getattr(evaluate_mod, "_optimizer_refused_flux_bounds", None)
+    if not callable(integral):
+        reason = "refused-flux integral is absent at this tree"
+        return {}, {species: reason for species in SPECIES}
+    bounds = integral(
         getattr(execution, "snapshots", ()),
         SPECIES,
         campaigns_elapsed=1.0,
@@ -295,8 +307,12 @@ def _refused_species(execution: object) -> list[str] | None:
     raw = getattr(trace, "wall_deposit_by_segment_species_kg", None)
     if not isinstance(raw, Mapping):
         return None
-    authority = objective_mod._coating_authority_status(raw, execution)
-    return list(physics_mod._coating_wall_refused_species(authority))
+    authority_fn = getattr(objective_mod, "_coating_authority_status", None)
+    refused_fn = getattr(physics_mod, "_coating_wall_refused_species", None)
+    if not callable(authority_fn) or not callable(refused_fn):
+        return None
+    authority = authority_fn(raw, execution)
+    return list(refused_fn(authority))
 
 
 def _book(execution: object) -> dict | None:
@@ -307,13 +323,18 @@ def _book(execution: object) -> dict | None:
     raw = getattr(trace, "wall_deposit_by_segment_species_kg", None)
     if not isinstance(raw, Mapping):
         raise RuntimeError("wall_deposit_by_segment_species_kg trace is absent")
-    authority = objective_mod._coating_authority_status(raw, execution)
+    authority_fn = getattr(objective_mod, "_coating_authority_status", None)
+    if not callable(authority_fn):
+        raise RuntimeError("coating authority status is absent at this tree")
+    authority = authority_fn(raw, execution)
     return book(raw, authority, execution)
 
 
 def _coating_summary(execution: object) -> dict:
-    summary = objective_mod._coating_product_summary(execution)
-    return dict(summary)
+    summary_fn = getattr(objective_mod, "_coating_product_summary", None)
+    if not callable(summary_fn):
+        raise RuntimeError("coating product summary is absent at this tree")
+    return dict(summary_fn(execution))
 
 
 def _species_row(
@@ -327,6 +348,7 @@ def _species_row(
     refused: list[str] | None,
     coating: Mapping | None,
     coating_reason: str | None,
+    money: Mapping,
 ) -> dict[str, object]:
     item = None
     if isinstance(booking, Mapping):
@@ -343,7 +365,6 @@ def _species_row(
         classification = _leaf(None, _BOOKING_ABSENT)
         flag = _leaf(None, _BOOKING_ABSENT)
         booked = _leaf(None, _BOOKING_ABSENT)
-        consequence = _leaf(None, _BOOKING_ABSENT)
     elif item is not None:
         reason = str(item.get("reason") or "")
         flag_value = item.get("flag") or reason or None
@@ -356,14 +377,6 @@ def _species_row(
             classification = _leaf("unavailable", reason or "booking reason is absent")
         flag = _leaf(flag_value)
         booked = _leaf(deposit)
-        consequence = _consequence(
-            species,
-            classification["value"],
-            str(classification["reason"] or "") or None,
-            item,
-            coating,
-            coating_reason,
-        )
     else:
         if supply is None:
             reason = supply_reason or "supply integral omitted this species"
@@ -376,11 +389,11 @@ def _species_row(
         classification = _leaf("unavailable", reason)
         flag = _leaf(reason)
         booked = _leaf(None, reason)
-        consequence = _leaf(None, reason)
 
     used_resolution = resolution
     if item is not None and "ledger_resolution_kg" in item:
         used_resolution = _leaf(item.get("ledger_resolution_kg"))
+    consequence = _species_consequence(species, coating, coating_reason, money)
     return {
         "supply_kg": supply_leaf,
         "ledger_resolution_kg": used_resolution,
@@ -403,68 +416,383 @@ def _map_kg(mapping: object, species: str) -> float | None:
     return number
 
 
-def _consequence(
-    species: str,
-    classification: object,
-    class_reason: str | None,
-    item: Mapping,
+def _finite_number(value: object) -> float | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    number = float(value)
+    if not math.isfinite(number):
+        return None
+    return number
+
+
+def _refusal_text(payload: Mapping) -> str | None:
+    refusal = payload.get("wall_deposit_refusal")
+    if not isinstance(refusal, Mapping):
+        return None
+    reason = refusal.get("reason")
+    if isinstance(reason, str) and reason:
+        return reason
+    return None
+
+
+def _species_wall_map(
+    coating: Mapping | None,
+) -> tuple[Mapping | None, str | None]:
+    if not isinstance(coating, Mapping):
+        return None, "coating diagnostic is absent"
+    raw = coating.get("wall_deposit_kg_by_species")
+    if isinstance(raw, Mapping):
+        return raw, None
+    if raw is None:
+        reason = (
+            coating.get("lifespan_cost_status_reason")
+            or coating.get("coating_unavailable_reason")
+            or "wall_deposit_kg_by_species is absent"
+        )
+        return None, str(reason)
+    return None, "wall_deposit_kg_by_species is not a mapping"
+
+
+def _consumption_leaf(
     coating: Mapping | None,
     coating_reason: str | None,
 ) -> dict[str, object]:
-    if classification == "unavailable":
-        return _leaf(None, class_reason or "unavailable")
-    if coating_reason is not None or not isinstance(coating, Mapping):
+    if not isinstance(coating, Mapping):
         return _leaf(None, coating_reason or "coating diagnostic is absent")
-    if coating.get("coating_unavailable_reason"):
-        return _leaf(None, str(coating.get("coating_unavailable_reason")))
-    unavailable = None
-    cost_status = coating.get("lifespan_cost_status")
-    if cost_status not in (None, "available"):
-        unavailable = coating.get("lifespan_cost_status_reason") or cost_status
-    species_kg = _map_kg(coating.get("wall_deposit_cumulative_kg_by_species"), species)
-    if species_kg is None:
-        species_kg = _map_kg(coating.get("wall_deposit_kg_by_species"), species)
-    if species_kg is None and "deposit_kg" in item:
-        species_kg = _map_kg({"deposit": item.get("deposit_kg")}, "deposit")
-    if species_kg is None and unavailable:
-        return _leaf(None, str(unavailable))
-    return _leaf(
-        {
-            "species_wall_deposit_kg": species_kg,
-            "coating_lifetime_campaigns": coating.get(
-                "campaigns_to_resinter_worst_segment",
-                coating.get("campaigns_to_resinter"),
-            ),
-            "lifespan_cost_status": cost_status,
-            "unavailable_reason": unavailable,
-        }
+    if "furnace_lifespan_consumed_fraction" not in coating:
+        return _leaf(
+            None,
+            "furnace_lifespan_consumed_fraction is absent at this tree",
+        )
+    value = _finite_number(coating.get("furnace_lifespan_consumed_fraction"))
+    status = coating.get("lifespan_cost_status")
+    if value is not None and status in (None, "available"):
+        return _leaf(value)
+    typed = (
+        coating.get("lifespan_cost_status_reason")
+        or status
+        or coating.get("coating_unavailable_reason")
+        or coating_reason
+        or "coating consumption is unavailable"
     )
+    return _leaf(None, str(typed))
+
+
+def _lifetime_leaf(
+    coating: Mapping | None,
+    coating_reason: str | None,
+) -> dict[str, object]:
+    if not isinstance(coating, Mapping):
+        return _leaf(None, coating_reason or "coating diagnostic is absent")
+    if "campaigns_to_resinter_worst_segment" in coating:
+        value = coating.get("campaigns_to_resinter_worst_segment")
+    elif "campaigns_to_resinter" in coating:
+        value = coating.get("campaigns_to_resinter")
+    else:
+        typed = (
+            coating.get("coating_unavailable_reason")
+            or coating_reason
+            or "coating lifetime is absent"
+        )
+        return _leaf(None, str(typed))
+    if value is None:
+        typed = (
+            coating.get("coating_unavailable_reason")
+            or coating.get("lifespan_cost_status_reason")
+            or "coating lifetime is absent"
+        )
+        return _leaf(None, str(typed))
+    return _leaf(value)
+
+
+def _default_cost_parameters() -> tuple[object | None, str | None]:
+    try:
+        import simulator.cost_parameters as cost_mod
+    except ImportError:
+        return None, "cost parameters are absent at this tree"
+    factory = getattr(cost_mod, "cost_parameters_from_mapping", None)
+    if not callable(factory):
+        return None, "cost_parameters_from_mapping is absent at this tree"
+    try:
+        return factory(), None
+    except Exception as exc:  # noqa: BLE001
+        return None, _exc_reason(exc)
+
+
+def _call_depreciation(
+    execution: object,
+    sim: object | None,
+    parameters: object | None,
+    param_reason: str | None,
+) -> tuple[object | None, str | None]:
+    dep_fn = getattr(objective_mod, "_depreciation_expense_per_run_summary", None)
+    if not callable(dep_fn):
+        return None, "re-sinter depreciation summary is absent at this tree"
+    if parameters is None:
+        return None, param_reason
+    if sim is None:
+        return None, "run simulator is absent"
+    try:
+        return dep_fn(execution, sim, cost_parameters=parameters), None
+    except Exception as exc:  # noqa: BLE001
+        return None, _exc_reason(exc)
+
+
+def _owned_lifetime(coating: Mapping) -> object:
+    if "campaigns_to_resinter_worst_segment" in coating:
+        return coating.get("campaigns_to_resinter_worst_segment")
+    if "campaigns_to_resinter" in coating:
+        return coating.get("campaigns_to_resinter")
+    return None
+
+
+def _call_amortization(
+    sim: object | None,
+    parameters: object | None,
+    param_reason: str | None,
+    coating: Mapping | None,
+    coating_reason: str | None,
+) -> tuple[object | None, str | None]:
+    amort_fn = getattr(objective_mod, "_furnace_amortization_summary", None)
+    if not callable(amort_fn):
+        return None, "furnace amortization summary is absent at this tree"
+    if parameters is None:
+        return None, param_reason
+    if sim is None:
+        return None, "run simulator is absent"
+    if not isinstance(coating, Mapping):
+        return None, coating_reason or "coating diagnostic is absent"
+    try:
+        summary = amort_fn(
+            sim,
+            _owned_lifetime(coating),
+            has_positive_fouling=coating.get("has_positive_qualified_fouling"),
+            cost_parameters=parameters,
+            coating_status=coating.get("coating_status"),
+            coating_status_reason=str(coating.get("coating_status_reason") or ""),
+            refusal=coating.get("wall_deposit_refusal"),
+        )
+    except Exception as exc:  # noqa: BLE001
+        return None, _exc_reason(exc)
+    return summary, None
+
+
+def _coating_money(
+    execution: object | None,
+    coating: Mapping | None,
+    coating_reason: str | None,
+) -> dict[str, object]:
+    """Re-sinter depreciation and furnace amortization.
+
+    ``run_input_cost`` is furnace-input money, not a coating cost.
+    """
+
+    if execution is None:
+        reason = coating_reason or "lunar run did not return an execution"
+        return {
+            "depreciation": None,
+            "depreciation_reason": reason,
+            "amortization": None,
+            "amortization_reason": reason,
+        }
+    parameters, param_reason = _default_cost_parameters()
+    sim = getattr(execution, "simulator", None)
+    depreciation, dep_reason = _call_depreciation(
+        execution,
+        sim,
+        parameters,
+        param_reason,
+    )
+    amortization, amort_reason = _call_amortization(
+        sim,
+        parameters,
+        param_reason,
+        coating,
+        coating_reason,
+    )
+    return {
+        "depreciation": depreciation,
+        "depreciation_reason": dep_reason,
+        "amortization": amortization,
+        "amortization_reason": amort_reason,
+    }
+
+
+def _resinter_leaf(money: Mapping) -> dict[str, object]:
+    summary = money.get("depreciation")
+    absent = money.get("depreciation_reason")
+    if not isinstance(summary, Mapping):
+        return _leaf(
+            None,
+            str(absent or "re-sinter depreciation summary is absent at this tree"),
+        )
+    status = summary.get("status")
+    usd = _finite_number(summary.get("depreciation_expense_per_run_usd"))
+    # configured_default is a parameter fallback, not the coating ratio.
+    if status in {"campaigns_to_resinter", "no_wall_deposit"} and usd is not None:
+        return _leaf(usd)
+    typed = _refusal_text(summary) or status or absent or "re-sinter cost is unavailable"
+    return _leaf(None, str(typed))
+
+
+def _amortization_leaf(money: Mapping) -> dict[str, object]:
+    summary = money.get("amortization")
+    absent = money.get("amortization_reason")
+    if not isinstance(summary, Mapping):
+        return _leaf(
+            None,
+            str(absent or "furnace amortization summary is absent at this tree"),
+        )
+    status = summary.get("furnace_amortization_status")
+    usd = _finite_number(summary.get("furnace_amortization_cost_per_run_usd"))
+    if status == "available" and usd is not None:
+        return _leaf(usd)
+    typed = (
+        summary.get("furnace_amortization_status_reason")
+        or _refusal_text(summary)
+        or status
+        or absent
+        or "furnace amortization is unavailable"
+    )
+    return _leaf(None, str(typed))
+
+
+def _species_on_wall(
+    species: str,
+    coating: Mapping | None,
+) -> tuple[float | None, str | None]:
+    wall, wall_reason = _species_wall_map(coating)
+    if wall is None:
+        return None, wall_reason or "wall_deposit_kg_by_species is absent"
+    if species not in wall:
+        return None, "species is absent from wall_deposit_kg_by_species"
+    species_kg = _map_kg(wall, species)
+    if species_kg is None:
+        return None, "species wall deposit kilogram is not finite"
+    return species_kg, None
+
+
+def _species_consumption(
+    species: str,
+    coating: Mapping | None,
+    coating_reason: str | None,
+) -> dict[str, object]:
+    total = _consumption_leaf(coating, coating_reason)
+    if total["value"] is None:
+        return _leaf(None, total["reason"])
+    species_kg, missing = _species_on_wall(species, coating)
+    if species_kg is None:
+        return _leaf(None, missing)
+    threshold = _finite_number(
+        coating.get("resinter_threshold_kg") if isinstance(coating, Mapping) else None
+    )
+    if threshold is None or threshold <= 0.0:
+        return _leaf(None, "resinter_threshold_kg is unavailable")
+    return _leaf(species_kg / threshold)
+
+
+def _species_resinter(
+    species: str,
+    coating: Mapping | None,
+    money: Mapping,
+) -> dict[str, object]:
+    total = _resinter_leaf(money)
+    if total["value"] is None:
+        return _leaf(None, total["reason"])
+    species_kg, missing = _species_on_wall(species, coating)
+    if species_kg is None:
+        return _leaf(None, missing)
+    summary = money.get("depreciation")
+    if not isinstance(summary, Mapping):
+        return _leaf(None, "re-sinter depreciation summary is absent")
+    if summary.get("status") == "no_wall_deposit":
+        return _leaf(0.0)
+    price = _finite_number(summary.get("furnace_resinter_cost_usd"))
+    threshold = _finite_number(summary.get("resinter_threshold_kg"))
+    if price is None or threshold is None or threshold <= 0.0:
+        return _leaf(None, "resinter price or threshold is unavailable")
+    # USD/resinter * (kg species / kg threshold) is this species' USD/run.
+    return _leaf(price * species_kg / threshold)
+
+
+def _species_amortization(
+    species: str,
+    coating: Mapping | None,
+    money: Mapping,
+) -> dict[str, object]:
+    total = _amortization_leaf(money)
+    if total["value"] is None:
+        return _leaf(None, total["reason"])
+    species_kg, missing = _species_on_wall(species, coating)
+    if species_kg is None:
+        return _leaf(None, missing)
+    total_usd = _finite_number(total["value"])
+    if total_usd is None:
+        return _leaf(None, "furnace amortization cost is not finite")
+    total_kg = _finite_number(
+        coating.get("wall_deposit_total_kg") if isinstance(coating, Mapping) else None
+    )
+    if total_kg is None or total_kg <= 0.0:
+        if species_kg == 0.0 and total_usd == 0.0:
+            return _leaf(0.0)
+        return _leaf(
+            None,
+            "wall_deposit_total_kg is unavailable for an amortization share",
+        )
+    return _leaf(total_usd * species_kg / total_kg)
+
+
+def _species_consequence(
+    species: str,
+    coating: Mapping | None,
+    coating_reason: str | None,
+    money: Mapping,
+) -> dict[str, object]:
+    return {
+        "coating_consumption": _species_consumption(species, coating, coating_reason),
+        "resinter_cost_usd": _species_resinter(species, coating, money),
+        "amortization_cost_usd": _species_amortization(species, coating, money),
+        "coating_lifetime_campaigns": _lifetime_leaf(coating, coating_reason),
+    }
+
+
+def _blank_species(reason: str) -> dict[str, object]:
+    missing = _leaf(None, reason)
+    return {
+        "supply_kg": missing,
+        "ledger_resolution_kg": missing,
+        "booked_wall_deposit_kg": missing,
+        "classification": missing,
+        "flag": missing,
+        "coating_cost_consequence": _species_consequence(
+            "",
+            None,
+            reason,
+            {
+                "depreciation": None,
+                "depreciation_reason": reason,
+                "amortization": None,
+                "amortization_reason": reason,
+            },
+        ),
+    }
 
 
 def _species_census(execution: object | None) -> dict[str, object]:
     if execution is None:
-        missing = _leaf(None, "lunar run did not return an execution")
-        return {species: {
-            "supply_kg": missing,
-            "ledger_resolution_kg": missing,
-            "booked_wall_deposit_kg": missing,
-            "classification": missing,
-            "flag": missing,
-            "coating_cost_consequence": missing,
-        } for species in SPECIES}
+        reason = "lunar run did not return an execution"
+        return {species: _blank_species(reason) for species in SPECIES}
     try:
         supply, missing_reason = _supply_kg(execution)
     except Exception as exc:  # noqa: BLE001 -- one probe reports every species
         supply = {}
-        missing_reason = {
-            species: f"{type(exc).__name__}: {exc}" for species in SPECIES
-        }
+        missing_reason = {species: _exc_reason(exc) for species in SPECIES}
     resolution = _resolution_kg(_charge_kg(execution))
     try:
         refused = _refused_species(execution)
     except Exception as exc:  # noqa: BLE001
         refused = None
-        refused_error = f"{type(exc).__name__}: {exc}"
+        refused_error = _exc_reason(exc)
     else:
         refused_error = None
     booking_fn = getattr(objective_mod, "_book_wall_deposits_at_vapour_supply", None)
@@ -475,14 +803,15 @@ def _species_census(execution: object | None) -> dict[str, object]:
         try:
             booking = _book(execution)
         except Exception as exc:  # noqa: BLE001
-            booking_error = f"{type(exc).__name__}: {exc}"
+            booking_error = _exc_reason(exc)
             booking_absent = True
     try:
         coating = _coating_summary(execution)
         coating_reason = None
     except Exception as exc:  # noqa: BLE001
         coating = None
-        coating_reason = f"{type(exc).__name__}: {exc}"
+        coating_reason = _exc_reason(exc)
+    money = _coating_money(execution, coating, coating_reason)
     rows = {}
     for species in SPECIES:
         row = _species_row(
@@ -495,13 +824,13 @@ def _species_census(execution: object | None) -> dict[str, object]:
             refused=refused,
             coating=coating,
             coating_reason=coating_reason,
+            money=money,
         )
         if booking_error and booking_absent:
             for key in (
                 "classification",
                 "flag",
                 "booked_wall_deposit_kg",
-                "coating_cost_consequence",
             ):
                 row[key] = _leaf(None, booking_error)
         refusal_missing = (
@@ -533,23 +862,46 @@ def _runner_wall_kg(document: Mapping) -> dict[str, object]:
     return _leaf({"by_species_kg": dict(raw), "total_kg": total})
 
 
-def _runner_cost(document: Mapping) -> dict[str, object]:
-    metadata = document.get("run_metadata")
-    if not isinstance(metadata, Mapping):
-        return _leaf(None, "run_metadata is absent")
-    rollup = metadata.get("cost_rollup_diagnostic")
-    if not isinstance(rollup, Mapping):
-        return _leaf(None, "cost_rollup_diagnostic is absent")
-    cost = rollup.get("run_input_cost")
-    if not isinstance(cost, Mapping):
-        return _leaf(None, "run_input_cost is absent")
-    return _leaf(
-        {
-            "allocation_status": cost.get("allocation_status"),
-            "owner_ratify_money_projection": cost.get("owner_ratify_money_projection"),
-            "unavailable_reason": cost.get("unavailable_reason"),
-        }
+def _wall_total_leaf(
+    summary: Mapping | None,
+    summary_reason: str | None,
+) -> dict[str, object]:
+    if not isinstance(summary, Mapping):
+        return _leaf(None, summary_reason or "coating diagnostic is absent")
+    if "wall_deposit_total_kg" not in summary:
+        return _leaf(None, "coating wall_deposit_total_kg is absent")
+    wall = _leaf(summary.get("wall_deposit_total_kg"))
+    if wall["value"] is None and summary.get("lifespan_cost_status_reason"):
+        return _leaf(None, str(summary.get("lifespan_cost_status_reason")))
+    return wall
+
+
+def _coating_diagnostic(
+    execution: object | None,
+    document: Mapping | None,
+    *,
+    summary: Mapping | None,
+    summary_reason: str | None,
+) -> dict[str, object]:
+    money = _coating_money(execution, summary, summary_reason)
+    runner = (
+        _runner_wall_kg(document)
+        if isinstance(document, Mapping)
+        else _leaf(None, summary_reason or "lunar run did not return a document")
     )
+    return {
+        "wall_deposit_kg": _wall_total_leaf(summary, summary_reason),
+        "runner_wall_deposit_kg": runner,
+        "coating_consumption": _consumption_leaf(summary, summary_reason),
+        "coating_lifetime": _lifetime_leaf(summary, summary_reason),
+        "resinter_cost_usd": _resinter_leaf(money),
+        "amortization_cost_usd": _amortization_leaf(money),
+        "lifespan_cost_status": (
+            _leaf(summary.get("lifespan_cost_status"))
+            if isinstance(summary, Mapping) and "lifespan_cost_status" in summary
+            else _leaf(None, summary_reason or "lifespan_cost_status is absent")
+        ),
+    }
 
 
 def _coating_digest(execution: object | None, document: Mapping) -> dict[str, object]:
@@ -564,41 +916,13 @@ def _coating_digest(execution: object | None, document: Mapping) -> dict[str, ob
             summary_reason = None
         except Exception as exc:  # noqa: BLE001
             summary = None
-            summary_reason = f"{type(exc).__name__}: {exc}"
-    if summary is None:
-        wall = _leaf(None, summary_reason)
-        lifetime = _leaf(None, summary_reason)
-    else:
-        if "wall_deposit_total_kg" in summary:
-            wall = _leaf(summary.get("wall_deposit_total_kg"))
-            if wall["value"] is None and summary.get("lifespan_cost_status_reason"):
-                wall = _leaf(None, str(summary.get("lifespan_cost_status_reason")))
-        else:
-            wall = _leaf(None, "coating wall_deposit_total_kg is absent")
-        lifetime_value = summary.get(
-            "campaigns_to_resinter_worst_segment",
-            summary.get("campaigns_to_resinter"),
-        )
-        if lifetime_value is None:
-            reason = (
-                summary.get("coating_unavailable_reason")
-                or summary.get("lifespan_cost_status_reason")
-                or "coating lifetime is absent"
-            )
-            lifetime = _leaf(None, str(reason))
-        else:
-            lifetime = _leaf(lifetime_value)
-    return {
-        "wall_deposit_kg": wall,
-        "runner_wall_deposit_kg": _runner_wall_kg(document),
-        "coating_lifetime": lifetime,
-        "cost": _runner_cost(document),
-        "lifespan_cost_status": (
-            _leaf(summary.get("lifespan_cost_status"))
-            if isinstance(summary, Mapping) and "lifespan_cost_status" in summary
-            else _leaf(None, summary_reason or "lifespan_cost_status is absent")
-        ),
-    }
+            summary_reason = _exc_reason(exc)
+    return _coating_diagnostic(
+        execution,
+        document,
+        summary=summary,
+        summary_reason=summary_reason,
+    )
 
 
 def _fe_capture(run: PyrolysisRun) -> dict[str, object]:
@@ -686,13 +1010,12 @@ def _lunar_bundle() -> dict[str, object]:
             "traceback": traceback.format_exc(),
             "species": _species_census(None),
             "fe_capture_kg": failed,
-            "coating_diagnostic": {
-                "wall_deposit_kg": failed,
-                "runner_wall_deposit_kg": failed,
-                "coating_lifetime": failed,
-                "cost": failed,
-                "lifespan_cost_status": failed,
-            },
+            "coating_diagnostic": _coating_diagnostic(
+                None,
+                None,
+                summary=None,
+                summary_reason=str(failed.get("reason") or "lunar run failed"),
+            ),
         }
     status = document.get("status") if isinstance(document, Mapping) else None
     return {
