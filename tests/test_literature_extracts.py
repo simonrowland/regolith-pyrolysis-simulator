@@ -5172,9 +5172,11 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # So uncovered observations 48661 -> 48664, uncovered extracts 616 -> 617, unattested 3128 -> 3131.
 # Not a fidelity regression.
 # t-1753a2: digit-bearing strings under ``ANNOTATION_KEYS`` are extractor
-# annotation, not measured evidence. Recounted with the validator: uncovered
-# observations 48664 -> 48630 and extracts 617 -> 615; all other warning
-# totals stayed unchanged. Both coverage ceilings may only fall.
+# annotation, not measured evidence. citation and standard_state are not in
+# that set. Recounted with tools/validate_literature_extracts.py after that
+# admission: uncovered observations 48664 -> 48630 and extracts 617 -> 615;
+# unattested 3131, pilots 57, and source-blind 0 stayed unchanged. Both
+# coverage ceilings may only fall.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 48630
 _UNCOVERED_EXTRACTS_CEILING = 615
@@ -5406,59 +5408,56 @@ def _assert_refused_sample_still_covers_addressed_observation(
     ) == max(0, unaddressed - 1)
 
 
-def test_fidelity_annotation_keys_are_the_reviewed_closed_set():
-    assert vle.ANNOTATION_KEYS == frozenset(
-        {
-            "attribution",
-            "note",
-            "reason",
-            "schema_gap",
-            "composition_derivation",
-            "parents_not_printed",
-            "standard_state",
-        }
-    )
-
-
-@pytest.mark.parametrize(
-    "annotation_key",
-    [
-        "attribution",
-        "note",
-        "reason",
-        "schema_gap",
-        "composition_derivation",
-        "parents_not_printed",
-        "standard_state",
-    ],
+# Closed set pinned against the validator. standard_state and citation are
+# absent: sampled values transcribe printed labels and citations.
+_ADMITTED_ANNOTATION_KEYS = (
+    "attribution",
+    "note",
+    "reason",
+    "schema_gap",
+    "composition_derivation",
+    "parents_not_printed",
 )
-def test_fidelity_annotation_strings_are_not_measured_leaves(annotation_key):
+
+
+def test_fidelity_annotation_keys_are_the_reviewed_closed_set():
+    assert vle.ANNOTATION_KEYS == frozenset(_ADMITTED_ANNOTATION_KEYS)
+
+
+@pytest.mark.parametrize("annotation_key", _ADMITTED_ANNOTATION_KEYS)
+def test_fidelity_annotation_string_is_covered_by_value_leaves_alone(annotation_key):
+    """Pin value leaves alone. The annotation string is not another leaf.
+
+    The temperature range on the minimal extract is removed first. An
+    unpinned scored condition would make every assertion uncovered and
+    would hide a float that the walker had stopped treating as a leaf.
+    """
     annotation = "Extractor note: based on the 1978 source table."
 
-    with_numeric_value = _minimal_extract()
-    with_numeric_value["species"]["Fe"]["observations"][0]["values"][
-        annotation_key
-    ] = annotation
-    assert _uncovered_observation_count(with_numeric_value) == 0
+    covered = _minimal_extract()
+    _strip_scored_conditions(covered)
+    covered["species"]["Fe"]["observations"][0]["values"][annotation_key] = annotation
+    assert _uncovered_observation_count(covered) == 0
 
-    with_text_value = _minimal_extract()
-    observation = with_text_value["species"]["Fe"]["observations"][0]
+    only_annotation_digits = _minimal_extract()
+    _strip_scored_conditions(only_annotation_digits)
+    observation = only_annotation_digits["species"]["Fe"]["observations"][0]
     observation["values"] = {"quantity": "alpha", annotation_key: annotation}
-    sample = with_text_value["fidelity_samples"][0]
+    sample = only_annotation_digits["fidelity_samples"][0]
     sample["path"] = "species.Fe.observations[fe_alpha_1].values.quantity"
     sample["value"] = "alpha"
-    assert _uncovered_observation_count(with_text_value) == 0
+    assert _uncovered_observation_count(only_annotation_digits) == 0
 
-    with_numeric_annotation = _minimal_extract()
-    with_numeric_annotation["species"]["Fe"]["observations"][0]["values"][
-        annotation_key
-    ] = 1978.0
-    assert _uncovered_observation_count(with_numeric_annotation) == 1
+    with_float = _minimal_extract()
+    _strip_scored_conditions(with_float)
+    with_float["species"]["Fe"]["observations"][0]["values"][annotation_key] = 1978.0
+    assert _uncovered_observation_count(with_float) == 1
 
 
 @pytest.mark.parametrize("printed_key", ["caption", "citation"])
 def test_fidelity_non_annotation_string_stays_a_measured_leaf(printed_key):
     doc = _minimal_extract()
+    _strip_scored_conditions(doc)
     doc["species"]["Fe"]["observations"][0]["values"][printed_key] = (
         "Printed text from the 1978 source table."
     )

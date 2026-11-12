@@ -106,13 +106,13 @@ the extract gate, and the literature index all call
 Coverage is by leaf address. A measured leaf is a finite int or float
 (not a boolean), or a string that contains any digit [0-9]. String values
 under the closed `ANNOTATION_KEYS` set (`attribution`, `note`, `reason`,
-`schema_gap`, `composition_derivation`, `parents_not_printed`,
-`standard_state`) are excluded only because sampled corpus examples show the
-extractor's paraphrase, provenance, or reasoning rather than printed evidence;
-numbers under those keys remain leaves. Keys stay outside the set when their
-values transcribe printed citations, cells, labels, ids, or captions. A
-quantity name, a unit on its own, or another label with no digit is not a
-leaf.
+`schema_gap`, `composition_derivation`, `parents_not_printed`) are excluded
+because sampled values are the extractor's paraphrase, provenance, reasoning,
+schema notes, or refusal reasons, not printed evidence. Numbers under those
+keys remain leaves. A key stays outside the set when its sampled values
+transcribe a printed citation, cell, label, id, caption, or standard state.
+`citation` and `standard_state` stay outside for that reason. A quantity
+name, a unit on its own, or another label with no digit is not a leaf.
 The evidence tree is the observation's `values` plus each scored numeric
 condition the temperature payload copies beside it: `T_range_K`, `T_K`,
 `T_C`, `temperature_C`, `temp_C`, and `point_conditions`. A `locator`
@@ -125,8 +125,9 @@ such as `quantity: pressure` is not a measured leaf and does not cover a
 sibling measurement, including a printed value such as `0.91Pa` that the
 numeric grammar does not read. Two samples may pin different addresses of
 the same observation. Evidence with no measured leaf is covered by a pin
-of that evidence only when the evidence also contains no digit. Zero
-recognised leaves in a block that still contains a digit is not coverage.
+of that evidence only when the evidence also contains no digit outside an
+annotation string. Zero recognised leaves in a block that still contains
+such a digit is not coverage.
 An equipment pin does not contribute.
 A bare integer bracket such as `observations[0]` is a list position, not
 an id, so it does not contribute. Structured samples address `values`

@@ -74,7 +74,8 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   as text. A string the numeric parser cannot read, such as ``0.91Pa``
   or ``0.0614K``, is still a leaf: it is uncovered unless the opened
   source carries that printed value. Zero recognised leaves in a block
-  that still contains a digit is a refusal, not coverage. Repeating a
+  that still contains a digit outside an annotation string is a refusal,
+  not coverage. Repeating a
   pin of one address does not cover a sibling, even when the numbers
   are equal, and a ``values`` pin does not cover a sibling condition.
   A descriptive label such as ``quantity: pressure`` does not cover a
@@ -1809,7 +1810,6 @@ ANNOTATION_KEYS = frozenset(
         "schema_gap",
         "composition_derivation",
         "parents_not_printed",
-        "standard_state",
     }
 )
 
