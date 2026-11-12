@@ -28,7 +28,6 @@ from simulator.battery.enums import (
 )
 from simulator.battery.generators._usgs_common import (
     LETTER_TAIL_RE,
-    _NUMBER_RE,
     _decimal_grain,
     _neighbours_of,
     _opposite_to_both_neighbours,

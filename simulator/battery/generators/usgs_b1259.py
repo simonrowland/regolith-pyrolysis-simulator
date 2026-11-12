@@ -44,7 +44,6 @@ from simulator.battery.generators._usgs_common import (
     _opposite_to_both_neighbours,
     _published_decimal,
     _reconstruction_coarser_than_column,
-    _unique_grain_split,
     _value_grain,
 )
 from simulator.battery.identity import (
