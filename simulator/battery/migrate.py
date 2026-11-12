@@ -4950,7 +4950,7 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "Pa",
         "atm",
     ),
-    "bar_to_Pa": (Decimal("100000"), "P_Pa = P_bar × 1e5", "Pa", "bar"),
+    "bar_to_Pa": (PA_PER_BAR_DEC, "P_Pa = P_bar × 1e5", "Pa", "bar"),
     "kPa_to_Pa": (Decimal("1000"), "P_Pa = P_kPa × 1000", "Pa", "kPa"),
     "GPa_to_Pa": (Decimal("1000000000"), "P_Pa = P_GPa × 1e9", "Pa", "GPa"),
     "mbar_to_Pa": (Decimal("100"), "P_Pa = P_mbar × 100", "Pa", "mbar"),
@@ -9644,7 +9644,7 @@ def _convert_printed_amount(amount: Decimal, unit: str) -> tuple[Decimal, str] |
         if normalized == "atm":
             return amount * Decimal(101325), "atm_to_Pa"
         if normalized == "bar":
-            return amount * Decimal(100000), "bar_to_Pa"
+            return amount * PA_PER_BAR_DEC, "bar_to_Pa"
         if normalized == "mbar":
             return amount * Decimal(100), "mbar_to_Pa"
         if normalized == "MPa":
@@ -19708,7 +19708,7 @@ _AUTHOR_RATIO_REL_TOLERANCE = Decimal("1e-4")
 _CONGRUENT_VAPORIZATION_M_O2_G_MOL = Decimal("32.00")
 _CONGRUENT_VAPORIZATION_M_K_G_MOL = Decimal("39.10")
 _OXYGEN_TABLE_KEYS = frozenset({"series", "rows", "points"})
-_BAR_PA = Decimal("100000")
+_BAR_PA = PA_PER_BAR_DEC
 # Explicit frames keep their reference. An empty unit is not a printed
 # standard state: `_bare_log_convention` accepts 1 bar only inside the IW band.
 _OXYGEN_LOG_REFERENCE_PA = {
@@ -26128,7 +26128,7 @@ class Migrator:
         p_std = p_sel.amount if p_sel.available else None
         if p_std is not None:
             measured.gibbs_reference_pressures += 1
-            if p_std == Decimal("100000") or p_std == Decimal("100000.0"):
+            if p_std == PA_PER_BAR_DEC:
                 measured.gibbs_reference_100000 += 1
             elif p_std == Decimal("101325") or p_std == Decimal("101325.0"):
                 measured.gibbs_reference_101325 += 1

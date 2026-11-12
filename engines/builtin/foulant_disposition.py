@@ -22,10 +22,9 @@ from engines.antoine import (
 )
 from engines.yaml_loader import YAML12SafeLoader
 
-from simulator.physical_constants import GAS_CONSTANT_10SIG
+from simulator.physical_constants import GAS_CONSTANT_10SIG, PA_PER_BAR
 
 GAS_CONSTANT_J_PER_MOL_K = GAS_CONSTANT_10SIG
-PA_PER_BAR = 100_000.0
 UNGROUNDABLE_PROCESS_EXTENT = "UNGROUNDABLE_PROCESS_EXTENT"
 NOT_SPECIFIED = "not_speciated"
 _NUMERICAL_PO2_GUARD_BAR = 1.0e-15

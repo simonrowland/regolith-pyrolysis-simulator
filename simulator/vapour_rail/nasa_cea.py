@@ -75,7 +75,7 @@ import math
 from dataclasses import dataclass
 from typing import Literal, Sequence
 
-from simulator.physical_constants import GAS_CONSTANT_10SIG
+from simulator.physical_constants import GAS_CONSTANT_10SIG, PA_PER_BAR
 
 # 10-significant-figure R (J/(mol·K)), not the full CODATA leaf
 # (relative gap −1.843e-11). Used only when converting dimensionless
@@ -448,7 +448,7 @@ class NasaCeaPolynomial:
     # in this module do not read the field; it is stored metadata.
     # NASA/TP-2002-211556 mixed convention (as encoded by tools/vp_cea_ingest.py):
     # ideal-gas standard state 1 bar; pure condensed reference substances 1 atm.
-    reference_pressure_Pa: float = 100_000.0
+    reference_pressure_Pa: float = PA_PER_BAR
 
     def __post_init__(self) -> None:
         if self.family not in ("nasa_cea_7", "nasa_cea_9"):

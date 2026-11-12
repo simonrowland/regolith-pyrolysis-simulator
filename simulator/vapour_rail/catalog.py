@@ -66,6 +66,7 @@ from simulator.vapour_rail.shomate import (
     ShomateSegment,
     coefficients_from_mapping,
 )
+from simulator.physical_constants import PA_PER_BAR
 
 
 SCHEMA_VERSION = 2
@@ -91,7 +92,7 @@ RUNTIME_THERMO_EVALUATOR_FAMILIES = frozenset(
     {"nasa_cea_7", "nasa_cea_9", "shomate"}
 )
 # CEA / JANAF standard-state pressure P° (Pa).
-_THERMO_REFERENCE_PRESSURE_PA = 100_000.0
+_THERMO_REFERENCE_PRESSURE_PA = PA_PER_BAR
 _THERMO_EXTRACT_DIR = (
     Path(__file__).resolve().parents[2] / "data" / "literature" / "extracts"
 )
@@ -3287,7 +3288,7 @@ def _compile_thermo_reference_model(
                 log10_base_pa = float(base_reference.log10_pressure(temperature_K))
                 log10_base_ratio = log10_base_pa - math.log10(Pstd)
                 log10_pO2_over_Pstd = math.log10(
-                    (pO2_reference_bar * 1.0e5) / Pstd
+                    (pO2_reference_bar * PA_PER_BAR) / Pstd
                 )
                 log10_target_ratio = (
                     log10_K
@@ -3425,7 +3426,7 @@ def _compile_thermo_reference_model(
             # Use stoichiometric ν_O2 in the pre-root division — NOT
             # −pO2_exponent. The declared outer exponent is already
             # −ν_O2/ν_v; using its negation here double-applies 1/ν_v.
-            pO2_over_Pstd = (pO2_reference_bar * 1.0e5) / Pstd
+            pO2_over_Pstd = (pO2_reference_bar * PA_PER_BAR) / Pstd
             if abs(nu_o2) > 0.0:
                 K_eff = K / (pO2_over_Pstd**nu_o2)
             else:

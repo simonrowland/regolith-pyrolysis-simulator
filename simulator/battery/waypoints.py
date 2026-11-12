@@ -42,7 +42,7 @@ from simulator.battery.records import (
     as_decimal,
 )
 from simulator.lab_schedule import LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
-from simulator.physical_constants import GAS_CONSTANT_DECIMAL
+from simulator.physical_constants import BAR_PA_DECIMAL, GAS_CONSTANT_DECIMAL
 from simulator.transport_constants import COLLISION_DIAMETERS_M, FREE_MOLECULAR_KNUDSEN_MIN
 
 
@@ -1943,7 +1943,7 @@ def oxygen_condition(
                     # T and P_CO (or total P when CO is the stated gas); the
                     # Jakobsson & Oskarsson 1994 CCO calibration is in
                     # simulator.oxygen_buffers.
-                    P_bar = pressure_value.point / Decimal(100000)
+                    P_bar = pressure_value.point / BAR_PA_DECIMAL
                     log_fo2 = log10_fo2_c_co_bar(float(T), float(P_bar))
                     routes.append(Waypoint(
                         "oxygen_condition",
@@ -1964,7 +1964,7 @@ def oxygen_condition(
                 if (temperature.kind is ValueKind.POINT and pressure.value.kind is ValueKind.POINT
                         and buffer.T_min_K <= temperature.point <= buffer.T_max_K):
                     T = temperature.point
-                    P = pressure.value.point / Decimal(100000)
+                    P = pressure.value.point / BAR_PA_DECIMAL
                     # Premise: Frost (1991) Table 1's condensed buffer line is
                     # within its published T domain; its equation is in
                     # simulator.oxygen_buffers.
@@ -2073,7 +2073,7 @@ def _log_pressure(pressure: Value) -> Value | None:
     # Algebra: log10(fO2/bar)=log10(pO2_Pa/100000); argument dimensionless.
     # Sanity: pO2=1 Pa gives -5. Monotonic transform preserves bounds.
     def convert(value: Decimal) -> Decimal:
-        return (value / Decimal(100000)).log10()
+        return (value / BAR_PA_DECIMAL).log10()
     if pressure.kind is ValueKind.POINT and pressure.point > 0:
         return replace(pressure, point=convert(pressure.point))
     if pressure.kind is ValueKind.INTERVAL and pressure.interval_low > 0:

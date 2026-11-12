@@ -30,7 +30,7 @@ import math
 from typing import Any
 
 from simulator.cost_energy import json_safe_number, unavailable_quantity
-from simulator.physical_constants import GAS_CONSTANT_10SIG
+from simulator.physical_constants import GAS_CONSTANT_10SIG, PA_PER_BAR, PA_PER_MBAR
 from simulator.environment import (
     ASTEROID_VACUUM_FLOOR_BAR,
     MARS_DATUM_PRESSURE_BAR,
@@ -41,8 +41,8 @@ from simulator.environment import (
 
 # 10-significant-figure R, J/(mol·K). Not the full CODATA leaf.
 _R_J_PER_MOL_K = GAS_CONSTANT_10SIG
-_PA_PER_BAR = 100_000.0
-_PA_PER_MBAR = 100.0
+_PA_PER_BAR = PA_PER_BAR
+_PA_PER_MBAR = PA_PER_MBAR
 _SECONDS_PER_HOUR = 3600.0
 
 # --- Ambient reference pressures (Pa). Cited so the optimizer can pick a site. ---

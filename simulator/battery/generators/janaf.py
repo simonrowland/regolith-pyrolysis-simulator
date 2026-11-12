@@ -82,12 +82,13 @@ from simulator.reference_data.janaf import (
     table_fusion_transition_for_table_id,
     table_printed_temperatures,
 )
+from simulator.physical_constants import BAR_PA_DECIMAL
 from tools.harvest_janaf_compilation import parse_table
 
 SOURCE_ID = "nist-janaf-4th"
 TABLE_SOURCE_PREFIX = "data/literature/compilations/janaf/tables"
 STANDARD_STATE = "p° = 0.1 MPa (as published by JANAF)"
-STANDARD_PRESSURE_PA = Decimal("100000")
+STANDARD_PRESSURE_PA = BAR_PA_DECIMAL
 # Chase 1998, NIST-JANAF 4th ed., Monograph 9, printed p. 10 §3.4
 # "Fundamental constants" table: molar gas constant R = 8.314 41(26)
 # J mol^-1 K^-1 (Cohen & Taylor 1973 / CODATA 1973). The same page's

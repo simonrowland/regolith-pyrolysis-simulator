@@ -37,6 +37,10 @@ STEFAN_BOLTZMANN_7SIG = 5.670374e-8
 # Unit conversions (exact by definition unless noted).
 CELSIUS_TO_KELVIN_OFFSET = 273.15  # T/K = t/deg C + 273.15.
 PA_PER_BAR = 1e5
+# Same object as PA_PER_BAR. The brief's name for the bar-to-pascal factor.
+BAR_PA = PA_PER_BAR
+# Exact decimal of 1 bar. 100000 is an integer, so this is not a float parse.
+BAR_PA_DECIMAL = Decimal(100000)
 PA_PER_MBAR = 100.0
 MBAR_PER_BAR = 1000.0
 J_PER_KJ = 1000.0
@@ -71,6 +75,8 @@ CATALOG_PHYSICAL_PRESSURE_CEILING_PA = 1.0e9
 __all__ = (
     "ANGSTROM_PER_M",
     "AVOGADRO",
+    "BAR_PA",
+    "BAR_PA_DECIMAL",
     "BOLTZMANN",
     "CATALOG_PHYSICAL_PRESSURE_CEILING_PA",
     "CELSIUS_TO_KELVIN_OFFSET",

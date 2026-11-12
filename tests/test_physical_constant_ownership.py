@@ -162,3 +162,31 @@ def test_ten_sig_gas_constant_has_one_owner() -> None:
     assert pumping_r is GAS_CONSTANT_10SIG
     assert cea_r is GAS_CONSTANT_10SIG
     assert GAS_CONSTANT_10SIG is not GAS_CONSTANT
+
+
+def test_bar_to_pascal_has_one_owner() -> None:
+    """1 bar is 1e5 Pa. The float and the decimal each have one object."""
+
+    from decimal import Decimal
+
+    from simulator.battery.identity import PA_PER_BAR_DEC
+    from simulator.battery.oxygen_identity import BAR_PA as oxygen_bar_pa
+    from simulator.chemistry.ellingham_graph import ELLINGHAM_STANDARD_PRESSURE_PA
+    from simulator.physical_constants import (
+        BAR_PA,
+        BAR_PA_DECIMAL,
+        PA_PER_BAR,
+        PA_PER_MBAR,
+    )
+    from simulator.pumping_cost import _PA_PER_BAR, _PA_PER_MBAR
+
+    assert BAR_PA is PA_PER_BAR
+    assert PA_PER_BAR == 1e5
+    assert BAR_PA_DECIMAL == Decimal(100000)
+    assert BAR_PA_DECIMAL == Decimal("100000.0")
+    assert BAR_PA_DECIMAL == Decimal("1e5")
+    assert PA_PER_BAR_DEC is BAR_PA_DECIMAL
+    assert oxygen_bar_pa is BAR_PA_DECIMAL
+    assert ELLINGHAM_STANDARD_PRESSURE_PA is PA_PER_BAR
+    assert _PA_PER_BAR is PA_PER_BAR
+    assert _PA_PER_MBAR is PA_PER_MBAR

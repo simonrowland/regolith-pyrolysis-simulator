@@ -14,7 +14,7 @@ from simulator.battery.enums import AdmissionStatus, EvidenceClass, NoticeKind, 
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import Bench, Derivation, Located, Locator, Notice, Observation, Species, State, Uncertainty, Value, _is_source_internally_inconsistent
 from simulator.battery.waypoints import identity_composition_waypoint
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 
 SOURCE_OXYGEN_RELATION = "source_oxygen_condition;"
 CO_MEASURED_CONSISTENCY_ORIGIN = "co-measured oxygen consistency"
@@ -295,7 +295,7 @@ def _po2_pa_from_atomic_oxygen(pressure_pa: Decimal, constant: float) -> Decimal
     # W pO=6.8e-10 atm gives q=3.073062243e-12 bar. Shornikov's
     # 2.65e-9 atm O gives 4.667080363e-11 bar, agreeing within 0.36%
     # with its printed O2=4.59e-11 atm=4.6508175e-11 bar.
-    return Decimal(str((float(pressure_pa) / 100000.0 / constant) ** 2 * 100000.0))
+    return Decimal(str((float(pressure_pa) / PA_PER_BAR / constant) ** 2 * PA_PER_BAR))
 
 
 def _atomic_oxygen_equilibrium_parameters(

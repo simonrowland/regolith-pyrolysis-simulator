@@ -39,7 +39,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_segment_for_temperature,
     ellingham_stoichiometry,
 )
-from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX
+from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX, PA_PER_BAR
 from simulator.diagnostic_helpers.gibbs_battery import (
     INDEPENDENT_AGREEMENT_BAND_KJ_MOL,
     LEDGER_PATH as GIBBS_PILOT_LEDGER_PATH,
@@ -112,7 +112,7 @@ VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
 # JANAF printed p° = 0.1 MPa = 1 bar = 1e5 Pa. B689 p° = 1 atm.
 # Na NBP 1156 K and Mg NBP 1363 K are the brief's 1-bar sanity rows
 # (NIST Mg T_b = 1363.15 K). P_sat(T_b) = 1 bar by definition.
-JANAF_STANDARD_PRESSURE_PA = 1.0e5
+JANAF_STANDARD_PRESSURE_PA = PA_PER_BAR
 B689_STANDARD_PRESSURE_PA = 101325.0
 NA_NBP_K = 1156.0
 MG_NBP_K = 1363.0
