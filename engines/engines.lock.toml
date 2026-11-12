@@ -65,7 +65,11 @@ patches = [
     "0002-lp-iteration-cap-terminates-without-pc-recheck",
     "0004-headless-singleton-mpi-defaults",
 ]
-reference_sha256 = "d7ce588f5b617ec6ea64ca11d020d5c9a159d9bc78c944ec06463627bf214cbe"
+# Studio SoC only (s1/s2/s3, measured on studio-3); matches install-engines.py
+# only when built at ~/repos/engine-bin/MAGEMin/<commit>/MAGEMin. rpp's M4 and
+# other build dirs can drift; check_engine_install reports git-engine
+# artifact_sha256_drift as an expected warning.
+reference_sha256 = "e30b733cfb020440d39465effd78fed7a4c30cf91b264db61925af4198b564b9"
 reference_sha256_source = "MAGEMin"
 
 [engines.petthermotools]

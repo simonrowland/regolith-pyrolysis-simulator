@@ -148,8 +148,9 @@ Clean. No local patches.
 
 ### magemin — v1.9.6 / upstream `40ed109`
 
-Three fixes held as patches pending upstream, with a draft pull-request description in
-`patches/magemin/UPSTREAM-PR.md` (not yet filed):
+Four fixes held as patches pending upstream (not yet filed): `0001`-`0003` share the draft
+pull-request description in `patches/magemin/UPSTREAM-PR.md`; `0004` has its own draft in the
+regolith-main combined offer:
 
 - `0001` THERMOCALC `aMgO`: the `tc` branch of `compute_activities()` never stored the periclase
   `gbase`, so `aMgO` printed `exp(Gamma_MgO/RT)` (~1e-21). Until the adapter-side recompute
@@ -162,11 +163,15 @@ Three fixes held as patches pending upstream, with a draft pull-request descript
 - `0003` sb21 `aFeO`: the four-cation wustite scaling was computed and then overwritten
   (printed aFeO ~5.6e25 for a basaltic sb21 bulk; 0.473 after). sb24 has no `FeO` oxide; its
   `aFeO` comes from the later Fe+O block, which already divides by 4 and is not touched.
+- `0004` headless singleton MPI defaults: exclude hwloc's unused OpenCL probe and set local
+  transport defaults for standalone MPI launches. Its draft issue and PR text are in the
+  regolith-main combined offer.
 
 The patch files keep MAGEMin's CRLF line endings: apply them with `git am --keep-cr` (or `git apply`),
 and edit them byte-safely. `enginepatch.sh` maps
-`magemin` to `../MAGEMin` (override with `MAGEMIN_CHECKOUT`). The engine's live binary is built
-from a separate, clean v1.9.6 tree, so none of these patches is in it; see `STATUS`.
+`magemin` to `../MAGEMin` (override with `MAGEMIN_CHECKOUT`); `STATUS` describes that sibling
+checkout. Studio runtime builds use the engine lock and `install-engines.py`, which apply patches
+0002 and 0004. The remaining MAGEMin patches are not part of the studio build.
 
 ### alphamelts — bundled 2.3.1 arm64 artifact / upstream `957b8f5`
 

@@ -3,4 +3,4 @@ base_sha:     40ed109d07d4246001cab59382596d33fed79086
 base_subject: MAGEMin v1.9.6
 captured_at:  2026-11-05
 checkout:     ../MAGEMin (override with MAGEMIN_CHECKOUT)
-live_build:   the engine runs a separate MAGEMin build tree at the same base_sha; that tree carries none of these patches
+live_build:   studio builds use install-engines.py and the lock-pinned 0002 + 0004 patches; STATUS describes the sibling checkout
