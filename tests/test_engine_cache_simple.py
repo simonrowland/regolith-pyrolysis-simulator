@@ -206,6 +206,7 @@ def test_cache_uses_canonical_request_and_wal_sqlite(
         "stores": 1,
         "store_error": 0,
         "read_error": 0,
+        "conflicts": 0,
     }
     with sqlite3.connect(database) as connection:
         assert connection.execute("PRAGMA journal_mode").fetchone()[0].lower() == "wal"
@@ -404,6 +405,7 @@ def test_recursive_simple_namespace_hot_value_round_trips_without_projection(
         "stores": 1,
         "store_error": 0,
         "read_error": 0,
+        "conflicts": 0,
     }
 
 
@@ -568,8 +570,8 @@ def test_every_chemistry_version_has_changelog_and_runtime_identity() -> None:
         for engine in engine_cache.ENGINE_CHEMISTRY_VERSION
     )
     assert all(
-        "stat" in engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT[engine]
-        for engine in ("alphamelts", "magemin")
+        "stat" not in identity
+        for identity in engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT.values()
     )
 
 
@@ -626,6 +628,7 @@ def test_stale_runtime_warns_once_without_changing_hits_or_results(
         "stores": 0,
         "store_error": 0,
         "read_error": 0,
+        "conflicts": 0,
     }
 
 
@@ -648,7 +651,7 @@ def test_runtime_identity_is_computed_once_per_engine(
     assert calls == Counter(dict.fromkeys(engine_cache.ENGINE_CHEMISTRY_VERSION, 1))
 
 
-def test_native_identity_hashes_only_after_recorded_binary_stat_changes(
+def test_native_identity_hashes_once_per_process_without_a_stat_pin(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -656,14 +659,15 @@ def test_native_identity_hashes_only_after_recorded_binary_stat_changes(
 
     binary = tmp_path / "engine"
     binary.write_bytes(b"initial binary")
-    stat = binary.stat()
-    engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT["alphamelts"] = {
-        "identity": "sha256:recorded",
-        "date": "2026-11-08",
-        "stat": {"size": stat.st_size, "mtime_ns": stat.st_mtime_ns},
-    }
-    engine_cache._RUNTIME_BACKENDS["alphamelts"] = SimpleNamespace(
-        _binary_path=binary
+    monkeypatch.setitem(
+        engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT,
+        "alphamelts",
+        {"identity": "sha256:recorded", "date": "2026-11-08"},
+    )
+    monkeypatch.setitem(
+        engine_cache._RUNTIME_BACKENDS,
+        "alphamelts",
+        SimpleNamespace(_binary_path=binary),
     )
     hashes: list[Path] = []
 
@@ -673,12 +677,37 @@ def test_native_identity_hashes_only_after_recorded_binary_stat_changes(
 
     monkeypatch.setattr(engine_cache, "_file_sha256", digest)
 
-    assert engine_cache._native_binary_identity("alphamelts") == "sha256:recorded"
-    assert hashes == []
+    engine_cache.runtime_identity.cache_clear()
+    assert engine_cache.runtime_identity("alphamelts") == "sha256:changed"
+    assert hashes == [binary]
 
     binary.write_bytes(b"changed binary")
-    assert engine_cache._native_binary_identity("alphamelts") == "sha256:changed"
+    assert engine_cache.runtime_identity("alphamelts") == "sha256:changed"
     assert hashes == [binary]
+
+
+def test_local_cache_rows_are_unrecorded_without_an_explicit_box(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_BOX", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+
+    engine_cache.cached_engine_call(
+        "openimcc", {"call": "unrecorded-box"}, lambda: {"answer": 42}
+    )
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "studio-box")
+    engine_cache.cached_engine_call(
+        "openimcc", {"call": "recorded-box"}, lambda: {"answer": 43}
+    )
+
+    with sqlite3.connect(database) as connection:
+        boxes = connection.execute(
+            "SELECT source_box FROM engine_outputs ORDER BY key"
+        ).fetchall()
+    assert {row[0] for row in boxes} == {"", "studio-box"}
 
 
 def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
@@ -726,6 +755,7 @@ def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
         "stores": 1,
         "store_error": 0,
         "read_error": 0,
+        "conflicts": 0,
     }
 
 
@@ -1006,6 +1036,27 @@ def test_bulk_loader_is_idempotent_and_chemistry_version_can_be_dropped(
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 0
 
 
+def test_bulk_loader_counts_conflicts_without_replacing_existing_bytes(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    digest = engine_cache_key("magemin", 2, {"call": "duplicate"})
+    _engine_cache_counters(reset=True)
+
+    assert load_cache_rows(
+        database, [(digest, {"answer": "first"}, "magemin", 2, "box-a", 1)]
+    ) == 1
+    assert load_cache_rows(
+        database, [(digest, {"answer": "different"}, "magemin", 2, "box-b", 2)]
+    ) == 0
+    assert _engine_cache_counters(reset=True)["magemin"]["conflicts"] == 1
+    with sqlite3.connect(database) as connection:
+        stored = connection.execute(
+            "SELECT value FROM engine_outputs WHERE key=?", (digest,)
+        ).fetchone()[0]
+    assert json.loads(zlib.decompress(stored)) == {"answer": "first"}
+
+
 def test_readonly_mode_serves_hits_and_solves_misses_without_writing(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1028,7 +1079,7 @@ def test_readonly_mode_serves_hits_and_solves_misses_without_writing(
     ) == {"pressure": 3.0}
     assert _engine_cache_counters(reset=True)["vaporock"] == {
         "hits": 1, "misses": 1, "stores": 0,
-        "store_error": 0, "read_error": 0,
+        "store_error": 0, "read_error": 0, "conflicts": 0,
     }
     with sqlite3.connect(database) as connection:
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
@@ -1060,6 +1111,7 @@ def test_non_authoritative_engine_result_is_cacheable(
         "stores": 1,
         "store_error": 0,
         "read_error": 0,
+        "conflicts": 0,
     }
 
 
@@ -1080,6 +1132,7 @@ def test_engine_worker_returns_cache_counters_to_parent(
             "stores": 1,
             "store_error": 0,
             "read_error": 0,
+        "conflicts": 0,
         }
     finally:
         pool.close(cancel_pending=True, timeout_s=5.0)
@@ -1105,10 +1158,11 @@ def test_exceptions_and_typed_refusals_are_not_stored(
         "stores": 0,
         "store_error": 0,
         "read_error": 0,
+        "conflicts": 0,
     }
 
 
-def test_corrupt_hot_json_is_a_miss_and_is_replaced(
+def test_corrupt_hot_json_is_a_counted_conflict_and_is_not_replaced(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1134,10 +1188,66 @@ def test_corrupt_hot_json_is_a_miss_and_is_replaced(
     assert _engine_cache_counters(reset=True)["alphamelts"] == {
         "hits": 1,
         "misses": 2,
-        "stores": 2,
+        "stores": 1,
         "store_error": 0,
         "read_error": 1,
+        "conflicts": 1,
     }
+    with sqlite3.connect(database) as connection:
+        assert connection.execute("SELECT value FROM engine_outputs").fetchone()[0] == b"not compressed JSON"
+
+
+def test_concurrent_cache_writer_counts_different_bytes_without_replacing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    engine_cache.engine_cache_counters(reset=True)
+    request = {"call": "conflicting-writer"}
+    digest = engine_cache.engine_cache_key("openimcc", 1, request)
+
+    def solve() -> dict[str, str]:
+        connection = engine_cache._CONNECTIONS[(str(database), False)]
+        existing_json = json.dumps(
+            {"answer": "existing"},
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        ).encode("ascii")
+        connection.execute(
+            "INSERT INTO engine_outputs "
+            "(key, value, engine, chem_version, source_box, row_seq) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                digest,
+                sqlite3.Binary(zlib.compress(existing_json, level=6)),
+                "openimcc",
+                "1",
+                "existing-box",
+                1,
+            ),
+        )
+        connection.commit()
+        return {"answer": "live"}
+
+    result = engine_cache.cached_engine_call("openimcc", request, solve)
+
+    assert result == {"answer": "live"}
+    assert _engine_cache_counters(reset=True)["openimcc"] == {
+        "hits": 0,
+        "misses": 1,
+        "stores": 0,
+        "store_error": 0,
+        "read_error": 0,
+        "conflicts": 1,
+    }
+    with sqlite3.connect(database) as connection:
+        stored = connection.execute(
+            "SELECT value FROM engine_outputs WHERE key=?", (digest,)
+        ).fetchone()[0]
+    assert json.loads(zlib.decompress(stored)) == {"answer": "existing"}
 
 
 def test_store_encoding_failure_returns_live_value_and_counts_error(
@@ -1162,6 +1272,7 @@ def test_store_encoding_failure_returns_live_value_and_counts_error(
         "stores": 0,
         "store_error": 1,
         "read_error": 0,
+        "conflicts": 0,
     }
     with sqlite3.connect(database) as connection:
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 0
