@@ -4476,13 +4476,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _refresh_oxygen_reservoir_transport_pO2_for_vapor(
         self,
+        head_o2_mol: float | None = None,
     ) -> OxygenReservoirState:
-        head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
-                OXYGEN_SPECIES,
-                0.0,
+        # A staged pre-solve drain passes the O2 that the uncommitted bleed
+        # would leave. The default reads the ledger, which is the committed
+        # holdup.
+        if head_o2_mol is None:
+            head_o2_mol = float(
+                self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                    OXYGEN_SPECIES,
+                    0.0,
+                )
             )
-        ))
+        head_o2_mol = max(0.0, float(head_o2_mol))
         ledger_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(head_o2_mol)
         reservoir = self.melt.oxygen_reservoir
         reservoir.headspace_ledger_pO2_bar = ledger_pO2
@@ -7823,6 +7829,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             dt_hr=dt_hr,
         )
 
+    def _commit_overhead_bleed_controls(
+        self,
+        controls: Mapping[str, Any],
+    ) -> IntentResult:
+        result = self._dispatch_and_commit(
+            ChemistryIntent.OVERHEAD_BLEED,
+            control_inputs=dict(controls),
+        )
+        if (result.diagnostic or {}).get('bled_o2_mol', 0.0) > 0.0:
+            for stage in self.train.stages:
+                stage.collected_kg.pop(OXYGEN_SPECIES, None)
+        self._sync_oxygen_kg_counters()
+        return result
+
     def _dispatch_overhead_bleed(
         self,
         *,
@@ -7830,6 +7850,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         capacity_result=None,
         effective_transport_capacity=None,
         conductance_kg_s: Optional[float] = None,
+        commit: bool = True,
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
@@ -7914,15 +7935,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 controls['p_total_bar'] = sum(
                     capacity_result.partial_pressures_Pa.values()
                 ) / 100000.0
-        result = self._dispatch_and_commit(
-            ChemistryIntent.OVERHEAD_BLEED,
-            control_inputs=controls,
-        )
-        if (result.diagnostic or {}).get('bled_o2_mol', 0.0) > 0.0:
-            for stage in self.train.stages:
-                stage.collected_kg.pop(OXYGEN_SPECIES, None)
-        self._sync_oxygen_kg_counters()
-        return result
+        if not commit:
+            # Same controls the accept path commits. The ledger is unchanged
+            # until the capacity shadow accepts.
+            preview = self._dispatch_only(
+                ChemistryIntent.OVERHEAD_BLEED,
+                control_inputs=controls,
+            )
+            self._presolve_bleed_pending = dict(controls)
+            return preview
+        return self._commit_overhead_bleed_controls(controls)
 
     def _project_overhead_bleed_partition(self, result: IntentResult) -> None:
         diagnostic = dict(result.diagnostic or {})
@@ -8022,7 +8044,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         ledger_before = self.atom_ledger.mol_by_account()
         transition_count_before = len(self.atom_ledger.transitions)
-        pre_holdup = self._overhead_holdup_mol()
+        # A deferred pre-solve bleed has not been committed. The shadow
+        # prices the holdup the bleed would leave, which is what this
+        # function read after the old eager commit.
+        staged_holdup = getattr(self, '_presolve_remaining_holdup_mol', None)
+        if staged_holdup is not None:
+            pre_holdup = {
+                species: float(mol)
+                for species, mol in staged_holdup.items()
+                if float(mol) > 0.0
+            }
+        else:
+            pre_holdup = self._overhead_holdup_mol()
         initial_partials = {
             species: 0.0
             for species in dict(equilibrium.vapor_pressures_Pa or {})
@@ -8083,11 +8116,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         frozen_cleaned_melt_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt'
         )
-        frozen_overhead_o2_kg = float(
-            self.atom_ledger.kg_by_account('process.overhead_gas').get(
-                OXYGEN_SPECIES, 0.0
+        if staged_holdup is not None:
+            frozen_overhead_o2_kg = float(
+                self._overhead_holdup_species_kg(pre_holdup).get(
+                    OXYGEN_SPECIES, 0.0
+                )
             )
-        )
+        else:
+            frozen_overhead_o2_kg = float(
+                self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                    OXYGEN_SPECIES, 0.0
+                )
+            )
 
         rates_cache = {}
 
@@ -16308,21 +16348,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ):
                     history.release()
 
-    def _drain_headspace_before_interface(self) -> None:
+    def _drain_headspace_before_interface(self) -> bool:
         """Remove this step's headspace through the live pipe, then flag excess.
 
         The rate comparison and the notice live in the overhead-bleed
-        module. This method only reads the hour's conductance and commits
-        the existing bleed. Probes that call ``_get_equilibrium`` do not
-        come through here, so they do not commit a bleed.
+        module. This method reads the hour's conductance and either commits
+        the existing bleed or, on the finite-capacity path, stages it.
+        A staged bleed publishes the drained partial and commits only after
+        the capacity shadow accepts. Probes that call ``_get_equilibrium``
+        do not come through here, so they do not commit a bleed.
+
+        Returns True when the bleed is staged and not yet committed.
         """
 
         self._hour_capacity_violation_notice = None
+        self._presolve_bleed_pending = None
+        self._presolve_remaining_holdup_mol = None
+        self._presolve_reservoir_restore = None
         if not self._overhead_headspace_enabled():
-            return
+            return False
         holdup = self._overhead_holdup_mol()
         if not holdup:
-            return
+            return False
         from engines.builtin.overhead_bleed import (
             capacity_violation_notice,
             headspace_removal_capacity_kg,
@@ -16394,17 +16441,83 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         notices = []
                         self._capacity_violation_notices = notices
                     notices.append(dict(stamped))
+        conductance_for_bleed = (
+            conductance_kg_s
+            if (
+                conductance_kg_s is not None
+                and math.isfinite(conductance_kg_s)
+                and conductance_kg_s >= 0.0
+            )
+            else None
+        )
+        from simulator.thermal_train import FiniteCapacity
+
+        capacity, _cold_train = self._cold_train_capacity_policy()
+        if isinstance(capacity, FiniteCapacity):
+            # Preview only. The shadow below can still refuse the hour, and
+            # the ledger is append-only, so the bleed stays uncommitted
+            # until that shadow accepts.
+            preview = self._dispatch_overhead_bleed(
+                conductance_kg_s=conductance_for_bleed,
+                commit=False,
+            )
+            self._stage_provisional_presolve_bleed(preview)
+            return True
         self._dispatch_overhead_bleed(
-            conductance_kg_s=(
-                conductance_kg_s
-                if (
-                    conductance_kg_s is not None
-                    and math.isfinite(conductance_kg_s)
-                    and conductance_kg_s >= 0.0
-                )
-                else None
+            conductance_kg_s=conductance_for_bleed,
+        )
+        return False
+
+    def _stage_provisional_presolve_bleed(self, preview) -> None:
+        """Publish the partial the uncommitted bleed would leave."""
+
+        reservoir = self.melt.oxygen_reservoir
+        self._presolve_reservoir_restore = (
+            float(getattr(reservoir, 'headspace_ledger_pO2_bar', 0.0) or 0.0),
+            float(getattr(reservoir, 'headspace_transport_pO2_bar', 0.0) or 0.0),
+            float(
+                getattr(reservoir, 'headspace_control_floor_pO2_bar', 0.0) or 0.0
             ),
         )
+        holdup = self._overhead_holdup_mol()
+        bled = dict((getattr(preview, 'diagnostic', None) or {}).get(
+            'bled_species_mol'
+        ) or {})
+        remaining: Dict[str, float] = {}
+        for species, mol in holdup.items():
+            left = float(mol) - float(bled.get(species, 0.0) or 0.0)
+            if left > 0.0:
+                remaining[species] = left
+        self._presolve_remaining_holdup_mol = remaining
+        self._refresh_oxygen_reservoir_transport_pO2_for_vapor(
+            head_o2_mol=remaining.get(OXYGEN_SPECIES, 0.0),
+        )
+
+    def _commit_deferred_presolve_bleed(self) -> None:
+        controls = getattr(self, '_presolve_bleed_pending', None)
+        self._presolve_bleed_pending = None
+        self._presolve_remaining_holdup_mol = None
+        self._presolve_reservoir_restore = None
+        if not controls:
+            return
+        self._commit_overhead_bleed_controls(controls)
+
+    def _discard_deferred_presolve_bleed(self) -> None:
+        """Drop a staged bleed. The refusal leaves the ledger unbled."""
+
+        self._presolve_bleed_pending = None
+        self._presolve_remaining_holdup_mol = None
+        saved = getattr(self, '_presolve_reservoir_restore', None)
+        self._presolve_reservoir_restore = None
+        if saved is None:
+            return
+        reservoir = self.melt.oxygen_reservoir
+        (
+            reservoir.headspace_ledger_pO2_bar,
+            reservoir.headspace_transport_pO2_bar,
+            reservoir.headspace_control_floor_pO2_bar,
+        ) = saved
+        self._sync_oxygen_reservoir_mirror()
 
     def _step_one_hour(self) -> HourSnapshot:
         """
@@ -16548,98 +16661,108 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._apply_fe_redox_respeciation()
         self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
-        # Bleed the headspace through the live pipe before the interface
-        # reads a partial. Refresh after the bleed so the surface is the
-        # remaining inventory, not nRT/V of the unbled holdup.
-        self._drain_headspace_before_interface()
-        self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        # The interface reads the drained partial. Finite capacity stages
+        # that partial and commits the bleed only after the shadow accepts,
+        # so a vessel-rating refusal does not drain the hour.
+        presolve_deferred = self._drain_headspace_before_interface()
+        if not presolve_deferred:
+            self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
 
-        # --- 4. Thermodynamic equilibrium ---
-        # Query the melt backend for phase assemblage, activities,
-        # and vapor pressures at the post-source, post-native composition.
-        equilibrium = self._get_equilibrium()
+        try:
+            # --- 4. Thermodynamic equilibrium ---
+            # Query the melt backend for phase assemblage, activities,
+            # and vapor pressures at the post-source, post-native composition.
+            equilibrium = self._get_equilibrium()
 
-        # --- 4b. Evaporation flux ---
-        # Hertz-Knudsen-Langmuir: how fast each species leaves the melt.
-        # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
-        # Not during MRE (C5) — electrolysis produces O₂ at the anode.
-        evap_flux = EvaporationFlux()
-        capacity_result = None
-        if evaporation_campaign:
-            if (
-                self._overhead_headspace_enabled()
-                and hasattr(equilibrium, 'vapor_pressures_Pa')
-            ):
-                from simulator.capacity_coupling import (
-                    CapacityCouplingRefusalError,
-                    CapacityShadowRefusal,
-                )
+            # --- 4b. Evaporation flux ---
+            # Hertz-Knudsen-Langmuir: how fast each species leaves the melt.
+            # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
+            # Not during MRE (C5) — electrolysis produces O₂ at the anode.
+            evap_flux = EvaporationFlux()
+            capacity_result = None
+            if evaporation_campaign:
+                if (
+                    self._overhead_headspace_enabled()
+                    and hasattr(equilibrium, 'vapor_pressures_Pa')
+                ):
+                    from simulator.capacity_coupling import (
+                        CapacityCouplingRefusalError,
+                        CapacityShadowRefusal,
+                    )
 
-                from simulator.thermal_train import FiniteCapacity
+                    from simulator.thermal_train import FiniteCapacity
 
-                capacity, cold_train = self._cold_train_capacity_policy()
-                if isinstance(capacity, FiniteCapacity):
-                    assert cold_train is not None
-                    capacity_result = (
-                        self._compute_capacity_coupling_shadow(equilibrium)
+                    capacity, cold_train = self._cold_train_capacity_policy()
+                    if isinstance(capacity, FiniteCapacity):
+                        assert cold_train is not None
+                        capacity_result = (
+                            self._compute_capacity_coupling_shadow(equilibrium)
+                        )
+                        if isinstance(capacity_result, CapacityShadowRefusal):
+                            raise CapacityCouplingRefusalError(capacity_result)
+            if presolve_deferred:
+                self._commit_deferred_presolve_bleed()
+                self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+            if evaporation_campaign:
+                if capacity_result is not None:
+                    live_raw_flux = self._calculate_evaporation(
+                        equilibrium,
+                        overhead_partials_override_Pa=(
+                            capacity_result.partial_pressures_Pa
+                        ),
                     )
-                    if isinstance(capacity_result, CapacityShadowRefusal):
-                        raise CapacityCouplingRefusalError(capacity_result)
-            if capacity_result is not None:
-                live_raw_flux = self._calculate_evaporation(
-                    equilibrium,
-                    overhead_partials_override_Pa=(
-                        capacity_result.partial_pressures_Pa
-                    ),
-                )
-                live_effective_flux = (
-                    self._apply_analytic_evaporation_depletion(live_raw_flux)
-                )
-                solved_rates = {
-                    species: float(rate)
-                    for species, rate in (
-                        capacity_result.evaporation_flux_kg_hr.items()
+                    live_effective_flux = (
+                        self._apply_analytic_evaporation_depletion(live_raw_flux)
                     )
-                    if float(rate) > 1.0e-12
-                }
-                live_rates = {
-                    species: float(rate)
-                    for species, rate in live_effective_flux.species_kg_hr.items()
-                    if float(rate) > 1.0e-12
-                }
-                assert set(live_rates) == set(solved_rates)
-                assert all(
-                    math.isclose(
-                        live_rates[species],
-                        solved_rates[species],
-                        rel_tol=1.0e-12,
-                        abs_tol=1.0e-15,
+                    solved_rates = {
+                        species: float(rate)
+                        for species, rate in (
+                            capacity_result.evaporation_flux_kg_hr.items()
+                        )
+                        if float(rate) > 1.0e-12
+                    }
+                    live_rates = {
+                        species: float(rate)
+                        for species, rate in live_effective_flux.species_kg_hr.items()
+                        if float(rate) > 1.0e-12
+                    }
+                    assert set(live_rates) == set(solved_rates)
+                    assert all(
+                        math.isclose(
+                            live_rates[species],
+                            solved_rates[species],
+                            rel_tol=1.0e-12,
+                            abs_tol=1.0e-15,
+                        )
+                        for species in solved_rates
                     )
-                    for species in solved_rates
-                )
-                evap_flux.species_kg_hr = {
-                    species: float(rate)
-                    for species, rate in (
-                        solved_rates.items()
+                    evap_flux.species_kg_hr = {
+                        species: float(rate)
+                        for species, rate in (
+                            solved_rates.items()
+                        )
+                        if float(rate) > 1.0e-12
+                    }
+                    evap_flux.alpha_authority_status_by_species = {
+                        species: status
+                        for species, status in (
+                            live_effective_flux.alpha_authority_status_by_species.items()
+                        )
+                        if species in evap_flux.species_kg_hr
+                    }
+                    evap_flux.carrier_authority_by_species = copy.deepcopy(
+                        live_effective_flux.carrier_authority_by_species
                     )
-                    if float(rate) > 1.0e-12
-                }
-                evap_flux.alpha_authority_status_by_species = {
-                    species: status
-                    for species, status in (
-                        live_effective_flux.alpha_authority_status_by_species.items()
+                    evap_flux.update_totals()
+                else:
+                    evap_flux = self._calculate_evaporation(equilibrium)
+                    evap_flux = self._apply_analytic_evaporation_depletion(
+                        evap_flux
                     )
-                    if species in evap_flux.species_kg_hr
-                }
-                evap_flux.carrier_authority_by_species = copy.deepcopy(
-                    live_effective_flux.carrier_authority_by_species
-                )
-                evap_flux.update_totals()
-            else:
-                evap_flux = self._calculate_evaporation(equilibrium)
-                evap_flux = self._apply_analytic_evaporation_depletion(
-                    evap_flux
-                )
+        except Exception:
+            if getattr(self, '_presolve_bleed_pending', None) is not None:
+                self._discard_deferred_presolve_bleed()
+            raise
         # Hertz-Knudsen reads the headspace persisted last step. A same-step
         # ordinary-only provisional would replace that combined basis.
         bakeout_diag = self._apply_c0_bakeout(
