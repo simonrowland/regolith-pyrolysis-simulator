@@ -347,6 +347,14 @@ def test_apply_magemin_patches_raises_for_conflict_or_partial_apply(
 ) -> None:
     installer = _load_install_engines_module()
     source = tmp_path / "source"
+    source.mkdir()
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", os.devnull)
+    subprocess.run(
+        ["git", "-C", str(source), "init", "--quiet"],
+        check=True,
+        env=os.environ.copy(),
+    )
     target = source / "src" / "sample.c"
     target.parent.mkdir(parents=True)
     target.write_text(source_text, encoding="utf-8")
@@ -359,6 +367,80 @@ def test_apply_magemin_patches_raises_for_conflict_or_partial_apply(
         installer._apply_magemin_patches(source, (patch_name,))
 
     assert target.read_text(encoding="utf-8") == source_text
+
+
+def test_build_magemin_rejects_a_source_nested_in_another_repository(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    installer = _load_install_engines_module()
+    lock = load_engine_lock(LOCK_PATH)
+    root = tmp_path / "engine-bin"
+    source = engine_install_path(lock, root, "magemin")
+    source.mkdir(parents=True)
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", os.devnull)
+    subprocess.run(
+        ["git", "-C", str(tmp_path), "init", "--quiet"],
+        check=True,
+        env=os.environ.copy(),
+    )
+    monkeypatch.setattr(installer, "checkout_matches_pin", lambda _pin, _source: True)
+    monkeypatch.setattr(installer, "_run", lambda *_args, **_kwargs: pytest.fail("git/build ran"))
+
+    with pytest.raises(RuntimeError, match="not its own Git repository root") as exc_info:
+        installer.build_magemin(lock, root)
+
+    assert str(source.resolve()) in str(exc_info.value)
+    assert str(tmp_path.resolve()) in str(exc_info.value)
+
+
+def test_apply_magemin_patches_rejects_zero_exit_when_reverse_check_fails(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    installer = _load_install_engines_module()
+    source = tmp_path / "source"
+    source.mkdir()
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", os.devnull)
+    subprocess.run(
+        ["git", "-C", str(source), "init", "--quiet"],
+        check=True,
+        env=os.environ.copy(),
+    )
+    target = source / "src" / "sample.c"
+    target.parent.mkdir(parents=True)
+    target.write_text("before\n", encoding="utf-8")
+    patch_dir = tmp_path / "patches" / "magemin"
+    patch_dir.mkdir(parents=True)
+    patch_name = "skipped"
+    (patch_dir / f"{patch_name}.patch").write_text(
+        "diff --git a/src/sample.c b/src/sample.c\n"
+        "--- a/src/sample.c\n+++ b/src/sample.c\n"
+        "@@ -1 +1 @@\n-before\n+after\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(installer, "ROOT", tmp_path)
+    real_run = subprocess.run
+
+    def skip_apply(command, **kwargs):
+        if command[0] == "git" and "apply" in command:
+            if "--reverse" in command:
+                return subprocess.CompletedProcess(command, 1, "", "patch does not apply")
+            return subprocess.CompletedProcess(
+                command, 0, "Skipped patch 'src/sample.c'.\n", ""
+            )
+        return real_run(command, **kwargs)
+
+    monkeypatch.setattr(installer.subprocess, "run", skip_apply)
+
+    with pytest.raises(RuntimeError, match="cannot verify locked MAGEMin patch") as exc_info:
+        installer._apply_magemin_patches(source, (patch_name,))
+
+    assert patch_name in str(exc_info.value)
+    assert "patch does not apply" in str(exc_info.value)
+    assert target.read_text(encoding="utf-8") == "before\n"
 
 
 def test_engine_lock_rejects_short_git_commits(tmp_path: Path) -> None:
