@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import queue
+import threading
 from pathlib import Path
 
 import app as app_module
@@ -38,6 +40,7 @@ def test_existing_flask_secret_file_is_tightened(monkeypatch, tmp_path: Path) ->
 
 
 def test_existing_secret_symlink_is_refused(monkeypatch, tmp_path: Path) -> None:
+    """This is the O_NOFOLLOW pin; the dangling-link case pins target safety."""
     monkeypatch.delenv("FLASK_SECRET_KEY", raising=False)
     monkeypatch.setattr(app_module, "__file__", str(tmp_path / "app.py"))
     secret_path = tmp_path / "instance" / "flask_secret_key"
@@ -87,8 +90,23 @@ def test_fifo_secret_path_does_not_block(monkeypatch, tmp_path: Path) -> None:
     secret_path.parent.mkdir(mode=0o700)
     os.mkfifo(secret_path)
 
-    with pytest.raises(RuntimeError, match="not a regular file"):
-        app_module._load_secret_key()
+    result: queue.Queue[tuple[bool, object]] = queue.Queue()
+
+    def load_secret() -> None:
+        try:
+            result.put((True, app_module._load_secret_key()))
+        except BaseException as exc:
+            result.put((False, exc))
+
+    worker = threading.Thread(target=load_secret, daemon=True)
+    worker.start()
+    worker.join(timeout=2)
+
+    assert not worker.is_alive(), "secret loading blocked while opening a FIFO"
+    succeeded, value = result.get_nowait()
+    assert not succeeded
+    assert isinstance(value, RuntimeError)
+    assert "not a regular file" in str(value)
 
 
 def test_explicit_flask_secret_does_not_create_a_file(monkeypatch, tmp_path: Path) -> None:
