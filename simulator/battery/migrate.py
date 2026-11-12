@@ -27275,6 +27275,7 @@ class Migrator:
         )
         if (
             q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and source_composition_located is None
             and _composition_axis_is_required(
                 q_token, ident_kwargs.get("subtype")
             )
