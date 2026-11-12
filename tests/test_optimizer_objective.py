@@ -3593,7 +3593,10 @@ def test_zero_net_bucket_is_supply_zero_and_not_a_debit() -> None:
     assert "Na" not in projected.supply_kg_hr
     flux = SimpleNamespace(species_kg_hr=dict(projected.debit_kg_hr))
     publish_wall_supply_on_flux(flux, projected.supply_kg_hr)
-    bounds = _optimizer_refused_flux_bounds(
+    # Hour 1 publishes SiO only. Mg is absent and has no physical-zero
+    # record, so the classifier withholds Mg (absent_no_record). The
+    # 0.4 kg/h hour is not a partial supply (d-367).
+    withheld = _optimizer_refused_flux_bounds(
         (
             _interval_flux_snapshot(1, 1.0, {"SiO": 1.0}),
             SimpleNamespace(hour=2, duration_h=1.0, evap_flux=flux),
@@ -3601,8 +3604,21 @@ def test_zero_net_bucket_is_supply_zero_and_not_a_debit() -> None:
         ("SiO", "Mg"),
         campaigns_elapsed=1.0,
     )
-    assert bounds["SiO"] == _approx_kg(1.0)
-    assert bounds["Mg"] == _approx_kg(0.4)
+    assert withheld["SiO"] == _approx_kg(1.0)
+    assert "Mg" not in withheld
+    # The same published hour, with hour 1 also naming Mg at a computed
+    # zero. SiO's zero-net rate stays a supply of 0, not a debit, and
+    # Mg's complete integral is the debit rate.
+    covered = _optimizer_refused_flux_bounds(
+        (
+            _interval_flux_snapshot(1, 1.0, {"SiO": 1.0, "Mg": 0.0}),
+            SimpleNamespace(hour=2, duration_h=1.0, evap_flux=flux),
+        ),
+        ("SiO", "Mg"),
+        campaigns_elapsed=1.0,
+    )
+    assert covered["SiO"] == _approx_kg(1.0)
+    assert covered["Mg"] == _approx_kg(0.4)
 
 
 def _pre_rg_channel_answer(species: str, kind: str) -> VapourAnswer:
@@ -4023,11 +4039,16 @@ def test_wall_supply_map_has_one_writer() -> None:
     assert "published_species_kg_hr =" in writer
     route = inspect.getsource(EvaporationMixin._route_to_condensation)
     calculate = inspect.getsource(EvaporationMixin._calculate_evaporation)
+    # step() is the poison/rollback wrapper (since 6d727259c). The
+    # snapshot publish is in the hour body it calls.
     step = inspect.getsource(PyrolysisSimulator.step)
+    hour = inspect.getsource(PyrolysisSimulator._step_one_hour)
     assert "publish_wall_supply_on_flux(" in route
     assert "published_species_kg_hr =" not in route
     assert "project_publisher_vapour_rates(" in calculate
-    assert "publish_wall_supply_on_flux(" in step
+    assert "_step_one_hour(" in step
+    assert "publish_wall_supply_on_flux(" not in step
+    assert "publish_wall_supply_on_flux(" in hour
     evaporation_text = inspect.getsource(inspect.getmodule(publish_wall_supply_on_flux))
     assert evaporation_text.count("published_species_kg_hr =") == 1
 

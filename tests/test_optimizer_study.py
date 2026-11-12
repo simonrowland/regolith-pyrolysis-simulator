@@ -3743,48 +3743,53 @@ def test_parallel_composition_target_stub_study_completes(
     pareto_path = tmp_path / "study" / "pareto.json"
     assert pareto_path.exists()
     payload = json.loads(pareto_path.read_text())
-    # Physics ruling 2026-11-10 (b-906 at 62247cb0e, extends d-367): a refused
-    # wall P_sat is priced at the vapour supply (wall_deposit_upper_bound_used)
-    # or, below ledger resolution, as an authorized zero. t-1368 still owns
-    # the SiO wall-pressure rail, so the refusal stays on the notice. The
-    # candidate is ranked on that conservative deposit and is not dropped.
-    assert result.status == "completed"
-    assert result.winner is not None
-    assert result.pareto
-    assert payload["status"] == "completed"
-    assert payload["winner_candidate_id"]
-    assert payload["pareto"]
+    # d-367, as applied by the pre-RG withhold (6d24ba1c1): SiO is the only
+    # wall-saturation refusal, and at least one interval has no computed
+    # vapour rate. The supply integral therefore returns no bound. This is
+    # not wall_deposit_upper_bound_used. d-045
+    # (test_d045_refused_species_without_flux_bound_is_unavailable) keeps
+    # the coating gate unavailable. Certain upstream deposit is 0 kg, under
+    # the 0.5 kg limit on a 1000 kg charge. The study record stores that
+    # missing bound as the string "-inf" (_json_number), so the Morris
+    # screen has no feasible winner.
+    assert result.status == "completed-no-feasible-winner"
+    assert result.winner is None
+    assert result.pareto == ()
+    assert payload["status"] == "completed-no-feasible-winner"
+    assert payload["winner_candidate_id"] is None
+    assert payload["pareto"] == []
     assert result.records
     assert result.leaderboard
-    assert all(record.feasible for record in result.records)
-    assert result.winner.candidate_id == result.leaderboard[0].candidate_id
-    assert result.winner.candidate_id in {
-        record.candidate_id for record in result.pareto
-    }
+    assert not any(record.feasible for record in result.records)
     definitions = objective_definitions(profile)
     for candidate in result.records:
+        assert list(candidate.failing_gates) == ["coating"]
+        coating = candidate.feasibility_margins["coating"]
+        assert coating["status"] == "unavailable"
+        assert coating["margin"] == "-inf"
+        payload_margin = coating["status_payload"]
+        assert payload_margin["certain_upstream_deposit_kg_per_campaign"] == 0.0
+        assert payload_margin[
+            "upstream_wall_deposit_limit_kg_per_campaign"
+        ] == pytest.approx(0.5)
+        assert list(
+            payload_margin["wall_saturation_pressure_refused_species"]
+        ) == ["SiO"]
+        assert (
+            payload_margin[
+                "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+            ]
+            == {}
+        )
         scores = study._record_objective_scores(candidate, definitions)
         assert scores
-        assert all(score is not None for score in scores)
         summary = candidate.product_summary
-        assert summary["furnace_amortization_status"] == "available"
-        assert "wall_deposit_refusal" not in summary
-        bookings = [
-            item
-            for item in (summary.get("wall_supply_bound_bookings") or ())
-            if item.get("species") == "SiO"
-        ]
-        assert bookings, summary.get("wall_supply_bound_bookings")
-        booking = bookings[0]
-        assert booking["species"] == "SiO"
-        assert booking["refusal_reason"]
-        # This stub's SiO vapour integral is below the mass-balance ledger
-        # resolution, so the ruling books an authorized physical zero and
-        # carries the bound. The non-negligible branch, which replaces a
-        # partial deposit with the full supply, is the objective-file case.
-        assert booking["reason"] == "below_wall_supply_upper_bound"
-        assert booking["deposit_kg"] == 0.0
-        assert booking["supply_upper_bound_kg"] <= booking["ledger_resolution_kg"]
+        assert summary["coating_unavailable_reason"] == (
+            "wall saturation pressure refused for SiO; "
+            "vapour flux upper bound unavailable"
+        )
+        assert summary.get("wall_deposit_refusal")
+        assert not summary.get("wall_supply_bound_bookings")
         wall_authority = summary["wall_deposit_sticking_authority"]
         refused = wall_authority.get("wall_saturation_pressure_refused_species") or []
         assert "SiO" in list(refused)
