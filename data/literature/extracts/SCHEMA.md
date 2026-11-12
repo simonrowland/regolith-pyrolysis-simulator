@@ -126,10 +126,20 @@ an id, so it does not contribute. Structured samples address `values`
 only; a condition is pinned by a path.
 Matching pins still detect later extraction drift; a mismatch does not cover
 and blocks certification. Certification opens the locator's text artifact
-(`source_path`, `quotes_path`, or a `record` that is a repository-relative
-file under a source-evidence root: `raw/`, `corpus/`, `text/`, `tables/`,
-`supporting/`, or `docs/references/`). The extract document and program
-source are not source artifacts, including a copy parked on a source root.
+(`source_path`, `quotes_path`, or a `record` that is a corpus-relative file
+under `raw/`, `corpus/`, `text/`, `tables/`, or `supporting/`). Set
+`REGOLITH_CORPUS_ROOT` to the mounted offline corpus directory (for example,
+`~/Repos/regolith-corpus`) so those paths resolve there. An unset root refuses
+with `corpus_root_unset`; a missing file refuses with
+`corpus_artifact_missing`, and a path outside the mount refuses with
+`corpus_path_outside_root`. Each corpus-resolved locator must include
+`source_sha256`, the lowercase 64-character SHA-256 of the exact bytes opened.
+A missing digest refuses with `artifact_digest_missing`; a mismatch refuses
+with `artifact_digest_mismatch`. Only a matching digest and a present token
+cover the pin. Files under
+`docs/references/` remain repository-relative and do not require a digest.
+The extract document and program source are not source artifacts, including
+a copy parked on a source root.
 A numeric pin matches only a complete token: the sign and the exponent
 belong to the token, so `0.24` is not `-0.24` or `0.24e-5`, and `1.0` is
 not `1`. The whole stored value, including a spaced or attached unit, must

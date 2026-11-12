@@ -98,11 +98,13 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 from copy import deepcopy
 from dataclasses import dataclass
 from decimal import Decimal, DecimalException
 from functools import lru_cache
 import math
+import os
 import re
 import subprocess
 import sys
@@ -220,11 +222,20 @@ LOCATOR_KEYS = frozenset(
         "note",
         "source_path",
         "record",
+        "source_sha256",
     }
 )
 
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ABS_PATH_RE = re.compile(r"^(/|[A-Za-z]:\\|\\\\)")
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
+def _valid_source_sha256(value: Any) -> bool:
+    """True when value is lowercase, 64-character SHA-256 hex."""
+    return isinstance(value, str) and _SHA256_RE.fullmatch(value) is not None
+
+
 # Unicode minus and the other dash/plus signs are not ASCII "+" or "-".
 # The citation grammar below only sees ASCII signs, so a raw scan of
 # "−0.24" (U+2212) yields the token "0.24" and certifies the opposite
@@ -612,9 +623,10 @@ def _leaf_in_table(leaf: Any, cells: Sequence[str]) -> bool:
     return any(_cell_certifies_leaf(leaf, cell) for cell in cells)
 
 
-# Repository-relative roots that hold a paper, OCR, quotes, or a reference
-# transcription. The extract tree and the gate implementation are absent
-# on purpose: a pin must not certify against its own YAML or this file.
+# Corpus-relative roots that hold a paper, OCR, or quotes. Reference
+# transcriptions under docs/references/ remain repository-relative. The
+# extract tree and gate implementation are absent: a pin must not certify
+# against its own YAML or this file.
 _SOURCE_ARTIFACT_PREFIXES = (
     "raw/",
     "corpus/",
@@ -2247,44 +2259,96 @@ def _parse_line_range(raw: Any) -> tuple[int, int] | None:
     return None
 
 
-def _resolve_artifact(root: Path, raw: str) -> Path | None:
-    """Repository-relative file inside ``root``, or None when it cannot be opened."""
-    text = raw.strip()
-    if not text or "://" in text or _ABS_PATH_RE.match(text):
-        return None
-    candidate = Path(text)
-    if candidate.is_absolute():
-        return None
-    root_resolved = root.resolve()
-    resolved = (root_resolved / candidate).resolve()
-    if not resolved.is_relative_to(root_resolved) or not resolved.is_file():
-        return None
-    return resolved
+def _open_source_artifact(
+    raw: str,
+    *,
+    repository_root: Path,
+    corpus_root: Path | None,
+    repository_root_explicit: bool,
+    expected_sha256: Any,
+) -> tuple[Path | None, bytes | None, str | None, str | None]:
+    """Resolve and open one source artifact, returning path, bytes, hash, refusal.
 
-
-def _source_artifact_refusal(root: Path, path: Path) -> str | None:
-    """None only when ``path`` is source evidence, not the gate or an extract.
-
-    Invariant: every certification path opens the artifact here. A file under
-    the extract tree, the validator, or a program-source suffix is not a
-    paper, OCR transcript, or quotes file, even when it contains the pin.
+    Corpus artifacts are relative to ``REGOLITH_CORPUS_ROOT`` and must match
+    the digest recorded on the attesting locator. ``docs/references/`` stays
+    repository-relative. A non-default ``artifact_root`` remains the local
+    repository override used by existing source-opening fixtures.
     """
-    try:
-        relative = path.resolve().relative_to(root.resolve()).as_posix()
-    except ValueError:
-        return f"{path.name} is outside the repository root"
-    if not any(relative.startswith(prefix) for prefix in _SOURCE_ARTIFACT_PREFIXES):
-        return (
-            f"{relative} is not a source artifact "
-            "(paper, OCR, quotes, or reference transcription)"
+    text = raw.strip()
+    candidate = Path(text)
+    normalized = candidate.as_posix()
+    while normalized.startswith("./"):
+        normalized = normalized[2:]
+    is_repository_reference = (
+        normalized.startswith("docs/references/") and ".." not in candidate.parts
+    )
+    is_corpus = not is_repository_reference and not repository_root_explicit
+    if not text or "://" in text or _ABS_PATH_RE.match(text):
+        outside_reason = (
+            "corpus_path_outside_root" if is_corpus else "artifact_path_outside_root"
         )
-    if path.suffix.lower() in _PROGRAM_SOURCE_SUFFIXES:
-        return f"{relative} is implementation source, not a source artifact"
+        return None, None, None, outside_reason
+    if (
+        is_corpus
+        and corpus_root is None
+        and not any(
+            normalized.startswith(prefix) for prefix in _SOURCE_ARTIFACT_PREFIXES
+        )
+    ):
+        return None, None, None, "artifact_not_source"
+    if is_repository_reference or repository_root_explicit:
+        root = repository_root
+    elif corpus_root is not None:
+        root = corpus_root
+    else:
+        return None, None, None, "corpus_root_unset"
+
+    outside_reason = (
+        "corpus_path_outside_root" if is_corpus else "artifact_path_outside_root"
+    )
+    if candidate.is_absolute():
+        return None, None, None, outside_reason
+
+    root_resolved = root.expanduser().resolve()
+    resolved = (root_resolved / candidate).resolve()
+    if not resolved.is_relative_to(root_resolved):
+        return None, None, None, outside_reason
+    relative = resolved.relative_to(root_resolved).as_posix()
+    if not any(relative.startswith(prefix) for prefix in _SOURCE_ARTIFACT_PREFIXES):
+        return None, None, None, "artifact_not_source"
+    if resolved.suffix.lower() in _PROGRAM_SOURCE_SUFFIXES:
+        return None, None, None, "artifact_not_source"
     # Quotes live under tables/. Other YAML is pipeline metadata or an extract
     # copy parked on a source root.
-    if path.suffix.lower() in {".yaml", ".yml"} and not relative.startswith("tables/"):
-        return f"{relative} is not a source-artifact transcription"
-    return None
+    if resolved.suffix.lower() in {".yaml", ".yml"} and not relative.startswith(
+        "tables/"
+    ):
+        return None, None, None, "artifact_not_source"
+    if not resolved.is_file():
+        return (
+            None,
+            None,
+            None,
+            "corpus_artifact_missing" if is_corpus else "artifact_missing",
+        )
+    try:
+        blob = resolved.read_bytes()
+    except OSError:
+        return (
+            None,
+            None,
+            None,
+            "corpus_artifact_unreadable" if is_corpus else "artifact_unreadable",
+        )
+    digest = hashlib.sha256(blob).hexdigest()
+    if is_corpus and expected_sha256 is None:
+        return resolved, blob, digest, "artifact_digest_missing"
+    if expected_sha256 is not None:
+        if not _valid_source_sha256(expected_sha256):
+            return resolved, blob, digest, "artifact_digest_invalid"
+        if digest != expected_sha256:
+            return resolved, blob, digest, "artifact_digest_mismatch"
+    return resolved, blob, digest, None
 
 
 def _text_is_extract_document(text: str) -> bool:
@@ -2309,46 +2373,21 @@ def _text_is_extract_document(text: str) -> bool:
     }
 
 
-def _artifact_candidates(locator: Mapping[str, Any], root: Path) -> list[Path]:
+def _artifact_locator_values(locator: Mapping[str, Any]) -> list[str]:
+    """Return path-like locator values without resolving or opening them."""
     explicit = [
         raw.strip()
         for key in _ARTIFACT_PATH_KEYS
         if isinstance((raw := locator.get(key)), str) and raw.strip()
     ]
     if explicit:
-        return [
-            path
-            for raw in explicit
-            if (path := _resolve_artifact(root, raw)) is not None
-        ]
+        return explicit
     record = locator.get("record")
     if not isinstance(record, str) or not record.strip():
         return []
     text = record.strip()
-    direct = _resolve_artifact(root, text)
-    if direct is not None:
-        return [direct]
     token = text.split()[0]
-    if token != text:
-        fallback = _resolve_artifact(root, token)
-        if fallback is not None:
-            return [fallback]
-    return []
-
-
-def _read_artifact_text(path: Path) -> tuple[str | None, str | None]:
-    if path.suffix.lower() == ".pdf":
-        return None, f"{path.name} is a PDF; certification opens a text or OCR artifact"
-    try:
-        blob = path.read_bytes()
-    except OSError as exc:
-        return None, f"could not read {path.name}: {exc}"
-    if blob.startswith(b"%PDF"):
-        return None, f"{path.name} is a PDF; certification opens a text or OCR artifact"
-    try:
-        return blob.decode("utf-8"), None
-    except UnicodeError:
-        return None, f"{path.name} is not UTF-8 text"
+    return [text] if token == text else [text, token]
 
 
 def _cited_text(
@@ -2540,6 +2579,8 @@ def _locator_source_blind_reason(
     sample: Mapping[str, Any],
     *,
     artifact_root: Path,
+    corpus_root: Path | None,
+    artifact_root_explicit: bool,
     doc: Mapping[str, Any] | None = None,
 ) -> str | None:
     """None only when the locator was opened and the certified leaves are in it.
@@ -2551,18 +2592,7 @@ def _locator_source_blind_reason(
     if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
         return "locator was not opened: attestation locator is missing"
     locator = sample[keys[0]]
-    explicit = [
-        raw.strip()
-        for key in _ARTIFACT_PATH_KEYS
-        if isinstance((raw := locator.get(key)), str) and raw.strip()
-    ]
-    candidates = _artifact_candidates(locator, artifact_root)
-    if explicit and not candidates:
-        joined = ", ".join(explicit)
-        return (
-            "locator was not opened: "
-            f"{joined} is not a text artifact inside the repository root"
-        )
+    candidates = _artifact_locator_values(locator)
     if not candidates:
         return (
             "locator was not opened: no source_path, quotes_path, or file record "
@@ -2572,14 +2602,29 @@ def _locator_source_blind_reason(
     if leaf_error:
         return leaf_error
     reasons: list[str] = []
-    for path in candidates:
-        provenance = _source_artifact_refusal(artifact_root, path)
-        if provenance:
-            reasons.append(f"locator was not opened: {provenance}")
+    for raw in candidates:
+        path, blob, _digest, open_refusal = _open_source_artifact(
+            raw,
+            repository_root=artifact_root,
+            corpus_root=corpus_root,
+            repository_root_explicit=artifact_root_explicit,
+            expected_sha256=locator.get("source_sha256"),
+        )
+        if open_refusal:
+            reasons.append(f"locator was not opened: {open_refusal} ({raw})")
             continue
-        text, read_error = _read_artifact_text(path)
-        if text is None:
-            reasons.append(read_error or f"{path.name} was not opened")
+        if path is None or blob is None:
+            reasons.append(f"locator was not opened: artifact_not_opened ({raw})")
+            continue
+        if path.suffix.lower() == ".pdf" or blob.startswith(b"%PDF"):
+            reasons.append(
+                f"{path.name} is a PDF; certification opens a text or OCR artifact"
+            )
+            continue
+        try:
+            text = blob.decode("utf-8")
+        except UnicodeError:
+            reasons.append(f"{path.name} is not UTF-8 text")
             continue
         if _text_is_extract_document(text):
             reasons.append(
@@ -2723,6 +2768,13 @@ def fidelity_source_warnings(
     source_blind_reasons: list[str] = []
     source_blind_extra = [0]
     root = artifact_root if artifact_root is not None else ROOT
+    configured_corpus_root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
+    corpus_root = (
+        Path(configured_corpus_root).expanduser() if configured_corpus_root else None
+    )
+    artifact_root_explicit = (
+        artifact_root is not None and artifact_root.resolve() != ROOT.resolve()
+    )
 
     for index, sample in enumerate(samples):
         sample_label = f"{label}:fidelity_samples[{index}]"
@@ -2755,7 +2807,11 @@ def fidelity_source_warnings(
             # Attestation-complete pins are the ones that would otherwise certify
             # without opening the source. Unattested pins stay on that count.
             blind = _locator_source_blind_reason(
-                sample, artifact_root=root, doc=doc
+                sample,
+                artifact_root=root,
+                corpus_root=corpus_root,
+                artifact_root_explicit=artifact_root_explicit,
+                doc=doc,
             )
             if blind:
                 source_blind += 1
@@ -3053,8 +3109,12 @@ def _locator_ok(locator: Any) -> bool:
     """
     if not isinstance(locator, Mapping):
         return False
+    if "source_sha256" in locator and not _valid_source_sha256(
+        locator["source_sha256"]
+    ):
+        return False
     for key, val in locator.items():
-        if key not in LOCATOR_KEYS:
+        if key not in LOCATOR_KEYS or key == "source_sha256":
             continue
         if val is None:
             continue

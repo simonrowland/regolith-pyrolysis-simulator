@@ -5196,43 +5196,73 @@ _MISSING_OBSERVATION_IDS_CEILING = 0
 _NON_FINITE_EVIDENCE_CEILING = 0
 
 
-def test_fidelity_source_warning_ratchet():
+def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path):
     """Source-fidelity holes are an upper bound, not a green bill of health.
 
     ``auto_migrated_pilot_pin`` is the number of pilot samples. Counting
     affected extracts alone would miss another pilot pin in an extract that
     already has one.
     """
-    uncovered_obs = 0
-    uncovered_extracts = 0
-    unattested_samples = 0
-    pilot_extracts = 0
-    pilot_pins = 0
-    source_blind_pins = 0
-    ambiguous_ids = 0
-    missing_ids = 0
-    non_finite = 0
-    for path in vle.discover_extracts():
-        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
-        if not isinstance(doc, dict):
-            continue
-        if doc.get("schema_version") != vle.SCHEMA_VERSION:
-            continue
-        warnings = vle.fidelity_source_warnings(doc, label=path.stem)
-        by_kind = {warning.kind: warning.count for warning in warnings}
-        uncovered = by_kind.get("uncovered_observation", 0)
-        if uncovered:
-            uncovered_extracts += 1
-            uncovered_obs += uncovered
-        unattested_samples += by_kind.get("unattested_sample", 0)
-        source_blind_pins += by_kind.get("source_blind_pin", 0)
-        ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
-        missing_ids += by_kind.get("missing_observation_id", 0)
-        non_finite += by_kind.get("non_finite_evidence", 0)
-        pilot = by_kind.get("auto_migrated_pilot_pin", 0)
-        pilot_pins += pilot
-        if pilot:
-            pilot_extracts += 1
+
+    def counts():
+        uncovered_obs = 0
+        uncovered_extracts = 0
+        unattested_samples = 0
+        pilot_extracts = 0
+        pilot_pins = 0
+        source_blind_pins = 0
+        ambiguous_ids = 0
+        missing_ids = 0
+        non_finite = 0
+        for path in vle.discover_extracts():
+            doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+            if not isinstance(doc, dict):
+                continue
+            if doc.get("schema_version") != vle.SCHEMA_VERSION:
+                continue
+            warnings = vle.fidelity_source_warnings(doc, label=path.stem)
+            by_kind = {warning.kind: warning.count for warning in warnings}
+            uncovered = by_kind.get("uncovered_observation", 0)
+            if uncovered:
+                uncovered_extracts += 1
+                uncovered_obs += uncovered
+            unattested_samples += by_kind.get("unattested_sample", 0)
+            source_blind_pins += by_kind.get("source_blind_pin", 0)
+            ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
+            missing_ids += by_kind.get("missing_observation_id", 0)
+            non_finite += by_kind.get("non_finite_evidence", 0)
+            pilot = by_kind.get("auto_migrated_pilot_pin", 0)
+            pilot_pins += pilot
+            if pilot:
+                pilot_extracts += 1
+        return (
+            uncovered_obs,
+            uncovered_extracts,
+            unattested_samples,
+            pilot_pins,
+            pilot_extracts,
+            source_blind_pins,
+            ambiguous_ids,
+            missing_ids,
+            non_finite,
+        )
+
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+    unmounted = counts()
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+    mounted = counts()
+    assert mounted == unmounted
+    (
+        uncovered_obs,
+        uncovered_extracts,
+        unattested_samples,
+        pilot_pins,
+        pilot_extracts,
+        source_blind_pins,
+        ambiguous_ids,
+        missing_ids,
+        non_finite,
+    ) = unmounted
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
     assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
     assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, unattested_samples
@@ -5299,6 +5329,103 @@ def _opened_payload_document(root: Path, *, structured: bool) -> dict:
         sample["reviewed_on"] = "2026-11-10"
         sample["locator"] = locator
     return doc
+
+
+def _corpus_pin_document(
+    root: Path,
+    *,
+    source_sha256: str | None = None,
+    source_path: str = "text/paper.txt",
+) -> dict:
+    doc = _opened_payload_document(root, structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator["source_path"] = source_path
+    if source_sha256 is not None:
+        locator["source_sha256"] = source_sha256
+    return doc
+
+
+def _source_blind_warning(doc: dict) -> vle.FidelityWarning:
+    warnings = vle.fidelity_source_warnings(doc, label="corpus-pin")
+    return next(warning for warning in warnings if warning.kind == "source_blind_pin")
+
+
+def test_corpus_artifact_is_opened_and_digest_is_recorded(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(tmp_path)
+    artifact = tmp_path / "text" / "paper.txt"
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    doc["fidelity_samples"][0]["locator"]["source_sha256"] = digest
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert vle.fidelity_source_warnings(doc, label="corpus-pin") == []
+    assert vle.certify_extract_source_fidelity(doc, label="corpus-pin") == []
+    assert doc["fidelity_samples"][0]["locator"] == {
+        "source_path": "text/paper.txt",
+        "line_range": "5-5",
+        "page": 2,
+        "source_sha256": digest,
+    }
+
+
+def test_unset_corpus_root_is_typed_and_keeps_source_blind_count(
+    tmp_path, monkeypatch
+):
+    artifact = tmp_path / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text("line 1\nline 2\nline 3\nline 4\nalpha 0.24 measured\n")
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    doc = _corpus_pin_document(tmp_path, source_sha256=digest)
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    warning = _source_blind_warning(doc)
+    assert warning.count == 1
+    assert "corpus_root_unset" in warning.detail
+    refusals = vle.certify_extract_source_fidelity(doc, label="corpus-pin")
+    assert any("corpus_root_unset" in refusal for refusal in refusals)
+
+
+def test_missing_corpus_artifact_is_typed(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(
+        tmp_path,
+        source_sha256="0" * 64,
+        source_path="text/missing.txt",
+    )
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "corpus_artifact_missing" in _source_blind_warning(doc).detail
+
+
+def test_corpus_path_outside_root_is_typed(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(
+        tmp_path,
+        source_sha256="0" * 64,
+        source_path="../outside.txt",
+    )
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "corpus_path_outside_root" in _source_blind_warning(doc).detail
+
+
+def test_corpus_artifact_requires_digest(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(tmp_path)
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "artifact_digest_missing" in _source_blind_warning(doc).detail
+
+
+def test_corpus_artifact_digest_mismatch_is_typed(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(tmp_path, source_sha256="0" * 64)
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "artifact_digest_mismatch" in _source_blind_warning(doc).detail
+
+
+@pytest.mark.parametrize("digest", ["A" * 64, "a" * 63, "g" * 64, 123])
+def test_source_sha256_locator_requires_lowercase_64_digit_hex(digest):
+    assert not vle._locator_ok(
+        {"source_path": "text/paper.txt", "source_sha256": digest}
+    )
+    assert not vle._locator_ok({"source_sha256": "a" * 64})
 
 
 def _source_locator(root: Path, text: str) -> dict:
