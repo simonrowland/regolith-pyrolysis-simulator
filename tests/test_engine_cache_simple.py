@@ -504,6 +504,47 @@ def test_alphamelts_parent_environment_does_not_change_adapter_request_key(
     assert calls == 1
 
 
+def test_legacy_battery_payload_is_a_miss_after_layout_key_change(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _call_cached_backend_equilibrate,
+    )
+
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    handle = SimpleNamespace(
+        name="thermoengine", backend=SimpleNamespace(), engine_settings={}
+    )
+    kwargs = {"temperature_C": 1000.0}
+    old_request = {
+        "battery_cache_schema": 2,
+        "kwargs": kwargs,
+        "engine_settings": engine_cache.engine_cache_settings(
+            "thermoengine", handle.backend, effective_settings={}
+        ),
+    }
+    engine_cache.cached_engine_call(
+        "thermoengine", old_request, lambda: ["legacy cache layout"]
+    )
+    engine_cache._MEMORY_CACHE.clear()
+    calls = 0
+
+    def solve() -> EquilibriumResult:
+        nonlocal calls
+        calls += 1
+        return EquilibriumResult(status="ok", liquid_fraction=0.375)
+
+    result = _call_cached_backend_equilibrate(handle, kwargs, solve)
+
+    assert calls == 1
+    assert isinstance(result, EquilibriumResult)
+    assert result.liquid_fraction == 0.375
+
+
 def test_every_chemistry_version_has_changelog_and_runtime_identity() -> None:
     import re
 
