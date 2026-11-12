@@ -3012,31 +3012,28 @@ def certify_extract_source_fidelity(
     return refusals
 
 
-def _check_fidelity_gate(
-    doc: Mapping[str, Any],
-    *,
-    label: str = "<document>",
-) -> list[str]:
-    """Certification refusals for this extract.
-
-    Schema validation does not emit these. A caller that certifies or promotes
-    the extract treats a non-empty list as a hard refusal. Older trees that
-    only have this helper keep that refusal behaviour.
-    """
-    return certify_extract_source_fidelity(doc, label=label)
-
-
 def load_known_species_ids() -> set[str] | None:
     """Return known U0/manifest ids, or None if the manifest is unavailable."""
     if not U0_MANIFEST.is_file():
         return None
     try:
         doc = yaml.safe_load(U0_MANIFEST.read_text(encoding="utf-8"))
-    except Exception:  # noqa: BLE001
-        return None
+    except Exception as exc:  # noqa: BLE001
+        raise ExtractValidationError(
+            [f"{U0_MANIFEST}: failed to load U0 species manifest: {exc}"]
+        ) from exc
     if not isinstance(doc, Mapping):
-        return None
+        raise ExtractValidationError(
+            [f"{U0_MANIFEST}: invalid U0 species manifest: expected a mapping"]
+        )
     species = doc.get("species")
+    if not isinstance(species, (list, Mapping)):
+        raise ExtractValidationError(
+            [
+                f"{U0_MANIFEST}: invalid U0 species manifest: "
+                "species must be a list or mapping"
+            ]
+        )
     ids: set[str] = set()
     if isinstance(species, list):
         for row in species:
@@ -3950,7 +3947,11 @@ def validate_all(
     files = list(paths) if paths is not None else discover_extracts()
     if not files and paths is None:
         errors.append(f"{EXTRACTS_DIR}: no extract YAML files found")
-    known = load_known_species_ids()
+    try:
+        known = load_known_species_ids()
+    except ExtractValidationError as exc:
+        errors.extend(exc.errors)
+        known = None
     for path in files:
         errors.extend(
             validate_extract_file(

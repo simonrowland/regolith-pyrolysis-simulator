@@ -1513,3 +1513,72 @@ def test_numeric_table_cells_keeps_zero_for_parsed_table_without_numbers():
     assert gate._numeric_table_cells(
         "<table><tr><td>FeO</td><td>—</td></tr></table>"
     ) == 0
+
+
+def test_known_species_ids_missing_manifest_stays_unavailable(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr(validator, "U0_MANIFEST", tmp_path / "missing.yaml")
+
+    assert validator.load_known_species_ids() is None
+
+
+def test_known_species_ids_parse_failure_is_typed_validation_error(
+    tmp_path: Path, monkeypatch
+):
+    manifest = tmp_path / "manifest.yaml"
+    manifest.write_text("species: [", encoding="utf-8")
+    monkeypatch.setattr(validator, "U0_MANIFEST", manifest)
+
+    with pytest.raises(validator.ExtractValidationError) as exc:
+        validator.load_known_species_ids()
+
+    assert "failed to load" in exc.value.errors[0]
+    assert str(manifest) in exc.value.errors[0]
+
+
+def test_known_species_ids_rejects_non_mapping_manifest(
+    tmp_path: Path, monkeypatch
+):
+    manifest = tmp_path / "manifest.yaml"
+    manifest.write_text("[]\n", encoding="utf-8")
+    monkeypatch.setattr(validator, "U0_MANIFEST", manifest)
+
+    with pytest.raises(validator.ExtractValidationError) as exc:
+        validator.load_known_species_ids()
+    assert "expected a mapping" in exc.value.errors[0]
+
+
+def test_known_species_ids_io_failure_is_typed_validation_error(
+    tmp_path: Path, monkeypatch
+):
+    manifest = tmp_path / "manifest.yaml"
+    manifest.write_text("species: []\n", encoding="utf-8")
+    monkeypatch.setattr(validator, "U0_MANIFEST", manifest)
+    original_read_text = Path.read_text
+
+    def fail_manifest_read(path: Path, *args, **kwargs):
+        if path == manifest:
+            raise OSError("injected manifest read failure")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_manifest_read)
+
+    with pytest.raises(validator.ExtractValidationError) as exc:
+        validator.load_known_species_ids()
+
+    assert "injected manifest read failure" in exc.value.errors[0]
+
+
+def test_validate_all_reports_manifest_load_failure(
+    tmp_path: Path, monkeypatch
+):
+    manifest = tmp_path / "manifest.yaml"
+    manifest.write_text("species: [", encoding="utf-8")
+    monkeypatch.setattr(validator, "U0_MANIFEST", manifest)
+
+    errors = validator.validate_all(
+        paths=[], check_priority=False, check_fidelity_policy=False
+    )
+
+    assert any("failed to load" in error for error in errors)
