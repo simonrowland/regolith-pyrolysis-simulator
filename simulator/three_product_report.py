@@ -110,6 +110,74 @@ which carries Si / Al / Mg / Ti routing too."""
 PURE_SILICA_GLASS_MIN_PURITY_WT_PCT = 99.0
 """Interim Stage 3 purity gate; the product owner spec is pending."""
 
+# Relative rounding for two recorded Stage-3 masses. Not an absolute floor:
+# a positive species absent from the other ledger is missing evidence at any
+# magnitude, including trace glass yields below 1e-9 kg.
+_STAGE_3_RECORDED_MASS_REL_TOL = 1.0e-9
+
+
+def _recorded_stage3_masses_match(left: float, right: float) -> bool:
+    """True only when both sides record the mass, within relative rounding.
+
+    One positive side and one non-positive side is missing evidence. An
+    absolute tolerance must not publish that absence as zero.
+    """
+    left_positive = math.isfinite(left) and left > 0.0
+    right_positive = math.isfinite(right) and right > 0.0
+    if left_positive != right_positive:
+        return False
+    if not left_positive:
+        return True
+    return math.isclose(
+        left,
+        right,
+        rel_tol=_STAGE_3_RECORDED_MASS_REL_TOL,
+        abs_tol=0.0,
+    )
+
+
+def _stage_3_ledger_issue(
+    train_kg: Mapping[str, float],
+    snapshot_kg: Mapping[str, float],
+) -> str | None:
+    """Refuse a one-sided positive Stage-3 species at every magnitude.
+
+    This is the only train-versus-snapshot comparison for the glass class.
+    Relative rounding closes two recorded values. It never closes a species
+    that only one ledger records.
+    """
+    missing_from_snapshots: list[str] = []
+    missing_from_train: list[str] = []
+    mismatched: list[str] = []
+    for species in sorted(set(train_kg) | set(snapshot_kg)):
+        train = float(train_kg.get(species, 0.0))
+        snapshot = float(snapshot_kg.get(species, 0.0))
+        if train > 0.0 and snapshot <= 0.0:
+            missing_from_snapshots.append(species)
+        elif snapshot > 0.0 and train <= 0.0:
+            missing_from_train.append(species)
+        elif not _recorded_stage3_masses_match(train, snapshot):
+            mismatched.append(species)
+    parts: list[str] = []
+    if missing_from_snapshots:
+        parts.append(
+            'stage_3_species_missing_from_snapshots: '
+            + ', '.join(missing_from_snapshots)
+        )
+    if missing_from_train:
+        parts.append(
+            'stage_3_species_missing_from_train: '
+            + ', '.join(missing_from_train)
+        )
+    if mismatched:
+        parts.append(
+            'Stage 3 snapshot composition does not match the train ledger for '
+            + ', '.join(mismatched)
+        )
+    if not parts:
+        return None
+    return '; '.join(parts)
+
 
 def _stage_3_glass_snapshot_census(snapshots) -> dict[str, Any]:
     """Qualify Stage 3 deposits per snapshot and retain exclusion mass."""
@@ -374,23 +442,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     snapshot_stage_3_kg_by_species = snapshot_census['total_by_species']
 
     if stage_3_unavailable_reason is None and stage_3_snapshot_issue is None:
-        stage_3_species = set(stage_3_collected_by_species) | set(
-            snapshot_stage_3_kg_by_species
+        stage_3_snapshot_issue = _stage_3_ledger_issue(
+            stage_3_collected_by_species,
+            snapshot_stage_3_kg_by_species,
         )
-        mismatched_species = [
-            species for species in sorted(stage_3_species)
-            if not math.isclose(
-                stage_3_collected_by_species.get(species, 0.0),
-                snapshot_stage_3_kg_by_species.get(species, 0.0),
-                rel_tol=1.0e-9,
-                abs_tol=1.0e-9,
-            )
-        ]
-        if mismatched_species:
-            stage_3_snapshot_issue = (
-                'Stage 3 snapshot composition does not match the train ledger '
-                f'for {", ".join(mismatched_species)}'
-            )
 
     silica_product_kg = (
         None if stage_3_snapshot_issue is not None else silica_product_kg
@@ -424,11 +479,9 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'per Stage 3 snapshot'
         )
     if silica_product_kg is not None and total_silicon_coproduct_kg > 0.0:
-        if math.isclose(
+        if _recorded_stage3_masses_match(
             total_silicon_coproduct_kg,
             qualified_silicon_coproduct_kg,
-            rel_tol=1.0e-9,
-            abs_tol=1.0e-9,
         ):
             silica_flag_reason += (
                 f'; Stage 3 Si coproduct {total_silicon_coproduct_kg:.6g} kg '

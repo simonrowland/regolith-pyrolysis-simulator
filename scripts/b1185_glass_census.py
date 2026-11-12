@@ -3,9 +3,7 @@
 
 from __future__ import annotations
 
-import argparse
 import json
-import math
 import sys
 from pathlib import Path
 from typing import Any, Mapping
@@ -66,7 +64,20 @@ def _run_case(
     )
     session = SimSession().start(runner._session_config())
     execution = RunExecutor().execute_session(session, hours=hours)
+    # A refused or short run has no Stage-3 evidence. Publishing glass 0
+    # would turn that refusal into a measured yield (m_type_metallic_phase
+    # C0: liquid_fraction_provider_failed, 0 snapshots).
+    if execution.status != "ok":
+        raise ValueError(
+            f"run_status={execution.status}: "
+            f"{execution.reason or execution.error_message or 'no reason'}"
+        )
     sim = execution.simulator
+    snapshots = getattr(getattr(sim, "record", None), "snapshots", ()) or ()
+    if len(snapshots) != hours:
+        raise ValueError(
+            f"run_snapshots={len(snapshots)} requested_hours={hours}"
+        )
     classification = classify_products(sim)
     bucket = classification["pure_silica_glass"]
     flag = bucket.get("flag", {})
@@ -74,12 +85,9 @@ def _run_case(
     if classified_glass_kg is None:
         raise ValueError(str(flag.get("reason") or "glass classification unavailable"))
     census = _census(sim)
-    if not math.isclose(
-        census["qualified_glass_kg"],
-        float(classified_glass_kg),
-        rel_tol=1.0e-9,
-        abs_tol=1.0e-9,
-    ):
+    # Same number published twice. An absolute tolerance would accept a trace
+    # disagreement as zero; refuse any difference.
+    if census["qualified_glass_kg"] != float(classified_glass_kg):
         raise ValueError(
             "snapshot census glass mass does not match product classification"
         )
@@ -116,7 +124,12 @@ def _runner_scenarios() -> list[dict[str, Any]]:
     return cases
 
 
-def _c0_profiles(max_hours: int) -> list[dict[str, Any]]:
+def _c0_profiles() -> list[dict[str, Any]]:
+    """Every configured C0 profile, at its configured duration.
+
+    A duration cap would leave the 60-hour profiles unmeasured. The census
+    the purity-spec question needs is the full configured set.
+    """
     cases = []
     for path in sorted(OPTIMIZER_PROFILE_DIR.rglob("*.yaml")):
         profile = yaml.safe_load(path.read_text()) or {}
@@ -125,21 +138,6 @@ def _c0_profiles(max_hours: int) -> list[dict[str, Any]]:
         if run.get("campaign") != "C0":
             continue
         hours = int(run["hours"])
-        if hours > max_hours:
-            print(json.dumps({
-                "case_id": case_id,
-                "case_kind": "optimizer_c0_profile",
-                "status": "skipped",
-                "reason": "profile_run_hours_exceeds_limit",
-                "configured_hours": hours,
-                "max_profile_hours": max_hours,
-                "qualified_glass_kg": None,
-                "excluded_kg_by_reason": None,
-                "si_coproduct_kg": None,
-                "qualified_si_coproduct_kg": None,
-                "flag_present": None,
-            }, sort_keys=True))
-            continue
         seed_recipes = profile.get("seed_recipes", ()) or ()
         patch: Mapping[str, Any] = {}
         if seed_recipes:
@@ -160,19 +158,8 @@ def _c0_profiles(max_hours: int) -> list[dict[str, Any]]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--max-profile-hours",
-        type=int,
-        default=25,
-        help="skip C0 profiles whose configured duration exceeds this bound",
-    )
-    args = parser.parse_args()
-    if args.max_profile_hours < 0:
-        parser.error("--max-profile-hours must be non-negative")
-
     had_errors = False
-    for case in [*_runner_scenarios(), *_c0_profiles(args.max_profile_hours)]:
+    for case in [*_runner_scenarios(), *_c0_profiles()]:
         try:
             result = _run_case(**case)
         except Exception as exc:

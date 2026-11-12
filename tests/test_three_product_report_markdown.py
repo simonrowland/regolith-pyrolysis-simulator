@@ -62,6 +62,8 @@ def test_empty_classification_marks_silica_capture_as_not_a_product():
     assert "Metals + O₂" in report
     assert "## 2. Pure silica glass" not in report
     assert "Stage 3 silica capture (not a product)" in report
+    assert "Class mass is Stage 3 SiO2 + SiO." in report
+    assert "Elemental Si is the disproportionation coproduct" in report
     assert "Industrial mixed glass" in report
     assert "Refractory ceramic rump" in report
 
@@ -231,6 +233,8 @@ def test_flagged_silica_product_reports_mass_and_certification_evidence():
     report = format_three_product_markdown(classification)
 
     assert 'Silica glass: 2.500 kg' in report
+    assert '## 2. Pure silica glass (Stage 3 SiO2 + SiO)' in report
+    assert 'Class mass is Stage 3 SiO2 + SiO.' in report
     assert '**Class total**: 2.500 kg' in report
     assert 'status=flagged prediction' in report
     assert 'authority=extrapolated' in report
@@ -258,7 +262,11 @@ def test_silica_report_labels_si_as_separate_coproduct():
 
     assert '**Class total**: 1.000 kg' in silica_section
     assert '**Si**: 5.000e-01 kg' in silica_section
-    assert 'Si is the Stage 3 disproportionation coproduct' in silica_section
+    assert '**SiO2**' in silica_section
+    assert 'Class mass is Stage 3 SiO2 + SiO.' in silica_section
+    assert 'Elemental Si is the disproportionation coproduct' in silica_section
+    assert 'not summed into the class total' in silica_section
+    assert 'Si is the Stage 3 disproportionation coproduct' not in silica_section
     assert 'qualified Stage 3 Si coproduct 0.5 kg' in silica_section
 
 

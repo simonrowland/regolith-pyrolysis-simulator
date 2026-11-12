@@ -19,7 +19,6 @@ would be the runner CLI + JSON-or-MD output mode.
 
 from __future__ import annotations
 
-import math
 from typing import Any, Mapping
 
 # Display order matches CLAUDE.md § 5 product class enumeration.
@@ -29,7 +28,7 @@ _CLASS_DISPLAY_ORDER: tuple[tuple[str, str], ...] = (
      '(alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co '
      '+ emitted O₂ potential)'),
     ('pure_silica_glass',
-     '2. Pure silica glass (Stage 3 fused-silica baffle capture)'),
+     '2. Pure silica glass (Stage 3 SiO2 + SiO)'),
     ('industrial_mixed_glass',
      '3. Industrial mixed glass (early-tap residual melt option)'),
     ('refractory_ceramic_rump',
@@ -256,15 +255,11 @@ def format_three_product_markdown(
             lines.append("")
             lines.append("Stage 3 deposits by species:")
             lines.append(_kg_by_species_block(stage_3))
-            try:
-                si_coproduct_kg = float(stage_3.get('Si', 0.0))
-            except (TypeError, ValueError):
-                si_coproduct_kg = 0.0
-            if math.isfinite(si_coproduct_kg) and si_coproduct_kg > 0.0:
-                lines.append(
-                    'Si is the Stage 3 disproportionation coproduct; it is '
-                    'reported beside the glass and excluded from the class total.'
-                )
+            lines.append(
+                'Class mass is Stage 3 SiO2 + SiO. Elemental Si is the '
+                'disproportionation coproduct, reported beside the class '
+                'and not summed into the class total.'
+            )
         elif bucket_key == 'industrial_mixed_glass':
             raw_residual = bucket.get('mixed_melt_residual_kg', 0.0)
             residual = None if raw_residual is None else float(raw_residual)

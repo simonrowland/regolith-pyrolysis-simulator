@@ -23,6 +23,10 @@ import yaml
 
 from simulator.accounting.queries import TERMINAL_RUMP_CLASS_TOLERANCE_PCT
 from simulator.backends import BackendSelectionPolicy
+from simulator.condensation_routing import (
+    CONDENSATION_COPRODUCT_STAGE,
+    DESIGNATED_STAGE,
+)
 from simulator.session import SimSession, SimSessionConfig
 from simulator.three_product_report import (
     METAL_PRODUCT_SPECIES,
@@ -34,6 +38,38 @@ from simulator.three_product_report import (
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
+# d-398 foreign co-deposits that are not condenser routing keys. The routed
+# species come from DESIGNATED_STAGE and CONDENSATION_COPRODUCT_STAGE.
+_STAGE_3_FOREIGN_OXIDES = ('FeO', 'K2O', 'MgO', 'Na2O')
+_TRACE_STAGE3_MASSES_KG = (1.0e-10, 1.0e-15)
+
+
+def _stage_3_deposit_species() -> tuple[str, ...]:
+    return tuple(sorted(
+        set(DESIGNATED_STAGE)
+        | set(CONDENSATION_COPRODUCT_STAGE)
+        | set(_STAGE_3_FOREIGN_OXIDES)
+    ))
+
+
+def _stage_3_foreign_species() -> tuple[str, ...]:
+    silica_bearing = set(PURE_SILICA_GLASS_SPECIES) | {'Si'}
+    return tuple(
+        species for species in _stage_3_deposit_species()
+        if species not in silica_bearing
+    )
+
+
+def _stage_3_sim(*, collected: dict, snapshots: list):
+    return SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[
+            None, None, None, SimpleNamespace(collected_kg=dict(collected)),
+        ]),
+        record=SimpleNamespace(snapshots=snapshots),
+        atom_ledger=None,
+    )
 
 
 def _load(name: str) -> dict:
@@ -554,6 +590,182 @@ def test_pure_silica_snapshot_outside_sio_window_counts_as_product():
     assert result['pure_silica_glass']['class_total_kg'] == 3.0
     assert result['glass']['class_total_kg'] == 3.0
     assert 'owner product spec pending' in result['pure_silica_glass']['flag']['reason']
+
+
+def test_train_trace_silica_without_snapshots_is_not_numeric_zero():
+    """Missing snapshots are a typed refusal, not a glass total of 0."""
+    kg = 1.0e-10
+    result = classify_products(_stage_3_sim(
+        collected={'SiO2': kg},
+        snapshots=[],
+    ))
+    silica = result['pure_silica_glass']
+
+    assert silica['stage_3_capture_kg'] == pytest.approx(kg)
+    assert silica['class_total_kg'] is None
+    assert result['glass']['class_total_kg'] is None
+    assert result['glass']['pure_silica_glass_kg'] is None
+    assert silica['flag']['status'] == 'unavailable'
+    assert 'stage_3_species_missing_from_snapshots: SiO2' in silica['flag']['reason']
+
+
+@pytest.mark.parametrize('foreign', _stage_3_foreign_species())
+def test_trace_pure_snapshot_does_not_qualify_when_train_omits_foreign(foreign):
+    """A 1e-10 kg foreign train deposit omitted from the snapshot blocks qualification."""
+    kg = 1.0e-10
+    result = classify_products(_stage_3_sim(
+        collected={'SiO2': kg, foreign: kg},
+        snapshots=[SimpleNamespace(
+            condensed_by_stage_species_delta={(3, 'SiO2'): kg},
+        )],
+    ))
+    silica = result['pure_silica_glass']
+
+    assert silica['class_total_kg'] is None
+    assert result['glass']['class_total_kg'] is None
+    assert silica['class_total_kg'] != kg
+    assert 'stage_3_species_missing_from_snapshots: ' in silica['flag']['reason']
+    assert foreign in silica['flag']['reason']
+    assert silica['flag']['status'] == 'unavailable'
+
+
+@pytest.mark.parametrize('species', _stage_3_deposit_species())
+@pytest.mark.parametrize('kg', _TRACE_STAGE3_MASSES_KG)
+@pytest.mark.parametrize('missing_side', ('snapshots', 'train'))
+def test_missing_positive_stage3_species_refuses_at_every_trace_mass(
+    species, kg, missing_side,
+):
+    """No positive Stage-3 species is reconciled to zero by absolute tolerance."""
+    if missing_side == 'snapshots':
+        sim = _stage_3_sim(collected={species: kg}, snapshots=[])
+        token = 'stage_3_species_missing_from_snapshots'
+    else:
+        sim = _stage_3_sim(
+            collected={},
+            snapshots=[SimpleNamespace(
+                condensed_by_stage_species_delta={(3, species): kg},
+            )],
+        )
+        token = 'stage_3_species_missing_from_train'
+
+    silica = classify_products(sim)['pure_silica_glass']
+
+    assert silica['class_total_kg'] is None
+    assert silica['class_total_kg'] != 0.0
+    assert silica['flag']['status'] == 'unavailable'
+    assert f'{token}: {species}' in silica['flag']['reason']
+
+
+@pytest.mark.parametrize('species', PURE_SILICA_GLASS_SPECIES)
+def test_agreed_trace_silica_species_still_counts(species):
+    kg = 1.0e-10
+    result = classify_products(_stage_3_sim(
+        collected={species: kg},
+        snapshots=[SimpleNamespace(
+            condensed_by_stage_species_delta={(3, species): kg},
+        )],
+    ))
+
+    assert result['pure_silica_glass']['class_total_kg'] == pytest.approx(kg)
+    assert result['glass']['class_total_kg'] == pytest.approx(kg)
+    assert 'stage_3_species_missing' not in result['pure_silica_glass']['flag']['reason']
+
+
+@pytest.mark.parametrize('species', _stage_3_foreign_species())
+def test_agreed_trace_foreign_deposit_is_excluded_not_refused(species):
+    kg = 1.0e-10
+    silica = classify_products(_stage_3_sim(
+        collected={species: kg},
+        snapshots=[SimpleNamespace(
+            condensed_by_stage_species_delta={(3, species): kg},
+        )],
+    ))['pure_silica_glass']
+
+    assert silica['class_total_kg'] == 0.0
+    assert 'purity_below_threshold' in silica['flag']['reason']
+    assert 'stage_3_species_missing' not in silica['flag']['reason']
+    assert silica['flag']['status'] == 'flagged product spec pending'
+
+
+def test_trace_scale_ledger_rounding_stays_distinct_from_a_missing_species():
+    silica = classify_products(_stage_3_sim(
+        collected={'SiO2': 1.0e-10},
+        snapshots=[SimpleNamespace(
+            condensed_by_stage_species_delta={(3, 'SiO2'): 2.0e-10},
+        )],
+    ))['pure_silica_glass']
+
+    assert silica['class_total_kg'] is None
+    assert 'stage_3_species_missing' not in silica['flag']['reason']
+    assert (
+        'Stage 3 snapshot composition does not match the train ledger for SiO2'
+        in silica['flag']['reason']
+    )
+
+
+def test_trace_rejected_si_is_not_reported_as_equal_to_qualified_si():
+    """A 1e-10 kg rejected Si coproduct is not closed against zero."""
+    collected = {'SiO2': 1.0, 'Na2O': 1.0, 'Si': 1.0e-10}
+    silica = classify_products(_stage_3_sim(
+        collected=collected,
+        snapshots=[SimpleNamespace(
+            condensed_by_stage_species_delta={
+                (3, 'SiO2'): 1.0,
+                (3, 'Na2O'): 1.0,
+                (3, 'Si'): 1.0e-10,
+            },
+        )],
+    ))['pure_silica_glass']
+
+    assert silica['class_total_kg'] == 0.0
+    assert 'purity_below_threshold' in silica['flag']['reason']
+    assert 'Stage 3 Si coproduct 1e-10 kg (qualified 0 kg; reported separately)' in (
+        silica['flag']['reason']
+    )
+
+
+def _load_b1185_census():
+    import importlib.util
+
+    script = (
+        Path(__file__).resolve().parents[1] / 'scripts' / 'b1185_glass_census.py'
+    )
+    spec = importlib.util.spec_from_file_location('b1185_glass_census', script)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_c0_glass_census_includes_every_configured_profile():
+    module = _load_b1185_census()
+    cases = {case['case_id']: case for case in module._c0_profiles()}
+    configured = {}
+    for path in sorted(module.OPTIMIZER_PROFILE_DIR.rglob('*.yaml')):
+        profile = yaml.safe_load(path.read_text()) or {}
+        run = profile.get('run') or {}
+        if run.get('campaign') != 'C0':
+            continue
+        case_id = path.relative_to(module.OPTIMIZER_PROFILE_DIR).with_suffix('').as_posix()
+        configured[case_id] = int(run['hours'])
+
+    assert configured
+    assert 60 in configured.values()
+    assert set(cases) == set(configured)
+    for case_id, hours in configured.items():
+        assert cases[case_id]['hours'] == hours
+        assert 'status' not in cases[case_id]
+
+
+def test_refused_metallic_c0_profile_is_not_reported_as_glass_zero():
+    """A run that never steps is a typed refusal, not qualified glass of 0 kg."""
+    module = _load_b1185_census()
+    case = next(
+        item for item in module._c0_profiles()
+        if item['case_id'] == 'm_type_metallic_phase'
+    )
+    with pytest.raises(ValueError, match='liquid_fraction_provider_failed'):
+        module._run_case(**case)
 
 
 def test_all_or_nothing_mutation_check_fails_the_mixed_snapshot_node(request):
