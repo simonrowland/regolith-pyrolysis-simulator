@@ -1,0 +1,576 @@
+schema_version: literature_extract.v1
+source_id: gibson-1971-lunar-gas-release
+source:
+  citation: "Gibson, E. K., Jr. & Johnson, S. M. (1971), Thermal analysis-inorganic gas release studies of lunar samples, Proceedings of the Second Lunar Science Conference, Vol. 2, pp. 1351–1366, The M.I.T. Press."
+  year: 1971
+  bibcode: 1971LPSC....2.1351G
+  url: https://ui.adsabs.harvard.edu/abs/1971LPSC....2.1351G
+  corpus_asset: raw/gibson-1971-lunar-gas-release/gibson-1971-lunar-gas-release.pdf
+extraction:
+  method: "Scanned LPI/ADS PDF with no usable text layer. All tabulated numbers were read from 400 dpi crops of Table 1 (published p. 1360) and Table 2 (published p. 1361). Prose numbers and figure-caption sample weights were read from 200 dpi pdftoppm renders of all 16 pages (1351–1366). Figures 1–5 ion-intensity vs temperature curves are figure-only and were not digitized. Concentrations printed as em-dashes in Table 2 are recorded as not reported, never guessed. Cited analyses from other workers (Chang, Friedman, Maxwell, Hanneman, Stoenner, Lambert, and others) are not stored as this paper's measurements. A printed discrepancy between the Fig. 1 caption sample weight 242.94 mg and the Table 1 weight 242.96 mg for 10086,16 is retained in both places; neither value was altered."
+  date: '2026-11-12'
+  worker: w1112emp-gj71
+  provenance_path: raw/gibson-1971-lunar-gas-release/gibson-1971-lunar-gas-release.pdf
+review_status: draft
+fidelity_samples:
+- path: species.unknown.observations[gibson_1971_table1_weight_loss].values.series[0].weight_mg
+  value: '242.96'
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 1360
+    table: '1'
+    row: Apollo 11 Soil 10086,16
+    column: Weight mg
+    note: "400 dpi crop of Table 1, published p. 1360. The Fig. 1 caption (p. 1354) prints 242.94 mg for the same sample; both values are retained."
+- path: species.unknown.observations[gibson_1971_table1_weight_loss].values.series[0].percent_weight_loss_to_1400_C
+  value: '1.41'
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 1360
+    table: '1'
+    row: Apollo 11 Soil 10086,16
+    column: Percent weight-loss to 1400°C
+    note: "400 dpi crop of Table 1, published p. 1360. The same 1.41 wt% is restated in the Table 1 prose."
+- path: species.K.observations[gibson_1971_table2_k].values.series[0].initial_ppm
+  value: '1200'
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 1361
+    table: '2'
+    row: K
+    column: "Breccia 10073, initial"
+    note: "400 dpi crop of Table 2, published p. 1361."
+- path: species.Na.observations[gibson_1971_table2_na].values.series[2].initial_ppm
+  value: '1824'
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 1361
+    table: '2'
+    row: Na
+    column: "Basalt 12022, initial"
+    note: "400 dpi crop of Table 2, published p. 1361."
+- path: species.Na.observations[gibson_1971_table2_na].values.series[2].after_1400_C_ppm
+  value: '673'
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 1361
+    table: '2'
+    row: Na
+    column: "Basalt 12022, after 1400°C"
+    note: "400 dpi crop of Table 2, published p. 1361."
+benches:
+- id: gibson-1971-mettler-finnigan
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Mettler recording vacuum thermoanalyzer interfaced with a Finnigan 1015S/L quadrupole mass spectrometer}
+    locator: &proc
+      page: 2
+      pdf_page_index: 1
+      published_page: 1352
+      section: Experiment Procedures
+      note: "Proof string beginning on published p. 1352 and continuing on p. 1353: 'The lunar samples were analyzed utilizing a Mettler recording vacuum thermoanalyzer interfaced with a Finnigan 1015S/L quadrupole mass spectrometer (Gibson and Johnson, 1971). The mass spectrometer source was placed directly in the reaction chamber.'"
+  cell_material_and_liner:
+    state: {tag: value, value: previously outgassed 16 mm diameter platinum crucible}
+    locator: *proc
+  detector:
+    state: {tag: value, value: Finnigan 1015S/L quadrupole mass spectrometer with the source placed directly in the reaction chamber; spectra obtained every 12.5°C; reproducible background spectra from bakeout subtracted}
+    locator: &proc1353
+      page: 3
+      pdf_page_index: 2
+      published_page: 1353
+      section: Experiment Procedures
+      note: "Proof strings on p. 1353: 'Spectra were obtained every 12.5°C during the heating cycle. Reproducible background spectra were obtained during the bakeout procedures before sample analysis began and were later subtracted from the obtained spectra.'"
+  temperature_measurement:
+    state: {tag: value, value: calibrated platinum/platinum-10% rhodium thermocouples located at the base of the sample crucibles}
+    locator: *proc1353
+  balance_sensitivity_mg:
+    state: {tag: value, value: '0.05'}
+    locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 1353
+      section: Experiment Procedures
+      note: "Proof string starting at the end of p. 1352 and opening p. 1353: 'The sensitivity of the analytical balance used for weight loss studies was 0.05 mg.'"
+experiments:
+- experiment_id: gibson-1971-vacuum-pyrolysis-4c-min
+  bench_id: gibson-1971-mettler-finnigan
+  method: vacuum_chamber_pyrolysis
+  locator: *proc1353
+  sample:
+    printed_set:
+      state:
+        tag: value
+        value: "Apollo 11 soil 10086,16; Apollo 11 breccia 10073,23; Apollo 11 crystalline rock 10017,57 (surface chip); Apollo 12 soil 12023,9; Apollo 12 crystalline rock 12022,38 (interior chip). Soil samples were neither crushed nor homogenized. Breccia and crystalline rock came from 2.5 g samples previously homogenized (< 60 mesh)."
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1353
+        section: Experimental Results
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: "Programmed heating from room temperature to 1400°C, not a single setpoint."}
+      locator: *proc1353
+    heating_rate_C_per_min:
+      state: {tag: value, value: '4'}
+      units: °C/min
+      locator: *proc1353
+    peak_T_C:
+      state: {tag: value, value: '1400'}
+      units: °C
+      locator: *proc1353
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: "Only the evacuation pressure 2 × 10^{-6} torr is printed, not a converted pascal point or a distinct running pressure."}
+      locator: *proc
+    vacuum_torr_as_printed:
+      state: {tag: value, value: "evacuated to 2 × 10^{-6} torr"}
+      locator: *proc
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Vacuum pyrolysis is described (evacuated to 2 × 10^{-6} torr); no sweep or carrier gas is printed.
+      locator: *proc
+species:
+
+  unknown:
+    observations:
+    - observation_id: gibson_1971_table1_weight_loss
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      type: mass_loss
+      locator: &table1
+        page: 10
+        pdf_page_index: 9
+        published_page: 1360
+        table: '1'
+        note: "Table 1. Summary of weight loss for lunar samples. 400 dpi crop. Columns: Weight mg; Percent weight-loss to 1000°C; Percent weight-loss to 1400°C; Initial melting °C. Balance sensitivity 0.05 mg is restated in the table preamble."
+      units: wt% and mg as printed
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        method_class: measured_tabulated
+        peak_T_C: 1400
+        heating_rate_C_per_min: 4
+        vacuum_as_printed: 2 × 10^{-6} torr
+        series:
+        - sample_as_printed: "Apollo 11 Soil 10086,16"
+          sample_id: "10086,16"
+          lithology_as_printed: "Apollo 11 soil"
+          weight_mg: '242.96'
+          percent_weight_loss_to_1000_C: '0.13'
+          percent_weight_loss_to_1400_C: '1.41'
+          initial_melting_C_as_printed: "1120 ± 10"
+          initial_melting_uncertainty_C_as_printed: '± 10'
+        - sample_as_printed: "Apollo 12 Soil 12023,9"
+          sample_id: "12023,9"
+          lithology_as_printed: "Apollo 12 soil"
+          weight_mg: '208.50'
+          percent_weight_loss_to_1000_C: '0.20'
+          percent_weight_loss_to_1400_C: '2.13'
+          initial_melting_C_as_printed: "1125 ± 10"
+          initial_melting_uncertainty_C_as_printed: '± 10'
+        - sample_as_printed: "Apollo 11 Breccia 10073,23"
+          sample_id: "10073,23"
+          lithology_as_printed: "Apollo 11 breccia"
+          weight_mg: '201.87'
+          percent_weight_loss_to_1000_C: '0.15'
+          percent_weight_loss_to_1400_C: '0.95'
+          initial_melting_C_as_printed: "1125, 1230 ± 10"
+          initial_melting_uncertainty_C_as_printed: '± 10'
+        - sample_as_printed: "Apollo 11 Rock A 10017,57"
+          sample_id: "10017,57"
+          lithology_as_printed: "Apollo 11 crystalline rock (Rock A, surface chip)"
+          weight_mg: '400.45'
+          percent_weight_loss_to_1000_C: '0.073'
+          percent_weight_loss_to_1400_C: '1.02'
+          initial_melting_C_as_printed: "1100 ± 10"
+          initial_melting_uncertainty_C_as_printed: '± 10'
+        - sample_as_printed: "Apollo 12 Rock 12022,38"
+          sample_id: "12022,38"
+          lithology_as_printed: "Apollo 12 crystalline rock (interior chip)"
+          weight_mg: '500.65'
+          percent_weight_loss_to_1000_C: '0.038'
+          percent_weight_loss_to_1400_C: '0.51'
+          initial_melting_C_as_printed: "1140 ± 10"
+          initial_melting_uncertainty_C_as_printed: '± 10'
+        printed_discrepancy_note: "Fig. 1 caption (published p. 1354) gives 242.94 mg for 10086,16; Table 1 gives 242.96 mg. Prose on p. 1353 rounds the soils to 242 mg and 208 mg and the breccia to 202 mg. All printed forms are retained."
+    context:
+    - observation_id: gibson_1971_figure_caption_sample_weights
+      type: typed_context
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1354
+        figure: '1'
+        note: "Figure captions on published pp. 1354–1355 give sample weights and a heating rate of 4°C/minute. Fig. 5 (p. 1356) has no numerical sample weight. The ion-intensity curves were not digitized."
+      units: mg
+      values:
+        method_class: method_only
+        heating_rate_C_per_min_as_printed: 4
+        series:
+        - figure: '1'
+          sample_id: "10086,16"
+          lithology_as_printed: "Apollo 11 soil"
+          weight_mg: '242.94'
+          published_page: 1354
+        - figure: '2'
+          sample_id: "12023,9"
+          lithology_as_printed: "Apollo 12 soil"
+          weight_mg: '208.50'
+          published_page: 1354
+        - figure: '3'
+          sample_id: "10017,57"
+          lithology_as_printed: "Apollo 11 crystalline rock 10017,57 surface chip"
+          weight_mg: '400.45'
+          published_page: 1355
+        - figure: '4'
+          sample_id: "12022,38"
+          lithology_as_printed: "Apollo 12 crystalline rock 12022,38 interior piece"
+          weight_mg: '500.65'
+          published_page: 1355
+    - observation_id: gibson_1971_synthetic_analog_matrix
+      type: typed_context
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1353
+        section: Experiment Procedures
+        note: "Proof string: 'The matrix of this lunar analog was composed of olivine (40 wt. %), pyroxene (40 wt. %), and anorthite (20 wt. %). The mixture was crushed to less than 150 mesh.' Fig. 5 caption adds '< 5% troilite, cohenite, and graphite added' and attributes the H2 and He release patterns below 500°C to Lord (1968)."
+      units: wt%
+      values:
+        method_class: method_only
+        olivine_wt_pct: '40'
+        pyroxene_wt_pct: '40'
+        anorthite_wt_pct: '20'
+        grain_size_as_printed: crushed to less than 150 mesh
+        added_phases_as_printed_fig5: "< 5% troilite, cohenite, and graphite added"
+  K:
+    observations:
+    - observation_id: gibson_1971_table2_k
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      type: concentration_series
+      locator: &table2
+        page: 11
+        pdf_page_index: 10
+        published_page: 1361
+        table: '2'
+        note: "Table 2. Concentrations of selected elements from volatilization study, units ppm. Residues after the gas-release heating at 4°C/min to 1400°C under 2 × 10^{-6} torr. Analyses by isotopic dilution and atomic absorption (Gast et al., 1970, cited for the procedure). Em-dashes are not reported, not zero. 400 dpi crop."
+      phase: residue_and_starting_sample
+      units: ppm
+      values:
+        quantity: residue_composition
+        method_class: measured_tabulated
+        basis_as_printed: ppm
+        element: K
+        series:
+        - sample_as_printed: "Breccia 10073"
+          sample_id: "10073"
+          initial_ppm: '1200'
+          after_1400_C_ppm: '385'
+        - sample_as_printed: "Basalt 10017"
+          sample_id: "10017"
+          initial_ppm: '2610'
+          after_1400_C_ppm: '641'
+        - sample_as_printed: "Basalt 12022"
+          sample_id: "12022"
+          initial_ppm: '536'
+          after_1400_C_ppm: '179.3'
+  Rb:
+    observations:
+    - observation_id: gibson_1971_table2_rb
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      type: concentration_series
+      locator: *table2
+      phase: residue_and_starting_sample
+      units: ppm
+      values:
+        quantity: residue_composition
+        method_class: measured_tabulated
+        basis_as_printed: ppm
+        element: Rb
+        series:
+        - sample_as_printed: "Breccia 10073"
+          sample_id: "10073"
+          initial_ppm: '2.84'
+          after_1400_C_ppm: '0.69'
+        - sample_as_printed: "Basalt 10017"
+          sample_id: "10017"
+          initial_ppm: '5.63'
+          after_1400_C_ppm: '1.05'
+        - sample_as_printed: "Basalt 12022"
+          sample_id: "12022"
+          initial_ppm: '0.738'
+          after_1400_C_ppm: '0.173'
+  Na:
+    observations:
+    - observation_id: gibson_1971_table2_na
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      type: concentration_series
+      locator: *table2
+      phase: residue_and_starting_sample
+      units: ppm
+      values:
+        quantity: residue_composition
+        method_class: measured_tabulated
+        basis_as_printed: ppm
+        element: Na
+        series:
+        - sample_as_printed: "Breccia 10073"
+          sample_id: "10073"
+          initial_ppm: '3500'
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 10017"
+          sample_id: "10017"
+          initial_ppm: '3800'
+          after_1400_C_ppm: '500'
+        - sample_as_printed: "Basalt 12022"
+          sample_id: "12022"
+          initial_ppm: '1824'
+          after_1400_C_ppm: '673'
+  Li:
+    observations:
+    - observation_id: gibson_1971_table2_li
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      type: concentration_series
+      locator: *table2
+      phase: residue_and_starting_sample
+      units: ppm
+      values:
+        quantity: residue_composition
+        method_class: measured_tabulated
+        basis_as_printed: ppm
+        element: Li
+        series:
+        - sample_as_printed: "Breccia 10073"
+          sample_id: "10073"
+          initial_ppm_as_printed: —
+          initial_ppm_status: not_reported
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 10017"
+          sample_id: "10017"
+          initial_ppm: '18.7'
+          after_1400_C_ppm: '19.3'
+        - sample_as_printed: "Basalt 12022"
+          sample_id: "12022"
+          initial_ppm: '9.51'
+          after_1400_C_ppm: '11.8'
+  Ce:
+    observations:
+    - observation_id: gibson_1971_table2_ce
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      type: concentration_series
+      locator: *table2
+      phase: residue_and_starting_sample
+      units: ppm
+      values:
+        quantity: residue_composition
+        method_class: measured_tabulated
+        basis_as_printed: ppm
+        element: Ce
+        series:
+        - sample_as_printed: "Breccia 10073"
+          sample_id: "10073"
+          initial_ppm: '46.5'
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 10017"
+          sample_id: "10017"
+          initial_ppm: '77.3'
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 12022"
+          sample_id: "12022"
+          initial_ppm: '17.4'
+          after_1400_C_ppm: '17.7'
+  Nd:
+    observations:
+    - observation_id: gibson_1971_table2_nd
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      type: concentration_series
+      locator: *table2
+      phase: residue_and_starting_sample
+      units: ppm
+      values:
+        quantity: residue_composition
+        method_class: measured_tabulated
+        basis_as_printed: ppm
+        element: Nd
+        series:
+        - sample_as_printed: "Breccia 10073"
+          sample_id: "10073"
+          initial_ppm: '35.4'
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 10017"
+          sample_id: "10017"
+          initial_ppm: '59.5'
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 12022"
+          sample_id: "12022"
+          initial_ppm: '14.8'
+          after_1400_C_ppm: '15.0'
+  Sm:
+    observations:
+    - observation_id: gibson_1971_table2_sm
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      type: concentration_series
+      locator: *table2
+      phase: residue_and_starting_sample
+      units: ppm
+      values:
+        quantity: residue_composition
+        method_class: measured_tabulated
+        basis_as_printed: ppm
+        element: Sm
+        series:
+        - sample_as_printed: "Breccia 10073"
+          sample_id: "10073"
+          initial_ppm: '12.4'
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 10017"
+          sample_id: "10017"
+          initial_ppm: '20.9'
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 12022"
+          sample_id: "12022"
+          initial_ppm: '5.58'
+          after_1400_C_ppm: '5.59'
+  Eu:
+    observations:
+    - observation_id: gibson_1971_table2_eu
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      type: concentration_series
+      locator: *table2
+      phase: residue_and_starting_sample
+      units: ppm
+      values:
+        quantity: residue_composition
+        method_class: measured_tabulated
+        basis_as_printed: ppm
+        element: Eu
+        series:
+        - sample_as_printed: "Breccia 10073"
+          sample_id: "10073"
+          initial_ppm: '1.70'
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 10017"
+          sample_id: "10017"
+          initial_ppm: '2.14'
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 12022"
+          sample_id: "12022"
+          initial_ppm: '1.28'
+          after_1400_C_ppm: '1.28'
+  Gd:
+    observations:
+    - observation_id: gibson_1971_table2_gd
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      type: concentration_series
+      locator: *table2
+      phase: residue_and_starting_sample
+      units: ppm
+      values:
+        quantity: residue_composition
+        method_class: measured_tabulated
+        basis_as_printed: ppm
+        element: Gd
+        series:
+        - sample_as_printed: "Breccia 10073"
+          sample_id: "10073"
+          initial_ppm: '15.9'
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 10017"
+          sample_id: "10017"
+          initial_ppm: '27.4'
+          after_1400_C_ppm_as_printed: —
+          after_1400_C_ppm_status: not_reported
+        - sample_as_printed: "Basalt 12022"
+          sample_id: "12022"
+          initial_ppm: '7.90'
+          after_1400_C_ppm: '7.85'
+  H2:
+    observations: []
+    context:
+    - observation_id: gibson_1971_h_he_atom_ratios
+      type: typed_context
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 1356
+        section: Lunar Soil
+        note: "Proof string p. 1356: 'The H/He ratio found in this investigation for the Apollo 11 fines is 7.3 and for the Apollo 12 fines is 9.5.' The breccia ratio is on p. 1358: 'The H/He ratio found for the breccia was 4.8, lower than the values of 7.3 and 9.5 found for the Apollo 11 and Apollo 12 soil samples.' Cited Stoenner (7.8), Hanneman (8.5), and Lambert solar (17) values are not stored as this paper's measurements."
+      units: atom ratio as printed
+      values:
+        method_class: measured_tabulated
+        quantity_as_printed: H/He ratio
+        series:
+        - sample_as_printed: Apollo 11 fines
+          H_over_He: '7.3'
+          locator_published_page: 1356
+        - sample_as_printed: Apollo 12 fines
+          H_over_He: '9.5'
+          locator_published_page: 1356
+        - sample_as_printed: Apollo 11 breccia 10073
+          H_over_He: '4.8'
+          locator_published_page: 1358
+  H2O:
+    observations: []
+    context:
+    - observation_id: gibson_1971_sample_10017_water_vapor_amount
+      type: typed_context
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 1359
+        figure: '3'
+        note: "Proof string: 'The quantity of water vapor released from the sample is in the order of 1 to 10 ppm.' The sample is holocrystalline rock 10017. Release in Fig. 3 at 262°–275°C is described as sudden. Cited Friedman 25 ppm and Maxwell 100 ppm H2O on 10017 are other workers and are not stored as this paper's measurements."
+      units: ppm
+      values:
+        method_class: method_only
+        sample_id: '10017'
+        quantity_as_printed: quantity of water vapor released
+        value_as_printed: in the order of 1 to 10 ppm
+        release_T_C_as_printed: 262–275
+        figure_only: Fig. 3 curve was not digitized
+  CO2:
+    observations: []
+    context:
+    - observation_id: gibson_1971_gas_release_temperature_windows
+      type: typed_context
+      experiment: gibson-1971-vacuum-pyrolysis-4c-min
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 1357
+        section: Lunar Soil
+        note: "Printed temperature windows and qualitative abundances from pp. 1356–1359. Ion-intensity curves in Figs. 1–5 were not digitized. Inclusion CO2 amount 'in the ppb range' is the authors' qualitative statement (p. 1358)."
+      units: as printed
+      values:
+        method_class: method_only
+        solar_wind_H_and_He_release_T_C_as_printed: 300–700
+        additional_hydrogen_release_T_C_as_printed: 1000–1300
+        mass_28_regions_T_C_as_printed: "(1) 700–900 and (2) 1000–1200"
+        apollo11_fines_sudden_CO2_release_T_C_as_printed: 675 and 1125
+        figs_1_2_CO2_spikes_T_C_as_printed: 1100–1125
+        H2S_and_SO2_release_T_C_as_printed: 900–1300
+        O2_release_T_C_as_printed: above 1300
+        O2_source_as_printed: "reaction product of iron from the melt with the platinum crucibles; FeO + Pt = [Fe, Pt] + 1/2 O2"
+        inclusion_CO2_amount_as_printed: very small, in the ppb range
+        crystalline_vs_soil_CO2_H2_He_factor_as_printed: lower by a factor of 8 to 10
+        alkali_depletion_factor_as_printed: "potassium, sodium, and rubidium contents of the samples were reduced by factors of 3 to 5"
+        alkali_depletion_locator_published_page: 1361
