@@ -5927,11 +5927,15 @@ def test_thermoengine_transport_pipe_close_failure_still_joins_worker(monkeypatc
 
 
 @pytest.mark.parametrize(
-    ('solved_fO2_log', 'expected_ok'),
-    [(-9.0, True), (-8.0, False)],
+    ('solved_fO2_log', 'expected_ok', 'echo_tolerance'),
+    [
+        (-9.0, True, 1.0e-3),
+        (-8.0, False, 1.0e-3),
+        (-9.002, True, 2.5e-3),
+    ],
 )
 def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
-    monkeypatch, solved_fO2_log, expected_ok,
+    monkeypatch, solved_fO2_log, expected_ok, echo_tolerance,
 ):
     class FakeTransport:
         def __init__(self, **_kwargs):
@@ -5947,7 +5951,10 @@ def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
                 solved_fO2_log=solved_fO2_log,
             )
 
+    executed_scripts = []
+
     def fake_run(args, **kwargs):
+        executed_scripts.append(args[-1])
         stdout = io.StringIO()
         try:
             with contextlib.redirect_stdout(stdout):
@@ -5967,6 +5974,9 @@ def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
         thermoengine_module, 'ThermoEngineTransport', FakeTransport,
     )
     monkeypatch.setattr(
+        thermoengine_module, '_FO2_ECHO_TOLERANCE', echo_tolerance,
+    )
+    monkeypatch.setattr(
         'engines.alphamelts.thermoengine.subprocess.run',
         fake_run,
     )
@@ -5978,6 +5988,12 @@ def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
     ok, reason = transport.health_check(timeout_s=1.0)
 
     assert ok is expected_ok
+    guard = next(
+        line.strip()
+        for line in executed_scripts[0].splitlines()
+        if 'payload.solved_fO2_log' in line and '>=' in line
+    )
+    assert guard.endswith(f'>= {echo_tolerance!r}')
     if expected_ok:
         assert reason == 'ThermoEngine smoke equilibrium completed'
     else:
