@@ -182,9 +182,13 @@ character is an ASCII letter or digit, a Unicode letter, µ, or °, or a
 dot or comma followed by a digit. So `1 K` is not `1 KPa`, and `1` is not
 `1,000`. A space, thin space, or narrow no-break space in an unsigned
 digit run is typography. The first group is one to three digits and each
-group after it is exactly three, so `1 550` is 1550. The run is not an
+group after it is exactly three, so `1 550` is 1550. The run starts at
+the beginning of the text or after whitespace or punctuation, and a letter
+does not precede it, so `SiO2 100` is formula `SiO2` and the number 100,
+not `SiO2100`. The run is not an
 exponent, a sign, or a decimal fraction, so `1e0 001`, `12 34`,
-`1.5 000`, and `1 550e3` are not one number. A comma is not this separator, so a cell
+`1.5 000`, and `1 550e3` are not one number. A formula or species label
+does not apply this fold. A comma is not this separator, so a cell
 `1,000` is not 1000.
 The same grouped spelling in a numeric cell is that number. The token must
 appear in the cited `line_range` when one is set,

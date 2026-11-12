@@ -64,8 +64,11 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   ``Fe2 O3``) stay separate tokens. ``CO`` is not ``CO₂`` and ``SiO₂`` is
   not ``SiO₂₂``. A space, thin space, or narrow no-break space in an
   unsigned digit run is typography: the first group is one to three
-  digits and each group after it is exactly three. ``1 550`` is ``1550``.
-  ``1e0 001``, ``12 34``, ``1.5 000``, and ``1 550e3`` are not one number.
+  digits and each group after it is exactly three. The run starts at
+  the beginning of the text or after whitespace or punctuation, never
+  after a letter, so ``SiO2 100`` stays ``SiO2`` and ``100``. ``1 550``
+  is ``1550``. ``1e0 001``, ``12 34``, ``1.5 000``, and ``1 550e3`` are
+  not one number. The formula-label path does not apply this fold.
   A comma is
   not that separator. A numeric leaf does not match a formula by the
   formula fold.
@@ -137,6 +140,7 @@ import os
 import re
 import subprocess
 import sys
+import unicodedata
 from collections.abc import (
     MutableMapping,
     MutableSequence,
@@ -156,6 +160,7 @@ from simulator.battery.extract_context import (
     SUPPORTED_EXTRACT_CONTEXT_PATH,
     iter_unsupported_context_container_paths,
 )
+from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.state_types import StateTag
 from tools.mineru_table_draft import Cell, TableGeometryError, parse_table_html
 
@@ -346,29 +351,64 @@ def _fold_numeric_signs(text: str) -> str:
 # Ordinary space, thin space, and narrow no-break space. One separator
 # between groups. A comma is not this separator: ``1,000`` stays ``1,000``.
 _DIGIT_GROUP_SEPARATORS = " \u2009\u202f"
+# A letter cannot precede the run. ``SiO2 100`` must not start at the
+# formula's count. Digits, a decimal point, an exponent marker, and a
+# sign stay excluded so ``1.5 000``, ``1e0 001``, and ``-1 550`` stay apart.
 _DIGIT_GROUP_RE = re.compile(
-    r"(?<![0-9.eE+\-])"
+    r"(?<![0-9.eE+\-A-Za-z])"
     r"(\d{1,3}(?:[" + _DIGIT_GROUP_SEPARATORS + r"]\d{3})+)"
     r"(?![0-9eE])"
 )
 
 
+def _digit_run_may_start(text: str, start: int) -> bool:
+    """True when a grouped digit run may begin at ``start``.
+
+    The previous character is the start of the text, whitespace, or
+    punctuation. A letter never starts a run. A digit, decimal point,
+    exponent marker, or sign does not either.
+    """
+    if start <= 0:
+        return True
+    previous = text[start - 1]
+    if previous in "0123456789.eE+-" or previous.isalpha():
+        return False
+    return previous.isspace() or unicodedata.category(previous).startswith("P")
+
+
 def _fold_digit_groups(text: str) -> str:
     """Join one unsigned digit run. A second call keeps the same spans.
 
+    The run starts at the beginning of the text or after whitespace or
+    punctuation, never after a letter, so ``SiO2 100`` stays ``SiO2 100``.
     The first group is one to three digits. Each following group is exactly
     three. A decimal point may follow the run, so ``1 550.25`` is
     ``1550.25``. ``1 550`` is ``1550``. ``12 345`` is ``12345``. ``12 34``,
     ``1e0 001``, ``1.5 000``, ``1 550e3``, and a signed run stay apart.
     """
-
-    def join(match: re.Match[str]) -> str:
+    pieces: list[str] = []
+    cursor = 0
+    while True:
+        match = _DIGIT_GROUP_RE.search(text, cursor)
+        if match is None:
+            pieces.append(text[cursor:])
+            return "".join(pieces)
+        if not _digit_run_may_start(text, match.start()):
+            previous = text[match.start() - 1]
+            # A letter is the same refusal as the lookbehind: skip that one
+            # digit so a later measurement can still group. Any other
+            # refused prefix keeps the whole run, so the groups inside it
+            # are not joined on their own.
+            end = match.start() + 1 if previous.isalpha() else match.end()
+            pieces.append(text[cursor:end])
+            cursor = end
+            continue
+        pieces.append(text[cursor:match.start()])
         grouped = match.group(0)
         for separator in _DIGIT_GROUP_SEPARATORS:
             grouped = grouped.replace(separator, "")
-        return grouped
-
-    return _DIGIT_GROUP_RE.sub(join, text)
+        pieces.append(grouped)
+        cursor = match.end()
 
 
 def _citation_token_matches(text: str) -> list[re.Match[str]]:
@@ -476,17 +516,24 @@ def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
     return True
 
 
-def _printed_value_carried(leaf: str, text: str) -> bool:
+def _printed_value_carried(
+    leaf: str, text: str, *, group_digits: bool = True
+) -> bool:
     """True when the folded ``leaf`` occurs in the folded ``text`` whole.
 
-    Signs and digit groups are folded on both sides. Acceptance is
+    Signs are folded on both sides. Digit groups are folded only when
+    ``group_digits`` is true. The formula-label path passes false, so a
+    formula count is not joined to a following measurement. Acceptance is
     ``_span_is_complete_printed_value`` on that span. ``0.91Pa`` is not
     ``10.91Pa`` or ``0.91Pascal``, ``91.`` is not ``91.0``, ``1 K`` is not
     ``1 KPa``, ``1,000`` is not ``1,000,000``, and ``12 34`` is not ``1234``.
-    ``1 550`` is ``1550``.
+    ``1 550`` is ``1550``. ``SiO2 100`` is not ``SiO2100``.
     """
-    leaf = _fold_digit_groups(_fold_numeric_signs(leaf))
-    text = _fold_digit_groups(_fold_numeric_signs(text))
+    leaf = _fold_numeric_signs(leaf)
+    text = _fold_numeric_signs(text)
+    if group_digits:
+        leaf = _fold_digit_groups(leaf)
+        text = _fold_digit_groups(text)
     if not leaf:
         return False
     start = 0
@@ -701,7 +748,6 @@ _HTML_COLUMN_KEYS = ("table_column", "table_column_number")
 # Formula-bearing label keys only. Every other key, and every number, keeps
 # the ordinary token or whole-cell comparison.
 _FORMULA_LABEL_KEYS = frozenset({"formula", "species"})
-_SUBSCRIPT_DIGIT_FOLD = str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789")
 _FORMULA_BRACE_SUBSCRIPT_RE = re.compile(r"_\{(\d+)\}")
 _FORMULA_BARE_SUBSCRIPT_RE = re.compile(r"_(\d+)")
 # Math that wraps only the subscript. The letters stay outside the dollars.
@@ -3085,7 +3131,7 @@ def _normalize_formula_label(text: str) -> str:
     normalized = _FORMULA_MATH_BARE_SUBSCRIPT_RE.sub(r"\1", normalized)
     normalized = _FORMULA_BRACE_SUBSCRIPT_RE.sub(r"\1", normalized)
     normalized = _FORMULA_BARE_SUBSCRIPT_RE.sub(r"\1", normalized)
-    normalized = normalized.translate(_SUBSCRIPT_DIGIT_FOLD)
+    normalized = fold_subscript_digits(normalized)
     previous = None
     while previous != normalized:
         previous = normalized
@@ -3120,14 +3166,19 @@ def _formula_label_in_text(leaf: str, text: str) -> bool:
 
     A numeric string does not match here. Digitless labels use the same
     complete-token boundary as a digit-bearing label, so ``CO`` is not a
-    token of ``CO2``.
+    token of ``CO2``. This path does not fold digit groups: ``SiO2 100``
+    is ``SiO2`` and is not ``SiO2100``.
     """
     if _string_is_plain_number(leaf):
         return False
     normalized = _normalize_formula_label(leaf)
     if not normalized.strip():
         return False
-    return _printed_value_carried(normalized, _normalize_formula_label(text))
+    return _printed_value_carried(
+        normalized,
+        _normalize_formula_label(text),
+        group_digits=False,
+    )
 
 
 def _pinned_leaf_in_text(leaf: _PinnedLeaf, text: str) -> bool:
@@ -3460,8 +3511,11 @@ def fidelity_source_warnings(
     power equal to that power (``1e3``, ``10^3``, ``1×10^3``); a plain
     number is ``superscript_in_cell``. An unsigned digit run whose first
     group is one to three
-    digits, then groups of three, is that number: ``1 550`` is ``1550``.
-    ``1e0 001``, ``12 34``, ``1.5 000``, and ``1 550e3`` are not. A comma is not that
+    digits, then groups of three, is that number when it starts at the
+    beginning of the text or after whitespace or punctuation, never after
+    a letter. ``1 550`` is ``1550``. ``SiO2 100`` is not ``SiO2100``.
+    ``1e0 001``, ``12 34``, ``1.5 000``, and ``1 550e3`` are not. The
+    formula-label path does not apply this fold. A comma is not that
     separator. ``1 K`` is not ``1 KPa``.
     A leading decimal is a numeric token.
     A spelling that rounds the stored float to a different number is not

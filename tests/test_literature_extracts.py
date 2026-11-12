@@ -10251,6 +10251,22 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
     """
     assert "_normalize_formula_label" not in inspect.getsource(vle._leaf_in_text)
     assert "_normalize_formula_label" not in inspect.getsource(vle._cell_certifies_leaf)
+    formula_text = inspect.getsource(vle._formula_label_in_text)
+    assert "_fold_digit_groups" not in formula_text
+    assert "group_digits=False" in formula_text
+    normalizer = inspect.getsource(vle._normalize_formula_label)
+    assert "fold_subscript_digits" in normalizer
+    assert "_fold_digit_groups" not in normalizer
+    assert "_fold_digit_groups" not in inspect.getsource(vle._formula_cell_matches)
+    assert not hasattr(vle, "_SUBSCRIPT_DIGIT_FOLD")
+    score_text = (REPO_ROOT / "simulator/battery/score.py").read_text(encoding="utf-8")
+    assert "fold_subscript_digits" in score_text
+    assert 'maketrans("₀₁₂₃₄₅₆₇₈₉"' not in score_text
+    assert vle._formula_label_in_text("SiO2", "SiO2 100") is True
+    assert vle._formula_label_in_text("SiO2100", "SiO2 100") is False
+    assert vle._leaf_in_text(100, "SiO2 100") is True
+    assert vle._leaf_in_text(1550, "1 550") is True
+    assert vle._fold_digit_groups("SiO2 100") == "SiO2 100"
     text_source = inspect.getsource(vle._pinned_leaf_in_text)
     cell_source = inspect.getsource(vle._pinned_leaf_in_cells)
     assert text_source.index("formula_label") < text_source.index("_formula_label_in_text")
@@ -10474,6 +10490,9 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         ("formula", "CO2N2", "CO2 N2", False),
         ("formula", "CO2", "CO2 N2", True),
         ("formula", "N2", "CO2 N2", True),
+        ("formula", "SiO2", "SiO2 100", True),
+        ("formula", "SiO2100", "SiO2 100", False),
+        ("alpha", 100, "SiO2 100", True),
     )
     for key, pin, source, accepts in prose_pins:
         doc = _html_source_document(tmp_path, pin, source + "\n", key=key)
@@ -10526,6 +10545,8 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
     ``1,000`` stays a comma group.
     """
     assert vle._fold_digit_groups("1 550") == "1550"
+    assert vle._fold_digit_groups("SiO2 100") == "SiO2 100"
+    assert vle._fold_digit_groups("(1 550)") == "(1550)"
     assert vle._fold_digit_groups("1\u2009550") == "1550"
     assert vle._fold_digit_groups("1\u202f550") == "1550"
     assert vle._fold_digit_groups("12 345") == "12345"
@@ -10545,6 +10566,8 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
     failures: list[str] = []
     prose = (
         (1550, "from 1 550 °C to\n", True),
+        (1550, "(1 550)\n", True),
+        (100, "SiO2 100\n", True),
         (1550, "from 1\u2009550 °C to\n", True),
         (1550, "from 1\u202f550 °C to\n", True),
         (12345, "12 345\n", True),
