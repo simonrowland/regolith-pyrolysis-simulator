@@ -10605,7 +10605,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'replay_enabled', False):
-            return store.replay_equilibrium(self)
+            return self._republish_cached_vapour_at_interface(
+                store.replay_equilibrium(self)
+            )
         cache_write_through = (
             store is not None
             and getattr(store, 'write_through_enabled', False)
@@ -10613,7 +10615,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if cache_write_through:
             cached_result = store.cached_equilibrium(self)
             if cached_result is not None:
-                return cached_result
+                return self._republish_cached_vapour_at_interface(
+                    cached_result
+                )
         self._ensure_hour_interface_oxygen()
         if self.backend is None:
             if cache_write_through:
@@ -10862,6 +10866,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             result,
             run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
         )
+
+    def _republish_cached_vapour_at_interface(self, result):
+        """Replace a stored vapour surface with this hour's interface potential.
+
+        Replay and the reduced-real cache return before the hour solves
+        ξ_s, and their payload still carries the vapour of the hour that
+        wrote it. Publishing here is the same kernel refresh the live
+        hour uses. Below 400 K that refresh does not run: the evaporation
+        provider returns an empty flux before it reads vapour, so a stale
+        cold surface cannot debit.
+        """
+
+        self._ensure_hour_interface_oxygen()
+        temperature_K = float(self.melt.temperature_C) + 273.15
+        if math.isfinite(temperature_K) and temperature_K >= 400.0:
+            self._refresh_vapor_pressures_from_kernel(
+                result,
+                publish_interface_oxygen=True,
+                simulation_hour=int(self.melt.hour) + 1,
+            )
+        return result
 
     def _record_equilibrium_status(
         self,

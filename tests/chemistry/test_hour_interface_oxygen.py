@@ -569,3 +569,60 @@ def test_enclosed_furnace_interface_is_body_independent(tmp_path: Path) -> None:
     assert moon._commanded_pO2_bar() == unset._commanded_pO2_bar()
     for species in ("Fe", "SiO"):
         assert moon_eq.vapor_pressures_Pa[species] == unset_eq.vapor_pressures_Pa[species]
+
+
+class _StoredEquilibrium:
+    """A replay or cache seam that serves one stored equilibrium."""
+
+    def __init__(self, result, *, replay: bool) -> None:
+        self._result = result
+        self.replay_enabled = replay
+        self.write_through_enabled = not replay
+        self.capture_enabled = False
+
+    def cached_equilibrium(self, _sim):
+        return self._result
+
+    def replay_equilibrium(self, _sim):
+        return self._result
+
+
+def _stale_vapour(result):
+    stale = copy.deepcopy(result)
+    stale.vapor_pressures_Pa = {
+        str(species): 1.0e6
+        for species in result.vapor_pressures_Pa
+    }
+    return stale
+
+
+def test_cached_and_replayed_hours_publish_the_fresh_vapour() -> None:
+    """A stored equilibrium must not serve vapour from the old potential."""
+
+    sim = _loaded(_yaml("feedstocks.yaml"))
+    fresh = sim._get_equilibrium()
+    fresh_pressures = {
+        str(species): float(pressure)
+        for species, pressure in fresh.vapor_pressures_Pa.items()
+    }
+    assert fresh_pressures
+    assert any(
+        pressure != pytest.approx(1.0e6)
+        for pressure in fresh_pressures.values()
+    )
+
+    cached = _stale_vapour(fresh)
+    sim.configure_pt0_determinism_store(_StoredEquilibrium(cached, replay=False))
+    from_cache = sim._get_equilibrium()
+    assert {
+        str(species): float(pressure)
+        for species, pressure in from_cache.vapor_pressures_Pa.items()
+    } == fresh_pressures
+
+    replayed = _stale_vapour(fresh)
+    sim.configure_pt0_determinism_store(_StoredEquilibrium(replayed, replay=True))
+    from_replay = sim._get_equilibrium()
+    assert {
+        str(species): float(pressure)
+        for species, pressure in from_replay.vapor_pressures_Pa.items()
+    } == fresh_pressures
