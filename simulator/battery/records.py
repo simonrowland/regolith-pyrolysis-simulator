@@ -321,7 +321,7 @@ def nominal_pressure_pa(value: object) -> Decimal | None:
 
     Accepts a ``State``, a ``Located``, an ``ApproxPressure``, a ``Value``
     point, a decimal-like scalar, and the serialized mapping
-    ``{tag: value, value: ...}`` or ``{kind: point, point: ...}``.
+    ``{tag: value, value: ...}``, a serialized band, or ``{kind: point, point: ...}``.
     Returns ``None`` when the pressure is absent or is not a point.
     Callers keep their own sign and finiteness filters.
     """
@@ -348,6 +348,8 @@ def nominal_pressure_pa(value: object) -> Decimal | None:
             return nominal_pressure_pa(value.get("value"))
         if "state" in value and tag is None:
             return nominal_pressure_pa(value.get("state"))
+        if value.get("kind") == _APPROXIMATE_PRESSURE_KIND:
+            return nominal_pressure_pa(approx_pressure_from_mapping(value))
         if value.get("kind") not in (None, "point"):
             return None
         if "point" in value:
