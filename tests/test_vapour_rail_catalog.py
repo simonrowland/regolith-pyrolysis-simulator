@@ -33,7 +33,7 @@ from simulator.vapour_rail.catalog import (
     compile_vapour_rail_catalog,
     validate_species_catalog,
 )
-from simulator.vapour_rail.channels import CHANNEL_O2
+from simulator.vapour_rail.channels import CHANNEL_O2, is_dioxygen_formula
 from tests.git_history import require_git_history
 
 
@@ -66,6 +66,28 @@ PINNED_CATALOG_FIXTURE_SHA256 = {
         "fefcd5fa2f3f1ba60c3255504dc33c7e710dbb1f0a60fedff433ef14c7826f5d"
     ),
 }
+
+
+@pytest.mark.parametrize(
+    ("formula", "expected"),
+    [
+        pytest.param("O2", True, id="bare-dioxygen"),
+        pytest.param("O2(g)", True, id="gas-phase"),
+        pytest.param("O2(g,ideal)", True, id="standard-state"),
+        pytest.param("O2(foo)(bar)", True, id="multiple-suffixes"),
+        pytest.param(" O2 (g)", True, id="trim-base-whitespace"),
+        pytest.param("O3", False, id="trioxygen"),
+        pytest.param("O", False, id="atomic-oxygen"),
+        pytest.param("O2-", False, id="charged-oxygen"),
+        pytest.param("O2 junk", False, id="junk-after-base"),
+    ],
+)
+def test_dioxygen_formula_uses_base_before_first_suffix(
+    formula: str, expected: bool
+) -> None:
+    assert is_dioxygen_formula(formula) is expected
+
+
 COLLISION_GASES = {
     "Al2O3_gas",
     "CaO_gas",
