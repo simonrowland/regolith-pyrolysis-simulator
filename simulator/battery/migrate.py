@@ -21520,6 +21520,12 @@ def _decision_for_buffer(
         notice_reason=notice_reason,
         notice_kind=notice_kind or NoticeKind.INPUT_OMITTED,
         notice_band=notice_band,
+        # The primary notice is the conversion notice only when gate-8 did
+        # not supply its own text. Notice.authority is the scoring authority
+        # of that converted value. Leaving it unset lets _oxygen_conversion_notice
+        # store a same-(kind, reason) copy, and the dedup then drops the
+        # PrintedOxygenNotice that carried the authority.
+        notice_authority=None if gate_notice is not None else authority,
         notices=tuple(notices),
         buffer_request=request,
         pressure_pa_used=total_pressure_pa,
