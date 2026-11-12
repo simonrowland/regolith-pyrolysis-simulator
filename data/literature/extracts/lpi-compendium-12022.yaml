@@ -1,0 +1,1175 @@
+schema_version: literature_extract.v1
+source_id: lpi-compendium-12022
+source:
+  citation: >-
+    Meyer, C. (2005). Lunar Sample Compendium: 12022 (Ilmenite Basalt).
+    Lunar and Planetary Institute. Footer on every page: "C Meyer 2005".
+    The first page is marked DRAFT. 9 pages. Sample mass printed as 1864.3 grams.
+  year: 2005
+  url: https://www.lpi.usra.edu/lunar/samples/atlas/compendium/12022.pdf
+  corpus_asset: raw/lpi-compendium-12022/lpi-compendium-12022.pdf
+  corpus_sha256: d5ff753e28defbaf0eda04a3c5aebed994da3c45aa00842f09dbda390788ba07
+extraction:
+  method: >-
+    Manual transcription from the 9-page compendium PDF. Pages were rendered
+    at 200 dpi. Tables 1a and 1b were read cell-by-cell from the page-4 and
+    page-5 images and checked against pdftotext -layout. Blank cells are
+    omitted, not filled with zero. Technique letters are stored beside the
+    values they mark. The mineralogical mode on page 2 and the printed age,
+    C/S/N, and An range are retained as context. Figures 4–8 (plotted
+    compilations) are figure-only and were not digitised. Photographs
+    (Figs. 1–3, 9–13) are not treated as data figures. This file is a
+    secondary compilation of published analyses of Apollo 12 sample 12022,
+    not a primary vaporization experiment. Distinct from
+    smales-1971-lpsc-12022 (a 1971 conference abstract, not this compendium)
+    and from other lpi-compendium-<sample> extracts already on green.
+  date: '2026-11-12'
+  worker: empirical-b15-2026-11-12
+  provenance_path: raw/lpi-compendium-12022/
+review_status: draft
+fidelity_samples:
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.SiO2.Kushiro71
+  value: '42.33'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.SiO2.LSPET70
+  value: '36'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.SiO2.Engel71
+  value: '43.2'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.TiO2.Kushiro71
+  value: '4.54'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.TiO2.LSPET70
+  value: '5.1'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.TiO2.Engel71
+  value: '5.16'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.Al2O3.Kushiro71
+  value: '9.12'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.Al2O3.LSPET70
+  value: '11'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.Al2O3.Engel71
+  value: '9.04'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.FeO.Kushiro71
+  value: '22.06'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.FeO.LSPET70
+  value: '22'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.FeO.Engel71
+  value: '21.44'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.MnO.Kushiro71
+  value: '0.26'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.MnO.LSPET70
+  value: '0.17'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.MnO.Engel71
+  value: '0.25'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.MgO.Kushiro71
+  value: '11.58'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.MgO.LSPET70
+  value: '13'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.MgO.Engel71
+  value: '10.43'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.CaO.Kushiro71
+  value: '9.37'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.CaO.LSPET70
+  value: '11'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.CaO.Engel71
+  value: '9.56'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.Na2O.Kushiro71
+  value: '0.29'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.Na2O.LSPET70
+  value: '0.36'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.Na2O.Hubbard71
+  value: '0.24'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.Na2O.Engel71
+  value: '0.47'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.K2O.Kushiro71
+  value: '0.07'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.K2O.LSPET70
+  value: '0.068'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.K2O.Hubbard71
+  value: '0.065'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.K2O.Weismann75
+  value: '0.065'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.K2O.Murthy71
+  value: '0.051'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.K2O.Engel71
+  value: '0.07'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.P2O5.Kushiro71
+  value: '0.02'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.wt_percent.P2O5.Engel71
+  value: '0.13'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sc.LSPET70
+  value: '52'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sc.Engel71
+  value: '55'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sc.Taylor71
+  value: '55'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.V.LSPET70
+  value: '65'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.V.Engel71
+  value: '180'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.V.Taylor71
+  value: '150'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Cr.Kushiro71
+  value: '3831'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Cr.LSPET70
+  value: '2650'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Cr.Engel71
+  value: '3800'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Cr.Taylor71
+  value: '3300'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Co.LSPET70
+  value: '36'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Co.Engel71
+  value: '44'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Co.Taylor71
+  value: '52'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ni.LSPET70
+  value: '40'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ni.Engel71
+  value: '42'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ni.Taylor71
+  value: '42'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Cu.Engel71
+  value: '8'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Cu.Taylor71
+  value: '5'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Rb.LSPET70
+  value: '0.17'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Rb.Hubbard71
+  value: '0.738'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Rb.Weismann75
+  value: '0.738'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Rb.Murthy71
+  value: '0.819'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sr.LSPET70
+  value: '160'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sr.Hubbard71
+  value: '143'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sr.Weismann75
+  value: '143'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sr.Murthy71
+  value: '138'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sr.Engel71
+  value: '130'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sr.Taylor71
+  value: '140'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Y.LSPET70
+  value: '62'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Y.Engel71
+  value: '68'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Y.Taylor71
+  value: '64'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Zr.LSPET70
+  value: '160'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Zr.Engel71
+  value: '180'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Zr.Taylor71
+  value: '135'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Nb.Taylor71
+  value: '6'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sn.Taylor71
+  value: '0.39'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Cs.Taylor71
+  value: '0.03'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ba.LSPET70
+  value: '38'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ba.Weismann75
+  value: '59.5'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ba.Murthy71
+  value: '148'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ba.Engel71
+  value: '70'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ba.Taylor71
+  value: '60'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.La.Haskin71
+  value: '5.81'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.La.Taylor71
+  value: '6.3'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ce.Hubbard71
+  value: '17.4'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ce.Weismann75
+  value: '17.4'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ce.Haskin71
+  value: '16.7'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ce.Taylor71
+  value: '19'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Pr.Taylor71
+  value: '3'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Nd.Hubbard71
+  value: '14.4'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Nd.Weismann75
+  value: '14.4'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Nd.Haskin71
+  value: '19'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Nd.Taylor71
+  value: '16'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sm.Hubbard71
+  value: '5.38'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sm.Weismann75
+  value: '5.38'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sm.Haskin71
+  value: '6.31'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Sm.Taylor71
+  value: '6.4'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Eu.Hubbard71
+  value: '1.26'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Eu.Weismann75
+  value: '1.26'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Eu.Haskin71
+  value: '1.32'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Eu.Taylor71
+  value: '1.4'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Gd.Hubbard71
+  value: '7.71'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Gd.Weismann75
+  value: '7.71'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Gd.Haskin71
+  value: '9.2'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Gd.Taylor71
+  value: '9.7'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Tb.Haskin71
+  value: '1.56'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Tb.Taylor71
+  value: '1.8'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Dy.Hubbard71
+  value: '9.37'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Dy.Weismann75
+  value: '9.37'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Dy.Haskin71
+  value: '10.8'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Dy.Taylor71
+  value: '12'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ho.Haskin71
+  value: '1.87'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Ho.Taylor71
+  value: '3'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Er.Hubbard71
+  value: '5.42'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Er.Weismann75
+  value: '5.42'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Er.Haskin71
+  value: '5.8'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Er.Taylor71
+  value: '8.2'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Tm.Taylor71
+  value: '1.3'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Yb.Hubbard71
+  value: '5.69'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Yb.Weismann75
+  value: '5.06'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Yb.Haskin71
+  value: '5.34'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Yb.Engel71
+  value: '10'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Yb.Taylor71
+  value: '7.2'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Lu.Haskin71
+  value: '0.767'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Hf.Weismann75
+  value: '0.18'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Hf.Taylor71
+  value: '5.2'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Th.Taylor71
+  value: '0.75'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.Th.Tats71
+  value: '0.71'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.U.Taylor71
+  value: '0.17'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.composition.traces.U.Tats71
+  value: '0.198'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a cell as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.wt_percent.SiO2.Snyder97
+  value: '43.2'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.wt_percent.TiO2.Snyder97
+  value: '5.16'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.wt_percent.Al2O3.Snyder97
+  value: '9.04'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.wt_percent.FeO.Snyder97
+  value: '21.44'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.wt_percent.MnO.Snyder97
+  value: '0.25'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.wt_percent.MgO.Snyder97
+  value: '10.43'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.wt_percent.CaO.Snyder97
+  value: '9.56'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.wt_percent.Na2O.Snyder97
+  value: '0.47'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.wt_percent.K2O.Snyder97
+  value: '0.07'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.wt_percent.P2O5.Snyder97
+  value: '0.13'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Cr.Snyder97
+  value: '3300'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Co.Snyder97
+  value: '52.6'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Ni.Snyder97
+  value: '47.4'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Cu.Snyder97
+  value: '17.6'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Zn.Baedecker71
+  value: '2'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Zn.Snyder97
+  value: '11.5'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Ga.Baedecker71
+  value: '3.9'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Ga.Snyder97
+  value: '4.24'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Rb.Snyder97
+  value: '0.841'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Sr.Snyder97
+  value: '142.5'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Y.Snyder97
+  value: '64.2'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Zr.Snyder97
+  value: '160.1'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Nb.Snyder97
+  value: '7.04'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Ag.Snyder97
+  value: '105'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Cd.Baedecker71
+  value: '6.4'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.In.Baedecker71
+  value: '1.6'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Cs.Snyder97
+  value: '0.058'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Ba.Snyder97
+  value: '58.4'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.La.Snyder97
+  value: '6.5'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Ce.Snyder97
+  value: '17.9'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Pr.Snyder97
+  value: '3.35'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Nd.Snyder97
+  value: '19.2'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Sm.Snyder97
+  value: '6.58'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Eu.Snyder97
+  value: '1.45'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Gd.Snyder97
+  value: '7.94'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Tb.Snyder97
+  value: '1.66'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Dy.Snyder97
+  value: '10.39'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Ho.Snyder97
+  value: '2.1'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Er.Snyder97
+  value: '5.81'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Tm.Snyder97
+  value: '0.82'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Yb.Snyder97
+  value: '5.36'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Lu.Snyder97
+  value: '0.78'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Ta.Snyder97
+  value: '0.381'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Ir.Baedecker71
+  value: '0.09'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.Th.Snyder97
+  value: '0.987'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.composition.traces.U.Snyder97
+  value: '0.28'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b cell as printed on page 5.'}
+
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.sample
+  value: 'Apollo_12_12022'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.table_reference_columns[0]
+  value: 'Kushiro71'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.table_reference_columns[1]
+  value: 'LSPET70'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.table_reference_columns[2]
+  value: 'Hubbard71'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.table_reference_columns[3]
+  value: 'Weismann75'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.table_reference_columns[4]
+  value: 'Murthy71'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.table_reference_columns[5]
+  value: 'Haskin71'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.table_reference_columns[6]
+  value: 'Engel71'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.table_reference_columns[7]
+  value: 'Taylor71'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.table_reference_columns[8]
+  value: 'Tats71'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.aliquot_masses_as_printed.Kushiro71
+  value: '1 g'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.aliquot_masses_as_printed.Hubbard71
+  value: '188 mg'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.aliquot_masses_as_printed.Weismann75
+  value: '188 mg'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1a_chemical_composition].values.header_spelling_note
+  value: 'The Table 1a header prints Weismann75. The Figure 6 caption on page 6 cites Wiesman
+  et al. 1975. Both spellings are retained as printed in their locators. S% and sum
+  rows are blank for every column and are not filled.'
+  locator: {published_page: 4, pdf_page_index: 3, table: '1a', note: 'Table 1a header and metadata as printed on page 4.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.sample
+  value: 'Apollo_12_12022'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b header and metadata as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.table_reference_columns[0]
+  value: 'Baedecker71'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b header and metadata as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.table_reference_columns[1]
+  value: 'Snyder97'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b header and metadata as printed on page 5.'}
+- path: species.lunar_sample_12022.observations[lpi_12022_table1b_chemical_composition].values.note
+  value: 'The Snyder97 major-element values are identical to the Engel71 majors in Table 1a,
+  as printed. Weight cells are blank. S% and sum rows are blank. Blank trace cells
+  are omitted.'
+  locator: {published_page: 5, pdf_page_index: 4, table: '1b', note: 'Table 1b header and metadata as printed on page 5.'}
+
+species:
+  lunar_sample_12022:
+    observations:
+    - observation_id: lpi_12022_table1a_chemical_composition
+      type: composition_series
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        table: '1a'
+        section: Chemistry
+      units: as_published
+      values:
+        quantity: chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        sample: Apollo_12_12022
+        table_reference_columns: [Kushiro71, LSPET70, Hubbard71, Weismann75, Murthy71, Haskin71, Engel71, Taylor71, Tats71]
+        aliquot_masses_as_printed:
+          Kushiro71: 1 g
+          Hubbard71: 188 mg
+          Weismann75: 188 mg
+        technique_markers:
+          a: conventional wet
+          b: IDMS
+          c: INAA
+          d: SSMS
+          e: RNAA
+        header_spelling_note: >-
+          The Table 1a header prints Weismann75. The Figure 6 caption on
+          page 6 cites Wiesman et al. 1975. Both spellings are retained as
+          printed in their locators. S% and sum rows are blank for every
+          column and are not filled.
+        composition:
+          wt_percent:
+            SiO2:
+              Kushiro71: '42.33'
+              Kushiro71_technique: a
+              LSPET70: '36'
+              Engel71: '43.2'
+              Engel71_technique: a
+            TiO2:
+              Kushiro71: '4.54'
+              Kushiro71_technique: a
+              LSPET70: '5.1'
+              Engel71: '5.16'
+              Engel71_technique: a
+            Al2O3:
+              Kushiro71: '9.12'
+              Kushiro71_technique: a
+              LSPET70: '11'
+              Engel71: '9.04'
+              Engel71_technique: a
+            FeO:
+              Kushiro71: '22.06'
+              Kushiro71_technique: a
+              LSPET70: '22'
+              Engel71: '21.44'
+              Engel71_technique: a
+            MnO:
+              Kushiro71: '0.26'
+              Kushiro71_technique: a
+              LSPET70: '0.17'
+              Engel71: '0.25'
+              Engel71_technique: a
+            MgO:
+              Kushiro71: '11.58'
+              Kushiro71_technique: a
+              LSPET70: '13'
+              Engel71: '10.43'
+              Engel71_technique: a
+            CaO:
+              Kushiro71: '9.37'
+              Kushiro71_technique: a
+              LSPET70: '11'
+              Engel71: '9.56'
+              Engel71_technique: a
+            Na2O:
+              Kushiro71: '0.29'
+              Kushiro71_technique: a
+              LSPET70: '0.36'
+              Hubbard71: '0.24'
+              Engel71: '0.47'
+              Engel71_technique: a
+            K2O:
+              Kushiro71: '0.07'
+              Kushiro71_technique: a
+              LSPET70: '0.068'
+              Hubbard71: '0.065'
+              Hubbard71_technique: b
+              Weismann75: '0.065'
+              Weismann75_technique: b
+              Murthy71: '0.051'
+              Murthy71_technique: b
+              Engel71: '0.07'
+              Engel71_technique: a
+            P2O5:
+              Kushiro71: '0.02'
+              Kushiro71_technique: a
+              Engel71: '0.13'
+              Engel71_technique: a
+          traces:
+            Sc:
+              unit: ppm
+              LSPET70: '52'
+              Engel71: '55'
+              Taylor71: '55'
+              Taylor71_technique: d
+            V:
+              unit: ppm
+              LSPET70: '65'
+              Engel71: '180'
+              Taylor71: '150'
+              Taylor71_technique: d
+            Cr:
+              unit: ppm
+              Kushiro71: '3831'
+              Kushiro71_technique: a
+              LSPET70: '2650'
+              Engel71: '3800'
+              Taylor71: '3300'
+              Taylor71_technique: d
+            Co:
+              unit: ppm
+              LSPET70: '36'
+              Engel71: '44'
+              Taylor71: '52'
+              Taylor71_technique: d
+            Ni:
+              unit: ppm
+              LSPET70: '40'
+              Engel71: '42'
+              Taylor71: '42'
+              Taylor71_technique: d
+            Cu:
+              unit: ppm
+              Engel71: '8'
+              Taylor71: '5'
+              Taylor71_technique: d
+            Rb:
+              unit: ppm
+              LSPET70: '0.17'
+              Hubbard71: '0.738'
+              Hubbard71_technique: b
+              Weismann75: '0.738'
+              Weismann75_technique: b
+              Murthy71: '0.819'
+              Murthy71_technique: b
+            Sr:
+              unit: ppm
+              LSPET70: '160'
+              Hubbard71: '143'
+              Hubbard71_technique: b
+              Weismann75: '143'
+              Weismann75_technique: b
+              Murthy71: '138'
+              Murthy71_technique: b
+              Engel71: '130'
+              Taylor71: '140'
+              Taylor71_technique: d
+            Y:
+              unit: ppm
+              LSPET70: '62'
+              Engel71: '68'
+              Taylor71: '64'
+              Taylor71_technique: d
+            Zr:
+              unit: ppm
+              LSPET70: '160'
+              Engel71: '180'
+              Taylor71: '135'
+              Taylor71_technique: d
+            Nb:
+              unit: ppm
+              Taylor71: '6'
+              Taylor71_technique: d
+            Sn:
+              unit: ppb
+              Taylor71: '0.39'
+              Taylor71_technique: d
+            Cs:
+              unit: ppm
+              Taylor71: '0.03'
+              Taylor71_technique: d
+            Ba:
+              unit: ppm
+              LSPET70: '38'
+              Weismann75: '59.5'
+              Weismann75_technique: b
+              Murthy71: '148'
+              Murthy71_technique: b
+              Engel71: '70'
+              Taylor71: '60'
+              Taylor71_technique: d
+            La:
+              unit: ppm
+              Haskin71: '5.81'
+              Haskin71_technique: c
+              Taylor71: '6.3'
+              Taylor71_technique: d
+            Ce:
+              unit: ppm
+              Hubbard71: '17.4'
+              Hubbard71_technique: b
+              Weismann75: '17.4'
+              Weismann75_technique: b
+              Haskin71: '16.7'
+              Haskin71_technique: c
+              Taylor71: '19'
+              Taylor71_technique: d
+            Pr:
+              unit: ppm
+              Taylor71: '3'
+              Taylor71_technique: d
+            Nd:
+              unit: ppm
+              Hubbard71: '14.4'
+              Hubbard71_technique: b
+              Weismann75: '14.4'
+              Weismann75_technique: b
+              Haskin71: '19'
+              Haskin71_technique: c
+              Taylor71: '16'
+              Taylor71_technique: d
+            Sm:
+              unit: ppm
+              Hubbard71: '5.38'
+              Hubbard71_technique: b
+              Weismann75: '5.38'
+              Weismann75_technique: b
+              Haskin71: '6.31'
+              Haskin71_technique: c
+              Taylor71: '6.4'
+              Taylor71_technique: d
+            Eu:
+              unit: ppm
+              Hubbard71: '1.26'
+              Hubbard71_technique: b
+              Weismann75: '1.26'
+              Weismann75_technique: b
+              Haskin71: '1.32'
+              Haskin71_technique: c
+              Taylor71: '1.4'
+              Taylor71_technique: d
+            Gd:
+              unit: ppm
+              Hubbard71: '7.71'
+              Hubbard71_technique: b
+              Weismann75: '7.71'
+              Weismann75_technique: b
+              Haskin71: '9.2'
+              Haskin71_technique: c
+              Taylor71: '9.7'
+              Taylor71_technique: d
+            Tb:
+              unit: ppm
+              Haskin71: '1.56'
+              Haskin71_technique: c
+              Taylor71: '1.8'
+              Taylor71_technique: d
+            Dy:
+              unit: ppm
+              Hubbard71: '9.37'
+              Hubbard71_technique: b
+              Weismann75: '9.37'
+              Weismann75_technique: b
+              Haskin71: '10.8'
+              Haskin71_technique: c
+              Taylor71: '12'
+              Taylor71_technique: d
+            Ho:
+              unit: ppm
+              Haskin71: '1.87'
+              Haskin71_technique: c
+              Taylor71: '3'
+              Taylor71_technique: d
+            Er:
+              unit: ppm
+              Hubbard71: '5.42'
+              Hubbard71_technique: b
+              Weismann75: '5.42'
+              Weismann75_technique: b
+              Haskin71: '5.8'
+              Haskin71_technique: c
+              Taylor71: '8.2'
+              Taylor71_technique: d
+            Tm:
+              unit: ppm
+              Taylor71: '1.3'
+              Taylor71_technique: d
+            Yb:
+              unit: ppm
+              Hubbard71: '5.69'
+              Hubbard71_technique: b
+              Weismann75: '5.06'
+              Weismann75_technique: b
+              Haskin71: '5.34'
+              Haskin71_technique: c
+              Engel71: '10'
+              Taylor71: '7.2'
+              Taylor71_technique: d
+            Lu:
+              unit: ppm
+              Haskin71: '0.767'
+              Haskin71_technique: c
+            Hf:
+              unit: ppm
+              Weismann75: '0.18'
+              Weismann75_technique: b
+              Taylor71: '5.2'
+              Taylor71_technique: d
+            Th:
+              unit: ppm
+              Taylor71: '0.75'
+              Taylor71_technique: d
+              Tats71: '0.71'
+              Tats71_technique: b
+            U:
+              unit: ppm
+              Taylor71: '0.17'
+              Taylor71_technique: d
+              Tats71: '0.198'
+              Tats71_technique: b
+    - observation_id: lpi_12022_table1b_chemical_composition
+      type: composition_series
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        table: '1b'
+        section: Chemistry
+      units: as_published
+      values:
+        quantity: chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        sample: Apollo_12_12022
+        table_reference_columns: [Baedecker71, Snyder97]
+        technique_markers:
+          e: RNAA
+          f: ICP-MS
+        note: >-
+          The Snyder97 major-element values are identical to the Engel71
+          majors in Table 1a, as printed. Weight cells are blank. S% and
+          sum rows are blank. Blank trace cells are omitted.
+        composition:
+          wt_percent:
+            SiO2:
+              Snyder97: '43.2'
+            TiO2:
+              Snyder97: '5.16'
+            Al2O3:
+              Snyder97: '9.04'
+            FeO:
+              Snyder97: '21.44'
+            MnO:
+              Snyder97: '0.25'
+            MgO:
+              Snyder97: '10.43'
+            CaO:
+              Snyder97: '9.56'
+            Na2O:
+              Snyder97: '0.47'
+            K2O:
+              Snyder97: '0.07'
+            P2O5:
+              Snyder97: '0.13'
+          traces:
+            Cr:
+              unit: ppm
+              Snyder97: '3300'
+              Snyder97_technique: f
+            Co:
+              unit: ppm
+              Snyder97: '52.6'
+              Snyder97_technique: f
+            Ni:
+              unit: ppm
+              Snyder97: '47.4'
+              Snyder97_technique: f
+            Cu:
+              unit: ppm
+              Snyder97: '17.6'
+              Snyder97_technique: f
+            Zn:
+              unit: ppm
+              Baedecker71: '2'
+              Baedecker71_technique: e
+              Snyder97: '11.5'
+              Snyder97_technique: f
+            Ga:
+              unit: ppm
+              Baedecker71: '3.9'
+              Baedecker71_technique: e
+              Snyder97: '4.24'
+              Snyder97_technique: f
+            Rb:
+              unit: ppm
+              Snyder97: '0.841'
+              Snyder97_technique: f
+            Sr:
+              unit: ppm
+              Snyder97: '142.5'
+              Snyder97_technique: f
+            Y:
+              unit: ppm
+              Snyder97: '64.2'
+              Snyder97_technique: f
+            Zr:
+              unit: ppm
+              Snyder97: '160.1'
+              Snyder97_technique: f
+            Nb:
+              unit: ppm
+              Snyder97: '7.04'
+              Snyder97_technique: f
+            Ag:
+              unit: ppb
+              Snyder97: '105'
+              Snyder97_technique: f
+            Cd:
+              unit: ppb
+              Baedecker71: '6.4'
+              Baedecker71_technique: e
+            In:
+              unit: ppb
+              Baedecker71: '1.6'
+              Baedecker71_technique: e
+            Cs:
+              unit: ppm
+              Snyder97: '0.058'
+              Snyder97_technique: f
+            Ba:
+              unit: ppm
+              Snyder97: '58.4'
+              Snyder97_technique: f
+            La:
+              unit: ppm
+              Snyder97: '6.5'
+              Snyder97_technique: f
+            Ce:
+              unit: ppm
+              Snyder97: '17.9'
+              Snyder97_technique: f
+            Pr:
+              unit: ppm
+              Snyder97: '3.35'
+              Snyder97_technique: f
+            Nd:
+              unit: ppm
+              Snyder97: '19.2'
+              Snyder97_technique: f
+            Sm:
+              unit: ppm
+              Snyder97: '6.58'
+              Snyder97_technique: f
+            Eu:
+              unit: ppm
+              Snyder97: '1.45'
+              Snyder97_technique: f
+            Gd:
+              unit: ppm
+              Snyder97: '7.94'
+              Snyder97_technique: f
+            Tb:
+              unit: ppm
+              Snyder97: '1.66'
+              Snyder97_technique: f
+            Dy:
+              unit: ppm
+              Snyder97: '10.39'
+              Snyder97_technique: f
+            Ho:
+              unit: ppm
+              Snyder97: '2.1'
+              Snyder97_technique: f
+            Er:
+              unit: ppm
+              Snyder97: '5.81'
+              Snyder97_technique: f
+            Tm:
+              unit: ppm
+              Snyder97: '0.82'
+              Snyder97_technique: f
+            Yb:
+              unit: ppm
+              Snyder97: '5.36'
+              Snyder97_technique: f
+            Lu:
+              unit: ppm
+              Snyder97: '0.78'
+              Snyder97_technique: f
+            Ta:
+              unit: ppm
+              Snyder97: '0.381'
+              Snyder97_technique: f
+            Ir:
+              unit: ppb
+              Baedecker71: '0.09'
+              Baedecker71_technique: e
+            Th:
+              unit: ppm
+              Snyder97: '0.987'
+              Snyder97_technique: f
+            U:
+              unit: ppm
+              Snyder97: '0.28'
+              Snyder97_technique: f
+    context:
+    - observation_id: lpi_12022_sample_mass_class_and_age
+      type: characterization
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: named_sample_identity
+        method_class: secondary_compilation
+        sample_mass_as_printed: 1864.3 grams
+        classification_as_printed: Neal et al. (1994) classify 12022 as an ilmenite basalt while James and Wright (1972) had termed it an ilmenite-bearing olivine basalt.
+        intro_age_as_printed: It has been dated at 3.2 b.y.
+        argon_plateau_age_as_printed: 3.18 ±0.04 b.y.
+        argon_plateau_attribution: Alexander et al. (1972) determined an age for 12022 of 3.18 ±0.04 b.y. by the Argon plateau method.
+        argon_plateau_locator: {published_page: 3, pdf_page_index: 2, section: 'Radiogenic age dating'}
+        exposure_ages_as_printed: 'Not reported !'
+        exposure_locator: {published_page: 3, pdf_page_index: 2, section: 'Cosmogenic isotopes and exposure ages'}
+    - observation_id: lpi_12022_mineralogical_mode
+      type: characterization
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Mineralogical Mode of 12022
+      units: as printed (volume percent implied by a mineralogical mode; the table does not print a unit)
+      values:
+        quantity: mineralogical_mode
+        method_class: secondary_compilation
+        columns_as_printed: [McGee et al. 1977, Neal et al. 1994, Brett et al. 1971]
+        mode:
+          Olivine: {McGee_et_al_1977: 16-33, Neal_et_al_1994: '19.5', Brett_et_al_1971: '16.5'}
+          Pyroxene: {McGee_et_al_1977: 30-59, Neal_et_al_1994: '56', Brett_et_al_1971: '58.6'}
+          Plagioclase: {McGee_et_al_1977: 12-26, Neal_et_al_1994: '12.2', Brett_et_al_1971: '12'}
+          Opaques: {McGee_et_al_1977: 9-23, Neal_et_al_1994: '~9', Brett_et_al_1971: '11.2'}
+          silica: {Neal_et_al_1994: '0.2', label_as_printed: '"silica"'}
+          mesostasis: {McGee_et_al_1977: '1', Neal_et_al_1994: '2.3', Brett_et_al_1971: '1.6'}
+        plagioclase_An_as_printed: Plagioclase is An91-85.
+        grain_sizes_as_printed: subhedral olivine (0.3 mm) and pyroxene (1-2 mm) phenocrysts; feldspar tablets (0.05-1 mm); subrounded ilmenite laths (0.03-0.2 mm); anhedral pyroxene crystals (0.6-0.8 mm)
+    - observation_id: lpi_12022_carbon_sulfur_nitrogen
+      type: characterization
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        section: Chemistry
+      units: ppm
+      values:
+        quantity: cited_C_S_N_abundances
+        method_class: secondary_compilation
+        Kaplan_and_Petrowski_1971_as_printed: about 20 ppm carbon and 800 ppm sulfur
+        Moore_et_al_1971_as_printed: about 40 ppm carbon and 44 ppm nitrogen
+        Rees_and_Thode_1972_as_printed: 914 ppm sulfur
+        gibson_hubbard_1972_mention: Gibson and Hubbard (1972) experimentally studied the volatile depletion for 12022 (no numeric results are reprinted here).
+        gibson_mention_locator: {published_page: 6, pdf_page_index: 5, section: 'Other Studies'}
+    - observation_id: lpi_12022_data_figures
+      type: figure_record
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        figure: '4–8'
+      units: as printed
+      values:
+        quantity: compiled_composition_and_exposure_figures
+        method_class: figure_only
+        evidence_class: figure_only
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        figures_as_printed:
+        - {id: '4', page: 3, caption: 'Pyroxene and olivine composition for 12022 (adapted from Weill et al. 1971, Brett et al. 1971).'}
+        - {id: '5', page: 3, caption: 'Histogram of Ni conentrations of metal grains in 7 lunar samples (lifted from Brett et al. 1971).', caption_spelling: 'conentrations as printed'}
+        - {id: '6', page: 6, caption: 'Comparison of rare-earth-element composition of 12022 by neutron activation analysis (Haskin et al. 1971) and spark-source mass spectroscopy (Taylor et al. 1971) with isotope dilution mass spectroscopy (line, Hubbard and Gast 1971, Wiesman et al. 1975).'}
+        - {id: '7', page: 6, caption: 'Composition of 12022 compared with that of other lunar basalts.'}
+        - {id: '8', page: 6, caption: 'Track density as function of depth in 12022 (from Barber et al. 1971).'}
+        note: No points were digitised from these compiled figures.
