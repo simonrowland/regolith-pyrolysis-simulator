@@ -87,6 +87,7 @@ BASELINES_PATH = (
 REGEN_ENV = "RPS_T512_REGEN_ROLLUP"
 _COLLECTED_ADOPTED_OBSERVATIONS: tuple[AdoptedObservation, ...] | None = None
 _COLLECTED_ADOPTED_OBSERVATIONS_ERROR: SystemExit | None = None
+_BATTERY_EVALUATION_BUILD_COUNT = 0
 
 
 def test_melt_observation_oxygen_admission_and_exact_cache(vapor_pressure_data, monkeypatch):
@@ -122,6 +123,20 @@ def _baseline_pin_key(point: dict) -> tuple[str, str]:
     return (str(point["case_id"]), str(point["key"]))
 
 
+def _evaluation_for_observation_id(
+    evaluations: tuple[ObservationEvaluation, ...], observation_id: str
+) -> ObservationEvaluation:
+    matches = [
+        evaluation
+        for evaluation in evaluations
+        if evaluation.observation.observation_id == observation_id
+    ]
+    assert len(matches) == 1, (
+        f"expected one battery evaluation for {observation_id}, got {len(matches)}"
+    )
+    return matches[0]
+
+
 @pytest.fixture(scope="module")
 def vapor_pressure_data() -> dict:
     return load_vapor_pressure_data()
@@ -149,11 +164,21 @@ def test_legacy_table_species_scalar_is_ignored_by_raw_observation_index(monkeyp
 @pytest.fixture(scope="module")
 def battery_evaluations(
     adopted_observations: tuple[AdoptedObservation, ...], vapor_pressure_data
-):
-    return [
+) -> tuple[ObservationEvaluation, ...]:
+    global _BATTERY_EVALUATION_BUILD_COUNT
+    _BATTERY_EVALUATION_BUILD_COUNT += 1
+    assert _BATTERY_EVALUATION_BUILD_COUNT == 1, (
+        "battery evaluations were rebuilt in one worker"
+    )
+    return tuple(
         evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
         for obs in adopted_observations
-    ]
+    )
+
+
+def test_battery_evaluations_are_built_once_per_worker(battery_evaluations) -> None:
+    assert isinstance(battery_evaluations, tuple)
+    assert _BATTERY_EVALUATION_BUILD_COUNT == 1
 
 
 @pytest.fixture(scope="module")
@@ -837,17 +862,10 @@ def test_coverage_primary_prefers_typed_refusal_over_point_drop() -> None:
 
 
 def test_wetzel_stale_duplicate_hits_system_class_and_form_gate(
-    adopted_observations: tuple[AdoptedObservation, ...],
+    battery_evaluations: tuple[ObservationEvaluation, ...],
 ) -> None:
-    observation = next(
-        row
-        for row in adopted_observations
-        if row.source_id == "wetzel-gail-2013-sio-arrhenius"
-        and row.observation_id == "wetzel_gail_2013_sio_arrhenius"
-    )
-    evaluation = evaluate_observation(
-        observation,
-        vapor_pressure_data=load_vapor_pressure_data(),
+    evaluation = _evaluation_for_observation_id(
+        battery_evaluations, "wetzel_gail_2013_sio_arrhenius"
     )
     assert not any(
         record.status in {"match", "mismatch"} for record in evaluation.records
@@ -1645,17 +1663,9 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
 def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
     observation_id: str,
     skip_reason: str,
-    adopted_observations: tuple[AdoptedObservation, ...],
+    battery_evaluations: tuple[ObservationEvaluation, ...],
 ) -> None:
-    observation = next(
-        row
-        for row in adopted_observations
-        if row.observation_id == observation_id
-    )
-    evaluation = evaluate_observation(
-        observation,
-        vapor_pressure_data=load_vapor_pressure_data(),
-    )
+    evaluation = _evaluation_for_observation_id(battery_evaluations, observation_id)
     assert not any(r.status in SCORING_STATUSES for r in evaluation.records)
     assert evaluation.skip_reason == skip_reason
     assert evaluation.skip_reasons == [skip_reason]
@@ -1663,6 +1673,7 @@ def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
 
 def test_wetzel_model_tables_refuse_as_model_output(
     adopted_observations: tuple[AdoptedObservation, ...],
+    battery_evaluations: tuple[ObservationEvaluation, ...],
 ) -> None:
     # PARENT RULE (b-483): the six quoted-model parents stay byte-identical
     # rate_series containers and are superseded; the retype lives on the
@@ -1690,9 +1701,8 @@ def test_wetzel_model_tables_refuse_as_model_output(
             observation.values["admission_status"]
             == "model_output_not_measurement"
         )
-        evaluation = evaluate_observation(
-            observation,
-            vapor_pressure_data=load_vapor_pressure_data(),
+        evaluation = _evaluation_for_observation_id(
+            battery_evaluations, observation.observation_id
         )
         assert evaluation.records
         assert not any(r.status in SCORING_STATUSES for r in evaluation.records)
@@ -1723,14 +1733,11 @@ def test_transition_point_is_an_adopted_target_type(
 
 
 def test_melting_point_is_typed_refusal_not_a_fabricated_psat(
-    vapor_pressure_data, adopted_observations: tuple[AdoptedObservation, ...]
+    battery_evaluations: tuple[ObservationEvaluation, ...],
 ) -> None:
-    obs = next(
-        row
-        for row in adopted_observations
-        if row.observation_id == "Na_melting_point"
+    evaluation = _evaluation_for_observation_id(
+        battery_evaluations, "Na_melting_point"
     )
-    evaluation = evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
     assert evaluation.skip_reason == "typed-refusal:no_engine_melting_point_model"
     assert evaluation.records
     assert all(r.status != "match" for r in evaluation.records)
@@ -1738,14 +1745,11 @@ def test_melting_point_is_typed_refusal_not_a_fabricated_psat(
 
 
 def test_normal_boiling_point_inverts_antoine_in_kelvin(
-    vapor_pressure_data, adopted_observations: tuple[AdoptedObservation, ...]
+    battery_evaluations: tuple[ObservationEvaluation, ...],
 ) -> None:
-    obs = next(
-        row
-        for row in adopted_observations
-        if row.observation_id == "Na_normal_boiling_point"
+    evaluation = _evaluation_for_observation_id(
+        battery_evaluations, "Na_normal_boiling_point"
     )
-    evaluation = evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
     comparable = [r for r in evaluation.records if r.status in {"match", "mismatch"}]
     assert comparable, evaluation.skip_reason
     record = comparable[0]
