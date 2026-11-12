@@ -326,6 +326,48 @@ def test_openimcc_cell_notice_record_kinds_are_classified_separately() -> None:
     ]
 
 
+def test_qualification_band_notice_is_stable_to_mapping_order() -> None:
+    first_band = {
+        "sio2_wt_pct": [30.0, 80.0],
+        "temperature_K": [1073.15, 1700.0],
+        "sio2_crash_floor_wt_pct": 34.0,
+        "citations": {
+            "sio2_band": "domain band",
+            "temperature_K": "temperature source",
+        },
+    }
+    reordered_band = {
+        "citations": {
+            "temperature_K": "temperature source",
+            "sio2_band": "domain band",
+        },
+        "sio2_crash_floor_wt_pct": 34.0,
+        "temperature_K": [1073.15, 1700.0],
+        "sio2_wt_pct": [30.0, 80.0],
+    }
+
+    def scored_band(band):
+        scored = cell_notices(
+            Quantity.ACTIVITY,
+            Engine.ALPHAMELTS,
+            types.SimpleNamespace(
+                notices=[
+                    {
+                        "kind": "melts_domain_gate",
+                        "certified_band": band,
+                        "gate_reason": "outside certified band",
+                    }
+                ]
+            ),
+        )
+        notice = next(
+            item for item in scored if item.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        )
+        return notice.band
+
+    assert scored_band(first_band) == scored_band(reordered_band)
+
+
 def test_scoring_envelope_uses_cell_flag() -> None:
     handle = open_battery_engine("openimcc")
     handle.backend._gas = None

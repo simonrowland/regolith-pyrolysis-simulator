@@ -15,6 +15,7 @@ import importlib.metadata
 import importlib.util
 import json
 import os
+import shlex
 import socket
 import subprocess
 import sys
@@ -44,6 +45,7 @@ from simulator.battery.pins import (  # noqa: E402
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
     _append_nasa9_fit_comparison_stratum,
+    _score_shard_failure_report_lines,
     _render_score_report_from_payloads_legacy,
     _ResidualJsonlRows,
     _count_residuals_jsonl,
@@ -161,10 +163,21 @@ def _measured_report(payload: Mapping[str, object]) -> str:
                 f"{(metric.get('flagged') or {}).get('median_abs') or '—'} | {refusal} |"
             )
     lines.append("")
+    failures = payload.get("score_shard_failures") or ()
+    if failures:
+        lines.extend(_score_shard_failure_report_lines(failures))
+        lines.append("")
     return "\n".join(lines)
 
 
-def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
+def _run_measured_headline(
+    root: Path,
+    engines: tuple,
+    context=None,
+    *,
+    workers: int = 1,
+    engine_cache_path: Path | None = None,
+) -> int:
     started_wall = time.perf_counter()
     started_cpu = time.process_time()
     print("loading measured-tier score context", flush=True)
@@ -177,10 +190,15 @@ def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
     }
     handles: dict[str, object] = {}
     openimcc_handle = None
+    close_engine_handle = None
     try:
         if any(engine.value == "openimcc" for engine in engines):
-            from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
+            from simulator.diagnostic_helpers.binary_pot_battery import (
+                close_battery_engine_handle,
+                open_battery_engine,
+            )
 
+            close_engine_handle = close_battery_engine_handle
             openimcc_install = _openimcc_install_identity()
             print(
                 "openimcc install: "
@@ -195,6 +213,13 @@ def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
                 getattr(openimcc_handle, "identity", {}) or {}
             )
             engine_identities["openimcc"]["installation"] = openimcc_install
+        score_handles = handles
+        if workers > 1:
+            if openimcc_handle is not None:
+                assert close_engine_handle is not None
+                close_engine_handle(openimcc_handle)
+                openimcc_handle = None
+            score_handles = {}
         written, metadata = _score_store_to_jsonl(
             context,
             residuals_path,
@@ -202,7 +227,8 @@ def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
             root=root,
             include_diagnostics=False,
             measured_only=True,
-            handles=handles,
+            handles=score_handles,
+            workers=workers,
         )
         residuals = _ResidualJsonlRows(
             residuals_partial,
@@ -231,7 +257,16 @@ def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
             "process_cpu_seconds": round(time.process_time() - started_cpu, 3),
             "load_average": load_average,
             "records": records,
+            "engine_cache": _engine_cache_summary(
+                engine_cache_path,
+                local_counters=metadata.engine_cache_counters,
+                local_runtime_identities=metadata.engine_cache_runtime_identities,
+            ),
         }
+        if metadata.shard_failures:
+            payload["score_shard_failures"] = [
+                dict(failure) for failure in metadata.shard_failures
+            ]
         summary_path = battery / "score-summary.json"
         summary_partial = summary_path.with_name(summary_path.name + ".partial")
         report_path = battery / "score-report.md"
@@ -256,11 +291,8 @@ def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
         os.replace(residuals_partial, residuals_path)
         return 0
     finally:
-        if openimcc_handle is not None:
-            backend = getattr(openimcc_handle, "backend", None)
-            close = getattr(backend, "close", None)
-            if callable(close):
-                close()
+        if openimcc_handle is not None and close_engine_handle is not None:
+            close_engine_handle(openimcc_handle)
 
 
 def _progress_wait(proc: subprocess.Popen[str], *, label: str) -> int:
@@ -274,34 +306,46 @@ def _progress_wait(proc: subprocess.Popen[str], *, label: str) -> int:
 
 
 def _run_studio(
-    engines: list[str], extra: list[str]
-) -> tuple[str | None, Path | None]:
+    engines: list[str], extra: list[str], *, engine_cache_path: Path | None = None
+) -> tuple[str | None, Path | None, dict[str, object] | None]:
     """Dispatch MELTS engines to Studio 1. Prints a progress line every 60 s."""
 
     remote_root = "/tmp/battery-score-impl-chunk2"
     print(f"rsync worktree → {STUDIO_HOST}:{remote_root}", flush=True)
-    rsync = subprocess.run(
-        [
-            "rsync",
-            "-a",
-            "--delete",
-            "--exclude",
-            ".venv",
-            "--exclude",
-            ".git",
-            "--exclude",
-            "__pycache__",
-            f"{ROOT}/",
-            f"{STUDIO_HOST}:{remote_root}/",
-        ],
-        check=False,
-    )
+    rsync_args = [
+        "rsync",
+        "-a",
+        "--delete",
+        "--exclude",
+        ".venv",
+        "--exclude",
+        ".git",
+        "--exclude",
+        "__pycache__",
+    ]
+    remote_cache_path = None
+    if engine_cache_path is not None:
+        resolved_cache_path = engine_cache_path.resolve()
+        try:
+            relative_cache_path = resolved_cache_path.relative_to(ROOT)
+        except ValueError:
+            remote_cache_path = str(engine_cache_path)
+        else:
+            remote_cache_path = relative_cache_path.as_posix()
+            rsync_args.extend(["--exclude", f"/{remote_cache_path}"])
+    rsync_args.extend([f"{ROOT}/", f"{STUDIO_HOST}:{remote_root}/"])
+    rsync = subprocess.run(rsync_args, check=False)
     if rsync.returncode != 0:
         print(f"studio rsync failed: {rsync.returncode}", flush=True)
-        return None, None
+        return None, None, None
     remote_py = "~/repos/regolith-pyrolysis-simulator/.venv/bin/python"
     engine_csv = ",".join(engines)
-    extra_args = " ".join(extra)
+    remote_extra = list(extra)
+    if remote_cache_path is not None:
+        remote_extra.extend(
+            ["--engine-cache", shlex.quote(remote_cache_path)]
+        )
+    extra_args = " ".join(remote_extra)
     remote = (
         f"hostname; "
         f"cd {remote_root} && "
@@ -334,7 +378,7 @@ def _run_studio(
     code = proc.wait()
     if code != 0:
         print(f"studio score failed: {code}", flush=True)
-        return hostname, None
+        return hostname, None, None
     subprocess.run(
         [
             "rsync",
@@ -371,7 +415,97 @@ def _run_studio(
     if copied.returncode != 0 or studio_comparisons_path.stat().st_size == 0:
         studio_comparisons_path.unlink(missing_ok=True)
         studio_comparisons_path = None
-    return hostname, studio_comparisons_path
+    studio_cache_summary = None
+    if remote_cache_path is not None:
+        remote_summary_path = f"{remote_root}/data/battery/score-summary.json"
+        summary = subprocess.run(
+            [
+                "ssh",
+                "-o",
+                "BatchMode=yes",
+                STUDIO_HOST,
+                f"cat {shlex.quote(remote_summary_path)}",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if summary.returncode == 0:
+            try:
+                remote_payload = json.loads(summary.stdout)
+                candidate = remote_payload.get("engine_cache")
+                if isinstance(candidate, dict):
+                    studio_cache_summary = candidate
+            except json.JSONDecodeError:
+                pass
+        if studio_cache_summary is None:
+            print("studio cache counters were unavailable", flush=True)
+    return hostname, studio_comparisons_path, studio_cache_summary
+
+
+def _engine_cache_summary(
+    cache_path: Path | None,
+    studio_cache_summary: Mapping[str, object] | None = None,
+    local_counters: Mapping[str, object] | None = None,
+    local_runtime_identities: Mapping[str, str] | None = None,
+) -> dict[str, object]:
+    engines = tuple(engine.value for engine in SCORE_ENGINE_SET)
+    by_engine: dict[str, dict[str, int]] = {
+        engine: {name: 0 for name in ("hits", "misses", "stores")}
+        for engine in engines
+    }
+    sources = [local_counters or {}]
+    if studio_cache_summary is not None:
+        studio_by_engine = studio_cache_summary.get("by_engine", {})
+        if isinstance(studio_by_engine, Mapping):
+            sources.append(studio_by_engine)
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        for engine, counts in source.items():
+            if not isinstance(counts, Mapping):
+                continue
+            target = by_engine.setdefault(str(engine), {"hits": 0, "misses": 0, "stores": 0})
+            for name in target:
+                value = counts.get(name, 0)
+                if isinstance(value, int):
+                    target[name] += value
+    runtime_identities = dict(local_runtime_identities or {})
+    if studio_cache_summary is not None:
+        studio_identities = studio_cache_summary.get("runtime_identities", {})
+        if isinstance(studio_identities, Mapping):
+            runtime_identities.update(
+                {str(engine): str(identity) for engine, identity in studio_identities.items()}
+            )
+    summary: dict[str, object] = {
+        "enabled": cache_path is not None or studio_cache_summary is not None,
+        "by_engine": by_engine,
+        "runtime_identities": runtime_identities,
+    }
+    if cache_path is not None:
+        summary["path"] = str(cache_path)
+    if studio_cache_summary is not None:
+        summary["studio_path"] = studio_cache_summary.get("path")
+    return summary
+
+
+def _attach_engine_cache_summary(
+    path: Path,
+    cache_path: Path | None,
+    studio_cache_summary: Mapping[str, object] | None = None,
+    local_counters: Mapping[str, object] | None = None,
+    local_runtime_identities: Mapping[str, str] | None = None,
+) -> None:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload["engine_cache"] = _engine_cache_summary(
+        cache_path,
+        studio_cache_summary,
+        local_counters,
+        local_runtime_identities,
+    )
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -385,6 +519,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--work", default=None, help="restrict to one work_id or source_id")
     parser.add_argument("--limit", type=int, default=None, help="max observations")
     parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="spawn this many scorer processes (default: 1)",
+    )
+    parser.add_argument(
         "--studio",
         action="store_true",
         help="dispatch MELTS engines (alphamelts/thermoengine/magemin) to Studio 1",
@@ -395,6 +535,12 @@ def main(argv: list[str] | None = None) -> int:
         help="regenerate data/battery/pins.yaml from legacy pin sources (not residuals)",
     )
     parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument(
+        "--engine-cache",
+        type=Path,
+        default=None,
+        help="reuse exact engine outputs from this SQLite cache file",
+    )
     parser.add_argument(
         "--measured-headline",
         action="store_true",
@@ -411,6 +557,15 @@ def main(argv: list[str] | None = None) -> int:
         help="accept current source-derived decision-band minima into the ratchet file",
     )
     args = parser.parse_args(argv)
+    if args.workers < 1:
+        parser.error("--workers must be at least 1")
+
+    if args.engine_cache is not None:
+        os.environ["REGOLITH_ENGINE_CACHE"] = str(args.engine_cache.expanduser())
+    cache_path_value = os.environ.get("REGOLITH_ENGINE_CACHE")
+    engine_cache_path = (
+        None if not cache_path_value else Path(cache_path_value).expanduser()
+    )
 
     if args.update_band_ratchet:
         context = load_score_context(args.root)
@@ -422,7 +577,12 @@ def main(argv: list[str] | None = None) -> int:
     rail = None if args.rail is None else canonicalize_rail(args.rail)
 
     if args.measured_headline:
-        return _run_measured_headline(args.root, engines)
+        return _run_measured_headline(
+            args.root,
+            engines,
+            workers=args.workers,
+            engine_cache_path=engine_cache_path,
+        )
 
     if args.write_pins:
         payload = migrate_pin_records(args.root)
@@ -491,6 +651,7 @@ def main(argv: list[str] | None = None) -> int:
             origins=context.origins,
             store_stamp=recorded,
         )
+        _attach_engine_cache_summary(summary_partial_path, engine_cache_path)
         os.replace(summary_partial_path, summary_path)
         os.replace(report_partial_path, report_path)
         print(
@@ -503,6 +664,7 @@ def main(argv: list[str] | None = None) -> int:
     laptop = [e for e in engines if e.value not in {"alphamelts", "thermoengine", "magemin"}]
     studio_hostname = None
     studio_comparisons_path = None
+    studio_cache_summary = None
     studio_routed = False
     host = socket.gethostname()
     if args.studio and melts and STUDIO_HOST not in host and "studio" not in host.lower():
@@ -514,7 +676,15 @@ def main(argv: list[str] | None = None) -> int:
             extra.extend(["--work", args.work])
         if args.limit is not None:
             extra.extend(["--limit", str(args.limit)])
-        studio_hostname, studio_comparisons_path = _run_studio(melts, extra)
+        if args.workers > 1:
+            extra.extend(["--workers", str(args.workers)])
+        (
+            studio_hostname,
+            studio_comparisons_path,
+            studio_cache_summary,
+        ) = _run_studio(
+            melts, extra, engine_cache_path=engine_cache_path
+        )
         engines = tuple(laptop)
 
     context = load_score_context(args.root)
@@ -526,6 +696,7 @@ def main(argv: list[str] | None = None) -> int:
         rail=rail,
         work_id=args.work,
         limit=args.limit,
+        workers=args.workers,
     )
     partial_path = residuals_path.with_name(residuals_path.name + ".partial")
     payloads = _ResidualJsonlRows(
@@ -606,6 +777,7 @@ def main(argv: list[str] | None = None) -> int:
             studio_hostname=studio_hostname,
             store_stamp=recorded,
             _aggregate=report_aggregate,
+            shard_failures=metadata.shard_failures,
         )
         report = _append_nasa9_fit_comparison_stratum(
             report,
@@ -615,6 +787,14 @@ def main(argv: list[str] | None = None) -> int:
             report_aggregate,
             summary_partial_path,
             store_stamp=recorded,
+            shard_failures=metadata.shard_failures,
+        )
+        _attach_engine_cache_summary(
+            summary_partial_path,
+            engine_cache_path,
+            studio_cache_summary,
+            metadata.engine_cache_counters,
+            metadata.engine_cache_runtime_identities,
         )
         report_partial_path.write_text(report, encoding="utf-8")
         os.replace(summary_partial_path, summary_path)

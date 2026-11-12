@@ -218,7 +218,6 @@ def test_sossi_printed_mn_row_reaches_the_scored_retention_path() -> None:
             run_id: {"Mn": starting_ppm, "Ti": starting_ti_ppm}
         },
         buffered_fO2_log_by_experiment={run_id: buffered_fO2},
-        code_revision="test",
         engine="internal-analytical",
     )[0]
     cache = {

@@ -1,5 +1,8 @@
 """Knudsen extent anchors and a pre-refactor Langmuir numeric pin."""
 
+import multiprocessing
+import os
+import pickle
 import sys
 import math
 from dataclasses import replace
@@ -389,6 +392,34 @@ def _real_analytical_cmas_pressure(temperature_K, inventory=None, extra_channels
     return inventory, channels, pressure_model
 
 
+def _read_markova_residue_cache_in_fresh_process(
+    cache_path: str,
+    result_path: str,
+    temperature_K: float,
+    inventory: dict[str, float],
+) -> None:
+    os.environ["REGOLITH_ENGINE_CACHE"] = cache_path
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        internal_analytical_residue_vapor_pressure,
+    )
+
+    result = internal_analytical_residue_vapor_pressure(
+        core=battery._new_internal_analytical_core(),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=0.0,
+        composition_kg=None,
+        composition_mol=inventory,
+        fO2_log=0.0,
+        po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0),
+        include_diagnostic_shadows=False,
+    )
+    with open(result_path, "wb") as stream:
+        pickle.dump(result, stream)
+
+
 def test_internal_analytical_pressure_callback_covers_real_channels_and_oxygen():
     from pathlib import Path
     from simulator.chemistry.offgas_fo2 import _oxygen_atom_partial_pressure_bar
@@ -422,7 +453,9 @@ def test_oxygen_projection_failure_has_typed_pressure_reason(monkeypatch, failur
     from simulator.vapour_rail.nasa_cea import NasaCeaError
     monkeypatch.setattr(battery, "_new_internal_analytical_core", lambda: object())
     monkeypatch.setattr(battery, "_internal_analytical_vapor_pressure_adapter",
-                        lambda **kwargs: SimpleNamespace(vapor_pressures_Pa={}))
+                        lambda **kwargs: SimpleNamespace(
+                            vapor_pressures_Pa={}, diagnostics={}
+                        ))
     def fail(*args, **kwargs):
         raise (NasaCeaError("CEA domain") if failure_kind == "domain" else OSError("CEA extract"))
     monkeypatch.setattr(offgas_fo2, "_oxygen_atom_partial_pressure_bar", fail)
@@ -560,24 +593,65 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_keeps_exponent_refusa
     (1748.15, {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95}),
     (1749.15, {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93}),
 ))
-def test_markova_bracket_top_callback_zeroes_recorded_al_omission(temperature_K, wt):
-    """A recorded below-threshold Al pressure is zero, and the notice cites that proof."""
+def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
+    temperature_K,
+    wt,
+    tmp_path,
+    monkeypatch,
+):
+    """An uncached IA recomputation retains the recorded below-threshold proof."""
     from simulator.accounting.formulas import parse_formula
     from simulator.battery.enums import NoticeKind
+    from simulator import engine_cache
     from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        internal_analytical_residue_vapor_pressure,
+    )
+
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
     inventory, _channels, pressure = _real_analytical_cmas_pressure(temperature_K, inventory)
     predicted = pressure(inventory, 0.0)
-    response = battery._internal_analytical_vapor_pressure_adapter(
-        core=battery._new_internal_analytical_core(),
-        temperature_C=temperature_K - 273.15,
-        pressure_bar=0.0,
-        composition_kg=None,
-        composition_mol=inventory,
-        fO2_log=0.0,
-        po2_request=battery.Po2Request(mode=battery.PO2_COMMANDED, po2_bar=1.0),
-        include_diagnostic_shadows=False,
+    residue_request = {
+        "core": battery._new_internal_analytical_core(),
+        "temperature_C": temperature_K - 273.15,
+        "pressure_bar": 0.0,
+        "composition_kg": None,
+        "composition_mol": inventory,
+        "fO2_log": 0.0,
+        "po2_request": Po2Request(mode=PO2_COMMANDED, po2_bar=1.0),
+        "include_diagnostic_shadows": False,
+    }
+    response = internal_analytical_residue_vapor_pressure(**residue_request)
+    database = tmp_path / "markova-engine-cache.sqlite"
+    database.unlink(missing_ok=True)
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    engine_cache.engine_cache_counters(reset=True)
+    cold = internal_analytical_residue_vapor_pressure(**residue_request)
+    assert engine_cache.engine_cache_counters(reset=True).get(
+        "internal-analytical", {}
+    ) == {}
+    assert not database.exists()
+
+    result_path = tmp_path / "markova-warm-result.pkl"
+    context = multiprocessing.get_context("spawn")
+    process = context.Process(
+        target=_read_markova_residue_cache_in_fresh_process,
+        args=(str(database), str(result_path), temperature_K, inventory),
     )
+    process.start()
+    process.join(timeout=180)
+    if process.is_alive():
+        process.terminate()
+        process.join()
+        pytest.fail("fresh-process Markova cache hit timed out")
+    assert process.exitcode == 0
+    with result_path.open("rb") as stream:
+        warm = pickle.load(stream)
+
+    assert response == cold == warm
     omissions = response.diagnostics["vapor_pressure_diagnostic"]["below_reporting_threshold_omissions"]
     record = omissions["Al"]
     assert "Al" not in response.vapor_pressures_Pa

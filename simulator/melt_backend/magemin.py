@@ -94,6 +94,7 @@ library is called.
 from __future__ import annotations
 
 import builtins
+import copy
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
 from decimal import Decimal, InvalidOperation
@@ -1620,6 +1621,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
             if pool_size <= 0:
                 raise ValueError('MAGEMin warm_pool_size must be positive')
+            worker_config = copy.deepcopy(self._config)
 
             def worker_factory(index: int) -> WarmEngineWorker:
                 return WarmEngineWorker(
@@ -1629,7 +1631,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     bootstrap_args=(
                         str(binary_path.resolve()),
                         self._database,
-                        self._config,
+                        worker_config,
                     ),
                     startup_timeout_s=startup_timeout_s,
                     call_timeout_s=warm_timeout_s,
@@ -1662,6 +1664,27 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
     def is_available(self) -> bool:
         return self._available
+
+    def _effective_worker_configuration(
+        self,
+    ) -> tuple[str, Mapping[str, Any]]:
+        """Return the database and configuration used by the active bridge."""
+        pool = self._subprocess_pool
+        if self._bridge == 'subprocess' and pool is not None and pool.workers:
+            bootstrap_args = pool.workers[0]._bootstrap_args
+            return str(bootstrap_args[1]), bootstrap_args[2]
+        return self._database, self._config
+
+    def _effective_database(self) -> str:
+        """Return the database used by both parent projection and worker calls."""
+        return self._effective_worker_configuration()[0]
+
+    def _effective_fO2_buffer(self) -> str:
+        configured = self._effective_worker_configuration()[1].get('fO2_buffer')
+        if configured is None:
+            return 'qfm'
+        name = str(configured).lower().strip()
+        return name if name in self._BUFFER_CHOICES else 'qfm'
 
     def get_vapor_species(self) -> List[str]:
         # MAGEMin does not compute vapor speciation.  Returning an empty
@@ -2462,7 +2485,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                                 str(resolved_binary_path),
                                 '--version',
                                 '--db',
-                                self._database,
+                            self._effective_database(),
                             ],
                             cwd=tmpdir,
                             capture_output=True,
@@ -2755,7 +2778,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             'fO2_log': fO2_log,
             'buffer': buffer_name,
             'buffer_n': buffer_n,
-            'database': self._database,
+            'database': self._effective_database(),
             'argv': args,
         }
         return self._encode_magemin_timeout_diagnostic(payload)
@@ -2793,7 +2816,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'fO2_log': fO2_log,
                     'buffer': None,
                     'buffer_n': None,
-                    'database': self._database,
+                    'database': self._effective_database(),
                     'argv': [],
                     'argv_truncated': True,
                 })
@@ -2983,7 +3006,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'P_GPa': pressure_GPa,
                     'P_kbar': pressure_kbar,
                     'log_fO2': fO2_log,
-                    'database': self._database,
+                    'database': self._effective_database(),
                 }
                 try:
                     return fn(**call_kwargs)
@@ -3030,7 +3053,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 bulk_projection.composition_wt_pct,
                 temperature_K,
                 pressure_kbar,
-                self._database,
+                self._effective_database(),
                 fO2_log,
             )
             try:
@@ -3056,12 +3079,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if self._bridge == 'ctypes':
             # ctypes path is intentionally NOT auto-marshaled here —
             # the C API needs careful struct setup that depends on
-            # the exact MAGEMin build.  Raise so the simulator falls
-            # back to alphaMELTS rather than silently returning empty.
-            raise RuntimeError(
+            # the exact MAGEMin build. This is an environment/configuration
+            # failure, not a chemistry result, so callers must not cache it.
+            raise _MAGEMinEngineCallError(
+                'MAGEMinBridgeUnavailable',
                 'MAGEMin ctypes bridge marshaling is not implemented; '
                 'use the default subprocess bridge or configure '
-                'python_bridge="julia"'
+                'python_bridge="julia"',
+                failure_disposition='environment',
             )
 
         if self._bridge == 'subprocess' or capture_native_activities:
@@ -3308,7 +3333,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         args = [
             str(binary_path),
             '--Verb=0',
-            f'--db={self._database}',
+            f'--db={self._effective_database()}',
             f'--Temp={temperature_C:.6f}',
             f'--Pres={pressure_kbar:.6f}',
             '--sys_in=wt',
@@ -3553,10 +3578,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         they are listed in warnings as documented drops. Unknown component
         names fail before the binary sees a positional vector.
         """
-        db = str(database or self._database).lower().strip()
+        effective_database = self._effective_database()
+        db = str(database or effective_database).lower().strip()
         if db not in self._DB_BULK_ORDERS:
             raise MeltCompositionError(
-                f'unknown MAGEMin database {database or self._database!r}; '
+                f'unknown MAGEMin database {database or effective_database!r}; '
                 f'known databases: {", ".join(sorted(self._DB_BULK_ORDERS))}'
             )
         order = self._DB_BULK_ORDERS[db]
@@ -3911,9 +3937,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 f'pure_phase pressure_bar must be finite and positive: '
                 f'{pressure_bar!r}'
             )
-        if self._database != 'ig':
+        database = self._effective_database()
+        if database != 'ig':
             raise PurePhaseUnsupportedDatabaseError(
-                f'pure-phase map verified for db=ig only; loaded {self._database!r}'
+                f'pure-phase map verified for db=ig only; loaded {database!r}'
             )
         spec = _MAGEMIN_PURE_PHASES.get(str(phase_id))
         if spec is None:
@@ -4023,7 +4050,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             raise PurePhaseAccessError('MAGEMin binary path not resolved')
         binary_path = self._binary_path.resolve()
 
-        order = self._DB_BULK_ORDERS[self._database]
+        database = self._effective_database()
+        order = self._DB_BULK_ORDERS[database]
         vector = [float(bulk_wt_ig.get(name, 0.0)) for name in order]
         buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
             temperature_C=temperature_C,
@@ -4032,7 +4060,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         args = [
             str(binary_path),
             '--Verb=1',
-            f'--db={self._database}',
+            f'--db={database}',
             f'--Temp={temperature_C:.6f}',
             f'--Pres={pressure_kbar:.6f}',
             '--sys_in=wt',

@@ -19,6 +19,7 @@ from typing import Any, ClassVar, Dict, List, Mapping, Optional, Sequence
 
 from engines.domain_reason import OutOfDomainReason
 from simulator.melt_regime import liquid_fraction_invalidity
+from simulator.scalar_boundary import finite_float
 
 
 BACKEND_CAPABILITY_KEYS = (
@@ -35,6 +36,460 @@ DEFAULT_BACKEND_CAPABILITIES = {
 }
 
 REDOX_MODE_NOT_AN_INPUT = 'not_an_input'
+
+ANTOINE_FALLBACK_SOURCE_PREFIX = 'antoine_fallback_from_vaporock'
+_EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS = frozenset({
+    'authority',
+    'authoritative_for_requested_vapor_pressure',
+    'vapor_pressure_backend_status',
+    'vapor_pressure_backend_status_reason',
+    'commissioning_notice',
+    'certified_band',
+    'imcc_notices',
+    'fo2_gas_only',
+    'backend_status_reason',
+    'empty_speciation_cause',
+    'backend_failure_reason_code',
+    'backend_failure_category',
+    'input_composition_projection',
+    'engine_reason',
+    'backend_failure_disposition',
+    'reported_activity_coefficients',
+    'subprocess_failure',
+})
+
+# Append-only wire table for consumer-visible engine notices and warnings.
+# Numbers are scoped by engine and never reused. Retired entries remain here.
+ENGINE_CACHE_NOTICE_CODE_TABLE = (
+    ('openimcc', 1, 'openimcc_flag', 'OpenIMCC emitted a melt or gas flag.'),
+    ('openimcc', 2, 'imcc_complex_saturation', 'OpenIMCC complex saturation boundary.'),
+    ('openimcc', 3, 'openimcc_temperature_extrapolated', 'OpenIMCC temperature is outside the datapack band.'),
+    ('openimcc', 4, 'openimcc_composition_outside_validated_envelope', 'OpenIMCC composition is outside its validated envelope.'),
+    ('openimcc', 5, 'openimcc_notice', 'OpenIMCC emitted a bridge notice.'),
+    ('openimcc', 6, 'openimcc_fe2o3_fold', 'Ferric iron was folded to total FeO.'),
+    ('openimcc', 7, 'openimcc_ferric_component_collapsed', 'OpenIMCC collapsed a ferric component.'),
+    ('openimcc', 8, 'openimcc_projection_crmn_relaxed', 'OpenIMCC relaxed the Cr/Mn projection threshold.'),
+    ('openimcc', 9, 'openimcc_projected_bulk', 'OpenIMCC projected bulk composition.'),
+    ('openimcc', 10, 'openimcc_gas_flag', 'OpenIMCC gas calculation emitted a species flag.'),
+    ('openimcc', 11, 'openimcc_gas_unavailable', 'OpenIMCC gas datapack was unavailable.'),
+    ('openimcc', 12, 'fo2_oxygen_balance_effusion_solved', 'OpenIMCC solved oxygen-balance effusion.'),
+    ('openimcc', 13, 'input_omitted', 'An OpenIMCC gas channel was omitted.'),
+    ('openimcc', 90, 'warning_text', 'OpenIMCC warning text used by cell classification.'),
+    ('alphamelts', 1, 'out_of_certified_band', 'AlphaMELTS ran outside its certified band.'),
+    ('alphamelts', 2, 'engine_model_caveat', 'AlphaMELTS reported a model caveat.'),
+    ('alphamelts', 3, 'input_omitted', 'AlphaMELTS omitted an input.'),
+    ('alphamelts', 4, 'fo2_gas_only', 'External oxygen fugacity was applied to gas only.'),
+    ('alphamelts', 90, 'warning_text', 'AlphaMELTS warning text used by cell classification.'),
+    ('thermoengine', 1, 'out_of_certified_band', 'ThermoEngine ran outside its certified band.'),
+    ('thermoengine', 2, 'engine_model_caveat', 'ThermoEngine reported a model caveat.'),
+    ('thermoengine', 3, 'fo2_gas_only', 'External oxygen fugacity was applied to gas only.'),
+    ('thermoengine', 4, 'fallback', 'ThermoEngine result included a fallback notice.'),
+    ('thermoengine', 90, 'warning_text', 'ThermoEngine warning text used by cell classification.'),
+    ('vaporock', 1, 'out_of_certified_band', 'VapoRock ran outside its certified band.'),
+    ('vaporock', 90, 'warning_text', 'VapoRock warning text used by cell classification.'),
+    ('magemin', 1, 'out_of_certified_band', 'MAGEMin ran outside its certified band.'),
+    ('magemin', 2, 'engine_model_caveat', 'MAGEMin reported a model caveat.'),
+    ('magemin', 3, 'input_omitted', 'MAGEMin omitted an input.'),
+    ('magemin', 90, 'warning_text', 'MAGEMin warning text used by cell classification.'),
+)
+_ENGINE_NOTICE_BY_CODE = {
+    (engine, code): number
+    for engine, number, code, _description in ENGINE_CACHE_NOTICE_CODE_TABLE
+}
+_ENGINE_NOTICE_BY_NUMBER = {
+    (engine, number): code
+    for engine, number, code, _description in ENGINE_CACHE_NOTICE_CODE_TABLE
+}
+_OPENIMCC_PAYLOAD_CODES = frozenset({
+    'openimcc_fe2o3_fold',
+    'openimcc_ferric_component_collapsed',
+    'openimcc_projection_crmn_relaxed',
+    'openimcc_projected_bulk',
+})
+
+
+def encode_engine_notice_codes(
+    engine_id: str,
+    notices: Sequence[Mapping[str, Any]],
+) -> tuple[tuple[int, ...], tuple[dict[str, Any], ...]]:
+    """Encode ordered notice rows as sorted codes plus typed row values."""
+    encoded: list[tuple[int, int, dict[str, Any]]] = []
+    for position, notice in enumerate(notices):
+        raw_code = notice.get('code')
+        code = str(raw_code or notice.get('kind') or '')
+        number = _ENGINE_NOTICE_BY_CODE.get((engine_id, code))
+        if number is None:
+            raise ValueError(
+                f'unregistered {engine_id} engine notice code {code!r}'
+            )
+        fields = {
+            str(key): _equilibrium_cache_json(value)
+            for key, value in notice.items()
+            if key not in {'kind', 'code'}
+        }
+        encoded.append((number, position, fields))
+    encoded.sort(key=lambda row: row[0])
+    return (
+        tuple(number for number, _position, _fields in encoded),
+        tuple(
+            {'position': position, **fields}
+            for _number, position, fields in encoded
+        ),
+    )
+
+
+def decode_engine_notice_codes(
+    engine_id: str,
+    codes: Sequence[int],
+    values: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Decode notice codes with the append-only table and restore input order."""
+    if len(codes) != len(values) or tuple(codes) != tuple(sorted(codes)):
+        raise ValueError('invalid engine notice code payload')
+    decoded: list[tuple[int, dict[str, Any]]] = []
+    for number, payload in zip(codes, values):
+        code = _ENGINE_NOTICE_BY_NUMBER.get((engine_id, int(number)))
+        if code is None:
+            raise ValueError(
+                f'unregistered {engine_id} engine notice number {number!r}'
+            )
+        row = dict(payload)
+        position = row.pop('position', None)
+        if type(position) is not int:
+            raise ValueError('invalid engine notice position')
+        if code in _OPENIMCC_PAYLOAD_CODES:
+            row['kind'] = 'openimcc_notice'
+            row['code'] = code
+        else:
+            row['kind'] = code
+        decoded.append((position, row))
+    decoded.sort(key=lambda item: item[0])
+    return [row for _position, row in decoded]
+
+
+def encode_engine_warning_codes(
+    engine_id: str,
+    warnings: Sequence[Any],
+) -> tuple[tuple[int, ...], tuple[dict[str, Any], ...]]:
+    """Encode warning messages with a registered engine warning code."""
+    number = _ENGINE_NOTICE_BY_CODE.get((engine_id, 'warning_text'))
+    if number is None:
+        raise ValueError(f'unregistered {engine_id} engine warning code')
+    return (
+        tuple(number for _warning in warnings),
+        tuple(
+            {'position': position, 'text': _equilibrium_cache_json(warning)}
+            for position, warning in enumerate(warnings)
+        ),
+    )
+
+
+def decode_engine_warning_codes(
+    engine_id: str,
+    codes: Sequence[int],
+    values: Sequence[Mapping[str, Any]],
+) -> list[Any]:
+    """Restore warning values using the engine's registered warning code."""
+    number = _ENGINE_NOTICE_BY_CODE.get((engine_id, 'warning_text'))
+    if number is None or len(codes) != len(values) or any(code != number for code in codes):
+        raise ValueError('invalid engine warning code payload')
+    restored: list[tuple[int, Any]] = []
+    for payload in values:
+        position = payload.get('position')
+        if type(position) is not int or 'text' not in payload:
+            raise ValueError('invalid engine warning value')
+        restored.append((position, payload['text']))
+    restored.sort(key=lambda item: item[0])
+    return [value for _position, value in restored]
+
+
+def _equilibrium_cache_json(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _equilibrium_cache_json(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_equilibrium_cache_json(item) for item in value]
+    if isinstance(value, Enum):
+        return value.value
+    return value
+
+
+def _cache_map(
+    value: Any, *, positive: bool = False, pressure: bool = False
+) -> dict[str, float | None]:
+    if not isinstance(value, Mapping):
+        return {}
+    result: dict[str, float | None] = {}
+    for key, raw in sorted(value.items(), key=lambda item: str(item[0])):
+        number = finite_float(raw)
+        if pressure:
+            if number is not None and number > 0.0:
+                result[str(key)] = number
+            elif number is None or number < 0.0:
+                result[str(key)] = None
+        elif number is not None and (not positive or number > 0.0):
+            result[str(key)] = number
+    return result
+
+
+def vapor_pressure_source_code(source: Any) -> str | None:
+    """Keep only source labels that affect battery classification."""
+    if not isinstance(source, str):
+        return None
+    if source in {"fallback", "speciation", "floor"}:
+        return source
+    if source.startswith(ANTOINE_FALLBACK_SOURCE_PREFIX) or "fallback" in source:
+        return 'fallback'
+    if source == 'vaporock' or source.startswith(('vaporock', 'builtin_authoritative')):
+        return 'speciation'
+    if (
+        'melt_dissociation_pO2_floor_inverted_through_mass_action' in source
+        or 'value_is_floor' in source
+    ):
+        return 'floor'
+    return None
+
+
+def _activity_detail_pairs(value: Any) -> list[list[Any]]:
+    if not isinstance(value, Mapping):
+        return []
+    pairs: list[list[Any]] = []
+    for key, detail in sorted(value.items(), key=lambda item: str(item[0])):
+        if not isinstance(detail, Mapping):
+            continue
+        standard = detail.get('standard_state')
+        if not isinstance(standard, Mapping):
+            standard = {}
+        values = (
+            _equilibrium_cache_json(detail.get('coefficient_basis')),
+            _equilibrium_cache_json(standard.get('convention')),
+            _equilibrium_cache_json(standard.get('phase')),
+            _equilibrium_cache_json(standard.get('component_basis')),
+        )
+        if any(value is not None for value in values):
+            pairs.append([str(key), *values])
+    return pairs
+
+
+def equilibrium_cache_from_value(
+    payload: Any,
+    *,
+    engine_id: str | None = None,
+) -> dict[str, Any]:
+    """Restore the fixed scorer projection from its compact JSON array."""
+    if not isinstance(payload, list) or len(payload) not in {11, 12}:
+        raise ValueError('invalid compact equilibrium cache value')
+
+    def restore_pairs(pairs: Any) -> dict[str, Any]:
+        if isinstance(pairs, Mapping):
+            return {str(key): value for key, value in pairs.items()}
+        if not isinstance(pairs, list):
+            raise ValueError('invalid compact equilibrium cache map')
+        result: dict[str, Any] = {}
+        for pair in pairs:
+            if not isinstance(pair, list) or len(pair) != 2 or not isinstance(pair[0], str):
+                raise ValueError('invalid compact equilibrium cache map entry')
+            result[pair[0]] = pair[1]
+        return result
+
+    restored: dict[str, Any] = {}
+    status, liquid_fraction, phase_available = payload[:3]
+    if status is not None:
+        restored['status'] = status
+    if liquid_fraction is not None:
+        restored['liquid_fraction'] = liquid_fraction
+    if phase_available is not None:
+        restored['phase_assemblage_available'] = bool(phase_available)
+    for index, field_name in (
+        (3, 'activity_coefficients'),
+        (4, 'reported_activity_coefficients'),
+        (6, 'vapor_pressures_Pa'),
+        (7, 'vapor_pressures_source'),
+        (8, 'vaporock_full_speciation_Pa'),
+        (9, 'liquid_composition_wt_pct'),
+        (10, 'fe_redox_split'),
+    ):
+        values = restore_pairs(payload[index])
+        if values:
+            restored[field_name] = values
+    details: dict[str, Any] = {}
+    if not isinstance(payload[5], list):
+        raise ValueError('invalid compact equilibrium activity details')
+    for pair in payload[5]:
+        if not isinstance(pair, list) or len(pair) != 5 or not isinstance(pair[0], str):
+            raise ValueError('invalid compact equilibrium activity detail')
+        _name, basis, convention, phase, component_basis = pair
+        detail: dict[str, Any] = {}
+        if basis is not None:
+            detail['coefficient_basis'] = basis
+        standard = {
+            name: value
+            for name, value in (
+                ('convention', convention),
+                ('phase', phase),
+                ('component_basis', component_basis),
+            )
+            if value is not None
+        }
+        if standard:
+            detail['standard_state'] = standard
+        details[_name] = detail
+    if details:
+        restored['activity_coefficient_details'] = details
+    if len(payload) == 12:
+        metadata = payload[11]
+        if not isinstance(metadata, Mapping):
+            raise ValueError('invalid compact equilibrium consumer metadata')
+        diagnostics = metadata.get('diagnostics')
+        diagnostics = dict(diagnostics) if isinstance(diagnostics, Mapping) else {}
+        notice_codes = metadata.get('notice_codes', ())
+        notice_values = metadata.get('notice_values', ())
+        if notice_codes:
+            if engine_id is None:
+                raise ValueError('engine_id is required to restore engine notices')
+            for row in decode_engine_notice_codes(
+                engine_id, notice_codes, notice_values
+            ):
+                source = row.pop('_source', None)
+                if source == 'commissioning_notice':
+                    diagnostics['commissioning_notice'] = row
+                elif source == 'diagnostics_imcc_notices':
+                    diagnostics.setdefault('imcc_notices', []).append(row)
+                    restored.setdefault('imcc_notices', []).append(row)
+                elif source == 'result_imcc_notices':
+                    restored.setdefault('imcc_notices', []).append(row)
+                elif source == 'fo2_gas_only':
+                    diagnostics['fo2_gas_only'] = {
+                        'notice': FO2_GAS_ONLY_NOTICE,
+                        **row,
+                    }
+                else:
+                    raise ValueError(f'invalid engine notice source {source!r}')
+        warning_codes = metadata.get('warning_codes', ())
+        warning_values = metadata.get('warning_values', ())
+        if warning_codes:
+            if engine_id is None:
+                raise ValueError('engine_id is required to restore engine warnings')
+            restored['warnings'] = decode_engine_warning_codes(
+                engine_id, warning_codes, warning_values
+            )
+        if diagnostics:
+            restored['diagnostics'] = diagnostics
+        if 'imcc_model_id' in metadata:
+            restored['imcc_model_id'] = metadata['imcc_model_id']
+    return restored
+
+
+def _equilibrium_cache_consumer_metadata(
+    values: Mapping[str, Any],
+    *,
+    engine_id: str | None,
+) -> dict[str, Any]:
+    diagnostics = values.get('diagnostics')
+    diagnostics = diagnostics if isinstance(diagnostics, Mapping) else {}
+    encoded_diagnostics = {
+        'commissioning_notice',
+        'imcc_notices',
+        'fo2_gas_only',
+    }
+    selected_diagnostics = {
+        name: _equilibrium_cache_json(diagnostics[name])
+        for name in _EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS
+        if name in diagnostics and name not in encoded_diagnostics
+    }
+    failure = selected_diagnostics.get('subprocess_failure')
+    if isinstance(failure, Mapping):
+        selected_diagnostics['subprocess_failure'] = {
+            'returncode': failure.get('returncode')
+        }
+
+    metadata: dict[str, Any] = {}
+    if selected_diagnostics:
+        metadata['diagnostics'] = selected_diagnostics
+
+    notice_rows: list[dict[str, Any]] = []
+    commissioning = diagnostics.get('commissioning_notice')
+    if isinstance(commissioning, Mapping):
+        notice_rows.append({'_source': 'commissioning_notice', **commissioning})
+    imcc_notices = diagnostics.get('imcc_notices')
+    imcc_source = 'diagnostics_imcc_notices'
+    if not imcc_notices:
+        imcc_notices = values.get('imcc_notices')
+        imcc_source = 'result_imcc_notices'
+    if isinstance(imcc_notices, (list, tuple)):
+        notice_rows.extend(
+            {'_source': imcc_source, **notice}
+            for notice in imcc_notices
+            if isinstance(notice, Mapping)
+        )
+    gas_only = diagnostics.get('fo2_gas_only')
+    if isinstance(gas_only, Mapping):
+        notice_rows.append({
+            '_source': 'fo2_gas_only',
+            'kind': 'fo2_gas_only',
+            'printed_fO2_log': gas_only.get('printed_fO2_log'),
+        })
+    warnings = values.get('warnings')
+    warnings = warnings if isinstance(warnings, (list, tuple)) else ()
+    if notice_rows or warnings:
+        if engine_id is None:
+            raise ValueError('engine_id is required to cache engine notices')
+        notice_codes, notice_values = encode_engine_notice_codes(
+            engine_id, notice_rows
+        )
+        warning_codes, warning_values = encode_engine_warning_codes(
+            engine_id, warnings
+        )
+        metadata['notice_codes'] = notice_codes
+        metadata['notice_values'] = notice_values
+        if warnings:
+            metadata['warning_codes'] = warning_codes
+            metadata['warning_values'] = warning_values
+    model_id = values.get('imcc_model_id')
+    if model_id is not None:
+        metadata['imcc_model_id'] = _equilibrium_cache_json(model_id)
+    return metadata
+
+
+def equilibrium_cache_value(
+    values: Mapping[str, Any],
+    *,
+    engine_id: str | None = None,
+) -> Any:
+    """Project the scorer-consumed equilibrium fields into a compact payload."""
+    sources = values.get('vapor_pressures_source')
+    compact_sources = []
+    if isinstance(sources, Mapping):
+        for name, source in sorted(sources.items(), key=lambda item: str(item[0])):
+            code = vapor_pressure_source_code(source)
+            if code is not None:
+                compact_sources.append([str(name), code])
+
+    liquid_fraction = finite_float(values.get('liquid_fraction'))
+    phase_available = values.get('phase_assemblage_available', True)
+    status = _equilibrium_cache_json(values.get('status'))
+    diagnostics = values.get('diagnostics')
+    if not isinstance(diagnostics, Mapping):
+        diagnostics = {}
+    reported_coefficients = values.get('reported_activity_coefficients')
+    if not isinstance(reported_coefficients, Mapping) or not reported_coefficients:
+        reported_coefficients = diagnostics.get('reported_activity_coefficients')
+    hot = [
+        status,
+        liquid_fraction,
+        None if phase_available is True else bool(phase_available),
+        _cache_map(values.get('activity_coefficients'), positive=True),
+        _cache_map(reported_coefficients, positive=True),
+        _activity_detail_pairs(values.get('activity_coefficient_details')),
+        _cache_map(values.get('vapor_pressures_Pa'), pressure=True),
+        {name: code for name, code in compact_sources},
+        _cache_map(values.get('vaporock_full_speciation_Pa'), pressure=True),
+        _cache_map(values.get('liquid_composition_wt_pct')),
+        _cache_map(values.get('fe_redox_split')),
+    ]
+    metadata = _equilibrium_cache_consumer_metadata(values, engine_id=engine_id)
+    if metadata:
+        hot.append(metadata)
+    return hot
 
 # More than one oxidation state in silicate melts over the fO2 range these
 # engines are asked to run. The melt-backend contract owns this eligibility
@@ -804,6 +1259,28 @@ class EquilibriumResult:
     # Other backends leave these fields unset.
     requested_fO2_log: Optional[float] = None
     printed_fO2_echo_log: Optional[float] = None
+
+    def to_engine_cache_value(self, *, engine_id: str | None = None) -> Any:
+        """Return the compact scorer-consumed equilibrium payload."""
+        return equilibrium_cache_value(vars(self), engine_id=engine_id)
+
+    @classmethod
+    def from_engine_cache_value(
+        cls, payload: Any, *, engine_id: str | None = None
+    ) -> EquilibriumResult:
+        """Rebuild the battery-visible equilibrium fields from the HOT JSON."""
+        from dataclasses import fields
+
+        if isinstance(payload, list):
+            payload = equilibrium_cache_from_value(payload, engine_id=engine_id)
+        if not isinstance(payload, Mapping):
+            raise TypeError('equilibrium cache value must be a mapping or compact array')
+        field_names = {item.name for item in fields(cls)}
+        result = cls(**{name: value for name, value in payload.items() if name in field_names})
+        for name, value in payload.items():
+            if name not in field_names:
+                setattr(result, name, value)
+        return result
 
     def __post_init__(self) -> None:
         if self.status != 'ok':

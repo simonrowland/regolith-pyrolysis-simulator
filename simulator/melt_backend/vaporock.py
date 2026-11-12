@@ -546,6 +546,8 @@ class VapoRockCallError(RuntimeError):
         self,
         cause: BaseException | str,
         message: Optional[str] = None,
+        *,
+        failure_disposition: Optional[str] = None,
     ) -> None:
         if isinstance(cause, BaseException):
             self.external_exception = type(cause).__name__
@@ -553,6 +555,7 @@ class VapoRockCallError(RuntimeError):
         else:
             self.external_exception = cause
             self.external_message = message or ''
+        self.failure_disposition = failure_disposition
         super().__init__(f'{self.external_exception}: {self.external_message}')
 
 
@@ -1390,6 +1393,7 @@ class VapoRockBackend(MeltBackend):
         self._available: bool = False
         self._vaporock: Optional[Any] = None
         self._config: Dict[str, Any] = {}
+        self._startup_failure_disposition: Optional[str] = None
         self._database_path: Optional[str] = None
         self._temperature_units: str = 'C'
         self._pressure_units: str = 'bar'
@@ -1447,6 +1451,7 @@ class VapoRockBackend(MeltBackend):
         self._available = False
         self._warnings = []
         self._last_error = None
+        self._startup_failure_disposition = None
         self._config = dict(config or {})
 
         self._database_path = self._config.get('database_path')
@@ -1620,6 +1625,7 @@ class VapoRockBackend(MeltBackend):
             )
             self._warnings.append(self._last_error)
             self._warm_pool = None
+            self._startup_failure_disposition = exc.failure_disposition
             return False
         except EngineWorkerDied as exc:
             named = (
@@ -1633,6 +1639,7 @@ class VapoRockBackend(MeltBackend):
             )
             self._warnings.append(self._last_error)
             self._warm_pool = None
+            self._startup_failure_disposition = 'worker_died'
             return False
         except EngineWorkerTimeout as exc:
             self._last_error = (
@@ -1641,6 +1648,7 @@ class VapoRockBackend(MeltBackend):
             )
             self._warnings.append(self._last_error)
             self._warm_pool = None
+            self._startup_failure_disposition = 'timeout'
             return False
         self._vaporock = None  # import lives in the child only
         self._available = True
@@ -1787,7 +1795,18 @@ class VapoRockBackend(MeltBackend):
                 fO2_log=fO2_log,
                 status='unavailable',
                 warnings=['VapoRock backend not initialized'],
-                diagnostics=melt_envelope_diagnostics,
+                diagnostics={
+                    **melt_envelope_diagnostics,
+                    **(
+                        {
+                            'backend_failure_disposition': (
+                                self._startup_failure_disposition
+                            )
+                        }
+                        if self._startup_failure_disposition is not None
+                        else {}
+                    ),
+                },
             )
 
         prior_warnings: List[str] = []
@@ -2115,6 +2134,15 @@ class VapoRockBackend(MeltBackend):
                     **projection_diagnostics,
                     'engine_exception': external_type,
                     'engine_exception_message': external_message,
+                    **(
+                        {
+                            'backend_failure_disposition': (
+                                exc.failure_disposition
+                            )
+                        }
+                        if exc.failure_disposition is not None
+                        else {}
+                    ),
                 },
             )
 
@@ -2519,6 +2547,12 @@ class VapoRockBackend(MeltBackend):
             payload = future.result()
         except EngineWorkerRemoteError as exc:
             if exc.exc_name != 'VapoRockCallError':
+                if exc.failure_disposition is not None:
+                    raise VapoRockCallError(
+                        exc.exc_name,
+                        exc.detail,
+                        failure_disposition=exc.failure_disposition,
+                    ) from exc
                 raise
             external_type, separator, external_message = exc.detail.partition(
                 ': '
@@ -2527,17 +2561,23 @@ class VapoRockBackend(MeltBackend):
                 external_type = exc.exc_name
                 external_message = exc.detail
             raise VapoRockCallError(
-                external_type, external_message
+                external_type,
+                external_message,
+                failure_disposition=exc.failure_disposition,
             ) from exc
         except EngineWorkerTimeout as exc:
-            raise VapoRockCallError(exc) from exc
+            raise VapoRockCallError(
+                exc, failure_disposition='timeout'
+            ) from exc
         except EngineWorkerDied as exc:
             named = (
                 exc.__cause__
                 if isinstance(exc.__cause__, BaseException)
                 else exc
             )
-            raise VapoRockCallError(named) from exc
+            raise VapoRockCallError(
+                named, failure_disposition='worker_died'
+            ) from exc
         if not isinstance(payload, dict):
             raise RuntimeError(
                 f'VapoRock warm worker returned non-dict payload: '

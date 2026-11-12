@@ -70,7 +70,7 @@ from simulator.chemistry.melt_activity import (
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
     resolve_alphamelts_python_api_model,
-    resolve_alphamelts_subprocess_model,
+    resolve_alphamelts_subprocess_settings,
 )
 from simulator.melt_backend.base import (
     EquilibriumResult,
@@ -140,6 +140,7 @@ ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
 # 20s is the established per-solve subprocess budget; bracket searches apply
 # it independently to each native call rather than treating it as a run budget.
 ALPHAMELTS_DEFAULT_TIMEOUT_S = 20.0
+_UNSET = object()
 ALPHAMELTS_REAP_GRACE_S = 1.0
 # ``nm -u`` plus ``strings`` verify that the supported alphamelts2 2.3.1
 # artifact has no fork, spawn, exec, system, or setsid surface. Arbitrary
@@ -1116,6 +1117,11 @@ class _MELTSBackendSupport(MeltBackend):
         self._fe3fet_ratio: Optional[float] = None
         self._raw_model_name = model_name
         self._model = str(model_name)
+        self._model_calc_mode: str | None = None
+        self._effective_subprocess_calc_mode: str | None = None
+        self._subprocess_calc_mode_conflict = False
+        self._subprocess_model_error: str | None = None
+        self._subprocess_calc_mode_configured = False
         self._python_api_model: tuple[str, int] | None = None
         self._timeout_s = ALPHAMELTS_DEFAULT_TIMEOUT_S
         self._last_normalization_warnings: List[str] = []
@@ -1162,6 +1168,19 @@ class _MELTSBackendSupport(MeltBackend):
         self._vapor_transport_pO2_bar = resolved_pO2
         self._vapor_transport_floor_bar = resolved_floor
         self._vapor_transport_pO2_admission = admission
+
+    def _configure_subprocess_calc_mode(
+        self, ambient_calc_mode: object | None
+    ) -> None:
+        settings = resolve_alphamelts_subprocess_settings(
+            self._model, ambient_calc_mode
+        )
+        self._model = settings["model"]
+        self._model_calc_mode = settings["model_calc_mode"]
+        self._effective_subprocess_calc_mode = settings["effective_calc_mode"]
+        self._subprocess_calc_mode_conflict = settings["calc_mode_conflict"]
+        self._subprocess_model_error = settings["subprocess_model_error"]
+        self._subprocess_calc_mode_configured = True
 
     def _initialize_vapor_transport(self, config: Mapping[str, object]) -> None:
         self._set_vapor_transport_pO2_bar(config.get(
@@ -1211,6 +1230,24 @@ class _MELTSBackendSupport(MeltBackend):
         model_name = config.get('model', self._raw_model_name)
         self._raw_model_name = model_name
         self._model = str(model_name)
+        effective_calc_mode = config.get('effective_calc_mode', _UNSET)
+        if effective_calc_mode is _UNSET:
+            self._configure_subprocess_calc_mode(
+                config.get(
+                    'ambient_calc_mode',
+                    os.environ.get('ALPHAMELTS_CALC_MODE'),
+                )
+            )
+        else:
+            self._model_calc_mode = config.get('model_calc_mode')
+            self._effective_subprocess_calc_mode = effective_calc_mode
+            self._subprocess_calc_mode_conflict = bool(
+                config.get('calc_mode_conflict', False)
+            )
+            self._subprocess_model_error = config.get(
+                'subprocess_model_error'
+            )
+            self._subprocess_calc_mode_configured = True
         self._timeout_s = _validated_timeout_s(
             config.get('timeout_s', ALPHAMELTS_DEFAULT_TIMEOUT_S)
         )
@@ -3574,20 +3611,27 @@ class _MELTSBackendSupport(MeltBackend):
 
         Slower (~1-3s per call) but reliable.
         """
-        try:
-            _, calc_mode = resolve_alphamelts_subprocess_model(
-                self._model
+        if not self._subprocess_calc_mode_configured:
+            self._configure_subprocess_calc_mode(
+                os.environ.get('ALPHAMELTS_CALC_MODE')
             )
-        except ValueError as exc:
+        if self._subprocess_model_error is not None:
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_MODEL_UNVERIFIED,
-                str(exc),
-            ) from exc
-        ambient_calc_mode = os.environ.get('ALPHAMELTS_CALC_MODE')
-        if ambient_calc_mode is not None and ambient_calc_mode != calc_mode:
+                self._subprocess_model_error,
+            )
+        if self._subprocess_calc_mode_conflict:
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_CALC_MODE_MISMATCH,
-                f'ambient={ambient_calc_mode!r}; resolved={calc_mode!r}',
+                'ambient='
+                f'{self._effective_subprocess_calc_mode!r}; '
+                f'resolved={self._model_calc_mode!r}',
+            )
+        calc_mode = self._effective_subprocess_calc_mode
+        if calc_mode is None:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_MODEL_UNVERIFIED,
+                f'AlphaMELTS model {self._model!r} has no resolved calculation mode',
             )
 
         requested_temperature_C = float(temperature_C)

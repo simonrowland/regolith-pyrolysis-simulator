@@ -373,7 +373,6 @@ def test_lazily_initialized_session_provider_survives_module_boundary():
         (test_dir / "_t1229_test_plugin.py").write_text(
             '''
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
 import simulator.engine_pool as engine_pool
@@ -382,11 +381,8 @@ from engines.magemin.provider import MAGEMinShadowProvider
 
 
 class FakePool:
-    def __init__(self, _worker_factory, *, size):
-        self.workers = tuple(
-            SimpleNamespace(name=f"MAGEMin subprocess pool slot {i}")
-            for i in range(size)
-        )
+    def __init__(self, worker_factory, *, size):
+        self.workers = tuple(worker_factory(i) for i in range(size))
         self.closed = False
         engine_pool._LIVE_ENGINE_POOLS.add(self)
 

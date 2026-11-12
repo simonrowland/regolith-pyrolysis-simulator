@@ -9,8 +9,10 @@ derived from resolve_backend.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
+import multiprocessing as mp
 import os
 import re
 import sqlite3
@@ -24,13 +26,16 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from fractions import Fraction
-from functools import lru_cache
+from functools import lru_cache, partial
 from pathlib import Path
-from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Sequence
+from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Sequence, TextIO
 
 import yaml
 
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
+from simulator.supervised_process_pool import (
+    supervised_process_map,
+)
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
@@ -5730,7 +5735,16 @@ def cell_notices(
         kind = str(row.get("kind") or "")
         if _row_out_of_certified_band(kind, row):
             raw_band = row.get("certified_band") or row.get("band")
-            band = str(raw_band or "")
+            band = (
+                json.dumps(
+                    to_plain(raw_band),
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    default=str,
+                )
+                if isinstance(raw_band, Mapping)
+                else str(raw_band or "")
+            )
             if kind == "openimcc_temperature_extrapolated" and isinstance(
                 raw_band, Mapping
             ):
@@ -5860,7 +5874,7 @@ def cell_notices(
             )
     status_reason = getattr(cell, "vapor_pressure_backend_status_reason", None)
     backend_status = getattr(cell, "vapor_pressure_backend_status", None)
-    if backend_status == AUTHORITY_FALLBACK or (
+    if backend_status == AUTHORITY_FALLBACK or status_reason == "fallback" or (
         isinstance(status_reason, str) and "fallback" in status_reason
     ):
         notices.append(
@@ -5873,7 +5887,9 @@ def cell_notices(
                 destination="antoine_fallback",
             )
         )
-    if isinstance(status_reason, str) and _FLOOR_INVERSION_REASON in status_reason:
+    if status_reason == "floor" or (
+        isinstance(status_reason, str) and _FLOOR_INVERSION_REASON in status_reason
+    ):
         notices.append(
             Notice(
                 kind=NoticeKind.FLOOR_INVERSION,
@@ -7204,7 +7220,7 @@ def _predict_distin_closed_feo_activity(
     inventory["Fe"] = inventory.get("Fe", 0.0) + 1.0
     try:
         import openimcc
-        import openimcc.redox as openimcc_redox
+        from simulator.melt_backend.openimcc_bridge import evaluate_redox
     except ImportError as exc:
         return refused(
             RefusalReason.OPENIMCC_NOT_IMPORTABLE,
@@ -7214,8 +7230,12 @@ def _predict_distin_closed_feo_activity(
             },
         )
     try:
-        result = openimcc_redox.evaluate_redox(
-            inventory, float(temperature_K), "closed"
+        temperature = float(temperature_K)
+        result = evaluate_redox(
+            inventory,
+            temperature,
+            "closed",
+            entry="openimcc.redox.evaluate_redox",
         )
     except openimcc.ImccRefusal as exc:
         return refused(
@@ -7444,11 +7464,16 @@ def _predict_fe_redox(
                 },
             )
         try:
-            result = openimcc.evaluate_redox(
+            from simulator.melt_backend.openimcc_bridge import evaluate_redox
+
+            temperature = float(material.temperature)
+            lambda_imposed = float(fo2_log) * math.log(10.0)
+            result = evaluate_redox(
                 inventory,
-                float(material.temperature),
+                temperature,
                 "imposed",
-                lambda_imposed=float(fo2_log) * math.log(10.0),
+                lambda_imposed=lambda_imposed,
+                entry="openimcc.evaluate_redox",
             )
         except openimcc.ImccRefusal as exc:
             return refused(
@@ -7667,10 +7692,7 @@ def _predict_fe_redox(
         physical_pressure_bar=pressure_bar,
     )
     name = str(getattr(handle, "name", engine.value))
-    call_evidence = (
-        f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
-        f":exit={getattr(cell, 'exit_code', None)}"
-    )
+    call_evidence = f"equilibrate_cell:{name}:exit={getattr(cell, 'exit_code', None)}"
     model_id = getattr(cell, "model_id", None)
     version = None if model_id is None else (str(model_id) or None)
     status = getattr(cell, "status", None)
@@ -8883,7 +8905,11 @@ def _equilibrate_phase_assemblage(
                     f"{solute_fugacity_parameter}"
                 )
             kwargs[solute_fugacity_parameter] = solute_fugacity_bar
-        return backend.equilibrate(**kwargs)
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            _call_cached_backend_equilibrate,
+        )
+
+        return _call_cached_backend_equilibrate(handle, kwargs, lambda: backend.equilibrate(**kwargs))
     finally:
         if owns_handle:
             from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -10720,8 +10746,8 @@ def _predict_with_engine(
     # MAGEMin's existing warm-worker hard wall is 15 s; the scorer's 20 s
     # cell timeout remains a secondary bound. call_timeout_s carries the
     # remaining cell budget into the worker, whose 15 s pool limit kills the
-    # observed >50 s non-finite Gamma loop. Expiry maps below to
-    # engine_not_converged with this cell's elapsed wall time.
+    # observed >50 s non-finite Gamma loop. Expiry maps below to the typed
+    # engine_not_converged refusal without adding runtime timing to the row.
     native_activity_formula = (
         formula
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY
@@ -10987,10 +11013,7 @@ def _predict_with_engine(
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
     refusal = getattr(cell, "refusal_reason", None)
     status = getattr(cell, "status", None)
-    call_evidence = (
-        f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
-        f":exit={getattr(cell, 'exit_code', None)}"
-    )
+    call_evidence = f"equilibrate_cell:{name}:exit={getattr(cell, 'exit_code', None)}"
     if engine is Engine.INTERNAL_ANALYTICAL:
         engine_version = (
             getattr(cell, "vapor_pressure_backend_status_reason", None)
@@ -11032,7 +11055,6 @@ def _predict_with_engine(
                 refusal_reason=refusal_reason,
                 refusal_detail={
                     "reason": typed_reason,
-                    "elapsed_s": float(getattr(cell, "wall_s", 0.0) or 0.0),
                     "cell_refusal_reason": typed,
                     "engine_status": cell_status,
                     "engine_reason": engine_side_reason,
@@ -11441,10 +11463,7 @@ def _predict_with_engine(
             origin=_KNUDSEN_TOTAL_PRESSURE_NOTICE_ORIGIN,
         )
         notices = union_notices(notices, (pressure_notice,))
-        call_evidence = (
-            f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
-            f":exit={getattr(cell, 'exit_code', None)}"
-        )
+        call_evidence = f"equilibrate_cell:{name}:exit={getattr(cell, 'exit_code', None)}"
         activities = dict(getattr(cell, "melt_activities", None) or {})
         pressures = updated_pressures
         identity = replace(
@@ -11967,6 +11986,8 @@ def _hashimoto_residue_prediction(
     reference: Observation,
     engine: Engine,
     cache: dict[tuple[str, Engine], Mapping[str, object]],
+    *,
+    test_experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
@@ -11989,6 +12010,10 @@ def _hashimoto_residue_prediction(
                 for row in context.observations.values()
                 if row.source_id == _HASHIMOTO_SOURCE_ID
                 and row.observation_id.startswith(_HASHIMOTO_SOURCE_ID + "::")
+                and (
+                    test_experiment_ids is None
+                    or row.experiment_id in test_experiment_ids
+                )
                 and isinstance(row.identity, Identity)
                 and quantity_token(row.identity)
                 is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -11998,10 +12023,21 @@ def _hashimoto_residue_prediction(
                 for row in observations
                 if row.experiment_id in context.experiments
             }
-            if len(experiments_by_id) != 24:
+            expected_experiments = test_experiment_ids or frozenset(experiments_by_id)
+            expected_count = (
+                24
+                if test_experiment_ids is None
+                else len(test_experiment_ids)
+            )
+            if (
+                len(experiments_by_id) != expected_count
+                or set(experiments_by_id) != set(expected_experiments)
+            ):
                 raise ResidueInventoryRefusal(
                     "hashimoto_cohort_invalid",
-                    f"scorer found {len(experiments_by_id)} Hashimoto runs, expected 24",
+                    "scorer found "
+                    f"{len(experiments_by_id)} Hashimoto runs, expected "
+                    f"{expected_count}",
                 )
             source_path = (
                 REPO_ROOT
@@ -12018,19 +12054,12 @@ def _hashimoto_residue_prediction(
                 to_plain(experiments_by_id[experiment_id])
                 for experiment_id in sorted(experiments_by_id)
             ]
-            revision = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                cwd=REPO_ROOT,
-                check=True,
-                capture_output=True,
-                text=True,
-            ).stdout.strip()
             rows = _predict_hashimoto_residue_cohort(
                 experiments,
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
                 preform_dimensions_mm=geometry,
-                code_revision=revision,
                 engine=engine.value,
+                _allow_partial_cohort_for_test=test_experiment_ids is not None,
             )
             cache[cache_key] = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
@@ -12226,7 +12255,6 @@ def _hashimoto_residue_prediction(
             # The source-resolved Phase.L identity denotes the modeled run-end
             # liquid's bulk oxide inventory; quenching preserves that inventory.
             identity=reference.identity,
-            version=str(primary.provenance.get("code_revision") or "unknown"),
             refusal_detail=(
                 {
                     **primary_provenance,
@@ -12290,7 +12318,9 @@ def _hashimoto_residue_prediction(
 _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 
 
-def _knudsen_residue_prediction(context, reference, engine, cache=None) -> EnginePrediction:
+def _knudsen_residue_prediction(
+    context, reference, engine, cache=None
+) -> EnginePrediction:
     """Translate the residue owner's extent result to the scoring contract."""
     quantity = quantity_token(reference.identity)
     is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
@@ -12413,6 +12443,8 @@ def _sossi_residue_prediction(
     reference: Observation,
     engine: Engine,
     cache: dict[tuple[str, Engine], Mapping[str, object]],
+    *,
+    test_experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
     """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
     channel = ENGINE_CHANNELS[engine]
@@ -12455,6 +12487,10 @@ def _sossi_residue_prediction(
                 row
                 for row in context.observations.values()
                 if row.source_id == _SOSSI_SOURCE_ID
+                and (
+                    test_experiment_ids is None
+                    or row.experiment_id in test_experiment_ids
+                )
                 and isinstance(row.identity, Identity)
                 and quantity_token(row.identity)
                 is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -12477,10 +12513,28 @@ def _sossi_residue_prediction(
                         trace_ppm_by_experiment.setdefault(short_id, {})[
                             element
                         ] = float(trace.state.value)
-            if len(experiments_by_run) != 43:
+            expected_experiments = (
+                {
+                    experiment_id.rsplit("::", 1)[-1]
+                    for experiment_id in test_experiment_ids
+                }
+                if test_experiment_ids is not None
+                else set(experiments_by_run)
+            )
+            expected_count = (
+                43
+                if test_experiment_ids is None
+                else len(expected_experiments)
+            )
+            if (
+                len(experiments_by_run) != expected_count
+                or set(experiments_by_run) != expected_experiments
+            ):
                 raise ResidueInventoryRefusal(
                     "sossi_cohort_invalid",
-                    f"scorer found {len(experiments_by_run)} Sossi runs, expected 43",
+                    "scorer found "
+                    f"{len(experiments_by_run)} Sossi runs, expected "
+                    f"{expected_count}",
                 )
             source = load_yaml(
                 REPO_ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
@@ -12496,19 +12550,11 @@ def _sossi_residue_prediction(
                     "sossi_experiment_missing_from_extract", ",".join(sorted(missing_runs))
                 )
             experiments = [source_experiments[key] for key in sorted(experiments_by_run)]
-            revision = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                cwd=REPO_ROOT,
-                check=True,
-                capture_output=True,
-                text=True,
-            ).stdout.strip()
             rows = _predict_sossi_residue_cohort(
                 experiments,
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
                 starting_trace_ppm_by_experiment=trace_ppm_by_experiment,
                 buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
-                code_revision=revision,
                 engine=engine.value,
             )
             cache[cache_key] = {
@@ -12675,7 +12721,6 @@ def _sossi_residue_prediction(
             lineage_complete=False,
             notices=tuple(notices),
             identity=reference.identity,
-            version=str(provenance.get("code_revision") or "unknown"),
             refusal_detail=provenance,
         )
     except Exception as exc:  # preserve a typed per-cell absence and keep scoring
@@ -13352,7 +13397,9 @@ def _compile_residual_with_lineage(
         and experiment is not None and experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
     ):
-        prediction = _knudsen_residue_prediction(context, reference, engine)
+        prediction = _knudsen_residue_prediction(
+            context, reference, engine
+        )
     if prediction is None:
         builtin_predictor = (
             predict is _BUILTIN_SCORE_PREDICTOR
@@ -14468,27 +14515,45 @@ def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, 
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
-def _score_store_with_decisions(
+@dataclass(frozen=True)
+class _PreparedScoreRun:
+    context: ScoreContext
+    engine_set: tuple[Engine, ...]
+    refs: tuple[Observation, ...]
+    fusion_diagnostic_ids: frozenset[str]
+    comparison_ids: frozenset[str]
+    observations: Mapping[str, Observation]
+    origins: Mapping[str, str]
+    live_context: ScoreContext
+    point_observations_by_experiment: Mapping[str, tuple[Observation, ...]]
+    table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]]
+    ratchet_missing: bool
+    source_bands: Mapping[str, DecisionBand]
+    source_band_reasons: Mapping[str, str]
+    kems_partial_pressure_band: DecisionBand | None
+    series_point_counts: Mapping[str, int]
+    test_experiment_ids: frozenset[str] | None
+
+
+def _prepare_score_run(
     context: ScoreContext,
     *,
-    engines: Sequence[Engine] | None = None,
-    rail: Rail | None = None,
-    work_id: str | None = None,
-    limit: int | None = None,
-    include_diagnostics: bool = True,
-    measured_only: bool = False,
-    predict: Callable[..., EnginePrediction] | None = None,
-    handles: Mapping[str, object] | None = None,
-    _stream: _ResidualJsonlStream | None = None,
-) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
+    engines: Sequence[Engine] | None,
+    rail: Rail | None,
+    work_id: str | None,
+    limit: int | None,
+    include_diagnostics: bool,
+    measured_only: bool,
+    _test_experiment_ids: Sequence[str] | None = None,
+) -> _PreparedScoreRun:
+    """Build global score inputs once so spawned shards share one snapshot."""
     engine_set = (
         _validated_score_engines(tuple(engines))
         if engines is not None
         else SCORE_ENGINE_SET
     )
-    provided_handles = dict(handles or {})
-    resolved_handles = dict(provided_handles)
-    refs = list(comparison_candidates(context))
+    comparison_observations = comparison_candidates(context)
+    refs = list(comparison_observations)
     fusion_diagnostic_ids: set[str] = set()
     if include_diagnostics:
         seen = {o.observation_id for o in refs}
@@ -14528,7 +14593,11 @@ def _score_store_with_decisions(
     if rail is not None:
         kept: list[Observation] = []
         for obs in refs:
-            quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
+            quantity = (
+                quantity_token(obs.identity)
+                if isinstance(obs.identity, Identity)
+                else None
+            )
             formula = (
                 obs.identity.species.formula
                 if isinstance(obs.identity, Identity)
@@ -14538,31 +14607,165 @@ def _score_store_with_decisions(
             if rail_for_quantity(quantity, species_formula=formula) is rail:
                 kept.append(obs)
         refs = kept
+    # Test-only: bypasses cohort-size guards for bounded cache parity tests.
+    selected_test_experiment_ids = (
+        None
+        if _test_experiment_ids is None
+        else frozenset(str(value) for value in _test_experiment_ids)
+    )
+    if selected_test_experiment_ids is not None:
+        refs = [
+            obs
+            for obs in refs
+            if obs.experiment_id in selected_test_experiment_ids
+        ]
     refs.sort(key=lambda o: o.observation_id)
     if limit is not None:
         refs = refs[: int(limit)]
-    from simulator.battery.compilation_tier import (
-        _compilation_series_point_count,
-        _iter_compilation_series_cells,
-        is_compilation_evidence,
-    )
 
-    comparison_ids = {o.observation_id for o in comparison_candidates(context)}
-    residuals: list[Residual] | None = [] if _stream is None else None
-    candidates: dict[str, Observation] = {}
-    # Snapshot. Engine candidates are returned separately and are not
-    # lineage inputs. The work-input index is this snapshot.
+    from simulator.battery.compilation_tier import _compilation_series_point_count
+    from simulator.battery.validate import build_printed_thermo_index
+
     observations = dict(context.observations)
     origins = context.origins
     live_context = replace(context, observations=observations, origins=origins)
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
         observations.values()
     )
-    lineage_resolver = _ScoringLineageResolver(live_context)
+    table_index = build_printed_thermo_index(observations)
+    ratchet_entries, ratchet_missing, _ratchet_history = _read_decision_band_ratchet(
+        context.root
+    )
+    source_bands, _source_band_records, source_band_reasons = _source_band_catalog(
+        context, ratchet_entries
+    )
+    kems_partial_pressure_band = derive_kems_partial_pressure_band(
+        observations, context.experiments, benches=context.benches
+    )
+    series_point_counts = {
+        obs.observation_id: _compilation_series_point_count(
+            obs, origins.get(obs.observation_id)
+        )
+        for obs in refs
+    }
+    return _PreparedScoreRun(
+        context=context,
+        engine_set=tuple(engine_set),
+        refs=tuple(refs),
+        fusion_diagnostic_ids=frozenset(fusion_diagnostic_ids),
+        comparison_ids=frozenset(o.observation_id for o in comparison_observations),
+        observations=observations,
+        origins=origins,
+        live_context=live_context,
+        point_observations_by_experiment=point_observations_by_experiment,
+        table_index=table_index,
+        ratchet_missing=ratchet_missing,
+        source_bands=source_bands,
+        source_band_reasons=source_band_reasons,
+        kems_partial_pressure_band=kems_partial_pressure_band,
+        series_point_counts=series_point_counts,
+        test_experiment_ids=selected_test_experiment_ids,
+    )
+
+
+def _score_group_id(observation: Observation) -> str:
+    if observation.source_id in {_HASHIMOTO_SOURCE_ID, _SOSSI_SOURCE_ID}:
+        return f"source:{observation.source_id}"
+    if observation.experiment_id:
+        return f"experiment:{observation.experiment_id}"
+    if observation.source_id:
+        return f"source:{observation.source_id}"
+    return "unassigned"
+
+
+def _partition_score_refs(
+    refs: Sequence[Observation], *, workers: int
+) -> tuple[tuple[Observation, ...], ...]:
+    """Assign whole experiment and residue-cohort groups to stable buckets."""
+
+    if workers < 1:
+        raise ValueError("workers must be at least 1")
+    group_buckets = {
+        group_id: int.from_bytes(
+            hashlib.sha256(group_id.encode("utf-8")).digest()[:8], "big"
+        ) % workers
+        for group_id in {_score_group_id(observation) for observation in refs}
+    }
+    chunks: list[list[Observation]] = [[] for _ in range(workers)]
+    for observation in refs:
+        chunks[group_buckets[_score_group_id(observation)]].append(observation)
+    return tuple(tuple(chunk) for chunk in chunks)
+
+
+def _score_store_with_decisions(
+    context: ScoreContext,
+    *,
+    engines: Sequence[Engine] | None = None,
+    rail: Rail | None = None,
+    work_id: str | None = None,
+    limit: int | None = None,
+    include_diagnostics: bool = True,
+    measured_only: bool = False,
+    _test_experiment_ids: Sequence[str] | None = None,
+    predict: Callable[..., EnginePrediction] | None = None,
+    handles: Mapping[str, object] | None = None,
+    _prepared: _PreparedScoreRun | None = None,
+    _engine_set: Sequence[Engine] | None = None,
+    _refs: Sequence[Observation] | None = None,
+    _stream: _ResidualJsonlStream | None = None,
+    _shard_failure_reason: str | None = None,
+    _skip_sort_orders: frozenset[tuple[str, int, int, int]] = frozenset(),
+) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
+    prepared = _prepared or _prepare_score_run(
+        context,
+        engines=engines,
+        rail=rail,
+        work_id=work_id,
+        limit=limit,
+        include_diagnostics=include_diagnostics,
+        measured_only=measured_only,
+        _test_experiment_ids=_test_experiment_ids,
+    )
+    if prepared.context is not context:
+        raise ValueError("prepared score context does not match the scoring context")
+    engine_set = (
+        prepared.engine_set
+        if _engine_set is None
+        else _validated_score_engines(tuple(_engine_set))
+    )
+    engine_order = {
+        engine: index for index, engine in enumerate(prepared.engine_set)
+    }
+    refs = prepared.refs if _refs is None else tuple(_refs)
+    fusion_diagnostic_ids = prepared.fusion_diagnostic_ids
+    comparison_ids = prepared.comparison_ids
+    observations = prepared.observations
+    origins = prepared.origins
+    live_context = prepared.live_context
+    point_observations_by_experiment = prepared.point_observations_by_experiment
+    table_index = prepared.table_index
+    ratchet_missing = prepared.ratchet_missing
+    source_bands = prepared.source_bands
+    source_band_reasons = prepared.source_band_reasons
+    kems_partial_pressure_band = prepared.kems_partial_pressure_band
+    from simulator.battery.compilation_tier import (
+        _iter_compilation_series_cells,
+        is_compilation_evidence,
+    )
+    from simulator.battery.validate import bound_work_inputs
+
+    provided_handles = dict(handles or {})
+    resolved_handles = dict(provided_handles)
+    residuals: list[Residual] | None = [] if _stream is None else None
+    candidates: dict[str, Observation] = {}
     empirical_ids = comparison_ids
+    lineage_resolver = _ScoringLineageResolver(live_context)
     started = time.monotonic()
     last_progress = started
     done = 0
+    total = sum(
+        prepared.series_point_counts.get(obs.observation_id, 1) for obs in refs
+    ) * max(len(engine_set), 1)
 
     def report_progress_if_due() -> None:
         nonlocal last_progress
@@ -14580,28 +14783,14 @@ def _score_store_with_decisions(
         )
         last_progress = now
 
-    total = sum(
-        _compilation_series_point_count(obs, origins.get(obs.observation_id))
-        for obs in refs
-    ) * max(len(engine_set), 1)
-    from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
-
-    table_index = build_printed_thermo_index(observations)
-    ratchet_entries, ratchet_missing, _ratchet_history = _read_decision_band_ratchet(
-        context.root
-    )
-    source_bands, _source_band_records, source_band_reasons = _source_band_catalog(
-        context, ratchet_entries
-    )
-    kems_partial_pressure_band = derive_kems_partial_pressure_band(
-        observations, context.experiments, benches=context.benches
-    )
     residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
             for obs in refs:
                 origin = origins.get(obs.observation_id)
-                for point in _iter_compilation_series_cells(obs, origin):
+                for point_index, point in enumerate(
+                    _iter_compilation_series_cells(obs, origin)
+                ):
                     point_origin = origins.get(point.observation_id, origin or "")
                     diagnostic = (
                         obs.observation_id not in empirical_ids
@@ -14653,6 +14842,15 @@ def _score_store_with_decisions(
                         derived_band = kems_partial_pressure_band
                         derived_band_reason = None
                     for engine in engine_set:
+                        prediction = None
+                        scoring_predict = (
+                            partial(
+                                _score_failed_shard_prediction,
+                                failure_reason=_shard_failure_reason,
+                            )
+                            if _shard_failure_reason is not None
+                            else predict
+                        )
                         lineage_id = (
                             obs.observation_id
                             if point.observation_id != obs.observation_id
@@ -14677,7 +14875,8 @@ def _score_store_with_decisions(
                                 identity=point.identity if isinstance(point.identity, Identity) else None,
                             )
                         if (
-                            predict is None
+                            _shard_failure_reason is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity in {
                                 Quantity.RESIDUE_COMPONENT_COMPOSITION,
@@ -14691,9 +14890,11 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                                test_experiment_ids=prepared.test_experiment_ids,
                             )
                         if (
-                            predict is None
+                            _shard_failure_reason is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity in {
                                 Quantity.RESIDUE_COMPONENT_COMPOSITION,
@@ -14707,9 +14908,11 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                                test_experiment_ids=prepared.test_experiment_ids,
                             )
                         if (
-                            predict is None
+                            _shard_failure_reason is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity in {
                                 Quantity.RESIDUE_COMPONENT_COMPOSITION,
@@ -14730,7 +14933,7 @@ def _score_store_with_decisions(
                             context=live_context,
                             prediction=prediction,
                             comparison_ids=comparison_ids,
-                            predict=predict,
+                            predict=scoring_predict,
                             handles=resolved_handles,
                             lineage_observation_id=lineage_id,
                             table_index=table_index,
@@ -14747,16 +14950,42 @@ def _score_store_with_decisions(
                             ),
                             _source_relation_resolver=lineage_resolver,
                         )
+                        if _shard_failure_reason is not None:
+                            residual = _score_failed_shard_residual(
+                                residual,
+                                engine,
+                                _shard_failure_reason,
+                                point,
+                                candidate,
+                            )
+                            candidate = None
+                        base_sort_order = (
+                            obs.observation_id,
+                            point_index,
+                            engine_order[engine],
+                            0,
+                        )
                         if _stream is None:
                             assert residuals is not None
                             residuals.append(residual)
                         else:
-                            _stream.append(residual, candidate)
+                            if base_sort_order not in _skip_sort_orders:
+                                _stream.append(
+                                    residual,
+                                    candidate,
+                                    sort_order=base_sort_order,
+                                )
                         if (
                             residual.fo2_mode is Fo2Mode.SHARED_LADDER
                             and intrinsic_redox_activity
-                            and prediction is None
-                            and predict is None
+                            and (
+                                prediction is None
+                                and predict is None
+                                and (
+                                    _stream is None
+                                    or base_sort_order not in _skip_sort_orders
+                                )
+                            )
                         ):
                             total += 1
                             intrinsic_residual, intrinsic_candidate = compile_residual(
@@ -14777,16 +15006,34 @@ def _score_store_with_decisions(
                                 point_observations=point_observations_by_experiment.get(
                                     point.experiment_id, ()
                                 ),
+                                predict=scoring_predict,
                                 fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
                             )
+                            if _shard_failure_reason is not None:
+                                intrinsic_residual = _score_failed_shard_residual(
+                                    intrinsic_residual,
+                                    engine,
+                                    _shard_failure_reason,
+                                    point,
+                                    intrinsic_candidate,
+                                )
+                                intrinsic_candidate = None
                             if _stream is None:
                                 assert residuals is not None
                                 residuals.append(intrinsic_residual)
                             else:
-                                _stream.append(
-                                    intrinsic_residual,
-                                    intrinsic_candidate,
+                                intrinsic_sort_order = (
+                                    obs.observation_id,
+                                    point_index,
+                                    engine_order[engine],
+                                    1,
                                 )
+                                if intrinsic_sort_order not in _skip_sort_orders:
+                                    _stream.append(
+                                        intrinsic_residual,
+                                        intrinsic_candidate,
+                                        sort_order=intrinsic_sort_order,
+                                    )
                             if intrinsic_candidate is not None and _stream is None:
                                 candidates[intrinsic_candidate.observation_id] = (
                                     intrinsic_candidate
@@ -14825,6 +15072,270 @@ def _score_store_with_decisions(
     return scored, candidates, _compilation_decision_strata(scored, context)
 
 
+_SCORE_WORKER_SETUP: (
+    tuple[
+        _PreparedScoreRun,
+        Callable[..., EnginePrediction] | None,
+    ]
+) | None = None
+
+
+@dataclass(frozen=True)
+class _ScoreShardResult:
+    partial_path: str | None = None
+    row_count: int = 0
+    counters: Mapping[str, Mapping[str, object]] | None = None
+    runtime_identities: Mapping[str, str] | None = None
+    failure: str | None = None
+    refused_rows: int = 0
+
+
+def _sum_engine_cache_counters(
+    total: dict[str, dict[str, object]] | None,
+    counts: Mapping[str, Mapping[str, object]],
+) -> dict[str, dict[str, object]]:
+    if total is None:
+        total = {}
+    for engine, engine_counts in counts.items():
+        accumulated = total.setdefault(engine, {})
+        for name, value in engine_counts.items():
+            if isinstance(value, int):
+                accumulated[name] = int(accumulated.get(name, 0)) + value
+    return total
+
+
+def _score_failed_shard_prediction(
+    engine: Engine,
+    observation: Observation,
+    *,
+    failure_reason: str,
+    **_kwargs: object,
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        execution=Execution(
+            state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            call_evidence=f"score_shard:{engine.value}",
+        ),
+        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+        refusal_detail={
+            "reason": "score_shard_failed",
+            "detail": failure_reason,
+        },
+        identity=(
+            observation.identity
+            if isinstance(observation.identity, Identity)
+            else None
+        ),
+    )
+
+
+def _score_failed_shard_residual(
+    residual: Residual,
+    engine: Engine,
+    failure_reason: str,
+    observation: Observation,
+    candidate: Observation | None,
+) -> Residual:
+    detail: dict[str, object] = {
+        "reason": "score_shard_failed",
+        "engine": engine.value,
+        "detail": failure_reason,
+    }
+    check_refs: tuple[str, ...] = ()
+    if residual.refusal is not None:
+        detail["prior_refusal"] = {
+            "reason": residual.refusal.reason.value,
+            "detail": dict(residual.refusal.detail),
+        }
+        check_refs = residual.refusal.check_refs
+    request = residual.candidate_request
+    if request is None and candidate is not None:
+        candidate_quantity = quantity_token(candidate.identity)
+        if candidate_quantity is not None:
+            request = CandidateRequest(
+                candidate.experiment_id,
+                candidate_quantity,
+                engine,
+                ENGINE_CHANNELS[engine],
+            )
+    if request is None and isinstance(observation.identity, Identity):
+        observed_quantity = quantity_token(observation.identity)
+        if observed_quantity is not None:
+            request = CandidateRequest(
+                observation.experiment_id,
+                observed_quantity,
+                engine,
+                ENGINE_CHANNELS[engine],
+            )
+    return replace(
+        residual,
+        execution=Execution(
+            state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            call_evidence=f"score_shard:{engine.value}",
+        ),
+        status=ResidualStatus.REFUSED,
+        score_eligible=False,
+        candidate=None,
+        candidate_request=request,
+        numeric=None,
+        refusal=ResidualRefusal(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            detail,
+            check_refs=check_refs,
+        ),
+    )
+
+
+def _score_shard_worker_error_result(
+    _task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
+    error: BaseException,
+) -> _ScoreShardResult:
+    return _ScoreShardResult(
+        failure=f"{type(error).__name__}: {error}",
+    )
+
+
+def _initialize_score_worker(
+    prepared: _PreparedScoreRun,
+    predict: Callable[..., EnginePrediction] | None,
+) -> None:
+    global _SCORE_WORKER_SETUP
+    _SCORE_WORKER_SETUP = (prepared, predict)
+
+
+def _score_group_shard(
+    task: tuple[int, Engine, tuple[Observation, ...], str, str | None]
+) -> _ScoreShardResult:
+    prepared, predict = _SCORE_WORKER_SETUP or (None, None)
+    if prepared is None:
+        raise RuntimeError("battery score worker was not initialized")
+    _shard_index, engine, refs, path_text, root_text = task
+    stream = _ResidualJsonlStream(
+        Path(path_text),
+        root=None if root_text is None else Path(root_text),
+        sort_on_finalize=False,
+    )
+    try:
+        from simulator.engine_cache import (
+            engine_cache_counters,
+            engine_cache_runtime_identities,
+        )
+
+        engine_cache_counters(reset=True)
+        _score_store_with_decisions(
+            prepared.context,
+            predict=predict,
+            _prepared=prepared,
+            _engine_set=(engine,),
+            _refs=refs,
+            _stream=stream,
+        )
+        counters = engine_cache_counters(reset=True)
+        runtime_identities = engine_cache_runtime_identities()
+        return _ScoreShardResult(
+            partial_path=str(stream.partial_path),
+            row_count=stream.count,
+            counters=counters,
+            runtime_identities=runtime_identities,
+        )
+    finally:
+        stream.close()
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            _close_isolated_cell_workers,
+        )
+
+        _close_isolated_cell_workers()
+
+
+def _materialize_failed_score_shard(
+    task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
+    result: _ScoreShardResult,
+    prepared: _PreparedScoreRun,
+    *,
+    expected_header: bytes,
+    predict: Callable[..., EnginePrediction] | None,
+) -> _ScoreShardResult:
+    if result.failure is None:
+        return result
+    path = Path(task[3])
+    partial_path = path.with_name(path.name + ".partial")
+    order_path = partial_path.with_name(partial_path.name + ".order")
+    recovered_path = path.with_name(path.name + ".recovered")
+    recovered_stream = _ResidualJsonlStream(
+        recovered_path,
+        root=None if task[4] is None else Path(task[4]),
+        sort_on_finalize=False,
+    )
+    completed_orders: set[tuple[str, int, int, int]] = set()
+    try:
+        if partial_path.is_file() and order_path.is_file():
+            with (
+                partial_path.open("rb") as shard,
+                order_path.open("rb") as order_file,
+            ):
+                if shard.readline() == expected_header:
+                    order_lines = iter(order_file)
+                    for line in shard:
+                        if not line.endswith(b"\n"):
+                            break
+                        try:
+                            order_line = next(order_lines)
+                        except StopIteration:
+                            break
+                        if not order_line.endswith(b"\n"):
+                            break
+                        try:
+                            payload = json.loads(line)
+                            order_value = json.loads(order_line)
+                        except (UnicodeDecodeError, json.JSONDecodeError):
+                            continue
+                        if (
+                            not isinstance(payload, Mapping)
+                            or is_store_stamp_payload(payload)
+                            or not isinstance(order_value, list)
+                            or len(order_value) != 4
+                            or not isinstance(order_value[0], str)
+                            or any(
+                                type(value) is not int for value in order_value[1:]
+                            )
+                        ):
+                            continue
+                        stable_order = (
+                            order_value[0],
+                            order_value[1],
+                            order_value[2],
+                            order_value[3],
+                        )
+                        if stable_order in completed_orders:
+                            continue
+                        recovered_stream.append_payload_line(
+                            line,
+                            sort_order=stable_order,
+                        )
+                        completed_orders.add(stable_order)
+        _score_store_with_decisions(
+            prepared.context,
+            _prepared=prepared,
+            _engine_set=(task[1],),
+            _refs=task[2],
+            _stream=recovered_stream,
+            predict=predict,
+            _shard_failure_reason=result.failure,
+            _skip_sort_orders=frozenset(completed_orders),
+        )
+        return replace(
+            result,
+            partial_path=str(recovered_stream.partial_path),
+            row_count=recovered_stream.count,
+            refused_rows=recovered_stream.count - len(completed_orders),
+        )
+    finally:
+        recovered_stream.close()
+
+
 def _score_store_to_jsonl(
     context: ScoreContext,
     path: Path,
@@ -14836,35 +15347,204 @@ def _score_store_to_jsonl(
     limit: int | None = None,
     include_diagnostics: bool = True,
     measured_only: bool = False,
+    _test_experiment_ids: Sequence[str] | None = None,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
+    workers: int = 1,
     compact_static_refusals: bool = False,
 ) -> tuple[int, _ResidualReportMetadata]:
     """Score directly to a sorted ``.partial`` JSONL without retaining rows."""
 
+    if workers < 1:
+        raise ValueError("workers must be at least 1")
+    if workers > 1 and handles:
+        raise ValueError("spawned score workers open their own engine handles")
     stream = _ResidualJsonlStream(
         path,
         root=root,
         compact_static_refusals=compact_static_refusals,
     )
+    from simulator.engine_cache import (
+        engine_cache_counters,
+        engine_cache_runtime_identities,
+    )
+
+    cache_counters: dict[str, dict[str, object]] | None = None
+    cache_runtime_identities: dict[str, str] | None = None
+    shard_failures: list[Mapping[str, object]] = []
     try:
-        _score_store_with_decisions(
-            context,
-            engines=engines,
-            rail=rail,
-            work_id=work_id,
-            limit=limit,
-            include_diagnostics=include_diagnostics,
-            measured_only=measured_only,
-            predict=predict,
-            handles=handles,
-            _stream=stream,
-        )
+        if workers == 1:
+            engine_cache_counters(reset=True)
+            _score_store_with_decisions(
+                context,
+                engines=engines,
+                rail=rail,
+                work_id=work_id,
+                limit=limit,
+                include_diagnostics=include_diagnostics,
+                measured_only=measured_only,
+                _test_experiment_ids=_test_experiment_ids,
+                predict=predict,
+                handles=handles,
+                _stream=stream,
+            )
+            cache_counters = engine_cache_counters(reset=True)
+            cache_runtime_identities = engine_cache_runtime_identities()
+        else:
+            prepared = _prepare_score_run(
+                context,
+                engines=engines,
+                rail=rail,
+                work_id=work_id,
+                limit=limit,
+                include_diagnostics=include_diagnostics,
+                measured_only=measured_only,
+                _test_experiment_ids=_test_experiment_ids,
+            )
+            chunks = _partition_score_refs(prepared.refs, workers=workers)
+            populated_chunks = [
+                (index, chunk)
+                for index, chunk in enumerate(chunks)
+                if chunk
+            ]
+            if not populated_chunks or not prepared.engine_set:
+                engine_cache_counters(reset=True)
+                _score_store_with_decisions(
+                    context,
+                    _prepared=prepared,
+                    _refs=(),
+                    _stream=stream,
+                )
+                cache_counters = engine_cache_counters(reset=True)
+                cache_runtime_identities = engine_cache_runtime_identities()
+            else:
+                root_text = None if root is None else str(root)
+                with tempfile.TemporaryDirectory(
+                    prefix="battery-score-shards-"
+                ) as temporary_dir:
+                    tasks = []
+                    for index, chunk in populated_chunks:
+                        for engine in prepared.engine_set:
+                            shard_path = Path(temporary_dir) / (
+                                f"shard-{index:04d}-{engine.value}.jsonl"
+                            )
+                            tasks.append(
+                                (index, engine, chunk, str(shard_path), root_text)
+                            )
+                    engine_cache_counters(reset=True)
+                    shard_results = supervised_process_map(
+                        tasks,
+                        _score_group_shard,
+                        max_workers=min(workers, len(tasks)),
+                        initializer=_initialize_score_worker,
+                        initargs=(
+                            prepared,
+                            predict,
+                        ),
+                        mp_context=mp.get_context("spawn"),
+                        timeout_seconds=None,
+                        handle_worker_error=_score_shard_worker_error_result,
+                    )
+                    with stream.partial_path.open("rb") as output:
+                        header = output.readline()
+                    shard_count = 0
+                    cache_counters = {}
+                    cache_runtime_identities = {}
+                    for task, shard_result in zip(tasks, shard_results):
+                        if shard_result.failure is not None:
+                            shard_result = _materialize_failed_score_shard(
+                                task,
+                                shard_result,
+                                prepared,
+                                expected_header=header,
+                                predict=predict,
+                            )
+                            shard_failures.append(
+                                {
+                                    "chunk": task[0],
+                                    "engine": task[1].value,
+                                    "reason": shard_result.failure,
+                                    "refused_rows": shard_result.refused_rows,
+                                }
+                            )
+                        if shard_result.partial_path is None:
+                            raise RuntimeError("score shard returned no residual file")
+                        shard_count += shard_result.row_count
+                        if shard_result.counters is not None:
+                            cache_counters = _sum_engine_cache_counters(
+                                cache_counters, shard_result.counters
+                            )
+                        if shard_result.runtime_identities is not None:
+                            cache_runtime_identities.update(
+                                shard_result.runtime_identities
+                            )
+                        order_path = Path(f"{shard_result.partial_path}.order")
+                        with (
+                            Path(shard_result.partial_path).open("rb") as shard,
+                            order_path.open("r", encoding="utf-8") as order_file,
+                        ):
+                            if shard.readline() != header:
+                                raise ValueError("score shard store stamp mismatch")
+                            for line in shard:
+                                if not line.strip():
+                                    continue
+                                payload = json.loads(line)
+                                if (
+                                    not isinstance(payload, dict)
+                                    or is_store_stamp_payload(payload)
+                                ):
+                                    continue
+                                order_value = json.loads(order_file.readline())
+                                if (
+                                    not isinstance(order_value, list)
+                                    or len(order_value) != 4
+                                    or not isinstance(order_value[0], str)
+                                    or any(
+                                        type(value) is not int
+                                        for value in order_value[1:]
+                                    )
+                                ):
+                                    raise ValueError(
+                                        "score shard has an invalid serial-order entry"
+                                    )
+                                stream.append_payload_line(
+                                    line,
+                                    sort_order=(
+                                        order_value[0],
+                                        order_value[1],
+                                        order_value[2],
+                                        order_value[3],
+                                    ),
+                                )
+                            if order_file.read(1):
+                                raise ValueError(
+                                    "score shard has extra serial-order entries"
+                                )
+                    if stream.count != shard_count:
+                        raise ValueError(
+                            "score shard row count does not match merged output"
+                        )
+                stream.finalize(context=context, engines=prepared.engine_set)
+        if shard_failures:
+            print(
+                "score run notice: failed score shards were written as "
+                "ATTEMPTED_UNAVAILABLE rows: "
+                + "; ".join(
+                    "chunk={chunk} engine={engine} refused_rows={refused_rows}: "
+                    "{reason}".format(**failure)
+                    for failure in shard_failures
+                ),
+                file=sys.stderr,
+                flush=True,
+            )
         return stream.count, _ResidualReportMetadata(
             family_band_values=dict(stream.band_values),
             headline_band_values=dict(stream.headline_band_values),
             tier_band_values=dict(stream.tier_band_values),
             aggregate=stream.report_aggregate,
+            engine_cache_counters=cache_counters,
+            engine_cache_runtime_identities=cache_runtime_identities,
+            shard_failures=tuple(shard_failures),
             static_refusals=stream.static_refusals,
         )
     finally:
@@ -15132,6 +15812,9 @@ class _ResidualReportMetadata:
     headline_band_values: Mapping[tuple[str, str, str], set[str]]
     tier_band_values: Mapping[tuple[str, str, str, str, str, str], set[str]]
     aggregate: _ScorePayloadAccumulator | None = None
+    engine_cache_counters: Mapping[str, Mapping[str, object]] | None = None
+    engine_cache_runtime_identities: Mapping[str, str] | None = None
+    shard_failures: tuple[Mapping[str, object], ...] = ()
     static_refusals: Sequence[Mapping[str, object]] = ()
 
 
@@ -19323,6 +20006,7 @@ def _render_score_report_from_payloads_legacy(
     studio_hostname: str | None = None,
     store_stamp: Mapping[str, object] | None = None,
     _aggregate: _ScorePayloadAccumulator | None = None,
+    shard_failures: Sequence[Mapping[str, object]] = (),
 ) -> str:
     aggregate = _aggregate or _ScorePayloadAccumulator.from_rows(
         rows, context=context, engines=engines
@@ -19594,8 +20278,35 @@ def _render_score_report_from_payloads_legacy(
         )
     elif has_residuals:
         lines.extend(["", "All mapped legacy keys have a v2.1 comparison slot."])
+    if shard_failures:
+        lines.extend(["", *_score_shard_failure_report_lines(shard_failures)])
     lines.append("")
     return "\n".join(lines)
+
+
+def _score_shard_failure_report_lines(
+    failures: Sequence[Mapping[str, object]],
+) -> list[str]:
+    lines = [
+        "## Score shard failures",
+        "",
+        "Failed shards were completed with typed refusals for rows that had no output.",
+        "",
+        "| chunk | engine | refused rows | reason |",
+        "|---:|---|---:|---|",
+    ]
+    for failure in failures:
+        reason = (
+            str(failure.get("reason", ""))
+            .replace("|", "\\|")
+            .replace("`", "\\`")
+            .replace("\n", " ")
+        )
+        lines.append(
+            f"| {failure.get('chunk', '—')} | {failure.get('engine', '—')} | "
+            f"{failure.get('refused_rows', 0)} | `{reason}` |"
+        )
+    return lines
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -19964,8 +20675,10 @@ class _ResidualJsonlStream:
         path: Path,
         *,
         root: Path | None = None,
+        sort_on_finalize: bool = True,
         compact_static_refusals: bool = False,
     ) -> None:
+        self.sort_on_finalize = sort_on_finalize
         self.partial_path = path.with_name(path.name + ".partial")
         self.root = root or REPO_ROOT
         self.compact_static_refusals = compact_static_refusals
@@ -19977,21 +20690,48 @@ class _ResidualJsonlStream:
             (dumps_store_stamp(self.store_stamp) + "\n").encode("utf-8")
         )
         self.file.flush()
-        self._temporary = tempfile.TemporaryDirectory(prefix="battery-score-index-")
-        self._database = sqlite3.connect(
-            Path(self._temporary.name) / "residual-order.sqlite"
-        )
-        self._database.execute("PRAGMA cache_size=-16384")
-        self._database.execute("PRAGMA temp_store=FILE")
-        self._database.execute("PRAGMA journal_mode=OFF")
-        self._database.execute("PRAGMA synchronous=OFF")
-        self._database.execute(
-            "CREATE TABLE residual_order ("
-            "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
-            "key TEXT NOT NULL, offset INTEGER NOT NULL, band_value TEXT, "
-            "numeric_value TEXT)"
-        )
-        self._pending: list[tuple[str, str, str, int, str | None, str | None]] = []
+        self._temporary: tempfile.TemporaryDirectory | None = None
+        self._database: sqlite3.Connection | None = None
+        self._order_path: Path | None = None
+        self._order_file: TextIO | None = None
+        if sort_on_finalize:
+            self._temporary = tempfile.TemporaryDirectory(
+                prefix="battery-score-index-"
+            )
+            self._database = sqlite3.connect(
+                Path(self._temporary.name) / "residual-order.sqlite"
+            )
+            self._database.execute("PRAGMA cache_size=-16384")
+            self._database.execute("PRAGMA temp_store=FILE")
+            self._database.execute("PRAGMA journal_mode=OFF")
+            self._database.execute("PRAGMA synchronous=OFF")
+            self._database.execute(
+                "CREATE TABLE residual_order ("
+                "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
+                "key TEXT NOT NULL, offset INTEGER NOT NULL, "
+                "band_value TEXT, numeric_value TEXT, order_ref TEXT NOT NULL, "
+                "order_point INTEGER NOT NULL, order_engine INTEGER NOT NULL, "
+                "order_subrow INTEGER NOT NULL)"
+            )
+        else:
+            self._order_path = self.partial_path.with_name(
+                f"{self.partial_path.name}.order"
+            )
+            self._order_file = self._order_path.open("w", encoding="utf-8")
+        self._pending: list[
+            tuple[
+                str,
+                str,
+                str,
+                int,
+                str | None,
+                str | None,
+                str,
+                int,
+                int,
+                int,
+            ]
+        ] = []
         self.band_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
         self.headline_band_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
         self.tier_band_values: dict[
@@ -20019,32 +20759,102 @@ class _ResidualJsonlStream:
         self,
         residual: Residual,
         candidate: Observation | None,
+        *,
+        sort_order: tuple[str, int, int, int] | None = None,
     ) -> None:
         if self.compact_static_refusals:
             static_key = _static_refusal_summary_key(residual)
             if static_key is not None:
                 self.static_refusal_counts[static_key] += 1
                 return
-        offset = self.file.tell()
         line = dumps_residual_line(residual, candidate).encode("utf-8")
-        self.file.write(line + b"\n")
         numeric = residual.numeric
         decision_band = None if numeric is None else numeric.decision_band
         band_value = None if decision_band is None else str(decision_band.value)
         numeric_value = None if numeric is None else str(numeric.value)
-        self._pending.append(
-            (
-                "" if residual.rail is None else residual.rail.value,
-                residual.reference,
-                residual.key,
-                offset,
-                band_value,
-                numeric_value,
-            )
+        self._append_line(
+            line,
+            rail="" if residual.rail is None else residual.rail.value,
+            reference=residual.reference,
+            key=residual.key,
+            band_value=band_value,
+            numeric_value=numeric_value,
+            sort_order=sort_order,
         )
+
+    def append_payload_line(
+        self,
+        line: bytes,
+        *,
+        sort_order: tuple[str, int, int, int] | None = None,
+    ) -> None:
+        payload = json.loads(line)
+        if not isinstance(payload, Mapping):
+            raise ValueError("score shard row is not an object")
+        numeric = payload.get("numeric")
+        band = numeric.get("decision_band") if isinstance(numeric, Mapping) else None
+        band_value = (
+            str(band["value"])
+            if isinstance(band, Mapping) and band.get("value") is not None
+            else None
+        )
+        numeric_value = (
+            str(numeric["value"])
+            if isinstance(numeric, Mapping) and numeric.get("value") is not None
+            else None
+        )
+        self._append_line(
+            line.rstrip(b"\r\n"),
+            rail=str(payload.get("rail") or ""),
+            reference=str(payload.get("reference") or ""),
+            key=str(payload.get("key") or ""),
+            band_value=band_value,
+            numeric_value=numeric_value,
+            sort_order=sort_order,
+        )
+
+    def _append_line(
+        self,
+        line: bytes,
+        *,
+        rail: str,
+        reference: str,
+        key: str,
+        band_value: str | None,
+        numeric_value: str | None,
+        sort_order: tuple[str, int, int, int] | None,
+    ) -> None:
+        stable_order = sort_order or ("", self.count, 0, 0)
+        if not self.sort_on_finalize:
+            assert self._order_file is not None
+            # The sidecar is written first. After both flushes, each complete
+            # residual line has exactly one recoverable serial-order entry.
+            self._order_file.write(
+                json.dumps(stable_order, ensure_ascii=False, separators=(",", ":"))
+                + "\n"
+            )
+            self._order_file.flush()
+        offset = self.file.tell()
+        self.file.write(line + b"\n")
+        if self.sort_on_finalize:
+            self._pending.append(
+                (
+                    rail,
+                    reference,
+                    key,
+                    offset,
+                    band_value,
+                    numeric_value,
+                    *stable_order,
+                )
+            )
+            if len(self._pending) >= self._INDEX_BATCH:
+                self._flush_index()
+        else:
+            # Shard workers may die without running Python cleanup. A flushed
+            # line is therefore the unit recovery can safely preserve.
+            self.file.flush()
         self.count += 1
-        if len(self._pending) >= self._INDEX_BATCH:
-            self._flush_index()
         now = time.monotonic()
         if self.count % self._FLUSH_LINES == 0 or now - self._last_flush >= 5:
             self.flush()
@@ -20052,15 +20862,19 @@ class _ResidualJsonlStream:
     def _flush_index(self) -> None:
         if not self._pending:
             return
+        assert self._database is not None
         self._database.executemany(
-            "INSERT INTO residual_order (rail, reference, key, offset, band_value, "
-            "numeric_value) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO residual_order (rail, reference, key, offset, "
+            "band_value, numeric_value, order_ref, order_point, order_engine, "
+            "order_subrow) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             self._pending,
         )
         self._database.commit()
         self._pending.clear()
 
     def flush(self) -> None:
+        if self._order_file is not None:
+            self._order_file.flush()
         self.file.flush()
         self._last_flush = time.monotonic()
 
@@ -20071,10 +20885,14 @@ class _ResidualJsonlStream:
         engines: Sequence[Engine],
     ) -> None:
         self.flush()
+        if not self.sort_on_finalize:
+            return
+        assert self._database is not None
         self._flush_index()
         self._database.execute(
             "CREATE INDEX residual_order_key ON residual_order("
-            "rail COLLATE BINARY, reference COLLATE BINARY, key COLLATE BINARY, seq)"
+            "rail COLLATE BINARY, reference COLLATE BINARY, key COLLATE BINARY, "
+            "order_ref COLLATE BINARY, order_point, order_engine, order_subrow, seq)"
         )
         report_aggregate = _ScorePayloadAccumulator(
             context,
@@ -20102,7 +20920,8 @@ class _ResidualJsonlStream:
                         "SELECT offset, band_value, numeric_value "
                         "FROM residual_order "
                         "ORDER BY rail COLLATE BINARY, reference COLLATE BINARY, "
-                        "key COLLATE BINARY, seq"
+                        "key COLLATE BINARY, order_ref COLLATE BINARY, order_point, "
+                        "order_engine, order_subrow, seq"
                     )
                     for offset, band_value, numeric_value in rows:
                         source.seek(offset)
@@ -20216,8 +21035,12 @@ class _ResidualJsonlStream:
     def close(self) -> None:
         if not self.file.closed:
             self.file.close()
-        self._database.close()
-        self._temporary.cleanup()
+        if self._order_file is not None and not self._order_file.closed:
+            self._order_file.close()
+        if self._database is not None:
+            self._database.close()
+        if self._temporary is not None:
+            self._temporary.cleanup()
 
 
 def flagged_stratum_payloads(
@@ -21126,10 +21949,14 @@ def _write_headline_summary_from_accumulator_json(
     path: Path,
     *,
     store_stamp: Mapping[str, object] | None,
+    shard_failures: Sequence[Mapping[str, object]] = (),
 ) -> None:
-    _write_headline_summary_payload_json(
-        aggregate.summary_payload(store_stamp), path
-    )
+    payload = aggregate.summary_payload(store_stamp)
+    if shard_failures:
+        payload["score_shard_failures"] = [
+            dict(failure) for failure in shard_failures
+        ]
+    _write_headline_summary_payload_json(payload, path)
 
 
 def _write_headline_summary_payload_json(

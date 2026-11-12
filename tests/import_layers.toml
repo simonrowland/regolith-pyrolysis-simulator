@@ -29,6 +29,8 @@
 "simulator.melt_backend" = 1
 "simulator.engine_local_config" = 0
 "simulator.engine_pool" = 1
+# engine_cache is a stdlib-only leaf; the import-boundary guard enforces that claim.
+"simulator.engine_cache" = 1
 "simulator.alphamelts_reference_pressure" = 1
 "simulator.material_densities" = 1
 "simulator.composition_projection" = 1
