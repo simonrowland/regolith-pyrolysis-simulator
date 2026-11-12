@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import re
+import ast
 import subprocess
 from pathlib import Path
 
@@ -40,6 +40,43 @@ SC_388_ALLOWLIST = (
     ("simulator/run_executor.py", "_safe_str", "engine", "d-396 #11"),
 )
 
+SC_388_BEHAVIOR_PINS = (
+    (
+        "simulator/diagnostic_helpers/species_rail_differential.py",
+        "_evaluate_rail_pressure_Pa",
+        ('return "rail_row_absent"',),
+    ),
+    (
+        "engines/alphamelts/provider.py",
+        "_run_liquidus_finder",
+        (
+            "status = 'not_converged'",
+            "LiquidusSolidusResult(",
+            "status=status",
+        ),
+    ),
+    (
+        "simulator/furnace_materials.py",
+        "_catalog_max_service_T_C",
+        ("default: float = 2000.0", "return default"),
+    ),
+    (
+        "scripts/render_flowsheet.py",
+        "build_live_major_facts",
+        (
+            'for el in ("Al", "Ti", "Si", "Mn", "Cr"):',
+            "facts.setdefault(",
+            '"reducibility": "mg_reducible"',
+            '"reductant_class": "Mg-C6"',
+        ),
+    ),
+    (
+        "simulator/run_executor.py",
+        "_safe_str",
+        ("def _safe_str(builder: Any, default: str)", "return default"),
+    ),
+)
+
 
 def _git_grep(pattern: str, *paths: str) -> list[str]:
     completed = subprocess.run(
@@ -63,12 +100,27 @@ def _assert_count_at_most(
     )
 
 
+def _function_source(path: str, function: str) -> str:
+    source = (REPO_ROOT / path).read_text(encoding="utf-8")
+    tree = ast.parse(source, filename=path)
+    matches = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == function
+    ]
+    assert len(matches) == 1, f"expected one {path}:{function} definition"
+    body = ast.get_source_segment(source, matches[0])
+    assert body is not None
+    return body
+
+
 def test_source_id_comparisons_are_decrease_only() -> None:
     simulator = _git_grep(
-        r'source_id[[:space:]]*(==|!=)[[:space:]]*"', "simulator"
+        r"""source_id[[:space:]]*(==|!=)[[:space:]]*['"]""", "simulator"
     )
     tools_scripts = _git_grep(
-        r'source_id[[:space:]]*(==|!=)[[:space:]]*"', "tools", "scripts"
+        r"""source_id[[:space:]]*(==|!=)[[:space:]]*['"]""", "tools", "scripts"
     )
 
     _assert_count_at_most(
@@ -96,21 +148,24 @@ def test_finite_numeric_helpers_are_frozen() -> None:
 
 
 def test_sc388_allowlist_only_shrinks() -> None:
-    entries = [
-        f"{path}:{function} ({lane}, {task})"
-        for path, function, lane, task in SC_388_ALLOWLIST
+    listed_sites = [
+        (path, function) for path, function, _lane, _task in SC_388_ALLOWLIST
     ]
-    extra = len(entries) - SC_388_SITE_CEILING
+    entries = set(listed_sites)
+    assert len(entries) == len(listed_sites), "SC-388 allow-list has duplicate sites"
+    extra = len(listed_sites) - SC_388_SITE_CEILING
     assert extra <= 0, (
         f"SC-388 allow-list gained {extra} new/extra site(s) above ceiling "
-        f"{SC_388_SITE_CEILING}: " + "; ".join(entries)
+        f"{SC_388_SITE_CEILING}: " + "; ".join(sorted(map(str, entries)))
     )
 
-    for path, function, lane, task in SC_388_ALLOWLIST:
-        definition = _git_grep(
-            rf"^[[:space:]]*def {re.escape(function)}\(", path
-        )
-        assert len(definition) == 1, (
-            f"SC-388 site {path}:{function} ({lane}, {task}) no longer exists; "
-            "remove its fixed entry from the allow-list"
-        )
+    live_fallbacks = set()
+    for path, function, fragments in SC_388_BEHAVIOR_PINS:
+        body = _function_source(path, function)
+        if all(fragment in body for fragment in fragments):
+            live_fallbacks.add((path, function))
+    assert entries == live_fallbacks, (
+        "SC-388 allow-list must match the handlers whose ordinary fallback "
+        "behavior is still present; remove a fixed entry or name the live "
+        f"handler. Listed={sorted(entries)} live={sorted(live_fallbacks)}"
+    )
