@@ -384,6 +384,130 @@ def test_default_alphamelts_projection_matches_resolved_opener_settings() -> Non
         close_battery_engine_handle(handle)
 
 
+def _capture_engine_cache_settings_paths(
+    engine: str,
+    normalized_settings: dict[str, Any],
+    backend: Any,
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[list[dict[str, Any]], list[Any]]:
+    from threading import Lock
+
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    requests: list[dict[str, Any]] = []
+    projection_inputs: list[Any] = []
+    original_projection = engine_cache.engine_cache_settings
+
+    def record_projection(name: str, settings: Any, **kwargs: Any) -> dict[str, Any]:
+        projection_inputs.append(settings)
+        return original_projection(name, settings, **kwargs)
+
+    def cached_call(
+        _name: str, request: dict[str, Any], solve: Callable[[], Any]
+    ) -> Any:
+        requests.append(dict(request))
+        return solve()
+
+    monkeypatch.setattr(engine_cache, "_configured_engine_cache_path", lambda: "test")
+    monkeypatch.setattr(engine_cache, "engine_cache_settings", record_projection)
+    monkeypatch.setattr(engine_cache, "cached_engine_call", cached_call)
+
+    if engine not in {"openimcc", "internal-analytical"}:
+        handle = binary_pot_battery.EngineHandle(
+            name=engine,
+            backend=backend,
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=False,
+            engine_settings=normalized_settings,
+        )
+        binary_pot_battery._call_cached_backend_equilibrate(
+            handle, {}, lambda: None
+        )
+
+    worker = object.__new__(binary_pot_battery._IsolatedCellWorker)
+    worker.engine = engine
+    worker.engine_settings = dict(normalized_settings)
+    worker._lock = Lock()
+    worker._worker = SimpleNamespace(
+        call=lambda _payload, *, timeout_s: {"status": "refusal"}
+    )
+    worker.request(
+        {
+            "composition_wt_pct": {},
+            "temperature_K": 1600.0,
+            "po2": {},
+        },
+        timeout_s=1.0,
+    )
+    return requests, projection_inputs
+
+
+@pytest.mark.parametrize(
+    "engine",
+    (
+        "internal-analytical",
+        "alphamelts",
+        "thermoengine",
+        "vaporock",
+        "magemin",
+        "openimcc",
+    ),
+)
+def test_default_engine_cache_settings_match_across_call_paths(
+    engine: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
+    from simulator.engine_cache import (
+        ENGINE_CHEMISTRY_VERSION,
+        engine_cache_key,
+        engine_cache_settings,
+    )
+
+    normalized = normalize_engine_settings(engine, None)
+    expected_projection = engine_cache_settings(engine, normalized)
+    expected_key = engine_cache_key(
+        engine,
+        ENGINE_CHEMISTRY_VERSION[engine],
+        {"engine_settings": expected_projection},
+    )
+    case = next(
+        (case for case in _setting_cases() if case.engine.value == engine), None
+    )
+    backend = object() if case is None else case.backend_factory()
+
+    requests, projection_inputs = _capture_engine_cache_settings_paths(
+        engine, normalized, backend, monkeypatch
+    )
+
+    expected_request_count = (
+        0 if engine == "internal-analytical" else 1 if engine == "openimcc" else 2
+    )
+    assert len(requests) == expected_request_count
+    if engine == "internal-analytical":
+        assert expected_projection == {}
+        assert projection_inputs == []
+        return
+
+    for request in requests:
+        assert engine_cache_key(
+            engine,
+            ENGINE_CHEMISTRY_VERSION[engine],
+            {"engine_settings": request["engine_settings"]},
+        ) == expected_key
+
+    if engine != "openimcc":
+        assert projection_inputs[0] is normalized
+        assert dict(projection_inputs[1]) == normalized
+    else:
+        assert dict(projection_inputs[0]) == normalized
+
+
 @pytest.mark.parametrize(
     ("engine", "configuration", "setting", "changed"),
     (
@@ -506,7 +630,9 @@ def test_worker_scheduling_config_does_not_change_prediction_settings(engine: st
         normalize_engine_settings,
     )
     from simulator.engine_cache import (
+        ENGINE_CHEMISTRY_VERSION,
         ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS,
+        engine_cache_key,
         engine_cache_settings,
     )
 
@@ -825,7 +951,9 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
     from simulator.melt_backend.vaporock import VapoRockBackend
 
     from simulator.engine_cache import (
+        ENGINE_CHEMISTRY_VERSION,
         ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS,
+        engine_cache_key,
         engine_cache_settings,
     )
 
@@ -967,6 +1095,32 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
             )
     opener_settings = normalized_reads[-1]
     opener_projection = engine_cache_settings(engine, opener_settings)
+    cache_backend = opened_backend or next(
+        case.backend_factory()
+        for case in _setting_cases()
+        if case.engine.value == engine
+    )
+    cache_requests, projection_inputs = _capture_engine_cache_settings_paths(
+        engine, opener_settings, cache_backend, monkeypatch
+    )
+    if engine == "openimcc":
+        assert len(cache_requests) == 1
+        assert dict(projection_inputs[0]) == dict(opener_settings)
+    else:
+        assert len(cache_requests) == 2
+        assert projection_inputs[0] is opener_settings
+        assert dict(projection_inputs[1]) == dict(opener_settings)
+    expected_projection_key = engine_cache_key(
+        engine,
+        ENGINE_CHEMISTRY_VERSION[engine],
+        {"engine_settings": opener_projection},
+    )
+    for request in cache_requests:
+        assert engine_cache_key(
+            engine,
+            ENGINE_CHEMISTRY_VERSION[engine],
+            {"engine_settings": request["engine_settings"]},
+        ) == expected_projection_key
     assert opener_settings.reads <= set(opener_settings)
     if engine == "alphamelts":
         assert {
