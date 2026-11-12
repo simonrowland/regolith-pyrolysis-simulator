@@ -37,6 +37,7 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
     melt_regime,
 )
+from simulator.physical_constants import PA_PER_BAR
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -845,9 +846,9 @@ class EvaporationMixin:
         """Ideal-gas partials of a holdup, Pa.
 
         Owner of the conversion is
-        ``OverheadGasModel._compute_partial_pressures`` (bar). Pa is
-        that bar value times 1e5. The 1e5 cancels the owner's
-        ``R T / (V * 1e5)`` scale, leaving ``n R T / V``.
+        ``OverheadGasModel._compute_partial_pressures`` (bar). Multiplying
+        by ``PA_PER_BAR`` cancels the owner's bar scale, leaving
+        ``n R T / V``.
 
         Unit check: mol * J/(mol·K) * K / m³ = Pa. Limit: empty holdup,
         headspace off, or ``V <= 0`` gives no partials. An empty holdup
@@ -870,7 +871,7 @@ class EvaporationMixin:
         partials_pa: dict[str, float] = {}
         for species, raw_bar in partials_bar.items():
             try:
-                pressure_pa = float(raw_bar) * 1.0e5
+                pressure_pa = float(raw_bar) * PA_PER_BAR
             except (TypeError, ValueError):
                 continue
             if math.isfinite(pressure_pa) and pressure_pa > 0.0:
