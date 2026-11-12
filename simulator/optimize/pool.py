@@ -751,11 +751,10 @@ def _supervised_process_context(
     evaluate_fn: Callable[..., ScoredResult],
     warm_runtime_spec: _WarmRuntimeSpec | None,
 ) -> mp.context.BaseContext:
-    try:
-        pickle.dumps((task, evaluate_fn, warm_runtime_spec))
-    except Exception:
-        if os.name != "nt":
-            return mp.get_context("fork")
+    _assert_picklable(
+        (task, evaluate_fn, warm_runtime_spec),
+        "supervised pool task",
+    )
     return mp.get_context("spawn")
 
 
