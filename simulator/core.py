@@ -10785,7 +10785,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # same source is moot"). Subsequent intent flips
         # (EVAPORATION_FLUX, ...) sit on top of this same kernel.
         self._refresh_vapor_pressures_from_kernel(
-            result, simulation_hour=int(self.melt.hour) + 1,
+            result,
+            simulation_hour=int(self.melt.hour) + 1,
+            publish_interface_oxygen=True,
         )
         # SULFUR_SATURATION_GATE — post-equilibrium hook. Runs only when
         # Stage 0 left sulfide / sulfate inventory behind; otherwise
@@ -10869,6 +10871,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         include_diagnostic_shadows: bool = True,
         simulation_hour: int | None = None,
         observation_pO2_bar: float | None = None,
+        publish_interface_oxygen: bool = False,
     ) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.
 
@@ -11015,6 +11018,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             simulation_hour=simulation_hour,
             result=result,
         )
+        if publish_interface_oxygen:
+            # Hour publish only. The trial pressure model calls the vapour
+            # provider directly with its own trial log and must not land here.
+            # Direct refresh callers omit the flag and keep the reservoir log.
+            from simulator.chemistry.oxygen_interface import (
+                require_evaporation_oxygen_potential_log10,
+            )
+
+            intrinsic_fO2_log = require_evaporation_oxygen_potential_log10(
+                getattr(self, '_hour_interface_oxygen', None)
+            )
+            control_inputs['intrinsic_fO2_log'] = intrinsic_fO2_log
+            control_inputs['pO2_bar'] = 10.0 ** intrinsic_fO2_log
         dispatch_kwargs = {
             'control_inputs': control_inputs,
             'fO2_log': intrinsic_fO2_log,

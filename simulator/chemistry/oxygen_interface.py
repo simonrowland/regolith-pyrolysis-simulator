@@ -56,8 +56,13 @@ from typing import Literal
 
 from scipy.optimize import brentq
 
+from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
-from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
+from simulator.physical_constants import (
+    GAS_CONSTANT,
+    MELT_DISSOCIATION_PO2_MIN_BAR,
+    PA_PER_BAR,
+)
 
 
 _LOWER_LOG10_PO2_BAR = -30.0
@@ -120,6 +125,62 @@ class InterfaceOxygenSolution:
     evaporative_source_mol_s: float
     gas_source_mol_s: float
     residual_mol_s: float
+
+
+class MissingInterfaceOxygenPotential(AccountingError):
+    """The evaporation publish has no usable solved surface potential."""
+
+
+def require_evaporation_oxygen_potential_log10(solution: object | None) -> float:
+    """Return the hour's solved ``log10(p_s / bar)`` for the vapour publish.
+
+    This is ξ_s, the same potential the interface model solved. The melt
+    reservoir log is not a substitute. A shuttle-collapsed reservoir near
+    −48 is rewritten by ``physical_melt_dissociation_pO2_bar`` onto
+    ``MELT_DISSOCIATION_PO2_MIN_BAR`` (1e-30 bar), and that clamp must not
+    drive an evaporation debit.
+
+    A missing or non-finite surface is a typed refusal. A log strictly
+    below the dissociation floor would be clamped to that same 1e-30 bar,
+    so it is a refusal too. The solved bracket edge, exactly the floor, is
+    the predicted value (``fO2 < log10(min)`` is the clamp, not equality)
+    and is returned.
+
+    Unit check: the return is log10(bar), the vapour law's fO2 argument.
+    Limit: no solution object raises; a surface of 1 bar returns 0.
+    """
+
+    surface_log = (
+        getattr(solution, "surface_log10_pO2_bar", None)
+        if solution is not None
+        else None
+    )
+    if surface_log is None:
+        raise MissingInterfaceOxygenPotential(
+            "evaporation vapour pressures require the hour solved interface "
+            "oxygen potential xi_s; missing surface_log10_pO2_bar is a "
+            "typed refusal, not a dissociation-floor clamp"
+        )
+    try:
+        log10_p = float(surface_log)
+    except (TypeError, ValueError) as exc:
+        raise MissingInterfaceOxygenPotential(
+            "evaporation vapour pressures require a numeric solved interface "
+            f"oxygen potential; got {surface_log!r}"
+        ) from exc
+    if not math.isfinite(log10_p):
+        raise MissingInterfaceOxygenPotential(
+            "evaporation vapour pressures require a finite solved interface "
+            f"oxygen potential; got {log10_p!r}"
+        )
+    floor_log = math.log10(MELT_DISSOCIATION_PO2_MIN_BAR)
+    if log10_p < floor_log:
+        raise MissingInterfaceOxygenPotential(
+            "solved interface oxygen potential is below the melt dissociation "
+            f"floor ({MELT_DISSOCIATION_PO2_MIN_BAR:g} bar); refusing rather "
+            "than publishing the clamped pressure"
+        )
+    return log10_p
 
 
 def solve_interface_oxygen(

@@ -18,6 +18,8 @@ import yaml
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.oxygen_interface import (
     InterfaceOxygenChannel,
+    MissingInterfaceOxygenPotential,
+    require_evaporation_oxygen_potential_log10,
     solve_interface_oxygen,
 )
 from simulator.core import (
@@ -224,6 +226,85 @@ def test_lower_edge_predicts_at_the_bracket_and_does_not_zero() -> None:
     assert notice["bracket_edge"] is True
     assert notice["xi_s"] == pytest.approx(-30.0 * math.log(10.0), rel=1e-12)
     assert notice["solved"] is True
+
+
+def test_evaporation_publish_refuses_a_missing_surface() -> None:
+    with pytest.raises(MissingInterfaceOxygenPotential, match="xi_s"):
+        require_evaporation_oxygen_potential_log10(None)
+    with pytest.raises(MissingInterfaceOxygenPotential, match="dissociation"):
+        require_evaporation_oxygen_potential_log10(
+            SimpleNamespace(surface_log10_pO2_bar=-47.88)
+        )
+
+
+def test_evaporation_publish_uses_the_solved_surface_not_the_reservoir() -> None:
+    # Reservoir −40 would be rewritten to 1e-30 bar by the dissociation
+    # clamp. The publish must hand the vapour law the solved surface.
+    sim, _calls = _solve_hour(capacity=0.0, reservoir_log=-40.0, overhead=0.0)
+    solution = sim._hour_interface_oxygen
+    assert require_evaporation_oxygen_potential_log10(solution) == pytest.approx(
+        solution.surface_log10_pO2_bar
+    )
+    assert solution.surface_log10_pO2_bar > -30.0
+
+    seen: dict[str, float] = {}
+
+    def dispatch(_intent, **kwargs):
+        seen["fO2_log"] = float(kwargs["fO2_log"])
+        seen["intrinsic"] = float(kwargs["control_inputs"]["intrinsic_fO2_log"])
+        seen["pO2_bar"] = float(kwargs["control_inputs"]["pO2_bar"])
+        raise RuntimeError("stop-after-publish-inputs")
+
+    sim._dispatch_only = dispatch
+    sim._last_backend_diagnostics = {}
+    sim._oxygen_log_guard_bar = lambda: 1.0e-30
+    sim.melt.ambient_pressure_mbar = 10.0
+    sim.melt.campaign = SimpleNamespace(name="C2A")
+    sim.liquid_feo_domain_at = lambda _temperature_K: None
+    result = SimpleNamespace(
+        vapor_pressures_Pa={"Fe": 1.0},
+        vapor_pressures_source={},
+        warnings=[],
+        liquid_fraction=1.0,
+        diagnostics={},
+    )
+    with pytest.raises(RuntimeError, match="stop-after-publish-inputs"):
+        sim._refresh_vapor_pressures_from_kernel(
+            result,
+            publish_interface_oxygen=True,
+        )
+
+    assert seen["intrinsic"] == pytest.approx(solution.surface_log10_pO2_bar)
+    assert seen["fO2_log"] == pytest.approx(solution.surface_log10_pO2_bar)
+    assert seen["pO2_bar"] == pytest.approx(solution.surface_pO2_bar)
+    assert seen["intrinsic"] != pytest.approx(-40.0)
+
+
+def test_direct_refresh_keeps_the_reservoir_log() -> None:
+    sim, _calls = _solve_hour(capacity=0.0, reservoir_log=-2.0, overhead=0.0)
+    seen: dict[str, float] = {}
+
+    def dispatch(_intent, **kwargs):
+        seen["intrinsic"] = float(kwargs["control_inputs"]["intrinsic_fO2_log"])
+        raise RuntimeError("stop-after-publish-inputs")
+
+    sim._dispatch_only = dispatch
+    sim._last_backend_diagnostics = {}
+    sim._oxygen_log_guard_bar = lambda: 1.0e-30
+    sim.melt.ambient_pressure_mbar = 10.0
+    sim.melt.campaign = SimpleNamespace(name="C2A")
+    sim.liquid_feo_domain_at = lambda _temperature_K: None
+    result = SimpleNamespace(
+        vapor_pressures_Pa={"Fe": 1.0},
+        vapor_pressures_source={},
+        warnings=[],
+        liquid_fraction=1.0,
+        diagnostics={},
+    )
+    with pytest.raises(RuntimeError, match="stop-after-publish-inputs"):
+        sim._refresh_vapor_pressures_from_kernel(result)
+
+    assert seen["intrinsic"] == pytest.approx(-2.0)
 
 
 def test_same_temperature_reuses_the_surface() -> None:
