@@ -15,6 +15,7 @@ import pytest
 from simulator.battery.enums import (
     AmountBasis,
     Engine,
+    EvidenceClass,
     IdentityEqualKind,
     MethodToken,
     NoticeKind,
@@ -61,6 +62,8 @@ from simulator.battery.score import (
     FLAGGED_STRATUM_APPROXIMATE_VALUE,
     _approximate_pressure_notice,
     _ConditionHull,
+    ScoreContext,
+    compile_residual,
     flagged_strata,
     total_pressure_bar_for_score,
 )
@@ -72,7 +75,7 @@ from simulator.transport_regime import (
     high_edge_knudsen_clause,
     single_species_mean_free_path_m,
 )
-from tests.battery.factories import activity_identity, observation
+from tests.battery.factories import activity_identity, observation, tabulation_experiment, work
 
 # 50 significant figures of √10. Independent of the constructor.
 _PUBLISHED_SQRT10_50 = Decimal(
@@ -706,51 +709,31 @@ def test_tenth_millipascal_high_edge_is_free_molecular() -> None:
     assert "activity |Δlog10(a)| bound" not in notice.reason
 
 
-def test_exact_residue_amount_does_not_take_the_value_stratum() -> None:
+@pytest.mark.parametrize("approximate", (False, True))
+def test_exact_residue_amount_does_not_take_the_value_stratum(approximate: bool) -> None:
     band = approximate_pressure_from_printed_point(
         _point(_HASHIMOTO_PA, approximate=True)
     )
-    measured = Value(ValueKind.POINT, point=Decimal("12.5"), approximate=False)
-    notice = _approximate_pressure_notice(
-        _banded_identity(
-            Quantity.RESIDUE_COMPONENT_COMPOSITION, band, "1973.15"
-        ),
-        Quantity.RESIDUE_COMPONENT_COMPOSITION,
-        origin="kems-015",
-        method=MethodToken.LANGMUIR_FREE_EVAPORATION,
+    experiment = tabulation_experiment(method=MethodToken.LANGMUIR_FREE_EVAPORATION)
+    reference = observation(
+        "residue", experiment.experiment_id, _residue(band), Decimal("12.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
     )
-    assert notice is not None
-    assert notice.kind is not NoticeKind.APPROXIMATE_VALUE
-    value_notices = (
-        (
-            Notice(
-                kind=NoticeKind.APPROXIMATE_VALUE,
-                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                reason="approximate_printed_value",
-                origin="kems-015",
-            ),
-        )
-        if measured.approximate
-        else ()
+    reference = replace(reference, value=replace(reference.value, approximate=approximate))
+    source = work()
+    context = ScoreContext(
+        works={source.work_id: source},
+        experiments={experiment.experiment_id: experiment},
+        observations={reference.observation_id: reference},
     )
-    assert flagged_strata((notice, *value_notices)) == (
-        FLAGGED_STRATUM_APPROXIMATE_PRESSURE,
+    residual, _candidate = compile_residual(
+        reference, Engine.INTERNAL_ANALYTICAL, context=context,
     )
-    both = flagged_strata(
-        (
-            Notice(
-                kind=NoticeKind.APPROXIMATE_VALUE,
-                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                reason="approximate_printed_value",
-                origin="kems-015",
-            ),
-            notice,
-        )
-    )
-    assert both == (
-        FLAGGED_STRATUM_APPROXIMATE_VALUE,
-        FLAGGED_STRATUM_APPROXIMATE_PRESSURE,
-    )
+    strata = flagged_strata(residual.notices)
+    assert FLAGGED_STRATUM_APPROXIMATE_PRESSURE in strata
+    assert (FLAGGED_STRATUM_APPROXIMATE_VALUE in strata) is approximate
+    assert any(n.kind is NoticeKind.APPROXIMATE_PRESSURE for n in residual.notices)
+    assert any(n.kind is NoticeKind.APPROXIMATE_VALUE for n in residual.notices) is approximate
 
 
 def test_knudsen_residue_notice_is_the_band_sentence_only() -> None:
