@@ -44,9 +44,12 @@ from typing import Any, Iterable, Mapping, Sequence
 
 import yaml
 
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from simulator.physical_constants import ATM_PA, BAR_PA
 
-ROOT = Path(__file__).resolve().parents[1]
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 U0_PATH = ROOT / "data" / "vapour_rail_u0_manifest.yaml"
 VP_PATH = ROOT / "data" / "vapor_pressures.yaml"
